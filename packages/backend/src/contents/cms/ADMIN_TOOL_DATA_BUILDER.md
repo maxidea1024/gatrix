@@ -20,6 +20,7 @@ node adminToolDataBuilder.js
 ```
 
 실행 결과:
+
 - ✅ 7개의 JSON 파일 생성
 - ✅ 약 2초 소요
 - ✅ 총 50,000+ 항목 처리
@@ -52,6 +53,7 @@ node adminToolDataBuilder.js --output-dir /path/to/output
 ### 1. 보상 아이템 관련 (5개 파일)
 
 #### `reward-lookup.json` (~1.5MB)
+
 전체 REWARD_TYPE별 아이템 목록
 
 ```json
@@ -70,6 +72,7 @@ node adminToolDataBuilder.js --output-dir /path/to/output
 ```
 
 #### `reward-type-list.json` (~7KB)
+
 REWARD_TYPE 드롭다운용 목록
 
 ```json
@@ -85,6 +88,7 @@ REWARD_TYPE 드롭다운용 목록
 ```
 
 #### `reward-localization-kr.json` (~3KB)
+
 한국어 로컬라이징
 
 ```json
@@ -96,6 +100,7 @@ REWARD_TYPE 드롭다운용 목록
 ```
 
 #### `reward-localization-us.json` (~3KB)
+
 영어 로컬라이징
 
 ```json
@@ -107,6 +112,7 @@ REWARD_TYPE 드롭다운용 목록
 ```
 
 #### `reward-localization-cn.json` (~3KB)
+
 중국어 로컬라이징
 
 ```json
@@ -120,6 +126,7 @@ REWARD_TYPE 드롭다운용 목록
 ### 2. UI 목록 데이터 (1개 파일)
 
 #### `ui-list-data.json` (~34KB)
+
 국가, 마을, 촌락 목록
 
 ```json
@@ -132,13 +139,12 @@ REWARD_TYPE 드롭다운용 목록
     { "id": 11000000, "name": "리스본", "nationId": 10000000 },
     { "id": 11000001, "name": "세비야", "nationId": 10000001 }
   ],
-  "villages": [
-    { "id": 70500000, "name": "스비아인의 마을" }
-  ]
+  "villages": [{ "id": 70500000, "name": "스비아인의 마을" }]
 }
 ```
 
 **통계:**
+
 - 국가: 153개
 - 마을: 222개
 - 촌락: 72개
@@ -146,6 +152,7 @@ REWARD_TYPE 드롭다운용 목록
 ### 3. 로컬라이징 테이블 (1개 파일)
 
 #### `loctab` (~3.3MB)
+
 한글→중국어 번역 테이블
 
 ```json
@@ -157,6 +164,7 @@ REWARD_TYPE 드롭다운용 목록
 ```
 
 **통계:**
+
 - 총 50,222개 항목
 - 중복 제거: 686개
 
@@ -171,28 +179,28 @@ import rewardLookup from './reward-lookup.json';
 function RewardSelector() {
   const [selectedType, setSelectedType] = useState('');
   const [selectedItemId, setSelectedItemId] = useState('');
-  
+
   // REWARD_TYPE 드롭다운
-  const rewardTypes = rewardTypeList.filter(t => t.hasTable);
-  
+  const rewardTypes = rewardTypeList.filter((t) => t.hasTable);
+
   // 선택된 타입의 아이템 목록
   const items = selectedType ? rewardLookup[selectedType].items : [];
-  
+
   return (
     <div>
-      <select onChange={e => setSelectedType(e.target.value)}>
+      <select onChange={(e) => setSelectedType(e.target.value)}>
         <option value="">보상 타입 선택</option>
-        {rewardTypes.map(type => (
+        {rewardTypes.map((type) => (
           <option key={type.value} value={type.value}>
             {type.name} ({type.itemCount}개)
           </option>
         ))}
       </select>
-      
+
       {selectedType && (
-        <select onChange={e => setSelectedItemId(e.target.value)}>
+        <select onChange={(e) => setSelectedItemId(e.target.value)}>
           <option value="">아이템 선택</option>
-          {items.map(item => (
+          {items.map((item) => (
             <option key={item.id} value={item.id}>
               [{item.id}] {item.name}
             </option>
@@ -212,26 +220,26 @@ import uiListData from './ui-list-data.json';
 function LocationSelector() {
   const [selectedNation, setSelectedNation] = useState('');
   const [selectedTown, setSelectedTown] = useState('');
-  
+
   // 선택된 국가의 마을만 필터링
   const filteredTowns = selectedNation
-    ? uiListData.towns.filter(t => t.nationId === parseInt(selectedNation))
+    ? uiListData.towns.filter((t) => t.nationId === parseInt(selectedNation))
     : uiListData.towns;
-  
+
   return (
     <div>
-      <select onChange={e => setSelectedNation(e.target.value)}>
+      <select onChange={(e) => setSelectedNation(e.target.value)}>
         <option value="">국가 선택</option>
-        {uiListData.nations.map(nation => (
+        {uiListData.nations.map((nation) => (
           <option key={nation.id} value={nation.id}>
             [{nation.id}] {nation.name}
           </option>
         ))}
       </select>
-      
-      <select onChange={e => setSelectedTown(e.target.value)}>
+
+      <select onChange={(e) => setSelectedTown(e.target.value)}>
         <option value="">마을 선택</option>
-        {filteredTowns.map(town => (
+        {filteredTowns.map((town) => (
           <option key={town.id} value={town.id}>
             [{town.id}] {town.name}
           </option>
@@ -298,13 +306,13 @@ jobs:
 
 ## 📊 성능
 
-| 항목 | 값 |
-|------|------|
-| **실행 시간** | ~2초 |
-| **처리 항목 수** | 50,000+ |
-| **생성 파일 수** | 7개 |
-| **총 파일 크기** | ~5MB |
-| **메모리 사용량** | ~100MB |
+| 항목              | 값      |
+| ----------------- | ------- |
+| **실행 시간**     | ~2초    |
+| **처리 항목 수**  | 50,000+ |
+| **생성 파일 수**  | 7개     |
+| **총 파일 크기**  | ~5MB    |
+| **메모리 사용량** | ~100MB  |
 
 ## 🛠️ 문제 해결
 
@@ -326,6 +334,7 @@ node adminToolDataBuilder.js --rewards --ui-lists
 ### 특정 REWARD_TYPE 아이템이 없음
 
 CMS 테이블 파일이 존재하는지 확인:
+
 - `cms/server/Item.json`
 - `cms/server/Ship.json`
 - `cms/server/Mate.json`
@@ -340,4 +349,3 @@ CMS 테이블 파일이 존재하는지 확인:
 ## 🎉 완료!
 
 이제 운영툴에서 생성된 7개의 JSON 파일을 사용하면 됩니다!
-

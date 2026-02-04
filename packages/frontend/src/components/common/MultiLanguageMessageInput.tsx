@@ -1,9 +1,4 @@
-import React, {
-  useState,
-  useRef,
-  useImperativeHandle,
-  forwardRef,
-} from "react";
+import React, { useState, useRef, useImperativeHandle, forwardRef } from 'react';
 import {
   Box,
   TextField,
@@ -15,14 +10,14 @@ import {
   Tooltip,
   Stack,
   Paper,
-} from "@mui/material";
-import { Translate as TranslateIcon } from "@mui/icons-material";
-import { useTranslation } from "react-i18next";
-import { useSnackbar } from "notistack";
-import translationService from "@/services/translationService";
+} from '@mui/material';
+import { Translate as TranslateIcon } from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
+import { useSnackbar } from 'notistack';
+import translationService from '@/services/translationService';
 
 export interface MessageLocale {
-  lang: "ko" | "en" | "zh";
+  lang: 'ko' | 'en' | 'zh';
   message: string;
 }
 
@@ -61,9 +56,9 @@ export interface MultiLanguageMessageInputRef {
 }
 
 const availableLanguages = [
-  { code: "ko" as const, label: "한국어" },
-  { code: "en" as const, label: "English" },
-  { code: "zh" as const, label: "中文" },
+  { code: 'ko' as const, label: '한국어' },
+  { code: 'en' as const, label: 'English' },
+  { code: 'zh' as const, label: '中文' },
 ];
 
 const MultiLanguageMessageInput = forwardRef<
@@ -95,7 +90,7 @@ const MultiLanguageMessageInput = forwardRef<
       sx,
       paperSx,
     },
-    ref,
+    ref
   ) => {
     const { t } = useTranslation();
     const { enqueueSnackbar } = useSnackbar();
@@ -111,33 +106,30 @@ const MultiLanguageMessageInput = forwardRef<
 
     const handleTranslate = async () => {
       if (!defaultMessage || defaultMessage.trim().length === 0) {
-        enqueueSnackbar(t("multiLanguageMessage.noMessageToTranslate"), {
-          variant: "warning",
+        enqueueSnackbar(t('multiLanguageMessage.noMessageToTranslate'), {
+          variant: 'warning',
         });
         return;
       }
 
       setIsTranslating(true);
       try {
-        const translations =
-          await translationService.translateMaintenanceMessage(defaultMessage, [
-            "ko",
-            "en",
-            "zh",
-          ]);
+        const translations = await translationService.translateMaintenanceMessage(defaultMessage, [
+          'ko',
+          'en',
+          'zh',
+        ]);
 
-        console.log("Translation results:", translations);
+        console.log('Translation results:', translations);
 
         // 번역 결과를 locales에 적용
         const newLocales = availableLanguages.map((lang) => {
           const existingLocale = locales.find((l) => l.lang === lang.code);
           const translationResult = translations[lang.code];
           const translatedMessage =
-            translationResult?.translatedText || existingLocale?.message || "";
+            translationResult?.translatedText || existingLocale?.message || '';
 
-          console.log(
-            `Language ${lang.code}: translatedMessage = "${translatedMessage}"`,
-          );
+          console.log(`Language ${lang.code}: translatedMessage = "${translatedMessage}"`);
 
           return {
             lang: lang.code,
@@ -145,31 +137,30 @@ const MultiLanguageMessageInput = forwardRef<
           };
         });
 
-        console.log("New locales:", newLocales);
+        console.log('New locales:', newLocales);
 
         // 번역 결과 적용 (부모 컴포넌트에서 자동으로 supportsMultiLanguage를 true로 설정함)
         onLocalesChange(newLocales);
 
-        enqueueSnackbar(t("multiLanguageMessage.translationCompleted"), {
-          variant: "success",
+        enqueueSnackbar(t('multiLanguageMessage.translationCompleted'), {
+          variant: 'success',
         });
       } catch (error: any) {
-        enqueueSnackbar(
-          error.message || t("multiLanguageMessage.translationFailed"),
-          { variant: "error" },
-        );
+        enqueueSnackbar(error.message || t('multiLanguageMessage.translationFailed'), {
+          variant: 'error',
+        });
       } finally {
         setIsTranslating(false);
       }
     };
 
-    const updateLocale = (langCode: "ko" | "en" | "zh", message: string) => {
+    const updateLocale = (langCode: 'ko' | 'en' | 'zh', message: string) => {
       const newLocales = availableLanguages.map((lang) => {
         const existingLocale = locales.find((l) => l.lang === lang.code);
         if (lang.code === langCode) {
           return { lang: lang.code, message };
         }
-        return existingLocale || { lang: lang.code, message: "" };
+        return existingLocale || { lang: lang.code, message: '' };
       });
       onLocalesChange(newLocales);
     };
@@ -194,19 +185,17 @@ const MultiLanguageMessageInput = forwardRef<
           {/* 언어별 메시지 사용 여부 및 번역 버튼 */}
           <Box
             sx={{
-              display: "flex",
-              alignItems: "center",
+              display: 'flex',
+              alignItems: 'center',
               gap: 2,
-              flexWrap: "wrap",
+              flexWrap: 'wrap',
             }}
           >
             <FormControlLabel
               control={
                 <Switch
                   checked={supportsMultiLanguage}
-                  onChange={(e) =>
-                    onSupportsMultiLanguageChange(e.target.checked)
-                  }
+                  onChange={(e) => onSupportsMultiLanguageChange(e.target.checked)}
                 />
               }
               label={supportsMultiLanguageLabel}
@@ -219,16 +208,10 @@ const MultiLanguageMessageInput = forwardRef<
                   <Button
                     variant="outlined"
                     size="small"
-                    startIcon={
-                      isTranslating ? (
-                        <CircularProgress size={16} />
-                      ) : (
-                        <TranslateIcon />
-                      )
-                    }
+                    startIcon={isTranslating ? <CircularProgress size={16} /> : <TranslateIcon />}
                     onClick={handleTranslate}
                     disabled={isTranslating || !defaultMessage?.trim()}
-                    sx={{ minWidth: "auto" }}
+                    sx={{ minWidth: 'auto' }}
                   >
                     {translateButtonLabel}
                   </Button>
@@ -249,9 +232,9 @@ const MultiLanguageMessageInput = forwardRef<
               elevation={0}
               sx={{
                 p: 2,
-                bgcolor: "background.default",
-                border: "1px solid",
-                borderColor: "divider",
+                bgcolor: 'background.default',
+                border: '1px solid',
+                borderColor: 'divider',
                 ...paperSx,
               }}
             >
@@ -268,8 +251,8 @@ const MultiLanguageMessageInput = forwardRef<
                       key={lang.code}
                       sx={{
                         p: 2,
-                        border: "1px solid",
-                        borderColor: "divider",
+                        border: '1px solid',
+                        borderColor: 'divider',
                         borderRadius: 1,
                       }}
                     >
@@ -280,15 +263,12 @@ const MultiLanguageMessageInput = forwardRef<
                         fullWidth
                         multiline
                         rows={3}
-                        value={locale?.message || ""}
-                        onChange={(e) =>
-                          updateLocale(lang.code, e.target.value)
-                        }
-                        placeholder={t(
-                          "multiLanguageMessage.languagePlaceholder",
-                          { language: lang.label },
-                        )}
-                        helperText={t("multiLanguageMessage.emptyUsesDefault")}
+                        value={locale?.message || ''}
+                        onChange={(e) => updateLocale(lang.code, e.target.value)}
+                        placeholder={t('multiLanguageMessage.languagePlaceholder', {
+                          language: lang.label,
+                        })}
+                        helperText={t('multiLanguageMessage.emptyUsesDefault')}
                       />
                     </Box>
                   );
@@ -299,9 +279,9 @@ const MultiLanguageMessageInput = forwardRef<
         </Stack>
       </Box>
     );
-  },
+  }
 );
 
-MultiLanguageMessageInput.displayName = "MultiLanguageMessageInput";
+MultiLanguageMessageInput.displayName = 'MultiLanguageMessageInput';
 
 export default MultiLanguageMessageInput;

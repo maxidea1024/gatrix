@@ -1,17 +1,7 @@
-import React, {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  ReactNode,
-} from "react";
-import {
-  createTheme,
-  Theme,
-  ThemeProvider as MuiThemeProvider,
-} from "@mui/material/styles";
-import { useTranslation } from "react-i18next";
-import { ThemeMode } from "@/types";
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createTheme, Theme, ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
+import { useTranslation } from 'react-i18next';
+import { ThemeMode } from '@/types';
 
 interface ThemeContextType {
   mode: ThemeMode;
@@ -21,13 +11,11 @@ interface ThemeContextType {
   isDark: boolean;
 }
 
-export const ThemeContext = createContext<ThemeContextType | undefined>(
-  undefined,
-);
+export const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 // Theme configurations
-const getTheme = (mode: "light" | "dark", language: string): Theme => {
-  const isChinese = language.startsWith("zh");
+const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
+  const isChinese = language.startsWith('zh');
   const fontFamily = isChinese
     ? '"Microsoft YaHei", "微软雅黑", "Source Han Sans SC", "思源黑体", "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Roboto", "Helvetica", "Arial", sans-serif'
     : '"Roboto", "Helvetica", "Arial", sans-serif';
@@ -36,22 +24,22 @@ const getTheme = (mode: "light" | "dark", language: string): Theme => {
     palette: {
       mode,
       primary: {
-        main: mode === "dark" ? "#6EA8FF" : "#1976d2",
-        light: mode === "dark" ? "#8FB9FF" : "#42a5f5",
-        dark: mode === "dark" ? "#3D7DFF" : "#1565c0",
+        main: mode === 'dark' ? '#6EA8FF' : '#1976d2',
+        light: mode === 'dark' ? '#8FB9FF' : '#42a5f5',
+        dark: mode === 'dark' ? '#3D7DFF' : '#1565c0',
       },
       secondary: {
-        main: mode === "dark" ? "#f48fb1" : "#dc004e",
-        light: mode === "dark" ? "#f8bbd9" : "#e91e63",
-        dark: mode === "dark" ? "#f06292" : "#c51162",
+        main: mode === 'dark' ? '#f48fb1' : '#dc004e',
+        light: mode === 'dark' ? '#f8bbd9' : '#e91e63',
+        dark: mode === 'dark' ? '#f06292' : '#c51162',
       },
       background: {
-        default: mode === "dark" ? "#0D0F12" : "#fafafa",
-        paper: mode === "dark" ? "#15181D" : "#ffffff",
+        default: mode === 'dark' ? '#0D0F12' : '#fafafa',
+        paper: mode === 'dark' ? '#15181D' : '#ffffff',
       },
       text: {
-        primary: mode === "dark" ? "#FFFFFF" : "#000000",
-        secondary: mode === "dark" ? "#9AA4AF" : "#666666",
+        primary: mode === 'dark' ? '#FFFFFF' : '#000000',
+        secondary: mode === 'dark' ? '#9AA4AF' : '#666666',
       },
     },
     zIndex: {
@@ -67,27 +55,27 @@ const getTheme = (mode: "light" | "dark", language: string): Theme => {
     typography: {
       fontFamily,
       h1: {
-        fontSize: "2.5rem",
+        fontSize: '2.5rem',
         fontWeight: 500,
       },
       h2: {
-        fontSize: "2rem",
+        fontSize: '2rem',
         fontWeight: 500,
       },
       h3: {
-        fontSize: "1.75rem",
+        fontSize: '1.75rem',
         fontWeight: 500,
       },
       h4: {
-        fontSize: "1.5rem",
+        fontSize: '1.5rem',
         fontWeight: 500,
       },
       h5: {
-        fontSize: "1.25rem",
+        fontSize: '1.25rem',
         fontWeight: 500,
       },
       h6: {
-        fontSize: "1rem",
+        fontSize: '1rem',
         fontWeight: 500,
       },
     },
@@ -99,9 +87,7 @@ const getTheme = (mode: "light" | "dark", language: string): Theme => {
         styleOverrides: {
           root: {
             boxShadow:
-              mode === "dark"
-                ? "0px 2px 4px rgba(0, 0, 0, 0.3)"
-                : "0px 2px 4px rgba(0, 0, 0, 0.1)",
+              mode === 'dark' ? '0px 2px 4px rgba(0, 0, 0, 0.3)' : '0px 2px 4px rgba(0, 0, 0, 0.1)',
           },
         },
       },
@@ -115,8 +101,8 @@ const getTheme = (mode: "light" | "dark", language: string): Theme => {
       MuiDrawer: {
         styleOverrides: {
           paper: {
-            backgroundColor: mode === "dark" ? "#1e1e1e" : "#ffffff",
-            borderRight: "none",
+            backgroundColor: mode === 'dark' ? '#1e1e1e' : '#ffffff',
+            borderRight: 'none',
             borderRadius: 0,
           },
         },
@@ -126,16 +112,14 @@ const getTheme = (mode: "light" | "dark", language: string): Theme => {
           root: {
             borderRadius: 0,
             boxShadow:
-              mode === "dark"
-                ? "0px 2px 8px rgba(0, 0, 0, 0.3)"
-                : "0px 2px 8px rgba(0, 0, 0, 0.1)",
+              mode === 'dark' ? '0px 2px 8px rgba(0, 0, 0, 0.3)' : '0px 2px 8px rgba(0, 0, 0, 0.1)',
           },
         },
       },
       MuiButton: {
         styleOverrides: {
           root: {
-            textTransform: "none",
+            textTransform: 'none',
             borderRadius: 0,
             fontWeight: 500,
           },
@@ -144,21 +128,19 @@ const getTheme = (mode: "light" | "dark", language: string): Theme => {
       MuiPagination: {
         styleOverrides: {
           root: {
-            "& .MuiPaginationItem-root": {
+            '& .MuiPaginationItem-root': {
               borderRadius: 0,
               fontWeight: 500,
-              "&.Mui-selected": {
-                backgroundColor: mode === "dark" ? "#6EA8FF" : "#1976d2",
-                color: "#fff",
-                "&:hover": {
-                  backgroundColor: mode === "dark" ? "#5A96E6" : "#1565c0",
+              '&.Mui-selected': {
+                backgroundColor: mode === 'dark' ? '#6EA8FF' : '#1976d2',
+                color: '#fff',
+                '&:hover': {
+                  backgroundColor: mode === 'dark' ? '#5A96E6' : '#1565c0',
                 },
               },
-              "&:hover": {
+              '&:hover': {
                 backgroundColor:
-                  mode === "dark"
-                    ? "rgba(255, 255, 255, 0.08)"
-                    : "rgba(0, 0, 0, 0.04)",
+                  mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)',
               },
             },
           },
@@ -167,24 +149,17 @@ const getTheme = (mode: "light" | "dark", language: string): Theme => {
       MuiTextField: {
         styleOverrides: {
           root: {
-            "& .MuiOutlinedInput-root": {
+            '& .MuiOutlinedInput-root': {
               borderRadius: 0,
-              backgroundColor:
-                mode === "dark" ? "rgba(255, 255, 255, 0.03)" : "inherit",
-              "& fieldset": {
-                borderColor:
-                  mode === "dark"
-                    ? "rgba(255, 255, 255, 0.12)"
-                    : "rgba(0, 0, 0, 0.12)",
+              backgroundColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : 'inherit',
+              '& fieldset': {
+                borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.12)',
               },
-              "&:hover fieldset": {
-                borderColor:
-                  mode === "dark"
-                    ? "rgba(255, 255, 255, 0.2)"
-                    : "rgba(0, 0, 0, 0.2)",
+              '&:hover fieldset': {
+                borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
               },
-              "&.Mui-focused fieldset": {
-                borderColor: mode === "dark" ? "#6EA8FF" : "#1976d2",
+              '&.Mui-focused fieldset': {
+                borderColor: mode === 'dark' ? '#6EA8FF' : '#1976d2',
               },
             },
           },
@@ -193,9 +168,9 @@ const getTheme = (mode: "light" | "dark", language: string): Theme => {
       MuiInputLabel: {
         styleOverrides: {
           root: {
-            color: mode === "dark" ? "rgba(255, 255, 255, 0.7)" : undefined,
-            "&.Mui-focused": {
-              color: mode === "dark" ? "#6EA8FF" : undefined,
+            color: mode === 'dark' ? 'rgba(255, 255, 255, 0.7)' : undefined,
+            '&.Mui-focused': {
+              color: mode === 'dark' ? '#6EA8FF' : undefined,
             },
           },
         },
@@ -203,24 +178,20 @@ const getTheme = (mode: "light" | "dark", language: string): Theme => {
       MuiTableRow: {
         styleOverrides: {
           root: {
-            transition: "background-color 0.15s ease-in-out",
-            "&:not(:last-child)": {
-              "& td": {
-                borderBottom: "none",
+            transition: 'background-color 0.15s ease-in-out',
+            '&:not(:last-child)': {
+              '& td': {
+                borderBottom: 'none',
               },
             },
             // Zebra stripes for better row separation
-            "&:nth-of-type(even)": {
+            '&:nth-of-type(even)': {
               backgroundColor:
-                mode === "dark"
-                  ? "rgba(255, 255, 255, 0.04)"
-                  : "rgba(0, 0, 0, 0.025)",
+                mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : 'rgba(0, 0, 0, 0.025)',
             },
-            "&:hover": {
+            '&:hover': {
               backgroundColor:
-                mode === "dark"
-                  ? "rgba(255, 255, 255, 0.08)"
-                  : "rgba(0, 0, 0, 0.05)",
+                mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)',
             },
           },
         },
@@ -228,28 +199,24 @@ const getTheme = (mode: "light" | "dark", language: string): Theme => {
       MuiTableCell: {
         styleOverrides: {
           root: {
-            borderBottom: "none",
+            borderBottom: 'none',
           },
           head: {
-            backgroundColor:
-              mode === "dark"
-                ? "rgba(255, 255, 255, 0.04)"
-                : "rgba(0, 0, 0, 0.02)",
+            backgroundColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : 'rgba(0, 0, 0, 0.02)',
             borderBottom:
-              mode === "dark"
-                ? "1px solid rgba(255, 255, 255, 0.12)"
-                : "1px solid rgba(0, 0, 0, 0.12)",
+              mode === 'dark'
+                ? '1px solid rgba(255, 255, 255, 0.12)'
+                : '1px solid rgba(0, 0, 0, 0.12)',
           },
         },
       },
       MuiDialog: {
         styleOverrides: {
           root: {
-            "& .MuiBackdrop-root": {
-              backgroundColor:
-                mode === "dark" ? "rgba(0, 0, 0, 0.7)" : "rgba(0, 0, 0, 0.5)",
-              backdropFilter: "blur(8px)",
-              WebkitBackdropFilter: "blur(8px)", // Safari support
+            '& .MuiBackdrop-root': {
+              backgroundColor: mode === 'dark' ? 'rgba(0, 0, 0, 0.7)' : 'rgba(0, 0, 0, 0.5)',
+              backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)', // Safari support
             },
           },
           paper: {
@@ -261,15 +228,14 @@ const getTheme = (mode: "light" | "dark", language: string): Theme => {
         styleOverrides: {
           root: {
             // Dialog와 Drawer에만 블러 효과 적용, Select는 제외
-            "&:not(.MuiSelect-root) .MuiBackdrop-root": {
-              backgroundColor:
-                mode === "dark" ? "rgba(0, 0, 0, 0.7)" : "rgba(0, 0, 0, 0.5)",
-              backdropFilter: "blur(8px)",
-              WebkitBackdropFilter: "blur(8px)", // Safari support
+            '&:not(.MuiSelect-root) .MuiBackdrop-root': {
+              backgroundColor: mode === 'dark' ? 'rgba(0, 0, 0, 0.7)' : 'rgba(0, 0, 0, 0.5)',
+              backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)', // Safari support
             },
             // Select 드롭다운용 투명한 배경
-            "&.MuiSelect-root .MuiBackdrop-root": {
-              backgroundColor: "transparent",
+            '&.MuiSelect-root .MuiBackdrop-root': {
+              backgroundColor: 'transparent',
             },
           },
         },
@@ -281,9 +247,9 @@ const getTheme = (mode: "light" | "dark", language: string): Theme => {
             // Portal은 기본값(false)을 사용하고, z-index는 theme.zIndex.modal을 따르게 함
             BackdropProps: {
               style: {
-                backgroundColor: "transparent",
-                backdropFilter: "none",
-                WebkitBackdropFilter: "none",
+                backgroundColor: 'transparent',
+                backdropFilter: 'none',
+                WebkitBackdropFilter: 'none',
               },
             },
             PaperProps: {
@@ -299,9 +265,9 @@ const getTheme = (mode: "light" | "dark", language: string): Theme => {
           disableScrollLock: true,
           BackdropProps: {
             style: {
-              backgroundColor: "transparent",
-              backdropFilter: "none",
-              WebkitBackdropFilter: "none",
+              backgroundColor: 'transparent',
+              backdropFilter: 'none',
+              WebkitBackdropFilter: 'none',
             },
           },
           PaperProps: {
@@ -323,9 +289,9 @@ const getTheme = (mode: "light" | "dark", language: string): Theme => {
           disableScrollLock: true,
           BackdropProps: {
             style: {
-              backgroundColor: "transparent",
-              backdropFilter: "none",
-              WebkitBackdropFilter: "none",
+              backgroundColor: 'transparent',
+              backdropFilter: 'none',
+              WebkitBackdropFilter: 'none',
             },
             invisible: true,
           },
@@ -336,30 +302,28 @@ const getTheme = (mode: "light" | "dark", language: string): Theme => {
 };
 
 // Detect system theme preference
-const getSystemTheme = (): "light" | "dark" => {
-  if (typeof window !== "undefined" && window.matchMedia) {
-    return window.matchMedia("(prefers-color-scheme: dark)").matches
-      ? "dark"
-      : "light";
+const getSystemTheme = (): 'light' | 'dark' => {
+  if (typeof window !== 'undefined' && window.matchMedia) {
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   }
-  return "light";
+  return 'light';
 };
 
 // Get stored theme preference
 const getStoredTheme = (): ThemeMode => {
-  if (typeof window !== "undefined") {
-    const stored = localStorage.getItem("theme") as ThemeMode;
-    if (stored && ["light", "dark", "auto"].includes(stored)) {
+  if (typeof window !== 'undefined') {
+    const stored = localStorage.getItem('theme') as ThemeMode;
+    if (stored && ['light', 'dark', 'auto'].includes(stored)) {
       return stored;
     }
   }
-  return "auto";
+  return 'auto';
 };
 
 // Store theme preference
 const storeTheme = (mode: ThemeMode): void => {
-  if (typeof window !== "undefined") {
-    localStorage.setItem("theme", mode);
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('theme', mode);
   }
 };
 
@@ -369,43 +333,41 @@ interface ThemeProviderProps {
 
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   const [mode, setMode] = useState<ThemeMode>(getStoredTheme);
-  const [systemTheme, setSystemTheme] = useState<"light" | "dark">(
-    getSystemTheme,
-  );
+  const [systemTheme, setSystemTheme] = useState<'light' | 'dark'>(getSystemTheme);
   const { i18n } = useTranslation();
 
   // Listen for system theme changes
   useEffect(() => {
-    if (typeof window !== "undefined" && window.matchMedia) {
-      const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    if (typeof window !== 'undefined' && window.matchMedia) {
+      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
       const handleChange = (e: MediaQueryListEvent) => {
-        setSystemTheme(e.matches ? "dark" : "light");
+        setSystemTheme(e.matches ? 'dark' : 'light');
       };
 
-      mediaQuery.addEventListener("change", handleChange);
-      return () => mediaQuery.removeEventListener("change", handleChange);
+      mediaQuery.addEventListener('change', handleChange);
+      return () => mediaQuery.removeEventListener('change', handleChange);
     }
   }, []);
 
   // Determine actual theme based on mode
-  const actualTheme = mode === "auto" ? systemTheme : mode;
+  const actualTheme = mode === 'auto' ? systemTheme : mode;
   const theme = React.useMemo(
     () => getTheme(actualTheme, i18n.language),
-    [actualTheme, i18n.language],
+    [actualTheme, i18n.language]
   );
-  const isDark = actualTheme === "dark";
+  const isDark = actualTheme === 'dark';
 
   // Set data-theme attribute on document root for CSS selectors
   useEffect(() => {
-    if (typeof document !== "undefined") {
-      document.documentElement.setAttribute("data-theme", actualTheme);
+    if (typeof document !== 'undefined') {
+      document.documentElement.setAttribute('data-theme', actualTheme);
     }
   }, [actualTheme]);
 
   const toggleTheme = () => {
     // Simple toggle between light and dark (skip auto mode for better UX)
-    const newMode: ThemeMode = actualTheme === "dark" ? "light" : "dark";
+    const newMode: ThemeMode = actualTheme === 'dark' ? 'light' : 'dark';
     setMode(newMode);
     storeTheme(newMode);
   };
@@ -433,7 +395,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
 export const useTheme = (): ThemeContextType => {
   const context = useContext(ThemeContext);
   if (context === undefined) {
-    throw new Error("useTheme must be used within a ThemeProvider");
+    throw new Error('useTheme must be used within a ThemeProvider');
   }
   return context;
 };

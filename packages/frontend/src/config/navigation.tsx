@@ -7,9 +7,9 @@
  * Icon names: See menuIcons.ts for available icons
  * Permission shorthand: 'users' auto-expands to ['users.view', 'users.manage']
  */
-import React from "react";
-import { Permission, PERMISSIONS } from "@/types/permissions";
-import { getIcon } from "./menuIcons";
+import React from 'react';
+import { Permission, PERMISSIONS } from '@/types/permissions';
+import { getIcon } from './menuIcons';
 
 // ==================== Types ====================
 
@@ -86,7 +86,7 @@ export interface MenuCategory {
  * e.g., 'users' -> [PERMISSIONS.USERS_VIEW, PERMISSIONS.USERS_MANAGE]
  */
 function expandPermission(shorthand: string): Permission[] {
-  const key = shorthand.toUpperCase().replace(/-/g, "_");
+  const key = shorthand.toUpperCase().replace(/-/g, '_');
   const viewKey = `${key}_VIEW` as keyof typeof PERMISSIONS;
   const manageKey = `${key}_MANAGE` as keyof typeof PERMISSIONS;
 
@@ -123,187 +123,187 @@ function getItemPermissions(item: MenuItemConfig): Permission[] | undefined {
 export const MENU_CONFIG: MenuCategoryConfig[] = [
   // Navigation (Base menu for all users)
   {
-    id: "navigation",
-    text: "sidebar.navigation",
-    icon: "Dashboard",
+    id: 'navigation',
+    text: 'sidebar.navigation',
+    icon: 'Dashboard',
     children: [
-      { text: "sidebar.dashboard", icon: "Dashboard", path: "/dashboard" },
-      { text: "settings.general.title", icon: "Settings", path: "/settings" },
+      { text: 'sidebar.dashboard', icon: 'Dashboard', path: '/dashboard' },
+      { text: 'settings.general.title', icon: 'Settings', path: '/settings' },
     ],
   },
 
   // Admin Panel
   {
-    id: "admin-panel",
-    text: "sidebar.adminPanel",
-    icon: "AdminPanelSettings",
+    id: 'admin-panel',
+    text: 'sidebar.adminPanel',
+    icon: 'AdminPanelSettings',
     adminOnly: true,
     children: [
       {
-        text: "sidebar.userManagement",
-        icon: "People",
-        path: "/admin/users",
-        permission: "users",
+        text: 'sidebar.userManagement',
+        icon: 'People',
+        path: '/admin/users',
+        permission: 'users',
       },
       {
-        text: "sidebar.clientVersions",
-        icon: "Widgets",
-        path: "/admin/client-versions",
-        permission: "client-versions",
+        text: 'sidebar.clientVersions',
+        icon: 'Widgets',
+        path: '/admin/client-versions',
+        permission: 'client-versions',
       },
       {
-        text: "sidebar.gameWorlds",
-        icon: "Language",
-        path: "/admin/game-worlds",
-        permission: "game-worlds",
+        text: 'sidebar.gameWorlds',
+        icon: 'Language',
+        path: '/admin/game-worlds',
+        permission: 'game-worlds',
       },
       {
-        text: "sidebar.serviceControl",
-        icon: "Build",
-        permission: "maintenance",
+        text: 'sidebar.serviceControl',
+        icon: 'Build',
+        permission: 'maintenance',
         children: [
           {
-            text: "sidebar.maintenance",
-            icon: "Build",
-            path: "/admin/maintenance",
-            permission: "maintenance",
+            text: 'sidebar.maintenance',
+            icon: 'Build',
+            path: '/admin/maintenance',
+            permission: 'maintenance',
           },
           {
-            text: "sidebar.playerConnections",
-            icon: "People",
-            path: "/admin/player-connections",
-            permission: "maintenance",
+            text: 'sidebar.playerConnections',
+            icon: 'People',
+            path: '/admin/player-connections',
+            permission: 'maintenance',
           },
         ],
       },
       {
-        text: "sidebar.maintenanceTemplates",
-        icon: "TextFields",
-        path: "/admin/maintenance-templates",
-        permission: "maintenance-templates",
+        text: 'sidebar.maintenanceTemplates',
+        icon: 'TextFields',
+        path: '/admin/maintenance-templates',
+        permission: 'maintenance-templates',
       },
       {
-        text: "sidebar.scheduleManagement",
-        icon: "Schedule",
-        permission: "scheduler",
+        text: 'sidebar.scheduleManagement',
+        icon: 'Schedule',
+        permission: 'scheduler',
         children: [
           {
-            text: "sidebar.scheduler",
-            icon: "Schedule",
-            path: "/admin/scheduler",
-            permission: "scheduler",
+            text: 'sidebar.scheduler',
+            icon: 'Schedule',
+            path: '/admin/scheduler',
+            permission: 'scheduler',
           },
           {
-            text: "sidebar.jobs",
-            icon: "Work",
-            path: "/admin/jobs",
-            permission: "scheduler",
+            text: 'sidebar.jobs',
+            icon: 'Work',
+            path: '/admin/jobs',
+            permission: 'scheduler',
           },
           {
-            text: "sidebar.queueMonitor",
-            icon: "Monitor",
-            path: "/admin/queue-monitor",
-            permission: "scheduler",
+            text: 'sidebar.queueMonitor',
+            icon: 'Monitor',
+            path: '/admin/queue-monitor',
+            permission: 'scheduler',
           },
         ],
       },
       {
-        text: "sidebar.auditLogs",
-        icon: "History",
-        path: "/admin/audit-logs",
+        text: 'sidebar.auditLogs',
+        icon: 'History',
+        path: '/admin/audit-logs',
         requiredPermission: PERMISSIONS.AUDIT_LOGS_VIEW,
       },
       {
-        text: "sidebar.realtimeEvents",
-        icon: "Timeline",
-        path: "/admin/realtime-events",
+        text: 'sidebar.realtimeEvents',
+        icon: 'Timeline',
+        path: '/admin/realtime-events',
         requiredPermission: PERMISSIONS.REALTIME_EVENTS_VIEW,
       },
       {
-        text: "sidebar.crashEvents",
-        icon: "BugReport",
-        path: "/admin/crash-events",
+        text: 'sidebar.crashEvents',
+        icon: 'BugReport',
+        path: '/admin/crash-events',
         requiredPermission: PERMISSIONS.CRASH_EVENTS_VIEW,
       },
       {
-        text: "sidebar.security",
-        icon: "Security",
-        permission: "security",
+        text: 'sidebar.security',
+        icon: 'Security',
+        permission: 'security',
         children: [
           {
-            text: "sidebar.apiAccessTokens",
-            icon: "VpnKey",
-            path: "/admin/api-tokens",
-            permission: "security",
+            text: 'sidebar.apiAccessTokens',
+            icon: 'VpnKey',
+            path: '/admin/api-tokens',
+            permission: 'security',
           },
           {
-            text: "sidebar.whitelist",
-            icon: "Security",
-            path: "/admin/whitelist",
-            permission: "security",
+            text: 'sidebar.whitelist',
+            icon: 'Security',
+            path: '/admin/whitelist',
+            permission: 'security',
           },
         ],
       },
       {
-        text: "sidebar.serverManagement",
-        icon: "Dns",
-        permission: "servers",
+        text: 'sidebar.serverManagement',
+        icon: 'Dns',
+        permission: 'servers',
         children: [
           {
-            text: "sidebar.serverList",
-            icon: "Storage",
-            path: "/admin/server-list",
-            permission: "servers",
+            text: 'sidebar.serverList',
+            icon: 'Storage',
+            path: '/admin/server-list',
+            permission: 'servers',
           },
           {
-            text: "sidebar.serverLifecycle",
-            icon: "History",
-            path: "/admin/server-lifecycle",
+            text: 'sidebar.serverLifecycle',
+            icon: 'History',
+            path: '/admin/server-lifecycle',
             requiredPermission: PERMISSIONS.SERVERS_VIEW,
           },
           {
-            text: "sidebar.gatrixEdges",
-            icon: "Dns",
-            path: "/admin/gatrix-edges",
+            text: 'sidebar.gatrixEdges',
+            icon: 'Dns',
+            path: '/admin/gatrix-edges',
             requiredPermission: PERMISSIONS.SERVERS_VIEW,
           },
         ],
       },
       {
-        text: "sidebar.monitoring",
-        icon: "Monitor",
+        text: 'sidebar.monitoring',
+        icon: 'Monitor',
         requiredPermission: PERMISSIONS.MONITORING_VIEW,
         children: [
           {
-            text: "sidebar.grafana",
-            icon: "Monitor",
-            path: "/admin/grafana-dashboard",
+            text: 'sidebar.grafana',
+            icon: 'Monitor',
+            path: '/admin/grafana-dashboard',
             requiredPermission: PERMISSIONS.MONITORING_VIEW,
           },
           {
-            text: "sidebar.logs",
-            icon: "Monitor",
-            path: "/monitoring/logs",
+            text: 'sidebar.logs',
+            icon: 'Monitor',
+            path: '/monitoring/logs',
             requiredPermission: PERMISSIONS.MONITORING_VIEW,
           },
           {
-            text: "sidebar.alerts",
-            icon: "Notifications",
-            path: "/monitoring/alerts",
+            text: 'sidebar.alerts',
+            icon: 'Notifications',
+            path: '/monitoring/alerts',
             requiredPermission: PERMISSIONS.MONITORING_VIEW,
           },
         ],
       },
       {
-        text: "sidebar.openApi",
-        icon: "Api",
-        path: "/admin/open-api",
+        text: 'sidebar.openApi',
+        icon: 'Api',
+        path: '/admin/open-api',
         requiredPermission: PERMISSIONS.OPEN_API_VIEW,
       },
       {
-        text: "sidebar.console",
-        icon: "Terminal",
-        path: "/admin/console",
+        text: 'sidebar.console',
+        icon: 'Terminal',
+        path: '/admin/console',
         requiredPermission: PERMISSIONS.CONSOLE_ACCESS,
       },
     ],
@@ -311,101 +311,101 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
 
   // Game Management
   {
-    id: "game-management",
-    text: "sidebar.gameManagement",
-    icon: "SportsEsports",
+    id: 'game-management',
+    text: 'sidebar.gameManagement',
+    icon: 'SportsEsports',
     adminOnly: true,
     children: [
       {
-        text: "sidebar.serviceNotices",
-        icon: "Announcement",
-        path: "/game/service-notices",
-        permission: "service-notices",
+        text: 'sidebar.serviceNotices',
+        icon: 'Announcement',
+        path: '/game/service-notices',
+        permission: 'service-notices',
       },
       {
-        text: "sidebar.ingamePopupNotices",
-        icon: "Notifications",
-        path: "/game/ingame-popup-notices",
-        permission: "ingame-popup-notices",
+        text: 'sidebar.ingamePopupNotices',
+        icon: 'Notifications',
+        path: '/game/ingame-popup-notices',
+        permission: 'ingame-popup-notices',
       },
       {
-        text: "sidebar.coupons",
-        icon: "ConfirmationNumber",
-        permission: "coupons",
+        text: 'sidebar.coupons',
+        icon: 'ConfirmationNumber',
+        permission: 'coupons',
         children: [
           {
-            text: "sidebar.couponSettings",
-            icon: "Settings",
-            path: "/game/coupon-settings",
-            permission: "coupons",
+            text: 'sidebar.couponSettings',
+            icon: 'Settings',
+            path: '/game/coupon-settings',
+            permission: 'coupons',
           },
           {
-            text: "sidebar.couponUsage",
-            icon: "History",
-            path: "/game/coupon-usage",
-            permission: "coupons",
+            text: 'sidebar.couponUsage',
+            icon: 'History',
+            path: '/game/coupon-usage',
+            permission: 'coupons',
           },
         ],
       },
       {
-        text: "sidebar.surveys",
-        icon: "Poll",
-        path: "/game/surveys",
-        permission: "surveys",
+        text: 'sidebar.surveys',
+        icon: 'Poll',
+        path: '/game/surveys',
+        permission: 'surveys',
       },
       {
-        text: "sidebar.operationEvents",
-        icon: "Event",
-        permission: "operation-events",
+        text: 'sidebar.operationEvents',
+        icon: 'Event',
+        permission: 'operation-events',
         children: [
           {
-            text: "sidebar.hotTimeButtonEvent",
-            icon: "Whatshot",
-            path: "/game/hot-time-button-event",
-            permission: "operation-events",
+            text: 'sidebar.hotTimeButtonEvent',
+            icon: 'Whatshot',
+            path: '/game/hot-time-button-event',
+            permission: 'operation-events',
           },
           {
-            text: "sidebar.liveEvent",
-            icon: "Celebration",
-            path: "/game/live-event",
-            permission: "operation-events",
+            text: 'sidebar.liveEvent',
+            icon: 'Celebration',
+            path: '/game/live-event',
+            permission: 'operation-events',
           },
         ],
       },
       {
-        text: "sidebar.storeProducts",
-        icon: "Storefront",
-        path: "/game/store-products",
-        permission: "store-products",
+        text: 'sidebar.storeProducts',
+        icon: 'Storefront',
+        path: '/game/store-products',
+        permission: 'store-products',
       },
       {
-        text: "sidebar.rewardTemplates",
-        icon: "CardGiftcard",
-        path: "/game/reward-templates",
-        permission: "reward-templates",
+        text: 'sidebar.rewardTemplates',
+        icon: 'CardGiftcard',
+        path: '/game/reward-templates',
+        permission: 'reward-templates',
       },
       {
-        text: "sidebar.banners",
-        icon: "ViewCarousel",
-        path: "/game/banners",
-        permission: "banners",
+        text: 'sidebar.banners',
+        icon: 'ViewCarousel',
+        path: '/game/banners',
+        permission: 'banners',
       },
       {
-        text: "sidebar.planningData",
-        icon: "Storage",
-        permission: "planning-data",
+        text: 'sidebar.planningData',
+        icon: 'Storage',
+        permission: 'planning-data',
         children: [
           {
-            text: "sidebar.planningDataManagement",
-            icon: "Storage",
-            path: "/game/planning-data",
-            permission: "planning-data",
+            text: 'sidebar.planningDataManagement',
+            icon: 'Storage',
+            path: '/game/planning-data',
+            permission: 'planning-data',
           },
           {
-            text: "sidebar.planningDataHistory",
-            icon: "History",
-            path: "/game/planning-data-history",
-            permission: "planning-data",
+            text: 'sidebar.planningDataHistory',
+            icon: 'History',
+            path: '/game/planning-data-history',
+            permission: 'planning-data',
           },
         ],
       },
@@ -414,120 +414,120 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
 
   // Event Lens
   {
-    id: "event-lens",
-    text: "sidebar.eventLens",
-    icon: "Insights",
+    id: 'event-lens',
+    text: 'sidebar.eventLens',
+    icon: 'Insights',
     adminOnly: true,
     children: [
       {
-        text: "sidebar.projects",
-        icon: "Folder",
-        path: "/admin/event-lens/projects",
-        permission: "event-lens",
+        text: 'sidebar.projects',
+        icon: 'Folder',
+        path: '/admin/event-lens/projects',
+        permission: 'event-lens',
       },
     ],
   },
 
   // Feature Flags
   {
-    id: "feature-flags",
-    text: "sidebar.featureFlagsCategory",
-    icon: "Flag",
+    id: 'feature-flags',
+    text: 'sidebar.featureFlagsCategory',
+    icon: 'Flag',
     adminOnly: true,
     children: [
       {
-        text: "sidebar.featureFlags",
-        icon: "Flag",
-        path: "/feature-flags",
-        permission: "feature-flags",
+        text: 'sidebar.featureFlags',
+        icon: 'Flag',
+        path: '/feature-flags',
+        permission: 'feature-flags',
       },
       {
-        text: "sidebar.featureSegments",
-        icon: "People",
-        path: "/feature-flags/segments",
-        permission: "feature-flags",
+        text: 'sidebar.featureSegments',
+        icon: 'People',
+        path: '/feature-flags/segments',
+        permission: 'feature-flags',
       },
       {
-        text: "sidebar.featureContextFields",
-        icon: "SettingsSuggest",
-        path: "/feature-flags/context-fields",
-        permission: "feature-flags",
+        text: 'sidebar.featureContextFields',
+        icon: 'SettingsSuggest',
+        path: '/feature-flags/context-fields',
+        permission: 'feature-flags',
       },
       {
-        text: "sidebar.featureFlagTypes",
-        icon: "Category",
-        path: "/feature-flags/types",
-        permission: "feature-flags",
+        text: 'sidebar.featureFlagTypes',
+        icon: 'Category',
+        path: '/feature-flags/types',
+        permission: 'feature-flags',
       },
       {
-        text: "sidebar.featureNetwork",
-        icon: "Hub",
-        path: "/feature-flags/network",
-        permission: "feature-flags",
+        text: 'sidebar.featureNetwork',
+        icon: 'Hub',
+        path: '/feature-flags/network',
+        permission: 'feature-flags',
       },
       {
-        text: "sidebar.unknownFlags",
-        icon: "HelpOutline",
-        path: "/feature-flags/unknown",
-        permission: "feature-flags",
+        text: 'sidebar.unknownFlags',
+        icon: 'HelpOutline',
+        path: '/feature-flags/unknown',
+        permission: 'feature-flags',
       },
     ],
   },
 
   // Change Requests (conditional)
   {
-    id: "change-requests",
-    text: "sidebar.changeRequests",
-    icon: "Campaign",
-    path: "/admin/change-requests",
+    id: 'change-requests',
+    text: 'sidebar.changeRequests',
+    icon: 'Campaign',
+    path: '/admin/change-requests',
     adminOnly: true,
     condition: (options) => options.requiresApproval !== false,
     children: [
       {
-        text: "sidebar.changeRequests",
-        icon: "Campaign",
-        path: "/admin/change-requests",
-        permission: "change-requests",
+        text: 'sidebar.changeRequests',
+        icon: 'Campaign',
+        path: '/admin/change-requests',
+        permission: 'change-requests',
       },
     ],
   },
 
   // Settings
   {
-    id: "settings",
-    text: "sidebar.settings",
-    icon: "Settings",
+    id: 'settings',
+    text: 'sidebar.settings',
+    icon: 'Settings',
     adminOnly: true,
     children: [
       {
-        text: "settings.systemSettings",
-        icon: "Settings",
-        path: "/settings/system",
-        permission: "system-settings",
+        text: 'settings.systemSettings',
+        icon: 'Settings',
+        path: '/settings/system',
+        permission: 'system-settings',
       },
       {
-        text: "tags.title",
-        icon: "Label",
-        path: "/settings/tags",
-        permission: "tags",
+        text: 'tags.title',
+        icon: 'Label',
+        path: '/settings/tags',
+        permission: 'tags',
       },
       {
-        text: "sidebar.dataManagement",
-        icon: "CloudSync",
-        path: "/admin/data-management",
-        permission: "data-management",
+        text: 'sidebar.dataManagement',
+        icon: 'CloudSync',
+        path: '/admin/data-management',
+        permission: 'data-management',
       },
       {
-        text: "environments.title",
-        icon: "Layers",
-        path: "/settings/environments",
-        permission: "environments",
+        text: 'environments.title',
+        icon: 'Layers',
+        path: '/settings/environments',
+        permission: 'environments',
       },
       {
-        text: "integrations.title",
-        icon: "Extension",
-        path: "/settings/integrations",
-        permission: "security",
+        text: 'integrations.title',
+        icon: 'Extension',
+        path: '/settings/integrations',
+        permission: 'security',
       },
     ],
   },
@@ -558,7 +558,7 @@ function convertMenuItem(config: MenuItemConfig): MenuItem {
  */
 function convertCategory(
   config: MenuCategoryConfig,
-  badges?: Record<string, string | number>,
+  badges?: Record<string, string | number>
 ): MenuCategory {
   return {
     id: config.id,
@@ -580,7 +580,7 @@ function convertCategory(
 export const getMenuCategories = (
   isAdmin: boolean,
   badges?: Record<string, string | number>,
-  options?: MenuOptions,
+  options?: MenuOptions
 ): MenuCategory[] => {
   const mergedOptions: MenuOptions = { ...options, badges };
 
@@ -607,7 +607,7 @@ export const getMenuCategories = (
       // Sum badges for category
       const sumBadges = (items: MenuItem[]): number => {
         return items.reduce((sum, item) => {
-          const itemBadge = typeof item.badge === "number" ? item.badge : 0;
+          const itemBadge = typeof item.badge === 'number' ? item.badge : 0;
           const childrenSum = item.children ? sumBadges(item.children) : 0;
           return sum + itemBadge + childrenSum;
         }, 0);
@@ -626,7 +626,7 @@ export const getMenuCategories = (
 export const getAllMenuItems = (isAdmin: boolean): MenuItem[] => {
   if (!isAdmin) {
     // Return only navigation items for non-admin
-    const navConfig = MENU_CONFIG.find((c) => c.id === "navigation");
+    const navConfig = MENU_CONFIG.find((c) => c.id === 'navigation');
     return navConfig ? navConfig.children.map(convertMenuItem) : [];
   }
 
@@ -646,32 +646,27 @@ export interface NavItem {
   divider?: boolean;
 }
 
-export const menuItemToNavItem = (
-  item: MenuItem,
-  _parentPath?: string,
-): NavItem => {
+export const menuItemToNavItem = (item: MenuItem, _parentPath?: string): NavItem => {
   const iconName = (() => {
     const type = item.icon.type as any;
     if (type) {
-      return (type.displayName || type.name || "Dashboard").replace("Icon", "");
+      return (type.displayName || type.name || 'Dashboard').replace('Icon', '');
     }
-    return "Dashboard";
+    return 'Dashboard';
   })();
 
   const id = item.path
-    ? item.path.replace(/\//g, "-").replace(/^-/, "")
-    : item.text.replace(/\./g, "-").toLowerCase();
+    ? item.path.replace(/\//g, '-').replace(/^-/, '')
+    : item.text.replace(/\./g, '-').toLowerCase();
 
   return {
     id,
     label: item.text,
     icon: iconName,
     path: item.path,
-    roles: item.adminOnly ? ["admin"] : undefined,
+    roles: item.adminOnly ? ['admin'] : undefined,
     divider: item.divider,
-    children: item.children?.map((child) =>
-      menuItemToNavItem(child, item.path),
-    ),
+    children: item.children?.map((child) => menuItemToNavItem(child, item.path)),
   };
 };
 

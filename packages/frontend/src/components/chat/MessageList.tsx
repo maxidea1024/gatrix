@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Box,
   Typography,
@@ -12,15 +12,15 @@ import {
   ListItemAvatar,
   ListItemText,
   Divider,
-} from "@mui/material";
-import { Send as SendIcon } from "@mui/icons-material";
-import { useTranslation } from "react-i18next";
-import { useChat } from "../../contexts/ChatContext";
-import { Message, MessageType } from "../../types/chat";
-import { format } from "date-fns";
-import { ko, enUS, zhCN } from "date-fns/locale";
-import TypingIndicator from "./TypingIndicator";
-import MessageContent from "./MessageContent";
+} from '@mui/material';
+import { Send as SendIcon } from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
+import { useChat } from '../../contexts/ChatContext';
+import { Message, MessageType } from '../../types/chat';
+import { format } from 'date-fns';
+import { ko, enUS, zhCN } from 'date-fns/locale';
+import TypingIndicator from './TypingIndicator';
+import MessageContent from './MessageContent';
 import {
   MainContainer,
   ChatContainer,
@@ -34,17 +34,14 @@ import {
   VoiceCallButton,
   VideoCallButton,
   MessageModel,
-} from "@chatscope/chat-ui-kit-react";
+} from '@chatscope/chat-ui-kit-react';
 
 interface MessageListProps {
   channelId: number;
   onSendMessage?: (message: string, attachments?: File[]) => void;
 }
 
-const MessageList: React.FC<MessageListProps> = ({
-  channelId,
-  onSendMessage,
-}) => {
+const MessageList: React.FC<MessageListProps> = ({ channelId, onSendMessage }) => {
   const { t, i18n } = useTranslation();
   const { state, actions } = useChat();
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -55,9 +52,9 @@ const MessageList: React.FC<MessageListProps> = ({
 
   const getDateLocale = () => {
     switch (i18n.language) {
-      case "ko":
+      case 'ko':
         return ko;
-      case "zh":
+      case 'zh':
         return zhCN;
       default:
         return enUS;
@@ -71,7 +68,7 @@ const MessageList: React.FC<MessageListProps> = ({
       setIsLoadingMore(true);
       await actions.loadMoreMessages(channelId);
     } catch (error) {
-      console.error("Failed to load more messages:", error);
+      console.error('Failed to load more messages:', error);
     } finally {
       setIsLoadingMore(false);
     }
@@ -81,7 +78,7 @@ const MessageList: React.FC<MessageListProps> = ({
     innerHtml: string,
     textContent: string,
     innerText: string,
-    nodes: any[],
+    nodes: any[]
   ) => {
     if (textContent.trim() && onSendMessage) {
       onSendMessage(textContent.trim());
@@ -90,7 +87,7 @@ const MessageList: React.FC<MessageListProps> = ({
 
   const handleAttachmentSend = async (files: File[]) => {
     if (files.length > 0 && onSendMessage) {
-      onSendMessage("", files);
+      onSendMessage('', files);
     }
   };
 
@@ -98,13 +95,11 @@ const MessageList: React.FC<MessageListProps> = ({
   const convertToChatScopeMessages = (messages: Message[]): MessageModel[] => {
     return messages.map((msg, index) => {
       const currentUser = state.user;
-      const direction =
-        msg.userId === currentUser?.id ? "outgoing" : "incoming";
+      const direction = msg.userId === currentUser?.id ? 'outgoing' : 'incoming';
 
       // 사용자 정보 안전하게 가져오기
       const messageUser = state.users[msg.userId];
-      const senderName =
-        messageUser?.username || messageUser?.name || `User ${msg.userId}`;
+      const senderName = messageUser?.username || messageUser?.name || `User ${msg.userId}`;
 
       return {
         message: msg.content,
@@ -118,30 +113,27 @@ const MessageList: React.FC<MessageListProps> = ({
   };
 
   const getMessagePosition = (message: Message, index: number) => {
-    const isFirst =
-      index === 0 || messages[index - 1]?.userId !== message.userId;
-    const isLast =
-      index === messages.length - 1 ||
-      messages[index + 1]?.userId !== message.userId;
+    const isFirst = index === 0 || messages[index - 1]?.userId !== message.userId;
+    const isLast = index === messages.length - 1 || messages[index + 1]?.userId !== message.userId;
 
-    if (isFirst && isLast) return "single";
-    if (isFirst) return "first";
-    if (isLast) return "last";
-    return "normal";
+    if (isFirst && isLast) return 'single';
+    if (isFirst) return 'first';
+    if (isLast) return 'last';
+    return 'normal';
   };
 
   const getMessageType = (type: MessageType) => {
     switch (type) {
-      case "image":
-        return "image";
-      case "video":
-        return "video";
-      case "audio":
-        return "audio";
-      case "file":
-        return "custom";
+      case 'image':
+        return 'image';
+      case 'video':
+        return 'video';
+      case 'audio':
+        return 'audio';
+      case 'file':
+        return 'custom';
       default:
-        return "text";
+        return 'text';
     }
   };
 
@@ -151,11 +143,11 @@ const MessageList: React.FC<MessageListProps> = ({
     const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60);
 
     if (diffInHours < 24) {
-      return format(date, "HH:mm");
+      return format(date, 'HH:mm');
     } else if (diffInHours < 24 * 7) {
-      return format(date, "EEE HH:mm", { locale: getDateLocale() });
+      return format(date, 'EEE HH:mm', { locale: getDateLocale() });
     } else {
-      return format(date, "MMM dd, HH:mm", { locale: getDateLocale() });
+      return format(date, 'MMM dd, HH:mm', { locale: getDateLocale() });
     }
   };
 
@@ -166,19 +158,19 @@ const MessageList: React.FC<MessageListProps> = ({
       <MainContainer>
         <ChatContainer>
           <ConversationHeader>
-            <Avatar name={currentChannel?.name || ""} />
+            <Avatar name={currentChannel?.name || ''} />
             <ConversationHeader.Content
-              userName={currentChannel?.name || t("chat.selectChannel")}
-              info={currentChannel?.description || ""}
+              userName={currentChannel?.name || t('chat.selectChannel')}
+              info={currentChannel?.description || ''}
             />
           </ConversationHeader>
 
           <ChatMessageList>
-            <MessageSeparator content={t("chat.noMessages")} />
+            <MessageSeparator content={t('chat.noMessages')} />
           </ChatMessageList>
 
           <MessageInput
-            placeholder={t("chat.typeMessage")}
+            placeholder={t('chat.typeMessage')}
             onSend={handleSendMessage}
             attachButton={true}
           />
@@ -192,10 +184,10 @@ const MessageList: React.FC<MessageListProps> = ({
       <ChatContainer>
         {/* Channel Header */}
         <ConversationHeader>
-          <Avatar name={currentChannel?.name || ""} />
+          <Avatar name={currentChannel?.name || ''} />
           <ConversationHeader.Content
-            userName={currentChannel?.name || ""}
-            info={`${currentChannel?.memberCount || 0} ${t("chat.members")}`}
+            userName={currentChannel?.name || ''}
+            info={`${currentChannel?.memberCount || 0} ${t('chat.members')}`}
           />
           <ConversationHeader.Actions>
             <VoiceCallButton />
@@ -211,26 +203,24 @@ const MessageList: React.FC<MessageListProps> = ({
               <ChatTypingIndicator
                 content={
                   typingUsers.length === 1
-                    ? t("chat.userTyping", {
+                    ? t('chat.userTyping', {
                         user: typingUsers[0].user.username,
                       })
-                    : t("chat.usersTyping", { count: typingUsers.length })
+                    : t('chat.usersTyping', { count: typingUsers.length })
                 }
               />
             ) : undefined
           }
         >
           {isLoadingMore && (
-            <Box sx={{ display: "flex", justifyContent: "center", p: 2 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'center', p: 2 }}>
               <CircularProgress size={24} />
             </Box>
           )}
 
           {chatScopeMessages.map((message, index) => {
             const originalMessage = messages[index];
-            const messageUser = originalMessage
-              ? state.users[originalMessage.userId]
-              : null;
+            const messageUser = originalMessage ? state.users[originalMessage.userId] : null;
 
             return (
               <ChatMessage key={index} model={message}>
@@ -239,7 +229,7 @@ const MessageList: React.FC<MessageListProps> = ({
                   name={
                     messageUser?.username ||
                     messageUser?.name ||
-                    `User ${originalMessage?.userId || ""}`
+                    `User ${originalMessage?.userId || ''}`
                   }
                 />
               </ChatMessage>
@@ -249,7 +239,7 @@ const MessageList: React.FC<MessageListProps> = ({
 
         {/* Message Input */}
         <MessageInput
-          placeholder={t("chat.typeMessage")}
+          placeholder={t('chat.typeMessage')}
           onSend={handleSendMessage}
           attachButton={true}
           disabled={!currentChannel}

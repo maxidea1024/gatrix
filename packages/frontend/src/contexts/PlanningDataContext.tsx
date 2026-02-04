@@ -1,10 +1,10 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import planningDataService, {
   RewardTypeInfo,
   RewardLookupData,
-} from "../services/planningDataService";
-import { useEnvironment } from "./EnvironmentContext";
+} from '../services/planningDataService';
+import { useEnvironment } from './EnvironmentContext';
 
 interface PlanningDataContextType {
   rewardTypes: RewardTypeInfo[];
@@ -14,14 +14,12 @@ interface PlanningDataContextType {
   refresh: () => Promise<void>;
 }
 
-const PlanningDataContext = createContext<PlanningDataContextType | undefined>(
-  undefined,
-);
+const PlanningDataContext = createContext<PlanningDataContextType | undefined>(undefined);
 
 export const usePlanningData = () => {
   const context = useContext(PlanningDataContext);
   if (!context) {
-    throw new Error("usePlanningData must be used within PlanningDataProvider");
+    throw new Error('usePlanningData must be used within PlanningDataProvider');
   }
   return context;
 };
@@ -30,15 +28,11 @@ interface PlanningDataProviderProps {
   children: React.ReactNode;
 }
 
-export const PlanningDataProvider: React.FC<PlanningDataProviderProps> = ({
-  children,
-}) => {
+export const PlanningDataProvider: React.FC<PlanningDataProviderProps> = ({ children }) => {
   const { i18n } = useTranslation();
   const { currentEnvironmentId } = useEnvironment();
   const [rewardTypes, setRewardTypes] = useState<RewardTypeInfo[]>([]);
-  const [rewardLookup, setRewardLookup] = useState<RewardLookupData | null>(
-    null,
-  );
+  const [rewardLookup, setRewardLookup] = useState<RewardLookupData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [hasLoaded, setHasLoaded] = useState(false);
@@ -54,16 +48,12 @@ export const PlanningDataProvider: React.FC<PlanningDataProviderProps> = ({
   // Listen for planning data updates via custom event (dispatched by SSE handler)
   useEffect(() => {
     const handlePlanningDataUpdate = () => {
-      console.log("Planning data updated, reloading...");
+      console.log('Planning data updated, reloading...');
       loadPlanningData();
     };
 
-    window.addEventListener("planning-data-updated", handlePlanningDataUpdate);
-    return () =>
-      window.removeEventListener(
-        "planning-data-updated",
-        handlePlanningDataUpdate,
-      );
+    window.addEventListener('planning-data-updated', handlePlanningDataUpdate);
+    return () => window.removeEventListener('planning-data-updated', handlePlanningDataUpdate);
   }, []);
 
   const loadPlanningData = async () => {
@@ -72,12 +62,12 @@ export const PlanningDataProvider: React.FC<PlanningDataProviderProps> = ({
       setError(null);
 
       // Map i18n language to API language
-      const languageMap: Record<string, "kr" | "en" | "zh"> = {
-        ko: "kr",
-        en: "en",
-        zh: "zh",
+      const languageMap: Record<string, 'kr' | 'en' | 'zh'> = {
+        ko: 'kr',
+        en: 'en',
+        zh: 'zh',
       };
-      const language = languageMap[i18n.language] || "kr";
+      const language = languageMap[i18n.language] || 'kr';
 
       // Load reward types
       const types = await planningDataService.getRewardTypeList();
@@ -87,9 +77,9 @@ export const PlanningDataProvider: React.FC<PlanningDataProviderProps> = ({
       const lookup = await planningDataService.getRewardLookup(language);
       setRewardLookup(lookup);
     } catch (err: any) {
-      const errorMessage = err?.message || "Failed to load planning data";
+      const errorMessage = err?.message || 'Failed to load planning data';
       setError(errorMessage);
-      console.error("Failed to load planning data:", err);
+      console.error('Failed to load planning data:', err);
     } finally {
       setIsLoading(false);
     }
@@ -103,11 +93,7 @@ export const PlanningDataProvider: React.FC<PlanningDataProviderProps> = ({
     refresh: loadPlanningData,
   };
 
-  return (
-    <PlanningDataContext.Provider value={value}>
-      {children}
-    </PlanningDataContext.Provider>
-  );
+  return <PlanningDataContext.Provider value={value}>{children}</PlanningDataContext.Provider>;
 };
 
 export default PlanningDataContext;

@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from "react";
-import { useAuth } from "@/hooks/useAuth";
-import { PERMISSIONS } from "@/types/permissions";
+import React, { useState, useEffect, useRef } from 'react';
+import { useAuth } from '@/hooks/useAuth';
+import { PERMISSIONS } from '@/types/permissions';
 import {
   Box,
   Typography,
@@ -34,7 +34,7 @@ import {
   AccordionSummary,
   AccordionDetails,
   InputLabel,
-} from "@mui/material";
+} from '@mui/material';
 import {
   Add as AddIcon,
   Save as SaveIcon,
@@ -47,25 +47,25 @@ import {
   Stop as StopIcon,
   ExpandMore as ExpandMoreIcon,
   History as HistoryIcon,
-} from "@mui/icons-material";
-import { useTranslation } from "react-i18next";
-import { useSnackbar } from "notistack";
+} from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
+import { useSnackbar } from 'notistack';
 
-import moment from "moment";
-import "moment/locale/ko";
+import moment from 'moment';
+import 'moment/locale/ko';
 
 // FullCalendar imports
-import FullCalendar from "@fullcalendar/react";
-import dayGridPlugin from "@fullcalendar/daygrid";
-import timeGridPlugin from "@fullcalendar/timegrid";
-import interactionPlugin from "@fullcalendar/interaction";
-import koLocale from "@fullcalendar/core/locales/ko";
-import enLocale from "@fullcalendar/core/locales/en-gb";
-import zhLocale from "@fullcalendar/core/locales/zh-cn";
+import FullCalendar from '@fullcalendar/react';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import timeGridPlugin from '@fullcalendar/timegrid';
+import interactionPlugin from '@fullcalendar/interaction';
+import koLocale from '@fullcalendar/core/locales/ko';
+import enLocale from '@fullcalendar/core/locales/en-gb';
+import zhLocale from '@fullcalendar/core/locales/zh-cn';
 
-import { formatDateTimeDetailed } from "@/utils/dateFormat";
-import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
-import FormDialogHeader from "@/components/common/FormDialogHeader";
+import { formatDateTimeDetailed } from '@/utils/dateFormat';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import FormDialogHeader from '@/components/common/FormDialogHeader';
 
 // 스케줄 이벤트 타입 정의
 interface ScheduleEvent {
@@ -88,7 +88,7 @@ interface JobDetail {
   description?: string;
   jobClass: string;
   dataMap: Record<string, any>;
-  status: "active" | "paused" | "error";
+  status: 'active' | 'paused' | 'error';
   lastExecution?: Date;
   nextExecution?: Date;
 }
@@ -99,13 +99,13 @@ interface TriggerDetail {
   group: string;
   jobName: string;
   jobGroup: string;
-  type: "cron" | "simple" | "calendar" | "daily";
+  type: 'cron' | 'simple' | 'calendar' | 'daily';
   cronExpression?: string;
   repeatInterval?: number;
   repeatCount?: number;
   startTime: Date;
   endTime?: Date;
-  status: "active" | "paused" | "complete" | "error";
+  status: 'active' | 'paused' | 'complete' | 'error';
   nextFireTime?: Date;
   previousFireTime?: Date;
 }
@@ -119,7 +119,7 @@ interface JobExecution {
   startTime: Date;
   endTime?: Date;
   duration?: number;
-  status: "running" | "success" | "error";
+  status: 'running' | 'success' | 'error';
   errorMessage?: string;
 }
 
@@ -129,7 +129,7 @@ interface CreateScheduleEventData {
   end?: Date;
   description?: string;
   allDay?: boolean;
-  scheduleType: "once" | "cron" | "interval";
+  scheduleType: 'once' | 'cron' | 'interval';
   cronExpression: string;
   intervalMinutes: number;
   repeatCount: number; // -1은 무한 반복
@@ -159,23 +159,23 @@ const SchedulerPage: React.FC = () => {
   const [editingEvent, setEditingEvent] = useState<ScheduleEvent | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [formData, setFormData] = useState<CreateScheduleEventData>({
-    title: "",
+    title: '',
     start: new Date(),
     end: undefined,
-    description: "",
+    description: '',
     allDay: false,
-    scheduleType: "interval",
-    cronExpression: "0 0 12 * * ?", // 매일 정오
+    scheduleType: 'interval',
+    cronExpression: '0 0 12 * * ?', // 매일 정오
     intervalMinutes: 1,
     repeatCount: -1,
-    calendar: "--- Not Set ---",
-    misfireInstruction: "Smart Policy",
+    calendar: '--- Not Set ---',
+    misfireInstruction: 'Smart Policy',
     priority: 5,
-    timeZone: "Asia/Seoul",
+    timeZone: 'Asia/Seoul',
     repeatForever: true,
-    startTimeOfDay: "00:00:00",
-    endTimeOfDay: "23:59:59",
-    daysOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+    startTimeOfDay: '00:00:00',
+    endTimeOfDay: '23:59:59',
+    daysOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
     jobDataMap: {},
   });
 
@@ -186,37 +186,37 @@ const SchedulerPage: React.FC = () => {
       // 임시 데이터
       const mockEvents: ScheduleEvent[] = [
         {
-          id: "1",
-          title: "팀 미팅",
-          start: "2024-01-15T10:00:00",
-          end: "2024-01-15T11:00:00",
-          description: "주간 팀 미팅",
-          backgroundColor: "#1976d2",
-          borderColor: "#1976d2",
+          id: '1',
+          title: '팀 미팅',
+          start: '2024-01-15T10:00:00',
+          end: '2024-01-15T11:00:00',
+          description: '주간 팀 미팅',
+          backgroundColor: '#1976d2',
+          borderColor: '#1976d2',
         },
         {
-          id: "2",
-          title: "프로젝트 리뷰",
-          start: "2024-01-16T14:00:00",
-          end: "2024-01-16T16:00:00",
-          description: "분기별 프로젝트 리뷰",
-          backgroundColor: "#388e3c",
-          borderColor: "#388e3c",
+          id: '2',
+          title: '프로젝트 리뷰',
+          start: '2024-01-16T14:00:00',
+          end: '2024-01-16T16:00:00',
+          description: '분기별 프로젝트 리뷰',
+          backgroundColor: '#388e3c',
+          borderColor: '#388e3c',
         },
         {
-          id: "3",
-          title: "시스템 점검",
-          start: "2024-01-17",
+          id: '3',
+          title: '시스템 점검',
+          start: '2024-01-17',
           allDay: true,
-          description: "정기 시스템 점검",
-          backgroundColor: "#f57c00",
-          borderColor: "#f57c00",
+          description: '정기 시스템 점검',
+          backgroundColor: '#f57c00',
+          borderColor: '#f57c00',
         },
       ];
       setEvents(mockEvents);
     } catch (error) {
-      console.error("Failed to load schedule events:", error);
-      enqueueSnackbar(t("scheduler.errors.loadFailed"), { variant: "error" });
+      console.error('Failed to load schedule events:', error);
+      enqueueSnackbar(t('scheduler.errors.loadFailed'), { variant: 'error' });
     } finally {
       setLoading(false);
     }
@@ -231,10 +231,10 @@ const SchedulerPage: React.FC = () => {
     setSelectedDate(selectInfo.start);
     setEditingEvent(null);
     setFormData({
-      title: "",
+      title: '',
       start: selectInfo.start,
       end: selectInfo.end,
-      description: "",
+      description: '',
       allDay: selectInfo.allDay,
     });
     setDialogOpen(true);
@@ -247,7 +247,7 @@ const SchedulerPage: React.FC = () => {
       title: event.title,
       start: event.start.toISOString(),
       end: event.end ? event.end.toISOString() : undefined,
-      description: event.extendedProps.description || "",
+      description: event.extendedProps.description || '',
       allDay: event.allDay,
       backgroundColor: event.backgroundColor,
       borderColor: event.borderColor,
@@ -256,7 +256,7 @@ const SchedulerPage: React.FC = () => {
       title: event.title,
       start: event.start,
       end: event.end,
-      description: event.extendedProps.description || "",
+      description: event.extendedProps.description || '',
       allDay: event.allDay,
     });
     setDialogOpen(true);
@@ -266,10 +266,10 @@ const SchedulerPage: React.FC = () => {
     setEditingEvent(null);
     setSelectedDate(new Date());
     setFormData({
-      title: "",
+      title: '',
       start: new Date(),
       end: undefined,
-      description: "",
+      description: '',
       allDay: false,
     });
     setDialogOpen(true);
@@ -277,18 +277,18 @@ const SchedulerPage: React.FC = () => {
 
   const handleSave = async () => {
     if (!formData.title.trim()) {
-      enqueueSnackbar(t("scheduler.titleRequired"), { variant: "error" });
+      enqueueSnackbar(t('scheduler.titleRequired'), { variant: 'error' });
       return;
     }
 
     if (!formData.start) {
-      enqueueSnackbar(t("scheduler.startTimeRequired"), { variant: "error" });
+      enqueueSnackbar(t('scheduler.startTimeRequired'), { variant: 'error' });
       return;
     }
 
     // 종료 시간이 시작 시간보다 이전인지 확인
     if (formData.end && formData.end <= formData.start) {
-      enqueueSnackbar(t("scheduler.endTimeAfterStart"), { variant: "error" });
+      enqueueSnackbar(t('scheduler.endTimeAfterStart'), { variant: 'error' });
       return;
     }
 
@@ -296,16 +296,16 @@ const SchedulerPage: React.FC = () => {
     try {
       // 임시 구현 (실제로는 API 호출)
       if (editingEvent) {
-        enqueueSnackbar(t("scheduler.eventUpdated"), { variant: "success" });
+        enqueueSnackbar(t('scheduler.eventUpdated'), { variant: 'success' });
       } else {
-        enqueueSnackbar(t("scheduler.eventCreated"), { variant: "success" });
+        enqueueSnackbar(t('scheduler.eventCreated'), { variant: 'success' });
       }
 
       setDialogOpen(false);
       await loadEvents();
     } catch (error) {
-      console.error("Failed to save schedule event:", error);
-      enqueueSnackbar(t("scheduler.errors.saveFailed"), { variant: "error" });
+      console.error('Failed to save schedule event:', error);
+      enqueueSnackbar(t('scheduler.errors.saveFailed'), { variant: 'error' });
     } finally {
       setSaving(false);
     }
@@ -314,18 +314,18 @@ const SchedulerPage: React.FC = () => {
   const handleDelete = async () => {
     if (!editingEvent) return;
 
-    if (!confirm(t("scheduler.confirmDelete", { name: editingEvent.title }))) {
+    if (!confirm(t('scheduler.confirmDelete', { name: editingEvent.title }))) {
       return;
     }
 
     try {
       // 임시 구현 (실제로는 API 호출)
-      enqueueSnackbar(t("scheduler.eventDeleted"), { variant: "success" });
+      enqueueSnackbar(t('scheduler.eventDeleted'), { variant: 'success' });
       setDialogOpen(false);
       await loadEvents();
     } catch (error) {
-      console.error("Failed to delete schedule event:", error);
-      enqueueSnackbar(t("scheduler.errors.deleteFailed"), { variant: "error" });
+      console.error('Failed to delete schedule event:', error);
+      enqueueSnackbar(t('scheduler.errors.deleteFailed'), { variant: 'error' });
     }
   };
 
@@ -336,11 +336,11 @@ const SchedulerPage: React.FC = () => {
   // FullCalendar 로케일 선택
   const getCalendarLocale = () => {
     switch (currentLanguage) {
-      case "en":
+      case 'en':
         return enLocale;
-      case "zh":
+      case 'zh':
         return zhLocale;
-      case "ko":
+      case 'ko':
       default:
         return koLocale;
     }
@@ -349,36 +349,36 @@ const SchedulerPage: React.FC = () => {
   // FullCalendar 버튼 텍스트 선택
   const getButtonText = () => {
     switch (currentLanguage) {
-      case "en":
+      case 'en':
         return {
-          today: "Today",
-          month: "Month",
-          week: "Week",
-          day: "Day",
-          dayGridMonth: "Month",
-          timeGridWeek: "Week",
-          timeGridDay: "Day",
+          today: 'Today',
+          month: 'Month',
+          week: 'Week',
+          day: 'Day',
+          dayGridMonth: 'Month',
+          timeGridWeek: 'Week',
+          timeGridDay: 'Day',
         };
-      case "zh":
+      case 'zh':
         return {
-          today: "今天",
-          month: "月",
-          week: "周",
-          day: "日",
-          dayGridMonth: "月",
-          timeGridWeek: "周",
-          timeGridDay: "日",
+          today: '今天',
+          month: '月',
+          week: '周',
+          day: '日',
+          dayGridMonth: '月',
+          timeGridWeek: '周',
+          timeGridDay: '日',
         };
-      case "ko":
+      case 'ko':
       default:
         return {
-          today: "오늘",
-          month: "월",
-          week: "주",
-          day: "일",
-          dayGridMonth: "월",
-          timeGridWeek: "주",
-          timeGridDay: "일",
+          today: '오늘',
+          month: '월',
+          week: '주',
+          day: '일',
+          dayGridMonth: '월',
+          timeGridWeek: '주',
+          timeGridDay: '일',
         };
     }
   };
@@ -388,30 +388,26 @@ const SchedulerPage: React.FC = () => {
       {/* Header */}
       <Box
         sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
           mb: 3,
         }}
       >
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <ScheduleIcon sx={{ fontSize: 32, color: "primary.main" }} />
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <ScheduleIcon sx={{ fontSize: 32, color: 'primary.main' }} />
           <Box>
             <Typography variant="h5" sx={{ fontWeight: 700 }}>
-              {t("scheduler.title")}
+              {t('scheduler.title')}
             </Typography>
             <Typography variant="caption" color="text.secondary">
-              {t("scheduler.subtitle")}
+              {t('scheduler.subtitle')}
             </Typography>
           </Box>
         </Box>
         {canManage && (
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={handleAdd}
-          >
-            {t("scheduler.addEvent")}
+          <Button variant="contained" startIcon={<AddIcon />} onClick={handleAdd}>
+            {t('scheduler.addEvent')}
           </Button>
         )}
       </Box>
@@ -424,9 +420,9 @@ const SchedulerPage: React.FC = () => {
             ref={calendarRef}
             plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
             headerToolbar={{
-              left: "prev,next today",
-              center: "title",
-              right: "dayGridMonth,timeGridWeek,timeGridDay",
+              left: 'prev,next today',
+              center: 'title',
+              right: 'dayGridMonth,timeGridWeek,timeGridDay',
             }}
             initialView="dayGridMonth"
             editable={true}
@@ -442,8 +438,8 @@ const SchedulerPage: React.FC = () => {
             buttonText={getButtonText()}
             eventDisplay="block"
             eventTimeFormat={{
-              hour: "2-digit",
-              minute: "2-digit",
+              hour: '2-digit',
+              minute: '2-digit',
               hour12: false,
             }}
             nowIndicator={true}
@@ -453,22 +449,17 @@ const SchedulerPage: React.FC = () => {
       </Card>
 
       {/* Add/Edit Event Dialog */}
-      <Dialog
-        open={dialogOpen}
-        onClose={() => setDialogOpen(false)}
-        maxWidth="md"
-        fullWidth
-      >
+      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="md" fullWidth>
         <FormDialogHeader
-          title={editingEvent ? "스케줄 이벤트 편집" : "스케줄 이벤트 추가"}
+          title={editingEvent ? '스케줄 이벤트 편집' : '스케줄 이벤트 추가'}
           description={
             editingEvent
-              ? "기존 스케줄 이벤트의 정보를 수정하고 업데이트할 수 있습니다."
-              : "새로운 스케줄 이벤트를 생성하고 실행 시간을 설정할 수 있습니다."
+              ? '기존 스케줄 이벤트의 정보를 수정하고 업데이트할 수 있습니다.'
+              : '새로운 스케줄 이벤트를 생성하고 실행 시간을 설정할 수 있습니다.'
           }
         />
         <DialogContent>
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 3, mt: 1 }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mt: 1 }}>
             {/* 기본 정보 */}
             <Grid container spacing={2}>
               <Grid size={{ xs: 6 }}>
@@ -515,11 +506,9 @@ const SchedulerPage: React.FC = () => {
             <FormControl fullWidth>
               <InputLabel>Calendar</InputLabel>
               <Select
-                value={formData.calendar || "--- Not Set ---"}
+                value={formData.calendar || '--- Not Set ---'}
                 label="Calendar"
-                onChange={(e) =>
-                  setFormData({ ...formData, calendar: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, calendar: e.target.value })}
               >
                 <MenuItem value="--- Not Set ---">--- Not Set ---</MenuItem>
                 <MenuItem value="BusinessCalendar">Business Calendar</MenuItem>
@@ -532,7 +521,7 @@ const SchedulerPage: React.FC = () => {
                 <FormControl fullWidth>
                   <InputLabel>Misfire Instruction</InputLabel>
                   <Select
-                    value={formData.misfireInstruction || "Smart Policy"}
+                    value={formData.misfireInstruction || 'Smart Policy'}
                     label="Misfire Instruction"
                     onChange={(e) =>
                       setFormData({
@@ -542,9 +531,7 @@ const SchedulerPage: React.FC = () => {
                     }
                   >
                     <MenuItem value="Smart Policy">Smart Policy</MenuItem>
-                    <MenuItem value="Ignore Misfire Policy">
-                      Ignore Misfire Policy
-                    </MenuItem>
+                    <MenuItem value="Ignore Misfire Policy">Ignore Misfire Policy</MenuItem>
                     <MenuItem value="Do Nothing">Do Nothing</MenuItem>
                     <MenuItem value="Fire Now">Fire Now</MenuItem>
                   </Select>
@@ -588,10 +575,7 @@ const SchedulerPage: React.FC = () => {
                   onChange={(e) =>
                     setFormData({
                       ...formData,
-                      intervalMinutes:
-                        e.target.value === ""
-                          ? ""
-                          : Number(e.target.value) || 1,
+                      intervalMinutes: e.target.value === '' ? '' : Number(e.target.value) || 1,
                     })
                   }
                   inputProps={{ min: 1 }}
@@ -611,19 +595,13 @@ const SchedulerPage: React.FC = () => {
                 <FormControl fullWidth>
                   <InputLabel>Time Zone</InputLabel>
                   <Select
-                    value={formData.timeZone || "Asia/Seoul"}
+                    value={formData.timeZone || 'Asia/Seoul'}
                     label="Time Zone"
-                    onChange={(e) =>
-                      setFormData({ ...formData, timeZone: e.target.value })
-                    }
+                    onChange={(e) => setFormData({ ...formData, timeZone: e.target.value })}
                   >
-                    <MenuItem value="Asia/Seoul">
-                      (GMT+09:00) Asia/Seoul
-                    </MenuItem>
+                    <MenuItem value="Asia/Seoul">(GMT+09:00) Asia/Seoul</MenuItem>
                     <MenuItem value="UTC">(GMT+00:00) UTC</MenuItem>
-                    <MenuItem value="America/New_York">
-                      (GMT-05:00) America/New_York
-                    </MenuItem>
+                    <MenuItem value="America/New_York">(GMT-05:00) America/New_York</MenuItem>
                   </Select>
                 </FormControl>
               </Grid>
@@ -635,9 +613,7 @@ const SchedulerPage: React.FC = () => {
                   fullWidth
                   label="Repeat Count"
                   type="number"
-                  value={
-                    formData.repeatCount === -1 ? "" : formData.repeatCount
-                  }
+                  value={formData.repeatCount === -1 ? '' : formData.repeatCount}
                   onChange={(e) =>
                     setFormData({
                       ...formData,
@@ -647,10 +623,7 @@ const SchedulerPage: React.FC = () => {
                   placeholder="Leave empty for infinite"
                 />
               </Grid>
-              <Grid
-                size={{ xs: 6 }}
-                sx={{ display: "flex", alignItems: "center" }}
-              >
+              <Grid size={{ xs: 6 }} sx={{ display: 'flex', alignItems: 'center' }}>
                 <FormControl>
                   <Stack direction="row" spacing={2} alignItems="center">
                     <Typography variant="body2">Repeat Forever</Typography>
@@ -677,10 +650,8 @@ const SchedulerPage: React.FC = () => {
                   fullWidth
                   label="Start Time of Day"
                   type="time"
-                  value={formData.startTimeOfDay || "00:00:00"}
-                  onChange={(e) =>
-                    setFormData({ ...formData, startTimeOfDay: e.target.value })
-                  }
+                  value={formData.startTimeOfDay || '00:00:00'}
+                  onChange={(e) => setFormData({ ...formData, startTimeOfDay: e.target.value })}
                   InputLabelProps={{ shrink: true }}
                 />
               </Grid>
@@ -689,10 +660,8 @@ const SchedulerPage: React.FC = () => {
                   fullWidth
                   label="End Time of Day"
                   type="time"
-                  value={formData.endTimeOfDay || "23:59:59"}
-                  onChange={(e) =>
-                    setFormData({ ...formData, endTimeOfDay: e.target.value })
-                  }
+                  value={formData.endTimeOfDay || '23:59:59'}
+                  onChange={(e) => setFormData({ ...formData, endTimeOfDay: e.target.value })}
                   InputLabelProps={{ shrink: true }}
                 />
               </Grid>
@@ -704,41 +673,35 @@ const SchedulerPage: React.FC = () => {
                 Days of Week
               </Typography>
               <Grid container spacing={1}>
-                {[
-                  "Monday",
-                  "Tuesday",
-                  "Wednesday",
-                  "Thursday",
-                  "Friday",
-                  "Saturday",
-                  "Sunday",
-                ].map((day) => (
-                  <Grid key={day}>
-                    <FormControl>
-                      <Stack direction="row" spacing={1} alignItems="center">
-                        <input
-                          type="checkbox"
-                          checked={formData.daysOfWeek?.includes(day) || false}
-                          onChange={(e) => {
-                            const days = formData.daysOfWeek || [];
-                            if (e.target.checked) {
-                              setFormData({
-                                ...formData,
-                                daysOfWeek: [...days, day],
-                              });
-                            } else {
-                              setFormData({
-                                ...formData,
-                                daysOfWeek: days.filter((d) => d !== day),
-                              });
-                            }
-                          }}
-                        />
-                        <Typography variant="body2">{day}</Typography>
-                      </Stack>
-                    </FormControl>
-                  </Grid>
-                ))}
+                {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(
+                  (day) => (
+                    <Grid key={day}>
+                      <FormControl>
+                        <Stack direction="row" spacing={1} alignItems="center">
+                          <input
+                            type="checkbox"
+                            checked={formData.daysOfWeek?.includes(day) || false}
+                            onChange={(e) => {
+                              const days = formData.daysOfWeek || [];
+                              if (e.target.checked) {
+                                setFormData({
+                                  ...formData,
+                                  daysOfWeek: [...days, day],
+                                });
+                              } else {
+                                setFormData({
+                                  ...formData,
+                                  daysOfWeek: days.filter((d) => d !== day),
+                                });
+                              }
+                            }}
+                          />
+                          <Typography variant="body2">{day}</Typography>
+                        </Stack>
+                      </FormControl>
+                    </Grid>
+                  )
+                )}
               </Grid>
             </Box>
 
@@ -747,7 +710,7 @@ const SchedulerPage: React.FC = () => {
               Job Data Map
             </Typography>
 
-            <Box sx={{ border: "1px solid #ddd", borderRadius: 1, p: 2 }}>
+            <Box sx={{ border: '1px solid #ddd', borderRadius: 1, p: 2 }}>
               <Grid container spacing={2} sx={{ mb: 2 }}>
                 <Grid size={{ xs: 4 }}>
                   <Typography variant="body2" fontWeight="bold">
@@ -778,9 +741,9 @@ const SchedulerPage: React.FC = () => {
                     value="10"
                     onChange={(e) => {
                       const newJobDataMap = { ...formData.jobDataMap };
-                      newJobDataMap["Count"] = {
+                      newJobDataMap['Count'] = {
                         value: e.target.value,
-                        type: "Integer",
+                        type: 'Integer',
                       };
                       setFormData({ ...formData, jobDataMap: newJobDataMap });
                     }}
@@ -801,11 +764,7 @@ const SchedulerPage: React.FC = () => {
               {/* 추가 파라미터 */}
               <Grid container spacing={2}>
                 <Grid size={{ xs: 4 }}>
-                  <TextField
-                    fullWidth
-                    size="small"
-                    placeholder="Parameter Name"
-                  />
+                  <TextField fullWidth size="small" placeholder="Parameter Name" />
                 </Grid>
                 <Grid size={{ xs: 4 }}>
                   <TextField fullWidth size="small" placeholder="String" />
@@ -825,7 +784,7 @@ const SchedulerPage: React.FC = () => {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Stack direction="row" spacing={1} sx={{ width: "100%" }}>
+          <Stack direction="row" spacing={1} sx={{ width: '100%' }}>
             {editingEvent && (
               <Button
                 onClick={handleDelete}
@@ -833,7 +792,7 @@ const SchedulerPage: React.FC = () => {
                 color="error"
                 startIcon={<DeleteIcon />}
               >
-                {t("common.delete")}
+                {t('common.delete')}
               </Button>
             )}
 
@@ -844,7 +803,7 @@ const SchedulerPage: React.FC = () => {
               disabled={saving}
               startIcon={<CancelIcon />}
             >
-              {t("common.cancel")}
+              {t('common.cancel')}
             </Button>
 
             <Button
@@ -853,7 +812,7 @@ const SchedulerPage: React.FC = () => {
               disabled={saving}
               startIcon={saving ? undefined : <SaveIcon />}
             >
-              {saving ? t("common.saving") : t("common.save")}
+              {saving ? t('common.saving') : t('common.save')}
             </Button>
           </Stack>
         </DialogActions>

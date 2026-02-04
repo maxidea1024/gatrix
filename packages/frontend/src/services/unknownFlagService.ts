@@ -1,4 +1,4 @@
-import { apiService } from "./api";
+import { apiService } from './api';
 
 export interface UnknownFlag {
   id: number;
@@ -21,13 +21,13 @@ export const unknownFlagService = {
   }): Promise<{ flags: UnknownFlag[]; total: number }> {
     const params = new URLSearchParams();
     if (options?.includeResolved) {
-      params.append("includeResolved", "true");
+      params.append('includeResolved', 'true');
     }
     if (options?.environment) {
-      params.append("environment", options.environment);
+      params.append('environment', options.environment);
     }
     const queryString = params.toString();
-    const url = `/admin/unknown-flags${queryString ? `?${queryString}` : ""}`;
+    const url = `/admin/unknown-flags${queryString ? `?${queryString}` : ''}`;
     const response = await apiService.get<{
       success: boolean;
       data: { flags: UnknownFlag[]; total: number };
@@ -39,7 +39,7 @@ export const unknownFlagService = {
     const response = await apiService.get<{
       success: boolean;
       data: { count: number };
-    }>("/admin/unknown-flags/count");
+    }>('/admin/unknown-flags/count');
     return response.data.count;
   },
 

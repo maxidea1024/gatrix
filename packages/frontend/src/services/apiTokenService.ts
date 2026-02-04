@@ -1,4 +1,4 @@
-import api from "./api";
+import api from './api';
 import {
   ApiAccessToken,
   CreateTokenRequest,
@@ -6,7 +6,7 @@ import {
   CreateTokenResponse,
   GetTokensRequest,
   GetTokensResponse,
-} from "@/types/apiToken";
+} from '@/types/apiToken';
 
 class ApiTokenService {
   /**
@@ -14,13 +14,13 @@ class ApiTokenService {
    */
   async getTokens(params: GetTokensRequest = {}): Promise<GetTokensResponse> {
     try {
-      const response = await api.get("/admin/api-tokens", { params });
+      const response = await api.get('/admin/api-tokens', { params });
 
       // api.request() returns response.data which is: { success: true, data: { tokens: [...], pagination: {...} } }
       // So response is already the full response object
       const backendData = response.data; // This is the nested data object from backend
 
-      console.log("[ApiTokenService] getTokens response:", {
+      console.log('[ApiTokenService] getTokens response:', {
         hasData: !!backendData,
         hasTokens: !!backendData?.tokens,
         tokensLength: backendData?.tokens?.length || 0,
@@ -29,11 +29,9 @@ class ApiTokenService {
               id: backendData.tokens[0].id,
               tokenName: backendData.tokens[0].tokenName,
               hasTokenValue: !!(backendData.tokens[0] as any).tokenValue,
-              tokenValueLength:
-                (backendData.tokens[0] as any).tokenValue?.length || 0,
+              tokenValueLength: (backendData.tokens[0] as any).tokenValue?.length || 0,
               tokenValuePreview:
-                (backendData.tokens[0] as any).tokenValue?.substring(0, 10) +
-                "...",
+                (backendData.tokens[0] as any).tokenValue?.substring(0, 10) + '...',
               hasTokenHash: !!backendData.tokens[0].tokenHash,
             }
           : null,
@@ -48,7 +46,7 @@ class ApiTokenService {
 
       return result;
     } catch (error) {
-      console.error("Error fetching API tokens:", error);
+      console.error('Error fetching API tokens:', error);
       throw error;
     }
   }
@@ -61,7 +59,7 @@ class ApiTokenService {
       const response = await api.get(`/admin/api-tokens/${id}`);
       return response.data;
     } catch (error) {
-      console.error("Error fetching API token:", error);
+      console.error('Error fetching API token:', error);
       throw error;
     }
   }
@@ -71,10 +69,10 @@ class ApiTokenService {
    */
   async createToken(data: CreateTokenRequest): Promise<CreateTokenResponse> {
     try {
-      const response = await api.post("/admin/api-tokens", data);
+      const response = await api.post('/admin/api-tokens', data);
       return response.data;
     } catch (error) {
-      console.error("Error creating API token:", error);
+      console.error('Error creating API token:', error);
       throw error;
     }
   }
@@ -82,15 +80,12 @@ class ApiTokenService {
   /**
    * Update API token
    */
-  async updateToken(
-    id: number,
-    data: UpdateTokenRequest,
-  ): Promise<ApiAccessToken> {
+  async updateToken(id: number, data: UpdateTokenRequest): Promise<ApiAccessToken> {
     try {
       const response = await api.put(`/admin/api-tokens/${id}`, data);
       return response.data;
     } catch (error) {
-      console.error("Error updating API token:", error);
+      console.error('Error updating API token:', error);
       throw error;
     }
   }
@@ -103,7 +98,7 @@ class ApiTokenService {
       const response = await api.post(`/admin/api-tokens/${id}/regenerate`);
       return response.data;
     } catch (error) {
-      console.error("Error regenerating API token:", error);
+      console.error('Error regenerating API token:', error);
       throw error;
     }
   }
@@ -115,7 +110,7 @@ class ApiTokenService {
     try {
       await api.delete(`/admin/api-tokens/${id}`);
     } catch (error) {
-      console.error("Error deleting API token:", error);
+      console.error('Error deleting API token:', error);
       throw error;
     }
   }
@@ -128,7 +123,7 @@ class ApiTokenService {
       const response = await api.patch(`/admin/api-tokens/${id}/revoke`);
       return response.data;
     } catch (error) {
-      console.error("Error revoking API token:", error);
+      console.error('Error revoking API token:', error);
       throw error;
     }
   }
@@ -141,7 +136,7 @@ class ApiTokenService {
       const response = await api.patch(`/admin/api-tokens/${id}/activate`);
       return response.data;
     } catch (error) {
-      console.error("Error activating API token:", error);
+      console.error('Error activating API token:', error);
       throw error;
     }
   }
@@ -156,7 +151,7 @@ class ApiTokenService {
       });
       return response.data;
     } catch (error) {
-      console.error("Error extending API token:", error);
+      console.error('Error extending API token:', error);
       throw error;
     }
   }
@@ -171,10 +166,10 @@ class ApiTokenService {
     recentlyUsed: number;
   }> {
     try {
-      const response = await api.get("/admin/api-tokens/stats");
+      const response = await api.get('/admin/api-tokens/stats');
       return response.data;
     } catch (error) {
-      console.error("Error fetching token stats:", error);
+      console.error('Error fetching token stats:', error);
       throw error;
     }
   }
@@ -182,16 +177,12 @@ class ApiTokenService {
   /**
    * Get tokens for specific environment
    */
-  async getTokensForEnvironment(
-    environment: string,
-  ): Promise<ApiAccessToken[]> {
+  async getTokensForEnvironment(environment: string): Promise<ApiAccessToken[]> {
     try {
-      const response = await api.get(
-        `/admin/api-tokens/environment/${environment}`,
-      );
+      const response = await api.get(`/admin/api-tokens/environment/${environment}`);
       return response.data;
     } catch (error) {
-      console.error("Error fetching environment tokens:", error);
+      console.error('Error fetching environment tokens:', error);
       throw error;
     }
   }
@@ -201,10 +192,10 @@ class ApiTokenService {
    */
   async getAdminTokens(): Promise<ApiAccessToken[]> {
     try {
-      const response = await api.get("/admin/api-tokens/admin");
+      const response = await api.get('/admin/api-tokens/admin');
       return response.data;
     } catch (error) {
-      console.error("Error fetching admin tokens:", error);
+      console.error('Error fetching admin tokens:', error);
       throw error;
     }
   }

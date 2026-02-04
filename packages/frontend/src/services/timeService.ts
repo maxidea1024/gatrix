@@ -1,4 +1,4 @@
-import { apiService } from "./api";
+import { apiService } from './api';
 
 export interface ServerTimeResponse {
   success: boolean;
@@ -30,7 +30,7 @@ class TimeService {
 
     try {
       const response = await apiService.get<ServerTimeResponse>(
-        `/public/time?clientLocalTime=${clientLocalTime}`,
+        `/public/time?clientLocalTime=${clientLocalTime}`
       );
       const currentLocalTime = new Date().getTime();
 
@@ -56,7 +56,7 @@ class TimeService {
 
       return serverTimeData;
     } catch (error) {
-      console.error("Failed to fetch server time:", error);
+      console.error('Failed to fetch server time:', error);
       throw error;
     }
   }
@@ -71,9 +71,7 @@ class TimeService {
 
     const now = Date.now();
     const timeSinceLastSync = now - this.currentServerTime.localTime.getTime();
-    return new Date(
-      this.currentServerTime.serverTime.getTime() + timeSinceLastSync,
-    );
+    return new Date(this.currentServerTime.serverTime.getTime() + timeSinceLastSync);
   }
 
   /**
@@ -85,8 +83,7 @@ class TimeService {
     }
 
     const now = Date.now();
-    const timeSinceLastSync =
-      (now - this.currentServerTime.uptimeBaseTime) / 1000; // 초 단위
+    const timeSinceLastSync = (now - this.currentServerTime.uptimeBaseTime) / 1000; // 초 단위
     return this.currentServerTime.uptime + timeSinceLastSync;
   }
 
@@ -138,7 +135,7 @@ class TimeService {
       try {
         callback(data);
       } catch (error) {
-        console.error("Error in time service listener:", error);
+        console.error('Error in time service listener:', error);
       }
     });
   }

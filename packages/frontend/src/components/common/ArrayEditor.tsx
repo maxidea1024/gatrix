@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Box,
   Button,
@@ -16,7 +16,7 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-} from "@mui/material";
+} from '@mui/material';
 import {
   Add as AddIcon,
   Delete as DeleteIcon,
@@ -24,7 +24,7 @@ import {
   AddCircleOutline as InsertIcon,
   Straighten as ResizeIcon,
   Edit as EditIcon,
-} from "@mui/icons-material";
+} from '@mui/icons-material';
 import {
   DndContext,
   closestCenter,
@@ -33,22 +33,22 @@ import {
   useSensor,
   useSensors,
   DragEndEvent,
-} from "@dnd-kit/core";
+} from '@dnd-kit/core';
 import {
   arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
   useSortable,
   verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
-import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
-import { useTranslation } from "react-i18next";
-import { MuiColorInput } from "mui-color-input";
-import JsonEditor from "./JsonEditor";
-import { VarValueType } from "@/services/varsService";
-import { useTheme } from "@mui/material/styles";
-import { useSnackbar } from "notistack";
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
+import { useTranslation } from 'react-i18next';
+import { MuiColorInput } from 'mui-color-input';
+import JsonEditor from './JsonEditor';
+import { VarValueType } from '@/services/varsService';
+import { useTheme } from '@mui/material/styles';
+import { useSnackbar } from 'notistack';
 
 interface ArrayEditorProps {
   value: string; // JSON string
@@ -91,14 +91,9 @@ const SortableItem: React.FC<SortableItemProps> = ({
 }) => {
   const { t } = useTranslation();
   const inputRef = useRef<HTMLInputElement>(null);
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: item.id });
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: item.id,
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -116,75 +111,67 @@ const SortableItem: React.FC<SortableItemProps> = ({
   // Render input based on element type
   const renderInput = () => {
     switch (elementType) {
-      case "number":
+      case 'number':
         return (
           <TextField
             fullWidth
             type="text"
             inputMode="numeric"
-            value={item.value ?? ""}
+            value={item.value ?? ''}
             onChange={(e) => {
               const val = e.target.value;
               // Allow empty, negative sign, and valid numbers
-              if (val === "" || val === "-" || !isNaN(Number(val))) {
-                onChange(
-                  item.id,
-                  val === "" || val === "-" ? "" : parseFloat(val),
-                );
+              if (val === '' || val === '-' || !isNaN(Number(val))) {
+                onChange(item.id, val === '' || val === '-' ? '' : parseFloat(val));
               }
             }}
             size="small"
             inputRef={inputRef}
             sx={{
-              "& input[type=text]::-webkit-outer-spin-button, & input[type=text]::-webkit-inner-spin-button":
+              '& input[type=text]::-webkit-outer-spin-button, & input[type=text]::-webkit-inner-spin-button':
                 {
-                  display: "none",
+                  display: 'none',
                 },
             }}
           />
         );
-      case "boolean":
+      case 'boolean':
         return (
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <FormControlLabel
               control={
                 <Switch
-                  checked={item.value === true || item.value === "true"}
+                  checked={item.value === true || item.value === 'true'}
                   onChange={(e) => onChange(item.id, e.target.checked)}
                   size="small"
                 />
               }
-              label={
-                item.value === true || item.value === "true" ? "true" : "false"
-              }
+              label={item.value === true || item.value === 'true' ? 'true' : 'false'}
               sx={{ m: 0 }}
             />
           </Box>
         );
-      case "color":
+      case 'color':
         return (
           <MuiColorInput
             fullWidth
-            value={item.value || "#000000"}
+            value={item.value || '#000000'}
             onChange={(color) => onChange(item.id, color)}
             format="hex"
             size="small"
           />
         );
-      case "object":
+      case 'object':
         const jsonStr =
-          typeof item.value === "object"
-            ? JSON.stringify(item.value)
-            : item.value || "{}";
-        const displayStr =
-          jsonStr.length > 50 ? jsonStr.substring(0, 50) + "..." : jsonStr;
+          typeof item.value === 'object' ? JSON.stringify(item.value) : item.value || '{}';
+        const displayStr = jsonStr.length > 50 ? jsonStr.substring(0, 50) + '...' : jsonStr;
         return (
           <Box
             sx={{
-              display: "flex",
-              alignItems: "center",
+              display: 'flex',
+              alignItems: 'center',
               gap: 1,
-              width: "100%",
+              width: '100%',
             }}
           >
             <TextField
@@ -195,19 +182,15 @@ const SortableItem: React.FC<SortableItemProps> = ({
               InputProps={{
                 readOnly: true,
                 sx: {
-                  fontFamily: "monospace",
-                  fontSize: "0.875rem",
-                  cursor: "pointer",
+                  fontFamily: 'monospace',
+                  fontSize: '0.875rem',
+                  cursor: 'pointer',
                 },
               }}
               onClick={() => onEditObject?.(item.id)}
             />
-            <Tooltip title={t("common.edit")}>
-              <IconButton
-                size="small"
-                onClick={() => onEditObject?.(item.id)}
-                color="primary"
-              >
+            <Tooltip title={t('common.edit')}>
+              <IconButton size="small" onClick={() => onEditObject?.(item.id)} color="primary">
                 <EditIcon fontSize="small" />
               </IconButton>
             </Tooltip>
@@ -217,7 +200,7 @@ const SortableItem: React.FC<SortableItemProps> = ({
         return (
           <TextField
             fullWidth
-            value={item.value ?? ""}
+            value={item.value ?? ''}
             onChange={(e) => onChange(item.id, e.target.value)}
             size="small"
             inputRef={inputRef}
@@ -231,28 +214,28 @@ const SortableItem: React.FC<SortableItemProps> = ({
       ref={setNodeRef}
       style={style}
       sx={{
-        display: "flex",
+        display: 'flex',
         gap: 1,
         p: 1,
         mb: 1,
-        bgcolor: "background.paper",
+        bgcolor: 'background.paper',
         border: 1,
-        borderColor: "divider",
+        borderColor: 'divider',
         borderRadius: 1,
-        "&:hover": {
-          bgcolor: "action.hover",
+        '&:hover': {
+          bgcolor: 'action.hover',
         },
       }}
     >
       <Box
         sx={{
           minWidth: 32,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          color: "text.secondary",
-          fontWeight: "bold",
-          fontSize: "0.875rem",
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: 'text.secondary',
+          fontWeight: 'bold',
+          fontSize: '0.875rem',
         }}
       >
         {index}
@@ -261,35 +244,31 @@ const SortableItem: React.FC<SortableItemProps> = ({
         {...attributes}
         {...listeners}
         sx={{
-          cursor: "grab",
-          display: "flex",
-          alignItems: "center",
-          color: "text.secondary",
-          "&:active": {
-            cursor: "grabbing",
+          cursor: 'grab',
+          display: 'flex',
+          alignItems: 'center',
+          color: 'text.secondary',
+          '&:active': {
+            cursor: 'grabbing',
           },
         }}
       >
         <DragIcon />
       </Box>
       <Box sx={{ flex: 1 }}>{renderInput()}</Box>
-      <Box sx={{ display: "flex", gap: 0.5, alignSelf: "center" }}>
-        <Tooltip title={t("settings.kv.insertBefore")}>
+      <Box sx={{ display: 'flex', gap: 0.5, alignSelf: 'center' }}>
+        <Tooltip title={t('settings.kv.insertBefore')}>
           <IconButton size="small" onClick={() => onInsertBefore(item.id)}>
-            <InsertIcon fontSize="small" sx={{ transform: "rotate(180deg)" }} />
+            <InsertIcon fontSize="small" sx={{ transform: 'rotate(180deg)' }} />
           </IconButton>
         </Tooltip>
-        <Tooltip title={t("settings.kv.insertAfter")}>
+        <Tooltip title={t('settings.kv.insertAfter')}>
           <IconButton size="small" onClick={() => onInsertAfter(item.id)}>
             <InsertIcon fontSize="small" />
           </IconButton>
         </Tooltip>
-        <Tooltip title={t("common.delete")}>
-          <IconButton
-            size="small"
-            color="error"
-            onClick={() => onDelete(item.id)}
-          >
+        <Tooltip title={t('common.delete')}>
+          <IconButton size="small" color="error" onClick={() => onDelete(item.id)}>
             <DeleteIcon fontSize="small" />
           </IconButton>
         </Tooltip>
@@ -313,22 +292,21 @@ const ArrayEditor: React.FC<ArrayEditorProps> = ({
   const [parseError, setParseError] = useState<string | null>(null);
   const itemIdCounter = useRef(0);
   const [resizeDialogOpen, setResizeDialogOpen] = useState(false);
-  const [resizeValue, setResizeValue] = useState("");
+  const [resizeValue, setResizeValue] = useState('');
   const [fillDialogOpen, setFillDialogOpen] = useState(false);
-  const [fillValue, setFillValue] = useState("");
+  const [fillValue, setFillValue] = useState('');
   const [objectEditorOpen, setObjectEditorOpen] = useState(false);
   const [editingObjectId, setEditingObjectId] = useState<string | null>(null);
-  const [editingObjectValue, setEditingObjectValue] = useState("");
+  const [editingObjectValue, setEditingObjectValue] = useState('');
 
   // Parse JSON value to items (only on initial load or when value changes externally)
   useEffect(() => {
     try {
-      const parsed = JSON.parse(value || "[]");
+      const parsed = JSON.parse(value || '[]');
       if (Array.isArray(parsed)) {
         // Only update if the values are actually different
         const currentValues = items.map((item) => item.value);
-        const valuesChanged =
-          JSON.stringify(currentValues) !== JSON.stringify(parsed);
+        const valuesChanged = JSON.stringify(currentValues) !== JSON.stringify(parsed);
 
         if (valuesChanged) {
           const newItems = parsed.map((val, idx) => ({
@@ -339,10 +317,10 @@ const ArrayEditor: React.FC<ArrayEditorProps> = ({
         }
         setParseError(null);
       } else {
-        setParseError(t("settings.kv.invalidArrayFormat"));
+        setParseError(t('settings.kv.invalidArrayFormat'));
       }
     } catch (e) {
-      setParseError(t("settings.kv.invalidJson"));
+      setParseError(t('settings.kv.invalidJson'));
     }
   }, [value, t]);
 
@@ -361,7 +339,7 @@ const ArrayEditor: React.FC<ArrayEditorProps> = ({
     }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    }),
+    })
   );
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -383,15 +361,15 @@ const ArrayEditor: React.FC<ArrayEditorProps> = ({
       valueToAdd = items[items.length - 1].value;
     } else {
       valueToAdd =
-        elementType === "number"
+        elementType === 'number'
           ? 0
-          : elementType === "boolean"
+          : elementType === 'boolean'
             ? false
-            : elementType === "color"
-              ? "#000000"
-              : elementType === "object"
+            : elementType === 'color'
+              ? '#000000'
+              : elementType === 'object'
                 ? {}
-                : "";
+                : '';
     }
 
     const newItem: ArrayItem = {
@@ -416,9 +394,7 @@ const ArrayEditor: React.FC<ArrayEditorProps> = ({
   };
 
   const handleChange = (id: string, newValue: any) => {
-    const newItems = items.map((item) =>
-      item.id === id ? { ...item, value: newValue } : item,
-    );
+    const newItems = items.map((item) => (item.id === id ? { ...item, value: newValue } : item));
     setItems(newItems);
     updateParent(newItems);
   };
@@ -432,11 +408,7 @@ const ArrayEditor: React.FC<ArrayEditorProps> = ({
       value: items[index].value,
       shouldFocus: true,
     };
-    const newItems = [
-      ...items.slice(0, index + 1),
-      duplicatedItem,
-      ...items.slice(index + 1),
-    ];
+    const newItems = [...items.slice(0, index + 1), duplicatedItem, ...items.slice(index + 1)];
     setItems(newItems);
     updateParent(newItems);
 
@@ -476,11 +448,7 @@ const ArrayEditor: React.FC<ArrayEditorProps> = ({
       value: items[index].value,
       shouldFocus: true,
     };
-    const newItems = [
-      ...items.slice(0, index + 1),
-      newItem,
-      ...items.slice(index + 1),
-    ];
+    const newItems = [...items.slice(0, index + 1), newItem, ...items.slice(index + 1)];
     setItems(newItems);
     updateParent(newItems);
 
@@ -509,15 +477,15 @@ const ArrayEditor: React.FC<ArrayEditorProps> = ({
       const lastValue =
         items.length > 0
           ? items[items.length - 1].value
-          : elementType === "number"
+          : elementType === 'number'
             ? 0
-            : elementType === "boolean"
+            : elementType === 'boolean'
               ? false
-              : elementType === "color"
-                ? "#000000"
-                : elementType === "object"
+              : elementType === 'color'
+                ? '#000000'
+                : elementType === 'object'
                   ? {}
-                  : "";
+                  : '';
 
       const newItems = [...items];
       for (let i = currentSize; i < targetSize; i++) {
@@ -536,7 +504,7 @@ const ArrayEditor: React.FC<ArrayEditorProps> = ({
     }
 
     setResizeDialogOpen(false);
-    setResizeValue("");
+    setResizeValue('');
   };
 
   const handleOpenResize = () => {
@@ -547,15 +515,15 @@ const ArrayEditor: React.FC<ArrayEditorProps> = ({
   const handleOpenFill = () => {
     // Set default fill value based on element type
     const defaultValue =
-      elementType === "number"
-        ? "0"
-        : elementType === "boolean"
-          ? "false"
-          : elementType === "color"
-            ? "#000000"
-            : elementType === "object"
-              ? "{}"
-              : "";
+      elementType === 'number'
+        ? '0'
+        : elementType === 'boolean'
+          ? 'false'
+          : elementType === 'color'
+            ? '#000000'
+            : elementType === 'object'
+              ? '{}'
+              : '';
     setFillValue(defaultValue);
     setFillDialogOpen(true);
   };
@@ -571,30 +539,29 @@ const ArrayEditor: React.FC<ArrayEditorProps> = ({
     // Parse value based on element type
     try {
       switch (elementType) {
-        case "number":
-          parsedValue =
-            fillValue === "" || fillValue === "-" ? "" : parseFloat(fillValue);
+        case 'number':
+          parsedValue = fillValue === '' || fillValue === '-' ? '' : parseFloat(fillValue);
           if (isNaN(parsedValue)) {
-            enqueueSnackbar(t("settings.kv.invalidNumber"), {
-              variant: "error",
+            enqueueSnackbar(t('settings.kv.invalidNumber'), {
+              variant: 'error',
             });
             return;
           }
           break;
-        case "boolean":
-          parsedValue = fillValue === "true";
+        case 'boolean':
+          parsedValue = fillValue === 'true';
           break;
-        case "color":
+        case 'color':
           parsedValue = fillValue;
           break;
-        case "object":
+        case 'object':
           parsedValue = JSON.parse(fillValue);
           break;
         default: // string
           parsedValue = fillValue;
       }
     } catch (e) {
-      enqueueSnackbar(t("settings.kv.invalidJson"), { variant: "error" });
+      enqueueSnackbar(t('settings.kv.invalidJson'), { variant: 'error' });
       return;
     }
 
@@ -614,9 +581,7 @@ const ArrayEditor: React.FC<ArrayEditorProps> = ({
     if (!item) return;
 
     const jsonStr =
-      typeof item.value === "object"
-        ? JSON.stringify(item.value, null, 2)
-        : item.value || "{}";
+      typeof item.value === 'object' ? JSON.stringify(item.value, null, 2) : item.value || '{}';
     setEditingObjectId(id);
     setEditingObjectValue(jsonStr);
     setObjectEditorOpen(true);
@@ -636,9 +601,9 @@ const ArrayEditor: React.FC<ArrayEditorProps> = ({
       }
       setObjectEditorOpen(false);
       setEditingObjectId(null);
-      setEditingObjectValue("");
+      setEditingObjectValue('');
     } catch (e) {
-      enqueueSnackbar(t("settings.kv.invalidJson"), { variant: "error" });
+      enqueueSnackbar(t('settings.kv.invalidJson'), { variant: 'error' });
     }
   };
 
@@ -659,9 +624,9 @@ const ArrayEditor: React.FC<ArrayEditorProps> = ({
 
         <Box
           sx={{
-            maxHeight: "400px",
-            overflowY: "auto",
-            overflowX: "hidden",
+            maxHeight: '400px',
+            overflowY: 'auto',
+            overflowX: 'hidden',
             mb: items.length > 0 ? 1 : 0,
           }}
         >
@@ -695,9 +660,9 @@ const ArrayEditor: React.FC<ArrayEditorProps> = ({
           </DndContext>
         </Box>
 
-        <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
           <Typography variant="body2" color="text.secondary" sx={{ mr: 1 }}>
-            {t("settings.kv.arrayElementCount", { count: items.length })}
+            {t('settings.kv.arrayElementCount', { count: items.length })}
           </Typography>
           <Button
             startIcon={<AddIcon />}
@@ -706,7 +671,7 @@ const ArrayEditor: React.FC<ArrayEditorProps> = ({
             size="small"
             sx={{ flex: 1 }}
           >
-            {t("settings.kv.addArrayElement")}
+            {t('settings.kv.addArrayElement')}
           </Button>
           <Button
             startIcon={<ResizeIcon />}
@@ -714,7 +679,7 @@ const ArrayEditor: React.FC<ArrayEditorProps> = ({
             size="small"
             onClick={handleOpenResize}
           >
-            {t("settings.kv.resizeArray")}
+            {t('settings.kv.resizeArray')}
           </Button>
           <Button
             variant="outlined"
@@ -722,7 +687,7 @@ const ArrayEditor: React.FC<ArrayEditorProps> = ({
             onClick={handleOpenFill}
             disabled={items.length === 0}
           >
-            {t("settings.kv.fillWith")}
+            {t('settings.kv.fillWith')}
           </Button>
         </Box>
       </Paper>
@@ -734,37 +699,35 @@ const ArrayEditor: React.FC<ArrayEditorProps> = ({
         maxWidth="xs"
         fullWidth
       >
-        <DialogTitle>{t("settings.kv.resizeArray")}</DialogTitle>
+        <DialogTitle>{t('settings.kv.resizeArray')}</DialogTitle>
         <DialogContent>
           <TextField
             autoFocus
             fullWidth
             type="text"
             inputMode="numeric"
-            label={t("settings.kv.arraySize")}
+            label={t('settings.kv.arraySize')}
             value={resizeValue}
             onChange={(e) => {
               const val = e.target.value;
-              if (val === "" || (!isNaN(Number(val)) && Number(val) >= 0)) {
+              if (val === '' || (!isNaN(Number(val)) && Number(val) >= 0)) {
                 setResizeValue(val);
               }
             }}
-            helperText={t("settings.kv.arraySizeHelp")}
+            helperText={t('settings.kv.arraySizeHelp')}
             sx={{
               mt: 2,
-              "& input[type=text]::-webkit-outer-spin-button, & input[type=text]::-webkit-inner-spin-button":
+              '& input[type=text]::-webkit-outer-spin-button, & input[type=text]::-webkit-inner-spin-button':
                 {
-                  display: "none",
+                  display: 'none',
                 },
             }}
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setResizeDialogOpen(false)}>
-            {t("common.cancel")}
-          </Button>
+          <Button onClick={() => setResizeDialogOpen(false)}>{t('common.cancel')}</Button>
           <Button onClick={handleResize} variant="contained">
-            {t("common.ok")}
+            {t('common.ok')}
           </Button>
         </DialogActions>
       </Dialog>
@@ -776,31 +739,24 @@ const ArrayEditor: React.FC<ArrayEditorProps> = ({
         maxWidth="xs"
         fullWidth
       >
-        <DialogTitle>{t("settings.kv.fillWith")}</DialogTitle>
+        <DialogTitle>{t('settings.kv.fillWith')}</DialogTitle>
         <DialogContent>
-          {elementType === "boolean" ? (
+          {elementType === 'boolean' ? (
             <Box sx={{ mt: 2 }}>
               <FormControlLabel
                 control={
                   <Switch
-                    checked={fillValue === "true"}
-                    onChange={(e) =>
-                      setFillValue(e.target.checked ? "true" : "false")
-                    }
+                    checked={fillValue === 'true'}
+                    onChange={(e) => setFillValue(e.target.checked ? 'true' : 'false')}
                   />
                 }
-                label={fillValue === "true" ? "true" : "false"}
+                label={fillValue === 'true' ? 'true' : 'false'}
               />
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                display="block"
-                sx={{ mt: 1 }}
-              >
-                {t("settings.kv.fillWithHelp")}
+              <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 1 }}>
+                {t('settings.kv.fillWithHelp')}
               </Typography>
             </Box>
-          ) : elementType === "color" ? (
+          ) : elementType === 'color' ? (
             <Box sx={{ mt: 2 }}>
               <MuiColorInput
                 fullWidth
@@ -808,29 +764,15 @@ const ArrayEditor: React.FC<ArrayEditorProps> = ({
                 onChange={(color) => setFillValue(color)}
                 format="hex"
               />
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                display="block"
-                sx={{ mt: 1 }}
-              >
-                {t("settings.kv.fillWithHelp")}
+              <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 1 }}>
+                {t('settings.kv.fillWithHelp')}
               </Typography>
             </Box>
-          ) : elementType === "object" ? (
+          ) : elementType === 'object' ? (
             <Box sx={{ mt: 2 }}>
-              <JsonEditor
-                value={fillValue}
-                onChange={setFillValue}
-                height={300}
-              />
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                display="block"
-                sx={{ mt: 1 }}
-              >
-                {t("settings.kv.fillWithHelp")}
+              <JsonEditor value={fillValue} onChange={setFillValue} height={300} />
+              <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 1 }}>
+                {t('settings.kv.fillWithHelp')}
               </Typography>
             </Box>
           ) : (
@@ -838,27 +780,25 @@ const ArrayEditor: React.FC<ArrayEditorProps> = ({
               autoFocus
               fullWidth
               type="text"
-              inputMode={elementType === "number" ? "numeric" : "text"}
-              label={t("settings.kv.fillValue")}
+              inputMode={elementType === 'number' ? 'numeric' : 'text'}
+              label={t('settings.kv.fillValue')}
               value={fillValue}
               onChange={(e) => setFillValue(e.target.value)}
-              helperText={t("settings.kv.fillWithHelp")}
+              helperText={t('settings.kv.fillWithHelp')}
               sx={{
                 mt: 2,
-                "& input[type=text]::-webkit-outer-spin-button, & input[type=text]::-webkit-inner-spin-button":
+                '& input[type=text]::-webkit-outer-spin-button, & input[type=text]::-webkit-inner-spin-button':
                   {
-                    display: "none",
+                    display: 'none',
                   },
               }}
             />
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setFillDialogOpen(false)}>
-            {t("common.cancel")}
-          </Button>
+          <Button onClick={() => setFillDialogOpen(false)}>{t('common.cancel')}</Button>
           <Button onClick={handleFill} variant="contained">
-            {t("common.ok")}
+            {t('common.ok')}
           </Button>
         </DialogActions>
       </Dialog>
@@ -870,22 +810,16 @@ const ArrayEditor: React.FC<ArrayEditorProps> = ({
         maxWidth="md"
         fullWidth
       >
-        <DialogTitle>{t("settings.kv.editObject")}</DialogTitle>
+        <DialogTitle>{t('settings.kv.editObject')}</DialogTitle>
         <DialogContent>
           <Box sx={{ mt: 2 }}>
-            <JsonEditor
-              value={editingObjectValue}
-              onChange={setEditingObjectValue}
-              height={400}
-            />
+            <JsonEditor value={editingObjectValue} onChange={setEditingObjectValue} height={400} />
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setObjectEditorOpen(false)}>
-            {t("common.cancel")}
-          </Button>
+          <Button onClick={() => setObjectEditorOpen(false)}>{t('common.cancel')}</Button>
           <Button onClick={handleSaveObject} variant="contained">
-            {t("common.save")}
+            {t('common.save')}
           </Button>
         </DialogActions>
       </Dialog>
@@ -897,11 +831,7 @@ const ArrayEditor: React.FC<ArrayEditorProps> = ({
       )}
 
       {helperText && !error && (
-        <Typography
-          variant="caption"
-          color="text.secondary"
-          sx={{ mt: 1, display: "block" }}
-        >
+        <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
           {helperText}
         </Typography>
       )}

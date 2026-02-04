@@ -1,14 +1,14 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
-import { useTranslation } from "react-i18next";
-import { Box, Typography, Button, Alert, useTheme } from "@mui/material";
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { Box, Typography, Button, Alert, useTheme } from '@mui/material';
 import {
   ErrorOutline as ErrorIcon,
   Login as LoginIcon,
   PersonAdd as RegisterIcon,
-} from "@mui/icons-material";
-import AuthLayout from "@/components/auth/AuthLayout";
-import { LanguageSelector } from "@/components/LanguageSelector";
+} from '@mui/icons-material';
+import AuthLayout from '@/components/auth/AuthLayout';
+import { LanguageSelector } from '@/components/LanguageSelector';
 
 const InvalidInvitePage: React.FC = () => {
   const { t } = useTranslation();
@@ -16,23 +16,23 @@ const InvalidInvitePage: React.FC = () => {
   const theme = useTheme();
 
   const handleGoToLogin = () => {
-    navigate("/login", { replace: true });
+    navigate('/login', { replace: true });
   };
 
   const handleGoToRegister = () => {
-    navigate("/register", { replace: true });
+    navigate('/register', { replace: true });
   };
 
   return (
     <AuthLayout
-      title={t("invitations.invalidInviteTitle")}
-      subtitle={t("invitations.invalidInviteSubtitle")}
+      title={t('invitations.invalidInviteTitle')}
+      subtitle={t('invitations.invalidInviteSubtitle')}
       showLeftPanel={false}
     >
       {/* Language Selector */}
       <Box
         sx={{
-          position: "absolute",
+          position: 'absolute',
           top: 16,
           right: 16,
           zIndex: 1000,
@@ -40,11 +40,11 @@ const InvalidInvitePage: React.FC = () => {
       >
         <LanguageSelector variant="icon" size="medium" />
       </Box>
-      <Box sx={{ textAlign: "center", mb: 4 }}>
+      <Box sx={{ textAlign: 'center', mb: 4 }}>
         <ErrorIcon
           sx={{
             fontSize: 64,
-            color: "error.main",
+            color: 'error.main',
             mb: 3,
           }}
         />
@@ -55,28 +55,26 @@ const InvalidInvitePage: React.FC = () => {
         sx={{
           mb: 4,
           backgroundColor:
-            theme.palette.mode === "dark"
-              ? "rgba(244, 67, 54, 0.1)"
-              : "rgba(244, 67, 54, 0.05)",
-          color: "error.main",
+            theme.palette.mode === 'dark' ? 'rgba(244, 67, 54, 0.1)' : 'rgba(244, 67, 54, 0.05)',
+          color: 'error.main',
           border: `1px solid ${theme.palette.error.main}20`,
-          "& .MuiAlert-icon": {
-            color: "error.main",
+          '& .MuiAlert-icon': {
+            color: 'error.main',
           },
-          "& .MuiAlert-message": {
-            width: "100%",
+          '& .MuiAlert-message': {
+            width: '100%',
           },
         }}
       >
         <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
-          {t("invitations.invalidInviteMessage")}
+          {t('invitations.invalidInviteMessage')}
         </Typography>
-        <Typography variant="body2" sx={{ color: "text.secondary" }}>
-          {t("invitations.invalidInviteHelp")}
+        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+          {t('invitations.invalidInviteHelp')}
         </Typography>
       </Alert>
 
-      <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         <Button
           variant="contained"
           size="large"
@@ -84,17 +82,17 @@ const InvalidInvitePage: React.FC = () => {
           onClick={handleGoToLogin}
           sx={{
             py: 1.5,
-            fontSize: "1rem",
+            fontSize: '1rem',
             fontWeight: 600,
             borderRadius: 2,
-            textTransform: "none",
+            textTransform: 'none',
             boxShadow: theme.shadows[2],
-            "&:hover": {
+            '&:hover': {
               boxShadow: theme.shadows[4],
             },
           }}
         >
-          {t("invitations.goToLogin")}
+          {t('invitations.goToLogin')}
         </Button>
 
         <Button
@@ -104,30 +102,30 @@ const InvalidInvitePage: React.FC = () => {
           onClick={handleGoToRegister}
           sx={{
             py: 1.5,
-            fontSize: "1rem",
+            fontSize: '1rem',
             fontWeight: 600,
             borderRadius: 2,
-            textTransform: "none",
+            textTransform: 'none',
             borderWidth: 2,
-            "&:hover": {
+            '&:hover': {
               borderWidth: 2,
-              backgroundColor: "primary.50",
+              backgroundColor: 'primary.50',
             },
           }}
         >
-          {t("invitations.goToRegister")}
+          {t('invitations.goToRegister')}
         </Button>
       </Box>
 
-      <Box sx={{ mt: 4, textAlign: "center" }}>
+      <Box sx={{ mt: 4, textAlign: 'center' }}>
         <Typography
           variant="body2"
           sx={{
-            color: "text.secondary",
-            fontSize: "0.875rem",
+            color: 'text.secondary',
+            fontSize: '0.875rem',
           }}
         >
-          {t("invitations.invalidInviteHelp")}
+          {t('invitations.invalidInviteHelp')}
         </Typography>
       </Box>
     </AuthLayout>

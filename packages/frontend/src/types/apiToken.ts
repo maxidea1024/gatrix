@@ -1,4 +1,4 @@
-export type TokenType = "client" | "server" | "edge" | "all";
+export type TokenType = 'client' | 'server' | 'edge' | 'all';
 
 export interface ApiAccessToken {
   id: string; // ULID (26 characters)
@@ -70,7 +70,7 @@ export interface GetTokensRequest {
   tokenType?: TokenType;
   environment?: string;
   sortBy?: string;
-  sortOrder?: "asc" | "desc";
+  sortOrder?: 'asc' | 'desc';
 }
 
 export interface GetTokensResponse {

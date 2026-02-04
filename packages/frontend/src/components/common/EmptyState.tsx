@@ -1,7 +1,7 @@
-import React from "react";
-import { Box, Typography, Button } from "@mui/material";
-import { Add as AddIcon, Inbox as InboxIcon } from "@mui/icons-material";
-import { useTranslation } from "react-i18next";
+import React from 'react';
+import { Box, Typography, Button } from '@mui/material';
+import { Add as AddIcon, Inbox as InboxIcon } from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
 
 interface EmptyStateProps {
   /** Main message to display */
@@ -40,17 +40,17 @@ const EmptyState: React.FC<EmptyStateProps> = ({
   return (
     <Box
       sx={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
         minHeight,
         py: 6,
         gap: 1.5,
       }}
     >
       {/* Icon */}
-      <Box sx={{ color: "text.disabled", mb: 1 }}>
+      <Box sx={{ color: 'text.disabled', mb: 1 }}>
         {icon || <InboxIcon sx={{ fontSize: 48 }} />}
       </Box>
 
@@ -67,21 +67,21 @@ const EmptyState: React.FC<EmptyStateProps> = ({
           startIcon={<AddIcon />}
           sx={{
             mt: 0.5,
-            textTransform: "none",
-            fontSize: "0.875rem",
-            color: "primary.main",
+            textTransform: 'none',
+            fontSize: '0.875rem',
+            color: 'primary.main',
             fontWeight: 600,
-            "&:hover": {
-              backgroundColor: "transparent",
-              textDecoration: "underline",
+            '&:hover': {
+              backgroundColor: 'transparent',
+              textDecoration: 'underline',
             },
           }}
         >
           {subtitle ||
             addButtonLabel ||
-            (t("common.addFirstItem") !== "common.addFirstItem"
-              ? t("common.addFirstItem")
-              : t("common.add"))}
+            (t('common.addFirstItem') !== 'common.addFirstItem'
+              ? t('common.addFirstItem')
+              : t('common.add'))}
         </Button>
       ) : (
         subtitle && (

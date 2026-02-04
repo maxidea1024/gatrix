@@ -1,12 +1,5 @@
-import React, { useEffect, useState } from "react";
-import {
-  Box,
-  Popover,
-  IconButton,
-  Typography,
-  TextField,
-  InputAdornment,
-} from "@mui/material";
+import React, { useEffect, useState } from 'react';
+import { Box, Popover, IconButton, Typography, TextField, InputAdornment } from '@mui/material';
 import {
   Search as SearchIcon,
   AccessTime,
@@ -19,8 +12,8 @@ import {
   Devices,
   FavoriteBorder,
   Flag,
-} from "@mui/icons-material";
-import { useTranslation } from "react-i18next";
+} from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
 
 interface EmojiPickerProps {
   onEmojiSelect: (emoji: string) => void;
@@ -31,371 +24,371 @@ interface EmojiPickerProps {
 
 // Common emoji categories
 const emojiCategories = {
-  recent: ["😀", "😂", "❤️", "👍", "👎", "😊", "😢", "😮", "😡", "🎉"],
+  recent: ['😀', '😂', '❤️', '👍', '👎', '😊', '😢', '😮', '😡', '🎉'],
   smileys: [
-    "😀",
-    "😃",
-    "😄",
-    "😁",
-    "😆",
-    "😅",
-    "🤣",
-    "😂",
-    "🙂",
-    "🙃",
-    "😉",
-    "😊",
-    "😇",
-    "🥰",
-    "😍",
-    "😘",
-    "😗",
-    "😙",
-    "😚",
-    "😋",
-    "😛",
-    "😝",
-    "😜",
-    "🤪",
-    "🤨",
-    "🧐",
-    "🤓",
-    "😎",
-    "🤩",
-    "🥳",
-    "😏",
-    "😒",
-    "🙄",
-    "😬",
-    "🤥",
-    "😌",
-    "😔",
-    "😪",
-    "🤤",
-    "😴",
-    "😷",
-    "🤒",
-    "🤕",
-    "🤢",
-    "🤮",
-    "🤧",
-    "🥵",
-    "🥶",
-    "🥴",
-    "😵",
-    "🤯",
-    "🤠",
-    "😳",
-    "😱",
-    "😨",
-    "😰",
-    "😥",
-    "😓",
-    "🥲",
-    "😟",
-    "😕",
-    "🙁",
-    "☹️",
-    "😣",
-    "😖",
-    "😫",
-    "😩",
-    "🥺",
-    "😢",
-    "😭",
-    "😤",
-    "😠",
-    "😡",
-    "🤬",
-    "🤗",
-    "🤔",
-    "🫣",
-    "🫠",
-    "🫢",
-    "🫡",
-    "🫥",
-    "🤫",
-    "🤭",
-    "🫨",
-    "🫤",
-    "🤐",
-    "🤑",
+    '😀',
+    '😃',
+    '😄',
+    '😁',
+    '😆',
+    '😅',
+    '🤣',
+    '😂',
+    '🙂',
+    '🙃',
+    '😉',
+    '😊',
+    '😇',
+    '🥰',
+    '😍',
+    '😘',
+    '😗',
+    '😙',
+    '😚',
+    '😋',
+    '😛',
+    '😝',
+    '😜',
+    '🤪',
+    '🤨',
+    '🧐',
+    '🤓',
+    '😎',
+    '🤩',
+    '🥳',
+    '😏',
+    '😒',
+    '🙄',
+    '😬',
+    '🤥',
+    '😌',
+    '😔',
+    '😪',
+    '🤤',
+    '😴',
+    '😷',
+    '🤒',
+    '🤕',
+    '🤢',
+    '🤮',
+    '🤧',
+    '🥵',
+    '🥶',
+    '🥴',
+    '😵',
+    '🤯',
+    '🤠',
+    '😳',
+    '😱',
+    '😨',
+    '😰',
+    '😥',
+    '😓',
+    '🥲',
+    '😟',
+    '😕',
+    '🙁',
+    '☹️',
+    '😣',
+    '😖',
+    '😫',
+    '😩',
+    '🥺',
+    '😢',
+    '😭',
+    '😤',
+    '😠',
+    '😡',
+    '🤬',
+    '🤗',
+    '🤔',
+    '🫣',
+    '🫠',
+    '🫢',
+    '🫡',
+    '🫥',
+    '🤫',
+    '🤭',
+    '🫨',
+    '🫤',
+    '🤐',
+    '🤑',
   ],
   people: [
-    "👋",
-    "🤚",
-    "🖐️",
-    "✋",
-    "🖖",
-    "👌",
-    "🤏",
-    "✌️",
-    "🤞",
-    "🤟",
-    "🤘",
-    "🤙",
-    "👈",
-    "👉",
-    "👆",
-    "🖕",
-    "👇",
-    "☝️",
-    "👍",
-    "👎",
-    "👊",
-    "✊",
-    "🤛",
-    "🤜",
-    "👏",
-    "🙌",
-    "👐",
-    "🤲",
-    "🤝",
-    "🙏",
-    "✍️",
-    "💅",
-    "🤳",
-    "💪",
-    "🦾",
-    "🦿",
-    "🦵",
-    "🦶",
-    "👂",
-    "🦻",
+    '👋',
+    '🤚',
+    '🖐️',
+    '✋',
+    '🖖',
+    '👌',
+    '🤏',
+    '✌️',
+    '🤞',
+    '🤟',
+    '🤘',
+    '🤙',
+    '👈',
+    '👉',
+    '👆',
+    '🖕',
+    '👇',
+    '☝️',
+    '👍',
+    '👎',
+    '👊',
+    '✊',
+    '🤛',
+    '🤜',
+    '👏',
+    '🙌',
+    '👐',
+    '🤲',
+    '🤝',
+    '🙏',
+    '✍️',
+    '💅',
+    '🤳',
+    '💪',
+    '🦾',
+    '🦿',
+    '🦵',
+    '🦶',
+    '👂',
+    '🦻',
   ],
   nature: [
-    "🐶",
-    "🐱",
-    "🐭",
-    "🐹",
-    "🐰",
-    "🦊",
-    "🐻",
-    "🐼",
-    "🐨",
-    "🐯",
-    "🦁",
-    "🐮",
-    "🐷",
-    "🐽",
-    "🐸",
-    "🐵",
-    "🙈",
-    "🙉",
-    "🙊",
-    "🐒",
-    "🐔",
-    "🐧",
-    "🐦",
-    "🐤",
-    "🐣",
-    "🐥",
-    "🦆",
-    "🦅",
-    "🦉",
-    "🦇",
-    "🐺",
-    "🐗",
-    "🐴",
-    "🦄",
-    "🐝",
-    "🐛",
-    "🦋",
-    "🐌",
-    "🐞",
-    "🐜",
+    '🐶',
+    '🐱',
+    '🐭',
+    '🐹',
+    '🐰',
+    '🦊',
+    '🐻',
+    '🐼',
+    '🐨',
+    '🐯',
+    '🦁',
+    '🐮',
+    '🐷',
+    '🐽',
+    '🐸',
+    '🐵',
+    '🙈',
+    '🙉',
+    '🙊',
+    '🐒',
+    '🐔',
+    '🐧',
+    '🐦',
+    '🐤',
+    '🐣',
+    '🐥',
+    '🦆',
+    '🦅',
+    '🦉',
+    '🦇',
+    '🐺',
+    '🐗',
+    '🐴',
+    '🦄',
+    '🐝',
+    '🐛',
+    '🦋',
+    '🐌',
+    '🐞',
+    '🐜',
   ],
   food: [
-    "🍎",
-    "🍐",
-    "🍊",
-    "🍋",
-    "🍌",
-    "🍉",
-    "🍇",
-    "🍓",
-    "🫐",
-    "🍈",
-    "🍒",
-    "🍑",
-    "🥭",
-    "🍍",
-    "🥥",
-    "🥝",
-    "🍅",
-    "🍆",
-    "🥑",
-    "🥦",
-    "🥬",
-    "🥒",
-    "🌶️",
-    "🫑",
-    "🌽",
-    "🥕",
-    "🫒",
-    "🧄",
-    "🧅",
-    "🥔",
-    "🍠",
-    "🥐",
-    "🥖",
-    "🍞",
-    "🥨",
-    "🥯",
-    "🧀",
-    "🥚",
-    "🍳",
-    "🧈",
+    '🍎',
+    '🍐',
+    '🍊',
+    '🍋',
+    '🍌',
+    '🍉',
+    '🍇',
+    '🍓',
+    '🫐',
+    '🍈',
+    '🍒',
+    '🍑',
+    '🥭',
+    '🍍',
+    '🥥',
+    '🥝',
+    '🍅',
+    '🍆',
+    '🥑',
+    '🥦',
+    '🥬',
+    '🥒',
+    '🌶️',
+    '🫑',
+    '🌽',
+    '🥕',
+    '🫒',
+    '🧄',
+    '🧅',
+    '🥔',
+    '🍠',
+    '🥐',
+    '🥖',
+    '🍞',
+    '🥨',
+    '🥯',
+    '🧀',
+    '🥚',
+    '🍳',
+    '🧈',
   ],
   activities: [
-    "⚽",
-    "🏀",
-    "🏈",
-    "⚾",
-    "🥎",
-    "🎾",
-    "🏐",
-    "🏉",
-    "🥏",
-    "🎱",
-    "🪀",
-    "🏓",
-    "🏸",
-    "🏒",
-    "🏑",
-    "🥍",
-    "🏏",
-    "🪃",
-    "🥅",
-    "⛳",
-    "🪁",
-    "🏹",
-    "🎣",
-    "🤿",
-    "🥊",
-    "🥋",
-    "🎽",
-    "🛹",
-    "🛷",
-    "⛸️",
+    '⚽',
+    '🏀',
+    '🏈',
+    '⚾',
+    '🥎',
+    '🎾',
+    '🏐',
+    '🏉',
+    '🥏',
+    '🎱',
+    '🪀',
+    '🏓',
+    '🏸',
+    '🏒',
+    '🏑',
+    '🥍',
+    '🏏',
+    '🪃',
+    '🥅',
+    '⛳',
+    '🪁',
+    '🏹',
+    '🎣',
+    '🤿',
+    '🥊',
+    '🥋',
+    '🎽',
+    '🛹',
+    '🛷',
+    '⛸️',
   ],
   travel: [
-    "🚗",
-    "🚕",
-    "🚙",
-    "🚌",
-    "🚎",
-    "🏎️",
-    "🚓",
-    "🚑",
-    "🚒",
-    "🚐",
-    "🛻",
-    "🚚",
-    "🚛",
-    "🚜",
-    "🏍️",
-    "🛵",
-    "🚲",
-    "🛴",
-    "🛺",
-    "🚨",
-    "🚔",
-    "🚍",
-    "🚘",
-    "🚖",
-    "🚡",
-    "🚠",
-    "🚟",
-    "🚃",
-    "🚋",
-    "🚞",
+    '🚗',
+    '🚕',
+    '🚙',
+    '🚌',
+    '🚎',
+    '🏎️',
+    '🚓',
+    '🚑',
+    '🚒',
+    '🚐',
+    '🛻',
+    '🚚',
+    '🚛',
+    '🚜',
+    '🏍️',
+    '🛵',
+    '🚲',
+    '🛴',
+    '🛺',
+    '🚨',
+    '🚔',
+    '🚍',
+    '🚘',
+    '🚖',
+    '🚡',
+    '🚠',
+    '🚟',
+    '🚃',
+    '🚋',
+    '🚞',
   ],
   objects: [
-    "⌚",
-    "📱",
-    "📲",
-    "💻",
-    "⌨️",
-    "🖥️",
-    "🖨️",
-    "🖱️",
-    "🖲️",
-    "🕹️",
-    "🗜️",
-    "💽",
-    "💾",
-    "💿",
-    "📀",
-    "📼",
-    "📷",
-    "📸",
-    "📹",
-    "🎥",
-    "📽️",
-    "🎞️",
-    "📞",
-    "☎️",
-    "📟",
-    "📠",
-    "📺",
-    "📻",
-    "🎙️",
-    "🎚️",
+    '⌚',
+    '📱',
+    '📲',
+    '💻',
+    '⌨️',
+    '🖥️',
+    '🖨️',
+    '🖱️',
+    '🖲️',
+    '🕹️',
+    '🗜️',
+    '💽',
+    '💾',
+    '💿',
+    '📀',
+    '📼',
+    '📷',
+    '📸',
+    '📹',
+    '🎥',
+    '📽️',
+    '🎞️',
+    '📞',
+    '☎️',
+    '📟',
+    '📠',
+    '📺',
+    '📻',
+    '🎙️',
+    '🎚️',
   ],
   symbols: [
-    "❤️",
-    "🧡",
-    "💛",
-    "💚",
-    "💙",
-    "💜",
-    "🖤",
-    "🤍",
-    "🤎",
-    "💔",
-    "❣️",
-    "💕",
-    "💞",
-    "💓",
-    "💗",
-    "💖",
-    "💘",
-    "💝",
-    "💟",
-    "☮️",
-    "✝️",
-    "☪️",
-    "🕉️",
-    "☸️",
-    "✡️",
-    "🔯",
-    "🕎",
-    "☯️",
-    "☦️",
-    "🛐",
+    '❤️',
+    '🧡',
+    '💛',
+    '💚',
+    '💙',
+    '💜',
+    '🖤',
+    '🤍',
+    '🤎',
+    '💔',
+    '❣️',
+    '💕',
+    '💞',
+    '💓',
+    '💗',
+    '💖',
+    '💘',
+    '💝',
+    '💟',
+    '☮️',
+    '✝️',
+    '☪️',
+    '🕉️',
+    '☸️',
+    '✡️',
+    '🔯',
+    '🕎',
+    '☯️',
+    '☦️',
+    '🛐',
   ],
   flags: [
-    "🏁",
-    "🚩",
-    "🎌",
-    "🏴",
-    "🏳️",
-    "🏳️‍🌈",
-    "🏳️‍⚧️",
-    "🏴‍☠️",
-    "🇦🇨",
-    "🇦🇩",
-    "🇦🇪",
-    "🇦🇫",
-    "🇦🇬",
-    "🇦🇮",
-    "🇦🇱",
-    "🇦🇲",
-    "🇦🇴",
-    "🇦🇶",
-    "🇦🇷",
-    "🇦🇸",
+    '🏁',
+    '🚩',
+    '🎌',
+    '🏴',
+    '🏳️',
+    '🏳️‍🌈',
+    '🏳️‍⚧️',
+    '🏴‍☠️',
+    '🇦🇨',
+    '🇦🇩',
+    '🇦🇪',
+    '🇦🇫',
+    '🇦🇬',
+    '🇦🇮',
+    '🇦🇱',
+    '🇦🇲',
+    '🇦🇴',
+    '🇦🇶',
+    '🇦🇷',
+    '🇦🇸',
   ],
 };
 
@@ -406,8 +399,8 @@ const EmojiPicker: React.FC<EmojiPickerProps> = ({
   onClose,
 }) => {
   const { t } = useTranslation();
-  const [selectedCategory, setSelectedCategory] = useState("recent");
-  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState('recent');
+  const [searchQuery, setSearchQuery] = useState('');
 
   const handleEmojiClick = (emoji: string) => {
     onEmojiSelect(emoji);
@@ -422,26 +415,26 @@ const EmojiPicker: React.FC<EmojiPickerProps> = ({
   // 이 피커가 열려있는 동안에만 모달 backdrop의 blur를 비활성화
   useEffect(() => {
     if (open) {
-      document.body.classList.add("no-backdrop-blur");
+      document.body.classList.add('no-backdrop-blur');
     } else {
-      document.body.classList.remove("no-backdrop-blur");
+      document.body.classList.remove('no-backdrop-blur');
     }
     return () => {
-      document.body.classList.remove("no-backdrop-blur");
+      document.body.classList.remove('no-backdrop-blur');
     };
   }, [open]);
 
   const categoryLabels = {
-    recent: t("chat.recentEmojis"),
-    smileys: t("chat.smileysEmojis"),
-    people: t("chat.peopleEmojis"),
-    nature: t("chat.natureEmojis"),
-    food: t("chat.foodEmojis"),
-    activities: t("chat.activitiesEmojis"),
-    travel: t("chat.travelEmojis"),
-    objects: t("chat.objectsEmojis"),
-    symbols: t("chat.symbolsEmojis"),
-    flags: t("chat.flagsEmojis"),
+    recent: t('chat.recentEmojis'),
+    smileys: t('chat.smileysEmojis'),
+    people: t('chat.peopleEmojis'),
+    nature: t('chat.natureEmojis'),
+    food: t('chat.foodEmojis'),
+    activities: t('chat.activitiesEmojis'),
+    travel: t('chat.travelEmojis'),
+    objects: t('chat.objectsEmojis'),
+    symbols: t('chat.symbolsEmojis'),
+    flags: t('chat.flagsEmojis'),
   };
 
   return (
@@ -464,50 +457,48 @@ const EmojiPicker: React.FC<EmojiPickerProps> = ({
         anchorEl={anchorEl}
         onClose={onClose}
         anchorOrigin={{
-          vertical: "top",
-          horizontal: "left",
+          vertical: 'top',
+          horizontal: 'left',
         }}
         transformOrigin={{
-          vertical: "bottom",
-          horizontal: "left",
+          vertical: 'bottom',
+          horizontal: 'left',
         }}
         BackdropProps={{
-          className: "emoji-picker-backdrop",
+          className: 'emoji-picker-backdrop',
           style: {
-            backgroundColor: "transparent",
-            backdropFilter: "none",
-            WebkitBackdropFilter: "none",
-            filter: "none",
+            backgroundColor: 'transparent',
+            backdropFilter: 'none',
+            WebkitBackdropFilter: 'none',
+            filter: 'none',
           },
         }}
         PaperProps={{
           sx: {
             width: 420, // 슬랙 스타일로 더 넓게
             height: 520, // 세로 높이 확장하여 내부 스크롤 방지
-            maxHeight: "min(70vh, 560px)",
+            maxHeight: 'min(70vh, 560px)',
             p: 0,
-            bgcolor: "background.paper",
-            overflow: "hidden",
+            bgcolor: 'background.paper',
+            overflow: 'hidden',
           },
         }}
       >
-        <Box sx={{ height: "100%", display: "flex", minHeight: 0 }}>
+        <Box sx={{ height: '100%', display: 'flex', minHeight: 0 }}>
           {/* 슬랙 스타일 세로 카테고리 사이드바 */}
           {!searchQuery && (
             <>
               <Box
                 sx={{
                   width: 60,
-                  height: "100%",
+                  height: '100%',
                   backgroundColor: (theme) =>
-                    theme.palette.mode === "dark"
-                      ? "rgba(255, 255, 255, 0.05)"
-                      : "#f5f5f5",
-                  display: "flex",
-                  flexDirection: "column",
+                    theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : '#f5f5f5',
+                  display: 'flex',
+                  flexDirection: 'column',
                   py: 1,
                   flexShrink: 0,
-                  overflow: "auto",
+                  overflow: 'auto',
                   borderRight: (theme) => `1px solid ${theme.palette.divider}`,
                 }}
               >
@@ -525,9 +516,7 @@ const EmojiPicker: React.FC<EmojiPickerProps> = ({
                     objects: Devices,
                     symbols: FavoriteBorder,
                     flags: Flag,
-                  }[
-                    category as keyof typeof categoryLabels
-                  ] as React.ElementType;
+                  }[category as keyof typeof categoryLabels] as React.ElementType;
 
                   return (
                     <IconButton
@@ -536,37 +525,35 @@ const EmojiPicker: React.FC<EmojiPickerProps> = ({
                       sx={{
                         width: 44,
                         height: 44,
-                        mx: "auto",
+                        mx: 'auto',
                         mb: 0.5,
                         color: isSelected
-                          ? "primary.main"
+                          ? 'primary.main'
                           : (theme) =>
-                              theme.palette.mode === "dark"
-                                ? "rgba(255, 255, 255, 0.7)"
-                                : "rgba(0, 0, 0, 0.6)",
+                              theme.palette.mode === 'dark'
+                                ? 'rgba(255, 255, 255, 0.7)'
+                                : 'rgba(0, 0, 0, 0.6)',
                         backgroundColor: isSelected
                           ? (theme) =>
-                              theme.palette.mode === "dark"
-                                ? "rgba(144, 202, 249, 0.16)"
-                                : "rgba(25, 118, 210, 0.08)"
-                          : "transparent",
+                              theme.palette.mode === 'dark'
+                                ? 'rgba(144, 202, 249, 0.16)'
+                                : 'rgba(25, 118, 210, 0.08)'
+                          : 'transparent',
                         borderRadius: 0,
-                        "&:hover": {
+                        '&:hover': {
                           backgroundColor: isSelected
                             ? (theme) =>
-                                theme.palette.mode === "dark"
-                                  ? "rgba(144, 202, 249, 0.24)"
-                                  : "rgba(25, 118, 210, 0.12)"
+                                theme.palette.mode === 'dark'
+                                  ? 'rgba(144, 202, 249, 0.24)'
+                                  : 'rgba(25, 118, 210, 0.12)'
                             : (theme) =>
-                                theme.palette.mode === "dark"
-                                  ? "rgba(255, 255, 255, 0.08)"
-                                  : "rgba(0, 0, 0, 0.04)",
+                                theme.palette.mode === 'dark'
+                                  ? 'rgba(255, 255, 255, 0.08)'
+                                  : 'rgba(0, 0, 0, 0.04)',
                         },
-                        "& .MuiTouchRipple-root": { display: "none" },
+                        '& .MuiTouchRipple-root': { display: 'none' },
                       }}
-                      title={
-                        categoryLabels[category as keyof typeof categoryLabels]
-                      }
+                      title={categoryLabels[category as keyof typeof categoryLabels]}
                       disableRipple
                     >
                       <Icon fontSize="small" />
@@ -581,17 +568,17 @@ const EmojiPicker: React.FC<EmojiPickerProps> = ({
           <Box
             sx={{
               flex: 1,
-              display: "flex",
-              flexDirection: "column",
+              display: 'flex',
+              flexDirection: 'column',
               p: 2,
-              overflow: "hidden",
+              overflow: 'hidden',
             }}
           >
             {/* Search */}
             <Box sx={{ mb: 2 }}>
               <TextField
                 size="small"
-                placeholder={t("chat.searchEmojis")}
+                placeholder={t('chat.searchEmojis')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 InputProps={{
@@ -603,22 +590,22 @@ const EmojiPicker: React.FC<EmojiPickerProps> = ({
                 }}
                 fullWidth
                 sx={{
-                  "& .MuiOutlinedInput-root": {
+                  '& .MuiOutlinedInput-root': {
                     backgroundColor: (theme) =>
-                      theme.palette.mode === "dark"
-                        ? "rgba(255, 255, 255, 0.05)"
-                        : "rgba(0, 0, 0, 0.02)",
-                    "&:hover": {
+                      theme.palette.mode === 'dark'
+                        ? 'rgba(255, 255, 255, 0.05)'
+                        : 'rgba(0, 0, 0, 0.02)',
+                    '&:hover': {
                       backgroundColor: (theme) =>
-                        theme.palette.mode === "dark"
-                          ? "rgba(255, 255, 255, 0.08)"
-                          : "rgba(0, 0, 0, 0.04)",
+                        theme.palette.mode === 'dark'
+                          ? 'rgba(255, 255, 255, 0.08)'
+                          : 'rgba(0, 0, 0, 0.04)',
                     },
-                    "&.Mui-focused": {
+                    '&.Mui-focused': {
                       backgroundColor: (theme) =>
-                        theme.palette.mode === "dark"
-                          ? "rgba(255, 255, 255, 0.08)"
-                          : "rgba(0, 0, 0, 0.04)",
+                        theme.palette.mode === 'dark'
+                          ? 'rgba(255, 255, 255, 0.08)'
+                          : 'rgba(0, 0, 0, 0.04)',
                     },
                   },
                 }}
@@ -632,18 +619,14 @@ const EmojiPicker: React.FC<EmojiPickerProps> = ({
                 sx={{
                   mb: 1.5,
                   px: 0.5,
-                  color: "text.secondary",
+                  color: 'text.secondary',
                   fontWeight: 600,
-                  fontSize: "0.75rem",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.5px",
+                  fontSize: '0.75rem',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px',
                 }}
               >
-                {
-                  categoryLabels[
-                    selectedCategory as keyof typeof categoryLabels
-                  ]
-                }
+                {categoryLabels[selectedCategory as keyof typeof categoryLabels]}
               </Typography>
             )}
 
@@ -651,27 +634,27 @@ const EmojiPicker: React.FC<EmojiPickerProps> = ({
             <Box
               sx={{
                 flex: 1,
-                overflow: "auto",
+                overflow: 'auto',
               }}
             >
               {filteredEmojis.length === 0 ? (
                 <Box
                   sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    height: "200px",
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    height: '200px',
                   }}
                 >
                   <Typography variant="body2" color="text.secondary">
-                    {searchQuery ? t("chat.noEmojisFound") : t("chat.noEmojis")}
+                    {searchQuery ? t('chat.noEmojisFound') : t('chat.noEmojis')}
                   </Typography>
                 </Box>
               ) : (
                 <Box
                   sx={{
-                    display: "grid",
-                    gridTemplateColumns: "repeat(8, 1fr)",
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(8, 1fr)',
                     gap: 0.5,
                     pb: 1,
                   }}
@@ -685,23 +668,21 @@ const EmojiPicker: React.FC<EmojiPickerProps> = ({
                       sx={{
                         width: 40,
                         height: 40,
-                        fontSize: "1.5rem",
-                        color: "inherit",
-                        backgroundColor: "transparent",
+                        fontSize: '1.5rem',
+                        color: 'inherit',
+                        backgroundColor: 'transparent',
                         borderRadius: 0,
-                        "&:hover": {
+                        '&:hover': {
                           backgroundColor: (theme) =>
-                            theme.palette.mode === "dark"
-                              ? "rgba(255, 255, 255, 0.08)"
-                              : "rgba(0, 0, 0, 0.04)",
-                          transform: "scale(1.2)",
+                            theme.palette.mode === 'dark'
+                              ? 'rgba(255, 255, 255, 0.08)'
+                              : 'rgba(0, 0, 0, 0.04)',
+                          transform: 'scale(1.2)',
                         },
-                        transition: "all 0.15s ease-in-out",
+                        transition: 'all 0.15s ease-in-out',
                       }}
                     >
-                      <span style={{ display: "block", lineHeight: 1 }}>
-                        {emoji}
-                      </span>
+                      <span style={{ display: 'block', lineHeight: 1 }}>{emoji}</span>
                     </IconButton>
                   ))}
                 </Box>

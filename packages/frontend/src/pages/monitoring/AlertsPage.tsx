@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   Box,
   Card,
@@ -12,12 +12,12 @@ import {
   TableRow,
   Typography,
   Chip,
-} from "@mui/material";
-import { useTranslation } from "react-i18next";
-import { useSnackbar } from "notistack";
-import { usePageState } from "../../hooks/usePageState";
-import SimplePagination from "../../components/common/SimplePagination";
-import api from "@/services/api";
+} from '@mui/material';
+import { useTranslation } from 'react-i18next';
+import { useSnackbar } from 'notistack';
+import { usePageState } from '../../hooks/usePageState';
+import SimplePagination from '../../components/common/SimplePagination';
+import api from '@/services/api';
 
 interface MonitoringAlert {
   id: string;
@@ -39,7 +39,7 @@ const AlertsPage: React.FC = () => {
       limit: 10,
       filters: {},
     },
-    storageKey: "monitoringAlertsPage",
+    storageKey: 'monitoringAlertsPage',
   });
 
   const [alerts, setAlerts] = useState<MonitoringAlert[]>([]);
@@ -55,7 +55,7 @@ const AlertsPage: React.FC = () => {
         limit: pageState.limit,
       };
 
-      const result = await api.get("/admin/monitoring/alerts", {
+      const result = await api.get('/admin/monitoring/alerts', {
         params,
       });
 
@@ -70,9 +70,9 @@ const AlertsPage: React.FC = () => {
       }
     } catch (error: any) {
       // eslint-disable-next-line no-console
-      console.error("Failed to load monitoring alerts", error);
-      enqueueSnackbar(error.message || t("monitoring.alerts.loadFailed"), {
-        variant: "error",
+      console.error('Failed to load monitoring alerts', error);
+      enqueueSnackbar(error.message || t('monitoring.alerts.loadFailed'), {
+        variant: 'error',
       });
       setAlerts([]);
       setTotal(0);
@@ -89,46 +89,40 @@ const AlertsPage: React.FC = () => {
     updatePage(newPage + 1);
   };
 
-  const handleRowsPerPageChange = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
+  const handleRowsPerPageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     updateLimit(parseInt(event.target.value, 10));
   };
 
   const renderSeverityChip = (severity: string) => {
-    const color: "default" | "primary" | "success" | "warning" | "error" =
-      severity === "critical"
-        ? "error"
-        : severity === "warning"
-          ? "warning"
-          : severity === "info"
-            ? "primary"
-            : "default";
+    const color: 'default' | 'primary' | 'success' | 'warning' | 'error' =
+      severity === 'critical'
+        ? 'error'
+        : severity === 'warning'
+          ? 'warning'
+          : severity === 'info'
+            ? 'primary'
+            : 'default';
 
     return (
       <Chip
         size="small"
         label={severity}
         color={color}
-        variant={color === "default" ? "outlined" : "filled"}
+        variant={color === 'default' ? 'outlined' : 'filled'}
       />
     );
   };
 
   const renderStatusChip = (status: string) => {
-    const color: "default" | "primary" | "success" | "warning" | "error" =
-      status === "firing"
-        ? "error"
-        : status === "resolved"
-          ? "success"
-          : "default";
+    const color: 'default' | 'primary' | 'success' | 'warning' | 'error' =
+      status === 'firing' ? 'error' : status === 'resolved' ? 'success' : 'default';
 
     return (
       <Chip
         size="small"
         label={status}
         color={color}
-        variant={color === "default" ? "outlined" : "filled"}
+        variant={color === 'default' ? 'outlined' : 'filled'}
       />
     );
   };
@@ -139,19 +133,19 @@ const AlertsPage: React.FC = () => {
       <Box sx={{ mb: 3 }}>
         <Box
           sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
           }}
         >
-          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <Typography variant="h5" sx={{ fontWeight: 700 }}>
-              {t("monitoring.alerts.title")}
+              {t('monitoring.alerts.title')}
             </Typography>
           </Box>
         </Box>
         <Typography variant="caption" color="text.secondary">
-          {t("monitoring.alerts.subtitle")}
+          {t('monitoring.alerts.subtitle')}
         </Typography>
       </Box>
 
@@ -160,9 +154,9 @@ const AlertsPage: React.FC = () => {
           {loading ? (
             <Box
               sx={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
                 minHeight: 200,
               }}
             >
@@ -174,24 +168,12 @@ const AlertsPage: React.FC = () => {
                 <Table size="small">
                   <TableHead>
                     <TableRow>
-                      <TableCell>
-                        {t("monitoring.alerts.fields.name")}
-                      </TableCell>
-                      <TableCell>
-                        {t("monitoring.alerts.fields.severity")}
-                      </TableCell>
-                      <TableCell>
-                        {t("monitoring.alerts.fields.status")}
-                      </TableCell>
-                      <TableCell>
-                        {t("monitoring.alerts.fields.message")}
-                      </TableCell>
-                      <TableCell>
-                        {t("monitoring.alerts.fields.startsAt")}
-                      </TableCell>
-                      <TableCell>
-                        {t("monitoring.alerts.fields.endsAt")}
-                      </TableCell>
+                      <TableCell>{t('monitoring.alerts.fields.name')}</TableCell>
+                      <TableCell>{t('monitoring.alerts.fields.severity')}</TableCell>
+                      <TableCell>{t('monitoring.alerts.fields.status')}</TableCell>
+                      <TableCell>{t('monitoring.alerts.fields.message')}</TableCell>
+                      <TableCell>{t('monitoring.alerts.fields.startsAt')}</TableCell>
+                      <TableCell>{t('monitoring.alerts.fields.endsAt')}</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -199,7 +181,7 @@ const AlertsPage: React.FC = () => {
                       <TableRow>
                         <TableCell colSpan={6} align="center">
                           <Typography variant="body2" color="text.secondary">
-                            {t("common.noData")}
+                            {t('common.noData')}
                           </Typography>
                         </TableCell>
                       </TableRow>
@@ -207,22 +189,14 @@ const AlertsPage: React.FC = () => {
                       alerts.map((alert) => (
                         <TableRow key={alert.id} hover>
                           <TableCell>{alert.alertName}</TableCell>
-                          <TableCell>
-                            {renderSeverityChip(alert.alertSeverity)}
-                          </TableCell>
-                          <TableCell>
-                            {renderStatusChip(alert.alertStatus)}
-                          </TableCell>
+                          <TableCell>{renderSeverityChip(alert.alertSeverity)}</TableCell>
+                          <TableCell>{renderStatusChip(alert.alertStatus)}</TableCell>
                           <TableCell>{alert.alertMessage}</TableCell>
                           <TableCell>
-                            {alert.startsAt
-                              ? new Date(alert.startsAt).toLocaleString()
-                              : "-"}
+                            {alert.startsAt ? new Date(alert.startsAt).toLocaleString() : '-'}
                           </TableCell>
                           <TableCell>
-                            {alert.endsAt
-                              ? new Date(alert.endsAt).toLocaleString()
-                              : "-"}
+                            {alert.endsAt ? new Date(alert.endsAt).toLocaleString() : '-'}
                           </TableCell>
                         </TableRow>
                       ))

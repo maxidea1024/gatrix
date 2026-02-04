@@ -105,17 +105,17 @@
 }
 
 .link-preview-author::before {
-  content: "👤";
+  content: '👤';
   font-size: 10px;
 }
 
 .link-preview-reading-time::before {
-  content: "⏱️";
+  content: '⏱️';
   font-size: 10px;
 }
 
 .link-preview-published-time::before {
-  content: "📅";
+  content: '📅';
   font-size: 10px;
 }
 
@@ -240,23 +240,23 @@
   .link-preview {
     max-width: 100%;
   }
-  
+
   .link-preview-image {
     height: 150px;
   }
-  
+
   .link-preview-content {
     padding: 12px;
   }
-  
+
   .link-preview-title {
     font-size: 15px;
   }
-  
+
   .link-preview-description {
     font-size: 13px;
   }
-  
+
   .link-preview-meta {
     gap: 8px;
     font-size: 11px;
@@ -269,40 +269,40 @@
     background: #1a1d21;
     border-color: #3c4043;
   }
-  
+
   .link-preview-card:hover {
     border-color: #4285f4;
   }
-  
+
   .link-preview-title {
     color: #e8eaed;
   }
-  
+
   .link-preview-description {
     color: #9aa0a6;
   }
-  
+
   .link-preview-meta {
     color: #9aa0a6;
   }
-  
+
   .link-preview-url {
     color: #8ab4f8;
   }
-  
+
   .link-preview.error .link-preview-card {
     background: #202124;
     border-color: #3c4043;
   }
-  
+
   .fallback-url {
     color: #8ab4f8;
   }
-  
+
   .fallback-message {
     color: #9aa0a6;
   }
-  
+
   .skeleton-image,
   .skeleton-title,
   .skeleton-description,

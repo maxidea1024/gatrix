@@ -10,18 +10,18 @@
  * @returns '#000' for bright backgrounds, '#fff' for dark backgrounds
  */
 export const getContrastColor = (hexColor: string): string => {
-  if (!hexColor) return "#fff";
+  if (!hexColor) return '#fff';
 
   // Remove # if present
-  const hex = hexColor.replace("#", "");
+  const hex = hexColor.replace('#', '');
 
   // Handle 3-character hex
   const fullHex =
     hex.length === 3
       ? hex
-          .split("")
+          .split('')
           .map((c) => c + c)
-          .join("")
+          .join('')
       : hex;
 
   // Parse RGB values
@@ -30,11 +30,11 @@ export const getContrastColor = (hexColor: string): string => {
   const b = parseInt(fullHex.substring(4, 6), 16);
 
   // Handle invalid colors
-  if (isNaN(r) || isNaN(g) || isNaN(b)) return "#fff";
+  if (isNaN(r) || isNaN(g) || isNaN(b)) return '#fff';
 
   // Calculate relative luminance using sRGB formula
   const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
 
   // Use black text for bright backgrounds, white for dark
-  return luminance > 0.5 ? "#000" : "#fff";
+  return luminance > 0.5 ? '#000' : '#fff';
 };

@@ -6,121 +6,121 @@
 // All available permissions in the system
 export const PERMISSIONS = {
   // User Management
-  USERS_VIEW: "users.view",
-  USERS_MANAGE: "users.manage",
+  USERS_VIEW: 'users.view',
+  USERS_MANAGE: 'users.manage',
 
   // Client Versions
-  CLIENT_VERSIONS_VIEW: "client-versions.view",
-  CLIENT_VERSIONS_MANAGE: "client-versions.manage",
+  CLIENT_VERSIONS_VIEW: 'client-versions.view',
+  CLIENT_VERSIONS_MANAGE: 'client-versions.manage',
 
   // Game Worlds
-  GAME_WORLDS_VIEW: "game-worlds.view",
-  GAME_WORLDS_MANAGE: "game-worlds.manage",
+  GAME_WORLDS_VIEW: 'game-worlds.view',
+  GAME_WORLDS_MANAGE: 'game-worlds.manage',
 
   // Maintenance
-  MAINTENANCE_VIEW: "maintenance.view",
-  MAINTENANCE_MANAGE: "maintenance.manage",
+  MAINTENANCE_VIEW: 'maintenance.view',
+  MAINTENANCE_MANAGE: 'maintenance.manage',
 
   // Maintenance Templates
-  MAINTENANCE_TEMPLATES_VIEW: "maintenance-templates.view",
-  MAINTENANCE_TEMPLATES_MANAGE: "maintenance-templates.manage",
+  MAINTENANCE_TEMPLATES_VIEW: 'maintenance-templates.view',
+  MAINTENANCE_TEMPLATES_MANAGE: 'maintenance-templates.manage',
 
   // Scheduler
-  SCHEDULER_VIEW: "scheduler.view",
-  SCHEDULER_MANAGE: "scheduler.manage",
+  SCHEDULER_VIEW: 'scheduler.view',
+  SCHEDULER_MANAGE: 'scheduler.manage',
 
   // Audit Logs
-  AUDIT_LOGS_VIEW: "audit-logs.view",
+  AUDIT_LOGS_VIEW: 'audit-logs.view',
 
   // Realtime Events
-  REALTIME_EVENTS_VIEW: "realtime-events.view",
+  REALTIME_EVENTS_VIEW: 'realtime-events.view',
 
   // Crash Events
-  CRASH_EVENTS_VIEW: "crash-events.view",
+  CRASH_EVENTS_VIEW: 'crash-events.view',
 
   // Security
-  SECURITY_VIEW: "security.view",
-  SECURITY_MANAGE: "security.manage",
+  SECURITY_VIEW: 'security.view',
+  SECURITY_MANAGE: 'security.manage',
 
   // Server Management
-  SERVERS_VIEW: "servers.view",
-  SERVERS_MANAGE: "servers.manage",
+  SERVERS_VIEW: 'servers.view',
+  SERVERS_MANAGE: 'servers.manage',
 
   // Monitoring
-  MONITORING_VIEW: "monitoring.view",
+  MONITORING_VIEW: 'monitoring.view',
 
   // Open API
-  OPEN_API_VIEW: "open-api.view",
+  OPEN_API_VIEW: 'open-api.view',
 
   // Console
-  CONSOLE_ACCESS: "console.access",
+  CONSOLE_ACCESS: 'console.access',
 
   // Game Management - Service Notices
-  SERVICE_NOTICES_VIEW: "service-notices.view",
-  SERVICE_NOTICES_MANAGE: "service-notices.manage",
+  SERVICE_NOTICES_VIEW: 'service-notices.view',
+  SERVICE_NOTICES_MANAGE: 'service-notices.manage',
 
   // Game Management - Ingame Popup Notices
-  INGAME_POPUP_NOTICES_VIEW: "ingame-popup-notices.view",
-  INGAME_POPUP_NOTICES_MANAGE: "ingame-popup-notices.manage",
+  INGAME_POPUP_NOTICES_VIEW: 'ingame-popup-notices.view',
+  INGAME_POPUP_NOTICES_MANAGE: 'ingame-popup-notices.manage',
 
   // Game Management - Coupons
-  COUPONS_VIEW: "coupons.view",
-  COUPONS_MANAGE: "coupons.manage",
+  COUPONS_VIEW: 'coupons.view',
+  COUPONS_MANAGE: 'coupons.manage',
 
   // Game Management - Surveys
-  SURVEYS_VIEW: "surveys.view",
-  SURVEYS_MANAGE: "surveys.manage",
+  SURVEYS_VIEW: 'surveys.view',
+  SURVEYS_MANAGE: 'surveys.manage',
 
   // Game Management - Operation Events
-  OPERATION_EVENTS_VIEW: "operation-events.view",
-  OPERATION_EVENTS_MANAGE: "operation-events.manage",
+  OPERATION_EVENTS_VIEW: 'operation-events.view',
+  OPERATION_EVENTS_MANAGE: 'operation-events.manage',
 
   // Game Management - Store Products
-  STORE_PRODUCTS_VIEW: "store-products.view",
-  STORE_PRODUCTS_MANAGE: "store-products.manage",
+  STORE_PRODUCTS_VIEW: 'store-products.view',
+  STORE_PRODUCTS_MANAGE: 'store-products.manage',
 
   // Game Management - Reward Templates
-  REWARD_TEMPLATES_VIEW: "reward-templates.view",
-  REWARD_TEMPLATES_MANAGE: "reward-templates.manage",
+  REWARD_TEMPLATES_VIEW: 'reward-templates.view',
+  REWARD_TEMPLATES_MANAGE: 'reward-templates.manage',
 
   // Game Management - Banners
-  BANNERS_VIEW: "banners.view",
-  BANNERS_MANAGE: "banners.manage",
+  BANNERS_VIEW: 'banners.view',
+  BANNERS_MANAGE: 'banners.manage',
 
   // Game Management - Planning Data
-  PLANNING_DATA_VIEW: "planning-data.view",
-  PLANNING_DATA_MANAGE: "planning-data.manage",
+  PLANNING_DATA_VIEW: 'planning-data.view',
+  PLANNING_DATA_MANAGE: 'planning-data.manage',
 
   // Game Management - Feature Flags
-  FEATURE_FLAGS_VIEW: "feature-flags.view",
-  FEATURE_FLAGS_MANAGE: "feature-flags.manage",
+  FEATURE_FLAGS_VIEW: 'feature-flags.view',
+  FEATURE_FLAGS_MANAGE: 'feature-flags.manage',
 
   // Game Management - Change Requests
-  CHANGE_REQUESTS_VIEW: "change-requests.view",
-  CHANGE_REQUESTS_MANAGE: "change-requests.manage",
+  CHANGE_REQUESTS_VIEW: 'change-requests.view',
+  CHANGE_REQUESTS_MANAGE: 'change-requests.manage',
 
   // Event Lens
-  EVENT_LENS_VIEW: "event-lens.view",
-  EVENT_LENS_MANAGE: "event-lens.manage",
+  EVENT_LENS_VIEW: 'event-lens.view',
+  EVENT_LENS_MANAGE: 'event-lens.manage',
 
   // Settings - Tags
-  TAGS_VIEW: "tags.view",
-  TAGS_MANAGE: "tags.manage",
+  TAGS_VIEW: 'tags.view',
+  TAGS_MANAGE: 'tags.manage',
 
   // Settings - Data Management
-  DATA_MANAGEMENT_VIEW: "data-management.view",
-  DATA_MANAGEMENT_MANAGE: "data-management.manage",
+  DATA_MANAGEMENT_VIEW: 'data-management.view',
+  DATA_MANAGEMENT_MANAGE: 'data-management.manage',
 
   // Settings - Environments
-  ENVIRONMENTS_VIEW: "environments.view",
-  ENVIRONMENTS_MANAGE: "environments.manage",
+  ENVIRONMENTS_VIEW: 'environments.view',
+  ENVIRONMENTS_MANAGE: 'environments.manage',
 
   // Settings - System Settings (Network, Integrations, Service Discovery, KV)
-  SYSTEM_SETTINGS_VIEW: "system-settings.view",
-  SYSTEM_SETTINGS_MANAGE: "system-settings.manage",
+  SYSTEM_SETTINGS_VIEW: 'system-settings.view',
+  SYSTEM_SETTINGS_MANAGE: 'system-settings.manage',
 
   // Chat
-  CHAT_ACCESS: "chat.access",
+  CHAT_ACCESS: 'chat.access',
 } as const;
 
 export type Permission = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];
@@ -137,7 +137,7 @@ export interface PermissionCategory {
 // Permission categories for UI grouping
 export const PERMISSION_CATEGORIES: Record<string, PermissionCategory> = {
   ADMIN_PANEL: {
-    label: "permissions.categories.adminPanel",
+    label: 'permissions.categories.adminPanel',
     permissions: [
       PERMISSIONS.USERS_VIEW,
       PERMISSIONS.USERS_MANAGE,
@@ -164,7 +164,7 @@ export const PERMISSION_CATEGORIES: Record<string, PermissionCategory> = {
     ],
   },
   GAME_MANAGEMENT: {
-    label: "permissions.categories.gameManagement",
+    label: 'permissions.categories.gameManagement',
     permissions: [
       PERMISSIONS.SERVICE_NOTICES_VIEW,
       PERMISSIONS.SERVICE_NOTICES_MANAGE,
@@ -191,11 +191,11 @@ export const PERMISSION_CATEGORIES: Record<string, PermissionCategory> = {
     ],
   },
   EVENT_LENS: {
-    label: "permissions.categories.eventLens",
+    label: 'permissions.categories.eventLens',
     permissions: [PERMISSIONS.EVENT_LENS_VIEW, PERMISSIONS.EVENT_LENS_MANAGE],
   },
   SETTINGS: {
-    label: "permissions.categories.settings",
+    label: 'permissions.categories.settings',
     permissions: [
       PERMISSIONS.TAGS_VIEW,
       PERMISSIONS.TAGS_MANAGE,
@@ -211,5 +211,5 @@ export const PERMISSION_CATEGORIES: Record<string, PermissionCategory> = {
 
 // Helper to get permission label key for i18n
 export const getPermissionLabelKey = (permission: Permission): string => {
-  return `permissions.${permission.replace(".", "_")}`;
+  return `permissions.${permission.replace('.', '_')}`;
 };

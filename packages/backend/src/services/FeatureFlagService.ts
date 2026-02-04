@@ -217,9 +217,7 @@ class FeatureFlagService {
     }
 
     // Determine variantType: for feature flags, default to 'none', for remote configs, it's required
-    const variantType = isRemoteConfig
-      ? input.variantType
-      : (input.variantType || 'none');
+    const variantType = isRemoteConfig ? input.variantType : input.variantType || 'none';
 
     const flag = await FeatureFlagModel.create({
       environment: input.environment,
@@ -250,7 +248,7 @@ class FeatureFlagService {
       await FeatureVariantModel.create({
         flagId: flag.id,
         environment: input.environment,
-        variantName: 'config',  // 'config' is default variant name for remote config
+        variantName: 'config', // 'config' is default variant name for remote config
         weight: 100,
         payload: defaultPayload,
         payloadType: 'json',

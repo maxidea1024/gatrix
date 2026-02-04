@@ -1,4 +1,4 @@
-import api from "./api";
+import api from './api';
 
 export interface RewardTypeInfo {
   value: number;
@@ -87,18 +87,18 @@ class PlanningDataService {
    * Helper function to get current language code
    * Gets language from localStorage (set by i18next)
    */
-  private getCurrentLanguage(): "kr" | "en" | "zh" {
+  private getCurrentLanguage(): 'kr' | 'en' | 'zh' {
     try {
-      const lang = localStorage.getItem("i18nextLng") || "ko";
+      const lang = localStorage.getItem('i18nextLng') || 'ko';
       // Map language codes to API format
-      const langMap: Record<string, "kr" | "en" | "zh"> = {
-        en: "en",
-        ko: "kr", // Changed from 'ko' to 'kr'
-        zh: "zh",
+      const langMap: Record<string, 'kr' | 'en' | 'zh'> = {
+        en: 'en',
+        ko: 'kr', // Changed from 'ko' to 'kr'
+        zh: 'zh',
       };
-      return langMap[lang] || "kr"; // Changed default from 'ko' to 'kr'
+      return langMap[lang] || 'kr'; // Changed default from 'ko' to 'kr'
     } catch {
-      return "kr"; // Changed default from 'ko' to 'kr'
+      return 'kr'; // Changed default from 'ko' to 'kr'
     }
   }
 
@@ -107,7 +107,7 @@ class PlanningDataService {
    */
   async getRewardLookup(): Promise<RewardLookupData> {
     const lang = this.getCurrentLanguage();
-    const response = await api.get("/admin/planning-data/reward-lookup", {
+    const response = await api.get('/admin/planning-data/reward-lookup', {
       params: { lang },
     });
     return response.data;
@@ -117,7 +117,7 @@ class PlanningDataService {
    * Get reward type list
    */
   async getRewardTypeList(): Promise<RewardTypeInfo[]> {
-    const response = await api.get("/admin/planning-data/reward-types");
+    const response = await api.get('/admin/planning-data/reward-types');
     return response.data;
   }
 
@@ -128,13 +128,12 @@ class PlanningDataService {
    */
   async getRewardTypeItems(
     rewardType: number,
-    language?: "kr" | "en" | "zh",
+    language?: 'kr' | 'en' | 'zh'
   ): Promise<RewardItem[]> {
     const lang = language || this.getCurrentLanguage();
-    const response = await api.get(
-      `/admin/planning-data/reward-types/${rewardType}/items`,
-      { params: { lang } },
-    );
+    const response = await api.get(`/admin/planning-data/reward-types/${rewardType}/items`, {
+      params: { lang },
+    });
     return response.data;
   }
 
@@ -146,7 +145,7 @@ class PlanningDataService {
     message: string;
     stats?: any;
   }> {
-    const response = await api.post("/admin/planning-data/rebuild");
+    const response = await api.post('/admin/planning-data/rebuild');
     return response.data;
   }
 
@@ -155,7 +154,7 @@ class PlanningDataService {
    */
   async getUIListData(): Promise<UIListData> {
     const lang = this.getCurrentLanguage();
-    const response = await api.get("/admin/planning-data/ui-list", {
+    const response = await api.get('/admin/planning-data/ui-list', {
       params: { lang },
     });
     return response.data;
@@ -167,10 +166,9 @@ class PlanningDataService {
    */
   async getUIListItems(category: string): Promise<any[]> {
     const lang = this.getCurrentLanguage();
-    const response = await api.get(
-      `/admin/planning-data/ui-list/${category}/items`,
-      { params: { lang } },
-    );
+    const response = await api.get(`/admin/planning-data/ui-list/${category}/items`, {
+      params: { lang },
+    });
     return response.data;
   }
 
@@ -178,7 +176,7 @@ class PlanningDataService {
    * Get planning data statistics
    */
   async getStats(): Promise<PlanningDataStats> {
-    const response = await api.get("/admin/planning-data/stats");
+    const response = await api.get('/admin/planning-data/stats');
     return response.data;
   }
 
@@ -187,7 +185,7 @@ class PlanningDataService {
    */
   async getHotTimeBuffLookup(): Promise<HotTimeBuffLookup> {
     const lang = this.getCurrentLanguage();
-    const response = await api.get("/admin/planning-data/hottimebuff", {
+    const response = await api.get('/admin/planning-data/hottimebuff', {
       params: { lang },
     });
     // api.get() returns { success, data: { totalCount, items }, message }
@@ -203,7 +201,7 @@ class PlanningDataService {
     message: string;
     itemCount: number;
   }> {
-    const response = await api.post("/admin/planning-data/hottimebuff/build");
+    const response = await api.post('/admin/planning-data/hottimebuff/build');
     return response.data;
   }
 
@@ -212,7 +210,7 @@ class PlanningDataService {
    */
   async getEventPageLookup(): Promise<any> {
     const lang = this.getCurrentLanguage();
-    const response = await api.get("/admin/planning-data/eventpage", {
+    const response = await api.get('/admin/planning-data/eventpage', {
       params: { lang },
     });
     // api.get() returns { success, data: { totalCount, items }, message }
@@ -228,7 +226,7 @@ class PlanningDataService {
     message: string;
     itemCount: number;
   }> {
-    const response = await api.post("/admin/planning-data/eventpage/build");
+    const response = await api.post('/admin/planning-data/eventpage/build');
     return response.data;
   }
 
@@ -237,7 +235,7 @@ class PlanningDataService {
    */
   async getLiveEventLookup(): Promise<any> {
     const lang = this.getCurrentLanguage();
-    const response = await api.get("/admin/planning-data/liveevent", {
+    const response = await api.get('/admin/planning-data/liveevent', {
       params: { lang },
     });
     // api.get() returns { success, data: { totalCount, items }, message }
@@ -253,7 +251,7 @@ class PlanningDataService {
     message: string;
     itemCount: number;
   }> {
-    const response = await api.post("/admin/planning-data/liveevent/build");
+    const response = await api.post('/admin/planning-data/liveevent/build');
     return response.data;
   }
 
@@ -262,7 +260,7 @@ class PlanningDataService {
    */
   async getMateRecruitingGroupLookup(): Promise<any> {
     const lang = this.getCurrentLanguage();
-    const response = await api.get("/admin/planning-data/materecruiting", {
+    const response = await api.get('/admin/planning-data/materecruiting', {
       params: { lang },
     });
     return response.data;
@@ -276,9 +274,7 @@ class PlanningDataService {
     message: string;
     itemCount: number;
   }> {
-    const response = await api.post(
-      "/admin/planning-data/materecruiting/build",
-    );
+    const response = await api.post('/admin/planning-data/materecruiting/build');
     return response.data;
   }
 
@@ -287,7 +283,7 @@ class PlanningDataService {
    */
   async getOceanNpcAreaSpawnerLookup(): Promise<any> {
     const lang = this.getCurrentLanguage();
-    const response = await api.get("/admin/planning-data/oceannpcarea", {
+    const response = await api.get('/admin/planning-data/oceannpcarea', {
       params: { lang },
     });
     return response.data;
@@ -301,7 +297,7 @@ class PlanningDataService {
     message: string;
     itemCount: number;
   }> {
-    const response = await api.post("/admin/planning-data/oceannpcarea/build");
+    const response = await api.post('/admin/planning-data/oceannpcarea/build');
     return response.data;
   }
 
@@ -314,7 +310,7 @@ class PlanningDataService {
   async uploadPlanningData(
     files: File[],
     comment?: string,
-    forceUpload?: boolean,
+    forceUpload?: boolean
   ): Promise<{
     success: boolean;
     message: string;
@@ -326,22 +322,22 @@ class PlanningDataService {
 
     // Add each file to FormData
     files.forEach((file) => {
-      formData.append("files", file, file.name);
+      formData.append('files', file, file.name);
     });
 
     // Add optional comment
     if (comment) {
-      formData.append("comment", comment);
+      formData.append('comment', comment);
     }
 
     // Add force upload flag
     if (forceUpload) {
-      formData.append("forceUpload", "true");
+      formData.append('forceUpload', 'true');
     }
 
-    const response = await api.post("/admin/planning-data/upload", formData, {
+    const response = await api.post('/admin/planning-data/upload', formData, {
       headers: {
-        "Content-Type": "multipart/form-data",
+        'Content-Type': 'multipart/form-data',
       },
     });
 
@@ -354,30 +350,24 @@ class PlanningDataService {
    */
   async previewDiff(
     files: File[],
-    onProgress?: (progress: number) => void,
+    onProgress?: (progress: number) => void
   ): Promise<PreviewDiffResult> {
     const formData = new FormData();
     files.forEach((file) => {
-      formData.append("files", file);
+      formData.append('files', file);
     });
 
-    const response = await api.post(
-      "/admin/planning-data/preview-diff",
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-        onUploadProgress: (progressEvent) => {
-          if (onProgress && progressEvent.total) {
-            const progress = Math.round(
-              (progressEvent.loaded / progressEvent.total) * 100,
-            );
-            onProgress(progress);
-          }
-        },
+    const response = await api.post('/admin/planning-data/preview-diff', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
       },
-    );
+      onUploadProgress: (progressEvent) => {
+        if (onProgress && progressEvent.total) {
+          const progress = Math.round((progressEvent.loaded / progressEvent.total) * 100);
+          onProgress(progress);
+        }
+      },
+    });
 
     return response.data;
   }
@@ -386,7 +376,7 @@ class PlanningDataService {
    * Get upload history
    */
   async getUploadHistory(limit: number = 20): Promise<UploadRecord[]> {
-    const response = await api.get("/admin/planning-data/history", {
+    const response = await api.get('/admin/planning-data/history', {
       params: { limit },
     });
     return response.data;
@@ -396,7 +386,7 @@ class PlanningDataService {
    * Get latest upload record
    */
   async getLatestUpload(): Promise<UploadRecord | null> {
-    const response = await api.get("/admin/planning-data/latest");
+    const response = await api.get('/admin/planning-data/latest');
     return response.data;
   }
 
@@ -404,7 +394,7 @@ class PlanningDataService {
    * Reset all upload history
    */
   async resetUploadHistory(): Promise<{ deletedCount: number }> {
-    const response = await api.delete("/admin/planning-data/history");
+    const response = await api.delete('/admin/planning-data/history');
     return response.data;
   }
 }
@@ -433,7 +423,7 @@ export interface UploadRecord {
   filesCount: number;
   totalSize: number;
   uploaderName: string | null;
-  uploadSource: "web" | "cli";
+  uploadSource: 'web' | 'cli';
   uploadComment: string | null;
   changedFiles: string[];
   fileDiffs?: Record<

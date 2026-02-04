@@ -1,30 +1,30 @@
-import { ServiceInstance } from "../../../services/serviceDiscoveryService";
+import { ServiceInstance } from '../../../services/serviceDiscoveryService';
 
 // Service status type
 export type ServiceStatus =
-  | "initializing"
-  | "ready"
-  | "shutting_down"
-  | "terminated"
-  | "error"
-  | "no_response"
-  | "noResponse"
-  | "shuttingDown";
+  | 'initializing'
+  | 'ready'
+  | 'shutting_down'
+  | 'terminated'
+  | 'error'
+  | 'no_response'
+  | 'noResponse'
+  | 'shuttingDown';
 
 // View mode type
-export type ViewMode = "list" | "grid" | "card" | "cluster" | "checkerboard";
+export type ViewMode = 'list' | 'grid' | 'card' | 'cluster' | 'checkerboard';
 
 // Grouping field type for multi-level grouping
 export type GroupingField =
-  | "service"
-  | "group"
-  | "environment"
-  | "cloudProvider"
-  | "cloudRegion"
-  | "cloudZone";
+  | 'service'
+  | 'group'
+  | 'environment'
+  | 'cloudProvider'
+  | 'cloudRegion'
+  | 'cloudZone';
 
 // Grouping option type (includes 'none' for single-level compatibility)
-export type GroupingOption = "none" | GroupingField;
+export type GroupingOption = 'none' | GroupingField;
 
 // Multi-level hierarchical group structure
 export interface ServerGroup {
@@ -41,7 +41,7 @@ export const buildServerGroups = (
   items: ServiceInstance[],
   levels: GroupingField[],
   getLabel: (field: GroupingField) => string,
-  currentLevel: number = 0,
+  currentLevel: number = 0
 ): ServerGroup[] => {
   if (levels.length === 0 || currentLevel >= levels.length) {
     return [];
@@ -54,7 +54,7 @@ export const buildServerGroups = (
   const groupMap = new Map<string, ServiceInstance[]>();
 
   items.forEach((service) => {
-    const value = service.labels[currentField] || "Unknown";
+    const value = service.labels[currentField] || 'Unknown';
     if (!groupMap.has(value)) {
       groupMap.set(value, []);
     }
@@ -65,8 +65,8 @@ export const buildServerGroups = (
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([name, instances]) => {
       const group: ServerGroup = {
-        id: levels.slice(0, currentLevel + 1).join("-") + "-" + name,
-        name: name === "Unknown" ? `(${getLabel(currentField)} N/A)` : name,
+        id: levels.slice(0, currentLevel + 1).join('-') + '-' + name,
+        name: name === 'Unknown' ? `(${getLabel(currentField)} N/A)` : name,
         level: currentLevel,
         fieldName: currentField,
         instances: hasMoreLevels

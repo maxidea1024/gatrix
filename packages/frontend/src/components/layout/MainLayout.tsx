@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   Box,
   Drawer,
@@ -22,8 +22,8 @@ import {
   Fab,
   Zoom,
   keyframes,
-} from "@mui/material";
-import { useSnackbar } from "notistack";
+} from '@mui/material';
+import { useSnackbar } from 'notistack';
 import {
   Dashboard as DashboardIcon,
   Widgets as WidgetsIcon,
@@ -80,35 +80,28 @@ import {
   Refresh as RefreshIcon,
   Lock as LockIcon,
   HelpOutline as HelpOutlineIcon,
-} from "@mui/icons-material";
-import { useNavigate, useLocation } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth";
-import { useTheme as useCustomTheme } from "@/contexts/ThemeContext";
-import { useTranslation } from "react-i18next";
-import { LanguageSelector } from "@/components/LanguageSelector";
-import TimezoneSelector from "../common/TimezoneSelector";
-import EnvironmentSelector from "@/components/EnvironmentSelector";
-import {
-  maintenanceService,
-  MaintenanceDetail,
-} from "@/services/maintenanceService";
-import { useSSENotifications } from "@/hooks/useSSENotifications";
-import changeRequestService from "@/services/changeRequestService";
-import { useEnvironment } from "@/contexts/EnvironmentContext";
-import { formatDateTimeDetailed } from "@/utils/dateFormat";
+} from '@mui/icons-material';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
+import { useTheme as useCustomTheme } from '@/contexts/ThemeContext';
+import { useTranslation } from 'react-i18next';
+import { LanguageSelector } from '@/components/LanguageSelector';
+import TimezoneSelector from '../common/TimezoneSelector';
+import EnvironmentSelector from '@/components/EnvironmentSelector';
+import { maintenanceService, MaintenanceDetail } from '@/services/maintenanceService';
+import { useSSENotifications } from '@/hooks/useSSENotifications';
+import changeRequestService from '@/services/changeRequestService';
+import { useEnvironment } from '@/contexts/EnvironmentContext';
+import { formatDateTimeDetailed } from '@/utils/dateFormat';
 import {
   computeMaintenanceStatus,
   getMaintenanceStatusDisplay,
   MaintenanceStatusType,
-} from "@/utils/maintenanceStatusUtils";
-import moment from "moment";
-import {
-  getMenuCategories,
-  MenuItem as NavMenuItem,
-  MenuCategory,
-} from "@/config/navigation";
-import mailService from "@/services/mailService";
-import { Permission, PERMISSIONS } from "@/types/permissions";
+} from '@/utils/maintenanceStatusUtils';
+import moment from 'moment';
+import { getMenuCategories, MenuItem as NavMenuItem, MenuCategory } from '@/config/navigation';
+import mailService from '@/services/mailService';
+import { Permission, PERMISSIONS } from '@/types/permissions';
 
 // Sidebar width is now dynamic
 
@@ -174,30 +167,26 @@ interface MainLayoutProps {
 export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const theme = useTheme();
   const navigate = useNavigate();
-  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [userMenuAnchor, setUserMenuAnchor] = useState<null | HTMLElement>(
-    null,
-  );
+  const [userMenuAnchor, setUserMenuAnchor] = useState<null | HTMLElement>(null);
 
   // Load selected category from localStorage
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(
-    () => {
-      try {
-        const stored = localStorage.getItem("sidebarSelectedCategory");
-        return stored ? stored : null;
-      } catch {
-        return null;
-      }
-    },
-  );
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(() => {
+    try {
+      const stored = localStorage.getItem('sidebarSelectedCategory');
+      return stored ? stored : null;
+    } catch {
+      return null;
+    }
+  });
 
   // Expanded submenu items state
   const [expandedSubmenus, setExpandedSubmenus] = useState<{
     [key: string]: boolean;
   }>(() => {
     try {
-      const stored = localStorage.getItem("sidebarExpandedSubmenus");
+      const stored = localStorage.getItem('sidebarExpandedSubmenus');
       return stored ? JSON.parse(stored) : {};
     } catch {
       return {};
@@ -207,8 +196,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   // Load sidebar state from localStorage
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
     try {
-      const stored = localStorage.getItem("sidebarCollapsed");
-      return stored === "true";
+      const stored = localStorage.getItem('sidebarCollapsed');
+      return stored === 'true';
     } catch {
       return false;
     }
@@ -237,8 +226,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const [myPendingReviewCount, setMyPendingReviewCount] = useState(0);
 
   // Check if admin user has environment access
-  const hasEnvironmentAccess =
-    isAdmin() && !environmentsLoading && environments.length > 0;
+  const hasEnvironmentAccess = isAdmin() && !environmentsLoading && environments.length > 0;
 
   // Filter menu items based on permissions
   const canAccessMenuItem = useCallback(
@@ -256,7 +244,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       }
       return true;
     },
-    [hasEnvironmentAccess, hasPermission],
+    [hasEnvironmentAccess, hasPermission]
   );
 
   const filterMenuItems = useCallback(
@@ -281,7 +269,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           return item;
         });
     },
-    [canAccessMenuItem],
+    [canAccessMenuItem]
   );
 
   // Get filtered menu categories
@@ -289,11 +277,11 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     const categories = getMenuCategories(
       isAdmin(),
       {
-        "sidebar.changeRequests": pendingCRCount,
+        'sidebar.changeRequests': pendingCRCount,
       },
       {
         requiresApproval: currentEnvironment?.requiresApproval,
-      },
+      }
     );
     return categories
       .map((category) => ({
@@ -328,10 +316,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     const findSubmenuIndex = (items: NavMenuItem[], path: string): number => {
       for (let i = 0; i < items.length; i++) {
         const item = items[i];
-        if (
-          item.children &&
-          item.children.some((child) => findPathInItem(child, path))
-        ) {
+        if (item.children && item.children.some((child) => findPathInItem(child, path))) {
           return i;
         }
         if (item.path === path) {
@@ -343,13 +328,11 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
     // Find which category contains the current path
     for (const category of categories) {
-      const hasPath = category.children.some((item) =>
-        findPathInItem(item, currentPath),
-      );
+      const hasPath = category.children.some((item) => findPathInItem(item, currentPath));
       if (hasPath) {
         // Skip "navigation" category - it's the main menu and should not set selectedCategory
         // This allows "Back to Main" to work properly
-        if (category.id === "navigation") {
+        if (category.id === 'navigation') {
           initialSyncDoneRef.current = true;
           return;
         }
@@ -358,9 +341,9 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         if (selectedCategory !== category.id) {
           setSelectedCategory(category.id);
           try {
-            localStorage.setItem("sidebarSelectedCategory", category.id);
+            localStorage.setItem('sidebarSelectedCategory', category.id);
           } catch (error) {
-            console.warn("Failed to save selected category:", error);
+            console.warn('Failed to save selected category:', error);
           }
         }
 
@@ -372,12 +355,9 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             setExpandedSubmenus((prev) => {
               const newState = { ...prev, [submenuKey]: true };
               try {
-                localStorage.setItem(
-                  "sidebarExpandedSubmenus",
-                  JSON.stringify(newState),
-                );
+                localStorage.setItem('sidebarExpandedSubmenus', JSON.stringify(newState));
               } catch (error) {
-                console.warn("Failed to save expanded submenus:", error);
+                console.warn('Failed to save expanded submenus:', error);
               }
               return newState;
             });
@@ -390,12 +370,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     }
 
     initialSyncDoneRef.current = true;
-  }, [
-    location.pathname,
-    getFilteredMenuCategories,
-    selectedCategory,
-    expandedSubmenus,
-  ]);
+  }, [location.pathname, getFilteredMenuCategories, selectedCategory, expandedSubmenus]);
 
   // Mail notification state
   const [unreadMailCount, setUnreadMailCount] = useState(0);
@@ -413,15 +388,9 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       }
     };
 
-    window.addEventListener(
-      "user-role-changed",
-      handleRoleChange as EventListener,
-    );
+    window.addEventListener('user-role-changed', handleRoleChange as EventListener);
     return () => {
-      window.removeEventListener(
-        "user-role-changed",
-        handleRoleChange as EventListener,
-      );
+      window.removeEventListener('user-role-changed', handleRoleChange as EventListener);
     };
   }, [user?.id]);
 
@@ -432,105 +401,92 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       // Only redirect if the notification is for the current user
       if (userId && user?.id === userId) {
         // Clear auth data and redirect to account suspended page
-        localStorage.removeItem("user");
-        localStorage.removeItem("accessToken");
-        navigate("/account-suspended");
+        localStorage.removeItem('user');
+        localStorage.removeItem('accessToken');
+        navigate('/account-suspended');
       }
     };
 
-    window.addEventListener(
-      "user-suspended",
-      handleUserSuspended as EventListener,
-    );
+    window.addEventListener('user-suspended', handleUserSuspended as EventListener);
     return () => {
-      window.removeEventListener(
-        "user-suspended",
-        handleUserSuspended as EventListener,
-      );
+      window.removeEventListener('user-suspended', handleUserSuspended as EventListener);
     };
   }, [user?.id, navigate]);
 
   // Handle change request notifications
   useEffect(() => {
     const handleCRNotification = (event: CustomEvent) => {
-      const { action, title, requesterName, approverName, rejectorName } =
-        event.detail || {};
+      const { action, title, requesterName, approverName, rejectorName } = event.detail || {};
 
       switch (action) {
-        case "submitted":
+        case 'submitted':
           enqueueSnackbar(
-            t("notifications.changeRequest.submitted", {
+            t('notifications.changeRequest.submitted', {
               title,
-              requester: requesterName || "Unknown",
+              requester: requesterName || 'Unknown',
             }),
             {
-              variant: "info",
+              variant: 'info',
               autoHideDuration: 8000,
               action: () => (
                 <IconButton
                   size="small"
                   color="inherit"
-                  onClick={() => navigate("/admin/change-requests?status=open")}
+                  onClick={() => navigate('/admin/change-requests?status=open')}
                 >
-                  <ArrowBackIcon sx={{ transform: "rotate(180deg)" }} />
+                  <ArrowBackIcon sx={{ transform: 'rotate(180deg)' }} />
                 </IconButton>
               ),
-            },
+            }
           );
           break;
-        case "approved":
+        case 'approved':
           enqueueSnackbar(
-            t("notifications.changeRequest.approved", {
+            t('notifications.changeRequest.approved', {
               title,
-              approver: approverName || "Unknown",
+              approver: approverName || 'Unknown',
             }),
             {
-              variant: "success",
+              variant: 'success',
               autoHideDuration: 5000,
-            },
+            }
           );
           break;
-        case "rejected":
+        case 'rejected':
           enqueueSnackbar(
-            t("notifications.changeRequest.rejected", {
+            t('notifications.changeRequest.rejected', {
               title,
-              rejector: rejectorName || "Unknown",
+              rejector: rejectorName || 'Unknown',
             }),
             {
-              variant: "warning",
+              variant: 'warning',
               autoHideDuration: 5000,
-            },
+            }
           );
           break;
-        case "executed":
-          enqueueSnackbar(
-            t("notifications.changeRequest.executed", { title }),
-            {
-              variant: "success",
-              autoHideDuration: 5000,
-            },
-          );
+        case 'executed':
+          enqueueSnackbar(t('notifications.changeRequest.executed', { title }), {
+            variant: 'success',
+            autoHideDuration: 5000,
+          });
           break;
       }
       // Refresh pending CR count when CR is submitted
       if (
-        action === "submitted" ||
-        action === "approved" ||
-        action === "rejected" ||
-        action === "executed"
+        action === 'submitted' ||
+        action === 'approved' ||
+        action === 'rejected' ||
+        action === 'executed'
       ) {
         loadPendingCRCount();
       }
     };
 
-    window.addEventListener(
-      "change-request-notification",
-      handleCRNotification as EventListener,
-    );
+    window.addEventListener('change-request-notification', handleCRNotification as EventListener);
     return () => {
       window.removeEventListener(
-        "change-request-notification",
-        handleCRNotification as EventListener,
+        'change-request-notification',
+        handleCRNotification as EventListener
       );
     };
   }, [enqueueSnackbar, t, navigate]);
@@ -543,7 +499,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       setMyDraftCount(response?.myDrafts?.length || 0);
       // Count my own CRs that are in 'open' status (pending review)
       const myOpenCount = (response?.myRequests || []).filter(
-        (cr: any) => cr.status === "open",
+        (cr: any) => cr.status === 'open'
       ).length;
       setMyPendingReviewCount(myOpenCount);
     } catch (error) {
@@ -565,14 +521,14 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     try {
       // Fetch latest user profile to update localStorage before reload
       // This ensures the new role/permissions are reflected after page refresh
-      const { AuthService } = await import("@/services/auth");
+      const { AuthService } = await import('@/services/auth');
       await AuthService.getProfile();
     } catch (error) {
       // Continue with reload even if profile fetch fails
-      console.error("Failed to refresh profile:", error);
+      console.error('Failed to refresh profile:', error);
     }
     // Navigate to dashboard and force a full page reload to refresh auth state
-    navigate("/dashboard");
+    navigate('/dashboard');
     window.location.reload();
   }, [navigate]);
 
@@ -581,7 +537,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     isMaintenance: boolean;
     status: MaintenanceStatusType;
     detail: MaintenanceDetail | null;
-  }>({ isMaintenance: false, status: "inactive", detail: null });
+  }>({ isMaintenance: false, status: 'inactive', detail: null });
   const prevMaintenanceRef = useRef<{
     isMaintenance: boolean;
     status: MaintenanceStatusType;
@@ -605,7 +561,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     // Reset maintenance status immediately when environment changes
     setMaintenanceStatus({
       isMaintenance: false,
-      status: "inactive",
+      status: 'inactive',
       detail: null,
     });
 
@@ -627,7 +583,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         if (maintenanceUpdatedBySSE.current) return;
         setMaintenanceStatus({
           isMaintenance: false,
-          status: "inactive",
+          status: 'inactive',
           detail: null,
         });
       });
@@ -657,7 +613,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     const updateMaintenanceStatus = () => {
       const newStatus = computeMaintenanceStatus(
         maintenanceStatus.isMaintenance,
-        maintenanceStatus.detail,
+        maintenanceStatus.detail
       );
       if (newStatus !== maintenanceStatus.status) {
         setMaintenanceStatus((prev) => ({ ...prev, status: newStatus }));
@@ -720,11 +676,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         maintenanceTimerRef.current = null;
       }
     };
-  }, [
-    maintenanceStatus.isMaintenance,
-    maintenanceStatus.detail,
-    maintenanceStatus.status,
-  ]);
+  }, [maintenanceStatus.isMaintenance, maintenanceStatus.detail, maintenanceStatus.status]);
 
   // SSE updates - 백엔드 연결 실패 시 적절히 처리
   const sseConnection = useSSENotifications({
@@ -732,7 +684,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     maxReconnectAttempts: 3, // 재연결 시도 횟수 줄임
     reconnectInterval: 10000, // 재연결 간격 늘림 (10초)
     onEvent: (event) => {
-      if (event.type === "maintenance_status_change") {
+      if (event.type === 'maintenance_status_change') {
         const { isUnderMaintenance, detail } = event.data || {};
         maintenanceUpdatedBySSE.current = true;
 
@@ -745,24 +697,23 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           if (prev.isMaintenance !== nextIsMaintenance) {
             if (nextIsMaintenance) {
               // Check if it's scheduled (start time is in the future)
-              const isScheduled =
-                detail?.startsAt && new Date(detail.startsAt) > new Date();
+              const isScheduled = detail?.startsAt && new Date(detail.startsAt) > new Date();
               enqueueSnackbar(
                 isScheduled
-                  ? t("notifications.maintenance.scheduled")
-                  : t("notifications.maintenance.started"),
+                  ? t('notifications.maintenance.scheduled')
+                  : t('notifications.maintenance.started'),
                 {
-                  variant: "warning",
-                },
+                  variant: 'warning',
+                }
               );
             } else {
-              enqueueSnackbar(t("notifications.maintenance.stopped"), {
-                variant: "success",
+              enqueueSnackbar(t('notifications.maintenance.stopped'), {
+                variant: 'success',
               });
             }
           } else if (nextIsMaintenance && prev.updatedAt !== nextUpdatedAt) {
-            enqueueSnackbar(t("notifications.maintenance.updated"), {
-              variant: "info",
+            enqueueSnackbar(t('notifications.maintenance.updated'), {
+              variant: 'info',
             });
           }
         }
@@ -780,25 +731,20 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
         // Dispatch custom event for other components (e.g., DashboardPage) to listen
         window.dispatchEvent(
-          new CustomEvent("maintenance-status-change", {
+          new CustomEvent('maintenance-status-change', {
             detail: {
               isUnderMaintenance: nextIsMaintenance,
               detail: detail || null,
             },
-          }),
+          })
         );
-      } else if (
-        event.type === "invitation_created" ||
-        event.type === "invitation_deleted"
-      ) {
+      } else if (event.type === 'invitation_created' || event.type === 'invitation_deleted') {
         // 초대링크 이벤트를 다른 컴포넌트에 전달
-        window.dispatchEvent(
-          new CustomEvent("invitation-change", { detail: event }),
-        );
+        window.dispatchEvent(new CustomEvent('invitation-change', { detail: event }));
       }
     },
     onError: (error) => {
-      console.warn("SSE connection error in MainLayout:", error);
+      console.warn('SSE connection error in MainLayout:', error);
     },
   });
 
@@ -808,7 +754,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       const count = await mailService.getUnreadCount();
       setUnreadMailCount(count);
     } catch (error) {
-      console.error("Failed to load unread mail count:", error);
+      console.error('Failed to load unread mail count:', error);
     }
   }, []);
 
@@ -822,11 +768,11 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     const handleMailRead = () => {
       loadUnreadMailCount();
     };
-    window.addEventListener("mail-read", handleMailRead);
+    window.addEventListener('mail-read', handleMailRead);
 
     return () => {
       clearInterval(interval);
-      window.removeEventListener("mail-read", handleMailRead);
+      window.removeEventListener('mail-read', handleMailRead);
     };
   }, [loadUnreadMailCount]);
 
@@ -843,14 +789,14 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     const newCollapsed = !sidebarCollapsed;
     setSidebarCollapsed(newCollapsed);
     try {
-      localStorage.setItem("sidebarCollapsed", String(newCollapsed));
+      localStorage.setItem('sidebarCollapsed', String(newCollapsed));
     } catch (error) {
-      console.warn("Failed to save sidebar collapsed state:", error);
+      console.warn('Failed to save sidebar collapsed state:', error);
     }
   };
 
   const handleMaintenanceBannerClick = () => {
-    navigate("/admin/maintenance");
+    navigate('/admin/maintenance');
   };
 
   const handleUserMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -862,7 +808,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   };
 
   const handleLogoutClick = () => {
-    navigate("/logout");
+    navigate('/logout');
     handleUserMenuClose();
   };
 
@@ -872,11 +818,11 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       return true;
     }
     // /settings, /feature-flags 경로들은 정확한 매칭만 사용 (prefix 매칭 안 함)
-    if (path.startsWith("/settings") || path.startsWith("/feature-flags")) {
+    if (path.startsWith('/settings') || path.startsWith('/feature-flags')) {
       return false;
     }
     // 하위 경로인 경우에만 true (단, 정확히 '/'로 구분되는 경우만)
-    if (path !== "/" && location.pathname.startsWith(path + "/")) {
+    if (path !== '/' && location.pathname.startsWith(path + '/')) {
       return true;
     }
     return false;
@@ -898,7 +844,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   // Open external http(s) links in new tab; otherwise navigate within SPA
   const openOrNavigate = (path: string) => {
     if (/^https?:\/\//i.test(path)) {
-      window.open(path, "_blank", "noopener,noreferrer");
+      window.open(path, '_blank', 'noopener,noreferrer');
     } else {
       navigate(path);
     }
@@ -909,9 +855,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     if (item.children) {
       const submenuKey = `submenu-${index}`;
       const isExpanded = expandedSubmenus[submenuKey];
-      const hasActiveChild = item.children.some((child: any) =>
-        isActivePath(child.path),
-      );
+      const hasActiveChild = item.children.some((child: any) => isActivePath(child.path));
 
       const toggleSubmenu = () => {
         setExpandedSubmenus((prev) => {
@@ -920,12 +864,9 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             [submenuKey]: !prev[submenuKey],
           };
           try {
-            localStorage.setItem(
-              "sidebarExpandedSubmenus",
-              JSON.stringify(newState),
-            );
+            localStorage.setItem('sidebarExpandedSubmenus', JSON.stringify(newState));
           } catch (error) {
-            console.warn("Failed to save expanded submenus:", error);
+            console.warn('Failed to save expanded submenus:', error);
           }
           return newState;
         });
@@ -944,27 +885,25 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                   borderRadius: 1,
                   py: 0.75,
                   color: theme.palette.text.secondary,
-                  backgroundColor: "transparent",
-                  "&:hover": {
+                  backgroundColor: 'transparent',
+                  '&:hover': {
                     backgroundColor:
-                      theme.palette.mode === "dark"
-                        ? "rgba(255,255,255,0.1)"
-                        : "rgba(0,0,0,0.08)",
+                      theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
                   },
                 }}
               >
                 <ListItemIcon
                   sx={{
-                    color: "inherit",
+                    color: 'inherit',
                     minWidth: 40,
-                    justifyContent: "center",
+                    justifyContent: 'center',
                   }}
                 >
                   {item.icon}
                 </ListItemIcon>
                 <ListItemText
                   primary={t(item.text)}
-                  primaryTypographyProps={{ fontSize: "0.875rem" }}
+                  primaryTypographyProps={{ fontSize: '0.875rem' }}
                 />
                 {isExpanded ? <ExpandLess /> : <ExpandMore />}
               </ListItemButton>
@@ -982,12 +921,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                 const isChildActive = isActivePath(child.path);
 
                 return (
-                  <Tooltip
-                    key={childIndex}
-                    title={t(child.text)}
-                    placement="right"
-                    arrow
-                  >
+                  <Tooltip key={childIndex} title={t(child.text)} placement="right" arrow>
                     <ListItemButton
                       onClick={() => openOrNavigate(child.path)}
                       sx={{
@@ -996,26 +930,26 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                         borderRadius: 1,
                         py: 0.75,
                         my: 0.5,
-                        justifyContent: "center",
+                        justifyContent: 'center',
                         color: isChildActive
                           ? theme.palette.text.primary
                           : theme.palette.text.secondary,
                         backgroundColor: isChildActive
                           ? `${theme.palette.primary.main}20`
-                          : "transparent",
-                        "&:hover": {
+                          : 'transparent',
+                        '&:hover': {
                           backgroundColor:
-                            theme.palette.mode === "dark"
-                              ? "rgba(255,255,255,0.1)"
-                              : "rgba(0,0,0,0.08)",
+                            theme.palette.mode === 'dark'
+                              ? 'rgba(255,255,255,0.1)'
+                              : 'rgba(0,0,0,0.08)',
                         },
                       }}
                     >
                       <ListItemIcon
                         sx={{
-                          color: "inherit",
+                          color: 'inherit',
                           minWidth: 0,
-                          justifyContent: "center",
+                          justifyContent: 'center',
                         }}
                       >
                         {child.icon}
@@ -1048,20 +982,20 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                           : theme.palette.text.secondary,
                         backgroundColor: isChildActive
                           ? `${theme.palette.primary.main}20`
-                          : "transparent",
-                        "&:hover": {
+                          : 'transparent',
+                        '&:hover': {
                           backgroundColor:
-                            theme.palette.mode === "dark"
-                              ? "rgba(255,255,255,0.1)"
-                              : "rgba(0,0,0,0.08)",
+                            theme.palette.mode === 'dark'
+                              ? 'rgba(255,255,255,0.1)'
+                              : 'rgba(0,0,0,0.08)',
                         },
                       }}
                     >
                       <ListItemIcon
                         sx={{
-                          color: "inherit",
+                          color: 'inherit',
                           minWidth: 40,
-                          justifyContent: "center",
+                          justifyContent: 'center',
                         }}
                       >
                         {sidebarCollapsed ? (
@@ -1076,7 +1010,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                         <>
                           <ListItemText
                             primary={t(child.text)}
-                            primaryTypographyProps={{ fontSize: "0.875rem" }}
+                            primaryTypographyProps={{ fontSize: '0.875rem' }}
                           />
                           {child.badge && (
                             <Badge
@@ -1084,7 +1018,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                               color="primary"
                               sx={{
                                 ml: 1,
-                                "& .MuiBadge-badge": { fontSize: "0.625rem" },
+                                '& .MuiBadge-badge': { fontSize: '0.625rem' },
                               }}
                             />
                           )}
@@ -1107,31 +1041,25 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         key={index}
         onClick={() => openOrNavigate(item.path)}
         sx={{
-          color: isActive
-            ? theme.palette.text.primary
-            : theme.palette.text.secondary,
-          backgroundColor: isActive
-            ? `${theme.palette.primary.main}20`
-            : "transparent",
+          color: isActive ? theme.palette.text.primary : theme.palette.text.secondary,
+          backgroundColor: isActive ? `${theme.palette.primary.main}20` : 'transparent',
           borderRadius: 1,
           py: 0.75,
           my: 0.5,
-          "&:hover": {
+          '&:hover': {
             backgroundColor:
-              theme.palette.mode === "dark"
-                ? "rgba(255,255,255,0.1)"
-                : "rgba(0,0,0,0.08)",
+              theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
           },
-          justifyContent: sidebarCollapsed ? "center" : "flex-start",
+          justifyContent: sidebarCollapsed ? 'center' : 'flex-start',
           px: sidebarCollapsed ? 0 : 2,
           pl: sidebarCollapsed ? 0 : 2,
         }}
       >
         <ListItemIcon
           sx={{
-            color: "inherit",
+            color: 'inherit',
             minWidth: sidebarCollapsed ? 0 : 40,
-            justifyContent: "center",
+            justifyContent: 'center',
           }}
         >
           {item.icon}
@@ -1140,13 +1068,13 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           <>
             <ListItemText
               primary={t(item.text)}
-              primaryTypographyProps={{ fontSize: "0.875rem" }}
+              primaryTypographyProps={{ fontSize: '0.875rem' }}
             />
             {item.badge && (
               <Badge
                 badgeContent={item.badge}
-                color={item.badge === "New" ? "secondary" : "primary"}
-                sx={{ "& .MuiBadge-badge": { fontSize: "0.625rem" } }}
+                color={item.badge === 'New' ? 'secondary' : 'primary'}
+                sx={{ '& .MuiBadge-badge': { fontSize: '0.625rem' } }}
               />
             )}
           </>
@@ -1169,17 +1097,15 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const drawerContent = (
     <Box
       sx={{
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
-        cursor: sidebarCollapsed ? "pointer" : "default",
-        transition: "background-color 0.2s ease",
-        "&:hover": sidebarCollapsed
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        cursor: sidebarCollapsed ? 'pointer' : 'default',
+        transition: 'background-color 0.2s ease',
+        '&:hover': sidebarCollapsed
           ? {
               backgroundColor:
-                theme.palette.mode === "dark"
-                  ? "rgba(255, 255, 255, 0.08)"
-                  : "rgba(0, 0, 0, 0.05)",
+                theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)',
             }
           : {},
       }}
@@ -1195,31 +1121,31 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         sx={{
           height: 64,
           flexShrink: 0,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
           px: 2,
         }}
       >
         {!sidebarCollapsed && (
           <Box
             sx={{
-              display: "flex",
-              alignItems: "center",
+              display: 'flex',
+              alignItems: 'center',
               gap: 1,
-              cursor: "pointer",
-              "&:hover": {
+              cursor: 'pointer',
+              '&:hover': {
                 opacity: 0.8,
               },
             }}
             onClick={() => {
               setSelectedCategory(null);
               try {
-                localStorage.removeItem("sidebarSelectedCategory");
+                localStorage.removeItem('sidebarSelectedCategory');
               } catch (error) {
-                console.warn("Failed to clear selected category:", error);
+                console.warn('Failed to clear selected category:', error);
               }
-              navigate("/dashboard");
+              navigate('/dashboard');
             }}
           >
             <Box
@@ -1228,22 +1154,16 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                 height: 32,
                 backgroundColor: theme.palette.primary.main,
                 borderRadius: 1,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
             >
-              <Typography
-                variant="h6"
-                sx={{ color: "white", fontWeight: "bold" }}
-              >
+              <Typography variant="h6" sx={{ color: 'white', fontWeight: 'bold' }}>
                 G
               </Typography>
             </Box>
-            <Typography
-              variant="h6"
-              sx={{ fontWeight: 600, color: theme.palette.text.primary }}
-            >
+            <Typography variant="h6" sx={{ fontWeight: 600, color: theme.palette.text.primary }}>
               Gatrix
             </Typography>
           </Box>
@@ -1252,22 +1172,22 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         {sidebarCollapsed && (
           <Box
             sx={{
-              width: "100%",
-              display: "flex",
-              justifyContent: "center",
-              cursor: "pointer",
-              "&:hover": {
+              width: '100%',
+              display: 'flex',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              '&:hover': {
                 opacity: 0.8,
               },
             }}
             onClick={() => {
               setSelectedCategory(null);
               try {
-                localStorage.removeItem("sidebarSelectedCategory");
+                localStorage.removeItem('sidebarSelectedCategory');
               } catch (error) {
-                console.warn("Failed to clear selected category:", error);
+                console.warn('Failed to clear selected category:', error);
               }
-              navigate("/dashboard");
+              navigate('/dashboard');
             }}
           >
             <Box
@@ -1276,15 +1196,12 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                 height: 32,
                 backgroundColor: theme.palette.primary.main,
                 borderRadius: 1,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
             >
-              <Typography
-                variant="h6"
-                sx={{ color: "white", fontWeight: "bold" }}
-              >
+              <Typography variant="h6" sx={{ color: 'white', fontWeight: 'bold' }}>
                 G
               </Typography>
             </Box>
@@ -1296,9 +1213,9 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       <Box
         sx={{
           flexGrow: 1,
-          display: "flex",
-          flexDirection: "column",
-          overflow: "auto",
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'auto',
           minHeight: 0,
         }}
         onClick={(e) => {
@@ -1320,11 +1237,11 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           <Box
             sx={{
               opacity: selectedCategory ? 0 : 1,
-              visibility: selectedCategory ? "hidden" : "visible",
-              transform: selectedCategory ? "scale(0.92)" : "scale(1)",
+              visibility: selectedCategory ? 'hidden' : 'visible',
+              transform: selectedCategory ? 'scale(0.92)' : 'scale(1)',
               transition:
-                "opacity 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), visibility 0.35s, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)",
-              position: selectedCategory ? "absolute" : "relative",
+                'opacity 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), visibility 0.35s, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)',
+              position: selectedCategory ? 'absolute' : 'relative',
             }}
           >
             {/* Show main categories */}
@@ -1337,49 +1254,40 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                       navigate(category.path);
                       setSelectedCategory(null);
                       try {
-                        localStorage.removeItem("sidebarSelectedCategory");
+                        localStorage.removeItem('sidebarSelectedCategory');
                       } catch (error) {
-                        console.warn(
-                          "Failed to clear selected category:",
-                          error,
-                        );
+                        console.warn('Failed to clear selected category:', error);
                       }
                     } else {
                       setSelectedCategory(category.id);
                       try {
-                        localStorage.setItem(
-                          "sidebarSelectedCategory",
-                          category.id,
-                        );
+                        localStorage.setItem('sidebarSelectedCategory', category.id);
                       } catch (error) {
-                        console.warn(
-                          "Failed to save selected category:",
-                          error,
-                        );
+                        console.warn('Failed to save selected category:', error);
                       }
                     }
                   }}
                   sx={{
                     color: theme.palette.text.secondary,
-                    justifyContent: sidebarCollapsed ? "center" : "flex-start",
+                    justifyContent: sidebarCollapsed ? 'center' : 'flex-start',
                     px: sidebarCollapsed ? 0 : 2,
                     pl: sidebarCollapsed ? 0 : 2,
                     borderRadius: 1,
                     py: 0.75,
                     my: 0.5,
-                    "&:hover": {
+                    '&:hover': {
                       backgroundColor:
-                        theme.palette.mode === "dark"
-                          ? "rgba(255,255,255,0.1)"
-                          : "rgba(0,0,0,0.08)",
+                        theme.palette.mode === 'dark'
+                          ? 'rgba(255,255,255,0.1)'
+                          : 'rgba(0,0,0,0.08)',
                     },
                   }}
                 >
                   <ListItemIcon
                     sx={{
-                      color: "inherit",
+                      color: 'inherit',
                       minWidth: sidebarCollapsed ? 0 : 40,
-                      justifyContent: "center",
+                      justifyContent: 'center',
                     }}
                   >
                     {sidebarCollapsed ? (
@@ -1395,7 +1303,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                       <ListItemText
                         primary={t(category.text)}
                         primaryTypographyProps={{
-                          fontSize: "0.875rem",
+                          fontSize: '0.875rem',
                           fontWeight: 500,
                         }}
                       />
@@ -1405,7 +1313,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                           color="primary"
                           sx={{
                             ml: 1,
-                            "& .MuiBadge-badge": { fontSize: "0.625rem" },
+                            '& .MuiBadge-badge': { fontSize: '0.625rem' },
                           }}
                         />
                       )}
@@ -1417,12 +1325,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               // Show tooltip when sidebar is collapsed
               if (sidebarCollapsed) {
                 return (
-                  <Tooltip
-                    key={category.id}
-                    title={t(category.text)}
-                    placement="right"
-                    arrow
-                  >
+                  <Tooltip key={category.id} title={t(category.text)} placement="right" arrow>
                     {categoryButton}
                   </Tooltip>
                 );
@@ -1435,11 +1338,11 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           <Box
             sx={{
               opacity: selectedCategory ? 1 : 0,
-              visibility: selectedCategory ? "visible" : "hidden",
-              transform: selectedCategory ? "scale(1)" : "scale(0.92)",
+              visibility: selectedCategory ? 'visible' : 'hidden',
+              transform: selectedCategory ? 'scale(1)' : 'scale(0.92)',
               transition:
-                "opacity 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), visibility 0.35s, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)",
-              position: selectedCategory ? "relative" : "absolute",
+                'opacity 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), visibility 0.35s, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)',
+              position: selectedCategory ? 'relative' : 'absolute',
             }}
           >
             {/* Show selected category's submenu */}
@@ -1447,21 +1350,14 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               <>
                 {/* Back to main button */}
                 {sidebarCollapsed ? (
-                  <Tooltip
-                    title={t("sidebar.backToMain")}
-                    placement="right"
-                    arrow
-                  >
+                  <Tooltip title={t('sidebar.backToMain')} placement="right" arrow>
                     <ListItemButton
                       onClick={() => {
                         setSelectedCategory(null);
                         try {
-                          localStorage.removeItem("sidebarSelectedCategory");
+                          localStorage.removeItem('sidebarSelectedCategory');
                         } catch (error) {
-                          console.warn(
-                            "Failed to clear selected category:",
-                            error,
-                          );
+                          console.warn('Failed to clear selected category:', error);
                         }
                       }}
                       sx={{
@@ -1469,22 +1365,22 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                         mb: 2,
                         borderRadius: 1,
                         py: 0.75,
-                        justifyContent: "center",
+                        justifyContent: 'center',
                         px: 0,
                         pl: 0,
-                        "&:hover": {
+                        '&:hover': {
                           backgroundColor:
-                            theme.palette.mode === "dark"
-                              ? "rgba(255,255,255,0.1)"
-                              : "rgba(0,0,0,0.08)",
+                            theme.palette.mode === 'dark'
+                              ? 'rgba(255,255,255,0.1)'
+                              : 'rgba(0,0,0,0.08)',
                         },
                       }}
                     >
                       <ListItemIcon
                         sx={{
-                          color: "inherit",
+                          color: 'inherit',
                           minWidth: 0,
-                          justifyContent: "center",
+                          justifyContent: 'center',
                         }}
                       >
                         <ArrowBackIcon />
@@ -1496,12 +1392,9 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                     onClick={() => {
                       setSelectedCategory(null);
                       try {
-                        localStorage.removeItem("sidebarSelectedCategory");
+                        localStorage.removeItem('sidebarSelectedCategory');
                       } catch (error) {
-                        console.warn(
-                          "Failed to clear selected category:",
-                          error,
-                        );
+                        console.warn('Failed to clear selected category:', error);
                       }
                     }}
                     sx={{
@@ -1509,29 +1402,29 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                       mb: 2,
                       borderRadius: 1,
                       py: 0.75,
-                      justifyContent: "flex-start",
+                      justifyContent: 'flex-start',
                       px: 2,
                       pl: 2,
-                      "&:hover": {
+                      '&:hover': {
                         backgroundColor:
-                          theme.palette.mode === "dark"
-                            ? "rgba(255,255,255,0.1)"
-                            : "rgba(0,0,0,0.08)",
+                          theme.palette.mode === 'dark'
+                            ? 'rgba(255,255,255,0.1)'
+                            : 'rgba(0,0,0,0.08)',
                       },
                     }}
                   >
                     <ListItemIcon
                       sx={{
-                        color: "inherit",
+                        color: 'inherit',
                         minWidth: 40,
-                        justifyContent: "center",
+                        justifyContent: 'center',
                       }}
                     >
                       <ArrowBackIcon />
                     </ListItemIcon>
                     <ListItemText
-                      primary={t("sidebar.backToMain")}
-                      primaryTypographyProps={{ fontSize: "0.875rem" }}
+                      primary={t('sidebar.backToMain')}
+                      primaryTypographyProps={{ fontSize: '0.875rem' }}
                     />
                   </ListItemButton>
                 )}
@@ -1546,18 +1439,16 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                     sx={{
                       px: 2,
                       py: 1,
-                      display: "block",
+                      display: 'block',
                       color: theme.palette.text.secondary,
                       fontWeight: 600,
-                      textTransform: "uppercase",
-                      letterSpacing: "0.05em",
-                      fontSize: "0.7rem",
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.05em',
+                      fontSize: '0.7rem',
                     }}
                   >
                     {t(
-                      getFilteredMenuCategories().find(
-                        (c) => c.id === selectedCategory,
-                      )?.text || "",
+                      getFilteredMenuCategories().find((c) => c.id === selectedCategory)?.text || ''
                     )}
                   </Typography>
                 )}
@@ -1568,16 +1459,11 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                   ?.children.map((item, index, items) => {
                     // Check if previous item has children (is a submenu group)
                     const prevItem = index > 0 ? items[index - 1] : null;
-                    const prevHasChildren =
-                      prevItem?.children && prevItem.children.length > 0;
-                    const currentHasChildren =
-                      item.children && item.children.length > 0;
+                    const prevHasChildren = prevItem?.children && prevItem.children.length > 0;
+                    const currentHasChildren = item.children && item.children.length > 0;
 
                     // Add divider if current item is regular (no children) and previous item is a submenu group
-                    const showDivider =
-                      !currentHasChildren &&
-                      prevHasChildren &&
-                      sidebarCollapsed;
+                    const showDivider = !currentHasChildren && prevHasChildren && sidebarCollapsed;
 
                     return (
                       <React.Fragment key={index}>
@@ -1596,35 +1482,33 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       <Box
         sx={{
           p: 2,
-          textAlign: "center",
+          textAlign: 'center',
           borderTop: `1px solid ${theme.palette.divider}`,
           opacity: 0.7,
-          transition: "all 0.2s",
-          "&:hover": {
+          transition: 'all 0.2s',
+          '&:hover': {
             opacity: 1,
-            bgcolor: "action.hover",
+            bgcolor: 'action.hover',
           },
         }}
       >
         <Typography
           variant="caption"
           sx={{
-            color: "text.secondary",
-            fontSize: "0.75rem",
+            color: 'text.secondary',
+            fontSize: '0.75rem',
             fontWeight: 600,
-            display: "block",
+            display: 'block',
           }}
         >
-          {sidebarCollapsed
-            ? `v${__APP_VERSION__}`
-            : `Gatrix v${__APP_VERSION__}`}
+          {sidebarCollapsed ? `v${__APP_VERSION__}` : `Gatrix v${__APP_VERSION__}`}
         </Typography>
       </Box>
     </Box>
   );
 
   return (
-    <Box sx={{ display: "flex", height: "100vh", overflow: "hidden" }}>
+    <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
       {/* 사이드바 - 전체 높이 차지 */}
       <Box
         component="nav"
@@ -1643,14 +1527,14 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             keepMounted: true,
           }}
           sx={{
-            display: { xs: "block", md: "none" },
-            "& .MuiDrawer-paper": {
-              boxSizing: "border-box",
+            display: { xs: 'block', md: 'none' },
+            '& .MuiDrawer-paper': {
+              boxSizing: 'border-box',
               width: 280,
               backgroundColor: theme.palette.background.paper,
               color: theme.palette.text.primary,
-              border: "none",
-              borderRight: "none",
+              border: 'none',
+              borderRight: 'none',
             },
           }}
         >
@@ -1661,21 +1545,21 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         <Drawer
           variant="permanent"
           sx={{
-            display: { xs: "none", md: "block" },
-            "& .MuiDrawer-paper": {
-              boxSizing: "border-box",
+            display: { xs: 'none', md: 'block' },
+            '& .MuiDrawer-paper': {
+              boxSizing: 'border-box',
               width: sidebarCollapsed ? 64 : sidebarWidth,
               backgroundColor: theme.palette.background.paper,
               color: theme.palette.text.primary,
-              position: "fixed",
-              height: "100vh",
+              position: 'fixed',
+              height: '100vh',
               top: 0,
               left: 0,
-              display: "flex",
-              flexDirection: "column",
-              overflow: "hidden",
-              border: "none",
-              borderRight: "none",
+              display: 'flex',
+              flexDirection: 'column',
+              overflow: 'hidden',
+              border: 'none',
+              borderRight: 'none',
             },
           }}
           open
@@ -1687,10 +1571,10 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       {/* 오른쪽 영역: AppBar + 메인 컨텐츠 */}
       <Box
         sx={{
-          display: "flex",
-          flexDirection: "column",
+          display: 'flex',
+          flexDirection: 'column',
           flexGrow: 1,
-          overflow: "hidden",
+          overflow: 'hidden',
         }}
       >
         {/* 상단 바 - 사이드바 옆에 위치 */}
@@ -1699,18 +1583,18 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           sx={{
             backgroundColor: theme.palette.background.paper,
             color: theme.palette.text.primary,
-            boxShadow: "none",
-            borderBottom: "none",
+            boxShadow: 'none',
+            borderBottom: 'none',
             zIndex: (theme) => theme.zIndex.appBar,
           }}
         >
           <Toolbar
             sx={{
-              justifyContent: "space-between",
+              justifyContent: 'space-between',
               minHeight: 64,
             }}
           >
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               {isMobile ? (
                 <IconButton
                   color="inherit"
@@ -1741,18 +1625,18 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                   <Box sx={{ p: 1.5, minWidth: 300 }}>
                     <Typography
                       variant="subtitle2"
-                      sx={{ fontWeight: "bold", mb: 1.5, color: "#ff6b6b" }}
+                      sx={{ fontWeight: 'bold', mb: 1.5, color: '#ff6b6b' }}
                     >
-                      🔧 {t("maintenance.tooltipTitle")}
+                      🔧 {t('maintenance.tooltipTitle')}
                     </Typography>
 
                     {/* 상태 */}
                     <Typography
                       variant="body2"
-                      sx={{ mb: 1, display: "flex", alignItems: "center" }}
+                      sx={{ mb: 1, display: 'flex', alignItems: 'center' }}
                     >
-                      <strong style={{ minWidth: "60px" }}>
-                        {t("maintenance.tooltipStatus")}:
+                      <strong style={{ minWidth: '60px' }}>
+                        {t('maintenance.tooltipStatus')}:
                       </strong>
                       <Box
                         component="span"
@@ -1761,35 +1645,31 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                           px: 1,
                           py: 0.25,
                           borderRadius: 1,
-                          backgroundColor: getMaintenanceStatusDisplay(
-                            maintenanceStatus.status,
-                          ).color,
-                          color: "white",
-                          fontSize: "0.75rem",
-                          fontWeight: "bold",
+                          backgroundColor: getMaintenanceStatusDisplay(maintenanceStatus.status)
+                            .color,
+                          color: 'white',
+                          fontSize: '0.75rem',
+                          fontWeight: 'bold',
                         }}
                       >
-                        {t(
-                          getMaintenanceStatusDisplay(maintenanceStatus.status)
-                            .label,
-                        )}
+                        {t(getMaintenanceStatusDisplay(maintenanceStatus.status).label)}
                       </Box>
                     </Typography>
 
                     {/* 유형 */}
                     {maintenanceStatus.detail?.type && (
                       <Typography variant="body2" sx={{ mb: 1 }}>
-                        <strong style={{ minWidth: "60px" }}>
-                          {t("maintenance.tooltipType")}:
-                        </strong>{" "}
+                        <strong style={{ minWidth: '60px' }}>
+                          {t('maintenance.tooltipType')}:
+                        </strong>{' '}
                         {(() => {
                           switch (maintenanceStatus.detail.type) {
-                            case "emergency":
-                              return t("maintenance.emergencyLabel");
-                            case "regular":
-                              return t("maintenance.regularLabel");
+                            case 'emergency':
+                              return t('maintenance.emergencyLabel');
+                            case 'regular':
+                              return t('maintenance.regularLabel');
                             default:
-                              return t("maintenance.immediateStartLabel");
+                              return t('maintenance.immediateStartLabel');
                           }
                         })()}
                       </Typography>
@@ -1798,74 +1678,61 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                     {/* 시작 시간 */}
                     {maintenanceStatus.detail?.startsAt && (
                       <Typography variant="body2" sx={{ mb: 1 }}>
-                        <strong style={{ minWidth: "60px" }}>
-                          {t("maintenance.tooltipStartTime")}:
-                        </strong>{" "}
-                        {formatDateTimeDetailed(
-                          maintenanceStatus.detail.startsAt,
-                        )}
+                        <strong style={{ minWidth: '60px' }}>
+                          {t('maintenance.tooltipStartTime')}:
+                        </strong>{' '}
+                        {formatDateTimeDetailed(maintenanceStatus.detail.startsAt)}
                       </Typography>
                     )}
 
                     {/* 종료 시간 */}
                     {maintenanceStatus.detail?.endsAt && (
                       <Typography variant="body2" sx={{ mb: 1 }}>
-                        <strong style={{ minWidth: "60px" }}>
-                          {t("maintenance.tooltipEndTime")}:
-                        </strong>{" "}
-                        {formatDateTimeDetailed(
-                          maintenanceStatus.detail.endsAt,
-                        )}
+                        <strong style={{ minWidth: '60px' }}>
+                          {t('maintenance.tooltipEndTime')}:
+                        </strong>{' '}
+                        {formatDateTimeDetailed(maintenanceStatus.detail.endsAt)}
                       </Typography>
                     )}
 
                     {/* 소요 시간 */}
-                    {maintenanceStatus.detail?.startsAt &&
-                      maintenanceStatus.detail?.endsAt && (
-                        <Typography variant="body2" sx={{ mb: 1 }}>
-                          <strong style={{ minWidth: "60px" }}>
-                            {t("maintenance.tooltipDuration")}:
-                          </strong>{" "}
-                          {(() => {
-                            const start = new Date(
-                              maintenanceStatus.detail.startsAt,
-                            );
-                            const end = new Date(
-                              maintenanceStatus.detail.endsAt,
-                            );
-                            const diffMs = end.getTime() - start.getTime();
-                            const diffHours = Math.floor(
-                              diffMs / (1000 * 60 * 60),
-                            );
-                            const diffMinutes = Math.floor(
-                              (diffMs % (1000 * 60 * 60)) / (1000 * 60),
-                            );
+                    {maintenanceStatus.detail?.startsAt && maintenanceStatus.detail?.endsAt && (
+                      <Typography variant="body2" sx={{ mb: 1 }}>
+                        <strong style={{ minWidth: '60px' }}>
+                          {t('maintenance.tooltipDuration')}:
+                        </strong>{' '}
+                        {(() => {
+                          const start = new Date(maintenanceStatus.detail.startsAt);
+                          const end = new Date(maintenanceStatus.detail.endsAt);
+                          const diffMs = end.getTime() - start.getTime();
+                          const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+                          const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
 
-                            if (diffHours > 0) {
-                              return `${diffHours}${t("maintenance.hoursUnit")} ${diffMinutes}${t("maintenance.minutesUnit")}`;
-                            } else {
-                              return `${diffMinutes}${t("maintenance.minutesUnit")}`;
-                            }
-                          })()}
-                        </Typography>
-                      )}
+                          if (diffHours > 0) {
+                            return `${diffHours}${t('maintenance.hoursUnit')} ${diffMinutes}${t('maintenance.minutesUnit')}`;
+                          } else {
+                            return `${diffMinutes}${t('maintenance.minutesUnit')}`;
+                          }
+                        })()}
+                      </Typography>
+                    )}
 
                     {/* 메시지 */}
                     {maintenanceStatus.detail?.message && (
                       <Typography variant="body2" sx={{ mb: 1.5 }}>
-                        <strong style={{ minWidth: "60px" }}>
-                          {t("maintenance.tooltipMessage")}:
+                        <strong style={{ minWidth: '60px' }}>
+                          {t('maintenance.tooltipMessage')}:
                         </strong>
                         <Box
                           component="div"
                           sx={{
                             mt: 0.5,
                             p: 1,
-                            backgroundColor: "rgba(255, 255, 255, 0.1)",
+                            backgroundColor: 'rgba(255, 255, 255, 0.1)',
                             borderRadius: 1,
-                            fontStyle: "italic",
-                            maxWidth: "250px",
-                            wordBreak: "break-word",
+                            fontStyle: 'italic',
+                            maxWidth: '250px',
+                            wordBreak: 'break-word',
                           }}
                         >
                           {maintenanceStatus.detail.message}
@@ -1876,16 +1743,16 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                     <Typography
                       variant="caption"
                       sx={{
-                        fontStyle: "italic",
+                        fontStyle: 'italic',
                         opacity: 0.8,
-                        display: "flex",
-                        alignItems: "center",
+                        display: 'flex',
+                        alignItems: 'center',
                         mt: 1,
                         pt: 1,
-                        borderTop: "1px solid rgba(255, 255, 255, 0.2)",
+                        borderTop: '1px solid rgba(255, 255, 255, 0.2)',
                       }}
                     >
-                      💡 {t("maintenance.clickToManageTooltip")}
+                      💡 {t('maintenance.clickToManageTooltip')}
                     </Typography>
                   </Box>
                 }
@@ -1899,87 +1766,84 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                   sx={{
                     mx: 2,
                     flex: 1,
-                    display: "flex",
-                    alignItems: "center",
+                    display: 'flex',
+                    alignItems: 'center',
                     height: 34,
                     borderRadius: 2,
-                    overflow: "hidden",
-                    cursor: "pointer",
+                    overflow: 'hidden',
+                    cursor: 'pointer',
                     border:
-                      maintenanceStatus.status === "active"
-                        ? "1.5px solid #ef5350"
-                        : "1.5px solid #ffa726",
+                      maintenanceStatus.status === 'active'
+                        ? '1.5px solid #ef5350'
+                        : '1.5px solid #ffa726',
                     background:
-                      maintenanceStatus.status === "active"
-                        ? "linear-gradient(135deg, #ef5350 0%, #e53935 100%)"
-                        : "linear-gradient(135deg, #ffa726 0%, #fb8c00 100%)",
+                      maintenanceStatus.status === 'active'
+                        ? 'linear-gradient(135deg, #ef5350 0%, #e53935 100%)'
+                        : 'linear-gradient(135deg, #ffa726 0%, #fb8c00 100%)',
                     boxShadow:
-                      maintenanceStatus.status === "active"
-                        ? "0 2px 12px rgba(239, 83, 80, 0.4)"
-                        : "0 2px 12px rgba(255, 167, 38, 0.4)",
-                    transition: "all 0.3s ease",
+                      maintenanceStatus.status === 'active'
+                        ? '0 2px 12px rgba(239, 83, 80, 0.4)'
+                        : '0 2px 12px rgba(255, 167, 38, 0.4)',
+                    transition: 'all 0.3s ease',
                     animation:
-                      maintenanceStatus.status === "active"
+                      maintenanceStatus.status === 'active'
                         ? `${maintenancePulseAnimation} 2s ease-in-out infinite`
-                        : "none",
-                    "&:hover": {
-                      transform: "translateY(-1px)",
+                        : 'none',
+                    '&:hover': {
+                      transform: 'translateY(-1px)',
                       boxShadow:
-                        maintenanceStatus.status === "active"
-                          ? "0 4px 16px rgba(239, 83, 80, 0.5)"
-                          : "0 4px 16px rgba(255, 167, 38, 0.5)",
+                        maintenanceStatus.status === 'active'
+                          ? '0 4px 16px rgba(239, 83, 80, 0.5)'
+                          : '0 4px 16px rgba(255, 167, 38, 0.5)',
                     },
                   }}
                 >
                   {/* Icon + Status */}
                   <Box
                     sx={{
-                      display: "flex",
-                      alignItems: "center",
+                      display: 'flex',
+                      alignItems: 'center',
                       gap: 0.75,
                       px: 1.5,
-                      height: "100%",
+                      height: '100%',
                       flexShrink: 0,
-                      bgcolor: "#424242",
-                      borderRight: "1px solid rgba(255,255,255,0.2)",
+                      bgcolor: '#424242',
+                      borderRight: '1px solid rgba(255,255,255,0.2)',
                     }}
                   >
                     <Box
                       sx={{
-                        fontSize: "1rem",
+                        fontSize: '1rem',
                         animation: `${maintenanceIconPulse} 1.5s ease-in-out infinite`,
-                        filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.2))",
+                        filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))',
                       }}
                     >
-                      {maintenanceStatus.status === "active" ? "🔧" : "📅"}
+                      {maintenanceStatus.status === 'active' ? '🔧' : '📅'}
                     </Box>
-                    <Box sx={{ display: "flex", flexDirection: "column" }}>
+                    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                       <Typography
                         sx={{
-                          fontSize: "0.7rem",
+                          fontSize: '0.7rem',
                           fontWeight: 700,
-                          color: "#fff",
+                          color: '#fff',
                           lineHeight: 1.2,
-                          textShadow: "0 1px 2px rgba(0,0,0,0.2)",
+                          textShadow: '0 1px 2px rgba(0,0,0,0.2)',
                         }}
                       >
-                        {t(
-                          getMaintenanceStatusDisplay(maintenanceStatus.status)
-                            .label,
-                        )}
+                        {t(getMaintenanceStatusDisplay(maintenanceStatus.status).label)}
                       </Typography>
                       <Typography
                         sx={{
-                          fontSize: "0.6rem",
+                          fontSize: '0.6rem',
                           fontWeight: 600,
-                          color: "rgba(255,255,255,0.85)",
+                          color: 'rgba(255,255,255,0.85)',
                           lineHeight: 1.1,
-                          textTransform: "uppercase",
+                          textTransform: 'uppercase',
                         }}
                       >
-                        {maintenanceStatus.detail?.type === "emergency"
-                          ? t("maintenance.types.emergency")
-                          : t("maintenance.types.regular")}
+                        {maintenanceStatus.detail?.type === 'emergency'
+                          ? t('maintenance.types.emergency')
+                          : t('maintenance.types.regular')}
                       </Typography>
                     </Box>
                   </Box>
@@ -1989,62 +1853,61 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                     sx={{
                       flex: 1,
                       minWidth: 0,
-                      overflow: "hidden",
-                      position: "relative",
-                      height: "100%",
-                      display: "flex",
-                      alignItems: "center",
-                      "&::before, &::after": {
+                      overflow: 'hidden',
+                      position: 'relative',
+                      height: '100%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      '&::before, &::after': {
                         content: '""',
-                        position: "absolute",
+                        position: 'absolute',
                         top: 0,
                         bottom: 0,
                         width: 20,
                         zIndex: 1,
-                        pointerEvents: "none",
+                        pointerEvents: 'none',
                       },
-                      "&::before": {
+                      '&::before': {
                         left: 0,
                         background:
-                          maintenanceStatus.status === "active"
-                            ? "linear-gradient(90deg, #e53935 0%, transparent 100%)"
-                            : "linear-gradient(90deg, #fb8c00 0%, transparent 100%)",
+                          maintenanceStatus.status === 'active'
+                            ? 'linear-gradient(90deg, #e53935 0%, transparent 100%)'
+                            : 'linear-gradient(90deg, #fb8c00 0%, transparent 100%)',
                       },
-                      "&::after": {
+                      '&::after': {
                         right: 0,
                         background:
-                          maintenanceStatus.status === "active"
-                            ? "linear-gradient(90deg, transparent 0%, #e53935 100%)"
-                            : "linear-gradient(90deg, transparent 0%, #fb8c00 100%)",
+                          maintenanceStatus.status === 'active'
+                            ? 'linear-gradient(90deg, transparent 0%, #e53935 100%)'
+                            : 'linear-gradient(90deg, transparent 0%, #fb8c00 100%)',
                       },
                     }}
                   >
                     <Box
                       sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        whiteSpace: "nowrap",
+                        display: 'flex',
+                        alignItems: 'center',
+                        whiteSpace: 'nowrap',
                         animation: `${marqueeScroll} 15s linear infinite`,
-                        "&:hover": { animationPlayState: "paused" },
+                        '&:hover': { animationPlayState: 'paused' },
                       }}
                     >
                       {[0, 1].map((idx) => (
                         <Typography
                           key={idx}
                           sx={{
-                            fontSize: "0.8rem",
-                            color: "#fff",
+                            fontSize: '0.8rem',
+                            color: '#fff',
                             fontWeight: 600,
                             px: 4,
-                            textShadow: "0 1px 2px rgba(0,0,0,0.2)",
+                            textShadow: '0 1px 2px rgba(0,0,0,0.2)',
                           }}
                         >
                           {maintenanceStatus.detail?.message
                             ? maintenanceStatus.detail.message
-                            : maintenanceStatus.detail?.startsAt &&
-                                maintenanceStatus.detail?.endsAt
+                            : maintenanceStatus.detail?.startsAt && maintenanceStatus.detail?.endsAt
                               ? `${formatDateTimeDetailed(maintenanceStatus.detail.startsAt)} → ${formatDateTimeDetailed(maintenanceStatus.detail.endsAt)}`
-                              : t("maintenance.clickToManageTooltip")}
+                              : t('maintenance.clickToManageTooltip')}
                         </Typography>
                       ))}
                     </Box>
@@ -2053,21 +1916,18 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               </Tooltip>
             )}
 
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               {/* Chat button - only visible for admin users with chat permission */}
               {isAdmin() && hasPermission(PERMISSIONS.CHAT_ACCESS) && (
-                <Tooltip title={t("sidebar.chat")}>
-                  <IconButton color="inherit" onClick={() => navigate("/chat")}>
+                <Tooltip title={t('sidebar.chat')}>
+                  <IconButton color="inherit" onClick={() => navigate('/chat')}>
                     <ChatIcon />
                   </IconButton>
                 </Tooltip>
               )}
 
-              <Tooltip title={t("mailbox.title")}>
-                <IconButton
-                  color="inherit"
-                  onClick={() => navigate("/mailbox")}
-                >
+              <Tooltip title={t('mailbox.title')}>
+                <IconButton color="inherit" onClick={() => navigate('/mailbox')}>
                   <Badge badgeContent={unreadMailCount} color="error">
                     <MailIcon />
                   </Badge>
@@ -2077,12 +1937,12 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               {/* 구분선 */}
               <Box
                 sx={{
-                  width: "1px",
-                  height: "24px",
+                  width: '1px',
+                  height: '24px',
                   bgcolor:
-                    theme.palette.mode === "dark"
-                      ? "rgba(255, 255, 255, 0.2)"
-                      : "rgba(0, 0, 0, 0.2)",
+                    theme.palette.mode === 'dark'
+                      ? 'rgba(255, 255, 255, 0.2)'
+                      : 'rgba(0, 0, 0, 0.2)',
                   mx: 1,
                 }}
               />
@@ -2092,12 +1952,12 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               {/* 구분선 */}
               <Box
                 sx={{
-                  width: "1px",
-                  height: "24px",
+                  width: '1px',
+                  height: '24px',
                   bgcolor:
-                    theme.palette.mode === "dark"
-                      ? "rgba(255, 255, 255, 0.2)"
-                      : "rgba(0, 0, 0, 0.2)",
+                    theme.palette.mode === 'dark'
+                      ? 'rgba(255, 255, 255, 0.2)'
+                      : 'rgba(0, 0, 0, 0.2)',
                   mx: 1,
                 }}
               />
@@ -2111,17 +1971,17 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               {/* 구분선 */}
               <Box
                 sx={{
-                  width: "1px",
-                  height: "24px",
+                  width: '1px',
+                  height: '24px',
                   bgcolor:
-                    theme.palette.mode === "dark"
-                      ? "rgba(255, 255, 255, 0.2)"
-                      : "rgba(0, 0, 0, 0.2)",
+                    theme.palette.mode === 'dark'
+                      ? 'rgba(255, 255, 255, 0.2)'
+                      : 'rgba(0, 0, 0, 0.2)',
                   mx: 1,
                 }}
               />
 
-              <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                 <IconButton onClick={handleUserMenuOpen} color="inherit">
                   {user?.avatarUrl && !avatarImageError ? (
                     <Avatar
@@ -2143,7 +2003,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                       sx={{
                         width: 32,
                         height: 32,
-                        color: "inherit",
+                        color: 'inherit',
                       }}
                     />
                   )}
@@ -2151,18 +2011,18 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                 <Typography
                   variant="body2"
                   sx={{
-                    display: { xs: "none", sm: "block" },
-                    color: "inherit",
+                    display: { xs: 'none', sm: 'block' },
+                    color: 'inherit',
                     fontWeight: 500,
                     maxWidth: 150,
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
-                    cursor: "pointer",
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    cursor: 'pointer',
                   }}
                   onClick={handleUserMenuOpen}
                 >
-                  {user?.name || user?.email?.split("@")[0] || ""}
+                  {user?.name || user?.email?.split('@')[0] || ''}
                 </Typography>
               </Box>
 
@@ -2172,12 +2032,12 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                   {/* 구분선 */}
                   <Box
                     sx={{
-                      width: "1px",
-                      height: "24px",
+                      width: '1px',
+                      height: '24px',
                       bgcolor:
-                        theme.palette.mode === "dark"
-                          ? "rgba(255, 255, 255, 0.2)"
-                          : "rgba(0, 0, 0, 0.2)",
+                        theme.palette.mode === 'dark'
+                          ? 'rgba(255, 255, 255, 0.2)'
+                          : 'rgba(0, 0, 0, 0.2)',
                       mx: 1,
                     }}
                   />
@@ -2190,26 +2050,26 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                 open={Boolean(userMenuAnchor)}
                 onClose={handleUserMenuClose}
                 anchorOrigin={{
-                  vertical: "bottom",
-                  horizontal: "right",
+                  vertical: 'bottom',
+                  horizontal: 'right',
                 }}
                 transformOrigin={{
-                  vertical: "top",
-                  horizontal: "right",
+                  vertical: 'top',
+                  horizontal: 'right',
                 }}
               >
                 <MenuItem
                   onClick={() => {
-                    navigate("/profile");
+                    navigate('/profile');
                     handleUserMenuClose();
                   }}
                 >
                   <PersonIcon sx={{ mr: 1 }} />
-                  {t("sidebar.profile")}
+                  {t('sidebar.profile')}
                 </MenuItem>
                 <MenuItem onClick={handleLogoutClick}>
                   <LogoutIcon sx={{ mr: 1 }} />
-                  {t("sidebar.logout")}
+                  {t('sidebar.logout')}
                 </MenuItem>
               </Menu>
             </Box>
@@ -2219,58 +2079,48 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         {/* Pending Review Lock Banner - shows when user has open CRs (edits are locked) */}
         {currentEnvironment?.requiresApproval &&
           myPendingReviewCount > 0 &&
-          !location.pathname.startsWith("/admin/change-requests") && (
+          !location.pathname.startsWith('/admin/change-requests') && (
             <Box
               sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
                 gap: 1,
                 px: 2,
                 py: 0.75,
-                bgcolor: "error.main",
-                color: "error.contrastText",
+                bgcolor: 'error.main',
+                color: 'error.contrastText',
               }}
             >
               <LockIcon sx={{ fontSize: 16 }} />
-              <Typography
-                variant="body2"
-                sx={{ fontWeight: 500, fontSize: "0.8125rem" }}
-              >
-                {t("changeRequest.pendingReviewLockBanner")}
+              <Typography variant="body2" sx={{ fontWeight: 500, fontSize: '0.8125rem' }}>
+                {t('changeRequest.pendingReviewLockBanner')}
               </Typography>
-              <Tooltip title={t("changeRequest.pendingReviewLockTooltip")}>
-                <HelpOutlineIcon
-                  sx={{ fontSize: 16, opacity: 0.8, cursor: "help" }}
-                />
+              <Tooltip title={t('changeRequest.pendingReviewLockTooltip')}>
+                <HelpOutlineIcon sx={{ fontSize: 16, opacity: 0.8, cursor: 'help' }} />
               </Tooltip>
               <Box
-                onClick={() => navigate("/admin/change-requests?status=open")}
+                onClick={() => navigate('/admin/change-requests?status=open')}
                 sx={{
                   ml: 1,
-                  display: "flex",
-                  alignItems: "center",
+                  display: 'flex',
+                  alignItems: 'center',
                   gap: 0.5,
-                  cursor: "pointer",
+                  cursor: 'pointer',
                   px: 1.5,
                   py: 0.25,
                   borderRadius: 1.5,
-                  bgcolor: "rgba(255,255,255,0.15)",
-                  "&:hover": {
-                    bgcolor: "rgba(255,255,255,0.25)",
+                  bgcolor: 'rgba(255,255,255,0.15)',
+                  '&:hover': {
+                    bgcolor: 'rgba(255,255,255,0.25)',
                   },
-                  transition: "background-color 0.2s",
+                  transition: 'background-color 0.2s',
                 }}
               >
-                <Typography
-                  variant="body2"
-                  sx={{ fontWeight: 500, fontSize: "0.75rem" }}
-                >
-                  {t("changeRequest.viewMyPendingReviews")}
+                <Typography variant="body2" sx={{ fontWeight: 500, fontSize: '0.75rem' }}>
+                  {t('changeRequest.viewMyPendingReviews')}
                 </Typography>
-                <ArrowBackIcon
-                  sx={{ transform: "rotate(180deg)", fontSize: 12 }}
-                />
+                <ArrowBackIcon sx={{ transform: 'rotate(180deg)', fontSize: 12 }} />
               </Box>
             </Box>
           )}
@@ -2278,24 +2128,24 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         {/* CR Status Banner - shows pending approvals and/or my drafts */}
         {currentEnvironment?.requiresApproval &&
           (pendingCRCount > 0 || myDraftCount > 0) &&
-          !location.pathname.startsWith("/admin/change-requests") && (
+          !location.pathname.startsWith('/admin/change-requests') && (
             <Box
               sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
                 px: 2,
                 py: 0.75,
-                bgcolor: "warning.main",
-                color: "warning.contrastText",
+                bgcolor: 'warning.main',
+                color: 'warning.contrastText',
               }}
             >
               <Box
                 sx={{
-                  display: "flex",
-                  alignItems: "center",
+                  display: 'flex',
+                  alignItems: 'center',
                   gap: 1,
-                  bgcolor: "rgba(0,0,0,0.08)",
+                  bgcolor: 'rgba(0,0,0,0.08)',
                   borderRadius: 2,
                   px: 0.5,
                   py: 0.25,
@@ -2304,75 +2154,59 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                 {/* My drafts section */}
                 {myDraftCount > 0 && (
                   <Box
-                    onClick={() =>
-                      navigate("/admin/change-requests?status=draft")
-                    }
+                    onClick={() => navigate('/admin/change-requests?status=draft')}
                     sx={{
-                      display: "flex",
-                      alignItems: "center",
+                      display: 'flex',
+                      alignItems: 'center',
                       gap: 0.5,
-                      cursor: "pointer",
+                      cursor: 'pointer',
                       px: 1.5,
                       py: 0.5,
                       borderRadius: 1.5,
-                      "&:hover": {
-                        bgcolor: "rgba(0,0,0,0.15)",
+                      '&:hover': {
+                        bgcolor: 'rgba(0,0,0,0.15)',
                       },
-                      transition: "background-color 0.2s",
+                      transition: 'background-color 0.2s',
                     }}
                   >
-                    <Typography
-                      variant="body2"
-                      sx={{ fontWeight: 500, fontSize: "0.8125rem" }}
-                    >
-                      {t("changeRequest.myDraftsBanner", {
+                    <Typography variant="body2" sx={{ fontWeight: 500, fontSize: '0.8125rem' }}>
+                      {t('changeRequest.myDraftsBanner', {
                         count: myDraftCount,
                       })}
                     </Typography>
-                    <ArrowBackIcon
-                      sx={{ transform: "rotate(180deg)", fontSize: 14 }}
-                    />
+                    <ArrowBackIcon sx={{ transform: 'rotate(180deg)', fontSize: 14 }} />
                   </Box>
                 )}
 
                 {/* Separator */}
                 {myDraftCount > 0 && pendingCRCount > 0 && (
-                  <Typography sx={{ opacity: 0.5, fontSize: "0.875rem" }}>
-                    |
-                  </Typography>
+                  <Typography sx={{ opacity: 0.5, fontSize: '0.875rem' }}>|</Typography>
                 )}
 
                 {/* Pending approvals section */}
                 {pendingCRCount > 0 && (
                   <Box
-                    onClick={() =>
-                      navigate("/admin/change-requests?status=open")
-                    }
+                    onClick={() => navigate('/admin/change-requests?status=open')}
                     sx={{
-                      display: "flex",
-                      alignItems: "center",
+                      display: 'flex',
+                      alignItems: 'center',
                       gap: 0.5,
-                      cursor: "pointer",
+                      cursor: 'pointer',
                       px: 1.5,
                       py: 0.5,
                       borderRadius: 1.5,
-                      "&:hover": {
-                        bgcolor: "rgba(0,0,0,0.15)",
+                      '&:hover': {
+                        bgcolor: 'rgba(0,0,0,0.15)',
                       },
-                      transition: "background-color 0.2s",
+                      transition: 'background-color 0.2s',
                     }}
                   >
-                    <Typography
-                      variant="body2"
-                      sx={{ fontWeight: 500, fontSize: "0.8125rem" }}
-                    >
-                      {t("changeRequest.pendingReviewBanner", {
+                    <Typography variant="body2" sx={{ fontWeight: 500, fontSize: '0.8125rem' }}>
+                      {t('changeRequest.pendingReviewBanner', {
                         count: pendingCRCount,
                       })}
                     </Typography>
-                    <ArrowBackIcon
-                      sx={{ transform: "rotate(180deg)", fontSize: 14 }}
-                    />
+                    <ArrowBackIcon sx={{ transform: 'rotate(180deg)', fontSize: 14 }} />
                   </Box>
                 )}
               </Box>
@@ -2385,10 +2219,10 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           sx={{
             flexGrow: 1,
             p: 3,
-            backgroundColor: "background.default",
-            overflow: "auto",
-            display: "flex",
-            flexDirection: "column",
+            backgroundColor: 'background.default',
+            overflow: 'auto',
+            display: 'flex',
+            flexDirection: 'column',
           }}
         >
           {children}
@@ -2399,7 +2233,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       <Zoom in={roleChangeDialogOpen}>
         <Box
           sx={{
-            position: "fixed",
+            position: 'fixed',
             bottom: 24,
             right: 24,
             zIndex: 9999,
@@ -2412,29 +2246,29 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             <Box
               key={index}
               sx={{
-                position: "absolute",
+                position: 'absolute',
                 top: 0,
                 left: 0,
                 width: 56,
                 height: 56,
-                borderRadius: "50%",
-                border: "2px solid",
-                borderColor: "warning.main",
+                borderRadius: '50%',
+                border: '2px solid',
+                borderColor: 'warning.main',
                 animation: `${ripplePulseAnimation} 2s ease-out infinite ${delay}s`,
-                pointerEvents: "none",
+                pointerEvents: 'none',
               }}
             />
           ))}
-          <Tooltip title={t("common.roleChangeMessage")} placement="left" arrow>
+          <Tooltip title={t('common.roleChangeMessage')} placement="left" arrow>
             <Fab
               color="warning"
               onClick={handleRoleChangeConfirm}
               sx={{
                 animation: `${wiggleAnimation} 1s ease-in-out infinite`,
-                boxShadow: "0 4px 20px rgba(237, 108, 2, 0.4)",
-                "&:hover": {
-                  animation: "none",
-                  transform: "scale(1.1)",
+                boxShadow: '0 4px 20px rgba(237, 108, 2, 0.4)',
+                '&:hover': {
+                  animation: 'none',
+                  transform: 'scale(1.1)',
                 },
               }}
             >

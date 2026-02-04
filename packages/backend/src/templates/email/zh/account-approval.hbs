@@ -1,47 +1,67 @@
-<!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8">
-  <title>账户已批准</title>
-  <style>
-    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-    .header { background-color: #5b6ad0; color: white; padding: 20px; text-align: center; }
-    .content { padding: 20px; background-color: #f9f9f9; }
-    .button { 
-      display: inline-block; 
-      padding: 12px 24px; 
-      background-color: #5b6ad0; 
-      color: white; 
-      text-decoration: none; 
-      border-radius: 4px; 
-      margin: 20px 0;
-    }
-    .footer { padding: 20px; text-align: center; color: #666; font-size: 12px; }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="header">
-      <h1>🎉 账户已批准！</h1>
+  <head>
+    <meta charset='utf-8' />
+    <title>账户已批准</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        color: #333;
+      }
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .header {
+        background-color: #5b6ad0;
+        color: white;
+        padding: 20px;
+        text-align: center;
+      }
+      .content {
+        padding: 20px;
+        background-color: #f9f9f9;
+      }
+      .button {
+        display: inline-block;
+        padding: 12px 24px;
+        background-color: #5b6ad0;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+        margin: 20px 0;
+      }
+      .footer {
+        padding: 20px;
+        text-align: center;
+        color: #666;
+        font-size: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class='container'>
+      <div class='header'>
+        <h1>🎉 账户已批准！</h1>
+      </div>
+      <div class='content'>
+        <h2>您好，{{name}}！</h2>
+        <p>好消息！</p>
+        <p>您的 Gatrix 账户已被管理员批准。您现在可以访问所有平台功能。</p>
+        <a href='{{loginUrl}}' class='button'>立即登录</a>
+        <p>您现在可以访问以下功能：</p>
+        <ul>
+          <li>游戏客户端管理</li>
+          <li>服务器配置工具</li>
+          <li>用户账户管理</li>
+          <li>平台监控和分析</li>
+        </ul>
+        <p>欢迎来到 Gatrix！</p>
+      </div>
+      <div class='footer'>
+        <p>© 2025 Gatrix. All rights reserved.</p>
+      </div>
     </div>
-    <div class="content">
-      <h2>您好，{{name}}！</h2>
-      <p>好消息！</p>
-      <p>您的 Gatrix 账户已被管理员批准。您现在可以访问所有平台功能。</p>
-      <a href="{{loginUrl}}" class="button">立即登录</a>
-      <p>您现在可以访问以下功能：</p>
-      <ul>
-        <li>游戏客户端管理</li>
-        <li>服务器配置工具</li>
-        <li>用户账户管理</li>
-        <li>平台监控和分析</li>
-      </ul>
-      <p>欢迎来到 Gatrix！</p>
-    </div>
-    <div class="footer">
-      <p>© 2025 Gatrix. All rights reserved.</p>
-    </div>
-  </div>
-</body>
+  </body>
 </html>

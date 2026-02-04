@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 import {
   Box,
   Card,
@@ -11,18 +11,16 @@ import {
   useTheme,
   CircularProgress,
   Alert,
-} from "@mui/material";
+} from '@mui/material';
 import {
   KeyboardArrowDown,
   KeyboardArrowUp,
   Refresh as RefreshIcon,
   Circle as CircleIcon,
   Dns as DnsIcon,
-} from "@mui/icons-material";
-import { useTranslation } from "react-i18next";
-import serviceDiscoveryService, {
-  ServiceInstance,
-} from "../../services/serviceDiscoveryService";
+} from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
+import serviceDiscoveryService, { ServiceInstance } from '../../services/serviceDiscoveryService';
 
 interface EdgeGroup {
   id: string;
@@ -49,7 +47,7 @@ const GatrixEdgesPage: React.FC = () => {
       const allServices = await serviceDiscoveryService.getServices();
 
       if (!allServices || !Array.isArray(allServices)) {
-        console.warn("getServices returned invalid data:", allServices);
+        console.warn('getServices returned invalid data:', allServices);
         setServices([]);
         setGroups([]);
         return;
@@ -60,14 +58,13 @@ const GatrixEdgesPage: React.FC = () => {
       // Ideally this should be configurable or determined by requirements.
       // Based on the image "edge-eu-north-1", the service name might be 'edge' or 'gatrix-edge'.
       const edgeServices = allServices.filter(
-        (s) =>
-          s.labels.service === "gatrix-edge" || s.labels.service === "edge",
+        (s) => s.labels.service === 'gatrix-edge' || s.labels.service === 'edge'
       );
 
       setServices(edgeServices);
       groupServices(edgeServices);
     } catch (err: any) {
-      setError(err.message || "Failed to fetch services");
+      setError(err.message || 'Failed to fetch services');
     } finally {
       setLoading(false);
     }
@@ -78,22 +75,18 @@ const GatrixEdgesPage: React.FC = () => {
 
     services.forEach((service) => {
       // Group by 'group' label or fallback to 'default'
-      const groupName = service.labels.group || "default";
+      const groupName = service.labels.group || 'default';
       if (!groupMap.has(groupName)) {
         groupMap.set(groupName, []);
       }
       groupMap.get(groupName)?.push(service);
     });
 
-    const newGroups: EdgeGroup[] = Array.from(groupMap.entries()).map(
-      ([name, instances]) => ({
-        id: name,
-        name: name === "default" ? "Default Group" : name,
-        instances: instances.sort((a, b) =>
-          a.instanceId.localeCompare(b.instanceId),
-        ),
-      }),
-    );
+    const newGroups: EdgeGroup[] = Array.from(groupMap.entries()).map(([name, instances]) => ({
+      id: name,
+      name: name === 'default' ? 'Default Group' : name,
+      instances: instances.sort((a, b) => a.instanceId.localeCompare(b.instanceId)),
+    }));
 
     setGroups(newGroups);
     // Expand all by default
@@ -116,14 +109,14 @@ const GatrixEdgesPage: React.FC = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "ready":
-      case "heartbeat":
+      case 'ready':
+      case 'heartbeat':
         return theme.palette.success.main;
-      case "starting":
-      case "initializing":
+      case 'starting':
+      case 'initializing':
         return theme.palette.warning.main;
-      case "error":
-      case "terminated":
+      case 'error':
+      case 'terminated':
         return theme.palette.error.main;
       default:
         return theme.palette.text.disabled;
@@ -131,17 +124,17 @@ const GatrixEdgesPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 3, maxWidth: 1600, mx: "auto" }}>
+    <Box sx={{ p: 3, maxWidth: 1600, mx: 'auto' }}>
       <Box
         sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
           mb: 4,
         }}
       >
-        <Typography variant="h4" component="h1" sx={{ fontWeight: "bold" }}>
-          {t("sidebar.gatrixEdges")}
+        <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold' }}>
+          {t('sidebar.gatrixEdges')}
         </Typography>
         <Button
           startIcon={<RefreshIcon />}
@@ -149,7 +142,7 @@ const GatrixEdgesPage: React.FC = () => {
           onClick={fetchServices}
           disabled={loading}
         >
-          {t("common.refresh")}
+          {t('common.refresh')}
         </Button>
       </Box>
 
@@ -160,15 +153,15 @@ const GatrixEdgesPage: React.FC = () => {
       )}
 
       {loading && !services.length ? (
-        <Box sx={{ display: "flex", justifyContent: "center", p: 8 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', p: 8 }}>
           <CircularProgress />
         </Box>
       ) : (
         <Box
           sx={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
             gap: 4,
           }}
         >
@@ -176,7 +169,7 @@ const GatrixEdgesPage: React.FC = () => {
           <Card
             sx={{
               minWidth: 200,
-              textAlign: "center",
+              textAlign: 'center',
               border: `2px solid ${theme.palette.primary.main}`,
               boxShadow: theme.shadows[4],
               zIndex: 2,
@@ -185,9 +178,9 @@ const GatrixEdgesPage: React.FC = () => {
             <CardContent>
               <Box
                 sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
                   gap: 1,
                 }}
               >
@@ -195,15 +188,15 @@ const GatrixEdgesPage: React.FC = () => {
                   sx={{
                     width: 48,
                     height: 48,
-                    bgcolor: "primary.main",
+                    bgcolor: 'primary.main',
                     borderRadius: 1,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    color: "white",
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'white',
                   }}
                 >
-                  <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+                  <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
                     G
                   </Typography>
                 </Box>
@@ -219,15 +212,15 @@ const GatrixEdgesPage: React.FC = () => {
 
           <Box
             sx={{
-              position: "relative",
-              width: "100%",
-              display: "flex",
-              justifyContent: "center",
-              "&::before": {
+              position: 'relative',
+              width: '100%',
+              display: 'flex',
+              justifyContent: 'center',
+              '&::before': {
                 content: '""',
-                position: "absolute",
+                position: 'absolute',
                 top: -32,
-                left: "50%",
+                left: '50%',
                 width: 2,
                 height: 32,
                 bgcolor: theme.palette.divider,
@@ -238,10 +231,10 @@ const GatrixEdgesPage: React.FC = () => {
             {groups.length > 1 && (
               <Box
                 sx={{
-                  position: "absolute",
+                  position: 'absolute',
                   top: 0,
-                  left: "10%", // approximate, needs dynamic calculation for perfect tree
-                  right: "10%",
+                  left: '10%', // approximate, needs dynamic calculation for perfect tree
+                  right: '10%',
                   height: 2,
                   bgcolor: theme.palette.divider,
                 }}
@@ -250,20 +243,20 @@ const GatrixEdgesPage: React.FC = () => {
 
             <Box
               sx={{
-                display: "flex",
+                display: 'flex',
                 gap: 3,
-                flexWrap: "wrap",
-                justifyContent: "center",
-                width: "100%",
+                flexWrap: 'wrap',
+                justifyContent: 'center',
+                width: '100%',
               }}
             >
               {groups.map((group) => (
                 <Box
                   key={group.id}
                   sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
                     minWidth: 300,
                   }}
                 >
@@ -281,7 +274,7 @@ const GatrixEdgesPage: React.FC = () => {
                   {/* Group Card */}
                   <Card
                     sx={{
-                      width: "100%",
+                      width: '100%',
                       mb: 2,
                       border: `1px solid ${theme.palette.divider}`,
                     }}
@@ -289,48 +282,40 @@ const GatrixEdgesPage: React.FC = () => {
                     <Box
                       sx={{
                         p: 1.5,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
                         bgcolor: theme.palette.action.hover,
-                        cursor: "pointer",
+                        cursor: 'pointer',
                       }}
                       onClick={() => toggleGroup(group.id)}
                     >
-                      <Box
-                        sx={{ display: "flex", alignItems: "center", gap: 1 }}
-                      >
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                         <Chip
                           label="Self-hosted"
                           size="small"
                           color="primary"
                           variant="outlined"
-                          sx={{ height: 20, fontSize: "0.7rem" }}
+                          sx={{ height: 20, fontSize: '0.7rem' }}
                         />
                         <Typography variant="subtitle1" fontWeight="bold">
                           {group.name}
                         </Typography>
                       </Box>
-                      <Box
-                        sx={{ display: "flex", alignItems: "center", gap: 1 }}
-                      >
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                         <Typography variant="caption" color="text.secondary">
                           {group.instances.length} instances
                         </Typography>
-                        {expandedGroups.has(group.id) ? (
-                          <KeyboardArrowUp />
-                        ) : (
-                          <KeyboardArrowDown />
-                        )}
+                        {expandedGroups.has(group.id) ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
                       </Box>
                     </Box>
 
                     <Collapse in={expandedGroups.has(group.id)}>
-                      <CardContent sx={{ p: 1, "&:last-child": { pb: 1 } }}>
+                      <CardContent sx={{ p: 1, '&:last-child': { pb: 1 } }}>
                         <Box
                           sx={{
-                            display: "flex",
-                            flexDirection: "column",
+                            display: 'flex',
+                            flexDirection: 'column',
                             gap: 1,
                           }}
                         >
@@ -340,16 +325,16 @@ const GatrixEdgesPage: React.FC = () => {
                               variant="outlined"
                               sx={{
                                 p: 1,
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "space-between",
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
                                 borderColor: theme.palette.divider,
                               }}
                             >
                               <Box
                                 sx={{
-                                  display: "flex",
-                                  alignItems: "center",
+                                  display: 'flex',
+                                  alignItems: 'center',
                                   gap: 1.5,
                                 }}
                               >
@@ -360,10 +345,7 @@ const GatrixEdgesPage: React.FC = () => {
                                   }}
                                 />
                                 <Box>
-                                  <Typography
-                                    variant="body2"
-                                    fontWeight="medium"
-                                  >
+                                  <Typography variant="body2" fontWeight="medium">
                                     {instance.hostname}
                                   </Typography>
                                   <Typography
@@ -378,24 +360,24 @@ const GatrixEdgesPage: React.FC = () => {
 
                               <Box
                                 sx={{
-                                  display: "flex",
-                                  alignItems: "center",
+                                  display: 'flex',
+                                  alignItems: 'center',
                                   gap: 1,
                                 }}
                               >
                                 {/* Detailed status metrics could go here if available */}
-                                {instance.status === "ready" ? (
+                                {instance.status === 'ready' ? (
                                   <Chip
                                     label="Connected"
                                     size="small"
                                     color="success"
-                                    sx={{ height: 20, fontSize: "0.65rem" }}
+                                    sx={{ height: 20, fontSize: '0.65rem' }}
                                   />
                                 ) : (
                                   <Chip
                                     label={instance.status}
                                     size="small"
-                                    sx={{ height: 20, fontSize: "0.65rem" }}
+                                    sx={{ height: 20, fontSize: '0.65rem' }}
                                   />
                                 )}
                                 <IconButton size="small">
@@ -409,7 +391,7 @@ const GatrixEdgesPage: React.FC = () => {
                             <Typography
                               variant="body2"
                               color="text.secondary"
-                              sx={{ textAlign: "center", py: 2 }}
+                              sx={{ textAlign: 'center', py: 2 }}
                             >
                               No active instances
                             </Typography>
@@ -422,10 +404,8 @@ const GatrixEdgesPage: React.FC = () => {
               ))}
 
               {groups.length === 0 && !loading && (
-                <Box sx={{ p: 4, textAlign: "center" }}>
-                  <Typography color="text.secondary">
-                    No Edge servers found.
-                  </Typography>
+                <Box sx={{ p: 4, textAlign: 'center' }}>
+                  <Typography color="text.secondary">No Edge servers found.</Typography>
                 </Box>
               )}
             </Box>

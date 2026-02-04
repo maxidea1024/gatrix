@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useMemo } from "react";
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import {
   Box,
   Typography,
@@ -11,7 +11,7 @@ import {
   TextField,
   InputAdornment,
   Fab,
-} from "@mui/material";
+} from '@mui/material';
 import {
   Download as DownloadIcon,
   ContentCopy as CopyIcon,
@@ -20,11 +20,11 @@ import {
   Clear as ClearIcon,
   KeyboardArrowUp as ArrowUpIcon,
   KeyboardArrowDown as ArrowDownIcon,
-} from "@mui/icons-material";
-import { useTranslation } from "react-i18next";
-import { useSnackbar } from "notistack";
-import { copyToClipboardWithNotification } from "../utils/clipboard";
-import { Virtuoso, VirtuosoHandle } from "react-virtuoso";
+} from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
+import { useSnackbar } from 'notistack';
+import { copyToClipboardWithNotification } from '../utils/clipboard';
+import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
 
 interface LogViewerProps {
   logContent: string;
@@ -54,13 +54,13 @@ export const LogViewer: React.FC<LogViewerProps> = ({
   } | null>(null);
   const [selectedLine, setSelectedLine] = useState<number | null>(null);
   const [highlightedLine, setHighlightedLine] = useState<number | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [goToLine, setGoToLine] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
+  const [goToLine, setGoToLine] = useState('');
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [showScrollBottom, setShowScrollBottom] = useState(false);
   const virtuosoRef = useRef<VirtuosoHandle>(null);
 
-  const lines = useMemo(() => logContent.split("\n"), [logContent]);
+  const lines = useMemo(() => logContent.split('\n'), [logContent]);
 
   // Find matching lines for search
   const matchingLines = useMemo(() => {
@@ -78,22 +78,22 @@ export const LogViewer: React.FC<LogViewerProps> = ({
   // Memoize style objects to prevent re-creation on every render
   const lineNumberBaseStyle = useMemo(
     () => ({
-      minWidth: "60px",
+      minWidth: '60px',
       px: 1,
       py: 0, // Reduced from 0.25
-      textAlign: "right" as const,
-      borderRight: "1px solid",
-      borderColor: "grey.700",
-      cursor: "pointer",
-      userSelect: "none" as const,
-      fontFamily: "D2Coding, monospace",
-      fontSize: "0.725rem", // Slightly smaller
-      "&:hover": {
-        color: "grey.300",
-        bgcolor: "grey.700",
+      textAlign: 'right' as const,
+      borderRight: '1px solid',
+      borderColor: 'grey.700',
+      cursor: 'pointer',
+      userSelect: 'none' as const,
+      fontFamily: 'D2Coding, monospace',
+      fontSize: '0.725rem', // Slightly smaller
+      '&:hover': {
+        color: 'grey.300',
+        bgcolor: 'grey.700',
       },
     }),
-    [],
+    []
   );
 
   const lineContentStyle = useMemo(
@@ -101,12 +101,12 @@ export const LogViewer: React.FC<LogViewerProps> = ({
       flex: 1,
       px: 2,
       py: 0, // Reduced from 0.25
-      whiteSpace: "pre-wrap" as const,
-      wordBreak: "break-all" as const,
-      fontFamily: "D2Coding, monospace",
-      fontSize: "0.725rem", // Slightly smaller
+      whiteSpace: 'pre-wrap' as const,
+      wordBreak: 'break-all' as const,
+      fontFamily: 'D2Coding, monospace',
+      fontSize: '0.725rem', // Slightly smaller
     }),
-    [],
+    []
   );
 
   // Scroll to line if hash is present in URL or initialScrollLine is provided
@@ -122,17 +122,12 @@ export const LogViewer: React.FC<LogViewerProps> = ({
     } else {
       // Otherwise check URL hash
       const hash = window.location.hash;
-      if (hash.startsWith("#L")) {
+      if (hash.startsWith('#L')) {
         lineNumber = parseInt(hash.substring(2), 10);
       }
     }
 
-    if (
-      lineNumber &&
-      !isNaN(lineNumber) &&
-      lineNumber > 0 &&
-      lineNumber <= lines.length
-    ) {
+    if (lineNumber && !isNaN(lineNumber) && lineNumber > 0 && lineNumber <= lines.length) {
       // Set highlighted line
       setHighlightedLine(lineNumber);
 
@@ -141,8 +136,8 @@ export const LogViewer: React.FC<LogViewerProps> = ({
         if (virtuosoRef.current) {
           virtuosoRef.current.scrollToIndex({
             index: lineNumber! - 1,
-            align: "center",
-            behavior: "auto",
+            align: 'center',
+            behavior: 'auto',
           });
         }
       }, 300);
@@ -151,8 +146,8 @@ export const LogViewer: React.FC<LogViewerProps> = ({
         if (virtuosoRef.current) {
           virtuosoRef.current.scrollToIndex({
             index: lineNumber! - 1,
-            align: "center",
-            behavior: "auto",
+            align: 'center',
+            behavior: 'auto',
           });
         }
       }, 800);
@@ -161,8 +156,8 @@ export const LogViewer: React.FC<LogViewerProps> = ({
         if (virtuosoRef.current) {
           virtuosoRef.current.scrollToIndex({
             index: lineNumber! - 1,
-            align: "center",
-            behavior: "smooth",
+            align: 'center',
+            behavior: 'smooth',
           });
         }
       }, 1500);
@@ -175,10 +170,7 @@ export const LogViewer: React.FC<LogViewerProps> = ({
     }
   }, [initialScrollLine, lines.length, logContent]);
 
-  const handleLineClick = (
-    event: React.MouseEvent<HTMLDivElement>,
-    lineNumber: number,
-  ) => {
+  const handleLineClick = (event: React.MouseEvent<HTMLDivElement>, lineNumber: number) => {
     event.preventDefault();
     event.stopPropagation();
     setSelectedLine(lineNumber);
@@ -200,10 +192,10 @@ export const LogViewer: React.FC<LogViewerProps> = ({
       await copyToClipboardWithNotification(
         lineContent,
         () =>
-          enqueueSnackbar(t("common.copiedToClipboard"), {
-            variant: "success",
+          enqueueSnackbar(t('common.copiedToClipboard'), {
+            variant: 'success',
           }),
-        () => enqueueSnackbar(t("common.copyFailed"), { variant: "error" }),
+        () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
       );
       handleClose();
     }
@@ -216,10 +208,10 @@ export const LogViewer: React.FC<LogViewerProps> = ({
       await copyToClipboardWithNotification(
         textToCopy,
         () =>
-          enqueueSnackbar(t("common.copiedToClipboard"), {
-            variant: "success",
+          enqueueSnackbar(t('common.copiedToClipboard'), {
+            variant: 'success',
           }),
-        () => enqueueSnackbar(t("common.copyFailed"), { variant: "error" }),
+        () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
       );
       handleClose();
     }
@@ -230,91 +222,80 @@ export const LogViewer: React.FC<LogViewerProps> = ({
       // Build absolute URL with eventId and action parameters for auto-opening log drawer
       // Uses window.location.origin so it automatically adapts to dev/staging/production environments
       const params = new URLSearchParams(window.location.search);
-      params.set("eventId", eventId);
-      params.set("action", "viewLog");
+      params.set('eventId', eventId);
+      params.set('action', 'viewLog');
       const url = `${window.location.origin}${window.location.pathname}?${params.toString()}#L${selectedLine}`;
       await copyToClipboardWithNotification(
         url,
         () =>
-          enqueueSnackbar(t("common.copiedToClipboard"), {
-            variant: "success",
+          enqueueSnackbar(t('common.copiedToClipboard'), {
+            variant: 'success',
           }),
-        () => enqueueSnackbar(t("common.copyFailed"), { variant: "error" }),
+        () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
       );
       handleClose();
     }
   };
 
   const handleDownload = () => {
-    const blob = new Blob([logContent], { type: "text/plain" });
+    const blob = new Blob([logContent], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
+    const a = document.createElement('a');
     a.href = url;
-    a.download = logFilePath
-      ? logFilePath.split("/").pop() || "log.txt"
-      : "log.txt";
+    a.download = logFilePath ? logFilePath.split('/').pop() || 'log.txt' : 'log.txt';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    enqueueSnackbar(t("crashes.logDownloaded"), { variant: "success" });
+    enqueueSnackbar(t('crashes.logDownloaded'), { variant: 'success' });
   };
 
   const handleCopyAll = async () => {
     await copyToClipboardWithNotification(
       logContent,
-      () =>
-        enqueueSnackbar(t("common.copiedToClipboard"), { variant: "success" }),
-      () => enqueueSnackbar(t("common.copyFailed"), { variant: "error" }),
+      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
     );
   };
 
   const handleGoToLine = () => {
     const lineNumber = parseInt(goToLine, 10);
-    if (
-      !isNaN(lineNumber) &&
-      lineNumber > 0 &&
-      lineNumber <= lines.length &&
-      virtuosoRef.current
-    ) {
+    if (!isNaN(lineNumber) && lineNumber > 0 && lineNumber <= lines.length && virtuosoRef.current) {
       virtuosoRef.current.scrollToIndex({
         index: lineNumber - 1,
-        align: "center",
-        behavior: "smooth",
+        align: 'center',
+        behavior: 'smooth',
       });
       window.location.hash = `#L${lineNumber}`;
-      setGoToLine("");
+      setGoToLine('');
     }
   };
 
   const handleScrollToTop = () => {
-    virtuosoRef.current?.scrollToIndex({ index: 0, behavior: "smooth" });
+    virtuosoRef.current?.scrollToIndex({ index: 0, behavior: 'smooth' });
   };
 
   const handleScrollToBottom = () => {
     virtuosoRef.current?.scrollToIndex({
       index: lines.length - 1,
-      behavior: "smooth",
+      behavior: 'smooth',
     });
   };
 
   const highlightText = (text: string, query: string) => {
     if (!query) return text;
 
-    const parts = text.split(new RegExp(`(${query})`, "gi"));
+    const parts = text.split(new RegExp(`(${query})`, 'gi'));
     return (
       <>
         {parts.map((part, index) =>
           part.toLowerCase() === query.toLowerCase() ? (
-            <span
-              key={index}
-              style={{ backgroundColor: "#ffeb3b", color: "#000" }}
-            >
+            <span key={index} style={{ backgroundColor: '#ffeb3b', color: '#000' }}>
               {part}
             </span>
           ) : (
             part
-          ),
+          )
         )}
       </>
     );
@@ -333,15 +314,15 @@ export const LogViewer: React.FC<LogViewerProps> = ({
         display="flex"
         onContextMenu={(e) => handleLineClick(e, lineNumber)}
         sx={{
-          bgcolor: isHighlighted ? "rgba(255, 255, 0, 0.1)" : "transparent",
-          outline: "1px dashed transparent",
-          outlineOffset: "-1px",
-          cursor: "context-menu",
-          "&:hover": {
-            bgcolor: "rgba(255, 255, 255, 0.05)",
-            outlineColor: "grey.600",
+          bgcolor: isHighlighted ? 'rgba(255, 255, 0, 0.1)' : 'transparent',
+          outline: '1px dashed transparent',
+          outlineOffset: '-1px',
+          cursor: 'context-menu',
+          '&:hover': {
+            bgcolor: 'rgba(255, 255, 255, 0.05)',
+            outlineColor: 'grey.600',
           },
-          "&:hover .line-menu-chip": {
+          '&:hover .line-menu-chip': {
             opacity: 1,
           },
         }}
@@ -350,17 +331,17 @@ export const LogViewer: React.FC<LogViewerProps> = ({
         <Box
           sx={{
             ...lineNumberBaseStyle,
-            color: isMatching ? "#ffeb3b" : "grey.500",
-            bgcolor: isMatching ? "rgba(255, 235, 59, 0.1)" : "grey.800",
+            color: isMatching ? '#ffeb3b' : 'grey.500',
+            bgcolor: isMatching ? 'rgba(255, 235, 59, 0.1)' : 'grey.800',
             borderLeft: isMatching
-              ? "3px solid #ffeb3b"
+              ? '3px solid #ffeb3b'
               : isSelected
-                ? "3px solid #2196f3"
-                : "none",
-            fontWeight: isMatching ? "bold" : "normal",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
+                ? '3px solid #2196f3'
+                : 'none',
+            fontWeight: isMatching ? 'bold' : 'normal',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
             gap: 0.5,
           }}
         >
@@ -370,10 +351,10 @@ export const LogViewer: React.FC<LogViewerProps> = ({
             className="line-menu-chip"
             sx={{
               opacity: isSelected ? 1 : 0,
-              transition: "opacity 0.2s",
-              fontSize: "0.7rem",
-              color: "grey.400",
-              cursor: "pointer",
+              transition: 'opacity 0.2s',
+              fontSize: '0.7rem',
+              color: 'grey.400',
+              cursor: 'pointer',
             }}
           >
             •••
@@ -382,13 +363,13 @@ export const LogViewer: React.FC<LogViewerProps> = ({
 
         {/* Line Content */}
         <Box sx={lineContentStyle}>
-          {searchQuery ? highlightText(line || " ", searchQuery) : line || " "}
+          {searchQuery ? highlightText(line || ' ', searchQuery) : line || ' '}
         </Box>
       </Box>
     );
   });
 
-  Row.displayName = "LogViewerRow";
+  Row.displayName = 'LogViewerRow';
 
   // Row renderer for react-virtuoso
   const rowRenderer = (index: number) => <Row index={index} />;
@@ -404,24 +385,18 @@ export const LogViewer: React.FC<LogViewerProps> = ({
   return (
     <Box
       sx={{
-        position: "relative",
-        display: "flex",
-        flexDirection: "column",
-        height: "100%",
+        position: 'relative',
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
       }}
     >
       {/* Toolbar */}
       <Box sx={{ flexShrink: 0, mb: 1 }}>
         {/* First row: File info */}
-        <Box
-          display="flex"
-          justifyContent="space-between"
-          alignItems="center"
-          mb={1}
-        >
+        <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
           <Typography variant="caption" color="text.secondary">
-            {logFilePath || t("crashes.logFile")} ({lines.length}{" "}
-            {t("crashes.lines")})
+            {logFilePath || t('crashes.logFile')} ({lines.length} {t('crashes.lines')})
             {searchQuery && ` - ${matchingLines.size} matches`}
           </Typography>
         </Box>
@@ -442,7 +417,7 @@ export const LogViewer: React.FC<LogViewerProps> = ({
               ),
               endAdornment: searchQuery && (
                 <InputAdornment position="end">
-                  <IconButton size="small" onClick={() => setSearchQuery("")}>
+                  <IconButton size="small" onClick={() => setSearchQuery('')}>
                     <ClearIcon fontSize="small" />
                   </IconButton>
                 </InputAdornment>
@@ -451,42 +426,37 @@ export const LogViewer: React.FC<LogViewerProps> = ({
             sx={{
               flex: 1,
               minWidth: 150,
-              "& .MuiOutlinedInput-root": {
-                height: "40px",
-                borderRadius: "20px",
-                bgcolor: "background.paper",
-                transition: "all 0.2s ease-in-out",
-                "& fieldset": {
-                  borderColor: "divider",
+              '& .MuiOutlinedInput-root': {
+                height: '40px',
+                borderRadius: '20px',
+                bgcolor: 'background.paper',
+                transition: 'all 0.2s ease-in-out',
+                '& fieldset': {
+                  borderColor: 'divider',
                 },
-                "&:hover": {
-                  bgcolor: "action.hover",
-                  "& fieldset": {
-                    borderColor: "primary.light",
+                '&:hover': {
+                  bgcolor: 'action.hover',
+                  '& fieldset': {
+                    borderColor: 'primary.light',
                   },
                 },
-                "&.Mui-focused": {
-                  bgcolor: "background.paper",
-                  boxShadow: "0 0 0 2px rgba(25, 118, 210, 0.1)",
-                  "& fieldset": {
-                    borderColor: "primary.main",
-                    borderWidth: "1px",
+                '&.Mui-focused': {
+                  bgcolor: 'background.paper',
+                  boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
+                  '& fieldset': {
+                    borderColor: 'primary.main',
+                    borderWidth: '1px',
                   },
                 },
               },
-              "& .MuiInputBase-input": {
-                fontSize: "0.875rem",
+              '& .MuiInputBase-input': {
+                fontSize: '0.875rem',
               },
             }}
           />
 
           {/* Right-aligned controls */}
-          <Box
-            display="flex"
-            gap={1}
-            alignItems="center"
-            sx={{ flexShrink: 0 }}
-          >
+          <Box display="flex" gap={1} alignItems="center" sx={{ flexShrink: 0 }}>
             {/* Go to Line */}
             <TextField
               size="small"
@@ -494,48 +464,48 @@ export const LogViewer: React.FC<LogViewerProps> = ({
               value={goToLine}
               onChange={(e) => setGoToLine(e.target.value)}
               onKeyPress={(e) => {
-                if (e.key === "Enter") {
+                if (e.key === 'Enter') {
                   handleGoToLine();
                 }
               }}
               type="number"
               sx={{
                 width: 120,
-                "& .MuiOutlinedInput-root": {
-                  height: "40px",
-                  borderRadius: "20px",
-                  bgcolor: "background.paper",
-                  transition: "all 0.2s ease-in-out",
-                  "& fieldset": {
-                    borderColor: "divider",
+                '& .MuiOutlinedInput-root': {
+                  height: '40px',
+                  borderRadius: '20px',
+                  bgcolor: 'background.paper',
+                  transition: 'all 0.2s ease-in-out',
+                  '& fieldset': {
+                    borderColor: 'divider',
                   },
-                  "&:hover": {
-                    bgcolor: "action.hover",
-                    "& fieldset": {
-                      borderColor: "primary.light",
+                  '&:hover': {
+                    bgcolor: 'action.hover',
+                    '& fieldset': {
+                      borderColor: 'primary.light',
                     },
                   },
-                  "&.Mui-focused": {
-                    bgcolor: "background.paper",
-                    boxShadow: "0 0 0 2px rgba(25, 118, 210, 0.1)",
-                    "& fieldset": {
-                      borderColor: "primary.main",
-                      borderWidth: "1px",
+                  '&.Mui-focused': {
+                    bgcolor: 'background.paper',
+                    boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
+                    '& fieldset': {
+                      borderColor: 'primary.main',
+                      borderWidth: '1px',
                     },
                   },
                 },
-                "& .MuiInputBase-input": {
-                  fontSize: "0.875rem",
+                '& .MuiInputBase-input': {
+                  fontSize: '0.875rem',
                 },
               }}
             />
 
-            <Tooltip title={t("crashes.copyAll")}>
+            <Tooltip title={t('crashes.copyAll')}>
               <IconButton size="small" onClick={handleCopyAll}>
                 <CopyIcon fontSize="small" />
               </IconButton>
             </Tooltip>
-            <Tooltip title={t("crashes.downloadLog")}>
+            <Tooltip title={t('crashes.downloadLog')}>
               <IconButton size="small" onClick={handleDownload}>
                 <DownloadIcon fontSize="small" />
               </IconButton>
@@ -549,21 +519,21 @@ export const LogViewer: React.FC<LogViewerProps> = ({
         variant="outlined"
         sx={{
           flex: 1,
-          display: "flex",
-          flexDirection: "column",
-          overflow: "hidden",
-          bgcolor: "grey.900",
-          color: "grey.100",
-          fontFamily: "monospace",
-          fontSize: "0.75rem",
-          position: "relative",
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden',
+          bgcolor: 'grey.900',
+          color: 'grey.100',
+          fontFamily: 'monospace',
+          fontSize: '0.75rem',
+          position: 'relative',
         }}
       >
         <Virtuoso
           ref={virtuosoRef}
           totalCount={lines.length}
           itemContent={rowRenderer}
-          style={{ height: "100%" }}
+          style={{ height: '100%' }}
           overscan={{
             main: 400,
             reverse: 200,
@@ -587,22 +557,20 @@ export const LogViewer: React.FC<LogViewerProps> = ({
         onClose={handleClose}
         anchorReference="anchorPosition"
         anchorPosition={
-          contextMenu !== null
-            ? { top: contextMenu.mouseY, left: contextMenu.mouseX }
-            : undefined
+          contextMenu !== null ? { top: contextMenu.mouseY, left: contextMenu.mouseX } : undefined
         }
       >
         <MenuItem onClick={handleCopyLine}>
           <CopyIcon fontSize="small" sx={{ mr: 1 }} />
-          {t("crashes.copyLine")}
+          {t('crashes.copyLine')}
         </MenuItem>
         <MenuItem onClick={handleCopyLineWithNumber}>
           <CopyIcon fontSize="small" sx={{ mr: 1 }} />
-          {t("crashes.copyLineWithNumber")}
+          {t('crashes.copyLineWithNumber')}
         </MenuItem>
         <MenuItem onClick={handleCopyLink}>
           <LinkIcon fontSize="small" sx={{ mr: 1 }} />
-          {t("crashes.copyLineLink")}
+          {t('crashes.copyLineLink')}
         </MenuItem>
       </Menu>
 
@@ -613,7 +581,7 @@ export const LogViewer: React.FC<LogViewerProps> = ({
           color="primary"
           onClick={handleScrollToTop}
           sx={{
-            position: "absolute",
+            position: 'absolute',
             bottom: showScrollBottom ? 80 : 16,
             right: 16,
             zIndex: 1,
@@ -628,7 +596,7 @@ export const LogViewer: React.FC<LogViewerProps> = ({
           color="primary"
           onClick={handleScrollToBottom}
           sx={{
-            position: "absolute",
+            position: 'absolute',
             bottom: 16,
             right: 16,
             zIndex: 1,

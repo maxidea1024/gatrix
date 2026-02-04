@@ -1,23 +1,16 @@
-import React from "react";
-import {
-  Box,
-  Avatar,
-  AvatarGroup,
-  Tooltip,
-  Typography,
-  Chip,
-} from "@mui/material";
+import React from 'react';
+import { Box, Avatar, AvatarGroup, Tooltip, Typography, Chip } from '@mui/material';
 import {
   Done as SentIcon,
   DoneAll as DeliveredIcon,
   Visibility as ReadIcon,
   Schedule as PendingIcon,
   Error as ErrorIcon,
-} from "@mui/icons-material";
-import { useTranslation } from "react-i18next";
-import { Message, MessageStatus, User } from "../../types/chat";
-import { format } from "date-fns";
-import { ko, enUS, zhCN } from "date-fns/locale";
+} from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
+import { Message, MessageStatus, User } from '../../types/chat';
+import { format } from 'date-fns';
+import { ko, enUS, zhCN } from 'date-fns/locale';
 
 interface ReadReceiptsProps {
   message: Message;
@@ -36,9 +29,9 @@ const ReadReceipts: React.FC<ReadReceiptsProps> = ({
 
   const getDateLocale = () => {
     switch (i18n.language) {
-      case "ko":
+      case 'ko':
         return ko;
-      case "zh":
+      case 'zh':
         return zhCN;
       default:
         return enUS;
@@ -47,18 +40,16 @@ const ReadReceipts: React.FC<ReadReceiptsProps> = ({
 
   const getStatusIcon = (status: MessageStatus) => {
     switch (status) {
-      case "sending":
-        return (
-          <PendingIcon fontSize="small" sx={{ color: "text.secondary" }} />
-        );
-      case "sent":
-        return <SentIcon fontSize="small" sx={{ color: "text.secondary" }} />;
-      case "delivered":
-        return <DeliveredIcon fontSize="small" sx={{ color: "info.main" }} />;
-      case "read":
-        return <ReadIcon fontSize="small" sx={{ color: "success.main" }} />;
-      case "failed":
-        return <ErrorIcon fontSize="small" sx={{ color: "error.main" }} />;
+      case 'sending':
+        return <PendingIcon fontSize="small" sx={{ color: 'text.secondary' }} />;
+      case 'sent':
+        return <SentIcon fontSize="small" sx={{ color: 'text.secondary' }} />;
+      case 'delivered':
+        return <DeliveredIcon fontSize="small" sx={{ color: 'info.main' }} />;
+      case 'read':
+        return <ReadIcon fontSize="small" sx={{ color: 'success.main' }} />;
+      case 'failed':
+        return <ErrorIcon fontSize="small" sx={{ color: 'error.main' }} />;
       default:
         return null;
     }
@@ -66,23 +57,23 @@ const ReadReceipts: React.FC<ReadReceiptsProps> = ({
 
   const getStatusText = (status: MessageStatus) => {
     switch (status) {
-      case "sending":
-        return t("chat.sending");
-      case "sent":
-        return t("chat.sent");
-      case "delivered":
-        return t("chat.delivered");
-      case "read":
-        return t("chat.read");
-      case "failed":
-        return t("chat.failed");
+      case 'sending':
+        return t('chat.sending');
+      case 'sent':
+        return t('chat.sent');
+      case 'delivered':
+        return t('chat.delivered');
+      case 'read':
+        return t('chat.read');
+      case 'failed':
+        return t('chat.failed');
       default:
-        return "";
+        return '';
     }
   };
 
   const formatTime = (date: Date) => {
-    return format(date, "HH:mm", { locale: getDateLocale() });
+    return format(date, 'HH:mm', { locale: getDateLocale() });
   };
 
   const readByUsers = message.readBy || [];
@@ -95,9 +86,9 @@ const ReadReceipts: React.FC<ReadReceiptsProps> = ({
   return (
     <Box
       sx={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: isOwnMessage ? "flex-end" : "flex-start",
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: isOwnMessage ? 'flex-end' : 'flex-start',
         gap: 0.5,
         mt: 0.5,
         opacity: 0.7,
@@ -111,36 +102,30 @@ const ReadReceipts: React.FC<ReadReceiptsProps> = ({
       {/* Status indicator for own messages */}
       {isOwnMessage && (
         <Tooltip title={getStatusText(message.status)}>
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            {getStatusIcon(message.status)}
-          </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>{getStatusIcon(message.status)}</Box>
         </Tooltip>
       )}
 
       {/* Read receipts for own messages */}
       {isOwnMessage && showReadReceipts && hasBeenRead && (
-        <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
           {compact ? (
             <Tooltip
               title={
                 <Box>
-                  <Typography variant="caption" sx={{ fontWeight: "bold" }}>
-                    {t("chat.readBy")}
+                  <Typography variant="caption" sx={{ fontWeight: 'bold' }}>
+                    {t('chat.readBy')}
                   </Typography>
                   {readByUsers.map((user) => (
-                    <Typography
-                      key={user.id}
-                      variant="caption"
-                      sx={{ display: "block" }}
-                    >
+                    <Typography key={user.id} variant="caption" sx={{ display: 'block' }}>
                       {user.username}
                     </Typography>
                   ))}
                 </Box>
               }
             >
-              <Box sx={{ display: "flex", alignItems: "center", gap: 0.25 }}>
-                <ReadIcon fontSize="small" sx={{ color: "success.main" }} />
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.25 }}>
+                <ReadIcon fontSize="small" sx={{ color: 'success.main' }} />
                 <Typography variant="caption" color="success.main">
                   {readByUsers.length}
                 </Typography>
@@ -150,17 +135,12 @@ const ReadReceipts: React.FC<ReadReceiptsProps> = ({
             <Tooltip
               title={
                 <Box>
-                  <Typography variant="caption" sx={{ fontWeight: "bold" }}>
-                    {t("chat.readBy")}
+                  <Typography variant="caption" sx={{ fontWeight: 'bold' }}>
+                    {t('chat.readBy')}
                   </Typography>
                   {readByUsers.map((user) => (
-                    <Typography
-                      key={user.id}
-                      variant="caption"
-                      sx={{ display: "block" }}
-                    >
-                      {user.username} at{" "}
-                      {formatTime(new Date(user.readAt || message.createdAt))}
+                    <Typography key={user.id} variant="caption" sx={{ display: 'block' }}>
+                      {user.username} at {formatTime(new Date(user.readAt || message.createdAt))}
                     </Typography>
                   ))}
                 </Box>
@@ -169,21 +149,17 @@ const ReadReceipts: React.FC<ReadReceiptsProps> = ({
               <AvatarGroup
                 max={3}
                 sx={{
-                  "& .MuiAvatar-root": {
+                  '& .MuiAvatar-root': {
                     width: 16,
                     height: 16,
-                    fontSize: "0.6rem",
-                    border: "1px solid",
-                    borderColor: "background.paper",
+                    fontSize: '0.6rem',
+                    border: '1px solid',
+                    borderColor: 'background.paper',
                   },
                 }}
               >
                 {readByUsers.map((user) => (
-                  <Avatar
-                    key={user.id}
-                    src={user.avatarUrl}
-                    alt={user.username}
-                  >
+                  <Avatar key={user.id} src={user.avatarUrl} alt={user.username}>
                     {user.username.charAt(0).toUpperCase()}
                   </Avatar>
                 ))}
@@ -196,20 +172,20 @@ const ReadReceipts: React.FC<ReadReceiptsProps> = ({
       {/* Edit indicator */}
       {message.editedAt && (
         <Tooltip
-          title={t("chat.editedAt", {
-            time: format(new Date(message.editedAt), "PPp", {
+          title={t('chat.editedAt', {
+            time: format(new Date(message.editedAt), 'PPp', {
               locale: getDateLocale(),
             }),
           })}
         >
           <Chip
-            label={t("chat.edited")}
+            label={t('chat.edited')}
             size="small"
             variant="outlined"
             sx={{
               height: 16,
-              fontSize: "0.6rem",
-              "& .MuiChip-label": {
+              fontSize: '0.6rem',
+              '& .MuiChip-label': {
                 px: 0.5,
               },
             }}
@@ -218,29 +194,29 @@ const ReadReceipts: React.FC<ReadReceiptsProps> = ({
       )}
 
       {/* Retry button for failed messages */}
-      {isOwnMessage && message.status === "failed" && (
-        <Tooltip title={t("chat.retry")}>
+      {isOwnMessage && message.status === 'failed' && (
+        <Tooltip title={t('chat.retry')}>
           <Box
             component="button"
             onClick={() => {
               // Handle retry logic
-              console.log("Retry message:", message.id);
+              console.log('Retry message:', message.id);
             }}
             sx={{
-              background: "none",
-              border: "none",
-              cursor: "pointer",
-              color: "error.main",
-              display: "flex",
-              alignItems: "center",
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              color: 'error.main',
+              display: 'flex',
+              alignItems: 'center',
               p: 0,
-              "&:hover": {
+              '&:hover': {
                 opacity: 0.7,
               },
             }}
           >
             <Typography variant="caption" color="error">
-              {t("chat.retry")}
+              {t('chat.retry')}
             </Typography>
           </Box>
         </Tooltip>

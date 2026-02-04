@@ -1,14 +1,8 @@
-import React, {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  ReactNode,
-} from "react";
-import { gameWorldService } from "../services/gameWorldService";
-import { useAuth } from "./AuthContext";
-import { useEnvironment } from "./EnvironmentContext";
-import { PERMISSIONS } from "@/types/permissions";
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { gameWorldService } from '../services/gameWorldService';
+import { useAuth } from './AuthContext';
+import { useEnvironment } from './EnvironmentContext';
+import { PERMISSIONS } from '@/types/permissions';
 
 export interface GameWorldOption {
   label: string;
@@ -22,20 +16,15 @@ export interface GameWorldContextType {
   refresh: () => Promise<void>;
 }
 
-const GameWorldContext = createContext<GameWorldContextType | undefined>(
-  undefined,
-);
+const GameWorldContext = createContext<GameWorldContextType | undefined>(undefined);
 
 interface GameWorldProviderProps {
   children: ReactNode;
 }
 
-export const GameWorldProvider: React.FC<GameWorldProviderProps> = ({
-  children,
-}) => {
+export const GameWorldProvider: React.FC<GameWorldProviderProps> = ({ children }) => {
   const { isAuthenticated, hasPermission, permissionsLoading } = useAuth();
-  const { currentEnvironment, isLoading: environmentLoading } =
-    useEnvironment();
+  const { currentEnvironment, isLoading: environmentLoading } = useEnvironment();
   const [worlds, setWorlds] = useState<GameWorldOption[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -58,18 +47,15 @@ export const GameWorldProvider: React.FC<GameWorldProviderProps> = ({
       setIsLoading(true);
       setError(null);
       const result = await gameWorldService.getGameWorlds({ limit: 1000 });
-      const worldOptions: GameWorldOption[] = (result.worlds || []).map(
-        (world: any) => ({
-          label: world.name,
-          value: world.worldId,
-        }),
-      );
+      const worldOptions: GameWorldOption[] = (result.worlds || []).map((world: any) => ({
+        label: world.name,
+        value: world.worldId,
+      }));
       setWorlds(worldOptions);
     } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "Failed to load game worlds";
+      const errorMessage = err instanceof Error ? err.message : 'Failed to load game worlds';
       setError(errorMessage);
-      console.error("Error loading game worlds:", err);
+      console.error('Error loading game worlds:', err);
     } finally {
       setIsLoading(false);
     }
@@ -101,17 +87,13 @@ export const GameWorldProvider: React.FC<GameWorldProviderProps> = ({
   // Listen for game world updates from backend (only when authenticated and has permission)
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
-      if (
-        e.key === "gameWorldsUpdated" &&
-        isAuthenticated &&
-        canViewGameWorlds
-      ) {
+      if (e.key === 'gameWorldsUpdated' && isAuthenticated && canViewGameWorlds) {
         loadGameWorlds();
       }
     };
 
-    window.addEventListener("storage", handleStorageChange);
-    return () => window.removeEventListener("storage", handleStorageChange);
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
   }, [isAuthenticated, canViewGameWorlds]);
 
   const value: GameWorldContextType = {
@@ -121,17 +103,13 @@ export const GameWorldProvider: React.FC<GameWorldProviderProps> = ({
     refresh: loadGameWorlds,
   };
 
-  return (
-    <GameWorldContext.Provider value={value}>
-      {children}
-    </GameWorldContext.Provider>
-  );
+  return <GameWorldContext.Provider value={value}>{children}</GameWorldContext.Provider>;
 };
 
 export const useGameWorld = (): GameWorldContextType => {
   const context = useContext(GameWorldContext);
   if (!context) {
-    throw new Error("useGameWorld must be used within GameWorldProvider");
+    throw new Error('useGameWorld must be used within GameWorldProvider');
   }
   return context;
 };

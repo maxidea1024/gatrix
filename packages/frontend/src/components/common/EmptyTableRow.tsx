@@ -1,14 +1,7 @@
-import React from "react";
-import {
-  TableRow,
-  TableCell,
-  Typography,
-  CircularProgress,
-  Box,
-  Button,
-} from "@mui/material";
-import { Add as AddIcon, Inbox as InboxIcon } from "@mui/icons-material";
-import { useTranslation } from "react-i18next";
+import React from 'react';
+import { TableRow, TableCell, Typography, CircularProgress, Box, Button } from '@mui/material';
+import { Add as AddIcon, Inbox as InboxIcon } from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
 
 interface EmptyTableRowProps {
   colSpan: number;
@@ -52,11 +45,11 @@ const EmptyTableRow: React.FC<EmptyTableRowProps> = ({
       >
         <Box
           sx={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            height: "100%",
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            height: '100%',
             gap: 1.5,
           }}
         >
@@ -65,15 +58,11 @@ const EmptyTableRow: React.FC<EmptyTableRowProps> = ({
           ) : (
             <>
               {/* Icon */}
-              <Box sx={{ color: "text.disabled", mb: 1 }}>
+              <Box sx={{ color: 'text.disabled', mb: 1 }}>
                 {icon || <InboxIcon sx={{ fontSize: 48 }} />}
               </Box>
               {/* Main message */}
-              <Typography
-                variant="body1"
-                color="text.secondary"
-                fontWeight={500}
-              >
+              <Typography variant="body1" color="text.secondary" fontWeight={500}>
                 {message}
               </Typography>
               {/* Subtitle / CTA */}
@@ -84,21 +73,21 @@ const EmptyTableRow: React.FC<EmptyTableRowProps> = ({
                   startIcon={<AddIcon />}
                   sx={{
                     mt: 0.5,
-                    textTransform: "none",
-                    fontSize: "0.875rem",
-                    color: "primary.main",
+                    textTransform: 'none',
+                    fontSize: '0.875rem',
+                    color: 'primary.main',
                     fontWeight: 600,
-                    "&:hover": {
-                      backgroundColor: "transparent",
-                      textDecoration: "underline",
+                    '&:hover': {
+                      backgroundColor: 'transparent',
+                      textDecoration: 'underline',
                     },
                   }}
                 >
                   {subtitle ||
                     addButtonLabel ||
-                    (t("common.addFirstItem") !== "common.addFirstItem"
-                      ? t("common.addFirstItem")
-                      : t("common.add"))}
+                    (t('common.addFirstItem') !== 'common.addFirstItem'
+                      ? t('common.addFirstItem')
+                      : t('common.add'))}
                 </Button>
               ) : (
                 subtitle && (

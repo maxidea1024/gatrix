@@ -1,27 +1,19 @@
-import React, { useState } from "react";
-import {
-  Box,
-  TextField,
-  Button,
-  Typography,
-  Alert,
-  CircularProgress,
-  Link,
-} from "@mui/material";
-import { ArrowBack, Email } from "@mui/icons-material";
-import { useNavigate, Link as RouterLink } from "react-router-dom";
-import { useTranslation } from "react-i18next";
-import { AuthService } from "@/services/auth";
-import { LanguageSelector } from "@/components/LanguageSelector";
-import AuthLayout from "../../components/auth/AuthLayout";
+import React, { useState } from 'react';
+import { Box, TextField, Button, Typography, Alert, CircularProgress, Link } from '@mui/material';
+import { ArrowBack, Email } from '@mui/icons-material';
+import { useNavigate, Link as RouterLink } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { AuthService } from '@/services/auth';
+import { LanguageSelector } from '@/components/LanguageSelector';
+import AuthLayout from '../../components/auth/AuthLayout';
 
 const ForgotPasswordPage: React.FC = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState<{
-    type: "success" | "error";
+    type: 'success' | 'error';
     text: string;
   } | null>(null);
   const [emailSent, setEmailSent] = useState(false);
@@ -39,10 +31,10 @@ const ForgotPasswordPage: React.FC = () => {
     setEmail(value);
     setMessage(null); // 기존 메시지 클리어
 
-    if (value.trim() === "") {
+    if (value.trim() === '') {
       setEmailError(null);
     } else if (!validateEmail(value)) {
-      setEmailError(t("auth.emailInvalid"));
+      setEmailError(t('auth.emailInvalid'));
     } else {
       setEmailError(null);
     }
@@ -54,18 +46,18 @@ const ForgotPasswordPage: React.FC = () => {
   // 백엔드 메시지 키를 번역하는 함수
   const getTranslatedMessage = (messageKey: string): string => {
     const messageMap: { [key: string]: string } = {
-      PASSWORD_RESET_EMAIL_SENT: t("auth.passwordResetEmailSent"),
-      EMAIL_SEND_FAILED: t("auth.emailSendFailed"),
-      EMAIL_NOT_REGISTERED: t("auth.emailNotRegistered"),
+      PASSWORD_RESET_EMAIL_SENT: t('auth.passwordResetEmailSent'),
+      EMAIL_SEND_FAILED: t('auth.emailSendFailed'),
+      EMAIL_NOT_REGISTERED: t('auth.emailNotRegistered'),
       PASSWORD_RESET_NOT_AVAILABLE_FOR_OAUTH_USERS: t(
-        "auth.passwordResetNotAvailableForOAuthUsers",
+        'auth.passwordResetNotAvailableForOAuthUsers'
       ),
-      PASSWORD_RESET_REQUEST_ERROR: t("auth.passwordResetRequestError"),
-      INVALID_TOKEN: t("auth.invalidToken"),
-      TOKEN_EXPIRED: t("auth.tokenExpired"),
-      TOKEN_VALIDATION_ERROR: t("auth.tokenValidationFailed"),
-      PASSWORD_RESET_SUCCESS: t("auth.passwordResetSuccess"),
-      PASSWORD_RESET_ERROR: t("auth.resetPasswordFailed"),
+      PASSWORD_RESET_REQUEST_ERROR: t('auth.passwordResetRequestError'),
+      INVALID_TOKEN: t('auth.invalidToken'),
+      TOKEN_EXPIRED: t('auth.tokenExpired'),
+      TOKEN_VALIDATION_ERROR: t('auth.tokenValidationFailed'),
+      PASSWORD_RESET_SUCCESS: t('auth.passwordResetSuccess'),
+      PASSWORD_RESET_ERROR: t('auth.resetPasswordFailed'),
     };
 
     return messageMap[messageKey] || messageKey;
@@ -89,15 +81,15 @@ const ForgotPasswordPage: React.FC = () => {
         setEmailSent(true);
         // 백엔드에서 메시지 키를 받아서 번역
         const translatedMessage = getTranslatedMessage(response.message);
-        setMessage({ type: "success", text: translatedMessage });
+        setMessage({ type: 'success', text: translatedMessage });
       } else {
         const translatedMessage = getTranslatedMessage(response.message);
-        setMessage({ type: "error", text: translatedMessage });
+        setMessage({ type: 'error', text: translatedMessage });
       }
     } catch (error: any) {
       setMessage({
-        type: "error",
-        text: error.message || t("auth.forgotPasswordFailed"),
+        type: 'error',
+        text: error.message || t('auth.forgotPasswordFailed'),
       });
     } finally {
       setIsSubmitting(false);
@@ -107,43 +99,43 @@ const ForgotPasswordPage: React.FC = () => {
   if (emailSent) {
     return (
       <AuthLayout
-        title={t("auth.emailSent")}
-        subtitle={t("auth.checkEmailForReset")}
+        title={t('auth.emailSent')}
+        subtitle={t('auth.checkEmailForReset')}
         showBackButton={true}
         showLeftPanel={false}
       >
-        <Box sx={{ textAlign: "center", mb: 4 }}>
+        <Box sx={{ textAlign: 'center', mb: 4 }}>
           <Email
             sx={{
               fontSize: 64,
-              color: "#667eea",
+              color: '#667eea',
               mb: 2,
-              filter: "drop-shadow(0 4px 8px rgba(102, 126, 234, 0.3))",
-              animation: "emailBounce 2s ease-in-out infinite",
-              "@keyframes emailBounce": {
-                "0%, 20%, 50%, 80%, 100%": {
-                  transform: "translateY(0)",
+              filter: 'drop-shadow(0 4px 8px rgba(102, 126, 234, 0.3))',
+              animation: 'emailBounce 2s ease-in-out infinite',
+              '@keyframes emailBounce': {
+                '0%, 20%, 50%, 80%, 100%': {
+                  transform: 'translateY(0)',
                 },
-                "40%": {
-                  transform: "translateY(-10px)",
+                '40%': {
+                  transform: 'translateY(-10px)',
                 },
-                "60%": {
-                  transform: "translateY(-5px)",
+                '60%': {
+                  transform: 'translateY(-5px)',
                 },
               },
             }}
           />
         </Box>
 
-        {message && message.type === "success" && (
+        {message && message.type === 'success' && (
           <Alert
             severity="success"
             sx={{
               mb: 3,
-              backgroundColor: "rgba(76, 175, 80, 0.1)",
-              color: "white",
-              "& .MuiAlert-icon": {
-                color: "#4caf50",
+              backgroundColor: 'rgba(76, 175, 80, 0.1)',
+              color: 'white',
+              '& .MuiAlert-icon': {
+                color: '#4caf50',
               },
             }}
           >
@@ -155,47 +147,47 @@ const ForgotPasswordPage: React.FC = () => {
           variant="body2"
           sx={{
             mb: 3,
-            color: "rgba(255, 255, 255, 0.7)",
-            textAlign: "center",
+            color: 'rgba(255, 255, 255, 0.7)',
+            textAlign: 'center',
           }}
         >
-          {t("auth.didntReceiveEmail")}
+          {t('auth.didntReceiveEmail')}
         </Typography>
 
-        <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           <Button
             variant="outlined"
             onClick={() => {
               setEmailSent(false);
               setMessage(null);
-              setEmail("");
+              setEmail('');
               setEmailError(null);
             }}
             sx={{
-              borderColor: "rgba(255, 255, 255, 0.3)",
-              color: "white",
-              "&:hover": {
-                borderColor: "#667eea",
-                backgroundColor: "rgba(102, 126, 234, 0.1)",
+              borderColor: 'rgba(255, 255, 255, 0.3)',
+              color: 'white',
+              '&:hover': {
+                borderColor: '#667eea',
+                backgroundColor: 'rgba(102, 126, 234, 0.1)',
               },
             }}
           >
-            {t("auth.resendEmail")}
+            {t('auth.resendEmail')}
           </Button>
 
           <Button
             variant="text"
             startIcon={<ArrowBack />}
-            onClick={() => navigate("/login")}
+            onClick={() => navigate('/login')}
             sx={{
-              color: "rgba(255, 255, 255, 0.7)",
-              "&:hover": {
-                color: "white",
-                backgroundColor: "rgba(255, 255, 255, 0.05)",
+              color: 'rgba(255, 255, 255, 0.7)',
+              '&:hover': {
+                color: 'white',
+                backgroundColor: 'rgba(255, 255, 255, 0.05)',
               },
             }}
           >
-            {t("auth.backToLogin")}
+            {t('auth.backToLogin')}
           </Button>
         </Box>
       </AuthLayout>
@@ -204,8 +196,8 @@ const ForgotPasswordPage: React.FC = () => {
 
   return (
     <AuthLayout
-      title={t("auth.forgotPassword")}
-      subtitle={t("auth.enterEmailToReset")}
+      title={t('auth.forgotPassword')}
+      subtitle={t('auth.enterEmailToReset')}
       showBackButton={true}
       showLeftPanel={false}
     >
@@ -213,24 +205,24 @@ const ForgotPasswordPage: React.FC = () => {
       <Box
         sx={{
           mb: message ? 3 : 0,
-          overflow: "hidden",
-          height: message ? "auto" : 0,
-          transition: "all 0.3s ease-out",
+          overflow: 'hidden',
+          height: message ? 'auto' : 0,
+          transition: 'all 0.3s ease-out',
         }}
       >
         {message && (
           <Box
             sx={{
-              width: "100%",
-              animation: "slideDown 0.3s ease-out forwards",
-              "@keyframes slideDown": {
+              width: '100%',
+              animation: 'slideDown 0.3s ease-out forwards',
+              '@keyframes slideDown': {
                 from: {
                   opacity: 0,
-                  transform: "translateY(-10px)",
+                  transform: 'translateY(-10px)',
                 },
                 to: {
                   opacity: 1,
-                  transform: "translateY(0)",
+                  transform: 'translateY(0)',
                 },
               },
             }}
@@ -238,15 +230,13 @@ const ForgotPasswordPage: React.FC = () => {
             <Alert
               severity={message.type}
               sx={{
-                width: "100%",
+                width: '100%',
                 backgroundColor:
-                  message.type === "error"
-                    ? "rgba(244, 67, 54, 0.1)"
-                    : "rgba(76, 175, 80, 0.1)",
-                color: message.type === "error" ? "#ff6b6b" : "#4caf50",
-                border: `1px solid ${message.type === "error" ? "rgba(244, 67, 54, 0.2)" : "rgba(76, 175, 80, 0.2)"}`,
-                "& .MuiAlert-icon": {
-                  color: message.type === "error" ? "#ff6b6b" : "#4caf50",
+                  message.type === 'error' ? 'rgba(244, 67, 54, 0.1)' : 'rgba(76, 175, 80, 0.1)',
+                color: message.type === 'error' ? '#ff6b6b' : '#4caf50',
+                border: `1px solid ${message.type === 'error' ? 'rgba(244, 67, 54, 0.2)' : 'rgba(76, 175, 80, 0.2)'}`,
+                '& .MuiAlert-icon': {
+                  color: message.type === 'error' ? '#ff6b6b' : '#4caf50',
                 },
               }}
               onClose={() => setMessage(null)}
@@ -260,7 +250,7 @@ const ForgotPasswordPage: React.FC = () => {
       <Box component="form" onSubmit={handleSubmit}>
         <TextField
           fullWidth
-          label={t("auth.email")}
+          label={t('auth.email')}
           type="email"
           value={email}
           onChange={handleEmailChange}
@@ -268,59 +258,56 @@ const ForgotPasswordPage: React.FC = () => {
           required
           autoFocus
           error={!!emailError}
-          helperText={emailError || t("auth.emailHelp")}
+          helperText={emailError || t('auth.emailHelp')}
           sx={{
             mb: 3,
-            "& .MuiOutlinedInput-root": {
-              backgroundColor: "rgba(255, 255, 255, 0.05)",
-              "& fieldset": {
-                borderColor: "rgba(255, 255, 255, 0.2)",
+            '& .MuiOutlinedInput-root': {
+              backgroundColor: 'rgba(255, 255, 255, 0.05)',
+              '& fieldset': {
+                borderColor: 'rgba(255, 255, 255, 0.2)',
               },
-              "&:hover fieldset": {
-                borderColor: "rgba(255, 255, 255, 0.3)",
+              '&:hover fieldset': {
+                borderColor: 'rgba(255, 255, 255, 0.3)',
               },
-              "&.Mui-focused fieldset": {
-                borderColor: "#667eea",
+              '&.Mui-focused fieldset': {
+                borderColor: '#667eea',
               },
-              "&.Mui-disabled": {
-                backgroundColor: "rgba(255, 255, 255, 0.03)",
-                "& fieldset": {
-                  borderColor: "rgba(255, 255, 255, 0.1)",
+              '&.Mui-disabled': {
+                backgroundColor: 'rgba(255, 255, 255, 0.03)',
+                '& fieldset': {
+                  borderColor: 'rgba(255, 255, 255, 0.1)',
                 },
               },
             },
-            "& .MuiInputLabel-root": {
-              color: "rgba(255, 255, 255, 0.7)",
-              "&.Mui-disabled": {
-                color: "rgba(255, 255, 255, 0.5)",
+            '& .MuiInputLabel-root': {
+              color: 'rgba(255, 255, 255, 0.7)',
+              '&.Mui-disabled': {
+                color: 'rgba(255, 255, 255, 0.5)',
               },
             },
-            "& .MuiInputBase-input": {
-              color: "white",
-              "&.Mui-disabled": {
-                color: "rgba(255, 255, 255, 0.7)",
-                WebkitTextFillColor: "rgba(255, 255, 255, 0.7)",
+            '& .MuiInputBase-input': {
+              color: 'white',
+              '&.Mui-disabled': {
+                color: 'rgba(255, 255, 255, 0.7)',
+                WebkitTextFillColor: 'rgba(255, 255, 255, 0.7)',
               },
-              "&:-webkit-autofill": {
-                WebkitBoxShadow:
-                  "0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important",
-                WebkitTextFillColor: "white !important",
+              '&:-webkit-autofill': {
+                WebkitBoxShadow: '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
+                WebkitTextFillColor: 'white !important',
               },
-              "&:-webkit-autofill:hover": {
-                WebkitBoxShadow:
-                  "0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important",
-                WebkitTextFillColor: "white !important",
+              '&:-webkit-autofill:hover': {
+                WebkitBoxShadow: '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
+                WebkitTextFillColor: 'white !important',
               },
-              "&:-webkit-autofill:focus": {
-                WebkitBoxShadow:
-                  "0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important",
-                WebkitTextFillColor: "white !important",
+              '&:-webkit-autofill:focus': {
+                WebkitBoxShadow: '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
+                WebkitTextFillColor: 'white !important',
               },
             },
-            "& .MuiFormHelperText-root": {
-              color: emailError ? "#ff6b6b" : "rgba(255, 255, 255, 0.6)",
-              "&.Mui-disabled": {
-                color: "rgba(255, 255, 255, 0.4)",
+            '& .MuiFormHelperText-root': {
+              color: emailError ? '#ff6b6b' : 'rgba(255, 255, 255, 0.6)',
+              '&.Mui-disabled': {
+                color: 'rgba(255, 255, 255, 0.4)',
               },
             },
           }}
@@ -336,41 +323,38 @@ const ForgotPasswordPage: React.FC = () => {
           sx={{
             mb: 3,
             height: 48,
-            background: "linear-gradient(45deg, #667eea 30%, #764ba2 90%)",
-            "&:hover": {
-              background: "linear-gradient(45deg, #5a6fd8 30%, #6a4190 90%)",
+            background: 'linear-gradient(45deg, #667eea 30%, #764ba2 90%)',
+            '&:hover': {
+              background: 'linear-gradient(45deg, #5a6fd8 30%, #6a4190 90%)',
             },
-            "&:disabled": {
-              background: "rgba(255, 255, 255, 0.1)",
-              color: "rgba(255, 255, 255, 0.3)",
+            '&:disabled': {
+              background: 'rgba(255, 255, 255, 0.1)',
+              color: 'rgba(255, 255, 255, 0.3)',
             },
             borderRadius: 2,
-            textTransform: "none",
-            fontSize: "1rem",
+            textTransform: 'none',
+            fontSize: '1rem',
             fontWeight: 600,
           }}
         >
-          {isSubmitting ? t("auth.sending") : t("auth.sendResetEmail")}
+          {isSubmitting ? t('auth.sending') : t('auth.sendResetEmail')}
         </Button>
 
-        <Box sx={{ textAlign: "center", mb: 2 }}>
-          <Typography
-            variant="body2"
-            sx={{ color: "rgba(255, 255, 255, 0.7)" }}
-          >
-            {t("auth.rememberPassword")}{" "}
+        <Box sx={{ textAlign: 'center', mb: 2 }}>
+          <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+            {t('auth.rememberPassword')}{' '}
             <Link
               component={RouterLink}
               to="/login"
               sx={{
-                color: "#667eea",
-                textDecoration: "none",
-                "&:hover": {
-                  textDecoration: "underline",
+                color: '#667eea',
+                textDecoration: 'none',
+                '&:hover': {
+                  textDecoration: 'underline',
                 },
               }}
             >
-              {t("auth.signIn")}
+              {t('auth.signIn')}
             </Link>
           </Typography>
         </Box>
@@ -378,32 +362,32 @@ const ForgotPasswordPage: React.FC = () => {
         {/* Divider */}
         <Box
           sx={{
-            width: "100%",
-            height: "1px",
-            backgroundColor: "rgba(255, 255, 255, 0.1)",
+            width: '100%',
+            height: '1px',
+            backgroundColor: 'rgba(255, 255, 255, 0.1)',
             mb: 3,
           }}
         />
 
-        <Box sx={{ textAlign: "center" }}>
+        <Box sx={{ textAlign: 'center' }}>
           <Link
             component={RouterLink}
             to="/login"
             sx={{
-              display: "inline-flex",
-              alignItems: "center",
+              display: 'inline-flex',
+              alignItems: 'center',
               gap: 0.5,
-              color: "rgba(255, 255, 255, 0.7)",
-              textDecoration: "none",
-              fontSize: "0.875rem",
-              "&:hover": {
-                color: "#667eea",
-                textDecoration: "underline",
+              color: 'rgba(255, 255, 255, 0.7)',
+              textDecoration: 'none',
+              fontSize: '0.875rem',
+              '&:hover': {
+                color: '#667eea',
+                textDecoration: 'underline',
               },
             }}
           >
             <ArrowBack sx={{ fontSize: 16 }} />
-            {t("auth.backToLogin")}
+            {t('auth.backToLogin')}
           </Link>
         </Box>
       </Box>

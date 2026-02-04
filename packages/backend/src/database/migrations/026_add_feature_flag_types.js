@@ -5,9 +5,9 @@
  */
 
 exports.up = async function (connection) {
-    console.log('Creating g_feature_flag_types table...');
+  console.log('Creating g_feature_flag_types table...');
 
-    await connection.execute(`
+  await connection.execute(`
     CREATE TABLE IF NOT EXISTS g_feature_flag_types (
       flagType VARCHAR(50) PRIMARY KEY COMMENT 'Type identifier (release, experiment, operational, killSwitch, permission)',
       displayName VARCHAR(255) NOT NULL COMMENT 'Human-readable name',
@@ -20,11 +20,11 @@ exports.up = async function (connection) {
       INDEX idx_sort_order (sortOrder)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Feature flag type definitions with lifetime settings'
   `);
-    console.log('✓ g_feature_flag_types table created');
+  console.log('✓ g_feature_flag_types table created');
 
-    // Insert default flag types
-    console.log('Inserting default flag types...');
-    await connection.execute(`
+  // Insert default flag types
+  console.log('Inserting default flag types...');
+  await connection.execute(`
     INSERT INTO g_feature_flag_types (flagType, displayName, description, lifetimeDays, iconName, sortOrder) VALUES
     ('release', 'Release', 'Release feature toggles are used to release new features.', 40, 'RocketLaunch', 1),
     ('experiment', 'Experiment', 'Experiment feature toggles are used to test and verify multiple different versions of a feature.', 40, 'Science', 2),
@@ -33,11 +33,11 @@ exports.up = async function (connection) {
     ('permission', 'Permission', 'Permission feature toggles are used to control permissions in your system.', NULL, 'VpnKey', 5)
     ON DUPLICATE KEY UPDATE displayName = VALUES(displayName)
   `);
-    console.log('✓ Default flag types inserted');
+  console.log('✓ Default flag types inserted');
 };
 
 exports.down = async function (connection) {
-    console.log('Dropping g_feature_flag_types table...');
-    await connection.execute('DROP TABLE IF EXISTS g_feature_flag_types');
-    console.log('✓ g_feature_flag_types table dropped');
+  console.log('Dropping g_feature_flag_types table...');
+  await connection.execute('DROP TABLE IF EXISTS g_feature_flag_types');
+  console.log('✓ g_feature_flag_types table dropped');
 };

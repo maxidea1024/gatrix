@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -17,17 +17,17 @@ import {
   CircularProgress,
   Box,
   Chip,
-} from "@mui/material";
+} from '@mui/material';
 import {
   Search as SearchIcon,
   PersonAdd as PersonAddIcon,
   Close as CloseIcon,
-} from "@mui/icons-material";
-import { useTranslation } from "react-i18next";
-import { useSnackbar } from "notistack";
-import { debounce } from "lodash";
-import { apiService } from "../../services/api";
-import { ErrorCodes } from "@gatrix/shared";
+} from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
+import { useSnackbar } from 'notistack';
+import { debounce } from 'lodash';
+import { apiService } from '../../services/api';
+import { ErrorCodes } from '@gatrix/shared';
 
 interface User {
   id: number;
@@ -58,16 +58,12 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
 
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<User[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [invitingUsers, setInvitingUsers] = useState<Set<number>>(new Set());
-  const [pendingInvitedUsers, setPendingInvitedUsers] = useState<Set<number>>(
-    new Set(),
-  );
-  const [channelMemberIds, setChannelMemberIds] = useState<Set<number>>(
-    new Set(),
-  );
+  const [pendingInvitedUsers, setPendingInvitedUsers] = useState<Set<number>>(new Set());
+  const [channelMemberIds, setChannelMemberIds] = useState<Set<number>>(new Set());
 
   // 검색 입력창 ref
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -79,30 +75,24 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
     try {
       const response = await fetch(`/api/v1/chat/channels/${channelId}`, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
         },
       });
 
       if (response.ok) {
         const data = await response.json();
-        console.log("Channel data response:", data); // 디버깅용
+        console.log('Channel data response:', data); // 디버깅용
         if (data.success && data.data) {
           // members 배열에서 userId 추출
-          const memberIds = new Set(
-            (data.data.members || []).map((member: any) => member.userId),
-          );
-          console.log("Channel member IDs:", memberIds); // 디버깅용
+          const memberIds = new Set((data.data.members || []).map((member: any) => member.userId));
+          console.log('Channel member IDs:', memberIds); // 디버깅용
           setChannelMemberIds(memberIds);
         }
       } else {
-        console.error(
-          "Failed to fetch channel members:",
-          response.status,
-          response.statusText,
-        );
+        console.error('Failed to fetch channel members:', response.status, response.statusText);
       }
     } catch (error) {
-      console.error("Failed to fetch channel members:", error);
+      console.error('Failed to fetch channel members:', error);
     }
   };
 
@@ -111,34 +101,25 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
     if (!channelId) return;
 
     try {
-      const response = await fetch(
-        `/api/v1/chat/channels/${channelId}/pending-invitations`,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          },
+      const response = await fetch(`/api/v1/chat/channels/${channelId}/pending-invitations`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
         },
-      );
+      });
 
       if (response.ok) {
         const data = await response.json();
-        console.log("Pending invitations response:", data); // 디버깅용
+        console.log('Pending invitations response:', data); // 디버깅용
         if (data.success && data.data) {
-          const invitedUserIds = new Set(
-            data.data.map((invitation: any) => invitation.inviteeId),
-          );
-          console.log("Pending invited user IDs:", invitedUserIds); // 디버깅용
+          const invitedUserIds = new Set(data.data.map((invitation: any) => invitation.inviteeId));
+          console.log('Pending invited user IDs:', invitedUserIds); // 디버깅용
           setPendingInvitedUsers(invitedUserIds);
         }
       } else {
-        console.error(
-          "Failed to fetch pending invitations:",
-          response.status,
-          response.statusText,
-        );
+        console.error('Failed to fetch pending invitations:', response.status, response.statusText);
       }
     } catch (error) {
-      console.error("Failed to fetch pending invitations:", error);
+      console.error('Failed to fetch pending invitations:', error);
     }
   };
 
@@ -152,10 +133,10 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
     setIsSearching(true);
     try {
       const response = await apiService.get<{ success: boolean; data: User[] }>(
-        `/users/search?q=${encodeURIComponent(query)}`,
+        `/users/search?q=${encodeURIComponent(query)}`
       );
 
-      console.log("User search response:", response); // 디버깅용
+      console.log('User search response:', response); // 디버깅용
 
       if (response.success && response.data) {
         // API 응답 구조에 따라 적절히 처리
@@ -168,26 +149,24 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
           // response.data.data가 배열인 경우
           users = response.data.data;
         } else {
-          console.warn("Unexpected API response structure:", response);
+          console.warn('Unexpected API response structure:', response);
           setSearchResults([]);
           return;
         }
 
         // 제외할 사용자들 필터링
-        const filteredUsers = users.filter(
-          (user: User) => !excludeUserIds.includes(user.id),
-        );
+        const filteredUsers = users.filter((user: User) => !excludeUserIds.includes(user.id));
         setSearchResults(filteredUsers);
       } else {
-        console.error("Search API failed:", response);
-        enqueueSnackbar(response.error?.message || "Search failed", {
-          variant: "error",
+        console.error('Search API failed:', response);
+        enqueueSnackbar(response.error?.message || 'Search failed', {
+          variant: 'error',
         });
         setSearchResults([]);
       }
     } catch (error: any) {
-      console.error("Search error:", error);
-      enqueueSnackbar(error.message || "Search failed", { variant: "error" });
+      console.error('Search error:', error);
+      enqueueSnackbar(error.message || 'Search failed', { variant: 'error' });
       setSearchResults([]);
     } finally {
       setIsSearching(false);
@@ -201,7 +180,7 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
         searchUsers(query.trim());
       }
     }, 300),
-    [excludeUserIds],
+    [excludeUserIds]
   );
 
   // 검색어 변경 시 디바운스된 검색 실행
@@ -245,7 +224,7 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
   // 다이얼로그 닫힐 때 상태 초기화
   useEffect(() => {
     if (!open) {
-      setSearchQuery("");
+      setSearchQuery('');
       setSearchResults([]);
       setInvitingUsers(new Set());
       setPendingInvitedUsers(new Set());
@@ -268,32 +247,32 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
 
       // 다이얼로그가 닫힌 후 토스트 표시
       setTimeout(() => {
-        enqueueSnackbar(t("chat.invitationSent"), { variant: "success" });
+        enqueueSnackbar(t('chat.invitationSent'), { variant: 'success' });
       }, 100);
     } catch (error: any) {
-      console.error("Invite error:", error);
+      console.error('Invite error:', error);
 
       // Use error code for specific handling
-      const errorCode = error?.error?.code || error?.code || "";
-      const errorMessage = error?.error?.message || error?.message || "";
+      const errorCode = error?.error?.code || error?.code || '';
+      const errorMessage = error?.error?.message || error?.message || '';
 
       switch (errorCode) {
         case ErrorCodes.CHANNEL_MEMBER_EXISTS:
         case ErrorCodes.ALREADY_MEMBER:
           // 이미 멤버인 경우 - 멤버 목록 새로고침
           await fetchChannelMembers();
-          enqueueSnackbar(t("chat.alreadyMember"), { variant: "info" });
+          enqueueSnackbar(t('chat.alreadyMember'), { variant: 'info' });
           break;
         case ErrorCodes.INVITATION_PENDING:
         case ErrorCodes.ALREADY_INVITED:
           // 이미 초대된 경우 - pending invitation 목록 새로고침
           await fetchPendingInvitations();
-          enqueueSnackbar(t("chat.alreadyInvited"), { variant: "warning" });
+          enqueueSnackbar(t('chat.alreadyInvited'), { variant: 'warning' });
           break;
         default:
           // 기타 오류
-          enqueueSnackbar(errorMessage || t("chat.invitationFailed"), {
-            variant: "error",
+          enqueueSnackbar(errorMessage || t('chat.invitationFailed'), {
+            variant: 'error',
           });
       }
     } finally {
@@ -322,15 +301,9 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
       <DialogTitle>
         <Box display="flex" alignItems="center" justifyContent="space-between">
           <Box>
-            <Typography variant="h6">
-              {title || t("chat.inviteUsers")}
-            </Typography>
+            <Typography variant="h6">{title || t('chat.inviteUsers')}</Typography>
             {subtitle && (
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                sx={{ mt: 0.5 }}
-              >
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
                 {subtitle}
               </Typography>
             )}
@@ -344,35 +317,33 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
       <DialogContent
         sx={{
           minHeight: 350, // 최소 높이 설정으로 안정화
-          display: "flex",
-          flexDirection: "column",
+          display: 'flex',
+          flexDirection: 'column',
           paddingTop: 3, // 윗부분 패딩 증가로 테두리 잘림 방지
-          overflow: "visible", // overflow 설정으로 테두리 표시 보장
+          overflow: 'visible', // overflow 설정으로 테두리 표시 보장
         }}
       >
         <TextField
           fullWidth
           inputRef={searchInputRef}
-          placeholder={t("chat.searchPlaceholder")}
+          placeholder={t('chat.searchPlaceholder')}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           InputProps={{
-            startAdornment: (
-              <SearchIcon sx={{ mr: 1, color: "text.secondary" }} />
-            ),
+            startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />,
             endAdornment: isSearching && <CircularProgress size={20} />,
           }}
           sx={{
             mb: 2,
-            "& .MuiOutlinedInput-root": {
-              "& fieldset": {
-                borderWidth: "1px",
+            '& .MuiOutlinedInput-root': {
+              '& fieldset': {
+                borderWidth: '1px',
               },
-              "&:hover fieldset": {
-                borderWidth: "1px",
+              '&:hover fieldset': {
+                borderWidth: '1px',
               },
-              "&.Mui-focused fieldset": {
-                borderWidth: "2px",
+              '&.Mui-focused fieldset': {
+                borderWidth: '2px',
               },
             },
           }}
@@ -383,75 +354,63 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
           sx={{
             flex: 1,
             minHeight: 280, // 고정 높이로 들썩임 방지
-            display: "flex",
-            flexDirection: "column",
+            display: 'flex',
+            flexDirection: 'column',
           }}
         >
           {searchQuery.length > 0 && searchQuery.length < 2 && (
             <Box
               sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
                 flex: 1,
               }}
             >
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                sx={{ textAlign: "center" }}
-              >
-                {t("chat.searchMinLength")}
+              <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center' }}>
+                {t('chat.searchMinLength')}
               </Typography>
             </Box>
           )}
 
-          {searchQuery.length >= 2 &&
-            searchResults.length === 0 &&
-            !isSearching && (
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  flex: 1,
-                }}
-              >
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{ textAlign: "center" }}
-                >
-                  {t("chat.noUsersFound")}
-                </Typography>
-              </Box>
-            )}
+          {searchQuery.length >= 2 && searchResults.length === 0 && !isSearching && (
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flex: 1,
+              }}
+            >
+              <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center' }}>
+                {t('chat.noUsersFound')}
+              </Typography>
+            </Box>
+          )}
 
           {searchQuery.length === 0 && (
             <Box
               sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
                 flex: 1,
-                textAlign: "center",
+                textAlign: 'center',
               }}
             >
-              <SearchIcon
-                sx={{ fontSize: 48, color: "text.secondary", mb: 2 }}
-              />
+              <SearchIcon sx={{ fontSize: 48, color: 'text.secondary', mb: 2 }} />
               <Typography variant="h6" color="text.secondary" gutterBottom>
-                {t("chat.searchUsers")}
+                {t('chat.searchUsers')}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                {t("chat.searchUsersDescription")}
+                {t('chat.searchUsersDescription')}
               </Typography>
             </Box>
           )}
 
           {searchResults.length > 0 && (
-            <List sx={{ flex: 1, overflow: "auto" }}>
+            <List sx={{ flex: 1, overflow: 'auto' }}>
               {searchResults.map((user) => (
                 <ListItem key={user.id} divider>
                   <ListItemAvatar>
@@ -472,7 +431,7 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
                       if (isMember) {
                         return (
                           <Chip
-                            label={t("chat.alreadyMember")}
+                            label={t('chat.alreadyMember')}
                             size="small"
                             color="success"
                             variant="outlined"
@@ -489,16 +448,16 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
                             disabled
                             startIcon={<PersonAddIcon />}
                             sx={{
-                              color: "warning.main",
-                              borderColor: "warning.main",
-                              "&.Mui-disabled": {
-                                color: "warning.main",
-                                borderColor: "warning.main",
+                              color: 'warning.main',
+                              borderColor: 'warning.main',
+                              '&.Mui-disabled': {
+                                color: 'warning.main',
+                                borderColor: 'warning.main',
                                 opacity: 0.7,
                               },
                             }}
                           >
-                            {t("chat.invitationPending")}
+                            {t('chat.invitationPending')}
                           </Button>
                         );
                       }
@@ -509,18 +468,12 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
                           variant="outlined"
                           size="small"
                           startIcon={
-                            isInviting ? (
-                              <CircularProgress size={16} />
-                            ) : (
-                              <PersonAddIcon />
-                            )
+                            isInviting ? <CircularProgress size={16} /> : <PersonAddIcon />
                           }
                           onClick={() => handleInviteUser(user.id)}
                           disabled={isInviting}
                         >
-                          {isInviting
-                            ? t("chat.inviting")
-                            : t("chat.inviteButton")}
+                          {isInviting ? t('chat.inviting') : t('chat.inviteButton')}
                         </Button>
                       );
                     })()}

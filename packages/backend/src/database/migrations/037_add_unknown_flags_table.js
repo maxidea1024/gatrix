@@ -4,7 +4,7 @@
  */
 
 exports.up = async function (connection) {
-    await connection.query(`
+  await connection.query(`
         CREATE TABLE IF NOT EXISTS unknown_flags (
             id INT AUTO_INCREMENT PRIMARY KEY,
             flagName VARCHAR(255) NOT NULL,
@@ -26,5 +26,5 @@ exports.up = async function (connection) {
 };
 
 exports.down = async function (connection) {
-    await connection.query('DROP TABLE IF EXISTS unknown_flags');
+  await connection.query('DROP TABLE IF EXISTS unknown_flags');
 };

@@ -3,7 +3,7 @@
  * Displays exposure metrics with line chart and summary cards
  */
 
-import React, { useEffect, useState, useCallback, useMemo } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import {
   Box,
   Paper,
@@ -27,15 +27,15 @@ import {
   IconButton,
   Chip,
   Divider,
-} from "@mui/material";
+} from '@mui/material';
 import {
   KeyboardArrowDown as ExpandIcon,
   KeyboardArrowUp as CollapseIcon,
-} from "@mui/icons-material";
-import { useTranslation } from "react-i18next";
-import { useSearchParams } from "react-router-dom";
-import api from "../../services/api";
-import { formatWith } from "../../utils/dateFormat";
+} from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router-dom';
+import api from '../../services/api';
+import { formatWith } from '../../utils/dateFormat';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -47,8 +47,8 @@ import {
   Tooltip,
   Legend,
   Filler,
-} from "chart.js";
-import { Line, Doughnut } from "react-chartjs-2";
+} from 'chart.js';
+import { Line, Doughnut } from 'react-chartjs-2';
 
 // Register Chart.js components
 ChartJS.register(
@@ -60,7 +60,7 @@ ChartJS.register(
   Title,
   Tooltip,
   Legend,
-  Filler,
+  Filler
 );
 
 interface FeatureFlagMetricsProps {
@@ -96,20 +96,20 @@ interface TimeSeriesPoint {
   appName?: string;
 }
 
-type PeriodOption = "1h" | "6h" | "24h" | "48h" | "7d" | "30d";
+type PeriodOption = '1h' | '6h' | '24h' | '48h' | '7d' | '30d';
 
 const PERIOD_OPTIONS: {
   value: PeriodOption;
   labelKey: string;
   hours: number;
 }[] = [
-    { value: "1h", labelKey: "featureFlags.metrics.lastHour", hours: 1 },
-    { value: "6h", labelKey: "featureFlags.metrics.last6Hours", hours: 6 },
-    { value: "24h", labelKey: "featureFlags.metrics.last24Hours", hours: 24 },
-    { value: "48h", labelKey: "featureFlags.metrics.last48Hours", hours: 48 },
-    { value: "7d", labelKey: "featureFlags.metrics.last7Days", hours: 168 },
-    { value: "30d", labelKey: "featureFlags.metrics.last30Days", hours: 720 },
-  ];
+  { value: '1h', labelKey: 'featureFlags.metrics.lastHour', hours: 1 },
+  { value: '6h', labelKey: 'featureFlags.metrics.last6Hours', hours: 6 },
+  { value: '24h', labelKey: 'featureFlags.metrics.last24Hours', hours: 24 },
+  { value: '48h', labelKey: 'featureFlags.metrics.last48Hours', hours: 48 },
+  { value: '7d', labelKey: 'featureFlags.metrics.last7Days', hours: 168 },
+  { value: '30d', labelKey: 'featureFlags.metrics.last30Days', hours: 720 },
+];
 
 export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
   flagName,
@@ -121,19 +121,15 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
 
   // Initialize state from URL params
   const [selectedEnvs, setSelectedEnvs] = useState<string[]>(() => {
-    const envParam = searchParams.get("envs");
+    const envParam = searchParams.get('envs');
     if (envParam) {
-      return envParam
-        .split(",")
-        .filter((e) => environments.some((env) => env.environment === e));
+      return envParam.split(',').filter((e) => environments.some((env) => env.environment === e));
     }
     return environments.map((e) => e.environment);
   });
   const [period, setPeriod] = useState<PeriodOption>(() => {
-    const periodParam = searchParams.get("period") as PeriodOption;
-    return PERIOD_OPTIONS.some((p) => p.value === periodParam)
-      ? periodParam
-      : "24h";
+    const periodParam = searchParams.get('period') as PeriodOption;
+    return PERIOD_OPTIONS.some((p) => p.value === periodParam) ? periodParam : '24h';
   });
   const [metrics, setMetrics] = useState<MetricsBucket[]>([]);
   const [loading, setLoading] = useState(true); // Start with true for initial load
@@ -141,20 +137,16 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [showTable, setShowTable] = useState(true); // Default expanded
   const [showVariantTable, setShowVariantTable] = useState(true); // Default expanded
-  const [chartGroupBy, setChartGroupBy] = useState<"all" | "app" | "env">(
-    () => {
-      const groupParam = searchParams.get("groupBy");
-      if (groupParam === "app" || groupParam === "env") return groupParam;
-      return "all";
-    },
-  );
-  const [variantGroupBy, setVariantGroupBy] = useState<"all" | "app" | "env">(
-    () => {
-      const groupParam = searchParams.get("variantGroupBy");
-      if (groupParam === "app" || groupParam === "env") return groupParam;
-      return "all";
-    },
-  );
+  const [chartGroupBy, setChartGroupBy] = useState<'all' | 'app' | 'env'>(() => {
+    const groupParam = searchParams.get('groupBy');
+    if (groupParam === 'app' || groupParam === 'env') return groupParam;
+    return 'all';
+  });
+  const [variantGroupBy, setVariantGroupBy] = useState<'all' | 'app' | 'env'>(() => {
+    const groupParam = searchParams.get('variantGroupBy');
+    if (groupParam === 'app' || groupParam === 'env') return groupParam;
+    return 'all';
+  });
 
   // App filter state
   const [availableApps, setAvailableApps] = useState<string[]>([]);
@@ -175,19 +167,16 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
       // Fetch app names from all selected environments
       const appPromises = selectedEnvs.map((env) =>
         api
-          .get<{ appNames: string[] }>(
-            `/admin/features/${flagName}/metrics/apps`,
-            {
-              params: {
-                startDate: startDate.toISOString(),
-                endDate: endDate.toISOString(),
-              },
-              headers: {
-                "x-environment": env,
-              },
+          .get<{ appNames: string[] }>(`/admin/features/${flagName}/metrics/apps`, {
+            params: {
+              startDate: startDate.toISOString(),
+              endDate: endDate.toISOString(),
             },
-          )
-          .then((response) => response.data.appNames || []),
+            headers: {
+              'x-environment': env,
+            },
+          })
+          .then((response) => response.data.appNames || [])
       );
 
       const allApps = await Promise.all(appPromises);
@@ -196,7 +185,7 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
       // Default: select all apps
       setSelectedApps(uniqueApps);
     } catch (err) {
-      console.error("Failed to fetch app names:", err);
+      console.error('Failed to fetch app names:', err);
     } finally {
       setLoadingApps(false);
     }
@@ -240,50 +229,44 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
           // Fetch all metrics (no app filter)
           metricsPromises.push(
             api
-              .get<{ metrics: MetricsBucket[] }>(
-                `/admin/features/${flagName}/metrics`,
-                {
-                  params: {
-                    startDate: startDate.toISOString(),
-                    endDate: endDate.toISOString(),
-                  },
-                  headers: {
-                    "x-environment": env,
-                  },
+              .get<{ metrics: MetricsBucket[] }>(`/admin/features/${flagName}/metrics`, {
+                params: {
+                  startDate: startDate.toISOString(),
+                  endDate: endDate.toISOString(),
                 },
-              )
+                headers: {
+                  'x-environment': env,
+                },
+              })
               .then((response) =>
                 (response.data.metrics || []).map((m) => ({
                   ...m,
                   environment: env,
-                })),
-              ),
+                }))
+              )
           );
         } else {
           // Fetch only for selected apps
           for (const appName of selectedApps) {
             metricsPromises.push(
               api
-                .get<{ metrics: MetricsBucket[] }>(
-                  `/admin/features/${flagName}/metrics`,
-                  {
-                    params: {
-                      startDate: startDate.toISOString(),
-                      endDate: endDate.toISOString(),
-                      appName,
-                    },
-                    headers: {
-                      "x-environment": env,
-                    },
+                .get<{ metrics: MetricsBucket[] }>(`/admin/features/${flagName}/metrics`, {
+                  params: {
+                    startDate: startDate.toISOString(),
+                    endDate: endDate.toISOString(),
+                    appName,
                   },
-                )
+                  headers: {
+                    'x-environment': env,
+                  },
+                })
                 .then((response) =>
                   (response.data.metrics || []).map((m) => ({
                     ...m,
                     environment: env,
                     appName,
-                  })),
-                ),
+                  }))
+                )
             );
           }
         }
@@ -293,8 +276,8 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
       setMetrics(allMetrics.flat());
       hasLoadedOnce.current = true;
     } catch (err) {
-      console.error("Failed to fetch metrics:", err);
-      setError(t("featureFlags.metrics.loadFailed"));
+      console.error('Failed to fetch metrics:', err);
+      setError(t('featureFlags.metrics.loadFailed'));
     } finally {
       setLoading(false);
       setIsRefreshing(false);
@@ -307,7 +290,11 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
 
   // Create a stable string representation of environments for dependency
   const envNamesKey = useMemo(
-    () => environments.map((e) => e.environment).sort().join(','),
+    () =>
+      environments
+        .map((e) => e.environment)
+        .sort()
+        .join(','),
     [environments]
   );
 
@@ -320,10 +307,7 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
     const allEnvs = environments.map((e) => e.environment);
     const envsKey = selectedEnvs.join(',');
     const currentEnvsParam = searchParams.get('envs') || '';
-    if (
-      selectedEnvs.length !== allEnvs.length ||
-      !selectedEnvs.every((e) => allEnvs.includes(e))
-    ) {
+    if (selectedEnvs.length !== allEnvs.length || !selectedEnvs.every((e) => allEnvs.includes(e))) {
       if (currentEnvsParam !== envsKey) {
         params.set('envs', envsKey);
         hasChanges = true;
@@ -422,12 +406,12 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
           total: acc.total + m.yesCount + m.noCount,
           variantCounts: m.variantCounts
             ? Object.entries(m.variantCounts).reduce(
-              (vc, [variant, count]) => ({
-                ...vc,
-                [variant]: (vc[variant] || 0) + count,
-              }),
-              acc.variantCounts,
-            )
+                (vc, [variant, count]) => ({
+                  ...vc,
+                  [variant]: (vc[variant] || 0) + count,
+                }),
+                acc.variantCounts
+              )
             : acc.variantCounts,
         }),
         {
@@ -435,18 +419,16 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
           totalNo: 0,
           total: 0,
           variantCounts: {} as Record<string, number>,
-        },
+        }
       ),
-    [metrics],
+    [metrics]
   );
 
   const hasMetrics = metrics.length > 0 && aggregatedMetrics.total > 0;
   const exposurePercentage =
     aggregatedMetrics.total > 0
-      ? ((aggregatedMetrics.totalYes / aggregatedMetrics.total) * 100).toFixed(
-        0,
-      )
-      : "0";
+      ? ((aggregatedMetrics.totalYes / aggregatedMetrics.total) * 100).toFixed(0)
+      : '0';
 
   // Prepare time series data - aggregate by time bucket across environments (for chart)
   const timeSeriesData: TimeSeriesPoint[] = useMemo(() => {
@@ -460,7 +442,7 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
         existing.total += m.yesCount + m.noCount;
       } else {
         // Use formatWith for consistent timezone handling (MM/DD HH:mm for chart labels)
-        const displayTime = formatWith(m.metricsBucket, "MM/DD HH:mm");
+        const displayTime = formatWith(m.metricsBucket, 'MM/DD HH:mm');
         bucketMap.set(m.metricsBucket, {
           time: m.metricsBucket,
           displayTime,
@@ -472,7 +454,7 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
     });
 
     return Array.from(bucketMap.values()).sort(
-      (a, b) => new Date(a.time).getTime() - new Date(b.time).getTime(),
+      (a, b) => new Date(a.time).getTime() - new Date(b.time).getTime()
     );
   }, [metrics]);
 
@@ -483,14 +465,14 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
       const bucketMap = new Map<string, TimeSeriesPoint>();
 
       metrics.forEach((m) => {
-        const key = `${m.metricsBucket}|${m.appName || ""}`;
+        const key = `${m.metricsBucket}|${m.appName || ''}`;
         const existing = bucketMap.get(key);
         if (existing) {
           existing.exposed += m.yesCount;
           existing.notExposed += m.noCount;
           existing.total += m.yesCount + m.noCount;
         } else {
-          const displayTime = formatWith(m.metricsBucket, "MM/DD HH:mm");
+          const displayTime = formatWith(m.metricsBucket, 'MM/DD HH:mm');
           bucketMap.set(key, {
             time: m.metricsBucket,
             displayTime,
@@ -503,10 +485,9 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
       });
 
       return Array.from(bucketMap.values()).sort((a, b) => {
-        const timeCompare =
-          new Date(a.time).getTime() - new Date(b.time).getTime();
+        const timeCompare = new Date(a.time).getTime() - new Date(b.time).getTime();
         if (timeCompare !== 0) return timeCompare;
-        return (a.appName || "").localeCompare(b.appName || "");
+        return (a.appName || '').localeCompare(b.appName || '');
       });
     }
 
@@ -538,14 +519,13 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
       }
     });
 
-    if (allVariants.size === 0)
-      return { labels: [], variants: [], data: {}, groups: [] };
+    if (allVariants.size === 0) return { labels: [], variants: [], data: {}, groups: [] };
 
     // Generate group key based on variantGroupBy
     const getGroupKey = (m: MetricsBucket): string => {
-      if (variantGroupBy === "app") return m.appName || "unknown";
-      if (variantGroupBy === "env") return m.environment || "unknown";
-      return "all";
+      if (variantGroupBy === 'app') return m.appName || 'unknown';
+      if (variantGroupBy === 'env') return m.environment || 'unknown';
+      return 'all';
     };
 
     // Aggregate by time bucket and group
@@ -569,7 +549,7 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
           existing.counts[group][v] = (existing.counts[group][v] || 0) + count;
         });
       } else {
-        const displayTime = formatWith(m.metricsBucket, "MM/DD HH:mm");
+        const displayTime = formatWith(m.metricsBucket, 'MM/DD HH:mm');
         bucketMap.set(m.metricsBucket, {
           displayTime,
           counts: { [group]: { ...m.variantCounts } },
@@ -579,7 +559,7 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
 
     // Sort by time
     const sortedBuckets = Array.from(bucketMap.entries()).sort(
-      (a, b) => new Date(a[0]).getTime() - new Date(b[0]).getTime(),
+      (a, b) => new Date(a[0]).getTime() - new Date(b[0]).getTime()
     );
 
     const labels = sortedBuckets.map(([, v]) => v.displayTime);
@@ -588,7 +568,7 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
     const data: Record<string, number[]> = {};
 
     // For 'all' mode, aggregate all groups
-    if (variantGroupBy === "all") {
+    if (variantGroupBy === 'all') {
       variants.forEach((variant) => {
         data[variant] = sortedBuckets.map(([, v]) => {
           let total = 0;
@@ -603,9 +583,7 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
       groups.forEach((group) => {
         variants.forEach((variant) => {
           const key = `${group} - ${variant}`;
-          data[key] = sortedBuckets.map(
-            ([, v]) => v.counts[group]?.[variant] || 0,
-          );
+          data[key] = sortedBuckets.map(([, v]) => v.counts[group]?.[variant] || 0);
         });
       });
     }
@@ -617,38 +595,33 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
   const segmentStyle = useCallback(
     (ctx: any) => {
       // If this segment goes to the last point and it's incomplete, use dashed line
-      if (
-        isLastPointIncomplete &&
-        ctx.p1DataIndex === timeSeriesData.length - 1
-      ) {
+      if (isLastPointIncomplete && ctx.p1DataIndex === timeSeriesData.length - 1) {
         return [5, 5];
       }
       return undefined; // Solid line
     },
-    [isLastPointIncomplete, timeSeriesData.length],
+    [isLastPointIncomplete, timeSeriesData.length]
   );
 
   // Line chart data - dynamic based on chartGroupBy
   const lineChartData = useMemo(() => {
     // Colors for grouping
     const groupColors = [
-      { border: theme.palette.primary.main, bg: "rgba(25, 118, 210, 0.1)" },
-      { border: theme.palette.secondary.main, bg: "rgba(156, 39, 176, 0.1)" },
-      { border: theme.palette.success.main, bg: "rgba(76, 175, 80, 0.1)" },
-      { border: theme.palette.warning.main, bg: "rgba(255, 152, 0, 0.1)" },
-      { border: theme.palette.error.main, bg: "rgba(244, 67, 54, 0.1)" },
-      { border: "#00bcd4", bg: "rgba(0, 188, 212, 0.1)" },
-      { border: "#9c27b0", bg: "rgba(156, 39, 176, 0.1)" },
-      { border: "#ff5722", bg: "rgba(255, 87, 34, 0.1)" },
+      { border: theme.palette.primary.main, bg: 'rgba(25, 118, 210, 0.1)' },
+      { border: theme.palette.secondary.main, bg: 'rgba(156, 39, 176, 0.1)' },
+      { border: theme.palette.success.main, bg: 'rgba(76, 175, 80, 0.1)' },
+      { border: theme.palette.warning.main, bg: 'rgba(255, 152, 0, 0.1)' },
+      { border: theme.palette.error.main, bg: 'rgba(244, 67, 54, 0.1)' },
+      { border: '#00bcd4', bg: 'rgba(0, 188, 212, 0.1)' },
+      { border: '#9c27b0', bg: 'rgba(156, 39, 176, 0.1)' },
+      { border: '#ff5722', bg: 'rgba(255, 87, 34, 0.1)' },
     ];
 
-    const allDisplayTimes = [
-      ...new Set(timeSeriesData.map((d) => d.displayTime)),
-    ];
+    const allDisplayTimes = [...new Set(timeSeriesData.map((d) => d.displayTime))];
 
-    if (chartGroupBy === "app") {
+    if (chartGroupBy === 'app') {
       // Group by application - show exposed/notExposed/total for each app
-      const apps = [...new Set(metrics.map((m) => m.appName || "unknown"))];
+      const apps = [...new Set(metrics.map((m) => m.appName || 'unknown'))];
       const datasets: any[] = [];
 
       apps.forEach((app, idx) => {
@@ -657,30 +630,27 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
         const totalMetrics = new Map<string, number>();
 
         metrics
-          .filter((m) => (m.appName || "unknown") === app)
+          .filter((m) => (m.appName || 'unknown') === app)
           .forEach((m) => {
-            const displayTime = formatWith(m.metricsBucket, "MM/DD HH:mm");
-            exposedMetrics.set(
-              displayTime,
-              (exposedMetrics.get(displayTime) || 0) + m.yesCount,
-            );
+            const displayTime = formatWith(m.metricsBucket, 'MM/DD HH:mm');
+            exposedMetrics.set(displayTime, (exposedMetrics.get(displayTime) || 0) + m.yesCount);
             notExposedMetrics.set(
               displayTime,
-              (notExposedMetrics.get(displayTime) || 0) + m.noCount,
+              (notExposedMetrics.get(displayTime) || 0) + m.noCount
             );
             totalMetrics.set(
               displayTime,
-              (totalMetrics.get(displayTime) || 0) + m.yesCount + m.noCount,
+              (totalMetrics.get(displayTime) || 0) + m.yesCount + m.noCount
             );
           });
 
         const color = groupColors[idx % groupColors.length];
 
         datasets.push({
-          label: `${app} - ${t("featureFlags.metrics.exposed")}`,
+          label: `${app} - ${t('featureFlags.metrics.exposed')}`,
           data: allDisplayTimes.map((time) => exposedMetrics.get(time) || 0),
           borderColor: theme.palette.success.main,
-          backgroundColor: "transparent",
+          backgroundColor: 'transparent',
           borderWidth: 2,
           borderDash: apps.length > 1 ? [idx * 2 + 5, idx * 2 + 2] : undefined,
           tension: 0.3,
@@ -689,10 +659,10 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
         });
 
         datasets.push({
-          label: `${app} - ${t("featureFlags.metrics.notExposed")}`,
+          label: `${app} - ${t('featureFlags.metrics.notExposed')}`,
           data: allDisplayTimes.map((time) => notExposedMetrics.get(time) || 0),
           borderColor: theme.palette.error.main,
-          backgroundColor: "transparent",
+          backgroundColor: 'transparent',
           borderWidth: 2,
           borderDash: apps.length > 1 ? [idx * 2 + 5, idx * 2 + 2] : undefined,
           tension: 0.3,
@@ -701,10 +671,10 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
         });
 
         datasets.push({
-          label: `${app} - ${t("featureFlags.metrics.totalRequests")}`,
+          label: `${app} - ${t('featureFlags.metrics.totalRequests')}`,
           data: allDisplayTimes.map((time) => totalMetrics.get(time) || 0),
           borderColor: color.border,
-          backgroundColor: "transparent",
+          backgroundColor: 'transparent',
           borderWidth: 2,
           borderDash: apps.length > 1 ? [idx * 2 + 5, idx * 2 + 2] : undefined,
           tension: 0.3,
@@ -714,7 +684,7 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
       });
 
       return { labels: allDisplayTimes, datasets };
-    } else if (chartGroupBy === "env") {
+    } else if (chartGroupBy === 'env') {
       // Group by environment - show exposed/notExposed/total for each env
       const envs = [...new Set(metrics.map((m) => m.environment))];
       const datasets: any[] = [];
@@ -727,28 +697,25 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
         metrics
           .filter((m) => m.environment === env)
           .forEach((m) => {
-            const displayTime = formatWith(m.metricsBucket, "MM/DD HH:mm");
-            exposedMetrics.set(
-              displayTime,
-              (exposedMetrics.get(displayTime) || 0) + m.yesCount,
-            );
+            const displayTime = formatWith(m.metricsBucket, 'MM/DD HH:mm');
+            exposedMetrics.set(displayTime, (exposedMetrics.get(displayTime) || 0) + m.yesCount);
             notExposedMetrics.set(
               displayTime,
-              (notExposedMetrics.get(displayTime) || 0) + m.noCount,
+              (notExposedMetrics.get(displayTime) || 0) + m.noCount
             );
             totalMetrics.set(
               displayTime,
-              (totalMetrics.get(displayTime) || 0) + m.yesCount + m.noCount,
+              (totalMetrics.get(displayTime) || 0) + m.yesCount + m.noCount
             );
           });
 
         const color = groupColors[idx % groupColors.length];
 
         datasets.push({
-          label: `${env} - ${t("featureFlags.metrics.exposed")}`,
+          label: `${env} - ${t('featureFlags.metrics.exposed')}`,
           data: allDisplayTimes.map((time) => exposedMetrics.get(time) || 0),
           borderColor: theme.palette.success.main,
-          backgroundColor: "transparent",
+          backgroundColor: 'transparent',
           borderWidth: 2,
           borderDash: envs.length > 1 ? [idx * 2 + 5, idx * 2 + 2] : undefined,
           tension: 0.3,
@@ -757,10 +724,10 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
         });
 
         datasets.push({
-          label: `${env} - ${t("featureFlags.metrics.notExposed")}`,
+          label: `${env} - ${t('featureFlags.metrics.notExposed')}`,
           data: allDisplayTimes.map((time) => notExposedMetrics.get(time) || 0),
           borderColor: theme.palette.error.main,
-          backgroundColor: "transparent",
+          backgroundColor: 'transparent',
           borderWidth: 2,
           borderDash: envs.length > 1 ? [idx * 2 + 5, idx * 2 + 2] : undefined,
           tension: 0.3,
@@ -769,10 +736,10 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
         });
 
         datasets.push({
-          label: `${env} - ${t("featureFlags.metrics.totalRequests")}`,
+          label: `${env} - ${t('featureFlags.metrics.totalRequests')}`,
           data: allDisplayTimes.map((time) => totalMetrics.get(time) || 0),
           borderColor: color.border,
-          backgroundColor: "transparent",
+          backgroundColor: 'transparent',
           borderWidth: 2,
           borderDash: envs.length > 1 ? [idx * 2 + 5, idx * 2 + 2] : undefined,
           tension: 0.3,
@@ -788,69 +755,69 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
         labels: timeSeriesData.map((d) => d.displayTime),
         datasets: [
           {
-            label: t("featureFlags.metrics.exposed"),
+            label: t('featureFlags.metrics.exposed'),
             data: timeSeriesData.map((d) => d.exposed),
             borderColor: theme.palette.success.main,
-            backgroundColor: "transparent",
+            backgroundColor: 'transparent',
             borderWidth: 2,
             tension: 0.3,
             pointRadius: timeSeriesData.map((_, i) =>
-              isLastPointIncomplete && i === timeSeriesData.length - 1 ? 6 : 4,
+              isLastPointIncomplete && i === timeSeriesData.length - 1 ? 6 : 4
             ),
             pointBackgroundColor: timeSeriesData.map((_, i) =>
               isLastPointIncomplete && i === timeSeriesData.length - 1
-                ? "transparent"
-                : theme.palette.success.main,
+                ? 'transparent'
+                : theme.palette.success.main
             ),
             pointBorderColor: theme.palette.success.main,
             pointBorderWidth: timeSeriesData.map((_, i) =>
-              isLastPointIncomplete && i === timeSeriesData.length - 1 ? 2 : 0,
+              isLastPointIncomplete && i === timeSeriesData.length - 1 ? 2 : 0
             ),
             segment: {
               borderDash: (ctx: any) => segmentStyle(ctx),
             },
           },
           {
-            label: t("featureFlags.metrics.notExposed"),
+            label: t('featureFlags.metrics.notExposed'),
             data: timeSeriesData.map((d) => d.notExposed),
             borderColor: theme.palette.error.main,
-            backgroundColor: "transparent",
+            backgroundColor: 'transparent',
             borderWidth: 2,
             tension: 0.3,
             pointRadius: timeSeriesData.map((_, i) =>
-              isLastPointIncomplete && i === timeSeriesData.length - 1 ? 6 : 4,
+              isLastPointIncomplete && i === timeSeriesData.length - 1 ? 6 : 4
             ),
             pointBackgroundColor: timeSeriesData.map((_, i) =>
               isLastPointIncomplete && i === timeSeriesData.length - 1
-                ? "transparent"
-                : theme.palette.error.main,
+                ? 'transparent'
+                : theme.palette.error.main
             ),
             pointBorderColor: theme.palette.error.main,
             pointBorderWidth: timeSeriesData.map((_, i) =>
-              isLastPointIncomplete && i === timeSeriesData.length - 1 ? 2 : 0,
+              isLastPointIncomplete && i === timeSeriesData.length - 1 ? 2 : 0
             ),
             segment: {
               borderDash: (ctx: any) => segmentStyle(ctx),
             },
           },
           {
-            label: t("featureFlags.metrics.totalRequests"),
+            label: t('featureFlags.metrics.totalRequests'),
             data: timeSeriesData.map((d) => d.total),
             borderColor: theme.palette.primary.main,
-            backgroundColor: "transparent",
+            backgroundColor: 'transparent',
             borderWidth: 2,
             tension: 0.3,
             pointRadius: timeSeriesData.map((_, i) =>
-              isLastPointIncomplete && i === timeSeriesData.length - 1 ? 6 : 4,
+              isLastPointIncomplete && i === timeSeriesData.length - 1 ? 6 : 4
             ),
             pointBackgroundColor: timeSeriesData.map((_, i) =>
               isLastPointIncomplete && i === timeSeriesData.length - 1
-                ? "transparent"
-                : theme.palette.primary.main,
+                ? 'transparent'
+                : theme.palette.primary.main
             ),
             pointBorderColor: theme.palette.primary.main,
             pointBorderWidth: timeSeriesData.map((_, i) =>
-              isLastPointIncomplete && i === timeSeriesData.length - 1 ? 2 : 0,
+              isLastPointIncomplete && i === timeSeriesData.length - 1 ? 2 : 0
             ),
             segment: {
               borderDash: (ctx: any) => segmentStyle(ctx),
@@ -873,22 +840,22 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
     responsive: true,
     maintainAspectRatio: false,
     interaction: {
-      mode: "index" as const,
+      mode: 'index' as const,
       intersect: false,
     },
     plugins: {
       legend: {
-        position: "top" as const,
-        align: "end" as const,
+        position: 'top' as const,
+        align: 'end' as const,
         labels: {
           usePointStyle: true,
-          pointStyle: "rect",
+          pointStyle: 'rect',
           boxWidth: 12,
           boxHeight: 12,
         },
       },
       tooltip: {
-        mode: "index" as const,
+        mode: 'index' as const,
         intersect: false,
       },
     },
@@ -910,7 +877,7 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
         },
         title: {
           display: true,
-          text: t("featureFlags.metrics.numberOfRequests"),
+          text: t('featureFlags.metrics.numberOfRequests'),
         },
       },
     },
@@ -922,10 +889,10 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
     theme.palette.secondary.main,
     theme.palette.info.main,
     theme.palette.warning.main,
-    "#9c27b0",
-    "#00bcd4",
-    "#ff9800",
-    "#795548",
+    '#9c27b0',
+    '#00bcd4',
+    '#ff9800',
+    '#795548',
   ];
 
   // Determine if this flag has variants
@@ -936,19 +903,19 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
       {/* Controls Row - Network page style with Chips and Dividers */}
       <Box
         sx={{
-          display: "flex",
+          display: 'flex',
           gap: 2,
           mb: 3,
-          flexWrap: "wrap",
-          alignItems: "center",
+          flexWrap: 'wrap',
+          alignItems: 'center',
         }}
       >
         {/* Environment Filter */}
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <Typography variant="caption" color="text.secondary" sx={{ mr: 0.5 }}>
-            {t("featureFlags.metrics.environments")}
+            {t('featureFlags.metrics.environments')}
           </Typography>
-          <Box sx={{ display: "flex", gap: 0.5, flexWrap: "wrap" }}>
+          <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
             {environments.map((env) => {
               const isSelected = selectedEnvs.includes(env.environment);
               return (
@@ -956,10 +923,10 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
                   key={env.environment}
                   label={env.environment}
                   onClick={() => handleEnvToggle(env.environment)}
-                  color={isSelected ? "primary" : "default"}
-                  variant={isSelected ? "filled" : "outlined"}
+                  color={isSelected ? 'primary' : 'default'}
+                  variant={isSelected ? 'filled' : 'outlined'}
                   size="small"
-                  sx={{ borderRadius: "16px" }}
+                  sx={{ borderRadius: '16px' }}
                 />
               );
             })}
@@ -967,22 +934,16 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
         </Box>
 
         {/* Divider */}
-        {availableApps.length > 0 && (
-          <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
-        )}
+        {availableApps.length > 0 && <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />}
 
         {/* Application Filter - only show if apps are available */}
         {availableApps.length > 0 && (
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <Typography
-              variant="caption"
-              color="text.secondary"
-              sx={{ mr: 0.5 }}
-            >
-              {t("featureFlags.metrics.applications")}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Typography variant="caption" color="text.secondary" sx={{ mr: 0.5 }}>
+              {t('featureFlags.metrics.applications')}
               {loadingApps && <CircularProgress size={12} sx={{ ml: 1 }} />}
             </Typography>
-            <Box sx={{ display: "flex", gap: 0.5, flexWrap: "wrap" }}>
+            <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
               {availableApps.map((app) => {
                 const isSelected = selectedApps.includes(app);
                 return (
@@ -990,10 +951,10 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
                     key={app}
                     label={app}
                     onClick={() => handleAppToggle(app)}
-                    color={isSelected ? "primary" : "default"}
-                    variant={isSelected ? "filled" : "outlined"}
+                    color={isSelected ? 'primary' : 'default'}
+                    variant={isSelected ? 'filled' : 'outlined'}
                     size="small"
-                    sx={{ borderRadius: "16px" }}
+                    sx={{ borderRadius: '16px' }}
                   />
                 );
               })}
@@ -1005,9 +966,9 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
         <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
 
         {/* Period Selector */}
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <Typography variant="caption" color="text.secondary">
-            {t("featureFlags.metrics.period")}
+            {t('featureFlags.metrics.period')}
           </Typography>
           <ToggleButtonGroup
             size="small"
@@ -1026,24 +987,22 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
 
       {/* Metrics Content */}
       {loading ? (
-        <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
           <CircularProgress />
         </Box>
       ) : error ? (
         <Alert severity="error">{error}</Alert>
       ) : !hasMetrics ? (
         <Paper variant="outlined" sx={{ p: 3, borderRadius: 1 }}>
-          <Typography color="text.secondary">
-            {t("featureFlags.metrics.noMetrics")}
-          </Typography>
+          <Typography color="text.secondary">{t('featureFlags.metrics.noMetrics')}</Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-            {t("featureFlags.metrics.noMetricsHint")}
+            {t('featureFlags.metrics.noMetricsHint')}
           </Typography>
         </Paper>
       ) : (
         <>
           {/* Summary Cards - Top (above chart) */}
-          <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
+          <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
             <Paper
               variant="outlined"
               sx={{
@@ -1051,7 +1010,7 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
                 px: 2,
                 borderRadius: 1,
                 flex: 1,
-                textAlign: "center",
+                textAlign: 'center',
                 borderLeft: `4px solid ${theme.palette.success.main}`,
               }}
             >
@@ -1059,10 +1018,10 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
                 {aggregatedMetrics.totalYes.toLocaleString()}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                {t("featureFlags.metrics.exposure")}
+                {t('featureFlags.metrics.exposure')}
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                {t("featureFlags.metrics.totalExposureInPeriod")}
+                {t('featureFlags.metrics.totalExposureInPeriod')}
               </Typography>
             </Paper>
 
@@ -1073,7 +1032,7 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
                 px: 2,
                 borderRadius: 1,
                 flex: 1,
-                textAlign: "center",
+                textAlign: 'center',
                 borderLeft: `4px solid ${theme.palette.secondary.main}`,
               }}
             >
@@ -1081,10 +1040,10 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
                 {exposurePercentage}%
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                {t("featureFlags.metrics.exposurePercent")}
+                {t('featureFlags.metrics.exposurePercent')}
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                {t("featureFlags.metrics.percentExposedInPeriod")}
+                {t('featureFlags.metrics.percentExposedInPeriod')}
               </Typography>
             </Paper>
 
@@ -1095,7 +1054,7 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
                 px: 2,
                 borderRadius: 1,
                 flex: 1,
-                textAlign: "center",
+                textAlign: 'center',
                 borderLeft: `4px solid ${theme.palette.primary.main}`,
               }}
             >
@@ -1103,10 +1062,10 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
                 {aggregatedMetrics.total.toLocaleString()}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                {t("featureFlags.metrics.requests")}
+                {t('featureFlags.metrics.requests')}
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                {t("featureFlags.metrics.totalRequestsInPeriod")}
+                {t('featureFlags.metrics.totalRequestsInPeriod')}
               </Typography>
             </Paper>
           </Box>
@@ -1116,18 +1075,15 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
             {/* Chart Header */}
             <Box
               sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
                 mb: 2,
               }}
             >
               <Typography variant="subtitle2" color="text.secondary">
-                {t("featureFlags.metrics.requestsInPeriod", {
-                  period: t(
-                    PERIOD_OPTIONS.find((p) => p.value === period)?.labelKey ||
-                    "",
-                  ),
+                {t('featureFlags.metrics.requestsInPeriod', {
+                  period: t(PERIOD_OPTIONS.find((p) => p.value === period)?.labelKey || ''),
                 })}
               </Typography>
               <ToggleButtonGroup
@@ -1136,15 +1092,9 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
                 exclusive
                 onChange={(_, value) => value && setChartGroupBy(value)}
               >
-                <ToggleButton value="all">
-                  {t("network.groupByAll")}
-                </ToggleButton>
-                <ToggleButton value="app">
-                  {t("network.groupByApp")}
-                </ToggleButton>
-                <ToggleButton value="env">
-                  {t("network.groupByEnv")}
-                </ToggleButton>
+                <ToggleButton value="all">{t('network.groupByAll')}</ToggleButton>
+                <ToggleButton value="app">{t('network.groupByApp')}</ToggleButton>
+                <ToggleButton value="env">{t('network.groupByEnv')}</ToggleButton>
               </ToggleButtonGroup>
             </Box>
 
@@ -1163,10 +1113,10 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
             >
               <Box
                 sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  cursor: "pointer",
-                  "&:hover": { bgcolor: "action.hover" },
+                  display: 'flex',
+                  alignItems: 'center',
+                  cursor: 'pointer',
+                  '&:hover': { bgcolor: 'action.hover' },
                   py: 1,
                   px: 0.5,
                   borderRadius: 1,
@@ -1177,7 +1127,7 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
                   {showTable ? <CollapseIcon /> : <ExpandIcon />}
                 </IconButton>
                 <Typography variant="subtitle2" sx={{ ml: 1 }}>
-                  {t("featureFlags.metrics.hourlyBreakdown")}
+                  {t('featureFlags.metrics.hourlyBreakdown')}
                 </Typography>
               </Box>
               <Collapse in={showTable}>
@@ -1185,60 +1135,42 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
                   <Table size="small">
                     <TableHead>
                       <TableRow>
-                        <TableCell>{t("featureFlags.metrics.time")}</TableCell>
+                        <TableCell>{t('featureFlags.metrics.time')}</TableCell>
                         {availableApps.length > 0 && (
-                          <TableCell>
-                            {t("featureFlags.metrics.applications")}
-                          </TableCell>
+                          <TableCell>{t('featureFlags.metrics.applications')}</TableCell>
                         )}
+                        <TableCell align="right">{t('featureFlags.metrics.exposed')}</TableCell>
+                        <TableCell align="right">{t('featureFlags.metrics.notExposed')}</TableCell>
+                        <TableCell align="right">{t('featureFlags.metrics.total')}</TableCell>
                         <TableCell align="right">
-                          {t("featureFlags.metrics.exposed")}
-                        </TableCell>
-                        <TableCell align="right">
-                          {t("featureFlags.metrics.notExposed")}
-                        </TableCell>
-                        <TableCell align="right">
-                          {t("featureFlags.metrics.total")}
-                        </TableCell>
-                        <TableCell align="right">
-                          {t("featureFlags.metrics.exposureRate")}
+                          {t('featureFlags.metrics.exposureRate')}
                         </TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
                       {tableData.map((row, index) => {
                         const rate =
-                          row.total > 0
-                            ? ((row.exposed / row.total) * 100).toFixed(1)
-                            : "0.0";
+                          row.total > 0 ? ((row.exposed / row.total) * 100).toFixed(1) : '0.0';
                         return (
                           <TableRow key={`${row.time}-${row.appName || index}`}>
                             <TableCell>{row.displayTime}</TableCell>
                             {availableApps.length > 0 && (
                               <TableCell>
                                 <Chip
-                                  label={row.appName || "-"}
+                                  label={row.appName || '-'}
                                   size="small"
                                   color="info"
-                                  sx={{ borderRadius: "16px" }}
+                                  sx={{ borderRadius: '16px' }}
                                 />
                               </TableCell>
                             )}
-                            <TableCell
-                              align="right"
-                              sx={{ color: "success.main" }}
-                            >
+                            <TableCell align="right" sx={{ color: 'success.main' }}>
                               {row.exposed.toLocaleString()}
                             </TableCell>
-                            <TableCell
-                              align="right"
-                              sx={{ color: "error.main" }}
-                            >
+                            <TableCell align="right" sx={{ color: 'error.main' }}>
                               {row.notExposed.toLocaleString()}
                             </TableCell>
-                            <TableCell align="right">
-                              {row.total.toLocaleString()}
-                            </TableCell>
+                            <TableCell align="right">{row.total.toLocaleString()}</TableCell>
                             <TableCell align="right">{rate}%</TableCell>
                           </TableRow>
                         );
@@ -1253,13 +1185,8 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
           {/* Variant Distribution (if flag has variants) */}
           {hasVariants &&
             (() => {
-              const variantEntries = Object.entries(
-                aggregatedMetrics.variantCounts,
-              );
-              const totalVariantCount = variantEntries.reduce(
-                (sum, [, count]) => sum + count,
-                0,
-              );
+              const variantEntries = Object.entries(aggregatedMetrics.variantCounts);
+              const totalVariantCount = variantEntries.reduce((sum, [, count]) => sum + count, 0);
 
               const doughnutData = {
                 labels: variantEntries.map(([variant]) => variant),
@@ -1276,7 +1203,7 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
               const doughnutOptions = {
                 responsive: true,
                 maintainAspectRatio: false,
-                cutout: "60%",
+                cutout: '60%',
                 plugins: {
                   legend: {
                     display: false,
@@ -1285,10 +1212,7 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
                     callbacks: {
                       label: (context: any) => {
                         const value = context.raw;
-                        const percentage = (
-                          (value / totalVariantCount) *
-                          100
-                        ).toFixed(1);
+                        const percentage = ((value / totalVariantCount) * 100).toFixed(1);
                         return `${context.label}: ${value.toLocaleString()} (${percentage}%)`;
                       },
                     },
@@ -1298,48 +1222,42 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
 
               return (
                 <Paper variant="outlined" sx={{ p: 3, borderRadius: 1, mt: 3 }}>
-                  <Typography
-                    variant="subtitle2"
-                    color="text.secondary"
-                    sx={{ mb: 2 }}
-                  >
-                    {t("featureFlags.metrics.variantDistribution")}
+                  <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 2 }}>
+                    {t('featureFlags.metrics.variantDistribution')}
                   </Typography>
 
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 4 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                     {/* Doughnut Chart */}
-                    <Box sx={{ width: 180, height: 180, position: "relative" }}>
+                    <Box sx={{ width: 180, height: 180, position: 'relative' }}>
                       <Doughnut data={doughnutData} options={doughnutOptions} />
                       <Box
                         sx={{
-                          position: "absolute",
-                          top: "50%",
-                          left: "50%",
-                          transform: "translate(-50%, -50%)",
-                          textAlign: "center",
+                          position: 'absolute',
+                          top: '50%',
+                          left: '50%',
+                          transform: 'translate(-50%, -50%)',
+                          textAlign: 'center',
                         }}
                       >
                         <Typography variant="h6" fontWeight={700}>
                           {totalVariantCount.toLocaleString()}
                         </Typography>
                         <Typography variant="caption" color="text.secondary">
-                          {t("featureFlags.metrics.total")}
+                          {t('featureFlags.metrics.total')}
                         </Typography>
                       </Box>
                     </Box>
 
                     {/* Legend */}
-                    <Box
-                      sx={{ display: "flex", flexDirection: "column", gap: 2 }}
-                    >
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                       {variantEntries.map(([variant, count], idx) => {
                         const percentage = (count / totalVariantCount) * 100;
                         return (
                           <Box
                             key={variant}
                             sx={{
-                              display: "flex",
-                              alignItems: "center",
+                              display: 'flex',
+                              alignItems: 'center',
                               gap: 1.5,
                             }}
                           >
@@ -1348,20 +1266,15 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
                                 width: 12,
                                 height: 12,
                                 borderRadius: 0.5,
-                                bgcolor:
-                                  variantColors[idx % variantColors.length],
+                                bgcolor: variantColors[idx % variantColors.length],
                               }}
                             />
                             <Box>
                               <Typography variant="body2" fontWeight={600}>
                                 {variant}
                               </Typography>
-                              <Typography
-                                variant="caption"
-                                color="text.secondary"
-                              >
-                                {count.toLocaleString()} (
-                                {percentage.toFixed(1)}%)
+                              <Typography variant="caption" color="text.secondary">
+                                {count.toLocaleString()} ({percentage.toFixed(1)}%)
                               </Typography>
                             </Box>
                           </Box>
@@ -1376,32 +1289,24 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
                       <Divider sx={{ mb: 2 }} />
                       <Box
                         sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "space-between",
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
                           mb: 2,
                         }}
                       >
                         <Typography variant="subtitle2" color="text.secondary">
-                          {t("featureFlags.metrics.variantTimeSeriesChart")}
+                          {t('featureFlags.metrics.variantTimeSeriesChart')}
                         </Typography>
                         <ToggleButtonGroup
                           value={variantGroupBy}
                           exclusive
-                          onChange={(_, value) =>
-                            value && setVariantGroupBy(value)
-                          }
+                          onChange={(_, value) => value && setVariantGroupBy(value)}
                           size="small"
                         >
-                          <ToggleButton value="all">
-                            {t("network.groupByAll")}
-                          </ToggleButton>
-                          <ToggleButton value="app">
-                            {t("network.groupByApp")}
-                          </ToggleButton>
-                          <ToggleButton value="env">
-                            {t("network.groupByEnv")}
-                          </ToggleButton>
+                          <ToggleButton value="all">{t('network.groupByAll')}</ToggleButton>
+                          <ToggleButton value="app">{t('network.groupByApp')}</ToggleButton>
+                          <ToggleButton value="env">{t('network.groupByEnv')}</ToggleButton>
                         </ToggleButtonGroup>
                       </Box>
                       <Box sx={{ height: 250 }}>
@@ -1409,67 +1314,53 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
                           data={{
                             labels: variantTimeSeriesData.labels,
                             datasets:
-                              variantGroupBy === "all"
-                                ? variantTimeSeriesData.variants.map(
-                                  (variant, idx) => ({
+                              variantGroupBy === 'all'
+                                ? variantTimeSeriesData.variants.map((variant, idx) => ({
                                     label: variant,
                                     data: variantTimeSeriesData.data[variant],
-                                    borderColor:
-                                      variantColors[
-                                      idx % variantColors.length
-                                      ],
+                                    borderColor: variantColors[idx % variantColors.length],
                                     backgroundColor:
-                                      variantColors[
-                                      idx % variantColors.length
-                                      ] + "20",
+                                      variantColors[idx % variantColors.length] + '20',
                                     borderWidth: 2,
                                     fill: false,
                                     tension: 0.3,
                                     pointRadius: 3,
                                     pointHoverRadius: 5,
-                                  }),
-                                )
-                                : Object.keys(variantTimeSeriesData.data).map(
-                                  (key, idx) => ({
+                                  }))
+                                : Object.keys(variantTimeSeriesData.data).map((key, idx) => ({
                                     label: key,
                                     data: variantTimeSeriesData.data[key],
-                                    borderColor:
-                                      variantColors[
-                                      idx % variantColors.length
-                                      ],
+                                    borderColor: variantColors[idx % variantColors.length],
                                     backgroundColor:
-                                      variantColors[
-                                      idx % variantColors.length
-                                      ] + "20",
+                                      variantColors[idx % variantColors.length] + '20',
                                     borderWidth: 2,
                                     fill: false,
                                     tension: 0.3,
                                     pointRadius: 3,
                                     pointHoverRadius: 5,
-                                  }),
-                                ),
+                                  })),
                           }}
                           options={{
                             responsive: true,
                             maintainAspectRatio: false,
                             interaction: {
-                              mode: "index",
+                              mode: 'index',
                               intersect: false,
                             },
                             plugins: {
                               legend: {
                                 display: true,
-                                position: "top",
+                                position: 'top',
                                 labels: {
                                   usePointStyle: true,
-                                  pointStyle: "circle",
+                                  pointStyle: 'circle',
                                   boxWidth: 10,
                                   boxHeight: 10,
                                   padding: 20,
                                 },
                               },
                               tooltip: {
-                                mode: "index",
+                                mode: 'index',
                                 intersect: false,
                               },
                             },
@@ -1499,24 +1390,20 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
                       <Box sx={{ mt: 2 }}>
                         <Box
                           sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            cursor: "pointer",
-                            "&:hover": { bgcolor: "action.hover" },
+                            display: 'flex',
+                            alignItems: 'center',
+                            cursor: 'pointer',
+                            '&:hover': { bgcolor: 'action.hover' },
                             borderRadius: 1,
                             p: 0.5,
                           }}
                           onClick={() => setShowVariantTable(!showVariantTable)}
                         >
                           <IconButton size="small">
-                            {showVariantTable ? (
-                              <CollapseIcon />
-                            ) : (
-                              <ExpandIcon />
-                            )}
+                            {showVariantTable ? <CollapseIcon /> : <ExpandIcon />}
                           </IconButton>
                           <Typography variant="body2" color="text.secondary">
-                            {t("featureFlags.metrics.hourlyDetail")}
+                            {t('featureFlags.metrics.hourlyDetail')}
                           </Typography>
                         </Box>
                         <Collapse in={showVariantTable}>
@@ -1525,37 +1412,32 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
                               <TableHead>
                                 <TableRow
                                   sx={{
-                                    "& th": {
-                                      bgcolor: "background.paper",
+                                    '& th': {
+                                      bgcolor: 'background.paper',
                                       zIndex: 1,
                                     },
                                   }}
                                 >
-                                  <TableCell>
-                                    {t("featureFlags.metrics.time")}
-                                  </TableCell>
-                                  {(variantGroupBy === "all"
+                                  <TableCell>{t('featureFlags.metrics.time')}</TableCell>
+                                  {(variantGroupBy === 'all'
                                     ? variantTimeSeriesData.variants
                                     : Object.keys(variantTimeSeriesData.data)
                                   ).map((key, idx) => (
                                     <TableCell key={key} align="right">
                                       <Box
                                         sx={{
-                                          display: "flex",
-                                          alignItems: "center",
+                                          display: 'flex',
+                                          alignItems: 'center',
                                           gap: 0.5,
-                                          justifyContent: "flex-end",
+                                          justifyContent: 'flex-end',
                                         }}
                                       >
                                         <Box
                                           sx={{
                                             width: 8,
                                             height: 8,
-                                            borderRadius: "50%",
-                                            bgcolor:
-                                              variantColors[
-                                              idx % variantColors.length
-                                              ],
+                                            borderRadius: '50%',
+                                            bgcolor: variantColors[idx % variantColors.length],
                                           }}
                                         />
                                         {key}
@@ -1563,49 +1445,37 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
                                     </TableCell>
                                   ))}
                                   <TableCell align="right">
-                                    {t("featureFlags.metrics.total")}
+                                    {t('featureFlags.metrics.total')}
                                   </TableCell>
                                 </TableRow>
                               </TableHead>
                               <TableBody>
-                                {variantTimeSeriesData.labels.map(
-                                  (label, rowIdx) => {
-                                    const dataKeys =
-                                      variantGroupBy === "all"
-                                        ? variantTimeSeriesData.variants
-                                        : Object.keys(
-                                          variantTimeSeriesData.data,
-                                        );
-                                    const rowTotal = dataKeys.reduce(
-                                      (sum, k) =>
-                                        sum +
-                                        (variantTimeSeriesData.data[k]?.[
-                                          rowIdx
-                                        ] || 0),
-                                      0,
-                                    );
-                                    return (
-                                      <TableRow key={label} hover>
-                                        <TableCell>{label}</TableCell>
-                                        {dataKeys.map((key) => (
-                                          <TableCell key={key} align="right">
-                                            {(
-                                              variantTimeSeriesData.data[key]?.[
-                                              rowIdx
-                                              ] || 0
-                                            ).toLocaleString()}
-                                          </TableCell>
-                                        ))}
-                                        <TableCell
-                                          align="right"
-                                          sx={{ fontWeight: 600 }}
-                                        >
-                                          {rowTotal.toLocaleString()}
+                                {variantTimeSeriesData.labels.map((label, rowIdx) => {
+                                  const dataKeys =
+                                    variantGroupBy === 'all'
+                                      ? variantTimeSeriesData.variants
+                                      : Object.keys(variantTimeSeriesData.data);
+                                  const rowTotal = dataKeys.reduce(
+                                    (sum, k) =>
+                                      sum + (variantTimeSeriesData.data[k]?.[rowIdx] || 0),
+                                    0
+                                  );
+                                  return (
+                                    <TableRow key={label} hover>
+                                      <TableCell>{label}</TableCell>
+                                      {dataKeys.map((key) => (
+                                        <TableCell key={key} align="right">
+                                          {(
+                                            variantTimeSeriesData.data[key]?.[rowIdx] || 0
+                                          ).toLocaleString()}
                                         </TableCell>
-                                      </TableRow>
-                                    );
-                                  },
-                                )}
+                                      ))}
+                                      <TableCell align="right" sx={{ fontWeight: 600 }}>
+                                        {rowTotal.toLocaleString()}
+                                      </TableCell>
+                                    </TableRow>
+                                  );
+                                })}
                               </TableBody>
                             </Table>
                           </TableContainer>

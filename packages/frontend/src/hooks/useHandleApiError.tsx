@@ -1,7 +1,7 @@
-import React, { useState, useCallback } from "react";
-import { useSnackbar } from "notistack";
-import { parseApiErrorMessage, extractConflictInfo } from "../utils/errorUtils";
-import ApiErrorDialog from "../components/common/ApiErrorDialog";
+import React, { useState, useCallback } from 'react';
+import { useSnackbar } from 'notistack';
+import { parseApiErrorMessage, extractConflictInfo } from '../utils/errorUtils';
+import ApiErrorDialog from '../components/common/ApiErrorDialog';
 
 interface UseHandleApiErrorOptions {
   onDelete?: () => void; // Optional delete callback for conflict/duplicate errors
@@ -10,17 +10,17 @@ interface UseHandleApiErrorOptions {
 export function useHandleApiError(options: UseHandleApiErrorOptions = {}) {
   const { enqueueSnackbar } = useSnackbar();
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [errorType, setErrorType] = useState<
-    "LOCKED" | "CONFLICT" | "DUPLICATE" | "GENERIC"
-  >("GENERIC");
+  const [errorType, setErrorType] = useState<'LOCKED' | 'CONFLICT' | 'DUPLICATE' | 'GENERIC'>(
+    'GENERIC'
+  );
   const [errorInfo, setErrorInfo] = useState<any>({});
 
   const handleApiError = useCallback(
-    (error: any, fallbackKey: string = "common.generic") => {
+    (error: any, fallbackKey: string = 'common.generic') => {
       const conflictInfo = extractConflictInfo(error);
 
       if (conflictInfo.isLocked) {
-        setErrorType("LOCKED");
+        setErrorType('LOCKED');
         setErrorInfo({
           lockedInfo: {
             lockedBy: conflictInfo.lockedBy,
@@ -33,7 +33,7 @@ export function useHandleApiError(options: UseHandleApiErrorOptions = {}) {
       }
 
       if (conflictInfo.isDataConflict) {
-        setErrorType("CONFLICT");
+        setErrorType('CONFLICT');
         setErrorInfo({
           conflictData: conflictInfo.conflictData,
         });
@@ -42,7 +42,7 @@ export function useHandleApiError(options: UseHandleApiErrorOptions = {}) {
       }
 
       if (conflictInfo.isDuplicate) {
-        setErrorType("DUPLICATE");
+        setErrorType('DUPLICATE');
         setErrorInfo({
           message: conflictInfo.message,
         });
@@ -52,11 +52,11 @@ export function useHandleApiError(options: UseHandleApiErrorOptions = {}) {
 
       // Generic error handling
       enqueueSnackbar(parseApiErrorMessage(error, fallbackKey), {
-        variant: "error",
+        variant: 'error',
       });
       return false;
     },
-    [enqueueSnackbar],
+    [enqueueSnackbar]
   );
 
   const ErrorDialog = useCallback(
@@ -69,7 +69,7 @@ export function useHandleApiError(options: UseHandleApiErrorOptions = {}) {
         {...errorInfo}
       />
     ),
-    [dialogOpen, errorType, errorInfo, options.onDelete],
+    [dialogOpen, errorType, errorInfo, options.onDelete]
   );
 
   return {

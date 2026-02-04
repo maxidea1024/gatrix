@@ -1,19 +1,13 @@
-import React, { useState, useEffect } from "react";
-import {
-  LinkPreviewData,
-  linkPreviewService,
-} from "../services/linkPreviewService";
-import "./LinkPreview.css";
+import React, { useState, useEffect } from 'react';
+import { LinkPreviewData, linkPreviewService } from '../services/linkPreviewService';
+import './LinkPreview.css';
 
 interface LinkPreviewProps {
   url: string;
   className?: string;
 }
 
-export const LinkPreview: React.FC<LinkPreviewProps> = ({
-  url,
-  className = "",
-}) => {
+export const LinkPreview: React.FC<LinkPreviewProps> = ({ url, className = '' }) => {
   const [preview, setPreview] = useState<LinkPreviewData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -38,7 +32,7 @@ export const LinkPreview: React.FC<LinkPreviewProps> = ({
           setError(true);
         }
       } catch (err) {
-        console.error("Failed to load link preview:", err);
+        console.error('Failed to load link preview:', err);
         setError(true);
       } finally {
         setLoading(false);
@@ -50,10 +44,7 @@ export const LinkPreview: React.FC<LinkPreviewProps> = ({
 
   if (loading) {
     return (
-      <div
-        className={`link-preview loading ${className}`}
-        data-link-preview="loading"
-      >
+      <div className={`link-preview loading ${className}`} data-link-preview="loading">
         <div className="link-preview-skeleton">
           <div className="skeleton-image"></div>
           <div className="skeleton-content">
@@ -68,17 +59,12 @@ export const LinkPreview: React.FC<LinkPreviewProps> = ({
 
   if (error || !preview) {
     return (
-      <div
-        className={`link-preview error ${className}`}
-        data-link-preview="error"
-      >
+      <div className={`link-preview error ${className}`} data-link-preview="error">
         <div className="link-preview-fallback">
           <div className="fallback-icon">🔗</div>
           <div className="fallback-content">
             <div className="fallback-url">{url}</div>
-            <div className="fallback-message">
-              링크 미리보기를 불러올 수 없습니다
-            </div>
+            <div className="fallback-message">링크 미리보기를 불러올 수 없습니다</div>
           </div>
         </div>
       </div>
@@ -86,25 +72,23 @@ export const LinkPreview: React.FC<LinkPreviewProps> = ({
   }
 
   const handleClick = () => {
-    window.open(url, "_blank", "noopener,noreferrer");
+    window.open(url, '_blank', 'noopener,noreferrer');
   };
 
   const formatDescription = (description: string) => {
     if (description.length > 150) {
-      return description.substring(0, 150) + "...";
+      return description.substring(0, 150) + '...';
     }
     return description;
   };
 
   const isYouTubeUrl = (url: string): boolean => {
-    return /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)/.test(
-      url,
-    );
+    return /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)/.test(url);
   };
 
   const getYouTubeEmbedUrl = (url: string): string | null => {
     const match = url.match(
-      /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
+      /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/
     );
     return match ? `https://www.youtube.com/embed/${match[1]}` : null;
   };
@@ -117,24 +101,24 @@ export const LinkPreview: React.FC<LinkPreviewProps> = ({
       <div
         className="link-preview-youtube"
         style={{
-          position: "relative",
-          paddingBottom: "56.25%",
+          position: 'relative',
+          paddingBottom: '56.25%',
           height: 0,
-          overflow: "hidden",
+          overflow: 'hidden',
         }}
       >
         <iframe
           src={embedUrl}
-          title={preview?.title || "YouTube video"}
+          title={preview?.title || 'YouTube video'}
           frameBorder="0"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen
           style={{
-            position: "absolute",
+            position: 'absolute',
             top: 0,
             left: 0,
-            width: "100%",
-            height: "100%",
+            width: '100%',
+            height: '100%',
           }}
         />
       </div>
@@ -154,10 +138,10 @@ export const LinkPreview: React.FC<LinkPreviewProps> = ({
           <div className="link-preview-image">
             <img
               src={preview.image}
-              alt={preview.title || "Link preview"}
+              alt={preview.title || 'Link preview'}
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
-                target.style.display = "none";
+                target.style.display = 'none';
               }}
             />
           </div>
@@ -172,7 +156,7 @@ export const LinkPreview: React.FC<LinkPreviewProps> = ({
                 className="link-preview-favicon"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
-                  target.style.display = "none";
+                  target.style.display = 'none';
                 }}
               />
             )}
@@ -181,27 +165,19 @@ export const LinkPreview: React.FC<LinkPreviewProps> = ({
             </span>
           </div>
 
-          {preview.title && (
-            <h3 className="link-preview-title">{preview.title}</h3>
-          )}
+          {preview.title && <h3 className="link-preview-title">{preview.title}</h3>}
 
           {preview.description && (
-            <p className="link-preview-description">
-              {formatDescription(preview.description)}
-            </p>
+            <p className="link-preview-description">{formatDescription(preview.description)}</p>
           )}
 
           <div className="link-preview-meta">
             {preview.author && (
-              <span className="link-preview-author">
-                작성자: {preview.author}
-              </span>
+              <span className="link-preview-author">작성자: {preview.author}</span>
             )}
 
             {preview.readingTime && (
-              <span className="link-preview-reading-time">
-                읽기 시간: {preview.readingTime}
-              </span>
+              <span className="link-preview-reading-time">읽기 시간: {preview.readingTime}</span>
             )}
 
             {preview.publishedTime && (
@@ -236,13 +212,8 @@ interface LinkPreviewListProps {
   className?: string;
 }
 
-export const LinkPreviewList: React.FC<LinkPreviewListProps> = ({
-  urls,
-  className = "",
-}) => {
-  const [previews, setPreviews] = useState<Map<string, LinkPreviewData | null>>(
-    new Map(),
-  );
+export const LinkPreviewList: React.FC<LinkPreviewListProps> = ({ urls, className = '' }) => {
+  const [previews, setPreviews] = useState<Map<string, LinkPreviewData | null>>(new Map());
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -257,7 +228,7 @@ export const LinkPreviewList: React.FC<LinkPreviewListProps> = ({
         const previewMap = await linkPreviewService.getMultiplePreviews(urls);
         setPreviews(previewMap);
       } catch (err) {
-        console.error("Failed to load link previews:", err);
+        console.error('Failed to load link previews:', err);
       } finally {
         setLoading(false);
       }
@@ -276,9 +247,7 @@ export const LinkPreviewList: React.FC<LinkPreviewListProps> = ({
     );
   }
 
-  const validPreviews = Array.from(previews.entries()).filter(
-    ([_, preview]) => preview !== null,
-  );
+  const validPreviews = Array.from(previews.entries()).filter(([_, preview]) => preview !== null);
 
   if (validPreviews.length === 0) {
     return null;

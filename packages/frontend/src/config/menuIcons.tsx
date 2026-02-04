@@ -3,7 +3,7 @@
  * Maps icon names (strings) to actual MUI Icon components
  * This allows menu configuration to use simple strings instead of JSX
  */
-import React from "react";
+import React from 'react';
 import {
   Dashboard as DashboardIcon,
   People as PeopleIcon,
@@ -50,7 +50,7 @@ import {
   Hub as HubIcon,
   SettingsSuggest as SettingsSuggestIcon,
   Category as CategoryIcon,
-} from "@mui/icons-material";
+} from '@mui/icons-material';
 
 // Icon name to component mapping
 const ICON_MAP: Record<string, React.ReactElement> = {

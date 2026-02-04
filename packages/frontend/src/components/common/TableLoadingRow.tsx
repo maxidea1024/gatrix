@@ -1,6 +1,6 @@
-import React from "react";
-import { TableRow, TableCell, Box, CircularProgress } from "@mui/material";
-import { DeferredLoading } from "./DeferredLoading";
+import React from 'react';
+import { TableRow, TableCell, Box, CircularProgress } from '@mui/material';
+import { DeferredLoading } from './DeferredLoading';
 
 interface TableLoadingRowProps {
   colSpan: number;
@@ -20,10 +20,10 @@ export const TableLoadingRow: React.FC<TableLoadingRowProps> = ({
       <TableCell colSpan={colSpan} align="center" sx={{ height: 200 }}>
         <Box
           sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            height: "100%",
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '100%',
           }}
         >
           <DeferredLoading loading={loading} delay={delay}>

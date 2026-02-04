@@ -1,6 +1,6 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { useAuth } from "@/hooks/useAuth";
-import { PERMISSIONS } from "@/types/permissions";
+import React, { useEffect, useMemo, useState } from 'react';
+import { useAuth } from '@/hooks/useAuth';
+import { PERMISSIONS } from '@/types/permissions';
 import {
   Box,
   Typography,
@@ -24,27 +24,27 @@ import {
   TableBody,
   TableContainer,
   LinearProgress,
-} from "@mui/material";
+} from '@mui/material';
 import {
   Delete as DeleteIcon,
   Edit as EditIcon,
   Save as SaveIcon,
   Close as CloseIcon,
   Autorenew as RandomIcon,
-} from "@mui/icons-material";
-import { useTranslation } from "react-i18next";
-import { tagService, Tag } from "@/services/tagService";
-import { useSnackbar } from "notistack";
-import EmptyState from "@/components/common/EmptyState";
-import { TableLoadingRow } from "@/components/common/TableLoadingRow";
-import { formatDateTimeDetailed } from "@/utils/dateFormat";
-import { ColorPicker } from "@/components/common/ColorPicker";
-import { getContrastColor } from "@/utils/colorUtils";
+} from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
+import { tagService, Tag } from '@/services/tagService';
+import { useSnackbar } from 'notistack';
+import EmptyState from '@/components/common/EmptyState';
+import { TableLoadingRow } from '@/components/common/TableLoadingRow';
+import { formatDateTimeDetailed } from '@/utils/dateFormat';
+import { ColorPicker } from '@/components/common/ColorPicker';
+import { getContrastColor } from '@/utils/colorUtils';
 
 const randomHexColor = () =>
   `#${Math.floor(Math.random() * 0xffffff)
     .toString(16)
-    .padStart(6, "0")}`;
+    .padStart(6, '0')}`;
 
 const TagsPage: React.FC = () => {
   const { t } = useTranslation();
@@ -54,25 +54,25 @@ const TagsPage: React.FC = () => {
 
   // Data/state
   const [tags, setTags] = useState<Tag[]>([]);
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState('');
   const nameInputRef = React.useRef<HTMLInputElement>(null);
 
   // Delete confirm dialog
   const [deleteTarget, setDeleteTarget] = useState<Tag | null>(null);
-  const [confirmName, setConfirmName] = useState("");
+  const [confirmName, setConfirmName] = useState('');
 
   const [loading, setLoading] = useState(false);
 
   // Create form
-  const [newName, setNewName] = useState("");
-  const [newColor, setNewColor] = useState("#23dd67");
-  const [newDescription, setNewDescription] = useState("");
+  const [newName, setNewName] = useState('');
+  const [newColor, setNewColor] = useState('#23dd67');
+  const [newDescription, setNewDescription] = useState('');
 
   // Inline edit
   const [editingId, setEditingId] = useState<number | null>(null);
-  const [editName, setEditName] = useState("");
-  const [editColor, setEditColor] = useState("#607D8B");
-  const [editDescription, setEditDescription] = useState("");
+  const [editName, setEditName] = useState('');
+  const [editColor, setEditColor] = useState('#607D8B');
+  const [editDescription, setEditDescription] = useState('');
 
   // Load
   const loadTags = async () => {
@@ -81,7 +81,7 @@ const TagsPage: React.FC = () => {
       const items = await tagService.list();
       setTags(items);
     } catch {
-      enqueueSnackbar(t("errors.loadError"), { variant: "error" });
+      enqueueSnackbar(t('errors.loadError'), { variant: 'error' });
     } finally {
       setLoading(false);
     }
@@ -95,9 +95,7 @@ const TagsPage: React.FC = () => {
     const q = query.trim().toLowerCase();
     return tags.filter(
       (x) =>
-        !q ||
-        x.name.toLowerCase().includes(q) ||
-        (x.description || "").toLowerCase().includes(q),
+        !q || x.name.toLowerCase().includes(q) || (x.description || '').toLowerCase().includes(q)
     );
   }, [tags, query]);
 
@@ -112,15 +110,15 @@ const TagsPage: React.FC = () => {
         description: newDescription || null,
       });
       setTags((prev) => [...prev, tag]);
-      setNewName("");
-      setNewDescription("");
-      enqueueSnackbar(t("common.success"), { variant: "success" });
+      setNewName('');
+      setNewDescription('');
+      enqueueSnackbar(t('common.success'), { variant: 'success' });
     } catch (e: any) {
       const msg = e?.response?.data?.error?.message;
       if (msg && /exists/i.test(msg)) {
-        enqueueSnackbar(t("tags.duplicateName"), { variant: "error" });
+        enqueueSnackbar(t('tags.duplicateName'), { variant: 'error' });
       } else {
-        enqueueSnackbar(msg || t("errors.saveError"), { variant: "error" });
+        enqueueSnackbar(msg || t('errors.saveError'), { variant: 'error' });
       }
     }
   };
@@ -129,22 +127,21 @@ const TagsPage: React.FC = () => {
     try {
       await tagService.remove(id);
       setTags((prev) => prev.filter((t) => t.id !== id));
-      enqueueSnackbar(t("common.success"), { variant: "success" });
+      enqueueSnackbar(t('common.success'), { variant: 'success' });
     } catch (e: any) {
-      enqueueSnackbar(
-        e?.response?.data?.error?.message || t("errors.deleteError"),
-        { variant: "error" },
-      );
+      enqueueSnackbar(e?.response?.data?.error?.message || t('errors.deleteError'), {
+        variant: 'error',
+      });
     }
   };
 
   const openDeleteDialog = (tag: Tag) => {
     setDeleteTarget(tag);
-    setConfirmName("");
+    setConfirmName('');
   };
   const closeDeleteDialog = () => {
     setDeleteTarget(null);
-    setConfirmName("");
+    setConfirmName('');
   };
   const confirmDelete = async () => {
     if (!deleteTarget) return;
@@ -156,7 +153,7 @@ const TagsPage: React.FC = () => {
     setEditingId(tag.id);
     setEditName(tag.name);
     setEditColor(tag.color);
-    setEditDescription(tag.description || "");
+    setEditDescription(tag.description || '');
   };
 
   const cancelEdit = () => {
@@ -166,7 +163,7 @@ const TagsPage: React.FC = () => {
   const saveEdit = async (id: number) => {
     const name = editName.trim();
     if (!name) {
-      enqueueSnackbar(t("tags.nameRequired"), { variant: "error" });
+      enqueueSnackbar(t('tags.nameRequired'), { variant: 'error' });
       return;
     }
 
@@ -178,15 +175,15 @@ const TagsPage: React.FC = () => {
       });
       setTags((prev) => prev.map((t) => (t.id === id ? updated : t)));
       setEditingId(null);
-      enqueueSnackbar(t("common.success"), { variant: "success" });
+      enqueueSnackbar(t('common.success'), { variant: 'success' });
     } catch (e: any) {
       const msg = e?.response?.data?.error?.message;
       if (msg && /exists/i.test(msg)) {
-        enqueueSnackbar(t("tags.duplicateName"), { variant: "error" });
+        enqueueSnackbar(t('tags.duplicateName'), { variant: 'error' });
       } else if (msg && /required/i.test(msg)) {
-        enqueueSnackbar(t("tags.nameRequired"), { variant: "error" });
+        enqueueSnackbar(t('tags.nameRequired'), { variant: 'error' });
       } else {
-        enqueueSnackbar(msg || t("errors.saveError"), { variant: "error" });
+        enqueueSnackbar(msg || t('errors.saveError'), { variant: 'error' });
       }
     }
   };
@@ -200,13 +197,13 @@ const TagsPage: React.FC = () => {
   return (
     <Box sx={{ p: 3 }}>
       {/* Header toolbar */}
-      <Box sx={{ display: "flex", alignItems: "center", mb: 2, gap: 2 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, gap: 2 }}>
         <Typography variant="h4" sx={{ fontWeight: 600, flex: 1 }}>
-          {t("tags.title")}
+          {t('tags.title')}
         </Typography>
         <TextField
           size="small"
-          placeholder={t("common.search")}
+          placeholder={t('common.search')}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           sx={{ maxWidth: 300 }}
@@ -218,50 +215,46 @@ const TagsPage: React.FC = () => {
         <Card sx={{ mb: 3 }}>
           <CardContent>
             <Stack
-              direction={{ xs: "column", md: "row" }}
+              direction={{ xs: 'column', md: 'row' }}
               spacing={2}
-              alignItems={{ md: "center" }}
+              alignItems={{ md: 'center' }}
             >
-              <Tooltip title={newDescription || t("tags.noDescription")} arrow>
+              <Tooltip title={newDescription || t('tags.noDescription')} arrow>
                 <Chip
-                  label={newName || "label"}
+                  label={newName || 'label'}
                   sx={{
                     bgcolor: newColor,
                     color: getContrastColor(newColor),
                     height: 28,
-                    cursor: "help",
+                    cursor: 'help',
                   }}
                 />
               </Tooltip>
               <TextField
                 inputRef={nameInputRef}
-                label={t("tags.name")}
+                label={t('tags.name')}
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter" && newName.trim()) {
+                  if (e.key === 'Enter' && newName.trim()) {
                     handleCreate();
                   }
                 }}
                 sx={{ width: 260 }}
               />
               <TextField
-                label={t("tags.description")}
+                label={t('tags.description')}
                 value={newDescription}
                 onChange={(e) => setNewDescription(e.target.value)}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter" && newName.trim()) {
+                  if (e.key === 'Enter' && newName.trim()) {
                     handleCreate();
                   }
                 }}
                 sx={{ flex: 1, minWidth: 220 }}
               />
               <Stack direction="row" spacing={1} alignItems="center">
-                <ColorPicker
-                  value={newColor}
-                  onChange={setNewColor}
-                  label={t("common.color")}
-                />
+                <ColorPicker value={newColor} onChange={setNewColor} label={t('common.color')} />
                 <Typography variant="body2" sx={{ minWidth: 80 }}>
                   {newColor}
                 </Typography>
@@ -270,18 +263,14 @@ const TagsPage: React.FC = () => {
                 <Button
                   variant="outlined"
                   onClick={() => {
-                    setNewName("");
-                    setNewDescription("");
+                    setNewName('');
+                    setNewDescription('');
                   }}
                 >
-                  {t("common.cancel")}
+                  {t('common.cancel')}
                 </Button>
-                <Button
-                  variant="contained"
-                  onClick={handleCreate}
-                  disabled={!newName.trim()}
-                >
-                  {t("tags.addTag")}
+                <Button variant="contained" onClick={handleCreate} disabled={!newName.trim()}>
+                  {t('tags.addTag')}
                 </Button>
               </Stack>
             </Stack>
@@ -291,40 +280,32 @@ const TagsPage: React.FC = () => {
 
       {/* Table list - only show when there's data or loading */}
       <Card>
-        <CardContent sx={{ p: 0, "&:last-child": { pb: 0 } }}>
+        <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
           {loading ? (
-            <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
-              <Typography color="text.secondary">
-                {t("common.loadingData")}
-              </Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
+              <Typography color="text.secondary">{t('common.loadingData')}</Typography>
             </Box>
           ) : tags.length === 0 ? (
             <EmptyState
-              message={t("tags.noTagsFound")}
-              onAddClick={
-                canManage ? () => nameInputRef.current?.focus() : undefined
-              }
-              addButtonLabel={t("tags.addTag")}
-              subtitle={canManage ? t("common.addFirstItem") : undefined}
+              message={t('tags.noTagsFound')}
+              onAddClick={canManage ? () => nameInputRef.current?.focus() : undefined}
+              addButtonLabel={t('tags.addTag')}
+              subtitle={canManage ? t('common.addFirstItem') : undefined}
             />
           ) : filtered.length === 0 ? (
-            <EmptyState message={t("tags.noMatchingTags")} />
+            <EmptyState message={t('tags.noMatchingTags')} />
           ) : (
             <TableContainer>
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell>{t("tags.name")}</TableCell>
-                    <TableCell>{t("tags.description")}</TableCell>
-                    <TableCell sx={{ width: 100 }}>
-                      {t("common.color")}
-                    </TableCell>
-                    <TableCell>{t("common.createdAt")}</TableCell>
-                    <TableCell>{t("common.updatedAt")}</TableCell>
-                    <TableCell>{t("common.createdBy")}</TableCell>
-                    {canManage && (
-                      <TableCell align="right">{t("common.actions")}</TableCell>
-                    )}
+                    <TableCell>{t('tags.name')}</TableCell>
+                    <TableCell>{t('tags.description')}</TableCell>
+                    <TableCell sx={{ width: 100 }}>{t('common.color')}</TableCell>
+                    <TableCell>{t('common.createdAt')}</TableCell>
+                    <TableCell>{t('common.updatedAt')}</TableCell>
+                    <TableCell>{t('common.createdBy')}</TableCell>
+                    {canManage && <TableCell align="right">{t('common.actions')}</TableCell>}
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -334,7 +315,7 @@ const TagsPage: React.FC = () => {
                         <Stack direction="row" spacing={1} alignItems="center">
                           {editingId === tag.id ? (
                             <Chip
-                              label={editName || "label"}
+                              label={editName || 'label'}
                               size="small"
                               sx={{
                                 bgcolor: editColor,
@@ -342,17 +323,14 @@ const TagsPage: React.FC = () => {
                               }}
                             />
                           ) : (
-                            <Tooltip
-                              title={tag.description || t("tags.noDescription")}
-                              arrow
-                            >
+                            <Tooltip title={tag.description || t('tags.noDescription')} arrow>
                               <Chip
                                 label={tag.name}
                                 size="small"
                                 sx={{
                                   bgcolor: tag.color,
                                   color: getContrastColor(tag.color),
-                                  cursor: "help",
+                                  cursor: 'help',
                                 }}
                               />
                             </Tooltip>
@@ -363,9 +341,9 @@ const TagsPage: React.FC = () => {
                               value={editName}
                               onChange={(e) => setEditName(e.target.value)}
                               onKeyDown={(e) => {
-                                if (e.key === "Enter") {
+                                if (e.key === 'Enter') {
                                   handleSaveEdit();
-                                } else if (e.key === "Escape") {
+                                } else if (e.key === 'Escape') {
                                   cancelEdit();
                                 }
                               }}
@@ -381,9 +359,9 @@ const TagsPage: React.FC = () => {
                             value={editDescription}
                             onChange={(e) => setEditDescription(e.target.value)}
                             onKeyDown={(e) => {
-                              if (e.key === "Enter") {
+                              if (e.key === 'Enter') {
                                 handleSaveEdit();
-                              } else if (e.key === "Escape") {
+                              } else if (e.key === 'Escape') {
                                 cancelEdit();
                               }
                             }}
@@ -391,7 +369,7 @@ const TagsPage: React.FC = () => {
                           />
                         ) : (
                           <Typography variant="body2" color="text.secondary">
-                            {tag.description || "-"}
+                            {tag.description || '-'}
                           </Typography>
                         )}
                       </TableCell>
@@ -400,7 +378,7 @@ const TagsPage: React.FC = () => {
                           <ColorPicker
                             value={editColor}
                             onChange={setEditColor}
-                            label={t("common.color")}
+                            label={t('common.color')}
                             size="small"
                           />
                         ) : (
@@ -410,46 +388,40 @@ const TagsPage: React.FC = () => {
                               height: 32,
                               bgcolor: tag.color,
                               borderRadius: 0,
-                              border: "1px solid",
-                              borderColor: "divider",
+                              border: '1px solid',
+                              borderColor: 'divider',
                             }}
                           />
                         )}
                       </TableCell>
                       <TableCell sx={{ width: 180 }}>
-                        {formatDateTimeDetailed(tag.createdAt || "")}
+                        {formatDateTimeDetailed(tag.createdAt || '')}
                       </TableCell>
                       <TableCell sx={{ width: 180 }}>
-                        {formatDateTimeDetailed(tag.updatedAt || "")}
+                        {formatDateTimeDetailed(tag.updatedAt || '')}
                       </TableCell>
                       <TableCell sx={{ width: 180 }}>
                         {tag.createdByName ? (
                           <Box>
-                            <Typography variant="body2">
-                              {tag.createdByName}
-                            </Typography>
+                            <Typography variant="body2">{tag.createdByName}</Typography>
                             {tag.createdByEmail && (
                               <Typography
                                 variant="caption"
                                 color="text.secondary"
-                                sx={{ display: "block" }}
+                                sx={{ display: 'block' }}
                               >
                                 {tag.createdByEmail}
                               </Typography>
                             )}
                           </Box>
                         ) : (
-                          "-"
+                          '-'
                         )}
                       </TableCell>
                       {canManage && (
                         <TableCell align="right" sx={{ width: 140 }}>
                           {editingId === tag.id ? (
-                            <Stack
-                              direction="row"
-                              spacing={1}
-                              justifyContent="flex-end"
-                            >
+                            <Stack direction="row" spacing={1} justifyContent="flex-end">
                               <IconButton
                                 size="small"
                                 color="primary"
@@ -463,15 +435,8 @@ const TagsPage: React.FC = () => {
                               </IconButton>
                             </Stack>
                           ) : (
-                            <Stack
-                              direction="row"
-                              spacing={1}
-                              justifyContent="flex-end"
-                            >
-                              <IconButton
-                                size="small"
-                                onClick={() => startEdit(tag)}
-                              >
+                            <Stack direction="row" spacing={1} justifyContent="flex-end">
+                              <IconButton size="small" onClick={() => startEdit(tag)}>
                                 <EditIcon fontSize="small" />
                               </IconButton>
                               <IconButton
@@ -496,16 +461,16 @@ const TagsPage: React.FC = () => {
 
       {/* Delete confirmation dialog */}
       <Dialog open={!!deleteTarget} onClose={closeDeleteDialog}>
-        <DialogTitle>{t("common.confirmDelete")}</DialogTitle>
+        <DialogTitle>{t('common.confirmDelete')}</DialogTitle>
         <DialogContent>
           <Typography sx={{ mb: 1 }}>
-            {t("tags.confirmDeleteMessage", { name: deleteTarget?.name })}
+            {t('tags.confirmDeleteMessage', { name: deleteTarget?.name })}
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={closeDeleteDialog}>{t("common.cancel")}</Button>
+          <Button onClick={closeDeleteDialog}>{t('common.cancel')}</Button>
           <Button color="error" variant="contained" onClick={confirmDelete}>
-            {t("common.delete")}
+            {t('common.delete')}
           </Button>
         </DialogActions>
       </Dialog>

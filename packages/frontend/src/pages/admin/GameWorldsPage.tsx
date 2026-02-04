@@ -1,13 +1,7 @@
-import React, {
-  useState,
-  useEffect,
-  useMemo,
-  useCallback,
-  useRef,
-} from "react";
-import { useDebounce } from "../../hooks/useDebounce";
-import { useAuth } from "../../hooks/useAuth";
-import { PERMISSIONS } from "../../types/permissions";
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { useDebounce } from '../../hooks/useDebounce';
+import { useAuth } from '../../hooks/useAuth';
+import { PERMISSIONS } from '../../types/permissions';
 import {
   Box,
   Typography,
@@ -53,8 +47,8 @@ import {
   ClickAwayListener,
   Checkbox,
   Divider,
-} from "@mui/material";
-import ResizableDrawer from "../../components/common/ResizableDrawer";
+} from '@mui/material';
+import ResizableDrawer from '../../components/common/ResizableDrawer';
 import {
   Add as AddIcon,
   Edit as EditIcon,
@@ -75,7 +69,7 @@ import {
   ExpandMore as ExpandMoreIcon,
   Code as CodeIcon,
   Schedule as ScheduleIcon,
-} from "@mui/icons-material";
+} from '@mui/icons-material';
 import {
   DndContext,
   closestCenter,
@@ -84,63 +78,53 @@ import {
   useSensor,
   useSensors,
   DragEndEvent,
-} from "@dnd-kit/core";
+} from '@dnd-kit/core';
 import {
   arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
-import { useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
-import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
-import { useNavigate } from "react-router-dom";
-import { useTranslation } from "react-i18next";
-import { useSnackbar } from "notistack";
-import dayjs from "dayjs";
-import "dayjs/locale/ko";
-import "dayjs/locale/en";
-import "dayjs/locale/zh-cn";
-import { gameWorldService } from "../../services/gameWorldService";
-import { tagService, Tag } from "@/services/tagService";
-import {
-  GameWorld,
-  CreateGameWorldData,
-  GameWorldMaintenanceLocale,
-} from "../../types/gameWorld";
-import { useEnvironment } from "../../contexts/EnvironmentContext";
-import {
-  formatDateTimeDetailed,
-  formatRelativeTime,
-} from "../../utils/dateFormat";
-import { useI18n } from "../../contexts/I18nContext";
-import { copyToClipboardWithNotification } from "../../utils/clipboard";
+} from '@dnd-kit/sortable';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
+import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { useSnackbar } from 'notistack';
+import dayjs from 'dayjs';
+import 'dayjs/locale/ko';
+import 'dayjs/locale/en';
+import 'dayjs/locale/zh-cn';
+import { gameWorldService } from '../../services/gameWorldService';
+import { tagService, Tag } from '@/services/tagService';
+import { GameWorld, CreateGameWorldData, GameWorldMaintenanceLocale } from '../../types/gameWorld';
+import { useEnvironment } from '../../contexts/EnvironmentContext';
+import { formatDateTimeDetailed, formatRelativeTime } from '../../utils/dateFormat';
+import { useI18n } from '../../contexts/I18nContext';
+import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import {
   computeMaintenanceStatus,
   getMaintenanceStatusDisplay,
   MaintenanceStatusType,
-} from "@/utils/maintenanceStatusUtils";
-import FormDialogHeader from "../../components/common/FormDialogHeader";
-import EmptyState from "../../components/common/EmptyState";
-import translationService from "../../services/translationService";
+} from '@/utils/maintenanceStatusUtils';
+import FormDialogHeader from '../../components/common/FormDialogHeader';
+import EmptyState from '../../components/common/EmptyState';
+import translationService from '../../services/translationService';
 import DynamicFilterBar, {
   FilterDefinition,
   ActiveFilter,
-} from "../../components/common/DynamicFilterBar";
-import {
-  messageTemplateService,
-  MessageTemplate,
-} from "@/services/messageTemplateService";
-import GameWorldSDKGuideDrawer from "../../components/gameWorlds/GameWorldSDKGuideDrawer";
-import { parseApiErrorMessage } from "../../utils/errorUtils";
-import { showChangeRequestCreatedToast } from "../../utils/changeRequestToast";
-import { getActionLabel } from "../../utils/changeRequestToast";
-import GameWorldForm from "../../components/admin/GameWorldForm";
-import MaintenanceSettingsInput from "../../components/common/MaintenanceSettingsInput";
-import { parseJson5 } from "../../components/common/JsonEditor";
-import { TableLoadingRow } from "@/components/common/TableLoadingRow";
-import { TableSkeletonRows } from "@/components/common/TableSkeletonRows";
-import SearchTextField from "../../components/common/SearchTextField";
+} from '../../components/common/DynamicFilterBar';
+import { messageTemplateService, MessageTemplate } from '@/services/messageTemplateService';
+import GameWorldSDKGuideDrawer from '../../components/gameWorlds/GameWorldSDKGuideDrawer';
+import { parseApiErrorMessage } from '../../utils/errorUtils';
+import { showChangeRequestCreatedToast } from '../../utils/changeRequestToast';
+import { getActionLabel } from '../../utils/changeRequestToast';
+import GameWorldForm from '../../components/admin/GameWorldForm';
+import MaintenanceSettingsInput from '../../components/common/MaintenanceSettingsInput';
+import { parseJson5 } from '../../components/common/JsonEditor';
+import { TableLoadingRow } from '@/components/common/TableLoadingRow';
+import { TableSkeletonRows } from '@/components/common/TableSkeletonRows';
+import SearchTextField from '../../components/common/SearchTextField';
 
 // Column definition interface
 interface ColumnConfig {
@@ -156,19 +140,11 @@ interface SortableColumnItemProps {
   onToggleVisibility: (id: string) => void;
 }
 
-const SortableColumnItem: React.FC<SortableColumnItemProps> = ({
-  column,
-  onToggleVisibility,
-}) => {
+const SortableColumnItem: React.FC<SortableColumnItemProps> = ({ column, onToggleVisibility }) => {
   const { t } = useTranslation();
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: column.id });
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: column.id,
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -186,21 +162,17 @@ const SortableColumnItem: React.FC<SortableColumnItemProps> = ({
           {...attributes}
           {...listeners}
           sx={{
-            cursor: "grab",
-            display: "flex",
-            alignItems: "center",
-            "&:active": { cursor: "grabbing" },
+            cursor: 'grab',
+            display: 'flex',
+            alignItems: 'center',
+            '&:active': { cursor: 'grabbing' },
           }}
         >
-          <DragIndicatorIcon sx={{ color: "text.disabled", fontSize: 20 }} />
+          <DragIndicatorIcon sx={{ color: 'text.disabled', fontSize: 20 }} />
         </Box>
       }
     >
-      <ListItemButton
-        dense
-        onClick={() => onToggleVisibility(column.id)}
-        sx={{ pr: 6 }}
-      >
+      <ListItemButton dense onClick={() => onToggleVisibility(column.id)} sx={{ pr: 6 }}>
         <Checkbox
           edge="start"
           checked={column.visible}
@@ -210,10 +182,7 @@ const SortableColumnItem: React.FC<SortableColumnItemProps> = ({
           icon={<VisibilityOffIcon fontSize="small" />}
           checkedIcon={<VisibilityIcon fontSize="small" />}
         />
-        <ListItemText
-          primary={t(column.labelKey)}
-          slotProps={{ primary: { variant: "body2" } }}
-        />
+        <ListItemText primary={t(column.labelKey)} slotProps={{ primary: { variant: 'body2' } }} />
       </ListItemButton>
     </ListItem>
   );
@@ -251,14 +220,9 @@ const SortableRow: React.FC<SortableRowProps> = ({
   highlight,
   canManage = true,
 }) => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: world.id });
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: world.id,
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -270,19 +234,19 @@ const SortableRow: React.FC<SortableRowProps> = ({
 
   const renderTags = (tags?: Tag[] | null) => {
     const items = (tags || []).slice(0, 6);
-    if (items.length === 0) return "-";
+    if (items.length === 0) return '-';
     return (
-      <Box sx={{ display: "flex", gap: 0.5, flexWrap: "wrap", maxWidth: 220 }}>
+      <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', maxWidth: 220 }}>
         {items.map((tag, idx) => (
           <Tooltip
             key={`${tag.id}-${idx}`}
-            title={tag.description || t("tags.noDescription")}
+            title={tag.description || t('tags.noDescription')}
             arrow
           >
             <Chip
               label={tag.name}
               size="small"
-              sx={{ bgcolor: tag.color, color: "#fff", cursor: "help" }}
+              sx={{ bgcolor: tag.color, color: '#fff', cursor: 'help' }}
             />
           </Tooltip>
         ))}
@@ -297,8 +261,8 @@ const SortableRow: React.FC<SortableRowProps> = ({
       hover
       data-world-id={world.id}
       sx={{
-        bgcolor: highlight ? "rgba(25,118,210,0.12)" : undefined,
-        transition: "background-color 1.2s ease",
+        bgcolor: highlight ? 'rgba(25,118,210,0.12)' : undefined,
+        transition: 'background-color 1.2s ease',
       }}
     >
       <TableCell>
@@ -306,7 +270,7 @@ const SortableRow: React.FC<SortableRowProps> = ({
           size="small"
           {...attributes}
           {...listeners}
-          sx={{ cursor: "grab", "&:active": { cursor: "grabbing" } }}
+          sx={{ cursor: 'grab', '&:active': { cursor: 'grabbing' } }}
         >
           <DragIcon />
         </IconButton>
@@ -324,15 +288,12 @@ const SortableRow: React.FC<SortableRowProps> = ({
             <Typography variant="body2" sx={{ fontWeight: 500 }}>
               {world.createdByName}
             </Typography>
-            <Typography
-              variant="caption"
-              sx={{ color: "text.secondary", display: "block" }}
-            >
+            <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
               {world.createdByEmail}
             </Typography>
           </Box>
         ) : (
-          <Typography variant="body2" sx={{ color: "text.secondary" }}>
+          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
             -
           </Typography>
         )}
@@ -340,23 +301,19 @@ const SortableRow: React.FC<SortableRowProps> = ({
       {canManage && (
         <TableCell align="center">
           {/* Duplicate world (copy values into new form, worldId cleared) */}
-          <Tooltip title={t("common.copy")}>
+          <Tooltip title={t('common.copy')}>
             <IconButton size="small" onClick={() => onDuplicate(world)}>
               <CopyIcon />
             </IconButton>
           </Tooltip>
 
-          <Tooltip title={t("gameWorlds.editGameWorld")}>
+          <Tooltip title={t('gameWorlds.editGameWorld')}>
             <IconButton size="small" onClick={() => onEdit(world)}>
               <EditIcon />
             </IconButton>
           </Tooltip>
-          <Tooltip title={t("gameWorlds.deleteGameWorld")}>
-            <IconButton
-              size="small"
-              onClick={() => onDelete(world.id)}
-              color="error"
-            >
+          <Tooltip title={t('gameWorlds.deleteGameWorld')}>
+            <IconButton size="small" onClick={() => onDelete(world.id)} color="error">
               <DeleteIcon />
             </IconButton>
           </Tooltip>
@@ -379,7 +336,7 @@ const GameWorldsPage: React.FC = () => {
   const [worlds, setWorlds] = useState<GameWorld[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState('');
 
   // 디바운싱된 검색어 (500ms 지연)
   const debouncedSearch = useDebounce(search, 500);
@@ -390,23 +347,21 @@ const GameWorldsPage: React.FC = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingWorld, setEditingWorld] = useState<GameWorld | null>(null);
   const [formData, setFormData] = useState<CreateGameWorldData>({
-    worldId: "",
-    name: "",
+    worldId: '',
+    name: '',
     isVisible: true,
     isMaintenance: false,
-    description: "",
-    maintenanceStartDate: "",
-    maintenanceEndDate: "",
-    maintenanceMessage: "",
+    description: '',
+    maintenanceStartDate: '',
+    maintenanceEndDate: '',
+    maintenanceMessage: '',
     supportsMultiLanguage: false,
     maintenanceLocales: [],
-    worldServerAddress: "",
+    worldServerAddress: '',
     tagIds: [],
   });
   const [formTags, setFormTags] = useState<Tag[]>([]);
-  const [maintenanceLocales, setMaintenanceLocales] = useState<
-    GameWorldMaintenanceLocale[]
-  >([]);
+  const [maintenanceLocales, setMaintenanceLocales] = useState<GameWorldMaintenanceLocale[]>([]);
   const [supportsMultiLanguage, setSupportsMultiLanguage] = useState(false);
 
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
@@ -430,11 +385,11 @@ const GameWorldsPage: React.FC = () => {
     open: false,
     world: null,
     isActivating: false,
-    confirmInput: "",
+    confirmInput: '',
     maintenanceData: {
-      maintenanceStartDate: "",
-      maintenanceEndDate: "",
-      maintenanceMessage: "",
+      maintenanceStartDate: '',
+      maintenanceEndDate: '',
+      maintenanceMessage: '',
       supportsMultiLanguage: false,
       maintenanceLocales: [],
       forceDisconnect: false,
@@ -444,60 +399,53 @@ const GameWorldsPage: React.FC = () => {
   const [toggleMaintenanceLocales, setToggleMaintenanceLocales] = useState<
     GameWorldMaintenanceLocale[]
   >([]);
-  const [toggleSupportsMultiLanguage, setToggleSupportsMultiLanguage] =
-    useState(false);
+  const [toggleSupportsMultiLanguage, setToggleSupportsMultiLanguage] = useState(false);
 
   // 메시지 템플릿 관련 state
-  const [messageTemplates, setMessageTemplates] = useState<MessageTemplate[]>(
-    [],
-  );
-  const [toggleInputMode, setToggleInputMode] = useState<"direct" | "template">(
-    "direct",
-  );
-  const [toggleSelectedTemplateId, setToggleSelectedTemplateId] = useState<
-    number | ""
-  >("");
+  const [messageTemplates, setMessageTemplates] = useState<MessageTemplate[]>([]);
+  const [toggleInputMode, setToggleInputMode] = useState<'direct' | 'template'>('direct');
+  const [toggleSelectedTemplateId, setToggleSelectedTemplateId] = useState<number | ''>('');
 
   // 게임월드 편집 폼용 state
-  const [inputMode, setInputMode] = useState<"direct" | "template">("direct");
-  const [selectedTemplateId, setSelectedTemplateId] = useState<number | "">("");
+  const [inputMode, setInputMode] = useState<'direct' | 'template'>('direct');
+  const [selectedTemplateId, setSelectedTemplateId] = useState<number | ''>('');
 
   const worldIdRef = useRef<HTMLInputElement>(null);
 
   // Custom payload JSON editor state
-  const [customPayloadText, setCustomPayloadText] = useState<string>("{}");
-  const [customPayloadError, setCustomPayloadError] = useState<string>("");
+  const [customPayloadText, setCustomPayloadText] = useState<string>('{}');
+  const [customPayloadError, setCustomPayloadError] = useState<string>('');
 
   // Infra settings JSON editor state
-  const [infraSettingsText, setInfraSettingsText] = useState<string>("{}");
-  const [infraSettingsError, setInfraSettingsError] = useState<string>("");
+  const [infraSettingsText, setInfraSettingsText] = useState<string>('{}');
+  const [infraSettingsError, setInfraSettingsError] = useState<string>('');
 
   // Form active tab state (0: Basic Info, 1: Infra Settings)
   const [formActiveTab, setFormActiveTab] = useState<number>(0);
 
   // Default column configuration
   const defaultColumns: ColumnConfig[] = [
-    { id: "worldId", labelKey: "gameWorlds.worldId", visible: true },
-    { id: "name", labelKey: "gameWorlds.name", visible: true },
-    { id: "description", labelKey: "gameWorlds.description", visible: true },
+    { id: 'worldId', labelKey: 'gameWorlds.worldId', visible: true },
+    { id: 'name', labelKey: 'gameWorlds.name', visible: true },
+    { id: 'description', labelKey: 'gameWorlds.description', visible: true },
     {
-      id: "worldServerAddress",
-      labelKey: "gameWorlds.worldServerAddress",
+      id: 'worldServerAddress',
+      labelKey: 'gameWorlds.worldServerAddress',
       visible: true,
     },
-    { id: "isVisible", labelKey: "gameWorlds.isVisible", visible: true },
+    { id: 'isVisible', labelKey: 'gameWorlds.isVisible', visible: true },
     {
-      id: "isMaintenance",
-      labelKey: "gameWorlds.isMaintenance",
+      id: 'isMaintenance',
+      labelKey: 'gameWorlds.isMaintenance',
       visible: true,
     },
-    { id: "tags", labelKey: "common.tags", visible: true },
-    { id: "createdAt", labelKey: "common.createdAt", visible: true },
+    { id: 'tags', labelKey: 'common.tags', visible: true },
+    { id: 'createdAt', labelKey: 'common.createdAt', visible: true },
   ];
 
   // Column configuration state (persisted in localStorage)
   const [columns, setColumns] = useState<ColumnConfig[]>(() => {
-    const saved = localStorage.getItem("gameWorldsColumns");
+    const saved = localStorage.getItem('gameWorldsColumns');
     if (saved) {
       try {
         const savedColumns = JSON.parse(saved);
@@ -516,8 +464,7 @@ const GameWorldsPage: React.FC = () => {
   });
 
   // Column settings popover state
-  const [columnSettingsAnchor, setColumnSettingsAnchor] =
-    useState<HTMLButtonElement | null>(null);
+  const [columnSettingsAnchor, setColumnSettingsAnchor] = useState<HTMLButtonElement | null>(null);
 
   // Drag and drop sensors for column settings
   const columnSensors = useSensors(
@@ -528,7 +475,7 @@ const GameWorldsPage: React.FC = () => {
     }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    }),
+    })
   );
 
   // Highlight & scroll for recently moved row
@@ -543,8 +490,8 @@ const GameWorldsPage: React.FC = () => {
     onConfirm: () => void;
   }>({
     open: false,
-    title: "",
-    message: "",
+    title: '',
+    message: '',
     onConfirm: () => {},
   });
 
@@ -552,7 +499,7 @@ const GameWorldsPage: React.FC = () => {
   const [deleteConfirmDialog, setDeleteConfirmDialog] = useState({
     open: false,
     world: null as GameWorld | null,
-    inputValue: "",
+    inputValue: '',
   });
 
   const sensors = useSensors(
@@ -564,7 +511,7 @@ const GameWorldsPage: React.FC = () => {
     }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    }),
+    })
   );
 
   // Load registry tags for form use
@@ -581,15 +528,12 @@ const GameWorldsPage: React.FC = () => {
     const loadTemplates = async () => {
       try {
         const result = await messageTemplateService.list({ limit: 1000 });
-        console.log("[GameWorldsPage] Message templates loaded:", result);
+        console.log('[GameWorldsPage] Message templates loaded:', result);
         const enabledTemplates = result.templates.filter((t) => t.isEnabled);
-        console.log("[GameWorldsPage] Enabled templates:", enabledTemplates);
+        console.log('[GameWorldsPage] Enabled templates:', enabledTemplates);
         setMessageTemplates(enabledTemplates);
       } catch (error) {
-        console.error(
-          "[GameWorldsPage] Failed to load message templates:",
-          error,
-        );
+        console.error('[GameWorldsPage] Failed to load message templates:', error);
       }
     };
     loadTemplates();
@@ -599,15 +543,15 @@ const GameWorldsPage: React.FC = () => {
   const [openSDKGuide, setOpenSDKGuide] = useState(false);
 
   // 점검 메시지 로케일 관리 함수들
-  const addMaintenanceLocale = (lang: "ko" | "en" | "zh") => {
+  const addMaintenanceLocale = (lang: 'ko' | 'en' | 'zh') => {
     if (!maintenanceLocales.find((l) => l.lang === lang)) {
-      const newLocales = [...maintenanceLocales, { lang, message: "" }];
+      const newLocales = [...maintenanceLocales, { lang, message: '' }];
       setMaintenanceLocales(newLocales);
       setFormData((prev) => ({ ...prev, maintenanceLocales: newLocales }));
     }
   };
 
-  const removeMaintenanceLocale = (lang: "ko" | "en" | "zh") => {
+  const removeMaintenanceLocale = (lang: 'ko' | 'en' | 'zh') => {
     const newLocales = maintenanceLocales.filter((l) => l.lang !== lang);
     setMaintenanceLocales(newLocales);
     setFormData((prev) => ({ ...prev, maintenanceLocales: newLocales }));
@@ -621,7 +565,7 @@ const GameWorldsPage: React.FC = () => {
       // 활성화 시, 기존 값을 보존하면서 누락된 언어만 추가
       const merged = availableLanguages.map((lang) => {
         const existing = maintenanceLocales.find((l) => l.lang === lang.code);
-        return { lang: lang.code, message: existing?.message || "" };
+        return { lang: lang.code, message: existing?.message || '' };
       });
       setMaintenanceLocales(merged);
       setFormData((prev) => ({ ...prev, maintenanceLocales: merged }));
@@ -634,32 +578,30 @@ const GameWorldsPage: React.FC = () => {
   // 사용 가능한 언어 목록
   const availableLanguages = useMemo(
     () => [
-      { code: "ko" as const, label: t("gameWorlds.maintenanceConfig.korean") },
-      { code: "en" as const, label: t("gameWorlds.maintenanceConfig.english") },
-      { code: "zh" as const, label: t("gameWorlds.maintenanceConfig.chinese") },
+      { code: 'ko' as const, label: t('gameWorlds.maintenanceConfig.korean') },
+      { code: 'en' as const, label: t('gameWorlds.maintenanceConfig.english') },
+      { code: 'zh' as const, label: t('gameWorlds.maintenanceConfig.chinese') },
     ],
-    [t],
+    [t]
   );
 
   const usedLanguages = new Set(maintenanceLocales.map((l) => l.lang));
-  const availableToAdd = availableLanguages.filter(
-    (l) => !usedLanguages.has(l.code),
-  );
+  const availableToAdd = availableLanguages.filter((l) => !usedLanguages.has(l.code));
 
   // 날짜 로케일 설정
   const getDateLocale = () => {
-    const currentLang = i18n.language || "ko";
+    const currentLang = i18n.language || 'ko';
     switch (currentLang) {
-      case "en":
-        dayjs.locale("en");
-        return "en";
+      case 'en':
+        dayjs.locale('en');
+        return 'en';
 
-      case "zh":
-        dayjs.locale("zh-cn");
-        return "zh-cn";
+      case 'zh':
+        dayjs.locale('zh-cn');
+        return 'zh-cn';
       default:
-        dayjs.locale("ko");
-        return "ko";
+        dayjs.locale('ko');
+        return 'ko';
     }
   };
 
@@ -667,10 +609,10 @@ const GameWorldsPage: React.FC = () => {
   const availableFilterDefinitions: FilterDefinition[] = useMemo(
     () => [
       {
-        key: "tags",
-        label: t("common.tags"),
-        type: "tags",
-        operator: "include_all",
+        key: 'tags',
+        label: t('common.tags'),
+        type: 'tags',
+        operator: 'include_all',
         allowOperatorToggle: true,
         options: allRegistryTags.map((tag) => ({
           value: tag.id,
@@ -679,7 +621,7 @@ const GameWorldsPage: React.FC = () => {
         })),
       },
     ],
-    [t, allRegistryTags],
+    [t, allRegistryTags]
   );
 
   // 동적 필터 핸들러
@@ -692,18 +634,11 @@ const GameWorldsPage: React.FC = () => {
   };
 
   const handleDynamicFilterChange = (key: string, value: any) => {
-    setActiveFilters((prev) =>
-      prev.map((f) => (f.key === key ? { ...f, value } : f)),
-    );
+    setActiveFilters((prev) => prev.map((f) => (f.key === key ? { ...f, value } : f)));
   };
 
-  const handleOperatorChange = (
-    key: string,
-    operator: "any_of" | "include_all",
-  ) => {
-    setActiveFilters((prev) =>
-      prev.map((f) => (f.key === key ? { ...f, operator } : f)),
-    );
+  const handleOperatorChange = (key: string, operator: 'any_of' | 'include_all') => {
+    setActiveFilters((prev) => prev.map((f) => (f.key === key ? { ...f, operator } : f)));
   };
 
   // Check if form is dirty (data changed)
@@ -711,22 +646,18 @@ const GameWorldsPage: React.FC = () => {
     if (!editingWorld) return true;
 
     // Normalize payloads for comparison
-    let normalizedCurrentPayload = "{}";
+    let normalizedCurrentPayload = '{}';
     try {
-      normalizedCurrentPayload = JSON.stringify(
-        JSON.parse(customPayloadText || "{}"),
-      );
+      normalizedCurrentPayload = JSON.stringify(JSON.parse(customPayloadText || '{}'));
     } catch (e) {
       normalizedCurrentPayload = customPayloadText;
     }
 
-    let normalizedOriginalPayload = "{}";
+    let normalizedOriginalPayload = '{}';
     try {
-      normalizedOriginalPayload = JSON.stringify(
-        editingWorld.customPayload || {},
-      );
+      normalizedOriginalPayload = JSON.stringify(editingWorld.customPayload || {});
     } catch (e) {
-      normalizedOriginalPayload = "{}";
+      normalizedOriginalPayload = '{}';
     }
 
     const currentData = {
@@ -734,21 +665,19 @@ const GameWorldsPage: React.FC = () => {
       name: formData.name,
       isVisible: !!formData.isVisible,
       isMaintenance: !!formData.isMaintenance,
-      description: formData.description || "",
+      description: formData.description || '',
       worldServerAddress: formData.worldServerAddress || null,
-      maintenanceStartDate: formData.maintenanceStartDate || "",
-      maintenanceEndDate: formData.maintenanceEndDate || "",
-      maintenanceMessage: formData.maintenanceMessage || "",
+      maintenanceStartDate: formData.maintenanceStartDate || '',
+      maintenanceEndDate: formData.maintenanceEndDate || '',
+      maintenanceMessage: formData.maintenanceMessage || '',
       supportsMultiLanguage: !!supportsMultiLanguage,
       maintenanceLocales: maintenanceLocales
-        .filter((l) => l.message.trim() !== "")
+        .filter((l) => l.message.trim() !== '')
         .map((l) => ({ lang: l.lang, message: l.message })),
       forceDisconnect: !!formData.forceDisconnect,
-      gracePeriodMinutes: formData.forceDisconnect
-        ? (formData.gracePeriodMinutes ?? 5)
-        : undefined,
+      gracePeriodMinutes: formData.forceDisconnect ? (formData.gracePeriodMinutes ?? 5) : undefined,
       customPayload: normalizedCurrentPayload,
-      infraSettingsRaw: (infraSettingsText || "").trim(),
+      infraSettingsRaw: (infraSettingsText || '').trim(),
       tagIds: (formTags || []).map((t) => t.id).sort((a, b) => a - b),
     };
 
@@ -757,14 +686,14 @@ const GameWorldsPage: React.FC = () => {
       name: editingWorld.name,
       isVisible: !!editingWorld.isVisible,
       isMaintenance: !!editingWorld.isMaintenance,
-      description: editingWorld.description || "",
+      description: editingWorld.description || '',
       worldServerAddress: editingWorld.worldServerAddress || null,
-      maintenanceStartDate: editingWorld.maintenanceStartDate || "",
-      maintenanceEndDate: editingWorld.maintenanceEndDate || "",
-      maintenanceMessage: editingWorld.maintenanceMessage || "",
+      maintenanceStartDate: editingWorld.maintenanceStartDate || '',
+      maintenanceEndDate: editingWorld.maintenanceEndDate || '',
+      maintenanceMessage: editingWorld.maintenanceMessage || '',
       supportsMultiLanguage: !!editingWorld.supportsMultiLanguage,
       maintenanceLocales: (editingWorld.maintenanceLocales || [])
-        .filter((l) => l.message.trim() !== "")
+        .filter((l) => l.message.trim() !== '')
         .map((l) => ({ lang: l.lang, message: l.message })),
       forceDisconnect: !!editingWorld.forceDisconnect,
       gracePeriodMinutes: editingWorld.forceDisconnect
@@ -772,8 +701,7 @@ const GameWorldsPage: React.FC = () => {
         : undefined,
       customPayload: normalizedOriginalPayload,
       infraSettingsRaw: (
-        editingWorld.infraSettingsRaw ||
-        JSON.stringify(editingWorld.infraSettings || {}, null, 2)
+        editingWorld.infraSettingsRaw || JSON.stringify(editingWorld.infraSettings || {}, null, 2)
       ).trim(),
       tagIds: (editingWorld.tags || []).map((t) => t.id).sort((a, b) => a - b),
     };
@@ -799,7 +727,7 @@ const GameWorldsPage: React.FC = () => {
     };
 
     // allRegistryTags가 로드된 후에만 게임월드를 로드
-    const tagFilter = activeFilters.find((f) => f.key === "tags");
+    const tagFilter = activeFilters.find((f) => f.key === 'tags');
     if (
       allRegistryTags.length > 0 ||
       !tagFilter ||
@@ -811,21 +739,16 @@ const GameWorldsPage: React.FC = () => {
     return () => {
       isMounted = false;
     };
-  }, [
-    debouncedSearch,
-    activeFilters,
-    allRegistryTags.length,
-    currentEnvironmentId,
-  ]);
+  }, [debouncedSearch, activeFilters, allRegistryTags.length, currentEnvironmentId]);
 
   // Scroll moved row into view when worlds reload and highlight is set
   useEffect(() => {
     if (recentlyMovedId != null) {
       const el = document.querySelector(
-        `[data-world-id="${recentlyMovedId}"]`,
+        `[data-world-id="${recentlyMovedId}"]`
       ) as HTMLElement | null;
       if (el) {
-        el.scrollIntoView({ behavior: "smooth", block: "center" });
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
     }
   }, [recentlyMovedId, worlds]);
@@ -842,9 +765,7 @@ const GameWorldsPage: React.FC = () => {
   // Avoid mobile viewport scroll zoom/focus issues by disabling autoScroll and portal for Autocomplete
   const autocompleteSlotProps = {
     popper: {
-      modifiers: [
-        { name: "preventOverflow", options: { altAxis: true, tether: true } },
-      ],
+      modifiers: [{ name: 'preventOverflow', options: { altAxis: true, tether: true } }],
     },
     paper: { sx: { maxHeight: 280 } },
   } as const;
@@ -860,11 +781,9 @@ const GameWorldsPage: React.FC = () => {
       setLoading(true);
 
       // 태그 필터에서 태그 ID 추출
-      const tagFilter = activeFilters.find((f) => f.key === "tags");
+      const tagFilter = activeFilters.find((f) => f.key === 'tags');
       const tagIds =
-        tagFilter &&
-        Array.isArray(tagFilter.value) &&
-        tagFilter.value.length > 0
+        tagFilter && Array.isArray(tagFilter.value) && tagFilter.value.length > 0
           ? tagFilter.value
           : [];
       const tagOperator = tagFilter?.operator;
@@ -872,21 +791,18 @@ const GameWorldsPage: React.FC = () => {
       const result = await gameWorldService.getGameWorlds({
         // 서버 컨트롤러는 tagIds(쉼표구분)를 기대함
         search: debouncedSearch || undefined,
-        tagIds: tagIds.length ? tagIds.join(",") : undefined,
+        tagIds: tagIds.length ? tagIds.join(',') : undefined,
         tags_operator: tagOperator,
       });
 
       setWorlds(result.worlds);
     } catch (error: any) {
-      console.error("Failed to load game worlds:", error);
+      console.error('Failed to load game worlds:', error);
 
       // 네트워크 오류인 경우에만 toast 표시
-      if (
-        error.message?.includes("Network Error") ||
-        error.code === "NETWORK_ERROR"
-      ) {
-        enqueueSnackbar(t("gameWorlds.errors.loadFailed"), {
-          variant: "error",
+      if (error.message?.includes('Network Error') || error.code === 'NETWORK_ERROR') {
+        enqueueSnackbar(t('gameWorlds.errors.loadFailed'), {
+          variant: 'error',
         });
       }
     } finally {
@@ -900,15 +816,15 @@ const GameWorldsPage: React.FC = () => {
   const handleAddWorld = () => {
     setEditingWorld(null);
     setFormData({
-      worldId: "",
-      name: "",
+      worldId: '',
+      name: '',
       isVisible: true,
       isMaintenance: false,
-      description: "",
-      worldServerAddress: "",
-      maintenanceStartDate: "",
-      maintenanceEndDate: "",
-      maintenanceMessage: "",
+      description: '',
+      worldServerAddress: '',
+      maintenanceStartDate: '',
+      maintenanceEndDate: '',
+      maintenanceMessage: '',
       supportsMultiLanguage: false,
       maintenanceLocales: [],
       forceDisconnect: false,
@@ -917,15 +833,15 @@ const GameWorldsPage: React.FC = () => {
       tagIds: [],
     });
 
-    setCustomPayloadText("{}");
-    setCustomPayloadError("");
-    setInfraSettingsText("{}");
-    setInfraSettingsError("");
+    setCustomPayloadText('{}');
+    setCustomPayloadError('');
+    setInfraSettingsText('{}');
+    setInfraSettingsError('');
     setFormTags([]);
     setMaintenanceLocales([]);
     setSupportsMultiLanguage(false);
-    setInputMode("direct");
-    setSelectedTemplateId("");
+    setInputMode('direct');
+    setSelectedTemplateId('');
     setFormErrors({});
     setFormActiveTab(0); // Reset to Basic Info tab
     setDialogOpen(true);
@@ -939,8 +855,7 @@ const GameWorldsPage: React.FC = () => {
     setEditingWorld(world);
 
     // 언어별 메시지가 있는지 확인
-    const hasMaintenanceLocales =
-      world.maintenanceLocales && world.maintenanceLocales.length > 0;
+    const hasMaintenanceLocales = world.maintenanceLocales && world.maintenanceLocales.length > 0;
     const shouldEnableMultiLanguage =
       (world.supportsMultiLanguage ?? false) || hasMaintenanceLocales;
 
@@ -949,11 +864,11 @@ const GameWorldsPage: React.FC = () => {
       name: world.name,
       isVisible: Boolean(world.isVisible),
       isMaintenance: Boolean(world.isMaintenance),
-      description: world.description || "",
+      description: world.description || '',
       worldServerAddress: world.worldServerAddress || null,
-      maintenanceStartDate: world.maintenanceStartDate || "",
-      maintenanceEndDate: world.maintenanceEndDate || "",
-      maintenanceMessage: world.maintenanceMessage || "",
+      maintenanceStartDate: world.maintenanceStartDate || '',
+      maintenanceEndDate: world.maintenanceEndDate || '',
+      maintenanceMessage: world.maintenanceMessage || '',
       supportsMultiLanguage: shouldEnableMultiLanguage,
       maintenanceLocales: world.maintenanceLocales || [],
       forceDisconnect: world.forceDisconnect ?? false,
@@ -962,18 +877,17 @@ const GameWorldsPage: React.FC = () => {
       tagIds: (world.tags || []).map((t) => t.id),
     });
     setCustomPayloadText(JSON.stringify(world.customPayload || {}, null, 2));
-    setCustomPayloadError("");
+    setCustomPayloadError('');
     // Use infraSettingsRaw for editing (preserves JSON5 with comments), fallback to JSON.stringify
     setInfraSettingsText(
-      world.infraSettingsRaw ||
-        JSON.stringify(world.infraSettings || {}, null, 2),
+      world.infraSettingsRaw || JSON.stringify(world.infraSettings || {}, null, 2)
     );
-    setInfraSettingsError("");
+    setInfraSettingsError('');
     setFormTags(world.tags || []);
     setMaintenanceLocales(world.maintenanceLocales || []);
     setSupportsMultiLanguage(shouldEnableMultiLanguage);
-    setInputMode("direct");
-    setSelectedTemplateId("");
+    setInputMode('direct');
+    setSelectedTemplateId('');
     setFormErrors({});
     setFormActiveTab(0); // Reset to Basic Info tab
     setDialogOpen(true);
@@ -983,21 +897,20 @@ const GameWorldsPage: React.FC = () => {
     // Duplicate: open in create mode with fields copied, but clear worldId
     setEditingWorld(null);
 
-    const hasMaintenanceLocales =
-      world.maintenanceLocales && world.maintenanceLocales.length > 0;
+    const hasMaintenanceLocales = world.maintenanceLocales && world.maintenanceLocales.length > 0;
     const shouldEnableMultiLanguage =
       (world.supportsMultiLanguage ?? false) || hasMaintenanceLocales;
 
     setFormData({
-      worldId: "", // must be empty for new world
-      name: world.name || "",
+      worldId: '', // must be empty for new world
+      name: world.name || '',
       isVisible: Boolean(world.isVisible),
       isMaintenance: Boolean(world.isMaintenance),
-      description: world.description || "",
+      description: world.description || '',
       worldServerAddress: world.worldServerAddress || null,
-      maintenanceStartDate: world.maintenanceStartDate || "",
-      maintenanceEndDate: world.maintenanceEndDate || "",
-      maintenanceMessage: world.maintenanceMessage || "",
+      maintenanceStartDate: world.maintenanceStartDate || '',
+      maintenanceEndDate: world.maintenanceEndDate || '',
+      maintenanceMessage: world.maintenanceMessage || '',
       supportsMultiLanguage: shouldEnableMultiLanguage,
       maintenanceLocales: world.maintenanceLocales || [],
       forceDisconnect: world.forceDisconnect ?? false,
@@ -1007,18 +920,17 @@ const GameWorldsPage: React.FC = () => {
     });
 
     setCustomPayloadText(JSON.stringify(world.customPayload || {}, null, 2));
-    setCustomPayloadError("");
+    setCustomPayloadError('');
     // Use infraSettingsRaw for editing (preserves JSON5 with comments), fallback to JSON.stringify
     setInfraSettingsText(
-      world.infraSettingsRaw ||
-        JSON.stringify(world.infraSettings || {}, null, 2),
+      world.infraSettingsRaw || JSON.stringify(world.infraSettings || {}, null, 2)
     );
-    setInfraSettingsError("");
+    setInfraSettingsError('');
     setFormTags(world.tags || []);
     setMaintenanceLocales(world.maintenanceLocales || []);
     setSupportsMultiLanguage(shouldEnableMultiLanguage);
-    setInputMode("direct");
-    setSelectedTemplateId("");
+    setInputMode('direct');
+    setSelectedTemplateId('');
     setFormErrors({});
     setFormActiveTab(0); // Reset to Basic Info tab
     setDialogOpen(true);
@@ -1034,30 +946,28 @@ const GameWorldsPage: React.FC = () => {
     const errors: Record<string, string> = {};
 
     if (!formData.worldId.trim()) {
-      errors.worldId = t("validation.fieldRequired", {
-        field: t("gameWorlds.worldId"),
+      errors.worldId = t('validation.fieldRequired', {
+        field: t('gameWorlds.worldId'),
       });
     }
 
     if (!formData.name.trim()) {
-      errors.name = t("validation.fieldRequired", {
-        field: t("gameWorlds.name"),
+      errors.name = t('validation.fieldRequired', {
+        field: t('gameWorlds.name'),
       });
     }
 
     // worldServerAddress 필수 체크 및 형식 검증 (일반 URL 또는 host[:port] 허용)
     if (!formData.worldServerAddress || !formData.worldServerAddress.trim()) {
-      errors.worldServerAddress = t("validation.fieldRequired", {
-        field: t("gameWorlds.worldServerAddress"),
+      errors.worldServerAddress = t('validation.fieldRequired', {
+        field: t('gameWorlds.worldServerAddress'),
       });
     } else if (
       !/^(?:[a-zA-Z][a-zA-Z0-9+.-]*:\/\/\S+|[a-zA-Z0-9.-]+(:\d+)?)$/.test(
-        formData.worldServerAddress.trim(),
+        formData.worldServerAddress.trim()
       )
     ) {
-      errors.worldServerAddress = t(
-        "gameWorlds.form.worldServerAddressInvalid",
-      );
+      errors.worldServerAddress = t('gameWorlds.form.worldServerAddressInvalid');
     }
 
     // 점검 모드일 때 기본 점검 메시지 필수 체크
@@ -1065,35 +975,32 @@ const GameWorldsPage: React.FC = () => {
       formData.isMaintenance &&
       (!formData.maintenanceMessage || !formData.maintenanceMessage.trim())
     ) {
-      errors.maintenanceMessage = t("gameWorlds.maintenance.messageRequired");
+      errors.maintenanceMessage = t('gameWorlds.maintenance.messageRequired');
     }
 
     // 점검 모드일 때 기간 및 유예시간 검증
     if (formData.isMaintenance && formData.maintenanceEndDate) {
       const now = dayjs();
-      const startsAt = formData.maintenanceStartDate
-        ? dayjs(formData.maintenanceStartDate)
-        : null;
+      const startsAt = formData.maintenanceStartDate ? dayjs(formData.maintenanceStartDate) : null;
       const endsAt = dayjs(formData.maintenanceEndDate);
       const effectiveStart = startsAt || now;
-      const duration = endsAt.diff(effectiveStart, "minute");
+      const duration = endsAt.diff(effectiveStart, 'minute');
 
       // Minimum 5 minutes validation
       if (duration < 5) {
-        errors.maintenanceEndDate = t(
-          "gameWorlds.maintenanceConfig.validationMinDuration",
-          { duration: Math.max(0, duration) },
-        );
+        errors.maintenanceEndDate = t('gameWorlds.maintenanceConfig.validationMinDuration', {
+          duration: Math.max(0, duration),
+        });
       }
 
       // Grace period validation (if forceDisconnect is enabled)
       if (formData.forceDisconnect && formData.gracePeriodMinutes >= duration) {
         errors.gracePeriodMinutes = t(
-          "gameWorlds.maintenanceConfig.validationGracePeriodExceedsDuration",
+          'gameWorlds.maintenanceConfig.validationGracePeriodExceedsDuration',
           {
             duration,
             gracePeriod: formData.gracePeriodMinutes,
-          },
+          }
         );
       }
     }
@@ -1104,9 +1011,7 @@ const GameWorldsPage: React.FC = () => {
 
   const allTags = useMemo(() => {
     const list = new Map<string, Tag>();
-    worlds.forEach((w) =>
-      (w.tags || []).forEach((t) => list.set(t.name.toLowerCase(), t)),
-    );
+    worlds.forEach((w) => (w.tags || []).forEach((t) => list.set(t.name.toLowerCase(), t)));
     // merge with registry
     allRegistryTags.forEach((t) => list.set(t.name.toLowerCase(), t));
     return Array.from(list.values());
@@ -1126,15 +1031,15 @@ const GameWorldsPage: React.FC = () => {
 
       // Parse custom payload JSON
       let parsedCustomPayload: any = {};
-      const text = (customPayloadText || "").trim();
+      const text = (customPayloadText || '').trim();
       if (text.length > 0) {
         try {
           parsedCustomPayload = JSON.parse(text);
-          setCustomPayloadError("");
+          setCustomPayloadError('');
         } catch (e: any) {
-          setCustomPayloadError("Invalid JSON format");
-          enqueueSnackbar("Custom payload JSON is invalid", {
-            variant: "error",
+          setCustomPayloadError('Invalid JSON format');
+          enqueueSnackbar('Custom payload JSON is invalid', {
+            variant: 'error',
           });
           setSaving(false);
           return;
@@ -1143,16 +1048,16 @@ const GameWorldsPage: React.FC = () => {
 
       // Parse infra settings JSON5 (supports comments, trailing commas, etc.)
       let parsedInfraSettings: any = {};
-      const infraText = (infraSettingsText || "").trim();
+      const infraText = (infraSettingsText || '').trim();
       if (infraText.length > 0) {
         const result = parseJson5(infraText);
         if (result.success) {
           parsedInfraSettings = result.data;
-          setInfraSettingsError("");
+          setInfraSettingsError('');
         } else {
-          setInfraSettingsError(result.error || "Invalid JSON5 format");
-          enqueueSnackbar("Infra settings JSON5 is invalid", {
-            variant: "error",
+          setInfraSettingsError(result.error || 'Invalid JSON5 format');
+          enqueueSnackbar('Infra settings JSON5 is invalid', {
+            variant: 'error',
           });
           setSaving(false);
           return;
@@ -1171,9 +1076,7 @@ const GameWorldsPage: React.FC = () => {
         maintenanceEndDate: formData.maintenanceEndDate || undefined,
         maintenanceMessage: formData.maintenanceMessage || undefined,
         supportsMultiLanguage: Boolean(formData.supportsMultiLanguage),
-        maintenanceLocales: maintenanceLocales.filter(
-          (l) => l.message.trim() !== "",
-        ),
+        maintenanceLocales: maintenanceLocales.filter((l) => l.message.trim() !== ''),
         forceDisconnect: Boolean(formData.forceDisconnect),
         gracePeriodMinutes: formData.forceDisconnect
           ? (formData.gracePeriodMinutes ?? 5)
@@ -1182,40 +1085,29 @@ const GameWorldsPage: React.FC = () => {
 
       let savedWorld: any;
       if (editingWorld) {
-        savedWorld = await gameWorldService.updateGameWorld(
-          editingWorld.id,
-          dataToSend,
-        );
+        savedWorld = await gameWorldService.updateGameWorld(editingWorld.id, dataToSend);
         if (savedWorld.isChangeRequest) {
-          showChangeRequestCreatedToast(
-            enqueueSnackbar,
-            closeSnackbar,
-            navigate,
-          );
+          showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
         } else {
-          enqueueSnackbar(t("gameWorlds.worldUpdated"), { variant: "success" });
+          enqueueSnackbar(t('gameWorlds.worldUpdated'), { variant: 'success' });
         }
       } else {
         savedWorld = await gameWorldService.createGameWorld(dataToSend);
         if (savedWorld.isChangeRequest) {
-          showChangeRequestCreatedToast(
-            enqueueSnackbar,
-            closeSnackbar,
-            navigate,
-          );
+          showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
         } else {
-          enqueueSnackbar(t("gameWorlds.worldCreated"), { variant: "success" });
+          enqueueSnackbar(t('gameWorlds.worldCreated'), { variant: 'success' });
         }
       }
 
       setDialogOpen(false);
       loadGameWorlds();
     } catch (error: any) {
-      console.error("Failed to save game world:", error);
+      console.error('Failed to save game world:', error);
       const status = error?.status || error?.response?.status;
       if (status === 409) {
-        enqueueSnackbar(t("gameWorlds.errors.alreadyExists"), {
-          variant: "error",
+        enqueueSnackbar(t('gameWorlds.errors.alreadyExists'), {
+          variant: 'error',
           autoHideDuration: 4000,
         });
         // Focus the World ID field for quick correction
@@ -1225,10 +1117,10 @@ const GameWorldsPage: React.FC = () => {
         }, 0);
       } else {
         const fallbackKey = currentEnvironment?.requiresApproval
-          ? "gameWorlds.errors.requestSaveFailed"
-          : "gameWorlds.errors.saveFailed";
+          ? 'gameWorlds.errors.requestSaveFailed'
+          : 'gameWorlds.errors.saveFailed';
         enqueueSnackbar(parseApiErrorMessage(error, fallbackKey), {
-          variant: "error",
+          variant: 'error',
           autoHideDuration: 4000,
         });
       }
@@ -1243,7 +1135,7 @@ const GameWorldsPage: React.FC = () => {
       setDeleteConfirmDialog({
         open: true,
         world,
-        inputValue: "",
+        inputValue: '',
       });
     }
   };
@@ -1254,25 +1146,19 @@ const GameWorldsPage: React.FC = () => {
       deleteConfirmDialog.inputValue === deleteConfirmDialog.world.name
     ) {
       try {
-        const result = await gameWorldService.deleteGameWorld(
-          deleteConfirmDialog.world.id,
-        );
+        const result = await gameWorldService.deleteGameWorld(deleteConfirmDialog.world.id);
 
         if (result.isChangeRequest) {
-          showChangeRequestCreatedToast(
-            enqueueSnackbar,
-            closeSnackbar,
-            navigate,
-          );
+          showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
         } else {
-          enqueueSnackbar(t("gameWorlds.worldDeleted"), { variant: "success" });
+          enqueueSnackbar(t('gameWorlds.worldDeleted'), { variant: 'success' });
           loadGameWorlds();
         }
-        setDeleteConfirmDialog({ open: false, world: null, inputValue: "" });
+        setDeleteConfirmDialog({ open: false, world: null, inputValue: '' });
       } catch (error) {
-        console.error("Failed to delete game world:", error);
-        enqueueSnackbar(t("gameWorlds.errors.deleteFailed"), {
-          variant: "error",
+        console.error('Failed to delete game world:', error);
+        enqueueSnackbar(t('gameWorlds.errors.deleteFailed'), {
+          variant: 'error',
         });
       }
     }
@@ -1287,17 +1173,16 @@ const GameWorldsPage: React.FC = () => {
       if (result.isChangeRequest) {
         showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
       } else {
-        enqueueSnackbar(t("gameWorlds.visibilityToggled"), {
-          variant: "success",
+        enqueueSnackbar(t('gameWorlds.visibilityToggled'), {
+          variant: 'success',
         });
         loadGameWorlds();
       }
     } catch (error) {
-      console.error("Failed to toggle visibility:", error);
-      enqueueSnackbar(
-        parseApiErrorMessage(error, "gameWorlds.errors.toggleVisibilityFailed"),
-        { variant: "error" },
-      );
+      console.error('Failed to toggle visibility:', error);
+      enqueueSnackbar(parseApiErrorMessage(error, 'gameWorlds.errors.toggleVisibilityFailed'), {
+        variant: 'error',
+      });
     }
   };
 
@@ -1311,19 +1196,19 @@ const GameWorldsPage: React.FC = () => {
     if (isActivating) {
       setToggleMaintenanceLocales(world.maintenanceLocales || []);
       setToggleSupportsMultiLanguage(world.supportsMultiLanguage || false);
-      setToggleInputMode("direct");
-      setToggleSelectedTemplateId("");
+      setToggleInputMode('direct');
+      setToggleSelectedTemplateId('');
     }
 
     setMaintenanceToggleDialog({
       open: true,
       world,
       isActivating,
-      confirmInput: "",
+      confirmInput: '',
       maintenanceData: {
-        maintenanceStartDate: world.maintenanceStartDate || "",
-        maintenanceEndDate: world.maintenanceEndDate || "",
-        maintenanceMessage: world.maintenanceMessage || "",
+        maintenanceStartDate: world.maintenanceStartDate || '',
+        maintenanceEndDate: world.maintenanceEndDate || '',
+        maintenanceMessage: world.maintenanceMessage || '',
         supportsMultiLanguage: world.supportsMultiLanguage || false,
         maintenanceLocales: world.maintenanceLocales || [],
         forceDisconnect: world.forceDisconnect || false,
@@ -1338,30 +1223,24 @@ const GameWorldsPage: React.FC = () => {
     try {
       if (maintenanceToggleDialog.isActivating) {
         // Validate maintenance time settings
-        const {
-          maintenanceStartDate,
-          maintenanceEndDate,
-          forceDisconnect,
-          gracePeriodMinutes,
-        } = maintenanceToggleDialog.maintenanceData;
+        const { maintenanceStartDate, maintenanceEndDate, forceDisconnect, gracePeriodMinutes } =
+          maintenanceToggleDialog.maintenanceData;
         const now = dayjs();
-        const startsAt = maintenanceStartDate
-          ? dayjs(maintenanceStartDate)
-          : null;
+        const startsAt = maintenanceStartDate ? dayjs(maintenanceStartDate) : null;
         const endsAt = maintenanceEndDate ? dayjs(maintenanceEndDate) : null;
 
         // Calculate duration based on start time (or now if immediate start)
         if (endsAt) {
           const effectiveStart = startsAt || now;
-          const duration = endsAt.diff(effectiveStart, "minute");
+          const duration = endsAt.diff(effectiveStart, 'minute');
 
           // Minimum 5 minutes validation
           if (duration < 5) {
             enqueueSnackbar(
-              t("gameWorlds.maintenanceConfig.validationMinDuration", {
+              t('gameWorlds.maintenanceConfig.validationMinDuration', {
                 duration: Math.max(0, duration),
               }),
-              { variant: "error" },
+              { variant: 'error' }
             );
             return;
           }
@@ -1369,14 +1248,11 @@ const GameWorldsPage: React.FC = () => {
           // Grace period validation (if forceDisconnect is enabled)
           if (forceDisconnect && gracePeriodMinutes >= duration) {
             enqueueSnackbar(
-              t(
-                "gameWorlds.maintenanceConfig.validationGracePeriodExceedsDuration",
-                {
-                  duration,
-                  gracePeriod: gracePeriodMinutes,
-                },
-              ),
-              { variant: "error" },
+              t('gameWorlds.maintenanceConfig.validationGracePeriodExceedsDuration', {
+                duration,
+                gracePeriod: gracePeriodMinutes,
+              }),
+              { variant: 'error' }
             );
             return;
           }
@@ -1393,41 +1269,33 @@ const GameWorldsPage: React.FC = () => {
         };
 
         // 메시지 소스에 따라 분기
-        if (toggleInputMode === "template") {
+        if (toggleInputMode === 'template') {
           // 템플릿 모드: templateId 전송
-          updateData.maintenanceMessageTemplateId =
-            toggleSelectedTemplateId || undefined;
+          updateData.maintenanceMessageTemplateId = toggleSelectedTemplateId || undefined;
         } else {
           // 직접 입력 모드: 메시지 직접 전송
           updateData.maintenanceMessage =
-            maintenanceToggleDialog.maintenanceData.maintenanceMessage ||
-            undefined;
+            maintenanceToggleDialog.maintenanceData.maintenanceMessage || undefined;
           updateData.supportsMultiLanguage = toggleSupportsMultiLanguage;
           updateData.maintenanceLocales = toggleMaintenanceLocales.filter(
-            (l) => l.message.trim() !== "",
+            (l) => l.message.trim() !== ''
           );
         }
 
-        await gameWorldService.updateMaintenance(
-          maintenanceToggleDialog.world.id,
-          updateData,
-        );
-        enqueueSnackbar(t("gameWorlds.maintenanceStarted"), {
-          variant: "success",
+        await gameWorldService.updateMaintenance(maintenanceToggleDialog.world.id, updateData);
+        enqueueSnackbar(t('gameWorlds.maintenanceStarted'), {
+          variant: 'success',
         });
       } else {
         // 점검 해제: 점검 전용 API 사용
         const updateData = {
           isMaintenance: false,
-          maintenanceMessage: "",
+          maintenanceMessage: '',
           maintenanceLocales: [],
         };
-        await gameWorldService.updateMaintenance(
-          maintenanceToggleDialog.world.id,
-          updateData,
-        );
-        enqueueSnackbar(t("gameWorlds.maintenanceEnded"), {
-          variant: "success",
+        await gameWorldService.updateMaintenance(maintenanceToggleDialog.world.id, updateData);
+        enqueueSnackbar(t('gameWorlds.maintenanceEnded'), {
+          variant: 'success',
         });
       }
       loadGameWorlds();
@@ -1435,11 +1303,11 @@ const GameWorldsPage: React.FC = () => {
         open: false,
         world: null,
         isActivating: false,
-        confirmInput: "",
+        confirmInput: '',
         maintenanceData: {
-          maintenanceStartDate: "",
-          maintenanceEndDate: "",
-          maintenanceMessage: "",
+          maintenanceStartDate: '',
+          maintenanceEndDate: '',
+          maintenanceMessage: '',
           supportsMultiLanguage: false,
           maintenanceLocales: [],
           forceDisconnect: false,
@@ -1448,17 +1316,13 @@ const GameWorldsPage: React.FC = () => {
       });
       setToggleMaintenanceLocales([]);
       setToggleSupportsMultiLanguage(false);
-      setToggleInputMode("direct");
-      setToggleSelectedTemplateId("");
+      setToggleInputMode('direct');
+      setToggleSelectedTemplateId('');
     } catch (error: any) {
-      console.error("Failed to toggle maintenance:", error);
-      enqueueSnackbar(
-        parseApiErrorMessage(
-          error,
-          "gameWorlds.errors.toggleMaintenanceFailed",
-        ),
-        { variant: "error" },
-      );
+      console.error('Failed to toggle maintenance:', error);
+      enqueueSnackbar(parseApiErrorMessage(error, 'gameWorlds.errors.toggleMaintenanceFailed'), {
+        variant: 'error',
+      });
     }
   };
 
@@ -1469,7 +1333,7 @@ const GameWorldsPage: React.FC = () => {
       const oldIndex = worlds.findIndex((world) => world.id === active.id);
       const newIndex = worlds.findIndex((world) => world.id === over?.id);
 
-      console.log("Drag and drop:", {
+      console.log('Drag and drop:', {
         activeId: active.id,
         overId: over?.id,
         oldIndex,
@@ -1486,22 +1350,20 @@ const GameWorldsPage: React.FC = () => {
         displayOrder: index * 10,
       }));
 
-      console.log("Order updates to send:", orderUpdates);
+      console.log('Order updates to send:', orderUpdates);
 
       try {
         await gameWorldService.updateDisplayOrders(orderUpdates);
-        console.log("Display orders updated successfully");
+        console.log('Display orders updated successfully');
         const movedWorld = worlds.find((w) => w.id === active.id);
-        enqueueSnackbar(
-          t("gameWorlds.orderUpdated", { name: movedWorld?.name || "Unknown" }),
-          { variant: "success" },
-        );
+        enqueueSnackbar(t('gameWorlds.orderUpdated', { name: movedWorld?.name || 'Unknown' }), {
+          variant: 'success',
+        });
       } catch (error) {
-        console.error("Failed to update order:", error);
-        enqueueSnackbar(
-          parseApiErrorMessage(error, "gameWorlds.errors.orderUpdateFailed"),
-          { variant: "error" },
-        );
+        console.error('Failed to update order:', error);
+        enqueueSnackbar(parseApiErrorMessage(error, 'gameWorlds.errors.orderUpdateFailed'), {
+          variant: 'error',
+        });
         // Reload to get correct order
         loadGameWorlds();
       }
@@ -1511,9 +1373,8 @@ const GameWorldsPage: React.FC = () => {
   const handleCopy = (text: string, type: string) => {
     copyToClipboardWithNotification(
       text,
-      () =>
-        enqueueSnackbar(t("common.copiedToClipboard"), { variant: "success" }),
-      () => enqueueSnackbar(t("common.copyFailed"), { variant: "error" }),
+      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
     );
   };
 
@@ -1524,15 +1385,15 @@ const GameWorldsPage: React.FC = () => {
   // Column settings handlers
   const handleToggleColumnVisibility = (columnId: string) => {
     const newColumns = columns.map((col) =>
-      col.id === columnId ? { ...col, visible: !col.visible } : col,
+      col.id === columnId ? { ...col, visible: !col.visible } : col
     );
     setColumns(newColumns);
-    localStorage.setItem("gameWorldsColumns", JSON.stringify(newColumns));
+    localStorage.setItem('gameWorldsColumns', JSON.stringify(newColumns));
   };
 
   const handleResetColumns = () => {
     setColumns(defaultColumns);
-    localStorage.setItem("gameWorldsColumns", JSON.stringify(defaultColumns));
+    localStorage.setItem('gameWorldsColumns', JSON.stringify(defaultColumns));
   };
 
   const handleColumnDragEnd = (event: DragEndEvent) => {
@@ -1542,90 +1403,78 @@ const GameWorldsPage: React.FC = () => {
       const newIndex = columns.findIndex((col) => col.id === over.id);
       const newColumns = arrayMove(columns, oldIndex, newIndex);
       setColumns(newColumns);
-      localStorage.setItem("gameWorldsColumns", JSON.stringify(newColumns));
+      localStorage.setItem('gameWorldsColumns', JSON.stringify(newColumns));
     }
   };
 
   // Render cell content based on column ID
   const renderCellContent = (world: GameWorld, columnId: string) => {
     switch (columnId) {
-      case "worldId":
+      case 'worldId':
         return (
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <Typography
               variant="body2"
               sx={{
                 fontWeight: 500,
-                cursor: "pointer",
-                "&:hover": {
-                  color: "primary.main",
-                  textDecoration: "underline",
+                cursor: 'pointer',
+                '&:hover': {
+                  color: 'primary.main',
+                  textDecoration: 'underline',
                 },
               }}
               onClick={() => handleEditWorld(world)}
             >
               {world.worldId}
             </Typography>
-            <Tooltip title={t("common.copy")}>
+            <Tooltip title={t('common.copy')}>
               <IconButton
                 size="small"
-                onClick={() =>
-                  handleCopy(world.worldId, t("gameWorlds.worldId"))
-                }
-                sx={{ opacity: 0.7, "&:hover": { opacity: 1 } }}
+                onClick={() => handleCopy(world.worldId, t('gameWorlds.worldId'))}
+                sx={{ opacity: 0.7, '&:hover': { opacity: 1 } }}
               >
                 <CopyIcon fontSize="small" />
               </IconButton>
             </Tooltip>
           </Box>
         );
-      case "name":
+      case 'name':
         return (
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <Typography variant="body2" sx={{ fontWeight: 500 }}>
               {world.name}
             </Typography>
-            <Tooltip title={t("common.copy")}>
+            <Tooltip title={t('common.copy')}>
               <IconButton
                 size="small"
-                onClick={() => handleCopy(world.name, t("gameWorlds.name"))}
-                sx={{ opacity: 0.7, "&:hover": { opacity: 1 } }}
+                onClick={() => handleCopy(world.name, t('gameWorlds.name'))}
+                sx={{ opacity: 0.7, '&:hover': { opacity: 1 } }}
               >
                 <CopyIcon fontSize="small" />
               </IconButton>
             </Tooltip>
           </Box>
         );
-      case "description":
+      case 'description':
         return (
-          <Typography
-            variant="body2"
-            color="text.secondary"
-            sx={{ maxWidth: 300 }}
-          >
-            {world.description || "-"}
+          <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 300 }}>
+            {world.description || '-'}
           </Typography>
         );
-      case "worldServerAddress":
+      case 'worldServerAddress':
         return (
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <Typography
-              variant="body2"
-              sx={{ fontFamily: "monospace", maxWidth: 250 }}
-            >
-              {world.worldServerAddress || "-"}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Typography variant="body2" sx={{ fontFamily: 'monospace', maxWidth: 250 }}>
+              {world.worldServerAddress || '-'}
             </Typography>
             {world.worldServerAddress && (
-              <Tooltip title={t("common.copy")}>
+              <Tooltip title={t('common.copy')}>
                 <IconButton
                   size="small"
                   onClick={() =>
-                    handleCopy(
-                      world.worldServerAddress || "",
-                      t("gameWorlds.worldServerAddress"),
-                    )
+                    handleCopy(world.worldServerAddress || '', t('gameWorlds.worldServerAddress'))
                   }
-                  sx={{ opacity: 0.7, "&:hover": { opacity: 1 } }}
+                  sx={{ opacity: 0.7, '&:hover': { opacity: 1 } }}
                 >
                   <CopyIcon fontSize="small" />
                 </IconButton>
@@ -1633,80 +1482,75 @@ const GameWorldsPage: React.FC = () => {
             )}
           </Box>
         );
-      case "isVisible":
+      case 'isVisible':
         return (
           <Chip
-            label={world.isVisible ? t("common.visible") : t("common.hidden")}
+            label={world.isVisible ? t('common.visible') : t('common.hidden')}
             size="small"
-            color={world.isVisible ? "success" : "default"}
+            color={world.isVisible ? 'success' : 'default'}
           />
         );
-      case "isMaintenance": {
-        const maintenanceStatus = computeMaintenanceStatus(
-          world.isMaintenance,
-          {
-            startsAt: world.maintenanceStartDate,
-            endsAt: world.maintenanceEndDate,
-          } as any,
-        );
+      case 'isMaintenance': {
+        const maintenanceStatus = computeMaintenanceStatus(world.isMaintenance, {
+          startsAt: world.maintenanceStartDate,
+          endsAt: world.maintenanceEndDate,
+        } as any);
         // Generate tooltip for scheduled/active status
         const maintenanceTooltip =
-          maintenanceStatus === "scheduled" || maintenanceStatus === "active"
+          maintenanceStatus === 'scheduled' || maintenanceStatus === 'active'
             ? (() => {
                 const parts: string[] = [];
                 // Start time: show "immediate start" if not set
                 parts.push(
-                  `${t("maintenance.tooltipStartTime")}: ${world.maintenanceStartDate ? formatDateTimeDetailed(world.maintenanceStartDate) : t("maintenance.immediateStart")}`,
+                  `${t('maintenance.tooltipStartTime')}: ${world.maintenanceStartDate ? formatDateTimeDetailed(world.maintenanceStartDate) : t('maintenance.immediateStart')}`
                 );
                 // End time: show "manual stop" if not set
                 parts.push(
-                  `${t("maintenance.tooltipEndTime")}: ${world.maintenanceEndDate ? formatDateTimeDetailed(world.maintenanceEndDate) : t("maintenance.manualStop")}`,
+                  `${t('maintenance.tooltipEndTime')}: ${world.maintenanceEndDate ? formatDateTimeDetailed(world.maintenanceEndDate) : t('maintenance.manualStop')}`
                 );
                 // Force disconnect info
                 if (world.forceDisconnect) {
                   const delayText =
                     (world.gracePeriodMinutes ?? 0) === 0
-                      ? t("maintenance.kickDelayImmediate")
-                      : `${world.gracePeriodMinutes}${t("maintenance.minutesUnit")}`;
+                      ? t('maintenance.kickDelayImmediate')
+                      : `${world.gracePeriodMinutes}${t('maintenance.minutesUnit')}`;
                   parts.push(
-                    `${t("maintenance.kickExistingPlayers")}: ${t("common.yes")} (${delayText})`,
+                    `${t('maintenance.kickExistingPlayers')}: ${t('common.yes')} (${delayText})`
                   );
                 } else {
-                  parts.push(
-                    `${t("maintenance.kickExistingPlayers")}: ${t("common.no")}`,
-                  );
+                  parts.push(`${t('maintenance.kickExistingPlayers')}: ${t('common.no')}`);
                 }
                 if (world.maintenanceMessage) {
                   const msg = world.maintenanceMessage;
                   parts.push(
-                    `${t("maintenance.tooltipMessage")}: ${msg.length > 50 ? msg.substring(0, 50) + "..." : msg}`,
+                    `${t('maintenance.tooltipMessage')}: ${msg.length > 50 ? msg.substring(0, 50) + '...' : msg}`
                   );
                 }
-                return parts.join("\n");
+                return parts.join('\n');
               })()
-            : "";
+            : '';
 
         const chip = (
           <Chip
             label={
-              maintenanceStatus === "active"
-                ? t("gameWorlds.maintenance")
-                : maintenanceStatus === "scheduled"
-                  ? t("maintenance.statusScheduled")
-                  : t("gameWorlds.normal")
+              maintenanceStatus === 'active'
+                ? t('gameWorlds.maintenance')
+                : maintenanceStatus === 'scheduled'
+                  ? t('maintenance.statusScheduled')
+                  : t('gameWorlds.normal')
             }
             size="small"
             color={
-              maintenanceStatus === "active"
-                ? "warning"
-                : maintenanceStatus === "scheduled"
-                  ? "info"
-                  : "success"
+              maintenanceStatus === 'active'
+                ? 'warning'
+                : maintenanceStatus === 'scheduled'
+                  ? 'info'
+                  : 'success'
             }
             icon={
-              maintenanceStatus === "active" ? (
+              maintenanceStatus === 'active' ? (
                 <MaintenanceIcon />
-              ) : maintenanceStatus === "scheduled" ? (
+              ) : maintenanceStatus === 'scheduled' ? (
                 <ScheduleIcon />
               ) : undefined
             }
@@ -1718,7 +1562,7 @@ const GameWorldsPage: React.FC = () => {
             title={maintenanceTooltip}
             arrow
             placement="top"
-            slotProps={{ tooltip: { sx: { whiteSpace: "pre-line" } } }}
+            slotProps={{ tooltip: { sx: { whiteSpace: 'pre-line' } } }}
           >
             {chip}
           </Tooltip>
@@ -1726,22 +1570,20 @@ const GameWorldsPage: React.FC = () => {
           chip
         );
       }
-      case "tags":
+      case 'tags':
         return (
-          <Box
-            sx={{ display: "flex", gap: 0.5, flexWrap: "wrap", maxWidth: 220 }}
-          >
+          <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', maxWidth: 220 }}>
             {world.tags && world.tags.length > 0 ? (
               world.tags.slice(0, 6).map((tag, idx) => (
                 <Tooltip
                   key={`${tag.id}-${idx}`}
-                  title={tag.description || t("tags.noDescription")}
+                  title={tag.description || t('tags.noDescription')}
                   arrow
                 >
                   <Chip
                     label={tag.name}
                     size="small"
-                    sx={{ bgcolor: tag.color, color: "#fff", cursor: "help" }}
+                    sx={{ bgcolor: tag.color, color: '#fff', cursor: 'help' }}
                   />
                 </Tooltip>
               ))
@@ -1752,7 +1594,7 @@ const GameWorldsPage: React.FC = () => {
             )}
           </Box>
         );
-      case "createdAt":
+      case 'createdAt':
         return (
           <Tooltip title={formatDateTimeDetailed(world.createdAt)}>
             <Typography variant="body2">
@@ -1771,41 +1613,33 @@ const GameWorldsPage: React.FC = () => {
       <Box
         sx={{
           mb: 3,
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
         }}
       >
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <WorldIcon sx={{ fontSize: 32, color: "primary.main" }} />
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <WorldIcon sx={{ fontSize: 32, color: 'primary.main' }} />
           <Box>
             <Typography variant="h5" sx={{ fontWeight: 700 }}>
-              {t("gameWorlds.title")}
+              {t('gameWorlds.title')}
             </Typography>
             <Typography variant="caption" color="text.secondary">
-              {t("gameWorlds.subtitle")}
+              {t('gameWorlds.subtitle')}
             </Typography>
           </Box>
         </Box>
-        <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
           {canManage && (
             <>
-              <Button
-                variant="contained"
-                startIcon={<AddIcon />}
-                onClick={handleAddWorld}
-              >
-                {t("gameWorlds.addGameWorld")}
+              <Button variant="contained" startIcon={<AddIcon />} onClick={handleAddWorld}>
+                {t('gameWorlds.addGameWorld')}
               </Button>
               <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
             </>
           )}
-          <Button
-            variant="outlined"
-            startIcon={<CodeIcon />}
-            onClick={() => setOpenSDKGuide(true)}
-          >
-            {t("coupons.couponSettings.sdkGuide")}
+          <Button variant="outlined" startIcon={<CodeIcon />} onClick={() => setOpenSDKGuide(true)}>
+            {t('coupons.couponSettings.sdkGuide')}
           </Button>
         </Box>
       </Box>
@@ -1815,24 +1649,24 @@ const GameWorldsPage: React.FC = () => {
         <CardContent>
           <Box
             sx={{
-              display: "flex",
-              alignItems: "center",
+              display: 'flex',
+              alignItems: 'center',
               gap: 2,
-              flexWrap: "wrap",
-              justifyContent: "space-between",
+              flexWrap: 'wrap',
+              justifyContent: 'space-between',
             }}
           >
             <Box
               sx={{
-                display: "flex",
+                display: 'flex',
                 gap: 2,
-                alignItems: "center",
-                flexWrap: "wrap",
+                alignItems: 'center',
+                flexWrap: 'wrap',
                 flexGrow: 1,
               }}
             >
               <SearchTextField
-                placeholder={t("gameWorlds.searchPlaceholder")}
+                placeholder={t('gameWorlds.searchPlaceholder')}
                 value={search}
                 onChange={setSearch}
               />
@@ -1840,10 +1674,10 @@ const GameWorldsPage: React.FC = () => {
               {/* Dynamic Filter Bar */}
               <Box
                 sx={{
-                  display: "flex",
-                  flexWrap: "wrap",
+                  display: 'flex',
+                  flexWrap: 'wrap',
                   gap: 1,
-                  alignItems: "center",
+                  alignItems: 'center',
                 }}
               >
                 <DynamicFilterBar
@@ -1856,15 +1690,15 @@ const GameWorldsPage: React.FC = () => {
                 />
 
                 {/* Column Settings Button */}
-                <Tooltip title={t("users.columnSettings")}>
+                <Tooltip title={t('users.columnSettings')}>
                   <IconButton
                     onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
                     sx={{
-                      bgcolor: "background.paper",
+                      bgcolor: 'background.paper',
                       border: 1,
-                      borderColor: "divider",
-                      "&:hover": {
-                        bgcolor: "action.hover",
+                      borderColor: 'divider',
+                      '&:hover': {
+                        bgcolor: 'action.hover',
                       },
                     }}
                   >
@@ -1879,19 +1713,17 @@ const GameWorldsPage: React.FC = () => {
 
       {/* Game Worlds Table */}
       <Card>
-        <CardContent sx={{ p: 0, "&:last-child": { pb: 0 } }}>
+        <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
           {loading ? (
-            <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
-              <Typography color="text.secondary">
-                {t("common.loadingData")}
-              </Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
+              <Typography color="text.secondary">{t('common.loadingData')}</Typography>
             </Box>
           ) : worlds.length === 0 ? (
             <EmptyState
-              message={t("gameWorlds.noWorldsFound")}
-              subtitle={canManage ? t("common.addFirstItem") : undefined}
+              message={t('gameWorlds.noWorldsFound')}
+              subtitle={canManage ? t('common.addFirstItem') : undefined}
               onAddClick={canManage ? handleAddWorld : undefined}
-              addButtonLabel={t("gameWorlds.addGameWorld")}
+              addButtonLabel={t('gameWorlds.addGameWorld')}
             />
           ) : (
             <DndContext
@@ -1901,7 +1733,7 @@ const GameWorldsPage: React.FC = () => {
               modifiers={[restrictToVerticalAxis]}
             >
               <TableContainer>
-                <Table sx={{ tableLayout: "auto" }}>
+                <Table sx={{ tableLayout: 'auto' }}>
                   <TableHead>
                     <TableRow>
                       <TableCell width="50px"></TableCell>
@@ -1912,12 +1744,8 @@ const GameWorldsPage: React.FC = () => {
                             {t(column.labelKey)}
                           </TableCell>
                         ))}
-                      <TableCell>{t("gameWorlds.creator")}</TableCell>
-                      {canManage && (
-                        <TableCell align="center">
-                          {t("gameWorlds.actions")}
-                        </TableCell>
-                      )}
+                      <TableCell>{t('gameWorlds.creator')}</TableCell>
+                      {canManage && <TableCell align="center">{t('gameWorlds.actions')}</TableCell>}
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -1958,15 +1786,9 @@ const GameWorldsPage: React.FC = () => {
       <ResizableDrawer
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
-        title={
-          editingWorld
-            ? t("gameWorlds.editGameWorld")
-            : t("gameWorlds.addGameWorld")
-        }
+        title={editingWorld ? t('gameWorlds.editGameWorld') : t('gameWorlds.addGameWorld')}
         subtitle={
-          editingWorld
-            ? t("gameWorlds.form.editDescription")
-            : t("gameWorlds.form.addDescription")
+          editingWorld ? t('gameWorlds.form.editDescription') : t('gameWorlds.form.addDescription')
         }
         storageKey="gameWorldFormDrawerWidth"
         defaultWidth={700}
@@ -1974,7 +1796,7 @@ const GameWorldsPage: React.FC = () => {
         zIndex={1300}
       >
         {/* Content */}
-        <Box sx={{ flex: 1, overflow: "auto", p: 3 }}>
+        <Box sx={{ flex: 1, overflow: 'auto', p: 3 }}>
           <GameWorldForm
             editingWorld={editingWorld}
             formData={formData}
@@ -2010,49 +1832,29 @@ const GameWorldsPage: React.FC = () => {
         <Box
           sx={{
             p: 2,
-            borderTop: "1px solid",
-            borderColor: "divider",
-            bgcolor: "background.paper",
-            display: "flex",
+            borderTop: '1px solid',
+            borderColor: 'divider',
+            bgcolor: 'background.paper',
+            display: 'flex',
             gap: 1,
-            justifyContent: "flex-end",
+            justifyContent: 'flex-end',
           }}
         >
-          <Button
-            onClick={() => setDialogOpen(false)}
-            disabled={saving}
-            startIcon={<CancelIcon />}
-          >
-            {t("gameWorlds.cancel")}
+          <Button onClick={() => setDialogOpen(false)} disabled={saving} startIcon={<CancelIcon />}>
+            {t('gameWorlds.cancel')}
           </Button>
           <Button
             onClick={handleSaveWorld}
             variant="contained"
-            disabled={
-              saving || formActiveTab !== 0 || (!!editingWorld && !isDirty)
-            }
+            disabled={saving || formActiveTab !== 0 || (!!editingWorld && !isDirty)}
             startIcon={
-              saving ? (
-                <CircularProgress size={20} />
-              ) : editingWorld ? (
-                <SaveIcon />
-              ) : (
-                <AddIcon />
-              )
+              saving ? <CircularProgress size={20} /> : editingWorld ? <SaveIcon /> : <AddIcon />
             }
-            title={
-              formActiveTab !== 0
-                ? t("gameWorlds.form.switchToBasicInfoToSave")
-                : undefined
-            }
+            title={formActiveTab !== 0 ? t('gameWorlds.form.switchToBasicInfoToSave') : undefined}
           >
             {saving
-              ? t("common.saving")
-              : getActionLabel(
-                  editingWorld ? "update" : "create",
-                  requiresApproval,
-                  t,
-                )}
+              ? t('common.saving')
+              : getActionLabel(editingWorld ? 'update' : 'create', requiresApproval, t)}
           </Button>
         </Box>
       </ResizableDrawer>
@@ -2064,11 +1866,11 @@ const GameWorldsPage: React.FC = () => {
         onClose={() => setConfirmDialog((prev) => ({ ...prev, open: false }))}
         sx={{
           zIndex: 1301,
-          "& .MuiDrawer-paper": {
+          '& .MuiDrawer-paper': {
             width: 400,
-            height: "100vh",
-            display: "flex",
-            flexDirection: "column",
+            height: '100vh',
+            display: 'flex',
+            flexDirection: 'column',
           },
         }}
         ModalProps={{
@@ -2080,12 +1882,12 @@ const GameWorldsPage: React.FC = () => {
           sx={{
             p: 3,
             borderBottom: 1,
-            borderColor: "divider",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            backgroundColor: "background.paper",
-            position: "sticky",
+            borderColor: 'divider',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            backgroundColor: 'background.paper',
+            position: 'sticky',
             top: 0,
             zIndex: 1,
           }}
@@ -2094,13 +1896,11 @@ const GameWorldsPage: React.FC = () => {
             {confirmDialog.title}
           </Typography>
           <IconButton
-            onClick={() =>
-              setConfirmDialog((prev) => ({ ...prev, open: false }))
-            }
+            onClick={() => setConfirmDialog((prev) => ({ ...prev, open: false }))}
             size="small"
             sx={{
-              "&:hover": {
-                backgroundColor: "action.hover",
+              '&:hover': {
+                backgroundColor: 'action.hover',
               },
             }}
           >
@@ -2109,7 +1909,7 @@ const GameWorldsPage: React.FC = () => {
         </Box>
 
         {/* Content */}
-        <Box sx={{ flex: 1, overflow: "auto", p: 3 }}>
+        <Box sx={{ flex: 1, overflow: 'auto', p: 3 }}>
           <Typography>{confirmDialog.message}</Typography>
         </Box>
 
@@ -2118,27 +1918,21 @@ const GameWorldsPage: React.FC = () => {
           sx={{
             p: 3,
             borderTop: 1,
-            borderColor: "divider",
-            display: "flex",
+            borderColor: 'divider',
+            display: 'flex',
             gap: 2,
-            justifyContent: "flex-end",
+            justifyContent: 'flex-end',
           }}
         >
           <Button
-            onClick={() =>
-              setConfirmDialog((prev) => ({ ...prev, open: false }))
-            }
+            onClick={() => setConfirmDialog((prev) => ({ ...prev, open: false }))}
             color="inherit"
             size="small"
           >
-            {t("gameWorlds.cancel")}
+            {t('gameWorlds.cancel')}
           </Button>
-          <Button
-            onClick={confirmDialog.onConfirm}
-            color="primary"
-            variant="contained"
-          >
-            {t("gameWorlds.confirm")}
+          <Button onClick={confirmDialog.onConfirm} color="primary" variant="contained">
+            {t('gameWorlds.confirm')}
           </Button>
         </Box>
       </Drawer>
@@ -2151,11 +1945,11 @@ const GameWorldsPage: React.FC = () => {
             open: false,
             world: null,
             isActivating: false,
-            confirmInput: "",
+            confirmInput: '',
             maintenanceData: {
-              maintenanceStartDate: "",
-              maintenanceEndDate: "",
-              maintenanceMessage: "",
+              maintenanceStartDate: '',
+              maintenanceEndDate: '',
+              maintenanceMessage: '',
               supportsMultiLanguage: false,
               maintenanceLocales: [],
               forceDisconnect: false,
@@ -2167,8 +1961,8 @@ const GameWorldsPage: React.FC = () => {
         }}
         title={
           maintenanceToggleDialog.isActivating
-            ? t("gameWorlds.confirmMaintenanceStart")
-            : t("gameWorlds.confirmMaintenanceEnd")
+            ? t('gameWorlds.confirmMaintenanceStart')
+            : t('gameWorlds.confirmMaintenanceEnd')
         }
         storageKey="gameWorldMaintenanceToggleDrawerWidth"
         defaultWidth={600}
@@ -2176,21 +1970,17 @@ const GameWorldsPage: React.FC = () => {
         zIndex={1301}
       >
         {/* Content */}
-        <Box sx={{ flex: 1, overflow: "auto", p: 3 }}>
+        <Box sx={{ flex: 1, overflow: 'auto', p: 3 }}>
           {maintenanceToggleDialog.isActivating ? (
             <>
               <Alert severity="warning" sx={{ mb: 3 }}>
-                {t("gameWorlds.configureMaintenanceSettings")}
+                {t('gameWorlds.configureMaintenanceSettings')}
               </Alert>
 
               {/* 점검 설정 폼 */}
               <MaintenanceSettingsInput
-                startDate={
-                  maintenanceToggleDialog.maintenanceData.maintenanceStartDate
-                }
-                endDate={
-                  maintenanceToggleDialog.maintenanceData.maintenanceEndDate
-                }
+                startDate={maintenanceToggleDialog.maintenanceData.maintenanceStartDate}
+                endDate={maintenanceToggleDialog.maintenanceData.maintenanceEndDate}
                 onStartDateChange={(date) =>
                   setMaintenanceToggleDialog((prev) => ({
                     ...prev,
@@ -2211,9 +2001,7 @@ const GameWorldsPage: React.FC = () => {
                 }
                 inputMode={toggleInputMode}
                 onInputModeChange={setToggleInputMode}
-                maintenanceMessage={
-                  maintenanceToggleDialog.maintenanceData.maintenanceMessage
-                }
+                maintenanceMessage={maintenanceToggleDialog.maintenanceData.maintenanceMessage}
                 onMaintenanceMessageChange={(message) =>
                   setMaintenanceToggleDialog((prev) => ({
                     ...prev,
@@ -2229,32 +2017,30 @@ const GameWorldsPage: React.FC = () => {
                   if (enabled) {
                     const availableLanguages = [
                       {
-                        code: "ko" as const,
-                        label: t("gameWorlds.maintenanceConfig.korean"),
+                        code: 'ko' as const,
+                        label: t('gameWorlds.maintenanceConfig.korean'),
                       },
                       {
-                        code: "en" as const,
-                        label: t("gameWorlds.maintenanceConfig.english"),
+                        code: 'en' as const,
+                        label: t('gameWorlds.maintenanceConfig.english'),
                       },
                       {
-                        code: "zh" as const,
-                        label: t("gameWorlds.maintenanceConfig.chinese"),
+                        code: 'zh' as const,
+                        label: t('gameWorlds.maintenanceConfig.chinese'),
                       },
                     ];
                     const merged = availableLanguages.map((lang) => {
-                      const existing = toggleMaintenanceLocales.find(
-                        (l) => l.lang === lang.code,
-                      );
+                      const existing = toggleMaintenanceLocales.find((l) => l.lang === lang.code);
                       return {
                         lang: lang.code,
-                        message: existing?.message || "",
+                        message: existing?.message || '',
                       };
                     });
                     setToggleMaintenanceLocales(merged);
                   }
                 }}
                 maintenanceLocales={toggleMaintenanceLocales.map((l) => ({
-                  lang: l.lang as "ko" | "en" | "zh",
+                  lang: l.lang as 'ko' | 'en' | 'zh',
                   message: l.message,
                 }))}
                 onMaintenanceLocalesChange={(locales) => {
@@ -2264,7 +2050,7 @@ const GameWorldsPage: React.FC = () => {
                   }));
                   setToggleMaintenanceLocales(newLocales);
                   const hasNonEmptyLocales = locales.some(
-                    (l) => l.message && l.message.trim() !== "",
+                    (l) => l.message && l.message.trim() !== ''
                   );
                   if (hasNonEmptyLocales && !toggleSupportsMultiLanguage) {
                     setToggleSupportsMultiLanguage(true);
@@ -2275,9 +2061,7 @@ const GameWorldsPage: React.FC = () => {
                 onSelectedTemplateIdChange={setToggleSelectedTemplateId}
                 messageRequired={true}
                 showForceDisconnect={true}
-                forceDisconnect={
-                  maintenanceToggleDialog.maintenanceData.forceDisconnect
-                }
+                forceDisconnect={maintenanceToggleDialog.maintenanceData.forceDisconnect}
                 onForceDisconnectChange={(value) =>
                   setMaintenanceToggleDialog((prev) => ({
                     ...prev,
@@ -2287,9 +2071,7 @@ const GameWorldsPage: React.FC = () => {
                     },
                   }))
                 }
-                gracePeriodMinutes={
-                  maintenanceToggleDialog.maintenanceData.gracePeriodMinutes
-                }
+                gracePeriodMinutes={maintenanceToggleDialog.maintenanceData.gracePeriodMinutes}
                 onGracePeriodMinutesChange={(value) =>
                   setMaintenanceToggleDialog((prev) => ({
                     ...prev,
@@ -2304,7 +2086,7 @@ const GameWorldsPage: React.FC = () => {
 
               {/* 확인 입력 */}
               <Typography variant="body2" sx={{ mb: 2 }}>
-                {t("gameWorlds.typeWorldIdToConfirm", {
+                {t('gameWorlds.typeWorldIdToConfirm', {
                   worldId: maintenanceToggleDialog.world?.worldId,
                 })}
               </Typography>
@@ -2324,12 +2106,12 @@ const GameWorldsPage: React.FC = () => {
           ) : (
             <>
               <Alert severity="warning" sx={{ mb: 2 }}>
-                {t("gameWorlds.confirmEndMaintenance", {
+                {t('gameWorlds.confirmEndMaintenance', {
                   name: maintenanceToggleDialog.world?.name,
                 })}
               </Alert>
               <Typography variant="body2" sx={{ mb: 2 }}>
-                {t("gameWorlds.typeWorldIdToConfirm", {
+                {t('gameWorlds.typeWorldIdToConfirm', {
                   worldId: maintenanceToggleDialog.world?.worldId,
                 })}
               </Typography>
@@ -2354,11 +2136,11 @@ const GameWorldsPage: React.FC = () => {
           sx={{
             p: 2,
             borderTop: 1,
-            borderColor: "divider",
-            display: "flex",
+            borderColor: 'divider',
+            display: 'flex',
             gap: 1,
-            justifyContent: "flex-end",
-            backgroundColor: "background.paper",
+            justifyContent: 'flex-end',
+            backgroundColor: 'background.paper',
           }}
         >
           <Button
@@ -2367,11 +2149,11 @@ const GameWorldsPage: React.FC = () => {
                 open: false,
                 world: null,
                 isActivating: false,
-                confirmInput: "",
+                confirmInput: '',
                 maintenanceData: {
-                  maintenanceStartDate: "",
-                  maintenanceEndDate: "",
-                  maintenanceMessage: "",
+                  maintenanceStartDate: '',
+                  maintenanceEndDate: '',
+                  maintenanceMessage: '',
                   supportsMultiLanguage: false,
                   maintenanceLocales: [],
                   forceDisconnect: false,
@@ -2384,24 +2166,23 @@ const GameWorldsPage: React.FC = () => {
             color="inherit"
             size="small"
           >
-            {t("gameWorlds.cancel")}
+            {t('gameWorlds.cancel')}
           </Button>
           <Button
             onClick={handleConfirmMaintenanceToggle}
-            color={maintenanceToggleDialog.isActivating ? "warning" : "primary"}
+            color={maintenanceToggleDialog.isActivating ? 'warning' : 'primary'}
             variant="contained"
             disabled={
-              maintenanceToggleDialog.confirmInput !==
-                maintenanceToggleDialog.world?.worldId ||
+              maintenanceToggleDialog.confirmInput !== maintenanceToggleDialog.world?.worldId ||
               (maintenanceToggleDialog.isActivating &&
-                (toggleInputMode === "direct"
+                (toggleInputMode === 'direct'
                   ? !maintenanceToggleDialog.maintenanceData.maintenanceMessage?.trim()
                   : !toggleSelectedTemplateId))
             }
           >
             {maintenanceToggleDialog.isActivating
-              ? t("gameWorlds.startMaintenance")
-              : t("gameWorlds.endMaintenance")}
+              ? t('gameWorlds.startMaintenance')
+              : t('gameWorlds.endMaintenance')}
           </Button>
         </Box>
       </ResizableDrawer>
@@ -2410,16 +2191,14 @@ const GameWorldsPage: React.FC = () => {
       <Drawer
         anchor="right"
         open={deleteConfirmDialog.open}
-        onClose={() =>
-          setDeleteConfirmDialog({ open: false, world: null, inputValue: "" })
-        }
+        onClose={() => setDeleteConfirmDialog({ open: false, world: null, inputValue: '' })}
         sx={{
           zIndex: 1301,
-          "& .MuiDrawer-paper": {
+          '& .MuiDrawer-paper': {
             width: 500,
-            height: "100vh",
-            display: "flex",
-            flexDirection: "column",
+            height: '100vh',
+            display: 'flex',
+            flexDirection: 'column',
           },
         }}
         ModalProps={{
@@ -2431,31 +2210,31 @@ const GameWorldsPage: React.FC = () => {
           sx={{
             p: 3,
             borderBottom: 1,
-            borderColor: "divider",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            backgroundColor: "background.paper",
-            position: "sticky",
+            borderColor: 'divider',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            backgroundColor: 'background.paper',
+            position: 'sticky',
             top: 0,
             zIndex: 1,
           }}
         >
           <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
-            {t("gameWorlds.deleteGameWorld")}
+            {t('gameWorlds.deleteGameWorld')}
           </Typography>
           <IconButton
             onClick={() =>
               setDeleteConfirmDialog({
                 open: false,
                 world: null,
-                inputValue: "",
+                inputValue: '',
               })
             }
             size="small"
             sx={{
-              "&:hover": {
-                backgroundColor: "action.hover",
+              '&:hover': {
+                backgroundColor: 'action.hover',
               },
             }}
           >
@@ -2464,21 +2243,21 @@ const GameWorldsPage: React.FC = () => {
         </Box>
 
         {/* Content */}
-        <Box sx={{ flex: 1, overflow: "auto", p: 3 }}>
+        <Box sx={{ flex: 1, overflow: 'auto', p: 3 }}>
           <Alert severity="warning" sx={{ mb: 2 }}>
-            {t("gameWorlds.confirmDelete", {
+            {t('gameWorlds.confirmDelete', {
               name: deleteConfirmDialog.world?.name,
             })}
           </Alert>
           <Typography variant="body2" sx={{ mb: 2 }}>
-            {t("gameWorlds.deleteTypeToConfirm", {
+            {t('gameWorlds.deleteTypeToConfirm', {
               name: deleteConfirmDialog.world?.name,
             })}
             <strong>{deleteConfirmDialog.world?.name}</strong>
           </Typography>
           <TextField
             fullWidth
-            label={t("gameWorlds.worldName")}
+            label={t('gameWorlds.worldName')}
             value={deleteConfirmDialog.inputValue}
             onChange={(e) =>
               setDeleteConfirmDialog((prev) => ({
@@ -2488,14 +2267,14 @@ const GameWorldsPage: React.FC = () => {
             }
             placeholder={deleteConfirmDialog.world?.name}
             error={
-              deleteConfirmDialog.inputValue !== "" &&
+              deleteConfirmDialog.inputValue !== '' &&
               deleteConfirmDialog.inputValue !== deleteConfirmDialog.world?.name
             }
             helperText={
-              deleteConfirmDialog.inputValue !== "" &&
+              deleteConfirmDialog.inputValue !== '' &&
               deleteConfirmDialog.inputValue !== deleteConfirmDialog.world?.name
-                ? "Name does not match"
-                : ""
+                ? 'Name does not match'
+                : ''
             }
             size="small"
           />
@@ -2506,10 +2285,10 @@ const GameWorldsPage: React.FC = () => {
           sx={{
             p: 3,
             borderTop: 1,
-            borderColor: "divider",
-            display: "flex",
+            borderColor: 'divider',
+            display: 'flex',
             gap: 2,
-            justifyContent: "flex-end",
+            justifyContent: 'flex-end',
           }}
         >
           <Button
@@ -2517,23 +2296,21 @@ const GameWorldsPage: React.FC = () => {
               setDeleteConfirmDialog({
                 open: false,
                 world: null,
-                inputValue: "",
+                inputValue: '',
               })
             }
             color="inherit"
             size="small"
           >
-            {t("gameWorlds.cancel")}
+            {t('gameWorlds.cancel')}
           </Button>
           <Button
             onClick={handleConfirmDelete}
             color="error"
             variant="contained"
-            disabled={
-              deleteConfirmDialog.inputValue !== deleteConfirmDialog.world?.name
-            }
+            disabled={deleteConfirmDialog.inputValue !== deleteConfirmDialog.world?.name}
           >
-            {t("common.delete")}
+            {t('common.delete')}
           </Button>
         </Box>
       </Drawer>
@@ -2544,12 +2321,12 @@ const GameWorldsPage: React.FC = () => {
         anchorEl={columnSettingsAnchor}
         onClose={() => setColumnSettingsAnchor(null)}
         anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "right",
+          vertical: 'bottom',
+          horizontal: 'right',
         }}
         transformOrigin={{
-          vertical: "top",
-          horizontal: "right",
+          vertical: 'top',
+          horizontal: 'right',
         }}
         hideBackdrop
         disableScrollLock
@@ -2558,17 +2335,17 @@ const GameWorldsPage: React.FC = () => {
           <Box sx={{ p: 2, minWidth: 280, maxWidth: 320 }}>
             <Box
               sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
                 mb: 1,
               }}
             >
               <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-                {t("users.columnSettings")}
+                {t('users.columnSettings')}
               </Typography>
               <Button size="small" onClick={handleResetColumns} color="warning">
-                {t("common.reset")}
+                {t('common.reset')}
               </Button>
             </Box>
             <DndContext
@@ -2597,10 +2374,7 @@ const GameWorldsPage: React.FC = () => {
       </Popover>
 
       {/* SDK Guide Drawer */}
-      <GameWorldSDKGuideDrawer
-        open={openSDKGuide}
-        onClose={() => setOpenSDKGuide(false)}
-      />
+      <GameWorldSDKGuideDrawer open={openSDKGuide} onClose={() => setOpenSDKGuide(false)} />
     </Box>
   );
 };

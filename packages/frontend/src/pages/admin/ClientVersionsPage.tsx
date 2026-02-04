@@ -1,15 +1,15 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { devLogger, prodLogger } from "../../utils/logger";
-import { usePageState } from "../../hooks/usePageState";
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { devLogger, prodLogger } from '../../utils/logger';
+import { usePageState } from '../../hooks/usePageState';
 import {
   useClientVersions,
   useAvailableVersions,
   useTags,
   mutateClientVersions,
-} from "../../hooks/useSWR";
-import { useAuth } from "../../hooks/useAuth";
-import { PERMISSIONS } from "../../types/permissions";
-import * as XLSX from "xlsx";
+} from '../../hooks/useSWR';
+import { useAuth } from '../../hooks/useAuth';
+import { PERMISSIONS } from '../../types/permissions';
+import * as XLSX from 'xlsx';
 import {
   Box,
   Card,
@@ -56,7 +56,7 @@ import {
   ListItemButton,
   ListItemText,
   ClickAwayListener,
-} from "@mui/material";
+} from '@mui/material';
 import {
   DndContext,
   closestCenter,
@@ -65,16 +65,16 @@ import {
   useSensor,
   useSensors,
   DragEndEvent,
-} from "@dnd-kit/core";
+} from '@dnd-kit/core';
 import {
   arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
   useSortable,
   verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
-import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import {
   Add as AddIcon,
   Edit as EditIcon,
@@ -98,25 +98,22 @@ import {
   DragIndicator as DragIndicatorIcon,
   Visibility as VisibilityIcon,
   VisibilityOff as VisibilityOffIcon,
-} from "@mui/icons-material";
-import { InputAdornment } from "@mui/material";
-import { useTranslation } from "react-i18next";
-import { useSnackbar } from "notistack";
-import { parseApiErrorMessage } from "../../utils/errorUtils";
-import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import dayjs from "dayjs";
-import {
-  messageTemplateService,
-  MessageTemplate,
-} from "@/services/messageTemplateService";
+} from '@mui/icons-material';
+import { InputAdornment } from '@mui/material';
+import { useTranslation } from 'react-i18next';
+import { useSnackbar } from 'notistack';
+import { parseApiErrorMessage } from '../../utils/errorUtils';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import dayjs from 'dayjs';
+import { messageTemplateService, MessageTemplate } from '@/services/messageTemplateService';
 import MultiLanguageMessageInput, {
   MessageLocale,
   MultiLanguageMessageInputRef,
-} from "@/components/common/MultiLanguageMessageInput";
-import { useTheme } from "@mui/material/styles";
-import { tagService, Tag } from "../../services/tagService";
+} from '@/components/common/MultiLanguageMessageInput';
+import { useTheme } from '@mui/material/styles';
+import { tagService, Tag } from '../../services/tagService';
 import {
   ClientVersion,
   ClientVersionFilters,
@@ -124,40 +121,33 @@ import {
   ClientStatusLabels,
   ClientStatusColors,
   BulkStatusUpdateRequest,
-} from "../../types/clientVersion";
-import { ClientVersionService } from "../../services/clientVersionService";
-import ClientVersionForm from "../../components/admin/ClientVersionForm";
-import BulkClientVersionForm from "../../components/admin/BulkClientVersionForm";
-import PlatformDefaultsDialog from "../../components/admin/PlatformDefaultsDialog";
+} from '../../types/clientVersion';
+import { ClientVersionService } from '../../services/clientVersionService';
+import ClientVersionForm from '../../components/admin/ClientVersionForm';
+import BulkClientVersionForm from '../../components/admin/BulkClientVersionForm';
+import PlatformDefaultsDialog from '../../components/admin/PlatformDefaultsDialog';
 import {
   formatDateTimeDetailed,
   formatRelativeTime,
   parseUTCForPicker,
-} from "../../utils/dateFormat";
-import { useI18n } from "../../contexts/I18nContext";
-import { copyToClipboardWithNotification } from "../../utils/clipboard";
-import SimplePagination from "../../components/common/SimplePagination";
-import EmptyState from "../../components/common/EmptyState";
+} from '../../utils/dateFormat';
+import { useI18n } from '../../contexts/I18nContext';
+import { copyToClipboardWithNotification } from '../../utils/clipboard';
+import SimplePagination from '../../components/common/SimplePagination';
+import EmptyState from '../../components/common/EmptyState';
 import DynamicFilterBar, {
   FilterDefinition,
   ActiveFilter,
-} from "../../components/common/DynamicFilterBar";
-import ClientVersionGuideDrawer from "../../components/admin/ClientVersionGuideDrawer";
-import { usePlatformConfig } from "../../contexts/PlatformConfigContext";
-import { useEnvironment } from "../../contexts/EnvironmentContext";
-import { getContrastColor } from "@/utils/colorUtils";
-import {
-  showChangeRequestCreatedToast,
-  getActionLabel,
-} from "../../utils/changeRequestToast";
-import { useNavigate } from "react-router-dom";
+} from '../../components/common/DynamicFilterBar';
+import ClientVersionGuideDrawer from '../../components/admin/ClientVersionGuideDrawer';
+import { usePlatformConfig } from '../../contexts/PlatformConfigContext';
+import { useEnvironment } from '../../contexts/EnvironmentContext';
+import { getContrastColor } from '@/utils/colorUtils';
+import { showChangeRequestCreatedToast, getActionLabel } from '../../utils/changeRequestToast';
+import { useNavigate } from 'react-router-dom';
 
 // HSV를 RGB로 변환하는 함수
-const hsvToRgb = (
-  h: number,
-  s: number,
-  v: number,
-): [number, number, number] => {
+const hsvToRgb = (h: number, s: number, v: number): [number, number, number] => {
   const c = v * s;
   const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
   const m = v - c;
@@ -192,17 +182,13 @@ const hsvToRgb = (
     b = x;
   }
 
-  return [
-    Math.round((r + m) * 255),
-    Math.round((g + m) * 255),
-    Math.round((b + m) * 255),
-  ];
+  return [Math.round((r + m) * 255), Math.round((g + m) * 255), Math.round((b + m) * 255)];
 };
 
 // 버전별 색상을 HSV 기반으로 다양하게 생성하는 함수 (황금비 활용)
 const getVersionColorStyle = (
   version: string,
-  isDarkMode: boolean = false,
+  isDarkMode: boolean = false
 ): { backgroundColor: string; color: string } => {
   // 개선된 해시 함수 (더 균등한 분포)
   let hash = 0;
@@ -247,7 +233,7 @@ const getVersionColorStyle = (
   const luminance = 0.2126 * sRGB[0] + 0.7152 * sRGB[1] + 0.0722 * sRGB[2];
 
   // 4.5:1 대비율을 위한 텍스트 색상 결정
-  const textColor = luminance > 0.179 ? "#000000" : "#ffffff";
+  const textColor = luminance > 0.179 ? '#000000' : '#ffffff';
 
   return {
     backgroundColor,
@@ -257,15 +243,8 @@ const getVersionColorStyle = (
 
 // 기존 MUI 색상 시스템과의 호환성을 위한 함수 (fallback용)
 const getVersionColor = (
-  version: string,
-):
-  | "default"
-  | "primary"
-  | "secondary"
-  | "error"
-  | "info"
-  | "success"
-  | "warning" => {
+  version: string
+): 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning' => {
   // 간단한 해시 함수
   let hash = 0;
   for (let i = 0; i < version.length; i++) {
@@ -275,9 +254,14 @@ const getVersionColor = (
   }
 
   // 사용 가능한 색상 배열
-  const colors: Array<
-    "primary" | "secondary" | "error" | "info" | "success" | "warning"
-  > = ["primary", "secondary", "error", "info", "success", "warning"];
+  const colors: Array<'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning'> = [
+    'primary',
+    'secondary',
+    'error',
+    'info',
+    'success',
+    'warning',
+  ];
 
   // 해시값을 색상 인덱스로 변환
   const colorIndex = Math.abs(hash) % colors.length;
@@ -298,19 +282,11 @@ interface SortableColumnItemProps {
   onToggleVisibility: (id: string) => void;
 }
 
-const SortableColumnItem: React.FC<SortableColumnItemProps> = ({
-  column,
-  onToggleVisibility,
-}) => {
+const SortableColumnItem: React.FC<SortableColumnItemProps> = ({ column, onToggleVisibility }) => {
   const { t } = useTranslation();
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: column.id });
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: column.id,
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -328,21 +304,17 @@ const SortableColumnItem: React.FC<SortableColumnItemProps> = ({
           {...attributes}
           {...listeners}
           sx={{
-            cursor: "grab",
-            display: "flex",
-            alignItems: "center",
-            "&:active": { cursor: "grabbing" },
+            cursor: 'grab',
+            display: 'flex',
+            alignItems: 'center',
+            '&:active': { cursor: 'grabbing' },
           }}
         >
-          <DragIndicatorIcon sx={{ color: "text.disabled", fontSize: 20 }} />
+          <DragIndicatorIcon sx={{ color: 'text.disabled', fontSize: 20 }} />
         </Box>
       }
     >
-      <ListItemButton
-        dense
-        onClick={() => onToggleVisibility(column.id)}
-        sx={{ pr: 6 }}
-      >
+      <ListItemButton dense onClick={() => onToggleVisibility(column.id)} sx={{ pr: 6 }}>
         <Checkbox
           edge="start"
           checked={column.visible}
@@ -352,10 +324,7 @@ const SortableColumnItem: React.FC<SortableColumnItemProps> = ({
           icon={<VisibilityOffIcon fontSize="small" />}
           checkedIcon={<VisibilityIcon fontSize="small" />}
         />
-        <ListItemText
-          primary={t(column.labelKey)}
-          slotProps={{ primary: { variant: "body2" } }}
-        />
+        <ListItemText primary={t(column.labelKey)} slotProps={{ primary: { variant: 'body2' } }} />
       </ListItemButton>
     </ListItem>
   );
@@ -374,17 +343,16 @@ const ClientVersionsPage: React.FC = () => {
   const canManage = hasPermission([PERMISSIONS.CLIENT_VERSIONS_MANAGE]);
 
   // 페이지 상태 관리 (localStorage 연동)
-  const { pageState, updatePage, updateLimit, updateSort, updateFilters } =
-    usePageState({
-      defaultState: {
-        page: 1,
-        limit: 10,
-        sortBy: "clientVersion",
-        sortOrder: "DESC",
-        filters: {},
-      },
-      storageKey: "clientVersionsPage",
-    });
+  const { pageState, updatePage, updateLimit, updateSort, updateFilters } = usePageState({
+    defaultState: {
+      page: 1,
+      limit: 10,
+      sortBy: 'clientVersion',
+      sortOrder: 'DESC',
+      filters: {},
+    },
+    storageKey: 'clientVersionsPage',
+  });
 
   // SWR로 데이터 로딩
   const {
@@ -396,26 +364,21 @@ const ClientVersionsPage: React.FC = () => {
     pageState.page,
     pageState.limit,
     pageState.sortBy,
-    pageState.sortOrder as "ASC" | "DESC",
-    pageState.filters,
+    pageState.sortOrder as 'ASC' | 'DESC',
+    pageState.filters
   );
 
-  const { data: availableVersions, isLoading: isLoadingAvailableVersions } =
-    useAvailableVersions();
+  const { data: availableVersions, isLoading: isLoadingAvailableVersions } = useAvailableVersions();
   const { data: allTags, isLoading: isLoadingTags } = useTags();
 
   // Derived state from SWR
   const clientVersions = useMemo(
     () => clientVersionsData?.clientVersions || [],
-    [clientVersionsData],
+    [clientVersionsData]
   );
-  const total = useMemo(
-    () => clientVersionsData?.total || 0,
-    [clientVersionsData],
-  );
+  const total = useMemo(() => clientVersionsData?.total || 0, [clientVersionsData]);
   const versions = useMemo(() => availableVersions || [], [availableVersions]);
-  const loading =
-    isLoadingVersions || isLoadingAvailableVersions || isLoadingTags;
+  const loading = isLoadingVersions || isLoadingAvailableVersions || isLoadingTags;
 
   // 초기 로딩 상태 추적
   const [isInitialLoad, setIsInitialLoad] = useState(true);
@@ -430,40 +393,31 @@ const ClientVersionsPage: React.FC = () => {
   const [selectAll, setSelectAll] = useState(false);
 
   // 다이얼로그
-  const [selectedClientVersion, setSelectedClientVersion] =
-    useState<ClientVersion | null>(null);
+  const [selectedClientVersion, setSelectedClientVersion] = useState<ClientVersion | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [bulkStatusDialogOpen, setBulkStatusDialogOpen] = useState(false);
   const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
-  const [bulkStatus, setBulkStatus] = useState<ClientStatus>(
-    ClientStatus.ONLINE,
-  );
+  const [bulkStatus, setBulkStatus] = useState<ClientStatus>(ClientStatus.ONLINE);
 
   // 점검 관련 상태
-  const [maintenanceStartDate, setMaintenanceStartDate] = useState<string>("");
-  const [maintenanceEndDate, setMaintenanceEndDate] = useState<string>("");
+  const [maintenanceStartDate, setMaintenanceStartDate] = useState<string>('');
+  const [maintenanceEndDate, setMaintenanceEndDate] = useState<string>('');
 
   // 메시지 입력 방식
-  const [inputMode, setInputMode] = useState<"direct" | "template">("direct");
+  const [inputMode, setInputMode] = useState<'direct' | 'template'>('direct');
 
   // 직접 입력
-  const [maintenanceMessage, setMaintenanceMessage] = useState<string>("");
+  const [maintenanceMessage, setMaintenanceMessage] = useState<string>('');
   const [supportsMultiLanguage, setSupportsMultiLanguage] = useState(false);
-  const [maintenanceLocales, setMaintenanceLocales] = useState<MessageLocale[]>(
-    [],
-  );
+  const [maintenanceLocales, setMaintenanceLocales] = useState<MessageLocale[]>([]);
 
   // 템플릿 선택
-  const [messageTemplates, setMessageTemplates] = useState<MessageTemplate[]>(
-    [],
-  );
-  const [selectedTemplateId, setSelectedTemplateId] = useState<number | "">("");
+  const [messageTemplates, setMessageTemplates] = useState<MessageTemplate[]>([]);
+  const [selectedTemplateId, setSelectedTemplateId] = useState<number | ''>('');
   const [formDialogOpen, setFormDialogOpen] = useState(false);
   const [bulkFormDialogOpen, setBulkFormDialogOpen] = useState(false);
-  const [platformDefaultsDialogOpen, setPlatformDefaultsDialogOpen] =
-    useState(false);
-  const [editingClientVersion, setEditingClientVersion] =
-    useState<ClientVersion | null>(null);
+  const [platformDefaultsDialogOpen, setPlatformDefaultsDialogOpen] = useState(false);
+  const [editingClientVersion, setEditingClientVersion] = useState<ClientVersion | null>(null);
   const [isCopyMode, setIsCopyMode] = useState(false);
 
   // 태그 관련 상태
@@ -477,11 +431,10 @@ const ClientVersionsPage: React.FC = () => {
   const [filtersInitialized, setFiltersInitialized] = useState(false);
 
   // 내보내기 메뉴 상태
-  const [exportMenuAnchor, setExportMenuAnchor] = useState<null | HTMLElement>(
-    null,
+  const [exportMenuAnchor, setExportMenuAnchor] = useState<null | HTMLElement>(null);
+  const [selectedExportMenuAnchor, setSelectedExportMenuAnchor] = useState<null | HTMLElement>(
+    null
   );
-  const [selectedExportMenuAnchor, setSelectedExportMenuAnchor] =
-    useState<null | HTMLElement>(null);
 
   // SDK 가이드 상태
   const [openSDKGuide, setOpenSDKGuide] = useState(false);
@@ -489,38 +442,38 @@ const ClientVersionsPage: React.FC = () => {
   // Default column configuration
   const defaultColumns: ColumnConfig[] = [
     {
-      id: "clientVersion",
-      labelKey: "clientVersions.clientVersion",
+      id: 'clientVersion',
+      labelKey: 'clientVersions.clientVersion',
       visible: true,
     },
-    { id: "platform", labelKey: "clientVersions.platform", visible: true },
+    { id: 'platform', labelKey: 'clientVersions.platform', visible: true },
     {
-      id: "clientStatus",
-      labelKey: "clientVersions.clientStatus",
-      visible: true,
-    },
-    {
-      id: "gameServerAddress",
-      labelKey: "clientVersions.gameServerAddress",
+      id: 'clientStatus',
+      labelKey: 'clientVersions.clientStatus',
       visible: true,
     },
     {
-      id: "patchAddress",
-      labelKey: "clientVersions.patchAddress",
+      id: 'gameServerAddress',
+      labelKey: 'clientVersions.gameServerAddress',
       visible: true,
     },
     {
-      id: "guestModeAllowed",
-      labelKey: "clientVersions.guestModeAllowed",
+      id: 'patchAddress',
+      labelKey: 'clientVersions.patchAddress',
       visible: true,
     },
-    { id: "tags", labelKey: "clientVersions.tags", visible: true },
-    { id: "createdAt", labelKey: "clientVersions.createdAt", visible: true },
+    {
+      id: 'guestModeAllowed',
+      labelKey: 'clientVersions.guestModeAllowed',
+      visible: true,
+    },
+    { id: 'tags', labelKey: 'clientVersions.tags', visible: true },
+    { id: 'createdAt', labelKey: 'clientVersions.createdAt', visible: true },
   ];
 
   // Column configuration state (persisted in localStorage)
   const [columns, setColumns] = useState<ColumnConfig[]>(() => {
-    const saved = localStorage.getItem("clientVersionsColumns");
+    const saved = localStorage.getItem('clientVersionsColumns');
     if (saved) {
       try {
         const savedColumns = JSON.parse(saved);
@@ -539,8 +492,7 @@ const ClientVersionsPage: React.FC = () => {
   });
 
   // Column settings popover state
-  const [columnSettingsAnchor, setColumnSettingsAnchor] =
-    useState<HTMLButtonElement | null>(null);
+  const [columnSettingsAnchor, setColumnSettingsAnchor] = useState<HTMLButtonElement | null>(null);
 
   // Drag and drop sensors
   const sensors = useSensors(
@@ -551,7 +503,7 @@ const ClientVersionsPage: React.FC = () => {
     }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    }),
+    })
   );
 
   // 메시지 템플릿 로드 (SWR로 변경 예정이지만 일단 유지)
@@ -571,17 +523,17 @@ const ClientVersionsPage: React.FC = () => {
     (newFilters: ClientVersionFilters) => {
       updateFilters(newFilters);
     },
-    [updateFilters],
+    [updateFilters]
   );
 
   // 동적 필터 정의
   const availableFilterDefinitions: FilterDefinition[] = useMemo(
     () => [
       {
-        key: "version",
-        label: t("clientVersions.version"),
-        type: "multiselect",
-        operator: "any_of",
+        key: 'version',
+        label: t('clientVersions.version'),
+        type: 'multiselect',
+        operator: 'any_of',
         allowOperatorToggle: false,
         options: (versions || []).map((version) => ({
           value: version,
@@ -589,10 +541,10 @@ const ClientVersionsPage: React.FC = () => {
         })),
       },
       {
-        key: "platform",
-        label: t("clientVersions.platform"),
-        type: "multiselect",
-        operator: "any_of",
+        key: 'platform',
+        label: t('clientVersions.platform'),
+        type: 'multiselect',
+        operator: 'any_of',
         allowOperatorToggle: false,
         options: platforms.map((platform) => ({
           value: platform.value,
@@ -600,10 +552,10 @@ const ClientVersionsPage: React.FC = () => {
         })),
       },
       {
-        key: "clientStatus",
-        label: t("clientVersions.statusLabel"),
-        type: "multiselect",
-        operator: "any_of",
+        key: 'clientStatus',
+        label: t('clientVersions.statusLabel'),
+        type: 'multiselect',
+        operator: 'any_of',
         allowOperatorToggle: false,
         options: Object.values(ClientStatus).map((status) => ({
           value: status,
@@ -611,31 +563,31 @@ const ClientVersionsPage: React.FC = () => {
         })),
       },
       {
-        key: "guestModeAllowed",
-        label: t("clientVersions.guestMode"),
-        type: "multiselect",
-        operator: "any_of",
+        key: 'guestModeAllowed',
+        label: t('clientVersions.guestMode'),
+        type: 'multiselect',
+        operator: 'any_of',
         allowOperatorToggle: false,
         options: [
-          { value: true, label: t("common.yes") },
-          { value: false, label: t("common.no") },
+          { value: true, label: t('common.yes') },
+          { value: false, label: t('common.no') },
         ],
       },
       {
-        key: "tags",
-        label: t("common.tags"),
-        type: "tags",
-        operator: "any_of",
+        key: 'tags',
+        label: t('common.tags'),
+        type: 'tags',
+        operator: 'any_of',
         allowOperatorToggle: true,
         options: (allTags || []).map((tag) => ({
           value: tag.id.toString(),
           label: tag.name,
           color: tag.color,
-          description: tag.description || "",
+          description: tag.description || '',
         })),
       },
     ],
-    [t, versions, allTags, platforms],
+    [t, versions, allTags, platforms]
   );
 
   // 동적 필터 추가 핸들러
@@ -649,23 +601,16 @@ const ClientVersionsPage: React.FC = () => {
   }, []);
 
   // 동적 필터 변경 핸들러
-  const handleDynamicFilterChange = useCallback(
-    (filterKey: string, value: any) => {
-      setActiveFilters((prev) =>
-        prev.map((f) => (f.key === filterKey ? { ...f, value } : f)),
-      );
-    },
-    [],
-  );
+  const handleDynamicFilterChange = useCallback((filterKey: string, value: any) => {
+    setActiveFilters((prev) => prev.map((f) => (f.key === filterKey ? { ...f, value } : f)));
+  }, []);
 
   // 동적 필터 연산자 변경 핸들러
   const handleOperatorChange = useCallback(
-    (filterKey: string, operator: "any_of" | "include_all") => {
-      setActiveFilters((prev) =>
-        prev.map((f) => (f.key === filterKey ? { ...f, operator } : f)),
-      );
+    (filterKey: string, operator: 'any_of' | 'include_all') => {
+      setActiveFilters((prev) => prev.map((f) => (f.key === filterKey ? { ...f, operator } : f)));
     },
-    [],
+    []
   );
 
   // 검색어 변경 핸들러
@@ -675,9 +620,9 @@ const ClientVersionsPage: React.FC = () => {
 
       // activeFilters를 newFilters에 반영
       activeFilters.forEach((filter) => {
-        if (filter.key === "tags") {
+        if (filter.key === 'tags') {
           newFilters.tags = Array.isArray(filter.value) ? filter.value : [];
-          newFilters.tagsOperator = filter.operator || "any_of";
+          newFilters.tagsOperator = filter.operator || 'any_of';
         } else {
           (newFilters as any)[filter.key] = filter.value;
         }
@@ -685,7 +630,7 @@ const ClientVersionsPage: React.FC = () => {
 
       updateFilters(newFilters);
     },
-    [activeFilters, updateFilters],
+    [activeFilters, updateFilters]
   );
 
   // 페이지 로드 시 pageState.filters에서 activeFilters 복원
@@ -703,58 +648,52 @@ const ClientVersionsPage: React.FC = () => {
     // version 필터 복원
     if (filters.version) {
       restoredFilters.push({
-        key: "version",
-        value: Array.isArray(filters.version)
-          ? filters.version
-          : [filters.version],
-        label: t("clientVersions.version"),
-        operator: "any_of",
+        key: 'version',
+        value: Array.isArray(filters.version) ? filters.version : [filters.version],
+        label: t('clientVersions.version'),
+        operator: 'any_of',
       });
     }
 
     // platform 필터 복원
     if (filters.platform) {
       restoredFilters.push({
-        key: "platform",
-        value: Array.isArray(filters.platform)
-          ? filters.platform
-          : [filters.platform],
-        label: t("clientVersions.platform"),
-        operator: "any_of",
+        key: 'platform',
+        value: Array.isArray(filters.platform) ? filters.platform : [filters.platform],
+        label: t('clientVersions.platform'),
+        operator: 'any_of',
       });
     }
 
     // clientStatus 필터 복원
     if (filters.clientStatus) {
       restoredFilters.push({
-        key: "clientStatus",
-        value: Array.isArray(filters.clientStatus)
-          ? filters.clientStatus
-          : [filters.clientStatus],
-        label: t("clientVersions.statusLabel"),
-        operator: "any_of",
+        key: 'clientStatus',
+        value: Array.isArray(filters.clientStatus) ? filters.clientStatus : [filters.clientStatus],
+        label: t('clientVersions.statusLabel'),
+        operator: 'any_of',
       });
     }
 
     // guestModeAllowed 필터 복원
     if (filters.guestModeAllowed !== undefined) {
       restoredFilters.push({
-        key: "guestModeAllowed",
+        key: 'guestModeAllowed',
         value: Array.isArray(filters.guestModeAllowed)
           ? filters.guestModeAllowed
           : [filters.guestModeAllowed],
-        label: t("clientVersions.guestMode"),
-        operator: "any_of",
+        label: t('clientVersions.guestMode'),
+        operator: 'any_of',
       });
     }
 
     // tags 필터 복원
     if (filters.tags && filters.tags.length > 0) {
       restoredFilters.push({
-        key: "tags",
+        key: 'tags',
         value: Array.isArray(filters.tags) ? filters.tags : [filters.tags],
-        label: t("common.tags"),
-        operator: filters.tagsOperator || "any_of",
+        label: t('common.tags'),
+        operator: filters.tagsOperator || 'any_of',
       });
     }
 
@@ -773,9 +712,9 @@ const ClientVersionsPage: React.FC = () => {
     };
 
     activeFilters.forEach((filter) => {
-      if (filter.key === "tags") {
+      if (filter.key === 'tags') {
         newFilters.tags = Array.isArray(filter.value) ? filter.value : [];
-        newFilters.tagsOperator = filter.operator || "any_of";
+        newFilters.tagsOperator = filter.operator || 'any_of';
       } else {
         (newFilters as any)[filter.key] = filter.value;
       }
@@ -797,7 +736,7 @@ const ClientVersionsPage: React.FC = () => {
     (_: unknown, newPage: number) => {
       updatePage(newPage + 1); // MUI는 0부터 시작, 우리는 1부터 시작
     },
-    [updatePage],
+    [updatePage]
   );
 
   // 페이지 크기 변경 핸들러
@@ -806,7 +745,7 @@ const ClientVersionsPage: React.FC = () => {
       const newLimit = parseInt(event.target.value, 10);
       updateLimit(newLimit);
     },
-    [updateLimit],
+    [updateLimit]
   );
 
   // 선택 관리
@@ -819,7 +758,7 @@ const ClientVersionsPage: React.FC = () => {
       }
       setSelectAll(checked);
     },
-    [clientVersions],
+    [clientVersions]
   );
 
   const handleSelectOne = useCallback((id: number, checked: boolean) => {
@@ -836,14 +775,12 @@ const ClientVersionsPage: React.FC = () => {
     if (!selectedClientVersion) return;
 
     try {
-      const result = await ClientVersionService.deleteClientVersion(
-        selectedClientVersion.id,
-      );
+      const result = await ClientVersionService.deleteClientVersion(selectedClientVersion.id);
       if (result?.isChangeRequest) {
         showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
       } else {
-        enqueueSnackbar(t("clientVersions.deleteSuccess"), {
-          variant: "success",
+        enqueueSnackbar(t('clientVersions.deleteSuccess'), {
+          variant: 'success',
         });
       }
       setDeleteDialogOpen(false);
@@ -851,20 +788,12 @@ const ClientVersionsPage: React.FC = () => {
       mutateVersions(); // SWR cache 갱신
       mutateClientVersions(); // 모든 client versions 캐시 갱신
     } catch (error: any) {
-      console.error("Error deleting client version:", error);
-      enqueueSnackbar(
-        parseApiErrorMessage(error, "clientVersions.deleteError"),
-        { variant: "error" },
-      );
+      console.error('Error deleting client version:', error);
+      enqueueSnackbar(parseApiErrorMessage(error, 'clientVersions.deleteError'), {
+        variant: 'error',
+      });
     }
-  }, [
-    selectedClientVersion,
-    t,
-    enqueueSnackbar,
-    closeSnackbar,
-    navigate,
-    mutateVersions,
-  ]);
+  }, [selectedClientVersion, t, enqueueSnackbar, closeSnackbar, navigate, mutateVersions]);
 
   // 일괄 상태 변경 핸들러
   const handleBulkStatusUpdate = useCallback(async () => {
@@ -872,15 +801,15 @@ const ClientVersionsPage: React.FC = () => {
 
     // 점검 상태일 때 필수 필드 검증
     if (bulkStatus === ClientStatus.MAINTENANCE) {
-      if (inputMode === "direct" && !maintenanceMessage.trim()) {
-        enqueueSnackbar(t("clientVersions.maintenance.messageRequired"), {
-          variant: "error",
+      if (inputMode === 'direct' && !maintenanceMessage.trim()) {
+        enqueueSnackbar(t('clientVersions.maintenance.messageRequired'), {
+          variant: 'error',
         });
         return;
       }
-      if (inputMode === "template" && !selectedTemplateId) {
-        enqueueSnackbar(t("maintenance.selectTemplateRequired"), {
-          variant: "error",
+      if (inputMode === 'template' && !selectedTemplateId) {
+        enqueueSnackbar(t('maintenance.selectTemplateRequired'), {
+          variant: 'error',
         });
         return;
       }
@@ -894,52 +823,47 @@ const ClientVersionsPage: React.FC = () => {
         ...(bulkStatus === ClientStatus.MAINTENANCE && {
           maintenanceStartDate: maintenanceStartDate || undefined,
           maintenanceEndDate: maintenanceEndDate || undefined,
-          ...(inputMode === "direct"
+          ...(inputMode === 'direct'
             ? {
                 maintenanceMessage: maintenanceMessage || undefined,
                 supportsMultiLanguage: supportsMultiLanguage,
-                maintenanceLocales: maintenanceLocales.filter(
-                  (l) => l.message.trim() !== "",
-                ),
+                maintenanceLocales: maintenanceLocales.filter((l) => l.message.trim() !== ''),
               }
             : {
                 messageTemplateId:
-                  selectedTemplateId === ""
-                    ? undefined
-                    : Number(selectedTemplateId),
+                  selectedTemplateId === '' ? undefined : Number(selectedTemplateId),
               }),
         }),
       };
 
       const result = await ClientVersionService.bulkUpdateStatus(request);
-      console.log("🔍 Bulk update result:", result);
+      console.log('🔍 Bulk update result:', result);
 
       // 로컬라이징된 메시지 생성
       const updatedCount = result?.updatedCount || selectedIds.length;
-      const successMessage = t("clientVersions.bulkStatusUpdated", {
+      const successMessage = t('clientVersions.bulkStatusUpdated', {
         count: updatedCount,
       });
 
-      enqueueSnackbar(successMessage, { variant: "success" });
+      enqueueSnackbar(successMessage, { variant: 'success' });
       setBulkStatusDialogOpen(false);
       setSelectedIds([]);
       setSelectAll(false);
       // 점검 관련 상태 초기화
-      setMaintenanceStartDate("");
-      setMaintenanceEndDate("");
-      setMaintenanceMessage("");
+      setMaintenanceStartDate('');
+      setMaintenanceEndDate('');
+      setMaintenanceMessage('');
       setSupportsMultiLanguage(false);
       setMaintenanceLocales([]);
-      setInputMode("direct");
-      setSelectedTemplateId("");
+      setInputMode('direct');
+      setSelectedTemplateId('');
       mutateVersions(); // SWR cache 갱신
       mutateClientVersions(); // 모든 client versions 캐시 갱신
     } catch (error: any) {
-      console.error("Error updating status:", error);
-      enqueueSnackbar(
-        parseApiErrorMessage(error, "clientVersions.statusUpdateError"),
-        { variant: "error" },
-      );
+      console.error('Error updating status:', error);
+      enqueueSnackbar(parseApiErrorMessage(error, 'clientVersions.statusUpdateError'), {
+        variant: 'error',
+      });
     }
   }, [
     selectedIds,
@@ -961,84 +885,70 @@ const ClientVersionsPage: React.FC = () => {
     if (selectedIds.length === 0) return;
 
     try {
-      await Promise.all(
-        selectedIds.map((id) => ClientVersionService.deleteClientVersion(id)),
-      );
-      enqueueSnackbar(
-        t("clientVersions.bulkDeleteSuccess", { count: selectedIds.length }),
-        { variant: "success" },
-      );
+      await Promise.all(selectedIds.map((id) => ClientVersionService.deleteClientVersion(id)));
+      enqueueSnackbar(t('clientVersions.bulkDeleteSuccess', { count: selectedIds.length }), {
+        variant: 'success',
+      });
       setSelectedIds([]);
       setSelectAll(false);
       setBulkDeleteDialogOpen(false);
       mutateVersions(); // SWR cache 갱신
       mutateClientVersions(); // 모든 client versions 캐시 갱신
     } catch (error: any) {
-      console.error("Failed to delete client versions:", error);
-      enqueueSnackbar(
-        parseApiErrorMessage(error, "clientVersions.bulkDeleteError"),
-        { variant: "error" },
-      );
+      console.error('Failed to delete client versions:', error);
+      enqueueSnackbar(parseApiErrorMessage(error, 'clientVersions.bulkDeleteError'), {
+        variant: 'error',
+      });
     }
   }, [selectedIds, t, enqueueSnackbar, mutateVersions]);
 
   // 내보내기 함수들
   const handleExport = useCallback(
-    async (format: "csv" | "json" | "xlsx") => {
+    async (format: 'csv' | 'json' | 'xlsx') => {
       try {
         let blob: Blob;
         let filename: string;
         const now = new Date();
-        const dateTimeStr = now
-          .toISOString()
-          .replace(/[:.]/g, "-")
-          .slice(0, 19); // YYYY-MM-DDTHH-MM-SS
+        const dateTimeStr = now.toISOString().replace(/[:.]/g, '-').slice(0, 19); // YYYY-MM-DDTHH-MM-SS
 
-        if (format === "csv") {
-          blob = await ClientVersionService.exportToCSV(
-            pageState.filters || {},
-          );
+        if (format === 'csv') {
+          blob = await ClientVersionService.exportToCSV(pageState.filters || {});
           filename = `client-versions-${dateTimeStr}.csv`;
-        } else if (format === "json") {
+        } else if (format === 'json') {
           // JSON 내보내기
-          const result = await ClientVersionService.exportToCSV(
-            pageState.filters || {},
-          ); // 같은 데이터 사용
+          const result = await ClientVersionService.exportToCSV(pageState.filters || {}); // 같은 데이터 사용
           const text = await result.text();
-          const lines = text.split("\n");
-          const headers = lines[0].split(",");
+          const lines = text.split('\n');
+          const headers = lines[0].split(',');
           const jsonData = lines
             .slice(1)
             .filter((line) => line.trim())
             .map((line) => {
-              const values = line.split(",");
+              const values = line.split(',');
               const obj: any = {};
               headers.forEach((header, index) => {
-                obj[header.replace(/"/g, "")] =
-                  values[index]?.replace(/"/g, "") || "";
+                obj[header.replace(/"/g, '')] = values[index]?.replace(/"/g, '') || '';
               });
               return obj;
             });
           blob = new Blob([JSON.stringify(jsonData, null, 2)], {
-            type: "application/json",
+            type: 'application/json',
           });
           filename = `client-versions-${dateTimeStr}.json`;
-        } else if (format === "xlsx") {
+        } else if (format === 'xlsx') {
           // XLSX 내보내기
-          const result = await ClientVersionService.exportToCSV(
-            pageState.filters || {},
-          );
+          const result = await ClientVersionService.exportToCSV(pageState.filters || {});
           const text = await result.text();
-          const lines = text.split("\n");
-          const headers = lines[0].split(",").map((h) => h.replace(/"/g, ""));
+          const lines = text.split('\n');
+          const headers = lines[0].split(',').map((h) => h.replace(/"/g, ''));
           const data = lines
             .slice(1)
             .filter((line) => line.trim())
             .map((line) => {
-              const values = line.split(",");
+              const values = line.split(',');
               const obj: any = {};
               headers.forEach((header, index) => {
-                obj[header] = values[index]?.replace(/"/g, "") || "";
+                obj[header] = values[index]?.replace(/"/g, '') || '';
               });
               return obj;
             });
@@ -1046,30 +956,30 @@ const ClientVersionsPage: React.FC = () => {
           // XLSX 워크북 생성
           const worksheet = XLSX.utils.json_to_sheet(data);
           const workbook = XLSX.utils.book_new();
-          XLSX.utils.book_append_sheet(workbook, worksheet, "Client Versions");
+          XLSX.utils.book_append_sheet(workbook, worksheet, 'Client Versions');
 
           // 컬럼 너비 자동 조정
           const colWidths = headers.map((header) => ({
             wch: Math.max(header.length, 15),
           }));
-          worksheet["!cols"] = colWidths;
+          worksheet['!cols'] = colWidths;
 
           // XLSX 파일 생성
           const xlsxBuffer = XLSX.write(workbook, {
-            bookType: "xlsx",
-            type: "array",
+            bookType: 'xlsx',
+            type: 'array',
           });
           blob = new Blob([xlsxBuffer], {
-            type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
           });
           filename = `client-versions-${dateTimeStr}.xlsx`;
         } else {
-          enqueueSnackbar("Unsupported export format", { variant: "warning" });
+          enqueueSnackbar('Unsupported export format', { variant: 'warning' });
           return;
         }
 
         const url = window.URL.createObjectURL(blob);
-        const link = document.createElement("a");
+        const link = document.createElement('a');
         link.href = url;
         link.download = filename;
         document.body.appendChild(link);
@@ -1077,66 +987,60 @@ const ClientVersionsPage: React.FC = () => {
         document.body.removeChild(link);
         window.URL.revokeObjectURL(url);
 
-        enqueueSnackbar(t("clientVersions.exportSuccess"), {
-          variant: "success",
+        enqueueSnackbar(t('clientVersions.exportSuccess'), {
+          variant: 'success',
         });
         setExportMenuAnchor(null);
       } catch (error: any) {
-        console.error("Error exporting:", error);
-        enqueueSnackbar(
-          parseApiErrorMessage(error, "clientVersions.exportError"),
-          { variant: "error" },
-        );
+        console.error('Error exporting:', error);
+        enqueueSnackbar(parseApiErrorMessage(error, 'clientVersions.exportError'), {
+          variant: 'error',
+        });
       }
     },
-    [pageState.filters, t, enqueueSnackbar],
+    [pageState.filters, t, enqueueSnackbar]
   );
 
   // 선택된 항목 내보내기
   const handleExportSelected = useCallback(
-    async (format: "csv" | "json" | "xlsx") => {
+    async (format: 'csv' | 'json' | 'xlsx') => {
       if (selectedIds.length === 0) return;
 
       try {
-        const selectedVersions = clientVersions.filter((cv) =>
-          selectedIds.includes(cv.id),
-        );
+        const selectedVersions = clientVersions.filter((cv) => selectedIds.includes(cv.id));
         let blob: Blob;
         let filename: string;
         const now = new Date();
-        const dateTimeStr = now
-          .toISOString()
-          .replace(/[:.]/g, "-")
-          .slice(0, 19); // YYYY-MM-DDTHH-MM-SS
+        const dateTimeStr = now.toISOString().replace(/[:.]/g, '-').slice(0, 19); // YYYY-MM-DDTHH-MM-SS
 
-        if (format === "csv") {
+        if (format === 'csv') {
           const csvContent = [
             // CSV 헤더
             [
-              "ID",
-              "Platform",
-              "Version",
-              "Status",
-              "Game Server",
-              "Game Server (Whitelist)",
-              "Patch Address",
-              "Patch Address (Whitelist)",
-              "Guest Mode",
-              "External Click Link",
-              "Memo",
-              "Custom Payload",
-              "Maintenance Start",
-              "Maintenance End",
-              "Maintenance Message",
-              "Multi Language",
-              "Tags",
-              "Created By",
-              "Created By Email",
-              "Created At",
-              "Updated By",
-              "Updated By Email",
-              "Updated At",
-            ].join(","),
+              'ID',
+              'Platform',
+              'Version',
+              'Status',
+              'Game Server',
+              'Game Server (Whitelist)',
+              'Patch Address',
+              'Patch Address (Whitelist)',
+              'Guest Mode',
+              'External Click Link',
+              'Memo',
+              'Custom Payload',
+              'Maintenance Start',
+              'Maintenance End',
+              'Maintenance Message',
+              'Multi Language',
+              'Tags',
+              'Created By',
+              'Created By Email',
+              'Created At',
+              'Updated By',
+              'Updated By Email',
+              'Updated At',
+            ].join(','),
             // CSV 데이터
             ...selectedVersions.map((cv) =>
               [
@@ -1145,60 +1049,60 @@ const ClientVersionsPage: React.FC = () => {
                 `"${cv.clientVersion}"`,
                 `"${cv.clientStatus}"`,
                 `"${cv.gameServerAddress}"`,
-                `"${cv.gameServerAddressForWhiteList || ""}"`,
+                `"${cv.gameServerAddressForWhiteList || ''}"`,
                 `"${cv.patchAddress}"`,
-                `"${cv.patchAddressForWhiteList || ""}"`,
-                cv.guestModeAllowed ? "Yes" : "No",
-                `"${cv.externalClickLink || ""}"`,
-                `"${cv.memo || ""}"`,
-                `"${cv.customPayload || ""}"`,
-                `"${cv.maintenanceStartDate || ""}"`,
-                `"${cv.maintenanceEndDate || ""}"`,
-                `"${cv.maintenanceMessage || ""}"`,
-                cv.supportsMultiLanguage ? "Yes" : "No",
-                `"${cv.tags ? cv.tags.map((tag) => tag.name).join("; ") : ""}"`,
-                `"${cv.createdByName || t("dashboard.unknown")}"`,
-                `"${cv.createdByEmail || ""}"`,
+                `"${cv.patchAddressForWhiteList || ''}"`,
+                cv.guestModeAllowed ? 'Yes' : 'No',
+                `"${cv.externalClickLink || ''}"`,
+                `"${cv.memo || ''}"`,
+                `"${cv.customPayload || ''}"`,
+                `"${cv.maintenanceStartDate || ''}"`,
+                `"${cv.maintenanceEndDate || ''}"`,
+                `"${cv.maintenanceMessage || ''}"`,
+                cv.supportsMultiLanguage ? 'Yes' : 'No',
+                `"${cv.tags ? cv.tags.map((tag) => tag.name).join('; ') : ''}"`,
+                `"${cv.createdByName || t('dashboard.unknown')}"`,
+                `"${cv.createdByEmail || ''}"`,
                 `"${new Date(cv.createdAt).toLocaleDateString()}"`,
-                `"${cv.updatedByName || ""}"`,
-                `"${cv.updatedByEmail || ""}"`,
+                `"${cv.updatedByName || ''}"`,
+                `"${cv.updatedByEmail || ''}"`,
                 `"${new Date(cv.updatedAt).toLocaleDateString()}"`,
-              ].join(","),
+              ].join(',')
             ),
-          ].join("\n");
-          blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+          ].join('\n');
+          blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
           filename = `client-versions-selected-${dateTimeStr}.csv`;
-        } else if (format === "json") {
+        } else if (format === 'json') {
           blob = new Blob([JSON.stringify(selectedVersions, null, 2)], {
-            type: "application/json",
+            type: 'application/json',
           });
           filename = `client-versions-selected-${dateTimeStr}.json`;
-        } else if (format === "xlsx") {
+        } else if (format === 'xlsx') {
           // XLSX 내보내기 - 선택된 항목들
           const headers = [
-            "ID",
-            "Platform",
-            "Version",
-            "Status",
-            "Game Server",
-            "Game Server (Whitelist)",
-            "Patch Address",
-            "Patch Address (Whitelist)",
-            "Guest Mode",
-            "External Click Link",
-            "Memo",
-            "Custom Payload",
-            "Maintenance Start",
-            "Maintenance End",
-            "Maintenance Message",
-            "Multi Language",
-            "Tags",
-            "Created By",
-            "Created By Email",
-            "Created At",
-            "Updated By",
-            "Updated By Email",
-            "Updated At",
+            'ID',
+            'Platform',
+            'Version',
+            'Status',
+            'Game Server',
+            'Game Server (Whitelist)',
+            'Patch Address',
+            'Patch Address (Whitelist)',
+            'Guest Mode',
+            'External Click Link',
+            'Memo',
+            'Custom Payload',
+            'Maintenance Start',
+            'Maintenance End',
+            'Maintenance Message',
+            'Multi Language',
+            'Tags',
+            'Created By',
+            'Created By Email',
+            'Created At',
+            'Updated By',
+            'Updated By Email',
+            'Updated At',
           ];
 
           const data = selectedVersions.map((cv) => ({
@@ -1206,58 +1110,54 @@ const ClientVersionsPage: React.FC = () => {
             Platform: cv.platform,
             Version: cv.clientVersion,
             Status: cv.clientStatus,
-            "Game Server": cv.gameServerAddress,
-            "Game Server (Whitelist)": cv.gameServerAddressForWhiteList || "",
-            "Patch Address": cv.patchAddress,
-            "Patch Address (Whitelist)": cv.patchAddressForWhiteList || "",
-            "Guest Mode": cv.guestModeAllowed ? "Yes" : "No",
-            "External Click Link": cv.externalClickLink || "",
-            Memo: cv.memo || "",
-            "Custom Payload": cv.customPayload || "",
-            "Maintenance Start": cv.maintenanceStartDate || "",
-            "Maintenance End": cv.maintenanceEndDate || "",
-            "Maintenance Message": cv.maintenanceMessage || "",
-            "Multi Language": cv.supportsMultiLanguage ? "Yes" : "No",
-            Tags: cv.tags ? cv.tags.map((tag) => tag.name).join("; ") : "",
-            "Created By": cv.createdByName || t("dashboard.unknown"),
-            "Created By Email": cv.createdByEmail || "",
-            "Created At": new Date(cv.createdAt).toLocaleDateString(),
-            "Updated By": cv.updatedByName || "",
-            "Updated By Email": cv.updatedByEmail || "",
-            "Updated At": new Date(cv.updatedAt).toLocaleDateString(),
+            'Game Server': cv.gameServerAddress,
+            'Game Server (Whitelist)': cv.gameServerAddressForWhiteList || '',
+            'Patch Address': cv.patchAddress,
+            'Patch Address (Whitelist)': cv.patchAddressForWhiteList || '',
+            'Guest Mode': cv.guestModeAllowed ? 'Yes' : 'No',
+            'External Click Link': cv.externalClickLink || '',
+            Memo: cv.memo || '',
+            'Custom Payload': cv.customPayload || '',
+            'Maintenance Start': cv.maintenanceStartDate || '',
+            'Maintenance End': cv.maintenanceEndDate || '',
+            'Maintenance Message': cv.maintenanceMessage || '',
+            'Multi Language': cv.supportsMultiLanguage ? 'Yes' : 'No',
+            Tags: cv.tags ? cv.tags.map((tag) => tag.name).join('; ') : '',
+            'Created By': cv.createdByName || t('dashboard.unknown'),
+            'Created By Email': cv.createdByEmail || '',
+            'Created At': new Date(cv.createdAt).toLocaleDateString(),
+            'Updated By': cv.updatedByName || '',
+            'Updated By Email': cv.updatedByEmail || '',
+            'Updated At': new Date(cv.updatedAt).toLocaleDateString(),
           }));
 
           // XLSX 워크북 생성
           const worksheet = XLSX.utils.json_to_sheet(data);
           const workbook = XLSX.utils.book_new();
-          XLSX.utils.book_append_sheet(
-            workbook,
-            worksheet,
-            "Selected Client Versions",
-          );
+          XLSX.utils.book_append_sheet(workbook, worksheet, 'Selected Client Versions');
 
           // 컬럼 너비 자동 조정
           const colWidths = headers.map((header) => ({
             wch: Math.max(header.length, 15),
           }));
-          worksheet["!cols"] = colWidths;
+          worksheet['!cols'] = colWidths;
 
           // XLSX 파일 생성
           const xlsxBuffer = XLSX.write(workbook, {
-            bookType: "xlsx",
-            type: "array",
+            bookType: 'xlsx',
+            type: 'array',
           });
           blob = new Blob([xlsxBuffer], {
-            type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
           });
           filename = `client-versions-selected-${dateTimeStr}.xlsx`;
         } else {
-          enqueueSnackbar("Unsupported export format", { variant: "warning" });
+          enqueueSnackbar('Unsupported export format', { variant: 'warning' });
           return;
         }
 
         const url = window.URL.createObjectURL(blob);
-        const link = document.createElement("a");
+        const link = document.createElement('a');
         link.href = url;
         link.download = filename;
         document.body.appendChild(link);
@@ -1265,25 +1165,24 @@ const ClientVersionsPage: React.FC = () => {
         document.body.removeChild(link);
         window.URL.revokeObjectURL(url);
 
-        enqueueSnackbar(t("clientVersions.exportSuccess"), {
-          variant: "success",
+        enqueueSnackbar(t('clientVersions.exportSuccess'), {
+          variant: 'success',
         });
         setSelectedExportMenuAnchor(null);
       } catch (error: any) {
-        console.error("Failed to export selected versions:", error);
-        enqueueSnackbar(
-          parseApiErrorMessage(error, "clientVersions.exportSelectedError"),
-          { variant: "error" },
-        );
+        console.error('Failed to export selected versions:', error);
+        enqueueSnackbar(parseApiErrorMessage(error, 'clientVersions.exportSelectedError'), {
+          variant: 'error',
+        });
       }
     },
-    [selectedIds, clientVersions, t, enqueueSnackbar],
+    [selectedIds, clientVersions, t, enqueueSnackbar]
   );
 
   // 버전 복사 핸들러
   const handleCopyVersion = useCallback(
     (clientVersion: ClientVersion) => {
-      console.log("Copy button clicked for client version:", {
+      console.log('Copy button clicked for client version:', {
         id: clientVersion.id,
         clientVersion: clientVersion,
       });
@@ -1292,32 +1191,31 @@ const ClientVersionsPage: React.FC = () => {
       const copiedData = {
         id: clientVersion.id, // 상세 재조회(maintenanceLocales 포함)를 위해 원본 id를 전달. 저장 시에는 isCopyMode로 신규 생성 처리됨
         platform: clientVersion.platform,
-        clientVersion: "", // 버전은 비워둠
+        clientVersion: '', // 버전은 비워둠
         clientStatus: clientVersion.clientStatus,
         gameServerAddress: clientVersion.gameServerAddress,
-        gameServerAddressForWhiteList:
-          clientVersion.gameServerAddressForWhiteList || "",
+        gameServerAddressForWhiteList: clientVersion.gameServerAddressForWhiteList || '',
         patchAddress: clientVersion.patchAddress,
-        patchAddressForWhiteList: clientVersion.patchAddressForWhiteList || "",
+        patchAddressForWhiteList: clientVersion.patchAddressForWhiteList || '',
         guestModeAllowed: clientVersion.guestModeAllowed,
-        externalClickLink: clientVersion.externalClickLink || "",
-        memo: clientVersion.memo || "",
-        customPayload: clientVersion.customPayload || "",
-        maintenanceStartDate: clientVersion.maintenanceStartDate || "",
-        maintenanceEndDate: clientVersion.maintenanceEndDate || "",
-        maintenanceMessage: clientVersion.maintenanceMessage || "",
+        externalClickLink: clientVersion.externalClickLink || '',
+        memo: clientVersion.memo || '',
+        customPayload: clientVersion.customPayload || '',
+        maintenanceStartDate: clientVersion.maintenanceStartDate || '',
+        maintenanceEndDate: clientVersion.maintenanceEndDate || '',
+        maintenanceMessage: clientVersion.maintenanceMessage || '',
         supportsMultiLanguage: clientVersion.supportsMultiLanguage || false,
         maintenanceLocales: clientVersion.maintenanceLocales || [],
         tags: clientVersion.tags || [],
       };
 
       // 폼 다이얼로그를 열고 복사된 데이터로 초기화
-      console.log("Setting copied data:", copiedData);
+      console.log('Setting copied data:', copiedData);
       setEditingClientVersion(copiedData as any);
       setIsCopyMode(true);
       setFormDialogOpen(true);
     },
-    [t, enqueueSnackbar],
+    [t, enqueueSnackbar]
   );
 
   // 태그 관련 핸들러
@@ -1329,11 +1227,11 @@ const ClientVersionsPage: React.FC = () => {
         setClientVersionTags(tags);
         setTagDialogOpen(true);
       } catch (error) {
-        console.error("Error loading client version tags:", error);
-        enqueueSnackbar(t("common.error"), { variant: "error" });
+        console.error('Error loading client version tags:', error);
+        enqueueSnackbar(t('common.error'), { variant: 'error' });
       }
     },
-    [t, enqueueSnackbar],
+    [t, enqueueSnackbar]
   );
 
   const handleSaveTags = useCallback(
@@ -1341,41 +1239,35 @@ const ClientVersionsPage: React.FC = () => {
       if (!selectedClientVersionForTags?.id) return;
 
       try {
-        await ClientVersionService.setTags(
-          selectedClientVersionForTags.id,
-          tagIds,
-        );
+        await ClientVersionService.setTags(selectedClientVersionForTags.id, tagIds);
         setTagDialogOpen(false);
-        enqueueSnackbar(t("common.success"), { variant: "success" });
+        enqueueSnackbar(t('common.success'), { variant: 'success' });
         // 필요시 목록 새로고침
         mutateVersions(); // SWR cache 갱신
         mutateClientVersions(); // 모든 client versions 캐시 갱신
       } catch (error) {
-        console.error("Error saving client version tags:", error);
-        enqueueSnackbar(t("common.error"), { variant: "error" });
+        console.error('Error saving client version tags:', error);
+        enqueueSnackbar(t('common.error'), { variant: 'error' });
       }
     },
-    [selectedClientVersionForTags, t, enqueueSnackbar, mutateVersions],
+    [selectedClientVersionForTags, t, enqueueSnackbar, mutateVersions]
   );
 
   // Column settings handlers
   const handleToggleColumnVisibility = useCallback(
     (columnId: string) => {
       const newColumns = columns.map((col) =>
-        col.id === columnId ? { ...col, visible: !col.visible } : col,
+        col.id === columnId ? { ...col, visible: !col.visible } : col
       );
       setColumns(newColumns);
-      localStorage.setItem("clientVersionsColumns", JSON.stringify(newColumns));
+      localStorage.setItem('clientVersionsColumns', JSON.stringify(newColumns));
     },
-    [columns],
+    [columns]
   );
 
   const handleResetColumns = useCallback(() => {
     setColumns(defaultColumns);
-    localStorage.setItem(
-      "clientVersionsColumns",
-      JSON.stringify(defaultColumns),
-    );
+    localStorage.setItem('clientVersionsColumns', JSON.stringify(defaultColumns));
   }, []);
 
   const handleColumnDragEnd = useCallback(
@@ -1386,48 +1278,37 @@ const ClientVersionsPage: React.FC = () => {
         const newIndex = columns.findIndex((col) => col.id === over.id);
         const newColumns = arrayMove(columns, oldIndex, newIndex);
         setColumns(newColumns);
-        localStorage.setItem(
-          "clientVersionsColumns",
-          JSON.stringify(newColumns),
-        );
+        localStorage.setItem('clientVersionsColumns', JSON.stringify(newColumns));
       }
     },
-    [columns],
+    [columns]
   );
 
   // Render cell content based on column ID
   const renderCellContent = useCallback(
     (clientVersion: ClientVersion, columnId: string) => {
       switch (columnId) {
-        case "platform":
+        case 'platform':
           return (
-            <Chip
-              label={clientVersion.platform}
-              size="small"
-              color="primary"
-              variant="outlined"
-            />
+            <Chip label={clientVersion.platform} size="small" color="primary" variant="outlined" />
           );
-        case "clientVersion":
+        case 'clientVersion':
           return (
             <Chip
               label={clientVersion.clientVersion}
               size="small"
               variant="filled"
               sx={{
-                ...getVersionColorStyle(
-                  clientVersion.clientVersion,
-                  theme.palette.mode === "dark",
-                ),
-                cursor: "pointer",
+                ...getVersionColorStyle(clientVersion.clientVersion, theme.palette.mode === 'dark'),
+                cursor: 'pointer',
                 fontWeight: 600,
-                borderRadius: "4px",
-                "&:hover": {
+                borderRadius: '4px',
+                '&:hover': {
                   opacity: 0.8,
-                  transform: "scale(1.05)",
+                  transform: 'scale(1.05)',
                   boxShadow: 2,
                 },
-                transition: "all 0.2s ease-in-out",
+                transition: 'all 0.2s ease-in-out',
               }}
               onClick={() => {
                 setEditingClientVersion(clientVersion);
@@ -1436,7 +1317,7 @@ const ClientVersionsPage: React.FC = () => {
               }}
             />
           );
-        case "clientStatus":
+        case 'clientStatus':
           return (
             <Chip
               label={t(ClientStatusLabels[clientVersion.clientStatus])}
@@ -1444,86 +1325,76 @@ const ClientVersionsPage: React.FC = () => {
               color={ClientStatusColors[clientVersion.clientStatus]}
             />
           );
-        case "gameServerAddress":
+        case 'gameServerAddress':
           return (
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <Typography
-                variant="body2"
-                sx={{ fontFamily: "monospace", fontSize: "0.75rem" }}
-              >
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }}>
                 {clientVersion.gameServerAddress}
               </Typography>
-              <Tooltip title={t("common.copy")}>
+              <Tooltip title={t('common.copy')}>
                 <IconButton
                   size="small"
                   onClick={async () => {
                     await copyToClipboardWithNotification(
                       clientVersion.gameServerAddress,
                       () =>
-                        enqueueSnackbar(t("common.copiedToClipboard"), {
-                          variant: "success",
+                        enqueueSnackbar(t('common.copiedToClipboard'), {
+                          variant: 'success',
                         }),
                       () =>
-                        enqueueSnackbar(t("common.copyFailed"), {
-                          variant: "error",
-                        }),
+                        enqueueSnackbar(t('common.copyFailed'), {
+                          variant: 'error',
+                        })
                     );
                   }}
                   sx={{ p: 0.5 }}
                 >
-                  <CopyIcon sx={{ fontSize: "1.25rem" }} />
+                  <CopyIcon sx={{ fontSize: '1.25rem' }} />
                 </IconButton>
               </Tooltip>
             </Box>
           );
-        case "patchAddress":
+        case 'patchAddress':
           return (
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <Typography
-                variant="body2"
-                sx={{ fontFamily: "monospace", fontSize: "0.75rem" }}
-              >
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }}>
                 {clientVersion.patchAddress}
               </Typography>
-              <Tooltip title={t("common.copy")}>
+              <Tooltip title={t('common.copy')}>
                 <IconButton
                   size="small"
                   onClick={async () => {
                     await copyToClipboardWithNotification(
                       clientVersion.patchAddress,
                       () =>
-                        enqueueSnackbar(t("common.copiedToClipboard"), {
-                          variant: "success",
+                        enqueueSnackbar(t('common.copiedToClipboard'), {
+                          variant: 'success',
                         }),
                       () =>
-                        enqueueSnackbar(t("common.copyFailed"), {
-                          variant: "error",
-                        }),
+                        enqueueSnackbar(t('common.copyFailed'), {
+                          variant: 'error',
+                        })
                     );
                   }}
                   sx={{ p: 0.5 }}
                 >
-                  <CopyIcon sx={{ fontSize: "1.25rem" }} />
+                  <CopyIcon sx={{ fontSize: '1.25rem' }} />
                 </IconButton>
               </Tooltip>
             </Box>
           );
-        case "guestModeAllowed":
+        case 'guestModeAllowed':
           return (
             <Chip
-              label={
-                clientVersion.guestModeAllowed
-                  ? t("common.yes")
-                  : t("common.no")
-              }
+              label={clientVersion.guestModeAllowed ? t('common.yes') : t('common.no')}
               size="small"
-              color={clientVersion.guestModeAllowed ? "success" : "default"}
+              color={clientVersion.guestModeAllowed ? 'success' : 'default'}
               variant="outlined"
             />
           );
-        case "tags":
+        case 'tags':
           return (
-            <Box sx={{ display: "flex", gap: 0.5, flexWrap: "wrap" }}>
+            <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
               {clientVersion.tags && clientVersion.tags.length > 0 ? (
                 clientVersion.tags.map((tag) => (
                   <Chip
@@ -1543,15 +1414,11 @@ const ClientVersionsPage: React.FC = () => {
               )}
             </Box>
           );
-        case "createdAt":
+        case 'createdAt':
           return (
             <Tooltip title={formatDateTimeDetailed(clientVersion.createdAt)}>
               <Typography variant="body2">
-                {formatRelativeTime(
-                  clientVersion.createdAt,
-                  undefined,
-                  language,
-                )}
+                {formatRelativeTime(clientVersion.createdAt, undefined, language)}
               </Typography>
             </Tooltip>
           );
@@ -1559,7 +1426,7 @@ const ClientVersionsPage: React.FC = () => {
           return null;
       }
     },
-    [theme, t],
+    [theme, t]
   );
 
   return (
@@ -1567,54 +1434,54 @@ const ClientVersionsPage: React.FC = () => {
       {/* 헤더 */}
       <Box
         sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
           mb: 3,
         }}
       >
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <WidgetsIcon sx={{ fontSize: 32, color: "primary.main" }} />
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <WidgetsIcon sx={{ fontSize: 32, color: 'primary.main' }} />
           <Box>
             <Typography variant="h5" sx={{ fontWeight: 700 }}>
-              {t("clientVersions.title")}
+              {t('clientVersions.title')}
             </Typography>
             <Typography variant="caption" color="text.secondary">
-              {t("clientVersions.description")}
+              {t('clientVersions.description')}
             </Typography>
           </Box>
         </Box>
-        <Box sx={{ display: "flex", gap: 1 }}>
+        <Box sx={{ display: 'flex', gap: 1 }}>
           <Button
             variant="outlined"
             startIcon={<DownloadIcon />}
             endIcon={<ArrowDropDownIcon />}
             onClick={(e) => setExportMenuAnchor(e.currentTarget)}
           >
-            {t("common.export")}
+            {t('common.export')}
           </Button>
           <Menu
             anchorEl={exportMenuAnchor}
             open={Boolean(exportMenuAnchor)}
             onClose={() => setExportMenuAnchor(null)}
             anchorOrigin={{
-              vertical: "bottom",
-              horizontal: "left",
+              vertical: 'bottom',
+              horizontal: 'left',
             }}
             transformOrigin={{
-              vertical: "top",
-              horizontal: "left",
+              vertical: 'top',
+              horizontal: 'left',
             }}
           >
-            <MenuItem onClick={() => handleExport("csv")}>
+            <MenuItem onClick={() => handleExport('csv')}>
               <TableChartIcon sx={{ mr: 1 }} />
               CSV
             </MenuItem>
-            <MenuItem onClick={() => handleExport("json")}>
+            <MenuItem onClick={() => handleExport('json')}>
               <JsonIcon sx={{ mr: 1 }} />
               JSON
             </MenuItem>
-            <MenuItem onClick={() => handleExport("xlsx")}>
+            <MenuItem onClick={() => handleExport('xlsx')}>
               <ExcelIcon sx={{ mr: 1 }} />
               Excel (XLSX)
             </MenuItem>
@@ -1632,7 +1499,7 @@ const ClientVersionsPage: React.FC = () => {
                   setFormDialogOpen(true);
                 }}
               >
-                {t("clientVersions.addIndividual")}
+                {t('clientVersions.addIndividual')}
               </Button>
               <Button
                 variant="contained"
@@ -1642,12 +1509,12 @@ const ClientVersionsPage: React.FC = () => {
                   setBulkFormDialogOpen(true);
                 }}
               >
-                {t("clientVersions.addBulk")}
+                {t('clientVersions.addBulk')}
               </Button>
               <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
-              <Tooltip title={t("platformDefaults.title")}>
+              <Tooltip title={t('platformDefaults.title')}>
                 <IconButton
-                  aria-label={t("platformDefaults.title")}
+                  aria-label={t('platformDefaults.title')}
                   onClick={() => {
                     setPlatformDefaultsDialogOpen(true);
                   }}
@@ -1659,12 +1526,8 @@ const ClientVersionsPage: React.FC = () => {
             </>
           )}
           <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
-          <Button
-            variant="outlined"
-            startIcon={<CodeIcon />}
-            onClick={() => setOpenSDKGuide(true)}
-          >
-            {t("clientVersions.sdkGuide")}
+          <Button variant="outlined" startIcon={<CodeIcon />} onClick={() => setOpenSDKGuide(true)}>
+            {t('clientVersions.sdkGuide')}
           </Button>
         </Box>
       </Box>
@@ -1674,54 +1537,52 @@ const ClientVersionsPage: React.FC = () => {
         <CardContent>
           <Box
             sx={{
-              display: "flex",
+              display: 'flex',
               gap: 2,
-              alignItems: "center",
-              flexWrap: "wrap",
+              alignItems: 'center',
+              flexWrap: 'wrap',
             }}
           >
             {/* Search */}
             <TextField
-              placeholder={t("common.search")}
-              value={pageState.filters?.search || ""}
+              placeholder={t('common.search')}
+              value={pageState.filters?.search || ''}
               onChange={(e) => handleSearchChange(e.target.value)}
               sx={{
                 minWidth: 200,
                 flexGrow: 1,
                 maxWidth: 320,
-                "& .MuiOutlinedInput-root": {
-                  height: "40px",
-                  borderRadius: "20px",
-                  bgcolor: "background.paper",
-                  transition: "all 0.2s ease-in-out",
-                  "& fieldset": {
-                    borderColor: "divider",
+                '& .MuiOutlinedInput-root': {
+                  height: '40px',
+                  borderRadius: '20px',
+                  bgcolor: 'background.paper',
+                  transition: 'all 0.2s ease-in-out',
+                  '& fieldset': {
+                    borderColor: 'divider',
                   },
-                  "&:hover": {
-                    bgcolor: "action.hover",
-                    "& fieldset": {
-                      borderColor: "primary.light",
+                  '&:hover': {
+                    bgcolor: 'action.hover',
+                    '& fieldset': {
+                      borderColor: 'primary.light',
                     },
                   },
-                  "&.Mui-focused": {
-                    bgcolor: "background.paper",
-                    boxShadow: "0 0 0 2px rgba(25, 118, 210, 0.1)",
-                    "& fieldset": {
-                      borderColor: "primary.main",
-                      borderWidth: "1px",
+                  '&.Mui-focused': {
+                    bgcolor: 'background.paper',
+                    boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
+                    '& fieldset': {
+                      borderColor: 'primary.main',
+                      borderWidth: '1px',
                     },
                   },
                 },
-                "& .MuiInputBase-input": {
-                  fontSize: "0.875rem",
+                '& .MuiInputBase-input': {
+                  fontSize: '0.875rem',
                 },
               }}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <SearchIcon
-                      sx={{ color: "text.secondary", fontSize: 20 }}
-                    />
+                    <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
                   </InputAdornment>
                 ),
               }}
@@ -1731,10 +1592,10 @@ const ClientVersionsPage: React.FC = () => {
             {/* Dynamic Filter Bar */}
             <Box
               sx={{
-                display: "flex",
-                flexWrap: "wrap",
+                display: 'flex',
+                flexWrap: 'wrap',
                 gap: 1,
-                alignItems: "center",
+                alignItems: 'center',
               }}
             >
               <DynamicFilterBar
@@ -1747,15 +1608,15 @@ const ClientVersionsPage: React.FC = () => {
               />
 
               {/* Column Settings Button */}
-              <Tooltip title={t("users.columnSettings")}>
+              <Tooltip title={t('users.columnSettings')}>
                 <IconButton
                   onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
                   sx={{
-                    bgcolor: "background.paper",
+                    bgcolor: 'background.paper',
                     border: 1,
-                    borderColor: "divider",
-                    "&:hover": {
-                      bgcolor: "action.hover",
+                    borderColor: 'divider',
+                    '&:hover': {
+                      bgcolor: 'action.hover',
                     },
                   }}
                 >
@@ -1773,29 +1634,26 @@ const ClientVersionsPage: React.FC = () => {
           sx={{
             mb: 2,
             bgcolor: (theme) =>
-              theme.palette.mode === "dark"
-                ? "rgba(110, 168, 255, 0.08)"
-                : "rgba(25, 118, 210, 0.04)",
+              theme.palette.mode === 'dark'
+                ? 'rgba(110, 168, 255, 0.08)'
+                : 'rgba(25, 118, 210, 0.04)',
           }}
         >
           <CardContent sx={{ py: 1 }}>
             <Box
               sx={{
-                display: "flex",
-                alignItems: "center",
+                display: 'flex',
+                alignItems: 'center',
                 gap: 2,
-                justifyContent: "space-between",
+                justifyContent: 'space-between',
               }}
             >
-              <Typography
-                variant="body2"
-                sx={{ fontWeight: 600, color: "primary.main" }}
-              >
-                {t("clientVersions.selectedCount", {
+              <Typography variant="body2" sx={{ fontWeight: 600, color: 'primary.main' }}>
+                {t('clientVersions.selectedCount', {
                   count: selectedIds.length,
                 })}
               </Typography>
-              <Box sx={{ display: "flex", gap: 1 }}>
+              <Box sx={{ display: 'flex', gap: 1 }}>
                 {canManage && (
                   <>
                     <Button
@@ -1805,7 +1663,7 @@ const ClientVersionsPage: React.FC = () => {
                       onClick={() => setBulkStatusDialogOpen(true)}
                       startIcon={<EditIcon />}
                     >
-                      {t("clientVersions.changeStatus")}
+                      {t('clientVersions.changeStatus')}
                     </Button>
                     <Button
                       size="small"
@@ -1814,7 +1672,7 @@ const ClientVersionsPage: React.FC = () => {
                       onClick={() => setBulkDeleteDialogOpen(true)}
                       startIcon={<DeleteIcon />}
                     >
-                      {t("common.delete")}
+                      {t('common.delete')}
                     </Button>
                   </>
                 )}
@@ -1825,30 +1683,30 @@ const ClientVersionsPage: React.FC = () => {
                   startIcon={<DownloadIcon />}
                   endIcon={<ArrowDropDownIcon />}
                 >
-                  {t("common.export")}
+                  {t('common.export')}
                 </Button>
                 <Menu
                   anchorEl={selectedExportMenuAnchor}
                   open={Boolean(selectedExportMenuAnchor)}
                   onClose={() => setSelectedExportMenuAnchor(null)}
                   anchorOrigin={{
-                    vertical: "bottom",
-                    horizontal: "left",
+                    vertical: 'bottom',
+                    horizontal: 'left',
                   }}
                   transformOrigin={{
-                    vertical: "top",
-                    horizontal: "left",
+                    vertical: 'top',
+                    horizontal: 'left',
                   }}
                 >
-                  <MenuItem onClick={() => handleExportSelected("csv")}>
+                  <MenuItem onClick={() => handleExportSelected('csv')}>
                     <TableChartIcon sx={{ mr: 1 }} />
                     CSV
                   </MenuItem>
-                  <MenuItem onClick={() => handleExportSelected("json")}>
+                  <MenuItem onClick={() => handleExportSelected('json')}>
                     <JsonIcon sx={{ mr: 1 }} />
                     JSON
                   </MenuItem>
-                  <MenuItem onClick={() => handleExportSelected("xlsx")}>
+                  <MenuItem onClick={() => handleExportSelected('xlsx')}>
                     <ExcelIcon sx={{ mr: 1 }} />
                     Excel (XLSX)
                   </MenuItem>
@@ -1861,7 +1719,7 @@ const ClientVersionsPage: React.FC = () => {
                     setSelectAll(false);
                   }}
                 >
-                  {t("common.clearSelection")}
+                  {t('common.clearSelection')}
                 </Button>
               </Box>
             </Box>
@@ -1870,17 +1728,15 @@ const ClientVersionsPage: React.FC = () => {
       )}
 
       {/* 테이블 */}
-      <Card sx={{ position: "relative" }}>
+      <Card sx={{ position: 'relative' }}>
         {isInitialLoad && loading ? (
-          <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
-            <Typography color="text.secondary">
-              {t("common.loadingData")}
-            </Typography>
+          <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
+            <Typography color="text.secondary">{t('common.loadingData')}</Typography>
           </Box>
         ) : clientVersions.length === 0 ? (
           <EmptyState
-            message={t("clientVersions.noVersionsFound")}
-            subtitle={canManage ? t("common.addFirstItem") : undefined}
+            message={t('clientVersions.noVersionsFound')}
+            subtitle={canManage ? t('common.addFirstItem') : undefined}
             onAddClick={
               canManage
                 ? () => {
@@ -1890,18 +1746,18 @@ const ClientVersionsPage: React.FC = () => {
                   }
                 : undefined
             }
-            addButtonLabel={t("clientVersions.addIndividual")}
+            addButtonLabel={t('clientVersions.addIndividual')}
           />
         ) : (
           <>
             <TableContainer
               sx={{
                 opacity: !isInitialLoad && loading ? 0.5 : 1,
-                transition: "opacity 0.15s ease-in-out",
-                pointerEvents: !isInitialLoad && loading ? "none" : "auto",
+                transition: 'opacity 0.15s ease-in-out',
+                pointerEvents: !isInitialLoad && loading ? 'none' : 'auto',
               }}
             >
-              <Table sx={{ tableLayout: "auto" }}>
+              <Table sx={{ tableLayout: 'auto' }}>
                 <TableHead>
                   <TableRow>
                     {canManage && (
@@ -1909,8 +1765,7 @@ const ClientVersionsPage: React.FC = () => {
                         <Checkbox
                           checked={selectAll}
                           indeterminate={
-                            selectedIds.length > 0 &&
-                            selectedIds.length < clientVersions.length
+                            selectedIds.length > 0 && selectedIds.length < clientVersions.length
                           }
                           onChange={(e) => handleSelectAll(e.target.checked)}
                         />
@@ -1921,23 +1776,15 @@ const ClientVersionsPage: React.FC = () => {
                       .map((column) => (
                         <TableCell
                           key={column.id}
-                          align={
-                            column.id === "guestModeAllowed" ? "center" : "left"
-                          }
+                          align={column.id === 'guestModeAllowed' ? 'center' : 'left'}
                           width={column.width}
                         >
                           {t(column.labelKey)}
-                          {(column.id === "clientVersion" ||
-                            column.id === "platform") &&
-                            " ↓"}
+                          {(column.id === 'clientVersion' || column.id === 'platform') && ' ↓'}
                         </TableCell>
                       ))}
-                    <TableCell>{t("common.createdBy")}</TableCell>
-                    {canManage && (
-                      <TableCell align="center">
-                        {t("common.actions")}
-                      </TableCell>
-                    )}
+                    <TableCell>{t('common.createdBy')}</TableCell>
+                    {canManage && <TableCell align="center">{t('common.actions')}</TableCell>}
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -1951,12 +1798,7 @@ const ClientVersionsPage: React.FC = () => {
                         <TableCell padding="checkbox">
                           <Checkbox
                             checked={selectedIds.includes(clientVersion.id)}
-                            onChange={(e) =>
-                              handleSelectOne(
-                                clientVersion.id,
-                                e.target.checked,
-                              )
-                            }
+                            onChange={(e) => handleSelectOne(clientVersion.id, e.target.checked)}
                           />
                         </TableCell>
                       )}
@@ -1965,11 +1807,7 @@ const ClientVersionsPage: React.FC = () => {
                         .map((column) => (
                           <TableCell
                             key={column.id}
-                            align={
-                              column.id === "guestModeAllowed"
-                                ? "center"
-                                : "left"
-                            }
+                            align={column.id === 'guestModeAllowed' ? 'center' : 'left'}
                             width={column.width}
                           >
                             {renderCellContent(clientVersion, column.id)}
@@ -1978,14 +1816,13 @@ const ClientVersionsPage: React.FC = () => {
                       <TableCell>
                         <Box>
                           <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                            {clientVersion.createdByName ||
-                              t("dashboard.unknown")}
+                            {clientVersion.createdByName || t('dashboard.unknown')}
                           </Typography>
                           {clientVersion.createdByEmail && (
                             <Typography
                               variant="caption"
                               color="text.secondary"
-                              sx={{ display: "block" }}
+                              sx={{ display: 'block' }}
                             >
                               {clientVersion.createdByEmail}
                             </Typography>
@@ -1995,60 +1832,52 @@ const ClientVersionsPage: React.FC = () => {
                       <TableCell align="center">
                         <Box
                           sx={{
-                            display: "flex",
+                            display: 'flex',
                             gap: 0.5,
-                            justifyContent: "center",
+                            justifyContent: 'center',
                           }}
                         >
                           {canManage && (
                             <>
-                              <Tooltip
-                                title={t("clientVersions.copyVersion")}
-                                arrow
-                              >
+                              <Tooltip title={t('clientVersions.copyVersion')} arrow>
                                 <IconButton
                                   size="small"
-                                  onClick={() =>
-                                    handleCopyVersion(clientVersion)
-                                  }
+                                  onClick={() => handleCopyVersion(clientVersion)}
                                   color="primary"
                                   sx={{
-                                    "&:hover": {
-                                      backgroundColor: "primary.light",
-                                      color: "white",
+                                    '&:hover': {
+                                      backgroundColor: 'primary.light',
+                                      color: 'white',
                                     },
                                   }}
                                 >
                                   <CopyIcon fontSize="small" />
                                 </IconButton>
                               </Tooltip>
-                              <Tooltip title={t("common.edit")} arrow>
+                              <Tooltip title={t('common.edit')} arrow>
                                 <IconButton
                                   size="small"
                                   onClick={() => {
-                                    console.log(
-                                      "Edit button clicked for client version:",
-                                      {
-                                        id: clientVersion.id,
-                                        clientVersion: clientVersion,
-                                      },
-                                    );
+                                    console.log('Edit button clicked for client version:', {
+                                      id: clientVersion.id,
+                                      clientVersion: clientVersion,
+                                    });
                                     setEditingClientVersion(clientVersion);
                                     setIsCopyMode(false);
                                     setFormDialogOpen(true);
                                   }}
                                   color="info"
                                   sx={{
-                                    "&:hover": {
-                                      backgroundColor: "info.light",
-                                      color: "white",
+                                    '&:hover': {
+                                      backgroundColor: 'info.light',
+                                      color: 'white',
                                     },
                                   }}
                                 >
                                   <EditIcon fontSize="small" />
                                 </IconButton>
                               </Tooltip>
-                              <Tooltip title={t("common.delete")} arrow>
+                              <Tooltip title={t('common.delete')} arrow>
                                 <IconButton
                                   size="small"
                                   onClick={() => {
@@ -2057,9 +1886,9 @@ const ClientVersionsPage: React.FC = () => {
                                   }}
                                   color="error"
                                   sx={{
-                                    "&:hover": {
-                                      backgroundColor: "error.light",
-                                      color: "white",
+                                    '&:hover': {
+                                      backgroundColor: 'error.light',
+                                      color: 'white',
                                     },
                                   }}
                                 >
@@ -2098,35 +1927,35 @@ const ClientVersionsPage: React.FC = () => {
         onClose={() => setDeleteDialogOpen(false)}
         sx={{
           zIndex: 1301,
-          "& .MuiDrawer-paper": {
-            width: { xs: "100%", sm: 400 },
-            maxWidth: "100vw",
-            display: "flex",
-            flexDirection: "column",
+          '& .MuiDrawer-paper': {
+            width: { xs: '100%', sm: 400 },
+            maxWidth: '100vw',
+            display: 'flex',
+            flexDirection: 'column',
           },
         }}
       >
         {/* Header */}
         <Box
           sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
             p: 2,
-            borderBottom: "1px solid",
-            borderColor: "divider",
-            bgcolor: "background.paper",
+            borderBottom: '1px solid',
+            borderColor: 'divider',
+            bgcolor: 'background.paper',
           }}
         >
           <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
-            {t("clientVersions.deleteConfirmTitle")}
+            {t('clientVersions.deleteConfirmTitle')}
           </Typography>
           <IconButton
             onClick={() => setDeleteDialogOpen(false)}
             size="small"
             sx={{
-              "&:hover": {
-                backgroundColor: "action.hover",
+              '&:hover': {
+                backgroundColor: 'action.hover',
               },
             }}
           >
@@ -2137,7 +1966,7 @@ const ClientVersionsPage: React.FC = () => {
         {/* Content */}
         <Box sx={{ flex: 1, p: 2 }}>
           <Typography>
-            {t("clientVersions.deleteConfirmMessage", {
+            {t('clientVersions.deleteConfirmMessage', {
               version: selectedClientVersion?.clientVersion,
             })}
           </Typography>
@@ -2147,16 +1976,16 @@ const ClientVersionsPage: React.FC = () => {
         <Box
           sx={{
             p: 2,
-            borderTop: "1px solid",
-            borderColor: "divider",
-            bgcolor: "background.paper",
-            display: "flex",
+            borderTop: '1px solid',
+            borderColor: 'divider',
+            bgcolor: 'background.paper',
+            display: 'flex',
             gap: 2,
-            justifyContent: "flex-end",
+            justifyContent: 'flex-end',
           }}
         >
           <Button onClick={() => setDeleteDialogOpen(false)} variant="outlined">
-            {t("common.cancel")}
+            {t('common.cancel')}
           </Button>
           <Button
             onClick={handleDelete}
@@ -2164,7 +1993,7 @@ const ClientVersionsPage: React.FC = () => {
             variant="contained"
             startIcon={<DeleteIcon />}
           >
-            {getActionLabel("delete", requiresApproval, t)}
+            {getActionLabel('delete', requiresApproval, t)}
           </Button>
         </Box>
       </Drawer>
@@ -2176,35 +2005,35 @@ const ClientVersionsPage: React.FC = () => {
         onClose={() => setBulkStatusDialogOpen(false)}
         sx={{
           zIndex: (theme) => theme.zIndex.drawer + 3, // AppBar(theme.zIndex.drawer+2)
-          "& .MuiDrawer-paper": {
-            width: { xs: "100%", sm: 600 },
-            maxWidth: "100vw",
-            display: "flex",
-            flexDirection: "column",
+          '& .MuiDrawer-paper': {
+            width: { xs: '100%', sm: 600 },
+            maxWidth: '100vw',
+            display: 'flex',
+            flexDirection: 'column',
           },
         }}
       >
         {/* Header */}
         <Box
           sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
             p: 2,
-            borderBottom: "1px solid",
-            borderColor: "divider",
-            bgcolor: "background.paper",
+            borderBottom: '1px solid',
+            borderColor: 'divider',
+            bgcolor: 'background.paper',
           }}
         >
           <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
-            {t("clientVersions.bulkStatusTitle")}
+            {t('clientVersions.bulkStatusTitle')}
           </Typography>
           <IconButton
             onClick={() => setBulkStatusDialogOpen(false)}
             size="small"
             sx={{
-              "&:hover": {
-                backgroundColor: "action.hover",
+              '&:hover': {
+                backgroundColor: 'action.hover',
               },
             }}
           >
@@ -2213,13 +2042,13 @@ const ClientVersionsPage: React.FC = () => {
         </Box>
 
         {/* Content */}
-        <Box sx={{ flex: 1, overflow: "auto", p: 2 }}>
+        <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
           <FormControl fullWidth sx={{ mt: 2 }}>
-            <InputLabel>{t("clientVersions.statusLabel")}</InputLabel>
+            <InputLabel>{t('clientVersions.statusLabel')}</InputLabel>
             <Select
               value={bulkStatus}
               onChange={(e) => setBulkStatus(e.target.value as ClientStatus)}
-              label={t("clientVersions.statusLabel")}
+              label={t('clientVersions.statusLabel')}
             >
               {Object.values(ClientStatus).map((status) => (
                 <MenuItem key={status} value={status}>
@@ -2236,49 +2065,41 @@ const ClientVersionsPage: React.FC = () => {
                 sx={{
                   mt: 3,
                   p: 2,
-                  border: "1px solid",
-                  borderColor: "warning.light",
+                  border: '1px solid',
+                  borderColor: 'warning.light',
                   borderRadius: 0,
-                  bgcolor: "background.default",
+                  bgcolor: 'background.default',
                 }}
               >
                 <Typography
                   variant="subtitle1"
                   gutterBottom
                   sx={{
-                    color: "warning.main",
+                    color: 'warning.main',
                     fontWeight: 600,
-                    display: "flex",
-                    alignItems: "center",
+                    display: 'flex',
+                    alignItems: 'center',
                     gap: 1,
                   }}
                 >
-                  <BuildIcon fontSize="small" sx={{ mr: 0.5 }} />{" "}
-                  {t("clientVersions.maintenance.title")}
+                  <BuildIcon fontSize="small" sx={{ mr: 0.5 }} />{' '}
+                  {t('clientVersions.maintenance.title')}
                 </Typography>
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{ mb: 2 }}
-                >
-                  {t("clientVersions.maintenance.description")}
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                  {t('clientVersions.maintenance.description')}
                 </Typography>
 
                 <Stack spacing={2}>
                   {/* 점검 시작일 */}
                   <DateTimePicker
-                    label={t("clientVersions.maintenance.startDate")}
+                    label={t('clientVersions.maintenance.startDate')}
                     value={parseUTCForPicker(maintenanceStartDate)}
-                    onChange={(date) =>
-                      setMaintenanceStartDate(date ? date.toISOString() : "")
-                    }
+                    onChange={(date) => setMaintenanceStartDate(date ? date.toISOString() : '')}
                     timeSteps={{ minutes: 1 }}
                     slotProps={{
                       textField: {
                         fullWidth: true,
-                        helperText: t(
-                          "clientVersions.maintenance.startDateHelp",
-                        ),
+                        helperText: t('clientVersions.maintenance.startDateHelp'),
                         slotProps: { input: { readOnly: true } },
                       },
                     }}
@@ -2286,28 +2107,26 @@ const ClientVersionsPage: React.FC = () => {
 
                   {/* 점검 종료일 */}
                   <DateTimePicker
-                    label={t("clientVersions.maintenance.endDate")}
+                    label={t('clientVersions.maintenance.endDate')}
                     value={parseUTCForPicker(maintenanceEndDate)}
-                    onChange={(date) =>
-                      setMaintenanceEndDate(date ? date.toISOString() : "")
-                    }
+                    onChange={(date) => setMaintenanceEndDate(date ? date.toISOString() : '')}
                     timeSteps={{ minutes: 1 }}
                     slotProps={{
                       textField: {
                         fullWidth: true,
-                        helperText: t("clientVersions.maintenance.endDateHelp"),
+                        helperText: t('clientVersions.maintenance.endDateHelp'),
                         slotProps: { input: { readOnly: true } },
                       },
                     }}
                   />
 
                   {/* 구분선 */}
-                  <Box sx={{ width: "100%", my: 5 }}>
+                  <Box sx={{ width: '100%', my: 5 }}>
                     <Box
                       sx={{
-                        height: "1px",
-                        backgroundColor: "divider",
-                        width: "100%",
+                        height: '1px',
+                        backgroundColor: 'divider',
+                        width: '100%',
                       }}
                     />
                   </Box>
@@ -2315,40 +2134,32 @@ const ClientVersionsPage: React.FC = () => {
                   {/* 메시지 소스 선택 */}
                   <TextField
                     select
-                    label={t("maintenance.messageSource")}
+                    label={t('maintenance.messageSource')}
                     value={inputMode}
-                    onChange={(e) =>
-                      setInputMode(e.target.value as "direct" | "template")
-                    }
+                    onChange={(e) => setInputMode(e.target.value as 'direct' | 'template')}
                     fullWidth
                   >
-                    <MenuItem value="direct">
-                      {t("maintenance.directInput")}
-                    </MenuItem>
-                    <MenuItem value="template">
-                      {t("maintenance.useTemplate")}
-                    </MenuItem>
+                    <MenuItem value="direct">{t('maintenance.directInput')}</MenuItem>
+                    <MenuItem value="template">{t('maintenance.useTemplate')}</MenuItem>
                   </TextField>
                   <Typography
                     variant="caption"
-                    sx={{ mt: 0.5, display: "block", color: "text.secondary" }}
+                    sx={{ mt: 0.5, display: 'block', color: 'text.secondary' }}
                   >
-                    {t("maintenance.messageSourceHelp")}
+                    {t('maintenance.messageSourceHelp')}
                   </Typography>
 
                   {/* 템플릿 선택 */}
-                  {inputMode === "template" && (
+                  {inputMode === 'template' && (
                     <Box>
                       <TextField
                         select
-                        label={t("maintenance.selectTemplate")}
+                        label={t('maintenance.selectTemplate')}
                         value={selectedTemplateId}
-                        onChange={(e) =>
-                          setSelectedTemplateId(Number(e.target.value))
-                        }
+                        onChange={(e) => setSelectedTemplateId(Number(e.target.value))}
                         fullWidth
                       >
-                        <MenuItem value="">{t("common.select")}</MenuItem>
+                        <MenuItem value="">{t('common.select')}</MenuItem>
                         {messageTemplates.map((tpl) => (
                           <MenuItem key={tpl.id} value={tpl.id}>
                             {tpl.name}
@@ -2359,43 +2170,39 @@ const ClientVersionsPage: React.FC = () => {
                         variant="caption"
                         sx={{
                           mt: 0.5,
-                          display: "block",
-                          color: "text.secondary",
+                          display: 'block',
+                          color: 'text.secondary',
                         }}
                       >
-                        {t("maintenance.selectTemplateHelp")}
+                        {t('maintenance.selectTemplateHelp')}
                       </Typography>
                     </Box>
                   )}
 
                   {/* 직접 입력 */}
-                  {inputMode === "direct" && (
+                  {inputMode === 'direct' && (
                     <MultiLanguageMessageInput
                       defaultMessage={maintenanceMessage}
                       onDefaultMessageChange={setMaintenanceMessage}
-                      defaultMessageLabel={t(
-                        "clientVersions.maintenance.defaultMessage",
-                      )}
-                      defaultMessageHelperText={t(
-                        "clientVersions.maintenance.defaultMessageHelp",
-                      )}
+                      defaultMessageLabel={t('clientVersions.maintenance.defaultMessage')}
+                      defaultMessageHelperText={t('clientVersions.maintenance.defaultMessageHelp')}
                       defaultMessageRequired={true}
                       supportsMultiLanguage={supportsMultiLanguage}
                       onSupportsMultiLanguageChange={setSupportsMultiLanguage}
                       supportsMultiLanguageLabel={t(
-                        "clientVersions.maintenance.supportsMultiLanguage",
+                        'clientVersions.maintenance.supportsMultiLanguage'
                       )}
                       supportsMultiLanguageHelperText={t(
-                        "clientVersions.maintenance.supportsMultiLanguageHelp",
+                        'clientVersions.maintenance.supportsMultiLanguageHelp'
                       )}
                       locales={maintenanceLocales}
                       onLocalesChange={setMaintenanceLocales}
                       languageSpecificMessagesLabel={t(
-                        "clientVersions.maintenance.languageSpecificMessages",
+                        'clientVersions.maintenance.languageSpecificMessages'
                       )}
                       enableTranslation={true}
-                      translateButtonLabel={t("common.autoTranslate")}
-                      translateTooltip={t("maintenance.translateTooltip")}
+                      translateButtonLabel={t('common.autoTranslate')}
+                      translateTooltip={t('maintenance.translateTooltip')}
                     />
                   )}
                 </Stack>
@@ -2408,12 +2215,12 @@ const ClientVersionsPage: React.FC = () => {
         <Box
           sx={{
             p: 2,
-            borderTop: "1px solid",
-            borderColor: "divider",
-            bgcolor: "background.paper",
-            display: "flex",
+            borderTop: '1px solid',
+            borderColor: 'divider',
+            bgcolor: 'background.paper',
+            display: 'flex',
             gap: 2,
-            justifyContent: "flex-end",
+            justifyContent: 'flex-end',
           }}
         >
           <Button
@@ -2421,14 +2228,10 @@ const ClientVersionsPage: React.FC = () => {
             startIcon={<CancelIcon />}
             variant="outlined"
           >
-            {t("common.cancel")}
+            {t('common.cancel')}
           </Button>
-          <Button
-            onClick={handleBulkStatusUpdate}
-            variant="contained"
-            startIcon={<UpdateIcon />}
-          >
-            {t("common.update")}
+          <Button onClick={handleBulkStatusUpdate} variant="contained" startIcon={<UpdateIcon />}>
+            {t('common.update')}
           </Button>
         </Box>
       </Drawer>
@@ -2478,38 +2281,38 @@ const ClientVersionsPage: React.FC = () => {
         onClose={() => setBulkDeleteDialogOpen(false)}
         sx={{
           zIndex: 1301,
-          "& .MuiDrawer-paper": {
-            width: { xs: "100%", sm: 500 },
-            maxWidth: "100vw",
-            display: "flex",
-            flexDirection: "column",
+          '& .MuiDrawer-paper': {
+            width: { xs: '100%', sm: 500 },
+            maxWidth: '100vw',
+            display: 'flex',
+            flexDirection: 'column',
           },
         }}
       >
         {/* Header */}
         <Box
           sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
             p: 2,
-            borderBottom: "1px solid",
-            borderColor: "divider",
-            bgcolor: "background.paper",
+            borderBottom: '1px solid',
+            borderColor: 'divider',
+            bgcolor: 'background.paper',
           }}
         >
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <DeleteIcon color="error" />
             <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
-              {t("clientVersions.bulkDeleteTitle")}
+              {t('clientVersions.bulkDeleteTitle')}
             </Typography>
           </Box>
           <IconButton
             onClick={() => setBulkDeleteDialogOpen(false)}
             size="small"
             sx={{
-              "&:hover": {
-                backgroundColor: "action.hover",
+              '&:hover': {
+                backgroundColor: 'action.hover',
               },
             }}
           >
@@ -2518,28 +2321,28 @@ const ClientVersionsPage: React.FC = () => {
         </Box>
 
         {/* Content */}
-        <Box sx={{ flex: 1, overflow: "auto", p: 2 }}>
+        <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
           <Alert severity="warning" sx={{ mb: 2 }}>
-            {t("clientVersions.bulkDeleteWarning")}
+            {t('clientVersions.bulkDeleteWarning')}
           </Alert>
           <Typography variant="body1">
-            {t("clientVersions.bulkDeleteConfirm", {
+            {t('clientVersions.bulkDeleteConfirm', {
               count: selectedIds.length,
             })}
           </Typography>
           <Box sx={{ mt: 2 }}>
             <Typography variant="subtitle2" gutterBottom>
-              {t("clientVersions.selectedItems")}:
+              {t('clientVersions.selectedItems')}:
             </Typography>
-            <Box sx={{ maxHeight: 200, overflow: "auto" }}>
+            <Box sx={{ maxHeight: 200, overflow: 'auto' }}>
               {clientVersions
                 .filter((cv) => selectedIds.includes(cv.id))
                 .map((cv) => (
                   <Box
                     key={cv.id}
                     sx={{
-                      display: "flex",
-                      alignItems: "center",
+                      display: 'flex',
+                      alignItems: 'center',
                       gap: 1,
                       py: 0.5,
                     }}
@@ -2550,8 +2353,8 @@ const ClientVersionsPage: React.FC = () => {
                       color="primary"
                       variant="outlined"
                       sx={{
-                        width: "100%",
-                        justifyContent: "center",
+                        width: '100%',
+                        justifyContent: 'center',
                         borderRadius: 0,
                       }}
                     />
@@ -2561,8 +2364,8 @@ const ClientVersionsPage: React.FC = () => {
                       color="info"
                       variant="filled"
                       sx={{
-                        width: "100%",
-                        justifyContent: "center",
+                        width: '100%',
+                        justifyContent: 'center',
                         borderRadius: 0,
                       }}
                     />
@@ -2576,12 +2379,12 @@ const ClientVersionsPage: React.FC = () => {
         <Box
           sx={{
             p: 2,
-            borderTop: "1px solid",
-            borderColor: "divider",
-            bgcolor: "background.paper",
-            display: "flex",
+            borderTop: '1px solid',
+            borderColor: 'divider',
+            bgcolor: 'background.paper',
+            display: 'flex',
             gap: 2,
-            justifyContent: "flex-end",
+            justifyContent: 'flex-end',
           }}
         >
           <Button
@@ -2589,7 +2392,7 @@ const ClientVersionsPage: React.FC = () => {
             startIcon={<CancelIcon />}
             variant="outlined"
           >
-            {t("common.cancel")}
+            {t('common.cancel')}
           </Button>
           <Button
             onClick={handleBulkDelete}
@@ -2597,7 +2400,7 @@ const ClientVersionsPage: React.FC = () => {
             variant="contained"
             startIcon={<DeleteIcon />}
           >
-            {t("common.delete")}
+            {t('common.delete')}
           </Button>
         </Box>
       </Drawer>
@@ -2609,36 +2412,36 @@ const ClientVersionsPage: React.FC = () => {
         onClose={() => setTagDialogOpen(false)}
         sx={{
           zIndex: 1301,
-          "& .MuiDrawer-paper": {
-            width: { xs: "100%", sm: 600 },
-            maxWidth: "100vw",
-            display: "flex",
-            flexDirection: "column",
+          '& .MuiDrawer-paper': {
+            width: { xs: '100%', sm: 600 },
+            maxWidth: '100vw',
+            display: 'flex',
+            flexDirection: 'column',
           },
         }}
       >
         {/* Header */}
         <Box
           sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
             p: 2,
-            borderBottom: "1px solid",
-            borderColor: "divider",
-            bgcolor: "background.paper",
+            borderBottom: '1px solid',
+            borderColor: 'divider',
+            bgcolor: 'background.paper',
           }}
         >
           <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
-            {t("common.tags")} - {selectedClientVersionForTags?.clientVersion} (
+            {t('common.tags')} - {selectedClientVersionForTags?.clientVersion} (
             {selectedClientVersionForTags?.platform})
           </Typography>
           <IconButton
             onClick={() => setTagDialogOpen(false)}
             size="small"
             sx={{
-              "&:hover": {
-                backgroundColor: "action.hover",
+              '&:hover': {
+                backgroundColor: 'action.hover',
               },
             }}
           >
@@ -2647,7 +2450,7 @@ const ClientVersionsPage: React.FC = () => {
         </Box>
 
         {/* Content */}
-        <Box sx={{ flex: 1, overflow: "auto", p: 2 }}>
+        <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
           <Autocomplete
             multiple
             options={allTags || []}
@@ -2667,7 +2470,7 @@ const ClientVersionsPage: React.FC = () => {
               value.map((option, index) => (
                 <Tooltip
                   key={option.id}
-                  title={option.description || t("tags.noDescription")}
+                  title={option.description || t('tags.noDescription')}
                   arrow
                 >
                   <Chip
@@ -2677,7 +2480,7 @@ const ClientVersionsPage: React.FC = () => {
                     sx={{
                       bgcolor: option.color,
                       color: getContrastColor(option.color),
-                      cursor: "help",
+                      cursor: 'help',
                     }}
                     {...getTagProps({ index })}
                   />
@@ -2687,25 +2490,25 @@ const ClientVersionsPage: React.FC = () => {
             renderInput={(params) => (
               <TextField
                 {...params}
-                label={t("common.tags")}
-                placeholder={t("common.selectTags")}
+                label={t('common.tags')}
+                placeholder={t('common.selectTags')}
                 size="small"
               />
             )}
             renderOption={(props, option) => (
               <li {...props}>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   <Chip
                     label={option.name}
                     size="small"
                     sx={{
                       bgcolor: option.color,
                       color: getContrastColor(option.color),
-                      cursor: "help",
+                      cursor: 'help',
                     }}
                   />
                   <Typography variant="body2" color="text.secondary">
-                    {option.description || t("tags.noDescription")}
+                    {option.description || t('tags.noDescription')}
                   </Typography>
                 </Box>
               </li>
@@ -2717,24 +2520,22 @@ const ClientVersionsPage: React.FC = () => {
         <Box
           sx={{
             p: 2,
-            borderTop: "1px solid",
-            borderColor: "divider",
-            bgcolor: "background.paper",
-            display: "flex",
+            borderTop: '1px solid',
+            borderColor: 'divider',
+            bgcolor: 'background.paper',
+            display: 'flex',
             gap: 2,
-            justifyContent: "flex-end",
+            justifyContent: 'flex-end',
           }}
         >
           <Button onClick={() => setTagDialogOpen(false)} variant="outlined">
-            {t("common.cancel")}
+            {t('common.cancel')}
           </Button>
           <Button
-            onClick={() =>
-              handleSaveTags(clientVersionTags.map((tag) => tag.id))
-            }
+            onClick={() => handleSaveTags(clientVersionTags.map((tag) => tag.id))}
             variant="contained"
           >
-            {t("common.save")}
+            {t('common.save')}
           </Button>
         </Box>
       </Drawer>
@@ -2745,12 +2546,12 @@ const ClientVersionsPage: React.FC = () => {
         anchorEl={columnSettingsAnchor}
         onClose={() => setColumnSettingsAnchor(null)}
         anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "right",
+          vertical: 'bottom',
+          horizontal: 'right',
         }}
         transformOrigin={{
-          vertical: "top",
-          horizontal: "right",
+          vertical: 'top',
+          horizontal: 'right',
         }}
         hideBackdrop
         disableScrollLock
@@ -2759,17 +2560,17 @@ const ClientVersionsPage: React.FC = () => {
           <Box sx={{ p: 2, minWidth: 280, maxWidth: 320 }}>
             <Box
               sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
                 mb: 1,
               }}
             >
               <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-                {t("users.columnSettings")}
+                {t('users.columnSettings')}
               </Typography>
               <Button size="small" onClick={handleResetColumns} color="warning">
-                {t("common.reset")}
+                {t('common.reset')}
               </Button>
             </Box>
             <DndContext
@@ -2798,10 +2599,7 @@ const ClientVersionsPage: React.FC = () => {
       </Popover>
 
       {/* Client Version Guide Drawer */}
-      <ClientVersionGuideDrawer
-        open={openSDKGuide}
-        onClose={() => setOpenSDKGuide(false)}
-      />
+      <ClientVersionGuideDrawer open={openSDKGuide} onClose={() => setOpenSDKGuide(false)} />
     </Box>
   );
 };

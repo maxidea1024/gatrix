@@ -4,7 +4,7 @@
  */
 
 exports.up = async function (knex) {
-    await knex.raw(`
+  await knex.raw(`
         CREATE TABLE IF NOT EXISTS NetworkTraffic (
             id INT AUTO_INCREMENT PRIMARY KEY,
             environment VARCHAR(100) NOT NULL,
@@ -22,5 +22,5 @@ exports.up = async function (knex) {
 };
 
 exports.down = async function (knex) {
-    await knex.raw('DROP TABLE IF EXISTS NetworkTraffic');
+  await knex.raw('DROP TABLE IF EXISTS NetworkTraffic');
 };

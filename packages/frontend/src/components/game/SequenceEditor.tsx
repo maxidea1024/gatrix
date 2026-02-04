@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useCallback } from "react";
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import {
   Box,
   Paper,
@@ -25,7 +25,7 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-} from "@mui/material";
+} from '@mui/material';
 import {
   ContentCopy as ContentCopyIcon,
   ContentPaste as ContentPasteIcon,
@@ -36,7 +36,7 @@ import {
   FindReplace as ReplaceIcon,
   VerticalAlignTop as InsertBeforeIcon,
   VerticalAlignBottom as InsertAfterIcon,
-} from "@mui/icons-material";
+} from '@mui/icons-material';
 import {
   ExpandMore as ExpandMoreIcon,
   ExpandLess as ExpandLessIcon,
@@ -52,16 +52,11 @@ import {
   BrokenImage as BrokenImageIcon,
   Edit as EditIcon,
   Shuffle as ShuffleIcon,
-} from "@mui/icons-material";
-import { useTranslation } from "react-i18next";
-import {
-  Sequence,
-  Frame,
-  LoopModeType,
-  FrameType,
-} from "../../services/bannerService";
-import { generateULID } from "../../utils/ulid";
-import FrameEditor from "./FrameEditor";
+} from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
+import { Sequence, Frame, LoopModeType, FrameType } from '../../services/bannerService';
+import { generateULID } from '../../utils/ulid';
+import FrameEditor from './FrameEditor';
 import {
   DndContext,
   closestCenter,
@@ -70,11 +65,8 @@ import {
   useSensor,
   useSensors,
   DragEndEvent,
-} from "@dnd-kit/core";
-import {
-  restrictToHorizontalAxis,
-  restrictToVerticalAxis,
-} from "@dnd-kit/modifiers";
+} from '@dnd-kit/core';
+import { restrictToHorizontalAxis, restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import {
   arrayMove,
   SortableContext,
@@ -82,8 +74,8 @@ import {
   rectSortingStrategy,
   verticalListSortingStrategy,
   useSortable,
-} from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 // Sortable list item component for list view
 interface SortableListItemProps {
@@ -143,14 +135,7 @@ const SortableListItem: React.FC<SortableListItemProps> = ({
   hasClipboard,
   t,
 }) => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: frame.frameId,
   });
 
@@ -161,7 +146,7 @@ const SortableListItem: React.FC<SortableListItemProps> = ({
   } | null>(null);
   const [clipboardUrls, setClipboardUrls] = useState<string[]>([]);
   const [emptyFrameCountDialogOpen, setEmptyFrameCountDialogOpen] = useState<
-    "before" | "after" | null
+    'before' | 'after' | null
   >(null);
 
   // Parse image URLs from clipboard text
@@ -172,9 +157,9 @@ const SortableListItem: React.FC<SortableListItemProps> = ({
       const trimmed = part.trim();
       if (!trimmed) continue;
       if (
-        trimmed.startsWith("http://") ||
-        trimmed.startsWith("https://") ||
-        trimmed.startsWith("//")
+        trimmed.startsWith('http://') ||
+        trimmed.startsWith('https://') ||
+        trimmed.startsWith('//')
       ) {
         urls.push(trimmed);
       }
@@ -215,10 +200,10 @@ const SortableListItem: React.FC<SortableListItemProps> = ({
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
-    zIndex: isDragging ? 1000 : "auto",
+    zIndex: isDragging ? 1000 : 'auto',
   };
 
-  const isVideo = frame.type === "mp4";
+  const isVideo = frame.type === 'mp4';
   const isEven = frameIndex % 2 === 0;
 
   return (
@@ -230,28 +215,24 @@ const SortableListItem: React.FC<SortableListItemProps> = ({
         onDoubleClick={onEdit}
         onContextMenu={handleContextMenu}
         sx={{
-          display: "flex",
-          alignItems: "center",
+          display: 'flex',
+          alignItems: 'center',
           gap: 2,
           p: 1.5,
           mb: 0.5,
           borderRadius: 1,
-          cursor: "pointer",
-          transition: "background-color 0.15s",
+          cursor: 'pointer',
+          transition: 'background-color 0.15s',
           // Alternating row color: even rows have a very subtle tint on top of Paper background
           ...(isEven && {
             bgcolor: (theme) =>
-              theme.palette.mode === "dark"
-                ? "rgba(255,255,255,0.02)"
-                : "rgba(0,0,0,0.015)",
+              theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.015)',
           }),
-          "&:hover": {
+          '&:hover': {
             bgcolor: (theme) =>
-              theme.palette.mode === "dark"
-                ? "rgba(255,255,255,0.05)"
-                : "rgba(0,0,0,0.025)",
+              theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.025)',
           },
-          "&:last-of-type": { mb: 0 },
+          '&:last-of-type': { mb: 0 },
         }}
       >
         {/* Drag Handle */}
@@ -260,19 +241,19 @@ const SortableListItem: React.FC<SortableListItemProps> = ({
           {...listeners}
           onClick={(e) => e.stopPropagation()}
           sx={{
-            cursor: "grab",
-            display: "flex",
-            alignItems: "center",
+            cursor: 'grab',
+            display: 'flex',
+            alignItems: 'center',
             px: 0.5,
             py: 1,
             mx: -0.5,
             borderRadius: 0.5,
-            color: "text.secondary",
-            "&:hover": {
-              color: "text.primary",
-              bgcolor: "action.hover",
+            color: 'text.secondary',
+            '&:hover': {
+              color: 'text.primary',
+              bgcolor: 'action.hover',
             },
-            "&:active": { cursor: "grabbing" },
+            '&:active': { cursor: 'grabbing' },
           }}
         >
           <DragIndicatorIcon fontSize="small" />
@@ -282,9 +263,9 @@ const SortableListItem: React.FC<SortableListItemProps> = ({
         <Typography
           sx={{
             minWidth: 32,
-            textAlign: "center",
+            textAlign: 'center',
             fontWeight: 600,
-            color: "primary.main",
+            color: 'primary.main',
           }}
         >
           #{frameIndex + 1}
@@ -293,7 +274,7 @@ const SortableListItem: React.FC<SortableListItemProps> = ({
         {/* Time Position */}
         <Box sx={{ minWidth: 100 }}>
           <Typography variant="caption" color="text.secondary">
-            {t("banners.listViewTime")}
+            {t('banners.listViewTime')}
           </Typography>
           <Typography variant="body2" fontFamily="monospace">
             {(startTime / 1000).toFixed(2)}s - {(endTime / 1000).toFixed(2)}s
@@ -306,11 +287,11 @@ const SortableListItem: React.FC<SortableListItemProps> = ({
             width: 80,
             height: 60,
             borderRadius: 1,
-            overflow: "hidden",
-            bgcolor: "grey.900",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
+            overflow: 'hidden',
+            bgcolor: 'grey.900',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
             flexShrink: 0,
           }}
         >
@@ -318,16 +299,16 @@ const SortableListItem: React.FC<SortableListItemProps> = ({
             isVideo ? (
               <video
                 src={frame.imageUrl}
-                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                 muted
               />
             ) : (
               <img
                 src={frame.imageUrl}
                 alt=""
-                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                 onError={(e) => {
-                  (e.target as HTMLImageElement).style.display = "none";
+                  (e.target as HTMLImageElement).style.display = 'none';
                   (e.target as HTMLImageElement).parentElement!.innerHTML =
                     '<span style="color: #999;">Error</span>';
                 }}
@@ -340,10 +321,10 @@ const SortableListItem: React.FC<SortableListItemProps> = ({
 
         {/* Frame Details */}
         <Box sx={{ flex: 1, minWidth: 0 }}>
-          <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
+          <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
             <Box>
               <Typography variant="caption" color="text.secondary">
-                {t("banners.duration")}
+                {t('banners.duration')}
               </Typography>
               <Typography variant="body2">
                 {(frame.delay / 1000).toFixed(2)}s ({frame.delay}ms)
@@ -351,18 +332,16 @@ const SortableListItem: React.FC<SortableListItemProps> = ({
             </Box>
             <Box>
               <Typography variant="caption" color="text.secondary">
-                {t("banners.type")}
+                {t('banners.type')}
               </Typography>
               <Typography variant="body2">
-                {frame.imageUrl
-                  ? frame.type?.toUpperCase() || "-"
-                  : t("banners.imageNotSet")}
+                {frame.imageUrl ? frame.type?.toUpperCase() || '-' : t('banners.imageNotSet')}
               </Typography>
             </Box>
             {frame.transition && (
               <Box>
                 <Typography variant="caption" color="text.secondary">
-                  {t("banners.frameTransition")}
+                  {t('banners.frameTransition')}
                 </Typography>
                 <Typography variant="body2">
                   {t(`banners.transitions.${frame.transition.type}`)} (
@@ -373,7 +352,7 @@ const SortableListItem: React.FC<SortableListItemProps> = ({
             {frame.link && (
               <Box sx={{ flex: 1, minWidth: 150 }}>
                 <Typography variant="caption" color="text.secondary">
-                  {t("banners.link")}
+                  {t('banners.link')}
                 </Typography>
                 <Typography variant="body2" noWrap title={frame.link}>
                   {frame.link}
@@ -388,15 +367,15 @@ const SortableListItem: React.FC<SortableListItemProps> = ({
               title={frame.imageUrl}
               sx={{
                 mt: 0.5,
-                display: "block",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                whiteSpace: "nowrap",
-                direction: "rtl",
-                textAlign: "left",
+                display: 'block',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                direction: 'rtl',
+                textAlign: 'left',
               }}
             >
-              <span style={{ direction: "ltr", unicodeBidi: "bidi-override" }}>
+              <span style={{ direction: 'ltr', unicodeBidi: 'bidi-override' }}>
                 URL: {frame.imageUrl}
               </span>
             </Typography>
@@ -404,27 +383,20 @@ const SortableListItem: React.FC<SortableListItemProps> = ({
         </Box>
 
         {/* Actions */}
-        <Box
-          sx={{ display: "flex", gap: 0.5 }}
-          onClick={(e) => e.stopPropagation()}
-        >
-          <Tooltip title={t("banners.contextMenu.edit")}>
+        <Box sx={{ display: 'flex', gap: 0.5 }} onClick={(e) => e.stopPropagation()}>
+          <Tooltip title={t('banners.contextMenu.edit')}>
             <IconButton size="small" onClick={onEdit}>
               <EditIcon fontSize="small" />
             </IconButton>
           </Tooltip>
-          <Tooltip title={t("banners.contextMenu.movePrev")}>
+          <Tooltip title={t('banners.contextMenu.movePrev')}>
             <span>
-              <IconButton
-                size="small"
-                disabled={frameIndex === 0}
-                onClick={onMovePrev}
-              >
+              <IconButton size="small" disabled={frameIndex === 0} onClick={onMovePrev}>
                 <ArrowUpwardIcon fontSize="small" />
               </IconButton>
             </span>
           </Tooltip>
-          <Tooltip title={t("banners.contextMenu.moveNext")}>
+          <Tooltip title={t('banners.contextMenu.moveNext')}>
             <span>
               <IconButton
                 size="small"
@@ -435,7 +407,7 @@ const SortableListItem: React.FC<SortableListItemProps> = ({
               </IconButton>
             </span>
           </Tooltip>
-          <Tooltip title={t("common.delete")}>
+          <Tooltip title={t('common.delete')}>
             <IconButton size="small" color="error" onClick={onDelete}>
               <DeleteIcon fontSize="small" />
             </IconButton>
@@ -449,9 +421,7 @@ const SortableListItem: React.FC<SortableListItemProps> = ({
         onClose={handleCloseContextMenu}
         anchorReference="anchorPosition"
         anchorPosition={
-          contextMenu
-            ? { top: contextMenu.mouseY, left: contextMenu.mouseX }
-            : undefined
+          contextMenu ? { top: contextMenu.mouseY, left: contextMenu.mouseX } : undefined
         }
       >
         {/* Edit */}
@@ -464,7 +434,7 @@ const SortableListItem: React.FC<SortableListItemProps> = ({
           <ListItemIcon>
             <EditIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText>{t("banners.contextMenu.edit")}</ListItemText>
+          <ListItemText>{t('banners.contextMenu.edit')}</ListItemText>
         </MenuItem>
 
         <Divider />
@@ -480,9 +450,7 @@ const SortableListItem: React.FC<SortableListItemProps> = ({
           <ListItemIcon>
             <InsertBeforeIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText>
-            {t("banners.contextMenu.duplicateBefore")}
-          </ListItemText>
+          <ListItemText>{t('banners.contextMenu.duplicateBefore')}</ListItemText>
         </MenuItem>
         <MenuItem
           onClick={() => {
@@ -493,7 +461,7 @@ const SortableListItem: React.FC<SortableListItemProps> = ({
           <ListItemIcon>
             <InsertAfterIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText>{t("banners.contextMenu.duplicateAfter")}</ListItemText>
+          <ListItemText>{t('banners.contextMenu.duplicateAfter')}</ListItemText>
         </MenuItem>
 
         <Divider />
@@ -508,7 +476,7 @@ const SortableListItem: React.FC<SortableListItemProps> = ({
           <ListItemIcon>
             <ContentCopyIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText>{t("banners.contextMenu.copy")}</ListItemText>
+          <ListItemText>{t('banners.contextMenu.copy')}</ListItemText>
         </MenuItem>
 
         {/* Paste */}
@@ -522,7 +490,7 @@ const SortableListItem: React.FC<SortableListItemProps> = ({
           <ListItemIcon>
             <ContentPasteIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText>{t("banners.contextMenu.pasteBefore")}</ListItemText>
+          <ListItemText>{t('banners.contextMenu.pasteBefore')}</ListItemText>
         </MenuItem>
         <MenuItem
           onClick={() => {
@@ -534,7 +502,7 @@ const SortableListItem: React.FC<SortableListItemProps> = ({
           <ListItemIcon>
             <ContentPasteIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText>{t("banners.contextMenu.pasteAfter")}</ListItemText>
+          <ListItemText>{t('banners.contextMenu.pasteAfter')}</ListItemText>
         </MenuItem>
         <MenuItem
           onClick={() => {
@@ -546,7 +514,7 @@ const SortableListItem: React.FC<SortableListItemProps> = ({
           <ListItemIcon>
             <ReplaceIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText>{t("banners.contextMenu.pasteReplace")}</ListItemText>
+          <ListItemText>{t('banners.contextMenu.pasteReplace')}</ListItemText>
         </MenuItem>
 
         <Divider />
@@ -561,20 +529,18 @@ const SortableListItem: React.FC<SortableListItemProps> = ({
           <ListItemIcon>
             <AddIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText>{t("banners.contextMenu.addEmptyBefore")}</ListItemText>
+          <ListItemText>{t('banners.contextMenu.addEmptyBefore')}</ListItemText>
         </MenuItem>
         <MenuItem
           onClick={() => {
             handleCloseContextMenu();
-            setEmptyFrameCountDialogOpen("before");
+            setEmptyFrameCountDialogOpen('before');
           }}
         >
           <ListItemIcon>
             <AddMultipleIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText>
-            {t("banners.contextMenu.addMultipleEmptyBefore")}
-          </ListItemText>
+          <ListItemText>{t('banners.contextMenu.addMultipleEmptyBefore')}</ListItemText>
         </MenuItem>
         <MenuItem
           onClick={() => {
@@ -585,20 +551,18 @@ const SortableListItem: React.FC<SortableListItemProps> = ({
           <ListItemIcon>
             <AddIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText>{t("banners.contextMenu.addEmptyAfter")}</ListItemText>
+          <ListItemText>{t('banners.contextMenu.addEmptyAfter')}</ListItemText>
         </MenuItem>
         <MenuItem
           onClick={() => {
             handleCloseContextMenu();
-            setEmptyFrameCountDialogOpen("after");
+            setEmptyFrameCountDialogOpen('after');
           }}
         >
           <ListItemIcon>
             <AddMultipleIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText>
-            {t("banners.contextMenu.addMultipleEmptyAfter")}
-          </ListItemText>
+          <ListItemText>{t('banners.contextMenu.addMultipleEmptyAfter')}</ListItemText>
         </MenuItem>
 
         {/* Add from Clipboard URLs */}
@@ -616,8 +580,8 @@ const SortableListItem: React.FC<SortableListItemProps> = ({
               </ListItemIcon>
               <ListItemText>
                 {clipboardUrls.length === 1
-                  ? t("banners.contextMenu.addFromClipboardBefore")
-                  : t("banners.contextMenu.addFromClipboardBeforeMultiple", {
+                  ? t('banners.contextMenu.addFromClipboardBefore')
+                  : t('banners.contextMenu.addFromClipboardBeforeMultiple', {
                       count: clipboardUrls.length,
                     })}
               </ListItemText>
@@ -633,8 +597,8 @@ const SortableListItem: React.FC<SortableListItemProps> = ({
               </ListItemIcon>
               <ListItemText>
                 {clipboardUrls.length === 1
-                  ? t("banners.contextMenu.addFromClipboardAfter")
-                  : t("banners.contextMenu.addFromClipboardAfterMultiple", {
+                  ? t('banners.contextMenu.addFromClipboardAfter')
+                  : t('banners.contextMenu.addFromClipboardAfterMultiple', {
                       count: clipboardUrls.length,
                     })}
               </ListItemText>
@@ -655,7 +619,7 @@ const SortableListItem: React.FC<SortableListItemProps> = ({
           <ListItemIcon>
             <ArrowUpwardIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText>{t("banners.contextMenu.movePrev")}</ListItemText>
+          <ListItemText>{t('banners.contextMenu.movePrev')}</ListItemText>
         </MenuItem>
         <MenuItem
           onClick={() => {
@@ -667,7 +631,7 @@ const SortableListItem: React.FC<SortableListItemProps> = ({
           <ListItemIcon>
             <ArrowDownwardIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText>{t("banners.contextMenu.moveNext")}</ListItemText>
+          <ListItemText>{t('banners.contextMenu.moveNext')}</ListItemText>
         </MenuItem>
         <MenuItem
           onClick={() => {
@@ -679,7 +643,7 @@ const SortableListItem: React.FC<SortableListItemProps> = ({
           <ListItemIcon>
             <FirstPageIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText>{t("banners.contextMenu.moveFirst")}</ListItemText>
+          <ListItemText>{t('banners.contextMenu.moveFirst')}</ListItemText>
         </MenuItem>
         <MenuItem
           onClick={() => {
@@ -691,7 +655,7 @@ const SortableListItem: React.FC<SortableListItemProps> = ({
           <ListItemIcon>
             <LastPageIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText>{t("banners.contextMenu.moveLast")}</ListItemText>
+          <ListItemText>{t('banners.contextMenu.moveLast')}</ListItemText>
         </MenuItem>
 
         <Divider />
@@ -702,12 +666,12 @@ const SortableListItem: React.FC<SortableListItemProps> = ({
             onDelete();
             handleCloseContextMenu();
           }}
-          sx={{ color: "error.main" }}
+          sx={{ color: 'error.main' }}
         >
           <ListItemIcon>
             <DeleteIcon fontSize="small" color="error" />
           </ListItemIcon>
-          <ListItemText>{t("banners.contextMenu.delete")}</ListItemText>
+          <ListItemText>{t('banners.contextMenu.delete')}</ListItemText>
         </MenuItem>
       </Menu>
 
@@ -718,14 +682,14 @@ const SortableListItem: React.FC<SortableListItemProps> = ({
         maxWidth="xs"
       >
         <DialogTitle>
-          {emptyFrameCountDialogOpen === "before"
-            ? t("banners.contextMenu.addMultipleEmptyBefore")
-            : t("banners.contextMenu.addMultipleEmptyAfter")}
+          {emptyFrameCountDialogOpen === 'before'
+            ? t('banners.contextMenu.addMultipleEmptyBefore')
+            : t('banners.contextMenu.addMultipleEmptyAfter')}
         </DialogTitle>
         <DialogContent>
           <TextField
             autoFocus
-            label={t("banners.emptyFrameCount")}
+            label={t('banners.emptyFrameCount')}
             defaultValue={5}
             fullWidth
             sx={{ mt: 1 }}
@@ -733,18 +697,14 @@ const SortableListItem: React.FC<SortableListItemProps> = ({
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setEmptyFrameCountDialogOpen(null)}>
-            {t("common.cancel")}
-          </Button>
+          <Button onClick={() => setEmptyFrameCountDialogOpen(null)}>{t('common.cancel')}</Button>
           <Button
             variant="contained"
             onClick={() => {
-              const input = document.getElementById(
-                "empty-frame-count-list",
-              ) as HTMLInputElement;
-              const count = parseInt(input?.value || "5", 10);
+              const input = document.getElementById('empty-frame-count-list') as HTMLInputElement;
+              const count = parseInt(input?.value || '5', 10);
               if (count > 0 && count <= 100) {
-                if (emptyFrameCountDialogOpen === "before") {
+                if (emptyFrameCountDialogOpen === 'before') {
                   onAddMultipleEmptyBefore(count);
                 } else {
                   onAddMultipleEmptyAfter(count);
@@ -753,7 +713,7 @@ const SortableListItem: React.FC<SortableListItemProps> = ({
               setEmptyFrameCountDialogOpen(null);
             }}
           >
-            {t("common.add")}
+            {t('common.add')}
           </Button>
         </DialogActions>
       </Dialog>
@@ -785,23 +745,21 @@ const SequenceEditor: React.FC<SequenceEditorProps> = ({
   const { t } = useTranslation();
   const [expanded, setExpanded] = useState(true);
   const [clipboardFrame, setClipboardFrame] = useState<Frame | null>(null);
-  const [viewMode, setViewMode] = useState<"grid" | "timeline" | "list">(() => {
+  const [viewMode, setViewMode] = useState<'grid' | 'timeline' | 'list'>(() => {
     // Restore view mode from localStorage
-    const saved = localStorage.getItem("bannerSequenceViewMode");
-    return saved === "timeline" || saved === "grid" || saved === "list"
-      ? (saved as "grid" | "timeline" | "list")
-      : "grid";
+    const saved = localStorage.getItem('bannerSequenceViewMode');
+    return saved === 'timeline' || saved === 'grid' || saved === 'list'
+      ? (saved as 'grid' | 'timeline' | 'list')
+      : 'grid';
   });
 
   // List view editing frame index
-  const [listEditingFrameIndex, setListEditingFrameIndex] = useState<
-    number | null
-  >(null);
+  const [listEditingFrameIndex, setListEditingFrameIndex] = useState<number | null>(null);
 
   // Timeline resize state
   const [resizeState, setResizeState] = useState<{
     frameIndex: number;
-    edge: "left" | "right";
+    edge: 'left' | 'right';
     startX: number;
     startDelay: number;
     prevFrameDelay?: number;
@@ -811,36 +769,35 @@ const SequenceEditor: React.FC<SequenceEditorProps> = ({
 
   // Save view mode to localStorage when changed
   useEffect(() => {
-    localStorage.setItem("bannerSequenceViewMode", viewMode);
+    localStorage.setItem('bannerSequenceViewMode', viewMode);
   }, [viewMode]);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    }),
+    })
   );
 
   // Calculate total duration and timeline scale
-  const { totalDuration, minFrameWidth, maxFrameWidth, pixelsPerSecond } =
-    useMemo(() => {
-      if (sequence.frames.length === 0) {
-        return {
-          totalDuration: 0,
-          minFrameWidth: 80,
-          maxFrameWidth: 200,
-          pixelsPerSecond: 40,
-        };
-      }
-      const total = sequence.frames.reduce((sum, f) => sum + f.delay, 0);
-      // Scale: 40 pixels per second, with min 80px and max 200px per frame
+  const { totalDuration, minFrameWidth, maxFrameWidth, pixelsPerSecond } = useMemo(() => {
+    if (sequence.frames.length === 0) {
       return {
-        totalDuration: total,
+        totalDuration: 0,
         minFrameWidth: 80,
         maxFrameWidth: 200,
         pixelsPerSecond: 40,
       };
-    }, [sequence.frames]);
+    }
+    const total = sequence.frames.reduce((sum, f) => sum + f.delay, 0);
+    // Scale: 40 pixels per second, with min 80px and max 200px per frame
+    return {
+      totalDuration: total,
+      minFrameWidth: 80,
+      maxFrameWidth: 200,
+      pixelsPerSecond: 40,
+    };
+  }, [sequence.frames]);
 
   // Calculate frame width for timeline view
   const getFrameWidthForTimeline = (delay: number) => {
@@ -849,11 +806,7 @@ const SequenceEditor: React.FC<SequenceEditorProps> = ({
   };
 
   // Handle timeline resize start
-  const handleResizeStart = (
-    frameIndex: number,
-    edge: "left" | "right",
-    startX: number,
-  ) => {
+  const handleResizeStart = (frameIndex: number, edge: 'left' | 'right', startX: number) => {
     const frame = sequence.frames[frameIndex];
     const prevFrame = frameIndex > 0 ? sequence.frames[frameIndex - 1] : null;
     setResizeState({
@@ -876,7 +829,7 @@ const SequenceEditor: React.FC<SequenceEditorProps> = ({
 
       const newFrames = [...sequence.frames];
 
-      if (resizeState.edge === "right") {
+      if (resizeState.edge === 'right') {
         // Resize right edge: extend/shrink current frame
         const newDelay = Math.max(minDelay, resizeState.startDelay + deltaTime);
         newFrames[resizeState.frameIndex] = {
@@ -889,14 +842,9 @@ const SequenceEditor: React.FC<SequenceEditorProps> = ({
         let deletedCount = 0;
         while (resizeState.frameIndex + 1 + deletedCount < newFrames.length) {
           const nextFrameIndex = resizeState.frameIndex + 1;
-          const nextFrameWidth = getFrameWidthForTimeline(
-            newFrames[nextFrameIndex].delay,
-          );
+          const nextFrameWidth = getFrameWidthForTimeline(newFrames[nextFrameIndex].delay);
           // If current frame extends over next frame completely
-          if (
-            frameWidth >=
-            (resizeState.startDelay / 1000) * pixelsPerSecond + nextFrameWidth
-          ) {
+          if (frameWidth >= (resizeState.startDelay / 1000) * pixelsPerSecond + nextFrameWidth) {
             newFrames.splice(nextFrameIndex, 1);
             deletedCount++;
           } else {
@@ -905,24 +853,12 @@ const SequenceEditor: React.FC<SequenceEditorProps> = ({
         }
       } else {
         // Resize left edge: extend/shrink current frame and previous frame
-        if (
-          resizeState.frameIndex > 0 &&
-          resizeState.prevFrameDelay !== undefined
-        ) {
-          const prevNewDelay = Math.max(
-            minDelay,
-            resizeState.prevFrameDelay + deltaTime,
-          );
-          const currentNewDelay = Math.max(
-            minDelay,
-            resizeState.startDelay - deltaTime,
-          );
+        if (resizeState.frameIndex > 0 && resizeState.prevFrameDelay !== undefined) {
+          const prevNewDelay = Math.max(minDelay, resizeState.prevFrameDelay + deltaTime);
+          const currentNewDelay = Math.max(minDelay, resizeState.startDelay - deltaTime);
 
           // Check if previous frame would be completely covered
-          if (
-            currentNewDelay >=
-            resizeState.startDelay + resizeState.prevFrameDelay - minDelay
-          ) {
+          if (currentNewDelay >= resizeState.startDelay + resizeState.prevFrameDelay - minDelay) {
             // Delete previous frame
             newFrames.splice(resizeState.frameIndex - 1, 1);
             newFrames[resizeState.frameIndex - 1] = {
@@ -948,31 +884,25 @@ const SequenceEditor: React.FC<SequenceEditorProps> = ({
     const handleMouseUp = () => {
       setResizeState(null);
       // Restore pointer events and user-select
-      document.body.style.userSelect = "";
-      document.body.style.cursor = "";
+      document.body.style.userSelect = '';
+      document.body.style.cursor = '';
     };
 
     // Disable pointer events on other elements and set cursor during resize
-    document.body.style.userSelect = "none";
-    document.body.style.cursor = "ew-resize";
+    document.body.style.userSelect = 'none';
+    document.body.style.cursor = 'ew-resize';
 
-    document.addEventListener("mousemove", handleMouseMove);
-    document.addEventListener("mouseup", handleMouseUp);
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
 
     return () => {
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleMouseUp);
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
       // Cleanup in case effect unmounts during resize
-      document.body.style.userSelect = "";
-      document.body.style.cursor = "";
+      document.body.style.userSelect = '';
+      document.body.style.cursor = '';
     };
-  }, [
-    resizeState,
-    sequence,
-    onUpdate,
-    pixelsPerSecond,
-    getFrameWidthForTimeline,
-  ]);
+  }, [resizeState, sequence, onUpdate, pixelsPerSecond, getFrameWidthForTimeline]);
 
   const handleNameChange = (name: string) => {
     onUpdate({ ...sequence, name });
@@ -989,8 +919,8 @@ const SequenceEditor: React.FC<SequenceEditorProps> = ({
   const handleAddFrame = () => {
     const newFrame: Frame = {
       frameId: generateULID(),
-      imageUrl: "",
-      type: "png" as FrameType,
+      imageUrl: '',
+      type: 'png' as FrameType,
       delay: 5000,
       loop: false,
     };
@@ -1085,8 +1015,8 @@ const SequenceEditor: React.FC<SequenceEditorProps> = ({
   // Create empty frame
   const createEmptyFrame = (): Frame => ({
     frameId: generateULID(),
-    imageUrl: "",
-    type: "png" as FrameType,
+    imageUrl: '',
+    type: 'png' as FrameType,
     delay: 5000,
     loop: false,
   });
@@ -1127,18 +1057,18 @@ const SequenceEditor: React.FC<SequenceEditorProps> = ({
 
   // Detect frame type from URL
   const detectFrameType = (url: string): FrameType => {
-    const ext = url.split("?")[0].split(".").pop()?.toLowerCase();
+    const ext = url.split('?')[0].split('.').pop()?.toLowerCase();
     switch (ext) {
-      case "jpg":
-      case "jpeg":
-        return "jpg";
-      case "gif":
-        return "gif";
-      case "mp4":
-      case "webm":
-        return "mp4";
+      case 'jpg':
+      case 'jpeg':
+        return 'jpg';
+      case 'gif':
+        return 'gif';
+      case 'mp4':
+      case 'webm':
+        return 'mp4';
       default:
-        return "png";
+        return 'png';
     }
   };
 
@@ -1195,9 +1125,7 @@ const SequenceEditor: React.FC<SequenceEditorProps> = ({
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     if (over && active.id !== over.id) {
-      const oldIndex = sequence.frames.findIndex(
-        (f) => f.frameId === active.id,
-      );
+      const oldIndex = sequence.frames.findIndex((f) => f.frameId === active.id);
       const newIndex = sequence.frames.findIndex((f) => f.frameId === over.id);
       onUpdate({
         ...sequence,
@@ -1218,26 +1146,22 @@ const SequenceEditor: React.FC<SequenceEditorProps> = ({
   };
 
   return (
-    <Paper sx={{ p: 2, border: 1, borderColor: "divider" }}>
-      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-        <DragIndicatorIcon sx={{ color: "text.secondary", cursor: "grab" }} />
+    <Paper sx={{ p: 2, border: 1, borderColor: 'divider' }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        <DragIndicatorIcon sx={{ color: 'text.secondary', cursor: 'grab' }} />
         <Typography variant="subtitle1" sx={{ flex: 1 }}>
-          {sequence.name || `${t("banners.sequence")} ${index + 1}`}
+          {sequence.name || `${t('banners.sequence')} ${index + 1}`}
         </Typography>
-        <Tooltip title={t("common.moveUp")}>
+        <Tooltip title={t('common.moveUp')}>
           <span>
             <IconButton size="small" onClick={onMoveUp} disabled={index === 0}>
               <ArrowUpwardIcon fontSize="small" />
             </IconButton>
           </span>
         </Tooltip>
-        <Tooltip title={t("common.moveDown")}>
+        <Tooltip title={t('common.moveDown')}>
           <span>
-            <IconButton
-              size="small"
-              onClick={onMoveDown}
-              disabled={index === totalCount - 1}
-            >
+            <IconButton size="small" onClick={onMoveDown} disabled={index === totalCount - 1}>
               <ArrowDownwardIcon fontSize="small" />
             </IconButton>
           </span>
@@ -1245,19 +1169,15 @@ const SequenceEditor: React.FC<SequenceEditorProps> = ({
         <IconButton size="small" onClick={() => setExpanded(!expanded)}>
           {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
         </IconButton>
-        <Tooltip title={t("common.delete")}>
+        <Tooltip title={t('common.delete')}>
           <IconButton size="small" color="error" onClick={onDelete}>
             <DeleteIcon fontSize="small" />
           </IconButton>
         </Tooltip>
         <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
-        <Tooltip title={t("banners.shuffleFrames")}>
+        <Tooltip title={t('banners.shuffleFrames')}>
           <span>
-            <IconButton
-              size="small"
-              onClick={handleShuffle}
-              disabled={sequence.frames.length < 2}
-            >
+            <IconButton size="small" onClick={handleShuffle} disabled={sequence.frames.length < 2}>
               <ShuffleIcon fontSize="small" />
             </IconButton>
           </span>
@@ -1269,7 +1189,7 @@ const SequenceEditor: React.FC<SequenceEditorProps> = ({
           <Stack direction="row" spacing={2}>
             <Box sx={{ flex: 1 }}>
               <TextField
-                label={t("banners.sequenceName")}
+                label={t('banners.sequenceName')}
                 value={sequence.name}
                 onChange={(e) => handleNameChange(e.target.value)}
                 fullWidth
@@ -1278,7 +1198,7 @@ const SequenceEditor: React.FC<SequenceEditorProps> = ({
             </Box>
             <Box sx={{ flex: 1 }}>
               <TextField
-                label={t("banners.speedMultiplier")}
+                label={t('banners.speedMultiplier')}
                 value={sequence.speedMultiplier}
                 onChange={(e) => handleSpeedChange(Number(e.target.value))}
                 fullWidth
@@ -1287,23 +1207,15 @@ const SequenceEditor: React.FC<SequenceEditorProps> = ({
             </Box>
             <Box sx={{ flex: 1 }}>
               <FormControl fullWidth size="small">
-                <InputLabel>{t("banners.loopMode")}</InputLabel>
+                <InputLabel>{t('banners.loopMode')}</InputLabel>
                 <Select
                   value={sequence.loopMode}
-                  label={t("banners.loopMode")}
-                  onChange={(e) =>
-                    handleLoopModeChange(e.target.value as LoopModeType)
-                  }
+                  label={t('banners.loopMode')}
+                  onChange={(e) => handleLoopModeChange(e.target.value as LoopModeType)}
                 >
-                  <MenuItem value="loop">
-                    {t("banners.loopModes.loop")}
-                  </MenuItem>
-                  <MenuItem value="pingpong">
-                    {t("banners.loopModes.pingpong")}
-                  </MenuItem>
-                  <MenuItem value="once">
-                    {t("banners.loopModes.once")}
-                  </MenuItem>
+                  <MenuItem value="loop">{t('banners.loopModes.loop')}</MenuItem>
+                  <MenuItem value="pingpong">{t('banners.loopModes.pingpong')}</MenuItem>
+                  <MenuItem value="once">{t('banners.loopModes.once')}</MenuItem>
                 </Select>
               </FormControl>
             </Box>
@@ -1313,15 +1225,15 @@ const SequenceEditor: React.FC<SequenceEditorProps> = ({
           <Box>
             <Box
               sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
                 mb: 1,
               }}
             >
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <Typography variant="subtitle2">
-                  {t("banners.frames")} ({sequence.frames.length})
+                  {t('banners.frames')} ({sequence.frames.length})
                 </Typography>
                 {totalDuration > 0 && (
                   <Typography variant="caption" color="text.secondary">
@@ -1334,20 +1246,20 @@ const SequenceEditor: React.FC<SequenceEditorProps> = ({
                 value={viewMode}
                 exclusive
                 onChange={(_, newMode) => newMode && setViewMode(newMode)}
-                sx={{ "& .MuiToggleButton-root": { py: 0.25, px: 0.75 } }}
+                sx={{ '& .MuiToggleButton-root': { py: 0.25, px: 0.75 } }}
               >
                 <ToggleButton value="grid">
-                  <Tooltip title={t("banners.gridView")}>
+                  <Tooltip title={t('banners.gridView')}>
                     <GridViewIcon fontSize="small" />
                   </Tooltip>
                 </ToggleButton>
                 <ToggleButton value="timeline">
-                  <Tooltip title={t("banners.timelineView")}>
+                  <Tooltip title={t('banners.timelineView')}>
                     <TimelineViewIcon fontSize="small" />
                   </Tooltip>
                 </ToggleButton>
                 <ToggleButton value="list">
-                  <Tooltip title={t("banners.listView")}>
+                  <Tooltip title={t('banners.listView')}>
                     <ListViewIcon fontSize="small" />
                   </Tooltip>
                 </ToggleButton>
@@ -1358,16 +1270,15 @@ const SequenceEditor: React.FC<SequenceEditorProps> = ({
               <Paper
                 sx={{
                   p: 3,
-                  textAlign: "center",
-                  bgcolor: (theme) =>
-                    theme.palette.mode === "dark" ? "grey.800" : "grey.50",
-                  border: "2px dashed",
-                  borderColor: "divider",
+                  textAlign: 'center',
+                  bgcolor: (theme) => (theme.palette.mode === 'dark' ? 'grey.800' : 'grey.50'),
+                  border: '2px dashed',
+                  borderColor: 'divider',
                   borderRadius: 1,
                 }}
               >
                 <Typography color="text.secondary" variant="body2">
-                  {t("banners.noFrames")}
+                  {t('banners.noFrames')}
                 </Typography>
                 <Button
                   size="small"
@@ -1379,16 +1290,16 @@ const SequenceEditor: React.FC<SequenceEditorProps> = ({
                       0%, 100% { transform: scale(1); }
                       50% { transform: scale(1.05); }
                     `} 2s ease-in-out infinite`,
-                    "&:hover": {
-                      animation: "none",
-                      transform: "scale(1.05)",
+                    '&:hover': {
+                      animation: 'none',
+                      transform: 'scale(1.05)',
                     },
                   }}
                 >
-                  {t("banners.addFirstFrame")}
+                  {t('banners.addFirstFrame')}
                 </Button>
               </Paper>
-            ) : viewMode === "timeline" ? (
+            ) : viewMode === 'timeline' ? (
               /* Timeline View - frames width based on duration, horizontal drag only */
               <DndContext
                 sensors={sensors}
@@ -1402,13 +1313,12 @@ const SequenceEditor: React.FC<SequenceEditorProps> = ({
                 >
                   <Box
                     sx={{
-                      display: "flex",
+                      display: 'flex',
                       gap: 0.5,
                       p: 1.5,
-                      bgcolor: (theme) =>
-                        theme.palette.mode === "dark" ? "grey.800" : "grey.100",
+                      bgcolor: (theme) => (theme.palette.mode === 'dark' ? 'grey.800' : 'grey.100'),
                       borderRadius: 1,
-                      overflowX: "auto",
+                      overflowX: 'auto',
                     }}
                   >
                     {sequence.frames.map((frame, frameIndex) => (
@@ -1417,16 +1327,10 @@ const SequenceEditor: React.FC<SequenceEditorProps> = ({
                         frame={frame}
                         frameIndex={frameIndex}
                         totalFrames={sequence.frames.length}
-                        onUpdate={(updated) =>
-                          handleUpdateFrame(frameIndex, updated)
-                        }
+                        onUpdate={(updated) => handleUpdateFrame(frameIndex, updated)}
                         onDelete={() => handleDeleteFrame(frameIndex)}
-                        onDuplicateBefore={() =>
-                          handleDuplicateBefore(frameIndex)
-                        }
-                        onDuplicateAfter={() =>
-                          handleDuplicateAfter(frameIndex)
-                        }
+                        onDuplicateBefore={() => handleDuplicateBefore(frameIndex)}
+                        onDuplicateAfter={() => handleDuplicateAfter(frameIndex)}
                         onCopy={() => handleCopyFrame(frameIndex)}
                         onPasteBefore={() => handlePasteBefore(frameIndex)}
                         onPasteAfter={() => handlePasteAfter(frameIndex)}
@@ -1435,9 +1339,7 @@ const SequenceEditor: React.FC<SequenceEditorProps> = ({
                         onMoveLast={() => handleMoveLast(frameIndex)}
                         onMovePrev={() => handleMovePrev(frameIndex)}
                         onMoveNext={() => handleMoveNext(frameIndex)}
-                        onAddEmptyBefore={() =>
-                          handleAddEmptyBefore(frameIndex)
-                        }
+                        onAddEmptyBefore={() => handleAddEmptyBefore(frameIndex)}
                         onAddEmptyAfter={() => handleAddEmptyAfter(frameIndex)}
                         onAddMultipleEmptyBefore={(count) =>
                           handleAddMultipleEmptyBefore(frameIndex, count)
@@ -1462,18 +1364,18 @@ const SequenceEditor: React.FC<SequenceEditorProps> = ({
                       sx={{
                         minWidth: 60,
                         height: TIMELINE_HEIGHT,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        border: "2px dashed",
-                        borderColor: "divider",
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        border: '2px dashed',
+                        borderColor: 'divider',
                         borderRadius: 1,
-                        cursor: "pointer",
-                        bgcolor: "transparent",
-                        transition: "all 0.2s",
-                        "&:hover": {
-                          borderColor: "primary.main",
-                          bgcolor: "action.hover",
+                        cursor: 'pointer',
+                        bgcolor: 'transparent',
+                        transition: 'all 0.2s',
+                        '&:hover': {
+                          borderColor: 'primary.main',
+                          bgcolor: 'action.hover',
                         },
                       }}
                       onClick={handleAddFrame}
@@ -1483,7 +1385,7 @@ const SequenceEditor: React.FC<SequenceEditorProps> = ({
                   </Box>
                 </SortableContext>
               </DndContext>
-            ) : viewMode === "grid" ? (
+            ) : viewMode === 'grid' ? (
               /* Grid View - equal size frames */
               <DndContext
                 sensors={sensors}
@@ -1496,12 +1398,11 @@ const SequenceEditor: React.FC<SequenceEditorProps> = ({
                 >
                   <Box
                     sx={{
-                      display: "flex",
+                      display: 'flex',
                       gap: 1,
-                      flexWrap: "wrap",
+                      flexWrap: 'wrap',
                       p: 1.5,
-                      bgcolor: (theme) =>
-                        theme.palette.mode === "dark" ? "grey.800" : "grey.100",
+                      bgcolor: (theme) => (theme.palette.mode === 'dark' ? 'grey.800' : 'grey.100'),
                       borderRadius: 1,
                     }}
                   >
@@ -1511,16 +1412,10 @@ const SequenceEditor: React.FC<SequenceEditorProps> = ({
                         frame={frame}
                         frameIndex={frameIndex}
                         totalFrames={sequence.frames.length}
-                        onUpdate={(updated) =>
-                          handleUpdateFrame(frameIndex, updated)
-                        }
+                        onUpdate={(updated) => handleUpdateFrame(frameIndex, updated)}
                         onDelete={() => handleDeleteFrame(frameIndex)}
-                        onDuplicateBefore={() =>
-                          handleDuplicateBefore(frameIndex)
-                        }
-                        onDuplicateAfter={() =>
-                          handleDuplicateAfter(frameIndex)
-                        }
+                        onDuplicateBefore={() => handleDuplicateBefore(frameIndex)}
+                        onDuplicateAfter={() => handleDuplicateAfter(frameIndex)}
                         onCopy={() => handleCopyFrame(frameIndex)}
                         onPasteBefore={() => handlePasteBefore(frameIndex)}
                         onPasteAfter={() => handlePasteAfter(frameIndex)}
@@ -1529,9 +1424,7 @@ const SequenceEditor: React.FC<SequenceEditorProps> = ({
                         onMoveLast={() => handleMoveLast(frameIndex)}
                         onMovePrev={() => handleMovePrev(frameIndex)}
                         onMoveNext={() => handleMoveNext(frameIndex)}
-                        onAddEmptyBefore={() =>
-                          handleAddEmptyBefore(frameIndex)
-                        }
+                        onAddEmptyBefore={() => handleAddEmptyBefore(frameIndex)}
                         onAddEmptyAfter={() => handleAddEmptyAfter(frameIndex)}
                         onAddMultipleEmptyBefore={(count) =>
                           handleAddMultipleEmptyBefore(frameIndex, count)
@@ -1553,18 +1446,18 @@ const SequenceEditor: React.FC<SequenceEditorProps> = ({
                       sx={{
                         width: 100,
                         height: 100,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        border: "2px dashed",
-                        borderColor: "divider",
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        border: '2px dashed',
+                        borderColor: 'divider',
                         borderRadius: 1,
-                        cursor: "pointer",
-                        bgcolor: "transparent",
-                        transition: "all 0.2s",
-                        "&:hover": {
-                          borderColor: "primary.main",
-                          bgcolor: "action.hover",
+                        cursor: 'pointer',
+                        bgcolor: 'transparent',
+                        transition: 'all 0.2s',
+                        '&:hover': {
+                          borderColor: 'primary.main',
+                          bgcolor: 'action.hover',
                         },
                       }}
                       onClick={handleAddFrame}
@@ -1589,8 +1482,7 @@ const SequenceEditor: React.FC<SequenceEditorProps> = ({
                   <Box
                     sx={{
                       p: 1.5,
-                      bgcolor: (theme) =>
-                        theme.palette.mode === "dark" ? "grey.800" : "grey.100",
+                      bgcolor: (theme) => (theme.palette.mode === 'dark' ? 'grey.800' : 'grey.100'),
                       borderRadius: 1,
                     }}
                   >
@@ -1615,22 +1507,14 @@ const SequenceEditor: React.FC<SequenceEditorProps> = ({
                           onMoveFirst={() => handleMoveFirst(frameIndex)}
                           onMoveLast={() => handleMoveLast(frameIndex)}
                           onDelete={() => handleDeleteFrame(frameIndex)}
-                          onDuplicateBefore={() =>
-                            handleDuplicateBefore(frameIndex)
-                          }
-                          onDuplicateAfter={() =>
-                            handleDuplicateAfter(frameIndex)
-                          }
+                          onDuplicateBefore={() => handleDuplicateBefore(frameIndex)}
+                          onDuplicateAfter={() => handleDuplicateAfter(frameIndex)}
                           onCopy={() => handleCopyFrame(frameIndex)}
                           onPasteBefore={() => handlePasteBefore(frameIndex)}
                           onPasteAfter={() => handlePasteAfter(frameIndex)}
                           onPasteReplace={() => handlePasteReplace(frameIndex)}
-                          onAddEmptyBefore={() =>
-                            handleAddEmptyBefore(frameIndex)
-                          }
-                          onAddEmptyAfter={() =>
-                            handleAddEmptyAfter(frameIndex)
-                          }
+                          onAddEmptyBefore={() => handleAddEmptyBefore(frameIndex)}
+                          onAddEmptyAfter={() => handleAddEmptyAfter(frameIndex)}
                           onAddMultipleEmptyBefore={(count) =>
                             handleAddMultipleEmptyBefore(frameIndex, count)
                           }
@@ -1643,9 +1527,7 @@ const SequenceEditor: React.FC<SequenceEditorProps> = ({
                           onAddFromClipboardAfter={(urls) =>
                             handleAddFromClipboardAfter(frameIndex, urls)
                           }
-                          onFrameClick={() =>
-                            onFrameSelect?.(index, frameIndex)
-                          }
+                          onFrameClick={() => onFrameSelect?.(index, frameIndex)}
                           hasClipboard={!!clipboardFrame}
                           t={t}
                         />
@@ -1657,90 +1539,53 @@ const SequenceEditor: React.FC<SequenceEditorProps> = ({
                       onClick={handleAddFrame}
                       sx={{ mt: 1 }}
                     >
-                      {t("banners.addFrame")}
+                      {t('banners.addFrame')}
                     </Button>
 
                     {/* Hidden FrameEditor for list view editing */}
-                    {listEditingFrameIndex !== null &&
-                      sequence.frames[listEditingFrameIndex] && (
-                        <Box sx={{ display: "none" }}>
-                          <FrameEditor
-                            frame={sequence.frames[listEditingFrameIndex]}
-                            frameIndex={listEditingFrameIndex}
-                            totalFrames={sequence.frames.length}
-                            onUpdate={(updated) => {
-                              handleUpdateFrame(listEditingFrameIndex, updated);
-                            }}
-                            onDelete={() => {
-                              handleDeleteFrame(listEditingFrameIndex);
-                              setListEditingFrameIndex(null);
-                            }}
-                            onDuplicateBefore={() =>
-                              handleDuplicateBefore(listEditingFrameIndex)
-                            }
-                            onDuplicateAfter={() =>
-                              handleDuplicateAfter(listEditingFrameIndex)
-                            }
-                            onCopy={() =>
-                              handleCopyFrame(listEditingFrameIndex)
-                            }
-                            onPasteBefore={() =>
-                              handlePasteBefore(listEditingFrameIndex)
-                            }
-                            onPasteAfter={() =>
-                              handlePasteAfter(listEditingFrameIndex)
-                            }
-                            onPasteReplace={() =>
-                              handlePasteReplace(listEditingFrameIndex)
-                            }
-                            onMoveFirst={() =>
-                              handleMoveFirst(listEditingFrameIndex)
-                            }
-                            onMoveLast={() =>
-                              handleMoveLast(listEditingFrameIndex)
-                            }
-                            onMovePrev={() =>
-                              handleMovePrev(listEditingFrameIndex)
-                            }
-                            onMoveNext={() =>
-                              handleMoveNext(listEditingFrameIndex)
-                            }
-                            onAddEmptyBefore={() =>
-                              handleAddEmptyBefore(listEditingFrameIndex)
-                            }
-                            onAddEmptyAfter={() =>
-                              handleAddEmptyAfter(listEditingFrameIndex)
-                            }
-                            onAddMultipleEmptyBefore={(count) =>
-                              handleAddMultipleEmptyBefore(
-                                listEditingFrameIndex,
-                                count,
-                              )
-                            }
-                            onAddMultipleEmptyAfter={(count) =>
-                              handleAddMultipleEmptyAfter(
-                                listEditingFrameIndex,
-                                count,
-                              )
-                            }
-                            onAddFromClipboardBefore={(urls) =>
-                              handleAddFromClipboardBefore(
-                                listEditingFrameIndex,
-                                urls,
-                              )
-                            }
-                            onAddFromClipboardAfter={(urls) =>
-                              handleAddFromClipboardAfter(
-                                listEditingFrameIndex,
-                                urls,
-                              )
-                            }
-                            hasClipboard={!!clipboardFrame}
-                            forceDialogOpen
-                            onDialogClose={() => setListEditingFrameIndex(null)}
-                          />
-                        </Box>
-                      )}
+                    {listEditingFrameIndex !== null && sequence.frames[listEditingFrameIndex] && (
+                      <Box sx={{ display: 'none' }}>
+                        <FrameEditor
+                          frame={sequence.frames[listEditingFrameIndex]}
+                          frameIndex={listEditingFrameIndex}
+                          totalFrames={sequence.frames.length}
+                          onUpdate={(updated) => {
+                            handleUpdateFrame(listEditingFrameIndex, updated);
+                          }}
+                          onDelete={() => {
+                            handleDeleteFrame(listEditingFrameIndex);
+                            setListEditingFrameIndex(null);
+                          }}
+                          onDuplicateBefore={() => handleDuplicateBefore(listEditingFrameIndex)}
+                          onDuplicateAfter={() => handleDuplicateAfter(listEditingFrameIndex)}
+                          onCopy={() => handleCopyFrame(listEditingFrameIndex)}
+                          onPasteBefore={() => handlePasteBefore(listEditingFrameIndex)}
+                          onPasteAfter={() => handlePasteAfter(listEditingFrameIndex)}
+                          onPasteReplace={() => handlePasteReplace(listEditingFrameIndex)}
+                          onMoveFirst={() => handleMoveFirst(listEditingFrameIndex)}
+                          onMoveLast={() => handleMoveLast(listEditingFrameIndex)}
+                          onMovePrev={() => handleMovePrev(listEditingFrameIndex)}
+                          onMoveNext={() => handleMoveNext(listEditingFrameIndex)}
+                          onAddEmptyBefore={() => handleAddEmptyBefore(listEditingFrameIndex)}
+                          onAddEmptyAfter={() => handleAddEmptyAfter(listEditingFrameIndex)}
+                          onAddMultipleEmptyBefore={(count) =>
+                            handleAddMultipleEmptyBefore(listEditingFrameIndex, count)
+                          }
+                          onAddMultipleEmptyAfter={(count) =>
+                            handleAddMultipleEmptyAfter(listEditingFrameIndex, count)
+                          }
+                          onAddFromClipboardBefore={(urls) =>
+                            handleAddFromClipboardBefore(listEditingFrameIndex, urls)
+                          }
+                          onAddFromClipboardAfter={(urls) =>
+                            handleAddFromClipboardAfter(listEditingFrameIndex, urls)
+                          }
+                          hasClipboard={!!clipboardFrame}
+                          forceDialogOpen
+                          onDialogClose={() => setListEditingFrameIndex(null)}
+                        />
+                      </Box>
+                    )}
                   </Box>
                 </SortableContext>
               </DndContext>

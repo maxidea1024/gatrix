@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -8,12 +8,9 @@ import {
   Button,
   Box,
   Alert,
-} from "@mui/material";
-import {
-  Warning as WarningIcon,
-  Delete as DeleteIcon,
-} from "@mui/icons-material";
-import { useTranslation } from "react-i18next";
+} from '@mui/material';
+import { Warning as WarningIcon, Delete as DeleteIcon } from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
 
 interface ConfirmDeleteDialogProps {
   open: boolean;
@@ -60,7 +57,7 @@ const ConfirmDeleteDialog: React.FC<ConfirmDeleteDialogProps> = ({
       }}
     >
       <DialogTitle sx={{ pb: 2 }}>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
           <WarningIcon color="error" />
           <Typography variant="h6" component="span" sx={{ fontWeight: 600 }}>
             {title}
@@ -69,7 +66,7 @@ const ConfirmDeleteDialog: React.FC<ConfirmDeleteDialogProps> = ({
       </DialogTitle>
 
       <DialogContent sx={{ pb: 2 }}>
-        <Typography variant="body1" sx={{ mb: 2, color: "text.primary" }}>
+        <Typography variant="body1" sx={{ mb: 2, color: 'text.primary' }}>
           {message}
         </Typography>
 
@@ -80,8 +77,8 @@ const ConfirmDeleteDialog: React.FC<ConfirmDeleteDialogProps> = ({
             severity="warning"
             sx={{
               mt: 2,
-              "& .MuiAlert-message": {
-                fontSize: "0.875rem",
+              '& .MuiAlert-message': {
+                fontSize: '0.875rem',
               },
             }}
           >
@@ -91,13 +88,8 @@ const ConfirmDeleteDialog: React.FC<ConfirmDeleteDialogProps> = ({
       </DialogContent>
 
       <DialogActions sx={{ px: 3, pb: 2, gap: 1 }}>
-        <Button
-          onClick={onClose}
-          variant="outlined"
-          disabled={loading}
-          sx={{ minWidth: 80 }}
-        >
-          {cancelButtonText || t("common.cancel")}
+        <Button onClick={onClose} variant="outlined" disabled={loading} sx={{ minWidth: 80 }}>
+          {cancelButtonText || t('common.cancel')}
         </Button>
 
         <Button
@@ -108,12 +100,12 @@ const ConfirmDeleteDialog: React.FC<ConfirmDeleteDialogProps> = ({
           startIcon={<DeleteIcon />}
           sx={{
             minWidth: 80,
-            "&:hover": {
-              backgroundColor: "error.dark",
+            '&:hover': {
+              backgroundColor: 'error.dark',
             },
           }}
         >
-          {confirmButtonText || t("common.delete")}
+          {confirmButtonText || t('common.delete')}
         </Button>
       </DialogActions>
     </Dialog>

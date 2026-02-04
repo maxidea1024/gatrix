@@ -4,23 +4,23 @@
  * Displays a full-screen overlay when environment changes,
  * with fighting game style "Let's Fight!" animation.
  */
-import React, { useState, useEffect } from "react";
-import { Box, Typography, keyframes } from "@mui/material";
-import { useEnvironment } from "@/contexts/EnvironmentContext";
-import { useTranslation } from "react-i18next";
+import React, { useState, useEffect } from 'react';
+import { Box, Typography, keyframes } from '@mui/material';
+import { useEnvironment } from '@/contexts/EnvironmentContext';
+import { useTranslation } from 'react-i18next';
 
 // Environment type colors
 const getEnvironmentColor = (type: string, customColor?: string): string => {
   if (customColor) return customColor;
   switch (type) {
-    case "production":
-      return "#d32f2f"; // Red
-    case "staging":
-      return "#ed6c02"; // Orange
-    case "development":
-      return "#2e7d32"; // Green
+    case 'production':
+      return '#d32f2f'; // Red
+    case 'staging':
+      return '#ed6c02'; // Orange
+    case 'development':
+      return '#2e7d32'; // Green
     default:
-      return "#1976d2"; // Blue
+      return '#1976d2'; // Blue
   }
 };
 
@@ -91,10 +91,8 @@ const DISPLAY_DURATION = 1200; // How long to show before exit animation
 export const EnvironmentChangeOverlay: React.FC = () => {
   const { t } = useTranslation();
   const { environments } = useEnvironment();
-  const [phase, setPhase] = useState<"hidden" | "enter" | "exit">("hidden");
-  const [displayedEnv, setDisplayedEnv] = useState<
-    (typeof environments)[0] | null
-  >(null);
+  const [phase, setPhase] = useState<'hidden' | 'enter' | 'exit'>('hidden');
+  const [displayedEnv, setDisplayedEnv] = useState<(typeof environments)[0] | null>(null);
 
   useEffect(() => {
     // Listen for manual environment switch only (not page load)
@@ -102,18 +100,18 @@ export const EnvironmentChangeOverlay: React.FC = () => {
       event: CustomEvent<{
         environment: string;
         env: (typeof environments)[0];
-      }>,
+      }>
     ) => {
       const { env } = event.detail;
       setDisplayedEnv(env);
-      setPhase("enter");
+      setPhase('enter');
 
       const exitTimer = setTimeout(() => {
-        setPhase("exit");
+        setPhase('exit');
       }, DISPLAY_DURATION);
 
       const hideTimer = setTimeout(() => {
-        setPhase("hidden");
+        setPhase('hidden');
       }, DISPLAY_DURATION + 400);
 
       return () => {
@@ -122,43 +120,34 @@ export const EnvironmentChangeOverlay: React.FC = () => {
       };
     };
 
-    window.addEventListener(
-      "environment-changed",
-      handleEnvironmentChange as EventListener,
-    );
+    window.addEventListener('environment-changed', handleEnvironmentChange as EventListener);
     return () => {
-      window.removeEventListener(
-        "environment-changed",
-        handleEnvironmentChange as EventListener,
-      );
+      window.removeEventListener('environment-changed', handleEnvironmentChange as EventListener);
     };
   }, []);
 
-  if (phase === "hidden" || !displayedEnv) return null;
+  if (phase === 'hidden' || !displayedEnv) return null;
 
-  const envColor = getEnvironmentColor(
-    displayedEnv.environmentType,
-    displayedEnv.color,
-  );
+  const envColor = getEnvironmentColor(displayedEnv.environmentType, displayedEnv.color);
   const envName = displayedEnv.displayName || displayedEnv.environmentName;
 
   return (
     <Box
       sx={{
-        position: "fixed",
+        position: 'fixed',
         top: 0,
         left: 0,
         right: 0,
         bottom: 0,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        backgroundColor: "rgba(0, 0, 0, 0.7)",
-        backdropFilter: "blur(8px)",
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.7)',
+        backdropFilter: 'blur(8px)',
         zIndex: 9999,
-        pointerEvents: "none",
+        pointerEvents: 'none',
         animation:
-          phase === "enter"
+          phase === 'enter'
             ? `${bgFadeIn} 0.15s ease-out forwards`
             : `${bgFadeOut} 0.4s ease-out forwards`,
       }}
@@ -166,24 +155,23 @@ export const EnvironmentChangeOverlay: React.FC = () => {
       {/* Radial glow background */}
       <Box
         sx={{
-          position: "absolute",
-          width: "150%",
-          height: "150%",
+          position: 'absolute',
+          width: '150%',
+          height: '150%',
           background: `radial-gradient(ellipse at center, ${envColor}33 0%, transparent 50%)`,
-          animation:
-            phase === "enter" ? `${glowPulse} 0.6s ease-in-out` : undefined,
+          animation: phase === 'enter' ? `${glowPulse} 0.6s ease-in-out` : undefined,
         }}
       />
 
       {/* Main content */}
       <Box
         sx={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
           gap: 1,
           animation:
-            phase === "enter"
+            phase === 'enter'
               ? `${slamIn} 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards, ${shakeEffect} 0.5s ease-out 0.3s`
               : `${slideOut} 0.4s ease-in forwards`,
         }}
@@ -191,11 +179,11 @@ export const EnvironmentChangeOverlay: React.FC = () => {
         {/* Environment name - Main text */}
         <Typography
           sx={{
-            fontSize: { xs: "3rem", sm: "4rem", md: "5rem" },
+            fontSize: { xs: '3rem', sm: '4rem', md: '5rem' },
             fontWeight: 900,
-            color: "#fff",
-            textTransform: "uppercase",
-            letterSpacing: "0.1em",
+            color: '#fff',
+            textTransform: 'uppercase',
+            letterSpacing: '0.1em',
             textShadow: `
               0 0 10px ${envColor},
               0 0 20px ${envColor},
@@ -203,7 +191,7 @@ export const EnvironmentChangeOverlay: React.FC = () => {
               0 4px 0 rgba(0,0,0,0.3)
             `,
             WebkitTextStroke: `2px ${envColor}`,
-            textAlign: "center",
+            textAlign: 'center',
             lineHeight: 1.1,
           }}
         >
@@ -224,16 +212,16 @@ export const EnvironmentChangeOverlay: React.FC = () => {
         {/* Subtitle */}
         <Typography
           sx={{
-            fontSize: { xs: "1rem", sm: "1.25rem" },
+            fontSize: { xs: '1rem', sm: '1.25rem' },
             fontWeight: 600,
             color: envColor,
-            textTransform: "uppercase",
-            letterSpacing: "0.3em",
+            textTransform: 'uppercase',
+            letterSpacing: '0.3em',
             textShadow: `0 0 10px ${envColor}`,
             mt: 1,
           }}
         >
-          {t("environments.switchedTo")}
+          {t('environments.switchedTo')}
         </Typography>
       </Box>
     </Box>

@@ -1,5 +1,5 @@
-import React, { useState, useMemo } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import React, { useState, useMemo } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import {
   Box,
   Typography,
@@ -15,8 +15,8 @@ import {
   Tabs,
   Tab,
   Collapse,
-} from "@mui/material";
-import { alpha } from "@mui/material/styles";
+} from '@mui/material';
+import { alpha } from '@mui/material/styles';
 import {
   ArrowBack as ArrowBackIcon,
   Check as CheckIcon,
@@ -30,71 +30,58 @@ import {
   DifferenceOutlined as DiffIcon,
   ChatBubbleOutline as ChatIcon,
   History as HistoryIcon,
-} from "@mui/icons-material";
-import { useTranslation } from "react-i18next";
-import { useSnackbar } from "notistack";
-import { useHandleApiError } from "@/hooks/useHandleApiError";
-import useSWR from "swr";
-import { useAuth } from "@/contexts/AuthContext";
-import { RelativeTime } from "@/components/common/RelativeTime";
-import ConfirmDeleteDialog from "@/components/common/ConfirmDeleteDialog";
+} from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
+import { useSnackbar } from 'notistack';
+import { useHandleApiError } from '@/hooks/useHandleApiError';
+import useSWR from 'swr';
+import { useAuth } from '@/contexts/AuthContext';
+import { RelativeTime } from '@/components/common/RelativeTime';
+import ConfirmDeleteDialog from '@/components/common/ConfirmDeleteDialog';
 import changeRequestService, {
   ChangeRequest,
   ChangeRequestStatus,
-} from "@/services/changeRequestService";
+} from '@/services/changeRequestService';
 
 // Status configuration
 const STATUS_CONFIG: Record<
   ChangeRequestStatus,
   {
-    color:
-      | "default"
-      | "primary"
-      | "secondary"
-      | "error"
-      | "info"
-      | "success"
-      | "warning";
+    color: 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning';
     labelKey: string;
     bgColor: string;
   }
 > = {
   draft: {
-    color: "default",
-    labelKey: "changeRequest.status.draft",
-    bgColor: "#6e7681",
+    color: 'default',
+    labelKey: 'changeRequest.status.draft',
+    bgColor: '#6e7681',
   },
   open: {
-    color: "primary",
-    labelKey: "changeRequest.status.open",
-    bgColor: "#238636",
+    color: 'primary',
+    labelKey: 'changeRequest.status.open',
+    bgColor: '#238636',
   },
   approved: {
-    color: "success",
-    labelKey: "changeRequest.status.approved",
-    bgColor: "#8957e5",
+    color: 'success',
+    labelKey: 'changeRequest.status.approved',
+    bgColor: '#8957e5',
   },
   applied: {
-    color: "info",
-    labelKey: "changeRequest.status.applied",
-    bgColor: "#a371f7",
+    color: 'info',
+    labelKey: 'changeRequest.status.applied',
+    bgColor: '#a371f7',
   },
   rejected: {
-    color: "error",
-    labelKey: "changeRequest.status.rejected",
-    bgColor: "#f85149",
+    color: 'error',
+    labelKey: 'changeRequest.status.rejected',
+    bgColor: '#f85149',
   },
 };
 
 // Timeline event type
 interface TimelineEvent {
-  type:
-    | "created"
-    | "submitted"
-    | "approved"
-    | "rejected"
-    | "reopened"
-    | "executed";
+  type: 'created' | 'submitted' | 'approved' | 'rejected' | 'reopened' | 'executed';
   timestamp: string;
   user?: { name?: string; email?: string };
   comment?: string;
@@ -107,7 +94,7 @@ interface FieldChange {
   field: string;
   oldValue: any;
   newValue: any;
-  operation: "added" | "removed" | "modified";
+  operation: 'added' | 'removed' | 'modified';
 }
 
 const ChangeRequestDetailPage: React.FC = () => {
@@ -118,27 +105,25 @@ const ChangeRequestDetailPage: React.FC = () => {
   const { user } = useAuth();
 
   const [actionLoading, setActionLoading] = useState(false);
-  const [comment, setComment] = useState("");
+  const [comment, setComment] = useState('');
   const [showSubmitForm, setShowSubmitForm] = useState(false);
-  const [submitTitle, setSubmitTitle] = useState("");
-  const [submitReason, setSubmitReason] = useState("");
+  const [submitTitle, setSubmitTitle] = useState('');
+  const [submitReason, setSubmitReason] = useState('');
   const [activeTab, setActiveTab] = useState(0);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [expandedReasons, setExpandedReasons] = useState<
-    Record<number, boolean>
-  >({});
+  const [expandedReasons, setExpandedReasons] = useState<Record<number, boolean>>({});
 
   // Delete handler for error dialog
   const handleDeleteFromError = async () => {
     try {
       await changeRequestService.delete(id!);
-      enqueueSnackbar(t("changeRequest.messages.deleted"), {
-        variant: "success",
+      enqueueSnackbar(t('changeRequest.messages.deleted'), {
+        variant: 'success',
       });
-      navigate("/admin/change-requests");
+      navigate('/admin/change-requests');
     } catch (err: any) {
-      enqueueSnackbar(t("changeRequest.errors.deleteFailed"), {
-        variant: "error",
+      enqueueSnackbar(t('changeRequest.errors.deleteFailed'), {
+        variant: 'error',
       });
     }
   };
@@ -153,11 +138,9 @@ const ChangeRequestDetailPage: React.FC = () => {
     error,
     isLoading,
     mutate,
-  } = useSWR(
-    id ? `change-request-${id}` : null,
-    () => changeRequestService.getById(id!),
-    { revalidateOnFocus: false },
-  );
+  } = useSWR(id ? `change-request-${id}` : null, () => changeRequestService.getById(id!), {
+    revalidateOnFocus: false,
+  });
 
   // Build timeline from CR data
   const timeline = useMemo<TimelineEvent[]>(() => {
@@ -165,14 +148,14 @@ const ChangeRequestDetailPage: React.FC = () => {
     const events: TimelineEvent[] = [];
 
     events.push({
-      type: "created",
+      type: 'created',
       timestamp: cr.createdAt,
       user: cr.requester,
     });
 
-    if (cr.status !== "draft") {
+    if (cr.status !== 'draft') {
       events.push({
-        type: "submitted",
+        type: 'submitted',
         timestamp: cr.updatedAt,
         user: cr.requester,
         title: cr.title,
@@ -183,7 +166,7 @@ const ChangeRequestDetailPage: React.FC = () => {
     if (cr.approvals?.length) {
       cr.approvals.forEach((approval) => {
         events.push({
-          type: "approved",
+          type: 'approved',
           timestamp: approval.createdAt,
           user: approval.approver,
           comment: approval.comment,
@@ -191,27 +174,24 @@ const ChangeRequestDetailPage: React.FC = () => {
       });
     }
 
-    if (cr.status === "rejected" && cr.rejectedAt) {
+    if (cr.status === 'rejected' && cr.rejectedAt) {
       events.push({
-        type: "rejected",
+        type: 'rejected',
         timestamp: cr.rejectedAt,
         user: cr.rejector,
         comment: cr.rejectionReason,
       });
     }
 
-    if (cr.status === "applied") {
+    if (cr.status === 'applied') {
       events.push({
-        type: "executed",
+        type: 'executed',
         timestamp: cr.updatedAt,
         user: cr.executor,
       });
     }
 
-    return events.sort(
-      (a, b) =>
-        new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime(),
-    );
+    return events.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
   }, [cr]);
 
   // Compute all field changes
@@ -228,9 +208,9 @@ const ChangeRequestDetailPage: React.FC = () => {
         const oldVal = before[key];
         const newVal = after[key];
         if (JSON.stringify(oldVal) !== JSON.stringify(newVal)) {
-          let operation: "added" | "removed" | "modified" = "modified";
-          if (oldVal === undefined) operation = "added";
-          else if (newVal === undefined) operation = "removed";
+          let operation: 'added' | 'removed' | 'modified' = 'modified';
+          if (oldVal === undefined) operation = 'added';
+          else if (newVal === undefined) operation = 'removed';
           changes.push({
             field: key,
             oldValue: oldVal,
@@ -243,16 +223,16 @@ const ChangeRequestDetailPage: React.FC = () => {
       return {
         table: item.targetTable,
         targetId: item.targetId,
-        operation: item.operation || "update",
+        operation: item.operation || 'update',
         changes,
       };
     });
   }, [cr]);
 
   const formatValue = (value: any): string => {
-    if (value === null) return "null";
-    if (value === undefined) return "";
-    if (typeof value === "object") return JSON.stringify(value, null, 2);
+    if (value === null) return 'null';
+    if (value === undefined) return '';
+    if (typeof value === 'object') return JSON.stringify(value, null, 2);
     return String(value);
   };
 
@@ -268,13 +248,13 @@ const ChangeRequestDetailPage: React.FC = () => {
     setActionLoading(true);
     try {
       await changeRequestService.approve(id!, comment || undefined);
-      enqueueSnackbar(t("changeRequest.messages.approved"), {
-        variant: "success",
+      enqueueSnackbar(t('changeRequest.messages.approved'), {
+        variant: 'success',
       });
-      setComment("");
+      setComment('');
       mutate();
     } catch (err: any) {
-      handleApiError(err, "changeRequest.errors.approveFailed");
+      handleApiError(err, 'changeRequest.errors.approveFailed');
     } finally {
       setActionLoading(false);
     }
@@ -282,21 +262,21 @@ const ChangeRequestDetailPage: React.FC = () => {
 
   const handleReject = async () => {
     if (!comment.trim()) {
-      enqueueSnackbar(t("changeRequest.errors.rejectCommentRequired"), {
-        variant: "warning",
+      enqueueSnackbar(t('changeRequest.errors.rejectCommentRequired'), {
+        variant: 'warning',
       });
       return;
     }
     setActionLoading(true);
     try {
       await changeRequestService.reject(id!, comment);
-      enqueueSnackbar(t("changeRequest.messages.rejected"), {
-        variant: "success",
+      enqueueSnackbar(t('changeRequest.messages.rejected'), {
+        variant: 'success',
       });
-      setComment("");
+      setComment('');
       mutate();
     } catch (err: any) {
-      handleApiError(err, "changeRequest.errors.rejectFailed");
+      handleApiError(err, 'changeRequest.errors.rejectFailed');
     } finally {
       setActionLoading(false);
     }
@@ -306,12 +286,12 @@ const ChangeRequestDetailPage: React.FC = () => {
     setActionLoading(true);
     try {
       await changeRequestService.reopen(id!);
-      enqueueSnackbar(t("changeRequest.messages.reopened"), {
-        variant: "success",
+      enqueueSnackbar(t('changeRequest.messages.reopened'), {
+        variant: 'success',
       });
       mutate();
     } catch (err: any) {
-      handleApiError(err, "changeRequest.errors.reopenFailed");
+      handleApiError(err, 'changeRequest.errors.reopenFailed');
     } finally {
       setActionLoading(false);
     }
@@ -321,12 +301,12 @@ const ChangeRequestDetailPage: React.FC = () => {
     setActionLoading(true);
     try {
       await changeRequestService.execute(id!);
-      enqueueSnackbar(t("changeRequest.messages.executed"), {
-        variant: "success",
+      enqueueSnackbar(t('changeRequest.messages.executed'), {
+        variant: 'success',
       });
       mutate();
     } catch (err: any) {
-      if (handleApiError(err, "changeRequest.errors.executeFailed")) {
+      if (handleApiError(err, 'changeRequest.errors.executeFailed')) {
         mutate(); // Refresh if it was a conflict
       }
     } finally {
@@ -342,12 +322,12 @@ const ChangeRequestDetailPage: React.FC = () => {
     setActionLoading(true);
     try {
       await changeRequestService.delete(id!);
-      enqueueSnackbar(t("changeRequest.messages.deleted"), {
-        variant: "success",
+      enqueueSnackbar(t('changeRequest.messages.deleted'), {
+        variant: 'success',
       });
-      navigate("/admin/change-requests");
+      navigate('/admin/change-requests');
     } catch (err: any) {
-      handleApiError(err, "changeRequest.errors.deleteFailed");
+      handleApiError(err, 'changeRequest.errors.deleteFailed');
       setIsDeleteDialogOpen(false);
     } finally {
       setActionLoading(false);
@@ -356,8 +336,8 @@ const ChangeRequestDetailPage: React.FC = () => {
 
   const handleSubmit = async () => {
     if (!submitTitle.trim()) {
-      enqueueSnackbar(t("changeRequest.errors.titleRequired"), {
-        variant: "warning",
+      enqueueSnackbar(t('changeRequest.errors.titleRequired'), {
+        variant: 'warning',
       });
       return;
     }
@@ -367,13 +347,13 @@ const ChangeRequestDetailPage: React.FC = () => {
         title: submitTitle.trim(),
         reason: submitReason.trim() || undefined,
       });
-      enqueueSnackbar(t("changeRequest.messages.submitted"), {
-        variant: "success",
+      enqueueSnackbar(t('changeRequest.messages.submitted'), {
+        variant: 'success',
       });
       setShowSubmitForm(false);
       mutate();
     } catch (err: any) {
-      handleApiError(err, "changeRequest.errors.submitFailed");
+      handleApiError(err, 'changeRequest.errors.submitFailed');
     } finally {
       setActionLoading(false);
     }
@@ -381,7 +361,7 @@ const ChangeRequestDetailPage: React.FC = () => {
 
   if (isLoading) {
     return (
-      <Box sx={{ display: "flex", justifyContent: "center", py: 8 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
         <CircularProgress />
       </Box>
     );
@@ -390,50 +370,42 @@ const ChangeRequestDetailPage: React.FC = () => {
   if (error || !cr) {
     return (
       <Box sx={{ p: 3 }}>
-        <Alert severity="error">{t("common.loadFailed")}</Alert>
+        <Alert severity="error">{t('common.loadFailed')}</Alert>
       </Box>
     );
   }
 
   const statusConfig = STATUS_CONFIG[cr.status];
-  const totalChanges = allChanges.reduce(
-    (sum, item) => sum + item.changes.length,
-    0,
-  );
+  const totalChanges = allChanges.reduce((sum, item) => sum + item.changes.length, 0);
 
   return (
-    <Box sx={{ p: 3, bgcolor: "background.default", minHeight: "100vh" }}>
+    <Box sx={{ p: 3, bgcolor: 'background.default', minHeight: '100vh' }}>
       {/* GitHub-style Header */}
       <Box
         sx={{
           borderBottom: 1,
-          borderColor: "divider",
-          bgcolor: "background.paper",
+          borderColor: 'divider',
+          bgcolor: 'background.paper',
           borderRadius: 1,
           mb: 3,
         }}
       >
         <Box sx={{ px: 3, py: 2 }}>
           {/* Back + Title */}
-          <Box
-            sx={{ display: "flex", alignItems: "flex-start", gap: 2, mb: 1 }}
-          >
+          <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2, mb: 1 }}>
             <IconButton
               size="small"
-              onClick={() => navigate("/admin/change-requests")}
+              onClick={() => navigate('/admin/change-requests')}
               sx={{ mt: 0.5 }}
             >
               <ArrowBackIcon fontSize="small" />
             </IconButton>
             <Box sx={{ flex: 1 }}>
-              <Typography
-                variant="h5"
-                sx={{ fontWeight: 600, lineHeight: 1.3 }}
-              >
-                {cr.title || t("changeRequest.title")}
+              <Typography variant="h5" sx={{ fontWeight: 600, lineHeight: 1.3 }}>
+                {cr.title || t('changeRequest.title')}
                 <Typography
                   component="span"
-                  sx={{ ml: 1, color: "text.secondary", fontWeight: 400 }}
+                  sx={{ ml: 1, color: 'text.secondary', fontWeight: 400 }}
                 >
                   #{cr.id.slice(0, 8)}
                 </Typography>
@@ -442,21 +414,20 @@ const ChangeRequestDetailPage: React.FC = () => {
           </Box>
 
           {/* Status + Meta */}
-          <Box sx={{ display: "flex", alignItems: "center", gap: 2, pl: 6 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, pl: 6 }}>
             <Chip
               label={t(statusConfig.labelKey)}
               size="small"
               sx={{
                 bgcolor: statusConfig.bgColor,
-                color: "#fff",
+                color: '#fff',
                 fontWeight: 600,
-                borderRadius: "2em",
+                borderRadius: '2em',
               }}
             />
             <Typography variant="body2" color="text.secondary">
-              <strong>{cr.requester?.name || cr.requester?.email}</strong>{" "}
-              {t("changeRequest.wantsToMerge")} {allChanges.length}{" "}
-              {t("changeRequest.changes")}
+              <strong>{cr.requester?.name || cr.requester?.email}</strong>{' '}
+              {t('changeRequest.wantsToMerge')} {allChanges.length} {t('changeRequest.changes')}
             </Typography>
           </Box>
 
@@ -467,9 +438,9 @@ const ChangeRequestDetailPage: React.FC = () => {
               onChange={(_, v) => setActiveTab(v)}
               sx={{
                 minHeight: 40,
-                "& .MuiTab-root": {
+                '& .MuiTab-root': {
                   minHeight: 40,
-                  textTransform: "none",
+                  textTransform: 'none',
                   fontWeight: 500,
                 },
               }}
@@ -477,12 +448,12 @@ const ChangeRequestDetailPage: React.FC = () => {
               <Tab
                 icon={<HistoryIcon sx={{ fontSize: 18 }} />}
                 iconPosition="start"
-                label={`${t("changeRequest.conversation")} (${timeline.length})`}
+                label={`${t('changeRequest.conversation')} (${timeline.length})`}
               />
               <Tab
                 icon={<DiffIcon sx={{ fontSize: 18 }} />}
                 iconPosition="start"
-                label={`${t("changeRequest.filesChanged")} (${totalChanges})`}
+                label={`${t('changeRequest.filesChanged')} (${totalChanges})`}
               />
             </Tabs>
           </Box>
@@ -493,38 +464,38 @@ const ChangeRequestDetailPage: React.FC = () => {
       <Box sx={{ px: 0 }}>
         {/* Conversation Tab */}
         {activeTab === 0 && (
-          <Box sx={{ display: "flex", gap: 3 }}>
+          <Box sx={{ display: 'flex', gap: 3 }}>
             {/* Main */}
             <Box sx={{ flex: 1 }}>
               {/* Initial Comment */}
-              <Box sx={{ display: "flex", mb: 2 }}>
+              <Box sx={{ display: 'flex', mb: 2 }}>
                 {/* Time column with triangle pointer */}
                 <Box
                   sx={{
                     width: 72,
                     flexShrink: 0,
-                    display: "flex",
-                    alignItems: "flex-start",
-                    justifyContent: "flex-end",
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    justifyContent: 'flex-end',
                     pr: 1,
                     pt: 1.5,
                   }}
                 >
                   <Box
                     sx={{
-                      display: "flex",
-                      alignItems: "center",
+                      display: 'flex',
+                      alignItems: 'center',
                       gap: 0.5,
                     }}
                   >
                     <Typography
                       variant="caption"
                       color="text.secondary"
-                      sx={{ fontWeight: 600, fontFamily: "monospace" }}
+                      sx={{ fontWeight: 600, fontFamily: 'monospace' }}
                     >
                       {new Date(cr.createdAt).toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
+                        hour: '2-digit',
+                        minute: '2-digit',
                         hour12: false,
                       })}
                     </Typography>
@@ -532,8 +503,8 @@ const ChangeRequestDetailPage: React.FC = () => {
                       sx={{
                         width: 0,
                         height: 0,
-                        borderTop: "6px solid transparent",
-                        borderBottom: "6px solid transparent",
+                        borderTop: '6px solid transparent',
+                        borderBottom: '6px solid transparent',
                         borderLeft: (theme) =>
                           `6px solid ${alpha(theme.palette.text.secondary, 0.3)}`,
                       }}
@@ -546,29 +517,29 @@ const ChangeRequestDetailPage: React.FC = () => {
                   sx={{
                     width: 48,
                     flexShrink: 0,
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    position: "relative",
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    position: 'relative',
                   }}
                 >
                   <Avatar
                     sx={{
                       width: 32,
                       height: 32,
-                      bgcolor: "grey.500",
+                      bgcolor: 'grey.500',
                       mt: 0.5,
                       zIndex: 1,
                     }}
                   >
                     <PersonIcon sx={{ fontSize: 18 }} />
                   </Avatar>
-                  {timeline.filter((e) => e.type !== "created").length > 0 && (
+                  {timeline.filter((e) => e.type !== 'created').length > 0 && (
                     <Box
                       sx={{
                         flex: 1,
                         width: 2,
-                        bgcolor: "divider",
+                        bgcolor: 'divider',
                         mt: 1,
                       }}
                     />
@@ -577,30 +548,24 @@ const ChangeRequestDetailPage: React.FC = () => {
 
                 {/* Content column */}
                 <Box sx={{ flex: 1, pl: 1.5 }}>
-                  <Paper variant="outlined" sx={{ overflow: "hidden" }}>
+                  <Paper variant="outlined" sx={{ overflow: 'hidden' }}>
                     <Box
                       sx={{
-                        bgcolor: "action.hover",
+                        bgcolor: 'action.hover',
                         px: 2,
                         py: 1,
                         borderBottom: cr.reason || cr.description ? 1 : 0,
-                        borderColor: "divider",
+                        borderColor: 'divider',
                       }}
                     >
                       <Typography variant="body2">
-                        <strong>
-                          {cr.requester?.name || cr.requester?.email}
-                        </strong>{" "}
-                        {t("changeRequest.opened")}{" "}
-                        <RelativeTime date={cr.createdAt} />
+                        <strong>{cr.requester?.name || cr.requester?.email}</strong>{' '}
+                        {t('changeRequest.opened')} <RelativeTime date={cr.createdAt} />
                       </Typography>
                     </Box>
                     {(cr.reason || cr.description) && (
                       <Box sx={{ p: 2 }}>
-                        <Typography
-                          variant="body2"
-                          sx={{ whiteSpace: "pre-wrap" }}
-                        >
+                        <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
                           {cr.reason || cr.description}
                         </Typography>
                       </Box>
@@ -611,36 +576,36 @@ const ChangeRequestDetailPage: React.FC = () => {
 
               {/* Timeline Events */}
               {timeline
-                .filter((e) => e.type !== "created")
+                .filter((e) => e.type !== 'created')
                 .map((event, idx, arr) => (
-                  <Box key={idx} sx={{ display: "flex", mb: 2 }}>
+                  <Box key={idx} sx={{ display: 'flex', mb: 2 }}>
                     {/* Time column with triangle pointer */}
                     <Box
                       sx={{
                         width: 72,
                         flexShrink: 0,
-                        display: "flex",
-                        alignItems: "flex-start",
-                        justifyContent: "flex-end",
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        justifyContent: 'flex-end',
                         pr: 1,
                         pt: 0.5,
                       }}
                     >
                       <Box
                         sx={{
-                          display: "flex",
-                          alignItems: "center",
+                          display: 'flex',
+                          alignItems: 'center',
                           gap: 0.5,
                         }}
                       >
                         <Typography
                           variant="caption"
                           color="text.secondary"
-                          sx={{ fontWeight: 600, fontFamily: "monospace" }}
+                          sx={{ fontWeight: 600, fontFamily: 'monospace' }}
                         >
                           {new Date(event.timestamp).toLocaleTimeString([], {
-                            hour: "2-digit",
-                            minute: "2-digit",
+                            hour: '2-digit',
+                            minute: '2-digit',
                             hour12: false,
                           })}
                         </Typography>
@@ -648,15 +613,15 @@ const ChangeRequestDetailPage: React.FC = () => {
                           sx={{
                             width: 0,
                             height: 0,
-                            borderTop: "6px solid transparent",
-                            borderBottom: "6px solid transparent",
+                            borderTop: '6px solid transparent',
+                            borderBottom: '6px solid transparent',
                             borderLeft: (theme) =>
                               `6px solid ${
-                                event.type === "rejected"
+                                event.type === 'rejected'
                                   ? theme.palette.error.main
-                                  : event.type === "approved"
+                                  : event.type === 'approved'
                                     ? theme.palette.success.main
-                                    : event.type === "executed"
+                                    : event.type === 'executed'
                                       ? theme.palette.info.main
                                       : theme.palette.primary.main
                               }`,
@@ -670,10 +635,10 @@ const ChangeRequestDetailPage: React.FC = () => {
                       sx={{
                         width: 48,
                         flexShrink: 0,
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                        position: "relative",
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        position: 'relative',
                       }}
                     >
                       <Avatar
@@ -681,35 +646,27 @@ const ChangeRequestDetailPage: React.FC = () => {
                           width: 32,
                           height: 32,
                           bgcolor:
-                            event.type === "rejected"
-                              ? "error.main"
-                              : event.type === "approved"
-                                ? "success.main"
-                                : event.type === "executed"
-                                  ? "info.main"
-                                  : "primary.main",
+                            event.type === 'rejected'
+                              ? 'error.main'
+                              : event.type === 'approved'
+                                ? 'success.main'
+                                : event.type === 'executed'
+                                  ? 'info.main'
+                                  : 'primary.main',
                           zIndex: 1,
                         }}
                       >
-                        {event.type === "submitted" && (
-                          <SendIcon sx={{ fontSize: 16 }} />
-                        )}
-                        {event.type === "approved" && (
-                          <CheckIcon sx={{ fontSize: 16 }} />
-                        )}
-                        {event.type === "rejected" && (
-                          <CloseIcon sx={{ fontSize: 16 }} />
-                        )}
-                        {event.type === "executed" && (
-                          <MergeIcon sx={{ fontSize: 16 }} />
-                        )}
+                        {event.type === 'submitted' && <SendIcon sx={{ fontSize: 16 }} />}
+                        {event.type === 'approved' && <CheckIcon sx={{ fontSize: 16 }} />}
+                        {event.type === 'rejected' && <CloseIcon sx={{ fontSize: 16 }} />}
+                        {event.type === 'executed' && <MergeIcon sx={{ fontSize: 16 }} />}
                       </Avatar>
                       {idx < arr.length - 1 && (
                         <Box
                           sx={{
                             flex: 1,
                             width: 2,
-                            bgcolor: "divider",
+                            bgcolor: 'divider',
                             mt: 1,
                           }}
                         />
@@ -719,46 +676,33 @@ const ChangeRequestDetailPage: React.FC = () => {
                     {/* Content column */}
                     <Box sx={{ flex: 1, pl: 1.5 }}>
                       <Typography variant="body2">
-                        <strong>
-                          {event.user?.name || event.user?.email || "System"}
-                        </strong>{" "}
-                        {event.type === "submitted" &&
-                          t("changeRequest.timeline.submitted")}
-                        {event.type === "approved" &&
-                          t("changeRequest.timeline.approved")}
-                        {event.type === "rejected" &&
-                          t("changeRequest.timeline.rejected")}
-                        {event.type === "executed" &&
-                          t("changeRequest.timeline.executed")}{" "}
+                        <strong>{event.user?.name || event.user?.email || 'System'}</strong>{' '}
+                        {event.type === 'submitted' && t('changeRequest.timeline.submitted')}
+                        {event.type === 'approved' && t('changeRequest.timeline.approved')}
+                        {event.type === 'rejected' && t('changeRequest.timeline.rejected')}
+                        {event.type === 'executed' && t('changeRequest.timeline.executed')}{' '}
                         <Typography component="span" color="text.secondary">
                           <RelativeTime date={event.timestamp} />
                         </Typography>
                       </Typography>
 
                       {/* Submitted event: show title with expandable reason */}
-                      {event.type === "submitted" && event.title && (
+                      {event.type === 'submitted' && event.title && (
                         <Box sx={{ mt: 1 }}>
                           <Box
                             sx={{
-                              display: "flex",
-                              alignItems: "center",
+                              display: 'flex',
+                              alignItems: 'center',
                               gap: 1,
-                              flexWrap: "wrap",
+                              flexWrap: 'wrap',
                             }}
                           >
-                            <Typography
-                              variant="body2"
-                              sx={{ fontWeight: 500 }}
-                            >
+                            <Typography variant="body2" sx={{ fontWeight: 500 }}>
                               {event.title}
                             </Typography>
                             {event.reason && (
                               <Chip
-                                label={
-                                  expandedReasons[idx]
-                                    ? t("changeRequest.collapse")
-                                    : "..."
-                                }
+                                label={expandedReasons[idx] ? t('changeRequest.collapse') : '...'}
                                 size="small"
                                 onClick={() =>
                                   setExpandedReasons((prev) => ({
@@ -770,13 +714,11 @@ const ChangeRequestDetailPage: React.FC = () => {
                                   height: 20,
                                   fontSize: 11,
                                   fontWeight: 500,
-                                  bgcolor: (theme) =>
-                                    alpha(theme.palette.text.primary, 0.08),
-                                  color: "text.secondary",
-                                  cursor: "pointer",
-                                  "&:hover": {
-                                    bgcolor: (theme) =>
-                                      alpha(theme.palette.text.primary, 0.15),
+                                  bgcolor: (theme) => alpha(theme.palette.text.primary, 0.08),
+                                  color: 'text.secondary',
+                                  cursor: 'pointer',
+                                  '&:hover': {
+                                    bgcolor: (theme) => alpha(theme.palette.text.primary, 0.15),
                                   },
                                 }}
                               />
@@ -789,13 +731,10 @@ const ChangeRequestDetailPage: React.FC = () => {
                                 sx={{
                                   mt: 1,
                                   p: 1.5,
-                                  bgcolor: "action.hover",
+                                  bgcolor: 'action.hover',
                                 }}
                               >
-                                <Typography
-                                  variant="body2"
-                                  sx={{ whiteSpace: "pre-wrap" }}
-                                >
+                                <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
                                   {event.reason}
                                 </Typography>
                               </Paper>
@@ -811,25 +750,20 @@ const ChangeRequestDetailPage: React.FC = () => {
                             mt: 1,
                             p: 1.5,
                             bgcolor:
-                              event.type === "rejected"
-                                ? (theme) =>
-                                    alpha(theme.palette.error.main, 0.1)
-                                : event.type === "approved"
-                                  ? (theme) =>
-                                      alpha(theme.palette.success.main, 0.1)
-                                  : "action.hover",
+                              event.type === 'rejected'
+                                ? (theme) => alpha(theme.palette.error.main, 0.1)
+                                : event.type === 'approved'
+                                  ? (theme) => alpha(theme.palette.success.main, 0.1)
+                                  : 'action.hover',
                             borderColor:
-                              event.type === "rejected"
-                                ? "error.main"
-                                : event.type === "approved"
-                                  ? "success.main"
-                                  : "divider",
+                              event.type === 'rejected'
+                                ? 'error.main'
+                                : event.type === 'approved'
+                                  ? 'success.main'
+                                  : 'divider',
                           }}
                         >
-                          <Typography
-                            variant="body2"
-                            sx={{ whiteSpace: "pre-wrap" }}
-                          >
+                          <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
                             {event.comment}
                           </Typography>
                         </Paper>
@@ -838,33 +772,27 @@ const ChangeRequestDetailPage: React.FC = () => {
                   </Box>
                 ))}
 
-              <Divider sx={{ my: 3, borderStyle: "dashed" }} />
+              <Divider sx={{ my: 3, borderStyle: 'dashed' }} />
 
               {/* Review Box */}
-              {cr.status === "open" && (
-                <Paper variant="outlined" sx={{ overflow: "hidden" }}>
+              {cr.status === 'open' && (
+                <Paper variant="outlined" sx={{ overflow: 'hidden' }}>
                   <Box
                     sx={{
-                      bgcolor: "action.hover",
+                      bgcolor: 'action.hover',
                       px: 2,
                       py: 1.5,
                       borderBottom: 1,
-                      borderColor: "divider",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
+                      borderColor: 'divider',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
                     }}
                   >
-                    <Typography variant="subtitle2">
-                      {t("changeRequest.addReview")}
-                    </Typography>
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      sx={{ fontWeight: 600 }}
-                    >
-                      {t("changeRequest.approvalProgress")}: {currentApprovals}{" "}
-                      / {requiredApprovals}
+                    <Typography variant="subtitle2">{t('changeRequest.addReview')}</Typography>
+                    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
+                      {t('changeRequest.approvalProgress')}: {currentApprovals} /{' '}
+                      {requiredApprovals}
                     </Typography>
                   </Box>
                   <Box sx={{ p: 2 }}>
@@ -875,7 +803,7 @@ const ChangeRequestDetailPage: React.FC = () => {
                           fullWidth
                           multiline
                           rows={4}
-                          placeholder={t("changeRequest.leaveComment")}
+                          placeholder={t('changeRequest.leaveComment')}
                           value={comment}
                           onChange={(e) => setComment(e.target.value)}
                           variant="outlined"
@@ -883,9 +811,9 @@ const ChangeRequestDetailPage: React.FC = () => {
                         />
                         <Box
                           sx={{
-                            display: "flex",
+                            display: 'flex',
                             gap: 1,
-                            justifyContent: "flex-end",
+                            justifyContent: 'flex-end',
                           }}
                         >
                           <Button
@@ -894,7 +822,7 @@ const ChangeRequestDetailPage: React.FC = () => {
                             onClick={handleReject}
                             disabled={actionLoading || !comment.trim()}
                           >
-                            {t("changeRequest.actions.reject")}
+                            {t('changeRequest.actions.reject')}
                           </Button>
                           <Button
                             variant="contained"
@@ -903,34 +831,31 @@ const ChangeRequestDetailPage: React.FC = () => {
                             onClick={handleApprove}
                             disabled={actionLoading}
                           >
-                            {t("changeRequest.actions.approve")}
+                            {t('changeRequest.actions.approve')}
                           </Button>
                         </Box>
                       </>
                     ) : (
                       <Box
                         sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
                           py: 2,
-                          flexDirection: "column",
+                          flexDirection: 'column',
                           gap: 1,
                         }}
                       >
                         {hasApproved ? (
                           <>
-                            <CheckIcon
-                              color="success"
-                              sx={{ fontSize: 40, mb: 1 }}
-                            />
+                            <CheckIcon color="success" sx={{ fontSize: 40, mb: 1 }} />
                             <Typography variant="body2" color="text.secondary">
-                              {t("errors.CR_ALREADY_APPROVED")}
+                              {t('errors.CR_ALREADY_APPROVED')}
                             </Typography>
                           </>
                         ) : (
                           <Typography variant="body2" color="text.secondary">
-                            {t("errors.CR_SELF_APPROVAL_NOT_ALLOWED")}
+                            {t('errors.CR_SELF_APPROVAL_NOT_ALLOWED')}
                           </Typography>
                         )}
                       </Box>
@@ -940,38 +865,32 @@ const ChangeRequestDetailPage: React.FC = () => {
               )}
 
               {/* Status Banners */}
-              {cr.status === "rejected" &&
-                (cr.requesterId === user?.id ||
-                  user?.role === "admin" ||
-                  user?.role === 0) && (
+              {cr.status === 'rejected' &&
+                (cr.requesterId === user?.id || user?.role === 'admin' || user?.role === 0) && (
                   <Paper
                     sx={{
                       p: 2,
                       bgcolor: (theme) => alpha(theme.palette.error.main, 0.1),
                       border: 1,
-                      borderColor: "error.main",
+                      borderColor: 'error.main',
                     }}
                   >
                     <Box
                       sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
                       }}
                     >
                       <Box>
-                        <Typography
-                          variant="body2"
-                          fontWeight={500}
-                          color="error.main"
-                        >
-                          {t("changeRequest.status.rejected")}
+                        <Typography variant="body2" fontWeight={500} color="error.main">
+                          {t('changeRequest.status.rejected')}
                         </Typography>
                         {cr.rejectionReason && (
                           <Typography
                             variant="caption"
                             color="text.secondary"
-                            sx={{ display: "block", mt: 0.5 }}
+                            sx={{ display: 'block', mt: 0.5 }}
                           >
                             {cr.rejectionReason}
                           </Typography>
@@ -984,39 +903,34 @@ const ChangeRequestDetailPage: React.FC = () => {
                         onClick={handleDelete}
                         disabled={actionLoading}
                       >
-                        {t("common.delete")}
+                        {t('common.delete')}
                       </Button>
                     </Box>
                   </Paper>
                 )}
 
-              {cr.status === "approved" && (
+              {cr.status === 'approved' && (
                 <Paper
                   sx={{
                     p: 2,
                     bgcolor: (theme) => alpha(theme.palette.success.main, 0.1),
                     border: 1,
-                    borderColor: "success.main",
+                    borderColor: 'success.main',
                   }}
                 >
                   <Box
                     sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
                     }}
                   >
                     <Box>
-                      <Typography
-                        variant="body2"
-                        fontWeight={500}
-                        color="success.main"
-                      >
-                        ✓ {t("changeRequest.readyToMerge")}
+                      <Typography variant="body2" fontWeight={500} color="success.main">
+                        ✓ {t('changeRequest.readyToMerge')}
                       </Typography>
                       <Typography variant="caption" color="text.secondary">
-                        {cr.approvals?.length || 0}{" "}
-                        {t("changeRequest.approvals")}
+                        {cr.approvals?.length || 0} {t('changeRequest.approvals')}
                       </Typography>
                     </Box>
                     <Button
@@ -1026,25 +940,25 @@ const ChangeRequestDetailPage: React.FC = () => {
                       onClick={handleExecute}
                       disabled={actionLoading}
                     >
-                      {t("changeRequest.actions.merge")}
+                      {t('changeRequest.actions.merge')}
                     </Button>
                   </Box>
                 </Paper>
               )}
 
-              {cr.status === "draft" && !showSubmitForm && (
+              {cr.status === 'draft' && !showSubmitForm && (
                 <Paper variant="outlined" sx={{ p: 2 }}>
                   <Box
                     sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
                     }}
                   >
                     <Typography variant="body2" color="text.secondary">
-                      {t("changeRequest.draftMessage")}
+                      {t('changeRequest.draftMessage')}
                     </Typography>
-                    <Box sx={{ display: "flex", gap: 1 }}>
+                    <Box sx={{ display: 'flex', gap: 1 }}>
                       <Button
                         variant="outlined"
                         color="error"
@@ -1052,7 +966,7 @@ const ChangeRequestDetailPage: React.FC = () => {
                         onClick={handleDelete}
                         disabled={actionLoading}
                       >
-                        {t("common.delete")}
+                        {t('common.delete')}
                       </Button>
                       <Button
                         variant="contained"
@@ -1060,33 +974,33 @@ const ChangeRequestDetailPage: React.FC = () => {
                         onClick={() => setShowSubmitForm(true)}
                         disabled={actionLoading}
                       >
-                        {t("changeRequest.actions.readyForReview")}
+                        {t('changeRequest.actions.readyForReview')}
                       </Button>
                     </Box>
                   </Box>
                 </Paper>
               )}
 
-              {cr.status === "draft" && showSubmitForm && (
-                <Paper variant="outlined" sx={{ overflow: "hidden" }}>
+              {cr.status === 'draft' && showSubmitForm && (
+                <Paper variant="outlined" sx={{ overflow: 'hidden' }}>
                   <Box
                     sx={{
-                      bgcolor: "action.hover",
+                      bgcolor: 'action.hover',
                       px: 2,
                       py: 1.5,
                       borderBottom: 1,
-                      borderColor: "divider",
+                      borderColor: 'divider',
                     }}
                   >
                     <Typography variant="subtitle2">
-                      {t("changeRequest.submitDialog.title")}
+                      {t('changeRequest.submitDialog.title')}
                     </Typography>
                   </Box>
                   <Box sx={{ p: 2 }}>
                     <TextField
                       autoFocus
                       fullWidth
-                      label={t("changeRequest.submitDialog.titleField")}
+                      label={t('changeRequest.submitDialog.titleField')}
                       value={submitTitle}
                       onChange={(e) => setSubmitTitle(e.target.value)}
                       sx={{ mb: 2 }}
@@ -1096,33 +1010,24 @@ const ChangeRequestDetailPage: React.FC = () => {
                       fullWidth
                       multiline
                       rows={3}
-                      label={t("changeRequest.submitDialog.reason")}
+                      label={t('changeRequest.submitDialog.reason')}
                       value={submitReason}
                       onChange={(e) => setSubmitReason(e.target.value)}
                       sx={{ mb: 2 }}
-                      helperText={t(
-                        "changeRequest.submitDialog.reasonOptional",
-                      )}
+                      helperText={t('changeRequest.submitDialog.reasonOptional')}
                     />
                     <Box
                       sx={{
-                        display: "flex",
+                        display: 'flex',
                         gap: 1,
-                        justifyContent: "flex-end",
+                        justifyContent: 'flex-end',
                       }}
                     >
-                      <Button
-                        onClick={() => setShowSubmitForm(false)}
-                        disabled={actionLoading}
-                      >
-                        {t("common.cancel")}
+                      <Button onClick={() => setShowSubmitForm(false)} disabled={actionLoading}>
+                        {t('common.cancel')}
                       </Button>
-                      <Button
-                        variant="contained"
-                        onClick={handleSubmit}
-                        disabled={actionLoading}
-                      >
-                        {t("changeRequest.actions.submit")}
+                      <Button variant="contained" onClick={handleSubmit} disabled={actionLoading}>
+                        {t('changeRequest.actions.submit')}
                       </Button>
                     </Box>
                   </Box>
@@ -1136,13 +1041,11 @@ const ChangeRequestDetailPage: React.FC = () => {
                 <Typography
                   variant="caption"
                   color="text.secondary"
-                  sx={{ textTransform: "uppercase", fontWeight: 600 }}
+                  sx={{ textTransform: 'uppercase', fontWeight: 600 }}
                 >
-                  {t("changeRequest.requester")}
+                  {t('changeRequest.requester')}
                 </Typography>
-                <Box
-                  sx={{ display: "flex", alignItems: "center", gap: 1, mt: 1 }}
-                >
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1 }}>
                   <Avatar sx={{ width: 20, height: 20 }}>
                     <PersonIcon sx={{ fontSize: 14 }} />
                   </Avatar>
@@ -1156,9 +1059,9 @@ const ChangeRequestDetailPage: React.FC = () => {
                 <Typography
                   variant="caption"
                   color="text.secondary"
-                  sx={{ textTransform: "uppercase", fontWeight: 600 }}
+                  sx={{ textTransform: 'uppercase', fontWeight: 600 }}
                 >
-                  {t("changeRequest.reviewers")}
+                  {t('changeRequest.reviewers')}
                 </Typography>
                 {cr.approvals?.length ? (
                   <Box sx={{ mt: 1 }}>
@@ -1166,15 +1069,13 @@ const ChangeRequestDetailPage: React.FC = () => {
                       <Box
                         key={a.id}
                         sx={{
-                          display: "flex",
-                          alignItems: "center",
+                          display: 'flex',
+                          alignItems: 'center',
                           gap: 1,
                           mb: 0.5,
                         }}
                       >
-                        <CheckIcon
-                          sx={{ fontSize: 14, color: "success.main" }}
-                        />
+                        <CheckIcon sx={{ fontSize: 14, color: 'success.main' }} />
                         <Typography variant="body2">
                           {a.approver?.name || a.approver?.email}
                         </Typography>
@@ -1182,49 +1083,41 @@ const ChangeRequestDetailPage: React.FC = () => {
                     ))}
                   </Box>
                 ) : (
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{ mt: 1 }}
-                  >
-                    {t("changeRequest.noReviewersYet")}
+                  <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                    {t('changeRequest.noReviewersYet')}
                   </Typography>
                 )}
               </Paper>
 
               {/* Executed By / Merged By */}
-              {cr.status === "applied" && (
+              {cr.status === 'applied' && (
                 <Paper variant="outlined" sx={{ p: 2, mt: 2 }}>
                   <Typography
                     variant="caption"
                     color="text.secondary"
-                    sx={{ textTransform: "uppercase", fontWeight: 600 }}
+                    sx={{ textTransform: 'uppercase', fontWeight: 600 }}
                   >
-                    {t("changeRequest.mergedBy")}
+                    {t('changeRequest.mergedBy')}
                   </Typography>
                   <Box
                     sx={{
-                      display: "flex",
-                      alignItems: "center",
+                      display: 'flex',
+                      alignItems: 'center',
                       gap: 1,
                       mt: 1,
                     }}
                   >
-                    <Avatar
-                      sx={{ width: 20, height: 20, bgcolor: "info.main" }}
-                    >
+                    <Avatar sx={{ width: 20, height: 20, bgcolor: 'info.main' }}>
                       <MergeIcon sx={{ fontSize: 14 }} />
                     </Avatar>
                     <Typography variant="body2">
-                      {cr.executor?.name ||
-                        cr.executor?.email ||
-                        t("common.unknown")}
+                      {cr.executor?.name || cr.executor?.email || t('common.unknown')}
                     </Typography>
                   </Box>
                   <Typography
                     variant="caption"
                     color="text.secondary"
-                    sx={{ display: "block", mt: 0.5, ml: 3.5 }}
+                    sx={{ display: 'block', mt: 0.5, ml: 3.5 }}
                   >
                     <RelativeTime date={cr.updatedAt} />
                   </Typography>
@@ -1238,28 +1131,21 @@ const ChangeRequestDetailPage: React.FC = () => {
         {activeTab === 1 && (
           <Box>
             {allChanges.map((item, idx) => (
-              <Paper
-                key={idx}
-                variant="outlined"
-                sx={{ mb: 2, overflow: "hidden" }}
-              >
+              <Paper key={idx} variant="outlined" sx={{ mb: 2, overflow: 'hidden' }}>
                 {/* File header */}
                 <Box
                   sx={{
                     px: 2,
                     py: 1,
-                    bgcolor: "action.hover",
+                    bgcolor: 'action.hover',
                     borderBottom: 1,
-                    borderColor: "divider",
-                    display: "flex",
-                    alignItems: "center",
+                    borderColor: 'divider',
+                    display: 'flex',
+                    alignItems: 'center',
                     gap: 1,
                   }}
                 >
-                  <Typography
-                    variant="body2"
-                    sx={{ fontFamily: "monospace", fontWeight: 600 }}
-                  >
+                  <Typography variant="body2" sx={{ fontFamily: 'monospace', fontWeight: 600 }}>
                     {item.table}/{item.targetId}
                   </Typography>
                   <Chip
@@ -1269,12 +1155,12 @@ const ChangeRequestDetailPage: React.FC = () => {
                       height: 20,
                       fontSize: 11,
                       bgcolor:
-                        item.operation === "create"
-                          ? "success.main"
-                          : item.operation === "delete"
-                            ? "error.main"
-                            : "primary.main",
-                      color: "#fff",
+                        item.operation === 'create'
+                          ? 'success.main'
+                          : item.operation === 'delete'
+                            ? 'error.main'
+                            : 'primary.main',
+                      color: '#fff',
                     }}
                   />
                 </Box>
@@ -1283,58 +1169,58 @@ const ChangeRequestDetailPage: React.FC = () => {
                 <Box
                   component="table"
                   sx={{
-                    width: "100%",
-                    borderCollapse: "collapse",
+                    width: '100%',
+                    borderCollapse: 'collapse',
                     fontSize: 13,
-                    fontFamily: "monospace",
+                    fontFamily: 'monospace',
                   }}
                 >
                   <Box component="thead">
                     <Box
                       component="tr"
                       sx={{
-                        bgcolor: "action.hover",
+                        bgcolor: 'action.hover',
                         borderBottom: 1,
-                        borderColor: "divider",
+                        borderColor: 'divider',
                       }}
                     >
                       <Box
                         component="th"
                         sx={{
-                          textAlign: "left",
+                          textAlign: 'left',
                           py: 1,
                           px: 2,
                           fontWeight: 600,
-                          width: "20%",
+                          width: '20%',
                         }}
                       >
-                        {t("changeRequest.field")}
+                        {t('changeRequest.field')}
                       </Box>
                       <Box
                         component="th"
                         sx={{
-                          textAlign: "left",
+                          textAlign: 'left',
                           py: 1,
                           px: 2,
                           fontWeight: 600,
-                          width: "40%",
-                          color: "error.main",
+                          width: '40%',
+                          color: 'error.main',
                         }}
                       >
-                        {t("changeRequest.oldValue")}
+                        {t('changeRequest.oldValue')}
                       </Box>
                       <Box
                         component="th"
                         sx={{
-                          textAlign: "left",
+                          textAlign: 'left',
                           py: 1,
                           px: 2,
                           fontWeight: 600,
-                          width: "40%",
-                          color: "success.main",
+                          width: '40%',
+                          color: 'success.main',
                         }}
                       >
-                        {t("changeRequest.newValue")}
+                        {t('changeRequest.newValue')}
                       </Box>
                     </Box>
                   </Box>
@@ -1345,16 +1231,14 @@ const ChangeRequestDetailPage: React.FC = () => {
                         key={i}
                         sx={{
                           borderBottom: 1,
-                          borderColor: "divider",
-                          "&:hover": { bgcolor: "action.hover" },
+                          borderColor: 'divider',
+                          '&:hover': { bgcolor: 'action.hover' },
                           bgcolor:
-                            change.operation === "added"
-                              ? (theme) =>
-                                  alpha(theme.palette.success.main, 0.05)
-                              : change.operation === "removed"
-                                ? (theme) =>
-                                    alpha(theme.palette.error.main, 0.05)
-                                : "transparent",
+                            change.operation === 'added'
+                              ? (theme) => alpha(theme.palette.success.main, 0.05)
+                              : change.operation === 'removed'
+                                ? (theme) => alpha(theme.palette.error.main, 0.05)
+                                : 'transparent',
                         }}
                       >
                         <Box
@@ -1363,9 +1247,9 @@ const ChangeRequestDetailPage: React.FC = () => {
                             py: 1,
                             px: 2,
                             fontWeight: 500,
-                            verticalAlign: "top",
+                            verticalAlign: 'top',
                             borderRight: 1,
-                            borderColor: "divider",
+                            borderColor: 'divider',
                           }}
                         >
                           {change.field}
@@ -1375,50 +1259,39 @@ const ChangeRequestDetailPage: React.FC = () => {
                           sx={{
                             py: 1,
                             px: 2,
-                            verticalAlign: "top",
-                            whiteSpace: "pre-wrap",
-                            wordBreak: "break-word",
+                            verticalAlign: 'top',
+                            whiteSpace: 'pre-wrap',
+                            wordBreak: 'break-word',
                             maxWidth: 0,
                             bgcolor:
-                              change.operation !== "added"
-                                ? (theme) =>
-                                    alpha(theme.palette.error.main, 0.08)
-                                : "transparent",
-                            color:
-                              change.operation !== "added"
-                                ? "error.main"
-                                : "text.disabled",
+                              change.operation !== 'added'
+                                ? (theme) => alpha(theme.palette.error.main, 0.08)
+                                : 'transparent',
+                            color: change.operation !== 'added' ? 'error.main' : 'text.disabled',
                             borderRight: 1,
-                            borderColor: "divider",
+                            borderColor: 'divider',
                           }}
                         >
-                          {change.operation === "added"
-                            ? "-"
-                            : formatValue(change.oldValue)}
+                          {change.operation === 'added' ? '-' : formatValue(change.oldValue)}
                         </Box>
                         <Box
                           component="td"
                           sx={{
                             py: 1,
                             px: 2,
-                            verticalAlign: "top",
-                            whiteSpace: "pre-wrap",
-                            wordBreak: "break-word",
+                            verticalAlign: 'top',
+                            whiteSpace: 'pre-wrap',
+                            wordBreak: 'break-word',
                             maxWidth: 0,
                             bgcolor:
-                              change.operation !== "removed"
-                                ? (theme) =>
-                                    alpha(theme.palette.success.main, 0.08)
-                                : "transparent",
+                              change.operation !== 'removed'
+                                ? (theme) => alpha(theme.palette.success.main, 0.08)
+                                : 'transparent',
                             color:
-                              change.operation !== "removed"
-                                ? "success.main"
-                                : "text.disabled",
+                              change.operation !== 'removed' ? 'success.main' : 'text.disabled',
                           }}
                         >
-                          {change.operation === "removed"
-                            ? "-"
-                            : formatValue(change.newValue)}
+                          {change.operation === 'removed' ? '-' : formatValue(change.newValue)}
                         </Box>
                       </Box>
                     ))}
@@ -1429,11 +1302,11 @@ const ChangeRequestDetailPage: React.FC = () => {
                           colSpan={3}
                           sx={{
                             p: 2,
-                            textAlign: "center",
-                            color: "text.secondary",
+                            textAlign: 'center',
+                            color: 'text.secondary',
                           }}
                         >
-                          {t("changeRequest.noChanges")}
+                          {t('changeRequest.noChanges')}
                         </Box>
                       </Box>
                     )}
@@ -1443,22 +1316,22 @@ const ChangeRequestDetailPage: React.FC = () => {
             ))}
 
             {/* Sticky Review Bar */}
-            {cr.status === "open" && (
+            {cr.status === 'open' && (
               <Paper
                 variant="outlined"
                 sx={{
-                  position: "sticky",
+                  position: 'sticky',
                   bottom: 16,
                   p: 2,
-                  display: "flex",
-                  alignItems: "center",
+                  display: 'flex',
+                  alignItems: 'center',
                   gap: 2,
-                  bgcolor: "background.paper",
+                  bgcolor: 'background.paper',
                   boxShadow: 3,
                 }}
               >
                 <TextField
-                  placeholder={t("changeRequest.leaveComment")}
+                  placeholder={t('changeRequest.leaveComment')}
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
                   size="small"
@@ -1471,7 +1344,7 @@ const ChangeRequestDetailPage: React.FC = () => {
                   onClick={handleReject}
                   disabled={actionLoading || !comment.trim()}
                 >
-                  {t("changeRequest.actions.reject")}
+                  {t('changeRequest.actions.reject')}
                 </Button>
                 <Button
                   variant="contained"
@@ -1480,7 +1353,7 @@ const ChangeRequestDetailPage: React.FC = () => {
                   onClick={handleApprove}
                   disabled={actionLoading}
                 >
-                  {t("changeRequest.actions.approve")}
+                  {t('changeRequest.actions.approve')}
                 </Button>
               </Paper>
             )}
@@ -1493,8 +1366,8 @@ const ChangeRequestDetailPage: React.FC = () => {
         open={isDeleteDialogOpen}
         onClose={() => setIsDeleteDialogOpen(false)}
         onConfirm={handleConfirmDelete}
-        title={t("changeRequest.deleteDialog.title")}
-        message={t("changeRequest.deleteDialog.message")}
+        title={t('changeRequest.deleteDialog.title')}
+        message={t('changeRequest.deleteDialog.message')}
         loading={actionLoading}
       />
       <ErrorDialog />

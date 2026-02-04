@@ -1,15 +1,8 @@
-import React, { useEffect, useMemo, useState } from "react";
-import {
-  Box,
-  Typography,
-  Card,
-  CardContent,
-  Alert,
-  CircularProgress,
-} from "@mui/material";
-import { Monitor as MonitorIcon } from "@mui/icons-material";
-import { useTranslation } from "react-i18next";
-import { useAuth } from "@/hooks/useAuth";
+import React, { useEffect, useMemo, useState } from 'react';
+import { Box, Typography, Card, CardContent, Alert, CircularProgress } from '@mui/material';
+import { Monitor as MonitorIcon } from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
+import { useAuth } from '@/hooks/useAuth';
 
 const QueueMonitorPage: React.FC = () => {
   const { t } = useTranslation();
@@ -26,18 +19,17 @@ const QueueMonitorPage: React.FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  if (!user || user.role !== "admin") {
+  if (!user || user.role !== 'admin') {
     return (
       <Box sx={{ p: 3 }}>
-        <Alert severity="error">{t("errors.accessDenied")}</Alert>
+        <Alert severity="error">{t('errors.accessDenied')}</Alert>
       </Box>
     );
   }
 
   // BullMQ Dashboard URL
   const bullboardUrl = useMemo(() => {
-    const isDevelopment =
-      import.meta.env.DEV || window.location.port === "43000";
+    const isDevelopment = import.meta.env.DEV || window.location.port === '43000';
     if (isDevelopment) {
       return `${window.location.protocol}//${window.location.hostname}:45000/bull-board`;
     }
@@ -47,30 +39,28 @@ const QueueMonitorPage: React.FC = () => {
   return (
     <Box sx={{ p: 3 }}>
       <Box sx={{ mb: 3 }}>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <MonitorIcon sx={{ fontSize: 32, color: "primary.main" }} />
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <MonitorIcon sx={{ fontSize: 32, color: 'primary.main' }} />
           <Box>
             <Typography variant="h5" sx={{ fontWeight: 700 }}>
-              {t("jobs.monitor")}
+              {t('jobs.monitor')}
             </Typography>
             <Typography variant="caption" color="text.secondary">
-              {t("jobs.monitorDescription")}
+              {t('jobs.monitorDescription')}
             </Typography>
           </Box>
         </Box>
       </Box>
 
       <Card>
-        <CardContent
-          sx={{ p: 0, position: "relative", height: "calc(100vh - 200px)" }}
-        >
+        <CardContent sx={{ p: 0, position: 'relative', height: 'calc(100vh - 200px)' }}>
           {loading && (
             <Box
               sx={{
-                position: "absolute",
-                top: "50%",
-                left: "50%",
-                transform: "translate(-50%, -50%)",
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
                 zIndex: 1,
               }}
             >
@@ -87,17 +77,17 @@ const QueueMonitorPage: React.FC = () => {
           <iframe
             src={bullboardUrl}
             style={{
-              width: "100%",
-              height: "100%",
-              border: "none",
+              width: '100%',
+              height: '100%',
+              border: 'none',
               opacity: loading ? 0.3 : 1,
-              transition: "opacity 0.3s ease-in-out",
+              transition: 'opacity 0.3s ease-in-out',
             }}
             title="Queue Monitor"
             onLoad={() => setLoading(false)}
             onError={() => {
               setLoading(false);
-              setError(t("jobs.monitorLoadError"));
+              setError(t('jobs.monitorLoadError'));
             }}
           />
         </CardContent>

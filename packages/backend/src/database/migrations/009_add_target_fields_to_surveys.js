@@ -1,10 +1,9 @@
-
 exports.up = async function (connection) {
-    console.log('Adding target fields to g_surveys table...');
+  console.log('Adding target fields to g_surveys table...');
 
-    // Use a single ALTER TABLE statement to add all columns
-    // Note: We are relying on the migration system's transaction to roll back if this fails
-    await connection.execute(`
+  // Use a single ALTER TABLE statement to add all columns
+  // Note: We are relying on the migration system's transaction to roll back if this fails
+  await connection.execute(`
     ALTER TABLE g_surveys
     ADD COLUMN targetPlatforms JSON NULL COMMENT 'Target platforms',
     ADD COLUMN targetPlatformsInverted BOOLEAN NOT NULL DEFAULT FALSE,
@@ -16,14 +15,14 @@ exports.up = async function (connection) {
     ADD COLUMN targetWorldsInverted BOOLEAN NOT NULL DEFAULT FALSE
   `);
 
-    console.log('✓ Added target fields to g_surveys table');
+  console.log('✓ Added target fields to g_surveys table');
 };
 
 exports.down = async function (connection) {
-    console.log('Removing target fields from g_surveys table...');
+  console.log('Removing target fields from g_surveys table...');
 
-    try {
-        await connection.execute(`
+  try {
+    await connection.execute(`
       ALTER TABLE g_surveys
       DROP COLUMN targetPlatforms,
       DROP COLUMN targetPlatformsInverted,
@@ -34,8 +33,8 @@ exports.down = async function (connection) {
       DROP COLUMN targetWorlds,
       DROP COLUMN targetWorldsInverted
     `);
-        console.log('✓ Removed target fields from g_surveys table');
-    } catch (error) {
-        console.warn('Error rolling back 009_add_target_fields_to_surveys (ignoring):', error.message);
-    }
+    console.log('✓ Removed target fields from g_surveys table');
+  } catch (error) {
+    console.warn('Error rolling back 009_add_target_fields_to_surveys (ignoring):', error.message);
+  }
 };

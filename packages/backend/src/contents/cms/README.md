@@ -153,24 +153,24 @@ import rewardLookupData from './reward-lookup.json';
 function RewardSelector() {
   const [rewardType, setRewardType] = useState('');
   const [itemId, setItemId] = useState('');
-  
+
   const typeInfo = rewardType ? rewardLookupData[rewardType] : null;
-  
+
   return (
     <div>
       {/* REWARD_TYPE 선택 */}
       <select onChange={(e) => setRewardType(e.target.value)}>
-        {Object.values(rewardLookupData).map(type => (
+        {Object.values(rewardLookupData).map((type) => (
           <option key={type.rewardType} value={type.rewardType}>
             {type.rewardTypeName}
           </option>
         ))}
       </select>
-      
+
       {/* 아이템 선택 (테이블이 있는 경우만) */}
       {typeInfo?.hasTable && (
         <select onChange={(e) => setItemId(e.target.value)}>
-          {typeInfo.items.map(item => (
+          {typeInfo.items.map((item) => (
             <option key={item.id} value={item.id}>
               [{item.id}] {item.name}
             </option>
@@ -223,48 +223,48 @@ const userTitles = lookupTable[REWARD_TYPE.USER_TITLE].items;
 
 ### 테이블 보유 타입
 
-| REWARD_TYPE | 이름 | 테이블 파일 | 아이템 수 |
-|-------------|------|-------------|-----------|
-| 1 | POINT | Point.json | 23 |
-| 2 | ITEM | Item.json | 2,827 |
-| 3 | DEPART_SUPPLY | DepartSupply.json | 4 |
-| 4 | TRADE_GOODS | TradeGoods.json | 698 |
-| 5 | MATE_EQUIP | CEquip.json | 3,966 |
-| 6 | SHIP | Ship.json | 699 |
-| 7 | MATE | Mate.json | 1,407 |
-| 8 | SHIP_BLUEPRINT | ShipBlueprint.json | 442 |
-| 9 | SHIP_SLOT_ITEM | ShipSlot.json | 7,617 |
-| 10 | QUEST_ITEM | Item.json | 2,827 |
-| 22 | TAX_FREE_PERMIT | TaxFreePermit.json | 18 |
-| 25 | SHIELD_NON_PURCHASE_COUNT | Shield.json | 4 |
-| 26 | SHIELD_PURCHASE_COUNT | Shield.json | 4 |
-| 32 | SHIP_CAMOUFLAGE | ShipCamouflage.json | 31 |
-| 33 | USER_TITLE | UserTitle.json | 125 |
-| 36 | PET | Pet.json | 20 |
-| 37 | SMUGGLE_GOODS | SmuggleGoods.json | 48 |
-| 38 | REWERD_SEASON_ITEMS | RewardSeasonItems.json | 810 |
+| REWARD_TYPE | 이름                      | 테이블 파일            | 아이템 수 |
+| ----------- | ------------------------- | ---------------------- | --------- |
+| 1           | POINT                     | Point.json             | 23        |
+| 2           | ITEM                      | Item.json              | 2,827     |
+| 3           | DEPART_SUPPLY             | DepartSupply.json      | 4         |
+| 4           | TRADE_GOODS               | TradeGoods.json        | 698       |
+| 5           | MATE_EQUIP                | CEquip.json            | 3,966     |
+| 6           | SHIP                      | Ship.json              | 699       |
+| 7           | MATE                      | Mate.json              | 1,407     |
+| 8           | SHIP_BLUEPRINT            | ShipBlueprint.json     | 442       |
+| 9           | SHIP_SLOT_ITEM            | ShipSlot.json          | 7,617     |
+| 10          | QUEST_ITEM                | Item.json              | 2,827     |
+| 22          | TAX_FREE_PERMIT           | TaxFreePermit.json     | 18        |
+| 25          | SHIELD_NON_PURCHASE_COUNT | Shield.json            | 4         |
+| 26          | SHIELD_PURCHASE_COUNT     | Shield.json            | 4         |
+| 32          | SHIP_CAMOUFLAGE           | ShipCamouflage.json    | 31        |
+| 33          | USER_TITLE                | UserTitle.json         | 125       |
+| 36          | PET                       | Pet.json               | 20        |
+| 37          | SMUGGLE_GOODS             | SmuggleGoods.json      | 48        |
+| 38          | REWERD_SEASON_ITEMS       | RewardSeasonItems.json | 810       |
 
 ### 수치 입력만 필요한 타입
 
-| REWARD_TYPE | 이름 | 설명 |
-|-------------|------|------|
-| 11 | BATTLE_EXP | Battle experience points |
-| 12 | TRADE_EXP | Trade experience points |
-| 13 | ADVENTURE_EXP | Adventure experience points |
-| 14 | BATTLE_FAME | Battle fame points |
-| 15 | TRADE_FAME | Trade fame points |
-| 16 | ADVENTURE_FAME | Adventure fame points |
-| 17 | SAILOR | Sailor count |
-| 18 | MATE_INTIMACY_OR_LOYALTY | Mate intimacy or loyalty points |
-| 19 | ENERGY | Energy points |
-| 27 | ARENA_TICKET | Arena ticket count |
-| 28 | WESTERN_SHIP_BUILD_EXP | Western ship building experience |
-| 29 | ORIENTAL_SHIP_BUILD_EXP | Oriental ship building experience |
-| 31 | CHOICE_BOX | Choice box (requires special handling) |
-| 34 | FREE_SWEEP_TICKET | Free sweep ticket count |
-| 35 | BUY_SWEEP_TICKET | Purchased sweep ticket count |
-| 100 | CAPTURED_SHIP | Captured ship (special handling required) |
-| 101 | SOUND_PACK | Sound pack |
+| REWARD_TYPE | 이름                     | 설명                                      |
+| ----------- | ------------------------ | ----------------------------------------- |
+| 11          | BATTLE_EXP               | Battle experience points                  |
+| 12          | TRADE_EXP                | Trade experience points                   |
+| 13          | ADVENTURE_EXP            | Adventure experience points               |
+| 14          | BATTLE_FAME              | Battle fame points                        |
+| 15          | TRADE_FAME               | Trade fame points                         |
+| 16          | ADVENTURE_FAME           | Adventure fame points                     |
+| 17          | SAILOR                   | Sailor count                              |
+| 18          | MATE_INTIMACY_OR_LOYALTY | Mate intimacy or loyalty points           |
+| 19          | ENERGY                   | Energy points                             |
+| 27          | ARENA_TICKET             | Arena ticket count                        |
+| 28          | WESTERN_SHIP_BUILD_EXP   | Western ship building experience          |
+| 29          | ORIENTAL_SHIP_BUILD_EXP  | Oriental ship building experience         |
+| 31          | CHOICE_BOX               | Choice box (requires special handling)    |
+| 34          | FREE_SWEEP_TICKET        | Free sweep ticket count                   |
+| 35          | BUY_SWEEP_TICKET         | Purchased sweep ticket count              |
+| 100         | CAPTURED_SHIP            | Captured ship (special handling required) |
+| 101         | SOUND_PACK               | Sound pack                                |
 
 ## 🔄 데이터 업데이트
 
@@ -362,4 +362,3 @@ npm install json5
 ## 📄 라이선스
 
 COPYRIGHT (C)2017 BY MOTIF CO., LTD. ALL RIGHTS RESERVED.
-

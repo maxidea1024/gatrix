@@ -6,7 +6,7 @@
  * - Shows strategies with OR separators when expanded
  * - Edit button opens drawer for detailed editing
  */
-import React from "react";
+import React from 'react';
 import {
   Box,
   Paper,
@@ -22,17 +22,17 @@ import {
   Tooltip,
   CircularProgress,
   useTheme,
-} from "@mui/material";
+} from '@mui/material';
 import {
   ExpandMore as ExpandMoreIcon,
   Edit as EditIcon,
   Add as AddIcon,
   ContentCopy as CopyIcon,
   MoreVert as MoreIcon,
-} from "@mui/icons-material";
-import { useTranslation } from "react-i18next";
-import FeatureSwitch from "../common/FeatureSwitch";
-import { getContrastColor } from "../../utils/colorUtils";
+} from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
+import FeatureSwitch from '../common/FeatureSwitch';
+import { getContrastColor } from '../../utils/colorUtils';
 
 export interface Strategy {
   id?: string;
@@ -98,9 +98,7 @@ const EnvironmentSettingsCard: React.FC<EnvironmentSettingsCardProps> = ({
 
   // Get segment names for display
   const getSegmentNames = (segmentIds: string[] = []) => {
-    return segmentIds
-      .map((id) => segments.find((s) => s.id === id)?.name || id)
-      .join(", ");
+    return segmentIds.map((id) => segments.find((s) => s.id === id)?.name || id).join(', ');
   };
 
   return (
@@ -108,8 +106,8 @@ const EnvironmentSettingsCard: React.FC<EnvironmentSettingsCardProps> = ({
       variant="outlined"
       sx={{
         borderLeftWidth: 4,
-        borderLeftColor: envData.color || "#888",
-        overflow: "hidden",
+        borderLeftColor: envData.color || '#888',
+        overflow: 'hidden',
       }}
     >
       <Accordion
@@ -117,26 +115,26 @@ const EnvironmentSettingsCard: React.FC<EnvironmentSettingsCardProps> = ({
         onChange={(_, isExpanded) => onExpandChange?.(isExpanded)}
         disableGutters
         sx={{
-          "&:before": { display: "none" },
-          bgcolor: "transparent",
+          '&:before': { display: 'none' },
+          bgcolor: 'transparent',
         }}
       >
         <AccordionSummary
           expandIcon={<ExpandMoreIcon />}
           sx={{
             px: 2,
-            "& .MuiAccordionSummary-content": {
-              alignItems: "center",
-              justifyContent: "space-between",
+            '& .MuiAccordionSummary-content': {
+              alignItems: 'center',
+              justifyContent: 'space-between',
               gap: 2,
             },
           }}
         >
-          <Box sx={{ display: "flex", alignItems: "center", gap: 2, flex: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flex: 1 }}>
             {/* Environment name and info */}
             <Box>
               <Typography variant="caption" color="text.secondary">
-                {t("featureFlags.environment")}
+                {t('featureFlags.environment')}
               </Typography>
               <Typography variant="subtitle1" fontWeight={600}>
                 {envData.displayName}
@@ -145,7 +143,7 @@ const EnvironmentSettingsCard: React.FC<EnvironmentSettingsCardProps> = ({
 
             {/* Strategy count */}
             <Chip
-              label={t("featureFlags.strategiesCount", {
+              label={t('featureFlags.strategiesCount', {
                 count: strategiesCount,
               })}
               size="small"
@@ -157,25 +155,19 @@ const EnvironmentSettingsCard: React.FC<EnvironmentSettingsCardProps> = ({
 
           {/* Right side: metrics gauge + toggle */}
           <Box
-            sx={{ display: "flex", alignItems: "center", gap: 2 }}
+            sx={{ display: 'flex', alignItems: 'center', gap: 2 }}
             onClick={(e) => e.stopPropagation()}
           >
             {metrics && metrics.total > 0 ? (
               (() => {
-                const yesPercent = Math.round(
-                  (metrics.totalYes / metrics.total) * 100,
-                );
+                const yesPercent = Math.round((metrics.totalYes / metrics.total) * 100);
                 const noPercent = 100 - yesPercent;
                 const radius = 18;
                 const cx = 20;
                 const cy = 20;
 
                 // Calculate arc path for pie chart
-                const getArcPath = (
-                  startAngle: number,
-                  endAngle: number,
-                  r: number,
-                ) => {
+                const getArcPath = (startAngle: number, endAngle: number, r: number) => {
                   const startRad = ((startAngle - 90) * Math.PI) / 180;
                   const endRad = ((endAngle - 90) * Math.PI) / 180;
                   const x1 = cx + r * Math.cos(startRad);
@@ -190,23 +182,18 @@ const EnvironmentSettingsCard: React.FC<EnvironmentSettingsCardProps> = ({
 
                 return (
                   <Tooltip
-                    title={`${t("featureFlags.metrics.exposedTrue")}: ${metrics.totalYes} (${yesPercent}%) / ${t("featureFlags.metrics.exposedFalse")}: ${metrics.totalNo} (${noPercent}%)`}
+                    title={`${t('featureFlags.metrics.exposedTrue')}: ${metrics.totalYes} (${yesPercent}%) / ${t('featureFlags.metrics.exposedFalse')}: ${metrics.totalNo} (${noPercent}%)`}
                     arrow
                   >
-                    <Box sx={{ display: "flex", alignItems: "center" }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
                       <svg width="40" height="40" viewBox="0 0 40 40">
                         {/* No (red) - full circle background */}
                         <circle cx={cx} cy={cy} r={radius} fill="#ef5350" />
                         {/* Yes (green) - pie slice */}
                         {yesPercent > 0 && yesPercent < 100 && (
-                          <path
-                            d={getArcPath(0, yesAngle, radius)}
-                            fill="#4caf50"
-                          />
+                          <path d={getArcPath(0, yesAngle, radius)} fill="#4caf50" />
                         )}
-                        {yesPercent >= 100 && (
-                          <circle cx={cx} cy={cy} r={radius} fill="#4caf50" />
-                        )}
+                        {yesPercent >= 100 && <circle cx={cx} cy={cy} r={radius} fill="#4caf50" />}
                         {/* Center text */}
                         <text
                           x={cx}
@@ -217,7 +204,7 @@ const EnvironmentSettingsCard: React.FC<EnvironmentSettingsCardProps> = ({
                           fontWeight="bold"
                           fontFamily="system-ui, -apple-system, sans-serif"
                           fill="white"
-                          style={{ textShadow: "0 1px 2px rgba(0,0,0,0.8)" }}
+                          style={{ textShadow: '0 1px 2px rgba(0,0,0,0.8)' }}
                         >
                           {yesPercent}%
                         </text>
@@ -227,8 +214,8 @@ const EnvironmentSettingsCard: React.FC<EnvironmentSettingsCardProps> = ({
                 );
               })()
             ) : (
-              <Tooltip title={t("featureFlags.noMetricsYetHint")} arrow>
-                <Box sx={{ display: "flex", alignItems: "center" }}>
+              <Tooltip title={t('featureFlags.noMetricsYetHint')} arrow>
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
                   <svg width="40" height="40" viewBox="0 0 40 40">
                     {/* Empty light circle for no metrics */}
                     <circle
@@ -236,9 +223,9 @@ const EnvironmentSettingsCard: React.FC<EnvironmentSettingsCardProps> = ({
                       cy={20}
                       r={18}
                       fill={
-                        theme.palette.mode === "dark"
-                          ? "rgba(255,255,255,0.05)"
-                          : "rgba(0,0,0,0.04)"
+                        theme.palette.mode === 'dark'
+                          ? 'rgba(255,255,255,0.05)'
+                          : 'rgba(0,0,0,0.04)'
                       }
                     />
                   </svg>
@@ -256,9 +243,9 @@ const EnvironmentSettingsCard: React.FC<EnvironmentSettingsCardProps> = ({
 
         <AccordionDetails sx={{ px: 2, pt: 0, pb: 2 }}>
           {strategies.length === 0 ? (
-            <Box sx={{ py: 3, textAlign: "center" }}>
+            <Box sx={{ py: 3, textAlign: 'center' }}>
               <Typography color="text.secondary" sx={{ mb: 2 }}>
-                {t("featureFlags.noStrategies")}
+                {t('featureFlags.noStrategies')}
               </Typography>
               {canManage && (
                 <Button
@@ -267,7 +254,7 @@ const EnvironmentSettingsCard: React.FC<EnvironmentSettingsCardProps> = ({
                   onClick={onAddStrategy}
                   size="small"
                 >
-                  {t("featureFlags.addStrategy")}
+                  {t('featureFlags.addStrategy')}
                 </Button>
               )}
             </Box>
@@ -277,14 +264,14 @@ const EnvironmentSettingsCard: React.FC<EnvironmentSettingsCardProps> = ({
                 <React.Fragment key={strategy.id || index}>
                   {/* OR divider between strategies */}
                   {index > 0 && (
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                       <Divider sx={{ flexGrow: 1 }} />
                       <Chip
                         label="OR"
                         size="small"
                         variant="outlined"
                         color="secondary"
-                        sx={{ fontWeight: 600, fontSize: "0.7rem" }}
+                        sx={{ fontWeight: 600, fontSize: '0.7rem' }}
                       />
                       <Divider sx={{ flexGrow: 1 }} />
                     </Box>
@@ -294,16 +281,16 @@ const EnvironmentSettingsCard: React.FC<EnvironmentSettingsCardProps> = ({
                   <Paper variant="outlined" sx={{ p: 2 }}>
                     <Box
                       sx={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "flex-start",
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'flex-start',
                       }}
                     >
                       <Box sx={{ flex: 1 }}>
                         <Box
                           sx={{
-                            display: "flex",
-                            alignItems: "center",
+                            display: 'flex',
+                            alignItems: 'center',
                             gap: 1,
                             mb: 1,
                           }}
@@ -313,7 +300,7 @@ const EnvironmentSettingsCard: React.FC<EnvironmentSettingsCardProps> = ({
                           </Typography>
                           {strategy.disabled && (
                             <Chip
-                              label={t("featureFlags.strategyDisabled")}
+                              label={t('featureFlags.strategyDisabled')}
                               size="small"
                               color="warning"
                             />
@@ -323,11 +310,8 @@ const EnvironmentSettingsCard: React.FC<EnvironmentSettingsCardProps> = ({
                         {/* Segments */}
                         {strategy.segments && strategy.segments.length > 0 && (
                           <Box sx={{ mb: 1 }}>
-                            <Typography
-                              variant="caption"
-                              color="text.secondary"
-                            >
-                              {t("featureFlags.segment")}:
+                            <Typography variant="caption" color="text.secondary">
+                              {t('featureFlags.segment')}:
                             </Typography>
                             <Typography variant="body2">
                               {getSegmentNames(strategy.segments)}
@@ -339,16 +323,13 @@ const EnvironmentSettingsCard: React.FC<EnvironmentSettingsCardProps> = ({
                         {strategy.parameters?.rollout !== undefined && (
                           <Box
                             sx={{
-                              display: "flex",
-                              alignItems: "center",
+                              display: 'flex',
+                              alignItems: 'center',
                               gap: 1,
                             }}
                           >
-                            <Typography
-                              variant="caption"
-                              color="text.secondary"
-                            >
-                              {t("featureFlags.rollout")}:
+                            <Typography variant="caption" color="text.secondary">
+                              {t('featureFlags.rollout')}:
                             </Typography>
                             <Chip
                               label={`${strategy.parameters.rollout}%`}
@@ -356,37 +337,33 @@ const EnvironmentSettingsCard: React.FC<EnvironmentSettingsCardProps> = ({
                               variant="outlined"
                             />
                             <Typography variant="body2" color="text.secondary">
-                              {t("featureFlags.ofYourBase")}
+                              {t('featureFlags.ofYourBase')}
                             </Typography>
                           </Box>
                         )}
 
                         {/* Constraints count */}
-                        {strategy.constraints &&
-                          strategy.constraints.length > 0 && (
-                            <Typography
-                              variant="caption"
-                              color="text.secondary"
-                              sx={{ mt: 0.5, display: "block" }}
-                            >
-                              +{strategy.constraints.length}{" "}
-                              {t("featureFlags.constraints").toLowerCase()}
-                            </Typography>
-                          )}
+                        {strategy.constraints && strategy.constraints.length > 0 && (
+                          <Typography
+                            variant="caption"
+                            color="text.secondary"
+                            sx={{ mt: 0.5, display: 'block' }}
+                          >
+                            +{strategy.constraints.length}{' '}
+                            {t('featureFlags.constraints').toLowerCase()}
+                          </Typography>
+                        )}
                       </Box>
 
                       {/* Action buttons */}
                       {canManage && (
-                        <Box sx={{ display: "flex", gap: 0.5 }}>
-                          <Tooltip title={t("common.edit")}>
-                            <IconButton
-                              size="small"
-                              onClick={() => onEditStrategy(strategy)}
-                            >
+                        <Box sx={{ display: 'flex', gap: 0.5 }}>
+                          <Tooltip title={t('common.edit')}>
+                            <IconButton size="small" onClick={() => onEditStrategy(strategy)}>
                               <EditIcon fontSize="small" />
                             </IconButton>
                           </Tooltip>
-                          <Tooltip title={t("common.copy")}>
+                          <Tooltip title={t('common.copy')}>
                             <IconButton size="small">
                               <CopyIcon fontSize="small" />
                             </IconButton>
@@ -403,14 +380,14 @@ const EnvironmentSettingsCard: React.FC<EnvironmentSettingsCardProps> = ({
 
               {/* Add strategy button */}
               {canManage && (
-                <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
                   <Button
                     variant="contained"
                     startIcon={<AddIcon />}
                     onClick={onAddStrategy}
                     size="small"
                   >
-                    {t("featureFlags.addStrategy")}
+                    {t('featureFlags.addStrategy')}
                   </Button>
                 </Box>
               )}

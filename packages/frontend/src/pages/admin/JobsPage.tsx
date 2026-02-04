@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { useAuth } from "@/hooks/useAuth";
-import { PERMISSIONS } from "@/types/permissions";
+import React, { useState, useEffect, useCallback } from 'react';
+import { useAuth } from '@/hooks/useAuth';
+import { PERMISSIONS } from '@/types/permissions';
 import {
   Box,
   Typography,
@@ -34,7 +34,7 @@ import {
   Drawer,
   InputAdornment,
   useTheme,
-} from "@mui/material";
+} from '@mui/material';
 import {
   Add as AddIcon,
   Edit as EditIcon,
@@ -45,37 +45,29 @@ import {
   Search as SearchIcon,
   Work as WorkIcon,
   ViewColumn as ViewColumnIcon,
-} from "@mui/icons-material";
-import { useTranslation } from "react-i18next";
-import { useSnackbar } from "notistack";
-import { jobService } from "../../services/jobService";
-import { tagService, Tag } from "../../services/tagService";
-import {
-  Job,
-  JobType,
-  JobExecution,
-  JobExecutionStatus,
-  JobListResponse,
-} from "../../types/job";
-import { formatDateTimeDetailed } from "../../utils/dateFormat";
-import JobForm from "../../components/jobs/JobForm";
-import JobExecutionHistory from "../../components/jobs/JobExecutionHistory";
-import SimplePagination from "../../components/common/SimplePagination";
-import EmptyState from "../../components/common/EmptyState";
-import ColumnSettingsDialog, {
-  ColumnConfig,
-} from "../../components/common/ColumnSettingsDialog";
-import { getContrastColor } from "@/utils/colorUtils";
+} from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
+import { useSnackbar } from 'notistack';
+import { jobService } from '../../services/jobService';
+import { tagService, Tag } from '../../services/tagService';
+import { Job, JobType, JobExecution, JobExecutionStatus, JobListResponse } from '../../types/job';
+import { formatDateTimeDetailed } from '../../utils/dateFormat';
+import JobForm from '../../components/jobs/JobForm';
+import JobExecutionHistory from '../../components/jobs/JobExecutionHistory';
+import SimplePagination from '../../components/common/SimplePagination';
+import EmptyState from '../../components/common/EmptyState';
+import ColumnSettingsDialog, { ColumnConfig } from '../../components/common/ColumnSettingsDialog';
+import { getContrastColor } from '@/utils/colorUtils';
 
 // Default column configuration
 const defaultColumns: ColumnConfig[] = [
-  { id: "jobName", labelKey: "jobs.jobName", visible: true },
-  { id: "jobType", labelKey: "jobs.jobType", visible: true },
-  { id: "schedule", labelKey: "jobs.schedule", visible: true },
-  { id: "lastExecution", labelKey: "jobs.lastExecution", visible: true },
-  { id: "nextExecution", labelKey: "jobs.nextExecution", visible: true },
-  { id: "isEnabled", labelKey: "jobs.isEnabled", visible: true },
-  { id: "tags", labelKey: "common.tags", visible: true },
+  { id: 'jobName', labelKey: 'jobs.jobName', visible: true },
+  { id: 'jobType', labelKey: 'jobs.jobType', visible: true },
+  { id: 'schedule', labelKey: 'jobs.schedule', visible: true },
+  { id: 'lastExecution', labelKey: 'jobs.lastExecution', visible: true },
+  { id: 'nextExecution', labelKey: 'jobs.nextExecution', visible: true },
+  { id: 'isEnabled', labelKey: 'jobs.isEnabled', visible: true },
+  { id: 'tags', labelKey: 'common.tags', visible: true },
 ];
 
 const JobsPage: React.FC = () => {
@@ -87,7 +79,7 @@ const JobsPage: React.FC = () => {
 
   // Column settings state
   const [columns, setColumns] = useState<ColumnConfig[]>(() => {
-    const saved = localStorage.getItem("jobsColumns");
+    const saved = localStorage.getItem('jobsColumns');
     if (saved) {
       try {
         const savedColumns = JSON.parse(saved);
@@ -105,8 +97,7 @@ const JobsPage: React.FC = () => {
     return defaultColumns;
   });
 
-  const [columnSettingsAnchor, setColumnSettingsAnchor] =
-    useState<HTMLButtonElement | null>(null);
+  const [columnSettingsAnchor, setColumnSettingsAnchor] = useState<HTMLButtonElement | null>(null);
 
   // State
   const [jobs, setJobs] = useState<Job[]>([]);
@@ -114,9 +105,9 @@ const JobsPage: React.FC = () => {
   const [allTags, setAllTags] = useState<Tag[]>([]);
   const [tagFilter, setTagFilter] = useState<Tag[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedJobType, setSelectedJobType] = useState<number | "">("");
-  const [enabledFilter, setEnabledFilter] = useState<boolean | "">("");
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedJobType, setSelectedJobType] = useState<number | ''>('');
+  const [enabledFilter, setEnabledFilter] = useState<boolean | ''>('');
   const [tabValue, setTabValue] = useState(0);
 
   // Pagination state
@@ -129,19 +120,18 @@ const JobsPage: React.FC = () => {
   const [historyDialogOpen, setHistoryDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [editingJob, setEditingJob] = useState<Job | null>(null);
-  const [selectedJobForHistory, setSelectedJobForHistory] =
-    useState<Job | null>(null);
+  const [selectedJobForHistory, setSelectedJobForHistory] = useState<Job | null>(null);
   const [jobToDelete, setJobToDelete] = useState<Job | null>(null);
 
   // Column handlers
   const handleColumnsChange = (newColumns: ColumnConfig[]) => {
     setColumns(newColumns);
-    localStorage.setItem("jobsColumns", JSON.stringify(newColumns));
+    localStorage.setItem('jobsColumns', JSON.stringify(newColumns));
   };
 
   const handleResetColumns = () => {
     setColumns(defaultColumns);
-    localStorage.removeItem("jobsColumns");
+    localStorage.removeItem('jobsColumns');
   };
 
   const loadData = useCallback(async () => {
@@ -151,7 +141,7 @@ const JobsPage: React.FC = () => {
       const [jobsResponse, jobTypesData] = await Promise.all([
         jobService.getJobsWithPagination({
           jobTypeId: selectedJobType || undefined,
-          isEnabled: enabledFilter !== "" ? enabledFilter : undefined,
+          isEnabled: enabledFilter !== '' ? enabledFilter : undefined,
           search: searchTerm || undefined,
           tags: tagIds.length > 0 ? tagIds : undefined,
           limit: rowsPerPage,
@@ -162,24 +152,17 @@ const JobsPage: React.FC = () => {
 
       setJobs(jobsResponse.jobs);
       setTotal(jobsResponse.pagination.total);
-      console.log("JobsPage - jobTypesData received:", jobTypesData);
+      console.log('JobsPage - jobTypesData received:', jobTypesData);
       setJobTypes(jobTypesData);
     } catch (error) {
-      console.error("Failed to load data:", error);
-      enqueueSnackbar("작업 목록을 불러오는데 실패했습니다.", {
-        variant: "error",
+      console.error('Failed to load data:', error);
+      enqueueSnackbar('작업 목록을 불러오는데 실패했습니다.', {
+        variant: 'error',
       });
     } finally {
       setLoading(false);
     }
-  }, [
-    selectedJobType,
-    enabledFilter,
-    searchTerm,
-    tagFilter,
-    page,
-    rowsPerPage,
-  ]);
+  }, [selectedJobType, enabledFilter, searchTerm, tagFilter, page, rowsPerPage]);
 
   // 태그 로딩
   const loadTags = useCallback(async () => {
@@ -187,7 +170,7 @@ const JobsPage: React.FC = () => {
       const tags = await tagService.list();
       setAllTags(tags);
     } catch (error) {
-      console.error("Failed to load tags:", error);
+      console.error('Failed to load tags:', error);
     }
   }, []);
 
@@ -198,7 +181,7 @@ const JobsPage: React.FC = () => {
 
   // Load data and tags
   useEffect(() => {
-    console.log("JobsPage useEffect - loading data");
+    console.log('JobsPage useEffect - loading data');
     loadData();
     loadTags();
   }, [loadData, loadTags]);
@@ -210,9 +193,9 @@ const JobsPage: React.FC = () => {
   };
 
   const handleReset = () => {
-    setSearchTerm("");
-    setSelectedJobType("");
-    setEnabledFilter("");
+    setSearchTerm('');
+    setSelectedJobType('');
+    setEnabledFilter('');
     setTagFilter([]);
     setPage(0); // Reset to first page
     // loadData will be called automatically by useEffect
@@ -230,14 +213,11 @@ const JobsPage: React.FC = () => {
   }, []);
 
   // 페이지 크기 변경 핸들러
-  const handleRowsPerPageChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      const newRowsPerPage = parseInt(event.target.value, 10);
-      setRowsPerPage(newRowsPerPage);
-      setPage(0);
-    },
-    [],
-  );
+  const handleRowsPerPageChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const newRowsPerPage = parseInt(event.target.value, 10);
+    setRowsPerPage(newRowsPerPage);
+    setPage(0);
+  }, []);
 
   const handleAddJob = () => {
     setEditingJob(null);
@@ -258,17 +238,17 @@ const JobsPage: React.FC = () => {
     try {
       const result = await jobService.executeJob(job.id);
       enqueueSnackbar(
-        t("jobs.executeStarted", {
+        t('jobs.executeStarted', {
           name: job.name,
           executionId: result.executionId,
         }),
         {
-          variant: "success",
-        },
+          variant: 'success',
+        }
       );
     } catch (error) {
-      console.error("Failed to execute job:", error);
-      enqueueSnackbar(t("common.jobExecuteFailed"), { variant: "error" });
+      console.error('Failed to execute job:', error);
+      enqueueSnackbar(t('common.jobExecuteFailed'), { variant: 'error' });
     }
   };
 
@@ -282,15 +262,15 @@ const JobsPage: React.FC = () => {
 
     try {
       await jobService.deleteJob(jobToDelete.id);
-      enqueueSnackbar(t("jobs.deleted", { name: jobToDelete.name }), {
-        variant: "success",
+      enqueueSnackbar(t('jobs.deleted', { name: jobToDelete.name }), {
+        variant: 'success',
       });
       setDeleteDialogOpen(false);
       setJobToDelete(null);
       loadData();
     } catch (error) {
-      console.error("Failed to delete job:", error);
-      enqueueSnackbar("작업 삭제에 실패했습니다.", { variant: "error" });
+      console.error('Failed to delete job:', error);
+      enqueueSnackbar('작업 삭제에 실패했습니다.', { variant: 'error' });
     }
   };
 
@@ -298,64 +278,59 @@ const JobsPage: React.FC = () => {
     try {
       if (editingJob) {
         await jobService.updateJob(editingJob.id, data);
-        enqueueSnackbar(t("jobs.updated", { name: data.name }), {
-          variant: "success",
+        enqueueSnackbar(t('jobs.updated', { name: data.name }), {
+          variant: 'success',
         });
       } else {
         await jobService.createJob(data);
-        enqueueSnackbar(t("jobs.created", { name: data.name }), {
-          variant: "success",
+        enqueueSnackbar(t('jobs.created', { name: data.name }), {
+          variant: 'success',
         });
       }
       setFormDialogOpen(false);
       loadData();
     } catch (error: any) {
-      console.error("Failed to save job:", error);
+      console.error('Failed to save job:', error);
 
       // 409 에러 (이름 중복) 처리
       const status = error?.status || error?.response?.status;
       if (status === 409) {
-        enqueueSnackbar(t("common.jobNameDuplicate"), { variant: "error" });
+        enqueueSnackbar(t('common.jobNameDuplicate'), { variant: 'error' });
       } else {
-        enqueueSnackbar(t("common.jobSaveFailed"), { variant: "error" });
+        enqueueSnackbar(t('common.jobSaveFailed'), { variant: 'error' });
       }
     }
   };
 
   const getStatusChip = (job: Job) => {
     if (!job.isEnabled) {
-      return (
-        <Chip label={t("common.unavailable")} color="default" size="small" />
-      );
+      return <Chip label={t('common.unavailable')} color="default" size="small" />;
     }
-    return <Chip label={t("common.usable")} color="success" size="small" />;
+    return <Chip label={t('common.usable')} color="success" size="small" />;
   };
 
   const getJobTypeLabel = (jobTypeId: number) => {
     const jobType = jobTypes.find((jt) => jt.id === jobTypeId);
-    return jobType?.displayName || jobType?.name || "Unknown";
+    return jobType?.displayName || jobType?.name || 'Unknown';
   };
 
   // 텍스트 길이 제한 함수
-  const truncateText = (
-    text: string | null | undefined,
-    maxLength: number = 50,
-  ) => {
-    if (!text) return "-";
+  const truncateText = (text: string | null | undefined, maxLength: number = 50) => {
+    if (!text) return '-';
     if (text.length <= maxLength) return text;
-    return text.substring(0, maxLength) + "...";
+    return text.substring(0, maxLength) + '...';
   };
 
   // Render cell content based on column ID
   const renderCellContent = (job: Job, columnId: string) => {
     switch (columnId) {
-      case "jobName":
+      case 'jobName':
         return (
           <Typography variant="body2" sx={{ fontWeight: 500 }}>
             {truncateText(job.name, 30)}
           </Typography>
         );
-      case "jobType":
+      case 'jobType':
         return (
           <Chip
             label={getJobTypeLabel(job.jobTypeId)}
@@ -364,35 +339,27 @@ const JobsPage: React.FC = () => {
             variant="outlined"
           />
         );
-      case "schedule":
-        return (
-          <Typography variant="body2">{job.cronExpression || "-"}</Typography>
-        );
-      case "lastExecution":
+      case 'schedule':
+        return <Typography variant="body2">{job.cronExpression || '-'}</Typography>;
+      case 'lastExecution':
         return (
           <Typography variant="body2">
-            {job.lastExecutedAt
-              ? formatDateTimeDetailed(job.lastExecutedAt)
-              : "-"}
+            {job.lastExecutedAt ? formatDateTimeDetailed(job.lastExecutedAt) : '-'}
           </Typography>
         );
-      case "nextExecution":
+      case 'nextExecution':
         return (
           <Typography variant="body2">
-            {job.nextExecutionAt
-              ? formatDateTimeDetailed(job.nextExecutionAt)
-              : "-"}
+            {job.nextExecutionAt ? formatDateTimeDetailed(job.nextExecutionAt) : '-'}
           </Typography>
         );
-      case "isEnabled":
+      case 'isEnabled':
         return getStatusChip(job);
-      case "tags":
+      case 'tags':
         return (
-          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
             {job.tags && job.tags.length > 0 ? (
-              job.tags.map((tag) => (
-                <Chip key={tag.id} label={tag.name} size="small" />
-              ))
+              job.tags.map((tag) => <Chip key={tag.id} label={tag.name} size="small" />)
             ) : (
               <Typography variant="body2" color="text.secondary">
                 -
@@ -410,30 +377,26 @@ const JobsPage: React.FC = () => {
       {/* Header */}
       <Box
         sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
           mb: 3,
         }}
       >
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <WorkIcon sx={{ fontSize: 32, color: "primary.main" }} />
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <WorkIcon sx={{ fontSize: 32, color: 'primary.main' }} />
           <Box>
             <Typography variant="h5" sx={{ fontWeight: 700 }}>
-              {t("jobs.title")}
+              {t('jobs.title')}
             </Typography>
             <Typography variant="caption" color="text.secondary">
-              {t("jobs.description")}
+              {t('jobs.description')}
             </Typography>
           </Box>
         </Box>
         {canManage && (
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={handleAddJob}
-          >
-            {t("jobs.addJob")}
+          <Button variant="contained" startIcon={<AddIcon />} onClick={handleAddJob}>
+            {t('jobs.addJob')}
           </Button>
         )}
       </Box>
@@ -446,44 +409,42 @@ const JobsPage: React.FC = () => {
               <TextField
                 fullWidth
                 size="small"
-                placeholder={t("common.search")}
+                placeholder={t('common.search')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                onKeyPress={(e) => e.key === "Enter" && handleSearch()}
+                onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
                 sx={{
-                  "& .MuiOutlinedInput-root": {
-                    height: "40px",
-                    borderRadius: "20px",
-                    bgcolor: "background.paper",
-                    transition: "all 0.2s ease-in-out",
-                    "& fieldset": {
-                      borderColor: "divider",
+                  '& .MuiOutlinedInput-root': {
+                    height: '40px',
+                    borderRadius: '20px',
+                    bgcolor: 'background.paper',
+                    transition: 'all 0.2s ease-in-out',
+                    '& fieldset': {
+                      borderColor: 'divider',
                     },
-                    "&:hover": {
-                      bgcolor: "action.hover",
-                      "& fieldset": {
-                        borderColor: "primary.light",
+                    '&:hover': {
+                      bgcolor: 'action.hover',
+                      '& fieldset': {
+                        borderColor: 'primary.light',
                       },
                     },
-                    "&.Mui-focused": {
-                      bgcolor: "background.paper",
-                      boxShadow: "0 0 0 2px rgba(25, 118, 210, 0.1)",
-                      "& fieldset": {
-                        borderColor: "primary.main",
-                        borderWidth: "1px",
+                    '&.Mui-focused': {
+                      bgcolor: 'background.paper',
+                      boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
+                      '& fieldset': {
+                        borderColor: 'primary.main',
+                        borderWidth: '1px',
                       },
                     },
                   },
-                  "& .MuiInputBase-input": {
-                    fontSize: "0.875rem",
+                  '& .MuiInputBase-input': {
+                    fontSize: '0.875rem',
                   },
                 }}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <SearchIcon
-                        sx={{ color: "text.secondary", fontSize: 20 }}
-                      />
+                      <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
                     </InputAdornment>
                   ),
                 }}
@@ -491,13 +452,11 @@ const JobsPage: React.FC = () => {
             </Grid>
             <Grid size={{ xs: 12, md: 2 }}>
               <FormControl fullWidth size="small">
-                <InputLabel shrink={true}>{t("jobs.jobType")}</InputLabel>
+                <InputLabel shrink={true}>{t('jobs.jobType')}</InputLabel>
                 <Select
                   value={selectedJobType}
-                  onChange={(e) =>
-                    setSelectedJobType(e.target.value as number | "")
-                  }
-                  label={t("jobs.jobType")}
+                  onChange={(e) => setSelectedJobType(e.target.value as number | '')}
+                  label={t('jobs.jobType')}
                   displayEmpty
                   size="small"
                   MenuProps={{
@@ -509,14 +468,14 @@ const JobsPage: React.FC = () => {
                   }}
                   sx={{
                     minWidth: 120,
-                    "& .MuiSelect-select": {
-                      overflow: "visible",
-                      textOverflow: "clip",
-                      whiteSpace: "nowrap",
+                    '& .MuiSelect-select': {
+                      overflow: 'visible',
+                      textOverflow: 'clip',
+                      whiteSpace: 'nowrap',
                     },
                   }}
                 >
-                  <MenuItem value="">{t("common.all")}</MenuItem>
+                  <MenuItem value="">{t('common.all')}</MenuItem>
                   {jobTypes.map((jobType) => (
                     <MenuItem key={jobType.id} value={jobType.id}>
                       {jobType.displayName}
@@ -527,13 +486,11 @@ const JobsPage: React.FC = () => {
             </Grid>
             <Grid size={{ xs: 12, md: 2 }}>
               <FormControl fullWidth size="small">
-                <InputLabel shrink={true}>{t("common.usable")}</InputLabel>
+                <InputLabel shrink={true}>{t('common.usable')}</InputLabel>
                 <Select
                   value={enabledFilter}
-                  onChange={(e) =>
-                    setEnabledFilter(e.target.value as boolean | "")
-                  }
-                  label={t("common.usable")}
+                  onChange={(e) => setEnabledFilter(e.target.value as boolean | '')}
+                  label={t('common.usable')}
                   displayEmpty
                   size="small"
                   MenuProps={{
@@ -545,16 +502,16 @@ const JobsPage: React.FC = () => {
                   }}
                   sx={{
                     minWidth: 120,
-                    "& .MuiSelect-select": {
-                      overflow: "visible",
-                      textOverflow: "clip",
-                      whiteSpace: "nowrap",
+                    '& .MuiSelect-select': {
+                      overflow: 'visible',
+                      textOverflow: 'clip',
+                      whiteSpace: 'nowrap',
                     },
                   }}
                 >
-                  <MenuItem value="">{t("common.all")}</MenuItem>
-                  <MenuItem value={true}>{t("common.usable")}</MenuItem>
-                  <MenuItem value={false}>{t("common.unavailable")}</MenuItem>
+                  <MenuItem value="">{t('common.all')}</MenuItem>
+                  <MenuItem value={true}>{t('common.usable')}</MenuItem>
+                  <MenuItem value={false}>{t('common.unavailable')}</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
@@ -582,7 +539,7 @@ const JobsPage: React.FC = () => {
                     return (
                       <Tooltip
                         key={option.id}
-                        title={option.description || t("tags.noDescription")}
+                        title={option.description || t('tags.noDescription')}
                         arrow
                       >
                         <Chip
@@ -600,11 +557,7 @@ const JobsPage: React.FC = () => {
                   })
                 }
                 renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label={t("common.tags")}
-                    size="small"
-                  />
+                  <TextField {...params} label={t('common.tags')} size="small" />
                 )}
                 renderOption={(props, option) => {
                   const { key, ...otherProps } = props;
@@ -619,7 +572,7 @@ const JobsPage: React.FC = () => {
                           mr: 1,
                         }}
                       />
-                      {option.description || t("common.noDescription")}
+                      {option.description || t('common.noDescription')}
                     </Box>
                   );
                 }}
@@ -630,41 +583,39 @@ const JobsPage: React.FC = () => {
       </Card>
 
       {/* Column Settings Button */}
-      <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
         <Button
           startIcon={<ViewColumnIcon />}
           onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
           size="small"
         >
-          {t("common.columnSettings")}
+          {t('common.columnSettings')}
         </Button>
       </Box>
 
       {/* Jobs Table */}
       {loading ? (
-        <Paper sx={{ p: 6, textAlign: "center" }}>
-          <Typography color="text.secondary">
-            {t("common.loadingJobs")}
-          </Typography>
+        <Paper sx={{ p: 6, textAlign: 'center' }}>
+          <Typography color="text.secondary">{t('common.loadingJobs')}</Typography>
         </Paper>
       ) : jobs.length === 0 ? (
         <Paper sx={{ p: 0 }}>
           <EmptyState
-            message={t("jobs.noJobsFound")}
-            subtitle={canManage ? t("common.addFirstItem") : undefined}
+            message={t('jobs.noJobsFound')}
+            subtitle={canManage ? t('common.addFirstItem') : undefined}
             onAddClick={canManage ? handleAddJob : undefined}
-            addButtonLabel={t("jobs.addJob")}
+            addButtonLabel={t('jobs.addJob')}
           />
         </Paper>
       ) : (
         <TableContainer
           component={Paper}
           sx={{
-            maxWidth: "100%",
-            overflow: "auto",
+            maxWidth: '100%',
+            overflow: 'auto',
           }}
         >
-          <Table sx={{ tableLayout: "auto" }}>
+          <Table sx={{ tableLayout: 'auto' }}>
             <TableHead>
               <TableRow>
                 {columns
@@ -674,7 +625,7 @@ const JobsPage: React.FC = () => {
                   ))}
                 {canManage && (
                   <TableCell align="right" sx={{ width: 150 }}>
-                    {t("common.actions")}
+                    {t('common.actions')}
                   </TableCell>
                 )}
               </TableRow>
@@ -686,22 +637,20 @@ const JobsPage: React.FC = () => {
                   sx={{
                     bgcolor:
                       index % 2 === 0
-                        ? theme.palette.mode === "dark"
-                          ? "rgba(255, 255, 255, 0.02)"
-                          : "rgba(0, 0, 0, 0.02)"
-                        : "transparent",
+                        ? theme.palette.mode === 'dark'
+                          ? 'rgba(255, 255, 255, 0.02)'
+                          : 'rgba(0, 0, 0, 0.02)'
+                        : 'transparent',
                   }}
                 >
                   {columns
                     .filter((col) => col.visible)
                     .map((column) => (
-                      <TableCell key={column.id}>
-                        {renderCellContent(job, column.id)}
-                      </TableCell>
+                      <TableCell key={column.id}>{renderCellContent(job, column.id)}</TableCell>
                     ))}
                   {canManage && (
                     <TableCell align="right">
-                      <Tooltip title={t("jobs.execute")}>
+                      <Tooltip title={t('jobs.execute')}>
                         <IconButton
                           size="small"
                           onClick={() => handleExecuteJob(job)}
@@ -710,27 +659,18 @@ const JobsPage: React.FC = () => {
                           <ExecuteIcon />
                         </IconButton>
                       </Tooltip>
-                      <Tooltip title={t("jobs.viewHistory")}>
-                        <IconButton
-                          size="small"
-                          onClick={() => handleViewHistory(job)}
-                        >
+                      <Tooltip title={t('jobs.viewHistory')}>
+                        <IconButton size="small" onClick={() => handleViewHistory(job)}>
                           <HistoryIcon />
                         </IconButton>
                       </Tooltip>
-                      <Tooltip title={t("common.edit")}>
-                        <IconButton
-                          size="small"
-                          onClick={() => handleEditJob(job)}
-                        >
+                      <Tooltip title={t('common.edit')}>
+                        <IconButton size="small" onClick={() => handleEditJob(job)}>
                           <EditIcon />
                         </IconButton>
                       </Tooltip>
-                      <Tooltip title={t("common.delete")}>
-                        <IconButton
-                          size="small"
-                          onClick={() => handleDeleteJob(job)}
-                        >
+                      <Tooltip title={t('common.delete')}>
+                        <IconButton size="small" onClick={() => handleDeleteJob(job)}>
                           <DeleteIcon />
                         </IconButton>
                       </Tooltip>
@@ -758,10 +698,10 @@ const JobsPage: React.FC = () => {
         onClose={() => setFormDialogOpen(false)}
         PaperProps={{
           sx: {
-            width: { xs: "100%", sm: 700 },
-            maxWidth: "100vw",
-            display: "flex",
-            flexDirection: "column",
+            width: { xs: '100%', sm: 700 },
+            maxWidth: '100vw',
+            display: 'flex',
+            flexDirection: 'column',
           },
         }}
         ModalProps={{
@@ -771,24 +711,24 @@ const JobsPage: React.FC = () => {
         {/* Header */}
         <Box
           sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
             p: 2,
-            borderBottom: "1px solid",
-            borderColor: "divider",
-            bgcolor: "background.paper",
+            borderBottom: '1px solid',
+            borderColor: 'divider',
+            bgcolor: 'background.paper',
           }}
         >
           <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
-            {editingJob ? t("jobs.editJob") : t("jobs.addJob")}
+            {editingJob ? t('jobs.editJob') : t('jobs.addJob')}
           </Typography>
           <IconButton
             onClick={() => setFormDialogOpen(false)}
             size="small"
             sx={{
-              "&:hover": {
-                backgroundColor: "action.hover",
+              '&:hover': {
+                backgroundColor: 'action.hover',
               },
             }}
           >
@@ -797,7 +737,7 @@ const JobsPage: React.FC = () => {
         </Box>
 
         {/* Content */}
-        <Box sx={{ flex: 1, overflow: "auto" }}>
+        <Box sx={{ flex: 1, overflow: 'auto' }}>
           <JobForm
             job={editingJob}
             jobTypes={jobTypes}
@@ -815,35 +755,35 @@ const JobsPage: React.FC = () => {
         onClose={() => setHistoryDialogOpen(false)}
         sx={{
           zIndex: 1301,
-          "& .MuiDrawer-paper": {
-            width: { xs: "100%", sm: 800 },
-            maxWidth: "100vw",
-            display: "flex",
-            flexDirection: "column",
+          '& .MuiDrawer-paper': {
+            width: { xs: '100%', sm: 800 },
+            maxWidth: '100vw',
+            display: 'flex',
+            flexDirection: 'column',
           },
         }}
       >
         {/* Header */}
         <Box
           sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
             p: 2,
-            borderBottom: "1px solid",
-            borderColor: "divider",
-            bgcolor: "background.paper",
+            borderBottom: '1px solid',
+            borderColor: 'divider',
+            bgcolor: 'background.paper',
           }}
         >
           <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
-            {t("jobs.executionHistory")} - {selectedJobForHistory?.name}
+            {t('jobs.executionHistory')} - {selectedJobForHistory?.name}
           </Typography>
           <IconButton
             onClick={() => setHistoryDialogOpen(false)}
             size="small"
             sx={{
-              "&:hover": {
-                backgroundColor: "action.hover",
+              '&:hover': {
+                backgroundColor: 'action.hover',
               },
             }}
           >
@@ -852,29 +792,24 @@ const JobsPage: React.FC = () => {
         </Box>
 
         {/* Content */}
-        <Box sx={{ flex: 1, overflow: "auto", p: 2 }}>
-          {selectedJobForHistory && (
-            <JobExecutionHistory jobId={selectedJobForHistory.id} />
-          )}
+        <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
+          {selectedJobForHistory && <JobExecutionHistory jobId={selectedJobForHistory.id} />}
         </Box>
 
         {/* Footer */}
         <Box
           sx={{
             p: 2,
-            borderTop: "1px solid",
-            borderColor: "divider",
-            bgcolor: "background.paper",
-            display: "flex",
+            borderTop: '1px solid',
+            borderColor: 'divider',
+            bgcolor: 'background.paper',
+            display: 'flex',
             gap: 2,
-            justifyContent: "flex-end",
+            justifyContent: 'flex-end',
           }}
         >
-          <Button
-            onClick={() => setHistoryDialogOpen(false)}
-            variant="outlined"
-          >
-            {t("common.close")}
+          <Button onClick={() => setHistoryDialogOpen(false)} variant="outlined">
+            {t('common.close')}
           </Button>
         </Box>
       </Drawer>
@@ -886,35 +821,35 @@ const JobsPage: React.FC = () => {
         onClose={() => setDeleteDialogOpen(false)}
         sx={{
           zIndex: 1301,
-          "& .MuiDrawer-paper": {
-            width: { xs: "100%", sm: 400 },
-            maxWidth: "100vw",
-            display: "flex",
-            flexDirection: "column",
+          '& .MuiDrawer-paper': {
+            width: { xs: '100%', sm: 400 },
+            maxWidth: '100vw',
+            display: 'flex',
+            flexDirection: 'column',
           },
         }}
       >
         {/* Header */}
         <Box
           sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
             p: 2,
-            borderBottom: "1px solid",
-            borderColor: "divider",
-            bgcolor: "background.paper",
+            borderBottom: '1px solid',
+            borderColor: 'divider',
+            bgcolor: 'background.paper',
           }}
         >
           <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
-            {t("common.confirmDelete")}
+            {t('common.confirmDelete')}
           </Typography>
           <IconButton
             onClick={() => setDeleteDialogOpen(false)}
             size="small"
             sx={{
-              "&:hover": {
-                backgroundColor: "action.hover",
+              '&:hover': {
+                backgroundColor: 'action.hover',
               },
             }}
           >
@@ -924,25 +859,23 @@ const JobsPage: React.FC = () => {
 
         {/* Content */}
         <Box sx={{ flex: 1, p: 2 }}>
-          <Typography>
-            {t("jobs.confirmDeleteMessage", { name: jobToDelete?.name })}
-          </Typography>
+          <Typography>{t('jobs.confirmDeleteMessage', { name: jobToDelete?.name })}</Typography>
         </Box>
 
         {/* Footer */}
         <Box
           sx={{
             p: 2,
-            borderTop: "1px solid",
-            borderColor: "divider",
-            bgcolor: "background.paper",
-            display: "flex",
+            borderTop: '1px solid',
+            borderColor: 'divider',
+            bgcolor: 'background.paper',
+            display: 'flex',
             gap: 2,
-            justifyContent: "flex-end",
+            justifyContent: 'flex-end',
           }}
         >
           <Button onClick={() => setDeleteDialogOpen(false)} variant="outlined">
-            {t("common.cancel")}
+            {t('common.cancel')}
           </Button>
           <Button
             onClick={confirmDelete}
@@ -950,7 +883,7 @@ const JobsPage: React.FC = () => {
             variant="contained"
             startIcon={<DeleteIcon />}
           >
-            {t("common.delete")}
+            {t('common.delete')}
           </Button>
         </Box>
       </Drawer>

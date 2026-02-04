@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo } from 'react';
 import {
   Box,
   Typography,
@@ -20,7 +20,7 @@ import {
   ListItemIcon,
   ListItemText,
   Badge,
-} from "@mui/material";
+} from '@mui/material';
 import {
   People as PeopleIcon,
   PersonAdd as PersonAddIcon,
@@ -51,36 +51,27 @@ import {
   Refresh as RefreshIcon,
   Block as BlockIcon,
   Storefront as StorefrontIcon,
-} from "@mui/icons-material";
-import { useTranslation } from "react-i18next";
-import { useAuth } from "@/hooks/useAuth";
-import { useUserStats } from "@/hooks/useSWR";
-import api from "@/services/api";
-import { useNavigate } from "react-router-dom";
-import { PERMISSIONS } from "@/types/permissions";
-import { crashService } from "@/services/crashService";
-import {
-  maintenanceService,
-  MaintenanceDetail,
-} from "@/services/maintenanceService";
-import { CrashEvent } from "@/types/crash";
-import { BugReport as BugReportIcon } from "@mui/icons-material";
-import { useEnvironment } from "@/contexts/EnvironmentContext";
-import {
-  formatDateTime,
-  formatRelativeTime,
-  formatDateTimeDetailed,
-} from "@/utils/dateFormat";
-import serverLifecycleService, {
-  ServerLifecycleEvent,
-} from "@/services/serverLifecycleService";
+} from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
+import { useAuth } from '@/hooks/useAuth';
+import { useUserStats } from '@/hooks/useSWR';
+import api from '@/services/api';
+import { useNavigate } from 'react-router-dom';
+import { PERMISSIONS } from '@/types/permissions';
+import { crashService } from '@/services/crashService';
+import { maintenanceService, MaintenanceDetail } from '@/services/maintenanceService';
+import { CrashEvent } from '@/types/crash';
+import { BugReport as BugReportIcon } from '@mui/icons-material';
+import { useEnvironment } from '@/contexts/EnvironmentContext';
+import { formatDateTime, formatRelativeTime, formatDateTimeDetailed } from '@/utils/dateFormat';
+import serverLifecycleService, { ServerLifecycleEvent } from '@/services/serverLifecycleService';
 
 // Stats card component with modern design
 interface StatsCardProps {
   title: string;
   value: number | string;
   icon: React.ReactElement;
-  color: "primary" | "secondary" | "success" | "warning" | "error" | "info";
+  color: 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info';
   subtitle?: string;
   onClick?: () => void;
   loading?: boolean;
@@ -102,57 +93,47 @@ const StatsCard: React.FC<StatsCardProps> = ({
   return (
     <Card
       sx={{
-        height: "100%",
-        cursor: onClick ? "pointer" : "default",
-        transition: "all 0.2s ease-in-out",
-        "&:hover": onClick
+        height: '100%',
+        cursor: onClick ? 'pointer' : 'default',
+        transition: 'all 0.2s ease-in-out',
+        '&:hover': onClick
           ? {
-              transform: "translateY(-4px)",
+              transform: 'translateY(-4px)',
               boxShadow: theme.shadows[8],
             }
           : {},
-        position: "relative",
-        overflow: "hidden",
+        position: 'relative',
+        overflow: 'hidden',
       }}
       onClick={onClick}
     >
       <Box
         sx={{
-          position: "absolute",
+          position: 'absolute',
           top: -20,
           right: -20,
           width: 100,
           height: 100,
-          borderRadius: "50%",
+          borderRadius: '50%',
           bgcolor: alpha(theme.palette[color].main, 0.1),
         }}
       />
-      <CardContent sx={{ position: "relative", zIndex: 1 }}>
+      <CardContent sx={{ position: 'relative', zIndex: 1 }}>
         <Box
           sx={{
-            display: "flex",
-            alignItems: "flex-start",
-            justifyContent: "space-between",
+            display: 'flex',
+            alignItems: 'flex-start',
+            justifyContent: 'space-between',
           }}
         >
           <Box>
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              fontWeight={500}
-              gutterBottom
-            >
+            <Typography variant="body2" color="text.secondary" fontWeight={500} gutterBottom>
               {title}
             </Typography>
             {loading ? (
               <Skeleton width={80} height={40} />
             ) : (
-              <Typography
-                variant="h4"
-                component="div"
-                fontWeight="bold"
-                color={`${color}.main`}
-              >
+              <Typography variant="h4" component="div" fontWeight="bold" color={`${color}.main`}>
                 {value}
               </Typography>
             )}
@@ -160,26 +141,21 @@ const StatsCard: React.FC<StatsCardProps> = ({
               <Typography
                 variant="caption"
                 color="text.secondary"
-                sx={{ mt: 0.5, display: "block" }}
+                sx={{ mt: 0.5, display: 'block' }}
               >
                 {subtitle}
               </Typography>
             )}
             {trend && (
-              <Box
-                sx={{ display: "flex", alignItems: "center", mt: 1, gap: 0.5 }}
-              >
+              <Box sx={{ display: 'flex', alignItems: 'center', mt: 1, gap: 0.5 }}>
                 <TrendingUpIcon
                   sx={{
                     fontSize: 16,
-                    color: trend.isUp ? "success.main" : "error.main",
-                    transform: trend.isUp ? "none" : "rotate(180deg)",
+                    color: trend.isUp ? 'success.main' : 'error.main',
+                    transform: trend.isUp ? 'none' : 'rotate(180deg)',
                   }}
                 />
-                <Typography
-                  variant="caption"
-                  color={trend.isUp ? "success.main" : "error.main"}
-                >
+                <Typography variant="caption" color={trend.isUp ? 'success.main' : 'error.main'}>
                   {trend.value}%
                 </Typography>
               </Box>
@@ -197,8 +173,8 @@ const StatsCard: React.FC<StatsCardProps> = ({
           </Avatar>
         </Box>
         {onClick && (
-          <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 1 }}>
-            <ArrowForwardIcon sx={{ fontSize: 16, color: "text.secondary" }} />
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
+            <ArrowForwardIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
           </Box>
         )}
       </CardContent>
@@ -229,26 +205,26 @@ const QuickActionCard: React.FC<QuickActionCardProps> = ({
   return (
     <Card
       sx={{
-        cursor: "pointer",
-        transition: "all 0.2s ease-in-out",
-        "&:hover": {
-          transform: "translateY(-2px)",
+        cursor: 'pointer',
+        transition: 'all 0.2s ease-in-out',
+        '&:hover': {
+          transform: 'translateY(-2px)',
           boxShadow: theme.shadows[4],
-          "& .action-icon": {
-            transform: "scale(1.1)",
+          '& .action-icon': {
+            transform: 'scale(1.1)',
           },
         },
       }}
     >
       <CardActionArea onClick={onClick} sx={{ p: 2 }}>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           <Badge badgeContent={badge} color="error" max={99}>
             <Avatar
               className="action-icon"
               sx={{
                 bgcolor: color || alpha(theme.palette.primary.main, 0.1),
-                color: color ? "white" : "primary.main",
-                transition: "transform 0.2s ease-in-out",
+                color: color ? 'white' : 'primary.main',
+                transition: 'transform 0.2s ease-in-out',
               }}
             >
               {icon}
@@ -262,7 +238,7 @@ const QuickActionCard: React.FC<QuickActionCardProps> = ({
               {description}
             </Typography>
           </Box>
-          <ArrowForwardIcon sx={{ fontSize: 18, color: "text.disabled" }} />
+          <ArrowForwardIcon sx={{ fontSize: 18, color: 'text.disabled' }} />
         </Box>
       </CardActionArea>
     </Card>
@@ -314,11 +290,7 @@ interface EnvironmentWithCounts extends Environment {
 const DashboardPage: React.FC = () => {
   const theme = useTheme();
   const { user, isAdmin, hasPermission, permissionsLoading } = useAuth();
-  const {
-    data: statsData,
-    isLoading: statsLoading,
-    mutate: refreshStats,
-  } = useUserStats();
+  const { data: statsData, isLoading: statsLoading, mutate: refreshStats } = useUserStats();
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const isAdminUser = isAdmin();
@@ -332,19 +304,13 @@ const DashboardPage: React.FC = () => {
     firing: 0,
   });
   const [alertsSummaryLoading, setAlertsSummaryLoading] = useState(false);
-  const [recentActivities, setRecentActivities] = useState<RecentActivity[]>(
-    [],
-  );
+  const [recentActivities, setRecentActivities] = useState<RecentActivity[]>([]);
   const [activitiesLoading, setActivitiesLoading] = useState(false);
-  const [environmentsWithCounts, setEnvironmentsWithCounts] = useState<
-    EnvironmentWithCounts[]
-  >([]);
+  const [environmentsWithCounts, setEnvironmentsWithCounts] = useState<EnvironmentWithCounts[]>([]);
   const [envCountsLoading, setEnvCountsLoading] = useState(false);
   const [recentCrashEvents, setRecentCrashEvents] = useState<CrashEvent[]>([]);
   const [crashEventsLoading, setCrashEventsLoading] = useState(false);
-  const [recentLifecycleEvents, setRecentLifecycleEvents] = useState<
-    ServerLifecycleEvent[]
-  >([]);
+  const [recentLifecycleEvents, setRecentLifecycleEvents] = useState<ServerLifecycleEvent[]>([]);
   const [lifecycleEventsLoading, setLifecycleEventsLoading] = useState(false);
   const [maintenanceStatus, setMaintenanceStatus] = useState<{
     isUnderMaintenance: boolean;
@@ -377,175 +343,175 @@ const DashboardPage: React.FC = () => {
     // Admin Panel actions
     if (hasPermission(PERMISSIONS.USERS_VIEW)) {
       actions.push({
-        key: "users",
-        title: t("sidebar.userManagement"),
-        description: t("dashboard.quickActions.usersDesc"),
+        key: 'users',
+        title: t('sidebar.userManagement'),
+        description: t('dashboard.quickActions.usersDesc'),
         icon: <PeopleIcon />,
-        path: "/admin/users",
+        path: '/admin/users',
         badge: stats.pending > 0 ? stats.pending : undefined,
       });
     }
 
     if (hasPermission(PERMISSIONS.CLIENT_VERSIONS_VIEW)) {
       actions.push({
-        key: "clientVersions",
-        title: t("sidebar.clientVersions"),
-        description: t("dashboard.quickActions.clientVersionsDesc"),
+        key: 'clientVersions',
+        title: t('sidebar.clientVersions'),
+        description: t('dashboard.quickActions.clientVersionsDesc'),
         icon: <StorageIcon />,
-        path: "/admin/client-versions",
+        path: '/admin/client-versions',
       });
     }
 
     if (hasPermission(PERMISSIONS.GAME_WORLDS_VIEW)) {
       actions.push({
-        key: "gameWorlds",
-        title: t("sidebar.gameWorlds"),
-        description: t("dashboard.quickActions.gameWorldsDesc"),
+        key: 'gameWorlds',
+        title: t('sidebar.gameWorlds'),
+        description: t('dashboard.quickActions.gameWorldsDesc'),
         icon: <GamesIcon />,
-        path: "/admin/game-worlds",
+        path: '/admin/game-worlds',
       });
     }
 
     if (hasPermission(PERMISSIONS.SERVERS_VIEW)) {
       actions.push({
-        key: "servers",
-        title: t("sidebar.serverList"),
-        description: t("dashboard.quickActions.serversDesc"),
+        key: 'servers',
+        title: t('sidebar.serverList'),
+        description: t('dashboard.quickActions.serversDesc'),
         icon: <CloudQueueIcon />,
-        path: "/admin/server-list",
+        path: '/admin/server-list',
       });
     }
 
     if (hasPermission(PERMISSIONS.MAINTENANCE_VIEW)) {
       actions.push({
-        key: "maintenance",
-        title: t("sidebar.maintenance"),
-        description: t("dashboard.quickActions.maintenanceDesc"),
+        key: 'maintenance',
+        title: t('sidebar.maintenance'),
+        description: t('dashboard.quickActions.maintenanceDesc'),
         icon: <BuildIcon />,
-        path: "/admin/maintenance",
+        path: '/admin/maintenance',
       });
     }
 
     if (hasPermission(PERMISSIONS.SCHEDULER_VIEW)) {
       actions.push({
-        key: "scheduler",
-        title: t("sidebar.scheduler"),
-        description: t("dashboard.quickActions.schedulerDesc"),
+        key: 'scheduler',
+        title: t('sidebar.scheduler'),
+        description: t('dashboard.quickActions.schedulerDesc'),
         icon: <ScheduleIcon />,
-        path: "/admin/scheduler",
+        path: '/admin/scheduler',
       });
     }
 
     // Game Management actions
     if (hasPermission(PERMISSIONS.SERVICE_NOTICES_VIEW)) {
       actions.push({
-        key: "serviceNotices",
-        title: t("sidebar.serviceNotices"),
-        description: t("dashboard.quickActions.serviceNoticesDesc"),
+        key: 'serviceNotices',
+        title: t('sidebar.serviceNotices'),
+        description: t('dashboard.quickActions.serviceNoticesDesc'),
         icon: <CampaignIcon />,
-        path: "/game/service-notices",
+        path: '/game/service-notices',
       });
     }
 
     if (hasPermission(PERMISSIONS.INGAME_POPUP_NOTICES_VIEW)) {
       actions.push({
-        key: "ingamePopupNotices",
-        title: t("sidebar.ingamePopupNotices"),
-        description: t("dashboard.quickActions.ingamePopupNoticesDesc"),
+        key: 'ingamePopupNotices',
+        title: t('sidebar.ingamePopupNotices'),
+        description: t('dashboard.quickActions.ingamePopupNoticesDesc'),
         icon: <NotificationsIcon />,
-        path: "/game/ingame-popup-notices",
+        path: '/game/ingame-popup-notices',
       });
     }
 
     if (hasPermission(PERMISSIONS.COUPONS_VIEW)) {
       actions.push({
-        key: "coupons",
-        title: t("sidebar.coupons"),
-        description: t("dashboard.quickActions.couponsDesc"),
+        key: 'coupons',
+        title: t('sidebar.coupons'),
+        description: t('dashboard.quickActions.couponsDesc'),
         icon: <CardGiftcardIcon />,
-        path: "/game/coupon-settings",
+        path: '/game/coupon-settings',
       });
     }
 
     if (hasPermission(PERMISSIONS.SURVEYS_VIEW)) {
       actions.push({
-        key: "surveys",
-        title: t("sidebar.surveys"),
-        description: t("dashboard.quickActions.surveysDesc"),
+        key: 'surveys',
+        title: t('sidebar.surveys'),
+        description: t('dashboard.quickActions.surveysDesc'),
         icon: <PollIcon />,
-        path: "/game/surveys",
+        path: '/game/surveys',
       });
     }
 
     if (hasPermission(PERMISSIONS.OPERATION_EVENTS_VIEW)) {
       actions.push({
-        key: "operationEvents",
-        title: t("sidebar.operationEvents"),
-        description: t("dashboard.quickActions.operationEventsDesc"),
+        key: 'operationEvents',
+        title: t('sidebar.operationEvents'),
+        description: t('dashboard.quickActions.operationEventsDesc'),
         icon: <EventNoteIcon />,
-        path: "/game/operation-events",
+        path: '/game/operation-events',
       });
     }
 
     if (hasPermission(PERMISSIONS.BANNERS_VIEW)) {
       actions.push({
-        key: "banners",
-        title: t("sidebar.banners"),
-        description: t("dashboard.quickActions.bannersDesc"),
+        key: 'banners',
+        title: t('sidebar.banners'),
+        description: t('dashboard.quickActions.bannersDesc'),
         icon: <ImageIcon />,
-        path: "/game/banners",
+        path: '/game/banners',
       });
     }
 
     if (hasPermission(PERMISSIONS.STORE_PRODUCTS_VIEW)) {
       actions.push({
-        key: "storeProducts",
-        title: t("sidebar.storeProducts"),
-        description: t("dashboard.quickActions.storeProductsDesc"),
+        key: 'storeProducts',
+        title: t('sidebar.storeProducts'),
+        description: t('dashboard.quickActions.storeProductsDesc'),
         icon: <StorefrontIcon />,
-        path: "/game/store-products",
+        path: '/game/store-products',
       });
     }
 
     if (hasPermission(PERMISSIONS.PLANNING_DATA_VIEW)) {
       actions.push({
-        key: "planningData",
-        title: t("sidebar.planningData"),
-        description: t("dashboard.quickActions.planningDataDesc"),
+        key: 'planningData',
+        title: t('sidebar.planningData'),
+        description: t('dashboard.quickActions.planningDataDesc'),
         icon: <DescriptionIcon />,
-        path: "/game/planning-data",
+        path: '/game/planning-data',
       });
     }
 
     // Security actions
     if (hasPermission(PERMISSIONS.SECURITY_VIEW)) {
       actions.push({
-        key: "security",
-        title: t("sidebar.security"),
-        description: t("dashboard.quickActions.securityDesc"),
+        key: 'security',
+        title: t('sidebar.security'),
+        description: t('dashboard.quickActions.securityDesc'),
         icon: <VpnKeyIcon />,
-        path: "/admin/api-tokens",
+        path: '/admin/api-tokens',
       });
     }
 
     if (hasPermission(PERMISSIONS.AUDIT_LOGS_VIEW)) {
       actions.push({
-        key: "auditLogs",
-        title: t("sidebar.auditLogs"),
-        description: t("dashboard.quickActions.auditLogsDesc"),
+        key: 'auditLogs',
+        title: t('sidebar.auditLogs'),
+        description: t('dashboard.quickActions.auditLogsDesc'),
         icon: <HistoryIcon />,
-        path: "/admin/audit-logs",
+        path: '/admin/audit-logs',
       });
     }
 
     // Monitoring actions
     if (hasPermission(PERMISSIONS.MONITORING_VIEW)) {
       actions.push({
-        key: "monitoring",
-        title: t("sidebar.monitoring"),
-        description: t("dashboard.quickActions.monitoringDesc"),
+        key: 'monitoring',
+        title: t('sidebar.monitoring'),
+        description: t('dashboard.quickActions.monitoringDesc'),
         icon: <SpeedIcon />,
-        path: "/admin/grafana-dashboard",
+        path: '/admin/grafana-dashboard',
         color: alertsSummary.firing > 0 ? theme.palette.error.main : undefined,
         badge: alertsSummary.firing > 0 ? alertsSummary.firing : undefined,
       });
@@ -554,11 +520,11 @@ const DashboardPage: React.FC = () => {
     // Settings actions
     if (hasPermission(PERMISSIONS.ENVIRONMENTS_VIEW)) {
       actions.push({
-        key: "environments",
-        title: t("sidebar.environments"),
-        description: t("dashboard.quickActions.environmentsDesc"),
+        key: 'environments',
+        title: t('sidebar.environments'),
+        description: t('dashboard.quickActions.environmentsDesc'),
         icon: <PublicIcon />,
-        path: "/settings/environments",
+        path: '/settings/environments',
       });
     }
 
@@ -585,11 +551,11 @@ const DashboardPage: React.FC = () => {
         setAlertsSummaryLoading(true);
 
         const [totalRes, firingRes] = await Promise.all([
-          api.get("/admin/monitoring/alerts", {
+          api.get('/admin/monitoring/alerts', {
             params: { page: 1, limit: 1 },
           }),
-          api.get("/admin/monitoring/alerts", {
-            params: { page: 1, limit: 1, status: "firing" },
+          api.get('/admin/monitoring/alerts', {
+            params: { page: 1, limit: 1, status: 'firing' },
           }),
         ]);
 
@@ -623,7 +589,7 @@ const DashboardPage: React.FC = () => {
     const loadRecentActivities = async () => {
       try {
         setActivitiesLoading(true);
-        const res = await api.get("/admin/audit-logs", {
+        const res = await api.get('/admin/audit-logs', {
           params: { page: 1, limit: 5 },
         });
 
@@ -634,10 +600,10 @@ const DashboardPage: React.FC = () => {
           logs.map((log: any) => ({
             id: log.id,
             action: log.action,
-            target: log.details || log.targetType || "",
+            target: log.details || log.targetType || '',
             timestamp: log.createdAt,
             userName: log.userName,
-          })),
+          }))
         );
       } catch {
         // Silently fail
@@ -665,8 +631,8 @@ const DashboardPage: React.FC = () => {
         setCrashEventsLoading(true);
         const response = await crashService.getCrashEvents({
           limit: 10,
-          sortBy: "createdAt",
-          sortOrder: "desc",
+          sortBy: 'createdAt',
+          sortOrder: 'desc',
         });
         if (isMounted) {
           setRecentCrashEvents(response.data || []);
@@ -741,7 +707,7 @@ const DashboardPage: React.FC = () => {
       event: CustomEvent<{
         isUnderMaintenance: boolean;
         detail: MaintenanceDetail | null;
-      }>,
+      }>
     ) => {
       if (isMounted) {
         setMaintenanceStatus({
@@ -751,16 +717,13 @@ const DashboardPage: React.FC = () => {
       }
     };
 
-    window.addEventListener(
-      "maintenance-status-change",
-      handleMaintenanceChange as EventListener,
-    );
+    window.addEventListener('maintenance-status-change', handleMaintenanceChange as EventListener);
 
     return () => {
       isMounted = false;
       window.removeEventListener(
-        "maintenance-status-change",
-        handleMaintenanceChange as EventListener,
+        'maintenance-status-change',
+        handleMaintenanceChange as EventListener
       );
     };
   }, [isAdminUser, hasPermission]);
@@ -779,8 +742,8 @@ const DashboardPage: React.FC = () => {
 
         // First get user's accessible environments
         const [accessResponse, envsResponse] = await Promise.all([
-          api.get("/admin/users/me/environments"),
-          api.get("/admin/environments"),
+          api.get('/admin/users/me/environments'),
+          api.get('/admin/environments'),
         ]);
 
         if (!isMounted) return;
@@ -791,24 +754,20 @@ const DashboardPage: React.FC = () => {
         // Filter to accessible environments
         const accessibleEnvs = access?.allowAllEnvironments
           ? allEnvs
-          : allEnvs.filter((env: Environment) =>
-              access?.environments?.includes(env.environment),
-            );
+          : allEnvs.filter((env: Environment) => access?.environments?.includes(env.environment));
 
         // Show all accessible environments
         const displayEnvs = accessibleEnvs;
 
         // Initialize with loading state
         setEnvironmentsWithCounts(
-          displayEnvs.map((env: Environment) => ({ ...env, loading: true })),
+          displayEnvs.map((env: Environment) => ({ ...env, loading: true }))
         );
 
         // Fetch counts for each environment
         const countsPromises = displayEnvs.map(async (env: Environment) => {
           try {
-            const res = await api.get(
-              `/admin/environments/${env.environment}/related-data`,
-            );
+            const res = await api.get(`/admin/environments/${env.environment}/related-data`);
             const rawData = res?.data?.relatedData;
             // Extract count from each { count, items } object
             const counts = rawData
@@ -860,9 +819,9 @@ const DashboardPage: React.FC = () => {
   // Get time-based greeting
   const getGreeting = () => {
     const hour = new Date().getHours();
-    if (hour < 12) return t("dashboard.greetingMorning");
-    if (hour < 18) return t("dashboard.greetingAfternoon");
-    return t("dashboard.greetingEvening");
+    if (hour < 12) return t('dashboard.greetingMorning');
+    if (hour < 18) return t('dashboard.greetingAfternoon');
+    return t('dashboard.greetingEvening');
   };
 
   return (
@@ -874,39 +833,39 @@ const DashboardPage: React.FC = () => {
           mb: 4,
           background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
           borderRadius: 0,
-          position: "relative",
-          overflow: "hidden",
+          position: 'relative',
+          overflow: 'hidden',
         }}
       >
         <Box
           sx={{
-            position: "absolute",
+            position: 'absolute',
             top: -50,
             right: -50,
             width: 200,
             height: 200,
-            borderRadius: "50%",
-            bgcolor: "rgba(255,255,255,0.1)",
+            borderRadius: '50%',
+            bgcolor: 'rgba(255,255,255,0.1)',
           }}
         />
         <Box
           sx={{
-            position: "absolute",
+            position: 'absolute',
             bottom: -30,
             right: 100,
             width: 100,
             height: 100,
-            borderRadius: "50%",
-            bgcolor: "rgba(255,255,255,0.05)",
+            borderRadius: '50%',
+            bgcolor: 'rgba(255,255,255,0.05)',
           }}
         />
-        <Box sx={{ position: "relative", zIndex: 1, color: "white" }}>
+        <Box sx={{ position: 'relative', zIndex: 1, color: 'white' }}>
           <Box
             sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              flexWrap: "wrap",
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
               gap: 2,
             }}
           >
@@ -915,38 +874,34 @@ const DashboardPage: React.FC = () => {
                 {getGreeting()}, {user?.name}!
               </Typography>
               <Typography variant="body1" sx={{ opacity: 0.9 }}>
-                {isAdminUser
-                  ? t("dashboard.adminWelcome")
-                  : t("dashboard.userWelcome")}
+                {isAdminUser ? t('dashboard.adminWelcome') : t('dashboard.userWelcome')}
               </Typography>
             </Box>
-            <Box sx={{ display: "flex", gap: 1 }}>
+            <Box sx={{ display: 'flex', gap: 1 }}>
               <Chip
                 label={t(`roles.${user?.role}`)}
                 sx={{
-                  bgcolor: "rgba(255, 255, 255, 0.2)",
-                  color: "white",
+                  bgcolor: 'rgba(255, 255, 255, 0.2)',
+                  color: 'white',
                   fontWeight: 600,
-                  backdropFilter: "blur(4px)",
+                  backdropFilter: 'blur(4px)',
                 }}
               />
               <Chip
                 icon={
-                  user?.status === "active" ? (
-                    <CheckCircleIcon sx={{ color: "white !important" }} />
+                  user?.status === 'active' ? (
+                    <CheckCircleIcon sx={{ color: 'white !important' }} />
                   ) : (
-                    <WarningIcon sx={{ color: "white !important" }} />
+                    <WarningIcon sx={{ color: 'white !important' }} />
                   )
                 }
                 label={t(`users.statuses.${user?.status}`)}
                 sx={{
                   bgcolor:
-                    user?.status === "active"
-                      ? "rgba(76, 175, 80, 0.6)"
-                      : "rgba(255, 152, 0, 0.6)",
-                  color: "white",
+                    user?.status === 'active' ? 'rgba(76, 175, 80, 0.6)' : 'rgba(255, 152, 0, 0.6)',
+                  color: 'white',
                   fontWeight: 600,
-                  backdropFilter: "blur(4px)",
+                  backdropFilter: 'blur(4px)',
                 }}
               />
             </Box>
@@ -955,166 +910,148 @@ const DashboardPage: React.FC = () => {
       </Paper>
 
       {/* Maintenance Status - Shown at top when active or scheduled */}
-      {isAdminUser &&
-        maintenanceStatus?.isUnderMaintenance &&
-        maintenanceStatus?.detail && (
-          <Box sx={{ mb: 4 }}>
-            {(() => {
-              const detail = maintenanceStatus.detail;
-              const now = new Date();
-              const startsAt = detail.startsAt
-                ? new Date(detail.startsAt)
-                : null;
-              const endsAt = detail.endsAt ? new Date(detail.endsAt) : null;
-              const isActive = startsAt ? now >= startsAt : true;
+      {isAdminUser && maintenanceStatus?.isUnderMaintenance && maintenanceStatus?.detail && (
+        <Box sx={{ mb: 4 }}>
+          {(() => {
+            const detail = maintenanceStatus.detail;
+            const now = new Date();
+            const startsAt = detail.startsAt ? new Date(detail.startsAt) : null;
+            const endsAt = detail.endsAt ? new Date(detail.endsAt) : null;
+            const isActive = startsAt ? now >= startsAt : true;
 
-              return (
-                <Card
-                  sx={{
-                    borderLeft: 4,
-                    borderColor: isActive ? "error.main" : "warning.main",
-                  }}
-                >
-                  <CardContent>
+            return (
+              <Card
+                sx={{
+                  borderLeft: 4,
+                  borderColor: isActive ? 'error.main' : 'warning.main',
+                }}
+              >
+                <CardContent>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      mb: 2,
+                    }}
+                  >
+                    <Typography variant="h6" fontWeight={600}>
+                      {t('dashboard.maintenanceStatus')}
+                    </Typography>
+                    <Tooltip title={t('dashboard.viewDetails')}>
+                      <IconButton size="small" onClick={() => navigate('/admin/maintenance')}>
+                        <OpenInNewIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  </Box>
+                  <Box>
+                    <Chip
+                      label={
+                        isActive
+                          ? t('dashboard.maintenanceActive')
+                          : t('dashboard.maintenanceScheduled')
+                      }
+                      color={isActive ? 'error' : 'warning'}
+                      size="small"
+                      sx={{ mb: 2 }}
+                    />
                     <Box
                       sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        mb: 2,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 1,
                       }}
                     >
-                      <Typography variant="h6" fontWeight={600}>
-                        {t("dashboard.maintenanceStatus")}
-                      </Typography>
-                      <Tooltip title={t("dashboard.viewDetails")}>
-                        <IconButton
-                          size="small"
-                          onClick={() => navigate("/admin/maintenance")}
-                        >
-                          <OpenInNewIcon fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-                    </Box>
-                    <Box>
-                      <Chip
-                        label={
-                          isActive
-                            ? t("dashboard.maintenanceActive")
-                            : t("dashboard.maintenanceScheduled")
-                        }
-                        color={isActive ? "error" : "warning"}
-                        size="small"
-                        sx={{ mb: 2 }}
-                      />
                       <Box
                         sx={{
-                          display: "flex",
-                          flexDirection: "column",
-                          gap: 1,
+                          display: 'flex',
+                          justifyContent: 'space-between',
                         }}
                       >
+                        <Typography variant="body2" color="text.secondary">
+                          {t('dashboard.maintenanceType')}
+                        </Typography>
+                        <Typography variant="body2" fontWeight={500}>
+                          {detail.type === 'emergency'
+                            ? t('maintenance.types.emergency')
+                            : t('maintenance.types.regular')}
+                        </Typography>
+                      </Box>
+                      {startsAt && (
                         <Box
                           sx={{
-                            display: "flex",
-                            justifyContent: "space-between",
+                            display: 'flex',
+                            justifyContent: 'space-between',
                           }}
                         >
                           <Typography variant="body2" color="text.secondary">
-                            {t("dashboard.maintenanceType")}
+                            {t('dashboard.maintenanceStartsAt')}
                           </Typography>
-                          <Typography variant="body2" fontWeight={500}>
-                            {detail.type === "emergency"
-                              ? t("maintenance.types.emergency")
-                              : t("maintenance.types.regular")}
+                          <Tooltip title={formatDateTimeDetailed(startsAt)}>
+                            <Typography variant="body2" fontWeight={500}>
+                              {formatRelativeTime(startsAt, undefined, i18n.language)}
+                            </Typography>
+                          </Tooltip>
+                        </Box>
+                      )}
+                      {endsAt && (
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                          }}
+                        >
+                          <Typography variant="body2" color="text.secondary">
+                            {t('dashboard.maintenanceEndsAt')}
+                          </Typography>
+                          <Tooltip title={formatDateTimeDetailed(endsAt)}>
+                            <Typography variant="body2" fontWeight={500}>
+                              {formatRelativeTime(endsAt, undefined, i18n.language)}
+                            </Typography>
+                          </Tooltip>
+                        </Box>
+                      )}
+                      {detail.message && (
+                        <Box
+                          sx={{
+                            mt: 1,
+                            p: 1.5,
+                            bgcolor: 'action.hover',
+                            borderRadius: 0,
+                          }}
+                        >
+                          <Typography variant="caption" color="text.secondary">
+                            {t('dashboard.maintenanceMessage')}
+                          </Typography>
+                          <Typography variant="body2" sx={{ mt: 0.5 }}>
+                            {detail.message}
                           </Typography>
                         </Box>
-                        {startsAt && (
-                          <Box
-                            sx={{
-                              display: "flex",
-                              justifyContent: "space-between",
-                            }}
-                          >
-                            <Typography variant="body2" color="text.secondary">
-                              {t("dashboard.maintenanceStartsAt")}
-                            </Typography>
-                            <Tooltip title={formatDateTimeDetailed(startsAt)}>
-                              <Typography variant="body2" fontWeight={500}>
-                                {formatRelativeTime(
-                                  startsAt,
-                                  undefined,
-                                  i18n.language,
-                                )}
-                              </Typography>
-                            </Tooltip>
-                          </Box>
-                        )}
-                        {endsAt && (
-                          <Box
-                            sx={{
-                              display: "flex",
-                              justifyContent: "space-between",
-                            }}
-                          >
-                            <Typography variant="body2" color="text.secondary">
-                              {t("dashboard.maintenanceEndsAt")}
-                            </Typography>
-                            <Tooltip title={formatDateTimeDetailed(endsAt)}>
-                              <Typography variant="body2" fontWeight={500}>
-                                {formatRelativeTime(
-                                  endsAt,
-                                  undefined,
-                                  i18n.language,
-                                )}
-                              </Typography>
-                            </Tooltip>
-                          </Box>
-                        )}
-                        {detail.message && (
-                          <Box
-                            sx={{
-                              mt: 1,
-                              p: 1.5,
-                              bgcolor: "action.hover",
-                              borderRadius: 0,
-                            }}
-                          >
-                            <Typography
-                              variant="caption"
-                              color="text.secondary"
-                            >
-                              {t("dashboard.maintenanceMessage")}
-                            </Typography>
-                            <Typography variant="body2" sx={{ mt: 0.5 }}>
-                              {detail.message}
-                            </Typography>
-                          </Box>
-                        )}
-                      </Box>
+                      )}
                     </Box>
-                  </CardContent>
-                </Card>
-              );
-            })()}
-          </Box>
-        )}
+                  </Box>
+                </CardContent>
+              </Card>
+            );
+          })()}
+        </Box>
+      )}
 
       {/* Stats Section - Only for Admins with USERS_VIEW permission */}
       {isAdminUser && hasPermission(PERMISSIONS.USERS_VIEW) && (
         <Box sx={{ mb: 4 }}>
           <Box
             sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
               mb: 2,
             }}
           >
             <Typography variant="h6" fontWeight={600}>
-              {t("dashboard.systemOverview")}
+              {t('dashboard.systemOverview')}
             </Typography>
-            <Tooltip title={t("common.refresh")}>
+            <Tooltip title={t('common.refresh')}>
               <IconButton size="small" onClick={() => refreshStats()}>
                 <RefreshIcon />
               </IconButton>
@@ -1123,65 +1060,57 @@ const DashboardPage: React.FC = () => {
           <Grid container spacing={2}>
             <Grid size={{ xs: 6, sm: 2.4 }}>
               <StatsCard
-                title={t("dashboard.totalUsers")}
+                title={t('dashboard.totalUsers')}
                 value={stats.total}
                 icon={<PeopleIcon />}
                 color="primary"
                 loading={statsLoading}
-                onClick={() => navigate("/admin/users")}
+                onClick={() => navigate('/admin/users')}
               />
             </Grid>
             <Grid size={{ xs: 6, sm: 2.4 }}>
               <StatsCard
-                title={t("dashboard.activeUsers")}
+                title={t('dashboard.activeUsers')}
                 value={stats.active}
                 icon={<TrendingUpIcon />}
                 color="success"
                 loading={statsLoading}
-                onClick={() => navigate("/admin/users?status=active")}
+                onClick={() => navigate('/admin/users?status=active')}
               />
             </Grid>
             <Grid size={{ xs: 6, sm: 2.4 }}>
               <StatsCard
-                title={t("dashboard.pendingApproval")}
+                title={t('dashboard.pendingApproval')}
                 value={stats.pending}
                 icon={<PersonAddIcon />}
                 color="warning"
                 loading={statsLoading}
-                subtitle={
-                  stats.pending > 0
-                    ? t("dashboard.requiresAttention")
-                    : undefined
-                }
+                subtitle={stats.pending > 0 ? t('dashboard.requiresAttention') : undefined}
                 onClick={
-                  stats.pending > 0
-                    ? () => navigate("/admin/users?status=pending")
-                    : undefined
+                  stats.pending > 0 ? () => navigate('/admin/users?status=pending') : undefined
                 }
               />
             </Grid>
             <Grid size={{ xs: 6, sm: 2.4 }}>
               <StatsCard
-                title={t("dashboard.suspendedUsers")}
+                title={t('dashboard.suspendedUsers')}
                 value={stats.suspended}
                 icon={<BlockIcon />}
                 color="error"
                 loading={statsLoading}
                 onClick={
-                  stats.suspended > 0
-                    ? () => navigate("/admin/users?status=suspended")
-                    : undefined
+                  stats.suspended > 0 ? () => navigate('/admin/users?status=suspended') : undefined
                 }
               />
             </Grid>
             <Grid size={{ xs: 6, sm: 2.4 }}>
               <StatsCard
-                title={t("dashboard.administrators")}
+                title={t('dashboard.administrators')}
                 value={stats.admins}
                 icon={<SecurityIcon />}
                 color="info"
                 loading={statsLoading}
-                onClick={() => navigate("/admin/users?role=admin")}
+                onClick={() => navigate('/admin/users?role=admin')}
               />
             </Grid>
           </Grid>
@@ -1192,36 +1121,36 @@ const DashboardPage: React.FC = () => {
       {isAdminUser && hasPermission(PERMISSIONS.MONITORING_VIEW) && (
         <Box sx={{ mb: 4 }}>
           <Typography variant="h6" fontWeight={600} sx={{ mb: 2 }}>
-            {t("dashboard.monitoringOverview")}
+            {t('dashboard.monitoringOverview')}
           </Typography>
           <Grid container spacing={2}>
             <Grid size={{ xs: 12, sm: 4 }}>
               <StatsCard
-                title={t("dashboard.monitoringActiveAlerts")}
+                title={t('dashboard.monitoringActiveAlerts')}
                 value={alertsSummary.firing}
                 icon={<WarningIcon />}
-                color={alertsSummary.firing > 0 ? "error" : "success"}
+                color={alertsSummary.firing > 0 ? 'error' : 'success'}
                 loading={alertsSummaryLoading}
-                onClick={() => navigate("/monitoring/alerts?status=firing")}
+                onClick={() => navigate('/monitoring/alerts?status=firing')}
               />
             </Grid>
             <Grid size={{ xs: 12, sm: 4 }}>
               <StatsCard
-                title={t("dashboard.monitoringTotalAlerts")}
+                title={t('dashboard.monitoringTotalAlerts')}
                 value={alertsSummary.total}
                 icon={<NotificationsIcon />}
                 color="primary"
                 loading={alertsSummaryLoading}
-                onClick={() => navigate("/monitoring/alerts")}
+                onClick={() => navigate('/monitoring/alerts')}
               />
             </Grid>
             <Grid size={{ xs: 12, sm: 4 }}>
               <StatsCard
-                title={t("dashboard.monitoringGrafanaCardTitle")}
+                title={t('dashboard.monitoringGrafanaCardTitle')}
                 value={<OpenInNewIcon sx={{ fontSize: 28 }} />}
                 icon={<TimelineIcon />}
                 color="secondary"
-                onClick={() => navigate("/admin/grafana-dashboard")}
+                onClick={() => navigate('/admin/grafana-dashboard')}
               />
             </Grid>
           </Grid>
@@ -1233,21 +1162,18 @@ const DashboardPage: React.FC = () => {
         <Box sx={{ mb: 4 }}>
           <Box
             sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
               mb: 2,
             }}
           >
             <Typography variant="h6" fontWeight={600}>
-              {t("dashboard.environmentOverview")}
+              {t('dashboard.environmentOverview')}
             </Typography>
             {hasPermission(PERMISSIONS.ENVIRONMENTS_MANAGE) && (
-              <Tooltip title={t("sidebar.environments")}>
-                <IconButton
-                  size="small"
-                  onClick={() => navigate("/settings/environments")}
-                >
+              <Tooltip title={t('sidebar.environments')}>
+                <IconButton size="small" onClick={() => navigate('/settings/environments')}>
                   <OpenInNewIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
@@ -1260,11 +1186,8 @@ const DashboardPage: React.FC = () => {
               const mdSize = 3;
               const smSize = 6;
               // Calculate empty cards needed to fill the row (4 columns on md)
-              const canManageEnvs = hasPermission(
-                PERMISSIONS.ENVIRONMENTS_MANAGE,
-              );
-              const emptyCardsCount =
-                (4 - (count % 4)) % 4 || (count < 4 ? 4 - count : 0);
+              const canManageEnvs = hasPermission(PERMISSIONS.ENVIRONMENTS_MANAGE);
+              const emptyCardsCount = (4 - (count % 4)) % 4 || (count < 4 ? 4 - count : 0);
 
               // Sort environments to put current environment first
               const sortedEnvs = [...environmentsWithCounts].sort((a, b) => {
@@ -1277,21 +1200,18 @@ const DashboardPage: React.FC = () => {
                 .map((env) => {
                   const isCurrentEnv = env.environment === currentEnvironmentId;
                   return (
-                    <Grid
-                      key={env.environment}
-                      size={{ xs: 12, sm: smSize, md: mdSize }}
-                    >
+                    <Grid key={env.environment} size={{ xs: 12, sm: smSize, md: mdSize }}>
                       <Card
                         sx={{
-                          height: "100%",
+                          height: '100%',
                           borderTop: `3px solid ${env.color || theme.palette.primary.main}`,
-                          transition: "all 0.2s ease-in-out",
+                          transition: 'all 0.2s ease-in-out',
                           ...(isCurrentEnv && {
                             boxShadow: `0 0 0 2px ${env.color || theme.palette.primary.main}40`,
                             bgcolor: `${env.color || theme.palette.primary.main}08`,
                           }),
-                          "&:hover": {
-                            transform: "translateY(-2px)",
+                          '&:hover': {
+                            transform: 'translateY(-2px)',
                             boxShadow: theme.shadows[4],
                           },
                         }}
@@ -1299,8 +1219,8 @@ const DashboardPage: React.FC = () => {
                         <CardContent sx={{ p: 2 }}>
                           <Box
                             sx={{
-                              display: "flex",
-                              alignItems: "center",
+                              display: 'flex',
+                              alignItems: 'center',
                               mb: 1.5,
                             }}
                           >
@@ -1308,9 +1228,8 @@ const DashboardPage: React.FC = () => {
                               sx={{
                                 width: 8,
                                 height: 8,
-                                borderRadius: "50%",
-                                bgcolor:
-                                  env.color || theme.palette.primary.main,
+                                borderRadius: '50%',
+                                bgcolor: env.color || theme.palette.primary.main,
                                 mr: 1,
                               }}
                             />
@@ -1331,32 +1250,28 @@ const DashboardPage: React.FC = () => {
                                   py: 0.25,
                                   borderRadius: 0,
                                   bgcolor: `${env.color || theme.palette.primary.main}20`,
-                                  color:
-                                    env.color || theme.palette.primary.main,
+                                  color: env.color || theme.palette.primary.main,
                                   fontWeight: 600,
-                                  fontSize: "0.65rem",
+                                  fontSize: '0.65rem',
                                 }}
                               >
-                                {t("common.current")}
+                                {t('common.current')}
                               </Typography>
                             ) : (
                               <Tooltip
-                                title={t("environments.switchTo", {
+                                title={t('environments.switchTo', {
                                   name: env.displayName || env.environmentName,
                                 })}
                               >
                                 <IconButton
                                   size="small"
-                                  onClick={() =>
-                                    switchEnvironment(env.environment)
-                                  }
+                                  onClick={() => switchEnvironment(env.environment)}
                                   sx={{
                                     ml: 0.5,
                                     p: 0.5,
-                                    color: "text.secondary",
-                                    "&:hover": {
-                                      color:
-                                        env.color || theme.palette.primary.main,
+                                    color: 'text.secondary',
+                                    '&:hover': {
+                                      color: env.color || theme.palette.primary.main,
                                       bgcolor: `${env.color || theme.palette.primary.main}15`,
                                     },
                                   }}
@@ -1369,8 +1284,8 @@ const DashboardPage: React.FC = () => {
                           {env.loading || envCountsLoading ? (
                             <Box
                               sx={{
-                                display: "flex",
-                                flexDirection: "column",
+                                display: 'flex',
+                                flexDirection: 'column',
                                 gap: 0.5,
                               }}
                             >
@@ -1381,94 +1296,92 @@ const DashboardPage: React.FC = () => {
                           ) : env.counts ? (
                             <Box
                               sx={{
-                                display: "grid",
-                                gridTemplateColumns: "repeat(2, 1fr)",
+                                display: 'grid',
+                                gridTemplateColumns: 'repeat(2, 1fr)',
                                 gap: 0.5,
                               }}
                             >
                               {[
                                 {
-                                  label: "envGameWorlds",
+                                  label: 'envGameWorlds',
                                   value: env.counts.gameWorlds,
-                                  path: "/admin/game-worlds",
+                                  path: '/admin/game-worlds',
                                 },
                                 {
-                                  label: "envClientVersions",
+                                  label: 'envClientVersions',
                                   value: env.counts.clientVersions,
-                                  path: "/admin/client-versions",
+                                  path: '/admin/client-versions',
                                 },
                                 {
-                                  label: "envVars",
+                                  label: 'envVars',
                                   value: env.counts.vars,
-                                  path: "/settings/kv",
+                                  path: '/settings/kv',
                                 },
                                 {
-                                  label: "envMessageTemplates",
+                                  label: 'envMessageTemplates',
                                   value: env.counts.messageTemplates,
-                                  path: "/admin/maintenance-templates",
+                                  path: '/admin/maintenance-templates',
                                 },
                                 {
-                                  label: "envSurveys",
+                                  label: 'envSurveys',
                                   value: env.counts.surveys,
-                                  path: "/game/surveys",
+                                  path: '/game/surveys',
                                 },
                                 {
-                                  label: "envCoupons",
+                                  label: 'envCoupons',
                                   value: env.counts.coupons,
-                                  path: "/game/coupon-settings",
+                                  path: '/game/coupon-settings',
                                 },
                                 {
-                                  label: "envNotices",
+                                  label: 'envNotices',
                                   value: env.counts.serviceNotices,
-                                  path: "/game/service-notices",
+                                  path: '/game/service-notices',
                                 },
                                 {
-                                  label: "envIngamePopups",
+                                  label: 'envIngamePopups',
                                   value: env.counts.ingamePopups,
-                                  path: "/game/ingame-popup-notices",
+                                  path: '/game/ingame-popup-notices',
                                 },
                                 {
-                                  label: "envBanners",
+                                  label: 'envBanners',
                                   value: env.counts.banners,
-                                  path: "/game/banners",
+                                  path: '/game/banners',
                                 },
                                 {
-                                  label: "envJobs",
+                                  label: 'envJobs',
                                   value: env.counts.jobs,
-                                  path: "/admin/jobs",
+                                  path: '/admin/jobs',
                                 },
                                 {
-                                  label: "envStoreProducts",
+                                  label: 'envStoreProducts',
                                   value: env.counts.storeProducts,
-                                  path: "/game/store-products",
+                                  path: '/game/store-products',
                                 },
                               ].map((item) => (
                                 <Box
                                   key={item.label}
                                   onClick={() => {
-                                    if (
-                                      env.environment !== currentEnvironmentId
-                                    ) {
+                                    if (env.environment !== currentEnvironmentId) {
                                       switchEnvironment(env.environment);
                                     }
                                     navigate(item.path);
                                   }}
                                   sx={{
-                                    display: "flex",
-                                    alignItems: "stretch",
+                                    display: 'flex',
+                                    alignItems: 'stretch',
                                     height: 24,
                                     borderRadius: 0,
                                     border: 1,
-                                    borderColor: "divider",
-                                    overflow: "hidden",
-                                    cursor: "pointer",
-                                    "&:hover": {
-                                      borderColor: "primary.main",
-                                      "& .env-count-label": {
-                                        bgcolor: "action.hover",
+                                    borderColor: 'divider',
+                                    overflow: 'hidden',
+                                    cursor: 'pointer',
+                                    '&:hover': {
+                                      borderColor: 'primary.main',
+                                      '& .env-count-label': {
+                                        bgcolor: 'action.hover',
                                       },
-                                      "& .env-count-value": {
-                                        bgcolor: "primary.dark",
+                                      '& .env-count-value': {
+                                        bgcolor: 'primary.dark',
                                       },
                                     },
                                   }}
@@ -1477,13 +1390,13 @@ const DashboardPage: React.FC = () => {
                                     className="env-count-label"
                                     sx={{
                                       flex: 1,
-                                      display: "flex",
-                                      alignItems: "center",
+                                      display: 'flex',
+                                      alignItems: 'center',
                                       px: 1,
-                                      fontSize: "0.7rem",
-                                      color: "text.secondary",
-                                      bgcolor: "background.paper",
-                                      transition: "background-color 0.15s",
+                                      fontSize: '0.7rem',
+                                      color: 'text.secondary',
+                                      bgcolor: 'background.paper',
+                                      transition: 'background-color 0.15s',
                                     }}
                                   >
                                     {t(`dashboard.${item.label}`)}
@@ -1491,19 +1404,19 @@ const DashboardPage: React.FC = () => {
                                   <Box
                                     className="env-count-value"
                                     sx={{
-                                      display: "flex",
-                                      alignItems: "center",
-                                      justifyContent: "center",
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
                                       minWidth: 28,
                                       px: 0.5,
-                                      fontSize: "0.7rem",
+                                      fontSize: '0.7rem',
                                       fontWeight: 700,
-                                      color: "primary.contrastText",
+                                      color: 'primary.contrastText',
                                       bgcolor:
                                         item.value > 0
-                                          ? "primary.main"
-                                          : "action.disabledBackground",
-                                      transition: "background-color 0.15s",
+                                          ? 'primary.main'
+                                          : 'action.disabledBackground',
+                                      transition: 'background-color 0.15s',
                                     }}
                                   >
                                     {item.value}
@@ -1512,11 +1425,8 @@ const DashboardPage: React.FC = () => {
                               ))}
                             </Box>
                           ) : (
-                            <Typography
-                              variant="caption"
-                              color="text.secondary"
-                            >
-                              {t("dashboard.envNoData")}
+                            <Typography variant="caption" color="text.secondary">
+                              {t('dashboard.envNoData')}
                             </Typography>
                           )}
                         </CardContent>
@@ -1527,35 +1437,30 @@ const DashboardPage: React.FC = () => {
                 .concat(
                   // Add empty placeholder cards to fill the row
                   Array.from({ length: emptyCardsCount }).map((_, idx) => (
-                    <Grid
-                      key={`empty-${idx}`}
-                      size={{ xs: 12, sm: smSize, md: mdSize }}
-                    >
+                    <Grid key={`empty-${idx}`} size={{ xs: 12, sm: smSize, md: mdSize }}>
                       <Card
                         onClick={
-                          canManageEnvs
-                            ? () => navigate("/settings/environments")
-                            : undefined
+                          canManageEnvs ? () => navigate('/settings/environments') : undefined
                         }
                         sx={{
-                          height: "100%",
-                          border: "1px dashed",
-                          borderColor: "divider",
-                          boxShadow: "none",
-                          bgcolor: "transparent",
-                          cursor: canManageEnvs ? "pointer" : "default",
-                          transition: "all 0.2s ease-in-out",
+                          height: '100%',
+                          border: '1px dashed',
+                          borderColor: 'divider',
+                          boxShadow: 'none',
+                          bgcolor: 'transparent',
+                          cursor: canManageEnvs ? 'pointer' : 'default',
+                          transition: 'all 0.2s ease-in-out',
                           ...(canManageEnvs && {
-                            "&:hover": {
-                              borderColor: "primary.main",
-                              bgcolor: "action.hover",
-                              transform: "translateY(-2px)",
-                              "& .add-icon": {
-                                color: "primary.main",
-                                transform: "scale(1.1)",
+                            '&:hover': {
+                              borderColor: 'primary.main',
+                              bgcolor: 'action.hover',
+                              transform: 'translateY(-2px)',
+                              '& .add-icon': {
+                                color: 'primary.main',
+                                transform: 'scale(1.1)',
                               },
-                              "& .add-text": {
-                                color: "text.primary",
+                              '& .add-text': {
+                                color: 'text.primary',
                               },
                             },
                           }),
@@ -1564,11 +1469,11 @@ const DashboardPage: React.FC = () => {
                         <CardContent
                           sx={{
                             p: 2,
-                            height: "100%",
-                            display: "flex",
-                            flexDirection: "column",
-                            alignItems: "center",
-                            justifyContent: "center",
+                            height: '100%',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
                             minHeight: 200,
                           }}
                         >
@@ -1578,25 +1483,25 @@ const DashboardPage: React.FC = () => {
                                 className="add-icon"
                                 sx={{
                                   fontSize: 32,
-                                  color: "text.disabled",
+                                  color: 'text.disabled',
                                   mb: 1,
-                                  transition: "all 0.2s ease-in-out",
+                                  transition: 'all 0.2s ease-in-out',
                                 }}
                               />
                               <Typography
                                 className="add-text"
                                 variant="caption"
                                 color="text.disabled"
-                                sx={{ transition: "color 0.2s ease-in-out" }}
+                                sx={{ transition: 'color 0.2s ease-in-out' }}
                               >
-                                {t("sidebar.environments")}
+                                {t('sidebar.environments')}
                               </Typography>
                             </>
                           )}
                         </CardContent>
                       </Card>
                     </Grid>
-                  )),
+                  ))
                 );
             })()}
           </Grid>
@@ -1606,10 +1511,10 @@ const DashboardPage: React.FC = () => {
       <Grid container spacing={3}>
         {/* Quick Actions */}
         <Grid size={{ xs: 12, lg: 8 }}>
-          <Card sx={{ height: "100%" }}>
+          <Card sx={{ height: '100%' }}>
             <CardContent>
               <Typography variant="h6" fontWeight={600} sx={{ mb: 2 }}>
-                {t("dashboard.quickActionsTitle")}
+                {t('dashboard.quickActionsTitle')}
               </Typography>
               <Grid container spacing={2}>
                 {quickActions.map((action) => (
@@ -1626,12 +1531,8 @@ const DashboardPage: React.FC = () => {
                 ))}
               </Grid>
               {quickActions.length === 0 && (
-                <Box
-                  sx={{ textAlign: "center", py: 4, color: "text.secondary" }}
-                >
-                  <Typography variant="body2">
-                    {t("dashboard.noQuickActions")}
-                  </Typography>
+                <Box sx={{ textAlign: 'center', py: 4, color: 'text.secondary' }}>
+                  <Typography variant="body2">{t('dashboard.noQuickActions')}</Typography>
                 </Box>
               )}
             </CardContent>
@@ -1640,25 +1541,22 @@ const DashboardPage: React.FC = () => {
 
         {/* Recent Activity */}
         <Grid size={{ xs: 12, lg: 4 }}>
-          <Card sx={{ height: "100%" }}>
+          <Card sx={{ height: '100%' }}>
             <CardContent>
               <Box
                 sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
                   mb: 2,
                 }}
               >
                 <Typography variant="h6" fontWeight={600}>
-                  {t("dashboard.recentActivity")}
+                  {t('dashboard.recentActivity')}
                 </Typography>
                 {hasPermission(PERMISSIONS.AUDIT_LOGS_VIEW) && (
-                  <Tooltip title={t("dashboard.viewAll")}>
-                    <IconButton
-                      size="small"
-                      onClick={() => navigate("/admin/audit-logs")}
-                    >
+                  <Tooltip title={t('dashboard.viewAll')}>
+                    <IconButton size="small" onClick={() => navigate('/admin/audit-logs')}>
                       <OpenInNewIcon fontSize="small" />
                     </IconButton>
                   </Tooltip>
@@ -1666,9 +1564,9 @@ const DashboardPage: React.FC = () => {
               </Box>
 
               {activitiesLoading ? (
-                <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                   {[1, 2, 3].map((i) => (
-                    <Box key={i} sx={{ display: "flex", gap: 2 }}>
+                    <Box key={i} sx={{ display: 'flex', gap: 2 }}>
                       <Skeleton variant="circular" width={40} height={40} />
                       <Box sx={{ flex: 1 }}>
                         <Skeleton width="60%" />
@@ -1688,7 +1586,7 @@ const DashboardPage: React.FC = () => {
                               width: 32,
                               height: 32,
                               bgcolor: alpha(theme.palette.primary.main, 0.1),
-                              color: "primary.main",
+                              color: 'primary.main',
                             }}
                           >
                             <EventNoteIcon sx={{ fontSize: 18 }} />
@@ -1705,37 +1603,24 @@ const DashboardPage: React.FC = () => {
                           secondary={
                             <Box
                               sx={{
-                                display: "flex",
-                                alignItems: "center",
+                                display: 'flex',
+                                alignItems: 'center',
                                 gap: 1,
                                 mt: 0.5,
                               }}
                             >
-                              <Typography
-                                variant="caption"
-                                color="text.secondary"
-                              >
+                              <Typography variant="caption" color="text.secondary">
                                 {activity.userName}
                               </Typography>
-                              <Typography
-                                variant="caption"
-                                color="text.disabled"
-                              >
+                              <Typography variant="caption" color="text.disabled">
                                 •
                               </Typography>
-                              <Typography
-                                variant="caption"
-                                color="text.secondary"
-                              >
-                                {formatRelativeTime(
-                                  activity.timestamp,
-                                  undefined,
-                                  i18n.language,
-                                )}
+                              <Typography variant="caption" color="text.secondary">
+                                {formatRelativeTime(activity.timestamp, undefined, i18n.language)}
                               </Typography>
                             </Box>
                           }
-                          secondaryTypographyProps={{ component: "div" }}
+                          secondaryTypographyProps={{ component: 'div' }}
                         />
                       </ListItem>
                       {index < recentActivities.length - 1 && <Divider />}
@@ -1743,13 +1628,9 @@ const DashboardPage: React.FC = () => {
                   ))}
                 </List>
               ) : (
-                <Box
-                  sx={{ textAlign: "center", py: 4, color: "text.secondary" }}
-                >
+                <Box sx={{ textAlign: 'center', py: 4, color: 'text.secondary' }}>
                   <HistoryIcon sx={{ fontSize: 48, mb: 1, opacity: 0.5 }} />
-                  <Typography variant="body2">
-                    {t("dashboard.noRecentActivity")}
-                  </Typography>
+                  <Typography variant="body2">{t('dashboard.noRecentActivity')}</Typography>
                 </Box>
               )}
             </CardContent>
@@ -1765,35 +1646,26 @@ const DashboardPage: React.FC = () => {
             {/* Recent Crash Events */}
             {hasPermission(PERMISSIONS.CRASH_EVENTS_VIEW) && (
               <Grid size={{ xs: 12, lg: 6 }}>
-                <Card sx={{ height: "100%" }}>
+                <Card sx={{ height: '100%' }}>
                   <CardContent>
                     <Box
                       sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
                         mb: 2,
                       }}
                     >
-                      <Box
-                        sx={{ display: "flex", alignItems: "center", gap: 1 }}
-                      >
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                         <Typography variant="h6" fontWeight={600}>
-                          {t("dashboard.recentCrashEvents")}
+                          {t('dashboard.recentCrashEvents')}
                         </Typography>
                         {recentCrashEvents.length > 0 && (
-                          <Chip
-                            label={recentCrashEvents.length}
-                            size="small"
-                            color="error"
-                          />
+                          <Chip label={recentCrashEvents.length} size="small" color="error" />
                         )}
                       </Box>
-                      <Tooltip title={t("dashboard.viewAll")}>
-                        <IconButton
-                          size="small"
-                          onClick={() => navigate("/admin/crash-events")}
-                        >
+                      <Tooltip title={t('dashboard.viewAll')}>
+                        <IconButton size="small" onClick={() => navigate('/admin/crash-events')}>
                           <OpenInNewIcon fontSize="small" />
                         </IconButton>
                       </Tooltip>
@@ -1802,8 +1674,8 @@ const DashboardPage: React.FC = () => {
                     {crashEventsLoading ? (
                       <Box
                         sx={{
-                          display: "flex",
-                          flexDirection: "column",
+                          display: 'flex',
+                          flexDirection: 'column',
                           gap: 1,
                         }}
                       >
@@ -1812,108 +1684,88 @@ const DashboardPage: React.FC = () => {
                         ))}
                       </Box>
                     ) : recentCrashEvents.length > 0 ? (
-                      <Box sx={{ maxHeight: 350, overflow: "auto" }}>
+                      <Box sx={{ maxHeight: 350, overflow: 'auto' }}>
                         <List disablePadding dense>
-                          {recentCrashEvents
-                            .slice(0, 10)
-                            .map((event, index) => (
-                              <React.Fragment key={event.id}>
-                                <ListItem
-                                  disablePadding
-                                  sx={{
-                                    py: 1,
-                                    cursor: "pointer",
-                                    "&:hover": { bgcolor: "action.hover" },
-                                  }}
-                                  onClick={() =>
-                                    navigate(
-                                      `/admin/crash-events?id=${event.id}`,
-                                    )
+                          {recentCrashEvents.slice(0, 10).map((event, index) => (
+                            <React.Fragment key={event.id}>
+                              <ListItem
+                                disablePadding
+                                sx={{
+                                  py: 1,
+                                  cursor: 'pointer',
+                                  '&:hover': { bgcolor: 'action.hover' },
+                                }}
+                                onClick={() => navigate(`/admin/crash-events?id=${event.id}`)}
+                              >
+                                <ListItemIcon sx={{ minWidth: 36 }}>
+                                  <Avatar
+                                    sx={{
+                                      width: 28,
+                                      height: 28,
+                                      bgcolor: alpha(theme.palette.error.main, 0.1),
+                                      color: 'error.main',
+                                      fontSize: 12,
+                                    }}
+                                  >
+                                    <BugReportIcon sx={{ fontSize: 16 }} />
+                                  </Avatar>
+                                </ListItemIcon>
+                                <ListItemText
+                                  primary={
+                                    <Typography variant="body2" noWrap sx={{ fontWeight: 500 }}>
+                                      {event.firstLine || event.crashId}
+                                    </Typography>
                                   }
-                                >
-                                  <ListItemIcon sx={{ minWidth: 36 }}>
-                                    <Avatar
+                                  secondary={
+                                    <Box
                                       sx={{
-                                        width: 28,
-                                        height: 28,
-                                        bgcolor: alpha(
-                                          theme.palette.error.main,
-                                          0.1,
-                                        ),
-                                        color: "error.main",
-                                        fontSize: 12,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: 1,
+                                        mt: 0.5,
+                                        flexWrap: 'wrap',
                                       }}
                                     >
-                                      <BugReportIcon sx={{ fontSize: 16 }} />
-                                    </Avatar>
-                                  </ListItemIcon>
-                                  <ListItemText
-                                    primary={
-                                      <Typography
-                                        variant="body2"
-                                        noWrap
-                                        sx={{ fontWeight: 500 }}
-                                      >
-                                        {event.firstLine || event.crashId}
+                                      <Chip
+                                        label={event.platform}
+                                        size="small"
+                                        variant="outlined"
+                                        sx={{ height: 18, fontSize: 10 }}
+                                      />
+                                      <Chip
+                                        label={event.branch}
+                                        size="small"
+                                        variant="outlined"
+                                        sx={{ height: 18, fontSize: 10 }}
+                                      />
+                                      <Typography variant="caption" color="text.secondary">
+                                        {formatRelativeTime(
+                                          event.createdAt,
+                                          undefined,
+                                          i18n.language
+                                        )}
                                       </Typography>
-                                    }
-                                    secondary={
-                                      <Box
-                                        sx={{
-                                          display: "flex",
-                                          alignItems: "center",
-                                          gap: 1,
-                                          mt: 0.5,
-                                          flexWrap: "wrap",
-                                        }}
-                                      >
-                                        <Chip
-                                          label={event.platform}
-                                          size="small"
-                                          variant="outlined"
-                                          sx={{ height: 18, fontSize: 10 }}
-                                        />
-                                        <Chip
-                                          label={event.branch}
-                                          size="small"
-                                          variant="outlined"
-                                          sx={{ height: 18, fontSize: 10 }}
-                                        />
-                                        <Typography
-                                          variant="caption"
-                                          color="text.secondary"
-                                        >
-                                          {formatRelativeTime(
-                                            event.createdAt,
-                                            undefined,
-                                            i18n.language,
-                                          )}
-                                        </Typography>
-                                      </Box>
-                                    }
-                                    secondaryTypographyProps={{
-                                      component: "div",
-                                    }}
-                                  />
-                                </ListItem>
-                                {index <
-                                  Math.min(recentCrashEvents.length, 10) -
-                                    1 && <Divider />}
-                              </React.Fragment>
-                            ))}
+                                    </Box>
+                                  }
+                                  secondaryTypographyProps={{
+                                    component: 'div',
+                                  }}
+                                />
+                              </ListItem>
+                              {index < Math.min(recentCrashEvents.length, 10) - 1 && <Divider />}
+                            </React.Fragment>
+                          ))}
                         </List>
                       </Box>
                     ) : (
                       <Box
                         sx={{
-                          textAlign: "center",
+                          textAlign: 'center',
                           py: 8,
-                          color: "text.secondary",
+                          color: 'text.secondary',
                         }}
                       >
-                        <Typography variant="body2">
-                          {t("dashboard.noCrashEvents")}
-                        </Typography>
+                        <Typography variant="body2">{t('dashboard.noCrashEvents')}</Typography>
                       </Box>
                     )}
                   </CardContent>
@@ -1924,34 +1776,28 @@ const DashboardPage: React.FC = () => {
             {/* Recent Server Lifecycle Events */}
             {hasPermission(PERMISSIONS.SERVERS_VIEW) && (
               <Grid size={{ xs: 12, lg: 6 }}>
-                <Card sx={{ height: "100%" }}>
+                <Card sx={{ height: '100%' }}>
                   <CardContent>
                     <Box
                       sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
                         mb: 2,
                       }}
                     >
-                      <Box
-                        sx={{ display: "flex", alignItems: "center", gap: 1 }}
-                      >
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                         <Typography variant="h6" fontWeight={600}>
-                          {t("serverLifecycle.title")}
+                          {t('serverLifecycle.title')}
                         </Typography>
                         {recentLifecycleEvents.length > 0 && (
-                          <Chip
-                            label={recentLifecycleEvents.length}
-                            size="small"
-                            color="primary"
-                          />
+                          <Chip label={recentLifecycleEvents.length} size="small" color="primary" />
                         )}
                       </Box>
-                      <Tooltip title={t("dashboard.viewAll")}>
+                      <Tooltip title={t('dashboard.viewAll')}>
                         <IconButton
                           size="small"
-                          onClick={() => navigate("/admin/server-lifecycle")}
+                          onClick={() => navigate('/admin/server-lifecycle')}
                         >
                           <OpenInNewIcon fontSize="small" />
                         </IconButton>
@@ -1961,8 +1807,8 @@ const DashboardPage: React.FC = () => {
                     {lifecycleEventsLoading ? (
                       <Box
                         sx={{
-                          display: "flex",
-                          flexDirection: "column",
+                          display: 'flex',
+                          flexDirection: 'column',
                           gap: 1,
                         }}
                       >
@@ -1971,31 +1817,31 @@ const DashboardPage: React.FC = () => {
                         ))}
                       </Box>
                     ) : recentLifecycleEvents.length > 0 ? (
-                      <Box sx={{ maxHeight: 350, overflow: "auto" }}>
+                      <Box sx={{ maxHeight: 350, overflow: 'auto' }}>
                         <List disablePadding dense>
                           {recentLifecycleEvents.map((event, index) => {
                             const getEventColor = (type: string) => {
                               switch (type) {
-                                case "REGISTER":
-                                  return "success";
-                                case "READY":
-                                  return "success";
-                                case "INITIALIZING":
-                                  return "info";
-                                case "UNREGISTER":
-                                  return "default";
-                                case "SHUTTING_DOWN":
-                                  return "warning";
-                                case "TERMINATED":
-                                  return "default";
-                                case "TIMEOUT":
-                                  return "warning";
-                                case "NO_RESPONSE":
-                                  return "warning";
-                                case "ERROR":
-                                  return "error";
+                                case 'REGISTER':
+                                  return 'success';
+                                case 'READY':
+                                  return 'success';
+                                case 'INITIALIZING':
+                                  return 'info';
+                                case 'UNREGISTER':
+                                  return 'default';
+                                case 'SHUTTING_DOWN':
+                                  return 'warning';
+                                case 'TERMINATED':
+                                  return 'default';
+                                case 'TIMEOUT':
+                                  return 'warning';
+                                case 'NO_RESPONSE':
+                                  return 'warning';
+                                case 'ERROR':
+                                  return 'error';
                                 default:
-                                  return "primary";
+                                  return 'primary';
                               }
                             };
 
@@ -2005,12 +1851,12 @@ const DashboardPage: React.FC = () => {
                                   disablePadding
                                   sx={{
                                     py: 1,
-                                    cursor: "pointer",
-                                    "&:hover": { bgcolor: "action.hover" },
+                                    cursor: 'pointer',
+                                    '&:hover': { bgcolor: 'action.hover' },
                                   }}
                                   onClick={() =>
                                     navigate(
-                                      `/admin/server-lifecycle?instanceId=${encodeURIComponent(event.instanceId)}`,
+                                      `/admin/server-lifecycle?instanceId=${encodeURIComponent(event.instanceId)}`
                                     )
                                   }
                                 >
@@ -2018,40 +1864,30 @@ const DashboardPage: React.FC = () => {
                                     primary={
                                       <Box
                                         sx={{
-                                          display: "flex",
-                                          alignItems: "center",
+                                          display: 'flex',
+                                          alignItems: 'center',
                                           gap: 1,
-                                          flexWrap: "wrap",
+                                          flexWrap: 'wrap',
                                         }}
                                       >
                                         <Chip
                                           label={t(
                                             `serverLifecycle.eventTypes.${event.eventType}`,
-                                            { defaultValue: event.eventType },
+                                            { defaultValue: event.eventType }
                                           )}
                                           size="small"
-                                          color={
-                                            getEventColor(
-                                              event.eventType,
-                                            ) as any
-                                          }
+                                          color={getEventColor(event.eventType) as any}
                                           sx={{
                                             height: 22,
-                                            fontSize: "0.7rem",
+                                            fontSize: '0.7rem',
                                             fontWeight: 600,
                                           }}
                                         />
-                                        <Typography
-                                          variant="body2"
-                                          sx={{ fontWeight: 500 }}
-                                        >
+                                        <Typography variant="body2" sx={{ fontWeight: 500 }}>
                                           {event.serviceType}
                                         </Typography>
                                         {event.serviceGroup && (
-                                          <Typography
-                                            variant="caption"
-                                            color="text.secondary"
-                                          >
+                                          <Typography variant="caption" color="text.secondary">
                                             ({event.serviceGroup})
                                           </Typography>
                                         )}
@@ -2060,11 +1896,11 @@ const DashboardPage: React.FC = () => {
                                     secondary={
                                       <Box
                                         sx={{
-                                          display: "flex",
-                                          alignItems: "center",
+                                          display: 'flex',
+                                          alignItems: 'center',
                                           gap: 1,
                                           mt: 0.5,
-                                          flexWrap: "wrap",
+                                          flexWrap: 'wrap',
                                         }}
                                       >
                                         {event.hostname && (
@@ -2080,30 +1916,27 @@ const DashboardPage: React.FC = () => {
                                           variant="caption"
                                           color="text.disabled"
                                           sx={{
-                                            fontFamily: "monospace",
-                                            fontSize: "0.65rem",
+                                            fontFamily: 'monospace',
+                                            fontSize: '0.65rem',
                                           }}
                                         >
                                           {event.instanceId}
                                         </Typography>
-                                        <Typography
-                                          variant="caption"
-                                          color="text.secondary"
-                                        >
+                                        <Typography variant="caption" color="text.secondary">
                                           {formatRelativeTime(
                                             event.createdAt,
                                             undefined,
-                                            i18n.language,
+                                            i18n.language
                                           )}
                                         </Typography>
                                         {event.cloudRegion && (
                                           <Typography
                                             variant="caption"
                                             sx={{
-                                              bgcolor: "action.selected",
+                                              bgcolor: 'action.selected',
                                               px: 0.5,
                                               borderRadius: 0,
-                                              fontSize: "0.65rem",
+                                              fontSize: '0.65rem',
                                             }}
                                           >
                                             {event.cloudRegion}
@@ -2112,13 +1945,11 @@ const DashboardPage: React.FC = () => {
                                       </Box>
                                     }
                                     secondaryTypographyProps={{
-                                      component: "div",
+                                      component: 'div',
                                     }}
                                   />
                                 </ListItem>
-                                {index < recentLifecycleEvents.length - 1 && (
-                                  <Divider />
-                                )}
+                                {index < recentLifecycleEvents.length - 1 && <Divider />}
                               </React.Fragment>
                             );
                           })}
@@ -2127,14 +1958,12 @@ const DashboardPage: React.FC = () => {
                     ) : (
                       <Box
                         sx={{
-                          textAlign: "center",
+                          textAlign: 'center',
                           py: 8,
-                          color: "text.secondary",
+                          color: 'text.secondary',
                         }}
                       >
-                        <Typography variant="body2">
-                          {t("serverLifecycle.noEvents")}
-                        </Typography>
+                        <Typography variant="body2">{t('serverLifecycle.noEvents')}</Typography>
                       </Box>
                     )}
                   </CardContent>

@@ -27,7 +27,7 @@ export enum InvitationDuration {
 }
 
 export const InvitationDurationLabels = {
-  [InvitationDuration.HOURS_48]: "48시간",
-  [InvitationDuration.WEEK]: "1주일",
-  [InvitationDuration.MONTH]: "1개월",
+  [InvitationDuration.HOURS_48]: '48시간',
+  [InvitationDuration.WEEK]: '1주일',
+  [InvitationDuration.MONTH]: '1개월',
 };

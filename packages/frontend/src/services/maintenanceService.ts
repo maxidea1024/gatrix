@@ -1,10 +1,7 @@
-import { apiService } from "./api";
-import {
-  MutationResult,
-  parseChangeRequestResponse,
-} from "./changeRequestUtils";
+import { apiService } from './api';
+import { MutationResult, parseChangeRequestResponse } from './changeRequestUtils';
 
-export type MaintenanceType = "regular" | "emergency";
+export type MaintenanceType = 'regular' | 'emergency';
 
 export interface MaintenanceDetail {
   type: MaintenanceType;
@@ -33,7 +30,7 @@ export const maintenanceService = {
       isUnderMaintenance: boolean;
       detail: MaintenanceDetail | null;
     }>(`/admin/maintenance/isUnderMaintenance`, {
-      headers: { "Cache-Control": "no-cache" },
+      headers: { 'Cache-Control': 'no-cache' },
     });
     return res.data as any;
   },
@@ -45,7 +42,7 @@ export const maintenanceService = {
     kickExistingPlayers?: boolean;
     kickDelayMinutes?: number;
     message?: string;
-    messages?: MaintenanceDetail["messages"];
+    messages?: MaintenanceDetail['messages'];
   }): Promise<MutationResult<void>> {
     const response = await apiService.post(`/admin/maintenance`, payload);
     return parseChangeRequestResponse<void>(response, () => undefined);
@@ -53,13 +50,13 @@ export const maintenanceService = {
   async getTemplates(): Promise<{
     templates: Array<{
       message?: string;
-      messages?: MaintenanceDetail["messages"];
+      messages?: MaintenanceDetail['messages'];
     }>;
   }> {
     const res = await apiService.get<{
       templates: Array<{
         message?: string;
-        messages?: MaintenanceDetail["messages"];
+        messages?: MaintenanceDetail['messages'];
       }>;
     }>(`/admin/maintenance/templates`);
     return res.data as any;
@@ -67,8 +64,8 @@ export const maintenanceService = {
   async saveTemplates(
     templates: Array<{
       message?: string;
-      messages?: MaintenanceDetail["messages"];
-    }>,
+      messages?: MaintenanceDetail['messages'];
+    }>
   ) {
     return apiService.post(`/admin/maintenance/templates`, { templates });
   },

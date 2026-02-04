@@ -5,6 +5,7 @@
 **`reward-lookup.json` 파일 하나에 모든 정보가 들어있습니다!**
 
 이 파일은 각 REWARD_TYPE별로:
+
 - 어떤 테이블을 참조하는지
 - 선택 가능한 아이템 목록이 무엇인지
 - ID가 필요한지, 수치만 필요한지
@@ -58,8 +59,8 @@
 ```javascript
 // 운영툴 시작 시 한 번만 로드
 fetch('/api/reward-lookup.json')
-  .then(res => res.json())
-  .then(data => {
+  .then((res) => res.json())
+  .then((data) => {
     window.rewardLookupData = data;
     initializeUI();
   });
@@ -70,25 +71,26 @@ fetch('/api/reward-lookup.json')
 ```javascript
 function initializeUI() {
   const rewardTypeSelect = document.getElementById('rewardType');
-  
+
   // rewardLookupData의 모든 타입을 드롭다운에 추가
-  Object.values(rewardLookupData).forEach(type => {
+  Object.values(rewardLookupData).forEach((type) => {
     const option = document.createElement('option');
     option.value = type.rewardType;
     option.textContent = `${type.rewardTypeName} (${type.rewardType})`;
-    
+
     if (type.hasTable) {
       option.textContent += ` - ${type.itemCount}개 아이템`;
     } else {
       option.textContent += ' - 수치 입력';
     }
-    
+
     rewardTypeSelect.appendChild(option);
   });
 }
 ```
 
 **결과:**
+
 ```
 드롭다운 목록:
 - POINT (1) - 23개 아이템
@@ -102,12 +104,12 @@ function initializeUI() {
 ### 3단계: 사용자가 REWARD_TYPE 선택
 
 ```javascript
-rewardTypeSelect.addEventListener('change', function() {
+rewardTypeSelect.addEventListener('change', function () {
   const selectedType = this.value; // 예: "33"
-  
+
   // 선택한 타입의 정보 가져오기
   const typeInfo = rewardLookupData[selectedType];
-  
+
   console.log(typeInfo);
   /*
   {
@@ -132,7 +134,7 @@ rewardTypeSelect.addEventListener('change', function() {
 function onRewardTypeChange() {
   const selectedType = document.getElementById('rewardType').value;
   const typeInfo = rewardLookupData[selectedType];
-  
+
   if (typeInfo.hasTable) {
     // 테이블이 있으면 아이템 드롭다운 표시
     showItemDropdown(typeInfo.items);
@@ -145,20 +147,21 @@ function onRewardTypeChange() {
 function showItemDropdown(items) {
   const itemSelect = document.getElementById('itemId');
   itemSelect.innerHTML = '<option value="">선택하세요</option>';
-  
+
   // items 배열을 드롭다운에 채우기
-  items.forEach(item => {
+  items.forEach((item) => {
     const option = document.createElement('option');
     option.value = item.id;
     option.textContent = `[${item.id}] ${item.name}`;
     itemSelect.appendChild(option);
   });
-  
+
   itemSelect.style.display = 'block';
 }
 ```
 
 **결과 (USER_TITLE 선택 시):**
+
 ```
 아이템 드롭다운:
 - [1400000] 전설적인 도시의 큰 손
@@ -176,12 +179,12 @@ function showItemDropdown(items) {
 
 ```javascript
 // USER_TITLE (33)을 선택하면
-const typeInfo = rewardLookupData["33"];
+const typeInfo = rewardLookupData['33'];
 
 // typeInfo.items에 이미 125개의 칭호가 들어있음
 typeInfo.items = [
-  { id: 1400000, name: "전설적인 도시의 큰 손" },
-  { id: 1400001, name: "전설의 거상" },
+  { id: 1400000, name: '전설적인 도시의 큰 손' },
+  { id: 1400001, name: '전설의 거상' },
   // ...123개 더
 ];
 
@@ -194,12 +197,12 @@ typeInfo.items = [
 
 ```javascript
 // 앱 시작 시 한 번만 로드
-const rewardLookupData = await fetch('/api/reward-lookup.json').then(r => r.json());
+const rewardLookupData = await fetch('/api/reward-lookup.json').then((r) => r.json());
 
 // 이후에는 메모리에서 바로 사용
-const userTitles = rewardLookupData["33"].items; // 즉시 사용 가능
-const points = rewardLookupData["1"].items;      // 즉시 사용 가능
-const ships = rewardLookupData["6"].items;       // 즉시 사용 가능
+const userTitles = rewardLookupData['33'].items; // 즉시 사용 가능
+const points = rewardLookupData['1'].items; // 즉시 사용 가능
+const ships = rewardLookupData['6'].items; // 즉시 사용 가능
 ```
 
 ### Q: CMS 파일이 업데이트되면?
@@ -226,35 +229,35 @@ import rewardLookupData from './reward-lookup.json';
 function RewardSelector() {
   const [rewardType, setRewardType] = useState('');
   const [itemId, setItemId] = useState('');
-  
+
   // 선택된 타입의 정보
   const typeInfo = rewardType ? rewardLookupData[rewardType] : null;
-  
+
   return (
     <div>
       {/* 1. REWARD_TYPE 선택 */}
       <select onChange={(e) => setRewardType(e.target.value)}>
         <option value="">보상 타입 선택</option>
-        {Object.values(rewardLookupData).map(type => (
+        {Object.values(rewardLookupData).map((type) => (
           <option key={type.rewardType} value={type.rewardType}>
             {type.rewardTypeName} ({type.rewardType})
             {type.hasTable ? ` - ${type.itemCount}개` : ' - 수치 입력'}
           </option>
         ))}
       </select>
-      
+
       {/* 2. 아이템 선택 (hasTable이 true인 경우만) */}
       {typeInfo?.hasTable && (
         <select onChange={(e) => setItemId(e.target.value)}>
           <option value="">아이템 선택</option>
-          {typeInfo.items.map(item => (
+          {typeInfo.items.map((item) => (
             <option key={item.id} value={item.id}>
               [{item.id}] {item.name}
             </option>
           ))}
         </select>
       )}
-      
+
       {/* 3. 수치 입력 (hasTable이 false인 경우) */}
       {typeInfo && !typeInfo.hasTable && (
         <div>
@@ -275,24 +278,16 @@ function RewardSelector() {
     <!-- REWARD_TYPE 선택 -->
     <select v-model="rewardType">
       <option value="">보상 타입 선택</option>
-      <option 
-        v-for="type in allTypes" 
-        :key="type.rewardType" 
-        :value="type.rewardType"
-      >
+      <option v-for="type in allTypes" :key="type.rewardType" :value="type.rewardType">
         {{ type.rewardTypeName }} ({{ type.rewardType }})
         {{ type.hasTable ? ` - ${type.itemCount}개` : ' - 수치 입력' }}
       </option>
     </select>
-    
+
     <!-- 아이템 선택 -->
     <select v-if="selectedTypeInfo?.hasTable" v-model="itemId">
       <option value="">아이템 선택</option>
-      <option 
-        v-for="item in selectedTypeInfo.items" 
-        :key="item.id" 
-        :value="item.id"
-      >
+      <option v-for="item in selectedTypeInfo.items" :key="item.id" :value="item.id">
         [{{ item.id }}] {{ item.name }}
       </option>
     </select>
@@ -344,4 +339,3 @@ open server/node/tools/example-admin-ui.html
 # 또는 파일 경로로 직접 열기
 file:///c:/work/uwo/game/server/node/tools/example-admin-ui.html
 ```
-

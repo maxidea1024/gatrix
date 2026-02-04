@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Box,
   Paper,
@@ -28,7 +28,7 @@ import {
   Slide,
   useTheme,
   Fade,
-} from "@mui/material";
+} from '@mui/material';
 import {
   Add as AddIcon,
   Chat as ChatIcon,
@@ -44,26 +44,24 @@ import {
   Wifi as ConnectedIcon,
   WifiOff as DisconnectedIcon,
   Circle as StatusIcon,
-} from "@mui/icons-material";
-import { useTranslation } from "react-i18next";
-import { useSnackbar } from "notistack";
-import { ChatProvider, useChat } from "../../contexts/ChatContext";
-import { useAuth } from "../../contexts/AuthContext";
-import { apiService } from "../../services/api";
-import ChannelList from "../../components/chat/ChannelList";
-import ChatElementsMessageList from "../../components/chat/ChatElementsMessageList";
-import NotificationManager from "../../components/chat/NotificationManager";
-import UserPresence from "../../components/chat/UserPresence";
-import UserSearchDialog from "../../components/chat/UserSearchDialog";
-import InvitationManager from "../../components/chat/InvitationManager";
-import PrivacySettings from "../../components/chat/PrivacySettings";
-import ThreadView from "../../components/chat/ThreadView";
-import UserStatusPicker, {
-  UserStatus,
-} from "../../components/chat/UserStatusPicker";
-import ChatSkeleton from "../../components/chat/ChatSkeleton";
-import { CreateChannelRequest, SendMessageRequest } from "../../types/chat";
-import { getChatWebSocketService } from "../../services/chatWebSocketService";
+} from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
+import { useSnackbar } from 'notistack';
+import { ChatProvider, useChat } from '../../contexts/ChatContext';
+import { useAuth } from '../../contexts/AuthContext';
+import { apiService } from '../../services/api';
+import ChannelList from '../../components/chat/ChannelList';
+import ChatElementsMessageList from '../../components/chat/ChatElementsMessageList';
+import NotificationManager from '../../components/chat/NotificationManager';
+import UserPresence from '../../components/chat/UserPresence';
+import UserSearchDialog from '../../components/chat/UserSearchDialog';
+import InvitationManager from '../../components/chat/InvitationManager';
+import PrivacySettings from '../../components/chat/PrivacySettings';
+import ThreadView from '../../components/chat/ThreadView';
+import UserStatusPicker, { UserStatus } from '../../components/chat/UserStatusPicker';
+import ChatSkeleton from '../../components/chat/ChatSkeleton';
+import { CreateChannelRequest, SendMessageRequest } from '../../types/chat';
+import { getChatWebSocketService } from '../../services/chatWebSocketService';
 
 const ChatPageContent: React.FC = () => {
   const { t } = useTranslation();
@@ -74,18 +72,18 @@ const ChatPageContent: React.FC = () => {
   const theme = useTheme();
 
   // 반응형 브레이크포인트 (1200px 이상에서 사이드바이사이드, 미만에서 스택)
-  const isLargeScreen = useMediaQuery(theme.breakpoints.up("xl")); // 1536px+
-  const isMediumScreen = useMediaQuery(theme.breakpoints.up("lg")); // 1200px+
+  const isLargeScreen = useMediaQuery(theme.breakpoints.up('xl')); // 1536px+
+  const isMediumScreen = useMediaQuery(theme.breakpoints.up('lg')); // 1200px+
   const [createChannelOpen, setCreateChannelOpen] = useState(false);
   const [isCreatingChannel, setIsCreatingChannel] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(() => {
-    const saved = localStorage.getItem("chatSidebarOpen");
+    const saved = localStorage.getItem('chatSidebarOpen');
     return saved !== null ? JSON.parse(saved) : true; // 기본값: 열린 상태
   });
   const [channelFormData, setChannelFormData] = useState<CreateChannelRequest>({
-    name: "",
-    description: "",
-    type: "public",
+    name: '',
+    description: '',
+    type: 'public',
   });
   // Get current selected channel from state
   const selectedChannel = state.currentChannelId
@@ -100,20 +98,15 @@ const ChatPageContent: React.FC = () => {
   const [privacySettingsOpen, setPrivacySettingsOpen] = useState(false);
   const [statusPickerOpen, setStatusPickerOpen] = useState(false);
   // Remember last opened thread per channel
-  const LAST_THREAD_KEY = "chatLastThreadByChannel";
+  const LAST_THREAD_KEY = 'chatLastThreadByChannel';
   const loadLastThreadMap = (): Record<string, number> => {
     try {
-      return JSON.parse(
-        localStorage.getItem(LAST_THREAD_KEY) || "{}",
-      ) as Record<string, number>;
+      return JSON.parse(localStorage.getItem(LAST_THREAD_KEY) || '{}') as Record<string, number>;
     } catch {
       return {};
     }
   };
-  const saveLastThreadForChannel = (
-    channelId: number,
-    messageId: number | null,
-  ) => {
+  const saveLastThreadForChannel = (channelId: number, messageId: number | null) => {
     try {
       const map = loadLastThreadMap();
       if (messageId) map[String(channelId)] = messageId;
@@ -130,9 +123,7 @@ const ChatPageContent: React.FC = () => {
 
   // Thread sidebar width (resizable)
   const [threadWidth, setThreadWidth] = useState<number>(() => {
-    const saved = Number(
-      localStorage.getItem("chatThreadWidth") || DEFAULT_THREAD_WIDTH,
-    );
+    const saved = Number(localStorage.getItem('chatThreadWidth') || DEFAULT_THREAD_WIDTH);
     const w = isNaN(saved) ? DEFAULT_THREAD_WIDTH : saved;
     return Math.min(Math.max(w, THREAD_MIN_WIDTH), THREAD_MAX_WIDTH);
   });
@@ -160,12 +151,12 @@ const ChatPageContent: React.FC = () => {
   function onMouseUpThreadResizer() {
     if (!isResizingRef.current) return;
     isResizingRef.current = false;
-    document.body.style.cursor = "";
-    document.body.style.userSelect = "";
-    window.removeEventListener("mousemove", onMouseMoveThreadResizer);
-    window.removeEventListener("mouseup", onMouseUpThreadResizer);
+    document.body.style.cursor = '';
+    document.body.style.userSelect = '';
+    window.removeEventListener('mousemove', onMouseMoveThreadResizer);
+    window.removeEventListener('mouseup', onMouseUpThreadResizer);
     try {
-      localStorage.setItem("chatThreadWidth", String(latestWidthRef.current));
+      localStorage.setItem('chatThreadWidth', String(latestWidthRef.current));
     } catch {}
   }
 
@@ -173,10 +164,10 @@ const ChatPageContent: React.FC = () => {
     isResizingRef.current = true;
     startXRef.current = e.clientX;
     startWidthRef.current = threadWidth;
-    document.body.style.cursor = "col-resize";
-    document.body.style.userSelect = "none";
-    window.addEventListener("mousemove", onMouseMoveThreadResizer);
-    window.addEventListener("mouseup", onMouseUpThreadResizer);
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+    window.addEventListener('mousemove', onMouseMoveThreadResizer);
+    window.addEventListener('mouseup', onMouseUpThreadResizer);
   };
 
   // 로딩 상태 확인 - 초기 로딩 중이거나 채널이 없으면 스켈레톤 표시
@@ -196,28 +187,28 @@ const ChatPageContent: React.FC = () => {
   const [isThreadOpen, setIsThreadOpen] = useState(false);
 
   // 스레드 뷰 모드 결정 (큰 화면: 사이드바이사이드, 작은 화면: 스택)
-  const threadViewMode = isMediumScreen ? "sidebar" : "stack";
-  const [userStatus, setUserStatus] = useState<UserStatus>("online");
-  const [statusMessage, setStatusMessage] = useState("");
+  const threadViewMode = isMediumScreen ? 'sidebar' : 'stack';
+  const [userStatus, setUserStatus] = useState<UserStatus>('online');
+  const [statusMessage, setStatusMessage] = useState('');
 
   // Track window focus for notifications
   useEffect(() => {
     const handleFocus = () => setIsWindowFocused(true);
     const handleBlur = () => setIsWindowFocused(false);
 
-    window.addEventListener("focus", handleFocus);
-    window.addEventListener("blur", handleBlur);
+    window.addEventListener('focus', handleFocus);
+    window.addEventListener('blur', handleBlur);
 
     return () => {
-      window.removeEventListener("focus", handleFocus);
-      window.removeEventListener("blur", handleBlur);
+      window.removeEventListener('focus', handleFocus);
+      window.removeEventListener('blur', handleBlur);
     };
   }, []);
 
   // Prevent page-level vertical scroll on Chat page; scroll is managed inside the chat layout
   useEffect(() => {
     const prevOverflowY = document.body.style.overflowY;
-    document.body.style.overflowY = "hidden";
+    document.body.style.overflowY = 'hidden';
     return () => {
       document.body.style.overflowY = prevOverflowY;
     };
@@ -234,8 +225,8 @@ const ChatPageContent: React.FC = () => {
 
     // Translate error message if it's a known error key we standardize
     let errorMessage = state.error;
-    if (state.error === "Failed to load channels") {
-      errorMessage = t("chat.loadChannelsFailed");
+    if (state.error === 'Failed to load channels') {
+      errorMessage = t('chat.loadChannelsFailed');
     }
 
     const now = Date.now();
@@ -247,15 +238,13 @@ const ChatPageContent: React.FC = () => {
     }
     lastErrorRef.current = { msg: errorMessage, ts: now };
 
-    enqueueSnackbar(errorMessage, { variant: "error" });
+    enqueueSnackbar(errorMessage, { variant: 'error' });
     actions.clearError();
   }, [state.error, t, enqueueSnackbar, actions]);
 
   // Auto-join channel when selected
   const [joinedChannels, setJoinedChannels] = useState<Set<number>>(new Set());
-  const [joiningChannels, setJoiningChannels] = useState<Set<number>>(
-    new Set(),
-  );
+  const [joiningChannels, setJoiningChannels] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     if (
@@ -267,14 +256,12 @@ const ChatPageContent: React.FC = () => {
     ) {
       // WebSocket 연결된 상태에서만 join 시도
 
-      console.log("Joining channel:", state.currentChannelId);
+      console.log('Joining channel:', state.currentChannelId);
       setJoiningChannels((prev) => new Set(prev).add(state.currentChannelId!));
 
       joinChannel(state.currentChannelId)
         .then(() => {
-          setJoinedChannels((prev) =>
-            new Set(prev).add(state.currentChannelId!),
-          );
+          setJoinedChannels((prev) => new Set(prev).add(state.currentChannelId!));
           setJoiningChannels((prev) => {
             const newSet = new Set(prev);
 
@@ -283,7 +270,7 @@ const ChatPageContent: React.FC = () => {
           });
         })
         .catch((error) => {
-          console.error("Failed to join channel:", error);
+          console.error('Failed to join channel:', error);
           setJoiningChannels((prev) => {
             const newSet = new Set(prev);
             newSet.delete(state.currentChannelId!);
@@ -291,13 +278,7 @@ const ChatPageContent: React.FC = () => {
           });
         });
     }
-  }, [
-    state.currentChannelId,
-    joinChannel,
-    joinedChannels,
-    joiningChannels,
-    state.isConnected,
-  ]);
+  }, [state.currentChannelId, joinChannel, joinedChannels, joiningChannels, state.isConnected]);
 
   // 연결이 끊어졌을 때 join 상태 초기화
   useEffect(() => {
@@ -309,7 +290,7 @@ const ChatPageContent: React.FC = () => {
 
   // localStorage에 사이드바 상태 저장
   useEffect(() => {
-    localStorage.setItem("chatSidebarOpen", JSON.stringify(isSidebarOpen));
+    localStorage.setItem('chatSidebarOpen', JSON.stringify(isSidebarOpen));
   }, [isSidebarOpen]);
 
   const toggleSidebar = () => {
@@ -319,18 +300,18 @@ const ChatPageContent: React.FC = () => {
   const handleCreateChannel = async () => {
     try {
       if (!channelFormData.name.trim()) {
-        enqueueSnackbar(t("chat.channelNameRequired"), { variant: "error" });
+        enqueueSnackbar(t('chat.channelNameRequired'), { variant: 'error' });
         return;
       }
 
       setIsCreatingChannel(true);
-      console.log("🚀 Creating channel:", channelFormData);
+      console.log('🚀 Creating channel:', channelFormData);
       const startTime = Date.now();
 
       const channel = await actions.createChannel(channelFormData);
 
       const duration = Date.now() - startTime;
-      console.log("✅ Channel created successfully:", {
+      console.log('✅ Channel created successfully:', {
         channel,
         duration: `${duration}ms`,
       });
@@ -339,12 +320,12 @@ const ChatPageContent: React.FC = () => {
       actions.setCurrentChannel(channel.id);
 
       setCreateChannelOpen(false);
-      setChannelFormData({ name: "", description: "", type: "public" });
-      enqueueSnackbar(t("chat.channelCreated"), { variant: "success" });
+      setChannelFormData({ name: '', description: '', type: 'public' });
+      enqueueSnackbar(t('chat.channelCreated'), { variant: 'success' });
     } catch (error: any) {
-      console.error("❌ Channel creation failed:", error);
-      enqueueSnackbar(error.message || t("chat.createChannelFailed"), {
-        variant: "error",
+      console.error('❌ Channel creation failed:', error);
+      enqueueSnackbar(error.message || t('chat.createChannelFailed'), {
+        variant: 'error',
       });
     } finally {
       setIsCreatingChannel(false);
@@ -403,7 +384,7 @@ const ChatPageContent: React.FC = () => {
       const messageData: SendMessageRequest = {
         content: message,
         channelId: state.currentChannelId,
-        type: attachments && attachments.length > 0 ? "file" : "text",
+        type: attachments && attachments.length > 0 ? 'file' : 'text',
         attachments,
       };
 
@@ -414,21 +395,19 @@ const ChatPageContent: React.FC = () => {
     }
   };
 
-  const currentChannel = state.channels.find(
-    (c) => c.id === state.currentChannelId,
-  );
+  const currentChannel = state.channels.find((c) => c.id === state.currentChannelId);
 
   // 사용자 초대 핸들러
   const handleInviteUser = async (userId: number) => {
     if (!state.currentChannelId) {
-      throw new Error("No channel selected");
+      throw new Error('No channel selected');
     }
 
     try {
       await actions.inviteUser(state.currentChannelId, userId);
-      console.log("✅ Invitation sent successfully");
+      console.log('✅ Invitation sent successfully');
     } catch (error: any) {
-      console.error("❌ Failed to invite user:", error);
+      console.error('❌ Failed to invite user:', error);
       throw error;
     }
   };
@@ -441,14 +420,14 @@ const ChatPageContent: React.FC = () => {
       if (wsService.isConnected()) {
         wsService.updateStatus(status, message);
         setUserStatus(status);
-        setStatusMessage(message || "");
-        enqueueSnackbar(t("chat.statusUpdated"), { variant: "success" });
+        setStatusMessage(message || '');
+        enqueueSnackbar(t('chat.statusUpdated'), { variant: 'success' });
       } else {
-        throw new Error("WebSocket not connected");
+        throw new Error('WebSocket not connected');
       }
     } catch (error) {
-      console.error("Failed to update status:", error);
-      enqueueSnackbar(t("chat.statusUpdateFailed"), { variant: "error" });
+      console.error('Failed to update status:', error);
+      enqueueSnackbar(t('chat.statusUpdateFailed'), { variant: 'error' });
     }
   };
 
@@ -472,16 +451,16 @@ const ChatPageContent: React.FC = () => {
 
   const getStatusColor = (status: UserStatus) => {
     switch (status) {
-      case "online":
-        return "success.main";
-      case "away":
-        return "warning.main";
-      case "busy":
-        return "error.main";
-      case "invisible":
-        return "text.disabled";
+      case 'online':
+        return 'success.main';
+      case 'away':
+        return 'warning.main';
+      case 'busy':
+        return 'error.main';
+      case 'invisible':
+        return 'text.disabled';
       default:
-        return "success.main";
+        return 'success.main';
     }
   };
 
@@ -493,10 +472,10 @@ const ChatPageContent: React.FC = () => {
   return (
     <Box
       sx={{
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
-        overflow: "hidden",
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden',
         px: 3,
         py: 3,
       }}
@@ -508,30 +487,28 @@ const ChatPageContent: React.FC = () => {
     >
       {/* Header */}
       <Box sx={{ mb: 3, flexShrink: 0 }}>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 1 }}>
-          <ChatIcon sx={{ fontSize: 32, color: "primary.main" }} />
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
+          <ChatIcon sx={{ fontSize: 32, color: 'primary.main' }} />
           <Typography variant="h4" sx={{ fontWeight: 600, flex: 1 }}>
-            {t("chat.title")}
+            {t('chat.title')}
           </Typography>
           {/* 웹소켓 연결 상태 */}
           <Tooltip
-            title={
-              state.isConnected ? t("chat.connected") : t("chat.disconnected")
-            }
+            title={state.isConnected ? t('chat.connected') : t('chat.disconnected')}
             placement="bottom"
           >
-            <Box sx={{ display: "flex", alignItems: "center" }}>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
               {state.isConnected ? (
                 <ConnectedIcon
                   sx={{
-                    color: "success.main",
+                    color: 'success.main',
                     fontSize: 28,
                   }}
                 />
               ) : (
                 <DisconnectedIcon
                   sx={{
-                    color: "error.main",
+                    color: 'error.main',
                     fontSize: 28,
                   }}
                 />
@@ -540,7 +517,7 @@ const ChatPageContent: React.FC = () => {
           </Tooltip>
         </Box>
         <Typography variant="body1" color="text.secondary">
-          {t("chat.subtitle")}
+          {t('chat.subtitle')}
         </Typography>
       </Box>
 
@@ -548,9 +525,9 @@ const ChatPageContent: React.FC = () => {
       <Paper
         sx={{
           flex: 1,
-          display: "flex",
+          display: 'flex',
           minHeight: 0, // 중요: flex 아이템이 축소될 수 있도록 함
-          overflow: "hidden",
+          overflow: 'hidden',
         }}
       >
         {/* Channel List Sidebar */}
@@ -558,12 +535,12 @@ const ChatPageContent: React.FC = () => {
           sx={{
             width: isSidebarOpen ? 300 : 48, // 닫힌 상태에서도 버튼 공간 확보
             borderRight: 1,
-            borderColor: "divider",
-            height: "100%",
-            overflow: "hidden",
-            transition: "width 0.3s ease-in-out",
-            display: "flex",
-            flexDirection: "column",
+            borderColor: 'divider',
+            height: '100%',
+            overflow: 'hidden',
+            transition: 'width 0.3s ease-in-out',
+            display: 'flex',
+            flexDirection: 'column',
           }}
         >
           {/* 토글 버튼 */}
@@ -571,17 +548,17 @@ const ChatPageContent: React.FC = () => {
             sx={{
               p: 1,
               borderBottom: isSidebarOpen ? 1 : 0,
-              borderColor: "divider",
-              display: "flex",
-              justifyContent: isSidebarOpen ? "flex-end" : "center",
+              borderColor: 'divider',
+              display: 'flex',
+              justifyContent: isSidebarOpen ? 'flex-end' : 'center',
             }}
           >
             <IconButton
               onClick={toggleSidebar}
               size="small"
               sx={{
-                "&:hover": {
-                  backgroundColor: "action.hover",
+                '&:hover': {
+                  backgroundColor: 'action.hover',
                 },
               }}
             >
@@ -592,47 +569,42 @@ const ChatPageContent: React.FC = () => {
           {/* 채널 목록 */}
           {isSidebarOpen && (
             <>
-              <Box sx={{ flex: 1, overflow: "hidden" }}>
-                <ChannelList
-                  onCreateChannel={() => setCreateChannelOpen(true)}
-                />
+              <Box sx={{ flex: 1, overflow: 'hidden' }}>
+                <ChannelList onCreateChannel={() => setCreateChannelOpen(true)} />
               </Box>
 
               {/* 하단 기능 버튼들 */}
-              <Box sx={{ p: 1, borderTop: 1, borderColor: "divider" }}>
-                <Box sx={{ display: "flex", justifyContent: "center", gap: 1 }}>
+              <Box sx={{ p: 1, borderTop: 1, borderColor: 'divider' }}>
+                <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1 }}>
                   {/* 내 상태 설정 버튼 */}
-                  <Tooltip title={t("chat.setStatus")} placement="top">
+                  <Tooltip title={t('chat.setStatus')} placement="top">
                     <IconButton
                       size="small"
                       onClick={() => setStatusPickerOpen(true)}
                       sx={{
                         border: 1,
-                        borderColor: "divider",
-                        "&:hover": {
-                          borderColor: "primary.main",
-                          backgroundColor: "primary.50",
+                        borderColor: 'divider',
+                        '&:hover': {
+                          borderColor: 'primary.main',
+                          backgroundColor: 'primary.50',
                         },
                       }}
                     >
-                      <StatusIcon
-                        fontSize="small"
-                        sx={{ color: getStatusColor(userStatus) }}
-                      />
+                      <StatusIcon fontSize="small" sx={{ color: getStatusColor(userStatus) }} />
                     </IconButton>
                   </Tooltip>
 
                   {/* 초대 관리 버튼 */}
-                  <Tooltip title={t("chat.manageInvitations")} placement="top">
+                  <Tooltip title={t('chat.manageInvitations')} placement="top">
                     <IconButton
                       size="small"
                       onClick={() => setInvitationManagerOpen(true)}
                       sx={{
                         border: 1,
-                        borderColor: "divider",
-                        "&:hover": {
-                          borderColor: "primary.main",
-                          backgroundColor: "primary.50",
+                        borderColor: 'divider',
+                        '&:hover': {
+                          borderColor: 'primary.main',
+                          backgroundColor: 'primary.50',
                         },
                       }}
                     >
@@ -648,16 +620,16 @@ const ChatPageContent: React.FC = () => {
                   </Tooltip>
 
                   {/* 프라이버시 설정 버튼 */}
-                  <Tooltip title={t("chat.privacySettings")} placement="top">
+                  <Tooltip title={t('chat.privacySettings')} placement="top">
                     <IconButton
                       size="small"
                       onClick={() => setPrivacySettingsOpen(true)}
                       sx={{
                         border: 1,
-                        borderColor: "divider",
-                        "&:hover": {
-                          borderColor: "primary.main",
-                          backgroundColor: "primary.50",
+                        borderColor: 'divider',
+                        '&:hover': {
+                          borderColor: 'primary.main',
+                          backgroundColor: 'primary.50',
                         },
                       }}
                     >
@@ -674,19 +646,18 @@ const ChatPageContent: React.FC = () => {
         <Box
           sx={{
             flex: 1,
-            height: "100%",
-            display: "flex",
-            position: "relative",
+            height: '100%',
+            display: 'flex',
+            position: 'relative',
           }}
         >
           {/* Main Chat - 스택 모드에서 스레드가 열리면 숨김 */}
           <Box
             sx={{
               flex: 1,
-              height: "100%",
-              display:
-                threadViewMode === "stack" && isThreadOpen ? "none" : "flex",
-              flexDirection: "column",
+              height: '100%',
+              display: threadViewMode === 'stack' && isThreadOpen ? 'none' : 'flex',
+              flexDirection: 'column',
             }}
           >
             {state.currentChannelId ? (
@@ -700,31 +671,31 @@ const ChatPageContent: React.FC = () => {
             ) : (
               <Box
                 sx={{
-                  height: "100%",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  flexDirection: "column",
+                  height: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexDirection: 'column',
                   gap: 2,
                 }}
               >
-                <ChatIcon sx={{ fontSize: 64, color: "text.secondary" }} />
+                <ChatIcon sx={{ fontSize: 64, color: 'text.secondary' }} />
                 <Typography variant="h6" color="text.secondary">
-                  {t("chat.selectChannelToStart")}
+                  {t('chat.selectChannelToStart')}
                 </Typography>
                 <Button
                   variant="contained"
                   startIcon={<AddIcon />}
                   onClick={() => setCreateChannelOpen(true)}
                 >
-                  {t("chat.createFirstChannel")}
+                  {t('chat.createFirstChannel')}
                 </Button>
               </Box>
             )}
           </Box>
 
           {/* Thread Panel - 사이드바 모드 (리사이즈 가능) */}
-          {threadViewMode === "sidebar" && isThreadOpen && threadMessage && (
+          {threadViewMode === 'sidebar' && isThreadOpen && threadMessage && (
             <>
               {/* Resizer */}
               <Box
@@ -732,29 +703,26 @@ const ChatPageContent: React.FC = () => {
                 onDoubleClick={() => {
                   setThreadWidth(DEFAULT_THREAD_WIDTH);
                   try {
-                    localStorage.setItem(
-                      "chatThreadWidth",
-                      String(DEFAULT_THREAD_WIDTH),
-                    );
+                    localStorage.setItem('chatThreadWidth', String(DEFAULT_THREAD_WIDTH));
                   } catch {}
                 }}
                 sx={{
                   width: 8,
-                  cursor: "col-resize",
-                  height: "100%",
-                  position: "relative",
-                  backgroundColor: "transparent",
-                  "&:before": {
+                  cursor: 'col-resize',
+                  height: '100%',
+                  position: 'relative',
+                  backgroundColor: 'transparent',
+                  '&:before': {
                     content: '""',
-                    position: "absolute",
-                    left: "50%",
+                    position: 'absolute',
+                    left: '50%',
                     top: 0,
                     bottom: 0,
-                    transform: "translateX(-0.5px)",
-                    width: "1px",
-                    backgroundColor: "divider",
+                    transform: 'translateX(-0.5px)',
+                    width: '1px',
+                    backgroundColor: 'divider',
                   },
-                  "&:hover": { backgroundColor: "action.hover" },
+                  '&:hover': { backgroundColor: 'action.hover' },
                 }}
               />
               {/* Thread Panel */}
@@ -763,56 +731,48 @@ const ChatPageContent: React.FC = () => {
                   width: threadWidth,
                   minWidth: THREAD_MIN_WIDTH,
                   maxWidth: THREAD_MAX_WIDTH,
-                  height: "100%",
+                  height: '100%',
                 }}
               >
-                <ThreadView
-                  originalMessage={threadMessage}
-                  onClose={handleCloseThread}
-                />
+                <ThreadView originalMessage={threadMessage} onClose={handleCloseThread} />
               </Box>
             </>
           )}
 
           {/* Thread Panel - 스택 모드 (전체 화면 오버레이) */}
-          {threadViewMode === "stack" && isThreadOpen && threadMessage && (
-            <Slide
-              direction="left"
-              in={isThreadOpen}
-              mountOnEnter
-              unmountOnExit
-            >
+          {threadViewMode === 'stack' && isThreadOpen && threadMessage && (
+            <Slide direction="left" in={isThreadOpen} mountOnEnter unmountOnExit>
               <Box
                 sx={{
-                  position: "absolute",
+                  position: 'absolute',
                   top: 0,
                   left: 0,
                   right: 0,
                   bottom: 0,
                   zIndex: 10,
-                  backgroundColor: "background.paper",
+                  backgroundColor: 'background.paper',
                 }}
               >
                 {/* 뒤로가기 헤더 */}
                 <Box
                   sx={{
-                    display: "flex",
-                    alignItems: "center",
+                    display: 'flex',
+                    alignItems: 'center',
                     p: 2,
                     borderBottom: `1px solid ${theme.palette.divider}`,
-                    backgroundColor: "background.paper",
+                    backgroundColor: 'background.paper',
                   }}
                 >
                   <IconButton onClick={handleCloseThread} sx={{ mr: 1 }}>
                     <ArrowBackIcon />
                   </IconButton>
-                  <Typography variant="h6" sx={{ fontSize: "1rem" }}>
-                    {t("chat.thread")}
+                  <Typography variant="h6" sx={{ fontSize: '1rem' }}>
+                    {t('chat.thread')}
                   </Typography>
                 </Box>
 
                 {/* 스레드 컨텐츠 */}
-                <Box sx={{ height: "calc(100% - 73px)" }}>
+                <Box sx={{ height: 'calc(100% - 73px)' }}>
                   <ThreadView
                     originalMessage={threadMessage}
                     onClose={handleCloseThread}
@@ -833,45 +793,32 @@ const ChatPageContent: React.FC = () => {
         fullWidth
       >
         <DialogTitle>
-          <Box
-            display="flex"
-            alignItems="center"
-            justifyContent="space-between"
-          >
+          <Box display="flex" alignItems="center" justifyContent="space-between">
             <Box>
-              <Typography variant="h6">{t("chat.createChannel")}</Typography>
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                sx={{ mt: 0.5 }}
-              >
-                {t("chat.createChannelSubtitle")}
+              <Typography variant="h6">{t('chat.createChannel')}</Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                {t('chat.createChannelSubtitle')}
               </Typography>
             </Box>
-            <IconButton
-              onClick={() => setCreateChannelOpen(false)}
-              size="small"
-            >
+            <IconButton onClick={() => setCreateChannelOpen(false)} size="small">
               <CloseIcon />
             </IconButton>
           </Box>
         </DialogTitle>
         <DialogContent>
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
             <TextField
-              label={t("chat.channelName")}
+              label={t('chat.channelName')}
               value={channelFormData.name}
-              onChange={(e) =>
-                setChannelFormData({ ...channelFormData, name: e.target.value })
-              }
+              onChange={(e) => setChannelFormData({ ...channelFormData, name: e.target.value })}
               fullWidth
               required
               autoFocus
-              placeholder={t("chat.channelNamePlaceholder")}
+              placeholder={t('chat.channelNamePlaceholder')}
             />
 
             <TextField
-              label={t("chat.channelDescription")}
+              label={t('chat.channelDescription')}
               value={channelFormData.description}
               onChange={(e) =>
                 setChannelFormData({
@@ -882,17 +829,17 @@ const ChatPageContent: React.FC = () => {
               fullWidth
               multiline
               rows={2}
-              placeholder={t("chat.channelDescriptionPlaceholder")}
+              placeholder={t('chat.channelDescriptionPlaceholder')}
             />
 
             <FormControl component="fieldset">
-              <FormLabel component="legend">{t("chat.channelType")}</FormLabel>
+              <FormLabel component="legend">{t('chat.channelType')}</FormLabel>
               <RadioGroup
                 value={channelFormData.type}
                 onChange={(e) =>
                   setChannelFormData({
                     ...channelFormData,
-                    type: e.target.value as "public" | "private",
+                    type: e.target.value as 'public' | 'private',
                   })
                 }
               >
@@ -902,10 +849,10 @@ const ChatPageContent: React.FC = () => {
                   label={
                     <Box>
                       <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                        {t("chat.publicChannel")}
+                        {t('chat.publicChannel')}
                       </Typography>
                       <Typography variant="caption" color="text.secondary">
-                        {t("chat.publicChannelDesc")}
+                        {t('chat.publicChannelDesc')}
                       </Typography>
                     </Box>
                   }
@@ -916,10 +863,10 @@ const ChatPageContent: React.FC = () => {
                   label={
                     <Box>
                       <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                        {t("chat.privateChannel")}
+                        {t('chat.privateChannel')}
                       </Typography>
                       <Typography variant="caption" color="text.secondary">
-                        {t("chat.privateChannelDesc")}
+                        {t('chat.privateChannelDesc')}
                       </Typography>
                     </Box>
                   }
@@ -933,12 +880,10 @@ const ChatPageContent: React.FC = () => {
             onClick={handleCreateChannel}
             variant="contained"
             disabled={!channelFormData.name.trim() || isCreatingChannel}
-            startIcon={
-              isCreatingChannel ? <CircularProgress size={20} /> : undefined
-            }
+            startIcon={isCreatingChannel ? <CircularProgress size={20} /> : undefined}
             fullWidth
           >
-            {isCreatingChannel ? t("chat.creating") : t("chat.createChannel")}
+            {isCreatingChannel ? t('chat.creating') : t('chat.createChannel')}
           </Button>
         </DialogActions>
       </Dialog>
@@ -955,12 +900,12 @@ const ChatPageContent: React.FC = () => {
         <Box
           sx={{
             p: 2,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
           }}
         >
-          <Typography variant="h6">{t("chat.memberList")}</Typography>
+          <Typography variant="h6">{t('chat.memberList')}</Typography>
           <IconButton onClick={() => setMemberListOpen(false)}>
             <CloseIcon />
           </IconButton>
@@ -971,12 +916,7 @@ const ChatPageContent: React.FC = () => {
           <List>
             {selectedChannel.members?.map((user) => (
               <ListItem key={user.id}>
-                <UserPresence
-                  user={user}
-                  variant="list"
-                  showStatus={true}
-                  showLastSeen={true}
-                />
+                <UserPresence user={user} variant="list" showStatus={true} showLastSeen={true} />
               </ListItem>
             ))}
           </List>
@@ -995,10 +935,10 @@ const ChatPageContent: React.FC = () => {
         open={userSearchOpen}
         onClose={() => setUserSearchOpen(false)}
         onInviteUser={handleInviteUser}
-        title={t("chat.inviteUsersToChannel")}
+        title={t('chat.inviteUsersToChannel')}
         subtitle={
           currentChannel
-            ? t("chat.inviteUsersToChannelSubtitle", {
+            ? t('chat.inviteUsersToChannelSubtitle', {
                 channelName: currentChannel.name,
               })
             : undefined
@@ -1010,13 +950,13 @@ const ChatPageContent: React.FC = () => {
       <InvitationManager
         open={invitationManagerOpen}
         onClose={() => setInvitationManagerOpen(false)}
-        title={t("chat.manageInvitations")}
-        subtitle={t("chat.manageInvitationsSubtitle")}
+        title={t('chat.manageInvitations')}
+        subtitle={t('chat.manageInvitationsSubtitle')}
         onInvitationAccepted={async (channelId) => {
           // 초대 수락 후 채널 목록 새로고침 후 해당 채널로 이동
           console.log(
-            "🎉 Invitation accepted, refreshing channels and switching to channel:",
-            channelId,
+            '🎉 Invitation accepted, refreshing channels and switching to channel:',
+            channelId
           );
 
           try {
@@ -1029,15 +969,9 @@ const ChatPageContent: React.FC = () => {
             // 초대 관리 창 닫기
             setInvitationManagerOpen(false);
 
-            console.log(
-              "✅ Successfully switched to accepted channel:",
-              channelId,
-            );
+            console.log('✅ Successfully switched to accepted channel:', channelId);
           } catch (error) {
-            console.error(
-              "❌ Failed to refresh channels after invitation acceptance:",
-              error,
-            );
+            console.error('❌ Failed to refresh channels after invitation acceptance:', error);
             // 실패해도 채널 전환은 시도
             actions.setCurrentChannel(channelId);
             setInvitationManagerOpen(false);
@@ -1048,8 +982,8 @@ const ChatPageContent: React.FC = () => {
       <PrivacySettings
         open={privacySettingsOpen}
         onClose={() => setPrivacySettingsOpen(false)}
-        title={t("chat.privacySettings")}
-        subtitle={t("chat.privacySettingsSubtitle")}
+        title={t('chat.privacySettings')}
+        subtitle={t('chat.privacySettingsSubtitle')}
       />
 
       <UserStatusPicker
@@ -1058,8 +992,8 @@ const ChatPageContent: React.FC = () => {
         currentStatus={userStatus}
         currentMessage={statusMessage}
         onStatusChange={handleStatusChange}
-        title={t("chat.setStatus")}
-        subtitle={t("chat.setStatusSubtitle")}
+        title={t('chat.setStatus')}
+        subtitle={t('chat.setStatusSubtitle')}
       />
     </Box>
   );

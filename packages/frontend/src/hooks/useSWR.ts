@@ -1,11 +1,11 @@
-import useSWR, { SWRConfiguration, SWRResponse, mutate } from "swr";
-import { apiService } from "@/services/api";
+import useSWR, { SWRConfiguration, SWRResponse, mutate } from 'swr';
+import { apiService } from '@/services/api';
 
 // Default fetcher function
 const defaultFetcher = async (url: string) => {
   const response = await apiService.get(url);
   if (!response.success) {
-    throw new Error(response.error?.message || "API request failed");
+    throw new Error(response.error?.message || 'API request failed');
   }
   return response.data;
 };
@@ -13,14 +13,14 @@ const defaultFetcher = async (url: string) => {
 // Custom hook for API requests with SWR
 export function useApi<T = any>(
   url: string | null,
-  config?: SWRConfiguration,
+  config?: SWRConfiguration
 ): SWRResponse<T, Error> {
   return useSWR(url, defaultFetcher, {
     revalidateOnFocus: false,
     revalidateOnReconnect: true,
     shouldRetryOnError: (error: Error) => {
       // Don't retry on 4xx errors
-      return !error?.message?.includes("4");
+      return !error?.message?.includes('4');
     },
     ...config,
   });
@@ -32,19 +32,19 @@ export function usePaginatedApi<T = any>(
   page: number = 1,
   limit: number = 10,
   filters?: Record<string, any>,
-  config?: SWRConfiguration,
+  config?: SWRConfiguration
 ) {
   const params = new URLSearchParams();
-  params.append("page", page.toString());
-  params.append("limit", limit.toString());
+  params.append('page', page.toString());
+  params.append('limit', limit.toString());
 
   if (filters) {
     Object.entries(filters).forEach(([key, value]) => {
-      if (value !== undefined && value !== null && value !== "") {
+      if (value !== undefined && value !== null && value !== '') {
         if (Array.isArray(value)) {
           // Handle array values (e.g., multiple filters)
           value.forEach((v) => {
-            if (v !== undefined && v !== null && v !== "") {
+            if (v !== undefined && v !== null && v !== '') {
               params.append(key, v.toString());
             }
           });
@@ -69,14 +69,14 @@ export function useUsers(
     status?: string;
     search?: string;
   },
-  config?: SWRConfiguration,
+  config?: SWRConfiguration
 ) {
-  return usePaginatedApi("/admin/users", page, limit, filters, config);
+  return usePaginatedApi('/admin/users', page, limit, filters, config);
 }
 
 // Hook for current user profile
 export function useProfile(config?: SWRConfiguration) {
-  return useApi<{ user: any }>("/auth/profile", config);
+  return useApi<{ user: any }>('/auth/profile', config);
 }
 
 // Hook for user statistics
@@ -86,12 +86,12 @@ export function useUserStats(config?: SWRConfiguration) {
     activeUsers: number;
     pendingUsers: number;
     adminUsers: number;
-  }>("/admin/stats/users", config);
+  }>('/admin/stats/users', config);
 }
 
 // Hook for pending users
 export function usePendingUsers(config?: SWRConfiguration) {
-  return useApi<{ users: any[] }>("/admin/pending-users", config);
+  return useApi<{ users: any[] }>('/admin/pending-users', config);
 }
 
 // Hook for audit logs
@@ -99,22 +99,22 @@ export function useAuditLogs(
   page: number = 1,
   limit: number = 10,
   sortBy?: string,
-  sortOrder?: "ASC" | "DESC",
+  sortOrder?: 'ASC' | 'DESC',
   filters?: Record<string, any>,
-  config?: SWRConfiguration,
+  config?: SWRConfiguration
 ) {
   const params = new URLSearchParams();
-  params.append("page", page.toString());
-  params.append("limit", limit.toString());
-  if (sortBy) params.append("sortBy", sortBy);
-  if (sortOrder) params.append("sortOrder", sortOrder);
+  params.append('page', page.toString());
+  params.append('limit', limit.toString());
+  if (sortBy) params.append('sortBy', sortBy);
+  if (sortOrder) params.append('sortOrder', sortOrder);
 
   if (filters) {
     Object.entries(filters).forEach(([key, value]) => {
-      if (value !== undefined && value !== null && value !== "") {
+      if (value !== undefined && value !== null && value !== '') {
         if (Array.isArray(value)) {
           value.forEach((v) => {
-            if (v !== undefined && v !== null && v !== "") {
+            if (v !== undefined && v !== null && v !== '') {
               params.append(key, v.toString());
             }
           });
@@ -126,10 +126,7 @@ export function useAuditLogs(
   }
 
   const url = `/admin/audit-logs?${params.toString()}`;
-  return useApi<{ logs: any[]; total: number; page: number; limit: number }>(
-    url,
-    config,
-  );
+  return useApi<{ logs: any[]; total: number; page: number; limit: number }>(url, config);
 }
 
 // Mutation hooks for common operations
@@ -137,9 +134,9 @@ export function useUserMutations() {
   const mutateUsers = () => {
     // Mutate all user-related cache keys
     return Promise.all([
-      mutate("/admin/users"),
-      mutate("/admin/stats/users"),
-      mutate("/admin/pending-users"),
+      mutate('/admin/users'),
+      mutate('/admin/stats/users'),
+      mutate('/admin/pending-users'),
     ]);
   };
 
@@ -149,10 +146,7 @@ export function useUserMutations() {
 }
 
 // Helper to create optimistic updates
-export function createOptimisticUpdate<T>(
-  key: string,
-  updateFn: (data: T) => T,
-) {
+export function createOptimisticUpdate<T>(key: string, updateFn: (data: T) => T) {
   return async (asyncFn: () => Promise<any>) => {
     // Get current data from cache (simplified approach)
     const { data: currentData } = useSWR(key, null, {
@@ -185,7 +179,7 @@ export function createOptimisticUpdate<T>(
 // Hook for infinite loading (useful for large lists)
 export function useInfiniteApi<T = any>(
   getKey: (pageIndex: number, previousPageData: T | null) => string | null,
-  config?: SWRConfiguration,
+  config?: SWRConfiguration
 ) {
   return useSWR(getKey, defaultFetcher, config);
 }
@@ -194,7 +188,7 @@ export function useInfiniteApi<T = any>(
 export function useRealTimeApi<T = any>(
   url: string | null,
   interval: number = 5000,
-  config?: SWRConfiguration,
+  config?: SWRConfiguration
 ) {
   return useApi<T>(url, {
     refreshInterval: interval,
@@ -206,14 +200,14 @@ export function useRealTimeApi<T = any>(
 export function useConditionalApi<T = any>(
   url: string | null,
   condition: boolean,
-  config?: SWRConfiguration,
+  config?: SWRConfiguration
 ) {
   return useApi<T>(condition ? url : null, config);
 }
 
 // Hook for tags
 export function useTags(config?: SWRConfiguration) {
-  const { data, ...rest } = useApi<{ tags: any[] }>("/admin/tags", config);
+  const { data, ...rest } = useApi<{ tags: any[] }>('/admin/tags', config);
   return {
     data: data?.tags,
     ...rest,
@@ -225,22 +219,22 @@ export function useClientVersions(
   page: number = 1,
   limit: number = 10,
   sortBy?: string,
-  sortOrder?: "ASC" | "DESC",
+  sortOrder?: 'ASC' | 'DESC',
   filters?: Record<string, any>,
-  config?: SWRConfiguration,
+  config?: SWRConfiguration
 ) {
   const params = new URLSearchParams();
-  params.append("page", page.toString());
-  params.append("limit", limit.toString());
-  if (sortBy) params.append("sortBy", sortBy);
-  if (sortOrder) params.append("sortOrder", sortOrder);
+  params.append('page', page.toString());
+  params.append('limit', limit.toString());
+  if (sortBy) params.append('sortBy', sortBy);
+  if (sortOrder) params.append('sortOrder', sortOrder);
 
   if (filters) {
     Object.entries(filters).forEach(([key, value]) => {
-      if (value !== undefined && value !== null && value !== "") {
+      if (value !== undefined && value !== null && value !== '') {
         if (Array.isArray(value)) {
           value.forEach((v) => {
-            if (v !== undefined && v !== null && v !== "") {
+            if (v !== undefined && v !== null && v !== '') {
               params.append(key, v.toString());
             }
           });
@@ -262,12 +256,12 @@ export function useClientVersions(
 
 // Hook for available client versions
 export function useAvailableVersions(config?: SWRConfiguration) {
-  return useApi<string[]>("/admin/client-versions/meta/versions", config);
+  return useApi<string[]>('/admin/client-versions/meta/versions', config);
 }
 
 // Hook for available platforms
 export function useAvailablePlatforms(config?: SWRConfiguration) {
-  return useApi<string[]>("/admin/client-versions/meta/platforms", config);
+  return useApi<string[]>('/admin/client-versions/meta/platforms', config);
 }
 
 // Hook for message templates
@@ -275,18 +269,18 @@ export function useMessageTemplates(
   page: number = 1,
   limit: number = 10,
   filters?: Record<string, any>,
-  config?: SWRConfiguration,
+  config?: SWRConfiguration
 ) {
   const params = new URLSearchParams();
-  params.append("page", page.toString());
-  params.append("limit", limit.toString());
+  params.append('page', page.toString());
+  params.append('limit', limit.toString());
 
   if (filters) {
     Object.entries(filters).forEach(([key, value]) => {
-      if (value !== undefined && value !== null && value !== "") {
+      if (value !== undefined && value !== null && value !== '') {
         if (Array.isArray(value)) {
           value.forEach((v) => {
-            if (v !== undefined && v !== null && v !== "") {
+            if (v !== undefined && v !== null && v !== '') {
               params.append(key, v.toString());
             }
           });
@@ -308,24 +302,18 @@ export function useMessageTemplates(
 
 // Hook for all users (for filter options)
 export function useAllUsers(config?: SWRConfiguration) {
-  return useApi<any[]>("/admin/users/all", config);
+  return useApi<any[]>('/admin/users/all', config);
 }
 
 // Mutation helper
 export function mutateClientVersions() {
-  return mutate(
-    (key) =>
-      typeof key === "string" && key.startsWith("/admin/client-versions"),
-  );
+  return mutate((key) => typeof key === 'string' && key.startsWith('/admin/client-versions'));
 }
 
 export function mutateMessageTemplates() {
-  return mutate(
-    (key) =>
-      typeof key === "string" && key.startsWith("/admin/message-templates"),
-  );
+  return mutate((key) => typeof key === 'string' && key.startsWith('/admin/message-templates'));
 }
 
 export function mutateTags() {
-  return mutate("/admin/tags");
+  return mutate('/admin/tags');
 }

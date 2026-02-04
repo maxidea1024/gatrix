@@ -349,8 +349,18 @@ router.get(
     const environment = requireEnvironment(req, res);
     if (!environment) return;
 
-    const { search, flagType, flagUsage, isEnabled, isArchived, tags, page, limit, sortBy, sortOrder } =
-      req.query;
+    const {
+      search,
+      flagType,
+      flagUsage,
+      isEnabled,
+      isArchived,
+      tags,
+      page,
+      limit,
+      sortBy,
+      sortOrder,
+    } = req.query;
 
     const result = await featureFlagService.listFlags({
       environment,
@@ -721,9 +731,8 @@ router.post(
     const segmentsMap = new Map(segments.map((s) => [s.segmentName, s]));
 
     // If specific flags are requested, create a Set for faster lookup
-    const flagNamesSet = flagNames && Array.isArray(flagNames) && flagNames.length > 0
-      ? new Set(flagNames)
-      : null;
+    const flagNamesSet =
+      flagNames && Array.isArray(flagNames) && flagNames.length > 0 ? new Set(flagNames) : null;
 
     for (const env of environments) {
       try {
@@ -753,13 +762,16 @@ router.post(
           // Manual override if variant is somehow missing (already handled in evaluateFlagWithDetails now)
           // But kept for safety
           if (!evalResult.variant) {
-            const envSettings = flag.environments?.find(e => e.environment === env);
+            const envSettings = flag.environments?.find((e) => e.environment === env);
             let payload = envSettings?.baselinePayload;
             let payloadSource: 'environment' | 'flag' | undefined;
 
             if (payload !== undefined && payload !== null) {
               payloadSource = 'environment';
-            } else if ((flag as any).baselinePayload !== undefined && (flag as any).baselinePayload !== null) {
+            } else if (
+              (flag as any).baselinePayload !== undefined &&
+              (flag as any).baselinePayload !== null
+            ) {
               payload = (flag as any).baselinePayload;
               payloadSource = 'flag';
             }
@@ -824,11 +836,18 @@ function evaluateFlagWithDetails(
       reason: 'FLAG_DISABLED',
       variant: {
         name: 'disabled',
-        payload: (flag.environments?.find((e: any) => e.environment === environment)?.baselinePayload ?? flag.baselinePayload) ?? null,
+        payload:
+          flag.environments?.find((e: any) => e.environment === environment)?.baselinePayload ??
+          flag.baselinePayload ??
+          null,
         payloadType: flag.variantType || 'string',
-        payloadSource: flag.environments?.find((e: any) => e.environment === environment)?.baselinePayload !== undefined
-          ? 'environment'
-          : flag.baselinePayload !== undefined ? 'flag' : undefined,
+        payloadSource:
+          flag.environments?.find((e: any) => e.environment === environment)?.baselinePayload !==
+          undefined
+            ? 'environment'
+            : flag.baselinePayload !== undefined
+              ? 'flag'
+              : undefined,
       },
       evaluationSteps,
     };
@@ -974,9 +993,7 @@ function evaluateFlagWithDetails(
     // Determine if strategy matched
     const strategyMatched = segmentsPassed && constraintsPassed && rolloutPassed;
     strategyStep.passed = strategyMatched;
-    strategyStep.message = strategyMatched
-      ? 'All conditions met'
-      : 'One or more conditions failed';
+    strategyStep.message = strategyMatched ? 'All conditions met' : 'One or more conditions failed';
     evaluationSteps.push(strategyStep);
 
     if (strategyMatched) {
@@ -1020,11 +1037,18 @@ function evaluateFlagWithDetails(
     evaluationSteps,
     variant: {
       name: 'disabled',
-      payload: (flag.environments?.find((e: any) => e.environment === environment)?.baselinePayload ?? flag.baselinePayload) ?? null,
+      payload:
+        flag.environments?.find((e: any) => e.environment === environment)?.baselinePayload ??
+        flag.baselinePayload ??
+        null,
       payloadType: flag.variantType || 'string',
-      payloadSource: flag.environments?.find((e: any) => e.environment === environment)?.baselinePayload !== undefined
-        ? 'environment'
-        : flag.baselinePayload !== undefined ? 'flag' : undefined,
+      payloadSource:
+        flag.environments?.find((e: any) => e.environment === environment)?.baselinePayload !==
+        undefined
+          ? 'environment'
+          : flag.baselinePayload !== undefined
+            ? 'flag'
+            : undefined,
     },
   };
 }

@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useMemo } from "react";
-import NamingGuide from "../../components/common/NamingGuide";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../hooks/useAuth";
-import { PERMISSIONS } from "../../types/permissions";
+import React, { useState, useEffect, useMemo } from 'react';
+import NamingGuide from '../../components/common/NamingGuide';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth';
+import { PERMISSIONS } from '../../types/permissions';
 import {
   Box,
   Typography,
@@ -40,7 +40,7 @@ import {
   ListItemIcon,
   ListItemText,
   ClickAwayListener,
-} from "@mui/material";
+} from '@mui/material';
 import {
   Add as AddIcon,
   Search as SearchIcon,
@@ -78,31 +78,31 @@ import {
   PlayArrow as PlaygroundIcon,
   SportsEsports as JoystickIcon,
   SwapVert as ImportExportIcon,
-} from "@mui/icons-material";
-import JsonEditor from "../../components/common/JsonEditor";
-import { useTranslation } from "react-i18next";
-import { useSnackbar } from "notistack";
-import { parseApiErrorMessage } from "../../utils/errorUtils";
-import featureFlagService, { FeatureFlag, FlagType } from "../../services/featureFlagService";
-import SimplePagination from "../../components/common/SimplePagination";
-import EmptyState from "../../components/common/EmptyState";
+} from '@mui/icons-material';
+import JsonEditor from '../../components/common/JsonEditor';
+import { useTranslation } from 'react-i18next';
+import { useSnackbar } from 'notistack';
+import { parseApiErrorMessage } from '../../utils/errorUtils';
+import featureFlagService, { FeatureFlag, FlagType } from '../../services/featureFlagService';
+import SimplePagination from '../../components/common/SimplePagination';
+import EmptyState from '../../components/common/EmptyState';
 import DynamicFilterBar, {
   FilterDefinition,
   ActiveFilter,
-} from "../../components/common/DynamicFilterBar";
-import ColumnSettingsDialog, { ColumnConfig } from "../../components/common/ColumnSettingsDialog";
-import { useDebounce } from "../../hooks/useDebounce";
-import { useGlobalPageSize } from "../../hooks/useGlobalPageSize";
-import { formatDateTimeDetailed, formatRelativeTime } from "../../utils/dateFormat";
-import ConfirmDeleteDialog from "../../components/common/ConfirmDeleteDialog";
-import { copyToClipboardWithNotification } from "../../utils/clipboard";
-import { tagService, Tag } from "../../services/tagService";
-import { getContrastColor } from "../../utils/colorUtils";
-import { environmentService, Environment } from "../../services/environmentService";
-import ResizableDrawer from "../../components/common/ResizableDrawer";
-import FeatureSwitch from "../../components/common/FeatureSwitch";
-import api from "../../services/api";
-import PlaygroundDialog from "../../components/features/PlaygroundDialog";
+} from '../../components/common/DynamicFilterBar';
+import ColumnSettingsDialog, { ColumnConfig } from '../../components/common/ColumnSettingsDialog';
+import { useDebounce } from '../../hooks/useDebounce';
+import { useGlobalPageSize } from '../../hooks/useGlobalPageSize';
+import { formatDateTimeDetailed, formatRelativeTime } from '../../utils/dateFormat';
+import ConfirmDeleteDialog from '../../components/common/ConfirmDeleteDialog';
+import { copyToClipboardWithNotification } from '../../utils/clipboard';
+import { tagService, Tag } from '../../services/tagService';
+import { getContrastColor } from '../../utils/colorUtils';
+import { environmentService, Environment } from '../../services/environmentService';
+import ResizableDrawer from '../../components/common/ResizableDrawer';
+import FeatureSwitch from '../../components/common/FeatureSwitch';
+import api from '../../services/api';
+import PlaygroundDialog from '../../components/features/PlaygroundDialog';
 
 interface FlagTypeInfo {
   flagType: string;
@@ -123,7 +123,7 @@ const FeatureFlagsPage: React.FC = () => {
   const [rowsPerPage, setRowsPerPage] = useGlobalPageSize();
   const [loading, setLoading] = useState(false);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [archiveConfirmOpen, setArchiveConfirmOpen] = useState(false);
@@ -139,31 +139,31 @@ const FeatureFlagsPage: React.FC = () => {
   const [createMenuAnchor, setCreateMenuAnchor] = useState<null | HTMLElement>(null);
   const [creating, setCreating] = useState(false);
   const [newFlag, setNewFlag] = useState({
-    flagName: "",
-    displayName: "",
-    description: "",
-    flagType: "release" as "release" | "experiment" | "operational" | "killSwitch" | "permission",
-    flagUsage: "flag" as "flag" | "remoteConfig",
+    flagName: '',
+    displayName: '',
+    description: '',
+    flagType: 'release' as 'release' | 'experiment' | 'operational' | 'killSwitch' | 'permission',
+    flagUsage: 'flag' as 'flag' | 'remoteConfig',
     tags: [] as string[],
     impressionDataEnabled: false,
-    variantType: "none" as "none" | "string" | "number" | "json",
-    baselinePayload: "" as string | number | object,
+    variantType: 'none' as 'none' | 'string' | 'number' | 'json',
+    baselinePayload: '' as string | number | object,
   });
 
   // Sorting state
   const [orderBy, setOrderBy] = useState<string>(() => {
-    const saved = localStorage.getItem("featureFlagsSortBy");
-    return saved || "createdAt";
+    const saved = localStorage.getItem('featureFlagsSortBy');
+    return saved || 'createdAt';
   });
-  const [order, setOrder] = useState<"asc" | "desc">(() => {
-    const saved = localStorage.getItem("featureFlagsSortOrder");
-    return (saved as "asc" | "desc") || "desc";
+  const [order, setOrder] = useState<'asc' | 'desc'>(() => {
+    const saved = localStorage.getItem('featureFlagsSortOrder');
+    return (saved as 'asc' | 'desc') || 'desc';
   });
 
   // Export/Import state
   const [importExportMenuAnchor, setImportExportMenuAnchor] = useState<null | HTMLElement>(null);
   const [importDialogOpen, setImportDialogOpen] = useState(false);
-  const [importData, setImportData] = useState<string>("");
+  const [importData, setImportData] = useState<string>('');
   const [importing, setImporting] = useState(false);
 
   // Playground dialog state
@@ -182,24 +182,26 @@ const FeatureFlagsPage: React.FC = () => {
   // Clone dialog state
   const [cloneDialogOpen, setCloneDialogOpen] = useState(false);
   const [cloningFlag, setCloningFlag] = useState<FeatureFlag | null>(null);
-  const [cloneNewName, setCloneNewName] = useState("");
+  const [cloneNewName, setCloneNewName] = useState('');
   const [cloning, setCloning] = useState(false);
-  const [newFlagBaselinePayloadJsonError, setNewFlagBaselinePayloadJsonError] = useState<string | null>(null);
+  const [newFlagBaselinePayloadJsonError, setNewFlagBaselinePayloadJsonError] = useState<
+    string | null
+  >(null);
 
   // Column settings state
   const [columnSettingsAnchor, setColumnSettingsAnchor] = useState<null | HTMLElement>(null);
   const defaultColumns: ColumnConfig[] = [
-    { id: "flagName", labelKey: "featureFlags.flagName", visible: true },
-    { id: "status", labelKey: "featureFlags.status", visible: true },
-    { id: "flagUsage", labelKey: "featureFlags.flagUsage", visible: true },
-    { id: "variantType", labelKey: "featureFlags.variantType", visible: true },
-    { id: "createdBy", labelKey: "common.createdBy", visible: true },
-    { id: "createdAt", labelKey: "featureFlags.createdAt", visible: true },
-    { id: "lastSeenAt", labelKey: "featureFlags.lastSeenAt", visible: true },
-    { id: "tags", labelKey: "featureFlags.tags", visible: true },
+    { id: 'flagName', labelKey: 'featureFlags.flagName', visible: true },
+    { id: 'status', labelKey: 'featureFlags.status', visible: true },
+    { id: 'flagUsage', labelKey: 'featureFlags.flagUsage', visible: true },
+    { id: 'variantType', labelKey: 'featureFlags.variantType', visible: true },
+    { id: 'createdBy', labelKey: 'common.createdBy', visible: true },
+    { id: 'createdAt', labelKey: 'featureFlags.createdAt', visible: true },
+    { id: 'lastSeenAt', labelKey: 'featureFlags.lastSeenAt', visible: true },
+    { id: 'tags', labelKey: 'featureFlags.tags', visible: true },
   ];
   const [columns, setColumns] = useState<ColumnConfig[]>(() => {
-    const saved = localStorage.getItem("featureFlagsColumns");
+    const saved = localStorage.getItem('featureFlagsColumns');
     if (saved) {
       try {
         const savedColumns = JSON.parse(saved);
@@ -221,22 +223,22 @@ const FeatureFlagsPage: React.FC = () => {
 
   // Extract filter values with useMemo (as string[] for multiselect)
   const flagTypeFilter = useMemo(() => {
-    const filter = activeFilters.find((f) => f.key === "flagType");
+    const filter = activeFilters.find((f) => f.key === 'flagType');
     return filter?.value as string[] | undefined;
   }, [activeFilters]);
 
   const statusFilter = useMemo(() => {
-    const filter = activeFilters.find((f) => f.key === "status");
+    const filter = activeFilters.find((f) => f.key === 'status');
     return filter?.value as string[] | undefined;
   }, [activeFilters]);
 
   const tagFilter = useMemo(() => {
-    const filter = activeFilters.find((f) => f.key === "tag");
+    const filter = activeFilters.find((f) => f.key === 'tag');
     return filter?.value as string[] | undefined;
   }, [activeFilters]);
 
   const flagUsageFilter = useMemo(() => {
-    const filter = activeFilters.find((f) => f.key === "flagUsage");
+    const filter = activeFilters.find((f) => f.key === 'flagUsage');
     return filter?.value as string[] | undefined;
   }, [activeFilters]);
 
@@ -244,13 +246,13 @@ const FeatureFlagsPage: React.FC = () => {
   const getStatusIcon = (status: string) => {
     const iconProps = { sx: { fontSize: 16 } };
     switch (status) {
-      case "active":
+      case 'active':
         return <CheckCircleIcon {...iconProps} color="success" />;
-      case "archived":
+      case 'archived':
         return <ArchiveIcon {...iconProps} color="disabled" />;
-      case "stale":
+      case 'stale':
         return <WarningIcon {...iconProps} color="error" />;
-      case "potentiallyStale":
+      case 'potentiallyStale':
         return <WarningIcon {...iconProps} color="warning" />;
       default:
         return null;
@@ -260,15 +262,15 @@ const FeatureFlagsPage: React.FC = () => {
   const getTypeIconSmall = (type: string) => {
     const iconProps = { sx: { fontSize: 16 } };
     switch (type) {
-      case "release":
+      case 'release':
         return <ReleaseIcon {...iconProps} color="primary" />;
-      case "experiment":
+      case 'experiment':
         return <ExperimentIcon {...iconProps} color="secondary" />;
-      case "operational":
+      case 'operational':
         return <OperationalIcon {...iconProps} color="warning" />;
-      case "killSwitch":
+      case 'killSwitch':
         return <KillSwitchIcon {...iconProps} color="error" />;
-      case "permission":
+      case 'permission':
         return <PermissionIcon {...iconProps} color="action" />;
       default:
         return <FlagIcon {...iconProps} />;
@@ -279,89 +281,89 @@ const FeatureFlagsPage: React.FC = () => {
   const availableFilterDefinitions: FilterDefinition[] = useMemo(
     () => [
       {
-        key: "status",
-        label: t("featureFlags.status"),
-        type: "multiselect",
+        key: 'status',
+        label: t('featureFlags.status'),
+        type: 'multiselect',
         options: [
           {
-            value: "active",
-            label: t("featureFlags.statusActive"),
-            icon: getStatusIcon("active"),
+            value: 'active',
+            label: t('featureFlags.statusActive'),
+            icon: getStatusIcon('active'),
           },
           {
-            value: "archived",
-            label: t("featureFlags.statusArchived"),
-            icon: getStatusIcon("archived"),
+            value: 'archived',
+            label: t('featureFlags.statusArchived'),
+            icon: getStatusIcon('archived'),
           },
           {
-            value: "stale",
-            label: t("featureFlags.statusStale"),
-            icon: getStatusIcon("stale"),
+            value: 'stale',
+            label: t('featureFlags.statusStale'),
+            icon: getStatusIcon('stale'),
           },
           {
-            value: "potentiallyStale",
-            label: t("featureFlags.statusPotentiallyStale"),
-            icon: getStatusIcon("potentiallyStale"),
+            value: 'potentiallyStale',
+            label: t('featureFlags.statusPotentiallyStale'),
+            icon: getStatusIcon('potentiallyStale'),
           },
         ],
       },
       {
-        key: "flagUsage",
-        label: t("featureFlags.flagUsage"),
-        type: "multiselect",
+        key: 'flagUsage',
+        label: t('featureFlags.flagUsage'),
+        type: 'multiselect',
         options: [
-          { value: "flag", label: t("featureFlags.flagUsages.flag") },
-          { value: "remoteConfig", label: t("featureFlags.flagUsages.remoteConfig") },
+          { value: 'flag', label: t('featureFlags.flagUsages.flag') },
+          { value: 'remoteConfig', label: t('featureFlags.flagUsages.remoteConfig') },
         ],
       },
       {
-        key: "flagType",
-        label: t("featureFlags.flagType"),
-        type: "multiselect",
+        key: 'flagType',
+        label: t('featureFlags.flagType'),
+        type: 'multiselect',
         options: [
           {
-            value: "release",
-            label: t("featureFlags.types.release"),
-            icon: getTypeIconSmall("release"),
+            value: 'release',
+            label: t('featureFlags.types.release'),
+            icon: getTypeIconSmall('release'),
           },
           {
-            value: "experiment",
-            label: t("featureFlags.types.experiment"),
-            icon: getTypeIconSmall("experiment"),
+            value: 'experiment',
+            label: t('featureFlags.types.experiment'),
+            icon: getTypeIconSmall('experiment'),
           },
           {
-            value: "operational",
-            label: t("featureFlags.types.operational"),
-            icon: getTypeIconSmall("operational"),
+            value: 'operational',
+            label: t('featureFlags.types.operational'),
+            icon: getTypeIconSmall('operational'),
           },
           {
-            value: "killSwitch",
-            label: t("featureFlags.types.killSwitch"),
-            icon: getTypeIconSmall("killSwitch"),
+            value: 'killSwitch',
+            label: t('featureFlags.types.killSwitch'),
+            icon: getTypeIconSmall('killSwitch'),
           },
           {
-            value: "permission",
-            label: t("featureFlags.types.permission"),
-            icon: getTypeIconSmall("permission"),
+            value: 'permission',
+            label: t('featureFlags.types.permission'),
+            icon: getTypeIconSmall('permission'),
           },
         ],
       },
       {
-        key: "tag",
-        label: t("featureFlags.tags"),
-        type: "multiselect",
-        operator: "any_of",
+        key: 'tag',
+        label: t('featureFlags.tags'),
+        type: 'multiselect',
+        operator: 'any_of',
         allowOperatorToggle: true,
         options: allTags.map((tag) => ({ value: tag.name, label: tag.name })),
       },
       {
-        key: "variantType",
-        label: t("featureFlags.variantType"),
-        type: "multiselect",
+        key: 'variantType',
+        label: t('featureFlags.variantType'),
+        type: 'multiselect',
         options: [
-          { value: "string", label: t("featureFlags.variantTypes.string") },
-          { value: "number", label: t("featureFlags.variantTypes.number") },
-          { value: "json", label: t("featureFlags.variantTypes.json") },
+          { value: 'string', label: t('featureFlags.variantTypes.string') },
+          { value: 'number', label: t('featureFlags.variantTypes.number') },
+          { value: 'json', label: t('featureFlags.variantTypes.json') },
         ],
       },
     ],
@@ -382,17 +384,17 @@ const FeatureFlagsPage: React.FC = () => {
       // For multiselect, if only specific statuses are selected, apply them
       if (statusFilter && statusFilter.length > 0) {
         // If only archived is selected
-        if (statusFilter.length === 1 && statusFilter[0] === "archived") {
+        if (statusFilter.length === 1 && statusFilter[0] === 'archived') {
           isArchived = true;
         }
         // If only active is selected
-        else if (statusFilter.length === 1 && statusFilter[0] === "active") {
+        else if (statusFilter.length === 1 && statusFilter[0] === 'active') {
           isArchived = false;
         }
         // If stale or potentiallyStale is selected without archived
         else if (
-          !statusFilter.includes("archived") &&
-          (statusFilter.includes("stale") || statusFilter.includes("potentiallyStale"))
+          !statusFilter.includes('archived') &&
+          (statusFilter.includes('stale') || statusFilter.includes('potentiallyStale'))
         ) {
           isArchived = false;
           if (statusFilter.length === 1) {
@@ -418,8 +420,8 @@ const FeatureFlagsPage: React.FC = () => {
 
       if (
         result &&
-        typeof result === "object" &&
-        "flags" in result &&
+        typeof result === 'object' &&
+        'flags' in result &&
         Array.isArray(result.flags)
       ) {
         // Apply client-side filtering for multiselect values that server doesn't support
@@ -436,13 +438,13 @@ const FeatureFlagsPage: React.FC = () => {
             // Determine the flag's status
             let flagStatus: string;
             if (f.isArchived) {
-              flagStatus = "archived";
+              flagStatus = 'archived';
             } else if (f.stale) {
-              flagStatus = "stale";
+              flagStatus = 'stale';
             } else if (f.potentiallyStale) {
-              flagStatus = "potentiallyStale";
+              flagStatus = 'potentiallyStale';
             } else {
-              flagStatus = "active";
+              flagStatus = 'active';
             }
             return statusFilter.includes(flagStatus);
           });
@@ -458,7 +460,7 @@ const FeatureFlagsPage: React.FC = () => {
         // Filter by flagUsage
         if (flagUsageFilter && flagUsageFilter.length > 0) {
           filteredFlags = filteredFlags.filter((f) =>
-            flagUsageFilter.includes(f.flagUsage || "flag")
+            flagUsageFilter.includes(f.flagUsage || 'flag')
           );
         }
 
@@ -472,17 +474,17 @@ const FeatureFlagsPage: React.FC = () => {
 
         setFlags(filteredFlags);
         const validTotal =
-          typeof result.total === "number" && !isNaN(result.total) ? result.total : 0;
+          typeof result.total === 'number' && !isNaN(result.total) ? result.total : 0;
         setTotal(validTotal);
       } else {
-        console.error("Invalid response:", result);
+        console.error('Invalid response:', result);
         setFlags([]);
         setTotal(0);
       }
     } catch (error: any) {
-      console.error("Failed to load feature flags:", error);
-      enqueueSnackbar(parseApiErrorMessage(error, "featureFlags.loadFailed"), {
-        variant: "error",
+      console.error('Failed to load feature flags:', error);
+      enqueueSnackbar(parseApiErrorMessage(error, 'featureFlags.loadFailed'), {
+        variant: 'error',
       });
       setFlags([]);
       setTotal(0);
@@ -518,7 +520,7 @@ const FeatureFlagsPage: React.FC = () => {
     setPage(0);
   };
 
-  const handleOperatorChange = (filterKey: string, operator: "any_of" | "include_all") => {
+  const handleOperatorChange = (filterKey: string, operator: 'any_of' | 'include_all') => {
     const newFilters = activeFilters.map((f) => (f.key === filterKey ? { ...f, operator } : f));
     setActiveFilters(newFilters);
   };
@@ -526,12 +528,12 @@ const FeatureFlagsPage: React.FC = () => {
   // Column handlers
   const handleColumnsChange = (newColumns: ColumnConfig[]) => {
     setColumns(newColumns);
-    localStorage.setItem("featureFlagsColumns", JSON.stringify(newColumns));
+    localStorage.setItem('featureFlagsColumns', JSON.stringify(newColumns));
   };
 
   const handleResetColumns = () => {
     setColumns(defaultColumns);
-    localStorage.setItem("featureFlagsColumns", JSON.stringify(defaultColumns));
+    localStorage.setItem('featureFlagsColumns', JSON.stringify(defaultColumns));
   };
 
   // Export/Import handlers
@@ -571,7 +573,7 @@ const FeatureFlagsPage: React.FC = () => {
         let segments: any[] = [];
         if (usedSegmentNames.size > 0) {
           try {
-            const response = await api.get("/admin/features/segments");
+            const response = await api.get('/admin/features/segments');
             const allSegments = response.data?.segments || [];
             segments = allSegments
               .filter((seg: any) => usedSegmentNames.has(seg.segmentName))
@@ -618,10 +620,10 @@ const FeatureFlagsPage: React.FC = () => {
               displayName: flag.displayName,
               description: flag.description,
               flagUsage: flag.flagUsage,
-              flagType: flag.flagType || "flag",
+              flagType: flag.flagType || 'flag',
               tags: flag.tags,
               impressionDataEnabled: flag.impressionDataEnabled,
-              variantType: flag.variantType || "string",
+              variantType: flag.variantType || 'string',
               baselinePayload: flag.baselinePayload,
               enabled: envData?.isEnabled ?? false,
               strategies,
@@ -631,26 +633,26 @@ const FeatureFlagsPage: React.FC = () => {
         };
 
         const blob = new Blob([JSON.stringify(exportData, null, 2)], {
-          type: "application/json",
+          type: 'application/json',
         });
         const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
+        const a = document.createElement('a');
         a.href = url;
-        a.download = `feature-flags-${environment}-${new Date().toISOString().split("T")[0]}.json`;
+        a.download = `feature-flags-${environment}-${new Date().toISOString().split('T')[0]}.json`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
 
-        enqueueSnackbar(t("featureFlags.exportSuccess", { count: detailedFlags.length }), {
-          variant: "success",
+        enqueueSnackbar(t('featureFlags.exportSuccess', { count: detailedFlags.length }), {
+          variant: 'success',
         });
       } else {
-        enqueueSnackbar(t("featureFlags.exportNoFlags"), { variant: "info" });
+        enqueueSnackbar(t('featureFlags.exportNoFlags'), { variant: 'info' });
       }
     } catch (error: any) {
-      enqueueSnackbar(parseApiErrorMessage(error, "featureFlags.exportFailed"), {
-        variant: "error",
+      enqueueSnackbar(parseApiErrorMessage(error, 'featureFlags.exportFailed'), {
+        variant: 'error',
       });
     }
     setExportMenuAnchor(null);
@@ -658,7 +660,7 @@ const FeatureFlagsPage: React.FC = () => {
 
   const handleImport = async () => {
     if (!importData.trim()) {
-      enqueueSnackbar(t("featureFlags.importNoData"), { variant: "warning" });
+      enqueueSnackbar(t('featureFlags.importNoData'), { variant: 'warning' });
       return;
     }
 
@@ -667,15 +669,15 @@ const FeatureFlagsPage: React.FC = () => {
       const data = JSON.parse(importData);
 
       if (!data.flags || !Array.isArray(data.flags)) {
-        enqueueSnackbar(t("featureFlags.importInvalidFormat"), {
-          variant: "error",
+        enqueueSnackbar(t('featureFlags.importInvalidFormat'), {
+          variant: 'error',
         });
         setImporting(false);
         return;
       }
 
       // Call backend import API
-      const response = await api.post("/admin/features/import", {
+      const response = await api.post('/admin/features/import', {
         segments: data.segments || [],
         flags: data.flags,
       });
@@ -685,60 +687,60 @@ const FeatureFlagsPage: React.FC = () => {
 
       // Show result
       if (summary.flagsCreated > 0 || summary.segmentsCreated > 0) {
-        let msg = "";
+        let msg = '';
         if (summary.flagsCreated > 0) {
-          msg += t("featureFlags.importFlagsCreated", {
+          msg += t('featureFlags.importFlagsCreated', {
             count: summary.flagsCreated,
           });
         }
         if (summary.segmentsCreated > 0) {
-          if (msg) msg += ", ";
-          msg += t("featureFlags.importSegmentsCreated", {
+          if (msg) msg += ', ';
+          msg += t('featureFlags.importSegmentsCreated', {
             count: summary.segmentsCreated,
           });
         }
-        enqueueSnackbar(msg, { variant: "success" });
+        enqueueSnackbar(msg, { variant: 'success' });
         loadFlags();
       }
 
       if (summary.flagsSkipped > 0 || summary.segmentsSkipped > 0) {
-        let msg = "";
+        let msg = '';
         if (summary.flagsSkipped > 0) {
-          msg += t("featureFlags.importFlagsSkipped", {
+          msg += t('featureFlags.importFlagsSkipped', {
             count: summary.flagsSkipped,
           });
         }
         if (summary.segmentsSkipped > 0) {
-          if (msg) msg += ", ";
-          msg += t("featureFlags.importSegmentsSkipped", {
+          if (msg) msg += ', ';
+          msg += t('featureFlags.importSegmentsSkipped', {
             count: summary.segmentsSkipped,
           });
         }
-        enqueueSnackbar(msg, { variant: "info" });
+        enqueueSnackbar(msg, { variant: 'info' });
       }
 
       if (summary.errors > 0) {
-        enqueueSnackbar(t("featureFlags.importPartialError", { count: summary.errors }), {
-          variant: "warning",
+        enqueueSnackbar(t('featureFlags.importPartialError', { count: summary.errors }), {
+          variant: 'warning',
         });
       }
 
       if (summary.flagsCreated === 0 && summary.segmentsCreated === 0) {
-        enqueueSnackbar(t("featureFlags.importNothingNew"), {
-          variant: "info",
+        enqueueSnackbar(t('featureFlags.importNothingNew'), {
+          variant: 'info',
         });
       }
 
       setImportDialogOpen(false);
-      setImportData("");
+      setImportData('');
     } catch (error: any) {
       if (error instanceof SyntaxError) {
-        enqueueSnackbar(t("featureFlags.importInvalidJson"), {
-          variant: "error",
+        enqueueSnackbar(t('featureFlags.importInvalidJson'), {
+          variant: 'error',
         });
       } else {
-        enqueueSnackbar(parseApiErrorMessage(error, "featureFlags.importFailed"), {
-          variant: "error",
+        enqueueSnackbar(parseApiErrorMessage(error, 'featureFlags.importFailed'), {
+          variant: 'error',
         });
       }
     } finally {
@@ -792,7 +794,7 @@ const FeatureFlagsPage: React.FC = () => {
 
   const loadFlagTypes = async () => {
     try {
-      const response = await api.get("/admin/features/types");
+      const response = await api.get('/admin/features/types');
       setFlagTypes(response.data?.types || []);
     } catch {
       setFlagTypes([]);
@@ -814,14 +816,14 @@ const FeatureFlagsPage: React.FC = () => {
 
   // Sort handler
   const handleSort = (colId: string) => {
-    let newOrder: "asc" | "desc" = "asc";
+    let newOrder: 'asc' | 'desc' = 'asc';
     if (orderBy === colId) {
-      newOrder = order === "asc" ? "desc" : "asc";
+      newOrder = order === 'asc' ? 'desc' : 'asc';
     }
     setOrderBy(colId);
     setOrder(newOrder);
-    localStorage.setItem("featureFlagsSortBy", colId);
-    localStorage.setItem("featureFlagsSortOrder", newOrder);
+    localStorage.setItem('featureFlagsSortBy', colId);
+    localStorage.setItem('featureFlagsSortOrder', newOrder);
     setPage(0);
   };
 
@@ -858,8 +860,8 @@ const FeatureFlagsPage: React.FC = () => {
     try {
       await featureFlagService.toggleFeatureFlag(flag.flagName, newEnabled, environment);
       enqueueSnackbar(
-        t(currentEnabled ? "featureFlags.disableSuccess" : "featureFlags.enableSuccess"),
-        { variant: "success" }
+        t(currentEnabled ? 'featureFlags.disableSuccess' : 'featureFlags.enableSuccess'),
+        { variant: 'success' }
       );
     } catch (error: any) {
       // Rollback on error
@@ -878,8 +880,8 @@ const FeatureFlagsPage: React.FC = () => {
           };
         })
       );
-      enqueueSnackbar(parseApiErrorMessage(error, "featureFlags.toggleFailed"), {
-        variant: "error",
+      enqueueSnackbar(parseApiErrorMessage(error, 'featureFlags.toggleFailed'), {
+        variant: 'error',
       });
     }
   };
@@ -899,19 +901,19 @@ const FeatureFlagsPage: React.FC = () => {
     try {
       if (flag.isArchived) {
         await featureFlagService.reviveFeatureFlag(flag.flagName);
-        enqueueSnackbar(t("featureFlags.reviveSuccess"), {
-          variant: "success",
+        enqueueSnackbar(t('featureFlags.reviveSuccess'), {
+          variant: 'success',
         });
       } else {
         await featureFlagService.archiveFeatureFlag(flag.flagName);
-        enqueueSnackbar(t("featureFlags.archiveSuccess"), {
-          variant: "success",
+        enqueueSnackbar(t('featureFlags.archiveSuccess'), {
+          variant: 'success',
         });
       }
       loadFlags();
     } catch (error: any) {
-      enqueueSnackbar(parseApiErrorMessage(error, "featureFlags.archiveFailed"), {
-        variant: "error",
+      enqueueSnackbar(parseApiErrorMessage(error, 'featureFlags.archiveFailed'), {
+        variant: 'error',
       });
     }
   };
@@ -926,11 +928,11 @@ const FeatureFlagsPage: React.FC = () => {
     if (!deletingFlag) return;
     try {
       await featureFlagService.deleteFeatureFlag(deletingFlag.flagName);
-      enqueueSnackbar(t("featureFlags.deleteSuccess"), { variant: "success" });
+      enqueueSnackbar(t('featureFlags.deleteSuccess'), { variant: 'success' });
       loadFlags();
     } catch (error: any) {
-      enqueueSnackbar(parseApiErrorMessage(error, "featureFlags.deleteFailed"), {
-        variant: "error",
+      enqueueSnackbar(parseApiErrorMessage(error, 'featureFlags.deleteFailed'), {
+        variant: 'error',
       });
     } finally {
       setDeleteConfirmOpen(false);
@@ -967,7 +969,7 @@ const FeatureFlagsPage: React.FC = () => {
   const handleClone = () => {
     if (actionMenuFlag) {
       setCloningFlag(actionMenuFlag);
-      setCloneNewName("");
+      setCloneNewName('');
       setCloneDialogOpen(true);
     }
     handleActionMenuClose();
@@ -980,18 +982,18 @@ const FeatureFlagsPage: React.FC = () => {
     setCloning(true);
     try {
       // Clone the flag via API
-      await api.post("/admin/features/clone", {
+      await api.post('/admin/features/clone', {
         sourceFlagName: cloningFlag.flagName,
         newFlagName: cloneNewName.trim(),
       });
-      enqueueSnackbar(t("featureFlags.cloneSuccess"), { variant: "success" });
+      enqueueSnackbar(t('featureFlags.cloneSuccess'), { variant: 'success' });
       setCloneDialogOpen(false);
       setCloningFlag(null);
-      setCloneNewName("");
+      setCloneNewName('');
       loadFlags();
     } catch (error: any) {
-      enqueueSnackbar(parseApiErrorMessage(error, "featureFlags.cloneFailed"), {
-        variant: "error",
+      enqueueSnackbar(parseApiErrorMessage(error, 'featureFlags.cloneFailed'), {
+        variant: 'error',
       });
     } finally {
       setCloning(false);
@@ -1016,13 +1018,13 @@ const FeatureFlagsPage: React.FC = () => {
         stale: newStale,
       });
       enqueueSnackbar(
-        newStale ? t("featureFlags.markStaleSuccess") : t("featureFlags.clearStaleSuccess"),
-        { variant: "success" }
+        newStale ? t('featureFlags.markStaleSuccess') : t('featureFlags.clearStaleSuccess'),
+        { variant: 'success' }
       );
       loadFlags();
     } catch (error: any) {
-      enqueueSnackbar(parseApiErrorMessage(error, "featureFlags.updateFailed"), {
-        variant: "error",
+      enqueueSnackbar(parseApiErrorMessage(error, 'featureFlags.updateFailed'), {
+        variant: 'error',
       });
     }
   };
@@ -1034,14 +1036,14 @@ const FeatureFlagsPage: React.FC = () => {
       await featureFlagService.toggleFavorite(flag.flagName, newFavorite);
       enqueueSnackbar(
         newFavorite
-          ? t("featureFlags.addFavoriteSuccess")
-          : t("featureFlags.removeFavoriteSuccess"),
-        { variant: "success" }
+          ? t('featureFlags.addFavoriteSuccess')
+          : t('featureFlags.removeFavoriteSuccess'),
+        { variant: 'success' }
       );
       loadFlags();
     } catch (error: any) {
-      enqueueSnackbar(parseApiErrorMessage(error, "featureFlags.updateFailed"), {
-        variant: "error",
+      enqueueSnackbar(parseApiErrorMessage(error, 'featureFlags.updateFailed'), {
+        variant: 'error',
       });
     }
   };
@@ -1076,8 +1078,8 @@ const FeatureFlagsPage: React.FC = () => {
     const nonArchivedFlags = flags.filter((f) => flagNames.includes(f.flagName) && !f.isArchived);
 
     if (nonArchivedFlags.length === 0) {
-      enqueueSnackbar(t("featureFlags.noFlagsToArchive"), {
-        variant: "warning",
+      enqueueSnackbar(t('featureFlags.noFlagsToArchive'), {
+        variant: 'warning',
       });
       return;
     }
@@ -1087,16 +1089,16 @@ const FeatureFlagsPage: React.FC = () => {
         await featureFlagService.archiveFeatureFlag(flag.flagName);
       }
       enqueueSnackbar(
-        t("featureFlags.bulkArchiveSuccess", {
+        t('featureFlags.bulkArchiveSuccess', {
           count: nonArchivedFlags.length,
         }),
-        { variant: "success" }
+        { variant: 'success' }
       );
       setSelectedFlags(new Set());
       loadFlags();
     } catch (error: any) {
-      enqueueSnackbar(parseApiErrorMessage(error, "featureFlags.bulkArchiveFailed"), {
-        variant: "error",
+      enqueueSnackbar(parseApiErrorMessage(error, 'featureFlags.bulkArchiveFailed'), {
+        variant: 'error',
       });
     }
   };
@@ -1106,8 +1108,8 @@ const FeatureFlagsPage: React.FC = () => {
     const archivedFlags = flags.filter((f) => flagNames.includes(f.flagName) && f.isArchived);
 
     if (archivedFlags.length === 0) {
-      enqueueSnackbar(t("featureFlags.noFlagsToRevive"), {
-        variant: "warning",
+      enqueueSnackbar(t('featureFlags.noFlagsToRevive'), {
+        variant: 'warning',
       });
       return;
     }
@@ -1116,14 +1118,14 @@ const FeatureFlagsPage: React.FC = () => {
       for (const flag of archivedFlags) {
         await featureFlagService.reviveFeatureFlag(flag.flagName);
       }
-      enqueueSnackbar(t("featureFlags.bulkReviveSuccess", { count: archivedFlags.length }), {
-        variant: "success",
+      enqueueSnackbar(t('featureFlags.bulkReviveSuccess', { count: archivedFlags.length }), {
+        variant: 'success',
       });
       setSelectedFlags(new Set());
       loadFlags();
     } catch (error: any) {
-      enqueueSnackbar(parseApiErrorMessage(error, "featureFlags.bulkReviveFailed"), {
-        variant: "error",
+      enqueueSnackbar(parseApiErrorMessage(error, 'featureFlags.bulkReviveFailed'), {
+        variant: 'error',
       });
     }
   };
@@ -1135,8 +1137,8 @@ const FeatureFlagsPage: React.FC = () => {
     );
 
     if (targetFlags.length === 0) {
-      enqueueSnackbar(t("featureFlags.noFlagsToUpdate"), {
-        variant: "warning",
+      enqueueSnackbar(t('featureFlags.noFlagsToUpdate'), {
+        variant: 'warning',
       });
       return;
     }
@@ -1149,19 +1151,19 @@ const FeatureFlagsPage: React.FC = () => {
       }
       enqueueSnackbar(
         markAsStale
-          ? t("featureFlags.bulkMarkStaleSuccess", {
-            count: targetFlags.length,
-          })
-          : t("featureFlags.bulkClearStaleSuccess", {
-            count: targetFlags.length,
-          }),
-        { variant: "success" }
+          ? t('featureFlags.bulkMarkStaleSuccess', {
+              count: targetFlags.length,
+            })
+          : t('featureFlags.bulkClearStaleSuccess', {
+              count: targetFlags.length,
+            }),
+        { variant: 'success' }
       );
       setSelectedFlags(new Set());
       loadFlags();
     } catch (error: any) {
-      enqueueSnackbar(parseApiErrorMessage(error, "featureFlags.bulkUpdateFailed"), {
-        variant: "error",
+      enqueueSnackbar(parseApiErrorMessage(error, 'featureFlags.bulkUpdateFailed'), {
+        variant: 'error',
       });
     }
   };
@@ -1171,8 +1173,8 @@ const FeatureFlagsPage: React.FC = () => {
     const targetFlags = flags.filter((f) => flagNames.includes(f.flagName) && !f.isArchived);
 
     if (targetFlags.length === 0) {
-      enqueueSnackbar(t("featureFlags.noFlagsToUpdate"), {
-        variant: "warning",
+      enqueueSnackbar(t('featureFlags.noFlagsToUpdate'), {
+        variant: 'warning',
       });
       return;
     }
@@ -1183,21 +1185,21 @@ const FeatureFlagsPage: React.FC = () => {
       }
       enqueueSnackbar(
         enable
-          ? t("featureFlags.bulkEnableSuccess", {
-            count: targetFlags.length,
-            env: environment,
-          })
-          : t("featureFlags.bulkDisableSuccess", {
-            count: targetFlags.length,
-            env: environment,
-          }),
-        { variant: "success" }
+          ? t('featureFlags.bulkEnableSuccess', {
+              count: targetFlags.length,
+              env: environment,
+            })
+          : t('featureFlags.bulkDisableSuccess', {
+              count: targetFlags.length,
+              env: environment,
+            }),
+        { variant: 'success' }
       );
       setSelectedFlags(new Set());
       loadFlags();
     } catch (error: any) {
-      enqueueSnackbar(parseApiErrorMessage(error, "featureFlags.bulkToggleFailed"), {
-        variant: "error",
+      enqueueSnackbar(parseApiErrorMessage(error, 'featureFlags.bulkToggleFailed'), {
+        variant: 'error',
       });
     }
   };
@@ -1223,8 +1225,8 @@ const FeatureFlagsPage: React.FC = () => {
   // Create flag handler
   const handleCreateFlag = async () => {
     if (!newFlag.flagName.trim()) {
-      enqueueSnackbar(t("featureFlags.flagNameRequired"), {
-        variant: "warning",
+      enqueueSnackbar(t('featureFlags.flagNameRequired'), {
+        variant: 'warning',
       });
       return;
     }
@@ -1232,7 +1234,7 @@ const FeatureFlagsPage: React.FC = () => {
     setCreating(true);
     try {
       // Create flag with empty strategies - user can add strategies manually
-      await api.post("/admin/features", {
+      await api.post('/admin/features', {
         flagName: newFlag.flagName.trim(),
         displayName: newFlag.displayName.trim() || undefined,
         description: newFlag.description.trim(),
@@ -1246,46 +1248,46 @@ const FeatureFlagsPage: React.FC = () => {
       });
 
       const createdFlagName = newFlag.flagName.trim();
-      enqueueSnackbar(t("featureFlags.createSuccess"), { variant: "success" });
+      enqueueSnackbar(t('featureFlags.createSuccess'), { variant: 'success' });
       setCreateDialogOpen(false);
       setNewFlag({
-        flagName: "",
-        displayName: "",
-        description: "",
-        flagUsage: "flag",
-        flagType: "release",
+        flagName: '',
+        displayName: '',
+        description: '',
+        flagUsage: 'flag',
+        flagType: 'release',
         tags: [],
         impressionDataEnabled: false,
-        variantType: "none",
-        baselinePayload: "",
+        variantType: 'none',
+        baselinePayload: '',
       });
       setNewFlagBaselinePayloadJsonError(null);
       // Navigate to the newly created flag's detail page
       navigate(`/feature-flags/${encodeURIComponent(createdFlagName)}`);
     } catch (error: any) {
-      enqueueSnackbar(parseApiErrorMessage(error, "featureFlags.createFailed"), {
-        variant: "error",
+      enqueueSnackbar(parseApiErrorMessage(error, 'featureFlags.createFailed'), {
+        variant: 'error',
       });
     } finally {
       setCreating(false);
     }
   };
 
-  const handleOpenCreateDialog = (flagUsage: "flag" | "remoteConfig" = "flag") => {
+  const handleOpenCreateDialog = (flagUsage: 'flag' | 'remoteConfig' = 'flag') => {
     // Generate default flag name with timestamp
     const timestamp = Date.now().toString(36).slice(-4);
-    const prefix = flagUsage === "remoteConfig" ? "config" : "new-feature";
+    const prefix = flagUsage === 'remoteConfig' ? 'config' : 'new-feature';
     setNewFlag({
       flagName: `${prefix}-${timestamp}`,
-      displayName: "",
-      description: "",
-      flagType: "release",
+      displayName: '',
+      description: '',
+      flagType: 'release',
       flagUsage,
       tags: [],
       impressionDataEnabled: false,
       // Remote Config requires a variant type, default to string
-      variantType: flagUsage === "remoteConfig" ? "string" : "none",
-      baselinePayload: "",
+      variantType: flagUsage === 'remoteConfig' ? 'string' : 'none',
+      baselinePayload: '',
     });
     setNewFlagBaselinePayloadJsonError(null);
     setCreateMenuAnchor(null);
@@ -1295,20 +1297,20 @@ const FeatureFlagsPage: React.FC = () => {
   // Flag type chip color
   const getTypeColor = (
     type: FlagType
-  ): "default" | "primary" | "secondary" | "warning" | "error" => {
+  ): 'default' | 'primary' | 'secondary' | 'warning' | 'error' => {
     switch (type) {
-      case "release":
-        return "primary";
-      case "experiment":
-        return "secondary";
-      case "operational":
-        return "warning";
-      case "killSwitch":
-        return "error";
-      case "permission":
-        return "default";
+      case 'release':
+        return 'primary';
+      case 'experiment':
+        return 'secondary';
+      case 'operational':
+        return 'warning';
+      case 'killSwitch':
+        return 'error';
+      case 'permission':
+        return 'default';
       default:
-        return "default";
+        return 'default';
     }
   };
 
@@ -1316,15 +1318,15 @@ const FeatureFlagsPage: React.FC = () => {
   const getTypeIcon = (type: FlagType) => {
     const iconProps = { sx: { fontSize: 18 } };
     switch (type) {
-      case "release":
+      case 'release':
         return <ReleaseIcon {...iconProps} color="primary" />;
-      case "experiment":
+      case 'experiment':
         return <ExperimentIcon {...iconProps} color="secondary" />;
-      case "operational":
+      case 'operational':
         return <OperationalIcon {...iconProps} color="warning" />;
-      case "killSwitch":
+      case 'killSwitch':
         return <KillSwitchIcon {...iconProps} color="error" />;
-      case "permission":
+      case 'permission':
         return <PermissionIcon {...iconProps} color="action" />;
       default:
         return <FlagIcon {...iconProps} />;
@@ -1336,13 +1338,13 @@ const FeatureFlagsPage: React.FC = () => {
     flag: FeatureFlag
   ): {
     status: string;
-    color: "default" | "primary" | "warning" | "error" | "success";
+    color: 'default' | 'primary' | 'warning' | 'error' | 'success';
   } => {
     if (flag.isArchived) {
-      return { status: "archived", color: "default" };
+      return { status: 'archived', color: 'default' };
     }
     if (flag.stale) {
-      return { status: "stale", color: "error" };
+      return { status: 'stale', color: 'error' };
     }
     // Check potentially stale based on lastSeenAt and flag type lifetime
     const flagTypeInfo = flagTypes.find((ft) => ft.flagType === flag.flagType);
@@ -1351,10 +1353,10 @@ const FeatureFlagsPage: React.FC = () => {
       const now = new Date();
       const daysSinceLastSeen = (now.getTime() - lastSeen.getTime()) / (1000 * 60 * 60 * 24);
       if (daysSinceLastSeen > flagTypeInfo.lifetimeDays) {
-        return { status: "potentiallyStale", color: "warning" };
+        return { status: 'potentiallyStale', color: 'warning' };
       }
     }
-    return { status: "active", color: "success" };
+    return { status: 'active', color: 'success' };
   };
 
   return (
@@ -1362,9 +1364,9 @@ const FeatureFlagsPage: React.FC = () => {
       {/* Header */}
       <Box
         sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "flex-start",
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
           mb: 3,
         }}
       >
@@ -1372,16 +1374,16 @@ const FeatureFlagsPage: React.FC = () => {
           <Typography
             variant="h4"
             gutterBottom
-            sx={{ display: "flex", alignItems: "center", gap: 1 }}
+            sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
           >
             <FlagIcon />
-            {t("featureFlags.title")}
+            {t('featureFlags.title')}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            {t("featureFlags.subtitle")}
+            {t('featureFlags.subtitle')}
           </Typography>
         </Box>
-        <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
           {canManage && (
             <>
               <Button
@@ -1390,31 +1392,31 @@ const FeatureFlagsPage: React.FC = () => {
                 onClick={(e) => setCreateMenuAnchor(e.currentTarget)}
                 endIcon={<ExpandMoreIcon sx={{ ml: -0.5 }} />}
               >
-                {t("featureFlags.createFlagOrRemoteConfig")}
+                {t('featureFlags.createFlagOrRemoteConfig')}
               </Button>
               <Menu
                 anchorEl={createMenuAnchor}
                 open={Boolean(createMenuAnchor)}
                 onClose={() => setCreateMenuAnchor(null)}
-                anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
-                transformOrigin={{ vertical: "top", horizontal: "left" }}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+                transformOrigin={{ vertical: 'top', horizontal: 'left' }}
               >
-                <MenuItem onClick={() => handleOpenCreateDialog("flag")}>
+                <MenuItem onClick={() => handleOpenCreateDialog('flag')}>
                   <ListItemIcon>
                     <FlagIcon fontSize="small" />
                   </ListItemIcon>
                   <ListItemText
-                    primary={t("featureFlags.createFlagOption")}
-                    secondary={t("featureFlags.createFlagSubtitle")}
+                    primary={t('featureFlags.createFlagOption')}
+                    secondary={t('featureFlags.createFlagSubtitle')}
                   />
                 </MenuItem>
-                <MenuItem onClick={() => handleOpenCreateDialog("remoteConfig")}>
+                <MenuItem onClick={() => handleOpenCreateDialog('remoteConfig')}>
                   <ListItemIcon>
                     <JsonIcon fontSize="small" />
                   </ListItemIcon>
                   <ListItemText
-                    primary={t("featureFlags.createRemoteConfigOption")}
-                    secondary={t("featureFlags.createRemoteConfigSubtitle")}
+                    primary={t('featureFlags.createRemoteConfigOption')}
+                    secondary={t('featureFlags.createRemoteConfigSubtitle')}
                   />
                 </MenuItem>
               </Menu>
@@ -1426,10 +1428,10 @@ const FeatureFlagsPage: React.FC = () => {
             onClick={(e) => setImportExportMenuAnchor(e.currentTarget)}
             endIcon={<ExpandMoreIcon sx={{ ml: -0.5 }} />}
           >
-            {t("featureFlags.importExport")}
+            {t('featureFlags.importExport')}
           </Button>
           <Divider orientation="vertical" sx={{ height: 32, mx: 0.5 }} />
-          <Tooltip title={t("playground.title")}>
+          <Tooltip title={t('playground.title')}>
             <IconButton
               size="small"
               onClick={() => setPlaygroundOpen(true)}
@@ -1452,25 +1454,25 @@ const FeatureFlagsPage: React.FC = () => {
         <CardContent>
           <Box
             sx={{
-              display: "flex",
-              alignItems: "center",
+              display: 'flex',
+              alignItems: 'center',
               gap: 2,
-              flexWrap: "nowrap",
-              justifyContent: "space-between",
+              flexWrap: 'nowrap',
+              justifyContent: 'space-between',
             }}
           >
             <Box
               sx={{
-                display: "flex",
+                display: 'flex',
                 gap: 2,
-                alignItems: "center",
-                flexWrap: "nowrap",
+                alignItems: 'center',
+                flexWrap: 'nowrap',
                 flexGrow: 1,
                 minWidth: 0,
               }}
             >
               <TextField
-                placeholder={t("featureFlags.searchPlaceholder")}
+                placeholder={t('featureFlags.searchPlaceholder')}
                 value={searchTerm}
                 onChange={(e) => {
                   setSearchTerm(e.target.value);
@@ -1480,31 +1482,31 @@ const FeatureFlagsPage: React.FC = () => {
                   minWidth: 300,
                   flexGrow: 1,
                   maxWidth: 500,
-                  "& .MuiOutlinedInput-root": {
-                    height: "40px",
-                    borderRadius: "20px",
-                    bgcolor: "background.paper",
-                    transition: "all 0.2s ease-in-out",
-                    "& fieldset": { borderColor: "divider" },
-                    "&:hover": {
-                      bgcolor: "action.hover",
-                      "& fieldset": { borderColor: "primary.light" },
+                  '& .MuiOutlinedInput-root': {
+                    height: '40px',
+                    borderRadius: '20px',
+                    bgcolor: 'background.paper',
+                    transition: 'all 0.2s ease-in-out',
+                    '& fieldset': { borderColor: 'divider' },
+                    '&:hover': {
+                      bgcolor: 'action.hover',
+                      '& fieldset': { borderColor: 'primary.light' },
                     },
-                    "&.Mui-focused": {
-                      bgcolor: "background.paper",
-                      boxShadow: "0 0 0 2px rgba(25, 118, 210, 0.1)",
-                      "& fieldset": {
-                        borderColor: "primary.main",
-                        borderWidth: "1px",
+                    '&.Mui-focused': {
+                      bgcolor: 'background.paper',
+                      boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
+                      '& fieldset': {
+                        borderColor: 'primary.main',
+                        borderWidth: '1px',
                       },
                     },
                   },
-                  "& .MuiInputBase-input": { fontSize: "0.875rem" },
+                  '& .MuiInputBase-input': { fontSize: '0.875rem' },
                 }}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <SearchIcon sx={{ color: "text.secondary", fontSize: 20 }} />
+                      <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
                     </InputAdornment>
                   ),
                 }}
@@ -1523,14 +1525,14 @@ const FeatureFlagsPage: React.FC = () => {
                 refreshDisabled={loading}
                 noWrap={true}
                 afterFilterAddActions={
-                  <Tooltip title={t("common.columnSettings")}>
+                  <Tooltip title={t('common.columnSettings')}>
                     <IconButton
                       onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
                       sx={{
-                        bgcolor: "background.paper",
+                        bgcolor: 'background.paper',
                         border: 1,
-                        borderColor: "divider",
-                        "&:hover": { bgcolor: "action.hover" },
+                        borderColor: 'divider',
+                        '&:hover': { bgcolor: 'action.hover' },
                       }}
                     >
                       <ViewColumnIcon />
@@ -1545,17 +1547,17 @@ const FeatureFlagsPage: React.FC = () => {
 
       {/* Table */}
       <Card>
-        <CardContent sx={{ p: 0, "&:last-child": { pb: 0 } }}>
+        <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
           {loading && isInitialLoad ? (
-            <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
-              <Typography color="text.secondary">{t("common.loadingData")}</Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
+              <Typography color="text.secondary">{t('common.loadingData')}</Typography>
             </Box>
           ) : flags.length === 0 ? (
             <EmptyState
-              message={t("featureFlags.noFlagsFound")}
-              onAddClick={canManage ? () => navigate("/feature-flags/new") : undefined}
-              addButtonLabel={t("featureFlags.createFlag")}
-              subtitle={canManage ? t("common.addFirstItem") : undefined}
+              message={t('featureFlags.noFlagsFound')}
+              onAddClick={canManage ? () => navigate('/feature-flags/new') : undefined}
+              addButtonLabel={t('featureFlags.createFlag')}
+              subtitle={canManage ? t('common.addFirstItem') : undefined}
             />
           ) : (
             <>
@@ -1583,23 +1585,23 @@ const FeatureFlagsPage: React.FC = () => {
                       {/* Dynamic columns based on visibleColumns order */}
                       {visibleColumns.map((col) => {
                         switch (col.id) {
-                          case "flagName":
+                          case 'flagName':
                             return (
                               <TableCell key={col.id}>
                                 <TableSortLabel
-                                  active={orderBy === "flagName"}
-                                  direction={orderBy === "flagName" ? order : "asc"}
-                                  onClick={() => handleSort("flagName")}
+                                  active={orderBy === 'flagName'}
+                                  direction={orderBy === 'flagName' ? order : 'asc'}
+                                  onClick={() => handleSort('flagName')}
                                 >
-                                  {t("featureFlags.flagName")}
+                                  {t('featureFlags.flagName')}
                                 </TableSortLabel>
                               </TableCell>
                             );
-                          case "status":
+                          case 'status':
                             // Status column followed by environment columns
                             return (
                               <React.Fragment key={col.id}>
-                                <TableCell>{t("featureFlags.status")}</TableCell>
+                                <TableCell>{t('featureFlags.status')}</TableCell>
                                 {/* Environment columns - right after status */}
                                 {environments.map((env) => (
                                   <TableCell
@@ -1616,15 +1618,15 @@ const FeatureFlagsPage: React.FC = () => {
                                         label={env.displayName}
                                         size="small"
                                         sx={{
-                                          bgcolor: env.color || "#888",
-                                          color: getContrastColor(env.color || "#888"),
-                                          fontSize: "0.7rem",
+                                          bgcolor: env.color || '#888',
+                                          color: getContrastColor(env.color || '#888'),
+                                          fontSize: '0.7rem',
                                           height: 20,
                                           maxWidth: 90,
-                                          "& .MuiChip-label": {
-                                            overflow: "hidden",
-                                            textOverflow: "ellipsis",
-                                            whiteSpace: "nowrap",
+                                          '& .MuiChip-label': {
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis',
+                                            whiteSpace: 'nowrap',
                                           },
                                         }}
                                       />
@@ -1633,35 +1635,39 @@ const FeatureFlagsPage: React.FC = () => {
                                 ))}
                               </React.Fragment>
                             );
-                          case "createdBy":
-                            return <TableCell key={col.id}>{t("common.createdBy")}</TableCell>;
-                          case "createdAt":
+                          case 'createdBy':
+                            return <TableCell key={col.id}>{t('common.createdBy')}</TableCell>;
+                          case 'createdAt':
                             return (
                               <TableCell key={col.id}>
                                 <TableSortLabel
-                                  active={orderBy === "createdAt"}
-                                  direction={orderBy === "createdAt" ? order : "asc"}
-                                  onClick={() => handleSort("createdAt")}
+                                  active={orderBy === 'createdAt'}
+                                  direction={orderBy === 'createdAt' ? order : 'asc'}
+                                  onClick={() => handleSort('createdAt')}
                                 >
-                                  {t("featureFlags.createdAt")}
+                                  {t('featureFlags.createdAt')}
                                 </TableSortLabel>
                               </TableCell>
                             );
-                          case "lastSeenAt":
+                          case 'lastSeenAt':
                             return (
-                              <TableCell key={col.id}>{t("featureFlags.lastSeenAt")}</TableCell>
+                              <TableCell key={col.id}>{t('featureFlags.lastSeenAt')}</TableCell>
                             );
-                          case "tags":
-                            return <TableCell key={col.id}>{t("featureFlags.tags")}</TableCell>;
-                          case "variantType":
-                            return <TableCell key={col.id}>{t("featureFlags.variantType")}</TableCell>;
-                          case "flagUsage":
-                            return <TableCell key={col.id}>{t("featureFlags.flagUsage")}</TableCell>;
+                          case 'tags':
+                            return <TableCell key={col.id}>{t('featureFlags.tags')}</TableCell>;
+                          case 'variantType':
+                            return (
+                              <TableCell key={col.id}>{t('featureFlags.variantType')}</TableCell>
+                            );
+                          case 'flagUsage':
+                            return (
+                              <TableCell key={col.id}>{t('featureFlags.flagUsage')}</TableCell>
+                            );
                           default:
                             return null;
                         }
                       })}
-                      {canManage && <TableCell align="center">{t("common.actions")}</TableCell>}
+                      {canManage && <TableCell align="center">{t('common.actions')}</TableCell>}
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -1694,14 +1700,14 @@ const FeatureFlagsPage: React.FC = () => {
                         {/* Dynamic columns based on visibleColumns order */}
                         {visibleColumns.map((col) => {
                           switch (col.id) {
-                            case "flagName":
+                            case 'flagName':
                               return (
                                 <TableCell key={col.id}>
                                   <Box>
                                     <Box
                                       sx={{
-                                        display: "flex",
-                                        alignItems: "center",
+                                        display: 'flex',
+                                        alignItems: 'center',
                                         gap: 0.5,
                                       }}
                                     >
@@ -1709,11 +1715,11 @@ const FeatureFlagsPage: React.FC = () => {
                                         {getTypeIcon(flag.flagType)}
                                       </Tooltip>
                                       {isStale(flag) && (
-                                        <Tooltip title={t("featureFlags.staleWarning")}>
+                                        <Tooltip title={t('featureFlags.staleWarning')}>
                                           <WarningIcon
                                             sx={{
                                               fontSize: 16,
-                                              color: "warning.main",
+                                              color: 'warning.main',
                                             }}
                                           />
                                         </Tooltip>
@@ -1721,16 +1727,16 @@ const FeatureFlagsPage: React.FC = () => {
                                       <Typography
                                         fontWeight={500}
                                         sx={{
-                                          cursor: "pointer",
-                                          "&:hover": {
-                                            textDecoration: "underline",
+                                          cursor: 'pointer',
+                                          '&:hover': {
+                                            textDecoration: 'underline',
                                           },
                                         }}
                                         onClick={() => navigate(`/feature-flags/${flag.flagName}`)}
                                       >
                                         {flag.flagName}
                                       </Typography>
-                                      <Tooltip title={t("common.copy")}>
+                                      <Tooltip title={t('common.copy')}>
                                         <IconButton
                                           size="small"
                                           onClick={(e) => {
@@ -1743,7 +1749,7 @@ const FeatureFlagsPage: React.FC = () => {
                                           }}
                                           sx={{
                                             opacity: 0.5,
-                                            "&:hover": { opacity: 1 },
+                                            '&:hover': { opacity: 1 },
                                           }}
                                         >
                                           <CopyIcon sx={{ fontSize: 14 }} />
@@ -1757,10 +1763,10 @@ const FeatureFlagsPage: React.FC = () => {
                                         }}
                                         sx={{
                                           color: flag.isFavorite
-                                            ? "warning.main"
-                                            : "action.disabled",
+                                            ? 'warning.main'
+                                            : 'action.disabled',
                                           opacity: flag.isFavorite ? 1 : 0.5,
-                                          "&:hover": { opacity: 1 },
+                                          '&:hover': { opacity: 1 },
                                         }}
                                       >
                                         {flag.isFavorite ? (
@@ -1774,7 +1780,7 @@ const FeatureFlagsPage: React.FC = () => {
                                       <Typography
                                         variant="body2"
                                         color="text.secondary"
-                                        sx={{ fontSize: "0.8rem" }}
+                                        sx={{ fontSize: '0.8rem' }}
                                       >
                                         {flag.displayName}
                                       </Typography>
@@ -1782,7 +1788,7 @@ const FeatureFlagsPage: React.FC = () => {
                                   </Box>
                                 </TableCell>
                               );
-                            case "status":
+                            case 'status':
                               // Status column followed by environment columns
                               return (
                                 <React.Fragment key={col.id}>
@@ -1796,10 +1802,10 @@ const FeatureFlagsPage: React.FC = () => {
                                           )}
                                           size="small"
                                           color={color}
-                                          variant={status === "active" ? "outlined" : "filled"}
+                                          variant={status === 'active' ? 'outlined' : 'filled'}
                                           sx={{
                                             height: 20,
-                                            fontSize: "0.75rem",
+                                            fontSize: '0.75rem',
                                           }}
                                         />
                                       );
@@ -1808,20 +1814,20 @@ const FeatureFlagsPage: React.FC = () => {
                                   {/* Environment columns - right after status */}
                                   {environments.map((env) => {
                                     const isEnabled = getEnvEnabled(flag, env.environment);
-                                    const tooltipText = `${t("featureFlags.toggleTooltip", { env: env.displayName })}\n${isEnabled ? t("featureFlags.toggleTooltipEnabled") : t("featureFlags.toggleTooltipDisabled")}`;
+                                    const tooltipText = `${t('featureFlags.toggleTooltip', { env: env.displayName })}\n${isEnabled ? t('featureFlags.toggleTooltipEnabled') : t('featureFlags.toggleTooltipDisabled')}`;
                                     return (
                                       <TableCell key={env.environment} align="center">
                                         <Box
                                           sx={{
-                                            display: "flex",
-                                            justifyContent: "center",
+                                            display: 'flex',
+                                            justifyContent: 'center',
                                           }}
                                         >
                                           <Tooltip
                                             title={
                                               <span
                                                 style={{
-                                                  whiteSpace: "pre-line",
+                                                  whiteSpace: 'pre-line',
                                                 }}
                                               >
                                                 {tooltipText}
@@ -1850,18 +1856,18 @@ const FeatureFlagsPage: React.FC = () => {
                                   })}
                                 </React.Fragment>
                               );
-                            case "createdBy":
+                            case 'createdBy':
                               return (
                                 <TableCell key={col.id}>
                                   <Box>
                                     <Typography variant="body2" fontWeight={500}>
-                                      {flag.createdByName || "-"}
+                                      {flag.createdByName || '-'}
                                     </Typography>
                                     {flag.createdByEmail && (
                                       <Typography
                                         variant="body2"
                                         color="text.secondary"
-                                        sx={{ fontSize: "0.8rem" }}
+                                        sx={{ fontSize: '0.8rem' }}
                                       >
                                         {flag.createdByEmail}
                                       </Typography>
@@ -1869,7 +1875,7 @@ const FeatureFlagsPage: React.FC = () => {
                                   </Box>
                                 </TableCell>
                               );
-                            case "createdAt":
+                            case 'createdAt':
                               return (
                                 <TableCell key={col.id}>
                                   <Tooltip title={formatDateTimeDetailed(flag.createdAt)}>
@@ -1877,7 +1883,7 @@ const FeatureFlagsPage: React.FC = () => {
                                   </Tooltip>
                                 </TableCell>
                               );
-                            case "lastSeenAt":
+                            case 'lastSeenAt':
                               return (
                                 <TableCell key={col.id}>
                                   {flag.lastSeenAt ? (
@@ -1891,57 +1897,59 @@ const FeatureFlagsPage: React.FC = () => {
                                   )}
                                 </TableCell>
                               );
-                            case "variantType":
+                            case 'variantType':
                               return (
                                 <TableCell key={col.id}>
-                                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                                    {flag.variantType === "none" ? (
+                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                    {flag.variantType === 'none' ? (
                                       <BlockIcon fontSize="small" color="disabled" />
-                                    ) : flag.variantType === "json" ? (
+                                    ) : flag.variantType === 'json' ? (
                                       <JsonIcon fontSize="small" color="secondary" />
-                                    ) : flag.variantType === "number" ? (
+                                    ) : flag.variantType === 'number' ? (
                                       <NumberIcon fontSize="small" color="info" />
                                     ) : (
                                       <StringIcon fontSize="small" color="action" />
                                     )}
                                     <Typography variant="body2">
-                                      {t(`featureFlags.variantTypes.${flag.variantType || "string"}`)}
+                                      {t(
+                                        `featureFlags.variantTypes.${flag.variantType || 'string'}`
+                                      )}
                                     </Typography>
                                   </Box>
                                 </TableCell>
                               );
-                            case "flagUsage":
+                            case 'flagUsage':
                               return (
                                 <TableCell key={col.id}>
-                                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                                    {flag.flagUsage === "remoteConfig" ? (
+                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                    {flag.flagUsage === 'remoteConfig' ? (
                                       <JsonIcon fontSize="small" color="secondary" />
                                     ) : (
                                       <FlagIcon fontSize="small" color="primary" />
                                     )}
                                     <Typography variant="body2">
-                                      {t(`featureFlags.flagUsages.${flag.flagUsage || "flag"}`)}
+                                      {t(`featureFlags.flagUsages.${flag.flagUsage || 'flag'}`)}
                                     </Typography>
                                   </Box>
                                 </TableCell>
                               );
-                            case "tags":
+                            case 'tags':
                               return (
                                 <TableCell key={col.id}>
                                   <Box
                                     sx={{
-                                      display: "flex",
-                                      flexWrap: "wrap",
+                                      display: 'flex',
+                                      flexWrap: 'wrap',
                                       gap: 0.5,
                                     }}
                                   >
                                     {flag.tags?.slice(0, 3).map((tagName) => {
                                       const tagData = allTags.find((t) => t.name === tagName);
-                                      const color = tagData?.color || "#888888";
+                                      const color = tagData?.color || '#888888';
                                       return (
                                         <Tooltip
                                           key={tagName}
-                                          title={tagData?.description || ""}
+                                          title={tagData?.description || ''}
                                           arrow
                                         >
                                           <Chip
@@ -2003,22 +2011,22 @@ const FeatureFlagsPage: React.FC = () => {
           <Paper
             elevation={8}
             sx={{
-              position: "fixed",
+              position: 'fixed',
               bottom: 24,
-              left: "50%",
-              transform: "translateX(-50%)",
+              left: '50%',
+              transform: 'translateX(-50%)',
               px: 3,
               py: 1.5,
               borderRadius: 3,
-              display: "flex",
-              alignItems: "center",
+              display: 'flex',
+              alignItems: 'center',
               gap: 2,
               zIndex: 1000,
-              bgcolor: "background.paper",
+              bgcolor: 'background.paper',
             }}
           >
             <Chip
-              label={`${selectedFlags.size} ${t("common.selected")}`}
+              label={`${selectedFlags.size} ${t('common.selected')}`}
               color="primary"
               size="small"
             />
@@ -2031,7 +2039,7 @@ const FeatureFlagsPage: React.FC = () => {
                 variant="outlined"
                 onClick={(e) => setEnvMenuAnchor(e.currentTarget)}
               >
-                {t("common.enable")} / {t("common.disable")}
+                {t('common.enable')} / {t('common.disable')}
               </Button>
               <Menu
                 anchorEl={envMenuAnchor}
@@ -2050,7 +2058,7 @@ const FeatureFlagsPage: React.FC = () => {
                         <CheckCircleIcon fontSize="small" color="success" />
                       </ListItemIcon>
                       <ListItemText>
-                        {t("common.enable")} - {env.displayName}
+                        {t('common.enable')} - {env.displayName}
                       </ListItemText>
                     </MenuItem>
                     <MenuItem
@@ -2063,7 +2071,7 @@ const FeatureFlagsPage: React.FC = () => {
                         <CancelIcon fontSize="small" color="error" />
                       </ListItemIcon>
                       <ListItemText>
-                        {t("common.disable")} - {env.displayName}
+                        {t('common.disable')} - {env.displayName}
                       </ListItemText>
                     </MenuItem>
                   </Box>
@@ -2077,7 +2085,7 @@ const FeatureFlagsPage: React.FC = () => {
               startIcon={<ArchiveIcon />}
               onClick={handleBulkArchive}
             >
-              {t("featureFlags.archive")}
+              {t('featureFlags.archive')}
             </Button>
 
             <Button
@@ -2086,7 +2094,7 @@ const FeatureFlagsPage: React.FC = () => {
               startIcon={<UnarchiveIcon />}
               onClick={handleBulkRevive}
             >
-              {t("featureFlags.revive")}
+              {t('featureFlags.revive')}
             </Button>
 
             {/* Stale Actions Dropdown */}
@@ -2113,7 +2121,7 @@ const FeatureFlagsPage: React.FC = () => {
                   <ListItemIcon>
                     <StaleIcon fontSize="small" color="warning" />
                   </ListItemIcon>
-                  <ListItemText>{t("featureFlags.markStale")}</ListItemText>
+                  <ListItemText>{t('featureFlags.markStale')}</ListItemText>
                 </MenuItem>
                 <MenuItem
                   onClick={() => {
@@ -2124,7 +2132,7 @@ const FeatureFlagsPage: React.FC = () => {
                   <ListItemIcon>
                     <CheckCircleIcon fontSize="small" />
                   </ListItemIcon>
-                  <ListItemText>{t("featureFlags.clearStale")}</ListItemText>
+                  <ListItemText>{t('featureFlags.clearStale')}</ListItemText>
                 </MenuItem>
               </Menu>
             </Box>
@@ -2139,7 +2147,7 @@ const FeatureFlagsPage: React.FC = () => {
                 setPlaygroundOpen(true);
               }}
             >
-              {t("featureFlags.testInPlayground")}
+              {t('featureFlags.testInPlayground')}
             </Button>
 
             <Divider orientation="vertical" flexItem />
@@ -2161,7 +2169,7 @@ const FeatureFlagsPage: React.FC = () => {
           <ListItemIcon>
             <CopyIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText>{t("featureFlags.copyName")}</ListItemText>
+          <ListItemText>{t('featureFlags.copyName')}</ListItemText>
         </MenuItem>
         <MenuItem
           onClick={() => {
@@ -2174,7 +2182,7 @@ const FeatureFlagsPage: React.FC = () => {
           <ListItemIcon>
             <OpenInNewIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText>{t("featureFlags.goToOverview")}</ListItemText>
+          <ListItemText>{t('featureFlags.goToOverview')}</ListItemText>
         </MenuItem>
         <MenuItem
           onClick={() => {
@@ -2187,7 +2195,7 @@ const FeatureFlagsPage: React.FC = () => {
           <ListItemIcon>
             <MetricsIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText>{t("featureFlags.goToMetrics")}</ListItemText>
+          <ListItemText>{t('featureFlags.goToMetrics')}</ListItemText>
         </MenuItem>
         <MenuItem
           onClick={() => {
@@ -2202,25 +2210,22 @@ const FeatureFlagsPage: React.FC = () => {
           <ListItemIcon>
             <JoystickIcon fontSize="small" color="primary" />
           </ListItemIcon>
-          <ListItemText>{t("featureFlags.testInPlayground")}</ListItemText>
+          <ListItemText>{t('featureFlags.testInPlayground')}</ListItemText>
         </MenuItem>
         <Divider />
         <MenuItem onClick={handleClone} disabled={!actionMenuFlag || actionMenuFlag.isArchived}>
           <ListItemIcon>
             <CloneIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText>{t("featureFlags.clone")}</ListItemText>
+          <ListItemText>{t('featureFlags.clone')}</ListItemText>
         </MenuItem>
         <Divider />
-        <MenuItem
-          onClick={handleStaleMenu}
-          disabled={!actionMenuFlag || actionMenuFlag.isArchived}
-        >
+        <MenuItem onClick={handleStaleMenu} disabled={!actionMenuFlag || actionMenuFlag.isArchived}>
           <ListItemIcon>
-            <StaleIcon fontSize="small" color={actionMenuFlag?.stale ? "warning" : "inherit"} />
+            <StaleIcon fontSize="small" color={actionMenuFlag?.stale ? 'warning' : 'inherit'} />
           </ListItemIcon>
           <ListItemText>
-            {actionMenuFlag?.stale ? t("featureFlags.clearStale") : t("featureFlags.markStale")}
+            {actionMenuFlag?.stale ? t('featureFlags.clearStale') : t('featureFlags.markStale')}
           </ListItemText>
         </MenuItem>
         <MenuItem onClick={handleArchiveFromMenu} disabled={!actionMenuFlag}>
@@ -2232,17 +2237,17 @@ const FeatureFlagsPage: React.FC = () => {
             )}
           </ListItemIcon>
           <ListItemText>
-            {actionMenuFlag?.isArchived ? t("featureFlags.revive") : t("featureFlags.archive")}
+            {actionMenuFlag?.isArchived ? t('featureFlags.revive') : t('featureFlags.archive')}
           </ListItemText>
         </MenuItem>
         {actionMenuFlag?.isArchived && (
           <>
             <Divider />
-            <MenuItem onClick={handleDeleteFromMenu} sx={{ color: "error.main" }}>
+            <MenuItem onClick={handleDeleteFromMenu} sx={{ color: 'error.main' }}>
               <ListItemIcon>
                 <DeleteIcon fontSize="small" color="error" />
               </ListItemIcon>
-              <ListItemText>{t("common.delete")}</ListItemText>
+              <ListItemText>{t('common.delete')}</ListItemText>
             </MenuItem>
           </>
         )}
@@ -2253,9 +2258,9 @@ const FeatureFlagsPage: React.FC = () => {
         open={deleteConfirmOpen}
         onClose={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}
-        title={t("featureFlags.deleteConfirmTitle")}
-        message={t("featureFlags.deleteConfirmMessage", {
-          name: deletingFlag?.flagName || "",
+        title={t('featureFlags.deleteConfirmTitle')}
+        message={t('featureFlags.deleteConfirmMessage', {
+          name: deletingFlag?.flagName || '',
         })}
       />
 
@@ -2268,26 +2273,24 @@ const FeatureFlagsPage: React.FC = () => {
       >
         <DialogTitle>
           {actionMenuFlag?.isArchived
-            ? t("featureFlags.reviveConfirmTitle")
-            : t("featureFlags.archiveConfirmTitle")}
+            ? t('featureFlags.reviveConfirmTitle')
+            : t('featureFlags.archiveConfirmTitle')}
         </DialogTitle>
         <DialogContent>
           <Typography>
             {actionMenuFlag?.isArchived
-              ? t("featureFlags.reviveConfirmMessage", { name: actionMenuFlag?.flagName })
-              : t("featureFlags.archiveConfirmMessage", { name: actionMenuFlag?.flagName })}
+              ? t('featureFlags.reviveConfirmMessage', { name: actionMenuFlag?.flagName })
+              : t('featureFlags.archiveConfirmMessage', { name: actionMenuFlag?.flagName })}
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setArchiveConfirmOpen(false)}>
-            {t("common.cancel")}
-          </Button>
+          <Button onClick={() => setArchiveConfirmOpen(false)}>{t('common.cancel')}</Button>
           <Button
             variant="contained"
-            color={actionMenuFlag?.isArchived ? "success" : "warning"}
+            color={actionMenuFlag?.isArchived ? 'success' : 'warning'}
             onClick={handleArchiveConfirm}
           >
-            {actionMenuFlag?.isArchived ? t("featureFlags.revive") : t("featureFlags.archive")}
+            {actionMenuFlag?.isArchived ? t('featureFlags.revive') : t('featureFlags.archive')}
           </Button>
         </DialogActions>
       </Dialog>
@@ -2301,26 +2304,24 @@ const FeatureFlagsPage: React.FC = () => {
       >
         <DialogTitle>
           {actionMenuFlag?.stale
-            ? t("featureFlags.unmarkStaleConfirmTitle")
-            : t("featureFlags.markStaleConfirmTitle")}
+            ? t('featureFlags.unmarkStaleConfirmTitle')
+            : t('featureFlags.markStaleConfirmTitle')}
         </DialogTitle>
         <DialogContent>
           <Typography>
             {actionMenuFlag?.stale
-              ? t("featureFlags.unmarkStaleConfirmMessage", { name: actionMenuFlag?.flagName })
-              : t("featureFlags.markStaleConfirmMessage", { name: actionMenuFlag?.flagName })}
+              ? t('featureFlags.unmarkStaleConfirmMessage', { name: actionMenuFlag?.flagName })
+              : t('featureFlags.markStaleConfirmMessage', { name: actionMenuFlag?.flagName })}
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setStaleConfirmOpen(false)}>
-            {t("common.cancel")}
-          </Button>
+          <Button onClick={() => setStaleConfirmOpen(false)}>{t('common.cancel')}</Button>
           <Button
             variant="contained"
-            color={actionMenuFlag?.stale ? "info" : "secondary"}
+            color={actionMenuFlag?.stale ? 'info' : 'secondary'}
             onClick={handleStaleConfirm}
           >
-            {actionMenuFlag?.stale ? t("featureFlags.unmarkStale") : t("featureFlags.markStale")}
+            {actionMenuFlag?.stale ? t('featureFlags.unmarkStale') : t('featureFlags.markStale')}
           </Button>
         </DialogActions>
       </Dialog>
@@ -2332,34 +2333,34 @@ const FeatureFlagsPage: React.FC = () => {
         maxWidth="sm"
         fullWidth
       >
-        <DialogTitle>{t("featureFlags.cloneFlag")}</DialogTitle>
+        <DialogTitle>{t('featureFlags.cloneFlag')}</DialogTitle>
         <DialogContent>
           <Box sx={{ pt: 1 }}>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              {t("featureFlags.cloneFlagDescription", {
-                name: cloningFlag?.flagName || "",
+              {t('featureFlags.cloneFlagDescription', {
+                name: cloningFlag?.flagName || '',
               })}
             </Typography>
             <TextField
               fullWidth
               required
               autoFocus
-              label={t("featureFlags.newFlagName")}
+              label={t('featureFlags.newFlagName')}
               value={cloneNewName}
-              onChange={(e) => setCloneNewName(e.target.value.replace(/[^a-zA-Z0-9_.-]/g, ""))}
+              onChange={(e) => setCloneNewName(e.target.value.replace(/[^a-zA-Z0-9_.-]/g, ''))}
               placeholder="new-flag-name"
-              helperText={t("featureFlags.flagNameHelp")}
+              helperText={t('featureFlags.flagNameHelp')}
             />
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setCloneDialogOpen(false)}>{t("common.cancel")}</Button>
+          <Button onClick={() => setCloneDialogOpen(false)}>{t('common.cancel')}</Button>
           <Button
             variant="contained"
             onClick={handleCloneConfirm}
             disabled={cloning || !cloneNewName.trim()}
           >
-            {cloning ? <CircularProgress size={20} /> : t("featureFlags.clone")}
+            {cloning ? <CircularProgress size={20} /> : t('featureFlags.clone')}
           </Button>
         </DialogActions>
       </Dialog>
@@ -2368,18 +2369,29 @@ const FeatureFlagsPage: React.FC = () => {
       <ResizableDrawer
         open={createDialogOpen}
         onClose={() => setCreateDialogOpen(false)}
-        title={newFlag.flagUsage === "remoteConfig" ? t("featureFlags.createRemoteConfig") : t("featureFlags.createFlag")}
-        subtitle={newFlag.flagUsage === "remoteConfig" ? t("featureFlags.createRemoteConfigSubtitle") : t("featureFlags.createFlagSubtitle")}
+        title={
+          newFlag.flagUsage === 'remoteConfig'
+            ? t('featureFlags.createRemoteConfig')
+            : t('featureFlags.createFlag')
+        }
+        subtitle={
+          newFlag.flagUsage === 'remoteConfig'
+            ? t('featureFlags.createRemoteConfigSubtitle')
+            : t('featureFlags.createFlagSubtitle')
+        }
         storageKey="featureFlagCreateDrawerWidth"
         defaultWidth={500}
       >
-        <Box sx={{ p: 3, flex: 1, overflow: "auto" }}>
+        <Box sx={{ p: 3, flex: 1, overflow: 'auto' }}>
           <Stack spacing={3}>
             {/* Flag Name */}
             <Box>
-              <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: 1 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1 }}>
                 <Typography variant="subtitle2">
-                  {t("featureFlags.flagName")} <Box component="span" sx={{ color: "error.main" }}>*</Box>
+                  {t('featureFlags.flagName')}{' '}
+                  <Box component="span" sx={{ color: 'error.main' }}>
+                    *
+                  </Box>
                 </Typography>
                 <NamingGuide type="flag" />
               </Box>
@@ -2390,10 +2402,10 @@ const FeatureFlagsPage: React.FC = () => {
                 onChange={(e) =>
                   setNewFlag({
                     ...newFlag,
-                    flagName: e.target.value.replace(/[^a-zA-Z0-9_-]/g, ""),
+                    flagName: e.target.value.replace(/[^a-zA-Z0-9_-]/g, ''),
                   })
                 }
-                helperText={t("featureFlags.flagNameHelp")}
+                helperText={t('featureFlags.flagNameHelp')}
                 inputProps={{ maxLength: 100 }}
               />
             </Box>
@@ -2401,10 +2413,10 @@ const FeatureFlagsPage: React.FC = () => {
             {/* Display Name */}
             <TextField
               fullWidth
-              label={t("featureFlags.displayName")}
-              value={newFlag.displayName || ""}
+              label={t('featureFlags.displayName')}
+              value={newFlag.displayName || ''}
               onChange={(e) => setNewFlag({ ...newFlag, displayName: e.target.value })}
-              helperText={t("featureFlags.displayNameHelp")}
+              helperText={t('featureFlags.displayNameHelp')}
             />
 
             {/* Description */}
@@ -2412,18 +2424,18 @@ const FeatureFlagsPage: React.FC = () => {
               fullWidth
               multiline
               rows={3}
-              label={t("featureFlags.description")}
+              label={t('featureFlags.description')}
               value={newFlag.description}
               onChange={(e) => setNewFlag({ ...newFlag, description: e.target.value })}
-              helperText={t("featureFlags.descriptionHelp")}
+              helperText={t('featureFlags.descriptionHelp')}
             />
 
             {/* Flag Type */}
             <FormControl fullWidth>
-              <InputLabel>{t("featureFlags.flagType")}</InputLabel>
+              <InputLabel>{t('featureFlags.flagType')}</InputLabel>
               <Select
                 value={newFlag.flagType}
-                label={t("featureFlags.flagType")}
+                label={t('featureFlags.flagType')}
                 onChange={(e) =>
                   setNewFlag({
                     ...newFlag,
@@ -2432,96 +2444,96 @@ const FeatureFlagsPage: React.FC = () => {
                 }
               >
                 <MenuItem value="release">
-                  <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
                     <Box sx={{ mt: 0.3 }}>
                       <ReleaseIcon sx={{ fontSize: 18 }} color="primary" />
                     </Box>
                     <Box>
                       <Typography variant="body2" fontWeight={500}>
-                        {t("featureFlags.types.release")}
+                        {t('featureFlags.types.release')}
                       </Typography>
                       <Typography
                         variant="caption"
                         color="text.secondary"
-                        sx={{ display: "block" }}
+                        sx={{ display: 'block' }}
                       >
-                        {t("featureFlags.flagTypes.release.desc")}
+                        {t('featureFlags.flagTypes.release.desc')}
                       </Typography>
                     </Box>
                   </Box>
                 </MenuItem>
                 <MenuItem value="experiment">
-                  <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
                     <Box sx={{ mt: 0.3 }}>
                       <ExperimentIcon sx={{ fontSize: 18 }} color="secondary" />
                     </Box>
                     <Box>
                       <Typography variant="body2" fontWeight={500}>
-                        {t("featureFlags.types.experiment")}
+                        {t('featureFlags.types.experiment')}
                       </Typography>
                       <Typography
                         variant="caption"
                         color="text.secondary"
-                        sx={{ display: "block" }}
+                        sx={{ display: 'block' }}
                       >
-                        {t("featureFlags.flagTypes.experiment.desc")}
+                        {t('featureFlags.flagTypes.experiment.desc')}
                       </Typography>
                     </Box>
                   </Box>
                 </MenuItem>
                 <MenuItem value="operational">
-                  <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
                     <Box sx={{ mt: 0.3 }}>
                       <OperationalIcon sx={{ fontSize: 18 }} color="warning" />
                     </Box>
                     <Box>
                       <Typography variant="body2" fontWeight={500}>
-                        {t("featureFlags.types.operational")}
+                        {t('featureFlags.types.operational')}
                       </Typography>
                       <Typography
                         variant="caption"
                         color="text.secondary"
-                        sx={{ display: "block" }}
+                        sx={{ display: 'block' }}
                       >
-                        {t("featureFlags.flagTypes.operational.desc")}
+                        {t('featureFlags.flagTypes.operational.desc')}
                       </Typography>
                     </Box>
                   </Box>
                 </MenuItem>
                 <MenuItem value="killSwitch">
-                  <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
                     <Box sx={{ mt: 0.3 }}>
                       <KillSwitchIcon sx={{ fontSize: 18 }} color="error" />
                     </Box>
                     <Box>
                       <Typography variant="body2" fontWeight={500}>
-                        {t("featureFlags.types.killSwitch")}
+                        {t('featureFlags.types.killSwitch')}
                       </Typography>
                       <Typography
                         variant="caption"
                         color="text.secondary"
-                        sx={{ display: "block" }}
+                        sx={{ display: 'block' }}
                       >
-                        {t("featureFlags.flagTypes.killSwitch.desc")}
+                        {t('featureFlags.flagTypes.killSwitch.desc')}
                       </Typography>
                     </Box>
                   </Box>
                 </MenuItem>
                 <MenuItem value="permission">
-                  <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
                     <Box sx={{ mt: 0.3 }}>
                       <PermissionIcon sx={{ fontSize: 18 }} color="action" />
                     </Box>
                     <Box>
                       <Typography variant="body2" fontWeight={500}>
-                        {t("featureFlags.types.permission")}
+                        {t('featureFlags.types.permission')}
                       </Typography>
                       <Typography
                         variant="caption"
                         color="text.secondary"
-                        sx={{ display: "block" }}
+                        sx={{ display: 'block' }}
                       >
-                        {t("featureFlags.flagTypes.permission.desc")}
+                        {t('featureFlags.flagTypes.permission.desc')}
                       </Typography>
                     </Box>
                   </Box>
@@ -2533,12 +2545,12 @@ const FeatureFlagsPage: React.FC = () => {
             <Box>
               <Box
                 sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
                 }}
               >
-                <Typography variant="body2">{t("featureFlags.impressionData")}</Typography>
+                <Typography variant="body2">{t('featureFlags.impressionData')}</Typography>
                 <Switch
                   checked={newFlag.impressionDataEnabled}
                   onChange={(e) =>
@@ -2550,7 +2562,7 @@ const FeatureFlagsPage: React.FC = () => {
                 />
               </Box>
               <Typography variant="caption" color="text.secondary">
-                {t("featureFlags.impressionDataHelp")}
+                {t('featureFlags.impressionDataHelp')}
               </Typography>
             </Box>
 
@@ -2558,55 +2570,66 @@ const FeatureFlagsPage: React.FC = () => {
             <Box>
               <Typography
                 variant="subtitle2"
-                sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: 1 }}
+                sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1 }}
               >
-                {t("featureFlags.variantType")}
-                <Tooltip title={t("featureFlags.variantTypeHelp")}>
+                {t('featureFlags.variantType')}
+                <Tooltip title={t('featureFlags.variantTypeHelp')}>
                   <HelpOutlineIcon fontSize="small" color="action" />
                 </Tooltip>
               </Typography>
-              {newFlag.flagUsage === "remoteConfig" && (
-                <Typography variant="caption" color="text.secondary" sx={{ display: "block", mb: 1 }}>
-                  {t("featureFlags.remoteConfigRequiresVariantType")}
+              {newFlag.flagUsage === 'remoteConfig' && (
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ display: 'block', mb: 1 }}
+                >
+                  {t('featureFlags.remoteConfigRequiresVariantType')}
                 </Typography>
               )}
               <FormControl size="small" sx={{ minWidth: 200 }}>
                 <Select
                   value={newFlag.variantType}
                   onChange={(e) => {
-                    const newType = e.target.value as "none" | "string" | "json" | "number";
+                    const newType = e.target.value as 'none' | 'string' | 'json' | 'number';
                     setNewFlag((prev) => ({
                       ...prev,
                       variantType: newType,
-                      baselinePayload: newType === "none" ? "" : newType === "number" ? 0 : newType === "json" ? "{}" : "",
+                      baselinePayload:
+                        newType === 'none'
+                          ? ''
+                          : newType === 'number'
+                            ? 0
+                            : newType === 'json'
+                              ? '{}'
+                              : '',
                     }));
-                    if (newType !== "json") {
+                    if (newType !== 'json') {
                       setNewFlagBaselinePayloadJsonError(null);
                     }
                   }}
                 >
-                  <MenuItem value="none" disabled={newFlag.flagUsage === "remoteConfig"}>
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                      <BlockIcon sx={{ fontSize: 16, color: "text.disabled" }} />
-                      {t("featureFlags.variantTypes.none")}
+                  <MenuItem value="none" disabled={newFlag.flagUsage === 'remoteConfig'}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <BlockIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
+                      {t('featureFlags.variantTypes.none')}
                     </Box>
                   </MenuItem>
                   <MenuItem value="string">
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                      <StringIcon sx={{ fontSize: 16, color: "info.main" }} />
-                      {t("featureFlags.variantTypes.string")}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <StringIcon sx={{ fontSize: 16, color: 'info.main' }} />
+                      {t('featureFlags.variantTypes.string')}
                     </Box>
                   </MenuItem>
                   <MenuItem value="number">
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                      <NumberIcon sx={{ fontSize: 16, color: "success.main" }} />
-                      {t("featureFlags.variantTypes.number")}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <NumberIcon sx={{ fontSize: 16, color: 'success.main' }} />
+                      {t('featureFlags.variantTypes.number')}
                     </Box>
                   </MenuItem>
                   <MenuItem value="json">
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                      <JsonIcon sx={{ fontSize: 16, color: "warning.main" }} />
-                      {t("featureFlags.variantTypes.json")}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <JsonIcon sx={{ fontSize: 16, color: 'warning.main' }} />
+                      {t('featureFlags.variantTypes.json')}
                     </Box>
                   </MenuItem>
                 </Select>
@@ -2614,23 +2637,24 @@ const FeatureFlagsPage: React.FC = () => {
             </Box>
 
             {/* Baseline Payload - only show when variantType is not 'none' */}
-            {newFlag.variantType !== "none" && (
+            {newFlag.variantType !== 'none' && (
               <Box>
                 <Typography
                   variant="subtitle2"
-                  sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: 1 }}
+                  sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1 }}
                 >
-                  {t("featureFlags.baselinePayload")}
-                  <Tooltip title={t("featureFlags.baselinePayloadHelp")}>
+                  {t('featureFlags.baselinePayload')}
+                  <Tooltip title={t('featureFlags.baselinePayloadHelp')}>
                     <HelpOutlineIcon fontSize="small" color="action" />
                   </Tooltip>
                 </Typography>
-                {newFlag.variantType === "json" ? (
+                {newFlag.variantType === 'json' ? (
                   <>
                     <JsonEditor
-                      value={typeof newFlag.baselinePayload === "object"
-                        ? JSON.stringify(newFlag.baselinePayload, null, 2)
-                        : String(newFlag.baselinePayload || "{}")
+                      value={
+                        typeof newFlag.baselinePayload === 'object'
+                          ? JSON.stringify(newFlag.baselinePayload, null, 2)
+                          : String(newFlag.baselinePayload || '{}')
                       }
                       onChange={(value) => {
                         let parsedValue: any = value;
@@ -2638,41 +2662,51 @@ const FeatureFlagsPage: React.FC = () => {
                           parsedValue = JSON.parse(value);
                           setNewFlagBaselinePayloadJsonError(null);
                         } catch (e: any) {
-                          setNewFlagBaselinePayloadJsonError(e.message || "Invalid JSON");
+                          setNewFlagBaselinePayloadJsonError(e.message || 'Invalid JSON');
                         }
                         setNewFlag((prev) => ({ ...prev, baselinePayload: parsedValue }));
                       }}
                       onValidation={(isValid, error) => {
-                        setNewFlagBaselinePayloadJsonError(isValid ? null : (error || "Invalid JSON"));
+                        setNewFlagBaselinePayloadJsonError(
+                          isValid ? null : error || 'Invalid JSON'
+                        );
                       }}
                       height={200}
                     />
                     {newFlagBaselinePayloadJsonError && (
-                      <Typography variant="caption" color="error" sx={{ mt: 0.5, display: "block" }}>
-                        {t("featureFlags.jsonError")}
+                      <Typography
+                        variant="caption"
+                        color="error"
+                        sx={{ mt: 0.5, display: 'block' }}
+                      >
+                        {t('featureFlags.jsonError')}
                       </Typography>
                     )}
-                    {!newFlagBaselinePayloadJsonError && newFlag.baselinePayload !== "" && (
-                      <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: "block" }}>
-                        {t("featureFlags.payloadSize", {
+                    {!newFlagBaselinePayloadJsonError && newFlag.baselinePayload !== '' && (
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        sx={{ mt: 0.5, display: 'block' }}
+                      >
+                        {t('featureFlags.payloadSize', {
                           size: new TextEncoder().encode(
-                            typeof newFlag.baselinePayload === "object"
+                            typeof newFlag.baselinePayload === 'object'
                               ? JSON.stringify(newFlag.baselinePayload)
-                              : String(newFlag.baselinePayload || "")
+                              : String(newFlag.baselinePayload || '')
                           ).length,
                         })}
                       </Typography>
                     )}
                   </>
-                ) : newFlag.variantType === "number" ? (
+                ) : newFlag.variantType === 'number' ? (
                   <TextField
                     fullWidth
                     size="small"
                     type="number"
                     placeholder="0"
-                    value={newFlag.baselinePayload ?? ""}
+                    value={newFlag.baselinePayload ?? ''}
                     onChange={(e) => {
-                      const numValue = e.target.value === "" ? undefined : Number(e.target.value);
+                      const numValue = e.target.value === '' ? undefined : Number(e.target.value);
                       setNewFlag((prev) => ({ ...prev, baselinePayload: numValue ?? 0 }));
                     }}
                   />
@@ -2681,16 +2715,21 @@ const FeatureFlagsPage: React.FC = () => {
                     <TextField
                       fullWidth
                       size="small"
-                      placeholder={t("featureFlags.baselinePayloadPlaceholder")}
-                      value={newFlag.baselinePayload ?? ""}
+                      placeholder={t('featureFlags.baselinePayloadPlaceholder')}
+                      value={newFlag.baselinePayload ?? ''}
                       onChange={(e) => {
                         setNewFlag((prev) => ({ ...prev, baselinePayload: e.target.value }));
                       }}
                     />
-                    {newFlag.baselinePayload !== "" && (
-                      <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: "block" }}>
-                        {t("featureFlags.payloadSize", {
-                          size: new TextEncoder().encode(String(newFlag.baselinePayload || "")).length,
+                    {newFlag.baselinePayload !== '' && (
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        sx={{ mt: 0.5, display: 'block' }}
+                      >
+                        {t('featureFlags.payloadSize', {
+                          size: new TextEncoder().encode(String(newFlag.baselinePayload || ''))
+                            .length,
                         })}
                       </Typography>
                     )}
@@ -2709,9 +2748,9 @@ const FeatureFlagsPage: React.FC = () => {
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  label={t("featureFlags.tags")}
-                  placeholder={t("featureFlags.selectTags")}
-                  helperText={t("featureFlags.tagsHelp")}
+                  label={t('featureFlags.tags')}
+                  placeholder={t('featureFlags.selectTags')}
+                  helperText={t('featureFlags.tagsHelp')}
                 />
               )}
               renderTags={(value, getTagProps) =>
@@ -2724,8 +2763,8 @@ const FeatureFlagsPage: React.FC = () => {
                       label={option}
                       size="small"
                       sx={{
-                        bgcolor: tag?.color || "#888",
-                        color: getContrastColor(tag?.color || "#888"),
+                        bgcolor: tag?.color || '#888',
+                        color: getContrastColor(tag?.color || '#888'),
                       }}
                     />
                   );
@@ -2740,22 +2779,26 @@ const FeatureFlagsPage: React.FC = () => {
           sx={{
             p: 2,
             borderTop: 1,
-            borderColor: "divider",
-            display: "flex",
-            justifyContent: "flex-end",
+            borderColor: 'divider',
+            display: 'flex',
+            justifyContent: 'flex-end',
             gap: 1,
           }}
         >
           <Button onClick={() => setCreateDialogOpen(false)} disabled={creating}>
-            {t("common.cancel")}
+            {t('common.cancel')}
           </Button>
           <Button
             variant="contained"
             onClick={handleCreateFlag}
-            disabled={creating || !newFlag.flagName.trim() || (newFlag.variantType === "json" && newFlagBaselinePayloadJsonError !== null)}
+            disabled={
+              creating ||
+              !newFlag.flagName.trim() ||
+              (newFlag.variantType === 'json' && newFlagBaselinePayloadJsonError !== null)
+            }
             startIcon={creating ? <CircularProgress size={20} /> : undefined}
           >
-            {t("featureFlags.createFlag")}
+            {t('featureFlags.createFlag')}
           </Button>
         </Box>
       </ResizableDrawer>
@@ -2783,7 +2826,7 @@ const FeatureFlagsPage: React.FC = () => {
           </ListItemIcon>
           <ListItemText>
             <Typography variant="subtitle2" color="text.secondary">
-              {t("featureFlags.export")}
+              {t('featureFlags.export')}
             </Typography>
           </ListItemText>
         </MenuItem>
@@ -2797,11 +2840,11 @@ const FeatureFlagsPage: React.FC = () => {
               <Chip
                 size="small"
                 sx={{
-                  bgcolor: env.color || "#888",
-                  color: getContrastColor(env.color || "#888"),
+                  bgcolor: env.color || '#888',
+                  color: getContrastColor(env.color || '#888'),
                   width: 20,
                   height: 20,
-                  "& .MuiChip-label": { display: "none" },
+                  '& .MuiChip-label': { display: 'none' },
                 }}
               />
             </ListItemIcon>
@@ -2820,7 +2863,7 @@ const FeatureFlagsPage: React.FC = () => {
           <ListItemIcon>
             <ImportIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText>{t("featureFlags.import")}</ListItemText>
+          <ListItemText>{t('featureFlags.import')}</ListItemText>
         </MenuItem>
       </Menu>
 
@@ -2831,45 +2874,45 @@ const FeatureFlagsPage: React.FC = () => {
         maxWidth="md"
         fullWidth
       >
-        <DialogTitle>{t("featureFlags.import")}</DialogTitle>
+        <DialogTitle>{t('featureFlags.import')}</DialogTitle>
         <DialogContent>
           <Box
             sx={{
               mb: 2,
               mt: 1,
               p: 3,
-              border: "2px dashed",
-              borderColor: "divider",
+              border: '2px dashed',
+              borderColor: 'divider',
               borderRadius: 2,
-              textAlign: "center",
-              cursor: "pointer",
-              transition: "all 0.2s ease",
-              "&:hover": {
-                borderColor: "primary.main",
-                bgcolor: "action.hover",
+              textAlign: 'center',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              '&:hover': {
+                borderColor: 'primary.main',
+                bgcolor: 'action.hover',
               },
-              "&.drag-active": {
-                borderColor: "primary.main",
-                bgcolor: "primary.main",
+              '&.drag-active': {
+                borderColor: 'primary.main',
+                bgcolor: 'primary.main',
                 opacity: 0.1,
               },
             }}
             onDragOver={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              e.currentTarget.classList.add("drag-active");
+              e.currentTarget.classList.add('drag-active');
             }}
             onDragLeave={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              e.currentTarget.classList.remove("drag-active");
+              e.currentTarget.classList.remove('drag-active');
             }}
             onDrop={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              e.currentTarget.classList.remove("drag-active");
+              e.currentTarget.classList.remove('drag-active');
               const file = e.dataTransfer.files[0];
-              if (file && file.name.endsWith(".json")) {
+              if (file && file.name.endsWith('.json')) {
                 const reader = new FileReader();
                 reader.onload = (ev) => {
                   setImportData(ev.target?.result as string);
@@ -2879,13 +2922,13 @@ const FeatureFlagsPage: React.FC = () => {
             }}
           >
             <Typography variant="body2" color="text.secondary" gutterBottom>
-              {t("featureFlags.importDescription")}
+              {t('featureFlags.importDescription')}
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              {t("featureFlags.importDragDrop")}
+              {t('featureFlags.importDragDrop')}
             </Typography>
             <Button variant="outlined" component="label" startIcon={<ImportIcon />}>
-              {t("featureFlags.selectFile")}
+              {t('featureFlags.selectFile')}
               <input type="file" accept=".json" hidden onChange={handleImportFileChange} />
             </Button>
           </Box>
@@ -2895,19 +2938,19 @@ const FeatureFlagsPage: React.FC = () => {
             fullWidth
             value={importData}
             onChange={(e) => setImportData(e.target.value)}
-            placeholder={t("featureFlags.importPlaceholder")}
-            sx={{ fontFamily: "monospace" }}
+            placeholder={t('featureFlags.importPlaceholder')}
+            sx={{ fontFamily: 'monospace' }}
           />
         </DialogContent>
         <DialogActions>
           <Button
             onClick={() => {
               setImportDialogOpen(false);
-              setImportData("");
+              setImportData('');
             }}
             disabled={importing}
           >
-            {t("common.cancel")}
+            {t('common.cancel')}
           </Button>
           <Button
             variant="contained"
@@ -2915,7 +2958,7 @@ const FeatureFlagsPage: React.FC = () => {
             disabled={importing || !importData.trim()}
             startIcon={importing ? <CircularProgress size={20} /> : undefined}
           >
-            {t("featureFlags.import")}
+            {t('featureFlags.import')}
           </Button>
         </DialogActions>
       </Dialog>
@@ -2931,7 +2974,7 @@ const FeatureFlagsPage: React.FC = () => {
         initialFlags={playgroundInitialFlags}
         autoExecute={playgroundAutoExecute}
       />
-    </Box >
+    </Box>
   );
 };
 

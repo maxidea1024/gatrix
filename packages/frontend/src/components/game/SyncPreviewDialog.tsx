@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -21,20 +21,20 @@ import {
   CircularProgress,
   Alert,
   Checkbox,
-} from "@mui/material";
+} from '@mui/material';
 import {
   ExpandMore as ExpandMoreIcon,
   Add as AddIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
-} from "@mui/icons-material";
-import { useTranslation } from "react-i18next";
+} from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
 import {
   SyncPreviewResult,
   SyncAddItem,
   SyncUpdateItem,
   SyncDeleteItem,
-} from "../../services/storeProductService";
+} from '../../services/storeProductService';
 
 export interface SelectedSyncItems {
   toAdd: number[]; // cmsProductId array
@@ -51,9 +51,9 @@ interface SyncPreviewDialogProps {
 }
 
 const FIELD_LABELS: Record<string, string> = {
-  productName: "syncFieldProductName",
-  price: "syncFieldPrice",
-  description: "syncFieldDescription",
+  productName: 'syncFieldProductName',
+  price: 'syncFieldPrice',
+  description: 'syncFieldDescription',
 };
 
 const SyncPreviewDialog: React.FC<SyncPreviewDialogProps> = ({
@@ -74,9 +74,7 @@ const SyncPreviewDialog: React.FC<SyncPreviewDialogProps> = ({
   useEffect(() => {
     if (preview) {
       setSelectedAdd(new Set(preview.toAdd.map((item) => item.cmsProductId)));
-      setSelectedUpdate(
-        new Set(preview.toUpdate.map((item) => item.cmsProductId)),
-      );
+      setSelectedUpdate(new Set(preview.toUpdate.map((item) => item.cmsProductId)));
       setSelectedDelete(new Set(preview.toDelete.map((item) => item.id)));
     }
   }, [preview]);
@@ -133,9 +131,7 @@ const SyncPreviewDialog: React.FC<SyncPreviewDialogProps> = ({
 
   const handleSelectAllUpdate = (checked: boolean) => {
     if (checked && preview) {
-      setSelectedUpdate(
-        new Set(preview.toUpdate.map((item) => item.cmsProductId)),
-      );
+      setSelectedUpdate(new Set(preview.toUpdate.map((item) => item.cmsProductId)));
     } else {
       setSelectedUpdate(new Set());
     }
@@ -159,62 +155,55 @@ const SyncPreviewDialog: React.FC<SyncPreviewDialogProps> = ({
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-      <DialogTitle>{t("storeProducts.syncPreviewTitle")}</DialogTitle>
+      <DialogTitle>{t('storeProducts.syncPreviewTitle')}</DialogTitle>
       <DialogContent dividers>
         {loading && !preview ? (
-          <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
             <CircularProgress />
           </Box>
         ) : preview ? (
           <Box>
             {/* Subtitle */}
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              {t("storeProducts.syncPreviewSubtitle")}
+              {t('storeProducts.syncPreviewSubtitle')}
             </Typography>
 
             {/* Summary */}
-            <Box sx={{ mb: 3, p: 2, bgcolor: "action.hover", borderRadius: 1 }}>
+            <Box sx={{ mb: 3, p: 2, bgcolor: 'action.hover', borderRadius: 1 }}>
               <Typography variant="subtitle2" gutterBottom color="text.primary">
-                {t("storeProducts.syncSummary")}
+                {t('storeProducts.syncSummary')}
               </Typography>
-              <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
+              <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
                 <Chip
                   icon={<AddIcon />}
-                  label={`${t("storeProducts.syncToAdd")}: ${preview.summary.addCount}`}
-                  color={preview.summary.addCount > 0 ? "success" : "default"}
+                  label={`${t('storeProducts.syncToAdd')}: ${preview.summary.addCount}`}
+                  color={preview.summary.addCount > 0 ? 'success' : 'default'}
                   variant="outlined"
                 />
                 <Chip
                   icon={<EditIcon />}
-                  label={`${t("storeProducts.syncToUpdate")}: ${preview.summary.updateCount}`}
-                  color={
-                    preview.summary.updateCount > 0 ? "warning" : "default"
-                  }
+                  label={`${t('storeProducts.syncToUpdate')}: ${preview.summary.updateCount}`}
+                  color={preview.summary.updateCount > 0 ? 'warning' : 'default'}
                   variant="outlined"
                 />
                 <Chip
                   icon={<DeleteIcon />}
-                  label={`${t("storeProducts.syncToDelete")}: ${preview.summary.deleteCount}`}
-                  color={preview.summary.deleteCount > 0 ? "error" : "default"}
+                  label={`${t('storeProducts.syncToDelete')}: ${preview.summary.deleteCount}`}
+                  color={preview.summary.deleteCount > 0 ? 'error' : 'default'}
                   variant="outlined"
                 />
               </Box>
             </Box>
 
-            {!hasChanges && (
-              <Alert severity="info">{t("storeProducts.syncNoChanges")}</Alert>
-            )}
+            {!hasChanges && <Alert severity="info">{t('storeProducts.syncNoChanges')}</Alert>}
 
             {/* To Add */}
             {preview.toAdd.length > 0 && (
               <Accordion defaultExpanded>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <Typography
-                    sx={{ display: "flex", alignItems: "center", gap: 1 }}
-                  >
+                  <Typography sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <AddIcon color="success" />
-                    {t("storeProducts.syncAddItems")} ({selectedAdd.size}/
-                    {preview.toAdd.length})
+                    {t('storeProducts.syncAddItems')} ({selectedAdd.size}/{preview.toAdd.length})
                   </Typography>
                 </AccordionSummary>
                 <AccordionDetails>
@@ -222,37 +211,26 @@ const SyncPreviewDialog: React.FC<SyncPreviewDialogProps> = ({
                     <Table size="small" stickyHeader>
                       <TableHead>
                         <TableRow>
-                          <TableCell
-                            padding="checkbox"
-                            sx={{ bgcolor: "background.paper" }}
-                          >
+                          <TableCell padding="checkbox" sx={{ bgcolor: 'background.paper' }}>
                             <Checkbox
-                              checked={
-                                selectedAdd.size === preview.toAdd.length
-                              }
+                              checked={selectedAdd.size === preview.toAdd.length}
                               indeterminate={
-                                selectedAdd.size > 0 &&
-                                selectedAdd.size < preview.toAdd.length
+                                selectedAdd.size > 0 && selectedAdd.size < preview.toAdd.length
                               }
-                              onChange={(e) =>
-                                handleSelectAllAdd(e.target.checked)
-                              }
+                              onChange={(e) => handleSelectAllAdd(e.target.checked)}
                             />
                           </TableCell>
-                          <TableCell sx={{ bgcolor: "background.paper" }}>
-                            {t("storeProducts.cmsProductId")}
+                          <TableCell sx={{ bgcolor: 'background.paper' }}>
+                            {t('storeProducts.cmsProductId')}
                           </TableCell>
-                          <TableCell sx={{ bgcolor: "background.paper" }}>
-                            {t("storeProducts.productId")}
+                          <TableCell sx={{ bgcolor: 'background.paper' }}>
+                            {t('storeProducts.productId')}
                           </TableCell>
-                          <TableCell sx={{ bgcolor: "background.paper" }}>
-                            {t("storeProducts.productName")}
+                          <TableCell sx={{ bgcolor: 'background.paper' }}>
+                            {t('storeProducts.productName')}
                           </TableCell>
-                          <TableCell
-                            align="right"
-                            sx={{ bgcolor: "background.paper" }}
-                          >
-                            {t("storeProducts.price")}
+                          <TableCell align="right" sx={{ bgcolor: 'background.paper' }}>
+                            {t('storeProducts.price')}
                           </TableCell>
                         </TableRow>
                       </TableHead>
@@ -262,17 +240,13 @@ const SyncPreviewDialog: React.FC<SyncPreviewDialogProps> = ({
                             <TableCell padding="checkbox">
                               <Checkbox
                                 checked={selectedAdd.has(item.cmsProductId)}
-                                onChange={() =>
-                                  handleToggleAdd(item.cmsProductId)
-                                }
+                                onChange={() => handleToggleAdd(item.cmsProductId)}
                               />
                             </TableCell>
                             <TableCell>{item.cmsProductId}</TableCell>
                             <TableCell>{item.productCode}</TableCell>
                             <TableCell>{item.name}</TableCell>
-                            <TableCell align="right">
-                              {item.price.toLocaleString()}
-                            </TableCell>
+                            <TableCell align="right">{item.price.toLocaleString()}</TableCell>
                           </TableRow>
                         ))}
                       </TableBody>
@@ -286,11 +260,9 @@ const SyncPreviewDialog: React.FC<SyncPreviewDialogProps> = ({
             {preview.toUpdate.length > 0 && (
               <Accordion defaultExpanded>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <Typography
-                    sx={{ display: "flex", alignItems: "center", gap: 1 }}
-                  >
+                  <Typography sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <EditIcon color="warning" />
-                    {t("storeProducts.syncUpdateItems")} ({selectedUpdate.size}/
+                    {t('storeProducts.syncUpdateItems')} ({selectedUpdate.size}/
                     {preview.toUpdate.length})
                   </Typography>
                 </AccordionSummary>
@@ -299,37 +271,30 @@ const SyncPreviewDialog: React.FC<SyncPreviewDialogProps> = ({
                     <Table size="small" stickyHeader>
                       <TableHead>
                         <TableRow>
-                          <TableCell
-                            padding="checkbox"
-                            sx={{ bgcolor: "background.paper" }}
-                          >
+                          <TableCell padding="checkbox" sx={{ bgcolor: 'background.paper' }}>
                             <Checkbox
-                              checked={
-                                selectedUpdate.size === preview.toUpdate.length
-                              }
+                              checked={selectedUpdate.size === preview.toUpdate.length}
                               indeterminate={
                                 selectedUpdate.size > 0 &&
                                 selectedUpdate.size < preview.toUpdate.length
                               }
-                              onChange={(e) =>
-                                handleSelectAllUpdate(e.target.checked)
-                              }
+                              onChange={(e) => handleSelectAllUpdate(e.target.checked)}
                             />
                           </TableCell>
-                          <TableCell sx={{ bgcolor: "background.paper" }}>
-                            {t("storeProducts.cmsProductId")}
+                          <TableCell sx={{ bgcolor: 'background.paper' }}>
+                            {t('storeProducts.cmsProductId')}
                           </TableCell>
-                          <TableCell sx={{ bgcolor: "background.paper" }}>
-                            {t("storeProducts.productId")}
+                          <TableCell sx={{ bgcolor: 'background.paper' }}>
+                            {t('storeProducts.productId')}
                           </TableCell>
-                          <TableCell sx={{ bgcolor: "background.paper" }}>
-                            {t("storeProducts.productName")}
+                          <TableCell sx={{ bgcolor: 'background.paper' }}>
+                            {t('storeProducts.productName')}
                           </TableCell>
-                          <TableCell sx={{ bgcolor: "background.paper" }}>
-                            {t("storeProducts.syncOldValue")}
+                          <TableCell sx={{ bgcolor: 'background.paper' }}>
+                            {t('storeProducts.syncOldValue')}
                           </TableCell>
-                          <TableCell sx={{ bgcolor: "background.paper" }}>
-                            {t("storeProducts.syncNewValue")}
+                          <TableCell sx={{ bgcolor: 'background.paper' }}>
+                            {t('storeProducts.syncNewValue')}
                           </TableCell>
                         </TableRow>
                       </TableHead>
@@ -339,17 +304,10 @@ const SyncPreviewDialog: React.FC<SyncPreviewDialogProps> = ({
                             <TableRow key={`${item.cmsProductId}-${idx}`}>
                               {idx === 0 ? (
                                 <>
-                                  <TableCell
-                                    rowSpan={item.changes.length}
-                                    padding="checkbox"
-                                  >
+                                  <TableCell rowSpan={item.changes.length} padding="checkbox">
                                     <Checkbox
-                                      checked={selectedUpdate.has(
-                                        item.cmsProductId,
-                                      )}
-                                      onChange={() =>
-                                        handleToggleUpdate(item.cmsProductId)
-                                      }
+                                      checked={selectedUpdate.has(item.cmsProductId)}
+                                      onChange={() => handleToggleUpdate(item.cmsProductId)}
                                     />
                                   </TableCell>
                                   <TableCell rowSpan={item.changes.length}>
@@ -358,37 +316,25 @@ const SyncPreviewDialog: React.FC<SyncPreviewDialogProps> = ({
                                   <TableCell rowSpan={item.changes.length}>
                                     {item.productCode}
                                   </TableCell>
-                                  <TableCell rowSpan={item.changes.length}>
-                                    {item.name}
-                                  </TableCell>
+                                  <TableCell rowSpan={item.changes.length}>{item.name}</TableCell>
                                 </>
                               ) : null}
                               <TableCell>
-                                <Typography
-                                  variant="caption"
-                                  color="text.secondary"
-                                >
-                                  {t(
-                                    `storeProducts.${FIELD_LABELS[change.field] || change.field}`,
-                                  )}
+                                <Typography variant="caption" color="text.secondary">
+                                  {t(`storeProducts.${FIELD_LABELS[change.field] || change.field}`)}
                                   :
-                                </Typography>{" "}
-                                {String(change.oldValue || "-")}
+                                </Typography>{' '}
+                                {String(change.oldValue || '-')}
                               </TableCell>
                               <TableCell>
-                                <Typography
-                                  variant="caption"
-                                  color="text.secondary"
-                                >
-                                  {t(
-                                    `storeProducts.${FIELD_LABELS[change.field] || change.field}`,
-                                  )}
+                                <Typography variant="caption" color="text.secondary">
+                                  {t(`storeProducts.${FIELD_LABELS[change.field] || change.field}`)}
                                   :
-                                </Typography>{" "}
-                                {String(change.newValue || "-")}
+                                </Typography>{' '}
+                                {String(change.newValue || '-')}
                               </TableCell>
                             </TableRow>
-                          )),
+                          ))
                         )}
                       </TableBody>
                     </Table>
@@ -401,11 +347,9 @@ const SyncPreviewDialog: React.FC<SyncPreviewDialogProps> = ({
             {preview.toDelete.length > 0 && (
               <Accordion defaultExpanded>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <Typography
-                    sx={{ display: "flex", alignItems: "center", gap: 1 }}
-                  >
+                  <Typography sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <DeleteIcon color="error" />
-                    {t("storeProducts.syncDeleteItems")} ({selectedDelete.size}/
+                    {t('storeProducts.syncDeleteItems')} ({selectedDelete.size}/
                     {preview.toDelete.length})
                   </Typography>
                 </AccordionSummary>
@@ -414,31 +358,24 @@ const SyncPreviewDialog: React.FC<SyncPreviewDialogProps> = ({
                     <Table size="small" stickyHeader>
                       <TableHead>
                         <TableRow>
-                          <TableCell
-                            padding="checkbox"
-                            sx={{ bgcolor: "background.paper" }}
-                          >
+                          <TableCell padding="checkbox" sx={{ bgcolor: 'background.paper' }}>
                             <Checkbox
-                              checked={
-                                selectedDelete.size === preview.toDelete.length
-                              }
+                              checked={selectedDelete.size === preview.toDelete.length}
                               indeterminate={
                                 selectedDelete.size > 0 &&
                                 selectedDelete.size < preview.toDelete.length
                               }
-                              onChange={(e) =>
-                                handleSelectAllDelete(e.target.checked)
-                              }
+                              onChange={(e) => handleSelectAllDelete(e.target.checked)}
                             />
                           </TableCell>
-                          <TableCell sx={{ bgcolor: "background.paper" }}>
-                            {t("storeProducts.cmsProductId")}
+                          <TableCell sx={{ bgcolor: 'background.paper' }}>
+                            {t('storeProducts.cmsProductId')}
                           </TableCell>
-                          <TableCell sx={{ bgcolor: "background.paper" }}>
-                            {t("storeProducts.productId")}
+                          <TableCell sx={{ bgcolor: 'background.paper' }}>
+                            {t('storeProducts.productId')}
                           </TableCell>
-                          <TableCell sx={{ bgcolor: "background.paper" }}>
-                            {t("storeProducts.productName")}
+                          <TableCell sx={{ bgcolor: 'background.paper' }}>
+                            {t('storeProducts.productName')}
                           </TableCell>
                         </TableRow>
                       </TableHead>
@@ -451,7 +388,7 @@ const SyncPreviewDialog: React.FC<SyncPreviewDialogProps> = ({
                                 onChange={() => handleToggleDelete(item.id)}
                               />
                             </TableCell>
-                            <TableCell>{item.cmsProductId ?? "-"}</TableCell>
+                            <TableCell>{item.cmsProductId ?? '-'}</TableCell>
                             <TableCell>{item.productCode}</TableCell>
                             <TableCell>{item.name}</TableCell>
                           </TableRow>
@@ -467,7 +404,7 @@ const SyncPreviewDialog: React.FC<SyncPreviewDialogProps> = ({
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} disabled={loading}>
-          {t("storeProducts.syncCancel")}
+          {t('storeProducts.syncCancel')}
         </Button>
         <Button
           onClick={handleApply}
@@ -475,7 +412,7 @@ const SyncPreviewDialog: React.FC<SyncPreviewDialogProps> = ({
           disabled={loading || !hasSelectedItems}
           startIcon={loading ? <CircularProgress size={20} /> : null}
         >
-          {t("storeProducts.syncApply")}
+          {t('storeProducts.syncApply')}
         </Button>
       </DialogActions>
     </Dialog>

@@ -1,4 +1,4 @@
-import { apiService } from "./api";
+import { apiService } from './api';
 
 export interface PlatformDefaults {
   gameServerAddress?: string;
@@ -16,7 +16,7 @@ export interface ApiResponse<T> {
 }
 
 export class PlatformDefaultsService {
-  private static readonly BASE_URL = "/admin/platform-defaults";
+  private static readonly BASE_URL = '/admin/platform-defaults';
 
   /**
    * 모든 플랫폼의 기본값 조회
@@ -29,9 +29,7 @@ export class PlatformDefaultsService {
   /**
    * 특정 플랫폼의 기본값 조회
    */
-  static async getPlatformDefaults(
-    platform: string,
-  ): Promise<PlatformDefaults> {
+  static async getPlatformDefaults(platform: string): Promise<PlatformDefaults> {
     const response = await apiService.get<{
       platform: string;
       defaults: PlatformDefaults;
@@ -42,14 +40,8 @@ export class PlatformDefaultsService {
   /**
    * 특정 플랫폼의 기본값 설정
    */
-  static async setPlatformDefaults(
-    platform: string,
-    defaults: PlatformDefaults,
-  ): Promise<void> {
-    await apiService.put(
-      `${this.BASE_URL}/${encodeURIComponent(platform)}`,
-      defaults,
-    );
+  static async setPlatformDefaults(platform: string, defaults: PlatformDefaults): Promise<void> {
+    await apiService.put(`${this.BASE_URL}/${encodeURIComponent(platform)}`, defaults);
   }
 
   /**
@@ -72,14 +64,12 @@ export class PlatformDefaultsService {
   static applyDefaultsToClientVersion(
     platform: string,
     defaults: PlatformDefaults,
-    clientVersionData: any,
+    clientVersionData: any
   ): any {
     return {
       ...clientVersionData,
-      gameServerAddress:
-        clientVersionData.gameServerAddress || defaults.gameServerAddress || "",
-      patchAddress:
-        clientVersionData.patchAddress || defaults.patchAddress || "",
+      gameServerAddress: clientVersionData.gameServerAddress || defaults.gameServerAddress || '',
+      patchAddress: clientVersionData.patchAddress || defaults.patchAddress || '',
     };
   }
 
@@ -89,13 +79,12 @@ export class PlatformDefaultsService {
   static applyDefaultsToPlatformData(
     platform: string,
     defaults: PlatformDefaults,
-    platformData: any,
+    platformData: any
   ): any {
     return {
       ...platformData,
-      gameServerAddress:
-        platformData.gameServerAddress || defaults.gameServerAddress || "",
-      patchAddress: platformData.patchAddress || defaults.patchAddress || "",
+      gameServerAddress: platformData.gameServerAddress || defaults.gameServerAddress || '',
+      patchAddress: platformData.patchAddress || defaults.patchAddress || '',
     };
   }
 }

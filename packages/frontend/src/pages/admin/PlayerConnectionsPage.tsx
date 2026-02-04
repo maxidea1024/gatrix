@@ -1,7 +1,7 @@
-import React from "react";
-import { Box, Typography, Paper, Alert } from "@mui/material";
-import { useTranslation } from "react-i18next";
-import { PeopleAlt as PeopleIcon } from "@mui/icons-material";
+import React from 'react';
+import { Box, Typography, Paper, Alert } from '@mui/material';
+import { useTranslation } from 'react-i18next';
+import { PeopleAlt as PeopleIcon } from '@mui/icons-material';
 
 /**
  * PlayerConnectionsPage
@@ -19,43 +19,40 @@ const PlayerConnectionsPage: React.FC = () => {
     <Box sx={{ p: 3 }}>
       {/* Page Header */}
       <Box sx={{ mb: 3 }}>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
           <PeopleIcon color="primary" />
           <Typography variant="h5" fontWeight="bold">
-            {t("playerConnections.title")}
+            {t('playerConnections.title')}
           </Typography>
         </Box>
         <Typography variant="body2" color="text.secondary">
-          {t("playerConnections.subtitle")}
+          {t('playerConnections.subtitle')}
         </Typography>
       </Box>
 
       {/* Coming Soon Notice */}
-      <Paper sx={{ p: 4, textAlign: "center" }}>
+      <Paper sx={{ p: 4, textAlign: 'center' }}>
         <Alert severity="info" sx={{ mb: 3 }}>
-          {t("playerConnections.comingSoon")}
+          {t('playerConnections.comingSoon')}
         </Alert>
 
         <Typography variant="h6" gutterBottom>
-          {t("playerConnections.plannedFeatures")}
+          {t('playerConnections.plannedFeatures')}
         </Typography>
-        <Box
-          component="ul"
-          sx={{ textAlign: "left", maxWidth: 400, mx: "auto", mt: 2 }}
-        >
+        <Box component="ul" sx={{ textAlign: 'left', maxWidth: 400, mx: 'auto', mt: 2 }}>
           <li>
             <Typography variant="body2" color="text.secondary">
-              {t("playerConnections.feature.monitoring")}
+              {t('playerConnections.feature.monitoring')}
             </Typography>
           </li>
           <li>
             <Typography variant="body2" color="text.secondary">
-              {t("playerConnections.feature.kick")}
+              {t('playerConnections.feature.kick')}
             </Typography>
           </li>
           <li>
             <Typography variant="body2" color="text.secondary">
-              {t("playerConnections.feature.statistics")}
+              {t('playerConnections.feature.statistics')}
             </Typography>
           </li>
         </Box>

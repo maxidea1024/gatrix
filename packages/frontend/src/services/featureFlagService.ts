@@ -1,15 +1,10 @@
-import api from "./api";
+import api from './api';
 
 // ==================== Types ====================
 
-export type FlagType =
-  | "release"
-  | "experiment"
-  | "operational"
-  | "killSwitch"
-  | "permission"; // Purpose
+export type FlagType = 'release' | 'experiment' | 'operational' | 'killSwitch' | 'permission'; // Purpose
 export type FlagUsage = 'flag' | 'remoteConfig'; // Classification: Feature Flag vs Remote Config
-export type FlagStatus = "enabled" | "disabled" | "archived";
+export type FlagStatus = 'enabled' | 'disabled' | 'archived';
 
 // Per-environment settings
 export interface FeatureFlagEnvironment {
@@ -55,7 +50,7 @@ export interface FeatureFlagListParams {
   isEnabled?: boolean;
   isArchived?: boolean;
   sortBy?: string;
-  sortOrder?: "asc" | "desc";
+  sortOrder?: 'asc' | 'desc';
 }
 
 export interface FeatureFlagListResponse {
@@ -93,9 +88,9 @@ export interface UpdateFeatureFlagInput {
  * Get all feature flags
  */
 export async function getFeatureFlags(
-  params: FeatureFlagListParams = {},
+  params: FeatureFlagListParams = {}
 ): Promise<FeatureFlagListResponse> {
-  const response = await api.get("/admin/features", { params });
+  const response = await api.get('/admin/features', { params });
   // Backend returns { data: [...], total: N }, map to { flags: [...], total: N }
   const result = response.data;
   return {
@@ -117,10 +112,8 @@ export async function getFeatureFlag(flagName: string): Promise<FeatureFlag> {
 /**
  * Create a new feature flag
  */
-export async function createFeatureFlag(
-  data: CreateFeatureFlagInput,
-): Promise<FeatureFlag> {
-  const response = await api.post("/admin/features", data);
+export async function createFeatureFlag(data: CreateFeatureFlagInput): Promise<FeatureFlag> {
+  const response = await api.post('/admin/features', data);
   return response.data.flag;
 }
 
@@ -129,7 +122,7 @@ export async function createFeatureFlag(
  */
 export async function updateFeatureFlag(
   flagName: string,
-  data: UpdateFeatureFlagInput,
+  data: UpdateFeatureFlagInput
 ): Promise<FeatureFlag> {
   const response = await api.put(`/admin/features/${flagName}`, data);
   return response.data.flag;
@@ -141,7 +134,7 @@ export async function updateFeatureFlag(
 export async function toggleFeatureFlag(
   flagName: string,
   isEnabled: boolean,
-  environment?: string,
+  environment?: string
 ): Promise<FeatureFlag> {
   const response = await api.post(`/admin/features/${flagName}/toggle`, {
     isEnabled,
@@ -153,9 +146,7 @@ export async function toggleFeatureFlag(
 /**
  * Archive a feature flag
  */
-export async function archiveFeatureFlag(
-  flagName: string,
-): Promise<FeatureFlag> {
+export async function archiveFeatureFlag(flagName: string): Promise<FeatureFlag> {
   const response = await api.post(`/admin/features/${flagName}/archive`);
   return response.data.flag;
 }
@@ -163,9 +154,7 @@ export async function archiveFeatureFlag(
 /**
  * Revive an archived feature flag
  */
-export async function reviveFeatureFlag(
-  flagName: string,
-): Promise<FeatureFlag> {
+export async function reviveFeatureFlag(flagName: string): Promise<FeatureFlag> {
   const response = await api.post(`/admin/features/${flagName}/revive`);
   return response.data.flag;
 }
@@ -173,10 +162,7 @@ export async function reviveFeatureFlag(
 /**
  * Toggle favorite status
  */
-export async function toggleFavorite(
-  flagName: string,
-  isFavorite: boolean,
-): Promise<FeatureFlag> {
+export async function toggleFavorite(flagName: string, isFavorite: boolean): Promise<FeatureFlag> {
   const response = await api.post(`/admin/features/${flagName}/favorite`, {
     isFavorite,
   });

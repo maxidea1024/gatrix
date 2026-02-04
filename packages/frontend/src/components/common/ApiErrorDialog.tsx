@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -9,8 +9,8 @@ import {
   Box,
   Paper,
   Stack,
-} from "@mui/material";
-import { alpha } from "@mui/material/styles";
+} from '@mui/material';
+import { alpha } from '@mui/material/styles';
 import {
   Lock as LockIcon,
   ArrowForward as ArrowForwardIcon,
@@ -18,14 +18,14 @@ import {
   Storage as StorageIcon,
   History as HistoryIcon,
   Delete as DeleteIcon,
-} from "@mui/icons-material";
-import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
+} from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 
 export interface ApiErrorDialogProps {
   open: boolean;
   onClose: () => void;
-  type?: "LOCKED" | "CONFLICT" | "DUPLICATE" | "GENERIC";
+  type?: 'LOCKED' | 'CONFLICT' | 'DUPLICATE' | 'GENERIC';
   lockedInfo?: {
     lockedBy?: number | string;
     changeRequestId?: string;
@@ -44,7 +44,7 @@ export interface ApiErrorDialogProps {
 const ApiErrorDialog: React.FC<ApiErrorDialogProps> = ({
   open,
   onClose,
-  type = "GENERIC",
+  type = 'GENERIC',
   lockedInfo,
   conflictData,
   message,
@@ -66,9 +66,9 @@ const ApiErrorDialog: React.FC<ApiErrorDialogProps> = ({
   };
 
   const formatValue = (value: any): string => {
-    if (value === null) return "null";
-    if (value === undefined) return "-";
-    if (typeof value === "object") return JSON.stringify(value, null, 2);
+    if (value === null) return 'null';
+    if (value === undefined) return '-';
+    if (typeof value === 'object') return JSON.stringify(value, null, 2);
     return String(value);
   };
 
@@ -76,49 +76,37 @@ const ApiErrorDialog: React.FC<ApiErrorDialogProps> = ({
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
       <DialogTitle
         sx={{
-          display: "flex",
-          alignItems: "center",
+          display: 'flex',
+          alignItems: 'center',
           gap: 1,
           color:
-            type === "LOCKED"
-              ? "error.main"
-              : type === "DUPLICATE"
-                ? "error.main"
-                : "warning.main",
+            type === 'LOCKED' ? 'error.main' : type === 'DUPLICATE' ? 'error.main' : 'warning.main',
         }}
       >
-        {type === "LOCKED" ? <LockIcon /> : <WarningIcon />}
-        {type === "LOCKED"
-          ? t("errors.RESOURCE_LOCKED_TITLE", "Resource Locked")
-          : type === "DUPLICATE"
-            ? t("errors.DUPLICATE_ENTRY_TITLE", "Duplicate Entry")
-            : t("errors.CR_DATA_CONFLICT")}
+        {type === 'LOCKED' ? <LockIcon /> : <WarningIcon />}
+        {type === 'LOCKED'
+          ? t('errors.RESOURCE_LOCKED_TITLE', 'Resource Locked')
+          : type === 'DUPLICATE'
+            ? t('errors.DUPLICATE_ENTRY_TITLE', 'Duplicate Entry')
+            : t('errors.CR_DATA_CONFLICT')}
       </DialogTitle>
       <DialogContent>
         <Box sx={{ mt: 1 }}>
-          {type === "LOCKED" && (
+          {type === 'LOCKED' && (
             <Box>
               <Typography variant="body1" gutterBottom>
-                {t("errors.RESOURCE_LOCKED", {
-                  changeRequestTitle:
-                    lockedInfo?.changeRequestTitle || t("common.unknown"),
+                {t('errors.RESOURCE_LOCKED', {
+                  changeRequestTitle: lockedInfo?.changeRequestTitle || t('common.unknown'),
                 })}
               </Typography>
 
               {lockedInfo?.changeRequestId && (
-                <Paper
-                  variant="outlined"
-                  sx={{ p: 2, mt: 2, bgcolor: "action.hover" }}
-                >
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    gutterBottom
-                  >
-                    {t("auditLogs.resourceId")}: {lockedInfo.changeRequestId}
+                <Paper variant="outlined" sx={{ p: 2, mt: 2, bgcolor: 'action.hover' }}>
+                  <Typography variant="body2" color="text.secondary" gutterBottom>
+                    {t('auditLogs.resourceId')}: {lockedInfo.changeRequestId}
                   </Typography>
                   {lockedInfo.changeRequestTitle && (
-                    <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
+                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
                       {lockedInfo.changeRequestTitle}
                     </Typography>
                   )}
@@ -127,12 +115,12 @@ const ApiErrorDialog: React.FC<ApiErrorDialogProps> = ({
             </Box>
           )}
 
-          {type === "CONFLICT" && (
+          {type === 'CONFLICT' && (
             <Box>
               <Typography variant="body1" gutterBottom sx={{ mb: 2 }}>
                 {t(
-                  "changeRequest.conflictDialog.description",
-                  "The data on the live server has changed since this request was created. The request has been automatically rejected to prevent data corruption.",
+                  'changeRequest.conflictDialog.description',
+                  'The data on the live server has changed since this request was created. The request has been automatically rejected to prevent data corruption.'
                 )}
               </Typography>
 
@@ -142,31 +130,28 @@ const ApiErrorDialog: React.FC<ApiErrorDialogProps> = ({
                     <Typography
                       variant="subtitle2"
                       sx={{
-                        display: "flex",
-                        alignItems: "center",
+                        display: 'flex',
+                        alignItems: 'center',
                         gap: 0.5,
                         mb: 0.5,
                       }}
                     >
-                      <StorageIcon fontSize="small" color="primary" />{" "}
-                      {t(
-                        "changeRequest.conflictDialog.liveData",
-                        "Current Live Data",
-                      )}
+                      <StorageIcon fontSize="small" color="primary" />{' '}
+                      {t('changeRequest.conflictDialog.liveData', 'Current Live Data')}
                     </Typography>
                     <Paper
                       variant="outlined"
                       sx={{
                         p: 1.5,
-                        bgcolor: "action.hover",
+                        bgcolor: 'action.hover',
                         maxHeight: 200,
-                        overflow: "auto",
+                        overflow: 'auto',
                       }}
                     >
                       <Typography
                         component="pre"
                         variant="caption"
-                        sx={{ fontFamily: "monospace", whiteSpace: "pre-wrap" }}
+                        sx={{ fontFamily: 'monospace', whiteSpace: 'pre-wrap' }}
                       >
                         {formatValue(conflictData.currentLive)}
                       </Typography>
@@ -179,31 +164,28 @@ const ApiErrorDialog: React.FC<ApiErrorDialogProps> = ({
                     <Typography
                       variant="subtitle2"
                       sx={{
-                        display: "flex",
-                        alignItems: "center",
+                        display: 'flex',
+                        alignItems: 'center',
                         gap: 0.5,
                         mb: 0.5,
                       }}
                     >
-                      <HistoryIcon fontSize="small" color="info" />{" "}
-                      {t(
-                        "changeRequest.conflictDialog.originalData",
-                        "Data When Request Created",
-                      )}
+                      <HistoryIcon fontSize="small" color="info" />{' '}
+                      {t('changeRequest.conflictDialog.originalData', 'Data When Request Created')}
                     </Typography>
                     <Paper
                       variant="outlined"
                       sx={{
                         p: 1.5,
-                        bgcolor: "action.hover",
+                        bgcolor: 'action.hover',
                         maxHeight: 200,
-                        overflow: "auto",
+                        overflow: 'auto',
                       }}
                     >
                       <Typography
                         component="pre"
                         variant="caption"
-                        sx={{ fontFamily: "monospace", whiteSpace: "pre-wrap" }}
+                        sx={{ fontFamily: 'monospace', whiteSpace: 'pre-wrap' }}
                       >
                         {formatValue(conflictData.originalDraftBase)}
                       </Typography>
@@ -214,12 +196,12 @@ const ApiErrorDialog: React.FC<ApiErrorDialogProps> = ({
             </Box>
           )}
 
-          {type === "DUPLICATE" && (
+          {type === 'DUPLICATE' && (
             <Box>
               <Typography variant="body1" gutterBottom sx={{ mb: 2 }}>
                 {t(
-                  "changeRequest.duplicateDialog.description",
-                  "A record with the same unique identifier already exists. This usually happens when the data you are trying to merge has already been added to the live server.",
+                  'changeRequest.duplicateDialog.description',
+                  'A record with the same unique identifier already exists. This usually happens when the data you are trying to merge has already been added to the live server.'
                 )}
               </Typography>
               <Paper
@@ -227,64 +209,55 @@ const ApiErrorDialog: React.FC<ApiErrorDialogProps> = ({
                 sx={{
                   p: 2,
                   bgcolor: (theme) => alpha(theme.palette.error.main, 0.05),
-                  borderColor: "error.main",
+                  borderColor: 'error.main',
                 }}
               >
-                <Typography
-                  variant="subtitle2"
-                  color="error"
-                  sx={{ mb: 1, fontWeight: "bold" }}
-                >
-                  {t("common.details")}
+                <Typography variant="subtitle2" color="error" sx={{ mb: 1, fontWeight: 'bold' }}>
+                  {t('common.details')}
                 </Typography>
                 <Typography
                   variant="body2"
-                  sx={{ fontFamily: "monospace", wordBreak: "break-all" }}
+                  sx={{ fontFamily: 'monospace', wordBreak: 'break-all' }}
                 >
                   {message}
                 </Typography>
               </Paper>
-              <Typography
-                variant="body2"
-                sx={{ mt: 2, color: "text.secondary" }}
-              >
+              <Typography variant="body2" sx={{ mt: 2, color: 'text.secondary' }}>
                 {t(
-                  "changeRequest.duplicateDialog.guide",
-                  "Please check the existing data on the live server and delete or modify this change request.",
+                  'changeRequest.duplicateDialog.guide',
+                  'Please check the existing data on the live server and delete or modify this change request.'
                 )}
               </Typography>
             </Box>
           )}
 
-          {type === "GENERIC" && (
-            <Typography variant="body1">
-              {message || t("common.genericError")}
-            </Typography>
+          {type === 'GENERIC' && (
+            <Typography variant="body1">{message || t('common.genericError')}</Typography>
           )}
         </Box>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} color="inherit">
-          {t("common.close")}
+          {t('common.close')}
         </Button>
-        {(type === "DUPLICATE" || type === "CONFLICT") && onDelete && (
+        {(type === 'DUPLICATE' || type === 'CONFLICT') && onDelete && (
           <Button
             onClick={handleDelete}
             variant="outlined"
             color="error"
             startIcon={<DeleteIcon />}
           >
-            {t("changeRequest.actions.delete")}
+            {t('changeRequest.actions.delete')}
           </Button>
         )}
-        {type === "LOCKED" && lockedInfo?.changeRequestId && (
+        {type === 'LOCKED' && lockedInfo?.changeRequestId && (
           <Button
             onClick={handleViewChangeRequest}
             variant="contained"
             color="primary"
             endIcon={<ArrowForwardIcon />}
           >
-            {t("auditLogs.actions.view")}
+            {t('auditLogs.actions.view')}
           </Button>
         )}
       </DialogActions>

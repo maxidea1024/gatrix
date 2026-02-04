@@ -40,13 +40,13 @@ export interface EvaluationResult {
 
 export interface EvaluationReason {
   kind:
-  | 'enabled'
-  | 'disabled'
-  | 'notFound'
-  | 'constraintFailed'
-  | 'rolloutFailed'
-  | 'fallback'
-  | 'archived';
+    | 'enabled'
+    | 'disabled'
+    | 'notFound'
+    | 'constraintFailed'
+    | 'rolloutFailed'
+    | 'fallback'
+    | 'archived';
   message?: string;
   failedConstraint?: {
     contextName: string;

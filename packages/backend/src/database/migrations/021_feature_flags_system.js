@@ -2,7 +2,7 @@
  * Feature Flags System Database Schema
  * Creates all tables for the feature flag system
  * Uses ULID for primary keys
- * 
+ *
  * Tables:
  * - g_feature_flags: Feature flag definitions
  * - g_feature_strategies: Targeting strategies for flags
@@ -211,16 +211,76 @@ exports.up = async function (connection) {
   // Insert default context fields with ULIDs
   const { ulid } = require('ulid');
   const defaultFields = [
-    { fieldName: 'userId', fieldType: 'string', description: 'Unique user identifier', stickiness: true, sortOrder: 1 },
-    { fieldName: 'sessionId', fieldType: 'string', description: 'Session identifier', stickiness: true, sortOrder: 2 },
-    { fieldName: 'environmentName', fieldType: 'string', description: 'Environment name (development, staging, production)', stickiness: false, sortOrder: 3 },
-    { fieldName: 'appName', fieldType: 'string', description: 'Application name (web, mobile-ios, mobile-android)', stickiness: false, sortOrder: 4 },
-    { fieldName: 'appVersion', fieldType: 'semver', description: 'Application version (semver format)', stickiness: false, sortOrder: 5 },
-    { fieldName: 'country', fieldType: 'string', description: 'Country code (ISO 3166-1 alpha-2)', stickiness: false, sortOrder: 6 },
-    { fieldName: 'city', fieldType: 'string', description: 'City name', stickiness: false, sortOrder: 7 },
-    { fieldName: 'ip', fieldType: 'string', description: 'IP address', stickiness: false, sortOrder: 8 },
-    { fieldName: 'userAgent', fieldType: 'string', description: 'User agent string', stickiness: false, sortOrder: 9 },
-    { fieldName: 'currentTime', fieldType: 'date', description: 'Current timestamp (ISO 8601)', stickiness: false, sortOrder: 10 },
+    {
+      fieldName: 'userId',
+      fieldType: 'string',
+      description: 'Unique user identifier',
+      stickiness: true,
+      sortOrder: 1,
+    },
+    {
+      fieldName: 'sessionId',
+      fieldType: 'string',
+      description: 'Session identifier',
+      stickiness: true,
+      sortOrder: 2,
+    },
+    {
+      fieldName: 'environmentName',
+      fieldType: 'string',
+      description: 'Environment name (development, staging, production)',
+      stickiness: false,
+      sortOrder: 3,
+    },
+    {
+      fieldName: 'appName',
+      fieldType: 'string',
+      description: 'Application name (web, mobile-ios, mobile-android)',
+      stickiness: false,
+      sortOrder: 4,
+    },
+    {
+      fieldName: 'appVersion',
+      fieldType: 'semver',
+      description: 'Application version (semver format)',
+      stickiness: false,
+      sortOrder: 5,
+    },
+    {
+      fieldName: 'country',
+      fieldType: 'string',
+      description: 'Country code (ISO 3166-1 alpha-2)',
+      stickiness: false,
+      sortOrder: 6,
+    },
+    {
+      fieldName: 'city',
+      fieldType: 'string',
+      description: 'City name',
+      stickiness: false,
+      sortOrder: 7,
+    },
+    {
+      fieldName: 'ip',
+      fieldType: 'string',
+      description: 'IP address',
+      stickiness: false,
+      sortOrder: 8,
+    },
+    {
+      fieldName: 'userAgent',
+      fieldType: 'string',
+      description: 'User agent string',
+      stickiness: false,
+      sortOrder: 9,
+    },
+    {
+      fieldName: 'currentTime',
+      fieldType: 'date',
+      description: 'Current timestamp (ISO 8601)',
+      stickiness: false,
+      sortOrder: 10,
+    },
   ];
 
   for (const field of defaultFields) {
@@ -228,7 +288,14 @@ exports.up = async function (connection) {
       `INSERT INTO g_feature_context_fields (id, fieldName, fieldType, description, stickiness, sortOrder)
        VALUES (?, ?, ?, ?, ?, ?)
        ON DUPLICATE KEY UPDATE description = VALUES(description)`,
-      [ulid(), field.fieldName, field.fieldType, field.description, field.stickiness, field.sortOrder]
+      [
+        ulid(),
+        field.fieldName,
+        field.fieldType,
+        field.description,
+        field.stickiness,
+        field.sortOrder,
+      ]
     );
   }
   console.log('✓ Default context fields inserted');

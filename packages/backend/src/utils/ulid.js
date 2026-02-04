@@ -1,10 +1,10 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
+'use strict';
+Object.defineProperty(exports, '__esModule', { value: true });
 exports.generateULID = generateULID;
 exports.generateULIDWithTimestamp = generateULIDWithTimestamp;
 exports.isValidULID = isValidULID;
 exports.getTimestampFromULID = getTimestampFromULID;
-const ulid_1 = require("ulid");
+const ulid_1 = require('ulid');
 /**
  * Generate a new ULID (Universally Unique Lexicographically Sortable Identifier)
  *
@@ -20,7 +20,7 @@ const ulid_1 = require("ulid");
  * @returns {string} A new ULID string
  */
 function generateULID() {
-    return (0, ulid_1.ulid)();
+  return (0, ulid_1.ulid)();
 }
 /**
  * Generate a ULID with a specific timestamp
@@ -29,7 +29,7 @@ function generateULID() {
  * @returns {string} A new ULID string with the specified timestamp
  */
 function generateULIDWithTimestamp(timestamp) {
-    return (0, ulid_1.ulid)(timestamp);
+  return (0, ulid_1.ulid)(timestamp);
 }
 /**
  * Validate if a string is a valid ULID
@@ -38,9 +38,9 @@ function generateULIDWithTimestamp(timestamp) {
  * @returns {boolean} True if valid ULID, false otherwise
  */
 function isValidULID(id) {
-    // ULID is 26 characters long and uses Crockford's base32
-    const ulidRegex = /^[0123456789ABCDEFGHJKMNPQRSTVWXYZ]{26}$/i;
-    return ulidRegex.test(id);
+  // ULID is 26 characters long and uses Crockford's base32
+  const ulidRegex = /^[0123456789ABCDEFGHJKMNPQRSTVWXYZ]{26}$/i;
+  return ulidRegex.test(id);
 }
 /**
  * Extract timestamp from a ULID
@@ -49,25 +49,25 @@ function isValidULID(id) {
  * @returns {number} Unix timestamp in milliseconds
  */
 function getTimestampFromULID(id) {
-    if (!isValidULID(id)) {
-        throw new Error('Invalid ULID format');
-    }
-    // First 10 characters represent the timestamp
-    const timestampPart = id.substring(0, 10);
-    // Decode from Crockford's base32
-    const crockfordBase32 = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
-    let timestamp = 0;
-    for (let i = 0; i < timestampPart.length; i++) {
-        const char = timestampPart[i].toUpperCase();
-        const value = crockfordBase32.indexOf(char);
-        timestamp = timestamp * 32 + value;
-    }
-    return timestamp;
+  if (!isValidULID(id)) {
+    throw new Error('Invalid ULID format');
+  }
+  // First 10 characters represent the timestamp
+  const timestampPart = id.substring(0, 10);
+  // Decode from Crockford's base32
+  const crockfordBase32 = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
+  let timestamp = 0;
+  for (let i = 0; i < timestampPart.length; i++) {
+    const char = timestampPart[i].toUpperCase();
+    const value = crockfordBase32.indexOf(char);
+    timestamp = timestamp * 32 + value;
+  }
+  return timestamp;
 }
 exports.default = {
-    generateULID,
-    generateULIDWithTimestamp,
-    isValidULID,
-    getTimestampFromULID
+  generateULID,
+  generateULIDWithTimestamp,
+  isValidULID,
+  getTimestampFromULID,
 };
 //# sourceMappingURL=ulid.js.map

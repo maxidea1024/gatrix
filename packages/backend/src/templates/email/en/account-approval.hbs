@@ -1,47 +1,68 @@
-<!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8">
-  <title>Account Approved</title>
-  <style>
-    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-    .header { background-color: #5b6ad0; color: white; padding: 20px; text-align: center; }
-    .content { padding: 20px; background-color: #f9f9f9; }
-    .button { 
-      display: inline-block; 
-      padding: 12px 24px; 
-      background-color: #5b6ad0; 
-      color: white; 
-      text-decoration: none; 
-      border-radius: 4px; 
-      margin: 20px 0;
-    }
-    .footer { padding: 20px; text-align: center; color: #666; font-size: 12px; }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="header">
-      <h1>🎉 Account Approved!</h1>
+  <head>
+    <meta charset='utf-8' />
+    <title>Account Approved</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        color: #333;
+      }
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .header {
+        background-color: #5b6ad0;
+        color: white;
+        padding: 20px;
+        text-align: center;
+      }
+      .content {
+        padding: 20px;
+        background-color: #f9f9f9;
+      }
+      .button {
+        display: inline-block;
+        padding: 12px 24px;
+        background-color: #5b6ad0;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+        margin: 20px 0;
+      }
+      .footer {
+        padding: 20px;
+        text-align: center;
+        color: #666;
+        font-size: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class='container'>
+      <div class='header'>
+        <h1>🎉 Account Approved!</h1>
+      </div>
+      <div class='content'>
+        <h2>Hello, {{name}}!</h2>
+        <p>Great news!</p>
+        <p>Your Gatrix account has been approved by an administrator. You can now access all
+          platform features.</p>
+        <a href='{{loginUrl}}' class='button'>Login Now</a>
+        <p>You can now access the following features:</p>
+        <ul>
+          <li>Game client management</li>
+          <li>Server configuration tools</li>
+          <li>User account administration</li>
+          <li>Platform monitoring and analytics</li>
+        </ul>
+        <p>Welcome to Gatrix!</p>
+      </div>
+      <div class='footer'>
+        <p>© 2025 Gatrix. All rights reserved.</p>
+      </div>
     </div>
-    <div class="content">
-      <h2>Hello, {{name}}!</h2>
-      <p>Great news!</p>
-      <p>Your Gatrix account has been approved by an administrator. You can now access all platform features.</p>
-      <a href="{{loginUrl}}" class="button">Login Now</a>
-      <p>You can now access the following features:</p>
-      <ul>
-        <li>Game client management</li>
-        <li>Server configuration tools</li>
-        <li>User account administration</li>
-        <li>Platform monitoring and analytics</li>
-      </ul>
-      <p>Welcome to Gatrix!</p>
-    </div>
-    <div class="footer">
-      <p>© 2025 Gatrix. All rights reserved.</p>
-    </div>
-  </div>
-</body>
+  </body>
 </html>

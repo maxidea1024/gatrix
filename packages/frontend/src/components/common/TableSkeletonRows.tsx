@@ -1,6 +1,6 @@
-import React from "react";
-import { TableRow, TableCell, Skeleton } from "@mui/material";
-import { DeferredLoading } from "./DeferredLoading";
+import React from 'react';
+import { TableRow, TableCell, Skeleton } from '@mui/material';
+import { DeferredLoading } from './DeferredLoading';
 
 interface TableSkeletonRowsProps {
   rowCount?: number;

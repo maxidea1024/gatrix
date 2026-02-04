@@ -4,10 +4,10 @@
  */
 
 exports.up = async function (connection) {
-    console.log('Creating g_feature_variant_metrics table...');
+  console.log('Creating g_feature_variant_metrics table...');
 
-    // Create new table for variant metrics
-    await connection.execute(`
+  // Create new table for variant metrics
+  await connection.execute(`
         CREATE TABLE IF NOT EXISTS g_feature_variant_metrics (
             id VARCHAR(26) PRIMARY KEY COMMENT 'ULID',
             environment VARCHAR(100) NOT NULL COMMENT 'Environment name',
@@ -20,25 +20,25 @@ exports.up = async function (connection) {
             INDEX idx_variant_metrics_query (environment, flagName, metricsBucket)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Feature flag variant metrics'
     `);
-    console.log('✓ g_feature_variant_metrics table created');
+  console.log('✓ g_feature_variant_metrics table created');
 
-    // Remove variantCounts column from g_feature_metrics
-    await connection.execute(`
+  // Remove variantCounts column from g_feature_metrics
+  await connection.execute(`
         ALTER TABLE g_feature_metrics DROP COLUMN variantCounts
     `);
-    console.log('✓ variantCounts column removed from g_feature_metrics');
+  console.log('✓ variantCounts column removed from g_feature_metrics');
 };
 
 exports.down = async function (connection) {
-    console.log('Rolling back variant metrics table...');
+  console.log('Rolling back variant metrics table...');
 
-    // Re-add variantCounts column
-    await connection.execute(`
+  // Re-add variantCounts column
+  await connection.execute(`
         ALTER TABLE g_feature_metrics ADD COLUMN variantCounts JSON NULL COMMENT 'Variant distribution {variantName: count}'
     `);
-    console.log('✓ variantCounts column restored');
+  console.log('✓ variantCounts column restored');
 
-    // Drop the new table
-    await connection.execute('DROP TABLE IF EXISTS g_feature_variant_metrics');
-    console.log('✓ g_feature_variant_metrics table dropped');
+  // Drop the new table
+  await connection.execute('DROP TABLE IF EXISTS g_feature_variant_metrics');
+  console.log('✓ g_feature_variant_metrics table dropped');
 };

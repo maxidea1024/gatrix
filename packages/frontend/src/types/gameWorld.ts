@@ -1,7 +1,7 @@
-import type { Tag } from "@/services/tagService";
+import type { Tag } from '@/services/tagService';
 
 export interface GameWorldMaintenanceLocale {
-  lang: "ko" | "en" | "zh";
+  lang: 'ko' | 'en' | 'zh';
   message: string;
 }
 
@@ -82,7 +82,7 @@ export interface GameWorldListParams {
   // Prefer tagIds for server-side filtering; keep tags for backward compatibility
   tagIds?: string; // comma-separated IDs, e.g., "1,2,3"
   tags?: string; // deprecated: comma-separated names or legacy filter
-  tags_operator?: "any_of" | "include_all"; // Filter operator for tags
+  tags_operator?: 'any_of' | 'include_all'; // Filter operator for tags
 }
 
 export interface GameWorldListResult {

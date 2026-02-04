@@ -15,6 +15,7 @@ node rewardLookupBuilder.js
 ```
 
 **결과:**
+
 - ✅ `reward-lookup.json` 생성 (운영툴에서 사용)
 - ✅ `reward-lookup.html` 생성 (브라우저에서 확인)
 
@@ -131,7 +132,7 @@ if (typeInfo.hasTable) {
 const reward = {
   type: selectedRewardType,
   id: selectedItemId, // hasTable이 false면 0
-  quantity: quantity
+  quantity: quantity,
 };
 ```
 
@@ -145,40 +146,40 @@ function RewardSelector() {
   const [rewardType, setRewardType] = useState('');
   const [itemId, setItemId] = useState('');
   const [quantity, setQuantity] = useState(1);
-  
+
   const typeInfo = rewardType ? rewardLookupData[rewardType] : null;
-  
+
   return (
     <div>
       {/* 1. REWARD_TYPE 선택 */}
       <select value={rewardType} onChange={(e) => setRewardType(e.target.value)}>
         <option value="">보상 타입 선택</option>
-        {Object.values(rewardLookupData).map(type => (
+        {Object.values(rewardLookupData).map((type) => (
           <option key={type.rewardType} value={type.rewardType}>
             {type.rewardTypeName} ({type.rewardType})
           </option>
         ))}
       </select>
-      
+
       {/* 2. 아이템 선택 (테이블이 있는 경우만) */}
       {typeInfo?.hasTable && (
         <select value={itemId} onChange={(e) => setItemId(e.target.value)}>
           <option value="">아이템 선택</option>
-          {typeInfo.items.map(item => (
+          {typeInfo.items.map((item) => (
             <option key={item.id} value={item.id}>
               [{item.id}] {item.name}
             </option>
           ))}
         </select>
       )}
-      
+
       {/* 3. 수량 입력 */}
-      <input 
-        type="number" 
-        value={quantity} 
+      <input
+        type="number"
+        value={quantity}
         onChange={(e) => setQuantity(parseInt(e.target.value))}
       />
-      
+
       {/* 4. 결과 */}
       <pre>{JSON.stringify({ type: rewardType, id: itemId, quantity }, null, 2)}</pre>
     </div>
@@ -190,24 +191,24 @@ function RewardSelector() {
 
 ### 테이블 보유 (드롭다운 필요)
 
-| Type | 이름 | 아이템 수 | 설명 |
-|------|------|-----------|------|
-| 1 | POINT | 23 | 두카트, 블루젬 등 |
-| 2 | ITEM | 2,827 | 일반 아이템 |
-| 6 | SHIP | 699 | 선박 |
-| 7 | MATE | 1,407 | 항해사 |
-| 33 | USER_TITLE | 125 | 칭호 |
-| 36 | PET | 20 | 반려동물 |
+| Type | 이름       | 아이템 수 | 설명              |
+| ---- | ---------- | --------- | ----------------- |
+| 1    | POINT      | 23        | 두카트, 블루젬 등 |
+| 2    | ITEM       | 2,827     | 일반 아이템       |
+| 6    | SHIP       | 699       | 선박              |
+| 7    | MATE       | 1,407     | 항해사            |
+| 33   | USER_TITLE | 125       | 칭호              |
+| 36   | PET        | 20        | 반려동물          |
 
 ### 수치 입력만 (드롭다운 불필요)
 
-| Type | 이름 | 설명 |
-|------|------|------|
-| 11 | BATTLE_EXP | 전투 경험치 |
-| 12 | TRADE_EXP | 교역 경험치 |
-| 13 | ADVENTURE_EXP | 모험 경험치 |
-| 17 | SAILOR | 선원 수 |
-| 19 | ENERGY | 행동력 |
+| Type | 이름          | 설명        |
+| ---- | ------------- | ----------- |
+| 11   | BATTLE_EXP    | 전투 경험치 |
+| 12   | TRADE_EXP     | 교역 경험치 |
+| 13   | ADVENTURE_EXP | 모험 경험치 |
+| 17   | SAILOR        | 선원 수     |
+| 19   | ENERGY        | 행동력      |
 
 ## 🔍 검색 기능 구현
 
@@ -216,9 +217,9 @@ function RewardSelector() {
 ```javascript
 function searchItems(items, query) {
   const lowerQuery = query.toLowerCase();
-  return items.filter(item => 
-    item.name.toLowerCase().includes(lowerQuery) ||
-    item.id.toString().includes(lowerQuery)
+  return items.filter(
+    (item) =>
+      item.name.toLowerCase().includes(lowerQuery) || item.id.toString().includes(lowerQuery)
   );
 }
 
@@ -252,16 +253,16 @@ app.get('/api/rewards/:type/items', (req, res) => {
 app.get('/api/rewards/:type/search', (req, res) => {
   const typeInfo = rewardLookupData[req.params.type];
   const query = req.query.q || '';
-  
+
   if (!typeInfo || !typeInfo.hasTable) {
     return res.json([]);
   }
-  
-  const results = typeInfo.items.filter(item =>
-    item.name.toLowerCase().includes(query.toLowerCase()) ||
-    item.id.toString().includes(query)
+
+  const results = typeInfo.items.filter(
+    (item) =>
+      item.name.toLowerCase().includes(query.toLowerCase()) || item.id.toString().includes(query)
   );
-  
+
   res.json(results);
 });
 
@@ -281,6 +282,7 @@ app.listen(3000);
 ```
 
 **필드 설명:**
+
 - `type`: REWARD_TYPE 값 (숫자)
 - `id`: 아이템 ID (hasTable이 false면 0 또는 생략)
 - `quantity`: 수량
@@ -295,15 +297,15 @@ node rewardLookupBuilder.js
 
 ## 📁 파일 설명
 
-| 파일 | 용도 |
-|------|------|
-| `rewardLookupBuilder.js` | 빌더 스크립트 (실행 파일) |
-| `reward-lookup.json` | 생성된 데이터 (운영툴에서 사용) |
-| `reward-lookup.html` | 생성된 HTML (확인용) |
-| `example-admin-ui.html` | 실제 동작하는 UI 예제 |
-| `README.md` | 상세 문서 |
-| `ADMIN_TOOL_INTEGRATION_GUIDE.md` | 통합 가이드 |
-| `USAGE_SUMMARY.md` | 이 파일 (빠른 참조) |
+| 파일                              | 용도                            |
+| --------------------------------- | ------------------------------- |
+| `rewardLookupBuilder.js`          | 빌더 스크립트 (실행 파일)       |
+| `reward-lookup.json`              | 생성된 데이터 (운영툴에서 사용) |
+| `reward-lookup.html`              | 생성된 HTML (확인용)            |
+| `example-admin-ui.html`           | 실제 동작하는 UI 예제           |
+| `README.md`                       | 상세 문서                       |
+| `ADMIN_TOOL_INTEGRATION_GUIDE.md` | 통합 가이드                     |
+| `USAGE_SUMMARY.md`                | 이 파일 (빠른 참조)             |
 
 ## 💡 핵심 포인트
 
@@ -337,4 +339,3 @@ npm install json5
 # 커스텀 경로로 실행
 node rewardLookupBuilder.js --cms-dir /path/to/cms/server
 ```
-

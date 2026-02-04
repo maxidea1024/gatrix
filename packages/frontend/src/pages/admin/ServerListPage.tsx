@@ -1,10 +1,4 @@
-import React, {
-  useState,
-  useEffect,
-  useCallback,
-  useRef,
-  useMemo,
-} from "react";
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import {
   forceSimulation,
   forceLink,
@@ -13,9 +7,9 @@ import {
   SimulationNodeDatum,
   SimulationLinkDatum,
   ForceLink,
-} from "d3-force";
-import { useAuth } from "../../hooks/useAuth";
-import { PERMISSIONS } from "../../types/permissions";
+} from 'd3-force';
+import { useAuth } from '../../hooks/useAuth';
+import { PERMISSIONS } from '../../types/permissions';
 import {
   Box,
   Typography,
@@ -57,7 +51,7 @@ import {
   Paper,
   Select,
   useTheme,
-} from "@mui/material";
+} from '@mui/material';
 import {
   Dns as DnsIcon,
   Search as SearchIcon,
@@ -93,7 +87,7 @@ import {
   Add as AddIcon,
   MonitorHeart as MonitorHeartIcon,
   Terminal as TerminalIcon,
-} from "@mui/icons-material";
+} from '@mui/icons-material';
 import {
   DndContext,
   closestCenter,
@@ -102,34 +96,32 @@ import {
   useSensor,
   useSensors,
   DragEndEvent,
-} from "@dnd-kit/core";
+} from '@dnd-kit/core';
 import {
   arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
   useSortable,
   verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
-import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
-import { useTranslation } from "react-i18next";
-import { useSnackbar } from "notistack";
-import useSWR from "swr";
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
+import { useTranslation } from 'react-i18next';
+import { useSnackbar } from 'notistack';
+import useSWR from 'swr';
 import DynamicFilterBar, {
   FilterDefinition,
   ActiveFilter,
-} from "../../components/common/DynamicFilterBar";
-import { useDebounce } from "../../hooks/useDebounce";
-import serviceDiscoveryService, {
-  ServiceInstance,
-} from "../../services/serviceDiscoveryService";
-import { formatDateTimeDetailed } from "../../utils/dateFormat";
-import { RelativeTime } from "../../components/common/RelativeTime";
-import { copyToClipboardWithNotification } from "../../utils/clipboard";
+} from '../../components/common/DynamicFilterBar';
+import { useDebounce } from '../../hooks/useDebounce';
+import serviceDiscoveryService, { ServiceInstance } from '../../services/serviceDiscoveryService';
+import { formatDateTimeDetailed } from '../../utils/dateFormat';
+import { RelativeTime } from '../../components/common/RelativeTime';
+import { copyToClipboardWithNotification } from '../../utils/clipboard';
 
 // View mode type
-type ViewMode = "list" | "grid" | "checkerboard" | "card" | "cluster";
-type ServiceStatus = ServiceInstance["status"];
+type ViewMode = 'list' | 'grid' | 'checkerboard' | 'card' | 'cluster';
+type ServiceStatus = ServiceInstance['status'];
 
 // Column definition interface
 interface ColumnConfig {
@@ -158,15 +150,15 @@ interface ClusterLink extends SimulationLinkDatum<ClusterNode> {
 
 // Grouping field type for multi-level grouping
 type GroupingField =
-  | "service"
-  | "group"
-  | "environment"
-  | "cloudProvider"
-  | "cloudRegion"
-  | "cloudZone";
+  | 'service'
+  | 'group'
+  | 'environment'
+  | 'cloudProvider'
+  | 'cloudRegion'
+  | 'cloudZone';
 
 // Grouping option type (includes 'none' for single-level compatibility)
-type GroupingOption = "none" | GroupingField;
+type GroupingOption = 'none' | GroupingField;
 
 // ClusterView component with D3 force simulation
 interface ClusterViewProps {
@@ -178,34 +170,31 @@ interface ClusterViewProps {
 }
 
 // Heartbeat TTL in seconds - configurable via environment variable
-const HEARTBEAT_TTL_SECONDS = parseInt(
-  import.meta.env.VITE_HEARTBEAT_TTL_SECONDS || "30",
-  10,
-);
+const HEARTBEAT_TTL_SECONDS = parseInt(import.meta.env.VITE_HEARTBEAT_TTL_SECONDS || '30', 10);
 
 // Status color helper function - shared across views
 const getStatusColor = (status: string): string => {
   switch (status) {
-    case "ready":
-      return "#4caf50";
-    case "initializing":
-      return "#ffc107";
-    case "busy":
-      return "#ff9800";
-    case "full":
-      return "#f44336";
-    case "starting":
-      return "#2196f3";
-    case "terminated":
-      return "#9e9e9e";
-    case "error":
-      return "#f44336";
-    case "no-response":
-      return "#795548";
-    case "shutting_down":
-      return "#03a9f4";
+    case 'ready':
+      return '#4caf50';
+    case 'initializing':
+      return '#ffc107';
+    case 'busy':
+      return '#ff9800';
+    case 'full':
+      return '#f44336';
+    case 'starting':
+      return '#2196f3';
+    case 'terminated':
+      return '#9e9e9e';
+    case 'error':
+      return '#f44336';
+    case 'no-response':
+      return '#795548';
+    case 'shutting_down':
+      return '#03a9f4';
     default:
-      return "#9e9e9e";
+      return '#9e9e9e';
   }
 };
 
@@ -217,38 +206,27 @@ const ClusterView: React.FC<ClusterViewProps> = ({
   onContextMenu,
 }) => {
   // ClusterView uses first grouping level only for now
-  const groupingBy: GroupingOption =
-    groupingLevels.length > 0 ? groupingLevels[0] : "none";
+  const groupingBy: GroupingOption = groupingLevels.length > 0 ? groupingLevels[0] : 'none';
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const [nodes, setNodes] = useState<ClusterNode[]>([]);
   const [links, setLinks] = useState<ClusterLink[]>([]);
   const [draggedNode, setDraggedNode] = useState<string | null>(null);
-  const simulationRef = useRef<ReturnType<
-    typeof forceSimulation<ClusterNode>
-  > | null>(null);
+  const simulationRef = useRef<ReturnType<typeof forceSimulation<ClusterNode>> | null>(null);
   const nodesRef = useRef<ClusterNode[]>([]);
   const linksRef = useRef<ClusterLink[]>([]);
 
   // Track rumble and heartbeat animation states
   const [rumbleNodes, setRumbleNodes] = useState<Set<string>>(new Set());
-  const [heartbeatAnimNodes, setHeartbeatAnimNodes] = useState<Set<string>>(
-    new Set(),
-  );
+  const [heartbeatAnimNodes, setHeartbeatAnimNodes] = useState<Set<string>>(new Set());
   // Counter to force re-render of animate elements - Map<nodeId, counter>
-  const [rumbleCounter, setRumbleCounter] = useState<Map<string, number>>(
-    new Map(),
-  );
+  const [rumbleCounter, setRumbleCounter] = useState<Map<string, number>>(new Map());
   const prevStatusRef = useRef<Map<string, string>>(new Map());
   const prevHeartbeatRef = useRef<Set<string>>(new Set());
 
   // Ping gauge state: track last heartbeat time for each node
-  const [lastHeartbeatTime, setLastHeartbeatTime] = useState<
-    Map<string, number>
-  >(new Map());
-  const [pingProgress, setPingProgress] = useState<Map<string, number>>(
-    new Map(),
-  );
+  const [lastHeartbeatTime, setLastHeartbeatTime] = useState<Map<string, number>>(new Map());
+  const [pingProgress, setPingProgress] = useState<Map<string, number>>(new Map());
 
   // Pan and zoom state for infinite canvas
   const [viewBox, setViewBox] = useState({
@@ -272,24 +250,24 @@ const ClusterView: React.FC<ClusterViewProps> = ({
   // Get status color for node
   const getNodeColor = (status: string) => {
     switch (status) {
-      case "ready":
-        return "#4caf50";
-      case "initializing":
-        return "#ffc107"; // Yellow for initializing
-      case "busy":
-        return "#ff9800";
-      case "full":
-        return "#f44336";
-      case "starting":
-        return "#2196f3";
-      case "terminated":
-        return "#9e9e9e";
-      case "error":
-        return "#f44336";
-      case "no-response":
-        return "#795548";
+      case 'ready':
+        return '#4caf50';
+      case 'initializing':
+        return '#ffc107'; // Yellow for initializing
+      case 'busy':
+        return '#ff9800';
+      case 'full':
+        return '#f44336';
+      case 'starting':
+        return '#2196f3';
+      case 'terminated':
+        return '#9e9e9e';
+      case 'error':
+        return '#f44336';
+      case 'no-response':
+        return '#795548';
       default:
-        return "#9e9e9e";
+        return '#9e9e9e';
     }
   };
 
@@ -298,7 +276,7 @@ const ClusterView: React.FC<ClusterViewProps> = ({
     return services
       .map((s) => `${s.labels.service}-${s.instanceId}`)
       .sort()
-      .join(",");
+      .join(',');
   }, [services]);
 
   // Create a service map for quick lookup (for UI updates without simulation restart)
@@ -311,8 +289,8 @@ const ClusterView: React.FC<ClusterViewProps> = ({
   }, [services]);
 
   // LocalStorage keys
-  const CLUSTER_CENTER_POS_KEY = "clusterViewCenterPosition";
-  const CLUSTER_VIEWBOX_KEY = "clusterViewViewBox";
+  const CLUSTER_CENTER_POS_KEY = 'clusterViewCenterPosition';
+  const CLUSTER_VIEWBOX_KEY = 'clusterViewViewBox';
 
   // Get saved center position from localStorage
   const getSavedCenterPosition = useCallback(() => {
@@ -320,7 +298,7 @@ const ClusterView: React.FC<ClusterViewProps> = ({
       const saved = localStorage.getItem(CLUSTER_CENTER_POS_KEY);
       if (saved) {
         const pos = JSON.parse(saved);
-        if (typeof pos.x === "number" && typeof pos.y === "number") {
+        if (typeof pos.x === 'number' && typeof pos.y === 'number') {
           return pos;
         }
       }
@@ -375,8 +353,7 @@ const ClusterView: React.FC<ClusterViewProps> = ({
         // Multiple center nodes (grouping mode) - arrange in a circle around screen center
         const groupRadius = Math.min(centerNodes.length * 60, 250);
         centerNodes.forEach((node, index) => {
-          const angle =
-            (2 * Math.PI * index) / centerNodes.length - Math.PI / 2;
+          const angle = (2 * Math.PI * index) / centerNodes.length - Math.PI / 2;
           const x = centerX + Math.cos(angle) * groupRadius;
           const y = centerY + Math.sin(angle) * groupRadius;
           node.x = x;
@@ -388,9 +365,7 @@ const ClusterView: React.FC<ClusterViewProps> = ({
         // Reposition service nodes around their respective center nodes
         serviceNodes.forEach((node) => {
           // Find the linked center node
-          const linkedCenter = centerNodes.find(
-            (c) => c.groupKey === node.groupKey,
-          );
+          const linkedCenter = centerNodes.find((c) => c.groupKey === node.groupKey);
           const targetCenter = linkedCenter || { x: centerX, y: centerY };
           const angle = Math.random() * 2 * Math.PI;
           const distance = 80 + Math.random() * 60;
@@ -458,9 +433,7 @@ const ClusterView: React.FC<ClusterViewProps> = ({
       // Increment rumble counter to force re-render of animate element
       setRumbleCounter((prev) => {
         const next = new Map(prev);
-        newHeartbeatNodes.forEach((id) =>
-          next.set(id, (prev.get(id) || 0) + 1),
-        );
+        newHeartbeatNodes.forEach((id) => next.set(id, (prev.get(id) || 0) + 1));
         return next;
       });
 
@@ -518,7 +491,7 @@ const ClusterView: React.FC<ClusterViewProps> = ({
 
     // Create initial center node
     const centerNode: ClusterNode = {
-      id: "center",
+      id: 'center',
       isCenter: true,
       radius: centerRadius,
       x: savedPos.x,
@@ -533,22 +506,22 @@ const ClusterView: React.FC<ClusterViewProps> = ({
     // Create simulation once
     const simulation = forceSimulation<ClusterNode>(nodesRef.current)
       .force(
-        "link",
+        'link',
         forceLink<ClusterNode, ClusterLink>(linksRef.current)
           .id((d) => d.id)
           .distance(100)
-          .strength(0.5),
+          .strength(0.5)
       )
-      .force("charge", forceManyBody<ClusterNode>().strength(-100))
+      .force('charge', forceManyBody<ClusterNode>().strength(-100))
       .force(
-        "collision",
+        'collision',
         forceCollide<ClusterNode>()
           .radius((d) => d.radius + 8)
-          .strength(0.8),
+          .strength(0.8)
       )
       .alphaDecay(0.02) // Slower decay for smoother movement
       .velocityDecay(0.3)
-      .on("tick", () => {
+      .on('tick', () => {
         setNodes([...nodesRef.current]);
         setLinks([...linksRef.current]);
       });
@@ -566,23 +539,23 @@ const ClusterView: React.FC<ClusterViewProps> = ({
   const getGroupKey = useCallback(
     (service: ServiceInstance): string => {
       switch (groupingBy) {
-        case "service":
-          return service.labels.service || "unknown";
-        case "group":
-          return service.labels.group || "unknown";
-        case "environment":
-          return service.labels.environment || "unknown";
-        case "cloudProvider":
-          return service.labels.cloudProvider || "unknown";
-        case "cloudRegion":
-          return service.labels.cloudRegion || "unknown";
-        case "cloudZone":
-          return service.labels.cloudZone || "unknown";
+        case 'service':
+          return service.labels.service || 'unknown';
+        case 'group':
+          return service.labels.group || 'unknown';
+        case 'environment':
+          return service.labels.environment || 'unknown';
+        case 'cloudProvider':
+          return service.labels.cloudProvider || 'unknown';
+        case 'cloudRegion':
+          return service.labels.cloudRegion || 'unknown';
+        case 'cloudZone':
+          return service.labels.cloudZone || 'unknown';
         default:
-          return "center";
+          return 'center';
       }
     },
-    [groupingBy],
+    [groupingBy]
   );
 
   // Track previous groupingBy to detect changes
@@ -615,9 +588,7 @@ const ClusterView: React.FC<ClusterViewProps> = ({
       nodesRef.current.forEach((n) => existingNodeMap.set(n.id, n));
     } else {
       // Only keep service nodes when grouping changes, recreate center nodes
-      nodesRef.current
-        .filter((n) => !n.isCenter)
-        .forEach((n) => existingNodeMap.set(n.id, n));
+      nodesRef.current.filter((n) => !n.isCenter).forEach((n) => existingNodeMap.set(n.id, n));
     }
 
     // Track new nodes for rumble effect
@@ -626,10 +597,10 @@ const ClusterView: React.FC<ClusterViewProps> = ({
     // Determine center nodes based on grouping
     const centerNodes: ClusterNode[] = [];
 
-    if (groupingBy === "none") {
+    if (groupingBy === 'none') {
       // Single center node - always create fresh when switching to 'none'
       const centerNode: ClusterNode = {
-        id: "center",
+        id: 'center',
         isCenter: true,
         radius: centerRadius,
         x: savedPos.x,
@@ -680,8 +651,7 @@ const ClusterView: React.FC<ClusterViewProps> = ({
       const nodeId = `${service.labels.service}-${service.instanceId}`;
       const existing = existingNodeMap.get(nodeId);
       const groupKey = getGroupKey(service);
-      const targetCenterId =
-        groupingBy === "none" ? "center" : `center-${groupKey}`;
+      const targetCenterId = groupingBy === 'none' ? 'center' : `center-${groupKey}`;
       const targetCenter = centerNodes.find((c) => c.id === targetCenterId);
 
       if (existing) {
@@ -724,8 +694,7 @@ const ClusterView: React.FC<ClusterViewProps> = ({
     // Create links - each service links to its group center
     const newLinks: ClusterLink[] = serviceNodes.map((node) => {
       const groupKey = getGroupKey(node.service!);
-      const targetCenterId =
-        groupingBy === "none" ? "center" : `center-${groupKey}`;
+      const targetCenterId = groupingBy === 'none' ? 'center' : `center-${groupKey}`;
       return {
         source: targetCenterId,
         target: node.id,
@@ -736,9 +705,7 @@ const ClusterView: React.FC<ClusterViewProps> = ({
     // Update simulation with new nodes/links (don't recreate)
     const simulation = simulationRef.current;
     simulation.nodes(allNodes);
-    (simulation.force("link") as ForceLink<ClusterNode, ClusterLink>)?.links(
-      newLinks,
-    );
+    (simulation.force('link') as ForceLink<ClusterNode, ClusterLink>)?.links(newLinks);
 
     // Force re-render to show new state immediately
     setNodes([...allNodes]);
@@ -746,9 +713,7 @@ const ClusterView: React.FC<ClusterViewProps> = ({
 
     // Restart simulation - stronger restart when grouping changes
     const hasChanges =
-      newNodeIds.length > 0 ||
-      allNodes.length !== existingNodeMap.size ||
-      groupingChanged;
+      newNodeIds.length > 0 || allNodes.length !== existingNodeMap.size || groupingChanged;
     if (hasChanges) {
       simulation.alpha(groupingChanged ? 0.8 : 0.3).restart();
     }
@@ -771,7 +736,7 @@ const ClusterView: React.FC<ClusterViewProps> = ({
 
       return { x, y };
     },
-    [viewBox],
+    [viewBox]
   );
 
   // Handle drag start for nodes
@@ -794,7 +759,7 @@ const ClusterView: React.FC<ClusterViewProps> = ({
         simulationRef.current.alphaTarget(0.3).restart();
       }
     },
-    [mouseToSvgCoords],
+    [mouseToSvgCoords]
   );
 
   // Handle pan start (right-click or ctrl+click or empty space click)
@@ -811,7 +776,7 @@ const ClusterView: React.FC<ClusterViewProps> = ({
         viewBoxY: viewBox.y,
       };
     },
-    [draggedNode, viewBox],
+    [draggedNode, viewBox]
   );
 
   // Handle mouse move for both dragging and panning
@@ -846,7 +811,7 @@ const ClusterView: React.FC<ClusterViewProps> = ({
         }));
       }
     },
-    [draggedNode, isPanning, mouseToSvgCoords, viewBox.width, viewBox.height],
+    [draggedNode, isPanning, mouseToSvgCoords, viewBox.width, viewBox.height]
   );
 
   // Handle mouse up - global listener for proper capture
@@ -876,12 +841,12 @@ const ClusterView: React.FC<ClusterViewProps> = ({
   // Global mouse event listeners for proper capture outside SVG
   useEffect(() => {
     if (draggedNode || isPanning) {
-      window.addEventListener("mousemove", handleMouseMove);
-      window.addEventListener("mouseup", handleMouseUp);
+      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mouseup', handleMouseUp);
 
       return () => {
-        window.removeEventListener("mousemove", handleMouseMove);
-        window.removeEventListener("mouseup", handleMouseUp);
+        window.removeEventListener('mousemove', handleMouseMove);
+        window.removeEventListener('mouseup', handleMouseUp);
       };
     }
   }, [draggedNode, isPanning, handleMouseMove, handleMouseUp]);
@@ -896,10 +861,7 @@ const ClusterView: React.FC<ClusterViewProps> = ({
 
       setViewBox((prev) => {
         const newWidth = Math.max(400, Math.min(4000, prev.width * zoomFactor));
-        const newHeight = Math.max(
-          300,
-          Math.min(3000, prev.height * zoomFactor),
-        );
+        const newHeight = Math.max(300, Math.min(3000, prev.height * zoomFactor));
 
         // Zoom toward mouse position
         const widthRatio = newWidth / prev.width;
@@ -911,16 +873,16 @@ const ClusterView: React.FC<ClusterViewProps> = ({
         return { x: newX, y: newY, width: newWidth, height: newHeight };
       });
     },
-    [mouseToSvgCoords],
+    [mouseToSvgCoords]
   );
 
   // Get link positions
   const getNodeById = useCallback(
     (id: string | ClusterNode): ClusterNode | undefined => {
-      if (typeof id === "object") return id;
+      if (typeof id === 'object') return id;
       return nodes.find((n) => n.id === id);
     },
-    [nodes],
+    [nodes]
   );
 
   return (
@@ -928,45 +890,45 @@ const ClusterView: React.FC<ClusterViewProps> = ({
       ref={containerRef}
       sx={{
         p: 2,
-        overflow: "hidden",
-        width: "100%",
+        overflow: 'hidden',
+        width: '100%',
         flex: 1,
         minHeight: 0,
-        display: "flex",
-        flexDirection: "column",
-        position: "relative",
+        display: 'flex',
+        flexDirection: 'column',
+        position: 'relative',
       }}
     >
       {services.length === 0 ? (
         <Box
           sx={{
             py: 4,
-            textAlign: "center",
+            textAlign: 'center',
             flex: 1,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
           }}
         >
           <Typography variant="body2" color="text.secondary">
-            {t("serverList.noData")}
+            {t('serverList.noData')}
           </Typography>
         </Box>
       ) : (
         <>
           {/* Reset view button - floating top right */}
-          <Tooltip title={t("common.reset")} placement="left">
+          <Tooltip title={t('common.reset')} placement="left">
             <IconButton
               onClick={handleResetView}
               sx={{
-                position: "absolute",
+                position: 'absolute',
                 top: 16,
                 right: 16,
                 zIndex: 10,
-                bgcolor: "background.paper",
+                bgcolor: 'background.paper',
                 boxShadow: 2,
-                "&:hover": {
-                  bgcolor: "action.hover",
+                '&:hover': {
+                  bgcolor: 'action.hover',
                 },
               }}
               size="small"
@@ -977,17 +939,13 @@ const ClusterView: React.FC<ClusterViewProps> = ({
 
           <Box
             sx={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              width: "100%",
-              height: "100%",
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              width: '100%',
+              height: '100%',
               flex: 1,
-              cursor: isPanning
-                ? "grabbing"
-                : draggedNode
-                  ? "grabbing"
-                  : "grab",
+              cursor: isPanning ? 'grabbing' : draggedNode ? 'grabbing' : 'grab',
             }}
             onMouseDown={handlePanStart}
           >
@@ -998,12 +956,8 @@ const ClusterView: React.FC<ClusterViewProps> = ({
               viewBox={`${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`}
               preserveAspectRatio="xMidYMid meet"
               style={{
-                cursor: draggedNode
-                  ? "grabbing"
-                  : isPanning
-                    ? "grabbing"
-                    : "grab",
-                userSelect: "none",
+                cursor: draggedNode ? 'grabbing' : isPanning ? 'grabbing' : 'grab',
+                userSelect: 'none',
               }}
               onWheel={handleWheel}
             >
@@ -1018,13 +972,7 @@ const ClusterView: React.FC<ClusterViewProps> = ({
               </style>
               <defs>
                 {/* Gradient definitions for animated links */}
-                <linearGradient
-                  id="pulseGradient"
-                  x1="0%"
-                  y1="0%"
-                  x2="100%"
-                  y2="0%"
-                >
+                <linearGradient id="pulseGradient" x1="0%" y1="0%" x2="100%" y2="0%">
                   <stop offset="0%" stopColor="#90a4ae">
                     <animate
                       attributeName="stop-color"
@@ -1052,13 +1000,7 @@ const ClusterView: React.FC<ClusterViewProps> = ({
                 </linearGradient>
 
                 {/* Heartbeat border glow filter */}
-                <filter
-                  id="heartbeatGlow"
-                  x="-50%"
-                  y="-50%"
-                  width="200%"
-                  height="200%"
-                >
+                <filter id="heartbeatGlow" x="-50%" y="-50%" width="200%" height="200%">
                   <feGaussianBlur stdDeviation="3" result="coloredBlur" />
                   <feMerge>
                     <feMergeNode in="coloredBlur" />
@@ -1074,10 +1016,7 @@ const ClusterView: React.FC<ClusterViewProps> = ({
                 if (!source || !target) return null;
 
                 // Check if this link's target node has heartbeat
-                const targetId =
-                  typeof link.target === "string"
-                    ? link.target
-                    : link.target.id;
+                const targetId = typeof link.target === 'string' ? link.target : link.target.id;
                 const hasHeartbeat = heartbeatIds.has(targetId);
 
                 return (
@@ -1088,9 +1027,9 @@ const ClusterView: React.FC<ClusterViewProps> = ({
                       y1={source.y || 0}
                       x2={target.x || 0}
                       y2={target.y || 0}
-                      stroke={hasHeartbeat ? "url(#pulseGradient)" : "#90a4ae"}
+                      stroke={hasHeartbeat ? 'url(#pulseGradient)' : '#90a4ae'}
                       strokeWidth={hasHeartbeat ? 3 : 2}
-                      strokeDasharray={hasHeartbeat ? "8,4" : "4,4"}
+                      strokeDasharray={hasHeartbeat ? '8,4' : '4,4'}
                       opacity={hasHeartbeat ? 0.8 : 0.5}
                     >
                       {hasHeartbeat && (
@@ -1112,15 +1051,14 @@ const ClusterView: React.FC<ClusterViewProps> = ({
                   // Center cluster node - draggable
                   // Calculate count for this center node
                   const centerCount = node.groupKey
-                    ? services.filter((s) => getGroupKey(s) === node.groupKey)
-                        .length
+                    ? services.filter((s) => getGroupKey(s) === node.groupKey).length
                     : services.length;
 
                   return (
                     <g
                       key={node.id}
                       transform={`translate(${node.x || 0}, ${node.y || 0})`}
-                      style={{ cursor: "grab" }}
+                      style={{ cursor: 'grab' }}
                       onMouseDown={(e) => handleMouseDown(node.id, e)}
                     >
                       <defs>
@@ -1151,9 +1089,7 @@ const ClusterView: React.FC<ClusterViewProps> = ({
                             fontWeight="bold"
                             dy="-12"
                           >
-                            {node.groupKey === "unknown"
-                              ? "---"
-                              : node.groupKey.toUpperCase()}
+                            {node.groupKey === 'unknown' ? '---' : node.groupKey.toUpperCase()}
                           </text>
                           <text
                             textAnchor="middle"
@@ -1222,28 +1158,25 @@ const ClusterView: React.FC<ClusterViewProps> = ({
                 // When progress is 0 (or very small), make it transparent
                 const pingGaugeColor =
                   progress < 0.01
-                    ? "transparent"
+                    ? 'transparent'
                     : progress >= 1
-                      ? "#f44336" // Red when fully elapsed
+                      ? '#f44336' // Red when fully elapsed
                       : progress >= 0.7
-                        ? "#ff9800" // Orange when near timeout
+                        ? '#ff9800' // Orange when near timeout
                         : progress >= 0.5
-                          ? "#ffc107" // Yellow at half
-                          : "#4caf50"; // Green when fresh
+                          ? '#ffc107' // Yellow at half
+                          : '#4caf50'; // Green when fresh
 
                 return (
                   <g
                     key={node.id}
                     transform={`translate(${node.x || 0}, ${node.y || 0})`}
-                    style={{ cursor: "grab" }}
+                    style={{ cursor: 'grab' }}
                     onMouseDown={(e) => handleMouseDown(node.id, e)}
                     onContextMenu={(e) => {
                       if (onContextMenu && service) {
                         e.preventDefault();
-                        onContextMenu(
-                          e as unknown as React.MouseEvent,
-                          service,
-                        );
+                        onContextMenu(e as unknown as React.MouseEvent, service);
                       }
                     }}
                   >
@@ -1298,7 +1231,7 @@ const ClusterView: React.FC<ClusterViewProps> = ({
                     )}
 
                     {/* Outer glow for active services */}
-                    {service.status === "ready" && (
+                    {service.status === 'ready' && (
                       <circle
                         r={nodeRadius + 5}
                         fill="none"
@@ -1329,13 +1262,13 @@ const ClusterView: React.FC<ClusterViewProps> = ({
                       strokeWidth="2"
                       style={{
                         filter: shouldRumble
-                          ? "drop-shadow(0 0 10px #e53935) drop-shadow(0 0 5px #ff6659)"
-                          : "none",
-                        transition: "filter 0.3s ease-out",
+                          ? 'drop-shadow(0 0 10px #e53935) drop-shadow(0 0 5px #ff6659)'
+                          : 'none',
+                        transition: 'filter 0.3s ease-out',
                       }}
                     >
                       {/* Soft breathing opacity animation for initializing services */}
-                      {service.status === "initializing" && (
+                      {service.status === 'initializing' && (
                         <animate
                           attributeName="opacity"
                           values="1;0.5;1"
@@ -1348,8 +1281,7 @@ const ClusterView: React.FC<ClusterViewProps> = ({
                     </circle>
 
                     {/* Ping gauge - circular progress indicator (only for normal states) */}
-                    {(service.status === "ready" ||
-                      service.status === "initializing") && (
+                    {(service.status === 'ready' || service.status === 'initializing') && (
                       <>
                         <circle
                           r={pingGaugeRadius}
@@ -1366,20 +1298,14 @@ const ClusterView: React.FC<ClusterViewProps> = ({
                           strokeLinecap="round"
                           transform="rotate(-90)"
                           style={{
-                            transition: "stroke 0.3s ease-out",
+                            transition: 'stroke 0.3s ease-out',
                           }}
                         />
                       </>
                     )}
 
                     {/* Shine effect */}
-                    <ellipse
-                      cx={-10}
-                      cy={-12}
-                      rx="10"
-                      ry="7"
-                      fill="rgba(255,255,255,0.25)"
-                    />
+                    <ellipse cx={-10} cy={-12} rx="10" ry="7" fill="rgba(255,255,255,0.25)" />
 
                     {/* Service type label */}
                     <text
@@ -1390,9 +1316,7 @@ const ClusterView: React.FC<ClusterViewProps> = ({
                       fontWeight="bold"
                       fontFamily="D2Coding, monospace"
                     >
-                      {(service.labels.service || "")
-                        .substring(0, 7)
-                        .toUpperCase()}
+                      {(service.labels.service || '').substring(0, 7).toUpperCase()}
                     </text>
 
                     {/* Hostname */}
@@ -1403,7 +1327,7 @@ const ClusterView: React.FC<ClusterViewProps> = ({
                       fontSize="9"
                       fontFamily="D2Coding, monospace"
                     >
-                      {(service.hostname || "").substring(0, 8)}
+                      {(service.hostname || '').substring(0, 8)}
                     </text>
                   </g>
                 );
@@ -1441,12 +1365,11 @@ const StatusStatsDisplay: React.FC<{
       error: 0,
     };
     services.forEach((s) => {
-      if (s.status === "initializing") counts.initializing++;
-      else if (s.status === "ready") counts.ready++;
-      else if (s.status === "shutting_down") counts.shutting_down++;
-      else if (s.status === "terminated") counts.terminated++;
-      else if (s.status === "error" || s.status === "no-response")
-        counts.error++;
+      if (s.status === 'initializing') counts.initializing++;
+      else if (s.status === 'ready') counts.ready++;
+      else if (s.status === 'shutting_down') counts.shutting_down++;
+      else if (s.status === 'terminated') counts.terminated++;
+      else if (s.status === 'error' || s.status === 'no-response') counts.error++;
     });
     return counts;
   }, [services]);
@@ -1454,150 +1377,122 @@ const StatusStatsDisplay: React.FC<{
   return (
     <Box
       sx={{
-        display: "flex",
-        alignItems: "center",
+        display: 'flex',
+        alignItems: 'center',
         gap: 0,
         borderRadius: 1,
-        bgcolor: "background.paper",
+        bgcolor: 'background.paper',
         border: 1,
-        borderColor: "divider",
-        overflow: "hidden",
+        borderColor: 'divider',
+        overflow: 'hidden',
         height: 24,
       }}
     >
       <Box
         sx={{
-          display: "flex",
-          alignItems: "center",
+          display: 'flex',
+          alignItems: 'center',
           gap: 0.75,
           px: 1,
-          height: "100%",
+          height: '100%',
         }}
       >
         <Box
           sx={{
             width: 8,
             height: 8,
-            borderRadius: "50%",
-            bgcolor: "info.main",
+            borderRadius: '50%',
+            bgcolor: 'info.main',
           }}
         />
-        <Typography
-          variant="caption"
-          color="text.secondary"
-          sx={{ whiteSpace: "nowrap" }}
-        >
-          {t("serverList.stats.initializing")}{" "}
-          <strong style={{ color: "inherit" }}>
-            {statusCounts.initializing}
-          </strong>
+        <Typography variant="caption" color="text.secondary" sx={{ whiteSpace: 'nowrap' }}>
+          {t('serverList.stats.initializing')}{' '}
+          <strong style={{ color: 'inherit' }}>{statusCounts.initializing}</strong>
         </Typography>
       </Box>
-      <Box sx={{ width: "1px", height: "100%", bgcolor: "divider" }} />
+      <Box sx={{ width: '1px', height: '100%', bgcolor: 'divider' }} />
       <Box
         sx={{
-          display: "flex",
-          alignItems: "center",
+          display: 'flex',
+          alignItems: 'center',
           gap: 0.75,
           px: 1,
-          height: "100%",
+          height: '100%',
         }}
       >
         <Box
           sx={{
             width: 8,
             height: 8,
-            borderRadius: "50%",
-            bgcolor: "success.main",
+            borderRadius: '50%',
+            bgcolor: 'success.main',
           }}
         />
-        <Typography
-          variant="caption"
-          color="text.secondary"
-          sx={{ whiteSpace: "nowrap" }}
-        >
-          {t("serverList.stats.ready")}{" "}
-          <strong style={{ color: "inherit" }}>{statusCounts.ready}</strong>
+        <Typography variant="caption" color="text.secondary" sx={{ whiteSpace: 'nowrap' }}>
+          {t('serverList.stats.ready')}{' '}
+          <strong style={{ color: 'inherit' }}>{statusCounts.ready}</strong>
         </Typography>
       </Box>
-      <Box sx={{ width: "1px", height: "100%", bgcolor: "divider" }} />
+      <Box sx={{ width: '1px', height: '100%', bgcolor: 'divider' }} />
       <Box
         sx={{
-          display: "flex",
-          alignItems: "center",
+          display: 'flex',
+          alignItems: 'center',
           gap: 0.75,
           px: 1,
-          height: "100%",
+          height: '100%',
         }}
       >
         <Box
           sx={{
             width: 8,
             height: 8,
-            borderRadius: "50%",
-            bgcolor: "warning.main",
+            borderRadius: '50%',
+            bgcolor: 'warning.main',
           }}
         />
-        <Typography
-          variant="caption"
-          color="text.secondary"
-          sx={{ whiteSpace: "nowrap" }}
-        >
-          {t("serverList.stats.shuttingDown")}{" "}
-          <strong style={{ color: "inherit" }}>
-            {statusCounts.shutting_down}
-          </strong>
+        <Typography variant="caption" color="text.secondary" sx={{ whiteSpace: 'nowrap' }}>
+          {t('serverList.stats.shuttingDown')}{' '}
+          <strong style={{ color: 'inherit' }}>{statusCounts.shutting_down}</strong>
         </Typography>
       </Box>
-      <Box sx={{ width: "1px", height: "100%", bgcolor: "divider" }} />
+      <Box sx={{ width: '1px', height: '100%', bgcolor: 'divider' }} />
       <Box
         sx={{
-          display: "flex",
-          alignItems: "center",
+          display: 'flex',
+          alignItems: 'center',
           gap: 0.75,
           px: 1,
-          height: "100%",
+          height: '100%',
         }}
       >
-        <Box
-          sx={{ width: 8, height: 8, borderRadius: "50%", bgcolor: "grey.500" }}
-        />
-        <Typography
-          variant="caption"
-          color="text.secondary"
-          sx={{ whiteSpace: "nowrap" }}
-        >
-          {t("serverList.stats.terminated")}{" "}
-          <strong style={{ color: "inherit" }}>
-            {statusCounts.terminated}
-          </strong>
+        <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: 'grey.500' }} />
+        <Typography variant="caption" color="text.secondary" sx={{ whiteSpace: 'nowrap' }}>
+          {t('serverList.stats.terminated')}{' '}
+          <strong style={{ color: 'inherit' }}>{statusCounts.terminated}</strong>
         </Typography>
       </Box>
-      <Box sx={{ width: "1px", height: "100%", bgcolor: "divider" }} />
+      <Box sx={{ width: '1px', height: '100%', bgcolor: 'divider' }} />
       <Box
         sx={{
-          display: "flex",
-          alignItems: "center",
+          display: 'flex',
+          alignItems: 'center',
           gap: 0.75,
           px: 1,
-          height: "100%",
+          height: '100%',
         }}
       >
         <Box
           sx={{
             width: 8,
             height: 8,
-            borderRadius: "50%",
-            bgcolor: "error.main",
+            borderRadius: '50%',
+            bgcolor: 'error.main',
           }}
         />
-        <Typography
-          variant="caption"
-          color="text.secondary"
-          sx={{ whiteSpace: "nowrap" }}
-        >
-          {t("serverList.stats.error")}{" "}
-          <strong style={{ color: "inherit" }}>{statusCounts.error}</strong>
+        <Typography variant="caption" color="text.secondary" sx={{ whiteSpace: 'nowrap' }}>
+          {t('serverList.stats.error')}{' '}
+          <strong style={{ color: 'inherit' }}>{statusCounts.error}</strong>
         </Typography>
       </Box>
     </Box>
@@ -1606,10 +1501,10 @@ const StatusStatsDisplay: React.FC<{
 
 const getStatusTranslationKey = (status: string): string => {
   switch (status) {
-    case "no-response":
-      return "noResponse";
-    case "shutting_down":
-      return "shuttingDown";
+    case 'no-response':
+      return 'noResponse';
+    case 'shutting_down':
+      return 'shuttingDown';
     default:
       return status;
   }
@@ -1633,18 +1528,17 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
     const renderItemsGrid = (items: ServiceInstance[], groupKey?: string) => {
       const colCount = 25;
       const itemCount = items.length;
-      const emptyCount =
-        itemCount > 0 ? (colCount - (itemCount % colCount)) % colCount : 0;
+      const emptyCount = itemCount > 0 ? (colCount - (itemCount % colCount)) % colCount : 0;
 
       return (
         <Box
           sx={{
-            display: "grid",
+            display: 'grid',
             gridTemplateColumns: `repeat(auto-fill, ${cellSize}px)`,
             gridAutoRows: `${cellSize}px`,
             gap: `${gap}px`,
-            alignContent: "start",
-            justifyContent: "start",
+            alignContent: 'start',
+            justifyContent: 'start',
           }}
         >
           {items.map((service) => {
@@ -1662,13 +1556,13 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
                 slotProps={{
                   tooltip: {
                     sx: {
-                      bgcolor: "background.paper",
-                      color: "text.primary",
+                      bgcolor: 'background.paper',
+                      color: 'text.primary',
                       boxShadow: (theme) => theme.shadows[10],
                       border: 1,
-                      borderColor: "divider",
+                      borderColor: 'divider',
                       p: 0,
-                      maxWidth: "none",
+                      maxWidth: 'none',
                     },
                   },
                 }}
@@ -1676,9 +1570,9 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
                   <Box sx={{ p: 1.5, minWidth: 320 }}>
                     <Box
                       sx={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
                         mb: 1.5,
                         gap: 2,
                       }}
@@ -1687,9 +1581,9 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
                         variant="subtitle1"
                         sx={{
                           fontWeight: 800,
-                          color: "primary.main",
-                          display: "flex",
-                          alignItems: "center",
+                          color: 'primary.main',
+                          display: 'flex',
+                          alignItems: 'center',
                           gap: 1,
                         }}
                       >
@@ -1697,44 +1591,39 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
                         {service.labels.service}
                       </Typography>
                       <Chip
-                        label={t(
-                          `serverList.status.${getStatusTranslationKey(service.status)}`,
-                        )}
+                        label={t(`serverList.status.${getStatusTranslationKey(service.status)}`)}
                         size="small"
                         color={
-                          service.status === "ready"
-                            ? "success"
-                            : service.status === "error"
-                              ? "error"
-                              : "warning"
+                          service.status === 'ready'
+                            ? 'success'
+                            : service.status === 'error'
+                              ? 'error'
+                              : 'warning'
                         }
                         variant="outlined"
-                        sx={{ fontWeight: "bold" }}
+                        sx={{ fontWeight: 'bold' }}
                       />
                     </Box>
 
-                    <Table
-                      size="small"
-                      sx={{ "& td": { border: 0, py: 0.5, px: 0 } }}
-                    >
+                    <Table size="small" sx={{ '& td': { border: 0, py: 0.5, px: 0 } }}>
                       <TableBody>
                         <TableRow>
                           <TableCell
                             sx={{
                               width: 100,
-                              color: "text.secondary",
-                              fontSize: "0.75rem",
+                              color: 'text.secondary',
+                              fontSize: '0.75rem',
                               fontWeight: 600,
                             }}
                           >
-                            {t("serverList.table.instanceId")}
+                            {t('serverList.table.instanceId')}
                           </TableCell>
                           <TableCell
                             sx={{
                               fontFamily: '"D2Coding", monospace',
                               fontWeight: 600,
-                              fontSize: "0.75rem",
-                              color: "text.primary",
+                              fontSize: '0.75rem',
+                              color: 'text.primary',
                             }}
                           >
                             {service.instanceId}
@@ -1743,33 +1632,31 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
                         <TableRow>
                           <TableCell
                             sx={{
-                              color: "text.secondary",
-                              fontSize: "0.75rem",
+                              color: 'text.secondary',
+                              fontSize: '0.75rem',
                               fontWeight: 600,
                             }}
                           >
-                            {t("serverList.table.hostname")}
+                            {t('serverList.table.hostname')}
                           </TableCell>
-                          <TableCell
-                            sx={{ fontWeight: 500, fontSize: "0.75rem" }}
-                          >
+                          <TableCell sx={{ fontWeight: 500, fontSize: '0.75rem' }}>
                             {service.hostname}
                           </TableCell>
                         </TableRow>
                         <TableRow>
                           <TableCell
                             sx={{
-                              color: "text.secondary",
-                              fontSize: "0.75rem",
+                              color: 'text.secondary',
+                              fontSize: '0.75rem',
                               fontWeight: 600,
                             }}
                           >
-                            {t("serverList.tooltip.addressExt")}
+                            {t('serverList.tooltip.addressExt')}
                           </TableCell>
                           <TableCell
                             sx={{
                               fontFamily: '"D2Coding", monospace',
-                              fontSize: "0.75rem",
+                              fontSize: '0.75rem',
                             }}
                           >
                             {service.externalAddress}
@@ -1778,17 +1665,17 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
                         <TableRow>
                           <TableCell
                             sx={{
-                              color: "text.secondary",
-                              fontSize: "0.75rem",
+                              color: 'text.secondary',
+                              fontSize: '0.75rem',
                               fontWeight: 600,
                             }}
                           >
-                            {t("serverList.tooltip.addressInt")}
+                            {t('serverList.tooltip.addressInt')}
                           </TableCell>
                           <TableCell
                             sx={{
                               fontFamily: '"D2Coding", monospace',
-                              fontSize: "0.75rem",
+                              fontSize: '0.75rem',
                             }}
                           >
                             {service.internalAddress}
@@ -1798,14 +1685,14 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
                           <TableRow>
                             <TableCell
                               sx={{
-                                color: "text.secondary",
-                                fontSize: "0.75rem",
+                                color: 'text.secondary',
+                                fontSize: '0.75rem',
                                 fontWeight: 600,
                               }}
                             >
-                              {t("serverList.table.environment")}
+                              {t('serverList.table.environment')}
                             </TableCell>
-                            <TableCell sx={{ fontSize: "0.75rem" }}>
+                            <TableCell sx={{ fontSize: '0.75rem' }}>
                               <Chip
                                 label={service.labels.environment}
                                 size="small"
@@ -1813,7 +1700,7 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
                                 color="secondary"
                                 sx={{
                                   height: 20,
-                                  fontSize: "0.65rem",
+                                  fontSize: '0.65rem',
                                   fontWeight: 600,
                                   borderRadius: 0.5,
                                 }}
@@ -1825,14 +1712,14 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
                           <TableRow>
                             <TableCell
                               sx={{
-                                color: "text.secondary",
-                                fontSize: "0.75rem",
+                                color: 'text.secondary',
+                                fontSize: '0.75rem',
                                 fontWeight: 600,
                               }}
                             >
-                              {t("serverList.table.region")}
+                              {t('serverList.table.region')}
                             </TableCell>
-                            <TableCell sx={{ fontSize: "0.75rem" }}>
+                            <TableCell sx={{ fontSize: '0.75rem' }}>
                               <Chip
                                 label={service.labels.region}
                                 size="small"
@@ -1840,7 +1727,7 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
                                 color="info"
                                 sx={{
                                   height: 20,
-                                  fontSize: "0.65rem",
+                                  fontSize: '0.65rem',
                                   fontWeight: 600,
                                   borderRadius: 0.5,
                                 }}
@@ -1852,17 +1739,17 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
                           <TableRow>
                             <TableCell
                               sx={{
-                                color: "text.secondary",
-                                fontSize: "0.75rem",
+                                color: 'text.secondary',
+                                fontSize: '0.75rem',
                                 fontWeight: 600,
                               }}
                             >
-                              {t("serverList.filters.version")}
+                              {t('serverList.filters.version')}
                             </TableCell>
                             <TableCell
                               sx={{
                                 fontFamily: '"D2Coding", monospace',
-                                fontSize: "0.75rem",
+                                fontSize: '0.75rem',
                               }}
                             >
                               {service.labels.version}
@@ -1884,73 +1771,72 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
                     border: 0,
                     boxShadow: (theme) =>
                       `inset 0 1px 0 rgba(255,255,255,0.2), 0 2px 4px ${alpha(theme.palette.common.black, 0.15)}`,
-                    cursor: "pointer",
-                    transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
-                    position: "relative",
-                    display: "flex",
-                    flexDirection: "column",
+                    cursor: 'pointer',
+                    transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                    position: 'relative',
+                    display: 'flex',
+                    flexDirection: 'column',
                     gap: 0,
-                    alignItems: "center",
-                    justifyContent: "center",
+                    alignItems: 'center',
+                    justifyContent: 'center',
                     pb: 0,
                     // Heartbeat glow animation
                     ...(hasHeartbeat && {
-                      animation: "heartbeatGlowPulse 1s ease-out",
-                      "@keyframes heartbeatGlowPulse": {
-                        "0%": {
+                      animation: 'heartbeatGlowPulse 1s ease-out',
+                      '@keyframes heartbeatGlowPulse': {
+                        '0%': {
                           boxShadow:
-                            "0 0 0 0 rgba(76, 175, 80, 0.7), 0 0 20px rgba(76, 175, 80, 0.8), inset 0 0 15px rgba(255, 255, 255, 0.3)",
-                          transform: "scale(1.08)",
-                          filter: "brightness(1.3)",
+                            '0 0 0 0 rgba(76, 175, 80, 0.7), 0 0 20px rgba(76, 175, 80, 0.8), inset 0 0 15px rgba(255, 255, 255, 0.3)',
+                          transform: 'scale(1.08)',
+                          filter: 'brightness(1.3)',
                         },
-                        "30%": {
+                        '30%': {
                           boxShadow:
-                            "0 0 0 8px rgba(76, 175, 80, 0.4), 0 0 30px rgba(76, 175, 80, 0.6), inset 0 0 10px rgba(255, 255, 255, 0.2)",
-                          transform: "scale(1.04)",
-                          filter: "brightness(1.15)",
+                            '0 0 0 8px rgba(76, 175, 80, 0.4), 0 0 30px rgba(76, 175, 80, 0.6), inset 0 0 10px rgba(255, 255, 255, 0.2)',
+                          transform: 'scale(1.04)',
+                          filter: 'brightness(1.15)',
                         },
-                        "60%": {
+                        '60%': {
                           boxShadow:
-                            "0 0 0 12px rgba(76, 175, 80, 0.1), 0 0 15px rgba(76, 175, 80, 0.3), inset 0 0 5px rgba(255, 255, 255, 0.1)",
-                          transform: "scale(1.02)",
-                          filter: "brightness(1.05)",
+                            '0 0 0 12px rgba(76, 175, 80, 0.1), 0 0 15px rgba(76, 175, 80, 0.3), inset 0 0 5px rgba(255, 255, 255, 0.1)',
+                          transform: 'scale(1.02)',
+                          filter: 'brightness(1.05)',
                         },
-                        "100%": {
+                        '100%': {
                           boxShadow:
-                            "inset 0 1px 0 rgba(255,255,255,0.2), 0 2px 4px rgba(0,0,0,0.15)",
-                          transform: "scale(1)",
-                          filter: "brightness(1)",
+                            'inset 0 1px 0 rgba(255,255,255,0.2), 0 2px 4px rgba(0,0,0,0.15)',
+                          transform: 'scale(1)',
+                          filter: 'brightness(1)',
                         },
                       },
                     }),
-                    "&::after": {
+                    '&::after': {
                       content: '""',
-                      position: "absolute",
+                      position: 'absolute',
                       top: 0,
                       left: 0,
                       right: 0,
                       bottom: 0,
                       background:
-                        "linear-gradient(180deg, rgba(255,255,255,0.15) 0%, transparent 50%, rgba(0,0,0,0.1) 100%)",
-                      pointerEvents: "none",
+                        'linear-gradient(180deg, rgba(255,255,255,0.15) 0%, transparent 50%, rgba(0,0,0,0.1) 100%)',
+                      pointerEvents: 'none',
                     },
-                    "&:hover": {
-                      transform: "scale(1.15) translateY(-2px)",
-                      boxShadow: (theme) =>
-                        `0 8px 16px ${alpha(theme.palette.common.black, 0.25)}`,
+                    '&:hover': {
+                      transform: 'scale(1.15) translateY(-2px)',
+                      boxShadow: (theme) => `0 8px 16px ${alpha(theme.palette.common.black, 0.25)}`,
                       zIndex: 2,
                     },
                   }}
                 >
                   <Box
                     sx={{
-                      position: "absolute",
+                      position: 'absolute',
                       top: 4,
                       left: 2,
                       right: 2,
-                      display: "flex",
-                      justifyContent: "center",
-                      pointerEvents: "none",
+                      display: 'flex',
+                      justifyContent: 'center',
+                      pointerEvents: 'none',
                       zIndex: 2,
                     }}
                   >
@@ -1959,18 +1845,18 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
                       size="small"
                       sx={{
                         height: 18,
-                        fontSize: "0.6rem",
+                        fontSize: '0.6rem',
                         fontWeight: 600,
-                        bgcolor: "rgba(0,0,0,0.4)",
-                        color: "white",
-                        backdropFilter: "blur(2px)",
-                        maxWidth: "100%",
+                        bgcolor: 'rgba(0,0,0,0.4)',
+                        color: 'white',
+                        backdropFilter: 'blur(2px)',
+                        maxWidth: '100%',
                         borderRadius: 0,
-                        "& .MuiChip-label": {
+                        '& .MuiChip-label': {
                           px: 0.5,
-                          display: "block",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
+                          display: 'block',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
                         },
                       }}
                     />
@@ -1981,110 +1867,106 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
                       width: 27,
                       height: 27,
                       mt: 0,
-                      borderRadius: "50%",
-                      bgcolor: "rgba(255,255,255,0.25)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      boxShadow: "inset 0 1px 2px rgba(0,0,0,0.2)",
+                      borderRadius: '50%',
+                      bgcolor: 'rgba(255,255,255,0.25)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.2)',
                       zIndex: 1,
                     }}
                   >
-                    {service.status === "ready" ? (
-                      <CheckCircleIcon sx={{ fontSize: 21, color: "white" }} />
-                    ) : service.status === "initializing" ? (
+                    {service.status === 'ready' ? (
+                      <CheckCircleIcon sx={{ fontSize: 21, color: 'white' }} />
+                    ) : service.status === 'initializing' ? (
                       <SearchIcon
                         sx={{
                           fontSize: 20,
-                          color: "white",
-                          animation: "searchingAnim 2s ease-in-out infinite",
-                          "@keyframes searchingAnim": {
-                            "0%": { transform: "translate(0, 0) rotate(0deg)" },
-                            "25%": {
-                              transform: "translate(2px, -2px) rotate(15deg)",
+                          color: 'white',
+                          animation: 'searchingAnim 2s ease-in-out infinite',
+                          '@keyframes searchingAnim': {
+                            '0%': { transform: 'translate(0, 0) rotate(0deg)' },
+                            '25%': {
+                              transform: 'translate(2px, -2px) rotate(15deg)',
                             },
-                            "50%": {
-                              transform: "translate(-2px, 2px) rotate(-15deg)",
+                            '50%': {
+                              transform: 'translate(-2px, 2px) rotate(-15deg)',
                             },
-                            "75%": {
-                              transform: "translate(2px, 2px) rotate(15deg)",
+                            '75%': {
+                              transform: 'translate(2px, 2px) rotate(15deg)',
                             },
-                            "100%": {
-                              transform: "translate(0, 0) rotate(0deg)",
+                            '100%': {
+                              transform: 'translate(0, 0) rotate(0deg)',
                             },
                           },
                         }}
                       />
-                    ) : service.status === "shutting_down" ? (
-                      <PowerSettingsNewIcon
-                        sx={{ fontSize: 18, color: "white" }}
-                      />
-                    ) : service.status === "terminated" ? (
-                      <PowerSettingsNewIcon
-                        sx={{ fontSize: 18, color: "white", opacity: 0.7 }}
-                      />
-                    ) : service.status === "error" ? (
-                      <ErrorIcon sx={{ fontSize: 18, color: "white" }} />
-                    ) : service.status === "no-response" ? (
-                      <WarningIcon sx={{ fontSize: 18, color: "white" }} />
-                    ) : service.status === "busy" ? (
+                    ) : service.status === 'shutting_down' ? (
+                      <PowerSettingsNewIcon sx={{ fontSize: 18, color: 'white' }} />
+                    ) : service.status === 'terminated' ? (
+                      <PowerSettingsNewIcon sx={{ fontSize: 18, color: 'white', opacity: 0.7 }} />
+                    ) : service.status === 'error' ? (
+                      <ErrorIcon sx={{ fontSize: 18, color: 'white' }} />
+                    ) : service.status === 'no-response' ? (
+                      <WarningIcon sx={{ fontSize: 18, color: 'white' }} />
+                    ) : service.status === 'busy' ? (
                       <SearchIcon
                         sx={{
                           fontSize: 20,
-                          color: "white",
-                          animation: "searchingAnim 2s ease-in-out infinite",
-                          "@keyframes searchingAnim": {
-                            "0%": { transform: "translate(0, 0) rotate(0deg)" },
-                            "25%": {
-                              transform: "translate(2px, -2px) rotate(15deg)",
+                          color: 'white',
+                          animation: 'searchingAnim 2s ease-in-out infinite',
+                          '@keyframes searchingAnim': {
+                            '0%': { transform: 'translate(0, 0) rotate(0deg)' },
+                            '25%': {
+                              transform: 'translate(2px, -2px) rotate(15deg)',
                             },
-                            "50%": {
-                              transform: "translate(-2px, 2px) rotate(-15deg)",
+                            '50%': {
+                              transform: 'translate(-2px, 2px) rotate(-15deg)',
                             },
-                            "75%": {
-                              transform: "translate(2px, 2px) rotate(15deg)",
+                            '75%': {
+                              transform: 'translate(2px, 2px) rotate(15deg)',
                             },
-                            "100%": {
-                              transform: "translate(0, 0) rotate(0deg)",
+                            '100%': {
+                              transform: 'translate(0, 0) rotate(0deg)',
                             },
                           },
                         }}
                       />
                     ) : (
-                      <HelpOutlineIcon sx={{ fontSize: 18, color: "white" }} />
+                      <HelpOutlineIcon sx={{ fontSize: 18, color: 'white' }} />
                     )}
                   </Box>
                   <Typography
                     variant="caption"
                     sx={{
-                      position: "absolute",
+                      position: 'absolute',
                       bottom: 4,
                       left: 0,
                       right: 0,
-                      textAlign: "center",
-                      fontSize: "0.65rem",
+                      textAlign: 'center',
+                      fontSize: '0.65rem',
                       fontWeight: 700,
-                      color: "white",
+                      color: 'white',
                       lineHeight: 1,
-                      textShadow: "0 1px 2px rgba(0,0,0,0.5)",
-                      fontFamily: "monospace",
+                      textShadow: '0 1px 2px rgba(0,0,0,0.5)',
+                      fontFamily: 'monospace',
                     }}
                   >
-                    {service.status === "ready"
-                      ? "READY"
-                      : service.status === "initializing"
-                        ? "INITIALIZING"
-                        : service.status === "shutting_down"
-                          ? "SHUTTING DOWN"
-                          : service.status === "terminated"
-                            ? "TERMINATED"
-                            : service.status === "error"
-                              ? "ERROR"
-                              : service.status === "no-response"
-                                ? "NO RESPONSE"
-                                : service.status === "busy"
-                                  ? "BUSY"
-                                  : "?"}
+                    {service.status === 'ready'
+                      ? 'READY'
+                      : service.status === 'initializing'
+                        ? 'INITIALIZING'
+                        : service.status === 'shutting_down'
+                          ? 'SHUTTING DOWN'
+                          : service.status === 'terminated'
+                            ? 'TERMINATED'
+                            : service.status === 'error'
+                              ? 'ERROR'
+                              : service.status === 'no-response'
+                                ? 'NO RESPONSE'
+                                : service.status === 'busy'
+                                  ? 'BUSY'
+                                  : '?'}
                   </Typography>
                 </Box>
               </Tooltip>
@@ -2094,14 +1976,14 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
           {emptyCount > 0 &&
             Array.from({ length: emptyCount }).map((_, idx) => (
               <Box
-                key={`empty-check-${groupKey ?? "all"}-${idx}`}
+                key={`empty-check-${groupKey ?? 'all'}-${idx}`}
                 sx={{
                   width: cellSize,
                   height: cellSize,
                   borderRadius: 0,
-                  border: "2px dashed",
-                  borderColor: "divider",
-                  bgcolor: "transparent",
+                  border: '2px dashed',
+                  borderColor: 'divider',
+                  bgcolor: 'transparent',
                   opacity: 0.3,
                 }}
               />
@@ -2124,7 +2006,7 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
     const buildGroups = (
       items: ServiceInstance[],
       levels: GroupingField[],
-      currentLevel: number = 0,
+      currentLevel: number = 0
     ): LocalServerGroup[] => {
       if (levels.length === 0 || currentLevel >= levels.length) {
         return [];
@@ -2137,7 +2019,7 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
       const groupMap = new Map<string, ServiceInstance[]>();
 
       items.forEach((service) => {
-        const value = service.labels[currentField] || "Unknown";
+        const value = service.labels[currentField] || 'Unknown';
         if (!groupMap.has(value)) {
           groupMap.set(value, []);
         }
@@ -2147,28 +2029,19 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
       return Array.from(groupMap.entries())
         .sort(([a], [b]) => a.localeCompare(b))
         .map(([name, instances]) => ({
-          id: levels.slice(0, currentLevel + 1).join("-") + "-" + name,
-          name:
-            name === "Unknown"
-              ? `(${getGroupingLabel(currentField)} N/A)`
-              : name,
+          id: levels.slice(0, currentLevel + 1).join('-') + '-' + name,
+          name: name === 'Unknown' ? `(${getGroupingLabel(currentField)} N/A)` : name,
           level: currentLevel,
           fieldName: currentField,
           instances: hasMoreLevels
             ? []
-            : instances.sort((a, b) =>
-                a.instanceId.localeCompare(b.instanceId),
-              ),
-          children: hasMoreLevels
-            ? buildGroups(instances, levels, nextLevel)
-            : undefined,
+            : instances.sort((a, b) => a.instanceId.localeCompare(b.instanceId)),
+          children: hasMoreLevels ? buildGroups(instances, levels, nextLevel) : undefined,
         }));
     };
 
     // Collect all instances from a group (including nested)
-    const collectAllInstances = (
-      group: LocalServerGroup,
-    ): ServiceInstance[] => {
+    const collectAllInstances = (group: LocalServerGroup): ServiceInstance[] => {
       if (group.children && group.children.length > 0) {
         return group.children.flatMap(collectAllInstances);
       }
@@ -2176,10 +2049,7 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
     };
 
     // Render a group recursively with its children
-    const renderGroup = (
-      group: LocalServerGroup,
-      depth: number,
-    ): React.ReactNode => {
+    const renderGroup = (group: LocalServerGroup, depth: number): React.ReactNode => {
       const allInstances = collectAllInstances(group);
       const hasChildren = group.children && group.children.length > 0;
 
@@ -2188,14 +2058,14 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
           {/* Modern Unified Group Header */}
           <Box
             sx={{
-              display: "flex",
-              alignItems: "center",
+              display: 'flex',
+              alignItems: 'center',
               mb: 1.5,
               gap: 1.5,
               pb: 1,
-              borderBottom: "1px solid",
-              borderColor: "divider",
-              position: "relative",
+              borderBottom: '1px solid',
+              borderColor: 'divider',
+              position: 'relative',
             }}
           >
             {/* visual level bar */}
@@ -2204,7 +2074,7 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
                 sx={{
                   width: 3,
                   height: 24,
-                  bgcolor: "primary.main",
+                  bgcolor: 'primary.main',
                   mr: 0.5,
                   opacity: 0.5,
                   borderRadius: 1,
@@ -2214,16 +2084,16 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
 
             <Box
               sx={{
-                display: "flex",
-                alignItems: "center",
+                display: 'flex',
+                alignItems: 'center',
                 px: 1.5,
                 py: 0.5,
                 borderRadius: 0,
-                bgcolor: depth === 0 ? "primary.main" : "action.selected",
-                color: depth === 0 ? "primary.contrastText" : "text.primary",
-                boxShadow: depth === 0 ? "0 3px 8px rgba(0,0,0,0.12)" : "none",
-                border: depth === 0 ? "none" : "1px solid",
-                borderColor: "divider",
+                bgcolor: depth === 0 ? 'primary.main' : 'action.selected',
+                color: depth === 0 ? 'primary.contrastText' : 'text.primary',
+                boxShadow: depth === 0 ? '0 3px 8px rgba(0,0,0,0.12)' : 'none',
+                border: depth === 0 ? 'none' : '1px solid',
+                borderColor: 'divider',
               }}
             >
               <Typography
@@ -2232,8 +2102,8 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
                   fontWeight: 800,
                   mr: 1,
                   opacity: 0.7,
-                  textTransform: "uppercase",
-                  letterSpacing: "0.05em",
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em',
                 }}
               >
                 {getGroupingLabel(group.fieldName)}
@@ -2241,10 +2111,7 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
               <Typography variant="body2" sx={{ fontWeight: 700 }}>
                 {group.name}
               </Typography>
-              <Typography
-                variant="caption"
-                sx={{ ml: 1, fontWeight: 800, opacity: 0.6 }}
-              >
+              <Typography variant="caption" sx={{ ml: 1, fontWeight: 800, opacity: 0.6 }}>
                 ({allInstances.length})
               </Typography>
             </Box>
@@ -2254,7 +2121,7 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
 
           <Box sx={{ mt: 1 }}>
             {hasChildren ? (
-              <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                 {group.children!.map((child) => renderGroup(child, depth + 1))}
               </Box>
             ) : (
@@ -2274,7 +2141,7 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
           sx={{
             flex: 1,
             minHeight: 0,
-            overflow: "auto",
+            overflow: 'auto',
             px: 0,
             py: 2,
           }}
@@ -2290,14 +2157,14 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
         sx={{
           flex: 1,
           minHeight: 0,
-          overflow: "auto",
+          overflow: 'auto',
           p: 1.5,
-          alignContent: "start",
-          justifyContent: "start",
+          alignContent: 'start',
+          justifyContent: 'start',
           bgcolor: (theme) => alpha(theme.palette.background.paper, 0.3),
           borderRadius: 1,
           border: 1,
-          borderColor: "divider",
+          borderColor: 'divider',
         }}
       >
         {renderItemsGrid(services)}
@@ -2312,13 +2179,8 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
     // 3. Updated service IDs changed
     // 4. Grouping levels changed
 
-    if (prevProps.groupingLevels.length !== nextProps.groupingLevels.length)
-      return false;
-    if (
-      prevProps.groupingLevels.some(
-        (level, i) => level !== nextProps.groupingLevels[i],
-      )
-    )
+    if (prevProps.groupingLevels.length !== nextProps.groupingLevels.length) return false;
+    if (prevProps.groupingLevels.some((level, i) => level !== nextProps.groupingLevels[i]))
       return false;
 
     // Shallow compare services array (length check first)
@@ -2344,26 +2206,18 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
       return false;
 
     return true;
-  },
+  }
 );
 interface SortableColumnItemProps {
   column: ColumnConfig;
   onToggleVisibility: (id: string) => void;
 }
 
-const SortableColumnItem: React.FC<SortableColumnItemProps> = ({
-  column,
-  onToggleVisibility,
-}) => {
+const SortableColumnItem: React.FC<SortableColumnItemProps> = ({ column, onToggleVisibility }) => {
   const { t } = useTranslation();
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: column.id });
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: column.id,
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -2381,21 +2235,17 @@ const SortableColumnItem: React.FC<SortableColumnItemProps> = ({
           {...attributes}
           {...listeners}
           sx={{
-            cursor: "grab",
-            display: "flex",
-            alignItems: "center",
-            "&:active": { cursor: "grabbing" },
+            cursor: 'grab',
+            display: 'flex',
+            alignItems: 'center',
+            '&:active': { cursor: 'grabbing' },
           }}
         >
-          <DragIndicatorIcon sx={{ color: "text.disabled", fontSize: 20 }} />
+          <DragIndicatorIcon sx={{ color: 'text.disabled', fontSize: 20 }} />
         </Box>
       }
     >
-      <ListItemButton
-        dense
-        onClick={() => onToggleVisibility(column.id)}
-        sx={{ pr: 6 }}
-      >
+      <ListItemButton dense onClick={() => onToggleVisibility(column.id)} sx={{ pr: 6 }}>
         <Checkbox
           edge="start"
           checked={column.visible}
@@ -2405,10 +2255,7 @@ const SortableColumnItem: React.FC<SortableColumnItemProps> = ({
           icon={<VisibilityOffIcon fontSize="small" />}
           checkedIcon={<VisibilityIcon fontSize="small" />}
         />
-        <ListItemText
-          primary={t(column.labelKey)}
-          slotProps={{ primary: { variant: "body2" } }}
-        />
+        <ListItemText primary={t(column.labelKey)} slotProps={{ primary: { variant: 'body2' } }} />
       </ListItemButton>
     </ListItem>
   );
@@ -2419,7 +2266,7 @@ const ServerListPage: React.FC = () => {
   const { enqueueSnackbar } = useSnackbar();
   const { hasPermission } = useAuth();
   const canManage = hasPermission([PERMISSIONS.SERVERS_MANAGE]);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
   const [services, setServices] = useState<ServiceInstance[]>([]);
@@ -2427,9 +2274,9 @@ const ServerListPage: React.FC = () => {
 
   // Real-time view state (persisted in localStorage)
   const [isPaused, setIsPaused] = useState(() => {
-    const saved = localStorage.getItem("serverListRealTimeEnabled");
+    const saved = localStorage.getItem('serverListRealTimeEnabled');
     // Default to true (real-time enabled), so isPaused = false
-    return saved === null ? false : saved === "false";
+    return saved === null ? false : saved === 'false';
   });
 
   // Track isPaused state in ref for use in SSE event handler
@@ -2437,28 +2284,24 @@ const ServerListPage: React.FC = () => {
   useEffect(() => {
     isPausedRef.current = isPaused;
     // Save to localStorage (inverted: realTimeEnabled = !isPaused)
-    localStorage.setItem("serverListRealTimeEnabled", (!isPaused).toString());
+    localStorage.setItem('serverListRealTimeEnabled', (!isPaused).toString());
   }, [isPaused]);
 
   // Sort state (persisted in localStorage)
   const [sortBy, setSortBy] = useState<string>(() => {
-    return localStorage.getItem("serverListSortBy") || "createdAt";
+    return localStorage.getItem('serverListSortBy') || 'createdAt';
   });
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">(() => {
-    return (
-      (localStorage.getItem("serverListSortOrder") as "asc" | "desc") || "asc"
-    );
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>(() => {
+    return (localStorage.getItem('serverListSortOrder') as 'asc' | 'desc') || 'asc';
   });
 
   // View mode state (persisted in localStorage)
   const [viewMode, setViewMode] = useState<ViewMode>(() => {
-    return (localStorage.getItem("serverListViewMode") as ViewMode) || "list";
+    return (localStorage.getItem('serverListViewMode') as ViewMode) || 'list';
   });
 
   // Track updated service IDs for highlight effect (with status)
-  const [updatedServiceIds, setUpdatedServiceIds] = useState<
-    Map<string, ServiceStatus>
-  >(new Map());
+  const [updatedServiceIds, setUpdatedServiceIds] = useState<Map<string, ServiceStatus>>(new Map());
 
   // Track newly added service IDs for appearance animation
   const [newServiceIds, setNewServiceIds] = useState<Set<string>>(new Set());
@@ -2494,15 +2337,13 @@ const ServerListPage: React.FC = () => {
       hostname?: string;
       internalIp?: string;
       healthPort?: number;
-      status: "pending" | "checking" | "success" | "failed";
+      status: 'pending' | 'checking' | 'success' | 'failed';
       latency?: number;
       error?: string;
     }[]
   >([]);
   const [bulkHealthCheckRunning, setBulkHealthCheckRunning] = useState(false);
-  const [bulkHealthCheckSelected, setBulkHealthCheckSelected] = useState<
-    Set<string>
-  >(new Set());
+  const [bulkHealthCheckSelected, setBulkHealthCheckSelected] = useState<Set<string>>(new Set());
 
   // Track expanded table cells (for labels and ports columns)
   const [expandedCells, setExpandedCells] = useState<Set<string>>(new Set());
@@ -2510,26 +2351,26 @@ const ServerListPage: React.FC = () => {
   // Multi-level grouping state (persisted in localStorage)
   const [groupingLevels, setGroupingLevels] = useState<GroupingField[]>(() => {
     try {
-      const saved = localStorage.getItem("serverListGroupingLevels");
+      const saved = localStorage.getItem('serverListGroupingLevels');
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed)) {
           return parsed.filter((item) =>
             [
-              "service",
-              "group",
-              "environment",
-              "cloudProvider",
-              "cloudRegion",
-              "cloudZone",
-            ].includes(item),
+              'service',
+              'group',
+              'environment',
+              'cloudProvider',
+              'cloudRegion',
+              'cloudZone',
+            ].includes(item)
           );
         }
       }
     } catch (e) {
       // Fallback to old single grouping if exists
-      const oldGrouping = localStorage.getItem("serverListGroupingBy");
-      if (oldGrouping && oldGrouping !== "none") {
+      const oldGrouping = localStorage.getItem('serverListGroupingBy');
+      if (oldGrouping && oldGrouping !== 'none') {
         return [oldGrouping as GroupingField];
       }
     }
@@ -2538,41 +2379,36 @@ const ServerListPage: React.FC = () => {
 
   // Save grouping levels to localStorage
   useEffect(() => {
-    localStorage.setItem(
-      "serverListGroupingLevels",
-      JSON.stringify(groupingLevels),
-    );
+    localStorage.setItem('serverListGroupingLevels', JSON.stringify(groupingLevels));
   }, [groupingLevels]);
 
   // Derived groupingBy for backward compatibility with views
-  const groupingBy: GroupingOption =
-    groupingLevels.length > 0 ? groupingLevels[0] : "none";
+  const groupingBy: GroupingOption = groupingLevels.length > 0 ? groupingLevels[0] : 'none';
   const setGroupingBy = (option: GroupingOption) => {
-    if (option === "none") {
+    if (option === 'none') {
       setGroupingLevels([]);
     } else {
       setGroupingLevels([option]);
     }
   };
 
-  const [groupingMenuAnchor, setGroupingMenuAnchor] =
-    useState<null | HTMLElement>(null);
+  const [groupingMenuAnchor, setGroupingMenuAnchor] = useState<null | HTMLElement>(null);
 
   // Grouping label helper
   const getGroupingLabel = (field: GroupingField): string => {
     switch (field) {
-      case "service":
-        return t("serverList.grouping.service");
-      case "group":
-        return t("serverList.grouping.group");
-      case "environment":
-        return t("serverList.grouping.environment");
-      case "cloudProvider":
-        return t("serverList.grouping.cloudProvider");
-      case "cloudRegion":
-        return t("serverList.grouping.cloudRegion");
-      case "cloudZone":
-        return t("serverList.grouping.cloudZone");
+      case 'service':
+        return t('serverList.grouping.service');
+      case 'group':
+        return t('serverList.grouping.group');
+      case 'environment':
+        return t('serverList.grouping.environment');
+      case 'cloudProvider':
+        return t('serverList.grouping.cloudProvider');
+      case 'cloudRegion':
+        return t('serverList.grouping.cloudRegion');
+      case 'cloudZone':
+        return t('serverList.grouping.cloudZone');
       default:
         return field;
     }
@@ -2580,64 +2416,64 @@ const ServerListPage: React.FC = () => {
 
   // All available grouping fields
   const allGroupingFields: GroupingField[] = [
-    "service",
-    "group",
-    "environment",
-    "cloudProvider",
-    "cloudRegion",
-    "cloudZone",
+    'service',
+    'group',
+    'environment',
+    'cloudProvider',
+    'cloudRegion',
+    'cloudZone',
   ];
 
   // Default column configuration
   const defaultColumns: ColumnConfig[] = [
-    { id: "status", labelKey: "serverList.table.status", visible: true },
-    { id: "service", labelKey: "serverList.table.service", visible: true },
-    { id: "group", labelKey: "serverList.table.group", visible: true },
+    { id: 'status', labelKey: 'serverList.table.status', visible: true },
+    { id: 'service', labelKey: 'serverList.table.service', visible: true },
+    { id: 'group', labelKey: 'serverList.table.group', visible: true },
     {
-      id: "environment",
-      labelKey: "serverList.table.environment",
+      id: 'environment',
+      labelKey: 'serverList.table.environment',
       visible: true,
     },
     {
-      id: "cloudProvider",
-      labelKey: "serverList.table.cloudProvider",
+      id: 'cloudProvider',
+      labelKey: 'serverList.table.cloudProvider',
       visible: false,
     },
     {
-      id: "cloudRegion",
-      labelKey: "serverList.table.cloudRegion",
+      id: 'cloudRegion',
+      labelKey: 'serverList.table.cloudRegion',
       visible: false,
     },
-    { id: "cloudZone", labelKey: "serverList.table.cloudZone", visible: false },
-    { id: "labels", labelKey: "serverList.table.labels", visible: true },
+    { id: 'cloudZone', labelKey: 'serverList.table.cloudZone', visible: false },
+    { id: 'labels', labelKey: 'serverList.table.labels', visible: true },
     {
-      id: "instanceId",
-      labelKey: "serverList.table.instanceId",
+      id: 'instanceId',
+      labelKey: 'serverList.table.instanceId',
       visible: true,
     },
-    { id: "hostname", labelKey: "serverList.table.hostname", visible: true },
+    { id: 'hostname', labelKey: 'serverList.table.hostname', visible: true },
     {
-      id: "externalAddress",
-      labelKey: "serverList.table.externalAddress",
+      id: 'externalAddress',
+      labelKey: 'serverList.table.externalAddress',
       visible: false,
     },
     {
-      id: "internalAddress",
-      labelKey: "serverList.table.internalAddress",
+      id: 'internalAddress',
+      labelKey: 'serverList.table.internalAddress',
       visible: true,
     },
-    { id: "ports", labelKey: "serverList.table.ports", visible: true },
-    { id: "stats", labelKey: "serverList.table.stats", visible: false },
-    { id: "meta", labelKey: "serverList.table.meta", visible: false },
-    { id: "createdAt", labelKey: "serverList.table.createdAt", visible: true },
-    { id: "updatedAt", labelKey: "serverList.table.updatedAt", visible: true },
-    { id: "actions", labelKey: "serverList.table.actions", visible: true },
+    { id: 'ports', labelKey: 'serverList.table.ports', visible: true },
+    { id: 'stats', labelKey: 'serverList.table.stats', visible: false },
+    { id: 'meta', labelKey: 'serverList.table.meta', visible: false },
+    { id: 'createdAt', labelKey: 'serverList.table.createdAt', visible: true },
+    { id: 'updatedAt', labelKey: 'serverList.table.updatedAt', visible: true },
+    { id: 'actions', labelKey: 'serverList.table.actions', visible: true },
   ];
 
   // Column configuration state (persisted in localStorage)
   const [currentTime, setCurrentTime] = useState(Date.now());
   const [columns, setColumns] = useState<ColumnConfig[]>(() => {
-    const saved = localStorage.getItem("serverListColumns");
+    const saved = localStorage.getItem('serverListColumns');
     if (saved) {
       try {
         const savedColumns = JSON.parse(saved);
@@ -2669,8 +2505,7 @@ const ServerListPage: React.FC = () => {
   }, [isPaused]);
 
   // Column settings popover state
-  const [columnSettingsAnchor, setColumnSettingsAnchor] =
-    useState<HTMLButtonElement | null>(null);
+  const [columnSettingsAnchor, setColumnSettingsAnchor] = useState<HTMLButtonElement | null>(null);
 
   // Service context menu state
   const [contextMenu, setContextMenu] = useState<{
@@ -2688,24 +2523,24 @@ const ServerListPage: React.FC = () => {
     }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    }),
+    })
   );
 
   // Fetch initial data (only once, SSE will handle updates)
   const { data, error, isLoading, mutate } = useSWR(
-    "/admin/services",
+    '/admin/services',
     () => serviceDiscoveryService.getServices(),
     {
       revalidateOnFocus: true, // Refetch when page becomes visible (SSE may have missed events while in background)
       revalidateOnReconnect: true, // Refetch on reconnect
       refreshInterval: 0, // Disable auto-refresh, SSE handles real-time updates
       dedupingInterval: 2000, // Dedupe requests within 2 seconds
-    },
+    }
   );
 
   // Fetch service types for filter
-  const { data: serviceTypes } = useSWR("/admin/services/types", () =>
-    serviceDiscoveryService.getServiceTypes(),
+  const { data: serviceTypes } = useSWR('/admin/services/types', () =>
+    serviceDiscoveryService.getServiceTypes()
   );
 
   // Sync services from SWR data
@@ -2734,7 +2569,7 @@ const ServerListPage: React.FC = () => {
     try {
       eventSource = serviceDiscoveryService.createSSEConnection(
         (event) => {
-          if (event.type === "init") {
+          if (event.type === 'init') {
             // Initial/reconnection data - always apply to ensure fresh state
             // This handles both first connection and SSE reconnection after network issues
             setServices(event.data);
@@ -2742,11 +2577,11 @@ const ServerListPage: React.FC = () => {
           } else if (isPausedRef.current) {
             // If paused, store updates in pending queue
             setPendingUpdates((prev) => {
-              if (event.type === "put") {
+              if (event.type === 'put') {
                 const index = prev.findIndex(
                   (s) =>
                     s.instanceId === event.data.instanceId &&
-                    s.labels.service === event.data.labels.service,
+                    s.labels.service === event.data.labels.service
                 );
                 if (index >= 0) {
                   const newPending = [...prev];
@@ -2755,37 +2590,36 @@ const ServerListPage: React.FC = () => {
                 } else {
                   return [...prev, event.data];
                 }
-              } else if (event.type === "delete") {
+              } else if (event.type === 'delete') {
                 return prev.filter(
                   (s) =>
                     !(
                       s.instanceId === event.data.instanceId &&
                       s.labels.service === event.data.labels.service
-                    ),
+                    )
                 );
               }
               return prev;
             });
           } else {
             // Not paused - apply updates immediately
-            if (event.type === "put") {
+            if (event.type === 'put') {
               setServices((prev) => {
                 const index = prev.findIndex(
                   (s) =>
                     s.instanceId === event.data.instanceId &&
-                    s.labels.service === event.data.labels.service,
+                    s.labels.service === event.data.labels.service
                 );
                 const serviceKey = `${event.data.labels.service}-${event.data.instanceId}`;
 
                 if (index >= 0) {
                   // Update existing - only highlight if status actually changed (not just heartbeat update)
                   const prevService = prev[index];
-                  const statusChanged =
-                    prevService.status !== event.data.status;
+                  const statusChanged = prevService.status !== event.data.status;
 
                   if (statusChanged) {
                     setUpdatedServiceIds((prevIds) =>
-                      new Map(prevIds).set(serviceKey, event.data.status),
+                      new Map(prevIds).set(serviceKey, event.data.status)
                     );
                     setTimeout(() => {
                       setUpdatedServiceIds((prevIds) => {
@@ -2797,9 +2631,7 @@ const ServerListPage: React.FC = () => {
                   }
 
                   // Trigger heartbeat pulse animation (for any update including heartbeat)
-                  setHeartbeatIds((prevIds) =>
-                    new Set(prevIds).add(serviceKey),
-                  );
+                  setHeartbeatIds((prevIds) => new Set(prevIds).add(serviceKey));
                   setTimeout(() => {
                     setHeartbeatIds((prevIds) => {
                       const newSet = new Set(prevIds);
@@ -2813,9 +2645,7 @@ const ServerListPage: React.FC = () => {
                   return newServices;
                 } else {
                   // Add new service - trigger appearance animation
-                  setNewServiceIds((prevIds) =>
-                    new Set(prevIds).add(serviceKey),
-                  );
+                  setNewServiceIds((prevIds) => new Set(prevIds).add(serviceKey));
                   setTimeout(() => {
                     setNewServiceIds((prevIds) => {
                       const newSet = new Set(prevIds);
@@ -2834,7 +2664,7 @@ const ServerListPage: React.FC = () => {
                   return newServices;
                 }
               });
-            } else if (event.type === "delete") {
+            } else if (event.type === 'delete') {
               // Service deleted/expired - remove from list immediately
               // Terminated services are kept for 5 minutes with TTL, so this only fires after TTL expires
               setServices((prev) =>
@@ -2843,18 +2673,18 @@ const ServerListPage: React.FC = () => {
                     !(
                       s.instanceId === event.data.instanceId &&
                       s.labels.service === event.data.labels.service
-                    ),
-                ),
+                    )
+                )
               );
             }
           }
         },
         (error) => {
-          console.error("SSE error:", error);
-        },
+          console.error('SSE error:', error);
+        }
       );
     } catch (error) {
-      console.error("Failed to create SSE connection:", error);
+      console.error('Failed to create SSE connection:', error);
     }
 
     return () => {
@@ -2874,7 +2704,7 @@ const ServerListPage: React.FC = () => {
           const index = updated.findIndex(
             (s) =>
               s.instanceId === pendingService.instanceId &&
-              s.labels.service === pendingService.labels.service,
+              s.labels.service === pendingService.labels.service
           );
           if (index >= 0) {
             updated[index] = pendingService;
@@ -2898,7 +2728,7 @@ const ServerListPage: React.FC = () => {
   // View mode change handler
   const handleViewModeChange = (mode: ViewMode) => {
     setViewMode(mode);
-    localStorage.setItem("serverListViewMode", mode);
+    localStorage.setItem('serverListViewMode', mode);
   };
 
   // Grouping change handler
@@ -2917,7 +2747,7 @@ const ServerListPage: React.FC = () => {
         loading: true,
         cooldown: false,
         fading: false,
-      }),
+      })
     );
 
     const startFadeOut = () => {
@@ -2944,7 +2774,7 @@ const ServerListPage: React.FC = () => {
     try {
       const result = await serviceDiscoveryService.healthCheck(
         service.labels.service,
-        service.instanceId,
+        service.instanceId
       );
 
       // Set result and start cooldown
@@ -2958,7 +2788,7 @@ const ServerListPage: React.FC = () => {
             latency: result.latency,
             error: result.error,
           },
-        }),
+        })
       );
 
       startFadeOut();
@@ -2972,9 +2802,9 @@ const ServerListPage: React.FC = () => {
           result: {
             healthy: false,
             latency: 0,
-            error: error.message || "Request failed",
+            error: error.message || 'Request failed',
           },
-        }),
+        })
       );
 
       startFadeOut();
@@ -2984,13 +2814,7 @@ const ServerListPage: React.FC = () => {
   // Check if service has a web port for health check
   const hasWebPort = (service: ServiceInstance): boolean => {
     const ports = service.ports;
-    return !!(
-      ports?.internalApi ||
-      ports?.externalApi ||
-      ports?.web ||
-      ports?.http ||
-      ports?.api
-    );
+    return !!(ports?.internalApi || ports?.externalApi || ports?.web || ports?.http || ports?.api);
   };
 
   // Clean up terminated, error, and no-response servers
@@ -3000,33 +2824,29 @@ const ServerListPage: React.FC = () => {
 
   const handleCleanupConfirm = async () => {
     try {
-      console.log("🗑️ Starting cleanup...");
+      console.log('🗑️ Starting cleanup...');
 
       // Call backend cleanup endpoint (handles all terminated/error/no-response servers)
       const result = await serviceDiscoveryService.cleanupServices();
 
       console.log(
-        `✅ Cleanup complete: ${result.deletedCount}/${result.totalCount} servers deleted`,
+        `✅ Cleanup complete: ${result.deletedCount}/${result.totalCount} servers deleted`
       );
 
       // Remove from frontend state immediately
       setServices((prev) =>
         prev.filter(
-          (s) =>
-            s.status !== "terminated" &&
-            s.status !== "error" &&
-            s.status !== "no-response",
-        ),
+          (s) => s.status !== 'terminated' && s.status !== 'error' && s.status !== 'no-response'
+        )
       );
 
       // Show success message
-      enqueueSnackbar(
-        t("serverList.cleanupSuccess", { count: result.deletedCount }),
-        { variant: "success" },
-      );
+      enqueueSnackbar(t('serverList.cleanupSuccess', { count: result.deletedCount }), {
+        variant: 'success',
+      });
     } catch (error) {
-      console.error("❌ Cleanup failed:", error);
-      enqueueSnackbar(t("serverList.cleanupFailed"), { variant: "error" });
+      console.error('❌ Cleanup failed:', error);
+      enqueueSnackbar(t('serverList.cleanupFailed'), { variant: 'error' });
     } finally {
       // Always close dialog, regardless of success or failure
       setCleanupDialogOpen(false);
@@ -3038,10 +2858,7 @@ const ServerListPage: React.FC = () => {
   };
 
   // Context menu handlers
-  const handleContextMenu = (
-    event: React.MouseEvent,
-    service: ServiceInstance,
-  ) => {
+  const handleContextMenu = (event: React.MouseEvent, service: ServiceInstance) => {
     event.preventDefault();
     setContextMenu({
       mouseX: event.clientX,
@@ -3059,9 +2876,8 @@ const ServerListPage: React.FC = () => {
     const jsonStr = JSON.stringify(contextMenu.service, null, 2);
     copyToClipboardWithNotification(
       jsonStr,
-      () =>
-        enqueueSnackbar(t("common.copiedToClipboard"), { variant: "success" }),
-      () => enqueueSnackbar(t("common.copyFailed"), { variant: "error" }),
+      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
     );
     handleContextMenuClose();
   };
@@ -3070,9 +2886,8 @@ const ServerListPage: React.FC = () => {
     if (!contextMenu?.service) return;
     copyToClipboardWithNotification(
       contextMenu.service.instanceId,
-      () =>
-        enqueueSnackbar(t("common.copiedToClipboard"), { variant: "success" }),
-      () => enqueueSnackbar(t("common.copyFailed"), { variant: "error" }),
+      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
     );
     handleContextMenuClose();
   };
@@ -3081,9 +2896,8 @@ const ServerListPage: React.FC = () => {
     if (!contextMenu?.service) return;
     copyToClipboardWithNotification(
       contextMenu.service.hostname,
-      () =>
-        enqueueSnackbar(t("common.copiedToClipboard"), { variant: "success" }),
-      () => enqueueSnackbar(t("common.copyFailed"), { variant: "error" }),
+      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
     );
     handleContextMenuClose();
   };
@@ -3091,11 +2905,9 @@ const ServerListPage: React.FC = () => {
   const handleCopyAddress = () => {
     if (!contextMenu?.service) return;
     copyToClipboardWithNotification(
-      contextMenu.service.externalAddress ||
-        contextMenu.service.internalAddress,
-      () =>
-        enqueueSnackbar(t("common.copiedToClipboard"), { variant: "success" }),
-      () => enqueueSnackbar(t("common.copyFailed"), { variant: "error" }),
+      contextMenu.service.externalAddress || contextMenu.service.internalAddress,
+      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
     );
     handleContextMenuClose();
   };
@@ -3112,18 +2924,14 @@ const ServerListPage: React.FC = () => {
         ports?.http ||
         ports?.api
       );
-      const isActive = s.status === "ready" || s.status === "initializing";
+      const isActive = s.status === 'ready' || s.status === 'initializing';
       return hasApiPort && isActive;
     });
 
     const results = checkableServices.map((s) => {
       const ports = s.ports;
       const healthPort =
-        ports?.internalApi ||
-        ports?.externalApi ||
-        ports?.web ||
-        ports?.http ||
-        ports?.api;
+        ports?.internalApi || ports?.externalApi || ports?.web || ports?.http || ports?.api;
       return {
         serviceKey: `${s.labels.service}-${s.instanceId}`,
         service: s.labels.service,
@@ -3133,7 +2941,7 @@ const ServerListPage: React.FC = () => {
         hostname: s.hostname,
         internalIp: s.internalAddress,
         healthPort: healthPort,
-        status: "pending" as const,
+        status: 'pending' as const,
       };
     });
 
@@ -3156,9 +2964,7 @@ const ServerListPage: React.FC = () => {
   };
 
   const handleBulkHealthCheckSelectAll = () => {
-    setBulkHealthCheckSelected(
-      new Set(bulkHealthCheckResults.map((r) => r.serviceKey)),
-    );
+    setBulkHealthCheckSelected(new Set(bulkHealthCheckResults.map((r) => r.serviceKey)));
   };
 
   const handleBulkHealthCheckDeselectAll = () => {
@@ -3176,78 +2982,63 @@ const ServerListPage: React.FC = () => {
         selectedKeys.has(item.serviceKey)
           ? {
               ...item,
-              status: "pending" as const,
+              status: 'pending' as const,
               latency: undefined,
               error: undefined,
             }
-          : item,
-      ),
+          : item
+      )
     );
 
     // Create a list of items to check. We use the current state's list as source of truth.
     // Note: 'itemsToCheck' are just metadata objects provided to the loop.
-    const itemsToCheck = bulkHealthCheckResults.filter((item) =>
-      selectedKeys.has(item.serviceKey),
-    );
+    const itemsToCheck = bulkHealthCheckResults.filter((item) => selectedKeys.has(item.serviceKey));
 
     for (const item of itemsToCheck) {
       // Find current index dynamically for scrolling
       const currentIndex = bulkHealthCheckResults.findIndex(
-        (r) => r.serviceKey === item.serviceKey,
+        (r) => r.serviceKey === item.serviceKey
       );
 
       // Update status to 'checking'
       setBulkHealthCheckResults((prev) =>
         prev.map((r) =>
-          r.serviceKey === item.serviceKey
-            ? { ...r, status: "checking" as const }
-            : r,
-        ),
+          r.serviceKey === item.serviceKey ? { ...r, status: 'checking' as const } : r
+        )
       );
 
       // Auto-scroll logic
       if (currentIndex !== -1) {
         setTimeout(() => {
-          const row = document.getElementById(
-            `bulk-health-row-${currentIndex}`,
-          );
-          const container = document.getElementById(
-            "bulk-health-check-scroll-container",
-          );
+          const row = document.getElementById(`bulk-health-row-${currentIndex}`);
+          const container = document.getElementById('bulk-health-check-scroll-container');
           if (row && container) {
             const rowTop = row.offsetTop;
             const containerHeight = container.clientHeight;
             const headerHeight = 40;
-            const scrollTarget =
-              rowTop -
-              headerHeight -
-              containerHeight / 2 +
-              row.offsetHeight / 2;
+            const scrollTarget = rowTop - headerHeight - containerHeight / 2 + row.offsetHeight / 2;
             container.scrollTo({
               top: Math.max(0, scrollTarget),
-              behavior: "smooth",
+              behavior: 'smooth',
             });
           }
         }, 50);
       }
 
       try {
-        const result = await serviceDiscoveryService.healthCheck(
-          item.service,
-          item.instanceId,
-        );
+        const result = await serviceDiscoveryService.healthCheck(item.service, item.instanceId);
 
         setBulkHealthCheckResults((prev) =>
           prev.map((r) =>
             r.serviceKey === item.serviceKey
               ? {
                   ...r,
-                  status: "success" as const,
+                  status: 'success' as const,
                   latency: result.latency,
                   error: result.error,
                 }
-              : r,
-          ),
+              : r
+          )
         );
       } catch (error: any) {
         setBulkHealthCheckResults((prev) =>
@@ -3255,12 +3046,12 @@ const ServerListPage: React.FC = () => {
             r.serviceKey === item.serviceKey
               ? {
                   ...r,
-                  status: "failed" as const,
+                  status: 'failed' as const,
                   latency: 0,
-                  error: error.message || "Request failed",
+                  error: error.message || 'Request failed',
                 }
-              : r,
-          ),
+              : r
+          )
         );
       }
 
@@ -3285,9 +3076,7 @@ const ServerListPage: React.FC = () => {
   const [hasCompletedHealthCheck, setHasCompletedHealthCheck] = useState(false);
 
   // Export menu anchor
-  const [exportMenuAnchor, setExportMenuAnchor] = useState<null | HTMLElement>(
-    null,
-  );
+  const [exportMenuAnchor, setExportMenuAnchor] = useState<null | HTMLElement>(null);
 
   const handleExportMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setExportMenuAnchor(event.currentTarget);
@@ -3297,50 +3086,47 @@ const ServerListPage: React.FC = () => {
     setExportMenuAnchor(null);
   };
 
-  const handleExportHealthCheck = (format: "csv" | "xlsx" | "json") => {
+  const handleExportHealthCheck = (format: 'csv' | 'xlsx' | 'json') => {
     handleExportMenuClose();
 
     const exportData = bulkHealthCheckResults.map((item) => ({
       service: item.service,
-      group: item.group || "",
-      env: item.env || "",
-      hostname: item.hostname || "",
-      internalIp: item.internalIp || "",
-      port: item.healthPort || "",
+      group: item.group || '',
+      env: item.env || '',
+      hostname: item.hostname || '',
+      internalIp: item.internalIp || '',
+      port: item.healthPort || '',
       status: item.status,
-      latency: item.latency || "",
-      error: item.error || "",
+      latency: item.latency || '',
+      error: item.error || '',
     }));
 
-    const timestamp = new Date()
-      .toISOString()
-      .replace(/[:.]/g, "-")
-      .slice(0, 19);
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
     const filename = `health-check-${timestamp}`;
 
-    if (format === "json") {
+    if (format === 'json') {
       const jsonStr = JSON.stringify(exportData, null, 2);
-      const blob = new Blob([jsonStr], { type: "application/json" });
+      const blob = new Blob([jsonStr], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
+      const a = document.createElement('a');
       a.href = url;
       a.download = `${filename}.json`;
       a.click();
       URL.revokeObjectURL(url);
-    } else if (format === "csv") {
+    } else if (format === 'csv') {
       const headers = [
-        "Service",
-        "Group",
-        "Environment",
-        "Hostname",
-        "Internal IP",
-        "Port",
-        "Status",
-        "Latency (ms)",
-        "Error",
+        'Service',
+        'Group',
+        'Environment',
+        'Hostname',
+        'Internal IP',
+        'Port',
+        'Status',
+        'Latency (ms)',
+        'Error',
       ];
       const csvRows = [
-        headers.join(","),
+        headers.join(','),
         ...exportData.map((row) =>
           [
             row.service,
@@ -3352,23 +3138,23 @@ const ServerListPage: React.FC = () => {
             row.status,
             row.latency,
             `"${row.error}"`,
-          ].join(","),
+          ].join(',')
         ),
       ];
-      const csvStr = csvRows.join("\n");
-      const blob = new Blob(["\uFEFF" + csvStr], {
-        type: "text/csv;charset=utf-8",
+      const csvStr = csvRows.join('\n');
+      const blob = new Blob(['\uFEFF' + csvStr], {
+        type: 'text/csv;charset=utf-8',
       });
       const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
+      const a = document.createElement('a');
       a.href = url;
       a.download = `${filename}.csv`;
       a.click();
       URL.revokeObjectURL(url);
-    } else if (format === "xlsx") {
+    } else if (format === 'xlsx') {
       // For xlsx, we'll use a simple approach with csv-like data
       // In production, you might want to use a library like xlsx or exceljs
-      import("xlsx")
+      import('xlsx')
         .then((XLSX) => {
           const ws = XLSX.utils.json_to_sheet(
             exportData.map((row) => ({
@@ -3376,19 +3162,19 @@ const ServerListPage: React.FC = () => {
               Group: row.group,
               Environment: row.env,
               Hostname: row.hostname,
-              "Internal IP": row.internalIp,
+              'Internal IP': row.internalIp,
               Port: row.port,
               Status: row.status,
-              "Latency (ms)": row.latency,
+              'Latency (ms)': row.latency,
               Error: row.error,
-            })),
+            }))
           );
           const wb = XLSX.utils.book_new();
-          XLSX.utils.book_append_sheet(wb, ws, "Health Check Results");
+          XLSX.utils.book_append_sheet(wb, ws, 'Health Check Results');
           XLSX.writeFile(wb, `${filename}.xlsx`);
         })
         .catch(() => {
-          enqueueSnackbar(t("common.exportFailed"), { variant: "error" });
+          enqueueSnackbar(t('common.exportFailed'), { variant: 'error' });
         });
     }
   };
@@ -3396,22 +3182,14 @@ const ServerListPage: React.FC = () => {
   // Bulk health check statistics
   const bulkHealthCheckStats = useMemo(() => {
     const total = bulkHealthCheckResults.length;
-    const success = bulkHealthCheckResults.filter(
-      (r) => r.status === "success",
-    ).length;
-    const failed = bulkHealthCheckResults.filter(
-      (r) => r.status === "failed",
-    ).length;
-    const pending = bulkHealthCheckResults.filter(
-      (r) => r.status === "pending",
-    ).length;
-    const checking = bulkHealthCheckResults.filter(
-      (r) => r.status === "checking",
-    ).length;
+    const success = bulkHealthCheckResults.filter((r) => r.status === 'success').length;
+    const failed = bulkHealthCheckResults.filter((r) => r.status === 'failed').length;
+    const pending = bulkHealthCheckResults.filter((r) => r.status === 'pending').length;
+    const checking = bulkHealthCheckResults.filter((r) => r.status === 'checking').length;
     const completed = success + failed;
     const avgLatency =
       bulkHealthCheckResults
-        .filter((r) => r.status === "success" && r.latency)
+        .filter((r) => r.status === 'success' && r.latency)
         .reduce((acc, r) => acc + (r.latency || 0), 0) / (success || 1);
 
     return { total, success, failed, pending, checking, completed, avgLatency };
@@ -3420,163 +3198,142 @@ const ServerListPage: React.FC = () => {
   // Extract unique values from current services for filter options
   const uniqueServices = useMemo(
     () => [...new Set(services.map((s) => s.labels.service))].sort(),
-    [services],
+    [services]
   );
   const uniqueInstanceIds = useMemo(
     () => [...new Set(services.map((s) => s.instanceId))].sort(),
-    [services],
+    [services]
   );
   const uniqueStatuses = useMemo(
     () => [...new Set(services.map((s) => s.status))].sort(),
-    [services],
+    [services]
   );
   const uniqueGroups = useMemo(
-    () =>
-      [
-        ...new Set(services.map((s) => s.labels.group).filter(Boolean)),
-      ].sort() as string[],
-    [services],
+    () => [...new Set(services.map((s) => s.labels.group).filter(Boolean))].sort() as string[],
+    [services]
   );
   const uniqueCloudProviders = useMemo(
     () =>
-      [
-        ...new Set(services.map((s) => s.labels.cloudProvider).filter(Boolean)),
-      ].sort() as string[],
-    [services],
+      [...new Set(services.map((s) => s.labels.cloudProvider).filter(Boolean))].sort() as string[],
+    [services]
   );
   const uniqueCloudRegions = useMemo(
     () =>
-      [
-        ...new Set(services.map((s) => s.labels.cloudRegion).filter(Boolean)),
-      ].sort() as string[],
-    [services],
+      [...new Set(services.map((s) => s.labels.cloudRegion).filter(Boolean))].sort() as string[],
+    [services]
   );
   const uniqueCloudZones = useMemo(
-    () =>
-      [
-        ...new Set(services.map((s) => s.labels.cloudZone).filter(Boolean)),
-      ].sort() as string[],
-    [services],
+    () => [...new Set(services.map((s) => s.labels.cloudZone).filter(Boolean))].sort() as string[],
+    [services]
   );
   const uniqueEnvs = useMemo(
     () =>
-      [
-        ...new Set(services.map((s) => s.labels.environment).filter(Boolean)),
-      ].sort() as string[],
-    [services],
+      [...new Set(services.map((s) => s.labels.environment).filter(Boolean))].sort() as string[],
+    [services]
   );
   const uniqueRoles = useMemo(
-    () =>
-      [
-        ...new Set(services.map((s) => s.labels.role).filter(Boolean)),
-      ].sort() as string[],
-    [services],
+    () => [...new Set(services.map((s) => s.labels.role).filter(Boolean))].sort() as string[],
+    [services]
   );
   const uniqueInternalAddresses = useMemo(
-    () =>
-      [
-        ...new Set(services.map((s) => s.internalAddress).filter(Boolean)),
-      ].sort(),
-    [services],
+    () => [...new Set(services.map((s) => s.internalAddress).filter(Boolean))].sort(),
+    [services]
   );
   const uniqueExternalAddresses = useMemo(
-    () =>
-      [
-        ...new Set(services.map((s) => s.externalAddress).filter(Boolean)),
-      ].sort(),
-    [services],
+    () => [...new Set(services.map((s) => s.externalAddress).filter(Boolean))].sort(),
+    [services]
   );
   const uniqueHostnames = useMemo(
     () => [...new Set(services.map((s) => s.hostname).filter(Boolean))].sort(),
-    [services],
+    [services]
   );
 
   // Status label mapping
   const statusLabels: Record<string, string> = {
-    initializing: t("serverList.status.initializing"),
-    ready: t("serverList.status.ready"),
-    shutting_down: t("serverList.status.shuttingDown"),
-    error: t("serverList.status.error"),
-    terminated: t("serverList.status.terminated"),
-    "no-response": t("serverList.status.noResponse"),
-    busy: t("serverList.status.busy"),
+    initializing: t('serverList.status.initializing'),
+    ready: t('serverList.status.ready'),
+    shutting_down: t('serverList.status.shuttingDown'),
+    error: t('serverList.status.error'),
+    terminated: t('serverList.status.terminated'),
+    'no-response': t('serverList.status.noResponse'),
+    busy: t('serverList.status.busy'),
   };
 
   // Filter configuration
   const availableFilterDefinitions: FilterDefinition[] = [
     {
-      key: "service",
-      label: t("serverList.filters.service"),
-      type: "select",
+      key: 'service',
+      label: t('serverList.filters.service'),
+      type: 'select',
       options: uniqueServices.map((type) => ({ value: type, label: type })),
     },
     {
-      key: "status",
-      label: t("serverList.filters.status"),
-      type: "select",
+      key: 'status',
+      label: t('serverList.filters.status'),
+      type: 'select',
       options: uniqueStatuses.map((status) => ({
         value: status,
         label: statusLabels[status] || status,
       })),
     },
     {
-      key: "instanceId",
-      label: t("serverList.filters.instanceId"),
-      type: "select",
+      key: 'instanceId',
+      label: t('serverList.filters.instanceId'),
+      type: 'select',
       options: uniqueInstanceIds.map((id) => ({ value: id, label: id })),
     },
     {
-      key: "group",
-      label: t("serverList.filters.group"),
-      type: "select",
+      key: 'group',
+      label: t('serverList.filters.group'),
+      type: 'select',
       options: uniqueGroups.map((g) => ({ value: g, label: g })),
     },
     {
-      key: "cloudProvider",
-      label: t("serverList.filters.cloudProvider"),
-      type: "select",
+      key: 'cloudProvider',
+      label: t('serverList.filters.cloudProvider'),
+      type: 'select',
       options: uniqueCloudProviders.map((p) => ({ value: p, label: p })),
     },
     {
-      key: "cloudRegion",
-      label: t("serverList.filters.cloudRegion"),
-      type: "select",
+      key: 'cloudRegion',
+      label: t('serverList.filters.cloudRegion'),
+      type: 'select',
       options: uniqueCloudRegions.map((r) => ({ value: r, label: r })),
     },
     {
-      key: "cloudZone",
-      label: t("serverList.filters.cloudZone"),
-      type: "select",
+      key: 'cloudZone',
+      label: t('serverList.filters.cloudZone'),
+      type: 'select',
       options: uniqueCloudZones.map((z) => ({ value: z, label: z })),
     },
     {
-      key: "env",
-      label: t("serverList.filters.env"),
-      type: "select",
+      key: 'env',
+      label: t('serverList.filters.env'),
+      type: 'select',
       options: uniqueEnvs.map((e) => ({ value: e, label: e })),
     },
     {
-      key: "role",
-      label: t("serverList.filters.role"),
-      type: "select",
+      key: 'role',
+      label: t('serverList.filters.role'),
+      type: 'select',
       options: uniqueRoles.map((r) => ({ value: r, label: r })),
     },
     {
-      key: "hostname",
-      label: t("serverList.filters.hostname"),
-      type: "select",
+      key: 'hostname',
+      label: t('serverList.filters.hostname'),
+      type: 'select',
       options: uniqueHostnames.map((h) => ({ value: h, label: h })),
     },
     {
-      key: "internalAddress",
-      label: t("serverList.filters.internalAddress"),
-      type: "select",
+      key: 'internalAddress',
+      label: t('serverList.filters.internalAddress'),
+      type: 'select',
       options: uniqueInternalAddresses.map((a) => ({ value: a, label: a })),
     },
     {
-      key: "externalAddress",
-      label: t("serverList.filters.externalAddress"),
-      type: "select",
+      key: 'externalAddress',
+      label: t('serverList.filters.externalAddress'),
+      type: 'select',
       options: uniqueExternalAddresses.map((a) => ({ value: a, label: a })),
     },
   ];
@@ -3591,23 +3348,21 @@ const ServerListPage: React.FC = () => {
   };
 
   const handleFilterChange = (filterKey: string, value: any) => {
-    setActiveFilters((prev) =>
-      prev.map((f) => (f.key === filterKey ? { ...f, value } : f)),
-    );
+    setActiveFilters((prev) => prev.map((f) => (f.key === filterKey ? { ...f, value } : f)));
   };
 
   // Column configuration handlers
   const handleToggleColumnVisibility = (columnId: string) => {
     const newColumns = columns.map((col) =>
-      col.id === columnId ? { ...col, visible: !col.visible } : col,
+      col.id === columnId ? { ...col, visible: !col.visible } : col
     );
     setColumns(newColumns);
-    localStorage.setItem("serverListColumns", JSON.stringify(newColumns));
+    localStorage.setItem('serverListColumns', JSON.stringify(newColumns));
   };
 
   const handleResetColumns = () => {
     setColumns(defaultColumns);
-    localStorage.setItem("serverListColumns", JSON.stringify(defaultColumns));
+    localStorage.setItem('serverListColumns', JSON.stringify(defaultColumns));
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -3619,30 +3374,27 @@ const ServerListPage: React.FC = () => {
 
       const newColumns = arrayMove(columns, oldIndex, newIndex);
       setColumns(newColumns);
-      localStorage.setItem("serverListColumns", JSON.stringify(newColumns));
+      localStorage.setItem('serverListColumns', JSON.stringify(newColumns));
     }
   };
 
   // Handle sort
   const handleSort = (columnId: string) => {
     if (sortBy === columnId) {
-      const newOrder = sortOrder === "asc" ? "desc" : "asc";
+      const newOrder = sortOrder === 'asc' ? 'desc' : 'asc';
       setSortOrder(newOrder);
-      localStorage.setItem("serverListSortOrder", newOrder);
+      localStorage.setItem('serverListSortOrder', newOrder);
     } else {
       setSortBy(columnId);
-      setSortOrder("asc");
-      localStorage.setItem("serverListSortBy", columnId);
-      localStorage.setItem("serverListSortOrder", "asc");
+      setSortOrder('asc');
+      localStorage.setItem('serverListSortBy', columnId);
+      localStorage.setItem('serverListSortOrder', 'asc');
     }
   };
 
   // Count inactive services (terminated, error, no-response)
   const inactiveCount = services.filter(
-    (s) =>
-      s.status === "terminated" ||
-      s.status === "error" ||
-      s.status === "no-response",
+    (s) => s.status === 'terminated' || s.status === 'error' || s.status === 'no-response'
   ).length;
 
   // Apply filters and search
@@ -3653,90 +3405,56 @@ const ServerListPage: React.FC = () => {
       const matchesSearch =
         service.instanceId.toLowerCase().includes(searchLower) ||
         service.labels.service.toLowerCase().includes(searchLower) ||
-        (service.labels.group &&
-          service.labels.group.toLowerCase().includes(searchLower)) ||
+        (service.labels.group && service.labels.group.toLowerCase().includes(searchLower)) ||
         service.hostname.toLowerCase().includes(searchLower) ||
         service.externalAddress.toLowerCase().includes(searchLower) ||
         service.internalAddress.toLowerCase().includes(searchLower) ||
         Object.entries(service.labels).some(
-          ([key, value]) => value && value.toLowerCase().includes(searchLower),
+          ([key, value]) => value && value.toLowerCase().includes(searchLower)
         ) ||
         // Search in ports (name:port format)
         Object.entries(service.ports || {}).some(
           ([name, port]) =>
-            name.toLowerCase().includes(searchLower) ||
-            String(port).includes(searchLower),
+            name.toLowerCase().includes(searchLower) || String(port).includes(searchLower)
         );
       if (!matchesSearch) return false;
     }
 
     // Dynamic filters (all are now select type with exact match)
     for (const filter of activeFilters) {
-      if (
-        filter.key === "service" &&
-        filter.value &&
-        service.labels.service !== filter.value
-      ) {
+      if (filter.key === 'service' && filter.value && service.labels.service !== filter.value) {
+        return false;
+      }
+      if (filter.key === 'status' && filter.value && service.status !== filter.value) {
+        return false;
+      }
+      if (filter.key === 'instanceId' && filter.value && service.instanceId !== filter.value) {
+        return false;
+      }
+      if (filter.key === 'group' && filter.value && service.labels.group !== filter.value) {
+        return false;
+      }
+      if (filter.key === 'region' && filter.value && service.labels.region !== filter.value) {
+        return false;
+      }
+      if (filter.key === 'env' && filter.value && service.labels.environment !== filter.value) {
+        return false;
+      }
+      if (filter.key === 'role' && filter.value && service.labels.role !== filter.value) {
+        return false;
+      }
+      if (filter.key === 'hostname' && filter.value && service.hostname !== filter.value) {
         return false;
       }
       if (
-        filter.key === "status" &&
-        filter.value &&
-        service.status !== filter.value
-      ) {
-        return false;
-      }
-      if (
-        filter.key === "instanceId" &&
-        filter.value &&
-        service.instanceId !== filter.value
-      ) {
-        return false;
-      }
-      if (
-        filter.key === "group" &&
-        filter.value &&
-        service.labels.group !== filter.value
-      ) {
-        return false;
-      }
-      if (
-        filter.key === "region" &&
-        filter.value &&
-        service.labels.region !== filter.value
-      ) {
-        return false;
-      }
-      if (
-        filter.key === "env" &&
-        filter.value &&
-        service.labels.environment !== filter.value
-      ) {
-        return false;
-      }
-      if (
-        filter.key === "role" &&
-        filter.value &&
-        service.labels.role !== filter.value
-      ) {
-        return false;
-      }
-      if (
-        filter.key === "hostname" &&
-        filter.value &&
-        service.hostname !== filter.value
-      ) {
-        return false;
-      }
-      if (
-        filter.key === "internalAddress" &&
+        filter.key === 'internalAddress' &&
         filter.value &&
         service.internalAddress !== filter.value
       ) {
         return false;
       }
       if (
-        filter.key === "externalAddress" &&
+        filter.key === 'externalAddress' &&
         filter.value &&
         service.externalAddress !== filter.value
       ) {
@@ -3757,12 +3475,11 @@ const ServerListPage: React.FC = () => {
       error: 0,
     };
     filteredServices.forEach((s) => {
-      if (s.status === "initializing") counts.initializing++;
-      else if (s.status === "ready") counts.ready++;
-      else if (s.status === "shutting_down") counts.shutting_down++;
-      else if (s.status === "terminated") counts.terminated++;
-      else if (s.status === "error" || s.status === "no-response")
-        counts.error++;
+      if (s.status === 'initializing') counts.initializing++;
+      else if (s.status === 'ready') counts.ready++;
+      else if (s.status === 'shutting_down') counts.shutting_down++;
+      else if (s.status === 'terminated') counts.terminated++;
+      else if (s.status === 'error' || s.status === 'no-response') counts.error++;
     });
     return counts;
   }, [filteredServices]);
@@ -3773,10 +3490,10 @@ const ServerListPage: React.FC = () => {
     let bValue: any;
 
     // Handle labels fields
-    if (sortBy === "service") {
+    if (sortBy === 'service') {
       aValue = a.labels.service;
       bValue = b.labels.service;
-    } else if (sortBy === "group") {
+    } else if (sortBy === 'group') {
       aValue = a.labels.group;
       bValue = b.labels.group;
     } else {
@@ -3785,7 +3502,7 @@ const ServerListPage: React.FC = () => {
     }
 
     // Handle special cases
-    if (sortBy === "createdAt" || sortBy === "updatedAt") {
+    if (sortBy === 'createdAt' || sortBy === 'updatedAt') {
       aValue = new Date(aValue).getTime();
       bValue = new Date(bValue).getTime();
     }
@@ -3793,8 +3510,8 @@ const ServerListPage: React.FC = () => {
     if (aValue === undefined || aValue === null) return 1;
     if (bValue === undefined || bValue === null) return -1;
 
-    if (aValue < bValue) return sortOrder === "asc" ? -1 : 1;
-    if (aValue > bValue) return sortOrder === "asc" ? 1 : -1;
+    if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1;
+    if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1;
     return 0;
   });
 
@@ -3807,77 +3524,77 @@ const ServerListPage: React.FC = () => {
   });
 
   // Status badge component
-  const getStatusBadge = (status: ServiceInstance["status"]) => {
+  const getStatusBadge = (status: ServiceInstance['status']) => {
     const statusConfig = {
       ready: {
-        color: "success" as const,
+        color: 'success' as const,
         icon: <CheckCircleIcon sx={{ fontSize: 16 }} />,
-        label: t("serverList.status.ready"),
-        tooltipKey: "ready",
+        label: t('serverList.status.ready'),
+        tooltipKey: 'ready',
       },
       error: {
-        color: "error" as const,
+        color: 'error' as const,
         icon: <ErrorIcon sx={{ fontSize: 16 }} />,
-        label: t("serverList.status.error"),
-        tooltipKey: "error",
+        label: t('serverList.status.error'),
+        tooltipKey: 'error',
       },
       initializing: {
-        color: "warning" as const,
+        color: 'warning' as const,
         icon: (
           <SearchIcon
             sx={{
               fontSize: 16,
-              animation: "searchingAnimSmall 2s ease-in-out infinite",
-              "@keyframes searchingAnimSmall": {
-                "0%": { transform: "translate(0, 0) rotate(0deg)" },
-                "25%": { transform: "translate(1px, -1px) rotate(10deg)" },
-                "50%": { transform: "translate(-1px, 1px) rotate(-10deg)" },
-                "75%": { transform: "translate(1px, 1px) rotate(10deg)" },
-                "100%": { transform: "translate(0, 0) rotate(0deg)" },
+              animation: 'searchingAnimSmall 2s ease-in-out infinite',
+              '@keyframes searchingAnimSmall': {
+                '0%': { transform: 'translate(0, 0) rotate(0deg)' },
+                '25%': { transform: 'translate(1px, -1px) rotate(10deg)' },
+                '50%': { transform: 'translate(-1px, 1px) rotate(-10deg)' },
+                '75%': { transform: 'translate(1px, 1px) rotate(10deg)' },
+                '100%': { transform: 'translate(0, 0) rotate(0deg)' },
               },
             }}
           />
         ),
-        label: t("serverList.status.initializing"),
-        tooltipKey: "initializing",
+        label: t('serverList.status.initializing'),
+        tooltipKey: 'initializing',
       },
       shutting_down: {
-        color: "info" as const,
+        color: 'info' as const,
         icon: <PowerSettingsNewIcon sx={{ fontSize: 16 }} />,
-        label: t("serverList.status.shuttingDown"),
-        tooltipKey: "shuttingDown",
+        label: t('serverList.status.shuttingDown'),
+        tooltipKey: 'shuttingDown',
       },
       terminated: {
-        color: "default" as const,
+        color: 'default' as const,
         icon: <PowerSettingsNewIcon sx={{ fontSize: 16 }} />,
-        label: t("serverList.status.terminated"),
-        tooltipKey: "terminated",
+        label: t('serverList.status.terminated'),
+        tooltipKey: 'terminated',
       },
-      "no-response": {
-        color: "warning" as const,
+      'no-response': {
+        color: 'warning' as const,
         icon: <WarningIcon sx={{ fontSize: 16 }} />,
-        label: t("serverList.status.noResponse"),
-        tooltipKey: "noResponse",
+        label: t('serverList.status.noResponse'),
+        tooltipKey: 'noResponse',
       },
       busy: {
-        color: "warning" as const,
+        color: 'warning' as const,
         icon: (
           <SearchIcon
             sx={{
               fontSize: 16,
-              animation: "searchingAnimSmall 2s ease-in-out infinite",
-              "@keyframes searchingAnimSmall": {
-                "0%": { transform: "translate(0, 0) rotate(0deg)" },
-                "25%": { transform: "translate(1px, -1px) rotate(10deg)" },
-                "50%": { transform: "translate(-1px, 1px) rotate(-10deg)" },
-                "75%": { transform: "translate(1px, 1px) rotate(10deg)" },
-                "100%": { transform: "translate(0, 0) rotate(0deg)" },
+              animation: 'searchingAnimSmall 2s ease-in-out infinite',
+              '@keyframes searchingAnimSmall': {
+                '0%': { transform: 'translate(0, 0) rotate(0deg)' },
+                '25%': { transform: 'translate(1px, -1px) rotate(10deg)' },
+                '50%': { transform: 'translate(-1px, 1px) rotate(-10deg)' },
+                '75%': { transform: 'translate(1px, 1px) rotate(10deg)' },
+                '100%': { transform: 'translate(0, 0) rotate(0deg)' },
               },
             }}
           />
         ),
-        label: t("serverList.status.busy") || "Busy",
-        tooltipKey: "busy",
+        label: t('serverList.status.busy') || 'Busy',
+        tooltipKey: 'busy',
       },
     };
 
@@ -3894,11 +3611,7 @@ const ServerListPage: React.FC = () => {
     }
 
     return (
-      <Tooltip
-        title={t(`serverList.statusTooltip.${config.tooltipKey}`)}
-        arrow
-        placement="top"
-      >
+      <Tooltip title={t(`serverList.statusTooltip.${config.tooltipKey}`)} arrow placement="top">
         <Chip
           icon={config.icon}
           label={config.label}
@@ -3910,44 +3623,38 @@ const ServerListPage: React.FC = () => {
     );
   };
 
-  const renderHeartbeatIcon = (
-    service: ServiceInstance,
-    size = 26,
-    iconSize = 14,
-  ) => {
+  const renderHeartbeatIcon = (service: ServiceInstance, size = 26, iconSize = 14) => {
     const serviceKey = `${service.labels.service}-${service.instanceId}`;
     const isActive = heartbeatIds.has(serviceKey);
 
     return (
-      (service.status === "initializing" || service.status === "ready") && (
+      (service.status === 'initializing' || service.status === 'ready') && (
         <Box
           sx={{
             width: size,
             height: size,
-            borderRadius: "50% !important",
-            border: "1px solid",
-            borderColor: isActive ? "error.main" : "divider",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            bgcolor: "background.paper",
+            borderRadius: '50% !important',
+            border: '1px solid',
+            borderColor: isActive ? 'error.main' : 'divider',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            bgcolor: 'background.paper',
             flexShrink: 0,
           }}
         >
           <FavoriteIcon
             sx={{
               fontSize: iconSize,
-              color: isActive ? "error.main" : "action.disabled",
+              color: isActive ? 'error.main' : 'action.disabled',
               opacity: isActive ? 1 : 0.3,
-              animation: isActive
-                ? "heartbeat 0.6s ease-in-out infinite"
-                : "none",
-              "@keyframes heartbeat": {
-                "0%": { transform: "scale(1)" },
-                "25%": { transform: "scale(1.3)" },
-                "50%": { transform: "scale(1)" },
-                "75%": { transform: "scale(1.2)" },
-                "100%": { transform: "scale(1)" },
+              animation: isActive ? 'heartbeat 0.6s ease-in-out infinite' : 'none',
+              '@keyframes heartbeat': {
+                '0%': { transform: 'scale(1)' },
+                '25%': { transform: 'scale(1.3)' },
+                '50%': { transform: 'scale(1)' },
+                '75%': { transform: 'scale(1.2)' },
+                '100%': { transform: 'scale(1)' },
               },
             }}
           />
@@ -3958,20 +3665,20 @@ const ServerListPage: React.FC = () => {
 
   const getStatusLabelText = (status: ServiceStatus) => {
     switch (status) {
-      case "ready":
-        return t("serverList.status.ready");
-      case "error":
-        return t("serverList.status.error");
-      case "initializing":
-        return t("serverList.status.initializing");
-      case "shutting_down":
-        return t("serverList.status.shuttingDown");
-      case "terminated":
-        return t("serverList.status.terminated");
-      case "no-response":
-        return t("serverList.status.noResponse");
-      case "busy":
-        return t("serverList.status.busy");
+      case 'ready':
+        return t('serverList.status.ready');
+      case 'error':
+        return t('serverList.status.error');
+      case 'initializing':
+        return t('serverList.status.initializing');
+      case 'shutting_down':
+        return t('serverList.status.shuttingDown');
+      case 'terminated':
+        return t('serverList.status.terminated');
+      case 'no-response':
+        return t('serverList.status.noResponse');
+      case 'busy':
+        return t('serverList.status.busy');
       default:
         return status;
     }
@@ -3991,59 +3698,51 @@ const ServerListPage: React.FC = () => {
 
   // Get background color based on status (for normal state)
   const getStatusBgColor = (status: ServiceStatus, theme: any) => {
-    const isDark = theme.palette.mode === "dark";
+    const isDark = theme.palette.mode === 'dark';
     switch (status) {
-      case "ready":
-        return "transparent"; // Online - keep current color (no tint)
-      case "initializing":
+      case 'ready':
+        return 'transparent'; // Online - keep current color (no tint)
+      case 'initializing':
         return isDark
           ? alpha(theme.palette.warning.main, 0.06)
           : alpha(theme.palette.warning.main, 0.04);
-      case "shutting_down":
-        return isDark
-          ? alpha(theme.palette.info.main, 0.06)
-          : alpha(theme.palette.info.main, 0.04);
-      case "error":
+      case 'shutting_down':
+        return isDark ? alpha(theme.palette.info.main, 0.06) : alpha(theme.palette.info.main, 0.04);
+      case 'error':
         return isDark
           ? alpha(theme.palette.error.main, 0.08)
           : alpha(theme.palette.error.main, 0.05);
-      case "terminated":
-        return isDark
-          ? alpha(theme.palette.grey[500], 0.08)
-          : alpha(theme.palette.grey[500], 0.05);
-      case "no-response":
+      case 'terminated':
+        return isDark ? alpha(theme.palette.grey[500], 0.08) : alpha(theme.palette.grey[500], 0.05);
+      case 'no-response':
         return isDark
           ? alpha(theme.palette.warning.main, 0.08)
           : alpha(theme.palette.warning.main, 0.05);
       default:
-        return "transparent";
+        return 'transparent';
     }
   };
 
   // Get highlight color based on status (for update animation)
   const getHighlightColor = (status: ServiceStatus, theme: any) => {
-    const isDark = theme.palette.mode === "dark";
+    const isDark = theme.palette.mode === 'dark';
     switch (status) {
-      case "initializing":
+      case 'initializing':
         return isDark
           ? alpha(theme.palette.warning.main, 0.12)
           : alpha(theme.palette.warning.main, 0.08);
-      case "ready":
+      case 'ready':
         return isDark
           ? alpha(theme.palette.success.main, 0.12)
           : alpha(theme.palette.success.main, 0.08);
-      case "shutting_down":
-        return isDark
-          ? alpha(theme.palette.info.main, 0.12)
-          : alpha(theme.palette.info.main, 0.08);
-      case "error":
+      case 'shutting_down':
+        return isDark ? alpha(theme.palette.info.main, 0.12) : alpha(theme.palette.info.main, 0.08);
+      case 'error':
         return isDark
           ? alpha(theme.palette.error.main, 0.12)
           : alpha(theme.palette.error.main, 0.08);
-      case "terminated":
-        return isDark
-          ? alpha(theme.palette.grey[500], 0.12)
-          : alpha(theme.palette.grey[500], 0.08);
+      case 'terminated':
+        return isDark ? alpha(theme.palette.grey[500], 0.12) : alpha(theme.palette.grey[500], 0.08);
       default:
         return isDark
           ? alpha(theme.palette.primary.main, 0.12)
@@ -4052,28 +3751,24 @@ const ServerListPage: React.FC = () => {
   };
 
   const getHighlightColorStart = (status: ServiceStatus, theme: any) => {
-    const isDark = theme.palette.mode === "dark";
+    const isDark = theme.palette.mode === 'dark';
     switch (status) {
-      case "initializing":
+      case 'initializing':
         return isDark
           ? alpha(theme.palette.warning.main, 0.2)
           : alpha(theme.palette.warning.main, 0.15);
-      case "ready":
+      case 'ready':
         return isDark
           ? alpha(theme.palette.success.main, 0.2)
           : alpha(theme.palette.success.main, 0.15);
-      case "shutting_down":
-        return isDark
-          ? alpha(theme.palette.info.main, 0.2)
-          : alpha(theme.palette.info.main, 0.15);
-      case "error":
+      case 'shutting_down':
+        return isDark ? alpha(theme.palette.info.main, 0.2) : alpha(theme.palette.info.main, 0.15);
+      case 'error':
         return isDark
           ? alpha(theme.palette.error.main, 0.2)
           : alpha(theme.palette.error.main, 0.15);
-      case "terminated":
-        return isDark
-          ? alpha(theme.palette.grey[500], 0.2)
-          : alpha(theme.palette.grey[500], 0.15);
+      case 'terminated':
+        return isDark ? alpha(theme.palette.grey[500], 0.2) : alpha(theme.palette.grey[500], 0.15);
       default:
         return isDark
           ? alpha(theme.palette.primary.main, 0.2)
@@ -4085,23 +3780,23 @@ const ServerListPage: React.FC = () => {
     <Box
       sx={{
         p: 3,
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
-        overflow: "hidden",
-        boxSizing: "border-box",
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden',
+        boxSizing: 'border-box',
       }}
     >
       {/* Header */}
       <Box sx={{ mb: 3, flexShrink: 0 }}>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <DnsIcon sx={{ fontSize: 32, color: "primary.main" }} />
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <DnsIcon sx={{ fontSize: 32, color: 'primary.main' }} />
           <Box sx={{ flex: 1 }}>
             <Typography variant="h5" sx={{ fontWeight: 700 }}>
-              {t("serverList.title")}
+              {t('serverList.title')}
             </Typography>
             <Typography variant="caption" color="text.secondary">
-              {t("serverList.subtitle")}
+              {t('serverList.subtitle')}
             </Typography>
           </Box>
         </Box>
@@ -4110,20 +3805,20 @@ const ServerListPage: React.FC = () => {
       {/* Search and Filters */}
       <Card sx={{ mb: 3, flexShrink: 0 }}>
         <CardContent>
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
             {/* Row 1: Search & Filtering */}
-            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <TextField
-                placeholder={t("serverList.searchPlaceholder")}
+                placeholder={t('serverList.searchPlaceholder')}
                 size="small"
                 sx={{
                   flex: 1,
                   minWidth: 280,
                   maxWidth: 400,
-                  "& .MuiOutlinedInput-root": {
-                    bgcolor: "background.paper",
+                  '& .MuiOutlinedInput-root': {
+                    bgcolor: 'background.paper',
                     borderRadius: 0,
-                    "&:hover fieldset": { borderColor: "primary.main" },
+                    '&:hover fieldset': { borderColor: 'primary.main' },
                   },
                 }}
                 value={searchTerm}
@@ -4131,9 +3826,7 @@ const ServerListPage: React.FC = () => {
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <SearchIcon
-                        sx={{ color: "text.secondary", fontSize: 20 }}
-                      />
+                      <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
                     </InputAdornment>
                   ),
                 }}
@@ -4151,30 +3844,28 @@ const ServerListPage: React.FC = () => {
             {/* Row 2: Config Bar (Sort, Group, Columns, View Mode, Actions) */}
             <Box
               sx={{
-                display: "flex",
-                alignItems: "center",
+                display: 'flex',
+                alignItems: 'center',
                 gap: 1.5,
                 p: 1,
                 bgcolor: (theme) =>
-                  theme.palette.mode === "dark"
-                    ? "rgba(255,255,255,0.03)"
-                    : "rgba(0,0,0,0.02)",
-                border: "1px solid",
-                borderColor: "divider",
-                flexWrap: "wrap",
+                  theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
+                border: '1px solid',
+                borderColor: 'divider',
+                flexWrap: 'wrap',
               }}
             >
               {/* Sorting */}
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <Typography
                   variant="caption"
                   sx={{
                     fontWeight: 800,
-                    color: "text.secondary",
-                    textTransform: "uppercase",
+                    color: 'text.secondary',
+                    textTransform: 'uppercase',
                   }}
                 >
-                  {t("serverList.sort.label") || "Sort"}
+                  {t('serverList.sort.label') || 'Sort'}
                 </Typography>
                 <Select
                   size="small"
@@ -4182,55 +3873,49 @@ const ServerListPage: React.FC = () => {
                   onChange={(e) => handleSort(e.target.value as string)}
                   sx={{
                     height: 28,
-                    fontSize: "0.75rem",
+                    fontSize: '0.75rem',
                     borderRadius: 0,
-                    bgcolor: "background.paper",
+                    bgcolor: 'background.paper',
                     minWidth: 120,
                   }}
                 >
                   {columns
-                    .filter((c) => c.id !== "actions")
+                    .filter((c) => c.id !== 'actions')
                     .map((col) => (
-                      <MenuItem
-                        key={col.id}
-                        value={col.id}
-                        sx={{ fontSize: "0.75rem" }}
-                      >
+                      <MenuItem key={col.id} value={col.id} sx={{ fontSize: '0.75rem' }}>
                         {t(col.labelKey)}
                       </MenuItem>
                     ))}
                 </Select>
-                <Tooltip title={t("common.sort")}>
+                <Tooltip title={t('common.sort')}>
                   <IconButton
                     size="small"
-                    onClick={() =>
-                      setSortOrder(sortOrder === "asc" ? "desc" : "asc")
-                    }
+                    onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
                     sx={{
-                      bgcolor: "background.paper",
-                      border: "1px solid",
-                      borderColor: "divider",
+                      bgcolor: 'background.paper',
+                      border: '1px solid',
+                      borderColor: 'divider',
                       borderRadius: 0,
                     }}
                   >
-                    {sortOrder === "asc" ? (
+                    {sortOrder === 'asc' ? (
                       <ArrowUpwardIcon fontSize="small" />
                     ) : (
                       <ArrowDownwardIcon fontSize="small" />
                     )}
                   </IconButton>
                 </Tooltip>
-                <Tooltip title={t("common.columnSettings")}>
+                <Tooltip title={t('common.columnSettings')}>
                   <IconButton
                     size="small"
                     onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
                     sx={{
                       height: 28,
                       width: 28,
-                      border: "1px solid",
-                      borderColor: "divider",
+                      border: '1px solid',
+                      borderColor: 'divider',
                       borderRadius: 0,
-                      bgcolor: "background.paper",
+                      bgcolor: 'background.paper',
                     }}
                   >
                     <ViewColumnIcon fontSize="small" />
@@ -4241,18 +3926,18 @@ const ServerListPage: React.FC = () => {
               <Divider orientation="vertical" flexItem />
 
               {/* Grouping Controls */}
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <Typography
                   variant="caption"
                   sx={{
                     fontWeight: 800,
-                    color: "text.secondary",
-                    textTransform: "uppercase",
+                    color: 'text.secondary',
+                    textTransform: 'uppercase',
                   }}
                 >
-                  {t("serverList.grouping.label")}
+                  {t('serverList.grouping.label')}
                 </Typography>
-                <Box sx={{ display: "flex", gap: 0.5, alignItems: "center" }}>
+                <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
                   {groupingLevels.map((level, index) => (
                     <Chip
                       key={index}
@@ -4267,8 +3952,8 @@ const ServerListPage: React.FC = () => {
                         height: 24,
                         borderRadius: 0,
                         fontWeight: 700,
-                        bgcolor: "primary.main",
-                        color: "primary.contrastText",
+                        bgcolor: 'primary.main',
+                        color: 'primary.contrastText',
                       }}
                     />
                   ))}
@@ -4279,15 +3964,15 @@ const ServerListPage: React.FC = () => {
                       onClick={(e) => setGroupingMenuAnchor(e.currentTarget)}
                       sx={{
                         height: 24,
-                        minWidth: "auto",
+                        minWidth: 'auto',
                         px: 1,
-                        fontSize: "0.65rem",
-                        borderStyle: "dashed",
+                        fontSize: '0.65rem',
+                        borderStyle: 'dashed',
                         borderRadius: 0,
                       }}
                       startIcon={<AddIcon sx={{ fontSize: 14 }} />}
                     >
-                      {t("serverList.grouping.add")}
+                      {t('serverList.grouping.add')}
                     </Button>
                   )}
                   {groupingLevels.length > 0 && (
@@ -4295,15 +3980,15 @@ const ServerListPage: React.FC = () => {
                       size="small"
                       onClick={() => setGroupingLevels([])}
                       sx={{
-                        minWidth: "auto",
+                        minWidth: 'auto',
                         px: 0.75,
                         height: 24,
-                        fontSize: "0.65rem",
-                        color: "text.secondary",
-                        textTransform: "none",
+                        fontSize: '0.65rem',
+                        color: 'text.secondary',
+                        textTransform: 'none',
                       }}
                     >
-                      {t("common.clear")}
+                      {t('common.clear')}
                     </Button>
                   )}
                 </Box>
@@ -4312,49 +3997,37 @@ const ServerListPage: React.FC = () => {
               <Divider orientation="vertical" flexItem />
 
               {/* View Mode */}
-              <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                 <Box
                   sx={{
-                    display: "flex",
-                    border: "1px solid",
-                    borderColor: "divider",
+                    display: 'flex',
+                    border: '1px solid',
+                    borderColor: 'divider',
                   }}
                 >
                   {[
-                    { mode: "list", icon: <ViewListIcon fontSize="small" /> },
-                    { mode: "grid", icon: <ViewModuleIcon fontSize="small" /> },
-                    { mode: "card", icon: <ViewComfyIcon fontSize="small" /> },
+                    { mode: 'list', icon: <ViewListIcon fontSize="small" /> },
+                    { mode: 'grid', icon: <ViewModuleIcon fontSize="small" /> },
+                    { mode: 'card', icon: <ViewComfyIcon fontSize="small" /> },
                     {
-                      mode: "checkerboard",
+                      mode: 'checkerboard',
                       icon: <AppsIcon fontSize="small" />,
                     },
                     {
-                      mode: "cluster",
+                      mode: 'cluster',
                       icon: <BubbleChartIcon fontSize="small" />,
                     },
                   ].map((item) => (
-                    <Tooltip
-                      key={item.mode}
-                      title={t(`serverList.viewMode.${item.mode}`)}
-                    >
+                    <Tooltip key={item.mode} title={t(`serverList.viewMode.${item.mode}`)}>
                       <IconButton
                         size="small"
                         onClick={() => handleViewModeChange(item.mode as any)}
                         sx={{
                           borderRadius: 0,
-                          bgcolor:
-                            viewMode === item.mode
-                              ? "primary.main"
-                              : "background.paper",
-                          color:
-                            viewMode === item.mode
-                              ? "primary.contrastText"
-                              : "inherit",
-                          "&:hover": {
-                            bgcolor:
-                              viewMode === item.mode
-                                ? "primary.dark"
-                                : "action.hover",
+                          bgcolor: viewMode === item.mode ? 'primary.main' : 'background.paper',
+                          color: viewMode === item.mode ? 'primary.contrastText' : 'inherit',
+                          '&:hover': {
+                            bgcolor: viewMode === item.mode ? 'primary.dark' : 'action.hover',
                           },
                         }}
                       >
@@ -4368,13 +4041,9 @@ const ServerListPage: React.FC = () => {
               <Divider orientation="vertical" flexItem />
 
               {/* Real-time Actions (Pause, Cleanup, HealthCheck) */}
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <Tooltip
-                  title={
-                    isPaused
-                      ? t("serverList.resumeUpdates")
-                      : t("serverList.pauseUpdates")
-                  }
+                  title={isPaused ? t('serverList.resumeUpdates') : t('serverList.pauseUpdates')}
                 >
                   <Badge
                     badgeContent={pendingUpdates.length}
@@ -4388,12 +4057,12 @@ const ServerListPage: React.FC = () => {
                         height: 28,
                         width: 28,
                         borderRadius: 0,
-                        bgcolor: isPaused ? "warning.main" : "background.paper",
-                        color: isPaused ? "warning.contrastText" : "inherit",
-                        border: "1px solid",
-                        borderColor: isPaused ? "warning.main" : "divider",
-                        "&:hover": {
-                          bgcolor: isPaused ? "warning.dark" : "action.hover",
+                        bgcolor: isPaused ? 'warning.main' : 'background.paper',
+                        color: isPaused ? 'warning.contrastText' : 'inherit',
+                        border: '1px solid',
+                        borderColor: isPaused ? 'warning.main' : 'divider',
+                        '&:hover': {
+                          bgcolor: isPaused ? 'warning.dark' : 'action.hover',
                         },
                       }}
                     >
@@ -4406,7 +4075,7 @@ const ServerListPage: React.FC = () => {
                   </Badge>
                 </Tooltip>
 
-                <Tooltip title={t("serverList.cleanup")}>
+                <Tooltip title={t('serverList.cleanup')}>
                   <span>
                     <IconButton
                       size="small"
@@ -4416,9 +4085,9 @@ const ServerListPage: React.FC = () => {
                         height: 28,
                         width: 28,
                         borderRadius: 0,
-                        border: "1px solid",
-                        borderColor: "divider",
-                        bgcolor: "background.paper",
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        bgcolor: 'background.paper',
                       }}
                     >
                       <CleaningServicesIcon fontSize="small" />
@@ -4426,24 +4095,22 @@ const ServerListPage: React.FC = () => {
                   </span>
                 </Tooltip>
 
-                <Tooltip title={t("serverList.bulkHealthCheck")}>
+                <Tooltip title={t('serverList.bulkHealthCheck')}>
                   <span>
                     <IconButton
                       size="small"
                       onClick={handleBulkHealthCheckOpen}
                       disabled={
-                        services.filter(
-                          (s) =>
-                            s.status === "ready" || s.status === "initializing",
-                        ).length === 0
+                        services.filter((s) => s.status === 'ready' || s.status === 'initializing')
+                          .length === 0
                       }
                       sx={{
                         height: 28,
                         width: 28,
                         borderRadius: 0,
-                        border: "1px solid",
-                        borderColor: "divider",
-                        bgcolor: "background.paper",
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        bgcolor: 'background.paper',
                       }}
                     >
                       <MonitorHeartIcon fontSize="small" />
@@ -4461,14 +4128,14 @@ const ServerListPage: React.FC = () => {
 
       {/* Loading State */}
       {isLoading && services.length === 0 && (
-        <Box sx={{ display: "flex", justifyContent: "center", p: 4 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
           <CircularProgress />
         </Box>
       )}
 
       {/* List View */}
       {(services.length > 0 || !isLoading) &&
-        viewMode === "list" &&
+        viewMode === 'list' &&
         (() => {
           const theme = useTheme();
 
@@ -4484,25 +4151,22 @@ const ServerListPage: React.FC = () => {
           const buildListGroups = (
             items: ServiceInstance[],
             levels: GroupingField[],
-            currentLevel: number = 0,
+            currentLevel: number = 0
           ): ListGroup[] => {
             if (levels.length === 0 || currentLevel >= levels.length) return [];
             const currentField = levels[currentLevel];
             const hasMoreLevels = currentLevel + 1 < levels.length;
             const groupMap = new Map<string, ServiceInstance[]>();
             items.forEach((service) => {
-              const value = service.labels[currentField] || "Unknown";
+              const value = service.labels[currentField] || 'Unknown';
               if (!groupMap.has(value)) groupMap.set(value, []);
               groupMap.get(value)!.push(service);
             });
             return Array.from(groupMap.entries())
               .sort(([a], [b]) => a.localeCompare(b))
               .map(([name, instances]) => ({
-                id: levels.slice(0, currentLevel + 1).join("-") + "-" + name,
-                name:
-                  name === "Unknown"
-                    ? `(${getGroupingLabel(currentField)} N/A)`
-                    : name,
+                id: levels.slice(0, currentLevel + 1).join('-') + '-' + name,
+                name: name === 'Unknown' ? `(${getGroupingLabel(currentField)} N/A)` : name,
                 level: currentLevel,
                 fieldName: currentField,
                 instances: hasMoreLevels ? [] : instances,
@@ -4512,18 +4176,13 @@ const ServerListPage: React.FC = () => {
               }));
           };
 
-          const collectListInstances = (
-            group: ListGroup,
-          ): ServiceInstance[] => {
+          const collectListInstances = (group: ListGroup): ServiceInstance[] => {
             if (group.children && group.children.length > 0)
               return group.children.flatMap(collectListInstances);
             return group.instances;
           };
 
-          const renderServiceRow = (
-            service: ServiceInstance,
-            depth: number,
-          ) => {
+          const renderServiceRow = (service: ServiceInstance, depth: number) => {
             const serviceKey = `${service.labels.service}-${service.instanceId}`;
             const updatedStatus = updatedServiceIds.get(serviceKey);
             const isUpdated = updatedStatus !== undefined;
@@ -4539,41 +4198,41 @@ const ServerListPage: React.FC = () => {
                   bgcolor: isUpdated
                     ? (t) => getHighlightColor(highlightStatus, t)
                     : (t) => getStatusBgColor(service.status, t),
-                  transition: "background-color 0.2s ease",
+                  transition: 'background-color 0.2s ease',
                 }}
               >
                 {visibleColumns.map((column) => {
                   switch (column.id) {
-                    case "instanceId":
+                    case 'instanceId':
                       return (
                         <TableCell key={column.id} sx={{ pl: depth * 4 + 2 }}>
                           <Box
                             sx={{
-                              display: "flex",
-                              alignItems: "center",
-                              position: "relative",
+                              display: 'flex',
+                              alignItems: 'center',
+                              position: 'relative',
                             }}
                           >
                             {depth > 0 && (
                               <Box
                                 sx={{
-                                  position: "absolute",
+                                  position: 'absolute',
                                   left: -16,
                                   width: 12,
                                   height: 12,
-                                  borderLeft: "2px solid",
-                                  borderBottom: "2px solid",
-                                  borderColor: "primary.main",
+                                  borderLeft: '2px solid',
+                                  borderBottom: '2px solid',
+                                  borderColor: 'primary.main',
                                   opacity: 0.5,
-                                  borderRadius: "0 0 0 4px",
-                                  top: "calc(50% - 8px)",
+                                  borderRadius: '0 0 0 4px',
+                                  top: 'calc(50% - 8px)',
                                 }}
                               />
                             )}
                             <Box
                               sx={{
-                                display: "flex",
-                                alignItems: "center",
+                                display: 'flex',
+                                alignItems: 'center',
                                 gap: 1,
                               }}
                             >
@@ -4590,13 +4249,11 @@ const ServerListPage: React.FC = () => {
                           </Box>
                         </TableCell>
                       );
-                    case "service":
+                    case 'service':
                       return (
-                        <TableCell key={column.id}>
-                          {getTypeChip(service.labels.service)}
-                        </TableCell>
+                        <TableCell key={column.id}>{getTypeChip(service.labels.service)}</TableCell>
                       );
-                    case "group":
+                    case 'group':
                       return (
                         <TableCell key={column.id}>
                           {service.labels.group ? (
@@ -4608,11 +4265,11 @@ const ServerListPage: React.FC = () => {
                               sx={{ fontWeight: 600, borderRadius: 0 }}
                             />
                           ) : (
-                            "-"
+                            '-'
                           )}
                         </TableCell>
                       );
-                    case "environment":
+                    case 'environment':
                       return (
                         <TableCell key={column.id}>
                           {service.labels.environment ? (
@@ -4624,68 +4281,60 @@ const ServerListPage: React.FC = () => {
                               sx={{ fontWeight: 600, borderRadius: 0 }}
                             />
                           ) : (
-                            "-"
+                            '-'
                           )}
                         </TableCell>
                       );
-                    case "status":
+                    case 'status':
                       return (
                         <TableCell key={column.id}>
                           <Box
                             sx={{
-                              display: "flex",
-                              alignItems: "center",
+                              display: 'flex',
+                              alignItems: 'center',
                               gap: 0.5,
                             }}
                           >
                             {renderHeartbeatIcon(service, 20, 10)}
                             <Chip
-                              label={getStatusLabelText(
-                                service.status,
-                              ).toUpperCase()}
+                              label={getStatusLabelText(service.status).toUpperCase()}
                               size="small"
                               sx={{
                                 height: 20,
-                                fontSize: "0.65rem",
+                                fontSize: '0.65rem',
                                 fontWeight: 900,
                                 borderRadius: 0,
-                                bgcolor: alpha(
-                                  getStatusColor(service.status),
-                                  0.1,
-                                ),
+                                bgcolor: alpha(getStatusColor(service.status), 0.1),
                                 color: getStatusColor(service.status),
-                                border: "1px solid",
-                                borderColor: alpha(
-                                  getStatusColor(service.status),
-                                  0.2,
-                                ),
+                                border: '1px solid',
+                                borderColor: alpha(getStatusColor(service.status), 0.2),
                               }}
                             />
                           </Box>
                         </TableCell>
                       );
-                    case "hostname":
+                    case 'hostname':
                       return (
                         <TableCell key={column.id}>
                           <Typography
                             variant="body2"
                             sx={{
                               fontFamily: '"D2Coding", monospace',
-                              fontSize: "0.75rem",
+                              fontSize: '0.75rem',
                             }}
                           >
                             {service.hostname}
                           </Typography>
                         </TableCell>
                       );
-                    case "externalAddress":
+                    case 'externalAddress':
                       return (
                         <TableCell key={column.id}>
                           <Typography
                             variant="body2"
                             sx={{
                               fontFamily: '"D2Coding", monospace',
-                              fontSize: "0.75rem",
+                              fontSize: '0.75rem',
                               opacity: 0.8,
                             }}
                           >
@@ -4693,14 +4342,14 @@ const ServerListPage: React.FC = () => {
                           </Typography>
                         </TableCell>
                       );
-                    case "internalAddress":
+                    case 'internalAddress':
                       return (
                         <TableCell key={column.id}>
                           <Typography
                             variant="body2"
                             sx={{
                               fontFamily: '"D2Coding", monospace',
-                              fontSize: "0.75rem",
+                              fontSize: '0.75rem',
                               opacity: 0.8,
                             }}
                           >
@@ -4708,23 +4357,19 @@ const ServerListPage: React.FC = () => {
                           </Typography>
                         </TableCell>
                       );
-                    case "ports":
+                    case 'ports':
                       const portEntries = Object.entries(service.ports || {});
-                      const portsExpanded = expandedCells.has(
-                        `${serviceKey}-ports`,
-                      );
-                      const visiblePorts = portsExpanded
-                        ? portEntries
-                        : portEntries.slice(0, 2);
+                      const portsExpanded = expandedCells.has(`${serviceKey}-ports`);
+                      const visiblePorts = portsExpanded ? portEntries : portEntries.slice(0, 2);
                       const hiddenPortsCount = portEntries.length - 2;
                       return (
                         <TableCell key={column.id}>
                           <Box
                             sx={{
-                              display: "flex",
+                              display: 'flex',
                               gap: 0.5,
-                              flexWrap: "wrap",
-                              alignItems: "center",
+                              flexWrap: 'wrap',
+                              alignItems: 'center',
                             }}
                           >
                             {visiblePorts.map(([name, port]) => (
@@ -4734,8 +4379,8 @@ const ServerListPage: React.FC = () => {
                                 size="small"
                                 sx={{
                                   fontFamily: '"D2Coding", monospace',
-                                  fontSize: "0.7rem",
-                                  height: "22px",
+                                  fontSize: '0.7rem',
+                                  height: '22px',
                                   borderRadius: 0,
                                 }}
                               />
@@ -4745,17 +4390,17 @@ const ServerListPage: React.FC = () => {
                                 variant="caption"
                                 color="primary"
                                 sx={{
-                                  cursor: "pointer",
-                                  textDecoration: "underline",
-                                  "&:hover": { color: "primary.dark" },
+                                  cursor: 'pointer',
+                                  textDecoration: 'underline',
+                                  '&:hover': { color: 'primary.dark' },
                                 }}
                                 onClick={() =>
                                   setExpandedCells((prev) =>
-                                    new Set(prev).add(`${serviceKey}-ports`),
+                                    new Set(prev).add(`${serviceKey}-ports`)
                                   )
                                 }
                               >
-                                +{hiddenPortsCount} {t("common.more")}
+                                +{hiddenPortsCount} {t('common.more')}
                               </Typography>
                             )}
                             {portsExpanded && hiddenPortsCount > 0 && (
@@ -4763,9 +4408,9 @@ const ServerListPage: React.FC = () => {
                                 variant="caption"
                                 color="primary"
                                 sx={{
-                                  cursor: "pointer",
-                                  textDecoration: "underline",
-                                  "&:hover": { color: "primary.dark" },
+                                  cursor: 'pointer',
+                                  textDecoration: 'underline',
+                                  '&:hover': { color: 'primary.dark' },
                                 }}
                                 onClick={() =>
                                   setExpandedCells((prev) => {
@@ -4775,135 +4420,122 @@ const ServerListPage: React.FC = () => {
                                   })
                                 }
                               >
-                                {t("common.showLess")}
+                                {t('common.showLess')}
                               </Typography>
                             )}
                           </Box>
                         </TableCell>
                       );
-                    case "stats":
+                    case 'stats':
                       return (
                         <TableCell key={column.id}>
-                          {service.stats &&
-                            Object.keys(service.stats).length > 0 && (
-                              <Box
-                                sx={{
-                                  display: "flex",
-                                  flexDirection: "column",
-                                  gap: 0.25,
-                                }}
-                              >
-                                {Object.entries(service.stats).map(([k, v]) => (
-                                  <Typography
-                                    key={k}
-                                    variant="caption"
-                                    sx={{
-                                      fontSize: "0.65rem",
-                                      color: "text.secondary",
-                                      fontFamily: '"D2Coding", monospace',
-                                    }}
-                                  >
-                                    {k}:{" "}
-                                    {typeof v === "number"
-                                      ? v.toFixed(2)
-                                      : String(v)}
-                                  </Typography>
-                                ))}
-                              </Box>
-                            )}
+                          {service.stats && Object.keys(service.stats).length > 0 && (
+                            <Box
+                              sx={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: 0.25,
+                              }}
+                            >
+                              {Object.entries(service.stats).map(([k, v]) => (
+                                <Typography
+                                  key={k}
+                                  variant="caption"
+                                  sx={{
+                                    fontSize: '0.65rem',
+                                    color: 'text.secondary',
+                                    fontFamily: '"D2Coding", monospace',
+                                  }}
+                                >
+                                  {k}: {typeof v === 'number' ? v.toFixed(2) : String(v)}
+                                </Typography>
+                              ))}
+                            </Box>
+                          )}
                         </TableCell>
                       );
-                    case "meta":
+                    case 'meta':
                       return (
                         <TableCell key={column.id}>
-                          {service.meta &&
-                            Object.keys(service.meta).length > 0 && (
-                              <Box
-                                sx={{
-                                  display: "flex",
-                                  flexDirection: "column",
-                                  gap: 0.25,
-                                }}
-                              >
-                                {Object.entries(service.meta).map(([k, v]) => (
-                                  <Typography
-                                    key={k}
-                                    variant="caption"
-                                    sx={{
-                                      fontSize: "0.65rem",
-                                      color: "text.secondary",
-                                    }}
-                                  >
-                                    {k}: {String(v)}
-                                  </Typography>
-                                ))}
-                              </Box>
-                            )}
+                          {service.meta && Object.keys(service.meta).length > 0 && (
+                            <Box
+                              sx={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: 0.25,
+                              }}
+                            >
+                              {Object.entries(service.meta).map(([k, v]) => (
+                                <Typography
+                                  key={k}
+                                  variant="caption"
+                                  sx={{
+                                    fontSize: '0.65rem',
+                                    color: 'text.secondary',
+                                  }}
+                                >
+                                  {k}: {String(v)}
+                                </Typography>
+                              ))}
+                            </Box>
+                          )}
                         </TableCell>
                       );
-                    case "createdAt":
+                    case 'createdAt':
                       return (
                         <TableCell key={column.id}>
                           <RelativeTime date={service.createdAt} showSeconds />
                         </TableCell>
                       );
-                    case "updatedAt":
+                    case 'updatedAt':
                       return (
                         <TableCell key={column.id}>
                           <Box
                             sx={{
-                              width: "100%",
+                              width: '100%',
                               minWidth: 100,
                               height: 20,
-                              bgcolor: "action.hover",
-                              position: "relative",
-                              overflow: "hidden",
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              border: "1px solid",
-                              borderColor: "divider",
+                              bgcolor: 'action.hover',
+                              position: 'relative',
+                              overflow: 'hidden',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              border: '1px solid',
+                              borderColor: 'divider',
                               borderRadius: 0,
                             }}
                           >
                             {(() => {
-                              const lastUpdate = new Date(
-                                service.updatedAt,
-                              ).getTime();
-                              const diff = Math.max(
-                                0,
-                                currentTime - lastUpdate,
-                              );
+                              const lastUpdate = new Date(service.updatedAt).getTime();
+                              const diff = Math.max(0, currentTime - lastUpdate);
                               const ttlMs = HEARTBEAT_TTL_SECONDS * 1000;
-                              const progress = Math.max(
-                                0,
-                                Math.min(100, (1 - diff / ttlMs) * 100),
-                              );
+                              const progress = Math.max(0, Math.min(100, (1 - diff / ttlMs) * 100));
                               const color =
                                 progress > 50
-                                  ? "success.main"
+                                  ? 'success.main'
                                   : progress > 20
-                                    ? "warning.main"
-                                    : "error.main";
+                                    ? 'warning.main'
+                                    : 'error.main';
 
                               return (
                                 <>
                                   <Box
                                     sx={{
-                                      position: "absolute",
+                                      position: 'absolute',
                                       left: 0,
                                       top: 0,
                                       bottom: 0,
                                       width: `${progress}%`,
                                       bgcolor: alpha(
-                                        color === "success.main"
-                                          ? "#4caf50"
-                                          : color === "warning.main"
-                                            ? "#ff9800"
-                                            : "#f44336",
-                                        0.15,
+                                        color === 'success.main'
+                                          ? '#4caf50'
+                                          : color === 'warning.main'
+                                            ? '#ff9800'
+                                            : '#f44336',
+                                        0.15
                                       ),
-                                      transition: "width 1s linear",
+                                      transition: 'width 1s linear',
                                     }}
                                   />
                                   <Typography
@@ -4911,8 +4543,8 @@ const ServerListPage: React.FC = () => {
                                     sx={{
                                       zIndex: 1,
                                       fontWeight: 700,
-                                      fontSize: "0.65rem",
-                                      color: "text.secondary",
+                                      fontSize: '0.65rem',
+                                      color: 'text.secondary',
                                     }}
                                   >
                                     <RelativeTime
@@ -4927,11 +4559,9 @@ const ServerListPage: React.FC = () => {
                           </Box>
                         </TableCell>
                       );
-                    case "labels":
+                    case 'labels':
                       const labelEntries = Object.entries(service.labels);
-                      const labelsExpanded = expandedCells.has(
-                        `${serviceKey}-labels`,
-                      );
+                      const labelsExpanded = expandedCells.has(`${serviceKey}-labels`);
                       const visibleLabels = labelsExpanded
                         ? labelEntries
                         : labelEntries.slice(0, 2);
@@ -4940,10 +4570,10 @@ const ServerListPage: React.FC = () => {
                         <TableCell key={column.id}>
                           <Box
                             sx={{
-                              display: "flex",
+                              display: 'flex',
                               gap: 0.5,
-                              flexWrap: "wrap",
-                              alignItems: "center",
+                              flexWrap: 'wrap',
+                              alignItems: 'center',
                             }}
                           >
                             {visibleLabels.map(([k, v]) => (
@@ -4952,7 +4582,7 @@ const ServerListPage: React.FC = () => {
                                 label={`${k}=${v}`}
                                 size="small"
                                 variant="outlined"
-                                sx={{ fontSize: "0.75rem", height: 22 }}
+                                sx={{ fontSize: '0.75rem', height: 22 }}
                               />
                             ))}
                             {hiddenLabelsCount > 0 && !labelsExpanded && (
@@ -4960,17 +4590,17 @@ const ServerListPage: React.FC = () => {
                                 variant="caption"
                                 color="primary"
                                 sx={{
-                                  cursor: "pointer",
-                                  textDecoration: "underline",
-                                  "&:hover": { color: "primary.dark" },
+                                  cursor: 'pointer',
+                                  textDecoration: 'underline',
+                                  '&:hover': { color: 'primary.dark' },
                                 }}
                                 onClick={() =>
                                   setExpandedCells((prev) =>
-                                    new Set(prev).add(`${serviceKey}-labels`),
+                                    new Set(prev).add(`${serviceKey}-labels`)
                                   )
                                 }
                               >
-                                +{hiddenLabelsCount} {t("common.more")}
+                                +{hiddenLabelsCount} {t('common.more')}
                               </Typography>
                             )}
                             {labelsExpanded && hiddenLabelsCount > 0 && (
@@ -4978,9 +4608,9 @@ const ServerListPage: React.FC = () => {
                                 variant="caption"
                                 color="primary"
                                 sx={{
-                                  cursor: "pointer",
-                                  textDecoration: "underline",
-                                  "&:hover": { color: "primary.dark" },
+                                  cursor: 'pointer',
+                                  textDecoration: 'underline',
+                                  '&:hover': { color: 'primary.dark' },
                                 }}
                                 onClick={() =>
                                   setExpandedCells((prev) => {
@@ -4990,89 +4620,76 @@ const ServerListPage: React.FC = () => {
                                   })
                                 }
                               >
-                                {t("common.showLess")}
+                                {t('common.showLess')}
                               </Typography>
                             )}
                           </Box>
                         </TableCell>
                       );
-                    case "cloudProvider":
+                    case 'cloudProvider':
                       return (
-                        <TableCell key={column.id}>
-                          {service.labels.cloudProvider || "-"}
-                        </TableCell>
+                        <TableCell key={column.id}>{service.labels.cloudProvider || '-'}</TableCell>
                       );
-                    case "cloudRegion":
+                    case 'cloudRegion':
                       return (
-                        <TableCell key={column.id}>
-                          {service.labels.cloudRegion || "-"}
-                        </TableCell>
+                        <TableCell key={column.id}>{service.labels.cloudRegion || '-'}</TableCell>
                       );
-                    case "cloudZone":
+                    case 'cloudZone':
                       return (
-                        <TableCell key={column.id}>
-                          {service.labels.cloudZone || "-"}
-                        </TableCell>
+                        <TableCell key={column.id}>{service.labels.cloudZone || '-'}</TableCell>
                       );
-                    case "actions":
+                    case 'actions':
                       const rowHealthStatus = healthCheckStatus.get(serviceKey);
                       return (
                         <TableCell key={column.id} align="center">
                           <Box
                             sx={{
-                              display: "flex",
-                              alignItems: "center",
+                              display: 'flex',
+                              alignItems: 'center',
                               gap: 0.5,
-                              justifyContent: "center",
+                              justifyContent: 'center',
                             }}
                           >
-                            <IconButton
-                              size="small"
-                              onClick={(e) => handleContextMenu(e, service)}
-                            >
+                            <IconButton size="small" onClick={(e) => handleContextMenu(e, service)}>
                               <MoreVertIcon fontSize="small" />
                             </IconButton>
-                            {rowHealthStatus?.loading && (
-                              <CircularProgress size={16} />
-                            )}
-                            {rowHealthStatus?.cooldown &&
-                              rowHealthStatus.result && (
-                                <Tooltip
-                                  title={
+                            {rowHealthStatus?.loading && <CircularProgress size={16} />}
+                            {rowHealthStatus?.cooldown && rowHealthStatus.result && (
+                              <Tooltip
+                                title={
+                                  rowHealthStatus.result.healthy
+                                    ? 'Healthy'
+                                    : rowHealthStatus.result.error || 'Unknown error'
+                                }
+                                arrow
+                              >
+                                <Chip
+                                  label={
                                     rowHealthStatus.result.healthy
-                                      ? "Healthy"
-                                      : rowHealthStatus.result.error ||
-                                        "Unknown error"
+                                      ? `${rowHealthStatus.result.latency}ms`
+                                      : 'ERR'
                                   }
-                                  arrow
-                                >
-                                  <Chip
-                                    label={
-                                      rowHealthStatus.result.healthy
-                                        ? `${rowHealthStatus.result.latency}ms`
-                                        : "ERR"
-                                    }
-                                    size="small"
-                                    sx={{
-                                      height: 20,
-                                      fontSize: "0.65rem",
-                                      fontWeight: 800,
-                                      borderRadius: 0,
-                                      bgcolor: rowHealthStatus.result.healthy
-                                        ? "success.main"
-                                        : "error.main",
-                                      color: "white",
-                                      animation: rowHealthStatus.fading
-                                        ? "fadeOut 0.5s ease-out forwards"
-                                        : "none",
-                                      "@keyframes fadeOut": {
-                                        from: { opacity: 1 },
-                                        to: { opacity: 0 },
-                                      },
-                                    }}
-                                  />
-                                </Tooltip>
-                              )}
+                                  size="small"
+                                  sx={{
+                                    height: 20,
+                                    fontSize: '0.65rem',
+                                    fontWeight: 800,
+                                    borderRadius: 0,
+                                    bgcolor: rowHealthStatus.result.healthy
+                                      ? 'success.main'
+                                      : 'error.main',
+                                    color: 'white',
+                                    animation: rowHealthStatus.fading
+                                      ? 'fadeOut 0.5s ease-out forwards'
+                                      : 'none',
+                                    '@keyframes fadeOut': {
+                                      from: { opacity: 1 },
+                                      to: { opacity: 0 },
+                                    },
+                                  }}
+                                />
+                              </Tooltip>
+                            )}
                           </Box>
                         </TableCell>
                       );
@@ -5098,14 +4715,14 @@ const ServerListPage: React.FC = () => {
                   colSpan={visibleColumns.length}
                   sx={{
                     py: 1,
-                    borderBottom: "2px solid",
-                    borderColor: "primary.main",
+                    borderBottom: '2px solid',
+                    borderColor: 'primary.main',
                   }}
                 >
                   <Box
                     sx={{
-                      display: "flex",
-                      alignItems: "center",
+                      display: 'flex',
+                      alignItems: 'center',
                       gap: 1.5,
                       pl: group.level * 4,
                     }}
@@ -5114,8 +4731,8 @@ const ServerListPage: React.FC = () => {
                       variant="caption"
                       sx={{
                         fontWeight: 800,
-                        color: "primary.main",
-                        textTransform: "uppercase",
+                        color: 'primary.main',
+                        textTransform: 'uppercase',
                       }}
                     >
                       {getGroupingLabel(group.fieldName)}
@@ -5123,80 +4740,67 @@ const ServerListPage: React.FC = () => {
                     <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>
                       {group.name}
                     </Typography>
-                    <Typography
-                      variant="caption"
-                      sx={{ fontWeight: 700, opacity: 0.6 }}
-                    >
+                    <Typography variant="caption" sx={{ fontWeight: 700, opacity: 0.6 }}>
                       ({allInstances.length})
                     </Typography>
                   </Box>
                 </TableCell>
-              </TableRow>,
+              </TableRow>
             );
 
             if (!group.children || group.children.length === 0) {
               rows.push(
-                <TableRow
-                  key={`group-cols-${group.id}`}
-                  sx={{ bgcolor: "background.paper" }}
-                >
+                <TableRow key={`group-cols-${group.id}`} sx={{ bgcolor: 'background.paper' }}>
                   {visibleColumns.map((col) => (
                     <TableCell
                       key={`col-${group.id}-${col.id}`}
                       sx={{
                         py: 0.5,
-                        fontSize: "0.65rem",
+                        fontSize: '0.65rem',
                         fontWeight: 600,
-                        color: "text.disabled",
-                        textTransform: "uppercase",
-                        bgcolor: "background.paper",
+                        color: 'text.disabled',
+                        textTransform: 'uppercase',
+                        bgcolor: 'background.paper',
                       }}
                     >
                       {t(col.labelKey)}
                     </TableCell>
                   ))}
-                </TableRow>,
+                </TableRow>
               );
             }
 
             if (group.children && group.children.length > 0) {
-              group.children.forEach((child) =>
-                rows.push(...renderGroupRows(child)),
-              );
+              group.children.forEach((child) => rows.push(...renderGroupRows(child)));
             } else {
               group.instances.forEach((service) =>
-                rows.push(renderServiceRow(service, group.level + 1)),
+                rows.push(renderServiceRow(service, group.level + 1))
               );
               rows.push(
                 <TableRow key={`spacer-${group.id}`} sx={{ height: 16 }}>
-                  <TableCell
-                    colSpan={visibleColumns.length}
-                    sx={{ border: "none" }}
-                  />
-                </TableRow>,
+                  <TableCell colSpan={visibleColumns.length} sx={{ border: 'none' }} />
+                </TableRow>
               );
             }
             return rows;
           };
 
           const listGroups =
-            groupingLevels.length > 0
-              ? buildListGroups(displayServices, groupingLevels)
-              : [];
+            groupingLevels.length > 0 ? buildListGroups(displayServices, groupingLevels) : [];
           const visibleColumnsHeader = columns.filter((col) => col.visible);
 
           return (
             <Card
               sx={{
                 flex: 1,
-                display: "flex",
-                flexDirection: "column",
+                display: 'flex',
+                flexDirection: 'column',
                 minHeight: 0,
-                overflow: "hidden",
+                overflow: 'hidden',
                 borderRadius: 0,
               }}
             >
-              <TableContainer sx={{ flex: 1, overflow: "auto" }}>
+              <TableContainer sx={{ flex: 1, overflow: 'auto' }}>
                 <Table stickyHeader size="small">
                   {groupingLevels.length === 0 && (
                     <TableHead>
@@ -5206,9 +4810,9 @@ const ServerListPage: React.FC = () => {
                             key={column.id}
                             sx={{
                               fontWeight: 600,
-                              bgcolor: "background.paper",
-                              borderBottom: "2px solid",
-                              borderColor: "divider",
+                              bgcolor: 'background.paper',
+                              borderBottom: '2px solid',
+                              borderColor: 'divider',
                             }}
                           >
                             {t(column.labelKey)}
@@ -5220,25 +4824,16 @@ const ServerListPage: React.FC = () => {
                   <TableBody>
                     {displayServices.length === 0 ? (
                       <TableRow>
-                        <TableCell
-                          colSpan={visibleColumnsHeader.length}
-                          align="center"
-                        >
-                          <Typography
-                            variant="body2"
-                            color="text.secondary"
-                            sx={{ py: 4 }}
-                          >
-                            {t("serverList.noData")}
+                        <TableCell colSpan={visibleColumnsHeader.length} align="center">
+                          <Typography variant="body2" color="text.secondary" sx={{ py: 4 }}>
+                            {t('serverList.noData')}
                           </Typography>
                         </TableCell>
                       </TableRow>
                     ) : groupingLevels.length > 0 ? (
                       listGroups.flatMap((group) => renderGroupRows(group))
                     ) : (
-                      displayServices.map((service) =>
-                        renderServiceRow(service, 0),
-                      )
+                      displayServices.map((service) => renderServiceRow(service, 0))
                     )}
                   </TableBody>
                 </Table>
@@ -5250,7 +4845,7 @@ const ServerListPage: React.FC = () => {
       {/* Grid View - Compact uniform tiles */}
       {/* Grid View - Rectangular detailed cards */}
       {(services.length > 0 || !isLoading) &&
-        viewMode === "grid" &&
+        viewMode === 'grid' &&
         (() => {
           interface GridGroup {
             id: string;
@@ -5264,25 +4859,22 @@ const ServerListPage: React.FC = () => {
           const buildGridGroups = (
             items: ServiceInstance[],
             levels: GroupingField[],
-            currentLevel: number = 0,
+            currentLevel: number = 0
           ): GridGroup[] => {
             if (levels.length === 0 || currentLevel >= levels.length) return [];
             const currentField = levels[currentLevel];
             const hasMoreLevels = currentLevel + 1 < levels.length;
             const groupMap = new Map<string, ServiceInstance[]>();
             items.forEach((service) => {
-              const value = service.labels[currentField] || "Unknown";
+              const value = service.labels[currentField] || 'Unknown';
               if (!groupMap.has(value)) groupMap.set(value, []);
               groupMap.get(value)!.push(service);
             });
             return Array.from(groupMap.entries())
               .sort(([a], [b]) => a.localeCompare(b))
               .map(([name, instances]) => ({
-                id: `grid-${levels.slice(0, currentLevel + 1).join("-")}-${name}`,
-                name:
-                  name === "Unknown"
-                    ? `(${getGroupingLabel(currentField)} N/A)`
-                    : name,
+                id: `grid-${levels.slice(0, currentLevel + 1).join('-')}-${name}`,
+                name: name === 'Unknown' ? `(${getGroupingLabel(currentField)} N/A)` : name,
                 level: currentLevel,
                 fieldName: currentField,
                 instances: hasMoreLevels ? [] : instances,
@@ -5292,9 +4884,7 @@ const ServerListPage: React.FC = () => {
               }));
           };
 
-          const collectGridInstances = (
-            group: GridGroup,
-          ): ServiceInstance[] => {
+          const collectGridInstances = (group: GridGroup): ServiceInstance[] => {
             if (group.children && group.children.length > 0)
               return group.children.flatMap(collectGridInstances);
             return group.instances;
@@ -5313,15 +4903,15 @@ const ServerListPage: React.FC = () => {
                 sx={{
                   p: 1.5,
                   borderRadius: 0, // NO ROUNDED CORNERS
-                  border: "1px solid",
-                  borderColor: "divider",
-                  bgcolor: "background.paper", // MONOCHROMATIC
-                  transition: "all 0.1s ease-in-out",
-                  display: "flex",
-                  flexDirection: "column",
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  bgcolor: 'background.paper', // MONOCHROMATIC
+                  transition: 'all 0.1s ease-in-out',
+                  display: 'flex',
+                  flexDirection: 'column',
                   gap: 1,
-                  "&:hover": {
-                    borderColor: "primary.main",
+                  '&:hover': {
+                    borderColor: 'primary.main',
                     boxShadow: (theme) => theme.shadows[4],
                     zIndex: 1,
                   },
@@ -5329,47 +4919,41 @@ const ServerListPage: React.FC = () => {
               >
                 <Box
                   sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
                   }}
                 >
-                  <Box sx={{ display: "flex", gap: 0.5, alignItems: "center" }}>
+                  <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
                     {getTypeChip(service.labels.service)}
                     <Chip
                       label={getStatusLabelText(service.status).toUpperCase()}
                       size="small"
                       sx={{
                         height: 18,
-                        fontSize: "0.6rem",
+                        fontSize: '0.6rem',
                         fontWeight: 900,
                         borderRadius: 0,
                         bgcolor: alpha(getStatusColor(service.status), 0.1),
                         color: getStatusColor(service.status),
-                        border: "1px solid",
+                        border: '1px solid',
                         borderColor: alpha(getStatusColor(service.status), 0.2),
                       }}
                     />
                   </Box>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                     {renderHeartbeatIcon(service, 20, 10)}
                     {hasWebPort(service) &&
                       (() => {
-                        const gridHealthStatus =
-                          healthCheckStatus.get(serviceKey);
-                        if (gridHealthStatus?.loading)
-                          return <CircularProgress size={12} />;
-                        if (
-                          gridHealthStatus?.cooldown &&
-                          gridHealthStatus.result
-                        ) {
+                        const gridHealthStatus = healthCheckStatus.get(serviceKey);
+                        if (gridHealthStatus?.loading) return <CircularProgress size={12} />;
+                        if (gridHealthStatus?.cooldown && gridHealthStatus.result) {
                           return (
                             <Tooltip
                               title={
                                 gridHealthStatus.result.healthy
-                                  ? "Healthy"
-                                  : gridHealthStatus.result.error ||
-                                    "Unknown error"
+                                  ? 'Healthy'
+                                  : gridHealthStatus.result.error || 'Unknown error'
                               }
                               arrow
                             >
@@ -5377,21 +4961,21 @@ const ServerListPage: React.FC = () => {
                                 label={
                                   gridHealthStatus.result.healthy
                                     ? `${gridHealthStatus.result.latency}ms`
-                                    : "ERR"
+                                    : 'ERR'
                                 }
                                 size="small"
                                 sx={{
                                   height: 18,
-                                  fontSize: "0.6rem",
+                                  fontSize: '0.6rem',
                                   fontWeight: 900,
                                   borderRadius: 0,
                                   bgcolor: gridHealthStatus.result.healthy
-                                    ? "success.main"
-                                    : "error.main",
-                                  color: "white",
+                                    ? 'success.main'
+                                    : 'error.main',
+                                  color: 'white',
                                   animation: gridHealthStatus.fading
-                                    ? "fadeOut 0.5s ease-out forwards"
-                                    : "none",
+                                    ? 'fadeOut 0.5s ease-out forwards'
+                                    : 'none',
                                 }}
                               />
                             </Tooltip>
@@ -5425,22 +5009,16 @@ const ServerListPage: React.FC = () => {
                   sx={{
                     fontFamily: '"D2Coding", monospace',
                     fontWeight: 700,
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
                   }}
                 >
                   {service.instanceId}
                 </Typography>
 
-                <Box
-                  sx={{ display: "flex", flexDirection: "column", gap: 0.25 }}
-                >
-                  <Typography
-                    variant="caption"
-                    color="text.secondary"
-                    sx={{ fontWeight: 600 }}
-                  >
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.25 }}>
+                  <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
                     {service.hostname}
                   </Typography>
                   <Typography
@@ -5453,13 +5031,13 @@ const ServerListPage: React.FC = () => {
 
                 <Box
                   sx={{
-                    display: "flex",
-                    flexWrap: "wrap",
+                    display: 'flex',
+                    flexWrap: 'wrap',
                     gap: 0.5,
-                    mt: "auto",
+                    mt: 'auto',
                     pt: 0.5,
-                    borderTop: "1px dashed",
-                    borderColor: "divider",
+                    borderTop: '1px dashed',
+                    borderColor: 'divider',
                   }}
                 >
                   {ports.map(([n, p]) => (
@@ -5468,8 +5046,8 @@ const ServerListPage: React.FC = () => {
                       variant="caption"
                       sx={{
                         fontFamily: '"D2Coding", monospace',
-                        fontSize: "0.6rem",
-                        color: "text.secondary",
+                        fontSize: '0.6rem',
+                        color: 'text.secondary',
                       }}
                     >
                       {n}:{p}
@@ -5480,9 +5058,7 @@ const ServerListPage: React.FC = () => {
             );
           };
 
-          const renderGridGroupRecursive = (
-            group: GridGroup,
-          ): React.ReactNode => {
+          const renderGridGroupRecursive = (group: GridGroup): React.ReactNode => {
             const allInstances = collectGridInstances(group);
             const hasChildren = group.children && group.children.length > 0;
             const colCount = 5;
@@ -5496,21 +5072,21 @@ const ServerListPage: React.FC = () => {
                 {/* Simple Group Header */}
                 <Box
                   sx={{
-                    display: "flex",
-                    alignItems: "center",
+                    display: 'flex',
+                    alignItems: 'center',
                     mb: 1.5,
                     gap: 1,
                     pl: group.level * 2,
-                    borderLeft: group.level > 0 ? "2px solid" : "none",
-                    borderColor: "primary.main",
+                    borderLeft: group.level > 0 ? '2px solid' : 'none',
+                    borderColor: 'primary.main',
                   }}
                 >
                   <Typography
                     variant="caption"
                     sx={{
                       fontWeight: 800,
-                      color: "text.secondary",
-                      textTransform: "uppercase",
+                      color: 'text.secondary',
+                      textTransform: 'uppercase',
                     }}
                   >
                     {getGroupingLabel(group.fieldName)}
@@ -5518,50 +5094,44 @@ const ServerListPage: React.FC = () => {
                   <Typography variant="body2" sx={{ fontWeight: 800 }}>
                     {group.name}
                   </Typography>
-                  <Typography variant="caption" sx={{ color: "text.disabled" }}>
+                  <Typography variant="caption" sx={{ color: 'text.disabled' }}>
                     ({allInstances.length})
                   </Typography>
                 </Box>
 
                 {hasChildren ? (
-                  <Box
-                    sx={{ display: "flex", flexDirection: "column", gap: 2 }}
-                  >
-                    {group.children!.map((child) =>
-                      renderGridGroupRecursive(child),
-                    )}
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    {group.children!.map((child) => renderGridGroupRecursive(child))}
                   </Box>
                 ) : (
                   <Box
                     sx={{
-                      display: "grid",
-                      gridTemplateColumns: "repeat(5, 1fr)",
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(5, 1fr)',
                       gap: 1,
-                      "@media (max-width: 1600px)": {
-                        gridTemplateColumns: "repeat(4, 1fr)",
+                      '@media (max-width: 1600px)': {
+                        gridTemplateColumns: 'repeat(4, 1fr)',
                       },
-                      "@media (max-width: 1200px)": {
-                        gridTemplateColumns: "repeat(3, 1fr)",
+                      '@media (max-width: 1200px)': {
+                        gridTemplateColumns: 'repeat(3, 1fr)',
                       },
-                      "@media (max-width: 900px)": {
-                        gridTemplateColumns: "repeat(2, 1fr)",
+                      '@media (max-width: 900px)': {
+                        gridTemplateColumns: 'repeat(2, 1fr)',
                       },
-                      "@media (max-width: 600px)": {
-                        gridTemplateColumns: "1fr",
+                      '@media (max-width: 600px)': {
+                        gridTemplateColumns: '1fr',
                       },
                     }}
                   >
-                    {group.instances.map((service) =>
-                      renderDetailedGridCard(service),
-                    )}
+                    {group.instances.map((service) => renderDetailedGridCard(service))}
                     {/* Restore Empty Placeholders */}
                     {Array.from({ length: emptyCount }).map((_, idx) => (
                       <Box
                         key={`empty-${group.id}-${idx}`}
                         sx={{
-                          border: "1px dashed",
-                          borderColor: "divider",
-                          height: "100%",
+                          border: '1px dashed',
+                          borderColor: 'divider',
+                          height: '100%',
                           minHeight: 120,
                           opacity: 0.3,
                         }}
@@ -5574,39 +5144,34 @@ const ServerListPage: React.FC = () => {
           };
 
           const groups =
-            groupingLevels.length > 0
-              ? buildGridGroups(gridDisplayServices, groupingLevels)
-              : [];
+            groupingLevels.length > 0 ? buildGridGroups(gridDisplayServices, groupingLevels) : [];
 
           if (groupingLevels.length === 0) {
             const colCount = 5;
             const emptyCount =
               gridDisplayServices.length > 0
-                ? (colCount - (gridDisplayServices.length % colCount)) %
-                  colCount
+                ? (colCount - (gridDisplayServices.length % colCount)) % colCount
                 : 0;
             return (
               <Box
                 sx={{
                   flex: 1,
                   minHeight: 0,
-                  overflow: "auto",
-                  display: "grid",
-                  gridTemplateColumns: "repeat(5, 1fr)",
+                  overflow: 'auto',
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(5, 1fr)',
                   gap: 1,
-                  alignContent: "start",
+                  alignContent: 'start',
                 }}
               >
-                {gridDisplayServices.map((service) =>
-                  renderDetailedGridCard(service),
-                )}
+                {gridDisplayServices.map((service) => renderDetailedGridCard(service))}
                 {Array.from({ length: emptyCount }).map((_, idx) => (
                   <Box
                     key={`empty-flatTarget-${idx}`}
                     sx={{
-                      border: "1px dashed",
-                      borderColor: "divider",
-                      height: "100%",
+                      border: '1px dashed',
+                      borderColor: 'divider',
+                      height: '100%',
                       minHeight: 120,
                       opacity: 0.3,
                     }}
@@ -5617,14 +5182,14 @@ const ServerListPage: React.FC = () => {
           }
 
           return (
-            <Box sx={{ flex: 1, minHeight: 0, overflow: "auto" }}>
+            <Box sx={{ flex: 1, minHeight: 0, overflow: 'auto' }}>
               {groups.map((group) => renderGridGroupRecursive(group))}
             </Box>
           );
         })()}
 
       {/* Checkerboard View - High density status grid */}
-      {(services.length > 0 || !isLoading) && viewMode === "checkerboard" && (
+      {(services.length > 0 || !isLoading) && viewMode === 'checkerboard' && (
         <CheckerboardView
           services={gridDisplayServices}
           updatedServiceIds={updatedServiceIds}
@@ -5638,7 +5203,7 @@ const ServerListPage: React.FC = () => {
 
       {/* Card View - Uniform detailed cards in grid layout */}
       {(services.length > 0 || !isLoading) &&
-        viewMode === "card" &&
+        viewMode === 'card' &&
         (() => {
           // Multi-level group structure for CardView
           interface CardGroup {
@@ -5654,25 +5219,22 @@ const ServerListPage: React.FC = () => {
           const buildCardGroups = (
             items: ServiceInstance[],
             levels: GroupingField[],
-            currentLevel: number = 0,
+            currentLevel: number = 0
           ): CardGroup[] => {
             if (levels.length === 0 || currentLevel >= levels.length) return [];
             const currentField = levels[currentLevel];
             const hasMoreLevels = currentLevel + 1 < levels.length;
             const groupMap = new Map<string, ServiceInstance[]>();
             items.forEach((service) => {
-              const value = service.labels[currentField] || "Unknown";
+              const value = service.labels[currentField] || 'Unknown';
               if (!groupMap.has(value)) groupMap.set(value, []);
               groupMap.get(value)!.push(service);
             });
             return Array.from(groupMap.entries())
               .sort(([a], [b]) => a.localeCompare(b))
               .map(([name, instances]) => ({
-                id: levels.slice(0, currentLevel + 1).join("-") + "-" + name,
-                name:
-                  name === "Unknown"
-                    ? `(${getGroupingLabel(currentField)} N/A)`
-                    : name,
+                id: levels.slice(0, currentLevel + 1).join('-') + '-' + name,
+                name: name === 'Unknown' ? `(${getGroupingLabel(currentField)} N/A)` : name,
                 level: currentLevel,
                 fieldName: currentField,
                 instances: hasMoreLevels ? [] : instances,
@@ -5683,9 +5245,7 @@ const ServerListPage: React.FC = () => {
           };
 
           // Collect all instances from a group recursively
-          const collectCardInstances = (
-            group: CardGroup,
-          ): ServiceInstance[] => {
+          const collectCardInstances = (group: CardGroup): ServiceInstance[] => {
             if (group.children && group.children.length > 0)
               return group.children.flatMap(collectCardInstances);
             return group.instances;
@@ -5700,10 +5260,7 @@ const ServerListPage: React.FC = () => {
             const highlightStatus = updatedStatus || service.status;
             const customLabels = Object.entries(service.labels).filter(
               ([key]) =>
-                key !== "service" &&
-                key !== "group" &&
-                key !== "environment" &&
-                key !== "region",
+                key !== 'service' && key !== 'group' && key !== 'environment' && key !== 'region'
             );
             const ports = Object.entries(service.ports || {});
 
@@ -5713,41 +5270,37 @@ const ServerListPage: React.FC = () => {
                 onContextMenu={(e) => handleContextMenu(e, service)}
                 sx={{
                   minHeight: 300,
-                  display: "flex",
-                  flexDirection: "column",
+                  display: 'flex',
+                  flexDirection: 'column',
                   padding: 1.5,
                   borderRadius: 0,
-                  border: "1px solid",
-                  borderColor: "divider",
+                  border: '1px solid',
+                  borderColor: 'divider',
                   bgcolor: isUpdated
                     ? (theme) => getHighlightColor(highlightStatus, theme)
-                    : (theme) =>
-                        getStatusBgColor(service.status, theme) ||
-                        "background.paper",
-                  transition: "all 0.1s ease-in-out",
+                    : (theme) => getStatusBgColor(service.status, theme) || 'background.paper',
+                  transition: 'all 0.1s ease-in-out',
                   animation: isNew
-                    ? "appearEffect 0.5s ease-out"
+                    ? 'appearEffect 0.5s ease-out'
                     : isUpdated
                       ? `flashEffect-${highlightStatus} 2s ease-out`
-                      : "none",
-                  "&:hover": {
-                    borderColor: "primary.main",
+                      : 'none',
+                  '&:hover': {
+                    borderColor: 'primary.main',
                     boxShadow: (theme) => theme.shadows[4],
                     zIndex: 1,
                   },
-                  "@keyframes appearEffect": {
-                    "0%": { opacity: 0, transform: "scale(0.9)" },
-                    "100%": { opacity: 1, transform: "scale(1)" },
+                  '@keyframes appearEffect': {
+                    '0%': { opacity: 0, transform: 'scale(0.9)' },
+                    '100%': { opacity: 1, transform: 'scale(1)' },
                   },
                   [`@keyframes flashEffect-${highlightStatus}`]: {
-                    "0%": {
-                      bgcolor: (theme) =>
-                        getHighlightColorStart(highlightStatus, theme),
+                    '0%': {
+                      bgcolor: (theme) => getHighlightColorStart(highlightStatus, theme),
                     },
-                    "100%": {
+                    '100%': {
                       bgcolor: (theme) =>
-                        getStatusBgColor(service.status, theme) ||
-                        "background.paper",
+                        getStatusBgColor(service.status, theme) || 'background.paper',
                     },
                   },
                 }}
@@ -5755,18 +5308,18 @@ const ServerListPage: React.FC = () => {
                 {/* Header: Type + Group + Status */}
                 <Box
                   sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
                     mb: 1,
                   }}
                 >
                   <Box
                     sx={{
-                      display: "flex",
+                      display: 'flex',
                       gap: 0.5,
-                      flexWrap: "wrap",
-                      alignItems: "center",
+                      flexWrap: 'wrap',
+                      alignItems: 'center',
                     }}
                   >
                     {getTypeChip(service.labels.service)}
@@ -5779,7 +5332,7 @@ const ServerListPage: React.FC = () => {
                         sx={{
                           fontWeight: 600,
                           height: 20,
-                          fontSize: "0.7rem",
+                          fontSize: '0.7rem',
                           borderRadius: 1,
                         }}
                       />
@@ -5793,7 +5346,7 @@ const ServerListPage: React.FC = () => {
                         sx={{
                           fontWeight: 600,
                           height: 20,
-                          fontSize: "0.7rem",
+                          fontSize: '0.7rem',
                           borderRadius: 1,
                         }}
                       />
@@ -5807,39 +5360,31 @@ const ServerListPage: React.FC = () => {
                         sx={{
                           fontWeight: 600,
                           height: 20,
-                          fontSize: "0.7rem",
+                          fontSize: '0.7rem',
                           borderRadius: 1,
                         }}
                       />
                     )}
                   </Box>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                       {getStatusBadge(service.status)}
                     </Box>
-                    <Box
-                      sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
-                    >
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                       {/* Only show heartbeat icon for initializing/ready status */}
                       {renderHeartbeatIcon(service, 26, 14)}
                       {/* Move health check button here */}
                       {hasWebPort(service) &&
                         (() => {
-                          const cardHealthStatus =
-                            healthCheckStatus.get(serviceKey);
-                          if (cardHealthStatus?.loading)
-                            return <CircularProgress size={16} />;
-                          if (
-                            cardHealthStatus?.cooldown &&
-                            cardHealthStatus.result
-                          ) {
+                          const cardHealthStatus = healthCheckStatus.get(serviceKey);
+                          if (cardHealthStatus?.loading) return <CircularProgress size={16} />;
+                          if (cardHealthStatus?.cooldown && cardHealthStatus.result) {
                             return (
                               <Tooltip
                                 title={
                                   cardHealthStatus.result.healthy
-                                    ? "Healthy"
-                                    : cardHealthStatus.result.error ||
-                                      "Unknown error"
+                                    ? 'Healthy'
+                                    : cardHealthStatus.result.error || 'Unknown error'
                                 }
                                 arrow
                               >
@@ -5847,31 +5392,28 @@ const ServerListPage: React.FC = () => {
                                   label={
                                     cardHealthStatus.result.healthy
                                       ? `${cardHealthStatus.result.latency} ms`
-                                      : "✕"
+                                      : '✕'
                                   }
                                   size="small"
                                   sx={{
                                     height: 22,
-                                    fontSize: "0.7rem",
+                                    fontSize: '0.7rem',
                                     fontWeight: 800,
                                     borderRadius: 0,
                                     bgcolor: cardHealthStatus.result.healthy
-                                      ? "success.main"
-                                      : "error.main",
-                                    color: "white",
+                                      ? 'success.main'
+                                      : 'error.main',
+                                    color: 'white',
                                     animation: cardHealthStatus.fading
-                                      ? "wiggleFade 0.5s ease-out forwards"
-                                      : "none",
+                                      ? 'wiggleFade 0.5s ease-out forwards'
+                                      : 'none',
                                   }}
                                 />
                               </Tooltip>
                             );
                           }
                           return (
-                            <Tooltip
-                              title={t("serverList.healthCheck.tooltip")}
-                              arrow
-                            >
+                            <Tooltip title={t('serverList.healthCheck.tooltip')} arrow>
                               <IconButton
                                 size="small"
                                 onClick={(e) => {
@@ -5882,10 +5424,10 @@ const ServerListPage: React.FC = () => {
                                   width: 24,
                                   height: 24,
                                   p: 0,
-                                  bgcolor: "background.paper",
+                                  bgcolor: 'background.paper',
                                   border: 1,
-                                  borderColor: "divider",
-                                  "&:hover": { bgcolor: "action.hover" },
+                                  borderColor: 'divider',
+                                  '&:hover': { bgcolor: 'action.hover' },
                                 }}
                               >
                                 <TouchAppIcon sx={{ fontSize: 16 }} />
@@ -5900,8 +5442,7 @@ const ServerListPage: React.FC = () => {
                       onClick={(e) => {
                         setContextMenu({
                           mouseX: e.currentTarget.getBoundingClientRect().left,
-                          mouseY:
-                            e.currentTarget.getBoundingClientRect().bottom,
+                          mouseY: e.currentTarget.getBoundingClientRect().bottom,
                           service,
                         });
                       }}
@@ -5926,9 +5467,9 @@ const ServerListPage: React.FC = () => {
                   color="text.disabled"
                   sx={{
                     fontFamily: '"D2Coding", monospace',
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
                   }}
                 >
                   {service.instanceId}
@@ -5938,31 +5479,27 @@ const ServerListPage: React.FC = () => {
                 <Box
                   sx={{
                     mt: 1,
-                    display: "grid",
-                    gridTemplateColumns: "auto 1fr",
+                    display: 'grid',
+                    gridTemplateColumns: 'auto 1fr',
                     gap: 0.25,
-                    "& .label": {
-                      color: "text.secondary",
-                      fontSize: "0.875rem",
+                    '& .label': {
+                      color: 'text.secondary',
+                      fontSize: '0.875rem',
                       minWidth: 55,
                     },
-                    "& .value": {
+                    '& .value': {
                       fontFamily: '"D2Coding", monospace',
-                      fontSize: "0.875rem",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap",
+                      fontSize: '0.875rem',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
                     },
                   }}
                 >
                   <Typography className="label">External</Typography>
-                  <Typography className="value">
-                    {service.externalAddress}
-                  </Typography>
+                  <Typography className="value">{service.externalAddress}</Typography>
                   <Typography className="label">Internal</Typography>
-                  <Typography className="value">
-                    {service.internalAddress}
-                  </Typography>
+                  <Typography className="value">{service.internalAddress}</Typography>
                 </Box>
 
                 {/* Ports - Compact inline chips */}
@@ -5970,8 +5507,8 @@ const ServerListPage: React.FC = () => {
                   <Box
                     sx={{
                       mt: 0.5,
-                      display: "flex",
-                      flexWrap: "wrap",
+                      display: 'flex',
+                      flexWrap: 'wrap',
                       gap: 0.5,
                     }}
                   >
@@ -5983,10 +5520,10 @@ const ServerListPage: React.FC = () => {
                         variant="outlined"
                         sx={{
                           height: 24,
-                          fontSize: "0.8rem",
+                          fontSize: '0.8rem',
                           fontFamily: '"D2Coding", monospace',
                           borderRadius: 0,
-                          "& .MuiChip-label": { px: 1 },
+                          '& .MuiChip-label': { px: 1 },
                         }}
                       />
                     ))}
@@ -5997,9 +5534,9 @@ const ServerListPage: React.FC = () => {
                 {customLabels.length > 0 && (
                   <Box
                     sx={{
-                      display: "flex",
+                      display: 'flex',
                       gap: 0.5,
-                      flexWrap: "wrap",
+                      flexWrap: 'wrap',
                       mt: 0.5,
                     }}
                   >
@@ -6010,7 +5547,7 @@ const ServerListPage: React.FC = () => {
                         size="small"
                         variant="outlined"
                         sx={{
-                          fontSize: "0.8rem",
+                          fontSize: '0.8rem',
                           height: 24,
                           fontFamily: '"D2Coding", monospace',
                           borderRadius: 0,
@@ -6029,33 +5566,25 @@ const ServerListPage: React.FC = () => {
                     sx={{
                       mt: 1,
                       p: 0.75,
-                      bgcolor: "action.hover",
+                      bgcolor: 'action.hover',
                       borderRadius: 0,
-                      display: "flex",
+                      display: 'flex',
                       gap: 2,
-                      flexWrap: "wrap",
-                      justifyContent: "center",
+                      flexWrap: 'wrap',
+                      justifyContent: 'center',
                     }}
                   >
                     {Object.entries(service.stats).map(([key, value]) => (
-                      <Box
-                        key={`${service.instanceId}-${key}`}
-                        sx={{ textAlign: "center" }}
-                      >
+                      <Box key={`${service.instanceId}-${key}`} sx={{ textAlign: 'center' }}>
                         <Typography
                           variant="caption"
                           color="text.secondary"
-                          sx={{ display: "block", fontSize: "0.6rem" }}
+                          sx={{ display: 'block', fontSize: '0.6rem' }}
                         >
                           {key}
                         </Typography>
-                        <Typography
-                          variant="body2"
-                          sx={{ fontWeight: 600, fontSize: "0.8rem" }}
-                        >
-                          {typeof value === "number"
-                            ? value.toFixed(1)
-                            : String(value)}
+                        <Typography variant="body2" sx={{ fontWeight: 600, fontSize: '0.8rem' }}>
+                          {typeof value === 'number' ? value.toFixed(1) : String(value)}
                         </Typography>
                       </Box>
                     ))}
@@ -6073,21 +5602,18 @@ const ServerListPage: React.FC = () => {
             const hasChildren = group.children && group.children.length > 0;
 
             return (
-              <Box
-                key={group.id}
-                sx={{ mb: group.level === 0 ? 4 : 3, ml: group.level * 2 }}
-              >
+              <Box key={group.id} sx={{ mb: group.level === 0 ? 4 : 3, ml: group.level * 2 }}>
                 {/* Premium Group Header */}
                 <Box
                   sx={{
-                    display: "flex",
-                    alignItems: "center",
+                    display: 'flex',
+                    alignItems: 'center',
                     mb: 2.5,
                     gap: 1.5,
                     pb: 1,
-                    borderBottom: "1px solid",
-                    borderColor: "divider",
-                    position: "relative",
+                    borderBottom: '1px solid',
+                    borderColor: 'divider',
+                    position: 'relative',
                   }}
                 >
                   {/* Visual Level indicator line */}
@@ -6096,7 +5622,7 @@ const ServerListPage: React.FC = () => {
                       sx={{
                         width: 3,
                         height: 28,
-                        bgcolor: "primary.main",
+                        bgcolor: 'primary.main',
                         mr: 0.5,
                         opacity: 0.4,
                         borderRadius: 0,
@@ -6106,33 +5632,26 @@ const ServerListPage: React.FC = () => {
 
                   <Box
                     sx={{
-                      display: "flex",
-                      alignItems: "center",
+                      display: 'flex',
+                      alignItems: 'center',
                       px: 2,
                       py: 0.75,
                       borderRadius: 0,
-                      bgcolor:
-                        group.level === 0 ? "primary.main" : "action.selected",
-                      color:
-                        group.level === 0
-                          ? "primary.contrastText"
-                          : "text.primary",
+                      bgcolor: group.level === 0 ? 'primary.main' : 'action.selected',
+                      color: group.level === 0 ? 'primary.contrastText' : 'text.primary',
                       boxShadow:
                         group.level === 0
-                          ? (theme) =>
-                              `0 4px 12px ${alpha(theme.palette.primary.main, 0.2)}`
-                          : "none",
-                      border: group.level === 0 ? "none" : "1px solid",
-                      borderColor: "divider",
-                      transition: "all 0.2s ease",
-                      "&:hover": {
-                        transform:
-                          group.level === 0 ? "translateY(-1px)" : "none",
+                          ? (theme) => `0 4px 12px ${alpha(theme.palette.primary.main, 0.2)}`
+                          : 'none',
+                      border: group.level === 0 ? 'none' : '1px solid',
+                      borderColor: 'divider',
+                      transition: 'all 0.2s ease',
+                      '&:hover': {
+                        transform: group.level === 0 ? 'translateY(-1px)' : 'none',
                         boxShadow:
                           group.level === 0
-                            ? (theme) =>
-                                `0 6px 16px ${alpha(theme.palette.primary.main, 0.3)}`
-                            : "none",
+                            ? (theme) => `0 6px 16px ${alpha(theme.palette.primary.main, 0.3)}`
+                            : 'none',
                       },
                     }}
                   >
@@ -6142,16 +5661,13 @@ const ServerListPage: React.FC = () => {
                         fontWeight: 800,
                         mr: 1.5,
                         opacity: 0.7,
-                        textTransform: "uppercase",
-                        letterSpacing: "0.1em",
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.1em',
                       }}
                     >
                       {getGroupingLabel(group.fieldName)}
                     </Typography>
-                    <Typography
-                      variant="subtitle2"
-                      sx={{ fontWeight: 800, fontSize: "1rem" }}
-                    >
+                    <Typography variant="subtitle2" sx={{ fontWeight: 800, fontSize: '1rem' }}>
                       {group.name}
                     </Typography>
                     <Box
@@ -6164,8 +5680,8 @@ const ServerListPage: React.FC = () => {
                           group.level === 0
                             ? alpha(theme.palette.common.white, 0.2)
                             : alpha(theme.palette.primary.main, 0.1),
-                        color: group.level === 0 ? "inherit" : "primary.main",
-                        fontSize: "0.75rem",
+                        color: group.level === 0 ? 'inherit' : 'primary.main',
+                        fontSize: '0.75rem',
                         fontWeight: 800,
                       }}
                     >
@@ -6176,28 +5692,24 @@ const ServerListPage: React.FC = () => {
 
                 {/* Render children or cards */}
                 {hasChildren ? (
-                  <Box
-                    sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}
-                  >
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
                     {group.children!.map((child) => renderCardGroup(child))}
                   </Box>
                 ) : (
                   <Box
                     sx={{
-                      display: "grid",
-                      gridTemplateColumns: "repeat(3, 1fr)",
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(3, 1fr)',
                       gap: 2,
-                      "@media (max-width: 1400px)": {
-                        gridTemplateColumns: "repeat(2, 1fr)",
+                      '@media (max-width: 1400px)': {
+                        gridTemplateColumns: 'repeat(2, 1fr)',
                       },
-                      "@media (max-width: 900px)": {
-                        gridTemplateColumns: "1fr",
+                      '@media (max-width: 900px)': {
+                        gridTemplateColumns: '1fr',
                       },
                     }}
                   >
-                    {group.instances.map((service) =>
-                      renderServiceCard(service),
-                    )}
+                    {group.instances.map((service) => renderServiceCard(service))}
                   </Box>
                 )}
               </Box>
@@ -6205,9 +5717,7 @@ const ServerListPage: React.FC = () => {
           };
 
           const groups =
-            groupingLevels.length > 0
-              ? buildCardGroups(gridDisplayServices, groupingLevels)
-              : [];
+            groupingLevels.length > 0 ? buildCardGroups(gridDisplayServices, groupingLevels) : [];
 
           // No grouping - render flat grid
           if (groupingLevels.length === 0) {
@@ -6216,28 +5726,26 @@ const ServerListPage: React.FC = () => {
                 sx={{
                   flex: 1,
                   minHeight: 0,
-                  overflow: "auto",
-                  display: "grid",
-                  gridTemplateColumns: "repeat(3, 1fr)",
+                  overflow: 'auto',
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(3, 1fr)',
                   gap: 1.5,
-                  "@media (max-width: 1200px)": {
-                    gridTemplateColumns: "repeat(2, 1fr)",
+                  '@media (max-width: 1200px)': {
+                    gridTemplateColumns: 'repeat(2, 1fr)',
                   },
-                  "@media (max-width: 768px)": { gridTemplateColumns: "1fr" },
+                  '@media (max-width: 768px)': { gridTemplateColumns: '1fr' },
                 }}
               >
                 {gridDisplayServices.length === 0 ? (
-                  <Card sx={{ gridColumn: "1 / -1" }}>
-                    <CardContent sx={{ py: 4, textAlign: "center" }}>
+                  <Card sx={{ gridColumn: '1 / -1' }}>
+                    <CardContent sx={{ py: 4, textAlign: 'center' }}>
                       <Typography variant="body2" color="text.secondary">
-                        {t("serverList.noData")}
+                        {t('serverList.noData')}
                       </Typography>
                     </CardContent>
                   </Card>
                 ) : (
-                  gridDisplayServices.map((service) =>
-                    renderServiceCard(service),
-                  )
+                  gridDisplayServices.map((service) => renderServiceCard(service))
                 )}
               </Box>
             );
@@ -6249,9 +5757,9 @@ const ServerListPage: React.FC = () => {
               sx={{
                 flex: 1,
                 minHeight: 0,
-                overflow: "auto",
-                display: "flex",
-                flexDirection: "column",
+                overflow: 'auto',
+                display: 'flex',
+                flexDirection: 'column',
                 gap: 2,
               }}
             >
@@ -6261,7 +5769,7 @@ const ServerListPage: React.FC = () => {
         })()}
 
       {/* Cluster View - Force-directed grape cluster visualization */}
-      {(services.length > 0 || !isLoading) && viewMode === "cluster" && (
+      {(services.length > 0 || !isLoading) && viewMode === 'cluster' && (
         <ClusterView
           services={gridDisplayServices}
           heartbeatIds={heartbeatIds}
@@ -6277,12 +5785,12 @@ const ServerListPage: React.FC = () => {
         anchorEl={columnSettingsAnchor}
         onClose={() => setColumnSettingsAnchor(null)}
         anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "right",
+          vertical: 'bottom',
+          horizontal: 'right',
         }}
         transformOrigin={{
-          vertical: "top",
-          horizontal: "right",
+          vertical: 'top',
+          horizontal: 'right',
         }}
         hideBackdrop
         disableScrollLock
@@ -6291,17 +5799,17 @@ const ServerListPage: React.FC = () => {
           <Box sx={{ p: 2, minWidth: 280, maxWidth: 320 }}>
             <Box
               sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
                 mb: 1,
               }}
             >
               <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-                {t("serverList.columnSettings")}
+                {t('serverList.columnSettings')}
               </Typography>
               <Button size="small" onClick={handleResetColumns} color="warning">
-                {t("common.reset")}
+                {t('common.reset')}
               </Button>
             </Box>
             <DndContext
@@ -6336,25 +5844,18 @@ const ServerListPage: React.FC = () => {
         aria-labelledby="cleanup-dialog-title"
         aria-describedby="cleanup-dialog-description"
       >
-        <DialogTitle id="cleanup-dialog-title">
-          {t("serverList.cleanupConfirmTitle")}
-        </DialogTitle>
+        <DialogTitle id="cleanup-dialog-title">{t('serverList.cleanupConfirmTitle')}</DialogTitle>
         <DialogContent>
           <DialogContentText id="cleanup-dialog-description">
-            {t("serverList.cleanupConfirmMessage")}
+            {t('serverList.cleanupConfirmMessage')}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCleanupCancel} color="primary">
-            {t("common.cancel")}
+            {t('common.cancel')}
           </Button>
-          <Button
-            onClick={handleCleanupConfirm}
-            color="error"
-            variant="contained"
-            autoFocus
-          >
-            {t("common.confirm")}
+          <Button onClick={handleCleanupConfirm} color="error" variant="contained" autoFocus>
+            {t('common.confirm')}
           </Button>
         </DialogActions>
       </Dialog>
@@ -6369,42 +5870,42 @@ const ServerListPage: React.FC = () => {
       >
         <DialogTitle
           id="bulk-health-check-dialog-title"
-          sx={{ display: "flex", alignItems: "center", gap: 1 }}
+          sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
         >
           <NetworkCheckIcon color="primary" />
-          {t("serverList.bulkHealthCheck")}
+          {t('serverList.bulkHealthCheck')}
         </DialogTitle>
         <DialogContent>
           {/* Subtitle */}
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            {t("serverList.bulkHealthCheck.subtitle")}
+            {t('serverList.bulkHealthCheck.subtitle')}
           </Typography>
 
           {/* Statistics Summary */}
-          <Box sx={{ display: "flex", gap: 2, mb: 3, flexWrap: "wrap" }}>
+          <Box sx={{ display: 'flex', gap: 2, mb: 3, flexWrap: 'wrap' }}>
             <Chip
-              label={`${t("serverList.bulkHealthCheck.total")}: ${bulkHealthCheckStats.total}`}
+              label={`${t('serverList.bulkHealthCheck.total')}: ${bulkHealthCheckStats.total}`}
               color="default"
               variant="outlined"
               sx={{ borderRadius: 1 }}
             />
             <Chip
               icon={<CheckCircleIcon />}
-              label={`${t("serverList.bulkHealthCheck.success")}: ${bulkHealthCheckStats.success}`}
+              label={`${t('serverList.bulkHealthCheck.success')}: ${bulkHealthCheckStats.success}`}
               color="success"
-              variant={bulkHealthCheckStats.success > 0 ? "filled" : "outlined"}
+              variant={bulkHealthCheckStats.success > 0 ? 'filled' : 'outlined'}
               sx={{ borderRadius: 1 }}
             />
             <Chip
               icon={<ErrorIcon />}
-              label={`${t("serverList.bulkHealthCheck.failed")}: ${bulkHealthCheckStats.failed}`}
+              label={`${t('serverList.bulkHealthCheck.failed')}: ${bulkHealthCheckStats.failed}`}
               color="error"
-              variant={bulkHealthCheckStats.failed > 0 ? "filled" : "outlined"}
+              variant={bulkHealthCheckStats.failed > 0 ? 'filled' : 'outlined'}
               sx={{ borderRadius: 1 }}
             />
             {bulkHealthCheckStats.success > 0 && (
               <Chip
-                label={`${t("serverList.bulkHealthCheck.avgLatency")}: ${Math.round(bulkHealthCheckStats.avgLatency)}ms`}
+                label={`${t('serverList.bulkHealthCheck.avgLatency')}: ${Math.round(bulkHealthCheckStats.avgLatency)}ms`}
                 color="info"
                 variant="outlined"
                 sx={{ borderRadius: 1 }}
@@ -6417,13 +5918,13 @@ const ServerListPage: React.FC = () => {
             <Box sx={{ mb: 2 }}>
               <Box
                 sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
+                  display: 'flex',
+                  justifyContent: 'space-between',
                   mb: 0.5,
                 }}
               >
                 <Typography variant="body2" color="text.secondary">
-                  {t("serverList.bulkHealthCheck.checking")}...
+                  {t('serverList.bulkHealthCheck.checking')}...
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   {bulkHealthCheckStats.completed}/{bulkHealthCheckStats.total}
@@ -6431,19 +5932,19 @@ const ServerListPage: React.FC = () => {
               </Box>
               <Box
                 sx={{
-                  width: "100%",
+                  width: '100%',
                   height: 8,
-                  bgcolor: "grey.200",
+                  bgcolor: 'grey.200',
                   borderRadius: 1,
-                  overflow: "hidden",
+                  overflow: 'hidden',
                 }}
               >
                 <Box
                   sx={{
                     width: `${(bulkHealthCheckStats.completed / bulkHealthCheckStats.total) * 100}%`,
-                    height: "100%",
-                    bgcolor: "primary.main",
-                    transition: "width 0.3s ease",
+                    height: '100%',
+                    bgcolor: 'primary.main',
+                    transition: 'width 0.3s ease',
                   }}
                 />
               </Box>
@@ -6455,9 +5956,9 @@ const ServerListPage: React.FC = () => {
             id="bulk-health-check-scroll-container"
             sx={{
               maxHeight: 600,
-              overflow: "auto",
+              overflow: 'auto',
               border: 1,
-              borderColor: "divider",
+              borderColor: 'divider',
               borderRadius: 1,
             }}
           >
@@ -6467,24 +5968,20 @@ const ServerListPage: React.FC = () => {
                   <TableCell
                     sx={{
                       width: 50,
-                      bgcolor: "background.paper",
-                      padding: "4px 8px",
+                      bgcolor: 'background.paper',
+                      padding: '4px 8px',
                     }}
                   >
-                    <Box
-                      sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
-                    >
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                       <Checkbox
                         size="small"
                         checked={
-                          bulkHealthCheckSelected.size ===
-                            bulkHealthCheckResults.length &&
+                          bulkHealthCheckSelected.size === bulkHealthCheckResults.length &&
                           bulkHealthCheckResults.length > 0
                         }
                         indeterminate={
                           bulkHealthCheckSelected.size > 0 &&
-                          bulkHealthCheckSelected.size <
-                            bulkHealthCheckResults.length
+                          bulkHealthCheckSelected.size < bulkHealthCheckResults.length
                         }
                         onChange={(e) =>
                           e.target.checked
@@ -6495,32 +5992,32 @@ const ServerListPage: React.FC = () => {
                       />
                     </Box>
                   </TableCell>
-                  <TableCell sx={{ width: 50, bgcolor: "background.paper" }}>
-                    {t("serverList.bulkHealthCheck.status")}
+                  <TableCell sx={{ width: 50, bgcolor: 'background.paper' }}>
+                    {t('serverList.bulkHealthCheck.status')}
                   </TableCell>
-                  <TableCell sx={{ bgcolor: "background.paper" }}>
-                    {t("serverList.table.service")}
+                  <TableCell sx={{ bgcolor: 'background.paper' }}>
+                    {t('serverList.table.service')}
                   </TableCell>
-                  <TableCell sx={{ bgcolor: "background.paper" }}>
-                    {t("serverList.table.group")}
+                  <TableCell sx={{ bgcolor: 'background.paper' }}>
+                    {t('serverList.table.group')}
                   </TableCell>
-                  <TableCell sx={{ bgcolor: "background.paper" }}>
-                    {t("serverList.filters.env")}
+                  <TableCell sx={{ bgcolor: 'background.paper' }}>
+                    {t('serverList.filters.env')}
                   </TableCell>
-                  <TableCell sx={{ bgcolor: "background.paper" }}>
-                    {t("serverList.table.hostname")}
+                  <TableCell sx={{ bgcolor: 'background.paper' }}>
+                    {t('serverList.table.hostname')}
                   </TableCell>
-                  <TableCell sx={{ bgcolor: "background.paper" }}>
-                    {t("serverList.table.internalAddress")}
+                  <TableCell sx={{ bgcolor: 'background.paper' }}>
+                    {t('serverList.table.internalAddress')}
                   </TableCell>
-                  <TableCell sx={{ width: 70, bgcolor: "background.paper" }}>
-                    {t("serverList.bulkHealthCheck.port")}
+                  <TableCell sx={{ width: 70, bgcolor: 'background.paper' }}>
+                    {t('serverList.bulkHealthCheck.port')}
                   </TableCell>
-                  <TableCell sx={{ width: 80, bgcolor: "background.paper" }}>
-                    {t("serverList.bulkHealthCheck.latency")}
+                  <TableCell sx={{ width: 80, bgcolor: 'background.paper' }}>
+                    {t('serverList.bulkHealthCheck.latency')}
                   </TableCell>
-                  <TableCell sx={{ bgcolor: "background.paper" }}>
-                    {t("serverList.bulkHealthCheck.result")}
+                  <TableCell sx={{ bgcolor: 'background.paper' }}>
+                    {t('serverList.bulkHealthCheck.result')}
                   </TableCell>
                 </TableRow>
               </TableHead>
@@ -6531,76 +6028,66 @@ const ServerListPage: React.FC = () => {
                     id={`bulk-health-row-${index}`}
                     sx={{
                       bgcolor:
-                        item.status === "checking"
-                          ? alpha("#1976d2", 0.1)
-                          : item.status === "success"
-                            ? alpha("#2e7d32", 0.05)
-                            : item.status === "failed"
-                              ? alpha("#d32f2f", 0.05)
-                              : "transparent",
-                      transition: "background-color 0.3s ease",
+                        item.status === 'checking'
+                          ? alpha('#1976d2', 0.1)
+                          : item.status === 'success'
+                            ? alpha('#2e7d32', 0.05)
+                            : item.status === 'failed'
+                              ? alpha('#d32f2f', 0.05)
+                              : 'transparent',
+                      transition: 'background-color 0.3s ease',
                     }}
                   >
-                    <TableCell sx={{ padding: "4px 8px" }}>
+                    <TableCell sx={{ padding: '4px 8px' }}>
                       <Checkbox
                         size="small"
                         checked={bulkHealthCheckSelected.has(item.serviceKey)}
-                        onChange={() =>
-                          handleBulkHealthCheckToggle(item.serviceKey)
-                        }
-                        disabled={
-                          bulkHealthCheckRunning || item.status !== "pending"
-                        }
+                        onChange={() => handleBulkHealthCheckToggle(item.serviceKey)}
+                        disabled={bulkHealthCheckRunning || item.status !== 'pending'}
                       />
                     </TableCell>
                     <TableCell>
-                      {item.status === "pending" && (
-                        <HourglassEmptyIcon
-                          sx={{ color: "text.disabled", fontSize: 20 }}
-                        />
+                      {item.status === 'pending' && (
+                        <HourglassEmptyIcon sx={{ color: 'text.disabled', fontSize: 20 }} />
                       )}
-                      {item.status === "checking" && (
+                      {item.status === 'checking' && (
                         <SearchIcon
                           sx={{
                             fontSize: 18,
-                            animation:
-                              "searchingAnimSmall 2s ease-in-out infinite",
-                            "@keyframes searchingAnimSmall": {
-                              "0%": {
-                                transform: "translate(0, 0) rotate(0deg)",
+                            animation: 'searchingAnimSmall 2s ease-in-out infinite',
+                            '@keyframes searchingAnimSmall': {
+                              '0%': {
+                                transform: 'translate(0, 0) rotate(0deg)',
                               },
-                              "25%": {
-                                transform: "translate(1px, -1px) rotate(10deg)",
+                              '25%': {
+                                transform: 'translate(1px, -1px) rotate(10deg)',
                               },
-                              "50%": {
-                                transform:
-                                  "translate(-1px, 1px) rotate(-10deg)",
+                              '50%': {
+                                transform: 'translate(-1px, 1px) rotate(-10deg)',
                               },
-                              "75%": {
-                                transform: "translate(1px, 1px) rotate(10deg)",
+                              '75%': {
+                                transform: 'translate(1px, 1px) rotate(10deg)',
                               },
-                              "100%": {
-                                transform: "translate(0, 0) rotate(0deg)",
+                              '100%': {
+                                transform: 'translate(0, 0) rotate(0deg)',
                               },
                             },
                           }}
                         />
                       )}
-                      {item.status === "success" && (
-                        <CheckCircleIcon
-                          sx={{ color: "success.main", fontSize: 20 }}
-                        />
+                      {item.status === 'success' && (
+                        <CheckCircleIcon sx={{ color: 'success.main', fontSize: 20 }} />
                       )}
-                      {item.status === "failed" && (
-                        <ErrorIcon sx={{ color: "error.main", fontSize: 20 }} />
+                      {item.status === 'failed' && (
+                        <ErrorIcon sx={{ color: 'error.main', fontSize: 20 }} />
                       )}
                     </TableCell>
                     <TableCell>
                       <Box
                         sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "space-between",
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
                           gap: 1,
                         }}
                       >
@@ -6614,18 +6101,17 @@ const ServerListPage: React.FC = () => {
                               copyToClipboardWithNotification(
                                 item.service as string,
                                 () =>
-                                  enqueueSnackbar(
-                                    t("common.copiedToClipboard"),
-                                    { variant: "success" },
-                                  ),
-                                () => {},
+                                  enqueueSnackbar(t('common.copiedToClipboard'), {
+                                    variant: 'success',
+                                  }),
+                                () => {}
                               );
                           }}
                           sx={{
                             opacity: 0.3,
-                            "&:hover": { opacity: 1 },
+                            '&:hover': { opacity: 1 },
                             p: 0.5,
-                            visibility: item.service ? "visible" : "hidden",
+                            visibility: item.service ? 'visible' : 'hidden',
                           }}
                         >
                           <ContentCopyIcon sx={{ fontSize: 14 }} />
@@ -6635,14 +6121,14 @@ const ServerListPage: React.FC = () => {
                     <TableCell>
                       <Box
                         sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "space-between",
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
                           gap: 1,
                         }}
                       >
                         <Typography variant="body2" color="text.secondary">
-                          {item.group || "-"}
+                          {item.group || '-'}
                         </Typography>
                         <IconButton
                           size="small"
@@ -6651,18 +6137,17 @@ const ServerListPage: React.FC = () => {
                               copyToClipboardWithNotification(
                                 item.group as string,
                                 () =>
-                                  enqueueSnackbar(
-                                    t("common.copiedToClipboard"),
-                                    { variant: "success" },
-                                  ),
-                                () => {},
+                                  enqueueSnackbar(t('common.copiedToClipboard'), {
+                                    variant: 'success',
+                                  }),
+                                () => {}
                               );
                           }}
                           sx={{
                             opacity: 0.3,
-                            "&:hover": { opacity: 1 },
+                            '&:hover': { opacity: 1 },
                             p: 0.5,
-                            visibility: item.group ? "visible" : "hidden",
+                            visibility: item.group ? 'visible' : 'hidden',
                           }}
                         >
                           <ContentCopyIcon sx={{ fontSize: 14 }} />
@@ -6672,14 +6157,14 @@ const ServerListPage: React.FC = () => {
                     <TableCell>
                       <Box
                         sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "space-between",
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
                           gap: 1,
                         }}
                       >
                         <Typography variant="body2" color="text.secondary">
-                          {item.env || "-"}
+                          {item.env || '-'}
                         </Typography>
                         <IconButton
                           size="small"
@@ -6688,18 +6173,17 @@ const ServerListPage: React.FC = () => {
                               copyToClipboardWithNotification(
                                 item.env as string,
                                 () =>
-                                  enqueueSnackbar(
-                                    t("common.copiedToClipboard"),
-                                    { variant: "success" },
-                                  ),
-                                () => {},
+                                  enqueueSnackbar(t('common.copiedToClipboard'), {
+                                    variant: 'success',
+                                  }),
+                                () => {}
                               );
                           }}
                           sx={{
                             opacity: 0.3,
-                            "&:hover": { opacity: 1 },
+                            '&:hover': { opacity: 1 },
                             p: 0.5,
-                            visibility: item.env ? "visible" : "hidden",
+                            visibility: item.env ? 'visible' : 'hidden',
                           }}
                         >
                           <ContentCopyIcon sx={{ fontSize: 14 }} />
@@ -6709,20 +6193,20 @@ const ServerListPage: React.FC = () => {
                     <TableCell>
                       <Box
                         sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "space-between",
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
                           gap: 1,
                         }}
                       >
                         <Typography
                           variant="body2"
                           sx={{
-                            fontFamily: "D2Coding, monospace",
-                            fontSize: "0.75rem",
+                            fontFamily: 'D2Coding, monospace',
+                            fontSize: '0.75rem',
                           }}
                         >
-                          {item.hostname || "-"}
+                          {item.hostname || '-'}
                         </Typography>
                         <IconButton
                           size="small"
@@ -6731,18 +6215,17 @@ const ServerListPage: React.FC = () => {
                               copyToClipboardWithNotification(
                                 item.hostname as string,
                                 () =>
-                                  enqueueSnackbar(
-                                    t("common.copiedToClipboard"),
-                                    { variant: "success" },
-                                  ),
-                                () => {},
+                                  enqueueSnackbar(t('common.copiedToClipboard'), {
+                                    variant: 'success',
+                                  }),
+                                () => {}
                               );
                           }}
                           sx={{
                             opacity: 0.3,
-                            "&:hover": { opacity: 1 },
+                            '&:hover': { opacity: 1 },
                             p: 0.5,
-                            visibility: item.hostname ? "visible" : "hidden",
+                            visibility: item.hostname ? 'visible' : 'hidden',
                           }}
                         >
                           <ContentCopyIcon sx={{ fontSize: 14 }} />
@@ -6752,20 +6235,20 @@ const ServerListPage: React.FC = () => {
                     <TableCell>
                       <Box
                         sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "space-between",
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
                           gap: 1,
                         }}
                       >
                         <Typography
                           variant="body2"
                           sx={{
-                            fontFamily: "D2Coding, monospace",
-                            fontSize: "0.75rem",
+                            fontFamily: 'D2Coding, monospace',
+                            fontSize: '0.75rem',
                           }}
                         >
-                          {item.internalIp || "-"}
+                          {item.internalIp || '-'}
                         </Typography>
                         <IconButton
                           size="small"
@@ -6774,18 +6257,17 @@ const ServerListPage: React.FC = () => {
                               copyToClipboardWithNotification(
                                 item.internalIp as string,
                                 () =>
-                                  enqueueSnackbar(
-                                    t("common.copiedToClipboard"),
-                                    { variant: "success" },
-                                  ),
-                                () => {},
+                                  enqueueSnackbar(t('common.copiedToClipboard'), {
+                                    variant: 'success',
+                                  }),
+                                () => {}
                               );
                           }}
                           sx={{
                             opacity: 0.3,
-                            "&:hover": { opacity: 1 },
+                            '&:hover': { opacity: 1 },
                             p: 0.5,
-                            visibility: item.internalIp ? "visible" : "hidden",
+                            visibility: item.internalIp ? 'visible' : 'hidden',
                           }}
                         >
                           <ContentCopyIcon sx={{ fontSize: 14 }} />
@@ -6795,20 +6277,20 @@ const ServerListPage: React.FC = () => {
                     <TableCell>
                       <Box
                         sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "space-between",
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
                           gap: 1,
                         }}
                       >
                         <Typography
                           variant="body2"
                           sx={{
-                            fontFamily: "D2Coding, monospace",
-                            fontSize: "0.75rem",
+                            fontFamily: 'D2Coding, monospace',
+                            fontSize: '0.75rem',
                           }}
                         >
-                          {item.healthPort || "-"}
+                          {item.healthPort || '-'}
                         </Typography>
                         <IconButton
                           size="small"
@@ -6817,18 +6299,17 @@ const ServerListPage: React.FC = () => {
                               copyToClipboardWithNotification(
                                 String(item.healthPort) as string,
                                 () =>
-                                  enqueueSnackbar(
-                                    t("common.copiedToClipboard"),
-                                    { variant: "success" },
-                                  ),
-                                () => {},
+                                  enqueueSnackbar(t('common.copiedToClipboard'), {
+                                    variant: 'success',
+                                  }),
+                                () => {}
                               );
                           }}
                           sx={{
                             opacity: 0.3,
-                            "&:hover": { opacity: 1 },
+                            '&:hover': { opacity: 1 },
                             p: 0.5,
-                            visibility: item.healthPort ? "visible" : "hidden",
+                            visibility: item.healthPort ? 'visible' : 'hidden',
                           }}
                         >
                           <ContentCopyIcon sx={{ fontSize: 14 }} />
@@ -6842,10 +6323,10 @@ const ServerListPage: React.FC = () => {
                           sx={{
                             color:
                               item.latency < 100
-                                ? "success.main"
+                                ? 'success.main'
                                 : item.latency < 500
-                                  ? "warning.main"
-                                  : "error.main",
+                                  ? 'warning.main'
+                                  : 'error.main',
                           }}
                         >
                           {item.latency}ms
@@ -6854,19 +6335,15 @@ const ServerListPage: React.FC = () => {
                     </TableCell>
                     <TableCell>
                       {item.error && (
-                        <Typography
-                          variant="body2"
-                          color="error.main"
-                          sx={{ fontSize: "0.75rem" }}
-                        >
+                        <Typography variant="body2" color="error.main" sx={{ fontSize: '0.75rem' }}>
                           {item.error}
                         </Typography>
                       )}
-                      {item.status === "success" && !item.error && (
+                      {item.status === 'success' && !item.error && (
                         <Typography
                           variant="body2"
                           color="success.main"
-                          sx={{ fontSize: "0.75rem" }}
+                          sx={{ fontSize: '0.75rem' }}
                         >
                           OK
                         </Typography>
@@ -6878,24 +6355,19 @@ const ServerListPage: React.FC = () => {
             </Table>
           </Box>
         </DialogContent>
-        <DialogActions sx={{ justifyContent: "space-between" }}>
+        <DialogActions sx={{ justifyContent: 'space-between' }}>
           <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
-            {t("serverList.bulkHealthCheck.selected")}:{" "}
-            {bulkHealthCheckSelected.size} / {bulkHealthCheckResults.length}
+            {t('serverList.bulkHealthCheck.selected')}: {bulkHealthCheckSelected.size} /{' '}
+            {bulkHealthCheckResults.length}
           </Typography>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <Button
-              onClick={handleBulkHealthCheckClose}
-              disabled={bulkHealthCheckRunning}
-            >
-              {t("common.close")}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Button onClick={handleBulkHealthCheckClose} disabled={bulkHealthCheckRunning}>
+              {t('common.close')}
             </Button>
             <Button
               onClick={handleBulkHealthCheckStart}
               variant="contained"
-              disabled={
-                bulkHealthCheckRunning || bulkHealthCheckSelected.size === 0
-              }
+              disabled={bulkHealthCheckRunning || bulkHealthCheckSelected.size === 0}
               startIcon={
                 bulkHealthCheckRunning ? (
                   <CircularProgress size={16} color="inherit" />
@@ -6905,14 +6377,14 @@ const ServerListPage: React.FC = () => {
               }
             >
               {bulkHealthCheckRunning
-                ? t("serverList.bulkHealthCheck.checking")
-                : t("serverList.bulkHealthCheck.start")}
+                ? t('serverList.bulkHealthCheck.checking')
+                : t('serverList.bulkHealthCheck.start')}
             </Button>
             <Box
               sx={{
-                width: "1px",
-                height: "24px",
-                bgcolor: "divider",
+                width: '1px',
+                height: '24px',
+                bgcolor: 'divider',
                 mx: 1,
               }}
             />
@@ -6921,26 +6393,26 @@ const ServerListPage: React.FC = () => {
               disabled={!hasCompletedHealthCheck || bulkHealthCheckRunning}
               startIcon={<FileDownloadIcon />}
             >
-              {t("common.export")}
+              {t('common.export')}
             </Button>
             <Menu
               anchorEl={exportMenuAnchor}
               open={Boolean(exportMenuAnchor)}
               onClose={handleExportMenuClose}
             >
-              <MenuItem onClick={() => handleExportHealthCheck("csv")}>
+              <MenuItem onClick={() => handleExportHealthCheck('csv')}>
                 <ListItemIcon>
                   <FileDownloadIcon fontSize="small" />
                 </ListItemIcon>
                 CSV
               </MenuItem>
-              <MenuItem onClick={() => handleExportHealthCheck("xlsx")}>
+              <MenuItem onClick={() => handleExportHealthCheck('xlsx')}>
                 <ListItemIcon>
                   <FileDownloadIcon fontSize="small" />
                 </ListItemIcon>
                 Excel (XLSX)
               </MenuItem>
-              <MenuItem onClick={() => handleExportHealthCheck("json")}>
+              <MenuItem onClick={() => handleExportHealthCheck('json')}>
                 <ListItemIcon>
                   <FileDownloadIcon fontSize="small" />
                 </ListItemIcon>
@@ -6957,34 +6429,32 @@ const ServerListPage: React.FC = () => {
         onClose={handleContextMenuClose}
         anchorReference="anchorPosition"
         anchorPosition={
-          contextMenu !== null
-            ? { top: contextMenu.mouseY, left: contextMenu.mouseX }
-            : undefined
+          contextMenu !== null ? { top: contextMenu.mouseY, left: contextMenu.mouseX } : undefined
         }
       >
         <MenuItem onClick={handleCopyServiceJson}>
           <ListItemIcon>
             <ContentCopyIcon fontSize="small" />
           </ListItemIcon>
-          {t("serverList.contextMenu.copyJson")}
+          {t('serverList.contextMenu.copyJson')}
         </MenuItem>
         <MenuItem onClick={handleCopyInstanceId}>
           <ListItemIcon>
             <ContentCopyIcon fontSize="small" />
           </ListItemIcon>
-          {t("serverList.contextMenu.copyInstanceId")}
+          {t('serverList.contextMenu.copyInstanceId')}
         </MenuItem>
         <MenuItem onClick={handleCopyHostname}>
           <ListItemIcon>
             <ContentCopyIcon fontSize="small" />
           </ListItemIcon>
-          {t("serverList.contextMenu.copyHostname")}
+          {t('serverList.contextMenu.copyHostname')}
         </MenuItem>
         <MenuItem onClick={handleCopyAddress}>
           <ListItemIcon>
             <ContentCopyIcon fontSize="small" />
           </ListItemIcon>
-          {t("serverList.contextMenu.copyAddress")}
+          {t('serverList.contextMenu.copyAddress')}
         </MenuItem>
         {contextMenu?.service && (
           <MenuItem
@@ -6998,7 +6468,7 @@ const ServerListPage: React.FC = () => {
             <ListItemIcon>
               <NetworkCheckIcon fontSize="small" />
             </ListItemIcon>
-            {t("serverList.contextMenu.healthCheck")}
+            {t('serverList.contextMenu.healthCheck')}
           </MenuItem>
         )}
       </Menu>

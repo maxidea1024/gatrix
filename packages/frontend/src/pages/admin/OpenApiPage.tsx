@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo } from 'react';
 import {
   Box,
   Paper,
@@ -10,10 +10,10 @@ import {
   Chip,
   Stack,
   useTheme,
-} from "@mui/material";
-import { useTranslation } from "react-i18next";
-import SwaggerUI from "swagger-ui-react";
-import "swagger-ui-react/swagger-ui.css";
+} from '@mui/material';
+import { useTranslation } from 'react-i18next';
+import SwaggerUI from 'swagger-ui-react';
+import 'swagger-ui-react/swagger-ui.css';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -40,90 +40,73 @@ export const OpenApiPage: React.FC = () => {
   const { t } = useTranslation();
   const theme = useTheme();
   const [tabValue, setTabValue] = useState(0);
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) =>
-    setTabValue(newValue);
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => setTabValue(newValue);
   const specs = useMemo(
     () => ({
       admin: createAdminApiSpec(),
       server: createServerSdkApiSpec(),
       client: createClientSdkApiSpec(),
     }),
-    [],
+    []
   );
 
   return (
     <Box sx={{ p: 3 }}>
       <Box sx={{ mb: 3 }}>
-        <Typography
-          variant="h5"
-          component="h1"
-          sx={{ mb: 0.5, fontWeight: 700 }}
-        >
-          {t("sidebar.openApi")}
+        <Typography variant="h5" component="h1" sx={{ mb: 0.5, fontWeight: 700 }}>
+          {t('sidebar.openApi')}
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          {t("openApi.description")}
+          {t('openApi.description')}
         </Typography>
       </Box>
-      <Paper sx={{ backgroundColor: "background.paper", borderRadius: 1 }}>
+      <Paper sx={{ backgroundColor: 'background.paper', borderRadius: 1 }}>
         <Tabs
           value={tabValue}
           onChange={handleTabChange}
           aria-label="API documentation tabs"
           sx={{
             borderBottom: 1,
-            borderColor: "divider",
-            backgroundColor: "background.paper",
-            "& .MuiTab-root": {
-              textTransform: "none",
-              fontSize: "0.95rem",
+            borderColor: 'divider',
+            backgroundColor: 'background.paper',
+            '& .MuiTab-root': {
+              textTransform: 'none',
+              fontSize: '0.95rem',
               fontWeight: 500,
               minHeight: 48,
             },
           }}
         >
-          <Tab
-            label="Admin API"
-            id="api-tab-0"
-            aria-controls="api-tabpanel-0"
-          />
-          <Tab
-            label="Server SDK API"
-            id="api-tab-1"
-            aria-controls="api-tabpanel-1"
-          />
-          <Tab
-            label="Client SDK API"
-            id="api-tab-2"
-            aria-controls="api-tabpanel-2"
-          />
+          <Tab label="Admin API" id="api-tab-0" aria-controls="api-tabpanel-0" />
+          <Tab label="Server SDK API" id="api-tab-1" aria-controls="api-tabpanel-1" />
+          <Tab label="Client SDK API" id="api-tab-2" aria-controls="api-tabpanel-2" />
         </Tabs>
         <TabPanel value={tabValue} index={0}>
           <Box sx={{ p: 2 }}>
             <Card
               sx={{
                 mb: 2,
-                backgroundColor: "rgba(244, 67, 54, 0.05)",
+                backgroundColor: 'rgba(244, 67, 54, 0.05)',
                 borderLeft: `4px solid ${theme.palette.error.main}`,
               }}
             >
-              <CardContent sx={{ py: 1.5, px: 2, "&:last-child": { pb: 1.5 } }}>
+              <CardContent sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
                 <Stack direction="row" spacing={1} sx={{ mb: 1 }}>
                   <Chip
-                    label={t("openApi.adminOnly")}
+                    label={t('openApi.adminOnly')}
                     color="error"
                     size="small"
                     variant="outlined"
                   />
                   <Chip
-                    label={t("openApi.authRequired")}
+                    label={t('openApi.authRequired')}
                     color="warning"
                     size="small"
                     variant="outlined"
                   />
                 </Stack>
                 <Typography variant="body2" color="text.secondary">
-                  {t("openApi.adminDescription")}
+                  {t('openApi.adminDescription')}
                 </Typography>
               </CardContent>
             </Card>
@@ -135,27 +118,27 @@ export const OpenApiPage: React.FC = () => {
             <Card
               sx={{
                 mb: 2,
-                backgroundColor: "rgba(33, 150, 243, 0.05)",
+                backgroundColor: 'rgba(33, 150, 243, 0.05)',
                 borderLeft: `4px solid ${theme.palette.primary.main}`,
               }}
             >
-              <CardContent sx={{ py: 1.5, px: 2, "&:last-child": { pb: 1.5 } }}>
+              <CardContent sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
                 <Stack direction="row" spacing={1} sx={{ mb: 1 }}>
                   <Chip
-                    label={t("openApi.serverSdk")}
+                    label={t('openApi.serverSdk')}
                     color="primary"
                     size="small"
                     variant="outlined"
                   />
                   <Chip
-                    label={t("openApi.apiTokenRequired")}
+                    label={t('openApi.apiTokenRequired')}
                     color="warning"
                     size="small"
                     variant="outlined"
                   />
                 </Stack>
                 <Typography variant="body2" color="text.secondary">
-                  {t("openApi.serverSdkDescription")}
+                  {t('openApi.serverSdkDescription')}
                 </Typography>
               </CardContent>
             </Card>
@@ -167,27 +150,27 @@ export const OpenApiPage: React.FC = () => {
             <Card
               sx={{
                 mb: 2,
-                backgroundColor: "rgba(76, 175, 80, 0.05)",
+                backgroundColor: 'rgba(76, 175, 80, 0.05)',
                 borderLeft: `4px solid ${theme.palette.success.main}`,
               }}
             >
-              <CardContent sx={{ py: 1.5, px: 2, "&:last-child": { pb: 1.5 } }}>
+              <CardContent sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
                 <Stack direction="row" spacing={1} sx={{ mb: 1 }}>
                   <Chip
-                    label={t("openApi.clientSdk")}
+                    label={t('openApi.clientSdk')}
                     color="success"
                     size="small"
                     variant="outlined"
                   />
                   <Chip
-                    label={t("openApi.apiTokenRequired")}
+                    label={t('openApi.apiTokenRequired')}
                     color="warning"
                     size="small"
                     variant="outlined"
                   />
                 </Stack>
                 <Typography variant="body2" color="text.secondary">
-                  {t("openApi.clientSdkDescription")}
+                  {t('openApi.clientSdkDescription')}
                 </Typography>
               </CardContent>
             </Card>
@@ -201,13 +184,13 @@ export const OpenApiPage: React.FC = () => {
 
 const SwaggerUIWrapper: React.FC<{ spec: any }> = ({ spec }) => {
   // Get the API base URL from environment or use relative path
-  const apiBaseUrl = import.meta.env.VITE_API_URL || "/api/v1";
+  const apiBaseUrl = import.meta.env.VITE_API_URL || '/api/v1';
 
   // Update spec servers to use the correct API URL
   const updatedSpec = {
     ...spec,
     servers: [
-      { url: apiBaseUrl, description: "Current Environment" },
+      { url: apiBaseUrl, description: 'Current Environment' },
       ...(spec.servers?.slice(1) || []),
     ],
   };
@@ -215,73 +198,73 @@ const SwaggerUIWrapper: React.FC<{ spec: any }> = ({ spec }) => {
   return (
     <Box
       sx={{
-        backgroundColor: "#fff",
+        backgroundColor: '#fff',
         borderRadius: 1,
-        "& .swagger-ui": {
+        '& .swagger-ui': {
           padding: 0,
-          backgroundColor: "transparent",
-          color: "#3b4151",
+          backgroundColor: 'transparent',
+          color: '#3b4151',
         },
-        "& .swagger-ui .topbar": { display: "none" },
-        "& .swagger-ui .scheme-container": {
-          backgroundColor: "transparent",
-          padding: "0 !important",
+        '& .swagger-ui .topbar': { display: 'none' },
+        '& .swagger-ui .scheme-container': {
+          backgroundColor: 'transparent',
+          padding: '0 !important',
         },
-        "& .swagger-ui .info": { color: "#3b4151" },
-        "& .swagger-ui .info .title": { color: "#3b4151", fontWeight: 700 },
-        "& .swagger-ui .info .description": { color: "#6b7280" },
-        "& .swagger-ui .opblock": { borderColor: "#e5e7eb" },
-        "& .swagger-ui .opblock-summary": {
-          backgroundColor: "#f9fafb",
+        '& .swagger-ui .info': { color: '#3b4151' },
+        '& .swagger-ui .info .title': { color: '#3b4151', fontWeight: 700 },
+        '& .swagger-ui .info .description': { color: '#6b7280' },
+        '& .swagger-ui .opblock': { borderColor: '#e5e7eb' },
+        '& .swagger-ui .opblock-summary': {
+          backgroundColor: '#f9fafb',
         },
-        "& .swagger-ui .opblock-summary-description": { color: "#3b4151" },
-        "& .swagger-ui .opblock-summary-path": { color: "#3b4151" },
-        "& .swagger-ui .parameter__name": { color: "#3b4151", fontWeight: 600 },
-        "& .swagger-ui .parameter__type": { color: "#6b7280" },
-        "& .swagger-ui .response-col_description": { color: "#3b4151" },
-        "& .swagger-ui table": { color: "#3b4151" },
-        "& .swagger-ui table thead tr": {
-          backgroundColor: "#f9fafb",
+        '& .swagger-ui .opblock-summary-description': { color: '#3b4151' },
+        '& .swagger-ui .opblock-summary-path': { color: '#3b4151' },
+        '& .swagger-ui .parameter__name': { color: '#3b4151', fontWeight: 600 },
+        '& .swagger-ui .parameter__type': { color: '#6b7280' },
+        '& .swagger-ui .response-col_description': { color: '#3b4151' },
+        '& .swagger-ui table': { color: '#3b4151' },
+        '& .swagger-ui table thead tr': {
+          backgroundColor: '#f9fafb',
         },
-        "& .swagger-ui table tbody tr": {
-          backgroundColor: "#ffffff",
+        '& .swagger-ui table tbody tr': {
+          backgroundColor: '#ffffff',
         },
-        "& .swagger-ui .model": { color: "#3b4151" },
-        "& .swagger-ui .model-title": { color: "#3b4151" },
-        "& .swagger-ui .prop-type": { color: "#6b7280" },
-        "& .swagger-ui .response-col": { color: "#3b4151" },
-        "& .swagger-ui .response-col_status": { color: "#3b4151" },
-        "& .swagger-ui .response-col_links": { color: "#3b4151" },
-        "& .swagger-ui .tab": { color: "#3b4151" },
-        "& .swagger-ui .tab.active": {
-          color: "#2563eb",
-          borderBottomColor: "#2563eb",
+        '& .swagger-ui .model': { color: '#3b4151' },
+        '& .swagger-ui .model-title': { color: '#3b4151' },
+        '& .swagger-ui .prop-type': { color: '#6b7280' },
+        '& .swagger-ui .response-col': { color: '#3b4151' },
+        '& .swagger-ui .response-col_status': { color: '#3b4151' },
+        '& .swagger-ui .response-col_links': { color: '#3b4151' },
+        '& .swagger-ui .tab': { color: '#3b4151' },
+        '& .swagger-ui .tab.active': {
+          color: '#2563eb',
+          borderBottomColor: '#2563eb',
         },
-        "& .swagger-ui .tab:hover": { color: "#3b4151" },
-        "& .swagger-ui .btn": { color: "#3b4151" },
-        "& .swagger-ui .btn:hover": { backgroundColor: "#f3f4f6" },
-        "& .swagger-ui .model-box": { backgroundColor: "#f9fafb" },
-        "& .swagger-ui .model-box-control": { color: "#3b4151" },
-        "& .swagger-ui .model-hint": { color: "#6b7280" },
-        "& .swagger-ui .model-toggle": { color: "#3b4151" },
-        "& .swagger-ui .model-toggle:hover": { color: "#2563eb" },
-        "& .swagger-ui .model-toggle::after": { color: "#3b4151" },
-        "& .swagger-ui .model-toggle.collapsed::after": { color: "#3b4151" },
-        "& .swagger-ui .response": { color: "#3b4151" },
-        "& .swagger-ui .response-col_description__inner": { color: "#3b4151" },
-        "& .swagger-ui .response-col_description__inner p": {
-          color: "#3b4151",
+        '& .swagger-ui .tab:hover': { color: '#3b4151' },
+        '& .swagger-ui .btn': { color: '#3b4151' },
+        '& .swagger-ui .btn:hover': { backgroundColor: '#f3f4f6' },
+        '& .swagger-ui .model-box': { backgroundColor: '#f9fafb' },
+        '& .swagger-ui .model-box-control': { color: '#3b4151' },
+        '& .swagger-ui .model-hint': { color: '#6b7280' },
+        '& .swagger-ui .model-toggle': { color: '#3b4151' },
+        '& .swagger-ui .model-toggle:hover': { color: '#2563eb' },
+        '& .swagger-ui .model-toggle::after': { color: '#3b4151' },
+        '& .swagger-ui .model-toggle.collapsed::after': { color: '#3b4151' },
+        '& .swagger-ui .response': { color: '#3b4151' },
+        '& .swagger-ui .response-col_description__inner': { color: '#3b4151' },
+        '& .swagger-ui .response-col_description__inner p': {
+          color: '#3b4151',
         },
-        "& .swagger-ui .response-col_description__inner a": {
-          color: "#2563eb",
+        '& .swagger-ui .response-col_description__inner a': {
+          color: '#2563eb',
         },
-        "& .swagger-ui .opblock-description-text": { color: "#6b7280" },
-        "& .swagger-ui .opblock-external-docs-url": { color: "#2563eb" },
-        "& .swagger-ui .opblock-tag": { color: "#3b4151" },
-        "& .swagger-ui .opblock-tag-section": { color: "#3b4151" },
-        "& .swagger-ui .opblock-tag-section .opblock-tag": { color: "#3b4151" },
-        "& .swagger-ui .opblock-tag-section .opblock-tag:hover": {
-          color: "#2563eb",
+        '& .swagger-ui .opblock-description-text': { color: '#6b7280' },
+        '& .swagger-ui .opblock-external-docs-url': { color: '#2563eb' },
+        '& .swagger-ui .opblock-tag': { color: '#3b4151' },
+        '& .swagger-ui .opblock-tag-section': { color: '#3b4151' },
+        '& .swagger-ui .opblock-tag-section .opblock-tag': { color: '#3b4151' },
+        '& .swagger-ui .opblock-tag-section .opblock-tag:hover': {
+          color: '#2563eb',
         },
       }}
     >
@@ -291,7 +274,7 @@ const SwaggerUIWrapper: React.FC<{ spec: any }> = ({ spec }) => {
         tryItOutEnabled={true}
         requestInterceptor={(request) => {
           // Add credentials to requests
-          request.credentials = "include";
+          request.credentials = 'include';
           return request;
         }}
       />
@@ -301,472 +284,470 @@ const SwaggerUIWrapper: React.FC<{ spec: any }> = ({ spec }) => {
 
 function createAdminApiSpec() {
   return {
-    openapi: "3.0.0",
+    openapi: '3.0.0',
     info: {
-      title: "Admin API",
-      version: "1.0.0",
+      title: 'Admin API',
+      version: '1.0.0',
       description:
-        "Admin panel API for managing game worlds, users, configurations, and system settings. All endpoints require JWT authentication and admin privileges.",
-      contact: { name: "API Support" },
+        'Admin panel API for managing game worlds, users, configurations, and system settings. All endpoints require JWT authentication and admin privileges.',
+      contact: { name: 'API Support' },
     },
-    servers: [
-      { url: "http://localhost:5000/api/v1", description: "Development" },
-    ],
+    servers: [{ url: 'http://localhost:5000/api/v1', description: 'Development' }],
     paths: {
-      "/admin/dashboard": {
+      '/admin/dashboard': {
         get: {
-          summary: "Get admin dashboard data",
-          description: "Retrieve dashboard statistics and overview information",
-          tags: ["Dashboard"],
+          summary: 'Get admin dashboard data',
+          description: 'Retrieve dashboard statistics and overview information',
+          tags: ['Dashboard'],
           security: [{ bearerAuth: [] }],
           responses: {
-            "200": { description: "Dashboard data with statistics" },
-            "401": { description: "Unauthorized" },
+            '200': { description: 'Dashboard data with statistics' },
+            '401': { description: 'Unauthorized' },
           },
         },
       },
-      "/admin/stats": {
+      '/admin/stats': {
         get: {
-          summary: "Get system statistics",
-          description: "Retrieve overall system statistics",
-          tags: ["Statistics"],
+          summary: 'Get system statistics',
+          description: 'Retrieve overall system statistics',
+          tags: ['Statistics'],
           security: [{ bearerAuth: [] }],
-          responses: { "200": { description: "System statistics" } },
+          responses: { '200': { description: 'System statistics' } },
         },
       },
-      "/admin/stats/users": {
+      '/admin/stats/users': {
         get: {
-          summary: "Get user statistics",
-          description: "Retrieve user-related statistics",
-          tags: ["Statistics"],
+          summary: 'Get user statistics',
+          description: 'Retrieve user-related statistics',
+          tags: ['Statistics'],
           security: [{ bearerAuth: [] }],
-          responses: { "200": { description: "User statistics" } },
+          responses: { '200': { description: 'User statistics' } },
         },
       },
-      "/admin/health": {
+      '/admin/health': {
         get: {
-          summary: "Health check",
-          description: "Check system health status",
-          tags: ["System"],
+          summary: 'Health check',
+          description: 'Check system health status',
+          tags: ['System'],
           security: [{ bearerAuth: [] }],
-          responses: { "200": { description: "Health status" } },
+          responses: { '200': { description: 'Health status' } },
         },
       },
-      "/admin/game-worlds": {
+      '/admin/game-worlds': {
         get: {
-          summary: "List all game worlds",
-          description: "Retrieve all game worlds with pagination support",
-          tags: ["Game Worlds"],
+          summary: 'List all game worlds',
+          description: 'Retrieve all game worlds with pagination support',
+          tags: ['Game Worlds'],
           security: [{ bearerAuth: [] }],
-          responses: { "200": { description: "List of game worlds" } },
+          responses: { '200': { description: 'List of game worlds' } },
         },
         post: {
-          summary: "Create game world",
-          description: "Create a new game world",
-          tags: ["Game Worlds"],
+          summary: 'Create game world',
+          description: 'Create a new game world',
+          tags: ['Game Worlds'],
           security: [{ bearerAuth: [] }],
-          responses: { "201": { description: "Game world created" } },
+          responses: { '201': { description: 'Game world created' } },
         },
       },
-      "/admin/game-worlds/{id}": {
+      '/admin/game-worlds/{id}': {
         get: {
-          summary: "Get game world by ID",
-          tags: ["Game Worlds"],
+          summary: 'Get game world by ID',
+          tags: ['Game Worlds'],
           security: [{ bearerAuth: [] }],
           parameters: [
             {
-              name: "id",
-              in: "path",
+              name: 'id',
+              in: 'path',
               required: true,
-              schema: { type: "string" },
+              schema: { type: 'string' },
             },
           ],
-          responses: { "200": { description: "Game world details" } },
+          responses: { '200': { description: 'Game world details' } },
         },
         put: {
-          summary: "Update game world",
-          tags: ["Game Worlds"],
+          summary: 'Update game world',
+          tags: ['Game Worlds'],
           security: [{ bearerAuth: [] }],
           parameters: [
             {
-              name: "id",
-              in: "path",
+              name: 'id',
+              in: 'path',
               required: true,
-              schema: { type: "string" },
+              schema: { type: 'string' },
             },
           ],
-          responses: { "200": { description: "Game world updated" } },
+          responses: { '200': { description: 'Game world updated' } },
         },
         delete: {
-          summary: "Delete game world",
-          tags: ["Game Worlds"],
+          summary: 'Delete game world',
+          tags: ['Game Worlds'],
           security: [{ bearerAuth: [] }],
           parameters: [
             {
-              name: "id",
-              in: "path",
+              name: 'id',
+              in: 'path',
               required: true,
-              schema: { type: "string" },
+              schema: { type: 'string' },
             },
           ],
-          responses: { "204": { description: "Game world deleted" } },
+          responses: { '204': { description: 'Game world deleted' } },
         },
       },
-      "/admin/game-worlds/{id}/toggle-visibility": {
+      '/admin/game-worlds/{id}/toggle-visibility': {
         patch: {
-          summary: "Toggle game world visibility",
-          tags: ["Game Worlds"],
+          summary: 'Toggle game world visibility',
+          tags: ['Game Worlds'],
           security: [{ bearerAuth: [] }],
           parameters: [
             {
-              name: "id",
-              in: "path",
+              name: 'id',
+              in: 'path',
               required: true,
-              schema: { type: "string" },
+              schema: { type: 'string' },
             },
           ],
-          responses: { "200": { description: "Visibility toggled" } },
+          responses: { '200': { description: 'Visibility toggled' } },
         },
       },
-      "/admin/game-worlds/{id}/toggle-maintenance": {
+      '/admin/game-worlds/{id}/toggle-maintenance': {
         patch: {
-          summary: "Toggle maintenance mode",
-          tags: ["Game Worlds"],
+          summary: 'Toggle maintenance mode',
+          tags: ['Game Worlds'],
           security: [{ bearerAuth: [] }],
           parameters: [
             {
-              name: "id",
-              in: "path",
+              name: 'id',
+              in: 'path',
               required: true,
-              schema: { type: "string" },
+              schema: { type: 'string' },
             },
           ],
-          responses: { "200": { description: "Maintenance mode toggled" } },
+          responses: { '200': { description: 'Maintenance mode toggled' } },
         },
       },
-      "/admin/users": {
+      '/admin/users': {
         get: {
-          summary: "List all users",
-          description: "Retrieve all users with pagination and filtering",
-          tags: ["Users"],
+          summary: 'List all users',
+          description: 'Retrieve all users with pagination and filtering',
+          tags: ['Users'],
           security: [{ bearerAuth: [] }],
-          responses: { "200": { description: "List of users" } },
+          responses: { '200': { description: 'List of users' } },
         },
         post: {
-          summary: "Create user",
-          tags: ["Users"],
+          summary: 'Create user',
+          tags: ['Users'],
           security: [{ bearerAuth: [] }],
-          responses: { "201": { description: "User created" } },
+          responses: { '201': { description: 'User created' } },
         },
       },
-      "/admin/users/{id}": {
+      '/admin/users/{id}': {
         get: {
-          summary: "Get user by ID",
-          tags: ["Users"],
+          summary: 'Get user by ID',
+          tags: ['Users'],
           security: [{ bearerAuth: [] }],
           parameters: [
             {
-              name: "id",
-              in: "path",
+              name: 'id',
+              in: 'path',
               required: true,
-              schema: { type: "string" },
+              schema: { type: 'string' },
             },
           ],
-          responses: { "200": { description: "User details" } },
+          responses: { '200': { description: 'User details' } },
         },
         put: {
-          summary: "Update user",
-          tags: ["Users"],
+          summary: 'Update user',
+          tags: ['Users'],
           security: [{ bearerAuth: [] }],
           parameters: [
             {
-              name: "id",
-              in: "path",
+              name: 'id',
+              in: 'path',
               required: true,
-              schema: { type: "string" },
+              schema: { type: 'string' },
             },
           ],
-          responses: { "200": { description: "User updated" } },
+          responses: { '200': { description: 'User updated' } },
         },
         delete: {
-          summary: "Delete user",
-          tags: ["Users"],
+          summary: 'Delete user',
+          tags: ['Users'],
           security: [{ bearerAuth: [] }],
           parameters: [
             {
-              name: "id",
-              in: "path",
+              name: 'id',
+              in: 'path',
               required: true,
-              schema: { type: "string" },
+              schema: { type: 'string' },
             },
           ],
-          responses: { "204": { description: "User deleted" } },
+          responses: { '204': { description: 'User deleted' } },
         },
       },
-      "/admin/users/{id}/activate": {
+      '/admin/users/{id}/activate': {
         post: {
-          summary: "Activate user",
-          tags: ["Users"],
+          summary: 'Activate user',
+          tags: ['Users'],
           security: [{ bearerAuth: [] }],
           parameters: [
             {
-              name: "id",
-              in: "path",
+              name: 'id',
+              in: 'path',
               required: true,
-              schema: { type: "string" },
+              schema: { type: 'string' },
             },
           ],
-          responses: { "200": { description: "User activated" } },
+          responses: { '200': { description: 'User activated' } },
         },
       },
-      "/admin/users/{id}/suspend": {
+      '/admin/users/{id}/suspend': {
         post: {
-          summary: "Suspend user",
-          tags: ["Users"],
+          summary: 'Suspend user',
+          tags: ['Users'],
           security: [{ bearerAuth: [] }],
           parameters: [
             {
-              name: "id",
-              in: "path",
+              name: 'id',
+              in: 'path',
               required: true,
-              schema: { type: "string" },
+              schema: { type: 'string' },
             },
           ],
-          responses: { "200": { description: "User suspended" } },
+          responses: { '200': { description: 'User suspended' } },
         },
       },
-      "/admin/users/{id}/promote": {
+      '/admin/users/{id}/promote': {
         post: {
-          summary: "Promote user to admin",
-          tags: ["Users"],
+          summary: 'Promote user to admin',
+          tags: ['Users'],
           security: [{ bearerAuth: [] }],
           parameters: [
             {
-              name: "id",
-              in: "path",
+              name: 'id',
+              in: 'path',
               required: true,
-              schema: { type: "string" },
+              schema: { type: 'string' },
             },
           ],
-          responses: { "200": { description: "User promoted" } },
+          responses: { '200': { description: 'User promoted' } },
         },
       },
-      "/admin/users/{id}/demote": {
+      '/admin/users/{id}/demote': {
         post: {
-          summary: "Demote user from admin",
-          tags: ["Users"],
+          summary: 'Demote user from admin',
+          tags: ['Users'],
           security: [{ bearerAuth: [] }],
           parameters: [
             {
-              name: "id",
-              in: "path",
+              name: 'id',
+              in: 'path',
               required: true,
-              schema: { type: "string" },
+              schema: { type: 'string' },
             },
           ],
-          responses: { "200": { description: "User demoted" } },
+          responses: { '200': { description: 'User demoted' } },
         },
       },
-      "/admin/users/bulk/status": {
+      '/admin/users/bulk/status': {
         post: {
-          summary: "Bulk update user status",
-          tags: ["Users"],
+          summary: 'Bulk update user status',
+          tags: ['Users'],
           security: [{ bearerAuth: [] }],
-          responses: { "200": { description: "Users updated" } },
+          responses: { '200': { description: 'Users updated' } },
         },
       },
-      "/admin/users/bulk/role": {
+      '/admin/users/bulk/role': {
         post: {
-          summary: "Bulk update user roles",
-          tags: ["Users"],
+          summary: 'Bulk update user roles',
+          tags: ['Users'],
           security: [{ bearerAuth: [] }],
-          responses: { "200": { description: "User roles updated" } },
+          responses: { '200': { description: 'User roles updated' } },
         },
       },
-      "/admin/pending-users": {
+      '/admin/pending-users': {
         get: {
-          summary: "Get pending user approvals",
-          tags: ["Users"],
+          summary: 'Get pending user approvals',
+          tags: ['Users'],
           security: [{ bearerAuth: [] }],
-          responses: { "200": { description: "Pending users" } },
+          responses: { '200': { description: 'Pending users' } },
         },
       },
-      "/admin/users/{id}/approve": {
+      '/admin/users/{id}/approve': {
         post: {
-          summary: "Approve pending user",
-          tags: ["Users"],
+          summary: 'Approve pending user',
+          tags: ['Users'],
           security: [{ bearerAuth: [] }],
           parameters: [
             {
-              name: "id",
-              in: "path",
+              name: 'id',
+              in: 'path',
               required: true,
-              schema: { type: "string" },
+              schema: { type: 'string' },
             },
           ],
-          responses: { "200": { description: "User approved" } },
+          responses: { '200': { description: 'User approved' } },
         },
       },
-      "/admin/users/{id}/reject": {
+      '/admin/users/{id}/reject': {
         post: {
-          summary: "Reject pending user",
-          tags: ["Users"],
+          summary: 'Reject pending user',
+          tags: ['Users'],
           security: [{ bearerAuth: [] }],
           parameters: [
             {
-              name: "id",
-              in: "path",
+              name: 'id',
+              in: 'path',
               required: true,
-              schema: { type: "string" },
+              schema: { type: 'string' },
             },
           ],
-          responses: { "200": { description: "User rejected" } },
+          responses: { '200': { description: 'User rejected' } },
         },
       },
-      "/admin/audit-logs": {
+      '/admin/audit-logs': {
         get: {
-          summary: "Get audit logs",
-          description: "Retrieve audit logs with filtering and pagination",
-          tags: ["Audit"],
+          summary: 'Get audit logs',
+          description: 'Retrieve audit logs with filtering and pagination',
+          tags: ['Audit'],
           security: [{ bearerAuth: [] }],
-          responses: { "200": { description: "Audit logs" } },
+          responses: { '200': { description: 'Audit logs' } },
         },
       },
-      "/admin/audit-logs/stats": {
+      '/admin/audit-logs/stats': {
         get: {
-          summary: "Get audit statistics",
-          tags: ["Audit"],
+          summary: 'Get audit statistics',
+          tags: ['Audit'],
           security: [{ bearerAuth: [] }],
-          responses: { "200": { description: "Audit statistics" } },
+          responses: { '200': { description: 'Audit statistics' } },
         },
       },
-      "/admin/audit-logs/cleanup": {
+      '/admin/audit-logs/cleanup': {
         post: {
-          summary: "Clean up old audit logs",
-          tags: ["Audit"],
+          summary: 'Clean up old audit logs',
+          tags: ['Audit'],
           security: [{ bearerAuth: [] }],
-          responses: { "200": { description: "Cleanup completed" } },
+          responses: { '200': { description: 'Cleanup completed' } },
         },
       },
-      "/admin/api-tokens": {
+      '/admin/api-tokens': {
         get: {
-          summary: "List API tokens",
-          tags: ["API Tokens"],
+          summary: 'List API tokens',
+          tags: ['API Tokens'],
           security: [{ bearerAuth: [] }],
-          responses: { "200": { description: "List of API tokens" } },
+          responses: { '200': { description: 'List of API tokens' } },
         },
         post: {
-          summary: "Create API token",
-          tags: ["API Tokens"],
+          summary: 'Create API token',
+          tags: ['API Tokens'],
           security: [{ bearerAuth: [] }],
-          responses: { "201": { description: "API token created" } },
+          responses: { '201': { description: 'API token created' } },
         },
       },
-      "/admin/api-tokens/{id}": {
+      '/admin/api-tokens/{id}': {
         put: {
-          summary: "Update API token",
-          tags: ["API Tokens"],
+          summary: 'Update API token',
+          tags: ['API Tokens'],
           security: [{ bearerAuth: [] }],
           parameters: [
             {
-              name: "id",
-              in: "path",
+              name: 'id',
+              in: 'path',
               required: true,
-              schema: { type: "string" },
+              schema: { type: 'string' },
             },
           ],
-          responses: { "200": { description: "API token updated" } },
+          responses: { '200': { description: 'API token updated' } },
         },
         delete: {
-          summary: "Delete API token",
-          tags: ["API Tokens"],
+          summary: 'Delete API token',
+          tags: ['API Tokens'],
           security: [{ bearerAuth: [] }],
           parameters: [
             {
-              name: "id",
-              in: "path",
+              name: 'id',
+              in: 'path',
               required: true,
-              schema: { type: "string" },
+              schema: { type: 'string' },
             },
           ],
-          responses: { "204": { description: "API token deleted" } },
+          responses: { '204': { description: 'API token deleted' } },
         },
       },
-      "/admin/api-tokens/{id}/regenerate": {
+      '/admin/api-tokens/{id}/regenerate': {
         post: {
-          summary: "Regenerate API token",
-          tags: ["API Tokens"],
+          summary: 'Regenerate API token',
+          tags: ['API Tokens'],
           security: [{ bearerAuth: [] }],
           parameters: [
             {
-              name: "id",
-              in: "path",
+              name: 'id',
+              in: 'path',
               required: true,
-              schema: { type: "string" },
+              schema: { type: 'string' },
             },
           ],
-          responses: { "200": { description: "API token regenerated" } },
+          responses: { '200': { description: 'API token regenerated' } },
         },
       },
 
-      "/admin/maintenance": {
+      '/admin/maintenance': {
         get: {
-          summary: "Get maintenance status",
-          tags: ["Maintenance"],
+          summary: 'Get maintenance status',
+          tags: ['Maintenance'],
           security: [{ bearerAuth: [] }],
-          responses: { "200": { description: "Maintenance status" } },
+          responses: { '200': { description: 'Maintenance status' } },
         },
         post: {
-          summary: "Set maintenance status",
-          tags: ["Maintenance"],
+          summary: 'Set maintenance status',
+          tags: ['Maintenance'],
           security: [{ bearerAuth: [] }],
-          responses: { "200": { description: "Maintenance status updated" } },
+          responses: { '200': { description: 'Maintenance status updated' } },
         },
       },
-      "/admin/maintenance/templates": {
+      '/admin/maintenance/templates': {
         get: {
-          summary: "Get maintenance templates",
-          tags: ["Maintenance"],
+          summary: 'Get maintenance templates',
+          tags: ['Maintenance'],
           security: [{ bearerAuth: [] }],
-          responses: { "200": { description: "Maintenance templates" } },
+          responses: { '200': { description: 'Maintenance templates' } },
         },
         post: {
-          summary: "Save maintenance templates",
-          tags: ["Maintenance"],
+          summary: 'Save maintenance templates',
+          tags: ['Maintenance'],
           security: [{ bearerAuth: [] }],
-          responses: { "200": { description: "Templates saved" } },
+          responses: { '200': { description: 'Templates saved' } },
         },
       },
-      "/admin/campaigns": {
+      '/admin/campaigns': {
         get: {
-          summary: "List campaigns",
-          tags: ["Campaigns"],
+          summary: 'List campaigns',
+          tags: ['Campaigns'],
           security: [{ bearerAuth: [] }],
-          responses: { "200": { description: "List of campaigns" } },
+          responses: { '200': { description: 'List of campaigns' } },
         },
         post: {
-          summary: "Create campaign",
-          tags: ["Campaigns"],
+          summary: 'Create campaign',
+          tags: ['Campaigns'],
           security: [{ bearerAuth: [] }],
-          responses: { "201": { description: "Campaign created" } },
+          responses: { '201': { description: 'Campaign created' } },
         },
       },
-      "/admin/cache/clear": {
+      '/admin/cache/clear': {
         post: {
-          summary: "Clear system cache",
-          tags: ["System"],
+          summary: 'Clear system cache',
+          tags: ['System'],
           security: [{ bearerAuth: [] }],
-          responses: { "200": { description: "Cache cleared" } },
+          responses: { '200': { description: 'Cache cleared' } },
         },
       },
     },
     components: {
       securitySchemes: {
         bearerAuth: {
-          type: "http",
-          scheme: "bearer",
-          bearerFormat: "JWT",
-          description: "JWT token from admin login",
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+          description: 'JWT token from admin login',
         },
       },
     },
@@ -775,252 +756,250 @@ function createAdminApiSpec() {
 
 function createServerSdkApiSpec() {
   return {
-    openapi: "3.0.0",
+    openapi: '3.0.0',
     info: {
-      title: "Server SDK API",
-      version: "1.0.0",
+      title: 'Server SDK API',
+      version: '1.0.0',
       description:
-        "Server-side SDK API for game servers. All endpoints require X-API-Token header authentication. Used by game servers to interact with the platform.",
-      contact: { name: "API Support" },
+        'Server-side SDK API for game servers. All endpoints require X-API-Token header authentication. Used by game servers to interact with the platform.',
+      contact: { name: 'API Support' },
     },
     servers: [
-      { url: "http://localhost:5000/api/v1", description: "Development" },
-      { url: "https://api.example.com/api/v1", description: "Production" },
+      { url: 'http://localhost:5000/api/v1', description: 'Development' },
+      { url: 'https://api.example.com/api/v1', description: 'Production' },
     ],
     paths: {
-      "/server/test": {
+      '/server/test': {
         get: {
-          summary: "Test server SDK authentication",
-          description: "Verify that the API token is valid and working",
-          tags: ["Authentication"],
+          summary: 'Test server SDK authentication',
+          description: 'Verify that the API token is valid and working',
+          tags: ['Authentication'],
           security: [{ apiKeyHeader: [] }],
           responses: {
-            "200": {
-              description: "Authentication successful with token details",
+            '200': {
+              description: 'Authentication successful with token details',
             },
           },
         },
       },
-      "/server/game-worlds": {
+      '/server/game-worlds': {
         get: {
-          summary: "Get active game worlds",
-          description:
-            "Retrieve list of active game worlds available for the server",
-          tags: ["Game Worlds"],
+          summary: 'Get active game worlds',
+          description: 'Retrieve list of active game worlds available for the server',
+          tags: ['Game Worlds'],
           security: [{ apiKeyHeader: [] }],
-          responses: { "200": { description: "List of active game worlds" } },
+          responses: { '200': { description: 'List of active game worlds' } },
         },
       },
-      "/server/game-worlds/{id}": {
+      '/server/game-worlds/{id}': {
         get: {
-          summary: "Get game world by ID",
-          tags: ["Game Worlds"],
+          summary: 'Get game world by ID',
+          tags: ['Game Worlds'],
           security: [{ apiKeyHeader: [] }],
           parameters: [
             {
-              name: "id",
-              in: "path",
+              name: 'id',
+              in: 'path',
               required: true,
-              schema: { type: "string" },
+              schema: { type: 'string' },
             },
           ],
-          responses: { "200": { description: "Game world details" } },
+          responses: { '200': { description: 'Game world details' } },
         },
       },
-      "/server/game-worlds/world/{worldId}": {
+      '/server/game-worlds/world/{worldId}': {
         get: {
-          summary: "Get game world by world ID",
-          tags: ["Game Worlds"],
+          summary: 'Get game world by world ID',
+          tags: ['Game Worlds'],
           security: [{ apiKeyHeader: [] }],
           parameters: [
             {
-              name: "worldId",
-              in: "path",
+              name: 'worldId',
+              in: 'path',
               required: true,
-              schema: { type: "string" },
+              schema: { type: 'string' },
             },
           ],
-          responses: { "200": { description: "Game world details" } },
+          responses: { '200': { description: 'Game world details' } },
         },
       },
-      "/server/auth/verify-token": {
+      '/server/auth/verify-token': {
         post: {
-          summary: "Verify JWT token",
-          description:
-            "Verify a JWT token without requiring API token authentication",
-          tags: ["Authentication"],
-          responses: { "200": { description: "Token verification result" } },
+          summary: 'Verify JWT token',
+          description: 'Verify a JWT token without requiring API token authentication',
+          tags: ['Authentication'],
+          responses: { '200': { description: 'Token verification result' } },
         },
       },
-      "/server/auth/user/{id}": {
+      '/server/auth/user/{id}': {
         get: {
-          summary: "Get user by ID",
-          tags: ["Users"],
+          summary: 'Get user by ID',
+          tags: ['Users'],
           security: [{ apiKeyHeader: [] }],
           parameters: [
             {
-              name: "id",
-              in: "path",
+              name: 'id',
+              in: 'path',
               required: true,
-              schema: { type: "string" },
+              schema: { type: 'string' },
             },
           ],
-          responses: { "200": { description: "User details" } },
+          responses: { '200': { description: 'User details' } },
         },
       },
-      "/server/users/sync": {
+      '/server/users/sync': {
         get: {
-          summary: "Sync users",
-          description: "Synchronize user data with the server",
-          tags: ["Users"],
+          summary: 'Sync users',
+          description: 'Synchronize user data with the server',
+          tags: ['Users'],
           security: [{ apiKeyHeader: [] }],
-          responses: { "200": { description: "User sync result" } },
+          responses: { '200': { description: 'User sync result' } },
         },
       },
-      "/server/users/{id}": {
+      '/server/users/{id}': {
         get: {
-          summary: "Get user by ID",
-          tags: ["Users"],
+          summary: 'Get user by ID',
+          tags: ['Users'],
           security: [{ apiKeyHeader: [] }],
           parameters: [
             {
-              name: "id",
-              in: "path",
+              name: 'id',
+              in: 'path',
               required: true,
-              schema: { type: "string" },
+              schema: { type: 'string' },
             },
           ],
-          responses: { "200": { description: "User details" } },
+          responses: { '200': { description: 'User details' } },
         },
       },
-      "/server/users/batch": {
+      '/server/users/batch': {
         post: {
-          summary: "Get multiple users by IDs",
-          description: "Retrieve multiple users in a single request",
-          tags: ["Users"],
+          summary: 'Get multiple users by IDs',
+          description: 'Retrieve multiple users in a single request',
+          tags: ['Users'],
           security: [{ apiKeyHeader: [] }],
-          responses: { "200": { description: "List of users" } },
+          responses: { '200': { description: 'List of users' } },
         },
       },
-      "/server/notifications": {
+      '/server/notifications': {
         post: {
-          summary: "Send notification",
-          description: "Send a notification to users",
-          tags: ["Notifications"],
+          summary: 'Send notification',
+          description: 'Send a notification to users',
+          tags: ['Notifications'],
           security: [{ apiKeyHeader: [] }],
-          responses: { "200": { description: "Notification sent" } },
+          responses: { '200': { description: 'Notification sent' } },
         },
       },
-      "/server/notifications/bulk": {
+      '/server/notifications/bulk': {
         post: {
-          summary: "Send bulk notifications",
-          description: "Send notifications to multiple users",
-          tags: ["Notifications"],
+          summary: 'Send bulk notifications',
+          description: 'Send notifications to multiple users',
+          tags: ['Notifications'],
           security: [{ apiKeyHeader: [] }],
-          responses: { "200": { description: "Bulk notifications sent" } },
+          responses: { '200': { description: 'Bulk notifications sent' } },
         },
       },
-      "/server/files/upload-url": {
+      '/server/files/upload-url': {
         post: {
-          summary: "Get file upload URL",
-          description: "Get a pre-signed URL for file upload",
-          tags: ["Files"],
+          summary: 'Get file upload URL',
+          description: 'Get a pre-signed URL for file upload',
+          tags: ['Files'],
           security: [{ apiKeyHeader: [] }],
-          responses: { "200": { description: "Upload URL" } },
+          responses: { '200': { description: 'Upload URL' } },
         },
       },
-      "/server/files/{fileId}": {
+      '/server/files/{fileId}': {
         get: {
-          summary: "Get file info",
-          tags: ["Files"],
+          summary: 'Get file info',
+          tags: ['Files'],
           security: [{ apiKeyHeader: [] }],
           parameters: [
             {
-              name: "fileId",
-              in: "path",
+              name: 'fileId',
+              in: 'path',
               required: true,
-              schema: { type: "string" },
+              schema: { type: 'string' },
             },
           ],
-          responses: { "200": { description: "File information" } },
+          responses: { '200': { description: 'File information' } },
         },
       },
-      "/server/chat/register": {
+      '/server/chat/register': {
         post: {
-          summary: "Register chat server",
-          description: "Register a game server for chat functionality",
-          tags: ["Chat"],
+          summary: 'Register chat server',
+          description: 'Register a game server for chat functionality',
+          tags: ['Chat'],
           security: [{ apiKeyHeader: [] }],
-          responses: { "200": { description: "Server registered" } },
+          responses: { '200': { description: 'Server registered' } },
         },
       },
-      "/server/chat/unregister": {
+      '/server/chat/unregister': {
         post: {
-          summary: "Unregister chat server",
-          tags: ["Chat"],
+          summary: 'Unregister chat server',
+          tags: ['Chat'],
           security: [{ apiKeyHeader: [] }],
-          responses: { "200": { description: "Server unregistered" } },
+          responses: { '200': { description: 'Server unregistered' } },
         },
       },
-      "/server/chat/stats": {
+      '/server/chat/stats': {
         post: {
-          summary: "Report chat statistics",
-          tags: ["Chat"],
+          summary: 'Report chat statistics',
+          tags: ['Chat'],
           security: [{ apiKeyHeader: [] }],
-          responses: { "200": { description: "Stats reported" } },
+          responses: { '200': { description: 'Stats reported' } },
         },
       },
-      "/server/chat/activity": {
+      '/server/chat/activity': {
         post: {
-          summary: "Report chat activity",
-          tags: ["Chat"],
+          summary: 'Report chat activity',
+          tags: ['Chat'],
           security: [{ apiKeyHeader: [] }],
-          responses: { "200": { description: "Activity reported" } },
+          responses: { '200': { description: 'Activity reported' } },
         },
       },
-      "/server/chat/servers": {
+      '/server/chat/servers': {
         get: {
-          summary: "Get registered chat servers",
-          tags: ["Chat"],
+          summary: 'Get registered chat servers',
+          tags: ['Chat'],
           security: [{ apiKeyHeader: [] }],
-          responses: { "200": { description: "List of registered servers" } },
+          responses: { '200': { description: 'List of registered servers' } },
         },
       },
-      "/server/coupons/{code}/redeem": {
+      '/server/coupons/{code}/redeem': {
         post: {
-          summary: "Redeem coupon",
-          description: "Redeem a coupon code for a user",
-          tags: ["Coupons"],
+          summary: 'Redeem coupon',
+          description: 'Redeem a coupon code for a user',
+          tags: ['Coupons'],
           security: [{ apiKeyHeader: [] }],
           parameters: [
             {
-              name: "code",
-              in: "path",
+              name: 'code',
+              in: 'path',
               required: true,
-              schema: { type: "string" },
+              schema: { type: 'string' },
             },
           ],
-          responses: { "200": { description: "Coupon redeemed" } },
+          responses: { '200': { description: 'Coupon redeemed' } },
         },
       },
 
-      "/server/services": {
+      '/server/services': {
         get: {
-          summary: "Service discovery",
-          description: "Discover available services",
-          tags: ["Services"],
+          summary: 'Service discovery',
+          description: 'Discover available services',
+          tags: ['Services'],
           security: [{ apiKeyHeader: [] }],
-          responses: { "200": { description: "Available services" } },
+          responses: { '200': { description: 'Available services' } },
         },
       },
     },
     components: {
       securitySchemes: {
         apiKeyHeader: {
-          type: "apiKey",
-          in: "header",
-          name: "X-API-Token",
-          description: "API token for server authentication",
+          type: 'apiKey',
+          in: 'header',
+          name: 'X-API-Token',
+          description: 'API token for server authentication',
         },
       },
     },
@@ -1029,85 +1008,79 @@ function createServerSdkApiSpec() {
 
 function createClientSdkApiSpec() {
   return {
-    openapi: "3.0.0",
+    openapi: '3.0.0',
     info: {
-      title: "Client SDK API",
-      version: "1.0.0",
+      title: 'Client SDK API',
+      version: '1.0.0',
       description:
-        "Client-side SDK API for game client applications. Some endpoints are public, others require X-API-Token header authentication. Used by game clients to fetch configuration and game data.",
-      contact: { name: "API Support" },
+        'Client-side SDK API for game client applications. Some endpoints are public, others require X-API-Token header authentication. Used by game clients to fetch configuration and game data.',
+      contact: { name: 'API Support' },
     },
-    servers: [
-      { url: "http://localhost:5000/api/v1", description: "Development" },
-    ],
+    servers: [{ url: 'http://localhost:5000/api/v1', description: 'Development' }],
     paths: {
-      "/client/test": {
+      '/client/test': {
         get: {
-          summary: "Test client SDK authentication",
-          description: "Verify that the API token is valid and working",
-          tags: ["Authentication"],
+          summary: 'Test client SDK authentication',
+          description: 'Verify that the API token is valid and working',
+          tags: ['Authentication'],
           security: [{ apiKeyHeader: [] }],
           responses: {
-            "200": {
-              description: "Authentication successful with token details",
+            '200': {
+              description: 'Authentication successful with token details',
             },
           },
         },
       },
-      "/client/client-version": {
+      '/client/client-version': {
         get: {
-          summary: "Get client version info",
-          description:
-            "Retrieve current client version information (public endpoint)",
-          tags: ["Version"],
-          responses: { "200": { description: "Client version information" } },
+          summary: 'Get client version info',
+          description: 'Retrieve current client version information (public endpoint)',
+          tags: ['Version'],
+          responses: { '200': { description: 'Client version information' } },
         },
       },
-      "/client/game-worlds": {
+      '/client/game-worlds': {
         get: {
-          summary: "Get game worlds",
-          description:
-            "Retrieve list of available game worlds (public endpoint)",
-          tags: ["Game Worlds"],
-          responses: { "200": { description: "List of game worlds" } },
+          summary: 'Get game worlds',
+          description: 'Retrieve list of available game worlds (public endpoint)',
+          tags: ['Game Worlds'],
+          responses: { '200': { description: 'List of game worlds' } },
         },
       },
-      "/client/cache-stats": {
+      '/client/cache-stats': {
         get: {
-          summary: "Get cache statistics",
-          description: "Retrieve cache statistics (public endpoint)",
-          tags: ["Cache"],
-          responses: { "200": { description: "Cache stats" } },
+          summary: 'Get cache statistics',
+          description: 'Retrieve cache statistics (public endpoint)',
+          tags: ['Cache'],
+          responses: { '200': { description: 'Cache stats' } },
         },
       },
-      "/client/invalidate-cache": {
+      '/client/invalidate-cache': {
         post: {
-          summary: "Invalidate cache",
-          description: "Invalidate client-side cache (public endpoint)",
-          tags: ["Cache"],
-          responses: { "200": { description: "Cache invalidated" } },
+          summary: 'Invalidate cache',
+          description: 'Invalidate client-side cache (public endpoint)',
+          tags: ['Cache'],
+          responses: { '200': { description: 'Cache invalidated' } },
         },
       },
 
-      "/client/crashes/upload": {
+      '/client/crashes/upload': {
         post: {
-          summary: "Upload crash report",
-          description:
-            "Upload crash report with stack trace and context information",
-          tags: ["Crash Reports"],
+          summary: 'Upload crash report',
+          description: 'Upload crash report with stack trace and context information',
+          tags: ['Crash Reports'],
           security: [{ apiKeyHeader: [] }],
-          responses: { "200": { description: "Crash report received" } },
+          responses: { '200': { description: 'Crash report received' } },
         },
       },
     },
     components: {
       securitySchemes: {
         apiKeyHeader: {
-          type: "apiKey",
-          in: "header",
-          name: "X-API-Token",
-          description:
-            "API token for client authentication (optional for some endpoints)",
+          type: 'apiKey',
+          in: 'header',
+          name: 'X-API-Token',
+          description: 'API token for client authentication (optional for some endpoints)',
         },
       },
     },

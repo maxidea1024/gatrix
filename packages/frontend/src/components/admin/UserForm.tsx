@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -16,10 +16,10 @@ import {
   Typography,
   Chip,
   CircularProgress,
-} from "@mui/material";
-import { useForm, Controller } from "react-hook-form";
-import { User, Tag } from "@/types";
-import { TagService } from "@/services/tagService";
+} from '@mui/material';
+import { useForm, Controller } from 'react-hook-form';
+import { User, Tag } from '@/types';
+import { TagService } from '@/services/tagService';
 
 interface UserFormProps {
   open: boolean;
@@ -33,19 +33,13 @@ export interface UserFormData {
   name: string;
   email: string;
   password?: string;
-  role: "admin" | "user";
-  status: "pending" | "active" | "suspended" | "deleted";
+  role: 'admin' | 'user';
+  status: 'pending' | 'active' | 'suspended' | 'deleted';
   emailVerified: boolean;
   tags: number[];
 }
 
-const UserForm: React.FC<UserFormProps> = ({
-  open,
-  onClose,
-  onSubmit,
-  user,
-  loading = false,
-}) => {
+const UserForm: React.FC<UserFormProps> = ({ open, onClose, onSubmit, user, loading = false }) => {
   const [allTags, setAllTags] = useState<Tag[]>([]);
   const [selectedTags, setSelectedTags] = useState<number[]>([]);
   const [tagsLoading, setTagsLoading] = useState(false);
@@ -57,11 +51,11 @@ const UserForm: React.FC<UserFormProps> = ({
     formState: { errors },
   } = useForm<UserFormData>({
     defaultValues: {
-      name: "",
-      email: "",
-      password: "",
-      role: "user",
-      status: "active",
+      name: '',
+      email: '',
+      password: '',
+      role: 'user',
+      status: 'active',
       emailVerified: true,
       tags: [],
     },
@@ -88,11 +82,11 @@ const UserForm: React.FC<UserFormProps> = ({
       setSelectedTags(user.tags?.map((tag) => tag.id) || []);
     } else {
       reset({
-        name: "",
-        email: "",
-        password: "",
-        role: "user",
-        status: "active",
+        name: '',
+        email: '',
+        password: '',
+        role: 'user',
+        status: 'active',
         emailVerified: true,
         tags: [],
       });
@@ -106,7 +100,7 @@ const UserForm: React.FC<UserFormProps> = ({
       const tags = await TagService.getAllTags();
       setAllTags(tags);
     } catch (error) {
-      console.error("Failed to load tags:", error);
+      console.error('Failed to load tags:', error);
     } finally {
       setTagsLoading(false);
     }
@@ -114,9 +108,7 @@ const UserForm: React.FC<UserFormProps> = ({
 
   const handleTagToggle = (tagId: number) => {
     setSelectedTags((prev) =>
-      prev.includes(tagId)
-        ? prev.filter((id) => id !== tagId)
-        : [...prev, tagId],
+      prev.includes(tagId) ? prev.filter((id) => id !== tagId) : [...prev, tagId]
     );
   };
 
@@ -136,15 +128,15 @@ const UserForm: React.FC<UserFormProps> = ({
 
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
-      <DialogTitle>{user ? "Edit User" : "Add New User"}</DialogTitle>
+      <DialogTitle>{user ? 'Edit User' : 'Add New User'}</DialogTitle>
       <form onSubmit={handleSubmit(handleFormSubmit)}>
         <DialogContent>
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
             {/* Name */}
             <Controller
               name="name"
               control={control}
-              rules={{ required: "Name is required" }}
+              rules={{ required: 'Name is required' }}
               render={({ field }) => (
                 <TextField
                   {...field}
@@ -161,10 +153,10 @@ const UserForm: React.FC<UserFormProps> = ({
               name="email"
               control={control}
               rules={{
-                required: "Email is required",
+                required: 'Email is required',
                 pattern: {
                   value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                  message: "Invalid email address",
+                  message: 'Invalid email address',
                 },
               }}
               render={({ field }) => (
@@ -185,10 +177,10 @@ const UserForm: React.FC<UserFormProps> = ({
                 name="password"
                 control={control}
                 rules={{
-                  required: "Password is required",
+                  required: 'Password is required',
                   minLength: {
                     value: 6,
-                    message: "Password must be at least 6 characters",
+                    message: 'Password must be at least 6 characters',
                   },
                 }}
                 render={({ field }) => (
@@ -256,27 +248,19 @@ const UserForm: React.FC<UserFormProps> = ({
               {tagsLoading ? (
                 <CircularProgress size={20} />
               ) : (
-                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
                   {allTags.map((tag) => (
                     <Chip
                       key={tag.id}
                       label={tag.name}
                       onClick={() => handleTagToggle(tag.id)}
-                      color={
-                        selectedTags.includes(tag.id) ? "primary" : "default"
-                      }
-                      variant={
-                        selectedTags.includes(tag.id) ? "filled" : "outlined"
-                      }
+                      color={selectedTags.includes(tag.id) ? 'primary' : 'default'}
+                      variant={selectedTags.includes(tag.id) ? 'filled' : 'outlined'}
                       sx={{
-                        backgroundColor: selectedTags.includes(tag.id)
-                          ? tag.color
-                          : "transparent",
+                        backgroundColor: selectedTags.includes(tag.id) ? tag.color : 'transparent',
                         borderColor: tag.color,
-                        color: selectedTags.includes(tag.id)
-                          ? "white"
-                          : tag.color,
-                        "&:hover": {
+                        color: selectedTags.includes(tag.id) ? 'white' : tag.color,
+                        '&:hover': {
                           backgroundColor: selectedTags.includes(tag.id)
                             ? tag.color
                             : `${tag.color}20`,
@@ -304,7 +288,7 @@ const UserForm: React.FC<UserFormProps> = ({
             disabled={loading}
             startIcon={loading ? <CircularProgress size={20} /> : null}
           >
-            {loading ? "Saving..." : user ? "Update" : "Create"}
+            {loading ? 'Saving...' : user ? 'Update' : 'Create'}
           </Button>
         </DialogActions>
       </form>

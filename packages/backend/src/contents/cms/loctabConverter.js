@@ -2,13 +2,13 @@
 
 /**
  * Localization Table Converter
- * 
+ *
  * Converts loctab-source CSV file to loctab JSON format for admin tool usage.
- * 
+ *
  * Usage:
  *   node loctabConverter.js
  *   node loctabConverter.js <input-file> <output-file>
- * 
+ *
  * Default:
  *   Input: loctab-source
  *   Output: loctab
@@ -26,11 +26,11 @@ function parseCSVLine(line) {
   const fields = [];
   let currentField = '';
   let insideQuotes = false;
-  
+
   for (let i = 0; i < line.length; i++) {
     const char = line[i];
     const nextChar = line[i + 1];
-    
+
     if (char === '"') {
       if (insideQuotes && nextChar === '"') {
         // Escaped quote ("") -> single quote
@@ -48,10 +48,10 @@ function parseCSVLine(line) {
       currentField += char;
     }
   }
-  
+
   // Add last field
   fields.push(currentField);
-  
+
   return fields;
 }
 
@@ -64,26 +64,26 @@ function convertLoctab(inputPath, outputPath) {
   console.log('Converting localization table...');
   console.log(`Input: ${inputPath}`);
   console.log(`Output: ${outputPath}\n`);
-  
+
   // Read input file
   if (!fs.existsSync(inputPath)) {
     console.error(`❌ Error: Input file not found: ${inputPath}`);
     process.exit(1);
   }
-  
+
   const content = fs.readFileSync(inputPath, 'utf8');
   const lines = content.split('\n');
-  
+
   if (lines.length < 2) {
     console.error('❌ Error: Input file must have at least 2 lines (header + data)');
     process.exit(1);
   }
-  
+
   // Parse header (first line) - just for validation
   const header = parseCSVLine(lines[0]);
   console.log(`Header: ${header.join(', ')}`);
   console.log(`Total lines: ${lines.length.toLocaleString()}\n`);
-  
+
   // Build localization object (only Chinese translation needed)
   const loctab = {};
 
@@ -168,29 +168,30 @@ function convertLoctab(inputPath, outputPath) {
       if (processedCount % 10000 === 0) {
         console.log(`Processed ${processedCount.toLocaleString()} entries...`);
       }
-
     } catch (error) {
       console.error(`❌ Error parsing line ${i + 1}: ${error.message}`);
       errorCount++;
     }
   }
-  
+
   console.log('\n📊 Processing Summary:');
   console.log(`  ✅ Processed: ${processedCount.toLocaleString()} entries`);
   console.log(`  ⏭️  Skipped: ${skippedCount.toLocaleString()} lines`);
   console.log(`  🔁 Exact duplicates: ${duplicateCount.toLocaleString()} keys`);
-  console.log(`  🔤 Case-insensitive duplicates: ${caseInsensitiveDuplicateCount.toLocaleString()} keys`);
+  console.log(
+    `  🔤 Case-insensitive duplicates: ${caseInsensitiveDuplicateCount.toLocaleString()} keys`
+  );
   console.log(`  ❌ Errors: ${errorCount.toLocaleString()} lines`);
-  
+
   // Save output file
   console.log(`\n💾 Saving to ${outputPath}...`);
-  
+
   const outputJson = JSON.stringify(loctab, null, 2);
   fs.writeFileSync(outputPath, outputJson, 'utf8');
-  
+
   const stats = fs.statSync(outputPath);
   const fileSizeMB = (stats.size / 1024 / 1024).toFixed(2);
-  
+
   console.log(`✅ Saved successfully! (${fileSizeMB} MB)`);
   console.log(`\n📦 Output structure:`);
   console.log(`  - Total entries: ${Object.keys(loctab).length.toLocaleString()}`);
@@ -198,7 +199,7 @@ function convertLoctab(inputPath, outputPath) {
   // Show sample entries
   console.log(`\n🔍 Sample entries (Korean → Chinese):`);
   const sampleKeys = Object.keys(loctab).slice(0, 5);
-  sampleKeys.forEach(key => {
+  sampleKeys.forEach((key) => {
     console.log(`  "${key}" → "${loctab[key]}"`);
   });
 }
@@ -208,15 +209,15 @@ function convertLoctab(inputPath, outputPath) {
  */
 function main() {
   const args = process.argv.slice(2);
-  
+
   // Default paths
   const defaultInputPath = path.join(__dirname, 'loctab-source');
   const defaultOutputPath = path.join(__dirname, 'loctab');
-  
+
   // Get input/output paths from arguments or use defaults
   const inputPath = args[0] ? path.resolve(args[0]) : defaultInputPath;
   const outputPath = args[1] ? path.resolve(args[1]) : defaultOutputPath;
-  
+
   try {
     convertLoctab(inputPath, outputPath);
     console.log('\n✅ Conversion completed successfully!');
@@ -235,6 +236,5 @@ if (require.main === module) {
 // Export for use as module
 module.exports = {
   convertLoctab,
-  parseCSVLine
+  parseCSVLine,
 };
-

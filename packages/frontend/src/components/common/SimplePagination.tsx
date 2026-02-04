@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
   Box,
   Pagination,
@@ -8,8 +8,8 @@ import {
   Typography,
   Divider,
   SelectChangeEvent,
-} from "@mui/material";
-import { useTranslation } from "react-i18next";
+} from '@mui/material';
+import { useTranslation } from 'react-i18next';
 
 interface SimplePaginationProps {
   count: number;
@@ -40,12 +40,9 @@ const SimplePagination: React.FC<SimplePaginationProps> = ({
   const totalPages = Math.max(1, Math.ceil(count / rowsPerPage));
   const currentPage = page + 1; // Convert 0-based to 1-based
 
-  const handlePageChange = (
-    event: React.ChangeEvent<unknown>,
-    newPage: number,
-  ) => {
+  const handlePageChange = (event: React.ChangeEvent<unknown>, newPage: number) => {
     // Ensure newPage is a valid number before converting
-    const pageNumber = typeof newPage === "number" ? newPage - 1 : 0;
+    const pageNumber = typeof newPage === 'number' ? newPage - 1 : 0;
     onPageChange(event, pageNumber); // Convert 1-based to 0-based
   };
 
@@ -57,12 +54,12 @@ const SimplePagination: React.FC<SimplePaginationProps> = ({
   return (
     <Box
       sx={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
         gap: 2,
         py: 2,
-        flexWrap: "wrap",
+        flexWrap: 'wrap',
       }}
     >
       {/* Center - Pagination */}
@@ -82,21 +79,21 @@ const SimplePagination: React.FC<SimplePaginationProps> = ({
       {showRowsPerPage && (
         <>
           <Divider orientation="vertical" flexItem sx={{ height: 32 }} />
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <FormControl size="small" variant="outlined">
               <Select
                 value={rowsPerPage}
                 onChange={handleRowsPerPageChange}
                 sx={{
                   minWidth: 80,
-                  "& .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "divider",
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'divider',
                   },
-                  "&:hover .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "primary.main",
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'primary.main',
                   },
-                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "primary.main",
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'primary.main',
                   },
                 }}
               >
@@ -108,7 +105,7 @@ const SimplePagination: React.FC<SimplePaginationProps> = ({
               </Select>
             </FormControl>
             <Typography variant="body2" color="text.secondary">
-              {t("common.perPage")}
+              {t('common.perPage')}
             </Typography>
           </Box>
         </>

@@ -1,4 +1,3 @@
-
 /**
  * Migration for Unified Change Request Engine
  */
@@ -81,7 +80,10 @@ exports.up = async function (connection) {
             ADD CONSTRAINT fk_audit_cr FOREIGN KEY (changeRequestId) REFERENCES g_change_requests(id) ON DELETE SET NULL
         `);
     } catch (e) {
-      console.warn('Could not add FK constraint to g_audit_logs.changeRequestId (non-fatal):', e.message);
+      console.warn(
+        'Could not add FK constraint to g_audit_logs.changeRequestId (non-fatal):',
+        e.message
+      );
     }
   }
 
@@ -93,7 +95,9 @@ exports.up = async function (connection) {
     WHERE environment = 'production'
   `);
 
-  console.log('✓ Production environment CR settings configured (requiresApproval=true, requiredApprovers=1)');
+  console.log(
+    '✓ Production environment CR settings configured (requiresApproval=true, requiredApprovers=1)'
+  );
   console.log('Change Request Engine schema created successfully.');
 };
 
@@ -104,11 +108,15 @@ exports.down = async function (connection) {
   try {
     // Drop FK first
     await connection.execute(`ALTER TABLE g_audit_logs DROP FOREIGN KEY fk_audit_cr`);
-  } catch (e) { /* ignore */ }
+  } catch (e) {
+    /* ignore */
+  }
 
   try {
     await connection.execute(`ALTER TABLE g_audit_logs DROP COLUMN changeRequestId`);
-  } catch (e) { /* ignore */ }
+  } catch (e) {
+    /* ignore */
+  }
 
   await connection.execute(`DROP TABLE IF EXISTS g_approvals`);
   await connection.execute(`DROP TABLE IF EXISTS g_change_items`);

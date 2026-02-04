@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   AppBar,
   Toolbar,
@@ -12,7 +12,7 @@ import {
   Divider,
   ListItemIcon,
   ListItemText,
-} from "@mui/material";
+} from '@mui/material';
 import {
   Menu as MenuIcon,
   AccountCircle,
@@ -21,32 +21,27 @@ import {
   Brightness4,
   Brightness7,
   BrightnessAuto,
-} from "@mui/icons-material";
-import { useAuth } from "@/hooks/useAuth";
-import { useTheme } from "@/contexts/ThemeContext";
-import { LanguageSelector } from "@/components/LanguageSelector";
-import { EnvironmentSelector } from "@/components/EnvironmentSelector";
-import { useNavigate } from "react-router-dom";
-import { useTranslation } from "react-i18next";
+} from '@mui/icons-material';
+import { useAuth } from '@/hooks/useAuth';
+import { useTheme } from '@/contexts/ThemeContext';
+import { LanguageSelector } from '@/components/LanguageSelector';
+import { EnvironmentSelector } from '@/components/EnvironmentSelector';
+import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 interface HeaderProps {
   onMenuClick: () => void;
   title?: string;
 }
 
-export const Header: React.FC<HeaderProps> = ({
-  onMenuClick,
-  title = "Admin Panel",
-}) => {
+export const Header: React.FC<HeaderProps> = ({ onMenuClick, title = 'Admin Panel' }) => {
   const { user } = useAuth();
   const { mode, setTheme } = useTheme();
   const { t } = useTranslation();
   const navigate = useNavigate();
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [themeMenuAnchor, setThemeMenuAnchor] = useState<null | HTMLElement>(
-    null,
-  );
+  const [themeMenuAnchor, setThemeMenuAnchor] = useState<null | HTMLElement>(null);
 
   const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -65,22 +60,22 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   const handleProfileClick = () => {
-    navigate("/profile");
+    navigate('/profile');
     handleProfileMenuClose();
   };
 
   const handleLogout = () => {
-    navigate("/logout");
+    navigate('/logout');
     handleProfileMenuClose();
   };
 
   const getThemeIcon = () => {
     switch (mode) {
-      case "light":
+      case 'light':
         return <Brightness7 />;
-      case "dark":
+      case 'dark':
         return <Brightness4 />;
-      case "auto":
+      case 'auto':
         return <BrightnessAuto />;
       default:
         return <BrightnessAuto />;
@@ -89,14 +84,14 @@ export const Header: React.FC<HeaderProps> = ({
 
   const getThemeLabel = () => {
     switch (mode) {
-      case "light":
-        return "Light Theme";
-      case "dark":
-        return "Dark Theme";
-      case "auto":
-        return "Auto Theme";
+      case 'light':
+        return 'Light Theme';
+      case 'dark':
+        return 'Dark Theme';
+      case 'auto':
+        return 'Auto Theme';
       default:
-        return "Auto Theme";
+        return 'Auto Theme';
     }
   };
 
@@ -118,26 +113,22 @@ export const Header: React.FC<HeaderProps> = ({
         </Typography>
 
         {user && (
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             {/* Environment selector */}
             <EnvironmentSelector size="small" />
 
             {/* User info display */}
             <Box
               sx={{
-                display: { xs: "none", sm: "flex" },
-                alignItems: "center",
+                display: { xs: 'none', sm: 'flex' },
+                alignItems: 'center',
                 gap: 1,
               }}
             >
               <Typography variant="body2" color="inherit">
                 {user.name}
               </Typography>
-              <Typography
-                variant="caption"
-                color="inherit"
-                sx={{ opacity: 0.7 }}
-              >
+              <Typography variant="caption" color="inherit" sx={{ opacity: 0.7 }}>
                 ({user.role})
               </Typography>
             </Box>
@@ -147,28 +138,16 @@ export const Header: React.FC<HeaderProps> = ({
 
             {/* Theme toggle button */}
             <Tooltip title={getThemeLabel()}>
-              <IconButton
-                color="inherit"
-                onClick={handleThemeMenuOpen}
-                aria-label="change theme"
-              >
+              <IconButton color="inherit" onClick={handleThemeMenuOpen} aria-label="change theme">
                 {getThemeIcon()}
               </IconButton>
             </Tooltip>
 
             {/* Profile menu button */}
             <Tooltip title="Account">
-              <IconButton
-                color="inherit"
-                onClick={handleProfileMenuOpen}
-                aria-label="account menu"
-              >
+              <IconButton color="inherit" onClick={handleProfileMenuOpen} aria-label="account menu">
                 {user.avatarUrl ? (
-                  <Avatar
-                    src={user.avatarUrl}
-                    alt={user.name}
-                    sx={{ width: 32, height: 32 }}
-                  />
+                  <Avatar src={user.avatarUrl} alt={user.name} sx={{ width: 32, height: 32 }} />
                 ) : (
                   <AccountCircle />
                 )}
@@ -182,12 +161,12 @@ export const Header: React.FC<HeaderProps> = ({
           anchorEl={themeMenuAnchor}
           open={Boolean(themeMenuAnchor)}
           onClose={handleThemeMenuClose}
-          transformOrigin={{ horizontal: "right", vertical: "top" }}
-          anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+          transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+          anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
         >
           <MenuItem
             onClick={() => {
-              setTheme("light");
+              setTheme('light');
               handleThemeMenuClose();
             }}
           >
@@ -198,7 +177,7 @@ export const Header: React.FC<HeaderProps> = ({
           </MenuItem>
           <MenuItem
             onClick={() => {
-              setTheme("dark");
+              setTheme('dark');
               handleThemeMenuClose();
             }}
           >
@@ -209,7 +188,7 @@ export const Header: React.FC<HeaderProps> = ({
           </MenuItem>
           <MenuItem
             onClick={() => {
-              setTheme("auto");
+              setTheme('auto');
               handleThemeMenuClose();
             }}
           >
@@ -225,32 +204,32 @@ export const Header: React.FC<HeaderProps> = ({
           anchorEl={anchorEl}
           open={Boolean(anchorEl)}
           onClose={handleProfileMenuClose}
-          transformOrigin={{ horizontal: "right", vertical: "top" }}
-          anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+          transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+          anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
         >
           <MenuItem onClick={handleProfileClick}>
             <ListItemIcon>
               <AccountCircle fontSize="small" />
             </ListItemIcon>
-            <ListItemText>{t("navigation.profile")}</ListItemText>
+            <ListItemText>{t('navigation.profile')}</ListItemText>
           </MenuItem>
           <MenuItem
             onClick={() => {
-              navigate("/settings");
+              navigate('/settings');
               handleProfileMenuClose();
             }}
           >
             <ListItemIcon>
               <Settings fontSize="small" />
             </ListItemIcon>
-            <ListItemText>{t("navigation.settings")}</ListItemText>
+            <ListItemText>{t('navigation.settings')}</ListItemText>
           </MenuItem>
           <Divider />
           <MenuItem onClick={handleLogout}>
             <ListItemIcon>
               <Logout fontSize="small" />
             </ListItemIcon>
-            <ListItemText>{t("navigation.logout")}</ListItemText>
+            <ListItemText>{t('navigation.logout')}</ListItemText>
           </MenuItem>
         </Menu>
       </Toolbar>

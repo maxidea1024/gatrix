@@ -1,14 +1,14 @@
-declare module "react-diff-viewer-continued" {
-  import { ComponentType, ReactNode } from "react";
+declare module 'react-diff-viewer-continued' {
+  import { ComponentType, ReactNode } from 'react';
 
   export enum DiffMethod {
-    CHARS = "diffChars",
-    WORDS = "diffWords",
-    WORDS_WITH_SPACE = "diffWordsWithSpace",
-    LINES = "diffLines",
-    TRIMMED_LINES = "diffTrimmedLines",
-    SENTENCES = "diffSentences",
-    CSS = "diffCss",
+    CHARS = 'diffChars',
+    WORDS = 'diffWords',
+    WORDS_WITH_SPACE = 'diffWordsWithSpace',
+    LINES = 'diffLines',
+    TRIMMED_LINES = 'diffTrimmedLines',
+    SENTENCES = 'diffSentences',
+    CSS = 'diffCss',
   }
 
   export interface ReactDiffViewerStylesOverride {
@@ -51,12 +51,9 @@ declare module "react-diff-viewer-continued" {
     codeFoldMessageRenderer?: (
       totalFoldedLines: number,
       leftStartLineNumber: number,
-      rightStartLineNumber: number,
+      rightStartLineNumber: number
     ) => ReactNode;
-    onLineNumberClick?: (
-      lineId: string,
-      event: React.MouseEvent<HTMLTableCellElement>,
-    ) => void;
+    onLineNumberClick?: (lineId: string, event: React.MouseEvent<HTMLTableCellElement>) => void;
     highlightLines?: string[];
     styles?: ReactDiffViewerStylesOverride;
     useDarkTheme?: boolean;

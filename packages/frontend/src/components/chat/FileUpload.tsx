@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState } from 'react';
 import {
   Box,
   IconButton,
@@ -14,7 +14,7 @@ import {
   Typography,
   LinearProgress,
   Alert,
-} from "@mui/material";
+} from '@mui/material';
 import {
   AttachFile as AttachIcon,
   Image as ImageIcon,
@@ -23,9 +23,9 @@ import {
   InsertDriveFile as FileIcon,
   LocationOn as LocationIcon,
   Cancel as CancelIcon,
-} from "@mui/icons-material";
-import { useTranslation } from "react-i18next";
-import { useSnackbar } from "notistack";
+} from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
+import { useSnackbar } from 'notistack';
 
 interface FileUploadProps {
   onFileSelect: (files: File[]) => void;
@@ -44,7 +44,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
   onFileSelect,
   onLocationShare,
   maxFileSize = 10,
-  allowedTypes = ["image/*", "video/*", "audio/*", "application/*", "text/*"],
+  allowedTypes = ['image/*', 'video/*', 'audio/*', 'application/*', 'text/*'],
   multiple = true,
 }) => {
   const { t } = useTranslation();
@@ -65,7 +65,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
 
   const handleFileInputClick = (accept?: string) => {
     if (fileInputRef.current) {
-      fileInputRef.current.accept = accept || allowedTypes.join(",");
+      fileInputRef.current.accept = accept || allowedTypes.join(',');
       fileInputRef.current.click();
     }
     handleMenuClose();
@@ -77,12 +77,10 @@ const FileUpload: React.FC<FileUploadProps> = ({
     if (files.length === 0) return;
 
     // Validate file sizes
-    const oversizedFiles = files.filter(
-      (file) => file.size > maxFileSize * 1024 * 1024,
-    );
+    const oversizedFiles = files.filter((file) => file.size > maxFileSize * 1024 * 1024);
     if (oversizedFiles.length > 0) {
-      enqueueSnackbar(t("chat.fileTooLarge", { size: maxFileSize }), {
-        variant: "error",
+      enqueueSnackbar(t('chat.fileTooLarge', { size: maxFileSize }), {
+        variant: 'error',
       });
       return;
     }
@@ -90,7 +88,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
     // Validate file types
     const invalidFiles = files.filter((file) => {
       return !allowedTypes.some((type) => {
-        if (type.endsWith("/*")) {
+        if (type.endsWith('/*')) {
           return file.type.startsWith(type.slice(0, -1));
         }
         return file.type === type;
@@ -98,7 +96,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
     });
 
     if (invalidFiles.length > 0) {
-      enqueueSnackbar(t("chat.unsupportedFileType"), { variant: "error" });
+      enqueueSnackbar(t('chat.unsupportedFileType'), { variant: 'error' });
       return;
     }
 
@@ -106,7 +104,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
 
     // Reset input
     if (fileInputRef.current) {
-      fileInputRef.current.value = "";
+      fileInputRef.current.value = '';
     }
   };
 
@@ -117,31 +115,27 @@ const FileUpload: React.FC<FileUploadProps> = ({
 
     try {
       if (!navigator.geolocation) {
-        throw new Error("Geolocation is not supported");
+        throw new Error('Geolocation is not supported');
       }
 
-      const position = await new Promise<GeolocationPosition>(
-        (resolve, reject) => {
-          navigator.geolocation.getCurrentPosition(resolve, reject, {
-            enableHighAccuracy: true,
-            timeout: 10000,
-            maximumAge: 60000,
-          });
-        },
-      );
+      const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject, {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 60000,
+        });
+      });
 
       const { latitude, longitude } = position.coords;
 
       // Try to get address using reverse geocoding (optional)
-      let address = "";
+      let address = '';
       try {
         const response = await fetch(
-          `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`,
+          `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`
         );
         const data = await response.json();
-        address =
-          data.display_name ||
-          `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
+        address = data.display_name || `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
       } catch {
         address = `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
       }
@@ -150,7 +144,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
         onLocationShare({
           latitude,
           longitude,
-          name: t("chat.currentLocation"),
+          name: t('chat.currentLocation'),
           address,
         });
       }
@@ -158,8 +152,8 @@ const FileUpload: React.FC<FileUploadProps> = ({
       setLocationDialog(false);
       // 위치 공유 성공 토스트 제거 - 불필요한 지저분함 방지
     } catch (error) {
-      console.error("Error getting location:", error);
-      enqueueSnackbar(t("chat.locationError"), { variant: "error" });
+      console.error('Error getting location:', error);
+      enqueueSnackbar(t('chat.locationError'), { variant: 'error' });
       setLocationDialog(false);
     } finally {
       setGettingLocation(false);
@@ -169,42 +163,38 @@ const FileUpload: React.FC<FileUploadProps> = ({
   const menuItems = [
     {
       icon: <ImageIcon />,
-      label: t("chat.uploadImage"),
-      accept: "image/*",
-      onClick: () => handleFileInputClick("image/*"),
+      label: t('chat.uploadImage'),
+      accept: 'image/*',
+      onClick: () => handleFileInputClick('image/*'),
     },
     {
       icon: <VideoIcon />,
-      label: t("chat.uploadVideo"),
-      accept: "video/*",
-      onClick: () => handleFileInputClick("video/*"),
+      label: t('chat.uploadVideo'),
+      accept: 'video/*',
+      onClick: () => handleFileInputClick('video/*'),
     },
     {
       icon: <AudioIcon />,
-      label: t("chat.uploadAudio"),
-      accept: "audio/*",
-      onClick: () => handleFileInputClick("audio/*"),
+      label: t('chat.uploadAudio'),
+      accept: 'audio/*',
+      onClick: () => handleFileInputClick('audio/*'),
     },
     {
       icon: <FileIcon />,
-      label: t("chat.uploadFile"),
+      label: t('chat.uploadFile'),
       accept: undefined,
       onClick: () => handleFileInputClick(),
     },
     {
       icon: <LocationIcon />,
-      label: t("chat.shareLocation"),
+      label: t('chat.shareLocation'),
       onClick: handleLocationShare,
     },
   ];
 
   return (
     <>
-      <IconButton
-        size="small"
-        onClick={handleMenuOpen}
-        sx={{ color: "text.secondary" }}
-      >
+      <IconButton size="small" onClick={handleMenuOpen} sx={{ color: 'text.secondary' }}>
         <AttachIcon />
       </IconButton>
 
@@ -213,12 +203,12 @@ const FileUpload: React.FC<FileUploadProps> = ({
         open={Boolean(anchorEl)}
         onClose={handleMenuClose}
         anchorOrigin={{
-          vertical: "top",
-          horizontal: "left",
+          vertical: 'top',
+          horizontal: 'left',
         }}
         transformOrigin={{
-          vertical: "bottom",
-          horizontal: "left",
+          vertical: 'bottom',
+          horizontal: 'left',
         }}
       >
         {menuItems.map((item, index) => (
@@ -233,47 +223,40 @@ const FileUpload: React.FC<FileUploadProps> = ({
         ref={fileInputRef}
         type="file"
         multiple={multiple}
-        style={{ display: "none" }}
+        style={{ display: 'none' }}
         onChange={handleFileChange}
       />
 
       {/* Location Dialog */}
       <Dialog open={locationDialog} onClose={() => setLocationDialog(false)}>
-        <DialogTitle>{t("chat.shareLocation")}</DialogTitle>
+        <DialogTitle>{t('chat.shareLocation')}</DialogTitle>
         <DialogContent>
           {gettingLocation ? (
             <Box sx={{ py: 2 }}>
               <Typography variant="body2" sx={{ mb: 2 }}>
-                {t("chat.gettingLocation")}
+                {t('chat.gettingLocation')}
               </Typography>
               <LinearProgress />
             </Box>
           ) : (
-            <Alert severity="info">{t("chat.locationPermission")}</Alert>
+            <Alert severity="info">{t('chat.locationPermission')}</Alert>
           )}
         </DialogContent>
         <DialogActions>
-          <Button
-            onClick={() => setLocationDialog(false)}
-            startIcon={<CancelIcon />}
-          >
-            {t("common.cancel")}
+          <Button onClick={() => setLocationDialog(false)} startIcon={<CancelIcon />}>
+            {t('common.cancel')}
           </Button>
         </DialogActions>
       </Dialog>
 
       {/* Upload Progress */}
       {uploadProgress !== null && (
-        <Box sx={{ position: "fixed", bottom: 16, right: 16, width: 300 }}>
+        <Box sx={{ position: 'fixed', bottom: 16, right: 16, width: 300 }}>
           <Alert severity="info">
             <Typography variant="body2">
-              {t("chat.uploading")} {uploadProgress}%
+              {t('chat.uploading')} {uploadProgress}%
             </Typography>
-            <LinearProgress
-              variant="determinate"
-              value={uploadProgress}
-              sx={{ mt: 1 }}
-            />
+            <LinearProgress variant="determinate" value={uploadProgress} sx={{ mt: 1 }} />
           </Alert>
         </Box>
       )}

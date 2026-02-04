@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { useDebounce } from "../../hooks/useDebounce";
-import { usePageState } from "../../hooks/usePageState";
+import React, { useState, useEffect, useCallback } from 'react';
+import { useDebounce } from '../../hooks/useDebounce';
+import { usePageState } from '../../hooks/usePageState';
 import {
   Box,
   Typography,
@@ -40,7 +40,7 @@ import {
   ClickAwayListener,
   Checkbox,
   Button,
-} from "@mui/material";
+} from '@mui/material';
 import {
   DndContext,
   closestCenter,
@@ -49,16 +49,16 @@ import {
   useSensor,
   useSensors,
   DragEndEvent,
-} from "@dnd-kit/core";
+} from '@dnd-kit/core';
 import {
   arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
   useSortable,
   verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
-import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import {
   Refresh as RefreshIcon,
   Info as InfoIcon,
@@ -70,34 +70,26 @@ import {
   DragIndicator as DragIndicatorIcon,
   Visibility as VisibilityIcon,
   VisibilityOff as VisibilityOffIcon,
-} from "@mui/icons-material";
-import { useTranslation } from "react-i18next";
-import { useSnackbar } from "notistack";
-import { copyToClipboardWithNotification } from "@/utils/clipboard";
-import {
-  AuditLogService,
-  AuditLogFilters,
-} from "../../services/auditLogService";
-import { AuditLog } from "../../types";
-import {
-  formatDateTimeDetailed,
-  formatRelativeTime,
-} from "../../utils/dateFormat";
-import SimplePagination from "../../components/common/SimplePagination";
-import EmptyState from "../../components/common/EmptyState";
-import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
-import { useI18n } from "../../contexts/I18nContext";
-import { koKR, zhCN, enUS } from "@mui/x-date-pickers/locales";
-import dayjs, { Dayjs } from "dayjs";
-import DateRangePicker, {
-  DateRangePreset,
-} from "../../components/common/DateRangePicker";
+} from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
+import { useSnackbar } from 'notistack';
+import { copyToClipboardWithNotification } from '@/utils/clipboard';
+import { AuditLogService, AuditLogFilters } from '../../services/auditLogService';
+import { AuditLog } from '../../types';
+import { formatDateTimeDetailed, formatRelativeTime } from '../../utils/dateFormat';
+import SimplePagination from '../../components/common/SimplePagination';
+import EmptyState from '../../components/common/EmptyState';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { useI18n } from '../../contexts/I18nContext';
+import { koKR, zhCN, enUS } from '@mui/x-date-pickers/locales';
+import dayjs, { Dayjs } from 'dayjs';
+import DateRangePicker, { DateRangePreset } from '../../components/common/DateRangePicker';
 import DynamicFilterBar, {
   FilterDefinition,
   ActiveFilter,
-} from "../../components/common/DynamicFilterBar";
-import { InputAdornment } from "@mui/material";
-import { Search as SearchIcon } from "@mui/icons-material";
+} from '../../components/common/DynamicFilterBar';
+import { InputAdornment } from '@mui/material';
+import { Search as SearchIcon } from '@mui/icons-material';
 
 // Column definition interface
 interface ColumnConfig {
@@ -112,19 +104,11 @@ interface SortableColumnItemProps {
   onToggleVisibility: (id: string) => void;
 }
 
-const SortableColumnItem: React.FC<SortableColumnItemProps> = ({
-  column,
-  onToggleVisibility,
-}) => {
+const SortableColumnItem: React.FC<SortableColumnItemProps> = ({ column, onToggleVisibility }) => {
   const { t } = useTranslation();
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: column.id });
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: column.id,
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -142,21 +126,17 @@ const SortableColumnItem: React.FC<SortableColumnItemProps> = ({
           {...attributes}
           {...listeners}
           sx={{
-            cursor: "grab",
-            display: "flex",
-            alignItems: "center",
-            "&:active": { cursor: "grabbing" },
+            cursor: 'grab',
+            display: 'flex',
+            alignItems: 'center',
+            '&:active': { cursor: 'grabbing' },
           }}
         >
-          <DragIndicatorIcon sx={{ color: "text.disabled", fontSize: 20 }} />
+          <DragIndicatorIcon sx={{ color: 'text.disabled', fontSize: 20 }} />
         </Box>
       }
     >
-      <ListItemButton
-        dense
-        onClick={() => onToggleVisibility(column.id)}
-        sx={{ pr: 6 }}
-      >
+      <ListItemButton dense onClick={() => onToggleVisibility(column.id)} sx={{ pr: 6 }}>
         <Checkbox
           edge="start"
           checked={column.visible}
@@ -166,10 +146,7 @@ const SortableColumnItem: React.FC<SortableColumnItemProps> = ({
           icon={<VisibilityOffIcon fontSize="small" />}
           checkedIcon={<VisibilityIcon fontSize="small" />}
         />
-        <ListItemText
-          primary={t(column.labelKey)}
-          slotProps={{ primary: { variant: "body2" } }}
-        />
+        <ListItemText primary={t(column.labelKey)} slotProps={{ primary: { variant: 'body2' } }} />
       </ListItemButton>
     </ListItem>
   );
@@ -186,19 +163,19 @@ const AuditLogsPage: React.FC = () => {
     defaultState: {
       page: 1,
       limit: 10,
-      sortBy: "createdAt",
-      sortOrder: "DESC",
+      sortBy: 'createdAt',
+      sortOrder: 'DESC',
       filters: {},
     },
-    storageKey: "auditLogsPage",
+    storageKey: 'auditLogsPage',
   });
 
   // Get locale text for DateTimePicker
   const getDatePickerLocale = () => {
     switch (language) {
-      case "ko":
+      case 'ko':
         return koKR;
-      case "zh":
+      case 'zh':
         return zhCN;
       default:
         return enUS;
@@ -216,20 +193,15 @@ const AuditLogsPage: React.FC = () => {
 
   // Date range state
   const [dateFrom, setDateFrom] = useState<Dayjs | null>(
-    pageState.filters?.start_date
-      ? dayjs(pageState.filters.start_date)
-      : dayjs().subtract(7, "day"),
+    pageState.filters?.start_date ? dayjs(pageState.filters.start_date) : dayjs().subtract(7, 'day')
   );
   const [dateTo, setDateTo] = useState<Dayjs | null>(
-    pageState.filters?.end_date ? dayjs(pageState.filters.end_date) : dayjs(),
+    pageState.filters?.end_date ? dayjs(pageState.filters.end_date) : dayjs()
   );
-  const [dateRangePreset, setDateRangePreset] =
-    useState<DateRangePreset>("last7d");
+  const [dateRangePreset, setDateRangePreset] = useState<DateRangePreset>('last7d');
 
   // Filters - localStorage에서 복원
-  const [userFilter, setUserFilter] = useState<string>(
-    pageState.filters?.user || "",
-  );
+  const [userFilter, setUserFilter] = useState<string>(pageState.filters?.user || '');
 
   // 동적 필터 상태
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
@@ -240,16 +212,16 @@ const AuditLogsPage: React.FC = () => {
 
   // Column configuration
   const defaultColumns: ColumnConfig[] = [
-    { id: "createdAt", labelKey: "auditLogs.createdAt", visible: true },
-    { id: "user", labelKey: "auditLogs.user", visible: true },
-    { id: "action", labelKey: "auditLogs.action", visible: true },
-    { id: "resource", labelKey: "auditLogs.resource", visible: true },
-    { id: "resourceId", labelKey: "auditLogs.resourceId", visible: true },
-    { id: "ipAddress", labelKey: "auditLogs.ipAddress", visible: true },
+    { id: 'createdAt', labelKey: 'auditLogs.createdAt', visible: true },
+    { id: 'user', labelKey: 'auditLogs.user', visible: true },
+    { id: 'action', labelKey: 'auditLogs.action', visible: true },
+    { id: 'resource', labelKey: 'auditLogs.resource', visible: true },
+    { id: 'resourceId', labelKey: 'auditLogs.resourceId', visible: true },
+    { id: 'ipAddress', labelKey: 'auditLogs.ipAddress', visible: true },
   ];
 
   const [columns, setColumns] = useState<ColumnConfig[]>(() => {
-    const saved = localStorage.getItem("auditLogsColumns");
+    const saved = localStorage.getItem('auditLogsColumns');
     if (saved) {
       try {
         const savedColumns = JSON.parse(saved);
@@ -267,23 +239,22 @@ const AuditLogsPage: React.FC = () => {
     return defaultColumns;
   });
 
-  const [columnSettingsAnchor, setColumnSettingsAnchor] =
-    useState<HTMLButtonElement | null>(null);
+  const [columnSettingsAnchor, setColumnSettingsAnchor] = useState<HTMLButtonElement | null>(null);
 
   const columnSensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    }),
+    })
   );
 
   // Available filter definitions
   const availableFilters: FilterDefinition[] = [
     {
-      key: "action",
-      label: t("auditLogs.action"),
-      type: "multiselect",
-      operator: "any_of",
+      key: 'action',
+      label: t('auditLogs.action'),
+      type: 'multiselect',
+      operator: 'any_of',
       allowOperatorToggle: false, // Single-value field, only 'any_of' makes sense
       options: AuditLogService.getAvailableActions().map((action) => ({
         value: action,
@@ -291,10 +262,10 @@ const AuditLogsPage: React.FC = () => {
       })),
     },
     {
-      key: "resource_type",
-      label: t("auditLogs.resourceType"),
-      type: "multiselect",
-      operator: "any_of",
+      key: 'resource_type',
+      label: t('auditLogs.resourceType'),
+      type: 'multiselect',
+      operator: 'any_of',
       allowOperatorToggle: false, // Single-value field, only 'any_of' makes sense
       options: AuditLogService.getAvailableResourceTypes().map((type) => ({
         value: type,
@@ -302,9 +273,9 @@ const AuditLogsPage: React.FC = () => {
       })),
     },
     {
-      key: "ip_address",
-      label: t("auditLogs.ipAddress"),
-      type: "text",
+      key: 'ip_address',
+      label: t('auditLogs.ipAddress'),
+      type: 'text',
     },
   ];
 
@@ -326,11 +297,7 @@ const AuditLogsPage: React.FC = () => {
 
       // Add dynamic filters
       activeFilters.forEach((filter) => {
-        if (
-          filter.value !== undefined &&
-          filter.value !== null &&
-          filter.value !== ""
-        ) {
+        if (filter.value !== undefined && filter.value !== null && filter.value !== '') {
           // For multiselect filters, send as array with operator
           if (Array.isArray(filter.value) && filter.value.length > 0) {
             (dateFilters as any)[filter.key] = filter.value;
@@ -348,7 +315,7 @@ const AuditLogsPage: React.FC = () => {
       const result = await AuditLogService.getAuditLogs(
         pageState.page,
         pageState.limit,
-        dateFilters,
+        dateFilters
       );
 
       if (result && Array.isArray(result.logs)) {
@@ -359,9 +326,9 @@ const AuditLogsPage: React.FC = () => {
         setTotal(0);
       }
     } catch (error: any) {
-      console.error("Error loading audit logs:", error);
-      enqueueSnackbar(error.message || t("auditLogs.loadFailed"), {
-        variant: "error",
+      console.error('Error loading audit logs:', error);
+      enqueueSnackbar(error.message || t('auditLogs.loadFailed'), {
+        variant: 'error',
       });
       setAuditLogs([]);
       setTotal(0);
@@ -369,15 +336,7 @@ const AuditLogsPage: React.FC = () => {
       setLoading(false);
       setIsInitialLoad(false);
     }
-  }, [
-    pageState,
-    dateFrom,
-    dateTo,
-    debouncedUserFilter,
-    activeFilters,
-    enqueueSnackbar,
-    t,
-  ]);
+  }, [pageState, dateFrom, dateTo, debouncedUserFilter, activeFilters, enqueueSnackbar, t]);
 
   useEffect(() => {
     loadAuditLogs();
@@ -388,9 +347,7 @@ const AuditLogsPage: React.FC = () => {
     updatePage(newPage + 1); // MUI는 0부터 시작, 우리는 1부터 시작
   };
 
-  const handleRowsPerPageChange = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
+  const handleRowsPerPageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newLimit = parseInt(event.target.value, 10);
     updateLimit(newLimit);
   };
@@ -422,34 +379,32 @@ const AuditLogsPage: React.FC = () => {
     // action 필터 복원
     if (filters.action) {
       restoredFilters.push({
-        key: "action",
-        value: Array.isArray(filters.action)
-          ? filters.action
-          : [filters.action],
-        label: t("auditLogs.action"),
-        operator: "any_of",
+        key: 'action',
+        value: Array.isArray(filters.action) ? filters.action : [filters.action],
+        label: t('auditLogs.action'),
+        operator: 'any_of',
       });
     }
 
     // resource_type 필터 복원
     if (filters.resource_type) {
       restoredFilters.push({
-        key: "resource_type",
+        key: 'resource_type',
         value: Array.isArray(filters.resource_type)
           ? filters.resource_type
           : [filters.resource_type],
-        label: t("auditLogs.resourceType"),
-        operator: "any_of",
+        label: t('auditLogs.resourceType'),
+        operator: 'any_of',
       });
     }
 
     // ip_address 필터 복원
     if (filters.ip_address) {
       restoredFilters.push({
-        key: "ip_address",
+        key: 'ip_address',
         value: filters.ip_address,
-        label: t("auditLogs.ipAddress"),
-        operator: "any_of",
+        label: t('auditLogs.ipAddress'),
+        operator: 'any_of',
       });
     }
 
@@ -469,32 +424,25 @@ const AuditLogsPage: React.FC = () => {
   };
 
   const handleDynamicFilterChange = (filterKey: string, value: any) => {
-    setActiveFilters((prev) =>
-      prev.map((f) => (f.key === filterKey ? { ...f, value } : f)),
-    );
+    setActiveFilters((prev) => prev.map((f) => (f.key === filterKey ? { ...f, value } : f)));
   };
 
-  const handleOperatorChange = (
-    filterKey: string,
-    operator: "any_of" | "include_all",
-  ) => {
-    setActiveFilters((prev) =>
-      prev.map((f) => (f.key === filterKey ? { ...f, operator } : f)),
-    );
+  const handleOperatorChange = (filterKey: string, operator: 'any_of' | 'include_all') => {
+    setActiveFilters((prev) => prev.map((f) => (f.key === filterKey ? { ...f, operator } : f)));
   };
 
   // Column handlers
   const handleToggleColumnVisibility = (columnId: string) => {
     const newColumns = columns.map((col) =>
-      col.id === columnId ? { ...col, visible: !col.visible } : col,
+      col.id === columnId ? { ...col, visible: !col.visible } : col
     );
     setColumns(newColumns);
-    localStorage.setItem("auditLogsColumns", JSON.stringify(newColumns));
+    localStorage.setItem('auditLogsColumns', JSON.stringify(newColumns));
   };
 
   const handleResetColumns = () => {
     setColumns(defaultColumns);
-    localStorage.setItem("auditLogsColumns", JSON.stringify(defaultColumns));
+    localStorage.setItem('auditLogsColumns', JSON.stringify(defaultColumns));
   };
 
   const handleColumnDragEnd = (event: DragEndEvent) => {
@@ -504,29 +452,21 @@ const AuditLogsPage: React.FC = () => {
       const newIndex = columns.findIndex((col) => col.id === over.id);
       const newColumns = arrayMove(columns, oldIndex, newIndex);
       setColumns(newColumns);
-      localStorage.setItem("auditLogsColumns", JSON.stringify(newColumns));
+      localStorage.setItem('auditLogsColumns', JSON.stringify(newColumns));
     }
   };
 
   const renderCellContent = (log: AuditLog, columnId: string) => {
     switch (columnId) {
-      case "createdAt":
+      case 'createdAt':
         return (
-          <Tooltip
-            title={formatDateTimeDetailed(
-              (log as any).createdAt || log.created_at,
-            )}
-          >
+          <Tooltip title={formatDateTimeDetailed((log as any).createdAt || log.created_at)}>
             <Typography variant="body2">
-              {formatRelativeTime(
-                (log as any).createdAt || log.created_at,
-                undefined,
-                language,
-              )}
+              {formatRelativeTime((log as any).createdAt || log.created_at, undefined, language)}
             </Typography>
           </Tooltip>
         );
-      case "user":
+      case 'user':
         return log.user_name ? (
           <Box>
             <Typography variant="body2" sx={{ fontWeight: 500 }}>
@@ -538,10 +478,10 @@ const AuditLogsPage: React.FC = () => {
           </Box>
         ) : (
           <Typography variant="body2" color="text.secondary">
-            {t("auditLogs.system")}
+            {t('auditLogs.system')}
           </Typography>
         );
-      case "action":
+      case 'action':
         return (
           <Chip
             label={t(`auditLogs.actions.${log.action}`)}
@@ -549,11 +489,9 @@ const AuditLogsPage: React.FC = () => {
             size="small"
           />
         );
-      case "resource":
+      case 'resource':
         const resourceType =
-          (log as any).resourceType ||
-          (log as any).resource_type ||
-          (log as any).entityType;
+          (log as any).resourceType || (log as any).resource_type || (log as any).entityType;
         return resourceType ? (
           <Box>
             <Typography variant="body2" fontWeight="medium">
@@ -563,16 +501,9 @@ const AuditLogsPage: React.FC = () => {
               const oldVals = (log as any).oldValues || (log as any).old_values;
               const newVals = (log as any).newValues || (log as any).new_values;
               const resourceName =
-                oldVals?.name ||
-                newVals?.name ||
-                oldVals?.worldId ||
-                newVals?.worldId;
+                oldVals?.name || newVals?.name || oldVals?.worldId || newVals?.worldId;
               return resourceName ? (
-                <Typography
-                  variant="body2"
-                  color="text.primary"
-                  sx={{ fontWeight: 500 }}
-                >
+                <Typography variant="body2" color="text.primary" sx={{ fontWeight: 500 }}>
                   {resourceName}
                 </Typography>
               ) : null;
@@ -583,11 +514,9 @@ const AuditLogsPage: React.FC = () => {
             -
           </Typography>
         );
-      case "resourceId":
+      case 'resourceId':
         const resourceId =
-          (log as any).resourceId ||
-          (log as any).resource_id ||
-          (log as any).entityId;
+          (log as any).resourceId || (log as any).resource_id || (log as any).entityId;
         return resourceId ? (
           <Typography variant="caption" color="text.secondary">
             ID: {resourceId}
@@ -597,10 +526,10 @@ const AuditLogsPage: React.FC = () => {
             -
           </Typography>
         );
-      case "ipAddress":
+      case 'ipAddress':
         return (
           <Typography variant="body2" fontFamily="monospace">
-            {log.ip_address || "-"}
+            {log.ip_address || '-'}
           </Typography>
         );
       default:
@@ -613,16 +542,16 @@ const AuditLogsPage: React.FC = () => {
   };
 
   const formatDetails = (details: any) => {
-    if (!details) return "-";
-    if (typeof details === "string") return details;
+    if (!details) return '-';
+    if (typeof details === 'string') return details;
     return JSON.stringify(details, null, 2);
   };
 
   const handleCopyDetails = async (details: any) => {
-    let text = "";
+    let text = '';
     if (!details) {
-      text = "No details available";
-    } else if (typeof details === "string") {
+      text = 'No details available';
+    } else if (typeof details === 'string') {
       text = details;
     } else {
       text = JSON.stringify(details, null, 2);
@@ -630,9 +559,8 @@ const AuditLogsPage: React.FC = () => {
 
     copyToClipboardWithNotification(
       text,
-      () =>
-        enqueueSnackbar(t("auditLogs.detailsCopied"), { variant: "success" }),
-      () => enqueueSnackbar(t("common.copyFailed"), { variant: "error" }),
+      () => enqueueSnackbar(t('auditLogs.detailsCopied'), { variant: 'success' }),
+      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
     );
   };
 
@@ -642,19 +570,19 @@ const AuditLogsPage: React.FC = () => {
       <Box sx={{ mb: 3 }}>
         <Box
           sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
           }}
         >
-          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-            <HistoryIcon sx={{ fontSize: 32, color: "primary.main" }} />
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <HistoryIcon sx={{ fontSize: 32, color: 'primary.main' }} />
             <Box>
               <Typography variant="h5" sx={{ fontWeight: 700 }}>
-                {t("auditLogs.title")}
+                {t('auditLogs.title')}
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                {t("auditLogs.subtitle")}
+                {t('auditLogs.subtitle')}
               </Typography>
             </Box>
           </Box>
@@ -666,10 +594,10 @@ const AuditLogsPage: React.FC = () => {
         <CardContent>
           <Box
             sx={{
-              display: "flex",
+              display: 'flex',
               gap: 2,
-              alignItems: "center",
-              flexWrap: "wrap",
+              alignItems: 'center',
+              flexWrap: 'wrap',
             }}
           >
             {/* Date Range Picker */}
@@ -683,65 +611,63 @@ const AuditLogsPage: React.FC = () => {
               }}
               preset={dateRangePreset}
               availablePresets={[
-                "today",
-                "yesterday",
-                "last7d",
-                "last30d",
-                "last3m",
-                "last6m",
-                "last12m",
-                "custom",
+                'today',
+                'yesterday',
+                'last7d',
+                'last30d',
+                'last3m',
+                'last6m',
+                'last12m',
+                'custom',
               ]}
               size="small"
             />
 
             {/* Search */}
             <TextField
-              placeholder={t("auditLogs.searchUserPlaceholder")}
+              placeholder={t('auditLogs.searchUserPlaceholder')}
               size="small"
               sx={{
                 minWidth: 200,
                 flexGrow: 1,
                 maxWidth: 320,
-                "& .MuiOutlinedInput-root": {
-                  height: "40px",
-                  borderRadius: "20px",
-                  bgcolor: "background.paper",
-                  transition: "all 0.2s ease-in-out",
-                  "& fieldset": {
-                    borderColor: "divider",
+                '& .MuiOutlinedInput-root': {
+                  height: '40px',
+                  borderRadius: '20px',
+                  bgcolor: 'background.paper',
+                  transition: 'all 0.2s ease-in-out',
+                  '& fieldset': {
+                    borderColor: 'divider',
                   },
-                  "&:hover": {
-                    bgcolor: "action.hover",
-                    "& fieldset": {
-                      borderColor: "primary.light",
+                  '&:hover': {
+                    bgcolor: 'action.hover',
+                    '& fieldset': {
+                      borderColor: 'primary.light',
                     },
                   },
-                  "&.Mui-focused": {
-                    bgcolor: "background.paper",
-                    boxShadow: "0 0 0 2px rgba(25, 118, 210, 0.1)",
-                    "& fieldset": {
-                      borderColor: "primary.main",
-                      borderWidth: "1px",
+                  '&.Mui-focused': {
+                    bgcolor: 'background.paper',
+                    boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
+                    '& fieldset': {
+                      borderColor: 'primary.main',
+                      borderWidth: '1px',
                     },
                   },
                 },
-                "& .MuiInputBase-input": {
-                  fontSize: "0.875rem",
+                '& .MuiInputBase-input': {
+                  fontSize: '0.875rem',
                 },
               }}
               value={userFilter}
               onChange={(e) => {
                 const value = e.target.value;
                 setUserFilter(value);
-                handleFilterChange("user", value);
+                handleFilterChange('user', value);
               }}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <SearchIcon
-                      sx={{ color: "text.secondary", fontSize: 20 }}
-                    />
+                    <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
                   </InputAdornment>
                 ),
               }}
@@ -758,14 +684,14 @@ const AuditLogsPage: React.FC = () => {
             />
 
             {/* Column Settings Button */}
-            <Tooltip title={t("users.columnSettings")}>
+            <Tooltip title={t('users.columnSettings')}>
               <IconButton
                 onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
                 sx={{
-                  bgcolor: "background.paper",
+                  bgcolor: 'background.paper',
                   border: 1,
-                  borderColor: "divider",
-                  "&:hover": { bgcolor: "action.hover" },
+                  borderColor: 'divider',
+                  '&:hover': { bgcolor: 'action.hover' },
                 }}
               >
                 <ViewColumnIcon />
@@ -777,35 +703,31 @@ const AuditLogsPage: React.FC = () => {
 
       {/* Audit Logs Table */}
 
-      <Card sx={{ position: "relative" }}>
-        <CardContent sx={{ p: 0, "&:last-child": { pb: 0 } }}>
+      <Card sx={{ position: 'relative' }}>
+        <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
           {isInitialLoad && loading ? (
-            <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
-              <Typography color="text.secondary">
-                {t("common.loadingAuditLogs")}
-              </Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
+              <Typography color="text.secondary">{t('common.loadingAuditLogs')}</Typography>
             </Box>
           ) : auditLogs.length === 0 ? (
-            <EmptyState message={t("auditLogs.noLogsFound")} />
+            <EmptyState message={t('auditLogs.noLogsFound')} />
           ) : (
             <>
               <TableContainer
                 sx={{
                   opacity: !isInitialLoad && loading ? 0.5 : 1,
-                  transition: "opacity 0.15s ease-in-out",
-                  pointerEvents: !isInitialLoad && loading ? "none" : "auto",
+                  transition: 'opacity 0.15s ease-in-out',
+                  pointerEvents: !isInitialLoad && loading ? 'none' : 'auto',
                 }}
               >
-                <Table sx={{ tableLayout: "auto" }}>
+                <Table sx={{ tableLayout: 'auto' }}>
                   <TableHead>
                     <TableRow>
                       <TableCell sx={{ width: 50 }}></TableCell>
                       {columns
                         .filter((col) => col.visible)
                         .map((column) => (
-                          <TableCell key={column.id}>
-                            {t(column.labelKey)}
-                          </TableCell>
+                          <TableCell key={column.id}>{t(column.labelKey)}</TableCell>
                         ))}
                     </TableRow>
                   </TableHead>
@@ -815,23 +737,18 @@ const AuditLogsPage: React.FC = () => {
                         <TableRow
                           hover
                           sx={{
-                            cursor: "pointer",
+                            cursor: 'pointer',
                             bgcolor: (theme) =>
                               index % 2 === 0
-                                ? "transparent"
-                                : theme.palette.mode === "dark"
-                                  ? "rgba(255, 255, 255, 0.02)"
-                                  : "rgba(0, 0, 0, 0.02)",
-                            "& > *": {
-                              borderBottom:
-                                expandedRowId === log.id ? "none" : undefined,
+                                ? 'transparent'
+                                : theme.palette.mode === 'dark'
+                                  ? 'rgba(255, 255, 255, 0.02)'
+                                  : 'rgba(0, 0, 0, 0.02)',
+                            '& > *': {
+                              borderBottom: expandedRowId === log.id ? 'none' : undefined,
                             },
                           }}
-                          onClick={() =>
-                            setExpandedRowId(
-                              expandedRowId === log.id ? null : log.id,
-                            )
-                          }
+                          onClick={() => setExpandedRowId(expandedRowId === log.id ? null : log.id)}
                         >
                           <TableCell>
                             <IconButton size="small">
@@ -855,33 +772,27 @@ const AuditLogsPage: React.FC = () => {
                         <TableRow>
                           <TableCell
                             style={{ paddingBottom: 0, paddingTop: 0 }}
-                            colSpan={
-                              columns.filter((col) => col.visible).length + 1
-                            }
+                            colSpan={columns.filter((col) => col.visible).length + 1}
                           >
-                            <Collapse
-                              in={expandedRowId === log.id}
-                              timeout="auto"
-                              unmountOnExit
-                            >
+                            <Collapse in={expandedRowId === log.id} timeout="auto" unmountOnExit>
                               <Box
                                 sx={{
                                   py: 3,
                                   px: 4,
                                   bgcolor:
-                                    theme.palette.mode === "dark"
-                                      ? "rgba(255,255,255,0.02)"
-                                      : "rgba(0,0,0,0.02)",
+                                    theme.palette.mode === 'dark'
+                                      ? 'rgba(255,255,255,0.02)'
+                                      : 'rgba(0,0,0,0.02)',
                                   borderTop: 1,
                                   borderBottom: 1,
-                                  borderColor: "divider",
+                                  borderColor: 'divider',
                                 }}
                               >
                                 {/* Header with Action Badge */}
                                 <Box
                                   sx={{
-                                    display: "flex",
-                                    alignItems: "center",
+                                    display: 'flex',
+                                    alignItems: 'center',
                                     gap: 2,
                                     mb: 3,
                                     pl: 3,
@@ -889,12 +800,10 @@ const AuditLogsPage: React.FC = () => {
                                 >
                                   <Chip
                                     label={t(`auditLogs.actions.${log.action}`)}
-                                    color={AuditLogService.getActionColor(
-                                      log.action,
-                                    )}
+                                    color={AuditLogService.getActionColor(log.action)}
                                     sx={{
                                       fontWeight: 600,
-                                      fontSize: "0.875rem",
+                                      fontSize: '0.875rem',
                                     }}
                                   />
                                   {((log as any).resourceType ||
@@ -905,7 +814,7 @@ const AuditLogsPage: React.FC = () => {
                                         `auditLogs.resources.${(log as any).resourceType || (log as any).resource_type || (log as any).entityType}`,
                                         (log as any).resourceType ||
                                           (log as any).resource_type ||
-                                          (log as any).entityType,
+                                          (log as any).entityType
                                       )}
                                       variant="outlined"
                                       size="small"
@@ -916,8 +825,8 @@ const AuditLogsPage: React.FC = () => {
                                 {/* Detail Fields in OpenSearch Discovery Style */}
                                 <Box
                                   sx={{
-                                    display: "flex",
-                                    flexDirection: "column",
+                                    display: 'flex',
+                                    flexDirection: 'column',
                                     gap: 2.5,
                                     pl: 3,
                                   }}
@@ -929,28 +838,26 @@ const AuditLogsPage: React.FC = () => {
                                       color="text.secondary"
                                       sx={{
                                         fontWeight: 600,
-                                        textTransform: "uppercase",
+                                        textTransform: 'uppercase',
                                         letterSpacing: 0.5,
                                       }}
                                     >
-                                      {t("auditLogs.date")}
+                                      {t('auditLogs.date')}
                                     </Typography>
                                     <Typography
                                       variant="body1"
-                                      sx={{ mt: 0.5, fontFamily: "monospace" }}
+                                      sx={{ mt: 0.5, fontFamily: 'monospace' }}
                                     >
                                       <Tooltip
                                         title={formatDateTimeDetailed(
-                                          (log as any).createdAt ||
-                                            log.created_at,
+                                          (log as any).createdAt || log.created_at
                                         )}
                                       >
                                         <span>
                                           {formatRelativeTime(
-                                            (log as any).createdAt ||
-                                              log.created_at,
+                                            (log as any).createdAt || log.created_at,
                                             undefined,
-                                            language,
+                                            language
                                           )}
                                         </span>
                                       </Tooltip>
@@ -966,38 +873,32 @@ const AuditLogsPage: React.FC = () => {
                                       color="text.secondary"
                                       sx={{
                                         fontWeight: 600,
-                                        textTransform: "uppercase",
+                                        textTransform: 'uppercase',
                                         letterSpacing: 0.5,
                                       }}
                                     >
-                                      {t("auditLogs.user")}
+                                      {t('auditLogs.user')}
                                     </Typography>
                                     <Box sx={{ mt: 0.5 }}>
                                       {log.user_name ? (
                                         <>
-                                          <Typography
-                                            variant="body1"
-                                            sx={{ fontWeight: 500 }}
-                                          >
+                                          <Typography variant="body1" sx={{ fontWeight: 500 }}>
                                             {log.user_name}
                                           </Typography>
                                           <Typography
                                             variant="body2"
                                             color="text.secondary"
                                             sx={{
-                                              fontFamily: "monospace",
-                                              fontSize: "0.8rem",
+                                              fontFamily: 'monospace',
+                                              fontSize: '0.8rem',
                                             }}
                                           >
                                             {log.user_email}
                                           </Typography>
                                         </>
                                       ) : (
-                                        <Typography
-                                          variant="body1"
-                                          color="text.secondary"
-                                        >
-                                          {t("auditLogs.system")}
+                                        <Typography variant="body1" color="text.secondary">
+                                          {t('auditLogs.system')}
                                         </Typography>
                                       )}
                                     </Box>
@@ -1016,20 +917,18 @@ const AuditLogsPage: React.FC = () => {
                                           color="text.secondary"
                                           sx={{
                                             fontWeight: 600,
-                                            textTransform: "uppercase",
+                                            textTransform: 'uppercase',
                                             letterSpacing: 0.5,
                                           }}
                                         >
-                                          {t("auditLogs.resource")}
+                                          {t('auditLogs.resource')}
                                         </Typography>
                                         <Box sx={{ mt: 0.5 }}>
                                           {(() => {
                                             const oldVals =
-                                              (log as any).oldValues ||
-                                              (log as any).old_values;
+                                              (log as any).oldValues || (log as any).old_values;
                                             const newVals =
-                                              (log as any).newValues ||
-                                              (log as any).new_values;
+                                              (log as any).newValues || (log as any).new_values;
                                             const resourceName =
                                               oldVals?.name ||
                                               newVals?.name ||
@@ -1060,8 +959,8 @@ const AuditLogsPage: React.FC = () => {
                                                 <Typography
                                                   variant="body2"
                                                   sx={{
-                                                    fontFamily: "monospace",
-                                                    color: "text.secondary",
+                                                    fontFamily: 'monospace',
+                                                    color: 'text.secondary',
                                                   }}
                                                 >
                                                   {resourceType} #{resourceId}
@@ -1082,17 +981,17 @@ const AuditLogsPage: React.FC = () => {
                                       color="text.secondary"
                                       sx={{
                                         fontWeight: 600,
-                                        textTransform: "uppercase",
+                                        textTransform: 'uppercase',
                                         letterSpacing: 0.5,
                                       }}
                                     >
-                                      {t("auditLogs.ipAddress")}
+                                      {t('auditLogs.ipAddress')}
                                     </Typography>
                                     <Typography
                                       variant="body1"
-                                      sx={{ mt: 0.5, fontFamily: "monospace" }}
+                                      sx={{ mt: 0.5, fontFamily: 'monospace' }}
                                     >
-                                      {log.ip_address || log.ipAddress || "-"}
+                                      {log.ip_address || log.ipAddress || '-'}
                                     </Typography>
                                   </Box>
 
@@ -1106,20 +1005,20 @@ const AuditLogsPage: React.FC = () => {
                                           color="text.secondary"
                                           sx={{
                                             fontWeight: 600,
-                                            textTransform: "uppercase",
+                                            textTransform: 'uppercase',
                                             letterSpacing: 0.5,
                                           }}
                                         >
-                                          {t("auditLogs.userAgent")}
+                                          {t('auditLogs.userAgent')}
                                         </Typography>
                                         <Typography
                                           variant="body2"
                                           sx={{
                                             mt: 0.5,
-                                            wordBreak: "break-all",
-                                            fontFamily: "monospace",
-                                            fontSize: "0.75rem",
-                                            color: "text.secondary",
+                                            wordBreak: 'break-all',
+                                            fontFamily: 'monospace',
+                                            fontSize: '0.75rem',
+                                            color: 'text.secondary',
                                           }}
                                         >
                                           {log.user_agent || log.userAgent}
@@ -1131,11 +1030,9 @@ const AuditLogsPage: React.FC = () => {
                                   {/* Changes - Diff Viewer */}
                                   {(() => {
                                     const oldVals =
-                                      (log as any).oldValues ||
-                                      (log as any).old_values;
+                                      (log as any).oldValues || (log as any).old_values;
                                     const newVals =
-                                      (log as any).newValues ||
-                                      (log as any).new_values;
+                                      (log as any).newValues || (log as any).new_values;
                                     return (
                                       oldVals &&
                                       newVals && (
@@ -1147,21 +1044,21 @@ const AuditLogsPage: React.FC = () => {
                                               color="text.secondary"
                                               sx={{
                                                 mb: 1.5,
-                                                display: "block",
+                                                display: 'block',
                                                 fontWeight: 600,
-                                                textTransform: "uppercase",
+                                                textTransform: 'uppercase',
                                                 letterSpacing: 0.5,
                                               }}
                                             >
-                                              {t("auditLogs.changes")}
+                                              {t('auditLogs.changes')}
                                             </Typography>
                                             <Paper
                                               elevation={0}
                                               sx={{
-                                                bgcolor: "background.default",
-                                                overflow: "hidden",
+                                                bgcolor: 'background.default',
+                                                overflow: 'hidden',
                                                 border: 1,
-                                                borderColor: "divider",
+                                                borderColor: 'divider',
                                                 borderRadius: 1,
                                               }}
                                             >
@@ -1169,48 +1066,40 @@ const AuditLogsPage: React.FC = () => {
                                                 <TableHead>
                                                   <TableRow
                                                     sx={{
-                                                      bgcolor: "action.hover",
+                                                      bgcolor: 'action.hover',
                                                     }}
                                                   >
                                                     <TableCell
                                                       sx={{
                                                         fontWeight: 600,
-                                                        width: "25%",
+                                                        width: '25%',
                                                       }}
                                                     >
-                                                      {t("changeRequest.field")}
+                                                      {t('changeRequest.field')}
                                                     </TableCell>
                                                     <TableCell
                                                       sx={{
                                                         fontWeight: 600,
-                                                        width: "37.5%",
+                                                        width: '37.5%',
                                                       }}
                                                     >
-                                                      {t(
-                                                        "changeRequest.oldValue",
-                                                      )}
+                                                      {t('changeRequest.oldValue')}
                                                     </TableCell>
                                                     <TableCell
                                                       sx={{
                                                         fontWeight: 600,
-                                                        width: "37.5%",
+                                                        width: '37.5%',
                                                       }}
                                                     >
-                                                      {t(
-                                                        "changeRequest.newValue",
-                                                      )}
+                                                      {t('changeRequest.newValue')}
                                                     </TableCell>
                                                   </TableRow>
                                                 </TableHead>
                                                 <TableBody>
                                                   {(() => {
                                                     const allKeys = new Set([
-                                                      ...Object.keys(
-                                                        oldVals || {},
-                                                      ),
-                                                      ...Object.keys(
-                                                        newVals || {},
-                                                      ),
+                                                      ...Object.keys(oldVals || {}),
+                                                      ...Object.keys(newVals || {}),
                                                     ]);
                                                     const changedFields: {
                                                       key: string;
@@ -1218,14 +1107,10 @@ const AuditLogsPage: React.FC = () => {
                                                       newVal: any;
                                                     }[] = [];
                                                     allKeys.forEach((key) => {
-                                                      const oldVal =
-                                                        oldVals?.[key];
-                                                      const newVal =
-                                                        newVals?.[key];
+                                                      const oldVal = oldVals?.[key];
+                                                      const newVal = newVals?.[key];
                                                       if (
-                                                        JSON.stringify(
-                                                          oldVal,
-                                                        ) !==
+                                                        JSON.stringify(oldVal) !==
                                                         JSON.stringify(newVal)
                                                       ) {
                                                         changedFields.push({
@@ -1235,108 +1120,78 @@ const AuditLogsPage: React.FC = () => {
                                                         });
                                                       }
                                                     });
-                                                    if (
-                                                      changedFields.length === 0
-                                                    ) {
+                                                    if (changedFields.length === 0) {
                                                       return (
                                                         <TableRow>
                                                           <TableCell
                                                             colSpan={3}
                                                             align="center"
                                                             sx={{
-                                                              color:
-                                                                "text.secondary",
+                                                              color: 'text.secondary',
                                                               py: 2,
                                                             }}
                                                           >
-                                                            {t(
-                                                              "changeRequest.noChanges",
-                                                            )}
+                                                            {t('changeRequest.noChanges')}
                                                           </TableCell>
                                                         </TableRow>
                                                       );
                                                     }
                                                     return changedFields.map(
-                                                      ({
-                                                        key,
-                                                        oldVal,
-                                                        newVal,
-                                                      }) => (
+                                                      ({ key, oldVal, newVal }) => (
                                                         <TableRow
                                                           key={key}
                                                           sx={{
-                                                            "&:nth-of-type(odd)":
-                                                              {
-                                                                bgcolor:
-                                                                  "action.hover",
-                                                              },
+                                                            '&:nth-of-type(odd)': {
+                                                              bgcolor: 'action.hover',
+                                                            },
                                                           }}
                                                         >
                                                           <TableCell
                                                             sx={{
                                                               fontWeight: 500,
-                                                              fontFamily:
-                                                                "monospace",
-                                                              fontSize:
-                                                                "0.75rem",
+                                                              fontFamily: 'monospace',
+                                                              fontSize: '0.75rem',
                                                             }}
                                                           >
                                                             {key}
                                                           </TableCell>
                                                           <TableCell
                                                             sx={{
-                                                              fontFamily:
-                                                                "monospace",
-                                                              fontSize:
-                                                                "0.75rem",
+                                                              fontFamily: 'monospace',
+                                                              fontSize: '0.75rem',
                                                               bgcolor: alpha(
-                                                                theme.palette
-                                                                  .error.main,
-                                                                0.08,
+                                                                theme.palette.error.main,
+                                                                0.08
                                                               ),
-                                                              color:
-                                                                "text.secondary",
-                                                              wordBreak:
-                                                                "break-all",
+                                                              color: 'text.secondary',
+                                                              wordBreak: 'break-all',
                                                             }}
                                                           >
-                                                            {oldVal !==
-                                                            undefined
-                                                              ? typeof oldVal ===
-                                                                "object"
-                                                                ? JSON.stringify(
-                                                                    oldVal,
-                                                                  )
+                                                            {oldVal !== undefined
+                                                              ? typeof oldVal === 'object'
+                                                                ? JSON.stringify(oldVal)
                                                                 : String(oldVal)
-                                                              : "-"}
+                                                              : '-'}
                                                           </TableCell>
                                                           <TableCell
                                                             sx={{
-                                                              fontFamily:
-                                                                "monospace",
-                                                              fontSize:
-                                                                "0.75rem",
+                                                              fontFamily: 'monospace',
+                                                              fontSize: '0.75rem',
                                                               bgcolor: alpha(
-                                                                theme.palette
-                                                                  .success.main,
-                                                                0.08,
+                                                                theme.palette.success.main,
+                                                                0.08
                                                               ),
-                                                              wordBreak:
-                                                                "break-all",
+                                                              wordBreak: 'break-all',
                                                             }}
                                                           >
-                                                            {newVal !==
-                                                            undefined
-                                                              ? typeof newVal ===
-                                                                "object"
-                                                                ? JSON.stringify(
-                                                                    newVal,
-                                                                  )
+                                                            {newVal !== undefined
+                                                              ? typeof newVal === 'object'
+                                                                ? JSON.stringify(newVal)
                                                                 : String(newVal)
-                                                              : "-"}
+                                                              : '-'}
                                                           </TableCell>
                                                         </TableRow>
-                                                      ),
+                                                      )
                                                     );
                                                   })()}
                                                 </TableBody>
@@ -1351,11 +1206,9 @@ const AuditLogsPage: React.FC = () => {
                                   {/* Show only new values if old values don't exist */}
                                   {(() => {
                                     const oldVals =
-                                      (log as any).oldValues ||
-                                      (log as any).old_values;
+                                      (log as any).oldValues || (log as any).old_values;
                                     const newVals =
-                                      (log as any).newValues ||
-                                      (log as any).new_values;
+                                      (log as any).newValues || (log as any).new_values;
                                     return (
                                       !oldVals &&
                                       newVals && (
@@ -1367,40 +1220,35 @@ const AuditLogsPage: React.FC = () => {
                                               color="text.secondary"
                                               sx={{
                                                 mb: 1.5,
-                                                display: "block",
+                                                display: 'block',
                                                 fontWeight: 600,
-                                                textTransform: "uppercase",
+                                                textTransform: 'uppercase',
                                                 letterSpacing: 0.5,
                                               }}
                                             >
-                                              {t("auditLogs.newValues")}
+                                              {t('auditLogs.newValues')}
                                             </Typography>
                                             <Paper
                                               elevation={0}
                                               sx={{
                                                 p: 2,
-                                                bgcolor: "background.default",
+                                                bgcolor: 'background.default',
                                                 border: 1,
-                                                borderColor: "divider",
+                                                borderColor: 'divider',
                                                 borderRadius: 1,
-                                                overflow: "auto",
+                                                overflow: 'auto',
                                                 maxHeight: 400,
                                               }}
                                             >
                                               <pre
                                                 style={{
                                                   margin: 0,
-                                                  fontSize: "0.75rem",
-                                                  fontFamily: "monospace",
-                                                  color:
-                                                    theme.palette.text.primary,
+                                                  fontSize: '0.75rem',
+                                                  fontFamily: 'monospace',
+                                                  color: theme.palette.text.primary,
                                                 }}
                                               >
-                                                {JSON.stringify(
-                                                  newVals,
-                                                  null,
-                                                  2,
-                                                )}
+                                                {JSON.stringify(newVals, null, 2)}
                                               </pre>
                                             </Paper>
                                           </Box>
@@ -1412,11 +1260,9 @@ const AuditLogsPage: React.FC = () => {
                                   {/* Show only old values if new values don't exist */}
                                   {(() => {
                                     const oldVals =
-                                      (log as any).oldValues ||
-                                      (log as any).old_values;
+                                      (log as any).oldValues || (log as any).old_values;
                                     const newVals =
-                                      (log as any).newValues ||
-                                      (log as any).new_values;
+                                      (log as any).newValues || (log as any).new_values;
                                     return (
                                       oldVals &&
                                       !newVals && (
@@ -1428,40 +1274,35 @@ const AuditLogsPage: React.FC = () => {
                                               color="text.secondary"
                                               sx={{
                                                 mb: 1.5,
-                                                display: "block",
+                                                display: 'block',
                                                 fontWeight: 600,
-                                                textTransform: "uppercase",
+                                                textTransform: 'uppercase',
                                                 letterSpacing: 0.5,
                                               }}
                                             >
-                                              {t("auditLogs.oldValues")}
+                                              {t('auditLogs.oldValues')}
                                             </Typography>
                                             <Paper
                                               elevation={0}
                                               sx={{
                                                 p: 2,
-                                                bgcolor: "background.default",
+                                                bgcolor: 'background.default',
                                                 border: 1,
-                                                borderColor: "divider",
+                                                borderColor: 'divider',
                                                 borderRadius: 1,
-                                                overflow: "auto",
+                                                overflow: 'auto',
                                                 maxHeight: 400,
                                               }}
                                             >
                                               <pre
                                                 style={{
                                                   margin: 0,
-                                                  fontSize: "0.75rem",
-                                                  fontFamily: "monospace",
-                                                  color:
-                                                    theme.palette.text.primary,
+                                                  fontSize: '0.75rem',
+                                                  fontFamily: 'monospace',
+                                                  color: theme.palette.text.primary,
                                                 }}
                                               >
-                                                {JSON.stringify(
-                                                  oldVals,
-                                                  null,
-                                                  2,
-                                                )}
+                                                {JSON.stringify(oldVals, null, 2)}
                                               </pre>
                                             </Paper>
                                           </Box>
@@ -1498,8 +1339,8 @@ const AuditLogsPage: React.FC = () => {
         open={Boolean(columnSettingsAnchor)}
         anchorEl={columnSettingsAnchor}
         onClose={() => setColumnSettingsAnchor(null)}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-        transformOrigin={{ vertical: "top", horizontal: "right" }}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
         hideBackdrop
         disableScrollLock
       >
@@ -1507,17 +1348,17 @@ const AuditLogsPage: React.FC = () => {
           <Box sx={{ p: 2, minWidth: 280, maxWidth: 320 }}>
             <Box
               sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
                 mb: 1,
               }}
             >
               <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-                {t("users.columnSettings")}
+                {t('users.columnSettings')}
               </Typography>
               <Button size="small" onClick={handleResetColumns} color="warning">
-                {t("common.reset")}
+                {t('common.reset')}
               </Button>
             </Box>
             <DndContext

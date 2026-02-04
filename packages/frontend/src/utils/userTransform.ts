@@ -1,4 +1,4 @@
-import { User } from "@/types";
+import { User } from '@/types';
 
 // Transform user data from API (snake_case) to frontend (camelCase)
 export function transformUser(apiUser: any): User & {

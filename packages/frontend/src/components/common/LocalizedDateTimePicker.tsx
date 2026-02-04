@@ -1,18 +1,14 @@
-import React, { useEffect } from "react";
-import {
-  DateTimePicker,
-  DateTimePickerProps,
-  LocalizationProvider,
-} from "@mui/x-date-pickers";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { useTranslation } from "react-i18next";
-import dayjs, { Dayjs } from "dayjs";
-import utc from "dayjs/plugin/utc";
-import timezone from "dayjs/plugin/timezone";
-import "dayjs/locale/ko";
-import "dayjs/locale/en";
-import "dayjs/locale/zh";
-import { getDateLocale, parseUTCForPicker } from "@/utils/dateFormat";
+import React, { useEffect } from 'react';
+import { DateTimePicker, DateTimePickerProps, LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { useTranslation } from 'react-i18next';
+import dayjs, { Dayjs } from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
+import 'dayjs/locale/ko';
+import 'dayjs/locale/en';
+import 'dayjs/locale/zh';
+import { getDateLocale, parseUTCForPicker } from '@/utils/dateFormat';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -68,18 +64,18 @@ const LocalizedDateTimePicker: React.FC<LocalizedDateTimePickerProps> = ({
   // Set dayjs locale based on current language
   useEffect(() => {
     const currentLang = i18n.language;
-    if (currentLang === "ko") {
-      dayjs.locale("ko");
-    } else if (currentLang === "zh") {
-      dayjs.locale("zh");
+    if (currentLang === 'ko') {
+      dayjs.locale('ko');
+    } else if (currentLang === 'zh') {
+      dayjs.locale('zh');
     } else {
-      dayjs.locale("en");
+      dayjs.locale('en');
     }
   }, [i18n.language]);
 
   const handleChange = (date: Dayjs | null) => {
     // DateTimePicker returns Dayjs in user's timezone, convert to UTC ISO string
-    const isoString = date ? date.utc().toISOString() : "";
+    const isoString = date ? date.utc().toISOString() : '';
     onChange(isoString);
   };
 
@@ -97,7 +93,7 @@ const LocalizedDateTimePicker: React.FC<LocalizedDateTimePickerProps> = ({
         maxDateTime={maxDateTime}
         ampm={true}
         format="YYYY-MM-DD A hh:mm"
-        views={["year", "month", "day", "hours", "minutes"]}
+        views={['year', 'month', 'day', 'hours', 'minutes']}
         timeSteps={{ minutes: 1 }}
         slotProps={{
           textField: {
@@ -107,7 +103,7 @@ const LocalizedDateTimePicker: React.FC<LocalizedDateTimePickerProps> = ({
             sx,
           },
           actionBar: {
-            actions: ["clear", "cancel", "accept"],
+            actions: ['clear', 'cancel', 'accept'],
           },
         }}
       />

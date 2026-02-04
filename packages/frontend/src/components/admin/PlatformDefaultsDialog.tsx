@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import {
   Drawer,
   Button,
@@ -12,30 +12,27 @@ import {
   Stack,
   Alert,
   CircularProgress,
-} from "@mui/material";
+} from '@mui/material';
 import {
   Close as CloseIcon,
   ExpandMore as ExpandMoreIcon,
   Save as SaveIcon,
-} from "@mui/icons-material";
-import { useTranslation } from "react-i18next";
-import { useSnackbar } from "notistack";
+} from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
+import { useSnackbar } from 'notistack';
 import {
   PlatformDefaultsService,
   PlatformDefaults,
   PlatformDefaultsMap,
-} from "@/services/platformDefaultsService";
-import { usePlatformConfig } from "@/contexts/PlatformConfigContext";
+} from '@/services/platformDefaultsService';
+import { usePlatformConfig } from '@/contexts/PlatformConfigContext';
 
 interface PlatformDefaultsDialogProps {
   open: boolean;
   onClose: () => void;
 }
 
-const PlatformDefaultsDialog: React.FC<PlatformDefaultsDialogProps> = ({
-  open,
-  onClose,
-}) => {
+const PlatformDefaultsDialog: React.FC<PlatformDefaultsDialogProps> = ({ open, onClose }) => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { platforms, isLoading: platformsLoading } = usePlatformConfig();
@@ -52,15 +49,15 @@ const PlatformDefaultsDialog: React.FC<PlatformDefaultsDialogProps> = ({
       // Ensure all known platforms are present, even if not stored yet
       const merged: PlatformDefaultsMap = platforms.reduce((acc, p) => {
         acc[p.value] = {
-          gameServerAddress: data?.[p.value]?.gameServerAddress || "",
-          patchAddress: data?.[p.value]?.patchAddress || "",
+          gameServerAddress: data?.[p.value]?.gameServerAddress || '',
+          patchAddress: data?.[p.value]?.patchAddress || '',
         };
         return acc;
       }, {} as PlatformDefaultsMap);
       setDefaults(merged);
     } catch (error) {
-      console.error("Failed to load platform defaults:", error);
-      enqueueSnackbar(t("platformDefaults.loadError"), { variant: "error" });
+      console.error('Failed to load platform defaults:', error);
+      enqueueSnackbar(t('platformDefaults.loadError'), { variant: 'error' });
     } finally {
       setLoading(false);
     }
@@ -78,7 +75,7 @@ const PlatformDefaultsDialog: React.FC<PlatformDefaultsDialogProps> = ({
   const handlePlatformDefaultChange = (
     platform: string,
     field: keyof PlatformDefaults,
-    value: string,
+    value: string
   ) => {
     setDefaults((prev) => ({
       ...prev,
@@ -94,13 +91,13 @@ const PlatformDefaultsDialog: React.FC<PlatformDefaultsDialogProps> = ({
     try {
       setSaving(true);
       await PlatformDefaultsService.setAllDefaults(defaults);
-      enqueueSnackbar(t("platformDefaults.saveSuccess"), {
-        variant: "success",
+      enqueueSnackbar(t('platformDefaults.saveSuccess'), {
+        variant: 'success',
       });
       onClose();
     } catch (error) {
-      console.error("Failed to save platform defaults:", error);
-      enqueueSnackbar(t("platformDefaults.saveError"), { variant: "error" });
+      console.error('Failed to save platform defaults:', error);
+      enqueueSnackbar(t('platformDefaults.saveError'), { variant: 'error' });
     } finally {
       setSaving(false);
     }
@@ -115,40 +112,40 @@ const PlatformDefaultsDialog: React.FC<PlatformDefaultsDialogProps> = ({
       onClose={onClose}
       sx={{
         zIndex: 1301,
-        "& .MuiDrawer-paper": {
-          width: { xs: "100%", sm: 600 },
-          maxWidth: "100vw",
-          display: "flex",
-          flexDirection: "column",
+        '& .MuiDrawer-paper': {
+          width: { xs: '100%', sm: 600 },
+          maxWidth: '100vw',
+          display: 'flex',
+          flexDirection: 'column',
         },
       }}
     >
       {/* Header */}
       <Box
         sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
           p: 2,
-          borderBottom: "1px solid",
-          borderColor: "divider",
-          bgcolor: "background.paper",
+          borderBottom: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper',
         }}
       >
         <Box>
           <Typography variant="h6" component="h2">
-            {t("platformDefaults.title")}
+            {t('platformDefaults.title')}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            {t("platformDefaults.description")}
+            {t('platformDefaults.description')}
           </Typography>
         </Box>
         <IconButton
           onClick={onClose}
           size="small"
           sx={{
-            "&:hover": {
-              backgroundColor: "action.hover",
+            '&:hover': {
+              backgroundColor: 'action.hover',
             },
           }}
         >
@@ -157,26 +154,26 @@ const PlatformDefaultsDialog: React.FC<PlatformDefaultsDialogProps> = ({
       </Box>
 
       {/* Content */}
-      <Box sx={{ flex: 1, overflow: "auto", p: 2 }}>
+      <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
         {loading ? (
-          <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
             <CircularProgress />
           </Box>
         ) : (
           <Stack spacing={2}>
             {/* 플랫폼별 설정 */}
             {platformList.length === 0 ? (
-              <Alert severity="info">{t("platformDefaults.noPlatforms")}</Alert>
+              <Alert severity="info">{t('platformDefaults.noPlatforms')}</Alert>
             ) : (
               platformList.map((platform) => (
                 <Accordion key={platform.value} defaultExpanded>
                   <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                     <Box
                       sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        width: "100%",
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        width: '100%',
                         mr: 2,
                       }}
                     >
@@ -189,33 +186,31 @@ const PlatformDefaultsDialog: React.FC<PlatformDefaultsDialogProps> = ({
                     <Stack spacing={2}>
                       <TextField
                         fullWidth
-                        label={t("clientVersions.form.gameServerAddress")}
-                        value={
-                          defaults[platform.value]?.gameServerAddress || ""
-                        }
+                        label={t('clientVersions.form.gameServerAddress')}
+                        value={defaults[platform.value]?.gameServerAddress || ''}
                         onChange={(e) =>
                           handlePlatformDefaultChange(
                             platform.value,
-                            "gameServerAddress",
-                            e.target.value,
+                            'gameServerAddress',
+                            e.target.value
                           )
                         }
                         placeholder="https://game.example.com"
-                        helperText={t("platformDefaults.gameServerAddressHelp")}
+                        helperText={t('platformDefaults.gameServerAddressHelp')}
                       />
                       <TextField
                         fullWidth
-                        label={t("clientVersions.form.patchAddress")}
-                        value={defaults[platform.value]?.patchAddress || ""}
+                        label={t('clientVersions.form.patchAddress')}
+                        value={defaults[platform.value]?.patchAddress || ''}
                         onChange={(e) =>
                           handlePlatformDefaultChange(
                             platform.value,
-                            "patchAddress",
-                            e.target.value,
+                            'patchAddress',
+                            e.target.value
                           )
                         }
                         placeholder="https://patch.example.com"
-                        helperText={t("platformDefaults.patchAddressHelp")}
+                        helperText={t('platformDefaults.patchAddressHelp')}
                       />
                     </Stack>
                   </AccordionDetails>
@@ -230,22 +225,22 @@ const PlatformDefaultsDialog: React.FC<PlatformDefaultsDialogProps> = ({
       <Box
         sx={{
           p: 2,
-          borderTop: "1px solid",
-          borderColor: "divider",
-          bgcolor: "background.paper",
-          display: "flex",
+          borderTop: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper',
+          display: 'flex',
           gap: 1,
-          justifyContent: "flex-end",
+          justifyContent: 'flex-end',
         }}
       >
-        <Button onClick={onClose}>{t("common.cancel")}</Button>
+        <Button onClick={onClose}>{t('common.cancel')}</Button>
         <Button
           variant="contained"
           startIcon={saving ? <CircularProgress size={16} /> : <SaveIcon />}
           onClick={handleSave}
           disabled={saving || loading}
         >
-          {t("common.save")}
+          {t('common.save')}
         </Button>
       </Box>
     </Drawer>

@@ -1,4 +1,4 @@
-import { apiClient } from "./api";
+import { apiClient } from './api';
 
 export interface LinkPreviewData {
   url: string;
@@ -61,12 +61,9 @@ class LinkPreviewService {
    */
   private async fetchPreview(url: string): Promise<LinkPreviewData | null> {
     try {
-      const response = await apiClient.post<LinkPreviewResponse>(
-        "/link-preview",
-        {
-          url,
-        },
-      );
+      const response = await apiClient.post<LinkPreviewResponse>('/link-preview', {
+        url,
+      });
 
       if (response.data.success && response.data.data) {
         return response.data.data;
@@ -74,7 +71,7 @@ class LinkPreviewService {
 
       return null;
     } catch (error) {
-      console.error("Failed to fetch link preview:", error);
+      console.error('Failed to fetch link preview:', error);
       return null;
     }
   }
@@ -108,49 +105,25 @@ class LinkPreviewService {
       const parsedUrl = new URL(url);
 
       // HTTP/HTTPS만 지원
-      if (!["http:", "https:"].includes(parsedUrl.protocol)) {
+      if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
         return false;
       }
 
       // 이미지 파일은 제외
-      const imageExtensions = [
-        ".jpg",
-        ".jpeg",
-        ".png",
-        ".gif",
-        ".webp",
-        ".svg",
-        ".bmp",
-      ];
+      const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg', '.bmp'];
       const pathname = parsedUrl.pathname.toLowerCase();
       if (imageExtensions.some((ext) => pathname.endsWith(ext))) {
         return false;
       }
 
       // 동영상 파일은 제외
-      const videoExtensions = [
-        ".mp4",
-        ".webm",
-        ".ogg",
-        ".avi",
-        ".mov",
-        ".wmv",
-        ".flv",
-      ];
+      const videoExtensions = ['.mp4', '.webm', '.ogg', '.avi', '.mov', '.wmv', '.flv'];
       if (videoExtensions.some((ext) => pathname.endsWith(ext))) {
         return false;
       }
 
       // 문서 파일은 제외
-      const docExtensions = [
-        ".pdf",
-        ".doc",
-        ".docx",
-        ".xls",
-        ".xlsx",
-        ".ppt",
-        ".pptx",
-      ];
+      const docExtensions = ['.pdf', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx'];
       if (docExtensions.some((ext) => pathname.endsWith(ext))) {
         return false;
       }
@@ -173,9 +146,7 @@ class LinkPreviewService {
   /**
    * 여러 URL의 미리보기를 동시에 가져옵니다
    */
-  async getMultiplePreviews(
-    urls: string[],
-  ): Promise<Map<string, LinkPreviewData | null>> {
+  async getMultiplePreviews(urls: string[]): Promise<Map<string, LinkPreviewData | null>> {
     const results = new Map<string, LinkPreviewData | null>();
 
     // 미리보기 가능한 URL만 필터링
@@ -206,7 +177,7 @@ class LinkPreviewService {
       const diffMonths = Math.floor(diffDays / 30);
       const diffYears = Math.floor(diffDays / 365);
 
-      if (diffMinutes < 1) return "방금 전";
+      if (diffMinutes < 1) return '방금 전';
       if (diffMinutes < 60) return `${diffMinutes}분 전`;
       if (diffHours < 24) return `${diffHours}시간 전`;
       if (diffDays < 30) return `${diffDays}일 전`;

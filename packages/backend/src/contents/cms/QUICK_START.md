@@ -20,6 +20,7 @@ ls -lh *.json loctab
 ```
 
 7개의 파일이 생성됩니다:
+
 - ✅ `reward-lookup.json` - 보상 아이템 전체 목록
 - ✅ `reward-type-list.json` - 보상 타입 드롭다운용
 - ✅ `reward-localization-kr.json` - 한국어 번역
@@ -45,13 +46,13 @@ import rewardTypeList from './reward-type-list.json';
 import rewardLookup from './reward-lookup.json';
 
 // 1. REWARD_TYPE 드롭다운 생성
-const rewardTypes = rewardTypeList.filter(t => t.hasTable);
+const rewardTypes = rewardTypeList.filter((t) => t.hasTable);
 
 // 2. 선택된 타입의 아이템 목록 가져오기
 const items = rewardLookup[selectedTypeValue].items;
 
 // 3. 아이템 드롭다운 생성
-items.forEach(item => {
+items.forEach((item) => {
   console.log(`[${item.id}] ${item.name}`);
 });
 ```
@@ -62,12 +63,12 @@ items.forEach(item => {
 import uiListData from './ui-list-data.json';
 
 // 1. 국가 드롭다운
-uiListData.nations.forEach(nation => {
+uiListData.nations.forEach((nation) => {
   console.log(`[${nation.id}] ${nation.name}`);
 });
 
 // 2. 선택된 국가의 마을만 필터링
-const towns = uiListData.towns.filter(t => t.nationId === selectedNationId);
+const towns = uiListData.towns.filter((t) => t.nationId === selectedNationId);
 ```
 
 ### 로컬라이징
@@ -109,15 +110,15 @@ node adminToolDataBuilder.js --output-dir /custom/output/path
 
 ## 📊 생성 데이터 통계
 
-| 파일 | 크기 | 항목 수 | 설명 |
-|------|------|---------|------|
-| reward-lookup.json | ~1.5MB | 21,556개 | 전체 보상 아이템 |
-| reward-type-list.json | ~7KB | 35개 | REWARD_TYPE 목록 |
-| reward-localization-kr.json | ~3KB | 70개 | 한국어 번역 |
-| reward-localization-us.json | ~3KB | 70개 | 영어 번역 |
-| reward-localization-cn.json | ~3KB | 70개 | 중국어 번역 |
-| ui-list-data.json | ~34KB | 447개 | 국가/마을/촌락 |
-| loctab | ~3.3MB | 50,222개 | 한글→중국어 |
+| 파일                        | 크기   | 항목 수  | 설명             |
+| --------------------------- | ------ | -------- | ---------------- |
+| reward-lookup.json          | ~1.5MB | 21,556개 | 전체 보상 아이템 |
+| reward-type-list.json       | ~7KB   | 35개     | REWARD_TYPE 목록 |
+| reward-localization-kr.json | ~3KB   | 70개     | 한국어 번역      |
+| reward-localization-us.json | ~3KB   | 70개     | 영어 번역        |
+| reward-localization-cn.json | ~3KB   | 70개     | 중국어 번역      |
+| ui-list-data.json           | ~34KB  | 447개    | 국가/마을/촌락   |
+| loctab                      | ~3.3MB | 50,222개 | 한글→중국어      |
 
 ## ❓ 자주 묻는 질문
 
@@ -154,4 +155,3 @@ A: 일반적으로 2초 이내입니다. 더 오래 걸린다면 CMS 파일 크�
 ## 🎉 완료!
 
 이제 운영툴에서 생성된 파일들을 사용할 수 있습니다!
-

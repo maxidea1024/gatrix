@@ -1,5 +1,5 @@
-import { apiService } from "./api";
-import { Mail, MailFilters, MailStats, SendMailRequest } from "../types/mail";
+import { apiService } from './api';
+import { Mail, MailFilters, MailStats, SendMailRequest } from '../types/mail';
 
 export interface MailListResponse {
   success: boolean;
@@ -54,18 +54,15 @@ export class MailService {
       params.limit = filters.limit;
     }
 
-    return apiService.get("/mails", { params });
+    return apiService.get('/mails', { params });
   }
 
   /**
    * Get sent mails for the current user
    */
-  async getSentMails(
-    page: number = 1,
-    limit: number = 20,
-  ): Promise<MailListResponse> {
+  async getSentMails(page: number = 1, limit: number = 20): Promise<MailListResponse> {
     const params = { page, limit };
-    return apiService.get("/mails/sent", { params });
+    return apiService.get('/mails/sent', { params });
   }
 
   /**
@@ -79,9 +76,7 @@ export class MailService {
    * Get unread mail count
    */
   async getUnreadCount(): Promise<number> {
-    const response: UnreadCountResponse = await apiService.get(
-      "/mails/unread-count",
-    );
+    const response: UnreadCountResponse = await apiService.get('/mails/unread-count');
     return response.count;
   }
 
@@ -89,7 +84,7 @@ export class MailService {
    * Get mail statistics
    */
   async getMailStats(): Promise<MailStats> {
-    const response: MailStatsResponse = await apiService.get("/mails/stats");
+    const response: MailStatsResponse = await apiService.get('/mails/stats');
     return response.data;
   }
 
@@ -97,7 +92,7 @@ export class MailService {
    * Send a new mail
    */
   async sendMail(mailData: SendMailRequest): Promise<MailResponse> {
-    return apiService.post("/mails", mailData);
+    return apiService.post('/mails', mailData);
   }
 
   /**
@@ -111,22 +106,22 @@ export class MailService {
    * Mark multiple mails as read
    */
   async markMultipleAsRead(mailIds: number[]): Promise<void> {
-    await apiService.patch("/mails/read-multiple", { mailIds });
+    await apiService.patch('/mails/read-multiple', { mailIds });
   }
 
   /**
    * Mark all unread mails as read (with optional filter)
    */
-  async markAllAsRead(filter?: "all" | "unread" | "starred"): Promise<void> {
+  async markAllAsRead(filter?: 'all' | 'unread' | 'starred'): Promise<void> {
     const params: any = {};
-    if (filter && filter !== "all") {
-      if (filter === "unread") {
+    if (filter && filter !== 'all') {
+      if (filter === 'unread') {
         params.isRead = false;
-      } else if (filter === "starred") {
+      } else if (filter === 'starred') {
         params.isStarred = true;
       }
     }
-    await apiService.patch("/mails/read-all", params);
+    await apiService.patch('/mails/read-all', params);
   }
 
   /**
@@ -148,22 +143,22 @@ export class MailService {
    * Delete multiple mails
    */
   async deleteMultiple(mailIds: number[]): Promise<void> {
-    await apiService.delete("/mails", { data: { mailIds } });
+    await apiService.delete('/mails', { data: { mailIds } });
   }
 
   /**
    * Delete all mails (with optional filter)
    */
-  async deleteAllMails(filter?: "all" | "unread" | "starred"): Promise<void> {
+  async deleteAllMails(filter?: 'all' | 'unread' | 'starred'): Promise<void> {
     const params: any = {};
-    if (filter && filter !== "all") {
-      if (filter === "unread") {
-        params.isRead = "false";
-      } else if (filter === "starred") {
-        params.isStarred = "true";
+    if (filter && filter !== 'all') {
+      if (filter === 'unread') {
+        params.isRead = 'false';
+      } else if (filter === 'starred') {
+        params.isStarred = 'true';
       }
     }
-    await apiService.delete("/mails/delete-all", { params });
+    await apiService.delete('/mails/delete-all', { params });
   }
 }
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Button,
   TextField,
@@ -20,28 +20,28 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
-} from "@mui/material";
+} from '@mui/material';
 import {
   Cancel as CancelIcon,
   Save as SaveIcon,
   FileCopy as CopyIcon,
   ExpandMore as ExpandMoreIcon,
   Build as BuildIcon,
-} from "@mui/icons-material";
-import ResizableDrawer from "../common/ResizableDrawer";
-import { useTranslation } from "react-i18next";
-import { useSnackbar } from "notistack";
-import { useForm, Controller, SubmitHandler } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
-import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import dayjs from "dayjs";
-import "dayjs/locale/ko";
-import "dayjs/locale/en";
-import "dayjs/locale/zh-cn";
-import FormDialogHeader from "../common/FormDialogHeader";
+} from '@mui/icons-material';
+import ResizableDrawer from '../common/ResizableDrawer';
+import { useTranslation } from 'react-i18next';
+import { useSnackbar } from 'notistack';
+import { useForm, Controller, SubmitHandler } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import dayjs from 'dayjs';
+import 'dayjs/locale/ko';
+import 'dayjs/locale/en';
+import 'dayjs/locale/zh-cn';
+import FormDialogHeader from '../common/FormDialogHeader';
 import {
   ClientVersion,
   ClientVersionFormData,
@@ -49,24 +49,21 @@ import {
   ClientStatus,
   ClientStatusLabels,
   CLIENT_VERSION_VALIDATION,
-} from "../../types/clientVersion";
-import { ClientVersionService } from "../../services/clientVersionService";
-import { tagService } from "../../services/tagService";
-import { PlatformDefaultsService } from "../../services/platformDefaultsService";
-import { usePlatformConfig } from "../../contexts/PlatformConfigContext";
-import JsonEditor from "../common/JsonEditor";
-import MaintenanceSettingsInput from "../common/MaintenanceSettingsInput";
-import {
-  MessageTemplate,
-  messageTemplateService,
-} from "../../services/messageTemplateService";
-import { MessageLocale } from "../common/MultiLanguageMessageInput";
-import { getContrastColor } from "@/utils/colorUtils";
-import { parseApiErrorMessage } from "@/utils/errorUtils";
-import { showChangeRequestCreatedToast } from "@/utils/changeRequestToast";
-import { useNavigate } from "react-router-dom";
-import { useEnvironment } from "../../contexts/EnvironmentContext";
-import { getActionLabel } from "@/utils/changeRequestToast";
+} from '../../types/clientVersion';
+import { ClientVersionService } from '../../services/clientVersionService';
+import { tagService } from '../../services/tagService';
+import { PlatformDefaultsService } from '../../services/platformDefaultsService';
+import { usePlatformConfig } from '../../contexts/PlatformConfigContext';
+import JsonEditor from '../common/JsonEditor';
+import MaintenanceSettingsInput from '../common/MaintenanceSettingsInput';
+import { MessageTemplate, messageTemplateService } from '../../services/messageTemplateService';
+import { MessageLocale } from '../common/MultiLanguageMessageInput';
+import { getContrastColor } from '@/utils/colorUtils';
+import { parseApiErrorMessage } from '@/utils/errorUtils';
+import { showChangeRequestCreatedToast } from '@/utils/changeRequestToast';
+import { useNavigate } from 'react-router-dom';
+import { useEnvironment } from '../../contexts/EnvironmentContext';
+import { getActionLabel } from '@/utils/changeRequestToast';
 
 interface ClientVersionFormProps {
   open: boolean;
@@ -81,23 +78,23 @@ const createValidationSchema = (t: any) =>
   yup.object({
     platform: yup
       .string()
-      .required(t("clientVersions.form.platformRequired"))
+      .required(t('clientVersions.form.platformRequired'))
       .min(CLIENT_VERSION_VALIDATION.PLATFORM.MIN_LENGTH)
       .max(CLIENT_VERSION_VALIDATION.PLATFORM.MAX_LENGTH),
     clientVersion: yup
       .string()
-      .required(t("clientVersions.form.versionRequired"))
+      .required(t('clientVersions.form.versionRequired'))
       .matches(
         CLIENT_VERSION_VALIDATION.CLIENT_VERSION.PATTERN,
-        t("clientVersions.form.versionInvalid"),
+        t('clientVersions.form.versionInvalid')
       ),
     clientStatus: yup
       .string()
       .oneOf(Object.values(ClientStatus))
-      .required(t("clientVersions.form.statusRequired")),
+      .required(t('clientVersions.form.statusRequired')),
     gameServerAddress: yup
       .string()
-      .required(t("clientVersions.form.gameServerRequired"))
+      .required(t('clientVersions.form.gameServerRequired'))
       .min(CLIENT_VERSION_VALIDATION.SERVER_ADDRESS.MIN_LENGTH)
       .max(CLIENT_VERSION_VALIDATION.SERVER_ADDRESS.MAX_LENGTH),
     gameServerAddressForWhiteList: yup
@@ -106,7 +103,7 @@ const createValidationSchema = (t: any) =>
       .notRequired(),
     patchAddress: yup
       .string()
-      .required(t("clientVersions.form.patchAddressRequired"))
+      .required(t('clientVersions.form.patchAddressRequired'))
       .min(CLIENT_VERSION_VALIDATION.PATCH_ADDRESS.MIN_LENGTH)
       .max(CLIENT_VERSION_VALIDATION.PATCH_ADDRESS.MAX_LENGTH),
     patchAddressForWhiteList: yup
@@ -118,10 +115,7 @@ const createValidationSchema = (t: any) =>
       .string()
       .max(CLIENT_VERSION_VALIDATION.EXTERNAL_LINK.MAX_LENGTH)
       .notRequired(),
-    memo: yup
-      .string()
-      .max(CLIENT_VERSION_VALIDATION.MEMO.MAX_LENGTH)
-      .notRequired(),
+    memo: yup.string().max(CLIENT_VERSION_VALIDATION.MEMO.MAX_LENGTH).notRequired(),
     customPayload: yup
       .string()
       .max(CLIENT_VERSION_VALIDATION.CUSTOM_PAYLOAD.MAX_LENGTH)
@@ -129,10 +123,9 @@ const createValidationSchema = (t: any) =>
     // 점검 관련 필드
     maintenanceStartDate: yup.string().notRequired(),
     maintenanceEndDate: yup.string().notRequired(),
-    maintenanceMessage: yup.string().when("clientStatus", {
+    maintenanceMessage: yup.string().when('clientStatus', {
       is: ClientStatus.MAINTENANCE,
-      then: (schema) =>
-        schema.required(t("clientVersions.maintenance.messageRequired")),
+      then: (schema) => schema.required(t('clientVersions.maintenance.messageRequired')),
       otherwise: (schema) => schema.notRequired(),
     }),
     supportsMultiLanguage: yup.boolean().notRequired(),
@@ -165,37 +158,37 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
   const [allTags, setAllTags] = useState<
     { id: number; name: string; color: string; description?: string }[]
   >([]);
-  const [selectedTags, setSelectedTags] = useState<
-    { id: number; name: string; color: string }[]
-  >([]);
+  const [selectedTags, setSelectedTags] = useState<{ id: number; name: string; color: string }[]>(
+    []
+  );
 
   // 점검 관련 상태
-  const [maintenanceLocales, setMaintenanceLocales] = useState<
-    ClientVersionMaintenanceLocale[]
-  >([]);
+  const [maintenanceLocales, setMaintenanceLocales] = useState<ClientVersionMaintenanceLocale[]>(
+    []
+  );
   const [supportsMultiLanguage, setSupportsMultiLanguage] = useState(false);
 
   // 메시지 소스 선택
-  const [inputMode, setInputMode] = useState<"direct" | "template">("direct");
+  const [inputMode, setInputMode] = useState<'direct' | 'template'>('direct');
   const [templates, setTemplates] = useState<MessageTemplate[]>([]);
-  const [selectedTemplateId, setSelectedTemplateId] = useState<number | "">("");
+  const [selectedTemplateId, setSelectedTemplateId] = useState<number | ''>('');
 
   // 기본값 설정
   const defaultValues: ClientVersionFormData = {
-    platform: "pc", // 첫 번째 플랫폼을 기본값으로 설정
-    clientVersion: "",
+    platform: 'pc', // 첫 번째 플랫폼을 기본값으로 설정
+    clientVersion: '',
     clientStatus: ClientStatus.OFFLINE, // 첫 번째 상태를 기본값으로 설정
-    gameServerAddress: "",
-    gameServerAddressForWhiteList: "",
-    patchAddress: "",
-    patchAddressForWhiteList: "",
+    gameServerAddress: '',
+    gameServerAddressForWhiteList: '',
+    patchAddress: '',
+    patchAddressForWhiteList: '',
     guestModeAllowed: false,
-    externalClickLink: "",
-    memo: "",
-    customPayload: "",
-    maintenanceStartDate: "",
-    maintenanceEndDate: "",
-    maintenanceMessage: "",
+    externalClickLink: '',
+    memo: '',
+    customPayload: '',
+    maintenanceStartDate: '',
+    maintenanceEndDate: '',
+    maintenanceMessage: '',
     supportsMultiLanguage: false,
     maintenanceLocales: [],
     tags: [],
@@ -215,7 +208,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
   });
 
   // 현재 상태 감시
-  const currentStatus = watch("clientStatus");
+  const currentStatus = watch('clientStatus');
   const isMaintenanceMode = currentStatus === ClientStatus.MAINTENANCE;
 
   // 폼 초기화
@@ -227,7 +220,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
 
       if (clientVersion) {
         // 편집 모드 또는 복사 모드일 때 기존 데이터로 초기화
-        console.log("Initializing form with clientVersion data:", {
+        console.log('Initializing form with clientVersion data:', {
           isEdit,
           isCopyMode,
           clientVersion,
@@ -238,95 +231,79 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
           try {
             // 목록에서 온 데이터에는 maintenanceLocales가 비어있을 수 있으므로 상세 재조회
             if (
-              (!source.maintenanceLocales ||
-                source.maintenanceLocales.length === 0) &&
+              (!source.maintenanceLocales || source.maintenanceLocales.length === 0) &&
               source.id
             ) {
-              const full = await ClientVersionService.getClientVersionById(
-                source.id,
-              );
+              const full = await ClientVersionService.getClientVersionById(source.id);
               if (full) source = full as any;
             }
           } catch (e) {
-            console.warn("Failed to load full client version details:", e);
+            console.warn('Failed to load full client version details:', e);
           }
 
           reset({
             platform: source.platform,
-            clientVersion: isCopyMode ? "" : source.clientVersion, // 복사 모드일 때만 버전 비움
+            clientVersion: isCopyMode ? '' : source.clientVersion, // 복사 모드일 때만 버전 비움
             clientStatus: source.clientStatus,
             gameServerAddress: source.gameServerAddress,
-            gameServerAddressForWhiteList:
-              source.gameServerAddressForWhiteList || "",
+            gameServerAddressForWhiteList: source.gameServerAddressForWhiteList || '',
             patchAddress: source.patchAddress,
-            patchAddressForWhiteList: source.patchAddressForWhiteList || "",
+            patchAddressForWhiteList: source.patchAddressForWhiteList || '',
             guestModeAllowed: source.guestModeAllowed,
-            externalClickLink: source.externalClickLink || "",
-            memo: source.memo || "",
-            customPayload: source.customPayload || "",
-            maintenanceStartDate: source.maintenanceStartDate || "",
-            maintenanceEndDate: source.maintenanceEndDate || "",
-            maintenanceMessage: source.maintenanceMessage || "",
+            externalClickLink: source.externalClickLink || '',
+            memo: source.memo || '',
+            customPayload: source.customPayload || '',
+            maintenanceStartDate: source.maintenanceStartDate || '',
+            maintenanceEndDate: source.maintenanceEndDate || '',
+            maintenanceMessage: source.maintenanceMessage || '',
             // supportsMultiLanguage가 false여도 로케일 데이터가 있으면 활성화
             supportsMultiLanguage:
               (source.supportsMultiLanguage ?? false) ||
-              !!(
-                source.maintenanceLocales &&
-                source.maintenanceLocales.length > 0
-              ),
+              !!(source.maintenanceLocales && source.maintenanceLocales.length > 0),
             // 서버 언어코드 정규화
-            maintenanceLocales: (source.maintenanceLocales || []).map(
-              (l: any) => ({
-                lang: normalizeLangCode(l.lang),
-                message: l.message || "",
-              }),
-            ),
+            maintenanceLocales: (source.maintenanceLocales || []).map((l: any) => ({
+              lang: normalizeLangCode(l.lang),
+              message: l.message || '',
+            })),
             tags: source.tags || [],
           });
           setSelectedTags(source.tags || []);
-          const normalizedLocales = (source.maintenanceLocales || []).map(
-            (l: any) => ({
-              lang: normalizeLangCode(l.lang),
-              message: l.message || "",
-            }),
-          );
+          const normalizedLocales = (source.maintenanceLocales || []).map((l: any) => ({
+            lang: normalizeLangCode(l.lang),
+            message: l.message || '',
+          }));
           setMaintenanceLocales(normalizedLocales);
           setSupportsMultiLanguage(
-            (source.supportsMultiLanguage ?? false) ||
-              normalizedLocales.length > 0,
+            (source.supportsMultiLanguage ?? false) || normalizedLocales.length > 0
           );
         })();
       } else {
         // 새로 생성할 때 기본값으로 초기화
-        console.log("Initializing form with default values");
+        console.log('Initializing form with default values');
         reset(defaultValues);
         setSelectedTags([]);
         setMaintenanceLocales([]);
         setSupportsMultiLanguage(false);
-        setInputMode("direct");
-        setSelectedTemplateId("");
+        setInputMode('direct');
+        setSelectedTemplateId('');
 
         // 초기 플랫폼(예: 'pc')에 대한 기본값을 즉시 적용 (필드가 비어있는 경우에만)
         (async () => {
           try {
-            const initialPlatform =
-              getValues("platform") || defaultValues.platform;
+            const initialPlatform = getValues('platform') || defaultValues.platform;
             if (initialPlatform) {
-              const defaults =
-                await PlatformDefaultsService.getPlatformDefaults(
-                  initialPlatform,
-                );
-              const currentGame = getValues("gameServerAddress");
-              const currentPatch = getValues("patchAddress");
+              const defaults = await PlatformDefaultsService.getPlatformDefaults(initialPlatform);
+              const currentGame = getValues('gameServerAddress');
+              const currentPatch = getValues('patchAddress');
               if (!currentGame && defaults.gameServerAddress) {
-                setValue("gameServerAddress", defaults.gameServerAddress);
+                setValue('gameServerAddress', defaults.gameServerAddress);
               }
               if (!currentPatch && defaults.patchAddress) {
-                setValue("patchAddress", defaults.patchAddress);
+                setValue('patchAddress', defaults.patchAddress);
               }
             }
           } catch (e) {
-            console.error("Failed to apply initial platform defaults:", e);
+            console.error('Failed to apply initial platform defaults:', e);
           }
         })();
       }
@@ -349,7 +326,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
           const tags = await tagService.list();
           setAllTags(tags);
         } catch (error) {
-          console.error("Failed to load tags:", error);
+          console.error('Failed to load tags:', error);
         }
       };
       loadTags();
@@ -366,7 +343,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
           });
           setTemplates(response.templates || []);
         } catch (error) {
-          console.error("Failed to load message templates:", error);
+          console.error('Failed to load message templates:', error);
           setTemplates([]);
         }
       };
@@ -375,52 +352,47 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
   }, [open]);
 
   // 언어 코드 정규화 (서버가 ko-KR, en-US, zh-CN 등으로 줄 수 있음)
-  const normalizeLangCode = (code: string): "ko" | "en" | "zh" => {
-    const lower = (code || "").toLowerCase();
-    if (lower.startsWith("ko")) return "ko";
-    if (lower.startsWith("en")) return "en";
-    if (lower.startsWith("zh")) return "zh";
-    return "en";
+  const normalizeLangCode = (code: string): 'ko' | 'en' | 'zh' => {
+    const lower = (code || '').toLowerCase();
+    if (lower.startsWith('ko')) return 'ko';
+    if (lower.startsWith('en')) return 'en';
+    if (lower.startsWith('zh')) return 'zh';
+    return 'en';
   };
 
   // 점검 메시지 로케일 관리 함수들
-  const addMaintenanceLocale = (lang: "ko" | "en" | "zh") => {
+  const addMaintenanceLocale = (lang: 'ko' | 'en' | 'zh') => {
     if (!maintenanceLocales.find((l) => l.lang === lang)) {
-      const newLocales = [...maintenanceLocales, { lang, message: "" }];
+      const newLocales = [...maintenanceLocales, { lang, message: '' }];
       setMaintenanceLocales(newLocales);
-      setValue("maintenanceLocales", newLocales, { shouldDirty: true });
+      setValue('maintenanceLocales', newLocales, { shouldDirty: true });
     }
   };
 
-  const updateMaintenanceLocale = (
-    lang: "ko" | "en" | "zh",
-    message: string,
-  ) => {
-    const newLocales = maintenanceLocales.map((l) =>
-      l.lang === lang ? { ...l, message } : l,
-    );
+  const updateMaintenanceLocale = (lang: 'ko' | 'en' | 'zh', message: string) => {
+    const newLocales = maintenanceLocales.map((l) => (l.lang === lang ? { ...l, message } : l));
     setMaintenanceLocales(newLocales);
-    setValue("maintenanceLocales", newLocales, { shouldDirty: true });
+    setValue('maintenanceLocales', newLocales, { shouldDirty: true });
   };
 
-  const removeMaintenanceLocale = (lang: "ko" | "en" | "zh") => {
+  const removeMaintenanceLocale = (lang: 'ko' | 'en' | 'zh') => {
     const newLocales = maintenanceLocales.filter((l) => l.lang !== lang);
     setMaintenanceLocales(newLocales);
-    setValue("maintenanceLocales", newLocales, { shouldDirty: true });
+    setValue('maintenanceLocales', newLocales, { shouldDirty: true });
   };
 
   // 언어별 메시지 사용 여부 변경
   const handleSupportsMultiLanguageChange = (enabled: boolean) => {
     setSupportsMultiLanguage(enabled);
-    setValue("supportsMultiLanguage", enabled, { shouldDirty: true });
+    setValue('supportsMultiLanguage', enabled, { shouldDirty: true });
     if (enabled) {
       // 활성화 시, 기존 값을 보존하면서 누락된 언어만 추가
       const merged = availableLanguages.map((lang) => {
         const existing = maintenanceLocales.find((l) => l.lang === lang.code);
-        return { lang: lang.code, message: existing?.message || "" } as any;
+        return { lang: lang.code, message: existing?.message || '' } as any;
       });
       setMaintenanceLocales(merged);
-      setValue("maintenanceLocales", merged, { shouldDirty: true });
+      setValue('maintenanceLocales', merged, { shouldDirty: true });
     } else {
       // 비활성화 시, 입력값은 유지하고 UI만 숨김 (state/폼 값은 건드리지 않음)
       // no-op
@@ -429,34 +401,32 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
 
   // 사용 가능한 언어 목록
   const availableLanguages = [
-    { code: "ko" as const, label: t("clientVersions.maintenance.korean") },
-    { code: "en" as const, label: t("clientVersions.maintenance.english") },
-    { code: "zh" as const, label: t("clientVersions.maintenance.chinese") },
+    { code: 'ko' as const, label: t('clientVersions.maintenance.korean') },
+    { code: 'en' as const, label: t('clientVersions.maintenance.english') },
+    { code: 'zh' as const, label: t('clientVersions.maintenance.chinese') },
   ];
 
   const usedLanguages = new Set(maintenanceLocales.map((l) => l.lang));
-  const availableToAdd = availableLanguages.filter(
-    (l) => !usedLanguages.has(l.code),
-  );
+  const availableToAdd = availableLanguages.filter((l) => !usedLanguages.has(l.code));
 
   // 날짜 로케일 설정
   const getDateLocale = () => {
-    const currentLang = t("language");
+    const currentLang = t('language');
     switch (currentLang) {
-      case "en":
-        dayjs.locale("en");
-        return "en";
-      case "zh":
-        dayjs.locale("zh-cn");
-        return "zh-cn";
+      case 'en':
+        dayjs.locale('en');
+        return 'en';
+      case 'zh':
+        dayjs.locale('zh-cn');
+        return 'zh-cn';
       default:
-        dayjs.locale("ko");
-        return "ko";
+        dayjs.locale('ko');
+        return 'ko';
     }
   };
 
   // 중복 검사
-  const watchedValues = watch(["platform", "clientVersion"]);
+  const watchedValues = watch(['platform', 'clientVersion']);
   useEffect(() => {
     const [platform, version] = watchedValues;
     if (platform && version) {
@@ -465,13 +435,11 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
           const isDuplicate = await ClientVersionService.checkDuplicate(
             platform,
             version,
-            isEdit ? clientVersion?.id : undefined,
+            isEdit ? clientVersion?.id : undefined
           );
-          setDuplicateError(
-            isDuplicate ? t("clientVersions.form.duplicateVersion") : null,
-          );
+          setDuplicateError(isDuplicate ? t('clientVersions.form.duplicateVersion') : null);
         } catch (error) {
-          console.error("Error checking duplicate:", error);
+          console.error('Error checking duplicate:', error);
         }
       };
 
@@ -483,24 +451,23 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
   }, [watchedValues, isEdit, clientVersion?.id, t]);
 
   // 플랫폼 변경 시 기본값 적용
-  const watchedPlatform = watch("platform");
+  const watchedPlatform = watch('platform');
   useEffect(() => {
     if (watchedPlatform && !isEdit) {
       // 새로 추가하는 경우에만 기본값 적용
       const applyDefaults = async () => {
         try {
-          const defaults =
-            await PlatformDefaultsService.getPlatformDefaults(watchedPlatform);
+          const defaults = await PlatformDefaultsService.getPlatformDefaults(watchedPlatform);
 
           // 플랫폼 기본값을 적용 (기존 값과 상관없이 덮어쓰기)
           if (defaults.gameServerAddress) {
-            setValue("gameServerAddress", defaults.gameServerAddress);
+            setValue('gameServerAddress', defaults.gameServerAddress);
           }
           if (defaults.patchAddress) {
-            setValue("patchAddress", defaults.patchAddress);
+            setValue('patchAddress', defaults.patchAddress);
           }
         } catch (error) {
-          console.error("Failed to apply platform defaults:", error);
+          console.error('Failed to apply platform defaults:', error);
         }
       };
 
@@ -510,59 +477,47 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
 
   // 폼 제출
   const onSubmit: SubmitHandler<ClientVersionFormData> = async (data) => {
-    console.log("=== FORM SUBMIT START ===");
-    console.log("Form data:", data);
-    console.log("isEdit:", isEdit);
-    console.log("isCopyMode:", isCopyMode);
-    console.log("clientVersion:", clientVersion);
+    console.log('=== FORM SUBMIT START ===');
+    console.log('Form data:', data);
+    console.log('isEdit:', isEdit);
+    console.log('isCopyMode:', isCopyMode);
+    console.log('clientVersion:', clientVersion);
 
     if (duplicateError) {
-      console.log(
-        "Form submission blocked due to duplicate error:",
-        duplicateError,
-      );
+      console.log('Form submission blocked due to duplicate error:', duplicateError);
       return;
     }
 
     try {
       setLoading(true);
-      console.log("Starting form submission...");
+      console.log('Starting form submission...');
 
       // 템플릿 모드일 때 메시지 처리
       let finalMaintenanceMessage = data.maintenanceMessage;
-      let finalMaintenanceLocales = maintenanceLocales.filter(
-        (l) => l.message.trim() !== "",
-      );
+      let finalMaintenanceLocales = maintenanceLocales.filter((l) => l.message.trim() !== '');
 
       if (
         data.clientStatus === ClientStatus.MAINTENANCE &&
-        inputMode === "template" &&
+        inputMode === 'template' &&
         selectedTemplateId
       ) {
-        const selectedTemplate = templates.find(
-          (t) => t.id === selectedTemplateId,
-        );
+        const selectedTemplate = templates.find((t) => t.id === selectedTemplateId);
         if (selectedTemplate) {
-          finalMaintenanceMessage = selectedTemplate.defaultMessage || "";
+          finalMaintenanceMessage = selectedTemplate.defaultMessage || '';
           finalMaintenanceLocales = (selectedTemplate.locales || [])
             .map((l) => ({
-              lang: l.lang as "ko" | "en" | "zh",
-              message: l.message || "",
+              lang: l.lang as 'ko' | 'en' | 'zh',
+              message: l.message || '',
             }))
-            .filter((l) => l.message.trim() !== "");
+            .filter((l) => l.message.trim() !== '');
         }
       }
 
       // 빈 문자열을 undefined로 변환하고 tags, maintenanceLocales 필드 제거 (별도 처리)
-      const {
-        tags,
-        maintenanceLocales: formMaintenanceLocales,
-        ...dataWithoutTags
-      } = data;
+      const { tags, maintenanceLocales: formMaintenanceLocales, ...dataWithoutTags } = data;
       const cleanedData = {
         ...dataWithoutTags,
-        gameServerAddressForWhiteList:
-          data.gameServerAddressForWhiteList || undefined,
+        gameServerAddressForWhiteList: data.gameServerAddressForWhiteList || undefined,
         patchAddressForWhiteList: data.patchAddressForWhiteList || undefined,
         externalClickLink: data.externalClickLink || undefined,
         memo: data.memo || undefined,
@@ -574,12 +529,12 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
         maintenanceLocales: finalMaintenanceLocales,
       };
 
-      console.log("Cleaned data to send:", cleanedData);
+      console.log('Cleaned data to send:', cleanedData);
 
       let clientVersionId: number;
 
       if (isEdit && clientVersion) {
-        console.log("Updating existing client version:", {
+        console.log('Updating existing client version:', {
           id: clientVersion.id,
           isEdit,
           isCopyMode,
@@ -587,48 +542,39 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
         });
 
         if (!clientVersion.id) {
-          throw new Error("Client version ID is missing");
+          throw new Error('Client version ID is missing');
         }
 
-        console.log("About to call updateClientVersion API...");
+        console.log('About to call updateClientVersion API...');
         const updateResult = await ClientVersionService.updateClientVersion(
           clientVersion.id,
-          cleanedData,
+          cleanedData
         );
-        console.log("updateClientVersion API call completed");
+        console.log('updateClientVersion API call completed');
 
         if (updateResult.isChangeRequest) {
-          showChangeRequestCreatedToast(
-            enqueueSnackbar,
-            closeSnackbar,
-            navigate,
-          );
+          showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
           onSuccess();
           onClose();
           return;
         }
 
         clientVersionId = clientVersion.id;
-        enqueueSnackbar(t("clientVersions.updateSuccess"), {
-          variant: "success",
+        enqueueSnackbar(t('clientVersions.updateSuccess'), {
+          variant: 'success',
         });
       } else {
-        console.log("Creating new client version (copy mode or new):", {
+        console.log('Creating new client version (copy mode or new):', {
           isEdit,
           isCopyMode,
           hasClientVersion: !!clientVersion,
         });
-        console.log("About to call createClientVersion API...");
-        const createResult =
-          await ClientVersionService.createClientVersion(cleanedData);
-        console.log("createClientVersion API call completed");
+        console.log('About to call createClientVersion API...');
+        const createResult = await ClientVersionService.createClientVersion(cleanedData);
+        console.log('createClientVersion API call completed');
 
         if (createResult.isChangeRequest) {
-          showChangeRequestCreatedToast(
-            enqueueSnackbar,
-            closeSnackbar,
-            navigate,
-          );
+          showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
           onSuccess();
           onClose();
           return;
@@ -636,23 +582,20 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
 
         clientVersionId = createResult.clientVersion?.id;
         if (!clientVersionId) {
-          throw new Error(t("common.cannotGetClientVersionId"));
+          throw new Error(t('common.cannotGetClientVersionId'));
         }
         enqueueSnackbar(
-          <Box
-            component="span"
-            sx={{ display: "inline-flex", alignItems: "center", gap: 0.75 }}
-          >
-            클라이언트 버전{" "}
+          <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.75 }}>
+            클라이언트 버전{' '}
             <Chip
               size="small"
               color="primary"
-              label={`${data.clientVersion}:${String(data.platform || "").toUpperCase()}`}
+              label={`${data.clientVersion}:${String(data.platform || '').toUpperCase()}`}
               sx={{ fontWeight: 600 }}
-            />{" "}
+            />{' '}
             을 등록했습니다.
           </Box>,
-          { variant: "success" },
+          { variant: 'success' }
         );
       }
 
@@ -665,16 +608,13 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
         await ClientVersionService.setTags(clientVersionId, []);
       }
 
-      console.log("Form submission successful");
+      console.log('Form submission successful');
       onSuccess();
       onClose();
     } catch (error: any) {
-      console.error("Error saving client version:", error);
-      const errorMessage = parseApiErrorMessage(
-        error,
-        "clientVersions.saveError",
-      );
-      enqueueSnackbar(errorMessage, { variant: "error" });
+      console.error('Error saving client version:', error);
+      const errorMessage = parseApiErrorMessage(error, 'clientVersions.saveError');
+      enqueueSnackbar(errorMessage, { variant: 'error' });
     } finally {
       setLoading(false);
     }
@@ -687,16 +627,16 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
   };
 
   const title = isCopyMode
-    ? t("clientVersions.form.copyTitle")
+    ? t('clientVersions.form.copyTitle')
     : isEdit
-      ? t("clientVersions.form.editTitle")
-      : t("clientVersions.form.title");
+      ? t('clientVersions.form.editTitle')
+      : t('clientVersions.form.title');
 
   const subtitle = isCopyMode
-    ? t("clientVersions.form.copyDescription")
+    ? t('clientVersions.form.copyDescription')
     : isEdit
-      ? t("clientVersions.form.editDescription")
-      : t("clientVersions.form.createDescription");
+      ? t('clientVersions.form.editDescription')
+      : t('clientVersions.form.createDescription');
 
   return (
     <ResizableDrawer
@@ -710,20 +650,17 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
       zIndex={1300}
     >
       <form
-        onSubmit={handleSubmit(
-          onSubmit as SubmitHandler<ClientVersionFormData>,
-          (errors) => {
-            console.log("Form validation failed:", errors);
-          },
-        )}
+        onSubmit={handleSubmit(onSubmit as SubmitHandler<ClientVersionFormData>, (errors) => {
+          console.log('Form validation failed:', errors);
+        })}
         style={{
-          display: "flex",
-          flexDirection: "column",
-          height: "100%",
+          display: 'flex',
+          flexDirection: 'column',
+          height: '100%',
         }}
       >
         {/* Content - Scrollable */}
-        <Box sx={{ flex: 1, overflow: "auto", p: 2 }}>
+        <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
           {duplicateError && (
             <Alert severity="error" sx={{ mb: 2 }}>
               {duplicateError}
@@ -736,26 +673,26 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
               elevation={0}
               sx={{
                 p: 2,
-                bgcolor: "background.default",
-                border: "1px solid",
-                borderColor: "divider",
+                bgcolor: 'background.default',
+                border: '1px solid',
+                borderColor: 'divider',
               }}
             >
               <Typography
                 variant="h6"
                 gutterBottom
                 sx={{
-                  color: "primary.main",
+                  color: 'primary.main',
                   fontWeight: 600,
-                  display: "flex",
-                  alignItems: "center",
+                  display: 'flex',
+                  alignItems: 'center',
                   gap: 1,
                 }}
               >
-                📋 {t("clientVersions.form.basicInfo")}
+                📋 {t('clientVersions.form.basicInfo')}
               </Typography>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                {t("clientVersions.form.basicInfoDescription")}
+                {t('clientVersions.form.basicInfoDescription')}
               </Typography>
 
               <Stack spacing={2}>
@@ -770,24 +707,21 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                       fullWidth
                       label={
                         <Box component="span">
-                          {t("clientVersions.version")}{" "}
+                          {t('clientVersions.version')}{' '}
                           <Typography component="span" color="error">
                             *
                           </Typography>
                         </Box>
                       }
-                      placeholder={
-                        CLIENT_VERSION_VALIDATION.CLIENT_VERSION.EXAMPLE
-                      }
+                      placeholder={CLIENT_VERSION_VALIDATION.CLIENT_VERSION.EXAMPLE}
                       error={!!errors.clientVersion}
                       helperText={
-                        errors.clientVersion?.message ||
-                        t("clientVersions.form.versionHelp")
+                        errors.clientVersion?.message || t('clientVersions.form.versionHelp')
                       }
                       inputProps={{
-                        autoComplete: "off",
-                        autoCorrect: "off",
-                        autoCapitalize: "off",
+                        autoComplete: 'off',
+                        autoCorrect: 'off',
+                        autoCapitalize: 'off',
                         spellCheck: false,
                       }}
                     />
@@ -801,7 +735,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                   render={({ field }) => (
                     <FormControl fullWidth error={!!errors.platform}>
                       <InputLabel id="cvf-platform-label">
-                        {t("clientVersions.platform")}{" "}
+                        {t('clientVersions.platform')}{' '}
                         <Typography component="span" color="error">
                           *
                         </Typography>
@@ -809,15 +743,15 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                       <Select
                         labelId="cvf-platform-label"
                         {...field}
-                        label={`${t("clientVersions.platform")} *`}
+                        label={`${t('clientVersions.platform')} *`}
                         MenuProps={{
                           anchorOrigin: {
-                            vertical: "bottom",
-                            horizontal: "left",
+                            vertical: 'bottom',
+                            horizontal: 'left',
                           },
                           transformOrigin: {
-                            vertical: "top",
-                            horizontal: "left",
+                            vertical: 'top',
+                            horizontal: 'left',
                           },
                         }}
                         onChange={async (e) => {
@@ -826,26 +760,19 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                           // 새로 추가하는 경우에만 기본값 적용
                           if (!isEdit && e.target.value) {
                             try {
-                              const defaults =
-                                await PlatformDefaultsService.getPlatformDefaults(
-                                  e.target.value as string,
-                                );
+                              const defaults = await PlatformDefaultsService.getPlatformDefaults(
+                                e.target.value as string
+                              );
 
                               // 플랫폼 기본값을 적용 (기존 값과 상관없이 덮어쓰기)
                               if (defaults.gameServerAddress) {
-                                setValue(
-                                  "gameServerAddress",
-                                  defaults.gameServerAddress,
-                                );
+                                setValue('gameServerAddress', defaults.gameServerAddress);
                               }
                               if (defaults.patchAddress) {
-                                setValue("patchAddress", defaults.patchAddress);
+                                setValue('patchAddress', defaults.patchAddress);
                               }
                             } catch (error) {
-                              console.error(
-                                "Failed to apply platform defaults:",
-                                error,
-                              );
+                              console.error('Failed to apply platform defaults:', error);
                             }
                           }
                         }}
@@ -856,15 +783,13 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                           </MenuItem>
                         ))}
                       </Select>
-                      {(errors.platform?.message ||
-                        t("clientVersions.form.platformHelp")) && (
+                      {(errors.platform?.message || t('clientVersions.form.platformHelp')) && (
                         <Typography
                           variant="caption"
-                          color={errors.platform ? "error" : "text.secondary"}
-                          sx={{ mt: 0.5, display: "block" }}
+                          color={errors.platform ? 'error' : 'text.secondary'}
+                          sx={{ mt: 0.5, display: 'block' }}
                         >
-                          {errors.platform?.message ||
-                            t("clientVersions.form.platformHelp")}
+                          {errors.platform?.message || t('clientVersions.form.platformHelp')}
                         </Typography>
                       )}
                     </FormControl>
@@ -878,7 +803,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                   render={({ field }) => (
                     <FormControl fullWidth variant="outlined">
                       <InputLabel id="cvf-status-label" shrink={true}>
-                        {t("clientVersions.statusLabel")}{" "}
+                        {t('clientVersions.statusLabel')}{' '}
                         <Typography component="span" color="error">
                           *
                         </Typography>
@@ -886,15 +811,15 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                       <Select
                         labelId="cvf-status-label"
                         {...field}
-                        label={`${t("clientVersions.statusLabel")} *`}
+                        label={`${t('clientVersions.statusLabel')} *`}
                         MenuProps={{
                           anchorOrigin: {
-                            vertical: "bottom",
-                            horizontal: "left",
+                            vertical: 'bottom',
+                            horizontal: 'left',
                           },
                           transformOrigin: {
-                            vertical: "top",
-                            horizontal: "left",
+                            vertical: 'top',
+                            horizontal: 'left',
                           },
                         }}
                       >
@@ -907,9 +832,9 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                       <Typography
                         variant="caption"
                         color="text.secondary"
-                        sx={{ mt: 0.5, display: "block" }}
+                        sx={{ mt: 0.5, display: 'block' }}
                       >
-                        {t("clientVersions.form.statusHelp")}
+                        {t('clientVersions.form.statusHelp')}
                       </Typography>
                     </FormControl>
                   )}
@@ -917,40 +842,34 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
 
                 {isMaintenanceMode && (
                   <MaintenanceSettingsInput
-                    startDate={watch("maintenanceStartDate") || ""}
-                    endDate={watch("maintenanceEndDate") || ""}
-                    onStartDateChange={(date) =>
-                      setValue("maintenanceStartDate", date)
-                    }
-                    onEndDateChange={(date) =>
-                      setValue("maintenanceEndDate", date)
-                    }
+                    startDate={watch('maintenanceStartDate') || ''}
+                    endDate={watch('maintenanceEndDate') || ''}
+                    onStartDateChange={(date) => setValue('maintenanceStartDate', date)}
+                    onEndDateChange={(date) => setValue('maintenanceEndDate', date)}
                     inputMode={inputMode}
                     onInputModeChange={setInputMode}
-                    maintenanceMessage={watch("maintenanceMessage") || ""}
+                    maintenanceMessage={watch('maintenanceMessage') || ''}
                     onMaintenanceMessageChange={(message) =>
-                      setValue("maintenanceMessage", message)
+                      setValue('maintenanceMessage', message)
                     }
                     supportsMultiLanguage={supportsMultiLanguage}
-                    onSupportsMultiLanguageChange={
-                      handleSupportsMultiLanguageChange
-                    }
+                    onSupportsMultiLanguageChange={handleSupportsMultiLanguageChange}
                     maintenanceLocales={maintenanceLocales.map((l) => ({
-                      lang: l.lang as "ko" | "en" | "zh",
+                      lang: l.lang as 'ko' | 'en' | 'zh',
                       message: l.message,
                     }))}
                     onMaintenanceLocalesChange={(locales) => {
                       setMaintenanceLocales(locales);
-                      setValue("maintenanceLocales", locales, {
+                      setValue('maintenanceLocales', locales, {
                         shouldDirty: true,
                       });
                       // 번역 결과가 있으면 자동으로 언어별 메시지 사용 활성화
                       const hasNonEmptyLocales = locales.some(
-                        (l) => l.message && l.message.trim() !== "",
+                        (l) => l.message && l.message.trim() !== ''
                       );
                       if (hasNonEmptyLocales && !supportsMultiLanguage) {
                         setSupportsMultiLanguage(true);
-                        setValue("supportsMultiLanguage", true, {
+                        setValue('supportsMultiLanguage', true, {
                           shouldDirty: true,
                         });
                       }
@@ -970,26 +889,26 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
               elevation={0}
               sx={{
                 p: 2,
-                bgcolor: "background.default",
-                border: "1px solid",
-                borderColor: "divider",
+                bgcolor: 'background.default',
+                border: '1px solid',
+                borderColor: 'divider',
               }}
             >
               <Typography
                 variant="h6"
                 gutterBottom
                 sx={{
-                  color: "primary.main",
+                  color: 'primary.main',
                   fontWeight: 600,
-                  display: "flex",
-                  alignItems: "center",
+                  display: 'flex',
+                  alignItems: 'center',
                   gap: 1,
                 }}
               >
-                🌐 {t("clientVersions.form.serverAddresses")}
+                🌐 {t('clientVersions.form.serverAddresses')}
               </Typography>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                {t("clientVersions.form.serverAddressesDescription")}
+                {t('clientVersions.form.serverAddressesDescription')}
               </Typography>
 
               <Stack spacing={2}>
@@ -1003,7 +922,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                       fullWidth
                       label={
                         <Box component="span">
-                          {t("clientVersions.gameServerAddress")}{" "}
+                          {t('clientVersions.gameServerAddress')}{' '}
                           <Typography component="span" color="error">
                             *
                           </Typography>
@@ -1012,12 +931,12 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                       error={!!errors.gameServerAddress}
                       helperText={
                         errors.gameServerAddress?.message ||
-                        t("clientVersions.form.gameServerAddressHelp")
+                        t('clientVersions.form.gameServerAddressHelp')
                       }
                       inputProps={{
-                        autoComplete: "off",
-                        autoCorrect: "off",
-                        autoCapitalize: "off",
+                        autoComplete: 'off',
+                        autoCorrect: 'off',
+                        autoCapitalize: 'off',
                         spellCheck: false,
                       }}
                     />
@@ -1032,18 +951,16 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                     <TextField
                       {...field}
                       fullWidth
-                      label={t("clientVersions.gameServerAddressForWhiteList")}
+                      label={t('clientVersions.gameServerAddressForWhiteList')}
                       error={!!errors.gameServerAddressForWhiteList}
                       helperText={
                         errors.gameServerAddressForWhiteList?.message ||
-                        t(
-                          "clientVersions.form.gameServerAddressForWhiteListHelp",
-                        )
+                        t('clientVersions.form.gameServerAddressForWhiteListHelp')
                       }
                       inputProps={{
-                        autoComplete: "off",
-                        autoCorrect: "off",
-                        autoCapitalize: "off",
+                        autoComplete: 'off',
+                        autoCorrect: 'off',
+                        autoCapitalize: 'off',
                         spellCheck: false,
                       }}
                     />
@@ -1060,7 +977,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                       fullWidth
                       label={
                         <Box component="span">
-                          {t("clientVersions.patchAddress")}{" "}
+                          {t('clientVersions.patchAddress')}{' '}
                           <Typography component="span" color="error">
                             *
                           </Typography>
@@ -1068,13 +985,12 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                       }
                       error={!!errors.patchAddress}
                       helperText={
-                        errors.patchAddress?.message ||
-                        t("clientVersions.form.patchAddressHelp")
+                        errors.patchAddress?.message || t('clientVersions.form.patchAddressHelp')
                       }
                       inputProps={{
-                        autoComplete: "off",
-                        autoCorrect: "off",
-                        autoCapitalize: "off",
+                        autoComplete: 'off',
+                        autoCorrect: 'off',
+                        autoCapitalize: 'off',
                         spellCheck: false,
                       }}
                     />
@@ -1089,16 +1005,16 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                     <TextField
                       {...field}
                       fullWidth
-                      label={t("clientVersions.patchAddressForWhiteList")}
+                      label={t('clientVersions.patchAddressForWhiteList')}
                       error={!!errors.patchAddressForWhiteList}
                       helperText={
                         errors.patchAddressForWhiteList?.message ||
-                        t("clientVersions.form.patchAddressForWhiteListHelp")
+                        t('clientVersions.form.patchAddressForWhiteListHelp')
                       }
                       inputProps={{
-                        autoComplete: "off",
-                        autoCorrect: "off",
-                        autoCapitalize: "off",
+                        autoComplete: 'off',
+                        autoCorrect: 'off',
+                        autoCapitalize: 'off',
                         spellCheck: false,
                       }}
                     />
@@ -1112,26 +1028,26 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
               elevation={0}
               sx={{
                 p: 2,
-                bgcolor: "background.default",
-                border: "1px solid",
-                borderColor: "divider",
+                bgcolor: 'background.default',
+                border: '1px solid',
+                borderColor: 'divider',
               }}
             >
               <Typography
                 variant="h6"
                 gutterBottom
                 sx={{
-                  color: "primary.main",
+                  color: 'primary.main',
                   fontWeight: 600,
-                  display: "flex",
-                  alignItems: "center",
+                  display: 'flex',
+                  alignItems: 'center',
                   gap: 1,
                 }}
               >
-                🏷️ {t("common.tags")}
+                🏷️ {t('common.tags')}
               </Typography>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                {t("clientVersions.form.tagsHelp")}
+                {t('clientVersions.form.tagsHelp')}
               </Typography>
 
               <Autocomplete
@@ -1143,11 +1059,11 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                 value={selectedTags}
                 onChange={(_, value) => {
                   setSelectedTags(value);
-                  setValue("tags", value, { shouldDirty: true });
+                  setValue('tags', value, { shouldDirty: true });
                 }}
                 slotProps={{
                   popper: {
-                    placement: "bottom-start",
+                    placement: 'bottom-start',
                   },
                 }}
                 renderTags={(value, getTagProps) =>
@@ -1156,7 +1072,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                     return (
                       <Tooltip
                         key={option.id}
-                        title={option.description || t("tags.noDescription")}
+                        title={option.description || t('tags.noDescription')}
                         arrow
                       >
                         <Chip
@@ -1176,8 +1092,8 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                 renderInput={(params) => (
                   <TextField
                     {...params}
-                    label={t("common.tags")}
-                    helperText={t("clientVersions.form.tagsHelp")}
+                    label={t('common.tags')}
+                    helperText={t('clientVersions.form.tagsHelp')}
                   />
                 )}
                 renderOption={(props, option) => (
@@ -1191,7 +1107,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                         mr: 1,
                       }}
                     />
-                    {option.description || t("common.noDescription")}
+                    {option.description || t('common.noDescription')}
                   </Box>
                 )}
               />
@@ -1202,32 +1118,28 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
               defaultExpanded={false}
               disableGutters
               sx={{
-                border: "1px solid",
-                borderColor: "divider",
-                bgcolor: "background.default",
+                border: '1px solid',
+                borderColor: 'divider',
+                bgcolor: 'background.default',
               }}
             >
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                 <Typography
                   variant="subtitle1"
                   sx={{
-                    color: "primary.main",
+                    color: 'primary.main',
                     fontWeight: 600,
-                    display: "flex",
-                    alignItems: "center",
+                    display: 'flex',
+                    alignItems: 'center',
                     gap: 1,
                   }}
                 >
-                  ⚙️ {t("clientVersions.form.additionalSettings")}
+                  ⚙️ {t('clientVersions.form.additionalSettings')}
                 </Typography>
               </AccordionSummary>
               <AccordionDetails>
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{ mb: 2 }}
-                >
-                  {t("clientVersions.form.additionalSettingsDescription")}
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                  {t('clientVersions.form.additionalSettingsDescription')}
                 </Typography>
 
                 <Stack spacing={2}>
@@ -1238,20 +1150,15 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                     render={({ field }) => (
                       <Box>
                         <FormControlLabel
-                          control={
-                            <Switch
-                              checked={field.value}
-                              onChange={field.onChange}
-                            />
-                          }
-                          label={t("clientVersions.guestModeAllowed")}
+                          control={<Switch checked={field.value} onChange={field.onChange} />}
+                          label={t('clientVersions.guestModeAllowed')}
                         />
                         <Typography
                           variant="caption"
                           color="text.secondary"
-                          sx={{ mt: 0.5, display: "block" }}
+                          sx={{ mt: 0.5, display: 'block' }}
                         >
-                          {t("clientVersions.form.guestModeAllowedHelp")}
+                          {t('clientVersions.form.guestModeAllowedHelp')}
                         </Typography>
                       </Box>
                     )}
@@ -1265,16 +1172,16 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                       <TextField
                         {...field}
                         fullWidth
-                        label={t("clientVersions.externalClickLink")}
+                        label={t('clientVersions.externalClickLink')}
                         error={!!errors.externalClickLink}
                         helperText={
                           errors.externalClickLink?.message ||
-                          t("clientVersions.form.externalClickLinkHelp")
+                          t('clientVersions.form.externalClickLinkHelp')
                         }
                         inputProps={{
-                          autoComplete: "off",
-                          autoCorrect: "off",
-                          autoCapitalize: "off",
+                          autoComplete: 'off',
+                          autoCorrect: 'off',
+                          autoCapitalize: 'off',
                           spellCheck: false,
                         }}
                       />
@@ -1291,12 +1198,9 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                         fullWidth
                         multiline
                         rows={3}
-                        label={t("clientVersions.memo")}
+                        label={t('clientVersions.memo')}
                         error={!!errors.memo}
-                        helperText={
-                          errors.memo?.message ||
-                          t("clientVersions.form.memoHelp")
-                        }
+                        helperText={errors.memo?.message || t('clientVersions.form.memoHelp')}
                       />
                     )}
                   />
@@ -1307,15 +1211,15 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                     control={control}
                     render={({ field }) => (
                       <JsonEditor
-                        value={field.value || "{}"}
+                        value={field.value || '{}'}
                         onChange={(newValue) => {
                           field.onChange(newValue);
                         }}
                         height="200px"
-                        label={t("clientVersions.customPayload")}
+                        label={t('clientVersions.customPayload')}
                         placeholder='{\n  "key": "value"\n}'
                         error={errors.customPayload?.message}
-                        helperText={t("clientVersions.form.customPayloadHelp")}
+                        helperText={t('clientVersions.form.customPayloadHelp')}
                       />
                     )}
                   />
@@ -1331,12 +1235,12 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
         <Box
           sx={{
             p: 2,
-            borderTop: "1px solid",
-            borderColor: "divider",
-            bgcolor: "background.paper",
-            display: "flex",
+            borderTop: '1px solid',
+            borderColor: 'divider',
+            bgcolor: 'background.paper',
+            display: 'flex',
             gap: 1,
-            justifyContent: "flex-end",
+            justifyContent: 'flex-end',
           }}
         >
           <Button
@@ -1344,20 +1248,15 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
             disabled={isSubmitting || loading}
             startIcon={<CancelIcon />}
           >
-            {t("common.cancel")}
+            {t('common.cancel')}
           </Button>
           <Button
             type="submit"
             variant="contained"
-            disabled={
-              isSubmitting ||
-              loading ||
-              !!duplicateError ||
-              (displayIsEdit && !isDirty)
-            }
+            disabled={isSubmitting || loading || !!duplicateError || (displayIsEdit && !isDirty)}
             startIcon={displayIsCopy ? <CopyIcon /> : <SaveIcon />}
             onClick={() => {
-              console.log("Submit button clicked!", {
+              console.log('Submit button clicked!', {
                 isSubmitting,
                 loading,
                 duplicateError,
@@ -1368,12 +1267,8 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
             }}
           >
             {displayIsCopy
-              ? t("clientVersions.form.copyTitle")
-              : getActionLabel(
-                  displayIsEdit ? "update" : "create",
-                  requiresApproval,
-                  t,
-                )}
+              ? t('clientVersions.form.copyTitle')
+              : getActionLabel(displayIsEdit ? 'update' : 'create', requiresApproval, t)}
           </Button>
         </Box>
       </form>

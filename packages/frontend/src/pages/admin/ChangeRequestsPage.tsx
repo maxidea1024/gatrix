@@ -1,5 +1,5 @@
-import React, { useState, useCallback, useMemo } from "react";
-import { useSearchParams } from "react-router-dom";
+import React, { useState, useCallback, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import {
   Box,
   Typography,
@@ -24,7 +24,7 @@ import {
   DialogActions,
   TextField,
   Paper,
-} from "@mui/material";
+} from '@mui/material';
 import {
   Refresh as RefreshIcon,
   Check as CheckIcon,
@@ -32,22 +32,22 @@ import {
   Undo as UndoIcon,
   PlayArrow as PlayArrowIcon,
   Delete as DeleteIcon,
-} from "@mui/icons-material";
-import { useTranslation } from "react-i18next";
-import { useSnackbar } from "notistack";
-import useSWR from "swr";
-import { useHandleApiError } from "@/hooks/useHandleApiError";
+} from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
+import { useSnackbar } from 'notistack';
+import useSWR from 'swr';
+import { useHandleApiError } from '@/hooks/useHandleApiError';
 
-import { RelativeTime } from "@/components/common/RelativeTime";
+import { RelativeTime } from '@/components/common/RelativeTime';
 import changeRequestService, {
   ChangeRequest,
   ChangeRequestStatus,
-} from "@/services/changeRequestService";
-import SimplePagination from "@/components/common/SimplePagination";
-import EmptyState from "@/components/common/EmptyState";
-import ChangeRequestDetailDrawer from "@/components/admin/ChangeRequestDetailDrawer";
-import RevertPreviewDrawer from "@/components/admin/RevertPreviewDrawer";
-import { formatChangeRequestTitle } from "@/utils/changeRequestFormatter";
+} from '@/services/changeRequestService';
+import SimplePagination from '@/components/common/SimplePagination';
+import EmptyState from '@/components/common/EmptyState';
+import ChangeRequestDetailDrawer from '@/components/admin/ChangeRequestDetailDrawer';
+import RevertPreviewDrawer from '@/components/admin/RevertPreviewDrawer';
+import { formatChangeRequestTitle } from '@/utils/changeRequestFormatter';
 
 // JSON Diff wrapper component
 interface FieldChange {
@@ -56,10 +56,7 @@ interface FieldChange {
   newValue: any;
 }
 
-const JsonDiffView: React.FC<{ before?: any; after?: any }> = ({
-  before,
-  after,
-}) => {
+const JsonDiffView: React.FC<{ before?: any; after?: any }> = ({ before, after }) => {
   const { t } = useTranslation();
 
   // Determine operation type
@@ -83,9 +80,9 @@ const JsonDiffView: React.FC<{ before?: any; after?: any }> = ({
   }, [before, after]);
 
   const formatValue = (value: any): string => {
-    if (value === null) return "null";
-    if (value === undefined) return "-";
-    if (typeof value === "object") return JSON.stringify(value);
+    if (value === null) return 'null';
+    if (value === undefined) return '-';
+    if (typeof value === 'object') return JSON.stringify(value);
     return String(value);
   };
 
@@ -94,7 +91,7 @@ const JsonDiffView: React.FC<{ before?: any; after?: any }> = ({
     return (
       <Box>
         <Chip
-          label={t("changeRequest.operationCreate")}
+          label={t('changeRequest.operationCreate')}
           color="success"
           size="small"
           sx={{ mb: 1 }}
@@ -102,13 +99,13 @@ const JsonDiffView: React.FC<{ before?: any; after?: any }> = ({
         <Box
           component="pre"
           sx={{
-            bgcolor: "success.main",
-            color: "common.white",
+            bgcolor: 'success.main',
+            color: 'common.white',
             p: 1.5,
             borderRadius: 1,
-            fontSize: "0.75rem",
-            fontFamily: "monospace",
-            overflow: "auto",
+            fontSize: '0.75rem',
+            fontFamily: 'monospace',
+            overflow: 'auto',
             maxHeight: 300,
             m: 0,
           }}
@@ -124,7 +121,7 @@ const JsonDiffView: React.FC<{ before?: any; after?: any }> = ({
     return (
       <Box>
         <Chip
-          label={t("changeRequest.operationDelete")}
+          label={t('changeRequest.operationDelete')}
           color="error"
           size="small"
           sx={{ mb: 1 }}
@@ -132,13 +129,13 @@ const JsonDiffView: React.FC<{ before?: any; after?: any }> = ({
         <Box
           component="pre"
           sx={{
-            bgcolor: "error.main",
-            color: "common.white",
+            bgcolor: 'error.main',
+            color: 'common.white',
             p: 1.5,
             borderRadius: 1,
-            fontSize: "0.75rem",
-            fontFamily: "monospace",
-            overflow: "auto",
+            fontSize: '0.75rem',
+            fontFamily: 'monospace',
+            overflow: 'auto',
             maxHeight: 300,
             m: 0,
           }}
@@ -152,12 +149,8 @@ const JsonDiffView: React.FC<{ before?: any; after?: any }> = ({
   // For MODIFY: show field-level changes in table format
   if (changes.length === 0) {
     return (
-      <Typography
-        variant="body2"
-        color="textSecondary"
-        sx={{ fontStyle: "italic" }}
-      >
-        {t("changeRequest.noChanges")}
+      <Typography variant="body2" color="textSecondary" sx={{ fontStyle: 'italic' }}>
+        {t('changeRequest.noChanges')}
       </Typography>
     );
   }
@@ -165,7 +158,7 @@ const JsonDiffView: React.FC<{ before?: any; after?: any }> = ({
   return (
     <Box>
       <Chip
-        label={t("changeRequest.operationModify")}
+        label={t('changeRequest.operationModify')}
         color="warning"
         size="small"
         sx={{ mb: 1 }}
@@ -174,37 +167,37 @@ const JsonDiffView: React.FC<{ before?: any; after?: any }> = ({
         <Table size="small">
           <TableHead>
             <TableRow>
-              <TableCell sx={{ fontWeight: "bold", width: "25%" }}>
-                {t("changeRequest.field")}
+              <TableCell sx={{ fontWeight: 'bold', width: '25%' }}>
+                {t('changeRequest.field')}
               </TableCell>
-              <TableCell sx={{ fontWeight: "bold", width: "37.5%" }}>
-                {t("changeRequest.oldValue")}
+              <TableCell sx={{ fontWeight: 'bold', width: '37.5%' }}>
+                {t('changeRequest.oldValue')}
               </TableCell>
-              <TableCell sx={{ fontWeight: "bold", width: "37.5%" }}>
-                {t("changeRequest.newValue")}
+              <TableCell sx={{ fontWeight: 'bold', width: '37.5%' }}>
+                {t('changeRequest.newValue')}
               </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {changes.map((change) => (
               <TableRow key={change.field}>
-                <TableCell sx={{ fontFamily: "monospace", fontWeight: 500 }}>
+                <TableCell sx={{ fontFamily: 'monospace', fontWeight: 500 }}>
                   {change.field}
                 </TableCell>
                 <TableCell
                   sx={{
-                    fontFamily: "monospace",
-                    bgcolor: "error.dark",
-                    color: "common.white",
+                    fontFamily: 'monospace',
+                    bgcolor: 'error.dark',
+                    color: 'common.white',
                   }}
                 >
                   {formatValue(change.oldValue)}
                 </TableCell>
                 <TableCell
                   sx={{
-                    fontFamily: "monospace",
-                    bgcolor: "success.dark",
-                    color: "common.white",
+                    fontFamily: 'monospace',
+                    bgcolor: 'success.dark',
+                    color: 'common.white',
                   }}
                 >
                   {formatValue(change.newValue)}
@@ -222,44 +215,30 @@ const JsonDiffView: React.FC<{ before?: any; after?: any }> = ({
 const STATUS_CONFIG: Record<
   ChangeRequestStatus,
   {
-    color:
-      | "default"
-      | "primary"
-      | "secondary"
-      | "error"
-      | "info"
-      | "success"
-      | "warning";
+    color: 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning';
     labelKey: string;
   }
 > = {
-  draft: { color: "default", labelKey: "changeRequest.status.draft" },
-  open: { color: "info", labelKey: "changeRequest.status.open" },
-  approved: { color: "success", labelKey: "changeRequest.status.approved" },
-  applied: { color: "primary", labelKey: "changeRequest.status.applied" },
-  rejected: { color: "error", labelKey: "changeRequest.status.rejected" },
-  conflict: { color: "warning", labelKey: "changeRequest.status.conflict" },
+  draft: { color: 'default', labelKey: 'changeRequest.status.draft' },
+  open: { color: 'info', labelKey: 'changeRequest.status.open' },
+  approved: { color: 'success', labelKey: 'changeRequest.status.approved' },
+  applied: { color: 'primary', labelKey: 'changeRequest.status.applied' },
+  rejected: { color: 'error', labelKey: 'changeRequest.status.rejected' },
+  conflict: { color: 'warning', labelKey: 'changeRequest.status.conflict' },
 };
 
 // Priority configuration
 const PRIORITY_CONFIG: Record<
   string,
   {
-    color:
-      | "default"
-      | "primary"
-      | "secondary"
-      | "error"
-      | "info"
-      | "success"
-      | "warning";
+    color: 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning';
     labelKey: string;
   }
 > = {
-  low: { color: "default", labelKey: "changeRequest.priority.low" },
-  medium: { color: "info", labelKey: "changeRequest.priority.medium" },
-  high: { color: "warning", labelKey: "changeRequest.priority.high" },
-  critical: { color: "error", labelKey: "changeRequest.priority.critical" },
+  low: { color: 'default', labelKey: 'changeRequest.priority.low' },
+  medium: { color: 'info', labelKey: 'changeRequest.priority.medium' },
+  high: { color: 'warning', labelKey: 'changeRequest.priority.high' },
+  critical: { color: 'error', labelKey: 'changeRequest.priority.critical' },
 };
 
 // Row component
@@ -281,10 +260,10 @@ const ChangeRequestRow: React.FC<ChangeRequestRowProps> = ({
 
   const [actionLoading, setActionLoading] = useState(false);
   const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
-  const [rejectComment, setRejectComment] = useState("");
+  const [rejectComment, setRejectComment] = useState('');
   const [submitDialogOpen, setSubmitDialogOpen] = useState(false);
-  const [submitTitle, setSubmitTitle] = useState("");
-  const [submitReason, setSubmitReason] = useState("");
+  const [submitTitle, setSubmitTitle] = useState('');
+  const [submitReason, setSubmitReason] = useState('');
   const [reopenDialogOpen, setReopenDialogOpen] = useState(false);
   const [rollbackPreviewOpen, setRollbackPreviewOpen] = useState(false);
   const { handleApiError, ErrorDialog } = useHandleApiError();
@@ -293,12 +272,12 @@ const ChangeRequestRow: React.FC<ChangeRequestRowProps> = ({
     setActionLoading(true);
     try {
       await changeRequestService.approve(cr.id);
-      enqueueSnackbar(t("changeRequest.messages.approved"), {
-        variant: "success",
+      enqueueSnackbar(t('changeRequest.messages.approved'), {
+        variant: 'success',
       });
       onRefresh();
     } catch (err: any) {
-      handleApiError(err, "changeRequest.errors.approveFailed");
+      handleApiError(err, 'changeRequest.errors.approveFailed');
     } finally {
       setActionLoading(false);
     }
@@ -306,22 +285,22 @@ const ChangeRequestRow: React.FC<ChangeRequestRowProps> = ({
 
   const handleReject = async () => {
     if (!rejectComment.trim()) {
-      enqueueSnackbar(t("changeRequest.errors.rejectCommentRequired"), {
-        variant: "warning",
+      enqueueSnackbar(t('changeRequest.errors.rejectCommentRequired'), {
+        variant: 'warning',
       });
       return;
     }
     setActionLoading(true);
     try {
       await changeRequestService.reject(cr.id, rejectComment);
-      enqueueSnackbar(t("changeRequest.messages.rejected"), {
-        variant: "success",
+      enqueueSnackbar(t('changeRequest.messages.rejected'), {
+        variant: 'success',
       });
       setRejectDialogOpen(false);
-      setRejectComment("");
+      setRejectComment('');
       onRefresh();
     } catch (err: any) {
-      handleApiError(err, "changeRequest.errors.rejectFailed");
+      handleApiError(err, 'changeRequest.errors.rejectFailed');
     } finally {
       setActionLoading(false);
     }
@@ -335,13 +314,13 @@ const ChangeRequestRow: React.FC<ChangeRequestRowProps> = ({
     setActionLoading(true);
     try {
       await changeRequestService.reopen(cr.id);
-      enqueueSnackbar(t("changeRequest.messages.reopened"), {
-        variant: "success",
+      enqueueSnackbar(t('changeRequest.messages.reopened'), {
+        variant: 'success',
       });
       setReopenDialogOpen(false);
       onRefresh();
     } catch (err: any) {
-      handleApiError(err, "changeRequest.errors.reopenFailed");
+      handleApiError(err, 'changeRequest.errors.reopenFailed');
     } finally {
       setActionLoading(false);
     }
@@ -351,12 +330,12 @@ const ChangeRequestRow: React.FC<ChangeRequestRowProps> = ({
     setActionLoading(true);
     try {
       await changeRequestService.execute(cr.id);
-      enqueueSnackbar(t("changeRequest.messages.executed"), {
-        variant: "success",
+      enqueueSnackbar(t('changeRequest.messages.executed'), {
+        variant: 'success',
       });
       onRefresh();
     } catch (err: any) {
-      if (handleApiError(err, "changeRequest.errors.executeFailed")) {
+      if (handleApiError(err, 'changeRequest.errors.executeFailed')) {
         onRefresh(); // Refresh if it was a conflict (to show rejected status if handled by dialog)
       }
     } finally {
@@ -365,16 +344,16 @@ const ChangeRequestRow: React.FC<ChangeRequestRowProps> = ({
   };
 
   const handleDelete = async () => {
-    if (!window.confirm(t("changeRequest.confirmDelete"))) return;
+    if (!window.confirm(t('changeRequest.confirmDelete'))) return;
     setActionLoading(true);
     try {
       await changeRequestService.delete(cr.id);
-      enqueueSnackbar(t("changeRequest.messages.deleted"), {
-        variant: "success",
+      enqueueSnackbar(t('changeRequest.messages.deleted'), {
+        variant: 'success',
       });
       onRefresh();
     } catch (err: any) {
-      handleApiError(err, "changeRequest.errors.deleteFailed");
+      handleApiError(err, 'changeRequest.errors.deleteFailed');
     } finally {
       setActionLoading(false);
     }
@@ -388,8 +367,8 @@ const ChangeRequestRow: React.FC<ChangeRequestRowProps> = ({
 
   const handleSubmit = async () => {
     if (!submitTitle.trim() || !submitReason.trim()) {
-      enqueueSnackbar(t("changeRequest.errors.submitFieldsRequired"), {
-        variant: "warning",
+      enqueueSnackbar(t('changeRequest.errors.submitFieldsRequired'), {
+        variant: 'warning',
       });
       return;
     }
@@ -399,15 +378,15 @@ const ChangeRequestRow: React.FC<ChangeRequestRowProps> = ({
         title: submitTitle.trim(),
         reason: submitReason.trim(),
       });
-      enqueueSnackbar(t("changeRequest.messages.submitted"), {
-        variant: "success",
+      enqueueSnackbar(t('changeRequest.messages.submitted'), {
+        variant: 'success',
       });
       setSubmitDialogOpen(false);
-      setSubmitTitle("");
-      setSubmitReason("");
+      setSubmitTitle('');
+      setSubmitReason('');
       onRefresh();
     } catch (err: any) {
-      handleApiError(err, "changeRequest.errors.submitFailed");
+      handleApiError(err, 'changeRequest.errors.submitFailed');
     } finally {
       setActionLoading(false);
     }
@@ -418,17 +397,13 @@ const ChangeRequestRow: React.FC<ChangeRequestRowProps> = ({
 
   return (
     <>
-      <TableRow
-        hover
-        sx={{ cursor: "pointer" }}
-        onClick={() => onOpenDrawer(cr.id)}
-      >
+      <TableRow hover sx={{ cursor: 'pointer' }} onClick={() => onOpenDrawer(cr.id)}>
         <TableCell>
           <Chip
             label={t(statusConfig.labelKey)}
             color={statusConfig.color}
             size="small"
-            sx={{ fontWeight: "bold", minWidth: 80 }}
+            sx={{ fontWeight: 'bold', minWidth: 80 }}
           />
         </TableCell>
         <TableCell>
@@ -438,7 +413,7 @@ const ChangeRequestRow: React.FC<ChangeRequestRowProps> = ({
         </TableCell>
         <TableCell>
           <Typography variant="body2">
-            {cr.requester?.name || cr.requester?.email || "-"}
+            {cr.requester?.name || cr.requester?.email || '-'}
           </Typography>
         </TableCell>
         <TableCell>
@@ -454,17 +429,16 @@ const ChangeRequestRow: React.FC<ChangeRequestRowProps> = ({
         </TableCell>
         <TableCell align="center">
           <Typography variant="body2">
-            {cr.approvals?.length || 0} /{" "}
-            {cr.environmentModel?.requiredApprovers || 1}
+            {cr.approvals?.length || 0} / {cr.environmentModel?.requiredApprovers || 1}
           </Typography>
         </TableCell>
         <TableCell align="center">
           <RelativeTime date={cr.updatedAt} />
         </TableCell>
         <TableCell align="center">
-          {cr.status === "applied" && (
+          {cr.status === 'applied' && (
             <Chip
-              label={t("changeRequest.actions.revert")}
+              label={t('changeRequest.actions.revert')}
               color="warning"
               size="small"
               variant="outlined"
@@ -486,15 +460,15 @@ const ChangeRequestRow: React.FC<ChangeRequestRowProps> = ({
         maxWidth="sm"
         fullWidth
       >
-        <DialogTitle>{t("changeRequest.submitDialog.title")}</DialogTitle>
+        <DialogTitle>{t('changeRequest.submitDialog.title')}</DialogTitle>
         <DialogContent>
           <DialogContentText sx={{ mb: 2 }}>
-            {t("changeRequest.submitDialog.description")}
+            {t('changeRequest.submitDialog.description')}
           </DialogContentText>
           <TextField
             autoFocus
             fullWidth
-            label={t("changeRequest.submitDialog.titleField")}
+            label={t('changeRequest.submitDialog.titleField')}
             value={submitTitle}
             onChange={(e) => setSubmitTitle(e.target.value)}
             required
@@ -504,22 +478,16 @@ const ChangeRequestRow: React.FC<ChangeRequestRowProps> = ({
             fullWidth
             multiline
             rows={3}
-            label={t("changeRequest.submitDialog.reason")}
+            label={t('changeRequest.submitDialog.reason')}
             value={submitReason}
             onChange={(e) => setSubmitReason(e.target.value)}
             required
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setSubmitDialogOpen(false)}>
-            {t("common.cancel")}
-          </Button>
-          <Button
-            onClick={handleSubmit}
-            variant="contained"
-            disabled={actionLoading}
-          >
-            {t("changeRequest.actions.submit")}
+          <Button onClick={() => setSubmitDialogOpen(false)}>{t('common.cancel')}</Button>
+          <Button onClick={handleSubmit} variant="contained" disabled={actionLoading}>
+            {t('changeRequest.actions.submit')}
           </Button>
         </DialogActions>
       </Dialog>
@@ -531,28 +499,26 @@ const ChangeRequestRow: React.FC<ChangeRequestRowProps> = ({
         maxWidth="sm"
         fullWidth
       >
-        <DialogTitle>{t("changeRequest.rejectDialog.title")}</DialogTitle>
+        <DialogTitle>{t('changeRequest.rejectDialog.title')}</DialogTitle>
         <DialogContent>
           <DialogContentText sx={{ mb: 2 }}>
-            {t("changeRequest.rejectDialog.description")}
+            {t('changeRequest.rejectDialog.description')}
           </DialogContentText>
           <TextField
             autoFocus
             fullWidth
             multiline
             rows={3}
-            label={t("changeRequest.rejectDialog.comment")}
+            label={t('changeRequest.rejectDialog.comment')}
             value={rejectComment}
             onChange={(e) => setRejectComment(e.target.value)}
             required
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setRejectDialogOpen(false)}>
-            {t("common.cancel")}
-          </Button>
+          <Button onClick={() => setRejectDialogOpen(false)}>{t('common.cancel')}</Button>
           <Button onClick={handleReject} color="error" disabled={actionLoading}>
-            {t("changeRequest.actions.reject")}
+            {t('changeRequest.actions.reject')}
           </Button>
         </DialogActions>
       </Dialog>
@@ -564,39 +530,29 @@ const ChangeRequestRow: React.FC<ChangeRequestRowProps> = ({
         maxWidth="sm"
         fullWidth
       >
-        <DialogTitle>{t("changeRequest.reopenDialog.title")}</DialogTitle>
+        <DialogTitle>{t('changeRequest.reopenDialog.title')}</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            {t("changeRequest.reopenDialog.description")}
-          </DialogContentText>
+          <DialogContentText>{t('changeRequest.reopenDialog.description')}</DialogContentText>
           {cr.rejectionReason && (
-            <Paper
-              variant="outlined"
-              sx={{ mt: 2, p: 2, bgcolor: "action.hover" }}
-            >
+            <Paper variant="outlined" sx={{ mt: 2, p: 2, bgcolor: 'action.hover' }}>
               <Typography variant="caption" color="textSecondary">
-                {t("changeRequest.rejectionReason")}
+                {t('changeRequest.rejectionReason')}
               </Typography>
-              <Typography
-                variant="body2"
-                sx={{ mt: 0.5, whiteSpace: "pre-wrap" }}
-              >
+              <Typography variant="body2" sx={{ mt: 0.5, whiteSpace: 'pre-wrap' }}>
                 {cr.rejectionReason}
               </Typography>
             </Paper>
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setReopenDialogOpen(false)}>
-            {t("common.cancel")}
-          </Button>
+          <Button onClick={() => setReopenDialogOpen(false)}>{t('common.cancel')}</Button>
           <Button
             onClick={confirmReopen}
             color="warning"
             variant="contained"
             disabled={actionLoading}
           >
-            {t("changeRequest.actions.reopen")}
+            {t('changeRequest.actions.reopen')}
           </Button>
         </DialogActions>
       </Dialog>
@@ -623,17 +579,17 @@ const ChangeRequestsPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const statusFilters: (ChangeRequestStatus | undefined)[] = [
     undefined,
-    "draft",
-    "open",
-    "approved",
-    "applied",
-    "rejected",
-    "conflict",
+    'draft',
+    'open',
+    'approved',
+    'applied',
+    'rejected',
+    'conflict',
   ];
 
   // Initialize/Get tab value from URL
   const tabValue = useMemo(() => {
-    const statusParam = searchParams.get("status");
+    const statusParam = searchParams.get('status');
     if (statusParam) {
       const index = statusFilters.indexOf(statusParam as ChangeRequestStatus);
       if (index !== -1) return index;
@@ -658,9 +614,7 @@ const ChangeRequestsPage: React.FC = () => {
 
   // Drawer state
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [selectedChangeRequestId, setSelectedChangeRequestId] = useState<
-    string | null
-  >(null);
+  const [selectedChangeRequestId, setSelectedChangeRequestId] = useState<string | null>(null);
 
   const handleOpenDrawer = useCallback((id: string) => {
     setSelectedChangeRequestId(id);
@@ -684,20 +638,20 @@ const ChangeRequestsPage: React.FC = () => {
   }, [page, rowsPerPage, statusFilter]);
 
   const { data, isLoading, mutate } = useSWR(
-    `change-requests-${page}-${rowsPerPage}-${statusFilter || "all"}`,
+    `change-requests-${page}-${rowsPerPage}-${statusFilter || 'all'}`,
     fetcher,
     {
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
-    },
+    }
   );
 
   const { data: stats, mutate: mutateStats } = useSWR(
-    "change-requests-stats",
+    'change-requests-stats',
     () => changeRequestService.getStats(),
     {
       revalidateOnFocus: false,
-    },
+    }
   );
 
   const handleRefresh = useCallback(() => {
@@ -709,87 +663,63 @@ const ChangeRequestsPage: React.FC = () => {
     setPage(newPage);
   }, []);
 
-  const handleRowsPerPageChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      const newRowsPerPage = parseInt(event.target.value, 10);
-      setRowsPerPage(newRowsPerPage);
-      setPage(0);
-    },
-    [],
-  );
+  const handleRowsPerPageChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const newRowsPerPage = parseInt(event.target.value, 10);
+    setRowsPerPage(newRowsPerPage);
+    setPage(0);
+  }, []);
 
   return (
     <Box sx={{ p: 3 }}>
       <Box
         sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "flex-start",
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
           mb: 3,
         }}
       >
         <Box>
           <Typography variant="h4" component="h1" gutterBottom>
-            {t("changeRequest.title")}
+            {t('changeRequest.title')}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            {t("changeRequest.subtitle")}
+            {t('changeRequest.subtitle')}
           </Typography>
         </Box>
-        <Button
-          variant="outlined"
-          startIcon={<RefreshIcon />}
-          onClick={handleRefresh}
-        >
-          {t("common.refresh")}
+        <Button variant="outlined" startIcon={<RefreshIcon />} onClick={handleRefresh}>
+          {t('common.refresh')}
         </Button>
       </Box>
 
       <Card>
-        <CardContent sx={{ p: 0, "&:last-child": { pb: 0 } }}>
+        <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
           {/* Status Tabs */}
-          <Box sx={{ borderBottom: 1, borderColor: "divider", px: 2 }}>
+          <Box sx={{ borderBottom: 1, borderColor: 'divider', px: 2 }}>
             <Tabs value={tabValue} onChange={handleTabChange}>
+              <Tab label={t('changeRequest.tabs.all') + (stats?.all ? ` (${stats.all})` : '')} />
+              <Tab
+                label={t('changeRequest.tabs.draft') + (stats?.draft ? ` (${stats.draft})` : '')}
+              />
+              <Tab label={t('changeRequest.tabs.open') + (stats?.open ? ` (${stats.open})` : '')} />
               <Tab
                 label={
-                  t("changeRequest.tabs.all") +
-                  (stats?.all ? ` (${stats.all})` : "")
+                  t('changeRequest.tabs.approved') + (stats?.approved ? ` (${stats.approved})` : '')
                 }
               />
               <Tab
                 label={
-                  t("changeRequest.tabs.draft") +
-                  (stats?.draft ? ` (${stats.draft})` : "")
+                  t('changeRequest.tabs.applied') + (stats?.applied ? ` (${stats.applied})` : '')
                 }
               />
               <Tab
                 label={
-                  t("changeRequest.tabs.open") +
-                  (stats?.open ? ` (${stats.open})` : "")
+                  t('changeRequest.tabs.rejected') + (stats?.rejected ? ` (${stats.rejected})` : '')
                 }
               />
               <Tab
                 label={
-                  t("changeRequest.tabs.approved") +
-                  (stats?.approved ? ` (${stats.approved})` : "")
-                }
-              />
-              <Tab
-                label={
-                  t("changeRequest.tabs.applied") +
-                  (stats?.applied ? ` (${stats.applied})` : "")
-                }
-              />
-              <Tab
-                label={
-                  t("changeRequest.tabs.rejected") +
-                  (stats?.rejected ? ` (${stats.rejected})` : "")
-                }
-              />
-              <Tab
-                label={
-                  t("changeRequest.tabs.conflict") +
-                  (stats?.conflict ? ` (${stats.conflict})` : "")
+                  t('changeRequest.tabs.conflict') + (stats?.conflict ? ` (${stats.conflict})` : '')
                 }
               />
             </Tabs>
@@ -798,29 +728,21 @@ const ChangeRequestsPage: React.FC = () => {
           {isLoading && <LinearProgress />}
 
           {!isLoading && (!data?.items || data.items.length === 0) ? (
-            <EmptyState message={t("changeRequest.noRequests")} />
+            <EmptyState message={t('changeRequest.noRequests')} />
           ) : (
             <>
               <TableContainer>
                 <Table>
                   <TableHead>
                     <TableRow>
-                      <TableCell>{t("changeRequest.status")}</TableCell>
-                      <TableCell>{t("changeRequest.titleField")}</TableCell>
-                      <TableCell>{t("changeRequest.requester")}</TableCell>
-                      <TableCell>{t("changeRequest.priorityField")}</TableCell>
-                      <TableCell align="center">
-                        {t("changeRequest.items")}
-                      </TableCell>
-                      <TableCell align="center">
-                        {t("changeRequest.approvalProgress")}
-                      </TableCell>
-                      <TableCell align="center">
-                        {t("changeRequest.lastUpdated")}
-                      </TableCell>
-                      <TableCell align="center">
-                        {t("changeRequest.actions.label")}
-                      </TableCell>
+                      <TableCell>{t('changeRequest.status')}</TableCell>
+                      <TableCell>{t('changeRequest.titleField')}</TableCell>
+                      <TableCell>{t('changeRequest.requester')}</TableCell>
+                      <TableCell>{t('changeRequest.priorityField')}</TableCell>
+                      <TableCell align="center">{t('changeRequest.items')}</TableCell>
+                      <TableCell align="center">{t('changeRequest.approvalProgress')}</TableCell>
+                      <TableCell align="center">{t('changeRequest.lastUpdated')}</TableCell>
+                      <TableCell align="center">{t('changeRequest.actions.label')}</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>

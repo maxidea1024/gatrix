@@ -368,8 +368,13 @@ export const EditIntegrationPage: React.FC = () => {
     if (description !== initialValues.description) return true;
     if (isEnabled !== initialValues.isEnabled) return true;
     if (JSON.stringify(parameters) !== JSON.stringify(initialValues.parameters)) return true;
-    if (JSON.stringify(selectedEvents.sort()) !== JSON.stringify(initialValues.events.sort())) return true;
-    if (JSON.stringify(selectedEnvironments.sort()) !== JSON.stringify(initialValues.environments.sort())) return true;
+    if (JSON.stringify(selectedEvents.sort()) !== JSON.stringify(initialValues.events.sort()))
+      return true;
+    if (
+      JSON.stringify(selectedEnvironments.sort()) !==
+      JSON.stringify(initialValues.environments.sort())
+    )
+      return true;
 
     return false;
   };
@@ -437,24 +442,24 @@ export const EditIntegrationPage: React.FC = () => {
         slotProps={
           isSensitive
             ? {
-              input: {
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      onClick={() =>
-                        setShowSensitive((prev) => ({
-                          ...prev,
-                          [param.name]: !prev[param.name],
-                        }))
-                      }
-                      edge="end"
-                    >
-                      {isVisible ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              },
-            }
+                input: {
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() =>
+                          setShowSensitive((prev) => ({
+                            ...prev,
+                            [param.name]: !prev[param.name],
+                          }))
+                        }
+                        edge="end"
+                      >
+                        {isVisible ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                },
+              }
             : undefined
         }
       />
@@ -713,11 +718,7 @@ export const EditIntegrationPage: React.FC = () => {
       <TabPanel value={tabValue} index={1}>
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
           <Typography variant="h6">{t('integrations.eventLogs')}</Typography>
-          <Button
-            startIcon={<RefreshIcon />}
-            onClick={fetchEventLogs}
-            disabled={logsLoading}
-          >
+          <Button startIcon={<RefreshIcon />} onClick={fetchEventLogs} disabled={logsLoading}>
             {t('common.refresh')}
           </Button>
         </Box>

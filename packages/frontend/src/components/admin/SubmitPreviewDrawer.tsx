@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -12,28 +12,25 @@ import {
   Divider,
   FormControlLabel,
   Collapse,
-} from "@mui/material";
-import { alpha } from "@mui/material/styles";
+} from '@mui/material';
+import { alpha } from '@mui/material/styles';
 import {
   Send as SendIcon,
   Add as AddIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
   ExpandMore as ExpandMoreIcon,
-} from "@mui/icons-material";
-import { useTranslation } from "react-i18next";
-import { useSnackbar } from "notistack";
-import { useHandleApiError } from "@/hooks/useHandleApiError";
-import ResizableDrawer from "@/components/common/ResizableDrawer";
+} from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
+import { useSnackbar } from 'notistack';
+import { useHandleApiError } from '@/hooks/useHandleApiError';
+import ResizableDrawer from '@/components/common/ResizableDrawer';
 import changeRequestService, {
   ChangeRequest,
   ActionGroup,
   ChangeItem,
-} from "@/services/changeRequestService";
-import {
-  formatChangeRequestTitle,
-  getTableLocalizationKey,
-} from "@/utils/changeRequestFormatter";
+} from '@/services/changeRequestService';
+import { formatChangeRequestTitle, getTableLocalizationKey } from '@/utils/changeRequestFormatter';
 
 interface SubmitPreviewDrawerProps {
   open: boolean;
@@ -46,7 +43,7 @@ interface FieldOp {
   path: string;
   oldValue: any;
   newValue: any;
-  opType: "SET" | "DEL" | "MOD";
+  opType: 'SET' | 'DEL' | 'MOD';
 }
 
 const SubmitPreviewDrawer: React.FC<SubmitPreviewDrawerProps> = ({
@@ -59,17 +56,13 @@ const SubmitPreviewDrawer: React.FC<SubmitPreviewDrawerProps> = ({
   const { enqueueSnackbar } = useSnackbar();
   const { handleApiError } = useHandleApiError();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [title, setTitle] = useState("");
-  const [reason, setReason] = useState("");
+  const [title, setTitle] = useState('');
+  const [reason, setReason] = useState('');
 
   // Track checked state for action groups and items
-  const [checkedGroups, setCheckedGroups] = useState<Record<string, boolean>>(
-    {},
-  );
+  const [checkedGroups, setCheckedGroups] = useState<Record<string, boolean>>({});
   const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>({});
-  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>(
-    {},
-  );
+  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
 
   // Initialize checked state when CR changes
   useEffect(() => {
@@ -96,8 +89,8 @@ const SubmitPreviewDrawer: React.FC<SubmitPreviewDrawerProps> = ({
       setCheckedGroups(groupsState);
       setCheckedItems(itemsState);
       setExpandedGroups(expandedState);
-      setTitle(changeRequest.title || "");
-      setReason("");
+      setTitle(changeRequest.title || '');
+      setReason('');
     }
   }, [changeRequest, open]);
 
@@ -115,11 +108,7 @@ const SubmitPreviewDrawer: React.FC<SubmitPreviewDrawerProps> = ({
     }
   };
 
-  const handleItemCheck = (
-    itemId: string,
-    groupId: string | undefined,
-    checked: boolean,
-  ) => {
+  const handleItemCheck = (itemId: string, groupId: string | undefined, checked: boolean) => {
     setCheckedItems((prev) => ({ ...prev, [itemId]: checked }));
 
     // Update group check state based on its items
@@ -127,12 +116,8 @@ const SubmitPreviewDrawer: React.FC<SubmitPreviewDrawerProps> = ({
       const group = changeRequest?.actionGroups?.find((g) => g.id === groupId);
       if (group?.changeItems) {
         const newItemsState = { ...checkedItems, [itemId]: checked };
-        const allChecked = group.changeItems.every(
-          (item) => newItemsState[item.id],
-        );
-        const someChecked = group.changeItems.some(
-          (item) => newItemsState[item.id],
-        );
+        const allChecked = group.changeItems.every((item) => newItemsState[item.id]);
+        const someChecked = group.changeItems.some((item) => newItemsState[item.id]);
         setCheckedGroups((prev) => ({ ...prev, [groupId]: allChecked }));
       }
     }
@@ -154,8 +139,8 @@ const SubmitPreviewDrawer: React.FC<SubmitPreviewDrawerProps> = ({
   const handleSubmit = async () => {
     if (!changeRequest) return;
     if (!title.trim()) {
-      enqueueSnackbar(t("changeRequest.errors.titleRequired"), {
-        variant: "warning",
+      enqueueSnackbar(t('changeRequest.errors.titleRequired'), {
+        variant: 'warning',
       });
       return;
     }
@@ -177,8 +162,8 @@ const SubmitPreviewDrawer: React.FC<SubmitPreviewDrawerProps> = ({
         reason: reason.trim() || undefined,
       });
 
-      enqueueSnackbar(t("changeRequest.messages.submitted"), {
-        variant: "success",
+      enqueueSnackbar(t('changeRequest.messages.submitted'), {
+        variant: 'success',
       });
       onClose();
       onSubmitted?.();
@@ -191,30 +176,30 @@ const SubmitPreviewDrawer: React.FC<SubmitPreviewDrawerProps> = ({
 
   const getOpTypeIcon = (opType: string) => {
     switch (opType) {
-      case "CREATE":
-        return <AddIcon fontSize="small" sx={{ color: "success.main" }} />;
-      case "DELETE":
-        return <DeleteIcon fontSize="small" sx={{ color: "error.main" }} />;
+      case 'CREATE':
+        return <AddIcon fontSize="small" sx={{ color: 'success.main' }} />;
+      case 'DELETE':
+        return <DeleteIcon fontSize="small" sx={{ color: 'error.main' }} />;
       default:
-        return <EditIcon fontSize="small" sx={{ color: "warning.main" }} />;
+        return <EditIcon fontSize="small" sx={{ color: 'warning.main' }} />;
     }
   };
 
   const getOpTypeLabel = (opType: string) => {
     switch (opType) {
-      case "CREATE":
-        return t("changeRequest.opCreate");
-      case "DELETE":
-        return t("changeRequest.opDelete");
+      case 'CREATE':
+        return t('changeRequest.opCreate');
+      case 'DELETE':
+        return t('changeRequest.opDelete');
       default:
-        return t("changeRequest.opUpdate");
+        return t('changeRequest.opUpdate');
     }
   };
 
   const formatValue = (value: any): string => {
-    if (value === null || value === undefined) return "—";
-    if (typeof value === "boolean") return value ? "true" : "false";
-    if (typeof value === "object") return JSON.stringify(value);
+    if (value === null || value === undefined) return '—';
+    if (typeof value === 'boolean') return value ? 'true' : 'false';
+    if (typeof value === 'object') return JSON.stringify(value);
     return String(value);
   };
 
@@ -225,23 +210,19 @@ const SubmitPreviewDrawer: React.FC<SubmitPreviewDrawerProps> = ({
       anchor="right"
       open={open}
       onClose={onClose}
-      title={t("changeRequest.submitPreview")}
+      title={t('changeRequest.submitPreview')}
       defaultWidth={650}
       minWidth={500}
     >
-      <Box
-        sx={{ p: 3, display: "flex", flexDirection: "column", height: "100%" }}
-      >
+      <Box sx={{ p: 3, display: 'flex', flexDirection: 'column', height: '100%' }}>
         {/* Header */}
-        <Paper sx={{ p: 2, mb: 3, bgcolor: alpha("#2196f3", 0.1) }}>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
+        <Paper sx={{ p: 2, mb: 3, bgcolor: alpha('#2196f3', 0.1) }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
             <SendIcon color="primary" />
-            <Typography variant="h6">
-              {t("changeRequest.submitPreviewTitle")}
-            </Typography>
+            <Typography variant="h6">{t('changeRequest.submitPreviewTitle')}</Typography>
           </Box>
           <Typography variant="body2" color="text.secondary">
-            {t("changeRequest.submitPreviewDesc")}
+            {t('changeRequest.submitPreviewDesc')}
           </Typography>
         </Paper>
 
@@ -249,7 +230,7 @@ const SubmitPreviewDrawer: React.FC<SubmitPreviewDrawerProps> = ({
         <Box sx={{ mb: 3 }}>
           <TextField
             fullWidth
-            label={t("changeRequest.submitDialog.titleField")}
+            label={t('changeRequest.submitDialog.titleField')}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             required
@@ -259,10 +240,10 @@ const SubmitPreviewDrawer: React.FC<SubmitPreviewDrawerProps> = ({
             fullWidth
             multiline
             rows={2}
-            label={t("changeRequest.submitDialog.reason")}
+            label={t('changeRequest.submitDialog.reason')}
             value={reason}
             onChange={(e) => setReason(e.target.value)}
-            helperText={t("changeRequest.submitDialog.reasonOptional")}
+            helperText={t('changeRequest.submitDialog.reasonOptional')}
           />
         </Box>
 
@@ -270,27 +251,23 @@ const SubmitPreviewDrawer: React.FC<SubmitPreviewDrawerProps> = ({
 
         {/* Changes Summary */}
         <Typography variant="subtitle2" sx={{ mb: 2 }}>
-          {t("changeRequest.selectChanges")} ({selectedCount}/{totalCount})
+          {t('changeRequest.selectChanges')} ({selectedCount}/{totalCount})
         </Typography>
 
         {/* Action Groups */}
-        <Box sx={{ flex: 1, overflow: "auto", mb: 3 }}>
+        <Box sx={{ flex: 1, overflow: 'auto', mb: 3 }}>
           {changeRequest.actionGroups?.map((group) => (
-            <Paper
-              key={group.id}
-              variant="outlined"
-              sx={{ mb: 2, overflow: "hidden" }}
-            >
+            <Paper key={group.id} variant="outlined" sx={{ mb: 2, overflow: 'hidden' }}>
               {/* Group Header */}
               <Box
                 sx={{
                   px: 2,
                   py: 1,
-                  bgcolor: "action.hover",
-                  display: "flex",
-                  alignItems: "center",
+                  bgcolor: 'action.hover',
+                  display: 'flex',
+                  alignItems: 'center',
                   gap: 1,
-                  cursor: "pointer",
+                  cursor: 'pointer',
                 }}
                 onClick={() => toggleGroupExpand(group.id)}
               >
@@ -309,10 +286,8 @@ const SubmitPreviewDrawer: React.FC<SubmitPreviewDrawerProps> = ({
                 />
                 <ExpandMoreIcon
                   sx={{
-                    transform: expandedGroups[group.id]
-                      ? "rotate(0deg)"
-                      : "rotate(-90deg)",
-                    transition: "transform 0.2s",
+                    transform: expandedGroups[group.id] ? 'rotate(0deg)' : 'rotate(-90deg)',
+                    transition: 'transform 0.2s',
                     fontSize: 20,
                   }}
                 />
@@ -333,58 +308,46 @@ const SubmitPreviewDrawer: React.FC<SubmitPreviewDrawerProps> = ({
                     <Box
                       key={item.id}
                       sx={{
-                        display: "flex",
-                        alignItems: "flex-start",
+                        display: 'flex',
+                        alignItems: 'flex-start',
                         gap: 1,
                         p: 1,
                         borderRadius: 1,
-                        bgcolor: checkedItems[item.id]
-                          ? "transparent"
-                          : alpha("#f44336", 0.05),
+                        bgcolor: checkedItems[item.id] ? 'transparent' : alpha('#f44336', 0.05),
                         opacity: checkedItems[item.id] ? 1 : 0.6,
-                        "&:hover": { bgcolor: "action.hover" },
+                        '&:hover': { bgcolor: 'action.hover' },
                       }}
                     >
                       <Checkbox
                         checked={checkedItems[item.id] ?? true}
-                        onChange={(e) =>
-                          handleItemCheck(item.id, group.id, e.target.checked)
-                        }
+                        onChange={(e) => handleItemCheck(item.id, group.id, e.target.checked)}
                         size="small"
                       />
                       <Box sx={{ flex: 1 }}>
                         <Box
                           sx={{
-                            display: "flex",
-                            alignItems: "center",
+                            display: 'flex',
+                            alignItems: 'center',
                             gap: 1,
                             mb: 0.5,
                           }}
                         >
-                          {getOpTypeIcon((item as any).opType || "UPDATE")}
+                          {getOpTypeIcon((item as any).opType || 'UPDATE')}
                           <Typography variant="body2" fontWeight={500}>
-                            {t(getTableLocalizationKey(item.targetTable))}:{" "}
-                            {item.targetId}
+                            {t(getTableLocalizationKey(item.targetTable))}: {item.targetId}
                           </Typography>
                           <Chip
-                            label={getOpTypeLabel(
-                              (item as any).opType || "UPDATE",
-                            )}
+                            label={getOpTypeLabel((item as any).opType || 'UPDATE')}
                             size="small"
                             sx={{ height: 20, fontSize: 11 }}
                           />
                         </Box>
                         {/* Show ops count for UPDATE */}
-                        {(item as any).opType === "UPDATE" &&
-                          (item as any).ops?.length > 0 && (
-                            <Typography
-                              variant="caption"
-                              color="text.secondary"
-                            >
-                              {(item as any).ops.length}{" "}
-                              {t("changeRequest.fieldChanges")}
-                            </Typography>
-                          )}
+                        {(item as any).opType === 'UPDATE' && (item as any).ops?.length > 0 && (
+                          <Typography variant="caption" color="text.secondary">
+                            {(item as any).ops.length} {t('changeRequest.fieldChanges')}
+                          </Typography>
+                        )}
                       </Box>
                     </Box>
                   ))}
@@ -398,18 +361,15 @@ const SubmitPreviewDrawer: React.FC<SubmitPreviewDrawerProps> = ({
             ?.filter((item) => !item.actionGroupId)
             .map((item) => (
               <Paper key={item.id} variant="outlined" sx={{ mb: 1, p: 1.5 }}>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   <Checkbox
                     checked={checkedItems[item.id] ?? true}
-                    onChange={(e) =>
-                      handleItemCheck(item.id, undefined, e.target.checked)
-                    }
+                    onChange={(e) => handleItemCheck(item.id, undefined, e.target.checked)}
                     size="small"
                   />
-                  {getOpTypeIcon((item as any).opType || "UPDATE")}
+                  {getOpTypeIcon((item as any).opType || 'UPDATE')}
                   <Typography variant="body2">
-                    {t(getTableLocalizationKey(item.targetTable))}:{" "}
-                    {item.targetId}
+                    {t(getTableLocalizationKey(item.targetTable))}: {item.targetId}
                   </Typography>
                 </Box>
               </Paper>
@@ -419,27 +379,25 @@ const SubmitPreviewDrawer: React.FC<SubmitPreviewDrawerProps> = ({
         {/* Warning if some items are unchecked */}
         {selectedCount < totalCount && (
           <Alert severity="warning" sx={{ mb: 2 }}>
-            {t("changeRequest.submitExcludeWarning", {
+            {t('changeRequest.submitExcludeWarning', {
               count: totalCount - selectedCount,
             })}
           </Alert>
         )}
 
         {/* Action Buttons */}
-        <Box sx={{ display: "flex", gap: 2, justifyContent: "flex-end" }}>
+        <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
           <Button variant="outlined" onClick={onClose}>
-            {t("common.cancel")}
+            {t('common.cancel')}
           </Button>
           <Button
             variant="contained"
             color="primary"
-            startIcon={
-              isSubmitting ? <CircularProgress size={16} /> : <SendIcon />
-            }
+            startIcon={isSubmitting ? <CircularProgress size={16} /> : <SendIcon />}
             onClick={handleSubmit}
             disabled={isSubmitting || selectedCount === 0}
           >
-            {t("changeRequest.actions.submit")}
+            {t('changeRequest.actions.submit')}
           </Button>
         </Box>
       </Box>

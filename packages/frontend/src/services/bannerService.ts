@@ -1,37 +1,34 @@
-import api from "./api";
-import {
-  MutationResult,
-  parseChangeRequestResponse,
-} from "./changeRequestUtils";
+import api from './api';
+import { MutationResult, parseChangeRequestResponse } from './changeRequestUtils';
 
 // Frame action types
-export type FrameActionType = "openUrl" | "command" | "deepLink" | "none";
-export type FrameActionTarget = "webview" | "external";
+export type FrameActionType = 'openUrl' | 'command' | 'deepLink' | 'none';
+export type FrameActionTarget = 'webview' | 'external';
 
 // Frame effect types
 export type FrameEffectType =
-  | "fadeIn"
-  | "fadeOut"
-  | "slideLeft"
-  | "slideRight"
-  | "slideUp"
-  | "slideDown"
-  | "zoomIn"
-  | "zoomOut"
-  | "shake"
-  | "none";
+  | 'fadeIn'
+  | 'fadeOut'
+  | 'slideLeft'
+  | 'slideRight'
+  | 'slideUp'
+  | 'slideDown'
+  | 'zoomIn'
+  | 'zoomOut'
+  | 'shake'
+  | 'none';
 
 // Transition types
-export type TransitionType = "fade" | "slide" | "crossfade" | "none";
+export type TransitionType = 'fade' | 'slide' | 'crossfade' | 'none';
 
 // Loop mode types
-export type LoopModeType = "loop" | "pingpong" | "once";
+export type LoopModeType = 'loop' | 'pingpong' | 'once';
 
 // Frame type
-export type FrameType = "jpg" | "png" | "gif" | "mp4";
+export type FrameType = 'jpg' | 'png' | 'gif' | 'mp4';
 
 // Banner status
-export type BannerStatus = "draft" | "published" | "archived";
+export type BannerStatus = 'draft' | 'published' | 'archived';
 
 export interface FrameAction {
   type: FrameActionType;
@@ -51,7 +48,7 @@ export interface FrameTransition {
 }
 
 // Frame filter logic type
-export type FrameFilterLogic = "and" | "or";
+export type FrameFilterLogic = 'and' | 'or';
 
 // Frame targeting/filtering options
 export interface FrameTargeting {
@@ -153,7 +150,7 @@ export interface GetBannersParams {
   search?: string;
   status?: BannerStatus | BannerStatus[];
   sortBy?: string;
-  sortOrder?: "asc" | "desc";
+  sortOrder?: 'asc' | 'desc';
 }
 
 export interface GetBannersResponse {
@@ -170,7 +167,7 @@ class BannerService {
    * Get all banners with pagination
    */
   async getBanners(params?: GetBannersParams): Promise<GetBannersResponse> {
-    const response = await api.get("/admin/banners", { params });
+    const response = await api.get('/admin/banners', { params });
     return response.data;
   }
 
@@ -186,17 +183,14 @@ class BannerService {
    * Create a new banner
    */
   async createBanner(input: CreateBannerInput): Promise<BannerMutationResult> {
-    const response = await api.post("/admin/banners", input);
+    const response = await api.post('/admin/banners', input);
     return parseChangeRequestResponse<Banner>(response, (r) => r?.banner);
   }
 
   /**
    * Update a banner
    */
-  async updateBanner(
-    bannerId: string,
-    input: UpdateBannerInput,
-  ): Promise<BannerMutationResult> {
+  async updateBanner(bannerId: string, input: UpdateBannerInput): Promise<BannerMutationResult> {
     const response = await api.put(`/admin/banners/${bannerId}`, input);
     return parseChangeRequestResponse<Banner>(response, (r) => r?.banner);
   }

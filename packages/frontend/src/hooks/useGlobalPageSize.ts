@@ -2,9 +2,9 @@
  * Hook to manage global page size setting across all paginated pages
  * The page size is stored in localStorage and shared across all pages
  */
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect } from 'react';
 
-const STORAGE_KEY = "globalPageSize";
+const STORAGE_KEY = 'globalPageSize';
 const DEFAULT_PAGE_SIZE = 10;
 const VALID_PAGE_SIZES = [5, 10, 20, 25, 50, 100];
 
@@ -38,8 +38,8 @@ export function useGlobalPageSize(): [number, (size: number) => void] {
       }
     };
 
-    window.addEventListener("storage", handleStorageChange);
-    return () => window.removeEventListener("storage", handleStorageChange);
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
   return [pageSize, setPageSize];

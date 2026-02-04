@@ -1,19 +1,9 @@
-import React, { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import {
-  Box,
-  Container,
-  Typography,
-  Button,
-  Paper,
-  Stack,
-} from "@mui/material";
-import {
-  ErrorOutline as ErrorIcon,
-  Login as LoginIcon,
-} from "@mui/icons-material";
-import { useTranslation } from "react-i18next";
-import { AuthService } from "@/services/auth";
+import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Box, Container, Typography, Button, Paper, Stack } from '@mui/material';
+import { ErrorOutline as ErrorIcon, Login as LoginIcon } from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
+import { AuthService } from '@/services/auth';
 
 /**
  * Session Expired Page
@@ -38,17 +28,17 @@ const SessionExpiredPage: React.FC = () => {
   }, []);
 
   const handleBackToLogin = () => {
-    navigate("/login", { replace: true });
+    navigate('/login', { replace: true });
   };
 
   return (
     <Box
       sx={{
-        minHeight: "100vh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
         padding: 2,
       }}
     >
@@ -58,7 +48,7 @@ const SessionExpiredPage: React.FC = () => {
           sx={{
             padding: { xs: 3, sm: 5 },
             borderRadius: 0,
-            textAlign: "center",
+            textAlign: 'center',
           }}
         >
           <Stack spacing={3} alignItems="center">
@@ -67,39 +57,30 @@ const SessionExpiredPage: React.FC = () => {
               sx={{
                 width: 80,
                 height: 80,
-                borderRadius: "50%",
-                backgroundColor: "error.light",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
+                borderRadius: '50%',
+                backgroundColor: 'error.light',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
                 mb: 1,
               }}
             >
               <ErrorIcon
                 sx={{
                   fontSize: 48,
-                  color: "error.main",
+                  color: 'error.main',
                 }}
               />
             </Box>
 
             {/* Title */}
-            <Typography
-              variant="h4"
-              component="h1"
-              fontWeight="bold"
-              color="text.primary"
-            >
-              {t("auth.sessionExpired.title")}
+            <Typography variant="h4" component="h1" fontWeight="bold" color="text.primary">
+              {t('auth.sessionExpired.title')}
             </Typography>
 
             {/* Description */}
-            <Typography
-              variant="body1"
-              color="text.secondary"
-              sx={{ maxWidth: 400 }}
-            >
-              {t("auth.sessionExpired.description")}
+            <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 400 }}>
+              {t('auth.sessionExpired.description')}
             </Typography>
 
             {/* Additional Info */}
@@ -108,14 +89,14 @@ const SessionExpiredPage: React.FC = () => {
               color="text.secondary"
               sx={{
                 maxWidth: 400,
-                backgroundColor: "grey.100",
+                backgroundColor: 'grey.100',
                 padding: 2,
                 borderRadius: 0,
                 borderLeft: 4,
-                borderColor: "warning.main",
+                borderColor: 'warning.main',
               }}
             >
-              {t("auth.sessionExpired.reason")}
+              {t('auth.sessionExpired.reason')}
             </Typography>
 
             {/* Back to Login Button */}
@@ -129,17 +110,16 @@ const SessionExpiredPage: React.FC = () => {
                 paddingX: 4,
                 paddingY: 1.5,
                 borderRadius: 0,
-                textTransform: "none",
-                fontSize: "1rem",
+                textTransform: 'none',
+                fontSize: '1rem',
                 fontWeight: 600,
-                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                "&:hover": {
-                  background:
-                    "linear-gradient(135deg, #5568d3 0%, #6a3f8f 100%)",
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                '&:hover': {
+                  background: 'linear-gradient(135deg, #5568d3 0%, #6a3f8f 100%)',
                 },
               }}
             >
-              {t("auth.sessionExpired.backToLogin")}
+              {t('auth.sessionExpired.backToLogin')}
             </Button>
           </Stack>
         </Paper>

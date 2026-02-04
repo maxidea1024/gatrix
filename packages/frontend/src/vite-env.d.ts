@@ -4,7 +4,7 @@
 declare const __APP_VERSION__: string;
 
 // INI file module declaration
-declare module "*.ini" {
+declare module '*.ini' {
   const content: Record<string, string>;
   export default content;
 }

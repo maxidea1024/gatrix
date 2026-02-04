@@ -13,7 +13,11 @@ import {
 } from '../models/Integration';
 import { IntegrationEventModel } from '../models/IntegrationEvent';
 import { getAddons, getProviderDefinitions, AddonDefinition, ADDON_DEFINITIONS } from '../addons';
-import { IntegrationSystemEvent, IntegrationEventType, INTEGRATION_EVENTS } from '../types/integrationEvents';
+import {
+  IntegrationSystemEvent,
+  IntegrationEventType,
+  INTEGRATION_EVENTS,
+} from '../types/integrationEvents';
 import { AuditLogModel } from '../models/AuditLog';
 
 const logger = createLogger('IntegrationService');

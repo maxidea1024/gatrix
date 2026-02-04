@@ -5,13 +5,13 @@
  * Generates 26-character identifiers using Crockford's Base32.
  */
 
-const ENCODING = "0123456789ABCDEFGHJKMNPQRSTVWXYZ"; // Crockford's Base32
+const ENCODING = '0123456789ABCDEFGHJKMNPQRSTVWXYZ'; // Crockford's Base32
 
 /**
  * Encode timestamp to Crockford's Base32
  */
 function encodeTime(now: number, len: number): string {
-  let str = "";
+  let str = '';
   for (let i = len - 1; i >= 0; i--) {
     const mod = now % 32;
     str = ENCODING[mod] + str;
@@ -24,7 +24,7 @@ function encodeTime(now: number, len: number): string {
  * Generate random characters using Crockford's Base32
  */
 function encodeRandom(len: number): string {
-  let str = "";
+  let str = '';
   const randomValues = new Uint8Array(len);
   crypto.getRandomValues(randomValues);
   for (let i = 0; i < len; i++) {

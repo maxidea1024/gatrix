@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useRef } from "react";
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import {
   Box,
   Card,
@@ -33,7 +33,7 @@ import {
   InputAdornment,
   ToggleButton,
   ToggleButtonGroup,
-} from "@mui/material";
+} from '@mui/material';
 import {
   KeyboardArrowDown,
   KeyboardArrowUp,
@@ -50,19 +50,17 @@ import {
   ExpandLess as ExpandLessIcon,
   TableChart as TableChartIcon,
   Visibility as VisibilityIcon,
-} from "@mui/icons-material";
-import { useTranslation } from "react-i18next";
-import Editor from "@monaco-editor/react";
-import serviceDiscoveryService, {
-  ServiceInstance,
-} from "../../services/serviceDiscoveryService";
-import { RelativeTime } from "../../components/common/RelativeTime";
-import { useDebounce } from "../../hooks/useDebounce";
-import { copyToClipboardWithNotification } from "../../utils/clipboard";
-import { formatDateTimeDetailed } from "../../utils/dateFormat";
+} from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
+import Editor from '@monaco-editor/react';
+import serviceDiscoveryService, { ServiceInstance } from '../../services/serviceDiscoveryService';
+import { RelativeTime } from '../../components/common/RelativeTime';
+import { useDebounce } from '../../hooks/useDebounce';
+import { copyToClipboardWithNotification } from '../../utils/clipboard';
+import { formatDateTimeDetailed } from '../../utils/dateFormat';
 
 // Grouping options - Cloud-related only
-type GroupingField = "cloudProvider" | "cloudRegion";
+type GroupingField = 'cloudProvider' | 'cloudRegion';
 
 interface EdgeGroup {
   id: string;
@@ -128,60 +126,46 @@ const GatrixEdgesPage: React.FC = () => {
   const [services, setServices] = useState<ServiceInstance[]>([]);
   const [groups, setGroups] = useState<EdgeGroup[]>([]);
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
-  const [expandedInstances, setExpandedInstances] = useState<Set<string>>(
-    new Set(),
-  );
+  const [expandedInstances, setExpandedInstances] = useState<Set<string>>(new Set());
 
   // Grouping - support multiple levels (cloud-related only)
   // Load from localStorage or default to empty array
   const [groupingLevels, setGroupingLevels] = useState<GroupingField[]>(() => {
     try {
-      const saved = localStorage.getItem("gatrixEdges.groupingLevels");
+      const saved = localStorage.getItem('gatrixEdges.groupingLevels');
       if (saved) {
         const parsed = JSON.parse(saved);
         // Validate that parsed values are valid GroupingField types
         if (
           Array.isArray(parsed) &&
-          parsed.every((item) =>
-            ["cloudProvider", "cloudRegion"].includes(item),
-          )
+          parsed.every((item) => ['cloudProvider', 'cloudRegion'].includes(item))
         ) {
           return parsed;
         }
       }
     } catch (e) {
-      console.warn("Failed to load grouping levels from localStorage:", e);
+      console.warn('Failed to load grouping levels from localStorage:', e);
     }
     return [];
   });
 
   // Cache status per instance
-  const [cacheStatuses, setCacheStatuses] = useState<Map<string, CacheStatus>>(
-    new Map(),
-  );
+  const [cacheStatuses, setCacheStatuses] = useState<Map<string, CacheStatus>>(new Map());
   const cachePollingRef = useRef<NodeJS.Timeout | null>(null);
 
   // Request stats per instance
-  const [requestStats, setRequestStats] = useState<Map<string, RequestStats>>(
-    new Map(),
-  );
+  const [requestStats, setRequestStats] = useState<Map<string, RequestStats>>(new Map());
   const statsPollingRef = useRef<NodeJS.Timeout | null>(null);
 
   // Collapsible sections state
-  const [expandedSections, setExpandedSections] = useState<
-    Map<string, Set<string>>
-  >(new Map());
+  const [expandedSections, setExpandedSections] = useState<Map<string, Set<string>>>(new Map());
 
   // Cache refresh interval state (persisted in localStorage)
-  const [cacheRefreshInterval, setCacheRefreshInterval] = useState<
-    number | null
-  >(() => {
+  const [cacheRefreshInterval, setCacheRefreshInterval] = useState<number | null>(() => {
     try {
-      const stored = localStorage.getItem(
-        "gatrix_edges_cache_refresh_interval",
-      );
-      if (stored === "off") return null;
-      const parsed = parseInt(stored || "10", 10);
+      const stored = localStorage.getItem('gatrix_edges_cache_refresh_interval');
+      if (stored === 'off') return null;
+      const parsed = parseInt(stored || '10', 10);
       return isNaN(parsed) ? 10 : parsed;
     } catch {
       return 10;
@@ -189,15 +173,11 @@ const GatrixEdgesPage: React.FC = () => {
   });
 
   // Stats refresh interval state (persisted in localStorage)
-  const [statsRefreshInterval, setStatsRefreshInterval] = useState<
-    number | null
-  >(() => {
+  const [statsRefreshInterval, setStatsRefreshInterval] = useState<number | null>(() => {
     try {
-      const stored = localStorage.getItem(
-        "gatrix_edges_stats_refresh_interval",
-      );
-      if (stored === "off") return null;
-      const parsed = parseInt(stored || "10", 10);
+      const stored = localStorage.getItem('gatrix_edges_stats_refresh_interval');
+      if (stored === 'off') return null;
+      const parsed = parseInt(stored || '10', 10);
       return isNaN(parsed) ? 10 : parsed;
     } catch {
       return 10;
@@ -208,15 +188,15 @@ const GatrixEdgesPage: React.FC = () => {
   useEffect(() => {
     try {
       if (cacheRefreshInterval === null) {
-        localStorage.setItem("gatrix_edges_cache_refresh_interval", "off");
+        localStorage.setItem('gatrix_edges_cache_refresh_interval', 'off');
       } else {
         localStorage.setItem(
-          "gatrix_edges_cache_refresh_interval",
-          cacheRefreshInterval.toString(),
+          'gatrix_edges_cache_refresh_interval',
+          cacheRefreshInterval.toString()
         );
       }
     } catch (e) {
-      console.error("Failed to save cache refresh interval to localStorage", e);
+      console.error('Failed to save cache refresh interval to localStorage', e);
     }
   }, [cacheRefreshInterval]);
 
@@ -224,29 +204,27 @@ const GatrixEdgesPage: React.FC = () => {
   useEffect(() => {
     try {
       if (statsRefreshInterval === null) {
-        localStorage.setItem("gatrix_edges_stats_refresh_interval", "off");
+        localStorage.setItem('gatrix_edges_stats_refresh_interval', 'off');
       } else {
         localStorage.setItem(
-          "gatrix_edges_stats_refresh_interval",
-          statsRefreshInterval.toString(),
+          'gatrix_edges_stats_refresh_interval',
+          statsRefreshInterval.toString()
         );
       }
     } catch (e) {
-      console.error("Failed to save stats refresh interval to localStorage", e);
+      console.error('Failed to save stats refresh interval to localStorage', e);
     }
   }, [statsRefreshInterval]);
 
   // JSON Dialog
   const [jsonDialogOpen, setJsonDialogOpen] = useState(false);
   const [jsonDialogData, setJsonDialogData] = useState<any>(null);
-  const [jsonDialogTitle, setJsonDialogTitle] = useState("");
+  const [jsonDialogTitle, setJsonDialogTitle] = useState('');
   const [fullJsonLoading, setFullJsonLoading] = useState<string | null>(null);
-  const [detailViewMode, setDetailViewMode] = useState<"table" | "json">(
-    "table",
-  );
+  const [detailViewMode, setDetailViewMode] = useState<'table' | 'json'>('table');
 
   // JSON Search State
-  const [jsonSearchQuery, setJsonSearchQuery] = useState("");
+  const [jsonSearchQuery, setJsonSearchQuery] = useState('');
   const debouncedJsonSearchQuery = useDebounce(jsonSearchQuery, 300);
   const [jsonSearchMatches, setJsonSearchMatches] = useState<any[]>([]);
   const [jsonSearchIndex, setJsonSearchIndex] = useState(0);
@@ -267,14 +245,7 @@ const GatrixEdgesPage: React.FC = () => {
     }
 
     // Search: case-insensitive
-    const matches = model.findMatches(
-      debouncedJsonSearchQuery,
-      false,
-      false,
-      false,
-      null,
-      true,
-    );
+    const matches = model.findMatches(debouncedJsonSearchQuery, false, false, false, null, true);
     setJsonSearchMatches(matches);
     setJsonSearchIndex(0);
 
@@ -294,9 +265,7 @@ const GatrixEdgesPage: React.FC = () => {
 
   const handlePrevMatch = () => {
     if (jsonSearchMatches.length === 0) return;
-    const prev =
-      (jsonSearchIndex - 1 + jsonSearchMatches.length) %
-      jsonSearchMatches.length;
+    const prev = (jsonSearchIndex - 1 + jsonSearchMatches.length) % jsonSearchMatches.length;
     setJsonSearchIndex(prev);
     editorRef.current.setSelection(jsonSearchMatches[prev].range);
     editorRef.current.revealRangeInCenter(jsonSearchMatches[prev].range);
@@ -305,8 +274,8 @@ const GatrixEdgesPage: React.FC = () => {
   // Localized grouping options
   const getGroupingLabel = (field: GroupingField) => {
     const labels: Record<GroupingField, string> = {
-      cloudProvider: t("gatrixEdges.cloudProvider"),
-      cloudRegion: t("gatrixEdges.cloudRegion"),
+      cloudProvider: t('gatrixEdges.cloudProvider'),
+      cloudRegion: t('gatrixEdges.cloudRegion'),
     };
     return labels[field];
   };
@@ -323,7 +292,7 @@ const GatrixEdgesPage: React.FC = () => {
       const allServices = await serviceDiscoveryService.getServices();
 
       if (!allServices || !Array.isArray(allServices)) {
-        console.warn("getServices returned invalid data:", allServices);
+        console.warn('getServices returned invalid data:', allServices);
         if (!isRefresh) {
           setServices([]);
           setGroups([]);
@@ -332,8 +301,7 @@ const GatrixEdgesPage: React.FC = () => {
       }
 
       const edgeServices = allServices.filter(
-        (s) =>
-          s.labels.service === "gatrix-edge" || s.labels.service === "edge",
+        (s) => s.labels.service === 'gatrix-edge' || s.labels.service === 'edge'
       );
 
       setServices(edgeServices);
@@ -342,16 +310,14 @@ const GatrixEdgesPage: React.FC = () => {
       // If it's a manual refresh and we have expanded instances, refresh their cache status too
       if (isRefresh && expandedInstances.size > 0) {
         expandedInstances.forEach((instanceId) => {
-          const instance = edgeServices.find(
-            (s) => s.instanceId === instanceId,
-          );
+          const instance = edgeServices.find((s) => s.instanceId === instanceId);
           if (instance) {
             fetchCacheStatus(instance);
           }
         });
       }
     } catch (err: any) {
-      setError(err.message || "Failed to fetch services");
+      setError(err.message || 'Failed to fetch services');
     } finally {
       if (isRefresh) {
         setIsRefreshing(false);
@@ -372,7 +338,7 @@ const GatrixEdgesPage: React.FC = () => {
 
       const buildGroups = (
         items: ServiceInstance[],
-        remainingLevels: GroupingField[],
+        remainingLevels: GroupingField[]
       ): EdgeGroup[] => {
         if (remainingLevels.length === 0) {
           return [];
@@ -384,7 +350,7 @@ const GatrixEdgesPage: React.FC = () => {
         const groupMap = new Map<string, ServiceInstance[]>();
 
         items.forEach((service) => {
-          const value = service.labels[currentLevel] || "unknown";
+          const value = service.labels[currentLevel] || 'unknown';
           if (!groupMap.has(value)) {
             groupMap.set(value, []);
           }
@@ -396,20 +362,12 @@ const GatrixEdgesPage: React.FC = () => {
           .map(([name, instances]) => {
             const group: EdgeGroup = {
               id: `${currentLevel} -${name} `,
-              name:
-                name === "unknown"
-                  ? `(${getGroupingLabel(currentLevel)} N / A)`
-                  : name,
+              name: name === 'unknown' ? `(${getGroupingLabel(currentLevel)} N / A)` : name,
               instances:
                 nextLevels.length === 0
-                  ? instances.sort((a, b) =>
-                      a.instanceId.localeCompare(b.instanceId),
-                    )
+                  ? instances.sort((a, b) => a.instanceId.localeCompare(b.instanceId))
                   : [],
-              children:
-                nextLevels.length > 0
-                  ? buildGroups(instances, nextLevels)
-                  : undefined,
+              children: nextLevels.length > 0 ? buildGroups(instances, nextLevels) : undefined,
             };
             return group;
           });
@@ -428,7 +386,7 @@ const GatrixEdgesPage: React.FC = () => {
       collectIds(newGroups);
       setExpandedGroups(allGroupIds);
     },
-    [t],
+    [t]
   );
 
   // Fetch cache status summary for an instance
@@ -436,7 +394,7 @@ const GatrixEdgesPage: React.FC = () => {
     const key = instance.instanceId;
     setCacheStatuses((prev) => {
       const next = new Map(prev);
-      const current = next.get(key) || { status: "loading" };
+      const current = next.get(key) || { status: 'loading' };
       next.set(key, { ...current, loading: true });
       return next;
     });
@@ -445,7 +403,7 @@ const GatrixEdgesPage: React.FC = () => {
       const serviceType = instance.labels.service;
       const result = await serviceDiscoveryService.getCacheSummary(
         serviceType,
-        instance.instanceId,
+        instance.instanceId
       );
       setCacheStatuses((prev) => {
         const next = new Map(prev);
@@ -455,10 +413,10 @@ const GatrixEdgesPage: React.FC = () => {
     } catch (err: any) {
       setCacheStatuses((prev) => {
         const next = new Map(prev);
-        const current = next.get(key) || { status: "error" };
+        const current = next.get(key) || { status: 'error' };
         next.set(key, {
           ...current,
-          status: "error",
+          status: 'error',
           error: err.message,
           loading: false,
         });
@@ -471,13 +429,10 @@ const GatrixEdgesPage: React.FC = () => {
     setFullJsonLoading(instance.instanceId);
     try {
       const serviceType = instance.labels.service;
-      const result = await serviceDiscoveryService.getCacheStatus(
-        serviceType,
-        instance.instanceId,
-      );
-      openJsonDialog(result, t("gatrixEdges.cacheStatus"));
+      const result = await serviceDiscoveryService.getCacheStatus(serviceType, instance.instanceId);
+      openJsonDialog(result, t('gatrixEdges.cacheStatus'));
     } catch (err: any) {
-      console.error("Failed to fetch full cache status:", err);
+      console.error('Failed to fetch full cache status:', err);
     } finally {
       setFullJsonLoading(null);
     }
@@ -500,10 +455,7 @@ const GatrixEdgesPage: React.FC = () => {
 
     if (expandedInstances.size > 0 && cacheRefreshInterval !== null) {
       pollCacheStatuses();
-      cachePollingRef.current = setInterval(
-        pollCacheStatuses,
-        cacheRefreshInterval * 1000,
-      );
+      cachePollingRef.current = setInterval(pollCacheStatuses, cacheRefreshInterval * 1000);
     }
 
     return () => {
@@ -527,7 +479,7 @@ const GatrixEdgesPage: React.FC = () => {
       const serviceType = instance.labels.service;
       const result = await serviceDiscoveryService.getRequestStats(
         serviceType,
-        instance.instanceId,
+        instance.instanceId
       );
       setRequestStats((prev) => {
         const next = new Map(prev);
@@ -566,10 +518,7 @@ const GatrixEdgesPage: React.FC = () => {
 
     if (expandedInstances.size > 0 && statsRefreshInterval !== null) {
       pollRequestStats();
-      statsPollingRef.current = setInterval(
-        pollRequestStats,
-        statsRefreshInterval * 1000,
-      );
+      statsPollingRef.current = setInterval(pollRequestStats, statsRefreshInterval * 1000);
     }
 
     return () => {
@@ -580,23 +529,20 @@ const GatrixEdgesPage: React.FC = () => {
   }, [expandedInstances, services, fetchRequestStats, statsRefreshInterval]);
 
   // Toggle collapsible section
-  const toggleSection = useCallback(
-    (instanceId: string, sectionName: string) => {
-      setExpandedSections((prev) => {
-        const next = new Map(prev);
-        const sections = next.get(instanceId) || new Set(["cache", "stats"]); // Default: both expanded
-        const newSections = new Set(sections);
-        if (newSections.has(sectionName)) {
-          newSections.delete(sectionName);
-        } else {
-          newSections.add(sectionName);
-        }
-        next.set(instanceId, newSections);
-        return next;
-      });
-    },
-    [],
-  );
+  const toggleSection = useCallback((instanceId: string, sectionName: string) => {
+    setExpandedSections((prev) => {
+      const next = new Map(prev);
+      const sections = next.get(instanceId) || new Set(['cache', 'stats']); // Default: both expanded
+      const newSections = new Set(sections);
+      if (newSections.has(sectionName)) {
+        newSections.delete(sectionName);
+      } else {
+        newSections.add(sectionName);
+      }
+      next.set(instanceId, newSections);
+      return next;
+    });
+  }, []);
 
   // Check if section is expanded
   const isSectionExpanded = useCallback(
@@ -606,7 +552,7 @@ const GatrixEdgesPage: React.FC = () => {
       if (!sections) return true;
       return sections.has(sectionName);
     },
-    [expandedSections],
+    [expandedSections]
   );
 
   useEffect(() => {
@@ -616,12 +562,9 @@ const GatrixEdgesPage: React.FC = () => {
   // Save grouping levels to localStorage whenever they change
   useEffect(() => {
     try {
-      localStorage.setItem(
-        "gatrixEdges.groupingLevels",
-        JSON.stringify(groupingLevels),
-      );
+      localStorage.setItem('gatrixEdges.groupingLevels', JSON.stringify(groupingLevels));
     } catch (e) {
-      console.warn("Failed to save grouping levels to localStorage:", e);
+      console.warn('Failed to save grouping levels to localStorage:', e);
     }
   }, [groupingLevels]);
 
@@ -657,9 +600,9 @@ const GatrixEdgesPage: React.FC = () => {
     setExpandedInstances(newExpanded);
   };
 
-  const handleGroupingChange = (index: number, value: GroupingField | "") => {
+  const handleGroupingChange = (index: number, value: GroupingField | '') => {
     const newLevels = [...groupingLevels];
-    if (value === "") {
+    if (value === '') {
       newLevels.splice(index);
     } else {
       newLevels[index] = value;
@@ -672,9 +615,9 @@ const GatrixEdgesPage: React.FC = () => {
 
   const addGroupingLevel = () => {
     const usedLevels = new Set(groupingLevels);
-    const available = (
-      ["cloudProvider", "cloudRegion"] as GroupingField[]
-    ).find((o) => !usedLevels.has(o));
+    const available = (['cloudProvider', 'cloudRegion'] as GroupingField[]).find(
+      (o) => !usedLevels.has(o)
+    );
     if (available) {
       setGroupingLevels([...groupingLevels, available]);
     }
@@ -683,7 +626,7 @@ const GatrixEdgesPage: React.FC = () => {
   const openJsonDialog = (data: any, title: string) => {
     setJsonDialogData(data);
     setJsonDialogTitle(title);
-    setJsonSearchQuery("");
+    setJsonSearchQuery('');
     setJsonSearchMatches([]);
     setJsonSearchIndex(0);
     setJsonDialogOpen(true);
@@ -691,14 +634,14 @@ const GatrixEdgesPage: React.FC = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "ready":
-      case "heartbeat":
+      case 'ready':
+      case 'heartbeat':
         return theme.palette.success.main;
-      case "starting":
-      case "initializing":
+      case 'starting':
+      case 'initializing':
         return theme.palette.warning.main;
-      case "error":
-      case "terminated":
+      case 'error':
+      case 'terminated':
         return theme.palette.error.main;
       default:
         return theme.palette.text.disabled;
@@ -708,19 +651,16 @@ const GatrixEdgesPage: React.FC = () => {
   const handleCopyJson = () => {
     if (jsonDialogData) {
       const text = JSON.stringify(jsonDialogData, null, 2);
-      copyToClipboardWithNotification(text, t("common.copiedToClipboard"));
+      copyToClipboardWithNotification(text, t('common.copiedToClipboard'));
     }
   };
 
   // Render cache summary
-  const renderCacheSummary = (
-    cacheStatus: CacheStatus | undefined,
-    instance: ServiceInstance,
-  ) => {
+  const renderCacheSummary = (cacheStatus: CacheStatus | undefined, instance: ServiceInstance) => {
     if (!cacheStatus) {
       return (
         <Typography variant="body2" color="text.secondary">
-          {t("gatrixEdges.cacheNotLoaded")}
+          {t('gatrixEdges.cacheNotLoaded')}
         </Typography>
       );
     }
@@ -731,75 +671,71 @@ const GatrixEdgesPage: React.FC = () => {
     const allEnvs = new Set<string>();
     if (summary) {
       Object.values(summary).forEach((envCounts) => {
-        Object.keys(envCounts as Record<string, number>).forEach((env) =>
-          allEnvs.add(env),
-        );
+        Object.keys(envCounts as Record<string, number>).forEach((env) => allEnvs.add(env));
       });
     }
     const sortedEnvs = Array.from(allEnvs).sort();
 
     return (
-      <Box sx={{ position: "relative" }}>
+      <Box sx={{ position: 'relative' }}>
         <Box
           sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
             mb: 1.5,
           }}
         >
           <Typography variant="subtitle2" fontWeight="bold">
-            {t("gatrixEdges.cacheStatus")}
+            {t('gatrixEdges.cacheStatus')}
           </Typography>
           <Stack direction="row" spacing={1} alignItems="center">
-            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
               <Typography variant="caption" color="text.secondary">
-                {t("gatrixEdges.refreshInterval")}:
+                {t('gatrixEdges.refreshInterval')}:
               </Typography>
               <FormControl size="small" sx={{ minWidth: 60 }}>
                 <Select
-                  value={
-                    cacheRefreshInterval === null ? "off" : cacheRefreshInterval
-                  }
+                  value={cacheRefreshInterval === null ? 'off' : cacheRefreshInterval}
                   onChange={(e) => {
                     const val = e.target.value;
-                    setCacheRefreshInterval(val === "off" ? null : Number(val));
+                    setCacheRefreshInterval(val === 'off' ? null : Number(val));
                   }}
                   displayEmpty
                   variant="standard"
                   disableUnderline
                   sx={{
-                    fontSize: "0.8rem",
-                    fontWeight: "bold",
+                    fontSize: '0.8rem',
+                    fontWeight: 'bold',
                     bgcolor: theme.palette.action.hover,
                     borderRadius: 0,
                     px: 1,
                     py: 0.25,
-                    "& .MuiSelect-select": {
+                    '& .MuiSelect-select': {
                       py: 0,
-                      paddingRight: "24px !important",
+                      paddingRight: '24px !important',
                     },
                   }}
                 >
-                  <MenuItem value="off" sx={{ fontSize: "0.8rem" }}>
-                    {t("gatrixEdges.refreshOff")}
+                  <MenuItem value="off" sx={{ fontSize: '0.8rem' }}>
+                    {t('gatrixEdges.refreshOff')}
                   </MenuItem>
-                  <MenuItem value={5} sx={{ fontSize: "0.8rem" }}>
-                    5{t("gatrixEdges.seconds")}
+                  <MenuItem value={5} sx={{ fontSize: '0.8rem' }}>
+                    5{t('gatrixEdges.seconds')}
                   </MenuItem>
-                  <MenuItem value={10} sx={{ fontSize: "0.8rem" }}>
-                    10{t("gatrixEdges.seconds")}
+                  <MenuItem value={10} sx={{ fontSize: '0.8rem' }}>
+                    10{t('gatrixEdges.seconds')}
                   </MenuItem>
-                  <MenuItem value={30} sx={{ fontSize: "0.8rem" }}>
-                    30{t("gatrixEdges.seconds")}
+                  <MenuItem value={30} sx={{ fontSize: '0.8rem' }}>
+                    30{t('gatrixEdges.seconds')}
                   </MenuItem>
-                  <MenuItem value={60} sx={{ fontSize: "0.8rem" }}>
-                    60{t("gatrixEdges.seconds")}
+                  <MenuItem value={60} sx={{ fontSize: '0.8rem' }}>
+                    60{t('gatrixEdges.seconds')}
                   </MenuItem>
                 </Select>
               </FormControl>
 
-              <Tooltip title={t("common.refresh")} leaveDelay={0}>
+              <Tooltip title={t('common.refresh')} leaveDelay={0}>
                 <span>
                   <IconButton
                     size="small"
@@ -813,13 +749,13 @@ const GatrixEdgesPage: React.FC = () => {
                     <RefreshIcon
                       fontSize="small"
                       sx={{
-                        animation: loading ? "spin 1s linear infinite" : "none",
-                        "@keyframes spin": {
-                          "0%": {
-                            transform: "rotate(0deg)",
+                        animation: loading ? 'spin 1s linear infinite' : 'none',
+                        '@keyframes spin': {
+                          '0%': {
+                            transform: 'rotate(0deg)',
                           },
-                          "100%": {
-                            transform: "rotate(360deg)",
+                          '100%': {
+                            transform: 'rotate(360deg)',
                           },
                         },
                       }}
@@ -833,20 +769,20 @@ const GatrixEdgesPage: React.FC = () => {
               <Tooltip
                 title={
                   lastRefreshedAt
-                    ? `${t("gatrixEdges.lastRefreshed")}: ${formatDateTimeDetailed(lastRefreshedAt)} `
-                    : ""
+                    ? `${t('gatrixEdges.lastRefreshed')}: ${formatDateTimeDetailed(lastRefreshedAt)} `
+                    : ''
                 }
               >
                 <Chip
                   label={`${latency} ms`}
                   size="small"
                   variant="outlined"
-                  sx={{ height: 20, fontSize: "0.65rem", cursor: "help" }}
+                  sx={{ height: 20, fontSize: '0.65rem', cursor: 'help' }}
                 />
               </Tooltip>
             )}
 
-            <Tooltip title={t("gatrixEdges.viewDetails")} leaveDelay={0}>
+            <Tooltip title={t('gatrixEdges.viewDetails')} leaveDelay={0}>
               <span>
                 <IconButton
                   size="small"
@@ -874,7 +810,7 @@ const GatrixEdgesPage: React.FC = () => {
               py: 0.2,
               px: 1,
               mb: 1,
-              "& .MuiAlert-message": { fontSize: "0.75rem" },
+              '& .MuiAlert-message': { fontSize: '0.75rem' },
             }}
           >
             {error}
@@ -886,33 +822,28 @@ const GatrixEdgesPage: React.FC = () => {
             sx={{
               mb: 1.5,
               p: 1,
-              bgcolor: theme.palette.primary.main + "10",
+              bgcolor: theme.palette.primary.main + '10',
               borderRadius: 0,
               border: `1px solid ${theme.palette.primary.main} 30`,
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
             }}
           >
-            <Typography
-              variant="caption"
-              color="primary"
-              sx={{ fontWeight: "bold" }}
-            >
-              {t("gatrixEdges.latestInvalidation")}:{" "}
-              <RelativeTime date={lastRefreshedAt} />
+            <Typography variant="caption" color="primary" sx={{ fontWeight: 'bold' }}>
+              {t('gatrixEdges.latestInvalidation')}: <RelativeTime date={lastRefreshedAt} />
               {cacheStatus.invalidationCount !== undefined && (
                 <Box
                   component="span"
                   sx={{
-                    fontWeight: "normal",
+                    fontWeight: 'normal',
                     opacity: 0.8,
                     ml: 0.5,
-                    color: "text.secondary",
+                    color: 'text.secondary',
                   }}
                 >
                   (
-                  {t("gatrixEdges.invalidationCountFormat", {
+                  {t('gatrixEdges.invalidationCountFormat', {
                     count: cacheStatus.invalidationCount,
                   })}
                   )
@@ -925,8 +856,8 @@ const GatrixEdgesPage: React.FC = () => {
         {summary && Object.keys(summary).length > 0 ? (
           <Box
             sx={{
-              width: "100%",
-              overflowX: "auto",
+              width: '100%',
+              overflowX: 'auto',
               mt: 1,
               border: `1px solid ${theme.palette.divider} `,
               borderRadius: 0,
@@ -937,11 +868,11 @@ const GatrixEdgesPage: React.FC = () => {
               size="small"
               sx={{
                 minWidth: 400,
-                "& th": {
-                  fontWeight: "bold",
+                '& th': {
+                  fontWeight: 'bold',
                   bgcolor: theme.palette.action.selected,
                   py: 1,
-                  fontSize: "0.75rem",
+                  fontSize: '0.75rem',
                 },
               }}
             >
@@ -960,17 +891,17 @@ const GatrixEdgesPage: React.FC = () => {
                   <TableRow
                     key={category}
                     sx={{
-                      "& td": { py: 0.75, fontSize: "0.75rem" },
-                      "&:nth-of-type(odd)": {
+                      '& td': { py: 0.75, fontSize: '0.75rem' },
+                      '&:nth-of-type(odd)': {
                         bgcolor: theme.palette.action.hover,
                       },
                     }}
                   >
                     <TableCell
                       sx={{
-                        color: "text.secondary",
-                        textTransform: "capitalize",
-                        fontWeight: "bold",
+                        color: 'text.secondary',
+                        textTransform: 'capitalize',
+                        fontWeight: 'bold',
                       }}
                     >
                       {category}
@@ -989,7 +920,7 @@ const GatrixEdgesPage: React.FC = () => {
           !loading &&
           !error && (
             <Typography variant="body2" color="text.secondary">
-              {t("gatrixEdges.noCacheData")}
+              {t('gatrixEdges.noCacheData')}
             </Typography>
           )
         )}
@@ -999,14 +930,7 @@ const GatrixEdgesPage: React.FC = () => {
 
   // Render instance details
   const renderInstanceDetails = (instance: ServiceInstance) => {
-    const {
-      ports,
-      labels,
-      externalAddress,
-      internalAddress,
-      createdAt,
-      updatedAt,
-    } = instance;
+    const { ports, labels, externalAddress, internalAddress, createdAt, updatedAt } = instance;
     const cacheStatus = cacheStatuses.get(instance.instanceId);
 
     return (
@@ -1014,24 +938,19 @@ const GatrixEdgesPage: React.FC = () => {
         {/* Basic Info - Moved to top */}
         <Box
           sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
             mb: 1,
           }}
         >
-          <Typography
-            variant="subtitle2"
-            sx={{ fontWeight: "bold", color: "text.secondary" }}
-          >
-            {t("gatrixEdges.basicInfo")}
+          <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'text.secondary' }}>
+            {t('gatrixEdges.basicInfo')}
           </Typography>
-          <Tooltip title={t("gatrixEdges.viewJson")} leaveDelay={0}>
+          <Tooltip title={t('gatrixEdges.viewJson')} leaveDelay={0}>
             <IconButton
               size="small"
-              onClick={() =>
-                openJsonDialog(instance, t("gatrixEdges.basicInfo"))
-              }
+              onClick={() => openJsonDialog(instance, t('gatrixEdges.basicInfo'))}
             >
               <CodeIcon sx={{ fontSize: 16 }} />
             </IconButton>
@@ -1039,76 +958,76 @@ const GatrixEdgesPage: React.FC = () => {
         </Box>
         <Table size="small" sx={{ mb: 2 }}>
           <TableBody>
-            <TableRow sx={{ "& td": { border: 0, py: 0.5 } }}>
-              <TableCell sx={{ pl: 0, width: "40%", color: "text.secondary" }}>
-                {t("gatrixEdges.instanceId")}
+            <TableRow sx={{ '& td': { border: 0, py: 0.5 } }}>
+              <TableCell sx={{ pl: 0, width: '40%', color: 'text.secondary' }}>
+                {t('gatrixEdges.instanceId')}
               </TableCell>
-              <TableCell sx={{ fontFamily: "monospace", fontSize: "0.8rem" }}>
+              <TableCell sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
                 {instance.instanceId}
               </TableCell>
             </TableRow>
-            <TableRow sx={{ "& td": { border: 0, py: 0.5 } }}>
-              <TableCell sx={{ pl: 0, color: "text.secondary" }}>
-                {t("gatrixEdges.hostname")}
+            <TableRow sx={{ '& td': { border: 0, py: 0.5 } }}>
+              <TableCell sx={{ pl: 0, color: 'text.secondary' }}>
+                {t('gatrixEdges.hostname')}
               </TableCell>
               <TableCell>{instance.hostname}</TableCell>
             </TableRow>
             {/* New version fields */}
             {labels?.appVersion && (
-              <TableRow sx={{ "& td": { border: 0, py: 0.5 } }}>
-                <TableCell sx={{ pl: 0, color: "text.secondary" }}>
-                  {t("gatrixEdges.appVersion")}
+              <TableRow sx={{ '& td': { border: 0, py: 0.5 } }}>
+                <TableCell sx={{ pl: 0, color: 'text.secondary' }}>
+                  {t('gatrixEdges.appVersion')}
                 </TableCell>
                 <TableCell>
                   <Chip
                     label={labels.appVersion}
                     size="small"
-                    sx={{ height: 20, fontSize: "0.75rem" }}
+                    sx={{ height: 20, fontSize: '0.75rem' }}
                   />
                 </TableCell>
               </TableRow>
             )}
             {labels?.sdkVersion && (
-              <TableRow sx={{ "& td": { border: 0, py: 0.5 } }}>
-                <TableCell sx={{ pl: 0, color: "text.secondary" }}>
-                  {t("gatrixEdges.sdkVersion")}
+              <TableRow sx={{ '& td': { border: 0, py: 0.5 } }}>
+                <TableCell sx={{ pl: 0, color: 'text.secondary' }}>
+                  {t('gatrixEdges.sdkVersion')}
                 </TableCell>
                 <TableCell>
                   <Chip
                     label={labels.sdkVersion}
                     size="small"
-                    sx={{ height: 20, fontSize: "0.75rem" }}
+                    sx={{ height: 20, fontSize: '0.75rem' }}
                   />
                 </TableCell>
               </TableRow>
             )}
-            <TableRow sx={{ "& td": { border: 0, py: 0.5 } }}>
-              <TableCell sx={{ pl: 0, color: "text.secondary" }}>
-                {t("gatrixEdges.externalAddress")}
+            <TableRow sx={{ '& td': { border: 0, py: 0.5 } }}>
+              <TableCell sx={{ pl: 0, color: 'text.secondary' }}>
+                {t('gatrixEdges.externalAddress')}
               </TableCell>
-              <TableCell sx={{ fontFamily: "monospace", fontSize: "0.8rem" }}>
+              <TableCell sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
                 {externalAddress}
               </TableCell>
             </TableRow>
-            <TableRow sx={{ "& td": { border: 0, py: 0.5 } }}>
-              <TableCell sx={{ pl: 0, color: "text.secondary" }}>
-                {t("gatrixEdges.internalAddress")}
+            <TableRow sx={{ '& td': { border: 0, py: 0.5 } }}>
+              <TableCell sx={{ pl: 0, color: 'text.secondary' }}>
+                {t('gatrixEdges.internalAddress')}
               </TableCell>
-              <TableCell sx={{ fontFamily: "monospace", fontSize: "0.8rem" }}>
+              <TableCell sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
                 {internalAddress}
               </TableCell>
             </TableRow>
-            <TableRow sx={{ "& td": { border: 0, py: 0.5 } }}>
-              <TableCell sx={{ pl: 0, color: "text.secondary" }}>
-                {t("gatrixEdges.created")}
+            <TableRow sx={{ '& td': { border: 0, py: 0.5 } }}>
+              <TableCell sx={{ pl: 0, color: 'text.secondary' }}>
+                {t('gatrixEdges.created')}
               </TableCell>
               <TableCell>
                 <RelativeTime date={createdAt} />
               </TableCell>
             </TableRow>
-            <TableRow sx={{ "& td": { border: 0, py: 0.5 } }}>
-              <TableCell sx={{ pl: 0, color: "text.secondary" }}>
-                {t("gatrixEdges.lastUpdated")}
+            <TableRow sx={{ '& td': { border: 0, py: 0.5 } }}>
+              <TableCell sx={{ pl: 0, color: 'text.secondary' }}>
+                {t('gatrixEdges.lastUpdated')}
               </TableCell>
               <TableCell>
                 <RelativeTime date={updatedAt} />
@@ -1122,11 +1041,11 @@ const GatrixEdgesPage: React.FC = () => {
           <>
             <Typography
               variant="subtitle2"
-              sx={{ mb: 1, fontWeight: "bold", color: "text.secondary" }}
+              sx={{ mb: 1, fontWeight: 'bold', color: 'text.secondary' }}
             >
-              {t("gatrixEdges.ports")}
+              {t('gatrixEdges.ports')}
             </Typography>
-            <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mb: 2 }}>
+            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 2 }}>
               {Object.entries(ports).map(([name, port]) => (
                 <Chip
                   key={name}
@@ -1134,8 +1053,8 @@ const GatrixEdgesPage: React.FC = () => {
                   size="small"
                   variant="outlined"
                   sx={{
-                    fontFamily: "monospace",
-                    fontSize: "0.75rem",
+                    fontFamily: 'monospace',
+                    fontSize: '0.75rem',
                     borderRadius: 0,
                   }}
                 />
@@ -1149,15 +1068,13 @@ const GatrixEdgesPage: React.FC = () => {
           <>
             <Typography
               variant="subtitle2"
-              sx={{ mb: 1, fontWeight: "bold", color: "text.secondary" }}
+              sx={{ mb: 1, fontWeight: 'bold', color: 'text.secondary' }}
             >
-              {t("gatrixEdges.labels")}
+              {t('gatrixEdges.labels')}
             </Typography>
-            <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mb: 1 }}>
+            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 1 }}>
               {Object.entries(labels)
-                .filter(
-                  ([k, v]) => v && k !== "appVersion" && k !== "sdkVersion",
-                )
+                .filter(([k, v]) => v && k !== 'appVersion' && k !== 'sdkVersion')
                 .map(([key, value]) => (
                   <Chip
                     key={key}
@@ -1165,7 +1082,7 @@ const GatrixEdgesPage: React.FC = () => {
                     size="small"
                     color="primary"
                     variant="outlined"
-                    sx={{ fontSize: "0.75rem" }}
+                    sx={{ fontSize: '0.75rem' }}
                   />
                 ))}
             </Box>
@@ -1185,29 +1102,27 @@ const GatrixEdgesPage: React.FC = () => {
         >
           <Box
             sx={{
-              display: "flex",
-              alignItems: "center",
+              display: 'flex',
+              alignItems: 'center',
               gap: 1,
               p: 1.5,
-              cursor: "pointer",
-              "&:hover": { bgcolor: theme.palette.action.hover },
+              cursor: 'pointer',
+              '&:hover': { bgcolor: theme.palette.action.hover },
             }}
-            onClick={() => toggleSection(instance.instanceId, "cache")}
+            onClick={() => toggleSection(instance.instanceId, 'cache')}
           >
             <CachedIcon fontSize="small" color="primary" />
             <Typography variant="subtitle2" fontWeight="bold" sx={{ flex: 1 }}>
-              {t("gatrixEdges.cachingInfo")}
+              {t('gatrixEdges.cachingInfo')}
             </Typography>
-            {isSectionExpanded(instance.instanceId, "cache") ? (
+            {isSectionExpanded(instance.instanceId, 'cache') ? (
               <ExpandLessIcon />
             ) : (
               <ExpandMoreIcon />
             )}
           </Box>
-          <Collapse in={isSectionExpanded(instance.instanceId, "cache")}>
-            <Box sx={{ p: 1.5, pt: 0 }}>
-              {renderCacheSummary(cacheStatus, instance)}
-            </Box>
+          <Collapse in={isSectionExpanded(instance.instanceId, 'cache')}>
+            <Box sx={{ p: 1.5, pt: 0 }}>{renderCacheSummary(cacheStatus, instance)}</Box>
           </Collapse>
         </Box>
 
@@ -1221,31 +1136,28 @@ const GatrixEdgesPage: React.FC = () => {
         >
           <Box
             sx={{
-              display: "flex",
-              alignItems: "center",
+              display: 'flex',
+              alignItems: 'center',
               gap: 1,
               p: 1.5,
-              cursor: "pointer",
-              "&:hover": { bgcolor: theme.palette.action.hover },
+              cursor: 'pointer',
+              '&:hover': { bgcolor: theme.palette.action.hover },
             }}
-            onClick={() => toggleSection(instance.instanceId, "stats")}
+            onClick={() => toggleSection(instance.instanceId, 'stats')}
           >
             <BarChartIcon fontSize="small" color="secondary" />
             <Typography variant="subtitle2" fontWeight="bold" sx={{ flex: 1 }}>
-              {t("gatrixEdges.requestStats")}
+              {t('gatrixEdges.requestStats')}
             </Typography>
-            {isSectionExpanded(instance.instanceId, "stats") ? (
+            {isSectionExpanded(instance.instanceId, 'stats') ? (
               <ExpandLessIcon />
             ) : (
               <ExpandMoreIcon />
             )}
           </Box>
-          <Collapse in={isSectionExpanded(instance.instanceId, "stats")}>
+          <Collapse in={isSectionExpanded(instance.instanceId, 'stats')}>
             <Box sx={{ p: 1.5, pt: 0 }}>
-              {renderRequestStatsSummary(
-                requestStats.get(instance.instanceId),
-                instance,
-              )}
+              {renderRequestStatsSummary(requestStats.get(instance.instanceId), instance)}
             </Box>
           </Collapse>
         </Box>
@@ -1256,12 +1168,12 @@ const GatrixEdgesPage: React.FC = () => {
   // Render request statistics summary
   const renderRequestStatsSummary = (
     stats: RequestStats | undefined,
-    instance: ServiceInstance,
+    instance: ServiceInstance
   ) => {
     if (!stats) {
       return (
         <Typography variant="body2" color="text.secondary">
-          {t("gatrixEdges.statsNotLoaded")}
+          {t('gatrixEdges.statsNotLoaded')}
         </Typography>
       );
     }
@@ -1279,11 +1191,11 @@ const GatrixEdgesPage: React.FC = () => {
 
     // Format bytes
     const formatBytes = (bytes: number) => {
-      if (bytes === 0) return "0 B";
+      if (bytes === 0) return '0 B';
       const k = 1024;
-      const sizes = ["B", "KB", "MB", "GB"];
+      const sizes = ['B', 'KB', 'MB', 'GB'];
       const i = Math.floor(Math.log(bytes) / Math.log(k));
-      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
     };
 
     // Format uptime
@@ -1297,67 +1209,65 @@ const GatrixEdgesPage: React.FC = () => {
     };
 
     return (
-      <Box sx={{ position: "relative" }}>
+      <Box sx={{ position: 'relative' }}>
         <Box
           sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
             mb: 1.5,
           }}
         >
           <Typography variant="subtitle2" fontWeight="bold">
-            {t("gatrixEdges.requestStats")}
+            {t('gatrixEdges.requestStats')}
           </Typography>
           <Stack direction="row" spacing={1} alignItems="center">
-            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
               <Typography variant="caption" color="text.secondary">
-                {t("gatrixEdges.refreshInterval")}:
+                {t('gatrixEdges.refreshInterval')}:
               </Typography>
               <FormControl size="small" sx={{ minWidth: 60 }}>
                 <Select
-                  value={
-                    statsRefreshInterval === null ? "off" : statsRefreshInterval
-                  }
+                  value={statsRefreshInterval === null ? 'off' : statsRefreshInterval}
                   onChange={(e) => {
                     const val = e.target.value;
-                    setStatsRefreshInterval(val === "off" ? null : Number(val));
+                    setStatsRefreshInterval(val === 'off' ? null : Number(val));
                   }}
                   displayEmpty
                   variant="standard"
                   disableUnderline
                   sx={{
-                    fontSize: "0.8rem",
-                    fontWeight: "bold",
+                    fontSize: '0.8rem',
+                    fontWeight: 'bold',
                     bgcolor: theme.palette.action.hover,
                     borderRadius: 0,
                     px: 1,
                     py: 0.25,
-                    "& .MuiSelect-select": {
+                    '& .MuiSelect-select': {
                       py: 0,
-                      paddingRight: "24px !important",
+                      paddingRight: '24px !important',
                     },
                   }}
                 >
-                  <MenuItem value="off" sx={{ fontSize: "0.8rem" }}>
-                    {t("gatrixEdges.refreshOff")}
+                  <MenuItem value="off" sx={{ fontSize: '0.8rem' }}>
+                    {t('gatrixEdges.refreshOff')}
                   </MenuItem>
-                  <MenuItem value={5} sx={{ fontSize: "0.8rem" }}>
-                    5{t("gatrixEdges.seconds")}
+                  <MenuItem value={5} sx={{ fontSize: '0.8rem' }}>
+                    5{t('gatrixEdges.seconds')}
                   </MenuItem>
-                  <MenuItem value={10} sx={{ fontSize: "0.8rem" }}>
-                    10{t("gatrixEdges.seconds")}
+                  <MenuItem value={10} sx={{ fontSize: '0.8rem' }}>
+                    10{t('gatrixEdges.seconds')}
                   </MenuItem>
-                  <MenuItem value={30} sx={{ fontSize: "0.8rem" }}>
-                    30{t("gatrixEdges.seconds")}
+                  <MenuItem value={30} sx={{ fontSize: '0.8rem' }}>
+                    30{t('gatrixEdges.seconds')}
                   </MenuItem>
-                  <MenuItem value={60} sx={{ fontSize: "0.8rem" }}>
-                    60{t("gatrixEdges.seconds")}
+                  <MenuItem value={60} sx={{ fontSize: '0.8rem' }}>
+                    60{t('gatrixEdges.seconds')}
                   </MenuItem>
                 </Select>
               </FormControl>
 
-              <Tooltip title={t("common.refresh")} leaveDelay={0}>
+              <Tooltip title={t('common.refresh')} leaveDelay={0}>
                 <span>
                   <IconButton
                     size="small"
@@ -1371,10 +1281,10 @@ const GatrixEdgesPage: React.FC = () => {
                     <RefreshIcon
                       fontSize="small"
                       sx={{
-                        animation: loading ? "spin 1s linear infinite" : "none",
-                        "@keyframes spin": {
-                          "0%": { transform: "rotate(0deg)" },
-                          "100%": { transform: "rotate(360deg)" },
+                        animation: loading ? 'spin 1s linear infinite' : 'none',
+                        '@keyframes spin': {
+                          '0%': { transform: 'rotate(0deg)' },
+                          '100%': { transform: 'rotate(360deg)' },
                         },
                       }}
                     />
@@ -1388,15 +1298,13 @@ const GatrixEdgesPage: React.FC = () => {
                 label={`${latency} ms`}
                 size="small"
                 variant="outlined"
-                sx={{ height: 20, fontSize: "0.65rem", cursor: "help" }}
+                sx={{ height: 20, fontSize: '0.65rem', cursor: 'help' }}
               />
             )}
-            <Tooltip title={t("gatrixEdges.viewDetails")} leaveDelay={0}>
+            <Tooltip title={t('gatrixEdges.viewDetails')} leaveDelay={0}>
               <IconButton
                 size="small"
-                onClick={() =>
-                  openJsonDialog(stats, t("gatrixEdges.requestStats"))
-                }
+                onClick={() => openJsonDialog(stats, t('gatrixEdges.requestStats'))}
               >
                 <VisibilityIcon sx={{ fontSize: 16 }} />
               </IconButton>
@@ -1411,7 +1319,7 @@ const GatrixEdgesPage: React.FC = () => {
               py: 0.2,
               px: 1,
               mb: 1,
-              "& .MuiAlert-message": { fontSize: "0.75rem" },
+              '& .MuiAlert-message': { fontSize: '0.75rem' },
             }}
           >
             {error}
@@ -1421,8 +1329,8 @@ const GatrixEdgesPage: React.FC = () => {
         {/* Summary Table */}
         <Box
           sx={{
-            width: "100%",
-            overflowX: "auto",
+            width: '100%',
+            overflowX: 'auto',
             mb: 2,
             border: `1px solid ${theme.palette.divider} `,
             borderRadius: 0,
@@ -1432,23 +1340,19 @@ const GatrixEdgesPage: React.FC = () => {
           <Table
             size="small"
             sx={{
-              "& th": {
-                fontWeight: "bold",
+              '& th': {
+                fontWeight: 'bold',
                 bgcolor: theme.palette.action.selected,
                 py: 1,
-                fontSize: "0.75rem",
+                fontSize: '0.75rem',
               },
             }}
           >
             <TableHead>
               <TableRow>
-                <TableCell>{t("gatrixEdges.uptime")}</TableCell>
-                <TableCell align="right">
-                  {t("gatrixEdges.totalRequests")}
-                </TableCell>
-                <TableCell align="right">
-                  {t("gatrixEdges.avgResponse")}
-                </TableCell>
+                <TableCell>{t('gatrixEdges.uptime')}</TableCell>
+                <TableCell align="right">{t('gatrixEdges.totalRequests')}</TableCell>
+                <TableCell align="right">{t('gatrixEdges.avgResponse')}</TableCell>
                 <TableCell align="right">Min</TableCell>
                 <TableCell align="right">Max</TableCell>
                 <TableCell align="right">↑</TableCell>
@@ -1456,34 +1360,24 @@ const GatrixEdgesPage: React.FC = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              <TableRow sx={{ "& td": { py: 0.75, fontSize: "0.75rem" } }}>
-                <TableCell sx={{ fontWeight: "bold" }}>
+              <TableRow sx={{ '& td': { py: 0.75, fontSize: '0.75rem' } }}>
+                <TableCell sx={{ fontWeight: 'bold' }}>
                   {formatUptime(uptimeSeconds || 0)}
                 </TableCell>
                 <TableCell
                   align="right"
                   sx={{
-                    fontWeight: "bold",
+                    fontWeight: 'bold',
                     color: theme.palette.secondary.main,
                   }}
                 >
                   {(totalRequests || 0).toLocaleString()}
                 </TableCell>
-                <TableCell align="right">
-                  {totals?.avgDurationMs || 0}ms
-                </TableCell>
-                <TableCell align="right">
-                  {totals?.minDurationMs || 0}ms
-                </TableCell>
-                <TableCell align="right">
-                  {totals?.maxDurationMs || 0}ms
-                </TableCell>
-                <TableCell align="right">
-                  {formatBytes(totals?.bytesSent || 0)}
-                </TableCell>
-                <TableCell align="right">
-                  {formatBytes(totals?.bytesReceived || 0)}
-                </TableCell>
+                <TableCell align="right">{totals?.avgDurationMs || 0}ms</TableCell>
+                <TableCell align="right">{totals?.minDurationMs || 0}ms</TableCell>
+                <TableCell align="right">{totals?.maxDurationMs || 0}ms</TableCell>
+                <TableCell align="right">{formatBytes(totals?.bytesSent || 0)}</TableCell>
+                <TableCell align="right">{formatBytes(totals?.bytesReceived || 0)}</TableCell>
               </TableRow>
             </TableBody>
           </Table>
@@ -1493,8 +1387,8 @@ const GatrixEdgesPage: React.FC = () => {
         {statusCodes && Object.keys(statusCodes).length > 0 && (
           <Box
             sx={{
-              width: "100%",
-              overflowX: "auto",
+              width: '100%',
+              overflowX: 'auto',
               mb: 2,
               border: `1px solid ${theme.palette.divider} `,
               borderRadius: 0,
@@ -1504,18 +1398,18 @@ const GatrixEdgesPage: React.FC = () => {
             <Table
               size="small"
               sx={{
-                "& th": {
-                  fontWeight: "bold",
+                '& th': {
+                  fontWeight: 'bold',
                   bgcolor: theme.palette.action.selected,
                   py: 1,
-                  fontSize: "0.75rem",
+                  fontSize: '0.75rem',
                 },
               }}
             >
               <TableHead>
                 <TableRow>
                   <TableCell colSpan={Object.keys(statusCodes).length + 1}>
-                    {t("gatrixEdges.statusCodes")}
+                    {t('gatrixEdges.statusCodes')}
                   </TableCell>
                 </TableRow>
                 <TableRow>
@@ -1526,13 +1420,13 @@ const GatrixEdgesPage: React.FC = () => {
                         key={code}
                         align="center"
                         sx={{
-                          color: code.startsWith("2")
+                          color: code.startsWith('2')
                             ? theme.palette.success.main
-                            : code.startsWith("4")
+                            : code.startsWith('4')
                               ? theme.palette.warning.main
-                              : code.startsWith("5")
+                              : code.startsWith('5')
                                 ? theme.palette.error.main
-                                : "inherit",
+                                : 'inherit',
                         }}
                       >
                         {code}
@@ -1541,15 +1435,11 @@ const GatrixEdgesPage: React.FC = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                <TableRow sx={{ "& td": { py: 0.75, fontSize: "0.75rem" } }}>
+                <TableRow sx={{ '& td': { py: 0.75, fontSize: '0.75rem' } }}>
                   {Object.entries(statusCodes)
                     .sort(([a], [b]) => parseInt(a) - parseInt(b))
                     .map(([code, count]) => (
-                      <TableCell
-                        key={code}
-                        align="center"
-                        sx={{ fontWeight: "bold" }}
-                      >
+                      <TableCell key={code} align="center" sx={{ fontWeight: 'bold' }}>
                         {count.toLocaleString()}
                       </TableCell>
                     ))}
@@ -1563,8 +1453,8 @@ const GatrixEdgesPage: React.FC = () => {
         {endpoints && Object.keys(endpoints).length > 0 && (
           <Box
             sx={{
-              width: "100%",
-              overflowX: "auto",
+              width: '100%',
+              overflowX: 'auto',
               border: `1px solid ${theme.palette.divider} `,
               borderRadius: 0,
               bgcolor: theme.palette.background.paper,
@@ -1574,20 +1464,20 @@ const GatrixEdgesPage: React.FC = () => {
               size="small"
               sx={{
                 minWidth: 600,
-                "& th": {
-                  fontWeight: "bold",
+                '& th': {
+                  fontWeight: 'bold',
                   bgcolor: theme.palette.action.selected,
                   py: 1,
-                  fontSize: "0.7rem",
+                  fontSize: '0.7rem',
                 },
               }}
             >
               <TableHead>
                 <TableRow>
-                  <TableCell>{t("gatrixEdges.endpoint")}</TableCell>
-                  <TableCell align="right">{t("gatrixEdges.count")}</TableCell>
-                  <TableCell>{t("gatrixEdges.statusCodes")}</TableCell>
-                  <TableCell align="right">{t("gatrixEdges.avgMs")}</TableCell>
+                  <TableCell>{t('gatrixEdges.endpoint')}</TableCell>
+                  <TableCell align="right">{t('gatrixEdges.count')}</TableCell>
+                  <TableCell>{t('gatrixEdges.statusCodes')}</TableCell>
+                  <TableCell align="right">{t('gatrixEdges.avgMs')}</TableCell>
                   <TableCell align="right">P95</TableCell>
                   <TableCell align="right">P99</TableCell>
                   <TableCell align="right">↑ Sent</TableCell>
@@ -1602,29 +1492,29 @@ const GatrixEdgesPage: React.FC = () => {
                     <TableRow
                       key={endpoint}
                       sx={{
-                        "& td": { py: 0.5, fontSize: "0.7rem" },
-                        "&:nth-of-type(odd)": {
+                        '& td': { py: 0.5, fontSize: '0.7rem' },
+                        '&:nth-of-type(odd)': {
                           bgcolor: theme.palette.action.hover,
                         },
                       }}
                     >
                       <TableCell
                         sx={{
-                          fontFamily: "monospace",
+                          fontFamily: 'monospace',
                           maxWidth: 250,
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          whiteSpace: "nowrap",
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
                         }}
                       >
                         <Tooltip title={endpoint}>
                           <span>{endpoint}</span>
                         </Tooltip>
                       </TableCell>
-                      <TableCell align="right" sx={{ fontWeight: "bold" }}>
+                      <TableCell align="right" sx={{ fontWeight: 'bold' }}>
                         {data.count.toLocaleString()}
                       </TableCell>
-                      <TableCell sx={{ whiteSpace: "nowrap" }}>
+                      <TableCell sx={{ whiteSpace: 'nowrap' }}>
                         {(data as any).statusCodes &&
                           Object.entries((data as any).statusCodes)
                             .sort(([a], [b]) => parseInt(a) - parseInt(b))
@@ -1634,22 +1524,22 @@ const GatrixEdgesPage: React.FC = () => {
                                 label={`${code}: ${(count as number).toLocaleString()} `}
                                 size="small"
                                 color={
-                                  code.startsWith("2")
-                                    ? "success"
-                                    : code.startsWith("3")
-                                      ? "info"
-                                      : code.startsWith("4")
-                                        ? "warning"
-                                        : code.startsWith("5")
-                                          ? "error"
-                                          : "default"
+                                  code.startsWith('2')
+                                    ? 'success'
+                                    : code.startsWith('3')
+                                      ? 'info'
+                                      : code.startsWith('4')
+                                        ? 'warning'
+                                        : code.startsWith('5')
+                                          ? 'error'
+                                          : 'default'
                                 }
                                 variant="outlined"
                                 sx={{
                                   mr: 0.3,
-                                  fontSize: "0.6rem",
+                                  fontSize: '0.6rem',
                                   height: 18,
-                                  "& .MuiChip-label": { px: 0.5 },
+                                  '& .MuiChip-label': { px: 0.5 },
                                 }}
                               />
                             ))}
@@ -1657,12 +1547,8 @@ const GatrixEdgesPage: React.FC = () => {
                       <TableCell align="right">{data.avgDurationMs}</TableCell>
                       <TableCell align="right">{data.p95DurationMs}</TableCell>
                       <TableCell align="right">{data.p99DurationMs}</TableCell>
-                      <TableCell align="right">
-                        {formatBytes(data.bytesSent)}
-                      </TableCell>
-                      <TableCell align="right">
-                        {formatBytes(data.bytesReceived)}
-                      </TableCell>
+                      <TableCell align="right">{formatBytes(data.bytesSent)}</TableCell>
+                      <TableCell align="right">{formatBytes(data.bytesReceived)}</TableCell>
                     </TableRow>
                   ))}
               </TableBody>
@@ -1680,9 +1566,9 @@ const GatrixEdgesPage: React.FC = () => {
       variant="outlined"
       sx={{
         borderColor: theme.palette.divider,
-        overflow: "hidden",
-        transition: "all 0.2s ease",
-        "&:hover": {
+        overflow: 'hidden',
+        transition: 'all 0.2s ease',
+        '&:hover': {
           borderColor: theme.palette.primary.light,
           boxShadow: theme.shadows[1],
         },
@@ -1691,49 +1577,41 @@ const GatrixEdgesPage: React.FC = () => {
       <Box
         sx={{
           p: 1.25,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          cursor: "pointer",
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          cursor: 'pointer',
         }}
         onClick={() => toggleInstance(instance.instanceId)}
       >
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-          <CircleIcon
-            sx={{ fontSize: 12, color: getStatusColor(instance.status) }}
-          />
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+          <CircleIcon sx={{ fontSize: 12, color: getStatusColor(instance.status) }} />
           <Box>
             <Typography variant="body2" fontWeight="bold">
               {instance.hostname}
             </Typography>
-            <Typography
-              variant="caption"
-              color="text.secondary"
-              sx={{ fontFamily: "monospace" }}
-            >
+            <Typography variant="caption" color="text.secondary" sx={{ fontFamily: 'monospace' }}>
               ID: {instance.instanceId}
             </Typography>
           </Box>
         </Box>
 
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-          {instance.status === "ready" ? (
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          {instance.status === 'ready' ? (
             <Chip
-              label={t("gatrixEdges.connected")}
+              label={t('gatrixEdges.connected')}
               size="small"
               color="success"
-              sx={{ height: 20, fontSize: "0.65rem" }}
+              sx={{ height: 20, fontSize: '0.65rem' }}
             />
           ) : (
             <Chip
               label={
-                instance.status === "no-response"
-                  ? t("gatrixEdges.noResponse")
-                  : instance.status
+                instance.status === 'no-response' ? t('gatrixEdges.noResponse') : instance.status
               }
               size="small"
-              color={instance.status === "no-response" ? "error" : "default"}
-              sx={{ height: 20, fontSize: "0.65rem" }}
+              color={instance.status === 'no-response' ? 'error' : 'default'}
+              sx={{ height: 20, fontSize: '0.65rem' }}
             />
           )}
           <IconButton size="small">
@@ -1764,71 +1642,63 @@ const GatrixEdgesPage: React.FC = () => {
           ml: depth > 0 ? 3 : 0,
           mt: depth > 0 ? 1 : 0,
           mb: depth === 0 ? 1 : 0,
-          position: "relative",
+          position: 'relative',
         }}
       >
         <Card
           sx={{
             border: `1px solid ${theme.palette.divider} `,
-            boxShadow: depth === 0 ? theme.shadows[1] : "none",
+            boxShadow: depth === 0 ? theme.shadows[1] : 'none',
           }}
         >
           <Box
             sx={{
               p: 1.5,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              bgcolor:
-                depth === 0
-                  ? theme.palette.background.paper
-                  : theme.palette.action.hover,
-              cursor: "pointer",
-              "&:hover": {
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              bgcolor: depth === 0 ? theme.palette.background.paper : theme.palette.action.hover,
+              cursor: 'pointer',
+              '&:hover': {
                 bgcolor: theme.palette.action.selected,
               },
             }}
             onClick={() => toggleGroup(group.id)}
           >
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <Typography variant="subtitle1" fontWeight="bold">
                 {group.name}
               </Typography>
             </Box>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               {hasChildren && (
                 <Chip
-                  label={`${group.children!.length} ${t("gatrixEdges.subgroups")} `}
+                  label={`${group.children!.length} ${t('gatrixEdges.subgroups')} `}
                   size="small"
                   variant="outlined"
-                  sx={{ height: 20, fontSize: "0.7rem" }}
+                  sx={{ height: 20, fontSize: '0.7rem' }}
                 />
               )}
               {hasInstances && (
                 <Chip
-                  label={`${group.instances.length} ${t("gatrixEdges.instances")} `}
+                  label={`${group.instances.length} ${t('gatrixEdges.instances')} `}
                   size="small"
                   variant="outlined"
-                  sx={{ height: 20, fontSize: "0.7rem" }}
+                  sx={{ height: 20, fontSize: '0.7rem' }}
                 />
               )}
-              {expandedGroups.has(group.id) ? (
-                <KeyboardArrowUp />
-              ) : (
-                <KeyboardArrowDown />
-              )}
+              {expandedGroups.has(group.id) ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
             </Box>
           </Box>
 
           <Collapse in={expandedGroups.has(group.id)}>
-            <CardContent sx={{ p: 1, "&:last-child": { pb: 1 } }}>
+            <CardContent sx={{ p: 1, '&:last-child': { pb: 1 } }}>
               {/* Child groups */}
-              {hasChildren &&
-                group.children!.map((child) => renderGroup(child, depth + 1))}
+              {hasChildren && group.children!.map((child) => renderGroup(child, depth + 1))}
 
               {/* Instances */}
               {hasInstances && (
-                <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                   {group.instances.map(renderInstanceCard)}
                 </Box>
               )}
@@ -1837,9 +1707,9 @@ const GatrixEdgesPage: React.FC = () => {
                 <Typography
                   variant="body2"
                   color="text.secondary"
-                  sx={{ textAlign: "center", py: 2 }}
+                  sx={{ textAlign: 'center', py: 2 }}
                 >
-                  {t("gatrixEdges.noInstances")}
+                  {t('gatrixEdges.noInstances')}
                 </Typography>
               )}
             </CardContent>
@@ -1850,11 +1720,7 @@ const GatrixEdgesPage: React.FC = () => {
   };
 
   // Tree item renderer for flat instances
-  const renderInstanceTreeItem = (
-    instance: ServiceInstance,
-    index: number,
-    total: number,
-  ) => {
+  const renderInstanceTreeItem = (instance: ServiceInstance, index: number, total: number) => {
     const isFirst = index === 0;
     const isLast = index === total - 1;
     const isOnly = total === 1;
@@ -1866,14 +1732,14 @@ const GatrixEdgesPage: React.FC = () => {
       <Box
         key={instance.instanceId}
         sx={{
-          position: "relative",
+          position: 'relative',
           px: 1.5, // Increased horizontal padding
           pt: 3, // Increased top space for curve
           width: 550, // Increased width for better readability
           flexShrink: 0,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
         }}
       >
         {/* Connector Lines */}
@@ -1883,10 +1749,10 @@ const GatrixEdgesPage: React.FC = () => {
             {isFirst && (
               <Box
                 sx={{
-                  position: "absolute",
+                  position: 'absolute',
                   top: 0,
                   right: 0,
-                  width: "50%",
+                  width: '50%',
                   height: 24,
                   borderTop: `2px solid ${theme.palette.divider} `,
                   borderLeft: `2px solid ${theme.palette.divider} `,
@@ -1899,10 +1765,10 @@ const GatrixEdgesPage: React.FC = () => {
             {isLast && (
               <Box
                 sx={{
-                  position: "absolute",
+                  position: 'absolute',
                   top: 0,
                   left: 0,
-                  width: "50%",
+                  width: '50%',
                   height: 24,
                   borderTop: `2px solid ${theme.palette.divider} `,
                   borderRight: `2px solid ${theme.palette.divider} `,
@@ -1916,23 +1782,23 @@ const GatrixEdgesPage: React.FC = () => {
               <>
                 <Box
                   sx={{
-                    position: "absolute",
+                    position: 'absolute',
                     top: 0,
                     left: 0,
-                    width: "100%",
+                    width: '100%',
                     height: 2,
-                    bgcolor: "divider",
+                    bgcolor: 'divider',
                   }}
                 />
                 <Box
                   sx={{
-                    position: "absolute",
+                    position: 'absolute',
                     top: 0,
-                    left: "50%",
-                    transform: "translateX(-50%)",
+                    left: '50%',
+                    transform: 'translateX(-50%)',
                     width: 2,
                     height: 24,
-                    bgcolor: "divider",
+                    bgcolor: 'divider',
                   }}
                 />
               </>
@@ -1944,18 +1810,18 @@ const GatrixEdgesPage: React.FC = () => {
         {isOnly && (
           <Box
             sx={{
-              position: "absolute",
+              position: 'absolute',
               top: 0,
-              left: "50%",
-              transform: "translateX(-50%)",
+              left: '50%',
+              transform: 'translateX(-50%)',
               width: 2,
               height: 24,
-              bgcolor: "divider",
+              bgcolor: 'divider',
             }}
           />
         )}
 
-        <Box sx={{ width: "100%" }}>{renderInstanceCard(instance)}</Box>
+        <Box sx={{ width: '100%' }}>{renderInstanceCard(instance)}</Box>
       </Box>
     );
   };
@@ -1966,9 +1832,9 @@ const GatrixEdgesPage: React.FC = () => {
       <Box sx={{ mb: 3 }}>
         <Box
           sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
             mb: 1.5,
           }}
         >
@@ -1976,48 +1842,41 @@ const GatrixEdgesPage: React.FC = () => {
             <Typography
               variant="h4"
               sx={{
-                display: "flex",
-                alignItems: "center",
+                display: 'flex',
+                alignItems: 'center',
                 gap: 1,
-                fontWeight: "bold",
+                fontWeight: 'bold',
                 mb: 0.5,
               }}
             >
               <HubIcon />
-              {t("gatrixEdges.title")}
+              {t('gatrixEdges.title')}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              {t("gatrixEdges.subtitle")}
+              {t('gatrixEdges.subtitle')}
             </Typography>
           </Box>
           <Button
             startIcon={
-              isRefreshing ? (
-                <CircularProgress size={20} color="inherit" />
-              ) : (
-                <RefreshIcon />
-              )
+              isRefreshing ? <CircularProgress size={20} color="inherit" /> : <RefreshIcon />
             }
             variant="contained"
             onClick={() => fetchServices(true)}
             disabled={initialLoading || isRefreshing}
           >
-            {t("common.refresh")}
+            {t('common.refresh')}
           </Button>
         </Box>
 
         {/* Compact Grouping Controls - Integrated */}
         <Box
           sx={{
-            display: "flex",
-            alignItems: "center",
+            display: 'flex',
+            alignItems: 'center',
             gap: 1,
             py: 1.5,
             px: 2,
-            bgcolor:
-              theme.palette.mode === "dark"
-                ? "rgba(255,255,255,0.02)"
-                : "rgba(0,0,0,0.02)",
+            bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)',
             borderRadius: 0,
             border: `1px solid ${theme.palette.divider} `,
           }}
@@ -2026,13 +1885,13 @@ const GatrixEdgesPage: React.FC = () => {
             variant="caption"
             sx={{
               fontWeight: 700,
-              color: "text.secondary",
-              textTransform: "uppercase",
+              color: 'text.secondary',
+              textTransform: 'uppercase',
               letterSpacing: 0.5,
               mr: 0.5,
             }}
           >
-            {t("gatrixEdges.groupBy")}
+            {t('gatrixEdges.groupBy')}
           </Typography>
 
           {groupingLevels.map((level, index) => (
@@ -2047,18 +1906,18 @@ const GatrixEdgesPage: React.FC = () => {
               size="small"
               sx={{
                 height: 24,
-                fontSize: "0.75rem",
+                fontSize: '0.75rem',
                 fontWeight: 600,
                 bgcolor: theme.palette.primary.main,
-                color: "#fff",
-                "&:hover": {
+                color: '#fff',
+                '&:hover': {
                   bgcolor: theme.palette.primary.dark,
                 },
-                "& .MuiChip-deleteIcon": {
-                  color: "rgba(255,255,255,0.7)",
-                  fontSize: "16px",
-                  "&:hover": {
-                    color: "#fff",
+                '& .MuiChip-deleteIcon': {
+                  color: 'rgba(255,255,255,0.7)',
+                  fontSize: '16px',
+                  '&:hover': {
+                    color: '#fff',
                   },
                 },
               }}
@@ -2077,35 +1936,32 @@ const GatrixEdgesPage: React.FC = () => {
                   }
                 }}
                 renderValue={() => (
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                    <Typography
-                      variant="caption"
-                      sx={{ fontWeight: 600, color: "primary.main" }}
-                    >
-                      {t("gatrixEdges.addGroupBy")}
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    <Typography variant="caption" sx={{ fontWeight: 600, color: 'primary.main' }}>
+                      {t('gatrixEdges.addGroupBy')}
                     </Typography>
                   </Box>
                 )}
                 sx={{
                   height: 24,
-                  fontSize: "0.75rem",
-                  "& .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "transparent",
+                  fontSize: '0.75rem',
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'transparent',
                   },
-                  "&:hover .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "primary.light",
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'primary.light',
                   },
-                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "primary.main",
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'primary.main',
                     borderWidth: 1,
                   },
-                  "& .MuiSelect-select": {
+                  '& .MuiSelect-select': {
                     py: 0.5,
                     px: 1,
                   },
                 }}
               >
-                {(["cloudProvider", "cloudRegion"] as GroupingField[])
+                {(['cloudProvider', 'cloudRegion'] as GroupingField[])
                   .filter((option) => !groupingLevels.includes(option))
                   .map((option) => (
                     <MenuItem key={option} value={option}>
@@ -2125,41 +1981,41 @@ const GatrixEdgesPage: React.FC = () => {
       )}
 
       {initialLoading ? (
-        <Box sx={{ display: "flex", justifyContent: "center", p: 8 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', p: 8 }}>
           <CircularProgress />
         </Box>
       ) : (
         <Box
           sx={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            width: "100%",
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            width: '100%',
             gap: 0,
           }}
         >
           {/* Root Node with Connector Line Wrapper */}
           <Box
             sx={{
-              position: "relative",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
+              position: 'relative',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
               // Add padding bottom if there are services to make space for the line
               pb: services.length > 0 ? 4 : 0,
               // Draw line using pseudo-element for perfect alignment and overlap
-              "&::after":
+              '&::after':
                 services.length > 0
                   ? {
                       content: '""',
-                      position: "absolute",
+                      position: 'absolute',
                       bottom: 0,
-                      left: "50%",
-                      transform: "translateX(-50%)",
+                      left: '50%',
+                      transform: 'translateX(-50%)',
                       width: 2,
                       // Height = padding(32px) + overlap(2px)
-                      height: "34px",
-                      bgcolor: "divider",
+                      height: '34px',
+                      bgcolor: 'divider',
                       zIndex: 0,
                     }
                   : undefined,
@@ -2168,21 +2024,21 @@ const GatrixEdgesPage: React.FC = () => {
             <Card
               sx={{
                 minWidth: 180,
-                textAlign: "center",
+                textAlign: 'center',
                 border: `2px solid ${theme.palette.primary.main} `,
                 boxShadow: theme.shadows[2],
                 // Ensure card sits on top of the line
                 zIndex: 1,
-                position: "relative",
+                position: 'relative',
                 mb: 0,
               }}
             >
-              <CardContent sx={{ pt: 2, pb: 0, "&:last-child": { pb: 0 } }}>
+              <CardContent sx={{ pt: 2, pb: 0, '&:last-child': { pb: 0 } }}>
                 <Box
                   sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
                     gap: 1,
                   }}
                 >
@@ -2190,15 +2046,15 @@ const GatrixEdgesPage: React.FC = () => {
                     sx={{
                       width: 48,
                       height: 48,
-                      bgcolor: "primary.main",
+                      bgcolor: 'primary.main',
                       borderRadius: 0,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      color: "white",
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: 'white',
                     }}
                   >
-                    <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+                    <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
                       G
                     </Typography>
                   </Box>
@@ -2213,34 +2069,31 @@ const GatrixEdgesPage: React.FC = () => {
           {/* Groups container */}
           <Box
             sx={{
-              width: "100%",
-              maxWidth: groupingLevels.length === 0 ? "100%" : 600,
-              display: "flex",
-              flexDirection: groupingLevels.length === 0 ? "row" : "column",
-              alignItems: groupingLevels.length === 0 ? "flex-start" : "center",
-              justifyContent:
-                groupingLevels.length === 0 ? "center" : "flex-start",
-              overflowX: groupingLevels.length === 0 ? "auto" : "visible",
+              width: '100%',
+              maxWidth: groupingLevels.length === 0 ? '100%' : 600,
+              display: 'flex',
+              flexDirection: groupingLevels.length === 0 ? 'row' : 'column',
+              alignItems: groupingLevels.length === 0 ? 'flex-start' : 'center',
+              justifyContent: groupingLevels.length === 0 ? 'center' : 'flex-start',
+              overflowX: groupingLevels.length === 0 ? 'auto' : 'visible',
             }}
           >
             {groupingLevels.length === 0 ? (
               // Horizontal Tree Layout
-              <Box sx={{ display: "flex", gap: 0, pb: 2 }}>
+              <Box sx={{ display: 'flex', gap: 0, pb: 2 }}>
                 {[...services]
                   .sort((a, b) => a.instanceId.localeCompare(b.instanceId))
-                  .map((service, index, arr) =>
-                    renderInstanceTreeItem(service, index, arr.length),
-                  )}
+                  .map((service, index, arr) => renderInstanceTreeItem(service, index, arr.length))}
               </Box>
             ) : (
               groups.map((group, index) => (
                 <React.Fragment key={group.id}>
                   <Box
                     sx={{
-                      width: "100%",
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
+                      width: '100%',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
                       gap: 0,
                     }}
                   >
@@ -2262,10 +2115,8 @@ const GatrixEdgesPage: React.FC = () => {
             )}
 
             {services.length === 0 && !initialLoading && (
-              <Box sx={{ p: 4, textAlign: "center" }}>
-                <Typography color="text.secondary">
-                  {t("gatrixEdges.noEdges")}
-                </Typography>
+              <Box sx={{ p: 4, textAlign: 'center' }}>
+                <Typography color="text.secondary">{t('gatrixEdges.noEdges')}</Typography>
               </Box>
             )}
           </Box>
@@ -2281,10 +2132,10 @@ const GatrixEdgesPage: React.FC = () => {
         PaperProps={{
           sx: {
             borderRadius: 0,
-            minHeight: "70vh",
-            maxHeight: "90vh",
+            minHeight: '70vh',
+            maxHeight: '90vh',
             bgcolor: theme.palette.background.paper,
-            backgroundImage: "none",
+            backgroundImage: 'none',
           },
         }}
       >
@@ -2293,8 +2144,8 @@ const GatrixEdgesPage: React.FC = () => {
           sx={{
             px: 3,
             py: 2.5,
-            display: "flex",
-            alignItems: "center",
+            display: 'flex',
+            alignItems: 'center',
             gap: 2,
             borderBottom: `1px solid ${theme.palette.divider} `,
             bgcolor: theme.palette.background.default,
@@ -2306,26 +2157,26 @@ const GatrixEdgesPage: React.FC = () => {
               height: 40,
               borderRadius: 0,
               bgcolor: theme.palette.primary.main,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
               flexShrink: 0,
             }}
           >
-            <CodeIcon sx={{ color: "#fff", fontSize: 22 }} />
+            <CodeIcon sx={{ color: '#fff', fontSize: 22 }} />
           </Box>
           <Box sx={{ flex: 1 }}>
             <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.25 }}>
-              {jsonDialogTitle || "JSON Data"}
+              {jsonDialogTitle || 'JSON Data'}
             </Typography>
             <Typography variant="caption" color="text.secondary">
               {jsonDialogData
                 ? `${(JSON.stringify(jsonDialogData).length / 1024).toFixed(1)} KB`
-                : "—"}
+                : '—'}
             </Typography>
           </Box>
 
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             {/* View Mode Toggle */}
             <ToggleButtonGroup
               value={detailViewMode}
@@ -2334,17 +2185,17 @@ const GatrixEdgesPage: React.FC = () => {
               size="small"
               sx={{
                 height: 36,
-                "& .MuiToggleButton-root": {
+                '& .MuiToggleButton-root': {
                   borderRadius: 0,
                   px: 1.5,
-                  textTransform: "none",
-                  fontSize: "0.8rem",
+                  textTransform: 'none',
+                  fontSize: '0.8rem',
                 },
               }}
             >
               <ToggleButton value="table">
                 <TableChartIcon sx={{ fontSize: 18, mr: 0.5 }} />
-                {t("common.table")}
+                {t('common.table')}
               </ToggleButton>
               <ToggleButton value="json">
                 <CodeIcon sx={{ fontSize: 18, mr: 0.5 }} />
@@ -2353,7 +2204,7 @@ const GatrixEdgesPage: React.FC = () => {
             </ToggleButtonGroup>
 
             {/* Search - JSON mode only */}
-            {detailViewMode === "json" && (
+            {detailViewMode === 'json' && (
               <>
                 <TextField
                   size="small"
@@ -2363,31 +2214,27 @@ const GatrixEdgesPage: React.FC = () => {
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <SearchIcon
-                          fontSize="small"
-                          sx={{ color: "text.secondary" }}
-                        />
+                        <SearchIcon fontSize="small" sx={{ color: 'text.secondary' }} />
                       </InputAdornment>
                     ),
                     sx: {
                       height: 36,
                       width: 180,
-                      fontSize: "0.875rem",
+                      fontSize: '0.875rem',
                       bgcolor: theme.palette.background.paper,
                     },
                   }}
                 />
                 <Box
                   sx={{
-                    display: "flex",
-                    alignItems: "center",
+                    display: 'flex',
+                    alignItems: 'center',
                     gap: 0.5,
                     bgcolor: theme.palette.action.hover,
                     borderRadius: 0,
                     px: 0.5,
                     height: 36,
-                    visibility:
-                      jsonSearchMatches.length > 0 ? "visible" : "hidden",
+                    visibility: jsonSearchMatches.length > 0 ? 'visible' : 'hidden',
                   }}
                 >
                   <Typography
@@ -2395,25 +2242,17 @@ const GatrixEdgesPage: React.FC = () => {
                     sx={{
                       mx: 0.5,
                       minWidth: 40,
-                      textAlign: "center",
-                      fontWeight: "bold",
+                      textAlign: 'center',
+                      fontWeight: 'bold',
                     }}
                   >
                     {jsonSearchIndex + 1} / {jsonSearchMatches.length}
                   </Typography>
                   <Divider orientation="vertical" flexItem sx={{ my: 0.5 }} />
-                  <IconButton
-                    size="small"
-                    onClick={handlePrevMatch}
-                    sx={{ p: 0.5 }}
-                  >
+                  <IconButton size="small" onClick={handlePrevMatch} sx={{ p: 0.5 }}>
                     <KeyboardArrowUp fontSize="small" />
                   </IconButton>
-                  <IconButton
-                    size="small"
-                    onClick={handleNextMatch}
-                    sx={{ p: 0.5 }}
-                  >
+                  <IconButton size="small" onClick={handleNextMatch} sx={{ p: 0.5 }}>
                     <KeyboardArrowDown fontSize="small" />
                   </IconButton>
                 </Box>
@@ -2425,22 +2264,22 @@ const GatrixEdgesPage: React.FC = () => {
         {/* Content - Table or JSON */}
         <DialogContent
           sx={{
-            p: detailViewMode === "table" ? 2 : 0,
+            p: detailViewMode === 'table' ? 2 : 0,
             bgcolor:
-              detailViewMode === "json"
-                ? theme.palette.mode === "dark"
-                  ? "#1e1e1e"
-                  : "#ffffff"
-                : "inherit",
-            overflow: "auto",
+              detailViewMode === 'json'
+                ? theme.palette.mode === 'dark'
+                  ? '#1e1e1e'
+                  : '#ffffff'
+                : 'inherit',
+            overflow: 'auto',
           }}
         >
-          {detailViewMode === "table" ? (
+          {detailViewMode === 'table' ? (
             <Box
               sx={{
-                height: "calc(70vh - 160px)",
+                height: 'calc(70vh - 160px)',
                 minHeight: 400,
-                overflow: "auto",
+                overflow: 'auto',
                 p: 2,
               }}
             >
@@ -2448,39 +2287,32 @@ const GatrixEdgesPage: React.FC = () => {
                 (() => {
                   // Helper: Get color for status code chip
                   const getStatusColor = (
-                    code: string,
-                  ): "success" | "info" | "warning" | "error" | "default" => {
-                    if (code.startsWith("2")) return "success";
-                    if (code.startsWith("3")) return "info";
-                    if (code.startsWith("4")) return "warning";
-                    if (code.startsWith("5")) return "error";
-                    return "default";
+                    code: string
+                  ): 'success' | 'info' | 'warning' | 'error' | 'default' => {
+                    if (code.startsWith('2')) return 'success';
+                    if (code.startsWith('3')) return 'info';
+                    if (code.startsWith('4')) return 'warning';
+                    if (code.startsWith('5')) return 'error';
+                    return 'default';
                   };
 
                   // Helper: Format bytes
                   const formatBytesLocal = (bytes: number): string => {
-                    if (bytes === 0) return "0 B";
+                    if (bytes === 0) return '0 B';
                     const k = 1024;
-                    const sizes = ["B", "KB", "MB", "GB"];
+                    const sizes = ['B', 'KB', 'MB', 'GB'];
                     const i = Math.floor(Math.log(bytes) / Math.log(k));
-                    return (
-                      parseFloat((bytes / Math.pow(k, i)).toFixed(2)) +
-                      " " +
-                      sizes[i]
-                    );
+                    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
                   };
 
                   // Render primitive value with formatting
-                  const renderPrimitive = (
-                    val: any,
-                    key?: string,
-                  ): React.ReactNode => {
+                  const renderPrimitive = (val: any, key?: string): React.ReactNode => {
                     if (val === null || val === undefined) {
                       return (
                         <Typography
                           variant="body2"
                           color="text.secondary"
-                          sx={{ fontStyle: "italic" }}
+                          sx={{ fontStyle: 'italic' }}
                         >
                           null
                         </Typography>
@@ -2489,47 +2321,31 @@ const GatrixEdgesPage: React.FC = () => {
                     // Format based on key hints
                     if (key) {
                       const lowerKey = key.toLowerCase();
-                      if (
-                        lowerKey.includes("bytes") &&
-                        typeof val === "number"
-                      ) {
+                      if (lowerKey.includes('bytes') && typeof val === 'number') {
                         return (
-                          <Typography
-                            variant="body2"
-                            sx={{ fontFamily: "monospace" }}
-                          >
+                          <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
                             {formatBytesLocal(val)}
                           </Typography>
                         );
                       }
                       if (
-                        (lowerKey.includes("time") ||
-                          lowerKey.includes("date")) &&
-                        typeof val === "string"
+                        (lowerKey.includes('time') || lowerKey.includes('date')) &&
+                        typeof val === 'string'
                       ) {
                         try {
                           const date = new Date(val);
                           if (!isNaN(date.getTime())) {
                             return (
-                              <Typography
-                                variant="body2"
-                                sx={{ fontFamily: "monospace" }}
-                              >
+                              <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
                                 {date.toLocaleString()}
                               </Typography>
                             );
                           }
                         } catch {}
                       }
-                      if (
-                        lowerKey.includes("duration") &&
-                        typeof val === "number"
-                      ) {
+                      if (lowerKey.includes('duration') && typeof val === 'number') {
                         return (
-                          <Typography
-                            variant="body2"
-                            sx={{ fontFamily: "monospace" }}
-                          >
+                          <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
                             {val} ms
                           </Typography>
                         );
@@ -2539,8 +2355,8 @@ const GatrixEdgesPage: React.FC = () => {
                       <Typography
                         variant="body2"
                         sx={{
-                          fontFamily: "monospace",
-                          wordBreak: "break-word",
+                          fontFamily: 'monospace',
+                          wordBreak: 'break-word',
                         }}
                       >
                         {String(val)}
@@ -2549,14 +2365,12 @@ const GatrixEdgesPage: React.FC = () => {
                   };
 
                   // Render status codes as colored chips
-                  const renderStatusCodes = (
-                    codes: Record<string, number>,
-                  ): React.ReactNode => {
+                  const renderStatusCodes = (codes: Record<string, number>): React.ReactNode => {
                     const entries = Object.entries(codes).sort(
-                      ([a], [b]) => parseInt(a) - parseInt(b),
+                      ([a], [b]) => parseInt(a) - parseInt(b)
                     );
                     return (
-                      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                         {entries.map(([code, count]) => (
                           <Chip
                             key={code}
@@ -2564,7 +2378,7 @@ const GatrixEdgesPage: React.FC = () => {
                             size="small"
                             color={getStatusColor(code)}
                             variant="filled"
-                            sx={{ fontSize: "0.75rem", fontWeight: "bold" }}
+                            sx={{ fontSize: '0.75rem', fontWeight: 'bold' }}
                           />
                         ))}
                       </Box>
@@ -2572,51 +2386,31 @@ const GatrixEdgesPage: React.FC = () => {
                   };
 
                   // Render endpoints table with expandable rows
-                  const renderEndpoints = (
-                    endpoints: Record<string, any>,
-                  ): React.ReactNode => {
+                  const renderEndpoints = (endpoints: Record<string, any>): React.ReactNode => {
                     const entries = Object.entries(endpoints).sort(
-                      ([, a], [, b]) => (b.count || 0) - (a.count || 0),
+                      ([, a], [, b]) => (b.count || 0) - (a.count || 0)
                     );
                     return (
-                      <Box
-                        sx={{ border: `1px solid ${theme.palette.divider}` }}
-                      >
+                      <Box sx={{ border: `1px solid ${theme.palette.divider}` }}>
                         <Table size="small">
                           <TableHead>
-                            <TableRow
-                              sx={{ bgcolor: theme.palette.action.selected }}
-                            >
-                              <TableCell
-                                sx={{ fontWeight: "bold", width: "35%" }}
-                              >
-                                {t("gatrixEdges.endpoint")}
+                            <TableRow sx={{ bgcolor: theme.palette.action.selected }}>
+                              <TableCell sx={{ fontWeight: 'bold', width: '35%' }}>
+                                {t('gatrixEdges.endpoint')}
                               </TableCell>
-                              <TableCell
-                                align="right"
-                                sx={{ fontWeight: "bold" }}
-                              >
-                                {t("gatrixEdges.count")}
+                              <TableCell align="right" sx={{ fontWeight: 'bold' }}>
+                                {t('gatrixEdges.count')}
                               </TableCell>
-                              <TableCell sx={{ fontWeight: "bold" }}>
-                                {t("gatrixEdges.statusCodes")}
+                              <TableCell sx={{ fontWeight: 'bold' }}>
+                                {t('gatrixEdges.statusCodes')}
                               </TableCell>
-                              <TableCell
-                                align="right"
-                                sx={{ fontWeight: "bold" }}
-                              >
+                              <TableCell align="right" sx={{ fontWeight: 'bold' }}>
                                 Avg
                               </TableCell>
-                              <TableCell
-                                align="right"
-                                sx={{ fontWeight: "bold" }}
-                              >
+                              <TableCell align="right" sx={{ fontWeight: 'bold' }}>
                                 P95
                               </TableCell>
-                              <TableCell
-                                align="right"
-                                sx={{ fontWeight: "bold" }}
-                              >
+                              <TableCell align="right" sx={{ fontWeight: 'bold' }}>
                                 ↑ Sent
                               </TableCell>
                             </TableRow>
@@ -2626,46 +2420,35 @@ const GatrixEdgesPage: React.FC = () => {
                               <TableRow
                                 key={endpoint}
                                 sx={{
-                                  "&:nth-of-type(odd)": {
+                                  '&:nth-of-type(odd)': {
                                     bgcolor: theme.palette.action.hover,
                                   },
                                 }}
                               >
                                 <TableCell
                                   sx={{
-                                    fontFamily: "monospace",
-                                    fontSize: "0.75rem",
+                                    fontFamily: 'monospace',
+                                    fontSize: '0.75rem',
                                   }}
                                 >
                                   <Tooltip title={endpoint}>
                                     <span>{endpoint}</span>
                                   </Tooltip>
                                 </TableCell>
-                                <TableCell
-                                  align="right"
-                                  sx={{ fontWeight: "bold" }}
-                                >
+                                <TableCell align="right" sx={{ fontWeight: 'bold' }}>
                                   {data.count?.toLocaleString() || 0}
                                 </TableCell>
                                 <TableCell>
-                                  {data.statusCodes &&
-                                  Object.keys(data.statusCodes).length > 0 ? (
+                                  {data.statusCodes && Object.keys(data.statusCodes).length > 0 ? (
                                     renderStatusCodes(data.statusCodes)
                                   ) : (
-                                    <Typography
-                                      variant="caption"
-                                      color="text.secondary"
-                                    >
+                                    <Typography variant="caption" color="text.secondary">
                                       -
                                     </Typography>
                                   )}
                                 </TableCell>
-                                <TableCell align="right">
-                                  {data.avgDurationMs ?? 0}ms
-                                </TableCell>
-                                <TableCell align="right">
-                                  {data.p95DurationMs ?? 0}ms
-                                </TableCell>
+                                <TableCell align="right">{data.avgDurationMs ?? 0}ms</TableCell>
+                                <TableCell align="right">{data.p95DurationMs ?? 0}ms</TableCell>
                                 <TableCell align="right">
                                   {formatBytesLocal(data.bytesSent || 0)}
                                 </TableCell>
@@ -2678,11 +2461,9 @@ const GatrixEdgesPage: React.FC = () => {
                   };
 
                   // Render totals section
-                  const renderTotals = (
-                    totals: Record<string, any>,
-                  ): React.ReactNode => {
+                  const renderTotals = (totals: Record<string, any>): React.ReactNode => {
                     return (
-                      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
                         {Object.entries(totals).map(([key, val]) => (
                           <Box
                             key={key}
@@ -2691,28 +2472,24 @@ const GatrixEdgesPage: React.FC = () => {
                               bgcolor: theme.palette.action.hover,
                               border: `1px solid ${theme.palette.divider}`,
                               minWidth: 120,
-                              textAlign: "center",
+                              textAlign: 'center',
                             }}
                           >
-                            <Typography
-                              variant="caption"
-                              color="text.secondary"
-                              display="block"
-                            >
+                            <Typography variant="caption" color="text.secondary" display="block">
                               {key}
                             </Typography>
                             <Typography
                               variant="h6"
                               sx={{
-                                fontFamily: "monospace",
-                                fontWeight: "bold",
+                                fontFamily: 'monospace',
+                                fontWeight: 'bold',
                               }}
                             >
-                              {key.toLowerCase().includes("bytes")
+                              {key.toLowerCase().includes('bytes')
                                 ? formatBytesLocal(val as number)
-                                : key.toLowerCase().includes("duration")
+                                : key.toLowerCase().includes('duration')
                                   ? `${val}ms`
-                                  : typeof val === "number"
+                                  : typeof val === 'number'
                                     ? val.toLocaleString()
                                     : String(val)}
                             </Typography>
@@ -2725,7 +2502,7 @@ const GatrixEdgesPage: React.FC = () => {
                   // Render generic object as table
                   const renderObject = (
                     obj: Record<string, any>,
-                    level: number = 0,
+                    level: number = 0
                   ): React.ReactNode => {
                     const entries = Object.entries(obj);
                     return (
@@ -2733,9 +2510,9 @@ const GatrixEdgesPage: React.FC = () => {
                         size="small"
                         sx={{
                           ml: level * 2,
-                          "& td": {
+                          '& td': {
                             py: 0.75,
-                            fontSize: "0.875rem",
+                            fontSize: '0.875rem',
                             borderBottom: `1px solid ${theme.palette.divider}`,
                           },
                         }}
@@ -2745,19 +2522,19 @@ const GatrixEdgesPage: React.FC = () => {
                             <TableRow key={key}>
                               <TableCell
                                 sx={{
-                                  fontWeight: "bold",
-                                  width: "35%",
-                                  fontSize: "0.875rem",
+                                  fontWeight: 'bold',
+                                  width: '35%',
+                                  fontSize: '0.875rem',
                                   bgcolor:
                                     level === 0
                                       ? theme.palette.action.selected
                                       : theme.palette.action.hover,
-                                  verticalAlign: "top",
+                                  verticalAlign: 'top',
                                 }}
                               >
                                 {key}
                               </TableCell>
-                              <TableCell sx={{ fontSize: "0.875rem" }}>
+                              <TableCell sx={{ fontSize: '0.875rem' }}>
                                 {renderAnyValue(val, key, level)}
                               </TableCell>
                             </TableRow>
@@ -2771,7 +2548,7 @@ const GatrixEdgesPage: React.FC = () => {
                   const renderAnyValue = (
                     val: any,
                     key?: string,
-                    level: number = 0,
+                    level: number = 0
                   ): React.ReactNode => {
                     // Null/undefined
                     if (val === null || val === undefined) {
@@ -2779,7 +2556,7 @@ const GatrixEdgesPage: React.FC = () => {
                         <Typography
                           variant="body2"
                           color="text.secondary"
-                          sx={{ fontStyle: "italic" }}
+                          sx={{ fontStyle: 'italic' }}
                         >
                           null
                         </Typography>
@@ -2787,7 +2564,7 @@ const GatrixEdgesPage: React.FC = () => {
                     }
 
                     // Primitives
-                    if (typeof val !== "object") {
+                    if (typeof val !== 'object') {
                       return renderPrimitive(val, key);
                     }
 
@@ -2800,18 +2577,16 @@ const GatrixEdgesPage: React.FC = () => {
                           </Typography>
                         );
                       }
-                      if (val.every((v) => typeof v !== "object")) {
+                      if (val.every((v) => typeof v !== 'object')) {
                         return (
-                          <Box
-                            sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}
-                          >
+                          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                             {val.slice(0, 20).map((item, i) => (
                               <Chip
                                 key={i}
                                 label={String(item)}
                                 size="small"
                                 variant="outlined"
-                                sx={{ fontSize: "0.8rem" }}
+                                sx={{ fontSize: '0.8rem' }}
                               />
                             ))}
                             {val.length > 20 && (
@@ -2831,11 +2606,11 @@ const GatrixEdgesPage: React.FC = () => {
                             m: 0,
                             p: 1,
                             bgcolor: theme.palette.action.hover,
-                            fontSize: "0.8rem",
-                            fontFamily: "monospace",
+                            fontSize: '0.8rem',
+                            fontFamily: 'monospace',
                             maxHeight: 150,
-                            overflow: "auto",
-                            whiteSpace: "pre-wrap",
+                            overflow: 'auto',
+                            whiteSpace: 'pre-wrap',
                           }}
                         >
                           {JSON.stringify(val, null, 2)}
@@ -2844,23 +2619,23 @@ const GatrixEdgesPage: React.FC = () => {
                     }
 
                     // Special handling for known keys
-                    const lowerKey = key?.toLowerCase() || "";
+                    const lowerKey = key?.toLowerCase() || '';
 
                     // Status codes
                     if (
-                      lowerKey === "statuscodes" &&
+                      lowerKey === 'statuscodes' &&
                       Object.keys(val).every((k) => /^\d+$/.test(k))
                     ) {
                       return renderStatusCodes(val);
                     }
 
                     // Endpoints
-                    if (lowerKey === "endpoints") {
+                    if (lowerKey === 'endpoints') {
                       return renderEndpoints(val);
                     }
 
                     // Totals
-                    if (lowerKey === "totals") {
+                    if (lowerKey === 'totals') {
                       return renderTotals(val);
                     }
 
@@ -2869,20 +2644,15 @@ const GatrixEdgesPage: React.FC = () => {
                     if (entries.length === 0) {
                       return (
                         <Typography variant="body2" color="text.secondary">
-                          {"{ }"}
+                          {'{ }'}
                         </Typography>
                       );
                     }
 
                     // Small simple objects as chips
-                    if (
-                      entries.length <= 4 &&
-                      entries.every(([, v]) => typeof v !== "object")
-                    ) {
+                    if (entries.length <= 4 && entries.every(([, v]) => typeof v !== 'object')) {
                       return (
-                        <Box
-                          sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}
-                        >
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                           {entries.map(([k, v]) => (
                             <Chip
                               key={k}
@@ -2890,8 +2660,8 @@ const GatrixEdgesPage: React.FC = () => {
                               size="small"
                               variant="outlined"
                               sx={{
-                                fontSize: "0.8rem",
-                                fontFamily: "monospace",
+                                fontSize: '0.8rem',
+                                fontFamily: 'monospace',
                               }}
                             />
                           ))}
@@ -2912,11 +2682,11 @@ const GatrixEdgesPage: React.FC = () => {
                           m: 0,
                           p: 0.5,
                           bgcolor: theme.palette.action.hover,
-                          fontSize: "0.8rem",
-                          fontFamily: "monospace",
+                          fontSize: '0.8rem',
+                          fontFamily: 'monospace',
                           maxHeight: 100,
-                          overflow: "auto",
-                          whiteSpace: "pre-wrap",
+                          overflow: 'auto',
+                          whiteSpace: 'pre-wrap',
                         }}
                       >
                         {JSON.stringify(val, null, 2)}
@@ -2926,12 +2696,10 @@ const GatrixEdgesPage: React.FC = () => {
 
                   // Main render
                   return (
-                    <Box
-                      sx={{ display: "flex", flexDirection: "column", gap: 2 }}
-                    >
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                       {Object.entries(jsonDialogData).map(([key, value]) => {
                         const isComplex =
-                          typeof value === "object" &&
+                          typeof value === 'object' &&
                           value !== null &&
                           !Array.isArray(value) &&
                           Object.keys(value).length > 4;
@@ -2949,15 +2717,15 @@ const GatrixEdgesPage: React.FC = () => {
                                 py: 1,
                                 bgcolor: theme.palette.action.selected,
                                 borderBottom: `1px solid ${theme.palette.divider}`,
-                                display: "flex",
-                                justifyContent: "space-between",
-                                alignItems: "center",
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
                               }}
                             >
                               <Typography variant="subtitle2" fontWeight="bold">
                                 {key}
                               </Typography>
-                              {typeof value === "object" && value !== null && (
+                              {typeof value === 'object' && value !== null && (
                                 <Chip
                                   label={
                                     Array.isArray(value)
@@ -2966,13 +2734,11 @@ const GatrixEdgesPage: React.FC = () => {
                                   }
                                   size="small"
                                   variant="outlined"
-                                  sx={{ fontSize: "0.65rem", height: 20 }}
+                                  sx={{ fontSize: '0.65rem', height: 20 }}
                                 />
                               )}
                             </Box>
-                            <Box sx={{ p: isComplex ? 0 : 2 }}>
-                              {renderAnyValue(value, key)}
-                            </Box>
+                            <Box sx={{ p: isComplex ? 0 : 2 }}>{renderAnyValue(value, key)}</Box>
                           </Box>
                         );
                       })}
@@ -2981,11 +2747,11 @@ const GatrixEdgesPage: React.FC = () => {
                 })()}
             </Box>
           ) : (
-            <Box sx={{ height: "calc(70vh - 160px)", minHeight: 400 }}>
+            <Box sx={{ height: 'calc(70vh - 160px)', minHeight: 400 }}>
               <Editor
                 height="100%"
                 language="json"
-                theme={theme.palette.mode === "dark" ? "vs-dark" : "light"}
+                theme={theme.palette.mode === 'dark' ? 'vs-dark' : 'light'}
                 value={JSON.stringify(jsonDialogData, null, 2)}
                 onMount={handleEditorDidMount}
                 options={{
@@ -2993,11 +2759,11 @@ const GatrixEdgesPage: React.FC = () => {
                   minimap: { enabled: true },
                   scrollBeyondLastLine: false,
                   fontSize: 13,
-                  lineNumbers: "on",
+                  lineNumbers: 'on',
                   automaticLayout: true,
                   padding: { top: 16, bottom: 16 },
-                  renderLineHighlight: "all",
-                  wordWrap: "off",
+                  renderLineHighlight: 'all',
+                  wordWrap: 'off',
                   folding: true,
                   scrollbar: {
                     verticalScrollbarSize: 12,
@@ -3015,9 +2781,9 @@ const GatrixEdgesPage: React.FC = () => {
             px: 3,
             py: 2,
             borderTop: `1px solid ${theme.palette.divider} `,
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
             bgcolor: theme.palette.background.default,
           }}
         >
@@ -3030,20 +2796,20 @@ const GatrixEdgesPage: React.FC = () => {
               onClick={handleCopyJson}
               sx={{
                 borderRadius: 0,
-                textTransform: "none",
+                textTransform: 'none',
               }}
             >
-              {t("common.copy")}
+              {t('common.copy')}
             </Button>
             <Button
               variant="contained"
               onClick={() => setJsonDialogOpen(false)}
               sx={{
                 borderRadius: 0,
-                textTransform: "none",
+                textTransform: 'none',
               }}
             >
-              {t("common.close")}
+              {t('common.close')}
             </Button>
           </Stack>
         </Box>

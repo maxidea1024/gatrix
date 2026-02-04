@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Button,
@@ -10,21 +10,18 @@ import {
   Tabs,
   Paper,
   TextField,
-} from "@mui/material";
-import {
-  CalendarToday as CalendarIcon,
-  ExpandMore as ExpandMoreIcon,
-} from "@mui/icons-material";
-import { StaticDatePicker } from "@mui/x-date-pickers/StaticDatePicker";
-import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
-import { PickersDay, PickersDayProps } from "@mui/x-date-pickers/PickersDay";
-import dayjs, { Dayjs } from "dayjs";
-import timezone from "dayjs/plugin/timezone";
-import utc from "dayjs/plugin/utc";
-import isBetween from "dayjs/plugin/isBetween";
-import { useTranslation } from "react-i18next";
-import { useI18n } from "@/contexts/I18nContext";
-import { getStoredTimezone } from "@/utils/dateFormat";
+} from '@mui/material';
+import { CalendarToday as CalendarIcon, ExpandMore as ExpandMoreIcon } from '@mui/icons-material';
+import { StaticDatePicker } from '@mui/x-date-pickers/StaticDatePicker';
+import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
+import { PickersDay, PickersDayProps } from '@mui/x-date-pickers/PickersDay';
+import dayjs, { Dayjs } from 'dayjs';
+import timezone from 'dayjs/plugin/timezone';
+import utc from 'dayjs/plugin/utc';
+import isBetween from 'dayjs/plugin/isBetween';
+import { useTranslation } from 'react-i18next';
+import { useI18n } from '@/contexts/I18nContext';
+import { getStoredTimezone } from '@/utils/dateFormat';
 
 // Extend dayjs with timezone support
 dayjs.extend(utc);
@@ -33,18 +30,18 @@ dayjs.extend(isBetween);
 
 // Date range preset types
 export type DateRangePreset =
-  | "today"
-  | "yesterday"
-  | "last7d"
-  | "last30d"
-  | "last3m"
-  | "last6m"
-  | "last12m"
-  | "ytd"
-  | "custom";
+  | 'today'
+  | 'yesterday'
+  | 'last7d'
+  | 'last30d'
+  | 'last3m'
+  | 'last6m'
+  | 'last12m'
+  | 'ytd'
+  | 'custom';
 
 // Date range mode types (Mixpanel-style)
-export type DateRangeMode = "fixed" | "since" | "last";
+export type DateRangeMode = 'fixed' | 'since' | 'last';
 
 export interface DateRange {
   from: Dayjs | null;
@@ -57,11 +54,7 @@ export interface DateRangePickerProps {
   dateTo: Dayjs | null;
 
   // Callback when date range changes
-  onChange: (
-    from: Dayjs | null,
-    to: Dayjs | null,
-    preset: DateRangePreset,
-  ) => void;
+  onChange: (from: Dayjs | null, to: Dayjs | null, preset: DateRangePreset) => void;
 
   // Current preset
   preset?: DateRangePreset;
@@ -70,7 +63,7 @@ export interface DateRangePickerProps {
   availablePresets?: DateRangePreset[];
 
   // Size variant
-  size?: "small" | "medium";
+  size?: 'small' | 'medium';
 
   // Show time picker (default: false for day-level selection)
   showTime?: boolean;
@@ -100,19 +93,19 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
   dateFrom,
   dateTo,
   onChange,
-  preset = "last7d",
+  preset = 'last7d',
   availablePresets = [
-    "today",
-    "yesterday",
-    "last7d",
-    "last30d",
-    "last3m",
-    "last6m",
-    "last12m",
-    "ytd",
-    "custom",
+    'today',
+    'yesterday',
+    'last7d',
+    'last30d',
+    'last3m',
+    'last6m',
+    'last12m',
+    'ytd',
+    'custom',
   ],
-  size = "small",
+  size = 'small',
   showTime = false,
 }) => {
   const { t } = useTranslation();
@@ -121,7 +114,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [tempFrom, setTempFrom] = useState<Dayjs | null>(dateFrom);
   const [tempTo, setTempTo] = useState<Dayjs | null>(dateTo);
-  const [mode, setMode] = useState<DateRangeMode>("fixed");
+  const [mode, setMode] = useState<DateRangeMode>('fixed');
   const [tempPreset, setTempPreset] = useState<DateRangePreset | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState<Dayjs | null>(null);
@@ -142,55 +135,55 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
     const now = dayjs().tz(timezone);
 
     switch (presetValue) {
-      case "today":
+      case 'today':
         return {
-          from: now.startOf("day"),
-          to: now.endOf("day"),
+          from: now.startOf('day'),
+          to: now.endOf('day'),
         };
 
-      case "yesterday":
+      case 'yesterday':
         return {
-          from: now.subtract(1, "day").startOf("day"),
-          to: now.subtract(1, "day").endOf("day"),
+          from: now.subtract(1, 'day').startOf('day'),
+          to: now.subtract(1, 'day').endOf('day'),
         };
 
-      case "last7d":
+      case 'last7d':
         return {
-          from: now.subtract(7, "day").startOf("day"),
-          to: now.endOf("day"),
+          from: now.subtract(7, 'day').startOf('day'),
+          to: now.endOf('day'),
         };
 
-      case "last30d":
+      case 'last30d':
         return {
-          from: now.subtract(30, "day").startOf("day"),
-          to: now.endOf("day"),
+          from: now.subtract(30, 'day').startOf('day'),
+          to: now.endOf('day'),
         };
 
-      case "last3m":
+      case 'last3m':
         return {
-          from: now.subtract(3, "month").startOf("day"),
-          to: now.endOf("day"),
+          from: now.subtract(3, 'month').startOf('day'),
+          to: now.endOf('day'),
         };
 
-      case "last6m":
+      case 'last6m':
         return {
-          from: now.subtract(6, "month").startOf("day"),
-          to: now.endOf("day"),
+          from: now.subtract(6, 'month').startOf('day'),
+          to: now.endOf('day'),
         };
 
-      case "last12m":
+      case 'last12m':
         return {
-          from: now.subtract(12, "month").startOf("day"),
-          to: now.endOf("day"),
+          from: now.subtract(12, 'month').startOf('day'),
+          to: now.endOf('day'),
         };
 
-      case "ytd":
+      case 'ytd':
         return {
-          from: now.startOf("year"),
-          to: now.endOf("day"),
+          from: now.startOf('year'),
+          to: now.endOf('day'),
         };
 
-      case "custom":
+      case 'custom':
       default:
         return {
           from: dateFrom,
@@ -201,8 +194,8 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
 
   // Handle preset button click
   const handlePresetClick = (presetValue: DateRangePreset) => {
-    if (presetValue === "custom") {
-      setCurrentPreset("custom");
+    if (presetValue === 'custom') {
+      setCurrentPreset('custom');
       setAnchorEl(null);
       return;
     }
@@ -224,15 +217,15 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
 
     if (!tempFrom || (tempFrom && tempTo)) {
       // Start new selection
-      setTempFrom(normalizedDate.startOf("day"));
+      setTempFrom(normalizedDate.startOf('day'));
       setTempTo(null);
     } else if (tempFrom && !tempTo) {
       // Complete selection
       if (normalizedDate.isBefore(tempFrom)) {
-        setTempTo(tempFrom.endOf("day"));
-        setTempFrom(normalizedDate.startOf("day"));
+        setTempTo(tempFrom.endOf('day'));
+        setTempFrom(normalizedDate.startOf('day'));
       } else {
-        setTempTo(normalizedDate.endOf("day"));
+        setTempTo(normalizedDate.endOf('day'));
       }
     }
   };
@@ -240,8 +233,8 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
   // Handle drag start
   const handleMouseDown = (date: Dayjs) => {
     setIsDragging(true);
-    setDragStart(date.startOf("day"));
-    setTempFrom(date.startOf("day"));
+    setDragStart(date.startOf('day'));
+    setTempFrom(date.startOf('day'));
     setTempTo(null);
   };
 
@@ -249,13 +242,13 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
   const handleMouseEnter = (date: Dayjs) => {
     if (!isDragging || !dragStart) return;
 
-    const normalizedDate = date.startOf("day");
+    const normalizedDate = date.startOf('day');
     if (normalizedDate.isBefore(dragStart)) {
       setTempFrom(normalizedDate);
-      setTempTo(dragStart.endOf("day"));
+      setTempTo(dragStart.endOf('day'));
     } else {
       setTempFrom(dragStart);
-      setTempTo(normalizedDate.endOf("day"));
+      setTempTo(normalizedDate.endOf('day'));
     }
   };
 
@@ -268,8 +261,8 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
   // Add global mouse up listener
   useEffect(() => {
     if (isDragging) {
-      window.addEventListener("mouseup", handleMouseUp);
-      return () => window.removeEventListener("mouseup", handleMouseUp);
+      window.addEventListener('mouseup', handleMouseUp);
+      return () => window.removeEventListener('mouseup', handleMouseUp);
     }
   }, [isDragging]);
 
@@ -281,9 +274,9 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
       return <PickersDay day={day} {...other} />;
     }
 
-    const dayStart = day.startOf("day");
-    const fromStart = tempFrom.startOf("day");
-    const toStart = tempTo ? tempTo.startOf("day") : null;
+    const dayStart = day.startOf('day');
+    const fromStart = tempFrom.startOf('day');
+    const toStart = tempTo ? tempTo.startOf('day') : null;
 
     // Compare full date including year, month, and day - use no unit or check year/month/date separately
     const isStart =
@@ -298,19 +291,17 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
 
     // Only highlight if both dates are selected
     const isInRange =
-      toStart && tempFrom
-        ? dayStart.isAfter(fromStart) && dayStart.isBefore(toStart)
-        : false;
+      toStart && tempFrom ? dayStart.isAfter(fromStart) && dayStart.isBefore(toStart) : false;
 
     const isSelected = isStart || isEnd || isInRange;
 
     return (
       <Box
         sx={{
-          position: "relative",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
+          position: 'relative',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
         }}
         onMouseDown={() => handleMouseDown(day)}
         onMouseEnter={() => handleMouseEnter(day)}
@@ -319,13 +310,13 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
         {isSelected && (
           <Box
             sx={{
-              position: "absolute",
-              top: "50%",
-              transform: "translateY(-50%)",
+              position: 'absolute',
+              top: '50%',
+              transform: 'translateY(-50%)',
               height: 36,
-              left: isStart ? "50%" : 0,
-              right: isEnd ? "50%" : 0,
-              backgroundColor: "rgba(25, 118, 210, 0.12)",
+              left: isStart ? '50%' : 0,
+              right: isEnd ? '50%' : 0,
+              backgroundColor: 'rgba(25, 118, 210, 0.12)',
               zIndex: 0,
             }}
           />
@@ -336,17 +327,15 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
           {...other}
           selected={false}
           sx={{
-            position: "relative",
+            position: 'relative',
             zIndex: 1,
-            userSelect: "none",
+            userSelect: 'none',
             ...(isSelected && {
-              backgroundColor:
-                isStart || isEnd ? "primary.main" : "transparent",
-              color: isStart || isEnd ? "primary.contrastText" : "text.primary",
+              backgroundColor: isStart || isEnd ? 'primary.main' : 'transparent',
+              color: isStart || isEnd ? 'primary.contrastText' : 'text.primary',
               fontWeight: isStart || isEnd ? 600 : 400,
-              "&:hover": {
-                backgroundColor:
-                  isStart || isEnd ? "primary.dark" : "rgba(25, 118, 210, 0.2)",
+              '&:hover': {
+                backgroundColor: isStart || isEnd ? 'primary.dark' : 'rgba(25, 118, 210, 0.2)',
               },
             }),
           }}
@@ -357,7 +346,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
 
   // Handle custom date apply
   const handleCustomApply = () => {
-    const presetToApply = tempPreset || "custom";
+    const presetToApply = tempPreset || 'custom';
     onChange(tempFrom, tempTo, presetToApply);
     setCurrentPreset(presetToApply);
     setTempPreset(null);
@@ -379,13 +368,13 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
 
   // Get current display text
   const getDisplayText = (): string => {
-    if (currentPreset === "custom") {
+    if (currentPreset === 'custom') {
       if (dateFrom && dateTo) {
-        const fromStr = dateFrom.format("MMM D, YYYY");
-        const toStr = dateTo.format("MMM D, YYYY");
+        const fromStr = dateFrom.format('MMM D, YYYY');
+        const toStr = dateTo.format('MMM D, YYYY');
         return `${fromStr} - ${toStr}`;
       }
-      return t("common.dateRange.presets.custom");
+      return t('common.dateRange.presets.custom');
     }
     return getPresetLabel(currentPreset);
   };
@@ -393,10 +382,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
   const open = Boolean(anchorEl);
 
   // Handle mode tab change
-  const handleModeChange = (
-    event: React.SyntheticEvent,
-    newMode: DateRangeMode,
-  ) => {
+  const handleModeChange = (event: React.SyntheticEvent, newMode: DateRangeMode) => {
     setMode(newMode);
   };
 
@@ -405,7 +391,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
     const value = e.target.value;
     const date = dayjs(value);
     if (date.isValid()) {
-      setTempFrom(date.startOf("day"));
+      setTempFrom(date.startOf('day'));
       // Auto-adjust end date if it's before the new start date
       if (tempTo && date.isAfter(tempTo)) {
         setTempTo(null);
@@ -417,10 +403,10 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
     const value = e.target.value;
     const date = dayjs(value);
     if (date.isValid()) {
-      setTempTo(date.endOf("day"));
+      setTempTo(date.endOf('day'));
       // Auto-adjust start date if it's after the new end date
       if (tempFrom && date.isBefore(tempFrom)) {
-        setTempFrom(date.startOf("day"));
+        setTempFrom(date.startOf('day'));
       }
     }
   };
@@ -432,19 +418,19 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
         variant="outlined"
         size={size}
         sx={{
-          "& .MuiButton-root": {
-            textTransform: "none",
-            minWidth: size === "small" ? 60 : 80,
-            height: size === "small" ? "40px" : "auto",
+          '& .MuiButton-root': {
+            textTransform: 'none',
+            minWidth: size === 'small' ? 60 : 80,
+            height: size === 'small' ? '40px' : 'auto',
           },
         }}
       >
         {availablePresets
-          .filter((p) => p !== "custom")
+          .filter((p) => p !== 'custom')
           .map((presetValue) => (
             <Button
               key={presetValue}
-              variant={currentPreset === presetValue ? "contained" : "outlined"}
+              variant={currentPreset === presetValue ? 'contained' : 'outlined'}
               onClick={() => handlePresetClick(presetValue)}
             >
               {getPresetLabel(presetValue)}
@@ -452,9 +438,9 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
           ))}
 
         {/* Custom Button with Dropdown */}
-        {availablePresets.includes("custom") && (
+        {availablePresets.includes('custom') && (
           <Button
-            variant={currentPreset === "custom" ? "contained" : "outlined"}
+            variant={currentPreset === 'custom' ? 'contained' : 'outlined'}
             onClick={(e) => {
               // Reset temp values when opening popover
               setTempFrom(dateFrom);
@@ -465,9 +451,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
             endIcon={<ExpandMoreIcon />}
             startIcon={<CalendarIcon />}
           >
-            {currentPreset === "custom"
-              ? getDisplayText()
-              : getPresetLabel("custom")}
+            {currentPreset === 'custom' ? getDisplayText() : getPresetLabel('custom')}
           </Button>
         )}
       </ButtonGroup>
@@ -478,52 +462,52 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
         anchorEl={anchorEl}
         onClose={handleCustomCancel}
         anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "left",
+          vertical: 'bottom',
+          horizontal: 'left',
         }}
         transformOrigin={{
-          vertical: "top",
-          horizontal: "left",
+          vertical: 'top',
+          horizontal: 'left',
         }}
         slotProps={{
           paper: {
             sx: {
               mt: 1,
-              boxShadow: "0 4px 20px rgba(0,0,0,0.15)",
+              boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
               borderRadius: 2,
             },
           },
         }}
       >
-        <Box sx={{ width: "auto", minWidth: 320 }}>
+        <Box sx={{ width: 'auto', minWidth: 320 }}>
           {/* Mode Tabs */}
-          <Box sx={{ borderBottom: 1, borderColor: "divider", px: 2, pt: 1 }}>
+          <Box sx={{ borderBottom: 1, borderColor: 'divider', px: 2, pt: 1 }}>
             <Tabs
               value={mode}
               onChange={handleModeChange}
               sx={{
                 minHeight: 40,
-                "& .MuiTab-root": {
+                '& .MuiTab-root': {
                   minHeight: 40,
-                  textTransform: "none",
-                  fontSize: "0.875rem",
+                  textTransform: 'none',
+                  fontSize: '0.875rem',
                   fontWeight: 500,
                 },
               }}
             >
-              <Tab label={t("common.dateRange.modes.fixed")} value="fixed" />
-              <Tab label={t("common.dateRange.modes.since")} value="since" />
-              <Tab label={t("common.dateRange.modes.last")} value="last" />
+              <Tab label={t('common.dateRange.modes.fixed')} value="fixed" />
+              <Tab label={t('common.dateRange.modes.since')} value="since" />
+              <Tab label={t('common.dateRange.modes.last')} value="last" />
             </Tabs>
           </Box>
 
           {/* Fixed Mode - Date Range Picker */}
-          {mode === "fixed" && (
+          {mode === 'fixed' && (
             <Box sx={{ p: 2 }}>
               <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
                 <TextField
-                  label={t("common.dateRange.from")}
-                  value={tempFrom ? tempFrom.format("YYYY-MM-DD") : ""}
+                  label={t('common.dateRange.from')}
+                  value={tempFrom ? tempFrom.format('YYYY-MM-DD') : ''}
                   onChange={handleFromDateChange}
                   size="small"
                   type="date"
@@ -534,8 +518,8 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
                   }}
                 />
                 <TextField
-                  label={t("common.dateRange.to")}
-                  value={tempTo ? tempTo.format("YYYY-MM-DD") : ""}
+                  label={t('common.dateRange.to')}
+                  value={tempTo ? tempTo.format('YYYY-MM-DD') : ''}
                   onChange={handleToDateChange}
                   size="small"
                   type="date"
@@ -555,44 +539,40 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
                       day: CustomDay,
                     }}
                     sx={{
-                      width: "100%",
+                      width: '100%',
                       maxHeight: 320,
-                      "& .MuiPickersCalendarHeader-root": {
+                      '& .MuiPickersCalendarHeader-root': {
                         paddingLeft: 1,
                         paddingRight: 1,
                       },
-                      "& .MuiDayCalendar-header": {
-                        justifyContent: "space-around",
+                      '& .MuiDayCalendar-header': {
+                        justifyContent: 'space-around',
                       },
-                      "& .MuiPickersDay-root": {
-                        fontSize: "0.875rem",
+                      '& .MuiPickersDay-root': {
+                        fontSize: '0.875rem',
                       },
                     }}
                   />
                 </Box>
                 <Box sx={{ flex: 1 }}>
                   <DateCalendar
-                    value={
-                      tempFrom
-                        ? tempFrom.add(1, "month")
-                        : dayjs().add(1, "month")
-                    }
+                    value={tempFrom ? tempFrom.add(1, 'month') : dayjs().add(1, 'month')}
                     onChange={handleDateClick}
                     slots={{
                       day: CustomDay,
                     }}
                     sx={{
-                      width: "100%",
+                      width: '100%',
                       maxHeight: 320,
-                      "& .MuiPickersCalendarHeader-root": {
+                      '& .MuiPickersCalendarHeader-root': {
                         paddingLeft: 1,
                         paddingRight: 1,
                       },
-                      "& .MuiDayCalendar-header": {
-                        justifyContent: "space-around",
+                      '& .MuiDayCalendar-header': {
+                        justifyContent: 'space-around',
                       },
-                      "& .MuiPickersDay-root": {
-                        fontSize: "0.875rem",
+                      '& .MuiPickersDay-root': {
+                        fontSize: '0.875rem',
                       },
                     }}
                   />
@@ -602,19 +582,19 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
           )}
 
           {/* Since Mode - Single Date Picker */}
-          {mode === "since" && (
+          {mode === 'since' && (
             <Box sx={{ p: 3 }}>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                {t("common.dateRange.sinceDescription")}
+                {t('common.dateRange.sinceDescription')}
               </Typography>
               <DateCalendar
                 value={tempFrom}
                 onChange={(date) => {
-                  setTempFrom(date.startOf("day"));
-                  setTempTo(dayjs().endOf("day"));
+                  setTempFrom(date.startOf('day'));
+                  setTempTo(dayjs().endOf('day'));
                 }}
                 sx={{
-                  width: "100%",
+                  width: '100%',
                   maxHeight: 320,
                 }}
               />
@@ -622,20 +602,18 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
           )}
 
           {/* Last Mode - Preset Buttons */}
-          {mode === "last" && (
+          {mode === 'last' && (
             <Box sx={{ p: 3 }}>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                {t("common.dateRange.lastDescription")}
+                {t('common.dateRange.lastDescription')}
               </Typography>
               <Stack spacing={1}>
                 {availablePresets
-                  .filter((p) => p !== "custom")
+                  .filter((p) => p !== 'custom')
                   .map((presetValue) => (
                     <Button
                       key={presetValue}
-                      variant={
-                        tempPreset === presetValue ? "contained" : "outlined"
-                      }
+                      variant={tempPreset === presetValue ? 'contained' : 'outlined'}
                       onClick={() => {
                         const range = calculateDateRange(presetValue);
                         setTempFrom(range.from);
@@ -644,8 +622,8 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
                       }}
                       fullWidth
                       sx={{
-                        justifyContent: "flex-start",
-                        textTransform: "none",
+                        justifyContent: 'flex-start',
+                        textTransform: 'none',
                       }}
                     >
                       {getPresetLabel(presetValue)}
@@ -661,28 +639,24 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
               px: 2,
               py: 1.5,
               borderTop: 1,
-              borderColor: "divider",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              bgcolor: "background.default",
+              borderColor: 'divider',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              bgcolor: 'background.default',
             }}
           >
-            <Button
-              size="small"
-              onClick={handleCustomCancel}
-              sx={{ textTransform: "none" }}
-            >
-              {t("common.cancel")}
+            <Button size="small" onClick={handleCustomCancel} sx={{ textTransform: 'none' }}>
+              {t('common.cancel')}
             </Button>
             <Button
               size="small"
               variant="contained"
               onClick={handleCustomApply}
               disabled={!tempFrom || !tempTo}
-              sx={{ textTransform: "none" }}
+              sx={{ textTransform: 'none' }}
             >
-              {t("common.apply")}
+              {t('common.apply')}
             </Button>
           </Box>
         </Box>

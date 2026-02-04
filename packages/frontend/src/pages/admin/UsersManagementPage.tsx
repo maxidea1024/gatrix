@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   Box,
   Typography,
@@ -41,7 +41,7 @@ import {
   ListItem,
   ListItemButton,
   ClickAwayListener,
-} from "@mui/material";
+} from '@mui/material';
 import {
   DndContext,
   closestCenter,
@@ -50,16 +50,16 @@ import {
   useSensor,
   useSensors,
   DragEndEvent,
-} from "@dnd-kit/core";
+} from '@dnd-kit/core';
 import {
   arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
   useSortable,
   verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
-import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import {
   Search as SearchIcon,
   MoreVert as MoreVertIcon,
@@ -91,38 +91,38 @@ import {
   Preview as PreviewIcon,
   ArrowBack as ArrowBackIcon,
   ArrowForward as ArrowForwardIcon,
-} from "@mui/icons-material";
-import { useTranslation } from "react-i18next";
-import { useSnackbar } from "notistack";
-import { User, Tag, Permission } from "@/types";
-import { apiService } from "@/services/api";
-import { copyToClipboardWithNotification } from "@/utils/clipboard";
-import { tagService } from "@/services/tagService";
-import { UserService } from "@/services/users";
-import { formatRelativeTime } from "../../utils/dateFormat";
-import { useAuth } from "@/hooks/useAuth";
-import { PERMISSIONS } from "@/types/permissions";
-import SimplePagination from "../../components/common/SimplePagination";
-import FormDialogHeader from "../../components/common/FormDialogHeader";
-import ResizableDrawer from "../../components/common/ResizableDrawer";
-import { invitationService } from "../../services/invitationService";
-import { Invitation, CreateInvitationRequest } from "../../types/invitation";
-import InvitationForm from "../../components/admin/InvitationForm";
-import InvitationStatusCard from "../../components/admin/InvitationStatusCard";
-import EmptyState from "../../components/common/EmptyState";
-import { useDebounce } from "../../hooks/useDebounce";
-import { usePageState } from "../../hooks/usePageState";
+} from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
+import { useSnackbar } from 'notistack';
+import { User, Tag, Permission } from '@/types';
+import { apiService } from '@/services/api';
+import { copyToClipboardWithNotification } from '@/utils/clipboard';
+import { tagService } from '@/services/tagService';
+import { UserService } from '@/services/users';
+import { formatRelativeTime } from '../../utils/dateFormat';
+import { useAuth } from '@/hooks/useAuth';
+import { PERMISSIONS } from '@/types/permissions';
+import SimplePagination from '../../components/common/SimplePagination';
+import FormDialogHeader from '../../components/common/FormDialogHeader';
+import ResizableDrawer from '../../components/common/ResizableDrawer';
+import { invitationService } from '../../services/invitationService';
+import { Invitation, CreateInvitationRequest } from '../../types/invitation';
+import InvitationForm from '../../components/admin/InvitationForm';
+import InvitationStatusCard from '../../components/admin/InvitationStatusCard';
+import EmptyState from '../../components/common/EmptyState';
+import { useDebounce } from '../../hooks/useDebounce';
+import { usePageState } from '../../hooks/usePageState';
 import DynamicFilterBar, {
   FilterDefinition,
   ActiveFilter,
-} from "../../components/common/DynamicFilterBar";
-import { usePaginatedApi, useTags } from "../../hooks/useSWR";
-import { useEnvironments } from "../../contexts/EnvironmentContext";
-import PermissionSelector from "../../components/common/PermissionSelector";
-import { getContrastColor } from "@/utils/colorUtils";
+} from '../../components/common/DynamicFilterBar';
+import { usePaginatedApi, useTags } from '../../hooks/useSWR';
+import { useEnvironments } from '../../contexts/EnvironmentContext';
+import PermissionSelector from '../../components/common/PermissionSelector';
+import { getContrastColor } from '@/utils/colorUtils';
 
-import { TableLoadingRow } from "@/components/common/TableLoadingRow";
-import { TableSkeletonRows } from "@/components/common/TableSkeletonRows";
+import { TableLoadingRow } from '@/components/common/TableLoadingRow';
+import { TableSkeletonRows } from '@/components/common/TableSkeletonRows';
 // SSE는 MainLayout에서 전역으로 처리하므로 여기서는 제거
 
 interface UsersResponse {
@@ -147,19 +147,11 @@ interface SortableColumnItemProps {
   onToggleVisibility: (id: string) => void;
 }
 
-const SortableColumnItem: React.FC<SortableColumnItemProps> = ({
-  column,
-  onToggleVisibility,
-}) => {
+const SortableColumnItem: React.FC<SortableColumnItemProps> = ({ column, onToggleVisibility }) => {
   const { t } = useTranslation();
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: column.id });
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: column.id,
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -177,21 +169,17 @@ const SortableColumnItem: React.FC<SortableColumnItemProps> = ({
           {...attributes}
           {...listeners}
           sx={{
-            cursor: "grab",
-            display: "flex",
-            alignItems: "center",
-            "&:active": { cursor: "grabbing" },
+            cursor: 'grab',
+            display: 'flex',
+            alignItems: 'center',
+            '&:active': { cursor: 'grabbing' },
           }}
         >
-          <DragIndicatorIcon sx={{ color: "text.disabled", fontSize: 20 }} />
+          <DragIndicatorIcon sx={{ color: 'text.disabled', fontSize: 20 }} />
         </Box>
       }
     >
-      <ListItemButton
-        dense
-        onClick={() => onToggleVisibility(column.id)}
-        sx={{ pr: 6 }}
-      >
+      <ListItemButton dense onClick={() => onToggleVisibility(column.id)} sx={{ pr: 6 }}>
         <Checkbox
           edge="start"
           checked={column.visible}
@@ -201,10 +189,7 @@ const SortableColumnItem: React.FC<SortableColumnItemProps> = ({
           icon={<VisibilityOffIcon fontSize="small" />}
           checkedIcon={<VisibilityIcon fontSize="small" />}
         />
-        <ListItemText
-          primary={t(column.labelKey)}
-          slotProps={{ primary: { variant: "body2" } }}
-        />
+        <ListItemText primary={t(column.labelKey)} slotProps={{ primary: { variant: 'body2' } }} />
       </ListItemButton>
     </ListItem>
   );
@@ -222,7 +207,7 @@ const RoleChipWithTooltip: React.FC<RoleChipWithTooltipProps> = ({ user }) => {
   const [loaded, setLoaded] = useState(false);
 
   const handleMouseEnter = async () => {
-    if (user.role !== "admin" || loaded) return;
+    if (user.role !== 'admin' || loaded) return;
 
     setLoading(true);
     try {
@@ -233,27 +218,27 @@ const RoleChipWithTooltip: React.FC<RoleChipWithTooltipProps> = ({ user }) => {
       setPermissions(response.data?.permissions || []);
       setLoaded(true);
     } catch (error) {
-      console.error("Failed to load user permissions:", error);
+      console.error('Failed to load user permissions:', error);
     } finally {
       setLoading(false);
     }
   };
 
   const getTooltipContent = () => {
-    if (user.role !== "admin") {
-      return t("users.noPermissionsForUser");
+    if (user.role !== 'admin') {
+      return t('users.noPermissionsForUser');
     }
 
     if (loading) {
-      return t("common.loading");
+      return t('common.loading');
     }
 
     if (!loaded) {
-      return t("users.hoverToLoadPermissions");
+      return t('users.hoverToLoadPermissions');
     }
 
     if (permissions.length === 0) {
-      return t("users.noPermissionsAssigned");
+      return t('users.noPermissionsAssigned');
     }
 
     const maxDisplay = 5;
@@ -262,27 +247,17 @@ const RoleChipWithTooltip: React.FC<RoleChipWithTooltipProps> = ({ user }) => {
 
     return (
       <Box sx={{ maxWidth: 300 }}>
-        <Typography
-          variant="caption"
-          sx={{ fontWeight: 600, display: "block", mb: 0.5 }}
-        >
-          {t("users.assignedPermissions")} ({permissions.length})
+        <Typography variant="caption" sx={{ fontWeight: 600, display: 'block', mb: 0.5 }}>
+          {t('users.assignedPermissions')} ({permissions.length})
         </Typography>
         {displayPermissions.map((perm) => (
-          <Typography
-            key={perm}
-            variant="caption"
-            sx={{ display: "block", color: "inherit" }}
-          >
-            • {t(`permissions.${perm.replace(".", "_")}`)}
+          <Typography key={perm} variant="caption" sx={{ display: 'block', color: 'inherit' }}>
+            • {t(`permissions.${perm.replace('.', '_')}`)}
           </Typography>
         ))}
         {remaining > 0 && (
-          <Typography
-            variant="caption"
-            sx={{ display: "block", fontStyle: "italic", mt: 0.5 }}
-          >
-            +{remaining} {t("users.morePermissions")}
+          <Typography variant="caption" sx={{ display: 'block', fontStyle: 'italic', mt: 0.5 }}>
+            +{remaining} {t('users.morePermissions')}
           </Typography>
         )}
       </Box>
@@ -298,12 +273,12 @@ const RoleChipWithTooltip: React.FC<RoleChipWithTooltipProps> = ({ user }) => {
       onOpen={handleMouseEnter}
     >
       <Chip
-        icon={user.role === "admin" ? <SecurityIcon /> : <PersonIcon />}
+        icon={user.role === 'admin' ? <SecurityIcon /> : <PersonIcon />}
         label={t(`users.roles.${user.role}`)}
-        color={user.role === "admin" ? "primary" : "secondary"}
+        color={user.role === 'admin' ? 'primary' : 'secondary'}
         size="small"
         variant="outlined"
-        sx={{ cursor: user.role === "admin" ? "help" : "default" }}
+        sx={{ cursor: user.role === 'admin' ? 'help' : 'default' }}
       />
     </Tooltip>
   );
@@ -312,11 +287,7 @@ const RoleChipWithTooltip: React.FC<RoleChipWithTooltipProps> = ({ user }) => {
 const UsersManagementPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
-  const {
-    user: currentUser,
-    isLoading: authLoading,
-    hasPermission,
-  } = useAuth();
+  const { user: currentUser, isLoading: authLoading, hasPermission } = useAuth();
   const { environments } = useEnvironments();
   const canManage = hasPermission([PERMISSIONS.USERS_MANAGE]);
 
@@ -328,7 +299,7 @@ const UsersManagementPage: React.FC = () => {
   // Helper function to check if user is super admin (admin@gatrix.com)
   // Super admin cannot be modified by anyone except themselves (name only)
   const isSuperAdmin = (user: User | null): boolean => {
-    return user?.email === "admin@gatrix.com";
+    return user?.email === 'admin@gatrix.com';
   };
 
   // Check if the target user can be modified
@@ -341,12 +312,11 @@ const UsersManagementPage: React.FC = () => {
   };
 
   // 클립보드 복사 함수
-  const copyToClipboard = async (text: string, type: "name" | "email") => {
+  const copyToClipboard = async (text: string, type: 'name' | 'email') => {
     copyToClipboardWithNotification(
       text,
-      () =>
-        enqueueSnackbar(t("common.copiedToClipboard"), { variant: "success" }),
-      () => enqueueSnackbar(t("common.copyFailed"), { variant: "error" }),
+      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
     );
   };
 
@@ -357,10 +327,10 @@ const UsersManagementPage: React.FC = () => {
       limit: 10,
       filters: {},
     },
-    storageKey: "usersPage",
+    storageKey: 'usersPage',
   });
 
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
 
   // 동적 필터 상태
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
@@ -375,15 +345,10 @@ const UsersManagementPage: React.FC = () => {
     error: usersError,
     isLoading: isLoadingUsers,
     mutate: mutateUsers,
-  } = usePaginatedApi<UsersResponse>(
-    "/admin/users",
-    pageState.page,
-    pageState.limit,
-    {
-      ...pageState.filters,
-      search: debouncedSearchTerm || undefined,
-    },
-  );
+  } = usePaginatedApi<UsersResponse>('/admin/users', pageState.page, pageState.limit, {
+    ...pageState.filters,
+    search: debouncedSearchTerm || undefined,
+  });
 
   const { data: allTags, isLoading: isLoadingTags } = useTags();
 
@@ -402,48 +367,42 @@ const UsersManagementPage: React.FC = () => {
 
   // 동적 필터에서 값 추출 (useMemo로 참조 안정화)
   const statusFilter = useMemo(
-    () =>
-      (activeFilters.find((f) => f.key === "status")?.value as string[]) || [],
-    [activeFilters],
+    () => (activeFilters.find((f) => f.key === 'status')?.value as string[]) || [],
+    [activeFilters]
   );
   const statusOperator = useMemo(
-    () => activeFilters.find((f) => f.key === "status")?.operator,
-    [activeFilters],
+    () => activeFilters.find((f) => f.key === 'status')?.operator,
+    [activeFilters]
   );
   const roleFilter = useMemo(
-    () =>
-      (activeFilters.find((f) => f.key === "role")?.value as string[]) || [],
-    [activeFilters],
+    () => (activeFilters.find((f) => f.key === 'role')?.value as string[]) || [],
+    [activeFilters]
   );
   const roleOperator = useMemo(
-    () => activeFilters.find((f) => f.key === "role")?.operator,
-    [activeFilters],
+    () => activeFilters.find((f) => f.key === 'role')?.operator,
+    [activeFilters]
   );
   const tagIds = useMemo(
-    () =>
-      (activeFilters.find((f) => f.key === "tags")?.value as number[]) || [],
-    [activeFilters],
+    () => (activeFilters.find((f) => f.key === 'tags')?.value as number[]) || [],
+    [activeFilters]
   );
   const tagOperator = useMemo(
-    () => activeFilters.find((f) => f.key === "tags")?.operator,
-    [activeFilters],
+    () => activeFilters.find((f) => f.key === 'tags')?.operator,
+    [activeFilters]
   );
 
   // 배열을 문자열로 변환하여 의존성 배열에 사용
-  const statusFilterString = useMemo(
-    () => statusFilter.join(","),
-    [statusFilter],
-  );
-  const roleFilterString = useMemo(() => roleFilter.join(","), [roleFilter]);
-  const tagIdsString = useMemo(() => tagIds.join(","), [tagIds]);
+  const statusFilterString = useMemo(() => statusFilter.join(','), [statusFilter]);
+  const roleFilterString = useMemo(() => roleFilter.join(','), [roleFilter]);
+  const tagIdsString = useMemo(() => tagIds.join(','), [tagIds]);
 
   // 일괄 선택 관련 상태
   const [selectedUsers, setSelectedUsers] = useState<Set<number>>(new Set());
   const [bulkActionDialogOpen, setBulkActionDialogOpen] = useState(false);
   const [bulkActionType, setBulkActionType] = useState<
-    "status" | "role" | "tags" | "emailVerified" | "delete"
-  >("status");
-  const [bulkActionValue, setBulkActionValue] = useState<any>("");
+    'status' | 'role' | 'tags' | 'emailVerified' | 'delete'
+  >('status');
+  const [bulkActionValue, setBulkActionValue] = useState<any>('');
   const [bulkActionTags, setBulkActionTags] = useState<Tag[]>([]);
   const [confirmDialog, setConfirmDialog] = useState<{
     open: boolean;
@@ -452,33 +411,31 @@ const UsersManagementPage: React.FC = () => {
     action: () => void;
   }>({
     open: false,
-    title: "",
-    message: "",
+    title: '',
+    message: '',
     action: () => {},
   });
   const [confirmDialogLoading, setConfirmDialogLoading] = useState(false);
 
   // 초대 관련 상태
   const [invitationDialogOpen, setInvitationDialogOpen] = useState(false);
-  const [currentInvitation, setCurrentInvitation] = useState<Invitation | null>(
-    null,
-  );
+  const [currentInvitation, setCurrentInvitation] = useState<Invitation | null>(null);
 
   const [addUserDialog, setAddUserDialog] = useState(false);
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [newUserData, setNewUserData] = useState({
-    name: "",
-    email: "",
-    password: "",
-    role: "user" as "admin" | "user",
+    name: '',
+    email: '',
+    password: '',
+    role: 'user' as 'admin' | 'user',
   });
   const [newUserTags, setNewUserTags] = useState<Tag[]>([]);
   const [newUserErrors, setNewUserErrors] = useState({
-    name: "",
-    email: "",
-    password: "",
+    name: '',
+    email: '',
+    password: '',
   });
 
   // Environment access state for new user
@@ -486,15 +443,13 @@ const UsersManagementPage: React.FC = () => {
   const [newUserEnvIds, setNewUserEnvIds] = useState<string[]>([]);
 
   // Permission state for new user
-  const [newUserPermissions, setNewUserPermissions] = useState<Permission[]>(
-    [],
-  );
+  const [newUserPermissions, setNewUserPermissions] = useState<Permission[]>([]);
 
   // Delete confirmation state
   const [deleteConfirmDialog, setDeleteConfirmDialog] = useState({
     open: false,
     user: null as User | null,
-    inputValue: "",
+    inputValue: '',
   });
 
   // Tags state
@@ -506,15 +461,15 @@ const UsersManagementPage: React.FC = () => {
     user: null as User | null,
   });
   const [editUserData, setEditUserData] = useState({
-    name: "",
-    email: "",
-    role: "user" as "admin" | "user",
-    status: "active" as "pending" | "active" | "suspended" | "deleted",
+    name: '',
+    email: '',
+    role: 'user' as 'admin' | 'user',
+    status: 'active' as 'pending' | 'active' | 'suspended' | 'deleted',
   });
   const [editUserTags, setEditUserTags] = useState<Tag[]>([]);
   const [editUserErrors, setEditUserErrors] = useState({
-    name: "",
-    email: "",
+    name: '',
+    email: '',
   });
 
   // Environment access state
@@ -522,17 +477,15 @@ const UsersManagementPage: React.FC = () => {
   const [editUserEnvIds, setEditUserEnvIds] = useState<string[]>([]);
 
   // Permission state
-  const [editUserPermissions, setEditUserPermissions] = useState<Permission[]>(
-    [],
-  );
+  const [editUserPermissions, setEditUserPermissions] = useState<Permission[]>([]);
   const [permissionsLoading, setPermissionsLoading] = useState(false);
 
   // Original user data for comparison in review
   const [originalUserData, setOriginalUserData] = useState<{
     name: string;
     email: string;
-    role: "admin" | "user";
-    status: "pending" | "active" | "suspended" | "deleted";
+    role: 'admin' | 'user';
+    status: 'pending' | 'active' | 'suspended' | 'deleted';
     tags: Tag[];
     allowAllEnvs: boolean;
     selectedEnvironments: string[];
@@ -568,25 +521,24 @@ const UsersManagementPage: React.FC = () => {
   });
 
   // 이메일 인증 관련 상태
-  const [emailVerificationLoading, setEmailVerificationLoading] =
-    useState(false);
+  const [emailVerificationLoading, setEmailVerificationLoading] = useState(false);
 
   // Default column configuration
   const defaultColumns: ColumnConfig[] = [
-    { id: "user", labelKey: "users.user", visible: true },
-    { id: "email", labelKey: "users.email", visible: true },
-    { id: "emailVerified", labelKey: "users.emailVerified", visible: true },
-    { id: "role", labelKey: "users.role", visible: true },
-    { id: "status", labelKey: "users.status", visible: true },
-    { id: "environments", labelKey: "users.environmentAccess", visible: true },
-    { id: "tags", labelKey: "users.tags", visible: true },
-    { id: "joinDate", labelKey: "users.joinDate", visible: true },
-    { id: "lastLogin", labelKey: "users.lastLogin", visible: true },
+    { id: 'user', labelKey: 'users.user', visible: true },
+    { id: 'email', labelKey: 'users.email', visible: true },
+    { id: 'emailVerified', labelKey: 'users.emailVerified', visible: true },
+    { id: 'role', labelKey: 'users.role', visible: true },
+    { id: 'status', labelKey: 'users.status', visible: true },
+    { id: 'environments', labelKey: 'users.environmentAccess', visible: true },
+    { id: 'tags', labelKey: 'users.tags', visible: true },
+    { id: 'joinDate', labelKey: 'users.joinDate', visible: true },
+    { id: 'lastLogin', labelKey: 'users.lastLogin', visible: true },
   ];
 
   // Column configuration state (persisted in localStorage)
   const [columns, setColumns] = useState<ColumnConfig[]>(() => {
-    const saved = localStorage.getItem("usersColumns");
+    const saved = localStorage.getItem('usersColumns');
     if (saved) {
       try {
         const savedColumns = JSON.parse(saved);
@@ -609,8 +561,7 @@ const UsersManagementPage: React.FC = () => {
   });
 
   // Column settings popover state
-  const [columnSettingsAnchor, setColumnSettingsAnchor] =
-    useState<HTMLButtonElement | null>(null);
+  const [columnSettingsAnchor, setColumnSettingsAnchor] = useState<HTMLButtonElement | null>(null);
 
   // Drag and drop sensors
   const sensors = useSensors(
@@ -621,7 +572,7 @@ const UsersManagementPage: React.FC = () => {
     }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    }),
+    })
   );
 
   // 현재 초대 정보 로드
@@ -630,7 +581,7 @@ const UsersManagementPage: React.FC = () => {
       const invitation = await invitationService.getCurrentInvitation();
       setCurrentInvitation(invitation);
     } catch (error: any) {
-      console.error("Failed to load current invitation:", error);
+      console.error('Failed to load current invitation:', error);
       // Error loading invitation - set to null
       setCurrentInvitation(null);
     }
@@ -642,25 +593,16 @@ const UsersManagementPage: React.FC = () => {
   useEffect(() => {
     const handleInvitationChange = (event: CustomEvent) => {
       const sseEvent = event.detail;
-      if (
-        sseEvent.type === "invitation_created" ||
-        sseEvent.type === "invitation_deleted"
-      ) {
+      if (sseEvent.type === 'invitation_created' || sseEvent.type === 'invitation_deleted') {
         // 초대링크 상태가 변경되면 현재 초대 정보를 다시 로드
         loadCurrentInvitation();
       }
     };
 
-    window.addEventListener(
-      "invitation-change",
-      handleInvitationChange as EventListener,
-    );
+    window.addEventListener('invitation-change', handleInvitationChange as EventListener);
 
     return () => {
-      window.removeEventListener(
-        "invitation-change",
-        handleInvitationChange as EventListener,
-      );
+      window.removeEventListener('invitation-change', handleInvitationChange as EventListener);
     };
   }, []);
 
@@ -671,7 +613,7 @@ const UsersManagementPage: React.FC = () => {
         const tags = await tagService.list();
         setAvailableTags(tags);
       } catch (error) {
-        console.error("Failed to load tags:", error);
+        console.error('Failed to load tags:', error);
       }
     };
     loadTags();
@@ -682,33 +624,33 @@ const UsersManagementPage: React.FC = () => {
   const availableFilterDefinitions: FilterDefinition[] = useMemo(
     () => [
       {
-        key: "status",
-        label: t("users.statusFilter"),
-        type: "multiselect",
-        operator: "any_of", // Status can be any of the selected values
+        key: 'status',
+        label: t('users.statusFilter'),
+        type: 'multiselect',
+        operator: 'any_of', // Status can be any of the selected values
         allowOperatorToggle: false, // Single-value field, only 'any_of' makes sense
         options: [
-          { value: "active", label: t("users.statuses.active") },
-          { value: "pending", label: t("users.statuses.pending") },
-          { value: "suspended", label: t("users.statuses.suspended") },
+          { value: 'active', label: t('users.statuses.active') },
+          { value: 'pending', label: t('users.statuses.pending') },
+          { value: 'suspended', label: t('users.statuses.suspended') },
         ],
       },
       {
-        key: "role",
-        label: t("users.roleFilter"),
-        type: "multiselect",
-        operator: "any_of", // Role can be any of the selected values
+        key: 'role',
+        label: t('users.roleFilter'),
+        type: 'multiselect',
+        operator: 'any_of', // Role can be any of the selected values
         allowOperatorToggle: false, // Single-value field, only 'any_of' makes sense
         options: [
-          { value: "admin", label: t("users.roles.admin") },
-          { value: "user", label: t("users.roles.user") },
+          { value: 'admin', label: t('users.roles.admin') },
+          { value: 'user', label: t('users.roles.user') },
         ],
       },
       {
-        key: "tags",
-        label: t("common.tags"),
-        type: "tags",
-        operator: "include_all", // Tags are filtered with AND logic in backend
+        key: 'tags',
+        label: t('common.tags'),
+        type: 'tags',
+        operator: 'include_all', // Tags are filtered with AND logic in backend
         allowOperatorToggle: true, // Tags support both 'any_of' and 'include_all'
         options: availableTags.map((tag) => ({
           value: tag.id,
@@ -718,7 +660,7 @@ const UsersManagementPage: React.FC = () => {
         })),
       },
     ],
-    [t, availableTags],
+    [t, availableTags]
   );
 
   // 페이지 로드 시 pageState.filters에서 activeFilters 복원
@@ -736,34 +678,30 @@ const UsersManagementPage: React.FC = () => {
     // status 필터 복원
     if (filters.status) {
       restoredFilters.push({
-        key: "status",
-        value: Array.isArray(filters.status)
-          ? filters.status
-          : [filters.status],
-        label: t("users.statusFilter"),
-        operator: filters.status_operator || "any_of",
+        key: 'status',
+        value: Array.isArray(filters.status) ? filters.status : [filters.status],
+        label: t('users.statusFilter'),
+        operator: filters.status_operator || 'any_of',
       });
     }
 
     // role 필터 복원
     if (filters.role) {
       restoredFilters.push({
-        key: "role",
+        key: 'role',
         value: Array.isArray(filters.role) ? filters.role : [filters.role],
-        label: t("users.roleFilter"),
-        operator: filters.role_operator || "any_of",
+        label: t('users.roleFilter'),
+        operator: filters.role_operator || 'any_of',
       });
     }
 
     // tags 필터 복원
     if (filters.tags) {
       restoredFilters.push({
-        key: "tags",
-        value: Array.isArray(filters.tags)
-          ? filters.tags.map(Number)
-          : [Number(filters.tags)],
-        label: t("common.tags"),
-        operator: filters.tags_operator || "include_all",
+        key: 'tags',
+        value: Array.isArray(filters.tags) ? filters.tags.map(Number) : [Number(filters.tags)],
+        label: t('common.tags'),
+        operator: filters.tags_operator || 'include_all',
       });
     }
 
@@ -780,13 +718,13 @@ const UsersManagementPage: React.FC = () => {
     const filters: Record<string, any> = {};
 
     activeFilters.forEach((filter) => {
-      if (filter.key === "status") {
+      if (filter.key === 'status') {
         filters.status = filter.value;
         filters.status_operator = filter.operator;
-      } else if (filter.key === "role") {
+      } else if (filter.key === 'role') {
         filters.role = filter.value;
         filters.role_operator = filter.operator;
-      } else if (filter.key === "tags") {
+      } else if (filter.key === 'tags') {
         filters.tags = filter.value;
         filters.tags_operator = filter.operator;
       }
@@ -810,18 +748,11 @@ const UsersManagementPage: React.FC = () => {
   };
 
   const handleDynamicFilterChange = (filterKey: string, value: any) => {
-    setActiveFilters(
-      activeFilters.map((f) => (f.key === filterKey ? { ...f, value } : f)),
-    );
+    setActiveFilters(activeFilters.map((f) => (f.key === filterKey ? { ...f, value } : f)));
   };
 
-  const handleOperatorChange = (
-    filterKey: string,
-    operator: "any_of" | "include_all",
-  ) => {
-    setActiveFilters(
-      activeFilters.map((f) => (f.key === filterKey ? { ...f, operator } : f)),
-    );
+  const handleOperatorChange = (filterKey: string, operator: 'any_of' | 'include_all') => {
+    setActiveFilters(activeFilters.map((f) => (f.key === filterKey ? { ...f, operator } : f)));
   };
 
   // 체크박스 핸들러
@@ -845,11 +776,11 @@ const UsersManagementPage: React.FC = () => {
 
   // 일괄 처리 핸들러
   const handleBulkAction = (
-    actionType: "status" | "role" | "tags" | "emailVerified" | "delete",
+    actionType: 'status' | 'role' | 'tags' | 'emailVerified' | 'delete'
   ) => {
     // 오픈 시 값 초기화 (이전에 선택한 값 유지 방지)
     setBulkActionType(actionType);
-    setBulkActionValue("");
+    setBulkActionValue('');
     setBulkActionTags([]);
     setBulkActionDialogOpen(true);
   };
@@ -857,14 +788,14 @@ const UsersManagementPage: React.FC = () => {
   // 일괄 작업 저장 버튼 활성화 조건 확인
   const isBulkActionValid = () => {
     switch (bulkActionType) {
-      case "status":
-      case "role":
-      case "emailVerified":
-        return bulkActionValue !== "";
-      case "tags":
+      case 'status':
+      case 'role':
+      case 'emailVerified':
+        return bulkActionValue !== '';
+      case 'tags':
         // 태그는 빈 배열도 허용 (태그 제거 목적)
         return true;
-      case "delete":
+      case 'delete':
         return true;
       default:
         return false;
@@ -878,50 +809,50 @@ const UsersManagementPage: React.FC = () => {
       const userIds = Array.from(selectedUsers);
 
       switch (bulkActionType) {
-        case "status":
-          await apiService.post("/admin/users/bulk/status", {
+        case 'status':
+          await apiService.post('/admin/users/bulk/status', {
             userIds,
             status: bulkActionValue,
           });
-          enqueueSnackbar(t("users.bulkStatusUpdated"), { variant: "success" });
+          enqueueSnackbar(t('users.bulkStatusUpdated'), { variant: 'success' });
           break;
-        case "role":
-          await apiService.post("/admin/users/bulk/role", {
+        case 'role':
+          await apiService.post('/admin/users/bulk/role', {
             userIds,
             role: bulkActionValue,
           });
-          enqueueSnackbar(t("users.bulkRoleUpdated"), { variant: "success" });
+          enqueueSnackbar(t('users.bulkRoleUpdated'), { variant: 'success' });
           break;
-        case "emailVerified":
-          await apiService.post("/admin/users/bulk/email-verified", {
+        case 'emailVerified':
+          await apiService.post('/admin/users/bulk/email-verified', {
             userIds,
-            emailVerified: bulkActionValue === "true",
+            emailVerified: bulkActionValue === 'true',
           });
-          enqueueSnackbar(t("users.bulkEmailVerifiedUpdated"), {
-            variant: "success",
+          enqueueSnackbar(t('users.bulkEmailVerifiedUpdated'), {
+            variant: 'success',
           });
           break;
-        case "tags":
-          await apiService.post("/admin/users/bulk/tags", {
+        case 'tags':
+          await apiService.post('/admin/users/bulk/tags', {
             userIds,
             tagIds: bulkActionTags.map((tag) => tag.id),
           });
-          enqueueSnackbar(t("users.bulkTagsUpdated"), { variant: "success" });
+          enqueueSnackbar(t('users.bulkTagsUpdated'), { variant: 'success' });
           break;
-        case "delete":
-          await apiService.post("/admin/users/bulk/delete", { userIds });
-          enqueueSnackbar(t("users.bulkDeleted"), { variant: "success" });
+        case 'delete':
+          await apiService.post('/admin/users/bulk/delete', { userIds });
+          enqueueSnackbar(t('users.bulkDeleted'), { variant: 'success' });
           break;
       }
 
       mutateUsers(); // SWR cache 갱신
       setSelectedUsers(new Set());
       setBulkActionDialogOpen(false);
-      setBulkActionValue("");
+      setBulkActionValue('');
       setBulkActionTags([]);
     } catch (error: any) {
-      enqueueSnackbar(error.message || t("users.bulkActionFailed"), {
-        variant: "error",
+      enqueueSnackbar(error.message || t('users.bulkActionFailed'), {
+        variant: 'error',
       });
     }
   };
@@ -929,18 +860,18 @@ const UsersManagementPage: React.FC = () => {
   const handleSuspendUser = (user: User) => {
     setConfirmDialog({
       open: true,
-      title: t("common.suspendUser"),
-      message: t("common.suspendUserConfirm", { name: user.name }),
+      title: t('common.suspendUser'),
+      message: t('common.suspendUserConfirm', { name: user.name }),
       action: async () => {
         if (confirmDialogLoading) return; // Prevent double click
         setConfirmDialogLoading(true);
         try {
           await apiService.post(`/admin/users/${user.id}/suspend`);
-          enqueueSnackbar(t("common.userSuspended"), { variant: "success" });
+          enqueueSnackbar(t('common.userSuspended'), { variant: 'success' });
           mutateUsers(); // SWR cache 갱신
         } catch (error: any) {
-          enqueueSnackbar(error.message || t("common.userSuspendFailed"), {
-            variant: "error",
+          enqueueSnackbar(error.message || t('common.userSuspendFailed'), {
+            variant: 'error',
           });
         } finally {
           setConfirmDialogLoading(false);
@@ -953,18 +884,18 @@ const UsersManagementPage: React.FC = () => {
   const handleActivateUser = (user: User) => {
     setConfirmDialog({
       open: true,
-      title: t("common.activateUser"),
-      message: t("common.activateUserConfirm", { name: user.name }),
+      title: t('common.activateUser'),
+      message: t('common.activateUserConfirm', { name: user.name }),
       action: async () => {
         if (confirmDialogLoading) return; // Prevent double click
         setConfirmDialogLoading(true);
         try {
           await apiService.post(`/admin/users/${user.id}/activate`);
-          enqueueSnackbar(t("common.userActivated"), { variant: "success" });
+          enqueueSnackbar(t('common.userActivated'), { variant: 'success' });
           mutateUsers(); // SWR cache 갱신
         } catch (error: any) {
-          enqueueSnackbar(error.message || t("common.userActivateFailed"), {
-            variant: "error",
+          enqueueSnackbar(error.message || t('common.userActivateFailed'), {
+            variant: 'error',
           });
         } finally {
           setConfirmDialogLoading(false);
@@ -1007,27 +938,19 @@ const UsersManagementPage: React.FC = () => {
 
       // Then set the permissions
       if (promoteDialog.permissions.length > 0) {
-        await apiService.put(
-          `/admin/users/${promoteDialog.user.id}/permissions`,
-          {
-            permissions: promoteDialog.permissions,
-          },
-        );
+        await apiService.put(`/admin/users/${promoteDialog.user.id}/permissions`, {
+          permissions: promoteDialog.permissions,
+        });
       }
 
       // Set environment access
       const promoteAllowAll = Boolean(promoteDialog.allowAllEnvs);
-      await apiService.put(
-        `/admin/users/${promoteDialog.user.id}/environments`,
-        {
-          allowAllEnvironments: promoteAllowAll,
-          environments: promoteAllowAll
-            ? []
-            : promoteDialog.selectedEnvironments,
-        },
-      );
+      await apiService.put(`/admin/users/${promoteDialog.user.id}/environments`, {
+        allowAllEnvironments: promoteAllowAll,
+        environments: promoteAllowAll ? [] : promoteDialog.selectedEnvironments,
+      });
 
-      enqueueSnackbar(t("common.userPromoted"), { variant: "success" });
+      enqueueSnackbar(t('common.userPromoted'), { variant: 'success' });
       mutateUsers();
       setPromoteDialog({
         open: false,
@@ -1039,8 +962,8 @@ const UsersManagementPage: React.FC = () => {
         selectedEnvironments: [],
       });
     } catch (error: any) {
-      enqueueSnackbar(error.message || t("common.userPromoteFailed"), {
-        variant: "error",
+      enqueueSnackbar(error.message || t('common.userPromoteFailed'), {
+        variant: 'error',
       });
       setPromoteDialog((prev) => ({ ...prev, loading: false }));
     }
@@ -1061,18 +984,18 @@ const UsersManagementPage: React.FC = () => {
   const handleDemoteUser = (user: User) => {
     setConfirmDialog({
       open: true,
-      title: t("common.demoteUser"),
-      message: t("common.demoteUserConfirm", { name: user.name }),
+      title: t('common.demoteUser'),
+      message: t('common.demoteUserConfirm', { name: user.name }),
       action: async () => {
         if (confirmDialogLoading) return; // Prevent double click
         setConfirmDialogLoading(true);
         try {
           await apiService.post(`/admin/users/${user.id}/demote`);
-          enqueueSnackbar(t("common.userDemoted"), { variant: "success" });
+          enqueueSnackbar(t('common.userDemoted'), { variant: 'success' });
           mutateUsers(); // SWR cache 갱신
         } catch (error: any) {
-          enqueueSnackbar(error.message || t("common.userDemoteFailed"), {
-            variant: "error",
+          enqueueSnackbar(error.message || t('common.userDemoteFailed'), {
+            variant: 'error',
           });
         } finally {
           setConfirmDialogLoading(false);
@@ -1096,28 +1019,28 @@ const UsersManagementPage: React.FC = () => {
     if (!selectedUser) return;
 
     switch (action) {
-      case "edit":
+      case 'edit':
         handleEditUser(selectedUser);
         break;
-      case "suspend":
+      case 'suspend':
         handleSuspendUser(selectedUser);
         break;
-      case "activate":
+      case 'activate':
         handleActivateUser(selectedUser);
         break;
-      case "promote":
+      case 'promote':
         handlePromoteUser(selectedUser);
         break;
-      case "demote":
+      case 'demote':
         handleDemoteUser(selectedUser);
         break;
-      case "delete":
+      case 'delete':
         handleDeleteUser(selectedUser);
         break;
-      case "verifyEmail":
+      case 'verifyEmail':
         handleVerifyUserEmail(selectedUser.id);
         break;
-      case "resendVerification":
+      case 'resendVerification':
         handleResendVerificationEmail(selectedUser.id);
         break;
     }
@@ -1138,8 +1061,8 @@ const UsersManagementPage: React.FC = () => {
     });
     setEditUserTags(user.tags || []);
     setEditUserErrors({
-      name: "",
-      email: "",
+      name: '',
+      email: '',
     });
 
     // Load environment access from user data (already included in list response)
@@ -1149,7 +1072,7 @@ const UsersManagementPage: React.FC = () => {
     // Load user permissions
     let loadedPermissions: Permission[] = [];
     setEditUserPermissions([]);
-    if (user.role === "admin") {
+    if (user.role === 'admin') {
       setPermissionsLoading(true);
       try {
         const response = await apiService.get<{
@@ -1159,7 +1082,7 @@ const UsersManagementPage: React.FC = () => {
         loadedPermissions = response.data?.permissions || [];
         setEditUserPermissions(loadedPermissions);
       } catch (error) {
-        console.error("Failed to load user permissions:", error);
+        console.error('Failed to load user permissions:', error);
         setEditUserPermissions([]);
       } finally {
         setPermissionsLoading(false);
@@ -1186,15 +1109,15 @@ const UsersManagementPage: React.FC = () => {
 
   const validateEditUserForm = () => {
     const errors = {
-      name: "",
-      email: "",
+      name: '',
+      email: '',
     };
 
     if (!editUserData.name.trim()) {
-      errors.name = t("users.form.nameRequired");
+      errors.name = t('users.form.nameRequired');
     }
     if (!editUserData.email.trim()) {
-      errors.email = t("users.form.emailRequired");
+      errors.email = t('users.form.emailRequired');
     }
 
     setEditUserErrors(errors);
@@ -1235,7 +1158,7 @@ const UsersManagementPage: React.FC = () => {
 
     if (editUserData.name !== originalUserData.name) {
       changes.push({
-        field: t("users.name"),
+        field: t('users.name'),
         from: originalUserData.name,
         to: editUserData.name,
       });
@@ -1244,21 +1167,21 @@ const UsersManagementPage: React.FC = () => {
     if (!isOwnAccount) {
       if (editUserData.email !== originalUserData.email) {
         changes.push({
-          field: t("users.email"),
+          field: t('users.email'),
           from: originalUserData.email,
           to: editUserData.email,
         });
       }
       if (editUserData.role !== originalUserData.role) {
         changes.push({
-          field: t("users.role"),
+          field: t('users.role'),
           from: t(`users.roles.${originalUserData.role}`),
           to: t(`users.roles.${editUserData.role}`),
         });
       }
       if (editUserData.status !== originalUserData.status) {
         changes.push({
-          field: t("users.status"),
+          field: t('users.status'),
           from: t(`users.statuses.${originalUserData.status}`),
           to: t(`users.statuses.${editUserData.status}`),
         });
@@ -1269,15 +1192,15 @@ const UsersManagementPage: React.FC = () => {
         originalUserData.tags
           .map((tag) => tag.name)
           .sort()
-          .join(", ") || "-";
+          .join(', ') || '-';
       const newTagNames =
         editUserTags
           .map((tag) => tag.name)
           .sort()
-          .join(", ") || "-";
+          .join(', ') || '-';
       if (origTagNames !== newTagNames) {
         changes.push({
-          field: t("users.tags"),
+          field: t('users.tags'),
           from: origTagNames,
           to: newTagNames,
         });
@@ -1286,17 +1209,13 @@ const UsersManagementPage: React.FC = () => {
       // Environment access
       if (editUserAllowAllEnvs !== originalUserData.allowAllEnvs) {
         changes.push({
-          field: t("users.environmentAccess"),
-          from: originalUserData.allowAllEnvs
-            ? t("common.all")
-            : t("users.specificEnvironments"),
-          to: editUserAllowAllEnvs
-            ? t("common.all")
-            : t("users.specificEnvironments"),
+          field: t('users.environmentAccess'),
+          from: originalUserData.allowAllEnvs ? t('common.all') : t('users.specificEnvironments'),
+          to: editUserAllowAllEnvs ? t('common.all') : t('users.specificEnvironments'),
         });
       } else if (!editUserAllowAllEnvs) {
-        const origEnvs = originalUserData.selectedEnvironments.sort().join(",");
-        const newEnvs = editUserEnvIds.sort().join(",");
+        const origEnvs = originalUserData.selectedEnvironments.sort().join(',');
+        const newEnvs = editUserEnvIds.sort().join(',');
         if (origEnvs !== newEnvs) {
           const getEnvNames = (ids: string[]) =>
             ids
@@ -1304,9 +1223,9 @@ const UsersManagementPage: React.FC = () => {
                 const env = environments.find((e) => e.environment === id);
                 return env?.displayName || env?.environmentName || id;
               })
-              .join(", ") || "-";
+              .join(', ') || '-';
           changes.push({
-            field: t("users.environmentAccess"),
+            field: t('users.environmentAccess'),
             from: getEnvNames(originalUserData.selectedEnvironments),
             to: getEnvNames(editUserEnvIds),
           });
@@ -1314,57 +1233,53 @@ const UsersManagementPage: React.FC = () => {
       }
 
       // Permissions (only for admin role)
-      if (editUserData.role === "admin") {
-        const origPerms = [...originalUserData.permissions].sort().join(",");
-        const newPerms = [...editUserPermissions].sort().join(",");
+      if (editUserData.role === 'admin') {
+        const origPerms = [...originalUserData.permissions].sort().join(',');
+        const newPerms = [...editUserPermissions].sort().join(',');
         if (origPerms !== newPerms) {
           const addedPerms = editUserPermissions.filter(
-            (p) => !originalUserData.permissions.includes(p),
+            (p) => !originalUserData.permissions.includes(p)
           );
           const removedPerms = originalUserData.permissions.filter(
-            (p) => !editUserPermissions.includes(p),
+            (p) => !editUserPermissions.includes(p)
           );
 
           // Build change description - if original is 0, just show "added", not "0 -> X"
           const origCount = originalUserData.permissions.length;
           const newCount = editUserPermissions.length;
 
-          let fromText = "";
-          let toText = "";
+          let fromText = '';
+          let toText = '';
 
           if (origCount === 0 && addedPerms.length > 0) {
             // No previous permissions - just show what's being added
-            fromText = "-";
-            toText = `${newCount} ${t("users.permissionsCount")} (+${addedPerms.length} ${t("users.added")})`;
+            fromText = '-';
+            toText = `${newCount} ${t('users.permissionsCount')} (+${addedPerms.length} ${t('users.added')})`;
           } else if (newCount === 0 && removedPerms.length > 0) {
             // All permissions removed
-            fromText = `${origCount} ${t("users.permissionsCount")}`;
-            toText = `- (-${removedPerms.length} ${t("users.removed")})`;
+            fromText = `${origCount} ${t('users.permissionsCount')}`;
+            toText = `- (-${removedPerms.length} ${t('users.removed')})`;
           } else {
             // Mixed changes
-            let permChange = "";
+            let permChange = '';
             if (addedPerms.length > 0) {
-              permChange += `+${addedPerms.length} ${t("users.added")}`;
+              permChange += `+${addedPerms.length} ${t('users.added')}`;
             }
             if (removedPerms.length > 0) {
-              if (permChange) permChange += ", ";
-              permChange += `-${removedPerms.length} ${t("users.removed")}`;
+              if (permChange) permChange += ', ';
+              permChange += `-${removedPerms.length} ${t('users.removed')}`;
             }
-            fromText = `${origCount} ${t("users.permissionsCount")}`;
-            toText = `${newCount} ${t("users.permissionsCount")} (${permChange})`;
+            fromText = `${origCount} ${t('users.permissionsCount')}`;
+            toText = `${newCount} ${t('users.permissionsCount')} (${permChange})`;
           }
 
           changes.push({
-            field: t("users.permissions"),
+            field: t('users.permissions'),
             from: fromText,
             to: toText,
             details: {
-              added: addedPerms.map((p) =>
-                t(`permissions.${p.replace(".", "_")}`),
-              ),
-              removed: removedPerms.map((p) =>
-                t(`permissions.${p.replace(".", "_")}`),
-              ),
+              added: addedPerms.map((p) => t(`permissions.${p.replace('.', '_')}`)),
+              removed: removedPerms.map((p) => t(`permissions.${p.replace('.', '_')}`)),
               addedKeys: addedPerms,
               removedKeys: removedPerms,
             },
@@ -1388,51 +1303,38 @@ const UsersManagementPage: React.FC = () => {
         const updateData = {
           name: editUserData.name,
         };
-        await apiService.put(
-          `/admin/users/${editUserDialog.user.id}`,
-          updateData,
-        );
+        await apiService.put(`/admin/users/${editUserDialog.user.id}`, updateData);
       } else {
         // For other users, allow all changes including tags
         const updateData = {
           ...editUserData,
           tagIds: editUserTags.map((tag) => tag.id),
         };
-        await apiService.put(
-          `/admin/users/${editUserDialog.user.id}`,
-          updateData,
-        );
+        await apiService.put(`/admin/users/${editUserDialog.user.id}`, updateData);
 
         // Update environment access separately
         const allowAll = Boolean(editUserAllowAllEnvs);
-        await apiService.put(
-          `/admin/users/${editUserDialog.user.id}/environments`,
-          {
-            allowAllEnvironments: allowAll,
-            environments: allowAll ? [] : editUserEnvIds,
-          },
-        );
+        await apiService.put(`/admin/users/${editUserDialog.user.id}/environments`, {
+          allowAllEnvironments: allowAll,
+          environments: allowAll ? [] : editUserEnvIds,
+        });
 
         // Update permissions for admin users
-        if (editUserData.role === "admin") {
-          await apiService.put(
-            `/admin/users/${editUserDialog.user.id}/permissions`,
-            {
-              permissions: editUserPermissions,
-            },
-          );
+        if (editUserData.role === 'admin') {
+          await apiService.put(`/admin/users/${editUserDialog.user.id}/permissions`, {
+            permissions: editUserPermissions,
+          });
         }
       }
 
-      enqueueSnackbar(t("users.userUpdated"), { variant: "success" });
+      enqueueSnackbar(t('users.userUpdated'), { variant: 'success' });
       mutateUsers(); // SWR cache 갱신
       setReviewDialog({ open: false, saving: false });
       setEditUserDialog({ open: false, user: null });
     } catch (error: any) {
       // API 오류 응답에서 구체적인 메시지 추출
-      const errorMessage =
-        error.error?.message || error.message || t("users.updateError");
-      enqueueSnackbar(errorMessage, { variant: "error" });
+      const errorMessage = error.error?.message || error.message || t('users.updateError');
+      enqueueSnackbar(errorMessage, { variant: 'error' });
       setReviewDialog((prev) => ({ ...prev, saving: false }));
     }
   };
@@ -1440,14 +1342,14 @@ const UsersManagementPage: React.FC = () => {
   const handleDeleteUser = (user: User) => {
     // Prevent deleting own account
     if (isCurrentUser(user)) {
-      enqueueSnackbar(t("users.cannotModifyOwnAccount"), { variant: "error" });
+      enqueueSnackbar(t('users.cannotModifyOwnAccount'), { variant: 'error' });
       return;
     }
 
     setDeleteConfirmDialog({
       open: true,
       user,
-      inputValue: "",
+      inputValue: '',
     });
   };
 
@@ -1458,14 +1360,13 @@ const UsersManagementPage: React.FC = () => {
     ) {
       try {
         await apiService.delete(`/admin/users/${deleteConfirmDialog.user.id}`);
-        enqueueSnackbar(t("users.userDeleted"), { variant: "success" });
+        enqueueSnackbar(t('users.userDeleted'), { variant: 'success' });
         mutateUsers(); // SWR cache 갱신
-        setDeleteConfirmDialog({ open: false, user: null, inputValue: "" });
+        setDeleteConfirmDialog({ open: false, user: null, inputValue: '' });
       } catch (error: any) {
         // API 오류 응답에서 구체적인 메시지 추출
-        const errorMessage =
-          error.error?.message || error.message || t("users.deleteError");
-        enqueueSnackbar(errorMessage, { variant: "error" });
+        const errorMessage = error.error?.message || error.message || t('users.deleteError');
+        enqueueSnackbar(errorMessage, { variant: 'error' });
       }
     }
   };
@@ -1475,7 +1376,7 @@ const UsersManagementPage: React.FC = () => {
     try {
       setEmailVerificationLoading(true);
       await UserService.verifyUserEmail(userId);
-      enqueueSnackbar(t("users.emailVerified"), { variant: "success" });
+      enqueueSnackbar(t('users.emailVerified'), { variant: 'success' });
       mutateUsers(); // SWR cache 갱신
       // 편집 폼이 열려있다면 데이터 업데이트
       if (editUserDialog.open && editUserDialog.user?.id === userId) {
@@ -1485,8 +1386,8 @@ const UsersManagementPage: React.FC = () => {
         }));
       }
     } catch (error: any) {
-      const errorMessage = error.message || t("users.emailVerificationError");
-      enqueueSnackbar(errorMessage, { variant: "error" });
+      const errorMessage = error.message || t('users.emailVerificationError');
+      enqueueSnackbar(errorMessage, { variant: 'error' });
     } finally {
       setEmailVerificationLoading(false);
     }
@@ -1497,10 +1398,10 @@ const UsersManagementPage: React.FC = () => {
     try {
       setEmailVerificationLoading(true);
       await UserService.resendVerificationEmail(userId);
-      enqueueSnackbar(t("users.verificationEmailSent"), { variant: "success" });
+      enqueueSnackbar(t('users.verificationEmailSent'), { variant: 'success' });
     } catch (error: any) {
-      const errorMessage = error.message || t("users.verificationEmailError");
-      enqueueSnackbar(errorMessage, { variant: "error" });
+      const errorMessage = error.message || t('users.verificationEmailError');
+      enqueueSnackbar(errorMessage, { variant: 'error' });
     } finally {
       setEmailVerificationLoading(false);
     }
@@ -1509,10 +1410,10 @@ const UsersManagementPage: React.FC = () => {
   const handleAddUser = () => {
     // 폼 데이터 초기화
     setNewUserData({
-      name: "",
-      email: "",
-      password: "",
-      role: "user",
+      name: '',
+      email: '',
+      password: '',
+      role: 'user',
     });
     setNewUserTags([]);
     setNewUserAllowAllEnvs(false);
@@ -1523,10 +1424,10 @@ const UsersManagementPage: React.FC = () => {
     // 브라우저 자동완성을 방지하기 위해 약간의 지연 후 다시 초기화
     setTimeout(() => {
       setNewUserData({
-        name: "",
-        email: "",
-        password: "",
-        role: "user",
+        name: '',
+        email: '',
+        password: '',
+        role: 'user',
       });
       setNewUserTags([]);
     }, 100);
@@ -1536,37 +1437,37 @@ const UsersManagementPage: React.FC = () => {
     setAddUserDialog(false);
     setShowPassword(false);
     setNewUserData({
-      name: "",
-      email: "",
-      password: "",
-      role: "user",
+      name: '',
+      email: '',
+      password: '',
+      role: 'user',
     });
     setNewUserTags([]);
     setNewUserAllowAllEnvs(false);
     setNewUserEnvIds([]);
     setNewUserPermissions([]);
     setNewUserErrors({
-      name: "",
-      email: "",
-      password: "",
+      name: '',
+      email: '',
+      password: '',
     });
   };
 
   const validateNewUserForm = () => {
     const errors = {
-      name: "",
-      email: "",
-      password: "",
+      name: '',
+      email: '',
+      password: '',
     };
 
     if (!newUserData.name.trim()) {
-      errors.name = t("users.form.nameRequired");
+      errors.name = t('users.form.nameRequired');
     }
     if (!newUserData.email.trim()) {
-      errors.email = t("users.form.emailRequired");
+      errors.email = t('users.form.emailRequired');
     }
     if (!newUserData.password.trim()) {
-      errors.password = t("users.form.passwordRequired");
+      errors.password = t('users.form.passwordRequired');
     }
 
     setNewUserErrors(errors);
@@ -1586,31 +1487,23 @@ const UsersManagementPage: React.FC = () => {
         allowAllEnvironments: newUserAllowAllEnvs,
         environments: newUserAllowAllEnvs ? [] : newUserEnvIds,
       };
-      const response = await apiService.post<{ user: User }>(
-        "/admin/users",
-        userData,
-      );
+      const response = await apiService.post<{ user: User }>('/admin/users', userData);
       const createdUser = response.data?.user;
 
       // Set permissions for admin users after creation
-      if (
-        createdUser &&
-        newUserData.role === "admin" &&
-        newUserPermissions.length > 0
-      ) {
+      if (createdUser && newUserData.role === 'admin' && newUserPermissions.length > 0) {
         await apiService.put(`/admin/users/${createdUser.id}/permissions`, {
           permissions: newUserPermissions,
         });
       }
 
-      enqueueSnackbar(t("users.userCreated"), { variant: "success" });
+      enqueueSnackbar(t('users.userCreated'), { variant: 'success' });
       mutateUsers(); // SWR cache 갱신
       handleCloseAddUserDialog();
     } catch (error: any) {
       // API 오류 응답에서 구체적인 메시지 추출
-      const errorMessage =
-        error.error?.message || error.message || t("users.createError");
-      enqueueSnackbar(errorMessage, { variant: "error" });
+      const errorMessage = error.error?.message || error.message || t('users.createError');
+      enqueueSnackbar(errorMessage, { variant: 'error' });
     }
   };
 
@@ -1622,9 +1515,9 @@ const UsersManagementPage: React.FC = () => {
       await loadCurrentInvitation(); // 현재 초대 정보 새로고침
       // 성공 토스트는 SSE 이벤트에서 처리 (중복 방지)
     } catch (error: any) {
-      console.error("Failed to create invitation:", error);
-      enqueueSnackbar(error.message || "초대 링크 생성에 실패했습니다.", {
-        variant: "error",
+      console.error('Failed to create invitation:', error);
+      enqueueSnackbar(error.message || '초대 링크 생성에 실패했습니다.', {
+        variant: 'error',
       });
     }
   };
@@ -1637,9 +1530,9 @@ const UsersManagementPage: React.FC = () => {
       setCurrentInvitation(null);
       // 성공 토스트는 SSE 이벤트에서 처리 (중복 방지)
     } catch (error: any) {
-      console.error("Failed to delete invitation:", error);
-      enqueueSnackbar(error.message || "초대 링크 삭제에 실패했습니다.", {
-        variant: "error",
+      console.error('Failed to delete invitation:', error);
+      enqueueSnackbar(error.message || '초대 링크 삭제에 실패했습니다.', {
+        variant: 'error',
       });
     }
   };
@@ -1651,15 +1544,15 @@ const UsersManagementPage: React.FC = () => {
   // Column configuration handlers
   const handleToggleColumnVisibility = (columnId: string) => {
     const newColumns = columns.map((col) =>
-      col.id === columnId ? { ...col, visible: !col.visible } : col,
+      col.id === columnId ? { ...col, visible: !col.visible } : col
     );
     setColumns(newColumns);
-    localStorage.setItem("usersColumns", JSON.stringify(newColumns));
+    localStorage.setItem('usersColumns', JSON.stringify(newColumns));
   };
 
   const handleResetColumns = () => {
     setColumns(defaultColumns);
-    localStorage.setItem("usersColumns", JSON.stringify(defaultColumns));
+    localStorage.setItem('usersColumns', JSON.stringify(defaultColumns));
   };
 
   const handleColumnDragEnd = (event: DragEndEvent) => {
@@ -1671,28 +1564,26 @@ const UsersManagementPage: React.FC = () => {
 
       const newColumns = arrayMove(columns, oldIndex, newIndex);
       setColumns(newColumns);
-      localStorage.setItem("usersColumns", JSON.stringify(newColumns));
+      localStorage.setItem('usersColumns', JSON.stringify(newColumns));
     }
   };
 
   // Render cell content based on column ID
   const renderCellContent = (user: User, columnId: string) => {
     switch (columnId) {
-      case "user":
+      case 'user':
         return (
-          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-            <Avatar src={user.avatarUrl}>
-              {user.name?.charAt(0).toUpperCase()}
-            </Avatar>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Avatar src={user.avatarUrl}>{user.name?.charAt(0).toUpperCase()}</Avatar>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <Typography
                 variant="body2"
                 sx={{
                   fontWeight: 500,
-                  cursor: "pointer",
-                  "&:hover": {
-                    color: "primary.main",
-                    textDecoration: "underline",
+                  cursor: 'pointer',
+                  '&:hover': {
+                    color: 'primary.main',
+                    textDecoration: 'underline',
                   },
                 }}
                 onClick={() => handleEditUser(user)}
@@ -1701,46 +1592,36 @@ const UsersManagementPage: React.FC = () => {
               </Typography>
               <IconButton
                 size="small"
-                onClick={() => copyToClipboard(user.name, "name")}
-                sx={{ opacity: 0.7, "&:hover": { opacity: 1 } }}
+                onClick={() => copyToClipboard(user.name, 'name')}
+                sx={{ opacity: 0.7, '&:hover': { opacity: 1 } }}
               >
                 <ContentCopyIcon fontSize="small" />
               </IconButton>
             </Box>
           </Box>
         );
-      case "email":
+      case 'email':
         return (
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <Typography variant="body2">{user.email}</Typography>
             <IconButton
               size="small"
-              onClick={() => copyToClipboard(user.email, "email")}
-              sx={{ opacity: 0.7, "&:hover": { opacity: 1 } }}
+              onClick={() => copyToClipboard(user.email, 'email')}
+              sx={{ opacity: 0.7, '&:hover': { opacity: 1 } }}
             >
               <ContentCopyIcon fontSize="small" />
             </IconButton>
           </Box>
         );
-      case "emailVerified":
+      case 'emailVerified':
         return user.emailVerified ? (
-          <Chip
-            label={t("users.verified")}
-            color="success"
-            size="small"
-            variant="outlined"
-          />
+          <Chip label={t('users.verified')} color="success" size="small" variant="outlined" />
         ) : (
-          <Chip
-            label={t("users.unverified")}
-            color="warning"
-            size="small"
-            variant="outlined"
-          />
+          <Chip label={t('users.unverified')} color="warning" size="small" variant="outlined" />
         );
-      case "role":
+      case 'role':
         return <RoleChipWithTooltip user={user} />;
-      case "status":
+      case 'status':
         return (
           <Chip
             label={t(`users.statuses.${user.status}`)}
@@ -1748,7 +1629,7 @@ const UsersManagementPage: React.FC = () => {
             size="small"
           />
         );
-      case "environments": {
+      case 'environments': {
         const userWithEnv = user as User & {
           allowAllEnvironments?: boolean;
           environments?: string[];
@@ -1756,7 +1637,7 @@ const UsersManagementPage: React.FC = () => {
         if (userWithEnv.allowAllEnvironments) {
           return (
             <Chip
-              label={t("users.allEnvironments")}
+              label={t('users.allEnvironments')}
               color="warning"
               size="small"
               sx={{ borderRadius: 0 }}
@@ -1767,12 +1648,12 @@ const UsersManagementPage: React.FC = () => {
         if (userEnvIds.length === 0) {
           return (
             <Typography variant="body2" color="text.secondary">
-              {t("users.noEnvironments")}
+              {t('users.noEnvironments')}
             </Typography>
           );
         }
         return (
-          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
             {userEnvIds.slice(0, 3).map((envName) => {
               const env = environments.find((e) => e.environment === envName);
               return (
@@ -1782,25 +1663,21 @@ const UsersManagementPage: React.FC = () => {
                   size="small"
                   sx={{
                     borderRadius: 0,
-                    bgcolor: env?.color || "#666",
-                    color: "#fff",
+                    bgcolor: env?.color || '#666',
+                    color: '#fff',
                   }}
                 />
               );
             })}
             {userEnvIds.length > 3 && (
-              <Chip
-                label={`+${userEnvIds.length - 3}`}
-                size="small"
-                sx={{ borderRadius: 0 }}
-              />
+              <Chip label={`+${userEnvIds.length - 3}`} size="small" sx={{ borderRadius: 0 }} />
             )}
           </Box>
         );
       }
-      case "tags":
+      case 'tags':
         return (
-          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
             {user.tags &&
               user.tags.length > 0 &&
               user.tags.map((tag: any) => (
@@ -1818,16 +1695,12 @@ const UsersManagementPage: React.FC = () => {
               ))}
           </Box>
         );
-      case "joinDate":
+      case 'joinDate':
+        return <Typography variant="body2">{formatRelativeTime(user.createdAt)}</Typography>;
+      case 'lastLogin':
         return (
           <Typography variant="body2">
-            {formatRelativeTime(user.createdAt)}
-          </Typography>
-        );
-      case "lastLogin":
-        return (
-          <Typography variant="body2">
-            {user.lastLoginAt ? formatRelativeTime(user.lastLoginAt) : "-"}
+            {user.lastLoginAt ? formatRelativeTime(user.lastLoginAt) : '-'}
           </Typography>
         );
       default:
@@ -1837,19 +1710,19 @@ const UsersManagementPage: React.FC = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "active":
-        return "success";
-      case "pending":
-        return "warning";
-      case "suspended":
-        return "error";
+      case 'active':
+        return 'success';
+      case 'pending':
+        return 'warning';
+      case 'suspended':
+        return 'error';
       default:
-        return "default";
+        return 'default';
     }
   };
 
   const getRoleColor = (role: string) => {
-    return role === "admin" ? "primary" : "secondary";
+    return role === 'admin' ? 'primary' : 'secondary';
   };
 
   // Show loading while auth is loading
@@ -1857,10 +1730,10 @@ const UsersManagementPage: React.FC = () => {
     return (
       <Box
         sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          minHeight: "50vh",
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '50vh',
         }}
       >
         <CircularProgress />
@@ -1874,32 +1747,28 @@ const UsersManagementPage: React.FC = () => {
       <Box
         sx={{
           mb: 3,
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
         }}
       >
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <PeopleIcon sx={{ fontSize: 32, color: "primary.main" }} />
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <PeopleIcon sx={{ fontSize: 32, color: 'primary.main' }} />
           <Box>
             <Typography variant="h5" sx={{ fontWeight: 700 }}>
-              {t("users.title")}
+              {t('users.title')}
             </Typography>
             <Typography variant="caption" color="text.secondary">
-              {t("users.subtitle")}
+              {t('users.subtitle')}
             </Typography>
           </Box>
         </Box>
 
         {/* 버튼 그룹 */}
         {canManage && (
-          <Box sx={{ display: "flex", gap: 1 }}>
-            <Button
-              variant="contained"
-              startIcon={<PersonAddIcon />}
-              onClick={handleAddUser}
-            >
-              {t("users.addUser")}
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <Button variant="contained" startIcon={<PersonAddIcon />} onClick={handleAddUser}>
+              {t('users.addUser')}
             </Button>
             <Button
               variant="outlined"
@@ -1907,7 +1776,7 @@ const UsersManagementPage: React.FC = () => {
               onClick={() => setInvitationDialogOpen(true)}
               disabled={!!currentInvitation}
             >
-              {t("invitations.createInvitation")}
+              {t('invitations.createInvitation')}
             </Button>
           </Box>
         )}
@@ -1918,54 +1787,52 @@ const UsersManagementPage: React.FC = () => {
         <CardContent>
           <Box
             sx={{
-              display: "flex",
+              display: 'flex',
               gap: 2,
-              alignItems: "center",
-              flexWrap: "wrap",
+              alignItems: 'center',
+              flexWrap: 'wrap',
             }}
           >
             {/* Search */}
             <TextField
-              placeholder={t("users.searchPlaceholder")}
+              placeholder={t('users.searchPlaceholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               sx={{
                 minWidth: 200,
                 flexGrow: 1,
                 maxWidth: 320,
-                "& .MuiOutlinedInput-root": {
-                  height: "40px",
-                  borderRadius: "20px",
-                  bgcolor: "background.paper",
-                  transition: "all 0.2s ease-in-out",
-                  "& fieldset": {
-                    borderColor: "divider",
+                '& .MuiOutlinedInput-root': {
+                  height: '40px',
+                  borderRadius: '20px',
+                  bgcolor: 'background.paper',
+                  transition: 'all 0.2s ease-in-out',
+                  '& fieldset': {
+                    borderColor: 'divider',
                   },
-                  "&:hover": {
-                    bgcolor: "action.hover",
-                    "& fieldset": {
-                      borderColor: "primary.light",
+                  '&:hover': {
+                    bgcolor: 'action.hover',
+                    '& fieldset': {
+                      borderColor: 'primary.light',
                     },
                   },
-                  "&.Mui-focused": {
-                    bgcolor: "background.paper",
-                    boxShadow: "0 0 0 2px rgba(25, 118, 210, 0.1)",
-                    "& fieldset": {
-                      borderColor: "primary.main",
-                      borderWidth: "1px",
+                  '&.Mui-focused': {
+                    bgcolor: 'background.paper',
+                    boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
+                    '& fieldset': {
+                      borderColor: 'primary.main',
+                      borderWidth: '1px',
                     },
                   },
                 },
-                "& .MuiInputBase-input": {
-                  fontSize: "0.875rem",
+                '& .MuiInputBase-input': {
+                  fontSize: '0.875rem',
                 },
               }}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <SearchIcon
-                      sx={{ color: "text.secondary", fontSize: 20 }}
-                    />
+                    <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
                   </InputAdornment>
                 ),
               }}
@@ -1975,10 +1842,10 @@ const UsersManagementPage: React.FC = () => {
             {/* Dynamic Filter Bar */}
             <Box
               sx={{
-                display: "flex",
-                flexWrap: "wrap",
+                display: 'flex',
+                flexWrap: 'wrap',
                 gap: 1,
-                alignItems: "center",
+                alignItems: 'center',
               }}
             >
               <DynamicFilterBar
@@ -1991,15 +1858,15 @@ const UsersManagementPage: React.FC = () => {
               />
 
               {/* Column Settings Button */}
-              <Tooltip title={t("users.columnSettings")}>
+              <Tooltip title={t('users.columnSettings')}>
                 <IconButton
                   onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
                   sx={{
-                    bgcolor: "background.paper",
+                    bgcolor: 'background.paper',
                     border: 1,
-                    borderColor: "divider",
-                    "&:hover": {
-                      bgcolor: "action.hover",
+                    borderColor: 'divider',
+                    '&:hover': {
+                      bgcolor: 'action.hover',
                     },
                   }}
                 >
@@ -2017,71 +1884,68 @@ const UsersManagementPage: React.FC = () => {
           sx={{
             mb: 2,
             bgcolor: (theme) =>
-              theme.palette.mode === "dark"
-                ? "rgba(110, 168, 255, 0.08)"
-                : "rgba(25, 118, 210, 0.04)",
+              theme.palette.mode === 'dark'
+                ? 'rgba(110, 168, 255, 0.08)'
+                : 'rgba(25, 118, 210, 0.04)',
           }}
         >
           <CardContent sx={{ py: 1 }}>
             <Box
               sx={{
-                display: "flex",
-                alignItems: "center",
+                display: 'flex',
+                alignItems: 'center',
                 gap: 2,
-                justifyContent: "space-between",
+                justifyContent: 'space-between',
               }}
             >
-              <Typography
-                variant="body2"
-                sx={{ fontWeight: 600, color: "primary.main" }}
-              >
-                {selectedUsers.size} {t("users.selectedUsers")}
+              <Typography variant="body2" sx={{ fontWeight: 600, color: 'primary.main' }}>
+                {selectedUsers.size} {t('users.selectedUsers')}
               </Typography>
-              <Box sx={{ display: "flex", gap: 1 }}>
+              <Box sx={{ display: 'flex', gap: 1 }}>
                 <Button
                   size="small"
                   variant="contained"
                   color="primary"
-                  onClick={() => handleBulkAction("status")}
+                  onClick={() => handleBulkAction('status')}
                   startIcon={<PersonIcon />}
                 >
-                  {t("users.bulkUpdateStatus")}
+                  {t('users.bulkUpdateStatus')}
                 </Button>
                 <Button
                   size="small"
                   variant="contained"
                   color="primary"
-                  onClick={() => handleBulkAction("role")}
+                  onClick={() => handleBulkAction('role')}
                   startIcon={<AdminIcon />}
                 >
-                  {t("users.bulkUpdateRole")}
+                  {t('users.bulkUpdateRole')}
                 </Button>
                 <Button
                   size="small"
                   variant="contained"
                   color="primary"
-                  onClick={() => handleBulkAction("emailVerified")}
+                  onClick={() => handleBulkAction('emailVerified')}
                   startIcon={<CheckCircleIcon />}
                 >
-                  {t("users.bulkVerifyEmail")}
+                  {t('users.bulkVerifyEmail')}
                 </Button>
                 <Button
                   size="small"
                   variant="contained"
                   color="primary"
-                  onClick={() => handleBulkAction("tags")}
+                  onClick={() => handleBulkAction('tags')}
                   startIcon={<TagIcon />}
                 >
-                  {t("users.bulkUpdateTags")}
+                  {t('users.bulkUpdateTags')}
                 </Button>
                 <Button
                   size="small"
                   variant="contained"
                   color="error"
-                  onClick={() => handleBulkAction("delete")}
+                  onClick={() => handleBulkAction('delete')}
                   startIcon={<DeleteIcon />}
                 >
-                  {t("users.bulkDelete")}
+                  {t('users.bulkDelete')}
                 </Button>
               </Box>
             </Box>
@@ -2099,43 +1963,37 @@ const UsersManagementPage: React.FC = () => {
       )}
 
       {/* Users Table */}
-      <Card sx={{ position: "relative" }}>
-        <CardContent sx={{ p: 0, "&:last-child": { pb: 0 } }}>
+      <Card sx={{ position: 'relative' }}>
+        <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
           {isInitialLoad && loading ? (
-            <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
-              <Typography color="text.secondary">
-                {t("common.loadingUsers")}
-              </Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
+              <Typography color="text.secondary">{t('common.loadingUsers')}</Typography>
             </Box>
           ) : users.length === 0 ? (
             <EmptyState
-              message={t("users.noUsersFound")}
-              subtitle={canManage ? t("common.addFirstItem") : undefined}
+              message={t('users.noUsersFound')}
+              subtitle={canManage ? t('common.addFirstItem') : undefined}
               onAddClick={canManage ? handleAddUser : undefined}
-              addButtonLabel={t("users.addUser")}
+              addButtonLabel={t('users.addUser')}
             />
           ) : (
             <>
               <TableContainer
                 style={{
                   opacity: !isInitialLoad && loading ? 0.5 : 1,
-                  transition: "opacity 0.15s ease-in-out",
-                  pointerEvents: !isInitialLoad && loading ? "none" : "auto",
+                  transition: 'opacity 0.15s ease-in-out',
+                  pointerEvents: !isInitialLoad && loading ? 'none' : 'auto',
                 }}
               >
-                <Table sx={{ tableLayout: "auto" }}>
+                <Table sx={{ tableLayout: 'auto' }}>
                   <TableHead>
                     <TableRow>
                       <TableCell padding="checkbox">
                         <Checkbox
                           indeterminate={
-                            selectedUsers.size > 0 &&
-                            selectedUsers.size < users.length
+                            selectedUsers.size > 0 && selectedUsers.size < users.length
                           }
-                          checked={
-                            users.length > 0 &&
-                            selectedUsers.size === users.length
-                          }
+                          checked={users.length > 0 && selectedUsers.size === users.length}
                           onChange={handleSelectAllUsers}
                         />
                       </TableCell>
@@ -2144,18 +2002,14 @@ const UsersManagementPage: React.FC = () => {
                         .map((column) => (
                           <TableCell
                             key={column.id}
-                            align={
-                              column.id === "emailVerified" ? "center" : "left"
-                            }
+                            align={column.id === 'emailVerified' ? 'center' : 'left'}
                             width={column.width}
                           >
                             {t(column.labelKey)}
                           </TableCell>
                         ))}
-                      <TableCell>{t("users.createdBy")}</TableCell>
-                      <TableCell align="center">
-                        {t("common.actions")}
-                      </TableCell>
+                      <TableCell>{t('users.createdBy')}</TableCell>
+                      <TableCell align="center">{t('common.actions')}</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -2172,11 +2026,7 @@ const UsersManagementPage: React.FC = () => {
                           .map((column) => (
                             <TableCell
                               key={column.id}
-                              align={
-                                column.id === "emailVerified"
-                                  ? "center"
-                                  : "left"
-                              }
+                              align={column.id === 'emailVerified' ? 'center' : 'left'}
                               width={column.width}
                             >
                               {renderCellContent(user, column.id)}
@@ -2189,23 +2039,20 @@ const UsersManagementPage: React.FC = () => {
                                 {user.createdByName}
                               </Typography>
                               {user.createdByEmail && (
-                                <Typography
-                                  variant="caption"
-                                  color="text.secondary"
-                                >
+                                <Typography variant="caption" color="text.secondary">
                                   {user.createdByEmail}
                                 </Typography>
                               )}
                             </Box>
                           ) : (
-                            "-"
+                            '-'
                           )}
                         </TableCell>
                         <TableCell align="center">
                           <IconButton
                             onClick={(event) => handleMenuOpen(event, user)}
                             size="small"
-                            title={t("common.actions")}
+                            title={t('common.actions')}
                           >
                             <MoreVertIcon />
                           </IconButton>
@@ -2239,77 +2086,74 @@ const UsersManagementPage: React.FC = () => {
         open={Boolean(menuAnchorEl)}
         onClose={handleMenuClose}
         anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "right",
+          vertical: 'bottom',
+          horizontal: 'right',
         }}
         transformOrigin={{
-          vertical: "top",
-          horizontal: "right",
+          vertical: 'top',
+          horizontal: 'right',
         }}
       >
         {/* Edit: allowed for super admin only if it's their own account */}
-        {canManage &&
-          (isCurrentUser(selectedUser) || canModifyUser(selectedUser)) && (
-            <MenuItem onClick={() => handleMenuAction("edit")}>
-              <ListItemIcon>
-                <EditIcon />
-              </ListItemIcon>
-              <ListItemText>{t("common.edit")}</ListItemText>
-            </MenuItem>
-          )}
+        {canManage && (isCurrentUser(selectedUser) || canModifyUser(selectedUser)) && (
+          <MenuItem onClick={() => handleMenuAction('edit')}>
+            <ListItemIcon>
+              <EditIcon />
+            </ListItemIcon>
+            <ListItemText>{t('common.edit')}</ListItemText>
+          </MenuItem>
+        )}
 
         {/* Suspend/Activate: not allowed for own account or super admin */}
         {canManage &&
           canModifyUser(selectedUser) &&
-          (selectedUser?.status === "active" ? (
+          (selectedUser?.status === 'active' ? (
             <MenuItem
-              onClick={() => handleMenuAction("suspend")}
+              onClick={() => handleMenuAction('suspend')}
               disabled={isCurrentUser(selectedUser)}
             >
               <ListItemIcon>
                 <BlockIcon />
               </ListItemIcon>
-              <ListItemText>{t("common.suspend")}</ListItemText>
+              <ListItemText>{t('common.suspend')}</ListItemText>
             </MenuItem>
           ) : (
             <MenuItem
-              onClick={() => handleMenuAction("activate")}
+              onClick={() => handleMenuAction('activate')}
               disabled={isCurrentUser(selectedUser)}
             >
               <ListItemIcon>
                 <CheckCircleIcon />
               </ListItemIcon>
-              <ListItemText>{t("common.activate")}</ListItemText>
+              <ListItemText>{t('common.activate')}</ListItemText>
             </MenuItem>
           ))}
 
         {/* Promote: not shown for super admin */}
         {canManage &&
           canModifyUser(selectedUser) &&
-          selectedUser?.role === "user" &&
-          selectedUser?.status === "active" && (
-            <MenuItem onClick={() => handleMenuAction("promote")}>
+          selectedUser?.role === 'user' &&
+          selectedUser?.status === 'active' && (
+            <MenuItem onClick={() => handleMenuAction('promote')}>
               <ListItemIcon>
                 <SecurityIcon />
               </ListItemIcon>
-              <ListItemText>{t("common.promoteToAdmin")}</ListItemText>
+              <ListItemText>{t('common.promoteToAdmin')}</ListItemText>
             </MenuItem>
           )}
 
         {/* Demote: not allowed for own account or super admin */}
-        {canManage &&
-          canModifyUser(selectedUser) &&
-          selectedUser?.role === "admin" && (
-            <MenuItem
-              onClick={() => handleMenuAction("demote")}
-              disabled={isCurrentUser(selectedUser)}
-            >
-              <ListItemIcon>
-                <PersonIcon />
-              </ListItemIcon>
-              <ListItemText>{t("common.demoteFromAdmin")}</ListItemText>
-            </MenuItem>
-          )}
+        {canManage && canModifyUser(selectedUser) && selectedUser?.role === 'admin' && (
+          <MenuItem
+            onClick={() => handleMenuAction('demote')}
+            disabled={isCurrentUser(selectedUser)}
+          >
+            <ListItemIcon>
+              <PersonIcon />
+            </ListItemIcon>
+            <ListItemText>{t('common.demoteFromAdmin')}</ListItemText>
+          </MenuItem>
+        )}
 
         {/* Email verification: not shown for super admin (unless own account) */}
         {canManage &&
@@ -2317,17 +2161,17 @@ const UsersManagementPage: React.FC = () => {
           selectedUser &&
           !selectedUser.emailVerified && (
             <>
-              <MenuItem onClick={() => handleMenuAction("verifyEmail")}>
+              <MenuItem onClick={() => handleMenuAction('verifyEmail')}>
                 <ListItemIcon>
                   <VerifiedUserIcon />
                 </ListItemIcon>
-                <ListItemText>{t("users.verifyEmail")}</ListItemText>
+                <ListItemText>{t('users.verifyEmail')}</ListItemText>
               </MenuItem>
-              <MenuItem onClick={() => handleMenuAction("resendVerification")}>
+              <MenuItem onClick={() => handleMenuAction('resendVerification')}>
                 <ListItemIcon>
                   <SendIcon />
                 </ListItemIcon>
-                <ListItemText>{t("users.resendVerification")}</ListItemText>
+                <ListItemText>{t('users.resendVerification')}</ListItemText>
               </MenuItem>
             </>
           )}
@@ -2335,14 +2179,14 @@ const UsersManagementPage: React.FC = () => {
         {/* Delete: not allowed for own account or super admin */}
         {canManage && canModifyUser(selectedUser) && (
           <MenuItem
-            onClick={() => handleMenuAction("delete")}
+            onClick={() => handleMenuAction('delete')}
             disabled={isCurrentUser(selectedUser)}
-            sx={{ color: "error.main" }}
+            sx={{ color: 'error.main' }}
           >
-            <ListItemIcon sx={{ color: "inherit" }}>
+            <ListItemIcon sx={{ color: 'inherit' }}>
               <DeleteIcon />
             </ListItemIcon>
-            <ListItemText>{t("common.delete")}</ListItemText>
+            <ListItemText>{t('common.delete')}</ListItemText>
           </MenuItem>
         )}
       </Menu>
@@ -2351,68 +2195,60 @@ const UsersManagementPage: React.FC = () => {
       <ResizableDrawer
         open={addUserDialog}
         onClose={handleCloseAddUserDialog}
-        title={t("users.addUserDialogTitle")}
-        subtitle={t("users.addUserDialogDescription")}
+        title={t('users.addUserDialogTitle')}
+        subtitle={t('users.addUserDialogDescription')}
         storageKey="usersAddFormDrawerWidth"
         defaultWidth={600}
         minWidth={450}
         zIndex={1300}
       >
         {/* Content */}
-        <Box sx={{ flex: 1, overflow: "auto", p: 2 }}>
+        <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
           <Box
             component="form"
             autoComplete="off"
-            sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}
+            sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}
           >
             <Box>
               <TextField
                 fullWidth
-                label={t("users.name")}
+                label={t('users.name')}
                 value={newUserData.name}
-                onChange={(e) =>
-                  setNewUserData({ ...newUserData, name: e.target.value })
-                }
+                onChange={(e) => setNewUserData({ ...newUserData, name: e.target.value })}
                 autoComplete="new-name"
                 placeholder=""
                 required
                 error={!!newUserErrors.name}
-                helperText={newUserErrors.name || t("users.form.nameHelp")}
+                helperText={newUserErrors.name || t('users.form.nameHelp')}
                 autoFocus
               />
             </Box>
             <Box>
               <TextField
                 fullWidth
-                label={t("users.email")}
+                label={t('users.email')}
                 type="email"
                 value={newUserData.email}
-                onChange={(e) =>
-                  setNewUserData({ ...newUserData, email: e.target.value })
-                }
+                onChange={(e) => setNewUserData({ ...newUserData, email: e.target.value })}
                 autoComplete="new-email"
                 placeholder=""
                 required
                 error={!!newUserErrors.email}
-                helperText={newUserErrors.email || t("users.form.emailHelp")}
+                helperText={newUserErrors.email || t('users.form.emailHelp')}
               />
             </Box>
             <Box>
               <TextField
                 fullWidth
-                label={t("users.password")}
-                type={showPassword ? "text" : "password"}
+                label={t('users.password')}
+                type={showPassword ? 'text' : 'password'}
                 value={newUserData.password}
-                onChange={(e) =>
-                  setNewUserData({ ...newUserData, password: e.target.value })
-                }
+                onChange={(e) => setNewUserData({ ...newUserData, password: e.target.value })}
                 autoComplete="new-password"
                 placeholder=""
                 required
                 error={!!newUserErrors.password}
-                helperText={
-                  newUserErrors.password || t("users.form.passwordHelp")
-                }
+                helperText={newUserErrors.password || t('users.form.passwordHelp')}
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
@@ -2421,16 +2257,10 @@ const UsersManagementPage: React.FC = () => {
                         edge="end"
                         size="small"
                         aria-label={
-                          showPassword
-                            ? t("users.hidePassword")
-                            : t("users.showPassword")
+                          showPassword ? t('users.hidePassword') : t('users.showPassword')
                         }
                       >
-                        {showPassword ? (
-                          <VisibilityOffIcon />
-                        ) : (
-                          <VisibilityIcon />
-                        )}
+                        {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
                       </IconButton>
                     </InputAdornment>
                   ),
@@ -2438,21 +2268,21 @@ const UsersManagementPage: React.FC = () => {
               />
             </Box>
             <FormControl fullWidth>
-              <InputLabel>{t("users.role")}</InputLabel>
+              <InputLabel>{t('users.role')}</InputLabel>
               <Select
                 value={newUserData.role}
-                label={t("users.role")}
+                label={t('users.role')}
                 onChange={(e) =>
                   setNewUserData({
                     ...newUserData,
-                    role: e.target.value as "admin" | "user",
+                    role: e.target.value as 'admin' | 'user',
                   })
                 }
               >
-                <MenuItem value="user">{t("users.roles.user")}</MenuItem>
-                <MenuItem value="admin">{t("users.roles.admin")}</MenuItem>
+                <MenuItem value="user">{t('users.roles.user')}</MenuItem>
+                <MenuItem value="admin">{t('users.roles.admin')}</MenuItem>
               </Select>
-              <FormHelperText>{t("users.roleHelp")}</FormHelperText>
+              <FormHelperText>{t('users.roleHelp')}</FormHelperText>
             </FormControl>
 
             {/* Tags Selection */}
@@ -2478,7 +2308,7 @@ const UsersManagementPage: React.FC = () => {
                     return (
                       <Tooltip
                         key={option.id}
-                        title={option.description || t("tags.noDescription")}
+                        title={option.description || t('tags.noDescription')}
                         arrow
                       >
                         <Chip
@@ -2496,11 +2326,7 @@ const UsersManagementPage: React.FC = () => {
                   })
                 }
                 renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label={t("users.tags")}
-                    helperText={t("users.tagsHelp")}
-                  />
+                  <TextField {...params} label={t('users.tags')} helperText={t('users.tagsHelp')} />
                 )}
                 renderOption={(props, option) => {
                   const { key, ...otherProps } = props;
@@ -2515,7 +2341,7 @@ const UsersManagementPage: React.FC = () => {
                           mr: 1,
                         }}
                       />
-                      {option.description || t("common.noDescription")}
+                      {option.description || t('common.noDescription')}
                     </Box>
                   );
                 }}
@@ -2523,7 +2349,7 @@ const UsersManagementPage: React.FC = () => {
             </Box>
 
             {/* Permissions & Environment Access - Only for admin role */}
-            {newUserData.role === "admin" && (
+            {newUserData.role === 'admin' && (
               <Box sx={{ mt: 2 }}>
                 <PermissionSelector
                   permissions={newUserPermissions}
@@ -2545,9 +2371,9 @@ const UsersManagementPage: React.FC = () => {
             )}
 
             {/* Non-admin users cannot set permissions */}
-            {newUserData.role !== "admin" && (
+            {newUserData.role !== 'admin' && (
               <Alert severity="info" sx={{ mt: 2 }}>
-                {t("users.noEnvironmentAccessForUser")}
+                {t('users.noEnvironmentAccessForUser')}
               </Alert>
             )}
           </Box>
@@ -2557,27 +2383,19 @@ const UsersManagementPage: React.FC = () => {
         <Box
           sx={{
             p: 2,
-            borderTop: "1px solid",
-            borderColor: "divider",
-            bgcolor: "background.paper",
-            display: "flex",
+            borderTop: '1px solid',
+            borderColor: 'divider',
+            bgcolor: 'background.paper',
+            display: 'flex',
             gap: 1,
-            justifyContent: "flex-end",
+            justifyContent: 'flex-end',
           }}
         >
-          <Button
-            onClick={handleCloseAddUserDialog}
-            startIcon={<CancelIcon />}
-            variant="outlined"
-          >
-            {t("common.cancel")}
+          <Button onClick={handleCloseAddUserDialog} startIcon={<CancelIcon />} variant="outlined">
+            {t('common.cancel')}
           </Button>
-          <Button
-            onClick={handleCreateUser}
-            variant="contained"
-            startIcon={<AddIcon />}
-          >
-            {t("users.addUser")}
+          <Button onClick={handleCreateUser} variant="contained" startIcon={<AddIcon />}>
+            {t('users.addUser')}
           </Button>
         </Box>
       </ResizableDrawer>
@@ -2589,37 +2407,35 @@ const UsersManagementPage: React.FC = () => {
         onClose={() => setConfirmDialog((prev) => ({ ...prev, open: false }))}
         sx={{
           zIndex: 1301,
-          "& .MuiDrawer-paper": {
-            width: { xs: "100%", sm: 400 },
-            maxWidth: "100vw",
-            display: "flex",
-            flexDirection: "column",
+          '& .MuiDrawer-paper': {
+            width: { xs: '100%', sm: 400 },
+            maxWidth: '100vw',
+            display: 'flex',
+            flexDirection: 'column',
           },
         }}
       >
         {/* Header */}
         <Box
           sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
             p: 2,
-            borderBottom: "1px solid",
-            borderColor: "divider",
-            bgcolor: "background.paper",
+            borderBottom: '1px solid',
+            borderColor: 'divider',
+            bgcolor: 'background.paper',
           }}
         >
           <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
             {confirmDialog.title}
           </Typography>
           <IconButton
-            onClick={() =>
-              setConfirmDialog((prev) => ({ ...prev, open: false }))
-            }
+            onClick={() => setConfirmDialog((prev) => ({ ...prev, open: false }))}
             size="small"
             sx={{
-              "&:hover": {
-                backgroundColor: "action.hover",
+              '&:hover': {
+                backgroundColor: 'action.hover',
               },
             }}
           >
@@ -2636,22 +2452,20 @@ const UsersManagementPage: React.FC = () => {
         <Box
           sx={{
             p: 2,
-            borderTop: "1px solid",
-            borderColor: "divider",
-            bgcolor: "background.paper",
-            display: "flex",
+            borderTop: '1px solid',
+            borderColor: 'divider',
+            bgcolor: 'background.paper',
+            display: 'flex',
             gap: 2,
-            justifyContent: "flex-end",
+            justifyContent: 'flex-end',
           }}
         >
           <Button
-            onClick={() =>
-              setConfirmDialog((prev) => ({ ...prev, open: false }))
-            }
+            onClick={() => setConfirmDialog((prev) => ({ ...prev, open: false }))}
             variant="outlined"
             disabled={confirmDialogLoading}
           >
-            {t("common.cancel")}
+            {t('common.cancel')}
           </Button>
           <Button
             onClick={confirmDialog.action}
@@ -2662,7 +2476,7 @@ const UsersManagementPage: React.FC = () => {
             {confirmDialogLoading ? (
               <CircularProgress size={20} color="inherit" />
             ) : (
-              t("common.confirm")
+              t('common.confirm')
             )}
           </Button>
         </Box>
@@ -2672,46 +2486,44 @@ const UsersManagementPage: React.FC = () => {
       <Drawer
         anchor="right"
         open={deleteConfirmDialog.open}
-        onClose={() =>
-          setDeleteConfirmDialog({ open: false, user: null, inputValue: "" })
-        }
+        onClose={() => setDeleteConfirmDialog({ open: false, user: null, inputValue: '' })}
         sx={{
           zIndex: 1301,
-          "& .MuiDrawer-paper": {
-            width: { xs: "100%", sm: 500 },
-            maxWidth: "100vw",
-            display: "flex",
-            flexDirection: "column",
+          '& .MuiDrawer-paper': {
+            width: { xs: '100%', sm: 500 },
+            maxWidth: '100vw',
+            display: 'flex',
+            flexDirection: 'column',
           },
         }}
       >
         {/* Header */}
         <Box
           sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
             p: 2,
-            borderBottom: "1px solid",
-            borderColor: "divider",
-            bgcolor: "background.paper",
+            borderBottom: '1px solid',
+            borderColor: 'divider',
+            bgcolor: 'background.paper',
           }}
         >
           <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
-            {t("users.deleteUser")}
+            {t('users.deleteUser')}
           </Typography>
           <IconButton
             onClick={() =>
               setDeleteConfirmDialog({
                 open: false,
                 user: null,
-                inputValue: "",
+                inputValue: '',
               })
             }
             size="small"
             sx={{
-              "&:hover": {
-                backgroundColor: "action.hover",
+              '&:hover': {
+                backgroundColor: 'action.hover',
               },
             }}
           >
@@ -2720,17 +2532,17 @@ const UsersManagementPage: React.FC = () => {
         </Box>
 
         {/* Content */}
-        <Box sx={{ flex: 1, overflow: "auto", p: 2 }}>
+        <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
           <Alert severity="warning" sx={{ mb: 2 }}>
-            {t("users.deleteConfirmation")}
+            {t('users.deleteConfirmation')}
           </Alert>
           <Typography variant="body2" sx={{ mb: 2 }}>
-            {t("users.deleteConfirmationInput")}
+            {t('users.deleteConfirmationInput')}
             <strong> {deleteConfirmDialog.user?.email}</strong>
           </Typography>
           <TextField
             fullWidth
-            label={t("users.email")}
+            label={t('users.email')}
             value={deleteConfirmDialog.inputValue}
             onChange={(e) =>
               setDeleteConfirmDialog((prev) => ({
@@ -2740,14 +2552,14 @@ const UsersManagementPage: React.FC = () => {
             }
             placeholder={deleteConfirmDialog.user?.email}
             error={
-              deleteConfirmDialog.inputValue !== "" &&
+              deleteConfirmDialog.inputValue !== '' &&
               deleteConfirmDialog.inputValue !== deleteConfirmDialog.user?.email
             }
             helperText={
-              deleteConfirmDialog.inputValue !== "" &&
+              deleteConfirmDialog.inputValue !== '' &&
               deleteConfirmDialog.inputValue !== deleteConfirmDialog.user?.email
-                ? t("users.emailDoesNotMatch")
-                : ""
+                ? t('users.emailDoesNotMatch')
+                : ''
             }
           />
         </Box>
@@ -2756,12 +2568,12 @@ const UsersManagementPage: React.FC = () => {
         <Box
           sx={{
             p: 2,
-            borderTop: "1px solid",
-            borderColor: "divider",
-            bgcolor: "background.paper",
-            display: "flex",
+            borderTop: '1px solid',
+            borderColor: 'divider',
+            bgcolor: 'background.paper',
+            display: 'flex',
             gap: 2,
-            justifyContent: "flex-end",
+            justifyContent: 'flex-end',
           }}
         >
           <Button
@@ -2769,25 +2581,23 @@ const UsersManagementPage: React.FC = () => {
               setDeleteConfirmDialog({
                 open: false,
                 user: null,
-                inputValue: "",
+                inputValue: '',
               })
             }
             color="inherit"
             startIcon={<CancelIcon />}
             variant="outlined"
           >
-            {t("common.cancel")}
+            {t('common.cancel')}
           </Button>
           <Button
             onClick={handleConfirmDeleteUser}
             color="error"
             variant="contained"
-            disabled={
-              deleteConfirmDialog.inputValue !== deleteConfirmDialog.user?.email
-            }
+            disabled={deleteConfirmDialog.inputValue !== deleteConfirmDialog.user?.email}
             startIcon={<DeleteIcon />}
           >
-            {t("common.delete")}
+            {t('common.delete')}
           </Button>
         </Box>
       </Drawer>
@@ -2796,15 +2606,9 @@ const UsersManagementPage: React.FC = () => {
       <ResizableDrawer
         open={promoteDialog.open}
         onClose={handlePromoteCancel}
-        title={
-          promoteDialog.showReview
-            ? t("users.reviewChanges")
-            : t("common.promoteUser")
-        }
+        title={promoteDialog.showReview ? t('users.reviewChanges') : t('common.promoteUser')}
         subtitle={
-          promoteDialog.showReview
-            ? t("users.reviewChangesDesc")
-            : t("users.selectPermissionsDesc")
+          promoteDialog.showReview ? t('users.reviewChangesDesc') : t('users.selectPermissionsDesc')
         }
         storageKey="usersPromoteFormDrawerWidth"
         defaultWidth={600}
@@ -2812,27 +2616,25 @@ const UsersManagementPage: React.FC = () => {
         zIndex={1301}
       >
         {/* Content */}
-        <Box sx={{ flex: 1, p: 2, overflow: "auto" }}>
+        <Box sx={{ flex: 1, p: 2, overflow: 'auto' }}>
           {promoteDialog.user && !promoteDialog.showReview && (
             <>
               <Alert severity="info" sx={{ mb: 2 }}>
-                {t("common.promoteUserConfirm", {
+                {t('common.promoteUserConfirm', {
                   name: promoteDialog.user.name,
                 })}
               </Alert>
 
               <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
-                {t("users.selectPermissions")}
+                {t('users.selectPermissions')}
               </Typography>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                {t("users.selectPermissionsDesc")}
+                {t('users.selectPermissionsDesc')}
               </Typography>
 
               <PermissionSelector
                 permissions={promoteDialog.permissions}
-                onChange={(permissions) =>
-                  setPromoteDialog((prev) => ({ ...prev, permissions }))
-                }
+                onChange={(permissions) => setPromoteDialog((prev) => ({ ...prev, permissions }))}
                 showTitle={false}
                 showEnvironments={true}
                 environments={environments.map((env) => ({
@@ -2863,28 +2665,28 @@ const UsersManagementPage: React.FC = () => {
           {promoteDialog.user && promoteDialog.showReview && (
             <Box>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                {t("users.reviewChangesDesc")}
+                {t('users.reviewChangesDesc')}
               </Typography>
               <Box
                 sx={{
-                  display: "flex",
-                  flexDirection: "column",
+                  display: 'flex',
+                  flexDirection: 'column',
                   gap: 2,
                   p: 2,
-                  bgcolor: "background.default",
+                  bgcolor: 'background.default',
                   borderRadius: 1,
                   border: 1,
-                  borderColor: "divider",
+                  borderColor: 'divider',
                 }}
               >
                 {/* User Info */}
-                <Box sx={{ pb: 2, borderBottom: 1, borderColor: "divider" }}>
+                <Box sx={{ pb: 2, borderBottom: 1, borderColor: 'divider' }}>
                   <Typography
                     variant="caption"
                     color="text.secondary"
-                    sx={{ display: "block", mb: 0.5 }}
+                    sx={{ display: 'block', mb: 0.5 }}
                   >
-                    {t("users.user")}
+                    {t('users.user')}
                   </Typography>
                   <Typography variant="body2" fontWeight={500}>
                     {promoteDialog.user.name} ({promoteDialog.user.email})
@@ -2892,27 +2694,25 @@ const UsersManagementPage: React.FC = () => {
                 </Box>
 
                 {/* Role Change */}
-                <Box sx={{ pb: 2, borderBottom: 1, borderColor: "divider" }}>
+                <Box sx={{ pb: 2, borderBottom: 1, borderColor: 'divider' }}>
                   <Typography
                     variant="caption"
                     color="text.secondary"
-                    sx={{ display: "block", mb: 0.5 }}
+                    sx={{ display: 'block', mb: 0.5 }}
                   >
-                    {t("users.role")}
+                    {t('users.role')}
                   </Typography>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <Typography
                       variant="body2"
                       color="text.disabled"
-                      sx={{ textDecoration: "line-through" }}
+                      sx={{ textDecoration: 'line-through' }}
                     >
-                      {t("users.roles.user")}
+                      {t('users.roles.user')}
                     </Typography>
-                    <ArrowForwardIcon
-                      sx={{ fontSize: 14, color: "text.disabled" }}
-                    />
+                    <ArrowForwardIcon sx={{ fontSize: 14, color: 'text.disabled' }} />
                     <Chip
-                      label={t("users.roles.admin")}
+                      label={t('users.roles.admin')}
                       size="small"
                       color="primary"
                       variant="filled"
@@ -2925,25 +2725,21 @@ const UsersManagementPage: React.FC = () => {
                   <Typography
                     variant="caption"
                     color="text.secondary"
-                    sx={{ display: "block", mb: 1 }}
+                    sx={{ display: 'block', mb: 1 }}
                   >
-                    {t("users.permissions")} ({promoteDialog.permissions.length}{" "}
-                    {t("users.permissionsCount")})
+                    {t('users.permissions')} ({promoteDialog.permissions.length}{' '}
+                    {t('users.permissionsCount')})
                   </Typography>
                   {promoteDialog.permissions.length === 0 ? (
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      fontStyle="italic"
-                    >
-                      {t("users.noPermissionsSelected")}
+                    <Typography variant="body2" color="text.secondary" fontStyle="italic">
+                      {t('users.noPermissionsSelected')}
                     </Typography>
                   ) : (
-                    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                       {promoteDialog.permissions.map((perm) => {
-                        const permKey = perm.replace(".", "_");
+                        const permKey = perm.replace('.', '_');
                         const tooltipText = t(`permissions.${permKey}_desc`, {
-                          defaultValue: "",
+                          defaultValue: '',
                         });
                         return (
                           <Tooltip
@@ -2958,7 +2754,7 @@ const UsersManagementPage: React.FC = () => {
                               size="small"
                               color="success"
                               variant="outlined"
-                              sx={{ fontSize: "0.75rem" }}
+                              sx={{ fontSize: '0.75rem' }}
                             />
                           </Tooltip>
                         );
@@ -2968,42 +2764,35 @@ const UsersManagementPage: React.FC = () => {
                 </Box>
 
                 {/* Environment Access */}
-                <Box sx={{ pt: 2, borderTop: 1, borderColor: "divider" }}>
+                <Box sx={{ pt: 2, borderTop: 1, borderColor: 'divider' }}>
                   <Typography
                     variant="caption"
                     color="text.secondary"
-                    sx={{ display: "block", mb: 1 }}
+                    sx={{ display: 'block', mb: 1 }}
                   >
-                    {t("users.environmentAccess")}
+                    {t('users.environmentAccess')}
                   </Typography>
                   {promoteDialog.allowAllEnvs ? (
                     <Chip
-                      label={t("users.allowAllEnvironments")}
+                      label={t('users.allowAllEnvironments')}
                       size="small"
                       color="warning"
                       variant="filled"
-                      sx={{ fontSize: "0.75rem" }}
+                      sx={{ fontSize: '0.75rem' }}
                     />
                   ) : promoteDialog.selectedEnvironments.length === 0 ? (
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      fontStyle="italic"
-                    >
-                      {t("users.noEnvironmentsSelected")}
+                    <Typography variant="body2" color="text.secondary" fontStyle="italic">
+                      {t('users.noEnvironmentsSelected')}
                     </Typography>
                   ) : (
-                    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                       {promoteDialog.selectedEnvironments.map((envName) => {
-                        const env = environments.find(
-                          (e) => e.environment === envName,
-                        );
-                        const displayName =
-                          env?.displayName || env?.environmentName || envName;
+                        const env = environments.find((e) => e.environment === envName);
+                        const displayName = env?.displayName || env?.environmentName || envName;
                         return (
                           <Tooltip
                             key={envName}
-                            title={t("users.environmentAccessDesc", {
+                            title={t('users.environmentAccessDesc', {
                               name: displayName,
                             })}
                             arrow
@@ -3015,7 +2804,7 @@ const UsersManagementPage: React.FC = () => {
                               size="small"
                               color="success"
                               variant="outlined"
-                              sx={{ fontSize: "0.75rem" }}
+                              sx={{ fontSize: '0.75rem' }}
                             />
                           </Tooltip>
                         );
@@ -3032,12 +2821,12 @@ const UsersManagementPage: React.FC = () => {
         <Box
           sx={{
             p: 2,
-            borderTop: "1px solid",
-            borderColor: "divider",
-            bgcolor: "background.paper",
-            display: "flex",
+            borderTop: '1px solid',
+            borderColor: 'divider',
+            bgcolor: 'background.paper',
+            display: 'flex',
             gap: 2,
-            justifyContent: "flex-end",
+            justifyContent: 'flex-end',
           }}
         >
           {!promoteDialog.showReview ? (
@@ -3047,7 +2836,7 @@ const UsersManagementPage: React.FC = () => {
                 variant="outlined"
                 disabled={promoteDialog.loading}
               >
-                {t("common.cancel")}
+                {t('common.cancel')}
               </Button>
               <Button
                 onClick={handlePromoteReview}
@@ -3055,7 +2844,7 @@ const UsersManagementPage: React.FC = () => {
                 variant="contained"
                 startIcon={<PreviewIcon />}
               >
-                {t("common.review")}
+                {t('common.review')}
               </Button>
             </>
           ) : (
@@ -3066,7 +2855,7 @@ const UsersManagementPage: React.FC = () => {
                 disabled={promoteDialog.loading}
                 startIcon={<ArrowBackIcon />}
               >
-                {t("common.reReview")}
+                {t('common.reReview')}
               </Button>
               <Button
                 onClick={handlePromoteConfirm}
@@ -3081,7 +2870,7 @@ const UsersManagementPage: React.FC = () => {
                   )
                 }
               >
-                {promoteDialog.loading ? t("common.saving") : t("common.apply")}
+                {promoteDialog.loading ? t('common.saving') : t('common.apply')}
               </Button>
             </>
           )}
@@ -3092,42 +2881,36 @@ const UsersManagementPage: React.FC = () => {
       <ResizableDrawer
         open={editUserDialog.open}
         onClose={() => setEditUserDialog({ open: false, user: null })}
-        title={t("users.editUserDialogTitle")}
-        subtitle={t("users.editUserDialogDescription")}
+        title={t('users.editUserDialogTitle')}
+        subtitle={t('users.editUserDialogDescription')}
         storageKey="usersEditFormDrawerWidth"
         defaultWidth={600}
         minWidth={450}
         zIndex={1300}
       >
         {/* Content */}
-        <Box sx={{ flex: 1, overflow: "auto", p: 2 }}>
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
+        <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
             <Box>
               <TextField
-                label={t("users.name")}
+                label={t('users.name')}
                 value={editUserData.name}
-                onChange={(e) =>
-                  setEditUserData({ ...editUserData, name: e.target.value })
-                }
+                onChange={(e) => setEditUserData({ ...editUserData, name: e.target.value })}
                 fullWidth
                 error={!!editUserErrors.name}
-                helperText={editUserErrors.name || t("users.form.nameHelp")}
+                helperText={editUserErrors.name || t('users.form.nameHelp')}
                 autoFocus
               />
             </Box>
             <Box>
               <TextField
-                label={t("users.email")}
+                label={t('users.email')}
                 value={editUserData.email}
-                onChange={(e) =>
-                  setEditUserData({ ...editUserData, email: e.target.value })
-                }
+                onChange={(e) => setEditUserData({ ...editUserData, email: e.target.value })}
                 fullWidth
-                disabled={
-                  editUserDialog.user && isCurrentUser(editUserDialog.user)
-                }
+                disabled={editUserDialog.user && isCurrentUser(editUserDialog.user)}
                 error={!!editUserErrors.email}
-                helperText={editUserErrors.email || t("users.form.emailHelp")}
+                helperText={editUserErrors.email || t('users.form.emailHelp')}
               />
             </Box>
 
@@ -3135,39 +2918,33 @@ const UsersManagementPage: React.FC = () => {
             {editUserDialog.user && !isCurrentUser(editUserDialog.user) && (
               <Box
                 sx={{
-                  display: "flex",
-                  alignItems: "center",
+                  display: 'flex',
+                  alignItems: 'center',
                   gap: 2,
                   p: 2,
-                  bgcolor: "background.paper",
+                  bgcolor: 'background.paper',
                   borderRadius: 1,
                   border: 1,
-                  borderColor: "divider",
+                  borderColor: 'divider',
                 }}
               >
-                <EmailIcon
-                  color={
-                    editUserDialog.user.emailVerified ? "success" : "warning"
-                  }
-                />
+                <EmailIcon color={editUserDialog.user.emailVerified ? 'success' : 'warning'} />
                 <Box sx={{ flex: 1 }}>
                   <Typography variant="body2" fontWeight="medium">
-                    {t("users.emailVerification")}
+                    {t('users.emailVerification')}
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
                     {editUserDialog.user.emailVerified
-                      ? t("users.emailVerified")
-                      : t("users.emailNotVerified")}
+                      ? t('users.emailVerified')
+                      : t('users.emailNotVerified')}
                   </Typography>
                 </Box>
                 {!editUserDialog.user.emailVerified && (
-                  <Box sx={{ display: "flex", gap: 1 }}>
+                  <Box sx={{ display: 'flex', gap: 1 }}>
                     <Button
                       size="small"
                       variant="outlined"
-                      onClick={() =>
-                        handleVerifyUserEmail(editUserDialog.user!.id)
-                      }
+                      onClick={() => handleVerifyUserEmail(editUserDialog.user!.id)}
                       disabled={emailVerificationLoading}
                       startIcon={
                         emailVerificationLoading ? (
@@ -3177,24 +2954,18 @@ const UsersManagementPage: React.FC = () => {
                         )
                       }
                     >
-                      {t("users.verifyEmail")}
+                      {t('users.verifyEmail')}
                     </Button>
                     <Button
                       size="small"
                       variant="text"
-                      onClick={() =>
-                        handleResendVerificationEmail(editUserDialog.user!.id)
-                      }
+                      onClick={() => handleResendVerificationEmail(editUserDialog.user!.id)}
                       disabled={emailVerificationLoading}
                       startIcon={
-                        emailVerificationLoading ? (
-                          <CircularProgress size={16} />
-                        ) : (
-                          <SendIcon />
-                        )
+                        emailVerificationLoading ? <CircularProgress size={16} /> : <SendIcon />
                       }
                     >
-                      {t("users.resendVerification")}
+                      {t('users.resendVerification')}
                     </Button>
                   </Box>
                 )}
@@ -3204,24 +2975,24 @@ const UsersManagementPage: React.FC = () => {
             {!(editUserDialog.user && isCurrentUser(editUserDialog.user)) && (
               <>
                 <FormControl fullWidth>
-                  <InputLabel>{t("users.role")}</InputLabel>
+                  <InputLabel>{t('users.role')}</InputLabel>
                   <Select
                     value={editUserData.role}
                     onChange={(e) =>
                       setEditUserData({
                         ...editUserData,
-                        role: e.target.value as "admin" | "user",
+                        role: e.target.value as 'admin' | 'user',
                       })
                     }
-                    label={t("users.role")}
+                    label={t('users.role')}
                   >
-                    <MenuItem value="user">{t("users.roles.user")}</MenuItem>
-                    <MenuItem value="admin">{t("users.roles.admin")}</MenuItem>
+                    <MenuItem value="user">{t('users.roles.user')}</MenuItem>
+                    <MenuItem value="admin">{t('users.roles.admin')}</MenuItem>
                   </Select>
-                  <FormHelperText>{t("users.roleHelp")}</FormHelperText>
+                  <FormHelperText>{t('users.roleHelp')}</FormHelperText>
                 </FormControl>
                 <FormControl fullWidth>
-                  <InputLabel>{t("users.status")}</InputLabel>
+                  <InputLabel>{t('users.status')}</InputLabel>
                   <Select
                     value={editUserData.status}
                     onChange={(e) =>
@@ -3230,19 +3001,13 @@ const UsersManagementPage: React.FC = () => {
                         status: e.target.value as any,
                       })
                     }
-                    label={t("users.status")}
+                    label={t('users.status')}
                   >
-                    <MenuItem value="pending">
-                      {t("users.statuses.pending")}
-                    </MenuItem>
-                    <MenuItem value="active">
-                      {t("users.statuses.active")}
-                    </MenuItem>
-                    <MenuItem value="suspended">
-                      {t("users.statuses.suspended")}
-                    </MenuItem>
+                    <MenuItem value="pending">{t('users.statuses.pending')}</MenuItem>
+                    <MenuItem value="active">{t('users.statuses.active')}</MenuItem>
+                    <MenuItem value="suspended">{t('users.statuses.suspended')}</MenuItem>
                   </Select>
-                  <FormHelperText>{t("users.statusHelp")}</FormHelperText>
+                  <FormHelperText>{t('users.statusHelp')}</FormHelperText>
                 </FormControl>
               </>
             )}
@@ -3270,7 +3035,7 @@ const UsersManagementPage: React.FC = () => {
                     return (
                       <Tooltip
                         key={option.id}
-                        title={option.description || t("tags.noDescription")}
+                        title={option.description || t('tags.noDescription')}
                         arrow
                       >
                         <Chip
@@ -3288,11 +3053,7 @@ const UsersManagementPage: React.FC = () => {
                   })
                 }
                 renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label={t("users.tags")}
-                    helperText={t("users.tagsHelp")}
-                  />
+                  <TextField {...params} label={t('users.tags')} helperText={t('users.tagsHelp')} />
                 )}
                 renderOption={(props, option) => {
                   const { key, ...otherProps } = props;
@@ -3307,7 +3068,7 @@ const UsersManagementPage: React.FC = () => {
                           mr: 1,
                         }}
                       />
-                      {option.description || t("common.noDescription")}
+                      {option.description || t('common.noDescription')}
                     </Box>
                   );
                 }}
@@ -3316,7 +3077,7 @@ const UsersManagementPage: React.FC = () => {
 
             {/* Permissions & Environment Access Section - Only for admin users */}
             {!(editUserDialog.user && isCurrentUser(editUserDialog.user)) &&
-              editUserData.role === "admin" && (
+              editUserData.role === 'admin' && (
                 <Box sx={{ mt: 2 }}>
                   <PermissionSelector
                     permissions={editUserPermissions}
@@ -3340,14 +3101,14 @@ const UsersManagementPage: React.FC = () => {
 
             {/* Non-admin users cannot access environments */}
             {!(editUserDialog.user && isCurrentUser(editUserDialog.user)) &&
-              editUserData.role !== "admin" && (
+              editUserData.role !== 'admin' && (
                 <Alert severity="info" sx={{ mt: 2 }}>
-                  {t("users.noEnvironmentAccessForUser")}
+                  {t('users.noEnvironmentAccessForUser')}
                 </Alert>
               )}
 
             {editUserDialog.user && isCurrentUser(editUserDialog.user) && (
-              <Alert severity="info">{t("users.canOnlyModifyOwnName")}</Alert>
+              <Alert severity="info">{t('users.canOnlyModifyOwnName')}</Alert>
             )}
           </Box>
         </Box>
@@ -3356,12 +3117,12 @@ const UsersManagementPage: React.FC = () => {
         <Box
           sx={{
             p: 2,
-            borderTop: "1px solid",
-            borderColor: "divider",
-            bgcolor: "background.paper",
-            display: "flex",
+            borderTop: '1px solid',
+            borderColor: 'divider',
+            bgcolor: 'background.paper',
+            display: 'flex',
             gap: 1,
-            justifyContent: "flex-end",
+            justifyContent: 'flex-end',
           }}
         >
           <Button
@@ -3369,7 +3130,7 @@ const UsersManagementPage: React.FC = () => {
             startIcon={<CancelIcon />}
             variant="outlined"
           >
-            {t("common.cancel")}
+            {t('common.cancel')}
           </Button>
           <Button
             onClick={handleOpenReview}
@@ -3377,7 +3138,7 @@ const UsersManagementPage: React.FC = () => {
             startIcon={<PreviewIcon />}
             disabled={getChanges().length === 0}
           >
-            {t("common.review")}
+            {t('common.review')}
           </Button>
         </Box>
       </ResizableDrawer>
@@ -3394,15 +3155,15 @@ const UsersManagementPage: React.FC = () => {
       >
         <DialogTitle
           sx={{
-            display: "flex",
-            alignItems: "center",
+            display: 'flex',
+            alignItems: 'center',
             gap: 1,
             borderBottom: 1,
-            borderColor: "divider",
+            borderColor: 'divider',
           }}
         >
           <PreviewIcon color="primary" />
-          {t("users.reviewChanges")}
+          {t('users.reviewChanges')}
         </DialogTitle>
         <DialogContent sx={{ mt: 2 }}>
           {(() => {
@@ -3410,68 +3171,60 @@ const UsersManagementPage: React.FC = () => {
             if (changes.length === 0) {
               return (
                 <Alert severity="info" sx={{ mt: 1 }}>
-                  {t("users.noChanges")}
+                  {t('users.noChanges')}
                 </Alert>
               );
             }
             return (
               <Box>
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{ mb: 2 }}
-                >
-                  {t("users.reviewChangesDesc")}
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                  {t('users.reviewChangesDesc')}
                 </Typography>
                 <Box
                   sx={{
-                    display: "flex",
-                    flexDirection: "column",
+                    display: 'flex',
+                    flexDirection: 'column',
                     gap: 1.5,
                     p: 2,
-                    bgcolor: "background.default",
+                    bgcolor: 'background.default',
                     borderRadius: 1,
                     border: 1,
-                    borderColor: "divider",
+                    borderColor: 'divider',
                   }}
                 >
                   {changes.map((change, index) => (
                     <Box
                       key={index}
                       sx={{
-                        display: "flex",
-                        flexDirection: "column",
+                        display: 'flex',
+                        flexDirection: 'column',
                         gap: 0.5,
                         pb: index < changes.length - 1 ? 1.5 : 0,
                         borderBottom: index < changes.length - 1 ? 1 : 0,
-                        borderColor: "divider",
+                        borderColor: 'divider',
                       }}
                     >
-                      <Typography
-                        variant="subtitle2"
-                        fontWeight={600}
-                        color="text.primary"
-                      >
+                      <Typography variant="subtitle2" fontWeight={600} color="text.primary">
                         {change.field}
                       </Typography>
                       <Box
                         sx={{
-                          display: "flex",
-                          alignItems: "center",
+                          display: 'flex',
+                          alignItems: 'center',
                           gap: 1,
-                          flexWrap: "wrap",
+                          flexWrap: 'wrap',
                         }}
                       >
                         <Typography
                           variant="body2"
                           sx={{
-                            textDecoration: "line-through",
-                            color: "error.main",
-                            bgcolor: "error.main",
+                            textDecoration: 'line-through',
+                            color: 'error.main',
+                            bgcolor: 'error.main',
                             backgroundColor: (theme) =>
-                              theme.palette.mode === "dark"
-                                ? "rgba(211, 47, 47, 0.15)"
-                                : "rgba(211, 47, 47, 0.08)",
+                              theme.palette.mode === 'dark'
+                                ? 'rgba(211, 47, 47, 0.15)'
+                                : 'rgba(211, 47, 47, 0.08)',
                             px: 1,
                             py: 0.25,
                             borderRadius: 0.5,
@@ -3485,12 +3238,12 @@ const UsersManagementPage: React.FC = () => {
                         <Typography
                           variant="body2"
                           sx={{
-                            color: "success.main",
-                            bgcolor: "success.main",
+                            color: 'success.main',
+                            bgcolor: 'success.main',
                             backgroundColor: (theme) =>
-                              theme.palette.mode === "dark"
-                                ? "rgba(46, 125, 50, 0.15)"
-                                : "rgba(46, 125, 50, 0.08)",
+                              theme.palette.mode === 'dark'
+                                ? 'rgba(46, 125, 50, 0.15)'
+                                : 'rgba(46, 125, 50, 0.08)',
                             px: 1,
                             py: 0.25,
                             borderRadius: 0.5,
@@ -3507,117 +3260,111 @@ const UsersManagementPage: React.FC = () => {
                             mt: 1,
                             pl: 1,
                             borderLeft: 2,
-                            borderColor: "divider",
+                            borderColor: 'divider',
                           }}
                         >
-                          {change.details.added &&
-                            change.details.added.length > 0 && (
-                              <Box sx={{ mb: 0.5 }}>
-                                <Typography
-                                  variant="caption"
-                                  color="success.main"
-                                  sx={{
-                                    display: "block",
-                                    mb: 0.5,
-                                    fontWeight: 600,
-                                  }}
-                                >
-                                  + {t("users.added")}:
-                                </Typography>
-                                <Box
-                                  sx={{
-                                    display: "flex",
-                                    flexWrap: "wrap",
-                                    gap: 0.5,
-                                  }}
-                                >
-                                  {change.details.added.map((perm, i) => {
-                                    const permKey =
-                                      change.details?.addedKeys?.[i];
-                                    const tooltipText = permKey
-                                      ? t(
-                                          `permissions.${permKey.replace(".", "_")}_desc`,
-                                          { defaultValue: "" },
-                                        )
-                                      : "";
-                                    return (
-                                      <Tooltip
-                                        key={i}
-                                        title={tooltipText}
-                                        arrow
-                                        placement="top"
-                                        enterDelay={200}
-                                      >
-                                        <Chip
-                                          label={perm}
-                                          size="small"
-                                          color="success"
-                                          variant="outlined"
-                                          sx={{
-                                            fontSize: "0.7rem",
-                                            height: 22,
-                                          }}
-                                        />
-                                      </Tooltip>
-                                    );
-                                  })}
-                                </Box>
+                          {change.details.added && change.details.added.length > 0 && (
+                            <Box sx={{ mb: 0.5 }}>
+                              <Typography
+                                variant="caption"
+                                color="success.main"
+                                sx={{
+                                  display: 'block',
+                                  mb: 0.5,
+                                  fontWeight: 600,
+                                }}
+                              >
+                                + {t('users.added')}:
+                              </Typography>
+                              <Box
+                                sx={{
+                                  display: 'flex',
+                                  flexWrap: 'wrap',
+                                  gap: 0.5,
+                                }}
+                              >
+                                {change.details.added.map((perm, i) => {
+                                  const permKey = change.details?.addedKeys?.[i];
+                                  const tooltipText = permKey
+                                    ? t(`permissions.${permKey.replace('.', '_')}_desc`, {
+                                        defaultValue: '',
+                                      })
+                                    : '';
+                                  return (
+                                    <Tooltip
+                                      key={i}
+                                      title={tooltipText}
+                                      arrow
+                                      placement="top"
+                                      enterDelay={200}
+                                    >
+                                      <Chip
+                                        label={perm}
+                                        size="small"
+                                        color="success"
+                                        variant="outlined"
+                                        sx={{
+                                          fontSize: '0.7rem',
+                                          height: 22,
+                                        }}
+                                      />
+                                    </Tooltip>
+                                  );
+                                })}
                               </Box>
-                            )}
-                          {change.details.removed &&
-                            change.details.removed.length > 0 && (
-                              <Box>
-                                <Typography
-                                  variant="caption"
-                                  color="error.main"
-                                  sx={{
-                                    display: "block",
-                                    mb: 0.5,
-                                    fontWeight: 600,
-                                  }}
-                                >
-                                  - {t("users.removed")}:
-                                </Typography>
-                                <Box
-                                  sx={{
-                                    display: "flex",
-                                    flexWrap: "wrap",
-                                    gap: 0.5,
-                                  }}
-                                >
-                                  {change.details.removed.map((perm, i) => {
-                                    const permKey =
-                                      change.details?.removedKeys?.[i];
-                                    const tooltipText = permKey
-                                      ? t(
-                                          `permissions.${permKey.replace(".", "_")}_desc`,
-                                          { defaultValue: "" },
-                                        )
-                                      : "";
-                                    return (
-                                      <Tooltip
-                                        key={i}
-                                        title={tooltipText}
-                                        arrow
-                                        placement="top"
-                                        enterDelay={200}
-                                      >
-                                        <Chip
-                                          label={perm}
-                                          size="small"
-                                          color="error"
-                                          variant="outlined"
-                                          sx={{
-                                            fontSize: "0.7rem",
-                                            height: 22,
-                                          }}
-                                        />
-                                      </Tooltip>
-                                    );
-                                  })}
-                                </Box>
+                            </Box>
+                          )}
+                          {change.details.removed && change.details.removed.length > 0 && (
+                            <Box>
+                              <Typography
+                                variant="caption"
+                                color="error.main"
+                                sx={{
+                                  display: 'block',
+                                  mb: 0.5,
+                                  fontWeight: 600,
+                                }}
+                              >
+                                - {t('users.removed')}:
+                              </Typography>
+                              <Box
+                                sx={{
+                                  display: 'flex',
+                                  flexWrap: 'wrap',
+                                  gap: 0.5,
+                                }}
+                              >
+                                {change.details.removed.map((perm, i) => {
+                                  const permKey = change.details?.removedKeys?.[i];
+                                  const tooltipText = permKey
+                                    ? t(`permissions.${permKey.replace('.', '_')}_desc`, {
+                                        defaultValue: '',
+                                      })
+                                    : '';
+                                  return (
+                                    <Tooltip
+                                      key={i}
+                                      title={tooltipText}
+                                      arrow
+                                      placement="top"
+                                      enterDelay={200}
+                                    >
+                                      <Chip
+                                        label={perm}
+                                        size="small"
+                                        color="error"
+                                        variant="outlined"
+                                        sx={{
+                                          fontSize: '0.7rem',
+                                          height: 22,
+                                        }}
+                                      />
+                                    </Tooltip>
+                                  );
+                                })}
                               </Box>
-                            )}
+                            </Box>
+                          )}
                         </Box>
                       )}
                     </Box>
@@ -3627,30 +3374,24 @@ const UsersManagementPage: React.FC = () => {
             );
           })()}
         </DialogContent>
-        <DialogActions
-          sx={{ px: 3, py: 2, borderTop: 1, borderColor: "divider" }}
-        >
+        <DialogActions sx={{ px: 3, py: 2, borderTop: 1, borderColor: 'divider' }}>
           <Button
             onClick={handleCloseReview}
             startIcon={<ArrowBackIcon />}
             variant="outlined"
             disabled={reviewDialog.saving}
           >
-            {t("common.reReview")}
+            {t('common.reReview')}
           </Button>
           <Button
             onClick={handleConfirmSave}
             variant="contained"
             startIcon={
-              reviewDialog.saving ? (
-                <CircularProgress size={16} color="inherit" />
-              ) : (
-                <SaveIcon />
-              )
+              reviewDialog.saving ? <CircularProgress size={16} color="inherit" /> : <SaveIcon />
             }
             disabled={reviewDialog.saving || getChanges().length === 0}
           >
-            {reviewDialog.saving ? t("common.saving") : t("common.apply")}
+            {reviewDialog.saving ? t('common.saving') : t('common.apply')}
           </Button>
         </DialogActions>
       </Dialog>
@@ -3662,11 +3403,11 @@ const UsersManagementPage: React.FC = () => {
         onClose={() => setBulkActionDialogOpen(false)}
         sx={{
           zIndex: (theme) => theme.zIndex.drawer + 3, // AppBar(theme.zIndex.drawer+2)보다 높게
-          "& .MuiDrawer-paper": {
-            width: { xs: "100%", sm: 500 },
-            maxWidth: "100vw",
-            display: "flex",
-            flexDirection: "column",
+          '& .MuiDrawer-paper': {
+            width: { xs: '100%', sm: 500 },
+            maxWidth: '100vw',
+            display: 'flex',
+            flexDirection: 'column',
           },
         }}
       >
@@ -3674,94 +3415,85 @@ const UsersManagementPage: React.FC = () => {
         <Box
           sx={{
             p: 2,
-            borderBottom: "1px solid",
-            borderColor: "divider",
-            bgcolor: "background.paper",
+            borderBottom: '1px solid',
+            borderColor: 'divider',
+            bgcolor: 'background.paper',
           }}
         >
           <Box
             sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
               mb: 1,
             }}
           >
             <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
-              {t(
-                `users.bulk${bulkActionType.charAt(0).toUpperCase() + bulkActionType.slice(1)}`,
-              )}{" "}
-              ({selectedUsers.size} {t("users.selectedUsers")})
+              {t(`users.bulk${bulkActionType.charAt(0).toUpperCase() + bulkActionType.slice(1)}`)} (
+              {selectedUsers.size} {t('users.selectedUsers')})
             </Typography>
             <IconButton
               onClick={() => setBulkActionDialogOpen(false)}
               size="small"
               sx={{
-                "&:hover": {
-                  backgroundColor: "action.hover",
+                '&:hover': {
+                  backgroundColor: 'action.hover',
                 },
               }}
             >
               <CloseIcon />
             </IconButton>
           </Box>
-          <Typography
-            variant="body2"
-            sx={{ color: "text.secondary", lineHeight: 1.6 }}
-          >
+          <Typography variant="body2" sx={{ color: 'text.secondary', lineHeight: 1.6 }}>
             {t(
-              `users.bulk${bulkActionType.charAt(0).toUpperCase() + bulkActionType.slice(1)}Subtitle`,
+              `users.bulk${bulkActionType.charAt(0).toUpperCase() + bulkActionType.slice(1)}Subtitle`
             )}
           </Typography>
         </Box>
 
         {/* Content */}
-        <Box sx={{ flex: 1, overflow: "auto", p: 2 }}>
-          {bulkActionType === "status" && (
+        <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
+          {bulkActionType === 'status' && (
             <FormControl fullWidth sx={{ mt: 2 }}>
-              <InputLabel>{t("users.status")}</InputLabel>
+              <InputLabel>{t('users.status')}</InputLabel>
               <Select
                 value={bulkActionValue}
-                label={t("users.status")}
+                label={t('users.status')}
                 onChange={(e) => setBulkActionValue(e.target.value)}
               >
-                <MenuItem value="active">{t("users.statuses.active")}</MenuItem>
-                <MenuItem value="pending">
-                  {t("users.statuses.pending")}
-                </MenuItem>
-                <MenuItem value="suspended">
-                  {t("users.statuses.suspended")}
-                </MenuItem>
+                <MenuItem value="active">{t('users.statuses.active')}</MenuItem>
+                <MenuItem value="pending">{t('users.statuses.pending')}</MenuItem>
+                <MenuItem value="suspended">{t('users.statuses.suspended')}</MenuItem>
               </Select>
             </FormControl>
           )}
-          {bulkActionType === "role" && (
+          {bulkActionType === 'role' && (
             <FormControl fullWidth sx={{ mt: 2 }}>
-              <InputLabel>{t("users.role")}</InputLabel>
+              <InputLabel>{t('users.role')}</InputLabel>
               <Select
                 value={bulkActionValue}
-                label={t("users.role")}
+                label={t('users.role')}
                 onChange={(e) => setBulkActionValue(e.target.value)}
               >
-                <MenuItem value="user">{t("users.roles.user")}</MenuItem>
-                <MenuItem value="admin">{t("users.roles.admin")}</MenuItem>
+                <MenuItem value="user">{t('users.roles.user')}</MenuItem>
+                <MenuItem value="admin">{t('users.roles.admin')}</MenuItem>
               </Select>
             </FormControl>
           )}
-          {bulkActionType === "emailVerified" && (
+          {bulkActionType === 'emailVerified' && (
             <FormControl fullWidth sx={{ mt: 2 }}>
-              <InputLabel>{t("users.emailVerified")}</InputLabel>
+              <InputLabel>{t('users.emailVerified')}</InputLabel>
               <Select
                 value={bulkActionValue}
-                label={t("users.emailVerified")}
+                label={t('users.emailVerified')}
                 onChange={(e) => setBulkActionValue(e.target.value)}
               >
-                <MenuItem value="true">{t("users.verified")}</MenuItem>
-                <MenuItem value="false">{t("users.unverified")}</MenuItem>
+                <MenuItem value="true">{t('users.verified')}</MenuItem>
+                <MenuItem value="false">{t('users.unverified')}</MenuItem>
               </Select>
             </FormControl>
           )}
-          {bulkActionType === "tags" && (
+          {bulkActionType === 'tags' && (
             <Box sx={{ mt: 2 }}>
               <Autocomplete
                 multiple
@@ -3784,7 +3516,7 @@ const UsersManagementPage: React.FC = () => {
                     return (
                       <Tooltip
                         key={option.id}
-                        title={option.description || t("tags.noDescription")}
+                        title={option.description || t('tags.noDescription')}
                         arrow
                       >
                         <Chip
@@ -3804,8 +3536,8 @@ const UsersManagementPage: React.FC = () => {
                 renderInput={(params) => (
                   <TextField
                     {...params}
-                    label={t("users.tags")}
-                    helperText={t("users.bulkTagsHelperText")}
+                    label={t('users.tags')}
+                    helperText={t('users.bulkTagsHelperText')}
                   />
                 )}
                 renderOption={(props, option) => {
@@ -3821,7 +3553,7 @@ const UsersManagementPage: React.FC = () => {
                           mr: 1,
                         }}
                       />
-                      {option.description || t("common.noDescription")}
+                      {option.description || t('common.noDescription')}
                     </Box>
                   );
                 }}
@@ -3830,22 +3562,19 @@ const UsersManagementPage: React.FC = () => {
           )}
 
           {/* 공통 대상 미리보기 (삭제 외 액션에도 표시) */}
-          {bulkActionType !== "delete" && selectedUsers.size > 0 && (
+          {bulkActionType !== 'delete' && selectedUsers.size > 0 && (
             <Box sx={{ mt: 3 }}>
-              <Typography
-                variant="subtitle2"
-                sx={{ mb: 1, fontWeight: "medium" }}
-              >
-                {t("users.targetList")}:
+              <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 'medium' }}>
+                {t('users.targetList')}:
               </Typography>
               <Box
                 sx={{
                   maxHeight: 300,
-                  overflow: "auto",
+                  overflow: 'auto',
                   border: 1,
-                  borderColor: "divider",
+                  borderColor: 'divider',
                   borderRadius: 1,
-                  bgcolor: "background.paper",
+                  bgcolor: 'background.paper',
                 }}
               >
                 {users
@@ -3854,20 +3583,17 @@ const UsersManagementPage: React.FC = () => {
                     <Box
                       key={user.id}
                       sx={{
-                        display: "flex",
-                        alignItems: "center",
+                        display: 'flex',
+                        alignItems: 'center',
                         gap: 2,
                         p: 2,
                         borderBottom: 1,
-                        borderColor: "divider",
-                        "&:last-child": { borderBottom: 0 },
+                        borderColor: 'divider',
+                        '&:last-child': { borderBottom: 0 },
                       }}
                     >
                       <Box sx={{ flex: 1 }}>
-                        <Typography
-                          variant="body2"
-                          sx={{ fontWeight: "medium" }}
-                        >
+                        <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
                           {user.name}
                         </Typography>
                         <Typography variant="caption" color="text.secondary">
@@ -3883,7 +3609,7 @@ const UsersManagementPage: React.FC = () => {
                       <Chip
                         label={t(`users.roles.${user.role}`)}
                         size="small"
-                        color={user.role === "admin" ? "error" : "default"}
+                        color={user.role === 'admin' ? 'error' : 'default'}
                         variant="outlined"
                       />
                     </Box>
@@ -3892,27 +3618,24 @@ const UsersManagementPage: React.FC = () => {
             </Box>
           )}
 
-          {bulkActionType === "delete" && (
+          {bulkActionType === 'delete' && (
             <Box sx={{ mt: 2 }}>
-              <Typography sx={{ mb: 2, fontWeight: "medium" }}>
-                {t("users.bulkDeleteConfirm", { count: selectedUsers.size })}
+              <Typography sx={{ mb: 2, fontWeight: 'medium' }}>
+                {t('users.bulkDeleteConfirm', { count: selectedUsers.size })}
               </Typography>
 
               {/* 삭제 대상 사용자 목록 */}
-              <Typography
-                variant="subtitle2"
-                sx={{ mb: 1, fontWeight: "medium" }}
-              >
-                {t("users.deleteTargetUsers")}:
+              <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 'medium' }}>
+                {t('users.deleteTargetUsers')}:
               </Typography>
               <Box
                 sx={{
                   maxHeight: 300,
-                  overflow: "auto",
+                  overflow: 'auto',
                   border: 1,
-                  borderColor: "divider",
+                  borderColor: 'divider',
                   borderRadius: 1,
-                  bgcolor: "background.paper",
+                  bgcolor: 'background.paper',
                 }}
               >
                 {users
@@ -3921,20 +3644,17 @@ const UsersManagementPage: React.FC = () => {
                     <Box
                       key={user.id}
                       sx={{
-                        display: "flex",
-                        alignItems: "center",
+                        display: 'flex',
+                        alignItems: 'center',
                         gap: 2,
                         p: 2,
                         borderBottom: 1,
-                        borderColor: "divider",
-                        "&:last-child": { borderBottom: 0 },
+                        borderColor: 'divider',
+                        '&:last-child': { borderBottom: 0 },
                       }}
                     >
                       <Box sx={{ flex: 1 }}>
-                        <Typography
-                          variant="body2"
-                          sx={{ fontWeight: "medium" }}
-                        >
+                        <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
                           {user.name}
                         </Typography>
                         <Typography variant="caption" color="text.secondary">
@@ -3944,7 +3664,7 @@ const UsersManagementPage: React.FC = () => {
                       <Chip
                         label={t(`users.roles.${user.role}`)}
                         size="small"
-                        color={user.role === "admin" ? "error" : "default"}
+                        color={user.role === 'admin' ? 'error' : 'default'}
                         variant="outlined"
                       />
                     </Box>
@@ -3958,12 +3678,12 @@ const UsersManagementPage: React.FC = () => {
         <Box
           sx={{
             p: 2,
-            borderTop: "1px solid",
-            borderColor: "divider",
-            bgcolor: "background.paper",
-            display: "flex",
+            borderTop: '1px solid',
+            borderColor: 'divider',
+            bgcolor: 'background.paper',
+            display: 'flex',
             gap: 1,
-            justifyContent: "flex-end",
+            justifyContent: 'flex-end',
           }}
         >
           <Button
@@ -3971,18 +3691,16 @@ const UsersManagementPage: React.FC = () => {
             startIcon={<CancelIcon />}
             variant="outlined"
           >
-            {t("common.cancel")}
+            {t('common.cancel')}
           </Button>
           <Button
             onClick={executeBulkAction}
             variant="contained"
-            color={bulkActionType === "delete" ? "error" : "primary"}
-            startIcon={
-              bulkActionType === "delete" ? <DeleteIcon /> : <SaveIcon />
-            }
+            color={bulkActionType === 'delete' ? 'error' : 'primary'}
+            startIcon={bulkActionType === 'delete' ? <DeleteIcon /> : <SaveIcon />}
             disabled={!isBulkActionValid()}
           >
-            {t("common.save")}
+            {t('common.save')}
           </Button>
         </Box>
       </Drawer>
@@ -3994,41 +3712,41 @@ const UsersManagementPage: React.FC = () => {
         onClose={() => setInvitationDialogOpen(false)}
         sx={{
           zIndex: 1300,
-          "& .MuiDrawer-paper": {
-            width: { xs: "100%", sm: 400 },
-            maxWidth: "100vw",
-            height: "100vh", // 전체 화면 높이 사용
+          '& .MuiDrawer-paper': {
+            width: { xs: '100%', sm: 400 },
+            maxWidth: '100vw',
+            height: '100vh', // 전체 화면 높이 사용
             top: 0, // 상단에 붙임
-            display: "flex",
-            flexDirection: "column",
+            display: 'flex',
+            flexDirection: 'column',
           },
         }}
       >
         {/* Header */}
         <Box
           sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
             p: 2,
-            borderBottom: "1px solid",
-            borderColor: "divider",
-            bgcolor: "background.paper",
+            borderBottom: '1px solid',
+            borderColor: 'divider',
+            bgcolor: 'background.paper',
           }}
         >
           <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
-            {t("invitations.drawerTitle")}
+            {t('invitations.drawerTitle')}
           </Typography>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <IconButton
               onClick={loadCurrentInvitation}
               size="small"
               sx={{
-                "&:hover": {
-                  backgroundColor: "action.hover",
+                '&:hover': {
+                  backgroundColor: 'action.hover',
                 },
               }}
-              title={t("common.refresh")}
+              title={t('common.refresh')}
             >
               <RefreshIcon />
             </IconButton>
@@ -4036,8 +3754,8 @@ const UsersManagementPage: React.FC = () => {
               onClick={() => setInvitationDialogOpen(false)}
               size="small"
               sx={{
-                "&:hover": {
-                  backgroundColor: "action.hover",
+                '&:hover': {
+                  backgroundColor: 'action.hover',
                 },
               }}
             >
@@ -4050,7 +3768,7 @@ const UsersManagementPage: React.FC = () => {
         <Box
           sx={{
             flex: 1,
-            overflow: "auto",
+            overflow: 'auto',
           }}
         >
           <InvitationForm
@@ -4067,12 +3785,12 @@ const UsersManagementPage: React.FC = () => {
         anchorEl={columnSettingsAnchor}
         onClose={() => setColumnSettingsAnchor(null)}
         anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "right",
+          vertical: 'bottom',
+          horizontal: 'right',
         }}
         transformOrigin={{
-          vertical: "top",
-          horizontal: "right",
+          vertical: 'top',
+          horizontal: 'right',
         }}
         hideBackdrop
         disableScrollLock
@@ -4081,17 +3799,17 @@ const UsersManagementPage: React.FC = () => {
           <Box sx={{ p: 2, minWidth: 280, maxWidth: 320 }}>
             <Box
               sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
                 mb: 1,
               }}
             >
               <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-                {t("users.columnSettings")}
+                {t('users.columnSettings')}
               </Typography>
               <Button size="small" onClick={handleResetColumns} color="warning">
-                {t("common.reset")}
+                {t('common.reset')}
               </Button>
             </Box>
             <DndContext

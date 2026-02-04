@@ -15,6 +15,7 @@ node rewardLookupBuilder.js
 ```
 
 이 명령은 다음 파일들을 생성합니다:
+
 - `reward-lookup.json`: 운영툴에서 사용할 JSON 데이터
 - `reward-lookup.html`: 브라우저에서 확인할 수 있는 HTML 파일
 
@@ -81,26 +82,24 @@ function RewardSelector() {
   const [selectedRewardType, setSelectedRewardType] = useState('');
   const [selectedItemId, setSelectedItemId] = useState('');
   const [quantity, setQuantity] = useState(1);
-  
+
   // REWARD_TYPE 목록
   const rewardTypes = Object.values(rewardLookupData);
-  
+
   // 선택된 REWARD_TYPE의 정보
-  const selectedTypeInfo = selectedRewardType 
-    ? rewardLookupData[selectedRewardType] 
-    : null;
-  
+  const selectedTypeInfo = selectedRewardType ? rewardLookupData[selectedRewardType] : null;
+
   // 선택 가능한 아이템 목록
   const availableItems = selectedTypeInfo?.items || [];
-  
+
   return (
     <div className="reward-selector">
       <h3>보상 선택</h3>
-      
+
       {/* Step 1: REWARD_TYPE 선택 */}
       <div className="form-group">
         <label>보상 타입:</label>
-        <select 
+        <select
           value={selectedRewardType}
           onChange={(e) => {
             setSelectedRewardType(e.target.value);
@@ -108,7 +107,7 @@ function RewardSelector() {
           }}
         >
           <option value="">선택하세요</option>
-          {rewardTypes.map(type => (
+          {rewardTypes.map((type) => (
             <option key={type.rewardType} value={type.rewardType}>
               {type.rewardTypeName} ({type.rewardType})
               {type.hasTable ? ` - ${type.itemCount}개 아이템` : ' - 수치 입력'}
@@ -116,7 +115,7 @@ function RewardSelector() {
           ))}
         </select>
       </div>
-      
+
       {/* Step 2: 아이템 선택 또는 수치 입력 */}
       {selectedTypeInfo && (
         <>
@@ -124,20 +123,15 @@ function RewardSelector() {
             // 테이블이 있는 경우: 드롭다운으로 아이템 선택
             <div className="form-group">
               <label>아이템 선택:</label>
-              <select 
-                value={selectedItemId}
-                onChange={(e) => setSelectedItemId(e.target.value)}
-              >
+              <select value={selectedItemId} onChange={(e) => setSelectedItemId(e.target.value)}>
                 <option value="">선택하세요</option>
-                {availableItems.map(item => (
+                {availableItems.map((item) => (
                   <option key={item.id} value={item.id}>
                     [{item.id}] {item.name}
                   </option>
                 ))}
               </select>
-              <p className="help-text">
-                총 {selectedTypeInfo.itemCount}개의 아이템이 있습니다.
-              </p>
+              <p className="help-text">총 {selectedTypeInfo.itemCount}개의 아이템이 있습니다.</p>
             </div>
           ) : (
             // 테이블이 없는 경우: 설명 표시
@@ -147,28 +141,34 @@ function RewardSelector() {
               </p>
             </div>
           )}
-          
+
           {/* Step 3: 수량 입력 */}
           <div className="form-group">
             <label>수량:</label>
-            <input 
-              type="number" 
+            <input
+              type="number"
               min="1"
               value={quantity}
               onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
             />
           </div>
-          
+
           {/* 선택 결과 표시 */}
           <div className="result">
             <h4>선택된 보상:</h4>
-            <pre>{JSON.stringify({
-              rewardType: selectedRewardType,
-              rewardTypeName: selectedTypeInfo.rewardTypeName,
-              itemId: selectedItemId || null,
-              itemName: availableItems.find(i => i.id == selectedItemId)?.name || null,
-              quantity: quantity
-            }, null, 2)}</pre>
+            <pre>
+              {JSON.stringify(
+                {
+                  rewardType: selectedRewardType,
+                  rewardTypeName: selectedTypeInfo.rewardTypeName,
+                  itemId: selectedItemId || null,
+                  itemName: availableItems.find((i) => i.id == selectedItemId)?.name || null,
+                  quantity: quantity,
+                },
+                null,
+                2
+              )}
+            </pre>
           </div>
         </>
       )}
@@ -185,45 +185,37 @@ export default RewardSelector;
 <template>
   <div class="reward-selector">
     <h3>보상 선택</h3>
-    
+
     <!-- REWARD_TYPE 선택 -->
     <div class="form-group">
       <label>보상 타입:</label>
       <select v-model="selectedRewardType" @change="onRewardTypeChange">
         <option value="">선택하세요</option>
-        <option 
-          v-for="type in rewardTypes" 
-          :key="type.rewardType" 
-          :value="type.rewardType"
-        >
+        <option v-for="type in rewardTypes" :key="type.rewardType" :value="type.rewardType">
           {{ type.rewardTypeName }} ({{ type.rewardType }})
           {{ type.hasTable ? ` - ${type.itemCount}개 아이템` : ' - 수치 입력' }}
         </option>
       </select>
     </div>
-    
+
     <!-- 아이템 선택 또는 수치 입력 -->
     <div v-if="selectedTypeInfo">
       <div v-if="selectedTypeInfo.hasTable" class="form-group">
         <label>아이템 선택:</label>
         <select v-model="selectedItemId">
           <option value="">선택하세요</option>
-          <option 
-            v-for="item in availableItems" 
-            :key="item.id" 
-            :value="item.id"
-          >
+          <option v-for="item in availableItems" :key="item.id" :value="item.id">
             [{{ item.id }}] {{ item.name }}
           </option>
         </select>
       </div>
-      
+
       <div v-else class="form-group">
         <p class="info-text">
           {{ selectedTypeInfo.description || '이 보상 타입은 아이템 ID가 필요하지 않습니다.' }}
         </p>
       </div>
-      
+
       <!-- 수량 입력 -->
       <div class="form-group">
         <label>수량:</label>
@@ -251,9 +243,7 @@ export default {
       return Object.values(this.rewardLookupData);
     },
     selectedTypeInfo() {
-      return this.selectedRewardType 
-        ? this.rewardLookupData[this.selectedRewardType] 
-        : null;
+      return this.selectedRewardType ? this.rewardLookupData[this.selectedRewardType] : null;
     },
     availableItems() {
       return this.selectedTypeInfo?.items || [];
@@ -273,109 +263,119 @@ export default {
 ```html
 <!DOCTYPE html>
 <html>
-<head>
-  <title>보상 선택기</title>
-  <style>
-    .form-group { margin: 15px 0; }
-    label { display: block; margin-bottom: 5px; font-weight: bold; }
-    select, input { padding: 8px; width: 300px; }
-  </style>
-</head>
-<body>
-  <div id="reward-selector">
-    <h3>보상 선택</h3>
-    
-    <div class="form-group">
-      <label>보상 타입:</label>
-      <select id="rewardType"></select>
+  <head>
+    <title>보상 선택기</title>
+    <style>
+      .form-group {
+        margin: 15px 0;
+      }
+      label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+      }
+      select,
+      input {
+        padding: 8px;
+        width: 300px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="reward-selector">
+      <h3>보상 선택</h3>
+
+      <div class="form-group">
+        <label>보상 타입:</label>
+        <select id="rewardType"></select>
+      </div>
+
+      <div id="itemSelector" class="form-group" style="display:none;">
+        <label>아이템 선택:</label>
+        <select id="itemId"></select>
+      </div>
+
+      <div id="description" class="form-group" style="display:none;">
+        <p id="descriptionText"></p>
+      </div>
+
+      <div class="form-group">
+        <label>수량:</label>
+        <input type="number" id="quantity" min="1" value="1" />
+      </div>
+
+      <div id="result"></div>
     </div>
-    
-    <div id="itemSelector" class="form-group" style="display:none;">
-      <label>아이템 선택:</label>
-      <select id="itemId"></select>
-    </div>
-    
-    <div id="description" class="form-group" style="display:none;">
-      <p id="descriptionText"></p>
-    </div>
-    
-    <div class="form-group">
-      <label>수량:</label>
-      <input type="number" id="quantity" min="1" value="1" />
-    </div>
-    
-    <div id="result"></div>
-  </div>
-  
-  <script>
-    // reward-lookup.json 데이터를 로드
-    fetch('reward-lookup.json')
-      .then(response => response.json())
-      .then(rewardLookupData => {
-        initRewardSelector(rewardLookupData);
-      });
-    
-    function initRewardSelector(rewardLookupData) {
-      const rewardTypeSelect = document.getElementById('rewardType');
-      const itemSelector = document.getElementById('itemSelector');
-      const itemIdSelect = document.getElementById('itemId');
-      const description = document.getElementById('description');
-      const descriptionText = document.getElementById('descriptionText');
-      
-      // REWARD_TYPE 옵션 추가
-      const defaultOption = document.createElement('option');
-      defaultOption.value = '';
-      defaultOption.textContent = '선택하세요';
-      rewardTypeSelect.appendChild(defaultOption);
-      
-      Object.values(rewardLookupData).forEach(type => {
-        const option = document.createElement('option');
-        option.value = type.rewardType;
-        option.textContent = `${type.rewardTypeName} (${type.rewardType})`;
-        if (type.hasTable) {
-          option.textContent += ` - ${type.itemCount}개 아이템`;
-        } else {
-          option.textContent += ' - 수치 입력';
-        }
-        rewardTypeSelect.appendChild(option);
-      });
-      
-      // REWARD_TYPE 변경 이벤트
-      rewardTypeSelect.addEventListener('change', function() {
-        const selectedType = this.value;
-        
-        if (!selectedType) {
-          itemSelector.style.display = 'none';
-          description.style.display = 'none';
-          return;
-        }
-        
-        const typeInfo = rewardLookupData[selectedType];
-        
-        if (typeInfo.hasTable) {
-          // 아이템 선택 드롭다운 표시
-          itemSelector.style.display = 'block';
-          description.style.display = 'none';
-          
-          // 아이템 옵션 추가
-          itemIdSelect.innerHTML = '<option value="">선택하세요</option>';
-          typeInfo.items.forEach(item => {
-            const option = document.createElement('option');
-            option.value = item.id;
-            option.textContent = `[${item.id}] ${item.name}`;
-            itemIdSelect.appendChild(option);
-          });
-        } else {
-          // 설명 표시
-          itemSelector.style.display = 'none';
-          description.style.display = 'block';
-          descriptionText.textContent = typeInfo.description || 
-            '이 보상 타입은 아이템 ID가 필요하지 않습니다.';
-        }
-      });
-    }
-  </script>
-</body>
+
+    <script>
+      // reward-lookup.json 데이터를 로드
+      fetch('reward-lookup.json')
+        .then((response) => response.json())
+        .then((rewardLookupData) => {
+          initRewardSelector(rewardLookupData);
+        });
+
+      function initRewardSelector(rewardLookupData) {
+        const rewardTypeSelect = document.getElementById('rewardType');
+        const itemSelector = document.getElementById('itemSelector');
+        const itemIdSelect = document.getElementById('itemId');
+        const description = document.getElementById('description');
+        const descriptionText = document.getElementById('descriptionText');
+
+        // REWARD_TYPE 옵션 추가
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = '선택하세요';
+        rewardTypeSelect.appendChild(defaultOption);
+
+        Object.values(rewardLookupData).forEach((type) => {
+          const option = document.createElement('option');
+          option.value = type.rewardType;
+          option.textContent = `${type.rewardTypeName} (${type.rewardType})`;
+          if (type.hasTable) {
+            option.textContent += ` - ${type.itemCount}개 아이템`;
+          } else {
+            option.textContent += ' - 수치 입력';
+          }
+          rewardTypeSelect.appendChild(option);
+        });
+
+        // REWARD_TYPE 변경 이벤트
+        rewardTypeSelect.addEventListener('change', function () {
+          const selectedType = this.value;
+
+          if (!selectedType) {
+            itemSelector.style.display = 'none';
+            description.style.display = 'none';
+            return;
+          }
+
+          const typeInfo = rewardLookupData[selectedType];
+
+          if (typeInfo.hasTable) {
+            // 아이템 선택 드롭다운 표시
+            itemSelector.style.display = 'block';
+            description.style.display = 'none';
+
+            // 아이템 옵션 추가
+            itemIdSelect.innerHTML = '<option value="">선택하세요</option>';
+            typeInfo.items.forEach((item) => {
+              const option = document.createElement('option');
+              option.value = item.id;
+              option.textContent = `[${item.id}] ${item.name}`;
+              itemIdSelect.appendChild(option);
+            });
+          } else {
+            // 설명 표시
+            itemSelector.style.display = 'none';
+            description.style.display = 'block';
+            descriptionText.textContent =
+              typeInfo.description || '이 보상 타입은 아이템 ID가 필요하지 않습니다.';
+          }
+        });
+      }
+    </script>
+  </body>
 </html>
 ```
 
@@ -398,11 +398,11 @@ app.get('/api/rewards/lookup', (req, res) => {
 app.get('/api/rewards/:rewardType/items', (req, res) => {
   const rewardType = req.params.rewardType;
   const typeInfo = rewardLookupData[rewardType];
-  
+
   if (!typeInfo) {
     return res.status(404).json({ error: 'Reward type not found' });
   }
-  
+
   res.json({
     rewardType: typeInfo.rewardType,
     rewardTypeName: typeInfo.rewardTypeName,
@@ -416,16 +416,15 @@ app.get('/api/rewards/:rewardType/search', (req, res) => {
   const rewardType = req.params.rewardType;
   const query = req.query.q?.toLowerCase() || '';
   const typeInfo = rewardLookupData[rewardType];
-  
+
   if (!typeInfo || !typeInfo.hasTable) {
     return res.status(404).json({ error: 'Reward type not found or has no items' });
   }
-  
-  const filteredItems = typeInfo.items.filter(item => 
-    item.name.toLowerCase().includes(query) ||
-    item.id.toString().includes(query)
+
+  const filteredItems = typeInfo.items.filter(
+    (item) => item.name.toLowerCase().includes(query) || item.id.toString().includes(query)
   );
-  
+
   res.json({
     rewardType: typeInfo.rewardType,
     rewardTypeName: typeInfo.rewardTypeName,
@@ -483,4 +482,3 @@ package.json에 스크립트 추가:
 - `type`: REWARD_TYPE 값 (숫자)
 - `id`: 선택한 아이템 ID (hasTable이 false면 0 또는 null)
 - `quantity`: 수량
-

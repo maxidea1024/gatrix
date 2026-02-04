@@ -1,47 +1,67 @@
-<!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8">
-  <title>계정 승인 완료</title>
-  <style>
-    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-    .header { background-color: #5b6ad0; color: white; padding: 20px; text-align: center; }
-    .content { padding: 20px; background-color: #f9f9f9; }
-    .button { 
-      display: inline-block; 
-      padding: 12px 24px; 
-      background-color: #5b6ad0; 
-      color: white; 
-      text-decoration: none; 
-      border-radius: 4px; 
-      margin: 20px 0;
-    }
-    .footer { padding: 20px; text-align: center; color: #666; font-size: 12px; }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="header">
-      <h1>🎉 계정 승인 완료!</h1>
+  <head>
+    <meta charset='utf-8' />
+    <title>계정 승인 완료</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        color: #333;
+      }
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .header {
+        background-color: #5b6ad0;
+        color: white;
+        padding: 20px;
+        text-align: center;
+      }
+      .content {
+        padding: 20px;
+        background-color: #f9f9f9;
+      }
+      .button {
+        display: inline-block;
+        padding: 12px 24px;
+        background-color: #5b6ad0;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+        margin: 20px 0;
+      }
+      .footer {
+        padding: 20px;
+        text-align: center;
+        color: #666;
+        font-size: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class='container'>
+      <div class='header'>
+        <h1>🎉 계정 승인 완료!</h1>
+      </div>
+      <div class='content'>
+        <h2>안녕하세요, {{name}}님!</h2>
+        <p>좋은 소식이 있습니다!</p>
+        <p>Gatrix 계정이 관리자에 의해 승인되었습니다. 이제 모든 플랫폼 기능을 사용하실 수 있습니다.</p>
+        <a href='{{loginUrl}}' class='button'>지금 로그인</a>
+        <p>이제 다음 기능들을 이용하실 수 있습니다:</p>
+        <ul>
+          <li>게임 클라이언트 관리</li>
+          <li>서버 설정 도구</li>
+          <li>사용자 계정 관리</li>
+          <li>플랫폼 모니터링 및 분석</li>
+        </ul>
+        <p>Gatrix에 오신 것을 진심으로 환영합니다!</p>
+      </div>
+      <div class='footer'>
+        <p>© 2025 Gatrix. All rights reserved.</p>
+      </div>
     </div>
-    <div class="content">
-      <h2>안녕하세요, {{name}}님!</h2>
-      <p>좋은 소식이 있습니다!</p>
-      <p>Gatrix 계정이 관리자에 의해 승인되었습니다. 이제 모든 플랫폼 기능을 사용하실 수 있습니다.</p>
-      <a href="{{loginUrl}}" class="button">지금 로그인</a>
-      <p>이제 다음 기능들을 이용하실 수 있습니다:</p>
-      <ul>
-        <li>게임 클라이언트 관리</li>
-        <li>서버 설정 도구</li>
-        <li>사용자 계정 관리</li>
-        <li>플랫폼 모니터링 및 분석</li>
-      </ul>
-      <p>Gatrix에 오신 것을 진심으로 환영합니다!</p>
-    </div>
-    <div class="footer">
-      <p>© 2025 Gatrix. All rights reserved.</p>
-    </div>
-  </div>
-</body>
+  </body>
 </html>

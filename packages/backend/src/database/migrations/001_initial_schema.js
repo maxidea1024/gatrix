@@ -4,7 +4,6 @@
  * Updated: 2025-09-12 - Consolidated all migrations into one
  */
 
-
 exports.up = async function (connection) {
   // Connection is provided by the migration system
 
@@ -605,10 +604,13 @@ exports.up = async function (connection) {
   const passwordHash = await bcrypt.hash(adminPassword, 12);
 
   // Insert default admin user
-  await connection.execute(`
+  await connection.execute(
+    `
     INSERT IGNORE INTO g_users (id, name, email, passwordHash, role, status, emailVerified, createdAt, updatedAt)
     VALUES (1, ?, ?, ?, 'admin', 'active', TRUE, NOW(), NOW())
-  `, [adminName, adminEmail, passwordHash]);
+  `,
+    [adminName, adminEmail, passwordHash]
+  );
 
   // Create g_projects table
   await connection.execute(`
@@ -661,10 +663,13 @@ exports.up = async function (connection) {
   // Insert default project
   const { ulid } = require('ulid');
   const defaultProjectId = ulid();
-  await connection.execute(`
+  await connection.execute(
+    `
     INSERT IGNORE INTO g_projects (id, projectName, displayName, description, isDefault, createdBy)
     VALUES (?, 'default', 'Default Project', 'Default project', TRUE, 1)
-  `, [defaultProjectId]);
+  `,
+    [defaultProjectId]
+  );
 
   // Insert predefined environments
   await connection.execute(`
@@ -1318,28 +1323,69 @@ exports.up = async function (connection) {
 
   // Seed all permissions to admin@gatrix.com
   const ALL_PERMISSIONS = [
-    'users.view', 'users.manage', 'client-versions.view', 'client-versions.manage',
-    'game-worlds.view', 'game-worlds.manage', 'maintenance.view', 'maintenance.manage',
-    'maintenance-templates.view', 'maintenance-templates.manage', 'scheduler.view', 'scheduler.manage',
-    'audit-logs.view', 'realtime-events.view', 'crash-events.view', 'remote-config.view',
-    'remote-config.manage', 'security.view', 'security.manage', 'servers.view',
-    'servers.manage', 'monitoring.view', 'open-api.view', 'console.access',
-    'service-notices.view', 'service-notices.manage', 'ingame-popup-notices.view', 'ingame-popup-notices.manage',
-    'coupons.view', 'coupons.manage', 'surveys.view', 'surveys.manage',
-    'operation-events.view', 'operation-events.manage', 'store-products.view', 'store-products.manage',
-    'reward-templates.view', 'reward-templates.manage', 'banners.view', 'banners.manage',
-    'planning-data.view', 'planning-data.manage', 'change-requests.view', 'change-requests.manage',
-    'event-lens.view', 'event-lens.manage',
-    'tags.view', 'tags.manage', 'data-management.view', 'data-management.manage',
-    'environments.view', 'environments.manage', 'system-settings.view', 'system-settings.manage',
-    'chat.access'
+    'users.view',
+    'users.manage',
+    'client-versions.view',
+    'client-versions.manage',
+    'game-worlds.view',
+    'game-worlds.manage',
+    'maintenance.view',
+    'maintenance.manage',
+    'maintenance-templates.view',
+    'maintenance-templates.manage',
+    'scheduler.view',
+    'scheduler.manage',
+    'audit-logs.view',
+    'realtime-events.view',
+    'crash-events.view',
+    'remote-config.view',
+    'remote-config.manage',
+    'security.view',
+    'security.manage',
+    'servers.view',
+    'servers.manage',
+    'monitoring.view',
+    'open-api.view',
+    'console.access',
+    'service-notices.view',
+    'service-notices.manage',
+    'ingame-popup-notices.view',
+    'ingame-popup-notices.manage',
+    'coupons.view',
+    'coupons.manage',
+    'surveys.view',
+    'surveys.manage',
+    'operation-events.view',
+    'operation-events.manage',
+    'store-products.view',
+    'store-products.manage',
+    'reward-templates.view',
+    'reward-templates.manage',
+    'banners.view',
+    'banners.manage',
+    'planning-data.view',
+    'planning-data.manage',
+    'change-requests.view',
+    'change-requests.manage',
+    'event-lens.view',
+    'event-lens.manage',
+    'tags.view',
+    'tags.manage',
+    'data-management.view',
+    'data-management.manage',
+    'environments.view',
+    'environments.manage',
+    'system-settings.view',
+    'system-settings.manage',
+    'chat.access',
   ];
-
 
   const adminUserId = 1; // From initial seed
   if (adminUserId) {
-    const permValues = ALL_PERMISSIONS.map(p => `(${adminUserId}, '${p}')`).join(', ');
-    await connection.execute(`INSERT IGNORE INTO g_user_permissions (userId, permission) VALUES ${permValues}`);
+    const permValues = ALL_PERMISSIONS.map((p) => `(${adminUserId}, '${p}')`).join(', ');
+    await connection.execute(
+      `INSERT IGNORE INTO g_user_permissions (userId, permission) VALUES ${permValues}`
+    );
   }
 
   // 57. Create g_mails table
@@ -1623,7 +1669,7 @@ exports.up = async function (connection) {
     { name: 'New', color: '#90EE90', description: 'Newly added features' },
     { name: 'Deprecated', color: '#D3D3D3', description: 'Deprecated items to be removed' },
     { name: 'Disabled', color: '#A9A9A9', description: 'Disabled or inactive items' },
-    { name: 'Enabled', color: '#32CD32', description: 'Enabled or active items' }
+    { name: 'Enabled', color: '#32CD32', description: 'Enabled or active items' },
   ];
   for (const tag of defaultTags) {
     await connection.execute(
@@ -1704,7 +1750,7 @@ exports.down = async function (connection) {
     'g_audit_logs',
     'g_password_reset_tokens',
     'g_oauth_accounts',
-    'g_users'
+    'g_users',
   ];
 
   for (const table of tables) {

@@ -1,12 +1,6 @@
-import React, {
-  useState,
-  useEffect,
-  useMemo,
-  useCallback,
-  useRef,
-} from "react";
-import { useAuth } from "@/hooks/useAuth";
-import { PERMISSIONS } from "@/types/permissions";
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { useAuth } from '@/hooks/useAuth';
+import { PERMISSIONS } from '@/types/permissions';
 import {
   Box,
   Typography,
@@ -28,8 +22,8 @@ import {
   TableSortLabel,
   Switch,
   Divider,
-} from "@mui/material";
-import { copyToClipboardWithNotification } from "@/utils/clipboard";
+} from '@mui/material';
+import { copyToClipboardWithNotification } from '@/utils/clipboard';
 import {
   Add as AddIcon,
   Edit as EditIcon,
@@ -41,48 +35,46 @@ import {
   Refresh as RefreshIcon,
   Sync as SyncIcon,
   PlaylistPlay as BatchProcessIcon,
-} from "@mui/icons-material";
-import { useTranslation } from "react-i18next";
-import { useSnackbar } from "notistack";
-import { parseApiErrorMessage } from "../../utils/errorUtils";
+} from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
+import { useSnackbar } from 'notistack';
+import { parseApiErrorMessage } from '../../utils/errorUtils';
 import storeProductService, {
   StoreProduct,
   SyncPreviewResult,
   SelectedSyncItems,
   StoreProductStats,
-} from "../../services/storeProductService";
-import { tagService } from "../../services/tagService";
+} from '../../services/storeProductService';
+import { tagService } from '../../services/tagService';
 import SyncPreviewDialog, {
   SelectedSyncItems as DialogSelectedSyncItems,
-} from "../../components/game/SyncPreviewDialog";
-import BatchProcessDialog from "../../components/game/BatchProcessDialog";
-import SimplePagination from "../../components/common/SimplePagination";
-import EmptyState from "../../components/common/EmptyState";
-import ColumnSettingsDialog, {
-  ColumnConfig,
-} from "../../components/common/ColumnSettingsDialog";
-import { useDebounce } from "../../hooks/useDebounce";
-import { useGlobalPageSize } from "../../hooks/useGlobalPageSize";
-import { formatDateTimeDetailed } from "../../utils/dateFormat";
-import ConfirmDeleteDialog from "../../components/common/ConfirmDeleteDialog";
-import StoreProductFormDrawer from "../../components/game/StoreProductFormDrawer";
+} from '../../components/game/SyncPreviewDialog';
+import BatchProcessDialog from '../../components/game/BatchProcessDialog';
+import SimplePagination from '../../components/common/SimplePagination';
+import EmptyState from '../../components/common/EmptyState';
+import ColumnSettingsDialog, { ColumnConfig } from '../../components/common/ColumnSettingsDialog';
+import { useDebounce } from '../../hooks/useDebounce';
+import { useGlobalPageSize } from '../../hooks/useGlobalPageSize';
+import { formatDateTimeDetailed } from '../../utils/dateFormat';
+import ConfirmDeleteDialog from '../../components/common/ConfirmDeleteDialog';
+import StoreProductFormDrawer from '../../components/game/StoreProductFormDrawer';
 import DynamicFilterBar, {
   FilterDefinition,
   ActiveFilter,
-} from "../../components/common/DynamicFilterBar";
-import { showChangeRequestCreatedToast } from "../../utils/changeRequestToast";
-import { useNavigate } from "react-router-dom";
-import { useHandleApiError } from "../../hooks/useHandleApiError";
+} from '../../components/common/DynamicFilterBar';
+import { showChangeRequestCreatedToast } from '../../utils/changeRequestToast';
+import { useNavigate } from 'react-router-dom';
+import { useHandleApiError } from '../../hooks/useHandleApiError';
 
 // Store display names
 const STORE_DISPLAY_NAMES: Record<string, string> = {
-  sdo: "SDO",
-  google_play: "Google Play",
-  app_store: "App Store",
-  one_store: "ONE Store",
-  galaxy_store: "Galaxy Store",
-  amazon: "Amazon Appstore",
-  huawei: "Huawei AppGallery",
+  sdo: 'SDO',
+  google_play: 'Google Play',
+  app_store: 'App Store',
+  one_store: 'ONE Store',
+  galaxy_store: 'Galaxy Store',
+  amazon: 'Amazon Appstore',
+  huawei: 'Huawei AppGallery',
 };
 
 const StoreProductsPage: React.FC = () => {
@@ -101,25 +93,18 @@ const StoreProductsPage: React.FC = () => {
   const [rowsPerPage, setRowsPerPage] = useGlobalPageSize();
   const [loading, setLoading] = useState(false);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [formDrawerOpen, setFormDrawerOpen] = useState(false);
-  const [editingProduct, setEditingProduct] = useState<StoreProduct | null>(
-    null,
-  );
+  const [editingProduct, setEditingProduct] = useState<StoreProduct | null>(null);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
-  const [deletingProduct, setDeletingProduct] = useState<StoreProduct | null>(
-    null,
-  );
-  const [columnSettingsAnchor, setColumnSettingsAnchor] =
-    useState<null | HTMLElement>(null);
+  const [deletingProduct, setDeletingProduct] = useState<StoreProduct | null>(null);
+  const [columnSettingsAnchor, setColumnSettingsAnchor] = useState<null | HTMLElement>(null);
   const [bulkDeleteConfirmOpen, setBulkDeleteConfirmOpen] = useState(false);
 
   // Sync state
   const [syncDialogOpen, setSyncDialogOpen] = useState(false);
-  const [syncPreview, setSyncPreview] = useState<SyncPreviewResult | null>(
-    null,
-  );
+  const [syncPreview, setSyncPreview] = useState<SyncPreviewResult | null>(null);
   const [syncLoading, setSyncLoading] = useState(false);
 
   // Batch process state
@@ -135,12 +120,12 @@ const StoreProductsPage: React.FC = () => {
 
   // Sorting state with localStorage persistence
   const [orderBy, setOrderBy] = useState<string>(() => {
-    const saved = localStorage.getItem("storeProductsSortBy");
-    return saved || "createdAt";
+    const saved = localStorage.getItem('storeProductsSortBy');
+    return saved || 'createdAt';
   });
-  const [order, setOrder] = useState<"asc" | "desc">(() => {
-    const saved = localStorage.getItem("storeProductsSortOrder");
-    return (saved as "asc" | "desc") || "desc";
+  const [order, setOrder] = useState<'asc' | 'desc'>(() => {
+    const saved = localStorage.getItem('storeProductsSortOrder');
+    return (saved as 'asc' | 'desc') || 'desc';
   });
 
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
@@ -148,7 +133,7 @@ const StoreProductsPage: React.FC = () => {
   // Dynamic filter state with localStorage persistence
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>(() => {
     try {
-      const saved = localStorage.getItem("storeProductsActiveFilters");
+      const saved = localStorage.getItem('storeProductsActiveFilters');
       return saved ? JSON.parse(saved) : [];
     } catch (e) {
       return [];
@@ -159,19 +144,19 @@ const StoreProductsPage: React.FC = () => {
   const availableFilterDefinitions: FilterDefinition[] = useMemo(
     () => [
       {
-        key: "isActive",
-        label: t("storeProducts.isActive"),
-        type: "select",
+        key: 'isActive',
+        label: t('storeProducts.isActive'),
+        type: 'select',
         options: [
-          { value: "true", label: t("common.active") },
-          { value: "false", label: t("common.inactive") },
+          { value: 'true', label: t('common.active') },
+          { value: 'false', label: t('common.inactive') },
         ],
       },
       {
-        key: "tags",
-        label: t("storeProducts.tags"),
-        type: "tags",
-        operator: "include_all",
+        key: 'tags',
+        label: t('storeProducts.tags'),
+        type: 'tags',
+        operator: 'include_all',
         allowOperatorToggle: true,
         options: allRegistryTags.map((tag) => ({
           value: tag.id,
@@ -181,62 +166,62 @@ const StoreProductsPage: React.FC = () => {
         })),
       },
       {
-        key: "store",
-        label: t("storeProducts.store"),
-        type: "select",
+        key: 'store',
+        label: t('storeProducts.store'),
+        type: 'select',
         options: Object.entries(STORE_DISPLAY_NAMES).map(([value, label]) => ({
           value,
           label,
         })),
       },
       {
-        key: "currency",
-        label: t("storeProducts.currency"),
-        type: "select",
+        key: 'currency',
+        label: t('storeProducts.currency'),
+        type: 'select',
         options: [
-          { value: "CNY", label: "CNY" },
-          { value: "KRW", label: "KRW" },
-          { value: "USD", label: "USD" },
+          { value: 'CNY', label: 'CNY' },
+          { value: 'KRW', label: 'KRW' },
+          { value: 'USD', label: 'USD' },
         ],
       },
       {
-        key: "priceMin",
-        label: t("storeProducts.priceMin"),
-        type: "number",
+        key: 'priceMin',
+        label: t('storeProducts.priceMin'),
+        type: 'number',
       },
       {
-        key: "priceMax",
-        label: t("storeProducts.priceMax"),
-        type: "number",
+        key: 'priceMax',
+        label: t('storeProducts.priceMax'),
+        type: 'number',
       },
     ],
-    [t, allRegistryTags],
+    [t, allRegistryTags]
   );
 
   // Default columns
   const defaultColumns: ColumnConfig[] = [
-    { id: "checkbox", labelKey: "", visible: true },
-    { id: "isActive", labelKey: "storeProducts.isActive", visible: true },
+    { id: 'checkbox', labelKey: '', visible: true },
+    { id: 'isActive', labelKey: 'storeProducts.isActive', visible: true },
     {
-      id: "cmsProductId",
-      labelKey: "storeProducts.cmsProductId",
+      id: 'cmsProductId',
+      labelKey: 'storeProducts.cmsProductId',
       visible: true,
     },
-    { id: "productId", labelKey: "storeProducts.productId", visible: true },
-    { id: "productName", labelKey: "storeProducts.productName", visible: true },
-    { id: "store", labelKey: "storeProducts.store", visible: true },
-    { id: "price", labelKey: "storeProducts.price", visible: true },
-    { id: "saleStartAt", labelKey: "storeProducts.saleStartAt", visible: true },
-    { id: "saleEndAt", labelKey: "storeProducts.saleEndAt", visible: true },
-    { id: "tags", labelKey: "storeProducts.tags", visible: true },
-    { id: "createdAt", labelKey: "storeProducts.createdAt", visible: false },
-    { id: "updatedAt", labelKey: "storeProducts.updatedAt", visible: false },
-    { id: "actions", labelKey: "common.actions", visible: true },
+    { id: 'productId', labelKey: 'storeProducts.productId', visible: true },
+    { id: 'productName', labelKey: 'storeProducts.productName', visible: true },
+    { id: 'store', labelKey: 'storeProducts.store', visible: true },
+    { id: 'price', labelKey: 'storeProducts.price', visible: true },
+    { id: 'saleStartAt', labelKey: 'storeProducts.saleStartAt', visible: true },
+    { id: 'saleEndAt', labelKey: 'storeProducts.saleEndAt', visible: true },
+    { id: 'tags', labelKey: 'storeProducts.tags', visible: true },
+    { id: 'createdAt', labelKey: 'storeProducts.createdAt', visible: false },
+    { id: 'updatedAt', labelKey: 'storeProducts.updatedAt', visible: false },
+    { id: 'actions', labelKey: 'common.actions', visible: true },
   ];
 
   // Column configuration (persisted in localStorage)
   const [columns, setColumns] = useState<ColumnConfig[]>(() => {
-    const saved = localStorage.getItem("storeProductsColumns");
+    const saved = localStorage.getItem('storeProductsColumns');
     if (saved) {
       try {
         const savedColumns = JSON.parse(saved);
@@ -262,56 +247,54 @@ const StoreProductsPage: React.FC = () => {
 
     return productsToFilter.filter((product) => {
       return activeFilters.every((filter) => {
-        if (filter.key === "tags") {
-          const selectedTagIds = Array.isArray(filter.value)
-            ? filter.value
-            : [];
+        if (filter.key === 'tags') {
+          const selectedTagIds = Array.isArray(filter.value) ? filter.value : [];
           if (selectedTagIds.length === 0) return true;
 
           const productTags = product.tags || [];
           const productTagIds = productTags
             .map((t) => {
-              if (typeof t === "object" && t !== null && "id" in t) {
+              if (typeof t === 'object' && t !== null && 'id' in t) {
                 return t.id;
               }
               return null;
             })
             .filter((id) => id !== null);
 
-          return filter.operator === "include_all"
+          return filter.operator === 'include_all'
             ? selectedTagIds.every((tagId) => productTagIds.includes(tagId))
             : selectedTagIds.some((tagId) => productTagIds.includes(tagId));
         }
-        if (filter.key === "store") {
+        if (filter.key === 'store') {
           // Skip filter if value is empty
           if (!filter.value) return true;
           return product.store === filter.value;
         }
-        if (filter.key === "isActive") {
+        if (filter.key === 'isActive') {
           // Skip filter if value is empty
           if (!filter.value) return true;
-          return product.isActive === (filter.value === "true");
+          return product.isActive === (filter.value === 'true');
         }
-        if (filter.key === "cmsProductId") {
+        if (filter.key === 'cmsProductId') {
           // Skip filter if value is empty
           if (!filter.value) return true;
           const searchId = Number(filter.value);
           if (isNaN(searchId)) return true;
           return product.cmsProductId === searchId;
         }
-        if (filter.key === "currency") {
+        if (filter.key === 'currency') {
           // Skip filter if value is empty
           if (!filter.value) return true;
           return product.currency === filter.value;
         }
-        if (filter.key === "priceMin") {
+        if (filter.key === 'priceMin') {
           // Skip filter if value is empty
           if (!filter.value) return true;
           const minPrice = Number(filter.value);
           if (isNaN(minPrice)) return true;
           return Number(product.price) >= minPrice;
         }
-        if (filter.key === "priceMax") {
+        if (filter.key === 'priceMax') {
           // Skip filter if value is empty
           if (!filter.value) return true;
           const maxPrice = Number(filter.value);
@@ -337,25 +320,20 @@ const StoreProductsPage: React.FC = () => {
 
       if (
         result &&
-        typeof result === "object" &&
-        "products" in result &&
+        typeof result === 'object' &&
+        'products' in result &&
         Array.isArray(result.products)
       ) {
         const productsCopy = result.products.map((p) => ({
           ...p,
-          tags:
-            p.tags && Array.isArray(p.tags)
-              ? p.tags.map((tag) => ({ ...tag }))
-              : [],
+          tags: p.tags && Array.isArray(p.tags) ? p.tags.map((tag) => ({ ...tag })) : [],
         }));
 
         setAllProducts(productsCopy);
         const filteredProducts = applyFilters(productsCopy);
         setProducts(filteredProducts);
         const validTotal =
-          typeof result.total === "number" && !isNaN(result.total)
-            ? result.total
-            : 0;
+          typeof result.total === 'number' && !isNaN(result.total) ? result.total : 0;
         setTotal(validTotal);
       } else {
         setProducts([]);
@@ -363,9 +341,9 @@ const StoreProductsPage: React.FC = () => {
         setTotal(0);
       }
     } catch (error: any) {
-      console.error("Failed to load products:", error);
-      enqueueSnackbar(parseApiErrorMessage(error, "storeProducts.loadFailed"), {
-        variant: "error",
+      console.error('Failed to load products:', error);
+      enqueueSnackbar(parseApiErrorMessage(error, 'storeProducts.loadFailed'), {
+        variant: 'error',
       });
       setProducts([]);
       setAllProducts([]);
@@ -382,16 +360,13 @@ const StoreProductsPage: React.FC = () => {
       const stats = await storeProductService.getStats();
       setProductStats(stats);
     } catch (error) {
-      console.error("Failed to load product stats:", error);
+      console.error('Failed to load product stats:', error);
     }
   };
 
   // Save active filters to localStorage
   useEffect(() => {
-    localStorage.setItem(
-      "storeProductsActiveFilters",
-      JSON.stringify(activeFilters),
-    );
+    localStorage.setItem('storeProductsActiveFilters', JSON.stringify(activeFilters));
   }, [activeFilters]);
 
   // Load all registry tags on mount
@@ -401,7 +376,7 @@ const StoreProductsPage: React.FC = () => {
         const tags = await tagService.list();
         setAllRegistryTags(tags);
       } catch (error) {
-        console.error("Failed to load registry tags:", error);
+        console.error('Failed to load registry tags:', error);
       }
     };
     loadTags();
@@ -415,36 +390,30 @@ const StoreProductsPage: React.FC = () => {
 
   // Column handlers
   const handleColumnsChange = (newColumns: ColumnConfig[]) => {
-    const checkboxCol = columns.find((c) => c.id === "checkbox");
-    const actionsCol = columns.find((c) => c.id === "actions");
+    const checkboxCol = columns.find((c) => c.id === 'checkbox');
+    const actionsCol = columns.find((c) => c.id === 'actions');
 
     const updatedColumns = [checkboxCol!, ...newColumns, actionsCol!];
 
     setColumns(updatedColumns);
-    localStorage.setItem(
-      "storeProductsColumns",
-      JSON.stringify(updatedColumns),
-    );
+    localStorage.setItem('storeProductsColumns', JSON.stringify(updatedColumns));
   };
 
   const handleResetColumns = () => {
     setColumns(defaultColumns);
-    localStorage.setItem(
-      "storeProductsColumns",
-      JSON.stringify(defaultColumns),
-    );
+    localStorage.setItem('storeProductsColumns', JSON.stringify(defaultColumns));
   };
 
   // Sort handler
   const handleSort = (colId: string) => {
-    let newOrder: "asc" | "desc" = "asc";
+    let newOrder: 'asc' | 'desc' = 'asc';
     if (orderBy === colId) {
-      newOrder = order === "asc" ? "desc" : "asc";
+      newOrder = order === 'asc' ? 'desc' : 'asc';
     }
     setOrderBy(colId);
     setOrder(newOrder);
-    localStorage.setItem("storeProductsSortBy", colId);
-    localStorage.setItem("storeProductsSortOrder", newOrder);
+    localStorage.setItem('storeProductsSortBy', colId);
+    localStorage.setItem('storeProductsSortOrder', newOrder);
     setPage(0);
   };
 
@@ -460,19 +429,12 @@ const StoreProductsPage: React.FC = () => {
   };
 
   const handleDynamicFilterChange = (key: string, value: any) => {
-    setActiveFilters((prev) =>
-      prev.map((f) => (f.key === key ? { ...f, value } : f)),
-    );
+    setActiveFilters((prev) => prev.map((f) => (f.key === key ? { ...f, value } : f)));
     setPage(0);
   };
 
-  const handleOperatorChange = (
-    key: string,
-    operator: "any_of" | "include_all",
-  ) => {
-    setActiveFilters((prev) =>
-      prev.map((f) => (f.key === key ? { ...f, operator } : f)),
-    );
+  const handleOperatorChange = (key: string, operator: 'any_of' | 'include_all') => {
+    setActiveFilters((prev) => prev.map((f) => (f.key === key ? { ...f, operator } : f)));
     setPage(0);
   };
 
@@ -492,10 +454,10 @@ const StoreProductsPage: React.FC = () => {
   };
 
   const handleCopy = (product: StoreProduct) => {
-    const copiedName = `${product.productName} (${t("common.copy")})`;
+    const copiedName = `${product.productName} (${t('common.copy')})`;
     const copiedProduct: StoreProduct = {
       ...product,
-      id: "",
+      id: '',
       productName: copiedName,
       tags: product.tags ? product.tags.map((tag) => ({ ...tag })) : [],
     };
@@ -524,11 +486,10 @@ const StoreProductsPage: React.FC = () => {
       setSyncPreview(preview);
       setSyncDialogOpen(true);
     } catch (error: any) {
-      console.error("Failed to get sync preview:", error);
-      enqueueSnackbar(
-        parseApiErrorMessage(error, "storeProducts.syncPreviewFailed"),
-        { variant: "error" },
-      );
+      console.error('Failed to get sync preview:', error);
+      enqueueSnackbar(parseApiErrorMessage(error, 'storeProducts.syncPreviewFailed'), {
+        variant: 'error',
+      });
     } finally {
       setSyncLoading(false);
     }
@@ -541,19 +502,18 @@ const StoreProductsPage: React.FC = () => {
       setSyncDialogOpen(false);
       setSyncPreview(null);
       enqueueSnackbar(
-        `${t("storeProducts.syncApplySuccess")} (${t("storeProducts.syncResultAdded", { count: result.addedCount })}, ${t("storeProducts.syncResultUpdated", { count: result.updatedCount })}, ${t("storeProducts.syncResultDeleted", { count: result.deletedCount })})`,
-        { variant: "success" },
+        `${t('storeProducts.syncApplySuccess')} (${t('storeProducts.syncResultAdded', { count: result.addedCount })}, ${t('storeProducts.syncResultUpdated', { count: result.updatedCount })}, ${t('storeProducts.syncResultDeleted', { count: result.deletedCount })})`,
+        { variant: 'success' }
       );
       setPage(0);
       setSelectedIds([]);
       await loadProducts();
       loadStats();
     } catch (error: any) {
-      console.error("Failed to apply sync:", error);
-      enqueueSnackbar(
-        parseApiErrorMessage(error, "storeProducts.syncApplyFailed"),
-        { variant: "error" },
-      );
+      console.error('Failed to apply sync:', error);
+      enqueueSnackbar(parseApiErrorMessage(error, 'storeProducts.syncApplyFailed'), {
+        variant: 'error',
+      });
     } finally {
       setSyncLoading(false);
     }
@@ -570,15 +530,13 @@ const StoreProductsPage: React.FC = () => {
     currentIsActive?: boolean;
     targetIsActive: boolean;
   }) => {
-    const result =
-      await storeProductService.bulkUpdateActiveStatusByFilter(params);
+    const result = await storeProductService.bulkUpdateActiveStatusByFilter(params);
     const actionLabel = params.targetIsActive
-      ? t("storeProducts.bulkActivate")
-      : t("storeProducts.bulkDeactivate");
-    enqueueSnackbar(
-      t("storeProducts.batchExecuteSuccess", { count: result.affectedCount }),
-      { variant: "success" },
-    );
+      ? t('storeProducts.bulkActivate')
+      : t('storeProducts.bulkDeactivate');
+    enqueueSnackbar(t('storeProducts.batchExecuteSuccess', { count: result.affectedCount }), {
+      variant: 'success',
+    });
     setPage(0);
     setSelectedIds([]);
     await loadProducts();
@@ -586,10 +544,7 @@ const StoreProductsPage: React.FC = () => {
     return result;
   };
 
-  const handleBatchProcessGetCount = async (params: {
-    search?: string;
-    isActive?: boolean;
-  }) => {
+  const handleBatchProcessGetCount = async (params: { search?: string; isActive?: boolean }) => {
     return await storeProductService.getCountByFilter(params);
   };
 
@@ -603,12 +558,12 @@ const StoreProductsPage: React.FC = () => {
 
     try {
       await storeProductService.deleteStoreProduct(deletingProduct.id);
-      enqueueSnackbar(t("storeProducts.deleteSuccess"), { variant: "success" });
+      enqueueSnackbar(t('storeProducts.deleteSuccess'), { variant: 'success' });
       setSelectedIds([]);
       loadProducts();
       loadStats();
     } catch (error: any) {
-      handleApiError(error, "storeProducts.deleteFailed");
+      handleApiError(error, 'storeProducts.deleteFailed');
     } finally {
       setDeleteConfirmOpen(false);
       setDeletingProduct(null);
@@ -630,14 +585,14 @@ const StoreProductsPage: React.FC = () => {
 
     try {
       await storeProductService.deleteStoreProducts(selectedIds);
-      enqueueSnackbar(t("storeProducts.bulkDeleteSuccess"), {
-        variant: "success",
+      enqueueSnackbar(t('storeProducts.bulkDeleteSuccess'), {
+        variant: 'success',
       });
       setSelectedIds([]);
       loadProducts();
       loadStats();
     } catch (error: any) {
-      handleApiError(error, "storeProducts.bulkDeleteFailed");
+      handleApiError(error, 'storeProducts.bulkDeleteFailed');
     } finally {
       setBulkDeleteConfirmOpen(false);
     }
@@ -651,68 +606,57 @@ const StoreProductsPage: React.FC = () => {
   const handleBulkActivate = async () => {
     if (selectedIds.length === 0) return;
     try {
-      const result = await storeProductService.bulkUpdateActiveStatus(
-        selectedIds,
-        true,
-      );
+      const result = await storeProductService.bulkUpdateActiveStatus(selectedIds, true);
       if (result.isChangeRequest) {
         showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
       } else {
-        enqueueSnackbar(t("storeProducts.bulkActivateSuccess"), {
-          variant: "success",
+        enqueueSnackbar(t('storeProducts.bulkActivateSuccess'), {
+          variant: 'success',
         });
         setSelectedIds([]);
         loadProducts();
         loadStats();
       }
     } catch (error: any) {
-      handleApiError(error, "storeProducts.bulkActivateFailed");
+      handleApiError(error, 'storeProducts.bulkActivateFailed');
     }
   };
 
   const handleBulkDeactivate = async () => {
     if (selectedIds.length === 0) return;
     try {
-      const result = await storeProductService.bulkUpdateActiveStatus(
-        selectedIds,
-        false,
-      );
+      const result = await storeProductService.bulkUpdateActiveStatus(selectedIds, false);
       if (result.isChangeRequest) {
         showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
       } else {
-        enqueueSnackbar(t("storeProducts.bulkDeactivateSuccess"), {
-          variant: "success",
+        enqueueSnackbar(t('storeProducts.bulkDeactivateSuccess'), {
+          variant: 'success',
         });
         setSelectedIds([]);
         loadProducts();
         loadStats();
       }
     } catch (error: any) {
-      handleApiError(error, "storeProducts.bulkDeactivateFailed");
+      handleApiError(error, 'storeProducts.bulkDeactivateFailed');
     }
   };
 
   // Toggle active status
   const handleToggleActive = async (product: StoreProduct) => {
     try {
-      const result = await storeProductService.toggleActive(
-        product.id,
-        !product.isActive,
-      );
+      const result = await storeProductService.toggleActive(product.id, !product.isActive);
       if (result.isChangeRequest) {
         showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
       } else {
         enqueueSnackbar(
-          product.isActive
-            ? t("storeProducts.deactivated")
-            : t("storeProducts.activated"),
-          { variant: "success" },
+          product.isActive ? t('storeProducts.deactivated') : t('storeProducts.activated'),
+          { variant: 'success' }
         );
         loadProducts();
         loadStats();
       }
     } catch (error: any) {
-      handleApiError(error, "common.saveFailed");
+      handleApiError(error, 'common.saveFailed');
     }
   };
 
@@ -726,9 +670,7 @@ const StoreProductsPage: React.FC = () => {
   };
 
   const handleSelectOne = (id: string) => {
-    setSelectedIds((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id],
-    );
+    setSelectedIds((prev) => (prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]));
   };
 
   // Visible columns
@@ -739,9 +681,9 @@ const StoreProductsPage: React.FC = () => {
       {/* Header */}
       <Box
         sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "flex-start",
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
           mb: 3,
         }}
       >
@@ -749,32 +691,27 @@ const StoreProductsPage: React.FC = () => {
           <Typography
             variant="h4"
             gutterBottom
-            sx={{ display: "flex", alignItems: "center", gap: 1 }}
+            sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
           >
             <StorefrontIcon />
-            {t("storeProducts.title")}
+            {t('storeProducts.title')}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            {t("storeProducts.subtitle")}
+            {t('storeProducts.subtitle')}
           </Typography>
         </Box>
         {canManage && (
-          <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+          <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
             <Button
               variant="outlined"
               startIcon={<SyncIcon />}
               onClick={handleSyncPreview}
               disabled={syncLoading}
             >
-              {t("storeProducts.syncWithPlanningData")}
+              {t('storeProducts.syncWithPlanningData')}
             </Button>
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={handleCreate}
-              disabled
-            >
-              {t("storeProducts.createProduct")}
+            <Button variant="contained" startIcon={<AddIcon />} onClick={handleCreate} disabled>
+              {t('storeProducts.createProduct')}
             </Button>
           </Box>
         )}
@@ -785,24 +722,24 @@ const StoreProductsPage: React.FC = () => {
         <CardContent>
           <Box
             sx={{
-              display: "flex",
-              alignItems: "center",
+              display: 'flex',
+              alignItems: 'center',
               gap: 2,
-              flexWrap: "wrap",
-              justifyContent: "space-between",
+              flexWrap: 'wrap',
+              justifyContent: 'space-between',
             }}
           >
             <Box
               sx={{
-                display: "flex",
+                display: 'flex',
                 gap: 2,
-                alignItems: "center",
-                flexWrap: "wrap",
+                alignItems: 'center',
+                flexWrap: 'wrap',
                 flex: 1,
               }}
             >
               <TextField
-                placeholder={t("storeProducts.searchPlaceholder")}
+                placeholder={t('storeProducts.searchPlaceholder')}
                 value={searchTerm}
                 onChange={(e) => {
                   setSearchTerm(e.target.value);
@@ -812,39 +749,37 @@ const StoreProductsPage: React.FC = () => {
                   minWidth: 200,
                   flexGrow: 1,
                   maxWidth: 320,
-                  "& .MuiOutlinedInput-root": {
-                    height: "40px",
-                    borderRadius: "20px",
-                    bgcolor: "background.paper",
-                    transition: "all 0.2s ease-in-out",
-                    "& fieldset": {
-                      borderColor: "divider",
+                  '& .MuiOutlinedInput-root': {
+                    height: '40px',
+                    borderRadius: '20px',
+                    bgcolor: 'background.paper',
+                    transition: 'all 0.2s ease-in-out',
+                    '& fieldset': {
+                      borderColor: 'divider',
                     },
-                    "&:hover": {
-                      bgcolor: "action.hover",
-                      "& fieldset": {
-                        borderColor: "primary.light",
+                    '&:hover': {
+                      bgcolor: 'action.hover',
+                      '& fieldset': {
+                        borderColor: 'primary.light',
                       },
                     },
-                    "&.Mui-focused": {
-                      bgcolor: "background.paper",
-                      boxShadow: "0 0 0 2px rgba(25, 118, 210, 0.1)",
-                      "& fieldset": {
-                        borderColor: "primary.main",
-                        borderWidth: "1px",
+                    '&.Mui-focused': {
+                      bgcolor: 'background.paper',
+                      boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
+                      '& fieldset': {
+                        borderColor: 'primary.main',
+                        borderWidth: '1px',
                       },
                     },
                   },
-                  "& .MuiInputBase-input": {
-                    fontSize: "0.875rem",
+                  '& .MuiInputBase-input': {
+                    fontSize: '0.875rem',
                   },
                 }}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <SearchIcon
-                        sx={{ color: "text.secondary", fontSize: 20 }}
-                      />
+                      <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
                     </InputAdornment>
                   ),
                 }}
@@ -861,23 +796,21 @@ const StoreProductsPage: React.FC = () => {
                 afterFilterAddActions={
                   <Box
                     sx={{
-                      display: "flex",
-                      alignItems: "center",
+                      display: 'flex',
+                      alignItems: 'center',
                       gap: 1,
                       flexShrink: 0,
                     }}
                   >
-                    <Tooltip title={t("common.columnSettings")}>
+                    <Tooltip title={t('common.columnSettings')}>
                       <IconButton
-                        onClick={(e) =>
-                          setColumnSettingsAnchor(e.currentTarget)
-                        }
+                        onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
                         sx={{
-                          bgcolor: "background.paper",
+                          bgcolor: 'background.paper',
                           border: 1,
-                          borderColor: "divider",
-                          "&:hover": {
-                            bgcolor: "action.hover",
+                          borderColor: 'divider',
+                          '&:hover': {
+                            bgcolor: 'action.hover',
                           },
                         }}
                       >
@@ -886,21 +819,21 @@ const StoreProductsPage: React.FC = () => {
                     </Tooltip>
                     <Box
                       sx={{
-                        display: "flex",
-                        alignItems: "center",
+                        display: 'flex',
+                        alignItems: 'center',
                         gap: 0,
                         ml: 1,
                         borderRadius: 0,
-                        bgcolor: "background.paper",
+                        bgcolor: 'background.paper',
                         border: 1,
-                        borderColor: "divider",
-                        overflow: "hidden",
+                        borderColor: 'divider',
+                        overflow: 'hidden',
                       }}
                     >
                       <Box
                         sx={{
-                          display: "flex",
-                          alignItems: "center",
+                          display: 'flex',
+                          alignItems: 'center',
                           gap: 0.75,
                           px: 1.5,
                           py: 0.5,
@@ -910,28 +843,24 @@ const StoreProductsPage: React.FC = () => {
                           sx={{
                             width: 8,
                             height: 8,
-                            borderRadius: "50%",
-                            bgcolor: "primary.main",
+                            borderRadius: '50%',
+                            bgcolor: 'primary.main',
                           }}
                         />
                         <Typography
                           variant="body2"
                           color="text.secondary"
-                          sx={{ whiteSpace: "nowrap" }}
+                          sx={{ whiteSpace: 'nowrap' }}
                         >
-                          {t("storeProducts.statsTotal")}{" "}
-                          <strong style={{ color: "inherit" }}>
-                            {productStats.total}
-                          </strong>
+                          {t('storeProducts.statsTotal')}{' '}
+                          <strong style={{ color: 'inherit' }}>{productStats.total}</strong>
                         </Typography>
                       </Box>
-                      <Box
-                        sx={{ width: "1px", height: 20, bgcolor: "divider" }}
-                      />
+                      <Box sx={{ width: '1px', height: 20, bgcolor: 'divider' }} />
                       <Box
                         sx={{
-                          display: "flex",
-                          alignItems: "center",
+                          display: 'flex',
+                          alignItems: 'center',
                           gap: 0.75,
                           px: 1.5,
                           py: 0.5,
@@ -941,28 +870,24 @@ const StoreProductsPage: React.FC = () => {
                           sx={{
                             width: 8,
                             height: 8,
-                            borderRadius: "50%",
-                            bgcolor: "success.main",
+                            borderRadius: '50%',
+                            bgcolor: 'success.main',
                           }}
                         />
                         <Typography
                           variant="body2"
                           color="text.secondary"
-                          sx={{ whiteSpace: "nowrap" }}
+                          sx={{ whiteSpace: 'nowrap' }}
                         >
-                          {t("storeProducts.statsActive")}{" "}
-                          <strong style={{ color: "inherit" }}>
-                            {productStats.active}
-                          </strong>
+                          {t('storeProducts.statsActive')}{' '}
+                          <strong style={{ color: 'inherit' }}>{productStats.active}</strong>
                         </Typography>
                       </Box>
-                      <Box
-                        sx={{ width: "1px", height: 20, bgcolor: "divider" }}
-                      />
+                      <Box sx={{ width: '1px', height: 20, bgcolor: 'divider' }} />
                       <Box
                         sx={{
-                          display: "flex",
-                          alignItems: "center",
+                          display: 'flex',
+                          alignItems: 'center',
                           gap: 0.75,
                           px: 1.5,
                           py: 0.5,
@@ -972,19 +897,17 @@ const StoreProductsPage: React.FC = () => {
                           sx={{
                             width: 8,
                             height: 8,
-                            borderRadius: "50%",
-                            bgcolor: "text.disabled",
+                            borderRadius: '50%',
+                            bgcolor: 'text.disabled',
                           }}
                         />
                         <Typography
                           variant="body2"
                           color="text.secondary"
-                          sx={{ whiteSpace: "nowrap" }}
+                          sx={{ whiteSpace: 'nowrap' }}
                         >
-                          {t("storeProducts.statsInactive")}{" "}
-                          <strong style={{ color: "inherit" }}>
-                            {productStats.inactive}
-                          </strong>
+                          {t('storeProducts.statsInactive')}{' '}
+                          <strong style={{ color: 'inherit' }}>{productStats.inactive}</strong>
                         </Typography>
                       </Box>
                     </Box>
@@ -996,23 +919,19 @@ const StoreProductsPage: React.FC = () => {
                       size="small"
                       startIcon={<BatchProcessIcon />}
                       onClick={() => setBatchProcessDialogOpen(true)}
-                      sx={{ whiteSpace: "nowrap" }}
+                      sx={{ whiteSpace: 'nowrap' }}
                     >
-                      {t("storeProducts.batchProcess")}
+                      {t('storeProducts.batchProcess')}
                     </Button>
                   </Box>
                 }
               />
             </Box>
 
-            <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
-              <Tooltip title={t("common.refresh")}>
+            <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+              <Tooltip title={t('common.refresh')}>
                 <span>
-                  <IconButton
-                    size="small"
-                    onClick={loadProducts}
-                    disabled={loading}
-                  >
+                  <IconButton size="small" onClick={loadProducts} disabled={loading}>
                     <RefreshIcon />
                   </IconButton>
                 </span>
@@ -1024,25 +943,15 @@ const StoreProductsPage: React.FC = () => {
 
       {/* Bulk Actions */}
       {selectedIds.length > 0 && (
-        <Box sx={{ mb: 2, display: "flex", gap: 1, alignItems: "center" }}>
+        <Box sx={{ mb: 2, display: 'flex', gap: 1, alignItems: 'center' }}>
           <Typography variant="body2" color="text.secondary">
-            {t("common.selectedCount", { count: selectedIds.length })}
+            {t('common.selectedCount', { count: selectedIds.length })}
           </Typography>
-          <Button
-            variant="outlined"
-            color="success"
-            size="small"
-            onClick={handleBulkActivate}
-          >
-            {t("storeProducts.bulkActivate")}
+          <Button variant="outlined" color="success" size="small" onClick={handleBulkActivate}>
+            {t('storeProducts.bulkActivate')}
           </Button>
-          <Button
-            variant="outlined"
-            color="warning"
-            size="small"
-            onClick={handleBulkDeactivate}
-          >
-            {t("storeProducts.bulkDeactivate")}
+          <Button variant="outlined" color="warning" size="small" onClick={handleBulkDeactivate}>
+            {t('storeProducts.bulkDeactivate')}
           </Button>
           <Button
             variant="outlined"
@@ -1051,26 +960,24 @@ const StoreProductsPage: React.FC = () => {
             startIcon={<DeleteIcon />}
             onClick={handleBulkDelete}
           >
-            {t("common.deleteSelected")}
+            {t('common.deleteSelected')}
           </Button>
         </Box>
       )}
 
       {/* Table */}
       <Card>
-        <CardContent sx={{ p: 0, "&:last-child": { pb: 0 } }}>
+        <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
           {loading && isInitialLoad ? (
-            <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
-              <Typography color="text.secondary">
-                {t("common.loadingData")}
-              </Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
+              <Typography color="text.secondary">{t('common.loadingData')}</Typography>
             </Box>
           ) : products.length === 0 ? (
             <EmptyState
-              message={t("storeProducts.noProductsFound")}
+              message={t('storeProducts.noProductsFound')}
               onAddClick={canManage ? handleSyncPreview : undefined}
-              addButtonLabel={t("storeProducts.syncWithPlanningData")}
-              subtitle={canManage ? t("common.addFirstItem") : undefined}
+              addButtonLabel={t('storeProducts.syncWithPlanningData')}
+              subtitle={canManage ? t('common.addFirstItem') : undefined}
             />
           ) : (
             <>
@@ -1079,25 +986,23 @@ const StoreProductsPage: React.FC = () => {
                   <TableHead>
                     <TableRow>
                       {visibleColumns.map((column) => {
-                        if (column.id === "checkbox") {
+                        if (column.id === 'checkbox') {
                           if (!canManage) return null;
                           return (
                             <TableCell key={column.id} padding="checkbox">
                               <Checkbox
                                 indeterminate={
-                                  selectedIds.length > 0 &&
-                                  selectedIds.length < products.length
+                                  selectedIds.length > 0 && selectedIds.length < products.length
                                 }
                                 checked={
-                                  products.length > 0 &&
-                                  selectedIds.length === products.length
+                                  products.length > 0 && selectedIds.length === products.length
                                 }
                                 onChange={handleSelectAll}
                               />
                             </TableCell>
                           );
                         }
-                        if (column.id === "actions") {
+                        if (column.id === 'actions') {
                           if (!canManage) return null;
                           return (
                             <TableCell key={column.id} align="center">
@@ -1106,22 +1011,20 @@ const StoreProductsPage: React.FC = () => {
                           );
                         }
                         const isSortable = [
-                          "cmsProductId",
-                          "productId",
-                          "productName",
-                          "store",
-                          "price",
-                          "createdAt",
-                          "updatedAt",
+                          'cmsProductId',
+                          'productId',
+                          'productName',
+                          'store',
+                          'price',
+                          'createdAt',
+                          'updatedAt',
                         ].includes(column.id);
                         return (
                           <TableCell key={column.id}>
                             {isSortable ? (
                               <TableSortLabel
                                 active={orderBy === column.id}
-                                direction={
-                                  orderBy === column.id ? order : "asc"
-                                }
+                                direction={orderBy === column.id ? order : 'asc'}
                                 onClick={() => handleSort(column.id)}
                               >
                                 {t(column.labelKey)}
@@ -1136,13 +1039,9 @@ const StoreProductsPage: React.FC = () => {
                   </TableHead>
                   <TableBody>
                     {products.map((product) => (
-                      <TableRow
-                        key={product.id}
-                        hover
-                        selected={selectedIds.includes(product.id)}
-                      >
+                      <TableRow key={product.id} hover selected={selectedIds.includes(product.id)}>
                         {visibleColumns.map((column) => {
-                          if (column.id === "checkbox") {
+                          if (column.id === 'checkbox') {
                             if (!canManage) return null;
                             return (
                               <TableCell key={column.id} padding="checkbox">
@@ -1153,13 +1052,13 @@ const StoreProductsPage: React.FC = () => {
                               </TableCell>
                             );
                           }
-                          if (column.id === "cmsProductId") {
+                          if (column.id === 'cmsProductId') {
                             return (
                               <TableCell key={column.id}>
                                 <Box
                                   sx={{
-                                    display: "flex",
-                                    alignItems: "center",
+                                    display: 'flex',
+                                    alignItems: 'center',
                                     gap: 0.5,
                                   }}
                                 >
@@ -1167,39 +1066,35 @@ const StoreProductsPage: React.FC = () => {
                                     component="span"
                                     onClick={() => handleEdit(product)}
                                     sx={{
-                                      cursor: "pointer",
-                                      color: "primary.main",
-                                      "&:hover": {
-                                        textDecoration: "underline",
+                                      cursor: 'pointer',
+                                      color: 'primary.main',
+                                      '&:hover': {
+                                        textDecoration: 'underline',
                                       },
                                     }}
                                   >
-                                    {product.cmsProductId ?? "-"}
+                                    {product.cmsProductId ?? '-'}
                                   </Box>
                                   {product.cmsProductId && (
-                                    <Tooltip title={t("common.copy")}>
+                                    <Tooltip title={t('common.copy')}>
                                       <IconButton
                                         size="small"
                                         onClick={() => {
                                           copyToClipboardWithNotification(
                                             String(product.cmsProductId),
                                             () =>
-                                              enqueueSnackbar(
-                                                t("common.copied"),
-                                                { variant: "success" },
-                                              ),
+                                              enqueueSnackbar(t('common.copied'), {
+                                                variant: 'success',
+                                              }),
                                             () =>
-                                              enqueueSnackbar(
-                                                t("common.copyFailed"),
-                                                { variant: "error" },
-                                              ),
+                                              enqueueSnackbar(t('common.copyFailed'), {
+                                                variant: 'error',
+                                              })
                                           );
                                         }}
                                         sx={{ p: 0.25 }}
                                       >
-                                        <ContentCopyIcon
-                                          sx={{ fontSize: 14 }}
-                                        />
+                                        <ContentCopyIcon sx={{ fontSize: 14 }} />
                                       </IconButton>
                                     </Tooltip>
                                   )}
@@ -1207,60 +1102,56 @@ const StoreProductsPage: React.FC = () => {
                               </TableCell>
                             );
                           }
-                          if (column.id === "isActive") {
+                          if (column.id === 'isActive') {
                             return (
                               <TableCell key={column.id}>
                                 <Chip
                                   label={
                                     product.isActive
-                                      ? t("storeProducts.statsActive")
-                                      : t("storeProducts.statsInactive")
+                                      ? t('storeProducts.statsActive')
+                                      : t('storeProducts.statsInactive')
                                   }
-                                  color={
-                                    product.isActive ? "success" : "default"
-                                  }
+                                  color={product.isActive ? 'success' : 'default'}
                                   size="small"
                                 />
                               </TableCell>
                             );
                           }
-                          if (column.id === "productId") {
+                          if (column.id === 'productId') {
                             return (
                               <TableCell key={column.id}>
                                 <Box
                                   sx={{
-                                    display: "flex",
-                                    alignItems: "center",
+                                    display: 'flex',
+                                    alignItems: 'center',
                                     gap: 0.5,
                                   }}
                                 >
                                   <Typography
                                     sx={{
-                                      cursor: "pointer",
-                                      "&:hover": {
-                                        textDecoration: "underline",
+                                      cursor: 'pointer',
+                                      '&:hover': {
+                                        textDecoration: 'underline',
                                       },
                                     }}
                                     onClick={() => handleEdit(product)}
                                   >
                                     {product.productId}
                                   </Typography>
-                                  <Tooltip title={t("common.copy")}>
+                                  <Tooltip title={t('common.copy')}>
                                     <IconButton
                                       size="small"
                                       onClick={() => {
                                         copyToClipboardWithNotification(
                                           product.productId,
                                           () =>
-                                            enqueueSnackbar(
-                                              t("common.copied"),
-                                              { variant: "success" },
-                                            ),
+                                            enqueueSnackbar(t('common.copied'), {
+                                              variant: 'success',
+                                            }),
                                           () =>
-                                            enqueueSnackbar(
-                                              t("common.copyFailed"),
-                                              { variant: "error" },
-                                            ),
+                                            enqueueSnackbar(t('common.copyFailed'), {
+                                              variant: 'error',
+                                            })
                                         );
                                       }}
                                       sx={{ p: 0.25 }}
@@ -1272,57 +1163,49 @@ const StoreProductsPage: React.FC = () => {
                               </TableCell>
                             );
                           }
-                          if (column.id === "productName") {
+                          if (column.id === 'productName') {
                             let displayName = product.productName;
-                            if (i18n.language === "ko" && product.nameKo) {
+                            if (i18n.language === 'ko' && product.nameKo) {
                               displayName = product.nameKo;
-                            } else if (
-                              i18n.language === "en" &&
-                              product.nameEn
-                            ) {
+                            } else if (i18n.language === 'en' && product.nameEn) {
                               displayName = product.nameEn;
-                            } else if (
-                              i18n.language === "zh" &&
-                              product.nameZh
-                            ) {
+                            } else if (i18n.language === 'zh' && product.nameZh) {
                               displayName = product.nameZh;
                             }
                             return (
                               <TableCell key={column.id}>
                                 <Box
                                   sx={{
-                                    display: "flex",
-                                    alignItems: "center",
+                                    display: 'flex',
+                                    alignItems: 'center',
                                     gap: 0.5,
                                   }}
                                 >
                                   <Typography
                                     sx={{
-                                      cursor: "pointer",
-                                      "&:hover": {
-                                        textDecoration: "underline",
+                                      cursor: 'pointer',
+                                      '&:hover': {
+                                        textDecoration: 'underline',
                                       },
                                     }}
                                     onClick={() => handleEdit(product)}
                                   >
                                     {displayName}
                                   </Typography>
-                                  <Tooltip title={t("common.copy")}>
+                                  <Tooltip title={t('common.copy')}>
                                     <IconButton
                                       size="small"
                                       onClick={() => {
                                         copyToClipboardWithNotification(
                                           displayName,
                                           () =>
-                                            enqueueSnackbar(
-                                              t("common.copied"),
-                                              { variant: "success" },
-                                            ),
+                                            enqueueSnackbar(t('common.copied'), {
+                                              variant: 'success',
+                                            }),
                                           () =>
-                                            enqueueSnackbar(
-                                              t("common.copyFailed"),
-                                              { variant: "error" },
-                                            ),
+                                            enqueueSnackbar(t('common.copyFailed'), {
+                                              variant: 'error',
+                                            })
                                         );
                                       }}
                                       sx={{ p: 0.25 }}
@@ -1334,54 +1217,50 @@ const StoreProductsPage: React.FC = () => {
                               </TableCell>
                             );
                           }
-                          if (column.id === "store") {
+                          if (column.id === 'store') {
                             return (
                               <TableCell key={column.id}>
                                 <Chip
-                                  label={
-                                    STORE_DISPLAY_NAMES[product.store] ||
-                                    product.store
-                                  }
+                                  label={STORE_DISPLAY_NAMES[product.store] || product.store}
                                   size="small"
                                   variant="outlined"
                                 />
                               </TableCell>
                             );
                           }
-                          if (column.id === "price") {
+                          if (column.id === 'price') {
                             return (
                               <TableCell key={column.id}>
-                                {product.price.toLocaleString()}{" "}
-                                {product.currency}
+                                {product.price.toLocaleString()} {product.currency}
                               </TableCell>
                             );
                           }
-                          if (column.id === "saleStartAt") {
+                          if (column.id === 'saleStartAt') {
                             return (
                               <TableCell key={column.id}>
                                 {product.saleStartAt
                                   ? formatDateTimeDetailed(product.saleStartAt)
-                                  : "-"}
+                                  : '-'}
                               </TableCell>
                             );
                           }
-                          if (column.id === "saleEndAt") {
+                          if (column.id === 'saleEndAt') {
                             return (
                               <TableCell key={column.id}>
                                 {product.saleEndAt
                                   ? formatDateTimeDetailed(product.saleEndAt)
-                                  : "-"}
+                                  : '-'}
                               </TableCell>
                             );
                           }
-                          if (column.id === "tags") {
+                          if (column.id === 'tags') {
                             return (
                               <TableCell key={column.id}>
                                 <Box
                                   sx={{
-                                    display: "flex",
+                                    display: 'flex',
                                     gap: 0.5,
-                                    flexWrap: "wrap",
+                                    flexWrap: 'wrap',
                                     maxWidth: 220,
                                   }}
                                 >
@@ -1389,10 +1268,7 @@ const StoreProductsPage: React.FC = () => {
                                     product.tags.slice(0, 6).map((tag, idx) => (
                                       <Tooltip
                                         key={`${tag.id}-${idx}`}
-                                        title={
-                                          tag.description ||
-                                          t("tags.noDescription")
-                                        }
+                                        title={tag.description || t('tags.noDescription')}
                                         arrow
                                       >
                                         <Chip
@@ -1400,17 +1276,14 @@ const StoreProductsPage: React.FC = () => {
                                           size="small"
                                           sx={{
                                             bgcolor: tag.color,
-                                            color: "#fff",
-                                            cursor: "help",
+                                            color: '#fff',
+                                            cursor: 'help',
                                           }}
                                         />
                                       </Tooltip>
                                     ))
                                   ) : (
-                                    <Typography
-                                      variant="body2"
-                                      color="text.secondary"
-                                    >
+                                    <Typography variant="body2" color="text.secondary">
                                       -
                                     </Typography>
                                   )}
@@ -1418,42 +1291,37 @@ const StoreProductsPage: React.FC = () => {
                               </TableCell>
                             );
                           }
-                          if (column.id === "createdAt") {
+                          if (column.id === 'createdAt') {
                             return (
                               <TableCell key={column.id}>
                                 {formatDateTimeDetailed(product.createdAt)}
                               </TableCell>
                             );
                           }
-                          if (column.id === "updatedAt") {
+                          if (column.id === 'updatedAt') {
                             return (
                               <TableCell key={column.id}>
                                 {formatDateTimeDetailed(product.updatedAt)}
                               </TableCell>
                             );
                           }
-                          if (column.id === "actions") {
+                          if (column.id === 'actions') {
                             if (!canManage) return null;
                             return (
                               <TableCell key={column.id} align="center">
                                 <Box
                                   sx={{
-                                    display: "flex",
+                                    display: 'flex',
                                     gap: 0.5,
-                                    justifyContent: "center",
+                                    justifyContent: 'center',
                                   }}
                                 >
-                                  <Tooltip title={t("common.edit")}>
-                                    <IconButton
-                                      size="small"
-                                      onClick={() => handleEdit(product)}
-                                    >
+                                  <Tooltip title={t('common.edit')}>
+                                    <IconButton size="small" onClick={() => handleEdit(product)}>
                                       <EditIcon fontSize="small" />
                                     </IconButton>
                                   </Tooltip>
-                                  <Tooltip
-                                    title={t("storeProducts.copyProduct")}
-                                  >
+                                  <Tooltip title={t('storeProducts.copyProduct')}>
                                     <span>
                                       <IconButton
                                         size="small"
@@ -1464,11 +1332,8 @@ const StoreProductsPage: React.FC = () => {
                                       </IconButton>
                                     </span>
                                   </Tooltip>
-                                  <Tooltip title={t("common.delete")}>
-                                    <IconButton
-                                      size="small"
-                                      onClick={() => handleDelete(product)}
-                                    >
+                                  <Tooltip title={t('common.delete')}>
+                                    <IconButton size="small" onClick={() => handleDelete(product)}>
                                       <DeleteIcon fontSize="small" />
                                     </IconButton>
                                   </Tooltip>
@@ -1504,9 +1369,7 @@ const StoreProductsPage: React.FC = () => {
       <ColumnSettingsDialog
         anchorEl={columnSettingsAnchor}
         onClose={() => setColumnSettingsAnchor(null)}
-        columns={columns.filter(
-          (col) => col.id !== "checkbox" && col.id !== "actions",
-        )}
+        columns={columns.filter((col) => col.id !== 'checkbox' && col.id !== 'actions')}
         onColumnsChange={handleColumnsChange}
         onReset={handleResetColumns}
       />
@@ -1524,9 +1387,9 @@ const StoreProductsPage: React.FC = () => {
         open={deleteConfirmOpen}
         onClose={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}
-        title={t("storeProducts.deleteConfirmTitle")}
-        message={t("storeProducts.deleteConfirmMessage", {
-          name: deletingProduct?.productName || "",
+        title={t('storeProducts.deleteConfirmTitle')}
+        message={t('storeProducts.deleteConfirmMessage', {
+          name: deletingProduct?.productName || '',
         })}
       />
 
@@ -1535,31 +1398,25 @@ const StoreProductsPage: React.FC = () => {
         open={bulkDeleteConfirmOpen}
         onClose={handleBulkDeleteCancel}
         onConfirm={handleBulkDeleteConfirm}
-        title={t("storeProducts.bulkDeleteConfirmTitle")}
-        message={t("storeProducts.bulkDeleteConfirmMessage", {
+        title={t('storeProducts.bulkDeleteConfirmTitle')}
+        message={t('storeProducts.bulkDeleteConfirmMessage', {
           count: selectedIds.length,
         })}
-        warning={t("storeProducts.bulkDeleteWarning")}
+        warning={t('storeProducts.bulkDeleteWarning')}
       >
         {/* List of products to be deleted */}
         <TableContainer sx={{ maxHeight: 300, mt: 2 }}>
           <Table size="small" stickyHeader>
             <TableHead>
               <TableRow>
-                <TableCell
-                  sx={{ fontWeight: "bold", bgcolor: "background.paper" }}
-                >
-                  {t("storeProducts.cmsProductId")}
+                <TableCell sx={{ fontWeight: 'bold', bgcolor: 'background.paper' }}>
+                  {t('storeProducts.cmsProductId')}
                 </TableCell>
-                <TableCell
-                  sx={{ fontWeight: "bold", bgcolor: "background.paper" }}
-                >
-                  {t("storeProducts.productId")}
+                <TableCell sx={{ fontWeight: 'bold', bgcolor: 'background.paper' }}>
+                  {t('storeProducts.productId')}
                 </TableCell>
-                <TableCell
-                  sx={{ fontWeight: "bold", bgcolor: "background.paper" }}
-                >
-                  {t("storeProducts.productName")}
+                <TableCell sx={{ fontWeight: 'bold', bgcolor: 'background.paper' }}>
+                  {t('storeProducts.productName')}
                 </TableCell>
               </TableRow>
             </TableHead>
@@ -1568,7 +1425,7 @@ const StoreProductsPage: React.FC = () => {
                 .filter((p) => selectedIds.includes(p.id))
                 .map((product) => (
                   <TableRow key={product.id}>
-                    <TableCell>{product.cmsProductId || "-"}</TableCell>
+                    <TableCell>{product.cmsProductId || '-'}</TableCell>
                     <TableCell>{product.productId}</TableCell>
                     <TableCell>{product.productName}</TableCell>
                   </TableRow>

@@ -2,9 +2,9 @@
  * ConstraintDisplay - Unleash-style constraint display component
  * Reusable component for displaying constraints in a clean, readable format
  */
-import React from "react";
-import { Box, Typography, Chip, Paper, Stack, Tooltip } from "@mui/material";
-import { formatDateTime } from "../../utils/dateFormat";
+import React from 'react';
+import { Box, Typography, Chip, Paper, Stack, Tooltip } from '@mui/material';
+import { formatDateTime } from '../../utils/dateFormat';
 
 export interface ConstraintValue {
   contextName: string;
@@ -32,33 +32,33 @@ interface ConstraintDisplayProps {
 // Get operator display label
 const getOperatorLabel = (op: string): string => {
   const opLabels: Record<string, string> = {
-    str_eq: "=",
-    str_neq: "≠",
-    str_contains: "⊃",
-    str_starts_with: "^",
-    str_ends_with: "$",
-    str_in: "∈",
-    str_not_in: "∉",
-    str_regex: "~",
-    num_eq: "=",
-    num_gt: ">",
-    num_gte: "≥",
-    num_lt: "<",
-    num_lte: "≤",
-    num_in: "∈",
-    num_not_in: "∉",
-    bool_is: "=",
-    date_gt: ">",
-    date_gte: "≥",
-    date_lt: "<",
-    date_lte: "≤",
-    semver_eq: "=",
-    semver_gt: ">",
-    semver_gte: "≥",
-    semver_lt: "<",
-    semver_lte: "≤",
-    semver_in: "∈",
-    semver_not_in: "∉",
+    str_eq: '=',
+    str_neq: '≠',
+    str_contains: '⊃',
+    str_starts_with: '^',
+    str_ends_with: '$',
+    str_in: '∈',
+    str_not_in: '∉',
+    str_regex: '~',
+    num_eq: '=',
+    num_gt: '>',
+    num_gte: '≥',
+    num_lt: '<',
+    num_lte: '≤',
+    num_in: '∈',
+    num_not_in: '∉',
+    bool_is: '=',
+    date_gt: '>',
+    date_gte: '≥',
+    date_lt: '<',
+    date_lte: '≤',
+    semver_eq: '=',
+    semver_gt: '>',
+    semver_gte: '≥',
+    semver_lt: '<',
+    semver_lte: '≤',
+    semver_in: '∈',
+    semver_not_in: '∉',
   };
   return opLabels[op] || op;
 };
@@ -75,7 +75,7 @@ const formatDateValueDisplay = (value: string): string => {
 
 // Check if operator is date-related
 const isDateOperator = (op: string): boolean => {
-  return op.startsWith("date_");
+  return op.startsWith('date_');
 };
 
 /**
@@ -89,17 +89,15 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({
 }) => {
   // Find context field info for tooltip (ensure contextFields is an array)
   const fieldsArray = Array.isArray(contextFields) ? contextFields : [];
-  const contextFieldInfo = fieldsArray.find(
-    (f) => f.fieldName === constraint.contextName,
-  );
+  const contextFieldInfo = fieldsArray.find((f) => f.fieldName === constraint.contextName);
   const contextFieldDescription =
-    contextFieldInfo?.description || contextFieldInfo?.displayName || "";
+    contextFieldInfo?.description || contextFieldInfo?.displayName || '';
 
   // Get constraint value display (for single values)
   const getSingleValueDisplay = (): string => {
     if (constraint.value !== undefined && constraint.value !== null) {
-      if (typeof constraint.value === "boolean") {
-        return constraint.value ? "true" : "false";
+      if (typeof constraint.value === 'boolean') {
+        return constraint.value ? 'true' : 'false';
       }
       const value = String(constraint.value);
       // Format date values
@@ -108,18 +106,16 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({
       }
       return value;
     }
-    return "-";
+    return '-';
   };
 
   const isMultiValue = constraint.values && constraint.values.length > 0;
-  const showCaseSensitivity = constraint.operator?.startsWith("str_");
+  const showCaseSensitivity = constraint.operator?.startsWith('str_');
 
   if (compact) {
-    const displayValue = isMultiValue
-      ? constraint.values!.join(", ")
-      : getSingleValueDisplay();
+    const displayValue = isMultiValue ? constraint.values!.join(', ') : getSingleValueDisplay();
     return (
-      <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
         <Typography variant="caption" fontWeight={500}>
           {constraint.contextName}
         </Typography>
@@ -134,96 +130,94 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({
   }
 
   // Get readable operator text and description for tooltip
-  const getOperatorInfo = (
-    op: string,
-  ): { text: string; description: string } => {
+  const getOperatorInfo = (op: string): { text: string; description: string } => {
     const opInfo: Record<string, { text: string; description: string }> = {
-      str_eq: { text: "equals", description: "String equals (exact match)" },
-      str_neq: { text: "not equals", description: "String not equals" },
+      str_eq: { text: 'equals', description: 'String equals (exact match)' },
+      str_neq: { text: 'not equals', description: 'String not equals' },
       str_contains: {
-        text: "contains",
-        description: "String contains substring",
+        text: 'contains',
+        description: 'String contains substring',
       },
       str_starts_with: {
-        text: "starts with",
-        description: "String starts with prefix",
+        text: 'starts with',
+        description: 'String starts with prefix',
       },
       str_ends_with: {
-        text: "ends with",
-        description: "String ends with suffix",
+        text: 'ends with',
+        description: 'String ends with suffix',
       },
       str_in: {
-        text: "is one of",
-        description: "Value matches one of the listed values",
+        text: 'is one of',
+        description: 'Value matches one of the listed values',
       },
       str_not_in: {
-        text: "is not one of",
-        description: "Value does not match any of the listed values",
+        text: 'is not one of',
+        description: 'Value does not match any of the listed values',
       },
       str_regex: {
-        text: "matches regex",
-        description: "Value matches regular expression",
+        text: 'matches regex',
+        description: 'Value matches regular expression',
       },
-      num_eq: { text: "equals", description: "Number equals" },
-      num_gt: { text: "greater than", description: "Number is greater than" },
+      num_eq: { text: 'equals', description: 'Number equals' },
+      num_gt: { text: 'greater than', description: 'Number is greater than' },
       num_gte: {
-        text: "greater or equal",
-        description: "Number is greater than or equal to",
+        text: 'greater or equal',
+        description: 'Number is greater than or equal to',
       },
-      num_lt: { text: "less than", description: "Number is less than" },
+      num_lt: { text: 'less than', description: 'Number is less than' },
       num_lte: {
-        text: "less or equal",
-        description: "Number is less than or equal to",
+        text: 'less or equal',
+        description: 'Number is less than or equal to',
       },
       num_in: {
-        text: "is one of",
-        description: "Value matches one of the listed values",
+        text: 'is one of',
+        description: 'Value matches one of the listed values',
       },
       num_not_in: {
-        text: "is not one of",
-        description: "Value does not match any of the listed values",
+        text: 'is not one of',
+        description: 'Value does not match any of the listed values',
       },
-      bool_is: { text: "is", description: "Boolean equals" },
+      bool_is: { text: 'is', description: 'Boolean equals' },
       date_gt: {
-        text: "is after",
-        description: "Date is after the specified time",
+        text: 'is after',
+        description: 'Date is after the specified time',
       },
       date_gte: {
-        text: "is on or after",
-        description: "Date is on or after the specified time",
+        text: 'is on or after',
+        description: 'Date is on or after the specified time',
       },
       date_lt: {
-        text: "is before",
-        description: "Date is before the specified time",
+        text: 'is before',
+        description: 'Date is before the specified time',
       },
       date_lte: {
-        text: "is on or before",
-        description: "Date is on or before the specified time",
+        text: 'is on or before',
+        description: 'Date is on or before the specified time',
       },
-      semver_eq: { text: "equals", description: "Semantic version equals" },
+      semver_eq: { text: 'equals', description: 'Semantic version equals' },
       semver_gt: {
-        text: "greater than",
-        description: "Semantic version is greater than",
+        text: 'greater than',
+        description: 'Semantic version is greater than',
       },
       semver_gte: {
-        text: "greater or equal",
-        description: "Semantic version is greater than or equal to",
+        text: 'greater or equal',
+        description: 'Semantic version is greater than or equal to',
       },
       semver_lt: {
-        text: "less than",
-        description: "Semantic version is less than",
+        text: 'less than',
+        description: 'Semantic version is less than',
       },
       semver_lte: {
-        text: "less or equal",
-        description: "Semantic version is less than or equal to",
+        text: 'less or equal',
+        description: 'Semantic version is less than or equal to',
       },
       semver_in: {
-        text: "is one of",
-        description: "Value matches one of the listed values",
+        text: 'is one of',
+        description: 'Value matches one of the listed values',
       },
       semver_not_in: {
-        text: "is not one of",
-        description: "Value does not match any of the listed values",
+        text: 'is not one of',
+        description: 'Value does not match any of the listed values',
       },
     };
     return opInfo[op] || { text: op, description: op };
@@ -234,16 +228,16 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({
   return (
     <Box
       sx={{
-        display: "flex",
-        alignItems: "center",
+        display: 'flex',
+        alignItems: 'center',
         gap: 1.5,
         px: noBorder ? 0 : 2,
         py: noBorder ? 0 : 1.25,
         border: noBorder ? 0 : 1,
-        borderColor: "divider",
+        borderColor: 'divider',
         borderRadius: noBorder ? 0 : 6,
-        bgcolor: noBorder ? "transparent" : "action.hover",
-        flexWrap: "wrap",
+        bgcolor: noBorder ? 'transparent' : 'action.hover',
+        flexWrap: 'wrap',
       }}
     >
       {/* Context Name - Bold text with tooltip for description */}
@@ -257,9 +251,9 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({
           variant="body2"
           sx={{
             fontWeight: 600,
-            fontSize: "0.85rem",
-            color: "text.primary",
-            cursor: contextFieldDescription ? "help" : "default",
+            fontSize: '0.85rem',
+            color: 'text.primary',
+            cursor: contextFieldDescription ? 'help' : 'default',
           }}
         >
           {constraint.contextName}
@@ -274,12 +268,12 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({
             size="small"
             sx={{
               height: 22,
-              fontSize: "0.7rem",
+              fontSize: '0.7rem',
               fontWeight: 600,
-              bgcolor: "error.main",
-              color: "error.contrastText",
+              bgcolor: 'error.main',
+              color: 'error.contrastText',
               borderRadius: 3,
-              "& .MuiChip-label": {
+              '& .MuiChip-label': {
                 px: 0.75,
               },
             }}
@@ -294,15 +288,15 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({
           size="small"
           sx={{
             height: 24,
-            fontSize: "0.75rem",
+            fontSize: '0.75rem',
             fontWeight: 400,
-            bgcolor: "action.selected",
-            color: "text.secondary",
+            bgcolor: 'action.selected',
+            color: 'text.secondary',
             border: 1,
-            borderColor: "divider",
+            borderColor: 'divider',
             borderRadius: 3,
-            cursor: "help",
-            "& .MuiChip-label": {
+            cursor: 'help',
+            '& .MuiChip-label': {
               px: 1.5,
             },
           }}
@@ -311,26 +305,22 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({
 
       {/* Case sensitivity indicator for string operators */}
       {showCaseSensitivity && (
-        <Tooltip
-          title={
-            constraint.caseInsensitive ? "Case insensitive" : "Case sensitive"
-          }
-        >
+        <Tooltip title={constraint.caseInsensitive ? 'Case insensitive' : 'Case sensitive'}>
           <Chip
-            label={constraint.caseInsensitive ? "Aa" : "AA"}
+            label={constraint.caseInsensitive ? 'Aa' : 'AA'}
             size="small"
             sx={{
               height: 24,
-              fontSize: "0.7rem",
+              fontSize: '0.7rem',
               fontWeight: 500,
               minWidth: 32,
-              fontFamily: "monospace",
+              fontFamily: 'monospace',
               borderRadius: 3,
-              bgcolor: "action.selected",
-              color: "text.secondary",
+              bgcolor: 'action.selected',
+              color: 'text.secondary',
               border: 1,
-              borderColor: "divider",
-              "& .MuiChip-label": {
+              borderColor: 'divider',
+              '& .MuiChip-label': {
                 px: 1,
               },
             }}
@@ -342,10 +332,10 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({
       {isMultiValue ? (
         <Box
           sx={{
-            display: "flex",
-            flexWrap: "wrap",
+            display: 'flex',
+            flexWrap: 'wrap',
             gap: 0.5,
-            alignItems: "center",
+            alignItems: 'center',
           }}
         >
           {constraint.values!.map((val, idx) => (
@@ -355,12 +345,12 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({
               size="small"
               sx={{
                 height: 22,
-                fontSize: "0.75rem",
+                fontSize: '0.75rem',
                 fontWeight: 500,
-                bgcolor: "action.selected",
-                color: "text.primary",
-                borderRadius: "16px",
-                "& .MuiChip-label": {
+                bgcolor: 'action.selected',
+                color: 'text.primary',
+                borderRadius: '16px',
+                '& .MuiChip-label': {
                   px: 1.25,
                 },
               }}
@@ -373,12 +363,12 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({
           size="small"
           sx={{
             height: 22,
-            fontSize: "0.75rem",
+            fontSize: '0.75rem',
             fontWeight: 500,
-            bgcolor: "action.selected",
-            color: "text.primary",
-            borderRadius: "16px",
-            "& .MuiChip-label": {
+            bgcolor: 'action.selected',
+            color: 'text.primary',
+            borderRadius: '16px',
+            '& .MuiChip-label': {
               px: 1.25,
             },
           }}
@@ -422,11 +412,11 @@ export const ConstraintList: React.FC<ConstraintListProps> = ({
           {i > 0 && (
             <Box
               sx={{
-                display: "flex",
-                alignItems: "center",
+                display: 'flex',
+                alignItems: 'center',
                 ml: 1,
                 my: -0.5,
-                position: "relative",
+                position: 'relative',
                 zIndex: 2,
               }}
             >
@@ -435,13 +425,13 @@ export const ConstraintList: React.FC<ConstraintListProps> = ({
                 size="small"
                 sx={{
                   height: 18,
-                  fontSize: "0.6rem",
+                  fontSize: '0.6rem',
                   fontWeight: 700,
-                  bgcolor: "background.paper",
-                  color: "text.secondary",
+                  bgcolor: 'background.paper',
+                  color: 'text.secondary',
                   border: 1,
-                  borderColor: "divider",
-                  "& .MuiChip-label": {
+                  borderColor: 'divider',
+                  '& .MuiChip-label': {
                     px: 0.75,
                   },
                 }}
@@ -476,17 +466,13 @@ export const SegmentPreview: React.FC<SegmentPreviewProps> = ({
       sx={{
         p: 2,
         mt: 1,
-        bgcolor: "background.default",
-        borderColor: "primary.light",
+        bgcolor: 'background.default',
+        borderColor: 'primary.light',
         borderWidth: 2,
       }}
     >
-      <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
-        <Typography
-          variant="body2"
-          color="text.secondary"
-          sx={{ fontWeight: 500 }}
-        >
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+        <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
           세그먼트 조건
         </Typography>
       </Box>

@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
-import { useDebounce } from "../../hooks/useDebounce";
-import { useGlobalPageSize } from "../../hooks/useGlobalPageSize";
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useDebounce } from '../../hooks/useDebounce';
+import { useGlobalPageSize } from '../../hooks/useGlobalPageSize';
 import {
   Box,
   Typography,
@@ -28,8 +28,8 @@ import {
   Switch,
   FormControlLabel,
   Drawer,
-} from "@mui/material";
-import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+} from '@mui/material';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import {
   Search as SearchIcon,
   MoreVert as MoreVertIcon,
@@ -43,29 +43,27 @@ import {
   Save as SaveIcon,
   ContentCopy as ContentCopyIcon,
   Close as CloseIcon,
-} from "@mui/icons-material";
-import { useTranslation } from "react-i18next";
-import { useSnackbar } from "notistack";
+} from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
+import { useSnackbar } from 'notistack';
 import {
   IpWhitelistService,
   IpWhitelist,
   CreateIpWhitelistData,
   BulkCreateIpEntry,
-} from "../../services/ipWhitelistService";
-import SimplePagination from "../common/SimplePagination";
-import { formatDateTimeDetailed } from "../../utils/dateFormat";
-import { copyToClipboardWithNotification } from "../../utils/clipboard";
-import FormDialogHeader from "../common/FormDialogHeader";
-import EmptyState from "../common/EmptyState";
-import dayjs from "dayjs";
+} from '../../services/ipWhitelistService';
+import SimplePagination from '../common/SimplePagination';
+import { formatDateTimeDetailed } from '../../utils/dateFormat';
+import { copyToClipboardWithNotification } from '../../utils/clipboard';
+import FormDialogHeader from '../common/FormDialogHeader';
+import EmptyState from '../common/EmptyState';
+import dayjs from 'dayjs';
 
 interface IpWhitelistTabProps {
   canManage?: boolean;
 }
 
-const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
-  canManage = true,
-}) => {
+const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({ canManage = true }) => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
 
@@ -78,15 +76,14 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useGlobalPageSize();
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState('');
 
   // 디바운싱된 검색어 (500ms 지연)
   const debouncedSearch = useDebounce(search, 500);
 
   // Menu state
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [selectedIpWhitelist, setSelectedIpWhitelist] =
-    useState<IpWhitelist | null>(null);
+  const [selectedIpWhitelist, setSelectedIpWhitelist] = useState<IpWhitelist | null>(null);
 
   // Dialog states
   const [addDialog, setAddDialog] = useState(false);
@@ -94,21 +91,21 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
   const [bulkDialog, setBulkDialog] = useState(false);
   const [confirmDialog, setConfirmDialog] = useState({
     open: false,
-    title: "",
-    message: "",
+    title: '',
+    message: '',
     action: () => {},
   });
 
   // Form data
   const [formData, setFormData] = useState<CreateIpWhitelistData>({
-    ipAddress: "",
-    purpose: "",
+    ipAddress: '',
+    purpose: '',
     isEnabled: true,
     startDate: undefined,
     endDate: undefined,
   });
 
-  const [bulkData, setBulkData] = useState("");
+  const [bulkData, setBulkData] = useState('');
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
   // Load IP whitelists
@@ -117,28 +114,20 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
       setLoading(true);
       const filters: any = {};
       if (debouncedSearch) filters.search = debouncedSearch;
-      const result = await IpWhitelistService.getIpWhitelists(
-        page + 1,
-        rowsPerPage,
-        filters,
-      );
+      const result = await IpWhitelistService.getIpWhitelists(page + 1, rowsPerPage, filters);
 
-      if (
-        result &&
-        typeof result === "object" &&
-        Array.isArray(result.ipWhitelists)
-      ) {
+      if (result && typeof result === 'object' && Array.isArray(result.ipWhitelists)) {
         setIpWhitelists(result.ipWhitelists);
         setTotal(result.total || 0);
       } else {
-        console.error("Invalid response structure:", result);
+        console.error('Invalid response structure:', result);
         setIpWhitelists([]);
         setTotal(0);
       }
     } catch (error: any) {
-      console.error("Error loading IP whitelists:", error);
-      enqueueSnackbar(error.message || t("ipWhitelist.errors.loadFailed"), {
-        variant: "error",
+      console.error('Error loading IP whitelists:', error);
+      enqueueSnackbar(error.message || t('ipWhitelist.errors.loadFailed'), {
+        variant: 'error',
       });
       setIpWhitelists([]);
       setTotal(0);
@@ -158,25 +147,20 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
   };
 
   const handleChangePage = (_event: unknown, newPage: number) => {
-    if (typeof newPage === "number" && !isNaN(newPage)) {
+    if (typeof newPage === 'number' && !isNaN(newPage)) {
       setPage(newPage);
     } else {
-      console.error("Invalid page number received:", newPage);
+      console.error('Invalid page number received:', newPage);
       setPage(0); // Reset to first page
     }
   };
 
-  const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
 
-  const handleMenuClick = (
-    event: React.MouseEvent<HTMLElement>,
-    ipWhitelist: IpWhitelist,
-  ) => {
+  const handleMenuClick = (event: React.MouseEvent<HTMLElement>, ipWhitelist: IpWhitelist) => {
     setAnchorEl(event.currentTarget);
     setSelectedIpWhitelist(ipWhitelist);
   };
@@ -190,16 +174,15 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
   const handleCopyToClipboard = (text: string, type: string) => {
     copyToClipboardWithNotification(
       text,
-      () =>
-        enqueueSnackbar(t("common.copiedToClipboard"), { variant: "success" }),
-      () => enqueueSnackbar(t("common.copyFailed"), { variant: "error" }),
+      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
     );
   };
 
   const handleAdd = () => {
     setFormData({
-      ipAddress: "",
-      purpose: "",
+      ipAddress: '',
+      purpose: '',
       isEnabled: true,
       startDate: undefined,
       endDate: undefined,
@@ -237,22 +220,21 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
     if (selectedIpWhitelist) {
       setConfirmDialog({
         open: true,
-        title: t("ipWhitelist.confirmDelete.title"),
-        message: t("ipWhitelist.confirmDelete.message", {
+        title: t('ipWhitelist.confirmDelete.title'),
+        message: t('ipWhitelist.confirmDelete.message', {
           ipAddress: selectedIpWhitelist.ipAddress,
         }),
         action: async () => {
           try {
             await IpWhitelistService.deleteIpWhitelist(selectedIpWhitelist.id);
-            enqueueSnackbar(t("ipWhitelist.deleteSuccess"), {
-              variant: "success",
+            enqueueSnackbar(t('ipWhitelist.deleteSuccess'), {
+              variant: 'success',
             });
             loadIpWhitelists();
           } catch (error: any) {
-            enqueueSnackbar(
-              error.message || t("ipWhitelist.errors.deleteFailed"),
-              { variant: "error" },
-            );
+            enqueueSnackbar(error.message || t('ipWhitelist.errors.deleteFailed'), {
+              variant: 'error',
+            });
           }
           setConfirmDialog((prev) => ({ ...prev, open: false }));
         },
@@ -265,17 +247,13 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
     try {
       await IpWhitelistService.toggleIpWhitelistStatus(ipWhitelist.id);
       enqueueSnackbar(
-        t(
-          ipWhitelist.isEnabled
-            ? "ipWhitelist.disableSuccess"
-            : "ipWhitelist.enableSuccess",
-        ),
-        { variant: "success" },
+        t(ipWhitelist.isEnabled ? 'ipWhitelist.disableSuccess' : 'ipWhitelist.enableSuccess'),
+        { variant: 'success' }
       );
       loadIpWhitelists();
     } catch (error: any) {
-      enqueueSnackbar(error.message || t("ipWhitelist.errors.toggleFailed"), {
-        variant: "error",
+      enqueueSnackbar(error.message || t('ipWhitelist.errors.toggleFailed'), {
+        variant: 'error',
       });
     }
   };
@@ -283,16 +261,13 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
   const validateForm = (): boolean => {
     const errors: Record<string, string> = {};
 
-    const ipValidation = IpWhitelistService.validateIpOrCidr(
-      formData.ipAddress,
-    );
+    const ipValidation = IpWhitelistService.validateIpOrCidr(formData.ipAddress);
     if (!ipValidation.isValid) {
-      errors.ipAddress =
-        ipValidation.error || t("ipWhitelist.errors.invalidIp");
+      errors.ipAddress = ipValidation.error || t('ipWhitelist.errors.invalidIp');
     }
 
     if (!formData.purpose.trim()) {
-      errors.purpose = t("ipWhitelist.errors.purposeRequired");
+      errors.purpose = t('ipWhitelist.errors.purposeRequired');
     }
 
     setFormErrors(errors);
@@ -313,33 +288,30 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
       };
 
       // Only include dates if they have valid values
-      if (formData.startDate && formData.startDate.trim() !== "") {
+      if (formData.startDate && formData.startDate.trim() !== '') {
         cleanFormData.startDate = formData.startDate;
       }
 
-      if (formData.endDate && formData.endDate.trim() !== "") {
+      if (formData.endDate && formData.endDate.trim() !== '') {
         cleanFormData.endDate = formData.endDate;
       }
 
-      console.log("Frontend sending data:", cleanFormData);
+      console.log('Frontend sending data:', cleanFormData);
 
       if (editDialog && selectedIpWhitelist) {
-        await IpWhitelistService.updateIpWhitelist(
-          selectedIpWhitelist.id,
-          cleanFormData,
-        );
-        enqueueSnackbar(t("ipWhitelist.updateSuccess"), { variant: "success" });
+        await IpWhitelistService.updateIpWhitelist(selectedIpWhitelist.id, cleanFormData);
+        enqueueSnackbar(t('ipWhitelist.updateSuccess'), { variant: 'success' });
       } else {
         await IpWhitelistService.createIpWhitelist(cleanFormData);
-        enqueueSnackbar(t("ipWhitelist.createSuccess"), { variant: "success" });
+        enqueueSnackbar(t('ipWhitelist.createSuccess'), { variant: 'success' });
       }
 
       setAddDialog(false);
       setEditDialog(false);
       loadIpWhitelists();
     } catch (error: any) {
-      enqueueSnackbar(error.message || t("ipWhitelist.errors.saveFailed"), {
-        variant: "error",
+      enqueueSnackbar(error.message || t('ipWhitelist.errors.saveFailed'), {
+        variant: 'error',
       });
     }
   };
@@ -349,8 +321,8 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
       const entries = IpWhitelistService.parseBulkImportText(bulkData);
 
       if (entries.length === 0) {
-        enqueueSnackbar(t("ipWhitelist.errors.noBulkEntries"), {
-          variant: "warning",
+        enqueueSnackbar(t('ipWhitelist.errors.noBulkEntries'), {
+          variant: 'warning',
         });
         return;
       }
@@ -358,28 +330,27 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
       const result = await IpWhitelistService.bulkCreateIpWhitelists(entries);
 
       enqueueSnackbar(
-        t("ipWhitelist.bulkImportSuccess", {
+        t('ipWhitelist.bulkImportSuccess', {
           created: result.createdCount,
           total: result.requestedCount,
         }),
-        { variant: "success" },
+        { variant: 'success' }
       );
 
       setBulkDialog(false);
-      setBulkData("");
+      setBulkData('');
       loadIpWhitelists();
     } catch (error: any) {
-      enqueueSnackbar(
-        error.message || t("ipWhitelist.errors.bulkImportFailed"),
-        { variant: "error" },
-      );
+      enqueueSnackbar(error.message || t('ipWhitelist.errors.bulkImportFailed'), {
+        variant: 'error',
+      });
     }
   };
 
   const getStatusChip = (isEnabled: boolean) => (
     <Chip
-      label={isEnabled ? t("common.enabled") : t("common.disabled")}
-      color={isEnabled ? "success" : "default"}
+      label={isEnabled ? t('common.enabled') : t('common.disabled')}
+      color={isEnabled ? 'success' : 'default'}
       size="small"
     />
   );
@@ -388,22 +359,12 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
     <>
       {/* Action Buttons */}
       {canManage && (
-        <Box
-          sx={{ display: "flex", gap: 2, mb: 3, justifyContent: "flex-end" }}
-        >
-          <Button
-            variant="outlined"
-            startIcon={<UploadIcon />}
-            onClick={() => setBulkDialog(true)}
-          >
-            {t("ipWhitelist.bulkImport")}
+        <Box sx={{ display: 'flex', gap: 2, mb: 3, justifyContent: 'flex-end' }}>
+          <Button variant="outlined" startIcon={<UploadIcon />} onClick={() => setBulkDialog(true)}>
+            {t('ipWhitelist.bulkImport')}
           </Button>
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={handleAdd}
-          >
-            {t("ipWhitelist.addEntry")}
+          <Button variant="contained" startIcon={<AddIcon />} onClick={handleAdd}>
+            {t('ipWhitelist.addEntry')}
           </Button>
         </Box>
       )}
@@ -413,23 +374,23 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
         <CardContent>
           <Box
             sx={{
-              display: "flex",
+              display: 'flex',
               gap: 2,
-              alignItems: "center",
-              flexWrap: "wrap",
-              justifyContent: "space-between",
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              justifyContent: 'space-between',
             }}
           >
             <Box
               sx={{
-                display: "flex",
+                display: 'flex',
                 gap: 2,
-                alignItems: "center",
-                flexWrap: "wrap",
+                alignItems: 'center',
+                flexWrap: 'wrap',
               }}
             >
               <TextField
-                placeholder={t("ipWhitelist.searchPlaceholder")}
+                placeholder={t('ipWhitelist.searchPlaceholder')}
                 value={search}
                 onChange={handleSearchChange}
                 size="small"
@@ -453,17 +414,15 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
       <Card variant="outlined">
         <CardContent sx={{ p: 0 }}>
           {loading ? (
-            <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
-              <Typography color="text.secondary">
-                {t("common.loadingWhitelist")}
-              </Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
+              <Typography color="text.secondary">{t('common.loadingWhitelist')}</Typography>
             </Box>
           ) : ipWhitelists.length === 0 ? (
             <EmptyState
-              message={t("ipWhitelist.noEntries")}
-              subtitle={canManage ? t("common.addFirstItem") : undefined}
+              message={t('ipWhitelist.noEntries')}
+              subtitle={canManage ? t('common.addFirstItem') : undefined}
               onAddClick={canManage ? handleAdd : undefined}
-              addButtonLabel={t("ipWhitelist.addEntry")}
+              addButtonLabel={t('ipWhitelist.addEntry')}
             />
           ) : (
             <>
@@ -471,15 +430,13 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
                 <Table>
                   <TableHead>
                     <TableRow>
-                      <TableCell>{t("ipWhitelist.ipAddress")}</TableCell>
-                      <TableCell>{t("ipWhitelist.purpose")}</TableCell>
-                      <TableCell>{t("ipWhitelist.period")}</TableCell>
-                      <TableCell>{t("ipWhitelist.status")}</TableCell>
-                      <TableCell>{t("ipWhitelist.createdBy")}</TableCell>
-                      <TableCell>{t("ipWhitelist.createdAt")}</TableCell>
-                      <TableCell align="center">
-                        {t("common.actions")}
-                      </TableCell>
+                      <TableCell>{t('ipWhitelist.ipAddress')}</TableCell>
+                      <TableCell>{t('ipWhitelist.purpose')}</TableCell>
+                      <TableCell>{t('ipWhitelist.period')}</TableCell>
+                      <TableCell>{t('ipWhitelist.status')}</TableCell>
+                      <TableCell>{t('ipWhitelist.createdBy')}</TableCell>
+                      <TableCell>{t('ipWhitelist.createdAt')}</TableCell>
+                      <TableCell align="center">{t('common.actions')}</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -488,30 +445,21 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
                         <TableCell>
                           <Box
                             sx={{
-                              display: "flex",
-                              alignItems: "center",
+                              display: 'flex',
+                              alignItems: 'center',
                               gap: 1,
                             }}
                           >
-                            <Typography
-                              variant="body2"
-                              sx={{ fontFamily: "monospace" }}
-                            >
+                            <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
                               {ipWhitelist.ipAddress}
                             </Typography>
-                            <Tooltip
-                              title={
-                                t("common.copy") +
-                                " " +
-                                t("ipWhitelist.ipAddress")
-                              }
-                            >
+                            <Tooltip title={t('common.copy') + ' ' + t('ipWhitelist.ipAddress')}>
                               <IconButton
                                 size="small"
                                 onClick={() =>
                                   handleCopyToClipboard(
                                     ipWhitelist.ipAddress,
-                                    t("ipWhitelist.ipAddress"),
+                                    t('ipWhitelist.ipAddress')
                                   )
                                 }
                                 sx={{ p: 0.5 }}
@@ -522,9 +470,7 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
                           </Box>
                         </TableCell>
                         <TableCell>
-                          <Typography variant="body2">
-                            {ipWhitelist.purpose}
-                          </Typography>
+                          <Typography variant="body2">{ipWhitelist.purpose}</Typography>
                         </TableCell>
                         <TableCell>
                           {ipWhitelist.startDate || ipWhitelist.endDate ? (
@@ -533,41 +479,36 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
                                 <Typography
                                   variant="caption"
                                   color="text.secondary"
-                                  sx={{ display: "block" }}
+                                  sx={{ display: 'block' }}
                                 >
-                                  {t("ipWhitelist.from")}:{" "}
-                                  {formatDateTimeDetailed(
-                                    ipWhitelist.startDate,
-                                  )}
+                                  {t('ipWhitelist.from')}:{' '}
+                                  {formatDateTimeDetailed(ipWhitelist.startDate)}
                                 </Typography>
                               )}
                               {ipWhitelist.endDate && (
                                 <Typography
                                   variant="caption"
                                   color="text.secondary"
-                                  sx={{ display: "block" }}
+                                  sx={{ display: 'block' }}
                                 >
-                                  {t("ipWhitelist.to")}:{" "}
+                                  {t('ipWhitelist.to')}:{' '}
                                   {formatDateTimeDetailed(ipWhitelist.endDate)}
                                 </Typography>
                               )}
                             </Box>
                           ) : (
                             <Chip
-                              label={t("ipWhitelist.unlimited")}
+                              label={t('ipWhitelist.unlimited')}
                               size="small"
                               color="primary"
                               variant="outlined"
                             />
                           )}
                         </TableCell>
-                        <TableCell>
-                          {getStatusChip(ipWhitelist.isEnabled)}
-                        </TableCell>
+                        <TableCell>{getStatusChip(ipWhitelist.isEnabled)}</TableCell>
                         <TableCell>
                           <Typography variant="body2">
-                            {ipWhitelist.createdByName ||
-                              t("dashboard.unknown")}
+                            {ipWhitelist.createdByName || t('dashboard.unknown')}
                           </Typography>
                         </TableCell>
                         <TableCell>
@@ -577,26 +518,17 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
                         </TableCell>
                         <TableCell align="center">
                           <Tooltip
-                            title={
-                              ipWhitelist.isEnabled
-                                ? t("common.disable")
-                                : t("common.enable")
-                            }
+                            title={ipWhitelist.isEnabled ? t('common.disable') : t('common.enable')}
                           >
                             <IconButton
                               size="small"
                               onClick={() => handleToggleStatus(ipWhitelist)}
-                              color={
-                                ipWhitelist.isEnabled ? "success" : "default"
-                              }
+                              color={ipWhitelist.isEnabled ? 'success' : 'default'}
                             >
                               <ToggleIcon />
                             </IconButton>
                           </Tooltip>
-                          <IconButton
-                            size="small"
-                            onClick={(e) => handleMenuClick(e, ipWhitelist)}
-                          >
+                          <IconButton size="small" onClick={(e) => handleMenuClick(e, ipWhitelist)}>
                             <MoreVertIcon />
                           </IconButton>
                         </TableCell>
@@ -621,21 +553,17 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
       </Card>
 
       {/* Action Menu */}
-      <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handleMenuClose}
-      >
+      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
         {canManage && (
           <MenuItem onClick={handleEdit}>
             <EditIcon sx={{ mr: 1 }} />
-            {t("common.edit")}
+            {t('common.edit')}
           </MenuItem>
         )}
         {canManage && (
-          <MenuItem onClick={handleDelete} sx={{ color: "error.main" }}>
+          <MenuItem onClick={handleDelete} sx={{ color: 'error.main' }}>
             <DeleteIcon sx={{ mr: 1 }} />
-            {t("common.delete")}
+            {t('common.delete')}
           </MenuItem>
         )}
       </Menu>
@@ -650,11 +578,11 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
         }}
         sx={{
           zIndex: 1300,
-          "& .MuiDrawer-paper": {
-            width: { xs: "100%", sm: 600 },
-            maxWidth: "100vw",
-            display: "flex",
-            flexDirection: "column",
+          '& .MuiDrawer-paper': {
+            width: { xs: '100%', sm: 600 },
+            maxWidth: '100vw',
+            display: 'flex',
+            flexDirection: 'column',
           },
         }}
         ModalProps={{
@@ -664,25 +592,23 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
         {/* Header */}
         <Box
           sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
             p: 2,
-            borderBottom: "1px solid",
-            borderColor: "divider",
-            bgcolor: "background.paper",
+            borderBottom: '1px solid',
+            borderColor: 'divider',
+            bgcolor: 'background.paper',
           }}
         >
           <Box>
             <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
-              {editDialog
-                ? t("ipWhitelist.dialog.editTitle")
-                : t("ipWhitelist.dialog.addTitle")}
+              {editDialog ? t('ipWhitelist.dialog.editTitle') : t('ipWhitelist.dialog.addTitle')}
             </Typography>
             <Typography variant="body2" color="text.secondary">
               {editDialog
-                ? t("ipWhitelist.dialog.editDescription")
-                : t("ipWhitelist.dialog.addDescription")}
+                ? t('ipWhitelist.dialog.editDescription')
+                : t('ipWhitelist.dialog.addDescription')}
             </Typography>
           </Box>
           <IconButton
@@ -697,33 +623,31 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
         </Box>
 
         {/* Content */}
-        <Box sx={{ flex: 1, p: 3, overflow: "auto" }}>
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+        <Box sx={{ flex: 1, p: 3, overflow: 'auto' }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <Box>
               <TextField
                 fullWidth
-                label={t("ipWhitelist.form.ipAddress")}
+                label={t('ipWhitelist.form.ipAddress')}
                 value={formData.ipAddress}
-                onChange={(e) =>
-                  setFormData({ ...formData, ipAddress: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, ipAddress: e.target.value })}
                 error={!!formErrors.ipAddress}
                 helperText={formErrors.ipAddress}
-                placeholder={t("ipWhitelist.form.ipAddressPlaceholder")}
+                placeholder={t('ipWhitelist.form.ipAddressPlaceholder')}
                 required
                 inputRef={ipAddressFieldRef}
               />
               <Typography
                 variant="caption"
                 color="text.secondary"
-                sx={{ mt: 0.5, display: "block" }}
+                sx={{ mt: 0.5, display: 'block' }}
               >
-                {t("ipWhitelist.form.ipAddressHelp")}
+                {t('ipWhitelist.form.ipAddressHelp')}
               </Typography>
             </Box>
             <Box>
               <DateTimePicker
-                label={t("ipWhitelist.form.startDate")}
+                label={t('ipWhitelist.form.startDate')}
                 value={formData.startDate ? dayjs(formData.startDate) : null}
                 onChange={(date) =>
                   setFormData({
@@ -742,14 +666,14 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
               <Typography
                 variant="caption"
                 color="text.secondary"
-                sx={{ mt: 0.5, display: "block" }}
+                sx={{ mt: 0.5, display: 'block' }}
               >
-                {t("ipWhitelist.form.startDateHelp")}
+                {t('ipWhitelist.form.startDateHelp')}
               </Typography>
             </Box>
             <Box>
               <DateTimePicker
-                label={t("ipWhitelist.form.endDate")}
+                label={t('ipWhitelist.form.endDate')}
                 value={formData.endDate ? dayjs(formData.endDate) : null}
                 onChange={(date) =>
                   setFormData({
@@ -757,9 +681,7 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
                     endDate: date?.isValid() ? date.toISOString() : undefined,
                   })
                 }
-                minDateTime={
-                  formData.startDate ? dayjs(formData.startDate) : undefined
-                }
+                minDateTime={formData.startDate ? dayjs(formData.startDate) : undefined}
                 timeSteps={{ minutes: 1 }}
                 slotProps={{
                   textField: {
@@ -771,9 +693,9 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
               <Typography
                 variant="caption"
                 color="text.secondary"
-                sx={{ mt: 0.5, display: "block" }}
+                sx={{ mt: 0.5, display: 'block' }}
               >
-                {t("ipWhitelist.form.endDateHelp")}
+                {t('ipWhitelist.form.endDateHelp')}
               </Typography>
             </Box>
             <Box>
@@ -781,32 +703,28 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
                 control={
                   <Switch
                     checked={formData.isEnabled}
-                    onChange={(e) =>
-                      setFormData({ ...formData, isEnabled: e.target.checked })
-                    }
+                    onChange={(e) => setFormData({ ...formData, isEnabled: e.target.checked })}
                   />
                 }
-                label={t("ipWhitelist.form.enabled")}
+                label={t('ipWhitelist.form.enabled')}
               />
               <Typography
                 variant="caption"
                 color="text.secondary"
-                sx={{ mt: 0.5, display: "block" }}
+                sx={{ mt: 0.5, display: 'block' }}
               >
-                {t("ipWhitelist.form.enabledHelp")}
+                {t('ipWhitelist.form.enabledHelp')}
               </Typography>
             </Box>
             <Box>
               <TextField
                 fullWidth
-                label={t("ipWhitelist.form.purpose")}
+                label={t('ipWhitelist.form.purpose')}
                 value={formData.purpose}
-                onChange={(e) =>
-                  setFormData({ ...formData, purpose: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, purpose: e.target.value })}
                 error={!!formErrors.purpose}
                 helperText={formErrors.purpose}
-                placeholder={t("ipWhitelist.form.purposePlaceholder")}
+                placeholder={t('ipWhitelist.form.purposePlaceholder')}
                 multiline
                 rows={3}
                 required
@@ -814,9 +732,9 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
               <Typography
                 variant="caption"
                 color="text.secondary"
-                sx={{ mt: 0.5, display: "block" }}
+                sx={{ mt: 0.5, display: 'block' }}
               >
-                {t("ipWhitelist.form.purposeHelp")}
+                {t('ipWhitelist.form.purposeHelp')}
               </Typography>
             </Box>
           </Box>
@@ -826,12 +744,12 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
         <Box
           sx={{
             p: 3,
-            borderTop: "1px solid",
-            borderColor: "divider",
-            bgcolor: "background.paper",
-            display: "flex",
+            borderTop: '1px solid',
+            borderColor: 'divider',
+            bgcolor: 'background.paper',
+            display: 'flex',
             gap: 2,
-            justifyContent: "flex-end",
+            justifyContent: 'flex-end',
           }}
         >
           <Button
@@ -841,32 +759,21 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
             }}
             startIcon={<CancelIcon />}
           >
-            {t("common.cancel")}
+            {t('common.cancel')}
           </Button>
-          <Button
-            onClick={handleSave}
-            variant="contained"
-            startIcon={<SaveIcon />}
-          >
-            {editDialog
-              ? t("ipWhitelist.dialog.editTitle")
-              : t("ipWhitelist.dialog.addTitle")}
+          <Button onClick={handleSave} variant="contained" startIcon={<SaveIcon />}>
+            {editDialog ? t('ipWhitelist.dialog.editTitle') : t('ipWhitelist.dialog.addTitle')}
           </Button>
         </Box>
       </Drawer>
 
       {/* Bulk Import Dialog */}
-      <Dialog
-        open={bulkDialog}
-        onClose={() => setBulkDialog(false)}
-        maxWidth="md"
-        fullWidth
-      >
-        <DialogTitle>{t("ipWhitelist.bulkImport")}</DialogTitle>
+      <Dialog open={bulkDialog} onClose={() => setBulkDialog(false)} maxWidth="md" fullWidth>
+        <DialogTitle>{t('ipWhitelist.bulkImport')}</DialogTitle>
         <DialogContent>
           <Box sx={{ mt: 1 }}>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              {t("ipWhitelist.bulkImportHelp")}
+              {t('ipWhitelist.bulkImportHelp')}
             </Typography>
             <TextField
               fullWidth
@@ -881,18 +788,11 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button
-            onClick={() => setBulkDialog(false)}
-            startIcon={<CancelIcon />}
-          >
-            {t("common.cancel")}
+          <Button onClick={() => setBulkDialog(false)} startIcon={<CancelIcon />}>
+            {t('common.cancel')}
           </Button>
-          <Button
-            onClick={handleBulkImport}
-            variant="contained"
-            startIcon={<UploadIcon />}
-          >
-            {t("common.import")}
+          <Button onClick={handleBulkImport} variant="contained" startIcon={<UploadIcon />}>
+            {t('common.import')}
           </Button>
         </DialogActions>
       </Dialog>
@@ -908,12 +808,10 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
         </DialogContent>
         <DialogActions>
           <Button
-            onClick={() =>
-              setConfirmDialog((prev) => ({ ...prev, open: false }))
-            }
+            onClick={() => setConfirmDialog((prev) => ({ ...prev, open: false }))}
             startIcon={<CancelIcon />}
           >
-            {t("common.cancel")}
+            {t('common.cancel')}
           </Button>
           <Button
             onClick={confirmDialog.action}
@@ -921,7 +819,7 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
             variant="contained"
             startIcon={<DeleteIcon />}
           >
-            {t("common.confirm")}
+            {t('common.confirm')}
           </Button>
         </DialogActions>
       </Dialog>

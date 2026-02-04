@@ -15,7 +15,7 @@ export interface MutationResult<T> {
  */
 export function parseChangeRequestResponse<T>(
   response: any,
-  dataExtractor: (responseData: any) => T | undefined,
+  dataExtractor: (responseData: any) => T | undefined
 ): MutationResult<T> {
   const responseData = response.data || response;
 

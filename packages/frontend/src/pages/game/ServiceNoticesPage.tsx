@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useMemo } from "react";
-import { useAuth } from "../../hooks/useAuth";
-import { PERMISSIONS } from "../../types/permissions";
+import React, { useState, useEffect, useMemo } from 'react';
+import { useAuth } from '../../hooks/useAuth';
+import { PERMISSIONS } from '../../types/permissions';
 import {
   Box,
   Typography,
@@ -27,7 +27,7 @@ import {
   Skeleton,
   Divider,
   TableSortLabel,
-} from "@mui/material";
+} from '@mui/material';
 import {
   Add as AddIcon,
   Edit as EditIcon,
@@ -42,38 +42,32 @@ import {
   Info as InfoIcon,
   SportsEsports as SportsEsportsIcon,
   PushPin as PushPinIcon,
-} from "@mui/icons-material";
-import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import { useTranslation } from "react-i18next";
-import { useSnackbar } from "notistack";
+} from '@mui/icons-material';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import { useTranslation } from 'react-i18next';
+import { useSnackbar } from 'notistack';
 import serviceNoticeService, {
   ServiceNotice,
   ServiceNoticeFilters,
-} from "../../services/serviceNoticeService";
-import ServiceNoticeFormDialog from "../../components/game/ServiceNoticeFormDialog";
-import SimplePagination from "../../components/common/SimplePagination";
+} from '../../services/serviceNoticeService';
+import ServiceNoticeFormDialog from '../../components/game/ServiceNoticeFormDialog';
+import SimplePagination from '../../components/common/SimplePagination';
 import DynamicFilterBar, {
   FilterDefinition,
   ActiveFilter,
-} from "../../components/common/DynamicFilterBar";
-import EmptyState from "../../components/common/EmptyState";
-import ColumnSettingsDialog, {
-  ColumnConfig,
-} from "../../components/common/ColumnSettingsDialog";
-import {
-  formatDateTime,
-  formatRelativeTime,
-  formatDateTimeDetailed,
-} from "../../utils/dateFormat";
-import { useI18n } from "../../contexts/I18nContext";
-import { useDebounce } from "../../hooks/useDebounce";
-import { useGlobalPageSize } from "../../hooks/useGlobalPageSize";
-import { copyToClipboardWithNotification } from "../../utils/clipboard";
-import { useEnvironment } from "../../contexts/EnvironmentContext";
-import { parseApiErrorMessage } from "../../utils/errorUtils";
+} from '../../components/common/DynamicFilterBar';
+import EmptyState from '../../components/common/EmptyState';
+import ColumnSettingsDialog, { ColumnConfig } from '../../components/common/ColumnSettingsDialog';
+import { formatDateTime, formatRelativeTime, formatDateTimeDetailed } from '../../utils/dateFormat';
+import { useI18n } from '../../contexts/I18nContext';
+import { useDebounce } from '../../hooks/useDebounce';
+import { useGlobalPageSize } from '../../hooks/useGlobalPageSize';
+import { copyToClipboardWithNotification } from '../../utils/clipboard';
+import { useEnvironment } from '../../contexts/EnvironmentContext';
+import { parseApiErrorMessage } from '../../utils/errorUtils';
 
 const ServiceNoticesPage: React.FC = () => {
   const { t } = useTranslation();
@@ -90,123 +84,114 @@ const ServiceNoticesPage: React.FC = () => {
   const [rowsPerPage, setRowsPerPage] = useGlobalPageSize();
   const [loading, setLoading] = useState(true);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
   // Sorting state
   const [orderBy, setOrderBy] = useState<string>(() => {
-    const saved = localStorage.getItem("serviceNoticesSort");
+    const saved = localStorage.getItem('serviceNoticesSort');
     if (saved) {
       try {
         const { orderBy } = JSON.parse(saved);
-        return orderBy || "";
+        return orderBy || '';
       } catch {
-        return "";
+        return '';
       }
     }
-    return "";
+    return '';
   });
 
-  const [order, setOrder] = useState<"asc" | "desc">(() => {
-    const saved = localStorage.getItem("serviceNoticesSort");
+  const [order, setOrder] = useState<'asc' | 'desc'>(() => {
+    const saved = localStorage.getItem('serviceNoticesSort');
     if (saved) {
       try {
         const { order } = JSON.parse(saved);
-        return order || "desc";
+        return order || 'desc';
       } catch {
-        return "desc";
+        return 'desc';
       }
     }
-    return "desc";
+    return 'desc';
   });
 
   // Extract filter values with useMemo for stable references
   const isActiveFilter = useMemo(() => {
-    const filter = activeFilters.find((f) => f.key === "isActive");
+    const filter = activeFilters.find((f) => f.key === 'isActive');
     return filter?.value as string | undefined;
   }, [activeFilters]);
 
   const currentlyVisibleFilter = useMemo(() => {
-    const filter = activeFilters.find((f) => f.key === "currentlyVisible");
+    const filter = activeFilters.find((f) => f.key === 'currentlyVisible');
     return filter?.value as string | undefined;
   }, [activeFilters]);
 
   const categoryFilter = useMemo(() => {
-    const filter = activeFilters.find((f) => f.key === "category");
+    const filter = activeFilters.find((f) => f.key === 'category');
     return filter?.value as string[] | undefined;
   }, [activeFilters]);
 
   const platformFilter = useMemo(() => {
-    const filter = activeFilters.find((f) => f.key === "platform");
+    const filter = activeFilters.find((f) => f.key === 'platform');
     return filter?.value as string[] | undefined;
   }, [activeFilters]);
 
   const platformOperator = useMemo(() => {
-    const filter = activeFilters.find((f) => f.key === "platform");
+    const filter = activeFilters.find((f) => f.key === 'platform');
     return filter?.operator;
   }, [activeFilters]);
 
   // Convert filters to strings for dependency array
-  const isActiveFilterString = useMemo(
-    () => isActiveFilter || "",
-    [isActiveFilter],
-  );
+  const isActiveFilterString = useMemo(() => isActiveFilter || '', [isActiveFilter]);
   const currentlyVisibleFilterString = useMemo(
-    () => currentlyVisibleFilter || "",
-    [currentlyVisibleFilter],
+    () => currentlyVisibleFilter || '',
+    [currentlyVisibleFilter]
   );
   const categoryFilterString = useMemo(
-    () => (Array.isArray(categoryFilter) ? categoryFilter.join(",") : ""),
-    [categoryFilter],
+    () => (Array.isArray(categoryFilter) ? categoryFilter.join(',') : ''),
+    [categoryFilter]
   );
   const platformFilterString = useMemo(
-    () => (Array.isArray(platformFilter) ? platformFilter.join(",") : ""),
-    [platformFilter],
+    () => (Array.isArray(platformFilter) ? platformFilter.join(',') : ''),
+    [platformFilter]
   );
 
   // Dialog states
   const [formDrawerOpen, setFormDrawerOpen] = useState(false);
-  const [editingNotice, setEditingNotice] = useState<ServiceNotice | null>(
-    null,
-  );
+  const [editingNotice, setEditingNotice] = useState<ServiceNotice | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [deletingNotice, setDeletingNotice] = useState<ServiceNotice | null>(
-    null,
-  );
+  const [deletingNotice, setDeletingNotice] = useState<ServiceNotice | null>(null);
   const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
   const [previewDialogOpen, setPreviewDialogOpen] = useState(false);
 
   // Webview menu state
-  const [webviewMenuAnchorEl, setWebviewMenuAnchorEl] =
-    useState<null | HTMLElement>(null);
+  const [webviewMenuAnchorEl, setWebviewMenuAnchorEl] = useState<null | HTMLElement>(null);
 
   // Default column configuration - title moved to first position
   const defaultColumns: ColumnConfig[] = [
-    { id: "title", labelKey: "serviceNotices.noticeTitle", visible: true },
-    { id: "isPinned", labelKey: "serviceNotices.isPinned", visible: true },
+    { id: 'title', labelKey: 'serviceNotices.noticeTitle', visible: true },
+    { id: 'isPinned', labelKey: 'serviceNotices.isPinned', visible: true },
     {
-      id: "currentlyVisible",
-      labelKey: "serviceNotices.currentlyVisible",
+      id: 'currentlyVisible',
+      labelKey: 'serviceNotices.currentlyVisible',
       visible: true,
     },
-    { id: "status", labelKey: "serviceNotices.status", visible: true },
-    { id: "category", labelKey: "serviceNotices.category", visible: true },
+    { id: 'status', labelKey: 'serviceNotices.status', visible: true },
+    { id: 'category', labelKey: 'serviceNotices.category', visible: true },
     {
-      id: "targetAudience",
-      labelKey: "serviceNotices.targetAudience",
+      id: 'targetAudience',
+      labelKey: 'serviceNotices.targetAudience',
       visible: true,
     },
-    { id: "period", labelKey: "serviceNotices.period", visible: true },
-    { id: "createdAt", labelKey: "common.createdAt", visible: true },
-    { id: "updatedAt", labelKey: "common.updatedAt", visible: true },
+    { id: 'period', labelKey: 'serviceNotices.period', visible: true },
+    { id: 'createdAt', labelKey: 'common.createdAt', visible: true },
+    { id: 'updatedAt', labelKey: 'common.updatedAt', visible: true },
   ];
 
   // Column settings
-  const [columnSettingsAnchor, setColumnSettingsAnchor] =
-    useState<null | HTMLElement>(null);
+  const [columnSettingsAnchor, setColumnSettingsAnchor] = useState<null | HTMLElement>(null);
   const [columns, setColumns] = useState<ColumnConfig[]>(() => {
-    const saved = localStorage.getItem("serviceNoticesColumns");
+    const saved = localStorage.getItem('serviceNoticesColumns');
     if (saved) {
       try {
         const savedColumns = JSON.parse(saved);
@@ -232,61 +217,58 @@ const ServiceNoticesPage: React.FC = () => {
   // Filter definitions
   const availableFilterDefinitions: FilterDefinition[] = [
     {
-      key: "isActive",
-      label: t("serviceNotices.status"),
-      type: "select",
+      key: 'isActive',
+      label: t('serviceNotices.status'),
+      type: 'select',
       options: [
-        { value: "true", label: t("common.active") },
-        { value: "false", label: t("common.inactive") },
+        { value: 'true', label: t('common.active') },
+        { value: 'false', label: t('common.inactive') },
       ],
     },
     {
-      key: "currentlyVisible",
-      label: t("serviceNotices.currentlyVisible"),
-      type: "select",
+      key: 'currentlyVisible',
+      label: t('serviceNotices.currentlyVisible'),
+      type: 'select',
       options: [
-        { value: "true", label: t("serviceNotices.visible") },
-        { value: "false", label: t("serviceNotices.notVisible") },
+        { value: 'true', label: t('serviceNotices.visible') },
+        { value: 'false', label: t('serviceNotices.notVisible') },
       ],
     },
     {
-      key: "category",
-      label: t("serviceNotices.category"),
-      type: "multiselect",
-      operator: "any_of",
+      key: 'category',
+      label: t('serviceNotices.category'),
+      type: 'multiselect',
+      operator: 'any_of',
       allowOperatorToggle: false,
       options: [
         {
-          value: "maintenance",
-          label: t("serviceNotices.categories.maintenance"),
+          value: 'maintenance',
+          label: t('serviceNotices.categories.maintenance'),
         },
-        { value: "event", label: t("serviceNotices.categories.event") },
-        { value: "notice", label: t("serviceNotices.categories.notice") },
-        { value: "promotion", label: t("serviceNotices.categories.promotion") },
-        { value: "other", label: t("serviceNotices.categories.other") },
+        { value: 'event', label: t('serviceNotices.categories.event') },
+        { value: 'notice', label: t('serviceNotices.categories.notice') },
+        { value: 'promotion', label: t('serviceNotices.categories.promotion') },
+        { value: 'other', label: t('serviceNotices.categories.other') },
       ],
     },
     {
-      key: "platform",
-      label: t("serviceNotices.platform"),
-      type: "multiselect",
-      operator: "any_of",
+      key: 'platform',
+      label: t('serviceNotices.platform'),
+      type: 'multiselect',
+      operator: 'any_of',
       allowOperatorToggle: true,
       options: [
-        { value: "pc", label: "PC" },
-        { value: "pc-wegame", label: "PC-WeGame" },
-        { value: "ios", label: "iOS" },
-        { value: "android", label: "Android" },
-        { value: "harmonyos", label: "HarmonyOS" },
+        { value: 'pc', label: 'PC' },
+        { value: 'pc-wegame', label: 'PC-WeGame' },
+        { value: 'ios', label: 'iOS' },
+        { value: 'android', label: 'Android' },
+        { value: 'harmonyos', label: 'HarmonyOS' },
       ],
     },
   ];
 
   // Visible columns
-  const visibleColumns = useMemo(
-    () => columns.filter((col) => col.visible),
-    [columns],
-  );
+  const visibleColumns = useMemo(() => columns.filter((col) => col.visible), [columns]);
 
   // Load notices
   const loadNotices = async () => {
@@ -297,14 +279,11 @@ const ServiceNoticesPage: React.FC = () => {
       };
 
       // Apply active filters
-      if (isActiveFilter !== undefined && isActiveFilter !== "") {
-        filters.isActive = isActiveFilter === "true";
+      if (isActiveFilter !== undefined && isActiveFilter !== '') {
+        filters.isActive = isActiveFilter === 'true';
       }
-      if (
-        currentlyVisibleFilter !== undefined &&
-        currentlyVisibleFilter !== ""
-      ) {
-        filters.currentlyVisible = currentlyVisibleFilter === "true";
+      if (currentlyVisibleFilter !== undefined && currentlyVisibleFilter !== '') {
+        filters.currentlyVisible = currentlyVisibleFilter === 'true';
       }
       if (Array.isArray(categoryFilter) && categoryFilter.length > 0) {
         filters.category = categoryFilter[0];
@@ -320,27 +299,22 @@ const ServiceNoticesPage: React.FC = () => {
         filters.sortOrder = order;
       }
 
-      const result = await serviceNoticeService.getServiceNotices(
-        page + 1,
-        rowsPerPage,
-        filters,
-      );
+      const result = await serviceNoticeService.getServiceNotices(page + 1, rowsPerPage, filters);
 
       // Validate response
-      if (result && typeof result === "object") {
+      if (result && typeof result === 'object') {
         setNotices(result.notices || []);
         setTotal(result.total || 0);
       } else {
-        console.error("Invalid response format:", result);
+        console.error('Invalid response format:', result);
         setNotices([]);
         setTotal(0);
       }
     } catch (error: any) {
-      console.error("Failed to load service notices:", error);
-      enqueueSnackbar(
-        parseApiErrorMessage(error, "serviceNotices.loadFailed"),
-        { variant: "error" },
-      );
+      console.error('Failed to load service notices:', error);
+      enqueueSnackbar(parseApiErrorMessage(error, 'serviceNotices.loadFailed'), {
+        variant: 'error',
+      });
       setNotices([]);
       setTotal(0);
     } finally {
@@ -376,49 +350,39 @@ const ServiceNoticesPage: React.FC = () => {
 
   // Sort handler
   const handleRequestSort = (property: string) => {
-    const isAsc = orderBy === property && order === "asc";
-    const newOrder = isAsc ? "desc" : "asc";
+    const isAsc = orderBy === property && order === 'asc';
+    const newOrder = isAsc ? 'desc' : 'asc';
     setOrder(newOrder);
     setOrderBy(property);
     setPage(0);
 
     // Save sort preference
     localStorage.setItem(
-      "serviceNoticesSort",
-      JSON.stringify({ orderBy: property, order: newOrder }),
+      'serviceNoticesSort',
+      JSON.stringify({ orderBy: property, order: newOrder })
     );
   };
 
   const handleDynamicFilterChange = (filterKey: string, value: any) => {
-    const newFilters = activeFilters.map((f) =>
-      f.key === filterKey ? { ...f, value } : f,
-    );
+    const newFilters = activeFilters.map((f) => (f.key === filterKey ? { ...f, value } : f));
     setActiveFilters(newFilters);
     setPage(0);
   };
 
-  const handleOperatorChange = (
-    filterKey: string,
-    operator: "any_of" | "include_all",
-  ) => {
-    const newFilters = activeFilters.map((f) =>
-      f.key === filterKey ? { ...f, operator } : f,
-    );
+  const handleOperatorChange = (filterKey: string, operator: 'any_of' | 'include_all') => {
+    const newFilters = activeFilters.map((f) => (f.key === filterKey ? { ...f, operator } : f));
     setActiveFilters(newFilters);
   };
 
   // Column handlers
   const handleColumnsChange = (newColumns: ColumnConfig[]) => {
     setColumns(newColumns);
-    localStorage.setItem("serviceNoticesColumns", JSON.stringify(newColumns));
+    localStorage.setItem('serviceNoticesColumns', JSON.stringify(newColumns));
   };
 
   const handleResetColumns = () => {
     setColumns(defaultColumns);
-    localStorage.setItem(
-      "serviceNoticesColumns",
-      JSON.stringify(defaultColumns),
-    );
+    localStorage.setItem('serviceNoticesColumns', JSON.stringify(defaultColumns));
   };
 
   // Search handler
@@ -464,19 +428,17 @@ const ServiceNoticesPage: React.FC = () => {
     if (!deletingNotice) return;
 
     try {
-      const result = await serviceNoticeService.deleteServiceNotice(
-        deletingNotice.id,
-      );
+      const result = await serviceNoticeService.deleteServiceNotice(deletingNotice.id);
 
       if (result.isChangeRequest) {
         // CR was created, not immediately deleted
-        enqueueSnackbar(t("serviceNotices.deleteChangeRequestCreated"), {
-          variant: "info",
+        enqueueSnackbar(t('serviceNotices.deleteChangeRequestCreated'), {
+          variant: 'info',
         });
       } else {
         // Directly deleted
-        enqueueSnackbar(t("serviceNotices.deleteSuccess"), {
-          variant: "success",
+        enqueueSnackbar(t('serviceNotices.deleteSuccess'), {
+          variant: 'success',
         });
       }
 
@@ -484,10 +446,9 @@ const ServiceNoticesPage: React.FC = () => {
       setDeletingNotice(null);
       loadNotices();
     } catch (error: any) {
-      enqueueSnackbar(
-        parseApiErrorMessage(error, "serviceNotices.deleteFailed"),
-        { variant: "error" },
-      );
+      enqueueSnackbar(parseApiErrorMessage(error, 'serviceNotices.deleteFailed'), {
+        variant: 'error',
+      });
     }
   };
 
@@ -498,33 +459,30 @@ const ServiceNoticesPage: React.FC = () => {
 
   const confirmBulkDelete = async () => {
     try {
-      const result =
-        await serviceNoticeService.deleteMultipleServiceNotices(selectedIds);
+      const result = await serviceNoticeService.deleteMultipleServiceNotices(selectedIds);
 
       if (result.isChangeRequest) {
         // CR was created, not immediately deleted
         enqueueSnackbar(
-          t("serviceNotices.bulkDeleteChangeRequestCreated", {
+          t('serviceNotices.bulkDeleteChangeRequestCreated', {
             count: selectedIds.length,
           }),
-          { variant: "info" },
+          { variant: 'info' }
         );
       } else {
         // Directly deleted
-        enqueueSnackbar(
-          t("serviceNotices.bulkDeleteSuccess", { count: selectedIds.length }),
-          { variant: "success" },
-        );
+        enqueueSnackbar(t('serviceNotices.bulkDeleteSuccess', { count: selectedIds.length }), {
+          variant: 'success',
+        });
       }
 
       setBulkDeleteDialogOpen(false);
       setSelectedIds([]);
       loadNotices();
     } catch (error: any) {
-      enqueueSnackbar(
-        parseApiErrorMessage(error, "serviceNotices.bulkDeleteFailed"),
-        { variant: "error" },
-      );
+      enqueueSnackbar(parseApiErrorMessage(error, 'serviceNotices.bulkDeleteFailed'), {
+        variant: 'error',
+      });
     }
   };
 
@@ -540,18 +498,15 @@ const ServiceNoticesPage: React.FC = () => {
   // Get Edge server URL for webview pages
   const getEdgeWebviewUrl = () => {
     // Runtime-injected config (for production docker/nginx) takes precedence
-    const runtimeUrl = (window as any)?.ENV?.VITE_EDGE_URL as
-      | string
-      | undefined;
-    const edgeUrl =
-      runtimeUrl || import.meta.env.VITE_EDGE_URL || "http://localhost:3400";
-    const envName = currentEnvironment?.environmentName || "development";
+    const runtimeUrl = (window as any)?.ENV?.VITE_EDGE_URL as string | undefined;
+    const edgeUrl = runtimeUrl || import.meta.env.VITE_EDGE_URL || 'http://localhost:3400';
+    const envName = currentEnvironment?.environmentName || 'development';
     return `${edgeUrl}/game-service-notices.html?environment=${encodeURIComponent(envName)}`;
   };
 
   const handleOpenWebviewPreview = () => {
     // Open the actual game webview HTML page served from Edge server
-    window.open(getEdgeWebviewUrl(), "_blank", "width=1536,height=928");
+    window.open(getEdgeWebviewUrl(), '_blank', 'width=1536,height=928');
     handleWebviewMenuClose();
   };
 
@@ -559,7 +514,7 @@ const ServiceNoticesPage: React.FC = () => {
   const handleCopyNoticeUrl = async () => {
     const noticeUrl = getEdgeWebviewUrl();
     if (!noticeUrl) {
-      enqueueSnackbar(t("common.copyFailed"), { variant: "error" });
+      enqueueSnackbar(t('common.copyFailed'), { variant: 'error' });
       handleWebviewMenuClose();
       return;
     }
@@ -568,14 +523,14 @@ const ServiceNoticesPage: React.FC = () => {
       await copyToClipboardWithNotification(
         noticeUrl,
         () =>
-          enqueueSnackbar(t("common.copiedToClipboard"), {
-            variant: "success",
+          enqueueSnackbar(t('common.copiedToClipboard'), {
+            variant: 'success',
           }),
-        () => enqueueSnackbar(t("common.copyFailed"), { variant: "error" }),
+        () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
       );
     } catch (error) {
-      console.error("Copy failed:", error);
-      enqueueSnackbar(t("common.copyFailed"), { variant: "error" });
+      console.error('Copy failed:', error);
+      enqueueSnackbar(t('common.copyFailed'), { variant: 'error' });
     } finally {
       handleWebviewMenuClose();
     }
@@ -584,15 +539,14 @@ const ServiceNoticesPage: React.FC = () => {
   const handleToggleActive = async (notice: ServiceNotice) => {
     try {
       await serviceNoticeService.toggleActive(notice.id);
-      enqueueSnackbar(t("serviceNotices.toggleSuccess"), {
-        variant: "success",
+      enqueueSnackbar(t('serviceNotices.toggleSuccess'), {
+        variant: 'success',
       });
       loadNotices();
     } catch (error: any) {
-      enqueueSnackbar(
-        parseApiErrorMessage(error, "serviceNotices.toggleFailed"),
-        { variant: "error" },
-      );
+      enqueueSnackbar(parseApiErrorMessage(error, 'serviceNotices.toggleFailed'), {
+        variant: 'error',
+      });
     }
   };
 
@@ -601,9 +555,9 @@ const ServiceNoticesPage: React.FC = () => {
       {/* Header */}
       <Box
         sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "flex-start",
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
           mb: 3,
         }}
       >
@@ -611,39 +565,31 @@ const ServiceNoticesPage: React.FC = () => {
           <Typography
             variant="h4"
             gutterBottom
-            sx={{ display: "flex", alignItems: "center", gap: 1 }}
+            sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
           >
             <AnnouncementIcon />
-            {t("serviceNotices.title")}
+            {t('serviceNotices.title')}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            {t("serviceNotices.subtitle")}
+            {t('serviceNotices.subtitle')}
           </Typography>
         </Box>
-        <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
           <Button
             variant="outlined"
             startIcon={<VisibilityIcon />}
             onClick={() => setPreviewDialogOpen(true)}
           >
-            {t("serviceNotices.preview")}
+            {t('serviceNotices.preview')}
           </Button>
           {canManage && (
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={handleCreate}
-            >
-              {t("serviceNotices.createNotice")}
+            <Button variant="contained" startIcon={<AddIcon />} onClick={handleCreate}>
+              {t('serviceNotices.createNotice')}
             </Button>
           )}
           <Divider orientation="vertical" sx={{ height: 32, mx: 0.5 }} />
-          <Tooltip title={t("serviceNotices.webviewMenuTooltip")}>
-            <IconButton
-              size="small"
-              onClick={handleWebviewMenuOpen}
-              sx={{ p: 1 }}
-            >
+          <Tooltip title={t('serviceNotices.webviewMenuTooltip')}>
+            <IconButton size="small" onClick={handleWebviewMenuOpen} sx={{ p: 1 }}>
               <SportsEsportsIcon />
             </IconButton>
           </Tooltip>
@@ -655,64 +601,62 @@ const ServiceNoticesPage: React.FC = () => {
         <CardContent>
           <Box
             sx={{
-              display: "flex",
-              alignItems: "center",
+              display: 'flex',
+              alignItems: 'center',
               gap: 2,
-              flexWrap: "nowrap",
-              justifyContent: "space-between",
+              flexWrap: 'nowrap',
+              justifyContent: 'space-between',
             }}
           >
             <Box
               sx={{
-                display: "flex",
+                display: 'flex',
                 gap: 2,
-                alignItems: "center",
-                flexWrap: "nowrap",
+                alignItems: 'center',
+                flexWrap: 'nowrap',
                 flexGrow: 1,
                 minWidth: 0,
               }}
             >
               <TextField
-                placeholder={t("serviceNotices.searchPlaceholder")}
+                placeholder={t('serviceNotices.searchPlaceholder')}
                 value={searchTerm}
                 onChange={handleSearchChange}
                 sx={{
                   minWidth: 300,
                   flexGrow: 1,
                   maxWidth: 500,
-                  "& .MuiOutlinedInput-root": {
-                    height: "40px",
-                    borderRadius: "20px",
-                    bgcolor: "background.paper",
-                    transition: "all 0.2s ease-in-out",
-                    "& fieldset": {
-                      borderColor: "divider",
+                  '& .MuiOutlinedInput-root': {
+                    height: '40px',
+                    borderRadius: '20px',
+                    bgcolor: 'background.paper',
+                    transition: 'all 0.2s ease-in-out',
+                    '& fieldset': {
+                      borderColor: 'divider',
                     },
-                    "&:hover": {
-                      bgcolor: "action.hover",
-                      "& fieldset": {
-                        borderColor: "primary.light",
+                    '&:hover': {
+                      bgcolor: 'action.hover',
+                      '& fieldset': {
+                        borderColor: 'primary.light',
                       },
                     },
-                    "&.Mui-focused": {
-                      bgcolor: "background.paper",
-                      boxShadow: "0 0 0 2px rgba(25, 118, 210, 0.1)",
-                      "& fieldset": {
-                        borderColor: "primary.main",
-                        borderWidth: "1px",
+                    '&.Mui-focused': {
+                      bgcolor: 'background.paper',
+                      boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
+                      '& fieldset': {
+                        borderColor: 'primary.main',
+                        borderWidth: '1px',
                       },
                     },
                   },
-                  "& .MuiInputBase-input": {
-                    fontSize: "0.875rem",
+                  '& .MuiInputBase-input': {
+                    fontSize: '0.875rem',
                   },
                 }}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <SearchIcon
-                        sx={{ color: "text.secondary", fontSize: 20 }}
-                      />
+                      <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
                     </InputAdornment>
                   ),
                 }}
@@ -731,15 +675,15 @@ const ServiceNoticesPage: React.FC = () => {
                 refreshDisabled={loading}
                 noWrap={true}
                 afterFilterAddActions={
-                  <Tooltip title={t("users.columnSettings")}>
+                  <Tooltip title={t('users.columnSettings')}>
                     <IconButton
                       onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
                       sx={{
-                        bgcolor: "background.paper",
+                        bgcolor: 'background.paper',
                         border: 1,
-                        borderColor: "divider",
-                        "&:hover": {
-                          bgcolor: "action.hover",
+                        borderColor: 'divider',
+                        '&:hover': {
+                          bgcolor: 'action.hover',
                         },
                       }}
                     >
@@ -755,9 +699,9 @@ const ServiceNoticesPage: React.FC = () => {
 
       {/* Bulk Actions */}
       {canManage && selectedIds.length > 0 && (
-        <Box sx={{ mb: 2, display: "flex", gap: 1, alignItems: "center" }}>
+        <Box sx={{ mb: 2, display: 'flex', gap: 1, alignItems: 'center' }}>
           <Typography variant="body2" color="text.secondary">
-            {t("common.selectedCount", { count: selectedIds.length })}
+            {t('common.selectedCount', { count: selectedIds.length })}
           </Typography>
           <Button
             variant="outlined"
@@ -766,26 +710,24 @@ const ServiceNoticesPage: React.FC = () => {
             startIcon={<DeleteIcon />}
             onClick={handleBulkDelete}
           >
-            {t("common.deleteSelected")}
+            {t('common.deleteSelected')}
           </Button>
         </Box>
       )}
 
       {/* Table */}
       <Card>
-        <CardContent sx={{ p: 0, "&:last-child": { pb: 0 } }}>
+        <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
           {isInitialLoad && loading ? (
-            <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
-              <Typography color="text.secondary">
-                {t("common.loadingData")}
-              </Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
+              <Typography color="text.secondary">{t('common.loadingData')}</Typography>
             </Box>
           ) : notices.length === 0 ? (
             <EmptyState
-              message={t("serviceNotices.noNoticesFound")}
+              message={t('serviceNotices.noNoticesFound')}
               onAddClick={canManage ? handleCreate : undefined}
-              addButtonLabel={t("serviceNotices.createNotice")}
-              subtitle={canManage ? t("common.addFirstItem") : undefined}
+              addButtonLabel={t('serviceNotices.createNotice')}
+              subtitle={canManage ? t('common.addFirstItem') : undefined}
             />
           ) : (
             <>
@@ -796,13 +738,9 @@ const ServiceNoticesPage: React.FC = () => {
                       {canManage && (
                         <TableCell padding="checkbox">
                           <Checkbox
-                            checked={
-                              notices.length > 0 &&
-                              selectedIds.length === notices.length
-                            }
+                            checked={notices.length > 0 && selectedIds.length === notices.length}
                             indeterminate={
-                              selectedIds.length > 0 &&
-                              selectedIds.length < notices.length
+                              selectedIds.length > 0 && selectedIds.length < notices.length
                             }
                             onChange={handleSelectAll}
                           />
@@ -810,44 +748,40 @@ const ServiceNoticesPage: React.FC = () => {
                       )}
                       {visibleColumns.map((column) => {
                         const isSortable = [
-                          "title",
-                          "isPinned",
-                          "status",
-                          "category",
-                          "period",
-                          "createdAt",
-                          "updatedAt",
+                          'title',
+                          'isPinned',
+                          'status',
+                          'category',
+                          'period',
+                          'createdAt',
+                          'updatedAt',
                         ].includes(column.id);
                         const sortProperty =
-                          column.id === "status"
-                            ? "isActive"
-                            : column.id === "period"
-                              ? "startDate"
+                          column.id === 'status'
+                            ? 'isActive'
+                            : column.id === 'period'
+                              ? 'startDate'
                               : column.id;
 
                         return (
                           <TableCell
                             key={column.id}
-                            align={column.id === "isPinned" ? "center" : "left"}
-                            sortDirection={
-                              orderBy === sortProperty ? order : false
-                            }
+                            align={column.id === 'isPinned' ? 'center' : 'left'}
+                            sortDirection={orderBy === sortProperty ? order : false}
                           >
                             {isSortable ? (
                               <TableSortLabel
                                 active={orderBy === sortProperty}
-                                direction={
-                                  orderBy === sortProperty ? order : "asc"
-                                }
+                                direction={orderBy === sortProperty ? order : 'asc'}
                                 onClick={() => handleRequestSort(sortProperty)}
                               >
-                                {column.id === "isPinned" ? (
-                                  <Tooltip title={t("serviceNotices.isPinned")}>
+                                {column.id === 'isPinned' ? (
+                                  <Tooltip title={t('serviceNotices.isPinned')}>
                                     <PushPinIcon
                                       fontSize="small"
                                       sx={{
-                                        transform: "rotate(45deg)",
-                                        verticalAlign: "middle",
+                                        transform: 'rotate(45deg)',
+                                        verticalAlign: 'middle',
                                       }}
                                     />
                                   </Tooltip>
@@ -855,13 +789,13 @@ const ServiceNoticesPage: React.FC = () => {
                                   t(column.labelKey)
                                 )}
                               </TableSortLabel>
-                            ) : column.id === "isPinned" ? (
-                              <Tooltip title={t("serviceNotices.isPinned")}>
+                            ) : column.id === 'isPinned' ? (
+                              <Tooltip title={t('serviceNotices.isPinned')}>
                                 <PushPinIcon
                                   fontSize="small"
                                   sx={{
-                                    transform: "rotate(45deg)",
-                                    verticalAlign: "middle",
+                                    transform: 'rotate(45deg)',
+                                    verticalAlign: 'middle',
                                   }}
                                 />
                               </Tooltip>
@@ -871,11 +805,7 @@ const ServiceNoticesPage: React.FC = () => {
                           </TableCell>
                         );
                       })}
-                      {canManage && (
-                        <TableCell align="center">
-                          {t("common.actions")}
-                        </TableCell>
-                      )}
+                      {canManage && <TableCell align="center">{t('common.actions')}</TableCell>}
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -890,47 +820,37 @@ const ServiceNoticesPage: React.FC = () => {
                           </TableCell>
                         )}
                         {visibleColumns.map((column) => {
-                          if (column.id === "isPinned") {
+                          if (column.id === 'isPinned') {
                             return (
                               <TableCell key={column.id} align="center">
                                 <PushPinIcon
                                   fontSize="small"
-                                  color={
-                                    notice.isPinned ? "primary" : "disabled"
-                                  }
+                                  color={notice.isPinned ? 'primary' : 'disabled'}
                                   sx={{
-                                    transform: "rotate(45deg)",
+                                    transform: 'rotate(45deg)',
                                     opacity: notice.isPinned ? 1 : 0.3,
                                   }}
                                 />
                               </TableCell>
                             );
                           }
-                          if (column.id === "status") {
+                          if (column.id === 'status') {
                             return (
                               <TableCell key={column.id}>
                                 <Chip
                                   label={
-                                    notice.isActive
-                                      ? t("common.active")
-                                      : t("common.inactive")
+                                    notice.isActive ? t('common.active') : t('common.inactive')
                                   }
-                                  color={
-                                    notice.isActive ? "success" : "default"
-                                  }
+                                  color={notice.isActive ? 'success' : 'default'}
                                   size="small"
                                 />
                               </TableCell>
                             );
                           }
-                          if (column.id === "currentlyVisible") {
+                          if (column.id === 'currentlyVisible') {
                             const now = new Date();
-                            const startDate = notice.startDate
-                              ? new Date(notice.startDate)
-                              : null;
-                            const endDate = notice.endDate
-                              ? new Date(notice.endDate)
-                              : null;
+                            const startDate = notice.startDate ? new Date(notice.startDate) : null;
+                            const endDate = notice.endDate ? new Date(notice.endDate) : null;
                             const isCurrentlyVisible =
                               notice.isActive &&
                               (!startDate || now >= startDate) &&
@@ -938,18 +858,18 @@ const ServiceNoticesPage: React.FC = () => {
 
                             const startText = startDate
                               ? formatDateTime(startDate)
-                              : t("serviceNotices.startImmediately");
+                              : t('serviceNotices.startImmediately');
                             const endText = endDate
                               ? formatDateTime(endDate)
-                              : t("serviceNotices.permanentDisplay");
+                              : t('serviceNotices.permanentDisplay');
 
                             const tooltipMessage = isCurrentlyVisible
-                              ? t("serviceNotices.currentlyVisibleTooltip", {
+                              ? t('serviceNotices.currentlyVisibleTooltip', {
                                   time: formatDateTime(now),
                                   start: startText,
                                   end: endText,
                                 })
-                              : t("serviceNotices.notVisibleTooltip", {
+                              : t('serviceNotices.notVisibleTooltip', {
                                   time: formatDateTime(now),
                                   start: startText,
                                   end: endText,
@@ -962,41 +882,35 @@ const ServiceNoticesPage: React.FC = () => {
                                   <Chip
                                     label={
                                       isCurrentlyVisible
-                                        ? t("serviceNotices.visible")
-                                        : t("serviceNotices.notVisible")
+                                        ? t('serviceNotices.visible')
+                                        : t('serviceNotices.notVisible')
                                     }
-                                    color={
-                                      isCurrentlyVisible ? "primary" : "default"
-                                    }
+                                    color={isCurrentlyVisible ? 'primary' : 'default'}
                                     size="small"
-                                    variant={
-                                      isCurrentlyVisible ? "filled" : "outlined"
-                                    }
+                                    variant={isCurrentlyVisible ? 'filled' : 'outlined'}
                                   />
                                 </Tooltip>
                               </TableCell>
                             );
                           }
-                          if (column.id === "category") {
+                          if (column.id === 'category') {
                             return (
                               <TableCell key={column.id}>
                                 <Chip
-                                  label={t(
-                                    `serviceNotices.categories.${notice.category}`,
-                                  )}
+                                  label={t(`serviceNotices.categories.${notice.category}`)}
                                   size="small"
                                   variant="outlined"
                                 />
                               </TableCell>
                             );
                           }
-                          if (column.id === "title") {
+                          if (column.id === 'title') {
                             return (
                               <TableCell key={column.id}>
                                 <Box
                                   sx={{
-                                    display: "flex",
-                                    alignItems: "center",
+                                    display: 'flex',
+                                    alignItems: 'center',
                                     gap: 1,
                                   }}
                                 >
@@ -1005,9 +919,9 @@ const ServiceNoticesPage: React.FC = () => {
                                       variant="body2"
                                       sx={{
                                         fontWeight: 500,
-                                        cursor: "pointer",
-                                        "&:hover": {
-                                          textDecoration: "underline",
+                                        cursor: 'pointer',
+                                        '&:hover': {
+                                          textDecoration: 'underline',
                                         },
                                       }}
                                       onClick={() => handleEdit(notice)}
@@ -1015,10 +929,7 @@ const ServiceNoticesPage: React.FC = () => {
                                       {notice.tabTitle || notice.title}
                                     </Typography>
                                     {notice.tabTitle && (
-                                      <Typography
-                                        variant="caption"
-                                        color="text.secondary"
-                                      >
+                                      <Typography variant="caption" color="text.secondary">
                                         {notice.title}
                                       </Typography>
                                     )}
@@ -1027,65 +938,51 @@ const ServiceNoticesPage: React.FC = () => {
                               </TableCell>
                             );
                           }
-                          if (column.id === "targetAudience") {
-                            const hasChannels =
-                              notice.channels && notice.channels.length > 0;
+                          if (column.id === 'targetAudience') {
+                            const hasChannels = notice.channels && notice.channels.length > 0;
                             const platformsText =
                               notice.platforms.length === 0
-                                ? t("common.all")
-                                : notice.platforms.join(", ");
-                            const channelsText = hasChannels
-                              ? notice.channels.join(", ")
-                              : null;
+                                ? t('common.all')
+                                : notice.platforms.join(', ');
+                            const channelsText = hasChannels ? notice.channels.join(', ') : null;
 
                             return (
                               <TableCell key={column.id}>
                                 <Box
                                   sx={{
-                                    display: "flex",
-                                    alignItems: "center",
+                                    display: 'flex',
+                                    alignItems: 'center',
                                     gap: 1,
                                   }}
                                 >
                                   <Box sx={{ flex: 1 }}>
-                                    <Typography
-                                      variant="body2"
-                                      sx={{ fontWeight: 500 }}
-                                    >
+                                    <Typography variant="body2" sx={{ fontWeight: 500 }}>
                                       {platformsText}
                                     </Typography>
                                     {channelsText && (
                                       <Typography
                                         variant="caption"
                                         color="text.secondary"
-                                        sx={{ display: "block", mt: 0.5 }}
+                                        sx={{ display: 'block', mt: 0.5 }}
                                       >
                                         {channelsText}
                                       </Typography>
                                     )}
                                   </Box>
-                                  {(hasChannels ||
-                                    notice.platforms.length > 2) && (
+                                  {(hasChannels || notice.platforms.length > 2) && (
                                     <Tooltip
                                       title={
                                         <Box>
                                           <Typography
                                             variant="caption"
-                                            sx={{ display: "block", mb: 0.5 }}
+                                            sx={{ display: 'block', mb: 0.5 }}
                                           >
-                                            <strong>
-                                              {t("serviceNotices.platforms")}:
-                                            </strong>{" "}
+                                            <strong>{t('serviceNotices.platforms')}:</strong>{' '}
                                             {platformsText}
                                           </Typography>
                                           {channelsText && (
-                                            <Typography
-                                              variant="caption"
-                                              sx={{ display: "block" }}
-                                            >
-                                              <strong>
-                                                {t("serviceNotices.channels")}:
-                                              </strong>{" "}
+                                            <Typography variant="caption" sx={{ display: 'block' }}>
+                                              <strong>{t('serviceNotices.channels')}:</strong>{' '}
                                               {channelsText}
                                             </Typography>
                                           )}
@@ -1094,9 +991,9 @@ const ServiceNoticesPage: React.FC = () => {
                                     >
                                       <InfoIcon
                                         sx={{
-                                          fontSize: "1rem",
-                                          cursor: "pointer",
-                                          color: "action.active",
+                                          fontSize: '1rem',
+                                          cursor: 'pointer',
+                                          color: 'action.active',
                                         }}
                                       />
                                     </Tooltip>
@@ -1105,31 +1002,27 @@ const ServiceNoticesPage: React.FC = () => {
                               </TableCell>
                             );
                           }
-                          if (column.id === "period") {
+                          if (column.id === 'period') {
                             return (
                               <TableCell key={column.id}>
                                 <Tooltip
                                   title={
                                     notice.startDate
                                       ? formatDateTimeDetailed(notice.startDate)
-                                      : t("serviceNotices.startImmediately")
+                                      : t('serviceNotices.startImmediately')
                                   }
                                 >
                                   <Typography variant="caption" display="block">
                                     {notice.startDate
-                                      ? formatRelativeTime(
-                                          notice.startDate,
-                                          undefined,
-                                          language,
-                                        )
-                                      : t("serviceNotices.startImmediately")}
+                                      ? formatRelativeTime(notice.startDate, undefined, language)
+                                      : t('serviceNotices.startImmediately')}
                                   </Typography>
                                 </Tooltip>
                                 <Tooltip
                                   title={
                                     notice.endDate
                                       ? formatDateTimeDetailed(notice.endDate)
-                                      : t("serviceNotices.permanent")
+                                      : t('serviceNotices.permanent')
                                   }
                                 >
                                   <Typography
@@ -1137,52 +1030,32 @@ const ServiceNoticesPage: React.FC = () => {
                                     display="block"
                                     color="text.secondary"
                                   >
-                                    ~{" "}
+                                    ~{' '}
                                     {notice.endDate
-                                      ? formatRelativeTime(
-                                          notice.endDate,
-                                          undefined,
-                                          language,
-                                        )
-                                      : t("serviceNotices.permanent")}
+                                      ? formatRelativeTime(notice.endDate, undefined, language)
+                                      : t('serviceNotices.permanent')}
                                   </Typography>
                                 </Tooltip>
                               </TableCell>
                             );
                           }
-                          if (column.id === "createdAt") {
+                          if (column.id === 'createdAt') {
                             return (
                               <TableCell key={column.id}>
-                                <Tooltip
-                                  title={formatDateTimeDetailed(
-                                    notice.createdAt,
-                                  )}
-                                >
+                                <Tooltip title={formatDateTimeDetailed(notice.createdAt)}>
                                   <Typography variant="caption">
-                                    {formatRelativeTime(
-                                      notice.createdAt,
-                                      undefined,
-                                      language,
-                                    )}
+                                    {formatRelativeTime(notice.createdAt, undefined, language)}
                                   </Typography>
                                 </Tooltip>
                               </TableCell>
                             );
                           }
-                          if (column.id === "updatedAt") {
+                          if (column.id === 'updatedAt') {
                             return (
                               <TableCell key={column.id}>
-                                <Tooltip
-                                  title={formatDateTimeDetailed(
-                                    notice.updatedAt,
-                                  )}
-                                >
+                                <Tooltip title={formatDateTimeDetailed(notice.updatedAt)}>
                                   <Typography variant="caption">
-                                    {formatRelativeTime(
-                                      notice.updatedAt,
-                                      undefined,
-                                      language,
-                                    )}
+                                    {formatRelativeTime(notice.updatedAt, undefined, language)}
                                   </Typography>
                                 </Tooltip>
                               </TableCell>
@@ -1194,12 +1067,12 @@ const ServiceNoticesPage: React.FC = () => {
                           <TableCell align="center">
                             <Box
                               sx={{
-                                display: "flex",
+                                display: 'flex',
                                 gap: 0.5,
-                                justifyContent: "center",
+                                justifyContent: 'center',
                               }}
                             >
-                              <Tooltip title={t("common.edit")}>
+                              <Tooltip title={t('common.edit')}>
                                 <IconButton
                                   size="small"
                                   onClick={() => handleEdit(notice)}
@@ -1208,7 +1081,7 @@ const ServiceNoticesPage: React.FC = () => {
                                   <EditIcon fontSize="small" />
                                 </IconButton>
                               </Tooltip>
-                              <Tooltip title={t("common.delete")}>
+                              <Tooltip title={t('common.delete')}>
                                 <IconButton
                                   size="small"
                                   onClick={() => handleDelete(notice)}
@@ -1244,7 +1117,7 @@ const ServiceNoticesPage: React.FC = () => {
 
       {/* Form Drawer */}
       <ServiceNoticeFormDialog
-        key={editingNotice?.id ?? "new"}
+        key={editingNotice?.id ?? 'new'}
         open={formDrawerOpen}
         onClose={() => setFormDrawerOpen(false)}
         onSuccess={loadNotices}
@@ -1252,47 +1125,37 @@ const ServiceNoticesPage: React.FC = () => {
       />
 
       {/* Delete Dialog */}
-      <Dialog
-        open={deleteDialogOpen}
-        onClose={() => setDeleteDialogOpen(false)}
-      >
-        <DialogTitle>{t("common.confirmDelete")}</DialogTitle>
+      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
+        <DialogTitle>{t('common.confirmDelete')}</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            {t("serviceNotices.confirmDelete", {
+            {t('serviceNotices.confirmDelete', {
               title: deletingNotice?.title,
             })}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDeleteDialogOpen(false)}>
-            {t("common.cancel")}
-          </Button>
+          <Button onClick={() => setDeleteDialogOpen(false)}>{t('common.cancel')}</Button>
           <Button onClick={confirmDelete} color="error" variant="contained">
-            {t("common.delete")}
+            {t('common.delete')}
           </Button>
         </DialogActions>
       </Dialog>
 
       {/* Bulk Delete Dialog */}
-      <Dialog
-        open={bulkDeleteDialogOpen}
-        onClose={() => setBulkDeleteDialogOpen(false)}
-      >
-        <DialogTitle>{t("common.confirmDelete")}</DialogTitle>
+      <Dialog open={bulkDeleteDialogOpen} onClose={() => setBulkDeleteDialogOpen(false)}>
+        <DialogTitle>{t('common.confirmDelete')}</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            {t("serviceNotices.confirmBulkDelete", {
+            {t('serviceNotices.confirmBulkDelete', {
               count: selectedIds.length,
             })}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setBulkDeleteDialogOpen(false)}>
-            {t("common.cancel")}
-          </Button>
+          <Button onClick={() => setBulkDeleteDialogOpen(false)}>{t('common.cancel')}</Button>
           <Button onClick={confirmBulkDelete} color="error" variant="contained">
-            {t("common.delete")}
+            {t('common.delete')}
           </Button>
         </DialogActions>
       </Dialog>
@@ -1315,36 +1178,36 @@ const ServiceNoticesPage: React.FC = () => {
           sx: {
             width: 1536,
             height: 928,
-            maxWidth: "95vw",
-            maxHeight: "95vh",
+            maxWidth: '95vw',
+            maxHeight: '95vh',
           },
         }}
       >
         <DialogTitle
           sx={(theme) => ({
-            display: "flex",
-            flexDirection: "column",
+            display: 'flex',
+            flexDirection: 'column',
             pb: 1,
-            bgcolor: theme.palette.mode === "dark" ? "grey.800" : "grey.100",
+            bgcolor: theme.palette.mode === 'dark' ? 'grey.800' : 'grey.100',
             borderBottom: 1,
-            borderColor: "divider",
+            borderColor: 'divider',
           })}
         >
           <Box
             sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
               mb: 0.5,
             }}
           >
-            <Typography variant="h6">{t("serviceNotices.preview")}</Typography>
-            <Box sx={{ display: "flex", gap: 1 }}>
+            <Typography variant="h6">{t('serviceNotices.preview')}</Typography>
+            <Box sx={{ display: 'flex', gap: 1 }}>
               <IconButton
                 color="primary"
                 onClick={() => {
                   const iframe = document.querySelector(
-                    'iframe[src="/service-notices-preview"]',
+                    'iframe[src="/service-notices-preview"]'
                   ) as HTMLIFrameElement;
                   if (iframe) {
                     iframe.src = iframe.src;
@@ -1366,23 +1229,19 @@ const ServiceNoticesPage: React.FC = () => {
               </IconButton>
             </Box>
           </Box>
-          <Typography
-            variant="caption"
-            color="text.secondary"
-            sx={{ fontStyle: "italic" }}
-          >
-            {t("serviceNotices.previewPage.subtitle")}
+          <Typography variant="caption" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+            {t('serviceNotices.previewPage.subtitle')}
           </Typography>
         </DialogTitle>
-        <DialogContent sx={{ p: 0, overflow: "hidden", display: "flex" }}>
+        <DialogContent sx={{ p: 0, overflow: 'hidden', display: 'flex' }}>
           <Box
             component="iframe"
             src="/service-notices-preview"
             sx={{
-              width: "100%",
-              height: "100%",
-              border: "none",
-              display: "block",
+              width: '100%',
+              height: '100%',
+              border: 'none',
+              display: 'block',
             }}
           />
         </DialogContent>
@@ -1394,25 +1253,25 @@ const ServiceNoticesPage: React.FC = () => {
         open={Boolean(webviewMenuAnchorEl)}
         onClose={handleWebviewMenuClose}
         anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "right",
+          vertical: 'bottom',
+          horizontal: 'right',
         }}
         transformOrigin={{
-          vertical: "top",
-          horizontal: "right",
+          vertical: 'top',
+          horizontal: 'right',
         }}
       >
         <MenuItem onClick={handleOpenWebviewPreview}>
           <ListItemIcon>
             <VisibilityIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText>{t("serviceNotices.webviewPreview")}</ListItemText>
+          <ListItemText>{t('serviceNotices.webviewPreview')}</ListItemText>
         </MenuItem>
         <MenuItem onClick={handleCopyNoticeUrl}>
           <ListItemIcon>
             <ContentCopyIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText>{t("serviceNotices.copyWebviewUrl")}</ListItemText>
+          <ListItemText>{t('serviceNotices.copyWebviewUrl')}</ListItemText>
         </MenuItem>
       </Menu>
     </Box>

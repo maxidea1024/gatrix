@@ -1,9 +1,6 @@
-import api from "./api";
-import { Tag } from "./tagService";
-import {
-  MutationResult,
-  parseChangeRequestResponse,
-} from "./changeRequestUtils";
+import api from './api';
+import { Tag } from './tagService';
+import { MutationResult, parseChangeRequestResponse } from './changeRequestUtils';
 
 export interface StoreProduct {
   id: string;
@@ -83,7 +80,7 @@ export interface GetStoreProductsParams {
   limit?: number;
   search?: string;
   sortBy?: string;
-  sortOrder?: "asc" | "desc";
+  sortOrder?: 'asc' | 'desc';
   store?: string;
   isActive?: boolean;
 }
@@ -125,10 +122,8 @@ class StoreProductService {
    * Get all store products with pagination
    * api.get() returns { success, data, message } - already unwrapped from axios response
    */
-  async getStoreProducts(
-    params?: GetStoreProductsParams,
-  ): Promise<GetStoreProductsResponse> {
-    const response = await api.get("/admin/store-products", { params });
+  async getStoreProducts(params?: GetStoreProductsParams): Promise<GetStoreProductsResponse> {
+    const response = await api.get('/admin/store-products', { params });
     // response = { success, data: { products, total, page, limit }, message }
     return response.data;
   }
@@ -137,7 +132,7 @@ class StoreProductService {
    * Get store product statistics
    */
   async getStats(): Promise<StoreProductStats> {
-    const response = await api.get("/admin/store-products/stats");
+    const response = await api.get('/admin/store-products/stats');
     return response.data;
   }
 
@@ -152,14 +147,9 @@ class StoreProductService {
   /**
    * Create a new store product
    */
-  async createStoreProduct(
-    input: CreateStoreProductInput,
-  ): Promise<MutationResult<StoreProduct>> {
-    const response = await api.post("/admin/store-products", input);
-    return parseChangeRequestResponse<StoreProduct>(
-      response,
-      (r) => r?.product,
-    );
+  async createStoreProduct(input: CreateStoreProductInput): Promise<MutationResult<StoreProduct>> {
+    const response = await api.post('/admin/store-products', input);
+    return parseChangeRequestResponse<StoreProduct>(response, (r) => r?.product);
   }
 
   /**
@@ -167,13 +157,10 @@ class StoreProductService {
    */
   async updateStoreProduct(
     id: string,
-    input: UpdateStoreProductInput,
+    input: UpdateStoreProductInput
   ): Promise<MutationResult<StoreProduct>> {
     const response = await api.put(`/admin/store-products/${id}`, input);
-    return parseChangeRequestResponse<StoreProduct>(
-      response,
-      (r) => r?.product,
-    );
+    return parseChangeRequestResponse<StoreProduct>(response, (r) => r?.product);
   }
 
   /**
@@ -188,7 +175,7 @@ class StoreProductService {
    * Delete multiple store products
    */
   async deleteStoreProducts(ids: string[]): Promise<number> {
-    const response = await api.delete("/admin/store-products", {
+    const response = await api.delete('/admin/store-products', {
       data: { ids },
     });
     return response.data.deletedCount;
@@ -197,35 +184,20 @@ class StoreProductService {
   /**
    * Toggle store product active status
    */
-  async toggleActive(
-    id: string,
-    isActive: boolean,
-  ): Promise<MutationResult<StoreProduct>> {
-    const response = await api.patch(
-      `/admin/store-products/${id}/toggle-active`,
-      { isActive },
-    );
-    return parseChangeRequestResponse<StoreProduct>(
-      response,
-      (r) => r?.product,
-    );
+  async toggleActive(id: string, isActive: boolean): Promise<MutationResult<StoreProduct>> {
+    const response = await api.patch(`/admin/store-products/${id}/toggle-active`, { isActive });
+    return parseChangeRequestResponse<StoreProduct>(response, (r) => r?.product);
   }
 
   /**
    * Bulk update active status for multiple products
    */
-  async bulkUpdateActiveStatus(
-    ids: string[],
-    isActive: boolean,
-  ): Promise<MutationResult<number>> {
-    const response = await api.patch("/admin/store-products/bulk-active", {
+  async bulkUpdateActiveStatus(ids: string[], isActive: boolean): Promise<MutationResult<number>> {
+    const response = await api.patch('/admin/store-products/bulk-active', {
       ids,
       isActive,
     });
-    return parseChangeRequestResponse<number>(
-      response,
-      (r) => r?.affectedCount,
-    );
+    return parseChangeRequestResponse<number>(response, (r) => r?.affectedCount);
   }
 
   /**
@@ -236,21 +208,15 @@ class StoreProductService {
     currentIsActive?: boolean;
     targetIsActive: boolean;
   }): Promise<{ affectedCount: number; affectedIds: string[] }> {
-    const response = await api.patch(
-      "/admin/store-products/bulk-active-by-filter",
-      params,
-    );
+    const response = await api.patch('/admin/store-products/bulk-active-by-filter', params);
     return response.data;
   }
 
   /**
    * Get count of products matching filter criteria (for batch processing preview)
    */
-  async getCountByFilter(params: {
-    search?: string;
-    isActive?: boolean;
-  }): Promise<number> {
-    const response = await api.get("/admin/store-products/count-by-filter", {
+  async getCountByFilter(params: { search?: string; isActive?: boolean }): Promise<number> {
+    const response = await api.get('/admin/store-products/count-by-filter', {
       params,
     });
     return response.data.count;
@@ -261,7 +227,7 @@ class StoreProductService {
    * Returns only valid products (with chinaPrice and productCodeSdo)
    */
   async getCmsCashShopProducts(): Promise<GetCmsCashShopResponse> {
-    const response = await api.get("/admin/cms/cash-shop");
+    const response = await api.get('/admin/cms/cash-shop');
     return response.data;
   }
 
@@ -269,7 +235,7 @@ class StoreProductService {
    * Refresh CMS CashShop cache and get products
    */
   async refreshCmsCashShopProducts(): Promise<GetCmsCashShopResponse> {
-    const response = await api.post("/admin/cms/cash-shop/refresh");
+    const response = await api.post('/admin/cms/cash-shop/refresh');
     return response.data;
   }
 
@@ -277,7 +243,7 @@ class StoreProductService {
    * Preview sync with planning data
    */
   async previewSync(): Promise<SyncPreviewResult> {
-    const response = await api.get("/admin/store-products/sync/preview");
+    const response = await api.get('/admin/store-products/sync/preview');
     return response.data;
   }
 
@@ -285,10 +251,7 @@ class StoreProductService {
    * Apply sync with planning data (selective)
    */
   async applySync(selected?: SelectedSyncItems): Promise<SyncApplyResult> {
-    const response = await api.post(
-      "/admin/store-products/sync/apply",
-      selected,
-    );
+    const response = await api.post('/admin/store-products/sync/apply', selected);
     return response.data;
   }
 }

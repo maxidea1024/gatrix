@@ -3,7 +3,7 @@
  *
  * Handles soft-lock functionality for entity editing
  */
-import api from "./api";
+import api from './api';
 
 export interface LockInfo {
   userId: number;
@@ -37,10 +37,10 @@ class EntityLockService {
   async acquireLock(
     table: string,
     entityId: string | number,
-    environment: string,
+    environment: string
   ): Promise<AcquireLockResult> {
     try {
-      const response = await api.post("/entity-locks/acquire", {
+      const response = await api.post('/entity-locks/acquire', {
         table,
         entityId: String(entityId),
         environment,
@@ -52,14 +52,14 @@ class EntityLockService {
       // api.request throws error.response.data directly for HTTP errors
       // So error itself contains { success, message, lockedBy, status }
       if (error.status === 409) {
-        console.log("[EntityLock] Lock conflict, lockedBy:", error.lockedBy);
+        console.log('[EntityLock] Lock conflict, lockedBy:', error.lockedBy);
         return {
           success: false,
           message: error.message,
           lockedBy: error.lockedBy,
         };
       }
-      console.error("[EntityLock] Failed to acquire lock:", error);
+      console.error('[EntityLock] Failed to acquire lock:', error);
       return { success: true }; // Fail open
     }
   }
@@ -70,17 +70,17 @@ class EntityLockService {
   async forceAcquireLock(
     table: string,
     entityId: string | number,
-    environment: string,
+    environment: string
   ): Promise<boolean> {
     try {
-      const response = await api.post("/entity-locks/force-acquire", {
+      const response = await api.post('/entity-locks/force-acquire', {
         table,
         entityId: String(entityId),
         environment,
       });
       return (response as any).success;
     } catch (error) {
-      console.error("[EntityLock] Failed to force acquire lock:", error);
+      console.error('[EntityLock] Failed to force acquire lock:', error);
       return false;
     }
   }
@@ -91,17 +91,17 @@ class EntityLockService {
   async releaseLock(
     table: string,
     entityId: string | number,
-    environment: string,
+    environment: string
   ): Promise<boolean> {
     try {
-      const response = await api.post("/entity-locks/release", {
+      const response = await api.post('/entity-locks/release', {
         table,
         entityId: String(entityId),
         environment,
       });
       return (response as any).success;
     } catch (error) {
-      console.error("[EntityLock] Failed to release lock:", error);
+      console.error('[EntityLock] Failed to release lock:', error);
       return false;
     }
   }
@@ -112,17 +112,17 @@ class EntityLockService {
   async extendLock(
     table: string,
     entityId: string | number,
-    environment: string,
+    environment: string
   ): Promise<boolean> {
     try {
-      const response = await api.post("/entity-locks/extend", {
+      const response = await api.post('/entity-locks/extend', {
         table,
         entityId: String(entityId),
         environment,
       });
       return (response as any).success;
     } catch (error) {
-      console.error("[EntityLock] Failed to extend lock:", error);
+      console.error('[EntityLock] Failed to extend lock:', error);
       return false;
     }
   }
@@ -133,10 +133,10 @@ class EntityLockService {
   async checkLock(
     table: string,
     entityId: string | number,
-    environment: string,
+    environment: string
   ): Promise<LockCheckResult> {
     try {
-      const response = await api.get("/entity-locks/check", {
+      const response = await api.get('/entity-locks/check', {
         params: {
           table,
           entityId: String(entityId),
@@ -145,7 +145,7 @@ class EntityLockService {
       });
       return response as any as LockCheckResult;
     } catch (error) {
-      console.error("[EntityLock] Failed to check lock:", error);
+      console.error('[EntityLock] Failed to check lock:', error);
       return { locked: false, lockInfo: null, pendingCR: null };
     }
   }

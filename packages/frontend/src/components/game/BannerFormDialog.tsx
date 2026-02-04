@@ -1,10 +1,4 @@
-import React, {
-  useState,
-  useEffect,
-  useCallback,
-  useRef,
-  useMemo,
-} from "react";
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import {
   Button,
   TextField,
@@ -27,7 +21,7 @@ import {
   MenuItem,
   Alert,
   AlertTitle,
-} from "@mui/material";
+} from '@mui/material';
 import {
   Add as AddIcon,
   ExpandMore as ExpandMoreIcon,
@@ -36,24 +30,20 @@ import {
   ViewList as ViewListIcon,
   Undo as UndoIcon,
   Redo as RedoIcon,
-} from "@mui/icons-material";
-import ResizableDrawer from "../common/ResizableDrawer";
-import { useTranslation } from "react-i18next";
-import { useSnackbar } from "notistack";
-import { useNavigate } from "react-router-dom";
-import { showChangeRequestCreatedToast } from "../../utils/changeRequestToast";
-import { getActionLabel } from "../../utils/changeRequestToast";
-import { useEnvironment } from "../../contexts/EnvironmentContext";
-import { parseApiErrorMessage } from "../../utils/errorUtils";
-import bannerService, {
-  Banner,
-  Sequence,
-  LoopModeType,
-} from "../../services/bannerService";
-import { generateULID } from "../../utils/ulid";
-import SequenceEditor from "./SequenceEditor";
-import BannerPreview from "./BannerPreview";
-import { useEntityLock } from "../../hooks/useEntityLock";
+} from '@mui/icons-material';
+import ResizableDrawer from '../common/ResizableDrawer';
+import { useTranslation } from 'react-i18next';
+import { useSnackbar } from 'notistack';
+import { useNavigate } from 'react-router-dom';
+import { showChangeRequestCreatedToast } from '../../utils/changeRequestToast';
+import { getActionLabel } from '../../utils/changeRequestToast';
+import { useEnvironment } from '../../contexts/EnvironmentContext';
+import { parseApiErrorMessage } from '../../utils/errorUtils';
+import bannerService, { Banner, Sequence, LoopModeType } from '../../services/bannerService';
+import { generateULID } from '../../utils/ulid';
+import SequenceEditor from './SequenceEditor';
+import BannerPreview from './BannerPreview';
+import { useEntityLock } from '../../hooks/useEntityLock';
 
 interface BannerFormDialogProps {
   open: boolean;
@@ -64,28 +54,23 @@ interface BannerFormDialogProps {
 
 // Predefined banner sizes
 const BANNER_SIZE_PRESETS = [
-  { label: "1024 × 512 (2:1)", width: 1024, height: 512 },
-  { label: "728 × 90 (Leaderboard)", width: 728, height: 90 },
-  { label: "300 × 250 (Medium Rectangle)", width: 300, height: 250 },
-  { label: "320 × 100 (Large Mobile)", width: 320, height: 100 },
-  { label: "468 × 60 (Banner)", width: 468, height: 60 },
-  { label: "320 × 50 (Mobile)", width: 320, height: 50 },
-  { label: "970 × 250 (Billboard)", width: 970, height: 250 },
-  { label: "300 × 600 (Half Page)", width: 300, height: 600 },
-  { label: "160 × 600 (Wide Skyscraper)", width: 160, height: 600 },
-  { label: "1200 × 628 (Social)", width: 1200, height: 628 },
-  { value: "custom", label: "" }, // Custom will be set with translation
+  { label: '1024 × 512 (2:1)', width: 1024, height: 512 },
+  { label: '728 × 90 (Leaderboard)', width: 728, height: 90 },
+  { label: '300 × 250 (Medium Rectangle)', width: 300, height: 250 },
+  { label: '320 × 100 (Large Mobile)', width: 320, height: 100 },
+  { label: '468 × 60 (Banner)', width: 468, height: 60 },
+  { label: '320 × 50 (Mobile)', width: 320, height: 50 },
+  { label: '970 × 250 (Billboard)', width: 970, height: 250 },
+  { label: '300 × 600 (Half Page)', width: 300, height: 600 },
+  { label: '160 × 600 (Wide Skyscraper)', width: 160, height: 600 },
+  { label: '1200 × 628 (Social)', width: 1200, height: 628 },
+  { value: 'custom', label: '' }, // Custom will be set with translation
 ];
 
 // Max undo/redo history size
 const MAX_HISTORY_SIZE = 50;
 
-const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
-  open,
-  onClose,
-  onSave,
-  banner,
-}) => {
+const BannerFormDialog: React.FC<BannerFormDialogProps> = ({ open, onClose, onSave, banner }) => {
   const { t } = useTranslation();
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const navigate = useNavigate();
@@ -93,11 +78,11 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
   const requiresApproval = currentEnvironment?.requiresApproval ?? false;
 
   // Form state
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
+  const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
   const [width, setWidth] = useState(1024);
   const [height, setHeight] = useState(512);
-  const [sizePreset, setSizePreset] = useState("1024x512");
+  const [sizePreset, setSizePreset] = useState('1024x512');
   const [playbackSpeed, setPlaybackSpeed] = useState(1.0);
   const [shuffle, setShuffle] = useState(false);
   const [sequences, setSequences] = useState<Sequence[]>([]);
@@ -105,7 +90,7 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
 
   // Entity Lock for edit mode
   const { hasLock, lockedBy, pendingCR, forceTakeover } = useEntityLock({
-    table: "g_banners",
+    table: 'g_banners',
     entityId: banner?.bannerId || null,
     isEditing: open && !!banner,
     // onLockLost is called when lock is taken - toast is now handled by useEntityLock via SSE
@@ -124,17 +109,15 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
 
   // Get size preset value from width/height
   const getSizePresetValue = useCallback((w: number, h: number) => {
-    const match = BANNER_SIZE_PRESETS.find(
-      (p) => p.width === w && p.height === h,
-    );
-    return match ? `${w}x${h}` : "custom";
+    const match = BANNER_SIZE_PRESETS.find((p) => p.width === w && p.height === h);
+    return match ? `${w}x${h}` : 'custom';
   }, []);
 
   // Handle size preset change
   const handleSizePresetChange = useCallback((value: string) => {
     setSizePreset(value);
-    if (value !== "custom") {
-      const [w, h] = value.split("x").map(Number);
+    if (value !== 'custom') {
+      const [w, h] = value.split('x').map(Number);
       setWidth(w);
       setHeight(h);
     }
@@ -152,25 +135,23 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
   useEffect(() => {
     if (banner) {
       setName(banner.name);
-      setDescription(banner.description || "");
+      setDescription(banner.description || '');
       setWidth(banner.width);
       setHeight(banner.height);
       setSizePreset(getSizePresetValue(banner.width, banner.height));
       setPlaybackSpeed(banner.playbackSpeed);
       setShuffle(banner.shuffle ?? false);
-      const initialSequences = banner.sequences
-        ? JSON.parse(JSON.stringify(banner.sequences))
-        : [];
+      const initialSequences = banner.sequences ? JSON.parse(JSON.stringify(banner.sequences)) : [];
       setSequences(initialSequences);
       setSequenceHistory([initialSequences]);
       setHistoryIndex(0);
     } else {
       // Reset form for new banner
-      setName("");
-      setDescription("");
+      setName('');
+      setDescription('');
       setWidth(1024);
       setHeight(512);
-      setSizePreset("1024x512");
+      setSizePreset('1024x512');
       setPlaybackSpeed(1.0);
       setShuffle(false);
       setSequences([]);
@@ -185,7 +166,7 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
 
     const currentData = {
       name: name.trim(),
-      description: description.trim() || "",
+      description: description.trim() || '',
       width,
       height,
       playbackSpeed,
@@ -197,14 +178,14 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
         frames: (s.frames || []).map((f) => ({
           imageUrl: f.imageUrl,
           delay: f.delay,
-          link: f.link || "",
+          link: f.link || '',
         })),
       })),
     };
 
     const originalData = {
       name: banner.name.trim(),
-      description: banner.description?.trim() || "",
+      description: banner.description?.trim() || '',
       width: banner.width,
       height: banner.height,
       playbackSpeed: banner.playbackSpeed,
@@ -216,22 +197,13 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
         frames: (s.frames || []).map((f) => ({
           imageUrl: f.imageUrl,
           delay: f.delay,
-          link: f.link || "",
+          link: f.link || '',
         })),
       })),
     };
 
     return JSON.stringify(currentData) !== JSON.stringify(originalData);
-  }, [
-    banner,
-    name,
-    description,
-    width,
-    height,
-    playbackSpeed,
-    shuffle,
-    sequences,
-  ]);
+  }, [banner, name, description, width, height, playbackSpeed, shuffle, sequences]);
 
   // Focus name input when dialog opens
   useEffect(() => {
@@ -254,8 +226,7 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
 
     // Don't add to history if the sequences are the same as current history
     const currentHistoryState = sequenceHistory[historyIndex];
-    if (JSON.stringify(currentHistoryState) === JSON.stringify(sequences))
-      return;
+    if (JSON.stringify(currentHistoryState) === JSON.stringify(sequences)) return;
 
     // Remove future history and add new state
     const newHistory = sequenceHistory.slice(0, historyIndex + 1);
@@ -292,22 +263,22 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
   // Keyboard shortcuts for undo/redo
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === "z") {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
         if (e.shiftKey) {
           handleRedo();
         } else {
           handleUndo();
         }
         e.preventDefault();
-      } else if ((e.ctrlKey || e.metaKey) && e.key === "y") {
+      } else if ((e.ctrlKey || e.metaKey) && e.key === 'y') {
         handleRedo();
         e.preventDefault();
       }
     };
 
     if (open) {
-      window.addEventListener("keydown", handleKeyDown);
-      return () => window.removeEventListener("keydown", handleKeyDown);
+      window.addEventListener('keydown', handleKeyDown);
+      return () => window.removeEventListener('keydown', handleKeyDown);
     }
   }, [open, handleUndo, handleRedo]);
 
@@ -328,7 +299,7 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
       return null; // Don't show error for empty field until save
     }
     if (!isValidBannerName(name)) {
-      return t("banners.nameInvalidFormat");
+      return t('banners.nameInvalidFormat');
     }
     return null;
   };
@@ -337,13 +308,13 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
 
   const handleSave = async () => {
     if (!name.trim()) {
-      enqueueSnackbar(t("banners.nameRequired"), { variant: "error" });
+      enqueueSnackbar(t('banners.nameRequired'), { variant: 'error' });
       return;
     }
 
     // Validate name format
     if (!isValidBannerName(name)) {
-      enqueueSnackbar(t("banners.nameInvalidFormat"), { variant: "error" });
+      enqueueSnackbar(t('banners.nameInvalidFormat'), { variant: 'error' });
       return;
     }
 
@@ -360,13 +331,9 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
           sequences,
         });
         if (result.isChangeRequest) {
-          showChangeRequestCreatedToast(
-            enqueueSnackbar,
-            closeSnackbar,
-            navigate,
-          );
+          showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
         } else {
-          enqueueSnackbar(t("banners.updateSuccess"), { variant: "success" });
+          enqueueSnackbar(t('banners.updateSuccess'), { variant: 'success' });
         }
       } else {
         const result = await bannerService.createBanner({
@@ -379,29 +346,25 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
           sequences,
         });
         if (result.isChangeRequest) {
-          showChangeRequestCreatedToast(
-            enqueueSnackbar,
-            closeSnackbar,
-            navigate,
-          );
+          showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
         } else {
-          enqueueSnackbar(t("banners.createSuccess"), { variant: "success" });
+          enqueueSnackbar(t('banners.createSuccess'), { variant: 'success' });
         }
       }
       onSave();
     } catch (error: any) {
       // Handle specific error codes from backend
       const errorCode = error.response?.data?.error?.code || error.code;
-      if (errorCode === "DUPLICATE_NAME") {
-        enqueueSnackbar(t("banners.nameDuplicate"), { variant: "error" });
-      } else if (errorCode === "INVALID_NAME_FORMAT") {
-        enqueueSnackbar(t("banners.nameInvalidFormat"), { variant: "error" });
+      if (errorCode === 'DUPLICATE_NAME') {
+        enqueueSnackbar(t('banners.nameDuplicate'), { variant: 'error' });
+      } else if (errorCode === 'INVALID_NAME_FORMAT') {
+        enqueueSnackbar(t('banners.nameInvalidFormat'), { variant: 'error' });
       } else {
         const fallbackKey = currentEnvironment?.requiresApproval
-          ? "banners.requestSaveFailed"
-          : "banners.saveFailed";
+          ? 'banners.requestSaveFailed'
+          : 'banners.saveFailed';
         enqueueSnackbar(parseApiErrorMessage(error, fallbackKey), {
-          variant: "error",
+          variant: 'error',
         });
       }
     } finally {
@@ -412,9 +375,9 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
   const handleAddSequence = () => {
     const newSequence: Sequence = {
       sequenceId: generateULID(),
-      name: `${t("banners.sequence")} ${sequences.length + 1}`,
+      name: `${t('banners.sequence')} ${sequences.length + 1}`,
       speedMultiplier: 1.0,
-      loopMode: "loop" as LoopModeType,
+      loopMode: 'loop' as LoopModeType,
       frames: [],
     };
     setSequences([...sequences, newSequence]);
@@ -443,7 +406,7 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
     <ResizableDrawer
       open={open}
       onClose={onClose}
-      title={isEditing ? t("banners.editBanner") : t("banners.createBanner")}
+      title={isEditing ? t('banners.editBanner') : t('banners.createBanner')}
       storageKey="bannerFormDrawerWidth"
       defaultWidth={900}
       minWidth={700}
@@ -451,7 +414,7 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
       <Box
         sx={{
           p: 3,
-          overflow: "auto",
+          overflow: 'auto',
           flex: 1,
         }}
       >
@@ -462,12 +425,12 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
             sx={{ mb: 2 }}
             action={
               <Button color="inherit" size="small" onClick={forceTakeover}>
-                {t("entityLock.takeOver")}
+                {t('entityLock.takeOver')}
               </Button>
             }
           >
             <AlertTitle>
-              {t("entityLock.warning", {
+              {t('entityLock.warning', {
                 userName: lockedBy.userName,
                 userEmail: lockedBy.userEmail,
               })}
@@ -477,8 +440,8 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
 
         {banner && pendingCR && (
           <Alert severity="info" sx={{ mb: 2 }}>
-            <AlertTitle>{t("entityLock.pendingCR")}</AlertTitle>
-            {t("entityLock.pendingCRDetail", {
+            <AlertTitle>{t('entityLock.pendingCR')}</AlertTitle>
+            {t('entityLock.pendingCRDetail', {
               crTitle: pendingCR.crTitle,
               crId: pendingCR.crId,
             })}
@@ -491,43 +454,38 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
           onChange={(_, expanded) => setBasicInfoExpanded(expanded)}
           sx={{
             mb: 1,
-            bgcolor: (theme) =>
-              theme.palette.mode === "dark" ? "grey.900" : "grey.50",
-            "&:before": { display: "none" },
+            bgcolor: (theme) => (theme.palette.mode === 'dark' ? 'grey.900' : 'grey.50'),
+            '&:before': { display: 'none' },
           }}
         >
           <AccordionSummary
             expandIcon={<ExpandMoreIcon />}
             sx={{
               minHeight: 48,
-              "& .MuiAccordionSummary-content": { my: 1 },
+              '& .MuiAccordionSummary-content': { my: 1 },
             }}
           >
-            <InfoIcon sx={{ mr: 1, color: "text.secondary" }} />
+            <InfoIcon sx={{ mr: 1, color: 'text.secondary' }} />
             <Typography variant="subtitle2" fontWeight={600}>
-              {t("banners.basicInfo")}
+              {t('banners.basicInfo')}
             </Typography>
           </AccordionSummary>
           <AccordionDetails sx={{ p: 2 }}>
             <Stack spacing={2}>
               <TextField
                 inputRef={nameInputRef}
-                label={t("banners.name")}
+                label={t('banners.name')}
                 value={name}
-                onChange={(e) =>
-                  setName(
-                    e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ""),
-                  )
-                }
+                onChange={(e) => setName(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ''))}
                 fullWidth
                 required
                 size="small"
                 error={!!nameError}
-                helperText={nameError || t("banners.nameHelperText")}
+                helperText={nameError || t('banners.nameHelperText')}
                 placeholder="main_banner"
               />
               <TextField
-                label={t("banners.description")}
+                label={t('banners.description')}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 fullWidth
@@ -538,51 +496,45 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
               <Divider />
               {/* Size row: Preset + (Custom fields if selected) */}
               <Stack direction="row" spacing={2}>
-                <Box sx={{ flex: sizePreset === "custom" ? 4 : 6 }}>
+                <Box sx={{ flex: sizePreset === 'custom' ? 4 : 6 }}>
                   <FormControl fullWidth size="small">
-                    <InputLabel>{t("banners.sizePreset")}</InputLabel>
+                    <InputLabel>{t('banners.sizePreset')}</InputLabel>
                     <Select
                       value={sizePreset}
-                      label={t("banners.sizePreset")}
+                      label={t('banners.sizePreset')}
                       onChange={(e) => handleSizePresetChange(e.target.value)}
                     >
                       {BANNER_SIZE_PRESETS.map((preset) => (
                         <MenuItem
-                          key={
-                            preset.value || `${preset.width}x${preset.height}`
-                          }
-                          value={
-                            preset.value || `${preset.width}x${preset.height}`
-                          }
+                          key={preset.value || `${preset.width}x${preset.height}`}
+                          value={preset.value || `${preset.width}x${preset.height}`}
                         >
-                          {preset.value === "custom"
-                            ? t("banners.customSize")
-                            : preset.label}
+                          {preset.value === 'custom' ? t('banners.customSize') : preset.label}
                         </MenuItem>
                       ))}
                     </Select>
                   </FormControl>
                 </Box>
-                {sizePreset === "custom" && (
+                {sizePreset === 'custom' && (
                   <>
                     <Box sx={{ flex: 4 }}>
                       <TextField
-                        label={t("banners.width")}
+                        label={t('banners.width')}
                         value={width}
                         onChange={(e) => setWidth(Number(e.target.value) || 0)}
                         fullWidth
                         size="small"
-                        inputProps={{ style: { MozAppearance: "textfield" } }}
+                        inputProps={{ style: { MozAppearance: 'textfield' } }}
                         sx={{
-                          "& input[type=number]": {
-                            MozAppearance: "textfield",
+                          '& input[type=number]': {
+                            MozAppearance: 'textfield',
                           },
-                          "& input[type=number]::-webkit-outer-spin-button": {
-                            WebkitAppearance: "none",
+                          '& input[type=number]::-webkit-outer-spin-button': {
+                            WebkitAppearance: 'none',
                             margin: 0,
                           },
-                          "& input[type=number]::-webkit-inner-spin-button": {
-                            WebkitAppearance: "none",
+                          '& input[type=number]::-webkit-inner-spin-button': {
+                            WebkitAppearance: 'none',
                             margin: 0,
                           },
                         }}
@@ -590,22 +542,22 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
                     </Box>
                     <Box sx={{ flex: 4 }}>
                       <TextField
-                        label={t("banners.height")}
+                        label={t('banners.height')}
                         value={height}
                         onChange={(e) => setHeight(Number(e.target.value) || 0)}
                         fullWidth
                         size="small"
-                        inputProps={{ style: { MozAppearance: "textfield" } }}
+                        inputProps={{ style: { MozAppearance: 'textfield' } }}
                         sx={{
-                          "& input[type=number]": {
-                            MozAppearance: "textfield",
+                          '& input[type=number]': {
+                            MozAppearance: 'textfield',
                           },
-                          "& input[type=number]::-webkit-outer-spin-button": {
-                            WebkitAppearance: "none",
+                          '& input[type=number]::-webkit-outer-spin-button': {
+                            WebkitAppearance: 'none',
                             margin: 0,
                           },
-                          "& input[type=number]::-webkit-inner-spin-button": {
-                            WebkitAppearance: "none",
+                          '& input[type=number]::-webkit-inner-spin-button': {
+                            WebkitAppearance: 'none',
                             margin: 0,
                           },
                         }}
@@ -613,36 +565,32 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
                     </Box>
                   </>
                 )}
-                {sizePreset !== "custom" && (
+                {sizePreset !== 'custom' && (
                   <>
                     <Box sx={{ flex: 4 }}>
                       <TextField
-                        label={t("banners.playbackSpeed")}
+                        label={t('banners.playbackSpeed')}
                         value={playbackSpeed}
-                        onChange={(e) =>
-                          setPlaybackSpeed(Number(e.target.value) || 1)
-                        }
+                        onChange={(e) => setPlaybackSpeed(Number(e.target.value) || 1)}
                         fullWidth
                         size="small"
-                        inputProps={{ style: { MozAppearance: "textfield" } }}
+                        inputProps={{ style: { MozAppearance: 'textfield' } }}
                         sx={{
-                          "& input[type=number]": {
-                            MozAppearance: "textfield",
+                          '& input[type=number]': {
+                            MozAppearance: 'textfield',
                           },
-                          "& input[type=number]::-webkit-outer-spin-button": {
-                            WebkitAppearance: "none",
+                          '& input[type=number]::-webkit-outer-spin-button': {
+                            WebkitAppearance: 'none',
                             margin: 0,
                           },
-                          "& input[type=number]::-webkit-inner-spin-button": {
-                            WebkitAppearance: "none",
+                          '& input[type=number]::-webkit-inner-spin-button': {
+                            WebkitAppearance: 'none',
                             margin: 0,
                           },
                         }}
                       />
                     </Box>
-                    <Box
-                      sx={{ flex: 2, display: "flex", alignItems: "center" }}
-                    >
+                    <Box sx={{ flex: 2, display: 'flex', alignItems: 'center' }}>
                       <FormControlLabel
                         control={
                           <Checkbox
@@ -651,35 +599,33 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
                             size="small"
                           />
                         }
-                        label={t("banners.shuffleMode")}
+                        label={t('banners.shuffleMode')}
                       />
                     </Box>
                   </>
                 )}
               </Stack>
               {/* Playback speed and shuffle on separate row when custom size */}
-              {sizePreset === "custom" && (
-                <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+              {sizePreset === 'custom' && (
+                <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
                   <TextField
-                    label={t("banners.playbackSpeed")}
+                    label={t('banners.playbackSpeed')}
                     value={playbackSpeed}
-                    onChange={(e) =>
-                      setPlaybackSpeed(Number(e.target.value) || 1)
-                    }
+                    onChange={(e) => setPlaybackSpeed(Number(e.target.value) || 1)}
                     size="small"
                     sx={{
                       flex: 1,
-                      "& input[type=number]": { MozAppearance: "textfield" },
-                      "& input[type=number]::-webkit-outer-spin-button": {
-                        WebkitAppearance: "none",
+                      '& input[type=number]': { MozAppearance: 'textfield' },
+                      '& input[type=number]::-webkit-outer-spin-button': {
+                        WebkitAppearance: 'none',
                         margin: 0,
                       },
-                      "& input[type=number]::-webkit-inner-spin-button": {
-                        WebkitAppearance: "none",
+                      '& input[type=number]::-webkit-inner-spin-button': {
+                        WebkitAppearance: 'none',
                         margin: 0,
                       },
                     }}
-                    inputProps={{ style: { MozAppearance: "textfield" } }}
+                    inputProps={{ style: { MozAppearance: 'textfield' } }}
                   />
                   <FormControlLabel
                     control={
@@ -689,7 +635,7 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
                         size="small"
                       />
                     }
-                    label={t("banners.shuffleMode")}
+                    label={t('banners.shuffleMode')}
                   />
                 </Box>
               )}
@@ -703,53 +649,42 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
           onChange={(_, expanded) => setSequenceExpanded(expanded)}
           sx={{
             mb: 1,
-            bgcolor: (theme) =>
-              theme.palette.mode === "dark" ? "grey.900" : "grey.50",
-            "&:before": { display: "none" },
+            bgcolor: (theme) => (theme.palette.mode === 'dark' ? 'grey.900' : 'grey.50'),
+            '&:before': { display: 'none' },
           }}
         >
           <AccordionSummary
             expandIcon={<ExpandMoreIcon />}
             sx={{
               minHeight: 48,
-              "& .MuiAccordionSummary-content": { my: 1 },
+              '& .MuiAccordionSummary-content': { my: 1 },
             }}
           >
-            <ViewListIcon sx={{ mr: 1, color: "text.secondary" }} />
+            <ViewListIcon sx={{ mr: 1, color: 'text.secondary' }} />
             <Typography variant="subtitle2" fontWeight={600}>
-              {t("banners.sequencesTab")}
+              {t('banners.sequencesTab')}
             </Typography>
           </AccordionSummary>
           <AccordionDetails sx={{ p: 2 }}>
             {/* Toolbar: Undo/Redo | Add Sequence */}
             <Box
               sx={{
-                display: "flex",
-                justifyContent: "flex-end",
-                alignItems: "center",
+                display: 'flex',
+                justifyContent: 'flex-end',
+                alignItems: 'center',
                 mb: 2,
               }}
             >
-              <Tooltip title={`${t("common.undo")} (Ctrl+Z)`}>
+              <Tooltip title={`${t('common.undo')} (Ctrl+Z)`}>
                 <span>
-                  <IconButton
-                    size="small"
-                    onClick={handleUndo}
-                    disabled={!canUndo}
-                    sx={{ p: 0.5 }}
-                  >
+                  <IconButton size="small" onClick={handleUndo} disabled={!canUndo} sx={{ p: 0.5 }}>
                     <UndoIcon fontSize="small" />
                   </IconButton>
                 </span>
               </Tooltip>
-              <Tooltip title={`${t("common.redo")} (Ctrl+Y)`}>
+              <Tooltip title={`${t('common.redo')} (Ctrl+Y)`}>
                 <span>
-                  <IconButton
-                    size="small"
-                    onClick={handleRedo}
-                    disabled={!canRedo}
-                    sx={{ p: 0.5 }}
-                  >
+                  <IconButton size="small" onClick={handleRedo} disabled={!canRedo} sx={{ p: 0.5 }}>
                     <RedoIcon fontSize="small" />
                   </IconButton>
                 </span>
@@ -757,7 +692,7 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
               <Divider
                 orientation="vertical"
                 flexItem
-                sx={{ mx: 1, height: 24, alignSelf: "center" }}
+                sx={{ mx: 1, height: 24, alignSelf: 'center' }}
               />
               <Button
                 variant="outlined"
@@ -765,23 +700,19 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
                 startIcon={<AddIcon />}
                 onClick={handleAddSequence}
               >
-                {t("banners.addSequence")}
+                {t('banners.addSequence')}
               </Button>
             </Box>
             {sequences.length === 0 ? (
-              <Paper
-                sx={{ p: 4, textAlign: "center", bgcolor: "action.hover" }}
-              >
-                <Typography color="text.secondary">
-                  {t("banners.noSequences")}
-                </Typography>
+              <Paper sx={{ p: 4, textAlign: 'center', bgcolor: 'action.hover' }}>
+                <Typography color="text.secondary">{t('banners.noSequences')}</Typography>
                 <Button
                   variant="contained"
                   startIcon={<AddIcon />}
                   onClick={handleAddSequence}
                   sx={{ mt: 2 }}
                 >
-                  {t("banners.addFirstSequence")}
+                  {t('banners.addFirstSequence')}
                 </Button>
               </Paper>
             ) : (
@@ -794,12 +725,9 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
                     totalCount={sequences.length}
                     onUpdate={(updated) => handleUpdateSequence(index, updated)}
                     onDelete={() => handleDeleteSequence(index)}
-                    onMoveUp={() =>
-                      index > 0 && handleMoveSequence(index, index - 1)
-                    }
+                    onMoveUp={() => index > 0 && handleMoveSequence(index, index - 1)}
                     onMoveDown={() =>
-                      index < sequences.length - 1 &&
-                      handleMoveSequence(index, index + 1)
+                      index < sequences.length - 1 && handleMoveSequence(index, index + 1)
                     }
                     onFrameSelect={(seqIdx, frameIdx) =>
                       setSelectedPreviewFrame({
@@ -820,21 +748,20 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
           onChange={(_, expanded) => setPreviewExpanded(expanded)}
           sx={{
             mb: 1,
-            bgcolor: (theme) =>
-              theme.palette.mode === "dark" ? "grey.900" : "grey.50",
-            "&:before": { display: "none" },
+            bgcolor: (theme) => (theme.palette.mode === 'dark' ? 'grey.900' : 'grey.50'),
+            '&:before': { display: 'none' },
           }}
         >
           <AccordionSummary
             expandIcon={<ExpandMoreIcon />}
             sx={{
               minHeight: 48,
-              "& .MuiAccordionSummary-content": { my: 1 },
+              '& .MuiAccordionSummary-content': { my: 1 },
             }}
           >
-            <VisibilityIcon sx={{ mr: 1, color: "text.secondary" }} />
+            <VisibilityIcon sx={{ mr: 1, color: 'text.secondary' }} />
             <Typography variant="subtitle2" fontWeight={600}>
-              {t("banners.previewTitle")}
+              {t('banners.previewTitle')}
             </Typography>
           </AccordionSummary>
           <AccordionDetails sx={{ p: 3 }}>
@@ -852,20 +779,16 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
 
       {/* Footer */}
       <Divider />
-      <Box sx={{ p: 2, display: "flex", justifyContent: "flex-end", gap: 1 }}>
-        <Button onClick={onClose}>{t("common.cancel")}</Button>
+      <Box sx={{ p: 2, display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+        <Button onClick={onClose}>{t('common.cancel')}</Button>
         <Button
           variant="contained"
           onClick={handleSave}
           disabled={saving || (!!banner && !isDirty)}
         >
           {saving
-            ? t("common.saving")
-            : getActionLabel(
-                isEditing ? "update" : "create",
-                requiresApproval,
-                t,
-              )}
+            ? t('common.saving')
+            : getActionLabel(isEditing ? 'update' : 'create', requiresApproval, t)}
         </Button>
       </Box>
     </ResizableDrawer>

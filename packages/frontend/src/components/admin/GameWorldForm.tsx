@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState } from 'react';
 import {
   Box,
   TextField,
@@ -14,26 +14,22 @@ import {
   Tab,
   Button,
   Stack,
-} from "@mui/material";
+} from '@mui/material';
 import {
   Download as DownloadIcon,
   Upload as UploadIcon,
   ContentCopy as CopyIcon,
-} from "@mui/icons-material";
-import { useTranslation } from "react-i18next";
-import { useSnackbar } from "notistack";
-import { Tag } from "@/services/tagService";
-import {
-  GameWorld,
-  GameWorldMaintenanceLocale,
-  CreateGameWorldData,
-} from "@/types/gameWorld";
-import MaintenanceSettingsInput from "@/components/common/MaintenanceSettingsInput";
-import JsonEditor, { parseJson5 } from "@/components/common/JsonEditor";
-import Json5Editor from "@/components/common/Json5Editor";
-import { MessageTemplate } from "@/services/messageTemplateService";
-import { copyToClipboardWithNotification } from "@/utils/clipboard";
-import { getContrastColor } from "@/utils/colorUtils";
+} from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
+import { useSnackbar } from 'notistack';
+import { Tag } from '@/services/tagService';
+import { GameWorld, GameWorldMaintenanceLocale, CreateGameWorldData } from '@/types/gameWorld';
+import MaintenanceSettingsInput from '@/components/common/MaintenanceSettingsInput';
+import JsonEditor, { parseJson5 } from '@/components/common/JsonEditor';
+import Json5Editor from '@/components/common/Json5Editor';
+import { MessageTemplate } from '@/services/messageTemplateService';
+import { copyToClipboardWithNotification } from '@/utils/clipboard';
+import { getContrastColor } from '@/utils/colorUtils';
 
 export interface GameWorldFormProps {
   editingWorld: GameWorld | null;
@@ -56,10 +52,10 @@ export interface GameWorldFormProps {
   infraSettingsError: string;
   onInfraSettingsErrorChange: (error: string) => void;
   messageTemplates: MessageTemplate[];
-  inputMode: "direct" | "template";
-  onInputModeChange: (mode: "direct" | "template") => void;
-  selectedTemplateId: number | "";
-  onSelectedTemplateIdChange: (id: number | "") => void;
+  inputMode: 'direct' | 'template';
+  onInputModeChange: (mode: 'direct' | 'template') => void;
+  selectedTemplateId: number | '';
+  onSelectedTemplateIdChange: (id: number | '') => void;
   worldIdRef?: React.RefObject<HTMLInputElement>;
   activeTab?: number;
   onActiveTabChange?: (tab: number) => void;
@@ -99,8 +95,7 @@ const GameWorldForm: React.FC<GameWorldFormProps> = ({
   const [internalActiveTab, setInternalActiveTab] = useState(0);
 
   // Use controlled or internal state
-  const activeTab =
-    controlledActiveTab !== undefined ? controlledActiveTab : internalActiveTab;
+  const activeTab = controlledActiveTab !== undefined ? controlledActiveTab : internalActiveTab;
   const setActiveTab = (tab: number) => {
     if (onActiveTabChange) {
       onActiveTabChange(tab);
@@ -115,21 +110,21 @@ const GameWorldForm: React.FC<GameWorldFormProps> = ({
   // Export settings to file (JSON5 format)
   const handleExportSettings = () => {
     try {
-      const settings = infraSettingsText.trim() || "{}";
-      const blob = new Blob([settings], { type: "text/plain" });
+      const settings = infraSettingsText.trim() || '{}';
+      const blob = new Blob([settings], { type: 'text/plain' });
       const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
+      const a = document.createElement('a');
       a.href = url;
-      a.download = `${formData.worldId || "world"}-infra-settings.json5`;
+      a.download = `${formData.worldId || 'world'}-infra-settings.json5`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      enqueueSnackbar(t("gameWorlds.form.settingsExported"), {
-        variant: "success",
+      enqueueSnackbar(t('gameWorlds.form.settingsExported'), {
+        variant: 'success',
       });
     } catch {
-      enqueueSnackbar(t("common.error"), { variant: "error" });
+      enqueueSnackbar(t('common.error'), { variant: 'error' });
     }
   };
 
@@ -147,60 +142,56 @@ const GameWorldForm: React.FC<GameWorldFormProps> = ({
         if (result.success) {
           // Keep original content to preserve comments/formatting
           onInfraSettingsTextChange(content);
-          onInfraSettingsErrorChange("");
-          enqueueSnackbar(t("gameWorlds.form.settingsImported"), {
-            variant: "success",
+          onInfraSettingsErrorChange('');
+          enqueueSnackbar(t('gameWorlds.form.settingsImported'), {
+            variant: 'success',
           });
         } else {
-          enqueueSnackbar(t("gameWorlds.form.invalidJsonFile"), {
-            variant: "error",
+          enqueueSnackbar(t('gameWorlds.form.invalidJsonFile'), {
+            variant: 'error',
           });
         }
       } catch {
-        enqueueSnackbar(t("gameWorlds.form.invalidJsonFile"), {
-          variant: "error",
+        enqueueSnackbar(t('gameWorlds.form.invalidJsonFile'), {
+          variant: 'error',
         });
       }
     };
     reader.readAsText(file);
     // Reset file input
     if (fileInputRef.current) {
-      fileInputRef.current.value = "";
+      fileInputRef.current.value = '';
     }
   };
 
   // Copy settings to clipboard
   const handleCopySettings = () => {
-    const settings = infraSettingsText.trim() || "{}";
-    copyToClipboardWithNotification(
-      settings,
-      t("gameWorlds.form.settingsCopied"),
-      enqueueSnackbar,
-    );
+    const settings = infraSettingsText.trim() || '{}';
+    copyToClipboardWithNotification(settings, t('gameWorlds.form.settingsCopied'), enqueueSnackbar);
   };
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       {/* Tabs */}
       <Tabs
         value={activeTab}
         onChange={(_, newValue) => setActiveTab(newValue)}
-        sx={{ borderBottom: 1, borderColor: "divider", mb: 2 }}
+        sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}
       >
-        <Tab label={t("gameWorlds.form.basicInfoTab")} />
-        <Tab label={t("gameWorlds.form.infraSettingsTab")} />
+        <Tab label={t('gameWorlds.form.basicInfoTab')} />
+        <Tab label={t('gameWorlds.form.infraSettingsTab')} />
       </Tabs>
 
       {/* Tab Content */}
-      <Box sx={{ flex: 1, overflow: "auto" }}>
+      <Box sx={{ flex: 1, overflow: 'auto' }}>
         {/* Basic Info Tab */}
         {activeTab === 0 && (
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 3, mt: 1 }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mt: 1 }}>
             {/* World ID */}
             <Box>
               <TextField
                 fullWidth
-                label={t("gameWorlds.worldId")}
+                label={t('gameWorlds.worldId')}
                 value={formData.worldId}
                 onChange={(e) => {
                   const newWorldId = e.target.value;
@@ -208,7 +199,7 @@ const GameWorldForm: React.FC<GameWorldFormProps> = ({
 
                   if (
                     !editingWorld &&
-                    (formData.name === "" || formData.name === formData.worldId)
+                    (formData.name === '' || formData.name === formData.worldId)
                   ) {
                     newFormData.name = newWorldId;
                   }
@@ -224,9 +215,9 @@ const GameWorldForm: React.FC<GameWorldFormProps> = ({
               <Typography
                 variant="caption"
                 color="text.secondary"
-                sx={{ mt: 0.5, display: "block" }}
+                sx={{ mt: 0.5, display: 'block' }}
               >
-                {t("gameWorlds.form.worldIdHelp")}
+                {t('gameWorlds.form.worldIdHelp')}
               </Typography>
             </Box>
 
@@ -234,11 +225,9 @@ const GameWorldForm: React.FC<GameWorldFormProps> = ({
             <Box>
               <TextField
                 fullWidth
-                label={t("gameWorlds.name")}
+                label={t('gameWorlds.name')}
                 value={formData.name}
-                onChange={(e) =>
-                  onFormDataChange({ ...formData, name: e.target.value })
-                }
+                onChange={(e) => onFormDataChange({ ...formData, name: e.target.value })}
                 error={!!formErrors.name}
                 helperText={formErrors.name}
                 required
@@ -246,9 +235,9 @@ const GameWorldForm: React.FC<GameWorldFormProps> = ({
               <Typography
                 variant="caption"
                 color="text.secondary"
-                sx={{ mt: 0.5, display: "block" }}
+                sx={{ mt: 0.5, display: 'block' }}
               >
-                {t("gameWorlds.form.nameHelp")}
+                {t('gameWorlds.form.nameHelp')}
               </Typography>
             </Box>
 
@@ -256,21 +245,19 @@ const GameWorldForm: React.FC<GameWorldFormProps> = ({
             <Box>
               <TextField
                 fullWidth
-                label={t("gameWorlds.description")}
+                label={t('gameWorlds.description')}
                 value={formData.description}
-                onChange={(e) =>
-                  onFormDataChange({ ...formData, description: e.target.value })
-                }
+                onChange={(e) => onFormDataChange({ ...formData, description: e.target.value })}
                 multiline
                 rows={3}
-                placeholder={t("gameWorlds.description")}
+                placeholder={t('gameWorlds.description')}
               />
               <Typography
                 variant="caption"
                 color="text.secondary"
-                sx={{ mt: 0.5, display: "block" }}
+                sx={{ mt: 0.5, display: 'block' }}
               >
-                {t("gameWorlds.form.descriptionHelp")}
+                {t('gameWorlds.form.descriptionHelp')}
               </Typography>
             </Box>
 
@@ -278,8 +265,8 @@ const GameWorldForm: React.FC<GameWorldFormProps> = ({
             <Box>
               <TextField
                 fullWidth
-                label={t("gameWorlds.worldServerAddress")}
-                value={formData.worldServerAddress || ""}
+                label={t('gameWorlds.worldServerAddress')}
+                value={formData.worldServerAddress || ''}
                 onChange={(e) =>
                   onFormDataChange({
                     ...formData,
@@ -289,8 +276,7 @@ const GameWorldForm: React.FC<GameWorldFormProps> = ({
                 required
                 error={!!formErrors.worldServerAddress}
                 helperText={
-                  formErrors.worldServerAddress ||
-                  t("gameWorlds.form.worldServerAddressHelp")
+                  formErrors.worldServerAddress || t('gameWorlds.form.worldServerAddressHelp')
                 }
               />
             </Box>
@@ -299,9 +285,7 @@ const GameWorldForm: React.FC<GameWorldFormProps> = ({
             <Box>
               <Autocomplete
                 multiple
-                options={allRegistryTags.filter(
-                  (tag) => typeof tag !== "string",
-                )}
+                options={allRegistryTags.filter((tag) => typeof tag !== 'string')}
                 getOptionLabel={(option) => option.name}
                 filterSelectedOptions
                 isOptionEqualToValue={(option, value) => option.id === value.id}
@@ -314,7 +298,7 @@ const GameWorldForm: React.FC<GameWorldFormProps> = ({
                     return (
                       <Tooltip
                         key={option.id}
-                        title={option.description || t("tags.noDescription")}
+                        title={option.description || t('tags.noDescription')}
                         arrow
                       >
                         <Chip
@@ -331,9 +315,7 @@ const GameWorldForm: React.FC<GameWorldFormProps> = ({
                     );
                   })
                 }
-                renderInput={(params) => (
-                  <TextField {...params} label={t("gameWorlds.tags")} />
-                )}
+                renderInput={(params) => <TextField {...params} label={t('gameWorlds.tags')} />}
                 renderOption={(props, option) => {
                   const { key, ...otherProps } = props;
                   return (
@@ -347,7 +329,7 @@ const GameWorldForm: React.FC<GameWorldFormProps> = ({
                           mr: 1,
                         }}
                       />
-                      {option.description || t("common.noDescription")}
+                      {option.description || t('common.noDescription')}
                     </Box>
                   );
                 }}
@@ -355,7 +337,7 @@ const GameWorldForm: React.FC<GameWorldFormProps> = ({
             </Box>
 
             {/* Visibility and Maintenance Toggles */}
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
               <FormControl variant="standard">
                 <FormControlLabel
                   control={
@@ -369,10 +351,10 @@ const GameWorldForm: React.FC<GameWorldFormProps> = ({
                       }
                     />
                   }
-                  label={t("gameWorlds.visibleToUsers")}
+                  label={t('gameWorlds.visibleToUsers')}
                 />
                 <FormHelperText sx={{ ml: 6, mt: -0.5, mb: 1 }}>
-                  {t("gameWorlds.form.visibleHelp")}
+                  {t('gameWorlds.form.visibleHelp')}
                 </FormHelperText>
               </FormControl>
 
@@ -389,10 +371,10 @@ const GameWorldForm: React.FC<GameWorldFormProps> = ({
                       }
                     />
                   }
-                  label={t("gameWorlds.underMaintenance")}
+                  label={t('gameWorlds.underMaintenance')}
                 />
                 <FormHelperText sx={{ ml: 6, mt: -0.5 }}>
-                  {t("gameWorlds.form.maintenanceHelp")}
+                  {t('gameWorlds.form.maintenanceHelp')}
                 </FormHelperText>
               </FormControl>
             </Box>
@@ -400,8 +382,8 @@ const GameWorldForm: React.FC<GameWorldFormProps> = ({
             {/* Maintenance Settings */}
             {!!formData.isMaintenance && (
               <MaintenanceSettingsInput
-                startDate={formData.maintenanceStartDate || ""}
-                endDate={formData.maintenanceEndDate || ""}
+                startDate={formData.maintenanceStartDate || ''}
+                endDate={formData.maintenanceEndDate || ''}
                 onStartDateChange={(date) =>
                   onFormDataChange({ ...formData, maintenanceStartDate: date })
                 }
@@ -410,14 +392,14 @@ const GameWorldForm: React.FC<GameWorldFormProps> = ({
                 }
                 inputMode={inputMode}
                 onInputModeChange={onInputModeChange}
-                maintenanceMessage={formData.maintenanceMessage || ""}
+                maintenanceMessage={formData.maintenanceMessage || ''}
                 onMaintenanceMessageChange={(message) =>
                   onFormDataChange({ ...formData, maintenanceMessage: message })
                 }
                 supportsMultiLanguage={supportsMultiLanguage}
                 onSupportsMultiLanguageChange={onSupportsMultiLanguageChange}
                 maintenanceLocales={maintenanceLocales.map((l) => ({
-                  lang: l.lang as "ko" | "en" | "zh",
+                  lang: l.lang as 'ko' | 'en' | 'zh',
                   message: l.message,
                 }))}
                 onMaintenanceLocalesChange={(locales) => {
@@ -431,7 +413,7 @@ const GameWorldForm: React.FC<GameWorldFormProps> = ({
                     maintenanceLocales: newLocales,
                   }));
                   const hasNonEmptyLocales = locales.some(
-                    (l) => l.message && l.message.trim() !== "",
+                    (l) => l.message && l.message.trim() !== ''
                   );
                   if (hasNonEmptyLocales && !supportsMultiLanguage) {
                     onSupportsMultiLanguageChange(true);
@@ -459,12 +441,12 @@ const GameWorldForm: React.FC<GameWorldFormProps> = ({
               value={customPayloadText}
               onChange={(val) => onCustomPayloadTextChange(val)}
               height="200px"
-              label={t("gameWorlds.customPayload") || "Custom Payload"}
+              label={t('gameWorlds.customPayload') || 'Custom Payload'}
               placeholder='{\n  "key": "value"\n}'
               error={customPayloadError}
               helperText={
-                t("gameWorlds.form.customPayloadHelp") ||
-                "게임월드 관련 추가 데이터(JSON). 비워두면 {}로 저장됩니다."
+                t('gameWorlds.form.customPayloadHelp') ||
+                '게임월드 관련 추가 데이터(JSON). 비워두면 {}로 저장됩니다.'
               }
             />
           </Box>
@@ -474,27 +456,22 @@ const GameWorldForm: React.FC<GameWorldFormProps> = ({
         {activeTab === 1 && (
           <Box
             sx={{
-              display: "flex",
-              flexDirection: "column",
+              display: 'flex',
+              flexDirection: 'column',
               gap: 2,
               mt: 1,
-              height: "100%",
+              height: '100%',
             }}
           >
             {/* Action Buttons */}
-            <Stack
-              direction="row"
-              spacing={1}
-              justifyContent="flex-end"
-              flexShrink={0}
-            >
+            <Stack direction="row" spacing={1} justifyContent="flex-end" flexShrink={0}>
               <Button
                 size="small"
                 variant="outlined"
                 startIcon={<DownloadIcon />}
                 onClick={handleExportSettings}
               >
-                {t("gameWorlds.form.exportSettings")}
+                {t('gameWorlds.form.exportSettings')}
               </Button>
               <Button
                 size="small"
@@ -502,7 +479,7 @@ const GameWorldForm: React.FC<GameWorldFormProps> = ({
                 startIcon={<UploadIcon />}
                 onClick={() => fileInputRef.current?.click()}
               >
-                {t("gameWorlds.form.importSettings")}
+                {t('gameWorlds.form.importSettings')}
               </Button>
               <Button
                 size="small"
@@ -510,13 +487,13 @@ const GameWorldForm: React.FC<GameWorldFormProps> = ({
                 startIcon={<CopyIcon />}
                 onClick={handleCopySettings}
               >
-                {t("gameWorlds.form.copyToClipboard")}
+                {t('gameWorlds.form.copyToClipboard')}
               </Button>
               <input
                 type="file"
                 ref={fileInputRef}
                 accept=".json5"
-                style={{ display: "none" }}
+                style={{ display: 'none' }}
                 onChange={handleImportSettings}
               />
             </Stack>
@@ -528,9 +505,7 @@ const GameWorldForm: React.FC<GameWorldFormProps> = ({
                 onChange={(val) => onInfraSettingsTextChange(val)}
                 height="100%"
                 error={infraSettingsError}
-                onValidationError={(err) =>
-                  onInfraSettingsErrorChange(err || "")
-                }
+                onValidationError={(err) => onInfraSettingsErrorChange(err || '')}
               />
             </Box>
           </Box>

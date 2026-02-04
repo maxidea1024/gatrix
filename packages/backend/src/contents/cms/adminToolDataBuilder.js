@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 /* eslint-disable */
 
-
 /**
  * Admin Tool Data Builder
  *
@@ -44,7 +43,10 @@ const JSON5 = require('json5');
 // - gatrix/planning-data-source/locdata (localization data)
 const DEFAULT_CMS_DIR = path.join(__dirname, '../../../../../planning-data-source/client');
 const DEFAULT_OUTPUT_DIR = __dirname;
-const DEFAULT_LOCTAB_SOURCE = path.join(__dirname, '../../../../../planning-data-source/locdata/locdata');
+const DEFAULT_LOCTAB_SOURCE = path.join(
+  __dirname,
+  '../../../../../planning-data-source/locdata/locdata'
+);
 
 // ============================================================================
 // REWARD_TYPE Definitions (from game server rewardDesc.ts)
@@ -315,7 +317,7 @@ const DESC_FORMAT_TYPE = {
 /**
  * Check if an item is filtered out by country code.
  * Returns true if the item should be EXCLUDED (filtered out).
- * 
+ *
  * @param {number|undefined|null} localBitFlag - The localBitFlag value from CMS
  * @param {string} fieldName - Name of the field (for debugging, defaults to 'localBitFlag')
  * @returns {boolean} - true if item should be filtered OUT, false if it should be included
@@ -326,7 +328,7 @@ function isFilteredByCountryCode(localBitFlag, fieldName = 'localBitFlag') {
     return false; // Not filtered, include it
   }
   // Get country code mask from global settings (default to CHINA = 6)
-  const countryCodeMask = global.COUNTRY_CODE_MASK || (1 << 6);
+  const countryCodeMask = global.COUNTRY_CODE_MASK || 1 << 6;
   // If the bit is NOT set, filter it out
   return (localBitFlag & countryCodeMask) === 0;
 }
@@ -334,7 +336,7 @@ function isFilteredByCountryCode(localBitFlag, fieldName = 'localBitFlag') {
 /**
  * Check if an item is available for the current country code.
  * Returns true if the item should be INCLUDED.
- * 
+ *
  * @param {number|undefined|null} localBitFlag - The localBitFlag value from CMS
  * @returns {boolean} - true if item should be included, false if it should be filtered out
  */
@@ -346,7 +348,7 @@ function isAvailableForCountryCode(localBitFlag) {
  * Resolve CMS file path with optional binaryCode suffix.
  * If binaryCode is set and the _BC{XX}.json file exists, use it.
  * Otherwise, fall back to the base file.
- * 
+ *
  * @param {string} cmsDir - CMS directory path
  * @param {string} tableName - Base table name without extension (e.g., 'CashShop')
  * @returns {{path: string, usedFile: string, hasBinaryVariant: boolean}} - Resolved path info
@@ -365,7 +367,7 @@ function resolveCmsFilePath(cmsDir, tableName) {
       return {
         path: variantPath,
         usedFile: variantFileName,
-        hasBinaryVariant: true
+        hasBinaryVariant: true,
       };
     }
     console.log(`   ⚠️  ${variantFileName} not found, falling back to ${baseFileName}`);
@@ -375,7 +377,7 @@ function resolveCmsFilePath(cmsDir, tableName) {
   return {
     path: basePath,
     usedFile: baseFileName,
-    hasBinaryVariant: false
+    hasBinaryVariant: false,
   };
 }
 
@@ -494,10 +496,14 @@ function makeCharacterDisplayNameCn(characterCms, loctab) {
   }
 
   // Translate each name part: try original first (with Japanese), then display name
-  const firstNameCn = firstName ? (loctab[firstNameOriginal] || loctab[firstName] || firstName) : '';
-  const middleNameCn = middleName ? (loctab[middleNameOriginal] || loctab[middleName] || middleName) : '';
-  const familyNameCn = familyName ? (loctab[familyNameOriginal] || loctab[familyName] || familyName) : '';
-  const particleCn = particle ? (loctab[particleOriginal] || loctab[particle] || particle) : '';
+  const firstNameCn = firstName ? loctab[firstNameOriginal] || loctab[firstName] || firstName : '';
+  const middleNameCn = middleName
+    ? loctab[middleNameOriginal] || loctab[middleName] || middleName
+    : '';
+  const familyNameCn = familyName
+    ? loctab[familyNameOriginal] || loctab[familyName] || familyName
+    : '';
+  const particleCn = particle ? loctab[particleOriginal] || loctab[particle] || particle : '';
 
   // Build Chinese name (Chinese names typically don't have spaces between parts)
   // But we follow the same pattern as Korean for consistency
@@ -606,7 +612,11 @@ function extractItemsFromTable(tableData, tableName, rewardType) {
  */
 function formatItemName(item, allCmsTables) {
   // Special handling for Mail - use languageMailTitle[0] (Korean)
-  if (item.languageMailTitle && Array.isArray(item.languageMailTitle) && item.languageMailTitle.length > 0) {
+  if (
+    item.languageMailTitle &&
+    Array.isArray(item.languageMailTitle) &&
+    item.languageMailTitle.length > 0
+  ) {
     return removeCommentFromName(item.languageMailTitle[0] || `Mail ${item.id}`);
   }
 
@@ -627,7 +637,9 @@ function formatItemName(item, allCmsTables) {
 
   // Special handling for Mate - get name from Character table
   if (item.characterId && allCmsTables.Character && allCmsTables.Character[item.characterId]) {
-    return removeCommentFromName(makeCharacterDisplayName(allCmsTables.Character[item.characterId]));
+    return removeCommentFromName(
+      makeCharacterDisplayName(allCmsTables.Character[item.characterId])
+    );
   }
 
   // Special handling for ShipBlueprint - get name from Ship table
@@ -680,7 +692,11 @@ function formatItemName(item, allCmsTables) {
     const firstReward = item.reward[0];
     let seasonName = `Season ${firstReward.SeasonId}`;
 
-    if (firstReward.SeasonId && allCmsTables.InvestSeason && allCmsTables.InvestSeason[firstReward.SeasonId]) {
+    if (
+      firstReward.SeasonId &&
+      allCmsTables.InvestSeason &&
+      allCmsTables.InvestSeason[firstReward.SeasonId]
+    ) {
       const season = allCmsTables.InvestSeason[firstReward.SeasonId];
       // InvestSeason has name field with placeholder like "투자 시즌 {0}"
       if (season.name && season.nameFormatTexts && season.nameFormatTexts.length > 0) {
@@ -698,9 +714,10 @@ function formatItemName(item, allCmsTables) {
         if (tableName && allCmsTables[tableName] && allCmsTables[tableName][reward.Id]) {
           const rewardItem = allCmsTables[tableName][reward.Id];
           const itemName = rewardItem.name || `ID ${reward.Id}`;
-          const qty = reward.MinQuantity === reward.MaxQuantity
-            ? `${reward.MinQuantity}개`
-            : `${reward.MinQuantity}-${reward.MaxQuantity}개`;
+          const qty =
+            reward.MinQuantity === reward.MaxQuantity
+              ? `${reward.MinQuantity}개`
+              : `${reward.MinQuantity}-${reward.MaxQuantity}개`;
           rewardNames.push(`${itemName} ${qty}`);
         }
       }
@@ -732,7 +749,11 @@ function formatItemName(item, allCmsTables) {
         }
         if (allCmsTables.Mate && allCmsTables.Mate[target]) {
           const mate = allCmsTables.Mate[target];
-          if (mate.characterId && allCmsTables.Character && allCmsTables.Character[mate.characterId]) {
+          if (
+            mate.characterId &&
+            allCmsTables.Character &&
+            allCmsTables.Character[mate.characterId]
+          ) {
             return makeCharacterDisplayName(allCmsTables.Character[mate.characterId]);
           }
           return `Mate ${target}`;
@@ -789,9 +810,10 @@ function formatItemNameLocalized(item, allCmsTables, lang, loctab = {}) {
     let out = text;
     // phrase-level replacements first
     const phraseMap = {
-      '인도 계약서': (loctab && loctab['인도 계약서'] && loctab['인도 계약서'] !== '인도 계약서')
-        ? loctab['인도 계약서']
-        : '引渡合同',
+      '인도 계약서':
+        loctab && loctab['인도 계약서'] && loctab['인도 계약서'] !== '인도 계약서'
+          ? loctab['인도 계약서']
+          : '引渡合同',
     };
     for (const [kr, zh] of Object.entries(phraseMap)) {
       out = out.replace(new RegExp(kr, 'g'), zh);
@@ -799,7 +821,7 @@ function formatItemNameLocalized(item, allCmsTables, lang, loctab = {}) {
     // token-level replacements next
     const known = ['도면', '계약서', '유료', '무료', '필수등장', '확률'];
     for (const k of known) {
-      const v = (loctab && loctab[k] && loctab[k] !== k) ? loctab[k] : k;
+      const v = loctab && loctab[k] && loctab[k] !== k ? loctab[k] : k;
       out = out.replace(new RegExp(k, 'g'), v);
     }
     return out;
@@ -820,19 +842,23 @@ function formatItemNameLocalized(item, allCmsTables, lang, loctab = {}) {
         const rawLast = character.lastName || character.familyName || '';
         const firstKr = removeParentheses(removeCommentFromName(rawFirst));
         const lastKr = removeParentheses(removeCommentFromName(rawLast));
-        const firstCn = firstKr ? (loctab[firstKr] || firstKr) : '';
-        const lastCn = lastKr ? (loctab[lastKr] || lastKr) : '';
-        return (firstCn && lastCn) ? `${firstCn} ${lastCn}` : (firstCn || lastCn || removeCommentFromName(targetItem.name || targetItem.Name || ''));
+        const firstCn = firstKr ? loctab[firstKr] || firstKr : '';
+        const lastCn = lastKr ? loctab[lastKr] || lastKr : '';
+        return firstCn && lastCn
+          ? `${firstCn} ${lastCn}`
+          : firstCn || lastCn || removeCommentFromName(targetItem.name || targetItem.Name || '');
       }
     }
 
     // Generic: remove comments and translate token-wise
-    const baseKr = removeCommentFromName(targetItem.name || targetItem.Name || `${tableName} ${targetId}`);
+    const baseKr = removeCommentFromName(
+      targetItem.name || targetItem.Name || `${tableName} ${targetId}`
+    );
     const mappedBase = loctab ? loctab[baseKr] : undefined;
     if (mappedBase !== undefined && mappedBase !== baseKr) return mappedBase;
     try {
       const tokens = baseKr.split(/\s+/).filter(Boolean);
-      const translated = tokens.map(t => (loctab && loctab[t] !== undefined) ? loctab[t] : t);
+      const translated = tokens.map((t) => (loctab && loctab[t] !== undefined ? loctab[t] : t));
       return translated.join(' ');
     } catch {
       return baseKr;
@@ -840,7 +866,12 @@ function formatItemNameLocalized(item, allCmsTables, lang, loctab = {}) {
   };
 
   // If item has descFormat info, build localized placeholders
-  if (item.descFormat && Array.isArray(item.descFormat) && item.descFormatType && Array.isArray(item.descFormatType)) {
+  if (
+    item.descFormat &&
+    Array.isArray(item.descFormat) &&
+    item.descFormatType &&
+    Array.isArray(item.descFormatType)
+  ) {
     const formatTexts = [];
     for (let i = 0; i < item.descFormat.length; i++) {
       const format = item.descFormat[i];
@@ -848,7 +879,11 @@ function formatItemNameLocalized(item, allCmsTables, lang, loctab = {}) {
       if (!format || !formatType) continue;
 
       if (format.Type === DESC_FORMAT_TYPE.COUNT) {
-        formatTexts.push((formatType.target !== undefined && formatType.target !== null) ? formatType.target.toString() : '0');
+        formatTexts.push(
+          formatType.target !== undefined && formatType.target !== null
+            ? formatType.target.toString()
+            : '0'
+        );
       } else if (format.Type === DESC_FORMAT_TYPE.CMS_NAME) {
         if (format.TypeName && formatType.target !== undefined && formatType.target !== null) {
           formatTexts.push(getCmsNameLocalized(format.TypeName, formatType.target));
@@ -867,11 +902,12 @@ function formatItemNameLocalized(item, allCmsTables, lang, loctab = {}) {
       const formatted = stringFormat(item.name, formatTexts);
       const formattedNoComment = removeCommentFromName(formatted);
       const mappedFormatted = loctab ? loctab[formattedNoComment] : undefined;
-      if (mappedFormatted !== undefined && mappedFormatted !== formattedNoComment) return mappedFormatted;
+      if (mappedFormatted !== undefined && mappedFormatted !== formattedNoComment)
+        return mappedFormatted;
       const withKnown = replaceKnownTokens(formattedNoComment);
       try {
         const tokens = withKnown.split(/\s+/).filter(Boolean);
-        const translated = tokens.map(t => (loctab && loctab[t] !== undefined) ? loctab[t] : t);
+        const translated = tokens.map((t) => (loctab && loctab[t] !== undefined ? loctab[t] : t));
         return translated.join(' ');
       } catch {
         return withKnown;
@@ -885,9 +921,11 @@ function formatItemNameLocalized(item, allCmsTables, lang, loctab = {}) {
     const shipNameKr = removeCommentFromName(ship.name || `Ship ${item.shipId}`);
     const suffixKr = '도면';
     const shipNameCnCandidate = loctab ? loctab[shipNameKr] : undefined;
-    const shipNameCn = (shipNameCnCandidate && shipNameCnCandidate !== shipNameKr) ? shipNameCnCandidate : shipNameKr;
+    const shipNameCn =
+      shipNameCnCandidate && shipNameCnCandidate !== shipNameKr ? shipNameCnCandidate : shipNameKr;
     const suffixCnCandidate = loctab ? loctab[suffixKr] : undefined;
-    const suffixCn = (suffixCnCandidate && suffixCnCandidate !== suffixKr) ? suffixCnCandidate : suffixKr;
+    const suffixCn =
+      suffixCnCandidate && suffixCnCandidate !== suffixKr ? suffixCnCandidate : suffixKr;
     return `${shipNameCn} ${suffixCn}`;
   }
 
@@ -915,7 +953,7 @@ function formatItemNameLocalized(item, allCmsTables, lang, loctab = {}) {
     // Token-wise translation fallback
     try {
       const tokens = nameKr.split(/[\[\]\s]+/).filter(Boolean);
-      const translated = tokens.map(t => (loctab && loctab[t] !== undefined) ? loctab[t] : t);
+      const translated = tokens.map((t) => (loctab && loctab[t] !== undefined ? loctab[t] : t));
       return translated.join(' ');
     } catch {
       return nameKr;
@@ -928,7 +966,6 @@ function formatItemNameLocalized(item, allCmsTables, lang, loctab = {}) {
   if (mappedBase2 !== undefined && mappedBase2 !== base) return mappedBase2;
   return replaceKnownTokens(base);
 }
-
 
 /**
  * Remove comment part from item name (everything after @)
@@ -958,7 +995,6 @@ function removeParentheses(text) {
   if (!text || typeof text !== 'string') return text;
   return text.replace(/\([^)]*\)/g, '').trim();
 }
-
 
 /**
  * Remove game client tags from text
@@ -992,7 +1028,15 @@ function buildRewardLookupTable(cmsDir, loctab = {}) {
   // First, load all CMS tables that might be referenced for item name formatting
   console.log('   Loading reference CMS tables for item name formatting...');
   const allCmsTables = {};
-  const referenceTables = ['Ship', 'Mate', 'Character', 'ShipBlueprint', 'Item', 'InvestSeason', 'Nation'];
+  const referenceTables = [
+    'Ship',
+    'Mate',
+    'Character',
+    'ShipBlueprint',
+    'Item',
+    'InvestSeason',
+    'Nation',
+  ];
 
   for (const tableName of referenceTables) {
     const filePath = path.join(cmsDir, `${tableName}.json`);
@@ -1053,37 +1097,52 @@ function buildRewardLookupTable(cmsDir, loctab = {}) {
           let items = extractItemsFromTable(tableData, tableName, rewardTypeNum);
 
           // Format item names with translations
-          items = items.map(item => {
+          items = items.map((item) => {
             const formattedName = formatItemName(item._original, allCmsTables);
 
             // Add translations
             const itemData = {
               id: item.id,
-              name: formattedName,  // Korean name (default)
-              nameKr: formattedName,  // Korean name
+              name: formattedName, // Korean name (default)
+              nameKr: formattedName, // Korean name
             };
 
             // Special handling for ShipBlueprint: split ship name + '도면' for CN
-            if (rewardTypeNum === REWARD_TYPE.SHIP_BLUEPRINT && item._original.shipId && allCmsTables.Ship && allCmsTables.Ship[item._original.shipId]) {
+            if (
+              rewardTypeNum === REWARD_TYPE.SHIP_BLUEPRINT &&
+              item._original.shipId &&
+              allCmsTables.Ship &&
+              allCmsTables.Ship[item._original.shipId]
+            ) {
               const rawShipName = allCmsTables.Ship[item._original.shipId].name || '';
               const shipNameKr = removeCommentFromName(rawShipName);
               const suffixKr = '도면';
               const shipNameCn = loctab[shipNameKr] || shipNameKr;
               const suffixCn = loctab[suffixKr] || suffixKr;
               // Return merged object to avoid shape warnings
-              return { ...itemData, nameCn: `${shipNameCn} ${suffixCn}`, nameEn: `${shipNameKr} Blueprint` };
+              return {
+                ...itemData,
+                nameCn: `${shipNameCn} ${suffixCn}`,
+                nameEn: `${shipNameKr} Blueprint`,
+              };
             }
 
             // Special handling for Mate: translate firstName and lastName separately for CN
-            if (rewardTypeNum === REWARD_TYPE.MATE && item._original.characterId && allCmsTables.Character && allCmsTables.Character[item._original.characterId]) {
+            if (
+              rewardTypeNum === REWARD_TYPE.MATE &&
+              item._original.characterId &&
+              allCmsTables.Character &&
+              allCmsTables.Character[item._original.characterId]
+            ) {
               const character = allCmsTables.Character[item._original.characterId];
               const rawFirst = character.firstName || '';
               const rawLast = character.lastName || character.familyName || '';
               const firstKr = removeParentheses(removeCommentFromName(rawFirst));
               const lastKr = removeParentheses(removeCommentFromName(rawLast));
-              const firstCn = firstKr ? (loctab[firstKr] || firstKr) : '';
-              const lastCn = lastKr ? (loctab[lastKr] || lastKr) : '';
-              const joinedCn = (firstCn && lastCn) ? `${firstCn} ${lastCn}` : (firstCn || lastCn || formattedName);
+              const firstCn = firstKr ? loctab[firstKr] || firstKr : '';
+              const lastCn = lastKr ? loctab[lastKr] || lastKr : '';
+              const joinedCn =
+                firstCn && lastCn ? `${firstCn} ${lastCn}` : firstCn || lastCn || formattedName;
               return { ...itemData, nameCn: joinedCn, nameEn: formattedName };
             }
 
@@ -1111,7 +1170,9 @@ function buildRewardLookupTable(cmsDir, loctab = {}) {
                 // Token-wise translation fallback
                 try {
                   const tokens = baseName.split(/\s+/).filter(Boolean);
-                  const translated = tokens.map(t => (loctab && loctab[t] !== undefined ? loctab[t] : t));
+                  const translated = tokens.map((t) =>
+                    loctab && loctab[t] !== undefined ? loctab[t] : t
+                  );
                   baseCn = translated.join(' ');
                 } catch {
                   baseCn = baseName;
@@ -1444,7 +1505,13 @@ function generateUIListData(cmsDir, loctab = {}) {
       }
 
       // If no direct translation, try template-based translation
-      if (!nameCn && item.name && item.name.includes('{0}') && item.descFormat && item.descFormatType) {
+      if (
+        !nameCn &&
+        item.name &&
+        item.name.includes('{0}') &&
+        item.descFormat &&
+        item.descFormatType
+      ) {
         // Try to find template translation (e.g., "{0} 도면" -> "{0}图纸")
         const templateName = removeCommentFromName(item.name);
         const templateCn = loctab[templateName];
@@ -1457,13 +1524,23 @@ function generateUIListData(cmsDir, loctab = {}) {
             if (!format || !formatType) continue;
 
             if (format.Type === DESC_FORMAT_TYPE.COUNT) {
-              formatTextsCn.push((formatType.target !== undefined && formatType.target !== null) ? formatType.target.toString() : '0');
+              formatTextsCn.push(
+                formatType.target !== undefined && formatType.target !== null
+                  ? formatType.target.toString()
+                  : '0'
+              );
             } else if (format.Type === DESC_FORMAT_TYPE.CMS_NAME) {
-              if (format.TypeName && formatType.target !== undefined && formatType.target !== null) {
+              if (
+                format.TypeName &&
+                formatType.target !== undefined &&
+                formatType.target !== null
+              ) {
                 const table = allCmsTables[format.TypeName];
                 if (table && table[formatType.target]) {
                   const targetItem = table[formatType.target];
-                  const targetNameKr = removeCommentFromName(targetItem.name || `${format.TypeName} ${formatType.target}`);
+                  const targetNameKr = removeCommentFromName(
+                    targetItem.name || `${format.TypeName} ${formatType.target}`
+                  );
                   formatTextsCn.push(loctab[targetNameKr] || targetNameKr);
                 } else {
                   formatTextsCn.push(`${format.TypeName} ${formatType.target}`);
@@ -1551,7 +1628,7 @@ function generateUIListData(cmsDir, loctab = {}) {
                       const mainPart = suffixMatch[1];
                       const suffix = suffixMatch[2];
                       const mainCn = loctab[mainPart];
-                      translatedParts.push((mainCn && mainCn !== mainPart) ? mainCn : mainPart);
+                      translatedParts.push(mainCn && mainCn !== mainPart ? mainCn : mainPart);
                       translatedParts.push(suffix);
                       handled = true;
                     }
@@ -1698,9 +1775,10 @@ function generateUIListData(cmsDir, loctab = {}) {
       }
 
       const baseShipNameKr = ship && ship.name ? ship.name.split('@')[0].trim() : '';
-      const nameCn = nameKr.endsWith(' 도면') && baseShipNameKr
-        ? `${(loctab[baseShipNameKr] || baseShipNameKr)} ${(loctab['도면'] || '도면')}`
-        : (loctab[nameKr] || nameKr);
+      const nameCn =
+        nameKr.endsWith(' 도면') && baseShipNameKr
+          ? `${loctab[baseShipNameKr] || baseShipNameKr} ${loctab['도면'] || '도면'}`
+          : loctab[nameKr] || nameKr;
       const nameEn = baseShipNameKr ? `${baseShipNameKr} Blueprint` : nameKr;
 
       uiListData.shipBlueprints.push({
@@ -1731,7 +1809,7 @@ function generateUIListData(cmsDir, loctab = {}) {
       if (!kr || !loctab) return kr;
       try {
         const tokens = kr.split(/\s+/).filter(Boolean);
-        const translated = tokens.map(t => (loctab[t] !== undefined ? loctab[t] : t));
+        const translated = tokens.map((t) => (loctab[t] !== undefined ? loctab[t] : t));
         return translated.join(' ');
       } catch {
         return kr;
@@ -1807,7 +1885,21 @@ function generateUIListData(cmsDir, loctab = {}) {
   if (achievementTable && achievementTable.Achievement) {
     // Pre-load commonly used tables for achievement formatting to avoid repeated loadTable calls
     const preloadedTables = {};
-    const tablesToPreload = ['Ship', 'Item', 'Discovery', 'Nation', 'Town', 'Job', 'TradeGoods', 'BattleSkill', 'WorldSkill', 'Mate', 'Character', 'Quest', 'QuestNode'];
+    const tablesToPreload = [
+      'Ship',
+      'Item',
+      'Discovery',
+      'Nation',
+      'Town',
+      'Job',
+      'TradeGoods',
+      'BattleSkill',
+      'WorldSkill',
+      'Mate',
+      'Character',
+      'Quest',
+      'QuestNode',
+    ];
     for (const tableName of tablesToPreload) {
       const table = loadTable(tableName);
       if (table && table[tableName]) {
@@ -1831,7 +1923,11 @@ function generateUIListData(cmsDir, loctab = {}) {
       // Special handling for "달성 보상" - add achievement target details with item names
       // Build both Korean and Chinese versions simultaneously
       let specialCaseCn = null;
-      if (nameKr === '달성 보상' && achievement.achievementTarget && achievement.achievementTarget.length > 0) {
+      if (
+        nameKr === '달성 보상' &&
+        achievement.achievementTarget &&
+        achievement.achievementTarget.length > 0
+      ) {
         const targetDetailsKr = [];
         const targetDetailsCn = [];
 
@@ -1841,7 +1937,15 @@ function generateUIListData(cmsDir, loctab = {}) {
           let itemNameCn = null;
 
           // Try to find the item in common tables
-          const tablesToCheck = ['Quest', 'QuestNode', 'Item', 'Discovery', 'Ship', 'Mate', 'Character'];
+          const tablesToCheck = [
+            'Quest',
+            'QuestNode',
+            'Item',
+            'Discovery',
+            'Ship',
+            'Mate',
+            'Character',
+          ];
           for (const tableName of tablesToCheck) {
             if (preloadedTables[tableName] && preloadedTables[tableName][targetId]) {
               const targetItem = preloadedTables[tableName][targetId];
@@ -1860,8 +1964,13 @@ function generateUIListData(cmsDir, loctab = {}) {
                 itemNameKr = removeCommentFromName(targetItem.name || targetItem.Name || '');
 
                 // Special handling for Quest - format placeholders using formatTexts
-                if (tableName === 'Quest' && targetItem.formatTexts && Array.isArray(targetItem.formatTexts) && targetItem.formatTexts.length > 0) {
-                  const formatValues = targetItem.formatTexts.map(ft => ft.Val || '');
+                if (
+                  tableName === 'Quest' &&
+                  targetItem.formatTexts &&
+                  Array.isArray(targetItem.formatTexts) &&
+                  targetItem.formatTexts.length > 0
+                ) {
+                  const formatValues = targetItem.formatTexts.map((ft) => ft.Val || '');
                   if (formatValues.length > 0) {
                     itemNameKr = stringFormat(itemNameKr, formatValues);
                   }
@@ -1890,7 +1999,7 @@ function generateUIListData(cmsDir, loctab = {}) {
                     if (!matched) {
                       const token = tokens[idx];
                       const tokenCn = loctab[token];
-                      translatedParts.push((tokenCn && tokenCn !== token) ? tokenCn : token);
+                      translatedParts.push(tokenCn && tokenCn !== token ? tokenCn : token);
                       idx++;
                     }
                   }
@@ -1926,9 +2035,16 @@ function generateUIListData(cmsDir, loctab = {}) {
       const originalTemplate = achievement.name || `Achievement ${achievement.id}`;
       // Remove @ comment from template
       const templateAtIndex = originalTemplate.indexOf('@');
-      const cleanTemplate = templateAtIndex !== -1 ? originalTemplate.substring(0, templateAtIndex).trim() : originalTemplate;
+      const cleanTemplate =
+        templateAtIndex !== -1
+          ? originalTemplate.substring(0, templateAtIndex).trim()
+          : originalTemplate;
 
-      if (achievement.descFormat && Array.isArray(achievement.descFormat) && achievement.descFormat.length > 0) {
+      if (
+        achievement.descFormat &&
+        Array.isArray(achievement.descFormat) &&
+        achievement.descFormat.length > 0
+      ) {
         const formatTextsKr = [];
         const formatTextsCn = [];
 
@@ -1940,7 +2056,11 @@ function generateUIListData(cmsDir, loctab = {}) {
           // Get the table name from Type or TypeName
           const tableName = format.TypeName || REWARD_TYPE_TO_TABLE[format.Type];
 
-          if (tableName && achievement.achievementTarget && achievement.achievementTarget[i] !== undefined) {
+          if (
+            tableName &&
+            achievement.achievementTarget &&
+            achievement.achievementTarget[i] !== undefined
+          ) {
             const targetId = achievement.achievementTarget[i];
 
             // Use preloaded table if available, otherwise load on demand
@@ -1980,7 +2100,9 @@ function generateUIListData(cmsDir, loctab = {}) {
                   formatTextCn = makeCharacterDisplayNameCn(targetItem, loctab);
                 }
               } else {
-                formatTextKr = removeCommentFromName(targetItem.name || targetItem.Name || `${tableName} ${targetId}`);
+                formatTextKr = removeCommentFromName(
+                  targetItem.name || targetItem.Name || `${tableName} ${targetId}`
+                );
                 // Translate target name to Chinese
                 formatTextCn = loctab[formatTextKr] || formatTextKr;
               }
@@ -2017,7 +2139,7 @@ function generateUIListData(cmsDir, loctab = {}) {
             // Fallback: Split template by placeholders and translate each part
             // e.g., "{0} 애호가" -> translate "애호가" -> combine with translated {0}
             const templateParts = cleanTemplate.split(/(\{[0-9]+\})/);
-            const translatedParts = templateParts.map(part => {
+            const translatedParts = templateParts.map((part) => {
               if (/^\{[0-9]+\}$/.test(part)) {
                 // This is a placeholder like {0}, {1}
                 const index = parseInt(part.slice(1, -1), 10);
@@ -2038,9 +2160,9 @@ function generateUIListData(cmsDir, loctab = {}) {
         if (!nameCn || nameCn === nameKr) {
           // Try token-wise translation
           const tokens = nameKr.split(/\s+/).filter(Boolean);
-          const translatedTokens = tokens.map(token => {
+          const translatedTokens = tokens.map((token) => {
             const tokenCn = loctab[token];
-            return (tokenCn && tokenCn !== token) ? tokenCn : token;
+            return tokenCn && tokenCn !== token ? tokenCn : token;
           });
           nameCn = translatedTokens.join('');
         }
@@ -2097,7 +2219,24 @@ function generateUIListData(cmsDir, loctab = {}) {
   if (eventMissionTable && eventMissionTable.EventMission) {
     // Pre-load commonly used tables for EventMission formatting
     const preloadedTables = {};
-    const tablesToPreload = ['Ship', 'Item', 'Discovery', 'Nation', 'Town', 'Village', 'Region', 'Job', 'TradeGoods', 'BattleSkill', 'WorldSkill', 'Mate', 'Character', 'Quest', 'QuestNode', 'Point'];
+    const tablesToPreload = [
+      'Ship',
+      'Item',
+      'Discovery',
+      'Nation',
+      'Town',
+      'Village',
+      'Region',
+      'Job',
+      'TradeGoods',
+      'BattleSkill',
+      'WorldSkill',
+      'Mate',
+      'Character',
+      'Quest',
+      'QuestNode',
+      'Point',
+    ];
     for (const tableName of tablesToPreload) {
       const table = loadTable(tableName);
       if (table && table[tableName]) {
@@ -2117,9 +2256,10 @@ function generateUIListData(cmsDir, loctab = {}) {
       // Type 2: BASE_REWARD - 기본 보상 (레벨 달성)
       if (mission.type === 2) {
         const level = mission.val || 0;
-        const expInfo = eventMissionExpTable && eventMissionExpTable.EventMissionExp
-          ? eventMissionExpTable.EventMissionExp[level]
-          : null;
+        const expInfo =
+          eventMissionExpTable && eventMissionExpTable.EventMissionExp
+            ? eventMissionExpTable.EventMissionExp[level]
+            : null;
         if (expInfo) {
           nameKr = `레벨 ${level} 기본 보상 (누적 경험치: ${expInfo.accumulateExp})`;
         } else {
@@ -2129,9 +2269,10 @@ function generateUIListData(cmsDir, loctab = {}) {
       // Type 3: ADDITIONAL_REWARD - 추가 보상 (프리미엄 패스)
       else if (mission.type === 3) {
         const level = mission.val || 0;
-        const expInfo = eventMissionExpTable && eventMissionExpTable.EventMissionExp
-          ? eventMissionExpTable.EventMissionExp[level]
-          : null;
+        const expInfo =
+          eventMissionExpTable && eventMissionExpTable.EventMissionExp
+            ? eventMissionExpTable.EventMissionExp[level]
+            : null;
         if (expInfo) {
           nameKr = `레벨 ${level} 추가 보상 (누적 경험치: ${expInfo.accumulateExp})`;
         } else {
@@ -2167,33 +2308,43 @@ function generateUIListData(cmsDir, loctab = {}) {
                 // Type 2 = CMS_NAME, get name from CMS table
                 if (fmt.Type === 2 && fmt.TypeName) {
                   const tableName = fmt.TypeName;
-                  const targetId = eventTask.descFormatType && eventTask.descFormatType[index]
-                    ? eventTask.descFormatType[index].target
-                    : null;
+                  const targetId =
+                    eventTask.descFormatType && eventTask.descFormatType[index]
+                      ? eventTask.descFormatType[index].target
+                      : null;
 
-                  if (targetId && preloadedTables[tableName] && preloadedTables[tableName][targetId]) {
+                  if (
+                    targetId &&
+                    preloadedTables[tableName] &&
+                    preloadedTables[tableName][targetId]
+                  ) {
                     const targetItem = preloadedTables[tableName][targetId];
-                    return removeCommentFromName(targetItem.name || targetItem.Name || `${tableName} ${targetId}`);
+                    return removeCommentFromName(
+                      targetItem.name || targetItem.Name || `${tableName} ${targetId}`
+                    );
                   }
                   return `[${tableName} ${targetId || 'Unknown'}]`;
                 }
 
                 // Type 3 = ENUM_NAME - get enum value from eventTaskTargets
                 if (fmt.Type === 3 && fmt.TypeName) {
-                  const enumValue = eventTask.eventTaskTargets && eventTask.eventTaskTargets[index]
-                    ? eventTask.eventTaskTargets[index]
-                    : null;
+                  const enumValue =
+                    eventTask.eventTaskTargets && eventTask.eventTaskTargets[index]
+                      ? eventTask.eventTaskTargets[index]
+                      : null;
 
                   // Handle JOB_TYPE enum
                   if (fmt.TypeName === 'JOB_TYPE' && enumValue !== null && preloadedTables['Job']) {
                     // Find job with matching jobType
-                    const jobWithType = Object.values(preloadedTables['Job']).find(j => j.jobType === enumValue);
+                    const jobWithType = Object.values(preloadedTables['Job']).find(
+                      (j) => j.jobType === enumValue
+                    );
                     if (jobWithType) {
                       // Return job type name based on jobType value
                       const jobTypeNames = {
                         1: '모험',
                         2: '교역',
-                        3: '전투'
+                        3: '전투',
                       };
                       return jobTypeNames[enumValue] || `JobType ${enumValue}`;
                     }
@@ -2225,7 +2376,8 @@ function generateUIListData(cmsDir, loctab = {}) {
             // Check AchievementTerms first (87000000-87999999)
             if (eventTask.eventTaskTermsId >= 87000000 && eventTask.eventTaskTermsId <= 87999999) {
               if (achievementTermsTable && achievementTermsTable.AchievementTerms) {
-                const achievementTerm = achievementTermsTable.AchievementTerms[eventTask.eventTaskTermsId];
+                const achievementTerm =
+                  achievementTermsTable.AchievementTerms[eventTask.eventTaskTermsId];
                 if (achievementTerm && achievementTerm.desc) {
                   termsDesc = achievementTerm.desc;
                   termsDescFormat = achievementTerm.descFormat;
@@ -2233,7 +2385,10 @@ function generateUIListData(cmsDir, loctab = {}) {
               }
             }
             // Check ContentsTerms (81000000-81999999)
-            else if (eventTask.eventTaskTermsId >= 81000000 && eventTask.eventTaskTermsId <= 81999999) {
+            else if (
+              eventTask.eventTaskTermsId >= 81000000 &&
+              eventTask.eventTaskTermsId <= 81999999
+            ) {
               if (contentsTermsTable && contentsTermsTable.ContentsTerms) {
                 const contentsTerm = contentsTermsTable.ContentsTerms[eventTask.eventTaskTermsId];
                 if (contentsTerm && contentsTerm.desc) {
@@ -2257,33 +2412,47 @@ function generateUIListData(cmsDir, loctab = {}) {
                   // Type 2 = CMS_NAME, get name from CMS table
                   if (fmt.Type === 2 && fmt.TypeName) {
                     const tableName = fmt.TypeName;
-                    const targetId = eventTask.descFormatType && eventTask.descFormatType[index]
-                      ? eventTask.descFormatType[index].target
-                      : null;
+                    const targetId =
+                      eventTask.descFormatType && eventTask.descFormatType[index]
+                        ? eventTask.descFormatType[index].target
+                        : null;
 
-                    if (targetId && preloadedTables[tableName] && preloadedTables[tableName][targetId]) {
+                    if (
+                      targetId &&
+                      preloadedTables[tableName] &&
+                      preloadedTables[tableName][targetId]
+                    ) {
                       const targetItem = preloadedTables[tableName][targetId];
-                      return removeCommentFromName(targetItem.name || targetItem.Name || `${tableName} ${targetId}`);
+                      return removeCommentFromName(
+                        targetItem.name || targetItem.Name || `${tableName} ${targetId}`
+                      );
                     }
                     return `[${tableName} ${targetId || 'Unknown'}]`;
                   }
 
                   // Type 3 = ENUM_NAME - get enum value from eventTaskTargets
                   if (fmt.Type === 3 && fmt.TypeName) {
-                    const enumValue = eventTask.eventTaskTargets && eventTask.eventTaskTargets[index]
-                      ? eventTask.eventTaskTargets[index]
-                      : null;
+                    const enumValue =
+                      eventTask.eventTaskTargets && eventTask.eventTaskTargets[index]
+                        ? eventTask.eventTaskTargets[index]
+                        : null;
 
                     // Handle JOB_TYPE enum
-                    if (fmt.TypeName === 'JOB_TYPE' && enumValue !== null && preloadedTables['Job']) {
+                    if (
+                      fmt.TypeName === 'JOB_TYPE' &&
+                      enumValue !== null &&
+                      preloadedTables['Job']
+                    ) {
                       // Find job with matching jobType
-                      const jobWithType = Object.values(preloadedTables['Job']).find(j => j.jobType === enumValue);
+                      const jobWithType = Object.values(preloadedTables['Job']).find(
+                        (j) => j.jobType === enumValue
+                      );
                       if (jobWithType) {
                         // Return job type name based on jobType value
                         const jobTypeNames = {
                           1: '모험',
                           2: '교역',
-                          3: '전투'
+                          3: '전투',
                         };
                         return jobTypeNames[enumValue] || `JobType ${enumValue}`;
                       }
@@ -2348,7 +2517,11 @@ function generateUIListData(cmsDir, loctab = {}) {
       let nameKr = `Mail ${mail.id}`;
 
       // Use languageMailTitle[0] (Korean) if available
-      if (mail.languageMailTitle && Array.isArray(mail.languageMailTitle) && mail.languageMailTitle.length > 0) {
+      if (
+        mail.languageMailTitle &&
+        Array.isArray(mail.languageMailTitle) &&
+        mail.languageMailTitle.length > 0
+      ) {
         nameKr = mail.languageMailTitle[0] || nameKr;
 
         // Replace placeholders if descFormat exists
@@ -2399,9 +2572,7 @@ function generateUIListData(cmsDir, loctab = {}) {
   // Convert keys to SNAKE_CASE_UPPER
   const convertedData = {};
   for (const [key, value] of Object.entries(uiListData)) {
-    const snakeCaseKey = key
-      .replace(/([a-z])([A-Z])/g, '$1_$2')
-      .toUpperCase();
+    const snakeCaseKey = key.replace(/([a-z])([A-Z])/g, '$1_$2').toUpperCase();
     convertedData[snakeCaseKey] = value;
   }
 
@@ -2435,9 +2606,12 @@ function convertEventDataToLanguageSpecific(eventData, eventType, outputDir, loc
     const computeHotTimeNameCn = (kr) => {
       if (!kr) return kr;
       // split by comma and optional spaces
-      const parts = kr.split(',').map(p => p.trim()).filter(Boolean);
+      const parts = kr
+        .split(',')
+        .map((p) => p.trim())
+        .filter(Boolean);
       if (!parts.length) return kr;
-      return parts.map(p => loctab[p] || p).join(', ');
+      return parts.map((p) => loctab[p] || p).join(', ');
     };
 
     // Helper: token-wise translation fallback when full phrase not found
@@ -2445,7 +2619,7 @@ function convertEventDataToLanguageSpecific(eventData, eventType, outputDir, loc
       if (!kr || !loctab) return kr;
       try {
         const tokens = kr.split(/\s+/).filter(Boolean);
-        const translated = tokens.map(t => (loctab[t] !== undefined ? loctab[t] : t));
+        const translated = tokens.map((t) => (loctab[t] !== undefined ? loctab[t] : t));
         return translated.join(' ');
       } catch {
         return kr;
@@ -2453,62 +2627,100 @@ function convertEventDataToLanguageSpecific(eventData, eventType, outputDir, loc
     };
 
     const nameEn = item.nameEn || nameKr; // No English translation table for now
-    let nameCn = item.nameCn || (eventType === 'hottimebuff'
-      ? computeHotTimeNameCn(nameKr)
-      : (loctab[nameKr] || translateByTokens(nameKr)));
+    let nameCn =
+      item.nameCn ||
+      (eventType === 'hottimebuff'
+        ? computeHotTimeNameCn(nameKr)
+        : loctab[nameKr] || translateByTokens(nameKr));
 
     // Extract language-specific descriptions (if available)
     const descKr = item.descKr || item.desc || '';
     const descEn = item.descEn || descKr;
-    const descCn = item.descCn || (loctab[descKr] || translateByTokens(descKr));
+    const descCn = item.descCn || loctab[descKr] || translateByTokens(descKr);
 
     // Extract language-specific descriptions for LiveEvent (if available)
     const descriptionKr = item.descriptionKr || item.description || '';
     const descriptionEn = item.descriptionEn || descriptionKr;
-    const descriptionCn = item.descriptionCn || (loctab[descriptionKr] || translateByTokens(descriptionKr));
+    const descriptionCn =
+      item.descriptionCn || loctab[descriptionKr] || translateByTokens(descriptionKr);
 
     // Prepare auxiliary localized fields (mateName/npcName/townNames) per language
     const mateNameKrVal = item.mateNameKr || item.mateName;
     const mateNameEnVal = item.mateNameEn || mateNameKrVal;
-    const mateNameCnVal = item.mateNameCn || (mateNameKrVal ? (loctab[mateNameKrVal] || translateByTokens(mateNameKrVal)) : undefined);
+    const mateNameCnVal =
+      item.mateNameCn ||
+      (mateNameKrVal ? loctab[mateNameKrVal] || translateByTokens(mateNameKrVal) : undefined);
 
     const npcNameKrVal = item.npcNameKr || item.npcName;
     const npcNameEnVal = item.npcNameEn || npcNameKrVal;
-    const npcNameCnVal = item.npcNameCn || (npcNameKrVal ? (loctab[npcNameKrVal] || translateByTokens(npcNameKrVal)) : undefined);
+    const npcNameCnVal =
+      item.npcNameCn ||
+      (npcNameKrVal ? loctab[npcNameKrVal] || translateByTokens(npcNameKrVal) : undefined);
 
     const townNamesKrVal = item.townNamesKr || item.townNames;
     const townNamesEnVal = item.townNamesEn || townNamesKrVal;
-    const townNamesCnVal = item.townNamesCn || (townNamesKrVal ? (loctab[townNamesKrVal] || translateByTokens(townNamesKrVal)) : undefined);
+    const townNamesCnVal =
+      item.townNamesCn ||
+      (townNamesKrVal ? loctab[townNamesKrVal] || translateByTokens(townNamesKrVal) : undefined);
 
     // Create entries with only 'name' field and other non-name/desc fields (strip localized name variants)
     const baseEntry = {};
     for (const [key, value] of Object.entries(item)) {
-      if (key !== 'name' && key !== 'nameKr' && key !== 'nameEn' && key !== 'nameCn' &&
-        key !== 'desc' && key !== 'descKr' && key !== 'descEn' && key !== 'descCn' &&
-        key !== 'description' && key !== 'descriptionKr' && key !== 'descriptionEn' && key !== 'descriptionCn' &&
-        key !== 'mateName' && key !== 'mateNameKr' && key !== 'mateNameEn' && key !== 'mateNameCn' &&
-        key !== 'npcName' && key !== 'npcNameKr' && key !== 'npcNameEn' && key !== 'npcNameCn' &&
-        key !== 'townNames' && key !== 'townNamesKr' && key !== 'townNamesEn' && key !== 'townNamesCn' &&
+      if (
+        key !== 'name' &&
+        key !== 'nameKr' &&
+        key !== 'nameEn' &&
+        key !== 'nameCn' &&
+        key !== 'desc' &&
+        key !== 'descKr' &&
+        key !== 'descEn' &&
+        key !== 'descCn' &&
+        key !== 'description' &&
+        key !== 'descriptionKr' &&
+        key !== 'descriptionEn' &&
+        key !== 'descriptionCn' &&
+        key !== 'mateName' &&
+        key !== 'mateNameKr' &&
+        key !== 'mateNameEn' &&
+        key !== 'mateNameCn' &&
+        key !== 'npcName' &&
+        key !== 'npcNameKr' &&
+        key !== 'npcNameEn' &&
+        key !== 'npcNameCn' &&
+        key !== 'townNames' &&
+        key !== 'townNamesKr' &&
+        key !== 'townNamesEn' &&
+        key !== 'townNamesCn' &&
         key !== 'worldBuffNames' &&
-        key !== 'towns') { // exclude nested towns and worldBuffNames to localize per-language below
+        key !== 'towns'
+      ) {
+        // exclude nested towns and worldBuffNames to localize per-language below
         baseEntry[key] = value;
       }
     }
 
     // Localize nested towns array per language (id + name only)
     const townsArray = Array.isArray(item.towns) ? item.towns : null;
-    const townsKr = townsArray ? townsArray.map(t => ({ id: t.id, name: (t.nameKr || t.name || '') })) : undefined;
-    const townsEn = townsArray ? townsArray.map(t => ({ id: t.id, name: (t.nameEn || t.name || t.nameKr || '') })) : undefined;
-    const townsCn = townsArray ? townsArray.map(t => {
-      const baseNm = (t.nameCn || t.nameKr || t.name || '');
-      const nm = t.nameCn || (loctab[baseNm] || translateByTokens(baseNm));
-      return { id: t.id, name: nm };
-    }) : undefined;
+    const townsKr = townsArray
+      ? townsArray.map((t) => ({ id: t.id, name: t.nameKr || t.name || '' }))
+      : undefined;
+    const townsEn = townsArray
+      ? townsArray.map((t) => ({ id: t.id, name: t.nameEn || t.name || t.nameKr || '' }))
+      : undefined;
+    const townsCn = townsArray
+      ? townsArray.map((t) => {
+          const baseNm = t.nameCn || t.nameKr || t.name || '';
+          const nm = t.nameCn || loctab[baseNm] || translateByTokens(baseNm);
+          return { id: t.id, name: nm };
+        })
+      : undefined;
 
     // Localize worldBuffNames per language
     const worldBuffNamesKrVal = item.worldBuffNames;
     const worldBuffNamesEnVal = item.worldBuffNames;
-    const worldBuffNamesCnVal = item.worldBuffNames ? item.worldBuffNames.map(name => loctab[name] || name) : undefined;
+    const worldBuffNamesCnVal = item.worldBuffNames
+      ? item.worldBuffNames.map((name) => loctab[name] || name)
+      : undefined;
 
     languageData.kr.items.push({
       ...baseEntry,
@@ -2580,7 +2792,7 @@ function convertUIListDataToLanguageSpecific(uiListData, outputDir, loctab = {})
     if (!kr || !loctab) return kr;
     try {
       const tokens = kr.split(/\s+/).filter(Boolean);
-      const translated = tokens.map(t => (loctab[t] !== undefined ? loctab[t] : t));
+      const translated = tokens.map((t) => (loctab[t] !== undefined ? loctab[t] : t));
       return translated.join(' ');
     } catch {
       return kr;
@@ -2660,7 +2872,7 @@ function convertLocalizationTable(inputPath, outputPath) {
 
   let content = fs.readFileSync(inputPath, 'utf8');
   // Remove UTF-8 BOM if present (otherwise first key gets corrupted)
-  if (content.charCodeAt(0) === 0xFEFF) {
+  if (content.charCodeAt(0) === 0xfeff) {
     content = content.slice(1);
   }
   // Handle both Windows (CRLF) and Unix (LF) line endings
@@ -2923,7 +3135,9 @@ function buildHotTimeBuffLookup(cmsDir, outputDir, loctab = {}) {
     console.log(`   📁 Using ${hotTimeBuffInfo.usedFile}`);
 
     const hotTimeBuffData = loadJson5File(hotTimeBuffInfo.path);
-    const worldBuffData = fs.existsSync(worldBuffInfo.path) ? loadJson5File(worldBuffInfo.path) : null;
+    const worldBuffData = fs.existsSync(worldBuffInfo.path)
+      ? loadJson5File(worldBuffInfo.path)
+      : null;
 
     if (!hotTimeBuffData || !hotTimeBuffData.HotTimeBuff) {
       return null;
@@ -2941,12 +3155,15 @@ function buildHotTimeBuffLookup(cmsDir, outputDir, loctab = {}) {
 
     // Convert HotTimeBuff data (filter by localBitflag)
     const items = Object.values(hotTimeBuffData.HotTimeBuff)
-      .filter(item => item && item.id && !isFilteredByCountryCode(item.localBitflag))
+      .filter((item) => item && item.id && !isFilteredByCountryCode(item.localBitflag))
       .map((item) => {
         const startDateISO = item.startDate ? new Date(item.startDate).toISOString() : null;
         const endDateISO = item.endDate ? new Date(item.endDate).toISOString() : null;
-        const worldBuffNames = (item.worldBuffId || []).map(id => worldBuffMap[id] || `Unknown (${id})`);
-        const name = worldBuffNames.length > 0 ? worldBuffNames.join(', ') : `HotTimeBuff ${item.id}`;
+        const worldBuffNames = (item.worldBuffId || []).map(
+          (id) => worldBuffMap[id] || `Unknown (${id})`
+        );
+        const name =
+          worldBuffNames.length > 0 ? worldBuffNames.join(', ') : `HotTimeBuff ${item.id}`;
 
         return {
           id: item.id,
@@ -2994,8 +3211,6 @@ function buildEventPageLookup(cmsDir, outputDir, loctab = {}) {
       return null;
     }
 
-
-
     const pageGroupNames = {
       0: 'Normal',
       1: 'Attendance',
@@ -3006,17 +3221,15 @@ function buildEventPageLookup(cmsDir, outputDir, loctab = {}) {
 
     // Filter by localBitflag for current country code
     const items = Object.values(eventPageData.EventPage)
-      .filter(item => item && item.id && !isFilteredByCountryCode(item.localBitflag))
+      .filter((item) => item && item.id && !isFilteredByCountryCode(item.localBitflag))
       .map((item) => {
-
-
         // Prepare KR fields only; CN will be computed via loctab during conversion
         const nameKr = item.name || '';
         const descKr = item.desc || '';
 
         return {
           id: item.id,
-          name: nameKr,  // Use Korean name; conversion step will localize per language
+          name: nameKr, // Use Korean name; conversion step will localize per language
           nameKr: nameKr,
           // Do NOT set nameEn/nameCn here to avoid blocking localization
           order: item.order || 0,
@@ -3086,20 +3299,17 @@ function buildLiveEventLookup(cmsDir, outputDir, loctab = {}) {
       return null;
     }
 
-
-
     // Filter by localBitflag for current country code
     const items = Object.values(liveEventData.LiveEvent)
-      .filter(item => item && item.id && !isFilteredByCountryCode(item.localBitflag))
+      .filter((item) => item && item.id && !isFilteredByCountryCode(item.localBitflag))
       .map((item) => {
-
         // Prepare KR fields only; CN will be computed via loctab during conversion
         const nameKr = item.name || '';
         const descKr = item.description || '';
 
         return {
           id: item.id,
-          name: nameKr,  // Use Korean name; conversion step will localize per language
+          name: nameKr, // Use Korean name; conversion step will localize per language
           nameKr: nameKr,
           // Do NOT set nameEn/nameCn here to avoid blocking localization
           description: descKr,
@@ -3144,12 +3354,16 @@ function buildMateRecruitingGroupLookup(cmsDir, outputDir, loctab = {}) {
     }
 
     if (!fs.existsSync(mateTemplateInfo.path) || !fs.existsSync(townInfo.path)) {
-      console.log(`   ⚠️  ${mateTemplateInfo.usedFile} or ${townInfo.usedFile} not found, skipping...`);
+      console.log(
+        `   ⚠️  ${mateTemplateInfo.usedFile} or ${townInfo.usedFile} not found, skipping...`
+      );
       return null;
     }
 
     if (!fs.existsSync(mateInfo.path) || !fs.existsSync(characterInfo.path)) {
-      console.log(`   ⚠️  ${mateInfo.usedFile} or ${characterInfo.usedFile} not found, falling back to tokenized name translation...`);
+      console.log(
+        `   ⚠️  ${mateInfo.usedFile} or ${characterInfo.usedFile} not found, falling back to tokenized name translation...`
+      );
     }
 
     console.log(`   📁 Using ${mrgInfo.usedFile}, ${mateInfo.usedFile}`);
@@ -3157,7 +3371,9 @@ function buildMateRecruitingGroupLookup(cmsDir, outputDir, loctab = {}) {
     const mateRecruitingGroupData = loadJson5File(mrgInfo.path);
     const mateTemplateData = loadJson5File(mateTemplateInfo.path);
     const mateData = fs.existsSync(mateInfo.path) ? loadJson5File(mateInfo.path) : null;
-    const characterData = fs.existsSync(characterInfo.path) ? loadJson5File(characterInfo.path) : null;
+    const characterData = fs.existsSync(characterInfo.path)
+      ? loadJson5File(characterInfo.path)
+      : null;
     const townData = loadJson5File(townInfo.path);
 
     if (!mateRecruitingGroupData || !mateRecruitingGroupData.MateRecruitingGroup) {
@@ -3172,8 +3388,8 @@ function buildMateRecruitingGroupLookup(cmsDir, outputDir, loctab = {}) {
     const mateNameMap = {};
     const mateLocalBitFlagMap = {}; // Store Mate's localBitFlag for filtering
     const mateTemplates = mateTemplateData.MateTemplate || {};
-    const matesTable = (mateData && mateData.Mate) ? mateData.Mate : {};
-    const characterTable = (characterData && characterData.Character) ? characterData.Character : {};
+    const matesTable = mateData && mateData.Mate ? mateData.Mate : {};
+    const characterTable = characterData && characterData.Character ? characterData.Character : {};
     Object.values(mateTemplates).forEach((mate) => {
       if (mate && mate.mateId && mate.name) {
         const cleanKr = removeCommentFromName(mate.name);
@@ -3187,21 +3403,24 @@ function buildMateRecruitingGroupLookup(cmsDir, outputDir, loctab = {}) {
         }
 
         // Try to resolve Character from Mate -> Character
-        const character = mateRow && mateRow.characterId ? characterTable[mateRow.characterId] : null;
+        const character =
+          mateRow && mateRow.characterId ? characterTable[mateRow.characterId] : null;
 
         let nameCn = '';
         if (character) {
           const firstKr = removeParentheses(removeCommentFromName(character.firstName || ''));
-          const lastKr = removeParentheses(removeCommentFromName(character.lastName || character.familyName || ''));
-          const firstCn = firstKr ? (loctab[firstKr] || firstKr) : '';
-          const lastCn = lastKr ? (loctab[lastKr] || lastKr) : '';
-          nameCn = (firstCn && lastCn) ? `${firstCn} ${lastCn}` : (firstCn || lastCn || '');
+          const lastKr = removeParentheses(
+            removeCommentFromName(character.lastName || character.familyName || '')
+          );
+          const firstCn = firstKr ? loctab[firstKr] || firstKr : '';
+          const lastCn = lastKr ? loctab[lastKr] || lastKr : '';
+          nameCn = firstCn && lastCn ? `${firstCn} ${lastCn}` : firstCn || lastCn || '';
         }
 
         // Fallback: token-wise translation from template name
         if (!nameCn) {
           const tokens = cleanKr.split(/\s+/).filter(Boolean);
-          const nameCnTokens = tokens.map(t => (loctab[t] !== undefined ? loctab[t] : t));
+          const nameCnTokens = tokens.map((t) => (loctab[t] !== undefined ? loctab[t] : t));
           nameCn = nameCnTokens.join(' ');
         }
 
@@ -3232,7 +3451,7 @@ function buildMateRecruitingGroupLookup(cmsDir, outputDir, loctab = {}) {
 
     // Convert MateRecruitingGroup data (filter by Mate's localBitFlag)
     const items = Object.values(mateRecruitingGroupData.MateRecruitingGroup)
-      .filter(item => {
+      .filter((item) => {
         if (!item || !item.id) return false;
         // Filter by Mate's localBitFlag
         const mateLocalBitFlag = mateLocalBitFlagMap[item.mateId];
@@ -3249,9 +3468,9 @@ function buildMateRecruitingGroupLookup(cmsDir, outputDir, loctab = {}) {
 
         // Get town info for this group (all languages with IDs)
         const townsList = groupToTownsMap[item.group] || [];
-        const townNamesKr = townsList.map(t => t.nameKr).join(', ');
-        const townNamesEn = townsList.map(t => t.nameEn).join(', ');
-        const townNamesCn = townsList.map(t => t.nameCn).join(', ');
+        const townNamesKr = townsList.map((t) => t.nameKr).join(', ');
+        const townNamesEn = townsList.map((t) => t.nameEn).join(', ');
+        const townNamesCn = townsList.map((t) => t.nameCn).join(', ');
 
         // Build KR name with KR tags
         const buildNameKr = (mateName, townNames) => {
@@ -3307,9 +3526,10 @@ function buildMateRecruitingGroupLookup(cmsDir, outputDir, loctab = {}) {
         };
 
         // Calculate probability percentage
-        const probability = item.Ratio && item.Ratio < 10000 && !item.isMustAppear
-          ? (item.Ratio / 100).toFixed(0)
-          : null;
+        const probability =
+          item.Ratio && item.Ratio < 10000 && !item.isMustAppear
+            ? (item.Ratio / 100).toFixed(0)
+            : null;
 
         return {
           ...item,
@@ -3392,7 +3612,7 @@ function buildOceanNpcAreaSpawnerLookup(cmsDir, outputDir, loctab = {}) {
 
     // Convert OceanNpcAreaSpawner data (filter by localBitFlag)
     const items = Object.values(oceanNpcAreaSpawnerData.OceanNpcAreaSpawner)
-      .filter(item => item && item.id && !isFilteredByCountryCode(item.localBitFlag))
+      .filter((item) => item && item.id && !isFilteredByCountryCode(item.localBitFlag))
       .map((item) => {
         const npcExists = !!oceanNpcNameMap[item.oceanNpcId];
         const npcNames = oceanNpcNameMap[item.oceanNpcId] || {
@@ -3464,7 +3684,7 @@ function buildCashShopLookup(cmsDir, outputDir, loctab = {}) {
     }
 
     // countryCode for filtering - use global settings
-    const countryCodeMask = global.COUNTRY_CODE_MASK || (1 << 6); // default to CHINA
+    const countryCodeMask = global.COUNTRY_CODE_MASK || 1 << 6; // default to CHINA
 
     // Helper function to check if item passes country filter
     const isAvailableForCountry = (item) => {
@@ -3674,7 +3894,10 @@ Examples:
     const rewardTypeList = generateRewardTypeList(lookupTable);
     const typeListFile = path.join(outputDir, 'reward-type-list.json');
     fs.writeFileSync(typeListFile, JSON.stringify(rewardTypeList, null, 2), 'utf8');
-    generatedFiles.push({ name: 'reward-type-list.json', description: 'REWARD_TYPE dropdown list' });
+    generatedFiles.push({
+      name: 'reward-type-list.json',
+      description: 'REWARD_TYPE dropdown list',
+    });
 
     // Generate and save language-specific reward lookup files
     const localizations = generateLocalizations(lookupTable);
@@ -3712,9 +3935,18 @@ Examples:
 
     const hotTimeBuff = buildHotTimeBuffLookup(cmsDir, outputDir, loctab);
     if (hotTimeBuff) {
-      generatedFiles.push({ name: 'hottimebuff-lookup-kr.json', description: 'HotTimeBuff (Korean)' });
-      generatedFiles.push({ name: 'hottimebuff-lookup-en.json', description: 'HotTimeBuff (English)' });
-      generatedFiles.push({ name: 'hottimebuff-lookup-zh.json', description: 'HotTimeBuff (Chinese)' });
+      generatedFiles.push({
+        name: 'hottimebuff-lookup-kr.json',
+        description: 'HotTimeBuff (Korean)',
+      });
+      generatedFiles.push({
+        name: 'hottimebuff-lookup-en.json',
+        description: 'HotTimeBuff (English)',
+      });
+      generatedFiles.push({
+        name: 'hottimebuff-lookup-zh.json',
+        description: 'HotTimeBuff (Chinese)',
+      });
     }
 
     const eventPage = buildEventPageLookup(cmsDir, outputDir, loctab);
@@ -3733,21 +3965,42 @@ Examples:
 
     const mateRecruiting = buildMateRecruitingGroupLookup(cmsDir, outputDir, loctab);
     if (mateRecruiting) {
-      generatedFiles.push({ name: 'materecruiting-lookup-kr.json', description: 'MateRecruiting (Korean)' });
-      generatedFiles.push({ name: 'materecruiting-lookup-en.json', description: 'MateRecruiting (English)' });
-      generatedFiles.push({ name: 'materecruiting-lookup-zh.json', description: 'MateRecruiting (Chinese)' });
+      generatedFiles.push({
+        name: 'materecruiting-lookup-kr.json',
+        description: 'MateRecruiting (Korean)',
+      });
+      generatedFiles.push({
+        name: 'materecruiting-lookup-en.json',
+        description: 'MateRecruiting (English)',
+      });
+      generatedFiles.push({
+        name: 'materecruiting-lookup-zh.json',
+        description: 'MateRecruiting (Chinese)',
+      });
     }
 
     const oceanNpcArea = buildOceanNpcAreaSpawnerLookup(cmsDir, outputDir, loctab);
     if (oceanNpcArea) {
-      generatedFiles.push({ name: 'oceannpcarea-lookup-kr.json', description: 'OceanNpcArea (Korean)' });
-      generatedFiles.push({ name: 'oceannpcarea-lookup-en.json', description: 'OceanNpcArea (English)' });
-      generatedFiles.push({ name: 'oceannpcarea-lookup-zh.json', description: 'OceanNpcArea (Chinese)' });
+      generatedFiles.push({
+        name: 'oceannpcarea-lookup-kr.json',
+        description: 'OceanNpcArea (Korean)',
+      });
+      generatedFiles.push({
+        name: 'oceannpcarea-lookup-en.json',
+        description: 'OceanNpcArea (English)',
+      });
+      generatedFiles.push({
+        name: 'oceannpcarea-lookup-zh.json',
+        description: 'OceanNpcArea (Chinese)',
+      });
     }
 
     const cashShop = buildCashShopLookup(cmsDir, outputDir, loctab);
     if (cashShop) {
-      generatedFiles.push({ name: 'cashshop-lookup.json', description: 'CashShop (Unified Multi-Language)' });
+      generatedFiles.push({
+        name: 'cashshop-lookup.json',
+        description: 'CashShop (Unified Multi-Language)',
+      });
     }
   }
 
@@ -3759,7 +4012,7 @@ Examples:
   console.log('╚════════════════════════════════════════════════════════════════╝\n');
 
   console.log('📁 Generated files:\n');
-  generatedFiles.forEach(file => {
+  generatedFiles.forEach((file) => {
     console.log(`   ✓ ${file.name}`);
     console.log(`     ${file.description}\n`);
   });

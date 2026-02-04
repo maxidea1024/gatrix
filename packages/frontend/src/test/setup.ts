@@ -1,7 +1,7 @@
-import "@testing-library/jest-dom";
-import { expect, afterEach } from "vitest";
-import { cleanup } from "@testing-library/react";
-import * as matchers from "@testing-library/jest-dom/matchers";
+import '@testing-library/jest-dom';
+import { expect, afterEach } from 'vitest';
+import { cleanup } from '@testing-library/react';
+import * as matchers from '@testing-library/jest-dom/matchers';
 
 // Extend Vitest's expect with jest-dom matchers
 expect.extend(matchers);
@@ -28,7 +28,7 @@ global.ResizeObserver = class ResizeObserver {
 };
 
 // Mock matchMedia
-Object.defineProperty(window, "matchMedia", {
+Object.defineProperty(window, 'matchMedia', {
   writable: true,
   value: (query: string) => ({
     matches: false,
@@ -43,7 +43,7 @@ Object.defineProperty(window, "matchMedia", {
 });
 
 // Mock scrollTo
-Object.defineProperty(window, "scrollTo", {
+Object.defineProperty(window, 'scrollTo', {
   writable: true,
   value: () => {},
 });
@@ -55,12 +55,12 @@ const localStorageMock = {
   removeItem: (key: string) => {},
   clear: () => {},
 };
-Object.defineProperty(window, "localStorage", {
+Object.defineProperty(window, 'localStorage', {
   value: localStorageMock,
 });
 
 // Mock sessionStorage
-Object.defineProperty(window, "sessionStorage", {
+Object.defineProperty(window, 'sessionStorage', {
   value: localStorageMock,
 });
 

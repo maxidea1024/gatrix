@@ -1,18 +1,12 @@
-import { apiService } from "./api";
-import {
-  Invitation,
-  CreateInvitationRequest,
-  InvitationResponse,
-} from "../types/invitation";
+import { apiService } from './api';
+import { Invitation, CreateInvitationRequest, InvitationResponse } from '../types/invitation';
 
 class InvitationService {
-  private readonly ADMIN_BASE_URL = "/admin/invitations";
-  private readonly PUBLIC_BASE_URL = "/invitations";
+  private readonly ADMIN_BASE_URL = '/admin/invitations';
+  private readonly PUBLIC_BASE_URL = '/invitations';
 
   // Admin: create invitation
-  async createInvitation(
-    data: CreateInvitationRequest,
-  ): Promise<InvitationResponse> {
+  async createInvitation(data: CreateInvitationRequest): Promise<InvitationResponse> {
     const response = await apiService.post(this.ADMIN_BASE_URL, data);
     return response.data;
   }
@@ -37,12 +31,8 @@ class InvitationService {
   }
 
   // Public: validate invitation token
-  async validateInvitation(
-    token: string,
-  ): Promise<{ valid: boolean; invitation?: Invitation }> {
-    const response = await apiService.get(
-      `${this.PUBLIC_BASE_URL}/validate/${token}`,
-    );
+  async validateInvitation(token: string): Promise<{ valid: boolean; invitation?: Invitation }> {
+    const response = await apiService.get(`${this.PUBLIC_BASE_URL}/validate/${token}`);
     return response.data;
   }
 
@@ -54,14 +44,14 @@ class InvitationService {
       password: string;
       email: string;
       fullName: string;
-    },
+    }
   ): Promise<void> {
     await apiService.post(`${this.PUBLIC_BASE_URL}/accept/${token}`, userData);
   }
 
   generateInviteUrl(token: string): string {
     if (!token) {
-      return "Invalid invitation token";
+      return 'Invalid invitation token';
     }
     const baseUrl = window.location.origin;
     return `${baseUrl}/signup?invite=${token}`;

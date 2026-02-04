@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Box,
   Typography,
@@ -23,40 +23,34 @@ import {
   DialogActions,
   LinearProgress,
   Menu,
-} from "@mui/material";
+} from '@mui/material';
 import {
   History as HistoryIcon,
   Search as SearchIcon,
   ViewColumn as ViewColumnIcon,
   Download as DownloadIcon,
   ContentCopy as ContentCopyIcon,
-} from "@mui/icons-material";
-import { useSnackbar } from "notistack";
-import { useTranslation } from "react-i18next";
-import SimplePagination from "@/components/common/SimplePagination";
-import { copyToClipboardWithNotification } from "@/utils/clipboard";
-import { useDebounce } from "@/hooks/useDebounce";
-import { useGlobalPageSize } from "@/hooks/useGlobalPageSize";
+} from '@mui/icons-material';
+import { useSnackbar } from 'notistack';
+import { useTranslation } from 'react-i18next';
+import SimplePagination from '@/components/common/SimplePagination';
+import { copyToClipboardWithNotification } from '@/utils/clipboard';
+import { useDebounce } from '@/hooks/useDebounce';
+import { useGlobalPageSize } from '@/hooks/useGlobalPageSize';
 import DynamicFilterBar, {
   ActiveFilter,
   FilterDefinition,
-} from "@/components/common/DynamicFilterBar";
-import EmptyState from "@/components/common/EmptyState";
-import {
-  couponService,
-  CouponSetting,
-  UsageRecord,
-} from "@/services/couponService";
+} from '@/components/common/DynamicFilterBar';
+import EmptyState from '@/components/common/EmptyState';
+import { couponService, CouponSetting, UsageRecord } from '@/services/couponService';
 import {
   formatDateTime,
   getStoredTimezone,
   formatRelativeTime,
   formatDateTimeDetailed,
-} from "@/utils/dateFormat";
-import { useI18n } from "@/contexts/I18nContext";
-import ColumnSettingsDialog, {
-  ColumnConfig,
-} from "@/components/common/ColumnSettingsDialog";
+} from '@/utils/dateFormat';
+import { useI18n } from '@/contexts/I18nContext';
+import ColumnSettingsDialog, { ColumnConfig } from '@/components/common/ColumnSettingsDialog';
 
 // Coupon Usage page (admin view of redemption records)
 const CouponUsagePage: React.FC = () => {
@@ -80,181 +74,167 @@ const CouponUsagePage: React.FC = () => {
   const [exportProcessedCount, setExportProcessedCount] = useState(0);
   const [exportError, setExportError] = useState<string | null>(null);
   const [exportSuccess, setExportSuccess] = useState(false);
-  const [exportFormat, setExportFormat] = useState<"csv" | "xlsx">("csv");
-  const [exportMenuAnchor, setExportMenuAnchor] = useState<null | HTMLElement>(
-    null,
-  );
+  const [exportFormat, setExportFormat] = useState<'csv' | 'xlsx'>('csv');
+  const [exportMenuAnchor, setExportMenuAnchor] = useState<null | HTMLElement>(null);
   const exportAbortControllerRef = React.useRef<AbortController | null>(null);
 
   // search & dynamic filters
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
 
   // derive individual filter values (stable for deps)
   const settingIdFilter = useMemo(
-    () =>
-      (activeFilters.find((f) => f.key === "settingId")?.value as string) || "",
-    [activeFilters],
+    () => (activeFilters.find((f) => f.key === 'settingId')?.value as string) || '',
+    [activeFilters]
   );
   const platformFilter = useMemo(
-    () =>
-      (activeFilters.find((f) => f.key === "platform")?.value as string) || "",
-    [activeFilters],
+    () => (activeFilters.find((f) => f.key === 'platform')?.value as string) || '',
+    [activeFilters]
   );
   const channelFilter = useMemo(
-    () =>
-      (activeFilters.find((f) => f.key === "channel")?.value as string) || "",
-    [activeFilters],
+    () => (activeFilters.find((f) => f.key === 'channel')?.value as string) || '',
+    [activeFilters]
   );
   const subChannelFilter = useMemo(
-    () =>
-      (activeFilters.find((f) => f.key === "subChannel")?.value as string) ||
-      "",
-    [activeFilters],
+    () => (activeFilters.find((f) => f.key === 'subChannel')?.value as string) || '',
+    [activeFilters]
   );
   const worldFilter = useMemo(
-    () =>
-      (activeFilters.find((f) => f.key === "gameWorldId")?.value as string) ||
-      "",
-    [activeFilters],
+    () => (activeFilters.find((f) => f.key === 'gameWorldId')?.value as string) || '',
+    [activeFilters]
   );
   const couponCodeFilter = useMemo(
-    () =>
-      (activeFilters.find((f) => f.key === "couponCode")?.value as string) ||
-      "",
-    [activeFilters],
+    () => (activeFilters.find((f) => f.key === 'couponCode')?.value as string) || '',
+    [activeFilters]
   );
   const characterIdFilter = useMemo(
-    () =>
-      (activeFilters.find((f) => f.key === "characterId")?.value as string) ||
-      "",
-    [activeFilters],
+    () => (activeFilters.find((f) => f.key === 'characterId')?.value as string) || '',
+    [activeFilters]
   );
 
   // filter definitions
   const availableFilterDefinitions: FilterDefinition[] = [
     {
-      key: "settingId",
-      label: t("coupons.couponUsage.filters.coupon"),
-      type: "select",
+      key: 'settingId',
+      label: t('coupons.couponUsage.filters.coupon'),
+      type: 'select',
       options: settings.map((s) => ({
         value: s.id,
         label: `${s.name} (${s.type})`,
       })),
     },
     {
-      key: "couponCode",
-      label: t("coupons.couponUsage.filters.couponCode"),
-      type: "text",
-      placeholder: t("coupons.couponUsage.filters.couponCode") as string,
+      key: 'couponCode',
+      label: t('coupons.couponUsage.filters.couponCode'),
+      type: 'text',
+      placeholder: t('coupons.couponUsage.filters.couponCode') as string,
     },
     {
-      key: "platform",
-      label: t("coupons.couponUsage.filters.platform"),
-      type: "text",
-      placeholder: t("coupons.couponUsage.filters.platform") as string,
+      key: 'platform',
+      label: t('coupons.couponUsage.filters.platform'),
+      type: 'text',
+      placeholder: t('coupons.couponUsage.filters.platform') as string,
     },
     {
-      key: "channel",
-      label: t("coupons.couponUsage.filters.channel"),
-      type: "text",
-      placeholder: t("coupons.couponUsage.filters.channel") as string,
+      key: 'channel',
+      label: t('coupons.couponUsage.filters.channel'),
+      type: 'text',
+      placeholder: t('coupons.couponUsage.filters.channel') as string,
     },
     {
-      key: "subChannel",
-      label: t("coupons.couponUsage.filters.subChannel"),
-      type: "text",
-      placeholder: t("coupons.couponUsage.filters.subChannel") as string,
+      key: 'subChannel',
+      label: t('coupons.couponUsage.filters.subChannel'),
+      type: 'text',
+      placeholder: t('coupons.couponUsage.filters.subChannel') as string,
     },
     {
-      key: "gameWorldId",
-      label: t("coupons.couponUsage.filters.gameWorldId"),
-      type: "text",
-      placeholder: t("coupons.couponUsage.filters.gameWorldId") as string,
+      key: 'gameWorldId',
+      label: t('coupons.couponUsage.filters.gameWorldId'),
+      type: 'text',
+      placeholder: t('coupons.couponUsage.filters.gameWorldId') as string,
     },
     {
-      key: "characterId",
-      label: t("coupons.couponUsage.filters.characterId"),
-      type: "text",
-      placeholder: t("coupons.couponUsage.filters.characterId") as string,
+      key: 'characterId',
+      label: t('coupons.couponUsage.filters.characterId'),
+      type: 'text',
+      placeholder: t('coupons.couponUsage.filters.characterId') as string,
     },
   ];
 
   // Column settings
   const defaultColumns: ColumnConfig[] = [
     {
-      id: "couponName",
-      labelKey: "coupons.couponUsage.columns.couponName",
+      id: 'couponName',
+      labelKey: 'coupons.couponUsage.columns.couponName',
       visible: true,
     },
     {
-      id: "couponCode",
-      labelKey: "coupons.couponUsage.columns.couponCode",
+      id: 'couponCode',
+      labelKey: 'coupons.couponUsage.columns.couponCode',
       visible: true,
     },
     {
-      id: "userId",
-      labelKey: "coupons.couponUsage.columns.userId",
+      id: 'userId',
+      labelKey: 'coupons.couponUsage.columns.userId',
       visible: true,
     },
     {
-      id: "userName",
-      labelKey: "coupons.couponUsage.columns.userName",
+      id: 'userName',
+      labelKey: 'coupons.couponUsage.columns.userName',
       visible: true,
     },
     {
-      id: "characterId",
-      labelKey: "coupons.couponUsage.columns.characterId",
+      id: 'characterId',
+      labelKey: 'coupons.couponUsage.columns.characterId',
       visible: true,
     },
     {
-      id: "sequence",
-      labelKey: "coupons.couponUsage.columns.sequence",
+      id: 'sequence',
+      labelKey: 'coupons.couponUsage.columns.sequence',
       visible: true,
     },
     {
-      id: "usedAt",
-      labelKey: "coupons.couponUsage.columns.usedAt",
+      id: 'usedAt',
+      labelKey: 'coupons.couponUsage.columns.usedAt',
       visible: true,
     },
     {
-      id: "couponStartsAt",
-      labelKey: "coupons.couponUsage.columns.couponStartsAt",
+      id: 'couponStartsAt',
+      labelKey: 'coupons.couponUsage.columns.couponStartsAt',
       visible: true,
     },
     {
-      id: "couponExpiresAt",
-      labelKey: "coupons.couponUsage.columns.couponExpiresAt",
+      id: 'couponExpiresAt',
+      labelKey: 'coupons.couponUsage.columns.couponExpiresAt',
       visible: true,
     },
     {
-      id: "gameWorldId",
-      labelKey: "coupons.couponUsage.columns.gameWorldId",
+      id: 'gameWorldId',
+      labelKey: 'coupons.couponUsage.columns.gameWorldId',
       visible: true,
     },
     {
-      id: "platform",
-      labelKey: "coupons.couponUsage.columns.platform",
+      id: 'platform',
+      labelKey: 'coupons.couponUsage.columns.platform',
       visible: true,
     },
     {
-      id: "channel",
-      labelKey: "coupons.couponUsage.columns.channel",
+      id: 'channel',
+      labelKey: 'coupons.couponUsage.columns.channel',
       visible: true,
     },
     {
-      id: "subChannel",
-      labelKey: "coupons.couponUsage.columns.subChannel",
+      id: 'subChannel',
+      labelKey: 'coupons.couponUsage.columns.subChannel',
       visible: true,
     },
   ];
 
-  const [columnSettingsAnchor, setColumnSettingsAnchor] =
-    useState<HTMLElement | null>(null);
+  const [columnSettingsAnchor, setColumnSettingsAnchor] = useState<HTMLElement | null>(null);
 
   const [columns, setColumns] = useState<ColumnConfig[]>(() => {
-    const saved = localStorage.getItem("couponUsageColumns");
+    const saved = localStorage.getItem('couponUsageColumns');
     if (saved) {
       try {
         const savedColumns = JSON.parse(saved);
@@ -272,31 +252,28 @@ const CouponUsagePage: React.FC = () => {
     return defaultColumns;
   });
 
-  const visibleColumns = useMemo(
-    () => columns.filter((c) => c.visible),
-    [columns],
-  );
+  const visibleColumns = useMemo(() => columns.filter((c) => c.visible), [columns]);
 
   const handleColumnsChange = (newColumns: ColumnConfig[]) => {
     setColumns(newColumns);
-    localStorage.setItem("couponUsageColumns", JSON.stringify(newColumns));
+    localStorage.setItem('couponUsageColumns', JSON.stringify(newColumns));
   };
 
   const handleResetColumns = () => {
     setColumns(defaultColumns);
-    localStorage.setItem("couponUsageColumns", JSON.stringify(defaultColumns));
+    localStorage.setItem('couponUsageColumns', JSON.stringify(defaultColumns));
   };
 
   // Sorting state
-  const [orderBy, setOrderBy] = useState<string>("usedAt");
-  const [order, setOrder] = useState<"asc" | "desc">("desc");
+  const [orderBy, setOrderBy] = useState<string>('usedAt');
+  const [order, setOrder] = useState<'asc' | 'desc'>('desc');
 
   const handleSort = (colId: string) => {
     if (orderBy === colId) {
-      setOrder((prev) => (prev === "asc" ? "desc" : "asc"));
+      setOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'));
     } else {
       setOrderBy(colId);
-      setOrder("asc");
+      setOrder('asc');
     }
   };
 
@@ -305,45 +282,44 @@ const CouponUsagePage: React.FC = () => {
     if (!text) return;
     copyToClipboardWithNotification(
       text,
-      () =>
-        enqueueSnackbar(t("common.copiedToClipboard"), { variant: "success" }),
-      () => enqueueSnackbar(t("common.copyFailed"), { variant: "error" }),
+      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
     );
   };
 
   const sortedRecords = useMemo(() => {
     const getVal = (r: UsageRecord) => {
       switch (orderBy) {
-        case "couponName":
-          return r.couponName || "";
-        case "couponCode":
-          return r.couponCode || "";
-        case "userId":
-          return r.userId || "";
-        case "userName":
-          return r.userName || "";
-        case "sequence":
-          return String(r.sequence ?? "");
-        case "usedAt":
-          return r.usedAt || "";
-        case "couponStartsAt":
-          return r.couponStartsAt || "";
-        case "couponExpiresAt":
-          return r.couponExpiresAt || "";
-        case "gameWorldId":
-          return r.gameWorldId || "";
-        case "platform":
-          return r.platform || "";
+        case 'couponName':
+          return r.couponName || '';
+        case 'couponCode':
+          return r.couponCode || '';
+        case 'userId':
+          return r.userId || '';
+        case 'userName':
+          return r.userName || '';
+        case 'sequence':
+          return String(r.sequence ?? '');
+        case 'usedAt':
+          return r.usedAt || '';
+        case 'couponStartsAt':
+          return r.couponStartsAt || '';
+        case 'couponExpiresAt':
+          return r.couponExpiresAt || '';
+        case 'gameWorldId':
+          return r.gameWorldId || '';
+        case 'platform':
+          return r.platform || '';
         default:
-          return "";
+          return '';
       }
     };
     const arr = [...records];
     arr.sort((a, b) => {
       const av = getVal(a);
       const bv = getVal(b);
-      if (av < bv) return order === "asc" ? -1 : 1;
-      if (av > bv) return order === "asc" ? 1 : -1;
+      if (av < bv) return order === 'asc' ? -1 : 1;
+      if (av > bv) return order === 'asc' ? 1 : -1;
       return 0;
     });
     return arr;
@@ -358,9 +334,7 @@ const CouponUsagePage: React.FC = () => {
     setPage(0);
   };
   const handleFilterChange = (filterKey: string, value: any) => {
-    setActiveFilters((prev) =>
-      prev.map((f) => (f.key === filterKey ? { ...f, value } : f)),
-    );
+    setActiveFilters((prev) => prev.map((f) => (f.key === filterKey ? { ...f, value } : f)));
     setPage(0);
   };
 
@@ -404,7 +378,7 @@ const CouponUsagePage: React.FC = () => {
       subChannelFilter,
       worldFilter,
       characterIdFilter,
-    ],
+    ]
   );
 
   useEffect(() => {
@@ -412,7 +386,7 @@ const CouponUsagePage: React.FC = () => {
   }, [load]);
 
   // Export usage records to CSV or XLSX
-  const handleExport = async (format: "csv" | "xlsx") => {
+  const handleExport = async (format: 'csv' | 'xlsx') => {
     try {
       // Get user's timezone setting
       const userTimezone = getStoredTimezone();
@@ -435,52 +409,48 @@ const CouponUsagePage: React.FC = () => {
       const records = exportResult.records || [];
       const filename = exportResult.filename;
 
-      if (format === "csv") {
+      if (format === 'csv') {
         // CSV export
         const headers = Object.keys(records[0] || {});
         const csvContent = [
-          headers.join(","),
+          headers.join(','),
           ...records.map((r: any) =>
             headers
               .map((h) => {
-                const cell = r[h] || "-";
+                const cell = r[h] || '-';
                 const str = String(cell);
-                if (
-                  str.includes(",") ||
-                  str.includes('"') ||
-                  str.includes("\n")
-                ) {
+                if (str.includes(',') || str.includes('"') || str.includes('\n')) {
                   return `"${str.replace(/"/g, '""')}"`;
                 }
                 return str;
               })
-              .join(","),
+              .join(',')
           ),
-        ].join("\n");
+        ].join('\n');
 
         const blob = new Blob([csvContent], {
-          type: "text/csv;charset=utf-8;",
+          type: 'text/csv;charset=utf-8;',
         });
         const url = window.URL.createObjectURL(blob);
-        const link = document.createElement("a");
+        const link = document.createElement('a');
         link.href = url;
         link.download = `${filename}.csv`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
         window.URL.revokeObjectURL(url);
-      } else if (format === "xlsx") {
+      } else if (format === 'xlsx') {
         // XLSX export using xlsx library
-        const XLSX = await import("xlsx");
+        const XLSX = await import('xlsx');
         const ws = XLSX.utils.json_to_sheet(records);
         const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Coupon Usage");
-        const xlsxBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+        XLSX.utils.book_append_sheet(wb, ws, 'Coupon Usage');
+        const xlsxBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
         const blob = new Blob([xlsxBuffer], {
-          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         });
         const url = window.URL.createObjectURL(blob);
-        const link = document.createElement("a");
+        const link = document.createElement('a');
         link.href = url;
         link.download = `${filename}.xlsx`;
         document.body.appendChild(link);
@@ -489,15 +459,14 @@ const CouponUsagePage: React.FC = () => {
         window.URL.revokeObjectURL(url);
       }
 
-      enqueueSnackbar(t("coupons.couponSettings.exportSuccess"), {
-        variant: "success",
+      enqueueSnackbar(t('coupons.couponSettings.exportSuccess'), {
+        variant: 'success',
       });
     } catch (error: any) {
-      console.error("Export error:", error);
-      enqueueSnackbar(
-        error.message || t("coupons.couponSettings.exportError"),
-        { variant: "error" },
-      );
+      console.error('Export error:', error);
+      enqueueSnackbar(error.message || t('coupons.couponSettings.exportError'), {
+        variant: 'error',
+      });
     }
   };
 
@@ -506,9 +475,9 @@ const CouponUsagePage: React.FC = () => {
       {/* Header */}
       <Box
         sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "flex-start",
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
           mb: 3,
         }}
       >
@@ -516,13 +485,13 @@ const CouponUsagePage: React.FC = () => {
           <Typography
             variant="h4"
             gutterBottom
-            sx={{ display: "flex", alignItems: "center", gap: 1 }}
+            sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
           >
             <HistoryIcon />
-            {t("coupons.couponUsage.title")}
+            {t('coupons.couponUsage.title')}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            {t("coupons.couponUsage.subtitle")}
+            {t('coupons.couponUsage.subtitle')}
           </Typography>
         </Box>
         <Box>
@@ -532,17 +501,15 @@ const CouponUsagePage: React.FC = () => {
             onClick={(e) => setExportMenuAnchor(e.currentTarget)}
             disabled={exporting || records.length === 0}
           >
-            {exporting ? t("common.exporting") : t("common.export")}
+            {exporting ? t('common.exporting') : t('common.export')}
           </Button>
           <Menu
             anchorEl={exportMenuAnchor}
             open={Boolean(exportMenuAnchor)}
             onClose={() => setExportMenuAnchor(null)}
           >
-            <MenuItem onClick={() => handleExport("csv")}>CSV</MenuItem>
-            <MenuItem onClick={() => handleExport("xlsx")}>
-              Excel (XLSX)
-            </MenuItem>
+            <MenuItem onClick={() => handleExport('csv')}>CSV</MenuItem>
+            <MenuItem onClick={() => handleExport('xlsx')}>Excel (XLSX)</MenuItem>
           </Menu>
         </Box>
       </Box>
@@ -552,25 +519,25 @@ const CouponUsagePage: React.FC = () => {
         <CardContent>
           <Box
             sx={{
-              display: "flex",
-              alignItems: "center",
+              display: 'flex',
+              alignItems: 'center',
               gap: 2,
-              flexWrap: "nowrap",
-              justifyContent: "space-between",
+              flexWrap: 'nowrap',
+              justifyContent: 'space-between',
             }}
           >
             <Box
               sx={{
-                display: "flex",
+                display: 'flex',
                 gap: 2,
-                alignItems: "center",
-                flexWrap: "nowrap",
+                alignItems: 'center',
+                flexWrap: 'nowrap',
                 flexGrow: 1,
                 minWidth: 0,
               }}
             >
               <TextField
-                placeholder={t("common.search") || ""}
+                placeholder={t('common.search') || ''}
                 value={searchTerm}
                 onChange={(e) => {
                   setSearchTerm(e.target.value);
@@ -580,33 +547,31 @@ const CouponUsagePage: React.FC = () => {
                   minWidth: 300,
                   flexGrow: 1,
                   maxWidth: 500,
-                  "& .MuiOutlinedInput-root": {
-                    height: "40px",
-                    borderRadius: "20px",
-                    bgcolor: "background.paper",
-                    transition: "all 0.2s ease-in-out",
-                    "& fieldset": { borderColor: "divider" },
-                    "&:hover": {
-                      bgcolor: "action.hover",
-                      "& fieldset": { borderColor: "primary.light" },
+                  '& .MuiOutlinedInput-root': {
+                    height: '40px',
+                    borderRadius: '20px',
+                    bgcolor: 'background.paper',
+                    transition: 'all 0.2s ease-in-out',
+                    '& fieldset': { borderColor: 'divider' },
+                    '&:hover': {
+                      bgcolor: 'action.hover',
+                      '& fieldset': { borderColor: 'primary.light' },
                     },
-                    "&.Mui-focused": {
-                      bgcolor: "background.paper",
-                      boxShadow: "0 0 0 2px rgba(25, 118, 210, 0.1)",
-                      "& fieldset": {
-                        borderColor: "primary.main",
-                        borderWidth: "1px",
+                    '&.Mui-focused': {
+                      bgcolor: 'background.paper',
+                      boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
+                      '& fieldset': {
+                        borderColor: 'primary.main',
+                        borderWidth: '1px',
                       },
                     },
                   },
-                  "& .MuiInputBase-input": { fontSize: "0.875rem" },
+                  '& .MuiInputBase-input': { fontSize: '0.875rem' },
                 }}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <SearchIcon
-                        sx={{ color: "text.secondary", fontSize: 20 }}
-                      />
+                      <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
                     </InputAdornment>
                   ),
                 }}
@@ -623,14 +588,14 @@ const CouponUsagePage: React.FC = () => {
                 refreshDisabled={loading}
                 noWrap
                 afterFilterAddActions={
-                  <Tooltip title={t("common.columnSettings")}>
+                  <Tooltip title={t('common.columnSettings')}>
                     <IconButton
                       onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
                       sx={{
-                        bgcolor: "background.paper",
+                        bgcolor: 'background.paper',
                         border: 1,
-                        borderColor: "divider",
-                        "&:hover": { bgcolor: "action.hover" },
+                        borderColor: 'divider',
+                        '&:hover': { bgcolor: 'action.hover' },
                       }}
                     >
                       <ViewColumnIcon />
@@ -645,15 +610,13 @@ const CouponUsagePage: React.FC = () => {
 
       {/* List */}
       <Card>
-        <CardContent sx={{ p: 0, "&:last-child": { pb: 0 } }}>
+        <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
           {loading ? (
-            <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
-              <Typography color="text.secondary">
-                {t("common.loading")}
-              </Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
+              <Typography color="text.secondary">{t('common.loading')}</Typography>
             </Box>
           ) : records.length === 0 ? (
-            <EmptyState message={t("coupons.couponUsage.noRecords")} />
+            <EmptyState message={t('coupons.couponUsage.noRecords')} />
           ) : (
             <>
               <TableContainer>
@@ -663,13 +626,11 @@ const CouponUsagePage: React.FC = () => {
                       {visibleColumns.map((col) => (
                         <TableCell
                           key={col.id}
-                          sortDirection={
-                            orderBy === col.id ? order : (false as any)
-                          }
+                          sortDirection={orderBy === col.id ? order : (false as any)}
                         >
                           <TableSortLabel
                             active={orderBy === col.id}
-                            direction={orderBy === col.id ? order : "asc"}
+                            direction={orderBy === col.id ? order : 'asc'}
                             onClick={() => handleSort(col.id)}
                           >
                             {t(col.labelKey)}
@@ -683,26 +644,22 @@ const CouponUsagePage: React.FC = () => {
                       <TableRow key={r.id} hover>
                         {visibleColumns.map((col) => {
                           switch (col.id) {
-                            case "couponName":
+                            case 'couponName':
                               return (
                                 <TableCell key="couponName">
                                   <Box
                                     sx={{
-                                      display: "flex",
-                                      alignItems: "center",
+                                      display: 'flex',
+                                      alignItems: 'center',
                                       gap: 0.5,
                                     }}
                                   >
-                                    <Typography variant="body2">
-                                      {r.couponName || "-"}
-                                    </Typography>
+                                    <Typography variant="body2">{r.couponName || '-'}</Typography>
                                     {r.couponName && (
-                                      <Tooltip title={t("common.copy")}>
+                                      <Tooltip title={t('common.copy')}>
                                         <IconButton
                                           size="small"
-                                          onClick={() =>
-                                            handleCopy(r.couponName)
-                                          }
+                                          onClick={() => handleCopy(r.couponName)}
                                         >
                                           <ContentCopyIcon fontSize="inherit" />
                                         </IconButton>
@@ -711,26 +668,22 @@ const CouponUsagePage: React.FC = () => {
                                   </Box>
                                 </TableCell>
                               );
-                            case "couponCode":
+                            case 'couponCode':
                               return (
                                 <TableCell key="couponCode">
                                   <Box
                                     sx={{
-                                      display: "flex",
-                                      alignItems: "center",
+                                      display: 'flex',
+                                      alignItems: 'center',
                                       gap: 0.5,
                                     }}
                                   >
-                                    <Typography variant="body2">
-                                      {r.couponCode || "-"}
-                                    </Typography>
+                                    <Typography variant="body2">{r.couponCode || '-'}</Typography>
                                     {r.couponCode && (
-                                      <Tooltip title={t("common.copy")}>
+                                      <Tooltip title={t('common.copy')}>
                                         <IconButton
                                           size="small"
-                                          onClick={() =>
-                                            handleCopy(r.couponCode)
-                                          }
+                                          onClick={() => handleCopy(r.couponCode)}
                                         >
                                           <ContentCopyIcon fontSize="inherit" />
                                         </IconButton>
@@ -739,44 +692,37 @@ const CouponUsagePage: React.FC = () => {
                                   </Box>
                                 </TableCell>
                               );
-                            case "userId":
+                            case 'userId':
                               return (
                                 <TableCell key="userId">
                                   <Box
                                     sx={{
-                                      display: "flex",
-                                      alignItems: "center",
+                                      display: 'flex',
+                                      alignItems: 'center',
                                       gap: 0.5,
                                     }}
                                   >
-                                    <Typography variant="body2">
-                                      {r.userId}
-                                    </Typography>
-                                    <Tooltip title={t("common.copy")}>
-                                      <IconButton
-                                        size="small"
-                                        onClick={() => handleCopy(r.userId)}
-                                      >
+                                    <Typography variant="body2">{r.userId}</Typography>
+                                    <Tooltip title={t('common.copy')}>
+                                      <IconButton size="small" onClick={() => handleCopy(r.userId)}>
                                         <ContentCopyIcon fontSize="inherit" />
                                       </IconButton>
                                     </Tooltip>
                                   </Box>
                                 </TableCell>
                               );
-                            case "userName":
+                            case 'userName':
                               return (
                                 <TableCell key="userName">
                                   <Box
                                     sx={{
-                                      display: "flex",
-                                      alignItems: "center",
+                                      display: 'flex',
+                                      alignItems: 'center',
                                       gap: 0.5,
                                     }}
                                   >
-                                    <Typography variant="body2">
-                                      {r.userName}
-                                    </Typography>
-                                    <Tooltip title={t("common.copy")}>
+                                    <Typography variant="body2">{r.userName}</Typography>
+                                    <Tooltip title={t('common.copy')}>
                                       <IconButton
                                         size="small"
                                         onClick={() => handleCopy(r.userName)}
@@ -787,26 +733,22 @@ const CouponUsagePage: React.FC = () => {
                                   </Box>
                                 </TableCell>
                               );
-                            case "characterId":
+                            case 'characterId':
                               return (
                                 <TableCell key="characterId">
                                   <Box
                                     sx={{
-                                      display: "flex",
-                                      alignItems: "center",
+                                      display: 'flex',
+                                      alignItems: 'center',
                                       gap: 0.5,
                                     }}
                                   >
-                                    <Typography variant="body2">
-                                      {r.characterId || "-"}
-                                    </Typography>
+                                    <Typography variant="body2">{r.characterId || '-'}</Typography>
                                     {r.characterId && (
-                                      <Tooltip title={t("common.copy")}>
+                                      <Tooltip title={t('common.copy')}>
                                         <IconButton
                                           size="small"
-                                          onClick={() =>
-                                            handleCopy(r.characterId)
-                                          }
+                                          onClick={() => handleCopy(r.characterId)}
                                         >
                                           <ContentCopyIcon fontSize="inherit" />
                                         </IconButton>
@@ -815,108 +757,80 @@ const CouponUsagePage: React.FC = () => {
                                   </Box>
                                 </TableCell>
                               );
-                            case "sequence":
+                            case 'sequence':
                               return (
                                 <TableCell key="sequence">
-                                  <Typography variant="body2">
-                                    {r.sequence}
-                                  </Typography>
+                                  <Typography variant="body2">{r.sequence}</Typography>
                                 </TableCell>
                               );
-                            case "usedAt":
+                            case 'usedAt':
                               return (
                                 <TableCell key="usedAt">
-                                  <Tooltip
-                                    title={formatDateTimeDetailed(r.usedAt)}
-                                  >
+                                  <Tooltip title={formatDateTimeDetailed(r.usedAt)}>
                                     <Typography variant="caption">
-                                      {formatRelativeTime(
-                                        r.usedAt,
-                                        undefined,
-                                        language,
-                                      )}
+                                      {formatRelativeTime(r.usedAt, undefined, language)}
                                     </Typography>
                                   </Tooltip>
                                 </TableCell>
                               );
-                            case "couponStartsAt":
+                            case 'couponStartsAt':
                               return (
                                 <TableCell key="couponStartsAt">
                                   <Tooltip
                                     title={
                                       r.couponStartsAt
-                                        ? formatDateTimeDetailed(
-                                            r.couponStartsAt,
-                                          )
-                                        : "-"
+                                        ? formatDateTimeDetailed(r.couponStartsAt)
+                                        : '-'
                                     }
                                   >
                                     <Typography variant="caption">
                                       {r.couponStartsAt
-                                        ? formatRelativeTime(
-                                            r.couponStartsAt,
-                                            undefined,
-                                            language,
-                                          )
-                                        : "-"}
+                                        ? formatRelativeTime(r.couponStartsAt, undefined, language)
+                                        : '-'}
                                     </Typography>
                                   </Tooltip>
                                 </TableCell>
                               );
-                            case "couponExpiresAt":
+                            case 'couponExpiresAt':
                               return (
                                 <TableCell key="couponExpiresAt">
                                   <Tooltip
                                     title={
                                       r.couponExpiresAt
-                                        ? formatDateTimeDetailed(
-                                            r.couponExpiresAt,
-                                          )
-                                        : "-"
+                                        ? formatDateTimeDetailed(r.couponExpiresAt)
+                                        : '-'
                                     }
                                   >
                                     <Typography variant="caption">
                                       {r.couponExpiresAt
-                                        ? formatRelativeTime(
-                                            r.couponExpiresAt,
-                                            undefined,
-                                            language,
-                                          )
-                                        : "-"}
+                                        ? formatRelativeTime(r.couponExpiresAt, undefined, language)
+                                        : '-'}
                                     </Typography>
                                   </Tooltip>
                                 </TableCell>
                               );
-                            case "gameWorldId":
+                            case 'gameWorldId':
                               return (
                                 <TableCell key="gameWorldId">
-                                  <Typography variant="body2">
-                                    {r.gameWorldId || "-"}
-                                  </Typography>
+                                  <Typography variant="body2">{r.gameWorldId || '-'}</Typography>
                                 </TableCell>
                               );
-                            case "platform":
+                            case 'platform':
                               return (
                                 <TableCell key="platform">
-                                  <Typography variant="body2">
-                                    {r.platform || "-"}
-                                  </Typography>
+                                  <Typography variant="body2">{r.platform || '-'}</Typography>
                                 </TableCell>
                               );
-                            case "channel":
+                            case 'channel':
                               return (
                                 <TableCell key="channel">
-                                  <Typography variant="body2">
-                                    {r.channel || "-"}
-                                  </Typography>
+                                  <Typography variant="body2">{r.channel || '-'}</Typography>
                                 </TableCell>
                               );
-                            case "subChannel":
+                            case 'subChannel':
                               return (
                                 <TableCell key="subChannel">
-                                  <Typography variant="body2">
-                                    {r.subchannel || "-"}
-                                  </Typography>
+                                  <Typography variant="body2">{r.subchannel || '-'}</Typography>
                                 </TableCell>
                               );
                             default:
@@ -955,9 +869,7 @@ const CouponUsagePage: React.FC = () => {
 
       {/* Export Progress Dialog - Only show for large datasets (>1000 records) */}
       <Dialog
-        open={
-          (exporting || exportSuccess || exportError !== null) && total > 1000
-        }
+        open={(exporting || exportSuccess || exportError !== null) && total > 1000}
         onClose={() => {
           if (!exporting) {
             setExportSuccess(false);
@@ -972,16 +884,16 @@ const CouponUsagePage: React.FC = () => {
       >
         <DialogTitle>
           {exportSuccess
-            ? t("coupons.couponUsage.exportDialog.completed")
+            ? t('coupons.couponUsage.exportDialog.completed')
             : exportError
-              ? t("coupons.couponUsage.exportDialog.failed")
-              : t("coupons.couponUsage.exportDialog.title")}
+              ? t('coupons.couponUsage.exportDialog.failed')
+              : t('coupons.couponUsage.exportDialog.title')}
         </DialogTitle>
         <DialogContent sx={{ py: 3 }}>
           {exporting ? (
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
               <Typography variant="body2" color="text.secondary">
-                {t("coupons.couponUsage.exportDialog.processing")}
+                {t('coupons.couponUsage.exportDialog.processing')}
               </Typography>
               <Box>
                 <LinearProgress
@@ -992,13 +904,13 @@ const CouponUsagePage: React.FC = () => {
               </Box>
               <Box
                 sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
                 }}
               >
                 <Typography variant="body2" color="text.secondary">
-                  {t("coupons.couponUsage.exportDialog.progress", {
+                  {t('coupons.couponUsage.exportDialog.progress', {
                     processed: exportProcessedCount,
                     total: total,
                   })}
@@ -1011,18 +923,18 @@ const CouponUsagePage: React.FC = () => {
           ) : exportSuccess ? (
             <Box
               sx={{
-                display: "flex",
-                flexDirection: "column",
+                display: 'flex',
+                flexDirection: 'column',
                 gap: 2,
-                alignItems: "center",
+                alignItems: 'center',
               }}
             >
               <Typography variant="body2" color="text.secondary">
-                {t("coupons.couponUsage.exportDialog.successMessage")}
+                {t('coupons.couponUsage.exportDialog.successMessage')}
               </Typography>
             </Box>
           ) : (
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
               <Typography variant="body2" color="error">
                 {exportError}
               </Typography>
@@ -1037,7 +949,7 @@ const CouponUsagePage: React.FC = () => {
               }}
               color="error"
             >
-              {t("common.cancel")}
+              {t('common.cancel')}
             </Button>
           ) : (
             <Button
@@ -1048,7 +960,7 @@ const CouponUsagePage: React.FC = () => {
                 setExportProcessedCount(0);
               }}
             >
-              {t("common.close")}
+              {t('common.close')}
             </Button>
           )}
         </DialogActions>

@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useMemo } from "react";
-import { useAuth } from "@/hooks/useAuth";
-import { PERMISSIONS } from "@/types/permissions";
+import React, { useState, useEffect, useMemo } from 'react';
+import { useAuth } from '@/hooks/useAuth';
+import { PERMISSIONS } from '@/types/permissions';
 import {
   Box,
   Typography,
@@ -25,7 +25,7 @@ import {
   DialogActions,
   DialogContentText,
   Divider,
-} from "@mui/material";
+} from '@mui/material';
 import {
   Add as AddIcon,
   Edit as EditIcon,
@@ -36,36 +36,30 @@ import {
   Close as CloseIcon,
   Refresh as RefreshIcon,
   Code as CodeIcon,
-} from "@mui/icons-material";
-import { useTranslation } from "react-i18next";
-import { useSnackbar } from "notistack";
-import { parseApiErrorMessage } from "../../utils/errorUtils";
-import { usePlatformConfig } from "../../contexts/PlatformConfigContext";
+} from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
+import { useSnackbar } from 'notistack';
+import { parseApiErrorMessage } from '../../utils/errorUtils';
+import { usePlatformConfig } from '../../contexts/PlatformConfigContext';
 import ingamePopupNoticeService, {
   IngamePopupNotice,
   IngamePopupNoticeFilters,
-} from "../../services/ingamePopupNoticeService";
-import IngamePopupNoticeFormDialog from "../../components/game/IngamePopupNoticeFormDialog";
-import IngamePopupNoticeGuideDrawer from "../../components/game/IngamePopupNoticeGuideDrawer";
+} from '../../services/ingamePopupNoticeService';
+import IngamePopupNoticeFormDialog from '../../components/game/IngamePopupNoticeFormDialog';
+import IngamePopupNoticeGuideDrawer from '../../components/game/IngamePopupNoticeGuideDrawer';
 
-import SimplePagination from "../../components/common/SimplePagination";
+import SimplePagination from '../../components/common/SimplePagination';
 import DynamicFilterBar, {
   FilterDefinition,
   ActiveFilter,
-} from "../../components/common/DynamicFilterBar";
-import EmptyState from "../../components/common/EmptyState";
-import ColumnSettingsDialog, {
-  ColumnConfig,
-} from "../../components/common/ColumnSettingsDialog";
-import {
-  formatDateTime,
-  formatRelativeTime,
-  formatDateTimeDetailed,
-} from "../../utils/dateFormat";
-import { useI18n } from "../../contexts/I18nContext";
-import { useDebounce } from "../../hooks/useDebounce";
-import { useGlobalPageSize } from "../../hooks/useGlobalPageSize";
-import dayjs from "dayjs";
+} from '../../components/common/DynamicFilterBar';
+import EmptyState from '../../components/common/EmptyState';
+import ColumnSettingsDialog, { ColumnConfig } from '../../components/common/ColumnSettingsDialog';
+import { formatDateTime, formatRelativeTime, formatDateTimeDetailed } from '../../utils/dateFormat';
+import { useI18n } from '../../contexts/I18nContext';
+import { useDebounce } from '../../hooks/useDebounce';
+import { useGlobalPageSize } from '../../hooks/useGlobalPageSize';
+import dayjs from 'dayjs';
 
 const IngamePopupNoticesPage: React.FC = () => {
   const { t } = useTranslation();
@@ -82,80 +76,73 @@ const IngamePopupNoticesPage: React.FC = () => {
   const [rowsPerPage, setRowsPerPage] = useGlobalPageSize();
   const [loading, setLoading] = useState(true);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
   // Extract filter values with useMemo for stable references
   const isActiveFilter = useMemo(() => {
-    const filter = activeFilters.find((f) => f.key === "isActive");
+    const filter = activeFilters.find((f) => f.key === 'isActive');
     return filter?.value as string | undefined;
   }, [activeFilters]);
 
   const currentlyVisibleFilter = useMemo(() => {
-    const filter = activeFilters.find((f) => f.key === "currentlyVisible");
+    const filter = activeFilters.find((f) => f.key === 'currentlyVisible');
     return filter?.value as string | undefined;
   }, [activeFilters]);
 
   const platformFilter = useMemo(() => {
-    const filter = activeFilters.find((f) => f.key === "platform");
+    const filter = activeFilters.find((f) => f.key === 'platform');
     return filter?.value as string[] | undefined;
   }, [activeFilters]);
 
   const platformOperator = useMemo(() => {
-    const filter = activeFilters.find((f) => f.key === "platform");
+    const filter = activeFilters.find((f) => f.key === 'platform');
     return filter?.operator;
   }, [activeFilters]);
 
   // Convert filters to strings for dependency array
-  const isActiveFilterString = useMemo(
-    () => isActiveFilter || "",
-    [isActiveFilter],
-  );
+  const isActiveFilterString = useMemo(() => isActiveFilter || '', [isActiveFilter]);
   const currentlyVisibleFilterString = useMemo(
-    () => currentlyVisibleFilter || "",
-    [currentlyVisibleFilter],
+    () => currentlyVisibleFilter || '',
+    [currentlyVisibleFilter]
   );
   const platformFilterString = useMemo(
-    () => (Array.isArray(platformFilter) ? platformFilter.join(",") : ""),
-    [platformFilter],
+    () => (Array.isArray(platformFilter) ? platformFilter.join(',') : ''),
+    [platformFilter]
   );
 
   // Dialog states
   const [formDrawerOpen, setFormDrawerOpen] = useState(false);
-  const [editingNotice, setEditingNotice] = useState<IngamePopupNotice | null>(
-    null,
-  );
+  const [editingNotice, setEditingNotice] = useState<IngamePopupNotice | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [deletingNotice, setDeletingNotice] =
-    useState<IngamePopupNotice | null>(null);
+  const [deletingNotice, setDeletingNotice] = useState<IngamePopupNotice | null>(null);
   const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
   const [guideDrawerOpen, setGuideDrawerOpen] = useState(false);
 
   // Default column configuration
   const defaultColumns: ColumnConfig[] = [
-    { id: "content", labelKey: "ingamePopupNotices.content", visible: true },
+    { id: 'content', labelKey: 'ingamePopupNotices.content', visible: true },
     {
-      id: "currentlyVisible",
-      labelKey: "ingamePopupNotices.currentlyVisible",
+      id: 'currentlyVisible',
+      labelKey: 'ingamePopupNotices.currentlyVisible',
       visible: true,
     },
-    { id: "status", labelKey: "ingamePopupNotices.status", visible: true },
-    { id: "priority", labelKey: "ingamePopupNotices.priority", visible: true },
+    { id: 'status', labelKey: 'ingamePopupNotices.status', visible: true },
+    { id: 'priority', labelKey: 'ingamePopupNotices.priority', visible: true },
     {
-      id: "targeting",
-      labelKey: "ingamePopupNotices.targetingInfo",
+      id: 'targeting',
+      labelKey: 'ingamePopupNotices.targetingInfo',
       visible: true,
     },
-    { id: "period", labelKey: "ingamePopupNotices.period", visible: true },
-    { id: "createdAt", labelKey: "common.createdAt", visible: true },
+    { id: 'period', labelKey: 'ingamePopupNotices.period', visible: true },
+    { id: 'createdAt', labelKey: 'common.createdAt', visible: true },
   ];
 
   // Column settings
-  const [columnSettingsAnchor, setColumnSettingsAnchor] =
-    useState<null | HTMLElement>(null);
+  const [columnSettingsAnchor, setColumnSettingsAnchor] = useState<null | HTMLElement>(null);
   const [columns, setColumns] = useState<ColumnConfig[]>(() => {
-    const saved = localStorage.getItem("ingamePopupNoticesColumns");
+    const saved = localStorage.getItem('ingamePopupNoticesColumns');
     if (saved) {
       try {
         const savedColumns = JSON.parse(saved);
@@ -181,28 +168,28 @@ const IngamePopupNoticesPage: React.FC = () => {
   // Filter definitions
   const availableFilterDefinitions: FilterDefinition[] = [
     {
-      key: "isActive",
-      label: t("ingamePopupNotices.status"),
-      type: "select",
+      key: 'isActive',
+      label: t('ingamePopupNotices.status'),
+      type: 'select',
       options: [
-        { value: "true", label: t("common.active") },
-        { value: "false", label: t("common.inactive") },
+        { value: 'true', label: t('common.active') },
+        { value: 'false', label: t('common.inactive') },
       ],
     },
     {
-      key: "currentlyVisible",
-      label: t("ingamePopupNotices.currentlyVisible"),
-      type: "select",
+      key: 'currentlyVisible',
+      label: t('ingamePopupNotices.currentlyVisible'),
+      type: 'select',
       options: [
-        { value: "true", label: t("ingamePopupNotices.visible") },
-        { value: "false", label: t("ingamePopupNotices.notVisible") },
+        { value: 'true', label: t('ingamePopupNotices.visible') },
+        { value: 'false', label: t('ingamePopupNotices.notVisible') },
       ],
     },
     {
-      key: "platform",
-      label: t("ingamePopupNotices.targetPlatforms"),
-      type: "multiselect",
-      operator: "any_of",
+      key: 'platform',
+      label: t('ingamePopupNotices.targetPlatforms'),
+      type: 'multiselect',
+      operator: 'any_of',
       allowOperatorToggle: true,
       options: platforms.map((platform) => ({
         value: platform.value,
@@ -212,10 +199,7 @@ const IngamePopupNoticesPage: React.FC = () => {
   ];
 
   // Visible columns
-  const visibleColumns = useMemo(
-    () => columns.filter((col) => col.visible),
-    [columns],
-  );
+  const visibleColumns = useMemo(() => columns.filter((col) => col.visible), [columns]);
 
   // Load notices
   const loadNotices = async () => {
@@ -229,14 +213,11 @@ const IngamePopupNoticesPage: React.FC = () => {
       }
 
       // Apply active filters
-      if (isActiveFilter !== undefined && isActiveFilter !== "") {
-        filters.isActive = isActiveFilter === "true";
+      if (isActiveFilter !== undefined && isActiveFilter !== '') {
+        filters.isActive = isActiveFilter === 'true';
       }
-      if (
-        currentlyVisibleFilter !== undefined &&
-        currentlyVisibleFilter !== ""
-      ) {
-        filters.currentlyVisible = currentlyVisibleFilter === "true";
+      if (currentlyVisibleFilter !== undefined && currentlyVisibleFilter !== '') {
+        filters.currentlyVisible = currentlyVisibleFilter === 'true';
       }
       if (Array.isArray(platformFilter) && platformFilter.length > 0) {
         filters.platform = platformFilter;
@@ -246,24 +227,23 @@ const IngamePopupNoticesPage: React.FC = () => {
       const result = await ingamePopupNoticeService.getIngamePopupNotices(
         page + 1,
         rowsPerPage,
-        filters,
+        filters
       );
 
       // Validate response
-      if (result && typeof result === "object") {
+      if (result && typeof result === 'object') {
         setNotices(result.notices || []);
         setTotal(result.total || 0);
       } else {
-        console.error("Invalid response format:", result);
+        console.error('Invalid response format:', result);
         setNotices([]);
         setTotal(0);
       }
     } catch (error: any) {
-      console.error("Failed to load ingame popup notices:", error);
-      enqueueSnackbar(
-        parseApiErrorMessage(error, "ingamePopupNotices.loadFailed"),
-        { variant: "error" },
-      );
+      console.error('Failed to load ingame popup notices:', error);
+      enqueueSnackbar(parseApiErrorMessage(error, 'ingamePopupNotices.loadFailed'), {
+        variant: 'error',
+      });
       setNotices([]);
       setTotal(0);
     } finally {
@@ -295,38 +275,25 @@ const IngamePopupNoticesPage: React.FC = () => {
   };
 
   const handleDynamicFilterChange = (filterKey: string, value: any) => {
-    const newFilters = activeFilters.map((f) =>
-      f.key === filterKey ? { ...f, value } : f,
-    );
+    const newFilters = activeFilters.map((f) => (f.key === filterKey ? { ...f, value } : f));
     setActiveFilters(newFilters);
     setPage(0);
   };
 
-  const handleOperatorChange = (
-    filterKey: string,
-    operator: "any_of" | "include_all",
-  ) => {
-    const newFilters = activeFilters.map((f) =>
-      f.key === filterKey ? { ...f, operator } : f,
-    );
+  const handleOperatorChange = (filterKey: string, operator: 'any_of' | 'include_all') => {
+    const newFilters = activeFilters.map((f) => (f.key === filterKey ? { ...f, operator } : f));
     setActiveFilters(newFilters);
   };
 
   // Column handlers
   const handleColumnsChange = (newColumns: ColumnConfig[]) => {
     setColumns(newColumns);
-    localStorage.setItem(
-      "ingamePopupNoticesColumns",
-      JSON.stringify(newColumns),
-    );
+    localStorage.setItem('ingamePopupNoticesColumns', JSON.stringify(newColumns));
   };
 
   const handleResetColumns = () => {
     setColumns(defaultColumns);
-    localStorage.setItem(
-      "ingamePopupNoticesColumns",
-      JSON.stringify(defaultColumns),
-    );
+    localStorage.setItem('ingamePopupNoticesColumns', JSON.stringify(defaultColumns));
   };
 
   // Search handler
@@ -373,17 +340,16 @@ const IngamePopupNoticesPage: React.FC = () => {
 
     try {
       await ingamePopupNoticeService.deleteIngamePopupNotice(deletingNotice.id);
-      enqueueSnackbar(t("ingamePopupNotices.deleteSuccess"), {
-        variant: "success",
+      enqueueSnackbar(t('ingamePopupNotices.deleteSuccess'), {
+        variant: 'success',
       });
       setDeleteDialogOpen(false);
       setDeletingNotice(null);
       loadNotices();
     } catch (error: any) {
-      enqueueSnackbar(
-        parseApiErrorMessage(error, "ingamePopupNotices.deleteFailed"),
-        { variant: "error" },
-      );
+      enqueueSnackbar(parseApiErrorMessage(error, 'ingamePopupNotices.deleteFailed'), {
+        variant: 'error',
+      });
     }
   };
 
@@ -394,38 +360,34 @@ const IngamePopupNoticesPage: React.FC = () => {
 
   const confirmBulkDelete = async () => {
     try {
-      await ingamePopupNoticeService.deleteMultipleIngamePopupNotices(
-        selectedIds,
-      );
+      await ingamePopupNoticeService.deleteMultipleIngamePopupNotices(selectedIds);
       enqueueSnackbar(
-        t("ingamePopupNotices.bulkDeleteSuccess", {
+        t('ingamePopupNotices.bulkDeleteSuccess', {
           count: selectedIds.length,
         }),
-        { variant: "success" },
+        { variant: 'success' }
       );
       setBulkDeleteDialogOpen(false);
       setSelectedIds([]);
       loadNotices();
     } catch (error: any) {
-      enqueueSnackbar(
-        parseApiErrorMessage(error, "ingamePopupNotices.bulkDeleteFailed"),
-        { variant: "error" },
-      );
+      enqueueSnackbar(parseApiErrorMessage(error, 'ingamePopupNotices.bulkDeleteFailed'), {
+        variant: 'error',
+      });
     }
   };
 
   const handleToggleActive = async (notice: IngamePopupNotice) => {
     try {
       await ingamePopupNoticeService.toggleActive(notice.id);
-      enqueueSnackbar(t("ingamePopupNotices.toggleSuccess"), {
-        variant: "success",
+      enqueueSnackbar(t('ingamePopupNotices.toggleSuccess'), {
+        variant: 'success',
       });
       loadNotices();
     } catch (error: any) {
-      enqueueSnackbar(
-        parseApiErrorMessage(error, "ingamePopupNotices.toggleFailed"),
-        { variant: "error" },
-      );
+      enqueueSnackbar(parseApiErrorMessage(error, 'ingamePopupNotices.toggleFailed'), {
+        variant: 'error',
+      });
     }
   };
 
@@ -434,9 +396,9 @@ const IngamePopupNoticesPage: React.FC = () => {
       {/* Header */}
       <Box
         sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "flex-start",
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
           mb: 3,
         }}
       >
@@ -444,23 +406,19 @@ const IngamePopupNoticesPage: React.FC = () => {
           <Typography
             variant="h4"
             gutterBottom
-            sx={{ display: "flex", alignItems: "center", gap: 1 }}
+            sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
           >
             <NotificationsIcon />
-            {t("ingamePopupNotices.title")}
+            {t('ingamePopupNotices.title')}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            {t("ingamePopupNotices.subtitle")}
+            {t('ingamePopupNotices.subtitle')}
           </Typography>
         </Box>
-        <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
           {canManage && (
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={handleCreate}
-            >
-              {t("ingamePopupNotices.createNotice")}
+            <Button variant="contained" startIcon={<AddIcon />} onClick={handleCreate}>
+              {t('ingamePopupNotices.createNotice')}
             </Button>
           )}
           <Divider orientation="vertical" flexItem sx={{ my: 1 }} />
@@ -469,7 +427,7 @@ const IngamePopupNoticesPage: React.FC = () => {
             startIcon={<CodeIcon />}
             onClick={() => setGuideDrawerOpen(true)}
           >
-            {t("ingamePopupNotices.sdkGuide")}
+            {t('ingamePopupNotices.sdkGuide')}
           </Button>
         </Box>
       </Box>
@@ -479,64 +437,62 @@ const IngamePopupNoticesPage: React.FC = () => {
         <CardContent>
           <Box
             sx={{
-              display: "flex",
-              alignItems: "center",
+              display: 'flex',
+              alignItems: 'center',
               gap: 2,
-              flexWrap: "nowrap",
-              justifyContent: "space-between",
+              flexWrap: 'nowrap',
+              justifyContent: 'space-between',
             }}
           >
             <Box
               sx={{
-                display: "flex",
+                display: 'flex',
                 gap: 2,
-                alignItems: "center",
-                flexWrap: "nowrap",
+                alignItems: 'center',
+                flexWrap: 'nowrap',
                 flexGrow: 1,
                 minWidth: 0,
               }}
             >
               <TextField
-                placeholder={t("ingamePopupNotices.searchPlaceholder")}
+                placeholder={t('ingamePopupNotices.searchPlaceholder')}
                 value={searchTerm}
                 onChange={handleSearchChange}
                 sx={{
                   minWidth: 300,
                   flexGrow: 1,
                   maxWidth: 500,
-                  "& .MuiOutlinedInput-root": {
-                    height: "40px",
-                    borderRadius: "20px",
-                    bgcolor: "background.paper",
-                    transition: "all 0.2s ease-in-out",
-                    "& fieldset": {
-                      borderColor: "divider",
+                  '& .MuiOutlinedInput-root': {
+                    height: '40px',
+                    borderRadius: '20px',
+                    bgcolor: 'background.paper',
+                    transition: 'all 0.2s ease-in-out',
+                    '& fieldset': {
+                      borderColor: 'divider',
                     },
-                    "&:hover": {
-                      bgcolor: "action.hover",
-                      "& fieldset": {
-                        borderColor: "primary.light",
+                    '&:hover': {
+                      bgcolor: 'action.hover',
+                      '& fieldset': {
+                        borderColor: 'primary.light',
                       },
                     },
-                    "&.Mui-focused": {
-                      bgcolor: "background.paper",
-                      boxShadow: "0 0 0 2px rgba(25, 118, 210, 0.1)",
-                      "& fieldset": {
-                        borderColor: "primary.main",
-                        borderWidth: "1px",
+                    '&.Mui-focused': {
+                      bgcolor: 'background.paper',
+                      boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
+                      '& fieldset': {
+                        borderColor: 'primary.main',
+                        borderWidth: '1px',
                       },
                     },
                   },
-                  "& .MuiInputBase-input": {
-                    fontSize: "0.875rem",
+                  '& .MuiInputBase-input': {
+                    fontSize: '0.875rem',
                   },
                 }}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <SearchIcon
-                        sx={{ color: "text.secondary", fontSize: 20 }}
-                      />
+                      <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
                     </InputAdornment>
                   ),
                 }}
@@ -555,15 +511,15 @@ const IngamePopupNoticesPage: React.FC = () => {
                 refreshDisabled={loading}
                 noWrap={true}
                 afterFilterAddActions={
-                  <Tooltip title={t("users.columnSettings")}>
+                  <Tooltip title={t('users.columnSettings')}>
                     <IconButton
                       onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
                       sx={{
-                        bgcolor: "background.paper",
+                        bgcolor: 'background.paper',
                         border: 1,
-                        borderColor: "divider",
-                        "&:hover": {
-                          bgcolor: "action.hover",
+                        borderColor: 'divider',
+                        '&:hover': {
+                          bgcolor: 'action.hover',
                         },
                       }}
                     >
@@ -579,9 +535,9 @@ const IngamePopupNoticesPage: React.FC = () => {
 
       {/* Bulk Actions */}
       {selectedIds.length > 0 && (
-        <Box sx={{ mb: 2, display: "flex", gap: 1, alignItems: "center" }}>
+        <Box sx={{ mb: 2, display: 'flex', gap: 1, alignItems: 'center' }}>
           <Typography variant="body2" color="text.secondary">
-            {t("common.selectedCount", { count: selectedIds.length })}
+            {t('common.selectedCount', { count: selectedIds.length })}
           </Typography>
           <Button
             variant="outlined"
@@ -590,26 +546,24 @@ const IngamePopupNoticesPage: React.FC = () => {
             startIcon={<DeleteIcon />}
             onClick={handleBulkDelete}
           >
-            {t("common.deleteSelected")}
+            {t('common.deleteSelected')}
           </Button>
         </Box>
       )}
 
       {/* Table */}
       <Card>
-        <CardContent sx={{ p: 0, "&:last-child": { pb: 0 } }}>
+        <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
           {isInitialLoad && loading ? (
-            <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
-              <Typography color="text.secondary">
-                {t("common.loadingData")}
-              </Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
+              <Typography color="text.secondary">{t('common.loadingData')}</Typography>
             </Box>
           ) : notices.length === 0 ? (
             <EmptyState
-              message={t("ingamePopupNotices.noNoticesFound")}
+              message={t('ingamePopupNotices.noNoticesFound')}
               onAddClick={canManage ? handleCreate : undefined}
-              addButtonLabel={t("ingamePopupNotices.createNotice")}
-              subtitle={canManage ? t("common.addFirstItem") : undefined}
+              addButtonLabel={t('ingamePopupNotices.createNotice')}
+              subtitle={canManage ? t('common.addFirstItem') : undefined}
             />
           ) : (
             <>
@@ -620,28 +574,18 @@ const IngamePopupNoticesPage: React.FC = () => {
                       {canManage && (
                         <TableCell padding="checkbox">
                           <Checkbox
-                            checked={
-                              notices.length > 0 &&
-                              selectedIds.length === notices.length
-                            }
+                            checked={notices.length > 0 && selectedIds.length === notices.length}
                             indeterminate={
-                              selectedIds.length > 0 &&
-                              selectedIds.length < notices.length
+                              selectedIds.length > 0 && selectedIds.length < notices.length
                             }
                             onChange={handleSelectAll}
                           />
                         </TableCell>
                       )}
                       {visibleColumns.map((column) => (
-                        <TableCell key={column.id}>
-                          {t(column.labelKey)}
-                        </TableCell>
+                        <TableCell key={column.id}>{t(column.labelKey)}</TableCell>
                       ))}
-                      {canManage && (
-                        <TableCell align="center">
-                          {t("common.actions")}
-                        </TableCell>
-                      )}
+                      {canManage && <TableCell align="center">{t('common.actions')}</TableCell>}
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -656,31 +600,23 @@ const IngamePopupNoticesPage: React.FC = () => {
                           </TableCell>
                         )}
                         {visibleColumns.map((column) => {
-                          if (column.id === "status") {
+                          if (column.id === 'status') {
                             return (
                               <TableCell key={column.id}>
                                 <Chip
                                   label={
-                                    notice.isActive
-                                      ? t("common.active")
-                                      : t("common.inactive")
+                                    notice.isActive ? t('common.active') : t('common.inactive')
                                   }
-                                  color={
-                                    notice.isActive ? "success" : "default"
-                                  }
+                                  color={notice.isActive ? 'success' : 'default'}
                                   size="small"
                                 />
                               </TableCell>
                             );
                           }
-                          if (column.id === "currentlyVisible") {
+                          if (column.id === 'currentlyVisible') {
                             const now = dayjs();
-                            const startDate = notice.startDate
-                              ? dayjs(notice.startDate)
-                              : null;
-                            const endDate = notice.endDate
-                              ? dayjs(notice.endDate)
-                              : null;
+                            const startDate = notice.startDate ? dayjs(notice.startDate) : null;
+                            const endDate = notice.endDate ? dayjs(notice.endDate) : null;
                             const isCurrentlyVisible =
                               notice.isActive &&
                               (!startDate || now.isAfter(startDate)) &&
@@ -691,21 +627,17 @@ const IngamePopupNoticesPage: React.FC = () => {
                                 <Chip
                                   label={
                                     isCurrentlyVisible
-                                      ? t("ingamePopupNotices.visible")
-                                      : t("ingamePopupNotices.notVisible")
+                                      ? t('ingamePopupNotices.visible')
+                                      : t('ingamePopupNotices.notVisible')
                                   }
-                                  color={
-                                    isCurrentlyVisible ? "primary" : "default"
-                                  }
+                                  color={isCurrentlyVisible ? 'primary' : 'default'}
                                   size="small"
-                                  variant={
-                                    isCurrentlyVisible ? "filled" : "outlined"
-                                  }
+                                  variant={isCurrentlyVisible ? 'filled' : 'outlined'}
                                 />
                               </TableCell>
                             );
                           }
-                          if (column.id === "content") {
+                          if (column.id === 'content') {
                             return (
                               <TableCell key={column.id}>
                                 <Typography
@@ -713,90 +645,73 @@ const IngamePopupNoticesPage: React.FC = () => {
                                   noWrap
                                   sx={{
                                     maxWidth: 300,
-                                    cursor: "pointer",
-                                    "&:hover": {
-                                      textDecoration: "underline",
+                                    cursor: 'pointer',
+                                    '&:hover': {
+                                      textDecoration: 'underline',
                                     },
                                   }}
                                   onClick={() => handleEdit(notice)}
                                 >
-                                  {notice.content ||
-                                    t("ingamePopupNotices.noContent")}
+                                  {notice.content || t('ingamePopupNotices.noContent')}
                                 </Typography>
                               </TableCell>
                             );
                           }
-                          if (column.id === "priority") {
+                          if (column.id === 'priority') {
                             return (
                               <TableCell key={column.id}>
-                                <Chip
-                                  label={notice.displayPriority}
-                                  size="small"
-                                />
+                                <Chip label={notice.displayPriority} size="small" />
                               </TableCell>
                             );
                           }
-                          if (column.id === "targeting") {
+                          if (column.id === 'targeting') {
                             return (
                               <TableCell key={column.id}>
                                 <Box
                                   sx={{
-                                    display: "flex",
+                                    display: 'flex',
                                     gap: 0.5,
-                                    flexWrap: "wrap",
+                                    flexWrap: 'wrap',
                                   }}
                                 >
-                                  {notice.targetPlatforms &&
-                                  notice.targetPlatforms.length > 0 ? (
+                                  {notice.targetPlatforms && notice.targetPlatforms.length > 0 ? (
                                     <>
-                                      {notice.targetPlatforms.map(
-                                        (platform) => (
-                                          <Chip
-                                            key={platform}
-                                            label={platform}
-                                            size="small"
-                                          />
-                                        ),
-                                      )}
+                                      {notice.targetPlatforms.map((platform) => (
+                                        <Chip key={platform} label={platform} size="small" />
+                                      ))}
                                     </>
                                   ) : (
+                                    <Chip label={t('common.all')} size="small" variant="outlined" />
+                                  )}
+                                  {notice.targetWorlds && notice.targetWorlds.length > 0 && (
                                     <Chip
-                                      label={t("common.all")}
+                                      label={`${t('ingamePopupNotices.targetWorlds')}: ${notice.targetWorlds.length}`}
                                       size="small"
-                                      variant="outlined"
                                     />
                                   )}
-                                  {notice.targetWorlds &&
-                                    notice.targetWorlds.length > 0 && (
-                                      <Chip
-                                        label={`${t("ingamePopupNotices.targetWorlds")}: ${notice.targetWorlds.length}`}
-                                        size="small"
-                                      />
-                                    )}
-                                  {notice.targetMarkets &&
-                                    notice.targetMarkets.length > 0 && (
-                                      <Chip
-                                        label={`${t("ingamePopupNotices.targetMarkets")}: ${notice.targetMarkets.length}`}
-                                        size="small"
-                                      />
-                                    )}
+                                  {notice.targetMarkets && notice.targetMarkets.length > 0 && (
+                                    <Chip
+                                      label={`${t('ingamePopupNotices.targetMarkets')}: ${notice.targetMarkets.length}`}
+                                      size="small"
+                                    />
+                                  )}
                                   {notice.targetClientVersions &&
                                     notice.targetClientVersions.length > 0 && (
                                       <Chip
-                                        label={`${t("ingamePopupNotices.targetClientVersions")}: ${notice.targetClientVersions.length}`}
+                                        label={`${t('ingamePopupNotices.targetClientVersions')}: ${notice.targetClientVersions.length}`}
                                         size="small"
                                       />
                                     )}
                                   {notice.targetAccountIds &&
                                     notice.targetAccountIds.length > 0 && (
                                       <Chip
-                                        label={`${t("ingamePopupNotices.targetAccountIds")}: ${notice.targetAccountIds.length}`}
+                                        label={`${t('ingamePopupNotices.targetAccountIds')}: ${notice.targetAccountIds.length}`}
                                         size="small"
                                       />
                                     )}
                                   {notice.showOnce && (
                                     <Chip
-                                      label={t("ingamePopupNotices.showOnce")}
+                                      label={t('ingamePopupNotices.showOnce')}
                                       size="small"
                                       color="info"
                                     />
@@ -805,33 +720,27 @@ const IngamePopupNoticesPage: React.FC = () => {
                               </TableCell>
                             );
                           }
-                          if (column.id === "period") {
+                          if (column.id === 'period') {
                             return (
                               <TableCell key={column.id}>
                                 <Tooltip
                                   title={
                                     notice.startDate
                                       ? formatDateTimeDetailed(notice.startDate)
-                                      : t("ingamePopupNotices.startImmediately")
+                                      : t('ingamePopupNotices.startImmediately')
                                   }
                                 >
                                   <Typography variant="caption" display="block">
                                     {notice.startDate
-                                      ? formatRelativeTime(
-                                          notice.startDate,
-                                          undefined,
-                                          language,
-                                        )
-                                      : t(
-                                          "ingamePopupNotices.startImmediately",
-                                        )}
+                                      ? formatRelativeTime(notice.startDate, undefined, language)
+                                      : t('ingamePopupNotices.startImmediately')}
                                   </Typography>
                                 </Tooltip>
                                 <Tooltip
                                   title={
                                     notice.endDate
                                       ? formatDateTimeDetailed(notice.endDate)
-                                      : t("ingamePopupNotices.endDateNotSet")
+                                      : t('ingamePopupNotices.endDateNotSet')
                                   }
                                 >
                                   <Typography
@@ -839,33 +748,21 @@ const IngamePopupNoticesPage: React.FC = () => {
                                     display="block"
                                     color="text.secondary"
                                   >
-                                    ~{" "}
+                                    ~{' '}
                                     {notice.endDate
-                                      ? formatRelativeTime(
-                                          notice.endDate,
-                                          undefined,
-                                          language,
-                                        )
-                                      : t("ingamePopupNotices.endDateNotSet")}
+                                      ? formatRelativeTime(notice.endDate, undefined, language)
+                                      : t('ingamePopupNotices.endDateNotSet')}
                                   </Typography>
                                 </Tooltip>
                               </TableCell>
                             );
                           }
-                          if (column.id === "createdAt") {
+                          if (column.id === 'createdAt') {
                             return (
                               <TableCell key={column.id}>
-                                <Tooltip
-                                  title={formatDateTimeDetailed(
-                                    notice.createdAt,
-                                  )}
-                                >
+                                <Tooltip title={formatDateTimeDetailed(notice.createdAt)}>
                                   <Typography variant="caption">
-                                    {formatRelativeTime(
-                                      notice.createdAt,
-                                      undefined,
-                                      language,
-                                    )}
+                                    {formatRelativeTime(notice.createdAt, undefined, language)}
                                   </Typography>
                                 </Tooltip>
                               </TableCell>
@@ -877,12 +774,12 @@ const IngamePopupNoticesPage: React.FC = () => {
                           <TableCell align="center">
                             <Box
                               sx={{
-                                display: "flex",
+                                display: 'flex',
                                 gap: 0.5,
-                                justifyContent: "center",
+                                justifyContent: 'center',
                               }}
                             >
-                              <Tooltip title={t("common.edit")}>
+                              <Tooltip title={t('common.edit')}>
                                 <IconButton
                                   size="small"
                                   onClick={() => handleEdit(notice)}
@@ -891,7 +788,7 @@ const IngamePopupNoticesPage: React.FC = () => {
                                   <EditIcon fontSize="small" />
                                 </IconButton>
                               </Tooltip>
-                              <Tooltip title={t("common.delete")}>
+                              <Tooltip title={t('common.delete')}>
                                 <IconButton
                                   size="small"
                                   onClick={() => handleDelete(notice)}
@@ -934,45 +831,33 @@ const IngamePopupNoticesPage: React.FC = () => {
       />
 
       {/* Delete Dialog */}
-      <Dialog
-        open={deleteDialogOpen}
-        onClose={() => setDeleteDialogOpen(false)}
-      >
-        <DialogTitle>{t("common.confirmDelete")}</DialogTitle>
+      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
+        <DialogTitle>{t('common.confirmDelete')}</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            {t("ingamePopupNotices.confirmDelete")}
-          </DialogContentText>
+          <DialogContentText>{t('ingamePopupNotices.confirmDelete')}</DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDeleteDialogOpen(false)}>
-            {t("common.cancel")}
-          </Button>
+          <Button onClick={() => setDeleteDialogOpen(false)}>{t('common.cancel')}</Button>
           <Button onClick={confirmDelete} color="error" variant="contained">
-            {t("common.delete")}
+            {t('common.delete')}
           </Button>
         </DialogActions>
       </Dialog>
 
       {/* Bulk Delete Dialog */}
-      <Dialog
-        open={bulkDeleteDialogOpen}
-        onClose={() => setBulkDeleteDialogOpen(false)}
-      >
-        <DialogTitle>{t("common.confirmDelete")}</DialogTitle>
+      <Dialog open={bulkDeleteDialogOpen} onClose={() => setBulkDeleteDialogOpen(false)}>
+        <DialogTitle>{t('common.confirmDelete')}</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            {t("ingamePopupNotices.confirmBulkDelete", {
+            {t('ingamePopupNotices.confirmBulkDelete', {
               count: selectedIds.length,
             })}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setBulkDeleteDialogOpen(false)}>
-            {t("common.cancel")}
-          </Button>
+          <Button onClick={() => setBulkDeleteDialogOpen(false)}>{t('common.cancel')}</Button>
           <Button onClick={confirmBulkDelete} color="error" variant="contained">
-            {t("common.delete")}
+            {t('common.delete')}
           </Button>
         </DialogActions>
       </Dialog>

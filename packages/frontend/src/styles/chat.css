@@ -143,25 +143,25 @@
 }
 
 /* Dark theme specific overrides */
-[data-mui-color-scheme="dark"] .cs-main-container {
+[data-mui-color-scheme='dark'] .cs-main-container {
   background-color: var(--mui-palette-background-default) !important;
 }
 
-[data-mui-color-scheme="dark"] .cs-message--incoming .cs-message__content {
+[data-mui-color-scheme='dark'] .cs-message--incoming .cs-message__content {
   background-color: var(--mui-palette-grey-800) !important;
   border-color: var(--mui-palette-grey-700) !important;
 }
 
-[data-mui-color-scheme="dark"] .cs-message-input__content-editor {
+[data-mui-color-scheme='dark'] .cs-message-input__content-editor {
   background-color: var(--mui-palette-grey-900) !important;
   border-color: var(--mui-palette-grey-700) !important;
 }
 
-[data-mui-color-scheme="dark"] .cs-typing-indicator {
+[data-mui-color-scheme='dark'] .cs-typing-indicator {
   background-color: var(--mui-palette-grey-800) !important;
 }
 
-[data-mui-color-scheme="dark"] .cs-message-separator__content {
+[data-mui-color-scheme='dark'] .cs-message-separator__content {
   background-color: var(--mui-palette-grey-800) !important;
   border-color: var(--mui-palette-grey-700) !important;
 }
@@ -213,7 +213,6 @@
 }
 
 /* Scrollbar styling */
-
 
 /* Message status indicators */
 .cs-message__footer {

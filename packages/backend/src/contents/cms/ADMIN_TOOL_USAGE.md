@@ -18,6 +18,7 @@
 빌더를 실행하면 6개의 JSON 파일이 생성됩니다:
 
 ### 1. `reward-type-list.json` - REWARD_TYPE 드롭다운용
+
 운영툴에서 REWARD_TYPE 드롭다운을 만들 때 사용합니다.
 
 ```json
@@ -53,6 +54,7 @@
 ```
 
 ### 2. `reward-lookup.json` - 전체 아이템 데이터
+
 각 REWARD_TYPE별 선택 가능한 아이템 목록이 포함되어 있습니다.
 
 ```json
@@ -71,9 +73,11 @@
 ```
 
 ### 3. 로컬라이징 파일 (3개 언어)
+
 운영툴의 로컬라이징 시스템에 바로 사용할 수 있는 번역 파일들입니다.
 
 #### `reward-localization-kr.json` - 한국어
+
 ```json
 {
   "REWARD_TYPE_POINT": "포인트",
@@ -84,6 +88,7 @@
 ```
 
 #### `reward-localization-us.json` - 영어
+
 ```json
 {
   "REWARD_TYPE_POINT": "Point",
@@ -94,6 +99,7 @@
 ```
 
 #### `reward-localization-cn.json` - 간체 중국어
+
 ```json
 {
   "REWARD_TYPE_POINT": "点数",
@@ -109,8 +115,8 @@
 
 ```javascript
 // 앱 시작 시 한 번만 로드
-const rewardTypeList = await fetch('/api/reward-type-list.json').then(r => r.json());
-const rewardLookupData = await fetch('/api/reward-lookup.json').then(r => r.json());
+const rewardTypeList = await fetch('/api/reward-type-list.json').then((r) => r.json());
+const rewardLookupData = await fetch('/api/reward-lookup.json').then((r) => r.json());
 ```
 
 ### 2단계: REWARD_TYPE 드롭다운 생성
@@ -124,21 +130,21 @@ function t(key, defaultValue) {
 // REWARD_TYPE 드롭다운 채우기
 function populateRewardTypeDropdown() {
   const select = document.getElementById('rewardType');
-  
-  rewardTypeList.forEach(type => {
+
+  rewardTypeList.forEach((type) => {
     const option = document.createElement('option');
     option.value = type.value;
-    
+
     // 로컬라이징된 이름 사용
     const localizedName = t(type.nameKey, type.name);
     option.textContent = `${localizedName} (${type.value})`;
-    
+
     if (type.hasTable) {
       option.textContent += ` - ${type.itemCount}개`;
     } else {
       option.textContent += ' - 수치 입력';
     }
-    
+
     select.appendChild(option);
   });
 }
@@ -149,8 +155,8 @@ function populateRewardTypeDropdown() {
 ```javascript
 function onRewardTypeChange(selectedValue) {
   // reward-type-list.json에서 선택된 타입 정보 가져오기
-  const typeInfo = rewardTypeList.find(t => t.value === selectedValue);
-  
+  const typeInfo = rewardTypeList.find((t) => t.value === selectedValue);
+
   if (typeInfo.hasTable) {
     // 아이템 선택 드롭다운 표시
     const items = rewardLookupData[selectedValue].items;
@@ -169,14 +175,14 @@ function onRewardTypeChange(selectedValue) {
 function populateItemDropdown(items) {
   const select = document.getElementById('itemId');
   select.innerHTML = '<option value="">선택하세요</option>';
-  
-  items.forEach(item => {
+
+  items.forEach((item) => {
     const option = document.createElement('option');
     option.value = item.id;
     option.textContent = `[${item.id}] ${item.name}`;
     select.appendChild(option);
   });
-  
+
   select.style.display = 'block';
 }
 ```
@@ -235,7 +241,7 @@ function createNationDropdown() {
   const select = document.getElementById('nationId');
   select.innerHTML = '<option value="">국가 선택</option>';
 
-  uiListData.nations.forEach(nation => {
+  uiListData.nations.forEach((nation) => {
     const option = document.createElement('option');
     option.value = nation.id;
     option.textContent = `[${nation.id}] ${nation.name}`;
@@ -249,14 +255,13 @@ function searchTowns(nationId, searchText) {
 
   // 국가별 필터링
   if (nationId) {
-    filteredTowns = filteredTowns.filter(town => town.nationId === nationId);
+    filteredTowns = filteredTowns.filter((town) => town.nationId === nationId);
   }
 
   // 텍스트 검색
   if (searchText) {
-    filteredTowns = filteredTowns.filter(town =>
-      town.name.includes(searchText) ||
-      town.id.toString().includes(searchText)
+    filteredTowns = filteredTowns.filter(
+      (town) => town.name.includes(searchText) || town.id.toString().includes(searchText)
     );
   }
 
@@ -266,9 +271,8 @@ function searchTowns(nationId, searchText) {
 // 촌락 자동완성
 function autocompleteVillage(searchText) {
   return uiListData.villages
-    .filter(village =>
-      village.name.includes(searchText) ||
-      village.id.toString().includes(searchText)
+    .filter(
+      (village) => village.name.includes(searchText) || village.id.toString().includes(searchText)
     )
     .slice(0, 10); // 최대 10개만 표시
 }
@@ -286,16 +290,16 @@ function LocationSelector() {
 
   // 선택된 국가에 속한 마을만 필터링
   const filteredTowns = selectedNation
-    ? uiListData.towns.filter(town => town.nationId === parseInt(selectedNation))
+    ? uiListData.towns.filter((town) => town.nationId === parseInt(selectedNation))
     : uiListData.towns;
 
   return (
     <div>
       <div>
         <label>국가:</label>
-        <select value={selectedNation} onChange={e => setSelectedNation(e.target.value)}>
+        <select value={selectedNation} onChange={(e) => setSelectedNation(e.target.value)}>
           <option value="">전체</option>
-          {uiListData.nations.map(nation => (
+          {uiListData.nations.map((nation) => (
             <option key={nation.id} value={nation.id}>
               [{nation.id}] {nation.name}
             </option>
@@ -305,9 +309,9 @@ function LocationSelector() {
 
       <div>
         <label>마을:</label>
-        <select value={selectedTown} onChange={e => setSelectedTown(e.target.value)}>
+        <select value={selectedTown} onChange={(e) => setSelectedTown(e.target.value)}>
           <option value="">선택하세요</option>
-          {filteredTowns.map(town => (
+          {filteredTowns.map((town) => (
             <option key={town.id} value={town.id}>
               [{town.id}] {town.name}
             </option>
@@ -378,8 +382,8 @@ function RewardSelector() {
   // 데이터 로드
   useEffect(() => {
     Promise.all([
-      fetch('/api/reward-type-list.json').then(r => r.json()),
-      fetch('/api/reward-lookup.json').then(r => r.json()),
+      fetch('/api/reward-type-list.json').then((r) => r.json()),
+      fetch('/api/reward-lookup.json').then((r) => r.json()),
     ]).then(([typeList, lookupData]) => {
       setRewardTypeList(typeList);
       setRewardLookupData(lookupData);
@@ -387,7 +391,7 @@ function RewardSelector() {
   }, []);
 
   // 선택된 타입 정보
-  const selectedTypeInfo = rewardTypeList.find(t => t.value === parseInt(selectedType));
+  const selectedTypeInfo = rewardTypeList.find((t) => t.value === parseInt(selectedType));
   const selectedLookupInfo = selectedType ? rewardLookupData[selectedType] : null;
 
   return (
@@ -405,7 +409,7 @@ function RewardSelector() {
           }}
         >
           <option value="">{t('SELECT_PLACEHOLDER', '선택하세요')}</option>
-          {rewardTypeList.map(type => (
+          {rewardTypeList.map((type) => (
             <option key={type.value} value={type.value}>
               {t(type.nameKey, type.name)} ({type.value})
               {type.hasTable ? ` - ${type.itemCount}개` : ` - ${t('AMOUNT_INPUT', '수치 입력')}`}
@@ -420,7 +424,7 @@ function RewardSelector() {
           <label>{t('ITEM_SELECT_LABEL', '아이템 선택')}:</label>
           <select value={selectedItemId} onChange={(e) => setSelectedItemId(e.target.value)}>
             <option value="">{t('SELECT_PLACEHOLDER', '선택하세요')}</option>
-            {selectedLookupInfo.items.map(item => (
+            {selectedLookupInfo.items.map((item) => (
               <option key={item.id} value={item.id}>
                 [{item.id}] {item.name} {/* 한국어 이름만 표시 */}
               </option>
@@ -435,9 +439,7 @@ function RewardSelector() {
       {/* 수치 입력 (hasTable이 false인 경우) */}
       {selectedTypeInfo && !selectedTypeInfo.hasTable && (
         <div className="form-group">
-          <div className="info-box">
-            {t(selectedTypeInfo.descriptionKey, '')}
-          </div>
+          <div className="info-box">{t(selectedTypeInfo.descriptionKey, '')}</div>
         </div>
       )}
 
@@ -445,9 +447,7 @@ function RewardSelector() {
       {selectedTypeInfo && (
         <div className="form-group">
           <label>
-            {selectedTypeInfo.hasTable
-              ? t('QUANTITY_LABEL', '수량')
-              : t('AMOUNT_LABEL', '수치')}:
+            {selectedTypeInfo.hasTable ? t('QUANTITY_LABEL', '수량') : t('AMOUNT_LABEL', '수치')}:
           </label>
           <input
             type="number"
@@ -462,11 +462,17 @@ function RewardSelector() {
       {selectedType && (
         <div className="result">
           <h4>{t('SELECTED_REWARD', '선택된 보상')}:</h4>
-          <pre>{JSON.stringify({
-            type: parseInt(selectedType),
-            id: selectedItemId ? parseInt(selectedItemId) : 0,
-            quantity: amount
-          }, null, 2)}</pre>
+          <pre>
+            {JSON.stringify(
+              {
+                type: parseInt(selectedType),
+                id: selectedItemId ? parseInt(selectedItemId) : 0,
+                quantity: amount,
+              },
+              null,
+              2
+            )}
+          </pre>
         </div>
       )}
     </div>
@@ -494,10 +500,10 @@ function RewardSelectorWithItemLocalization() {
   // 데이터 로드
   useEffect(() => {
     Promise.all([
-      fetch('/api/reward-type-list.json').then(r => r.json()),
-      fetch('/api/reward-lookup.json').then(r => r.json()),
+      fetch('/api/reward-type-list.json').then((r) => r.json()),
+      fetch('/api/reward-lookup.json').then((r) => r.json()),
       // 운영툴의 언어별 아이템 이름 테이블 로드
-      fetch('/api/item-names.json').then(r => r.json()),
+      fetch('/api/item-names.json').then((r) => r.json()),
     ]).then(([typeList, lookupData, itemNamesData]) => {
       setRewardTypeList(typeList);
       setRewardLookupData(lookupData);
@@ -515,12 +521,12 @@ function RewardSelectorWithItemLocalization() {
     }
 
     // 없으면 한국어 기본값 사용
-    const koreanItem = rewardLookupData[selectedType]?.items.find(item => item.id === itemId);
+    const koreanItem = rewardLookupData[selectedType]?.items.find((item) => item.id === itemId);
     return koreanItem?.name || `[${itemId}]`;
   };
 
   // 선택된 타입 정보
-  const selectedTypeInfo = rewardTypeList.find(t => t.value === parseInt(selectedType));
+  const selectedTypeInfo = rewardTypeList.find((t) => t.value === parseInt(selectedType));
   const selectedLookupInfo = selectedType ? rewardLookupData[selectedType] : null;
 
   return (
@@ -538,7 +544,7 @@ function RewardSelectorWithItemLocalization() {
           }}
         >
           <option value="">{t('SELECT_PLACEHOLDER')}</option>
-          {rewardTypeList.map(type => (
+          {rewardTypeList.map((type) => (
             <option key={type.value} value={type.value}>
               {t(type.nameKey)} ({type.value})
               {type.hasTable ? ` - ${type.itemCount}개` : ` - ${t('AMOUNT_INPUT')}`}
@@ -553,33 +559,27 @@ function RewardSelectorWithItemLocalization() {
           <label>{t('ITEM_SELECT_LABEL')}:</label>
           <select value={selectedItemId} onChange={(e) => setSelectedItemId(e.target.value)}>
             <option value="">{t('SELECT_PLACEHOLDER')}</option>
-            {selectedLookupInfo.items.map(item => (
+            {selectedLookupInfo.items.map((item) => (
               <option key={item.id} value={item.id}>
                 [{item.id}] {getItemName(item.id)} {/* 현재 언어로 표시 */}
               </option>
             ))}
           </select>
-          <p className="help-text">
-            {t('TOTAL_ITEMS', { count: selectedLookupInfo.itemCount })}
-          </p>
+          <p className="help-text">{t('TOTAL_ITEMS', { count: selectedLookupInfo.itemCount })}</p>
         </div>
       )}
 
       {/* 수치 입력 */}
       {selectedTypeInfo && !selectedTypeInfo.hasTable && (
         <div className="form-group">
-          <div className="info-box">
-            {t(selectedTypeInfo.descriptionKey)}
-          </div>
+          <div className="info-box">{t(selectedTypeInfo.descriptionKey)}</div>
         </div>
       )}
 
       {/* 수량/수치 입력 */}
       {selectedTypeInfo && (
         <div className="form-group">
-          <label>
-            {selectedTypeInfo.hasTable ? t('QUANTITY_LABEL') : t('AMOUNT_LABEL')}:
-          </label>
+          <label>{selectedTypeInfo.hasTable ? t('QUANTITY_LABEL') : t('AMOUNT_LABEL')}:</label>
           <input
             type="number"
             min="1"
@@ -598,11 +598,17 @@ function RewardSelectorWithItemLocalization() {
               {t('SELECTED_ITEM')}: [{selectedItemId}] {getItemName(parseInt(selectedItemId))}
             </p>
           )}
-          <pre>{JSON.stringify({
-            type: parseInt(selectedType),
-            id: selectedItemId ? parseInt(selectedItemId) : 0,
-            quantity: amount
-          }, null, 2)}</pre>
+          <pre>
+            {JSON.stringify(
+              {
+                type: parseInt(selectedType),
+                id: selectedItemId ? parseInt(selectedItemId) : 0,
+                quantity: amount,
+              },
+              null,
+              2
+            )}
+          </pre>
         </div>
       )}
     </div>
@@ -645,9 +651,7 @@ export default RewardSelectorWithItemLocalization;
 ```json
 {
   "33": {
-    "items": [
-      { "id": 1400000, "name": "전설적인 도시의 큰 손" }
-    ]
+    "items": [{ "id": 1400000, "name": "전설적인 도시의 큰 손" }]
   }
 }
 ```
@@ -692,6 +696,7 @@ const itemName = adminToolItemCache[language][itemId];
 운영툴에서 CMS 파일을 읽어서 언어별 아이템 이름 테이블을 생성합니다.
 
 **CMS 파일 구조:**
+
 - 한국어: `cms/server/Item.json`
 - 중국어: `cms/server/Item_BCCN.json`
 - 영어: 한국어와 동일하거나 별도 번역 필요
@@ -723,12 +728,12 @@ const itemNames = {
 };
 
 // 한국어
-Object.values(itemKr).forEach(item => {
+Object.values(itemKr).forEach((item) => {
   itemNames.kr[item.id] = item.name;
 });
 
 // 중국어
-Object.values(itemCn).forEach(item => {
+Object.values(itemCn).forEach((item) => {
   itemNames.cn[item.id] = item.name;
 });
 
@@ -755,11 +760,13 @@ function getItemName(itemId, language) {
 }
 
 // 드롭다운
-{items.map(item => (
-  <option key={item.id} value={item.id}>
-    [{item.id}] {getItemName(item.id, currentLanguage)}
-  </option>
-))}
+{
+  items.map((item) => (
+    <option key={item.id} value={item.id}>
+      [{item.id}] {getItemName(item.id, currentLanguage)}
+    </option>
+  ));
+}
 ```
 
 ### 권장 사항
@@ -825,14 +832,16 @@ node generateItemNames.js
 **A: `reward-type-list.json` 파일에서 가져옵니다!**
 
 ```javascript
-const rewardTypeList = await fetch('/api/reward-type-list.json').then(r => r.json());
+const rewardTypeList = await fetch('/api/reward-type-list.json').then((r) => r.json());
 
 // 드롭다운 채우기
-rewardTypeList.forEach(type => {
-  dropdown.add(new Option(
-    t(type.nameKey, type.name), // 로컬라이징된 이름
-    type.value
-  ));
+rewardTypeList.forEach((type) => {
+  dropdown.add(
+    new Option(
+      t(type.nameKey, type.name), // 로컬라이징된 이름
+      type.value
+    )
+  );
 });
 ```
 
@@ -890,22 +899,22 @@ const itemName = getItemNameByLanguage(selectedItemId, currentLanguage);
 ```javascript
 // 한국어 (Item.json)
 const itemNamesKr = {
-  1400000: "전설적인 도시의 큰 손",
-  1400001: "전설의 거상",
+  1400000: '전설적인 도시의 큰 손',
+  1400001: '전설의 거상',
   // ...
 };
 
 // 중국어 (Item_BCCN.json)
 const itemNamesCn = {
-  1400000: "传说中的城市大亨",
-  1400001: "传说中的巨商",
+  1400000: '传说中的城市大亨',
+  1400001: '传说中的巨商',
   // ...
 };
 
 // 영어 (한국어와 동일하거나 별도 번역)
 const itemNamesUs = {
-  1400000: "Legendary City Tycoon",
-  1400001: "Legendary Merchant",
+  1400000: 'Legendary City Tycoon',
+  1400001: 'Legendary Merchant',
   // ...
 };
 
@@ -933,6 +942,7 @@ const itemName = {
 ```
 
 **권장 사항:**
+
 - 운영툴이 이미 게임 아이템 데이터를 가지고 있다면 그것을 재사용
 - 없다면 CMS 파일에서 직접 읽어서 언어별 매핑 테이블 생성
 - `reward-lookup.json`의 `name` 필드는 참고용으로만 사용
@@ -941,32 +951,34 @@ const itemName = {
 
 ### 필수 파일 (빌더가 생성)
 
-| 파일 | 용도 | 크기 | 포함 내용 |
-|------|------|------|----------|
-| `reward-type-list.json` | REWARD_TYPE 드롭다운 생성 | ~10KB | REWARD_TYPE 목록, 메타데이터 |
-| `reward-lookup.json` | 아이템 ID 목록 조회 | ~1.7MB | 아이템 ID + 한국어 이름 |
-| `reward-localization-kr.json` | 한국어 번역 | ~2KB | REWARD_TYPE 이름/설명 (한국어) |
-| `reward-localization-us.json` | 영어 번역 | ~2KB | REWARD_TYPE 이름/설명 (영어) |
-| `reward-localization-cn.json` | 중국어 번역 | ~2KB | REWARD_TYPE 이름/설명 (중국어) |
+| 파일                          | 용도                      | 크기   | 포함 내용                      |
+| ----------------------------- | ------------------------- | ------ | ------------------------------ |
+| `reward-type-list.json`       | REWARD_TYPE 드롭다운 생성 | ~10KB  | REWARD_TYPE 목록, 메타데이터   |
+| `reward-lookup.json`          | 아이템 ID 목록 조회       | ~1.7MB | 아이템 ID + 한국어 이름        |
+| `reward-localization-kr.json` | 한국어 번역               | ~2KB   | REWARD_TYPE 이름/설명 (한국어) |
+| `reward-localization-us.json` | 영어 번역                 | ~2KB   | REWARD_TYPE 이름/설명 (영어)   |
+| `reward-localization-cn.json` | 중국어 번역               | ~2KB   | REWARD_TYPE 이름/설명 (중국어) |
 
 ### 선택 파일 (운영툴에서 생성)
 
-| 파일 | 용도 | 크기 | 생성 방법 |
-|------|------|------|----------|
+| 파일              | 용도               | 크기   | 생성 방법                |
+| ----------------- | ------------------ | ------ | ------------------------ |
 | `item-names.json` | 아이템 이름 다국어 | ~500KB | CMS 파일에서 생성 (선택) |
 
 ### 로드 전략
 
 **최소 구성:**
+
 - `reward-type-list.json` (필수)
 - `reward-lookup.json` (필수)
 - `reward-localization-{언어}.json` (필요한 언어만)
 
 **완전 구성 (아이템 이름 다국어 지원):**
+
 - 위 파일들 + `item-names.json` (운영툴에서 생성)
 
 **참고:**
+
 - `reward-lookup.json`의 아이템 이름은 **한국어만** 포함
 - 다국어 아이템 이름이 필요하면 운영툴에서 별도 처리 필요
 - 자세한 내용은 "아이템 이름 다국어 처리 가이드" 섹션 참고
-

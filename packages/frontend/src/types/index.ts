@@ -1,12 +1,6 @@
 // User types
-export type SupportedLanguage = "en" | "ko" | "zh";
-export type AuthType =
-  | "local"
-  | "google"
-  | "github"
-  | "qq"
-  | "wechat"
-  | "baidu";
+export type SupportedLanguage = 'en' | 'ko' | 'zh';
+export type AuthType = 'local' | 'google' | 'github' | 'qq' | 'wechat' | 'baidu';
 
 // 태그 인터페이스
 export interface Tag {
@@ -24,8 +18,8 @@ export interface User {
   name: string;
   avatarUrl?: string;
   preferredLanguage: SupportedLanguage;
-  role: "admin" | "user";
-  status: "pending" | "active" | "suspended" | "deleted";
+  role: 'admin' | 'user';
+  status: 'pending' | 'active' | 'suspended' | 'deleted';
   authType: AuthType;
   emailVerified: boolean;
   emailVerifiedAt?: string;
@@ -87,10 +81,10 @@ export interface AuthResponse {
 }
 
 // Theme types
-export type ThemeMode = "light" | "dark" | "auto";
+export type ThemeMode = 'light' | 'dark' | 'auto';
 
 // Language types
-export type Language = "en" | "ko" | "zh";
+export type Language = 'en' | 'ko' | 'zh';
 
 // Navigation types
 export interface NavItem {
@@ -106,7 +100,7 @@ export interface NavItem {
 export interface FormField {
   name: string;
   label: string;
-  type: "text" | "email" | "password" | "select" | "checkbox" | "textarea";
+  type: 'text' | 'email' | 'password' | 'select' | 'checkbox' | 'textarea';
   required?: boolean;
   options?: { value: string; label: string }[];
   validation?: any;
@@ -114,8 +108,8 @@ export interface FormField {
 
 // Filter types
 export interface UserFilters {
-  role?: "admin" | "user";
-  status?: "pending" | "active" | "suspended" | "deleted";
+  role?: 'admin' | 'user';
+  status?: 'pending' | 'active' | 'suspended' | 'deleted';
   search?: string;
   tags?: number[]; // 태그 ID 배열로 필터링
 }
@@ -158,7 +152,7 @@ export interface LoadingState {
 }
 
 // Notification types
-export type NotificationType = "success" | "error" | "warning" | "info";
+export type NotificationType = 'success' | 'error' | 'warning' | 'info';
 
 export interface Notification {
   id: string;
@@ -168,4 +162,4 @@ export interface Notification {
 }
 
 // Permission types
-export * from "./permissions";
+export * from './permissions';

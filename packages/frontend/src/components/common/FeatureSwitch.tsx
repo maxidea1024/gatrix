@@ -1,9 +1,9 @@
-import React from "react";
-import { Box, styled } from "@mui/material";
+import React from 'react';
+import { Box, styled } from '@mui/material';
 
 // Utility to darken a hex color
 const darkenColor = (hex: string, percent: number): string => {
-  const num = parseInt(hex.replace("#", ""), 16);
+  const num = parseInt(hex.replace('#', ''), 16);
   const amt = Math.round(2.55 * percent);
   const R = Math.max(0, (num >> 16) - amt);
   const G = Math.max(0, ((num >> 8) & 0x00ff) - amt);
@@ -13,7 +13,7 @@ const darkenColor = (hex: string, percent: number): string => {
 
 // Utility to lighten a hex color
 const lightenColor = (hex: string, percent: number): string => {
-  const num = parseInt(hex.replace("#", ""), 16);
+  const num = parseInt(hex.replace('#', ''), 16);
   const amt = Math.round(2.55 * percent);
   const R = Math.min(255, (num >> 16) + amt);
   const G = Math.min(255, ((num >> 8) & 0x00ff) + amt);
@@ -25,20 +25,18 @@ interface FeatureSwitchProps {
   checked: boolean;
   onChange: () => void;
   disabled?: boolean;
-  size?: "small" | "medium" | "large";
+  size?: 'small' | 'medium' | 'large';
   onClick?: (e: React.MouseEvent) => void;
   color?: string; // Custom color for the switch when checked
 }
 
 const SwitchContainer = styled(Box, {
   shouldForwardProp: (prop) =>
-    !["checked", "disabled", "switchSize", "customColor"].includes(
-      prop as string,
-    ),
+    !['checked', 'disabled', 'switchSize', 'customColor'].includes(prop as string),
 })<{
   checked: boolean;
   disabled?: boolean;
-  switchSize: "small" | "medium" | "large";
+  switchSize: 'small' | 'medium' | 'large';
   customColor?: string;
 }>(({ theme, checked, disabled, switchSize, customColor }) => {
   const sizes = {
@@ -49,58 +47,57 @@ const SwitchContainer = styled(Box, {
   const { width, height } = sizes[switchSize];
 
   // Use custom color or default green
-  const baseColor = customColor || "#43a047";
+  const baseColor = customColor || '#43a047';
   const darkColor = darkenColor(baseColor, 20);
   const lightColor = lightenColor(baseColor, 10);
 
   return {
-    position: "relative",
+    position: 'relative',
     width,
     height,
     borderRadius: 0,
-    cursor: disabled ? "not-allowed" : "pointer",
-    transition: "all 0.2s ease",
+    cursor: disabled ? 'not-allowed' : 'pointer',
+    transition: 'all 0.2s ease',
     background: checked
       ? disabled
-        ? theme.palette.mode === "dark"
+        ? theme.palette.mode === 'dark'
           ? darkenColor(baseColor, 30)
           : lightenColor(baseColor, 30)
-        : theme.palette.mode === "dark"
+        : theme.palette.mode === 'dark'
           ? `linear-gradient(135deg, ${baseColor} 0%, ${darkColor} 100%)`
           : `linear-gradient(135deg, ${lightColor} 0%, ${baseColor} 100%)`
       : disabled
-        ? theme.palette.mode === "dark"
-          ? "#444"
-          : "#e0e0e0"
-        : theme.palette.mode === "dark"
-          ? "linear-gradient(135deg, #555 0%, #333 100%)"
-          : "linear-gradient(135deg, #bdbdbd 0%, #9e9e9e 100%)",
+        ? theme.palette.mode === 'dark'
+          ? '#444'
+          : '#e0e0e0'
+        : theme.palette.mode === 'dark'
+          ? 'linear-gradient(135deg, #555 0%, #333 100%)'
+          : 'linear-gradient(135deg, #bdbdbd 0%, #9e9e9e 100%)',
     boxShadow: checked
       ? `inset 0 1px 2px rgba(0,0,0,0.1), 0 1px 3px ${baseColor}4D`
-      : "inset 0 1px 3px rgba(0,0,0,0.2)",
-    border: checked ? `1px solid ${darkColor}4D` : "1px solid rgba(0,0,0,0.1)",
+      : 'inset 0 1px 3px rgba(0,0,0,0.2)',
+    border: checked ? `1px solid ${darkColor}4D` : '1px solid rgba(0,0,0,0.1)',
     opacity: disabled ? 0.6 : 1,
-    "&:hover": disabled
+    '&:hover': disabled
       ? {}
       : {
           boxShadow: checked
             ? `inset 0 1px 2px rgba(0,0,0,0.1), 0 2px 6px ${baseColor}66`
-            : "0 2px 8px rgba(0,0,0,0.2), inset 0 1px 3px rgba(0,0,0,0.2)",
+            : '0 2px 8px rgba(0,0,0,0.2), inset 0 1px 3px rgba(0,0,0,0.2)',
         },
-    "&:active": disabled
+    '&:active': disabled
       ? {}
       : {
-          transform: "scale(0.97)",
+          transform: 'scale(0.97)',
         },
   };
 });
 
 const SwitchThumb = styled(Box, {
-  shouldForwardProp: (prop) =>
-    !["checked", "switchSize", "customColor"].includes(prop as string),
+  shouldForwardProp: (prop) => !['checked', 'switchSize', 'customColor'].includes(prop as string),
 })<{
   checked: boolean;
-  switchSize: "small" | "medium" | "large";
+  switchSize: 'small' | 'medium' | 'large';
   customColor?: string;
 }>(({ checked, switchSize, customColor }) => {
   const sizes = {
@@ -112,29 +109,29 @@ const SwitchThumb = styled(Box, {
   const padding = 2;
 
   // Use custom color or default green for checkmark
-  const checkColor = customColor ? darkenColor(customColor, 20) : "#2e7d32";
+  const checkColor = customColor ? darkenColor(customColor, 20) : '#2e7d32';
 
   return {
-    position: "absolute",
-    top: "50%",
-    transform: "translateY(-50%)",
+    position: 'absolute',
+    top: '50%',
+    transform: 'translateY(-50%)',
     left: checked ? width - thumbSize - padding - 2 : padding,
     width: thumbSize,
     height: thumbSize,
     borderRadius: 0,
     background: checked
-      ? "linear-gradient(180deg, #ffffff 0%, #f0f0f0 100%)"
-      : "linear-gradient(180deg, #ffffff 0%, #e8e8e8 100%)",
-    boxShadow: "0 1px 3px rgba(0,0,0,0.2)",
-    transition: "all 0.2s ease",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    "&::after": {
+      ? 'linear-gradient(180deg, #ffffff 0%, #f0f0f0 100%)'
+      : 'linear-gradient(180deg, #ffffff 0%, #e8e8e8 100%)',
+    boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+    transition: 'all 0.2s ease',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    '&::after': {
       content: checked ? '"✓"' : '""',
-      fontSize: switchSize === "small" ? 9 : switchSize === "medium" ? 11 : 13,
-      color: checked ? checkColor : "#9e9e9e",
-      fontWeight: "bold",
+      fontSize: switchSize === 'small' ? 9 : switchSize === 'medium' ? 11 : 13,
+      color: checked ? checkColor : '#9e9e9e',
+      fontWeight: 'bold',
     },
   };
 });
@@ -154,7 +151,7 @@ const FeatureSwitch: React.FC<FeatureSwitchProps> = ({
   checked,
   onChange,
   disabled = false,
-  size = "small",
+  size = 'small',
   onClick,
   color,
 }) => {
@@ -177,7 +174,7 @@ const FeatureSwitch: React.FC<FeatureSwitchProps> = ({
       aria-disabled={disabled}
       tabIndex={disabled ? -1 : 0}
       onKeyDown={(e: React.KeyboardEvent) => {
-        if ((e.key === "Enter" || e.key === " ") && !disabled) {
+        if ((e.key === 'Enter' || e.key === ' ') && !disabled) {
           e.preventDefault();
           onChange();
         }

@@ -1,4 +1,4 @@
-import { apiService } from "./api";
+import { apiService } from './api';
 import {
   ClientVersion,
   ClientVersionFormData,
@@ -10,7 +10,7 @@ import {
   ClientVersionMetadata,
   ApiResponse,
   CLIENT_VERSION_DEFAULTS,
-} from "../types/clientVersion";
+} from '../types/clientVersion';
 
 // Extended response type to indicate if change request was created
 export interface ClientVersionMutationResult {
@@ -20,7 +20,7 @@ export interface ClientVersionMutationResult {
 }
 
 export class ClientVersionService {
-  private static readonly BASE_URL = "/admin/client-versions";
+  private static readonly BASE_URL = '/admin/client-versions';
 
   /**
    * 사용 가능한 버전 목록 조회
@@ -31,7 +31,7 @@ export class ClientVersionService {
       // apiService.get()이 이미 response.data를 반환하므로 response.data가 실제 데이터
       return response.data || [];
     } catch (error) {
-      console.error("Error getting available versions:", error);
+      console.error('Error getting available versions:', error);
       throw error;
     }
   }
@@ -44,7 +44,7 @@ export class ClientVersionService {
     limit: number = CLIENT_VERSION_DEFAULTS.PAGE_SIZE,
     filters: ClientVersionFilters = {},
     sortBy: string = CLIENT_VERSION_DEFAULTS.SORT_BY,
-    sortOrder: string = CLIENT_VERSION_DEFAULTS.SORT_ORDER,
+    sortOrder: string = CLIENT_VERSION_DEFAULTS.SORT_ORDER
   ): Promise<ClientVersionListResponse> {
     const params = new URLSearchParams({
       page: page.toString(),
@@ -55,25 +55,25 @@ export class ClientVersionService {
 
     // 필터 조건 추가
     Object.entries(filters).forEach(([key, value]) => {
-      if (value === undefined || value === null || value === "") return;
+      if (value === undefined || value === null || value === '') return;
 
       // 태그는 백엔드에서 배열 타입으로 기대하므로 반드시 배열 파라미터로 직렬화
-      if (key === "tags") {
+      if (key === 'tags') {
         if (Array.isArray(value)) {
-          value.forEach((item) => params.append("tags[]", item.toString()));
-        } else if (typeof value === "string") {
+          value.forEach((item) => params.append('tags[]', item.toString()));
+        } else if (typeof value === 'string') {
           // 콤마 구분 문자열도 지원: "1,2,3" -> tags[]=1&tags[]=2&tags[]=3
           const parts = value
-            .split(",")
+            .split(',')
             .map((s) => s.trim())
             .filter(Boolean);
           if (parts.length > 0) {
-            parts.forEach((p) => params.append("tags[]", p));
+            parts.forEach((p) => params.append('tags[]', p));
           } else {
-            params.append("tags[]", value);
+            params.append('tags[]', value);
           }
         } else {
-          params.append("tags[]", String(value));
+          params.append('tags[]', String(value));
         }
         return;
       }
@@ -86,9 +86,9 @@ export class ClientVersionService {
       }
     });
 
-    const response = await apiService.get<
-      ApiResponse<ClientVersionListResponse>
-    >(`${this.BASE_URL}?${params}`);
+    const response = await apiService.get<ApiResponse<ClientVersionListResponse>>(
+      `${this.BASE_URL}?${params}`
+    );
 
     // ApiService.request()가 이미 response.data를 반환하므로
     // response는 백엔드에서 보낸 { success: true, data: {...} } 구조
@@ -113,16 +113,14 @@ export class ClientVersionService {
    * 클라이언트 버전 상세 조회
    */
   static async getClientVersionById(id: number): Promise<ClientVersion> {
-    const response = await apiService.get<ApiResponse<ClientVersion>>(
-      `${this.BASE_URL}/${id}`,
-    );
+    const response = await apiService.get<ApiResponse<ClientVersion>>(`${this.BASE_URL}/${id}`);
 
     // ApiService.request()가 이미 response.data를 반환하므로
     if (response?.success && response?.data) {
       return response.data;
     }
 
-    console.error("Unexpected getById response structure:", response);
+    console.error('Unexpected getById response structure:', response);
     return null;
   }
 
@@ -130,12 +128,9 @@ export class ClientVersionService {
    * 클라이언트 버전 생성
    */
   static async createClientVersion(
-    data: ClientVersionFormData,
+    data: ClientVersionFormData
   ): Promise<ClientVersionMutationResult> {
-    const response: any = await apiService.post<ApiResponse<ClientVersion>>(
-      this.BASE_URL,
-      data,
-    );
+    const response: any = await apiService.post<ApiResponse<ClientVersion>>(this.BASE_URL, data);
 
     // Check if this is a change request response
     // Backend returns: { success: true, data: { changeRequestId: "...", status: "DRAFT_SAVED" } }
@@ -143,8 +138,7 @@ export class ClientVersionService {
       return {
         clientVersion: undefined,
         isChangeRequest: true,
-        changeRequestId:
-          response?.data?.changeRequestId || response?.changeRequestId,
+        changeRequestId: response?.data?.changeRequestId || response?.changeRequestId,
       };
     }
 
@@ -159,10 +153,7 @@ export class ClientVersionService {
     // 일부 서버는 생성 시 본문 없이 { success: true }만 반환할 수 있음
     if (response?.success && !response?.data) {
       try {
-        const found = await this.findByPlatformAndVersion(
-          data.platform,
-          data.clientVersion,
-        );
+        const found = await this.findByPlatformAndVersion(data.platform, data.clientVersion);
         if (found) {
           return {
             clientVersion: found,
@@ -170,19 +161,19 @@ export class ClientVersionService {
           };
         }
       } catch (e) {
-        console.warn("Fallback lookup after create failed:", e);
+        console.warn('Fallback lookup after create failed:', e);
       }
     }
 
-    console.error("Unexpected create response structure:", response);
-    throw new Error("Invalid response structure from server");
+    console.error('Unexpected create response structure:', response);
+    throw new Error('Invalid response structure from server');
   }
   /**
    * 생성 직후 데이터 본문이 없는 서버 대응: 플랫폼/버전으로 재조회
    */
   static async findByPlatformAndVersion(
     platform: string,
-    clientVersion: string,
+    clientVersion: string
   ): Promise<ClientVersion | null> {
     try {
       const result = await this.getClientVersions(1, 100, {
@@ -190,11 +181,11 @@ export class ClientVersionService {
         search: clientVersion,
       });
       const exact = result.clientVersions.find(
-        (cv) => cv.platform === platform && cv.clientVersion === clientVersion,
+        (cv) => cv.platform === platform && cv.clientVersion === clientVersion
       );
       return exact || null;
     } catch (error) {
-      console.warn("findByPlatformAndVersion failed:", error);
+      console.warn('findByPlatformAndVersion failed:', error);
       return null;
     }
   }
@@ -202,12 +193,10 @@ export class ClientVersionService {
   /**
    * 클라이언트 버전 간편 생성
    */
-  static async bulkCreateClientVersions(
-    data: BulkCreateFormData,
-  ): Promise<ClientVersion[]> {
+  static async bulkCreateClientVersions(data: BulkCreateFormData): Promise<ClientVersion[]> {
     const response = await apiService.post<ApiResponse<ClientVersion[]>>(
       `${this.BASE_URL}/bulk`,
-      data,
+      data
     );
 
     // ApiService.request()가 이미 response.data를 반환하므로
@@ -220,8 +209,8 @@ export class ClientVersionService {
       return [];
     }
 
-    console.error("Unexpected bulk create response structure:", response);
-    throw new Error("Invalid response structure from server");
+    console.error('Unexpected bulk create response structure:', response);
+    throw new Error('Invalid response structure from server');
   }
 
   /**
@@ -229,11 +218,11 @@ export class ClientVersionService {
    */
   static async updateClientVersion(
     id: number,
-    data: Partial<ClientVersionFormData>,
+    data: Partial<ClientVersionFormData>
   ): Promise<ClientVersionMutationResult> {
     const response: any = await apiService.put<ApiResponse<ClientVersion>>(
       `${this.BASE_URL}/${id}`,
-      data,
+      data
     );
 
     // Check if this is a change request response
@@ -242,8 +231,7 @@ export class ClientVersionService {
       return {
         clientVersion: undefined,
         isChangeRequest: true,
-        changeRequestId:
-          response?.data?.changeRequestId || response?.changeRequestId,
+        changeRequestId: response?.data?.changeRequestId || response?.changeRequestId,
       };
     }
 
@@ -255,15 +243,15 @@ export class ClientVersionService {
       };
     }
 
-    console.error("Unexpected update response structure:", response);
-    throw new Error("Invalid response structure from server");
+    console.error('Unexpected update response structure:', response);
+    throw new Error('Invalid response structure from server');
   }
 
   /**
    * 클라이언트 버전 삭제
    */
   static async deleteClientVersion(
-    id: number,
+    id: number
   ): Promise<{ isChangeRequest: boolean; changeRequestId?: string }> {
     const response = await apiService.delete<
       ApiResponse<{ changeRequestId?: string; status?: string }>
@@ -281,21 +269,22 @@ export class ClientVersionService {
    * 일괄 상태 변경
    */
   static async bulkUpdateStatus(
-    data: BulkStatusUpdateRequest,
+    data: BulkStatusUpdateRequest
   ): Promise<{ updatedCount: number; message: string }> {
-    const response = await apiService.patch<
-      ApiResponse<{ updatedCount: number; message: string }>
-    >(`${this.BASE_URL}/bulk-status`, data);
+    const response = await apiService.patch<ApiResponse<{ updatedCount: number; message: string }>>(
+      `${this.BASE_URL}/bulk-status`,
+      data
+    );
 
-    console.log("🔍 Bulk update response:", response);
+    console.log('🔍 Bulk update response:', response);
 
     // ApiService.request()가 이미 response.data를 반환하므로
     if (response?.success && response?.data) {
       return response.data;
     }
 
-    console.error("Unexpected bulk update response structure:", response);
-    throw new Error("Invalid response structure from server");
+    console.error('Unexpected bulk update response structure:', response);
+    throw new Error('Invalid response structure from server');
   }
 
   /**
@@ -304,11 +293,11 @@ export class ClientVersionService {
   static async getPlatforms(): Promise<string[]> {
     try {
       const response = await apiService.get<ApiResponse<string[]>>(
-        `${this.BASE_URL}/meta/platforms`,
+        `${this.BASE_URL}/meta/platforms`
       );
       return response.data?.data || [];
     } catch (error) {
-      console.error("Error fetching platforms:", error);
+      console.error('Error fetching platforms:', error);
       return [];
     }
   }
@@ -330,7 +319,7 @@ export class ClientVersionService {
   static async checkDuplicate(
     platform: string,
     clientVersion: string,
-    excludeId?: number,
+    excludeId?: number
   ): Promise<boolean> {
     try {
       const filters: ClientVersionFilters = {
@@ -343,14 +332,12 @@ export class ClientVersionService {
       // 정확히 일치하는 버전이 있는지 확인
       const duplicate = result.clientVersions.find(
         (cv) =>
-          cv.platform === platform &&
-          cv.clientVersion === clientVersion &&
-          cv.id !== excludeId,
+          cv.platform === platform && cv.clientVersion === clientVersion && cv.id !== excludeId
       );
 
       return !!duplicate;
     } catch (error) {
-      console.error("Error checking duplicate:", error);
+      console.error('Error checking duplicate:', error);
       return false;
     }
   }
@@ -365,14 +352,12 @@ export class ClientVersionService {
     // 필터 추가
     if (filters.platform) params.platform = filters.platform;
     if (filters.clientStatus) params.clientStatus = filters.clientStatus;
-    if (filters.gameServerAddress)
-      params.gameServerAddress = filters.gameServerAddress;
+    if (filters.gameServerAddress) params.gameServerAddress = filters.gameServerAddress;
     if (filters.patchAddress) params.patchAddress = filters.patchAddress;
     if (filters.search) params.search = filters.search;
     if (filters.guestModeAllowed !== undefined)
       params.guestModeAllowed = filters.guestModeAllowed.toString();
-    if (filters.externalClickLink)
-      params.externalClickLink = filters.externalClickLink;
+    if (filters.externalClickLink) params.externalClickLink = filters.externalClickLink;
     if (filters.memo) params.memo = filters.memo;
     if (filters.customPayload) params.customPayload = filters.customPayload;
     if (filters.createdBy) params.createdBy = filters.createdBy.toString();
@@ -389,70 +374,70 @@ export class ClientVersionService {
       });
 
       if (!result.success) {
-        throw new Error(result.message || "Failed to export client versions");
+        throw new Error(result.message || 'Failed to export client versions');
       }
 
       const headers = [
-        "ID",
-        "Platform",
-        "Client Version",
-        "Status",
-        "Game Server Address",
-        "Game Server Address (Whitelist)",
-        "Patch Address",
-        "Patch Address (Whitelist)",
-        "Guest Mode Allowed",
-        "External Click Link",
-        "Memo",
-        "Custom Payload",
-        "Maintenance Start Date",
-        "Maintenance End Date",
-        "Maintenance Message",
-        "Supports Multi Language",
-        "Tags",
-        "Created At",
-        "Created By",
-        "Created By Email",
-        "Updated At",
-        "Updated By",
-        "Updated By Email",
+        'ID',
+        'Platform',
+        'Client Version',
+        'Status',
+        'Game Server Address',
+        'Game Server Address (Whitelist)',
+        'Patch Address',
+        'Patch Address (Whitelist)',
+        'Guest Mode Allowed',
+        'External Click Link',
+        'Memo',
+        'Custom Payload',
+        'Maintenance Start Date',
+        'Maintenance End Date',
+        'Maintenance Message',
+        'Supports Multi Language',
+        'Tags',
+        'Created At',
+        'Created By',
+        'Created By Email',
+        'Updated At',
+        'Updated By',
+        'Updated By Email',
       ];
 
       const csvContent = [
-        headers.join(","),
+        headers.join(','),
         ...result.data.clientVersions.map((cv: any) =>
           [
             cv.id,
-            `"${cv.platform || ""}"`,
+            `"${cv.platform || ''}"`,
             `"${cv.clientVersion}"`,
             `"${cv.clientStatus}"`,
             `"${cv.gameServerAddress}"`,
-            `"${cv.gameServerAddressForWhiteList || ""}"`,
+            `"${cv.gameServerAddressForWhiteList || ''}"`,
             `"${cv.patchAddress}"`,
-            `"${cv.patchAddressForWhiteList || ""}"`,
+            `"${cv.patchAddressForWhiteList || ''}"`,
             cv.guestModeAllowed,
-            `"${cv.externalClickLink || ""}"`,
-            `"${cv.memo || ""}"`,
-            `"${cv.customPayload || ""}"`,
-            `"${cv.maintenanceStartDate || ""}"`,
-            `"${cv.maintenanceEndDate || ""}"`,
-            `"${cv.maintenanceMessage || ""}"`,
+            `"${cv.externalClickLink || ''}"`,
+            `"${cv.memo || ''}"`,
+            `"${cv.customPayload || ''}"`,
+            `"${cv.maintenanceStartDate || ''}"`,
+            `"${cv.maintenanceEndDate || ''}"`,
+            `"${cv.maintenanceMessage || ''}"`,
             cv.supportsMultiLanguage || false,
-            `"${cv.tags ? cv.tags.map((tag: any) => tag.name).join("; ") : ""}"`,
+            `"${cv.tags ? cv.tags.map((tag: any) => tag.name).join('; ') : ''}"`,
             `"${cv.createdAt}"`,
-            `"${cv.createdByName || ""}"`,
-            `"${cv.createdByEmail || ""}"`,
+            `"${cv.createdByName || ''}"`,
+            `"${cv.createdByEmail || ''}"`,
             `"${cv.updatedAt}"`,
-            `"${cv.updatedByName || ""}"`,
-            `"${cv.updatedByEmail || ""}"`,
-          ].join(","),
+            `"${cv.updatedByName || ''}"`,
+            `"${cv.updatedByEmail || ''}"`,
+          ].join(',')
         ),
-      ].join("\n");
+      ].join('\n');
 
-      return new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      return new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     } catch (error: any) {
-      console.error("Error exporting client versions:", error);
-      throw new Error(error.message || "Failed to export client versions");
+      console.error('Error exporting client versions:', error);
+      throw new Error(error.message || 'Failed to export client versions');
     }
   }
 
@@ -461,7 +446,7 @@ export class ClientVersionService {
    */
   static getStoredPageSize(): number {
     try {
-      const stored = localStorage.getItem("clientVersionPageSize");
+      const stored = localStorage.getItem('clientVersionPageSize');
       return stored ? parseInt(stored, 10) : CLIENT_VERSION_DEFAULTS.PAGE_SIZE;
     } catch {
       return CLIENT_VERSION_DEFAULTS.PAGE_SIZE;
@@ -473,9 +458,9 @@ export class ClientVersionService {
    */
   static setStoredPageSize(pageSize: number): void {
     try {
-      localStorage.setItem("clientVersionPageSize", pageSize.toString());
+      localStorage.setItem('clientVersionPageSize', pageSize.toString());
     } catch (error) {
-      console.warn("Failed to save page size to localStorage:", error);
+      console.warn('Failed to save page size to localStorage:', error);
     }
   }
 
@@ -484,7 +469,7 @@ export class ClientVersionService {
    */
   static getStoredFilters(): ClientVersionFilters {
     try {
-      const stored = localStorage.getItem("clientVersionFilters");
+      const stored = localStorage.getItem('clientVersionFilters');
       return stored ? JSON.parse(stored) : {};
     } catch {
       return {};
@@ -496,9 +481,9 @@ export class ClientVersionService {
    */
   static setStoredFilters(filters: ClientVersionFilters): void {
     try {
-      localStorage.setItem("clientVersionFilters", JSON.stringify(filters));
+      localStorage.setItem('clientVersionFilters', JSON.stringify(filters));
     } catch (error) {
-      console.warn("Failed to save filters to localStorage:", error);
+      console.warn('Failed to save filters to localStorage:', error);
     }
   }
 
@@ -507,7 +492,7 @@ export class ClientVersionService {
    */
   static getStoredSort(): { sortBy: string; sortOrder: string } {
     try {
-      const stored = localStorage.getItem("clientVersionSort");
+      const stored = localStorage.getItem('clientVersionSort');
       return stored
         ? JSON.parse(stored)
         : {
@@ -527,12 +512,9 @@ export class ClientVersionService {
    */
   static setStoredSort(sortBy: string, sortOrder: string): void {
     try {
-      localStorage.setItem(
-        "clientVersionSort",
-        JSON.stringify({ sortBy, sortOrder }),
-      );
+      localStorage.setItem('clientVersionSort', JSON.stringify({ sortBy, sortOrder }));
     } catch (error) {
-      console.warn("Failed to save sort settings to localStorage:", error);
+      console.warn('Failed to save sort settings to localStorage:', error);
     }
   }
 
@@ -540,9 +522,7 @@ export class ClientVersionService {
    * 클라이언트 버전 태그 조회
    */
   static async getTags(id: number): Promise<any[]> {
-    const response = await apiService.get<ApiResponse<any[]>>(
-      `${this.BASE_URL}/${id}/tags`,
-    );
+    const response = await apiService.get<ApiResponse<any[]>>(`${this.BASE_URL}/${id}/tags`);
     return response.data.data || [];
   }
 
