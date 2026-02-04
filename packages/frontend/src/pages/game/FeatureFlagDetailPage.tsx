@@ -210,6 +210,8 @@ interface FeatureFlag {
   environments?: FeatureFlagEnvironment[];
   lastSeenAt?: string;
   archivedAt?: string;
+  stale?: boolean;
+  flagUsage?: "flag" | "remoteConfig";
   createdBy?: number;
   createdByName?: string;
   updatedBy?: number;
@@ -538,11 +540,12 @@ const FeatureFlagDetailPage: React.FC = () => {
 
   // ==================== Data Loading ====================
 
-  const loadFlag = useCallback(async () => {
-    if (isCreating || !flagName) return;
+  const loadFlag = useCallback(async (targetFlagName?: string, showLoading = true) => {
+    const name = targetFlagName || flagName;
+    if (isCreating || !name) return;
     try {
-      setLoading(true);
-      const response = await api.get(`/admin/features/${flagName}`);
+      if (showLoading) setLoading(true);
+      const response = await api.get(`/admin/features/${name}`);
       // Backend returns { success: true, data: { flag } }
       // api.request() returns response.data, so we get { flag }
       const data = response.data?.flag || response.data;
@@ -562,7 +565,7 @@ const FeatureFlagDetailPage: React.FC = () => {
       });
       navigate("/feature-flags");
     } finally {
-      setLoading(false);
+      if (showLoading) setLoading(false);
     }
   }, [flagName, isCreating, navigate, enqueueSnackbar]);
 
@@ -1082,7 +1085,7 @@ const FeatureFlagDetailPage: React.FC = () => {
     const variantType = flag?.variantType || "string";
 
     // Determine default payload value based on type and existing variants
-    let defaultPayload: { type: string; value: string } | undefined = undefined;
+    let defaultPayload: { type: "string" | "json" | "csv"; value: string } | undefined = undefined;
     if (lastVariant?.payload?.value !== undefined) {
       // Copy last variant's payload
       defaultPayload = {
@@ -1370,7 +1373,7 @@ const FeatureFlagDetailPage: React.FC = () => {
         { headers: { "x-environment": envName } },
       );
       // Reload flag data
-      await loadFlag(flag.flagName, environments);
+      await loadFlag(flag.flagName, false);
       enqueueSnackbar(t("featureFlags.fallbackValueSaved"), { variant: "success" });
     } catch (error: any) {
       enqueueSnackbar(parseApiErrorMessage(error, "featureFlags.fallbackValueSaveFailed"), {
@@ -4042,16 +4045,16 @@ const FeatureFlagDetailPage: React.FC = () => {
       </TabPanel>
 
       {/* Delete Confirmation Dialog */}
-      < ConfirmDeleteDialog
+      <ConfirmDeleteDialog
         open={deleteDialogOpen}
         title={t("featureFlags.deleteConfirmTitle")}
-        description={
+        message={
           t("featureFlags.deleteConfirmMessage", {
             name: flag.flagName,
           })}
         onConfirm={handleDelete}
-        onCancel={() => setDeleteDialogOpen(false)}
-        confirmText={t("common.delete")}
+        onClose={() => setDeleteDialogOpen(false)}
+        confirmButtonText={t("common.delete")}
       />
 
       {/* Strategy Delete Confirmation Dialog */}
@@ -4413,7 +4416,7 @@ const FeatureFlagDetailPage: React.FC = () => {
 
                         {/* Stickiness & GroupId */}
                         <Grid container spacing={2} sx={{ mt: 2 }}>
-                          <Grid item xs={6}>
+                          <Grid size={{ xs: 6 }}>
                             <FormControl fullWidth size="small">
                               <Typography
                                 variant="subtitle2"
@@ -4494,7 +4497,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                               </Select>
                             </FormControl>
                           </Grid>
-                          <Grid item xs={6}>
+                          <Grid size={{ xs: 6 }}>
                             <Box>
                               <Typography
                                 variant="subtitle2"

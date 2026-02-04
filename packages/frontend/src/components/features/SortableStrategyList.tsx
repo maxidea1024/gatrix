@@ -176,11 +176,14 @@ const SortableStrategyItem: React.FC<SortableStrategyItemProps> = ({
       str_ends_with: "⊇",
       str_in: "∈",
       str_not_in: "∉",
+      str_regex: "~",
       num_eq: "=",
       num_gt: ">",
       num_gte: "≥",
       num_lt: "<",
       num_lte: "≤",
+      num_in: "∈",
+      num_not_in: "∉",
       bool_is: "=",
       date_gt: ">",
       date_gte: "≥",
@@ -191,6 +194,8 @@ const SortableStrategyItem: React.FC<SortableStrategyItemProps> = ({
       semver_gte: "≥",
       semver_lt: "<",
       semver_lte: "≤",
+      semver_in: "∈",
+      semver_not_in: "∉",
     };
     return opMap[operator] || operator;
   };
@@ -509,19 +514,19 @@ const SortableStrategyItem: React.FC<SortableStrategyItemProps> = ({
             {/* AND Indicator */}
             {(strategy.segments?.length > 0 ||
               strategy.constraints?.length > 0) && (
-              <Box
-                sx={{ display: "flex", alignItems: "center", gap: 1, py: 0.5 }}
-              >
-                <Divider sx={{ flexGrow: 1 }} />
-                <Chip
-                  label="AND"
-                  size="small"
-                  variant="outlined"
-                  sx={{ fontWeight: 600 }}
-                />
-                <Divider sx={{ flexGrow: 1 }} />
-              </Box>
-            )}
+                <Box
+                  sx={{ display: "flex", alignItems: "center", gap: 1, py: 0.5 }}
+                >
+                  <Divider sx={{ flexGrow: 1 }} />
+                  <Chip
+                    label="AND"
+                    size="small"
+                    variant="outlined"
+                    sx={{ fontWeight: 600 }}
+                  />
+                  <Divider sx={{ flexGrow: 1 }} />
+                </Box>
+              )}
 
             {/* Constraints Section */}
             <Box>

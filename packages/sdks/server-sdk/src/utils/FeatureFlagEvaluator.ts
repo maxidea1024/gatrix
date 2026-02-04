@@ -194,6 +194,12 @@ export class FeatureFlagEvaluator {
       case 'num_lte':
         result = Number(contextValue) <= Number(constraint.value);
         break;
+      case 'num_in':
+        result = targetValues.map(Number).includes(Number(contextValue));
+        break;
+      case 'num_not_in':
+        result = !targetValues.map(Number).includes(Number(contextValue));
+        break;
       // Boolean
       case 'bool_is':
         result = Boolean(contextValue) === (constraint.value === 'true');
@@ -226,6 +232,12 @@ export class FeatureFlagEvaluator {
         break;
       case 'semver_lte':
         result = this.compareSemver(stringValue, targetValue) <= 0;
+        break;
+      case 'semver_in':
+        result = targetValues.some((v) => this.compareSemver(stringValue, v) === 0);
+        break;
+      case 'semver_not_in':
+        result = !targetValues.some((v) => this.compareSemver(stringValue, v) === 0);
         break;
       default:
         result = false;

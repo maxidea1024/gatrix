@@ -40,13 +40,13 @@ export interface EvaluationResult {
 
 export interface EvaluationReason {
   kind:
-    | 'enabled'
-    | 'disabled'
-    | 'notFound'
-    | 'constraintFailed'
-    | 'rolloutFailed'
-    | 'fallback'
-    | 'archived';
+  | 'enabled'
+  | 'disabled'
+  | 'notFound'
+  | 'constraintFailed'
+  | 'rolloutFailed'
+  | 'fallback'
+  | 'archived';
   message?: string;
   failedConstraint?: {
     contextName: string;
@@ -234,6 +234,15 @@ export class FeatureEvaluator {
       case 'str_contains':
         return ctx.includes(val);
 
+      case 'str_regex':
+        try {
+          const flags = caseInsensitive ? 'i' : '';
+          const regex = new RegExp(constraintValue || '', flags);
+          return regex.test(String(contextValue));
+        } catch {
+          return false;
+        }
+
       // Boolean operators
       case 'bool_is':
         return (
@@ -255,6 +264,12 @@ export class FeatureEvaluator {
 
       case 'num_lte':
         return parseFloat(contextValue) <= parseFloat(constraintValue || '0');
+
+      case 'num_in':
+        return vals.map(Number).includes(Number(contextValue));
+
+      case 'num_not_in':
+        return !vals.map(Number).includes(Number(contextValue));
 
       // Date operators
       case 'date_gt':
@@ -284,6 +299,12 @@ export class FeatureEvaluator {
 
       case 'semver_lte':
         return this.compareSemver(contextValue, constraintValue || '') <= 0;
+
+      case 'semver_in':
+        return vals.some((v) => this.compareSemver(contextValue, v) === 0);
+
+      case 'semver_not_in':
+        return !vals.some((v) => this.compareSemver(contextValue, v) === 0);
 
       default:
         logger.warn(`Unknown operator: ${operator}`);
@@ -346,8 +367,6 @@ export class FeatureEvaluator {
     switch (variant.payloadType) {
       case 'number':
         return Number(variant.payload);
-      case 'boolean':
-        return variant.payload === true || variant.payload === 'true';
       case 'json':
         if (typeof variant.payload === 'string') {
           try {

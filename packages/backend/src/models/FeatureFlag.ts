@@ -6,7 +6,7 @@ import { ulid } from 'ulid';
 
 export type FlagType = 'release' | 'experiment' | 'operational' | 'killSwitch' | 'permission'; // Purpose
 export type FlagUsage = 'flag' | 'remoteConfig'; // Classification: Feature Flag vs Remote Config
-export type PayloadType = 'string' | 'number' | 'boolean' | 'json';
+export type PayloadType = 'string' | 'number' | 'json';
 export type FieldType = 'string' | 'number' | 'boolean' | 'date' | 'semver';
 
 export type ConstraintOperator =
@@ -18,12 +18,15 @@ export type ConstraintOperator =
   | 'str_ends_with'
   | 'str_in'
   | 'str_not_in'
+  | 'str_regex'
   // Number operators
   | 'num_eq'
   | 'num_gt'
   | 'num_gte'
   | 'num_lt'
   | 'num_lte'
+  | 'num_in'
+  | 'num_not_in'
   // Boolean operators
   | 'bool_is'
   // Date operators
@@ -36,7 +39,9 @@ export type ConstraintOperator =
   | 'semver_gt'
   | 'semver_gte'
   | 'semver_lt'
-  | 'semver_lte';
+  | 'semver_lte'
+  | 'semver_in'
+  | 'semver_not_in';
 
 export interface StrategyParameters {
   rollout?: number;
@@ -1084,7 +1089,7 @@ export class FeatureContextFieldModel {
         });
       }
 
-      const fields = await query.orderBy('g_feature_context_fields.sortOrder', 'asc');
+      const fields = await query.orderBy('g_feature_context_fields.createdAt', 'desc');
 
       return fields.map((f: any) => ({
         ...f,

@@ -39,11 +39,14 @@ const getOperatorLabel = (op: string): string => {
     str_ends_with: "$",
     str_in: "∈",
     str_not_in: "∉",
+    str_regex: "~",
     num_eq: "=",
     num_gt: ">",
     num_gte: "≥",
     num_lt: "<",
     num_lte: "≤",
+    num_in: "∈",
+    num_not_in: "∉",
     bool_is: "=",
     date_gt: ">",
     date_gte: "≥",
@@ -54,6 +57,8 @@ const getOperatorLabel = (op: string): string => {
     semver_gte: "≥",
     semver_lt: "<",
     semver_lte: "≤",
+    semver_in: "∈",
+    semver_not_in: "∉",
   };
   return opLabels[op] || op;
 };
@@ -155,6 +160,10 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({
         text: "is not one of",
         description: "Value does not match any of the listed values",
       },
+      str_regex: {
+        text: "matches regex",
+        description: "Value matches regular expression",
+      },
       num_eq: { text: "equals", description: "Number equals" },
       num_gt: { text: "greater than", description: "Number is greater than" },
       num_gte: {
@@ -165,6 +174,14 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({
       num_lte: {
         text: "less or equal",
         description: "Number is less than or equal to",
+      },
+      num_in: {
+        text: "is one of",
+        description: "Value matches one of the listed values",
+      },
+      num_not_in: {
+        text: "is not one of",
+        description: "Value does not match any of the listed values",
       },
       bool_is: { text: "is", description: "Boolean equals" },
       date_gt: {
@@ -199,6 +216,14 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({
       semver_lte: {
         text: "less or equal",
         description: "Semantic version is less than or equal to",
+      },
+      semver_in: {
+        text: "is one of",
+        description: "Value matches one of the listed values",
+      },
+      semver_not_in: {
+        text: "is not one of",
+        description: "Value does not match any of the listed values",
       },
     };
     return opInfo[op] || { text: op, description: op };

@@ -24,6 +24,8 @@ export type ConstraintOperator =
   | 'num_gte'
   | 'num_lt'
   | 'num_lte'
+  | 'num_in'
+  | 'num_not_in'
   // Boolean operators
   | 'bool_is'
   // Date operators
@@ -36,7 +38,9 @@ export type ConstraintOperator =
   | 'semver_gt'
   | 'semver_gte'
   | 'semver_lt'
-  | 'semver_lte';
+  | 'semver_lte'
+  | 'semver_in'
+  | 'semver_not_in';
 
 // ==================== Evaluation Context ====================
 

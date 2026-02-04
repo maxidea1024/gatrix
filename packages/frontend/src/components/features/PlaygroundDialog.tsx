@@ -150,6 +150,8 @@ interface PlaygroundDialogProps {
   autoExecute?: boolean;
   /** Embedded mode - renders as inline Box instead of Dialog, hides flag/env selectors */
   embedded?: boolean;
+  /** Pre-loaded flag details for embedded mode */
+  initialFlagDetails?: any;
 }
 
 const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
@@ -160,6 +162,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
   initialContext,
   autoExecute = false,
   embedded = false,
+  initialFlagDetails,
 }) => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
@@ -309,6 +312,12 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
   // Load flag details when evaluation popover opens
   useEffect(() => {
     if (selectedEvaluation?.flagName) {
+      // Use initial details if they match the current flag
+      if (initialFlagDetails && initialFlagDetails.flagName === selectedEvaluation.flagName) {
+        setFlagDetails(initialFlagDetails);
+        return;
+      }
+
       setLoadingFlagDetails(true);
       setFlagDetails(null);
       featureFlagService
@@ -325,7 +334,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
     } else {
       setFlagDetails(null);
     }
-  }, [selectedEvaluation?.flagName]);
+  }, [selectedEvaluation?.flagName, initialFlagDetails]);
 
   // Helper function to localize evaluation reason
   const getLocalizedReason = (reason: string, reasonDetails?: any): string => {

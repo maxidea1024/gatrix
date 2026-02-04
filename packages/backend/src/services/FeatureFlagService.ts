@@ -83,7 +83,7 @@ export interface CreateVariantInput {
   variantName: string;
   weight: number;
   payload?: any;
-  payloadType?: 'string' | 'number' | 'boolean' | 'json';
+  payloadType?: 'string' | 'number' | 'json';
   weightLock?: boolean;
 }
 
@@ -250,7 +250,7 @@ class FeatureFlagService {
       await FeatureVariantModel.create({
         flagId: flag.id,
         environment: input.environment,
-        variantName: 'default',
+        variantName: 'config',  // 'config' is default variant name for remote config
         weight: 100,
         payload: defaultPayload,
         payloadType: 'json',

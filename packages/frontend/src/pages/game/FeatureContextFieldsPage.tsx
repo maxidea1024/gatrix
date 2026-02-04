@@ -70,7 +70,7 @@ interface FeatureContextField {
   fieldName: string;
   displayName: string;
   description: string;
-  fieldType: "string" | "number" | "boolean" | "datetime" | "semver";
+  fieldType: "string" | "number" | "boolean" | "date" | "semver";
   legalValues: string[];
   isEnabled: boolean;
   tags: string[];
@@ -207,7 +207,7 @@ const FeatureContextFieldsPage: React.FC = () => {
         return <NumberIcon sx={{ fontSize: 16 }} color="success" />;
       case "boolean":
         return <BooleanIcon sx={{ fontSize: 16 }} color="warning" />;
-      case "datetime":
+      case "date":
         return <DateTimeIcon sx={{ fontSize: 16 }} color="secondary" />;
       case "semver":
         return <SemverIcon sx={{ fontSize: 16 }} color="primary" />;
@@ -240,9 +240,9 @@ const FeatureContextFieldsPage: React.FC = () => {
             icon: getFieldTypeIcon("boolean"),
           },
           {
-            value: "datetime",
-            label: t("featureFlags.fieldTypes.datetime"),
-            icon: getFieldTypeIcon("datetime"),
+            value: "date",
+            label: t("featureFlags.fieldTypes.date"),
+            icon: getFieldTypeIcon("date"),
           },
           {
             value: "semver",
@@ -316,7 +316,7 @@ const FeatureContextFieldsPage: React.FC = () => {
         return <NumberIcon {...iconProps} color="success" />;
       case "boolean":
         return <BooleanIcon {...iconProps} color="warning" />;
-      case "datetime":
+      case "date":
         return <DateTimeIcon {...iconProps} color="secondary" />;
       case "semver":
         return <SemverIcon {...iconProps} color="primary" />;
@@ -440,8 +440,8 @@ const FeatureContextFieldsPage: React.FC = () => {
         return t("featureFlags.fieldTypes.number");
       case "boolean":
         return t("featureFlags.fieldTypes.boolean");
-      case "datetime":
-        return t("featureFlags.fieldTypes.datetime");
+      case "date":
+        return t("featureFlags.fieldTypes.date");
       case "semver":
         return t("featureFlags.fieldTypes.semver");
       default:
@@ -780,8 +780,8 @@ const FeatureContextFieldsPage: React.FC = () => {
                                           {expandedLegalValues.has(field.id)
                                             ? t("featureFlags.showLess")
                                             : t("featureFlags.showMore", {
-                                                count: field.legalValues.length - 3,
-                                              })}
+                                              count: field.legalValues.length - 3,
+                                            })}
                                         </Typography>
                                       )}
                                     </Box>
@@ -1007,10 +1007,10 @@ const FeatureContextFieldsPage: React.FC = () => {
                     {t("featureFlags.fieldTypes.boolean")}
                   </Box>
                 </MenuItem>
-                <MenuItem value="datetime">
+                <MenuItem value="date">
                   <Box sx={{ display: "flex", alignItems: "center" }}>
-                    {getTypeIcon("datetime")}
-                    {t("featureFlags.fieldTypes.datetime")}
+                    {getTypeIcon("date")}
+                    {t("featureFlags.fieldTypes.date")}
                   </Box>
                 </MenuItem>
                 <MenuItem value="semver">

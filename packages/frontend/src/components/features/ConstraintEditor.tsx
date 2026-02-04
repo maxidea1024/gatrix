@@ -76,14 +76,15 @@ export type ConstraintOperator =
   | "str_contains"
   | "str_starts_with"
   | "str_ends_with"
-  | "str_in"
-  | "str_not_in"
+  | "str_regex"
   // Number operators
   | "num_eq"
   | "num_gt"
   | "num_gte"
   | "num_lt"
   | "num_lte"
+  | "num_in"
+  | "num_not_in"
   // Boolean operators
   | "bool_is"
   // Date operators
@@ -96,13 +97,15 @@ export type ConstraintOperator =
   | "semver_gt"
   | "semver_gte"
   | "semver_lt"
-  | "semver_lte";
+  | "semver_lte"
+  | "semver_in"
+  | "semver_not_in";
 
 export interface ContextField {
   fieldName: string;
   displayName: string;
   description?: string;
-  fieldType: "string" | "number" | "boolean" | "datetime" | "semver";
+  fieldType: "string" | "number" | "boolean" | "date" | "semver";
   legalValues?: string[];
 }
 
@@ -123,6 +126,7 @@ const OPERATORS_BY_TYPE: Record<string, { value: string; label: string }[]> = {
     { value: "str_ends_with", label: "ends with" },
     { value: "str_in", label: "in list" },
     { value: "str_not_in", label: "not in list" },
+    { value: "str_regex", label: "matches regex" },
   ],
   number: [
     { value: "num_eq", label: "=" },
@@ -130,9 +134,11 @@ const OPERATORS_BY_TYPE: Record<string, { value: string; label: string }[]> = {
     { value: "num_gte", label: ">=" },
     { value: "num_lt", label: "<" },
     { value: "num_lte", label: "<=" },
+    { value: "num_in", label: "in list" },
+    { value: "num_not_in", label: "not in list" },
   ],
   boolean: [{ value: "bool_is", label: "is" }],
-  datetime: [
+  date: [
     { value: "date_gt", label: "after" },
     { value: "date_gte", label: "on or after" },
     { value: "date_lt", label: "before" },
@@ -144,6 +150,8 @@ const OPERATORS_BY_TYPE: Record<string, { value: string; label: string }[]> = {
     { value: "semver_gte", label: ">=" },
     { value: "semver_lt", label: "<" },
     { value: "semver_lte", label: "<=" },
+    { value: "semver_in", label: "in list" },
+    { value: "semver_not_in", label: "not in list" },
   ],
 };
 
@@ -156,11 +164,14 @@ const INVERTED_OPERATOR_LABELS: Record<string, string> = {
   str_ends_with: "does not end with",
   str_in: "not in list",
   str_not_in: "in list",
+  str_regex: "does not match regex",
   num_eq: "≠",
   num_gt: "≤",
   num_gte: "<",
   num_lt: "≥",
   num_lte: ">",
+  num_in: "not in list",
+  num_not_in: "in list",
   bool_is: "is not",
   date_gt: "on or before",
   date_gte: "before",
@@ -171,6 +182,8 @@ const INVERTED_OPERATOR_LABELS: Record<string, string> = {
   semver_gte: "<",
   semver_lt: "≥",
   semver_lte: ">",
+  semver_in: "not in list",
+  semver_not_in: "in list",
 };
 
 // Get operator label based on inverted state
@@ -187,7 +200,14 @@ const getOperatorLabel = (
 
 // Check if operator expects multiple values
 const isMultiValueOperator = (operator: ConstraintOperator): boolean => {
-  return operator === "str_in" || operator === "str_not_in";
+  return (
+    operator === "str_in" ||
+    operator === "str_not_in" ||
+    operator === "num_in" ||
+    operator === "num_not_in" ||
+    operator === "semver_in" ||
+    operator === "semver_not_in"
+  );
 };
 
 // Sortable constraint card component
@@ -332,7 +352,7 @@ const SortableConstraintCard: React.FC<SortableConstraintCardProps> = ({
                         sx={{ fontSize: 16, color: "warning.main", mr: 1 }}
                       />
                     );
-                  case "datetime":
+                  case "date":
                     return (
                       <DateTimeIcon
                         sx={{ fontSize: 16, color: "secondary.main", mr: 1 }}
@@ -384,7 +404,7 @@ const SortableConstraintCard: React.FC<SortableConstraintCardProps> = ({
                         sx={{ fontSize: 16, color: "warning.main" }}
                       />
                     );
-                  case "datetime":
+                  case "date":
                     return (
                       <DateTimeIcon
                         sx={{ fontSize: 16, color: "secondary.main" }}
@@ -842,7 +862,7 @@ export const ConstraintEditor: React.FC<ConstraintEditorProps> = ({
     }
 
     // Date input
-    if (fieldType === "datetime") {
+    if (fieldType === "date") {
       return (
         <LocalizedDateTimePicker
           value={constraint.value || null}

@@ -225,7 +225,9 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
         // Clear env-specific, use global
         await onSaveFallbackValue(null, true);
       }
+      isSavingRef.current = false;
     } catch (error) {
+      isSavingRef.current = false;
       // Error handling done by parent
     } finally {
       setSavingFallback(false);
@@ -368,6 +370,10 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
       });
 
       await onSave(variantsToSave);
+      isSavingRef.current = false;
+    } catch (error) {
+      isSavingRef.current = false;
+      throw error;
     } finally {
       setSaving(false);
     }

@@ -586,7 +586,9 @@ export class ClientController {
 
     res.json({
       success: true,
-      data: results,
+      data: {
+        flags: Object.values(results),
+      },
       meta: {
         environment,
         evaluatedAt: new Date().toISOString(),
