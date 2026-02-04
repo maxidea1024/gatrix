@@ -66,6 +66,7 @@ import { useSnackbar } from 'notistack';
 import { useNavigate } from 'react-router-dom';
 import { parseApiErrorMessage } from '../../utils/errorUtils';
 import { Environment, environmentService } from '../../services/environmentService';
+import featureFlagService from '../../services/featureFlagService';
 import api from '../../services/api';
 import ConstraintDisplay from './ConstraintDisplay';
 import LocalizedDateTimePicker from '../common/LocalizedDateTimePicker';
@@ -176,7 +177,9 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
 
     // Evaluation details popover state
     const [evaluationPopoverAnchor, setEvaluationPopoverAnchor] = useState<HTMLElement | null>(null);
-    const [selectedEvaluation, setSelectedEvaluation] = useState<{ env: string; result: EvaluationResult } | null>(null);
+    const [selectedEvaluation, setSelectedEvaluation] = useState<{ flagName: string; env: string; result: EvaluationResult } | null>(null);
+    const [flagDetails, setFlagDetails] = useState<any | null>(null);
+    const [loadingFlagDetails, setLoadingFlagDetails] = useState(false);
 
     // Load environments and context fields
     useEffect(() => {
@@ -251,6 +254,26 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
             handleEvaluate();
         }
     }, [autoExecutePending, environments.length]);
+
+    // Load flag details when evaluation popover opens
+    useEffect(() => {
+        if (selectedEvaluation?.flagName) {
+            setLoadingFlagDetails(true);
+            setFlagDetails(null);
+            featureFlagService.getFeatureFlag(selectedEvaluation.flagName)
+                .then((flag) => {
+                    setFlagDetails(flag);
+                })
+                .catch((error) => {
+                    console.error('Failed to load flag details:', error);
+                })
+                .finally(() => {
+                    setLoadingFlagDetails(false);
+                });
+        } else {
+            setFlagDetails(null);
+        }
+    }, [selectedEvaluation?.flagName]);
 
     // Helper function to localize evaluation reason
     const getLocalizedReason = (reason: string, reasonDetails?: any): string => {
@@ -1021,7 +1044,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                                                                 onClick={(e) => {
                                                                                     if (hasDetails) {
                                                                                         setEvaluationPopoverAnchor(e.currentTarget);
-                                                                                        setSelectedEvaluation({ env, result });
+                                                                                        setSelectedEvaluation({ flagName, env, result });
                                                                                     }
                                                                                 }}
                                                                             >
@@ -1260,6 +1283,157 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                     </Typography>
                                 </Box>
                             )}
+
+                            {/* Flag Strategy Structure (Evaluation Blueprint) */}
+                            {loadingFlagDetails ? (
+                                <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+                                    <CircularProgress size={16} />
+                                    <Typography variant="caption" color="text.secondary">
+                                        {t('common.loading')}...
+                                    </Typography>
+                                </Box>
+                            ) : flagDetails && (() => {
+                                // Find environment strategies
+                                const envConfig = flagDetails.environments?.find((e: any) => e.environment === selectedEvaluation.env);
+                                const strategies = envConfig?.strategies || [];
+
+                                if (strategies.length === 0) {
+                                    return null;
+                                }
+
+                                // Map strategy names from evaluation result to track which was matched
+                                const matchedStrategyName = selectedEvaluation.result.reasonDetails?.strategyName;
+
+                                return (
+                                    <Box sx={{ mb: 2 }}>
+                                        <Typography variant="caption" color="text.secondary" fontWeight={600} sx={{ display: 'block', mb: 1 }}>
+                                            {t('playground.evaluationBlueprint')}:
+                                        </Typography>
+                                        <Box sx={{
+                                            border: '1px solid',
+                                            borderColor: 'divider',
+                                            borderRadius: 1,
+                                            overflow: 'hidden'
+                                        }}>
+                                            {strategies.map((strategy: any, stratIdx: number) => {
+                                                const strategyName = strategy.name || strategy.strategyName;
+                                                const localizedName = (() => {
+                                                    const key = `featureFlags.strategyTypes.${strategyName}`;
+                                                    const localized = t(key);
+                                                    return localized !== key ? localized : strategyName;
+                                                })();
+
+                                                const isMatched = matchedStrategyName === strategyName;
+                                                const wasEvaluated = selectedEvaluation.result.evaluationSteps?.some(
+                                                    (step: any) => step.type === 'STRATEGY' && step.strategyName === strategyName
+                                                );
+                                                const stepResult = selectedEvaluation.result.evaluationSteps?.find(
+                                                    (step: any) => step.type === 'STRATEGY' && step.strategyName === strategyName
+                                                );
+
+                                                return (
+                                                    <Box
+                                                        key={stratIdx}
+                                                        sx={{
+                                                            p: 1.5,
+                                                            borderBottom: stratIdx < strategies.length - 1 ? '1px solid' : 'none',
+                                                            borderColor: 'divider',
+                                                            bgcolor: isMatched ? 'success.50' : wasEvaluated ? (stepResult?.passed ? 'success.50' : 'error.50') : 'grey.50',
+                                                            position: 'relative',
+                                                            '&::before': isMatched ? {
+                                                                content: '""',
+                                                                position: 'absolute',
+                                                                left: 0,
+                                                                top: 0,
+                                                                bottom: 0,
+                                                                width: 4,
+                                                                bgcolor: 'success.main'
+                                                            } : wasEvaluated && !stepResult?.passed ? {
+                                                                content: '""',
+                                                                position: 'absolute',
+                                                                left: 0,
+                                                                top: 0,
+                                                                bottom: 0,
+                                                                width: 4,
+                                                                bgcolor: 'error.main'
+                                                            } : {}
+                                                        }}
+                                                    >
+                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+                                                            {isMatched ? (
+                                                                <TrueIcon sx={{ fontSize: 16, color: 'success.main' }} />
+                                                            ) : wasEvaluated ? (
+                                                                stepResult?.passed ? (
+                                                                    <TrueIcon sx={{ fontSize: 16, color: 'success.main' }} />
+                                                                ) : (
+                                                                    <FalseIcon sx={{ fontSize: 16, color: 'error.main' }} />
+                                                                )
+                                                            ) : (
+                                                                <RemoveCircleOutlineIcon sx={{ fontSize: 16, color: 'grey.400' }} />
+                                                            )}
+                                                            <Typography variant="body2" fontWeight={600}>
+                                                                {t('playground.strategyLabel', { index: stratIdx + 1 })}: {localizedName}
+                                                            </Typography>
+                                                            {isMatched && (
+                                                                <Chip
+                                                                    label={t('playground.matched')}
+                                                                    size="small"
+                                                                    color="success"
+                                                                    sx={{ height: 18, fontSize: '0.65rem' }}
+                                                                />
+                                                            )}
+                                                            {!wasEvaluated && (
+                                                                <Chip
+                                                                    label={t('playground.notEvaluated')}
+                                                                    size="small"
+                                                                    sx={{ height: 18, fontSize: '0.65rem', bgcolor: 'grey.300', color: 'grey.600' }}
+                                                                />
+                                                            )}
+                                                        </Box>
+
+                                                        {/* Strategy components preview */}
+                                                        <Box sx={{ pl: 3, display: 'flex', flexWrap: 'wrap', gap: 0.5, mt: 0.5 }}>
+                                                            {strategy.segments && strategy.segments.length > 0 && (
+                                                                <Chip
+                                                                    label={`${strategy.segments.length} ${t('playground.segments')}`}
+                                                                    size="small"
+                                                                    variant="outlined"
+                                                                    sx={{ height: 20, fontSize: '0.65rem' }}
+                                                                />
+                                                            )}
+                                                            {strategy.constraints && strategy.constraints.length > 0 && (
+                                                                <Chip
+                                                                    label={`${strategy.constraints.length} ${t('playground.constraints')}`}
+                                                                    size="small"
+                                                                    variant="outlined"
+                                                                    sx={{ height: 20, fontSize: '0.65rem' }}
+                                                                />
+                                                            )}
+                                                            {strategy.rollout !== undefined && strategy.rollout < 100 && (
+                                                                <Chip
+                                                                    label={`${t('playground.rolloutLabel')}: ${strategy.rollout}%`}
+                                                                    size="small"
+                                                                    variant="outlined"
+                                                                    sx={{ height: 20, fontSize: '0.65rem' }}
+                                                                />
+                                                            )}
+                                                            {strategy.variants && strategy.variants.length > 0 && (
+                                                                <Chip
+                                                                    label={`${strategy.variants.length} ${t('playground.variants')}`}
+                                                                    size="small"
+                                                                    variant="outlined"
+                                                                    color="secondary"
+                                                                    sx={{ height: 20, fontSize: '0.65rem' }}
+                                                                />
+                                                            )}
+                                                        </Box>
+                                                    </Box>
+                                                );
+                                            })}
+                                        </Box>
+                                    </Box>
+                                );
+                            })()}
 
                             {/* Context Fields Used */}
                             {contextEntries.length > 0 && (
