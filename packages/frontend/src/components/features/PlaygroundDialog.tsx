@@ -146,6 +146,8 @@ interface PlaygroundDialogProps {
     initialContext?: Record<string, any>;
     /** Auto-execute evaluation when dialog opens */
     autoExecute?: boolean;
+    /** Embedded mode - renders as inline Box instead of Dialog, hides flag/env selectors */
+    embedded?: boolean;
 }
 
 const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
@@ -155,6 +157,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
     initialEnvironments,
     initialContext,
     autoExecute = false,
+    embedded = false,
 }) => {
     const { t } = useTranslation();
     const { enqueueSnackbar } = useSnackbar();
@@ -1747,9 +1750,9 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                                                                                 sx={{
                                                                                                     height: 18,
                                                                                                     fontSize: '0.65rem',
-                                                                                                    fontWeight: 700,
-                                                                                                    bgcolor: operatorType === 'AND' ? 'primary.main' : 'secondary.main',
-                                                                                                    color: '#fff',
+                                                                                                    fontWeight: 600,
+                                                                                                    bgcolor: 'grey.500',
+                                                                                                    color: 'common.white',
                                                                                                     '& .MuiChip-label': { px: 1 }
                                                                                                 }}
                                                                                             />
