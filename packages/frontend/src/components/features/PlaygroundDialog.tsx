@@ -1747,9 +1747,9 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                                                                                 sx={{
                                                                                                     height: 18,
                                                                                                     fontSize: '0.65rem',
-                                                                                                    fontWeight: 700,
-                                                                                                    bgcolor: operatorType === 'AND' ? 'primary.main' : 'secondary.main',
-                                                                                                    color: '#fff',
+                                                                                                    fontWeight: 600,
+                                                                                                    bgcolor: 'action.selected',
+                                                                                                    color: 'text.secondary',
                                                                                                     '& .MuiChip-label': { px: 1 }
                                                                                                 }}
                                                                                             />
