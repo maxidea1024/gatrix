@@ -379,7 +379,8 @@ export class ClientController {
       if (!context.userId && req.query.userId) context.userId = req.query.userId as string;
       if (!context.sessionId && req.query.sessionId)
         context.sessionId = req.query.sessionId as string;
-      if (!context.ip && req.query.remoteAddress) context.ip = req.query.remoteAddress as string;
+      if (!context.remoteAddress && req.query.remoteAddress)
+        context.remoteAddress = req.query.remoteAddress as string;
       if (!context.appName && req.query.appName) context.appName = req.query.appName as string;
 
       // Handle properties[key]=value
@@ -399,8 +400,8 @@ export class ClientController {
     }
 
     // Default context values from request if not provided
-    if (!context.ip) context.ip = ClientController.getClientIp(req);
-    context.environmentName = environment;
+    if (!context.remoteAddress) context.remoteAddress = ClientController.getClientIp(req);
+    context.environment = environment;
 
     // 2. Fetch all flags and segments (with caching)
     // We cache the *definitions* for a short time (e.g. 60s) to avoid DB spam

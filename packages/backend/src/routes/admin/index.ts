@@ -41,6 +41,7 @@ import changeRequestRoutes from './changeRequests';
 import featureRoutes from './features';
 import platformDefaultsRoutes from './platformDefaults';
 import unknownFlagsRoutes from './unknownFlags';
+import integrationRoutes from './integrations';
 
 const router = express.Router();
 
@@ -284,6 +285,13 @@ router.use(
   '/unknown-flags',
   requirePermission([PERMISSIONS.FEATURE_FLAGS_VIEW, PERMISSIONS.FEATURE_FLAGS_MANAGE]) as any,
   unknownFlagsRoutes
+);
+
+// Integrations - requires security.view or security.manage permission
+router.use(
+  '/integrations',
+  requirePermission([PERMISSIONS.SECURITY_VIEW, PERMISSIONS.SECURITY_MANAGE]) as any,
+  integrationRoutes
 );
 
 export default router;

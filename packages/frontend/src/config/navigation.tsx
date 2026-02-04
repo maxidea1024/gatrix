@@ -523,6 +523,12 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
         path: "/settings/environments",
         permission: "environments",
       },
+      {
+        text: "integrations.title",
+        icon: "Extension",
+        path: "/settings/integrations",
+        permission: "security",
+      },
     ],
   },
 ];

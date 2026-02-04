@@ -53,6 +53,7 @@ export interface EvaluationContext {
   appName?: string;
   appVersion?: string;
   remoteAddress?: string;
+  environment?: string;
   currentTime?: Date;
   // Custom properties
   properties?: Record<string, string | number | boolean>;

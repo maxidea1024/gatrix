@@ -106,6 +106,9 @@ import DataManagementPage from "./pages/admin/DataManagementPage";
 import GatrixEdgesPage from "./pages/admin/GatrixEdgesPage";
 import EnvironmentsPage from "./pages/settings/EnvironmentsPage";
 import KeyValuePage from "./pages/settings/KeyValuePage";
+import IntegrationsPage from "./pages/settings/IntegrationsPage";
+import CreateIntegrationPage from "./pages/settings/CreateIntegrationPage";
+import EditIntegrationPage from "./pages/settings/EditIntegrationPage";
 // import AdvancedSettingsPage from './pages/admin/AdvancedSettingsPage'];
 
 // Pages - Game
@@ -542,6 +545,37 @@ const AppContent: React.FC = () => {
                               </ProtectedRoute>
                             }
                           />
+                          <Route
+                            path="/settings/integrations"
+                            element={
+                              <ProtectedRoute requiredRoles={["admin"]}>
+                                <MainLayout>
+                                  <IntegrationsPage />
+                                </MainLayout>
+                              </ProtectedRoute>
+                            }
+                          />
+                          <Route
+                            path="/settings/integrations/create"
+                            element={
+                              <ProtectedRoute requiredRoles={["admin"]}>
+                                <MainLayout>
+                                  <CreateIntegrationPage />
+                                </MainLayout>
+                              </ProtectedRoute>
+                            }
+                          />
+                          <Route
+                            path="/settings/integrations/:id/edit"
+                            element={
+                              <ProtectedRoute requiredRoles={["admin"]}>
+                                <MainLayout>
+                                  <EditIntegrationPage />
+                                </MainLayout>
+                              </ProtectedRoute>
+                            }
+                          />
+
 
                           {/* Admin Routes */}
                           <Route
