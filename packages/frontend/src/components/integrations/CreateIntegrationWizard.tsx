@@ -415,7 +415,7 @@ export const CreateIntegrationWizard: React.FC<CreateIntegrationWizardProps> = (
 
             <DialogContent sx={{ pt: 3 }}>
                 {/* Stepper */}
-                <Stepper activeStep={activeStep} sx={{ mb: 4 }}>
+                <Stepper activeStep={activeStep} sx={{ mt: 2, mb: 4 }}>
                     {STEPS.map((step) => (
                         <Step key={step}>
                             <StepLabel>{t(`integrations.step.${step}`)}</StepLabel>
