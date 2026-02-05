@@ -617,9 +617,41 @@ export const dingtalkDefinition: AddonDefinition = {
 };
 
 /**
+ * Debug Addon Definition
+ */
+export const debugDefinition: AddonDefinition = {
+  name: 'debug',
+  displayName: 'integrations.providers.debug.displayName',
+  description: 'integrations.providers.debug.description',
+  parameters: [
+    {
+      name: 'logLevel',
+      displayName: 'integrations.providers.debug.params.logLevel.displayName',
+      type: 'list',
+      description: 'integrations.providers.debug.params.logLevel.description',
+      placeholder: 'info',
+      required: false,
+      sensitive: false,
+      default: 'info',
+    },
+    {
+      name: 'simulateAttribute',
+      displayName: 'integrations.providers.debug.params.simulateAttribute.displayName',
+      type: 'text',
+      description: 'integrations.providers.debug.params.simulateAttribute.description',
+      placeholder: 'key=value',
+      required: false,
+      sensitive: false,
+    },
+  ],
+  events: ALL_INTEGRATION_EVENTS,
+};
+
+/**
  * All addon definitions
  */
 export const ADDON_DEFINITIONS: Record<string, AddonDefinition> = {
+  debug: debugDefinition,
   'slack-app': slackAppDefinition,
   'new-relic': newRelicDefinition,
   webhook: webhookDefinition,

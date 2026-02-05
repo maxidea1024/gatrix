@@ -20,6 +20,7 @@ import { KakaoAddon } from './KakaoAddon';
 import { GoogleChatAddon } from './GoogleChatAddon';
 import { WeComAddon } from './WeComAddon';
 import { DingTalkAddon } from './DingTalkAddon';
+import { DebugAddon } from './DebugAddon';
 import { getAllAddonDefinitions, getAddonDefinition, ADDON_DEFINITIONS } from './definitions';
 import type { AddonDefinition } from './definitions';
 
@@ -30,6 +31,7 @@ export type AddonProviders = Record<string, Addon>;
  */
 export function getAddons(): AddonProviders {
   return {
+    debug: new DebugAddon(),
     slack: new SlackAddon(),
     'slack-app': new SlackAppAddon(),
     'new-relic': new NewRelicAddon(),
@@ -81,6 +83,7 @@ export {
   GoogleChatAddon,
   WeComAddon,
   DingTalkAddon,
+  DebugAddon,
   AddonDefinition,
   getAddonDefinition,
   ADDON_DEFINITIONS,

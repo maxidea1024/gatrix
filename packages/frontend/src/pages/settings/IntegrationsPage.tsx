@@ -40,6 +40,7 @@ import kakaoIcon from '@/assets/icons/integrations/kakao.svg';
 import googleChatIcon from '@/assets/icons/integrations/google-chat.svg';
 import wecomIcon from '@/assets/icons/integrations/wecom.svg';
 import dingtalkIcon from '@/assets/icons/integrations/dingtalk.svg';
+import debugIcon from '@/assets/icons/integrations/debug.svg';
 
 interface Integration {
   id: string;
@@ -89,6 +90,7 @@ const PROVIDER_ICONS: Record<string, string> = {
   'google-chat': googleChatIcon,
   wecom: wecomIcon,
   dingtalk: dingtalkIcon,
+  debug: debugIcon,
 };
 
 export const IntegrationsPage: React.FC = () => {

@@ -68,6 +68,7 @@ interface SdkProvider {
     description: string;
     icon: string;
     isServer?: boolean;
+    adaptive?: boolean;
 }
 
 const SERVER_SDKS: SdkProvider[] = [
@@ -105,15 +106,15 @@ const MOBILE_SDKS: SdkProvider[] = [
 ];
 
 const GAME_ENGINE_SDKS: SdkProvider[] = [
-    { name: 'unreal', displayName: 'Unreal Engine', type: 'Game Engine', description: 'Unreal Engine native C++ SDK.', icon: unrealIcon },
+    { name: 'unreal', displayName: 'Unreal Engine', type: 'Game Engine', description: 'Unreal Engine native C++ SDK.', icon: unrealIcon, adaptive: true },
     { name: 'unity', displayName: 'Unity', type: 'Game Engine', description: 'Unity C# SDK for cross-platform games.', icon: unityIcon },
     { name: 'roblox', displayName: 'Roblox', type: 'Game Engine', description: 'Roblox Luau SDK for game creators.', icon: robloxIcon },
     { name: 'cocos', displayName: 'Cocos', type: 'Game Engine', description: 'Cocos2d-x / Cocos Creator SDK.', icon: cocosIcon },
     { name: 'godot', displayName: 'Godot', type: 'Game Engine', description: 'Godot Engine GDScript/C# SDK.', icon: godotIcon },
     { name: 'gamemaker', displayName: 'GameMaker', type: 'Game Engine', description: 'GameMaker GML SDK for 2D games.', icon: gamemakerIcon },
-    { name: 'cryengine', displayName: 'CryEngine', type: 'Game Engine', description: 'CryEngine C++/C# SDK.', icon: cryengineIcon },
-    { name: 'bevy', displayName: 'Bevy', type: 'Game Engine', description: 'Data-driven Bevy Engine Rust SDK.', icon: bevyIcon },
-    { name: 'raylib', displayName: 'Raylib', type: 'Game Engine', description: 'Raylib C/C++ integration.', icon: raylibIcon },
+    { name: 'cryengine', displayName: 'CryEngine', type: 'Game Engine', description: 'CryEngine C++/C# SDK.', icon: cryengineIcon, adaptive: true },
+    { name: 'bevy', displayName: 'Bevy', type: 'Game Engine', description: 'Data-driven Bevy Engine Rust SDK.', icon: bevyIcon, adaptive: true },
+    { name: 'raylib', displayName: 'Raylib', type: 'Game Engine', description: 'Raylib C/C++ integration.', icon: raylibIcon, adaptive: true },
     { name: 'lua', displayName: 'Lua', type: 'Scripting', description: 'Universal Lua SDK for scripted environments.', icon: luaIcon },
 ];
 
@@ -140,17 +141,31 @@ const SdkCard: React.FC<{ sdk: SdkProvider }> = ({ sdk }) => {
             <CardContent sx={{ flex: 1, py: 1.5, px: 2 }}>
                 <Box display="flex" alignItems="center" justifyContent="space-between" mb={1}>
                     <Box display="flex" alignItems="center" gap={1.2} sx={{ minWidth: 0, flex: 1 }}>
-                        <Box
-                            component="img"
-                            src={sdk.icon}
-                            alt={sdk.displayName}
-                            sx={{
-                                width: 28,
-                                height: 28,
-                                flexShrink: 0,
-                                opacity: 0.9,
-                            }}
-                        />
+                        {sdk.adaptive ? (
+                            <Box
+                                sx={{
+                                    width: 28,
+                                    height: 28,
+                                    flexShrink: 0,
+                                    opacity: 0.9,
+                                    bgcolor: 'text.primary',
+                                    mask: `url(${sdk.icon}) no-repeat center / contain`,
+                                    WebkitMask: `url(${sdk.icon}) no-repeat center / contain`,
+                                }}
+                            />
+                        ) : (
+                            <Box
+                                component="img"
+                                src={sdk.icon}
+                                alt={sdk.displayName}
+                                sx={{
+                                    width: 28,
+                                    height: 28,
+                                    flexShrink: 0,
+                                    opacity: 0.9,
+                                }}
+                            />
+                        )}
                         <Box sx={{ minWidth: 0 }}>
                             <Typography variant="body1" fontWeight="bold" noWrap sx={{ lineHeight: 1.2 }}>
                                 {sdk.displayName}
