@@ -17,7 +17,7 @@ export interface PasswordResetToken {
 export class PasswordResetService {
   private static instance: PasswordResetService;
 
-  private constructor() {}
+  private constructor() { }
 
   public static getInstance(): PasswordResetService {
     if (!PasswordResetService.instance) {
@@ -189,7 +189,7 @@ export class PasswordResetService {
   async cleanupExpiredTokens(): Promise<void> {
     try {
       const deletedCount = await db('g_password_reset_tokens')
-        .where('expiresAt', '<', db.fn.now())
+        .where('expiresAt', '<', db.raw('UTC_TIMESTAMP()'))
         .orWhere('used', true)
         .del();
 

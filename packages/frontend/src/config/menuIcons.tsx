@@ -50,6 +50,9 @@ import {
   Hub as HubIcon,
   SettingsSuggest as SettingsSuggestIcon,
   Category as CategoryIcon,
+  Extension as ExtensionIcon,
+  Code as CodeIcon,
+  Phonelink as PhonelinkIcon,
 } from '@mui/icons-material';
 
 // Icon name to component mapping
@@ -99,6 +102,9 @@ const ICON_MAP: Record<string, React.ReactElement> = {
   Hub: <HubIcon />,
   SettingsSuggest: <SettingsSuggestIcon />,
   Category: <CategoryIcon />,
+  Extension: <ExtensionIcon />,
+  Code: <CodeIcon />,
+  Phonelink: <PhonelinkIcon />,
 };
 
 /**

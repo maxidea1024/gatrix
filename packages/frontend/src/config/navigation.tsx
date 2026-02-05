@@ -529,6 +529,12 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
         path: '/settings/integrations',
         permission: 'security',
       },
+      {
+        text: 'integrations.sdks.title',
+        icon: 'Code',
+        path: '/settings/integrations/sdks',
+        permission: 'security',
+      },
     ],
   },
 ];

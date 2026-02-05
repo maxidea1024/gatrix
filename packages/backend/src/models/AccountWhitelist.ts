@@ -258,7 +258,7 @@ export class WhitelistModel {
         throw new GatrixError('No fields to update', 400);
       }
 
-      updateData.updatedAt = db.fn.now();
+      updateData.updatedAt = db.raw('UTC_TIMESTAMP()');
 
       await db('g_account_whitelist')
         .where('id', id)
@@ -312,18 +312,20 @@ export class WhitelistModel {
     let tags: string[] | undefined = undefined;
 
     if (row.tags) {
-      try {
-        tags = JSON.parse(row.tags);
-      } catch (error) {
-        // JSON 파싱 실패 시 문자열을 배열로 변환
-        console.warn(`Invalid JSON in tags for whitelist ${row.id}: ${row.tags}`);
-        if (typeof row.tags === 'string') {
+      if (typeof row.tags === 'string') {
+        try {
+          tags = JSON.parse(row.tags);
+        } catch (error) {
+          // JSON 파싱 실패 시 문자열을 배열로 변환
+          console.warn(`Invalid JSON in tags for whitelist ${row.id}: ${row.tags}`);
           // 쉼표로 구분된 문자열을 배열로 변환
           tags = row.tags
             .split(',')
             .map((tag: string) => tag.trim())
             .filter((tag: string) => tag.length > 0);
         }
+      } else {
+        tags = row.tags;
       }
     }
 

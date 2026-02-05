@@ -321,6 +321,302 @@ export const newRelicDefinition: AddonDefinition = {
 };
 
 /**
+ * Discord Addon Definition
+ */
+export const discordDefinition: AddonDefinition = {
+  name: 'discord',
+  displayName: 'integrations.providers.discord.displayName',
+  description: 'integrations.providers.discord.description',
+  documentationUrl: 'https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks',
+  parameters: [
+    {
+      name: 'url',
+      displayName: 'integrations.providers.discord.params.url.displayName',
+      type: 'url',
+      description: 'integrations.providers.discord.params.url.description',
+      placeholder: 'https://discord.com/api/webhooks/xxx/xxx',
+      required: true,
+      sensitive: true,
+    },
+    {
+      name: 'username',
+      displayName: 'integrations.providers.discord.params.username.displayName',
+      type: 'text',
+      description: 'integrations.providers.discord.params.username.description',
+      placeholder: 'Gatrix Bot',
+      required: false,
+      sensitive: false,
+      default: 'Gatrix',
+    },
+    {
+      name: 'avatar_url',
+      displayName: 'integrations.providers.discord.params.avatar_url.displayName',
+      type: 'url',
+      description: 'integrations.providers.discord.params.avatar_url.description',
+      required: false,
+      sensitive: false,
+    },
+    {
+      name: 'customHeaders',
+      displayName: 'integrations.providers.common.customHeaders.displayName',
+      type: 'textfield',
+      description: 'integrations.providers.common.customHeaders.description',
+      placeholder: '{"X-Custom-Header": "value"}',
+      required: false,
+      sensitive: false,
+    },
+  ],
+  events: ALL_INTEGRATION_EVENTS,
+};
+
+/**
+ * PagerDuty Addon Definition
+ */
+export const pagerDutyDefinition: AddonDefinition = {
+  name: 'pagerduty',
+  displayName: 'integrations.providers.pagerduty.displayName',
+  description: 'integrations.providers.pagerduty.description',
+  documentationUrl: 'https://developer.pagerduty.com/docs/apis/events-api-v2/',
+  parameters: [
+    {
+      name: 'routingKey',
+      displayName: 'integrations.providers.pagerduty.params.routingKey.displayName',
+      type: 'text',
+      description: 'integrations.providers.pagerduty.params.routingKey.description',
+      placeholder: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+      required: true,
+      sensitive: true,
+    },
+    {
+      name: 'customHeaders',
+      displayName: 'integrations.providers.common.customHeaders.displayName',
+      type: 'textfield',
+      description: 'integrations.providers.common.customHeaders.description',
+      placeholder: '{"X-Custom-Header": "value"}',
+      required: false,
+      sensitive: false,
+    },
+  ],
+  events: ALL_INTEGRATION_EVENTS,
+};
+
+/**
+ * Line Addon Definition
+ */
+export const lineDefinition: AddonDefinition = {
+  name: 'line',
+  displayName: 'integrations.providers.line.displayName',
+  description: 'integrations.providers.line.description',
+  documentationUrl: 'https://developers.line.biz/en/docs/messaging-api/overview/',
+  parameters: [
+    {
+      name: 'accessToken',
+      displayName: 'integrations.providers.line.params.accessToken.displayName',
+      type: 'text',
+      description: 'integrations.providers.line.params.accessToken.description',
+      required: true,
+      sensitive: true,
+    },
+    {
+      name: 'to',
+      displayName: 'integrations.providers.line.params.to.displayName',
+      type: 'text',
+      description: 'integrations.providers.line.params.to.description',
+      placeholder: 'User ID or Group ID',
+      required: true,
+      sensitive: false,
+    },
+  ],
+  events: ALL_INTEGRATION_EVENTS,
+};
+
+/**
+ * KakaoTalk Addon Definition
+ */
+export const kakaoDefinition: AddonDefinition = {
+  name: 'kakao',
+  displayName: 'integrations.providers.kakao.displayName',
+  description: 'integrations.providers.kakao.description',
+  parameters: [
+    {
+      name: 'apiUrl',
+      displayName: 'integrations.providers.kakao.params.apiUrl.displayName',
+      type: 'url',
+      description: 'integrations.providers.kakao.params.apiUrl.description',
+      placeholder: 'https://api.kakaoagent.com/v1/send',
+      required: true,
+      sensitive: false,
+    },
+    {
+      name: 'apiKey',
+      displayName: 'integrations.providers.kakao.params.apiKey.displayName',
+      type: 'text',
+      required: true,
+      sensitive: true,
+    },
+    {
+      name: 'senderKey',
+      displayName: 'integrations.providers.kakao.params.senderKey.displayName',
+      type: 'text',
+      required: true,
+      sensitive: false,
+    },
+  ],
+  events: ALL_INTEGRATION_EVENTS,
+};
+
+/**
+ * Google Chat Addon Definition
+ */
+export const googleChatDefinition: AddonDefinition = {
+  name: 'google-chat',
+  displayName: 'integrations.providers.googleChat.displayName',
+  description: 'integrations.providers.googleChat.description',
+  documentationUrl: 'https://developers.google.com/chat/how-tos/webhooks',
+  parameters: [
+    {
+      name: 'url',
+      displayName: 'integrations.providers.googleChat.params.url.displayName',
+      type: 'url',
+      description: 'integrations.providers.googleChat.params.url.description',
+      placeholder: 'https://chat.googleapis.com/v1/spaces/xxx/messages?key=xxx&token=xxx',
+      required: true,
+      sensitive: true,
+    },
+  ],
+  events: ALL_INTEGRATION_EVENTS,
+};
+
+/**
+ * Telegram Addon Definition
+ */
+export const telegramDefinition: AddonDefinition = {
+  name: 'telegram',
+  displayName: 'integrations.providers.telegram.displayName',
+  description: 'integrations.providers.telegram.description',
+  documentationUrl: 'https://core.telegram.org/bots/api#sendmessage',
+  parameters: [
+    {
+      name: 'botToken',
+      displayName: 'integrations.providers.telegram.params.botToken.displayName',
+      type: 'text',
+      description: 'integrations.providers.telegram.params.botToken.description',
+      placeholder: '123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11',
+      required: true,
+      sensitive: true,
+    },
+    {
+      name: 'chatId',
+      displayName: 'integrations.providers.telegram.params.chatId.displayName',
+      type: 'text',
+      description: 'integrations.providers.telegram.params.chatId.description',
+      placeholder: '@channelname or 123456789',
+      required: true,
+      sensitive: false,
+    },
+    {
+      name: 'parse_mode',
+      displayName: 'integrations.providers.telegram.params.parse_mode.displayName',
+      type: 'text',
+      description: 'integrations.providers.telegram.params.parse_mode.description',
+      required: false,
+      sensitive: false,
+      default: 'Markdown',
+    },
+  ],
+  events: ALL_INTEGRATION_EVENTS,
+};
+
+/**
+ * WhatsApp (Meta API) Addon Definition
+ */
+export const whatsappDefinition: AddonDefinition = {
+  name: 'whatsapp',
+  displayName: 'integrations.providers.whatsapp.displayName',
+  description: 'integrations.providers.whatsapp.description',
+  documentationUrl: 'https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages',
+  parameters: [
+    {
+      name: 'accessToken',
+      displayName: 'integrations.providers.whatsapp.params.accessToken.displayName',
+      type: 'text',
+      description: 'integrations.providers.whatsapp.params.accessToken.description',
+      required: true,
+      sensitive: true,
+    },
+    {
+      name: 'phoneNumberId',
+      displayName: 'integrations.providers.whatsapp.params.phoneNumberId.displayName',
+      type: 'text',
+      description: 'integrations.providers.whatsapp.params.phoneNumberId.description',
+      required: true,
+      sensitive: false,
+    },
+    {
+      name: 'recipientPhoneNumber',
+      displayName: 'integrations.providers.whatsapp.params.recipientPhoneNumber.displayName',
+      type: 'text',
+      description: 'integrations.providers.whatsapp.params.recipientPhoneNumber.description',
+      placeholder: '15551234567',
+      required: true,
+      sensitive: false,
+    },
+  ],
+  events: ALL_INTEGRATION_EVENTS,
+};
+
+/**
+ * WeChat Work (WeCom) Addon Definition
+ */
+export const wecomDefinition: AddonDefinition = {
+  name: 'wecom',
+  displayName: 'integrations.providers.wecom.displayName',
+  description: 'integrations.providers.wecom.description',
+  documentationUrl: 'https://developer.work.weixin.qq.com/document/path/91770',
+  parameters: [
+    {
+      name: 'key',
+      displayName: 'integrations.providers.wecom.params.key.displayName',
+      type: 'text',
+      description: 'integrations.providers.wecom.params.key.description',
+      placeholder: '693a91f6-7xxx-4xxx-8xxx-xxxxxxxxxxxx',
+      required: true,
+      sensitive: true,
+    },
+  ],
+  events: ALL_INTEGRATION_EVENTS,
+};
+
+/**
+ * DingTalk Addon Definition
+ */
+export const dingtalkDefinition: AddonDefinition = {
+  name: 'dingtalk',
+  displayName: 'integrations.providers.dingtalk.displayName',
+  description: 'integrations.providers.dingtalk.description',
+  documentationUrl: 'https://open.dingtalk.com/document/group/custom-robot-access',
+  parameters: [
+    {
+      name: 'accessToken',
+      displayName: 'integrations.providers.dingtalk.params.accessToken.displayName',
+      type: 'text',
+      description: 'integrations.providers.dingtalk.params.accessToken.description',
+      required: true,
+      sensitive: true,
+    },
+    {
+      name: 'secret',
+      displayName: 'integrations.providers.dingtalk.params.secret.displayName',
+      type: 'text',
+      description: 'integrations.providers.dingtalk.params.secret.description',
+      required: false,
+      sensitive: true,
+    },
+  ],
+  events: ALL_INTEGRATION_EVENTS,
+};
+
+/**
  * All addon definitions
  */
 export const ADDON_DEFINITIONS: Record<string, AddonDefinition> = {
@@ -330,6 +626,15 @@ export const ADDON_DEFINITIONS: Record<string, AddonDefinition> = {
   teams: teamsDefinition,
   lark: larkDefinition,
   slack: slackDefinition,
+  discord: discordDefinition,
+  pagerduty: pagerDutyDefinition,
+  telegram: telegramDefinition,
+  whatsapp: whatsappDefinition,
+  line: lineDefinition,
+  kakao: kakaoDefinition,
+  'google-chat': googleChatDefinition,
+  wecom: wecomDefinition,
+  dingtalk: dingtalkDefinition,
 };
 
 /**

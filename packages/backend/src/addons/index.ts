@@ -11,6 +11,15 @@ import { WebhookAddon } from './WebhookAddon';
 import { TeamsAddon } from './TeamsAddon';
 import { LarkAddon } from './LarkAddon';
 import { NewRelicAddon } from './NewRelicAddon';
+import { DiscordAddon } from './DiscordAddon';
+import { PagerDutyAddon } from './PagerDutyAddon';
+import { TelegramAddon } from './TelegramAddon';
+import { WhatsAppAddon } from './WhatsAppAddon';
+import { LineAddon } from './LineAddon';
+import { KakaoAddon } from './KakaoAddon';
+import { GoogleChatAddon } from './GoogleChatAddon';
+import { WeComAddon } from './WeComAddon';
+import { DingTalkAddon } from './DingTalkAddon';
 import { getAllAddonDefinitions, getAddonDefinition, ADDON_DEFINITIONS } from './definitions';
 import type { AddonDefinition } from './definitions';
 
@@ -27,6 +36,15 @@ export function getAddons(): AddonProviders {
     webhook: new WebhookAddon(),
     teams: new TeamsAddon(),
     lark: new LarkAddon(),
+    discord: new DiscordAddon(),
+    pagerduty: new PagerDutyAddon(),
+    telegram: new TelegramAddon(),
+    whatsapp: new WhatsAppAddon(),
+    line: new LineAddon(),
+    kakao: new KakaoAddon(),
+    'google-chat': new GoogleChatAddon(),
+    wecom: new WeComAddon(),
+    dingtalk: new DingTalkAddon(),
   };
 }
 
@@ -54,6 +72,15 @@ export {
   TeamsAddon,
   LarkAddon,
   NewRelicAddon,
+  DiscordAddon,
+  PagerDutyAddon,
+  TelegramAddon,
+  WhatsAppAddon,
+  LineAddon,
+  KakaoAddon,
+  GoogleChatAddon,
+  WeComAddon,
+  DingTalkAddon,
   AddonDefinition,
   getAddonDefinition,
   ADDON_DEFINITIONS,

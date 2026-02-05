@@ -203,6 +203,264 @@ export function formatLarkMessage(event: IntegrationSystemEvent): Record<string,
 }
 
 /**
+ * Format Discord message payload
+ */
+export function formatDiscordMessage(event: IntegrationSystemEvent): Record<string, any> {
+  const emoji = getEventEmoji(event.type);
+  const message = formatEventMessage(event);
+  const color = parseInt(getEventColor(event.type).replace('#', ''), 16);
+  const details = buildEventDetails(event);
+
+  return {
+    embeds: [
+      {
+        title: `${emoji} ${formatEventType(event.type)}`,
+        description: message,
+        color,
+        fields: details.length > 0 ? [{ name: 'Details', value: details.join('\n') }] : [],
+        footer: {
+          text: 'Gatrix Integration',
+        },
+        timestamp: new Date(event.createdAt).toISOString(),
+      },
+    ],
+  };
+}
+
+/**
+ * Format PagerDuty message payload
+ */
+export function formatPagerDutyMessage(event: IntegrationSystemEvent, routingKey: string): Record<string, any> {
+  const eventName = formatEventType(event.type);
+  const actor = event.createdBy || 'System';
+  const details = buildEventDetails(event);
+
+  return {
+    routing_key: routingKey,
+    event_action: 'trigger',
+    payload: {
+      summary: `${eventName} by ${actor}`,
+      source: 'Gatrix',
+      severity: event.type.includes('deleted') || event.type.includes('archived') ? 'warning' : 'info',
+      timestamp: new Date(event.createdAt).toISOString(),
+      custom_details: {
+        eventType: event.type,
+        actor,
+        environment: event.environment,
+        ...event.data,
+      },
+      text: details.join('\n'),
+    },
+  };
+}
+
+/**
+ * Format Telegram message payload
+ */
+export function formatTelegramMessage(event: IntegrationSystemEvent): string {
+  const emoji = getEventEmoji(event.type);
+  const eventName = formatEventType(event.type);
+  const actor = event.createdBy || 'System';
+  const details = buildEventDetails(event);
+
+  let content = `${emoji} *${eventName}*\n`;
+  content += `By: ${actor}\n`;
+  if (event.environment) content += `Env: ${event.environment}\n`;
+  content += `Time: ${formatTimestamp(event.createdAt)}\n\n`;
+  content += details.join('\n');
+
+  return content;
+}
+
+/**
+ * Format WhatsApp message payload (Meta API)
+ */
+export function formatWhatsAppMessage(event: IntegrationSystemEvent, to: string): Record<string, any> {
+  const emoji = getEventEmoji(event.type);
+  const eventName = formatEventType(event.type);
+  const actor = event.createdBy || 'System';
+  const details = buildEventDetails(event);
+
+  const content = [
+    `${emoji} *${eventName}*`,
+    `By: ${actor}`,
+    event.environment ? `Env: ${event.environment}` : null,
+    `Time: ${formatTimestamp(event.createdAt)}`,
+    '',
+    ...details,
+  ]
+    .filter(Boolean)
+    .join('\n');
+
+  return {
+    messaging_product: 'whatsapp',
+    to,
+    type: 'text',
+    text: {
+      body: content,
+    },
+  };
+}
+
+/**
+ * Format Line message payload
+ */
+export function formatLineMessage(event: IntegrationSystemEvent, to: string): Record<string, any> {
+  const emoji = getEventEmoji(event.type);
+  const eventName = formatEventType(event.type);
+  const actor = event.createdBy || 'System';
+  const details = buildEventDetails(event);
+
+  const content = [
+    `${emoji} ${eventName}`,
+    `By: ${actor}`,
+    event.environment ? `Env: ${event.environment}` : null,
+    `Time: ${formatTimestamp(event.createdAt)}`,
+    '',
+    ...details,
+  ]
+    .filter(Boolean)
+    .join('\n');
+
+  return {
+    to,
+    messages: [
+      {
+        type: 'text',
+        text: content,
+      },
+    ],
+  };
+}
+
+/**
+ * Format KakaoTalk message payload (Generic Agent format)
+ */
+export function formatKakaoMessage(event: IntegrationSystemEvent): Record<string, any> {
+  const emoji = getEventEmoji(event.type);
+  const eventName = formatEventType(event.type);
+  const actor = event.createdBy || 'System';
+  const details = buildEventDetails(event);
+
+  const content = [
+    `${emoji} [Gatrix Alert]`,
+    `Event: ${eventName}`,
+    `Actor: ${actor}`,
+    event.environment ? `Environment: ${event.environment}` : null,
+    `Time: ${formatTimestamp(event.createdAt)}`,
+    '',
+    ...details,
+  ]
+    .filter(Boolean)
+    .join('\n');
+
+  return {
+    msg: content,
+  };
+}
+
+/**
+ * Format Google Chat message payload
+ */
+export function formatGoogleChatMessage(event: IntegrationSystemEvent): Record<string, any> {
+  const emoji = getEventEmoji(event.type);
+  const eventName = formatEventType(event.type);
+  const actor = event.createdBy || 'System';
+  const color = getEventColor(event.type);
+  const details = buildEventDetails(event);
+
+  return {
+    cardsV2: [
+      {
+        cardId: 'gatrixEvent',
+        card: {
+          header: {
+            title: `${emoji} ${eventName}`,
+            subtitle: `by ${actor}`,
+          },
+          sections: [
+            {
+              widgets: [
+                {
+                  textParagraph: {
+                    text: [
+                      event.environment ? `<b>Environment:</b> ${event.environment}` : null,
+                      `<b>Time:</b> ${formatTimestamp(event.createdAt)}`,
+                    ].filter(Boolean).join('<br>'),
+                  },
+                },
+                {
+                  textParagraph: {
+                    text: details.join('<br>'),
+                  },
+                },
+              ],
+            },
+          ],
+        },
+      },
+    ],
+  };
+}
+
+/**
+ * Format WeChat Work (WeCom) message payload
+ */
+export function formatWeComMessage(event: IntegrationSystemEvent): Record<string, any> {
+  const emoji = getEventEmoji(event.type);
+  const eventName = formatEventType(event.type);
+  const actor = event.createdBy || 'System';
+  const details = buildEventDetails(event);
+
+  const content = [
+    `# ${emoji} ${eventName}`,
+    `**Actor**: ${actor}`,
+    event.environment ? `**Environment**: ${event.environment}` : null,
+    `**Time**: ${formatTimestamp(event.createdAt)}`,
+    '',
+    ...details.map((d) => `> ${d}`),
+  ]
+    .filter(Boolean)
+    .join('\n');
+
+  return {
+    msgtype: 'markdown',
+    markdown: {
+      content,
+    },
+  };
+}
+
+/**
+ * Format DingTalk message payload
+ */
+export function formatDingTalkMessage(event: IntegrationSystemEvent): Record<string, any> {
+  const emoji = getEventEmoji(event.type);
+  const eventName = formatEventType(event.type);
+  const actor = event.createdBy || 'System';
+  const details = buildEventDetails(event);
+
+  const content = [
+    `### ${emoji} ${eventName}`,
+    `- **Actor**: ${actor}`,
+    event.environment ? `- **Environment**: ${event.environment}` : null,
+    `- **Time**: ${formatTimestamp(event.createdAt)}`,
+    '',
+    ...details,
+  ]
+    .filter(Boolean)
+    .join('\n');
+
+  return {
+    msgtype: 'markdown',
+    markdown: {
+      title: `${emoji} Gatrix Alert`,
+      text: content,
+    },
+  };
+}
+
+/**
  * Format webhook JSON payload
  */
 export function formatWebhookPayload(event: IntegrationSystemEvent): Record<string, any> {

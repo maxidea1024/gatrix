@@ -461,11 +461,11 @@ export class CouponSettingsService {
   static async disableExpiredCoupons(): Promise<number> {
     const affectedRows = await db('g_coupon_settings')
       .where('status', 'ACTIVE')
-      .where('expiresAt', '<', db.fn.now())
+      .where('expiresAt', '<', db.raw('UTC_TIMESTAMP()'))
       .update({
         status: 'DISABLED',
         disabledBy: db.raw("COALESCE(disabledBy, 'system')"),
-        disabledAt: db.fn.now(),
+        disabledAt: db.raw('UTC_TIMESTAMP()'),
         disabledReason: db.raw("COALESCE(disabledReason, 'Expired by scheduler')"),
       });
     return affectedRows || 0;

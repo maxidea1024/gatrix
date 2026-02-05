@@ -607,7 +607,7 @@ exports.up = async function (connection) {
   await connection.execute(
     `
     INSERT IGNORE INTO g_users (id, name, email, passwordHash, role, status, emailVerified, createdAt, updatedAt)
-    VALUES (1, ?, ?, ?, 'admin', 'active', TRUE, NOW(), NOW())
+    VALUES (1, ?, ?, ?, 'admin', 'active', TRUE, UTC_TIMESTAMP(), UTC_TIMESTAMP())
   `,
     [adminName, adminEmail, passwordHash]
   );
@@ -1673,7 +1673,7 @@ exports.up = async function (connection) {
   ];
   for (const tag of defaultTags) {
     await connection.execute(
-      'INSERT IGNORE INTO g_tags (name, color, description, createdAt, updatedAt) VALUES (?, ?, ?, NOW(), NOW())',
+      'INSERT IGNORE INTO g_tags (name, color, description, createdAt, updatedAt) VALUES (?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())',
       [tag.name, tag.color, tag.description]
     );
   }

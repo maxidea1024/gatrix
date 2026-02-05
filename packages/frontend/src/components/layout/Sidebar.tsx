@@ -56,6 +56,9 @@ import {
   Folder,
   ViewCarousel,
   Layers,
+  Extension,
+  Code,
+  Phonelink,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -111,6 +114,9 @@ const iconMap: Record<string, React.ReactElement> = {
   Folder: <Folder />,
   ViewCarousel: <ViewCarousel />,
   Layers: <Layers />,
+  Extension: <Extension />,
+  Code: <Code />,
+  Phonelink: <Phonelink />,
 };
 
 // Helper to get icon name from React element

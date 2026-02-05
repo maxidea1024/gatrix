@@ -59,6 +59,15 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: 'category',
+      label: 'SDKs',
+      items: [
+        'sdks/server-side',
+        'sdks/client-side',
+        'sdks/game-engines',
+      ],
+    },
+    {
+      type: 'category',
       label: 'API Reference',
       items: [
         'api/client-api',

@@ -40,12 +40,22 @@ import teamsIcon from '@/assets/icons/integrations/teams.svg';
 import webhookIcon from '@/assets/icons/integrations/webhook.svg';
 import larkIcon from '@/assets/icons/integrations/lark.svg';
 import newrelicIcon from '@/assets/icons/integrations/newrelic.svg';
+import discordIcon from '@/assets/icons/integrations/discord.svg';
+import pagerdutyIcon from '@/assets/icons/integrations/pagerduty.svg';
+import telegramIcon from '@/assets/icons/integrations/telegram.svg';
+import whatsappIcon from '@/assets/icons/integrations/whatsapp.svg';
+import lineIcon from '@/assets/icons/integrations/line.svg';
+import kakaoIcon from '@/assets/icons/integrations/kakao.svg';
+import googleChatIcon from '@/assets/icons/integrations/google-chat.svg';
+import wecomIcon from '@/assets/icons/integrations/wecom.svg';
+import dingtalkIcon from '@/assets/icons/integrations/dingtalk.svg';
 
 interface ProviderDefinition {
   name: string;
   displayName: string;
   description: string;
   documentationUrl?: string;
+  deprecated?: string;
   parameters: Array<{
     name: string;
     displayName: string;
@@ -71,6 +81,15 @@ const PROVIDER_ICONS: Record<string, string> = {
   teams: teamsIcon,
   webhook: webhookIcon,
   lark: larkIcon,
+  discord: discordIcon,
+  pagerduty: pagerdutyIcon,
+  telegram: telegramIcon,
+  whatsapp: whatsappIcon,
+  line: lineIcon,
+  kakao: kakaoIcon,
+  'google-chat': googleChatIcon,
+  wecom: wecomIcon,
+  dingtalk: dingtalkIcon,
 };
 
 const PROVIDER_COLORS: Record<string, string> = {
@@ -80,6 +99,15 @@ const PROVIDER_COLORS: Record<string, string> = {
   teams: '#6264A7',
   webhook: '#607D8B',
   lark: '#00D6B9',
+  discord: '#5865F2',
+  pagerduty: '#25C151',
+  telegram: '#0088CC',
+  whatsapp: '#25D366',
+  line: '#00C300',
+  kakao: '#FFCD00',
+  'google-chat': '#00AC47',
+  wecom: '#2585CF',
+  dingtalk: '#0089FF',
 };
 
 // Event categories for UI grouping
@@ -227,7 +255,7 @@ export const CreateIntegrationWizard: React.FC<CreateIntegrationWizardProps> = (
 
       // Set default description
       const providerName = t(currentProvider.displayName);
-      setDescription(`Gatrix ${providerName}`);
+      setDescription(providerName);
     }
   }, [selectedProvider, providers]);
 
@@ -343,6 +371,7 @@ export const CreateIntegrationWizard: React.FC<CreateIntegrationWizardProps> = (
           required={param.required}
           size="small"
           sx={{ mb: 2 }}
+          autoComplete="off"
         />
       );
     }
@@ -360,6 +389,7 @@ export const CreateIntegrationWizard: React.FC<CreateIntegrationWizardProps> = (
         required={param.required}
         size="small"
         sx={{ mb: 2 }}
+        autoComplete={isSensitive ? 'new-password' : 'off'}
         slotProps={
           isSensitive
             ? {
@@ -452,24 +482,32 @@ export const CreateIntegrationWizard: React.FC<CreateIntegrationWizardProps> = (
                 >
                   {providers.map((provider) => {
                     const isSelected = selectedProvider === provider.name;
-                    const color = PROVIDER_COLORS[provider.name] || '#607D8B';
+                    const color = PROVIDER_COLORS[provider.name.toLowerCase()] || '#607D8B';
                     return (
                       <Card
                         key={provider.name}
                         sx={{
+                          height: 120,
                           border: 2,
                           borderColor: isSelected ? color : 'divider',
                           bgcolor: isSelected ? alpha(color, 0.05) : 'background.paper',
+                          opacity: provider.deprecated ? 0.7 : 1,
                           transition: 'all 0.2s ease',
+                          display: 'flex',
+                          flexDirection: 'column',
                           '&:hover': {
                             borderColor: alpha(color, 0.5),
                             transform: 'translateY(-2px)',
                             boxShadow: 2,
+                            opacity: 1,
                           },
                         }}
                       >
-                        <CardActionArea onClick={() => setSelectedProvider(provider.name)}>
-                          <CardContent sx={{ p: 2.5 }}>
+                        <CardActionArea
+                          onClick={() => setSelectedProvider(provider.name)}
+                          sx={{ height: '100%', display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-start' }}
+                        >
+                          <CardContent sx={{ p: 2.5, width: '100%' }}>
                             <Box display="flex" alignItems="center" gap={2}>
                               <Box
                                 sx={{
@@ -480,24 +518,55 @@ export const CreateIntegrationWizard: React.FC<CreateIntegrationWizardProps> = (
                                   display: 'flex',
                                   alignItems: 'center',
                                   justifyContent: 'center',
+                                  flexShrink: 0,
                                 }}
                               >
                                 <Box
                                   component="img"
-                                  src={PROVIDER_ICONS[provider.name] || webhookIcon}
+                                  src={PROVIDER_ICONS[provider.name.toLowerCase()] || webhookIcon}
                                   alt={t(provider.displayName)}
                                   sx={{ width: 32, height: 32 }}
                                 />
                               </Box>
-                              <Box flex={1}>
-                                <Typography variant="subtitle1" fontWeight="bold">
+                              <Box flex={1} sx={{ overflow: 'hidden' }}>
+                                <Typography variant="subtitle1" fontWeight="bold" noWrap>
                                   {t(provider.displayName)}
                                 </Typography>
-                                <Typography variant="body2" color="text.secondary">
+                                <Typography
+                                  variant="body2"
+                                  color="text.secondary"
+                                  sx={{
+                                    display: '-webkit-box',
+                                    WebkitLineClamp: provider.deprecated ? 1 : 2,
+                                    WebkitBoxOrient: 'vertical',
+                                    overflow: 'hidden',
+                                    lineHeight: '1.4em',
+                                    height: provider.deprecated ? '1.4em' : '2.8em',
+                                  }}
+                                >
                                   {t(provider.description)}
                                 </Typography>
+                                {provider.deprecated && (
+                                  <Typography
+                                    variant="caption"
+                                    color="warning.main"
+                                    sx={{
+                                      display: 'block',
+                                      mt: 0.5,
+                                      fontWeight: 'medium',
+                                      height: '1.4em',
+                                      overflow: 'hidden',
+                                      textOverflow: 'ellipsis',
+                                      whiteSpace: 'nowrap',
+                                    }}
+                                  >
+                                    {t(provider.deprecated)}
+                                  </Typography>
+                                )}
                               </Box>
-                              {isSelected && <CheckIcon sx={{ color: color }} />}
+                              <Box sx={{ width: 24, display: 'flex', justifyContent: 'center', flexShrink: 0 }}>
+                                {isSelected && <CheckIcon sx={{ color: color }} />}
+                              </Box>
                             </Box>
                           </CardContent>
                         </CardActionArea>
@@ -512,30 +581,51 @@ export const CreateIntegrationWizard: React.FC<CreateIntegrationWizardProps> = (
             <Fade in={activeStep === 1}>
               <Box sx={{ display: activeStep === 1 ? 'block' : 'none' }}>
                 {currentProvider && (
-                  <Box
+                  <Card
+                    elevation={0}
                     sx={{
+                      mb: 4,
+                      p: 2.5,
+                      borderRadius: 3,
+                      border: '1px solid',
+                      borderColor: 'divider',
+                      background: (theme) => `linear-gradient(135deg, ${alpha(PROVIDER_COLORS[currentProvider.name.toLowerCase()] || '#607D8B', 0.08)} 0%, ${alpha(theme.palette.background.paper, 0.5)} 100%)`,
                       display: 'flex',
                       alignItems: 'center',
-                      gap: 2,
-                      mb: 3,
-                      p: 2,
-                      borderRadius: 2,
-                      bgcolor: alpha(PROVIDER_COLORS[currentProvider.name] || '#607D8B', 0.05),
+                      gap: 3,
                     }}
                   >
                     <Box
-                      component="img"
-                      src={PROVIDER_ICONS[currentProvider.name] || webhookIcon}
-                      alt={t(currentProvider.displayName)}
-                      sx={{ width: 32, height: 32 }}
-                    />
-                    <Box>
-                      <Typography variant="h6">{t(currentProvider.displayName)}</Typography>
-                      <Typography variant="body2" color="text.secondary">
+                      sx={{
+                        width: 64,
+                        height: 64,
+                        borderRadius: '20px',
+                        bgcolor: 'background.paper',
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0,
+                        border: '1px solid',
+                        borderColor: alpha(PROVIDER_COLORS[currentProvider.name.toLowerCase()] || '#607D8B', 0.1),
+                      }}
+                    >
+                      <Box
+                        component="img"
+                        src={PROVIDER_ICONS[currentProvider.name.toLowerCase()] || webhookIcon}
+                        alt={t(currentProvider.displayName)}
+                        sx={{ width: 40, height: 40, objectFit: 'contain' }}
+                      />
+                    </Box>
+                    <Box sx={{ flex: 1 }}>
+                      <Typography variant="h6" fontWeight="bold" sx={{ color: 'text.primary', mb: 0.5 }}>
+                        {t(currentProvider.displayName)}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.5 }}>
                         {t(currentProvider.description)}
                       </Typography>
                     </Box>
-                  </Box>
+                  </Card>
                 )}
 
                 <FormControlLabel
@@ -554,6 +644,7 @@ export const CreateIntegrationWizard: React.FC<CreateIntegrationWizardProps> = (
                   placeholder={t('integrations.descriptionPlaceholder')}
                   size="small"
                   sx={{ mb: 2 }}
+                  autoComplete="off"
                 />
 
                 {currentProvider?.parameters.map((param) => renderParameterInput(param))}
