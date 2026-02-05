@@ -221,6 +221,7 @@ const getEventDescriptionConfig = (log: EventLog): { key: string; params: any } 
   const data = log.eventData;
 
   const params = {
+    ...data,
     // Prefer friendly names if available
     name: data.segmentName || data.flagName || data.name || data.title || data.id || '',
     environment: data.environment || '',
