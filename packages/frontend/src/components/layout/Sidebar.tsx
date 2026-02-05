@@ -416,7 +416,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, onClose, width }) => {
             display: 'block',
           }}
         >
-          Gatrix {__APP_VERSION__}
+          Gatrix {__APP_VERSION__.replace(/^v/, '')}
         </Typography>
       </Box>
     </Box>
@@ -688,7 +688,7 @@ export const DesktopSidebar: React.FC<{ width: number }> = ({ width }) => {
             display: 'block',
           }}
         >
-          Gatrix {__APP_VERSION__}
+          Gatrix {__APP_VERSION__.replace(/^v/, '')}
         </Typography>
       </Box>
     </Drawer>

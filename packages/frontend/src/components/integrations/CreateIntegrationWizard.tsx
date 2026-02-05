@@ -256,7 +256,10 @@ export const CreateIntegrationWizard: React.FC<CreateIntegrationWizardProps> = (
       setParameters(defaults);
 
       // Set default description
-      const providerName = t(currentProvider.displayName);
+      let providerName = t(currentProvider.displayName);
+      if (currentProvider.name === 'debug') {
+        providerName = 'Debug Console';
+      }
       setDescription(providerName);
     }
   }, [selectedProvider, providers]);
