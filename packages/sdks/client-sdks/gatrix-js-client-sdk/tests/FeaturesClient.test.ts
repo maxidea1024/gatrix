@@ -398,8 +398,22 @@ describe('FeaturesClient', () => {
     });
 
     describe('context management', () => {
+        let consoleErrorSpy: jest.SpyInstance;
+
         beforeEach(async () => {
             await client.init();
+            // Mock console.error to suppress expected error output during context changes
+            consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => { });
+            // Mock fetch to return empty flags response
+            mockFetch.mockResolvedValue({
+                ok: true,
+                status: 200,
+                json: async () => ({ success: true, data: { flags: bootstrapFlags } }),
+            });
+        });
+
+        afterEach(() => {
+            consoleErrorSpy.mockRestore();
         });
 
         it('should get initial context from config', () => {

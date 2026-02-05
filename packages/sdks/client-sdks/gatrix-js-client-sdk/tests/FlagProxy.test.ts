@@ -232,4 +232,188 @@ describe('FlagProxy', () => {
             expect(proxy.jsonVariation({})).toEqual({});
         });
     });
+
+    describe('variationDetails', () => {
+        describe('boolVariationDetails', () => {
+            it('should return flag_not_found for undefined flag', () => {
+                const proxy = new FlagProxy(undefined);
+                const result = proxy.boolVariationDetails();
+                expect(result).toEqual({
+                    value: false,
+                    reason: 'flag_not_found',
+                    flagExists: false,
+                    enabled: false,
+                });
+            });
+
+            it('should return correct details for enabled flag', () => {
+                const flag = bootstrapFlags.find((f) => f.name === 'enabled-flag')!;
+                const proxy = new FlagProxy(flag);
+                const result = proxy.boolVariationDetails();
+                expect(result).toEqual({
+                    value: true,
+                    reason: 'targeting_match',
+                    flagExists: true,
+                    enabled: true,
+                });
+            });
+
+            it('should return correct details for disabled flag', () => {
+                const flag = bootstrapFlags.find((f) => f.name === 'disabled-flag')!;
+                const proxy = new FlagProxy(flag);
+                const result = proxy.boolVariationDetails();
+                expect(result).toEqual({
+                    value: false,
+                    reason: 'disabled',
+                    flagExists: true,
+                    enabled: false,
+                });
+            });
+        });
+
+        describe('stringVariationDetails', () => {
+            it('should return flag_not_found for undefined flag', () => {
+                const proxy = new FlagProxy(undefined);
+                const result = proxy.stringVariationDetails('default');
+                expect(result.reason).toBe('flag_not_found');
+                expect(result.value).toBe('default');
+            });
+
+            it('should return correct details for string flag', () => {
+                const flag = bootstrapFlags.find((f) => f.name === 'string-flag')!;
+                const proxy = new FlagProxy(flag);
+                const result = proxy.stringVariationDetails();
+                expect(result).toEqual({
+                    value: 'hello world',
+                    reason: 'percentage_rollout',
+                    flagExists: true,
+                    enabled: true,
+                });
+            });
+
+            it('should return disabled reason for disabled flag', () => {
+                const flag = bootstrapFlags.find((f) => f.name === 'disabled-flag')!;
+                const proxy = new FlagProxy(flag);
+                const result = proxy.stringVariationDetails('default');
+                expect(result.reason).toBe('disabled');
+                expect(result.enabled).toBe(false);
+            });
+        });
+
+        describe('numberVariationDetails', () => {
+            it('should return parse_error for invalid number', () => {
+                const flag = bootstrapFlags.find((f) => f.name === 'invalid-number-flag')!;
+                const proxy = new FlagProxy(flag);
+                const result = proxy.numberVariationDetails(999);
+                expect(result.reason).toBe('parse_error');
+                expect(result.value).toBe(999);
+            });
+
+            it('should return correct value for valid number', () => {
+                const flag = bootstrapFlags.find((f) => f.name === 'number-flag')!;
+                const proxy = new FlagProxy(flag);
+                const result = proxy.numberVariationDetails();
+                expect(result.value).toBe(42.5);
+                expect(result.reason).toBe('evaluated');
+            });
+        });
+
+        describe('jsonVariationDetails', () => {
+            it('should return parse_error for invalid json', () => {
+                const flag = bootstrapFlags.find((f) => f.name === 'invalid-json-flag')!;
+                const proxy = new FlagProxy(flag);
+                const result = proxy.jsonVariationDetails({});
+                expect(result.reason).toBe('parse_error');
+            });
+
+            it('should return correct value for valid json', () => {
+                const flag = bootstrapFlags.find((f) => f.name === 'json-flag')!;
+                const proxy = new FlagProxy(flag);
+                const result = proxy.jsonVariationDetails({});
+                expect(result.value).toEqual({ key: 'value', nested: { a: 1 } });
+                expect(result.reason).toBe('evaluated');
+            });
+        });
+    });
+
+    describe('variationOrThrow', () => {
+        describe('boolVariationOrThrow', () => {
+            it('should throw for undefined flag', () => {
+                const proxy = new FlagProxy(undefined);
+                expect(() => proxy.boolVariationOrThrow()).toThrow('Flag not found');
+            });
+
+            it('should return value for existing flag', () => {
+                const flag = bootstrapFlags.find((f) => f.name === 'enabled-flag')!;
+                const proxy = new FlagProxy(flag);
+                expect(proxy.boolVariationOrThrow()).toBe(true);
+            });
+        });
+
+        describe('stringVariationOrThrow', () => {
+            it('should throw for undefined flag', () => {
+                const proxy = new FlagProxy(undefined);
+                expect(() => proxy.stringVariationOrThrow()).toThrow('Flag not found');
+            });
+
+            it('should throw for disabled flag', () => {
+                const flag = bootstrapFlags.find((f) => f.name === 'disabled-flag')!;
+                const proxy = new FlagProxy(flag);
+                expect(() => proxy.stringVariationOrThrow()).toThrow('is disabled');
+            });
+
+            it('should throw for flag without payload', () => {
+                const flag = bootstrapFlags.find((f) => f.name === 'enabled-flag')!;
+                const proxy = new FlagProxy(flag);
+                expect(() => proxy.stringVariationOrThrow()).toThrow('has no payload');
+            });
+
+            it('should return value for valid string flag', () => {
+                const flag = bootstrapFlags.find((f) => f.name === 'string-flag')!;
+                const proxy = new FlagProxy(flag);
+                expect(proxy.stringVariationOrThrow()).toBe('hello world');
+            });
+        });
+
+        describe('numberVariationOrThrow', () => {
+            it('should throw for invalid number', () => {
+                const flag = bootstrapFlags.find((f) => f.name === 'invalid-number-flag')!;
+                const proxy = new FlagProxy(flag);
+                expect(() => proxy.numberVariationOrThrow()).toThrow('invalid number payload');
+            });
+
+            it('should return value for valid number', () => {
+                const flag = bootstrapFlags.find((f) => f.name === 'number-flag')!;
+                const proxy = new FlagProxy(flag);
+                expect(proxy.numberVariationOrThrow()).toBe(42.5);
+            });
+        });
+
+        describe('jsonVariationOrThrow', () => {
+            it('should throw for invalid json', () => {
+                const flag = bootstrapFlags.find((f) => f.name === 'invalid-json-flag')!;
+                const proxy = new FlagProxy(flag);
+                expect(() => proxy.jsonVariationOrThrow()).toThrow('invalid JSON payload');
+            });
+
+            it('should return value for valid json', () => {
+                const flag = bootstrapFlags.find((f) => f.name === 'json-flag')!;
+                const proxy = new FlagProxy(flag);
+                expect(proxy.jsonVariationOrThrow()).toEqual({ key: 'value', nested: { a: 1 } });
+            });
+        });
+    });
+
+    describe('reason getter', () => {
+        it('should return undefined for undefined flag', () => {
+            const proxy = new FlagProxy(undefined);
+            expect(proxy.reason).toBeUndefined();
+        });
+
+        it('should return reason from flag', () => {
+            const flag = bootstrapFlags.find((f) => f.name === 'enabled-flag')!;
+            const proxy = new FlagProxy(flag);
+            expect(proxy.reason).toBe('targeting_match');
+        });
+    });
 });

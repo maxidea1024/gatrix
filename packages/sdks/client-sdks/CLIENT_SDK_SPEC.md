@@ -68,17 +68,16 @@ The Edge API returns evaluated flags in this format:
 
 ### Flag Structure
 
-| Field | Type | Description |
-|-------|------|-------------|
 | `name` | string | Unique flag identifier |
 | `enabled` | boolean | Whether the flag is enabled |
 | `variant` | object | Selected variant details |
 | `variant.name` | string | Variant name |
 | `variant.enabled` | boolean | Whether variant is enabled |
-| `variant.payload` | string? | Variant payload (may be stringified JSON) |
-| `variantType` | "none" \| "string" \| "json" | Payload type hint |
+| `variant.payload` | string \| number \| object | Variant payload (flexible type) |
+| `variantType` | "none" \| "string" \| "number" \| "json" | Payload type hint |
 | `version` | number | Flag version for change detection |
 | `impressionData` | boolean? | Whether to track impressions |
+| `reason` | string? | Evaluation reason (e.g., "targeting_match", "disabled", "not_found") |
 
 ## SDK Configuration
 
@@ -159,21 +158,35 @@ class GatrixClient extends EventEmitter {
 
   // Flag Access - Basic
   isEnabled(flagName: string): boolean;
-  getVariant(flagName: string): Variant;
+  getVariant(flagName: string): Variant;  // Never returns null/undefined
   getAllFlags(): EvaluatedFlag[];
 
   // Flag Access - Typed Variations (no context parameter - uses global)
+  variation(flagName: string, defaultValue?: string): string;  // Returns variant name
   boolVariation(flagName: string, defaultValue?: boolean): boolean;
   stringVariation(flagName: string, defaultValue?: string): string;
   numberVariation(flagName: string, defaultValue?: number): number;
   jsonVariation<T>(flagName: string, defaultValue?: T): T;
 
+  // Variation Details - Returns detailed result with reason
+  boolVariationDetails(flagName: string, defaultValue?: boolean): VariationResult<boolean>;
+  stringVariationDetails(flagName: string, defaultValue?: string): VariationResult<string>;
+  numberVariationDetails(flagName: string, defaultValue?: number): VariationResult<number>;
+  jsonVariationDetails<T>(flagName: string, defaultValue?: T): VariationResult<T>;
+
+  // Strict Variations - Throws on not found/disabled/invalid
+  boolVariationOrThrow(flagName: string): boolean;
+  stringVariationOrThrow(flagName: string): string;
+  numberVariationOrThrow(flagName: string): number;
+  jsonVariationOrThrow<T>(flagName: string): T;
+
   // Explicit Sync Mode
   syncFlags(fetchNow?: boolean): Promise<void>;
 
-  // Watch (Change Detection)
-  watchFlag(flagName: string, callback: (flag: EvaluatedFlag) => void): () => void;
-  watchFlagWithInitialState(flagName: string, callback: (flag: EvaluatedFlag) => void): () => void;
+  // Watch (Change Detection) - Returns FlagProxy for convenience
+  watchFlag(flagName: string, callback: (flag: FlagProxy) => void): () => void;
+  watchFlagWithInitialState(flagName: string, callback: (flag: FlagProxy) => void): () => void;
+  createWatchGroup(name: string): WatchFlagGroup;
 
   // Manual Control
   fetchFlags(): Promise<void>;
@@ -203,10 +216,89 @@ All variation functions:
 
 | Function | Return Type | Description |
 |----------|-------------|-------------|
+| `variation` | string | Variant name only |
 | `boolVariation` | boolean | Flag enabled state |
 | `stringVariation` | string | Variant payload as string |
 | `numberVariation` | number | Variant payload as number |
 | `jsonVariation<T>` | T | Variant payload parsed as JSON |
+
+### VariationResult Interface
+
+```typescript
+interface VariationResult<T> {
+  value: T;              // The evaluated value
+  reason: string;        // Evaluation reason
+  flagExists: boolean;   // Whether flag exists
+  enabled: boolean;      // Flag enabled state
+}
+```
+
+### FlagProxy Class
+
+Convenience wrapper for accessing flag values:
+
+```typescript
+class FlagProxy {
+  constructor(flag: EvaluatedFlag | undefined);
+  
+  get exists(): boolean;
+  get enabled(): boolean;
+  get name(): string;
+  get variant(): Variant;        // Never null/undefined
+  get variantType(): VariantType;
+  get version(): number;
+  get reason(): string | undefined;
+  get impressionData(): boolean;
+  get raw(): EvaluatedFlag | undefined;
+  
+  isEnabled(): boolean;
+  getVariantName(): string;
+  
+  // Variation methods
+  boolVariation(defaultValue?: boolean): boolean;
+  stringVariation(defaultValue?: string): string;
+  numberVariation(defaultValue?: number): number;
+  jsonVariation<T>(defaultValue?: T): T;
+  
+  // Variation details - returns VariationResult with reason
+  boolVariationDetails(defaultValue?: boolean): VariationResult<boolean>;
+  stringVariationDetails(defaultValue?: string): VariationResult<string>;
+  numberVariationDetails(defaultValue?: number): VariationResult<number>;
+  jsonVariationDetails<T>(defaultValue?: T): VariationResult<T>;
+  
+  // Strict variations - throws on not found/disabled/invalid
+  boolVariationOrThrow(): boolean;
+  stringVariationOrThrow(): string;
+  numberVariationOrThrow(): number;
+  jsonVariationOrThrow<T>(): T;
+}
+```
+
+### WatchFlagGroup Class
+
+Batch management for multiple flag watchers:
+
+```typescript
+class WatchFlagGroup {
+  constructor(client: FeaturesClient, name: string);
+  
+  getName(): string;
+  watchFlag(flagName: string, callback: (flag: FlagProxy) => void): this;
+  watchFlagWithInitialState(flagName: string, callback: (flag: FlagProxy) => void): this;
+  unwatchAll(): void;
+  destroy(): void;
+  get size(): number;
+}
+
+// Usage
+const group = client.createWatchGroup('my-group');
+group
+  .watchFlag('flag-1', handler1)
+  .watchFlag('flag-2', handler2);
+
+// Later, unsubscribe all at once
+group.unwatchAll();
+```
 
 ## Explicit Sync Mode
 
@@ -257,8 +349,19 @@ When metrics enabled, SDK tracks:
 - Flag access counts (enabled: yes/no)
 - Variant selections
 - Impression events (if impressionData enabled)
+- **notFound events** (when accessing non-existent flags)
 
 Metrics are batched and sent periodically to the Edge API.
+
+## Design Rules
+
+> [!IMPORTANT]
+> **getVariant never returns null/undefined** - Always returns a fallback variant (`{ name: 'disabled', enabled: false }`) when flag not found or disabled.
+
+- All variation functions return default values for disabled/not-found flags
+- `*VariationOrThrow` methods throw for strict checking scenarios
+- Context updates trigger automatic re-fetch of flags
+- SessionId is automatically generated if not provided
 
 ## Error Handling
 
@@ -267,17 +370,19 @@ SDK should be resilient:
 - Exponential backoff on fetch failures
 - Error events emitted, not thrown
 
-## Implementation Checklist
+## Implementation Checklist (gatrix-js-client-sdk)
 
-- [ ] Core client class with event emitter
-- [ ] Configuration validation
-- [ ] Repository pattern with storage providers
-- [ ] Polling mechanism with backoff
-- [ ] Context management
-- [ ] Explicit sync mode
-- [ ] Watch pattern for change detection
-- [ ] Variation functions
-- [ ] Metrics collection
-- [ ] TypeScript types
-- [ ] Browser build (ES modules + UMD)
+- [x] Core GatrixClient class with event emitter
+- [x] Configuration validation
+- [x] Repository pattern with storage providers
+- [x] Polling mechanism with backoff
+- [x] Context management (global)
+- [x] Explicit sync mode
+- [x] Watch pattern for change detection (watchFlag, WatchFlagGroup)
+- [x] Variation functions (bool, string, number, json)
+- [x] Variation details and OrThrow variants
+- [x] FlagProxy convenience wrapper
+- [x] Metrics collection with notFound tracking
+- [x] TypeScript types and exports
+- [x] Browser build (ES modules + CJS + UMD)
 - [ ] React hooks wrapper (separate package)

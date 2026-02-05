@@ -2,7 +2,7 @@
  * FlagProxy - Wrapper for EvaluatedFlag with helper methods
  * Provides convenient variation accessors like .boolVariation(), .stringVariation(), etc.
  */
-import { EvaluatedFlag, Variant, VariantType } from './types';
+import { EvaluatedFlag, Variant, VariantType, VariationResult } from './types';
 
 const FALLBACK_DISABLED_VARIANT: Variant = {
   name: 'disabled',
@@ -149,5 +149,191 @@ export class FlagProxy {
    */
   getVariantName(): string {
     return this.variant.name;
+  }
+
+  /**
+   * Get evaluation reason
+   */
+  get reason(): string | undefined {
+    return this.flag?.reason;
+  }
+
+  // ==================== Variation Details Methods ====================
+
+  /**
+   * Get boolean variation with details
+   */
+  boolVariationDetails(defaultValue: boolean = false): VariationResult<boolean> {
+    if (!this.flag) {
+      return { value: defaultValue, reason: 'flag_not_found', flagExists: false, enabled: false };
+    }
+    return {
+      value: this.flag.enabled,
+      reason: this.flag.reason ?? 'evaluated',
+      flagExists: true,
+      enabled: this.flag.enabled,
+    };
+  }
+
+  /**
+   * Get string variation with details
+   */
+  stringVariationDetails(defaultValue: string = ''): VariationResult<string> {
+    if (!this.flag) {
+      return { value: defaultValue, reason: 'flag_not_found', flagExists: false, enabled: false };
+    }
+    if (!this.flag.enabled) {
+      return { value: defaultValue, reason: this.flag.reason ?? 'disabled', flagExists: true, enabled: false };
+    }
+    if (this.flag.variant?.payload == null) {
+      return { value: defaultValue, reason: 'no_payload', flagExists: true, enabled: true };
+    }
+    return {
+      value: String(this.flag.variant.payload),
+      reason: this.flag.reason ?? 'evaluated',
+      flagExists: true,
+      enabled: true,
+    };
+  }
+
+  /**
+   * Get number variation with details
+   */
+  numberVariationDetails(defaultValue: number = 0): VariationResult<number> {
+    if (!this.flag) {
+      return { value: defaultValue, reason: 'flag_not_found', flagExists: false, enabled: false };
+    }
+    if (!this.flag.enabled) {
+      return { value: defaultValue, reason: this.flag.reason ?? 'disabled', flagExists: true, enabled: false };
+    }
+    if (this.flag.variant?.payload == null) {
+      return { value: defaultValue, reason: 'no_payload', flagExists: true, enabled: true };
+    }
+
+    const payload = this.flag.variant.payload;
+    if (typeof payload === 'number') {
+      return { value: payload, reason: this.flag.reason ?? 'evaluated', flagExists: true, enabled: true };
+    }
+
+    const num = Number(payload);
+    if (isNaN(num)) {
+      return { value: defaultValue, reason: 'parse_error', flagExists: true, enabled: true };
+    }
+    return { value: num, reason: this.flag.reason ?? 'evaluated', flagExists: true, enabled: true };
+  }
+
+  /**
+   * Get JSON variation with details
+   */
+  jsonVariationDetails<T>(defaultValue: T): VariationResult<T> {
+    if (!this.flag) {
+      return { value: defaultValue, reason: 'flag_not_found', flagExists: false, enabled: false };
+    }
+    if (!this.flag.enabled) {
+      return { value: defaultValue, reason: this.flag.reason ?? 'disabled', flagExists: true, enabled: false };
+    }
+    if (this.flag.variant?.payload == null) {
+      return { value: defaultValue, reason: 'no_payload', flagExists: true, enabled: true };
+    }
+
+    const payload = this.flag.variant.payload;
+    if (typeof payload === 'object') {
+      return { value: payload as T, reason: this.flag.reason ?? 'evaluated', flagExists: true, enabled: true };
+    }
+
+    if (typeof payload === 'string') {
+      try {
+        return { value: JSON.parse(payload) as T, reason: this.flag.reason ?? 'evaluated', flagExists: true, enabled: true };
+      } catch {
+        return { value: defaultValue, reason: 'parse_error', flagExists: true, enabled: true };
+      }
+    }
+
+    return { value: defaultValue, reason: 'parse_error', flagExists: true, enabled: true };
+  }
+
+  // ==================== Strict Variation Methods (OrThrow) ====================
+
+  /**
+   * Get boolean variation or throw if flag not found
+   */
+  boolVariationOrThrow(): boolean {
+    if (!this.flag) {
+      throw new Error(`Flag not found`);
+    }
+    return this.flag.enabled;
+  }
+
+  /**
+   * Get string variation or throw if flag not found/disabled/no payload
+   */
+  stringVariationOrThrow(): string {
+    if (!this.flag) {
+      throw new Error(`Flag not found`);
+    }
+    if (!this.flag.enabled) {
+      throw new Error(`Flag "${this.flag.name}" is disabled`);
+    }
+    if (this.flag.variant?.payload == null) {
+      throw new Error(`Flag "${this.flag.name}" has no payload`);
+    }
+    return String(this.flag.variant.payload);
+  }
+
+  /**
+   * Get number variation or throw if flag not found/disabled/invalid
+   */
+  numberVariationOrThrow(): number {
+    if (!this.flag) {
+      throw new Error(`Flag not found`);
+    }
+    if (!this.flag.enabled) {
+      throw new Error(`Flag "${this.flag.name}" is disabled`);
+    }
+    if (this.flag.variant?.payload == null) {
+      throw new Error(`Flag "${this.flag.name}" has no payload`);
+    }
+
+    const payload = this.flag.variant.payload;
+    if (typeof payload === 'number') {
+      return payload;
+    }
+
+    const num = Number(payload);
+    if (isNaN(num)) {
+      throw new Error(`Flag "${this.flag.name}" has invalid number payload`);
+    }
+    return num;
+  }
+
+  /**
+   * Get JSON variation or throw if flag not found/disabled/invalid
+   */
+  jsonVariationOrThrow<T>(): T {
+    if (!this.flag) {
+      throw new Error(`Flag not found`);
+    }
+    if (!this.flag.enabled) {
+      throw new Error(`Flag "${this.flag.name}" is disabled`);
+    }
+    if (this.flag.variant?.payload == null) {
+      throw new Error(`Flag "${this.flag.name}" has no payload`);
+    }
+
+    const payload = this.flag.variant.payload;
+
+    if (typeof payload === 'object') {
+      return payload as T;
+    }
+
+    if (typeof payload === 'string') {
+      try {
+        return JSON.parse(payload) as T;
+      } catch {
+        throw new Error(`Flag "${this.flag.name}" has invalid JSON payload`);
+      }
+    }
+
+    throw new Error(`Flag "${this.flag.name}" has invalid JSON payload`);
   }
 }
