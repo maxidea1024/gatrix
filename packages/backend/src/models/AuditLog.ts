@@ -25,50 +25,72 @@ export class AuditLogModel {
       // Use dynamic import to avoid circular dependency
       try {
         const { ALL_INTEGRATION_EVENTS } = await import('../types/integrationEvents');
+        const { IntegrationService } = await import('../services/IntegrationService');
 
-        let eventType = auditData.action;
-        let isValidEvent = ALL_INTEGRATION_EVENTS.includes(eventType as any);
+        const eventsToTrigger: string[] = [];
+        let primaryEventType = auditData.action;
 
-        // Try mapping if not valid (e.g., _create -> _created, _update -> _updated)
-        // Audit logs often use 'verb' (create), while Integration events use 'past tense' (created)
-        if (!isValidEvent) {
-          // Special mappings
-          if (eventType === 'game_world_toggle_maintenance' && auditData.newValues) {
-            // Handle boolean or 0/1 (though newValues should be boolean from middleware)
+        // 1. Determine primary event type (with mapping)
+        let isPrimaryValid = ALL_INTEGRATION_EVENTS.includes(primaryEventType as any);
+
+        if (!isPrimaryValid) {
+          // Special mappings for primary event replacement
+          if (primaryEventType === 'game_world_toggle_maintenance' && auditData.newValues) {
             const isActive = auditData.newValues.isMaintenance === true || auditData.newValues.isMaintenance === 1;
-            eventType = isActive ? 'game_world_maintenance_on' : 'game_world_maintenance_off';
-          } else if (eventType === 'game_world_toggle_visibility') {
-            eventType = 'game_world_visibility_changed';
+            primaryEventType = isActive ? 'game_world_maintenance_on' : 'game_world_maintenance_off';
+            isPrimaryValid = ALL_INTEGRATION_EVENTS.includes(primaryEventType as any);
+          } else if (primaryEventType === 'game_world_toggle_visibility') {
+            primaryEventType = 'game_world_visibility_changed';
+            isPrimaryValid = ALL_INTEGRATION_EVENTS.includes(primaryEventType as any);
           } else {
             // Generic mappings
-            if (eventType.endsWith('_create')) {
-              eventType = eventType + 'd';
-            } else if (eventType.endsWith('_update')) {
-              eventType = eventType + 'd';
-            } else if (eventType.endsWith('_delete')) {
-              eventType = eventType + 'd';
-            } else if (eventType.endsWith('_bulk_create')) {
-              eventType = eventType + 'd';
-            } else if (eventType.endsWith('_bulk_update')) {
-              eventType = eventType + 'd';
-            }
+            if (primaryEventType.endsWith('_create')) primaryEventType += 'd';
+            else if (primaryEventType.endsWith('_update')) primaryEventType += 'd';
+            else if (primaryEventType.endsWith('_delete')) primaryEventType += 'd';
+            else if (primaryEventType.endsWith('_bulk_create')) primaryEventType += 'd';
+            else if (primaryEventType.endsWith('_bulk_update')) primaryEventType += 'd';
+
+            isPrimaryValid = ALL_INTEGRATION_EVENTS.includes(primaryEventType as any);
           }
-          isValidEvent = ALL_INTEGRATION_EVENTS.includes(eventType as any);
         }
 
-        if (isValidEvent) {
-          const { IntegrationService } = await import('../services/IntegrationService');
+        if (isPrimaryValid) {
+          eventsToTrigger.push(primaryEventType);
+        }
 
+        // 2. Check for side-effect events (e.g. Client Version Maintenance)
+        if (auditData.action === 'client_version_update' && auditData.newValues && auditData.oldValues) {
+          const newStatus = typeof auditData.newValues === 'string' ? JSON.parse(auditData.newValues).clientStatus : auditData.newValues.clientStatus;
+          const oldStatus = typeof auditData.oldValues === 'string' ? JSON.parse(auditData.oldValues).clientStatus : auditData.oldValues.clientStatus;
+
+          if (newStatus && oldStatus) {
+            if (newStatus === 'MAINTENANCE' && oldStatus !== 'MAINTENANCE') {
+              if (ALL_INTEGRATION_EVENTS.includes('client_version_maintenance_on' as any)) {
+                eventsToTrigger.push('client_version_maintenance_on');
+              }
+            } else if (newStatus !== 'MAINTENANCE' && oldStatus === 'MAINTENANCE') {
+              if (ALL_INTEGRATION_EVENTS.includes('client_version_maintenance_off' as any)) {
+                eventsToTrigger.push('client_version_maintenance_off');
+              }
+            }
+          }
+        }
+
+        // Deduplicate events
+        const uniqueEvents = [...new Set(eventsToTrigger)];
+
+        // 3. Trigger all events
+        for (const eventType of uniqueEvents) {
           // Construct event data from newValues and other audit info
           const eventData: Record<string, any> = {
-            ...(auditData.newValues || {}),
+            ...(typeof auditData.newValues === 'string' ? JSON.parse(auditData.newValues) : (auditData.newValues || {})),
             resourceId: auditData.resourceId,
             resourceType: auditData.resourceType,
           };
 
           // Add oldValues if present
           if (auditData.oldValues) {
-            eventData.oldValues = auditData.oldValues;
+            eventData.oldValues = typeof auditData.oldValues === 'string' ? JSON.parse(auditData.oldValues) : auditData.oldValues;
           }
 
           await IntegrationService.handleEvent({

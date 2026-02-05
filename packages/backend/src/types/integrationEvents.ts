@@ -39,6 +39,8 @@ export const INTEGRATION_EVENTS = {
   CLIENT_VERSION_UPDATED: 'client_version_updated',
   CLIENT_VERSION_DELETED: 'client_version_deleted',
   CLIENT_VERSION_BULK_CREATED: 'client_version_bulk_created',
+  CLIENT_VERSION_MAINTENANCE_ON: 'client_version_maintenance_on',
+  CLIENT_VERSION_MAINTENANCE_OFF: 'client_version_maintenance_off',
 
   // Service Notice
   SERVICE_NOTICE_CREATED: 'service_notice_created',
