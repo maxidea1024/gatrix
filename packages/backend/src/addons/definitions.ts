@@ -152,7 +152,7 @@ export const webhookDefinition: AddonDefinition = {
       description: 'integrations.providers.webhook.params.url.description',
       placeholder: 'https://example.com/webhook',
       required: true,
-      sensitive: true,
+      sensitive: false,
     },
     {
       name: 'contentType',
