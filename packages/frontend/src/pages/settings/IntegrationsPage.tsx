@@ -60,6 +60,7 @@ interface ProviderDefinition {
 
 const PROVIDER_ICONS: Record<string, string> = {
   slack: slackIcon,
+  'slack-app': slackIcon,
   teams: teamsIcon,
   webhook: webhookIcon,
   lark: larkIcon,
@@ -269,7 +270,7 @@ export const IntegrationsPage: React.FC = () => {
                           <Typography variant="h6">
                             {t(
                               providers.find((p) => p.name === integration.provider)?.displayName ||
-                                integration.provider
+                              integration.provider
                             )}
                           </Typography>
                           <Typography variant="body2" color="text.secondary">
@@ -327,8 +328,8 @@ export const IntegrationsPage: React.FC = () => {
         message={t('integrations.deleteConfirmMessage', {
           provider: t(
             providers.find((p) => p.name === deleteTarget?.provider)?.displayName ||
-              deleteTarget?.provider ||
-              ''
+            deleteTarget?.provider ||
+            ''
           ),
         })}
         onConfirm={handleDelete}

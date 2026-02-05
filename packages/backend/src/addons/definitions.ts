@@ -105,6 +105,38 @@ export const slackDefinition: AddonDefinition = {
 };
 
 /**
+ * Slack App Addon Definition
+ * Uses Slack Web API with access token instead of webhook
+ */
+export const slackAppDefinition: AddonDefinition = {
+  name: 'slack-app',
+  displayName: 'integrations.providers.slackApp.displayName',
+  description: 'integrations.providers.slackApp.description',
+  documentationUrl: 'https://api.slack.com/messaging/sending',
+  parameters: [
+    {
+      name: 'accessToken',
+      displayName: 'integrations.providers.slackApp.params.accessToken.displayName',
+      type: 'text',
+      description: 'integrations.providers.slackApp.params.accessToken.description',
+      placeholder: 'xoxb-xxx-xxx-xxx',
+      required: true,
+      sensitive: true,
+    },
+    {
+      name: 'defaultChannels',
+      displayName: 'integrations.providers.slackApp.params.defaultChannels.displayName',
+      type: 'text',
+      description: 'integrations.providers.slackApp.params.defaultChannels.description',
+      placeholder: '#general, #alerts',
+      required: false,
+      sensitive: false,
+    },
+  ],
+  events: ALL_INTEGRATION_EVENTS,
+};
+
+/**
  * Webhook Addon Definition
  */
 export const webhookDefinition: AddonDefinition = {
@@ -239,6 +271,7 @@ export const larkDefinition: AddonDefinition = {
  */
 export const ADDON_DEFINITIONS: Record<string, AddonDefinition> = {
   slack: slackDefinition,
+  'slack-app': slackAppDefinition,
   webhook: webhookDefinition,
   teams: teamsDefinition,
   lark: larkDefinition,

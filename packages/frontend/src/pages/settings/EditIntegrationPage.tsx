@@ -96,6 +96,7 @@ interface EventLog {
 
 const PROVIDER_ICONS: Record<string, string> = {
   slack: slackIcon,
+  'slack-app': slackIcon,
   teams: teamsIcon,
   webhook: webhookIcon,
   lark: larkIcon,
@@ -442,24 +443,24 @@ export const EditIntegrationPage: React.FC = () => {
         slotProps={
           isSensitive
             ? {
-                input: {
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton
-                        onClick={() =>
-                          setShowSensitive((prev) => ({
-                            ...prev,
-                            [param.name]: !prev[param.name],
-                          }))
-                        }
-                        edge="end"
-                      >
-                        {isVisible ? <VisibilityOff /> : <Visibility />}
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                },
-              }
+              input: {
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() =>
+                        setShowSensitive((prev) => ({
+                          ...prev,
+                          [param.name]: !prev[param.name],
+                        }))
+                      }
+                      edge="end"
+                    >
+                      {isVisible ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              },
+            }
             : undefined
         }
       />

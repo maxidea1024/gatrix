@@ -65,6 +65,7 @@ interface EventCategory {
 
 const PROVIDER_ICONS: Record<string, string> = {
   slack: slackIcon,
+  'slack-app': slackIcon,
   teams: teamsIcon,
   webhook: webhookIcon,
   lark: larkIcon,
@@ -72,6 +73,7 @@ const PROVIDER_ICONS: Record<string, string> = {
 
 const PROVIDER_COLORS: Record<string, string> = {
   slack: '#4A154B',
+  'slack-app': '#4A154B',
   teams: '#6264A7',
   webhook: '#607D8B',
   lark: '#00D6B9',

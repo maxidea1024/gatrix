@@ -6,6 +6,7 @@
 
 import { Addon } from './Addon';
 import { SlackAddon } from './SlackAddon';
+import { SlackAppAddon } from './SlackAppAddon';
 import { WebhookAddon } from './WebhookAddon';
 import { TeamsAddon } from './TeamsAddon';
 import { LarkAddon } from './LarkAddon';
@@ -20,6 +21,7 @@ export type AddonProviders = Record<string, Addon>;
 export function getAddons(): AddonProviders {
   return {
     slack: new SlackAddon(),
+    'slack-app': new SlackAppAddon(),
     webhook: new WebhookAddon(),
     teams: new TeamsAddon(),
     lark: new LarkAddon(),
@@ -45,6 +47,7 @@ export function getProviderDefinitions(): AddonDefinition[] {
 export {
   Addon,
   SlackAddon,
+  SlackAppAddon,
   WebhookAddon,
   TeamsAddon,
   LarkAddon,
