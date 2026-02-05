@@ -14,6 +14,11 @@ import {
   IconButton,
   Tooltip,
   Stack,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
+  Divider,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -21,6 +26,11 @@ import {
   ChevronRight as ChevronRightIcon,
   CheckCircle as CheckCircleIcon,
   Error as ErrorIcon,
+  MoreVert as MoreVertIcon,
+  Edit as EditIcon,
+  EventNote as EventIcon,
+  PlayArrow as PlayIcon,
+  Stop as StopIcon,
 } from '@mui/icons-material';
 import ConfirmDeleteDialog from '@/components/common/ConfirmDeleteDialog';
 import { CreateIntegrationWizard } from '@/components/integrations/CreateIntegrationWizard';
@@ -111,6 +121,18 @@ export const IntegrationsPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [wizardOpen, setWizardOpen] = useState(false);
   const [wizardProvider, setWizardProvider] = useState<string | undefined>(undefined);
+  const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
+  const [menuTarget, setMenuTarget] = useState<Integration | null>(null);
+
+  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, integration: Integration) => {
+    setMenuAnchorEl(event.currentTarget);
+    setMenuTarget(integration);
+  };
+
+  const handleMenuClose = () => {
+    setMenuAnchorEl(null);
+    setMenuTarget(null);
+  };
 
   const fetchData = async () => {
     try {
@@ -290,16 +312,13 @@ export const IntegrationsPage: React.FC = () => {
                               sx={{ height: 20, fontSize: '0.7rem', flexShrink: 0 }}
                             />
                           </Box>
-                          <Tooltip title={t('common.delete')}>
-                            <IconButton
-                              size="small"
-                              color="error"
-                              onClick={() => setDeleteTarget(integration)}
-                              sx={{ ml: 1 }}
-                            >
-                              <DeleteIcon fontSize="small" />
-                            </IconButton>
-                          </Tooltip>
+                          <IconButton
+                            size="small"
+                            onClick={(e) => handleMenuOpen(e, integration)}
+                            sx={{ ml: 1 }}
+                          >
+                            <MoreVertIcon fontSize="small" />
+                          </IconButton>
                         </Box>
 
                         <Typography
@@ -516,6 +535,80 @@ export const IntegrationsPage: React.FC = () => {
         onClose={() => setDeleteTarget(null)}
         confirmButtonText={t('common.delete')}
       />
+
+      <Menu
+        anchorEl={menuAnchorEl}
+        open={Boolean(menuAnchorEl)}
+        onClose={handleMenuClose}
+        transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+      >
+        <MenuItem
+          onClick={() => {
+            if (menuTarget) {
+              navigate(`/settings/integrations/${menuTarget.id}/edit`);
+            }
+            handleMenuClose();
+          }}
+        >
+          <ListItemIcon>
+            <EditIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('common.edit')}</ListItemText>
+        </MenuItem>
+
+        <MenuItem
+          onClick={() => {
+            if (menuTarget) {
+              navigate(`/settings/integrations/${menuTarget.id}/edit?tab=1`);
+            }
+            handleMenuClose();
+          }}
+        >
+          <ListItemIcon>
+            <EventIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('integrations.eventLogs')}</ListItemText>
+        </MenuItem>
+
+        <Divider />
+
+        <MenuItem
+          onClick={() => {
+            if (menuTarget) {
+              handleToggle(menuTarget);
+            }
+            handleMenuClose();
+          }}
+        >
+          <ListItemIcon>
+            {menuTarget?.isEnabled ? (
+              <StopIcon fontSize="small" color="warning" />
+            ) : (
+              <PlayIcon fontSize="small" color="success" />
+            )}
+          </ListItemIcon>
+          <ListItemText>
+            {menuTarget?.isEnabled ? t('common.disable') : t('common.enable')}
+          </ListItemText>
+        </MenuItem>
+
+        <Divider />
+
+        <MenuItem
+          onClick={() => {
+            if (menuTarget) {
+              setDeleteTarget(menuTarget);
+            }
+            handleMenuClose();
+          }}
+        >
+          <ListItemIcon>
+            <DeleteIcon fontSize="small" color="error" />
+          </ListItemIcon>
+          <ListItemText sx={{ color: 'error.main' }}>{t('common.delete')}</ListItemText>
+        </MenuItem>
+      </Menu>
 
       <CreateIntegrationWizard
         open={wizardOpen}
