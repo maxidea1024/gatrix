@@ -19,7 +19,7 @@
     "migrate:clickhouse": "node scripts/migrate-clickhouse.js",
     "migrate:mysql": "node scripts/migrate-mysql.js",
     "migrate:safe": "(node scripts/migrate-clickhouse.js && node scripts/migrate-mysql.js) || echo 'Migration failed but continuing...'",
-    "clean": "rm -rf dist"
+    "clean": "rimraf dist"
   },
   "keywords": [
     "analytics",
@@ -48,6 +48,7 @@
     "ulid": "^2.3.0",
     "winston": "^3.11.0",
     "winston-daily-rotate-file": "^5.0.0",
+    "winston-loki": "^6.1.3",
     "zod": "^3.22.4"
   },
   "devDependencies": {
