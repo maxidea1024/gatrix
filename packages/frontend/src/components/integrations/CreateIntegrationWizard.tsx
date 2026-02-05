@@ -358,25 +358,25 @@ export const CreateIntegrationWizard: React.FC<CreateIntegrationWizardProps> = (
         slotProps={
           isSensitive
             ? {
-                input: {
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton
-                        onClick={() =>
-                          setShowSensitive((prev) => ({
-                            ...prev,
-                            [param.name]: !prev[param.name],
-                          }))
-                        }
-                        edge="end"
-                        size="small"
-                      >
-                        {isVisible ? <VisibilityOff /> : <Visibility />}
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                },
-              }
+              input: {
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() =>
+                        setShowSensitive((prev) => ({
+                          ...prev,
+                          [param.name]: !prev[param.name],
+                        }))
+                      }
+                      edge="end"
+                      size="small"
+                    >
+                      {isVisible ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              },
+            }
             : undefined
         }
       />
@@ -453,7 +453,7 @@ export const CreateIntegrationWizard: React.FC<CreateIntegrationWizardProps> = (
                         key={provider.name}
                         sx={{
                           border: 2,
-                          borderColor: isSelected ? color : 'transparent',
+                          borderColor: isSelected ? color : 'divider',
                           bgcolor: isSelected ? alpha(color, 0.05) : 'background.paper',
                           transition: 'all 0.2s ease',
                           '&:hover': {
