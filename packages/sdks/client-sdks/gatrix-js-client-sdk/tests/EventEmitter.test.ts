@@ -112,18 +112,22 @@ describe('EventEmitter', () => {
 
     describe('listenerCount', () => {
         it('should return correct count', () => {
-            const callback = jest.fn();
+            const callback1 = jest.fn();
+            const callback2 = jest.fn();
 
             expect(emitter.listenerCount('test')).toBe(0);
 
-            emitter.on('test', callback);
+            emitter.on('test', callback1);
             expect(emitter.listenerCount('test')).toBe(1);
 
-            emitter.on('test', callback);
+            emitter.on('test', callback2);
             expect(emitter.listenerCount('test')).toBe(2);
 
-            emitter.off('test', callback);
+            emitter.off('test', callback1);
             expect(emitter.listenerCount('test')).toBe(1);
+
+            emitter.off('test', callback2);
+            expect(emitter.listenerCount('test')).toBe(0);
         });
     });
 });

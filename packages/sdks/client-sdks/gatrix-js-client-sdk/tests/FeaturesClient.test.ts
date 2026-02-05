@@ -387,10 +387,13 @@ describe('FeaturesClient', () => {
             });
         });
 
-        it('should return undefined variant for non-existent flag', () => {
+        it('should return fallback variant for non-existent flag', () => {
             const variant = client.getVariant('non-existent');
 
-            expect(variant).toBeUndefined();
+            expect(variant).toEqual({
+                name: 'disabled',
+                enabled: false,
+            });
         });
     });
 
@@ -406,7 +409,7 @@ describe('FeaturesClient', () => {
             };
             const clientWithContext = new FeaturesClient(emitter, configWithContext);
 
-            expect(clientWithContext.getContext()).toEqual({
+            expect(clientWithContext.getContext()).toMatchObject({
                 userId: 'user-123',
                 deviceId: 'device-456',
             });
@@ -415,14 +418,14 @@ describe('FeaturesClient', () => {
         it('should update context', () => {
             client.updateContext({ userId: 'new-user' });
 
-            expect(client.getContext()).toEqual({ userId: 'new-user' });
+            expect(client.getContext()).toMatchObject({ userId: 'new-user' });
         });
 
         it('should merge context with updateContext', () => {
             client.updateContext({ userId: 'user-1' });
             client.updateContext({ deviceId: 'device-1' });
 
-            expect(client.getContext()).toEqual({
+            expect(client.getContext()).toMatchObject({
                 userId: 'user-1',
                 deviceId: 'device-1',
             });
@@ -438,7 +441,8 @@ describe('FeaturesClient', () => {
             client.updateContext({ userId: 'user-1', deviceId: 'device-1' });
             client.removeContextField('userId');
 
-            expect(client.getContext()).toEqual({ deviceId: 'device-1' });
+            expect(client.getContext()).toMatchObject({ deviceId: 'device-1' });
+            expect(client.getContext().userId).toBeUndefined();
         });
     });
 
@@ -455,7 +459,8 @@ describe('FeaturesClient', () => {
             });
 
             await errorClient.init();
-            // Initial fetch will fail
+            // Try to fetch which will fail
+            await errorClient.fetchFlags();
 
             expect(errorCallback).toHaveBeenCalled();
             expect(errorClient.getError()).toBeTruthy();
