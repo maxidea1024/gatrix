@@ -53,13 +53,12 @@ export class DiscordAddon extends Addon {
                 statusCode: response.status,
             });
         } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : String(error);
             this.logger.error(
                 `Failed to send Discord notification for integration ${integrationId}:`,
                 error
             );
 
-            await this.registerEvent(integrationId, event, 'failed', errorMessage, {
+            await this.registerFailure(integrationId, event, error, {
                 url: this.maskUrl(url),
                 username,
             });

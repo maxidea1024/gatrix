@@ -155,6 +155,28 @@ export abstract class Addon {
   }
 
   /**
+   * Register a failed integration event with automatic status code extraction
+   */
+  protected async registerFailure(
+    integrationId: string,
+    event: IntegrationSystemEvent,
+    error: any,
+    details: Record<string, any> = {}
+  ): Promise<void> {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    let statusCode: number | undefined;
+
+    if (error instanceof HttpError) {
+      statusCode = error.statusCode;
+    }
+
+    await this.registerEvent(integrationId, event, 'failed', errorMessage, {
+      ...details,
+      statusCode: statusCode || details.statusCode,
+    });
+  }
+
+  /**
    * Parse custom headers from string format
    */
   protected parseCustomHeaders(headersString: string | undefined): Record<string, string> {

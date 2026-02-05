@@ -76,17 +76,10 @@ export class WebhookAddon extends Addon {
         contentType: contentType || 'application/json',
       });
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
       this.logger.error(`Failed to send webhook for integration ${integrationId}:`, error);
 
-      let statusCode: number | undefined;
-      if (error instanceof HttpError) {
-        statusCode = error.statusCode;
-      }
-
-      await this.registerEvent(integrationId, event, 'failed', errorMessage, {
+      await this.registerFailure(integrationId, event, error, {
         url: this.maskUrl(url),
-        statusCode,
       });
     }
   }
