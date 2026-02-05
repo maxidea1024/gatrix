@@ -20,6 +20,11 @@ export interface Integration {
   // Joined fields
   createdByName?: string;
   updatedByName?: string;
+  lastEvent?: {
+    state: 'success' | 'failed' | 'successWithErrors';
+    stateDetails: string | null;
+    createdAt: Date;
+  };
 }
 
 export interface CreateIntegrationData {
@@ -123,7 +128,43 @@ export class IntegrationModel {
       }
 
       const rows = await query;
-      return rows.map((row: any) => this.rowToIntegration(row));
+      const integrations = rows.map((row: any) => this.rowToIntegration(row));
+
+      if (integrations.length > 0) {
+        // Fetch last event status for each integration
+        // We use a window function or subquery to get the latest event for each integration
+        // Since we are using Knex, we can do this with a raw query or simple separate queries if N is small
+        // For better performance with N integrations, we will fetch the latest logs in one go
+
+        const integrationIds = integrations.map((i) => i.id);
+
+        // This query finds the latest event ID for each integration
+        // Note: ULIDs are k-sortable, so MAX(id) gives the latest event
+        const latestEvents = await db('g_integration_events')
+          .select('integrationId', 'state', 'stateDetails', 'createdAt')
+          .whereIn('id', function () {
+            this.select(db.raw('MAX(id)'))
+              .from('g_integration_events')
+              .whereIn('integrationId', integrationIds)
+              .groupBy('integrationId');
+          });
+
+        // Map events to integrations
+        const eventMap = new Map(latestEvents.map((e) => [e.integrationId, e]));
+
+        integrations.forEach((integration) => {
+          const event = eventMap.get(integration.id);
+          if (event) {
+            integration.lastEvent = {
+              state: event.state,
+              stateDetails: event.stateDetails,
+              createdAt: event.createdAt,
+            };
+          }
+        });
+      }
+
+      return integrations;
     } catch (error) {
       logger.error('Error finding all integrations:', error);
       throw error;

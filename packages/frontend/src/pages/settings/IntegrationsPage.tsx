@@ -19,6 +19,8 @@ import {
   Add as AddIcon,
   Delete as DeleteIcon,
   ChevronRight as ChevronRightIcon,
+  CheckCircle as CheckCircleIcon,
+  Error as ErrorIcon,
 } from '@mui/icons-material';
 import ConfirmDeleteDialog from '@/components/common/ConfirmDeleteDialog';
 import { CreateIntegrationWizard } from '@/components/integrations/CreateIntegrationWizard';
@@ -54,6 +56,11 @@ interface Integration {
   updatedByName?: string;
   createdAt: string;
   updatedAt: string;
+  lastEvent?: {
+    state: 'success' | 'failed' | 'successWithErrors';
+    stateDetails: string | null;
+    createdAt: string;
+  };
 }
 
 interface ProviderDefinition {
@@ -240,6 +247,28 @@ export const IntegrationsPage: React.FC = () => {
                               variant="outlined"
                               sx={{ height: 20, fontSize: '0.7rem', flexShrink: 0 }}
                             />
+                            {/* Last Event Status */}
+                            {integration.lastEvent && (
+                              <Tooltip
+                                title={
+                                  integration.lastEvent.state === 'success'
+                                    ? t('integrations.eventState.success')
+                                    : integration.lastEvent.stateDetails || t('integrations.eventState.failed')
+                                }
+                              >
+                                <Box display="flex" alignItems="center">
+                                  {integration.lastEvent.state === 'success' ? (
+                                    <CheckCircleIcon color="success" fontSize="small" sx={{ fontSize: 20 }} />
+                                  ) : (
+                                    <ErrorIcon
+                                      color={integration.lastEvent.state === 'successWithErrors' ? 'warning' : 'error'}
+                                      fontSize="small"
+                                      sx={{ fontSize: 20 }}
+                                    />
+                                  )}
+                                </Box>
+                              </Tooltip>
+                            )}
                           </Box>
                           <Tooltip title={t('common.delete')}>
                             <IconButton
