@@ -98,6 +98,7 @@ export const enhancedAuditLog = (options: EnhancedAuditLogOptions) => {
           newValues: finalNewValues,
           ipAddress: req.ip,
           userAgent: req.get('User-Agent'),
+          environment: req.environment,
         });
 
         if (captureError) {

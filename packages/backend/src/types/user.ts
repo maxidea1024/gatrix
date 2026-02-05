@@ -50,7 +50,7 @@ export interface UpdateUserData {
   lastLoginAt?: Date;
 }
 
-export interface UserWithoutPassword extends Omit<User, 'passwordHash'> {}
+export interface UserWithoutPassword extends Omit<User, 'passwordHash'> { }
 
 export interface OAuthAccount {
   id: number;
@@ -101,4 +101,5 @@ export interface CreateAuditLogData {
   newValues?: any;
   ipAddress?: string;
   userAgent?: string;
+  environment?: string;
 }

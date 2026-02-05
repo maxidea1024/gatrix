@@ -21,6 +21,69 @@ export class AuditLogModel {
         throw new Error('Failed to create audit log');
       }
 
+      // Trigger Integration Event
+      // Use dynamic import to avoid circular dependency
+      try {
+        const { ALL_INTEGRATION_EVENTS } = await import('../types/integrationEvents');
+
+        let eventType = auditData.action;
+        let isValidEvent = ALL_INTEGRATION_EVENTS.includes(eventType as any);
+
+        // Try mapping if not valid (e.g., _create -> _created, _update -> _updated)
+        // Audit logs often use 'verb' (create), while Integration events use 'past tense' (created)
+        if (!isValidEvent) {
+          // Special mappings
+          if (eventType === 'game_world_toggle_maintenance' && auditData.newValues) {
+            // Handle boolean or 0/1 (though newValues should be boolean from middleware)
+            const isActive = auditData.newValues.isMaintenance === true || auditData.newValues.isMaintenance === 1;
+            eventType = isActive ? 'game_world_maintenance_on' : 'game_world_maintenance_off';
+          } else if (eventType === 'game_world_toggle_visibility') {
+            eventType = 'game_world_visibility_changed';
+          } else {
+            // Generic mappings
+            if (eventType.endsWith('_create')) {
+              eventType = eventType + 'd';
+            } else if (eventType.endsWith('_update')) {
+              eventType = eventType + 'd';
+            } else if (eventType.endsWith('_delete')) {
+              eventType = eventType + 'd';
+            } else if (eventType.endsWith('_bulk_create')) {
+              eventType = eventType + 'd';
+            } else if (eventType.endsWith('_bulk_update')) {
+              eventType = eventType + 'd';
+            }
+          }
+          isValidEvent = ALL_INTEGRATION_EVENTS.includes(eventType as any);
+        }
+
+        if (isValidEvent) {
+          const { IntegrationService } = await import('../services/IntegrationService');
+
+          // Construct event data from newValues and other audit info
+          const eventData: Record<string, any> = {
+            ...(auditData.newValues || {}),
+            resourceId: auditData.resourceId,
+            resourceType: auditData.resourceType,
+          };
+
+          // Add oldValues if present
+          if (auditData.oldValues) {
+            eventData.oldValues = auditData.oldValues;
+          }
+
+          await IntegrationService.handleEvent({
+            type: eventType as any,
+            environment: auditData.environment,
+            createdByUserId: auditData.userId,
+            data: eventData,
+            createdAt: new Date(),
+          });
+        }
+      } catch (error) {
+        logger.error('Failed to trigger integration event on audit log creation:', error);
+        // Continue execution, do not fail audit log creation
+      }
+
       return auditLog;
     } catch (error) {
       logger.error('Error creating audit log:', error);
