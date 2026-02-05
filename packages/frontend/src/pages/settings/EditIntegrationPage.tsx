@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { useTranslation, Trans } from 'react-i18next';
 import {
   Box,
   Card,
@@ -31,6 +31,7 @@ import {
   TableRow,
   Paper,
   Tooltip,
+  Collapse,
 } from '@mui/material';
 import {
   ExpandMore as ExpandMoreIcon,
@@ -42,9 +43,12 @@ import {
   CheckCircle as CheckCircleIcon,
   Error as ErrorIcon,
   Refresh as RefreshIcon,
+  KeyboardArrowDown,
+  KeyboardArrowUp,
 } from '@mui/icons-material';
 import { useSnackbar } from 'notistack';
 import { api } from '@/services/api';
+import { formatRelativeTime } from '@/utils/dateFormat';
 
 // Provider icons
 import slackIcon from '@/assets/icons/integrations/slack.svg';
@@ -52,6 +56,7 @@ import teamsIcon from '@/assets/icons/integrations/teams.svg';
 import webhookIcon from '@/assets/icons/integrations/webhook.svg';
 import larkIcon from '@/assets/icons/integrations/lark.svg';
 import newrelicIcon from '@/assets/icons/integrations/newrelic.svg';
+import debugIcon from '@/assets/icons/integrations/debug.svg';
 
 interface Integration {
   id: string;
@@ -93,6 +98,7 @@ interface EventLog {
   statusCode: number | null;
   stateDetails: string | null;
   createdAt: string;
+  eventData?: any;
 }
 
 const PROVIDER_ICONS: Record<string, string> = {
@@ -102,7 +108,9 @@ const PROVIDER_ICONS: Record<string, string> = {
   teams: teamsIcon,
   webhook: webhookIcon,
   lark: larkIcon,
+  debug: debugIcon, // Use specific debug icon
 };
+
 
 // Event categories for UI grouping
 const EVENT_CATEGORIES: EventCategory[] = [
@@ -116,11 +124,11 @@ const EVENT_CATEGORIES: EventCategory[] = [
       'feature_flag_deleted',
       'feature_flag_stale_on',
       'feature_flag_stale_off',
-      'feature_environment_enabled',
-      'feature_environment_disabled',
-      'feature_strategy_added',
-      'feature_strategy_updated',
-      'feature_strategy_removed',
+      'feature_flag_environment_enabled',
+      'feature_flag_environment_disabled',
+      'feature_flag_strategy_added',
+      'feature_flag_strategy_updated',
+      'feature_flag_strategy_removed',
     ],
   },
   {
@@ -146,6 +154,8 @@ const EVENT_CATEGORIES: EventCategory[] = [
       'client_version_updated',
       'client_version_deleted',
       'client_version_bulk_created',
+      'client_version_maintenance_on',
+      'client_version_maintenance_off',
     ],
   },
   {
@@ -182,7 +192,7 @@ const EVENT_CATEGORIES: EventCategory[] = [
   },
   {
     key: 'integration',
-    events: ['integration_created', 'integration_updated', 'integration_deleted'],
+    events: ['integration_created', 'integration_updated', 'integration_deleted', 'integration_test'],
   },
 ];
 
@@ -201,13 +211,218 @@ function TabPanel(props: TabPanelProps) {
   );
 }
 
+const getEventCategoryKey = (eventType: string): string => {
+  const category = EVENT_CATEGORIES.find((c) => c.events.includes(eventType));
+  return category ? category.key : 'other';
+};
+
+const getEventDescriptionConfig = (log: EventLog): { key: string; params: any } | null => {
+  if (!log.eventData) return null;
+  const data = log.eventData;
+
+  const params = {
+    // Prefer friendly names if available
+    name: data.segmentName || data.flagName || data.name || data.title || data.id || '',
+    environment: data.environment || '',
+    message: data.message || '',
+    email: data.email || '',
+    displayName: data.displayName || '',
+  };
+
+  // List of events we have specific description keys for
+  const SPECIFIC_EVENTS = [
+    'feature_flag_environment_enabled',
+    'feature_flag_environment_disabled',
+    'feature_flag_created',
+    'feature_flag_updated',
+    'feature_flag_archived',
+    'feature_flag_revived',
+    'feature_flag_deleted',
+    'feature_segment_created',
+    'feature_segment_updated',
+    'feature_segment_deleted',
+    'integration_test',
+  ];
+
+  if (SPECIFIC_EVENTS.includes(log.eventType)) {
+    return { key: `integrations.eventDescription.${log.eventType}`, params };
+  }
+
+  return null;
+};
+
+const FallbackDescription: React.FC<{ log: EventLog }> = ({ log }) => {
+  const data = log.eventData || {};
+  if (data.email) return <>{data.email}</>;
+  if (data.displayName) return <>{data.displayName}</>;
+  if (data.name && data.environment) return <>{`${data.environment}: ${data.name}`}</>;
+  if (data.name) return <>{data.name}</>;
+  if (data.title) return <>{data.title}</>;
+  if (data.message) return <>{data.message}</>;
+  return <>{data.id || ''}</>;
+};
+
+const LabelChip = ({ children, ...props }: any) => {
+  if (!children) return null;
+  return <Chip label={children} {...props} />;
+};
+
+const LogDetailsRow: React.FC<{ log: EventLog; index: number }> = ({ log, index }) => {
+  const [open, setOpen] = useState(false);
+  const { t } = useTranslation();
+
+  const getStateIcon = (state: string) => {
+    switch (state) {
+      case 'success':
+        return <CheckCircleIcon color="success" fontSize="small" />;
+      case 'failed':
+        return <ErrorIcon color="error" fontSize="small" />;
+      default:
+        return <ErrorIcon color="warning" fontSize="small" />;
+    }
+  };
+
+  const categoryKey = getEventCategoryKey(log.eventType);
+  const descriptionConfig = getEventDescriptionConfig(log);
+
+  return (
+    <>
+      <TableRow
+        sx={{
+          '& > *': { borderBottom: 'unset' },
+          bgcolor: (theme) =>
+            index % 2 === 0
+              ? theme.palette.mode === 'dark'
+                ? 'rgba(255, 255, 255, 0.02)' // More subtle for dark mode
+                : 'action.hover'
+              : 'inherit',
+        }}
+      >
+        <TableCell>
+          <IconButton
+            aria-label="expand row"
+            size="small"
+            onClick={() => setOpen(!open)}
+          >
+            {open ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
+          </IconButton>
+        </TableCell>
+        <TableCell>
+          <Tooltip title={t(`integrations.eventState.${log.state}`)}>
+            {getStateIcon(log.state)}
+          </Tooltip>
+        </TableCell>
+        <TableCell>
+          {categoryKey !== 'other' && (
+            <Chip
+              label={t(`integrations.eventCategories.${categoryKey}`)}
+              size="small"
+              variant="outlined"
+              sx={{ fontSize: '0.75rem', height: 24 }}
+            />
+          )}
+        </TableCell>
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>{log.eventType.replace(/_/g, ' ')}</TableCell>
+        <TableCell sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>
+          {descriptionConfig ? (
+            <Trans
+              i18nKey={descriptionConfig.key}
+              values={descriptionConfig.params}
+              components={{
+                name: <LabelChip size="small" variant="outlined" sx={{ height: 20, fontSize: '0.75rem', fontWeight: 500 }} />,
+                environment: <LabelChip size="small" color="primary" variant="outlined" sx={{ height: 20, fontSize: '0.75rem' }} />,
+                enabled: <LabelChip size="small" color="success" variant="outlined" sx={{ height: 20, fontSize: '0.75rem', fontWeight: 600 }} />,
+                disabled: <LabelChip size="small" color="default" variant="outlined" sx={{ height: 20, fontSize: '0.75rem', fontWeight: 600 }} />,
+                message: <span style={{ fontWeight: 500 }} />,
+              }}
+            />
+          ) : (
+            <FallbackDescription log={log} />
+          )}
+        </TableCell>
+        <TableCell>{log.statusCode ?? '-'}</TableCell>
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>{formatRelativeTime(log.createdAt, { showSeconds: true })}</TableCell>
+      </TableRow>
+      <TableRow
+        sx={{
+          bgcolor: (theme) =>
+            index % 2 === 0
+              ? theme.palette.mode === 'dark'
+                ? 'rgba(255, 255, 255, 0.02)'
+                : 'action.hover'
+              : 'inherit',
+        }}
+      >
+        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={7}>
+          <Collapse in={open} timeout="auto" unmountOnExit>
+            <Box sx={{ margin: 2 }}>
+              <Typography variant="h6" gutterBottom component="div" sx={{ fontSize: '0.9rem', fontWeight: 600 }}>
+                {t('integrations.eventDetails')}
+              </Typography>
+
+              {/* Event Data (JSON) */}
+              {log.eventData && Object.keys(log.eventData).length > 0 && (
+                <Box sx={{ mb: 2 }}>
+                  <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                    Payload
+                  </Typography>
+                  <Box
+                    sx={{
+                      p: 2,
+                      bgcolor: (theme) => theme.palette.mode === 'dark' ? '#2b2b2b' : '#f5f5f5',
+                      color: (theme) => theme.palette.mode === 'dark' ? '#e6e6e6' : '#333333',
+                      borderRadius: 1,
+                      fontFamily: 'Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace',
+                      fontSize: '0.85rem',
+                      whiteSpace: 'pre-wrap',
+                      overflowX: 'auto',
+                      border: 1,
+                      borderColor: 'divider',
+                    }}
+                  >
+                    {JSON.stringify(log.eventData, null, 2)}
+                  </Box>
+                </Box>
+              )}
+
+              {/* State Details (Text) */}
+              {log.stateDetails && (
+                <Box>
+                  <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                    {t('integrations.results')}
+                  </Typography>
+                  <Box
+                    sx={{
+                      p: 2,
+                      bgcolor: 'action.hover',
+                      borderRadius: 1,
+                      fontFamily: 'monospace',
+                      fontSize: '0.85rem',
+                      whiteSpace: 'pre-wrap',
+                      border: 1,
+                      borderColor: 'divider',
+                    }}
+                  >
+                    {log.stateDetails}
+                  </Box>
+                </Box>
+              )}
+            </Box>
+          </Collapse>
+        </TableCell>
+      </TableRow>
+    </>
+  );
+};
+
 export const EditIntegrationPage: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const { enqueueSnackbar } = useSnackbar();
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  const [tabValue, setTabValue] = useState(0);
+  const [tabValue, setTabValue] = useState(parseInt(searchParams.get('tab') || '0', 10));
   const [providers, setProviders] = useState<ProviderDefinition[]>([]);
   const [environments, setEnvironments] = useState<{ environment: string; displayName?: string }[]>(
     []
@@ -240,10 +455,21 @@ export const EditIntegrationPage: React.FC = () => {
   }, [id]);
 
   useEffect(() => {
+    // If tab is 1 (Event Logs), fetch logs
     if (tabValue === 1) {
-      fetchEventLogs();
+      if (eventLogs.length === 0) {
+        fetchEventLogs();
+      }
+    }
+    // Update URL param
+    if (searchParams.get('tab') !== String(tabValue)) {
+      setSearchParams({ tab: String(tabValue) }, { replace: true });
     }
   }, [tabValue, id]);
+
+  const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
+    setTabValue(newValue);
+  };
 
   const fetchData = async () => {
     try {
@@ -290,10 +516,10 @@ export const EditIntegrationPage: React.FC = () => {
     }
   };
 
-  const fetchEventLogs = async () => {
+  const fetchEventLogs = async (isRefresh = false) => {
     try {
       setLogsLoading(true);
-      const res = await api.get(`/admin/integrations/${id}/events`);
+      const res = await api.get(`/admin/integrations/${id}/events?limit=200`);
       setEventLogs(res?.data || []);
     } catch {
       // Ignore error
@@ -540,7 +766,7 @@ export const EditIntegrationPage: React.FC = () => {
 
       {/* Tabs */}
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Tabs value={tabValue} onChange={(_, v) => setTabValue(v)}>
+        <Tabs value={tabValue} onChange={handleTabChange}>
           <Tab label={t('integrations.settings')} />
           <Tab label={t('integrations.eventLogs')} />
         </Tabs>
@@ -719,17 +945,18 @@ export const EditIntegrationPage: React.FC = () => {
 
       {/* Event Logs Tab */}
       <TabPanel value={tabValue} index={1}>
-        <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-          <Typography variant="h6">{t('integrations.eventLogs')}</Typography>
-          <Button startIcon={<RefreshIcon />} onClick={fetchEventLogs} disabled={logsLoading}>
+        <Box display="flex" justifyContent="flex-end" alignItems="center" mb={1}>
+          <Button
+            startIcon={logsLoading ? <CircularProgress size={16} color="inherit" /> : <RefreshIcon />}
+            onClick={() => fetchEventLogs(true)}
+            size="small"
+            disabled={logsLoading}
+          >
             {t('common.refresh')}
           </Button>
         </Box>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-          {t('integrations.eventLogsSubtitle')}
-        </Typography>
 
-        {logsLoading ? (
+        {logsLoading && eventLogs.length === 0 ? (
           <Box display="flex" justifyContent="center" py={4}>
             <CircularProgress />
           </Box>
@@ -740,38 +967,18 @@ export const EditIntegrationPage: React.FC = () => {
             <Table size="small">
               <TableHead>
                 <TableRow>
-                  <TableCell>{t('common.status')}</TableCell>
-                  <TableCell>{t('integrations.eventType')}</TableCell>
-                  <TableCell>{t('integrations.statusCode')}</TableCell>
-                  <TableCell>{t('integrations.details')}</TableCell>
-                  <TableCell>{t('common.createdAt')}</TableCell>
+                  <TableCell width={50} />
+                  <TableCell width={60}>{t('common.status')}</TableCell>
+                  <TableCell width={120}>{t('integrations.category')}</TableCell>
+                  <TableCell width={200}>{t('integrations.eventType')}</TableCell>
+                  <TableCell>{t('integrations.description')}</TableCell>
+                  <TableCell width={100}>{t('integrations.statusCode')}</TableCell>
+                  <TableCell width={150}>{t('common.createdAt')}</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {eventLogs.map((log) => (
-                  <TableRow key={log.id}>
-                    <TableCell>
-                      <Tooltip title={t(`integrations.eventState.${log.state}`)}>
-                        {getStateIcon(log.state)}
-                      </Tooltip>
-                    </TableCell>
-                    <TableCell>{log.eventType.replace(/_/g, ' ')}</TableCell>
-                    <TableCell>{log.statusCode ?? '-'}</TableCell>
-                    <TableCell>
-                      <Typography
-                        variant="body2"
-                        sx={{
-                          maxWidth: 300,
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        {log.stateDetails || '-'}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>{new Date(log.createdAt).toLocaleString()}</TableCell>
-                  </TableRow>
+                {eventLogs.map((log, index) => (
+                  <LogDetailsRow key={log.id} log={log} index={index} />
                 ))}
               </TableBody>
             </Table>

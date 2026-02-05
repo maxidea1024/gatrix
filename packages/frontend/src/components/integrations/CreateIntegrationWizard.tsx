@@ -152,6 +152,8 @@ const EVENT_CATEGORIES: EventCategory[] = [
       'client_version_updated',
       'client_version_deleted',
       'client_version_bulk_created',
+      'client_version_maintenance_on',
+      'client_version_maintenance_off',
     ],
   },
   {
