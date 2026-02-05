@@ -139,6 +139,9 @@ export interface GatrixClientConfig {
 
   // ==================== Feature-specific Settings ====================
 
+  /** Start in offline mode (no network requests, use cached/bootstrap flags) */
+  offlineMode?: boolean;
+
   /** Feature flags configuration */
   features?: FeaturesConfig;
 }

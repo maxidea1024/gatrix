@@ -102,6 +102,10 @@ interface GatrixClientConfig {
   // Optional - Sync Mode
   explicitSyncMode?: boolean;     // Enable explicit sync mode
 
+  // Optional - Offline Mode
+  offlineMode?: boolean;          // Start in offline mode (no network requests)
+                                  // Requires bootstrap or cached flags, throws error if none available
+
   // Optional - Bootstrap
   bootstrap?: EvaluatedFlag[];    // Initial flags for instant availability
   bootstrapOverride?: boolean;    // Override stored flags with bootstrap

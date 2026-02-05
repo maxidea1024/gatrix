@@ -21,6 +21,7 @@ import { InMemoryStorageProvider } from './storage-provider-inmemory';
 import { uuidv4, resolveFetch, resolveAbortController, deepClone } from './utils';
 import { FlagProxy } from './FlagProxy';
 import { WatchFlagGroup } from './WatchFlagGroup';
+import { Logger, ConsoleLogger } from './Logger';
 
 const STORAGE_KEY_FLAGS = 'flags';
 const STORAGE_KEY_SESSION = 'sessionId';
@@ -38,6 +39,7 @@ export class FeaturesClient {
   private fetch: typeof fetch;
   private createAbortController?: () => AbortController;
   private abortController?: AbortController | null;
+  private logger: Logger;
 
   // Flag storage
   private realtimeFlags: Map<string, EvaluatedFlag> = new Map();
@@ -75,11 +77,14 @@ export class FeaturesClient {
       config.storageProvider ??
       (typeof window !== 'undefined' ? new LocalStorageProvider() : new InMemoryStorageProvider());
 
+    // Initialize logger
+    this.logger = config.logger ?? new ConsoleLogger('GatrixClient');
+
     // Initialize fetch
     const fetchFn = config.fetch ?? resolveFetch();
     if (!fetchFn) {
-      console.error(
-        'GatrixClient: You must provide a "fetch" implementation or run in an environment where "fetch" is available.'
+      this.logger.error(
+        'You must provide a "fetch" implementation or run in an environment where "fetch" is available.'
       );
     }
     this.fetch = fetchFn!;
@@ -142,10 +147,25 @@ export class FeaturesClient {
    */
   async start(): Promise<void> {
     if (this.started) {
-      console.warn('FeaturesClient already started');
+      this.logger.warn('FeaturesClient already started');
       return;
     }
     this.started = true;
+
+    // Offline mode: skip all network requests, use cached/bootstrap flags only
+    if (this.config.offlineMode) {
+      if (this.realtimeFlags.size === 0) {
+        const error = new Error(
+          'GatrixClient: offlineMode requires bootstrap data or cached flags, but none are available'
+        );
+        this.sdkState = 'error';
+        this.lastError = error;
+        this.emitter.emit(EVENTS.ERROR, { type: 'offline_no_data', error });
+        throw error;
+      }
+      this.setReady();
+      return;
+    }
 
     // Initial fetch
     await this.fetchFlags();
@@ -631,6 +651,12 @@ export class FeaturesClient {
   // ==================== Fetch ====================
 
   async fetchFlags(): Promise<void> {
+    // Offline mode: no network requests allowed
+    if (this.config.offlineMode) {
+      this.logger.warn('fetchFlags called but client is in offline mode, ignoring');
+      return;
+    }
+
     if (!this.fetch) {
       return;
     }
@@ -724,7 +750,7 @@ export class FeaturesClient {
       if (e instanceof Error && e.name === 'AbortError') {
         return;
       }
-      console.error('GatrixClient: Failed to fetch flags', e);
+      this.logger.error('Failed to fetch flags', e);
       this.sdkState = 'error';
       this.lastError = e;
       this.emitter.emit(EVENTS.ERROR, {

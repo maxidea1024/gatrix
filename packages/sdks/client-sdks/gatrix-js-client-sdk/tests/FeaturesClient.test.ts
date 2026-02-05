@@ -493,4 +493,82 @@ describe('FeaturesClient', () => {
             expect(flags.map((f) => f.name)).toEqual(expect.arrayContaining(bootstrapFlags.map((f) => f.name)));
         });
     });
+
+    describe('offline mode', () => {
+        it('should start successfully with bootstrap data in offline mode', async () => {
+            const offlineClient = new FeaturesClient(emitter, {
+                ...defaultConfig,
+                offlineMode: true,
+                features: {
+                    bootstrap: bootstrapFlags,
+                },
+            });
+
+            await offlineClient.init();
+            await offlineClient.start();
+
+            expect(offlineClient.isReady()).toBe(true);
+            expect(offlineClient.isEnabled('bool-enabled')).toBe(true);
+        });
+
+        it('should throw error when offline mode has no data', async () => {
+            const offlineClient = new FeaturesClient(emitter, {
+                ...defaultConfig,
+                offlineMode: true,
+                features: {
+                    bootstrap: [], // Empty bootstrap
+                },
+            });
+
+            await offlineClient.init();
+
+            await expect(offlineClient.start()).rejects.toThrow(
+                'offlineMode requires bootstrap data or cached flags'
+            );
+        });
+
+        it('should warn and skip fetchFlags in offline mode', async () => {
+            const mockLogger = {
+                debug: jest.fn(),
+                info: jest.fn(),
+                warn: jest.fn(),
+                error: jest.fn(),
+            };
+            const offlineClient = new FeaturesClient(emitter, {
+                ...defaultConfig,
+                offlineMode: true,
+                logger: mockLogger,
+                features: {
+                    bootstrap: bootstrapFlags,
+                },
+            });
+
+            await offlineClient.init();
+            await offlineClient.start();
+
+            // Try to fetch - should warn and do nothing
+            await offlineClient.fetchFlags();
+
+            expect(mockLogger.warn).toHaveBeenCalledWith(
+                expect.stringContaining('offline mode')
+            );
+        });
+
+        it('should not start polling in offline mode', async () => {
+            const offlineClient = new FeaturesClient(emitter, {
+                ...defaultConfig,
+                offlineMode: true,
+                features: {
+                    bootstrap: bootstrapFlags,
+                    refreshInterval: 1, // 1 second
+                },
+            });
+
+            await offlineClient.init();
+            await offlineClient.start();
+
+            // Mock should not be called even after waiting
+            expect(mockFetch).not.toHaveBeenCalled();
+        });
+    });
 });
