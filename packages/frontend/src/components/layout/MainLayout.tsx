@@ -1502,7 +1502,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             display: 'block',
           }}
         >
-          {sidebarCollapsed ? `v${__APP_VERSION__}` : `Gatrix v${__APP_VERSION__}`}
+          {sidebarCollapsed ? `${__APP_VERSION__}` : `Gatrix ${__APP_VERSION__}`}
         </Typography>
       </Box>
     </Box>
