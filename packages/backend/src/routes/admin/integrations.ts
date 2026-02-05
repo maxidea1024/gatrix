@@ -207,6 +207,9 @@ router.get('/:id/events', async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'Integration not found' });
     }
 
+    // Add synthetic delay for better UX (prevent flicker)
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
     const result = await IntegrationService.getIntegrationEvents(id, page, limit);
 
     res.json({

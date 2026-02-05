@@ -1,5 +1,6 @@
 import winston from "winston";
 import DailyRotateFile from "winston-daily-rotate-file";
+import LokiTransport from "winston-loki";
 import { config } from "../config";
 import os from "os";
 
@@ -12,9 +13,15 @@ const monitoringEnabled =
   process.env.MONITORING_ENABLED === "1";
 const hostname = os.hostname();
 
-const useJsonFormat = logFormatEnv
-  ? logFormatEnv === "json"
-  : monitoringEnabled || nodeEnv !== "development";
+const lokiEnabled = process.env.GATRIX_LOKI_ENABLED === 'true';
+const lokiUrl = process.env.GATRIX_LOKI_URL;
+
+// Use JSON format for file/Loki if configured via LOG_FORMAT
+const useJsonFormat = logFormatEnv === "json";
+
+// For console, use pretty format unless explicitly requested via LOG_CONSOLE_FORMAT
+// This ignores LOG_FORMAT=json for console to keep it readable in development
+const useJsonConsoleFormat = process.env.LOG_CONSOLE_FORMAT === 'json';
 
 /**
  * Get the first non-internal IPv4 address from network interfaces
@@ -97,7 +104,7 @@ const consolePrettyFormat = winston.format.combine(
 const transports: winston.transport[] = [
   // Console transport
   new winston.transports.Console({
-    format: useJsonFormat ? jsonFormat : consolePrettyFormat,
+    format: useJsonConsoleFormat ? jsonFormat : consolePrettyFormat,
   }),
 ];
 
@@ -119,6 +126,21 @@ if (config.nodeEnv === "production") {
       maxFiles: "30d",
       format: jsonFormat,
     }),
+  );
+
+}
+
+// Add Loki transport if enabled
+if (lokiEnabled && lokiUrl) {
+  transports.push(
+    new LokiTransport({
+      host: lokiUrl,
+      labels: { service: serviceName, hostname },
+      json: true,
+      format: jsonFormat,
+      replaceTimestamp: true,
+      onConnectionError: (err) => console.error(err),
+    })
   );
 }
 

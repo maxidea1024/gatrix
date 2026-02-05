@@ -1,5 +1,6 @@
 import winston from 'winston';
 import DailyRotateFile from 'winston-daily-rotate-file';
+import LokiTransport from 'winston-loki';
 import path from 'path';
 import os from 'os';
 
@@ -12,9 +13,15 @@ const monitoringEnabled =
   process.env.MONITORING_ENABLED === 'true' || process.env.MONITORING_ENABLED === '1';
 const hostname = os.hostname();
 
-const useJsonFormat = logFormat
-  ? logFormat === 'json'
-  : monitoringEnabled || nodeEnv !== 'development';
+const lokiEnabled = process.env.GATRIX_LOKI_ENABLED === 'true';
+const lokiUrl = process.env.GATRIX_LOKI_URL;
+
+// Use JSON format for file/Loki if configured via LOG_FORMAT
+const useJsonFormat = logFormat === 'json';
+
+// For console, use pretty format unless explicitly requested via LOG_CONSOLE_FORMAT
+// This ignores LOG_FORMAT=json for console to keep it readable in development
+const useJsonConsoleFormat = process.env.LOG_CONSOLE_FORMAT === 'json';
 
 /**
  * Get the first non-internal IPv4 address from network interfaces
@@ -102,7 +109,7 @@ const transports: winston.transport[] = [
   // Console transport
   new winston.transports.Console({
     level: logLevel,
-    format: useJsonFormat ? jsonFormat : consolePrettyFormat,
+    format: useJsonConsoleFormat ? jsonFormat : consolePrettyFormat,
   }),
 ];
 
@@ -130,6 +137,21 @@ if (process.env.NODE_ENV === 'production' || process.env.LOG_DIR) {
       maxSize: '20m',
       maxFiles: '14d',
       zippedArchive: true,
+    })
+  );
+
+}
+
+// Add Loki transport if enabled
+if (lokiEnabled && lokiUrl) {
+  transports.push(
+    new LokiTransport({
+      host: lokiUrl,
+      labels: { service: serviceName, hostname },
+      json: true,
+      format: jsonFormat,
+      replaceTimestamp: true,
+      onConnectionError: (err) => console.error(err),
     })
   );
 }
@@ -231,29 +253,29 @@ const createLogger = (category: string): winston.Logger => {
       // Console transport with category format
       new winston.transports.Console({
         level: logLevel,
-        format: useJsonFormat ? categoryJsonFormat : categoryPrettyFormat,
+        format: useJsonConsoleFormat ? categoryJsonFormat : categoryPrettyFormat,
       }),
       // Add file transports only in production or when LOG_DIR is specified
       ...(process.env.NODE_ENV === 'production' || process.env.LOG_DIR
         ? [
-            new DailyRotateFile({
-              filename: path.join(logDir, 'error-%DATE%.log'),
-              datePattern: 'YYYY-MM-DD',
-              level: 'error',
-              format: fileFormat,
-              maxSize: '20m',
-              maxFiles: '14d',
-              zippedArchive: true,
-            }),
-            new DailyRotateFile({
-              filename: path.join(logDir, 'combined-%DATE%.log'),
-              datePattern: 'YYYY-MM-DD',
-              format: fileFormat,
-              maxSize: '20m',
-              maxFiles: '14d',
-              zippedArchive: true,
-            }),
-          ]
+          new DailyRotateFile({
+            filename: path.join(logDir, 'error-%DATE%.log'),
+            datePattern: 'YYYY-MM-DD',
+            level: 'error',
+            format: fileFormat,
+            maxSize: '20m',
+            maxFiles: '14d',
+            zippedArchive: true,
+          }),
+          new DailyRotateFile({
+            filename: path.join(logDir, 'combined-%DATE%.log'),
+            datePattern: 'YYYY-MM-DD',
+            format: fileFormat,
+            maxSize: '20m',
+            maxFiles: '14d',
+            zippedArchive: true,
+          }),
+        ]
         : []),
     ],
   });

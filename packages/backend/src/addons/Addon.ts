@@ -111,12 +111,27 @@ export abstract class Addon {
     details: Record<string, any> = {}
   ): Promise<void> {
     try {
+      let eventData = event.data;
+
+      // Ensure environment context is preserved in the saved data
+      // This is critical for events where the payload is the full object (like FeatureFlag)
+      // but doesn't explicitly have the environment that triggered the event at the top level
+      if (
+        event.environment &&
+        eventData &&
+        typeof eventData === 'object' &&
+        !Array.isArray(eventData) &&
+        !eventData.environment
+      ) {
+        eventData = { ...eventData, environment: event.environment };
+      }
+
       await IntegrationEventModel.create({
         integrationId,
         eventType: event.type,
         state,
         stateDetails,
-        eventData: event.data,
+        eventData,
         details,
       });
     } catch (error) {

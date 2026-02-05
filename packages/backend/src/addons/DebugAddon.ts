@@ -9,6 +9,7 @@ import Addon from './Addon';
 import { debugDefinition } from './definitions';
 import { IntegrationSystemEvent } from '../types/integrationEvents';
 import { createLogger } from '../config/logger';
+import { buildEventDetails, formatEventMessage } from './EventFormatter';
 
 export class DebugAddon extends Addon {
     private debugLogger;
@@ -30,7 +31,6 @@ export class DebugAddon extends Addon {
         if (simulateAttribute) {
             this.debugLogger.info(`[Debug] Custom Attribute: ${simulateAttribute}`, {
                 integrationId,
-                eventId: event.id,
             });
         }
 
@@ -62,9 +62,14 @@ export class DebugAddon extends Addon {
         }
 
         // Always succeed
-        await this.registerEvent(integrationId, event, 'success', 'Logged to debug console', {
+        const details = buildEventDetails(event);
+        const detailedMessage = `Logged to debug console\n\n${details.join('\n')}`;
+
+        await this.registerEvent(integrationId, event, 'success', detailedMessage, {
             logLevel,
             loggedAt: new Date().toISOString(),
+            formattedMessage: formatEventMessage(event),
+            details,
         });
     }
 }

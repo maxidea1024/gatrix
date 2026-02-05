@@ -137,13 +137,25 @@ export class IntegrationModel {
     try {
       const integrations = await this.findAll({ isEnabled: true });
 
+      // Filter by environment
       return integrations.filter((integration) => {
-        // Check if integration subscribes to this event
-        if (!integration.events.includes(eventType) && !integration.events.includes('*')) {
-          return false;
+        // First check events (including legacy mapping)
+        let eventMatch = false;
+        if (integration.events.includes('*') || integration.events.includes(eventType)) {
+          eventMatch = true;
+        } else if (eventType.startsWith('feature_flag_')) {
+          const legacyName = eventType.replace('feature_flag_', 'feature_');
+          if (integration.events.includes(legacyName)) {
+            logger.debug(
+              `[IntegrationModel] Matched legacy event name '${legacyName}' for event '${eventType}'`
+            );
+            eventMatch = true;
+          }
         }
 
-        // Check environment filter
+        if (!eventMatch) return false;
+
+        // Then check environment
         if (environment && integration.environments.length > 0) {
           if (
             !integration.environments.includes(environment) &&

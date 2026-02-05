@@ -45,6 +45,34 @@ export class IntegrationEventModel {
     const id = ulid();
 
     try {
+      // Enforce max logs limit
+      const maxLogs = process.env.MAX_INTEGRATION_EVENTS_LOGS ? parseInt(process.env.MAX_INTEGRATION_EVENTS_LOGS) : 200;
+
+      // Check current count
+      const countResult = await db(this.TABLE)
+        .where('integrationId', data.integrationId)
+        .count('id as total')
+        .first();
+      const currentCount = Number(countResult?.total || 0);
+
+      if (currentCount >= maxLogs) {
+        // Find latest valid events to keep
+        const eventsToKeep = await db(this.TABLE)
+          .where('integrationId', data.integrationId)
+          .orderBy('createdAt', 'desc')
+          .limit(maxLogs - 1) // Keep max-1 so we can add one
+          .select('id');
+
+        if (eventsToKeep.length > 0) {
+          const keepIds = eventsToKeep.map((e: any) => e.id);
+          // Delete everything else
+          await db(this.TABLE)
+            .where('integrationId', data.integrationId)
+            .whereNotIn('id', keepIds)
+            .del();
+        }
+      }
+
       await db(this.TABLE).insert({
         id,
         integrationId: data.integrationId,
