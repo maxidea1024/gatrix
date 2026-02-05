@@ -242,6 +242,9 @@ const getEventDescriptionConfig = (log: EventLog): { key: string; params: any } 
     'feature_segment_updated',
     'feature_segment_deleted',
     'integration_test',
+    'feature_flag_strategy_added',
+    'feature_flag_strategy_updated',
+    'feature_flag_strategy_removed',
     'client_version_maintenance_on',
     'client_version_maintenance_off',
   ];

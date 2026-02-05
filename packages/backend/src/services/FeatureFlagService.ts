@@ -27,6 +27,8 @@ import logger from '../config/logger';
 import { pubSubService } from './PubSubService';
 import { ENV_SCOPED } from '../constants/cacheKeys';
 import db from '../config/knex';
+import { IntegrationService } from './IntegrationService';
+import { INTEGRATION_EVENTS, IntegrationEventType } from '../types/integrationEvents';
 
 // Types for service methods
 export interface CreateFlagInput {
@@ -304,6 +306,15 @@ class FeatureFlagService {
     // Invalidate cache
     await this.invalidateCache(input.environment);
 
+    // Trigger integration event
+    await IntegrationService.handleEvent({
+      type: INTEGRATION_EVENTS.FEATURE_FLAG_CREATED,
+      environment: input.environment,
+      createdByUserId: userId,
+      createdAt: new Date(),
+      data: flag as any,
+    });
+
     logger.info(`Feature flag created: ${input.flagName} in ${input.environment}`);
     return flag;
   }
@@ -357,6 +368,24 @@ class FeatureFlagService {
     await this.incrementFlagVersion(flag.id, environment);
     await this.invalidateCache(environment);
 
+    // Trigger integration event
+    let eventType: IntegrationEventType = INTEGRATION_EVENTS.FEATURE_FLAG_UPDATED;
+    if (input.isEnabled !== undefined) {
+      eventType = input.isEnabled
+        ? INTEGRATION_EVENTS.FEATURE_FLAG_ENVIRONMENT_ENABLED
+        : INTEGRATION_EVENTS.FEATURE_FLAG_ENVIRONMENT_DISABLED;
+    }
+
+    await IntegrationService.handleEvent({
+      type: eventType,
+      environment,
+      createdByUserId: userId,
+      createdAt: new Date(),
+      data: updated as any,
+      // Pass old values for context
+      preData: flag as any,
+    });
+
     return updated!;
   }
 
@@ -406,6 +435,16 @@ class FeatureFlagService {
     // Invalidate cache
     await this.invalidateCache(environment);
 
+    // Trigger integration event
+    await IntegrationService.handleEvent({
+      type: INTEGRATION_EVENTS.FEATURE_FLAG_ARCHIVED,
+      environment,
+      createdByUserId: userId,
+      createdAt: new Date(),
+      data: updated as any,
+      preData: flag as any,
+    });
+
     return updated;
   }
 
@@ -430,6 +469,16 @@ class FeatureFlagService {
 
     // Invalidate cache
     await this.invalidateCache(environment);
+
+    // Trigger integration event
+    await IntegrationService.handleEvent({
+      type: INTEGRATION_EVENTS.FEATURE_FLAG_REVIVED,
+      environment,
+      createdByUserId: userId,
+      createdAt: new Date(),
+      data: updated as any,
+      preData: flag as any,
+    });
 
     return updated;
   }
@@ -495,6 +544,16 @@ class FeatureFlagService {
     // Invalidate cache
     await this.invalidateCache(environment);
 
+    // Trigger integration event
+    await IntegrationService.handleEvent({
+      type: INTEGRATION_EVENTS.FEATURE_FLAG_STALE_ON,
+      environment,
+      createdByUserId: userId,
+      createdAt: new Date(),
+      data: updated as any,
+      preData: flag as any,
+    });
+
     return updated;
   }
 
@@ -528,6 +587,16 @@ class FeatureFlagService {
     // Invalidate cache
     await this.invalidateCache(environment);
 
+    // Trigger integration event
+    await IntegrationService.handleEvent({
+      type: INTEGRATION_EVENTS.FEATURE_FLAG_STALE_OFF,
+      environment,
+      createdByUserId: userId,
+      createdAt: new Date(),
+      data: updated as any,
+      preData: flag as any,
+    });
+
     return updated;
   }
 
@@ -558,6 +627,15 @@ class FeatureFlagService {
       resourceId: flag.id,
       userId,
       oldValues: flag,
+    });
+
+    // Trigger integration event
+    await IntegrationService.handleEvent({
+      type: INTEGRATION_EVENTS.FEATURE_FLAG_DELETED,
+      environment,
+      createdByUserId: userId,
+      createdAt: new Date(),
+      data: flag as any,
     });
 
     // Invalidate cache
@@ -594,6 +672,18 @@ class FeatureFlagService {
       createdBy: userId,
     });
 
+    // Invalidate cache
+    await this.invalidateCache(environment);
+
+    // Trigger integration event
+    await IntegrationService.handleEvent({
+      type: INTEGRATION_EVENTS.FEATURE_FLAG_STRATEGY_ADDED,
+      environment,
+      createdByUserId: userId,
+      createdAt: new Date(),
+      data: { ...strategy, flagName: flag.flagName },
+    });
+
     return strategy;
   }
 
@@ -610,10 +700,29 @@ class FeatureFlagService {
       throw new GatrixError('Strategy not found', 404, true, ErrorCodes.NOT_FOUND);
     }
 
-    return FeatureStrategyModel.update(strategyId, {
+    const updated = await FeatureStrategyModel.update(strategyId, {
       ...input,
       updatedBy: userId,
     });
+
+    const flag = await this.getFlagById(strategy.flagId);
+
+    // Invalidate cache
+    if (flag) {
+      await this.invalidateCache(strategy.environment);
+    }
+
+    // Trigger integration event
+    await IntegrationService.handleEvent({
+      type: INTEGRATION_EVENTS.FEATURE_FLAG_STRATEGY_UPDATED,
+      environment: strategy.environment,
+      createdByUserId: userId,
+      createdAt: new Date(),
+      data: { ...updated, flagName: flag?.flagName },
+      preData: { ...strategy },
+    });
+
+    return updated;
   }
 
   /**
@@ -625,7 +734,21 @@ class FeatureFlagService {
       throw new GatrixError('Strategy not found', 404, true, ErrorCodes.NOT_FOUND);
     }
 
+    const flag = await this.getFlagById(strategy.flagId);
+
     await FeatureStrategyModel.delete(strategyId);
+
+    // Invalidate cache
+    await this.invalidateCache(strategy.environment);
+
+    // Trigger integration event
+    await IntegrationService.handleEvent({
+      type: INTEGRATION_EVENTS.FEATURE_FLAG_STRATEGY_REMOVED,
+      environment: strategy.environment,
+      createdByUserId: userId,
+      createdAt: new Date(),
+      data: { ...strategy, flagName: flag?.flagName },
+    });
   }
 
   /**
@@ -679,6 +802,24 @@ class FeatureFlagService {
 
       newStrategies.push(strategy);
     }
+
+    // Invalidate cache
+    await this.invalidateCache(environment);
+
+    // Trigger integration event
+    // For bulk update, we treat it as "strategies updated"
+    await IntegrationService.handleEvent({
+      type: INTEGRATION_EVENTS.FEATURE_FLAG_STRATEGY_UPDATED,
+      environment,
+      createdByUserId: userId,
+      createdAt: new Date(),
+      data: {
+        flagName,
+        strategies: newStrategies,
+        count: newStrategies.length,
+        action: 'bulk_update',
+      },
+    });
 
     return newStrategies;
   }
@@ -883,6 +1024,14 @@ class FeatureFlagService {
       },
     });
 
+    // Trigger integration event
+    await IntegrationService.handleEvent({
+      type: INTEGRATION_EVENTS.FEATURE_SEGMENT_CREATED,
+      createdByUserId: userId,
+      createdAt: new Date(),
+      data: segment,
+    });
+
     return segment;
   }
 
@@ -911,6 +1060,15 @@ class FeatureFlagService {
         id: updated.id,
         segmentName: updated.segmentName,
       },
+    });
+
+    // Trigger integration event
+    await IntegrationService.handleEvent({
+      type: INTEGRATION_EVENTS.FEATURE_SEGMENT_UPDATED,
+      createdByUserId: userId,
+      createdAt: new Date(),
+      data: updated as any,
+      preData: segment as any,
     });
 
     return updated;
@@ -945,6 +1103,14 @@ class FeatureFlagService {
         id: segment.id,
         segmentName: segment.segmentName,
       },
+    });
+
+    // Trigger integration event
+    await IntegrationService.handleEvent({
+      type: INTEGRATION_EVENTS.FEATURE_SEGMENT_DELETED,
+      createdByUserId: userId,
+      createdAt: new Date(),
+      data: segment,
     });
   }
 

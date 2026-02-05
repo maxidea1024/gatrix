@@ -124,9 +124,9 @@ const EVENT_CATEGORIES: EventCategory[] = [
       'feature_flag_stale_off',
       'feature_environment_enabled',
       'feature_environment_disabled',
-      'feature_strategy_added',
-      'feature_strategy_updated',
-      'feature_strategy_removed',
+      'feature_flag_strategy_added',
+      'feature_flag_strategy_updated',
+      'feature_flag_strategy_removed',
     ],
   },
   {
