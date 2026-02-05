@@ -231,12 +231,54 @@ export const IntegrationsPage: React.FC = () => {
                       <CardContent sx={{ flex: 1, pb: 0 }}>
                         <Box display="flex" alignItems="center" justifyContent="space-between" mb={1.5}>
                           <Box display="flex" alignItems="center" gap={1} sx={{ minWidth: 0, flex: 1 }}>
-                            <Box
-                              component="img"
-                              src={getProviderIcon(integration.provider)}
-                              alt={integration.provider}
-                              sx={{ width: 28, height: 28, flexShrink: 0 }}
-                            />
+                            <Box position="relative" display="inline-flex">
+                              <Box
+                                component="img"
+                                src={getProviderIcon(integration.provider)}
+                                alt={integration.provider}
+                                sx={{ width: 28, height: 28, flexShrink: 0 }}
+                              />
+                              {/* Last Event Status Overlay */}
+                              {integration.lastEvent && (
+                                <Tooltip
+                                  title={
+                                    integration.lastEvent.state === 'success'
+                                      ? t('integrations.eventState.success')
+                                      : integration.lastEvent.stateDetails || t('integrations.eventState.failed')
+                                  }
+                                >
+                                  <Box
+                                    sx={{
+                                      position: 'absolute',
+                                      bottom: -6,
+                                      right: -6,
+                                      bgcolor: 'background.paper',
+                                      borderRadius: '50%',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                      boxShadow: 1,
+                                      cursor: 'pointer',
+                                      width: 18,
+                                      height: 18,
+                                    }}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      navigate(`/settings/integrations/${integration.id}/edit?tab=1`);
+                                    }}
+                                  >
+                                    {integration.lastEvent.state === 'success' ? (
+                                      <CheckCircleIcon color="success" sx={{ fontSize: 16 }} />
+                                    ) : (
+                                      <ErrorIcon
+                                        color={integration.lastEvent.state === 'successWithErrors' ? 'warning' : 'error'}
+                                        sx={{ fontSize: 16 }}
+                                      />
+                                    )}
+                                  </Box>
+                                </Tooltip>
+                              )}
+                            </Box>
                             <Typography variant="subtitle1" fontWeight="bold" noWrap sx={{ flexShrink: 1 }}>
                               {t(provider?.displayName || integration.provider)}
                             </Typography>
@@ -247,28 +289,6 @@ export const IntegrationsPage: React.FC = () => {
                               variant="outlined"
                               sx={{ height: 20, fontSize: '0.7rem', flexShrink: 0 }}
                             />
-                            {/* Last Event Status */}
-                            {integration.lastEvent && (
-                              <Tooltip
-                                title={
-                                  integration.lastEvent.state === 'success'
-                                    ? t('integrations.eventState.success')
-                                    : integration.lastEvent.stateDetails || t('integrations.eventState.failed')
-                                }
-                              >
-                                <Box display="flex" alignItems="center">
-                                  {integration.lastEvent.state === 'success' ? (
-                                    <CheckCircleIcon color="success" fontSize="small" sx={{ fontSize: 20 }} />
-                                  ) : (
-                                    <ErrorIcon
-                                      color={integration.lastEvent.state === 'successWithErrors' ? 'warning' : 'error'}
-                                      fontSize="small"
-                                      sx={{ fontSize: 20 }}
-                                    />
-                                  )}
-                                </Box>
-                              </Tooltip>
-                            )}
                           </Box>
                           <Tooltip title={t('common.delete')}>
                             <IconButton
