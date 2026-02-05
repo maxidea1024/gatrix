@@ -39,12 +39,12 @@ export const getStoredDateTimeFormat = (): string => {
 export const setStoredTimezone = (tz: string) => {
   try {
     localStorage.setItem('settings.timezone', tz);
-  } catch {}
+  } catch { }
 };
 export const setStoredDateTimeFormat = (fmt: string) => {
   try {
     localStorage.setItem('settings.datetimeFormat', fmt);
-  } catch {}
+  } catch { }
 };
 
 // 내부: 다양한 문자열을 dayjs로 변환 (UTC -> 사용자 timezone)
@@ -200,10 +200,8 @@ export const formatRelativeTime = (
   if (!date) return '-';
 
   try {
-    // Set dayjs locale based on language
-    if (language) {
-      getDateLocale(language);
-    }
+    // Determine language and set dayjs locale
+    const lang = getDateLocale(language);
 
     const d = toDayjs(date);
     if (!d) return '-';
@@ -213,8 +211,8 @@ export const formatRelativeTime = (
 
     // Handle future dates (prevent "in ... seconds" or "방금 후")
     if (d.isAfter(now)) {
-      if (language === 'ko') return '방금 전';
-      if (language === 'zh') return '刚刚';
+      if (lang === 'ko') return '방금 전';
+      if (lang === 'zh-cn' || lang === 'zh') return '刚刚';
       return 'Just now';
     }
 
@@ -223,8 +221,9 @@ export const formatRelativeTime = (
 
       // Less than 60 seconds: show exact seconds
       if (diffSeconds >= 0 && diffSeconds < 60) {
-        // Return a special format that will be handled by i18n
-        return `__SECONDS_AGO__${diffSeconds}`;
+        if (lang === 'ko') return `${diffSeconds}초 전`;
+        if (lang === 'zh-cn' || lang === 'zh') return `${diffSeconds}秒前`;
+        return `${diffSeconds} seconds ago`;
       }
     }
 
