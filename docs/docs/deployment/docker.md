@@ -1,4 +1,4 @@
----
+﻿---
 slug: /deployment/docker
 title: Docker Deployment Guide
 sidebar_position: 50
@@ -96,9 +96,9 @@ Production environments use pre-built images from Tencent Cloud Registry.
 
 ### Registry Information
 
-- **Registry**: `uwocn.tencentcloudcr.com`
-- **Namespace**: `uwocn`
-- **Image**: `uwocn`
+- **Registry**: `your-registry.example.com`
+- **Namespace**: `gatrix`
+- **Image**: `gatrix`
 - **Tag Format**: `{service}-{version}` (e.g., `backend-1.0.0`, `frontend-latest`)
 
 ### Building and Pushing Images
@@ -282,20 +282,20 @@ Result: All data stored in `/data/gatrix/mysql`, `/data/gatrix/redis`, etc. (abs
 
 ```
 ${DATA_ROOT}/
-├── mysql/              # MySQL database files
-├── redis/              # Redis persistence
-├── backend/
-│   ├── logs/           # Backend application logs
-│   └── data/           # Backend data files
-├── event-lens/
-│   └── logs/           # Event Lens logs
-├── chat-server/
-│   ├── uploads/        # User uploaded files
-│   └── logs/           # Chat server logs
-├── etcd/               # etcd cluster data
-├── prometheus/         # Prometheus metrics storage
-├── grafana/            # Grafana dashboards & settings
-└── loki/               # Loki log aggregation
+?��??� mysql/              # MySQL database files
+?��??� redis/              # Redis persistence
+?��??� backend/
+??  ?��??� logs/           # Backend application logs
+??  ?��??� data/           # Backend data files
+?��??� event-lens/
+??  ?��??� logs/           # Event Lens logs
+?��??� chat-server/
+??  ?��??� uploads/        # User uploaded files
+??  ?��??� logs/           # Chat server logs
+?��??� etcd/               # etcd cluster data
+?��??� prometheus/         # Prometheus metrics storage
+?��??� grafana/            # Grafana dashboards & settings
+?��??� loki/               # Loki log aggregation
 
 # Managed by Docker (named volumes):
 # - clickhouse-data     # ClickHouse data (use docker volume commands)
@@ -371,4 +371,5 @@ Do not use restart on Docker; prefer down -> up for restarts.
 ## Monitoring
 
 For Prometheus + Grafana setup details and environment variables, see: [Monitoring](../features/monitoring)
+
 

@@ -1,4 +1,4 @@
----
+﻿---
 sidebar_position: 9
 ---
 
@@ -277,7 +277,7 @@ If the Grafana Logs dashboard only shows `info` logs even when `level=All` is se
 ## Internationalization
 
 - All UI labels for the Grafana menu item are localized (ko/en/zh).
-- When adding new guidance strings, ensure localization keys are unique and friendly (Korean guidelines ending with "...합니다.").
+- When adding new guidance strings, ensure localization keys are unique and friendly (Korean guidelines ending with "...?�니??").
 
 ## Loki Direct Log Push (SDK)
 
@@ -323,4 +323,5 @@ While configuration via `mconf` is preferred, the SDK also supports automatic ac
 ### Migration from Promtail
 
 Promtail is no longer required for game server log collection. All relevant `docker-compose` services and documentation have been updated to reflect this change. Host-based PM2 logs are now natively pushed by the application process itself.
+
 

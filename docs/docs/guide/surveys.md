@@ -1,48 +1,54 @@
----
+﻿---
 sidebar_position: 4
+sidebar_label: Surveys
 ---
 
-# 설문지
+# Surveys
 
-## 기능 설명
+## Overview
 
-게임 내 설문조사를 생성하고 관리합니다.
+Create and manage in-game surveys to collect player feedback.
 
-**접근 경로:** 게임 관리 → 설문지
+**Navigation:** Game Operations → Surveys
 
-## 사용 방법
+## Features
 
-### 목록 화면
+- Create surveys with multiple question types
+- Target specific user segments
+- Set survey periods
+- Analyze response data
+- Export results
 
-![설문지 목록](./img/survey-list.png)
+## Creating a Survey
 
-**페이지 헤더:**
-- 제목: 설문지
-- 설명: 게임 내 설문조사를 생성하고 관리합니다
+1. Navigate to **Game Operations** > **Surveys**
+2. Click **Add Survey** button
+3. Configure the survey:
 
-**버튼:**
-- 설문지 등록
-- 설정
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| Title | Text | Required | Survey title |
+| Description | Textarea | - | Survey description |
+| Start Date | DateTime | - | When survey opens |
+| End Date | DateTime | - | When survey closes |
+| Target Segment | Select | - | Target audience |
 
-**테이블 컬럼:**
-| 컬럼명 |
-|--------|
-| 플랫폼 설문지 ID |
-| 제목 |
-| 발동 조건 |
-| 보상 내역 |
-| 상태 |
-| 생성일 |
-| 작업 |
+4. Add questions
+5. Click **Create** to save
 
-## 즉시 발생하는 변화
+## Question Types
 
-[확인 필요]
+- **Single Choice** - Radio buttons, one answer
+- **Multiple Choice** - Checkboxes, multiple answers
+- **Text** - Free-form text response
+- **Rating** - 1-5 star rating
+- **Scale** - Numeric scale (1-10)
 
-## ⚠ 주의사항
+## Response Analysis
 
-[확인 필요]
-
-## 🚨 실제 사고 사례
-
-해당 없음
+View survey results including:
+- Total responses
+- Response rate
+- Answer distribution
+- Average ratings
+- Export to CSV

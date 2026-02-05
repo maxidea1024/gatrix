@@ -1,0 +1,30 @@
+{
+    "sidebar.tutorialSidebar.category.Getting Started": {
+        "message": "入门指南",
+        "description": "The label for category Getting Started"
+    },
+    "sidebar.tutorialSidebar.category.Feature Flags": {
+        "message": "功能开关",
+        "description": "The label for category Feature Flags"
+    },
+    "sidebar.tutorialSidebar.category.Game Operations": {
+        "message": "游戏运营",
+        "description": "The label for category Game Operations"
+    },
+    "sidebar.tutorialSidebar.category.System Management": {
+        "message": "系统管理",
+        "description": "The label for category System Management"
+    },
+    "sidebar.tutorialSidebar.category.Integrations": {
+        "message": "外部集成",
+        "description": "The label for category Integrations"
+    },
+    "sidebar.tutorialSidebar.category.API Reference": {
+        "message": "API 参考",
+        "description": "The label for category API Reference"
+    },
+    "sidebar.tutorialSidebar.category.Deployment": {
+        "message": "部署指南",
+        "description": "The label for category Deployment"
+    }
+}

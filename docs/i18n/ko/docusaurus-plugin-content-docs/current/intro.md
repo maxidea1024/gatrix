@@ -1,85 +1,87 @@
----
+﻿---
 sidebar_position: 1
 ---
 
-# Gatrix 시작하기
+# Gatrix 소개
 
-**Gatrix**에 오신 것을 환영합니다. **UWO (Uncharted Waters Online)** 게임 관리를 위해 특별히 제작된 포괄적인 온라인 게임 플랫폼 관리 시스템입니다.
+**Gatrix**는 온라인 게임 서비스를 위한 통합 관리 시스템입니다.
 
-## Gatrix란?
+## 🎯 핵심 기능
 
-Gatrix는 온라인 게임 플랫폼을 위한 강력한 사용자 관리, 인증 및 관리 기능을 제공하는 현대적인 풀스택 플랫폼입니다. TypeScript, React, MUI, Express.js로 구축되어 게임 플랫폼 운영을 위한 완전한 솔루션을 제공합니다.
+### 피처 플래그 (Feature Flags)
+코드 배포 없이 기능을 실시간으로 제어합니다.
+- 환경별/세그먼트별 점진적 출시
+- A/B 테스트 지원
+- 즉각적인 롤백
 
-### 주요 기능
+### 게임 운영 도구
+- **공지사항** - 인게임 및 외부 공지 관리
+- **팝업 공지** - 타겟팅된 인게임 팝업
+- **쿠폰** - 보상 쿠폰 생성 및 관리
+- **설문조사** - 유저 의견 수집
+- **배너** - 홍보 배너 관리
+- **상점 상품** - 인앱 상품 관리
+- **기획 데이터** - 게임 밸런스 및 설정 데이터
 
-- 🎮 **게임 플랫폼 관리**: 온라인 게임 관리를 위한 포괄적인 플랫폼
-- 🌍 **게임 월드 관리**: 개별 구성이 가능한 다중 월드 지원
-- 📱 **클라이언트 버전 관리**: 버전 제어 및 배포 관리
-- 🔧 **점검 모드**: 사용자 정의 메시지가 있는 시스템 전체 점검 제어
-- 🏷️ **태깅 시스템**: 콘텐츠 구성을 위한 유연한 태깅
-- 📝 **메시지 템플릿**: 다국어 메시지 템플릿 관리
-- 🛡️ **IP 화이트리스트**: 고급 IP 접근 제어 및 관리
-- ⚙️ **작업 스케줄러**: 크론과 유사한 구문을 사용한 고급 작업 스케줄링
-- 📊 **큐 모니터링**: Bull Board를 통한 실시간 작업 큐 모니터링
+### 시스템 관리
+- **점검 관리** - 정기/긴급 점검 스케줄링
+- **화이트리스트** - 테스트 계정/IP 관리
+- **게임 월드** - 서버 상태 모니터링
+- **클라이언트 버전** - 앱 버전 관리
 
-## 사전 요구사항
+### 외부 연동
+Slack, Microsoft Teams, Webhook, New Relic, Lark 등 다양한 서비스 연동 지원
 
-시작하기 전에 다음이 설치되어 있는지 확인하세요:
+### 모니터링
+- **Event Lens** - 이벤트 분석 및 통계
+- **Grafana 대시보드** - 실시간 메트릭 모니터링
+- **감사 로그** - 모든 변경 이력 추적
 
-- [Node.js](https://nodejs.org/en/download/) 버전 18.0 이상
-- [MySQL](https://dev.mysql.com/downloads/) 버전 8.0 이상
-- [Redis](https://redis.io/download) 버전 6.0 이상
+## 🏗️ 아키텍처
 
-## 빠른 시작
+Gatrix는 모노레포 구조의 마이크로서비스 아키텍처입니다:
 
-### 1. 저장소 복제
+| 패키지 | 설명 |
+|--------|------|
+| `@gatrix/backend` | 메인 API 서버 |
+| `@gatrix/frontend` | 관리자 대시보드 (React + MUI) |
+| `@gatrix/edge` | 엣지 서버 (캐시/CDN 용도) |
+| `@gatrix/chat-server` | 실시간 채팅 서버 |
+| `@gatrix/event-lens` | 이벤트 분석 서버 |
+| `@gatrix/server-sdk` | 게임 서버용 SDK |
+| `@gatrix/shared` | 공유 타입 및 유틸리티 |
 
-```bash
-git clone https://github.com/motifgames/gatrix.git
-cd gatrix
-```
-
-### 2. 환경 설정
-
-```bash
-# 환경 변수 복사
-cp .env.example .env
-
-# 구성에 맞게 .env 파일 업데이트
-```
-
-### 3. 의존성 설치
-
-```bash
-npm install
-```
-
-### 4. 데이터베이스 설정
+## 🚀 빠른 시작
 
 ```bash
-# 데이터베이스 마이그레이션 실행
-npm run migrate
+# 1. 의존성 설치
+yarn install
 
-# 초기 데이터 시드
-npm run seed
+# 2. 인프라 시작 (MySQL, Redis)
+yarn infra:up
+
+# 3. 마이그레이션
+yarn migrate
+
+# 4. 개발 서버 시작
+yarn dev
 ```
 
-### 5. 개발 서버 시작
+접속: http://localhost:43000
 
-```bash
-# 프론트엔드와 백엔드 모두 시작
-npm run dev
-```
+## 🌐 지원 언어
 
-애플리케이션은 다음 주소에서 사용할 수 있습니다:
-- 프론트엔드: http://localhost:3000
-- 백엔드 API: http://localhost:5000
-- API 문서: http://localhost:5000/api-docs
-- 큐 모니터: http://localhost:5000/admin/queues
+- 🇰🇷 한국어
+- 🇺🇸 English
+- 🇨🇳 简体中文
 
-## 다음 단계
+## 📚 문서 구조
 
-- 📖 [API 문서 읽기](/docs/api/client-api)
-- 🔧 [캐시 시스템 알아보기](/docs/backend/cache-keys)
-- 🚀 [작업 관리 탐색하기](/docs/features/job-management)
-- 🌍 [게임 월드 구성하기](/docs/features/game-worlds)
+| 섹션 | 설명 |
+|------|------|
+| [시작하기](./getting-started/quick-start) | 설치 및 초기 설정 |
+| [피처 플래그](./features/feature-flags) | 기능 토글 사용법 |
+| [게임 운영](./guide/service-notices) | 운영 도구 가이드 |
+| [시스템 관리](./admin/maintenance) | 시스템 관리 가이드 |
+| [외부 연동](./integrations/overview) | 연동 설정 가이드 |
+| [API 레퍼런스](./api/client-api) | API 문서 |

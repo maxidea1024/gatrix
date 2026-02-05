@@ -1,20 +1,9 @@
 gatrix-team:
   name: Gatrix Team
   title: Game Platform Development Team
-  url: https://github.com/motifgames/gatrix
-  image_url: https://github.com/motifgames.png
+  url: https://github.com/your-org/gatrix
+  image_url: https://avatars.githubusercontent.com/u/0?v=4
   page: true
   socials:
-    github: motifgames
+    github: your-org
     email: mailto:support@gatrix.com
-
-motif-games:
-  name: Motif Games
-  title: Game Development Studio
-  url: https://motifgames.com
-  image_url: https://github.com/motifgames.png
-  page: true
-  socials:
-    github: motifgames
-    website: https://motifgames.com
-    email: mailto:contact@motifgames.com

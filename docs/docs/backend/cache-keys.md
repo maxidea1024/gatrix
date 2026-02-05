@@ -1,4 +1,4 @@
----
+﻿---
 sidebar_position: 1
 ---
 
@@ -6,17 +6,17 @@ sidebar_position: 1
 
 This directory provides centralized management of all cache keys used in the application.
 
-## 📁 File Structure
+## ?�� File Structure
 
 ```
 constants/
-├── cacheKeys.ts    # Cache key constants definition
-└── README.md       # This file
+?��??� cacheKeys.ts    # Cache key constants definition
+?��??� README.md       # This file
 ```
 
-## 🎯 Purpose
+## ?�� Purpose
 
-### ❌ **Previous Issues**
+### ??**Previous Issues**
 ```typescript
 // Hard-coded cache keys - difficult to maintain
 await pubSubService.invalidateKey('game_worlds:public');
@@ -26,7 +26,7 @@ cacheService.set('game_worlds:public', data, 10 * 60 * 1000);
 await pubSubService.invalidateKey('game_world:public'); // Typo!
 ```
 
-### ✅ **Improved Approach**
+### ??**Improved Approach**
 ```typescript
 import { GAME_WORLDS, DEFAULT_CONFIG } from '../constants/cacheKeys';
 
@@ -35,7 +35,7 @@ await pubSubService.invalidateKey(GAME_WORLDS.PUBLIC);
 cacheService.set(GAME_WORLDS.PUBLIC, data, DEFAULT_CONFIG.GAME_WORLDS_PUBLIC_TTL);
 ```
 
-## 🔧 Usage
+## ?�� Usage
 
 ### 1. **Basic Cache Key Usage**
 
@@ -77,51 +77,51 @@ await pubSubService.invalidateByPattern(PATTERNS.GAME_WORLDS);
 await pubSubService.invalidateByPattern(PATTERNS.USER(123));
 ```
 
-## 📋 Cache Key Categories
+## ?�� Cache Key Categories
 
-### 🎮 **Game World Related**
+### ?�� **Game World Related**
 - `GAME_WORLDS.PUBLIC` - Public game world list
 - `GAME_WORLDS.ADMIN` - Admin game world list
 - `GAME_WORLDS.DETAIL(id)` - Specific game world details
 - `GAME_WORLDS.BY_WORLD_ID(worldId)` - Query by world ID
 
-### 📱 **Client Version Related**
+### ?�� **Client Version Related**
 - `CLIENT_VERSION.BY_CHANNEL(channel, subChannel)` - Version by channel
 - `CLIENT_VERSION.ALL` - All version list
 - `CLIENT_VERSION.ACTIVE` - Active versions only
 
-### 👤 **User Related**
+### ?�� **User Related**
 - `USER.PROFILE(userId)` - User profile
 - `USER.PERMISSIONS(userId)` - User permissions
 - `USER.SESSION(sessionId)` - Session information
 
-### 🏷️ **Tag Related**
+### ?���?**Tag Related**
 - `TAG.ALL` - All tag list
 - `TAG.BY_ENTITY(entityType, entityId)` - Tags by entity
 
-### 🛡️ **Whitelist Related**
+### ?���?**Whitelist Related**
 - `WHITELIST.ALL` - All whitelist
 - `WHITELIST.ACTIVE` - Active items only
 - `WHITELIST.BY_IP(ip)` - Status by IP
 
-### 🔧 **Maintenance Related**
+### ?�� **Maintenance Related**
 - `MAINTENANCE.STATUS` - Current maintenance status
 - `MAINTENANCE.TEMPLATES` - Maintenance templates
 
-### 💬 **Message Template Related**
+### ?�� **Message Template Related**
 - `MESSAGE_TEMPLATE.ALL` - All templates
 - `MESSAGE_TEMPLATE.BY_TYPE(type)` - Templates by type
 
-### 📋 **Job Related**
+### ?�� **Job Related**
 - `JOB.ALL` - All job list
 - `JOB.TYPES` - Job type list
 - `JOB.DETAIL(jobId)` - Job details
 
-### 📊 **Audit Log Related**
+### ?�� **Audit Log Related**
 - `AUDIT_LOG.RECENT(page, limit)` - Recent logs
 - `AUDIT_LOG.BY_USER(userId, page)` - Logs by user
 
-## ⏱️ TTL Constants
+## ?�️ TTL Constants
 
 ```typescript
 // Time constants
@@ -141,7 +141,7 @@ DEFAULT_CONFIG.WHITELIST_TTL           // Whitelist TTL
 DEFAULT_CONFIG.MAINTENANCE_TTL         // Maintenance status TTL
 ```
 
-## 🔄 Pattern Constants
+## ?�� Pattern Constants
 
 ```typescript
 // For pattern-based cache invalidation
@@ -156,7 +156,7 @@ PATTERNS.JOBS               // 'job*'
 PATTERNS.AUDIT_LOGS         // 'audit_log*'
 ```
 
-## 📝 Adding New Cache Keys
+## ?�� Adding New Cache Keys
 
 ### 1. **Adding Simple Keys**
 ```typescript
@@ -190,7 +190,7 @@ export const DEFAULT_CONFIG = {
 } as const;
 ```
 
-## ✅ Best Practices
+## ??Best Practices
 
 ### 1. **Consistent Naming**
 - Entity names use uppercase and underscores: `GAME_WORLDS`, `CLIENT_VERSION`
@@ -209,7 +209,7 @@ export const DEFAULT_CONFIG = {
 - Gradually replace existing hard-coded keys
 - Update related test code when making changes
 
-## 🧪 Testing
+## ?�� Testing
 
 Verify cache key constants work properly:
 
@@ -224,10 +224,11 @@ curl http://localhost:5000/api/v1/client/game-worlds
 
 Check server logs for `Cache delete attempted but key not found: game_worlds:public` message
 
-## 🔗 Related Files
+## ?�� Related Files
 
 - `src/services/GameWorldService.ts` - Game world cache invalidation
 - `src/controllers/ClientController.ts` - Client API cache
 - `src/services/CacheService.ts` - Cache service
 - `src/services/PubSubService.ts` - Distributed cache invalidation
 - `CLIENT_API.md` - Client API documentation
+

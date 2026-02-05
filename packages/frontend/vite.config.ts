@@ -1,9 +1,10 @@
 /// <reference types="vitest" />
-import { defineConfig } from "vite";
+import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
 import http from "http";
 import https from "https";
+import fs from "fs";
 import iniPlugin from "./src/plugins/vite-plugin-ini";
 
 // Force platform for WSL compatibility
@@ -50,9 +51,53 @@ console.log(`🔧 Vite proxy configuration:`, {
 
 const frontendRoot = path.resolve(__dirname).replace(/\\/g, "/");
 
+// Plugin to serve static docs from public/docs
+function staticDocsPlugin(): Plugin {
+  const docsPath = path.resolve(__dirname, "public/docs");
+  return {
+    name: "static-docs",
+    configureServer(server) {
+      server.middlewares.use((req, res, next) => {
+        if (req.url?.startsWith("/docs")) {
+          // Remove /docs prefix and handle trailing slash
+          let filePath = req.url.replace(/^\/docs/, "") || "/index.html";
+          if (filePath.endsWith("/")) {
+            filePath += "index.html";
+          }
+          const fullPath = path.join(docsPath, filePath);
+
+          if (fs.existsSync(fullPath) && fs.statSync(fullPath).isFile()) {
+            const ext = path.extname(fullPath);
+            const contentTypes: Record<string, string> = {
+              ".html": "text/html",
+              ".js": "application/javascript",
+              ".css": "text/css",
+              ".json": "application/json",
+              ".png": "image/png",
+              ".jpg": "image/jpeg",
+              ".svg": "image/svg+xml",
+              ".ico": "image/x-icon",
+              ".xml": "application/xml",
+              ".txt": "text/plain",
+            };
+            res.setHeader("Content-Type", contentTypes[ext] || "application/octet-stream");
+            fs.createReadStream(fullPath).pipe(res);
+            return;
+          } else if (fs.existsSync(fullPath + "/index.html")) {
+            res.setHeader("Content-Type", "text/html");
+            fs.createReadStream(fullPath + "/index.html").pipe(res);
+            return;
+          }
+        }
+        next();
+      });
+    },
+  };
+}
+
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react(), iniPlugin()],
+  plugins: [react(), iniPlugin(), staticDocsPlugin()],
   define: {
     __APP_VERSION__: JSON.stringify(process.env.VITE_APP_VERSION || "0.0.0"),
   },

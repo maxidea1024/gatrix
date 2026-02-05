@@ -1,79 +1,81 @@
----
+﻿---
 slug: welcome-to-gatrix
-title: Gatrix에 오신 것을 환영합니다! 게임 플랫폼 관리의 새로운 차원
+title: Welcome to Gatrix - A New Dimension of Game Platform Management
 authors: [gatrix-team]
 tags: [gatrix, announcement, features]
 ---
 
-Gatrix는 온라인 게임 플랫폼 관리를 위한 종합적인 솔루션입니다. UWO(Uncharted Waters Online) 게임 관리를 위해 특별히 설계된 이 플랫폼은 현대적인 웹 기술을 활용하여 강력하고 확장 가능한 게임 관리 시스템을 제공합니다.
+Gatrix is an integrated management system for online game services. We provide a powerful and scalable game management platform using modern technologies.
 
 <!-- truncate -->
 
-## 🎮 Gatrix란 무엇인가요?
+## 🚀 What is Gatrix?
 
-Gatrix는 TypeScript, React, MUI, Express.js로 구축된 현대적인 풀스택 게임 플랫폼 관리 시스템입니다. 이 플랫폼은 게임 운영자들이 게임 서버, 사용자, 콘텐츠를 효율적으로 관리할 수 있도록 설계되었습니다.
+Gatrix is a modern tech stack game platform management system built with TypeScript, React, MUI, and Express.js. This platform is designed to help game operators efficiently manage game servers, users, and content.
 
-### 주요 특징
+### Key Features
 
-- **🎮 게임 플랫폼 관리**: 온라인 게임 관리를 위한 종합적인 플랫폼
-- **🌍 게임 월드 관리**: 개별 설정이 가능한 다중 월드 지원
-- **📱 클라이언트 버전 관리**: 버전 제어 및 배포 관리
-- **🔧 유지보수 모드**: 사용자 정의 메시지가 있는 시스템 전체 유지보수 제어
-- **🏷️ 태깅 시스템**: 콘텐츠 구성의 유연한 태깅
-- **📝 메시지 템플릿**: 다국어 메시지 템플릿 관리
-- **🛡️ IP 화이트리스트**: 고급 IP 접근 제어 및 관리
-- **💬 실시간 채팅**: Socket.IO와 Redis 클러스터링을 통한 고성능 채팅 서버
+- **Integrated Game Platform Management**: Comprehensive platform for online game management
+- **Game World Management**: Individual configuration for multiple worlds/shards
+- **Client Version Control**: Version control and deployment management
+- **Maintenance Mode**: Maintenance control with custom user messages
+- **Flexible Tagging System**: Flexible tagging for content configuration
+- **Message Templates**: Multi-language message template management
+- **IP Whitelist**: Advanced IP access control and management
+- **Real-time Chat**: High-performance chat server using Socket.IO and Redis clustering
 
-## 🚀 빠른 시작
+## 🛠️ Quick Start
 
-### 1. 시스템 요구사항
+### 1. Requirements
 
-- Node.js 18.0 이상
-- MySQL 8.0 이상
-- Redis 6.0 이상
+- Node.js 22.0 or higher
+- Docker & Docker Compose
+- Yarn 1.22 or higher
 
-### 2. 설치
+### 2. Installation
 
 ```bash
-# 저장소 클론
-git clone https://github.com/motifgames/gatrix.git
+# Clone repository
+git clone https://github.com/your-org/gatrix.git
 cd gatrix
 
-# 환경 변수 설정
-cp .env.example .env
+# Setup environment variables
+cp .env.example .env.local
 
-# 의존성 설치
-npm install
+# Install dependencies
+yarn install
 
-# 데이터베이스 설정
-npm run migrate
-npm run seed
+# Start infrastructure (MySQL, Redis)
+yarn infra:up
 
-# 개발 서버 시작
-npm run dev
+# Run database migrations
+yarn migrate
+
+# Start development server
+yarn dev
 ```
 
-### 3. 접속
+### 3. Access
 
-설치가 완료되면 다음 URL로 접속할 수 있습니다:
+Once the installation is complete, you can access the following URLs:
 
-- **프론트엔드**: http://localhost:3000
-- **백엔드 API**: http://localhost:5000
-- **채팅 서버**: http://localhost:3001
-- **API 문서**: http://localhost:5000/api-docs
-- **큐 모니터**: http://localhost:5000/admin/queues
+- **Frontend**: http://localhost:43000
+- **Backend API**: http://localhost:45000
+- **Edge Server**: http://localhost:3400
+- **Chat Server**: http://localhost:45100
+- **Event Lens**: http://localhost:45200
+- **Grafana**: http://localhost:44000
 
-## 🎯 다음 단계
+## 🎯 Next Steps
 
-1. **[API 문서 읽기](/docs/api/client-api)**: 클라이언트 API 사용법 알아보기
-2. **[캐시 시스템 학습](/docs/backend/cache-keys)**: 성능 최적화를 위한 캐시 시스템 이해
-3. **[작업 관리 탐색](/docs/features/job-management)**: 자동화된 작업 스케줄링 설정
-4. **[게임 월드 구성](/docs/features/game-worlds)**: 다중 게임 월드 설정
+1. **[API Documentation](../../api/client-api)**: Learn how to use the client API
+2. **[Feature Flags](../../features/feature-flags)**: Understand feature control and testing
+3. **[Job Management](../../features/job-management)**: Configure automated job scheduling
+4. **[Game Worlds](../../features/game-worlds)**: Setup multiple game worlds
 
-## 🤝 커뮤니티
+## 🤝 Community
 
-- **GitHub**: [motifgames/gatrix](https://github.com/motifgames/gatrix)
-- **이슈 리포트**: [GitHub Issues](https://github.com/motifgames/gatrix/issues)
-- **문서**: [이 사이트](/docs/intro)
+- **GitHub**: [your-org/gatrix](https://github.com/your-org/gatrix)
+- **Documentation**: [This site](../../intro)
 
-Gatrix와 함께 게임 플랫폼 관리의 새로운 차원을 경험해보세요! 🚀
+Experience a new dimension of game platform management with Gatrix! 🎮

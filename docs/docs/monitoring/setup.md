@@ -1,4 +1,4 @@
----
+﻿---
 slug: /monitoring/setup
 title: Monitoring Setup
 sidebar_position: 51
@@ -8,7 +8,7 @@ sidebar_position: 51
 
 This page provides a quick entry point for setting up Prometheus and Grafana.
 
-For the complete guide, see: [/docs/features/monitoring](/docs/features/monitoring)
+For the complete guide, see: [/docs/features/monitoring](/features/monitoring)
 
 ## Quick Steps
 
@@ -45,4 +45,5 @@ docker compose -f docker-compose.dev.yml up -d
     }
   }
   ```
+
 

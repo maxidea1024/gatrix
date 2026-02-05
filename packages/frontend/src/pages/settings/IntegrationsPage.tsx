@@ -15,7 +15,11 @@ import {
   Tooltip,
   Stack,
 } from '@mui/material';
-import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
+import {
+  Add as AddIcon,
+  Delete as DeleteIcon,
+  ChevronRight as ChevronRightIcon,
+} from '@mui/icons-material';
 import ConfirmDeleteDialog from '@/components/common/ConfirmDeleteDialog';
 import { CreateIntegrationWizard } from '@/components/integrations/CreateIntegrationWizard';
 import { useSnackbar } from 'notistack';
@@ -26,6 +30,7 @@ import slackIcon from '@/assets/icons/integrations/slack.svg';
 import teamsIcon from '@/assets/icons/integrations/teams.svg';
 import webhookIcon from '@/assets/icons/integrations/webhook.svg';
 import larkIcon from '@/assets/icons/integrations/lark.svg';
+import newrelicIcon from '@/assets/icons/integrations/newrelic.svg';
 
 interface Integration {
   id: string;
@@ -46,6 +51,7 @@ interface ProviderDefinition {
   displayName: string;
   description: string;
   documentationUrl?: string;
+  deprecated?: string;
   parameters: Array<{
     name: string;
     displayName: string;
@@ -61,6 +67,7 @@ interface ProviderDefinition {
 const PROVIDER_ICONS: Record<string, string> = {
   slack: slackIcon,
   'slack-app': slackIcon,
+  'new-relic': newrelicIcon,
   teams: teamsIcon,
   webhook: webhookIcon,
   lark: larkIcon,
@@ -165,14 +172,91 @@ export const IntegrationsPage: React.FC = () => {
         </Box>
       ) : (
         <>
-          {/* Available Integrations */}
-          <Typography variant="h6" sx={{ mb: 2 }}>
+          {/* Configured Integrations - Now at TOP */}
+          {integrations.length > 0 && (
+            <>
+              <Typography variant="h6" sx={{ mb: 1 }}>
+                {t('integrations.configuredIntegrations')}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                {t('integrations.configuredDescription')}
+              </Typography>
+              <Stack spacing={2} sx={{ mb: 4 }}>
+                {integrations.map((integration) => {
+                  const provider = providers.find((p) => p.name === integration.provider);
+                  return (
+                    <Card
+                      key={integration.id}
+                      sx={{
+                        border: 1,
+                        borderColor: 'divider',
+                        boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+                      }}
+                    >
+                      <CardContent sx={{ py: 2 }}>
+                        <Box display="flex" alignItems="center" justifyContent="space-between">
+                          <Box display="flex" alignItems="center" gap={2}>
+                            <Box
+                              component="img"
+                              src={getProviderIcon(integration.provider)}
+                              alt={integration.provider}
+                              sx={{ width: 32, height: 32 }}
+                            />
+                            <Typography variant="subtitle1" fontWeight="medium">
+                              {t(provider?.displayName || integration.provider)}
+                            </Typography>
+                          </Box>
+                          <Box display="flex" alignItems="center" gap={1}>
+                            <Chip
+                              label={integration.isEnabled ? t('common.enabled') : t('common.disabled')}
+                              size="small"
+                              color={integration.isEnabled ? 'success' : 'default'}
+                              variant="outlined"
+                            />
+                            <Tooltip title={t('common.delete')}>
+                              <IconButton
+                                size="small"
+                                color="error"
+                                onClick={() => setDeleteTarget(integration)}
+                              >
+                                <DeleteIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                          </Box>
+                        </Box>
+                        <Box sx={{ mt: 1 }}>
+                          <Button
+                            size="small"
+                            endIcon={<ChevronRightIcon />}
+                            onClick={() => navigate(`/settings/integrations/${integration.id}/edit`)}
+                            sx={{ textTransform: 'none' }}
+                          >
+                            {t('common.open')}
+                          </Button>
+                        </Box>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </Stack>
+            </>
+          )}
+
+          {/* Available Integrations - Now at BOTTOM */}
+          <Typography variant="h6" sx={{ mb: 1 }}>
             {t('integrations.availableProviders')}
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            {t('integrations.availableDescription')}
           </Typography>
           <Box
             sx={{
               display: 'grid',
-              gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' },
+              gridTemplateColumns: {
+                xs: '1fr',
+                sm: 'repeat(auto-fill, minmax(280px, 1fr))',
+                md: 'repeat(auto-fill, minmax(280px, 1fr))',
+              },
               gap: 2,
               mb: 4,
             }}
@@ -181,144 +265,57 @@ export const IntegrationsPage: React.FC = () => {
               <Card
                 key={provider.name}
                 sx={{
-                  height: '100%',
-                  cursor: 'pointer',
-                  transition: 'transform 0.2s, box-shadow 0.2s',
+                  minWidth: 280,
+                  maxWidth: 400,
+                  border: 1,
+                  borderColor: 'divider',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  opacity: provider.deprecated ? 0.7 : 1,
+                  transition: 'box-shadow 0.2s',
                   '&:hover': {
-                    transform: 'translateY(-4px)',
-                    boxShadow: 4,
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
                   },
                 }}
-                onClick={() => {
-                  setWizardProvider(provider.name);
-                  setWizardOpen(true);
-                }}
               >
-                <CardContent>
+                <CardContent sx={{ flex: 1, pb: 1 }}>
                   <Box display="flex" alignItems="center" gap={2} mb={1}>
                     <Box
                       component="img"
                       src={getProviderIcon(provider.name)}
                       alt={t(provider.displayName)}
-                      sx={{ width: 40, height: 40 }}
+                      sx={{ width: 32, height: 32 }}
                     />
-                    <Typography variant="h6">{t(provider.displayName)}</Typography>
+                    <Typography variant="subtitle1" fontWeight="medium">
+                      {t(provider.displayName)}
+                    </Typography>
                   </Box>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                     {t(provider.description)}
                   </Typography>
-                  {getConfiguredProviders().has(provider.name) && (
-                    <Chip
-                      label={t('integrations.configured')}
-                      size="small"
-                      color="success"
-                      sx={{ mt: 1 }}
-                    />
+                  {provider.deprecated && (
+                    <Typography variant="caption" color="warning.main">
+                      {t(provider.deprecated)}
+                    </Typography>
                   )}
                 </CardContent>
+                <Box sx={{ px: 2, pb: 2 }}>
+                  <Button
+                    size="small"
+                    endIcon={<ChevronRightIcon />}
+                    onClick={() => {
+                      setWizardProvider(provider.name);
+                      setWizardOpen(true);
+                    }}
+                    sx={{ textTransform: 'none' }}
+                  >
+                    {t('integrations.configure')}
+                  </Button>
+                </Box>
               </Card>
             ))}
           </Box>
-
-          {/* Configured Integrations */}
-          <Typography variant="h6" sx={{ mb: 2 }}>
-            {t('integrations.configuredIntegrations')}
-          </Typography>
-          {integrations.length === 0 ? (
-            <Box
-              sx={{
-                border: '2px dashed',
-                borderColor: 'divider',
-                borderRadius: 2,
-                p: 4,
-                minHeight: 150,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                textAlign: 'center',
-              }}
-            >
-              <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
-                {t('integrations.noIntegrationsGuide')}
-              </Typography>
-              <Button
-                variant="contained"
-                startIcon={<AddIcon />}
-                onClick={() => {
-                  setWizardProvider(undefined);
-                  setWizardOpen(true);
-                }}
-              >
-                {t('integrations.createFirst')}
-              </Button>
-            </Box>
-          ) : (
-            <Stack spacing={2}>
-              {integrations.map((integration) => (
-                <Card key={integration.id}>
-                  <CardContent>
-                    <Box display="flex" alignItems="center" justifyContent="space-between">
-                      <Box display="flex" alignItems="center" gap={2}>
-                        <Box
-                          component="img"
-                          src={getProviderIcon(integration.provider)}
-                          alt={integration.provider}
-                          sx={{ width: 40, height: 40 }}
-                        />
-                        <Box>
-                          <Typography variant="h6">
-                            {t(
-                              providers.find((p) => p.name === integration.provider)?.displayName ||
-                              integration.provider
-                            )}
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            {integration.description || t('integrations.noDescription')}
-                          </Typography>
-                          <Box display="flex" gap={1} mt={0.5}>
-                            <Chip
-                              label={`${integration.events.length} ${t('integrations.events')}`}
-                              size="small"
-                              variant="outlined"
-                            />
-                            {integration.environments.length > 0 && (
-                              <Chip
-                                label={`${integration.environments.length} ${t('integrations.environments')}`}
-                                size="small"
-                                variant="outlined"
-                              />
-                            )}
-                          </Box>
-                        </Box>
-                      </Box>
-                      <Box display="flex" alignItems="center" gap={1}>
-                        <Switch
-                          checked={integration.isEnabled}
-                          onChange={() => handleToggle(integration)}
-                          color="primary"
-                        />
-                        <Tooltip title={t('common.edit')}>
-                          <IconButton
-                            onClick={() =>
-                              navigate(`/settings/integrations/${integration.id}/edit`)
-                            }
-                          >
-                            <EditIcon />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title={t('common.delete')}>
-                          <IconButton color="error" onClick={() => setDeleteTarget(integration)}>
-                            <DeleteIcon />
-                          </IconButton>
-                        </Tooltip>
-                      </Box>
-                    </Box>
-                  </CardContent>
-                </Card>
-              ))}
-            </Stack>
-          )}
         </>
       )}
 

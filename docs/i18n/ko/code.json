@@ -1,0 +1,50 @@
+{
+    "homepage.welcome": {
+        "message": "환영합니다",
+        "description": "Welcome text on homepage"
+    },
+    "homepage.cta.docs": {
+        "message": "문서",
+        "description": "Documentation CTA button"
+    },
+    "homepage.cta.quickstart": {
+        "message": "빠른 시작",
+        "description": "Quick start CTA button"
+    },
+    "homepage.features.title": {
+        "message": "핵심 기능",
+        "description": "Features section title"
+    },
+    "homepage.feature.flags.title": {
+        "message": "피처 플래그",
+        "description": "Feature flags title"
+    },
+    "homepage.feature.flags.desc": {
+        "message": "코드 배포 없이 기능을 실시간으로 제어",
+        "description": "Feature flags description"
+    },
+    "homepage.feature.gameops.title": {
+        "message": "게임 운영",
+        "description": "Game operations title"
+    },
+    "homepage.feature.gameops.desc": {
+        "message": "공지, 쿠폰, 설문, 배너 등",
+        "description": "Game operations description"
+    },
+    "homepage.feature.integrations.title": {
+        "message": "외부 연동",
+        "description": "Integrations title"
+    },
+    "homepage.feature.integrations.desc": {
+        "message": "Slack, Teams, Webhook, New Relic 등",
+        "description": "Integrations description"
+    },
+    "homepage.feature.monitoring.title": {
+        "message": "모니터링",
+        "description": "Monitoring title"
+    },
+    "homepage.feature.monitoring.desc": {
+        "message": "이벤트 분석, Grafana 대시보드, 감사 로그",
+        "description": "Monitoring description"
+    }
+}

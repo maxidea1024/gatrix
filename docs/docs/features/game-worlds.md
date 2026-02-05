@@ -1,4 +1,4 @@
----
+﻿---
 sidebar_position: 2
 ---
 
@@ -458,3 +458,4 @@ Set up monitoring for:
 - High cache miss rates
 - Slow API response times
 - Failed world operations
+

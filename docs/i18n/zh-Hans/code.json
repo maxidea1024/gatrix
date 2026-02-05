@@ -1,0 +1,50 @@
+{
+    "homepage.welcome": {
+        "message": "欢迎来到",
+        "description": "Welcome text on homepage"
+    },
+    "homepage.cta.docs": {
+        "message": "文档",
+        "description": "Documentation CTA button"
+    },
+    "homepage.cta.quickstart": {
+        "message": "快速入门",
+        "description": "Quick start CTA button"
+    },
+    "homepage.features.title": {
+        "message": "核心功能",
+        "description": "Features section title"
+    },
+    "homepage.feature.flags.title": {
+        "message": "功能开关",
+        "description": "Feature flags title"
+    },
+    "homepage.feature.flags.desc": {
+        "message": "无需代码部署即可实时控制功能",
+        "description": "Feature flags description"
+    },
+    "homepage.feature.gameops.title": {
+        "message": "游戏运营",
+        "description": "Game operations title"
+    },
+    "homepage.feature.gameops.desc": {
+        "message": "公告、优惠券、问卷、横幅等",
+        "description": "Game operations description"
+    },
+    "homepage.feature.integrations.title": {
+        "message": "外部集成",
+        "description": "Integrations title"
+    },
+    "homepage.feature.integrations.desc": {
+        "message": "Slack、Teams、Webhook、New Relic 等",
+        "description": "Integrations description"
+    },
+    "homepage.feature.monitoring.title": {
+        "message": "监控",
+        "description": "Monitoring title"
+    },
+    "homepage.feature.monitoring.desc": {
+        "message": "事件分析、Grafana 仪表板、审计日志",
+        "description": "Monitoring description"
+    }
+}

@@ -102,6 +102,7 @@ export const slackDefinition: AddonDefinition = {
     },
   ],
   events: ALL_INTEGRATION_EVENTS,
+  deprecated: 'integrations.providers.slack.deprecated',
 };
 
 /**
@@ -267,14 +268,68 @@ export const larkDefinition: AddonDefinition = {
 };
 
 /**
+ * New Relic Addon Definition
+ */
+export const newRelicDefinition: AddonDefinition = {
+  name: 'new-relic',
+  displayName: 'integrations.providers.newRelic.displayName',
+  description: 'integrations.providers.newRelic.description',
+  documentationUrl: 'https://docs.newrelic.com/docs/apis/intro-apis/new-relic-api-keys/',
+  parameters: [
+    {
+      name: 'url',
+      displayName: 'integrations.providers.newRelic.params.url.displayName',
+      type: 'url',
+      description: 'integrations.providers.newRelic.params.url.description',
+      placeholder: 'https://insights-collector.newrelic.com/v1/accounts/YOUR_ACCOUNT_ID/events',
+      required: true,
+      sensitive: false,
+    },
+    {
+      name: 'licenseKey',
+      displayName: 'integrations.providers.newRelic.params.licenseKey.displayName',
+      type: 'text',
+      description: 'integrations.providers.newRelic.params.licenseKey.description',
+      placeholder: 'eu01xx0f12a6b3434a8d710110bd862',
+      required: true,
+      sensitive: true,
+    },
+    {
+      name: 'customHeaders',
+      displayName: 'integrations.providers.common.customHeaders.displayName',
+      type: 'textfield',
+      description: 'integrations.providers.common.customHeaders.description',
+      placeholder: '{"X-Custom-Header": "value"}',
+      required: false,
+      sensitive: false,
+    },
+    {
+      name: 'bodyTemplate',
+      displayName: 'integrations.providers.newRelic.params.bodyTemplate.displayName',
+      type: 'textfield',
+      description: 'integrations.providers.newRelic.params.bodyTemplate.description',
+      placeholder: `{
+  "event": "{{event.type}}",
+  "eventType": "gatrix",
+  "featureToggle": "{{event.data.name}}"
+}`,
+      required: false,
+      sensitive: false,
+    },
+  ],
+  events: ALL_INTEGRATION_EVENTS,
+};
+
+/**
  * All addon definitions
  */
 export const ADDON_DEFINITIONS: Record<string, AddonDefinition> = {
-  slack: slackDefinition,
   'slack-app': slackAppDefinition,
+  'new-relic': newRelicDefinition,
   webhook: webhookDefinition,
   teams: teamsDefinition,
   lark: larkDefinition,
+  slack: slackDefinition,
 };
 
 /**

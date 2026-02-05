@@ -1,4 +1,4 @@
----
+﻿---
 slug: /optimization/database
 title: Database Optimization Guide
 sidebar_position: 60
@@ -36,5 +36,6 @@ Track slow queries and collect latency metrics exposed via Prometheus.
 
 ## Next
 
-- See caching strategies: [/docs/optimization/caching](/docs/optimization/caching)
+- See caching strategies: [/docs/optimization/caching](/optimization/caching)
+
 

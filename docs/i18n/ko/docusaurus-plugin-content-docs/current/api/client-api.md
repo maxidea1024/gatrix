@@ -1,17 +1,18 @@
----
+﻿---
 sidebar_position: 1
+sidebar_label: 클라이언트 API
 ---
 
-# 클라이언트 API 문서
+# 클라이언트 API
 
 게임 클라이언트에서 직접 호출할 수 있는 공개 API 엔드포인트입니다.
 
 ## 특징
 
 - **인증 불필요**: 클라이언트에서 직접 호출 가능
-- **Rate Limit 없음**: 대량의 요청 처리 가능
-- **고성능 캐싱**: 로컬 메모리 캐싱으로 빠른 응답
-- **자동 캐시 무효화**: 관리자 수정 시 pub/sub를 통한 실시간 캐시 갱신
+- **Rate Limit 적용**: 과도한 요청 처리 제한
+- **고성능 캐싱**: 로컬 메모리 캐싱을 통한 빠른 응답
+- **실시간 캐시 무효화**: 관리자 설정 변경 시 Pub/Sub을 통한 즉각적인 캐시 갱신
 
 ## API 엔드포인트
 
@@ -21,52 +22,15 @@ sidebar_position: 1
 GET /api/v1/client/client-version
 ```
 
-게임 클라이언트에서 사용할 버전 정보를 조회합니다.
-
-### 4. Client SDK API (인증 필요)
-
-Client SDK를 위한 API 엔드포인트들입니다. API 토큰 인증이 필요합니다.
-
-#### 4.1. SDK 테스트
-
-```
-GET /api/v1/client/test
-```
-
-SDK 인증을 테스트합니다.
-
-#### 4.2. SDK 템플릿 조회
-
-```
-GET /api/v1/client/templates
-```
-
-Client SDK용 원격 설정 템플릿을 조회합니다.
-
-#### 4.3. 설정 평가
-
-```
-POST /api/v1/client/evaluate
-```
-
-사용자 컨텍스트를 기반으로 설정을 평가합니다.
-
-#### 4.4. 메트릭 제출
-
-```
-POST /api/v1/client/metrics
-```
-
-SDK 사용 메트릭을 제출합니다.
+게임 클라이언트의 버전 정보를 조회합니다.
 
 #### 쿼리 매개변수
-
-| 매개변수 | 타입 | 설명 |
+| 매개변수 | 유형 | 설명 |
 |----------|------|------|
-| channel | string | 채널 필터 (예: A1, PC) |
-| subChannel | string | 서브 채널 필터 (예: QQ, WeChat, iOS) |
+| channel | string | 채널 필터 (예: PC, Mobile) |
+| subChannel | string | 서브 채널 필터 (예: Steam, Google, iOS) |
 
-#### 응답
+#### 응답 예시
 
 ```json
 {
@@ -79,31 +43,13 @@ SDK 사용 메트릭을 제출합니다.
         "subChannel": "Steam",
         "clientVersion": "1.0.0",
         "gameServerAddress": "https://game.example.com",
-        "gameServerAddressForWhiteList": "https://game-vip.example.com",
         "patchAddress": "https://patch.example.com",
-        "patchAddressForWhiteList": "https://patch-vip.example.com",
-        "guestModeAllowed": true,
-        "externalClickLink": "https://website.example.com",
-        "customPayload": {
-          "feature1": true,
-          "setting1": "value1"
-        },
-        "createdAt": "2024-01-01T00:00:00.000Z",
-        "updatedAt": "2024-01-01T00:00:00.000Z"
+        "forceUpdate": false
       }
-    ],
-    "total": 1,
-    "timestamp": "2024-01-01T00:00:00.000Z"
-  },
-  "cached": false
+    ]
+  }
 }
 ```
-
-#### 캐시 정보
-
-- **캐시 키**: `CLIENT_VERSION.BY_CHANNEL(channel, subChannel)`
-- **캐시 TTL**: 5분 (`DEFAULT_CONFIG.CLIENT_VERSION_TTL`)
-- **무효화**: 클라이언트 버전 생성/수정/삭제 시
 
 ### 2. 게임 월드 목록
 
@@ -113,7 +59,7 @@ GET /api/v1/client/game-worlds
 
 사용 가능한 게임 월드 목록을 조회합니다.
 
-#### 응답
+#### 응답 예시
 
 ```json
 {
@@ -121,232 +67,38 @@ GET /api/v1/client/game-worlds
   "data": {
     "worlds": [
       {
-        "id": 1,
         "worldId": "world001",
         "name": "메인 월드",
-        "description": "기본 게임 월드",
-        "displayOrder": 1,
-        "createdAt": "2024-01-01T00:00:00.000Z",
-        "updatedAt": "2024-01-01T00:00:00.000Z"
+        "status": "online"
       }
-    ],
-    "total": 1,
-    "timestamp": "2024-01-01T00:00:00.000Z"
+    ]
+  }
+}
+```
+
+### 3. 서비스 공지사항
+
+```
+GET /api/v1/client/notices
+```
+
+활성 서비스 공지사항을 조회합니다.
+
+### 4. 피처 플래그 평가
+
+```
+POST /api/v1/client/evaluate
+```
+
+사용자 컨텍스트에 따라 피처 플래그를 평가합니다.
+
+#### 요청 본문
+```json
+{
+  "context": {
+    "userId": "user123",
+    "country": "KR"
   },
-  "cached": false
+  "flags": ["new_ui", "event_mode"]
 }
-```
-
-#### 필터링
-
-- **visible**: `true`인 월드만 반환
-- **maintenance**: `false`인 월드만 반환 (점검 중이 아닌 월드)
-- **정렬**: `displayOrder` 오름차순
-
-#### 캐시 정보
-
-- **캐시 키**: `GAME_WORLDS.PUBLIC`
-- **캐시 TTL**: 10분 (`DEFAULT_CONFIG.GAME_WORLDS_PUBLIC_TTL`)
-- **무효화**: 게임 월드 생성/수정/삭제 시
-
-### 3. 캐시 통계
-
-```
-GET /api/v1/client/cache-stats
-```
-
-캐시 성능 통계를 조회합니다 (모니터링 용도).
-
-#### 응답
-
-```json
-{
-  "success": true,
-  "data": {
-    "totalItems": 10,
-    "validItems": 8,
-    "expiredItems": 2,
-    "memoryUsage": {
-      "rss": 50331648,
-      "heapTotal": 20971520,
-      "heapUsed": 15728640,
-      "external": 1048576,
-      "arrayBuffers": 524288
-    }
-  }
-}
-```
-
-## 캐시 시스템
-
-### 로컬 메모리 캐싱
-
-- **CacheService**: 인메모리 캐시 관리
-- **자동 만료**: TTL 기반 자동 정리
-- **패턴 매칭**: 정규식을 통한 일괄 삭제
-
-### BullMQ 기반 큐 시스템
-
-- **PubSubService**: BullMQ를 통한 안정적인 캐시 무효화 큐
-- **QueueService**: 이메일, 감사로그, 정리 작업 등을 위한 범용 큐 시스템
-- **실시간 동기화**: 관리자 수정 시 모든 인스턴스의 캐시 즉시 무효화
-- **재시도 메커니즘**: 실패한 작업 자동 재시도 (지수 백오프)
-- **장애 허용**: Redis 연결 실패 시에도 로컬 캐시는 정상 동작
-
-### 캐시 무효화 시나리오
-
-1. **클라이언트 버전 변경**
-   - 생성/수정/삭제/상태변경 시
-   - 패턴: `client_version:.*`
-   - 큐를 통한 비동기 처리
-
-2. **게임 월드 변경**
-   - 생성/수정/삭제 시
-   - 키: `game_worlds:public`
-   - 큐를 통한 비동기 처리
-
-### 큐 시스템 특징
-
-- **높은 우선순위**: 캐시 무효화 작업은 우선순위 10으로 처리
-- **자동 정리**: 완료된 작업 100개, 실패한 작업 50개까지 보관
-- **동시성 제어**: 워커당 최대 5개 작업 동시 처리
-- **모니터링**: 큐 상태 실시간 모니터링 가능
-
-## 성능 최적화
-
-### 응답 시간
-
-- **캐시 히트**: ~1ms
-- **캐시 미스**: ~50-100ms (DB 조회)
-- **캐시 무효화**: ~2-5ms (BullMQ 큐 추가)
-- **큐 처리**: ~10-50ms (백그라운드 처리)
-
-### 메모리 사용량
-
-- **예상 사용량**: 항목당 ~1-5KB
-- **자동 정리**: 만료된 항목 1분마다 정리
-- **큐 정리**: 완료/실패 작업 자동 정리
-- **메모리 모니터링**: `/api/v1/client/cache-stats`로 확인
-
-## 사용 예시
-
-### JavaScript (게임 클라이언트)
-
-```javascript
-// 클라이언트 버전 정보 조회
-async function getClientVersion(channel, subChannel) {
-  const params = new URLSearchParams();
-  if (channel) params.append('channel', channel);
-  if (subChannel) params.append('subChannel', subChannel);
-  
-  const response = await fetch(`/api/v1/client/client-version?${params}`);
-  const data = await response.json();
-  
-  if (data.success) {
-    return data.data.versions;
-  }
-  throw new Error('클라이언트 버전 조회 실패');
-}
-
-// 게임 월드 목록 조회
-async function getGameWorlds() {
-  const response = await fetch('/api/v1/client/game-worlds');
-  const data = await response.json();
-  
-  if (data.success) {
-    return data.data.worlds;
-  }
-  throw new Error('게임 월드 조회 실패');
-}
-```
-
-### Unity C# (게임 클라이언트)
-
-```csharp
-using UnityEngine;
-using UnityEngine.Networking;
-using System.Collections;
-
-public class ClientAPI : MonoBehaviour
-{
-    private const string BASE_URL = "https://api.example.com/api/v1/client";
-    
-    public IEnumerator GetClientVersion(string channel, string subChannel)
-    {
-        string url = $"{BASE_URL}/client-version";
-        if (!string.IsNullOrEmpty(channel))
-            url += $"?channel={channel}";
-        if (!string.IsNullOrEmpty(subChannel))
-            url += $"&subChannel={subChannel}";
-            
-        using (UnityWebRequest request = UnityWebRequest.Get(url))
-        {
-            yield return request.SendWebRequest();
-            
-            if (request.result == UnityWebRequest.Result.Success)
-            {
-                string json = request.downloadHandler.text;
-                // JSON 파싱 및 처리
-                Debug.Log($"클라이언트 버전 데이터: {json}");
-            }
-        }
-    }
-}
-```
-
-## 모니터링
-
-### 로그 확인
-
-```bash
-# 캐시 관련 로그 확인
-tail -f logs/app.log | grep -i cache
-
-# PubSub 관련 로그 확인
-tail -f logs/app.log | grep -i pubsub
-```
-
-### 캐시 및 큐 통계 모니터링
-
-```bash
-# 캐시 및 큐 통계 API 호출
-curl http://localhost:3000/api/v1/client/cache-stats
-```
-
-**응답 예시:**
-```json
-{
-  "success": true,
-  "data": {
-    "cache": {
-      "totalItems": 10,
-      "validItems": 8,
-      "expiredItems": 2,
-      "memoryUsage": { ... }
-    },
-    "queue": {
-      "waiting": 0,
-      "active": 1,
-      "completed": 150,
-      "failed": 2,
-      "total": 153
-    },
-    "pubsub": {
-      "connected": true,
-      "timestamp": "2024-01-01T00:00:00.000Z"
-    }
-  }
-}
-```
-
-### BullMQ 대시보드 (선택사항)
-
-BullMQ UI를 통한 큐 모니터링:
-
-```bash
-# BullMQ UI 설치 (개발 환경)
-npm install -g @bull-board/ui
-
-# 대시보드 실행
-bull-board
 ```

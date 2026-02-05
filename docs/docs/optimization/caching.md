@@ -1,4 +1,4 @@
----
+﻿---
 slug: /optimization/caching
 title: Caching Strategy Guide
 sidebar_position: 61
@@ -32,5 +32,6 @@ This page summarizes a practical multi-tier caching approach used in Gatrix.
 
 ## Next
 
-- See database optimization: [/docs/optimization/database](/docs/optimization/database)
+- See database optimization: [/docs/optimization/database](/optimization/database)
+
 

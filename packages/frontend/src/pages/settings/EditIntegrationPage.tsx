@@ -51,6 +51,7 @@ import slackIcon from '@/assets/icons/integrations/slack.svg';
 import teamsIcon from '@/assets/icons/integrations/teams.svg';
 import webhookIcon from '@/assets/icons/integrations/webhook.svg';
 import larkIcon from '@/assets/icons/integrations/lark.svg';
+import newrelicIcon from '@/assets/icons/integrations/newrelic.svg';
 
 interface Integration {
   id: string;
@@ -97,6 +98,7 @@ interface EventLog {
 const PROVIDER_ICONS: Record<string, string> = {
   slack: slackIcon,
   'slack-app': slackIcon,
+  'new-relic': newrelicIcon,
   teams: teamsIcon,
   webhook: webhookIcon,
   lark: larkIcon,

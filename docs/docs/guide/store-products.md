@@ -1,57 +1,46 @@
----
+﻿---
 sidebar_position: 5
+sidebar_label: Store Products
 ---
 
-# 스토어 상품관리
+# Store Products
 
-## 기능 설명
+## Overview
 
-게임 내 스토어에서 판매되는 상품의 판매 여부를 설정합니다.
+Manage in-app purchase products and virtual items.
 
-**접근 경로:** 게임 관리 → 스토어 상품관리
+**Navigation:** Game Operations → Store Products
 
-## 사용 방법
+## Features
 
-### 목록 화면
+- Define product catalog
+- Set pricing (real money, virtual currency)
+- Configure purchase limits
+- Schedule availability
+- Track sales
 
-![스토어 상품관리 목록](./img/store-products-list.png)
+## Creating a Product
 
-**페이지 헤더:**
-- 제목: 스토어 상품관리
-- 설명: 게임 내 스토어에서 판매되는 상품의 판매 여부를 설정합니다
+1. Navigate to **Game Operations** > **Store Products**
+2. Click **Add Product** button
+3. Configure the product:
 
-**버튼:**
-- 기획데이터 동기화
-- 상품 추가
-- 배치 프로세스
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| Product ID | Text | Required | Unique product identifier |
+| Name | Text | Required | Display name |
+| Description | Textarea | - | Product description |
+| Price | Number | Required | Price in cents/points |
+| Currency | Select | Required | USD, KRW, Gems, etc. |
+| Icon | Image | - | Product image |
+| Max Purchases | Number | - | Per-user limit |
+| Available From | DateTime | - | Start availability |
+| Available Until | DateTime | - | End availability |
 
-**필터 탭:**
-- 전체
-- 판매중
-- 판매중지
+4. Click **Create** to save
 
-**테이블 컬럼:**
-| 컬럼명 |
-|--------|
-| 판매여부 |
-| CMS ID |
-| 상품 ID |
-| 상품명 |
-| 스토어 |
-| 가격 |
-| 판매 시작일시 |
-| 판매 종료일시 |
-| 태그 |
-| 작업 |
+## Product Types
 
-## 즉시 발생하는 변화
-
-[확인 필요]
-
-## ⚠ 주의사항
-
-[확인 필요]
-
-## 🚨 실제 사고 사례
-
-해당 없음
+- **Consumable** - Items that can be purchased multiple times
+- **Non-Consumable** - One-time purchases
+- **Subscription** - Recurring purchases

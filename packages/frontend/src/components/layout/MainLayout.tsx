@@ -51,6 +51,7 @@ import {
   Person as PersonIcon,
   Brightness4 as DarkModeIcon,
   Brightness7 as LightModeIcon,
+  MenuBook as MenuBookIcon,
   Language as LanguageIcon,
   Security as SecurityIcon,
   History as HistoryIcon,
@@ -1104,9 +1105,9 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         transition: 'background-color 0.2s ease',
         '&:hover': sidebarCollapsed
           ? {
-              backgroundColor:
-                theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)',
-            }
+            backgroundColor:
+              theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)',
+          }
           : {},
       }}
       onClick={(e) => {
@@ -1961,6 +1962,16 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                   mx: 1,
                 }}
               />
+
+              {/* Documentation button */}
+              <Tooltip title={t('header.documentation')}>
+                <IconButton
+                  color="inherit"
+                  onClick={() => window.open('/docs', '_blank')}
+                >
+                  <MenuBookIcon />
+                </IconButton>
+              </Tooltip>
 
               <IconButton onClick={toggleTheme} color="inherit">
                 {isDark ? <LightModeIcon /> : <DarkModeIcon />}

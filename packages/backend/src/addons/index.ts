@@ -10,6 +10,7 @@ import { SlackAppAddon } from './SlackAppAddon';
 import { WebhookAddon } from './WebhookAddon';
 import { TeamsAddon } from './TeamsAddon';
 import { LarkAddon } from './LarkAddon';
+import { NewRelicAddon } from './NewRelicAddon';
 import { getAllAddonDefinitions, getAddonDefinition, ADDON_DEFINITIONS } from './definitions';
 import type { AddonDefinition } from './definitions';
 
@@ -22,6 +23,7 @@ export function getAddons(): AddonProviders {
   return {
     slack: new SlackAddon(),
     'slack-app': new SlackAppAddon(),
+    'new-relic': new NewRelicAddon(),
     webhook: new WebhookAddon(),
     teams: new TeamsAddon(),
     lark: new LarkAddon(),
@@ -51,6 +53,7 @@ export {
   WebhookAddon,
   TeamsAddon,
   LarkAddon,
+  NewRelicAddon,
   AddonDefinition,
   getAddonDefinition,
   ADDON_DEFINITIONS,

@@ -1,85 +1,87 @@
----
+﻿---
 sidebar_position: 1
 ---
 
-# Gatrix 入门指南
+# Gatrix 简介
 
-欢迎使用 **Gatrix**，这是一个专为 **UWO (Uncharted Waters Online)** 游戏管理而构建的综合在线游戏平台管理系统。
+**Gatrix** 是一个用于在线游戏服务的集成管理系统。
 
-## 什么是 Gatrix？
+## 🎯 核心功能
 
-Gatrix 是一个现代化的全栈平台，为在线游戏平台提供强大的用户管理、身份验证和管理功能。使用 TypeScript、React、MUI 和 Express.js 构建，为游戏平台运营提供完整的解决方案。
+### 功能开关 (Feature Flags)
+无需重新发布代码即可实时控制功能。
+- 环境/群组分步发布
+- A/B 测试支持
+- 立即回滚
 
-### 主要功能
+### 游戏运营工具
+- **服务公告** - 游戏内和外部公告管理
+- **弹窗公告** - 针对性游戏内弹窗
+- **优惠券** - 奖励优惠券生成与管理
+- **问卷调查** - 收集玩家意见
+- **横幅** - 宣传横幅管理
+- **商店商品** - 应用内商品管理
+- **策划数据** - 游戏平衡和配置数据
 
-- 🎮 **游戏平台管理**：在线游戏管理的综合平台
-- 🌍 **游戏世界管理**：支持多世界，每个世界都有独立配置
-- 📱 **客户端版本管理**：版本控制和分发管理
-- 🔧 **维护模式**：带有自定义消息的系统级维护控制
-- 🏷️ **标签系统**：用于内容组织的灵活标签
-- 📝 **消息模板**：多语言消息模板管理
-- 🛡️ **IP 白名单**：高级 IP 访问控制和管理
-- ⚙️ **作业调度器**：具有类似 cron 语法的高级作业调度
-- 📊 **队列监控**：通过 Bull Board 进行实时作业队列监控
+### 系统管理
+- **维护管理** - 定期/紧急维护调度
+- **白名单** - 测试账号/IP 管理
+- **游戏世界** - 服务器状态监控
+- **客户端版本** - 应用版本管理
 
-## 前置要求
+### 外部集成
+支持 Slack, Microsoft Teams, Webhook, New Relic, Lark 等多种服务集成
 
-开始之前，请确保已安装以下软件：
+### 监控分析
+- **Event Lens** - 事件分析和统计
+- **Grafana 仪表板** - 实时指标监控
+- **审计日志** - 追踪所有变更记录
 
-- [Node.js](https://nodejs.org/en/download/) 版本 18.0 或更高
-- [MySQL](https://dev.mysql.com/downloads/) 版本 8.0 或更高
-- [Redis](https://redis.io/download) 版本 6.0 或更高
+## 🏗️ 架构
 
-## 快速开始
+Gatrix 是一个采用 Monorepo 结构的微服务架构：
 
-### 1. 克隆仓库
+| 包名 | 说明 |
+|--------|------|
+| `@gatrix/backend` | 主 API 服务器 |
+| `@gatrix/frontend` | 管理员仪表板 (React + MUI) |
+| `@gatrix/edge` | 边缘服务器 (用于缓存/CDN) |
+| `@gatrix/chat-server` | 实时聊天服务器 |
+| `@gatrix/event-lens` | 事件分析服务器 |
+| `@gatrix/server-sdk` | 游戏服务器 SDK |
+| `@gatrix/shared` | 共享类型和工具 |
 
-```bash
-git clone https://github.com/motifgames/gatrix.git
-cd gatrix
-```
-
-### 2. 环境设置
-
-```bash
-# 复制环境变量
-cp .env.example .env
-
-# 根据您的配置更新 .env 文件
-```
-
-### 3. 安装依赖
-
-```bash
-npm install
-```
-
-### 4. 数据库设置
+## 🚀 快速开始
 
 ```bash
-# 运行数据库迁移
-npm run migrate
+# 1. 安装依赖
+yarn install
 
-# 填充初始数据
-npm run seed
+# 2. 启动基础设施 (MySQL, Redis)
+yarn infra:up
+
+# 3. 运行数据库迁移
+yarn migrate
+
+# 4. 启动开发服务器
+yarn dev
 ```
 
-### 5. 启动开发服务器
+访问地址: http://localhost:43000
 
-```bash
-# 同时启动前端和后端
-npm run dev
-```
+## 🌐 支持语言
 
-应用程序将在以下地址可用：
-- 前端：http://localhost:3000
-- 后端 API：http://localhost:5000
-- API 文档：http://localhost:5000/api-docs
-- 队列监控：http://localhost:5000/admin/queues
+- 🇰🇷 한국어 (韩语)
+- 🇺🇸 English (英语)
+- 🇨🇳 简体中文 (中文)
 
-## 下一步
+## 📚 文档结构
 
-- 📖 [阅读 API 文档](/docs/api/client-api)
-- 🔧 [了解缓存系统](/docs/backend/cache-keys)
-- 🚀 [探索作业管理](/docs/features/job-management)
-- 🌍 [配置游戏世界](/docs/features/game-worlds)
+| 章节 | 说明 |
+|------|------|
+| [快速开始](./getting-started/quick-start) | 安装和初始设置 |
+| [功能开关](./features/feature-flags) | 如何使用功能开关 |
+| [游戏运营](./guide/service-notices) | 运营工具指南 |
+| [系统管理](./admin/maintenance) | 系统管理指南 |
+| [外部集成](./integrations/overview) | 设置集成指南 |
+| [API 参考](./api/client-api) | API 文档 |

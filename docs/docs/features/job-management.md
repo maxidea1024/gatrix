@@ -1,4 +1,4 @@
----
+﻿---
 sidebar_position: 1
 ---
 
@@ -410,3 +410,4 @@ Set up monitoring for:
 2. **Monitor Queues**: Use Bull Board to inspect queue status
 3. **Test Jobs**: Execute jobs manually to isolate issues
 4. **Validate Configuration**: Ensure job data is properly formatted
+

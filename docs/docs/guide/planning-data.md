@@ -1,58 +1,66 @@
----
+﻿---
 sidebar_position: 7
+sidebar_label: Planning Data
 ---
 
-# 기획데이터
+# Planning Data
 
-## 기능 설명
+## Overview
 
-게임 기획 데이터를 관리합니다.
+Manage game balance and configuration data (game planning data).
 
-**접근 경로:** 게임 관리 → 기획데이터 → 기획데이터 관리
+**Navigation:** Game Operations → Planning Data
 
-## 사용 방법
+## Features
 
-### 목록 화면
+- Store JSON configuration data
+- Version control for configs
+- Environment-specific values
+- Instant updates without deployment
 
-![기획데이터 목록](./img/planning-data-list.png)
+## Use Cases
 
-**페이지 헤더:**
-- 제목: 기획데이터
-- 설명: 게임 기획 데이터를 관리합니다
+- Game balance parameters
+- Level requirements
+- Item drop rates
+- Event configurations
+- Seasonal settings
 
-**버튼:**
-- 새로고침
-- 기획데이터 업로드
+## Creating Planning Data
 
-**표시 정보:**
-- 최근 업로드 시간
-- 업로더
-- 해시값
-- 총 파일 수
+1. Navigate to **Game Operations** > **Planning Data**
+2. Click **Add Data** button
+3. Configure:
 
-**데이터 탭:**
-- 보상 타입 목록
-- UI 목록 데이터
-- HotTimeBuff
-- EventPage
-- LiveEvent
-- MateRecruitingGroup
-- OceanNpcAreaSpawner
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| Key | Text | Required | Unique data key |
+| Name | Text | Required | Display name |
+| Description | Textarea | - | Admin notes |
+| Data | JSON Editor | Required | Configuration data |
+| Environment | Select | - | Target environment |
 
-**테이블 컬럼 (보상 타입 목록):**
-| 컬럼명 |
-|--------|
-| ID |
-| 이름 |
+4. Click **Create** to save
 
-## 즉시 발생하는 변화
+## Example
 
-[확인 필요]
+```json
+{
+  "key": "level_requirements",
+  "data": {
+    "levels": [
+      { "level": 1, "exp": 0 },
+      { "level": 2, "exp": 100 },
+      { "level": 3, "exp": 300 },
+      { "level": 4, "exp": 600 },
+      { "level": 5, "exp": 1000 }
+    ]
+  }
+}
+```
 
-## ⚠ 주의사항
+## API Access
 
-[확인 필요]
-
-## 🚨 실제 사고 사례
-
-해당 없음
+```bash
+GET /api/v1/planning-data/:key
+```

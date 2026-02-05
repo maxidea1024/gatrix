@@ -1,12 +1,12 @@
-import {themes as prismThemes} from 'prism-react-renderer';
-import type {Config} from '@docusaurus/types';
+import { themes as prismThemes } from 'prism-react-renderer';
+import type { Config } from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
 const config: Config = {
   title: 'Gatrix Documentation',
-  tagline: 'Online Game Platform Management System for UWO',
+  tagline: 'Online Game Platform Management System',
   favicon: 'img/favicon.ico',
 
   // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
@@ -18,14 +18,14 @@ const config: Config = {
   url: 'https://gatrix-docs.example.com',
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
-  baseUrl: '/',
+  baseUrl: '/docs/',
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
-  organizationName: 'motifgames', // Usually your GitHub org/user name.
+  organizationName: 'your-org', // Usually your GitHub org/user name.
   projectName: 'gatrix', // Usually your repo name.
 
-  onBrokenLinks: 'throw',
+  onBrokenLinks: 'warn',
   onBrokenMarkdownLinks: 'warn',
 
   // Internationalization configuration
@@ -57,10 +57,11 @@ const config: Config = {
       {
         docs: {
           sidebarPath: './sidebars.ts',
+          routeBasePath: '/', // Serve docs at /docs/ instead of /docs/docs/
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl:
-            'https://github.com/motifgames/gatrix/tree/main/docs/',
+            'https://github.com/your-org/gatrix/tree/main/docs/',
         },
         blog: {
           showReadingTime: true,
@@ -71,7 +72,7 @@ const config: Config = {
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl:
-            'https://github.com/motifgames/gatrix/tree/main/docs/',
+            'https://github.com/your-org/gatrix/tree/main/docs/',
           // Useful options to enforce blogging best practices
           onInlineTags: 'warn',
           onInlineAuthors: 'warn',
@@ -100,15 +101,16 @@ const config: Config = {
           position: 'left',
           label: 'Documentation',
         },
-        {to: '/blog', label: 'Blog', position: 'left'},
+        { to: '/blog', label: 'Blog', position: 'left' },
         {
           type: 'localeDropdown',
           position: 'right',
         },
         {
-          href: 'https://github.com/motifgames/gatrix',
-          label: 'GitHub',
+          href: 'https://github.com/your-org/gatrix',
           position: 'right',
+          className: 'header-github-link',
+          'aria-label': 'GitHub repository',
         },
       ],
     },
@@ -120,15 +122,15 @@ const config: Config = {
           items: [
             {
               label: 'Getting Started',
-              to: '/docs/intro',
+              to: '/intro',
             },
             {
               label: 'API Reference',
-              to: '/docs/api/client-api',
+              to: '/api/client-api',
             },
             {
               label: 'Cache System',
-              to: '/docs/backend/cache-keys',
+              to: '/backend/cache-keys',
             },
           ],
         },
@@ -137,11 +139,11 @@ const config: Config = {
           items: [
             {
               label: 'GitHub Issues',
-              href: 'https://github.com/motifgames/gatrix/issues',
+              href: 'https://github.com/your-org/gatrix/issues',
             },
             {
               label: 'GitHub Discussions',
-              href: 'https://github.com/motifgames/gatrix/discussions',
+              href: 'https://github.com/your-org/gatrix/discussions',
             },
           ],
         },
@@ -154,12 +156,12 @@ const config: Config = {
             },
             {
               label: 'GitHub',
-              href: 'https://github.com/motifgames/gatrix',
+              href: 'https://github.com/your-org/gatrix',
             },
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} Motif Games. Built with Docusaurus.`,
+      copyright: `Copyright © ${new Date().getFullYear()} Gatrix. Built with Docusaurus.`,
     },
     prism: {
       theme: prismThemes.github,

@@ -1,46 +1,87 @@
----
+﻿---
 sidebar_position: 1
 ---
 
-# Gatrix 시작하기
+# Introduction to Gatrix
 
-## 기능 설명
+**Gatrix** is a comprehensive management system for online game services.
 
-Gatrix는 온라인 게임 플랫폼을 위한 관리 시스템입니다.
+## 🎯 Core Features
 
-### 제공 기능
+### Feature Flags
+Control features in real-time without code deployment.
+- Gradual rollout by environment/segment
+- A/B testing support
+- Instant rollback
 
-**게임 운영:**
-- 공지사항 (Service Notices)
-- 인게임 팝업 (Popup Notices)
-- 쿠폰 (Coupons)
-- 배너 (Banners)
-- 설문조사 (Surveys)
-- 상점 상품 (Store Products)
-- 기획 데이터 (Planning Data)
+### Game Operations Tools
+- **Notices** - In-game and external notice management
+- **Popup Notices** - Targeted in-game popups
+- **Coupons** - Reward coupon creation and management
+- **Surveys** - User feedback collection
+- **Banners** - Promotional banner management
+- **Store Products** - In-app product management
+- **Planning Data** - Game balance and configuration data
 
-**시스템 관리:**
-- 클라이언트 버전 (Client Versions)
-- 게임 월드 (Game Worlds)
-- 점검 관리 (Maintenance)
-- 사용자 관리 (Users)
+### System Management
+- **Maintenance** - Scheduled/emergency maintenance
+- **Whitelist** - Test account/IP management
+- **Game Worlds** - Server status monitoring
+- **Client Versions** - App version management
 
-**API:**
-- Client API
-- Server SDK API
+### Integrations
+Support for Slack, Microsoft Teams, Webhook, New Relic, Lark, and more
 
-## 사용 방법
+### Monitoring
+- **Event Lens** - Event analytics and statistics
+- **Grafana Dashboard** - Real-time metrics monitoring
+- **Audit Logs** - Complete change history tracking
 
-[확인 필요] 설치 및 실행 방법은 별도 문서 참조
+## 🏗️ Architecture
 
-## 즉시 발생하는 변화
+Gatrix is a microservices architecture in a monorepo structure:
 
-해당 없음
+| Package | Description |
+|---------|-------------|
+| `@gatrix/backend` | Main API server |
+| `@gatrix/frontend` | Admin dashboard (React + MUI) |
+| `@gatrix/edge` | Edge server (cache/CDN) |
+| `@gatrix/chat-server` | Real-time chat server |
+| `@gatrix/event-lens` | Event analytics server |
+| `@gatrix/server-sdk` | Game server SDK |
+| `@gatrix/shared` | Shared types and utilities |
 
-## ⚠ 주의사항
+## 🚀 Quick Start
 
-해당 없음
+```bash
+# 1. Install dependencies
+yarn install
 
-## � 실제 사고 사례
+# 2. Start infrastructure (MySQL, Redis)
+yarn infra:up
 
-해당 없음
+# 3. Run migrations
+yarn migrate
+
+# 4. Start development server
+yarn dev
+```
+
+Access: http://localhost:43000
+
+## 🌐 Supported Languages
+
+- 🇰🇷 한국어
+- 🇺🇸 English
+- 🇨🇳 简体中文
+
+## 📚 Documentation Structure
+
+| Section | Description |
+|---------|-------------|
+| [Getting Started](./getting-started/quick-start) | Installation and initial setup |
+| [Feature Flags](./features/feature-flags) | Feature toggle usage |
+| [Game Operations](./guide/service-notices) | Operations tool guides |
+| [System Management](./admin/maintenance) | System management guide |
+| [Integrations](./integrations/overview) | Integration setup guide |
+| [API Reference](./api/client-api) | API documentation |

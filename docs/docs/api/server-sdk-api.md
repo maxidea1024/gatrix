@@ -1,359 +1,142 @@
+﻿---
+sidebar_position: 2
+sidebar_label: Server SDK API
 ---
-sidebar_position: 3
----
 
-# Server SDK API Documentation
+# Server SDK API
 
-Server-side API endpoints for backend services and server applications.
+SDK for game servers to integrate with Gatrix.
 
-## Features
+## Installation
 
-- **API Token Authentication**: Secure server-to-server communication
-- **High Performance**: Optimized for server-side usage
-- **Rate Limiting**: Appropriate limits for server applications
-
-## Authentication
-
-All Server SDK endpoints require API token authentication:
-
-```
-Headers:
-X-API-Token: your-server-api-token
-X-Application-Name: your-application-name
+```bash
+npm install @gatrix/server-sdk
+# or
+yarn add @gatrix/server-sdk
 ```
 
-## API Endpoints
+## Initialization
 
-### Environment-Specific Endpoints
+```typescript
+import { GatrixServerSDK } from '@gatrix/server-sdk';
 
-All environment-specific endpoints follow the pattern:
-
-```
-GET /api/v1/server/:env/resource
-```
-
-Where `:env` is the environment ID (e.g., `development`, `production`, `qa`).
-
-**Important:** Each endpoint returns data filtered by the specified environment. This ensures that:
-- Development data is only returned for development environment requests
-- Production data is only returned for production environment requests
-- No cross-environment data leakage occurs
-
-### 1. Game Worlds
-
-```
-GET /api/v1/server/:env/game-worlds
+const gatrix = new GatrixServerSDK({
+  apiKey: 'your-server-api-key',
+  environment: 'production',
+  // Optional
+  baseUrl: 'https://your-backend:45000',
+  cacheEnabled: true,
+  cacheTTL: 60000, // 1 minute
+});
 ```
 
-Get all visible game worlds for the specified environment.
+## Feature Flags
 
-#### Response
+### Get Boolean Value
 
-```json
-{
-  "success": true,
-  "data": {
-    "worlds": [
-      {
-        "id": 1,
-        "worldId": "world-1",
-        "name": "Main Server",
-        "worldServerAddress": "world1.example.com:7777",
-        "status": "active",
-        "hasMaintenanceScheduled": false,
-        "isMaintenanceActive": false
-      }
-    ]
-  }
+```typescript
+const isEnabled = await gatrix.featureFlags.getBoolValue('dark_mode', {
+  userId: 'user123',
+  country: 'KR'
+});
+```
+
+### Get String Value
+
+```typescript
+const message = await gatrix.featureFlags.getStringValue('welcome_message', context);
+```
+
+### Get Number Value
+
+```typescript
+const maxItems = await gatrix.featureFlags.getNumberValue('max_items', context);
+```
+
+### Get JSON Value
+
+```typescript
+const config = await gatrix.featureFlags.getJsonValue('feature_config', context);
+```
+
+### Get All Flags
+
+```typescript
+const allFlags = await gatrix.featureFlags.getAllFlags(context);
+```
+
+## Maintenance
+
+### Check Status
+
+```typescript
+const status = await gatrix.maintenance.getCurrentStatus();
+if (status.isActive) {
+  // Server is under maintenance
 }
 ```
 
-### 2. Popup Notices
+## Whitelist
 
-```
-GET /api/v1/server/:env/ingame-popup-notices
-```
+### Check Account
 
-Get active popup notices for the specified environment.
-
-### 3. Surveys
-
-```
-GET /api/v1/server/:env/surveys
+```typescript
+const isWhitelisted = await gatrix.whitelist.isAccountWhitelisted('user123');
 ```
 
-Get active surveys for the specified environment.
+### Check IP
 
-### 4. Service Discovery
-
-```
-GET /api/v1/server/:env/service-discovery
+```typescript
+const isIpWhitelisted = await gatrix.whitelist.isIpWhitelisted('192.168.1.1');
 ```
 
-Get service discovery data including whitelists for the specified environment.
+## Game Worlds
 
-#### Response
+### Register Instance
 
-```json
-{
-  "success": true,
-  "data": {
-    "ipWhitelist": [
-      { "ip": "192.168.1.0/24", "description": "Office network" }
-    ],
-    "accountWhitelist": [
-      { "accountId": "admin123", "description": "Admin account" }
-    ]
+```typescript
+await gatrix.gameWorlds.register({
+  worldId: 'world-1',
+  name: 'World 1',
+  region: 'KR',
+  capacity: 1000,
+  currentPlayers: 500,
+  status: 'online'
+});
+```
+
+### Update Status
+
+```typescript
+await gatrix.gameWorlds.updateStatus('world-1', {
+  currentPlayers: 600,
+  status: 'online'
+});
+```
+
+## Events
+
+### Send Event
+
+```typescript
+await gatrix.events.send({
+  name: 'player_login',
+  userId: 'user123',
+  properties: {
+    platform: 'android',
+    version: '1.2.0'
+  }
+});
+```
+
+## Error Handling
+
+```typescript
+try {
+  const value = await gatrix.featureFlags.getBoolValue('my_flag', context);
+} catch (error) {
+  if (error instanceof GatrixError) {
+    console.error('Gatrix error:', error.code, error.message);
   }
 }
 ```
-
-### 5. Authentication Test
-
-```
-GET /api/v1/server/test
-```
-
-Test server SDK authentication.
-
-#### Response
-
-```json
-{
-  "success": true,
-  "message": "SDK authentication successful",
-  "data": {
-    "tokenId": "token-id",
-    "tokenName": "token-name",
-    "tokenType": "server",
-    "timestamp": "2024-01-01T00:00:00.000Z"
-  }
-}
-```
-
-### 6. Get Server Templates
-
-```
-GET /api/v1/server/templates
-```
-
-Retrieve remote configuration templates for server-side usage.
-
-#### Response
-
-```json
-{
-  "success": true,
-  "data": {
-    "templates": [
-      {
-        "id": 1,
-        "key": "feature_flag",
-        "name": "Feature Flag",
-        "type": "boolean",
-        "defaultValue": false,
-        "description": "Enable/disable feature"
-      }
-    ],
-    "etag": "abc123",
-    "timestamp": "2024-01-01T00:00:00.000Z"
-  }
-}
-```
-
-### 3. Submit Metrics
-
-```
-POST /api/v1/server/metrics
-```
-
-Submit usage metrics from server applications.
-
-#### Request Body
-
-```json
-{
-  "metrics": [
-    {
-      "configKey": "feature_flag",
-      "value": true,
-      "timestamp": "2024-01-01T00:00:00.000Z",
-      "metadata": {
-        "server_id": "server-001",
-        "environment": "production"
-      }
-    }
-  ]
-}
-```
-
-#### Response
-
-```json
-{
-  "success": true,
-  "message": "Metrics submitted successfully",
-  "data": {
-    "processed": 1,
-    "timestamp": "2024-01-01T00:00:00.000Z"
-  }
-}
-```
-
-## Error Responses
-
-All endpoints return standardized error responses:
-
-```json
-{
-  "success": false,
-  "error": {
-    "message": "Error description",
-    "code": "ERROR_CODE"
-  }
-}
-```
-
-### Common Error Codes
-
-- `INVALID_API_TOKEN`: Invalid or missing API token
-- `INSUFFICIENT_PERMISSIONS`: Token doesn't have required permissions
-- `RATE_LIMIT_EXCEEDED`: Too many requests
-- `ENVIRONMENT_NOT_FOUND`: Environment not found
-- `VALIDATION_ERROR`: Request validation failed
-
-## Usage Examples
-
-### Node.js Example
-
-```javascript
-const axios = require('axios');
-
-const serverSDK = {
-  baseURL: 'https://api.example.com/api/v1/server',
-  apiKey: 'your-server-api-token',
-  appName: 'your-app-name',
-
-  async getTemplates() {
-    try {
-      const response = await axios.get(`${this.baseURL}/templates`, {
-        headers: {
-          'X-API-Key': this.apiKey,
-          'X-Application-Name': this.appName,
-          'Content-Type': 'application/json'
-        }
-      });
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching templates:', error.response?.data);
-      throw error;
-    }
-  },
-
-  async submitMetrics(metrics) {
-    try {
-      const response = await axios.post(`${this.baseURL}/metrics`, 
-        { metrics },
-        {
-          headers: {
-            'X-API-Key': this.apiKey,
-            'X-Application-Name': this.appName,
-            'Content-Type': 'application/json'
-          }
-        }
-      );
-      return response.data;
-    } catch (error) {
-      console.error('Error submitting metrics:', error.response?.data);
-      throw error;
-    }
-  }
-};
-
-// Usage
-async function main() {
-  try {
-    const templates = await serverSDK.getTemplates();
-    console.log('Templates:', templates);
-
-    await serverSDK.submitMetrics([
-      {
-        configKey: 'feature_flag',
-        value: true,
-        timestamp: new Date().toISOString(),
-        metadata: { server_id: 'server-001' }
-      }
-    ]);
-  } catch (error) {
-    console.error('SDK Error:', error);
-  }
-}
-```
-
-### Python Example
-
-```python
-import requests
-import json
-from datetime import datetime
-
-class ServerSDK:
-    def __init__(self, base_url, api_key, app_name):
-        self.base_url = base_url
-        self.headers = {
-            'X-API-Key': api_key,
-            'X-Application-Name': app_name,
-            'Content-Type': 'application/json'
-        }
-    
-    def get_templates(self):
-        response = requests.get(
-            f"{self.base_url}/templates",
-            headers=self.headers
-        )
-        response.raise_for_status()
-        return response.json()
-    
-    def submit_metrics(self, metrics):
-        response = requests.post(
-            f"{self.base_url}/metrics",
-            headers=self.headers,
-            json={'metrics': metrics}
-        )
-        response.raise_for_status()
-        return response.json()
-
-# Usage
-sdk = ServerSDK(
-    'https://api.example.com/api/v1/server',
-    'your-server-api-token',
-    'your-app-name'
-)
-
-try:
-    templates = sdk.get_templates()
-    print(f"Templates: {templates}")
-    
-    sdk.submit_metrics([{
-        'configKey': 'feature_flag',
-        'value': True,
-        'timestamp': datetime.utcnow().isoformat() + 'Z',
-        'metadata': {'server_id': 'server-001'}
-    }])
-except requests.RequestException as e:
-    print(f"SDK Error: {e}")
-```
-
-## Rate Limits
-
-- **Templates**: 1000 requests per minute
-- **Metrics**: 10000 requests per minute
-- **Test**: 100 requests per minute
-
-## Best Practices
-
-1. **Cache Templates**: Cache template responses using ETags
-2. **Batch Metrics**: Submit metrics in batches for better performance
-3. **Error Handling**: Implement proper retry logic with exponential backoff
-4. **Token Security**: Store API tokens securely and rotate regularly
-5. **Monitoring**: Monitor API usage and response times

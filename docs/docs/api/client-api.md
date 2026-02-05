@@ -1,336 +1,128 @@
----
+﻿---
 sidebar_position: 1
+sidebar_label: Client API
 ---
 
-# Client API Documentation
+# Client API
 
-Public API endpoints that can be called directly from game clients.
+API for game clients to access Gatrix features.
 
-## Features
-
-- **No Authentication Required**: Can be called directly from clients
-- **No Rate Limiting**: Handles high-volume requests
-- **High-Performance Caching**: Fast response with local memory caching
-- **Automatic Cache Invalidation**: Real-time cache updates via pub/sub when admin makes changes
-
-## API Endpoints
-
-### 1. Client Version Information
+## Base URL
 
 ```
-GET /api/v1/client/client-version
+https://your-edge-server:3400/api/v1
 ```
 
-Retrieves version information for game clients.
+## Authentication
 
-#### Query Parameters
+Include the API key in the request header:
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| channel | string | Channel filter (e.g., A1, PC) |
-| subChannel | string | Sub-channel filter (e.g., QQ, WeChat, iOS) |
+```
+X-API-Key: your-client-api-key
+```
 
-#### Response
+## Endpoints
 
+### Get Feature Flags
+
+```http
+GET /flags
+```
+
+Query parameters:
+- `context` - JSON-encoded context object
+
+Response:
 ```json
 {
-  "success": true,
-  "data": {
-    "versions": [
-      {
-        "id": 1,
-        "channel": "PC",
-        "subChannel": "Steam",
-        "clientVersion": "1.0.0",
-        "gameServerAddress": "https://game.example.com",
-        "gameServerAddressForWhiteList": "https://game-vip.example.com",
-        "patchAddress": "https://patch.example.com",
-        "patchAddressForWhiteList": "https://patch-vip.example.com",
-        "guestModeAllowed": true,
-        "externalClickLink": "https://website.example.com",
-        "customPayload": {
-          "feature1": true,
-          "setting1": "value1"
-        },
-        "createdAt": "2024-01-01T00:00:00.000Z",
-        "updatedAt": "2024-01-01T00:00:00.000Z"
-      }
-    ],
-    "total": 1,
-    "timestamp": "2024-01-01T00:00:00.000Z"
-  },
-  "cached": false
-}
-```
-
-#### Cache Information
-
-- **Cache Key**: `CLIENT_VERSION.BY_CHANNEL(channel, subChannel)`
-- **Cache TTL**: 5 minutes (`DEFAULT_CONFIG.CLIENT_VERSION_TTL`)
-- **Invalidation**: When client versions are created/updated/deleted
-
-### 2. Game World List
-
-```
-GET /api/v1/client/game-worlds
-```
-
-Retrieves available game world list.
-
-#### Response
-
-```json
-{
-  "success": true,
-  "data": {
-    "worlds": [
-      {
-        "id": 1,
-        "worldId": "world001",
-        "name": "Main World",
-        "description": "Default game world",
-        "displayOrder": 1,
-        "createdAt": "2024-01-01T00:00:00.000Z",
-        "updatedAt": "2024-01-01T00:00:00.000Z"
-      }
-    ],
-    "total": 1,
-    "timestamp": "2024-01-01T00:00:00.000Z"
-  },
-  "cached": false
-}
-```
-
-#### Filtering
-
-- **visible**: Only returns worlds with `visible: true`
-- **maintenance**: Only returns worlds with `maintenance: false` (not under maintenance)
-- **sorting**: Ordered by `displayOrder` ascending
-
-#### Cache Information
-
-- **Cache Key**: `GAME_WORLDS.PUBLIC`
-- **Cache TTL**: 10 minutes (`DEFAULT_CONFIG.GAME_WORLDS_PUBLIC_TTL`)
-- **Invalidation**: When game worlds are created/updated/deleted
-
-### 3. Cache Statistics
-
-```
-GET /api/v1/client/cache-stats
-```
-
-Retrieves cache performance statistics (for monitoring purposes).
-
-#### Response
-
-```json
-{
-  "success": true,
-  "data": {
-    "totalItems": 10,
-    "validItems": 8,
-    "expiredItems": 2,
-    "memoryUsage": {
-      "rss": 50331648,
-      "heapTotal": 20971520,
-      "heapUsed": 15728640,
-      "external": 1048576,
-      "arrayBuffers": 524288
-    }
+  "flags": {
+    "dark_mode": true,
+    "max_items": 50,
+    "welcome_message": "Hello!"
   }
 }
 ```
 
-## Cache System
+### Get Notices
 
-### Local Memory Caching
-
-- **CacheService**: In-memory cache management
-- **Automatic Expiration**: TTL-based automatic cleanup
-- **Pattern Matching**: Bulk deletion via regex patterns
-
-### BullMQ-based Queue System
-
-- **PubSubService**: Reliable cache invalidation queue via BullMQ
-- **QueueService**: General-purpose queue system for email, audit logs, cleanup tasks
-- **Real-time Synchronization**: Immediate cache invalidation across all instances when admin makes changes
-- **Retry Mechanism**: Automatic retry for failed jobs (exponential backoff)
-- **Fault Tolerance**: Local cache continues to work even if Redis connection fails
-
-### Cache Invalidation Scenarios
-
-1. **Client Version Changes**
-   - On create/update/delete/status change
-   - Pattern: `client_version:.*`
-   - Processed asynchronously via queue
-
-2. **Game World Changes**
-   - On create/update/delete
-   - Key: `game_worlds:public`
-   - Processed asynchronously via queue
-
-### Queue System Features
-
-- **High Priority**: Cache invalidation jobs processed with priority 10
-- **Automatic Cleanup**: Keeps 100 completed jobs, 50 failed jobs
-- **Concurrency Control**: Maximum 5 concurrent jobs per worker
-- **Monitoring**: Real-time queue status monitoring available
-
-## Performance Optimization
-
-### Response Times
-
-- **Cache Hit**: ~1ms
-- **Cache Miss**: ~50-100ms (database query)
-- **Cache Invalidation**: ~2-5ms (BullMQ queue addition)
-- **Queue Processing**: ~10-50ms (background processing)
-
-### Memory Usage
-
-- **Expected Usage**: ~1-5KB per item
-- **Automatic Cleanup**: Expired items cleaned every minute
-- **Queue Cleanup**: Automatic cleanup of completed/failed jobs
-- **Memory Monitoring**: Check via `/api/v1/client/cache-stats`
-
-## Usage Examples
-
-### JavaScript (Game Client)
-
-```javascript
-// Get client version information
-async function getClientVersion(channel, subChannel) {
-  const params = new URLSearchParams();
-  if (channel) params.append('channel', channel);
-  if (subChannel) params.append('subChannel', subChannel);
-  
-  const response = await fetch(`/api/v1/client/client-version?${params}`);
-  const data = await response.json();
-  
-  if (data.success) {
-    return data.data.versions;
-  }
-  throw new Error('Failed to get client version');
-}
-
-// Get game world list
-async function getGameWorlds() {
-  const response = await fetch('/api/v1/client/game-worlds');
-  const data = await response.json();
-  
-  if (data.success) {
-    return data.data.worlds;
-  }
-  throw new Error('Failed to get game worlds');
-}
+```http
+GET /notices
 ```
 
-### Unity C# (Game Client)
+Query parameters:
+- `category` - Filter by category (optional)
+- `limit` - Max results (default: 20)
 
-```csharp
-using UnityEngine;
-using UnityEngine.Networking;
-using System.Collections;
-
-public class ClientAPI : MonoBehaviour
+Response:
+```json
 {
-    private const string BASE_URL = "https://api.example.com/api/v1/client";
-
-    public IEnumerator GetClientVersion(string channel, string subChannel)
+  "notices": [
     {
-        string url = $"{BASE_URL}/client-version";
-        if (!string.IsNullOrEmpty(channel))
-            url += $"?channel={channel}";
-        if (!string.IsNullOrEmpty(subChannel))
-            url += $"&subChannel={subChannel}";
-
-        using (UnityWebRequest request = UnityWebRequest.Get(url))
-        {
-            yield return request.SendWebRequest();
-
-            if (request.result == UnityWebRequest.Result.Success)
-            {
-                string json = request.downloadHandler.text;
-                // JSON parsing and processing
-                Debug.Log($"Client version data: {json}");
-            }
-        }
+      "id": "1",
+      "title": "Maintenance Notice",
+      "content": "...",
+      "category": "maintenance",
+      "startDate": "2024-01-15T00:00:00Z",
+      "endDate": "2024-01-15T06:00:00Z"
     }
-
-    // Client SDK API with authentication
-    public IEnumerator GetSDKTemplates(string apiKey)
-    {
-        string url = $"{BASE_URL}/templates";
-
-        using (UnityWebRequest request = UnityWebRequest.Get(url))
-        {
-            request.SetRequestHeader("X-API-Key", apiKey);
-            request.SetRequestHeader("X-Application-Name", "your-app-name");
-
-            yield return request.SendWebRequest();
-
-            if (request.result == UnityWebRequest.Result.Success)
-            {
-                string json = request.downloadHandler.text;
-                Debug.Log($"SDK templates: {json}");
-            }
-        }
-    }
+  ]
 }
 ```
 
-## Monitoring
+### Redeem Coupon
 
-### Log Checking
-
-```bash
-# Check cache-related logs
-tail -f logs/app.log | grep -i cache
-
-# Check PubSub-related logs
-tail -f logs/app.log | grep -i pubsub
+```http
+POST /coupons/redeem
 ```
 
-### Cache and Queue Statistics Monitoring
-
-```bash
-# Call cache and queue statistics API
-curl http://localhost:3000/api/v1/client/cache-stats
+Request:
+```json
+{
+  "code": "SUMMER2024",
+  "userId": "user123"
+}
 ```
 
-**Response Example:**
+Response:
 ```json
 {
   "success": true,
-  "data": {
-    "cache": {
-      "totalItems": 10,
-      "validItems": 8,
-      "expiredItems": 2,
-      "memoryUsage": { ... }
-    },
-    "queue": {
-      "waiting": 0,
-      "active": 1,
-      "completed": 150,
-      "failed": 2,
-      "total": 153
-    },
-    "pubsub": {
-      "connected": true,
-      "timestamp": "2024-01-01T00:00:00.000Z"
-    }
-  }
+  "rewards": [
+    { "type": "item", "id": "item_001", "quantity": 1 }
+  ]
 }
 ```
 
-### BullMQ Dashboard (Optional)
+### Check Version
 
-Queue monitoring via BullMQ UI:
+```http
+GET /client-version
+```
 
-```bash
-# Install BullMQ UI (development environment)
-npm install -g @bull-board/ui
+Query parameters:
+- `platform` - ios, android, windows, mac
+- `version` - Current client version
 
-# Run dashboard
-bull-board
+Response:
+```json
+{
+  "needsUpdate": true,
+  "forceUpdate": false,
+  "latestVersion": "1.3.0",
+  "updateUrl": "https://..."
+}
+```
+
+### Get Status
+
+```http
+GET /status
+```
+
+Response:
+```json
+{
+  "maintenance": false,
+  "message": null
+}
 ```

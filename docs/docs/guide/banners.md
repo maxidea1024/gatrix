@@ -1,48 +1,53 @@
----
+﻿---
 sidebar_position: 6
+sidebar_label: Banners
 ---
 
-# 배너 관리
+# Banners
 
-## 기능 설명
+## Overview
 
-시퀀스와 프레임으로 인게임 배너를 생성하고 관리합니다.
+Manage promotional banners displayed in the game.
 
-**접근 경로:** 게임 관리 → 배너 관리
+**Navigation:** Game Operations → Banners
 
-## 사용 방법
+## Features
 
-### 목록 화면
+- Create image banners
+- Set display positions
+- Schedule display periods
+- Configure click actions
+- Track impressions and clicks
 
-![배너 관리 목록](./img/banner-list.png)
+## Creating a Banner
 
-**페이지 헤더:**
-- 제목: 배너 관리
-- 설명: 시퀀스와 프레임으로 인게임 배너를 생성하고 관리합니다
+1. Navigate to **Game Operations** > **Banners**
+2. Click **Add Banner** button
+3. Configure the banner:
 
-**버튼:**
-- 배너 추가
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| Name | Text | Required | Banner name |
+| Image | Image Upload | Required | Banner image |
+| Position | Select | Required | Display position |
+| Action Type | Select | - | What happens on click |
+| Action URL | Text | - | URL or deep link |
+| Start Date | DateTime | - | Start showing |
+| End Date | DateTime | - | Stop showing |
+| Priority | Number | - | Display order |
 
-**테이블 컬럼:**
-| 컬럼명 |
-|--------|
-| 이름 |
-| 설명 |
-| 크기 |
-| 시퀀스 |
-| 상태 |
-| 버전 |
-| 생성일 |
-| 작업 |
+4. Click **Create** to save
 
-## 즉시 발생하는 변화
+## Banner Positions
 
-[확인 필요]
+- **Main** - Main screen banner
+- **Event** - Event page banner
+- **Store** - Store page banner
+- **Login** - Login screen banner
 
-## ⚠ 주의사항
+## Action Types
 
-[확인 필요]
-
-## 🚨 실제 사고 사례
-
-해당 없음
+- **None** - No action
+- **URL** - Open external URL
+- **Deep Link** - Navigate in-game
+- **Notice** - Show a notice

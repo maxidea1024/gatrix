@@ -5,7 +5,26 @@ const sidebars: SidebarsConfig = {
     'intro',
     {
       type: 'category',
-      label: '게임 관리',
+      label: 'Getting Started',
+      collapsed: false,
+      items: [
+        'getting-started/quick-start',
+        'getting-started/installation',
+        'getting-started/configuration',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Feature Flags',
+      items: [
+        'features/feature-flags',
+        'features/segments',
+        'features/environments',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Game Operations',
       items: [
         'guide/service-notices',
         'guide/popup-notices',
@@ -18,7 +37,29 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: 'category',
-      label: 'API 레퍼런스',
+      label: 'System Management',
+      items: [
+        'admin/maintenance',
+        'admin/whitelist',
+        'admin/game-worlds',
+        'admin/client-versions',
+        'admin/users',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Integrations',
+      items: [
+        'integrations/overview',
+        'integrations/slack',
+        'integrations/teams',
+        'integrations/webhook',
+        'integrations/new-relic',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'API Reference',
       items: [
         'api/client-api',
         'api/server-sdk-api',
@@ -26,7 +67,7 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: 'category',
-      label: '배포 가이드',
+      label: 'Deployment',
       items: [
         'deployment/docker',
         'deployment/edge-server',
