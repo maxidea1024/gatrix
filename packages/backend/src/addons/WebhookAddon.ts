@@ -5,7 +5,7 @@
  * Supports Mustache templates for custom payloads.
  */
 
-import Addon from './Addon';
+import Addon, { HttpError } from './Addon';
 import { webhookDefinition } from './definitions';
 import { IntegrationSystemEvent } from '../types/integrationEvents';
 import { formatWebhookPayload } from './EventFormatter';
@@ -79,8 +79,14 @@ export class WebhookAddon extends Addon {
       const errorMessage = error instanceof Error ? error.message : String(error);
       this.logger.error(`Failed to send webhook for integration ${integrationId}:`, error);
 
+      let statusCode: number | undefined;
+      if (error instanceof HttpError) {
+        statusCode = error.statusCode;
+      }
+
       await this.registerEvent(integrationId, event, 'failed', errorMessage, {
         url: this.maskUrl(url),
+        statusCode,
       });
     }
   }

@@ -13,6 +13,16 @@ import type { AddonDefinition } from './definitions';
 
 type Logger = WinstonLogger;
 
+export class HttpError extends Error {
+  statusCode: number;
+
+  constructor(statusCode: number, message: string) {
+    super(message);
+    this.name = 'HttpError';
+    this.statusCode = statusCode;
+  }
+}
+
 const MAX_RETRIES = 3;
 const RETRY_DELAY_MS = 1000;
 
@@ -62,6 +72,7 @@ export abstract class Addon {
     retries: number = MAX_RETRIES
   ): Promise<Response> {
     let lastError: Error | null = null;
+    let lastStatusCode: number | undefined;
 
     for (let attempt = 0; attempt <= retries; attempt++) {
       try {
@@ -79,14 +90,18 @@ export abstract class Addon {
 
         // Non-retryable status codes
         if (response.status >= 400 && response.status < 500 && response.status !== 429) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+          throw new HttpError(response.status, `HTTP ${response.status}: ${response.statusText}`);
         }
 
         // Retryable error
-        lastError = new Error(`HTTP ${response.status}: ${response.statusText}`);
+        lastError = new HttpError(response.status, `HTTP ${response.status}: ${response.statusText}`);
+        lastStatusCode = response.status;
         this.logger.warn(`Attempt ${attempt + 1}/${retries + 1} failed: ${lastError.message}`);
       } catch (error) {
         lastError = error instanceof Error ? error : new Error(String(error));
+        if (error instanceof HttpError) {
+          lastStatusCode = error.statusCode;
+        }
         this.logger.warn(`Attempt ${attempt + 1}/${retries + 1} failed: ${lastError.message}`);
       }
 
