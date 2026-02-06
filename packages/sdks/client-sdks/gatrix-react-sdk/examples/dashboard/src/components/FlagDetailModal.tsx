@@ -37,7 +37,7 @@ function FlagDetailModal({ flag, onClose }: FlagDetailModalProps) {
                 style={{
                     maxWidth: '700px',
                     width: '90%',
-                    maxHeight: '85vh',
+                    maxHeight: '70vh',
                     padding: '0 !important',
                     overflow: 'hidden',
                     backgroundColor: '#fff',
@@ -47,7 +47,7 @@ function FlagDetailModal({ flag, onClose }: FlagDetailModalProps) {
                     flexDirection: 'column'
                 }}
             >
-                <div className="flag-header" style={{ margin: '0', padding: '12px 16px' }}>
+                <div className="flag-header" style={{ margin: '0', padding: '8px 16px' }}>
                     <span className="flag-name" style={{ fontSize: '12px' }}>
                         <span className="status-dot" style={{ width: '10px', height: '10px' }}></span> {flag.name}
                     </span>
@@ -56,14 +56,14 @@ function FlagDetailModal({ flag, onClose }: FlagDetailModalProps) {
                     </span>
                 </div>
 
-                <div className="modal-scroll-area" style={{ padding: '16px', margin: '0', flex: 1, overflowY: 'auto' }}>
+                <div className="modal-scroll-area" style={{ padding: '12px', margin: '0', flex: 1, overflowY: 'auto' }}>
                     <div className="flag-details">
                         <div className="detail-grid" style={{
                             display: 'grid',
                             gridTemplateColumns: '1fr 1fr 1fr',
                             gap: '12px',
                             borderBottom: '4px solid #eee',
-                            paddingBottom: '16px'
+                            paddingBottom: '12px'
                         }}>
                             <div className="flag-detail" style={{ margin: '0', border: 'none', flexDirection: 'column', alignItems: 'flex-start', gap: '4px' }}>
                                 <span className="flag-detail-label">Version</span>
@@ -85,14 +85,14 @@ function FlagDetailModal({ flag, onClose }: FlagDetailModalProps) {
                             </div>
                         </div>
 
-                        <div className="flag-payload" style={{ marginTop: '16px' }}>
-                            <div className="flag-payload-label" style={{ marginBottom: '8px' }}>Payload Detail</div>
+                        <div className="flag-payload" style={{ marginTop: '12px' }}>
+                            <div className="flag-payload-label" style={{ marginBottom: '6px' }}>Payload Detail</div>
                             {hasPayload ? (
                                 <>
                                     <pre
                                         className={`flag-payload-value ${isEmptyString ? 'empty-string' : 'has-payload'}`}
                                         style={{
-                                            maxHeight: '300px',
+                                            maxHeight: '200px',
                                             overflow: 'auto',
                                             whiteSpace: 'pre-wrap',
                                             fontSize: '9px',
@@ -125,7 +125,7 @@ function FlagDetailModal({ flag, onClose }: FlagDetailModalProps) {
                 </div>
 
                 <div className="modal-footer" style={{
-                    padding: '12px 16px',
+                    padding: '8px 16px',
                     borderTop: '4px solid #eee',
                     display: 'flex',
                     justifyContent: 'flex-end',
