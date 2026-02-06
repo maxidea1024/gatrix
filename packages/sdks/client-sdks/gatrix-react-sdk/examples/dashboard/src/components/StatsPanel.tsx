@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import type { GatrixClientConfig } from '@gatrix/react-sdk';
+import { useGatrixClient, type GatrixClientConfig } from '@gatrix/react-sdk';
 
 interface Stats {
     sdkState: string;
@@ -13,6 +13,9 @@ interface Stats {
     startTime: Date | null;
     lastFetchTime: Date | null;
     lastError: Error | null;
+    connectionId?: string;
+    metricsSentCount?: number;
+    metricsErrorCount?: number;
 }
 
 interface StatsPanelProps {
@@ -85,6 +88,8 @@ function StatsPanel({
     const [rumbleTotal, setRumbleTotal] = useState(false);
     const [rumbleEnabled, setRumbleEnabled] = useState(false);
     const [rumbleDisabled, setRumbleDisabled] = useState(false);
+    const [isScanning, setIsScanning] = useState(false);
+    const client = useGatrixClient();
 
     // Detect count changes and trigger rumble
     useEffect(() => {
@@ -110,6 +115,18 @@ function StatsPanel({
         }
         prevDisabledRef.current = disabledCount;
     }, [disabledCount]);
+
+    useEffect(() => {
+        const handleFetch = () => {
+            setIsScanning(true);
+            setTimeout(() => setIsScanning(false), 800);
+        };
+
+        client.on('flags.fetch', handleFetch);
+        return () => {
+            client.off('flags.fetch', handleFetch);
+        };
+    }, [client]);
 
     const formatTime = (date: Date | null): string => {
         if (!date) return '--:--:--';
@@ -180,7 +197,7 @@ function StatsPanel({
 
         return (
             <div className="mascot-outer-container" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <div className="mascot-container">
+                <div className={`mascot-container ${isScanning ? 'mascot-scanning' : ''}`}>
                     {mascotIcon}
                 </div>
                 {(state === 'error' || errorMessage) && formattedError && (
@@ -290,6 +307,14 @@ function StatsPanel({
                                         <td className="stats-value">{stats?.recoveryCount || 0}</td>
                                         <td className="stats-label">ETAG:</td>
                                         <td className="stats-value">{formatEtag(stats?.etag || null)}</td>
+                                    </tr>
+                                    <tr>
+                                        <td className="stats-label">METRIC:</td>
+                                        <td className="stats-value">{stats?.metricsSentCount || 0}</td>
+                                        <td className="stats-label">M-ERR:</td>
+                                        <td className="stats-value">{stats?.metricsErrorCount || 0}</td>
+                                        <td className="stats-label">IMP:</td>
+                                        <td className="stats-value">{stats?.impressionCount || 0}</td>
                                     </tr>
                                 </tbody>
                             </table>
