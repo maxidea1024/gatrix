@@ -58,6 +58,11 @@ export const API_HEADERS = {
   X_ENVIRONMENT_ID: 'x-environment-id',
 
   /**
+   * 환경 이름 헤더 (SDK용)
+   */
+  X_ENVIRONMENT: 'x-environment',
+
+  /**
    * 사용자 ID 헤더 (Chat Server용)
    */
   X_USER_ID: 'x-user-id',
@@ -71,6 +76,16 @@ export const API_HEADERS = {
    * 요청 ID 헤더
    */
   X_REQUEST_ID: 'x-request-id',
+
+  /**
+   * 클라이언트 연결 ID 헤더 (SDK용)
+   */
+  X_CONNECTION_ID: 'x-connection-id',
+
+  /**
+   * 세션 ID 헤더 (SDK용)
+   */
+  X_SESSION_ID: 'x-session-id',
 } as const;
 
 /**
@@ -195,6 +210,9 @@ export const ALLOWED_HEADERS: string[] = [
   HEADERS.X_APPLICATION_NAME,
   HEADERS.X_REQUEST_ID,
   HEADERS.X_ENVIRONMENT_ID,
+  HEADERS.X_ENVIRONMENT,
+  HEADERS.X_CONNECTION_ID,
+  HEADERS.X_SESSION_ID,
 ];
 
 export default HEADERS;
