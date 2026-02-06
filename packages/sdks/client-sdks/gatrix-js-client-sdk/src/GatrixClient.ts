@@ -18,6 +18,7 @@ export class GatrixClient {
   private config: GatrixClientConfig;
   private featuresClient: FeaturesClient;
   private initialized = false;
+  private startPromise: Promise<void> | null = null;
 
   /**
    * Feature flags client
@@ -54,14 +55,25 @@ export class GatrixClient {
    * Initializes all services and begins polling for updates
    */
   async start(): Promise<void> {
-    if (this.initialized) {
-      console.warn('GatrixClient already started');
-      return;
+    if (this.startPromise) {
+      return this.startPromise;
     }
 
-    await this.featuresClient.init();
-    await this.featuresClient.start();
-    this.initialized = true;
+    if (this.initialized) {
+      return Promise.resolve();
+    }
+
+    this.startPromise = (async () => {
+      try {
+        await this.featuresClient.init();
+        await this.featuresClient.start();
+        this.initialized = true;
+      } finally {
+        this.startPromise = null;
+      }
+    })();
+
+    return this.startPromise;
   }
 
   /**
@@ -71,6 +83,7 @@ export class GatrixClient {
   stop(): void {
     this.featuresClient.stop();
     this.initialized = false;
+    this.startPromise = null;
   }
 
   /**

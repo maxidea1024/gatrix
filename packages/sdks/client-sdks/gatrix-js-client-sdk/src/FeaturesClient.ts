@@ -183,7 +183,6 @@ export class FeaturesClient {
    */
   async start(): Promise<void> {
     if (this.started) {
-      this.logger.warn('FeaturesClient already started');
       return;
     }
     this.started = true;
