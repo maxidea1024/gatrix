@@ -71,10 +71,7 @@ class RequestStats {
   constructor() {
     this.startTime = new Date();
     // Default: 100 logs per second, 0 = disabled
-    this.logRateLimit = parseInt(
-      process.env.REQUEST_LOG_RATE_LIMIT || "100",
-      10,
-    );
+    this.logRateLimit = parseInt(process.env.REQUEST_LOG_RATE_LIMIT || '100', 10);
     this.logTokens = this.logRateLimit;
     this.lastTokenRefill = Date.now();
   }
@@ -89,7 +86,7 @@ class RequestStats {
     statusCode: number,
     durationMs: number,
     bytesSent: number,
-    bytesReceived: number,
+    bytesReceived: number
   ): boolean {
     this.totalRequests++;
 
@@ -169,10 +166,7 @@ class RequestStats {
       this.lastTokenRefill = now;
     } else {
       const tokensToAdd = (elapsed / 1000) * this.logRateLimit;
-      this.logTokens = Math.min(
-        this.logRateLimit,
-        this.logTokens + tokensToAdd,
-      );
+      this.logTokens = Math.min(this.logRateLimit, this.logTokens + tokensToAdd);
       this.lastTokenRefill = now;
     }
 
@@ -198,9 +192,7 @@ class RequestStats {
    */
   getSnapshot(): RequestStatsSnapshot {
     const now = new Date();
-    const uptimeSeconds = Math.floor(
-      (now.getTime() - this.startTime.getTime()) / 1000,
-    );
+    const uptimeSeconds = Math.floor((now.getTime() - this.startTime.getTime()) / 1000);
 
     // Status codes as object
     const statusCodesObj: Record<string, number> = {};
@@ -209,10 +201,7 @@ class RequestStats {
     }
 
     // Endpoint stats
-    const endpointsObj: Record<
-      string,
-      RequestStatsSnapshot["endpoints"][string]
-    > = {};
+    const endpointsObj: Record<string, RequestStatsSnapshot['endpoints'][string]> = {};
     for (const [key, stats] of this.endpoints) {
       const sorted = [...stats.durations].sort((a, b) => a - b);
       // Convert endpoint status codes Map to object
@@ -222,10 +211,8 @@ class RequestStats {
       }
       endpointsObj[key] = {
         count: stats.count,
-        avgDurationMs:
-          stats.count > 0 ? Math.round(stats.totalDurationMs / stats.count) : 0,
-        minDurationMs:
-          stats.minDurationMs === Infinity ? 0 : stats.minDurationMs,
+        avgDurationMs: stats.count > 0 ? Math.round(stats.totalDurationMs / stats.count) : 0,
+        minDurationMs: stats.minDurationMs === Infinity ? 0 : stats.minDurationMs,
         maxDurationMs: stats.maxDurationMs,
         p95DurationMs: this.percentile(sorted, 95),
         p99DurationMs: this.percentile(sorted, 99),
@@ -238,12 +225,9 @@ class RequestStats {
     // Calculate global average
     const totalDuration = Array.from(this.endpoints.values()).reduce(
       (sum, e) => sum + e.totalDurationMs,
-      0,
+      0
     );
-    const avgDuration =
-      this.totalRequests > 0
-        ? Math.round(totalDuration / this.totalRequests)
-        : 0;
+    const avgDuration = this.totalRequests > 0 ? Math.round(totalDuration / this.totalRequests) : 0;
 
     return {
       startTime: this.startTime.toISOString(),
