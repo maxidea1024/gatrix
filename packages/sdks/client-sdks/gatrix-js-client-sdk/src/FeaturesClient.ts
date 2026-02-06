@@ -145,6 +145,13 @@ export class FeaturesClient {
   }
 
   /**
+   * Get client connection ID
+   */
+  public getConnectionId(): string {
+    return this.connectionId;
+  }
+
+  /**
    * Initialize the features client
    */
   async init(): Promise<void> {

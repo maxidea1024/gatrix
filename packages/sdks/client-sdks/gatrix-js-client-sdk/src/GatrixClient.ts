@@ -46,8 +46,6 @@ export class GatrixClient {
     this.config = config;
     this.emitter = new EventEmitter();
     this.featuresClient = new FeaturesClient(this.emitter, config);
-
-    console.log(`GatrixClient v${SDK_VERSION} created for ${config.appName}`);
   }
 
   /**
@@ -62,6 +60,9 @@ export class GatrixClient {
     if (this.initialized) {
       return Promise.resolve();
     }
+
+    const connId = this.featuresClient.getConnectionId();
+    console.log(`[GatrixClient][${connId}] Starting SDK for ${this.config.appName} (v${SDK_VERSION})`);
 
     this.startPromise = (async () => {
       try {
