@@ -111,7 +111,7 @@ function ConfigForm({ onConnect }: ConfigFormProps) {
     <div className="login-container">
       <div className="login-box">
         <div className="nes-container is-dark with-title">
-          <p className="title" style={{ backgroundColor: '#212529' }}>
+          <p className="title" style={{ backgroundColor: '#000' }}>
             <i className="nes-icon coin is-small"></i> CONNECT TO GATRIX
           </p>
 
@@ -202,10 +202,6 @@ function ConfigForm({ onConnect }: ConfigFormProps) {
             </button>
           </form>
         </div>
-      </div>
-
-      <div className="mascot" style={{ marginTop: '16px', textAlign: 'center' }}>
-        <i className="nes-octocat animate"></i>
       </div>
     </div>
   );

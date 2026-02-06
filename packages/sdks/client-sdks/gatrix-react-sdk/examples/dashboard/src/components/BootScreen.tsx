@@ -77,7 +77,7 @@ function BootScreen({ onComplete }: BootScreenProps) {
       </div>
 
       <div className="boot-text dim" style={{ marginTop: '24px' }}>
-        PRESS START TO CONTINUE
+        NOW LOADING...
       </div>
     </div>
   );
