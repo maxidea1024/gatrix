@@ -6,11 +6,13 @@
  *
  * Usage:
  *   yarn example:dashboard
- *   # or
  *   npx ts-node examples/dashboard.ts
+ *   npx ts-node examples/dashboard.ts --url <url> --token <token>
+ *   npx ts-node examples/dashboard.ts --config ./config.json
  */
 
 import { GatrixClient, EVENTS, InMemoryStorageProvider } from '../src';
+import { parseConfig } from './config';
 
 // ANSI escape codes for terminal control
 const CLEAR_SCREEN = '\x1b[2J';
@@ -26,11 +28,13 @@ const CYAN = '\x1b[36m';
 const DIM = '\x1b[2m';
 
 async function main() {
+  const config = parseConfig();
+
   const client = new GatrixClient({
-    apiUrl: process.env.GATRIX_URL || 'http://localhost:45000/api/v1',
-    apiToken: process.env.GATRIX_API_TOKEN || 'gatrix-unsecured-client-api-token',
-    appName: process.env.GATRIX_APP || 'test-app',
-    environment: process.env.GATRIX_ENV || 'development',
+    apiUrl: config.apiUrl,
+    apiToken: config.apiToken,
+    appName: config.appName,
+    environment: config.environment,
     storageProvider: new InMemoryStorageProvider(),
     features: {
       refreshInterval: 1,
@@ -119,6 +123,21 @@ async function main() {
     return `${seconds}s`;
   }
 
+  function formatTimeAgo(date: Date): string {
+    const diffMs = Date.now() - date.getTime();
+    const diffSec = Math.floor(diffMs / 1000);
+    const diffMin = Math.floor(diffSec / 60);
+    const diffHour = Math.floor(diffMin / 60);
+    if (diffHour > 0) {
+      return `${diffHour}h ago`;
+    } else if (diffMin > 0) {
+      return `${diffMin}m ago`;
+    } else if (diffSec > 5) {
+      return `${diffSec}s ago`;
+    }
+    return 'just now';
+  }
+
   function render() {
     const flags = client.features.getAllFlags();
     const stats = client.features.getStats();
@@ -129,6 +148,46 @@ async function main() {
     // Header
     output += `\n  ${BOLD}${CYAN}Gatrix Feature Flags Dashboard${RESET}\n\n`;
 
+    // API info
+    output += `  ${'API:'.padEnd(12)} ${DIM}${config.apiUrl}${RESET}\n`;
+    output += `  ${'App/Env:'.padEnd(12)} ${DIM}${config.appName} / ${config.environment}${RESET}\n`;
+
+    // Helper to format error details
+    const formatError = (err: any): string => {
+      if (!err) return '';
+      if (err.code === 'ECONNREFUSED') return 'Connection refused';
+      if (err.code === 'ETIMEDOUT') return 'Connection timeout';
+      if (err.code === 'ENOTFOUND') return 'Host not found';
+      if (typeof err.code === 'number') return `HTTP ${err.code}`;
+      if (err.message) return err.message.substring(0, 30);
+      if (err.type) return err.type;
+      return 'Unknown error';
+    };
+
+    // Check if still initializing (no flags fetched yet)
+    const isInitializing = stats.totalFlagCount === 0 && stats.sdkState !== 'healthy' && stats.sdkState !== 'ready';
+
+    if (isInitializing) {
+      // Simplified initializing view
+      output += `\n  ${YELLOW}●${RESET} ${'Status:'.padEnd(12)} ${YELLOW}Initializing...${RESET}\n`;
+      output += `  ${'Uptime:'.padEnd(12)} ${uptime}\n`;
+      output += `  ${'Attempts:'.padEnd(12)} ${stats.fetchFlagsCount}\n`;
+
+      if (stats.lastError) {
+        const errDetail = formatError(stats.lastError);
+        output += `\n  ${RED}Error:${RESET} ${errDetail}\n`;
+        if (stats.lastErrorTime) {
+          output += `  ${DIM}Last attempt: ${stats.lastErrorTime.toLocaleTimeString()}${RESET}\n`;
+        }
+      }
+
+      output += `\n  ${DIM}Waiting for server connection...${RESET}\n`;
+      output += `\n  ${DIM}Press Ctrl+C to exit${RESET}\n`;
+
+      process.stdout.write(output);
+      return;
+    }
+
     // Status line
     const stateIcon =
       stats.sdkState === 'healthy' || stats.sdkState === 'ready'
@@ -137,8 +196,13 @@ async function main() {
           ? `${RED}●${RESET}`
           : `${YELLOW}●${RESET}`;
 
-    // Stats with aligned labels
-    output += `  ${'Status:'.padEnd(12)} ${stateIcon} ${stats.sdkState}\n`;
+    // Stats with aligned labels - show error details if in error state
+    let statusLine = `${stateIcon} ${stats.sdkState}`;
+    if (stats.sdkState === 'error' && stats.lastError) {
+      const errDetail = formatError(stats.lastError);
+      statusLine += ` ${DIM}(${errDetail})${RESET}`;
+    }
+    output += `  ${'Status:'.padEnd(12)} ${statusLine}\n`;
     output += `  ${'Uptime:'.padEnd(12)} ${uptime}\n`;
 
     // Flag counts
@@ -213,16 +277,9 @@ async function main() {
 
       const type = flag.variantType || 'none';
 
-      // Last changed time
+      // Last changed time (relative)
       const lastChangedTime = stats.flagLastChangedTimes[flag.name];
-      const lastChg = lastChangedTime
-        ? lastChangedTime.toLocaleTimeString('en-US', {
-          hour12: false,
-          hour: '2-digit',
-          minute: '2-digit',
-          second: '2-digit',
-        })
-        : '-';
+      const lastChg = lastChangedTime ? formatTimeAgo(lastChangedTime) : '-';
 
       // Payload
       let payload = '-';
@@ -235,7 +292,7 @@ async function main() {
           typeof flag.variant.payload === 'object'
             ? JSON.stringify(flag.variant.payload)
             : String(flag.variant.payload);
-        payload = payloadStr.length > 20 ? payloadStr.substring(0, 17) + '...' : payloadStr;
+        payload = payloadStr.length > 40 ? payloadStr.substring(0, 37) + '...' : payloadStr;
       }
 
       tableRows.push([icon, name, ver, chg, variant, type, lastChg, payload]);
@@ -245,14 +302,7 @@ async function main() {
     for (const [flagName] of initialVersions) {
       if (!currentFlagNames.has(flagName)) {
         const delLastChg = stats.flagLastChangedTimes[flagName];
-        const lastChg = delLastChg
-          ? delLastChg.toLocaleTimeString('en-US', {
-            hour12: false,
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-          })
-          : '-';
+        const lastChg = delLastChg ? formatTimeAgo(delLastChg) : '-';
         tableRows.push([
           { text: '✗', display: `${RED}✗${RESET}` },
           flagName,

@@ -6,20 +6,26 @@
  *
  * Usage:
  *   yarn example:watch
- *   # or
  *   npx ts-node examples/watch-test.ts
+ *   npx ts-node examples/watch-test.ts --url <url> --token <token>
+ *   npx ts-node examples/watch-test.ts --config ./config.json
  */
 
 import { GatrixClient, EVENTS, InMemoryStorageProvider, FlagProxy } from '../src';
+import { parseConfig, printConfig } from './config';
 
 async function main() {
   console.log('=== Gatrix JS Client SDK - Real-time Watch Test ===\n');
 
+  const config = parseConfig();
+  printConfig(config);
+  console.log();
+
   const client = new GatrixClient({
-    apiUrl: process.env.GATRIX_URL || 'http://localhost:45000/api/v1',
-    apiToken: process.env.GATRIX_API_TOKEN || 'gatrix-unsecured-client-api-token',
-    appName: process.env.GATRIX_APP || 'test-app',
-    environment: process.env.GATRIX_ENV || 'development',
+    apiUrl: config.apiUrl,
+    apiToken: config.apiToken,
+    appName: config.appName,
+    environment: config.environment,
     storageProvider: new InMemoryStorageProvider(),
     features: {
       refreshInterval: 1,
@@ -100,7 +106,7 @@ async function main() {
     console.log('');
 
     // Keep the process running
-    await new Promise(() => {}); // Never resolves
+    await new Promise(() => { }); // Never resolves
   } catch (error: any) {
     console.error('Error:', error.message);
     await client.stop();

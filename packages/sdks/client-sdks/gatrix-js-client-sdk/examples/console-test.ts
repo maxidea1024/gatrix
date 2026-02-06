@@ -3,34 +3,29 @@
  *
  * Usage:
  *   npx ts-node examples/console-test.ts
- *
- * Or with custom URL and API key:
- *   GATRIX_URL=http://localhost:4001/api/features GATRIX_API_KEY=your-key npx ts-node examples/console-test.ts
+ *   npx ts-node examples/console-test.ts --url <url> --token <token>
+ *   npx ts-node examples/console-test.ts --config ./config.json
  */
 
 import { GatrixClient, EVENTS, InMemoryStorageProvider } from '../src';
-
-// Configuration - override with environment variables
-const config = {
-  url: process.env.GATRIX_URL || 'http://localhost:4001/api/features',
-  apiKey: process.env.GATRIX_API_KEY || 'test-client-key',
-  appName: process.env.GATRIX_APP || 'console-test',
-};
+import { parseConfig, printConfig } from './config';
 
 async function main() {
   console.log('='.repeat(60));
   console.log('Gatrix JS Client SDK - Console Test');
   console.log('='.repeat(60));
   console.log();
-  console.log('Configuration:');
-  console.log(`  URL:     ${config.url}`);
-  console.log(`  API Key: ${config.apiKey.substring(0, 10)}...`);
-  console.log(`  App:     ${config.appName}`);
+
+  const config = parseConfig();
+  printConfig(config);
   console.log();
 
   // Initialize client
   const client = new GatrixClient({
-    ...config,
+    apiUrl: config.apiUrl,
+    apiToken: config.apiToken,
+    appName: config.appName,
+    environment: config.environment,
     storageProvider: new InMemoryStorageProvider(),
     context: {
       userId: 'test-user-123',
@@ -69,7 +64,7 @@ async function main() {
 
     // Get all flags
     console.log('\n--- All Flags ---');
-    const allFlags = client.getAllFlags();
+    const allFlags = client.features.getAllFlags();
     if (allFlags.length === 0) {
       console.log('No flags found. Make sure the server is running and has flags configured.');
     } else {
@@ -92,26 +87,9 @@ async function main() {
     testNumberVariation(client, 'max-items', 10);
     testJsonVariation(client, 'ui-config', { theme: 'light' });
 
-    // Test FlagProxy
-    console.log('\n--- FlagProxy Tests ---');
-    const flagProxy = client.features.getFlag('test-feature');
-    console.log(`  FlagProxy('test-feature'):`);
-    console.log(`    exists: ${flagProxy.exists}`);
-    console.log(`    enabled: ${flagProxy.enabled}`);
-    console.log(`    variant: ${flagProxy.variantName}`);
-    console.log(`    reason: ${flagProxy.reason}`);
-
-    // Test variationDetails
-    console.log('\n--- VariationDetails Tests ---');
-    const details = client.boolVariationDetails('test-feature', false);
-    console.log(`  boolVariationDetails('test-feature'):`);
-    console.log(`    value: ${details.value}`);
-    console.log(`    reason: ${details.reason}`);
-    console.log(`    flagExists: ${details.flagExists}`);
-
     // Stop client
     console.log('\n--- Stopping client ---');
-    await client.stop();
+    client.stop();
     console.log('Client stopped.\n');
 
     console.log('='.repeat(60));
@@ -119,7 +97,7 @@ async function main() {
     console.log('='.repeat(60));
   } catch (error) {
     console.error('Error during test:', error);
-    await client.stop();
+    client.stop();
     process.exit(1);
   }
 }
@@ -130,27 +108,27 @@ function sleep(ms: number): Promise<void> {
 }
 
 function testIsEnabled(client: GatrixClient, flagName: string): void {
-  const result = client.isEnabled(flagName);
+  const result = client.features.isEnabled(flagName);
   console.log(`  isEnabled('${flagName}'): ${result}`);
 }
 
 function testBoolVariation(client: GatrixClient, flagName: string, defaultValue: boolean): void {
-  const result = client.boolVariation(flagName, defaultValue);
+  const result = client.features.boolVariation(flagName, defaultValue);
   console.log(`  boolVariation('${flagName}', ${defaultValue}): ${result}`);
 }
 
 function testStringVariation(client: GatrixClient, flagName: string, defaultValue: string): void {
-  const result = client.stringVariation(flagName, defaultValue);
+  const result = client.features.stringVariation(flagName, defaultValue);
   console.log(`  stringVariation('${flagName}', '${defaultValue}'): '${result}'`);
 }
 
 function testNumberVariation(client: GatrixClient, flagName: string, defaultValue: number): void {
-  const result = client.numberVariation(flagName, defaultValue);
+  const result = client.features.numberVariation(flagName, defaultValue);
   console.log(`  numberVariation('${flagName}', ${defaultValue}): ${result}`);
 }
 
 function testJsonVariation(client: GatrixClient, flagName: string, defaultValue: object): void {
-  const result = client.jsonVariation(flagName, defaultValue);
+  const result = client.features.jsonVariation(flagName, defaultValue);
   console.log(
     `  jsonVariation('${flagName}', ${JSON.stringify(defaultValue)}): ${JSON.stringify(result)}`
   );

@@ -3,21 +3,27 @@
  *
  * Usage:
  *   yarn example:simple
- *   # or
  *   npx ts-node examples/simple-test.ts
+ *   npx ts-node examples/simple-test.ts --url <url> --token <token>
+ *   npx ts-node examples/simple-test.ts --config ./config.json
  */
 
 import { GatrixClient, EVENTS, InMemoryStorageProvider } from '../src';
+import { parseConfig, printConfig } from './config';
 
 async function main() {
   console.log('=== Gatrix JS Client SDK - Simple Test ===\n');
 
-  // Initialize client with minimal configuration
+  const config = parseConfig();
+  printConfig(config);
+  console.log();
+
+  // Initialize client with configuration
   const client = new GatrixClient({
-    apiUrl: process.env.GATRIX_URL || 'http://localhost:45000/api/v1',
-    apiToken: process.env.GATRIX_API_TOKEN || 'gatrix-unsecured-client-api-token',
-    appName: process.env.GATRIX_APP || 'test-app',
-    environment: process.env.GATRIX_ENV || 'development',
+    apiUrl: config.apiUrl,
+    apiToken: config.apiToken,
+    appName: config.appName,
+    environment: config.environment,
     storageProvider: new InMemoryStorageProvider(),
     context: {
       userId: 'user-12345',
