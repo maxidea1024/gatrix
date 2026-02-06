@@ -16,17 +16,15 @@ const DISCONNECT_MESSAGES = [
 
 function DisconnectScreen({ onComplete }: DisconnectScreenProps) {
     const [visibleMessages, setVisibleMessages] = useState<string[]>([]);
-    const [progress, setProgress] = useState(0);
     const [showGoodbye, setShowGoodbye] = useState(false);
 
     useEffect(() => {
         const timers: NodeJS.Timeout[] = [];
 
         // Show messages progressively
-        DISCONNECT_MESSAGES.forEach((msg, index) => {
+        DISCONNECT_MESSAGES.forEach((msg) => {
             const timer = setTimeout(() => {
                 setVisibleMessages((prev) => [...prev, msg.text]);
-                setProgress(((index + 1) / DISCONNECT_MESSAGES.length) * 100);
             }, msg.delay);
             timers.push(timer);
         });
@@ -87,14 +85,10 @@ function DisconnectScreen({ onComplete }: DisconnectScreenProps) {
                     </div>
                 )}
             </div>
-            <div style={{ width: '300px' }}>
-                <progress className="nes-progress is-error" value={progress} max="100"></progress>
-            </div>
-            <div style={{ fontSize: '8px', color: '#e76e55', marginTop: '24px' }}>
-                {showGoodbye ? 'SEE YOU SOON...' : 'TERMINATING SESSION...'}
-            </div>
         </div>
     );
+
+
 }
 
 export default DisconnectScreen;
