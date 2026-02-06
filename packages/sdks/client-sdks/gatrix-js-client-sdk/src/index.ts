@@ -24,12 +24,13 @@ export type {
   ErrorEvent,
   FlagsApiResponse,
   SdkState,
+  SdkStats,
 } from './types';
 
 // Storage Providers
-export { StorageProvider } from './storage-provider';
-export { LocalStorageProvider } from './storage-provider-localstorage';
-export { InMemoryStorageProvider } from './storage-provider-inmemory';
+export { StorageProvider } from './StorageProvider';
+export { LocalStorageProvider } from './LocalStorageProvider';
+export { InMemoryStorageProvider } from './InMemoryStorageProvider';
 
 // Version
 export { SDK_VERSION, SDK_NAME } from './version';

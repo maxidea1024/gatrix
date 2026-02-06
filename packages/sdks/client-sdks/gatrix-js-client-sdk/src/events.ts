@@ -7,6 +7,8 @@ export const EVENTS = {
   INIT: 'flags.init',
   /** First successful fetch completed */
   READY: 'flags.ready',
+  /** Started fetching flags from server */
+  FETCH: 'flags.fetch',
   /** Flags updated from server */
   UPDATE: 'flags.update',
   /** Error occurred */

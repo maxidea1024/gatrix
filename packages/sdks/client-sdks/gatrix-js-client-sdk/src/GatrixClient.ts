@@ -11,6 +11,7 @@ import { GatrixClientConfig } from './types';
 import { FeaturesClient } from './FeaturesClient';
 import { EVENTS } from './events';
 import { SDK_VERSION } from './version';
+import { GatrixError } from './errors';
 
 export class GatrixClient {
   private emitter: EventEmitter;
@@ -28,14 +29,17 @@ export class GatrixClient {
 
   constructor(config: GatrixClientConfig) {
     // Validate required config
-    if (!config.url) {
-      throw new Error('GatrixClient: url is required');
+    if (!config.apiUrl) {
+      throw new GatrixError('GatrixClient: apiUrl is required');
     }
-    if (!config.apiKey) {
-      throw new Error('GatrixClient: apiKey is required');
+    if (!config.apiToken) {
+      throw new GatrixError('GatrixClient: apiToken is required');
     }
     if (!config.appName) {
-      throw new Error('GatrixClient: appName is required');
+      throw new GatrixError('GatrixClient: appName is required');
+    }
+    if (!config.environment) {
+      throw new GatrixError('GatrixClient: environment is required');
     }
 
     this.config = config;
@@ -106,6 +110,23 @@ export class GatrixClient {
    */
   off(event: string, callback?: (...args: any[]) => void): this {
     this.emitter.off(event, callback);
+    return this;
+  }
+
+  /**
+   * Subscribe to ALL events
+   * Callback receives (eventName, ...args)
+   */
+  onAny(callback: (event: string, ...args: any[]) => void): this {
+    this.emitter.onAny(callback);
+    return this;
+  }
+
+  /**
+   * Unsubscribe from ALL events listener
+   */
+  offAny(callback?: (event: string, ...args: any[]) => void): this {
+    this.emitter.offAny(callback);
     return this;
   }
 

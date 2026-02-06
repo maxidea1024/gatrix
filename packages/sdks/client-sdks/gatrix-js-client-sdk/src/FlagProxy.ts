@@ -3,6 +3,7 @@
  * Provides convenient variation accessors like .boolVariation(), .stringVariation(), etc.
  */
 import { EvaluatedFlag, Variant, VariantType, VariationResult } from './types';
+import { GatrixFeatureError, GatrixFeatureErrorCode } from './errors';
 
 const FALLBACK_DISABLED_VARIANT: Variant = {
   name: 'disabled',
@@ -77,7 +78,7 @@ export class FlagProxy {
   /**
    * Get boolean variation (flag enabled state)
    */
-  boolVariation(defaultValue: boolean = false): boolean {
+  boolVariation(defaultValue: boolean): boolean {
     if (!this.flag) {
       return defaultValue;
     }
@@ -87,8 +88,8 @@ export class FlagProxy {
   /**
    * Get string variation from variant payload
    */
-  stringVariation(defaultValue: string = ''): string {
-    if (!this.flag || !this.flag.enabled || this.flag.variant?.payload == null) {
+  stringVariation(defaultValue: string): string {
+    if (!this.flag || this.flag.variant?.payload == null) {
       return defaultValue;
     }
     return String(this.flag.variant.payload);
@@ -97,8 +98,8 @@ export class FlagProxy {
   /**
    * Get number variation from variant payload
    */
-  numberVariation(defaultValue: number = 0): number {
-    if (!this.flag || !this.flag.enabled || this.flag.variant?.payload == null) {
+  numberVariation(defaultValue: number): number {
+    if (!this.flag || this.flag.variant?.payload == null) {
       return defaultValue;
     }
 
@@ -106,26 +107,34 @@ export class FlagProxy {
     if (typeof payload === 'number') {
       return payload;
     }
-    const num = Number(payload);
-    return isNaN(num) ? defaultValue : num;
+
+    // Fallback: parse string number (for backward compatibility)
+    if (typeof payload === 'string') {
+      const parsed = Number(payload);
+      if (!isNaN(parsed)) {
+        return parsed;
+      }
+    }
+
+    return defaultValue;
   }
 
   /**
    * Get JSON variation from variant payload
    */
   jsonVariation<T>(defaultValue: T): T {
-    if (!this.flag || !this.flag.enabled || this.flag.variant?.payload == null) {
+    if (!this.flag || this.flag.variant?.payload == null) {
       return defaultValue;
     }
 
     const payload = this.flag.variant.payload;
 
-    // If already an object, return directly
+    // Server sends object directly
     if (typeof payload === 'object') {
       return payload as T;
     }
 
-    // If string, try to parse as JSON
+    // Fallback: parse JSON string (for backward compatibility)
     if (typeof payload === 'string') {
       try {
         return JSON.parse(payload) as T;
@@ -163,7 +172,7 @@ export class FlagProxy {
   /**
    * Get boolean variation with details
    */
-  boolVariationDetails(defaultValue: boolean = false): VariationResult<boolean> {
+  boolVariationDetails(defaultValue: boolean): VariationResult<boolean> {
     if (!this.flag) {
       return { value: defaultValue, reason: 'flag_not_found', flagExists: false, enabled: false };
     }
@@ -178,12 +187,17 @@ export class FlagProxy {
   /**
    * Get string variation with details
    */
-  stringVariationDetails(defaultValue: string = ''): VariationResult<string> {
+  stringVariationDetails(defaultValue: string): VariationResult<string> {
     if (!this.flag) {
       return { value: defaultValue, reason: 'flag_not_found', flagExists: false, enabled: false };
     }
     if (!this.flag.enabled) {
-      return { value: defaultValue, reason: this.flag.reason ?? 'disabled', flagExists: true, enabled: false };
+      return {
+        value: defaultValue,
+        reason: this.flag.reason ?? 'disabled',
+        flagExists: true,
+        enabled: false,
+      };
     }
     if (this.flag.variant?.payload == null) {
       return { value: defaultValue, reason: 'no_payload', flagExists: true, enabled: true };
@@ -199,12 +213,17 @@ export class FlagProxy {
   /**
    * Get number variation with details
    */
-  numberVariationDetails(defaultValue: number = 0): VariationResult<number> {
+  numberVariationDetails(defaultValue: number): VariationResult<number> {
     if (!this.flag) {
       return { value: defaultValue, reason: 'flag_not_found', flagExists: false, enabled: false };
     }
     if (!this.flag.enabled) {
-      return { value: defaultValue, reason: this.flag.reason ?? 'disabled', flagExists: true, enabled: false };
+      return {
+        value: defaultValue,
+        reason: this.flag.reason ?? 'disabled',
+        flagExists: true,
+        enabled: false,
+      };
     }
     if (this.flag.variant?.payload == null) {
       return { value: defaultValue, reason: 'no_payload', flagExists: true, enabled: true };
@@ -212,14 +231,20 @@ export class FlagProxy {
 
     const payload = this.flag.variant.payload;
     if (typeof payload === 'number') {
-      return { value: payload, reason: this.flag.reason ?? 'evaluated', flagExists: true, enabled: true };
+      return {
+        value: payload,
+        reason: this.flag.reason ?? 'evaluated',
+        flagExists: true,
+        enabled: true,
+      };
     }
 
-    const num = Number(payload);
-    if (isNaN(num)) {
-      return { value: defaultValue, reason: 'parse_error', flagExists: true, enabled: true };
-    }
-    return { value: num, reason: this.flag.reason ?? 'evaluated', flagExists: true, enabled: true };
+    return {
+      value: defaultValue,
+      reason: 'type_mismatch:payload_not_number',
+      flagExists: true,
+      enabled: true,
+    };
   }
 
   /**
@@ -230,7 +255,12 @@ export class FlagProxy {
       return { value: defaultValue, reason: 'flag_not_found', flagExists: false, enabled: false };
     }
     if (!this.flag.enabled) {
-      return { value: defaultValue, reason: this.flag.reason ?? 'disabled', flagExists: true, enabled: false };
+      return {
+        value: defaultValue,
+        reason: this.flag.reason ?? 'disabled',
+        flagExists: true,
+        enabled: false,
+      };
     }
     if (this.flag.variant?.payload == null) {
       return { value: defaultValue, reason: 'no_payload', flagExists: true, enabled: true };
@@ -238,18 +268,20 @@ export class FlagProxy {
 
     const payload = this.flag.variant.payload;
     if (typeof payload === 'object') {
-      return { value: payload as T, reason: this.flag.reason ?? 'evaluated', flagExists: true, enabled: true };
+      return {
+        value: payload as T,
+        reason: this.flag.reason ?? 'evaluated',
+        flagExists: true,
+        enabled: true,
+      };
     }
 
-    if (typeof payload === 'string') {
-      try {
-        return { value: JSON.parse(payload) as T, reason: this.flag.reason ?? 'evaluated', flagExists: true, enabled: true };
-      } catch {
-        return { value: defaultValue, reason: 'parse_error', flagExists: true, enabled: true };
-      }
-    }
-
-    return { value: defaultValue, reason: 'parse_error', flagExists: true, enabled: true };
+    return {
+      value: defaultValue,
+      reason: 'type_mismatch:payload_not_object',
+      flagExists: true,
+      enabled: true,
+    };
   }
 
   // ==================== Strict Variation Methods (OrThrow) ====================
@@ -259,39 +291,35 @@ export class FlagProxy {
    */
   boolVariationOrThrow(): boolean {
     if (!this.flag) {
-      throw new Error(`Flag not found`);
+      throw GatrixFeatureError.flagNotFound(this.name || 'unknown');
     }
     return this.flag.enabled;
   }
 
   /**
-   * Get string variation or throw if flag not found/disabled/no payload
+   * Get string variation or throw if flag not found or no payload
+   * Note: disabled flag still returns payload if it exists
    */
   stringVariationOrThrow(): string {
     if (!this.flag) {
-      throw new Error(`Flag not found`);
-    }
-    if (!this.flag.enabled) {
-      throw new Error(`Flag "${this.flag.name}" is disabled`);
+      throw GatrixFeatureError.flagNotFound(this.name || 'unknown');
     }
     if (this.flag.variant?.payload == null) {
-      throw new Error(`Flag "${this.flag.name}" has no payload`);
+      throw GatrixFeatureError.noPayload(this.flag.name);
     }
     return String(this.flag.variant.payload);
   }
 
   /**
-   * Get number variation or throw if flag not found/disabled/invalid
+   * Get number variation or throw if flag not found or invalid type
+   * Note: disabled flag still returns payload if it exists
    */
   numberVariationOrThrow(): number {
     if (!this.flag) {
-      throw new Error(`Flag not found`);
-    }
-    if (!this.flag.enabled) {
-      throw new Error(`Flag "${this.flag.name}" is disabled`);
+      throw GatrixFeatureError.flagNotFound('unknown');
     }
     if (this.flag.variant?.payload == null) {
-      throw new Error(`Flag "${this.flag.name}" has no payload`);
+      throw GatrixFeatureError.noPayload(this.flag.name);
     }
 
     const payload = this.flag.variant.payload;
@@ -299,25 +327,19 @@ export class FlagProxy {
       return payload;
     }
 
-    const num = Number(payload);
-    if (isNaN(num)) {
-      throw new Error(`Flag "${this.flag.name}" has invalid number payload`);
-    }
-    return num;
+    throw GatrixFeatureError.typeMismatch(this.flag.name, 'number', typeof payload);
   }
 
   /**
-   * Get JSON variation or throw if flag not found/disabled/invalid
+   * Get JSON variation or throw if flag not found or invalid type
+   * Note: disabled flag still returns payload if it exists
    */
   jsonVariationOrThrow<T>(): T {
     if (!this.flag) {
-      throw new Error(`Flag not found`);
-    }
-    if (!this.flag.enabled) {
-      throw new Error(`Flag "${this.flag.name}" is disabled`);
+      throw GatrixFeatureError.flagNotFound('unknown');
     }
     if (this.flag.variant?.payload == null) {
-      throw new Error(`Flag "${this.flag.name}" has no payload`);
+      throw GatrixFeatureError.noPayload(this.flag.name);
     }
 
     const payload = this.flag.variant.payload;
@@ -326,14 +348,6 @@ export class FlagProxy {
       return payload as T;
     }
 
-    if (typeof payload === 'string') {
-      try {
-        return JSON.parse(payload) as T;
-      } catch {
-        throw new Error(`Flag "${this.flag.name}" has invalid JSON payload`);
-      }
-    }
-
-    throw new Error(`Flag "${this.flag.name}" has invalid JSON payload`);
+    throw GatrixFeatureError.typeMismatch(this.flag.name, 'object', typeof payload);
   }
 }

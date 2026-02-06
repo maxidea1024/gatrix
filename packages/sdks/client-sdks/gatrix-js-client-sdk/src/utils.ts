@@ -20,23 +20,6 @@ export function uuidv4(): string {
 }
 
 /**
- * Resolve fetch function from global scope
- */
-export function resolveFetch(): typeof fetch | undefined {
-  try {
-    if (typeof window !== 'undefined' && 'fetch' in window) {
-      return fetch.bind(window);
-    }
-    if (typeof globalThis !== 'undefined' && 'fetch' in globalThis) {
-      return fetch.bind(globalThis);
-    }
-  } catch {
-    // Ignore errors
-  }
-  return undefined;
-}
-
-/**
  * Resolve AbortController from global scope
  */
 export function resolveAbortController(): (() => AbortController) | undefined {
@@ -56,8 +39,8 @@ export function resolveAbortController(): (() => AbortController) | undefined {
 /**
  * Build URL with context as query parameters (for GET requests)
  */
-export function urlWithContextAsQuery(baseUrl: URL, context: Record<string, any>): URL {
-  const url = new URL(baseUrl.toString());
+export function urlWithContextAsQuery(apiUrl: URL, context: Record<string, any>): URL {
+  const url = new URL(apiUrl.toString());
 
   for (const [key, value] of Object.entries(context)) {
     if (value === undefined || value === null) continue;
@@ -94,4 +77,56 @@ export function deepClone<T>(obj: T): T {
     }
   }
   return cloned;
+}
+
+/**
+ * Convert context to a stable JSON string for hashing
+ */
+export function contextString(context: Record<string, any>): string {
+  const { properties = {}, ...fields } = context;
+
+  const sortEntries = (record: Record<string, any>) =>
+    Object.entries(record).sort(([a], [b]) => a.localeCompare(b, undefined));
+
+  return JSON.stringify([sortEntries(fields), sortEntries(properties)]);
+}
+
+/**
+ * Compute SHA-256 hash of a string
+ */
+async function sha256(input: string): Promise<string> {
+  const cryptoSubtle =
+    typeof globalThis !== 'undefined' && globalThis.crypto?.subtle
+      ? globalThis.crypto?.subtle
+      : undefined;
+
+  if (
+    typeof TextEncoder === 'undefined' ||
+    !cryptoSubtle?.digest ||
+    typeof Uint8Array === 'undefined'
+  ) {
+    throw new Error('Hashing function not available');
+  }
+
+  const msgUint8 = new TextEncoder().encode(input);
+  const hashBuffer = await cryptoSubtle.digest('SHA-256', msgUint8);
+  const hexString = Array.from(new Uint8Array(hashBuffer))
+    .map((x) => x.toString(16).padStart(2, '0'))
+    .join('');
+  return hexString;
+}
+
+/**
+ * Compute a hash value for context (for cache TTL validation)
+ * Falls back to raw string if crypto not available
+ */
+export async function computeContextHash(context: Record<string, any>): Promise<string> {
+  const value = contextString(context);
+
+  try {
+    const hash = await sha256(value);
+    return hash;
+  } catch {
+    return value;
+  }
 }

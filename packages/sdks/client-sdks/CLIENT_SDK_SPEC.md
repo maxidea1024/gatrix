@@ -84,16 +84,16 @@ The Edge API returns evaluated flags in this format:
 ```typescript
 interface GatrixClientConfig {
   // Required
-  url: string;                    // Edge API URL
-  apiKey: string;                 // Client API key
+  apiUrl: string;                 // Base API URL for Edge or Backend server (e.g., https://edge.your-api.com/api/v1)
+  apiToken: string;               // Client API token
   appName: string;                // Application name
+  environment: string;            // Environment name (required)
 
   // Optional - Polling
   refreshInterval?: number;       // Seconds between polls (default: 30)
   disableRefresh?: boolean;       // Disable automatic polling
 
   // Optional - Context
-  environment?: string;           // Environment name
   context?: GatrixContext;        // Initial context
 
   // Optional - Storage
@@ -112,7 +112,8 @@ interface GatrixClientConfig {
 
   // Optional - Advanced
   customHeaders?: Record<string, string>;
-  disableMetrics?: boolean;
+  disableMetrics?: boolean;       // Disable server-side metrics collection
+  disableStats?: boolean;         // Disable local statistics tracking (default: false)
   impressionDataAll?: boolean;    // Track impressions for all flags
 }
 ```
@@ -139,46 +140,63 @@ All events use the `flags.*` prefix for namespacing:
 | `flags.ready` | First successful fetch completed | - |
 | `flags.update` | Flags updated from server | `{ flags: EvaluatedFlag[] }` |
 | `flags.error` | Error occurred | `{ type: string, error: Error }` |
+| `flags.recovered` | SDK recovered from error state | - |
 | `flags.impression` | Flag accessed (if impressionData enabled) | `ImpressionEvent` |
+| `flags.{flagName}:update` | Specific flag changed | `FlagProxy` |
+| `flags.metrics.sent` | Metrics successfully sent to server | `{ count: number }` |
 
 ## Main Interface
 
 ### GatrixClient
 
 ```typescript
-class GatrixClient extends EventEmitter {
+class GatrixClient {
   constructor(config: GatrixClientConfig);
+
+  // Access to FeaturesClient
+  get features(): FeaturesClient;
 
   // Lifecycle
   start(): Promise<void>;
   stop(): void;
   isReady(): boolean;
+  getError(): unknown;
 
-  // Context Management (Global)
+  // Event Subscription
+  on(event: string, callback: (...args: any[]) => void | Promise<void>): this;
+  once(event: string, callback: (...args: any[]) => void | Promise<void>): this;
+  off(event: string, callback?: (...args: any[]) => void | Promise<void>): this;
+  onAny(callback: (event: string, ...args: any[]) => void): this;    // Subscribe to ALL events
+  offAny(callback?: (event: string, ...args: any[]) => void): this;  // Unsubscribe from ALL events
+
+  // Static
+  static get version(): string;
+  static get EVENTS(): typeof EVENTS;
+}
+
+class FeaturesClient {
+  // Context Management
   getContext(): GatrixContext;
-  updateContext(context: GatrixContext): Promise<void>;
-  setContextField(field: string, value: string | number | boolean): Promise<void>;
-  removeContextField(field: string): Promise<void>;
+  updateContext(context: Partial<GatrixContext>): Promise<void>;
 
   // Flag Access - Basic
   isEnabled(flagName: string): boolean;
   getVariant(flagName: string): Variant;  // Never returns null/undefined
   getAllFlags(): EvaluatedFlag[];
 
-  // Flag Access - Typed Variations (no context parameter - uses global)
-  variation(flagName: string, defaultValue?: string): string;  // Returns variant name
-  boolVariation(flagName: string, defaultValue?: boolean): boolean;
-  stringVariation(flagName: string, defaultValue?: string): string;
-  numberVariation(flagName: string, defaultValue?: number): number;
-  jsonVariation<T>(flagName: string, defaultValue?: T): T;
+  // Flag Access - Typed Variations (defaultValue is REQUIRED)
+  boolVariation(flagName: string, defaultValue: boolean): boolean;
+  stringVariation(flagName: string, defaultValue: string): string;
+  numberVariation(flagName: string, defaultValue: number): number;
+  jsonVariation<T>(flagName: string, defaultValue: T): T;
 
-  // Variation Details - Returns detailed result with reason
-  boolVariationDetails(flagName: string, defaultValue?: boolean): VariationResult<boolean>;
-  stringVariationDetails(flagName: string, defaultValue?: string): VariationResult<string>;
-  numberVariationDetails(flagName: string, defaultValue?: number): VariationResult<number>;
-  jsonVariationDetails<T>(flagName: string, defaultValue?: T): VariationResult<T>;
+  // Variation Details - Returns detailed result with reason (defaultValue is REQUIRED)
+  boolVariationDetails(flagName: string, defaultValue: boolean): VariationResult<boolean>;
+  stringVariationDetails(flagName: string, defaultValue: string): VariationResult<string>;
+  numberVariationDetails(flagName: string, defaultValue: number): VariationResult<number>;
+  jsonVariationDetails<T>(flagName: string, defaultValue: T): VariationResult<T>;
 
-  // Strict Variations - Throws on not found/disabled/invalid
+  // Strict Variations - Throws GatrixFeatureError on not found/disabled/invalid
   boolVariationOrThrow(flagName: string): boolean;
   stringVariationOrThrow(flagName: string): string;
   numberVariationOrThrow(flagName: string): number;
@@ -188,14 +206,79 @@ class GatrixClient extends EventEmitter {
   syncFlags(fetchNow?: boolean): Promise<void>;
 
   // Watch (Change Detection) - Returns FlagProxy for convenience
-  watchFlag(flagName: string, callback: (flag: FlagProxy) => void): () => void;
-  watchFlagWithInitialState(flagName: string, callback: (flag: FlagProxy) => void): () => void;
-  createWatchGroup(name: string): WatchFlagGroup;
+  watchFlag(flagName: string, callback: (flag: FlagProxy) => void | Promise<void>): () => void;
+  watchFlagWithInitialState(flagName: string, callback: (flag: FlagProxy) => void | Promise<void>): () => void;
+  createWatchFlagGroup(name: string): WatchFlagGroup;
 
-  // Manual Control
-  fetchFlags(): Promise<void>;
+  // Statistics (Debugging & Monitoring)
+  getStats(): SdkStats;
 }
 ```
+
+### SDK Statistics
+
+The `getStats()` method returns comprehensive SDK statistics for debugging and monitoring:
+
+```typescript
+interface SdkStats {
+  // Counts
+  totalFlagCount: number;           // Total flags in cache
+  fetchFlagsCount: number;          // Number of fetchFlags calls
+  updateCount: number;              // Successful updates (flag data changed)
+  notModifiedCount: number;         // 304 Not Modified responses
+  errorCount: number;               // Total errors
+  recoveryCount: number;            // Recoveries from error state
+  impressionCount: number;          // Impression events sent
+  contextChangeCount: number;       // Context change count
+  syncFlagsCount: number;           // syncFlags calls
+
+  // Timestamps
+  startTime: Date | null;           // SDK start time
+  lastFetchTime: Date | null;       // Last fetch attempt
+  lastUpdateTime: Date | null;      // Last successful update
+  lastErrorTime: Date | null;       // Last error occurrence
+  lastRecoveryTime: Date | null;    // Last recovery from error
+
+  // State
+  sdkState: SdkState;               // 'initializing' | 'ready' | 'healthy' | 'error'
+  etag: string | null;              // Current ETag
+  offlineMode: boolean;             // Offline mode status
+  lastError: Error | null;          // Last error object
+  missingFlags: Record<string, number>;  // Missing flag access counts
+
+  // Per-flag data
+  flagEnabledCounts: Record<string, { yes: number; no: number }>;
+  flagVariantCounts: Record<string, Record<string, number>>;
+  flagLastChangedTimes: Record<string, Date>;  // Per-flag last change time
+  activeWatchGroups: string[];      // Active watch group names
+}
+```
+
+
+### API Call Frequency Guide
+
+Understanding which methods can be called frequently is important for performance:
+
+**Safe for Hot Paths (call frequently):**
+- `isEnabled()`, `boolVariation()`, `stringVariation()`, `numberVariation()`, `jsonVariation()`
+- `*VariationDetails()`, `*VariationOrThrow()`
+- `getVariant()`, `getAllFlags()`, `getContext()`
+
+These methods read from in-memory cache and are safe to call in render loops, event handlers, or any hot code path.
+
+**Moderate Frequency:**
+- `watchFlag()`, `watchFlagWithInitialState()` - Register once, no need to call repeatedly
+
+**Infrequent / Setup Only:**
+- `start()`, `stop()` - Call once per app lifecycle
+- `updateContext()`, `syncFlags()` - Triggers network request, debounce if calling from user input
+- `fetchFlags()` - Manual refresh, avoid calling in loops
+
+> [!CAUTION]
+> **Context Update Performance**: Client-side SDKs use **remote evaluation only** (flags are evaluated on the server, not locally). This means every `updateContext()` call requires a network request to get re-evaluated flags. Avoid putting frequently changing values (timestamps, counters, animation frames) in context. For time-based targeting, use the server-side `currentTime` context field which is evaluated on the server without client-side updates.
+
+> [!TIP]
+> Flag evaluation methods are purely in-memory operations. The SDK automatically fetches flags on `start()` and periodically using configurable `fetchInterval`.
 
 ## Storage Provider Interface
 
@@ -211,12 +294,58 @@ Built-in implementations:
 - `LocalStorageProvider`: Uses browser localStorage
 - `InMemoryStorageProvider`: In-memory only (no persistence)
 
+### Custom Storage Provider
+
+You can implement your own storage provider for different use cases (e.g., Redis, IndexedDB, or custom backend storage):
+
+```typescript
+// Example: Redis Storage Provider for Node.js
+class RedisStorageProvider implements IStorageProvider {
+  private client: RedisClient;
+
+  constructor(client: RedisClient) {
+    this.client = client;
+  }
+
+  async get(key: string): Promise<any> {
+    const value = await this.client.get(key);
+    return value ? JSON.parse(value) : null;
+  }
+
+  async save(key: string, value: any): Promise<void> {
+    await this.client.set(key, JSON.stringify(value));
+  }
+
+  async delete(key: string): Promise<void> {
+    await this.client.del(key);
+  }
+}
+
+// Usage
+const client = new GatrixClient({
+  apiUrl: 'https://edge.your-api.com/api/v1',
+  apiToken: 'your-token',
+  appName: 'my-app',
+  environment: 'production',
+  storageProvider: new RedisStorageProvider(redisClient),
+});
+```
+
 ## Variation Functions
 
 All variation functions:
 - Use the global context (no context parameter needed)
 - Return the default value if flag not found or disabled
 - Count metrics for the flag access
+
+### Why Default Values Are Required
+
+All variation methods require an explicit default value parameter. This is a deliberate design decision:
+
+1. **Prevents Ambiguity:** When a flag doesn't exist or has no payload, the SDK returns your specified default—not `undefined` or `null`.
+2. **Type Safety:** The default value establishes the expected return type.
+3. **Fail-Safe Behavior:** Your application always receives a usable value, even during network failures or SDK initialization.
+4. **Explicit Intent:** Forces developers to consider the fallback scenario, reducing bugs.
 
 | Function | Return Type | Description |
 |----------|-------------|-------------|
@@ -258,19 +387,19 @@ class FlagProxy {
   isEnabled(): boolean;
   getVariantName(): string;
   
-  // Variation methods
-  boolVariation(defaultValue?: boolean): boolean;
-  stringVariation(defaultValue?: string): string;
-  numberVariation(defaultValue?: number): number;
-  jsonVariation<T>(defaultValue?: T): T;
+  // Variation methods (defaultValue is REQUIRED)
+  boolVariation(defaultValue: boolean): boolean;
+  stringVariation(defaultValue: string): string;
+  numberVariation(defaultValue: number): number;
+  jsonVariation<T>(defaultValue: T): T;
   
-  // Variation details - returns VariationResult with reason
-  boolVariationDetails(defaultValue?: boolean): VariationResult<boolean>;
-  stringVariationDetails(defaultValue?: string): VariationResult<string>;
-  numberVariationDetails(defaultValue?: number): VariationResult<number>;
-  jsonVariationDetails<T>(defaultValue?: T): VariationResult<T>;
+  // Variation details (defaultValue is REQUIRED)
+  boolVariationDetails(defaultValue: boolean): VariationResult<boolean>;
+  stringVariationDetails(defaultValue: string): VariationResult<string>;
+  numberVariationDetails(defaultValue: number): VariationResult<number>;
+  jsonVariationDetails<T>(defaultValue: T): VariationResult<T>;
   
-  // Strict variations - throws on not found/disabled/invalid
+  // Strict variations - throws GatrixFeatureError on not found or invalid type
   boolVariationOrThrow(): boolean;
   stringVariationOrThrow(): string;
   numberVariationOrThrow(): number;
@@ -315,7 +444,7 @@ When `explicitSyncMode: true`:
 ```typescript
 // Enable explicit sync mode
 const client = new GatrixClient({
-  url: 'https://edge.gatrix.com',
+  url: 'https://edge.gatrix.com/api/v1',
   apiKey: 'client-key',
   appName: 'my-app',
   explicitSyncMode: true,
@@ -345,6 +474,41 @@ const unwatch = client.watchFlagWithInitialState('my-feature', (flag) => {
 
 // Stop watching
 unwatch();
+```
+
+## Events
+
+SDK emits the following events that you can subscribe to:
+
+| Event | Constant | Description | Data |
+|-------|----------|-------------|------|
+| `flags.init` | `EVENTS.INIT` | SDK initialized (from storage/bootstrap) | - |
+| `flags.ready` | `EVENTS.READY` | First successful fetch completed | - |
+| `flags.fetch` | `EVENTS.FETCH` | Started fetching flags from server | `{ etag: string \| null }` |
+| `flags.update` | `EVENTS.UPDATE` | Flags updated from server | `{ flags: EvaluatedFlag[] }` |
+| `flags.{name}:update` | - | Individual flag changed | `(newFlag: EvaluatedFlag, oldFlag?: EvaluatedFlag)` |
+| `flags.error` | `EVENTS.ERROR` | Error occurred | `{ type: string, message: string }` |
+| `flags.recovered` | `EVENTS.RECOVERED` | SDK recovered from error state | - |
+| `flags.sync` | `EVENTS.SYNC` | Flags synchronized (explicitSyncMode) | - |
+| `flags.impression` | `EVENTS.IMPRESSION` | Flag accessed (if impressionData enabled) | `{ featureName, enabled, variant, ... }` |
+
+
+### Event Subscription
+
+```typescript
+// Subscribe to specific event
+client.on(EVENTS.READY, () => {
+  console.log('SDK is ready');
+});
+
+// Subscribe to ALL events at once (useful for debugging)
+client.onAny((eventName, data) => {
+  console.log(`Event: ${eventName}`, data);
+});
+
+// Unsubscribe
+client.off(EVENTS.READY, myCallback);
+client.offAny(myAnyCallback);
 ```
 
 ## Metrics
@@ -389,4 +553,3 @@ SDK should be resilient:
 - [x] Metrics collection with notFound tracking
 - [x] TypeScript types and exports
 - [x] Browser build (ES modules + CJS + UMD)
-- [ ] React hooks wrapper (separate package)

@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import crypto from 'crypto';
 import { ClientVersionService } from '../services/ClientVersionService';
 import { ClientVersionModel, ClientStatus } from '../models/ClientVersion';
 import { GameWorldService } from '../services/GameWorldService';
@@ -527,7 +528,7 @@ export class ClientController {
       // Build variant object according to Unleash client specification
       let variant: {
         name: string;
-        payload?: string;
+        payload?: any;  // Can be string, number, or object depending on variantType
         enabled: boolean;
       };
 
@@ -540,19 +541,29 @@ export class ClientController {
         if (result.variant.payload) {
           let payloadValue = result.variant.payload.value ?? result.variant.payload;
 
-          // If variant type is JSON, ensure converting to compact JSON string
-          if (dbFlag.variantType === 'json' && typeof payloadValue === 'string') {
-            try {
-              // Parse and re-stringify to remove whitespaces/newlines
-              payloadValue = JSON.stringify(JSON.parse(payloadValue));
-            } catch (e) {
-              // If not valid JSON, keep as is
+          // If variant type is JSON, ensure returning as parsed object
+          if (dbFlag.variantType === 'json') {
+            if (typeof payloadValue === 'string') {
+              try {
+                payloadValue = JSON.parse(payloadValue);
+              } catch (e) {
+                // If not valid JSON, keep as is
+              }
             }
-          } else if (typeof payloadValue !== 'string') {
-            payloadValue = JSON.stringify(payloadValue);
+            // Keep as object for JSON type
+            variant.payload = payloadValue;
+          } else if (dbFlag.variantType === 'number') {
+            // Number type: parse if string
+            if (typeof payloadValue === 'string') {
+              const parsed = Number(payloadValue);
+              variant.payload = isNaN(parsed) ? payloadValue : parsed;
+            } else {
+              variant.payload = payloadValue;
+            }
+          } else {
+            // String type or other: keep as string
+            variant.payload = typeof payloadValue === 'string' ? payloadValue : String(payloadValue);
           }
-
-          variant.payload = payloadValue;
         }
       } else {
         // Disabled or no variant - fallback "$none" variant with baselinePayload
@@ -585,15 +596,30 @@ export class ClientController {
       };
     }
 
-    res.json({
+    const flagsArray = Object.values(results);
+    const responseData = {
       success: true,
       data: {
-        flags: Object.values(results),
+        flags: flagsArray,
       },
       meta: {
         environment,
         evaluatedAt: new Date().toISOString(),
       },
-    });
+    };
+
+    // Generate ETag from flags data (hash of stringified flags with versions)
+    const etagSource = flagsArray.map((f: any) => `${f.name}:${f.version}:${f.enabled}`).join('|');
+    const etag = `"${crypto.createHash('md5').update(etagSource).digest('hex')}"`;
+
+
+    // Check If-None-Match header
+    const requestEtag = req.headers['if-none-match'];
+    if (requestEtag === etag) {
+      return res.status(304).end();
+    }
+
+    res.set('ETag', etag);
+    res.json(responseData);
   });
 }

@@ -13,15 +13,19 @@ import {
   ImpressionEvent,
   ErrorEvent,
   SdkState,
+  SdkStats,
   VariationResult,
 } from './types';
-import { StorageProvider } from './storage-provider';
-import { LocalStorageProvider } from './storage-provider-localstorage';
-import { InMemoryStorageProvider } from './storage-provider-inmemory';
-import { uuidv4, resolveFetch, resolveAbortController, deepClone } from './utils';
+import { StorageProvider } from './StorageProvider';
+import { LocalStorageProvider } from './LocalStorageProvider';
+import { InMemoryStorageProvider } from './InMemoryStorageProvider';
+import { uuidv4, resolveAbortController, deepClone, computeContextHash } from './utils';
 import { FlagProxy } from './FlagProxy';
 import { WatchFlagGroup } from './WatchFlagGroup';
 import { Logger, ConsoleLogger } from './Logger';
+import { Metrics } from './Metrics';
+import { GatrixError, GatrixFeatureError } from './errors';
+import ky, { HTTPError } from 'ky';
 
 const STORAGE_KEY_FLAGS = 'flags';
 const STORAGE_KEY_SESSION = 'sessionId';
@@ -36,7 +40,6 @@ export class FeaturesClient {
   private emitter: EventEmitter;
   private config: GatrixClientConfig;
   private storage: StorageProvider;
-  private fetch: typeof fetch;
   private createAbortController?: () => AbortController;
   private abortController?: AbortController | null;
   private logger: Logger;
@@ -59,8 +62,31 @@ export class FeaturesClient {
   private refreshInterval: number;
   private connectionId: string;
 
-  // Backoff
-  private fetchFailures = 0;
+  // Metrics
+  private metrics: Metrics;
+  private lastContextHash: string = '';
+
+  // Statistics tracking
+  private fetchFlagsCount: number = 0;
+  private updateCount: number = 0;
+  private notModifiedCount: number = 0;
+  private errorCount: number = 0;
+  private recoveryCount: number = 0;
+  private impressionCount: number = 0;
+  private contextChangeCount: number = 0;
+  private lastFetchTime: Date | null = null;
+  private lastUpdateTime: Date | null = null;
+  private lastErrorTime: Date | null = null;
+  private lastRecoveryTime: Date | null = null;
+  private startTime: Date | null = null;
+  private syncFlagsCount: number = 0;
+  private watchGroups: Map<string, WatchFlagGroup> = new Map();
+  private flagEnabledCounts: Map<string, { yes: number; no: number }> = new Map();
+  private flagVariantCounts: Map<string, Map<string, number>> = new Map();
+  private flagLastChangedTimes: Map<string, Date> = new Map();
+
+  // System context fields (cannot be removed)
+  private static readonly SYSTEM_CONTEXT_FIELDS = ['appName', 'environment'];
 
   // Feature-specific config shortcuts
   private get featuresConfig() {
@@ -69,7 +95,11 @@ export class FeaturesClient {
 
   constructor(emitter: EventEmitter, config: GatrixClientConfig) {
     this.emitter = emitter;
-    this.config = config;
+    // Normalize apiUrl - remove trailing slash
+    this.config = {
+      ...config,
+      apiUrl: config.apiUrl.replace(/\/+$/, ''),
+    };
     this.connectionId = uuidv4();
 
     // Initialize storage
@@ -78,16 +108,9 @@ export class FeaturesClient {
       (typeof window !== 'undefined' ? new LocalStorageProvider() : new InMemoryStorageProvider());
 
     // Initialize logger
-    this.logger = config.logger ?? new ConsoleLogger('GatrixClient');
+    this.logger = config.logger ?? new ConsoleLogger('GatrixFeatureClient');
 
-    // Initialize fetch
-    const fetchFn = config.fetch ?? resolveFetch();
-    if (!fetchFn) {
-      this.logger.error(
-        'You must provide a "fetch" implementation or run in an environment where "fetch" is available.'
-      );
-    }
-    this.fetch = fetchFn!;
+    // Initialize abort controller
     this.createAbortController = resolveAbortController();
 
     // Refresh interval (default: 30 seconds)
@@ -95,10 +118,24 @@ export class FeaturesClient {
       ? 0
       : (this.featuresConfig.refreshInterval ?? 30) * 1000;
 
-    // Initial context
+    // Initial context with system fields
     this.context = {
+      appName: config.appName,
+      environment: config.environment,
       ...config.context,
     };
+
+    // Initialize metrics
+    this.metrics = new Metrics({
+      appName: config.appName,
+      apiUrl: config.apiUrl,
+      apiToken: config.apiToken,
+      environment: config.environment,
+      customHeaders: config.customHeaders,
+      disableMetrics: this.featuresConfig.disableMetrics,
+      logger: this.logger,
+      connectionId: this.connectionId,
+    });
 
     // Bootstrap data
     const bootstrap = this.featuresConfig.bootstrap;
@@ -132,14 +169,13 @@ export class FeaturesClient {
     const hasBootstrap = bootstrap && bootstrap.length > 0;
     const bootstrapOverride = this.featuresConfig.bootstrapOverride !== false;
 
-    if (hasBootstrap && (bootstrapOverride || this.realtimeFlags.size === 0)) {
-      await this.storage.save(STORAGE_KEY_FLAGS, bootstrap);
-      this.sdkState = 'healthy';
-      this.setReady();
-    }
-
     this.sdkState = 'healthy';
     this.emitter.emit(EVENTS.INIT);
+
+    if (hasBootstrap && (bootstrapOverride || this.realtimeFlags.size === 0)) {
+      await this.storage.save(STORAGE_KEY_FLAGS, bootstrap);
+      this.setReady();
+    }
   }
 
   /**
@@ -151,12 +187,13 @@ export class FeaturesClient {
       return;
     }
     this.started = true;
+    this.startTime = new Date();
 
     // Offline mode: skip all network requests, use cached/bootstrap flags only
     if (this.config.offlineMode) {
       if (this.realtimeFlags.size === 0) {
-        const error = new Error(
-          'GatrixClient: offlineMode requires bootstrap data or cached flags, but none are available'
+        const error = new GatrixError(
+          'offlineMode requires bootstrap data or cached flags, but none are available'
         );
         this.sdkState = 'error';
         this.lastError = error;
@@ -164,18 +201,18 @@ export class FeaturesClient {
         throw error;
       }
       this.setReady();
+      this.metrics.start();
       return;
     }
 
     // Initial fetch
     await this.fetchFlags();
 
-    // Schedule periodic refresh
-    if (this.refreshInterval > 0) {
-      this.timerRef = setInterval(() => {
-        this.fetchFlags();
-      }, this.refreshInterval);
-    }
+    // Start metrics collection
+    this.metrics.start();
+
+    // Schedule next refresh using setTimeout (not setInterval)
+    this.scheduleNextRefresh();
   }
 
   /**
@@ -183,9 +220,10 @@ export class FeaturesClient {
    */
   stop(): void {
     if (this.timerRef) {
-      clearInterval(this.timerRef);
+      clearTimeout(this.timerRef);
       this.timerRef = undefined;
     }
+    this.metrics.stop();
     this.started = false;
   }
 
@@ -210,11 +248,32 @@ export class FeaturesClient {
   }
 
   async updateContext(context: GatrixContext): Promise<void> {
-    this.context = { ...this.context, ...context };
+    // Filter out system fields from input
+    const { appName, environment, ...userContext } = context;
+    const newContext = {
+      ...this.context,
+      ...userContext,
+    };
+
+    // Check if context actually changed using hash
+    const newHash = await computeContextHash(newContext);
+    if (newHash === this.lastContextHash) {
+      return; // No change, skip fetch
+    }
+
+    this.context = newContext;
+    this.lastContextHash = newHash;
+    this.contextChangeCount++;
     await this.fetchFlags();
   }
 
   async setContextField(field: string, value: string | number | boolean): Promise<void> {
+    // Prevent modifying system fields
+    if (FeaturesClient.SYSTEM_CONTEXT_FIELDS.includes(field)) {
+      this.logger.warn(`Cannot modify system context field: ${field}`);
+      return;
+    }
+
     const definedFields = ['userId', 'sessionId', 'deviceId', 'currentTime'];
 
     if (definedFields.includes(field)) {
@@ -226,10 +285,23 @@ export class FeaturesClient {
       this.context.properties[field] = value;
     }
 
+    // Check if context actually changed
+    const newHash = await computeContextHash(this.context);
+    if (newHash === this.lastContextHash) {
+      return;
+    }
+    this.lastContextHash = newHash;
+    this.contextChangeCount++;
     await this.fetchFlags();
   }
 
   async removeContextField(field: string): Promise<void> {
+    // Prevent removing system fields
+    if (FeaturesClient.SYSTEM_CONTEXT_FIELDS.includes(field)) {
+      this.logger.warn(`Cannot remove system context field: ${field}`);
+      return;
+    }
+
     const definedFields = ['userId', 'sessionId', 'deviceId', 'currentTime'];
 
     if (definedFields.includes(field)) {
@@ -238,6 +310,13 @@ export class FeaturesClient {
       delete this.context.properties[field];
     }
 
+    // Check if context actually changed
+    const newHash = await computeContextHash(this.context);
+    if (newHash === this.lastContextHash) {
+      return;
+    }
+    this.lastContextHash = newHash;
+    this.contextChangeCount++;
     await this.fetchFlags();
   }
 
@@ -248,7 +327,22 @@ export class FeaturesClient {
     const flag = flags.get(flagName);
     const enabled = flag?.enabled ?? false;
 
-    // Track impression
+    // Track undefined flag access
+    if (!flag) {
+      this.metrics.countMissing(flagName);
+    } else {
+      this.metrics.count(flagName, enabled);
+      if (flag.variant) {
+        this.metrics.countVariant(flagName, flag.variant.name);
+      }
+
+      // Track local statistics
+      this.trackFlagEnabledCount(flagName, enabled);
+      if (flag.variant) {
+        this.trackVariantCount(flagName, flag.variant.name);
+      }
+    }
+
     this.trackImpression(flagName, enabled, flag, 'isEnabled');
 
     return enabled;
@@ -260,7 +354,14 @@ export class FeaturesClient {
     const enabled = flag?.enabled ?? false;
     const variant = flag?.variant ?? FALLBACK_DISABLED_VARIANT;
 
-    // Track impression
+    // Track undefined flag access or normal metrics
+    if (!flag) {
+      this.metrics.countMissing(flagName);
+    } else {
+      this.metrics.count(flagName, enabled);
+      this.metrics.countVariant(flagName, variant.name);
+    }
+
     this.trackImpression(flagName, enabled, flag, 'getVariant', variant.name);
 
     return {
@@ -279,11 +380,11 @@ export class FeaturesClient {
    * Get the variant name for a flag
    * Returns the variant name or 'disabled' if flag is not found/enabled
    */
-  variation(flagName: string, defaultValue: string = 'disabled'): string {
+  variation(flagName: string, defaultValue: string): string {
     const flags = this.selectFlags();
     const flag = flags.get(flagName);
 
-    if (!flag || !flag.enabled) {
+    if (!flag) {
       return defaultValue;
     }
 
@@ -292,91 +393,159 @@ export class FeaturesClient {
     return flag.variant?.name ?? defaultValue;
   }
 
-  boolVariation(flagName: string, defaultValue: boolean = false): boolean {
+  boolVariation(flagName: string, defaultValue: boolean): boolean {
     const flags = this.selectFlags();
     const flag = flags.get(flagName);
 
     if (!flag) {
+      this.metrics.countMissing(flagName);
       return defaultValue;
     }
 
-    // Track impression
     this.trackImpression(flagName, flag.enabled, flag, 'isEnabled');
 
     return flag.enabled;
   }
 
-  stringVariation(flagName: string, defaultValue: string = ''): string {
+  stringVariation(flagName: string, defaultValue: string): string {
     const flags = this.selectFlags();
     const flag = flags.get(flagName);
 
-    if (!flag || !flag.enabled || flag.variant?.payload == null) {
+    if (!flag) {
+      this.metrics.countMissing(flagName);
+      return defaultValue;
+    }
+    if (flag.variant?.payload == null) {
       return defaultValue;
     }
 
-    // Track impression
     this.trackImpression(flagName, flag.enabled, flag, 'getVariant', flag.variant.name);
 
     return String(flag.variant.payload);
   }
 
-  numberVariation(flagName: string, defaultValue: number = 0): number {
+  numberVariation(flagName: string, defaultValue: number): number {
     const flags = this.selectFlags();
     const flag = flags.get(flagName);
 
-    if (!flag || !flag.enabled || !flag.variant?.payload) {
+    if (!flag) {
+      this.metrics.countMissing(flagName);
+      return defaultValue;
+    }
+    if (flag.variant?.payload == null) {
       return defaultValue;
     }
 
-    const num = Number(flag.variant.payload);
-    if (isNaN(num)) {
-      return defaultValue;
+    // Server sends number directly, no parsing needed
+    const payload = flag.variant.payload;
+    if (typeof payload === 'number') {
+      this.trackImpression(flagName, flag.enabled, flag, 'getVariant', flag.variant.name);
+      return payload;
     }
 
-    // Track impression
-    this.trackImpression(flagName, flag.enabled, flag, 'getVariant', flag.variant.name);
-
-    return num;
+    return defaultValue;
   }
 
   jsonVariation<T>(flagName: string, defaultValue: T): T {
     const flags = this.selectFlags();
     const flag = flags.get(flagName);
 
-    if (!flag || !flag.enabled || flag.variant?.payload == null) {
+    if (!flag) {
+      this.metrics.countMissing(flagName);
+      return defaultValue;
+    }
+    if (flag.variant?.payload == null) {
       return defaultValue;
     }
 
     const payload = flag.variant.payload;
 
-    // If already an object, return directly
+    // Server sends object directly, no parsing needed
     if (typeof payload === 'object') {
-      // Track impression
       this.trackImpression(flagName, flag.enabled, flag, 'getVariant', flag.variant.name);
       return payload as T;
-    }
-
-    // If string, try to parse as JSON
-    if (typeof payload === 'string') {
-      try {
-        const parsed = JSON.parse(payload) as T;
-        this.trackImpression(flagName, flag.enabled, flag, 'getVariant', flag.variant.name);
-        return parsed;
-      } catch {
-        return defaultValue;
-      }
     }
 
     return defaultValue;
   }
 
-  // ==================== Variation Details ====================
+  // ==================== Strict Variation Methods (OrThrow) ====================
 
-  boolVariationDetails(flagName: string, defaultValue: boolean = false): VariationResult<boolean> {
+  boolVariationOrThrow(flagName: string): boolean {
     const flags = this.selectFlags();
     const flag = flags.get(flagName);
 
     if (!flag) {
+      throw GatrixFeatureError.flagNotFound(flagName);
+    }
+
+    this.trackImpression(flagName, flag.enabled, flag, 'isEnabled');
+    return flag.enabled;
+  }
+
+  stringVariationOrThrow(flagName: string): string {
+    const flags = this.selectFlags();
+    const flag = flags.get(flagName);
+
+    if (!flag) {
+      throw GatrixFeatureError.flagNotFound(flagName);
+    }
+    if (flag.variant?.payload == null) {
+      throw GatrixFeatureError.noPayload(flagName);
+    }
+
+    this.trackImpression(flagName, flag.enabled, flag, 'getVariant', flag.variant.name);
+    return String(flag.variant.payload);
+  }
+
+  numberVariationOrThrow(flagName: string): number {
+    const flags = this.selectFlags();
+    const flag = flags.get(flagName);
+
+    if (!flag) {
+      throw GatrixFeatureError.flagNotFound(flagName);
+    }
+    if (flag.variant?.payload == null) {
+      throw GatrixFeatureError.noPayload(flagName);
+    }
+
+    const payload = flag.variant.payload;
+    if (typeof payload !== 'number') {
+      throw GatrixFeatureError.typeMismatch(flagName, 'number', typeof payload);
+    }
+
+    this.trackImpression(flagName, flag.enabled, flag, 'getVariant', flag.variant.name);
+    return payload;
+  }
+
+  jsonVariationOrThrow<T>(flagName: string): T {
+    const flags = this.selectFlags();
+    const flag = flags.get(flagName);
+
+    if (!flag) {
+      throw GatrixFeatureError.flagNotFound(flagName);
+    }
+    if (flag.variant?.payload == null) {
+      throw GatrixFeatureError.noPayload(flagName);
+    }
+
+    const payload = flag.variant.payload;
+    if (typeof payload !== 'object') {
+      throw GatrixFeatureError.typeMismatch(flagName, 'object', typeof payload);
+    }
+
+    this.trackImpression(flagName, flag.enabled, flag, 'getVariant', flag.variant.name);
+    return payload as T;
+  }
+
+  // ==================== Variation Details ====================
+
+  boolVariationDetails(flagName: string, defaultValue: boolean): VariationResult<boolean> {
+    const flags = this.selectFlags();
+    const flag = flags.get(flagName);
+
+    if (!flag) {
+      this.metrics.countMissing(flagName);
       return {
         value: defaultValue,
         reason: 'flag_not_found',
@@ -395,24 +564,16 @@ export class FeaturesClient {
     };
   }
 
-  stringVariationDetails(flagName: string, defaultValue: string = ''): VariationResult<string> {
+  stringVariationDetails(flagName: string, defaultValue: string): VariationResult<string> {
     const flags = this.selectFlags();
     const flag = flags.get(flagName);
 
     if (!flag) {
+      this.metrics.countMissing(flagName);
       return {
         value: defaultValue,
         reason: 'flag_not_found',
         flagExists: false,
-        enabled: false,
-      };
-    }
-
-    if (!flag.enabled) {
-      return {
-        value: defaultValue,
-        reason: flag.reason ?? 'disabled',
-        flagExists: true,
         enabled: false,
       };
     }
@@ -424,15 +585,16 @@ export class FeaturesClient {
       value: payload != null ? String(payload) : defaultValue,
       reason: flag.reason ?? 'evaluated',
       flagExists: true,
-      enabled: true,
+      enabled: flag.enabled,
     };
   }
 
-  numberVariationDetails(flagName: string, defaultValue: number = 0): VariationResult<number> {
+  numberVariationDetails(flagName: string, defaultValue: number): VariationResult<number> {
     const flags = this.selectFlags();
     const flag = flags.get(flagName);
 
     if (!flag) {
+      this.metrics.countMissing(flagName);
       return {
         value: defaultValue,
         reason: 'flag_not_found',
@@ -441,32 +603,43 @@ export class FeaturesClient {
       };
     }
 
-    if (!flag.enabled || !flag.variant?.payload) {
+    if (flag.variant?.payload == null) {
       return {
         value: defaultValue,
-        reason: flag.reason ?? 'disabled',
+        reason: 'no_payload',
         flagExists: true,
         enabled: flag.enabled,
       };
     }
 
-    const num = Number(flag.variant.payload);
-    if (isNaN(num)) {
+    const payload = flag.variant.payload;
+
+    // Check variantType hint for better error messages
+    if (flag.variantType && flag.variantType !== 'number') {
       return {
         value: defaultValue,
-        reason: 'parse_error',
+        reason: `type_mismatch:expected_number_got_${flag.variantType}`,
         flagExists: true,
-        enabled: true,
+        enabled: flag.enabled,
+      };
+    }
+
+    if (typeof payload !== 'number') {
+      return {
+        value: defaultValue,
+        reason: `type_mismatch:payload_not_number`,
+        flagExists: true,
+        enabled: flag.enabled,
       };
     }
 
     this.trackImpression(flagName, flag.enabled, flag, 'getVariant', flag.variant.name);
 
     return {
-      value: num,
+      value: payload,
       reason: flag.reason ?? 'evaluated',
       flagExists: true,
-      enabled: true,
+      enabled: flag.enabled,
     };
   }
 
@@ -475,6 +648,7 @@ export class FeaturesClient {
     const flag = flags.get(flagName);
 
     if (!flag) {
+      this.metrics.countMissing(flagName);
       return {
         value: defaultValue,
         reason: 'flag_not_found',
@@ -483,10 +657,10 @@ export class FeaturesClient {
       };
     }
 
-    if (!flag.enabled || flag.variant?.payload == null) {
+    if (flag.variant?.payload == null) {
       return {
         value: defaultValue,
-        reason: flag.reason ?? 'disabled',
+        reason: 'no_payload',
         flagExists: true,
         enabled: flag.enabled,
       };
@@ -494,96 +668,34 @@ export class FeaturesClient {
 
     const payload = flag.variant.payload;
 
-    // If already an object, return directly
+    // Check variantType hint for better error messages
+    if (flag.variantType && flag.variantType !== 'json') {
+      return {
+        value: defaultValue,
+        reason: `type_mismatch:expected_json_got_${flag.variantType}`,
+        flagExists: true,
+        enabled: flag.enabled,
+      };
+    }
+
+    // Server sends object directly, no parsing needed
     if (typeof payload === 'object') {
       this.trackImpression(flagName, flag.enabled, flag, 'getVariant', flag.variant.name);
       return {
         value: payload as T,
         reason: flag.reason ?? 'evaluated',
         flagExists: true,
-        enabled: true,
+        enabled: flag.enabled,
       };
-    }
-
-    // If string, try to parse as JSON
-    if (typeof payload === 'string') {
-      try {
-        const parsed = JSON.parse(payload) as T;
-        this.trackImpression(flagName, flag.enabled, flag, 'getVariant', flag.variant.name);
-        return {
-          value: parsed,
-          reason: flag.reason ?? 'evaluated',
-          flagExists: true,
-          enabled: true,
-        };
-      } catch {
-        return {
-          value: defaultValue,
-          reason: 'parse_error',
-          flagExists: true,
-          enabled: true,
-        };
-      }
     }
 
     return {
       value: defaultValue,
-      reason: 'parse_error',
+      reason: 'type_mismatch:payload_not_object',
       flagExists: true,
-      enabled: true,
+      enabled: flag.enabled,
     };
   }
-
-  // ==================== Strict Variations (OrThrow) ====================
-
-  boolVariationOrThrow(flagName: string): boolean {
-    const result = this.boolVariationDetails(flagName);
-    if (!result.flagExists) {
-      throw new Error(`Flag "${flagName}" not found`);
-    }
-    return result.value;
-  }
-
-  stringVariationOrThrow(flagName: string): string {
-    const result = this.stringVariationDetails(flagName);
-    if (!result.flagExists) {
-      throw new Error(`Flag "${flagName}" not found`);
-    }
-    if (!result.enabled) {
-      throw new Error(`Flag "${flagName}" is disabled`);
-    }
-    return result.value;
-  }
-
-  numberVariationOrThrow(flagName: string): number {
-    const result = this.numberVariationDetails(flagName);
-    if (!result.flagExists) {
-      throw new Error(`Flag "${flagName}" not found`);
-    }
-    if (!result.enabled) {
-      throw new Error(`Flag "${flagName}" is disabled`);
-    }
-    if (result.reason === 'parse_error') {
-      throw new Error(`Flag "${flagName}" has invalid number payload`);
-    }
-    return result.value;
-  }
-
-  jsonVariationOrThrow<T>(flagName: string): T {
-    const result = this.jsonVariationDetails<T>(flagName, undefined as T);
-    if (!result.flagExists) {
-      throw new Error(`Flag "${flagName}" not found`);
-    }
-    if (!result.enabled) {
-      throw new Error(`Flag "${flagName}" is disabled`);
-    }
-    if (result.reason === 'parse_error') {
-      throw new Error(`Flag "${flagName}" has invalid JSON payload`);
-    }
-    return result.value;
-  }
-
-  // ==================== Explicit Sync Mode ====================
 
   async syncFlags(fetchNow: boolean = true): Promise<void> {
     if (!this.featuresConfig.explicitSyncMode) {
@@ -595,6 +707,7 @@ export class FeaturesClient {
     }
 
     this.synchronizedFlags = new Map(this.realtimeFlags);
+    this.syncFlagsCount++;
     this.emitter.emit(EVENTS.SYNC);
   }
 
@@ -604,7 +717,7 @@ export class FeaturesClient {
    * Watch callback type - supports both sync and async callbacks
    */
   watchFlag(flagName: string, callback: (flag: FlagProxy) => void | Promise<void>): () => void {
-    const eventName = `flag:${flagName}`;
+    const eventName = `flags.${flagName}:update`;
     const wrappedCallback = (rawFlag: EvaluatedFlag | undefined) => {
       callback(new FlagProxy(rawFlag));
     };
@@ -619,7 +732,7 @@ export class FeaturesClient {
     flagName: string,
     callback: (flag: FlagProxy) => void | Promise<void>
   ): () => void {
-    const eventName = `flag:${flagName}`;
+    const eventName = `flags.${flagName}:update`;
     const wrappedCallback = (rawFlag: EvaluatedFlag | undefined) => {
       callback(new FlagProxy(rawFlag));
     };
@@ -645,7 +758,9 @@ export class FeaturesClient {
    * Create a watch group for batch management of multiple flag watchers
    */
   createWatchGroup(name: string): WatchFlagGroup {
-    return new WatchFlagGroup(this, name);
+    const group = new WatchFlagGroup(this, name);
+    this.watchGroups.set(name, group);
+    return group;
   }
 
   // ==================== Fetch ====================
@@ -657,10 +772,6 @@ export class FeaturesClient {
       return;
     }
 
-    if (!this.fetch) {
-      return;
-    }
-
     // Cancel previous request
     if (this.abortController && !this.abortController.signal.aborted) {
       this.abortController.abort();
@@ -668,7 +779,12 @@ export class FeaturesClient {
     this.abortController = this.createAbortController?.() ?? null;
 
     try {
-      const url = new URL(this.config.url);
+      // Update statistics
+      this.fetchFlagsCount++;
+      this.lastFetchTime = new Date();
+
+      // Build endpoint: {apiUrl}/client/features/{environment}/eval
+      const url = new URL(`${this.config.apiUrl}/client/features/${this.config.environment}/eval`);
 
       // Add context as query params for GET request
       for (const [key, value] of Object.entries(this.context)) {
@@ -685,28 +801,40 @@ export class FeaturesClient {
         }
       }
 
-      const headers: Record<string, string> = {
-        [this.config.headerName ?? 'Authorization']: this.config.apiKey,
-        Accept: 'application/json',
-        'Cache-Control': 'no-cache',
-        'X-Gatrix-App': this.config.appName,
-        'X-Gatrix-Connection-Id': this.connectionId,
-        ...this.config.customHeaders,
-      };
+      const headers = this.buildHeaders();
 
       if (this.etag) {
         headers['If-None-Match'] = this.etag;
       }
 
-      const response = await this.fetch(url.toString(), {
-        method: 'GET',
+      // Emit FETCH event with current etag
+      this.emitter.emit(EVENTS.FETCH, { etag: this.etag || null });
+
+      // Get retry options from config or use defaults
+      const retryOptions = this.featuresConfig.fetchRetryOptions ?? {};
+      const retryLimit = retryOptions.limit ?? 3;
+      const backoffLimit = retryOptions.backoffLimit ?? 8000;
+      const timeout = retryOptions.timeout ?? 30000;
+
+      // Use ky with retry and exponential backoff
+      const response = await ky.get(url.toString(), {
         headers,
         signal: this.abortController?.signal,
+        retry: {
+          limit: retryLimit,
+          methods: ['get', 'post'],
+          statusCodes: [408, 429, 500, 502, 503, 504],
+          backoffLimit,
+        },
+        timeout,
+        throwHttpErrors: false, // Handle status codes manually for ETag support
       });
 
       // Check for recovery
       if (this.sdkState === 'error' && response.status < 400) {
         this.sdkState = 'healthy';
+        this.recoveryCount++;
+        this.lastRecoveryTime = new Date();
         this.emitter.emit(EVENTS.RECOVERED);
       }
 
@@ -720,29 +848,18 @@ export class FeaturesClient {
         const data: FlagsApiResponse = await response.json();
 
         if (data.success && data.data?.flags) {
-          const oldFlags = new Map(this.realtimeFlags);
-          this.setFlags(data.data.flags);
-          await this.storage.save(STORAGE_KEY_FLAGS, data.data.flags);
-
-          // Emit flag change events (using version field)
-          this.emitFlagChanges(oldFlags, this.realtimeFlags);
-
-          this.sdkState = 'healthy';
-          this.fetchFailures = 0;
+          await this.storeFlags(data.data.flags);
+          this.updateCount++;
+          this.lastUpdateTime = new Date();
 
           if (!this.fetchedFromServer) {
             this.fetchedFromServer = true;
             this.setReady();
           }
-
-          // In non-explicit sync mode, emit update
-          if (!this.featuresConfig.explicitSyncMode) {
-            this.emitter.emit(EVENTS.UPDATE, { flags: data.data.flags });
-          }
         }
       } else if (response.status === 304) {
         // Not modified - ETag matched
-        this.fetchFailures = 0;
+        this.notModifiedCount++;
       } else {
         this.handleFetchError(response.status);
       }
@@ -750,12 +867,18 @@ export class FeaturesClient {
       if (e instanceof Error && e.name === 'AbortError') {
         return;
       }
-      this.logger.error('Failed to fetch flags', e);
+
+      // Extract meaningful error message
+      const errorMessage = this.extractErrorMessage(e);
+      this.logger.error('Failed to fetch flags:', errorMessage);
+
       this.sdkState = 'error';
       this.lastError = e;
+      this.errorCount++;
+      this.lastErrorTime = new Date();
       this.emitter.emit(EVENTS.ERROR, {
         type: 'fetch-flags',
-        error: e,
+        message: errorMessage,
       } as ErrorEvent);
     } finally {
       this.abortController = null;
@@ -767,6 +890,17 @@ export class FeaturesClient {
   private setReady(): void {
     this.readyEventEmitted = true;
     this.emitter.emit(EVENTS.READY);
+  }
+
+  private scheduleNextRefresh(): void {
+    if (this.refreshInterval <= 0 || !this.started) {
+      return;
+    }
+
+    this.timerRef = setTimeout(async () => {
+      await this.fetchFlags();
+      this.scheduleNextRefresh();
+    }, this.refreshInterval);
   }
 
   private selectFlags(): Map<string, EvaluatedFlag> {
@@ -785,32 +919,62 @@ export class FeaturesClient {
   }
 
   /**
-   * Emit flag change events using version field for comparison
+   * Store flags with change detection and event emission
    */
-  private emitFlagChanges(
+  private async storeFlags(flags: EvaluatedFlag[]): Promise<void> {
+    const oldFlags = new Map(this.realtimeFlags);
+    this.setFlags(flags);
+    await this.storage.save(STORAGE_KEY_FLAGS, flags);
+
+    // Emit flag change events
+    this.emitRealtimeFlagChanges(oldFlags, this.realtimeFlags);
+
+    this.sdkState = 'healthy';
+
+    // In non-explicit sync mode, emit update
+    if (!this.featuresConfig.explicitSyncMode) {
+      this.emitter.emit(EVENTS.UPDATE, { flags });
+    }
+  }
+
+  /**
+   * Emit flag change events using version field for comparison
+   * Emits (newFlag, oldFlag) for changes, (undefined, oldFlag) for removals
+   */
+  private emitRealtimeFlagChanges(
     oldFlags: Map<string, EvaluatedFlag>,
     newFlags: Map<string, EvaluatedFlag>
   ): void {
+    // Skip tracking on initial load (oldFlags is empty)
+    const isInitialLoad = oldFlags.size === 0;
+    const now = new Date();
+
     // Check for changed/new flags (compare by version)
     for (const [name, newFlag] of newFlags) {
       const oldFlag = oldFlags.get(name);
       if (!oldFlag || oldFlag.version !== newFlag.version) {
-        this.emitter.emit(`flag:${name}`, newFlag);
+        // Only record change time for actual changes, not initial load
+        if (!isInitialLoad) {
+          this.flagLastChangedTimes.set(name, now);
+        }
+        this.emitter.emit(`flags.${name}:update`, newFlag, oldFlag);
       }
     }
 
     // Check for removed flags
-    for (const [name] of oldFlags) {
+    for (const [name, oldFlag] of oldFlags) {
       if (!newFlags.has(name)) {
-        this.emitter.emit(`flag:${name}`, undefined);
+        this.flagLastChangedTimes.set(name, now);
+        this.emitter.emit(`flags.${name}:update`, undefined, oldFlag);
       }
     }
   }
 
   private handleFetchError(statusCode: number): void {
-    this.fetchFailures = Math.min(this.fetchFailures + 1, 10);
     this.sdkState = 'error';
     this.lastError = { type: 'HttpError', code: statusCode };
+    this.errorCount++;
+    this.lastErrorTime = new Date();
     this.emitter.emit(EVENTS.ERROR, {
       type: 'HttpError',
       code: statusCode,
@@ -834,18 +998,12 @@ export class FeaturesClient {
     flagName: string,
     enabled: boolean,
     flag: EvaluatedFlag | undefined,
-    eventType: 'isEnabled' | 'getVariant' | 'notFound',
+    eventType: 'isEnabled' | 'getVariant',
     variantName?: string
   ): void {
-    // Always track not_found events regardless of impressionData setting
-    if (eventType !== 'notFound') {
-      const shouldTrack = this.featuresConfig.impressionDataAll || flag?.impressionData;
-      if (!shouldTrack || this.featuresConfig.disableMetrics) {
-        return;
-      }
-    }
-
-    if (this.featuresConfig.disableMetrics) {
+    // Only track if impressionDataAll is enabled or flag has impressionData set
+    const shouldTrack = this.featuresConfig.impressionDataAll || flag?.impressionData;
+    if (!shouldTrack) {
       return;
     }
 
@@ -857,9 +1015,138 @@ export class FeaturesClient {
       featureName: flagName,
       impressionData: flag?.impressionData ?? false,
       variantName,
-      reason: flag?.reason ?? (eventType === 'notFound' ? 'not_found' : undefined),
+      reason: flag?.reason,
     };
 
+    this.impressionCount++;
     this.emitter.emit(EVENTS.IMPRESSION, event);
+  }
+
+  // ==================== Headers ====================
+
+  /**
+   * Build common API headers
+   */
+  private buildHeaders(): Record<string, string> {
+    return {
+      'Content-Type': 'application/json',
+      'X-API-Token': this.config.apiToken,
+      'X-Application-Name': this.config.appName,
+      'X-Environment': this.config.environment,
+      'X-Connection-Id': this.connectionId,
+      ...this.config.customHeaders,
+    };
+  }
+
+  /**
+   * Extract user-friendly error message from error object
+   */
+  private extractErrorMessage(e: unknown): string {
+    if (e instanceof Error) {
+      // Check for network errors (ECONNREFUSED, ENOTFOUND, etc.)
+      const cause = (e as any).cause;
+      if (cause?.code === 'ECONNREFUSED') {
+        return 'Connection refused - server may be down';
+      }
+      if (cause?.code === 'ENOTFOUND') {
+        return 'Server not found - check URL';
+      }
+      if (cause?.code === 'ETIMEDOUT') {
+        return 'Connection timed out';
+      }
+      // Generic fetch error
+      if (e.message === 'fetch failed') {
+        return 'Network error - unable to reach server';
+      }
+      return e.message;
+    }
+    return String(e);
+  }
+
+  // ==================== Statistics ====================
+
+  /**
+   * Track flag enabled/disabled access count
+   */
+  private trackFlagEnabledCount(flagName: string, enabled: boolean): void {
+    if (this.featuresConfig.disableStats) return;
+
+    const counts = this.flagEnabledCounts.get(flagName) ?? { yes: 0, no: 0 };
+    if (enabled) {
+      counts.yes++;
+    } else {
+      counts.no++;
+    }
+    this.flagEnabledCounts.set(flagName, counts);
+  }
+
+  /**
+   * Track variant access count
+   */
+  private trackVariantCount(flagName: string, variantName: string): void {
+    if (this.featuresConfig.disableStats) return;
+
+    let variantCounts = this.flagVariantCounts.get(flagName);
+    if (!variantCounts) {
+      variantCounts = new Map<string, number>();
+      this.flagVariantCounts.set(flagName, variantCounts);
+    }
+    variantCounts.set(variantName, (variantCounts.get(variantName) ?? 0) + 1);
+  }
+
+  /**
+   * Get SDK statistics for debugging and monitoring
+   */
+  getStats(): SdkStats {
+    const flags = this.selectFlags();
+
+    // Convert Map to Record for flagEnabledCounts
+    const flagEnabledCounts: Record<string, { yes: number; no: number }> = {};
+    for (const [name, counts] of this.flagEnabledCounts) {
+      flagEnabledCounts[name] = counts;
+    }
+
+    // Convert nested Map to Record for flagVariantCounts
+    const flagVariantCounts: Record<string, Record<string, number>> = {};
+    for (const [flagName, variantMap] of this.flagVariantCounts) {
+      flagVariantCounts[flagName] = {};
+      for (const [variantName, count] of variantMap) {
+        flagVariantCounts[flagName][variantName] = count;
+      }
+    }
+
+    // Get active watch group names
+    const activeWatchGroups: string[] = [];
+    for (const [name, group] of this.watchGroups) {
+      if (group.size > 0) {
+        activeWatchGroups.push(name);
+      }
+    }
+
+    return {
+      totalFlagCount: flags.size,
+      missingFlags: this.metrics.getMissingFlags(),
+      fetchFlagsCount: this.fetchFlagsCount,
+      updateCount: this.updateCount,
+      notModifiedCount: this.notModifiedCount,
+      errorCount: this.errorCount,
+      recoveryCount: this.recoveryCount,
+      lastFetchTime: this.lastFetchTime,
+      lastUpdateTime: this.lastUpdateTime,
+      lastErrorTime: this.lastErrorTime,
+      lastRecoveryTime: this.lastRecoveryTime,
+      lastError: this.lastError instanceof Error ? this.lastError : null,
+      flagEnabledCounts,
+      flagVariantCounts,
+      offlineMode: this.config.offlineMode ?? false,
+      syncFlagsCount: this.syncFlagsCount,
+      activeWatchGroups,
+      sdkState: this.sdkState,
+      etag: this.etag || null,
+      startTime: this.startTime,
+      impressionCount: this.impressionCount,
+      contextChangeCount: this.contextChangeCount,
+      flagLastChangedTimes: Object.fromEntries(this.flagLastChangedTimes),
+    };
   }
 }
