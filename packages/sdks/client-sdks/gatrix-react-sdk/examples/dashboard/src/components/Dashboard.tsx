@@ -3,10 +3,12 @@ import {
   useFlagsStatus,
   useGatrixClient,
   type GatrixClientConfig,
+  type EvaluatedFlag,
 } from '@gatrix/react-sdk';
 import { useEffect, useState, useRef } from 'react';
 import FlagCard from './FlagCard';
 import StatsPanel from './StatsPanel';
+import FlagDetailModal from './FlagDetailModal';
 
 interface DashboardProps {
   config: GatrixClientConfig;
@@ -104,8 +106,16 @@ function Dashboard({ config }: DashboardProps) {
   // Check if we haven't fetched any flags yet
   const isSearching = !flagsReady && flags.length === 0;
 
+  const [selectedFlag, setSelectedFlag] = useState<EvaluatedFlag | null>(null);
+
   return (
     <div className={`dashboard-content ${showRecoveryEffect ? 'recovery-shimmer' : ''}`}>
+      {selectedFlag && (
+        <FlagDetailModal
+          flag={selectedFlag}
+          onClose={() => setSelectedFlag(null)}
+        />
+      )}
       <StatsPanel
         config={config}
         enabledCount={enabledCount}
@@ -144,6 +154,7 @@ function Dashboard({ config }: DashboardProps) {
                   flag={flag}
                   initialVersion={initialVersions.get(flag.name) ?? null}
                   lastChangedTime={stats?.flagLastChangedTimes?.[flag.name] ?? null}
+                  onSelect={() => setSelectedFlag(flag)}
                 />
               ))}
             </div>
@@ -152,6 +163,7 @@ function Dashboard({ config }: DashboardProps) {
       </section>
     </div>
   );
+
 }
 
 export default Dashboard;

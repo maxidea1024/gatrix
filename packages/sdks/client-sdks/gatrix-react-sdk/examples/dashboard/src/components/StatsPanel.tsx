@@ -65,9 +65,6 @@ function useTypewriter(
     return { displayText, isTyping };
 }
 
-// Talking faces for animation
-const TALKING_FACES = ['😫', '😩', '😣', '😖'];
-const SAD_FACE = '😢';
 
 function StatsPanel({
     config,
@@ -78,7 +75,6 @@ function StatsPanel({
     stats,
     errorMessage,
 }: StatsPanelProps) {
-    const [faceIndex, setFaceIndex] = useState(0);
 
     // Track previous counts for rumble effect
     const prevTotalRef = useRef(totalCount);
@@ -161,14 +157,6 @@ function StatsPanel({
     const formattedError = errorMessage ? formatErrorMessage(errorMessage) : '';
     const { displayText, isTyping } = useTypewriter(formattedError, 40, 3000);
 
-    // Animate talking faces when typing
-    useEffect(() => {
-        if (!isTyping) return;
-        const interval = setInterval(() => {
-            setFaceIndex((i) => (i + 1) % TALKING_FACES.length);
-        }, 100);
-        return () => clearInterval(interval);
-    }, [isTyping]);
 
     const formatEtag = (etag: string | null): string => {
         if (!etag) return '-';

@@ -5,6 +5,7 @@ interface FlagCardProps {
   flag: EvaluatedFlag;
   initialVersion: number | null;
   lastChangedTime: Date | null;
+  onSelect: () => void;
 }
 
 function formatTimeAgo(date: Date | null): string {
@@ -23,7 +24,7 @@ function formatTimeAgo(date: Date | null): string {
   return 'just now';
 }
 
-function FlagCard({ flag, initialVersion, lastChangedTime }: FlagCardProps) {
+function FlagCard({ flag, initialVersion, lastChangedTime, onSelect }: FlagCardProps) {
   const payload = flag.variant?.payload;
   const hasPayload = payload !== undefined && payload !== null;
   const isEmptyString = payload === '';
@@ -72,7 +73,11 @@ function FlagCard({ flag, initialVersion, lastChangedTime }: FlagCardProps) {
     initialVersion !== null ? Math.max(0, (flag.version || 0) - initialVersion) : 0;
 
   return (
-    <div className={`flag-card ${isRumbling ? 'flag-card-rumble' : ''}`}>
+    <div
+      className={`flag-card ${isRumbling ? 'flag-card-rumble' : ''}`}
+      onClick={onSelect}
+      style={{ cursor: 'pointer' }}
+    >
       <div className={`flag-card-inner ${flag.enabled ? 'is-enabled' : 'is-disabled'}`}>
         <div className="flag-header">
           <span className="flag-name">
@@ -136,5 +141,6 @@ function FlagCard({ flag, initialVersion, lastChangedTime }: FlagCardProps) {
     </div>
   );
 }
+
 
 export default FlagCard;
