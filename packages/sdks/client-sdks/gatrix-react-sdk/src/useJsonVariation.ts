@@ -32,45 +32,45 @@ import { useGatrixContext } from './useGatrixContext';
 import { EVENTS } from '@gatrix/js-client-sdk';
 
 export function useJsonVariation<T>(flagName: string, defaultValue: T): T {
-    const { features, client } = useGatrixContext();
+  const { features, client } = useGatrixContext();
 
-    const getValue = useCallback(
-        () => features.jsonVariation<T>(flagName, defaultValue),
-        [features, flagName, defaultValue]
-    );
+  const getValue = useCallback(
+    () => features.jsonVariation<T>(flagName, defaultValue),
+    [features, flagName, defaultValue]
+  );
 
-    const [value, setValue] = useState<T>(() => getValue());
-    const valueRef = useRef<T>(value);
-    valueRef.current = value;
+  const [value, setValue] = useState<T>(() => getValue());
+  const valueRef = useRef<T>(value);
+  valueRef.current = value;
 
-    useEffect(() => {
-        if (!client) return;
+  useEffect(() => {
+    if (!client) return;
 
-        const updateHandler = () => {
-            const newValue = getValue();
-            // Deep comparison for objects
-            if (JSON.stringify(newValue) !== JSON.stringify(valueRef.current)) {
-                valueRef.current = newValue;
-                setValue(newValue);
-            }
-        };
+    const updateHandler = () => {
+      const newValue = getValue();
+      // Deep comparison for objects
+      if (JSON.stringify(newValue) !== JSON.stringify(valueRef.current)) {
+        valueRef.current = newValue;
+        setValue(newValue);
+      }
+    };
 
-        const readyHandler = () => {
-            const newValue = getValue();
-            valueRef.current = newValue;
-            setValue(newValue);
-        };
+    const readyHandler = () => {
+      const newValue = getValue();
+      valueRef.current = newValue;
+      setValue(newValue);
+    };
 
-        client.on(EVENTS.UPDATE, updateHandler);
-        client.on(EVENTS.READY, readyHandler);
+    client.on(EVENTS.UPDATE, updateHandler);
+    client.on(EVENTS.READY, readyHandler);
 
-        return () => {
-            client.off(EVENTS.UPDATE, updateHandler);
-            client.off(EVENTS.READY, readyHandler);
-        };
-    }, [client, getValue]);
+    return () => {
+      client.off(EVENTS.UPDATE, updateHandler);
+      client.off(EVENTS.READY, readyHandler);
+    };
+  }, [client, getValue]);
 
-    return value;
+  return value;
 }
 
 export default useJsonVariation;

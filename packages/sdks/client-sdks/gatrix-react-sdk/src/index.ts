@@ -6,29 +6,29 @@
 
 // Re-export everything from js-client-sdk
 export type {
-    GatrixClientConfig,
-    GatrixContext,
-    FeaturesConfig,
-    EvaluatedFlag,
-    Variant,
-    VariantType,
-    VariationResult,
-    ImpressionEvent,
-    ErrorEvent,
-    SdkState,
-    SdkStats,
+  GatrixClientConfig,
+  GatrixContext,
+  FeaturesConfig,
+  EvaluatedFlag,
+  Variant,
+  VariantType,
+  VariationResult,
+  ImpressionEvent,
+  ErrorEvent,
+  SdkState,
+  SdkStats,
 } from '@gatrix/js-client-sdk';
 
 export {
-    GatrixClient,
-    FeaturesClient,
-    FlagProxy,
-    WatchFlagGroup,
-    EVENTS,
-    LocalStorageProvider,
-    InMemoryStorageProvider,
-    SDK_VERSION,
-    SDK_NAME,
+  GatrixClient,
+  FeaturesClient,
+  FlagProxy,
+  WatchFlagGroup,
+  EVENTS,
+  LocalStorageProvider,
+  InMemoryStorageProvider,
+  SDK_VERSION,
+  SDK_NAME,
 } from '@gatrix/js-client-sdk';
 
 export type { StorageProvider } from '@gatrix/js-client-sdk';

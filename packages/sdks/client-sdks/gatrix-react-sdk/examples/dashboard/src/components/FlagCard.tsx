@@ -1,55 +1,84 @@
 import type { EvaluatedFlag } from '@gatrix/react-sdk';
 
 interface FlagCardProps {
-    flag: EvaluatedFlag;
+  flag: EvaluatedFlag;
 }
 
 function FlagCard({ flag }: FlagCardProps) {
-    const formatPayload = (payload: unknown): string => {
-        if (payload === undefined || payload === null) return '-';
-        if (typeof payload === 'object') {
-            const str = JSON.stringify(payload);
-            return str.length > 50 ? str.substring(0, 47) + '...' : str;
-        }
-        return String(payload);
-    };
+  const payload = flag.variant?.payload;
+  const hasPayload = payload !== undefined && payload !== null;
+  const isEmptyString = payload === '';
 
-    return (
-        <div className={`flag-card ${flag.enabled ? 'enabled' : 'disabled'}`}>
-            <div className="flag-header">
-                <span className="flag-name">{flag.name}</span>
-                <span className={`flag-badge ${flag.enabled ? 'on' : 'off'}`}>
-                    {flag.enabled ? 'ON' : 'OFF'}
-                </span>
-            </div>
+  const formatPayload = (p: unknown): string => {
+    if (p === '') return 'EMPTY STRING';
+    if (typeof p === 'object') {
+      const str = JSON.stringify(p, null, 2);
+      return str.length > 80 ? str.substring(0, 77) + '...' : str;
+    }
+    return String(p);
+  };
 
-            <div className="flag-details">
-                <div className="flag-detail">
-                    <span className="flag-detail-label">Variant</span>
-                    <span className="flag-detail-value">{flag.variant?.name || '-'}</span>
-                </div>
+  const getPayloadSize = (p: unknown): number => {
+    if (p === undefined || p === null) return 0;
+    const str = typeof p === 'object' ? JSON.stringify(p) : String(p);
+    return new Blob([str]).size;
+  };
 
-                <div className="flag-detail">
-                    <span className="flag-detail-label">Type</span>
-                    <span className="flag-detail-value">{flag.variantType || 'none'}</span>
-                </div>
+  const payloadSize = hasPayload ? getPayloadSize(payload) : 0;
 
-                <div className="flag-detail">
-                    <span className="flag-detail-label">Version</span>
-                    <span className="flag-detail-value">{flag.version || 0}</span>
-                </div>
-
-                {flag.variant?.payload !== undefined && (
-                    <div className="flag-payload">
-                        <div className="flag-payload-label">Payload</div>
-                        <div className="flag-payload-value">
-                            {formatPayload(flag.variant.payload)}
-                        </div>
-                    </div>
-                )}
-            </div>
+  return (
+    <div className="flag-card">
+      <div
+        className="nes-container is-rounded flag-card-inner"
+        style={{
+          borderColor: flag.enabled ? '#92cc41' : '#e76e55',
+          backgroundColor: flag.enabled ? 'rgba(146, 204, 65, 0.1)' : 'rgba(231, 110, 85, 0.1)',
+        }}
+      >
+        <div className="flag-header">
+          <span className="flag-name">
+            {flag.enabled ? '🟢' : '🔴'} {flag.name}
+          </span>
+          <span className={`badge ${flag.enabled ? 'badge-success' : 'badge-error'}`}>
+            {flag.enabled ? 'ON' : 'OFF'}
+          </span>
         </div>
-    );
+
+        <div className="flag-details">
+          <div className="flag-detail">
+            <span className="flag-detail-label">Variant</span>
+            <span className="flag-detail-value">{flag.variant?.name || '-'}</span>
+          </div>
+
+          <div className="flag-detail">
+            <span className="flag-detail-label">Type</span>
+            <span className="flag-detail-value">{flag.variantType || 'none'}</span>
+          </div>
+
+          <div className="flag-detail">
+            <span className="flag-detail-label">Version</span>
+            <span className="flag-detail-value">{flag.version || 0}</span>
+          </div>
+
+          <div className="flag-payload">
+            <div className="flag-payload-label">Payload</div>
+            {hasPayload ? (
+              <>
+                <div
+                  className={`flag-payload-value ${isEmptyString ? 'empty-string' : 'has-payload'}`}
+                >
+                  {formatPayload(payload)}
+                </div>
+                <div className="flag-payload-size">{payloadSize} BYTES</div>
+              </>
+            ) : (
+              <div className="flag-payload-value no-payload">✕ NO PAYLOAD</div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default FlagCard;

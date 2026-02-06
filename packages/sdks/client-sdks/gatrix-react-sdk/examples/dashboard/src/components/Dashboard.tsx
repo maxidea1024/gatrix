@@ -1,82 +1,115 @@
-import { useFlags, useFlagsStatus, useGatrixClient, type GatrixClientConfig } from '@gatrix/react-sdk';
+import {
+  useFlags,
+  useFlagsStatus,
+  useGatrixClient,
+  type GatrixClientConfig,
+} from '@gatrix/react-sdk';
 import { useEffect, useState } from 'react';
 import FlagCard from './FlagCard';
 import StatsPanel from './StatsPanel';
 
 interface DashboardProps {
-    config: GatrixClientConfig;
+  config: GatrixClientConfig;
+}
+
+interface Stats {
+  sdkState: string;
+  fetchFlagsCount: number;
+  updateCount: number;
+  notModifiedCount: number;
+  errorCount: number;
+  recoveryCount: number;
+  impressionCount: number;
+  etag: string | null;
+  startTime: Date | null;
+  lastFetchTime: Date | null;
+  lastError: Error | null;
 }
 
 function Dashboard({ config }: DashboardProps) {
-    const flags = useFlags();
-    const { flagsReady, flagsError } = useFlagsStatus();
-    const client = useGatrixClient();
-    const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
+  const flags = useFlags();
+  const { flagsReady, flagsError } = useFlagsStatus();
+  const client = useGatrixClient();
+  const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
+  const [stats, setStats] = useState<Stats | null>(null);
 
-    useEffect(() => {
-        const handleUpdate = () => {
-            setLastUpdate(new Date());
-        };
+  useEffect(() => {
+    const updateStats = () => {
+      const clientStats = client.features.getStats();
+      setStats(clientStats as Stats);
+      setLastUpdate(new Date());
+    };
 
-        client.on('flags.update', handleUpdate);
-        client.on('flags.ready', handleUpdate);
+    // Initial stats
+    updateStats();
 
-        return () => {
-            client.off('flags.update', handleUpdate);
-            client.off('flags.ready', handleUpdate);
-        };
-    }, [client]);
+    client.on('flags.update', updateStats);
+    client.on('flags.ready', updateStats);
+    client.on('error', updateStats);
 
-    if (flagsError) {
-        return (
-            <div className="error-box">
-                <div className="error-title">❌ Connection Error</div>
-                <div className="error-message">
-                    {flagsError.message || 'Failed to connect to Gatrix server'}
-                </div>
+    // Update stats periodically
+    const interval = setInterval(updateStats, 1000);
+
+    return () => {
+      client.off('flags.update', updateStats);
+      client.off('flags.ready', updateStats);
+      client.off('error', updateStats);
+      clearInterval(interval);
+    };
+  }, [client]);
+
+  const enabledCount = flags.filter((f) => f.enabled).length;
+  const disabledCount = flags.filter((f) => !f.enabled).length;
+
+  // Get error message for display
+  const errorMessage = flagsError?.message || stats?.lastError?.message || null;
+
+  // Check if we haven't fetched any flags yet
+  const isSearching = !flagsReady && flags.length === 0;
+
+  return (
+    <div>
+      <StatsPanel
+        config={config}
+        enabledCount={enabledCount}
+        disabledCount={disabledCount}
+        totalCount={flags.length}
+        lastUpdate={lastUpdate}
+        stats={stats}
+        errorMessage={errorMessage}
+      />
+
+      <section className="flags-section">
+        <div className="nes-container is-dark with-title">
+          <p className="title" style={{ backgroundColor: '#212529' }}>
+            FEATURE FLAGS ({flags.length})
+          </p>
+
+          {isSearching ? (
+            <div className="searching-state">
+              <div className="searching-icon">
+                <span role="img" aria-label="searching">
+                  🔍
+                </span>
+              </div>
+              <p className="searching-text">SEARCHING FOR FLAGS...</p>
             </div>
-        );
-    }
-
-    if (!flagsReady) {
-        return (
-            <div className="loading-container">
-                <div className="loading-content">
-                    <div className="loading-icon">⏳</div>
-                    <div className="loading-text">Connecting to Gatrix...</div>
-                </div>
+          ) : flags.length === 0 ? (
+            <div className="empty-state">
+              <i className="nes-icon is-large heart is-empty"></i>
+              <p className="empty-text">NO FEATURE FLAGS FOUND</p>
             </div>
-        );
-    }
-
-    const enabledCount = flags.filter((f) => f.enabled).length;
-    const disabledCount = flags.filter((f) => !f.enabled).length;
-
-    return (
-        <div>
-            <StatsPanel
-                config={config}
-                enabledCount={enabledCount}
-                disabledCount={disabledCount}
-                totalCount={flags.length}
-                lastUpdate={lastUpdate}
-            />
-
-            <h2 className="section-title">Feature Flags ({flags.length})</h2>
-
-            {flags.length === 0 ? (
-                <div className="empty-state">
-                    <span>No feature flags found</span>
-                </div>
-            ) : (
-                <div className="flags-grid">
-                    {flags.map((flag) => (
-                        <FlagCard key={flag.name} flag={flag} />
-                    ))}
-                </div>
-            )}
+          ) : (
+            <div className="flags-grid">
+              {flags.map((flag) => (
+                <FlagCard key={flag.name} flag={flag} />
+              ))}
+            </div>
+          )}
         </div>
-    );
+      </section>
+    </div>
+  );
 }
 
 export default Dashboard;

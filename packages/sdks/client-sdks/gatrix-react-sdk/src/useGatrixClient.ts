@@ -19,8 +19,8 @@ import { useGatrixContext } from './useGatrixContext';
 import type { GatrixClient } from '@gatrix/js-client-sdk';
 
 export function useGatrixClient(): GatrixClient {
-    const { client } = useGatrixContext();
-    return client;
+  const { client } = useGatrixContext();
+  return client;
 }
 
 export default useGatrixClient;

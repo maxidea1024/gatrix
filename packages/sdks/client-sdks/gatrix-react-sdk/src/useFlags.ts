@@ -26,30 +26,30 @@ import { useGatrixContext } from './useGatrixContext';
 import { EVENTS, type EvaluatedFlag } from '@gatrix/js-client-sdk';
 
 export function useFlags(): EvaluatedFlag[] {
-    const { features, client } = useGatrixContext();
-    const [flags, setFlags] = useState<EvaluatedFlag[]>(() => features.getAllFlags());
+  const { features, client } = useGatrixContext();
+  const [flags, setFlags] = useState<EvaluatedFlag[]>(() => features.getAllFlags());
 
-    useEffect(() => {
-        if (!client) return;
+  useEffect(() => {
+    if (!client) return;
 
-        const onUpdate = () => {
-            setFlags(features.getAllFlags());
-        };
+    const onUpdate = () => {
+      setFlags(features.getAllFlags());
+    };
 
-        const onReady = () => {
-            setFlags(features.getAllFlags());
-        };
+    const onReady = () => {
+      setFlags(features.getAllFlags());
+    };
 
-        client.on(EVENTS.UPDATE, onUpdate);
-        client.on(EVENTS.READY, onReady);
+    client.on(EVENTS.UPDATE, onUpdate);
+    client.on(EVENTS.READY, onReady);
 
-        return () => {
-            client.off(EVENTS.UPDATE, onUpdate);
-            client.off(EVENTS.READY, onReady);
-        };
-    }, [client, features]);
+    return () => {
+      client.off(EVENTS.UPDATE, onUpdate);
+      client.off(EVENTS.READY, onReady);
+    };
+  }, [client, features]);
 
-    return flags;
+  return flags;
 }
 
 export default useFlags;

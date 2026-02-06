@@ -19,15 +19,15 @@
 import { useGatrixContext } from './useGatrixContext';
 
 export interface FlagsStatus {
-    /** Whether flags have been fetched and are ready to use */
-    flagsReady: boolean;
-    /** Any error that occurred during flag fetching */
-    flagsError: any;
+  /** Whether flags have been fetched and are ready to use */
+  flagsReady: boolean;
+  /** Any error that occurred during flag fetching */
+  flagsError: any;
 }
 
 export function useFlagsStatus(): FlagsStatus {
-    const { flagsReady, flagsError } = useGatrixContext();
-    return { flagsReady, flagsError };
+  const { flagsReady, flagsError } = useGatrixContext();
+  return { flagsReady, flagsError };
 }
 
 export default useFlagsStatus;

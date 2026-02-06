@@ -1,54 +1,54 @@
 {
-    "name": "@gatrix/react-sdk",
-    "version": "1.0.0",
-    "description": "Gatrix React SDK for feature flags",
-    "type": "module",
-    "main": "./dist/gatrix-react.umd.cjs",
-    "module": "./dist/gatrix-react.js",
-    "types": "./dist/index.d.ts",
-    "exports": {
-        ".": {
-            "import": "./dist/gatrix-react.js",
-            "require": "./dist/gatrix-react.umd.cjs",
-            "types": "./dist/index.d.ts"
-        }
-    },
-    "files": [
-        "dist"
-    ],
-    "scripts": {
-        "build": "tsc && vite build",
-        "test": "vitest run",
-        "test:watch": "vitest --watch",
-        "lint": "eslint src --ext .ts,.tsx",
-        "clean": "rimraf dist"
-    },
-    "peerDependencies": {
-        "react": ">=17.0.0",
-        "@gatrix/js-client-sdk": "link:../gatrix-js-client-sdk"
-    },
-    "devDependencies": {
-        "@gatrix/js-client-sdk": "link:../gatrix-js-client-sdk",
-        "@testing-library/react": "^14.1.2",
-        "@types/react": "^18.2.38",
-        "@vitejs/plugin-react": "^4.2.1",
-        "react": "^18.2.0",
-        "react-dom": "^18.2.0",
-        "rimraf": "^5.0.5",
-        "typescript": "^5.3.2",
-        "vite": "^5.0.0",
-        "vite-plugin-dts": "^3.6.3",
-        "vitest": "^1.0.0"
-    },
-    "keywords": [
-        "gatrix",
-        "react",
-        "feature-flags",
-        "feature-toggle"
-    ],
-    "license": "MIT",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/gatrix/react-sdk"
+  "name": "@gatrix/react-sdk",
+  "version": "1.0.0",
+  "description": "Gatrix React SDK for feature flags",
+  "type": "module",
+  "main": "./dist/gatrix-react.umd.cjs",
+  "module": "./dist/gatrix-react.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/gatrix-react.js",
+      "require": "./dist/gatrix-react.umd.cjs",
+      "types": "./dist/index.d.ts"
     }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc && vite build",
+    "test": "vitest run",
+    "test:watch": "vitest --watch",
+    "lint": "eslint src --ext .ts,.tsx",
+    "clean": "rimraf dist"
+  },
+  "peerDependencies": {
+    "react": ">=17.0.0",
+    "@gatrix/js-client-sdk": "link:../gatrix-js-client-sdk"
+  },
+  "devDependencies": {
+    "@gatrix/js-client-sdk": "link:../gatrix-js-client-sdk",
+    "@testing-library/react": "^14.1.2",
+    "@types/react": "^18.2.38",
+    "@vitejs/plugin-react": "^4.2.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "rimraf": "^5.0.5",
+    "typescript": "^5.3.2",
+    "vite": "^5.0.0",
+    "vite-plugin-dts": "^3.6.3",
+    "vitest": "^1.0.0"
+  },
+  "keywords": [
+    "gatrix",
+    "react",
+    "feature-flags",
+    "feature-toggle"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gatrix/react-sdk"
+  }
 }

@@ -25,55 +25,52 @@ import { EVENTS, type Variant } from '@gatrix/js-client-sdk';
 /**
  * Check if variant has changed
  */
-export const variantHasChanged = (
-    oldVariant: Variant,
-    newVariant?: Variant
-): boolean => {
-    if (!newVariant) return true;
+export const variantHasChanged = (oldVariant: Variant, newVariant?: Variant): boolean => {
+  if (!newVariant) return true;
 
-    const variantsAreEqual =
-        oldVariant.name === newVariant.name &&
-        oldVariant.enabled === newVariant.enabled &&
-        JSON.stringify(oldVariant.payload) === JSON.stringify(newVariant.payload);
+  const variantsAreEqual =
+    oldVariant.name === newVariant.name &&
+    oldVariant.enabled === newVariant.enabled &&
+    JSON.stringify(oldVariant.payload) === JSON.stringify(newVariant.payload);
 
-    return !variantsAreEqual;
+  return !variantsAreEqual;
 };
 
 const DISABLED_VARIANT: Variant = { name: 'disabled', enabled: false };
 
 export function useVariant(flagName: string): Variant {
-    const { getVariant, client } = useGatrixContext();
-    const [variant, setVariant] = useState<Variant>(() => getVariant(flagName) || DISABLED_VARIANT);
-    const variantRef = useRef<Variant>(variant);
-    variantRef.current = variant;
+  const { getVariant, client } = useGatrixContext();
+  const [variant, setVariant] = useState<Variant>(() => getVariant(flagName) || DISABLED_VARIANT);
+  const variantRef = useRef<Variant>(variant);
+  variantRef.current = variant;
 
-    useEffect(() => {
-        if (!client) return;
+  useEffect(() => {
+    if (!client) return;
 
-        const updateHandler = () => {
-            const newVariant = getVariant(flagName);
-            if (variantHasChanged(variantRef.current, newVariant)) {
-                variantRef.current = newVariant;
-                setVariant(newVariant);
-            }
-        };
+    const updateHandler = () => {
+      const newVariant = getVariant(flagName);
+      if (variantHasChanged(variantRef.current, newVariant)) {
+        variantRef.current = newVariant;
+        setVariant(newVariant);
+      }
+    };
 
-        const readyHandler = () => {
-            const newVariant = getVariant(flagName);
-            variantRef.current = newVariant;
-            setVariant(newVariant);
-        };
+    const readyHandler = () => {
+      const newVariant = getVariant(flagName);
+      variantRef.current = newVariant;
+      setVariant(newVariant);
+    };
 
-        client.on(EVENTS.UPDATE, updateHandler);
-        client.on(EVENTS.READY, readyHandler);
+    client.on(EVENTS.UPDATE, updateHandler);
+    client.on(EVENTS.READY, readyHandler);
 
-        return () => {
-            client.off(EVENTS.UPDATE, updateHandler);
-            client.off(EVENTS.READY, readyHandler);
-        };
-    }, [client, flagName]);
+    return () => {
+      client.off(EVENTS.UPDATE, updateHandler);
+      client.off(EVENTS.READY, readyHandler);
+    };
+  }, [client, flagName]);
 
-    return variant;
+  return variant;
 }
 
 export default useVariant;

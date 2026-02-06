@@ -19,8 +19,8 @@ import type { GatrixContext } from '@gatrix/js-client-sdk';
 export type UpdateContextFunction = (context: Partial<GatrixContext>) => Promise<void>;
 
 export function useUpdateContext(): UpdateContextFunction {
-    const { updateContext } = useGatrixContext();
-    return updateContext;
+  const { updateContext } = useGatrixContext();
+  return updateContext;
 }
 
 export default useUpdateContext;

@@ -10,63 +10,63 @@ import type { GatrixClient, FeaturesClient, Variant } from '@gatrix/js-client-sd
 
 // Mock methods that log errors when used outside provider
 const mockMethods = {
-    on: (_event: string, _callback: (...args: any[]) => void): GatrixClient => {
-        console.error('on() must be used within a GatrixProvider');
-        return mockGatrixClient;
-    },
-    off: (_event: string, _callback?: (...args: any[]) => void): GatrixClient => {
-        console.error('off() must be used within a GatrixProvider');
-        return mockGatrixClient;
-    },
-    updateContext: async () => {
-        console.error('updateContext() must be used within a GatrixProvider');
-        return undefined;
-    },
-    isEnabled: () => {
-        console.error('isEnabled() must be used within a GatrixProvider');
-        return false;
-    },
-    getVariant: (): Variant => {
-        console.error('getVariant() must be used within a GatrixProvider');
-        return { name: 'disabled', enabled: false };
-    },
+  on: (_event: string, _callback: (...args: any[]) => void): GatrixClient => {
+    console.error('on() must be used within a GatrixProvider');
+    return mockGatrixClient;
+  },
+  off: (_event: string, _callback?: (...args: any[]) => void): GatrixClient => {
+    console.error('off() must be used within a GatrixProvider');
+    return mockGatrixClient;
+  },
+  updateContext: async () => {
+    console.error('updateContext() must be used within a GatrixProvider');
+    return undefined;
+  },
+  isEnabled: () => {
+    console.error('isEnabled() must be used within a GatrixProvider');
+    return false;
+  },
+  getVariant: (): Variant => {
+    console.error('getVariant() must be used within a GatrixProvider');
+    return { name: 'disabled', enabled: false };
+  },
 };
 
 // Mock FeaturesClient
 const mockFeaturesClient = {
-    ...mockMethods,
-    getContext: () => ({}),
-    getAllFlags: () => [],
-    boolVariation: () => false,
-    stringVariation: () => '',
-    numberVariation: () => 0,
-    jsonVariation: () => ({}),
-    getStats: () => ({}),
+  ...mockMethods,
+  getContext: () => ({}),
+  getAllFlags: () => [],
+  boolVariation: () => false,
+  stringVariation: () => '',
+  numberVariation: () => 0,
+  jsonVariation: () => ({}),
+  getStats: () => ({}),
 } as unknown as FeaturesClient;
 
 // Mock GatrixClient for use outside provider
 const mockGatrixClient = {
-    ...mockMethods,
-    features: mockFeaturesClient,
-    start: () => Promise.resolve(),
-    stop: () => { },
-    isReady: () => false,
-    getError: () => null,
+  ...mockMethods,
+  features: mockFeaturesClient,
+  start: () => Promise.resolve(),
+  stop: () => {},
+  isReady: () => false,
+  getError: () => null,
 } as unknown as GatrixClient;
 
 // Default context value for use outside provider
 const defaultContextValue: GatrixContextValue = {
-    ...mockMethods,
-    client: mockGatrixClient,
-    features: mockFeaturesClient,
-    flagsReady: false,
-    setFlagsReady: () => {
-        console.error('setFlagsReady() must be used within a GatrixProvider');
-    },
-    flagsError: null,
-    setFlagsError: () => {
-        console.error('setFlagsError() must be used within a GatrixProvider');
-    },
+  ...mockMethods,
+  client: mockGatrixClient,
+  features: mockFeaturesClient,
+  flagsReady: false,
+  setFlagsReady: () => {
+    console.error('setFlagsReady() must be used within a GatrixProvider');
+  },
+  flagsError: null,
+  setFlagsError: () => {
+    console.error('setFlagsError() must be used within a GatrixProvider');
+  },
 };
 
 /**
@@ -76,12 +76,12 @@ const defaultContextValue: GatrixContextValue = {
  * @throws Console error if used outside GatrixProvider (returns mock value)
  */
 export function useGatrixContext(): GatrixContextValue {
-    const context = useContext(GatrixFlagContext);
-    if (!context) {
-        console.error('useGatrixContext() must be used within a GatrixProvider');
-        return defaultContextValue;
-    }
-    return context;
+  const context = useContext(GatrixFlagContext);
+  if (!context) {
+    console.error('useGatrixContext() must be used within a GatrixProvider');
+    return defaultContextValue;
+  }
+  return context;
 }
 
 export default useGatrixContext;
