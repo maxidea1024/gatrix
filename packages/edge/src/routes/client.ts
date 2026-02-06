@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import axios from 'axios';
+import crypto from 'crypto';
 import { clientAuth, ClientRequest } from '../middleware/clientAuth';
 import { sdkManager } from '../services/sdkManager';
 import { config } from '../config/env';
@@ -1048,7 +1049,7 @@ router.post(
 
 /**
  * @openapi
- * /client/{environment}/features/eval:
+ * /client/features/{environment}/eval:
  *   post:
  *     tags: [EdgeClient]
  *     summary: Evaluate feature flags (Local Evaluation)
@@ -1068,73 +1069,250 @@ router.post(
  *             type: object
  *             properties:
  *               context: { type: object }
- *               keys: { type: array, items: { type: string } }
+ *               flagNames: { type: array, items: { type: string } }
+ *     responses:
+ *       200:
+ *         description: Evaluation result
+ *   get:
+ *     tags: [EdgeClient]
+ *     summary: Evaluate feature flags (Local Evaluation - GET)
+ *     description: Evaluates feature flags for the given context using local cache.
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: environment
+ *         required: true
+ *         schema: { type: string }
+ *       - in: query
+ *         name: context
+ *         schema: { type: string }
+ *         description: Base64 encoded JSON string of the evaluation context.
+ *       - in: query
+ *         name: userId
+ *         schema: { type: string }
+ *         description: User ID for context.
+ *       - in: query
+ *         name: sessionId
+ *         schema: { type: string }
+ *         description: Session ID for context.
+ *       - in: query
+ *         name: remoteAddress
+ *         schema: { type: string }
+ *         description: Remote IP address for context.
+ *       - in: query
+ *         name: appName
+ *         schema: { type: string }
+ *         description: Application name for context.
+ *       - in: query
+ *         name: flagNames
+ *         schema: { type: string }
+ *         description: Comma-separated list of flag names to evaluate. If omitted, all flags are evaluated.
  *     responses:
  *       200:
  *         description: Evaluation result
  */
+/**
+ * Evaluation helper to reduce code duplication
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function performEvaluation(
+  req: Request,
+  res: Response,
+  clientContext: any,
+  isPost: boolean
+) {
+  try {
+    const sdk = getSDKOrError(res);
+    if (!sdk) return;
+
+    const { environment, applicationName } = clientContext;
+    let context: any = {};
+    let flagNames: string[] = [];
+
+    if (isPost) {
+      context = req.body.context || {};
+      flagNames = req.body.flagNames || req.body.keys || [];
+    } else {
+      // GET: context from parameters (Unleash Proxy style) or header
+      // 1. Try X-Gatrix-Feature-Context header (Base64 JSON)
+      const contextHeader = req.headers['x-gatrix-feature-context'] as string;
+      if (contextHeader) {
+        try {
+          const jsonStr = Buffer.from(contextHeader, 'base64').toString('utf-8');
+          context = JSON.parse(jsonStr);
+        } catch (error) {
+          logger.warn('Failed to parse x-gatrix-feature-context header', {
+            error,
+          });
+        }
+      }
+
+      // 2. Try 'context' query param (Base64 JSON)
+      if (Object.keys(context).length === 0 && req.query.context) {
+        try {
+          const contextStr = req.query.context as string;
+          const jsonStr = Buffer.from(contextStr, 'base64').toString('utf-8');
+          context = JSON.parse(jsonStr);
+        } catch (e) {
+          try {
+            context = JSON.parse(req.query.context as string);
+          } catch (e2) {
+            /* ignore */
+          }
+        }
+      }
+
+      // 3. Fallback: Parse individual query parameters
+      if (!context.userId && req.query.userId)
+        context.userId = req.query.userId as string;
+      if (!context.sessionId && req.query.sessionId)
+        context.sessionId = req.query.sessionId as string;
+      if (!context.remoteAddress && req.query.remoteAddress)
+        context.remoteAddress = req.query.remoteAddress as string;
+      if (!context.appName && req.query.appName)
+        context.appName = req.query.appName as string;
+
+      const flagNamesParam = req.query.flagNames as string;
+      if (flagNamesParam) {
+        flagNames = flagNamesParam.split(',');
+      }
+    }
+
+    // Default context values
+    if (!context.appName) {
+      context.appName = applicationName;
+    }
+    context.environment = environment;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const results: Record<string, any> = {};
+    const evaluatedKeys: string[] = Array.isArray(flagNames)
+      ? (flagNames as string[])
+      : [];
+
+    // If no keys specified, evaluate ALL (matching backend behavior for client)
+    const keysToEvaluate =
+      evaluatedKeys.length > 0
+        ? evaluatedKeys
+        : sdk.featureFlag.getCached(environment).map((f) => f.name);
+
+    for (const key of keysToEvaluate) {
+      const result = sdk.featureFlag.evaluate(key, context, environment);
+      const flagDef = sdk.featureFlag.getFlagByName(environment, key);
+
+      // Build variant object according to backend specification
+      let variant: any = {
+        name: result.variant?.name || (result.enabled ? 'default' : 'disabled'),
+        enabled: result.enabled,
+      };
+
+      // Check specifically for null/undefined to include empty strings/zero (e.g. config-txw0 case)
+      if (result.variant?.payload !== undefined && result.variant?.payload !== null) {
+        let payloadValue = result.variant.payload.value ?? result.variant.payload;
+        const variantType = flagDef?.variantType || 'string';
+
+        if (variantType === 'json') {
+          if (typeof payloadValue === 'string' && payloadValue.trim() !== '') {
+            try {
+              payloadValue = JSON.parse(payloadValue);
+            } catch (e) { /* ignore */ }
+          }
+          variant.payload = payloadValue;
+        } else if (variantType === 'number') {
+          if (typeof payloadValue === 'string') {
+            const parsed = Number(payloadValue);
+            variant.payload = isNaN(parsed) ? payloadValue : parsed;
+          } else {
+            variant.payload = payloadValue;
+          }
+        } else {
+          // Default to string for other types (config-txw0 case: payload: "")
+          variant.payload = String(payloadValue);
+        }
+      } else if (!result.enabled && flagDef && flagDef.baselinePayload !== undefined && flagDef.baselinePayload !== null) {
+        // Match backend's baselinePayload processing: baseline is stringified if object
+        let baselineValue = flagDef.baselinePayload;
+        if (typeof baselineValue === 'string' && baselineValue.trim() !== '') {
+          try {
+            baselineValue = JSON.parse(baselineValue);
+          } catch { /* ignore */ }
+        }
+        variant.payload = typeof baselineValue === 'string' ? baselineValue : JSON.stringify(baselineValue);
+      }
+
+      results[key] = {
+        name: key,
+        enabled: result.enabled,
+        variant,
+        variantType: flagDef?.variantType || 'string',
+        version: 1, // Edge cache currently doesn't store version, default to 1
+        ...(flagDef?.impressionDataEnabled && { impressionData: true }),
+      };
+    }
+
+    const flagsArray = Object.values(results);
+    const responseData = {
+      success: true,
+      data: {
+        flags: flagsArray,
+      },
+      meta: {
+        environment,
+        evaluatedAt: new Date().toISOString(),
+      }
+    };
+
+    // Generate ETag from flags data (hash of stringified flags with names and status)
+    const etagSource = flagsArray.map((f: any) => `${f.name}:${f.enabled}`).join('|');
+    const etag = `"${crypto.createHash('md5').update(etagSource).digest('hex')}"`;
+
+    // Check If-None-Match header
+    const requestEtag = req.headers['if-none-match'];
+    if (requestEtag === etag) {
+      return res.status(304).end();
+    }
+
+    res.set('ETag', etag);
+    res.json(responseData);
+  } catch (error) {
+    logger.error('Error evaluating feature flags in edge:', error);
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'Failed to evaluate feature flags',
+      },
+    });
+  }
+}
+
 router.post(
-  '/:environment/features/eval',
+  '/features/:environment/eval',
   clientAuth,
   async (req: ClientRequest, res: Response) => {
-    try {
-      const sdk = getSDKOrError(res);
-      if (!sdk) return;
+    await performEvaluation(req, res, req.clientContext, true);
+  }
+);
 
-      const { environment, applicationName } = req.clientContext!;
-      const { context = {}, keys = [] } = req.body;
-
-      // Ensure appName is in context if not provided
-      if (!context.appName) {
-        context.appName = applicationName;
-      }
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const results: Record<string, any> = {};
-      const evaluatedKeys: string[] = Array.isArray(keys) ? (keys as string[]) : [];
-
-      for (const key of evaluatedKeys) {
-        const result = sdk.featureFlag.evaluate(key, context, environment);
-        results[key] = {
-          value: result.enabled,
-          variant: result.variant?.name,
-          reason: result.reason,
-          payload: result.variant?.payload,
-        };
-      }
-
-      res.json({
-        success: true,
-        data: {
-          configs: results,
-          evaluatedAt: new Date().toISOString(),
-          context,
-        },
-        cached: true,
-      });
-    } catch (error) {
-      logger.error('Error evaluating feature flags in edge:', error);
-      res.status(500).json({
-        success: false,
-        error: {
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to evaluate feature flags',
-        },
-      });
-    }
+router.get(
+  '/features/:environment/eval',
+  clientAuth,
+  async (req: ClientRequest, res: Response) => {
+    await performEvaluation(req, res, req.clientContext, false);
   }
 );
 
 /**
  * @openapi
- * /client/{environment}/features/metrics:
+ * /client/features/{environment}/metrics:
  *   post:
  *     tags: [EdgeClient]
  *     summary: Submit feature flag metrics (Buffered Aggregation)
  *     description: Buffers and aggregates metrics at edge before flushing to backend.
  */
 router.post(
-  '/:environment/features/metrics',
+  '/features/:environment/metrics',
   clientAuth,
   async (req: ClientRequest, res: Response) => {
     try {

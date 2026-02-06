@@ -5,21 +5,28 @@ interface ConfigFormProps {
   onConnect: (config: GatrixClientConfig) => void;
 }
 
-const DEV_TOKEN = 'gatrix-unsecured-client-api-token';
+const DEV_TOKEN_ALL = 'gatrix-unsecured-edge-api-token';
+const DEV_TOKEN_CLIENT = 'gatrix-unsecured-client-api-token';
 const STORAGE_KEY_TOKEN = 'gatrix-dashboard-last-token';
 const STORAGE_KEY_USE_DEV = 'gatrix-dashboard-use-dev-token';
 const STORAGE_KEY_REMEMBER = 'gatrix-dashboard-remember-token';
 const STORAGE_KEY_API_URL = 'gatrix-dashboard-api-url';
 const STORAGE_KEY_APP_NAME = 'gatrix-dashboard-app-name';
 const STORAGE_KEY_ENVIRONMENT = 'gatrix-dashboard-environment';
+const STORAGE_KEY_SERVER_TYPE = 'gatrix-dashboard-server-type';
 
 function ConfigForm({ onConnect }: ConfigFormProps) {
+  const [serverType, setServerType] = useState<'edge' | 'backend'>(() => {
+    const saved = localStorage.getItem(STORAGE_KEY_SERVER_TYPE);
+    return (saved as 'edge' | 'backend') || 'edge';
+  });
   const [apiUrl, setApiUrl] = useState('http://localhost:45000/api/v1');
   const [apiToken, setApiToken] = useState('');
   const [appName, setAppName] = useState('my-app');
   const [environment, setEnvironment] = useState('development');
   const [useDevToken, setUseDevToken] = useState(false);
   const [rememberToken, setRememberToken] = useState(false);
+  const [showToken, setShowToken] = useState(false);
 
   // Load saved preferences on mount
   useEffect(() => {
@@ -32,6 +39,11 @@ function ConfigForm({ onConnect }: ConfigFormProps) {
 
     // Restore saved form values
     if (savedApiUrl) setApiUrl(savedApiUrl);
+    else {
+      // Set default based on server type if no saved URL
+      setApiUrl(serverType === 'edge' ? 'http://localhost:45000/api/v1' : 'http://localhost:5000/api/v1');
+    }
+
     if (savedAppName) setAppName(savedAppName);
     if (savedEnvironment) setEnvironment(savedEnvironment);
 
@@ -39,26 +51,36 @@ function ConfigForm({ onConnect }: ConfigFormProps) {
     setRememberToken(savedRememberToken);
 
     if (savedUseDevToken) {
-      setApiToken(DEV_TOKEN);
+      setApiToken(serverType === 'edge' ? DEV_TOKEN_ALL : DEV_TOKEN_CLIENT);
     } else if (savedRememberToken && savedToken) {
       setApiToken(savedToken);
     }
   }, []);
 
-  // Update token when useDevToken changes
+  // Update token and URL when serverType or useDevToken changes
   useEffect(() => {
+    // If no saved URL, update to default for the server type
+    const savedApiUrl = localStorage.getItem(STORAGE_KEY_API_URL);
+    if (!savedApiUrl) {
+      setApiUrl(serverType === 'edge' ? 'http://localhost:45000/api/v1' : 'http://localhost:5000/api/v1');
+    }
+
     if (useDevToken) {
-      setApiToken(DEV_TOKEN);
+      setApiToken(serverType === 'edge' ? DEV_TOKEN_ALL : DEV_TOKEN_CLIENT);
     } else {
       // Restore saved token if remember is enabled
       const savedToken = localStorage.getItem(STORAGE_KEY_TOKEN) || '';
-      if (rememberToken && savedToken && savedToken !== DEV_TOKEN) {
+      const isDevToken = savedToken === DEV_TOKEN_ALL || savedToken === DEV_TOKEN_CLIENT;
+
+      if (rememberToken && savedToken && !isDevToken) {
         setApiToken(savedToken);
-      } else if (apiToken === DEV_TOKEN) {
+      } else if (apiToken === DEV_TOKEN_ALL || apiToken === DEV_TOKEN_CLIENT) {
         setApiToken('');
       }
     }
-  }, [useDevToken]);
+
+    localStorage.setItem(STORAGE_KEY_SERVER_TYPE, serverType);
+  }, [serverType, useDevToken]);
 
   const handleUseDevTokenChange = (checked: boolean) => {
     setUseDevToken(checked);
@@ -85,9 +107,11 @@ function ConfigForm({ onConnect }: ConfigFormProps) {
     localStorage.setItem(STORAGE_KEY_API_URL, apiUrl);
     localStorage.setItem(STORAGE_KEY_APP_NAME, appName);
     localStorage.setItem(STORAGE_KEY_ENVIRONMENT, environment);
+    localStorage.setItem(STORAGE_KEY_SERVER_TYPE, serverType);
 
     // Save token if remember is enabled
-    if (rememberToken && apiToken !== DEV_TOKEN) {
+    const isDevToken = apiToken === DEV_TOKEN_ALL || apiToken === DEV_TOKEN_CLIENT;
+    if (rememberToken && !isDevToken) {
       localStorage.setItem(STORAGE_KEY_TOKEN, apiToken);
     }
 
@@ -102,7 +126,7 @@ function ConfigForm({ onConnect }: ConfigFormProps) {
   // Mask token for display
   const getDisplayToken = (): string => {
     if (useDevToken) {
-      return '****************************';
+      return serverType === 'edge' ? DEV_TOKEN_ALL : DEV_TOKEN_CLIENT;
     }
     return apiToken;
   };
@@ -117,29 +141,74 @@ function ConfigForm({ onConnect }: ConfigFormProps) {
 
           <form onSubmit={handleSubmit}>
             <div className="form-group">
+              <label className="form-label">SERVER TYPE</label>
+              <div style={{ display: 'flex', gap: '40px', marginBottom: '20px' }}>
+                <label>
+                  <input
+                    type="radio"
+                    className="nes-radio is-dark"
+                    name="serverType"
+                    checked={serverType === 'edge'}
+                    onChange={() => setServerType('edge')}
+                  />
+                  <span>EDGE</span>
+                </label>
+                <label>
+                  <input
+                    type="radio"
+                    className="nes-radio is-dark"
+                    name="serverType"
+                    checked={serverType === 'backend'}
+                    onChange={() => setServerType('backend')}
+                  />
+                  <span>BACKEND</span>
+                </label>
+              </div>
+            </div>
+
+            <div className="form-group">
               <label className="form-label">API URL</label>
               <input
                 type="url"
                 className="nes-input is-dark"
                 value={apiUrl}
                 onChange={(e) => setApiUrl(e.target.value)}
-                placeholder="http://localhost:45000/api/v1"
+                placeholder={serverType === 'edge' ? "http://localhost:45000/api/v1" : "http://localhost:5000/api/v1"}
                 required
               />
             </div>
 
             <div className="form-group">
               <label className="form-label">API TOKEN</label>
-              <input
-                type={useDevToken ? 'password' : 'text'}
-                className="nes-input is-dark"
-                value={getDisplayToken()}
-                onChange={(e) => !useDevToken && setApiToken(e.target.value)}
-                placeholder="Enter your API token"
-                required
-                readOnly={useDevToken}
-                style={{ opacity: useDevToken ? 0.7 : 1 }}
-              />
+              <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                <input
+                  type={!showToken ? 'password' : 'text'}
+                  className="nes-input is-dark"
+                  value={getDisplayToken()}
+                  onChange={(e) => !useDevToken && setApiToken(e.target.value)}
+                  placeholder="Enter your API token"
+                  required
+                  readOnly={useDevToken}
+                  style={{ opacity: useDevToken ? 0.7 : 1, paddingRight: '50px' }}
+                />
+                <button
+                  type="button"
+                  className="nes-btn is-primary"
+                  onClick={() => setShowToken(!showToken)}
+                  style={{
+                    position: 'absolute',
+                    right: '4px',
+                    padding: '4px 8px',
+                    height: '38px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                  title={showToken ? "Hide Token" : "Show Token"}
+                >
+                  <i className={`nes-icon is-small ${showToken ? 'close' : 'eye'}`} style={{ transform: 'scale(1.2)' }}></i>
+                </button>
+              </div>
             </div>
 
             <div className="checkbox-group">

@@ -57,10 +57,6 @@ export const API_HEADERS = {
    */
   X_APPLICATION_NAME: 'x-application-name',
 
-  /**
-   * 환경 ID 헤더 (멀티 환경 지원)
-   */
-  X_ENVIRONMENT_ID: 'x-environment-id',
 
   /**
    * 환경 이름 헤더 (SDK용)
@@ -214,7 +210,6 @@ export const ALLOWED_HEADERS: string[] = [
   HEADERS.X_USER_ID,
   HEADERS.X_APPLICATION_NAME,
   HEADERS.X_REQUEST_ID,
-  HEADERS.X_ENVIRONMENT_ID,
   HEADERS.X_ENVIRONMENT,
   HEADERS.X_CONNECTION_ID,
   HEADERS.X_SESSION_ID,

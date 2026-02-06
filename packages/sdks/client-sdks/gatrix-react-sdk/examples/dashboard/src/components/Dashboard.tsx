@@ -48,7 +48,9 @@ function Dashboard({ config }: DashboardProps) {
     const updateStats = () => {
       const clientStats = client.features.getStats();
       setStats(clientStats as Stats);
-      setLastUpdate(new Date());
+      if (clientStats.lastFetchTime) {
+        setLastUpdate(clientStats.lastFetchTime);
+      }
       setContext(client.features.getContext());
     };
 

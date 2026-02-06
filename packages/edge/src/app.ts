@@ -28,7 +28,7 @@ const cspDirectives: Record<string, string[] | null | undefined> = {
   styleSrc: ["'self'", "'unsafe-inline'"], // Allow inline styles
   imgSrc: ["'self'", 'data:', 'https:', 'http:'],
   fontSrc: ["'self'", 'https:', 'http:', 'data:'],
-  connectSrc: ["'self'"],
+  connectSrc: ["'self'", '*'], // Allow connecting to any API (important for SDKs)
 };
 
 // Only add upgrade-insecure-requests for HTTPS environments
@@ -39,6 +39,7 @@ if (forceHttps) {
 app.use(
   helmet({
     contentSecurityPolicy: {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       directives: cspDirectives as any,
     },
     // Disable HTTPS-related headers for HTTP environments
@@ -56,11 +57,17 @@ app.use(
     methods: ['GET', 'POST', 'OPTIONS'],
     allowedHeaders: [
       'Content-Type',
+      'Authorization',
+      'If-None-Match',
       'x-api-token',
       'x-application-name',
-      'x-environment-id',
+      'x-environment',
+      'x-sdk-version',
       'x-client-version',
       'x-platform',
+      'x-connection-id',
+      'x-session-id',
+      'x-gatrix-feature-context',
     ],
   })
 );

@@ -40,11 +40,11 @@ class SDKManager {
       // Redis for PubSub (optional)
       redis: config.redis.host
         ? {
-            host: config.redis.host,
-            port: config.redis.port,
-            password: config.redis.password,
-            db: config.redis.db,
-          }
+          host: config.redis.host,
+          port: config.redis.port,
+          password: config.redis.password,
+          db: config.redis.db,
+        }
         : undefined,
 
       // Cache configuration
@@ -63,6 +63,7 @@ class SDKManager {
         serviceNotice: true,
         banner: true,
         storeProduct: true,
+        featureFlag: true,
       },
 
       // Enable metrics

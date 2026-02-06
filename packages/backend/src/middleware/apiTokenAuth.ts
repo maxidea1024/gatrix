@@ -4,412 +4,321 @@ import { Environment } from '../models/Environment';
 import { CacheService } from '../services/CacheService';
 import logger from '../config/logger';
 import { HEADERS, HEADER_VALUES } from '../constants/headers';
-import { isValidEnvironment } from '../utils/environmentContext';
 import { ErrorCodes } from '../utils/apiResponse';
 
-// Unsecured tokens for testing purposes
-const UNSECURED_CLIENT_TOKEN = 'gatrix-unsecured-client-api-token';
-const UNSECURED_SERVER_TOKEN = 'gatrix-unsecured-server-api-token';
+// ==================== Constants ====================
 
-// Edge bypass token - allows access to all environments and internal APIs
-// This token is used by Edge servers that run in internal network
-// Can be configured via EDGE_BYPASS_TOKEN environment variable
-// TODO: In the future, this should be replaced with a generated/registered token
+const UNSECURED_TOKENS = {
+  CLIENT: 'gatrix-unsecured-client-api-token',
+  SERVER: 'gatrix-unsecured-server-api-token',
+  EDGE: 'gatrix-unsecured-edge-api-token',
+} as const;
+
 export const EDGE_BYPASS_TOKEN =
   process.env.EDGE_BYPASS_TOKEN || 'gatrix-edge-internal-bypass-token';
+
+const CACHE_TTL = 300; // 5 minutes
+
+// ==================== Types ====================
 
 export interface SDKRequest extends Request {
   apiToken?: ApiAccessToken;
   environments?: Environment[];
-  environment?: string; // Environment name string
-  environmentModel?: Environment; // Optional model if needed
-  isUnsecuredToken?: boolean; // Flag to indicate unsecured token usage
-  isEdgeBypassToken?: boolean; // Flag to indicate Edge bypass token usage
+  environment?: string;
+  environmentModel?: Environment;
+  isUnsecuredToken?: boolean;
+  isEdgeBypassToken?: boolean;
+}
+
+// ==================== Helpers ====================
+
+/**
+ * Extracts API token from headers or query parameters
+ */
+function extractToken(req: Request): string | undefined {
+  const authHeader = req.headers[HEADERS.AUTHORIZATION] as string;
+  if (authHeader?.startsWith(HEADER_VALUES.BEARER_PREFIX)) {
+    return authHeader.substring(HEADER_VALUES.BEARER_PREFIX.length);
+  }
+
+  return (
+    (req.headers[HEADERS.X_API_TOKEN] as string) ||
+    (req.query.token as string) ||
+    (req.query.apiToken as string)
+  );
 }
 
 /**
- * Middleware to authenticate API access tokens
+ * Handles special internal/testing tokens
+ */
+function handleSpecialTokens(token: string): {
+  apiToken: Partial<ApiAccessToken>;
+  isUnsecured?: boolean;
+  isEdgeBypass?: boolean;
+} | null {
+  // Unsecured testing tokens
+  if (
+    token === UNSECURED_TOKENS.CLIENT ||
+    token === UNSECURED_TOKENS.SERVER ||
+    token === UNSECURED_TOKENS.EDGE
+  ) {
+    const typeMap: Record<string, 'client' | 'server' | 'edge' | 'all'> = {
+      [UNSECURED_TOKENS.CLIENT]: 'client',
+      [UNSECURED_TOKENS.SERVER]: 'server',
+      [UNSECURED_TOKENS.EDGE]: 'all',
+    };
+    const type = typeMap[token] || 'client';
+    return {
+      apiToken: {
+        id: `unsecured-${type}`,
+        tokenType: type as any,
+        tokenName: `Unsecured ${type.toUpperCase()} Token`,
+        allowAllEnvironments: true,
+        createdBy: 0, // Mock system user ID
+      },
+      isUnsecured: true,
+    };
+  }
+
+  // Edge internal bypass token
+  if (token === EDGE_BYPASS_TOKEN) {
+    return {
+      apiToken: {
+        id: 'edge-bypass',
+        tokenType: 'all',
+        tokenName: 'Edge Bypass Token (Internal)',
+        allowAllEnvironments: true,
+        createdBy: 0, // Mock system user ID
+      },
+      isEdgeBypass: true,
+    };
+  }
+
+  return null;
+}
+
+/**
+ * Validates if token has access to specific environment
+ */
+async function checkEnvironmentAccess(
+  apiToken: ApiAccessToken,
+  environmentName: string
+): Promise<boolean> {
+  if (apiToken.allowAllEnvironments) return true;
+
+  if (typeof apiToken.hasEnvironmentAccess === 'function') {
+    return await apiToken.hasEnvironmentAccess(environmentName);
+  }
+
+  // Fallback for cached plain objects
+  const { default: knex } = await import('../config/knex');
+  const envAccess = await knex('g_api_access_token_environments')
+    .where('tokenId', apiToken.id)
+    .where('environment', environmentName)
+    .first();
+  return !!envAccess;
+}
+
+// ==================== Middlewares ====================
+
+/**
+ * Core API Token authentication middleware
  */
 export const authenticateApiToken = async (req: SDKRequest, res: Response, next: NextFunction) => {
   try {
-    const authHeader = req.headers[HEADERS.AUTHORIZATION];
-    const apiTokenHeader = req.headers[HEADERS.X_API_TOKEN] as string;
-
-    // Extract token from Authorization header or X-API-Token header
-    let token: string | undefined;
-
-    if (authHeader && authHeader.startsWith(HEADER_VALUES.BEARER_PREFIX)) {
-      token = authHeader.substring(HEADER_VALUES.BEARER_PREFIX.length);
-    } else if (apiTokenHeader) {
-      token = apiTokenHeader;
-    }
-
+    const token = extractToken(req);
     if (!token) {
       return res.status(401).json({
         success: false,
-        error: {
-          code: ErrorCodes.AUTH_TOKEN_MISSING,
-          message: 'API token is required',
-        },
+        error: { code: ErrorCodes.AUTH_TOKEN_MISSING, message: 'API token is required' },
       });
     }
 
-    // Check for unsecured client token (for testing)
-    if (token === UNSECURED_CLIENT_TOKEN) {
-      req.isUnsecuredToken = true;
-      req.apiToken = {
-        id: 'unsecured-client',
-        tokenType: 'client',
-        tokenValue: UNSECURED_CLIENT_TOKEN,
-        tokenName: 'Unsecured Client Token (Testing)',
-        isActive: true,
-        expiresAt: null,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      } as any;
+    // 1. Check special tokens first
+    const special = handleSpecialTokens(token);
+    if (special) {
+      req.isUnsecuredToken = special.isUnsecured || false;
+      req.isEdgeBypassToken = special.isEdgeBypass || false;
+      req.apiToken = special.apiToken as ApiAccessToken;
       return next();
     }
 
-    // Check for Edge bypass token (internal network only)
-    // Edge server uses this token when proxying client requests to backend
-    if (token === EDGE_BYPASS_TOKEN) {
-      req.isUnsecuredToken = true;
-      req.isEdgeBypassToken = true;
-      req.apiToken = {
-        id: 'edge-bypass',
-        tokenType: 'client', // Treat as client for client SDK endpoints
-        tokenValue: EDGE_BYPASS_TOKEN,
-        tokenName: 'Edge Bypass Token (Internal)',
-        allowAllEnvironments: true,
-        isActive: true,
-        expiresAt: null,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      } as any;
-      return next();
-    }
+    // 2. Check cache
+    const cacheKey = `api_token:${token.substring(0, 16)}...`;
+    let tokenData = await CacheService.get<ApiAccessToken>(cacheKey);
 
-    // Try to get token from cache first
-    const cacheKey = `api_token:${token.substring(0, 16)}...`; // Use partial token for cache key
-    let apiToken = await CacheService.get<ApiAccessToken>(cacheKey);
-
-    if (!apiToken) {
-      // Validate token against database
-      apiToken = await ApiAccessToken.validateAndUse(token);
-
-      if (!apiToken) {
+    // 3. Check database if not in cache
+    if (!tokenData) {
+      const dbToken = await ApiAccessToken.validateAndUse(token);
+      if (!dbToken) {
         return res.status(401).json({
           success: false,
-          error: {
-            code: ErrorCodes.AUTH_TOKEN_INVALID,
-            message: 'Invalid or expired API token',
-          },
+          error: { code: ErrorCodes.AUTH_TOKEN_INVALID, message: 'Invalid or expired API token' },
         });
       }
-
-      // Cache the token for 5 minutes
-      await CacheService.set(cacheKey, apiToken, 300);
-    } else {
-      // 캐시에서 토큰을 찾았어도 사용량 기록
-      if (apiToken.id) {
-        const { default: apiTokenUsageService } = await import('../services/ApiTokenUsageService');
-        apiTokenUsageService.recordTokenUsage(apiToken.id).catch((error) => {
-          logger.error('Failed to record token usage from cache:', error);
-        });
-      }
+      tokenData = dbToken;
+      await CacheService.set(cacheKey, tokenData, CACHE_TTL);
+    } else if (tokenData.id) {
+      // Record usage even if cached
+      const { default: apiTokenUsageService } = await import('../services/ApiTokenUsageService');
+      apiTokenUsageService.recordTokenUsage(tokenData.id).catch((e) => {
+        logger.error('Failed to record token usage from cache:', e);
+      });
     }
 
-    // Check if token is valid (handle both model instances and plain objects from cache)
-    const isExpired = apiToken.expiresAt ? new Date() > new Date(apiToken.expiresAt) : false;
+    // 4. Expiration check
+    const isExpired = tokenData.expiresAt ? new Date() > new Date(tokenData.expiresAt) : false;
     if (isExpired) {
       return res.status(401).json({
         success: false,
-        error: {
-          code: ErrorCodes.AUTH_TOKEN_EXPIRED,
-          message: 'API token is inactive or expired',
-        },
+        error: { code: ErrorCodes.AUTH_TOKEN_EXPIRED, message: 'API token has expired' },
       });
     }
 
-    // Get environments if token has specific environment access
-    let environments: Environment[] = [];
-
-    if (
-      !apiToken.allowAllEnvironments &&
-      apiToken.environments &&
-      apiToken.environments.length > 0
-    ) {
-      environments = apiToken.environments;
-    } else if (!apiToken.allowAllEnvironments) {
-      // Fetch environments from database if not loaded
-      const { default: knex } = await import('../config/knex');
-      const envNames = await knex('g_api_access_token_environments')
-        .where('tokenId', apiToken.id)
-        .select('environment');
-
-      if (envNames.length > 0) {
-        environments = await Environment.query().whereIn(
-          'environment',
-          envNames.map((e) => e.environment)
-        );
-      }
-    }
-
-    // If token has no environments and doesn't allow all, deny access
-    if (!apiToken.allowAllEnvironments && environments.length === 0) {
-      return res.status(403).json({
-        success: false,
-        error: {
-          code: ErrorCodes.ENV_ACCESS_DENIED,
-          message: 'API token has no environment access configured',
-        },
-      });
-    }
-
-    // Attach token and environments to request
-    req.apiToken = apiToken;
-    req.environments = environments;
-
+    req.apiToken = tokenData;
     next();
   } catch (error) {
-    logger.error('Error authenticating API token:', error);
+    logger.error('Authentication error:', error);
     res.status(500).json({
       success: false,
-      error: {
-        code: ErrorCodes.INTERNAL_SERVER_ERROR,
-        message: 'Authentication error',
-      },
+      error: { code: ErrorCodes.INTERNAL_SERVER_ERROR, message: 'Authentication failed' },
     });
   }
 };
 
 /**
- * Middleware to check token type
- * 'all' token type can access both client and server APIs
+ * Validates token type (client, server, etc.)
  */
 export const requireTokenType = (tokenType: 'client' | 'server' | 'admin') => {
   return (req: SDKRequest, res: Response, next: NextFunction) => {
     const apiToken = req.apiToken;
-
     if (!apiToken) {
       return res.status(401).json({
         success: false,
-        error: {
-          code: ErrorCodes.AUTH_TOKEN_MISSING,
-          message: 'API token not found',
-        },
+        error: { code: ErrorCodes.AUTH_TOKEN_MISSING, message: 'Token not found' },
       });
     }
 
-    // 'all' token type can access any API
-    if (apiToken.tokenType === 'all') {
+    if (apiToken.tokenType === 'all' || apiToken.tokenType === (tokenType as any)) {
       return next();
     }
 
-    if (apiToken.tokenType !== tokenType) {
-      return res.status(403).json({
-        success: false,
-        error: {
-          code: ErrorCodes.AUTH_PERMISSION_DENIED,
-          message: `Invalid token type. Required: ${tokenType}, got: ${apiToken.tokenType}`,
-        },
-      });
-    }
+    logger.warn('Auth: Token type mismatch', {
+      tokenId: apiToken.id,
+      tokenType: apiToken.tokenType,
+      requiredType: tokenType,
+      url: req.originalUrl,
+      isUnsecured: (req as any).isUnsecuredToken,
+    });
 
-    next();
+    res.status(403).json({
+      success: false,
+      error: {
+        code: ErrorCodes.AUTH_PERMISSION_DENIED,
+        message: `Invalid token type. Required: ${tokenType}`,
+      },
+    });
   };
 };
 
 /**
- * Middleware to validate application name header
+ * Validates application name from header or query
  */
 export const validateApplicationName = (req: SDKRequest, res: Response, next: NextFunction) => {
-  const appName = req.headers[HEADERS.X_APPLICATION_NAME] as string;
+  const appName =
+    (req.headers[HEADERS.X_APPLICATION_NAME] as string) || (req.query.appName as string);
 
   if (!appName) {
+    logger.warn('Auth: Application name missing', { url: req.originalUrl });
     return res.status(400).json({
       success: false,
-      error: {
-        code: ErrorCodes.BAD_REQUEST,
-        message: 'X-Application-Name header is required',
-      },
+      error: { code: ErrorCodes.BAD_REQUEST, message: 'X-Application-Name is required' },
     });
   }
 
-  // Validate app name format
+  // Validate format
   if (!/^[a-zA-Z0-9_-]+$/.test(appName) || appName.length > 100) {
+    logger.warn('Auth: Invalid application name format', { appName });
     return res.status(400).json({
       success: false,
-      error: {
-        code: ErrorCodes.VALIDATION_ERROR,
-        message: 'Invalid application name format',
-      },
+      error: { code: ErrorCodes.VALIDATION_ERROR, message: 'Invalid application name format' },
     });
   }
 
-  // Attach app name to request for metrics
   (req as any).applicationName = appName;
-
   next();
 };
 
 /**
- * Rate limiting for SDK endpoints
- */
-export const sdkRateLimit = (req: SDKRequest, res: Response, next: NextFunction) => {
-  // TODO: Implement rate limiting based on token type and environment
-  // For now, just pass through
-  next();
-};
-
-/**
- * SDK 환경 설정 미들웨어
- * X-Environment 헤더 또는 URL 파라미터를 사용하여 req.environment를 설정합니다.
- * 토큰의 환경 접근 권한을 검증합니다.
+ * Resolves atmosphere and environment, validates access
  */
 export const setSDKEnvironment = async (req: SDKRequest, res: Response, next: NextFunction) => {
   try {
-    const apiToken = req.apiToken;
-
-    // Get environment from header or use default
-    // SDK sends 'X-Environment'
-    let environmentName = req.headers['x-environment'] as string;
-
-    // Use pre-resolved environment if available (e.g. from URL params)
-    if (!environmentName && req.environment) {
-      environmentName = req.environment;
-    }
-
-    // Attempt to resolve from URL (specifically for server routes like /api/v1/server/:env/...
-    // or client feature flag routes like /api/v1/client/features/:env/eval)
-    if (!environmentName) {
-      let envParam = req.params?.env || req.params?.environment;
-
-      // Fallback: Manually parse URL if req.params is not populated (middleware order issue)
-      if (!envParam) {
-        const path = req.originalUrl || req.url;
-        // Match /api/v1/server/:env/ pattern
-        let match = path.match(/\/api\/v1\/server\/([^\/]+)\//);
-        if (
-          match &&
-          match[1] &&
-          match[1] !== 'services' &&
-          match[1] !== 'internal' &&
-          match[1] !== 'auth'
-        ) {
-          envParam = match[1];
-        }
-
-        // Match /api/v1/client/features/:env/eval pattern
-        // Match /api/v1/client/features/:env/metrics or .../eval pattern
-        if (!envParam) {
-          match = path.match(/\/api\/v1\/client\/features\/([^\/]+)\/(eval|metrics)/);
-          if (match && match[1]) {
-            envParam = match[1];
-          }
-        }
-      }
-
-      if (envParam) {
-        environmentName = envParam;
-      }
-    }
+    const environmentName =
+      (req.headers[HEADERS.X_ENVIRONMENT] as string) ||
+      (req.params.env as string) ||
+      (req.params.environment as string) ||
+      (req.query.environment as string);
 
     if (!environmentName) {
+      logger.warn('Auth: Environment missing in request', { url: req.originalUrl });
       return res.status(400).json({
         success: false,
-        error: {
-          code: ErrorCodes.ENV_INVALID,
-          message: 'Environment is required (via X-Environment header)',
-        },
+        error: { code: ErrorCodes.ENV_INVALID, message: 'Environment is required' },
       });
     }
 
-    // Fetch environment from database to validate
+    // Resolve and validate environment
     const cacheKey = `sdk_env:${environmentName}`;
-    let environment: Environment | null = await CacheService.get<Environment>(cacheKey);
+    let environment = await CacheService.get<Environment>(cacheKey);
 
     if (!environment) {
-      const foundEnv = await Environment.getByName(environmentName);
-
-      if (!foundEnv) {
+      environment = (await Environment.getByName(environmentName)) || null;
+      if (!environment) {
+        logger.warn('Auth: Environment not found', { environmentName });
         return res.status(404).json({
           success: false,
-          error: {
-            code: ErrorCodes.ENV_NOT_FOUND,
-            message: `Environment not found: ${environmentName}`,
-          },
+          error: { code: ErrorCodes.ENV_NOT_FOUND, message: `Environment not found: ${environmentName}` },
         });
       }
-
-      environment = foundEnv;
-
-      // Cache environment for 5 minutes
-      await CacheService.set(cacheKey, environment, 300);
+      await CacheService.set(cacheKey, environment, CACHE_TTL);
     }
 
-    // Update to canonical name
-    environmentName = environment.environment;
-    req.environment = environmentName;
+    req.environment = environment.environment;
     req.environmentModel = environment;
 
-    // Validate token has access to this environment (skip for unsecured tokens)
-    if (!req.isUnsecuredToken && apiToken && !apiToken.allowAllEnvironments) {
-      let hasAccess = false;
-
-      if (typeof apiToken.hasEnvironmentAccess === 'function') {
-        hasAccess = await apiToken.hasEnvironmentAccess(environmentName);
-      } else {
-        // For cached plain objects, query the database
-        const { default: knex } = await import('../config/knex');
-        const envAccess = await knex('g_api_access_token_environments')
-          .where('tokenId', apiToken.id)
-          .where('environment', environmentName)
-          .first();
-        hasAccess = !!envAccess;
-      }
-
+    // Access check
+    if (!req.isUnsecuredToken && req.apiToken) {
+      const hasAccess = await checkEnvironmentAccess(req.apiToken, req.environment);
       if (!hasAccess) {
-        // Detailed logging for debugging
-        logger.error('API token environment access denied:', {
-          tokenId: apiToken.id,
-          tokenName: apiToken.tokenName,
-          environment: environmentName,
-          isUnsecuredToken: req.isUnsecuredToken,
-          allowAllEnvironments: apiToken.allowAllEnvironments,
-          path: req.originalUrl,
+        logger.warn('Auth: Environment access denied', {
+          tokenId: req.apiToken.id,
+          tokenType: req.apiToken.tokenType,
+          env: req.environment,
+          url: req.originalUrl,
+          allowAll: req.apiToken.allowAllEnvironments,
         });
-
         return res.status(403).json({
           success: false,
-          error: {
-            code: ErrorCodes.ENV_ACCESS_DENIED,
-            message: 'API token does not have access to this environment',
-            details: {
-              tokenId: apiToken.id,
-              tokenName: apiToken.tokenName,
-              environment: environmentName,
-            },
-          },
+          error: { code: ErrorCodes.ENV_ACCESS_DENIED, message: 'No access to this environment' },
         });
       }
     }
 
     next();
   } catch (error) {
-    logger.error('Error setting SDK environment:', error);
-    return res.status(500).json({
+    logger.error('Environment resolution error:', error);
+    res.status(500).json({
       success: false,
-      error: {
-        code: ErrorCodes.INTERNAL_SERVER_ERROR,
-        message: 'Failed to set environment',
-      },
+      error: { code: ErrorCodes.INTERNAL_SERVER_ERROR, message: 'Failed to resolve environment' },
     });
   }
 };
 
+export const sdkRateLimit = (req: SDKRequest, res: Response, next: NextFunction) => next();
+
 /**
- * Combined middleware for client SDK endpoints
+ * Combined authentication chain for Client SDK
  */
 export const clientSDKAuth = [
   authenticateApiToken,
@@ -420,125 +329,21 @@ export const clientSDKAuth = [
 ];
 
 /**
- * Server API 토큰 인증 미들웨어
- * X-API-Token 헤더를 사용하여 서버 간 통신을 인증합니다.
+ * Base authentication for Server SDK (No environment required)
  */
-export const authenticateServerApiToken = async (
-  req: SDKRequest,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const apiToken = req.headers[HEADERS.X_API_TOKEN] as string;
-    const appName = req.headers[HEADERS.X_APPLICATION_NAME] as string;
-
-    if (!apiToken) {
-      return res.status(401).json({
-        success: false,
-        error: {
-          code: ErrorCodes.AUTH_TOKEN_MISSING,
-          message: 'API token is required',
-        },
-      });
-    }
-
-    if (!appName) {
-      return res.status(401).json({
-        success: false,
-        error: {
-          code: ErrorCodes.BAD_REQUEST,
-          message: 'Application name is required',
-        },
-      });
-    }
-
-    // Check for unsecured server token (for testing)
-    if (apiToken === UNSECURED_SERVER_TOKEN) {
-      req.isUnsecuredToken = true;
-      req.apiToken = {
-        id: 'unsecured-server',
-        tokenType: 'server',
-        tokenValue: UNSECURED_SERVER_TOKEN,
-        tokenName: 'Unsecured Server Token (Testing)',
-        isActive: true,
-        expiresAt: null,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      } as any;
-      return next();
-    }
-
-    // Check for Edge bypass token (internal network only)
-    if (apiToken === EDGE_BYPASS_TOKEN) {
-      req.isUnsecuredToken = true;
-      req.isEdgeBypassToken = true;
-      req.apiToken = {
-        id: 'edge-bypass',
-        tokenType: 'server',
-        tokenValue: EDGE_BYPASS_TOKEN,
-        tokenName: 'Edge Bypass Token (Internal)',
-        allowAllEnvironments: true,
-        isActive: true,
-        expiresAt: null,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      } as any;
-      return next();
-    }
-
-    // Try to get token from cache first
-    const cacheKey = `server_api_token:${apiToken.substring(0, 16)}...`;
-    let validatedToken = await CacheService.get<ApiAccessToken>(cacheKey);
-
-    if (!validatedToken) {
-      // Validate token against database
-      validatedToken = await ApiAccessToken.validateAndUse(apiToken);
-
-      if (!validatedToken) {
-        return res.status(401).json({
-          success: false,
-          error: {
-            code: ErrorCodes.AUTH_TOKEN_INVALID,
-            message: 'Invalid or expired API token',
-          },
-        });
-      }
-
-      // Check server token type - 'server' or 'all' are allowed
-      if (validatedToken.tokenType !== 'server' && validatedToken.tokenType !== 'all') {
-        return res.status(403).json({
-          success: false,
-          error: {
-            code: ErrorCodes.AUTH_PERMISSION_DENIED,
-            message: 'Server API token required',
-          },
-        });
-      }
-
-      // Cache the validated token for 5 minutes
-      await CacheService.set(cacheKey, validatedToken, 5 * 60 * 1000);
-    }
-
-    // 요청 객체에 토큰 정보 추가
-    req.apiToken = validatedToken;
-
-    next();
-  } catch (error) {
-    logger.error('Server API token authentication error:', error);
-    return res.status(500).json({
-      success: false,
-      error: {
-        code: ErrorCodes.INTERNAL_SERVER_ERROR,
-        message: 'Authentication failed',
-      },
-    });
-  }
-};
+export const serverAuthBase = [
+  authenticateApiToken,
+  requireTokenType('server'),
+  validateApplicationName,
+  sdkRateLimit,
+];
 
 /**
- * Combined middleware for server SDK endpoints
+ * Combined authentication chain for Server SDK (With environment)
  */
-export const serverSDKAuth = [authenticateServerApiToken, setSDKEnvironment, sdkRateLimit];
+export const serverSDKAuth = [...serverAuthBase, setSDKEnvironment];
+
+export const authenticateServerApiToken = serverSDKAuth;
 
 export default {
   authenticateApiToken,
@@ -549,4 +354,6 @@ export default {
   sdkRateLimit,
   clientSDKAuth,
   serverSDKAuth,
+  serverAuthBase,
 };
+

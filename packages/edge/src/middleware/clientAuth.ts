@@ -3,6 +3,11 @@ import logger from '../config/logger';
 import { tokenMirrorService } from '../services/tokenMirrorService';
 import { tokenUsageTracker } from '../services/tokenUsageTracker';
 
+// Unsecured tokens for testing purposes
+const UNSECURED_CLIENT_TOKEN = 'gatrix-unsecured-client-api-token';
+const UNSECURED_SERVER_TOKEN = 'gatrix-unsecured-server-api-token';
+const UNSECURED_EDGE_TOKEN = 'gatrix-unsecured-edge-api-token';
+
 export interface ClientRequest extends Request {
   clientContext?: {
     apiToken: string;
@@ -27,34 +32,71 @@ export interface ClientRequest extends Request {
  * instead of x-environment header for cleaner API design.
  */
 export function clientAuth(req: ClientRequest, res: Response, next: NextFunction): void {
-  const apiToken = req.headers['x-api-token'] as string;
-  const applicationName = req.headers['x-application-name'] as string;
+  // Extract token from multiple sources
+  const authHeader = req.headers['authorization'] as string | undefined;
+  let apiToken = req.headers['x-api-token'] as string | undefined;
+
+  if (!apiToken && authHeader?.startsWith('Bearer ')) {
+    apiToken = authHeader.substring(7);
+  }
+
+  // Support token in query for testing convenience
+  if (!apiToken) {
+    apiToken = (req.query.token as string) || (req.query.apiToken as string);
+  }
+
+  // Support applicationName in query
+  const applicationName =
+    (req.headers['x-application-name'] as string) ||
+    (req.query.appName as string) ||
+    (req.query.applicationName as string);
+
   // Get environment from URL path parameter instead of header
   const environment = req.params.environment as string;
   const clientVersion = req.headers['x-client-version'] as string | undefined;
   const platform = req.headers['x-platform'] as string | undefined;
 
-  // Validate required headers
+  // Validate required parameters
   if (!apiToken) {
+    logger.warn('Missing API token in client request', { url: req.originalUrl, query: req.query });
     res.status(401).json({
       success: false,
       error: {
         code: 'MISSING_API_TOKEN',
-        message: 'x-api-token header is required',
+        message: 'x-api-token header or token query parameter is required',
       },
     });
     return;
   }
 
   if (!applicationName) {
+    logger.warn('Missing application name in client request', { url: req.originalUrl });
     res.status(401).json({
       success: false,
       error: {
         code: 'MISSING_APPLICATION_NAME',
-        message: 'x-application-name header is required',
+        message: 'x-application-name header or appName query parameter is required',
       },
     });
     return;
+  }
+
+  // Handle Unsecured Tokens (Bypass)
+  if (
+    apiToken === UNSECURED_CLIENT_TOKEN ||
+    apiToken === UNSECURED_SERVER_TOKEN ||
+    apiToken === UNSECURED_EDGE_TOKEN
+  ) {
+    req.clientContext = {
+      apiToken,
+      applicationName,
+      environment,
+      clientVersion,
+      platform,
+      tokenName: 'Unsecured Testing Token',
+    };
+    logger.debug('Authenticated with unsecured token', { token: apiToken, environment });
+    return next();
   }
 
   // Validate environment from path parameter

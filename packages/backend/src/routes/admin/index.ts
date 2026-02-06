@@ -59,7 +59,7 @@ router.get('/users/me/environments', authenticate as any, UserController.getMyEn
 router.use(authenticate as any);
 router.use(requireAdmin as any);
 
-// Apply environment context middleware to set current environment from X-Environment-Id header
+// Apply environment context middleware to set current environment from X-Environment header
 router.use(environmentContextMiddleware as any);
 
 // Mount all other admin routes with permission checks
