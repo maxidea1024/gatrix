@@ -62,7 +62,7 @@ export class GatrixClient {
     }
 
     const connId = this.featuresClient.getConnectionId();
-    console.log(`[GatrixClient][${connId}] Starting SDK for ${this.config.appName} (v${SDK_VERSION})`);
+    console.log(`[GatrixClient] Starting SDK for ${this.config.appName} (v${SDK_VERSION}) [${connId}]`);
 
     this.startPromise = (async () => {
       try {
