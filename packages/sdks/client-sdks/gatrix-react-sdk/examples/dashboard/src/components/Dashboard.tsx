@@ -27,6 +27,7 @@ interface Stats {
   lastFetchTime: Date | null;
   lastError: Error | null;
   flagLastChangedTimes: Record<string, Date>;
+  connectionId: string;
 }
 
 function Dashboard({ config }: DashboardProps) {

@@ -1147,6 +1147,7 @@ export class FeaturesClient {
       impressionCount: this.impressionCount,
       contextChangeCount: this.contextChangeCount,
       flagLastChangedTimes: Object.fromEntries(this.flagLastChangedTimes),
+      connectionId: this.connectionId,
     };
   }
 }

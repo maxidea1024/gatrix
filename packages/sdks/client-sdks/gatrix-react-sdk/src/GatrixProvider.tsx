@@ -48,19 +48,23 @@ const GatrixProvider: FC<PropsWithChildren<GatrixProviderProps>> = ({
   startTransition = defaultStartTransition,
 }) => {
   const config = customConfig || offlineConfig;
-  const client = React.useRef<GatrixClient>(gatrixClient || new GatrixClient(config));
+  const client = React.useRef<GatrixClient | null>(null);
+
+  if (!client.current) {
+    client.current = gatrixClient || new GatrixClient(config);
+  }
 
   const [flagsReady, setFlagsReady] = useState(
     Boolean(
       gatrixClient
         ? (customConfig?.features?.bootstrap &&
-            customConfig?.features?.bootstrapOverride !== false) ||
-            gatrixClient.isReady?.()
+          customConfig?.features?.bootstrapOverride !== false) ||
+        gatrixClient.isReady?.()
         : config.features?.bootstrap && config.features?.bootstrapOverride !== false
     )
   );
 
-  const [flagsError, setFlagsError] = useState<any>(client.current.getError?.() || null);
+  const [flagsError, setFlagsError] = useState<any>(client.current!.getError?.() || null);
 
   useEffect(() => {
     if (!config && !gatrixClient) {
@@ -93,15 +97,15 @@ const GatrixProvider: FC<PropsWithChildren<GatrixProviderProps>> = ({
       }, 0);
     };
 
-    client.current.on(EVENTS.READY, readyCallback);
-    client.current.on(EVENTS.ERROR, errorCallback);
-    client.current.on(EVENTS.RECOVERED, clearErrorCallback);
+    client.current!.on(EVENTS.READY, readyCallback);
+    client.current!.on(EVENTS.ERROR, errorCallback);
+    client.current!.on(EVENTS.RECOVERED, clearErrorCallback);
 
-    if (startClient) {
-      // Defensively stop the client first
-      client.current.stop();
-      // Start the client
-      client.current.start();
+    const hasStarted = { current: false };
+
+    if (startClient && !client.current!.isReady() && !hasStarted.current) {
+      hasStarted.current = true;
+      client.current!.start();
     }
 
     // Stop client on unmount
@@ -122,20 +126,17 @@ const GatrixProvider: FC<PropsWithChildren<GatrixProviderProps>> = ({
 
   const context = useMemo<GatrixContextValue>(
     () => ({
-      client: client.current,
-      features: client.current.features,
+      client: client.current!,
+      features: client.current!.features,
       flagsReady,
       flagsError,
       setFlagsReady,
       setFlagsError,
-      on: (...args: Parameters<GatrixClient['on']>) => client.current.on(...args),
-      off: (...args: Parameters<GatrixClient['off']>) => client.current.off(...args),
-      isEnabled: (...args: Parameters<typeof client.current.features.isEnabled>) =>
-        client.current.features.isEnabled(...args),
-      getVariant: (...args: Parameters<typeof client.current.features.getVariant>) =>
-        client.current.features.getVariant(...args),
-      updateContext: async (...args: Parameters<typeof client.current.features.updateContext>) =>
-        await client.current.features.updateContext(...args),
+      on: (...args: any[]) => client.current!.on(args[0], args[1]),
+      off: (...args: any[]) => client.current!.off(args[0], args[1]),
+      isEnabled: (flagName: string) => client.current!.features.isEnabled(flagName),
+      getVariant: (flagName: string) => client.current!.features.getVariant(flagName),
+      updateContext: async (context: any) => await client.current!.features.updateContext(context),
     }),
     [flagsReady, flagsError]
   );

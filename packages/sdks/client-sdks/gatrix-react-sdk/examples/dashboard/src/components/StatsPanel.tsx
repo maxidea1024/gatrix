@@ -254,6 +254,12 @@ function StatsPanel({
                                         </td>
                                     </tr>
                                     <tr>
+                                        <td className="stats-label">CONN ID:</td>
+                                        <td className="stats-value" colSpan={5}>
+                                            {stats?.connectionId || '-'}
+                                        </td>
+                                    </tr>
+                                    <tr>
                                         <td className="stats-label">APP/ENV:</td>
                                         <td className="stats-value" colSpan={5}>
                                             {config.appName} / {config.environment}

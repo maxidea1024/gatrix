@@ -36,6 +36,11 @@ export const STANDARD_HEADERS = {
    * X-Requested-With 헤더
    */
   X_REQUESTED_WITH: 'x-requested-with',
+
+  /**
+   * If-None-Match 헤더 (ETag용)
+   */
+  IF_NONE_MATCH: 'if-none-match',
 } as const;
 
 /**
@@ -213,6 +218,7 @@ export const ALLOWED_HEADERS: string[] = [
   HEADERS.X_ENVIRONMENT,
   HEADERS.X_CONNECTION_ID,
   HEADERS.X_SESSION_ID,
+  HEADERS.IF_NONE_MATCH,
 ];
 
 export default HEADERS;

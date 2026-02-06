@@ -493,11 +493,11 @@ body {
 /* Mascot in stats */
 .mascot-container,
 .mascot-bubble-left {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.25);
   padding: 10px;
   border-radius: 8px;
-  border: 4px solid #333;
-  box-shadow: inset 4px 4px 0 rgba(0, 0, 0, 0.2);
+  border: 4px solid #444;
+  box-shadow: inset 4px 4px 0 rgba(0, 0, 0, 0.3);
   flex-shrink: 0;
 }
 

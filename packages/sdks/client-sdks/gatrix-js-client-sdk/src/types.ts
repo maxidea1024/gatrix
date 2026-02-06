@@ -246,4 +246,6 @@ export interface SdkStats {
   contextChangeCount: number;
   /** Per-flag last changed times */
   flagLastChangedTimes: Record<string, Date>;
+  /** Client connection ID */
+  connectionId: string;
 }
