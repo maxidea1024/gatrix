@@ -860,6 +860,13 @@ export class FeaturesClient {
       } else if (response.status === 304) {
         // Not modified - ETag matched
         this.notModifiedCount++;
+
+        // If this was our first fetch and we got a 304, it means our cached/bootstrap 
+        // flags are up to date. We should mark the SDK as ready.
+        if (!this.fetchedFromServer) {
+          this.fetchedFromServer = true;
+          this.setReady();
+        }
       } else {
         this.handleFetchError(response.status);
       }

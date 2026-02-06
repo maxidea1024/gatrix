@@ -54,6 +54,8 @@ const GatrixProvider: FC<PropsWithChildren<GatrixProviderProps>> = ({
     client.current = gatrixClient || new GatrixClient(config);
   }
 
+  const hasStarted = React.useRef(false);
+
   const [flagsReady, setFlagsReady] = useState(
     Boolean(
       gatrixClient
@@ -100,8 +102,6 @@ const GatrixProvider: FC<PropsWithChildren<GatrixProviderProps>> = ({
     client.current!.on(EVENTS.READY, readyCallback);
     client.current!.on(EVENTS.ERROR, errorCallback);
     client.current!.on(EVENTS.RECOVERED, clearErrorCallback);
-
-    const hasStarted = { current: false };
 
     if (startClient && !client.current!.isReady() && !hasStarted.current) {
       hasStarted.current = true;
