@@ -5,19 +5,11 @@ import { config } from "../config";
 import os from "os";
 
 const logLevel = config.logLevel;
-const nodeEnv = config.nodeEnv;
-const logFormatEnv = process.env.LOG_FORMAT || "";
 const serviceName = process.env.LOG_SERVICE_NAME || "gatrix-event-lens";
-const monitoringEnabled =
-  process.env.MONITORING_ENABLED === "true" ||
-  process.env.MONITORING_ENABLED === "1";
 const hostname = os.hostname();
 
 const lokiEnabled = process.env.GATRIX_LOKI_ENABLED === 'true';
 const lokiUrl = process.env.GATRIX_LOKI_URL;
-
-// Use JSON format for file/Loki if configured via LOG_FORMAT
-const useJsonFormat = logFormatEnv === "json";
 
 // For console, use pretty format unless explicitly requested via LOG_CONSOLE_FORMAT
 // This ignores LOG_FORMAT=json for console to keep it readable in development
