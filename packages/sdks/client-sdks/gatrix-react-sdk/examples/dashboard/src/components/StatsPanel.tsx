@@ -197,7 +197,11 @@ function StatsPanel({
 
         return (
             <div className="mascot-outer-container" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <div className={`mascot-container ${isScanning ? 'mascot-scanning' : ''}`}>
+                <div
+                    className={`mascot-container clickable ${isScanning ? 'mascot-scanning' : ''}`}
+                    onClick={() => !isScanning && client.features.fetchFlags()}
+                    title="Click to Refresh Flags"
+                >
                     {mascotIcon}
                 </div>
                 {(state === 'error' || errorMessage) && formattedError && (

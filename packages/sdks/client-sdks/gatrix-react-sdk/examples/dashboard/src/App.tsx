@@ -97,6 +97,8 @@ function App() {
             ...config,
             features: {
               refreshInterval: 30,
+              metricsIntervalInitial: 2,
+              metricsInterval: 10,
             },
           }}
         >

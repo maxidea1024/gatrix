@@ -9,6 +9,7 @@ import { GAME_WORLDS, DEFAULT_CONFIG, withEnvironment } from '../constants/cache
 import logger from '../config/logger';
 import { asyncHandler } from '../utils/asyncHandler';
 import VarsModel from '../models/Vars';
+import { sendBadRequest, sendSuccessResponse, ErrorCodes } from '../utils/apiResponse';
 import { IpWhitelistService } from '../services/IpWhitelistService';
 import { SDKRequest } from '../middleware/apiTokenAuth';
 import { resolvePassiveData } from '../utils/passiveDataUtils';
@@ -621,5 +622,79 @@ export class ClientController {
 
     res.set('ETag', etag);
     res.json(responseData);
+  });
+
+  /**
+   * Submit SDK metrics
+   * POST /api/v1/client/features/:environment/metrics
+   */
+  static submitMetrics = asyncHandler(async (req: SDKRequest, res: Response) => {
+    const environment = req.params.environment || req.environment;
+    const { bucket, appName } = req.body;
+
+    if (!bucket || !bucket.flags) {
+      return sendBadRequest(res, 'Invalid metrics payload');
+    }
+
+    const aggregatedMetrics: any[] = [];
+
+    // Map bucket.flags to AggregatedMetric[]
+    for (const [flagName, counts] of Object.entries(bucket.flags as any)) {
+      if ((counts as any).yes > 0) {
+        aggregatedMetrics.push({
+          flagName,
+          enabled: true,
+          count: (counts as any).yes,
+        });
+      }
+      if ((counts as any).no > 0) {
+        aggregatedMetrics.push({
+          flagName,
+          enabled: false,
+          count: (counts as any).no,
+        });
+      }
+      // Handle variants
+      if ((counts as any).variants) {
+        for (const [variantName, variantCount] of Object.entries((counts as any).variants as any)) {
+          if ((variantCount as number) > 0) {
+            aggregatedMetrics.push({
+              flagName,
+              enabled: true,
+              variantName,
+              count: variantCount,
+            });
+          }
+        }
+      }
+    }
+
+    // Process using service (which adds to queue)
+    const { featureMetricsService } = await import('../services/FeatureMetricsService');
+    await featureMetricsService.processAggregatedMetrics(
+      environment!,
+      aggregatedMetrics,
+      bucket.stop,
+      appName || req.body.appName,
+      bucket.start
+    );
+
+    // Handle missing flags (unknown flag reporting)
+    if (bucket.missing && Object.keys(bucket.missing).length > 0) {
+      const { unknownFlagService } = await import('../services/UnknownFlagService');
+      const sdkVersion = req.headers['x-sdk-version'] as string | undefined;
+
+      for (const [flagName, count] of Object.entries(bucket.missing as any)) {
+        await unknownFlagService.reportUnknownFlag({
+          flagName,
+          environment: environment!,
+          appName: appName || req.body.appName,
+          sdkVersion,
+          count: (count as number) || 1,
+        });
+      }
+    }
+
+    return sendSuccessResponse(res);
   });
 }

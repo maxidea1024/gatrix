@@ -377,6 +377,9 @@ router.post('/invalidate-cache', clientSDKAuth, ClientController.invalidateCache
 router.post('/features/:environment/eval', clientSDKAuth, ClientController.evaluateFlags);
 router.get('/features/:environment/eval', clientSDKAuth, ClientController.evaluateFlags);
 
+// Metrics route
+router.post('/features/:environment/metrics', clientSDKAuth, ClientController.submitMetrics);
+
 // Client SDK routes (with API token authentication)
 router.get('/test', clientSDKAuth, (req: any, res: any) => {
   const apiToken = req.apiToken;

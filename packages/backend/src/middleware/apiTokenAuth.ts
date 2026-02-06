@@ -301,8 +301,9 @@ export const setSDKEnvironment = async (req: SDKRequest, res: Response, next: Ne
         }
 
         // Match /api/v1/client/features/:env/eval pattern
+        // Match /api/v1/client/features/:env/metrics or .../eval pattern
         if (!envParam) {
-          match = path.match(/\/api\/v1\/client\/features\/([^\/]+)\/eval/);
+          match = path.match(/\/api\/v1\/client\/features\/([^\/]+)\/(eval|metrics)/);
           if (match && match[1]) {
             envParam = match[1];
           }

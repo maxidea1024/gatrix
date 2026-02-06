@@ -80,6 +80,8 @@ export class FeaturesClient {
   private lastRecoveryTime: Date | null = null;
   private startTime: Date | null = null;
   private syncFlagsCount: number = 0;
+  private metricsSentCount: number = 0;
+  private metricsErrorCount: number = 0;
   private watchGroups: Map<string, WatchFlagGroup> = new Map();
   private flagEnabledCounts: Map<string, { yes: number; no: number }> = new Map();
   private flagVariantCounts: Map<string, Map<string, number>> = new Map();
@@ -135,6 +137,15 @@ export class FeaturesClient {
       disableMetrics: this.featuresConfig.disableMetrics,
       logger: this.logger,
       connectionId: this.connectionId,
+      emitter: this.emitter,
+    });
+
+    // Handle metrics events for statistics
+    this.emitter.on(EVENTS.METRICS_SENT, () => {
+      this.metricsSentCount++;
+    });
+    this.emitter.on(EVENTS.METRICS_ERROR, () => {
+      this.metricsErrorCount++;
     });
 
     // Bootstrap data
@@ -1161,6 +1172,8 @@ export class FeaturesClient {
       contextChangeCount: this.contextChangeCount,
       flagLastChangedTimes: Object.fromEntries(this.flagLastChangedTimes),
       connectionId: this.connectionId,
+      metricsSentCount: this.metricsSentCount,
+      metricsErrorCount: this.metricsErrorCount,
     };
   }
 }

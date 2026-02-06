@@ -248,4 +248,8 @@ export interface SdkStats {
   flagLastChangedTimes: Record<string, Date>;
   /** Client connection ID */
   connectionId: string;
+  /** Number of metrics payloads sent */
+  metricsSentCount: number;
+  /** Number of metrics send errors */
+  metricsErrorCount: number;
 }

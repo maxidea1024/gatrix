@@ -353,6 +353,20 @@ body {
   color: #e76e55;
 }
 
+.spin-icon {
+  animation: nes-icon-spin 1s linear infinite;
+}
+
+@keyframes nes-icon-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 /* Mascot Scanning Animation */
 .mascot-scanning {
   position: relative;

@@ -28,6 +28,8 @@ interface Stats {
   lastError: Error | null;
   flagLastChangedTimes: Record<string, Date>;
   connectionId: string;
+  metricsSentCount?: number;
+  metricsErrorCount?: number;
 }
 
 function Dashboard({ config }: DashboardProps) {

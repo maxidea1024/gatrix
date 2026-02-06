@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import type { EvaluatedFlag } from '@gatrix/react-sdk';
+import { useGatrixClient, type EvaluatedFlag } from '@gatrix/react-sdk';
 
 interface FlagCardProps {
   flag: EvaluatedFlag;
@@ -31,6 +31,12 @@ function FlagCard({ flag, initialVersion, lastChangedTime, onSelect }: FlagCardP
   const [isRumbling, setIsRumbling] = useState(false);
   const [timeAgo, setTimeAgo] = useState(formatTimeAgo(lastChangedTime));
   const prevVersionRef = useRef(flag.version);
+  const client = useGatrixClient();
+
+  // Register flag access for metrics when card mounts or version changes
+  useEffect(() => {
+    client.features.isEnabled(flag.name);
+  }, [client, flag.name, flag.version]);
 
   // Detect flag changes and trigger rumble
   useEffect(() => {
