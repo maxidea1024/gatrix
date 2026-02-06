@@ -1676,7 +1676,7 @@
 "@gatrix/server-sdk@file:packages/sdks/server-sdk":
   version "1.0.65"
   dependencies:
-    "@gatrix/shared" "file:../../../Users/jhseo/AppData/Local/Yarn/Cache/v6/npm-@gatrix-server-sdk-1.0.65-4b47177a-b01e-45f1-81d6-bd45bcc4268c-1770280600514/node_modules/shared"
+    "@gatrix/shared" "file:../../../Users/jhseo/AppData/Local/Yarn/Cache/v6/npm-@gatrix-server-sdk-1.0.65-692a0953-039a-442c-b3b4-489ed9122760-1770392760994/node_modules/shared"
     axios "^1.7.9"
     ioredis "^5.8.2"
     murmurhash "^2.0.1"
@@ -5477,6 +5477,15 @@ axios@^1.12.0, axios@^1.12.2, axios@^1.13.2, axios@^1.6.2, axios@^1.7.9:
   version "1.13.2"
   resolved "https://registry.npmjs.org/axios/-/axios-1.13.2.tgz"
   integrity sha512-VPk9ebNqPcy5lRGuSlKx752IlDatOjT9paPlm8A7yOuW2Fbvp4X3JznJtT4f0GzGLLiWE9W8onz51SqLYwzGaA==
+  dependencies:
+    follow-redirects "^1.15.6"
+    form-data "^4.0.4"
+    proxy-from-env "^1.1.0"
+
+axios@^1.13.4:
+  version "1.13.4"
+  resolved "https://registry.yarnpkg.com/axios/-/axios-1.13.4.tgz#15d109a4817fb82f73aea910d41a2c85606076bc"
+  integrity sha512-1wVkUaAO6WyaYtCkcYCOx12ZgpGf9Zif+qXa4n+oYzK558YryKqiL6UWwd5DqiH3VRW0GYhTZQ/vlgJrCoNQlg==
   dependencies:
     follow-redirects "^1.15.6"
     form-data "^4.0.4"

@@ -1,25 +1,24 @@
-import winston from "winston";
-import DailyRotateFile from "winston-daily-rotate-file";
-import LokiTransport from "winston-loki";
-import path from "path";
-import os from "os";
-import { config } from "./env";
+import winston from 'winston';
+import DailyRotateFile from 'winston-daily-rotate-file';
+import LokiTransport from 'winston-loki';
+import path from 'path';
+import os from 'os';
+import { config } from './env';
 
-const logDir = process.env.LOG_DIR || "logs";
-const logLevel = config.logLevel || "info";
-const logFormat = process.env.LOG_FORMAT || "";
-const nodeEnv = process.env.NODE_ENV || "development";
-const serviceName = process.env.LOG_SERVICE_NAME || "gatrix-edge";
+const logDir = process.env.LOG_DIR || 'logs';
+const logLevel = config.logLevel || 'info';
+const logFormat = process.env.LOG_FORMAT || '';
+const nodeEnv = process.env.NODE_ENV || 'development';
+const serviceName = process.env.LOG_SERVICE_NAME || 'gatrix-edge';
 const monitoringEnabled =
-  process.env.MONITORING_ENABLED === "true" ||
-  process.env.MONITORING_ENABLED === "1";
+  process.env.MONITORING_ENABLED === 'true' || process.env.MONITORING_ENABLED === '1';
 const hostname = os.hostname();
 
 const lokiEnabled = process.env.GATRIX_LOKI_ENABLED === 'true';
 const lokiUrl = process.env.GATRIX_LOKI_URL;
 
 // Use JSON format for file/Loki if configured via LOG_FORMAT
-const useJsonFormat = logFormat === "json";
+const useJsonFormat = logFormat === 'json';
 
 // For console, use pretty format unless explicitly requested via LOG_CONSOLE_FORMAT
 // This ignores LOG_FORMAT=json for console to keep it readable in development
@@ -39,7 +38,7 @@ function getInternalIp(): string {
 
     for (const addr of iface) {
       // Skip non-IPv4 and internal addresses
-      if (addr.family === "IPv4" && !addr.internal) {
+      if (addr.family === 'IPv4' && !addr.internal) {
         return addr.address;
       }
     }
@@ -51,14 +50,14 @@ function getInternalIp(): string {
     if (!iface) continue;
 
     for (const addr of iface) {
-      if (addr.family === "IPv4") {
+      if (addr.family === 'IPv4') {
         return addr.address;
       }
     }
   }
 
   // Ultimate fallback
-  return "127.0.0.1";
+  return '127.0.0.1';
 }
 
 const internalIp = getInternalIp();
@@ -80,29 +79,29 @@ const serviceFormat = winston.format((info) => {
 // Pretty console format (for human readable logs)
 const consolePrettyFormat = winston.format.combine(
   serviceFormat(),
-  winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
+  winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
   winston.format.colorize(),
   winston.format.printf(({ timestamp, level, message, ...meta }) => {
-    let metaStr = "";
+    let metaStr = '';
     // Exclude internal metadata from pretty printing
     const { service, hostname, internalIp, ...displayMeta } = meta;
     if (Object.keys(displayMeta).length > 0) {
       try {
-        metaStr = " " + JSON.stringify(displayMeta);
+        metaStr = ' ' + JSON.stringify(displayMeta);
       } catch (error) {
-        metaStr = " [Object could not be serialized]";
+        metaStr = ' [Object could not be serialized]';
       }
     }
     return `${timestamp} [${level}] ${message}${metaStr}`;
-  }),
+  })
 );
 
 // JSON format for Loki / file logs
 const jsonFormat = winston.format.combine(
   serviceFormat(),
-  winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
+  winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
   winston.format.errors({ stack: true }),
-  winston.format.json(),
+  winston.format.json()
 );
 
 // File format always JSON
@@ -118,31 +117,30 @@ const transports: winston.transport[] = [
 ];
 
 // Add file transports in production
-if (nodeEnv === "production" || process.env.LOG_DIR) {
+if (nodeEnv === 'production' || process.env.LOG_DIR) {
   const logsDir = path.join(process.cwd(), logDir);
 
   transports.push(
     new DailyRotateFile({
       dirname: logsDir,
-      filename: "edge-%DATE%.log",
-      datePattern: "YYYY-MM-DD",
-      maxSize: "20m",
-      maxFiles: "14d",
+      filename: 'edge-%DATE%.log',
+      datePattern: 'YYYY-MM-DD',
+      maxSize: '20m',
+      maxFiles: '14d',
       format: fileFormat,
       zippedArchive: true,
     }),
     new DailyRotateFile({
       dirname: logsDir,
-      filename: "edge-error-%DATE%.log",
-      datePattern: "YYYY-MM-DD",
-      maxSize: "20m",
-      maxFiles: "30d",
-      level: "error",
+      filename: 'edge-error-%DATE%.log',
+      datePattern: 'YYYY-MM-DD',
+      maxSize: '20m',
+      maxFiles: '30d',
+      level: 'error',
       format: fileFormat,
       zippedArchive: true,
-    }),
+    })
   );
-
 }
 
 // Add Loki transport if enabled
@@ -180,31 +178,31 @@ const logger = winston.createLogger({
 });
 
 // Add file exception handlers in production
-if (nodeEnv === "production" || process.env.LOG_DIR) {
+if (nodeEnv === 'production' || process.env.LOG_DIR) {
   const logsDir = path.join(process.cwd(), logDir);
 
   logger.exceptions.handle(
     new DailyRotateFile({
       dirname: logsDir,
-      filename: "edge-exceptions-%DATE%.log",
-      datePattern: "YYYY-MM-DD",
+      filename: 'edge-exceptions-%DATE%.log',
+      datePattern: 'YYYY-MM-DD',
       format: fileFormat,
-      maxSize: "20m",
-      maxFiles: "14d",
+      maxSize: '20m',
+      maxFiles: '14d',
       zippedArchive: true,
-    }),
+    })
   );
 
   logger.rejections.handle(
     new DailyRotateFile({
       dirname: logsDir,
-      filename: "edge-rejections-%DATE%.log",
-      datePattern: "YYYY-MM-DD",
+      filename: 'edge-rejections-%DATE%.log',
+      datePattern: 'YYYY-MM-DD',
       format: fileFormat,
-      maxSize: "20m",
-      maxFiles: "14d",
+      maxSize: '20m',
+      maxFiles: '14d',
       zippedArchive: true,
-    }),
+    })
   );
 }
 

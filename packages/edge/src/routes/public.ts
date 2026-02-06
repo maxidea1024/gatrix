@@ -1,7 +1,7 @@
-import { Router, Request, Response } from "express";
-import { sdkManager } from "../services/sdkManager";
-import logger from "../config/logger";
-import { cacheHitsTotal, cacheMissesTotal } from "../services/edgeMetrics";
+import { Router, Request, Response } from 'express';
+import { sdkManager } from '../services/sdkManager';
+import logger from '../config/logger';
+import { cacheHitsTotal, cacheMissesTotal } from '../services/edgeMetrics';
 
 const router = Router();
 
@@ -26,16 +26,14 @@ function recordCacheMiss(cacheType: string): void {
 /**
  * Get SDK instance or return 503 error
  */
-function getSDKOrError(
-  res: Response,
-): ReturnType<typeof sdkManager.getSDK> | null {
+function getSDKOrError(res: Response): ReturnType<typeof sdkManager.getSDK> | null {
   const sdk = sdkManager.getSDK();
   if (!sdk) {
     res.status(503).json({
       success: false,
       error: {
-        code: "SERVICE_UNAVAILABLE",
-        message: "SDK not initialized",
+        code: 'SERVICE_UNAVAILABLE',
+        message: 'SDK not initialized',
       },
     });
     return null;
@@ -85,83 +83,75 @@ function getSDKOrError(
  *                       items: { $ref: '#/components/schemas/ServiceNotice' }
  *                     total: { type: integer, example: 3 }
  */
-router.get(
-  "/:environment/service-notices",
-  async (req: Request, res: Response) => {
-    try {
-      const sdk = getSDKOrError(res);
-      if (!sdk) return;
+router.get('/:environment/service-notices', async (req: Request, res: Response) => {
+  try {
+    const sdk = getSDKOrError(res);
+    if (!sdk) return;
 
-      const environment = req.params.environment;
-      const platform = req.query.platform as string | undefined;
-      const fields = req.query.fields as string | undefined;
+    const environment = req.params.environment;
+    const platform = req.query.platform as string | undefined;
+    const fields = req.query.fields as string | undefined;
 
-      // Get service notices from cache for this environment
-      const envNotices = sdk.getServiceNotices(environment);
+    // Get service notices from cache for this environment
+    const envNotices = sdk.getServiceNotices(environment);
 
-      // Optionally filter by platform
-      let filteredNotices = envNotices;
-      if (platform) {
-        filteredNotices = envNotices.filter(
-          (n: { platforms?: string[] }) =>
-            !n.platforms ||
-            n.platforms.length === 0 ||
-            n.platforms.includes(platform),
-        );
-      }
-
-      // If fields=summary, exclude content for lighter payload (for list view)
-      let responseNotices = filteredNotices;
-      if (fields === "summary") {
-        responseNotices = filteredNotices.map((n: any) => {
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          const { content, ...summary } = n;
-          return summary;
-        });
-      }
-
-      // Record cache hit/miss
-      if (filteredNotices.length > 0) {
-        recordCacheHit("public_service_notices");
-      } else {
-        recordCacheMiss("public_service_notices");
-      }
-
-      logger.debug("Public service notices retrieved", {
-        environment,
-        platform,
-        fields,
-        count: responseNotices.length,
-      });
-
-      // Disable HTTP caching so browser always gets fresh data from SDK cache
-      res.set(
-        "Cache-Control",
-        "no-store, no-cache, must-revalidate, proxy-revalidate",
+    // Optionally filter by platform
+    let filteredNotices = envNotices;
+    if (platform) {
+      filteredNotices = envNotices.filter(
+        (n: { platforms?: string[] }) =>
+          !n.platforms || n.platforms.length === 0 || n.platforms.includes(platform)
       );
-      res.set("Pragma", "no-cache");
-      res.set("Expires", "0");
-      res.removeHeader("ETag");
+    }
 
-      res.json({
-        success: true,
-        data: {
-          notices: responseNotices,
-          total: responseNotices.length,
-        },
-      });
-    } catch (error) {
-      logger.error("Error getting public service notices:", error);
-      res.status(500).json({
-        success: false,
-        error: {
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to retrieve service notices",
-        },
+    // If fields=summary, exclude content for lighter payload (for list view)
+    let responseNotices = filteredNotices;
+    if (fields === 'summary') {
+      responseNotices = filteredNotices.map((n: any) => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { content, ...summary } = n;
+        return summary;
       });
     }
-  },
-);
+
+    // Record cache hit/miss
+    if (filteredNotices.length > 0) {
+      recordCacheHit('public_service_notices');
+    } else {
+      recordCacheMiss('public_service_notices');
+    }
+
+    logger.debug('Public service notices retrieved', {
+      environment,
+      platform,
+      fields,
+      count: responseNotices.length,
+    });
+
+    // Disable HTTP caching so browser always gets fresh data from SDK cache
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.set('Pragma', 'no-cache');
+    res.set('Expires', '0');
+    res.removeHeader('ETag');
+
+    res.json({
+      success: true,
+      data: {
+        notices: responseNotices,
+        total: responseNotices.length,
+      },
+    });
+  } catch (error) {
+    logger.error('Error getting public service notices:', error);
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'Failed to retrieve service notices',
+      },
+    });
+  }
+});
 
 /**
  * @openapi
@@ -187,73 +177,67 @@ router.get(
  *       404:
  *         description: Notice not found
  */
-router.get(
-  "/:environment/service-notices/:noticeId",
-  async (req: Request, res: Response) => {
-    try {
-      const sdk = getSDKOrError(res);
-      if (!sdk) return;
+router.get('/:environment/service-notices/:noticeId', async (req: Request, res: Response) => {
+  try {
+    const sdk = getSDKOrError(res);
+    if (!sdk) return;
 
-      const environment = req.params.environment;
-      const noticeId = parseInt(req.params.noticeId, 10);
+    const environment = req.params.environment;
+    const noticeId = parseInt(req.params.noticeId, 10);
 
-      if (isNaN(noticeId)) {
-        res.status(400).json({
-          success: false,
-          error: {
-            code: "INVALID_PARAMETER",
-            message: "Invalid notice ID",
-          },
-        });
-        return;
-      }
-
-      // Get service notices from cache for this environment
-      const envNotices = sdk.getServiceNotices(environment);
-      const notice = envNotices.find((n: { id: number }) => n.id === noticeId);
-
-      if (!notice) {
-        res.status(404).json({
-          success: false,
-          error: {
-            code: "NOT_FOUND",
-            message: "Service notice not found",
-          },
-        });
-        return;
-      }
-
-      recordCacheHit("public_service_notice_detail");
-
-      logger.debug("Public service notice detail retrieved", {
-        environment,
-        noticeId,
-      });
-
-      // Disable HTTP caching
-      res.set(
-        "Cache-Control",
-        "no-store, no-cache, must-revalidate, proxy-revalidate",
-      );
-      res.set("Pragma", "no-cache");
-      res.set("Expires", "0");
-      res.removeHeader("ETag");
-
-      res.json({
-        success: true,
-        data: notice,
-      });
-    } catch (error) {
-      logger.error("Error getting service notice detail:", error);
-      res.status(500).json({
+    if (isNaN(noticeId)) {
+      res.status(400).json({
         success: false,
         error: {
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to retrieve service notice",
+          code: 'INVALID_PARAMETER',
+          message: 'Invalid notice ID',
         },
       });
+      return;
     }
-  },
-);
+
+    // Get service notices from cache for this environment
+    const envNotices = sdk.getServiceNotices(environment);
+    const notice = envNotices.find((n: { id: number }) => n.id === noticeId);
+
+    if (!notice) {
+      res.status(404).json({
+        success: false,
+        error: {
+          code: 'NOT_FOUND',
+          message: 'Service notice not found',
+        },
+      });
+      return;
+    }
+
+    recordCacheHit('public_service_notice_detail');
+
+    logger.debug('Public service notice detail retrieved', {
+      environment,
+      noticeId,
+    });
+
+    // Disable HTTP caching
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.set('Pragma', 'no-cache');
+    res.set('Expires', '0');
+    res.removeHeader('ETag');
+
+    res.json({
+      success: true,
+      data: notice,
+    });
+  } catch (error) {
+    logger.error('Error getting service notice detail:', error);
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'Failed to retrieve service notice',
+      },
+    });
+  }
+});
 
 export default router;

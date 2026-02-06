@@ -1,15 +1,12 @@
-import { Router, Request, Response } from "express";
-import axios from "axios";
-import { clientAuth, ClientRequest } from "../middleware/clientAuth";
-import { sdkManager } from "../services/sdkManager";
-import { config } from "../config/env";
-import logger from "../config/logger";
-import { ClientVersion, Banner, GameWorld } from "@gatrix/server-sdk";
-import {
-  cacheHitsTotal,
-  cacheMissesTotal,
-  cacheSize,
-} from "../services/edgeMetrics";
+import { Router, Request, Response } from 'express';
+import axios from 'axios';
+import { clientAuth, ClientRequest } from '../middleware/clientAuth';
+import { sdkManager } from '../services/sdkManager';
+import { config } from '../config/env';
+import logger from '../config/logger';
+import { ClientVersion, Banner, GameWorld } from '@gatrix/server-sdk';
+import { metricsAggregator } from '../services/metricsAggregator';
+import { cacheHitsTotal, cacheMissesTotal, cacheSize } from '../services/edgeMetrics';
 
 const router = Router();
 
@@ -45,7 +42,7 @@ function updateCacheSizeMetrics(): void {
 
   // Helper to count items from environment-keyed object
   const countItems = (data: Record<string, unknown[]> | undefined): number => {
-    if (!data || typeof data !== "object") return 0;
+    if (!data || typeof data !== 'object') return 0;
     let count = 0;
     for (const key of Object.keys(data)) {
       const items = data[key];
@@ -66,14 +63,9 @@ function updateCacheSizeMetrics(): void {
 
   // Helper to count items from environment-keyed object with non-array values (like WhitelistData)
   const countWhitelistItems = (
-    data:
-      | Record<
-          string,
-          { ipWhitelist?: unknown[]; accountWhitelist?: unknown[] }
-        >
-      | undefined,
+    data: Record<string, { ipWhitelist?: unknown[]; accountWhitelist?: unknown[] }> | undefined
   ): number => {
-    if (!data || typeof data !== "object") return 0;
+    if (!data || typeof data !== 'object') return 0;
     let count = 0;
     for (const key of Object.keys(data)) {
       const whitelist = data[key];
@@ -90,41 +82,39 @@ function updateCacheSizeMetrics(): void {
   };
   const whitelistsCount = countWhitelistItems(allData.whitelists);
 
-  cacheSize?.labels("client_versions").set(versionsCount);
-  cacheSize?.labels("banners").set(bannersCount);
-  cacheSize?.labels("service_notices").set(noticesCount);
-  cacheSize?.labels("game_worlds").set(worldsCount);
-  cacheSize?.labels("surveys").set(surveysCount);
-  cacheSize?.labels("popup_notices").set(popupNoticesCount);
-  cacheSize?.labels("store_products").set(storeProductsCount);
-  cacheSize?.labels("whitelists").set(whitelistsCount);
+  cacheSize?.labels('client_versions').set(versionsCount);
+  cacheSize?.labels('banners').set(bannersCount);
+  cacheSize?.labels('service_notices').set(noticesCount);
+  cacheSize?.labels('game_worlds').set(worldsCount);
+  cacheSize?.labels('surveys').set(surveysCount);
+  cacheSize?.labels('popup_notices').set(popupNoticesCount);
+  cacheSize?.labels('store_products').set(storeProductsCount);
+  cacheSize?.labels('whitelists').set(whitelistsCount);
   cacheSize
-    ?.labels("total")
+    ?.labels('total')
     .set(
       versionsCount +
-        bannersCount +
-        noticesCount +
-        worldsCount +
-        surveysCount +
-        popupNoticesCount +
-        storeProductsCount +
-        whitelistsCount,
+      bannersCount +
+      noticesCount +
+      worldsCount +
+      surveysCount +
+      popupNoticesCount +
+      storeProductsCount +
+      whitelistsCount
     );
 }
 
 /**
  * Get SDK instance or return 503 error
  */
-function getSDKOrError(
-  res: Response,
-): ReturnType<typeof sdkManager.getSDK> | null {
+function getSDKOrError(res: Response): ReturnType<typeof sdkManager.getSDK> | null {
   const sdk = sdkManager.getSDK();
   if (!sdk) {
     res.status(503).json({
       success: false,
       error: {
-        code: "SERVICE_UNAVAILABLE",
-        message: "SDK not initialized",
+        code: 'SERVICE_UNAVAILABLE',
+        message: 'SDK not initialized',
       },
     });
     return null;
@@ -209,168 +199,154 @@ setTimeout(() => {
  *             schema: { $ref: '#/components/schemas/ErrorResponse' }
  *             example: { success: false, message: "Client version not found", error: "NOT_FOUND" }
  */
-router.get(
-  "/:environment/client-version",
-  async (req: Request, res: Response) => {
-    try {
-      const sdk = getSDKOrError(res);
-      if (!sdk) return;
+router.get('/:environment/client-version', async (req: Request, res: Response) => {
+  try {
+    const sdk = getSDKOrError(res);
+    if (!sdk) return;
 
-      const environment = req.params.environment;
-      const { platform, version, status, lang } = req.query as {
-        platform?: string;
-        version?: string;
-        status?: string;
-        lang?: string;
-      };
+    const environment = req.params.environment;
+    const { platform, version, status, lang } = req.query as {
+      platform?: string;
+      version?: string;
+      status?: string;
+      lang?: string;
+    };
 
-      // Validate required query params
-      if (!platform) {
-        return res.status(400).json({
-          success: false,
-          message: "platform is a required query parameter",
-        });
-      }
-
-      // Validate required headers (same as Backend)
-      const appName = req.headers["x-application-name"];
-      const apiToken = req.headers["x-api-token"];
-
-      if (!appName || !apiToken) {
-        return res.status(400).json({
-          success: false,
-          message: "X-Application-Name and X-API-Token headers are required",
-        });
-      }
-
-      // Validate status parameter if provided
-      const validStatuses = [
-        "ONLINE",
-        "OFFLINE",
-        "MAINTENANCE",
-        "UPDATE_REQUIRED",
-      ];
-      let statusFilter: string | undefined;
-      if (status) {
-        const upperStatus = status.toUpperCase();
-        if (!validStatuses.includes(upperStatus)) {
-          return res.status(400).json({
-            success: false,
-            message: `Invalid status. Valid values are: ${validStatuses.join(", ")}`,
-          });
-        }
-        statusFilter = upperStatus;
-      }
-
-      // Get client versions from cache for this environment
-      const envVersions = sdk.getClientVersions(environment) as ClientVersion[];
-
-      // Filter by platform
-      const platformVersions = envVersions.filter(
-        (v) => v.platform === platform || v.platform === "all",
-      );
-
-      // Determine if we should fetch the latest version
-      const isLatestRequest = !version || version.toLowerCase() === "latest";
-
-      let record: ClientVersion | undefined;
-      if (isLatestRequest) {
-        // Get the latest version for the platform (with optional status filter)
-        let candidates = platformVersions;
-        if (statusFilter) {
-          candidates = candidates.filter(
-            (v) => v.clientStatus === statusFilter,
-          );
-        }
-        // Sort by version descending and get the first one
-        record = candidates.sort((a, b) =>
-          b.clientVersion.localeCompare(a.clientVersion, undefined, {
-            numeric: true,
-          }),
-        )[0];
-      } else {
-        // Get exact version match
-        record = platformVersions.find((v) => v.clientVersion === version);
-      }
-
-      if (!record) {
-        recordCacheMiss("client_versions");
-        return res.status(404).json({
-          success: false,
-          message: isLatestRequest
-            ? `No client version found for platform: ${platform}${statusFilter ? ` with status: ${statusFilter}` : ""}`
-            : "Client version not found",
-        });
-      }
-
-      // Record cache hit
-      recordCacheHit("client_versions");
-
-      // Get maintenance message if status is MAINTENANCE
-      let maintenanceMessage: string | undefined = record.maintenanceMessage;
-      if (
-        record.clientStatus === "MAINTENANCE" &&
-        record.maintenanceLocales &&
-        record.maintenanceLocales.length > 0
-      ) {
-        // Try to find message for requested language
-        if (lang) {
-          const localeMessage = record.maintenanceLocales.find(
-            (m) => m.lang === lang,
-          );
-          if (localeMessage) {
-            maintenanceMessage = localeMessage.message;
-          }
-        }
-        // If no localized message found, use first available message
-        if (!maintenanceMessage && record.maintenanceLocales.length > 0) {
-          maintenanceMessage = record.maintenanceLocales[0].message;
-        }
-      }
-
-      // Transform data for client consumption (same format as Backend)
-      const clientData: Record<string, unknown> = {
-        platform: record.platform,
-        clientVersion: record.clientVersion,
-        status: record.clientStatus,
-        gameServerAddress: record.gameServerAddress,
-        patchAddress: record.patchAddress,
-        guestModeAllowed:
-          record.clientStatus === "MAINTENANCE"
-            ? false
-            : Boolean(record.guestModeAllowed),
-        externalClickLink: record.externalClickLink,
-        meta: record.customPayload || {},
-      };
-
-      // Add maintenance message if status is MAINTENANCE
-      if (record.clientStatus === "MAINTENANCE") {
-        clientData.maintenanceMessage = maintenanceMessage || "";
-      }
-
-      logger.debug("Client version retrieved", {
-        environment,
-        platform,
-        version: record.clientVersion,
-      });
-
-      return res.json({
-        success: true,
-        data: clientData,
-        cached: true, // Edge always serves from cache
-      });
-    } catch (error) {
-      logger.error("Error getting client version:", error);
-      res.status(500).json({
+    // Validate required query params
+    if (!platform) {
+      return res.status(400).json({
         success: false,
-        error: {
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to retrieve client version",
-        },
+        message: 'platform is a required query parameter',
       });
     }
-  },
-);
+
+    // Validate required headers (same as Backend)
+    const appName = req.headers['x-application-name'];
+    const apiToken = req.headers['x-api-token'];
+
+    if (!appName || !apiToken) {
+      return res.status(400).json({
+        success: false,
+        message: 'X-Application-Name and X-API-Token headers are required',
+      });
+    }
+
+    // Validate status parameter if provided
+    const validStatuses = ['ONLINE', 'OFFLINE', 'MAINTENANCE', 'UPDATE_REQUIRED'];
+    let statusFilter: string | undefined;
+    if (status) {
+      const upperStatus = status.toUpperCase();
+      if (!validStatuses.includes(upperStatus)) {
+        return res.status(400).json({
+          success: false,
+          message: `Invalid status. Valid values are: ${validStatuses.join(', ')}`,
+        });
+      }
+      statusFilter = upperStatus;
+    }
+
+    // Get client versions from cache for this environment
+    const envVersions = sdk.getClientVersions(environment) as ClientVersion[];
+
+    // Filter by platform
+    const platformVersions = envVersions.filter(
+      (v) => v.platform === platform || v.platform === 'all'
+    );
+
+    // Determine if we should fetch the latest version
+    const isLatestRequest = !version || version.toLowerCase() === 'latest';
+
+    let record: ClientVersion | undefined;
+    if (isLatestRequest) {
+      // Get the latest version for the platform (with optional status filter)
+      let candidates = platformVersions;
+      if (statusFilter) {
+        candidates = candidates.filter((v) => v.clientStatus === statusFilter);
+      }
+      // Sort by version descending and get the first one
+      record = candidates.sort((a, b) =>
+        b.clientVersion.localeCompare(a.clientVersion, undefined, {
+          numeric: true,
+        })
+      )[0];
+    } else {
+      // Get exact version match
+      record = platformVersions.find((v) => v.clientVersion === version);
+    }
+
+    if (!record) {
+      recordCacheMiss('client_versions');
+      return res.status(404).json({
+        success: false,
+        message: isLatestRequest
+          ? `No client version found for platform: ${platform}${statusFilter ? ` with status: ${statusFilter}` : ''}`
+          : 'Client version not found',
+      });
+    }
+
+    // Record cache hit
+    recordCacheHit('client_versions');
+
+    // Get maintenance message if status is MAINTENANCE
+    let maintenanceMessage: string | undefined = record.maintenanceMessage;
+    if (
+      record.clientStatus === 'MAINTENANCE' &&
+      record.maintenanceLocales &&
+      record.maintenanceLocales.length > 0
+    ) {
+      // Try to find message for requested language
+      if (lang) {
+        const localeMessage = record.maintenanceLocales.find((m) => m.lang === lang);
+        if (localeMessage) {
+          maintenanceMessage = localeMessage.message;
+        }
+      }
+      // If no localized message found, use first available message
+      if (!maintenanceMessage && record.maintenanceLocales.length > 0) {
+        maintenanceMessage = record.maintenanceLocales[0].message;
+      }
+    }
+
+    // Transform data for client consumption (same format as Backend)
+    const clientData: Record<string, unknown> = {
+      platform: record.platform,
+      clientVersion: record.clientVersion,
+      status: record.clientStatus,
+      gameServerAddress: record.gameServerAddress,
+      patchAddress: record.patchAddress,
+      guestModeAllowed:
+        record.clientStatus === 'MAINTENANCE' ? false : Boolean(record.guestModeAllowed),
+      externalClickLink: record.externalClickLink,
+      meta: record.customPayload || {},
+    };
+
+    // Add maintenance message if status is MAINTENANCE
+    if (record.clientStatus === 'MAINTENANCE') {
+      clientData.maintenanceMessage = maintenanceMessage || '';
+    }
+
+    logger.debug('Client version retrieved', {
+      environment,
+      platform,
+      version: record.clientVersion,
+    });
+
+    return res.json({
+      success: true,
+      data: clientData,
+      cached: true, // Edge always serves from cache
+    });
+  } catch (error) {
+    logger.error('Error getting client version:', error);
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'Failed to retrieve client version',
+      },
+    });
+  }
+});
 
 /**
  * @openapi
@@ -404,7 +380,7 @@ router.get(
  *                     timestamp: { type: string, format: date-time, example: '2025-12-12T12:00:00Z' }
  *                 cached: { type: boolean, example: true }
  */
-router.get("/:environment/game-worlds", async (req: Request, res: Response) => {
+router.get('/:environment/game-worlds', async (req: Request, res: Response) => {
   try {
     const sdk = getSDKOrError(res);
     if (!sdk) return;
@@ -416,15 +392,13 @@ router.get("/:environment/game-worlds", async (req: Request, res: Response) => {
 
     // Record cache hit/miss
     if (envWorlds.length > 0) {
-      recordCacheHit("game_worlds");
+      recordCacheHit('game_worlds');
     } else {
-      recordCacheMiss("game_worlds");
+      recordCacheMiss('game_worlds');
     }
 
     // Filter visible, non-maintenance worlds (same as Backend)
-    const visibleWorlds = envWorlds.filter(
-      (w: GameWorld) => w.isMaintenance !== true,
-    );
+    const visibleWorlds = envWorlds.filter((w: GameWorld) => w.isMaintenance !== true);
 
     // Transform data for client consumption (same format as Backend)
     // Note: GameWorld type doesn't have description/updatedAt, but Backend returns them
@@ -433,20 +407,17 @@ router.get("/:environment/game-worlds", async (req: Request, res: Response) => {
         id: world.id,
         worldId: world.worldId,
         name: world.name,
-        description:
-          (world as unknown as { description?: string }).description || "",
+        description: (world as unknown as { description?: string }).description || '',
         displayOrder: world.displayOrder,
         meta: world.customPayload || {},
         createdAt: world.createdAt,
-        updatedAt:
-          (world as unknown as { updatedAt?: string }).updatedAt ||
-          world.createdAt,
+        updatedAt: (world as unknown as { updatedAt?: string }).updatedAt || world.createdAt,
       })),
       total: visibleWorlds.length,
       timestamp: new Date().toISOString(),
     };
 
-    logger.debug("Game worlds retrieved", {
+    logger.debug('Game worlds retrieved', {
       environment,
       count: visibleWorlds.length,
     });
@@ -457,12 +428,12 @@ router.get("/:environment/game-worlds", async (req: Request, res: Response) => {
       cached: true, // Edge always serves from cache
     });
   } catch (error) {
-    logger.error("Error getting game worlds:", error);
+    logger.error('Error getting game worlds:', error);
     res.status(500).json({
       success: false,
       error: {
-        code: "INTERNAL_SERVER_ERROR",
-        message: "Failed to retrieve game worlds",
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'Failed to retrieve game worlds',
       },
     });
   }
@@ -491,7 +462,7 @@ router.get("/:environment/game-worlds", async (req: Request, res: Response) => {
  *                     queue: { type: object, example: { pending: 0 } }
  *                     pubsub: { type: object, example: { connected: true, timestamp: '2025-12-12T12:00:00Z' } }
  */
-router.get("/cache-stats", async (_req: Request, res: Response) => {
+router.get('/cache-stats', async (_req: Request, res: Response) => {
   try {
     const sdk = sdkManager.getSDK();
     const isInitialized = sdk !== null;
@@ -501,7 +472,7 @@ router.get("/cache-stats", async (_req: Request, res: Response) => {
       data: {
         cache: {
           initialized: isInitialized,
-          type: "edge-sdk-cache",
+          type: 'edge-sdk-cache',
         },
         queue: {
           pending: 0, // Edge doesn't have a queue
@@ -513,12 +484,12 @@ router.get("/cache-stats", async (_req: Request, res: Response) => {
       },
     });
   } catch (error) {
-    logger.error("Error getting cache stats:", error);
+    logger.error('Error getting cache stats:', error);
     res.status(500).json({
       success: false,
       error: {
-        code: "INTERNAL_SERVER_ERROR",
-        message: "Failed to retrieve cache stats",
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'Failed to retrieve cache stats',
       },
     });
   }
@@ -557,25 +528,21 @@ router.get("/cache-stats", async (_req: Request, res: Response) => {
  *                   type: object
  *                   example: { tokenId: 'edge-token', tokenName: 'app-1', tokenType: 'client', environment: 'production', timestamp: '2025-12-12T12:00:00Z' }
  */
-router.get(
-  "/:environment/test",
-  clientAuth,
-  (req: ClientRequest, res: Response) => {
-    const { applicationName, environment } = req.clientContext!;
+router.get('/:environment/test', clientAuth, (req: ClientRequest, res: Response) => {
+  const { applicationName, environment } = req.clientContext!;
 
-    res.json({
-      success: true,
-      message: "Client SDK authentication successful",
-      data: {
-        tokenId: "edge-token", // Edge doesn't have token ID
-        tokenName: applicationName,
-        tokenType: "client",
-        environment,
-        timestamp: new Date().toISOString(),
-      },
-    });
-  },
-);
+  res.json({
+    success: true,
+    message: 'Client SDK authentication successful',
+    data: {
+      tokenId: 'edge-token', // Edge doesn't have token ID
+      tokenName: applicationName,
+      tokenType: 'client',
+      environment,
+      timestamp: new Date().toISOString(),
+    },
+  });
+});
 
 /**
  * @openapi
@@ -609,62 +576,58 @@ router.get(
  *                       items: { $ref: '#/components/schemas/Banner' }
  *                     timestamp: { type: string, format: date-time, example: '2025-12-12T12:00:00Z' }
  */
-router.get(
-  "/:environment/banners",
-  clientAuth,
-  async (req: ClientRequest, res: Response) => {
-    try {
-      const sdk = getSDKOrError(res);
-      if (!sdk) return;
+router.get('/:environment/banners', clientAuth, async (req: ClientRequest, res: Response) => {
+  try {
+    const sdk = getSDKOrError(res);
+    if (!sdk) return;
 
-      const { environment } = req.clientContext!;
+    const { environment } = req.clientContext!;
 
-      // Get banners from cache for this environment
-      const envBanners = sdk.getBanners(environment) as Banner[];
+    // Get banners from cache for this environment
+    const envBanners = sdk.getBanners(environment) as Banner[];
 
-      // Record cache hit/miss
-      if (envBanners.length > 0) {
-        recordCacheHit("banners");
-      } else {
-        recordCacheMiss("banners");
-      }
-
-      // Transform for client (same format as Backend BannerClientController)
-      const clientBanners = envBanners.map((banner) => ({
-        bannerId: banner.bannerId,
-        name: banner.name,
-        width: banner.width,
-        height: banner.height,
-        playbackSpeed: banner.playbackSpeed,
-        sequences: banner.sequences,
-        metadata: banner.metadata,
-        version: banner.version,
-      }));
-
-      logger.debug("Banners retrieved", {
-        environment,
-        count: clientBanners.length,
-      });
-
-      res.json({
-        success: true,
-        data: {
-          banners: clientBanners,
-          timestamp: new Date().toISOString(),
-        },
-      });
-    } catch (error) {
-      logger.error("Error getting banners:", error);
-      res.status(500).json({
-        success: false,
-        error: {
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to retrieve banners",
-        },
-      });
+    // Record cache hit/miss
+    if (envBanners.length > 0) {
+      recordCacheHit('banners');
+    } else {
+      recordCacheMiss('banners');
     }
-  },
-);
+
+    // Transform for client (same format as Backend BannerClientController)
+    const clientBanners = envBanners.map((banner) => ({
+      bannerId: banner.bannerId,
+      name: banner.name,
+      width: banner.width,
+      height: banner.height,
+      playbackSpeed: banner.playbackSpeed,
+      sequences: banner.sequences,
+      metadata: banner.metadata,
+      version: banner.version,
+    }));
+
+    logger.debug('Banners retrieved', {
+      environment,
+      count: clientBanners.length,
+    });
+
+    res.json({
+      success: true,
+      data: {
+        banners: clientBanners,
+        timestamp: new Date().toISOString(),
+      },
+    });
+  } catch (error) {
+    logger.error('Error getting banners:', error);
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'Failed to retrieve banners',
+      },
+    });
+  }
+});
 
 /**
  * @openapi
@@ -702,7 +665,7 @@ router.get(
  *       404: { $ref: '#/components/responses/NotFoundError' }
  */
 router.get(
-  "/:environment/banners/:bannerId",
+  '/:environment/banners/:bannerId',
   clientAuth,
   async (req: ClientRequest, res: Response) => {
     try {
@@ -722,8 +685,8 @@ router.get(
         return res.status(404).json({
           success: false,
           error: {
-            code: "NOT_FOUND",
-            message: "Banner not found",
+            code: 'NOT_FOUND',
+            message: 'Banner not found',
           },
         });
       }
@@ -740,7 +703,7 @@ router.get(
         version: banner.version,
       };
 
-      logger.debug("Banner retrieved", {
+      logger.debug('Banner retrieved', {
         environment,
         bannerId,
       });
@@ -753,16 +716,16 @@ router.get(
         },
       });
     } catch (error) {
-      logger.error("Error getting banner:", error);
+      logger.error('Error getting banner:', error);
       res.status(500).json({
         success: false,
         error: {
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to retrieve banner",
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to retrieve banner',
         },
       });
     }
-  },
+  }
 );
 
 // ============================================================================
@@ -802,7 +765,7 @@ router.get(
  *                     total: { type: integer, example: 5 }
  */
 router.get(
-  "/:environment/client-versions",
+  '/:environment/client-versions',
   clientAuth,
   async (req: ClientRequest, res: Response) => {
     try {
@@ -818,18 +781,18 @@ router.get(
       let filteredVersions = envVersions;
       if (platform) {
         filteredVersions = envVersions.filter(
-          (v) => v.platform === platform || v.platform === "all",
+          (v) => v.platform === platform || v.platform === 'all'
         );
       }
 
       // Record cache hit/miss
       if (filteredVersions.length > 0) {
-        recordCacheHit("client_versions");
+        recordCacheHit('client_versions');
       } else {
-        recordCacheMiss("client_versions");
+        recordCacheMiss('client_versions');
       }
 
-      logger.debug("Client versions retrieved", {
+      logger.debug('Client versions retrieved', {
         environment,
         platform,
         count: filteredVersions.length,
@@ -843,16 +806,16 @@ router.get(
         },
       });
     } catch (error) {
-      logger.error("Error getting client versions:", error);
+      logger.error('Error getting client versions:', error);
       res.status(500).json({
         success: false,
         error: {
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to retrieve client versions",
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to retrieve client versions',
         },
       });
     }
-  },
+  }
 );
 
 /**
@@ -888,7 +851,7 @@ router.get(
  *                     total: { type: integer, example: 3 }
  */
 router.get(
-  "/:environment/service-notices",
+  '/:environment/service-notices',
   clientAuth,
   async (req: ClientRequest, res: Response) => {
     try {
@@ -905,20 +868,18 @@ router.get(
       if (platform) {
         filteredNotices = envNotices.filter(
           (n: { platforms?: string[] }) =>
-            !n.platforms ||
-            n.platforms.length === 0 ||
-            n.platforms.includes(platform),
+            !n.platforms || n.platforms.length === 0 || n.platforms.includes(platform)
         );
       }
 
       // Record cache hit/miss
       if (filteredNotices.length > 0) {
-        recordCacheHit("service_notices");
+        recordCacheHit('service_notices');
       } else {
-        recordCacheMiss("service_notices");
+        recordCacheMiss('service_notices');
       }
 
-      logger.debug("Service notices retrieved", {
+      logger.debug('Service notices retrieved', {
         environment,
         platform,
         count: filteredNotices.length,
@@ -932,16 +893,16 @@ router.get(
         },
       });
     } catch (error) {
-      logger.error("Error getting service notices:", error);
+      logger.error('Error getting service notices:', error);
       res.status(500).json({
         success: false,
         error: {
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to retrieve service notices",
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to retrieve service notices',
         },
       });
     }
-  },
+  }
 );
 
 // ============================================================================
@@ -1000,7 +961,7 @@ router.get(
  *             example: { success: false, error: "SERVICE_UNAVAILABLE", message: "Failed to connect to backend server" }
  */
 router.post(
-  "/:environment/crashes/upload",
+  '/:environment/crashes/upload',
   clientAuth,
   async (req: ClientRequest, res: Response) => {
     try {
@@ -1008,12 +969,10 @@ router.post(
 
       // Get client IP and user agent to forward to backend
       const clientIp =
-        (req.headers["x-forwarded-for"] as string) ||
-        req.socket.remoteAddress ||
-        "unknown";
-      const userAgent = req.headers["user-agent"] || "unknown";
+        (req.headers['x-forwarded-for'] as string) || req.socket.remoteAddress || 'unknown';
+      const userAgent = req.headers['user-agent'] || 'unknown';
 
-      logger.debug("Proxying crash upload to backend", {
+      logger.debug('Proxying crash upload to backend', {
         environment,
         platform: req.body.platform,
         branch: req.body.branch,
@@ -1025,17 +984,17 @@ router.post(
 
       const response = await axios.post(backendUrl, req.body, {
         headers: {
-          "Content-Type": "application/json",
-          "x-api-token": config.apiToken,
-          "x-application-name": config.applicationName,
-          "x-environment": environment,
-          "x-forwarded-for": clientIp,
-          "user-agent": userAgent,
+          'Content-Type': 'application/json',
+          'x-api-token': config.apiToken,
+          'x-application-name': config.applicationName,
+          'x-environment': environment,
+          'x-forwarded-for': clientIp,
+          'user-agent': userAgent,
         },
         timeout: 30000, // 30 second timeout for crash uploads
       });
 
-      logger.info("Crash upload proxied successfully", {
+      logger.info('Crash upload proxied successfully', {
         environment,
         platform: req.body.platform,
         branch: req.body.branch,
@@ -1048,7 +1007,7 @@ router.post(
       res.status(response.status).json(response.data);
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        logger.error("Error proxying crash upload to backend:", {
+        logger.error('Error proxying crash upload to backend:', {
           status: error.response?.status,
           message: error.response?.data?.message || error.message,
           environment: req.clientContext?.environment,
@@ -1065,22 +1024,143 @@ router.post(
         return res.status(503).json({
           success: false,
           error: {
-            code: "SERVICE_UNAVAILABLE",
-            message: "Failed to connect to backend server",
+            code: 'SERVICE_UNAVAILABLE',
+            message: 'Failed to connect to backend server',
           },
         });
       }
 
-      logger.error("Unexpected error in crash upload proxy:", error);
+      logger.error('Unexpected error in crash upload proxy:', error);
       res.status(500).json({
         success: false,
         error: {
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to process crash upload",
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to process crash upload',
         },
       });
     }
-  },
+  }
+);
+
+// ============================================================================
+// Feature Flag Routes
+// ============================================================================
+
+/**
+ * @openapi
+ * /client/{environment}/features/eval:
+ *   post:
+ *     tags: [EdgeClient]
+ *     summary: Evaluate feature flags (Local Evaluation)
+ *     description: Evaluates feature flags for the given context using local cache.
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: environment
+ *         required: true
+ *         schema: { type: string }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               context: { type: object }
+ *               keys: { type: array, items: { type: string } }
+ *     responses:
+ *       200:
+ *         description: Evaluation result
+ */
+router.post(
+  '/:environment/features/eval',
+  clientAuth,
+  async (req: ClientRequest, res: Response) => {
+    try {
+      const sdk = getSDKOrError(res);
+      if (!sdk) return;
+
+      const { environment, applicationName } = req.clientContext!;
+      const { context = {}, keys = [] } = req.body;
+
+      // Ensure appName is in context if not provided
+      if (!context.appName) {
+        context.appName = applicationName;
+      }
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const results: Record<string, any> = {};
+      const evaluatedKeys: string[] = Array.isArray(keys) ? (keys as string[]) : [];
+
+      for (const key of evaluatedKeys) {
+        const result = sdk.featureFlag.evaluate(key, context, environment);
+        results[key] = {
+          value: result.enabled,
+          variant: result.variant?.name,
+          reason: result.reason,
+          payload: result.variant?.payload,
+        };
+      }
+
+      res.json({
+        success: true,
+        data: {
+          configs: results,
+          evaluatedAt: new Date().toISOString(),
+          context,
+        },
+        cached: true,
+      });
+    } catch (error) {
+      logger.error('Error evaluating feature flags in edge:', error);
+      res.status(500).json({
+        success: false,
+        error: {
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to evaluate feature flags',
+        },
+      });
+    }
+  }
+);
+
+/**
+ * @openapi
+ * /client/{environment}/features/metrics:
+ *   post:
+ *     tags: [EdgeClient]
+ *     summary: Submit feature flag metrics (Buffered Aggregation)
+ *     description: Buffers and aggregates metrics at edge before flushing to backend.
+ */
+router.post(
+  '/:environment/features/metrics',
+  clientAuth,
+  async (req: ClientRequest, res: Response) => {
+    try {
+      const { environment, applicationName } = req.clientContext!;
+      const { bucket } = req.body;
+
+      if (!bucket) {
+        return res.status(400).json({ success: false, error: 'bucket is required' });
+      }
+
+      // Add to aggregator for buffering
+      metricsAggregator.addClientMetrics(environment, applicationName, bucket);
+
+      // Return success immediately (fire and forget from client perspective)
+      res.json({ success: true, buffered: true });
+    } catch (error) {
+      logger.error('Error buffering feature metrics:', error);
+      res.status(500).json({
+        success: false,
+        error: {
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to process metrics',
+        },
+      });
+    }
+  }
 );
 
 export default router;
