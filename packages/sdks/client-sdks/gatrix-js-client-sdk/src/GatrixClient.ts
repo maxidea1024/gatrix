@@ -12,6 +12,7 @@ import { FeaturesClient } from './FeaturesClient';
 import { EVENTS } from './events';
 import { SDK_VERSION } from './version';
 import { GatrixError } from './errors';
+import { Logger, ConsoleLogger } from './Logger';
 
 export class GatrixClient {
   private emitter: EventEmitter;
@@ -19,6 +20,7 @@ export class GatrixClient {
   private featuresClient: FeaturesClient;
   private initialized = false;
   private startPromise: Promise<void> | null = null;
+  private logger: Logger;
 
   /**
    * Feature flags client
@@ -45,6 +47,7 @@ export class GatrixClient {
 
     this.config = config;
     this.emitter = new EventEmitter();
+    this.logger = config.logger ?? new ConsoleLogger('GatrixClient');
     this.featuresClient = new FeaturesClient(this.emitter, config);
   }
 
@@ -62,7 +65,7 @@ export class GatrixClient {
     }
 
     const connId = this.featuresClient.getConnectionId();
-    console.log(`[GatrixClient] Starting SDK for ${this.config.appName} (v${SDK_VERSION}) [${connId}]`);
+    this.logger.info(`Starting SDK for ${this.config.appName} (v${SDK_VERSION}) [${connId}]`);
 
     this.startPromise = (async () => {
       try {
