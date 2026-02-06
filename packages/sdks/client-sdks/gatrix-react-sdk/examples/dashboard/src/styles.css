@@ -294,8 +294,35 @@ body {
 
 .stats-info {
   min-width: 0;
-  border-left: 2px solid #adafbc;
-  padding-left: 16px;
+}
+
+.stats-separator {
+  width: 4px;
+  height: 100px;
+  background-color: #444;
+  margin: 0 24px;
+  box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.5);
+}
+
+.stats-context-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 151px;
+}
+
+.context-item {
+  display: flex;
+  gap: 8px;
+  font-size: 8px;
+}
+
+.context-key {
+  color: #adafbc;
+}
+
+.context-value {
+  color: #f7d51d;
 }
 
 .stats-table {
@@ -328,9 +355,6 @@ body {
 
 /* Mascot with bubble on left */
 .mascot-bubble-left {
-  display: flex;
-  align-items: center;
-  gap: 8px;
   flex-shrink: 0;
 }
 
@@ -406,6 +430,11 @@ body {
   font-size: 16px;
   font-weight: bold;
   display: block;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: grayscale;
+  font-smooth: never;
+  text-rendering: optimizeSpeed;
+  image-rendering: pixelated;
 }
 
 .stat-mini-value.total {
@@ -430,31 +459,45 @@ body {
 }
 
 @keyframes stat-rumble {
-
-  0%,
-  100% {
-    transform: translateX(0) scale(1);
+  0% {
+    transform: translateX(0);
+    background-color: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 0 15px #fff;
   }
 
   20% {
-    transform: translateX(-2px) scale(1.05);
+    transform: translateX(-4px);
+    background-color: rgba(255, 255, 255, 0.4);
   }
 
   40% {
-    transform: translateX(2px) scale(1.05);
+    transform: translateX(4px);
+    background-color: rgba(255, 255, 255, 0.4);
   }
 
   60% {
-    transform: translateX(-1px) scale(1.02);
+    transform: translateX(-2px);
   }
 
   80% {
-    transform: translateX(1px) scale(1.02);
+    transform: translateX(2px);
+  }
+
+  100% {
+    transform: translateX(0);
+    background-color: transparent;
+    box-shadow: none;
   }
 }
 
 /* Mascot in stats */
-.mascot-container {
+.mascot-container,
+.mascot-bubble-left {
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 10px;
+  border-radius: 8px;
+  border: 4px solid #333;
+  box-shadow: inset 4px 4px 0 rgba(0, 0, 0, 0.2);
   flex-shrink: 0;
 }
 
@@ -621,7 +664,7 @@ body {
 .flags-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 8px;
+  gap: 24px;
   overflow-y: scroll;
   flex: 1;
   padding: 10px;
@@ -660,18 +703,22 @@ body {
 }
 
 @keyframes card-rumble {
-
-  0%,
-  100% {
+  0% {
     transform: translateX(0) rotate(0deg);
+    filter: brightness(3.0);
+    box-shadow: 0 0 25px #fff, 8px 8px 0px rgba(0, 0, 0, 1);
   }
 
   20% {
-    transform: translateX(-3px) rotate(-1deg);
+    transform: translateX(-4px) rotate(-1.5deg);
+    filter: brightness(1.5);
+    box-shadow: 0 0 15px #fff, 6px 6px 0px rgba(0, 0, 0, 1);
   }
 
   40% {
-    transform: translateX(3px) rotate(1deg);
+    transform: translateX(4px) rotate(1.5deg);
+    filter: brightness(1.5);
+    box-shadow: 0 0 15px #fff, 6px 6px 0px rgba(0, 0, 0, 1);
   }
 
   60% {
@@ -680,6 +727,12 @@ body {
 
   80% {
     transform: translateX(2px) rotate(0.5deg);
+  }
+
+  100% {
+    transform: translateX(0) rotate(0deg);
+    filter: brightness(1);
+    box-shadow: 4px 4px 0px rgba(0, 0, 0, 1);
   }
 }
 

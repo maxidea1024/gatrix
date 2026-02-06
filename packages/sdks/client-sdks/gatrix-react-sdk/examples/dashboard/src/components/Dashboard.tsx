@@ -39,12 +39,14 @@ function Dashboard({ config }: DashboardProps) {
   const [initialVersions, setInitialVersions] = useState<Map<string, number>>(new Map());
   const [showRecoveryEffect, setShowRecoveryEffect] = useState(false);
   const prevSdkStateRef = useRef<string | null>(null);
+  const [context, setContext] = useState<Record<string, any>>({});
 
   useEffect(() => {
     const updateStats = () => {
       const clientStats = client.features.getStats();
       setStats(clientStats as Stats);
       setLastUpdate(new Date());
+      setContext(client.features.getContext());
     };
 
     // Capture initial versions on ready
@@ -124,6 +126,7 @@ function Dashboard({ config }: DashboardProps) {
         lastUpdate={lastUpdate}
         stats={stats}
         errorMessage={errorMessage}
+        context={context}
       />
 
       <section className="flags-section">

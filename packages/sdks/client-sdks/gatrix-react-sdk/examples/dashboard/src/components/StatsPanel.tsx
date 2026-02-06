@@ -23,6 +23,7 @@ interface StatsPanelProps {
     lastUpdate: Date | null;
     stats: Stats | null;
     errorMessage: string | null;
+    context: Record<string, any>;
 }
 
 // Typewriter hook with repeat
@@ -74,6 +75,7 @@ function StatsPanel({
     lastUpdate,
     stats,
     errorMessage,
+    context,
 }: StatsPanelProps) {
 
     // Track previous counts for rumble effect
@@ -167,32 +169,28 @@ function StatsPanel({
     const renderMascotWithBubble = () => {
         const state = stats?.sdkState || 'initializing';
 
+        let mascotIcon;
         if (state === 'error' || errorMessage) {
-            return (
-                <div className="mascot-bubble-left">
-                    <div className={`mascot-error ${isTyping ? 'mascot-talking' : 'mascot-sad'}`}>
-                        <i className="nes-bcrikko"></i>
-                    </div>
-                    {formattedError && (
-                        <div className="nes-balloon from-left is-dark error-balloon-inline">
-                            <p>
-                                {displayText}
-                                {isTyping && <span className="typewriter-cursor">_</span>}
-                            </p>
-                        </div>
-                    )}
-                </div>
-            );
+            mascotIcon = <div className={`mascot-error ${isTyping ? 'mascot-talking' : 'mascot-sad'}`}><i className="nes-bcrikko"></i></div>;
         } else if (state === 'healthy' || state === 'ready') {
-            return (
-                <div className="mascot-container mascot-happy">
-                    <i className="nes-octocat animate"></i>
-                </div>
-            );
+            mascotIcon = <div className="mascot-happy"><i className="nes-octocat animate"></i></div>;
+        } else {
+            mascotIcon = <div className="mascot-waiting"><i className="nes-kirby"></i></div>;
         }
+
         return (
-            <div className="mascot-container mascot-waiting">
-                <i className="nes-kirby"></i>
+            <div className="mascot-outer-container" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div className="mascot-container">
+                    {mascotIcon}
+                </div>
+                {(state === 'error' || errorMessage) && formattedError && (
+                    <div className="nes-balloon from-left is-dark error-balloon-inline">
+                        <p>
+                            {displayText}
+                            {isTyping && <span className="typewriter-cursor">_</span>}
+                        </p>
+                    </div>
+                )}
             </div>
         );
     };
@@ -208,11 +206,12 @@ function StatsPanel({
                     {/* Left: Mascot with bubble */}
                     {renderMascotWithBubble()}
 
-                    {/* Spacer */}
+                    {/* Spacer - pushes everything else to the right */}
                     <div className="stats-spacer"></div>
 
-                    {/* Right Group: Flag Counts + Stats */}
-                    <div className="stats-right-group">
+                    {/* Right Group: Flag Counts + Context + Stats */}
+                    <div className="stats-right-group" style={{ display: 'flex', alignItems: 'center', gap: '0' }}>
+                        {/* Flag Counts */}
                         <div className="stats-numbers-compact">
                             <div className={`stat-mini ${rumbleTotal ? 'stat-rumble' : ''}`}>
                                 <span className="stat-mini-value total">{totalCount}</span>
@@ -228,6 +227,23 @@ function StatsPanel({
                             </div>
                         </div>
 
+                        {/* Vertical Separator */}
+                        <div className="stats-separator"></div>
+
+                        {/* Context Info */}
+                        <div className="stats-context-info">
+                            {Object.entries(context || {}).map(([key, value]) => (
+                                <div key={key} className="context-item">
+                                    <span className="context-key">{key}:</span>
+                                    <span className="context-value">{String(value)}</span>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Vertical Separator */}
+                        <div className="stats-separator"></div>
+
+                        {/* Stats Info */}
                         <div className="stats-info">
                             <table className="stats-table">
                                 <tbody>
