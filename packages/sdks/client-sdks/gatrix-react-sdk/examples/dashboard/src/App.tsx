@@ -96,7 +96,7 @@ function App() {
           config={{
             ...config,
             features: {
-              refreshInterval: 30,
+              refreshInterval: 5,
               metricsIntervalInitial: 2,
               metricsInterval: 10,
             },
