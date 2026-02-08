@@ -29,7 +29,6 @@ const IdleRPGGame: React.FC<IdleRPGGameProps> = ({ onExit }) => {
     const [gold, setGold] = useState(0);
     const [exp, setExp] = useState(0);
     const [stage, setStage] = useState(1);
-    const [isBoss, setIsBoss] = useState(false);
     const [killCount, setKillCount] = useState(0);
     const [log, setLog] = useState<string[]>(['Entering the Gatrix Realm...']);
 
@@ -286,7 +285,7 @@ const IdleRPGGame: React.FC<IdleRPGGameProps> = ({ onExit }) => {
                     </div>
                     <div style={{ display: 'flex', gap: '20px' }}>
                         <div className="nes-badge">
-                            <span className="is-success">STAGE {stage}</span>
+                            <span className="is-success">STAGE {stage} ({killCount}/5)</span>
                         </div>
                         <button type="button" className="nes-btn is-error" onClick={onExit} style={{ fontSize: '10px' }}>EXIT</button>
                     </div>
