@@ -8,14 +8,14 @@ interface IdleRPGGameProps {
 
 // Retro Color Palette
 const COLORS = {
-    BG: 0x212529,
-    HERO: 0x209cee,
-    ENEMY: 0xe76e55,
-    BOSS: 0x8c2020,
-    GOLD: 0xf7d51d,
-    EXP: 0x92cc41,
-    TEXT: 0xffffff,
-    BAR_BG: 0x444444
+    BG: '#212529',
+    HERO: '#209cee',
+    ENEMY: '#e76e55',
+    BOSS: '#8c2020',
+    GOLD: '#f7d51d',
+    EXP: '#92cc41',
+    TEXT: '#ffffff',
+    BAR_BG: '#444444'
 };
 
 const IdleRPGGame: React.FC<IdleRPGGameProps> = ({ onExit }) => {
@@ -309,7 +309,7 @@ const IdleRPGGame: React.FC<IdleRPGGameProps> = ({ onExit }) => {
                             <div style={{ textAlign: 'center' }}>
                                 <i className="nes-icon is-large star animate"></i>
                                 <p style={{ marginTop: '20px', fontSize: '12px' }}>SYNCHRONIZING FLAGS...</p>
-                                <progress className="nes-progress is-success" value={undefined} max="100"></progress>
+                                <progress className="nes-progress is-success" max={100}></progress>
                             </div>
                         </div>
                     </div>
