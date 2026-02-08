@@ -227,6 +227,24 @@ function StatsPanel({
                     {/* Left: Mascot with bubble */}
                     {renderMascotWithBubble()}
 
+                    {/* Mode Info */}
+                    <div className="stats-modes-compact">
+                        <div className={`mode-badge ${client.features.isOfflineMode() ? 'warning' : 'active'}`}>
+                            <span className="mode-label">NETWORK</span>
+                            <span className="mode-value">{client.features.isOfflineMode() ? 'OFFLINE' : 'ONLINE'}</span>
+                        </div>
+                        <div className={`mode-badge ${config.features?.refreshInterval === 0 && !client.features.isOfflineMode() ? 'warning' : 'active'}`}>
+                            <span className="mode-label">POLLING</span>
+                            <span className="mode-value">
+                                {client.features.isOfflineMode() ? 'OFF' : (config.features?.refreshInterval === 0 ? 'MANUAL' : `${config.features?.refreshInterval}s`)}
+                            </span>
+                        </div>
+                        <div className={`mode-badge ${config.features?.explicitSyncMode ? 'warning' : 'active'}`}>
+                            <span className="mode-label">SYNC</span>
+                            <span className="mode-value">{config.features?.explicitSyncMode && !client.features.isOfflineMode() ? 'EXPLICIT' : 'AUTO'}</span>
+                        </div>
+                    </div>
+
                     {/* Spacer - pushes everything else to the right */}
                     <div className="stats-spacer"></div>
 
