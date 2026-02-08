@@ -35,7 +35,7 @@ function FlagCard({
   const payload = flag.variant?.payload;
   const hasPayload = payload !== undefined && payload !== null;
   const isEmptyString = payload === '';
-  const [isRumbling, setIsRumbling] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
   const [timeAgo, setTimeAgo] = useState(formatTimeAgo(lastChangedTime));
   const prevVersionRef = useRef(flag.version);
   const client = useGatrixClient();
@@ -45,14 +45,14 @@ function FlagCard({
     client.features.isEnabled(flag.name);
   }, [client, flag.name, flag.version]);
 
-  // Detect flag changes and trigger rumble
+  // Detect flag changes and trigger flash
   useEffect(() => {
     if (
       prevVersionRef.current !== undefined &&
       prevVersionRef.current !== flag.version
     ) {
-      setIsRumbling(true);
-      const timeout = setTimeout(() => setIsRumbling(false), 500);
+      setIsUpdating(true);
+      const timeout = setTimeout(() => setIsUpdating(false), 500);
       return () => clearTimeout(timeout);
     }
     prevVersionRef.current = flag.version;
@@ -93,7 +93,7 @@ function FlagCard({
   if (viewMode === 'list') {
     return (
       <div
-        className={`flag-list-item ${isRumbling ? 'flag-card-rumble' : ''} ${flag.enabled ? 'is-enabled' : 'is-disabled'}`}
+        className={`flag-list-item ${isUpdating ? 'flag-card-flash' : ''} ${flag.enabled ? 'is-enabled' : 'is-disabled'}`}
         onClick={onSelect}
       >
         <div className="col-name">
@@ -136,7 +136,7 @@ function FlagCard({
   if (viewMode === 'simple') {
     return (
       <div
-        className={`flag-card simple-mode ${isRumbling ? 'flag-card-rumble' : ''}`}
+        className={`flag-card simple-mode ${isUpdating ? 'flag-card-flash' : ''}`}
         onClick={onSelect}
         title={flag.name}
       >
@@ -147,9 +147,25 @@ function FlagCard({
             <span className="flag-name" style={{ fontSize: '10px' }}>
               <span className="status-dot"></span> {flag.name}
             </span>
-            <span className="pixel-chip type-chip is-mini" style={{ fontSize: '6px', marginLeft: '8px' }}>
+            <span
+              className="pixel-chip type-chip is-mini"
+              style={{ fontSize: '6px' }}
+            >
               {flag.variantType || 'none'}
             </span>
+          </div>
+          <div className="flag-details" style={{ marginTop: 0 }}>
+            <div
+              className="flag-detail"
+              style={{ paddingBottom: 0, marginBottom: 0, borderBottom: 'none' }}
+            >
+              <span
+                className="pixel-chip variant-chip is-mini"
+                style={{ fontSize: '8px', width: '100%', textAlign: 'center', color: '#000', fontWeight: 'bold' }}
+              >
+                {flag.variant?.name || '-'}
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -158,7 +174,7 @@ function FlagCard({
 
   return (
     <div
-      className={`flag-card ${isRumbling ? 'flag-card-rumble' : ''}`}
+      className={`flag-card ${isUpdating ? 'flag-card-flash' : ''}`}
       onClick={onSelect}
       style={{ cursor: 'pointer' }}
     >

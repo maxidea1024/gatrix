@@ -1017,47 +1017,48 @@ body {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
 }
 
-.flag-card-rumble {
-  animation: card-rumble 0.5s ease;
+.flag-card-flash {
+  position: relative;
+  overflow: hidden;
+  animation: card-flash 0.5s ease;
 }
 
-@keyframes card-rumble {
+.flag-card-flash::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(255, 255, 255, 0.4),
+      transparent);
+  transform: skewX(-20deg);
+  animation: sweep 0.5s ease-in-out;
+  pointer-events: none;
+  z-index: 100;
+}
+
+@keyframes card-flash {
   0% {
-    transform: translateX(0) rotate(0deg);
-    filter: brightness(3);
-    box-shadow:
-      0 0 25px #fff,
-      8px 8px 0px rgba(0, 0, 0, 1);
-  }
-
-  20% {
-    transform: translateX(-4px) rotate(-1.5deg);
-    filter: brightness(1.5);
-    box-shadow:
-      0 0 15px #fff,
-      6px 6px 0px rgba(0, 0, 0, 1);
-  }
-
-  40% {
-    transform: translateX(4px) rotate(1.5deg);
-    filter: brightness(1.5);
-    box-shadow:
-      0 0 15px #fff,
-      6px 6px 0px rgba(0, 0, 0, 1);
-  }
-
-  60% {
-    transform: translateX(-2px) rotate(-0.5deg);
-  }
-
-  80% {
-    transform: translateX(2px) rotate(0.5deg);
+    filter: brightness(2.5);
+    box-shadow: 0 0 30px #fff;
   }
 
   100% {
-    transform: translateX(0) rotate(0deg);
     filter: brightness(1);
     box-shadow: 4px 4px 0px rgba(0, 0, 0, 1);
+  }
+}
+
+@keyframes sweep {
+  0% {
+    left: -100%;
+  }
+
+  100% {
+    left: 150%;
   }
 }
 
@@ -1105,34 +1106,19 @@ body {
   box-shadow: inset 0 3px 0 rgba(255, 255, 255, 0.3);
 }
 
-.simple-mode .flag-header {
-  padding: 0 !important;
-  margin: 0 !important;
-  background-color: transparent !important;
-  border-bottom: none !important;
-  box-shadow: none !important;
-}
-
-.simple-mode .flag-card-inner.is-enabled {
-  background-color: #2e7d32 !important;
-}
-
-.simple-mode .flag-card-inner.is-disabled {
-  background-color: #c62828 !important;
-}
-
 .simple-mode .flag-card-inner {
   height: auto !important;
-  padding: 4px 10px !important;
+  padding: 8px 8px 10px 8px !important;
   min-height: unset !important;
-  border-width: 2px !important;
+  border-width: 4px !important;
 }
 
-.simple-mode .flag-name {
-  color: #fff !important;
-  text-shadow: 2px 2px 0px #000 !important;
-  font-size: 10px;
+.simple-mode .flag-header {
+  margin: -10px -8px 10px -8px !important;
+  padding: 6px 10px !important;
+  border-bottom-width: 2px !important;
 }
+
 
 .simple-mode .status-dot {
   width: 10px !important;
