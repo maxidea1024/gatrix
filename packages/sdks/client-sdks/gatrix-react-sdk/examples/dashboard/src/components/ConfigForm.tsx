@@ -14,6 +14,10 @@ const STORAGE_KEY_API_URL = 'gatrix-dashboard-api-url';
 const STORAGE_KEY_APP_NAME = 'gatrix-dashboard-app-name';
 const STORAGE_KEY_ENVIRONMENT = 'gatrix-dashboard-environment';
 const STORAGE_KEY_SERVER_TYPE = 'gatrix-dashboard-server-type';
+const STORAGE_KEY_OFFLINE_MODE = 'gatrix-dashboard-offline-mode';
+const STORAGE_KEY_REFRESH_INTERVAL = 'gatrix-dashboard-refresh-interval';
+const STORAGE_KEY_EXPLICIT_SYNC = 'gatrix-dashboard-explicit-sync';
+const STORAGE_KEY_MANUAL_POLLING = 'gatrix-dashboard-manual-polling';
 
 function ConfigForm({ onConnect }: ConfigFormProps) {
   const [serverType, setServerType] = useState<'edge' | 'backend'>(() => {
@@ -27,6 +31,10 @@ function ConfigForm({ onConnect }: ConfigFormProps) {
   const [useDevToken, setUseDevToken] = useState(false);
   const [rememberToken, setRememberToken] = useState(false);
   const [showToken, setShowToken] = useState(false);
+  const [offlineMode, setOfflineMode] = useState(false);
+  const [refreshInterval, setRefreshInterval] = useState(1);
+  const [manualPolling, setManualPolling] = useState(false);
+  const [explicitSyncMode, setExplicitSyncMode] = useState(false);
 
   // Load saved preferences on mount
   useEffect(() => {
@@ -55,6 +63,14 @@ function ConfigForm({ onConnect }: ConfigFormProps) {
     } else if (savedRememberToken && savedToken) {
       setApiToken(savedToken);
     }
+
+    setOfflineMode(localStorage.getItem(STORAGE_KEY_OFFLINE_MODE) === 'true');
+    const savedManualPolling = localStorage.getItem(STORAGE_KEY_MANUAL_POLLING) === 'true';
+    const savedRefreshInterval = parseInt(localStorage.getItem(STORAGE_KEY_REFRESH_INTERVAL) || '30', 10);
+
+    setManualPolling(savedManualPolling);
+    setRefreshInterval(!savedManualPolling && savedRefreshInterval === 0 ? 30 : savedRefreshInterval);
+    setExplicitSyncMode(localStorage.getItem(STORAGE_KEY_EXPLICIT_SYNC) === 'true');
   }, []);
 
   // Update token and URL when serverType or useDevToken changes
@@ -99,15 +115,24 @@ function ConfigForm({ onConnect }: ConfigFormProps) {
       localStorage.setItem(STORAGE_KEY_USE_DEV, 'false');
     }
   };
+  const handleManualPollingChange = (checked: boolean) => {
+    setManualPolling(checked);
+    if (!checked && refreshInterval === 0) {
+      setRefreshInterval(30); // Default to 30 seconds if it was 0
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     // Save all form values for next session
     localStorage.setItem(STORAGE_KEY_API_URL, apiUrl);
-    localStorage.setItem(STORAGE_KEY_APP_NAME, appName);
     localStorage.setItem(STORAGE_KEY_ENVIRONMENT, environment);
     localStorage.setItem(STORAGE_KEY_SERVER_TYPE, serverType);
+    localStorage.setItem(STORAGE_KEY_OFFLINE_MODE, String(offlineMode));
+    localStorage.setItem(STORAGE_KEY_REFRESH_INTERVAL, String(manualPolling ? 0 : refreshInterval));
+    localStorage.setItem(STORAGE_KEY_MANUAL_POLLING, String(manualPolling));
+    localStorage.setItem(STORAGE_KEY_EXPLICIT_SYNC, String(explicitSyncMode));
 
     // Save token if remember is enabled
     const isDevToken = apiToken === DEV_TOKEN_ALL || apiToken === DEV_TOKEN_CLIENT;
@@ -120,6 +145,11 @@ function ConfigForm({ onConnect }: ConfigFormProps) {
       apiToken,
       appName,
       environment,
+      offlineMode,
+      features: {
+        refreshInterval: manualPolling ? 0 : refreshInterval,
+        explicitSyncMode,
+      },
     });
   };
 
@@ -263,6 +293,58 @@ function ConfigForm({ onConnect }: ConfigFormProps) {
                   required
                 />
               </div>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">POLLING INTERVAL (SEC)</label>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+                <input
+                  type="number"
+                  className={`nes-input is-dark ${manualPolling ? 'is-disabled' : ''}`}
+                  value={refreshInterval}
+                  onChange={(e) => setRefreshInterval(Math.max(1, parseInt(e.target.value) || 1))}
+                  min="1"
+                  disabled={manualPolling}
+                  style={{ flex: 1 }}
+                />
+                <label style={{ marginBottom: 0 }}>
+                  <input
+                    type="checkbox"
+                    className="nes-checkbox is-dark"
+                    checked={manualPolling}
+                    onChange={(e) => handleManualPollingChange(e.target.checked)}
+                  />
+                  <span className="checkbox-label">MANUAL</span>
+                </label>
+              </div>
+            </div>
+
+            <div className="checkbox-group" style={{ marginTop: '20px' }}>
+              <label>
+                <input
+                  type="checkbox"
+                  className="nes-checkbox is-dark"
+                  checked={offlineMode}
+                  onChange={(e) => setOfflineMode(e.target.checked)}
+                />
+                <span className="checkbox-label">
+                  &nbsp;<i className="nes-icon is-small is-empty heart"></i>&nbsp;OFFLINE MODE
+                </span>
+              </label>
+            </div>
+
+            <div className="checkbox-group">
+              <label>
+                <input
+                  type="checkbox"
+                  className="nes-checkbox is-dark"
+                  checked={explicitSyncMode}
+                  onChange={(e) => setExplicitSyncMode(e.target.checked)}
+                />
+                <span className="checkbox-label">
+                  &nbsp;<i className="nes-icon is-small star"></i>&nbsp;EXPLICIT SYNC
+                </span>
+              </label>
             </div>
 
             <button type="submit" className="nes-btn is-success" style={{ width: '100%' }}>

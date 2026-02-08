@@ -241,8 +241,24 @@ client.on(EVENTS.READY, () => {
   console.log('SDK is ready');
 });
 
-client.on(EVENTS.UPDATE, ({ flags }) => {
-  console.log('Flags updated:', flags);
+client.on(EVENTS.FETCH_START, () => {
+  console.log('Started fetching flags');
+});
+
+client.on(EVENTS.FETCH_SUCCESS, () => {
+  console.log('Successfully fetched flags');
+});
+
+client.on(EVENTS.FETCH_ERROR, (error) => {
+  console.error('Fetch error:', error);
+});
+
+client.on(EVENTS.FETCH_END, () => {
+  console.log('Fetch process completed');
+});
+
+client.on(EVENTS.CHANGE, ({ flags }) => {
+  console.log('Flags changed:', flags);
 });
 
 client.on(EVENTS.ERROR, (error) => {
@@ -254,8 +270,8 @@ client.on(EVENTS.RECOVERED, () => {
 });
 
 // Watch specific flag changes
-client.on('flag:my-feature:update', (flag) => {
-  console.log('my-feature updated:', flag);
+client.on('flags.my-feature.change', (flag) => {
+  console.log('my-feature changed:', flag);
 });
 ```
 
@@ -326,6 +342,9 @@ await client.features.syncFlags();
 | `watchFlag(flagName, callback)`                 | Watch for changes           |
 | `watchFlagWithInitialState(flagName, callback)` | Watch with initial callback |
 | `createWatchFlagGroup(name)`                    | Create a watch group        |
+| `isFetching()`                                | Check if currently fetching |
+| `isExplicitSync()`                             | Check if explicit mode      |
+| `canSyncFlags()`                               | Check if sync can be called |
 | `syncFlags(fetchNow?)`                          | Manual sync (explicit mode) |
 | `updateContext(context)`                        | Update evaluation context   |
 | `getContext()`                                  | Get current context         |

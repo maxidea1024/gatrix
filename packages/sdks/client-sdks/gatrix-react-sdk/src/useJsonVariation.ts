@@ -61,11 +61,11 @@ export function useJsonVariation<T>(flagName: string, defaultValue: T): T {
       setValue(newValue);
     };
 
-    client.on(EVENTS.UPDATE, updateHandler);
+    client.on(EVENTS.CHANGE, updateHandler);
     client.on(EVENTS.READY, readyHandler);
 
     return () => {
-      client.off(EVENTS.UPDATE, updateHandler);
+      client.off(EVENTS.CHANGE, updateHandler);
       client.off(EVENTS.READY, readyHandler);
     };
   }, [client, getValue]);

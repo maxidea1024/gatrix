@@ -7,6 +7,7 @@ import { EVENTS } from './events';
 import {
   GatrixContext,
   GatrixClientConfig,
+  FeaturesConfig,
   EvaluatedFlag,
   Variant,
   FlagsApiResponse,
@@ -57,6 +58,7 @@ export class FeaturesClient {
   private started = false;
   private readyEventEmitted = false;
   private fetchedFromServer = false;
+  private isFetchingFlags = false;
   private timerRef?: ReturnType<typeof setInterval>;
   private etag = '';
   private refreshInterval: number;
@@ -179,7 +181,7 @@ export class FeaturesClient {
     // Load cached flags
     const cachedFlags = await this.storage.get(STORAGE_KEY_FLAGS);
     if (cachedFlags && Array.isArray(cachedFlags)) {
-      this.setFlags(cachedFlags);
+      this.setFlags(cachedFlags, true); // Force sync for initial cache load
     }
 
     // Handle bootstrap
@@ -192,6 +194,7 @@ export class FeaturesClient {
 
     if (hasBootstrap && (bootstrapOverride || this.realtimeFlags.size === 0)) {
       await this.storage.save(STORAGE_KEY_FLAGS, bootstrap);
+      this.setFlags(bootstrap, true); // Force sync for bootstrap
       this.setReady();
     }
   }
@@ -728,13 +731,64 @@ export class FeaturesClient {
     this.emitter.emit(EVENTS.SYNC);
   }
 
+  /**
+   * Check if explicit sync mode is enabled
+   */
+  public isExplicitSync(): boolean {
+    return !!this.featuresConfig.explicitSyncMode;
+  }
+
+  /**
+   * Alias for isExplicitSync() to check if syncFlags() can be called
+   */
+  public canSyncFlags(): boolean {
+    if (!this.isExplicitSync()) {
+      return false;
+    }
+
+    // Compare realtimeFlags and synchronizedFlags
+    if (this.realtimeFlags.size !== this.synchronizedFlags.size) {
+      return true;
+    }
+
+    for (const [name, flag] of this.realtimeFlags) {
+      const syncFlag = this.synchronizedFlags.get(name);
+      if (!syncFlag || syncFlag.version !== flag.version) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Check if offline mode is enabled
+   */
+  public isOfflineMode(): boolean {
+    return !!this.config.offlineMode;
+  }
+
+  /**
+   * Get current features configuration
+   */
+  public getConfig(): FeaturesConfig {
+    return this.featuresConfig;
+  }
+
+  /**
+   * Check if the client is currently fetching flags from the server
+   */
+  public isFetching(): boolean {
+    return this.isFetchingFlags;
+  }
+
   // ==================== Watch ====================
 
   /**
    * Watch callback type - supports both sync and async callbacks
    */
   watchFlag(flagName: string, callback: (flag: FlagProxy) => void | Promise<void>): () => void {
-    const eventName = `flags.${flagName}:update`;
+    const eventName = `flags.${flagName}.change`;
     const wrappedCallback = (rawFlag: EvaluatedFlag | undefined) => {
       callback(new FlagProxy(rawFlag));
     };
@@ -749,7 +803,7 @@ export class FeaturesClient {
     flagName: string,
     callback: (flag: FlagProxy) => void | Promise<void>
   ): () => void {
-    const eventName = `flags.${flagName}:update`;
+    const eventName = `flags.${flagName}.change`;
     const wrappedCallback = (rawFlag: EvaluatedFlag | undefined) => {
       callback(new FlagProxy(rawFlag));
     };
@@ -787,6 +841,19 @@ export class FeaturesClient {
     if (this.config.offlineMode) {
       this.logger.warn('fetchFlags called but client is in offline mode, ignoring');
       return;
+    }
+
+    if (this.isFetchingFlags) {
+      return;
+    }
+
+    this.isFetchingFlags = true;
+    this.emitter.emit(EVENTS.FETCH_START);
+
+    // Cancel existing polling timer if fetch is called manually or by polying
+    if (this.timerRef) {
+      clearTimeout(this.timerRef);
+      this.timerRef = undefined;
     }
 
     // Cancel previous request
@@ -865,7 +932,8 @@ export class FeaturesClient {
         const data: FlagsApiResponse = await response.json();
 
         if (data.success && data.data?.flags) {
-          await this.storeFlags(data.data.flags);
+          const isInitialFetch = !this.fetchedFromServer;
+          await this.storeFlags(data.data.flags, isInitialFetch);
           this.updateCount++;
           this.lastUpdateTime = new Date();
 
@@ -874,6 +942,10 @@ export class FeaturesClient {
             this.setReady();
           }
         }
+
+        // Restart polling timer only after successful fetch
+        this.scheduleNextRefresh();
+        this.emitter.emit(EVENTS.FETCH_SUCCESS);
       } else if (response.status === 304) {
         // Not modified - ETag matched
         this.notModifiedCount++;
@@ -884,8 +956,13 @@ export class FeaturesClient {
           this.fetchedFromServer = true;
           this.setReady();
         }
+
+        // Restart polling timer only after successful fetch
+        this.scheduleNextRefresh();
+        this.emitter.emit(EVENTS.FETCH_SUCCESS);
       } else {
         this.handleFetchError(response.status);
+        this.emitter.emit(EVENTS.FETCH_ERROR, { status: response.status });
       }
     } catch (e: unknown) {
       if (e instanceof Error && e.name === 'AbortError') {
@@ -904,8 +981,11 @@ export class FeaturesClient {
         type: 'fetch-flags',
         message: errorMessage,
       } as ErrorEvent);
+      this.emitter.emit(EVENTS.FETCH_ERROR, { error: e, message: errorMessage });
     } finally {
+      this.isFetchingFlags = false;
       this.abortController = null;
+      this.emitter.emit(EVENTS.FETCH_END);
     }
   }
 
@@ -921,9 +1001,13 @@ export class FeaturesClient {
       return;
     }
 
+    // Ensure any existing timer is cleared before setting a new one
+    if (this.timerRef) {
+      clearTimeout(this.timerRef);
+    }
+
     this.timerRef = setTimeout(async () => {
       await this.fetchFlags();
-      this.scheduleNextRefresh();
     }, this.refreshInterval);
   }
 
@@ -931,13 +1015,13 @@ export class FeaturesClient {
     return this.featuresConfig.explicitSyncMode ? this.synchronizedFlags : this.realtimeFlags;
   }
 
-  private setFlags(flags: EvaluatedFlag[]): void {
+  private setFlags(flags: EvaluatedFlag[], forceSync: boolean = false): void {
     this.realtimeFlags.clear();
     for (const flag of flags) {
       this.realtimeFlags.set(flag.name, flag);
     }
 
-    if (!this.featuresConfig.explicitSyncMode) {
+    if (!this.featuresConfig.explicitSyncMode || forceSync) {
       this.synchronizedFlags = new Map(this.realtimeFlags);
     }
   }
@@ -945,9 +1029,9 @@ export class FeaturesClient {
   /**
    * Store flags with change detection and event emission
    */
-  private async storeFlags(flags: EvaluatedFlag[]): Promise<void> {
+  private async storeFlags(flags: EvaluatedFlag[], forceSync: boolean = false): Promise<void> {
     const oldFlags = new Map(this.realtimeFlags);
-    this.setFlags(flags);
+    this.setFlags(flags, forceSync);
     await this.storage.save(STORAGE_KEY_FLAGS, flags);
 
     // Emit flag change events
@@ -955,9 +1039,9 @@ export class FeaturesClient {
 
     this.sdkState = 'healthy';
 
-    // In non-explicit sync mode, emit update
-    if (!this.featuresConfig.explicitSyncMode) {
-      this.emitter.emit(EVENTS.UPDATE, { flags });
+    // In synchronous mode or if forced, emit change
+    if (!this.featuresConfig.explicitSyncMode || forceSync) {
+      this.emitter.emit(EVENTS.CHANGE, { flags });
     }
   }
 
@@ -981,7 +1065,7 @@ export class FeaturesClient {
         if (!isInitialLoad) {
           this.flagLastChangedTimes.set(name, now);
         }
-        this.emitter.emit(`flags.${name}:update`, newFlag, oldFlag);
+        this.emitter.emit(`flags.${name}.change`, newFlag, oldFlag);
       }
     }
 
@@ -989,7 +1073,7 @@ export class FeaturesClient {
     for (const [name, oldFlag] of oldFlags) {
       if (!newFlags.has(name)) {
         this.flagLastChangedTimes.set(name, now);
-        this.emitter.emit(`flags.${name}:update`, undefined, oldFlag);
+        this.emitter.emit(`flags.${name}.change`, undefined, oldFlag);
       }
     }
   }

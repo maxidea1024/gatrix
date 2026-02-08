@@ -1,7 +1,7 @@
 import {
   useFlags,
-  useFlagsStatus,
   useGatrixClient,
+  useGatrixContext,
   type GatrixClientConfig,
   type EvaluatedFlag,
 } from '@gatrix/react-sdk';
@@ -34,7 +34,7 @@ interface Stats {
 
 function Dashboard({ config }: DashboardProps) {
   const flags = useFlags();
-  const { flagsReady, flagsError } = useFlagsStatus();
+  const { flagsReady, flagsError, isExplicitSync, canSyncFlags, fetchFlags, syncFlags } = useGatrixContext();
   const client = useGatrixClient();
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
   const [stats, setStats] = useState<Stats | null>(null);
@@ -43,6 +43,7 @@ function Dashboard({ config }: DashboardProps) {
   const [showRecoveryEffect, setShowRecoveryEffect] = useState(false);
   const prevSdkStateRef = useRef<string | null>(null);
   const [context, setContext] = useState<Record<string, any>>({});
+  const [isFetching, setIsFetching] = useState(false);
 
   useEffect(() => {
     const updateStats = () => {
@@ -73,16 +74,25 @@ function Dashboard({ config }: DashboardProps) {
     // Initial stats
     updateStats();
 
-    client.on('flags.update', updateStats);
+    const handleFetchStart = () => setIsFetching(true);
+    const handleFetchEnd = () => setIsFetching(false);
+
+    client.on('flags.change', updateStats);
     client.on('flags.ready', handleReady);
+    client.on('flags.sync', updateStats);
+    client.on('flags.fetch_start', handleFetchStart);
+    client.on('flags.fetch_end', handleFetchEnd);
     client.on('error', updateStats);
 
     // Update stats periodically
     const interval = setInterval(updateStats, 1000);
 
     return () => {
-      client.off('flags.update', updateStats);
+      client.off('flags.change', updateStats);
       client.off('flags.ready', handleReady);
+      client.off('flags.sync', updateStats);
+      client.off('flags.fetch_start', handleFetchStart);
+      client.off('flags.fetch_end', handleFetchEnd);
       client.off('error', updateStats);
       clearInterval(interval);
     };
@@ -139,6 +149,32 @@ function Dashboard({ config }: DashboardProps) {
           <p className="title" style={{ backgroundColor: '#000' }}>
             FEATURE FLAGS ({flags.length})
           </p>
+
+          <div style={{ padding: '10px', display: 'flex', gap: '15px', justifyContent: 'flex-end', marginBottom: '10px' }}>
+            {!client.features.isOfflineMode() && client.features.getConfig().refreshInterval === 0 && (
+              <button
+                type="button"
+                className={`nes-btn is-primary ${isFetching ? 'is-disabled' : ''}`}
+                onClick={() => fetchFlags()}
+                disabled={isFetching}
+                title="Manual Fetch"
+              >
+                {isFetching ? 'FETCHING...' : 'FETCH FLAGS'}
+              </button>
+            )}
+
+            {isExplicitSync() && (
+              <button
+                type="button"
+                className={`nes-btn is-warning ${!canSyncFlags() ? 'is-disabled' : ''}`}
+                onClick={() => syncFlags()}
+                disabled={!canSyncFlags()}
+                title="Synchronize Flags"
+              >
+                SYNC FLAGS
+              </button>
+            )}
+          </div>
 
           {isSearching ? (
             <div className="searching-state">

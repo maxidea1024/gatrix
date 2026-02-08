@@ -137,6 +137,10 @@ const GatrixProvider: FC<PropsWithChildren<GatrixProviderProps>> = ({
       isEnabled: (flagName: string) => client.current!.features.isEnabled(flagName),
       getVariant: (flagName: string) => client.current!.features.getVariant(flagName),
       updateContext: async (context: any) => await client.current!.features.updateContext(context),
+      isExplicitSync: () => client.current!.features.isExplicitSync(),
+      canSyncFlags: () => client.current!.features.canSyncFlags(),
+      fetchFlags: async () => await client.current!.features.fetchFlags(),
+      syncFlags: async (fetchNow?: boolean) => await client.current!.features.syncFlags(fetchNow),
     }),
     [flagsReady, flagsError]
   );

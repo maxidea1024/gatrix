@@ -43,6 +43,7 @@ export { default as GatrixProvider, type GatrixProviderProps } from './GatrixPro
 export { useGatrixClient } from './useGatrixClient';
 export { useFlagsStatus, type FlagsStatus } from './useFlagsStatus';
 export { useUpdateContext, type UpdateContextFunction } from './useUpdateContext';
+export { useGatrixContext } from './useGatrixContext';
 
 // Flag Access Hooks
 export { useFlag } from './useFlag';

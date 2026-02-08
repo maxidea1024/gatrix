@@ -30,6 +30,13 @@ body {
 }
 
 
+.nes-input.is-disabled,
+.nes-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: grayscale(1);
+}
+
 /* Retro Pixel Scrollbar */
 ::-webkit-scrollbar {
   width: 16px;

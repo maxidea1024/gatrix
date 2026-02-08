@@ -138,11 +138,16 @@ All events use the `flags.*` prefix for namespacing:
 |-------|-------------|---------|
 | `flags.init` | SDK initialized (from storage/bootstrap) | - |
 | `flags.ready` | First successful fetch completed | - |
-| `flags.update` | Flags updated from server | `{ flags: EvaluatedFlag[] }` |
-| `flags.error` | Error occurred | `{ type: string, error: Error }` |
+| `flags.fetch` | Started fetching flags from server | `{ etag: string \| null }` |
+| `flags.fetch_start` | Started fetching flags from server (alias for fetch) | `{ etag: string \| null }` |
+| `flags.fetch_success` | Successfully fetched flags from server | - |
+| `flags.fetch_error` | Error occurred during fetching | `{ status?: number, error?: Error }` |
+| `flags.fetch_end` | Completed fetching flags (success or error) | - |
+| `flags.change` | Flags changed from server | `{ flags: EvaluatedFlag[] }` |
+| `flags.error` | General SDK error occurred | `{ type: string, error: Error }` |
 | `flags.recovered` | SDK recovered from error state | - |
 | `flags.impression` | Flag accessed (if impressionData enabled) | `ImpressionEvent` |
-| `flags.{flagName}:update` | Specific flag changed | `FlagProxy` |
+| `flags.{flagName}.change` | Specific flag changed | `FlagProxy` |
 | `flags.metrics.sent` | Metrics successfully sent to server | `{ count: number }` |
 
 ## Main Interface
@@ -203,6 +208,8 @@ class FeaturesClient {
   jsonVariationOrThrow<T>(flagName: string): T;
 
   // Explicit Sync Mode
+  isExplicitSync(): boolean;
+  canSyncFlags(): boolean;
   syncFlags(fetchNow?: boolean): Promise<void>;
 
   // Watch (Change Detection) - Returns FlagProxy for convenience
@@ -485,9 +492,13 @@ SDK emits the following events that you can subscribe to:
 | `flags.init` | `EVENTS.INIT` | SDK initialized (from storage/bootstrap) | - |
 | `flags.ready` | `EVENTS.READY` | First successful fetch completed | - |
 | `flags.fetch` | `EVENTS.FETCH` | Started fetching flags from server | `{ etag: string \| null }` |
-| `flags.update` | `EVENTS.UPDATE` | Flags updated from server | `{ flags: EvaluatedFlag[] }` |
-| `flags.{name}:update` | - | Individual flag changed | `(newFlag: EvaluatedFlag, oldFlag?: EvaluatedFlag)` |
-| `flags.error` | `EVENTS.ERROR` | Error occurred | `{ type: string, message: string }` |
+| `flags.fetch_start` | `EVENTS.FETCH_START` | Started fetching flags from server (alias for fetch) | `{ etag: string \| null }` |
+| `flags.fetch_success` | `EVENTS.FETCH_SUCCESS` | Successfully fetched flags from server | - |
+| `flags.fetch_error` | `EVENTS.FETCH_ERROR` | Error occurred during fetching | `{ status?: number, error?: Error }` |
+| `flags.fetch_end` | `EVENTS.FETCH_END` | Completed fetching flags (success or error) | - |
+| `flags.change` | `EVENTS.CHANGE` | Flags changed from server | `{ flags: EvaluatedFlag[] }` |
+| `flags.{name}.change` | - | Individual flag changed | `(newFlag: EvaluatedFlag, oldFlag?: EvaluatedFlag)` |
+| `flags.error` | `EVENTS.ERROR` | General error occurred | `{ type: string, message: string }` |
 | `flags.recovered` | `EVENTS.RECOVERED` | SDK recovered from error state | - |
 | `flags.sync` | `EVENTS.SYNC` | Flags synchronized (explicitSyncMode) | - |
 | `flags.impression` | `EVENTS.IMPRESSION` | Flag accessed (if impressionData enabled) | `{ featureName, enabled, variant, ... }` |
@@ -545,7 +556,7 @@ SDK should be resilient:
 - [x] Repository pattern with storage providers
 - [x] Polling mechanism with backoff
 - [x] Context management (global)
-- [x] Explicit sync mode
+- [x] Explicit sync mode (with isExplicitSync, canSyncFlags)
 - [x] Watch pattern for change detection (watchFlag, WatchFlagGroup)
 - [x] Variation functions (bool, string, number, json)
 - [x] Variation details and OrThrow variants

@@ -27,6 +27,14 @@ export interface GatrixContextValue {
   getVariant: FeaturesClient['getVariant'];
   /** Update context */
   updateContext: FeaturesClient['updateContext'];
+  /** Check if explicit sync mode is enabled */
+  isExplicitSync: () => boolean;
+  /** Check if syncFlags can be called */
+  canSyncFlags: () => boolean;
+  /** Manually fetch flags from server */
+  fetchFlags: () => Promise<void>;
+  /** Synchronize flags in explicit sync mode */
+  syncFlags: (fetchNow?: boolean) => Promise<void>;
 }
 
 const GatrixFlagContext = React.createContext<GatrixContextValue | null>(null);

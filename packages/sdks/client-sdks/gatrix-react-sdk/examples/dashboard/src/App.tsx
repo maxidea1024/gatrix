@@ -6,7 +6,7 @@ import BootScreen from './components/BootScreen';
 import DisconnectScreen from './components/DisconnectScreen';
 import ConfirmDialog from './components/ConfirmDialog';
 import ArkanoidGame from './components/ArkanoidGame';
-import PaletteBackground from './components/PaletteBackground';
+import MatrixBackground from './components/MatrixBackground';
 import './styles.css';
 
 function App() {
@@ -88,7 +88,7 @@ function App() {
       )}
       {!config ? (
         <div className="center-container">
-          <PaletteBackground />
+          <MatrixBackground />
           <ConfigForm onConnect={handleConnect} />
         </div>
       ) : (
@@ -96,9 +96,9 @@ function App() {
           config={{
             ...config,
             features: {
-              refreshInterval: 5,
-              metricsIntervalInitial: 2,
-              metricsInterval: 10,
+              metricsIntervalInitial: 1,
+              metricsInterval: 5,
+              ...config.features,
             },
           }}
         >

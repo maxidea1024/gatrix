@@ -17,7 +17,7 @@ const BOOT_MESSAGES = [
   { text: 'SYSTEM READY!', delay: 4500 },
 ];
 
-const MIN_BOOT_TIME = 5000; // Minimum 5 seconds
+const MIN_BOOT_TIME = 6500; // Increased to allow 2s delay after 'SYSTEM READY!'
 
 function BootScreen({ onComplete }: BootScreenProps) {
   const [visibleLines, setVisibleLines] = useState<number>(0);
@@ -31,7 +31,7 @@ function BootScreen({ onComplete }: BootScreenProps) {
       }, msg.delay);
     });
 
-    // Progress bar animation (slower for 5 seconds)
+    // Progress bar animation (adjusted for 6.5 seconds)
     const progressInterval = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 100) {
@@ -40,7 +40,7 @@ function BootScreen({ onComplete }: BootScreenProps) {
         }
         return prev + 1;
       });
-    }, 50);
+    }, 65);
 
     // Complete after minimum boot time
     const completeTimeout = setTimeout(() => {

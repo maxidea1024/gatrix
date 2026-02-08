@@ -30,6 +30,20 @@ const mockMethods = {
     console.error('getVariant() must be used within a GatrixProvider');
     return { name: 'disabled', enabled: false };
   },
+  isExplicitSync: () => {
+    console.error('isExplicitSync() must be used within a GatrixProvider');
+    return false;
+  },
+  canSyncFlags: () => {
+    console.error('canSyncFlags() must be used within a GatrixProvider');
+    return false;
+  },
+  fetchFlags: async () => {
+    console.error('fetchFlags() must be used within a GatrixProvider');
+  },
+  syncFlags: async () => {
+    console.error('syncFlags() must be used within a GatrixProvider');
+  },
 };
 
 // Mock FeaturesClient
@@ -49,7 +63,7 @@ const mockGatrixClient = {
   ...mockMethods,
   features: mockFeaturesClient,
   start: () => Promise.resolve(),
-  stop: () => {},
+  stop: () => { },
   isReady: () => false,
   getError: () => null,
 } as unknown as GatrixClient;
