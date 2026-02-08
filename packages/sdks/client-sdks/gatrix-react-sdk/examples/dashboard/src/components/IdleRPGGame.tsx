@@ -162,6 +162,11 @@ const IdleRPGGame: React.FC<IdleRPGGameProps> = ({ onExit }) => {
             s.hero.y = 300 + Math.sin(Date.now() / 200) * 5;
             s.enemy.y = 300 + Math.cos(Date.now() / 200) * 5;
 
+            // Apply boss mode effects
+            const targetScale = bossMode ? 1.5 : 1;
+            s.enemy.scale.x = targetScale;
+            s.enemy.scale.y = targetScale;
+
             // Movement logic (simulated idle "approaching")
             if (!s.isAttacking) {
                 s.moveTimer += 0.05 * speed * moveMult;
