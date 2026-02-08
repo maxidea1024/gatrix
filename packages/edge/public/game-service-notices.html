@@ -1,1040 +1,1088 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Service Notices</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Service Notices</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
 
-    html,
-    body {
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-    }
+      body {
+        font-family: 'Noto Sans KR', Arial, sans-serif;
+        background: #e8ddd0;
+        color: #3d3228;
+      }
 
-    body {
-      font-family: 'Noto Sans KR', Arial, sans-serif;
-      background: #E8DDD0;
-      color: #3D3228;
-    }
+      /* Chinese fonts for zh-CN locale */
+      html[lang='zh'],
+      html[lang='zh-CN'],
+      html[lang='zh-Hans'] {
+        body,
+        .content-text,
+        .notice-item-title {
+          font-family:
+            'Microsoft YaHei', '微软雅黑', 'Source Han Sans SC', '思源黑体', 'Noto Sans SC',
+            'PingFang SC', 'Hiragino Sans GB', sans-serif;
+        }
+      }
 
-    /* Chinese fonts for zh-CN locale */
-    html[lang="zh"],
-    html[lang="zh-CN"],
-    html[lang="zh-Hans"] {
+      .container {
+        display: flex;
+        width: 100%;
+        height: 100%;
+      }
 
-      body,
-      .content-text,
+      .sidebar {
+        width: 260px;
+        height: 100%;
+        background: #2b2420;
+        border-right: 1px solid #4a3d32;
+        box-shadow: 4px 0 8px rgba(0, 0, 0, 0.2);
+        overflow-y: auto;
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
+        touch-action: pan-y;
+      }
+
+      .sidebar::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      .sidebar::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.1);
+        border-radius: 4px;
+      }
+
+      .sidebar::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.4);
+        border-radius: 4px;
+      }
+
+      .sidebar::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.6);
+      }
+
+      .notice-item {
+        padding: 12px 20px;
+        border-bottom: 1px solid #4a3d32;
+        cursor: pointer;
+        transition: background 0.2s;
+        min-height: 80px;
+        display: flex;
+        align-items: center;
+      }
+
+      .notice-item:nth-child(even) {
+        background: #322822;
+      }
+
+      .notice-item:nth-child(odd) {
+        background: #2b2420;
+      }
+
+      .notice-item:hover {
+        background: #4a3d32;
+      }
+
+      .notice-item.active {
+        background: #6b5d52;
+        color: #e8ddd0;
+      }
+
+      .notice-item-content {
+        width: 100%;
+      }
+
+      .notice-item-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 4px;
+      }
+
+      .notice-item-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        width: 20px;
+        height: 20px;
+        line-height: 1;
+        margin-right: 6px;
+      }
+
+      .notice-item-icon svg {
+        display: block;
+      }
+
       .notice-item-title {
-        font-family: "Microsoft YaHei", "微软雅黑", "Source Han Sans SC", "思源黑体", "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", sans-serif;
-      }
-    }
-
-    .container {
-      display: flex;
-      width: 100%;
-      height: 100%;
-    }
-
-    .sidebar {
-      width: 260px;
-      height: 100%;
-      background: #2B2420;
-      border-right: 1px solid #4A3D32;
-      box-shadow: 4px 0 8px rgba(0, 0, 0, 0.2);
-      overflow-y: auto;
-      overflow-x: hidden;
-      -webkit-overflow-scrolling: touch;
-      touch-action: pan-y;
-    }
-
-    .sidebar::-webkit-scrollbar {
-      width: 8px;
-    }
-
-    .sidebar::-webkit-scrollbar-track {
-      background: rgba(0, 0, 0, 0.1);
-      border-radius: 4px;
-    }
-
-    .sidebar::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.4);
-      border-radius: 4px;
-    }
-
-    .sidebar::-webkit-scrollbar-thumb:hover {
-      background: rgba(255, 255, 255, 0.6);
-    }
-
-    .notice-item {
-      padding: 12px 20px;
-      border-bottom: 1px solid #4A3D32;
-      cursor: pointer;
-      transition: background 0.2s;
-      min-height: 80px;
-      display: flex;
-      align-items: center;
-    }
-
-    .notice-item:nth-child(even) {
-      background: #322822;
-    }
-
-    .notice-item:nth-child(odd) {
-      background: #2B2420;
-    }
-
-    .notice-item:hover {
-      background: #4A3D32;
-    }
-
-    .notice-item.active {
-      background: #6B5D52;
-      color: #E8DDD0;
-    }
-
-    .notice-item-content {
-      width: 100%;
-    }
-
-    .notice-item-header {
-      display: flex;
-      align-items: center;
-      margin-bottom: 4px;
-    }
-
-    .notice-item-icon {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      width: 20px;
-      height: 20px;
-      line-height: 1;
-      margin-right: 6px;
-    }
-
-    .notice-item-icon svg {
-      display: block;
-    }
-
-    .notice-item-title {
-      font-weight: bold;
-      color: #E8DDD0;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      font-size: 0.95rem;
-      flex: 1;
-    }
-
-    .notice-item.active .notice-item-title {
-      color: #2A1F18;
-    }
-
-    .notice-item-unread {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      font-size: 1rem;
-      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-    }
-
-    .notice-item-date {
-      font-size: 12px;
-      color: #999;
-    }
-
-    .notice-item.active .notice-item-date {
-      color: #666;
-    }
-
-    .content {
-      flex: 1;
-      height: 100%;
-      background: #E8DDD0;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-
-    .content-header {
-      padding: 20px;
-      border-bottom: 1px solid rgba(155, 138, 120, 0.3);
-      background: rgba(255, 255, 255, 0.3);
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-      min-height: 80px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-
-    .content-title {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: #3D3228;
-      margin-bottom: 8px;
-      text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
-    }
-
-    .content-meta {
-      display: flex;
-      align-items: center;
-      font-size: 12px;
-      color: #6B5D52;
-    }
-
-    .content-category {
-      background: #6B5D52;
-      color: #E8DDD0;
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-weight: 600;
-      border: 1px solid #4A3D32;
-      margin-right: 8px;
-    }
-
-    .content-body {
-      flex: 1;
-      overflow-y: auto;
-      overflow-x: hidden;
-      padding: 24px;
-    }
-
-    .content-body::-webkit-scrollbar {
-      width: 8px;
-    }
-
-    .content-body::-webkit-scrollbar-track {
-      background: rgba(0, 0, 0, 0.05);
-      border-radius: 4px;
-    }
-
-    .content-body::-webkit-scrollbar-thumb {
-      background: rgba(107, 93, 82, 0.4);
-      border-radius: 4px;
-    }
-
-    .content-body::-webkit-scrollbar-thumb:hover {
-      background: rgba(107, 93, 82, 0.6);
-    }
-
-    .content-text {
-      color: #3D3228;
-      line-height: 1.6;
-      font-size: 0.95rem;
-      word-wrap: break-word;
-      word-break: break-word;
-    }
-
-    .content-text img {
-      display: block;
-      margin: 0;
-    }
-
-    .content-text a {
-      color: #8B4513;
-      text-decoration: underline;
-      font-weight: 600;
-    }
-
-    .content-text a:hover {
-      color: #A0522D;
-    }
-
-    .content-text p {
-      margin: 0;
-      padding: 0;
-      min-height: 1em;
-    }
-
-    .content-text p:empty {
-      min-height: 1em;
-    }
-
-    .content-text p:has(> img:only-child) {
-      margin: 0;
-      padding: 0;
-    }
-
-    .content-text h1,
-    .content-text h2,
-    .content-text h3,
-    .content-text h4,
-    .content-text h5,
-    .content-text h6 {
-      color: #3D3228;
-      font-weight: 700;
-      margin-top: 1.2em;
-      margin-bottom: 0.5em;
-    }
-
-    .content-text ul,
-    .content-text ol {
-      padding-left: 2.5em;
-      margin: 0.75em 0;
-    }
-
-    .content-text li {
-      margin-bottom: 0.4em;
-      line-height: 1.6;
-    }
-
-    .content-text .video-wrapper {
-      margin: 10px 0;
-      position: relative;
-    }
-
-    .content-text .video-wrapper iframe {
-      border: none;
-      display: block;
-    }
-
-    .loading,
-    .error,
-    .empty {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100%;
-      font-size: 2rem;
-      color: #6B5D52;
-    }
-
-    .error {
-      color: #d32f2f;
-      font-size: 2.5rem;
-    }
-
-    /* Content area loading spinner */
-    .content-loading {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100%;
-    }
-
-    .content-spinner {
-      width: 36px;
-      height: 36px;
-      border: 3px solid rgba(107, 93, 82, 0.2);
-      border-top-color: #6B5D52;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-
-    /* Full-screen loading overlay */
-    .loading-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: #E8DDD0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-      transition: opacity 0.3s ease-out;
-    }
-
-    .loading-overlay.hidden {
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    .loading-spinner {
-      width: 48px;
-      height: 48px;
-      border: 4px solid rgba(107, 93, 82, 0.2);
-      border-top-color: #6B5D52;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
-    }
-
-    /* Text animation effects for rich text content */
-    @keyframes ql-blink {
-
-      0%,
-      100% {
-        opacity: 1;
+        font-weight: bold;
+        color: #e8ddd0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 0.95rem;
+        flex: 1;
       }
 
-      50% {
+      .notice-item.active .notice-item-title {
+        color: #2a1f18;
+      }
+
+      .notice-item-unread {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-size: 1rem;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+      }
+
+      .notice-item-date {
+        font-size: 12px;
+        color: #999;
+      }
+
+      .notice-item.active .notice-item-date {
+        color: #666;
+      }
+
+      .content {
+        flex: 1;
+        height: 100%;
+        background: #e8ddd0;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      .content-header {
+        padding: 20px;
+        border-bottom: 1px solid rgba(155, 138, 120, 0.3);
+        background: rgba(255, 255, 255, 0.3);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        min-height: 80px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+
+      .content-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #3d3228;
+        margin-bottom: 8px;
+        text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
+      }
+
+      .content-meta {
+        display: flex;
+        align-items: center;
+        font-size: 12px;
+        color: #6b5d52;
+      }
+
+      .content-category {
+        background: #6b5d52;
+        color: #e8ddd0;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-weight: 600;
+        border: 1px solid #4a3d32;
+        margin-right: 8px;
+      }
+
+      .content-body {
+        flex: 1;
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding: 24px;
+      }
+
+      .content-body::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      .content-body::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.05);
+        border-radius: 4px;
+      }
+
+      .content-body::-webkit-scrollbar-thumb {
+        background: rgba(107, 93, 82, 0.4);
+        border-radius: 4px;
+      }
+
+      .content-body::-webkit-scrollbar-thumb:hover {
+        background: rgba(107, 93, 82, 0.6);
+      }
+
+      .content-text {
+        color: #3d3228;
+        line-height: 1.6;
+        font-size: 0.95rem;
+        word-wrap: break-word;
+        word-break: break-word;
+      }
+
+      .content-text img {
+        display: block;
+        margin: 0;
+      }
+
+      .content-text a {
+        color: #8b4513;
+        text-decoration: underline;
+        font-weight: 600;
+      }
+
+      .content-text a:hover {
+        color: #a0522d;
+      }
+
+      .content-text p {
+        margin: 0;
+        padding: 0;
+        min-height: 1em;
+      }
+
+      .content-text p:empty {
+        min-height: 1em;
+      }
+
+      .content-text p:has(> img:only-child) {
+        margin: 0;
+        padding: 0;
+      }
+
+      .content-text h1,
+      .content-text h2,
+      .content-text h3,
+      .content-text h4,
+      .content-text h5,
+      .content-text h6 {
+        color: #3d3228;
+        font-weight: 700;
+        margin-top: 1.2em;
+        margin-bottom: 0.5em;
+      }
+
+      .content-text ul,
+      .content-text ol {
+        padding-left: 2.5em;
+        margin: 0.75em 0;
+      }
+
+      .content-text li {
+        margin-bottom: 0.4em;
+        line-height: 1.6;
+      }
+
+      .content-text .video-wrapper {
+        margin: 10px 0;
+        position: relative;
+      }
+
+      .content-text .video-wrapper iframe {
+        border: none;
+        display: block;
+      }
+
+      .loading,
+      .error,
+      .empty {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        font-size: 2rem;
+        color: #6b5d52;
+      }
+
+      .error {
+        color: #d32f2f;
+        font-size: 2.5rem;
+      }
+
+      /* Content area loading spinner */
+      .content-loading {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+      }
+
+      .content-spinner {
+        width: 36px;
+        height: 36px;
+        border: 3px solid rgba(107, 93, 82, 0.2);
+        border-top-color: #6b5d52;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      /* Full-screen loading overlay */
+      .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #e8ddd0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        transition: opacity 0.3s ease-out;
+      }
+
+      .loading-overlay.hidden {
         opacity: 0;
-      }
-    }
-
-    @keyframes ql-pulse {
-
-      0%,
-      100% {
-        transform: scale(1);
+        pointer-events: none;
       }
 
-      50% {
-        transform: scale(1.05);
-      }
-    }
-
-    @keyframes ql-shake {
-
-      0%,
-      100% {
-        transform: translateX(0);
+      .loading-spinner {
+        width: 48px;
+        height: 48px;
+        border: 4px solid rgba(107, 93, 82, 0.2);
+        border-top-color: #6b5d52;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
       }
 
-      25% {
-        transform: translateX(-3px);
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
       }
 
-      75% {
-        transform: translateX(3px);
-      }
-    }
+      /* Text animation effects for rich text content */
+      @keyframes ql-blink {
+        0%,
+        100% {
+          opacity: 1;
+        }
 
-    @keyframes ql-bounce {
-
-      0%,
-      100% {
-        transform: translateY(0);
-      }
-
-      50% {
-        transform: translateY(-5px);
-      }
-    }
-
-    @keyframes ql-glow-pulse {
-
-      0%,
-      100% {
-        text-shadow: 0 0 5px currentColor, 0 0 10px currentColor;
+        50% {
+          opacity: 0;
+        }
       }
 
-      50% {
-        text-shadow: 0 0 20px currentColor, 0 0 30px currentColor, 0 0 40px currentColor;
-      }
-    }
+      @keyframes ql-pulse {
+        0%,
+        100% {
+          transform: scale(1);
+        }
 
-    @keyframes ql-rainbow {
-      0% {
-        background-position: 0% center;
-      }
-
-      100% {
-        background-position: 200% center;
-      }
-    }
-
-    @keyframes ql-float {
-
-      0%,
-      100% {
-        transform: translateY(0);
+        50% {
+          transform: scale(1.05);
+        }
       }
 
-      50% {
-        transform: translateY(-8px);
-      }
-    }
+      @keyframes ql-shake {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
 
-    @keyframes ql-jelly {
+        25% {
+          transform: translateX(-3px);
+        }
 
-      0%,
-      100% {
-        transform: scale(1, 1);
-      }
-
-      25% {
-        transform: scale(0.95, 1.05);
-      }
-
-      50% {
-        transform: scale(1.05, 0.95);
+        75% {
+          transform: translateX(3px);
+        }
       }
 
-      75% {
-        transform: scale(0.95, 1.05);
-      }
-    }
+      @keyframes ql-bounce {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
 
-    @keyframes ql-swing {
-
-      0%,
-      100% {
-        transform: rotate(0deg);
-      }
-
-      25% {
-        transform: rotate(5deg);
+        50% {
+          transform: translateY(-5px);
+        }
       }
 
-      75% {
-        transform: rotate(-5deg);
-      }
-    }
+      @keyframes ql-glow-pulse {
+        0%,
+        100% {
+          text-shadow:
+            0 0 5px currentColor,
+            0 0 10px currentColor;
+        }
 
-    @keyframes ql-heartbeat {
-
-      0%,
-      100% {
-        transform: scale(1);
-      }
-
-      14% {
-        transform: scale(1.15);
-      }
-
-      28% {
-        transform: scale(1);
+        50% {
+          text-shadow:
+            0 0 20px currentColor,
+            0 0 30px currentColor,
+            0 0 40px currentColor;
+        }
       }
 
-      42% {
-        transform: scale(1.15);
+      @keyframes ql-rainbow {
+        0% {
+          background-position: 0% center;
+        }
+
+        100% {
+          background-position: 200% center;
+        }
       }
 
-      70% {
-        transform: scale(1);
+      @keyframes ql-float {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+
+        50% {
+          transform: translateY(-8px);
+        }
       }
-    }
 
-    /* Page background color wrapper */
-    .page-background {
-      border-radius: 4px;
-    }
+      @keyframes ql-jelly {
+        0%,
+        100% {
+          transform: scale(1, 1);
+        }
 
-    /*
+        25% {
+          transform: scale(0.95, 1.05);
+        }
+
+        50% {
+          transform: scale(1.05, 0.95);
+        }
+
+        75% {
+          transform: scale(0.95, 1.05);
+        }
+      }
+
+      @keyframes ql-swing {
+        0%,
+        100% {
+          transform: rotate(0deg);
+        }
+
+        25% {
+          transform: rotate(5deg);
+        }
+
+        75% {
+          transform: rotate(-5deg);
+        }
+      }
+
+      @keyframes ql-heartbeat {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+
+        14% {
+          transform: scale(1.15);
+        }
+
+        28% {
+          transform: scale(1);
+        }
+
+        42% {
+          transform: scale(1.15);
+        }
+
+        70% {
+          transform: scale(1);
+        }
+      }
+
+      /* Page background color wrapper */
+      .page-background {
+        border-radius: 4px;
+      }
+
+      /*
      * Note: Always use horizontal layout (sidebar left, content right)
      * for UE4 webview compatibility. Sidebar uses percentage width
      * instead of fixed pixels to maintain proportions on any screen size.
      */
-    @media (max-width: 768px) {
-      .sidebar {
-        width: 30%;
-        min-width: 180px;
+      @media (max-width: 768px) {
+        .sidebar {
+          width: 30%;
+          min-width: 180px;
+        }
+
+        .content-header {
+          padding: 16px;
+          min-height: 60px;
+        }
+
+        .content-title {
+          font-size: 1.2rem;
+        }
+
+        .content-body {
+          padding: 16px;
+        }
+
+        .content-text {
+          font-size: 0.9rem;
+        }
+
+        .notice-item {
+          padding: 10px 12px;
+          min-height: 60px;
+        }
+
+        .notice-item-title {
+          font-size: 0.85rem;
+        }
+
+        .notice-item-date {
+          font-size: 0.7rem;
+        }
       }
 
-      .content-header {
-        padding: 16px;
-        min-height: 60px;
+      @media (max-width: 480px) {
+        .sidebar {
+          width: 35%;
+          min-width: 140px;
+        }
+
+        .content-title {
+          font-size: 1rem;
+        }
+
+        .content-text {
+          font-size: 0.85rem;
+        }
+
+        .content-body {
+          padding: 12px;
+        }
+
+        .content-header {
+          padding: 12px;
+          min-height: 50px;
+        }
+
+        .notice-item {
+          padding: 8px 10px;
+          min-height: 50px;
+        }
+
+        .notice-item-title {
+          font-size: 0.8rem;
+        }
+
+        .notice-item-icon {
+          width: 16px;
+          height: 16px;
+          margin-right: 4px;
+        }
+
+        .notice-item-icon svg {
+          width: 14px;
+          height: 14px;
+        }
       }
+    </style>
+  </head>
 
-      .content-title {
-        font-size: 1.2rem;
-      }
-
-      .content-body {
-        padding: 16px;
-      }
-
-      .content-text {
-        font-size: 0.9rem;
-      }
-
-      .notice-item {
-        padding: 10px 12px;
-        min-height: 60px;
-      }
-
-      .notice-item-title {
-        font-size: 0.85rem;
-      }
-
-      .notice-item-date {
-        font-size: 0.7rem;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .sidebar {
-        width: 35%;
-        min-width: 140px;
-      }
-
-      .content-title {
-        font-size: 1rem;
-      }
-
-      .content-text {
-        font-size: 0.85rem;
-      }
-
-      .content-body {
-        padding: 12px;
-      }
-
-      .content-header {
-        padding: 12px;
-        min-height: 50px;
-      }
-
-      .notice-item {
-        padding: 8px 10px;
-        min-height: 50px;
-      }
-
-      .notice-item-title {
-        font-size: 0.8rem;
-      }
-
-      .notice-item-icon {
-        width: 16px;
-        height: 16px;
-        margin-right: 4px;
-      }
-
-      .notice-item-icon svg {
-        width: 14px;
-        height: 14px;
-      }
-    }
-  </style>
-</head>
-
-<body>
-  <!-- Full-screen loading overlay -->
-  <div class="loading-overlay" id="loadingOverlay">
-    <div class="loading-spinner"></div>
-  </div>
-
-  <div class="container">
-    <div class="sidebar" id="sidebar">
-      <!-- Content loaded dynamically -->
+  <body>
+    <!-- Full-screen loading overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+      <div class="loading-spinner"></div>
     </div>
-    <div class="content" id="content">
-      <!-- Content loaded dynamically -->
+
+    <div class="container">
+      <div class="sidebar" id="sidebar">
+        <!-- Content loaded dynamically -->
+      </div>
+      <div class="content" id="content">
+        <!-- Content loaded dynamically -->
+      </div>
     </div>
-  </div>
 
-  <script>
-    // Configuration - Edge server API endpoint (no auth required for public notices)
-    // Environment is now a required path parameter: /public/{environment}/service-notices
-    const NOTICES_ENDPOINT_BASE = '/public';
-    const READ_NOTICES_KEY = 'serviceNotices_readStatus';
+    <script>
+      // Configuration - Edge server API endpoint (no auth required for public notices)
+      // Environment is now a required path parameter: /public/{environment}/service-notices
+      const NOTICES_ENDPOINT_BASE = '/public';
+      const READ_NOTICES_KEY = 'serviceNotices_readStatus';
 
-    // Detect language from URL parameter and set html lang attribute
-    (function () {
-      const urlParams = new URLSearchParams(window.location.search);
-      const lang = urlParams.get('lang') || urlParams.get('language') || 'ko';
-      document.documentElement.lang = lang;
-    })();
+      // Detect language from URL parameter and set html lang attribute
+      (function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        const lang = urlParams.get('lang') || urlParams.get('language') || 'ko';
+        document.documentElement.lang = lang;
+      })();
 
-    // State
-    let notices = [];
-    let selectedNotice = null;
-    let readNotices = new Set();
-    let noticeContentCache = {}; // Cache for notice content by ID
-    let currentEnvironment = null; // Store environment for API calls
+      // State
+      let notices = [];
+      let selectedNotice = null;
+      let readNotices = new Set();
+      let noticeContentCache = {}; // Cache for notice content by ID
+      let currentEnvironment = null; // Store environment for API calls
 
-    // Initialize
-    document.addEventListener('DOMContentLoaded', function () {
-      loadReadNotices();
-      loadNotices();
-      initializeTouchScroll();
-    });
+      // Initialize
+      document.addEventListener('DOMContentLoaded', function () {
+        loadReadNotices();
+        loadNotices();
+        initializeTouchScroll();
+      });
 
-    // Initialize touch scroll for mobile
-    function initializeTouchScroll() {
-      const sidebar = document.getElementById('sidebar');
-      let isScrolling = false;
-      let startY = 0;
-      let scrollTop = 0;
+      // Initialize touch scroll for mobile
+      function initializeTouchScroll() {
+        const sidebar = document.getElementById('sidebar');
+        let isScrolling = false;
+        let startY = 0;
+        let scrollTop = 0;
 
-      sidebar.addEventListener('touchstart', function (e) {
-        isScrolling = true;
-        startY = e.touches[0].clientY;
-        scrollTop = sidebar.scrollTop;
-      }, false);
+        sidebar.addEventListener(
+          'touchstart',
+          function (e) {
+            isScrolling = true;
+            startY = e.touches[0].clientY;
+            scrollTop = sidebar.scrollTop;
+          },
+          false
+        );
 
-      sidebar.addEventListener('touchmove', function (e) {
-        if (!isScrolling) return;
-        const currentY = e.touches[0].clientY;
-        const diff = startY - currentY;
-        sidebar.scrollTop = scrollTop + diff;
-      }, false);
+        sidebar.addEventListener(
+          'touchmove',
+          function (e) {
+            if (!isScrolling) return;
+            const currentY = e.touches[0].clientY;
+            const diff = startY - currentY;
+            sidebar.scrollTop = scrollTop + diff;
+          },
+          false
+        );
 
-      sidebar.addEventListener('touchend', function (e) {
-        isScrolling = false;
-      }, false);
-    }
-
-    // Check if localStorage is available
-    function isLocalStorageAvailable() {
-      try {
-        const test = '__localStorage_test__';
-        localStorage.setItem(test, test);
-        localStorage.removeItem(test);
-        return true;
-      } catch (e) {
-        return false;
+        sidebar.addEventListener(
+          'touchend',
+          function (e) {
+            isScrolling = false;
+          },
+          false
+        );
       }
-    }
 
-    // Cookie helper functions
-    function setCookie(name, value, days) {
-      const expires = days ? '; expires=' + new Date(Date.now() + days * 864e5).toUTCString() : '';
-      document.cookie = name + '=' + encodeURIComponent(value) + expires + '; path=/; SameSite=Lax';
-    }
-
-    function getCookie(name) {
-      const nameEQ = name + '=';
-      const ca = document.cookie.split(';');
-      for (let i = 0; i < ca.length; i++) {
-        let c = ca[i];
-        while (c.charAt(0) === ' ') c = c.substring(1, c.length);
-        if (c.indexOf(nameEQ) === 0) return decodeURIComponent(c.substring(nameEQ.length, c.length));
-      }
-      return null;
-    }
-
-    // Load read notices from localStorage or cookie
-    function loadReadNotices() {
-      try {
-        let stored = null;
-        if (isLocalStorageAvailable()) {
-          stored = localStorage.getItem(READ_NOTICES_KEY);
-        } else {
-          stored = getCookie(READ_NOTICES_KEY);
+      // Check if localStorage is available
+      function isLocalStorageAvailable() {
+        try {
+          const test = '__localStorage_test__';
+          localStorage.setItem(test, test);
+          localStorage.removeItem(test);
+          return true;
+        } catch (e) {
+          return false;
         }
-        if (stored) {
-          readNotices = new Set(JSON.parse(stored));
+      }
+
+      // Cookie helper functions
+      function setCookie(name, value, days) {
+        const expires = days
+          ? '; expires=' + new Date(Date.now() + days * 864e5).toUTCString()
+          : '';
+        document.cookie =
+          name + '=' + encodeURIComponent(value) + expires + '; path=/; SameSite=Lax';
+      }
+
+      function getCookie(name) {
+        const nameEQ = name + '=';
+        const ca = document.cookie.split(';');
+        for (let i = 0; i < ca.length; i++) {
+          let c = ca[i];
+          while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+          if (c.indexOf(nameEQ) === 0)
+            return decodeURIComponent(c.substring(nameEQ.length, c.length));
         }
-      } catch (error) {
-        console.error('[ReadStatus] Failed to load read notices:', error);
-      }
-    }
-
-    // Save read notices to localStorage or cookie
-    function saveReadNotices() {
-      try {
-        const data = JSON.stringify(Array.from(readNotices));
-        if (isLocalStorageAvailable()) {
-          localStorage.setItem(READ_NOTICES_KEY, data);
-        } else {
-          setCookie(READ_NOTICES_KEY, data, 365);
-        }
-      } catch (error) {
-        console.error('[ReadStatus] Failed to save read notices:', error);
-      }
-    }
-
-    // Get URL parameters
-    function getUrlParams() {
-      const params = new URLSearchParams(window.location.search);
-      return {
-        platform: params.get('platform'),
-        channel: params.get('channel'),
-        subChannel: params.get('subChannel'),
-        environment: params.get('environment')
-      };
-    }
-
-    // Hide loading overlay
-    function hideLoadingOverlay() {
-      const overlay = document.getElementById('loadingOverlay');
-      if (overlay) {
-        overlay.classList.add('hidden');
-        // Remove from DOM after transition
-        setTimeout(function () {
-          overlay.style.display = 'none';
-        }, 300);
-      }
-    }
-
-    // Load notices from Edge API
-    function loadNotices() {
-      const sidebar = document.getElementById('sidebar');
-      const loadStartTime = Date.now();
-      const MIN_LOADING_TIME = 2000; // Minimum 2 seconds loading time
-
-      // Build query string with parameters
-      const urlParams = getUrlParams();
-
-      // Environment is required - show warning icon
-      if (!urlParams.environment) {
-        sidebar.innerHTML = '<div class="error">⚠️</div>';
-        hideLoadingOverlay();
-        return;
+        return null;
       }
 
-      // Build API URL with environment in path - use fields=summary to exclude content
-      const apiUrl = NOTICES_ENDPOINT_BASE + '/' + encodeURIComponent(urlParams.environment) + '/service-notices';
-      currentEnvironment = urlParams.environment;
-
-      let queryString = '?limit=100&fields=summary';
-      if (urlParams.platform) {
-        queryString += '&platform=' + encodeURIComponent(urlParams.platform);
-      }
-      if (urlParams.channel) {
-        queryString += '&channel=' + encodeURIComponent(urlParams.channel);
-      }
-      if (urlParams.subChannel) {
-        queryString += '&subchannel=' + encodeURIComponent(urlParams.subChannel);
-      }
-
-      // Helper function to ensure minimum loading time
-      function ensureMinLoadingTime() {
-        return new Promise(function (resolve) {
-          const elapsed = Date.now() - loadStartTime;
-          const remaining = MIN_LOADING_TIME - elapsed;
-          if (remaining > 0) {
-            setTimeout(resolve, remaining);
+      // Load read notices from localStorage or cookie
+      function loadReadNotices() {
+        try {
+          let stored = null;
+          if (isLocalStorageAvailable()) {
+            stored = localStorage.getItem(READ_NOTICES_KEY);
           } else {
-            resolve();
+            stored = getCookie(READ_NOTICES_KEY);
           }
-        });
+          if (stored) {
+            readNotices = new Set(JSON.parse(stored));
+          }
+        } catch (error) {
+          console.error('[ReadStatus] Failed to load read notices:', error);
+        }
       }
 
-      fetch(apiUrl + queryString)
-        .then(function (response) {
-          if (!response.ok) {
-            throw new Error('Failed to load notices');
-          }
-          return response.json();
-        })
-        .then(function (data) {
-          // API response structure: { success: true, data: { notices: [...], total: ... } }
-          const noticeList = data.data && data.data.notices ? data.data.notices : [];
-          notices = noticeList.filter(function (notice) {
-            const now = new Date();
-            const startDate = notice.startDate ? new Date(notice.startDate) : null;
-            const endDate = notice.endDate ? new Date(notice.endDate) : null;
-            return (!startDate || now >= startDate) && (!endDate || now <= endDate);
-          });
-
-          renderNoticeList(notices);
-
-          if (notices.length > 0) {
-            selectNoticeById(notices[0].id);
+      // Save read notices to localStorage or cookie
+      function saveReadNotices() {
+        try {
+          const data = JSON.stringify(Array.from(readNotices));
+          if (isLocalStorageAvailable()) {
+            localStorage.setItem(READ_NOTICES_KEY, data);
           } else {
-            document.getElementById('sidebar').innerHTML = '<div class="empty">📭</div>';
-            document.getElementById('content').innerHTML = '<div class="empty">📭</div>';
+            setCookie(READ_NOTICES_KEY, data, 365);
           }
+        } catch (error) {
+          console.error('[ReadStatus] Failed to save read notices:', error);
+        }
+      }
 
-          // Wait for minimum loading time before hiding overlay
-          return ensureMinLoadingTime();
-        })
-        .then(function () {
-          hideLoadingOverlay();
-        })
-        .catch(function (error) {
-          console.error('Error loading notices:', error);
+      // Get URL parameters
+      function getUrlParams() {
+        const params = new URLSearchParams(window.location.search);
+        return {
+          platform: params.get('platform'),
+          channel: params.get('channel'),
+          subChannel: params.get('subChannel'),
+          environment: params.get('environment'),
+        };
+      }
+
+      // Hide loading overlay
+      function hideLoadingOverlay() {
+        const overlay = document.getElementById('loadingOverlay');
+        if (overlay) {
+          overlay.classList.add('hidden');
+          // Remove from DOM after transition
+          setTimeout(function () {
+            overlay.style.display = 'none';
+          }, 300);
+        }
+      }
+
+      // Load notices from Edge API
+      function loadNotices() {
+        const sidebar = document.getElementById('sidebar');
+        const loadStartTime = Date.now();
+        const MIN_LOADING_TIME = 2000; // Minimum 2 seconds loading time
+
+        // Build query string with parameters
+        const urlParams = getUrlParams();
+
+        // Environment is required - show warning icon
+        if (!urlParams.environment) {
           sidebar.innerHTML = '<div class="error">⚠️</div>';
-          // Still wait for minimum loading time on error
-          ensureMinLoadingTime().then(function () {
+          hideLoadingOverlay();
+          return;
+        }
+
+        // Build API URL with environment in path - use fields=summary to exclude content
+        const apiUrl =
+          NOTICES_ENDPOINT_BASE +
+          '/' +
+          encodeURIComponent(urlParams.environment) +
+          '/service-notices';
+        currentEnvironment = urlParams.environment;
+
+        let queryString = '?limit=100&fields=summary';
+        if (urlParams.platform) {
+          queryString += '&platform=' + encodeURIComponent(urlParams.platform);
+        }
+        if (urlParams.channel) {
+          queryString += '&channel=' + encodeURIComponent(urlParams.channel);
+        }
+        if (urlParams.subChannel) {
+          queryString += '&subchannel=' + encodeURIComponent(urlParams.subChannel);
+        }
+
+        // Helper function to ensure minimum loading time
+        function ensureMinLoadingTime() {
+          return new Promise(function (resolve) {
+            const elapsed = Date.now() - loadStartTime;
+            const remaining = MIN_LOADING_TIME - elapsed;
+            if (remaining > 0) {
+              setTimeout(resolve, remaining);
+            } else {
+              resolve();
+            }
+          });
+        }
+
+        fetch(apiUrl + queryString)
+          .then(function (response) {
+            if (!response.ok) {
+              throw new Error('Failed to load notices');
+            }
+            return response.json();
+          })
+          .then(function (data) {
+            // API response structure: { success: true, data: { notices: [...], total: ... } }
+            const noticeList = data.data && data.data.notices ? data.data.notices : [];
+            notices = noticeList.filter(function (notice) {
+              const now = new Date();
+              const startDate = notice.startDate ? new Date(notice.startDate) : null;
+              const endDate = notice.endDate ? new Date(notice.endDate) : null;
+              return (!startDate || now >= startDate) && (!endDate || now <= endDate);
+            });
+
+            renderNoticeList(notices);
+
+            if (notices.length > 0) {
+              selectNoticeById(notices[0].id);
+            } else {
+              document.getElementById('sidebar').innerHTML = '<div class="empty">📭</div>';
+              document.getElementById('content').innerHTML = '<div class="empty">📭</div>';
+            }
+
+            // Wait for minimum loading time before hiding overlay
+            return ensureMinLoadingTime();
+          })
+          .then(function () {
             hideLoadingOverlay();
+          })
+          .catch(function (error) {
+            console.error('Error loading notices:', error);
+            sidebar.innerHTML = '<div class="error">⚠️</div>';
+            // Still wait for minimum loading time on error
+            ensureMinLoadingTime().then(function () {
+              hideLoadingOverlay();
+            });
+          });
+      }
+
+      // Get category icon SVG
+      function getCategoryIcon(category) {
+        const iconMap = {
+          maintenance:
+            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.6C.4 7 .9 10 2.9 12c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"/></svg>',
+          event:
+            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg>',
+          notice:
+            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12h-8v-2h8v2zm0-3h-8V9h8v2zm0-3H4V4h14v4z"/></svg>',
+          promotion:
+            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M21 7L7 21H5V19L19 5h2V7z"/></svg>',
+        };
+        return (
+          iconMap[category] ||
+          '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11z"/></svg>'
+        );
+      }
+
+      // Get unread icon SVG
+      function getUnreadIcon() {
+        return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>';
+      }
+
+      // Render notice list
+      function renderNoticeList(noticeList) {
+        const sidebar = document.getElementById('sidebar');
+
+        if (noticeList.length === 0) {
+          sidebar.innerHTML = '<div class="empty">📭</div>';
+          return;
+        }
+
+        let html = '';
+        noticeList.forEach(function (notice) {
+          const isRead = readNotices.has(notice.id);
+          const categoryIcon = getCategoryIcon(notice.category);
+          const unreadIcon = getUnreadIcon();
+
+          html +=
+            '<div class="notice-item' +
+            (selectedNotice && selectedNotice.id === notice.id ? ' active' : '') +
+            '" data-notice-id="' +
+            notice.id +
+            '">';
+          html += '<div class="notice-item-content">';
+          html += '<div class="notice-item-header">';
+          html +=
+            '<div class="notice-item-icon" style="color: #D4A574;">' + categoryIcon + '</div>';
+          html += '<div class="notice-item-title">' + escapeHtml(notice.title) + '</div>';
+          html +=
+            '<div class="notice-item-unread" data-notice-id="' +
+            notice.id +
+            '" style="color: #D32F2F; display: ' +
+            (isRead ? 'none' : 'flex') +
+            ';">' +
+            unreadIcon +
+            '</div>';
+          html += '</div>';
+          html += '</div>';
+          html += '</div>';
+        });
+
+        sidebar.innerHTML = html;
+
+        // Add click event listeners to notice items (Event Delegation)
+        sidebar.querySelectorAll('.notice-item').forEach(function (item) {
+          item.addEventListener('click', function () {
+            const noticeId = parseInt(this.getAttribute('data-notice-id'));
+            selectNoticeById(noticeId);
           });
         });
-    }
-
-    // Get category icon SVG
-    function getCategoryIcon(category) {
-      const iconMap = {
-        'maintenance': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.6C.4 7 .9 10 2.9 12c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"/></svg>',
-        'event': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg>',
-        'notice': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12h-8v-2h8v2zm0-3h-8V9h8v2zm0-3H4V4h14v4z"/></svg>',
-        'promotion': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M21 7L7 21H5V19L19 5h2V7z"/></svg>'
-      };
-      return iconMap[category] || '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11z"/></svg>';
-    }
-
-    // Get unread icon SVG
-    function getUnreadIcon() {
-      return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>';
-    }
-
-    // Render notice list
-    function renderNoticeList(noticeList) {
-      const sidebar = document.getElementById('sidebar');
-
-      if (noticeList.length === 0) {
-        sidebar.innerHTML = '<div class="empty">📭</div>';
-        return;
       }
 
-      let html = '';
-      noticeList.forEach(function (notice) {
-        const isRead = readNotices.has(notice.id);
-        const categoryIcon = getCategoryIcon(notice.category);
-        const unreadIcon = getUnreadIcon();
-
-        html += '<div class="notice-item' + (selectedNotice && selectedNotice.id === notice.id ? ' active' : '') + '" data-notice-id="' + notice.id + '">';
-        html += '<div class="notice-item-content">';
-        html += '<div class="notice-item-header">';
-        html += '<div class="notice-item-icon" style="color: #D4A574;">' + categoryIcon + '</div>';
-        html += '<div class="notice-item-title">' + escapeHtml(notice.title) + '</div>';
-        html += '<div class="notice-item-unread" data-notice-id="' + notice.id + '" style="color: #D32F2F; display: ' + (isRead ? 'none' : 'flex') + ';">' + unreadIcon + '</div>';
-        html += '</div>';
-        html += '</div>';
-        html += '</div>';
-      });
-
-      sidebar.innerHTML = html;
-
-      // Add click event listeners to notice items (Event Delegation)
-      sidebar.querySelectorAll('.notice-item').forEach(function (item) {
-        item.addEventListener('click', function () {
-          const noticeId = parseInt(this.getAttribute('data-notice-id'));
-          selectNoticeById(noticeId);
+      // Select notice by ID - loads content from API if not cached
+      function selectNoticeById(noticeId) {
+        const notice = notices.find(function (n) {
+          return n.id === noticeId;
         });
-      });
-    }
+        if (!notice) return;
 
-    // Select notice by ID - loads content from API if not cached
-    function selectNoticeById(noticeId) {
-      const notice = notices.find(function (n) { return n.id === noticeId; });
-      if (!notice) return;
+        selectedNotice = notice;
 
-      selectedNotice = notice;
+        // Mark as read
+        const wasUnread = !readNotices.has(notice.id);
+        if (wasUnread) {
+          readNotices.add(notice.id);
+          saveReadNotices();
 
-      // Mark as read
-      const wasUnread = !readNotices.has(notice.id);
-      if (wasUnread) {
-        readNotices.add(notice.id);
-        saveReadNotices();
-
-        const unreadIcon = document.querySelector('[data-notice-id="' + notice.id + '"].notice-item-unread');
-        if (unreadIcon) {
-          unreadIcon.style.display = 'none';
+          const unreadIcon = document.querySelector(
+            '[data-notice-id="' + notice.id + '"].notice-item-unread'
+          );
+          if (unreadIcon) {
+            unreadIcon.style.display = 'none';
+          }
         }
-      }
 
-      // Update active state in sidebar
-      document.querySelectorAll('.notice-item').forEach(function (item) {
-        item.classList.remove('active');
-      });
+        // Update active state in sidebar
+        document.querySelectorAll('.notice-item').forEach(function (item) {
+          item.classList.remove('active');
+        });
 
-      const noticeItem = document.querySelector('[data-notice-id="' + notice.id + '"]');
-      if (noticeItem) {
-        noticeItem.classList.add('active');
-      }
+        const noticeItem = document.querySelector('[data-notice-id="' + notice.id + '"]');
+        if (noticeItem) {
+          noticeItem.classList.add('active');
+        }
 
-      // Check if content is already cached
-      if (noticeContentCache[noticeId]) {
-        renderNoticeContent(notice, noticeContentCache[noticeId]);
-        return;
-      }
+        // Check if content is already cached
+        if (noticeContentCache[noticeId]) {
+          renderNoticeContent(notice, noticeContentCache[noticeId]);
+          return;
+        }
 
-      // Show header immediately, only show spinner in body area (prevents flicker)
-      const content = document.getElementById('content');
-      const updatedDate = formatDateTime(notice.updatedAt);
+        // Show header immediately, only show spinner in body area (prevents flicker)
+        const content = document.getElementById('content');
+        const updatedDate = formatDateTime(notice.updatedAt);
 
-      let html = '<div class="content-header">';
-      html += '<div class="content-title">' + escapeHtml(notice.title) + '</div>';
-      html += '<div class="content-meta">';
-      html += '<span class="content-category">' + notice.category.toUpperCase() + '</span>';
-      html += '<span>' + updatedDate + '</span>';
-      html += '</div>';
-      html += '</div>';
-      html += '<div class="content-body">';
-      html += '<div class="content-loading"><div class="content-spinner"></div></div>';
-      html += '</div>';
-      content.innerHTML = html;
+        let html = '<div class="content-header">';
+        html += '<div class="content-title">' + escapeHtml(notice.title) + '</div>';
+        html += '<div class="content-meta">';
+        html += '<span class="content-category">' + notice.category.toUpperCase() + '</span>';
+        html += '<span>' + updatedDate + '</span>';
+        html += '</div>';
+        html += '</div>';
+        html += '<div class="content-body">';
+        html += '<div class="content-loading"><div class="content-spinner"></div></div>';
+        html += '</div>';
+        content.innerHTML = html;
 
-      // Fetch notice detail from API
-      const apiUrl = NOTICES_ENDPOINT_BASE + '/' + encodeURIComponent(currentEnvironment) + '/service-notices/' + noticeId;
+        // Fetch notice detail from API
+        const apiUrl =
+          NOTICES_ENDPOINT_BASE +
+          '/' +
+          encodeURIComponent(currentEnvironment) +
+          '/service-notices/' +
+          noticeId;
 
-      const loadStartTime = Date.now();
-      const MIN_CONTENT_LOADING_TIME = 1250; // 1.25 seconds
+        const loadStartTime = Date.now();
+        const MIN_CONTENT_LOADING_TIME = 1250; // 1.25 seconds
 
-      fetch(apiUrl)
-        .then(function (response) {
-          if (!response.ok) {
-            throw new Error('Failed to load notice');
-          }
-          return response.json();
-        })
-        .then(function (data) {
-          // Ensure minimum loading time
-          const elapsed = Date.now() - loadStartTime;
-          const remaining = MIN_CONTENT_LOADING_TIME - elapsed;
+        fetch(apiUrl)
+          .then(function (response) {
+            if (!response.ok) {
+              throw new Error('Failed to load notice');
+            }
+            return response.json();
+          })
+          .then(function (data) {
+            // Ensure minimum loading time
+            const elapsed = Date.now() - loadStartTime;
+            const remaining = MIN_CONTENT_LOADING_TIME - elapsed;
 
-          if (remaining > 0) {
-            return new Promise(function (resolve) {
-              setTimeout(function () { resolve(data); }, remaining);
-            });
-          }
-          return data;
-        })
-        .then(function (data) {
-          if (data.success && data.data) {
-            // Cache the content
-            noticeContentCache[noticeId] = data.data.content;
-            renderNoticeContent(notice, data.data.content);
-          } else {
+            if (remaining > 0) {
+              return new Promise(function (resolve) {
+                setTimeout(function () {
+                  resolve(data);
+                }, remaining);
+              });
+            }
+            return data;
+          })
+          .then(function (data) {
+            if (data.success && data.data) {
+              // Cache the content
+              noticeContentCache[noticeId] = data.data.content;
+              renderNoticeContent(notice, data.data.content);
+            } else {
+              // Only update body, keep header
+              const bodyEl = content.querySelector('.content-body');
+              if (bodyEl) bodyEl.innerHTML = '<div class="error">⚠️</div>';
+            }
+          })
+          .catch(function (error) {
+            console.error('Error loading notice:', error);
             // Only update body, keep header
             const bodyEl = content.querySelector('.content-body');
             if (bodyEl) bodyEl.innerHTML = '<div class="error">⚠️</div>';
-          }
-        })
-        .catch(function (error) {
-          console.error('Error loading notice:', error);
-          // Only update body, keep header
-          const bodyEl = content.querySelector('.content-body');
-          if (bodyEl) bodyEl.innerHTML = '<div class="error">⚠️</div>';
+          });
+      }
+
+      // Render notice content
+      function renderNoticeContent(notice, contentHtml) {
+        const content = document.getElementById('content');
+        const updatedDate = formatDateTime(notice.updatedAt);
+
+        let html = '<div class="content-header">';
+        html += '<div class="content-title">' + escapeHtml(notice.title) + '</div>';
+        html += '<div class="content-meta">';
+        html += '<span class="content-category">' + notice.category.toUpperCase() + '</span>';
+        html += '<span>' + updatedDate + '</span>';
+        html += '</div>';
+        html += '</div>';
+        html += '<div class="content-body">';
+        html += '<div class="content-text">' + contentHtml + '</div>';
+        html += '</div>';
+
+        content.innerHTML = html;
+      }
+
+      // Format date and time
+      function formatDateTime(date) {
+        if (!date) return '';
+        const d = new Date(date);
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        const hours = String(d.getHours()).padStart(2, '0');
+        const minutes = String(d.getMinutes()).padStart(2, '0');
+        return year + '.' + month + '.' + day + '. ' + hours + ':' + minutes;
+      }
+
+      // Escape HTML to prevent XSS
+      function escapeHtml(text) {
+        if (!text) return '';
+        var map = {
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#039;',
+        };
+        return text.replace(/[&<>"']/g, function (m) {
+          return map[m];
         });
-    }
-
-    // Render notice content
-    function renderNoticeContent(notice, contentHtml) {
-      const content = document.getElementById('content');
-      const updatedDate = formatDateTime(notice.updatedAt);
-
-      let html = '<div class="content-header">';
-      html += '<div class="content-title">' + escapeHtml(notice.title) + '</div>';
-      html += '<div class="content-meta">';
-      html += '<span class="content-category">' + notice.category.toUpperCase() + '</span>';
-      html += '<span>' + updatedDate + '</span>';
-      html += '</div>';
-      html += '</div>';
-      html += '<div class="content-body">';
-      html += '<div class="content-text">' + contentHtml + '</div>';
-      html += '</div>';
-
-      content.innerHTML = html;
-    }
-
-    // Format date and time
-    function formatDateTime(date) {
-      if (!date) return '';
-      const d = new Date(date);
-      const year = d.getFullYear();
-      const month = String(d.getMonth() + 1).padStart(2, '0');
-      const day = String(d.getDate()).padStart(2, '0');
-      const hours = String(d.getHours()).padStart(2, '0');
-      const minutes = String(d.getMinutes()).padStart(2, '0');
-      return year + '.' + month + '.' + day + '. ' + hours + ':' + minutes;
-    }
-
-    // Escape HTML to prevent XSS
-    function escapeHtml(text) {
-      if (!text) return '';
-      var map = {
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#039;'
-      };
-      return text.replace(/[&<>"']/g, function (m) { return map[m]; });
-    }
-  </script>
-</body>
-
+      }
+    </script>
+  </body>
 </html>

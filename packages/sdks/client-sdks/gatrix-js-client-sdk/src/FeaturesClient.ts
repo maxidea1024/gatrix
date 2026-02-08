@@ -80,6 +80,8 @@ export class FeaturesClient {
   private lastRecoveryTime: Date | null = null;
   private startTime: Date | null = null;
   private syncFlagsCount: number = 0;
+  private metricsSentCount: number = 0;
+  private metricsErrorCount: number = 0;
   private watchGroups: Map<string, WatchFlagGroup> = new Map();
   private flagEnabledCounts: Map<string, { yes: number; no: number }> = new Map();
   private flagVariantCounts: Map<string, Map<string, number>> = new Map();
@@ -135,6 +137,15 @@ export class FeaturesClient {
       disableMetrics: this.featuresConfig.disableMetrics,
       logger: this.logger,
       connectionId: this.connectionId,
+      emitter: this.emitter,
+    });
+
+    // Handle metrics events for statistics
+    this.emitter.on(EVENTS.METRICS_SENT, () => {
+      this.metricsSentCount++;
+    });
+    this.emitter.on(EVENTS.METRICS_ERROR, () => {
+      this.metricsErrorCount++;
     });
 
     // Bootstrap data
@@ -142,6 +153,13 @@ export class FeaturesClient {
     if (bootstrap && bootstrap.length > 0) {
       this.setFlags(bootstrap);
     }
+  }
+
+  /**
+   * Get client connection ID
+   */
+  public getConnectionId(): string {
+    return this.connectionId;
   }
 
   /**
@@ -183,7 +201,6 @@ export class FeaturesClient {
    */
   async start(): Promise<void> {
     if (this.started) {
-      this.logger.warn('FeaturesClient already started');
       return;
     }
     this.started = true;
@@ -860,6 +877,13 @@ export class FeaturesClient {
       } else if (response.status === 304) {
         // Not modified - ETag matched
         this.notModifiedCount++;
+
+        // If this was our first fetch and we got a 304, it means our cached/bootstrap 
+        // flags are up to date. We should mark the SDK as ready.
+        if (!this.fetchedFromServer) {
+          this.fetchedFromServer = true;
+          this.setReady();
+        }
       } else {
         this.handleFetchError(response.status);
       }
@@ -1147,6 +1171,9 @@ export class FeaturesClient {
       impressionCount: this.impressionCount,
       contextChangeCount: this.contextChangeCount,
       flagLastChangedTimes: Object.fromEntries(this.flagLastChangedTimes),
+      connectionId: this.connectionId,
+      metricsSentCount: this.metricsSentCount,
+      metricsErrorCount: this.metricsErrorCount,
     };
   }
 }

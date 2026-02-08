@@ -9,6 +9,8 @@
  */
 
 import { Logger } from './Logger';
+import { EventEmitter } from './EventEmitter';
+import { EVENTS } from './events';
 import ky from 'ky';
 
 export interface MetricsOptions {
@@ -22,6 +24,7 @@ export interface MetricsOptions {
   disableMetrics?: boolean;
   logger?: Logger;
   connectionId?: string;
+  emitter?: EventEmitter;
 }
 
 interface VariantBucket {
@@ -68,6 +71,7 @@ export class Metrics {
   private disabled: boolean;
   private logger: Logger | undefined;
   private connectionId: string;
+  private emitter: EventEmitter | undefined;
   private timer: ReturnType<typeof setInterval> | undefined;
   private started: boolean = false;
 
@@ -82,6 +86,7 @@ export class Metrics {
     this.disabled = options.disableMetrics ?? false;
     this.logger = options.logger;
     this.connectionId = options.connectionId ?? '';
+    this.emitter = options.emitter;
     this.bucket = this.createEmptyBucket();
   }
 
@@ -183,8 +188,10 @@ export class Metrics {
         timeout: 10000,
       });
       this.logger?.debug('Metrics sent successfully');
+      this.emitter?.emit(EVENTS.METRICS_SENT, payload);
     } catch (e) {
       this.logger?.error('Failed to send metrics', e);
+      this.emitter?.emit(EVENTS.METRICS_ERROR, e);
     }
   }
 
@@ -227,23 +234,23 @@ export class Metrics {
     return {
       bucket,
       appName: this.appName,
-      instanceId: 'browser',
+      instanceId: this.connectionId,
     };
   }
 
   private buildMetricsUrl(): string {
-    // Metrics endpoint: {apiUrl}/client/metrics/{environment}
-    return `${this.apiUrl}/client/metrics/${this.environment}`;
+    // Metrics endpoint: {apiUrl}/client/features/{environment}/metrics
+    return `${this.apiUrl}/client/features/${this.environment}/metrics`;
   }
 
   private getHeaders(): Record<string, string> {
-    return {
+    const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       'X-API-Token': this.apiToken,
       'X-Application-Name': this.appName,
-      'X-Environment': this.environment,
       'X-Connection-Id': this.connectionId,
       ...this.customHeaders,
     };
+    return headers;
   }
 }

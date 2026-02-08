@@ -860,6 +860,7 @@ export class FeatureFlagService {
 
     if (!flag) {
       return {
+        id: '',
         flagName,
         enabled: false,
         reason: 'not_found',

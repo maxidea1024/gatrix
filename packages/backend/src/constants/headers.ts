@@ -36,6 +36,11 @@ export const STANDARD_HEADERS = {
    * X-Requested-With 헤더
    */
   X_REQUESTED_WITH: 'x-requested-with',
+
+  /**
+   * If-None-Match 헤더 (ETag용)
+   */
+  IF_NONE_MATCH: 'if-none-match',
 } as const;
 
 /**
@@ -52,10 +57,11 @@ export const API_HEADERS = {
    */
   X_APPLICATION_NAME: 'x-application-name',
 
+
   /**
-   * 환경 ID 헤더 (멀티 환경 지원)
+   * 환경 이름 헤더 (SDK용)
    */
-  X_ENVIRONMENT_ID: 'x-environment-id',
+  X_ENVIRONMENT: 'x-environment',
 
   /**
    * 사용자 ID 헤더 (Chat Server용)
@@ -71,6 +77,16 @@ export const API_HEADERS = {
    * 요청 ID 헤더
    */
   X_REQUEST_ID: 'x-request-id',
+
+  /**
+   * 클라이언트 연결 ID 헤더 (SDK용)
+   */
+  X_CONNECTION_ID: 'x-connection-id',
+
+  /**
+   * 세션 ID 헤더 (SDK용)
+   */
+  X_SESSION_ID: 'x-session-id',
 } as const;
 
 /**
@@ -194,7 +210,10 @@ export const ALLOWED_HEADERS: string[] = [
   HEADERS.X_USER_ID,
   HEADERS.X_APPLICATION_NAME,
   HEADERS.X_REQUEST_ID,
-  HEADERS.X_ENVIRONMENT_ID,
+  HEADERS.X_ENVIRONMENT,
+  HEADERS.X_CONNECTION_ID,
+  HEADERS.X_SESSION_ID,
+  HEADERS.IF_NONE_MATCH,
 ];
 
 export default HEADERS;

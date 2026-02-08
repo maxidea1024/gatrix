@@ -19,6 +19,10 @@ export const EVENTS = {
   SYNC: 'flags.sync',
   /** SDK recovered from error state */
   RECOVERED: 'flags.recovered',
+  /** Metrics sent to server */
+  METRICS_SENT: 'flags.metrics_sent',
+  /** Error sending metrics */
+  METRICS_ERROR: 'flags.metrics_error',
 } as const;
 
 export type EventType = (typeof EVENTS)[keyof typeof EVENTS];

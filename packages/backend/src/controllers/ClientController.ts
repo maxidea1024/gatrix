@@ -9,6 +9,7 @@ import { GAME_WORLDS, DEFAULT_CONFIG, withEnvironment } from '../constants/cache
 import logger from '../config/logger';
 import { asyncHandler } from '../utils/asyncHandler';
 import VarsModel from '../models/Vars';
+import { sendBadRequest, sendSuccessResponse, ErrorCodes } from '../utils/apiResponse';
 import { IpWhitelistService } from '../services/IpWhitelistService';
 import { SDKRequest } from '../middleware/apiTokenAuth';
 import { resolvePassiveData } from '../utils/passiveDataUtils';
@@ -332,294 +333,439 @@ export class ClientController {
    * GET /api/v1/client/features/:environment/eval
    */
   static evaluateFlags = asyncHandler(async (req: SDKRequest, res: Response) => {
-    // Environment from path parameter (preferred) or header (fallback)
-    const environment = req.params.environment || req.environment;
-    if (!environment) {
-      return res.status(400).json({ success: false, message: 'Environment is required' });
-    }
-
-    let context: EvaluationContext = {};
-
-    let flagNames: string[] | undefined;
-
-    // 1. Extract context and keys
-    if (req.method === 'POST') {
-      context = req.body.context || {};
-      flagNames = req.body.flagNames;
-    } else {
-      // GET: context from parameters (Unleash Proxy style) or header
-
-      // 1. Try X-Gatrix-Feature-Context header (Base64 JSON)
-      const contextHeader = req.headers['x-gatrix-feature-context'] as string;
-      if (contextHeader) {
-        try {
-          const jsonStr = Buffer.from(contextHeader, 'base64').toString('utf-8');
-          context = JSON.parse(jsonStr);
-        } catch (error) {
-          logger.warn('Failed to parse x-gatrix-feature-context header', { error });
-        }
+    try {
+      // Environment from path parameter (preferred) or header (fallback)
+      const environment = req.params.environment || req.environment;
+      if (!environment) {
+        return res.status(400).json({ success: false, message: 'Environment is required' });
       }
 
-      // 2. Try 'context' query param (Base64 JSON) - if header didn't populate main fields
-      if (Object.keys(context).length === 0 && req.query.context) {
-        try {
-          const contextStr = req.query.context as string;
-          const jsonStr = Buffer.from(contextStr, 'base64').toString('utf-8');
-          if (jsonStr.trim().startsWith('{')) {
+      let context: EvaluationContext = {};
+
+      let flagNames: string[] | undefined;
+
+      // 1. Extract context and keys
+      if (req.method === 'POST') {
+        context = req.body.context || {};
+        flagNames = req.body.flagNames;
+      } else {
+        // GET: context from parameters (Unleash Proxy style) or header
+
+        // 1. Try X-Gatrix-Feature-Context header (Base64 JSON)
+        const contextHeader = req.headers['x-gatrix-feature-context'] as string;
+        if (contextHeader) {
+          try {
+            const jsonStr = Buffer.from(contextHeader, 'base64').toString('utf-8');
             context = JSON.parse(jsonStr);
-          } else {
-            context = JSON.parse(contextStr);
+          } catch (error) {
+            logger.warn('Failed to parse x-gatrix-feature-context header', { error });
           }
-        } catch (e) {
-          /* ignore */
         }
-      }
 
-      // 3. Fallback: Parse individual query parameters (Unleash Proxy standard)
-      // Only set if not already present
-      if (!context.userId && req.query.userId) context.userId = req.query.userId as string;
-      if (!context.sessionId && req.query.sessionId)
-        context.sessionId = req.query.sessionId as string;
-      if (!context.remoteAddress && req.query.remoteAddress)
-        context.remoteAddress = req.query.remoteAddress as string;
-      if (!context.appName && req.query.appName) context.appName = req.query.appName as string;
+        // 2. Try 'context' query param (Base64 JSON) - if header didn't populate main fields
+        if (Object.keys(context).length === 0 && req.query.context) {
+          try {
+            const contextStr = req.query.context as string;
+            const jsonStr = Buffer.from(contextStr, 'base64').toString('utf-8');
+            if (jsonStr.trim().startsWith('{')) {
+              context = JSON.parse(jsonStr);
+            } else {
+              context = JSON.parse(contextStr);
+            }
+          } catch (e) {
+            /* ignore */
+          }
+        }
 
-      // Handle properties[key]=value
-      // Cast query to any to bypass strict type checking on ParsedQs
-      const query = req.query as any;
-      if (query.properties) {
-        context.properties = {
-          ...context.properties,
-          ...query.properties,
-        };
-      }
+        // 3. Fallback: Parse individual query parameters (Unleash Proxy standard)
+        // Only set if not already present
+        if (!context.userId && req.query.userId) context.userId = req.query.userId as string;
+        if (!context.sessionId && req.query.sessionId)
+          context.sessionId = req.query.sessionId as string;
+        if (!context.remoteAddress && req.query.remoteAddress)
+          context.remoteAddress = req.query.remoteAddress as string;
+        if (!context.appName && req.query.appName) context.appName = req.query.appName as string;
 
-      const flagNamesParam = req.query.flagNames as string;
-      if (flagNamesParam) {
-        flagNames = flagNamesParam.split(',');
-      }
-    }
-
-    // Default context values from request if not provided
-    if (!context.remoteAddress) context.remoteAddress = ClientController.getClientIp(req);
-    context.environment = environment;
-
-    // 2. Fetch all flags and segments (with caching)
-    // We cache the *definitions* for a short time (e.g. 60s) to avoid DB spam
-    const definitionsCacheKey = `feature_flags:definitions:${environment}`;
-    let definitions = await cacheService.get<any>(definitionsCacheKey);
-
-    if (!definitions) {
-      // Fetch from DB
-      // We need ALL flags to evaluate, and ALL segments, and ALL variants
-      const [flagsData, segmentsList] = await Promise.all([
-        FeatureFlagModel.findAll({ environment, limit: 10000 }),
-        FeatureSegmentModel.findAll(),
-      ]);
-
-      // Load variants and strategies for all flags
-      const flagIds = flagsData.flags.map((f: any) => f.id);
-      let allVariants: any[] = [];
-      let allStrategies: any[] = [];
-      if (flagIds.length > 0) {
-        [allVariants, allStrategies] = await Promise.all([
-          db('g_feature_variants').whereIn('flagId', flagIds).where('environment', environment),
-          db('g_feature_strategies')
-            .whereIn('flagId', flagIds)
-            .where('environment', environment)
-            .orderBy('sortOrder', 'asc'),
-        ]);
-      }
-
-      // Attach variants and strategies to each flag
-      const flagsWithData = flagsData.flags.map((f: any) => ({
-        ...f,
-        variants: allVariants
-          .filter((v: any) => v.flagId === f.id)
-          .map((v: any) => ({
-            variantName: v.variantName,
-            weight: v.weight,
-            payload: typeof v.payload === 'string' ? JSON.parse(v.payload) : v.payload,
-          })),
-        strategies: allStrategies
-          .filter((s: any) => s.flagId === f.id)
-          .map((s: any) => ({
-            strategyName: s.strategyName,
-            parameters: typeof s.parameters === 'string' ? JSON.parse(s.parameters) : s.parameters,
-            constraints:
-              typeof s.constraints === 'string' ? JSON.parse(s.constraints) : s.constraints,
-            segments: [], // TODO: Load segment links if needed
-            isEnabled: Boolean(s.isEnabled),
-          })),
-      }));
-
-      definitions = {
-        flags: flagsWithData,
-        segments: segmentsList,
-      };
-
-      await cacheService.set(definitionsCacheKey, definitions, 5 * 60 * 1000); // 5 minutes cache
-    }
-
-    const { flags, segments } = definitions;
-
-    // Map segments to SDK type
-    const segmentsMap = new Map<string, FeatureSegment>(
-      segments.map((s: any) => [
-        s.segmentName,
-        {
-          name: s.segmentName,
-          constraints: s.constraints,
-          isActive: s.isActive,
-        },
-      ])
-    );
-
-    // 3. Evaluate
-    const results: Record<string, any> = {};
-
-    // If specific flags are requested, check for not found ones
-    if (flagNames && flagNames.length > 0) {
-      const existingFlagNames = flags.map((f: any) => f.flagName);
-      for (const requestedName of flagNames) {
-        if (!existingFlagNames.includes(requestedName)) {
-          results[requestedName] = {
-            name: requestedName,
-            enabled: false,
-            variant: {
-              name: 'disabled',
-              enabled: false,
-            },
-            matchReason: 'not_found',
+        // Handle properties[key]=value
+        // Cast query to any to bypass strict type checking on ParsedQs
+        const query = req.query as any;
+        if (query.properties) {
+          context.properties = {
+            ...context.properties,
+            ...query.properties,
           };
         }
+
+        const flagNamesParam = req.query.flagNames as string;
+        if (flagNamesParam) {
+          flagNames = flagNamesParam.split(',');
+        }
       }
-    }
 
-    const evaluableFlags = flagNames
-      ? flags.filter((f: any) => flagNames!.includes(f.flagName))
-      : flags;
+      // Default context values from request if not provided
+      if (!context.remoteAddress) context.remoteAddress = ClientController.getClientIp(req);
+      context.environment = environment;
 
-    for (const dbFlag of evaluableFlags) {
-      // Map DB flag to SDK FeatureFlag type
-      const sdkFlag: FeatureFlag = {
-        name: dbFlag.flagName,
-        isEnabled: dbFlag.isEnabled,
-        impressionDataEnabled: dbFlag.impressionDataEnabled,
-        strategies:
-          dbFlag.strategies?.map((s: any) => ({
-            name: s.strategyName,
-            parameters: s.parameters,
-            constraints: s.constraints,
-            segments: s.segments,
-            isEnabled: s.isEnabled,
-          })) || [],
-        variants:
-          dbFlag.variants?.map((v: any) => ({
-            name: v.variantName,
-            weight: v.weight,
-            payload: v.payload,
-            payloadType: dbFlag.variantType || v.payloadType,
-          })) || [],
-      };
+      // 2. Fetch all flags and segments (with caching)
+      // We cache the *definitions* for a short time (e.g. 60s) to avoid DB spam
+      const definitionsCacheKey = `feature_flags:definitions:${environment}`;
+      let definitions = await cacheService.get<any>(definitionsCacheKey);
 
-      const result = FeatureFlagEvaluator.evaluate(sdkFlag, context, segmentsMap);
+      if (!definitions) {
+        // Fetch from DB
+        // We need ALL flags to evaluate, and ALL segments, and ALL variants
+        const [flagsData, segmentsList] = await Promise.all([
+          FeatureFlagModel.findAll({ environment, limit: 10000 }),
+          FeatureSegmentModel.findAll(),
+        ]);
 
-      // Build variant object according to Unleash client specification
-      let variant: {
-        name: string;
-        payload?: any;  // Can be string, number, or object depending on variantType
-        enabled: boolean;
-      };
+        // Load variants and strategies for all flags
+        const flagIds = flagsData.flags.map((f: any) => f.id);
+        let allVariants: any[] = [];
+        let allStrategies: any[] = [];
+        if (flagIds.length > 0) {
+          [allVariants, allStrategies] = await Promise.all([
+            db('g_feature_variants').whereIn('flagId', flagIds).where('environment', environment),
+            db('g_feature_strategies as s')
+              .leftJoin('g_feature_flag_segments as fs', 's.id', 'fs.strategyId')
+              .leftJoin('g_feature_segments as seg', 'fs.segmentId', 'seg.id')
+              .select('s.*', db.raw('GROUP_CONCAT(seg.segmentName) as strategySegmentNames'))
+              .whereIn('s.flagId', flagIds)
+              .where('s.environment', environment)
+              .groupBy('s.id')
+              .orderBy('s.sortOrder', 'asc'),
+          ]);
+        }
 
-      if (result.enabled && result.variant) {
-        // Active variant
-        variant = {
-          name: result.variant.name,
-          enabled: true,
+        // Process variants and strategies with safety
+        const flagsWithData = flagsData.flags.map((f: any) => {
+          const flagVariants = allVariants
+            .filter((v: any) => v.flagId === f.id)
+            .map((v: any) => {
+              let payload = v.payload;
+              if (typeof payload === 'string' && payload.trim() !== '') {
+                try {
+                  payload = JSON.parse(payload);
+                } catch (e) {
+                  logger.warn(`Failed to parse variant payload for flag ${f.flagName}`, { payload });
+                }
+              }
+              return {
+                variantName: v.variantName,
+                weight: v.weight,
+                payload,
+              };
+            });
+
+          const flagStrategies = allStrategies
+            .filter((s: any) => s.flagId === f.id)
+            .map((s: any) => {
+              let parameters = s.parameters;
+              if (typeof parameters === 'string' && parameters.trim() !== '') {
+                try {
+                  parameters = JSON.parse(parameters);
+                } catch (e) {
+                  logger.warn(`Failed to parse strategy parameters for flag ${f.flagName}`);
+                }
+              }
+
+              let constraints = s.constraints;
+              if (typeof constraints === 'string' && constraints.trim() !== '') {
+                try {
+                  constraints = JSON.parse(constraints);
+                } catch (e) {
+                  logger.warn(`Failed to parse strategy constraints for flag ${f.flagName}`);
+                }
+              }
+
+              return {
+                strategyName: s.strategyName,
+                parameters: parameters || {},
+                constraints: constraints || [],
+                segments: s.strategySegmentNames ? s.strategySegmentNames.split(',') : [],
+                isEnabled: Boolean(s.isEnabled),
+              };
+            });
+
+          return {
+            ...f,
+            variants: flagVariants,
+            strategies: flagStrategies,
+          };
+        });
+
+        definitions = {
+          flags: flagsWithData,
+          segments: segmentsList,
         };
-        if (result.variant.payload) {
-          let payloadValue = result.variant.payload.value ?? result.variant.payload;
 
-          // If variant type is JSON, ensure returning as parsed object
-          if (dbFlag.variantType === 'json') {
-            if (typeof payloadValue === 'string') {
+        await cacheService.set(definitionsCacheKey, definitions, 5 * 60 * 1000); // 5 minutes cache
+      }
+
+      const flags = definitions?.flags || [];
+      const segments = definitions?.segments || [];
+
+      // Map segments to SDK type
+      const segmentsMap = new Map<string, FeatureSegment>(
+        segments.map((s: any) => {
+          let constraints = s.constraints;
+          if (typeof constraints === 'string' && constraints.trim() !== '') {
+            try {
+              constraints = JSON.parse(constraints);
+            } catch (e) {
+              logger.warn(`Failed to parse segment constraints for segment ${s.segmentName}`);
+            }
+          }
+          return [
+            s.segmentName,
+            {
+              name: s.segmentName,
+              constraints: constraints || [],
+              isActive: Boolean(s.isActive),
+            },
+          ];
+        })
+      );
+
+      // 3. Evaluate
+      const results: Record<string, any> = {};
+
+      // If specific flags are requested, check for not found ones
+      if (flagNames && flagNames.length > 0) {
+        const existingFlagNames = flags.map((f: any) => f.flagName);
+        for (const requestedName of flagNames) {
+          if (!existingFlagNames.includes(requestedName)) {
+            results[requestedName] = {
+              name: requestedName,
+              enabled: false,
+              variant: {
+                name: 'disabled',
+                enabled: false,
+              },
+              matchReason: 'not_found',
+            };
+          }
+        }
+      }
+
+      const evaluableFlags = flagNames
+        ? flags.filter((f: any) => flagNames!.includes(f.flagName))
+        : flags;
+
+      for (const dbFlag of evaluableFlags) {
+        // Resolve priority baselinePayload (environment settings > global flag)
+        const envSettings = dbFlag.environments?.find((e: any) => e.environment === environment);
+        const resolvedBaseline = envSettings?.baselinePayload ?? dbFlag.baselinePayload;
+
+        // Map DB flag to SDK FeatureFlag type
+        const sdkFlag: FeatureFlag = {
+          name: dbFlag.flagName,
+          isEnabled: dbFlag.isEnabled,
+          impressionDataEnabled: dbFlag.impressionDataEnabled,
+          baselinePayload: resolvedBaseline,
+          strategies:
+            dbFlag.strategies?.map((s: any) => ({
+              name: s.strategyName,
+              parameters: s.parameters,
+              constraints: s.constraints,
+              segments: s.segments,
+              isEnabled: s.isEnabled,
+            })) || [],
+          variants:
+            dbFlag.variants?.map((v: any) => ({
+              name: v.variantName,
+              weight: v.weight,
+              payload: v.payload,
+              payloadType: dbFlag.variantType || v.payloadType,
+            })) || [],
+        };
+
+        const result = FeatureFlagEvaluator.evaluate(sdkFlag, context, segmentsMap);
+
+        // Build variant object according to Unleash client specification
+        let variant: {
+          name: string;
+          payload?: any;  // Can be string, number, or object depending on variantType
+          enabled: boolean;
+        };
+
+        if (result.enabled && result.variant) {
+          // Active variant
+          variant = {
+            name: result.variant.name,
+            enabled: true,
+          };
+          if (result.variant.payload) {
+            let payloadValue = result.variant.payload.value ?? result.variant.payload;
+
+            // If variant type is JSON, ensure returning as parsed object
+            if (dbFlag.variantType === 'json') {
+              if (typeof payloadValue === 'string') {
+                try {
+                  payloadValue = JSON.parse(payloadValue);
+                } catch (e) {
+                  // If not valid JSON, keep as is
+                }
+              }
+              // Keep as object for JSON type
+              variant.payload = payloadValue;
+            } else if (dbFlag.variantType === 'number') {
+              // Number type: parse if string
+              if (typeof payloadValue === 'string') {
+                const parsed = Number(payloadValue);
+                variant.payload = isNaN(parsed) ? payloadValue : parsed;
+              } else {
+                variant.payload = payloadValue;
+              }
+            } else {
+              // String type or other: keep as string
+              variant.payload = typeof payloadValue === 'string' ? payloadValue : String(payloadValue);
+            }
+          }
+        } else {
+          // Disabled or no variant - fallback "$none" variant with baselinePayload
+          variant = {
+            name: 'disabled',
+            enabled: false,
+          };
+          // Add baselinePayload if defined
+          if (resolvedBaseline !== undefined && resolvedBaseline !== null) {
+            let baselineValue = resolvedBaseline;
+            if (typeof baselineValue === 'string') {
               try {
-                payloadValue = JSON.parse(payloadValue);
-              } catch (e) {
-                // If not valid JSON, keep as is
+                baselineValue = JSON.parse(baselineValue);
+              } catch {
+                // Keep as string if not valid JSON
               }
             }
-            // Keep as object for JSON type
-            variant.payload = payloadValue;
-          } else if (dbFlag.variantType === 'number') {
-            // Number type: parse if string
-            if (typeof payloadValue === 'string') {
-              const parsed = Number(payloadValue);
-              variant.payload = isNaN(parsed) ? payloadValue : parsed;
-            } else {
-              variant.payload = payloadValue;
-            }
-          } else {
-            // String type or other: keep as string
-            variant.payload = typeof payloadValue === 'string' ? payloadValue : String(payloadValue);
+            variant.payload =
+              typeof baselineValue === 'string' ? baselineValue : JSON.stringify(baselineValue);
           }
         }
-      } else {
-        // Disabled or no variant - fallback "$none" variant with baselinePayload
-        variant = {
-          name: 'disabled',
-          enabled: false,
+
+        results[dbFlag.flagName] = {
+          id: dbFlag.id,
+          name: dbFlag.flagName,
+          enabled: result.enabled,
+          variant,
+          variantType: dbFlag.variantType || 'string',
+          version: dbFlag.version || 1,
+          ...(dbFlag.impressionDataEnabled && { impressionData: true }),
         };
-        // Add baselinePayload if defined
-        if (dbFlag.baselinePayload !== undefined && dbFlag.baselinePayload !== null) {
-          let baselineValue = dbFlag.baselinePayload;
-          if (typeof baselineValue === 'string') {
-            try {
-              baselineValue = JSON.parse(baselineValue);
-            } catch {
-              // Keep as string if not valid JSON
-            }
-          }
-          variant.payload =
-            typeof baselineValue === 'string' ? baselineValue : JSON.stringify(baselineValue);
-        }
       }
 
-      results[dbFlag.flagName] = {
-        name: dbFlag.flagName,
-        enabled: result.enabled,
-        variant,
-        variantType: dbFlag.variantType || 'string',
-        version: dbFlag.version || 1,
-        ...(dbFlag.impressionDataEnabled && { impressionData: true }),
+      const flagsArray = Object.values(results).sort((a, b) => (b.id || '').localeCompare(a.id || ''));
+      const responseData = {
+        success: true,
+        data: {
+          flags: flagsArray,
+        },
+        meta: {
+          environment,
+          evaluatedAt: new Date().toISOString(),
+        },
       };
+
+      // Generate ETag from flags data (hash of stringified flags with versions and variants)
+      // We include name, version, enabled state, and variant name for consistency with Edge
+      const etagSource = flagsArray
+        .map((f: any) => {
+          const variantPart = f.variant ? `${f.variant.name}:${f.variant.enabled}` : 'no-variant';
+          return `${f.name}:${f.version}:${f.enabled}:${variantPart}`;
+        })
+        .join('|');
+      const etag = `"${crypto.createHash('md5').update(etagSource).digest('hex')}"`;
+
+
+      // Check If-None-Match header
+      const requestEtag = req.headers['if-none-match'];
+      if (requestEtag === etag) {
+        return res.status(304).end();
+      }
+
+      res.set('ETag', etag);
+      res.json(responseData);
+    } catch (error) {
+      logger.error('Error in evaluateFlags:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Internal server error during flag evaluation',
+        error: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+
+  /**
+   * Submit SDK metrics
+   * POST /api/v1/client/features/:environment/metrics
+   */
+  static submitMetrics = asyncHandler(async (req: SDKRequest, res: Response) => {
+    const environment = req.params.environment || req.environment;
+    const { bucket, appName } = req.body;
+
+    if (!bucket || !bucket.flags) {
+      return sendBadRequest(res, 'Invalid metrics payload');
     }
 
-    const flagsArray = Object.values(results);
-    const responseData = {
-      success: true,
-      data: {
-        flags: flagsArray,
-      },
-      meta: {
-        environment,
-        evaluatedAt: new Date().toISOString(),
-      },
-    };
+    const aggregatedMetrics: any[] = [];
 
-    // Generate ETag from flags data (hash of stringified flags with versions)
-    const etagSource = flagsArray.map((f: any) => `${f.name}:${f.version}:${f.enabled}`).join('|');
-    const etag = `"${crypto.createHash('md5').update(etagSource).digest('hex')}"`;
-
-
-    // Check If-None-Match header
-    const requestEtag = req.headers['if-none-match'];
-    if (requestEtag === etag) {
-      return res.status(304).end();
+    // Map bucket.flags to AggregatedMetric[]
+    for (const [flagName, counts] of Object.entries(bucket.flags as any)) {
+      if ((counts as any).yes > 0) {
+        aggregatedMetrics.push({
+          flagName,
+          enabled: true,
+          count: (counts as any).yes,
+        });
+      }
+      if ((counts as any).no > 0) {
+        aggregatedMetrics.push({
+          flagName,
+          enabled: false,
+          count: (counts as any).no,
+        });
+      }
+      // Handle variants
+      if ((counts as any).variants) {
+        for (const [variantName, variantCount] of Object.entries((counts as any).variants as any)) {
+          if ((variantCount as number) > 0) {
+            aggregatedMetrics.push({
+              flagName,
+              enabled: true,
+              variantName,
+              count: variantCount,
+            });
+          }
+        }
+      }
     }
 
-    res.set('ETag', etag);
-    res.json(responseData);
+    // Process using service (which adds to queue)
+    const { featureMetricsService } = await import('../services/FeatureMetricsService');
+    await featureMetricsService.processAggregatedMetrics(
+      environment!,
+      aggregatedMetrics,
+      bucket.stop,
+      appName || req.body.appName,
+      bucket.start
+    );
+
+    // Handle missing flags (unknown flag reporting)
+    if (bucket.missing && Object.keys(bucket.missing).length > 0) {
+      const { unknownFlagService } = await import('../services/UnknownFlagService');
+      const sdkVersion = req.headers['x-sdk-version'] as string | undefined;
+
+      for (const [flagName, count] of Object.entries(bucket.missing as any)) {
+        await unknownFlagService.reportUnknownFlag({
+          flagName,
+          environment: environment!,
+          appName: appName || req.body.appName,
+          sdkVersion,
+          count: (count as number) || 1,
+        });
+      }
+    }
+
+    return sendSuccessResponse(res);
   });
 }

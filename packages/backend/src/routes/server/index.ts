@@ -1,6 +1,6 @@
 import express from 'express';
 import multer from 'multer';
-import { authenticateServerApiToken } from '../../middleware/apiTokenAuth';
+import { serverAuthBase, serverSDKAuth } from '../../middleware/apiTokenAuth';
 import { resolveEnvironment } from '../../middleware/environmentResolver';
 import ServerAuthController from '../../controllers/ServerAuthController';
 import ServerUserController from '../../controllers/ServerUserController';
@@ -20,6 +20,7 @@ import ServerStoreProductController from '../../controllers/ServerStoreProductCo
 import ServerEnvironmentController from '../../controllers/ServerEnvironmentController';
 import InternalApiTokensController from '../../controllers/InternalApiTokensController';
 import { PlanningDataController } from '../../controllers/PlanningDataController';
+import ServerFeatureFlagController from '../../controllers/ServerFeatureFlagController';
 
 const router = express.Router();
 
@@ -37,16 +38,12 @@ const upload = multer({
 // ============================================================================
 
 // Get all valid API tokens for Edge mirroring
-router.get(
-  '/internal/tokens',
-  authenticateServerApiToken,
-  InternalApiTokensController.getAllTokens as any
-);
+router.get('/internal/tokens', serverAuthBase, InternalApiTokensController.getAllTokens as any);
 
 // Receive token usage report from Edge servers
 router.post(
   '/internal/token-usage-report',
-  authenticateServerApiToken,
+  serverAuthBase,
   InternalApiTokensController.receiveUsageReport as any
 );
 
@@ -55,7 +52,7 @@ router.post(
 // ============================================================================
 
 // Test SDK authentication
-router.get('/test', authenticateServerApiToken, (req: any, res: any) => {
+router.get('/test', serverAuthBase, (req: any, res: any) => {
   const apiToken = req.apiToken;
 
   res.json({
@@ -71,43 +68,35 @@ router.get('/test', authenticateServerApiToken, (req: any, res: any) => {
 });
 
 // Environment list (for Edge to discover all environments) - No environment header required
-router.get(
-  '/environments',
-  authenticateServerApiToken,
-  ServerEnvironmentController.getEnvironments
-);
+router.get('/environments', serverAuthBase, ServerEnvironmentController.getEnvironments);
 
 // Authentication routes - No environment required
 router.post('/auth/verify-token', ServerAuthController.verifyToken); // JWT 토큰 검증 (API Token 불필요)
-router.get('/auth/user/:id', authenticateServerApiToken, ServerAuthController.getUserById);
+router.get('/auth/user/:id', serverAuthBase, ServerAuthController.getUserById);
 
 // User routes - No environment required (global users)
-router.get('/users/sync', authenticateServerApiToken, ServerUserController.syncUsers);
-router.get('/users/:id', authenticateServerApiToken, ServerUserController.getUserById);
-router.post('/users/batch', authenticateServerApiToken, ServerUserController.getUsersByIds);
+router.get('/users/sync', serverAuthBase, ServerUserController.syncUsers);
+router.get('/users/:id', serverAuthBase, ServerUserController.getUserById);
+router.post('/users/batch', serverAuthBase, ServerUserController.getUsersByIds);
 
 // Notification routes - No environment required (global notifications)
-router.post(
-  '/notifications',
-  authenticateServerApiToken,
-  ServerNotificationController.sendNotification
-);
+router.post('/notifications', serverAuthBase, ServerNotificationController.sendNotification);
 router.post(
   '/notifications/bulk',
-  authenticateServerApiToken,
+  serverAuthBase,
   ServerNotificationController.sendBulkNotification
 );
 
 // File routes - No environment required
-router.post('/files/upload-url', authenticateServerApiToken, ServerFileController.getUploadUrl);
-router.get('/files/:fileId', authenticateServerApiToken, ServerFileController.getFileInfo);
+router.post('/files/upload-url', serverAuthBase, ServerFileController.getUploadUrl);
+router.get('/files/:fileId', serverAuthBase, ServerFileController.getFileInfo);
 
 // Chat server routes - No environment required
-router.post('/chat/register', authenticateServerApiToken, ServerChatController.registerServer);
-router.post('/chat/unregister', authenticateServerApiToken, ServerChatController.unregisterServer);
-router.post('/chat/stats', authenticateServerApiToken, ServerChatController.reportStats);
-router.post('/chat/activity', authenticateServerApiToken, ServerChatController.reportActivity);
-router.get('/chat/servers', authenticateServerApiToken, ServerChatController.getRegisteredServers);
+router.post('/chat/register', serverAuthBase, ServerChatController.registerServer);
+router.post('/chat/unregister', serverAuthBase, ServerChatController.unregisterServer);
+router.post('/chat/stats', serverAuthBase, ServerChatController.reportStats);
+router.post('/chat/activity', serverAuthBase, ServerChatController.reportActivity);
+router.get('/chat/servers', serverAuthBase, ServerChatController.getRegisteredServers);
 
 // Service discovery routes
 router.use('/services', serviceDiscoveryRoutes);
@@ -116,182 +105,94 @@ router.use('/services', serviceDiscoveryRoutes);
 // Environment-specific routes: /api/v1/server/:env/...
 // ============================================================================
 
-// Note: Remote config templates routes removed - will be reimplemented with new system
-
 // Coupon routes
-router.post(
-  '/:env/coupons/:code/redeem',
-  authenticateServerApiToken,
-  resolveEnvironment,
-  CouponRedeemController.redeem
-);
+router.post('/:env/coupons/:code/redeem', serverSDKAuth, CouponRedeemController.redeem);
 
 // Game world routes
-router.get(
-  '/:env/game-worlds',
-  authenticateServerApiToken,
-  resolveEnvironment,
-  ServerGameWorldController.getGameWorlds
-);
+router.get('/:env/game-worlds', serverSDKAuth, ServerGameWorldController.getGameWorlds);
 router.get(
   '/:env/game-worlds/world/:worldId',
-  authenticateServerApiToken,
-  resolveEnvironment,
+  serverSDKAuth,
   ServerGameWorldController.getGameWorldByWorldId
 );
-router.get(
-  '/:env/game-worlds/:id',
-  authenticateServerApiToken,
-  resolveEnvironment,
-  ServerGameWorldController.getGameWorldById
-);
+router.get('/:env/game-worlds/:id', serverSDKAuth, ServerGameWorldController.getGameWorldById);
 
 // Ingame popup notice routes
 router.get(
   '/:env/ingame-popup-notices',
-  authenticateServerApiToken,
-  resolveEnvironment,
+  serverSDKAuth,
   IngamePopupNoticeController.getServerIngamePopupNotices
 );
 router.get(
   '/:env/ingame-popup-notices/:id',
-  authenticateServerApiToken,
-  resolveEnvironment,
+  serverSDKAuth,
   IngamePopupNoticeController.getServerIngamePopupNoticeById
 );
 
 // Survey routes
-router.get(
-  '/:env/surveys/settings',
-  authenticateServerApiToken,
-  resolveEnvironment,
-  SurveyController.getServerSurveySettings
-);
-router.get(
-  '/:env/surveys',
-  authenticateServerApiToken,
-  resolveEnvironment,
-  SurveyController.getServerSurveys
-);
-router.get(
-  '/:env/surveys/:id',
-  authenticateServerApiToken,
-  resolveEnvironment,
-  SurveyController.getServerSurveyById
-);
+router.get('/:env/surveys/settings', serverSDKAuth, SurveyController.getServerSurveySettings);
+router.get('/:env/surveys', serverSDKAuth, SurveyController.getServerSurveys);
+router.get('/:env/surveys/:id', serverSDKAuth, SurveyController.getServerSurveyById);
 
 // Whitelist routes
-router.get(
-  '/:env/whitelists',
-  authenticateServerApiToken,
-  resolveEnvironment,
-  getWhitelistsHandler
-);
+router.get('/:env/whitelists', serverSDKAuth, getWhitelistsHandler);
 
 // Maintenance routes
-router.get(
-  '/:env/maintenance',
-  authenticateServerApiToken,
-  resolveEnvironment,
-  MaintenanceController.getStatus as any
-);
+router.get('/:env/maintenance', serverSDKAuth, MaintenanceController.getStatus as any);
 
 // Client version routes
-router.get(
-  '/:env/client-versions',
-  authenticateServerApiToken,
-  resolveEnvironment,
-  ServerClientVersionController.getClientVersions
-);
+router.get('/:env/client-versions', serverSDKAuth, ServerClientVersionController.getClientVersions);
 router.get(
   '/:env/client-versions/:id',
-  authenticateServerApiToken,
-  resolveEnvironment,
+  serverSDKAuth,
   ServerClientVersionController.getClientVersionById
 );
 
 // Service notice routes
-router.get(
-  '/:env/service-notices',
-  authenticateServerApiToken,
-  resolveEnvironment,
-  ServerServiceNoticeController.getServiceNotices
-);
+router.get('/:env/service-notices', serverSDKAuth, ServerServiceNoticeController.getServiceNotices);
 router.get(
   '/:env/service-notices/:id',
-  authenticateServerApiToken,
-  resolveEnvironment,
+  serverSDKAuth,
   ServerServiceNoticeController.getServiceNoticeById
 );
 
 // Banner routes
-router.get(
-  '/:env/banners',
-  authenticateServerApiToken,
-  resolveEnvironment,
-  ServerBannerController.getBanners
-);
-router.get(
-  '/:env/banners/:bannerId',
-  authenticateServerApiToken,
-  resolveEnvironment,
-  ServerBannerController.getBannerById
-);
+router.get('/:env/banners', serverSDKAuth, ServerBannerController.getBanners);
+router.get('/:env/banners/:bannerId', serverSDKAuth, ServerBannerController.getBannerById);
 
 // Store product routes
-router.get(
-  '/:env/store-products',
-  authenticateServerApiToken,
-  resolveEnvironment,
-  ServerStoreProductController.getStoreProducts
-);
+router.get('/:env/store-products', serverSDKAuth, ServerStoreProductController.getStoreProducts);
 router.get(
   '/:env/store-products/:id',
-  authenticateServerApiToken,
-  resolveEnvironment,
+  serverSDKAuth,
   ServerStoreProductController.getStoreProductById
 );
 
 // Planning data upload route (for external CLI uploads)
 router.post(
   '/:env/planning-data/upload',
-  authenticateServerApiToken as any,
-  resolveEnvironment as any,
+  serverSDKAuth as any,
   upload.any() as any,
   PlanningDataController.uploadPlanningData as any
 );
 
 // Feature flag routes
-import ServerFeatureFlagController from '../../controllers/ServerFeatureFlagController';
-router.get(
-  '/:env/features',
-  authenticateServerApiToken as any,
-  resolveEnvironment as any,
-  ServerFeatureFlagController.getFeatureFlags as any
-);
+router.get('/:env/features', serverSDKAuth as any, ServerFeatureFlagController.getFeatureFlags as any);
 router.get(
   '/:env/features/:flagName',
-  authenticateServerApiToken as any,
-  resolveEnvironment as any,
+  serverSDKAuth as any,
   ServerFeatureFlagController.getFeatureFlag as any
 );
 router.post(
   '/:env/features/metrics',
-  authenticateServerApiToken as any,
-  resolveEnvironment as any,
+  serverSDKAuth as any,
   ServerFeatureFlagController.receiveMetrics as any
 );
 router.post(
   '/:env/features/unknown',
-  authenticateServerApiToken as any,
-  resolveEnvironment as any,
+  serverSDKAuth as any,
   ServerFeatureFlagController.reportUnknownFlag as any
 );
-router.get(
-  '/:env/segments',
-  authenticateServerApiToken as any,
-  resolveEnvironment as any,
-  ServerFeatureFlagController.getSegments as any
-);
+router.get('/:env/segments', serverSDKAuth as any, ServerFeatureFlagController.getSegments as any);
 
 export default router;

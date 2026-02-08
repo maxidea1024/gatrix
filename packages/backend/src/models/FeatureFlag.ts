@@ -83,6 +83,7 @@ export interface FeatureFlagAttributes {
   updatedBy?: number;
   createdAt?: Date;
   updatedAt?: Date;
+  version?: number;
   // Environment-specific fields (joined from g_feature_flag_environments)
   lastSeenAt?: Date;
   // Relations - loaded per environment when needed
@@ -101,6 +102,7 @@ export interface FeatureFlagEnvironmentAttributes {
   lastSeenAt?: Date;
   createdAt?: Date;
   updatedAt?: Date;
+  version?: number;
 }
 
 // Strategy - now includes environment
@@ -408,15 +410,15 @@ export class FeatureFlagModel {
         variants,
         environments: envSettings
           ? [
-              {
-                id: envSettings.id,
-                flagId: id,
-                environment,
-                isEnabled: Boolean(envSettings.isEnabled),
-                baselinePayload: parseJsonField(envSettings.baselinePayload),
-                lastSeenAt: envSettings.lastSeenAt,
-              },
-            ]
+            {
+              id: envSettings.id,
+              flagId: id,
+              environment,
+              isEnabled: Boolean(envSettings.isEnabled),
+              baselinePayload: parseJsonField(envSettings.baselinePayload),
+              lastSeenAt: envSettings.lastSeenAt,
+            },
+          ]
           : [],
       };
     } catch (error) {

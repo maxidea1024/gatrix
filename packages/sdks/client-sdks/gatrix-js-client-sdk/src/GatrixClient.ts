@@ -12,12 +12,15 @@ import { FeaturesClient } from './FeaturesClient';
 import { EVENTS } from './events';
 import { SDK_VERSION } from './version';
 import { GatrixError } from './errors';
+import { Logger, ConsoleLogger } from './Logger';
 
 export class GatrixClient {
   private emitter: EventEmitter;
   private config: GatrixClientConfig;
   private featuresClient: FeaturesClient;
   private initialized = false;
+  private startPromise: Promise<void> | null = null;
+  private logger: Logger;
 
   /**
    * Feature flags client
@@ -44,9 +47,8 @@ export class GatrixClient {
 
     this.config = config;
     this.emitter = new EventEmitter();
+    this.logger = config.logger ?? new ConsoleLogger('GatrixClient');
     this.featuresClient = new FeaturesClient(this.emitter, config);
-
-    console.log(`GatrixClient v${SDK_VERSION} created for ${config.appName}`);
   }
 
   /**
@@ -54,14 +56,28 @@ export class GatrixClient {
    * Initializes all services and begins polling for updates
    */
   async start(): Promise<void> {
-    if (this.initialized) {
-      console.warn('GatrixClient already started');
-      return;
+    if (this.startPromise) {
+      return this.startPromise;
     }
 
-    await this.featuresClient.init();
-    await this.featuresClient.start();
-    this.initialized = true;
+    if (this.initialized) {
+      return Promise.resolve();
+    }
+
+    const connId = this.featuresClient.getConnectionId();
+    this.logger.info(`Starting SDK for ${this.config.appName} (v${SDK_VERSION}) [${connId}]`);
+
+    this.startPromise = (async () => {
+      try {
+        await this.featuresClient.init();
+        await this.featuresClient.start();
+        this.initialized = true;
+      } finally {
+        this.startPromise = null;
+      }
+    })();
+
+    return this.startPromise;
   }
 
   /**
@@ -71,6 +87,7 @@ export class GatrixClient {
   stop(): void {
     this.featuresClient.stop();
     this.initialized = false;
+    this.startPromise = null;
   }
 
   /**

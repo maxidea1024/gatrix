@@ -31,6 +31,7 @@ export interface ReportUnknownFlagInput {
   environment: string;
   appName?: string;
   sdkVersion?: string;
+  count?: number;
 }
 
 export class UnknownFlagService {
@@ -42,13 +43,14 @@ export class UnknownFlagService {
   async reportUnknownFlag(input: ReportUnknownFlagInput): Promise<void> {
     try {
       const client = redisClient.getClient();
+      const count = input.count || 1;
 
       // Create unique key for this flag + environment combo
       const bufferKey = `${REDIS_KEY_PREFIX}${input.environment}:${input.flagName}`;
       const metadataKey = `${REDIS_METADATA_PREFIX}${input.environment}:${input.flagName}`;
 
       // Increment count in Redis (atomic operation, handles high volume)
-      await client.hIncrBy(bufferKey, 'count', 1);
+      await client.hIncrBy(bufferKey, 'count', count);
 
       // Store metadata (will be overwritten if already exists, which is fine)
       if (input.appName || input.sdkVersion) {
@@ -77,13 +79,14 @@ export class UnknownFlagService {
    * Fallback to direct DB write if Redis is unavailable
    */
   private async directDbReport(input: ReportUnknownFlagInput): Promise<void> {
+    const count = input.count || 1;
     const updated = await db('unknown_flags')
       .where({
         flagName: input.flagName,
         environment: input.environment,
       })
       .update({
-        accessCount: db.raw('accessCount + 1'),
+        accessCount: db.raw(`accessCount + ${count}`),
         lastReportedAt: db.raw('UTC_TIMESTAMP()'),
         appName: input.appName || db.raw('appName'),
         sdkVersion: input.sdkVersion || db.raw('sdkVersion'),
@@ -95,7 +98,7 @@ export class UnknownFlagService {
         environment: input.environment,
         appName: input.appName || null,
         sdkVersion: input.sdkVersion || null,
-        accessCount: 1,
+        accessCount: count,
         firstReportedAt: db.raw('UTC_TIMESTAMP()'),
         lastReportedAt: db.raw('UTC_TIMESTAMP()'),
         isResolved: false,
