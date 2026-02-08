@@ -6,12 +6,12 @@ async function dropOldTables() {
     port: process.env.DB_PORT || 3306,
     user: process.env.DB_USER || 'motif_dev',
     password: process.env.DB_PASSWORD || 'dev123$',
-    database: process.env.DB_NAME || 'uwo_gate'
+    database: process.env.DB_NAME || 'uwo_gate',
   });
 
   try {
     console.log('Dropping old remote config tables...');
-    
+
     // Disable foreign key checks temporarily
     await connection.execute('SET FOREIGN_KEY_CHECKS = 0');
 
@@ -24,7 +24,7 @@ async function dropOldTables() {
     `);
 
     console.log('Raw tables result:', tables);
-    const oldTables = tables.map(row => row.TABLE_NAME || row.table_name);
+    const oldTables = tables.map((row) => row.TABLE_NAME || row.table_name);
     console.log('Found tables to drop:', oldTables);
 
     for (const table of oldTables) {

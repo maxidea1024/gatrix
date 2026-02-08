@@ -1,6 +1,6 @@
 /**
  * Migration: Add worldServerAddress to game worlds
- * 
+ *
  * Adds support for specifying the world server address for each game world.
  * This allows clients to connect to the appropriate game server.
  */
@@ -42,4 +42,3 @@ async function down(connection) {
 }
 
 module.exports = { up, down };
-

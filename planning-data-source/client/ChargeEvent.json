@@ -44,9 +44,7 @@
     ":links": {
       "contentsTerms": [
         {
-          "Id": [
-            "ContentsTerms"
-          ]
+          "Id": ["ContentsTerms"]
         }
       ]
     }

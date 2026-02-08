@@ -1,1 +1,131 @@
-"use strict";(globalThis.webpackChunkdocs=globalThis.webpackChunkdocs||[]).push([[6355],{2794(e,n,i){i.r(n),i.d(n,{assets:()=>l,contentTitle:()=>c,default:()=>h,frontMatter:()=>o,metadata:()=>t,toc:()=>a});const t=JSON.parse('{"id":"integrations/new-relic","title":"New Relic ?\ufffd\ub3d9","description":"New Relic Event API\ufffd??\ufffd\ubca4?\ufffd\ufffd? ?\ufffd\uc1a1?????\ufffd\uc2b5?\ufffd\ub2e4.","source":"@site/docs/integrations/new-relic.md","sourceDirName":"integrations","slug":"/integrations/new-relic","permalink":"/docs/zh-Hans/integrations/new-relic","draft":false,"unlisted":false,"editUrl":"https://github.com/your-org/gatrix/tree/main/docs/docs/integrations/new-relic.md","tags":[],"version":"current","sidebarPosition":5,"frontMatter":{"sidebar_position":5},"sidebar":"tutorialSidebar","previous":{"title":"Webhook ?\ufffd\ub3d9","permalink":"/docs/zh-Hans/integrations/webhook"},"next":{"title":"\u5ba2\u6237\ufffd?API ?\ufffd\u6863","permalink":"/docs/zh-Hans/api/client-api"}}');var s=i(4848),r=i(8453);const o={sidebar_position:5},c="New Relic ?\ufffd\ub3d9",l={},a=[{value:"?\ufffd\uc815 \ubc29\ubc95",id:"\uc815-\ubc29\ubc95",level:2},{value:"?\ufffd\uc694 ?\ufffd\ubcf4",id:"\uc694-\ubcf4",level:2}];function d(e){const n={code:"code",h1:"h1",h2:"h2",header:"header",li:"li",ol:"ol",p:"p",strong:"strong",ul:"ul",...(0,r.R)(),...e.components};return(0,s.jsxs)(s.Fragment,{children:[(0,s.jsx)(n.header,{children:(0,s.jsx)(n.h1,{id:"new-relic-\ub3d9",children:"New Relic ?\ufffd\ub3d9"})}),"\n",(0,s.jsx)(n.p,{children:"New Relic Event API\ufffd??\ufffd\ubca4?\ufffd\ufffd? ?\ufffd\uc1a1?????\ufffd\uc2b5?\ufffd\ub2e4."}),"\n",(0,s.jsx)(n.h2,{id:"\uc815-\ubc29\ubc95",children:"?\ufffd\uc815 \ubc29\ubc95"}),"\n",(0,s.jsxs)(n.ol,{children:["\n",(0,s.jsx)(n.li,{children:"New Relic \uacc4\uc815?\ufffd\uc11c License Key \ubc1c\uae09"}),"\n",(0,s.jsx)(n.li,{children:"Event API URL ?\ufffd\uc778"}),"\n",(0,s.jsx)(n.li,{children:"Gatrix?\ufffd\uc11c ?\ufffd\ub3d9 ?\ufffd\uc815"}),"\n"]}),"\n",(0,s.jsx)(n.h2,{id:"\uc694-\ubcf4",children:"?\ufffd\uc694 ?\ufffd\ubcf4"}),"\n",(0,s.jsxs)(n.ul,{children:["\n",(0,s.jsxs)(n.li,{children:[(0,s.jsx)(n.strong,{children:"Event URL"}),": ",(0,s.jsx)(n.code,{children:"https://insights-collector.newrelic.com/v1/accounts/YOUR_ACCOUNT_ID/events"})]}),"\n",(0,s.jsxs)(n.li,{children:[(0,s.jsx)(n.strong,{children:"License Key"}),": New Relic License Key"]}),"\n"]})]})}function h(e={}){const{wrapper:n}={...(0,r.R)(),...e.components};return n?(0,s.jsx)(n,{...e,children:(0,s.jsx)(d,{...e})}):d(e)}},8453(e,n,i){i.d(n,{R:()=>o,x:()=>c});var t=i(6540);const s={},r=t.createContext(s);function o(e){const n=t.useContext(r);return t.useMemo(function(){return"function"==typeof e?e(n):{...n,...e}},[n,e])}function c(e){let n;return n=e.disableParentContext?"function"==typeof e.components?e.components(s):e.components||s:o(e.components),t.createElement(r.Provider,{value:n},e.children)}}}]);
+'use strict';
+(globalThis.webpackChunkdocs = globalThis.webpackChunkdocs || []).push([
+  [6355],
+  {
+    2794(e, n, i) {
+      (i.r(n),
+        i.d(n, {
+          assets: () => l,
+          contentTitle: () => c,
+          default: () => h,
+          frontMatter: () => o,
+          metadata: () => t,
+          toc: () => a,
+        }));
+      const t = JSON.parse(
+        '{"id":"integrations/new-relic","title":"New Relic ?\ufffd\ub3d9","description":"New Relic Event API\ufffd??\ufffd\ubca4?\ufffd\ufffd? ?\ufffd\uc1a1?????\ufffd\uc2b5?\ufffd\ub2e4.","source":"@site/docs/integrations/new-relic.md","sourceDirName":"integrations","slug":"/integrations/new-relic","permalink":"/docs/zh-Hans/integrations/new-relic","draft":false,"unlisted":false,"editUrl":"https://github.com/your-org/gatrix/tree/main/docs/docs/integrations/new-relic.md","tags":[],"version":"current","sidebarPosition":5,"frontMatter":{"sidebar_position":5},"sidebar":"tutorialSidebar","previous":{"title":"Webhook ?\ufffd\ub3d9","permalink":"/docs/zh-Hans/integrations/webhook"},"next":{"title":"\u5ba2\u6237\ufffd?API ?\ufffd\u6863","permalink":"/docs/zh-Hans/api/client-api"}}'
+      );
+      var s = i(4848),
+        r = i(8453);
+      const o = { sidebar_position: 5 },
+        c = 'New Relic ?\ufffd\ub3d9',
+        l = {},
+        a = [
+          { value: '?\ufffd\uc815 \ubc29\ubc95', id: '\uc815-\ubc29\ubc95', level: 2 },
+          { value: '?\ufffd\uc694 ?\ufffd\ubcf4', id: '\uc694-\ubcf4', level: 2 },
+        ];
+      function d(e) {
+        const n = {
+          code: 'code',
+          h1: 'h1',
+          h2: 'h2',
+          header: 'header',
+          li: 'li',
+          ol: 'ol',
+          p: 'p',
+          strong: 'strong',
+          ul: 'ul',
+          ...(0, r.R)(),
+          ...e.components,
+        };
+        return (0, s.jsxs)(s.Fragment, {
+          children: [
+            (0, s.jsx)(n.header, {
+              children: (0, s.jsx)(n.h1, {
+                id: 'new-relic-\ub3d9',
+                children: 'New Relic ?\ufffd\ub3d9',
+              }),
+            }),
+            '\n',
+            (0, s.jsx)(n.p, {
+              children:
+                'New Relic Event API\ufffd??\ufffd\ubca4?\ufffd\ufffd? ?\ufffd\uc1a1?????\ufffd\uc2b5?\ufffd\ub2e4.',
+            }),
+            '\n',
+            (0, s.jsx)(n.h2, { id: '\uc815-\ubc29\ubc95', children: '?\ufffd\uc815 \ubc29\ubc95' }),
+            '\n',
+            (0, s.jsxs)(n.ol, {
+              children: [
+                '\n',
+                (0, s.jsx)(n.li, {
+                  children: 'New Relic \uacc4\uc815?\ufffd\uc11c License Key \ubc1c\uae09',
+                }),
+                '\n',
+                (0, s.jsx)(n.li, { children: 'Event API URL ?\ufffd\uc778' }),
+                '\n',
+                (0, s.jsx)(n.li, { children: 'Gatrix?\ufffd\uc11c ?\ufffd\ub3d9 ?\ufffd\uc815' }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, s.jsx)(n.h2, { id: '\uc694-\ubcf4', children: '?\ufffd\uc694 ?\ufffd\ubcf4' }),
+            '\n',
+            (0, s.jsxs)(n.ul, {
+              children: [
+                '\n',
+                (0, s.jsxs)(n.li, {
+                  children: [
+                    (0, s.jsx)(n.strong, { children: 'Event URL' }),
+                    ': ',
+                    (0, s.jsx)(n.code, {
+                      children:
+                        'https://insights-collector.newrelic.com/v1/accounts/YOUR_ACCOUNT_ID/events',
+                    }),
+                  ],
+                }),
+                '\n',
+                (0, s.jsxs)(n.li, {
+                  children: [
+                    (0, s.jsx)(n.strong, { children: 'License Key' }),
+                    ': New Relic License Key',
+                  ],
+                }),
+                '\n',
+              ],
+            }),
+          ],
+        });
+      }
+      function h(e = {}) {
+        const { wrapper: n } = { ...(0, r.R)(), ...e.components };
+        return n ? (0, s.jsx)(n, { ...e, children: (0, s.jsx)(d, { ...e }) }) : d(e);
+      }
+    },
+    8453(e, n, i) {
+      i.d(n, { R: () => o, x: () => c });
+      var t = i(6540);
+      const s = {},
+        r = t.createContext(s);
+      function o(e) {
+        const n = t.useContext(r);
+        return t.useMemo(
+          function () {
+            return 'function' == typeof e ? e(n) : { ...n, ...e };
+          },
+          [n, e]
+        );
+      }
+      function c(e) {
+        let n;
+        return (
+          (n = e.disableParentContext
+            ? 'function' == typeof e.components
+              ? e.components(s)
+              : e.components || s
+            : o(e.components)),
+          t.createElement(r.Provider, { value: n }, e.children)
+        );
+      }
+    },
+  },
+]);

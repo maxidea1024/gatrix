@@ -6,13 +6,7 @@
       "startTownId": "number",
       "startLongitude": "number",
       "startLatitude": "number",
-      "defaultTowns": [
-        "number",
-        "number",
-        "number",
-        "number",
-        "number"
-      ],
+      "defaultTowns": ["number", "number", "number", "number", "number"],
       "admiralGroupId": "number",
       "defaultSailor": "number",
       "startOpenFOWTileIds": [
@@ -26,10 +20,7 @@
         "number",
         "number"
       ],
-      "startOpenRegionInfo": [
-        "number",
-        "number"
-      ],
+      "startOpenRegionInfo": ["number", "number"],
       "startRoyalTitelId": "number",
       "isBasicAdmiral": "bool",
       "questId0": "number",
@@ -77,9 +68,7 @@
     },
     ":required": {
       "mateId": 1,
-      "defaultTowns": [
-        1
-      ],
+      "defaultTowns": [1],
       "defaultSailor": 1,
       "startRoyalTitelId": 1,
       "recruitingPoint": 1,
@@ -112,19 +101,10 @@
     ":min": {
       "mateId": 21200000,
       "startTownId": 11000000,
-      "defaultTowns": [
-        70400000,
-        70400000,
-        70400000,
-        70400000,
-        70400000
-      ],
+      "defaultTowns": [70400000, 70400000, 70400000, 70400000, 70400000],
       "admiralGroupId": 20899000,
       "defaultSailor": 21200000,
-      "startOpenRegionInfo": [
-        12000000,
-        12000000
-      ],
+      "startOpenRegionInfo": [12000000, 12000000],
       "startRoyalTitelId": 21700000,
       "questId0": 82000000,
       "questId1": 82000000,
@@ -155,19 +135,10 @@
     ":max": {
       "mateId": 21399999,
       "startTownId": 11999999,
-      "defaultTowns": [
-        70499999,
-        70499999,
-        70499999,
-        70499999,
-        70499999
-      ],
+      "defaultTowns": [70499999, 70499999, 70499999, 70499999, 70499999],
       "admiralGroupId": 20899999,
       "defaultSailor": 21399999,
-      "startOpenRegionInfo": [
-        12099999,
-        12099999
-      ],
+      "startOpenRegionInfo": [12099999, 12099999],
       "startRoyalTitelId": 21709999,
       "questId0": 82999999,
       "questId1": 82999999,
@@ -197,99 +168,37 @@
     },
     ":enum": {},
     ":links": {
-      "mateId": [
-        "Mate"
-      ],
-      "startTownId": [
-        "Town"
-      ],
-      "defaultTowns": [
-        [
-          "Discovery"
-        ],
-        [
-          "Discovery"
-        ],
-        [
-          "Discovery"
-        ],
-        [
-          "Discovery"
-        ],
-        [
-          "Discovery"
-        ]
-      ],
-      "admiralGroupId": [
-        "AdmiralGroup"
-      ],
-      "defaultSailor": [
-        "Mate"
-      ],
-      "startOpenRegionInfo": [
-        [
-          "Region"
-        ],
-        [
-          "Region"
-        ]
-      ],
-      "startRoyalTitelId": [
-        "RoyalTitle"
-      ],
-      "questId0": [
-        "Quest"
-      ],
-      "questId1": [
-        "Quest"
-      ],
-      "questId2": [
-        "Quest"
-      ],
-      "questId3": [
-        "Quest"
-      ],
-      "questId4": [
-        "Quest"
-      ],
-      "questId5": [
-        "Quest"
-      ],
-      "questId6": [
-        "Quest"
-      ],
-      "recruitingPoint": [
-        "Point"
-      ],
+      "mateId": ["Mate"],
+      "startTownId": ["Town"],
+      "defaultTowns": [["Discovery"], ["Discovery"], ["Discovery"], ["Discovery"], ["Discovery"]],
+      "admiralGroupId": ["AdmiralGroup"],
+      "defaultSailor": ["Mate"],
+      "startOpenRegionInfo": [["Region"], ["Region"]],
+      "startRoyalTitelId": ["RoyalTitle"],
+      "questId0": ["Quest"],
+      "questId1": ["Quest"],
+      "questId2": ["Quest"],
+      "questId3": ["Quest"],
+      "questId4": ["Quest"],
+      "questId5": ["Quest"],
+      "questId6": ["Quest"],
+      "recruitingPoint": ["Point"],
       "contentsTerms": [
         {
-          "Id": [
-            "ContentsTerms"
-          ]
+          "Id": ["ContentsTerms"]
         },
         {
-          "Id": [
-            "ContentsTerms"
-          ]
+          "Id": ["ContentsTerms"]
         },
         {
-          "Id": [
-            "ContentsTerms"
-          ]
+          "Id": ["ContentsTerms"]
         }
       ],
       "orders": [
         {
-          "Type": [
-            "CompanyJob"
-          ],
-          "Id": [
-            "BattleSkill",
-            "WorldSkill"
-          ],
-          "RoyalTitle": [
-            "RoyalTitle"
-          ]
+          "Type": ["CompanyJob"],
+          "Id": ["BattleSkill", "WorldSkill"],
+          "RoyalTitle": ["RoyalTitle"]
         }
       ]
     }
@@ -299,28 +208,11 @@
       "id": 20000001,
       "mateId": 21200001,
       "startTownId": 11000000,
-      "defaultTowns": [
-        70412033,
-        70412091,
-        70412092,
-        70412186,
-        70412177
-      ],
+      "defaultTowns": [70412033, 70412091, 70412092, 70412186, 70412177],
       "admiralGroupId": 20899000,
       "defaultSailor": 21390501,
-      "startOpenFOWTileIds": [
-        1931,
-        1930,
-        2056,
-        2057,
-        2058,
-        1805,
-        1806
-      ],
-      "startOpenRegionInfo": [
-        12000000,
-        12001000
-      ],
+      "startOpenFOWTileIds": [1931, 1930, 2056, 2057, 2058, 1805, 1806],
+      "startOpenRegionInfo": [12000000, 12001000],
       "startRoyalTitelId": 21700000,
       "isBasicAdmiral": true,
       "questId0": 82000001,
@@ -352,29 +244,11 @@
       "id": 20000002,
       "mateId": 21200002,
       "startTownId": 11000001,
-      "defaultTowns": [
-        70412091,
-        70412033,
-        70412092,
-        70412058,
-        70412044
-      ],
+      "defaultTowns": [70412091, 70412033, 70412092, 70412058, 70412044],
       "admiralGroupId": 20899000,
       "defaultSailor": 21390501,
-      "startOpenFOWTileIds": [
-        2056,
-        2055,
-        1931,
-        1930,
-        2058,
-        1933,
-        1934,
-        2057
-      ],
-      "startOpenRegionInfo": [
-        12000000,
-        12001000
-      ],
+      "startOpenFOWTileIds": [2056, 2055, 1931, 1930, 2058, 1933, 1934, 2057],
+      "startOpenRegionInfo": [12000000, 12001000],
       "startRoyalTitelId": 21700000,
       "isBasicAdmiral": true,
       "questId0": 82000002,
@@ -405,30 +279,11 @@
       "id": 20000003,
       "mateId": 21200003,
       "startTownId": 11000130,
-      "defaultTowns": [
-        70412126,
-        70412167,
-        70412122,
-        70412160,
-        70412109
-      ],
+      "defaultTowns": [70412126, 70412167, 70412122, 70412160, 70412109],
       "admiralGroupId": 20899000,
       "defaultSailor": 21390501,
-      "startOpenFOWTileIds": [
-        1818,
-        1817,
-        1942,
-        1943,
-        2067,
-        2068,
-        1819,
-        1694,
-        1695
-      ],
-      "startOpenRegionInfo": [
-        12000400,
-        12001600
-      ],
+      "startOpenFOWTileIds": [1818, 1817, 1942, 1943, 2067, 2068, 1819, 1694, 1695],
+      "startOpenRegionInfo": [12000400, 12001600],
       "startRoyalTitelId": 21700000,
       "isBasicAdmiral": true,
       "questId0": 82000003,
@@ -460,27 +315,11 @@
       "mateId": 21200004,
       "startLongitude": 1.025857091,
       "startLatitude": 52.416320801,
-      "defaultTowns": [
-        70412026,
-        70412017,
-        70412111,
-        70412191,
-        70412115
-      ],
+      "defaultTowns": [70412026, 70412017, 70412111, 70412191, 70412115],
       "admiralGroupId": 20899000,
       "defaultSailor": 21390501,
-      "startOpenFOWTileIds": [
-        1309,
-        1434,
-        1435,
-        1433,
-        1432,
-        1558
-      ],
-      "startOpenRegionInfo": [
-        12001200,
-        12000500
-      ],
+      "startOpenFOWTileIds": [1309, 1434, 1435, 1433, 1432, 1558],
+      "startOpenRegionInfo": [12001200, 12000500],
       "startRoyalTitelId": 21700002,
       "isBasicAdmiral": true,
       "questId0": 82000004,
@@ -511,27 +350,11 @@
       "id": 20000005,
       "mateId": 21200005,
       "startTownId": 11000118,
-      "defaultTowns": [
-        70412115,
-        70412016,
-        70412203,
-        70412197,
-        70412026
-      ],
+      "defaultTowns": [70412115, 70412016, 70412203, 70412197, 70412026],
       "admiralGroupId": 20899000,
       "defaultSailor": 21390501,
-      "startOpenFOWTileIds": [
-        1434,
-        1435,
-        1310,
-        1311,
-        1312,
-        1309
-      ],
-      "startOpenRegionInfo": [
-        12001200,
-        12000500
-      ],
+      "startOpenFOWTileIds": [1434, 1435, 1310, 1311, 1312, 1309],
+      "startOpenRegionInfo": [12001200, 12000500],
       "startRoyalTitelId": 21700000,
       "isBasicAdmiral": true,
       "questId0": 82000005,
@@ -562,15 +385,10 @@
       "id": 20000006,
       "mateId": 21200006,
       "startTownId": 11000136,
-      "defaultTowns": [
-        70412130
-      ],
+      "defaultTowns": [70412130],
       "admiralGroupId": 20899000,
       "defaultSailor": 21390501,
-      "startOpenFOWTileIds": [
-        1687,
-        1686
-      ],
+      "startOpenFOWTileIds": [1687, 1686],
       "startRoyalTitelId": 21700000,
       "isBasicAdmiral": false,
       "questId0": 82000006,
@@ -601,15 +419,10 @@
       "id": 20000007,
       "mateId": 21200007,
       "startTownId": 11000136,
-      "defaultTowns": [
-        70412130
-      ],
+      "defaultTowns": [70412130],
       "admiralGroupId": 20899000,
       "defaultSailor": 21390501,
-      "startOpenFOWTileIds": [
-        1687,
-        1686
-      ],
+      "startOpenFOWTileIds": [1687, 1686],
       "startRoyalTitelId": 21700000,
       "isBasicAdmiral": false,
       "questId0": 82000007,
@@ -641,15 +454,10 @@
       "mateId": 21200008,
       "startLongitude": 3.2030074596,
       "startLatitude": 37.194019318,
-      "defaultTowns": [
-        70412113
-      ],
+      "defaultTowns": [70412113],
       "admiralGroupId": 20899000,
       "defaultSailor": 21390501,
-      "startOpenFOWTileIds": [
-        2060,
-        2059
-      ],
+      "startOpenFOWTileIds": [2060, 2059],
       "startRoyalTitelId": 21700000,
       "isBasicAdmiral": false,
       "questId0": 82000008,
@@ -680,15 +488,10 @@
       "id": 20000009,
       "mateId": 21200009,
       "startTownId": 11000000,
-      "defaultTowns": [
-        70412033
-      ],
+      "defaultTowns": [70412033],
       "admiralGroupId": 20899000,
       "defaultSailor": 21390501,
-      "startOpenFOWTileIds": [
-        1931,
-        1930
-      ],
+      "startOpenFOWTileIds": [1931, 1930],
       "startRoyalTitelId": 21700000,
       "isBasicAdmiral": false,
       "questId0": 82000009,
@@ -719,15 +522,10 @@
       "id": 20000010,
       "mateId": 21200010,
       "startTownId": 11000197,
-      "defaultTowns": [
-        70412198
-      ],
+      "defaultTowns": [70412198],
       "admiralGroupId": 20899000,
       "defaultSailor": 21390502,
-      "startOpenFOWTileIds": [
-        2226,
-        2225
-      ],
+      "startOpenFOWTileIds": [2226, 2225],
       "startRoyalTitelId": 21700000,
       "isBasicAdmiral": false,
       "questId0": 82000010,
@@ -758,15 +556,10 @@
       "id": 20000011,
       "mateId": 21200011,
       "startTownId": 11000128,
-      "defaultTowns": [
-        70412120
-      ],
+      "defaultTowns": [70412120],
       "admiralGroupId": 20899000,
       "defaultSailor": 21390502,
-      "startOpenFOWTileIds": [
-        2100,
-        2099
-      ],
+      "startOpenFOWTileIds": [2100, 2099],
       "startRoyalTitelId": 21700000,
       "isBasicAdmiral": false,
       "questId0": 82000011,
@@ -797,15 +590,10 @@
       "id": 20000012,
       "mateId": 21200012,
       "startTownId": 11000021,
-      "defaultTowns": [
-        70412014
-      ],
+      "defaultTowns": [70412014],
       "admiralGroupId": 20899000,
       "defaultSailor": 21390501,
-      "startOpenFOWTileIds": [
-        1307,
-        1306
-      ],
+      "startOpenFOWTileIds": [1307, 1306],
       "startRoyalTitelId": 21700000,
       "isBasicAdmiral": false,
       "questId0": 82000012,
@@ -836,15 +624,10 @@
       "id": 20000013,
       "mateId": 21200013,
       "startTownId": 11000010,
-      "defaultTowns": [
-        70412006
-      ],
+      "defaultTowns": [70412006],
       "admiralGroupId": 20899000,
       "defaultSailor": 21390502,
-      "startOpenFOWTileIds": [
-        2475,
-        2474
-      ],
+      "startOpenFOWTileIds": [2475, 2474],
       "startRoyalTitelId": 21700000,
       "isBasicAdmiral": false,
       "questId0": 82000013,
@@ -875,15 +658,10 @@
       "id": 20000014,
       "mateId": 21200014,
       "startTownId": 11000204,
-      "defaultTowns": [
-        70412132
-      ],
+      "defaultTowns": [70412132],
       "admiralGroupId": 20899000,
       "defaultSailor": 21390502,
-      "startOpenFOWTileIds": [
-        2228,
-        2227
-      ],
+      "startOpenFOWTileIds": [2228, 2227],
       "startRoyalTitelId": 21700000,
       "isBasicAdmiral": false,
       "questId0": 82000014,
@@ -914,15 +692,10 @@
       "id": 20000015,
       "mateId": 21200015,
       "startTownId": 11000195,
-      "defaultTowns": [
-        70412196
-      ],
+      "defaultTowns": [70412196],
       "admiralGroupId": 20899000,
       "defaultSailor": 21390502,
-      "startOpenFOWTileIds": [
-        2103,
-        2102
-      ],
+      "startOpenFOWTileIds": [2103, 2102],
       "startRoyalTitelId": 21700000,
       "isBasicAdmiral": false,
       "questId0": 82000015,
@@ -953,15 +726,10 @@
       "id": 20000016,
       "mateId": 21200016,
       "startTownId": 11000195,
-      "defaultTowns": [
-        70412196
-      ],
+      "defaultTowns": [70412196],
       "admiralGroupId": 20899000,
       "defaultSailor": 21390502,
-      "startOpenFOWTileIds": [
-        2103,
-        2102
-      ],
+      "startOpenFOWTileIds": [2103, 2102],
       "startRoyalTitelId": 21700000,
       "isBasicAdmiral": false,
       "recruitingPoint": 100004,
@@ -985,15 +753,10 @@
       "id": 20000017,
       "mateId": 21200017,
       "startTownId": 11000122,
-      "defaultTowns": [
-        70412118
-      ],
+      "defaultTowns": [70412118],
       "admiralGroupId": 20899000,
       "defaultSailor": 21390502,
-      "startOpenFOWTileIds": [
-        2107,
-        2106
-      ],
+      "startOpenFOWTileIds": [2107, 2106],
       "startRoyalTitelId": 21700002,
       "isBasicAdmiral": false,
       "questId0": 82000017,
@@ -1024,15 +787,10 @@
       "id": 20000018,
       "mateId": 21200018,
       "startTownId": 11000085,
-      "defaultTowns": [
-        70412083
-      ],
+      "defaultTowns": [70412083],
       "admiralGroupId": 20899000,
       "defaultSailor": 21390502,
-      "startOpenFOWTileIds": [
-        2231,
-        2230
-      ],
+      "startOpenFOWTileIds": [2231, 2230],
       "startRoyalTitelId": 21700000,
       "isBasicAdmiral": false,
       "questId0": 82000018,
@@ -1063,15 +821,10 @@
       "id": 20000019,
       "mateId": 21200019,
       "startTownId": 11000161,
-      "defaultTowns": [
-        70412157
-      ],
+      "defaultTowns": [70412157],
       "admiralGroupId": 20899000,
       "defaultSailor": 21390501,
-      "startOpenFOWTileIds": [
-        4034,
-        4159
-      ],
+      "startOpenFOWTileIds": [4034, 4159],
       "startRoyalTitelId": 21700000,
       "isBasicAdmiral": false,
       "questId0": 82000019,
@@ -1102,15 +855,10 @@
       "id": 20000020,
       "mateId": 21200020,
       "startTownId": 11000025,
-      "defaultTowns": [
-        70412021
-      ],
+      "defaultTowns": [70412021],
       "admiralGroupId": 20899000,
       "defaultSailor": 21390502,
-      "startOpenFOWTileIds": [
-        2709,
-        2708
-      ],
+      "startOpenFOWTileIds": [2709, 2708],
       "startRoyalTitelId": 21700000,
       "isBasicAdmiral": false,
       "questId0": 82000020,
@@ -1141,15 +889,10 @@
       "id": 20000021,
       "mateId": 21200021,
       "startTownId": 11000091,
-      "defaultTowns": [
-        70412088
-      ],
+      "defaultTowns": [70412088],
       "admiralGroupId": 20899000,
       "defaultSailor": 21390501,
-      "startOpenFOWTileIds": [
-        1944,
-        1943
-      ],
+      "startOpenFOWTileIds": [1944, 1943],
       "startRoyalTitelId": 21700002,
       "isBasicAdmiral": false,
       "recruitingPoint": 100004,
@@ -1173,15 +916,10 @@
       "id": 20000022,
       "mateId": 21200022,
       "startTownId": 11000094,
-      "defaultTowns": [
-        70412092
-      ],
+      "defaultTowns": [70412092],
       "admiralGroupId": 20899000,
       "defaultSailor": 21390501,
-      "startOpenFOWTileIds": [
-        2057,
-        2056
-      ],
+      "startOpenFOWTileIds": [2057, 2056],
       "startRoyalTitelId": 21700002,
       "isBasicAdmiral": false,
       "questId0": 82000022,
@@ -1212,14 +950,9 @@
       "id": 20000023,
       "mateId": 21200023,
       "startTownId": 11000086,
-      "defaultTowns": [
-        70412084
-      ],
+      "defaultTowns": [70412084],
       "defaultSailor": 21390501,
-      "startOpenFOWTileIds": [
-        2532,
-        2531
-      ],
+      "startOpenFOWTileIds": [2532, 2531],
       "startRoyalTitelId": 21700000,
       "isBasicAdmiral": false,
       "recruitingPoint": 100004,
@@ -1243,15 +976,10 @@
       "id": 20000024,
       "mateId": 21200024,
       "startTownId": 11000012,
-      "defaultTowns": [
-        70412134
-      ],
+      "defaultTowns": [70412134],
       "admiralGroupId": 20899000,
       "defaultSailor": 21390501,
-      "startOpenFOWTileIds": [
-        2407,
-        2406
-      ],
+      "startOpenFOWTileIds": [2407, 2406],
       "startRoyalTitelId": 21700000,
       "isBasicAdmiral": false,
       "questId0": 82000024,
@@ -1282,15 +1010,10 @@
       "id": 20000025,
       "mateId": 21200025,
       "startTownId": 11000130,
-      "defaultTowns": [
-        70412126
-      ],
+      "defaultTowns": [70412126],
       "admiralGroupId": 20899000,
       "defaultSailor": 21390501,
-      "startOpenFOWTileIds": [
-        1818,
-        1817
-      ],
+      "startOpenFOWTileIds": [1818, 1817],
       "startRoyalTitelId": 21700000,
       "isBasicAdmiral": false,
       "questId0": 82000025,
@@ -1321,14 +1044,9 @@
       "id": 20000026,
       "mateId": 21200026,
       "startTownId": 11000000,
-      "defaultTowns": [
-        70412033
-      ],
+      "defaultTowns": [70412033],
       "defaultSailor": 21390501,
-      "startOpenFOWTileIds": [
-        1931,
-        1930
-      ],
+      "startOpenFOWTileIds": [1931, 1930],
       "startRoyalTitelId": 21700000,
       "isBasicAdmiral": false,
       "recruitingPoint": 100004,
@@ -1352,14 +1070,9 @@
       "id": 20000027,
       "mateId": 21390037,
       "startTownId": 11000000,
-      "defaultTowns": [
-        70412033
-      ],
+      "defaultTowns": [70412033],
       "defaultSailor": 21390501,
-      "startOpenFOWTileIds": [
-        1931,
-        1930
-      ],
+      "startOpenFOWTileIds": [1931, 1930],
       "startRoyalTitelId": 21700000,
       "isBasicAdmiral": false,
       "recruitingPoint": 100004,
@@ -1383,15 +1096,10 @@
       "id": 20000028,
       "mateId": 21200028,
       "startTownId": 11000132,
-      "defaultTowns": [
-        70412162
-      ],
+      "defaultTowns": [70412162],
       "admiralGroupId": 20899000,
       "defaultSailor": 21390501,
-      "startOpenFOWTileIds": [
-        1818,
-        1817
-      ],
+      "startOpenFOWTileIds": [1818, 1817],
       "startRoyalTitelId": 21700000,
       "isBasicAdmiral": false,
       "questId0": 82000028,
@@ -1422,15 +1130,10 @@
       "id": 20001029,
       "mateId": 21200029,
       "startTownId": 11000181,
-      "defaultTowns": [
-        70412033
-      ],
+      "defaultTowns": [70412033],
       "admiralGroupId": 20899000,
       "defaultSailor": 21390501,
-      "startOpenFOWTileIds": [
-        1818,
-        1817
-      ],
+      "startOpenFOWTileIds": [1818, 1817],
       "startRoyalTitelId": 21700000,
       "isBasicAdmiral": false,
       "questId0": 82000029,
@@ -1463,15 +1166,10 @@
       "id": 20000030,
       "mateId": 21200030,
       "startTownId": 11000100,
-      "defaultTowns": [
-        70412097
-      ],
+      "defaultTowns": [70412097],
       "admiralGroupId": 20899000,
       "defaultSailor": 21390501,
-      "startOpenFOWTileIds": [
-        1818,
-        1817
-      ],
+      "startOpenFOWTileIds": [1818, 1817],
       "startRoyalTitelId": 21700000,
       "isBasicAdmiral": false,
       "questId0": 82000030,
@@ -1502,15 +1200,10 @@
       "id": 20000031,
       "mateId": 21200031,
       "startTownId": 11000010,
-      "defaultTowns": [
-        70412006
-      ],
+      "defaultTowns": [70412006],
       "admiralGroupId": 20899000,
       "defaultSailor": 21390501,
-      "startOpenFOWTileIds": [
-        1818,
-        1817
-      ],
+      "startOpenFOWTileIds": [1818, 1817],
       "startRoyalTitelId": 21700000,
       "isBasicAdmiral": false,
       "questId0": 82000031,
@@ -1541,15 +1234,10 @@
       "id": 20000032,
       "mateId": 21200032,
       "startTownId": 11000008,
-      "defaultTowns": [
-        70412005
-      ],
+      "defaultTowns": [70412005],
       "admiralGroupId": 20899000,
       "defaultSailor": 21390501,
-      "startOpenFOWTileIds": [
-        1818,
-        1817
-      ],
+      "startOpenFOWTileIds": [1818, 1817],
       "startRoyalTitelId": 21700000,
       "isBasicAdmiral": false,
       "questId0": 82000032,
@@ -1580,15 +1268,10 @@
       "id": 20000033,
       "mateId": 21200033,
       "startTownId": 11000115,
-      "defaultTowns": [
-        70412112
-      ],
+      "defaultTowns": [70412112],
       "admiralGroupId": 20899000,
       "defaultSailor": 21390501,
-      "startOpenFOWTileIds": [
-        1818,
-        1817
-      ],
+      "startOpenFOWTileIds": [1818, 1817],
       "startRoyalTitelId": 21700000,
       "isBasicAdmiral": false,
       "questId0": 82000033,
@@ -1619,15 +1302,10 @@
       "id": 20000034,
       "mateId": 21200034,
       "startTownId": 11000140,
-      "defaultTowns": [
-        70412135
-      ],
+      "defaultTowns": [70412135],
       "admiralGroupId": 20899000,
       "defaultSailor": 21390502,
-      "startOpenFOWTileIds": [
-        1818,
-        1817
-      ],
+      "startOpenFOWTileIds": [1818, 1817],
       "startRoyalTitelId": 21700000,
       "isBasicAdmiral": false,
       "questId0": 82000034,
@@ -1658,15 +1336,10 @@
       "id": 20000035,
       "mateId": 21200035,
       "startTownId": 11000030,
-      "defaultTowns": [
-        70412026
-      ],
+      "defaultTowns": [70412026],
       "admiralGroupId": 20899000,
       "defaultSailor": 21390501,
-      "startOpenFOWTileIds": [
-        1818,
-        1817
-      ],
+      "startOpenFOWTileIds": [1818, 1817],
       "startRoyalTitelId": 21700000,
       "isBasicAdmiral": false,
       "recruitingPoint": 100004,
@@ -1690,15 +1363,10 @@
       "id": 20000036,
       "mateId": 21200037,
       "startTownId": 11000091,
-      "defaultTowns": [
-        70412088
-      ],
+      "defaultTowns": [70412088],
       "admiralGroupId": 20899000,
       "defaultSailor": 21390501,
-      "startOpenFOWTileIds": [
-        1818,
-        1817
-      ],
+      "startOpenFOWTileIds": [1818, 1817],
       "startRoyalTitelId": 21700000,
       "isBasicAdmiral": false,
       "questId0": 82000036,
@@ -1729,14 +1397,9 @@
       "id": 20000037,
       "mateId": 21200036,
       "startTownId": 11000000,
-      "defaultTowns": [
-        70412033
-      ],
+      "defaultTowns": [70412033],
       "defaultSailor": 21390502,
-      "startOpenFOWTileIds": [
-        1818,
-        1817
-      ],
+      "startOpenFOWTileIds": [1818, 1817],
       "startRoyalTitelId": 21700000,
       "isBasicAdmiral": false,
       "questId0": 82000037,

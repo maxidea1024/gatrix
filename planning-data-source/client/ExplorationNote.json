@@ -7,13 +7,7 @@
       "sortingOrder": "number",
       "explorationNoteType": "number",
       "explorationNoteTargetType": "number",
-      "explorationNoteTarget": [
-        "number",
-        "number",
-        "number",
-        "number",
-        "number"
-      ],
+      "explorationNoteTarget": ["number", "number", "number", "number", "number"],
       "reward": "number"
     },
     ":required": {
@@ -28,9 +22,7 @@
     },
     ":enum": {},
     ":links": {
-      "reward": [
-        "RewardFixed"
-      ]
+      "reward": ["RewardFixed"]
     }
   },
   "ExplorationNote": {
@@ -41,13 +33,7 @@
       "sortingOrder": 0,
       "explorationNoteType": 0,
       "explorationNoteTargetType": 0,
-      "explorationNoteTarget": [
-        70414006,
-        70414085,
-        70414057,
-        70414082,
-        70414096
-      ],
+      "explorationNoteTarget": [70414006, 70414085, 70414057, 70414082, 70414096],
       "reward": 94011001
     },
     "99900001": {
@@ -57,11 +43,7 @@
       "sortingOrder": 1,
       "explorationNoteType": 0,
       "explorationNoteTargetType": 0,
-      "explorationNoteTarget": [
-        70414005,
-        70414004,
-        70414045
-      ],
+      "explorationNoteTarget": [70414005, 70414004, 70414045],
       "reward": 94011001
     },
     "99905000": {
@@ -70,10 +52,7 @@
       "desc": "하늘을 관찰하고 연구합니다.",
       "sortingOrder": 2,
       "explorationNoteType": 0,
-      "explorationNoteTarget": [
-        99900000,
-        99900001
-      ],
+      "explorationNoteTarget": [99900000, 99900001],
       "reward": 94011001
     }
   }

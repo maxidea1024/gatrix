@@ -15,10 +15,7 @@
           "Value": "number"
         }
       ],
-      "advSpcEff": [
-        "number",
-        "number"
-      ],
+      "advSpcEff": ["number", "number"],
       "addEventSpot": [
         {
           "Id": "number",
@@ -63,10 +60,7 @@
           "Value": 0
         }
       ],
-      "advSpcEff": [
-        77400000,
-        77400000
-      ],
+      "advSpcEff": [77400000, 77400000],
       "addEventSpot": [
         {
           "Id": 77200000
@@ -87,10 +81,7 @@
           "Value": 999
         }
       ],
-      "advSpcEff": [
-        77499999,
-        77499999
-      ],
+      "advSpcEff": [77499999, 77499999],
       "addEventSpot": [
         {
           "Id": 77299999
@@ -99,19 +90,10 @@
     },
     ":enum": {},
     ":links": {
-      "advSpcEff": [
-        [
-          "AdventureSpecialEffect"
-        ],
-        [
-          "AdventureSpecialEffect"
-        ]
-      ],
+      "advSpcEff": [["AdventureSpecialEffect"], ["AdventureSpecialEffect"]],
       "addEventSpot": [
         {
-          "Id": [
-            "AdventureEventSpot"
-          ]
+          "Id": ["AdventureEventSpot"]
         }
       ]
     }
@@ -495,9 +477,7 @@
           "Value": 3
         }
       ],
-      "advSpcEff": [
-        77410003
-      ]
+      "advSpcEff": [77410003]
     },
     "77590001": {
       "id": 77590001,
@@ -509,9 +489,7 @@
           "Value": 3
         }
       ],
-      "advSpcEff": [
-        77410004
-      ]
+      "advSpcEff": [77410004]
     },
     "77590002": {
       "id": 77590002,
@@ -523,9 +501,7 @@
           "Value": 3
         }
       ],
-      "advSpcEff": [
-        77410005
-      ]
+      "advSpcEff": [77410005]
     },
     "77590003": {
       "id": 77590003,
@@ -537,9 +513,7 @@
           "Value": 5
         }
       ],
-      "advSpcEff": [
-        77410006
-      ]
+      "advSpcEff": [77410006]
     },
     "77590004": {
       "id": 77590004,
@@ -551,9 +525,7 @@
           "Value": 5
         }
       ],
-      "advSpcEff": [
-        77410007
-      ]
+      "advSpcEff": [77410007]
     },
     "77590005": {
       "id": 77590005,
@@ -565,9 +537,7 @@
           "Value": 5
         }
       ],
-      "advSpcEff": [
-        77410008
-      ]
+      "advSpcEff": [77410008]
     },
     "77590006": {
       "id": 77590006,
@@ -579,9 +549,7 @@
           "Value": 7
         }
       ],
-      "advSpcEff": [
-        77410009
-      ]
+      "advSpcEff": [77410009]
     },
     "77590007": {
       "id": 77590007,
@@ -593,9 +561,7 @@
           "Value": 7
         }
       ],
-      "advSpcEff": [
-        77410010
-      ]
+      "advSpcEff": [77410010]
     },
     "77590008": {
       "id": 77590008,
@@ -607,9 +573,7 @@
           "Value": 7
         }
       ],
-      "advSpcEff": [
-        77410013
-      ]
+      "advSpcEff": [77410013]
     },
     "77590009": {
       "id": 77590009,
@@ -626,9 +590,7 @@
           "Value": 5
         }
       ],
-      "advSpcEff": [
-        77410014
-      ]
+      "advSpcEff": [77410014]
     },
     "77590010": {
       "id": 77590010,
@@ -640,9 +602,7 @@
           "Value": 5
         }
       ],
-      "advSpcEff": [
-        77410015
-      ]
+      "advSpcEff": [77410015]
     }
   }
 }

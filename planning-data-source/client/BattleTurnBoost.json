@@ -89,39 +89,25 @@
     ":links": {
       "battleBuffInfos": [
         {
-          "Id": [
-            "BattleBuff"
-          ]
+          "Id": ["BattleBuff"]
         },
         {
-          "Id": [
-            "BattleBuff"
-          ]
+          "Id": ["BattleBuff"]
         },
         {
-          "Id": [
-            "BattleBuff"
-          ]
+          "Id": ["BattleBuff"]
         },
         {
-          "Id": [
-            "BattleBuff"
-          ]
+          "Id": ["BattleBuff"]
         },
         {
-          "Id": [
-            "BattleBuff"
-          ]
+          "Id": ["BattleBuff"]
         },
         {
-          "Id": [
-            "BattleBuff"
-          ]
+          "Id": ["BattleBuff"]
         },
         {
-          "Id": [
-            "BattleBuff"
-          ]
+          "Id": ["BattleBuff"]
         }
       ]
     },

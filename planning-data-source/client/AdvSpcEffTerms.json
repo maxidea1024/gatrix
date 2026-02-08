@@ -3,16 +3,9 @@
     ":type": {
       "id": "key",
       "termsType": "number",
-      "termsTypeTag": [
-        "number",
-        "number",
-        "number"
-      ],
+      "termsTypeTag": ["number", "number", "number"],
       "termsSpotType": "number",
-      "termsSpotTag": [
-        "number",
-        "number"
-      ],
+      "termsSpotTag": ["number", "number"],
       "termsInequalitySign": "number",
       "termsValue": "number"
     },
@@ -37,70 +30,47 @@
     "77460001": {
       "id": 77460001,
       "termsType": 9,
-      "termsTypeTag": [
-        9
-      ],
+      "termsTypeTag": [9],
       "termsInequalitySign": 4,
       "termsValue": 10
     },
     "77460002": {
       "id": 77460002,
       "termsType": 4,
-      "termsTypeTag": [
-        1014
-      ]
+      "termsTypeTag": [1014]
     },
     "77460003": {
       "id": 77460003,
       "termsType": 4,
-      "termsTypeTag": [
-        1011,
-        1012,
-        1013
-      ]
+      "termsTypeTag": [1011, 1012, 1013]
     },
     "77460004": {
       "id": 77460004,
       "termsType": 2,
-      "termsTypeTag": [
-        1021
-      ],
+      "termsTypeTag": [1021],
       "termsInequalitySign": 2,
       "termsValue": 2
     },
     "77460005": {
       "id": 77460005,
       "termsType": 7,
-      "termsTypeTag": [
-        10001031,
-        10001071,
-        10001033
-      ]
+      "termsTypeTag": [10001031, 10001071, 10001033]
     },
     "77460006": {
       "id": 77460006,
       "termsType": 1,
-      "termsTypeTag": [
-        1021
-      ],
-      "termsSpotTag": [
-        10003,
-        10004
-      ]
+      "termsTypeTag": [1021],
+      "termsSpotTag": [10003, 10004]
     },
     "77460007": {
       "id": 77460007,
       "termsType": 4,
-      "termsTypeTag": [
-        1012
-      ]
+      "termsTypeTag": [1012]
     },
     "77460008": {
       "id": 77460008,
       "termsType": 3,
-      "termsTypeTag": [
-        1002
-      ]
+      "termsTypeTag": [1002]
     }
   }
 }

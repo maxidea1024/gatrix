@@ -20,12 +20,12 @@ Monitor and manage game server instances (worlds/channels).
 
 ## World Status
 
-| Status | Description |
-|--------|-------------|
-| **Online** | Server is running normally |
+| Status          | Description                 |
+| --------------- | --------------------------- |
+| **Online**      | Server is running normally  |
 | **Maintenance** | Server is under maintenance |
-| **Offline** | Server is not running |
-| **Full** | Server is at capacity |
+| **Offline**     | Server is not running       |
+| **Full**        | Server is at capacity       |
 
 ## Managing a World
 
@@ -48,6 +48,6 @@ await gatrix.gameWorlds.register({
   region: 'KR',
   capacity: 1000,
   currentPlayers: 500,
-  status: 'online'
+  status: 'online',
 });
 ```

@@ -1,10 +1,10 @@
-import { Router } from "express";
-import multer from "multer";
-import { ChannelController } from "../controllers/ChannelController";
-import { MessageController } from "../controllers/MessageController";
-import { InvitationController } from "../controllers/InvitationController";
-import { authenticate, rateLimiter, validateInput } from "../middleware/auth";
-import Joi from "joi";
+import { Router } from 'express';
+import multer from 'multer';
+import { ChannelController } from '../controllers/ChannelController';
+import { MessageController } from '../controllers/MessageController';
+import { InvitationController } from '../controllers/InvitationController';
+import { authenticate, rateLimiter, validateInput } from '../middleware/auth';
+import Joi from 'joi';
 
 // Multer 설정 - 메모리 저장소 사용 (임시)
 const upload = multer({
@@ -16,24 +16,24 @@ const upload = multer({
   fileFilter: (req, file, cb) => {
     // 허용할 파일 타입 (이미지, 문서, 비디오 등)
     const allowedMimes = [
-      "image/jpeg",
-      "image/png",
-      "image/gif",
-      "image/webp",
-      "application/pdf",
-      "text/plain",
-      "application/msword",
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-      "video/mp4",
-      "video/webm",
-      "audio/mpeg",
-      "audio/wav",
+      'image/jpeg',
+      'image/png',
+      'image/gif',
+      'image/webp',
+      'application/pdf',
+      'text/plain',
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'video/mp4',
+      'video/webm',
+      'audio/mpeg',
+      'audio/wav',
     ];
 
     if (allowedMimes.includes(file.mimetype)) {
       cb(null, true);
     } else {
-      cb(new Error("File type not allowed"));
+      cb(new Error('File type not allowed'));
     }
   },
 });
@@ -44,7 +44,7 @@ const router = Router();
 const createChannelSchema = Joi.object({
   name: Joi.string().min(1).max(255).required(),
   description: Joi.string().max(1000).optional(),
-  type: Joi.string().valid("public", "private", "direct").required(),
+  type: Joi.string().valid('public', 'private', 'direct').required(),
   maxMembers: Joi.number().integer().min(1).max(10000).optional(),
   settings: Joi.object({
     allowFileUploads: Joi.boolean().optional(),
@@ -86,118 +86,118 @@ router.use(authenticate);
 
 // 채널 생성
 router.post(
-  "/",
+  '/',
   rateLimiter(60000, 10), // 1분에 10개 채널 생성 제한
   validateInput(createChannelSchema),
-  ChannelController.create,
+  ChannelController.create
 );
 
 // 사용자의 채널 목록 조회
 router.get(
-  "/my",
+  '/my',
   rateLimiter(60000, 100), // 1분에 100회 요청 제한
-  ChannelController.getUserChannels,
+  ChannelController.getUserChannels
 );
 
 // 인기 채널 조회
 router.get(
-  "/popular",
+  '/popular',
   rateLimiter(60000, 60), // 1분에 60회 요청 제한
-  ChannelController.getPopular,
+  ChannelController.getPopular
 );
 
 // 채널 검색
 router.get(
-  "/search",
+  '/search',
   rateLimiter(60000, 60), // 1분에 60회 검색 제한
-  ChannelController.search,
+  ChannelController.search
 );
 
 // 특정 채널 조회
 router.get(
-  "/:id",
+  '/:id',
   rateLimiter(60000, 200), // 1분에 200회 요청 제한
-  ChannelController.getById,
+  ChannelController.getById
 );
 
 // 채널 업데이트
 router.put(
-  "/:id",
+  '/:id',
   rateLimiter(60000, 20), // 1분에 20회 업데이트 제한
   validateInput(updateChannelSchema),
-  ChannelController.update,
+  ChannelController.update
 );
 
 // 채널 삭제
 router.delete(
-  "/:id",
+  '/:id',
   rateLimiter(60000, 5), // 1분에 5회 삭제 제한
   validateInput(deleteChannelSchema),
-  ChannelController.delete,
+  ChannelController.delete
 );
 
 // 채널 통계 조회
 router.get(
-  "/:id/stats",
+  '/:id/stats',
   rateLimiter(60000, 60), // 1분에 60회 요청 제한
-  ChannelController.getStats,
+  ChannelController.getStats
 );
 
 // 채널의 메시지 조회
 router.get(
-  "/:id/messages",
+  '/:id/messages',
   rateLimiter(60000, 200), // 1분에 200회 요청 제한
-  ChannelController.getMessages,
+  ChannelController.getMessages
 );
 
 // 채널을 읽음으로 표시
 router.post(
-  "/:id/read",
+  '/:id/read',
   rateLimiter(60000, 100), // 1분에 100회 요청 제한
-  ChannelController.markAsRead,
+  ChannelController.markAsRead
 );
 
 // 채널에 메시지 보내기
 router.post(
-  "/:id/messages",
+  '/:id/messages',
   rateLimiter(60000, 60), // 1분에 60개 메시지 생성 제한
-  upload.array("attachments", 5) as any, // 최대 5개 파일 첨부 허용
-  MessageController.createInChannel,
+  upload.array('attachments', 5) as any, // 최대 5개 파일 첨부 허용
+  MessageController.createInChannel
 );
 
 // 채널 참여
 router.post(
-  "/:id/join",
+  '/:id/join',
   rateLimiter(60000, 30), // 1분에 30회 참여 제한
-  ChannelController.joinChannel,
+  ChannelController.joinChannel
 );
 
 // 채널 나가기
 router.post(
-  "/:id/leave",
+  '/:id/leave',
   rateLimiter(60000, 30), // 1분에 30회 나가기 제한
-  ChannelController.leaveChannel,
+  ChannelController.leaveChannel
 );
 
 // 채널에 사용자 초대
 router.post(
-  "/:channelId/invite",
+  '/:channelId/invite',
   rateLimiter(60000, 20), // 1분에 20회 초대 제한
-  InvitationController.inviteUser,
+  InvitationController.inviteUser
 );
 
 // 채널의 pending invitation 목록 조회
 router.get(
-  "/:channelId/pending-invitations",
+  '/:channelId/pending-invitations',
   rateLimiter(60000, 60), // 1분에 60회 요청 제한
-  InvitationController.getChannelPendingInvitations,
+  InvitationController.getChannelPendingInvitations
 );
 
 // 채널 존재 여부 확인
 router.head(
-  "/:id",
+  '/:id',
   rateLimiter(60000, 100), // 1분에 100회 요청 제한
-  ChannelController.checkExists,
+  ChannelController.checkExists
 );
 
 export default router;

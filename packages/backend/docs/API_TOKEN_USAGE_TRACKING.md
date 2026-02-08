@@ -92,35 +92,40 @@ TTL: 5분
 ## 동기화 프로세스
 
 ### 1. 캐시 수집
+
 - 모든 `token_usage:*` 패턴의 캐시 키 검색
 - 각 토큰별로 여러 인스턴스의 사용량 집계
 
 ### 2. 데이터 집계
+
 ```typescript
 interface AggregatedStats {
-  totalUsageCount: number;    // 모든 인스턴스의 사용량 합계
-  latestUsedAt: Date;        // 가장 최근 사용 시간
-  instances: string[];       // 사용한 인스턴스 목록
+  totalUsageCount: number; // 모든 인스턴스의 사용량 합계
+  latestUsedAt: Date; // 가장 최근 사용 시간
+  instances: string[]; // 사용한 인스턴스 목록
 }
 ```
 
 ### 3. DB 업데이트
+
 - 현재 DB 사용량에 집계된 사용량 추가
 - 마지막 사용 시간 업데이트
 - 관련 토큰 캐시 무효화
 
 ### 4. 캐시 정리
+
 - 성공적으로 동기화된 캐시 항목 삭제
 
 ## 로깅
 
 ### 디버그 로그
+
 ```typescript
 // 토큰 사용 기록
 logger.debug('Token usage recorded in cache', {
   tokenId,
   usageCount: stats.usageCount,
-  instanceId: this.instanceId
+  instanceId: this.instanceId,
 });
 
 // DB 업데이트
@@ -130,11 +135,12 @@ logger.debug('Database updated for token', {
   addedUsageCount,
   newUsageCount,
   lastUsedAt,
-  instances
+  instances,
 });
 ```
 
 ### 정보 로그
+
 ```typescript
 // 동기화 시작/완료
 logger.info('Starting token usage synchronization', { instanceId });
@@ -145,6 +151,7 @@ logger.info(`Successfully synced usage data for ${tokenCount} tokens`);
 ```
 
 ### 에러 로그
+
 ```typescript
 // 캐시 실패 (API 요청은 계속 처리)
 logger.error('Failed to record token usage in cache:', error);
@@ -156,12 +163,14 @@ logger.error('Token usage synchronization failed:', error);
 ## 모니터링
 
 ### 주요 메트릭
+
 - 동기화 성공/실패율
 - 캐시 히트율
 - 동기화 지연 시간
 - 인스턴스별 사용량 분포
 
 ### 알림 조건
+
 - 동기화 연속 실패
 - 캐시 사용량 급증
 - 비정상적인 토큰 사용 패턴
@@ -169,54 +178,65 @@ logger.error('Token usage synchronization failed:', error);
 ## 장애 처리
 
 ### 캐시 장애
+
 - 사용량 기록 실패 시 로그만 남기고 API 요청 계속 처리
 - 동기화 시 캐시 읽기 실패한 항목은 건너뛰기
 
 ### DB 장애
+
 - QueueService의 재시도 메커니즘 활용
 - 지수 백오프로 재시도 간격 증가
 
 ### 네트워크 분할
+
 - 각 인스턴스가 독립적으로 캐시 관리
 - 복구 후 자동으로 집계 및 동기화
 
 ## 성능 최적화
 
 ### 캐시 최적화
+
 - TTL을 동기화 주기의 2배로 설정하여 데이터 손실 방지
 - 인스턴스별 캐시 키로 동시성 문제 해결
 
 ### DB 최적화
+
 - 배치 업데이트로 DB 부하 분산
 - 인덱스 추가로 조회 성능 향상
 
 ### 메모리 최적화
+
 - 동기화 완료 후 캐시 항목 즉시 삭제
 - 만료된 캐시 항목 주기적 정리
 
 ## 확장성
 
 ### 수평 확장
+
 - 여러 Gatrix 인스턴스가 동일한 Redis 공유
 - 인스턴스별 고유 ID로 사용량 구분
 
 ### 수직 확장
+
 - 동기화 주기 조정으로 성능 튜닝
 - 캐시 TTL 조정으로 메모리 사용량 제어
 
 ## 문제 해결
 
 ### 사용량 불일치
+
 1. 캐시와 DB 간 일시적 불일치는 정상
 2. 동기화 주기 후 일치 확인
 3. 필요시 수동 동기화 실행
 
 ### 성능 저하
+
 1. 동기화 주기 증가 고려
 2. 캐시 TTL 조정
 3. DB 인덱스 확인
 
 ### 메모리 사용량 증가
+
 1. 캐시 정리 주기 확인
 2. TTL 설정 검토
 3. 동기화 주기 단축 고려

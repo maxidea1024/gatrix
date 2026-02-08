@@ -15,9 +15,7 @@
     },
     ":enum": {},
     ":links": {
-      "shipBlueprintId": [
-        "ShipBlueprint"
-      ]
+      "shipBlueprintId": ["ShipBlueprint"]
     }
   },
   "DefaultShipBlueprint": {

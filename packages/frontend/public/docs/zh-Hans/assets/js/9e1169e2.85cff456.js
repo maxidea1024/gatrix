@@ -1,1 +1,106 @@
-"use strict";(globalThis.webpackChunkdocs=globalThis.webpackChunkdocs||[]).push([[789],{4552(n,e,t){t.r(e),t.d(e,{assets:()=>c,contentTitle:()=>a,default:()=>u,frontMatter:()=>o,metadata:()=>i,toc:()=>d});const i=JSON.parse('{"id":"admin/maintenance","title":"?\ufffd\ufffd? \uad00\ufffd?","description":"?\ufffd\ube44???\ufffd\ufffd????\ufffd\ufffd?\uc904\ub9c1?\ufffd\uace0 \uad00\ub9ac\ud569?\ufffd\ub2e4.","source":"@site/docs/admin/maintenance.md","sourceDirName":"admin","slug":"/admin/maintenance","permalink":"/docs/zh-Hans/admin/maintenance","draft":false,"unlisted":false,"editUrl":"https://github.com/your-org/gatrix/tree/main/docs/docs/admin/maintenance.md","tags":[],"version":"current","sidebarPosition":1,"frontMatter":{"sidebar_position":1},"sidebar":"tutorialSidebar","previous":{"title":"\uae30\ud68d?\ufffd\uc774??","permalink":"/docs/zh-Hans/guide/planning-data"},"next":{"title":"?\ufffd\uc774?\ufffd\ub9ac?\ufffd\ud2b8","permalink":"/docs/zh-Hans/admin/whitelist"}}');var s=t(4848),r=t(8453);const o={sidebar_position:1},a="?\ufffd\ufffd? \uad00\ufffd?",c={},d=[{value:"?\ufffd\ufffd? ?\ufffd\ud615",id:"-\ud615",level:2}];function l(n){const e={h1:"h1",h2:"h2",header:"header",li:"li",p:"p",strong:"strong",ul:"ul",...(0,r.R)(),...n.components};return(0,s.jsxs)(s.Fragment,{children:[(0,s.jsx)(e.header,{children:(0,s.jsx)(e.h1,{id:"-\uad00",children:"?\ufffd\ufffd? \uad00\ufffd?"})}),"\n",(0,s.jsx)(e.p,{children:"?\ufffd\ube44???\ufffd\ufffd????\ufffd\ufffd?\uc904\ub9c1?\ufffd\uace0 \uad00\ub9ac\ud569?\ufffd\ub2e4."}),"\n",(0,s.jsx)(e.h2,{id:"-\ud615",children:"?\ufffd\ufffd? ?\ufffd\ud615"}),"\n",(0,s.jsxs)(e.ul,{children:["\n",(0,s.jsxs)(e.li,{children:[(0,s.jsx)(e.strong,{children:"?\ufffd\uae30 ?\ufffd\ufffd?"}),": ?\ufffd\uc57d???\ufffd\uac04???\ufffd\uc791"]}),"\n",(0,s.jsxs)(e.li,{children:[(0,s.jsx)(e.strong,{children:"\uae34\uae09 ?\ufffd\ufffd?"}),": \uc989\uc2dc ?\ufffd\uc791"]}),"\n"]})]})}function u(n={}){const{wrapper:e}={...(0,r.R)(),...n.components};return e?(0,s.jsx)(e,{...n,children:(0,s.jsx)(l,{...n})}):l(n)}},8453(n,e,t){t.d(e,{R:()=>o,x:()=>a});var i=t(6540);const s={},r=i.createContext(s);function o(n){const e=i.useContext(r);return i.useMemo(function(){return"function"==typeof n?n(e):{...e,...n}},[e,n])}function a(n){let e;return e=n.disableParentContext?"function"==typeof n.components?n.components(s):n.components||s:o(n.components),i.createElement(r.Provider,{value:e},n.children)}}}]);
+'use strict';
+(globalThis.webpackChunkdocs = globalThis.webpackChunkdocs || []).push([
+  [789],
+  {
+    4552(n, e, t) {
+      (t.r(e),
+        t.d(e, {
+          assets: () => c,
+          contentTitle: () => a,
+          default: () => u,
+          frontMatter: () => o,
+          metadata: () => i,
+          toc: () => d,
+        }));
+      const i = JSON.parse(
+        '{"id":"admin/maintenance","title":"?\ufffd\ufffd? \uad00\ufffd?","description":"?\ufffd\ube44???\ufffd\ufffd????\ufffd\ufffd?\uc904\ub9c1?\ufffd\uace0 \uad00\ub9ac\ud569?\ufffd\ub2e4.","source":"@site/docs/admin/maintenance.md","sourceDirName":"admin","slug":"/admin/maintenance","permalink":"/docs/zh-Hans/admin/maintenance","draft":false,"unlisted":false,"editUrl":"https://github.com/your-org/gatrix/tree/main/docs/docs/admin/maintenance.md","tags":[],"version":"current","sidebarPosition":1,"frontMatter":{"sidebar_position":1},"sidebar":"tutorialSidebar","previous":{"title":"\uae30\ud68d?\ufffd\uc774??","permalink":"/docs/zh-Hans/guide/planning-data"},"next":{"title":"?\ufffd\uc774?\ufffd\ub9ac?\ufffd\ud2b8","permalink":"/docs/zh-Hans/admin/whitelist"}}'
+      );
+      var s = t(4848),
+        r = t(8453);
+      const o = { sidebar_position: 1 },
+        a = '?\ufffd\ufffd? \uad00\ufffd?',
+        c = {},
+        d = [{ value: '?\ufffd\ufffd? ?\ufffd\ud615', id: '-\ud615', level: 2 }];
+      function l(n) {
+        const e = {
+          h1: 'h1',
+          h2: 'h2',
+          header: 'header',
+          li: 'li',
+          p: 'p',
+          strong: 'strong',
+          ul: 'ul',
+          ...(0, r.R)(),
+          ...n.components,
+        };
+        return (0, s.jsxs)(s.Fragment, {
+          children: [
+            (0, s.jsx)(e.header, {
+              children: (0, s.jsx)(e.h1, {
+                id: '-\uad00',
+                children: '?\ufffd\ufffd? \uad00\ufffd?',
+              }),
+            }),
+            '\n',
+            (0, s.jsx)(e.p, {
+              children:
+                '?\ufffd\ube44???\ufffd\ufffd????\ufffd\ufffd?\uc904\ub9c1?\ufffd\uace0 \uad00\ub9ac\ud569?\ufffd\ub2e4.',
+            }),
+            '\n',
+            (0, s.jsx)(e.h2, { id: '-\ud615', children: '?\ufffd\ufffd? ?\ufffd\ud615' }),
+            '\n',
+            (0, s.jsxs)(e.ul, {
+              children: [
+                '\n',
+                (0, s.jsxs)(e.li, {
+                  children: [
+                    (0, s.jsx)(e.strong, { children: '?\ufffd\uae30 ?\ufffd\ufffd?' }),
+                    ': ?\ufffd\uc57d???\ufffd\uac04???\ufffd\uc791',
+                  ],
+                }),
+                '\n',
+                (0, s.jsxs)(e.li, {
+                  children: [
+                    (0, s.jsx)(e.strong, { children: '\uae34\uae09 ?\ufffd\ufffd?' }),
+                    ': \uc989\uc2dc ?\ufffd\uc791',
+                  ],
+                }),
+                '\n',
+              ],
+            }),
+          ],
+        });
+      }
+      function u(n = {}) {
+        const { wrapper: e } = { ...(0, r.R)(), ...n.components };
+        return e ? (0, s.jsx)(e, { ...n, children: (0, s.jsx)(l, { ...n }) }) : l(n);
+      }
+    },
+    8453(n, e, t) {
+      t.d(e, { R: () => o, x: () => a });
+      var i = t(6540);
+      const s = {},
+        r = i.createContext(s);
+      function o(n) {
+        const e = i.useContext(r);
+        return i.useMemo(
+          function () {
+            return 'function' == typeof n ? n(e) : { ...e, ...n };
+          },
+          [e, n]
+        );
+      }
+      function a(n) {
+        let e;
+        return (
+          (e = n.disableParentContext
+            ? 'function' == typeof n.components
+              ? n.components(s)
+              : n.components || s
+            : o(n.components)),
+          i.createElement(r.Provider, { value: e }, n.children)
+        );
+      }
+    },
+  },
+]);

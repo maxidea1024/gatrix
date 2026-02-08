@@ -274,88 +274,52 @@
     },
     ":enum": {},
     ":links": {
-      "cEquipLink": [
-        "CEquip"
-      ],
+      "cEquipLink": ["CEquip"],
       "relateItem": [
         {
-          "Id": [
-            "Item",
-            "CEquip"
-          ]
+          "Id": ["Item", "CEquip"]
         },
         {
-          "Id": [
-            "Item",
-            "CEquip"
-          ]
+          "Id": ["Item", "CEquip"]
         },
         {
-          "Id": [
-            "Item",
-            "CEquip"
-          ]
+          "Id": ["Item", "CEquip"]
         },
         {
-          "Id": [
-            "Item",
-            "CEquip"
-          ]
+          "Id": ["Item", "CEquip"]
         }
       ],
       "needSpecialStat": [
         {
-          "Id": [
-            "SpecialStat"
-          ]
+          "Id": ["SpecialStat"]
         },
         {
-          "Id": [
-            "SpecialStat"
-          ]
+          "Id": ["SpecialStat"]
         },
         {
-          "Id": [
-            "SpecialStat"
-          ]
+          "Id": ["SpecialStat"]
         }
       ],
       "contentsTerms": [
         {
-          "Id": [
-            "ContentsTerms"
-          ]
+          "Id": ["ContentsTerms"]
         },
         {
-          "Id": [
-            "ContentsTerms"
-          ]
+          "Id": ["ContentsTerms"]
         },
         {
-          "Id": [
-            "ContentsTerms"
-          ]
+          "Id": ["ContentsTerms"]
         }
       ],
       "instanceReward": [
         {
-          "Id": [
-            "Reward"
-          ]
+          "Id": ["Reward"]
         }
       ],
-      "locatedNationId": [
-        "Nation"
-      ],
-      "locatedTownId": [
-        "Town"
-      ],
-      "locatedRegionId": [
-        "Region"
-      ],
-      "fishId": [
-        "Fish"
-      ]
+      "locatedNationId": ["Nation"],
+      "locatedTownId": ["Town"],
+      "locatedRegionId": ["Region"],
+      "fishId": ["Fish"]
     }
   },
   "Discovery": {

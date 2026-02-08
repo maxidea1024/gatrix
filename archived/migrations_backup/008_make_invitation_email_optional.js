@@ -3,7 +3,7 @@
  * This allows creating invitations without specifying an email address
  */
 
-exports.up = async function(connection) {
+exports.up = async function (connection) {
   // Connection is provided by the migration system
   console.log('Making email field optional in g_invitations table...');
 
@@ -15,7 +15,7 @@ exports.up = async function(connection) {
   console.log('✓ Email field in g_invitations table is now optional');
 };
 
-exports.down = async function(connection) {
+exports.down = async function (connection) {
   // Connection is provided by the migration system
   console.log('Making email field required in g_invitations table...');
 

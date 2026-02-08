@@ -35,21 +35,23 @@ npm run test:redis-connection
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      scriptSrc: ["'self'"],
-      imgSrc: ["'self'", "data:", "https:"],
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        scriptSrc: ["'self'"],
+        imgSrc: ["'self'", 'data:', 'https:'],
+      },
     },
-  },
-  hsts: {
-    maxAge: 31536000,
-    includeSubDomains: true,
-    preload: true
-  }
-}));
+    hsts: {
+      maxAge: 31536000,
+      includeSubDomains: true,
+      preload: true,
+    },
+  })
+);
 
 // Rate Limiting
 const limiter = rateLimit({
@@ -112,7 +114,7 @@ const httpRequestDuration = new prometheus.Histogram({
   name: 'http_request_duration_seconds',
   help: 'Duration of HTTP requests in seconds',
   labelNames: ['method', 'route', 'status_code'],
-  buckets: [0.1, 0.3, 0.5, 0.7, 1, 3, 5, 7, 10]
+  buckets: [0.1, 0.3, 0.5, 0.7, 1, 3, 5, 7, 10],
 });
 
 register.registerMetric(httpRequestDuration);

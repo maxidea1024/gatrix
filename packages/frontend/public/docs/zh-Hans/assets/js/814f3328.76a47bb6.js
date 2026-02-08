@@ -1,1 +1,11 @@
-"use strict";(globalThis.webpackChunkdocs=globalThis.webpackChunkdocs||[]).push([[7472],{5513(e){e.exports=JSON.parse('{"title":"Recent posts","items":[{"title":"Gatrix Performance Optimization Guide","permalink":"/docs/zh-Hans/blog/performance-optimization","unlisted":false,"date":"2024-01-20T00:00:00.000Z"},{"title":"Gatrix Production Deployment Tips and Best Practices","permalink":"/docs/zh-Hans/blog/production-deployment-tips","unlisted":false,"date":"2024-01-15T00:00:00.000Z"},{"title":"Gatrix API Integration and Webhook Setup Guide","permalink":"/docs/zh-Hans/blog/api-integration-webhooks","unlisted":false,"date":"2021-08-26T00:00:00.000Z"},{"title":"Gatrix Real-time Chat Server Setup Guide","permalink":"/docs/zh-Hans/blog/real-time-chat-server-setup","unlisted":false,"date":"2021-08-01T00:00:00.000Z"},{"title":"Mastering Gatrix Job Management System","permalink":"/docs/zh-Hans/blog/mastering-job-management-system","unlisted":false,"date":"2019-05-29T00:00:00.000Z"}]}')}}]);
+'use strict';
+(globalThis.webpackChunkdocs = globalThis.webpackChunkdocs || []).push([
+  [7472],
+  {
+    5513(e) {
+      e.exports = JSON.parse(
+        '{"title":"Recent posts","items":[{"title":"Gatrix Performance Optimization Guide","permalink":"/docs/zh-Hans/blog/performance-optimization","unlisted":false,"date":"2024-01-20T00:00:00.000Z"},{"title":"Gatrix Production Deployment Tips and Best Practices","permalink":"/docs/zh-Hans/blog/production-deployment-tips","unlisted":false,"date":"2024-01-15T00:00:00.000Z"},{"title":"Gatrix API Integration and Webhook Setup Guide","permalink":"/docs/zh-Hans/blog/api-integration-webhooks","unlisted":false,"date":"2021-08-26T00:00:00.000Z"},{"title":"Gatrix Real-time Chat Server Setup Guide","permalink":"/docs/zh-Hans/blog/real-time-chat-server-setup","unlisted":false,"date":"2021-08-01T00:00:00.000Z"},{"title":"Mastering Gatrix Job Management System","permalink":"/docs/zh-Hans/blog/mastering-job-management-system","unlisted":false,"date":"2019-05-29T00:00:00.000Z"}]}'
+      );
+    },
+  },
+]);

@@ -5,7 +5,9 @@
  */
 
 async function up(connection) {
-  console.log('Updating worldServerAddress comment in g_game_worlds to allow URL or host:port format...');
+  console.log(
+    'Updating worldServerAddress comment in g_game_worlds to allow URL or host:port format...'
+  );
 
   await connection.execute(`
     ALTER TABLE g_game_worlds
@@ -27,4 +29,3 @@ async function down(connection) {
 }
 
 module.exports = { up, down };
-

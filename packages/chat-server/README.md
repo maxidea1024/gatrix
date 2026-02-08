@@ -5,30 +5,35 @@
 ## 🚀 주요 기능
 
 ### 📡 실시간 통신
+
 - **Socket.IO 기반** WebSocket 서버
 - **Redis Adapter**를 통한 다중 인스턴스 동기화
 - **JWT 인증** 및 **Rate Limiting**
 - **타이핑 인디케이터** 및 **사용자 상태**
 
 ### ⚡ 고성능 아키텍처
+
 - **클러스터링**: CPU 코어 수만큼 워커 프로세스 생성
 - **수평 확장**: 무제한 서버 인스턴스 추가 가능
 - **로드 밸런싱**: HAProxy를 통한 Sticky Session 지원
 - **Redis 클러스터**: 고가용성 캐싱 및 세션 관리
 
 ### 🔄 메시지 브로드캐스팅 최적화
+
 - **배치 처리**: 1000개씩 메시지 배치 전송
 - **압축**: MessagePack + gzip으로 대역폭 70% 절약
 - **캐싱**: LRU 캐시로 중복 메시지 처리 최적화
 - **샤딩**: 채널별 샤딩으로 부하 분산
 
 ### 🗄️ 데이터베이스 최적화
+
 - **파티셔닝**: 시간/해시 기반 테이블 파티셔닝
 - **인덱싱**: 쿼리 성능 최적화 인덱스
 - **연결 풀링**: 효율적인 데이터베이스 연결 관리
 - **마이그레이션**: Knex.js 기반 스키마 관리
 
 ### 📊 모니터링 및 메트릭
+
 - **Prometheus**: 실시간 성능 지표 수집
 - **Grafana**: 시각화 대시보드
 - **헬스 체크**: 서버 상태 모니터링
@@ -117,6 +122,7 @@ chmod +x scripts/deploy.sh
 ### REST API 엔드포인트
 
 #### 채널 관리
+
 - `GET /api/v1/channels` - 사용자 채널 목록
 - `POST /api/v1/channels` - 채널 생성
 - `GET /api/v1/channels/:id` - 채널 정보 조회
@@ -124,6 +130,7 @@ chmod +x scripts/deploy.sh
 - `DELETE /api/v1/channels/:id` - 채널 삭제
 
 #### 메시지 관리
+
 - `GET /api/v1/messages/channel/:channelId` - 채널 메시지 목록
 - `POST /api/v1/messages` - 메시지 전송
 - `GET /api/v1/messages/:id` - 메시지 조회
@@ -133,6 +140,7 @@ chmod +x scripts/deploy.sh
 ### WebSocket 이벤트
 
 #### 클라이언트 → 서버
+
 - `join_channel` - 채널 참여
 - `leave_channel` - 채널 나가기
 - `send_message` - 메시지 전송
@@ -140,6 +148,7 @@ chmod +x scripts/deploy.sh
 - `typing_stop` - 타이핑 중지
 
 #### 서버 → 클라이언트
+
 - `message` - 새 메시지
 - `user_joined` - 사용자 참여
 - `user_left` - 사용자 나감
@@ -182,10 +191,10 @@ BROADCAST_BATCH_SIZE=1000
 
 ```typescript
 // 자동 클러스터링 (CPU 코어 수만큼)
-CLUSTER_WORKERS=0
+CLUSTER_WORKERS = 0;
 
 // 수동 클러스터링
-CLUSTER_WORKERS=4
+CLUSTER_WORKERS = 4;
 ```
 
 ## 📊 모니터링
@@ -209,11 +218,13 @@ CLUSTER_WORKERS=4
 ## 🔒 보안
 
 ### 인증 및 권한
+
 - JWT 토큰 기반 인증
 - Gatrix 메인 서버와 토큰 검증 연동
 - Rate Limiting으로 DDoS 방지
 
 ### 데이터 보호
+
 - HTTPS/WSS 암호화 통신
 - 입력 데이터 검증 및 새니타이징
 - SQL Injection 방지

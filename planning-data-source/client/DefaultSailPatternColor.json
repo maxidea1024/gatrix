@@ -15,9 +15,7 @@
     },
     ":enum": {},
     ":links": {
-      "defaultsailpatterncolorId": [
-        "SailPatternColor"
-      ]
+      "defaultsailpatterncolorId": ["SailPatternColor"]
     }
   },
   "DefaultSailPatternColor": {

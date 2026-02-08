@@ -12,7 +12,7 @@
 const TABLES_REQUIRING_ENVIRONMENT = [
   'g_remote_config_segments',
   'g_remote_config_context_fields',
-  'g_remote_config_campaigns'
+  'g_remote_config_campaigns',
 ];
 
 module.exports = {
@@ -150,6 +150,5 @@ module.exports = {
         DROP COLUMN environmentId
       `);
     }
-  }
+  },
 };
-

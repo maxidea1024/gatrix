@@ -20,13 +20,7 @@
       "addOceanDisasterRate3f": "number",
       "addCombatOceanDisasterRate3f": "number",
       "canAttackedAnywhere": "bool",
-      "desc": [
-        "text",
-        "text",
-        "text",
-        "text",
-        "text"
-      ]
+      "desc": ["text", "text", "text", "text", "text"]
     },
     ":required": {
       "name": 1,

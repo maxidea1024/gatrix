@@ -1,1 +1,231 @@
-"use strict";(globalThis.webpackChunkdocs=globalThis.webpackChunkdocs||[]).push([[5163],{4956(e,n,i){i.r(n),i.d(n,{assets:()=>c,contentTitle:()=>d,default:()=>o,frontMatter:()=>l,metadata:()=>s,toc:()=>a});const s=JSON.parse('{"id":"api/client-api","title":"\u5ba2\u6237\u7aef API","description":"\u8fd9\u4e9b\u662f\u6e38\u620f\u5ba2\u6237\u7aef\u53ef\u4ee5\u76f4\u63a5\u8c03\u7528\u7684\u516c\u5171 API \u7aef\u70b9\u3002","source":"@site/i18n/zh-Hans/docusaurus-plugin-content-docs/current/api/client-api.md","sourceDirName":"api","slug":"/api/client-api","permalink":"/docs/zh-Hans/api/client-api","draft":false,"unlisted":false,"editUrl":"https://github.com/your-org/gatrix/tree/main/docs/docs/api/client-api.md","tags":[],"version":"current","sidebarPosition":1,"frontMatter":{"sidebar_position":1,"sidebar_label":"\u5ba2\u6237\u7aef API"},"sidebar":"tutorialSidebar","previous":{"title":"Client-side SDKs","permalink":"/docs/zh-Hans/sdks/client-side"},"next":{"title":"\u670d\u52a1\u5668 SDK API","permalink":"/docs/zh-Hans/api/server-sdk-api"}}');var t=i(4848),r=i(8453);const l={sidebar_position:1,sidebar_label:"\u5ba2\u6237\u7aef API"},d="\u5ba2\u6237\u7aef API",c={},a=[{value:"\u7279\u70b9",id:"\u7279\u70b9",level:2},{value:"API \u7aef\u70b9",id:"api-\u7aef\u70b9",level:2},{value:"1. \u5ba2\u6237\u7aef\u7248\u672c\u4fe1\u606f",id:"1-\u5ba2\u6237\u7aef\u7248\u672c\u4fe1\u606f",level:3},{value:"\u67e5\u8be2\u53c2\u6570",id:"\u67e5\u8be2\u53c2\u6570",level:4},{value:"2. \u6e38\u620f\u4e16\u754c\u5217\u8868",id:"2-\u6e38\u620f\u4e16\u754c\u5217\u8868",level:3},{value:"3. \u670d\u52a1\u516c\u544a",id:"3-\u670d\u52a1\u516c\u544a",level:3}];function h(e){const n={code:"code",h1:"h1",h2:"h2",h3:"h3",h4:"h4",header:"header",li:"li",p:"p",pre:"pre",strong:"strong",table:"table",tbody:"tbody",td:"td",th:"th",thead:"thead",tr:"tr",ul:"ul",...(0,r.R)(),...e.components};return(0,t.jsxs)(t.Fragment,{children:[(0,t.jsx)(n.header,{children:(0,t.jsx)(n.h1,{id:"\u5ba2\u6237\u7aef-api",children:"\u5ba2\u6237\u7aef API"})}),"\n",(0,t.jsx)(n.p,{children:"\u8fd9\u4e9b\u662f\u6e38\u620f\u5ba2\u6237\u7aef\u53ef\u4ee5\u76f4\u63a5\u8c03\u7528\u7684\u516c\u5171 API \u7aef\u70b9\u3002"}),"\n",(0,t.jsx)(n.h2,{id:"\u7279\u70b9",children:"\u7279\u70b9"}),"\n",(0,t.jsxs)(n.ul,{children:["\n",(0,t.jsxs)(n.li,{children:[(0,t.jsx)(n.strong,{children:"\u65e0\u9700\u8eab\u4efd\u9a8c\u8bc1"}),": \u53ef\u7531\u5ba2\u6237\u7aef\u76f4\u63a5\u8bbf\u95ee"]}),"\n",(0,t.jsxs)(n.li,{children:[(0,t.jsx)(n.strong,{children:"\u8bbf\u95ee\u9650\u5236"}),": \u5e94\u7528\u4e86\u901f\u7387\u9650\u5236\u4ee5\u5904\u7406\u8fc7\u91cf\u8bf7\u6c42"]}),"\n",(0,t.jsxs)(n.li,{children:[(0,t.jsx)(n.strong,{children:"\u9ad8\u6027\u80fd\u7f13\u5b58"}),": \u901a\u8fc7\u672c\u5730\u5185\u5b58\u7f13\u5b58\u5b9e\u73b0\u5feb\u901f\u54cd\u5e94"]}),"\n",(0,t.jsxs)(n.li,{children:[(0,t.jsx)(n.strong,{children:"\u5b9e\u65f6\u5237\u65b0"}),": \u7ba1\u7406\u5458\u66f4\u6539\u8bbe\u7f6e\u65f6\uff0c\u901a\u8fc7 Pub/Sub \u7acb\u5373\u66f4\u65b0\u7f13\u5b58"]}),"\n"]}),"\n",(0,t.jsx)(n.h2,{id:"api-\u7aef\u70b9",children:"API \u7aef\u70b9"}),"\n",(0,t.jsx)(n.h3,{id:"1-\u5ba2\u6237\u7aef\u7248\u672c\u4fe1\u606f",children:"1. \u5ba2\u6237\u7aef\u7248\u672c\u4fe1\u606f"}),"\n",(0,t.jsx)(n.pre,{children:(0,t.jsx)(n.code,{children:"GET /api/v1/client/client-version\n"})}),"\n",(0,t.jsx)(n.p,{children:"\u67e5\u8be2\u6e38\u620f\u5ba2\u6237\u7aef\u7684\u7248\u672c\u4fe1\u606f\u3002"}),"\n",(0,t.jsx)(n.h4,{id:"\u67e5\u8be2\u53c2\u6570",children:"\u67e5\u8be2\u53c2\u6570"}),"\n",(0,t.jsxs)(n.table,{children:[(0,t.jsx)(n.thead,{children:(0,t.jsxs)(n.tr,{children:[(0,t.jsx)(n.th,{children:"\u53c2\u6570"}),(0,t.jsx)(n.th,{children:"\u7c7b\u578b"}),(0,t.jsx)(n.th,{children:"\u8bf4\u660e"})]})}),(0,t.jsxs)(n.tbody,{children:[(0,t.jsxs)(n.tr,{children:[(0,t.jsx)(n.td,{children:"channel"}),(0,t.jsx)(n.td,{children:"string"}),(0,t.jsx)(n.td,{children:"\u6e20\u9053\u7b5b\u9009\uff08\u4f8b\u5982\uff1aPC, Mobile\uff09"})]}),(0,t.jsxs)(n.tr,{children:[(0,t.jsx)(n.td,{children:"subChannel"}),(0,t.jsx)(n.td,{children:"string"}),(0,t.jsx)(n.td,{children:"\u5b50\u6e20\u9053\u7b5b\u9009\uff08\u4f8b\u5982\uff1aSteam, Google, iOS\uff09"})]})]})]}),"\n",(0,t.jsx)(n.h3,{id:"2-\u6e38\u620f\u4e16\u754c\u5217\u8868",children:"2. \u6e38\u620f\u4e16\u754c\u5217\u8868"}),"\n",(0,t.jsx)(n.pre,{children:(0,t.jsx)(n.code,{children:"GET /api/v1/client/game-worlds\n"})}),"\n",(0,t.jsx)(n.p,{children:"\u83b7\u53d6\u53ef\u7528\u7684\u6e38\u620f\u670d\u52a1\u5668\uff08\u4e16\u754c\uff09\u5217\u8868\u3002"}),"\n",(0,t.jsx)(n.h3,{id:"3-\u670d\u52a1\u516c\u544a",children:"3. \u670d\u52a1\u516c\u544a"}),"\n",(0,t.jsx)(n.pre,{children:(0,t.jsx)(n.code,{children:"GET /api/v1/client/notices\n"})}),"\n",(0,t.jsx)(n.p,{children:"\u83b7\u53d6\u5f53\u524d\u6709\u6548\u7684\u670d\u52a1\u516c\u544a\u3002"})]})}function o(e={}){const{wrapper:n}={...(0,r.R)(),...e.components};return n?(0,t.jsx)(n,{...e,children:(0,t.jsx)(h,{...e})}):h(e)}},8453(e,n,i){i.d(n,{R:()=>l,x:()=>d});var s=i(6540);const t={},r=s.createContext(t);function l(e){const n=s.useContext(r);return s.useMemo(function(){return"function"==typeof e?e(n):{...n,...e}},[n,e])}function d(e){let n;return n=e.disableParentContext?"function"==typeof e.components?e.components(t):e.components||t:l(e.components),s.createElement(r.Provider,{value:n},e.children)}}}]);
+'use strict';
+(globalThis.webpackChunkdocs = globalThis.webpackChunkdocs || []).push([
+  [5163],
+  {
+    4956(e, n, i) {
+      (i.r(n),
+        i.d(n, {
+          assets: () => c,
+          contentTitle: () => d,
+          default: () => o,
+          frontMatter: () => l,
+          metadata: () => s,
+          toc: () => a,
+        }));
+      const s = JSON.parse(
+        '{"id":"api/client-api","title":"\u5ba2\u6237\u7aef API","description":"\u8fd9\u4e9b\u662f\u6e38\u620f\u5ba2\u6237\u7aef\u53ef\u4ee5\u76f4\u63a5\u8c03\u7528\u7684\u516c\u5171 API \u7aef\u70b9\u3002","source":"@site/i18n/zh-Hans/docusaurus-plugin-content-docs/current/api/client-api.md","sourceDirName":"api","slug":"/api/client-api","permalink":"/docs/zh-Hans/api/client-api","draft":false,"unlisted":false,"editUrl":"https://github.com/your-org/gatrix/tree/main/docs/docs/api/client-api.md","tags":[],"version":"current","sidebarPosition":1,"frontMatter":{"sidebar_position":1,"sidebar_label":"\u5ba2\u6237\u7aef API"},"sidebar":"tutorialSidebar","previous":{"title":"Client-side SDKs","permalink":"/docs/zh-Hans/sdks/client-side"},"next":{"title":"\u670d\u52a1\u5668 SDK API","permalink":"/docs/zh-Hans/api/server-sdk-api"}}'
+      );
+      var t = i(4848),
+        r = i(8453);
+      const l = { sidebar_position: 1, sidebar_label: '\u5ba2\u6237\u7aef API' },
+        d = '\u5ba2\u6237\u7aef API',
+        c = {},
+        a = [
+          { value: '\u7279\u70b9', id: '\u7279\u70b9', level: 2 },
+          { value: 'API \u7aef\u70b9', id: 'api-\u7aef\u70b9', level: 2 },
+          {
+            value: '1. \u5ba2\u6237\u7aef\u7248\u672c\u4fe1\u606f',
+            id: '1-\u5ba2\u6237\u7aef\u7248\u672c\u4fe1\u606f',
+            level: 3,
+          },
+          { value: '\u67e5\u8be2\u53c2\u6570', id: '\u67e5\u8be2\u53c2\u6570', level: 4 },
+          {
+            value: '2. \u6e38\u620f\u4e16\u754c\u5217\u8868',
+            id: '2-\u6e38\u620f\u4e16\u754c\u5217\u8868',
+            level: 3,
+          },
+          { value: '3. \u670d\u52a1\u516c\u544a', id: '3-\u670d\u52a1\u516c\u544a', level: 3 },
+        ];
+      function h(e) {
+        const n = {
+          code: 'code',
+          h1: 'h1',
+          h2: 'h2',
+          h3: 'h3',
+          h4: 'h4',
+          header: 'header',
+          li: 'li',
+          p: 'p',
+          pre: 'pre',
+          strong: 'strong',
+          table: 'table',
+          tbody: 'tbody',
+          td: 'td',
+          th: 'th',
+          thead: 'thead',
+          tr: 'tr',
+          ul: 'ul',
+          ...(0, r.R)(),
+          ...e.components,
+        };
+        return (0, t.jsxs)(t.Fragment, {
+          children: [
+            (0, t.jsx)(n.header, {
+              children: (0, t.jsx)(n.h1, {
+                id: '\u5ba2\u6237\u7aef-api',
+                children: '\u5ba2\u6237\u7aef API',
+              }),
+            }),
+            '\n',
+            (0, t.jsx)(n.p, {
+              children:
+                '\u8fd9\u4e9b\u662f\u6e38\u620f\u5ba2\u6237\u7aef\u53ef\u4ee5\u76f4\u63a5\u8c03\u7528\u7684\u516c\u5171 API \u7aef\u70b9\u3002',
+            }),
+            '\n',
+            (0, t.jsx)(n.h2, { id: '\u7279\u70b9', children: '\u7279\u70b9' }),
+            '\n',
+            (0, t.jsxs)(n.ul, {
+              children: [
+                '\n',
+                (0, t.jsxs)(n.li, {
+                  children: [
+                    (0, t.jsx)(n.strong, { children: '\u65e0\u9700\u8eab\u4efd\u9a8c\u8bc1' }),
+                    ': \u53ef\u7531\u5ba2\u6237\u7aef\u76f4\u63a5\u8bbf\u95ee',
+                  ],
+                }),
+                '\n',
+                (0, t.jsxs)(n.li, {
+                  children: [
+                    (0, t.jsx)(n.strong, { children: '\u8bbf\u95ee\u9650\u5236' }),
+                    ': \u5e94\u7528\u4e86\u901f\u7387\u9650\u5236\u4ee5\u5904\u7406\u8fc7\u91cf\u8bf7\u6c42',
+                  ],
+                }),
+                '\n',
+                (0, t.jsxs)(n.li, {
+                  children: [
+                    (0, t.jsx)(n.strong, { children: '\u9ad8\u6027\u80fd\u7f13\u5b58' }),
+                    ': \u901a\u8fc7\u672c\u5730\u5185\u5b58\u7f13\u5b58\u5b9e\u73b0\u5feb\u901f\u54cd\u5e94',
+                  ],
+                }),
+                '\n',
+                (0, t.jsxs)(n.li, {
+                  children: [
+                    (0, t.jsx)(n.strong, { children: '\u5b9e\u65f6\u5237\u65b0' }),
+                    ': \u7ba1\u7406\u5458\u66f4\u6539\u8bbe\u7f6e\u65f6\uff0c\u901a\u8fc7 Pub/Sub \u7acb\u5373\u66f4\u65b0\u7f13\u5b58',
+                  ],
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, t.jsx)(n.h2, { id: 'api-\u7aef\u70b9', children: 'API \u7aef\u70b9' }),
+            '\n',
+            (0, t.jsx)(n.h3, {
+              id: '1-\u5ba2\u6237\u7aef\u7248\u672c\u4fe1\u606f',
+              children: '1. \u5ba2\u6237\u7aef\u7248\u672c\u4fe1\u606f',
+            }),
+            '\n',
+            (0, t.jsx)(n.pre, {
+              children: (0, t.jsx)(n.code, { children: 'GET /api/v1/client/client-version\n' }),
+            }),
+            '\n',
+            (0, t.jsx)(n.p, {
+              children:
+                '\u67e5\u8be2\u6e38\u620f\u5ba2\u6237\u7aef\u7684\u7248\u672c\u4fe1\u606f\u3002',
+            }),
+            '\n',
+            (0, t.jsx)(n.h4, {
+              id: '\u67e5\u8be2\u53c2\u6570',
+              children: '\u67e5\u8be2\u53c2\u6570',
+            }),
+            '\n',
+            (0, t.jsxs)(n.table, {
+              children: [
+                (0, t.jsx)(n.thead, {
+                  children: (0, t.jsxs)(n.tr, {
+                    children: [
+                      (0, t.jsx)(n.th, { children: '\u53c2\u6570' }),
+                      (0, t.jsx)(n.th, { children: '\u7c7b\u578b' }),
+                      (0, t.jsx)(n.th, { children: '\u8bf4\u660e' }),
+                    ],
+                  }),
+                }),
+                (0, t.jsxs)(n.tbody, {
+                  children: [
+                    (0, t.jsxs)(n.tr, {
+                      children: [
+                        (0, t.jsx)(n.td, { children: 'channel' }),
+                        (0, t.jsx)(n.td, { children: 'string' }),
+                        (0, t.jsx)(n.td, {
+                          children:
+                            '\u6e20\u9053\u7b5b\u9009\uff08\u4f8b\u5982\uff1aPC, Mobile\uff09',
+                        }),
+                      ],
+                    }),
+                    (0, t.jsxs)(n.tr, {
+                      children: [
+                        (0, t.jsx)(n.td, { children: 'subChannel' }),
+                        (0, t.jsx)(n.td, { children: 'string' }),
+                        (0, t.jsx)(n.td, {
+                          children:
+                            '\u5b50\u6e20\u9053\u7b5b\u9009\uff08\u4f8b\u5982\uff1aSteam, Google, iOS\uff09',
+                        }),
+                      ],
+                    }),
+                  ],
+                }),
+              ],
+            }),
+            '\n',
+            (0, t.jsx)(n.h3, {
+              id: '2-\u6e38\u620f\u4e16\u754c\u5217\u8868',
+              children: '2. \u6e38\u620f\u4e16\u754c\u5217\u8868',
+            }),
+            '\n',
+            (0, t.jsx)(n.pre, {
+              children: (0, t.jsx)(n.code, { children: 'GET /api/v1/client/game-worlds\n' }),
+            }),
+            '\n',
+            (0, t.jsx)(n.p, {
+              children:
+                '\u83b7\u53d6\u53ef\u7528\u7684\u6e38\u620f\u670d\u52a1\u5668\uff08\u4e16\u754c\uff09\u5217\u8868\u3002',
+            }),
+            '\n',
+            (0, t.jsx)(n.h3, {
+              id: '3-\u670d\u52a1\u516c\u544a',
+              children: '3. \u670d\u52a1\u516c\u544a',
+            }),
+            '\n',
+            (0, t.jsx)(n.pre, {
+              children: (0, t.jsx)(n.code, { children: 'GET /api/v1/client/notices\n' }),
+            }),
+            '\n',
+            (0, t.jsx)(n.p, {
+              children: '\u83b7\u53d6\u5f53\u524d\u6709\u6548\u7684\u670d\u52a1\u516c\u544a\u3002',
+            }),
+          ],
+        });
+      }
+      function o(e = {}) {
+        const { wrapper: n } = { ...(0, r.R)(), ...e.components };
+        return n ? (0, t.jsx)(n, { ...e, children: (0, t.jsx)(h, { ...e }) }) : h(e);
+      }
+    },
+    8453(e, n, i) {
+      i.d(n, { R: () => l, x: () => d });
+      var s = i(6540);
+      const t = {},
+        r = s.createContext(t);
+      function l(e) {
+        const n = s.useContext(r);
+        return s.useMemo(
+          function () {
+            return 'function' == typeof e ? e(n) : { ...n, ...e };
+          },
+          [n, e]
+        );
+      }
+      function d(e) {
+        let n;
+        return (
+          (n = e.disableParentContext
+            ? 'function' == typeof e.components
+              ? e.components(t)
+              : e.components || t
+            : l(e.components)),
+          s.createElement(r.Provider, { value: n }, e.children)
+        );
+      }
+    },
+  },
+]);

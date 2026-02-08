@@ -17,6 +17,7 @@ docker compose -f docker-compose.dev.yml logs -f frontend-dev
 ```
 
 **자동 설정:**
+
 - `DOCKER_ENV=true` (docker-compose.dev.yml에서 자동 설정)
 - Backend URL: `http://backend-dev:5000`
 - Frontend: `http://localhost:3000`
@@ -42,6 +43,7 @@ yarn dev
 ```
 
 **자동 설정:**
+
 - `DOCKER_ENV` 미설정 또는 `false`
 - Backend URL: `http://localhost:5000` (또는 `BACKEND_PORT` 환경 변수)
 - Frontend: `http://localhost:3000`
@@ -99,6 +101,7 @@ VITE_DEFAULT_LANGUAGE=ko
 **원인:** Backend가 실행되지 않았거나 잘못된 포트로 프록시 설정됨
 
 **해결:**
+
 ```bash
 # Backend가 실행 중인지 확인
 # Docker 환경
@@ -114,10 +117,12 @@ yarn dev
 **증상:** `[vite] http proxy error: Error: connect ECONNREFUSED`
 
 **원인:**
+
 - Docker 환경: `DOCKER_ENV=true`가 설정되지 않음
 - 로컬 환경: Backend 포트가 잘못 설정됨
 
 **해결:**
+
 ```bash
 # Docker 환경
 # docker-compose.dev.yml에 DOCKER_ENV=true가 있는지 확인
@@ -135,6 +140,7 @@ cat .env.local
 **원인:** GitHub OAuth 앱 설정의 callback URL이 잘못됨
 
 **해결:**
+
 - GitHub OAuth 앱 설정에서 Authorization callback URL을 다음으로 설정:
   - Docker: `http://localhost:3000/api/v1/auth/github/callback`
   - Local: `http://localhost:3000/api/v1/auth/github/callback`
@@ -193,4 +199,3 @@ yarn preview
 - Vite 설정: `vite.config.ts`
 - Docker 설정: `../../docker-compose.dev.yml`
 - Backend 설정: `../backend/.env`
-

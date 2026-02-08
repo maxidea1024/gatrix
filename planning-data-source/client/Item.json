@@ -53,15 +53,8 @@
       ],
       "requiredLv": "number",
       "canRefresh": "bool",
-      "burstGroups": [
-        "number",
-        "number",
-        "number"
-      ],
-      "treasureMapGroup": [
-        "number",
-        "number"
-      ],
+      "burstGroups": ["number", "number", "number"],
+      "treasureMapGroup": ["number", "number"],
       "fishingCount": "number",
       "fishingSkill": "number",
       "salvageHp": "number",
@@ -82,21 +75,14 @@
       "pointIconType": "number",
       "enchantSlotKeepRate": "number",
       "enchantCEquipKeepRate": "number",
-      "gainRegionId": [
-        "number",
-        "number"
-      ],
+      "gainRegionId": ["number", "number"],
       "rewardNotice": "bool",
       "choiceBoxGroup": "number",
       "unlockKey": {
         "Item": "number",
         "Count": "number"
       },
-      "timeCostBuildingMenu": [
-        "number",
-        "number",
-        "number"
-      ]
+      "timeCostBuildingMenu": ["number", "number", "number"]
     },
     ":required": {
       "name": 1,
@@ -128,15 +114,8 @@
       "discoveryPoint": 1,
       "discoveryDucat": 1,
       "battleSoundType": 1,
-      "gainRegionId": [
-        12000000,
-        12000000
-      ],
-      "timeCostBuildingMenu": [
-        38400000,
-        38400000,
-        38400000
-      ]
+      "gainRegionId": [12000000, 12000000],
+      "timeCostBuildingMenu": [38400000, 38400000, 38400000]
     },
     ":max": {
       "type": 38,
@@ -157,52 +136,18 @@
       "discoveryPoint": 99999,
       "discoveryDucat": 99999999,
       "battleSoundType": 99999999,
-      "gainRegionId": [
-        12099999,
-        12099999
-      ],
-      "timeCostBuildingMenu": [
-        38419999,
-        38419999,
-        38419999
-      ]
+      "gainRegionId": [12099999, 12099999],
+      "timeCostBuildingMenu": [38419999, 38419999, 38419999]
     },
     ":enum": {},
     ":links": {
-      "gachaRewardId": [
-        "Reward"
-      ],
-      "buffId": [
-        "WorldBuff"
-      ],
-      "adventurerSkillId": [
-        "WorldSkill"
-      ],
-      "battleSkillId": [
-        "BattleSkill"
-      ],
-      "advFunc": [
-        "AdventureItemFunction"
-      ],
-      "gainRegionId": [
-        [
-          "Region"
-        ],
-        [
-          "Region"
-        ]
-      ],
-      "timeCostBuildingMenu": [
-        [
-          "BuildingMenu"
-        ],
-        [
-          "BuildingMenu"
-        ],
-        [
-          "BuildingMenu"
-        ]
-      ]
+      "gachaRewardId": ["Reward"],
+      "buffId": ["WorldBuff"],
+      "adventurerSkillId": ["WorldSkill"],
+      "battleSkillId": ["BattleSkill"],
+      "advFunc": ["AdventureItemFunction"],
+      "gainRegionId": [["Region"], ["Region"]],
+      "timeCostBuildingMenu": [["BuildingMenu"], ["BuildingMenu"], ["BuildingMenu"]]
     }
   },
   "Item": {
@@ -2083,9 +2028,7 @@
       "icon": "Icon_Item_23320000_Sprite",
       "desc": "바다에 표류하던 병 속에 담겨있던 편지로, 돌발 임무를 시작할 수 있다.\n어떠한 사연이 적혀 있는지 읽어보자.\n(이 편지는 6개 이상 보유할 수 없다.)",
       "canRefresh": false,
-      "burstGroups": [
-        100
-      ],
+      "burstGroups": [100],
       "discoveryType": 0,
       "rewardNotice": false
     },
@@ -2117,9 +2060,7 @@
       "icon": "Icon_Item_23320000_Sprite",
       "desc": "보물지도입니다. 6개이상 보유 불가능합니다.",
       "canRefresh": false,
-      "treasureMapGroup": [
-        100
-      ],
+      "treasureMapGroup": [100],
       "discoveryType": 0,
       "rewardNotice": false
     },
@@ -2152,9 +2093,7 @@
       "desc": "돌발 임무를 시작할 수 있다.",
       "requiredLv": 1,
       "canRefresh": false,
-      "burstGroups": [
-        10000
-      ],
+      "burstGroups": [10000],
       "discoveryType": 0,
       "rewardNotice": false
     },
@@ -2187,9 +2126,7 @@
       "desc": "돌발 임무를 시작할 수 있다.",
       "requiredLv": 6,
       "canRefresh": false,
-      "burstGroups": [
-        10001
-      ],
+      "burstGroups": [10001],
       "discoveryType": 0,
       "rewardNotice": false
     },
@@ -2222,9 +2159,7 @@
       "desc": "돌발 임무를 시작할 수 있다.",
       "requiredLv": 11,
       "canRefresh": false,
-      "burstGroups": [
-        10002
-      ],
+      "burstGroups": [10002],
       "discoveryType": 0,
       "rewardNotice": false
     },
@@ -2257,9 +2192,7 @@
       "desc": "돌발 임무를 시작할 수 있다.",
       "requiredLv": 16,
       "canRefresh": false,
-      "burstGroups": [
-        10003
-      ],
+      "burstGroups": [10003],
       "discoveryType": 0,
       "rewardNotice": false
     },
@@ -2292,9 +2225,7 @@
       "desc": "돌발 임무를 시작할 수 있다.",
       "requiredLv": 21,
       "canRefresh": false,
-      "burstGroups": [
-        10004
-      ],
+      "burstGroups": [10004],
       "discoveryType": 0,
       "rewardNotice": false
     },
@@ -2327,9 +2258,7 @@
       "desc": "돌발 임무를 시작할 수 있다.",
       "requiredLv": 26,
       "canRefresh": false,
-      "burstGroups": [
-        10004
-      ],
+      "burstGroups": [10004],
       "discoveryType": 0,
       "rewardNotice": false
     },
@@ -2362,9 +2291,7 @@
       "desc": "돌발 임무를 시작할 수 있다.",
       "requiredLv": 31,
       "canRefresh": false,
-      "burstGroups": [
-        10004
-      ],
+      "burstGroups": [10004],
       "discoveryType": 0,
       "rewardNotice": false
     },
@@ -2397,9 +2324,7 @@
       "desc": "돌발 임무를 시작할 수 있다.",
       "requiredLv": 36,
       "canRefresh": false,
-      "burstGroups": [
-        11000
-      ],
+      "burstGroups": [11000],
       "discoveryType": 0,
       "rewardNotice": false
     },
@@ -2432,9 +2357,7 @@
       "desc": "돌발 임무를 시작할 수 있다.",
       "requiredLv": 41,
       "canRefresh": false,
-      "burstGroups": [
-        11001
-      ],
+      "burstGroups": [11001],
       "discoveryType": 0,
       "rewardNotice": false
     },
@@ -2467,9 +2390,7 @@
       "desc": "돌발 임무를 시작할 수 있다.",
       "requiredLv": 46,
       "canRefresh": false,
-      "burstGroups": [
-        11002
-      ],
+      "burstGroups": [11002],
       "discoveryType": 0,
       "rewardNotice": false
     },
@@ -2502,9 +2423,7 @@
       "desc": "돌발 임무를 시작할 수 있다.",
       "requiredLv": 51,
       "canRefresh": false,
-      "burstGroups": [
-        11003
-      ],
+      "burstGroups": [11003],
       "discoveryType": 0,
       "rewardNotice": false
     },
@@ -2537,9 +2456,7 @@
       "desc": "돌발 임무를 시작할 수 있다.",
       "requiredLv": 56,
       "canRefresh": false,
-      "burstGroups": [
-        11004
-      ],
+      "burstGroups": [11004],
       "discoveryType": 0,
       "rewardNotice": false
     },
@@ -4999,9 +4916,7 @@
       "desc": "몹시 눅눅하고 냄새가 심한 융단이다.\n돌발 임무를 시작할 수 있다.",
       "requiredLv": 1,
       "canRefresh": false,
-      "burstGroups": [
-        11005
-      ],
+      "burstGroups": [11005],
       "discoveryType": 0,
       "rewardNotice": false
     },
@@ -63793,11 +63708,7 @@
       "desc": "소모 시간을 5분 단축할 수 있다.\n- 고용, 격려, 승급, 훈련, 학습, 건조, 제작, 합성, 파견",
       "discoveryType": 0,
       "rewardNotice": false,
-      "timeCostBuildingMenu": [
-        38400001,
-        38400002,
-        38400014
-      ]
+      "timeCostBuildingMenu": [38400001, 38400002, 38400014]
     },
     "23500053": {
       "id": 23500053,
@@ -63828,11 +63739,7 @@
       "desc": "소모 시간을 10분 단축할 수 있다.\n- 고용, 격려, 승급, 훈련, 학습, 건조, 제작, 합성, 파견",
       "discoveryType": 0,
       "rewardNotice": false,
-      "timeCostBuildingMenu": [
-        38400001,
-        38400002,
-        38400014
-      ]
+      "timeCostBuildingMenu": [38400001, 38400002, 38400014]
     },
     "23500054": {
       "id": 23500054,
@@ -63863,11 +63770,7 @@
       "desc": "소모 시간을 30분 단축할 수 있다.\n- 고용, 격려, 승급, 훈련, 학습, 건조, 제작, 합성, 파견",
       "discoveryType": 0,
       "rewardNotice": false,
-      "timeCostBuildingMenu": [
-        38400001,
-        38400002,
-        38400014
-      ]
+      "timeCostBuildingMenu": [38400001, 38400002, 38400014]
     },
     "23500055": {
       "id": 23500055,
@@ -63898,11 +63801,7 @@
       "desc": "소모 시간을 1시간 단축할 수 있다.\n- 고용, 격려, 승급, 훈련, 학습, 건조, 제작, 합성, 파견",
       "discoveryType": 0,
       "rewardNotice": false,
-      "timeCostBuildingMenu": [
-        38400001,
-        38400002,
-        38400014
-      ]
+      "timeCostBuildingMenu": [38400001, 38400002, 38400014]
     },
     "23500056": {
       "id": 23500056,
@@ -63933,11 +63832,7 @@
       "desc": "소모 시간을 6시간 단축할 수 있다.\n- 고용, 격려, 승급, 훈련, 학습, 건조, 제작, 합성, 파견",
       "discoveryType": 0,
       "rewardNotice": false,
-      "timeCostBuildingMenu": [
-        38400001,
-        38400002,
-        38400014
-      ]
+      "timeCostBuildingMenu": [38400001, 38400002, 38400014]
     },
     "23500057": {
       "id": 23500057,
@@ -63968,11 +63863,7 @@
       "desc": "소모 시간을 1일 단축할 수 있다.\n- 고용, 격려, 승급, 훈련, 학습, 건조, 제작, 합성, 파견",
       "discoveryType": 0,
       "rewardNotice": false,
-      "timeCostBuildingMenu": [
-        38400001,
-        38400002,
-        38400014
-      ]
+      "timeCostBuildingMenu": [38400001, 38400002, 38400014]
     },
     "23510000": {
       "id": 23510000,
@@ -71828,10 +71719,7 @@
       "icon": "Icon_Item_23220000_Sprite",
       "desc": "소형 선박 건조 시 배의 중심을 구성하는 재료.\n단단한 나무로 제작되었으며 소형 배에 적합한 크기이다.\n전투, 탐색, 조합 의뢰 보상으로 획득하거나, 도구점에서 구입할 수 있다.",
       "discoveryType": 0,
-      "gainRegionId": [
-        12000000,
-        12000200
-      ],
+      "gainRegionId": [12000000, 12000200],
       "rewardNotice": false
     },
     "23610001": {
@@ -71861,10 +71749,7 @@
       "icon": "Icon_Item_23220001_Sprite",
       "desc": "중형 선박 건조 시 배의 중심을 구성하는 재료.\n단단한 나무로 제작되었으며 중형 배에 적합한 크기이다.\n전투, 탐색, 조합 의뢰 보상으로 획득할 수 있다.",
       "discoveryType": 0,
-      "gainRegionId": [
-        12000200,
-        12000100
-      ],
+      "gainRegionId": [12000200, 12000100],
       "rewardNotice": false
     },
     "23610002": {
@@ -71894,10 +71779,7 @@
       "icon": "Icon_Item_23220002_Sprite",
       "desc": "대형 선박 건조 시 배의 중심을 구성하는 재료.\n단단한 나무로 제작되었으며 대형 배에 적합한 크기이다.\n전투, 탐색, 조합 의뢰 보상으로 획득할 수 있다.",
       "discoveryType": 0,
-      "gainRegionId": [
-        12000100,
-        12000400
-      ],
+      "gainRegionId": [12000100, 12000400],
       "rewardNotice": false
     },
     "23610003": {
@@ -71927,10 +71809,7 @@
       "icon": "Icon_Item_23220003_Sprite",
       "desc": "초대형 선박 건조 시 배의 중심을 구성하는 재료.\n단단한 나무로 제작되었으며 초대형 배에 적합한 크기이다.\n전투, 탐색, 조합 의뢰 보상으로 획득할 수 있다.",
       "discoveryType": 0,
-      "gainRegionId": [
-        12000400,
-        12000500
-      ],
+      "gainRegionId": [12000400, 12000500],
       "rewardNotice": false
     },
     "23610004": {
@@ -71960,10 +71839,7 @@
       "icon": "Icon_Item_23220004_Sprite",
       "desc": "선박 건조 시 여러 재료를 묶거나 엮는데 사용하는 밧줄.\n일반적인 섬유를 꼬아 제작되어 적당한 강도를 가지고 있다.\n전투, 탐색, 조합 의뢰 보상으로 획득하거나, 도구점에서 구입할 수 있다.",
       "discoveryType": 0,
-      "gainRegionId": [
-        12000500,
-        12000000
-      ],
+      "gainRegionId": [12000500, 12000000],
       "rewardNotice": false
     },
     "23610005": {
@@ -71993,10 +71869,7 @@
       "icon": "Icon_Item_23220005_Sprite",
       "desc": "선박 건조 시 여러 재료를 묶거나 엮는데 사용하는 밧줄.\n밧줄의 강도를 높이기 위한 처리가 되어 준수한 강도를 가지고 있다.\n전투, 탐색, 조합 의뢰 보상으로 획득할 수 있다.",
       "discoveryType": 0,
-      "gainRegionId": [
-        12000000,
-        12000200
-      ],
+      "gainRegionId": [12000000, 12000200],
       "rewardNotice": false
     },
     "23610006": {
@@ -72026,10 +71899,7 @@
       "icon": "Icon_Item_23220006_Sprite",
       "desc": "선박 건조 시 여러 재료를 묶거나 엮는데 사용하는 밧줄.\n꽤 강한 섬유와 제작 방식을 통해 강한 강도를 가지고 있다.\n전투, 탐색, 조합 의뢰 보상으로 획득할 수 있다.",
       "discoveryType": 0,
-      "gainRegionId": [
-        12000200,
-        12000100
-      ],
+      "gainRegionId": [12000200, 12000100],
       "rewardNotice": false
     },
     "23610007": {
@@ -72059,10 +71929,7 @@
       "icon": "Icon_Item_23220007_Sprite",
       "desc": "선박 건조 시 여러 재료를 묶거나 엮는데 사용하는 밧줄.\n매우 강한 섬유와 제작 방식을 통해 매우 강한 강도를 가지고 있다.\n전투, 탐색, 조합 의뢰 보상으로 획득할 수 있다.",
       "discoveryType": 0,
-      "gainRegionId": [
-        12000100,
-        12000400
-      ],
+      "gainRegionId": [12000100, 12000400],
       "rewardNotice": false
     },
     "23610008": {
@@ -72092,10 +71959,7 @@
       "icon": "Icon_Item_23220008_Sprite",
       "desc": "선박 건조 시 선체를 구성하는 데 사용하는 재료.\n약한 강도와 모양을 가진, 아직 가공되지 않은 삼나무.\n전투, 탐색, 조합 의뢰 보상으로 획득하거나, 도구점에서 구입할 수 있다.",
       "discoveryType": 0,
-      "gainRegionId": [
-        12000400,
-        12000500
-      ],
+      "gainRegionId": [12000400, 12000500],
       "rewardNotice": false
     },
     "23610009": {
@@ -72125,10 +71989,7 @@
       "icon": "Icon_Item_23220009_Sprite",
       "desc": "선박 건조 시 선체를 구성하는 데 사용하는 재료.\n약한 강도와 모양을 가진, 아직 가공되지 않은 가문비나무.\n전투, 탐색, 조합 의뢰 보상으로 획득하거나, 도구점에서 구입할 수 있다.",
       "discoveryType": 0,
-      "gainRegionId": [
-        12000500,
-        12000000
-      ],
+      "gainRegionId": [12000500, 12000000],
       "rewardNotice": false
     },
     "23610010": {
@@ -72158,10 +72019,7 @@
       "icon": "Icon_Item_23220010_Sprite",
       "desc": "선박 건조 시 선체를 구성하는 데 사용하는 재료.\n보통의 강도와 모양을 가진, 아직 가공되지 않은 적송\n전투, 탐색, 조합 의뢰 보상으로 획득하거나, 도구점에서 구입할 수 있다.",
       "discoveryType": 0,
-      "gainRegionId": [
-        12000000,
-        12000200
-      ],
+      "gainRegionId": [12000000, 12000200],
       "rewardNotice": false
     },
     "23610011": {
@@ -72191,10 +72049,7 @@
       "icon": "Icon_Item_23220011_Sprite",
       "desc": "선박 건조 시 선체를 구성하는 데 사용하는 재료.\n보통의 강도와 모양을 가진, 아직 가공되지 않은 오리나무.\n전투, 탐색, 조합 의뢰 보상으로 획득할 수 있다.",
       "discoveryType": 0,
-      "gainRegionId": [
-        12000200,
-        12000100
-      ],
+      "gainRegionId": [12000200, 12000100],
       "rewardNotice": false
     },
     "23610012": {
@@ -72224,10 +72079,7 @@
       "icon": "Icon_Item_23220012_Sprite",
       "desc": "선박 건조 시 선체를 구성하는 데 사용하는 재료.\n강한 강도와 좋은 모양을 가진, 아직 가공되지 않은 너도밤나무.\n전투, 탐색, 조합 의뢰 보상으로 획득할 수 있다.",
       "discoveryType": 0,
-      "gainRegionId": [
-        12000100,
-        12000400
-      ],
+      "gainRegionId": [12000100, 12000400],
       "rewardNotice": false
     },
     "23610013": {
@@ -72268,10 +72120,7 @@
         }
       ],
       "discoveryType": 0,
-      "gainRegionId": [
-        12000400,
-        12000500
-      ],
+      "gainRegionId": [12000400, 12000500],
       "rewardNotice": false
     },
     "23610014": {
@@ -72312,10 +72161,7 @@
         }
       ],
       "discoveryType": 0,
-      "gainRegionId": [
-        12000500,
-        12000000
-      ],
+      "gainRegionId": [12000500, 12000000],
       "rewardNotice": false
     },
     "23610015": {
@@ -72345,10 +72191,7 @@
       "icon": "Icon_Item_23220015_Sprite",
       "desc": "선박 건조 시 선체를 구성하는 데 사용하는 재료.\n매우 강한 강도와 고급스러운 모양을 가진, 아직 가공되지 않은 자단나무.\n전투, 탐색, 조합 의뢰 보상으로 획득할 수 있다.",
       "discoveryType": 0,
-      "gainRegionId": [
-        12000000,
-        12000200
-      ],
+      "gainRegionId": [12000000, 12000200],
       "rewardNotice": false
     },
     "23610016": {
@@ -72389,10 +72232,7 @@
         }
       ],
       "discoveryType": 0,
-      "gainRegionId": [
-        12000200,
-        12000100
-      ],
+      "gainRegionId": [12000200, 12000100],
       "rewardNotice": false
     },
     "23610017": {
@@ -72422,10 +72262,7 @@
       "icon": "Icon_Item_23220017_Sprite",
       "desc": "선박 건조 시 재료로 사용되는 삼나무 돛대.\n삼나무로 돛을 달기에 적합한 형태로 제작되었으며 약한 강도를 가지고 있다.\n전투, 탐색, 조합 의뢰 보상으로 획득하거나, 도구점에서 구입할 수 있다.",
       "discoveryType": 0,
-      "gainRegionId": [
-        12000100,
-        12000400
-      ],
+      "gainRegionId": [12000100, 12000400],
       "rewardNotice": false
     },
     "23610018": {
@@ -72455,10 +72292,7 @@
       "icon": "Icon_Item_23220018_Sprite",
       "desc": "선박 건조 시 재료로 사용되는 가문비나무 돛대.\n가문비나무로 돛을 달기에 적합한 형태로 제작되었으며 약한 강도를 가지고 있다.\n전투, 탐색, 조합 의뢰 보상으로 획득하거나, 도구점에서 구입할 수 있다.",
       "discoveryType": 0,
-      "gainRegionId": [
-        12000400,
-        12000500
-      ],
+      "gainRegionId": [12000400, 12000500],
       "rewardNotice": false
     },
     "23610019": {
@@ -72488,10 +72322,7 @@
       "icon": "Icon_Item_23220019_Sprite",
       "desc": "선박 건조 시 재료로 사용되는 적송 돛대.\n적송으로 돛을 달기에 적합한 형태로 제작되었으며 보통의 강도를 가지고 있다.\n전투, 탐색, 조합 의뢰 보상으로 획득하거나, 도구점에서 구입할 수 있다.",
       "discoveryType": 0,
-      "gainRegionId": [
-        12000500,
-        12000000
-      ],
+      "gainRegionId": [12000500, 12000000],
       "rewardNotice": false
     },
     "23610020": {
@@ -72521,10 +72352,7 @@
       "icon": "Icon_Item_23220020_Sprite",
       "desc": "선박 건조 시 재료로 사용되는 오리나무 돛대.\n오리나무로 돛을 달기에 적합한 형태로 제작되었으며 보통의 강도를 가지고 있다.\n전투, 탐색, 조합 의뢰 보상으로 획득할 수 있다.",
       "discoveryType": 0,
-      "gainRegionId": [
-        12000000,
-        12000200
-      ],
+      "gainRegionId": [12000000, 12000200],
       "rewardNotice": false
     },
     "23610021": {
@@ -72554,10 +72382,7 @@
       "icon": "Icon_Item_23220021_Sprite",
       "desc": "선박 건조 시 재료로 사용되는 너도밤나무 돛대.\n너도밤나무로 돛을 달기에 적합한 형태로 제작되었으며 강한 강도를 가지고 있다.\n전투, 탐색, 조합 의뢰 보상으로 획득할 수 있다.",
       "discoveryType": 0,
-      "gainRegionId": [
-        12000200,
-        12000100
-      ],
+      "gainRegionId": [12000200, 12000100],
       "rewardNotice": false
     },
     "23610022": {
@@ -72598,10 +72423,7 @@
         }
       ],
       "discoveryType": 0,
-      "gainRegionId": [
-        12000100,
-        12000400
-      ],
+      "gainRegionId": [12000100, 12000400],
       "rewardNotice": false
     },
     "23610023": {
@@ -72642,10 +72464,7 @@
         }
       ],
       "discoveryType": 0,
-      "gainRegionId": [
-        12000400,
-        12000500
-      ],
+      "gainRegionId": [12000400, 12000500],
       "rewardNotice": false
     },
     "23610024": {
@@ -72675,10 +72494,7 @@
       "icon": "Icon_Item_23220024_Sprite",
       "desc": "선박 건조 시 재료로 사용되는 자단나무 돛대.\n자단나무로 돛을 달기에 적합한 형태로 제작되었으며 매우 강한 강도를 가지고 있다.\n전투, 탐색, 조합 의뢰 보상으로 획득할 수 있다.",
       "discoveryType": 0,
-      "gainRegionId": [
-        12000500,
-        12000000
-      ],
+      "gainRegionId": [12000500, 12000000],
       "rewardNotice": false
     },
     "23610025": {
@@ -72719,10 +72535,7 @@
         }
       ],
       "discoveryType": 0,
-      "gainRegionId": [
-        12000000,
-        12000200
-      ],
+      "gainRegionId": [12000000, 12000200],
       "rewardNotice": false
     },
     "23610026": {
@@ -72752,10 +72565,7 @@
       "icon": "Icon_Item_23220026_Sprite",
       "desc": "선박 건조 시 재료로 사용되는 양모.\n풍기성이 좋아 풍력을 이용하기에 부적합한 섬유로 돛을 만드는데 사용한다.\n전투, 탐색, 조합 의뢰 보상으로 획득하거나, 도구점에서 구입할 수 있다.",
       "discoveryType": 0,
-      "gainRegionId": [
-        12000200,
-        12000100
-      ],
+      "gainRegionId": [12000200, 12000100],
       "rewardNotice": false
     },
     "23610027": {
@@ -72785,10 +72595,7 @@
       "icon": "Icon_Item_23220027_Sprite",
       "desc": "선박 건조 시 재료로 사용되는 삼베.\n풍기성이 좋아 풍력을 이용하기에 부적합한 섬유로 돛을 만드는데 사용한다.\n전투, 탐색, 조합 의뢰 보상으로 획득하거나, 도구점에서 구입할 수 있다.",
       "discoveryType": 0,
-      "gainRegionId": [
-        12000100,
-        12000400
-      ],
+      "gainRegionId": [12000100, 12000400],
       "rewardNotice": false
     },
     "23610028": {
@@ -72818,10 +72625,7 @@
       "icon": "Icon_Item_23220028_Sprite",
       "desc": "선박 건조 시 재료로 사용되는 고급 삼베.\n풍기성이 좋아 풍력을 이용하기에 부적합한 섬유로 돛을 만드는데 사용한다.\n전투, 탐색, 조합 의뢰 보상으로 획득하거나, 도구점에서 구입할 수 있다.",
       "discoveryType": 0,
-      "gainRegionId": [
-        12000400,
-        12000500
-      ],
+      "gainRegionId": [12000400, 12000500],
       "rewardNotice": false
     },
     "23610029": {
@@ -72851,10 +72655,7 @@
       "icon": "Icon_Item_23220029_Sprite",
       "desc": "선박 건조 시 재료로 사용되는 황마\n풍력을 이용하기에 적합한 섬유로 돛을 만드는데 사용한다.\n전투, 탐색, 조합 의뢰 보상으로 획득할 수 있다.",
       "discoveryType": 0,
-      "gainRegionId": [
-        12000500,
-        12000000
-      ],
+      "gainRegionId": [12000500, 12000000],
       "rewardNotice": false
     },
     "23610030": {
@@ -72884,10 +72685,7 @@
       "icon": "Icon_Item_23220030_Sprite",
       "desc": "선박 건조 시 재료로 사용되는 고급 황마.\n풍력을 이용하기에 적합한 섬유로 돛을 만드는데 사용한다.\n전투, 탐색, 조합 의뢰 보상으로 획득할 수 있다.",
       "discoveryType": 0,
-      "gainRegionId": [
-        12000000,
-        12000200
-      ],
+      "gainRegionId": [12000000, 12000200],
       "rewardNotice": false
     },
     "23610031": {
@@ -72917,10 +72715,7 @@
       "icon": "Icon_Item_23220031_Sprite",
       "desc": "선박 건조 시 재료로 사용되는 리넨.\n가볍고 풍력을 이용하기에 적합한 섬유로 돛을 만드는데 사용한다.\n전투, 탐색, 조합 의뢰 보상으로 획득할 수 있다.",
       "discoveryType": 0,
-      "gainRegionId": [
-        12000200,
-        12000100
-      ],
+      "gainRegionId": [12000200, 12000100],
       "rewardNotice": false
     },
     "23610032": {
@@ -72950,10 +72745,7 @@
       "icon": "Icon_Item_23220032_Sprite",
       "desc": "선박 건조 시 재료로 사용되는 고급 리넨.\n가볍고 풍력을 이용하기에 적합한 섬유로 돛을 만드는데 사용한다.\n전투, 탐색, 조합 의뢰 보상으로 획득할 수 있다.",
       "discoveryType": 0,
-      "gainRegionId": [
-        12000100,
-        12000400
-      ],
+      "gainRegionId": [12000100, 12000400],
       "rewardNotice": false
     },
     "23610033": {
@@ -72983,10 +72775,7 @@
       "icon": "Icon_Item_23220033_Sprite",
       "desc": "선박 건조 시 재료로 사용되는 면.\n매우 가볍고 풍력을 이용하기에 매우 적합한 섬유로 돛을 만드는데 사용한다.\n전투, 탐색, 조합 의뢰 보상으로 획득할 수 있다.",
       "discoveryType": 0,
-      "gainRegionId": [
-        12000400,
-        12000500
-      ],
+      "gainRegionId": [12000400, 12000500],
       "rewardNotice": false
     },
     "23610034": {
@@ -73016,10 +72805,7 @@
       "icon": "Icon_Item_23220034_Sprite",
       "desc": "선박 건조 시 재료로 사용되는 고급 면.\n매우 가볍고 풍력을 이용하기에 매우 적합한 섬유로 돛을 만드는데 사용한다.\n전투, 탐색, 조합 의뢰 보상으로 획득할 수 있다.",
       "discoveryType": 0,
-      "gainRegionId": [
-        12000500,
-        12000000
-      ],
+      "gainRegionId": [12000500, 12000000],
       "rewardNotice": false
     },
     "23610035": {
@@ -73049,10 +72835,7 @@
       "icon": "Icon_Item_23220035_Sprite",
       "desc": "선박 건조 시 재료로 사용되는 포문.\n삼나무로 제작되어 포격에 용이한 형태로 제작되었다.\n전투, 탐색, 조합 의뢰 보상으로 획득할 수 있다.",
       "discoveryType": 0,
-      "gainRegionId": [
-        12000000,
-        12000200
-      ],
+      "gainRegionId": [12000000, 12000200],
       "rewardNotice": false
     },
     "23610036": {
@@ -73082,10 +72865,7 @@
       "icon": "Icon_Item_23220036_Sprite",
       "desc": "선박 건조 시 재료로 사용되는 포문.\n가문비나무로 제작되어 포격에 용이한 형태로 제작되었다.\n전투, 탐색, 조합 의뢰 보상으로 획득할 수 있다.",
       "discoveryType": 0,
-      "gainRegionId": [
-        12000200,
-        12000100
-      ],
+      "gainRegionId": [12000200, 12000100],
       "rewardNotice": false
     },
     "23610037": {
@@ -73115,10 +72895,7 @@
       "icon": "Icon_Item_23220037_Sprite",
       "desc": "선박 건조 시 재료로 사용되는 포문.\n적송으로 제작되어 포격에 용이한 형태로 제작되었다.\n전투, 탐색, 조합 의뢰 보상으로 획득할 수 있다.",
       "discoveryType": 0,
-      "gainRegionId": [
-        12000100,
-        12000400
-      ],
+      "gainRegionId": [12000100, 12000400],
       "rewardNotice": false
     },
     "23610038": {
@@ -73148,10 +72925,7 @@
       "icon": "Icon_Item_23220038_Sprite",
       "desc": "선박 건조 시 재료로 사용되는 포문.\n오리나무로 제작되어 포격에 용이한 형태로 제작되었다.\n전투, 탐색, 조합 의뢰 보상으로 획득할 수 있다.",
       "discoveryType": 0,
-      "gainRegionId": [
-        12000400,
-        12000500
-      ],
+      "gainRegionId": [12000400, 12000500],
       "rewardNotice": false
     },
     "23610039": {
@@ -73181,10 +72955,7 @@
       "icon": "Icon_Item_23220039_Sprite",
       "desc": "선박 건조 시 재료로 사용되는 포문.\n너도밤나무로 제작되어 포격에 용이한 형태로 제작되었다.\n전투, 탐색, 조합 의뢰 보상으로 획득할 수 있다.",
       "discoveryType": 0,
-      "gainRegionId": [
-        12000500,
-        12000000
-      ],
+      "gainRegionId": [12000500, 12000000],
       "rewardNotice": false
     },
     "23610040": {
@@ -73214,10 +72985,7 @@
       "icon": "Icon_Item_23220040_Sprite",
       "desc": "선박 건조 시 재료로 사용되는 포문.\n자단나무로 제작되어 포격에 용이한 형태로 제작되었다.\n전투, 탐색, 조합 의뢰 보상으로 획득할 수 있다.",
       "discoveryType": 0,
-      "gainRegionId": [
-        12000000,
-        12000200
-      ],
+      "gainRegionId": [12000000, 12000200],
       "rewardNotice": false
     },
     "23610041": {
@@ -73258,10 +73026,7 @@
         }
       ],
       "discoveryType": 0,
-      "gainRegionId": [
-        12000200,
-        12000100
-      ],
+      "gainRegionId": [12000200, 12000100],
       "rewardNotice": false
     },
     "23610042": {
@@ -73302,10 +73067,7 @@
         }
       ],
       "discoveryType": 0,
-      "gainRegionId": [
-        12000100,
-        12000400
-      ],
+      "gainRegionId": [12000100, 12000400],
       "rewardNotice": false
     },
     "23610043": {
@@ -73346,10 +73108,7 @@
         }
       ],
       "discoveryType": 0,
-      "gainRegionId": [
-        12000400,
-        12000500
-      ],
+      "gainRegionId": [12000400, 12000500],
       "rewardNotice": false
     },
     "23610044": {
@@ -73390,10 +73149,7 @@
         }
       ],
       "discoveryType": 0,
-      "gainRegionId": [
-        12000500,
-        12000000
-      ],
+      "gainRegionId": [12000500, 12000000],
       "rewardNotice": false
     },
     "23610045": {
@@ -73423,10 +73179,7 @@
       "icon": "Icon_Item_23220041_Sprite",
       "desc": "선박 건조 시 재료로 사용되는 포문.\n초대형 대형 대포에 어울리게 제작된 초대형 포문.\n전투, 탐색, 조합 의뢰 보상으로 획득할 수 있다.",
       "discoveryType": 0,
-      "gainRegionId": [
-        12000000,
-        12000200
-      ],
+      "gainRegionId": [12000000, 12000200],
       "rewardNotice": false
     },
     "23610046": {
@@ -73456,10 +73209,7 @@
       "icon": "Icon_Item_23220042_Sprite",
       "desc": "선박 건조 시 재료로 사용되는 포문.\n개량형 초대형 대포에 어울리게 제작된 개량형 초대형 포문.\n전투, 탐색, 조합 의뢰 보상으로 획득할 수 있다.",
       "discoveryType": 0,
-      "gainRegionId": [
-        12000200,
-        12000100
-      ],
+      "gainRegionId": [12000200, 12000100],
       "rewardNotice": false
     },
     "23610047": {
@@ -73489,10 +73239,7 @@
       "icon": "Icon_Item_23220043_Sprite",
       "desc": "선박 건조 시 재료로 사용되는 포문.\n강화 초대형 대포에 어울리게 제작된 강화 초대형 포문.\n전투, 탐색, 조합 의뢰 보상으로 획득할 수 있다.",
       "discoveryType": 0,
-      "gainRegionId": [
-        12000100,
-        12000400
-      ],
+      "gainRegionId": [12000100, 12000400],
       "rewardNotice": false
     },
     "23610048": {
@@ -74282,10 +74029,7 @@
         }
       ],
       "discoveryType": 0,
-      "gainRegionId": [
-        12000400,
-        12000500
-      ],
+      "gainRegionId": [12000400, 12000500],
       "rewardNotice": false
     },
     "23610068": {
@@ -74326,10 +74070,7 @@
         }
       ],
       "discoveryType": 0,
-      "gainRegionId": [
-        12000400,
-        12000500
-      ],
+      "gainRegionId": [12000400, 12000500],
       "rewardNotice": false
     },
     "23610069": {
@@ -74370,10 +74111,7 @@
         }
       ],
       "discoveryType": 0,
-      "gainRegionId": [
-        12000400,
-        12000500
-      ],
+      "gainRegionId": [12000400, 12000500],
       "rewardNotice": false
     },
     "23610070": {
@@ -74414,10 +74152,7 @@
         }
       ],
       "discoveryType": 0,
-      "gainRegionId": [
-        12000400,
-        12000500
-      ],
+      "gainRegionId": [12000400, 12000500],
       "rewardNotice": false
     },
     "23610071": {
@@ -74458,10 +74193,7 @@
         }
       ],
       "discoveryType": 0,
-      "gainRegionId": [
-        12000400,
-        12000500
-      ],
+      "gainRegionId": [12000400, 12000500],
       "rewardNotice": false
     },
     "23610072": {
@@ -74502,10 +74234,7 @@
         }
       ],
       "discoveryType": 0,
-      "gainRegionId": [
-        12000400,
-        12000500
-      ],
+      "gainRegionId": [12000400, 12000500],
       "rewardNotice": false
     },
     "23610073": {
@@ -74666,10 +74395,7 @@
         }
       ],
       "discoveryType": 0,
-      "gainRegionId": [
-        12000500,
-        12000000
-      ],
+      "gainRegionId": [12000500, 12000000],
       "rewardNotice": false
     },
     "23610077": {
@@ -75472,10 +75198,7 @@
       "icon": "Icon_Item_23220000_Sprite",
       "desc": "소형 선박 건조 시 배의 중심을 구성하는 재료.\n단단한 나무로 제작되었으며 소형 배에 적합한 크기이다.",
       "discoveryType": 0,
-      "gainRegionId": [
-        12000000,
-        12000200
-      ],
+      "gainRegionId": [12000000, 12000200],
       "rewardNotice": false
     },
     "23700026": {
@@ -75835,10 +75558,7 @@
       "icon": "Icon_Item_23220002_Sprite",
       "desc": "특수 로르샤 건조 시 배의 중심을 구성하는 재료.\n단단한 나무로 제작되었으며 특수 로르샤에 적합한 크기이다.",
       "discoveryType": 0,
-      "gainRegionId": [
-        12000100,
-        12000400
-      ],
+      "gainRegionId": [12000100, 12000400],
       "rewardNotice": false
     },
     "23700038": {
@@ -77635,10 +77355,7 @@
         }
       ],
       "discoveryType": 0,
-      "gainRegionId": [
-        12000400,
-        12000500
-      ],
+      "gainRegionId": [12000400, 12000500],
       "rewardNotice": false
     },
     "23700099": {
@@ -78060,10 +77777,7 @@
         }
       ],
       "discoveryType": 0,
-      "gainRegionId": [
-        12000100,
-        12000400
-      ],
+      "gainRegionId": [12000100, 12000400],
       "rewardNotice": false
     },
     "23700113": {
@@ -83637,7 +83351,7 @@
       "discoveryType": 0,
       "rewardNotice": false
     },
-      "23700316": {
+    "23700316": {
       "id": 23700316,
       "name": "26등급 황금 선박 선택권",
       "type": 6,

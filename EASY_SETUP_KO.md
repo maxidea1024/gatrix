@@ -48,6 +48,7 @@ docker-compose --version
 
 3. **설치 확인:**
    - PowerShell을 열고 실행:
+
    ```powershell
    docker --version
    docker-compose --version
@@ -63,11 +64,13 @@ docker-compose --version
 ### 환경 선택
 
 **개발 환경** (로컬 개발용):
+
 - `docker-compose.dev.yml` 사용
 - 핫 리로드 및 디버깅 도구 포함
 - 개발 및 테스트에 적합
 
 **프로덕션 환경** (배포용):
+
 - `docker-compose.yml` 사용
 - 성능 및 보안 최적화
 - 프로덕션 배포에 적합
@@ -77,6 +80,7 @@ docker-compose --version
 Docker로 모든 서비스를 실행하면 빌드 시간이 오래 걸립니다. **더 빠른 개발을 위해 인프라(MySQL, Redis, etcd 등)만 Docker로 실행하고, 개발 서비스(backend, frontend 등)는 로컬에서 `yarn dev`로 실행**하는 것을 권장합니다.
 
 #### 장점:
+
 - ⚡ **빠른 코드 반영** - Hot reload로 변경사항 즉시 확인
 - 🚀 **빌드 시간 절약** - Docker 이미지 빌드 없이 바로 테스트
 - 🔍 **디버깅 용이** - 로컬에서 직접 디버깅 가능
@@ -105,11 +109,13 @@ Copy-Item .env.local.example .env.local
 #### 3단계: 서비스 로컬 실행
 
 **기본 서비스만 실행 (Backend + Frontend):**
+
 ```bash
 yarn dev
 ```
 
 **모든 서비스 동시 실행 (Backend, Frontend, Edge, Chat, Event-Lens):**
+
 ```bash
 yarn dev:all
 ```
@@ -117,6 +123,7 @@ yarn dev:all
 > **참고:** `yarn dev:all`은 모든 서비스를 동시에 시작합니다. Backend가 먼저 준비되어야 다른 서비스가 정상 작동하므로, 초기 시작 시 일부 재시도 오류가 발생할 수 있습니다. 개발 시에는 `yarn dev` (Backend + Frontend)를 권장합니다.
 
 **개별 서비스 실행 (별도 터미널에서):**
+
 ```bash
 # Backend
 yarn dev:backend
@@ -140,22 +147,24 @@ yarn dev:event-lens
 - **Backend API:** http://localhost:45000
 - **Grafana:** http://localhost:44000
 
-
 ### 1단계: 설정 파일 생성
 
 설정 스크립트를 실행하여 보안 암호화 키가 포함된 `.env` 파일을 자동으로 생성합니다.
 
 **개발 환경 (Linux/Mac):**
+
 ```bash
 ./setup-env.sh localhost development
 ```
 
 **개발 환경 (Windows PowerShell):**
+
 ```powershell
 .\setup-env.ps1 -HostAddress localhost -Environment development
 ```
 
 **프로덕션 환경 (Linux/Mac):**
+
 ```bash
 # 영어 (기본값)
 ./setup-env.sh example.com production
@@ -165,6 +174,7 @@ yarn dev:event-lens
 ```
 
 **프로덕션 환경 (Windows PowerShell):**
+
 ```powershell
 # 영어 (기본값)
 .\setup-env.ps1 -HostAddress example.com -Environment production
@@ -176,16 +186,19 @@ yarn dev:event-lens
 **사용자 정의 옵션:**
 
 **관리자 비밀번호 지정 (Linux/Mac):**
+
 ```bash
 ./setup-env.sh localhost development ko --admin-password "MySecurePassword123"
 ```
 
 **관리자 비밀번호 지정 (Windows PowerShell):**
+
 ```powershell
 .\setup-env.ps1 -HostAddress localhost -Environment development -AdminPassword "MySecurePassword123"
 ```
 
 **프로토콜 지정 (Linux/Mac):**
+
 ```bash
 # 개발 환경에서 HTTPS 사용
 ./setup-env.sh localhost development ko --protocol https
@@ -198,6 +211,7 @@ yarn dev:event-lens
 ```
 
 **프로토콜 지정 (Windows PowerShell):**
+
 ```powershell
 # 개발 환경에서 HTTPS 사용
 .\setup-env.ps1 -HostAddress localhost -Environment development -Protocol https
@@ -210,6 +224,7 @@ yarn dev:event-lens
 ```
 
 **Service Discovery 모드 지정 (Linux/Mac):**
+
 ```bash
 # Redis 모드 사용
 ./setup-env.sh localhost development ko --service-discovery-mode redis
@@ -219,6 +234,7 @@ yarn dev:event-lens
 ```
 
 **Service Discovery 모드 지정 (Windows PowerShell):**
+
 ```powershell
 # Redis 모드 사용
 .\setup-env.ps1 -HostAddress localhost -Environment development -ServiceDiscoveryMode redis
@@ -228,6 +244,7 @@ yarn dev:event-lens
 ```
 
 **데이터 루트 경로 지정 (Linux/Mac):**
+
 ```bash
 # 모든 Docker 볼륨 데이터를 /data/gatrix에 저장
 ./setup-env.sh example.com production en --data-root /data/gatrix
@@ -237,6 +254,7 @@ yarn dev:event-lens
 ```
 
 **데이터 루트 경로 지정 (Windows PowerShell):**
+
 ```powershell
 # 모든 Docker 볼륨 데이터를 /data/gatrix에 저장
 .\setup-env.ps1 -HostAddress example.com -Environment production -DataRoot /data/gatrix
@@ -246,6 +264,7 @@ yarn dev:event-lens
 ```
 
 스크립트는 다음을 수행합니다:
+
 - 보안 암호화 키 자동 생성
 - Docker용 데이터베이스 및 Redis 설정
 - 기본 언어 설정 (한국어 `ko`, 영어 `en`, 중국어 `zh`)
@@ -257,6 +276,7 @@ yarn dev:event-lens
 - 환경에 따라 올바른 docker-compose 파일 자동 선택
 
 **지원 언어:**
+
 - `ko` - 한국어 - 개발 환경 기본값
 - `en` - English (영어) - 프로덕션 환경 기본값
 - `zh` - 中文 (중국어) - 중국 배포용
@@ -264,11 +284,13 @@ yarn dev:event-lens
 ### 2단계: Docker 환경 빌드
 
 **개발 환경:**
+
 ```bash
 docker-compose -f docker-compose.dev.yml build
 ```
 
 **프로덕션 환경:**
+
 ```bash
 docker-compose -f docker-compose.yml build
 ```
@@ -276,11 +298,13 @@ docker-compose -f docker-compose.yml build
 ### 3단계: 서비스 시작
 
 **개발 환경:**
+
 ```bash
 docker-compose -f docker-compose.dev.yml up -d
 ```
 
 **프로덕션 환경:**
+
 ```bash
 docker-compose -f docker-compose.yml up -d
 ```
@@ -290,11 +314,13 @@ docker-compose -f docker-compose.yml up -d
 ### 4단계: 설치 확인
 
 **개발 환경:**
+
 ```bash
 docker-compose -f docker-compose.dev.yml ps
 ```
 
 **프로덕션 환경:**
+
 ```bash
 docker-compose -f docker-compose.yml ps
 ```
@@ -306,16 +332,19 @@ docker-compose -f docker-compose.yml ps
 브라우저를 열고 다음 주소로 이동하세요:
 
 **개발 환경:**
+
 ```
 http://localhost:43000
 ```
 
 **프로덕션 (HTTPS - 기본값):**
+
 ```
 https://example.com
 ```
 
 **프로덕션 (HTTP - --protocol http로 설정한 경우):**
+
 ```
 http://example.com
 ```
@@ -336,6 +365,7 @@ http://example.com
    프로덕션 환경에서는 클라우드 로드 밸런서를 통해 HTTPS를 처리하고 내부 포트로 포워딩해야 합니다.
 
    **포트 포워딩 설정:**
+
    ```
    외부 HTTPS 443 → 내부 43000 (Frontend + Bull Board)
    외부 HTTPS 443/grafana → 내부 44000 (Grafana)
@@ -359,6 +389,7 @@ http://example.com
    - 참고: `/bull-board` 경로는 Rule 2로 처리됨 (별도 규칙 불필요)
 
    **Nginx Reverse Proxy 예시:**
+
    ```nginx
    server {
        listen 443 ssl http2;
@@ -390,11 +421,13 @@ http://example.com
    - 서비스 재시작:
 
    **개발 환경:**
+
    ```bash
    docker-compose -f docker-compose.dev.yml restart frontend-dev
    ```
 
    **프로덕션 환경:**
+
    ```bash
    docker-compose -f docker-compose.yml restart frontend
    ```
@@ -406,11 +439,13 @@ http://example.com
    - 서비스 재시작:
 
    **개발 환경:**
+
    ```bash
    docker-compose -f docker-compose.dev.yml restart frontend-dev
    ```
 
    **프로덕션 환경:**
+
    ```bash
    docker-compose -f docker-compose.yml restart frontend
    ```
@@ -421,11 +456,13 @@ http://example.com
    - 서비스 재시작:
 
    **개발 환경:**
+
    ```bash
    docker-compose -f docker-compose.dev.yml restart
    ```
 
    **프로덕션 환경:**
+
    ```bash
    docker-compose -f docker-compose.yml restart
    ```
@@ -433,11 +470,13 @@ http://example.com
 5. **로그 확인**:
 
    **개발 환경:**
+
    ```bash
    docker-compose -f docker-compose.dev.yml logs -f backend
    ```
 
    **프로덕션 환경:**
+
    ```bash
    docker-compose -f docker-compose.yml logs -f backend
    ```
@@ -445,11 +484,13 @@ http://example.com
 6. **서비스 중지**:
 
    **개발 환경:**
+
    ```bash
    docker-compose -f docker-compose.dev.yml down
    ```
 
    **프로덕션 환경:**
+
    ```bash
    docker-compose -f docker-compose.yml down
    ```
@@ -459,6 +500,7 @@ http://example.com
 ### 포트가 이미 사용 중
 
 "port already in use" 오류가 발생하면:
+
 - 해당 포트를 사용하는 서비스를 중지하거나
 - docker-compose 파일에서 포트를 수정하세요:
   - 개발 환경: `docker-compose.dev.yml`
@@ -469,26 +511,29 @@ http://example.com
 로그를 확인하세요:
 
 **개발 환경:**
+
 ```bash
 docker-compose -f docker-compose.dev.yml logs
 ```
 
 **프로덕션 환경:**
+
 ```bash
 docker-compose -f docker-compose.yml logs
 ```
-
 
 ### Docker 데몬이 실행되지 않음
 
 Docker가 실행 중인지 확인하세요:
 
 **Linux:**
+
 ```bash
 sudo systemctl start docker
 ```
 
 **Windows:**
+
 - Docker Desktop 애플리케이션 열기
 - 완전히 시작될 때까지 대기
 
@@ -499,13 +544,15 @@ sudo systemctl start docker
 이는 Grafana의 보안 설정이 iframe 임베딩을 방지할 때 발생합니다. 해결 방법:
 
 1. **docker-compose.dev.yml 업데이트** - Grafana 서비스에 다음 환경 변수 추가:
+
    ```yaml
    environment:
-     GF_SECURITY_ALLOW_EMBEDDING: "true"
-     GF_SECURITY_COOKIE_SAMESITE: "Lax"
+     GF_SECURITY_ALLOW_EMBEDDING: 'true'
+     GF_SECURITY_COOKIE_SAMESITE: 'Lax'
    ```
 
 2. **Docker 컨테이너 재시작:**
+
    ```bash
    docker-compose -f docker-compose.dev.yml down
    docker-compose -f docker-compose.dev.yml up -d
@@ -535,16 +582,19 @@ sudo systemctl start docker
 프로젝트의 `scripts/` 디렉토리에 Jenkins 설정 스크립트가 포함되어 있습니다:
 
 **Linux/Mac:**
+
 ```bash
 ./scripts/setup.sh
 ```
 
 **Windows PowerShell:**
+
 ```powershell
 .\scripts\setup.ps1
 ```
 
 이 스크립트는 다음을 수행합니다:
+
 - Node.js 22 LTS 설치 확인
 - 필요한 의존성 설치
 - 환경 변수 설정
@@ -559,6 +609,7 @@ sudo systemctl start docker
    - Branch: `main` (또는 기본 브랜치)
 
 3. **파이프라인 스크립트:**
+
    ```groovy
    pipeline {
      agent any
@@ -632,7 +683,6 @@ sudo systemctl start docker
 5. **웹훅 설정** (선택사항):
    - GitHub/GitLab 웹훅을 설정하여 푸시 시 자동으로 빌드 트리거
 
-
 ### Jenkins 중요 사항
 
 - **환경 변수:** 파이프라인 스크립트에서 다음을 설정하세요:
@@ -649,6 +699,7 @@ sudo systemctl start docker
 ### 설정 예시
 
 **프로덕션 HTTP (기본값):**
+
 ```groovy
 environment {
   HOST_ADDRESS = 'example.com'
@@ -660,6 +711,7 @@ environment {
 ```
 
 **프로덕션 HTTPS (보안):**
+
 ```groovy
 environment {
   HOST_ADDRESS = 'example.com'
@@ -671,6 +723,7 @@ environment {
 ```
 
 **중국 프로덕션 (중국어):**
+
 ```groovy
 environment {
   HOST_ADDRESS = 'example.cn'
@@ -682,6 +735,7 @@ environment {
 ```
 
 **개발 환경 (한국어):**
+
 ```groovy
 environment {
   HOST_ADDRESS = 'dev.example.com'
@@ -704,21 +758,25 @@ environment {
 `.env` 파일을 재생성해야 하는 경우:
 
 **개발 환경 (Linux/Mac):**
+
 ```bash
 ./setup-env.sh localhost development --force
 ```
 
 **개발 환경 (Windows PowerShell):**
+
 ```powershell
 .\setup-env.ps1 -HostAddress localhost -Environment development -Force
 ```
 
 **프로덕션 환경 (Linux/Mac):**
+
 ```bash
 ./setup-env.sh example.com production --force
 ```
 
 **프로덕션 환경 (Windows PowerShell):**
+
 ```powershell
 .\setup-env.ps1 -HostAddress example.com -Environment production -Force
 ```
@@ -726,16 +784,19 @@ environment {
 **사용자 정의 옵션:**
 
 **관리자 비밀번호 지정 (Linux/Mac):**
+
 ```bash
 ./setup-env.sh localhost development ko --admin-password "NewPassword123" --force
 ```
 
 **관리자 비밀번호 지정 (Windows PowerShell):**
+
 ```powershell
 .\setup-env.ps1 -HostAddress localhost -Environment development -AdminPassword "NewPassword123" -Force
 ```
 
 **프로토콜 지정 (Linux/Mac):**
+
 ```bash
 # 한국어로 HTTPS
 ./setup-env.sh localhost development ko --protocol https --force
@@ -745,6 +806,7 @@ environment {
 ```
 
 **프로토콜 지정 (Windows PowerShell):**
+
 ```powershell
 # 한국어로 HTTPS
 .\setup-env.ps1 -HostAddress localhost -Environment development -Protocol https -Force
@@ -754,6 +816,7 @@ environment {
 ```
 
 다음을 수행합니다:
+
 - 기존 `.env` 파일 백업 (`.env.backup.TIMESTAMP`)
 - 새 암호화 키 생성
 - 새 관리자 비밀번호 설정 (제공된 경우)
@@ -767,11 +830,13 @@ environment {
 ### 1단계: 모든 컨테이너 중지 및 제거
 
 **개발 환경:**
+
 ```bash
 docker-compose -f docker-compose.dev.yml down -v
 ```
 
 **프로덕션 환경:**
+
 ```bash
 docker-compose -f docker-compose.yml down -v
 ```
@@ -783,11 +848,13 @@ docker-compose -f docker-compose.yml down -v
 처음부터 모든 것을 다시 빌드하려면:
 
 **개발 환경:**
+
 ```bash
 docker-compose -f docker-compose.dev.yml down -v --rmi all
 ```
 
 **프로덕션 환경:**
+
 ```bash
 docker-compose -f docker-compose.yml down -v --rmi all
 ```
@@ -799,6 +866,7 @@ rm .env
 ```
 
 또는 먼저 백업:
+
 ```bash
 mv .env .env.old
 ```
@@ -808,6 +876,7 @@ mv .env .env.old
 처음부터 **빠른 시작** 섹션을 따라하세요:
 
 1. 새 설정 생성:
+
    ```bash
    # 개발 환경 (한국어)
    ./setup-env.sh localhost development
@@ -820,6 +889,7 @@ mv .env .env.old
    ```
 
 2. Docker 환경 빌드:
+
    ```bash
    # 개발 환경
    docker-compose -f docker-compose.dev.yml build
@@ -829,6 +899,7 @@ mv .env .env.old
    ```
 
 3. 서비스 시작:
+
    ```bash
    # 개발 환경
    docker-compose -f docker-compose.dev.yml up -d
@@ -838,6 +909,7 @@ mv .env .env.old
    ```
 
 4. 설치 확인:
+
    ```bash
    # 개발 환경
    docker-compose -f docker-compose.dev.yml ps

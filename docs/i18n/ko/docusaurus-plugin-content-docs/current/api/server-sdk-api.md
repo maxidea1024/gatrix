@@ -14,7 +14,7 @@ import { GatrixClient } from '@gatrix/server-sdk';
 
 const client = new GatrixClient({
   apiKey: 'your-api-key',
-  environment: 'production'
+  environment: 'production',
 });
 ```
 
@@ -25,7 +25,7 @@ const client = new GatrixClient({
 ```typescript
 const isEnabled = await client.getFeatureFlag('new_battle_mode', {
   userId: 'player_1',
-  level: 50
+  level: 50,
 });
 ```
 

@@ -4,10 +4,10 @@
  * Common functionality for all test servers
  */
 
-import { GatrixServerSDK, getLogger } from "../src/index";
-import { ServiceInstance, ServiceLabels } from "../src/types/api";
-import * as os from "os";
-import { Logger } from "../src/utils/logger";
+import { GatrixServerSDK, getLogger } from '../src/index';
+import { ServiceInstance, ServiceLabels } from '../src/types/api';
+import * as os from 'os';
+import { Logger } from '../src/utils/logger';
 
 export interface BaseServerConfig {
   serviceType: string;
@@ -34,30 +34,30 @@ export class BaseTestServer {
 
     // Create SDK instance
     this.sdk = new GatrixServerSDK({
-      gatrixUrl: process.env.GATRIX_URL || "http://localhost:45000",
-      apiToken: process.env.API_TOKEN || "gatrix-unsecured-server-api-token",
+      gatrixUrl: process.env.GATRIX_URL || 'http://localhost:45000',
+      apiToken: process.env.API_TOKEN || 'gatrix-unsecured-server-api-token',
       applicationName: config.serviceType,
 
       // Redis for events
       redis: {
-        host: process.env.REDIS_HOST || "localhost",
-        port: parseInt(process.env.REDIS_PORT || "6379"),
+        host: process.env.REDIS_HOST || 'localhost',
+        port: parseInt(process.env.REDIS_PORT || '6379'),
       },
 
       // Cache configuration
       cache: {
         enabled: config.enableCache !== false,
         ttl: 300,
-        refreshMethod: config.enableEvents ? "event" : "polling", // 'event' if events enabled, 'polling' otherwise
+        refreshMethod: config.enableEvents ? 'event' : 'polling', // 'event' if events enabled, 'polling' otherwise
       },
 
       // Logger configuration
       logger: {
-        level: "info",
+        level: 'info',
       },
     });
 
-    this.logger.info("Server instance created");
+    this.logger.info('Server instance created');
 
     // Setup global error handlers
     this.setupErrorHandlers();
@@ -68,27 +68,24 @@ export class BaseTestServer {
    * This ensures the service status is updated to 'error' before shutdown
    */
   private setupErrorHandlers(): void {
-    process.on("uncaughtException", async (error: Error) => {
-      this.logError("Uncaught Exception", error);
-      await this.handleFatalError("UNCAUGHT_EXCEPTION");
+    process.on('uncaughtException', async (error: Error) => {
+      this.logError('Uncaught Exception', error);
+      await this.handleFatalError('UNCAUGHT_EXCEPTION');
     });
 
-    process.on(
-      "unhandledRejection",
-      async (reason: any, promise: Promise<any>) => {
-        this.logError("Unhandled Rejection", { reason, promise });
-        await this.handleFatalError("UNHANDLED_REJECTION");
-      },
-    );
+    process.on('unhandledRejection', async (reason: any, promise: Promise<any>) => {
+      this.logError('Unhandled Rejection', { reason, promise });
+      await this.handleFatalError('UNHANDLED_REJECTION');
+    });
 
     // Handle graceful shutdown signals
-    process.on("SIGTERM", async () => {
-      this.log("Received SIGTERM signal, initiating graceful shutdown...");
+    process.on('SIGTERM', async () => {
+      this.log('Received SIGTERM signal, initiating graceful shutdown...');
       await this.handleGracefulShutdown();
     });
 
-    process.on("SIGINT", async () => {
-      this.log("Received SIGINT signal, initiating graceful shutdown...");
+    process.on('SIGINT', async () => {
+      this.log('Received SIGINT signal, initiating graceful shutdown...');
       await this.handleGracefulShutdown();
     });
   }
@@ -104,25 +101,25 @@ export class BaseTestServer {
     this.isShuttingDown = true;
 
     try {
-      this.log("Starting graceful shutdown...");
+      this.log('Starting graceful shutdown...');
 
       // Unregister service if service discovery is enabled
       if (this.config.enableServiceDiscovery) {
-        this.log("Unregistering service from discovery...");
+        this.log('Unregistering service from discovery...');
         await this.sdk.serviceDiscovery.unregister().catch((err) => {
-          this.logError("Failed to unregister service", err);
+          this.logError('Failed to unregister service', err);
         });
-        this.log("Service unregistered successfully");
+        this.log('Service unregistered successfully');
       }
 
       // Graceful shutdown
-      this.log("Stopping server...");
+      this.log('Stopping server...');
       await this.stop();
-      this.log("Server stopped");
+      this.log('Server stopped');
     } catch (shutdownError) {
-      this.logError("Error during graceful shutdown", shutdownError);
+      this.logError('Error during graceful shutdown', shutdownError);
     } finally {
-      this.log("Exiting process");
+      this.log('Exiting process');
       process.exit(0);
     }
   }
@@ -141,21 +138,21 @@ export class BaseTestServer {
       if (this.config.enableServiceDiscovery) {
         await this.sdk
           .updateServiceStatus({
-            status: "error",
+            status: 'error',
             stats: {
               errorType,
               errorTime: new Date().toISOString(),
             },
           })
           .catch((err) => {
-            this.logError("Failed to update service status to error", err);
+            this.logError('Failed to update service status to error', err);
           });
       }
 
       // Graceful shutdown
       await this.stop();
     } catch (shutdownError) {
-      this.logError("Error during fatal error handling", shutdownError);
+      this.logError('Error during fatal error handling', shutdownError);
     } finally {
       process.exit(1);
     }
@@ -166,11 +163,11 @@ export class BaseTestServer {
    */
   async start(): Promise<void> {
     try {
-      this.log("Starting server...");
+      this.log('Starting server...');
 
       // Initialize SDK
       await this.sdk.initialize();
-      this.log("SDK initialized");
+      this.log('SDK initialized');
 
       // Note: Events are disabled for testing, but Redis is still available for service discovery
 
@@ -193,9 +190,9 @@ export class BaseTestServer {
       // Run server-specific logic
       await this.onStart();
 
-      this.log("Server started successfully");
+      this.log('Server started successfully');
     } catch (error) {
-      this.logError("Failed to start server", error);
+      this.logError('Failed to start server', error);
       throw error;
     }
   }
@@ -205,7 +202,7 @@ export class BaseTestServer {
    */
   async stop(): Promise<void> {
     try {
-      this.log("Stopping server...");
+      this.log('Stopping server...');
 
       // Run server-specific cleanup
       await this.onStop();
@@ -213,9 +210,9 @@ export class BaseTestServer {
       // Close SDK
       await this.sdk.close();
 
-      this.log("Server stopped");
+      this.log('Server stopped');
     } catch (error) {
-      this.logError("Error stopping server", error);
+      this.logError('Error stopping server', error);
     }
   }
 
@@ -242,7 +239,7 @@ export class BaseTestServer {
         externalApi: this.config.port,
         // metricsApi is automatically added by SDK
       },
-      status: "ready",
+      status: 'ready',
       meta: {
         instanceName: this.config.instanceName,
         startTime: this.startTime.toISOString(),
@@ -256,7 +253,7 @@ export class BaseTestServer {
    * Print current cache state
    */
   protected async printCacheState(): Promise<void> {
-    this.log("=== Cache State ===");
+    this.log('=== Cache State ===');
 
     // Game worlds
     const worlds = await this.sdk.fetchGameWorlds();
@@ -264,7 +261,7 @@ export class BaseTestServer {
     worlds.forEach((world) => {
       const maintenance = this.sdk.isWorldInMaintenance(world.worldId);
       this.log(
-        `  - ${world.name} (${world.worldId}) ${maintenance ? "[MAINTENANCE]" : "[ACTIVE]"}`,
+        `  - ${world.name} (${world.worldId}) ${maintenance ? '[MAINTENANCE]' : '[ACTIVE]'}`
       );
     });
 
@@ -273,8 +270,7 @@ export class BaseTestServer {
     this.log(`Popup Notices: ${popups.length} loaded`);
     popups.forEach((popup) => {
       const contentPreview =
-        popup.message.substring(0, 50) +
-        (popup.message.length > 50 ? "..." : "");
+        popup.message.substring(0, 50) + (popup.message.length > 50 ? '...' : '');
       this.log(`  - ${popup.id}: ${contentPreview}`);
     });
 
@@ -283,13 +279,13 @@ export class BaseTestServer {
       const surveys = await this.sdk.fetchSurveys();
       this.log(`Surveys: ${surveys.length} loaded`);
       surveys.forEach((survey) => {
-        this.log(`  - ${survey.id}: ${survey.surveyTitle || "No title"}`);
+        this.log(`  - ${survey.id}: ${survey.surveyTitle || 'No title'}`);
       });
     } catch (error: any) {
       this.log(`Surveys: Not available (${error.message})`);
     }
 
-    this.log("==================");
+    this.log('==================');
   }
 
   /**
@@ -297,100 +293,98 @@ export class BaseTestServer {
    */
   protected setupEventListeners(): void {
     // Game world events
-    this.sdk.on("gameworld.updated", (data) => {
+    this.sdk.on('gameworld.updated', (data) => {
       this.log(`[EVENT] Game world updated: ${JSON.stringify(data)}`);
     });
 
-    this.sdk.on("gameworld.created", (data) => {
+    this.sdk.on('gameworld.created', (data) => {
       this.log(`[EVENT] Game world created: ${JSON.stringify(data)}`);
     });
 
-    this.sdk.on("gameworld.deleted", (data) => {
+    this.sdk.on('gameworld.deleted', (data) => {
       this.log(`[EVENT] Game world deleted: ${JSON.stringify(data)}`);
     });
 
     // Popup events
-    this.sdk.on("popup.updated", (data) => {
+    this.sdk.on('popup.updated', (data) => {
       this.log(`[EVENT] Popup updated: ${JSON.stringify(data)}`);
     });
 
     // Survey events
-    this.sdk.on("survey.updated", (data) => {
+    this.sdk.on('survey.updated', (data) => {
       this.log(`[EVENT] Survey updated: ${JSON.stringify(data)}`);
     });
 
     // Maintenance events
-    this.sdk.on("maintenance.settings.updated", (data) => {
+    this.sdk.on('maintenance.settings.updated', (data) => {
       this.log(`[EVENT] Maintenance settings updated: ${JSON.stringify(data)}`);
     });
 
-    this.sdk.on("maintenance.started", (data) => {
+    this.sdk.on('maintenance.started', (data) => {
       this.log(`[EVENT] Maintenance started: ${JSON.stringify(data)}`);
     });
 
-    this.sdk.on("maintenance.ended", (data) => {
+    this.sdk.on('maintenance.ended', (data) => {
       this.log(`[EVENT] Maintenance ended: ${JSON.stringify(data)}`);
     });
 
     // Whitelist events
-    this.sdk.on("whitelist.updated", (data) => {
+    this.sdk.on('whitelist.updated', (data) => {
       this.log(`[EVENT] Whitelist updated: ${JSON.stringify(data)}`);
     });
 
     // Banner events
-    this.sdk.on("banner.updated", (data) => {
+    this.sdk.on('banner.updated', (data) => {
       this.log(`[EVENT] Banner updated: ${JSON.stringify(data)}`);
     });
 
     // Client version events
-    this.sdk.on("client_version.updated", (data) => {
+    this.sdk.on('client_version.updated', (data) => {
       this.log(`[EVENT] Client version updated: ${JSON.stringify(data)}`);
     });
 
     // Service notice events
-    this.sdk.on("service_notice.updated", (data) => {
+    this.sdk.on('service_notice.updated', (data) => {
       this.log(`[EVENT] Service notice updated: ${JSON.stringify(data)}`);
     });
 
     // Store product events
-    this.sdk.on("store_product.updated", (data) => {
+    this.sdk.on('store_product.updated', (data) => {
       this.log(`[EVENT] Store product updated: ${JSON.stringify(data)}`);
     });
 
     // Environment events
-    this.sdk.on("environment.created", (data) => {
+    this.sdk.on('environment.created', (data) => {
       this.log(`[EVENT] Environment created: ${JSON.stringify(data)}`);
     });
 
-    this.sdk.on("environment.deleted", (data) => {
+    this.sdk.on('environment.deleted', (data) => {
       this.log(`[EVENT] Environment deleted: ${JSON.stringify(data)}`);
     });
 
     // Custom events
-    this.sdk.on("custom.event", (data) => {
+    this.sdk.on('custom.event', (data) => {
       this.log(`[EVENT] Custom event: ${JSON.stringify(data)}`);
     });
 
-    this.log("Event listeners registered");
+    this.log('Event listeners registered');
   }
 
   /**
    * Get internal IP address
    */
-  protected getInternalIp(
-    networkInterfaces: NodeJS.Dict<os.NetworkInterfaceInfo[]>,
-  ): string {
+  protected getInternalIp(networkInterfaces: NodeJS.Dict<os.NetworkInterfaceInfo[]>): string {
     for (const name of Object.keys(networkInterfaces)) {
       const interfaces = networkInterfaces[name];
       if (!interfaces) continue;
 
       for (const iface of interfaces) {
-        if (iface.family === "IPv4" && !iface.internal) {
+        if (iface.family === 'IPv4' && !iface.internal) {
           return iface.address;
         }
       }
     }
-    return "127.0.0.1";
+    return '127.0.0.1';
   }
 
   /**
@@ -417,28 +411,26 @@ export class BaseTestServer {
       this.log(`Service Discovery API: ${allServices.length} total services`);
 
       // Get services by service type
-      const authServices = await this.sdk.fetchServices({ service: "authd" });
+      const authServices = await this.sdk.fetchServices({ service: 'authd' });
       this.log(`  - authd: ${authServices.length} instances`);
 
       const lobbydServices = await this.sdk.fetchServices({
-        service: "lobbyd",
+        service: 'lobbyd',
       });
       this.log(`  - lobbyd: ${lobbydServices.length} instances`);
 
-      const chatdServices = await this.sdk.fetchServices({ service: "chatd" });
+      const chatdServices = await this.sdk.fetchServices({ service: 'chatd' });
       this.log(`  - chatd: ${chatdServices.length} instances`);
 
       const worlddServices = await this.sdk.fetchServices({
-        service: "worldd",
+        service: 'worldd',
       });
       this.log(`  - worldd: ${worlddServices.length} instances`);
 
       // Get services by group
       if (worlddServices.length > 0) {
-        const groups = [
-          ...new Set(worlddServices.map((s) => s.labels.group).filter(Boolean)),
-        ];
-        this.log(`  - worldd groups: ${groups.join(", ")}`);
+        const groups = [...new Set(worlddServices.map((s) => s.labels.group).filter(Boolean))];
+        this.log(`  - worldd groups: ${groups.join(', ')}`);
       }
     } catch (error: any) {
       this.log(`Service Discovery API not available: ${error.message}`);

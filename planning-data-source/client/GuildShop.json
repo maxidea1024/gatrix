@@ -33,12 +33,8 @@
     },
     ":enum": {},
     ":links": {
-      "salePointId": [
-        "Point"
-      ],
-      "productRewardFixedId": [
-        "RewardFixed"
-      ]
+      "salePointId": ["Point"],
+      "productRewardFixedId": ["RewardFixed"]
     }
   },
   "GuildShop": {

@@ -14,7 +14,7 @@ async function createServerApiToken() {
       port: parseInt(process.env.DB_PORT || '3306'),
       user: process.env.DB_USER || 'motif_dev',
       password: process.env.DB_PASSWORD || 'dev123$',
-      database: process.env.DB_NAME || 'uwo_gate'
+      database: process.env.DB_NAME || 'uwo_gate',
     });
 
     console.log('✅ Database connected\n');
@@ -39,7 +39,7 @@ async function createServerApiToken() {
       1, // Admin user ID
       0, // Initial usage count
       now,
-      now
+      now,
     ]);
 
     console.log('✅ Server API Token created successfully!');
@@ -59,7 +59,6 @@ async function createServerApiToken() {
     console.log('🔧 Configuration Update:');
     console.log('Make sure your chat-server config uses X-API-Token header');
     console.log('');
-
   } catch (error) {
     console.error('❌ Error creating server API token:', error);
     process.exit(1);

@@ -10,58 +10,58 @@ import { IntegrationSystemEvent } from '../types/integrationEvents';
 import { formatPagerDutyMessage } from './EventFormatter';
 
 export class PagerDutyAddon extends Addon {
-    private readonly apiUrl = 'https://events.pagerduty.com/v2/enqueue';
+  private readonly apiUrl = 'https://events.pagerduty.com/v2/enqueue';
 
-    constructor() {
-        super(pagerDutyDefinition);
+  constructor() {
+    super(pagerDutyDefinition);
+  }
+
+  async handleEvent(
+    event: IntegrationSystemEvent,
+    parameters: Record<string, any>,
+    integrationId: string
+  ): Promise<void> {
+    const { routingKey, customHeaders } = parameters;
+
+    if (!routingKey) {
+      this.logger.warn(`Missing PagerDuty routing key for integration ${integrationId}`);
+      await this.registerEvent(integrationId, event, 'failed', 'Missing routing key');
+      return;
     }
 
-    async handleEvent(
-        event: IntegrationSystemEvent,
-        parameters: Record<string, any>,
-        integrationId: string
-    ): Promise<void> {
-        const { routingKey, customHeaders } = parameters;
+    try {
+      const payload = formatPagerDutyMessage(event, routingKey);
 
-        if (!routingKey) {
-            this.logger.warn(`Missing PagerDuty routing key for integration ${integrationId}`);
-            await this.registerEvent(integrationId, event, 'failed', 'Missing routing key');
-            return;
-        }
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+        ...this.parseCustomHeaders(customHeaders),
+      };
 
-        try {
-            const payload = formatPagerDutyMessage(event, routingKey);
+      const response = await this.fetchRetry(this.apiUrl, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(payload),
+      });
 
-            const headers: Record<string, string> = {
-                'Content-Type': 'application/json',
-                ...this.parseCustomHeaders(customHeaders),
-            };
+      this.logger.info(
+        `PagerDuty notification sent for event ${event.type} (integration: ${integrationId})`
+      );
 
-            const response = await this.fetchRetry(this.apiUrl, {
-                method: 'POST',
-                headers,
-                body: JSON.stringify(payload),
-            });
+      await this.registerEvent(integrationId, event, 'success', '', {
+        routingKey: '***',
+        statusCode: response.status,
+      });
+    } catch (error) {
+      this.logger.error(
+        `Failed to send PagerDuty notification for integration ${integrationId}:`,
+        error
+      );
 
-            this.logger.info(
-                `PagerDuty notification sent for event ${event.type} (integration: ${integrationId})`
-            );
-
-            await this.registerEvent(integrationId, event, 'success', '', {
-                routingKey: '***',
-                statusCode: response.status,
-            });
-        } catch (error) {
-            this.logger.error(
-                `Failed to send PagerDuty notification for integration ${integrationId}:`,
-                error
-            );
-
-            await this.registerFailure(integrationId, event, error, {
-                routingKey: '***',
-            });
-        }
+      await this.registerFailure(integrationId, event, error, {
+        routingKey: '***',
+      });
     }
+  }
 }
 
 export default PagerDutyAddon;

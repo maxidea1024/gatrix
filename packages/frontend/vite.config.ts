@@ -1,27 +1,26 @@
 /// <reference types="vitest" />
-import { defineConfig, type Plugin } from "vite";
-import react from "@vitejs/plugin-react";
-import path from "path";
-import http from "http";
-import https from "https";
-import fs from "fs";
-import iniPlugin from "./src/plugins/vite-plugin-ini";
+import { defineConfig, type Plugin } from 'vite';
+import react from '@vitejs/plugin-react';
+import path from 'path';
+import http from 'http';
+import https from 'https';
+import fs from 'fs';
+import iniPlugin from './src/plugins/vite-plugin-ini';
 
 // Force platform for WSL compatibility
-process.env.ROLLUP_BINARY_PATH = process.env.ROLLUP_BINARY_PATH || "";
+process.env.ROLLUP_BINARY_PATH = process.env.ROLLUP_BINARY_PATH || '';
 
 // Use esbuild-wasm for better compatibility
-process.env.ESBUILD_BINARY_PATH = process.env.ESBUILD_BINARY_PATH || "";
+process.env.ESBUILD_BINARY_PATH = process.env.ESBUILD_BINARY_PATH || '';
 
 // Determine backend URL based on environment
 // In Docker: use service name 'backend-dev'
 // In local: use 'localhost'
 // Note: Vite only exposes VITE_* env vars to the client, but in vite.config.ts we can access all env vars
-const isDocker =
-  process.env.VITE_DOCKER_ENV === "true" || process.env.DOCKER_ENV === "true";
-const backendHost = isDocker ? "backend-dev" : "localhost";
-const backendPort = isDocker ? "5000" : process.env.BACKEND_PORT || "45000";
-const frontendPort = parseInt(process.env.FRONTEND_PORT || "43000", 10);
+const isDocker = process.env.VITE_DOCKER_ENV === 'true' || process.env.DOCKER_ENV === 'true';
+const backendHost = isDocker ? 'backend-dev' : 'localhost';
+const backendPort = isDocker ? '5000' : process.env.BACKEND_PORT || '45000';
+const frontendPort = parseInt(process.env.FRONTEND_PORT || '43000', 10);
 const backendUrl = `http://${backendHost}:${backendPort}`;
 
 // Create HTTP agents with DNS caching disabled
@@ -49,43 +48,43 @@ console.log(`🔧 Vite proxy configuration:`, {
   viteDockerEnvVar: process.env.VITE_DOCKER_ENV,
 });
 
-const frontendRoot = path.resolve(__dirname).replace(/\\/g, "/");
+const frontendRoot = path.resolve(__dirname).replace(/\\/g, '/');
 
 // Plugin to serve static docs from public/docs
 function staticDocsPlugin(): Plugin {
-  const docsPath = path.resolve(__dirname, "public/docs");
+  const docsPath = path.resolve(__dirname, 'public/docs');
   return {
-    name: "static-docs",
+    name: 'static-docs',
     configureServer(server) {
       server.middlewares.use((req, res, next) => {
-        if (req.url?.startsWith("/docs")) {
+        if (req.url?.startsWith('/docs')) {
           // Remove /docs prefix and handle trailing slash
-          let filePath = req.url.replace(/^\/docs/, "") || "/index.html";
-          if (filePath.endsWith("/")) {
-            filePath += "index.html";
+          let filePath = req.url.replace(/^\/docs/, '') || '/index.html';
+          if (filePath.endsWith('/')) {
+            filePath += 'index.html';
           }
           const fullPath = path.join(docsPath, filePath);
 
           if (fs.existsSync(fullPath) && fs.statSync(fullPath).isFile()) {
             const ext = path.extname(fullPath);
             const contentTypes: Record<string, string> = {
-              ".html": "text/html",
-              ".js": "application/javascript",
-              ".css": "text/css",
-              ".json": "application/json",
-              ".png": "image/png",
-              ".jpg": "image/jpeg",
-              ".svg": "image/svg+xml",
-              ".ico": "image/x-icon",
-              ".xml": "application/xml",
-              ".txt": "text/plain",
+              '.html': 'text/html',
+              '.js': 'application/javascript',
+              '.css': 'text/css',
+              '.json': 'application/json',
+              '.png': 'image/png',
+              '.jpg': 'image/jpeg',
+              '.svg': 'image/svg+xml',
+              '.ico': 'image/x-icon',
+              '.xml': 'application/xml',
+              '.txt': 'text/plain',
             };
-            res.setHeader("Content-Type", contentTypes[ext] || "application/octet-stream");
+            res.setHeader('Content-Type', contentTypes[ext] || 'application/octet-stream');
             fs.createReadStream(fullPath).pipe(res);
             return;
-          } else if (fs.existsSync(fullPath + "/index.html")) {
-            res.setHeader("Content-Type", "text/html");
-            fs.createReadStream(fullPath + "/index.html").pipe(res);
+          } else if (fs.existsSync(fullPath + '/index.html')) {
+            res.setHeader('Content-Type', 'text/html');
+            fs.createReadStream(fullPath + '/index.html').pipe(res);
             return;
           }
         }
@@ -99,51 +98,49 @@ function staticDocsPlugin(): Plugin {
 export default defineConfig({
   plugins: [react(), iniPlugin(), staticDocsPlugin()],
   define: {
-    __APP_VERSION__: JSON.stringify(process.env.VITE_APP_VERSION || "0.0.0"),
+    __APP_VERSION__: JSON.stringify(process.env.VITE_APP_VERSION || '0.0.0'),
   },
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src"),
-      "@/components": path.resolve(__dirname, "./src/components"),
-      "@/pages": path.resolve(__dirname, "./src/pages"),
-      "@/hooks": path.resolve(__dirname, "./src/hooks"),
-      "@/utils": path.resolve(__dirname, "./src/utils"),
-      "@/types": path.resolve(__dirname, "./src/types"),
-      "@/services": path.resolve(__dirname, "./src/services"),
-      "@/contexts": path.resolve(__dirname, "./src/contexts"),
+      '@': path.resolve(__dirname, './src'),
+      '@/components': path.resolve(__dirname, './src/components'),
+      '@/pages': path.resolve(__dirname, './src/pages'),
+      '@/hooks': path.resolve(__dirname, './src/hooks'),
+      '@/utils': path.resolve(__dirname, './src/utils'),
+      '@/types': path.resolve(__dirname, './src/types'),
+      '@/services': path.resolve(__dirname, './src/services'),
+      '@/contexts': path.resolve(__dirname, './src/contexts'),
     },
   },
   server: {
-    host: "0.0.0.0", // Allow external connections (required for Docker)
+    host: '0.0.0.0', // Allow external connections (required for Docker)
     port: frontendPort,
     watch: {
       usePolling: true, // Required for Docker on Windows/WSL
       interval: 1000, // Increased from 100ms to 1000ms to reduce unnecessary reloads
       ignored: (watchPath: string) => {
         // Only watch files inside the frontend workspace to avoid reloads from other packages
-        const normalizedPath = watchPath.replace(/\\/g, "/");
+        const normalizedPath = watchPath.replace(/\\/g, '/');
         if (!normalizedPath.startsWith(frontendRoot)) {
           return true;
         }
 
         // Ignore common non-source directories and files
         const ignoredPatterns = [
-          "node_modules",
-          ".git",
-          "dist",
-          "build",
-          ".next",
-          "logs",
-          ".log",
-          "tmp",
-          ".DS_Store",
-          ".vite",
-          "coverage",
-          ".turbo",
+          'node_modules',
+          '.git',
+          'dist',
+          'build',
+          '.next',
+          'logs',
+          '.log',
+          'tmp',
+          '.DS_Store',
+          '.vite',
+          'coverage',
+          '.turbo',
         ];
-        return ignoredPatterns.some((pattern) =>
-          normalizedPath.includes(pattern),
-        );
+        return ignoredPatterns.some((pattern) => normalizedPath.includes(pattern));
       },
     },
     // Let Vite infer the HMR host from the page URL so LAN clients use the correct IP
@@ -152,37 +149,31 @@ export default defineConfig({
       timeout: 30000, // Increase timeout before giving up on reconnection
     },
     proxy: {
-      "/api": {
+      '/api': {
         target: backendUrl,
         changeOrigin: true, // Change origin to backend URL
         secure: false,
         agent: httpAgent,
         // SSE 지원을 위한 설정
         configure: (proxy) => {
-          proxy.on("proxyReq", (proxyReq, req) => {
+          proxy.on('proxyReq', (proxyReq, req) => {
             // SSE requests need special headers to keep the stream open
-            if (
-              req.url?.includes("/notifications/sse") ||
-              req.url?.includes("/services/sse")
-            ) {
-              proxyReq.setHeader("Cache-Control", "no-cache");
-              proxyReq.setHeader("Connection", "keep-alive");
+            if (req.url?.includes('/notifications/sse') || req.url?.includes('/services/sse')) {
+              proxyReq.setHeader('Cache-Control', 'no-cache');
+              proxyReq.setHeader('Connection', 'keep-alive');
             }
           });
-          proxy.on("proxyRes", (proxyRes, req) => {
+          proxy.on('proxyRes', (proxyRes, req) => {
             // SSE 응답인 경우 특별 처리
-            if (
-              req.url?.includes("/notifications/sse") ||
-              req.url?.includes("/services/sse")
-            ) {
-              proxyRes.headers["cache-control"] = "no-cache";
-              proxyRes.headers["connection"] = "keep-alive";
-              proxyRes.headers["content-type"] = "text/event-stream";
+            if (req.url?.includes('/notifications/sse') || req.url?.includes('/services/sse')) {
+              proxyRes.headers['cache-control'] = 'no-cache';
+              proxyRes.headers['connection'] = 'keep-alive';
+              proxyRes.headers['content-type'] = 'text/event-stream';
             }
           });
         },
       },
-      "/bull-board": {
+      '/bull-board': {
         target: backendUrl,
         changeOrigin: true,
         secure: false,
@@ -192,34 +183,32 @@ export default defineConfig({
         rewrite: undefined, // Don't rewrite the path
         bypass: undefined, // Don't bypass any requests
       },
-      "/grafana": {
-        target: isDocker
-          ? "http://gatrix-grafana-dev:3000"
-          : "http://localhost:44000",
+      '/grafana': {
+        target: isDocker ? 'http://gatrix-grafana-dev:3000' : 'http://localhost:44000',
         changeOrigin: true,
         secure: false,
         ws: true, // Enable WebSocket proxying for Grafana Live
         // Don't rewrite path because Grafana is configured to serve from /grafana subpath
         configure: (proxy) => {
-          proxy.on("proxyReq", (proxyReq) => {
+          proxy.on('proxyReq', (proxyReq) => {
             // Set Origin header to match Grafana's expected origin to pass CSRF check
             const grafanaOrigin = isDocker
-              ? "http://gatrix-grafana-dev:3000"
-              : "http://localhost:44000";
-            proxyReq.setHeader("Origin", grafanaOrigin);
+              ? 'http://gatrix-grafana-dev:3000'
+              : 'http://localhost:44000';
+            proxyReq.setHeader('Origin', grafanaOrigin);
           });
         },
       },
     },
   },
   build: {
-    outDir: "dist",
+    outDir: 'dist',
     sourcemap: true,
     // chunkSizeWarningLimit increased (default: 500KB)
     chunkSizeWarningLimit: 1000,
     // Performance optimization
-    minify: "esbuild",
-    target: "es2020",
+    minify: 'esbuild',
+    target: 'es2020',
     rollupOptions: {
       output: {
         // Hardening: eliminate dynamic code-splitting to avoid runtime init-order issues across chunks
@@ -230,7 +219,7 @@ export default defineConfig({
   },
   test: {
     globals: true,
-    environment: "jsdom",
-    setupFiles: ["./src/test/setup.ts"],
+    environment: 'jsdom',
+    setupFiles: ['./src/test/setup.ts'],
   },
 } as any);

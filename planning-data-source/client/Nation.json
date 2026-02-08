@@ -13,10 +13,7 @@
       "nationFlagRichText": "string",
       "orderCutinName": "string",
       "royalTitleNameType": "number",
-      "languageId": [
-        "number",
-        "number"
-      ],
+      "languageId": ["number", "number"],
       "shapeId": "number",
       "baseRoyalOrderQuestGoalId": "number",
       "economicBloc": "number"
@@ -33,41 +30,22 @@
     },
     ":min": {
       "townId": 11000000,
-      "languageId": [
-        39000000,
-        39000000
-      ],
+      "languageId": [39000000, 39000000],
       "shapeId": 15400000,
       "baseRoyalOrderQuestGoalId": 89000000
     },
     ":max": {
       "townId": 11999999,
-      "languageId": [
-        39999999,
-        39999999
-      ],
+      "languageId": [39999999, 39999999],
       "shapeId": 15499999,
       "baseRoyalOrderQuestGoalId": 89999999
     },
     ":enum": {},
     ":links": {
-      "townId": [
-        "Town"
-      ],
-      "languageId": [
-        [
-          "Language"
-        ],
-        [
-          "Language"
-        ]
-      ],
-      "shapeId": [
-        "OceanNpcShape"
-      ],
-      "baseRoyalOrderQuestGoalId": [
-        "QuestGoal"
-      ]
+      "townId": ["Town"],
+      "languageId": [["Language"], ["Language"]],
+      "shapeId": ["OceanNpcShape"],
+      "baseRoyalOrderQuestGoalId": ["QuestGoal"]
     }
   },
   "Nation": {
@@ -84,9 +62,7 @@
       "nationFlagRichText": "[[PO]]",
       "orderCutinName": "WBP_CutInSkill_Portugal",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000000
-      ],
+      "languageId": [39000000],
       "shapeId": 15400000,
       "baseRoyalOrderQuestGoalId": 89900002,
       "economicBloc": 0
@@ -104,9 +80,7 @@
       "nationFlagRichText": "[[ES]]",
       "orderCutinName": "WBP_CutInSkill_Espana",
       "royalTitleNameType": 1,
-      "languageId": [
-        39000001
-      ],
+      "languageId": [39000001],
       "shapeId": 15400001,
       "baseRoyalOrderQuestGoalId": 89900003,
       "economicBloc": 0
@@ -124,9 +98,7 @@
       "nationFlagRichText": "[[EN]]",
       "orderCutinName": "WBP_CutInSkill_England",
       "royalTitleNameType": 2,
-      "languageId": [
-        39000002
-      ],
+      "languageId": [39000002],
       "shapeId": 15400002,
       "baseRoyalOrderQuestGoalId": 89900004,
       "economicBloc": 0
@@ -144,9 +116,7 @@
       "nationFlagRichText": "[[NE]]",
       "orderCutinName": "WBP_CutInSkill_Nederland",
       "royalTitleNameType": 3,
-      "languageId": [
-        39000009
-      ],
+      "languageId": [39000009],
       "shapeId": 15400003,
       "baseRoyalOrderQuestGoalId": 89900005,
       "economicBloc": 0
@@ -161,9 +131,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 4,
-      "languageId": [
-        39000003
-      ],
+      "languageId": [39000003],
       "shapeId": 15400004,
       "economicBloc": 0
     },
@@ -180,10 +148,7 @@
       "nationFlagRichText": "[[OT]]",
       "orderCutinName": "WBP_CutInSkill_Istanbul",
       "royalTitleNameType": 6,
-      "languageId": [
-        39000005,
-        39000014
-      ],
+      "languageId": [39000005, 39000014],
       "shapeId": 15400005,
       "baseRoyalOrderQuestGoalId": 89900006,
       "economicBloc": 0
@@ -198,9 +163,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 5,
-      "languageId": [
-        39000007
-      ],
+      "languageId": [39000007],
       "shapeId": 15400006,
       "economicBloc": 0
     },
@@ -214,9 +177,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000019
-      ],
+      "languageId": [39000019],
       "shapeId": 15400007,
       "economicBloc": 0
     },
@@ -256,9 +217,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000028
-      ],
+      "languageId": [39000028],
       "shapeId": 15400010,
       "economicBloc": 1
     },
@@ -272,9 +231,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000019
-      ],
+      "languageId": [39000019],
       "shapeId": 15400011,
       "economicBloc": 0
     },
@@ -288,9 +245,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000025
-      ],
+      "languageId": [39000025],
       "shapeId": 15400012,
       "economicBloc": 0
     },
@@ -304,9 +259,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000007
-      ],
+      "languageId": [39000007],
       "shapeId": 15400013,
       "economicBloc": 0
     },
@@ -320,9 +273,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000019
-      ],
+      "languageId": [39000019],
       "shapeId": 15400014,
       "economicBloc": 0
     },
@@ -336,9 +287,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000022
-      ],
+      "languageId": [39000022],
       "shapeId": 15400015,
       "economicBloc": 0
     },
@@ -352,9 +301,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000015
-      ],
+      "languageId": [39000015],
       "shapeId": 15400016,
       "economicBloc": 0
     },
@@ -368,9 +315,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 9,
-      "languageId": [
-        39000033
-      ],
+      "languageId": [39000033],
       "shapeId": 15400017,
       "economicBloc": 1
     },
@@ -384,9 +329,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 9,
-      "languageId": [
-        39000033
-      ],
+      "languageId": [39000033],
       "shapeId": 15400018,
       "economicBloc": 1
     },
@@ -400,9 +343,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000032
-      ],
+      "languageId": [39000032],
       "shapeId": 15400019,
       "economicBloc": 1
     },
@@ -416,9 +357,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000011
-      ],
+      "languageId": [39000011],
       "shapeId": 15400020,
       "economicBloc": 0
     },
@@ -432,9 +371,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000010
-      ],
+      "languageId": [39000010],
       "shapeId": 15400021,
       "economicBloc": 0
     },
@@ -448,9 +385,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000016
-      ],
+      "languageId": [39000016],
       "shapeId": 15400022,
       "economicBloc": 0
     },
@@ -464,9 +399,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000004
-      ],
+      "languageId": [39000004],
       "shapeId": 15400023,
       "economicBloc": 0
     },
@@ -480,9 +413,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000012
-      ],
+      "languageId": [39000012],
       "shapeId": 15400024,
       "economicBloc": 0
     },
@@ -496,9 +427,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000031
-      ],
+      "languageId": [39000031],
       "shapeId": 15400025,
       "economicBloc": 1
     },
@@ -512,9 +441,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000031
-      ],
+      "languageId": [39000031],
       "shapeId": 15400026,
       "economicBloc": 1
     },
@@ -528,9 +455,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000016
-      ],
+      "languageId": [39000016],
       "shapeId": 15400027,
       "economicBloc": 0
     },
@@ -544,9 +469,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000030
-      ],
+      "languageId": [39000030],
       "shapeId": 15400028,
       "economicBloc": 1
     },
@@ -560,9 +483,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000021
-      ],
+      "languageId": [39000021],
       "shapeId": 15400029,
       "economicBloc": 0
     },
@@ -576,9 +497,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000030
-      ],
+      "languageId": [39000030],
       "shapeId": 15400030,
       "economicBloc": 1
     },
@@ -592,9 +511,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000032
-      ],
+      "languageId": [39000032],
       "shapeId": 15400031,
       "economicBloc": 1
     },
@@ -608,9 +525,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000017
-      ],
+      "languageId": [39000017],
       "shapeId": 15400032,
       "economicBloc": 0
     },
@@ -624,10 +539,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000017,
-        39000015
-      ],
+      "languageId": [39000017, 39000015],
       "shapeId": 15400033,
       "economicBloc": 0
     },
@@ -641,9 +553,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000028
-      ],
+      "languageId": [39000028],
       "shapeId": 15400034,
       "economicBloc": 1
     },
@@ -657,9 +567,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000015
-      ],
+      "languageId": [39000015],
       "shapeId": 15400035,
       "economicBloc": 0
     },
@@ -673,9 +581,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000014
-      ],
+      "languageId": [39000014],
       "shapeId": 15400036,
       "economicBloc": 0
     },
@@ -689,9 +595,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000016
-      ],
+      "languageId": [39000016],
       "shapeId": 15400037,
       "economicBloc": 0
     },
@@ -708,9 +612,7 @@
       "nationFlagRichText": "[[MI]]",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 9,
-      "languageId": [
-        39000033
-      ],
+      "languageId": [39000033],
       "shapeId": 15400038,
       "baseRoyalOrderQuestGoalId": 89900007,
       "economicBloc": 1
@@ -725,9 +627,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000008
-      ],
+      "languageId": [39000008],
       "shapeId": 15400039,
       "economicBloc": 0
     },
@@ -744,9 +644,7 @@
       "nationFlagRichText": "[[JP]]",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 7,
-      "languageId": [
-        39000034
-      ],
+      "languageId": [39000034],
       "shapeId": 15400040,
       "baseRoyalOrderQuestGoalId": 89900008,
       "economicBloc": 1
@@ -761,9 +659,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000015
-      ],
+      "languageId": [39000015],
       "shapeId": 15400042,
       "economicBloc": 0
     },
@@ -777,9 +673,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000013
-      ],
+      "languageId": [39000013],
       "shapeId": 15400043,
       "economicBloc": 0
     },
@@ -793,9 +687,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000019
-      ],
+      "languageId": [39000019],
       "shapeId": 15400044,
       "economicBloc": 0
     },
@@ -809,9 +701,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000017
-      ],
+      "languageId": [39000017],
       "shapeId": 15400045,
       "economicBloc": 0
     },
@@ -825,9 +715,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000028
-      ],
+      "languageId": [39000028],
       "shapeId": 15400047,
       "economicBloc": 1
     },
@@ -841,9 +729,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000019
-      ],
+      "languageId": [39000019],
       "shapeId": 15400048,
       "economicBloc": 0
     },
@@ -857,9 +743,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000018
-      ],
+      "languageId": [39000018],
       "shapeId": 15400049,
       "economicBloc": 0
     },
@@ -873,9 +757,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000031
-      ],
+      "languageId": [39000031],
       "shapeId": 15400050,
       "economicBloc": 1
     },
@@ -889,9 +771,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000023
-      ],
+      "languageId": [39000023],
       "shapeId": 15400051,
       "economicBloc": 0
     },
@@ -905,9 +785,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000006
-      ],
+      "languageId": [39000006],
       "shapeId": 15400052,
       "economicBloc": 0
     },
@@ -921,9 +799,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000002
-      ],
+      "languageId": [39000002],
       "shapeId": 15400053,
       "economicBloc": 0
     },
@@ -937,9 +813,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000025
-      ],
+      "languageId": [39000025],
       "shapeId": 15400054,
       "economicBloc": 0
     },
@@ -953,9 +827,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000019
-      ],
+      "languageId": [39000019],
       "shapeId": 15400055,
       "economicBloc": 0
     },
@@ -969,9 +841,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000014
-      ],
+      "languageId": [39000014],
       "shapeId": 15400056,
       "economicBloc": 0
     },
@@ -985,9 +855,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000019
-      ],
+      "languageId": [39000019],
       "shapeId": 15400057,
       "economicBloc": 0
     },
@@ -1001,9 +869,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000025
-      ],
+      "languageId": [39000025],
       "shapeId": 15400058,
       "economicBloc": 0
     },
@@ -1017,9 +883,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000015
-      ],
+      "languageId": [39000015],
       "shapeId": 15400059,
       "economicBloc": 0
     },
@@ -1033,9 +897,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000022
-      ],
+      "languageId": [39000022],
       "shapeId": 15400060,
       "economicBloc": 0
     },
@@ -1049,9 +911,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000027
-      ],
+      "languageId": [39000027],
       "shapeId": 15400061,
       "economicBloc": 1
     },
@@ -1065,9 +925,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000024
-      ],
+      "languageId": [39000024],
       "shapeId": 15400062,
       "economicBloc": 0
     },
@@ -1081,9 +939,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000002
-      ],
+      "languageId": [39000002],
       "shapeId": 15400063,
       "economicBloc": 0
     },
@@ -1097,9 +953,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000014
-      ],
+      "languageId": [39000014],
       "shapeId": 15400064,
       "economicBloc": 0
     },
@@ -1113,9 +967,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000032
-      ],
+      "languageId": [39000032],
       "shapeId": 15400065,
       "economicBloc": 1
     },
@@ -1129,9 +981,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000015
-      ],
+      "languageId": [39000015],
       "shapeId": 15400066,
       "economicBloc": 0
     },
@@ -1145,9 +995,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000023
-      ],
+      "languageId": [39000023],
       "shapeId": 15400067,
       "economicBloc": 0
     },
@@ -1161,9 +1009,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000030
-      ],
+      "languageId": [39000030],
       "shapeId": 15400068,
       "economicBloc": 1
     },
@@ -1177,9 +1023,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000024
-      ],
+      "languageId": [39000024],
       "shapeId": 15400069,
       "economicBloc": 0
     },
@@ -1193,9 +1037,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000014
-      ],
+      "languageId": [39000014],
       "shapeId": 15400070,
       "economicBloc": 0
     },
@@ -1209,9 +1051,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000007
-      ],
+      "languageId": [39000007],
       "shapeId": 15400071,
       "economicBloc": 0
     },
@@ -1225,9 +1065,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000014
-      ],
+      "languageId": [39000014],
       "shapeId": 15400072,
       "economicBloc": 0
     },
@@ -1241,9 +1079,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000023
-      ],
+      "languageId": [39000023],
       "shapeId": 15400073,
       "economicBloc": 0
     },
@@ -1257,9 +1093,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000028
-      ],
+      "languageId": [39000028],
       "shapeId": 15400074,
       "economicBloc": 1
     },
@@ -1273,9 +1107,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000023
-      ],
+      "languageId": [39000023],
       "shapeId": 15400075,
       "economicBloc": 0
     },
@@ -1289,9 +1121,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000020
-      ],
+      "languageId": [39000020],
       "shapeId": 15400076,
       "economicBloc": 0
     },
@@ -1305,9 +1135,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Genoa",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000007
-      ],
+      "languageId": [39000007],
       "shapeId": 15400077,
       "economicBloc": 0
     },
@@ -1324,9 +1152,7 @@
       "nationFlagRichText": "[[JO]]",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 8,
-      "languageId": [
-        39000035
-      ],
+      "languageId": [39000035],
       "shapeId": 15400078,
       "baseRoyalOrderQuestGoalId": 89900009,
       "economicBloc": 1
@@ -1341,9 +1167,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000024
-      ],
+      "languageId": [39000024],
       "shapeId": 15400079,
       "economicBloc": 0
     },
@@ -1357,9 +1181,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000028
-      ],
+      "languageId": [39000028],
       "shapeId": 15400080,
       "economicBloc": 1
     },
@@ -1373,9 +1195,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000014
-      ],
+      "languageId": [39000014],
       "shapeId": 15400081,
       "economicBloc": 0
     },
@@ -1389,9 +1209,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000026
-      ],
+      "languageId": [39000026],
       "shapeId": 15400082,
       "economicBloc": 0
     },
@@ -1405,9 +1223,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000026
-      ],
+      "languageId": [39000026],
       "shapeId": 15400083,
       "economicBloc": 0
     },
@@ -1421,9 +1237,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000015
-      ],
+      "languageId": [39000015],
       "shapeId": 15400084,
       "economicBloc": 0
     },
@@ -1437,9 +1251,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000017
-      ],
+      "languageId": [39000017],
       "shapeId": 15400085,
       "economicBloc": 0
     },
@@ -1453,10 +1265,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000017,
-        39000015
-      ],
+      "languageId": [39000017, 39000015],
       "shapeId": 15400086,
       "economicBloc": 0
     },
@@ -1470,9 +1279,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000023
-      ],
+      "languageId": [39000023],
       "shapeId": 15400087,
       "economicBloc": 0
     },
@@ -1486,9 +1293,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000012
-      ],
+      "languageId": [39000012],
       "shapeId": 15400088,
       "economicBloc": 0
     },
@@ -1502,9 +1307,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000029
-      ],
+      "languageId": [39000029],
       "shapeId": 15400089,
       "economicBloc": 1
     },
@@ -1518,9 +1321,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000016
-      ],
+      "languageId": [39000016],
       "shapeId": 15400090,
       "economicBloc": 0
     },
@@ -1534,9 +1335,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000016
-      ],
+      "languageId": [39000016],
       "shapeId": 15400091,
       "economicBloc": 0
     },
@@ -1550,9 +1349,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000025
-      ],
+      "languageId": [39000025],
       "shapeId": 15400092,
       "economicBloc": 0
     },
@@ -1566,9 +1363,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000025
-      ],
+      "languageId": [39000025],
       "shapeId": 15400093,
       "economicBloc": 0
     },
@@ -1582,9 +1377,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000014
-      ],
+      "languageId": [39000014],
       "shapeId": 15400094,
       "economicBloc": 0
     },
@@ -1598,9 +1391,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000030
-      ],
+      "languageId": [39000030],
       "shapeId": 15400095,
       "economicBloc": 1
     },
@@ -1614,9 +1405,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000028
-      ],
+      "languageId": [39000028],
       "shapeId": 15400096,
       "economicBloc": 1
     },
@@ -1630,9 +1419,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000015
-      ],
+      "languageId": [39000015],
       "shapeId": 15400097,
       "economicBloc": 0
     },
@@ -1646,9 +1433,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000024
-      ],
+      "languageId": [39000024],
       "shapeId": 15400098,
       "economicBloc": 0
     },
@@ -1662,9 +1447,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000032
-      ],
+      "languageId": [39000032],
       "shapeId": 15400099,
       "economicBloc": 1
     },
@@ -1678,9 +1461,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000030
-      ],
+      "languageId": [39000030],
       "shapeId": 15400100,
       "economicBloc": 1
     },
@@ -1694,9 +1475,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000012
-      ],
+      "languageId": [39000012],
       "shapeId": 15400101,
       "economicBloc": 0
     },
@@ -1710,9 +1489,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000004
-      ],
+      "languageId": [39000004],
       "shapeId": 15400102,
       "economicBloc": 0
     },
@@ -1726,9 +1503,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000030
-      ],
+      "languageId": [39000030],
       "shapeId": 15400103,
       "economicBloc": 1
     },
@@ -1742,9 +1517,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000014
-      ],
+      "languageId": [39000014],
       "shapeId": 15400104,
       "economicBloc": 0
     },
@@ -1758,9 +1531,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000027
-      ],
+      "languageId": [39000027],
       "shapeId": 15400105,
       "economicBloc": 1
     },
@@ -1774,9 +1545,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000014
-      ],
+      "languageId": [39000014],
       "shapeId": 15400107,
       "economicBloc": 0
     },
@@ -1790,9 +1559,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000030
-      ],
+      "languageId": [39000030],
       "shapeId": 15400108,
       "economicBloc": 1
     },
@@ -1806,9 +1573,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000030
-      ],
+      "languageId": [39000030],
       "shapeId": 15400109,
       "economicBloc": 1
     },
@@ -1822,9 +1587,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 7,
-      "languageId": [
-        39000034
-      ],
+      "languageId": [39000034],
       "shapeId": 15400110,
       "economicBloc": 1
     },
@@ -1838,9 +1601,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000000
-      ],
+      "languageId": [39000000],
       "shapeId": 15400000,
       "economicBloc": 1
     },
@@ -1854,9 +1615,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000000
-      ],
+      "languageId": [39000000],
       "shapeId": 15400000,
       "economicBloc": 1
     },
@@ -1870,9 +1629,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000000
-      ],
+      "languageId": [39000000],
       "shapeId": 15400000,
       "economicBloc": 1
     },
@@ -1886,9 +1643,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000001
-      ],
+      "languageId": [39000001],
       "shapeId": 15400001,
       "economicBloc": 0
     },
@@ -1902,9 +1657,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000000
-      ],
+      "languageId": [39000000],
       "shapeId": 15400000,
       "economicBloc": 1
     },
@@ -1918,9 +1671,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000000
-      ],
+      "languageId": [39000000],
       "shapeId": 15400000,
       "economicBloc": 1
     },
@@ -1934,9 +1685,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000000
-      ],
+      "languageId": [39000000],
       "shapeId": 15400000,
       "economicBloc": 1
     },
@@ -1950,9 +1699,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000000
-      ],
+      "languageId": [39000000],
       "shapeId": 15400000,
       "economicBloc": 1
     },
@@ -1966,9 +1713,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000000
-      ],
+      "languageId": [39000000],
       "shapeId": 15400000,
       "economicBloc": 1
     },
@@ -1982,9 +1727,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000000
-      ],
+      "languageId": [39000000],
       "shapeId": 15400000,
       "economicBloc": 1
     },
@@ -1998,9 +1741,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000000
-      ],
+      "languageId": [39000000],
       "shapeId": 15400000,
       "economicBloc": 1
     },
@@ -2014,9 +1755,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000000
-      ],
+      "languageId": [39000000],
       "shapeId": 15400000,
       "economicBloc": 1
     },
@@ -2030,9 +1769,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000008
-      ],
+      "languageId": [39000008],
       "shapeId": 15400039,
       "economicBloc": 0
     },
@@ -2046,9 +1783,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000000
-      ],
+      "languageId": [39000000],
       "shapeId": 15400000,
       "economicBloc": 1
     },
@@ -2062,9 +1797,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000000
-      ],
+      "languageId": [39000000],
       "shapeId": 15400000,
       "economicBloc": 1
     },
@@ -2078,9 +1811,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000000
-      ],
+      "languageId": [39000000],
       "shapeId": 15400000,
       "economicBloc": 1
     },
@@ -2094,9 +1825,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000000
-      ],
+      "languageId": [39000000],
       "shapeId": 15400000,
       "economicBloc": 1
     },
@@ -2110,9 +1839,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000000
-      ],
+      "languageId": [39000000],
       "shapeId": 15400000,
       "economicBloc": 1
     },
@@ -2126,9 +1853,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000000
-      ],
+      "languageId": [39000000],
       "shapeId": 15400000,
       "economicBloc": 1
     },
@@ -2142,9 +1867,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000014
-      ],
+      "languageId": [39000014],
       "shapeId": 15400049,
       "economicBloc": 0
     },
@@ -2158,9 +1881,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000007
-      ],
+      "languageId": [39000007],
       "shapeId": 15400077,
       "economicBloc": 0
     },
@@ -2174,9 +1895,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000030
-      ],
+      "languageId": [39000030],
       "shapeId": 15400095,
       "economicBloc": 1
     },
@@ -2190,10 +1909,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000015,
-        39000000
-      ],
+      "languageId": [39000015, 39000000],
       "shapeId": 15400016,
       "economicBloc": 0
     },
@@ -2207,10 +1923,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000007,
-        39000001
-      ],
+      "languageId": [39000007, 39000001],
       "shapeId": 15400077,
       "economicBloc": 0
     },
@@ -2237,10 +1950,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000006,
-        39000003
-      ],
+      "languageId": [39000006, 39000003],
       "shapeId": 15400052,
       "economicBloc": 0
     },
@@ -2254,10 +1964,7 @@
       "shipFlagImageName": "T_Ship_Flag_Default",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 0,
-      "languageId": [
-        39000015,
-        39000024
-      ],
+      "languageId": [39000015, 39000024],
       "shapeId": 15400052,
       "economicBloc": 1
     },
@@ -2271,9 +1978,7 @@
       "shipFlagImageName": "T_Ship_Flag_GreatQing",
       "orderCutinName": "WBP_CutInSkill_Dummy",
       "royalTitleNameType": 9,
-      "languageId": [
-        39000033
-      ],
+      "languageId": [39000033],
       "shapeId": 15400038,
       "economicBloc": 1
     },

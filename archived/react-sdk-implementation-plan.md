@@ -1,9 +1,11 @@
 # Gatrix React SDK 구현 계획
 
 ## 개요
+
 `gatrix-js-client-sdk`를 래핑하여 React에서 사용할 수 있는 hooks 및 Context를 제공하는 SDK를 제작합니다.
 
 **참고 자료:**
+
 - `ref/unleash-react-sdk` - Unleash React SDK 구조
 - `client-sdks/gatrix-js-client-sdk` - 기존 JavaScript SDK
 - `client-sdks/CLIENT_SDK_SPEC.md` - SDK 스펙 문서
@@ -47,12 +49,14 @@ client-sdks/gatrix-react-sdk/
 ## Task 1: React SDK 프로젝트 초기화 및 기본 설정
 
 ### 목표
+
 - 프로젝트 폴더 생성
 - package.json 설정 (React, TypeScript, Vite)
 - tsconfig.json 설정
 - vite.config.js 빌드 설정
 
 ### 상세 작업
+
 1. `gatrix-react-sdk` 폴더 생성
 2. package.json 작성
    - peerDependencies: react, @gatrix/js-client-sdk
@@ -66,12 +70,14 @@ client-sdks/gatrix-react-sdk/
 ## Task 2: Context 및 Provider 구현
 
 ### 목표
+
 - GatrixContext 정의
 - GatrixProvider 컴포넌트 구현
 
 ### 상세 작업
 
 #### GatrixContext.ts
+
 ```typescript
 export interface IGatrixContextValue {
   client: GatrixClient;
@@ -87,6 +93,7 @@ export interface IGatrixContextValue {
 ```
 
 #### GatrixProvider.tsx
+
 - config prop으로 GatrixClientConfig 받기
 - 또는 gatrixClient prop으로 이미 생성된 인스턴스 받기
 - startClient, stopClient 옵션 제공
@@ -98,27 +105,30 @@ export interface IGatrixContextValue {
 ## Task 3: Core Hooks 구현
 
 ### useGatrixClient
+
 ```typescript
 const useGatrixClient = (): GatrixClient => {
   const { client } = useGatrixContext();
   return client;
-}
+};
 ```
 
 ### useFlagsStatus
+
 ```typescript
 const useFlagsStatus = (): { flagsReady: boolean; flagsError: any } => {
   const { flagsReady, flagsError } = useGatrixContext();
   return { flagsReady, flagsError };
-}
+};
 ```
 
 ### useUpdateContext
+
 ```typescript
 const useUpdateContext = () => {
   const { updateContext } = useGatrixContext();
   return updateContext;
-}
+};
 ```
 
 ---
@@ -126,15 +136,18 @@ const useUpdateContext = () => {
 ## Task 4: Flag Access Hooks 구현
 
 ### useFlag(flagName: string): boolean
+
 - isEnabled 결과 반환
 - 'update', 'ready' 이벤트 구독하여 자동 업데이트
 - useRef로 현재 값 추적하여 불필요한 렌더링 방지
 
 ### useFlags(): EvaluatedFlag[]
+
 - getAllFlags() 결과 반환
 - 'update' 이벤트 구독하여 자동 업데이트
 
 ### useVariant(flagName: string): Variant
+
 - getVariant 결과 반환
 - variant 변경 감지 로직 구현
 
@@ -143,11 +156,12 @@ const useUpdateContext = () => {
 ## Task 5: Variation Hooks 구현
 
 ### useBoolVariation(flagName: string, defaultValue: boolean): boolean
+
 ```typescript
 const useBoolVariation = (flagName: string, defaultValue: boolean): boolean => {
   const { features, client } = useGatrixContext();
   const [value, setValue] = useState(() => features.boolVariation(flagName, defaultValue));
-  
+
   useEffect(() => {
     const handler = () => setValue(features.boolVariation(flagName, defaultValue));
     client.on('update', handler);
@@ -157,12 +171,13 @@ const useBoolVariation = (flagName: string, defaultValue: boolean): boolean => {
       client.off('ready', handler);
     };
   }, [client, flagName, defaultValue]);
-  
+
   return value;
-}
+};
 ```
 
 ### useStringVariation, useNumberVariation, useJsonVariation
+
 - 동일한 패턴으로 구현
 
 ---
@@ -170,10 +185,21 @@ const useBoolVariation = (flagName: string, defaultValue: boolean): boolean => {
 ## Task 6: 빌드 및 Export 설정
 
 ### index.ts exports
+
 ```typescript
 // Re-export from js-client-sdk
-export type { GatrixClientConfig, GatrixContext, EvaluatedFlag, Variant } from '@gatrix/js-client-sdk';
-export { GatrixClient, InMemoryStorageProvider, LocalStorageProvider, EVENTS } from '@gatrix/js-client-sdk';
+export type {
+  GatrixClientConfig,
+  GatrixContext,
+  EvaluatedFlag,
+  Variant,
+} from '@gatrix/js-client-sdk';
+export {
+  GatrixClient,
+  InMemoryStorageProvider,
+  LocalStorageProvider,
+  EVENTS,
+} from '@gatrix/js-client-sdk';
 
 // React specific
 export { GatrixContext as GatrixFlagContext } from './GatrixContext';
@@ -197,10 +223,12 @@ export default GatrixProvider;
 ## Task 7: React Dashboard 예제 구현
 
 ### 목표
+
 - gatrix-js-client-sdk의 dashboard.ts를 React 버전으로 포팅
 - Rebass 사용하여 UI 스타일링
 
 ### 구조
+
 ```
 examples/dashboard/
 ├── src/
@@ -218,6 +246,7 @@ examples/dashboard/
 ```
 
 ### 주요 기능
+
 - 실시간 플래그 목록 표시
 - 플래그 on/off 상태 표시
 - variant 정보 표시
@@ -241,6 +270,7 @@ examples/dashboard/
 ## 예상 파일 목록
 
 ### SDK 파일
+
 1. `package.json`
 2. `tsconfig.json`
 3. `vite.config.js`
@@ -261,6 +291,7 @@ examples/dashboard/
 18. `README.md`
 
 ### 예제 파일
+
 19. `examples/dashboard/package.json`
 20. `examples/dashboard/vite.config.js`
 21. `examples/dashboard/index.html`
@@ -277,12 +308,14 @@ examples/dashboard/
 ## 기술 스택
 
 ### React SDK
+
 - TypeScript
 - React 18+
 - Vite (빌드)
 - vite-plugin-dts (타입 생성)
 
 ### Dashboard 예제
+
 - Vite
 - React
 - Rebass (UI 컴포넌트)

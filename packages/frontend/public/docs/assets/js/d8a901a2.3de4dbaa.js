@@ -1,1 +1,174 @@
-"use strict";(globalThis.webpackChunkdocs=globalThis.webpackChunkdocs||[]).push([[4217],{3130(e,n,i){i.r(n),i.d(n,{assets:()=>c,contentTitle:()=>s,default:()=>m,frontMatter:()=>r,metadata:()=>t,toc:()=>l});var t=i(8536),a=i(4848),o=i(8453);const r={slug:"performance-optimization",title:"Gatrix Performance Optimization Guide",authors:["gatrix-team"],tags:["performance","optimization"]},s=void 0,c={authorsImageUrls:[void 0]},l=[{value:"Overview",id:"overview",level:2},{value:"Caching Strategy",id:"caching-strategy",level:2},{value:"Redis Caching",id:"redis-caching",level:3},{value:"Database Optimization",id:"database-optimization",level:2},{value:"Indexing",id:"indexing",level:3},{value:"Connection Pooling",id:"connection-pooling",level:3},{value:"Edge Server CDN",id:"edge-server-cdn",level:2},{value:"Monitoring",id:"monitoring",level:2},{value:"Conclusion",id:"conclusion",level:2}];function d(e){const n={code:"code",h2:"h2",h3:"h3",li:"li",p:"p",pre:"pre",ul:"ul",...(0,o.R)(),...e.components};return(0,a.jsxs)(a.Fragment,{children:[(0,a.jsx)(n.p,{children:"Learn how to optimize Gatrix for maximum performance."}),"\n",(0,a.jsx)(n.h2,{id:"overview",children:"Overview"}),"\n",(0,a.jsx)(n.p,{children:"This guide covers key performance optimization techniques for Gatrix."}),"\n",(0,a.jsx)(n.h2,{id:"caching-strategy",children:"Caching Strategy"}),"\n",(0,a.jsx)(n.h3,{id:"redis-caching",children:"Redis Caching"}),"\n",(0,a.jsx)(n.pre,{children:(0,a.jsx)(n.code,{className:"language-typescript",children:"// Use Redis for frequently accessed data\nconst cache = new Redis({\n  host: process.env.REDIS_HOST,\n  port: process.env.REDIS_PORT,\n});\n\n// Cache feature flags\nasync function getCachedFlag(key: string) {\n  const cached = await cache.get(`flag:${key}`);\n  if (cached) return JSON.parse(cached);\n  \n  const flag = await fetchFlagFromDB(key);\n  await cache.setex(`flag:${key}`, 60, JSON.stringify(flag));\n  return flag;\n}\n"})}),"\n",(0,a.jsx)(n.h2,{id:"database-optimization",children:"Database Optimization"}),"\n",(0,a.jsx)(n.h3,{id:"indexing",children:"Indexing"}),"\n",(0,a.jsx)(n.pre,{children:(0,a.jsx)(n.code,{className:"language-sql",children:"-- Create indexes for frequently queried columns\nCREATE INDEX idx_feature_flags_key ON feature_flags(flag_key);\nCREATE INDEX idx_audit_logs_created ON audit_logs(created_at);\nCREATE INDEX idx_notices_status ON notices(is_active, start_date);\n"})}),"\n",(0,a.jsx)(n.h3,{id:"connection-pooling",children:"Connection Pooling"}),"\n",(0,a.jsx)(n.pre,{children:(0,a.jsx)(n.code,{className:"language-typescript",children:"const pool = mysql.createPool({\n  host: process.env.DB_HOST,\n  connectionLimit: 10,\n  queueLimit: 0,\n  waitForConnections: true,\n});\n"})}),"\n",(0,a.jsx)(n.h2,{id:"edge-server-cdn",children:"Edge Server CDN"}),"\n",(0,a.jsx)(n.p,{children:"Deploy edge servers close to your game servers for minimal latency:"}),"\n",(0,a.jsxs)(n.ul,{children:["\n",(0,a.jsx)(n.li,{children:"Host edge in the same region as game servers"}),"\n",(0,a.jsx)(n.li,{children:"Enable response caching for static data"}),"\n",(0,a.jsx)(n.li,{children:"Use connection keep-alive"}),"\n"]}),"\n",(0,a.jsx)(n.h2,{id:"monitoring",children:"Monitoring"}),"\n",(0,a.jsx)(n.p,{children:"Use Prometheus and Grafana to monitor:"}),"\n",(0,a.jsxs)(n.ul,{children:["\n",(0,a.jsx)(n.li,{children:"API response times"}),"\n",(0,a.jsx)(n.li,{children:"Cache hit rates"}),"\n",(0,a.jsx)(n.li,{children:"Database query performance"}),"\n",(0,a.jsx)(n.li,{children:"Memory and CPU usage"}),"\n"]}),"\n",(0,a.jsx)(n.h2,{id:"conclusion",children:"Conclusion"}),"\n",(0,a.jsx)(n.p,{children:"Apply these optimizations to ensure Gatrix runs efficiently at scale."})]})}function m(e={}){const{wrapper:n}={...(0,o.R)(),...e.components};return n?(0,a.jsx)(n,{...e,children:(0,a.jsx)(d,{...e})}):d(e)}},8453(e,n,i){i.d(n,{R:()=>r,x:()=>s});var t=i(6540);const a={},o=t.createContext(a);function r(e){const n=t.useContext(o);return t.useMemo(function(){return"function"==typeof e?e(n):{...n,...e}},[n,e])}function s(e){let n;return n=e.disableParentContext?"function"==typeof e.components?e.components(a):e.components||a:r(e.components),t.createElement(o.Provider,{value:n},e.children)}},8536(e){e.exports=JSON.parse('{"permalink":"/docs/blog/performance-optimization","editUrl":"https://github.com/your-org/gatrix/tree/main/docs/blog/2024-01-20-performance-optimization.md","source":"@site/blog/2024-01-20-performance-optimization.md","title":"Gatrix Performance Optimization Guide","description":"Learn how to optimize Gatrix for maximum performance.","date":"2024-01-20T00:00:00.000Z","tags":[{"inline":true,"label":"performance","permalink":"/docs/blog/tags/performance"},{"inline":true,"label":"optimization","permalink":"/docs/blog/tags/optimization"}],"readingTime":0.89,"hasTruncateMarker":true,"authors":[{"name":"Gatrix Team","title":"Game Platform Development Team","url":"https://github.com/your-org/gatrix","page":{"permalink":"/docs/blog/authors/gatrix-team"},"socials":{"github":"https://github.com/your-org","email":"mailto:support@gatrix.com"},"imageURL":"https://avatars.githubusercontent.com/u/0?v=4","key":"gatrix-team"}],"frontMatter":{"slug":"performance-optimization","title":"Gatrix Performance Optimization Guide","authors":["gatrix-team"],"tags":["performance","optimization"]},"unlisted":false,"nextItem":{"title":"Gatrix Production Deployment Tips and Best Practices","permalink":"/docs/blog/production-deployment-tips"}}')}}]);
+'use strict';
+(globalThis.webpackChunkdocs = globalThis.webpackChunkdocs || []).push([
+  [4217],
+  {
+    3130(e, n, i) {
+      (i.r(n),
+        i.d(n, {
+          assets: () => c,
+          contentTitle: () => s,
+          default: () => m,
+          frontMatter: () => r,
+          metadata: () => t,
+          toc: () => l,
+        }));
+      var t = i(8536),
+        a = i(4848),
+        o = i(8453);
+      const r = {
+          slug: 'performance-optimization',
+          title: 'Gatrix Performance Optimization Guide',
+          authors: ['gatrix-team'],
+          tags: ['performance', 'optimization'],
+        },
+        s = void 0,
+        c = { authorsImageUrls: [void 0] },
+        l = [
+          { value: 'Overview', id: 'overview', level: 2 },
+          { value: 'Caching Strategy', id: 'caching-strategy', level: 2 },
+          { value: 'Redis Caching', id: 'redis-caching', level: 3 },
+          { value: 'Database Optimization', id: 'database-optimization', level: 2 },
+          { value: 'Indexing', id: 'indexing', level: 3 },
+          { value: 'Connection Pooling', id: 'connection-pooling', level: 3 },
+          { value: 'Edge Server CDN', id: 'edge-server-cdn', level: 2 },
+          { value: 'Monitoring', id: 'monitoring', level: 2 },
+          { value: 'Conclusion', id: 'conclusion', level: 2 },
+        ];
+      function d(e) {
+        const n = {
+          code: 'code',
+          h2: 'h2',
+          h3: 'h3',
+          li: 'li',
+          p: 'p',
+          pre: 'pre',
+          ul: 'ul',
+          ...(0, o.R)(),
+          ...e.components,
+        };
+        return (0, a.jsxs)(a.Fragment, {
+          children: [
+            (0, a.jsx)(n.p, { children: 'Learn how to optimize Gatrix for maximum performance.' }),
+            '\n',
+            (0, a.jsx)(n.h2, { id: 'overview', children: 'Overview' }),
+            '\n',
+            (0, a.jsx)(n.p, {
+              children: 'This guide covers key performance optimization techniques for Gatrix.',
+            }),
+            '\n',
+            (0, a.jsx)(n.h2, { id: 'caching-strategy', children: 'Caching Strategy' }),
+            '\n',
+            (0, a.jsx)(n.h3, { id: 'redis-caching', children: 'Redis Caching' }),
+            '\n',
+            (0, a.jsx)(n.pre, {
+              children: (0, a.jsx)(n.code, {
+                className: 'language-typescript',
+                children:
+                  '// Use Redis for frequently accessed data\nconst cache = new Redis({\n  host: process.env.REDIS_HOST,\n  port: process.env.REDIS_PORT,\n});\n\n// Cache feature flags\nasync function getCachedFlag(key: string) {\n  const cached = await cache.get(`flag:${key}`);\n  if (cached) return JSON.parse(cached);\n  \n  const flag = await fetchFlagFromDB(key);\n  await cache.setex(`flag:${key}`, 60, JSON.stringify(flag));\n  return flag;\n}\n',
+              }),
+            }),
+            '\n',
+            (0, a.jsx)(n.h2, { id: 'database-optimization', children: 'Database Optimization' }),
+            '\n',
+            (0, a.jsx)(n.h3, { id: 'indexing', children: 'Indexing' }),
+            '\n',
+            (0, a.jsx)(n.pre, {
+              children: (0, a.jsx)(n.code, {
+                className: 'language-sql',
+                children:
+                  '-- Create indexes for frequently queried columns\nCREATE INDEX idx_feature_flags_key ON feature_flags(flag_key);\nCREATE INDEX idx_audit_logs_created ON audit_logs(created_at);\nCREATE INDEX idx_notices_status ON notices(is_active, start_date);\n',
+              }),
+            }),
+            '\n',
+            (0, a.jsx)(n.h3, { id: 'connection-pooling', children: 'Connection Pooling' }),
+            '\n',
+            (0, a.jsx)(n.pre, {
+              children: (0, a.jsx)(n.code, {
+                className: 'language-typescript',
+                children:
+                  'const pool = mysql.createPool({\n  host: process.env.DB_HOST,\n  connectionLimit: 10,\n  queueLimit: 0,\n  waitForConnections: true,\n});\n',
+              }),
+            }),
+            '\n',
+            (0, a.jsx)(n.h2, { id: 'edge-server-cdn', children: 'Edge Server CDN' }),
+            '\n',
+            (0, a.jsx)(n.p, {
+              children: 'Deploy edge servers close to your game servers for minimal latency:',
+            }),
+            '\n',
+            (0, a.jsxs)(n.ul, {
+              children: [
+                '\n',
+                (0, a.jsx)(n.li, { children: 'Host edge in the same region as game servers' }),
+                '\n',
+                (0, a.jsx)(n.li, { children: 'Enable response caching for static data' }),
+                '\n',
+                (0, a.jsx)(n.li, { children: 'Use connection keep-alive' }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, a.jsx)(n.h2, { id: 'monitoring', children: 'Monitoring' }),
+            '\n',
+            (0, a.jsx)(n.p, { children: 'Use Prometheus and Grafana to monitor:' }),
+            '\n',
+            (0, a.jsxs)(n.ul, {
+              children: [
+                '\n',
+                (0, a.jsx)(n.li, { children: 'API response times' }),
+                '\n',
+                (0, a.jsx)(n.li, { children: 'Cache hit rates' }),
+                '\n',
+                (0, a.jsx)(n.li, { children: 'Database query performance' }),
+                '\n',
+                (0, a.jsx)(n.li, { children: 'Memory and CPU usage' }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, a.jsx)(n.h2, { id: 'conclusion', children: 'Conclusion' }),
+            '\n',
+            (0, a.jsx)(n.p, {
+              children: 'Apply these optimizations to ensure Gatrix runs efficiently at scale.',
+            }),
+          ],
+        });
+      }
+      function m(e = {}) {
+        const { wrapper: n } = { ...(0, o.R)(), ...e.components };
+        return n ? (0, a.jsx)(n, { ...e, children: (0, a.jsx)(d, { ...e }) }) : d(e);
+      }
+    },
+    8453(e, n, i) {
+      i.d(n, { R: () => r, x: () => s });
+      var t = i(6540);
+      const a = {},
+        o = t.createContext(a);
+      function r(e) {
+        const n = t.useContext(o);
+        return t.useMemo(
+          function () {
+            return 'function' == typeof e ? e(n) : { ...n, ...e };
+          },
+          [n, e]
+        );
+      }
+      function s(e) {
+        let n;
+        return (
+          (n = e.disableParentContext
+            ? 'function' == typeof e.components
+              ? e.components(a)
+              : e.components || a
+            : r(e.components)),
+          t.createElement(o.Provider, { value: n }, e.children)
+        );
+      }
+    },
+    8536(e) {
+      e.exports = JSON.parse(
+        '{"permalink":"/docs/blog/performance-optimization","editUrl":"https://github.com/your-org/gatrix/tree/main/docs/blog/2024-01-20-performance-optimization.md","source":"@site/blog/2024-01-20-performance-optimization.md","title":"Gatrix Performance Optimization Guide","description":"Learn how to optimize Gatrix for maximum performance.","date":"2024-01-20T00:00:00.000Z","tags":[{"inline":true,"label":"performance","permalink":"/docs/blog/tags/performance"},{"inline":true,"label":"optimization","permalink":"/docs/blog/tags/optimization"}],"readingTime":0.89,"hasTruncateMarker":true,"authors":[{"name":"Gatrix Team","title":"Game Platform Development Team","url":"https://github.com/your-org/gatrix","page":{"permalink":"/docs/blog/authors/gatrix-team"},"socials":{"github":"https://github.com/your-org","email":"mailto:support@gatrix.com"},"imageURL":"https://avatars.githubusercontent.com/u/0?v=4","key":"gatrix-team"}],"frontMatter":{"slug":"performance-optimization","title":"Gatrix Performance Optimization Guide","authors":["gatrix-team"],"tags":["performance","optimization"]},"unlisted":false,"nextItem":{"title":"Gatrix Production Deployment Tips and Best Practices","permalink":"/docs/blog/production-deployment-tips"}}'
+      );
+    },
+  },
+]);

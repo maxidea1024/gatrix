@@ -7,111 +7,111 @@ const path = require('path');
 const localesDir = 'c:/work/uwo/gatrix/packages/frontend/src/locales';
 
 function findDuplicateKeys(obj, prefix = '', duplicates = [], keyLocations = {}) {
-    for (const key in obj) {
-        const fullKey = prefix ? `${prefix}.${key}` : key;
+  for (const key in obj) {
+    const fullKey = prefix ? `${prefix}.${key}` : key;
 
-        if (typeof obj[key] === 'object' && obj[key] !== null && !Array.isArray(obj[key])) {
-            findDuplicateKeys(obj[key], fullKey, duplicates, keyLocations);
-        }
+    if (typeof obj[key] === 'object' && obj[key] !== null && !Array.isArray(obj[key])) {
+      findDuplicateKeys(obj[key], fullKey, duplicates, keyLocations);
     }
-    return duplicates;
+  }
+  return duplicates;
 }
 
 function findDuplicatesInRawJson(content, filename) {
-    const lines = content.split('\n');
-    const keyPattern = /^\s*"([^"]+)":/;
-    const keyLocations = {};
-    const duplicates = [];
-    const stack = []; // Track nested object paths
+  const lines = content.split('\n');
+  const keyPattern = /^\s*"([^"]+)":/;
+  const keyLocations = {};
+  const duplicates = [];
+  const stack = []; // Track nested object paths
 
-    for (let i = 0; i < lines.length; i++) {
-        const line = lines[i];
-        const match = line.match(keyPattern);
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const match = line.match(keyPattern);
 
-        // Track opening/closing braces for nested context
-        if (line.includes('{')) {
-            if (match) {
-                stack.push(match[1]);
-            }
-        }
-        if (line.includes('}')) {
-            stack.pop();
-        }
-
-        if (match) {
-            const key = match[1];
-            const fullPath = [...stack, key].join('.');
-
-            if (!keyLocations[fullPath]) {
-                keyLocations[fullPath] = [];
-            }
-            keyLocations[fullPath].push(i + 1);
-        }
+    // Track opening/closing braces for nested context
+    if (line.includes('{')) {
+      if (match) {
+        stack.push(match[1]);
+      }
+    }
+    if (line.includes('}')) {
+      stack.pop();
     }
 
-    // Find duplicates
-    for (const [key, locations] of Object.entries(keyLocations)) {
-        if (locations.length > 1) {
-            duplicates.push({ key, locations });
-        }
-    }
+    if (match) {
+      const key = match[1];
+      const fullPath = [...stack, key].join('.');
 
-    return duplicates;
+      if (!keyLocations[fullPath]) {
+        keyLocations[fullPath] = [];
+      }
+      keyLocations[fullPath].push(i + 1);
+    }
+  }
+
+  // Find duplicates
+  for (const [key, locations] of Object.entries(keyLocations)) {
+    if (locations.length > 1) {
+      duplicates.push({ key, locations });
+    }
+  }
+
+  return duplicates;
 }
 
 // Simple approach: find consecutive duplicate keys
 function findConsecutiveDuplicates(content, filename) {
-    const lines = content.split('\n');
-    const keyPattern = /^\s*"([^"]+)":/;
-    const duplicates = [];
-    let lastKey = null;
-    let lastLine = 0;
+  const lines = content.split('\n');
+  const keyPattern = /^\s*"([^"]+)":/;
+  const duplicates = [];
+  let lastKey = null;
+  let lastLine = 0;
 
-    for (let i = 0; i < lines.length; i++) {
-        const line = lines[i];
-        const match = line.match(keyPattern);
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const match = line.match(keyPattern);
 
-        if (match) {
-            const key = match[1];
-            if (key === lastKey && i === lastLine + 1) {
-                duplicates.push({ key, firstLine: lastLine + 1, secondLine: i + 1 });
-            }
-            lastKey = key;
-            lastLine = i;
-        }
+    if (match) {
+      const key = match[1];
+      if (key === lastKey && i === lastLine + 1) {
+        duplicates.push({ key, firstLine: lastLine + 1, secondLine: i + 1 });
+      }
+      lastKey = key;
+      lastLine = i;
     }
+  }
 
-    return duplicates;
+  return duplicates;
 }
 
 // Compare key counts between files
 function compareKeyStructure(files) {
-    const fileCounts = {};
+  const fileCounts = {};
 
-    for (const file of files) {
-        const content = fs.readFileSync(path.join(localesDir, file), 'utf8');
-        const json = JSON.parse(content);
+  for (const file of files) {
+    const content = fs.readFileSync(path.join(localesDir, file), 'utf8');
+    const json = JSON.parse(content);
 
-        function countKeys(obj, prefix = '') {
-            let count = 0;
-            for (const key in obj) {
-                const fullKey = prefix ? `${prefix}.${key}` : key;
-                if (typeof obj[key] === 'object' && obj[key] !== null && !Array.isArray(obj[key])) {
-                    count += countKeys(obj[key], fullKey);
-                } else {
-                    count++;
-                }
-            }
-            return count;
+    function countKeys(obj, prefix = '') {
+      let count = 0;
+      for (const key in obj) {
+        const fullKey = prefix ? `${prefix}.${key}` : key;
+        if (typeof obj[key] === 'object' && obj[key] !== null && !Array.isArray(obj[key])) {
+          count += countKeys(obj[key], fullKey);
+        } else {
+          count++;
         }
-
-        fileCounts[file] = {
-            topLevelKeys: Object.keys(json).length,
-            totalKeys: countKeys(json)
-        };
+      }
+      return count;
     }
 
-    return fileCounts;
+    fileCounts[file] = {
+      topLevelKeys: Object.keys(json).length,
+      totalKeys: countKeys(json),
+    };
+  }
+
+  return fileCounts;
 }
 
 // Main
@@ -123,23 +123,25 @@ console.log('=== Locale File Analysis ===\n');
 console.log('1. Key Count Comparison:');
 const counts = compareKeyStructure(files);
 for (const [file, data] of Object.entries(counts)) {
-    console.log(`   ${file}: ${data.topLevelKeys} top-level keys, ${data.totalKeys} total keys`);
+  console.log(`   ${file}: ${data.topLevelKeys} top-level keys, ${data.totalKeys} total keys`);
 }
 
 console.log('\n2. Duplicate Key Check (Consecutive):');
 
 for (const file of files) {
-    const content = fs.readFileSync(path.join(localesDir, file), 'utf8');
-    const duplicates = findConsecutiveDuplicates(content, file);
+  const content = fs.readFileSync(path.join(localesDir, file), 'utf8');
+  const duplicates = findConsecutiveDuplicates(content, file);
 
-    if (duplicates.length > 0) {
-        console.log(`\n   ${file}:`);
-        for (const dup of duplicates) {
-            console.log(`     - Key "${dup.key}" duplicated at lines ${dup.firstLine} and ${dup.secondLine}`);
-        }
-    } else {
-        console.log(`   ${file}: No consecutive duplicates found`);
+  if (duplicates.length > 0) {
+    console.log(`\n   ${file}:`);
+    for (const dup of duplicates) {
+      console.log(
+        `     - Key "${dup.key}" duplicated at lines ${dup.firstLine} and ${dup.secondLine}`
+      );
     }
+  } else {
+    console.log(`   ${file}: No consecutive duplicates found`);
+  }
 }
 
 // 3. Check specific lines mentioned by user

@@ -11,24 +11,25 @@ Docker Compose 설정을 최신 표준에 맞게 업데이트하고, 누락된 �
 **이유**: Docker Compose v2부터 `version` 필드가 obsolete(구식)로 간주됩니다.
 
 **변경된 파일**:
+
 - ✅ `docker-compose.yml`
 - ✅ `docker-compose.dev.yml`
 - ✅ `packages/chat-server/docker-compose.yml`
 
 **변경 전**:
+
 ```yaml
 version: '3.8'
 
 services:
-  mysql:
-    ...
+  mysql: ...
 ```
 
 **변경 후**:
+
 ```yaml
 services:
-  mysql:
-    ...
+  mysql: ...
 ```
 
 ### 2. docker-compose.yml에 Chat Server 추가
@@ -36,6 +37,7 @@ services:
 **추가된 서비스**: `chat-server`
 
 **주요 설정**:
+
 - **포트**: 3001 (WebSocket), 9090 (Metrics)
 - **의존성**: MySQL, Redis, Backend
 - **클러스터링**: 활성화 (프로덕션)
@@ -44,6 +46,7 @@ services:
 - **Health Check**: HTTP GET /health
 
 **환경 변수**:
+
 ```yaml
 environment:
   NODE_ENV: production
@@ -58,18 +61,21 @@ environment:
 ```
 
 **볼륨**:
+
 - `chat_server_uploads`: 파일 업로드 저장
 - `chat_server_logs`: 로그 파일 저장
 
 ### 3. docker-compose.dev.yml에 서비스 추가
 
 **추가된 서비스**:
+
 1. ✅ `clickhouse` - ClickHouse 데이터베이스
 2. ✅ `event-lens-dev` - Event Lens 서버 (hot reload)
 3. ✅ `event-lens-worker-dev` - Event Lens Worker (hot reload)
 4. ✅ `chat-server-dev` - Chat Server (hot reload)
 
 **개발 환경 특징**:
+
 - Hot reload 활성화 (nodemon)
 - 디버그 로그 레벨
 - 클러스터링 비활성화 (개발 편의성)
@@ -79,10 +85,12 @@ environment:
 ### 4. Dockerfile.dev 파일 생성
 
 **생성된 파일**:
+
 - ✅ `packages/event-lens/Dockerfile.dev`
 - ✅ `packages/chat-server/Dockerfile.dev`
 
 **특징**:
+
 - Node.js 18 Alpine 기반
 - 개발 의존성 포함
 - Hot reload 지원
@@ -91,35 +99,37 @@ environment:
 ### 5. 문서 업데이트
 
 **업데이트된 문서**:
+
 - ✅ `README.md` - Docker 섹션 업데이트, 서비스 포트 테이블 추가
 - ✅ `EVENT_LENS_SETUP_GUIDE.md` - Docker Compose v2 명령어 업데이트
 - ✅ `packages/chat-server/README.md` - Docker Compose v2 명령어 업데이트
 
 **새로 생성된 문서**:
+
 - ✅ `DOCKER_COMPOSE_SETUP.md` - 완전한 Docker Compose 설정 가이드
 
 ## 📊 전체 서비스 구성
 
 ### 프로덕션 환경 (docker-compose.yml)
 
-| 서비스 | 포트 | 용도 | Health Check |
-|--------|------|------|--------------|
-| MySQL | 3306 | 데이터베이스 | ✅ |
-| Redis | 6379 | 캐시 & 큐 | ✅ |
-| ClickHouse | 8123, 9000 | 분석 DB | ✅ |
-| Backend | 5000 | REST API | ✅ |
-| Frontend | 80, 443 | 웹 UI (Nginx) | ✅ |
-| Chat Server | 3001, 9090 | WebSocket, Metrics | ✅ |
-| Event Lens | 3002 | 분석 API | ✅ |
-| Event Lens Worker | - | 백그라운드 작업 | ❌ |
+| 서비스            | 포트       | 용도               | Health Check |
+| ----------------- | ---------- | ------------------ | ------------ |
+| MySQL             | 3306       | 데이터베이스       | ✅           |
+| Redis             | 6379       | 캐시 & 큐          | ✅           |
+| ClickHouse        | 8123, 9000 | 분석 DB            | ✅           |
+| Backend           | 5000       | REST API           | ✅           |
+| Frontend          | 80, 443    | 웹 UI (Nginx)      | ✅           |
+| Chat Server       | 3001, 9090 | WebSocket, Metrics | ✅           |
+| Event Lens        | 3002       | 분석 API           | ✅           |
+| Event Lens Worker | -          | 백그라운드 작업    | ❌           |
 
 ### 개발 환경 (docker-compose.dev.yml)
 
 프로덕션 서비스 + 추가 도구:
 
-| 서비스 | 포트 | 용도 |
-|--------|------|------|
-| Adminer | 8080 | DB 관리 UI |
+| 서비스          | 포트 | 용도          |
+| --------------- | ---- | ------------- |
+| Adminer         | 8080 | DB 관리 UI    |
 | Redis Commander | 8081 | Redis 관리 UI |
 
 ## 🚀 사용 방법
@@ -203,15 +213,15 @@ GATRIX_API_SECRET=shared-secret-between-servers
 
 ## 📈 개발 vs 프로덕션 차이
 
-| 설정 | 개발 | 프로덕션 |
-|------|------|----------|
-| Hot Reload | ✅ | ❌ |
-| 클러스터링 | ❌ | ✅ |
-| 로그 레벨 | debug | info |
-| Message Pack | ❌ | ✅ |
-| 압축 | ❌ | ✅ |
-| 최대 연결 | 1,000 | 10,000 |
-| 관리 도구 | ✅ (Adminer, Redis Commander) | ❌ |
+| 설정         | 개발                          | 프로덕션 |
+| ------------ | ----------------------------- | -------- |
+| Hot Reload   | ✅                            | ❌       |
+| 클러스터링   | ❌                            | ✅       |
+| 로그 레벨    | debug                         | info     |
+| Message Pack | ❌                            | ✅       |
+| 압축         | ❌                            | ✅       |
+| 최대 연결    | 1,000                         | 10,000   |
+| 관리 도구    | ✅ (Adminer, Redis Commander) | ❌       |
 
 ## 🔍 검증
 
@@ -271,4 +281,3 @@ $ docker compose -f packages/chat-server/docker-compose.yml config --quiet
 - ✅ 볼륨 관리 체계화
 - ✅ 네트워크 격리
 - ✅ 문서화 완료
-

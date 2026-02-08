@@ -2,92 +2,28 @@
   ":BattleMapLayer": {
     ":type": {
       "id": "key",
-      "layerName": [
-        "string",
-        "string",
-        "string",
-        "string",
-        "string",
-        "string",
-        "string"
-      ],
-      "layerType": [
-        "number",
-        "number",
-        "number",
-        "number",
-        "number",
-        "number",
-        "number"
-      ],
-      "layerVal": [
-        "number",
-        "number",
-        "number",
-        "number",
-        "number",
-        "number",
-        "number"
-      ],
-      "layerProb": [
-        "number",
-        "number",
-        "number",
-        "number",
-        "number",
-        "number",
-        "number"
-      ]
+      "layerName": ["string", "string", "string", "string", "string", "string", "string"],
+      "layerType": ["number", "number", "number", "number", "number", "number", "number"],
+      "layerVal": ["number", "number", "number", "number", "number", "number", "number"],
+      "layerProb": ["number", "number", "number", "number", "number", "number", "number"]
     },
     ":required": {
-      "layerName": [
-        1
-      ],
-      "layerType": [
-        1
-      ],
-      "layerVal": [
-        1
-      ],
-      "layerProb": [
-        1
-      ]
+      "layerName": [1],
+      "layerType": [1],
+      "layerVal": [1],
+      "layerProb": [1]
     },
     ":requiredInObject": {
-      "layerName": [
-        1
-      ],
-      "layerType": [
-        1
-      ],
-      "layerVal": [
-        1
-      ],
-      "layerProb": [
-        1
-      ]
+      "layerName": [1],
+      "layerType": [1],
+      "layerVal": [1],
+      "layerProb": [1]
     },
     ":min": {
-      "layerType": [
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0
-      ]
+      "layerType": [0, 0, 0, 0, 0, 0, 0]
     },
     ":max": {
-      "layerType": [
-        3,
-        3,
-        3,
-        3,
-        3,
-        3,
-        3
-      ]
+      "layerType": [3, 3, 3, 3, 3, 3, 3]
     },
     ":enum": {},
     ":links": {}
@@ -95,6265 +31,2117 @@
   "BattleMapLayer": {
     "69200000": {
       "id": 69200000,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69200001": {
       "id": 69200001,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69200002": {
       "id": 69200002,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69200003": {
       "id": 69200003,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69200004": {
       "id": 69200004,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69200005": {
       "id": 69200005,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69200006": {
       "id": 69200006,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69200007": {
       "id": 69200007,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69200008": {
       "id": 69200008,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69200009": {
       "id": 69200009,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69200010": {
       "id": 69200010,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69200011": {
       "id": 69200011,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69200012": {
       "id": 69200012,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69200013": {
       "id": 69200013,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69200014": {
       "id": 69200014,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69200015": {
       "id": 69200015,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69200100": {
       "id": 69200100,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69200101": {
       "id": 69200101,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69200102": {
       "id": 69200102,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69200103": {
       "id": 69200103,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69200104": {
       "id": 69200104,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69200105": {
       "id": 69200105,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69200106": {
       "id": 69200106,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69200107": {
       "id": 69200107,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69200108": {
       "id": 69200108,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69200200": {
       "id": 69200200,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69200201": {
       "id": 69200201,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69200202": {
       "id": 69200202,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69200203": {
       "id": 69200203,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69200204": {
       "id": 69200204,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69200205": {
       "id": 69200205,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69200206": {
       "id": 69200206,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69200207": {
       "id": 69200207,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69200300": {
       "id": 69200300,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69200301": {
       "id": 69200301,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69200302": {
       "id": 69200302,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69200303": {
       "id": 69200303,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69200304": {
       "id": 69200304,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69200305": {
       "id": 69200305,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69200306": {
       "id": 69200306,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69200307": {
       "id": 69200307,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69200400": {
       "id": 69200400,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69200401": {
       "id": 69200401,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69200402": {
       "id": 69200402,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69200403": {
       "id": 69200403,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69200404": {
       "id": 69200404,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69200405": {
       "id": 69200405,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69200406": {
       "id": 69200406,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69200407": {
       "id": 69200407,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69200408": {
       "id": 69200408,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69200409": {
       "id": 69200409,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69200410": {
       "id": 69200410,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69200411": {
       "id": 69200411,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69200412": {
       "id": 69200412,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69200413": {
       "id": 69200413,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69200414": {
       "id": 69200414,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69200415": {
       "id": 69200415,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69200416": {
       "id": 69200416,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69200417": {
       "id": 69200417,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69200500": {
       "id": 69200500,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69200501": {
       "id": 69200501,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69200502": {
       "id": 69200502,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69200503": {
       "id": 69200503,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69200504": {
       "id": 69200504,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69200505": {
       "id": 69200505,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69200506": {
       "id": 69200506,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69200507": {
       "id": 69200507,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69200508": {
       "id": 69200508,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69200509": {
       "id": 69200509,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69200600": {
       "id": 69200600,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69200601": {
       "id": 69200601,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69200602": {
       "id": 69200602,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69200603": {
       "id": 69200603,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69200604": {
       "id": 69200604,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69200605": {
       "id": 69200605,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69200606": {
       "id": 69200606,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69200607": {
       "id": 69200607,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69200700": {
       "id": 69200700,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69200701": {
       "id": 69200701,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69200702": {
       "id": 69200702,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69200703": {
       "id": 69200703,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69200704": {
       "id": 69200704,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69200705": {
       "id": 69200705,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69200706": {
       "id": 69200706,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69200707": {
       "id": 69200707,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69200800": {
       "id": 69200800,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69200801": {
       "id": 69200801,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69200802": {
       "id": 69200802,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69200803": {
       "id": 69200803,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69200804": {
       "id": 69200804,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69200805": {
       "id": 69200805,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69200806": {
       "id": 69200806,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69200807": {
       "id": 69200807,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69200900": {
       "id": 69200900,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69200901": {
       "id": 69200901,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69200902": {
       "id": 69200902,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69200903": {
       "id": 69200903,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69200904": {
       "id": 69200904,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69200905": {
       "id": 69200905,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69200906": {
       "id": 69200906,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69200907": {
       "id": 69200907,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69240001": {
       "id": 69240001,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        1
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [1]
     },
     "69250001": {
       "id": 69250001,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69250002": {
       "id": 69250002,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69250003": {
       "id": 69250003,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69250004": {
       "id": 69250004,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69250005": {
       "id": 69250005,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69250006": {
       "id": 69250006,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69250007": {
       "id": 69250007,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69250008": {
       "id": 69250008,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69250009": {
       "id": 69250009,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69250010": {
       "id": 69250010,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69250011": {
       "id": 69250011,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69250012": {
       "id": 69250012,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69250013": {
       "id": 69250013,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69250014": {
       "id": 69250014,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69250015": {
       "id": 69250015,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69250016": {
       "id": 69250016,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69250017": {
       "id": 69250017,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69250018": {
       "id": 69250018,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69250019": {
       "id": 69250019,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69250020": {
       "id": 69250020,
-      "layerName": [
-        "Erenst_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["Erenst_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69250021": {
       "id": 69250021,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69250022": {
       "id": 69250022,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69250023": {
       "id": 69250023,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69250024": {
       "id": 69250024,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69250025": {
       "id": 69250025,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69250026": {
       "id": 69250026,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69250027": {
       "id": 69250027,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69250028": {
       "id": 69250028,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69250029": {
       "id": 69250029,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69250030": {
       "id": 69250030,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69250031": {
       "id": 69250031,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69250032": {
       "id": 69250032,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69250033": {
       "id": 69250033,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69250034": {
       "id": 69250034,
-      "layerName": [
-        "base_01",
-        "base_02"
-      ],
-      "layerType": [
-        0,
-        0
-      ],
-      "layerVal": [
-        0,
-        0
-      ],
-      "layerProb": [
-        10,
-        0
-      ]
+      "layerName": ["base_01", "base_02"],
+      "layerType": [0, 0],
+      "layerVal": [0, 0],
+      "layerProb": [10, 0]
     },
     "69250035": {
       "id": 69250035,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69250036": {
       "id": 69250036,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69250037": {
       "id": 69250037,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69250038": {
       "id": 69250038,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69250039": {
       "id": 69250039,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69250040": {
       "id": 69250040,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69250041": {
       "id": 69250041,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69250042": {
       "id": 69250042,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69250043": {
       "id": 69250043,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69250044": {
       "id": 69250044,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69250045": {
       "id": 69250045,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69250046": {
       "id": 69250046,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260001": {
       "id": 69260001,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260002": {
       "id": 69260002,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260003": {
       "id": 69260003,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260004": {
       "id": 69260004,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260005": {
       "id": 69260005,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260006": {
       "id": 69260006,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260007": {
       "id": 69260007,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260008": {
       "id": 69260008,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260009": {
       "id": 69260009,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260010": {
       "id": 69260010,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260011": {
       "id": 69260011,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260012": {
       "id": 69260012,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260013": {
       "id": 69260013,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260014": {
       "id": 69260014,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260015": {
       "id": 69260015,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260016": {
       "id": 69260016,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260017": {
       "id": 69260017,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260018": {
       "id": 69260018,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260019": {
       "id": 69260019,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260020": {
       "id": 69260020,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260021": {
       "id": 69260021,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260022": {
       "id": 69260022,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260023": {
       "id": 69260023,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260024": {
       "id": 69260024,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260025": {
       "id": 69260025,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260026": {
       "id": 69260026,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260027": {
       "id": 69260027,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260028": {
       "id": 69260028,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260029": {
       "id": 69260029,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260030": {
       "id": 69260030,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260031": {
       "id": 69260031,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260032": {
       "id": 69260032,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260033": {
       "id": 69260033,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260034": {
       "id": 69260034,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260035": {
       "id": 69260035,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260036": {
       "id": 69260036,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260037": {
       "id": 69260037,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260038": {
       "id": 69260038,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260039": {
       "id": 69260039,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260040": {
       "id": 69260040,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260041": {
       "id": 69260041,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260042": {
       "id": 69260042,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260043": {
       "id": 69260043,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260044": {
       "id": 69260044,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260045": {
       "id": 69260045,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260046": {
       "id": 69260046,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260047": {
       "id": 69260047,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260048": {
       "id": 69260048,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260049": {
       "id": 69260049,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260050": {
       "id": 69260050,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260051": {
       "id": 69260051,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260052": {
       "id": 69260052,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260053": {
       "id": 69260053,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260054": {
       "id": 69260054,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260055": {
       "id": 69260055,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260056": {
       "id": 69260056,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260057": {
       "id": 69260057,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260058": {
       "id": 69260058,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260059": {
       "id": 69260059,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260060": {
       "id": 69260060,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260061": {
       "id": 69260061,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260062": {
       "id": 69260062,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260063": {
       "id": 69260063,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260064": {
       "id": 69260064,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260065": {
       "id": 69260065,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260066": {
       "id": 69260066,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260067": {
       "id": 69260067,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260068": {
       "id": 69260068,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260069": {
       "id": 69260069,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260070": {
       "id": 69260070,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260071": {
       "id": 69260071,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260072": {
       "id": 69260072,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260073": {
       "id": 69260073,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260074": {
       "id": 69260074,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260075": {
       "id": 69260075,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260076": {
       "id": 69260076,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260077": {
       "id": 69260077,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260078": {
       "id": 69260078,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260079": {
       "id": 69260079,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260080": {
       "id": 69260080,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260081": {
       "id": 69260081,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260082": {
       "id": 69260082,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260083": {
       "id": 69260083,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260084": {
       "id": 69260084,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260085": {
       "id": 69260085,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260086": {
       "id": 69260086,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260087": {
       "id": 69260087,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260088": {
       "id": 69260088,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260089": {
       "id": 69260089,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260090": {
       "id": 69260090,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260091": {
       "id": 69260091,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260092": {
       "id": 69260092,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260093": {
       "id": 69260093,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260094": {
       "id": 69260094,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260095": {
       "id": 69260095,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260096": {
       "id": 69260096,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260097": {
       "id": 69260097,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260098": {
       "id": 69260098,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260099": {
       "id": 69260099,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260100": {
       "id": 69260100,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260101": {
       "id": 69260101,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260102": {
       "id": 69260102,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260103": {
       "id": 69260103,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260104": {
       "id": 69260104,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260105": {
       "id": 69260105,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260106": {
       "id": 69260106,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260107": {
       "id": 69260107,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260108": {
       "id": 69260108,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260109": {
       "id": 69260109,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260110": {
       "id": 69260110,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260111": {
       "id": 69260111,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260112": {
       "id": 69260112,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260113": {
       "id": 69260113,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260114": {
       "id": 69260114,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260115": {
       "id": 69260115,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260116": {
       "id": 69260116,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260117": {
       "id": 69260117,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260118": {
       "id": 69260118,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260119": {
       "id": 69260119,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260120": {
       "id": 69260120,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260121": {
       "id": 69260121,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260122": {
       "id": 69260122,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260123": {
       "id": 69260123,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260124": {
       "id": 69260124,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260125": {
       "id": 69260125,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260126": {
       "id": 69260126,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260127": {
       "id": 69260127,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260128": {
       "id": 69260128,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260129": {
       "id": 69260129,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260130": {
       "id": 69260130,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260131": {
       "id": 69260131,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260132": {
       "id": 69260132,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260133": {
       "id": 69260133,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260134": {
       "id": 69260134,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260135": {
       "id": 69260135,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260136": {
       "id": 69260136,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260137": {
       "id": 69260137,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260138": {
       "id": 69260138,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260139": {
       "id": 69260139,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260140": {
       "id": 69260140,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260141": {
       "id": 69260141,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260142": {
       "id": 69260142,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260143": {
       "id": 69260143,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260144": {
       "id": 69260144,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260145": {
       "id": 69260145,
-      "layerName": [
-        "base_01"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_01"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260146": {
       "id": 69260146,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260147": {
       "id": 69260147,
-      "layerName": [
-        "base_02"
-      ],
-      "layerType": [
-        0
-      ],
-      "layerVal": [
-        0
-      ],
-      "layerProb": [
-        10
-      ]
+      "layerName": ["base_02"],
+      "layerType": [0],
+      "layerVal": [0],
+      "layerProb": [10]
     },
     "69260148": {
       "id": 69260148,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260149": {
       "id": 69260149,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260150": {
       "id": 69260150,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260151": {
       "id": 69260151,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260152": {
       "id": 69260152,
-      "layerName": [
-        "mine1",
-        "mine2",
-        "mine3",
-        "오브젝트"
-      ],
-      "layerType": [
-        0,
-        0,
-        0,
-        0
-      ],
-      "layerVal": [
-        0,
-        1,
-        2,
-        3
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["mine1", "mine2", "mine3", "오브젝트"],
+      "layerType": [0, 0, 0, 0],
+      "layerVal": [0, 1, 2, 3],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260153": {
       "id": 69260153,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "summer",
-        "winter"
-      ],
-      "layerType": [
-        0,
-        0,
-        1,
-        1
-      ],
-      "layerVal": [
-        0,
-        0,
-        2,
-        4
-      ],
-      "layerProb": [
-        10,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "summer", "winter"],
+      "layerType": [0, 0, 1, 1],
+      "layerVal": [0, 0, 2, 4],
+      "layerProb": [10, 10, 10, 10]
     },
     "69260154": {
       "id": 69260154,
-      "layerName": [
-        "base_01",
-        "base_02",
-        "base_03",
-        "base_04"
-      ],
-      "layerType": [
-        0,
-        0,
-        0,
-        0
-      ],
-      "layerVal": [
-        0,
-        0,
-        0,
-        0
-      ],
-      "layerProb": [
-        100,
-        10,
-        10,
-        10
-      ]
+      "layerName": ["base_01", "base_02", "base_03", "base_04"],
+      "layerType": [0, 0, 0, 0],
+      "layerVal": [0, 0, 0, 0],
+      "layerProb": [100, 10, 10, 10]
     }
   }
 }

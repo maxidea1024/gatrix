@@ -1,13 +1,13 @@
 /**
  * Migration: Create crashes tables
- * 
+ *
  * Creates tables for client crash reporting system:
  * - crashes: Main crash groups (deduplicated by hash + branch)
  * - crash_events: Individual crash occurrences
  * - crash_retention_settings: Retention policy settings
  */
 
-exports.up = async function(connection) {
+exports.up = async function (connection) {
   console.log('Creating crashes tables...');
 
   // Disable foreign key checks to allow dropping tables with dependencies
@@ -139,7 +139,7 @@ exports.up = async function(connection) {
   console.log('Crashes tables created successfully');
 };
 
-exports.down = async function(connection) {
+exports.down = async function (connection) {
   console.log('Rolling back crashes tables...');
 
   // Drop tables in reverse order (respecting foreign key constraints)
@@ -154,4 +154,3 @@ exports.down = async function(connection) {
 
   console.log('Crashes tables rollback completed');
 };
-

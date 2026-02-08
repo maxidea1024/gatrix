@@ -4,13 +4,13 @@
  * Simulates an authentication server
  */
 
-import { BaseTestServer, BaseServerConfig } from "./base-server";
+import { BaseTestServer, BaseServerConfig } from './base-server';
 
 class AuthServer extends BaseTestServer {
   private userSessions: Map<string, any> = new Map();
 
   protected async onStart(): Promise<void> {
-    this.log("Authentication server specific initialization");
+    this.log('Authentication server specific initialization');
 
     // Simulate periodic user login
     setInterval(() => {
@@ -30,36 +30,34 @@ class AuthServer extends BaseTestServer {
       ip: `192.168.1.${Math.floor(Math.random() * 255)}`,
     });
 
-    this.log(
-      `User logged in: ${userId} (Total sessions: ${this.userSessions.size})`,
-    );
+    this.log(`User logged in: ${userId} (Total sessions: ${this.userSessions.size})`);
 
     // Update service stats (only if service discovery is enabled)
     if (this.config.enableServiceDiscovery) {
       this.sdk
         .updateServiceStatus({
-          status: "ready",
+          status: 'ready',
           stats: {
             activeSessions: this.userSessions.size,
           },
         })
-        .catch((err) => this.logError("Failed to update service status", err));
+        .catch((err) => this.logError('Failed to update service status', err));
     }
   }
 }
 
 // Parse command line arguments
-const instanceId = process.argv[2] || "1";
-const port = parseInt(process.argv[3] || "8001");
-const group = process.argv[4] || "production";
-const enableDiscovery = process.argv[5] === "true" || false;
+const instanceId = process.argv[2] || '1';
+const port = parseInt(process.argv[3] || '8001');
+const group = process.argv[4] || 'production';
+const enableDiscovery = process.argv[5] === 'true' || false;
 
 const config: BaseServerConfig = {
-  serviceType: "authd",
+  serviceType: 'authd',
   serviceGroup: group,
   customLabels: {
-    env: process.env.NODE_ENV || "development",
-    region: "ap-northeast-2",
+    env: process.env.NODE_ENV || 'development',
+    region: 'ap-northeast-2',
   },
   instanceName: `authd-${instanceId}`,
   port: port,
@@ -72,6 +70,6 @@ const server = new AuthServer(config);
 
 // Start server
 server.start().catch((error) => {
-  console.error("Failed to start auth server:", error);
+  console.error('Failed to start auth server:', error);
   process.exit(1);
 });

@@ -14,9 +14,7 @@
     ":max": {},
     ":enum": {},
     ":links": {
-      "groupId": [
-        "BattleChallengeGroup"
-      ]
+      "groupId": ["BattleChallengeGroup"]
     }
   },
   "ChronicleBattleChallenge": {

@@ -7,7 +7,7 @@
 module.exports = {
   up: async (connection) => {
     console.log('Creating g_service_maintenance table...');
-    
+
     // Create service maintenance table
     await connection.execute(`
       CREATE TABLE IF NOT EXISTS g_service_maintenance (
@@ -54,15 +54,14 @@ module.exports = {
 
   down: async (connection) => {
     console.log('Rolling back service maintenance tables...');
-    
+
     // Drop tables in reverse order
     await connection.execute('DROP TABLE IF EXISTS g_service_maintenance_locales');
     console.log('✓ Dropped g_service_maintenance_locales table');
-    
+
     await connection.execute('DROP TABLE IF EXISTS g_service_maintenance');
     console.log('✓ Dropped g_service_maintenance table');
 
     console.log('Service maintenance tables rolled back successfully!');
-  }
+  },
 };
-

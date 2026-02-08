@@ -1,77 +1,71 @@
-import { Request, Response, NextFunction } from "express";
-import { authenticateApiToken } from "./apiAuth";
-import { UserModel } from "../models/User";
-import { createLogger } from "../config/logger";
-import { HEADERS } from "../constants/headers";
+import { Request, Response, NextFunction } from 'express';
+import { authenticateApiToken } from './apiAuth';
+import { UserModel } from '../models/User';
+import { createLogger } from '../config/logger';
+import { HEADERS } from '../constants/headers';
 
-const logger = createLogger("Auth");
+const logger = createLogger('Auth');
 
 // JWT 시스템을 API Token으로 완전 교체
-export * from "./apiAuth";
+export * from './apiAuth';
 
 // Backend -> Chat Server 특수 토큰 (환경변수에서 가져옴)
 const BACKEND_SERVICE_TOKEN =
   process.env.BACKEND_SERVICE_TOKEN ||
-  "gatrix-backend-service-token-default-key-change-in-production";
+  'gatrix-backend-service-token-default-key-change-in-production';
 
 // 간소화된 인증 미들웨어 (User ID 헤더 기반)
 export const authenticate = async (
   req: Request,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ): Promise<void> => {
   try {
     const apiTokenHeader = req.headers[HEADERS.X_API_TOKEN] as string;
     const userIdHeader = req.headers[HEADERS.X_USER_ID] as string;
     const authHeader = req.headers[HEADERS.AUTHORIZATION] as string;
 
-    logger.info("🔍 Chat Server Authentication Debug:", {
+    logger.info('🔍 Chat Server Authentication Debug:', {
       path: req.path,
       method: req.method,
       hasApiToken: !!apiTokenHeader,
       hasUserId: !!userIdHeader,
       hasAuthHeader: !!authHeader,
       userIdValue: userIdHeader,
-      authHeaderPrefix: authHeader
-        ? authHeader.substring(0, 20) + "..."
-        : "none",
+      authHeaderPrefix: authHeader ? authHeader.substring(0, 20) + '...' : 'none',
     });
 
     // 1. Backend 서비스 토큰 확인 (가장 먼저 확인)
-    const token = apiTokenHeader || authHeader?.replace("Bearer ", "");
+    const token = apiTokenHeader || authHeader?.replace('Bearer ', '');
     if (token === BACKEND_SERVICE_TOKEN) {
-      logger.info("✅ Backend service token verified - allowing request");
+      logger.info('✅ Backend service token verified - allowing request');
       (req as any).isBackendService = true;
       // Attach user when X-User-ID is provided to avoid downstream 500s
       if (userIdHeader) {
         const gatrixUserId = parseInt(userIdHeader, 10);
         if (isNaN(gatrixUserId)) {
-          logger.warn(
-            "Invalid User ID header (service token path):",
-            userIdHeader,
-          );
+          logger.warn('Invalid User ID header (service token path):', userIdHeader);
           res.status(401).json({
             success: false,
-            error: { message: "Invalid user ID" },
+            error: { message: 'Invalid user ID' },
           });
           return;
         }
 
         const isUserSyncRoute =
-          typeof req.path === "string" &&
-          (req.path.includes("sync-user") || req.path.includes("upsert"));
+          typeof req.path === 'string' &&
+          (req.path.includes('sync-user') || req.path.includes('upsert'));
         if (!isUserSyncRoute) {
           const chatUser = await UserModel.findByGatrixUserId(gatrixUserId);
           if (!chatUser) {
             // Not found and not a sync route → ask caller to sync first
             logger.warn(
-              `Chat user not found (service token path). Gatrix User ID: ${gatrixUserId}`,
+              `Chat user not found (service token path). Gatrix User ID: ${gatrixUserId}`
             );
             res.status(401).json({
               success: false,
               error: {
-                message:
-                  "User not found in chat system. Please sync user first.",
+                message: 'User not found in chat system. Please sync user first.',
               },
             });
             return;
@@ -88,7 +82,7 @@ export const authenticate = async (
           // Update last activity (best-effort)
           await UserModel.updateLastActivity(gatrixUserId);
 
-          logger.info("✅ Backend service token + user attached", {
+          logger.info('✅ Backend service token + user attached', {
             chatUserId: chatUser.id,
             gatrixUserId: chatUser.gatrixUserId,
           });
@@ -99,7 +93,7 @@ export const authenticate = async (
 
     // 2. API Token이 있으면 기존 API Token 인증 사용
     if (apiTokenHeader) {
-      logger.info("🔑 Using API Token authentication");
+      logger.info('🔑 Using API Token authentication');
       return authenticateApiToken(req, res, next);
     }
 
@@ -108,10 +102,10 @@ export const authenticate = async (
       const gatrixUserId = parseInt(userIdHeader, 10);
 
       if (isNaN(gatrixUserId)) {
-        logger.warn("Invalid User ID header:", userIdHeader);
+        logger.warn('Invalid User ID header:', userIdHeader);
         res.status(401).json({
           success: false,
-          error: { message: "Invalid user ID" },
+          error: { message: 'Invalid user ID' },
         });
         return;
       }
@@ -123,7 +117,7 @@ export const authenticate = async (
         logger.warn(`Chat user not found for Gatrix User ID: ${gatrixUserId}`);
         res.status(401).json({
           success: false,
-          error: { message: "User not found in chat system" },
+          error: { message: 'User not found in chat system' },
         });
         return;
       }
@@ -139,7 +133,7 @@ export const authenticate = async (
       // 마지막 활동 시간 업데이트
       await UserModel.updateLastActivity(gatrixUserId);
 
-      logger.info("✅ User ID authentication successful:", {
+      logger.info('✅ User ID authentication successful:', {
         chatUserId: chatUser.id,
         gatrixUserId: chatUser.gatrixUserId,
         email: chatUser.email,
@@ -151,21 +145,21 @@ export const authenticate = async (
     }
 
     // 인증 정보가 없으면 실패
-    logger.warn("No authentication information provided");
+    logger.warn('No authentication information provided');
     res.status(401).json({
       success: false,
-      error: { message: "Authentication required" },
+      error: { message: 'Authentication required' },
     });
   } catch (error) {
-    logger.error("Authentication error:", error);
+    logger.error('Authentication error:', error);
     res.status(500).json({
       success: false,
-      error: { message: "Authentication failed" },
+      error: { message: 'Authentication failed' },
     });
   }
 };
 
-export { requireAdmin } from "./apiAuth";
+export { requireAdmin } from './apiAuth';
 
 // 기존 미들웨어들 (임시로 간단한 구현)
 export const rateLimiter = (windowMs: number, maxRequests: number) => {
@@ -177,8 +171,8 @@ export const validateInput = (schema: any) => {
 };
 
 export const errorHandler = (error: Error, req: any, res: any, next: any) => {
-  console.error("Error:", error);
+  console.error('Error:', error);
   if (!res.headersSent) {
-    res.status(500).json({ success: false, error: "Internal server error" });
+    res.status(500).json({ success: false, error: 'Internal server error' });
   }
 };

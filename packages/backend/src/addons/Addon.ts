@@ -94,7 +94,10 @@ export abstract class Addon {
         }
 
         // Retryable error
-        lastError = new HttpError(response.status, `HTTP ${response.status}: ${response.statusText}`);
+        lastError = new HttpError(
+          response.status,
+          `HTTP ${response.status}: ${response.statusText}`
+        );
         lastStatusCode = response.status;
         this.logger.warn(`Attempt ${attempt + 1}/${retries + 1} failed: ${lastError.message}`);
       } catch (error) {

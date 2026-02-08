@@ -120,48 +120,32 @@
     ":links": {
       "guideBattleSkill": [
         {
-          "BattleSkill": [
-            "BattleSkill"
-          ]
+          "BattleSkill": ["BattleSkill"]
         },
         {
-          "BattleSkill": [
-            "BattleSkill"
-          ]
+          "BattleSkill": ["BattleSkill"]
         },
         {
-          "BattleSkill": [
-            "BattleSkill"
-          ]
+          "BattleSkill": ["BattleSkill"]
         }
       ],
       "guideBattlePassive": [
         {
-          "BattlePassive": [
-            "BattlePassive"
-          ]
+          "BattlePassive": ["BattlePassive"]
         },
         {
-          "BattlePassive": [
-            "BattlePassive"
-          ]
+          "BattlePassive": ["BattlePassive"]
         }
       ],
       "guideBattleBuff": [
         {
-          "BattleBuff": [
-            "BattleBuff"
-          ]
+          "BattleBuff": ["BattleBuff"]
         },
         {
-          "BattleBuff": [
-            "BattleBuff"
-          ]
+          "BattleBuff": ["BattleBuff"]
         },
         {
-          "BattleBuff": [
-            "BattleBuff"
-          ]
+          "BattleBuff": ["BattleBuff"]
         }
       ]
     }

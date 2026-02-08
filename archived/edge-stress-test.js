@@ -13,7 +13,7 @@ const BASE_URL = 'http://localhost:51337';
 const headers = {
   'x-api-token': 'gatrix-unsecured-server-api-token',
   'x-application-name': 'stress-test',
-  'x-environment-id': '01KBP3PMDF4MJPKYVX7ER1VMSH'
+  'x-environment-id': '01KBP3PMDF4MJPKYVX7ER1VMSH',
 };
 
 const endpoints = [
@@ -24,7 +24,7 @@ const endpoints = [
   { path: '/api/v1/client/client-version?platform=android&version=latest', auth: true },
   { path: '/api/v1/client/banners', auth: true },
   { path: '/api/v1/client/versions', auth: true },
-  { path: '/api/v1/client/notices', auth: true }
+  { path: '/api/v1/client/notices', auth: true },
 ];
 
 const stats = {
@@ -32,10 +32,10 @@ const stats = {
   success: 0,
   failed: 0,
   latencies: [],
-  byEndpoint: {}
+  byEndpoint: {},
 };
 
-endpoints.forEach(ep => {
+endpoints.forEach((ep) => {
   stats.byEndpoint[ep.path] = { success: 0, failed: 0, latencies: [] };
 });
 
@@ -48,20 +48,20 @@ function makeRequest(endpoint) {
       path: endpoint.path,
       method: 'GET',
       headers: endpoint.auth ? headers : {},
-      timeout: 10000
+      timeout: 10000,
     };
 
     const req = http.request(options, (res) => {
       let data = '';
-      res.on('data', chunk => data += chunk);
+      res.on('data', (chunk) => (data += chunk));
       res.on('end', () => {
         const latency = Date.now() - start;
         const success = res.statusCode === 200 || res.statusCode === 404;
-        
+
         stats.total++;
         stats.latencies.push(latency);
         stats.byEndpoint[endpoint.path].latencies.push(latency);
-        
+
         if (success) {
           stats.success++;
           stats.byEndpoint[endpoint.path].success++;
@@ -126,10 +126,10 @@ async function main() {
   console.log('');
 
   const startTime = Date.now();
-  const endTime = startTime + (DURATION_SEC * 1000);
+  const endTime = startTime + DURATION_SEC * 1000;
 
   console.log(`Starting ${CONCURRENT} workers...`);
-  
+
   const workers = [];
   for (let i = 0; i < CONCURRENT; i++) {
     workers.push(worker(endTime));
@@ -149,9 +149,10 @@ async function main() {
   const actualDuration = (Date.now() - startTime) / 1000;
   const rps = (stats.total / actualDuration).toFixed(2);
   const successRate = stats.total > 0 ? ((stats.success / stats.total) * 100).toFixed(2) : 0;
-  const avgLatency = stats.latencies.length > 0 
-    ? (stats.latencies.reduce((a, b) => a + b, 0) / stats.latencies.length).toFixed(2) 
-    : 0;
+  const avgLatency =
+    stats.latencies.length > 0
+      ? (stats.latencies.reduce((a, b) => a + b, 0) / stats.latencies.length).toFixed(2)
+      : 0;
 
   console.log('\n\n=== Results ===');
   console.log(`Duration: ${actualDuration.toFixed(2)} seconds`);
@@ -169,20 +170,22 @@ async function main() {
   console.log(`  Max: ${Math.max(...stats.latencies)} ms`);
   console.log('');
   console.log('=== Per-Endpoint Stats ===');
-  
+
   for (const ep of endpoints) {
     const epStats = stats.byEndpoint[ep.path];
     const epTotal = epStats.success + epStats.failed;
     const epRate = epTotal > 0 ? ((epStats.success / epTotal) * 100).toFixed(1) : 0;
-    const epAvg = epStats.latencies.length > 0 
-      ? (epStats.latencies.reduce((a, b) => a + b, 0) / epStats.latencies.length).toFixed(1)
-      : 0;
+    const epAvg =
+      epStats.latencies.length > 0
+        ? (epStats.latencies.reduce((a, b) => a + b, 0) / epStats.latencies.length).toFixed(1)
+        : 0;
     const shortPath = ep.path.length > 45 ? ep.path.substring(0, 42) + '...' : ep.path;
-    console.log(`  ${shortPath.padEnd(45)} | ${String(epTotal).padStart(6)} reqs | ${String(epRate).padStart(5)}% ok | ${String(epAvg).padStart(5)} ms`);
+    console.log(
+      `  ${shortPath.padEnd(45)} | ${String(epTotal).padStart(6)} reqs | ${String(epRate).padStart(5)}% ok | ${String(epAvg).padStart(5)} ms`
+    );
   }
-  
+
   console.log('\n=== Test Complete ===');
 }
 
 main().catch(console.error);
-

@@ -1,6 +1,6 @@
-import { Queue, QueueOptions } from "bullmq";
-import { redis } from "./redis";
-import logger from "../utils/logger";
+import { Queue, QueueOptions } from 'bullmq';
+import { redis } from './redis';
+import logger from '../utils/logger';
 
 const connection = redis;
 
@@ -9,7 +9,7 @@ const defaultQueueOptions: QueueOptions = {
   defaultJobOptions: {
     attempts: 3,
     backoff: {
-      type: "exponential",
+      type: 'exponential',
       delay: 1000,
     },
     removeOnComplete: {
@@ -23,44 +23,35 @@ const defaultQueueOptions: QueueOptions = {
 };
 
 // 이벤트 처리 큐 (Queue name cannot contain ':' character)
-export const eventQueue = new Queue("event-lens-events", defaultQueueOptions);
+export const eventQueue = new Queue('event-lens-events', defaultQueueOptions);
 
 // 프로필 업데이트 큐
-export const profileQueue = new Queue(
-  "event-lens-profiles",
-  defaultQueueOptions,
-);
+export const profileQueue = new Queue('event-lens-profiles', defaultQueueOptions);
 
 // 세션 집계 큐
-export const sessionQueue = new Queue(
-  "event-lens-sessions",
-  defaultQueueOptions,
-);
+export const sessionQueue = new Queue('event-lens-sessions', defaultQueueOptions);
 
 // 집계 큐
-export const aggregationQueue = new Queue(
-  "event-lens-aggregations",
-  defaultQueueOptions,
-);
+export const aggregationQueue = new Queue('event-lens-aggregations', defaultQueueOptions);
 
 // 큐 이벤트 리스너
-eventQueue.on("error", (error) => {
-  logger.error("Event queue error", { error });
+eventQueue.on('error', (error) => {
+  logger.error('Event queue error', { error });
 });
 
-profileQueue.on("error", (error) => {
-  logger.error("Profile queue error", { error });
+profileQueue.on('error', (error) => {
+  logger.error('Profile queue error', { error });
 });
 
-sessionQueue.on("error", (error) => {
-  logger.error("Session queue error", { error });
+sessionQueue.on('error', (error) => {
+  logger.error('Session queue error', { error });
 });
 
-aggregationQueue.on("error", (error) => {
-  logger.error("Aggregation queue error", { error });
+aggregationQueue.on('error', (error) => {
+  logger.error('Aggregation queue error', { error });
 });
 
-logger.info("✅ BullMQ queues initialized");
+logger.info('✅ BullMQ queues initialized');
 
 export default {
   eventQueue,

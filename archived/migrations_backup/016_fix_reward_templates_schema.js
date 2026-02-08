@@ -3,7 +3,7 @@
  * Add name and description columns, and add rewardItems column
  */
 
-exports.up = async function(connection) {
+exports.up = async function (connection) {
   console.log('Fixing reward templates schema...');
 
   // Check if name column exists
@@ -36,7 +36,7 @@ exports.up = async function(connection) {
   }
 };
 
-exports.down = async function(connection) {
+exports.down = async function (connection) {
   console.log('Reverting reward templates schema...');
 
   // Check if name column exists
@@ -66,4 +66,3 @@ exports.down = async function(connection) {
     console.log('✅ Reward templates schema reverted successfully');
   }
 };
-

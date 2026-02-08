@@ -1,22 +1,22 @@
-import express from "express";
-import http from "http";
-import cors from "cors";
-import helmet from "helmet";
-import compression from "compression";
-import cookieParser from "cookie-parser";
-import { config } from "./config";
-import { createLogger } from "./config/logger";
-import { requestLogger } from "./middleware/requestLogger";
-import { ALLOWED_HEADERS } from "./constants/headers";
-import { WebSocketService } from "./services/WebSocketService";
-import { initMetrics } from "./services/MetricsService";
-import { redisManager } from "./config/redis";
-import { ApiTokenService } from "./services/ApiTokenService";
-import { databaseManager } from "./config/database";
-import apiRoutes from "./routes";
-import { GatrixServerSDK } from "@gatrix/server-sdk";
+import express from 'express';
+import http from 'http';
+import cors from 'cors';
+import helmet from 'helmet';
+import compression from 'compression';
+import cookieParser from 'cookie-parser';
+import { config } from './config';
+import { createLogger } from './config/logger';
+import { requestLogger } from './middleware/requestLogger';
+import { ALLOWED_HEADERS } from './constants/headers';
+import { WebSocketService } from './services/WebSocketService';
+import { initMetrics } from './services/MetricsService';
+import { redisManager } from './config/redis';
+import { ApiTokenService } from './services/ApiTokenService';
+import { databaseManager } from './config/database';
+import apiRoutes from './routes';
+import { GatrixServerSDK } from '@gatrix/server-sdk';
 
-const logger = createLogger("ChatServerApp");
+const logger = createLogger('ChatServerApp');
 
 // SDK instance for service discovery
 let gatrixSdk: GatrixServerSDK | null = null;
@@ -42,14 +42,14 @@ class ChatServerApp {
         contentSecurityPolicy: {
           directives: {
             defaultSrc: ["'self'"],
-            connectSrc: ["'self'", "ws:", "wss:"],
+            connectSrc: ["'self'", 'ws:', 'wss:'],
             scriptSrc: ["'self'"],
             styleSrc: ["'self'", "'unsafe-inline'"],
-            imgSrc: ["'self'", "data:", "https:"],
+            imgSrc: ["'self'", 'data:', 'https:'],
           },
         },
         crossOriginEmbedderPolicy: false,
-      }),
+      })
     );
 
     // CORS
@@ -57,17 +57,17 @@ class ChatServerApp {
       cors({
         origin: config.cors.origin,
         credentials: config.cors.credentials,
-        methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
         allowedHeaders: ALLOWED_HEADERS,
-      }),
+      })
     );
 
     // Compression
     this.app.use(compression() as any);
 
     // Body parsing
-    this.app.use(express.json({ limit: "10mb" }));
-    this.app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+    this.app.use(express.json({ limit: '10mb' }));
+    this.app.use(express.urlencoded({ extended: true, limit: '10mb' }));
     this.app.use(cookieParser() as any);
 
     // Request logging
@@ -78,7 +78,7 @@ class ChatServerApp {
     this.app.use((req, res, next) => {
       if (gatrixSdk && !httpMetricsMiddleware) {
         httpMetricsMiddleware = gatrixSdk.createHttpMetricsMiddleware({
-          scope: "public",
+          scope: 'public',
         });
       }
 
@@ -89,20 +89,20 @@ class ChatServerApp {
     });
 
     // Health check middleware
-    this.app.use("/health", (req, res) => {
+    this.app.use('/health', (req, res) => {
       res.json({
-        status: "healthy",
+        status: 'healthy',
         timestamp: new Date().toISOString(),
         uptime: process.uptime(),
         memory: process.memoryUsage(),
         pid: process.pid,
-        serverId: process.env.SERVER_ID || "unknown",
+        serverId: process.env.SERVER_ID || 'unknown',
         connections: this.webSocketService?.getConnectedUsersCount() || 0,
       });
     });
 
     // Readiness check
-    this.app.use("/ready", async (req, res) => {
+    this.app.use('/ready', async (req, res) => {
       try {
         // Check Redis connection
         const redisClient = redisManager.getClient();
@@ -112,23 +112,23 @@ class ChatServerApp {
         const isDbConnected = await databaseManager.testConnection();
 
         if (!isDbConnected) {
-          throw new Error("Database not ready");
+          throw new Error('Database not ready');
         }
 
         res.json({
-          status: "ready",
+          status: 'ready',
           timestamp: new Date().toISOString(),
           checks: {
-            redis: "ok",
-            database: "ok",
-            websocket: this.webSocketService ? "ok" : "not_initialized",
+            redis: 'ok',
+            database: 'ok',
+            websocket: this.webSocketService ? 'ok' : 'not_initialized',
           },
         });
       } catch (error) {
-        logger.error("Readiness check failed:", error);
+        logger.error('Readiness check failed:', error);
         res.status(503).json({
-          status: "not_ready",
-          error: error instanceof Error ? error.message : "Unknown error",
+          status: 'not_ready',
+          error: error instanceof Error ? error.message : 'Unknown error',
           timestamp: new Date().toISOString(),
         });
       }
@@ -143,12 +143,12 @@ class ChatServerApp {
     });
 
     // API routes
-    this.app.use("/api/v1", apiRoutes);
+    this.app.use('/api/v1', apiRoutes);
 
     // WebSocket info endpoint
-    this.app.get("/ws/info", (req, res) => {
+    this.app.get('/ws/info', (req, res) => {
       res.json({
-        serverId: process.env.SERVER_ID || "unknown",
+        serverId: process.env.SERVER_ID || 'unknown',
         connections: this.webSocketService?.getConnectedUsersCount() || 0,
         uptime: process.uptime(),
         timestamp: new Date().toISOString(),
@@ -156,9 +156,9 @@ class ChatServerApp {
     });
 
     // 404 handler
-    this.app.use("*", (req, res) => {
+    this.app.use('*', (req, res) => {
       res.status(404).json({
-        error: "Not Found",
+        error: 'Not Found',
         message: `Route ${req.method} ${req.originalUrl} not found`,
         timestamp: new Date().toISOString(),
       });
@@ -168,34 +168,29 @@ class ChatServerApp {
   private setupErrorHandling(): void {
     // Global error handler
     this.app.use(
-      (
-        error: Error,
-        req: express.Request,
-        res: express.Response,
-        next: express.NextFunction,
-      ) => {
+      (error: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
         // Check if this is a client abort error (common and expected)
         const isClientAbort =
-          error.message?.includes("request aborted") ||
-          error.message?.includes("aborted") ||
-          (error as any)?.code === "ECONNABORTED" ||
-          (error as any)?.code === "ECONNRESET" ||
-          (error as any)?.code === "EPIPE" ||
-          (error as any)?.type === "request.aborted" ||
-          error.name === "BadRequestError";
+          error.message?.includes('request aborted') ||
+          error.message?.includes('aborted') ||
+          (error as any)?.code === 'ECONNABORTED' ||
+          (error as any)?.code === 'ECONNRESET' ||
+          (error as any)?.code === 'EPIPE' ||
+          (error as any)?.type === 'request.aborted' ||
+          error.name === 'BadRequestError';
 
         if (isClientAbort) {
           // Log client aborts at debug level only (not error level)
-          logger.debug("Client aborted request:", {
+          logger.debug('Client aborted request:', {
             method: req.method,
             url: req.originalUrl,
-            userAgent: req.get("User-Agent"),
+            userAgent: req.get('User-Agent'),
             code: (error as any)?.code,
             type: (error as any)?.type,
           });
         } else {
           // Log actual errors at error level
-          logger.error("Unhandled error:", error);
+          logger.error('Unhandled error:', error);
         }
 
         if (res.headersSent) {
@@ -208,25 +203,23 @@ class ChatServerApp {
         }
 
         res.status(500).json({
-          error: "Internal Server Error",
-          message: config.isDevelopment
-            ? error.message
-            : "Something went wrong",
+          error: 'Internal Server Error',
+          message: config.isDevelopment ? error.message : 'Something went wrong',
           timestamp: new Date().toISOString(),
         });
-      },
+      }
     );
 
     // Uncaught exception handler
-    process.on("uncaughtException", (error: Error) => {
-      logger.error("Uncaught Exception:", error);
-      this.gracefulShutdown("UNCAUGHT_EXCEPTION");
+    process.on('uncaughtException', (error: Error) => {
+      logger.error('Uncaught Exception:', error);
+      this.gracefulShutdown('UNCAUGHT_EXCEPTION');
     });
 
     // Unhandled promise rejection handler
-    process.on("unhandledRejection", (reason: any, promise: Promise<any>) => {
-      logger.error("Unhandled Rejection at:", promise, "reason:", reason);
-      this.gracefulShutdown("UNHANDLED_REJECTION");
+    process.on('unhandledRejection', (reason: any, promise: Promise<any>) => {
+      logger.error('Unhandled Rejection at:', promise, 'reason:', reason);
+      this.gracefulShutdown('UNHANDLED_REJECTION');
     });
   }
 
@@ -234,23 +227,23 @@ class ChatServerApp {
     try {
       // Initialize Redis
       await redisManager.initialize();
-      logger.info("Redis connection established");
+      logger.info('Redis connection established');
 
       // Initialize Database (blocking - required for chat functionality)
       await databaseManager.initialize();
-      logger.info("Database connection established");
+      logger.info('Database connection established');
 
       // Chat server runs independently - no Gatrix dependency
-      logger.info("Chat server running in standalone mode");
+      logger.info('Chat server running in standalone mode');
 
       // Initialize WebSocket service
       this.webSocketService = new WebSocketService(this.server, this.app);
       this.io = this.webSocketService.getIO();
-      logger.info("WebSocket service initialized");
+      logger.info('WebSocket service initialized');
 
-      logger.info("Chat server initialization completed");
+      logger.info('Chat server initialization completed');
     } catch (error) {
-      logger.error("Failed to initialize chat server:", error);
+      logger.error('Failed to initialize chat server:', error);
       throw error;
     }
   }
@@ -264,39 +257,29 @@ class ChatServerApp {
         const defaultToken = await Promise.race([
           ApiTokenService.ensureDefaultToken(),
           new Promise<string>((_, reject) =>
-            setTimeout(
-              () => reject(new Error("Token generation timeout")),
-              5000,
-            ),
+            setTimeout(() => reject(new Error('Token generation timeout')), 5000)
           ),
         ]);
-        logger.info(
-          `Default API token ready: ${defaultToken.substring(0, 12)}...`,
-        );
+        logger.info(`Default API token ready: ${defaultToken.substring(0, 12)}...`);
         logger.info(`🔑 FULL API TOKEN FOR BACKEND: ${defaultToken}`);
       } catch (tokenError) {
-        logger.warn(
-          "Failed to generate default API token, continuing anyway:",
-          tokenError,
-        );
+        logger.warn('Failed to generate default API token, continuing anyway:', tokenError);
       }
 
       // Handle server errors
-      this.server.on("error", (error: any) => {
-        if (error.syscall !== "listen") {
+      this.server.on('error', (error: any) => {
+        if (error.syscall !== 'listen') {
           throw error;
         }
 
         const bind =
-          typeof config.port === "string"
-            ? "Pipe " + config.port
-            : "Port " + config.port;
+          typeof config.port === 'string' ? 'Pipe ' + config.port : 'Port ' + config.port;
 
         switch (error.code) {
-          case "EACCES":
+          case 'EACCES':
             logger.error(`${bind} requires elevated privileges`);
             process.exit(1);
-          case "EADDRINUSE":
+          case 'EADDRINUSE':
             logger.error(`${bind} is already in use`);
             process.exit(1);
           default:
@@ -305,52 +288,46 @@ class ChatServerApp {
       });
 
       // Register graceful shutdown signals early
-      process.on("SIGTERM", () => this.gracefulShutdown("SIGTERM"));
-      process.on("SIGINT", () => this.gracefulShutdown("SIGINT"));
+      process.on('SIGTERM', () => this.gracefulShutdown('SIGTERM'));
+      process.on('SIGINT', () => this.gracefulShutdown('SIGINT'));
 
       // Start listening - wrap in Promise to ensure it completes
       return new Promise<void>((resolve, reject) => {
         this.server.listen(config.port, config.host, async () => {
           logger.info(`Chat server running on ${config.host}:${config.port}`, {
             environment: config.nodeEnv,
-            serverId: process.env.SERVER_ID || "unknown",
+            serverId: process.env.SERVER_ID || 'unknown',
             pid: process.pid,
             timestamp: new Date().toISOString(),
           });
 
           if (config.monitoring.enabled) {
-            logger.info(
-              `Metrics available at http://${config.host}:${config.port}/metrics`,
-            );
+            logger.info(`Metrics available at http://${config.host}:${config.port}/metrics`);
           }
 
           // Register Chat Server service to Service Discovery via SDK
           try {
             // Use APP_VERSION env var (set via Docker build-arg) or fallback to package.json
-            let serverVersion = process.env.APP_VERSION || "0.0.0";
-            if (serverVersion === "0.0.0") {
+            let serverVersion = process.env.APP_VERSION || '0.0.0';
+            if (serverVersion === '0.0.0') {
               try {
-                const packageJson = require("../package.json");
-                serverVersion = packageJson.version || "0.0.0";
+                const packageJson = require('../package.json');
+                serverVersion = packageJson.version || '0.0.0';
               } catch (err) {
-                logger.warn(
-                  "Failed to load package.json version, using default 0.0.0",
-                );
+                logger.warn('Failed to load package.json version, using default 0.0.0');
               }
             }
-            const backendUrl =
-              process.env.GATRIX_URL || "http://localhost:55000";
-            const apiToken =
-              process.env.API_TOKEN || "gatrix-unsecured-server-api-token";
+            const backendUrl = process.env.GATRIX_URL || 'http://localhost:55000';
+            const apiToken = process.env.API_TOKEN || 'gatrix-unsecured-server-api-token';
 
             gatrixSdk = new GatrixServerSDK({
               gatrixUrl: backendUrl,
               apiToken: apiToken,
-              applicationName: "chat-server",
-              service: "chat",
-              group: process.env.SERVICE_GROUP || "gatrix",
-              environment: process.env.ENVIRONMENT || "gatrix-env",
-              logger: { level: "info" },
+              applicationName: 'chat-server',
+              service: 'chat',
+              group: process.env.SERVICE_GROUP || 'gatrix',
+              environment: process.env.ENVIRONMENT || 'gatrix-env',
+              logger: { level: 'info' },
               cache: {
                 enabled: false, // Chat server doesn't need caching for now
               },
@@ -378,29 +355,26 @@ class ChatServerApp {
             // Manually register service
             const result = await gatrixSdk.registerService({
               labels: {
-                service: "chat",
-                group: process.env.SERVICE_GROUP || "gatrix",
+                service: 'chat',
+                group: process.env.SERVICE_GROUP || 'gatrix',
                 appVersion: serverVersion,
               },
               ports: {
                 internalApi: config.port,
                 metricsApi: config.port,
               },
-              status: "ready",
+              status: 'ready',
               meta: {
-                instanceName: "chat-server-1",
+                instanceName: 'chat-server-1',
               },
             });
 
-            logger.info(
-              "Chat Server service registered to Service Discovery via SDK",
-              {
-                instanceId: result.instanceId,
-                version: serverVersion,
-              },
-            );
+            logger.info('Chat Server service registered to Service Discovery via SDK', {
+              instanceId: result.instanceId,
+              version: serverVersion,
+            });
           } catch (error: any) {
-            logger.warn("Chat Server service registration failed, continuing", {
+            logger.warn('Chat Server service registration failed, continuing', {
               error: error instanceof Error ? error.message : String(error),
             });
           }
@@ -408,7 +382,7 @@ class ChatServerApp {
           resolve();
         });
 
-        this.server.on("error", reject);
+        this.server.on('error', reject);
       });
     } catch (error) {
       // Error already logged in initialize() method
@@ -422,7 +396,7 @@ class ChatServerApp {
     // Set a hard timeout to force exit if graceful shutdown takes too long
     const SHUTDOWN_TIMEOUT = 10000; // 10 seconds
     const shutdownTimer = setTimeout(() => {
-      logger.warn("Graceful shutdown timeout exceeded, forcing exit");
+      logger.warn('Graceful shutdown timeout exceeded, forcing exit');
       process.exit(1);
     }, SHUTDOWN_TIMEOUT);
 
@@ -431,22 +405,22 @@ class ChatServerApp {
       // This must happen before closing HTTP server to prevent hanging
       if (this.webSocketService) {
         await this.webSocketService.shutdown();
-        logger.info("WebSocket service shutdown completed");
+        logger.info('WebSocket service shutdown completed');
       }
 
       // 2. Close HTTP server (now that WebSocket connections are gone, this should be fast)
       await new Promise<void>((resolve, reject) => {
         const serverCloseTimeout = setTimeout(() => {
-          logger.warn("HTTP server close timeout, forcing");
+          logger.warn('HTTP server close timeout, forcing');
           resolve();
         }, 5000);
 
         this.server.close((err) => {
           clearTimeout(serverCloseTimeout);
           if (err) {
-            logger.warn("Error closing HTTP server:", err);
+            logger.warn('Error closing HTTP server:', err);
           }
-          logger.info("HTTP server closed");
+          logger.info('HTTP server closed');
           resolve();
         });
       });
@@ -456,28 +430,26 @@ class ChatServerApp {
         try {
           await gatrixSdk.unregisterService();
           await gatrixSdk.close();
-          logger.info(
-            "Chat Server service unregistered from Service Discovery",
-          );
+          logger.info('Chat Server service unregistered from Service Discovery');
         } catch (error) {
-          logger.warn("Error unregistering Chat Server service:", error);
+          logger.warn('Error unregistering Chat Server service:', error);
         }
       }
 
       // 4. Close database connections
       await databaseManager.close();
-      logger.info("Database connections closed");
+      logger.info('Database connections closed');
 
       // 5. Close Redis connections
       await redisManager.disconnect();
-      logger.info("Redis connections closed");
+      logger.info('Redis connections closed');
 
       clearTimeout(shutdownTimer);
-      logger.info("Graceful shutdown completed");
+      logger.info('Graceful shutdown completed');
       process.exit(0);
     } catch (error) {
       clearTimeout(shutdownTimer);
-      logger.error("Error during graceful shutdown:", error);
+      logger.error('Error during graceful shutdown:', error);
       process.exit(1);
     }
   }

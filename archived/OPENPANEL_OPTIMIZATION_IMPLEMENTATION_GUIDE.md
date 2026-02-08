@@ -9,6 +9,7 @@
 ## 🔍 분석 결과 요약
 
 ### ✅ 이미 구현된 기술
+
 - ✅ ZSTD 압축
 - ✅ Bloom Filter 인덱스 (더 많음)
 - ✅ 월별 파티셔닝
@@ -18,6 +19,7 @@
 - ✅ ULID (OpenPanel은 UUID 사용)
 
 ### ❌ 누락된 핵심 기술
+
 1. **LowCardinality 타입** - 메모리 30-50% 절감
 2. **고급 압축 코덱** (Delta, DoubleDelta, Gorilla) - 스토리지 10-20% 절감
 3. **Map 타입** - 쿼리 성능 5-10% 향상
@@ -42,6 +44,7 @@ npm run migrate:clickhouse
 ```
 
 이 마이그레이션은 다음을 생성합니다:
+
 - `events_optimized` - LowCardinality, 고급 압축, Map 타입 적용
 - `profiles_optimized` - 최적화된 프로필 테이블
 - `sessions_optimized` - 최적화된 세션 테이블
@@ -186,6 +189,7 @@ OpenPanel의 복잡한 버퍼링 시스템을 참고하여 구현:
    - 배치 업데이트 최적화
 
 **참고 파일:**
+
 - `packages/db/src/buffers/event-buffer-redis.ts` (OpenPanel)
 - 약 600줄의 복잡한 로직
 
@@ -194,16 +198,19 @@ OpenPanel의 복잡한 버퍼링 시스템을 참고하여 구현:
 ## 📊 예상 성능 개선
 
 ### 스토리지 사용량
+
 - **현재**: 100GB 기준
 - **Phase 1 적용 후**: 약 70-80GB (20-30% 감소)
 - **Phase 3 적용 후**: 약 65-75GB (25-35% 감소)
 
 ### 쿼리 성능
+
 - **현재**: 기준
 - **Phase 1 적용 후**: 약 15-25% 빠름
 - **Phase 3 적용 후**: 약 20-30% 빠름
 
 ### 메모리 사용량
+
 - **현재**: 기준
 - **Phase 1 적용 후**: 약 30-50% 감소
 - **Phase 3 적용 후**: 약 35-55% 감소
@@ -213,19 +220,23 @@ OpenPanel의 복잡한 버퍼링 시스템을 참고하여 구현:
 ## ⚠️ 주의사항
 
 ### 1. 다운타임
+
 - 테이블 교체 시 짧은 다운타임 발생 (약 1-5분)
 - 트래픽이 적은 시간대에 진행 권장
 
 ### 2. 데이터 마이그레이션
+
 - 대용량 데이터의 경우 시간이 오래 걸릴 수 있음
 - 단계적으로 진행 권장 (예: 최근 30일 데이터만 먼저 마이그레이션)
 
 ### 3. 호환성
+
 - 기존 쿼리 코드 수정 필요
 - JSON 함수 → Map 함수로 변경
 - 철저한 테스트 필요
 
 ### 4. 롤백 계획
+
 - 기존 테이블 백업 필수
 - 문제 발생 시 즉시 롤백 가능하도록 준비
 
@@ -234,6 +245,7 @@ OpenPanel의 복잡한 버퍼링 시스템을 참고하여 구현:
 ## 🧪 테스트 계획
 
 ### 1. 단위 테스트
+
 ```typescript
 // normalize.test.ts
 import { toDots, fromDots, normalizeEvent } from '../utils/normalize';
@@ -248,11 +260,13 @@ describe('toDots', () => {
 ```
 
 ### 2. 통합 테스트
+
 - 이벤트 삽입 테스트
 - 쿼리 성능 테스트
 - 필터링 테스트
 
 ### 3. 성능 테스트
+
 - 100만 이벤트 삽입 시간 측정
 - 쿼리 응답 시간 측정
 - 메모리 사용량 측정
@@ -262,6 +276,7 @@ describe('toDots', () => {
 ## 📚 참고 자료
 
 ### OpenPanel GitHub
+
 - **저장소**: https://github.com/Openpanel-dev/openpanel
 - **핵심 파일**:
   - `packages/db/code-migrations/3-init-ch.sql` - ClickHouse 스키마
@@ -270,6 +285,7 @@ describe('toDots', () => {
   - `apps/worker/src/jobs/events.incoming-event.ts` - 이벤트 처리
 
 ### Event Lens 파일
+
 - **비교 분석**: `packages/event-lens/OPENPANEL_COMPARISON_ANALYSIS.md`
 - **마이그레이션**: `packages/event-lens/migrations/clickhouse/006_apply_openpanel_optimizations.sql`
 - **정규화 유틸**: `packages/event-lens/src/utils/normalize.ts`
@@ -279,6 +295,7 @@ describe('toDots', () => {
 ## ✅ 체크리스트
 
 ### Phase 1 (즉시 적용)
+
 - [ ] 마이그레이션 파일 검토
 - [ ] 테스트 환경에서 마이그레이션 실행
 - [ ] 데이터 마이그레이션 스크립트 작성
@@ -288,6 +305,7 @@ describe('toDots', () => {
 - [ ] 성능 모니터링
 
 ### Phase 2 (단기 개선)
+
 - [ ] 정규화 유틸리티 테스트
 - [ ] 모든 이벤트 처리 코드에 적용
 - [ ] 필터 빌더 업데이트
@@ -295,6 +313,7 @@ describe('toDots', () => {
 - [ ] 배포 및 모니터링
 
 ### Phase 3 (장기 개선)
+
 - [ ] Redis 버퍼링 시스템 설계
 - [ ] Lua 스크립트 작성
 - [ ] Duration 계산 로직 구현
@@ -311,4 +330,3 @@ Event Lens는 OpenPanel의 핵심 아이디어를 잘 구현했으나, **프로�
 **Phase 1만 적용해도 20-30%의 성능 개선**을 기대할 수 있으며, **Phase 3까지 완료하면 OpenPanel과 동등한 수준**의 최적화를 달성할 수 있습니다.
 
 **권장 사항**: Phase 1을 우선 적용하고, 트래픽과 데이터 증가에 따라 Phase 2, 3를 순차적으로 적용하는 것이 안전합니다.
-

@@ -51,8 +51,8 @@ declare global {
 }
 
 // Login command
-Cypress.Commands.add("login", (email: string, password: string) => {
-  cy.visit("/login");
+Cypress.Commands.add('login', (email: string, password: string) => {
+  cy.visit('/login');
   cy.get('input[name="email"]').type(email);
   cy.get('input[name="password"]').type(password);
   cy.get('button[type="submit"]').click();
@@ -60,37 +60,37 @@ Cypress.Commands.add("login", (email: string, password: string) => {
 });
 
 // Login as admin
-Cypress.Commands.add("loginAsAdmin", () => {
-  cy.login("admin@motifgames.com", "admin123");
+Cypress.Commands.add('loginAsAdmin', () => {
+  cy.login('admin@motifgames.com', 'admin123');
 });
 
 // Login as user (you'll need to create a test user)
-Cypress.Commands.add("loginAsUser", () => {
-  cy.login("user@example.com", "password123");
+Cypress.Commands.add('loginAsUser', () => {
+  cy.login('user@example.com', 'password123');
 });
 
 // Logout command
-Cypress.Commands.add("logout", () => {
+Cypress.Commands.add('logout', () => {
   cy.get('[data-testid="user-menu"]').click();
   cy.get('[data-testid="logout-button"]').click();
   cy.waitForPageLoad();
 });
 
 // Wait for page to load
-Cypress.Commands.add("waitForPageLoad", () => {
-  cy.get('[data-testid="loading"]', { timeout: 10000 }).should("not.exist");
+Cypress.Commands.add('waitForPageLoad', () => {
+  cy.get('[data-testid="loading"]', { timeout: 10000 }).should('not.exist');
 });
 
 // Check if authenticated
-Cypress.Commands.add("shouldBeAuthenticated", () => {
-  cy.get('[data-testid="user-menu"]').should("exist");
-  cy.url().should("not.include", "/login");
+Cypress.Commands.add('shouldBeAuthenticated', () => {
+  cy.get('[data-testid="user-menu"]').should('exist');
+  cy.url().should('not.include', '/login');
 });
 
 // Check if not authenticated
-Cypress.Commands.add("shouldNotBeAuthenticated", () => {
-  cy.get('[data-testid="user-menu"]').should("not.exist");
-  cy.url().should("include", "/login");
+Cypress.Commands.add('shouldNotBeAuthenticated', () => {
+  cy.get('[data-testid="user-menu"]').should('not.exist');
+  cy.url().should('include', '/login');
 });
 
 // Prevent TypeScript errors

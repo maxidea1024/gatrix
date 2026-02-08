@@ -1,17 +1,15 @@
-import { Request, Response } from "express";
-import { ChannelInvitationModel } from "../models/ChannelInvitation";
-import { UserPrivacySettingsModel } from "../models/UserPrivacySettings";
-import { ChannelModel } from "../models/Channel";
-import { UserModel, ChatUser } from "../models/User";
-import { redisManager } from "../config/redis";
-import { createLogger } from "../config/logger";
+import { Request, Response } from 'express';
+import { ChannelInvitationModel } from '../models/ChannelInvitation';
+import { UserPrivacySettingsModel } from '../models/UserPrivacySettings';
+import { ChannelModel } from '../models/Channel';
+import { UserModel, ChatUser } from '../models/User';
+import { redisManager } from '../config/redis';
+import { createLogger } from '../config/logger';
 
-const logger = createLogger("InvitationController");
+const logger = createLogger('InvitationController');
 
 // Helper function to get user info (Redis cache → DB fallback)
-async function getUserInfo(
-  userId: number,
-): Promise<{
+async function getUserInfo(userId: number): Promise<{
   id: number;
   name: string;
   email: string;
@@ -36,7 +34,7 @@ async function getUserInfo(
           };
         }
       } catch (error) {
-        logger.warn("Failed to parse user data from Redis", { userId, error });
+        logger.warn('Failed to parse user data from Redis', { userId, error });
       }
     }
 
@@ -52,13 +50,9 @@ async function getUserInfo(
 
       // 3. Cache the result in Redis (1 hour TTL)
       try {
-        await redisClient.setex(
-          userKey,
-          3600,
-          JSON.stringify({ value: userInfo }),
-        );
+        await redisClient.setex(userKey, 3600, JSON.stringify({ value: userInfo }));
       } catch (error) {
-        logger.warn("Failed to cache user data to Redis", { userId, error });
+        logger.warn('Failed to cache user data to Redis', { userId, error });
       }
 
       return userInfo;
@@ -66,7 +60,7 @@ async function getUserInfo(
 
     return null;
   } catch (error) {
-    logger.error("Error getting user info", { userId, error });
+    logger.error('Error getting user info', { userId, error });
     return null;
   }
 }
@@ -79,10 +73,10 @@ export class InvitationController {
       const { channelId } = req.params;
       const { inviteeId, message } = req.body;
 
-      if (!inviteeId || typeof inviteeId !== "number") {
+      if (!inviteeId || typeof inviteeId !== 'number') {
         res.status(400).json({
           success: false,
-          error: "Invitee ID is required",
+          error: 'Invitee ID is required',
         });
         return;
       }
@@ -91,7 +85,7 @@ export class InvitationController {
       if (isNaN(channelIdNum)) {
         res.status(400).json({
           success: false,
-          error: "Invalid channel ID",
+          error: 'Invalid channel ID',
         });
         return;
       }
@@ -101,7 +95,7 @@ export class InvitationController {
       if (!channel) {
         res.status(404).json({
           success: false,
-          error: "Channel not found",
+          error: 'Channel not found',
         });
         return;
       }
@@ -111,31 +105,27 @@ export class InvitationController {
       if (!isInviterMember) {
         res.status(403).json({
           success: false,
-          error: "You must be a member of the channel to invite others",
+          error: 'You must be a member of the channel to invite others',
         });
         return;
       }
 
       // Check if invitee is already a member
-      const isAlreadyMember = await ChannelModel.isMember(
-        channelIdNum,
-        inviteeId,
-      );
+      const isAlreadyMember = await ChannelModel.isMember(channelIdNum, inviteeId);
       if (isAlreadyMember) {
         res.status(400).json({
           success: false,
-          error: "User is already a member of this channel",
+          error: 'User is already a member of this channel',
         });
         return;
       }
 
       // Check if there's already a pending invitation
-      const hasPendingInvitation =
-        await ChannelInvitationModel.hasPendingInvitation(
-          channelIdNum,
-          inviteeId,
-        );
-      logger.info("Checking pending invitation", {
+      const hasPendingInvitation = await ChannelInvitationModel.hasPendingInvitation(
+        channelIdNum,
+        inviteeId
+      );
+      logger.info('Checking pending invitation', {
         channelId: channelIdNum,
         inviteeId,
         hasPendingInvitation,
@@ -143,16 +133,18 @@ export class InvitationController {
 
       if (hasPendingInvitation) {
         // Get existing invitation details for debugging
-        const existingInvitations =
-          await ChannelInvitationModel.findByChannelId(channelIdNum, "pending");
-        logger.info("Existing pending invitations for channel", {
+        const existingInvitations = await ChannelInvitationModel.findByChannelId(
+          channelIdNum,
+          'pending'
+        );
+        logger.info('Existing pending invitations for channel', {
           channelId: channelIdNum,
           invitations: existingInvitations,
         });
 
         res.status(400).json({
           success: false,
-          error: "User already has a pending invitation to this channel",
+          error: 'User already has a pending invitation to this channel',
         });
         return;
       }
@@ -161,19 +153,19 @@ export class InvitationController {
       const invitePermission = await UserPrivacySettingsModel.canInviteUser(
         userId,
         inviteeId,
-        "channel",
+        'channel'
       );
       if (!invitePermission.canInvite) {
-        let errorMessage = "Cannot invite this user";
+        let errorMessage = 'Cannot invite this user';
         switch (invitePermission.reason) {
-          case "blocked":
-            errorMessage = "You have been blocked by this user";
+          case 'blocked':
+            errorMessage = 'You have been blocked by this user';
             break;
-          case "policy_nobody":
-            errorMessage = "This user does not accept channel invitations";
+          case 'policy_nobody':
+            errorMessage = 'This user does not accept channel invitations';
             break;
-          case "policy_contacts_only":
-            errorMessage = "This user only accepts invitations from contacts";
+          case 'policy_contacts_only':
+            errorMessage = 'This user only accepts invitations from contacts';
             break;
         }
 
@@ -195,17 +187,17 @@ export class InvitationController {
       // Get inviter info (Redis cache → DB fallback)
       const inviterData = await getUserInfo(userId);
       if (!inviterData) {
-        logger.error("Inviter not found", { userId });
+        logger.error('Inviter not found', { userId });
         res.status(404).json({
           success: false,
-          error: "Internal server error",
+          error: 'Internal server error',
         });
         return;
       }
 
       const inviter = {
         id: inviterData.id,
-        name: inviterData.name || "Unknown User",
+        name: inviterData.name || 'Unknown User',
         email: inviterData.email,
         avatarUrl: inviterData.avatarUrl,
       };
@@ -213,41 +205,31 @@ export class InvitationController {
       // Send real-time notification to invitee
       try {
         // Dynamically import BroadcastService to resolve circular import issues
-        const BroadcastServiceModule =
-          await import("../services/BroadcastService");
+        const BroadcastServiceModule = await import('../services/BroadcastService');
         const BroadcastService = BroadcastServiceModule.default;
         const broadcastService = BroadcastService.getInstance();
 
         if (broadcastService) {
-          await broadcastService.broadcastToUser(
-            inviteeId,
-            "channel_invitation",
-            {
-              invitationId: invitation.id,
-              channelId: channelIdNum,
-              channelName: channel.name,
-              inviterName: inviter.name,
-              message: message, // Only pass user-entered message (frontend generates default message)
-              expiresAt: invitation.expiresAt,
-              createdAt: invitation.createdAt,
-            },
-          );
+          await broadcastService.broadcastToUser(inviteeId, 'channel_invitation', {
+            invitationId: invitation.id,
+            channelId: channelIdNum,
+            channelName: channel.name,
+            inviterName: inviter.name,
+            message: message, // Only pass user-entered message (frontend generates default message)
+            expiresAt: invitation.expiresAt,
+            createdAt: invitation.createdAt,
+          });
 
-          logger.info(
-            `Real-time invitation notification sent to user ${inviteeId}`,
-            {
-              invitationId: invitation.id,
-              channelId: channelIdNum,
-              inviterId: userId,
-            },
-          );
+          logger.info(`Real-time invitation notification sent to user ${inviteeId}`, {
+            invitationId: invitation.id,
+            channelId: channelIdNum,
+            inviterId: userId,
+          });
         } else {
-          logger.warn(
-            "BroadcastService not available for real-time notifications",
-          );
+          logger.warn('BroadcastService not available for real-time notifications');
         }
       } catch (notificationError) {
-        logger.error("Failed to send real-time invitation notification", {
+        logger.error('Failed to send real-time invitation notification', {
           error: notificationError,
           inviteeId,
           channelId: channelIdNum,
@@ -255,38 +237,36 @@ export class InvitationController {
       }
 
       logger.info(
-        `Channel invitation sent: user ${userId} invited user ${inviteeId} to channel ${channelIdNum}`,
+        `Channel invitation sent: user ${userId} invited user ${inviteeId} to channel ${channelIdNum}`
       );
 
       // Send notification to Gatrix main server as well
-      const { gatrixApiService } = require("../services/GatrixApiService");
+      const { gatrixApiService } = require('../services/GatrixApiService');
       await gatrixApiService.sendNotification({
         userId: inviteeId,
-        type: "channel_invite",
+        type: 'channel_invite',
         title: `Channel Invitation`,
-        content: `${(req as any).user.name || "Someone"} invited you to join "${channel.name}"`,
+        content: `${(req as any).user.name || 'Someone'} invited you to join "${channel.name}"`,
         channelId: channelIdNum,
         metadata: {
           invitationId: invitation.id,
-          inviterName: (req as any).user.name || "Unknown User",
+          inviterName: (req as any).user.name || 'Unknown User',
           message,
         },
       });
 
-      logger.info(
-        `User ${userId} invited user ${inviteeId} to channel ${channelIdNum}`,
-      );
+      logger.info(`User ${userId} invited user ${inviteeId} to channel ${channelIdNum}`);
 
       res.status(201).json({
         success: true,
         data: invitation,
-        message: "Invitation sent successfully",
+        message: 'Invitation sent successfully',
       });
     } catch (error) {
-      logger.error("Failed to invite user:", error);
+      logger.error('Failed to invite user:', error);
       res.status(500).json({
         success: false,
-        error: "Failed to send invitation",
+        error: 'Failed to send invitation',
       });
     }
   }
@@ -298,7 +278,7 @@ export class InvitationController {
       const { invitationId } = req.params;
       const { action } = req.body; // 'accept' or 'decline'
 
-      if (!["accept", "decline"].includes(action)) {
+      if (!['accept', 'decline'].includes(action)) {
         res.status(400).json({
           success: false,
           error: 'Action must be "accept" or "decline"',
@@ -310,7 +290,7 @@ export class InvitationController {
       if (isNaN(invitationIdNum)) {
         res.status(400).json({
           success: false,
-          error: "Invalid invitation ID",
+          error: 'Invalid invitation ID',
         });
         return;
       }
@@ -320,7 +300,7 @@ export class InvitationController {
       if (!invitation) {
         res.status(404).json({
           success: false,
-          error: "Invitation not found",
+          error: 'Invitation not found',
         });
         return;
       }
@@ -329,66 +309,55 @@ export class InvitationController {
       if (invitation.inviteeId !== userId) {
         res.status(403).json({
           success: false,
-          error: "You can only respond to your own invitations",
+          error: 'You can only respond to your own invitations',
         });
         return;
       }
 
       // Check invitation status
-      if (invitation.status !== "pending") {
+      if (invitation.status !== 'pending') {
         res.status(400).json({
           success: false,
-          error: "This invitation has already been responded to",
+          error: 'This invitation has already been responded to',
         });
         return;
       }
 
-      const status = action === "accept" ? "accepted" : "declined";
-      const updatedInvitation = await ChannelInvitationModel.respond(
-        invitationIdNum,
-        status,
-      );
+      const status = action === 'accept' ? 'accepted' : 'declined';
+      const updatedInvitation = await ChannelInvitationModel.respond(invitationIdNum, status);
 
       // Get invitee info (Redis cache → DB fallback)
       const inviteeData = await getUserInfo(userId);
-      const inviteeName = inviteeData?.name || "Unknown User";
+      const inviteeName = inviteeData?.name || 'Unknown User';
 
       // If accepted, add user as channel member
-      if (action === "accept") {
-        await ChannelModel.addMember(invitation.channelId, userId, "member");
+      if (action === 'accept') {
+        await ChannelModel.addMember(invitation.channelId, userId, 'member');
 
         // Notify channel members about new member joining
-        const { BroadcastService } = require("../services/BroadcastService");
+        const { BroadcastService } = require('../services/BroadcastService');
         const broadcastService = BroadcastService.getInstance();
 
-        await broadcastService.broadcastToChannel(
-          invitation.channelId,
-          "user_joined_channel",
-          {
-            userId,
-            channelId: invitation.channelId,
-            userName: inviteeName,
-            timestamp: Date.now(),
-          },
-        );
+        await broadcastService.broadcastToChannel(invitation.channelId, 'user_joined_channel', {
+          userId,
+          channelId: invitation.channelId,
+          userName: inviteeName,
+          timestamp: Date.now(),
+        });
       }
 
       // Notify inviter about response
-      const { BroadcastService } = require("../services/BroadcastService");
+      const { BroadcastService } = require('../services/BroadcastService');
       const broadcastService = BroadcastService.getInstance();
 
-      await broadcastService.broadcastToUser(
-        invitation.inviterId,
-        "invitation_response",
-        {
-          invitationId: invitation.id,
-          channelId: invitation.channelId,
-          inviteeId: userId,
-          inviteeName: inviteeName,
-          action,
-          timestamp: Date.now(),
-        },
-      );
+      await broadcastService.broadcastToUser(invitation.inviterId, 'invitation_response', {
+        invitationId: invitation.id,
+        channelId: invitation.channelId,
+        inviteeId: userId,
+        inviteeName: inviteeName,
+        action,
+        timestamp: Date.now(),
+      });
 
       res.json({
         success: true,
@@ -397,10 +366,10 @@ export class InvitationController {
         message: `Invitation ${action}ed successfully`,
       });
     } catch (error) {
-      logger.error("Failed to respond to invitation:", error);
+      logger.error('Failed to respond to invitation:', error);
       res.status(500).json({
         success: false,
-        error: "Failed to respond to invitation",
+        error: 'Failed to respond to invitation',
       });
     }
   }
@@ -415,11 +384,10 @@ export class InvitationController {
       const limitNum = Math.min(parseInt(limit as string) || 20, 50);
       const offset = (pageNum - 1) * limitNum;
 
-      const result = await ChannelInvitationModel.findByInviteeId(
-        userId,
-        status as any,
-        { limit: limitNum, offset },
-      );
+      const result = await ChannelInvitationModel.findByInviteeId(userId, status as any, {
+        limit: limitNum,
+        offset,
+      });
 
       // Add channel info and inviter info
       const enrichedInvitations = await Promise.all(
@@ -447,7 +415,7 @@ export class InvitationController {
                 }
               : null,
           };
-        }),
+        })
       );
 
       res.json({
@@ -463,24 +431,21 @@ export class InvitationController {
         },
       });
     } catch (error) {
-      logger.error("Failed to get invitations:", error);
+      logger.error('Failed to get invitations:', error);
       res.status(500).json({
         success: false,
-        error: "Failed to get invitations",
+        error: 'Failed to get invitations',
       });
     }
   }
 
   // Get my sent invitations
-  static async getMySentInvitations(
-    req: Request,
-    res: Response,
-  ): Promise<void> {
+  static async getMySentInvitations(req: Request, res: Response): Promise<void> {
     try {
       const userId = (req as any).user.id;
       const { status, page = 1, limit = 20 } = req.query;
 
-      logger.info("getMySentInvitations request", {
+      logger.info('getMySentInvitations request', {
         userId,
         status,
         page,
@@ -491,13 +456,12 @@ export class InvitationController {
       const limitNum = Math.min(parseInt(limit as string) || 20, 50);
       const offset = (pageNum - 1) * limitNum;
 
-      const result = await ChannelInvitationModel.findByInviterId(
-        userId,
-        status as any,
-        { limit: limitNum, offset },
-      );
+      const result = await ChannelInvitationModel.findByInviterId(userId, status as any, {
+        limit: limitNum,
+        offset,
+      });
 
-      logger.info("getMySentInvitations result", { userId, status, result });
+      logger.info('getMySentInvitations result', { userId, status, result });
 
       // Add channel info and invitee info
       const enrichedInvitations = await Promise.all(
@@ -525,7 +489,7 @@ export class InvitationController {
                 }
               : null,
           };
-        }),
+        })
       );
 
       res.json({
@@ -541,24 +505,21 @@ export class InvitationController {
         },
       });
     } catch (error) {
-      logger.error("Failed to get sent invitations:", error);
+      logger.error('Failed to get sent invitations:', error);
       res.status(500).json({
         success: false,
-        error: "Failed to get sent invitations",
+        error: 'Failed to get sent invitations',
       });
     }
   }
 
   // Get channel's pending invitations
-  static async getChannelPendingInvitations(
-    req: Request,
-    res: Response,
-  ): Promise<void> {
+  static async getChannelPendingInvitations(req: Request, res: Response): Promise<void> {
     try {
       const userId = (req as any).user.id;
       const { channelId } = req.params;
 
-      logger.info("getChannelPendingInvitations request", {
+      logger.info('getChannelPendingInvitations request', {
         userId,
         channelId,
       });
@@ -567,7 +528,7 @@ export class InvitationController {
       if (isNaN(channelIdNum)) {
         res.status(400).json({
           success: false,
-          error: "Invalid channel ID",
+          error: 'Invalid channel ID',
         });
         return;
       }
@@ -577,7 +538,7 @@ export class InvitationController {
       if (!channel) {
         res.status(404).json({
           success: false,
-          error: "Channel not found",
+          error: 'Channel not found',
         });
         return;
       }
@@ -587,19 +548,18 @@ export class InvitationController {
       if (!isMember) {
         res.status(403).json({
           success: false,
-          error:
-            "You must be a member of the channel to view pending invitations",
+          error: 'You must be a member of the channel to view pending invitations',
         });
         return;
       }
 
       const result = await ChannelInvitationModel.findByChannelId(
         channelIdNum,
-        "pending",
-        { limit: 100 }, // Maximum 100 items
+        'pending',
+        { limit: 100 } // Maximum 100 items
       );
 
-      logger.info("getChannelPendingInvitations result", {
+      logger.info('getChannelPendingInvitations result', {
         channelId: channelIdNum,
         result,
       });
@@ -619,7 +579,7 @@ export class InvitationController {
                 }
               : null,
           };
-        }),
+        })
       );
 
       res.json({
@@ -627,10 +587,10 @@ export class InvitationController {
         data: enrichedInvitations,
       });
     } catch (error) {
-      logger.error("Failed to get channel pending invitations:", error);
+      logger.error('Failed to get channel pending invitations:', error);
       res.status(500).json({
         success: false,
-        error: "Failed to get channel pending invitations",
+        error: 'Failed to get channel pending invitations',
       });
     }
   }
@@ -645,41 +605,38 @@ export class InvitationController {
       if (isNaN(invitationIdNum)) {
         res.status(400).json({
           success: false,
-          error: "Invalid invitation ID",
+          error: 'Invalid invitation ID',
         });
         return;
       }
 
-      const cancelledInvitation = await ChannelInvitationModel.cancel(
-        invitationIdNum,
-        userId,
-      );
+      const cancelledInvitation = await ChannelInvitationModel.cancel(invitationIdNum, userId);
 
       // Notify invitee about cancellation
-      const { BroadcastService } = require("../services/BroadcastService");
+      const { BroadcastService } = require('../services/BroadcastService');
       const broadcastService = BroadcastService.getInstance();
 
       await broadcastService.broadcastToUser(
         cancelledInvitation.inviteeId,
-        "invitation_cancelled",
+        'invitation_cancelled',
         {
           invitationId: cancelledInvitation.id,
           channelId: cancelledInvitation.channelId,
-          inviterName: (req as any).user.name || "Unknown User",
+          inviterName: (req as any).user.name || 'Unknown User',
           timestamp: Date.now(),
-        },
+        }
       );
 
       res.json({
         success: true,
         data: cancelledInvitation,
-        message: "Invitation cancelled successfully",
+        message: 'Invitation cancelled successfully',
       });
     } catch (error) {
-      logger.error("Failed to cancel invitation:", error);
+      logger.error('Failed to cancel invitation:', error);
       res.status(500).json({
         success: false,
-        error: "Failed to cancel invitation",
+        error: 'Failed to cancel invitation',
       });
     }
   }

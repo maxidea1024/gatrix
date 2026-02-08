@@ -16,9 +16,7 @@
     ":max": {},
     ":enum": {},
     ":links": {
-      "groupId": [
-        "BattleChallengeGroup"
-      ]
+      "groupId": ["BattleChallengeGroup"]
     }
   },
   "DayOfWeekBattleChallenge": {

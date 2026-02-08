@@ -9,41 +9,13 @@
       "learnPointId": "number",
       "learnPointVal": "number",
       "duration": "number",
-      "frontBattleBuffId": [
-        "number",
-        "number",
-        "number"
-      ],
-      "frontSlot": [
-        "number",
-        "number",
-        "number",
-        "number"
-      ],
-      "centerBattleBuffId": [
-        "number",
-        "number",
-        "number"
-      ],
-      "centerSlot": [
-        "number",
-        "number",
-        "number",
-        "number"
-      ],
-      "rearBattleBuffId": [
-        "number",
-        "number",
-        "number"
-      ],
-      "rearSlot": [
-        "number",
-        "number",
-        "number"
-      ],
-      "worldBuffId": [
-        "number"
-      ],
+      "frontBattleBuffId": ["number", "number", "number"],
+      "frontSlot": ["number", "number", "number", "number"],
+      "centerBattleBuffId": ["number", "number", "number"],
+      "centerSlot": ["number", "number", "number", "number"],
+      "rearBattleBuffId": ["number", "number", "number"],
+      "rearSlot": ["number", "number", "number"],
+      "worldBuffId": ["number"],
       "clearQuestId": "number",
       "needMateId": "number",
       "purchaseNeedRank": "number",
@@ -59,135 +31,43 @@
       "purchaseNeedRank": 1
     },
     ":requiredInObject": {
-      "frontSlot": [
-        1
-      ],
-      "centerSlot": [
-        1
-      ],
-      "rearSlot": [
-        1
-      ]
+      "frontSlot": [1],
+      "centerSlot": [1],
+      "rearSlot": [1]
     },
     ":min": {
       "learnPointId": 100000,
-      "frontBattleBuffId": [
-        65500000,
-        65500000,
-        65500000
-      ],
-      "frontSlot": [
-        1,
-        1,
-        1,
-        1
-      ],
-      "centerBattleBuffId": [
-        65500000,
-        65500000,
-        65500000
-      ],
-      "centerSlot": [
-        1
-      ],
-      "rearBattleBuffId": [
-        65500000,
-        65500000,
-        65500000
-      ],
-      "rearSlot": [
-        1
-      ],
-      "worldBuffId": [
-        38000000
-      ],
+      "frontBattleBuffId": [65500000, 65500000, 65500000],
+      "frontSlot": [1, 1, 1, 1],
+      "centerBattleBuffId": [65500000, 65500000, 65500000],
+      "centerSlot": [1],
+      "rearBattleBuffId": [65500000, 65500000, 65500000],
+      "rearSlot": [1],
+      "worldBuffId": [38000000],
       "clearQuestId": 82000000,
       "needMateId": 21200000
     },
     ":max": {
       "learnPointId": 199999,
-      "frontBattleBuffId": [
-        65999999,
-        65999999,
-        65999999
-      ],
-      "frontSlot": [
-        7,
-        7,
-        7,
-        7
-      ],
-      "centerBattleBuffId": [
-        65999999,
-        65999999,
-        65999999
-      ],
-      "centerSlot": [
-        7
-      ],
-      "rearBattleBuffId": [
-        65999999,
-        65999999,
-        65999999
-      ],
-      "rearSlot": [
-        7
-      ],
-      "worldBuffId": [
-        38099999
-      ],
+      "frontBattleBuffId": [65999999, 65999999, 65999999],
+      "frontSlot": [7, 7, 7, 7],
+      "centerBattleBuffId": [65999999, 65999999, 65999999],
+      "centerSlot": [7],
+      "rearBattleBuffId": [65999999, 65999999, 65999999],
+      "rearSlot": [7],
+      "worldBuffId": [38099999],
       "clearQuestId": 82999999,
       "needMateId": 21399999
     },
     ":enum": {},
     ":links": {
-      "learnPointId": [
-        "Point"
-      ],
-      "frontBattleBuffId": [
-        [
-          "BattleBuff"
-        ],
-        [
-          "BattleBuff"
-        ],
-        [
-          "BattleBuff"
-        ]
-      ],
-      "centerBattleBuffId": [
-        [
-          "BattleBuff"
-        ],
-        [
-          "BattleBuff"
-        ],
-        [
-          "BattleBuff"
-        ]
-      ],
-      "rearBattleBuffId": [
-        [
-          "BattleBuff"
-        ],
-        [
-          "BattleBuff"
-        ],
-        [
-          "BattleBuff"
-        ]
-      ],
-      "worldBuffId": [
-        [
-          "WorldBuff"
-        ]
-      ],
-      "clearQuestId": [
-        "Quest"
-      ],
-      "needMateId": [
-        "Mate"
-      ]
+      "learnPointId": ["Point"],
+      "frontBattleBuffId": [["BattleBuff"], ["BattleBuff"], ["BattleBuff"]],
+      "centerBattleBuffId": [["BattleBuff"], ["BattleBuff"], ["BattleBuff"]],
+      "rearBattleBuffId": [["BattleBuff"], ["BattleBuff"], ["BattleBuff"]],
+      "worldBuffId": [["WorldBuff"]],
+      "clearQuestId": ["Quest"],
+      "needMateId": ["Mate"]
     }
   },
   "BattleFormation": {
@@ -199,31 +79,13 @@
       "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
       "learnPointId": 100003,
       "learnPointVal": 1000,
-      "frontBattleBuffId": [
-        65800024
-      ],
-      "frontSlot": [
-        2,
-        3
-      ],
-      "centerBattleBuffId": [
-        65800025
-      ],
-      "centerSlot": [
-        1,
-        4,
-        7
-      ],
-      "rearBattleBuffId": [
-        65800026
-      ],
-      "rearSlot": [
-        5,
-        6
-      ],
-      "worldBuffId": [
-        38001000
-      ],
+      "frontBattleBuffId": [65800024],
+      "frontSlot": [2, 3],
+      "centerBattleBuffId": [65800025],
+      "centerSlot": [1, 4, 7],
+      "rearBattleBuffId": [65800026],
+      "rearSlot": [5, 6],
+      "worldBuffId": [38001000],
       "purchaseNeedRank": 1,
       "purchaseGem": 1000
     },
@@ -235,31 +97,13 @@
       "desc": "적을 포위하여 섬멸하는데 특화된 진형",
       "learnPointId": 100003,
       "learnPointVal": 1000,
-      "frontBattleBuffId": [
-        65800027
-      ],
-      "frontSlot": [
-        6,
-        7
-      ],
-      "centerBattleBuffId": [
-        65800028
-      ],
-      "centerSlot": [
-        4,
-        5
-      ],
-      "rearBattleBuffId": [
-        65800029
-      ],
-      "rearSlot": [
-        1,
-        2,
-        3
-      ],
-      "worldBuffId": [
-        38001000
-      ],
+      "frontBattleBuffId": [65800027],
+      "frontSlot": [6, 7],
+      "centerBattleBuffId": [65800028],
+      "centerSlot": [4, 5],
+      "rearBattleBuffId": [65800029],
+      "rearSlot": [1, 2, 3],
+      "worldBuffId": [38001000],
       "purchaseNeedRank": 5,
       "purchaseGem": 1000
     },
@@ -271,31 +115,13 @@
       "desc": "후방에 집결하여 적의 공격을 무력화하는데 특화된 진형",
       "learnPointId": 100003,
       "learnPointVal": 1000,
-      "frontBattleBuffId": [
-        65800030
-      ],
-      "frontSlot": [
-        6,
-        7
-      ],
-      "centerBattleBuffId": [
-        65800031
-      ],
-      "centerSlot": [
-        2,
-        3,
-        4,
-        5
-      ],
-      "rearBattleBuffId": [
-        65800032
-      ],
-      "rearSlot": [
-        1
-      ],
-      "worldBuffId": [
-        38001000
-      ],
+      "frontBattleBuffId": [65800030],
+      "frontSlot": [6, 7],
+      "centerBattleBuffId": [65800031],
+      "centerSlot": [2, 3, 4, 5],
+      "rearBattleBuffId": [65800032],
+      "rearSlot": [1],
+      "worldBuffId": [38001000],
       "purchaseNeedRank": 10,
       "purchaseGem": 1000
     },
@@ -307,31 +133,13 @@
       "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
       "learnPointId": 100003,
       "learnPointVal": 1000,
-      "frontBattleBuffId": [
-        65800024
-      ],
-      "frontSlot": [
-        1,
-        2,
-        3
-      ],
-      "centerBattleBuffId": [
-        65800025
-      ],
-      "centerSlot": [
-        4,
-        5,
-        6
-      ],
-      "rearBattleBuffId": [
-        65800026
-      ],
-      "rearSlot": [
-        7
-      ],
-      "worldBuffId": [
-        38001000
-      ],
+      "frontBattleBuffId": [65800024],
+      "frontSlot": [1, 2, 3],
+      "centerBattleBuffId": [65800025],
+      "centerSlot": [4, 5, 6],
+      "rearBattleBuffId": [65800026],
+      "rearSlot": [7],
+      "worldBuffId": [38001000],
       "purchaseNeedRank": 10,
       "purchaseGem": 1000
     },
@@ -343,31 +151,13 @@
       "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
       "learnPointId": 100003,
       "learnPointVal": 1000,
-      "frontBattleBuffId": [
-        65800024
-      ],
-      "frontSlot": [
-        1,
-        2,
-        3
-      ],
-      "centerBattleBuffId": [
-        65800025
-      ],
-      "centerSlot": [
-        4,
-        5,
-        6
-      ],
-      "rearBattleBuffId": [
-        65800026
-      ],
-      "rearSlot": [
-        7
-      ],
-      "worldBuffId": [
-        38001000
-      ],
+      "frontBattleBuffId": [65800024],
+      "frontSlot": [1, 2, 3],
+      "centerBattleBuffId": [65800025],
+      "centerSlot": [4, 5, 6],
+      "rearBattleBuffId": [65800026],
+      "rearSlot": [7],
+      "worldBuffId": [38001000],
       "purchaseNeedRank": 10,
       "purchaseGem": 1000
     },
@@ -379,31 +169,13 @@
       "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
       "learnPointId": 100003,
       "learnPointVal": 1000,
-      "frontBattleBuffId": [
-        65800024
-      ],
-      "frontSlot": [
-        1,
-        2,
-        3
-      ],
-      "centerBattleBuffId": [
-        65800025
-      ],
-      "centerSlot": [
-        4,
-        5,
-        6
-      ],
-      "rearBattleBuffId": [
-        65800026
-      ],
-      "rearSlot": [
-        7
-      ],
-      "worldBuffId": [
-        38001000
-      ],
+      "frontBattleBuffId": [65800024],
+      "frontSlot": [1, 2, 3],
+      "centerBattleBuffId": [65800025],
+      "centerSlot": [4, 5, 6],
+      "rearBattleBuffId": [65800026],
+      "rearSlot": [7],
+      "worldBuffId": [38001000],
       "purchaseNeedRank": 10,
       "purchaseGem": 1000
     },
@@ -415,31 +187,13 @@
       "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
       "learnPointId": 100003,
       "learnPointVal": 1000,
-      "frontBattleBuffId": [
-        65800024
-      ],
-      "frontSlot": [
-        1,
-        2,
-        3
-      ],
-      "centerBattleBuffId": [
-        65800025
-      ],
-      "centerSlot": [
-        4,
-        5,
-        6
-      ],
-      "rearBattleBuffId": [
-        65800026
-      ],
-      "rearSlot": [
-        7
-      ],
-      "worldBuffId": [
-        38001000
-      ],
+      "frontBattleBuffId": [65800024],
+      "frontSlot": [1, 2, 3],
+      "centerBattleBuffId": [65800025],
+      "centerSlot": [4, 5, 6],
+      "rearBattleBuffId": [65800026],
+      "rearSlot": [7],
+      "worldBuffId": [38001000],
       "purchaseNeedRank": 10,
       "purchaseGem": 1000
     },
@@ -451,31 +205,13 @@
       "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
       "learnPointId": 100003,
       "learnPointVal": 1000,
-      "frontBattleBuffId": [
-        65800024
-      ],
-      "frontSlot": [
-        1,
-        2,
-        3
-      ],
-      "centerBattleBuffId": [
-        65800025
-      ],
-      "centerSlot": [
-        4,
-        5,
-        6
-      ],
-      "rearBattleBuffId": [
-        65800026
-      ],
-      "rearSlot": [
-        7
-      ],
-      "worldBuffId": [
-        38001000
-      ],
+      "frontBattleBuffId": [65800024],
+      "frontSlot": [1, 2, 3],
+      "centerBattleBuffId": [65800025],
+      "centerSlot": [4, 5, 6],
+      "rearBattleBuffId": [65800026],
+      "rearSlot": [7],
+      "worldBuffId": [38001000],
       "purchaseNeedRank": 10,
       "purchaseGem": 1000
     },
@@ -487,31 +223,13 @@
       "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
       "learnPointId": 100003,
       "learnPointVal": 1000,
-      "frontBattleBuffId": [
-        65800024
-      ],
-      "frontSlot": [
-        1,
-        2,
-        3
-      ],
-      "centerBattleBuffId": [
-        65800025
-      ],
-      "centerSlot": [
-        4,
-        5,
-        6
-      ],
-      "rearBattleBuffId": [
-        65800026
-      ],
-      "rearSlot": [
-        7
-      ],
-      "worldBuffId": [
-        38001000
-      ],
+      "frontBattleBuffId": [65800024],
+      "frontSlot": [1, 2, 3],
+      "centerBattleBuffId": [65800025],
+      "centerSlot": [4, 5, 6],
+      "rearBattleBuffId": [65800026],
+      "rearSlot": [7],
+      "worldBuffId": [38001000],
       "purchaseNeedRank": 10,
       "purchaseGem": 1000
     },
@@ -523,31 +241,13 @@
       "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
       "learnPointId": 100003,
       "learnPointVal": 1000,
-      "frontBattleBuffId": [
-        65800024
-      ],
-      "frontSlot": [
-        1,
-        2,
-        3
-      ],
-      "centerBattleBuffId": [
-        65800025
-      ],
-      "centerSlot": [
-        4,
-        5,
-        6
-      ],
-      "rearBattleBuffId": [
-        65800026
-      ],
-      "rearSlot": [
-        7
-      ],
-      "worldBuffId": [
-        38001000
-      ],
+      "frontBattleBuffId": [65800024],
+      "frontSlot": [1, 2, 3],
+      "centerBattleBuffId": [65800025],
+      "centerSlot": [4, 5, 6],
+      "rearBattleBuffId": [65800026],
+      "rearSlot": [7],
+      "worldBuffId": [38001000],
       "purchaseNeedRank": 10,
       "purchaseGem": 1000
     },
@@ -559,31 +259,13 @@
       "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
       "learnPointId": 100003,
       "learnPointVal": 1000,
-      "frontBattleBuffId": [
-        65800024
-      ],
-      "frontSlot": [
-        1,
-        2,
-        3
-      ],
-      "centerBattleBuffId": [
-        65800025
-      ],
-      "centerSlot": [
-        4,
-        5,
-        6
-      ],
-      "rearBattleBuffId": [
-        65800026
-      ],
-      "rearSlot": [
-        7
-      ],
-      "worldBuffId": [
-        38001000
-      ],
+      "frontBattleBuffId": [65800024],
+      "frontSlot": [1, 2, 3],
+      "centerBattleBuffId": [65800025],
+      "centerSlot": [4, 5, 6],
+      "rearBattleBuffId": [65800026],
+      "rearSlot": [7],
+      "worldBuffId": [38001000],
       "purchaseNeedRank": 10,
       "purchaseGem": 1000
     },
@@ -595,31 +277,13 @@
       "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
       "learnPointId": 100003,
       "learnPointVal": 1000,
-      "frontBattleBuffId": [
-        65800024
-      ],
-      "frontSlot": [
-        1,
-        2,
-        3
-      ],
-      "centerBattleBuffId": [
-        65800025
-      ],
-      "centerSlot": [
-        4,
-        5,
-        6
-      ],
-      "rearBattleBuffId": [
-        65800026
-      ],
-      "rearSlot": [
-        7
-      ],
-      "worldBuffId": [
-        38001000
-      ],
+      "frontBattleBuffId": [65800024],
+      "frontSlot": [1, 2, 3],
+      "centerBattleBuffId": [65800025],
+      "centerSlot": [4, 5, 6],
+      "rearBattleBuffId": [65800026],
+      "rearSlot": [7],
+      "worldBuffId": [38001000],
       "purchaseNeedRank": 10,
       "purchaseGem": 1000
     },
@@ -631,31 +295,13 @@
       "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
       "learnPointId": 100003,
       "learnPointVal": 1000,
-      "frontBattleBuffId": [
-        65800024
-      ],
-      "frontSlot": [
-        1,
-        2,
-        3
-      ],
-      "centerBattleBuffId": [
-        65800025
-      ],
-      "centerSlot": [
-        4,
-        5,
-        6
-      ],
-      "rearBattleBuffId": [
-        65800026
-      ],
-      "rearSlot": [
-        7
-      ],
-      "worldBuffId": [
-        38001000
-      ],
+      "frontBattleBuffId": [65800024],
+      "frontSlot": [1, 2, 3],
+      "centerBattleBuffId": [65800025],
+      "centerSlot": [4, 5, 6],
+      "rearBattleBuffId": [65800026],
+      "rearSlot": [7],
+      "worldBuffId": [38001000],
       "purchaseNeedRank": 10,
       "purchaseGem": 1000
     },
@@ -667,31 +313,13 @@
       "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
       "learnPointId": 100003,
       "learnPointVal": 1000,
-      "frontBattleBuffId": [
-        65800024
-      ],
-      "frontSlot": [
-        1,
-        2,
-        3
-      ],
-      "centerBattleBuffId": [
-        65800025
-      ],
-      "centerSlot": [
-        4,
-        5,
-        6
-      ],
-      "rearBattleBuffId": [
-        65800026
-      ],
-      "rearSlot": [
-        7
-      ],
-      "worldBuffId": [
-        38001000
-      ],
+      "frontBattleBuffId": [65800024],
+      "frontSlot": [1, 2, 3],
+      "centerBattleBuffId": [65800025],
+      "centerSlot": [4, 5, 6],
+      "rearBattleBuffId": [65800026],
+      "rearSlot": [7],
+      "worldBuffId": [38001000],
       "purchaseNeedRank": 10,
       "purchaseGem": 1000
     },
@@ -703,31 +331,13 @@
       "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
       "learnPointId": 100003,
       "learnPointVal": 1000,
-      "frontBattleBuffId": [
-        65800024
-      ],
-      "frontSlot": [
-        1,
-        2,
-        3
-      ],
-      "centerBattleBuffId": [
-        65800025
-      ],
-      "centerSlot": [
-        4,
-        5,
-        6
-      ],
-      "rearBattleBuffId": [
-        65800026
-      ],
-      "rearSlot": [
-        7
-      ],
-      "worldBuffId": [
-        38001000
-      ],
+      "frontBattleBuffId": [65800024],
+      "frontSlot": [1, 2, 3],
+      "centerBattleBuffId": [65800025],
+      "centerSlot": [4, 5, 6],
+      "rearBattleBuffId": [65800026],
+      "rearSlot": [7],
+      "worldBuffId": [38001000],
       "purchaseNeedRank": 10,
       "purchaseGem": 1000
     },
@@ -739,31 +349,13 @@
       "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
       "learnPointId": 100003,
       "learnPointVal": 1000,
-      "frontBattleBuffId": [
-        65800024
-      ],
-      "frontSlot": [
-        1,
-        2,
-        3
-      ],
-      "centerBattleBuffId": [
-        65800025
-      ],
-      "centerSlot": [
-        4,
-        5,
-        6
-      ],
-      "rearBattleBuffId": [
-        65800026
-      ],
-      "rearSlot": [
-        7
-      ],
-      "worldBuffId": [
-        38001000
-      ],
+      "frontBattleBuffId": [65800024],
+      "frontSlot": [1, 2, 3],
+      "centerBattleBuffId": [65800025],
+      "centerSlot": [4, 5, 6],
+      "rearBattleBuffId": [65800026],
+      "rearSlot": [7],
+      "worldBuffId": [38001000],
       "purchaseNeedRank": 10,
       "purchaseGem": 1000
     },
@@ -775,31 +367,13 @@
       "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
       "learnPointId": 100003,
       "learnPointVal": 1000,
-      "frontBattleBuffId": [
-        65800024
-      ],
-      "frontSlot": [
-        1,
-        2,
-        3
-      ],
-      "centerBattleBuffId": [
-        65800025
-      ],
-      "centerSlot": [
-        4,
-        5,
-        6
-      ],
-      "rearBattleBuffId": [
-        65800026
-      ],
-      "rearSlot": [
-        7
-      ],
-      "worldBuffId": [
-        38001000
-      ],
+      "frontBattleBuffId": [65800024],
+      "frontSlot": [1, 2, 3],
+      "centerBattleBuffId": [65800025],
+      "centerSlot": [4, 5, 6],
+      "rearBattleBuffId": [65800026],
+      "rearSlot": [7],
+      "worldBuffId": [38001000],
       "purchaseNeedRank": 10,
       "purchaseGem": 1000
     },
@@ -811,31 +385,13 @@
       "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
       "learnPointId": 100003,
       "learnPointVal": 1000,
-      "frontBattleBuffId": [
-        65800024
-      ],
-      "frontSlot": [
-        1,
-        2,
-        3
-      ],
-      "centerBattleBuffId": [
-        65800025
-      ],
-      "centerSlot": [
-        4,
-        5,
-        6
-      ],
-      "rearBattleBuffId": [
-        65800026
-      ],
-      "rearSlot": [
-        7
-      ],
-      "worldBuffId": [
-        38001000
-      ],
+      "frontBattleBuffId": [65800024],
+      "frontSlot": [1, 2, 3],
+      "centerBattleBuffId": [65800025],
+      "centerSlot": [4, 5, 6],
+      "rearBattleBuffId": [65800026],
+      "rearSlot": [7],
+      "worldBuffId": [38001000],
       "purchaseNeedRank": 10,
       "purchaseGem": 1000
     },
@@ -847,31 +403,13 @@
       "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
       "learnPointId": 100003,
       "learnPointVal": 1000,
-      "frontBattleBuffId": [
-        65800024
-      ],
-      "frontSlot": [
-        1,
-        2,
-        3
-      ],
-      "centerBattleBuffId": [
-        65800025
-      ],
-      "centerSlot": [
-        4,
-        5,
-        6
-      ],
-      "rearBattleBuffId": [
-        65800026
-      ],
-      "rearSlot": [
-        7
-      ],
-      "worldBuffId": [
-        38001000
-      ],
+      "frontBattleBuffId": [65800024],
+      "frontSlot": [1, 2, 3],
+      "centerBattleBuffId": [65800025],
+      "centerSlot": [4, 5, 6],
+      "rearBattleBuffId": [65800026],
+      "rearSlot": [7],
+      "worldBuffId": [38001000],
       "purchaseNeedRank": 10,
       "purchaseGem": 1000
     },
@@ -883,31 +421,13 @@
       "desc": "빠른 기동력으로 적을 제압하는 진형",
       "learnPointId": 100003,
       "learnPointVal": 1000,
-      "frontBattleBuffId": [
-        65800000
-      ],
-      "frontSlot": [
-        2,
-        3
-      ],
-      "centerBattleBuffId": [
-        65800001
-      ],
-      "centerSlot": [
-        1,
-        4,
-        7
-      ],
-      "rearBattleBuffId": [
-        65800002
-      ],
-      "rearSlot": [
-        5,
-        6
-      ],
-      "worldBuffId": [
-        38001000
-      ],
+      "frontBattleBuffId": [65800000],
+      "frontSlot": [2, 3],
+      "centerBattleBuffId": [65800001],
+      "centerSlot": [1, 4, 7],
+      "rearBattleBuffId": [65800002],
+      "rearSlot": [5, 6],
+      "worldBuffId": [38001000],
       "purchaseNeedRank": 1
     },
     "64249501": {
@@ -918,31 +438,13 @@
       "desc": "적이 접근하기 전에 포격 공격을 가하기 좋은 진형",
       "learnPointId": 100003,
       "learnPointVal": 1000,
-      "frontBattleBuffId": [
-        65800003
-      ],
-      "frontSlot": [
-        2,
-        3,
-        4,
-        5
-      ],
-      "centerBattleBuffId": [
-        65800004
-      ],
-      "centerSlot": [
-        6,
-        7
-      ],
-      "rearBattleBuffId": [
-        65800005
-      ],
-      "rearSlot": [
-        1
-      ],
-      "worldBuffId": [
-        38001000
-      ],
+      "frontBattleBuffId": [65800003],
+      "frontSlot": [2, 3, 4, 5],
+      "centerBattleBuffId": [65800004],
+      "centerSlot": [6, 7],
+      "rearBattleBuffId": [65800005],
+      "rearSlot": [1],
+      "worldBuffId": [38001000],
       "purchaseNeedRank": 10,
       "purchaseGem": 1000
     },
@@ -954,31 +456,13 @@
       "desc": "적에게 빠르게 접근하여 백병 공격을 가하기 좋은 진형",
       "learnPointId": 100003,
       "learnPointVal": 1000,
-      "frontBattleBuffId": [
-        65800006
-      ],
-      "frontSlot": [
-        2,
-        3,
-        4
-      ],
-      "centerBattleBuffId": [
-        65800007
-      ],
-      "centerSlot": [
-        1
-      ],
-      "rearBattleBuffId": [
-        65800008
-      ],
-      "rearSlot": [
-        5,
-        6,
-        7
-      ],
-      "worldBuffId": [
-        38001000
-      ],
+      "frontBattleBuffId": [65800006],
+      "frontSlot": [2, 3, 4],
+      "centerBattleBuffId": [65800007],
+      "centerSlot": [1],
+      "rearBattleBuffId": [65800008],
+      "rearSlot": [5, 6, 7],
+      "worldBuffId": [38001000],
       "purchaseNeedRank": 10,
       "purchaseGem": 1000
     },
@@ -990,31 +474,13 @@
       "desc": "가까이 접근한 적에게 충파 공격을 가하기 좋은 진형",
       "learnPointId": 100003,
       "learnPointVal": 1000,
-      "frontBattleBuffId": [
-        65800009
-      ],
-      "frontSlot": [
-        1,
-        2,
-        3
-      ],
-      "centerBattleBuffId": [
-        65800010
-      ],
-      "centerSlot": [
-        4,
-        5
-      ],
-      "rearBattleBuffId": [
-        65800011
-      ],
-      "rearSlot": [
-        6,
-        7
-      ],
-      "worldBuffId": [
-        38001000
-      ],
+      "frontBattleBuffId": [65800009],
+      "frontSlot": [1, 2, 3],
+      "centerBattleBuffId": [65800010],
+      "centerSlot": [4, 5],
+      "rearBattleBuffId": [65800011],
+      "rearSlot": [6, 7],
+      "worldBuffId": [38001000],
       "purchaseNeedRank": 10,
       "purchaseGem": 1000
     },
@@ -1026,31 +492,13 @@
       "desc": "적에게 치명적인 피해를 주는데 특화된 진형",
       "learnPointId": 100003,
       "learnPointVal": 1000,
-      "frontBattleBuffId": [
-        65800012
-      ],
-      "frontSlot": [
-        2,
-        3,
-        4,
-        5
-      ],
-      "centerBattleBuffId": [
-        65800013
-      ],
-      "centerSlot": [
-        6,
-        7
-      ],
-      "rearBattleBuffId": [
-        65800014
-      ],
-      "rearSlot": [
-        1
-      ],
-      "worldBuffId": [
-        38001000
-      ],
+      "frontBattleBuffId": [65800012],
+      "frontSlot": [2, 3, 4, 5],
+      "centerBattleBuffId": [65800013],
+      "centerSlot": [6, 7],
+      "rearBattleBuffId": [65800014],
+      "rearSlot": [1],
+      "worldBuffId": [38001000],
       "purchaseNeedRank": 10,
       "purchaseGem": 1000
     },
@@ -1062,31 +510,13 @@
       "desc": "방어를 포기하는 대신 포격에 특화된 진형",
       "learnPointId": 100003,
       "learnPointVal": 1000,
-      "frontBattleBuffId": [
-        65800015
-      ],
-      "frontSlot": [
-        2,
-        3,
-        4
-      ],
-      "centerBattleBuffId": [
-        65800016
-      ],
-      "centerSlot": [
-        5,
-        6,
-        7
-      ],
-      "rearBattleBuffId": [
-        65800017
-      ],
-      "rearSlot": [
-        1
-      ],
-      "worldBuffId": [
-        38001000
-      ],
+      "frontBattleBuffId": [65800015],
+      "frontSlot": [2, 3, 4],
+      "centerBattleBuffId": [65800016],
+      "centerSlot": [5, 6, 7],
+      "rearBattleBuffId": [65800017],
+      "rearSlot": [1],
+      "worldBuffId": [38001000],
       "purchaseNeedRank": 10,
       "purchaseGem": 1000
     },
@@ -1098,31 +528,13 @@
       "desc": "방어와 생존에 집중하여 버티기에 특화된 진형",
       "learnPointId": 100003,
       "learnPointVal": 1000,
-      "frontBattleBuffId": [
-        65800018
-      ],
-      "frontSlot": [
-        2,
-        3
-      ],
-      "centerBattleBuffId": [
-        65800019
-      ],
-      "centerSlot": [
-        1,
-        6,
-        7
-      ],
-      "rearBattleBuffId": [
-        65800020
-      ],
-      "rearSlot": [
-        4,
-        5
-      ],
-      "worldBuffId": [
-        38001000
-      ],
+      "frontBattleBuffId": [65800018],
+      "frontSlot": [2, 3],
+      "centerBattleBuffId": [65800019],
+      "centerSlot": [1, 6, 7],
+      "rearBattleBuffId": [65800020],
+      "rearSlot": [4, 5],
+      "worldBuffId": [38001000],
       "purchaseNeedRank": 10,
       "purchaseGem": 1000
     },
@@ -1134,31 +546,13 @@
       "desc": "적의 공격에 대한 반격에 특화된 진형",
       "learnPointId": 100003,
       "learnPointVal": 1000,
-      "frontBattleBuffId": [
-        65800021
-      ],
-      "frontSlot": [
-        2,
-        3
-      ],
-      "centerBattleBuffId": [
-        65800022
-      ],
-      "centerSlot": [
-        4,
-        5
-      ],
-      "rearBattleBuffId": [
-        65800023
-      ],
-      "rearSlot": [
-        1,
-        6,
-        7
-      ],
-      "worldBuffId": [
-        38001000
-      ],
+      "frontBattleBuffId": [65800021],
+      "frontSlot": [2, 3],
+      "centerBattleBuffId": [65800022],
+      "centerSlot": [4, 5],
+      "rearBattleBuffId": [65800023],
+      "rearSlot": [1, 6, 7],
+      "worldBuffId": [38001000],
       "purchaseNeedRank": 10,
       "purchaseGem": 1000
     },
@@ -1170,34 +564,13 @@
       "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
       "learnPointId": 100003,
       "learnPointVal": 1000,
-      "frontBattleBuffId": [
-        65551038,
-        65800034
-      ],
-      "frontSlot": [
-        2,
-        3
-      ],
-      "centerBattleBuffId": [
-        65551038,
-        65800034
-      ],
-      "centerSlot": [
-        1,
-        4,
-        7
-      ],
-      "rearBattleBuffId": [
-        65551038,
-        65800034
-      ],
-      "rearSlot": [
-        5,
-        6
-      ],
-      "worldBuffId": [
-        38001000
-      ],
+      "frontBattleBuffId": [65551038, 65800034],
+      "frontSlot": [2, 3],
+      "centerBattleBuffId": [65551038, 65800034],
+      "centerSlot": [1, 4, 7],
+      "rearBattleBuffId": [65551038, 65800034],
+      "rearSlot": [5, 6],
+      "worldBuffId": [38001000],
       "purchaseNeedRank": 1,
       "purchaseGem": 1000
     },
@@ -1209,31 +582,13 @@
       "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
       "learnPointId": 100003,
       "learnPointVal": 1000,
-      "frontBattleBuffId": [
-        65800036
-      ],
-      "frontSlot": [
-        2,
-        3
-      ],
-      "centerBattleBuffId": [
-        65800036
-      ],
-      "centerSlot": [
-        1,
-        4,
-        7
-      ],
-      "rearBattleBuffId": [
-        65800036
-      ],
-      "rearSlot": [
-        5,
-        6
-      ],
-      "worldBuffId": [
-        38001000
-      ],
+      "frontBattleBuffId": [65800036],
+      "frontSlot": [2, 3],
+      "centerBattleBuffId": [65800036],
+      "centerSlot": [1, 4, 7],
+      "rearBattleBuffId": [65800036],
+      "rearSlot": [5, 6],
+      "worldBuffId": [38001000],
       "purchaseNeedRank": 1,
       "purchaseGem": 1000
     },
@@ -1245,31 +600,13 @@
       "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
       "learnPointId": 100003,
       "learnPointVal": 1000,
-      "frontBattleBuffId": [
-        65800034
-      ],
-      "frontSlot": [
-        2,
-        3
-      ],
-      "centerBattleBuffId": [
-        65800034
-      ],
-      "centerSlot": [
-        1,
-        4,
-        7
-      ],
-      "rearBattleBuffId": [
-        65800034
-      ],
-      "rearSlot": [
-        5,
-        6
-      ],
-      "worldBuffId": [
-        38001000
-      ],
+      "frontBattleBuffId": [65800034],
+      "frontSlot": [2, 3],
+      "centerBattleBuffId": [65800034],
+      "centerSlot": [1, 4, 7],
+      "rearBattleBuffId": [65800034],
+      "rearSlot": [5, 6],
+      "worldBuffId": [38001000],
       "purchaseNeedRank": 1,
       "purchaseGem": 1000
     },
@@ -1281,31 +618,13 @@
       "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
       "learnPointId": 100003,
       "learnPointVal": 1000,
-      "frontBattleBuffId": [
-        65800035
-      ],
-      "frontSlot": [
-        2,
-        3
-      ],
-      "centerBattleBuffId": [
-        65800035
-      ],
-      "centerSlot": [
-        1,
-        4,
-        7
-      ],
-      "rearBattleBuffId": [
-        65800035
-      ],
-      "rearSlot": [
-        5,
-        6
-      ],
-      "worldBuffId": [
-        38001000
-      ],
+      "frontBattleBuffId": [65800035],
+      "frontSlot": [2, 3],
+      "centerBattleBuffId": [65800035],
+      "centerSlot": [1, 4, 7],
+      "rearBattleBuffId": [65800035],
+      "rearSlot": [5, 6],
+      "worldBuffId": [38001000],
       "purchaseNeedRank": 1,
       "purchaseGem": 1000
     },
@@ -1317,31 +636,13 @@
       "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
       "learnPointId": 100003,
       "learnPointVal": 1000,
-      "frontBattleBuffId": [
-        65800037
-      ],
-      "frontSlot": [
-        2,
-        3
-      ],
-      "centerBattleBuffId": [
-        65800037
-      ],
-      "centerSlot": [
-        1,
-        4,
-        7
-      ],
-      "rearBattleBuffId": [
-        65800037
-      ],
-      "rearSlot": [
-        5,
-        6
-      ],
-      "worldBuffId": [
-        38001000
-      ],
+      "frontBattleBuffId": [65800037],
+      "frontSlot": [2, 3],
+      "centerBattleBuffId": [65800037],
+      "centerSlot": [1, 4, 7],
+      "rearBattleBuffId": [65800037],
+      "rearSlot": [5, 6],
+      "worldBuffId": [38001000],
       "purchaseNeedRank": 1,
       "purchaseGem": 1000
     },
@@ -1353,31 +654,13 @@
       "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
       "learnPointId": 100003,
       "learnPointVal": 1000,
-      "frontBattleBuffId": [
-        65800038
-      ],
-      "frontSlot": [
-        2,
-        3
-      ],
-      "centerBattleBuffId": [
-        65800038
-      ],
-      "centerSlot": [
-        1,
-        4,
-        7
-      ],
-      "rearBattleBuffId": [
-        65800038
-      ],
-      "rearSlot": [
-        5,
-        6
-      ],
-      "worldBuffId": [
-        38001000
-      ],
+      "frontBattleBuffId": [65800038],
+      "frontSlot": [2, 3],
+      "centerBattleBuffId": [65800038],
+      "centerSlot": [1, 4, 7],
+      "rearBattleBuffId": [65800038],
+      "rearSlot": [5, 6],
+      "worldBuffId": [38001000],
       "purchaseNeedRank": 1,
       "purchaseGem": 1000
     },
@@ -1390,31 +673,13 @@
       "learnPointId": 100004,
       "learnPointVal": 300,
       "duration": 604800,
-      "frontBattleBuffId": [
-        65800021
-      ],
-      "frontSlot": [
-        2,
-        3
-      ],
-      "centerBattleBuffId": [
-        65800022
-      ],
-      "centerSlot": [
-        4,
-        5
-      ],
-      "rearBattleBuffId": [
-        65800023
-      ],
-      "rearSlot": [
-        1,
-        6,
-        7
-      ],
-      "worldBuffId": [
-        38001000
-      ],
+      "frontBattleBuffId": [65800021],
+      "frontSlot": [2, 3],
+      "centerBattleBuffId": [65800022],
+      "centerSlot": [4, 5],
+      "rearBattleBuffId": [65800023],
+      "rearSlot": [1, 6, 7],
+      "worldBuffId": [38001000],
       "purchaseNeedRank": 10,
       "purchaseGem": 1000
     },
@@ -1426,31 +691,13 @@
       "desc": "각개전투에 특화된 진형",
       "learnPointId": 100003,
       "learnPointVal": 1000,
-      "frontBattleBuffId": [
-        65800039
-      ],
-      "frontSlot": [
-        2,
-        3,
-        4
-      ],
-      "centerBattleBuffId": [
-        65800039
-      ],
-      "centerSlot": [
-        5,
-        6,
-        7
-      ],
-      "rearBattleBuffId": [
-        65800039
-      ],
-      "rearSlot": [
-        1
-      ],
-      "worldBuffId": [
-        38001000
-      ],
+      "frontBattleBuffId": [65800039],
+      "frontSlot": [2, 3, 4],
+      "centerBattleBuffId": [65800039],
+      "centerSlot": [5, 6, 7],
+      "rearBattleBuffId": [65800039],
+      "rearSlot": [1],
+      "worldBuffId": [38001000],
       "purchaseNeedRank": 10,
       "purchaseGem": 1000
     },
@@ -1462,31 +709,13 @@
       "desc": "길게 늘어진 선박별로 연계를 보완한 진형",
       "learnPointId": 100003,
       "learnPointVal": 1000,
-      "frontBattleBuffId": [
-        65800040
-      ],
-      "frontSlot": [
-        2,
-        3
-      ],
-      "centerBattleBuffId": [
-        65800040
-      ],
-      "centerSlot": [
-        1,
-        6,
-        7
-      ],
-      "rearBattleBuffId": [
-        65800040
-      ],
-      "rearSlot": [
-        4,
-        5
-      ],
-      "worldBuffId": [
-        38001000
-      ],
+      "frontBattleBuffId": [65800040],
+      "frontSlot": [2, 3],
+      "centerBattleBuffId": [65800040],
+      "centerSlot": [1, 6, 7],
+      "rearBattleBuffId": [65800040],
+      "rearSlot": [4, 5],
+      "worldBuffId": [38001000],
       "purchaseNeedRank": 10,
       "purchaseGem": 1000
     },
@@ -1498,31 +727,13 @@
       "desc": "일제히 적진으로 돌격하기에 특화된 진형",
       "learnPointId": 100003,
       "learnPointVal": 1000,
-      "frontBattleBuffId": [
-        65800041
-      ],
-      "frontSlot": [
-        2,
-        3
-      ],
-      "centerBattleBuffId": [
-        65800041
-      ],
-      "centerSlot": [
-        4,
-        5
-      ],
-      "rearBattleBuffId": [
-        65800041
-      ],
-      "rearSlot": [
-        1,
-        6,
-        7
-      ],
-      "worldBuffId": [
-        38001000
-      ],
+      "frontBattleBuffId": [65800041],
+      "frontSlot": [2, 3],
+      "centerBattleBuffId": [65800041],
+      "centerSlot": [4, 5],
+      "rearBattleBuffId": [65800041],
+      "rearSlot": [1, 6, 7],
+      "worldBuffId": [38001000],
       "purchaseNeedRank": 10,
       "purchaseGem": 1000
     },
@@ -1534,31 +745,13 @@
       "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
       "learnPointId": 100003,
       "learnPointVal": 1000,
-      "frontBattleBuffId": [
-        65800036
-      ],
-      "frontSlot": [
-        2,
-        3
-      ],
-      "centerBattleBuffId": [
-        65800036
-      ],
-      "centerSlot": [
-        1,
-        4,
-        7
-      ],
-      "rearBattleBuffId": [
-        65800036
-      ],
-      "rearSlot": [
-        5,
-        6
-      ],
-      "worldBuffId": [
-        38001000
-      ],
+      "frontBattleBuffId": [65800036],
+      "frontSlot": [2, 3],
+      "centerBattleBuffId": [65800036],
+      "centerSlot": [1, 4, 7],
+      "rearBattleBuffId": [65800036],
+      "rearSlot": [5, 6],
+      "worldBuffId": [38001000],
       "purchaseNeedRank": 1,
       "purchaseGem": 1000
     },
@@ -1570,31 +763,13 @@
       "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
       "learnPointId": 100003,
       "learnPointVal": 1000,
-      "frontBattleBuffId": [
-        65800034
-      ],
-      "frontSlot": [
-        2,
-        3
-      ],
-      "centerBattleBuffId": [
-        65800034
-      ],
-      "centerSlot": [
-        1,
-        4,
-        7
-      ],
-      "rearBattleBuffId": [
-        65800034
-      ],
-      "rearSlot": [
-        5,
-        6
-      ],
-      "worldBuffId": [
-        38001000
-      ],
+      "frontBattleBuffId": [65800034],
+      "frontSlot": [2, 3],
+      "centerBattleBuffId": [65800034],
+      "centerSlot": [1, 4, 7],
+      "rearBattleBuffId": [65800034],
+      "rearSlot": [5, 6],
+      "worldBuffId": [38001000],
       "purchaseNeedRank": 1,
       "purchaseGem": 1000
     },
@@ -1606,31 +781,13 @@
       "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
       "learnPointId": 100003,
       "learnPointVal": 1000,
-      "frontBattleBuffId": [
-        65800035
-      ],
-      "frontSlot": [
-        2,
-        3
-      ],
-      "centerBattleBuffId": [
-        65800035
-      ],
-      "centerSlot": [
-        1,
-        4,
-        7
-      ],
-      "rearBattleBuffId": [
-        65800035
-      ],
-      "rearSlot": [
-        5,
-        6
-      ],
-      "worldBuffId": [
-        38001000
-      ],
+      "frontBattleBuffId": [65800035],
+      "frontSlot": [2, 3],
+      "centerBattleBuffId": [65800035],
+      "centerSlot": [1, 4, 7],
+      "rearBattleBuffId": [65800035],
+      "rearSlot": [5, 6],
+      "worldBuffId": [38001000],
       "purchaseNeedRank": 1,
       "purchaseGem": 1000
     },
@@ -1642,37 +799,13 @@
       "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
       "learnPointId": 100003,
       "learnPointVal": 1000,
-      "frontBattleBuffId": [
-        65551038,
-        65800035,
-        65551048
-      ],
-      "frontSlot": [
-        2,
-        3
-      ],
-      "centerBattleBuffId": [
-        65551038,
-        65800035,
-        65551048
-      ],
-      "centerSlot": [
-        1,
-        4,
-        7
-      ],
-      "rearBattleBuffId": [
-        65551038,
-        65800035,
-        65551048
-      ],
-      "rearSlot": [
-        5,
-        6
-      ],
-      "worldBuffId": [
-        38001000
-      ],
+      "frontBattleBuffId": [65551038, 65800035, 65551048],
+      "frontSlot": [2, 3],
+      "centerBattleBuffId": [65551038, 65800035, 65551048],
+      "centerSlot": [1, 4, 7],
+      "rearBattleBuffId": [65551038, 65800035, 65551048],
+      "rearSlot": [5, 6],
+      "worldBuffId": [38001000],
       "purchaseNeedRank": 1,
       "purchaseGem": 1000
     },
@@ -1684,34 +817,13 @@
       "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
       "learnPointId": 100003,
       "learnPointVal": 1000,
-      "frontBattleBuffId": [
-        65800036,
-        65800042
-      ],
-      "frontSlot": [
-        2,
-        3
-      ],
-      "centerBattleBuffId": [
-        65800036,
-        65800042
-      ],
-      "centerSlot": [
-        1,
-        4,
-        7
-      ],
-      "rearBattleBuffId": [
-        65800036,
-        65800042
-      ],
-      "rearSlot": [
-        5,
-        6
-      ],
-      "worldBuffId": [
-        38001000
-      ],
+      "frontBattleBuffId": [65800036, 65800042],
+      "frontSlot": [2, 3],
+      "centerBattleBuffId": [65800036, 65800042],
+      "centerSlot": [1, 4, 7],
+      "rearBattleBuffId": [65800036, 65800042],
+      "rearSlot": [5, 6],
+      "worldBuffId": [38001000],
       "purchaseNeedRank": 1,
       "purchaseGem": 1000
     },
@@ -1723,34 +835,13 @@
       "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
       "learnPointId": 100003,
       "learnPointVal": 1000,
-      "frontBattleBuffId": [
-        65800036,
-        65800043
-      ],
-      "frontSlot": [
-        2,
-        3
-      ],
-      "centerBattleBuffId": [
-        65800036,
-        65800043
-      ],
-      "centerSlot": [
-        1,
-        4,
-        7
-      ],
-      "rearBattleBuffId": [
-        65800036,
-        65800043
-      ],
-      "rearSlot": [
-        5,
-        6
-      ],
-      "worldBuffId": [
-        38001000
-      ],
+      "frontBattleBuffId": [65800036, 65800043],
+      "frontSlot": [2, 3],
+      "centerBattleBuffId": [65800036, 65800043],
+      "centerSlot": [1, 4, 7],
+      "rearBattleBuffId": [65800036, 65800043],
+      "rearSlot": [5, 6],
+      "worldBuffId": [38001000],
       "purchaseNeedRank": 1,
       "purchaseGem": 1000
     },
@@ -1762,37 +853,13 @@
       "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
       "learnPointId": 100003,
       "learnPointVal": 1000,
-      "frontBattleBuffId": [
-        65551040,
-        65800033,
-        65551050
-      ],
-      "frontSlot": [
-        2,
-        3
-      ],
-      "centerBattleBuffId": [
-        65551040,
-        65800033,
-        65551050
-      ],
-      "centerSlot": [
-        1,
-        4,
-        7
-      ],
-      "rearBattleBuffId": [
-        65551040,
-        65800033,
-        65551050
-      ],
-      "rearSlot": [
-        5,
-        6
-      ],
-      "worldBuffId": [
-        38001000
-      ],
+      "frontBattleBuffId": [65551040, 65800033, 65551050],
+      "frontSlot": [2, 3],
+      "centerBattleBuffId": [65551040, 65800033, 65551050],
+      "centerSlot": [1, 4, 7],
+      "rearBattleBuffId": [65551040, 65800033, 65551050],
+      "rearSlot": [5, 6],
+      "worldBuffId": [38001000],
       "purchaseNeedRank": 1,
       "purchaseGem": 1000
     },
@@ -1804,34 +871,13 @@
       "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
       "learnPointId": 100003,
       "learnPointVal": 1000,
-      "frontBattleBuffId": [
-        65800035,
-        65800043
-      ],
-      "frontSlot": [
-        2,
-        3
-      ],
-      "centerBattleBuffId": [
-        65800035,
-        65800043
-      ],
-      "centerSlot": [
-        1,
-        4,
-        7
-      ],
-      "rearBattleBuffId": [
-        65800035,
-        65800043
-      ],
-      "rearSlot": [
-        5,
-        6
-      ],
-      "worldBuffId": [
-        38001000
-      ],
+      "frontBattleBuffId": [65800035, 65800043],
+      "frontSlot": [2, 3],
+      "centerBattleBuffId": [65800035, 65800043],
+      "centerSlot": [1, 4, 7],
+      "rearBattleBuffId": [65800035, 65800043],
+      "rearSlot": [5, 6],
+      "worldBuffId": [38001000],
       "purchaseNeedRank": 1,
       "purchaseGem": 1000
     },
@@ -1843,34 +889,13 @@
       "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
       "learnPointId": 100003,
       "learnPointVal": 1000,
-      "frontBattleBuffId": [
-        65800034,
-        65800044
-      ],
-      "frontSlot": [
-        2,
-        3
-      ],
-      "centerBattleBuffId": [
-        65800034,
-        65800044
-      ],
-      "centerSlot": [
-        1,
-        4,
-        7
-      ],
-      "rearBattleBuffId": [
-        65800034,
-        65800044
-      ],
-      "rearSlot": [
-        5,
-        6
-      ],
-      "worldBuffId": [
-        38001000
-      ],
+      "frontBattleBuffId": [65800034, 65800044],
+      "frontSlot": [2, 3],
+      "centerBattleBuffId": [65800034, 65800044],
+      "centerSlot": [1, 4, 7],
+      "rearBattleBuffId": [65800034, 65800044],
+      "rearSlot": [5, 6],
+      "worldBuffId": [38001000],
       "purchaseNeedRank": 1,
       "purchaseGem": 1000
     },
@@ -1882,34 +907,13 @@
       "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
       "learnPointId": 100003,
       "learnPointVal": 1000,
-      "frontBattleBuffId": [
-        65800036,
-        65800045
-      ],
-      "frontSlot": [
-        2,
-        3
-      ],
-      "centerBattleBuffId": [
-        65800036,
-        65800045
-      ],
-      "centerSlot": [
-        1,
-        4,
-        7
-      ],
-      "rearBattleBuffId": [
-        65800036,
-        65800045
-      ],
-      "rearSlot": [
-        5,
-        6
-      ],
-      "worldBuffId": [
-        38001000
-      ],
+      "frontBattleBuffId": [65800036, 65800045],
+      "frontSlot": [2, 3],
+      "centerBattleBuffId": [65800036, 65800045],
+      "centerSlot": [1, 4, 7],
+      "rearBattleBuffId": [65800036, 65800045],
+      "rearSlot": [5, 6],
+      "worldBuffId": [38001000],
       "purchaseNeedRank": 1,
       "purchaseGem": 1000
     },
@@ -1921,34 +925,13 @@
       "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
       "learnPointId": 100003,
       "learnPointVal": 1000,
-      "frontBattleBuffId": [
-        65800034,
-        65800045
-      ],
-      "frontSlot": [
-        2,
-        3
-      ],
-      "centerBattleBuffId": [
-        65800034,
-        65800045
-      ],
-      "centerSlot": [
-        1,
-        4,
-        7
-      ],
-      "rearBattleBuffId": [
-        65800034,
-        65800045
-      ],
-      "rearSlot": [
-        5,
-        6
-      ],
-      "worldBuffId": [
-        38001000
-      ],
+      "frontBattleBuffId": [65800034, 65800045],
+      "frontSlot": [2, 3],
+      "centerBattleBuffId": [65800034, 65800045],
+      "centerSlot": [1, 4, 7],
+      "rearBattleBuffId": [65800034, 65800045],
+      "rearSlot": [5, 6],
+      "worldBuffId": [38001000],
       "purchaseNeedRank": 1,
       "purchaseGem": 1000
     },
@@ -1960,34 +943,13 @@
       "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
       "learnPointId": 100003,
       "learnPointVal": 1000,
-      "frontBattleBuffId": [
-        65800035,
-        65800044
-      ],
-      "frontSlot": [
-        2,
-        3
-      ],
-      "centerBattleBuffId": [
-        65800035,
-        65800044
-      ],
-      "centerSlot": [
-        1,
-        4,
-        7
-      ],
-      "rearBattleBuffId": [
-        65800035,
-        65800044
-      ],
-      "rearSlot": [
-        5,
-        6
-      ],
-      "worldBuffId": [
-        38001000
-      ],
+      "frontBattleBuffId": [65800035, 65800044],
+      "frontSlot": [2, 3],
+      "centerBattleBuffId": [65800035, 65800044],
+      "centerSlot": [1, 4, 7],
+      "rearBattleBuffId": [65800035, 65800044],
+      "rearSlot": [5, 6],
+      "worldBuffId": [38001000],
       "purchaseNeedRank": 1,
       "purchaseGem": 1000
     },
@@ -1999,31 +961,13 @@
       "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
       "learnPointId": 100003,
       "learnPointVal": 1000,
-      "frontBattleBuffId": [
-        65800033
-      ],
-      "frontSlot": [
-        2,
-        3
-      ],
-      "centerBattleBuffId": [
-        65800033
-      ],
-      "centerSlot": [
-        1,
-        4,
-        7
-      ],
-      "rearBattleBuffId": [
-        65800033
-      ],
-      "rearSlot": [
-        5,
-        6
-      ],
-      "worldBuffId": [
-        38001000
-      ],
+      "frontBattleBuffId": [65800033],
+      "frontSlot": [2, 3],
+      "centerBattleBuffId": [65800033],
+      "centerSlot": [1, 4, 7],
+      "rearBattleBuffId": [65800033],
+      "rearSlot": [5, 6],
+      "worldBuffId": [38001000],
       "purchaseNeedRank": 1,
       "purchaseGem": 1000
     },
@@ -2035,37 +979,13 @@
       "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
       "learnPointId": 100003,
       "learnPointVal": 1000,
-      "frontBattleBuffId": [
-        65551040,
-        65800046,
-        65800036
-      ],
-      "frontSlot": [
-        2,
-        3
-      ],
-      "centerBattleBuffId": [
-        65551040,
-        65800046,
-        65800036
-      ],
-      "centerSlot": [
-        1,
-        4,
-        7
-      ],
-      "rearBattleBuffId": [
-        65551040,
-        65800046,
-        65800036
-      ],
-      "rearSlot": [
-        5,
-        6
-      ],
-      "worldBuffId": [
-        38001000
-      ],
+      "frontBattleBuffId": [65551040, 65800046, 65800036],
+      "frontSlot": [2, 3],
+      "centerBattleBuffId": [65551040, 65800046, 65800036],
+      "centerSlot": [1, 4, 7],
+      "rearBattleBuffId": [65551040, 65800046, 65800036],
+      "rearSlot": [5, 6],
+      "worldBuffId": [38001000],
       "purchaseNeedRank": 1,
       "purchaseGem": 1000
     },
@@ -2077,34 +997,13 @@
       "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
       "learnPointId": 100003,
       "learnPointVal": 1000,
-      "frontBattleBuffId": [
-        65800047,
-        65800048
-      ],
-      "frontSlot": [
-        2,
-        3
-      ],
-      "centerBattleBuffId": [
-        65800047,
-        65800048
-      ],
-      "centerSlot": [
-        1,
-        4,
-        7
-      ],
-      "rearBattleBuffId": [
-        65800047,
-        65800048
-      ],
-      "rearSlot": [
-        5,
-        6
-      ],
-      "worldBuffId": [
-        38001000
-      ],
+      "frontBattleBuffId": [65800047, 65800048],
+      "frontSlot": [2, 3],
+      "centerBattleBuffId": [65800047, 65800048],
+      "centerSlot": [1, 4, 7],
+      "rearBattleBuffId": [65800047, 65800048],
+      "rearSlot": [5, 6],
+      "worldBuffId": [38001000],
       "purchaseNeedRank": 1,
       "purchaseGem": 1000
     },
@@ -2116,34 +1015,13 @@
       "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
       "learnPointId": 100003,
       "learnPointVal": 1000,
-      "frontBattleBuffId": [
-        65800034,
-        65800043
-      ],
-      "frontSlot": [
-        2,
-        3
-      ],
-      "centerBattleBuffId": [
-        65800034,
-        65800043
-      ],
-      "centerSlot": [
-        1,
-        4,
-        7
-      ],
-      "rearBattleBuffId": [
-        65800034,
-        65800043
-      ],
-      "rearSlot": [
-        5,
-        6
-      ],
-      "worldBuffId": [
-        38001000
-      ],
+      "frontBattleBuffId": [65800034, 65800043],
+      "frontSlot": [2, 3],
+      "centerBattleBuffId": [65800034, 65800043],
+      "centerSlot": [1, 4, 7],
+      "rearBattleBuffId": [65800034, 65800043],
+      "rearSlot": [5, 6],
+      "worldBuffId": [38001000],
       "purchaseNeedRank": 1,
       "purchaseGem": 1000
     },
@@ -2155,31 +1033,13 @@
       "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
       "learnPointId": 100003,
       "learnPointVal": 1000,
-      "frontBattleBuffId": [
-        65990170
-      ],
-      "frontSlot": [
-        2,
-        3
-      ],
-      "centerBattleBuffId": [
-        65990170
-      ],
-      "centerSlot": [
-        1,
-        4,
-        7
-      ],
-      "rearBattleBuffId": [
-        65990170
-      ],
-      "rearSlot": [
-        5,
-        6
-      ],
-      "worldBuffId": [
-        38001000
-      ],
+      "frontBattleBuffId": [65990170],
+      "frontSlot": [2, 3],
+      "centerBattleBuffId": [65990170],
+      "centerSlot": [1, 4, 7],
+      "rearBattleBuffId": [65990170],
+      "rearSlot": [5, 6],
+      "worldBuffId": [38001000],
       "purchaseNeedRank": 1,
       "purchaseGem": 1000
     },
@@ -2191,31 +1051,13 @@
       "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
       "learnPointId": 100003,
       "learnPointVal": 1000,
-      "frontBattleBuffId": [
-        65990172
-      ],
-      "frontSlot": [
-        2,
-        3
-      ],
-      "centerBattleBuffId": [
-        65990172
-      ],
-      "centerSlot": [
-        1,
-        4,
-        7
-      ],
-      "rearBattleBuffId": [
-        65990172
-      ],
-      "rearSlot": [
-        5,
-        6
-      ],
-      "worldBuffId": [
-        38001000
-      ],
+      "frontBattleBuffId": [65990172],
+      "frontSlot": [2, 3],
+      "centerBattleBuffId": [65990172],
+      "centerSlot": [1, 4, 7],
+      "rearBattleBuffId": [65990172],
+      "rearSlot": [5, 6],
+      "worldBuffId": [38001000],
       "purchaseNeedRank": 1,
       "purchaseGem": 1000
     },
@@ -2227,31 +1069,13 @@
       "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
       "learnPointId": 100003,
       "learnPointVal": 1000,
-      "frontBattleBuffId": [
-        65990173
-      ],
-      "frontSlot": [
-        2,
-        3
-      ],
-      "centerBattleBuffId": [
-        65990173
-      ],
-      "centerSlot": [
-        1,
-        4,
-        7
-      ],
-      "rearBattleBuffId": [
-        65990173
-      ],
-      "rearSlot": [
-        5,
-        6
-      ],
-      "worldBuffId": [
-        38001000
-      ],
+      "frontBattleBuffId": [65990173],
+      "frontSlot": [2, 3],
+      "centerBattleBuffId": [65990173],
+      "centerSlot": [1, 4, 7],
+      "rearBattleBuffId": [65990173],
+      "rearSlot": [5, 6],
+      "worldBuffId": [38001000],
       "purchaseNeedRank": 1,
       "purchaseGem": 1000
     },
@@ -2263,37 +1087,13 @@
       "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
       "learnPointId": 100003,
       "learnPointVal": 1000,
-      "frontBattleBuffId": [
-        65551040,
-        65800046,
-        65800035
-      ],
-      "frontSlot": [
-        2,
-        3
-      ],
-      "centerBattleBuffId": [
-        65551040,
-        65800046,
-        65800035
-      ],
-      "centerSlot": [
-        1,
-        4,
-        7
-      ],
-      "rearBattleBuffId": [
-        65551040,
-        65800046,
-        65800035
-      ],
-      "rearSlot": [
-        5,
-        6
-      ],
-      "worldBuffId": [
-        38001000
-      ],
+      "frontBattleBuffId": [65551040, 65800046, 65800035],
+      "frontSlot": [2, 3],
+      "centerBattleBuffId": [65551040, 65800046, 65800035],
+      "centerSlot": [1, 4, 7],
+      "rearBattleBuffId": [65551040, 65800046, 65800035],
+      "rearSlot": [5, 6],
+      "worldBuffId": [38001000],
       "purchaseNeedRank": 1,
       "purchaseGem": 1000
     },
@@ -2305,34 +1105,13 @@
       "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
       "learnPointId": 100003,
       "learnPointVal": 1000,
-      "frontBattleBuffId": [
-        65800033,
-        65800044
-      ],
-      "frontSlot": [
-        2,
-        3
-      ],
-      "centerBattleBuffId": [
-        65800033,
-        65800044
-      ],
-      "centerSlot": [
-        1,
-        4,
-        7
-      ],
-      "rearBattleBuffId": [
-        65800033,
-        65800044
-      ],
-      "rearSlot": [
-        5,
-        6
-      ],
-      "worldBuffId": [
-        38001000
-      ],
+      "frontBattleBuffId": [65800033, 65800044],
+      "frontSlot": [2, 3],
+      "centerBattleBuffId": [65800033, 65800044],
+      "centerSlot": [1, 4, 7],
+      "rearBattleBuffId": [65800033, 65800044],
+      "rearSlot": [5, 6],
+      "worldBuffId": [38001000],
       "purchaseNeedRank": 1,
       "purchaseGem": 1000
     },
@@ -2344,34 +1123,13 @@
       "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
       "learnPointId": 100003,
       "learnPointVal": 1000,
-      "frontBattleBuffId": [
-        65800035,
-        65800051
-      ],
-      "frontSlot": [
-        2,
-        3
-      ],
-      "centerBattleBuffId": [
-        65800035,
-        65800051
-      ],
-      "centerSlot": [
-        1,
-        4,
-        7
-      ],
-      "rearBattleBuffId": [
-        65800035,
-        65800051
-      ],
-      "rearSlot": [
-        5,
-        6
-      ],
-      "worldBuffId": [
-        38001000
-      ],
+      "frontBattleBuffId": [65800035, 65800051],
+      "frontSlot": [2, 3],
+      "centerBattleBuffId": [65800035, 65800051],
+      "centerSlot": [1, 4, 7],
+      "rearBattleBuffId": [65800035, 65800051],
+      "rearSlot": [5, 6],
+      "worldBuffId": [38001000],
       "purchaseNeedRank": 1,
       "purchaseGem": 1000
     },
@@ -2383,31 +1141,13 @@
       "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
       "learnPointId": 100003,
       "learnPointVal": 1000,
-      "frontBattleBuffId": [
-        65800038
-      ],
-      "frontSlot": [
-        1
-      ],
-      "centerBattleBuffId": [
-        65800025
-      ],
-      "centerSlot": [
-        2,
-        3,
-        4
-      ],
-      "rearBattleBuffId": [
-        65800026
-      ],
-      "rearSlot": [
-        5,
-        6,
-        7
-      ],
-      "worldBuffId": [
-        38001000
-      ],
+      "frontBattleBuffId": [65800038],
+      "frontSlot": [1],
+      "centerBattleBuffId": [65800025],
+      "centerSlot": [2, 3, 4],
+      "rearBattleBuffId": [65800026],
+      "rearSlot": [5, 6, 7],
+      "worldBuffId": [38001000],
       "purchaseNeedRank": 1,
       "purchaseGem": 1000
     }

@@ -168,19 +168,8 @@
       "dispatchJobType": 0,
       "regionId": 12000000,
       "dispatchTownId": [
-        11000000,
-        11000000,
-        11000000,
-        11000000,
-        11000000,
-        11000000,
-        11000000,
-        11000000,
-        11000000,
-        11000000,
-        11000000,
-        11000000,
-        11000000
+        11000000, 11000000, 11000000, 11000000, 11000000, 11000000, 11000000, 11000000, 11000000,
+        11000000, 11000000, 11000000, 11000000
       ],
       "needSpecialStat": [
         {
@@ -238,19 +227,8 @@
       "dispatchJobType": 3,
       "regionId": 12099999,
       "dispatchTownId": [
-        11999999,
-        11999999,
-        11999999,
-        11999999,
-        11999999,
-        11999999,
-        11999999,
-        11999999,
-        11999999,
-        11999999,
-        11999999,
-        11999999,
-        11999999
+        11999999, 11999999, 11999999, 11999999, 11999999, 11999999, 11999999, 11999999, 11999999,
+        11999999, 11999999, 11999999, 11999999
       ],
       "needSpecialStat": [
         {
@@ -306,89 +284,45 @@
     },
     ":enum": {},
     ":links": {
-      "regionId": [
-        "Region"
-      ],
+      "regionId": ["Region"],
       "dispatchTownId": [
-        [
-          "Town"
-        ],
-        [
-          "Town"
-        ],
-        [
-          "Town"
-        ],
-        [
-          "Town"
-        ],
-        [
-          "Town"
-        ],
-        [
-          "Town"
-        ],
-        [
-          "Town"
-        ],
-        [
-          "Town"
-        ],
-        [
-          "Town"
-        ],
-        [
-          "Town"
-        ],
-        [
-          "Town"
-        ],
-        [
-          "Town"
-        ],
-        [
-          "Town"
-        ]
+        ["Town"],
+        ["Town"],
+        ["Town"],
+        ["Town"],
+        ["Town"],
+        ["Town"],
+        ["Town"],
+        ["Town"],
+        ["Town"],
+        ["Town"],
+        ["Town"],
+        ["Town"],
+        ["Town"]
       ],
       "needPassive": [
         {
-          "GroupId": [
-            "WorldPassive",
-            "BattlePassive"
-          ]
+          "GroupId": ["WorldPassive", "BattlePassive"]
         },
         {
-          "GroupId": [
-            "WorldPassive",
-            "BattlePassive"
-          ]
+          "GroupId": ["WorldPassive", "BattlePassive"]
         }
       ],
       "needStat": [
         {
-          "Id": [
-            "StatOperator"
-          ]
+          "Id": ["StatOperator"]
         },
         {
-          "Id": [
-            "StatOperator"
-          ]
+          "Id": ["StatOperator"]
         },
         {
-          "Id": [
-            "StatOperator"
-          ]
+          "Id": ["StatOperator"]
         },
         {
-          "Id": [
-            "StatOperator"
-          ]
+          "Id": ["StatOperator"]
         }
       ],
-      "dispatchPointId": [
-        "Point"
-      ]
+      "dispatchPointId": ["Point"]
     }
   },
   "FleetDispatch": {
@@ -399,17 +333,8 @@
       "actionGroup": 10,
       "regionId": 12000000,
       "dispatchTownId": [
-        11000094,
-        11000145,
-        11000067,
-        11000067,
-        11000071,
-        11000101,
-        11000014,
-        11000042,
-        11000136,
-        11000070,
-        11000211
+        11000094, 11000145, 11000067, 11000067, 11000071, 11000101, 11000014, 11000042, 11000136,
+        11000070, 11000211
       ],
       "needCompanyLv": 1,
       "needFleetPowerVal": 5000,
@@ -446,13 +371,7 @@
       "dispatchJobType": 3,
       "actionGroup": 10,
       "regionId": 12001200,
-      "dispatchTownId": [
-        11000078,
-        11000123,
-        11000196,
-        11000125,
-        11000160
-      ],
+      "dispatchTownId": [11000078, 11000123, 11000196, 11000125, 11000160],
       "needCompanyLv": 1,
       "needFleetPowerVal": 5000,
       "needSpecialStat": [
@@ -489,14 +408,7 @@
       "actionGroup": 10,
       "regionId": 12000700,
       "dispatchTownId": [
-        11000020,
-        11000034,
-        11000035,
-        11000069,
-        11000082,
-        11000091,
-        11000100,
-        11000159
+        11000020, 11000034, 11000035, 11000069, 11000082, 11000091, 11000100, 11000159
       ],
       "needCompanyLv": 5,
       "needFleetPowerVal": 10000,
@@ -561,14 +473,7 @@
       "dispatchJobType": 3,
       "actionGroup": 10,
       "regionId": 12000900,
-      "dispatchTownId": [
-        11000029,
-        11000106,
-        11000057,
-        11000081,
-        11000103,
-        11000144
-      ],
+      "dispatchTownId": [11000029, 11000106, 11000057, 11000081, 11000103, 11000144],
       "needCompanyLv": 15,
       "needFleetPowerVal": 30000,
       "needSpecialStat": [
@@ -629,14 +534,7 @@
       "dispatchJobType": 3,
       "actionGroup": 10,
       "regionId": 12000900,
-      "dispatchTownId": [
-        11000108,
-        11000095,
-        11000066,
-        11000024,
-        11000175,
-        11000090
-      ],
+      "dispatchTownId": [11000108, 11000095, 11000066, 11000024, 11000175, 11000090],
       "needCompanyLv": 20,
       "needFleetPowerVal": 40000,
       "needSpecialStat": [
@@ -702,19 +600,8 @@
       "actionGroup": 10,
       "regionId": 12001900,
       "dispatchTownId": [
-        11000008,
-        11000040,
-        11000041,
-        11000086,
-        11000087,
-        11000088,
-        11000129,
-        11000132,
-        11000141,
-        11000142,
-        11000171,
-        11000193,
-        11000185
+        11000008, 11000040, 11000041, 11000086, 11000087, 11000088, 11000129, 11000132, 11000141,
+        11000142, 11000171, 11000193, 11000185
       ],
       "needCompanyLv": 18,
       "needFleetPowerVal": 30000,
@@ -775,12 +662,7 @@
       "dispatchJobType": 3,
       "actionGroup": 10,
       "regionId": 12001800,
-      "dispatchTownId": [
-        11000032,
-        11000072,
-        11000143,
-        11000156
-      ],
+      "dispatchTownId": [11000032, 11000072, 11000143, 11000156],
       "needCompanyLv": 24,
       "needFleetPowerVal": 40000,
       "needSpecialStat": [
@@ -842,15 +724,7 @@
       "actionGroup": 10,
       "regionId": 12001801,
       "dispatchTownId": [
-        11000013,
-        11000097,
-        11000157,
-        11000052,
-        11000164,
-        11000134,
-        11000053,
-        11000049,
-        11000166,
+        11000013, 11000097, 11000157, 11000052, 11000164, 11000134, 11000053, 11000049, 11000166,
         11000051
       ],
       "needCompanyLv": 27,
@@ -912,14 +786,7 @@
       "dispatchJobType": 3,
       "actionGroup": 10,
       "regionId": 12001100,
-      "dispatchTownId": [
-        11000096,
-        11000023,
-        11000105,
-        11000043,
-        11000137,
-        11000099
-      ],
+      "dispatchTownId": [11000096, 11000023, 11000105, 11000043, 11000137, 11000099],
       "needCompanyLv": 30,
       "needFleetPowerVal": 70000,
       "needSpecialStat": [
@@ -984,14 +851,7 @@
       "dispatchJobType": 3,
       "actionGroup": 10,
       "regionId": 12001100,
-      "dispatchTownId": [
-        11000055,
-        11000199,
-        11000149,
-        11000102,
-        11000058,
-        11000208
-      ],
+      "dispatchTownId": [11000055, 11000199, 11000149, 11000102, 11000058, 11000208],
       "needCompanyLv": 30,
       "needFleetPowerVal": 70000,
       "needSpecialStat": [
@@ -1055,12 +915,7 @@
       "dispatchJobType": 3,
       "actionGroup": 10,
       "regionId": 12002000,
-      "dispatchTownId": [
-        11000025,
-        11000004,
-        11000154,
-        11000158
-      ],
+      "dispatchTownId": [11000025, 11000004, 11000154, 11000158],
       "needCompanyLv": 30,
       "needFleetPowerVal": 70000,
       "needSpecialStat": [
@@ -1120,11 +975,7 @@
       "dispatchJobType": 3,
       "actionGroup": 10,
       "regionId": 12000600,
-      "dispatchTownId": [
-        11000183,
-        11000059,
-        11000037
-      ],
+      "dispatchTownId": [11000183, 11000059, 11000037],
       "needCompanyLv": 30,
       "needFleetPowerVal": 70000,
       "needSpecialStat": [
@@ -1185,12 +1036,7 @@
       "dispatchJobType": 3,
       "actionGroup": 10,
       "regionId": 12002000,
-      "dispatchTownId": [
-        11000104,
-        11000188,
-        11000044,
-        11000155
-      ],
+      "dispatchTownId": [11000104, 11000188, 11000044, 11000155],
       "needCompanyLv": 35,
       "needFleetPowerVal": 100000,
       "needSpecialStat": [
@@ -1250,9 +1096,7 @@
       "dispatchJobType": 3,
       "actionGroup": 10,
       "regionId": 12001500,
-      "dispatchTownId": [
-        11000209
-      ],
+      "dispatchTownId": [11000209],
       "needCompanyLv": 35,
       "needFleetPowerVal": 100000,
       "needSpecialStat": [
@@ -1317,14 +1161,7 @@
       "dispatchJobType": 3,
       "actionGroup": 10,
       "regionId": 12000600,
-      "dispatchTownId": [
-        11000036,
-        11000063,
-        11000127,
-        11000161,
-        11000168,
-        11000176
-      ],
+      "dispatchTownId": [11000036, 11000063, 11000127, 11000161, 11000168, 11000176],
       "needCompanyLv": 40,
       "needFleetPowerVal": 150000,
       "needSpecialStat": [
@@ -1384,14 +1221,7 @@
       "dispatchJobType": 3,
       "actionGroup": 10,
       "regionId": 12000100,
-      "dispatchTownId": [
-        11000182,
-        11000110,
-        11000179,
-        11000048,
-        11000180,
-        11000031
-      ],
+      "dispatchTownId": [11000182, 11000110, 11000179, 11000048, 11000180, 11000031],
       "needCompanyLv": 40,
       "needFleetPowerVal": 150000,
       "needSpecialStat": [
@@ -1452,13 +1282,7 @@
       "dispatchJobType": 3,
       "actionGroup": 10,
       "regionId": 12000100,
-      "dispatchTownId": [
-        11000064,
-        11000098,
-        11000133,
-        11000139,
-        11000192
-      ],
+      "dispatchTownId": [11000064, 11000098, 11000133, 11000139, 11000192],
       "needCompanyLv": 40,
       "needFleetPowerVal": 150000,
       "needSpecialStat": [
@@ -1519,17 +1343,8 @@
       "actionGroup": 10,
       "regionId": 12001400,
       "dispatchTownId": [
-        11000018,
-        11000027,
-        11000038,
-        11000045,
-        11000060,
-        11000061,
-        11000079,
-        11000117,
-        11000163,
-        11000167,
-        11000201
+        11000018, 11000027, 11000038, 11000045, 11000060, 11000061, 11000079, 11000117, 11000163,
+        11000167, 11000201
       ],
       "needCompanyLv": 40,
       "needFleetPowerVal": 150000,
@@ -1591,15 +1406,7 @@
       "dispatchJobType": 3,
       "actionGroup": 10,
       "regionId": 12001400,
-      "dispatchTownId": [
-        11000019,
-        11000114,
-        11000167,
-        11000201,
-        11000046,
-        11000140,
-        11000207
-      ],
+      "dispatchTownId": [11000019, 11000114, 11000167, 11000201, 11000046, 11000140, 11000207],
       "needCompanyLv": 45,
       "needFleetPowerVal": 200000,
       "needSpecialStat": [
@@ -1659,13 +1466,7 @@
       "dispatchJobType": 3,
       "actionGroup": 10,
       "regionId": 12000800,
-      "dispatchTownId": [
-        11000077,
-        11000128,
-        11000135,
-        11000138,
-        11000197
-      ],
+      "dispatchTownId": [11000077, 11000128, 11000135, 11000138, 11000197],
       "needCompanyLv": 45,
       "needFleetPowerVal": 200000,
       "needSpecialStat": [
@@ -1711,10 +1512,7 @@
       "dispatchJobType": 3,
       "actionGroup": 10,
       "regionId": 12000301,
-      "dispatchTownId": [
-        11000195,
-        11000204
-      ],
+      "dispatchTownId": [11000195, 11000204],
       "needCompanyLv": 45,
       "needFleetPowerVal": 200000,
       "needSpecialStat": [
@@ -1756,10 +1554,7 @@
       "dispatchJobType": 3,
       "actionGroup": 10,
       "regionId": 12000302,
-      "dispatchTownId": [
-        11000085,
-        11000122
-      ],
+      "dispatchTownId": [11000085, 11000122],
       "needCompanyLv": 45,
       "needFleetPowerVal": 200000,
       "needSpecialStat": [
@@ -1801,10 +1596,7 @@
       "dispatchJobType": 3,
       "actionGroup": 10,
       "regionId": 12001706,
-      "dispatchTownId": [
-        11000191,
-        11000217
-      ],
+      "dispatchTownId": [11000191, 11000217],
       "needCompanyLv": 50,
       "needFleetPowerVal": 230000,
       "needSpecialStat": [
@@ -1868,11 +1660,7 @@
       "dispatchJobType": 3,
       "actionGroup": 10,
       "regionId": 12001300,
-      "dispatchTownId": [
-        11000006,
-        11000111,
-        11000092
-      ],
+      "dispatchTownId": [11000006, 11000111, 11000092],
       "needCompanyLv": 50,
       "needFleetPowerVal": 230000,
       "needSpecialStat": [
@@ -1933,10 +1721,7 @@
       "dispatchJobType": 3,
       "actionGroup": 10,
       "regionId": 12001706,
-      "dispatchTownId": [
-        11000148,
-        11000162
-      ],
+      "dispatchTownId": [11000148, 11000162],
       "needCompanyLv": 55,
       "needFleetPowerVal": 250000,
       "needSpecialStat": [
@@ -1997,11 +1782,7 @@
       "dispatchJobType": 3,
       "actionGroup": 10,
       "regionId": 12000301,
-      "dispatchTownId": [
-        11000033,
-        11000075,
-        11000187
-      ],
+      "dispatchTownId": [11000033, 11000075, 11000187],
       "needCompanyLv": 60,
       "needFleetPowerVal": 280000,
       "needSpecialStat": [
@@ -2044,10 +1825,7 @@
       "dispatchJobType": 3,
       "actionGroup": 10,
       "regionId": 12000302,
-      "dispatchTownId": [
-        11000010,
-        11000218
-      ],
+      "dispatchTownId": [11000010, 11000218],
       "needCompanyLv": 60,
       "needFleetPowerVal": 280000,
       "needSpecialStat": [
@@ -2090,10 +1868,7 @@
       "dispatchJobType": 3,
       "actionGroup": 10,
       "regionId": 12001300,
-      "dispatchTownId": [
-        11000220,
-        11000121
-      ],
+      "dispatchTownId": [11000220, 11000121],
       "needCompanyLv": 65,
       "needFleetPowerVal": 300000,
       "needSpecialStat": [
@@ -2158,9 +1933,7 @@
       "dispatchJobType": 3,
       "actionGroup": 10,
       "regionId": 12001700,
-      "dispatchTownId": [
-        11000194
-      ],
+      "dispatchTownId": [11000194],
       "needCompanyLv": 86,
       "needFleetPowerVal": 430000,
       "needSpecialStat": [
@@ -2226,12 +1999,7 @@
       "dispatchGroup": 100,
       "actionGroup": 10,
       "regionId": 12000900,
-      "dispatchTownId": [
-        11000106,
-        11000057,
-        11000144,
-        11000081
-      ],
+      "dispatchTownId": [11000106, 11000057, 11000144, 11000081],
       "needCompanyLv": 25,
       "needFleetPowerVal": 40000,
       "needSpecialStat": [
@@ -2293,10 +2061,7 @@
       "dispatchGroup": 101,
       "actionGroup": 10,
       "regionId": 12001200,
-      "dispatchTownId": [
-        11000123,
-        11000069
-      ],
+      "dispatchTownId": [11000123, 11000069],
       "needCompanyLv": 25,
       "needFleetPowerVal": 200000,
       "needSpecialStat": [
@@ -2334,13 +2099,7 @@
       "dispatchGroup": 102,
       "actionGroup": 10,
       "regionId": 12001900,
-      "dispatchTownId": [
-        11000185,
-        11000142,
-        11000132,
-        11000040,
-        11000129
-      ],
+      "dispatchTownId": [11000185, 11000142, 11000132, 11000040, 11000129],
       "needCompanyLv": 30,
       "needFleetPowerVal": 230000,
       "needSpecialStat": [
@@ -2402,10 +2161,7 @@
       "dispatchGroup": 103,
       "actionGroup": 10,
       "regionId": 12000000,
-      "dispatchTownId": [
-        11000039,
-        11000109
-      ],
+      "dispatchTownId": [11000039, 11000109],
       "needCompanyLv": 30,
       "needFleetPowerVal": 280000,
       "needSpecialStat": [
@@ -2443,13 +2199,7 @@
       "dispatchGroup": 104,
       "actionGroup": 10,
       "regionId": 12001000,
-      "dispatchTownId": [
-        11000067,
-        11000113,
-        11000131,
-        11000028,
-        11000172
-      ],
+      "dispatchTownId": [11000067, 11000113, 11000131, 11000028, 11000172],
       "needCompanyLv": 35,
       "needFleetPowerVal": 70000,
       "needSpecialStat": [
@@ -2505,13 +2255,7 @@
       "dispatchGroup": 105,
       "actionGroup": 10,
       "regionId": 12001000,
-      "dispatchTownId": [
-        11000054,
-        11000042,
-        11000153,
-        11000136,
-        11000190
-      ],
+      "dispatchTownId": [11000054, 11000042, 11000153, 11000136, 11000190],
       "needCompanyLv": 35,
       "needFleetPowerVal": 100000,
       "needSpecialStat": [
@@ -2567,9 +2311,7 @@
       "dispatchGroup": 106,
       "actionGroup": 10,
       "regionId": 12001800,
-      "dispatchTownId": [
-        11000156
-      ],
+      "dispatchTownId": [11000156],
       "needCompanyLv": 35,
       "needFleetPowerVal": 150000,
       "needSpecialStat": [
@@ -2631,12 +2373,7 @@
       "dispatchGroup": 107,
       "actionGroup": 10,
       "regionId": 12001801,
-      "dispatchTownId": [
-        11000013,
-        11000097,
-        11000157,
-        11000052
-      ],
+      "dispatchTownId": [11000013, 11000097, 11000157, 11000052],
       "needCompanyLv": 40,
       "needFleetPowerVal": 200000,
       "needSpecialStat": [
@@ -2698,13 +2435,7 @@
       "dispatchGroup": 108,
       "actionGroup": 10,
       "regionId": 12002000,
-      "dispatchTownId": [
-        11000188,
-        11000044,
-        11000155,
-        11000182,
-        11000110
-      ],
+      "dispatchTownId": [11000188, 11000044, 11000155, 11000182, 11000110],
       "needCompanyLv": 50,
       "needFleetPowerVal": 250000,
       "needSpecialStat": [
@@ -2766,9 +2497,7 @@
       "dispatchGroup": 109,
       "actionGroup": 10,
       "regionId": 12000600,
-      "dispatchTownId": [
-        11000076
-      ],
+      "dispatchTownId": [11000076],
       "needCompanyLv": 55,
       "needFleetPowerVal": 200000,
       "needSpecialStat": [
@@ -2830,12 +2559,7 @@
       "dispatchGroup": 110,
       "actionGroup": 10,
       "regionId": 12000100,
-      "dispatchTownId": [
-        11000038,
-        11000139,
-        11000192,
-        11000079
-      ],
+      "dispatchTownId": [11000038, 11000139, 11000192, 11000079],
       "needCompanyLv": 55,
       "needFleetPowerVal": 300000,
       "needSpecialStat": [
@@ -2897,10 +2621,7 @@
       "dispatchGroup": 111,
       "actionGroup": 10,
       "regionId": 12000600,
-      "dispatchTownId": [
-        11000161,
-        11000063
-      ],
+      "dispatchTownId": [11000161, 11000063],
       "needCompanyLv": 55,
       "needFleetPowerVal": 250000,
       "needSpecialStat": [
@@ -2962,13 +2683,7 @@
       "dispatchGroup": 112,
       "actionGroup": 10,
       "regionId": 12000800,
-      "dispatchTownId": [
-        11000046,
-        11000114,
-        11000140,
-        11000019,
-        11000207
-      ],
+      "dispatchTownId": [11000046, 11000114, 11000140, 11000019, 11000207],
       "needCompanyLv": 60,
       "needFleetPowerVal": 250000,
       "needSpecialStat": [
@@ -3016,13 +2731,7 @@
       "dispatchGroup": 113,
       "actionGroup": 10,
       "regionId": 12000301,
-      "dispatchTownId": [
-        11000204,
-        11000075,
-        11000187,
-        11000010,
-        11000085
-      ],
+      "dispatchTownId": [11000204, 11000075, 11000187, 11000010, 11000085],
       "needCompanyLv": 65,
       "needFleetPowerVal": 300000,
       "needSpecialStat": [
@@ -3066,10 +2775,7 @@
       "dispatchGroup": 114,
       "actionGroup": 10,
       "regionId": 12011400,
-      "dispatchTownId": [
-        11000104,
-        11000166
-      ],
+      "dispatchTownId": [11000104, 11000166],
       "needCompanyLv": 75,
       "needFleetPowerVal": 280000,
       "needSpecialStat": [
@@ -3135,11 +2841,7 @@
       "dispatchGroup": 115,
       "actionGroup": 10,
       "regionId": 12001706,
-      "dispatchTownId": [
-        11000126,
-        11000162,
-        11000200
-      ],
+      "dispatchTownId": [11000126, 11000162, 11000200],
       "needCompanyLv": 70,
       "needFleetPowerVal": 330000,
       "needSpecialStat": [
@@ -3205,10 +2907,7 @@
       "dispatchGroup": 116,
       "actionGroup": 10,
       "regionId": 12001700,
-      "dispatchTownId": [
-        11000202,
-        11000205
-      ],
+      "dispatchTownId": [11000202, 11000205],
       "needCompanyLv": 75,
       "needFleetPowerVal": 350000,
       "needSpecialStat": [
@@ -3274,9 +2973,7 @@
       "dispatchGroup": 117,
       "actionGroup": 10,
       "regionId": 12001700,
-      "dispatchTownId": [
-        11000194
-      ],
+      "dispatchTownId": [11000194],
       "needCompanyLv": 75,
       "needFleetPowerVal": 450000,
       "needSpecialStat": [
@@ -3342,10 +3039,7 @@
       "dispatchGroup": 118,
       "actionGroup": 10,
       "regionId": 12001301,
-      "dispatchTownId": [
-        11000012,
-        11000074
-      ],
+      "dispatchTownId": [11000012, 11000074],
       "needCompanyLv": 75,
       "needFleetPowerVal": 500000,
       "needSpecialStat": [
@@ -3411,10 +3105,7 @@
       "dispatchGroup": 119,
       "actionGroup": 10,
       "regionId": 12001505,
-      "dispatchTownId": [
-        11000026,
-        11000174
-      ],
+      "dispatchTownId": [11000026, 11000174],
       "needCompanyLv": 75,
       "needFleetPowerVal": 550000,
       "needSpecialStat": [
@@ -3490,17 +3181,8 @@
       "actionGroup": 20,
       "regionId": 12000000,
       "dispatchTownId": [
-        11000094,
-        11000145,
-        11000067,
-        11000067,
-        11000071,
-        11000101,
-        11000014,
-        11000042,
-        11000136,
-        11000070,
-        11000211
+        11000094, 11000145, 11000067, 11000067, 11000071, 11000101, 11000014, 11000042, 11000136,
+        11000070, 11000211
       ],
       "tradeCultureAreaPer": 1,
       "needCompanyLv": 1,
@@ -3539,13 +3221,7 @@
       "dispatchGroup": 300,
       "actionGroup": 20,
       "regionId": 12001200,
-      "dispatchTownId": [
-        11000078,
-        11000123,
-        11000196,
-        11000125,
-        11000160
-      ],
+      "dispatchTownId": [11000078, 11000123, 11000196, 11000125, 11000160],
       "tradeCultureAreaPer": 1,
       "needCompanyLv": 1,
       "needFleetLoadage": 100,
@@ -3584,14 +3260,7 @@
       "actionGroup": 20,
       "regionId": 12000700,
       "dispatchTownId": [
-        11000020,
-        11000034,
-        11000035,
-        11000069,
-        11000082,
-        11000091,
-        11000100,
-        11000159
+        11000020, 11000034, 11000035, 11000069, 11000082, 11000091, 11000100, 11000159
       ],
       "tradeCultureAreaPer": 2,
       "needCompanyLv": 5,
@@ -3658,14 +3327,7 @@
       "dispatchGroup": 303,
       "actionGroup": 20,
       "regionId": 12000900,
-      "dispatchTownId": [
-        11000029,
-        11000106,
-        11000057,
-        11000081,
-        11000103,
-        11000144
-      ],
+      "dispatchTownId": [11000029, 11000106, 11000057, 11000081, 11000103, 11000144],
       "tradeCultureAreaPer": 3,
       "needCompanyLv": 15,
       "needFleetLoadage": 400,
@@ -3727,14 +3389,7 @@
       "dispatchGroup": 303,
       "actionGroup": 20,
       "regionId": 12000900,
-      "dispatchTownId": [
-        11000108,
-        11000095,
-        11000066,
-        11000024,
-        11000175,
-        11000090
-      ],
+      "dispatchTownId": [11000108, 11000095, 11000066, 11000024, 11000175, 11000090],
       "tradeCultureAreaPer": 3,
       "needCompanyLv": 20,
       "needFleetLoadage": 500,
@@ -3801,19 +3456,8 @@
       "actionGroup": 20,
       "regionId": 12001900,
       "dispatchTownId": [
-        11000008,
-        11000040,
-        11000041,
-        11000086,
-        11000087,
-        11000088,
-        11000129,
-        11000132,
-        11000141,
-        11000142,
-        11000171,
-        11000193,
-        11000185
+        11000008, 11000040, 11000041, 11000086, 11000087, 11000088, 11000129, 11000132, 11000141,
+        11000142, 11000171, 11000193, 11000185
       ],
       "tradeCultureAreaPer": 3,
       "needCompanyLv": 18,
@@ -3876,12 +3520,7 @@
       "dispatchGroup": 304,
       "actionGroup": 20,
       "regionId": 12001800,
-      "dispatchTownId": [
-        11000032,
-        11000072,
-        11000143,
-        11000156
-      ],
+      "dispatchTownId": [11000032, 11000072, 11000143, 11000156],
       "tradeCultureAreaPer": 4,
       "needCompanyLv": 24,
       "needFleetLoadage": 500,
@@ -3944,15 +3583,7 @@
       "actionGroup": 20,
       "regionId": 12001801,
       "dispatchTownId": [
-        11000013,
-        11000097,
-        11000157,
-        11000052,
-        11000164,
-        11000134,
-        11000053,
-        11000049,
-        11000166,
+        11000013, 11000097, 11000157, 11000052, 11000164, 11000134, 11000053, 11000049, 11000166,
         11000051
       ],
       "tradeCultureAreaPer": 4,
@@ -4016,14 +3647,7 @@
       "dispatchGroup": 306,
       "actionGroup": 20,
       "regionId": 12001100,
-      "dispatchTownId": [
-        11000096,
-        11000023,
-        11000105,
-        11000043,
-        11000137,
-        11000099
-      ],
+      "dispatchTownId": [11000096, 11000023, 11000105, 11000043, 11000137, 11000099],
       "tradeCultureAreaPer": 4,
       "needCompanyLv": 30,
       "needFleetLoadage": 700,
@@ -4089,14 +3713,7 @@
       "dispatchGroup": 306,
       "actionGroup": 20,
       "regionId": 12001100,
-      "dispatchTownId": [
-        11000055,
-        11000199,
-        11000149,
-        11000102,
-        11000058,
-        11000208
-      ],
+      "dispatchTownId": [11000055, 11000199, 11000149, 11000102, 11000058, 11000208],
       "tradeCultureAreaPer": 4,
       "needCompanyLv": 30,
       "needFleetLoadage": 700,
@@ -4162,12 +3779,7 @@
       "dispatchGroup": 307,
       "actionGroup": 20,
       "regionId": 12002000,
-      "dispatchTownId": [
-        11000025,
-        11000004,
-        11000154,
-        11000158
-      ],
+      "dispatchTownId": [11000025, 11000004, 11000154, 11000158],
       "tradeCultureAreaPer": 4,
       "needCompanyLv": 30,
       "needFleetLoadage": 700,
@@ -4229,11 +3841,7 @@
       "dispatchGroup": 315,
       "actionGroup": 20,
       "regionId": 12000600,
-      "dispatchTownId": [
-        11000183,
-        11000059,
-        11000037
-      ],
+      "dispatchTownId": [11000183, 11000059, 11000037],
       "tradeCultureAreaPer": 4,
       "needCompanyLv": 30,
       "needFleetLoadage": 700,
@@ -4295,12 +3903,7 @@
       "dispatchGroup": 307,
       "actionGroup": 20,
       "regionId": 12002000,
-      "dispatchTownId": [
-        11000104,
-        11000188,
-        11000044,
-        11000155
-      ],
+      "dispatchTownId": [11000104, 11000188, 11000044, 11000155],
       "tradeCultureAreaPer": 5,
       "needCompanyLv": 35,
       "needFleetLoadage": 800,
@@ -4362,14 +3965,7 @@
       "dispatchGroup": 314,
       "actionGroup": 20,
       "regionId": 12000600,
-      "dispatchTownId": [
-        11000036,
-        11000063,
-        11000127,
-        11000161,
-        11000168,
-        11000176
-      ],
+      "dispatchTownId": [11000036, 11000063, 11000127, 11000161, 11000168, 11000176],
       "tradeCultureAreaPer": 5,
       "needCompanyLv": 40,
       "needFleetLoadage": 900,
@@ -4431,14 +4027,7 @@
       "dispatchGroup": 307,
       "actionGroup": 20,
       "regionId": 12000100,
-      "dispatchTownId": [
-        11000182,
-        11000110,
-        11000179,
-        11000048,
-        11000180,
-        11000031
-      ],
+      "dispatchTownId": [11000182, 11000110, 11000179, 11000048, 11000180, 11000031],
       "tradeCultureAreaPer": 5,
       "needCompanyLv": 40,
       "needFleetLoadage": 900,
@@ -4500,13 +4089,7 @@
       "dispatchGroup": 308,
       "actionGroup": 20,
       "regionId": 12000100,
-      "dispatchTownId": [
-        11000064,
-        11000098,
-        11000133,
-        11000139,
-        11000192
-      ],
+      "dispatchTownId": [11000064, 11000098, 11000133, 11000139, 11000192],
       "tradeCultureAreaPer": 5,
       "needCompanyLv": 40,
       "needFleetLoadage": 900,
@@ -4569,17 +4152,8 @@
       "actionGroup": 20,
       "regionId": 12001400,
       "dispatchTownId": [
-        11000018,
-        11000027,
-        11000038,
-        11000045,
-        11000060,
-        11000061,
-        11000079,
-        11000117,
-        11000163,
-        11000167,
-        11000201
+        11000018, 11000027, 11000038, 11000045, 11000060, 11000061, 11000079, 11000117, 11000163,
+        11000167, 11000201
       ],
       "tradeCultureAreaPer": 5,
       "needCompanyLv": 40,
@@ -4642,15 +4216,7 @@
       "dispatchGroup": 308,
       "actionGroup": 20,
       "regionId": 12001400,
-      "dispatchTownId": [
-        11000019,
-        11000114,
-        11000167,
-        11000201,
-        11000046,
-        11000140,
-        11000207
-      ],
+      "dispatchTownId": [11000019, 11000114, 11000167, 11000201, 11000046, 11000140, 11000207],
       "tradeCultureAreaPer": 6,
       "needCompanyLv": 45,
       "needFleetLoadage": 900,
@@ -4712,13 +4278,7 @@
       "dispatchGroup": 309,
       "actionGroup": 20,
       "regionId": 12000800,
-      "dispatchTownId": [
-        11000077,
-        11000128,
-        11000135,
-        11000138,
-        11000197
-      ],
+      "dispatchTownId": [11000077, 11000128, 11000135, 11000138, 11000197],
       "tradeCultureAreaPer": 6,
       "needCompanyLv": 45,
       "needFleetLoadage": 900,
@@ -4766,10 +4326,7 @@
       "dispatchGroup": 310,
       "actionGroup": 20,
       "regionId": 12000301,
-      "dispatchTownId": [
-        11000195,
-        11000204
-      ],
+      "dispatchTownId": [11000195, 11000204],
       "tradeCultureAreaPer": 6,
       "needCompanyLv": 45,
       "needFleetLoadage": 900,
@@ -4813,10 +4370,7 @@
       "dispatchGroup": 310,
       "actionGroup": 20,
       "regionId": 12000302,
-      "dispatchTownId": [
-        11000085,
-        11000122
-      ],
+      "dispatchTownId": [11000085, 11000122],
       "tradeCultureAreaPer": 6,
       "needCompanyLv": 45,
       "needFleetLoadage": 900,
@@ -4860,10 +4414,7 @@
       "dispatchGroup": 311,
       "actionGroup": 20,
       "regionId": 12001706,
-      "dispatchTownId": [
-        11000191,
-        11000217
-      ],
+      "dispatchTownId": [11000191, 11000217],
       "tradeCultureAreaPer": 7,
       "needCompanyLv": 50,
       "needFleetLoadage": 1000,
@@ -4929,11 +4480,7 @@
       "dispatchGroup": 316,
       "actionGroup": 20,
       "regionId": 12001300,
-      "dispatchTownId": [
-        11000006,
-        11000111,
-        11000092
-      ],
+      "dispatchTownId": [11000006, 11000111, 11000092],
       "tradeCultureAreaPer": 7,
       "needCompanyLv": 50,
       "needFleetLoadage": 1000,
@@ -4995,10 +4542,7 @@
       "dispatchGroup": 311,
       "actionGroup": 20,
       "regionId": 12001706,
-      "dispatchTownId": [
-        11000148,
-        11000162
-      ],
+      "dispatchTownId": [11000148, 11000162],
       "tradeCultureAreaPer": 8,
       "needCompanyLv": 55,
       "needFleetLoadage": 1000,
@@ -5060,11 +4604,7 @@
       "dispatchGroup": 310,
       "actionGroup": 20,
       "regionId": 12000301,
-      "dispatchTownId": [
-        11000033,
-        11000075,
-        11000187
-      ],
+      "dispatchTownId": [11000033, 11000075, 11000187],
       "tradeCultureAreaPer": 9,
       "needCompanyLv": 60,
       "needFleetLoadage": 1100,
@@ -5108,10 +4648,7 @@
       "dispatchGroup": 310,
       "actionGroup": 20,
       "regionId": 12000302,
-      "dispatchTownId": [
-        11000010,
-        11000218
-      ],
+      "dispatchTownId": [11000010, 11000218],
       "tradeCultureAreaPer": 9,
       "needCompanyLv": 60,
       "needFleetLoadage": 1100,
@@ -5155,10 +4692,7 @@
       "dispatchGroup": 316,
       "actionGroup": 20,
       "regionId": 12001300,
-      "dispatchTownId": [
-        11000220,
-        11000121
-      ],
+      "dispatchTownId": [11000220, 11000121],
       "tradeCultureAreaPer": 10,
       "needCompanyLv": 65,
       "needFleetLoadage": 1200,
@@ -5224,10 +4758,7 @@
       "dispatchGroup": 317,
       "actionGroup": 20,
       "regionId": 12001700,
-      "dispatchTownId": [
-        11000202,
-        11000205
-      ],
+      "dispatchTownId": [11000202, 11000205],
       "tradeCultureAreaPer": 12,
       "needCompanyLv": 70,
       "needFleetLoadage": 1300,
@@ -5293,9 +4824,7 @@
       "dispatchGroup": 317,
       "actionGroup": 20,
       "regionId": 12001700,
-      "dispatchTownId": [
-        11000194
-      ],
+      "dispatchTownId": [11000194],
       "tradeCultureAreaPer": 12,
       "needCompanyLv": 75,
       "needFleetLoadage": 1400,
@@ -5361,10 +4890,7 @@
       "dispatchGroup": 313,
       "actionGroup": 20,
       "regionId": 12001505,
-      "dispatchTownId": [
-        11000026,
-        11000174
-      ],
+      "dispatchTownId": [11000026, 11000174],
       "tradeCultureAreaPer": 12,
       "needCompanyLv": 75,
       "needFleetLoadage": 1800,
@@ -5440,10 +4966,7 @@
       "dispatchGroup": 1108,
       "actionGroup": 30,
       "regionId": 12001600,
-      "dispatchTownId": [
-        11000115,
-        11000211
-      ],
+      "dispatchTownId": [11000115, 11000211],
       "needCompanyLv": 1,
       "needFleetSpeed": 4,
       "needSpecialStat": [
@@ -5498,14 +5021,7 @@
       "dispatchGroup": 1107,
       "actionGroup": 30,
       "regionId": 12001200,
-      "dispatchTownId": [
-        11000118,
-        11000009,
-        11000198,
-        11000030,
-        11000123,
-        11000021
-      ],
+      "dispatchTownId": [11000118, 11000009, 11000198, 11000030, 11000123, 11000021],
       "needCompanyLv": 1,
       "needFleetSpeed": 4,
       "needSpecialStat": [
@@ -5542,11 +5058,7 @@
       "dispatchGroup": 1106,
       "actionGroup": 30,
       "regionId": 12000700,
-      "dispatchTownId": [
-        11000069,
-        11000125,
-        11000160
-      ],
+      "dispatchTownId": [11000069, 11000125, 11000160],
       "needCompanyLv": 1,
       "needFleetSpeed": 4,
       "needSpecialStat": [
@@ -5601,11 +5113,7 @@
       "dispatchGroup": 1116,
       "actionGroup": 30,
       "regionId": 12000700,
-      "dispatchTownId": [
-        11000100,
-        11000159,
-        11000091
-      ],
+      "dispatchTownId": [11000100, 11000159, 11000091],
       "needCompanyLv": 1,
       "needFleetSpeed": 4,
       "needSpecialStat": [
@@ -5670,11 +5178,7 @@
       "dispatchGroup": 1103,
       "actionGroup": 30,
       "regionId": 12000200,
-      "dispatchTownId": [
-        11000136,
-        11000190,
-        11000014
-      ],
+      "dispatchTownId": [11000136, 11000190, 11000014],
       "needCompanyLv": 1,
       "needFleetSpeed": 4,
       "needSpecialStat": [
@@ -5735,10 +5239,7 @@
       "dispatchGroup": 1105,
       "actionGroup": 30,
       "regionId": 12000500,
-      "dispatchTownId": [
-        11000015,
-        11000073
-      ],
+      "dispatchTownId": [11000015, 11000073],
       "needCompanyLv": 1,
       "needFleetSpeed": 4,
       "needSpecialStat": [
@@ -5793,14 +5294,7 @@
       "dispatchGroup": 1101,
       "actionGroup": 30,
       "regionId": 12000000,
-      "dispatchTownId": [
-        11000000,
-        11000002,
-        11000203,
-        11000145,
-        11000116,
-        11000169
-      ],
+      "dispatchTownId": [11000000, 11000002, 11000203, 11000145, 11000116, 11000169],
       "needCompanyLv": 1,
       "needFleetSpeed": 4,
       "needSpecialStat": [
@@ -5837,10 +5331,7 @@
       "dispatchGroup": 1102,
       "actionGroup": 30,
       "regionId": 12001000,
-      "dispatchTownId": [
-        11000042,
-        11000054
-      ],
+      "dispatchTownId": [11000042, 11000054],
       "needCompanyLv": 1,
       "needFleetSpeed": 4,
       "needSpecialStat": [
@@ -5902,14 +5393,7 @@
       "actionGroup": 30,
       "regionId": 12000400,
       "dispatchTownId": [
-        11000170,
-        11000130,
-        11000089,
-        11000112,
-        11000003,
-        11000150,
-        11000165,
-        11000124
+        11000170, 11000130, 11000089, 11000112, 11000003, 11000150, 11000165, 11000124
       ],
       "needCompanyLv": 1,
       "needFleetSpeed": 4,
@@ -5947,11 +5431,7 @@
       "dispatchGroup": 1201,
       "actionGroup": 30,
       "regionId": 12000900,
-      "dispatchTownId": [
-        11000106,
-        11000029,
-        11000144
-      ],
+      "dispatchTownId": [11000106, 11000029, 11000144],
       "needCompanyLv": 15,
       "needFleetSpeed": 6,
       "needSpecialStat": [
@@ -6007,15 +5487,7 @@
       "actionGroup": 30,
       "regionId": 12001900,
       "dispatchTownId": [
-        11000141,
-        11000040,
-        11000142,
-        11000050,
-        11000171,
-        11000068,
-        11000087,
-        11000193,
-        11000074
+        11000141, 11000040, 11000142, 11000050, 11000171, 11000068, 11000087, 11000193, 11000074
       ],
       "needCompanyLv": 18,
       "needFleetSpeed": 6,
@@ -6077,10 +5549,7 @@
       "dispatchGroup": 1213,
       "actionGroup": 30,
       "regionId": 12001900,
-      "dispatchTownId": [
-        11000050,
-        11000146
-      ],
+      "dispatchTownId": [11000050, 11000146],
       "needCompanyLv": 18,
       "needFleetSpeed": 6,
       "needSpecialStat": [
@@ -6145,12 +5614,7 @@
       "dispatchGroup": 1301,
       "actionGroup": 30,
       "regionId": 12000900,
-      "dispatchTownId": [
-        11000175,
-        11000066,
-        11000095,
-        11000108
-      ],
+      "dispatchTownId": [11000175, 11000066, 11000095, 11000108],
       "needCompanyLv": 20,
       "needFleetSpeed": 7,
       "needSpecialStat": [
@@ -6215,12 +5679,7 @@
       "dispatchGroup": 1401,
       "actionGroup": 30,
       "regionId": 12001800,
-      "dispatchTownId": [
-        11000072,
-        11000143,
-        11000156,
-        11000032
-      ],
+      "dispatchTownId": [11000072, 11000143, 11000156, 11000032],
       "needCompanyLv": 24,
       "needFleetSpeed": 7,
       "needSpecialStat": [
@@ -6285,9 +5744,7 @@
       "dispatchGroup": 1402,
       "actionGroup": 30,
       "regionId": 12001600,
-      "dispatchTownId": [
-        11000147
-      ],
+      "dispatchTownId": [11000147],
       "needCompanyLv": 24,
       "needFleetSpeed": 7,
       "needSpecialStat": [
@@ -6348,9 +5805,7 @@
       "dispatchGroup": 1504,
       "actionGroup": 30,
       "regionId": 12000600,
-      "dispatchTownId": [
-        11000037
-      ],
+      "dispatchTownId": [11000037],
       "needCompanyLv": 30,
       "needFleetSpeed": 8,
       "needSpecialStat": [
@@ -6412,14 +5867,7 @@
       "actionGroup": 30,
       "regionId": 12001800,
       "dispatchTownId": [
-        11000166,
-        11000097,
-        11000013,
-        11000097,
-        11000157,
-        11000043,
-        11000105,
-        11000137
+        11000166, 11000097, 11000013, 11000097, 11000157, 11000043, 11000105, 11000137
       ],
       "needCompanyLv": 30,
       "needFleetSpeed": 8,
@@ -6485,10 +5933,7 @@
       "dispatchGroup": 1502,
       "actionGroup": 30,
       "regionId": 12001100,
-      "dispatchTownId": [
-        11000023,
-        11000096
-      ],
+      "dispatchTownId": [11000023, 11000096],
       "needCompanyLv": 30,
       "needFleetSpeed": 8,
       "needSpecialStat": [
@@ -6549,11 +5994,7 @@
       "dispatchGroup": 1512,
       "actionGroup": 30,
       "regionId": 12001100,
-      "dispatchTownId": [
-        11000199,
-        11000149,
-        11000102
-      ],
+      "dispatchTownId": [11000199, 11000149, 11000102],
       "needCompanyLv": 30,
       "needFleetSpeed": 8,
       "needSpecialStat": [
@@ -6618,10 +6059,7 @@
       "dispatchGroup": 1503,
       "actionGroup": 30,
       "regionId": 12002000,
-      "dispatchTownId": [
-        11000004,
-        11000154
-      ],
+      "dispatchTownId": [11000004, 11000154],
       "needCompanyLv": 30,
       "needFleetSpeed": 8,
       "needSpecialStat": [
@@ -6682,12 +6120,7 @@
       "dispatchGroup": 1603,
       "actionGroup": 30,
       "regionId": 12000600,
-      "dispatchTownId": [
-        11000063,
-        11000161,
-        11000076,
-        11000127
-      ],
+      "dispatchTownId": [11000063, 11000161, 11000076, 11000127],
       "needCompanyLv": 35,
       "needFleetSpeed": 9,
       "needSpecialStat": [
@@ -6752,12 +6185,7 @@
       "dispatchGroup": 1602,
       "actionGroup": 30,
       "regionId": 12002000,
-      "dispatchTownId": [
-        11000188,
-        11000104,
-        11000155,
-        11000182
-      ],
+      "dispatchTownId": [11000188, 11000104, 11000155, 11000182],
       "needCompanyLv": 35,
       "needFleetSpeed": 9,
       "needSpecialStat": [
@@ -6818,10 +6246,7 @@
       "dispatchGroup": 1605,
       "actionGroup": 30,
       "regionId": 12001500,
-      "dispatchTownId": [
-        11000209,
-        11000011
-      ],
+      "dispatchTownId": [11000209, 11000011],
       "needCompanyLv": 35,
       "needFleetSpeed": 9,
       "needSpecialStat": [
@@ -6886,9 +6311,7 @@
       "dispatchGroup": 1604,
       "actionGroup": 30,
       "regionId": 12001301,
-      "dispatchTownId": [
-        11000186
-      ],
+      "dispatchTownId": [11000186],
       "needCompanyLv": 35,
       "needFleetSpeed": 9,
       "needSpecialStat": [
@@ -6953,11 +6376,7 @@
       "dispatchGroup": 1601,
       "actionGroup": 30,
       "regionId": 12000100,
-      "dispatchTownId": [
-        11000031,
-        11000192,
-        11000139
-      ],
+      "dispatchTownId": [11000031, 11000192, 11000139],
       "needCompanyLv": 35,
       "needFleetSpeed": 9,
       "needSpecialStat": [
@@ -7018,9 +6437,7 @@
       "dispatchGroup": 1606,
       "actionGroup": 30,
       "regionId": 12001801,
-      "dispatchTownId": [
-        11000166
-      ],
+      "dispatchTownId": [11000166],
       "needCompanyLv": 35,
       "needFleetSpeed": 9,
       "needSpecialStat": [
@@ -7081,10 +6498,7 @@
       "dispatchGroup": 1703,
       "actionGroup": 30,
       "regionId": 12000600,
-      "dispatchTownId": [
-        11000168,
-        11000036
-      ],
+      "dispatchTownId": [11000168, 11000036],
       "needCompanyLv": 40,
       "needFleetSpeed": 10,
       "needSpecialStat": [
@@ -7145,15 +6559,7 @@
       "dispatchGroup": 1702,
       "actionGroup": 30,
       "regionId": 12001400,
-      "dispatchTownId": [
-        11000038,
-        11000201,
-        11000018,
-        11000163,
-        11000061,
-        11000098,
-        11000133
-      ],
+      "dispatchTownId": [11000038, 11000201, 11000018, 11000163, 11000061, 11000098, 11000133],
       "needCompanyLv": 40,
       "needFleetSpeed": 10,
       "needSpecialStat": [
@@ -7214,10 +6620,7 @@
       "dispatchGroup": 1701,
       "actionGroup": 30,
       "regionId": 12000800,
-      "dispatchTownId": [
-        11000046,
-        11000140
-      ],
+      "dispatchTownId": [11000046, 11000140],
       "needCompanyLv": 40,
       "needFleetSpeed": 10,
       "needSpecialStat": [
@@ -7260,9 +6663,7 @@
       "dispatchGroup": 1704,
       "actionGroup": 30,
       "regionId": 12001300,
-      "dispatchTownId": [
-        11000006
-      ],
+      "dispatchTownId": [11000006],
       "needCompanyLv": 40,
       "needFleetSpeed": 10,
       "needSpecialStat": [
@@ -7323,12 +6724,7 @@
       "dispatchGroup": 1802,
       "actionGroup": 30,
       "regionId": 12000302,
-      "dispatchTownId": [
-        11000122,
-        11000085,
-        11000010,
-        11000207
-      ],
+      "dispatchTownId": [11000122, 11000085, 11000010, 11000207],
       "needCompanyLv": 45,
       "needFleetSpeed": 11,
       "needSpecialStat": [
@@ -7371,10 +6767,7 @@
       "dispatchGroup": 1801,
       "actionGroup": 30,
       "regionId": 12000301,
-      "dispatchTownId": [
-        11000195,
-        11000204
-      ],
+      "dispatchTownId": [11000195, 11000204],
       "needCompanyLv": 45,
       "needFleetSpeed": 11,
       "needSpecialStat": [
@@ -7417,10 +6810,7 @@
       "dispatchGroup": 1804,
       "actionGroup": 30,
       "regionId": 12001400,
-      "dispatchTownId": [
-        11000114,
-        11000019
-      ],
+      "dispatchTownId": [11000114, 11000019],
       "needCompanyLv": 45,
       "needFleetSpeed": 11,
       "needSpecialStat": [
@@ -7481,12 +6871,7 @@
       "dispatchGroup": 1803,
       "actionGroup": 30,
       "regionId": 12000800,
-      "dispatchTownId": [
-        11000138,
-        11000077,
-        11000128,
-        11000135
-      ],
+      "dispatchTownId": [11000138, 11000077, 11000128, 11000135],
       "needCompanyLv": 45,
       "needFleetSpeed": 11,
       "needSpecialStat": [
@@ -7533,9 +6918,7 @@
       "dispatchGroup": 1902,
       "actionGroup": 30,
       "regionId": 12001300,
-      "dispatchTownId": [
-        11000092
-      ],
+      "dispatchTownId": [11000092],
       "needCompanyLv": 50,
       "needFleetSpeed": 12,
       "needSpecialStat": [
@@ -7596,10 +6979,7 @@
       "dispatchGroup": 1903,
       "actionGroup": 30,
       "regionId": 12001706,
-      "dispatchTownId": [
-        11000217,
-        11000191
-      ],
+      "dispatchTownId": [11000217, 11000191],
       "needCompanyLv": 50,
       "needFleetSpeed": 12,
       "needSpecialStat": [
@@ -7664,9 +7044,7 @@
       "dispatchGroup": 2002,
       "actionGroup": 30,
       "regionId": 12002000,
-      "dispatchTownId": [
-        11000148
-      ],
+      "dispatchTownId": [11000148],
       "needCompanyLv": 55,
       "needFleetSpeed": 12,
       "needSpecialStat": [
@@ -7727,10 +7105,7 @@
       "dispatchGroup": 2001,
       "actionGroup": 30,
       "regionId": 12001706,
-      "dispatchTownId": [
-        11000162,
-        11000200
-      ],
+      "dispatchTownId": [11000162, 11000200],
       "needCompanyLv": 55,
       "needFleetSpeed": 12,
       "needSpecialStat": [
@@ -7791,10 +7166,7 @@
       "dispatchGroup": 2101,
       "actionGroup": 30,
       "regionId": 12000301,
-      "dispatchTownId": [
-        11000033,
-        11000187
-      ],
+      "dispatchTownId": [11000033, 11000187],
       "needCompanyLv": 60,
       "needFleetSpeed": 13,
       "needSpecialStat": [
@@ -7837,9 +7209,7 @@
       "dispatchGroup": 2102,
       "actionGroup": 30,
       "regionId": 12000300,
-      "dispatchTownId": [
-        11000218
-      ],
+      "dispatchTownId": [11000218],
       "needCompanyLv": 60,
       "needFleetSpeed": 13,
       "needSpecialStat": [
@@ -7900,9 +7270,7 @@
       "dispatchGroup": 1901,
       "actionGroup": 30,
       "regionId": 12001300,
-      "dispatchTownId": [
-        11000220
-      ],
+      "dispatchTownId": [11000220],
       "needCompanyLv": 65,
       "needFleetSpeed": 14,
       "needSpecialStat": [
@@ -7967,10 +7335,7 @@
       "dispatchGroup": 2201,
       "actionGroup": 30,
       "regionId": 12001500,
-      "dispatchTownId": [
-        11000209,
-        11000011
-      ],
+      "dispatchTownId": [11000209, 11000011],
       "needCompanyLv": 65,
       "needFleetSpeed": 14,
       "needSpecialStat": [
@@ -8035,9 +7400,7 @@
       "dispatchGroup": 2401,
       "actionGroup": 30,
       "regionId": 12001706,
-      "dispatchTownId": [
-        11000126
-      ],
+      "dispatchTownId": [11000126],
       "needCompanyLv": 75,
       "needFleetSpeed": 15,
       "needSpecialStat": [
@@ -8102,9 +7465,7 @@
       "dispatchGroup": 2501,
       "actionGroup": 30,
       "regionId": 12001700,
-      "dispatchTownId": [
-        11000194
-      ],
+      "dispatchTownId": [11000194],
       "needCompanyLv": 75,
       "needFleetSpeed": 16,
       "needSpecialStat": [
@@ -8169,10 +7530,7 @@
       "dispatchGroup": 2601,
       "actionGroup": 30,
       "regionId": 12011400,
-      "dispatchTownId": [
-        11000191,
-        11000166
-      ],
+      "dispatchTownId": [11000191, 11000166],
       "needCompanyLv": 75,
       "needFleetSpeed": 16,
       "needSpecialStat": [
@@ -8237,10 +7595,7 @@
       "dispatchGroup": 2701,
       "actionGroup": 30,
       "regionId": 12001301,
-      "dispatchTownId": [
-        11000012,
-        11000074
-      ],
+      "dispatchTownId": [11000012, 11000074],
       "needCompanyLv": 75,
       "needFleetSpeed": 20,
       "needSpecialStat": [
@@ -8305,10 +7660,7 @@
       "dispatchGroup": 2801,
       "actionGroup": 30,
       "regionId": 12001505,
-      "dispatchTownId": [
-        11000026,
-        11000174
-      ],
+      "dispatchTownId": [11000026, 11000174],
       "needCompanyLv": 75,
       "needFleetSpeed": 24,
       "needSpecialStat": [

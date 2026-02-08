@@ -2,10 +2,7 @@ module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
   roots: ['<rootDir>/src'],
-  testMatch: [
-    '**/__tests__/**/*.ts',
-    '**/?(*.)+(spec|test).ts'
-  ],
+  testMatch: ['**/__tests__/**/*.ts', '**/?(*.)+(spec|test).ts'],
   transform: {
     '^.+\\.ts$': 'ts-jest',
   },
@@ -18,12 +15,7 @@ module.exports = {
     '!src/database/migrations/**',
   ],
   coverageDirectory: 'coverage',
-  coverageReporters: [
-    'text',
-    'lcov',
-    'html',
-    'json'
-  ],
+  coverageReporters: ['text', 'lcov', 'html', 'json'],
   setupFilesAfterEnv: ['<rootDir>/src/test/setup.ts'],
   testTimeout: 10000,
   moduleNameMapping: {

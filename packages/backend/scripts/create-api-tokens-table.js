@@ -6,12 +6,12 @@ async function createApiTokensTable() {
     port: parseInt(process.env.DB_PORT || '3306'),
     user: process.env.DB_USER || 'gatrix_dev',
     password: process.env.DB_PASSWORD || 'dev123$',
-    database: process.env.DB_NAME || 'gatrix'
+    database: process.env.DB_NAME || 'gatrix',
   });
-  
+
   try {
     console.log('🔧 Creating g_api_access_tokens table...\n');
-    
+
     await connection.execute(`
       CREATE TABLE IF NOT EXISTS g_api_access_tokens (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -38,16 +38,17 @@ async function createApiTokensTable() {
         INDEX idx_expires_at (expiresAt)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `);
-    
+
     console.log('✅ g_api_access_tokens table created successfully\n');
-    
+
     // Show table structure
     const [columns] = await connection.execute('DESCRIBE g_api_access_tokens');
     console.log('📋 Table structure:');
-    columns.forEach(col => {
-      console.log(`  ${col.Field}: ${col.Type} ${col.Null === 'YES' ? 'NULL' : 'NOT NULL'} ${col.Key ? `(${col.Key})` : ''}`);
+    columns.forEach((col) => {
+      console.log(
+        `  ${col.Field}: ${col.Type} ${col.Null === 'YES' ? 'NULL' : 'NOT NULL'} ${col.Key ? `(${col.Key})` : ''}`
+      );
     });
-    
   } catch (error) {
     console.error('❌ Error creating table:', error.message);
     throw error;
@@ -57,4 +58,3 @@ async function createApiTokensTable() {
 }
 
 createApiTokensTable();
-

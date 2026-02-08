@@ -5,7 +5,7 @@
  * This migration adds these columns if they don't already exist.
  */
 
-exports.up = async function(connection) {
+exports.up = async function (connection) {
   try {
     // Check if isCopyable column exists
     const [columns] = await connection.execute(`
@@ -16,7 +16,7 @@ exports.up = async function(connection) {
       AND COLUMN_NAME IN ('isCopyable', 'valueType', 'isSystemDefined')
     `);
 
-    const existingColumns = columns.map(col => col.COLUMN_NAME);
+    const existingColumns = columns.map((col) => col.COLUMN_NAME);
 
     // Add isCopyable if it doesn't exist
     if (!existingColumns.includes('isCopyable')) {
@@ -59,7 +59,7 @@ exports.up = async function(connection) {
   }
 };
 
-exports.down = async function(connection) {
+exports.down = async function (connection) {
   try {
     // Check if columns exist before dropping
     const [columns] = await connection.execute(`
@@ -70,7 +70,7 @@ exports.down = async function(connection) {
       AND COLUMN_NAME IN ('isCopyable', 'valueType', 'isSystemDefined')
     `);
 
-    const existingColumns = columns.map(col => col.COLUMN_NAME);
+    const existingColumns = columns.map((col) => col.COLUMN_NAME);
 
     if (existingColumns.includes('isCopyable')) {
       console.log('Removing isCopyable column from g_vars table...');
@@ -94,4 +94,3 @@ exports.down = async function(connection) {
     throw error;
   }
 };
-

@@ -3,31 +3,20 @@
     ":type": {
       "id": "key",
       "groupName": "text",
-      "groupNameFormatTexts": [
-        "text"
-      ],
+      "groupNameFormatTexts": ["text"],
       "popupTitle": "text",
-      "popupTitleFormatTexts": [
-        "text"
-      ],
+      "popupTitleFormatTexts": ["text"],
       "groupNo": "number",
       "groupId": "number",
       "icon": "string",
       "category": "number",
       "rewardGrade": "number",
-      "viewRewardGrade": [
-        "number",
-        "number"
-      ],
+      "viewRewardGrade": ["number", "number"],
       "isPreview": "bool",
       "startDate": "string",
       "endDate": "string",
       "desc": "text",
-      "descFormatTexts": [
-        "text",
-        "text",
-        "text"
-      ],
+      "descFormatTexts": ["text", "text", "text"],
       "guildLevelRequired": "number",
       "isSpecial": "bool",
       "eventTag": "number"
@@ -48,19 +37,13 @@
     ":min": {
       "category": 0,
       "rewardGrade": 0,
-      "viewRewardGrade": [
-        0,
-        0
-      ],
+      "viewRewardGrade": [0, 0],
       "guildLevelRequired": 1
     },
     ":max": {
       "category": 1,
       "rewardGrade": 8,
-      "viewRewardGrade": [
-        8,
-        8
-      ]
+      "viewRewardGrade": [8, 8]
     },
     ":enum": {},
     ":links": {}
@@ -70,25 +53,16 @@
       "id": 4000,
       "groupName": "부품 합성",
       "popupTitle": "{0} 부품 합성",
-      "popupTitleFormatTexts": [
-        "A, S"
-      ],
+      "popupTitleFormatTexts": ["A, S"],
       "groupNo": 10000,
       "groupId": 0,
       "icon": "Icon_Item_23430003_Sprite",
       "category": 0,
       "rewardGrade": 4,
-      "viewRewardGrade": [
-        4,
-        5
-      ],
+      "viewRewardGrade": [4, 5],
       "isPreview": true,
       "desc": "{0}등급 {1}|hpp(을,를) 합성하여 {2}등급 {1}|hpp(을,를) 얻을 수 있습니다.",
-      "descFormatTexts": [
-        "B, A",
-        "부품",
-        "A, S"
-      ],
+      "descFormatTexts": ["B, A", "부품", "A, S"],
       "guildLevelRequired": 1,
       "isSpecial": false,
       "eventTag": 1
@@ -97,25 +71,16 @@
       "id": 4001,
       "groupName": "장비 합성",
       "popupTitle": "{0} 장비 합성",
-      "popupTitleFormatTexts": [
-        "A, S"
-      ],
+      "popupTitleFormatTexts": ["A, S"],
       "groupNo": 10001,
       "groupId": 1,
       "icon": "Icon_Item_23430002_Sprite",
       "category": 1,
       "rewardGrade": 4,
-      "viewRewardGrade": [
-        4,
-        5
-      ],
+      "viewRewardGrade": [4, 5],
       "isPreview": true,
       "desc": "{0}등급 {1}|hpp(을,를) 합성하여 {2}등급 {1}|hpp(을,를) 얻을 수 있습니다.",
-      "descFormatTexts": [
-        "B, A",
-        "장비",
-        "A, S"
-      ],
+      "descFormatTexts": ["B, A", "장비", "A, S"],
       "guildLevelRequired": 1,
       "isSpecial": false,
       "eventTag": 1
@@ -124,25 +89,16 @@
       "id": 4002,
       "groupName": "부품 합성",
       "popupTitle": "{0} 부품 합성",
-      "popupTitleFormatTexts": [
-        "A, S"
-      ],
+      "popupTitleFormatTexts": ["A, S"],
       "groupNo": 10002,
       "groupId": 2,
       "icon": "Icon_Item_23430003_Sprite",
       "category": 0,
       "rewardGrade": 4,
-      "viewRewardGrade": [
-        4,
-        5
-      ],
+      "viewRewardGrade": [4, 5],
       "isPreview": true,
       "desc": "{0}등급 {1}|hpp(을,를) 합성하여 {2}등급 {1}|hpp(을,를) 얻을 수 있습니다.",
-      "descFormatTexts": [
-        "A, S",
-        "부품",
-        "A, S"
-      ],
+      "descFormatTexts": ["A, S", "부품", "A, S"],
       "guildLevelRequired": 1,
       "isSpecial": true,
       "eventTag": 2
@@ -151,25 +107,16 @@
       "id": 4003,
       "groupName": "장비 합성",
       "popupTitle": "{0} 장비 합성",
-      "popupTitleFormatTexts": [
-        "A, S"
-      ],
+      "popupTitleFormatTexts": ["A, S"],
       "groupNo": 10003,
       "groupId": 3,
       "icon": "Icon_Item_23430002_Sprite",
       "category": 1,
       "rewardGrade": 4,
-      "viewRewardGrade": [
-        4,
-        5
-      ],
+      "viewRewardGrade": [4, 5],
       "isPreview": true,
       "desc": "{0}등급 {1}|hpp(을,를) 합성하여 {2}등급 {1}|hpp(을,를) 얻을 수 있습니다.",
-      "descFormatTexts": [
-        "A, S",
-        "장비",
-        "A, S"
-      ],
+      "descFormatTexts": ["A, S", "장비", "A, S"],
       "guildLevelRequired": 1,
       "isSpecial": true,
       "eventTag": 2
@@ -178,17 +125,13 @@
       "id": 4004,
       "groupName": "부품 합성",
       "popupTitle": "{0} 부품 합성",
-      "popupTitleFormatTexts": [
-        "S등급"
-      ],
+      "popupTitleFormatTexts": ["S등급"],
       "groupNo": 10004,
       "groupId": 4,
       "icon": "Icon_Item_23430003_Sprite",
       "category": 0,
       "rewardGrade": 5,
-      "viewRewardGrade": [
-        5
-      ],
+      "viewRewardGrade": [5],
       "isPreview": true,
       "endDate": "2020/01/01/00:00:00",
       "desc": "A등급 부품을 합성하여 S등급 부품을 얻습니다.",
@@ -200,17 +143,13 @@
       "id": 4005,
       "groupName": "장비 합성",
       "popupTitle": "{0} 장비 합성",
-      "popupTitleFormatTexts": [
-        "S등급"
-      ],
+      "popupTitleFormatTexts": ["S등급"],
       "groupNo": 10005,
       "groupId": 5,
       "icon": "Icon_Item_23430002_Sprite",
       "category": 1,
       "rewardGrade": 5,
-      "viewRewardGrade": [
-        5
-      ],
+      "viewRewardGrade": [5],
       "isPreview": true,
       "endDate": "2020/01/01/00:00:00",
       "desc": "A등급 장비를 합성하여 S등급 장비를 얻습니다.",
@@ -222,17 +161,13 @@
       "id": 4006,
       "groupName": "부품 합성",
       "popupTitle": "{0} 동급 부품 합성",
-      "popupTitleFormatTexts": [
-        "S"
-      ],
+      "popupTitleFormatTexts": ["S"],
       "groupNo": 10006,
       "groupId": 6,
       "icon": "Icon_Item_23430003_Sprite",
       "category": 0,
       "rewardGrade": 5,
-      "viewRewardGrade": [
-        5
-      ],
+      "viewRewardGrade": [5],
       "isPreview": true,
       "endDate": "2020/01/01/00:00:00",
       "desc": "S등급 부품을 합성하여 S등급 부품을 얻습니다.",
@@ -244,17 +179,13 @@
       "id": 4007,
       "groupName": "장비 합성",
       "popupTitle": "{0} 동급 장비 합성",
-      "popupTitleFormatTexts": [
-        "S"
-      ],
+      "popupTitleFormatTexts": ["S"],
       "groupNo": 10007,
       "groupId": 7,
       "icon": "Icon_Item_23430002_Sprite",
       "category": 1,
       "rewardGrade": 5,
-      "viewRewardGrade": [
-        5
-      ],
+      "viewRewardGrade": [5],
       "isPreview": true,
       "endDate": "2020/01/01/00:00:00",
       "desc": "S등급 장비를 합성하여 S등급 장비를 얻습니다.",
@@ -265,30 +196,20 @@
     "4008": {
       "id": 4008,
       "groupName": "{0} 장비 합성",
-      "groupNameFormatTexts": [
-        "창세기전"
-      ],
+      "groupNameFormatTexts": ["창세기전"],
       "popupTitle": "{0} 장비 합성",
-      "popupTitleFormatTexts": [
-        "창세기전"
-      ],
+      "popupTitleFormatTexts": ["창세기전"],
       "groupNo": 999,
       "groupId": 300,
       "icon": "Icon_Item_23430002_Sprite",
       "category": 1,
       "rewardGrade": 5,
-      "viewRewardGrade": [
-        5
-      ],
+      "viewRewardGrade": [5],
       "isPreview": false,
       "startDate": "2025/06/25/00:00:00",
       "endDate": "2025/08/27/00:00:00",
       "desc": "{0}등급 {1}|hpp(을,를) 합성하여 {2} {1}|hpp(을,를) 얻을 수 있습니다.",
-      "descFormatTexts": [
-        "S",
-        "장비",
-        "창세기전 세트"
-      ],
+      "descFormatTexts": ["S", "장비", "창세기전 세트"],
       "guildLevelRequired": 1,
       "isSpecial": false,
       "eventTag": 3
@@ -296,30 +217,20 @@
     "4009": {
       "id": 4009,
       "groupName": "{0} 부품 합성",
-      "groupNameFormatTexts": [
-        "구름 사제"
-      ],
+      "groupNameFormatTexts": ["구름 사제"],
       "popupTitle": "{0} 부품 합성",
-      "popupTitleFormatTexts": [
-        "구름 사제"
-      ],
+      "popupTitleFormatTexts": ["구름 사제"],
       "groupNo": 997,
       "groupId": 400,
       "icon": "Icon_Item_23430003_Sprite",
       "category": 0,
       "rewardGrade": 5,
-      "viewRewardGrade": [
-        5
-      ],
+      "viewRewardGrade": [5],
       "isPreview": false,
       "startDate": "2025/09/24/00:00:00",
       "endDate": "2025/10/22/00:00:00",
       "desc": "{0}등급 {1}|hpp(을,를) 합성하여 {2} {1}|hpp(을,를) 얻을 수 있습니다.",
-      "descFormatTexts": [
-        "S",
-        "부품",
-        "구름 사제 세트"
-      ],
+      "descFormatTexts": ["S", "부품", "구름 사제 세트"],
       "guildLevelRequired": 1,
       "isSpecial": false,
       "eventTag": 3
@@ -327,30 +238,20 @@
     "4010": {
       "id": 4010,
       "groupName": "{0} 장비 합성",
-      "groupNameFormatTexts": [
-        "구름 사제"
-      ],
+      "groupNameFormatTexts": ["구름 사제"],
       "popupTitle": "{0} 장비 합성",
-      "popupTitleFormatTexts": [
-        "구름 사제"
-      ],
+      "popupTitleFormatTexts": ["구름 사제"],
       "groupNo": 998,
       "groupId": 500,
       "icon": "Icon_Item_23430002_Sprite",
       "category": 1,
       "rewardGrade": 5,
-      "viewRewardGrade": [
-        5
-      ],
+      "viewRewardGrade": [5],
       "isPreview": false,
       "startDate": "2025/09/24/00:00:00",
       "endDate": "2025/10/22/00:00:00",
       "desc": "{0}등급 {1}|hpp(을,를) 합성하여 {2} {1}|hpp(을,를) 얻을 수 있습니다.",
-      "descFormatTexts": [
-        "S",
-        "장비",
-        "구름 사제 세트"
-      ],
+      "descFormatTexts": ["S", "장비", "구름 사제 세트"],
       "guildLevelRequired": 1,
       "isSpecial": false,
       "eventTag": 3
@@ -358,30 +259,20 @@
     "4011": {
       "id": 4011,
       "groupName": "{0} 부품 합성",
-      "groupNameFormatTexts": [
-        "신록"
-      ],
+      "groupNameFormatTexts": ["신록"],
       "popupTitle": "{0} 부품 합성",
-      "popupTitleFormatTexts": [
-        "신록"
-      ],
+      "popupTitleFormatTexts": ["신록"],
       "groupNo": 995,
       "groupId": 600,
       "icon": "Icon_Item_23430003_Sprite",
       "category": 0,
       "rewardGrade": 5,
-      "viewRewardGrade": [
-        5
-      ],
+      "viewRewardGrade": [5],
       "isPreview": false,
       "startDate": "2025/10/22/00:00:00",
       "endDate": "2025/11/19/00:00:00",
       "desc": "{0}등급 {1}|hpp(을,를) 합성하여 {2} {1}|hpp(을,를) 얻을 수 있습니다.",
-      "descFormatTexts": [
-        "S",
-        "부품",
-        "신록 세트"
-      ],
+      "descFormatTexts": ["S", "부품", "신록 세트"],
       "guildLevelRequired": 1,
       "isSpecial": false,
       "eventTag": 3
@@ -389,30 +280,20 @@
     "4012": {
       "id": 4012,
       "groupName": "{0} 장비 합성",
-      "groupNameFormatTexts": [
-        "신록"
-      ],
+      "groupNameFormatTexts": ["신록"],
       "popupTitle": "{0} 장비 합성",
-      "popupTitleFormatTexts": [
-        "신록"
-      ],
+      "popupTitleFormatTexts": ["신록"],
       "groupNo": 996,
       "groupId": 700,
       "icon": "Icon_Item_23430002_Sprite",
       "category": 1,
       "rewardGrade": 5,
-      "viewRewardGrade": [
-        5
-      ],
+      "viewRewardGrade": [5],
       "isPreview": false,
       "startDate": "2025/10/22/00:00:00",
       "endDate": "2025/11/19/00:00:00",
       "desc": "{0}등급 {1}|hpp(을,를) 합성하여 {2} {1}|hpp(을,를) 얻을 수 있습니다.",
-      "descFormatTexts": [
-        "S",
-        "장비",
-        "신록 세트"
-      ],
+      "descFormatTexts": ["S", "장비", "신록 세트"],
       "guildLevelRequired": 1,
       "isSpecial": false,
       "eventTag": 3
@@ -420,30 +301,20 @@
     "4013": {
       "id": 4013,
       "groupName": "{0} 부품 합성",
-      "groupNameFormatTexts": [
-        "황금향"
-      ],
+      "groupNameFormatTexts": ["황금향"],
       "popupTitle": "{0} 부품 합성",
-      "popupTitleFormatTexts": [
-        "황금향"
-      ],
+      "popupTitleFormatTexts": ["황금향"],
       "groupNo": 992,
       "groupId": 800,
       "icon": "Icon_Item_23430003_Sprite",
       "category": 0,
       "rewardGrade": 5,
-      "viewRewardGrade": [
-        5
-      ],
+      "viewRewardGrade": [5],
       "isPreview": false,
       "startDate": "2025/11/19/00:00:00",
       "endDate": "2025/12/17/00:00:00",
       "desc": "{0}등급 {1}|hpp(을,를) 합성하여 {2} {1}|hpp(을,를) 얻을 수 있습니다.",
-      "descFormatTexts": [
-        "S",
-        "부품",
-        "황금향 세트"
-      ],
+      "descFormatTexts": ["S", "부품", "황금향 세트"],
       "guildLevelRequired": 1,
       "isSpecial": false,
       "eventTag": 3
@@ -451,30 +322,20 @@
     "4014": {
       "id": 4014,
       "groupName": "{0} 장비 합성",
-      "groupNameFormatTexts": [
-        "황금향"
-      ],
+      "groupNameFormatTexts": ["황금향"],
       "popupTitle": "{0} 장비 합성",
-      "popupTitleFormatTexts": [
-        "황금향"
-      ],
+      "popupTitleFormatTexts": ["황금향"],
       "groupNo": 993,
       "groupId": 900,
       "icon": "Icon_Item_23430002_Sprite",
       "category": 1,
       "rewardGrade": 5,
-      "viewRewardGrade": [
-        5
-      ],
+      "viewRewardGrade": [5],
       "isPreview": false,
       "startDate": "2025/11/19/00:00:00",
       "endDate": "2025/12/17/00:00:00",
       "desc": "{0}등급 {1}|hpp(을,를) 합성하여 {2} {1}|hpp(을,를) 얻을 수 있습니다.",
-      "descFormatTexts": [
-        "S",
-        "장비",
-        "황금향 세트"
-      ],
+      "descFormatTexts": ["S", "장비", "황금향 세트"],
       "guildLevelRequired": 1,
       "isSpecial": false,
       "eventTag": 3
@@ -482,30 +343,20 @@
     "4015": {
       "id": 4015,
       "groupName": "{0} 의상 합성",
-      "groupNameFormatTexts": [
-        "파티"
-      ],
+      "groupNameFormatTexts": ["파티"],
       "popupTitle": "{0} 의상 합성",
-      "popupTitleFormatTexts": [
-        "파티"
-      ],
+      "popupTitleFormatTexts": ["파티"],
       "groupNo": 994,
       "groupId": 1000,
       "icon": "Icon_Item_23430002_Sprite",
       "category": 1,
       "rewardGrade": 8,
-      "viewRewardGrade": [
-        8
-      ],
+      "viewRewardGrade": [8],
       "isPreview": false,
       "startDate": "2024/09/11/00:00:00",
       "endDate": "2024/12/04/00:00:00",
       "desc": "{0}등급 {1}|hpp(을,를) 합성하여 {2}|hpp(을,를) 얻을 수 있습니다.",
-      "descFormatTexts": [
-        "S",
-        "장비",
-        "파티 세트 의상"
-      ],
+      "descFormatTexts": ["S", "장비", "파티 세트 의상"],
       "guildLevelRequired": 1,
       "isSpecial": false,
       "eventTag": 3
@@ -513,30 +364,20 @@
     "4016": {
       "id": 4016,
       "groupName": "{0} 부품 합성",
-      "groupNameFormatTexts": [
-        "창공"
-      ],
+      "groupNameFormatTexts": ["창공"],
       "popupTitle": "{0} 부품 합성",
-      "popupTitleFormatTexts": [
-        "창공"
-      ],
+      "popupTitleFormatTexts": ["창공"],
       "groupNo": 990,
       "groupId": 1100,
       "icon": "Icon_Item_23430003_Sprite",
       "category": 0,
       "rewardGrade": 5,
-      "viewRewardGrade": [
-        5
-      ],
+      "viewRewardGrade": [5],
       "isPreview": false,
       "startDate": "2025/09/24/00:00:00",
       "endDate": "2025/10/22/00:00:00",
       "desc": "{0}등급 {1}|hpp(을,를) 합성하여 {2} {1}|hpp(을,를) 얻을 수 있습니다.",
-      "descFormatTexts": [
-        "S",
-        "부품",
-        "창공 세트"
-      ],
+      "descFormatTexts": ["S", "부품", "창공 세트"],
       "guildLevelRequired": 1,
       "isSpecial": false,
       "eventTag": 3
@@ -544,30 +385,20 @@
     "4017": {
       "id": 4017,
       "groupName": "{0} 장비 합성",
-      "groupNameFormatTexts": [
-        "창공"
-      ],
+      "groupNameFormatTexts": ["창공"],
       "popupTitle": "{0} 장비 합성",
-      "popupTitleFormatTexts": [
-        "창공"
-      ],
+      "popupTitleFormatTexts": ["창공"],
       "groupNo": 991,
       "groupId": 1200,
       "icon": "Icon_Item_23430002_Sprite",
       "category": 1,
       "rewardGrade": 5,
-      "viewRewardGrade": [
-        5
-      ],
+      "viewRewardGrade": [5],
       "isPreview": false,
       "startDate": "2025/09/24/00:00:00",
       "endDate": "2025/10/22/00:00:00",
       "desc": "{0}등급 {1}|hpp(을,를) 합성하여 {2} {1}|hpp(을,를) 얻을 수 있습니다.",
-      "descFormatTexts": [
-        "S",
-        "장비",
-        "창공 세트"
-      ],
+      "descFormatTexts": ["S", "장비", "창공 세트"],
       "guildLevelRequired": 1,
       "isSpecial": false,
       "eventTag": 3
@@ -576,25 +407,17 @@
       "id": 4018,
       "groupName": "부품 빠른 합성",
       "popupTitle": "{0} 부품 빠른 합성",
-      "popupTitleFormatTexts": [
-        "A등급"
-      ],
+      "popupTitleFormatTexts": ["A등급"],
       "groupNo": 2001,
       "groupId": 1300,
       "icon": "Icon_Item_23430003_Sprite",
       "category": 0,
       "rewardGrade": 4,
-      "viewRewardGrade": [
-        4
-      ],
+      "viewRewardGrade": [4],
       "isPreview": true,
       "endDate": "2020/01/01/00:00:00",
       "desc": "{0}등급 {1}|hpp(을,를) 합성하여 {2}등급 {1}|hpp(을,를) 얻을 수 있습니다. 소모 시간이 적습니다.",
-      "descFormatTexts": [
-        "B, A",
-        "부품",
-        "A, S"
-      ],
+      "descFormatTexts": ["B, A", "부품", "A, S"],
       "guildLevelRequired": 1,
       "isSpecial": false,
       "eventTag": 1
@@ -603,25 +426,17 @@
       "id": 4019,
       "groupName": "장비 빠른 합성",
       "popupTitle": "{0} 장비 빠른 합성",
-      "popupTitleFormatTexts": [
-        "A등급"
-      ],
+      "popupTitleFormatTexts": ["A등급"],
       "groupNo": 2001,
       "groupId": 1400,
       "icon": "Icon_Item_23430002_Sprite",
       "category": 1,
       "rewardGrade": 4,
-      "viewRewardGrade": [
-        4
-      ],
+      "viewRewardGrade": [4],
       "isPreview": true,
       "endDate": "2020/01/01/00:00:00",
       "desc": "{0}등급 {1}|hpp(을,를) 합성하여 {2}등급 {1}|hpp(을,를) 얻을 수 있습니다. 소모 시간이 적습니다.",
-      "descFormatTexts": [
-        "B, A",
-        "장비",
-        "A, S"
-      ],
+      "descFormatTexts": ["B, A", "장비", "A, S"],
       "guildLevelRequired": 1,
       "isSpecial": false,
       "eventTag": 1
@@ -630,24 +445,17 @@
       "id": 4020,
       "groupName": "부품 빠른 합성",
       "popupTitle": "{0} 부품 빠른 합성",
-      "popupTitleFormatTexts": [
-        "S등급"
-      ],
+      "popupTitleFormatTexts": ["S등급"],
       "groupNo": 2003,
       "groupId": 1500,
       "icon": "Icon_Item_23430003_Sprite",
       "category": 0,
       "rewardGrade": 5,
-      "viewRewardGrade": [
-        5
-      ],
+      "viewRewardGrade": [5],
       "isPreview": true,
       "endDate": "2020/01/01/00:00:00",
       "desc": "{0}등급 부품을 합성하여 {1}등급 부품을 얻습니다. 소모 시간이 적습니다.",
-      "descFormatTexts": [
-        "A",
-        "S"
-      ],
+      "descFormatTexts": ["A", "S"],
       "guildLevelRequired": 1,
       "isSpecial": false,
       "eventTag": 1
@@ -656,24 +464,17 @@
       "id": 4021,
       "groupName": "장비 빠른 합성",
       "popupTitle": "{0} 장비 빠른 합성",
-      "popupTitleFormatTexts": [
-        "S등급"
-      ],
+      "popupTitleFormatTexts": ["S등급"],
       "groupNo": 2004,
       "groupId": 1600,
       "icon": "Icon_Item_23430002_Sprite",
       "category": 1,
       "rewardGrade": 5,
-      "viewRewardGrade": [
-        5
-      ],
+      "viewRewardGrade": [5],
       "isPreview": true,
       "endDate": "2020/01/01/00:00:00",
       "desc": "{0}등급 장비를 합성하여 {1}등급 장비를 얻습니다. 소모 시간이 적습니다.",
-      "descFormatTexts": [
-        "A",
-        "S"
-      ],
+      "descFormatTexts": ["A", "S"],
       "guildLevelRequired": 1,
       "isSpecial": false,
       "eventTag": 1
@@ -681,30 +482,20 @@
     "4024": {
       "id": 4024,
       "groupName": "{0} 부품 합성",
-      "groupNameFormatTexts": [
-        "은하"
-      ],
+      "groupNameFormatTexts": ["은하"],
       "popupTitle": "{0} 부품 합성",
-      "popupTitleFormatTexts": [
-        "은하"
-      ],
+      "popupTitleFormatTexts": ["은하"],
       "groupNo": 988,
       "groupId": 1900,
       "icon": "Icon_Item_23430003_Sprite",
       "category": 0,
       "rewardGrade": 5,
-      "viewRewardGrade": [
-        5
-      ],
+      "viewRewardGrade": [5],
       "isPreview": false,
       "startDate": "2025/10/22/00:00:00",
       "endDate": "2025/11/19/00:00:00",
       "desc": "{0}등급 {1}|hpp(을,를) 합성하여 {2} {1}|hpp(을,를) 얻을 수 있습니다.",
-      "descFormatTexts": [
-        "S",
-        "부품",
-        "은하 세트"
-      ],
+      "descFormatTexts": ["S", "부품", "은하 세트"],
       "guildLevelRequired": 1,
       "isSpecial": false,
       "eventTag": 3
@@ -712,30 +503,20 @@
     "4025": {
       "id": 4025,
       "groupName": "{0} 장비 합성",
-      "groupNameFormatTexts": [
-        "은하"
-      ],
+      "groupNameFormatTexts": ["은하"],
       "popupTitle": "{0} 장비 합성",
-      "popupTitleFormatTexts": [
-        "은하"
-      ],
+      "popupTitleFormatTexts": ["은하"],
       "groupNo": 989,
       "groupId": 2000,
       "icon": "Icon_Item_23430002_Sprite",
       "category": 1,
       "rewardGrade": 5,
-      "viewRewardGrade": [
-        5
-      ],
+      "viewRewardGrade": [5],
       "isPreview": false,
       "startDate": "2025/10/22/00:00:00",
       "endDate": "2025/11/19/00:00:00",
       "desc": "{0}등급 {1}|hpp(을,를) 합성하여 {2} {1}|hpp(을,를) 얻을 수 있습니다.",
-      "descFormatTexts": [
-        "S",
-        "장비",
-        "은하 세트"
-      ],
+      "descFormatTexts": ["S", "장비", "은하 세트"],
       "guildLevelRequired": 1,
       "isSpecial": false,
       "eventTag": 3
@@ -743,30 +524,20 @@
     "4026": {
       "id": 4026,
       "groupName": "{0} 부품 합성",
-      "groupNameFormatTexts": [
-        "영옥"
-      ],
+      "groupNameFormatTexts": ["영옥"],
       "popupTitle": "{0} 부품 합성",
-      "popupTitleFormatTexts": [
-        "영옥"
-      ],
+      "popupTitleFormatTexts": ["영옥"],
       "groupNo": 986,
       "groupId": 2100,
       "icon": "Icon_Item_23430003_Sprite",
       "category": 0,
       "rewardGrade": 5,
-      "viewRewardGrade": [
-        5
-      ],
+      "viewRewardGrade": [5],
       "isPreview": false,
       "startDate": "2025/11/19/00:00:00",
       "endDate": "2025/12/17/00:00:00",
       "desc": "{0}등급 {1}|hpp(을,를) 합성하여 {2} {1}|hpp(을,를) 얻을 수 있습니다.",
-      "descFormatTexts": [
-        "S",
-        "부품",
-        "영옥 세트"
-      ],
+      "descFormatTexts": ["S", "부품", "영옥 세트"],
       "guildLevelRequired": 1,
       "isSpecial": false,
       "eventTag": 3
@@ -774,30 +545,20 @@
     "4027": {
       "id": 4027,
       "groupName": "{0} 장비 합성",
-      "groupNameFormatTexts": [
-        "영옥"
-      ],
+      "groupNameFormatTexts": ["영옥"],
       "popupTitle": "{0} 장비 합성",
-      "popupTitleFormatTexts": [
-        "영옥"
-      ],
+      "popupTitleFormatTexts": ["영옥"],
       "groupNo": 987,
       "groupId": 2200,
       "icon": "Icon_Item_23430002_Sprite",
       "category": 1,
       "rewardGrade": 5,
-      "viewRewardGrade": [
-        5
-      ],
+      "viewRewardGrade": [5],
       "isPreview": false,
       "startDate": "2025/11/19/00:00:00",
       "endDate": "2025/12/17/00:00:00",
       "desc": "{0}등급 {1}|hpp(을,를) 합성하여 {2} {1}|hpp(을,를) 얻을 수 있습니다.",
-      "descFormatTexts": [
-        "S",
-        "장비",
-        "영옥 세트"
-      ],
+      "descFormatTexts": ["S", "장비", "영옥 세트"],
       "guildLevelRequired": 1,
       "isSpecial": false,
       "eventTag": 3
@@ -811,9 +572,7 @@
       "icon": "Icon_Item_23430002_Sprite",
       "category": 1,
       "rewardGrade": 5,
-      "viewRewardGrade": [
-        5
-      ],
+      "viewRewardGrade": [5],
       "isPreview": false,
       "startDate": "2020/01/01/00:00:00",
       "endDate": "2020/01/02/00:00:00",
@@ -831,9 +590,7 @@
       "icon": "Icon_Item_23430002_Sprite",
       "category": 0,
       "rewardGrade": 5,
-      "viewRewardGrade": [
-        5
-      ],
+      "viewRewardGrade": [5],
       "isPreview": false,
       "startDate": "2020/01/01/00:00:00",
       "endDate": "2020/01/02/00:00:00",
@@ -845,30 +602,20 @@
     "4030": {
       "id": 4030,
       "groupName": "{0} 부품 합성",
-      "groupNameFormatTexts": [
-        "광륜"
-      ],
+      "groupNameFormatTexts": ["광륜"],
       "popupTitle": "{0} 장비 합성",
-      "popupTitleFormatTexts": [
-        "광륜"
-      ],
+      "popupTitleFormatTexts": ["광륜"],
       "groupNo": 984,
       "groupId": 2300,
       "icon": "Icon_Item_23430003_Sprite",
       "category": 0,
       "rewardGrade": 5,
-      "viewRewardGrade": [
-        5
-      ],
+      "viewRewardGrade": [5],
       "isPreview": false,
       "startDate": "2025/09/24/00:00:00",
       "endDate": "2025/12/17/00:00:00",
       "desc": "{0}등급 {1}|hpp(을,를) 합성하여 {2} {1}|hpp(을,를) 얻을 수 있습니다.",
-      "descFormatTexts": [
-        "S",
-        "부품",
-        "광륜 세트"
-      ],
+      "descFormatTexts": ["S", "부품", "광륜 세트"],
       "guildLevelRequired": 1,
       "isSpecial": false,
       "eventTag": 3
@@ -876,30 +623,20 @@
     "4031": {
       "id": 4031,
       "groupName": "{0} 장비 합성",
-      "groupNameFormatTexts": [
-        "광륜"
-      ],
+      "groupNameFormatTexts": ["광륜"],
       "popupTitle": "{0} 장비 합성",
-      "popupTitleFormatTexts": [
-        "광륜"
-      ],
+      "popupTitleFormatTexts": ["광륜"],
       "groupNo": 985,
       "groupId": 2400,
       "icon": "Icon_Item_23430002_Sprite",
       "category": 1,
       "rewardGrade": 5,
-      "viewRewardGrade": [
-        5
-      ],
+      "viewRewardGrade": [5],
       "isPreview": false,
       "startDate": "2025/09/24/00:00:00",
       "endDate": "2025/12/17/00:00:00",
       "desc": "{0}등급 {1}|hpp(을,를) 합성하여 {2} {1}|hpp(을,를) 얻을 수 있습니다.",
-      "descFormatTexts": [
-        "S",
-        "장비",
-        "광륜 세트"
-      ],
+      "descFormatTexts": ["S", "장비", "광륜 세트"],
       "guildLevelRequired": 1,
       "isSpecial": false,
       "eventTag": 3
@@ -907,28 +644,18 @@
     "4032": {
       "id": 4032,
       "groupName": "{0} 부품 합성",
-      "groupNameFormatTexts": [
-        "특수"
-      ],
+      "groupNameFormatTexts": ["특수"],
       "popupTitle": "{0} 장비 합성",
-      "popupTitleFormatTexts": [
-        "특수"
-      ],
+      "popupTitleFormatTexts": ["특수"],
       "groupNo": 10008,
       "groupId": 2500,
       "icon": "Icon_Item_23430003_Sprite",
       "category": 0,
       "rewardGrade": 5,
-      "viewRewardGrade": [
-        5
-      ],
+      "viewRewardGrade": [5],
       "isPreview": true,
       "desc": "{0}등급 부품을 합성하여 {1}등급 부품을 얻습니다. 낮은 확률로 {2}|hpp(을,를) 얻을 수 있습니다.",
-      "descFormatTexts": [
-        "S",
-        "S",
-        "특수 합성 부품"
-      ],
+      "descFormatTexts": ["S", "S", "특수 합성 부품"],
       "guildLevelRequired": 1,
       "isSpecial": false,
       "eventTag": 3
@@ -936,28 +663,18 @@
     "4033": {
       "id": 4033,
       "groupName": "{0} 장비 합성",
-      "groupNameFormatTexts": [
-        "특수"
-      ],
+      "groupNameFormatTexts": ["특수"],
       "popupTitle": "{0} 장비 합성",
-      "popupTitleFormatTexts": [
-        "특수"
-      ],
+      "popupTitleFormatTexts": ["특수"],
       "groupNo": 10009,
       "groupId": 2600,
       "icon": "Icon_Item_23430002_Sprite",
       "category": 1,
       "rewardGrade": 5,
-      "viewRewardGrade": [
-        5
-      ],
+      "viewRewardGrade": [5],
       "isPreview": true,
       "desc": "{0}등급 장비를 합성하여 {1}등급 장비를 얻습니다. 낮은 확률로 {2}|hpp(을,를) 얻을 수 있습니다.",
-      "descFormatTexts": [
-        "S",
-        "S",
-        "특수 합성 장비"
-      ],
+      "descFormatTexts": ["S", "S", "특수 합성 장비"],
       "guildLevelRequired": 1,
       "isSpecial": false,
       "eventTag": 3

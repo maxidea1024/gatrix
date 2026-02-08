@@ -11,8 +11,8 @@ async function makeApiCall(callNumber) {
       headers: {
         'X-API-Key': API_TOKEN,
         'X-Application-Name': 'test-app',
-        'Content-Type': 'application/json'
-      }
+        'Content-Type': 'application/json',
+      },
     });
 
     console.log(`Call ${callNumber}: Success - Status: ${response.status}`);
@@ -29,50 +29,52 @@ async function runApiTest() {
   console.log(`📍 Target URL: ${BASE_URL}/api/v1/remote-config/client/templates`);
   console.log(`🔑 API Token: ${API_TOKEN.substring(0, 16)}...`);
   console.log('=' * 60);
-  
+
   const startTime = Date.now();
   const results = [];
-  
+
   // 순차적으로 호출 (너무 빠르면 서버에 부하)
   for (let i = 1; i <= TOTAL_CALLS; i++) {
     const result = await makeApiCall(i);
     results.push(result);
-    
+
     // 10번마다 진행상황 출력
     if (i % 10 === 0) {
-      const successCount = results.filter(r => r.success).length;
+      const successCount = results.filter((r) => r.success).length;
       console.log(`📊 Progress: ${i}/${TOTAL_CALLS} (${successCount} successful)`);
     }
-    
+
     // 서버 부하 방지를 위한 짧은 대기
-    await new Promise(resolve => setTimeout(resolve, 50));
+    await new Promise((resolve) => setTimeout(resolve, 50));
   }
-  
+
   const endTime = Date.now();
   const duration = (endTime - startTime) / 1000;
-  
+
   // 결과 요약
-  const successCount = results.filter(r => r.success).length;
-  const errorCount = results.filter(r => !r.success).length;
-  
+  const successCount = results.filter((r) => r.success).length;
+  const errorCount = results.filter((r) => !r.success).length;
+
   console.log('=' * 60);
   console.log('📈 Test Results Summary:');
   console.log(`✅ Successful calls: ${successCount}/${TOTAL_CALLS}`);
   console.log(`❌ Failed calls: ${errorCount}/${TOTAL_CALLS}`);
   console.log(`⏱️  Total duration: ${duration.toFixed(2)} seconds`);
-  console.log(`🔄 Average time per call: ${(duration / TOTAL_CALLS * 1000).toFixed(2)}ms`);
-  
+  console.log(`🔄 Average time per call: ${((duration / TOTAL_CALLS) * 1000).toFixed(2)}ms`);
+
   if (errorCount > 0) {
     console.log('\n❌ Error breakdown:');
     const errorTypes = {};
-    results.filter(r => !r.success).forEach(r => {
-      errorTypes[r.error] = (errorTypes[r.error] || 0) + 1;
-    });
+    results
+      .filter((r) => !r.success)
+      .forEach((r) => {
+        errorTypes[r.error] = (errorTypes[r.error] || 0) + 1;
+      });
     Object.entries(errorTypes).forEach(([error, count]) => {
       console.log(`   ${error}: ${count} times`);
     });
   }
-  
+
   console.log('\n💡 Check the backend logs for token usage tracking information!');
   console.log('💡 Usage count should be updated in the database after 1 minute.');
 }

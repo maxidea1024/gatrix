@@ -10,56 +10,56 @@ import { IntegrationSystemEvent } from '../types/integrationEvents';
 import { formatWhatsAppMessage } from './EventFormatter';
 
 export class WhatsAppAddon extends Addon {
-    constructor() {
-        super(whatsappDefinition);
+  constructor() {
+    super(whatsappDefinition);
+  }
+
+  async handleEvent(
+    event: IntegrationSystemEvent,
+    parameters: Record<string, any>,
+    integrationId: string
+  ): Promise<void> {
+    const { accessToken, phoneNumberId, recipientPhoneNumber } = parameters;
+
+    if (!accessToken || !phoneNumberId || !recipientPhoneNumber) {
+      this.logger.warn(`Missing WhatsApp configuration for integration ${integrationId}`);
+      await this.registerEvent(integrationId, event, 'failed', 'Missing required parameters');
+      return;
     }
 
-    async handleEvent(
-        event: IntegrationSystemEvent,
-        parameters: Record<string, any>,
-        integrationId: string
-    ): Promise<void> {
-        const { accessToken, phoneNumberId, recipientPhoneNumber } = parameters;
+    const url = `https://graph.facebook.com/v21.0/${phoneNumberId}/messages`;
 
-        if (!accessToken || !phoneNumberId || !recipientPhoneNumber) {
-            this.logger.warn(`Missing WhatsApp configuration for integration ${integrationId}`);
-            await this.registerEvent(integrationId, event, 'failed', 'Missing required parameters');
-            return;
-        }
+    try {
+      const payload = formatWhatsAppMessage(event, recipientPhoneNumber);
 
-        const url = `https://graph.facebook.com/v21.0/${phoneNumberId}/messages`;
+      const response = await this.fetchRetry(url, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
 
-        try {
-            const payload = formatWhatsAppMessage(event, recipientPhoneNumber);
+      this.logger.info(
+        `WhatsApp notification sent for event ${event.type} (integration: ${integrationId})`
+      );
 
-            const response = await this.fetchRetry(url, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${accessToken}`,
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(payload),
-            });
+      await this.registerEvent(integrationId, event, 'success', '', {
+        recipient: recipientPhoneNumber,
+        statusCode: response.status,
+      });
+    } catch (error) {
+      this.logger.error(
+        `Failed to send WhatsApp notification for integration ${integrationId}:`,
+        error
+      );
 
-            this.logger.info(
-                `WhatsApp notification sent for event ${event.type} (integration: ${integrationId})`
-            );
-
-            await this.registerEvent(integrationId, event, 'success', '', {
-                recipient: recipientPhoneNumber,
-                statusCode: response.status,
-            });
-        } catch (error) {
-            this.logger.error(
-                `Failed to send WhatsApp notification for integration ${integrationId}:`,
-                error
-            );
-
-            await this.registerFailure(integrationId, event, error, {
-                recipient: recipientPhoneNumber,
-            });
-        }
+      await this.registerFailure(integrationId, event, error, {
+        recipient: recipientPhoneNumber,
+      });
     }
+  }
 }
 
 export default WhatsAppAddon;

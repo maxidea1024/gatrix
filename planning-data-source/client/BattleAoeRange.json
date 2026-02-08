@@ -3,18 +3,8 @@
     ":type": {
       "id": "key",
       "name": "string",
-      "battleActionRangePath": [
-        "string",
-        "string",
-        "string",
-        "string"
-      ],
-      "battleActionRangeImage": [
-        "string",
-        "string",
-        "string",
-        "string"
-      ],
+      "battleActionRangePath": ["string", "string", "string", "string"],
+      "battleActionRangeImage": ["string", "string", "string", "string"],
       "image": "string",
       "directionAngle": "number",
       "centralAngle": "number",

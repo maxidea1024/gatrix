@@ -1,25 +1,22 @@
-import { Request, Response } from "express";
-import { ChannelModel } from "../models/Channel";
-import { UserPrivacySettingsModel } from "../models/UserPrivacySettings";
-import { redisClient } from "../config/redis";
-import { createLogger } from "../config/logger";
+import { Request, Response } from 'express';
+import { ChannelModel } from '../models/Channel';
+import { UserPrivacySettingsModel } from '../models/UserPrivacySettings';
+import { redisClient } from '../config/redis';
+import { createLogger } from '../config/logger';
 
-const logger = createLogger("DirectMessageController");
+const logger = createLogger('DirectMessageController');
 
 export class DirectMessageController {
   // 1:1 대화 시작 또는 기존 대화 조회
-  static async createOrGetDirectMessage(
-    req: Request,
-    res: Response,
-  ): Promise<void> {
+  static async createOrGetDirectMessage(req: Request, res: Response): Promise<void> {
     try {
       const userId = (req as any).user.id;
       const { targetUserId } = req.body;
 
-      if (!targetUserId || typeof targetUserId !== "number") {
+      if (!targetUserId || typeof targetUserId !== 'number') {
         res.status(400).json({
           success: false,
-          error: "Target user ID is required",
+          error: 'Target user ID is required',
         });
         return;
       }
@@ -28,7 +25,7 @@ export class DirectMessageController {
       if (userId === targetUserId) {
         res.status(400).json({
           success: false,
-          error: "Cannot start a conversation with yourself",
+          error: 'Cannot start a conversation with yourself',
         });
         return;
       }
@@ -46,7 +43,7 @@ export class DirectMessageController {
       if (!targetUser) {
         res.status(404).json({
           success: false,
-          error: "Target user not found",
+          error: 'Target user not found',
         });
         return;
       }
@@ -55,20 +52,19 @@ export class DirectMessageController {
       const dmPermission = await UserPrivacySettingsModel.canInviteUser(
         userId,
         targetUserId,
-        "direct",
+        'direct'
       );
       if (!dmPermission.canInvite) {
-        let errorMessage = "Cannot start a conversation with this user";
+        let errorMessage = 'Cannot start a conversation with this user';
         switch (dmPermission.reason) {
-          case "blocked":
-            errorMessage = "You have been blocked by this user";
+          case 'blocked':
+            errorMessage = 'You have been blocked by this user';
             break;
-          case "policy_nobody":
-            errorMessage = "This user does not accept direct messages";
+          case 'policy_nobody':
+            errorMessage = 'This user does not accept direct messages';
             break;
-          case "policy_contacts_only":
-            errorMessage =
-              "This user only accepts direct messages from contacts";
+          case 'policy_contacts_only':
+            errorMessage = 'This user only accepts direct messages from contacts';
             break;
         }
 
@@ -80,18 +76,17 @@ export class DirectMessageController {
       }
 
       // 기존 1:1 대화 채널이 있는지 확인
-      const existingChannel =
-        await DirectMessageController.findExistingDirectChannel(
-          userId,
-          targetUserId,
-        );
+      const existingChannel = await DirectMessageController.findExistingDirectChannel(
+        userId,
+        targetUserId
+      );
 
       if (existingChannel) {
         // 기존 채널이 있으면 반환
         res.json({
           success: true,
           data: existingChannel,
-          message: "Existing direct message channel found",
+          message: 'Existing direct message channel found',
         });
         return;
       }
@@ -106,13 +101,13 @@ export class DirectMessageController {
             avatar: currentUserData.avatarUrl,
           }
         : null;
-      const channelName = `${currentUser?.name || "User"} & ${targetUser.name}`;
+      const channelName = `${currentUser?.name || 'User'} & ${targetUser.name}`;
 
       const channel = await ChannelModel.create(
         {
           name: channelName,
-          description: "Direct message conversation",
-          type: "direct",
+          description: 'Direct message conversation',
+          type: 'direct',
           maxMembers: 2,
           memberIds: [targetUserId], // 대상 사용자를 멤버로 추가
           settings: {
@@ -124,52 +119,40 @@ export class DirectMessageController {
             autoDeleteMessages: false,
             autoDeleteDays: 0,
             requireApproval: false,
-            allowedFileTypes: [
-              "image/*",
-              "video/*",
-              "audio/*",
-              "application/pdf",
-            ],
+            allowedFileTypes: ['image/*', 'video/*', 'audio/*', 'application/pdf'],
             maxFileSize: 10485760, // 10MB
           },
         },
-        userId,
+        userId
       );
 
       // 대상 사용자에게 새 DM 알림
-      const { BroadcastService } = require("../services/BroadcastService");
+      const { BroadcastService } = require('../services/BroadcastService');
       const broadcastService = BroadcastService.getInstance();
 
-      await broadcastService.broadcastToUser(
-        targetUserId,
-        "new_direct_message",
-        {
-          channelId: channel.id,
-          fromUserId: userId,
-          fromUserName: currentUser?.name || "User",
-          timestamp: Date.now(),
-        },
-      );
+      await broadcastService.broadcastToUser(targetUserId, 'new_direct_message', {
+        channelId: channel.id,
+        fromUserId: userId,
+        fromUserName: currentUser?.name || 'User',
+        timestamp: Date.now(),
+      });
 
       res.status(201).json({
         success: true,
         data: channel,
-        message: "Direct message channel created successfully",
+        message: 'Direct message channel created successfully',
       });
     } catch (error) {
-      logger.error("Failed to create or get direct message:", error);
+      logger.error('Failed to create or get direct message:', error);
       res.status(500).json({
         success: false,
-        error: "Failed to create or get direct message",
+        error: 'Failed to create or get direct message',
       });
     }
   }
 
   // 사용자의 모든 1:1 대화 목록 조회
-  static async getDirectMessageChannels(
-    req: Request,
-    res: Response,
-  ): Promise<void> {
+  static async getDirectMessageChannels(req: Request, res: Response): Promise<void> {
     try {
       const userId = (req as any).user.id;
       const { page = 1, limit = 20 } = req.query;
@@ -186,15 +169,11 @@ export class DirectMessageController {
       const enrichedChannels = await Promise.all(
         channels.channels.map(async (channel: any) => {
           // DM 채널에서 상대방 찾기
-          const otherMember = channel.members?.find(
-            (member: any) => member.userId !== userId,
-          );
+          const otherMember = channel.members?.find((member: any) => member.userId !== userId);
           let otherUser = null;
 
           if (otherMember) {
-            const otherUserData = await redisClient.hgetall(
-              `user:${otherMember.userId}`,
-            );
+            const otherUserData = await redisClient.hgetall(`user:${otherMember.userId}`);
             otherUser = otherUserData.id
               ? {
                   id: parseInt(otherUserData.id),
@@ -216,7 +195,7 @@ export class DirectMessageController {
                 }
               : null,
           };
-        }),
+        })
       );
 
       res.json({
@@ -232,19 +211,16 @@ export class DirectMessageController {
         },
       });
     } catch (error) {
-      logger.error("Failed to get direct message channels:", error);
+      logger.error('Failed to get direct message channels:', error);
       res.status(500).json({
         success: false,
-        error: "Failed to get direct message channels",
+        error: 'Failed to get direct message channels',
       });
     }
   }
 
   // 1:1 대화 채널 아카이브 (삭제 대신)
-  static async archiveDirectMessage(
-    req: Request,
-    res: Response,
-  ): Promise<void> {
+  static async archiveDirectMessage(req: Request, res: Response): Promise<void> {
     try {
       const userId = (req as any).user.id;
       const { channelId } = req.params;
@@ -253,7 +229,7 @@ export class DirectMessageController {
       if (isNaN(channelIdNum)) {
         res.status(400).json({
           success: false,
-          error: "Invalid channel ID",
+          error: 'Invalid channel ID',
         });
         return;
       }
@@ -263,15 +239,15 @@ export class DirectMessageController {
       if (!channel) {
         res.status(404).json({
           success: false,
-          error: "Channel not found",
+          error: 'Channel not found',
         });
         return;
       }
 
-      if (channel.type !== "direct") {
+      if (channel.type !== 'direct') {
         res.status(400).json({
           success: false,
-          error: "This endpoint is only for direct message channels",
+          error: 'This endpoint is only for direct message channels',
         });
         return;
       }
@@ -281,7 +257,7 @@ export class DirectMessageController {
       if (!isMember) {
         res.status(403).json({
           success: false,
-          error: "You are not a member of this channel",
+          error: 'You are not a member of this channel',
         });
         return;
       }
@@ -291,50 +267,44 @@ export class DirectMessageController {
 
       res.json({
         success: true,
-        message: "Direct message channel archived successfully",
+        message: 'Direct message channel archived successfully',
       });
     } catch (error) {
-      logger.error("Failed to archive direct message:", error);
+      logger.error('Failed to archive direct message:', error);
       res.status(500).json({
         success: false,
-        error: "Failed to archive direct message",
+        error: 'Failed to archive direct message',
       });
     }
   }
 
   // 기존 1:1 대화 채널 찾기 (내부 메서드)
-  private static async findExistingDirectChannel(
-    userId1: number,
-    userId2: number,
-  ): Promise<any> {
+  private static async findExistingDirectChannel(userId1: number, userId2: number): Promise<any> {
     try {
       // 두 사용자가 모두 참여한 direct 타입 채널 찾기
-      const knex = ChannelModel["knex"];
+      const knex = ChannelModel['knex'];
 
-      const channel = await knex("chat_channels as c")
-        .select("c.*")
-        .join("chat_channel_members as m1", "c.id", "m1.channelId")
-        .join("chat_channel_members as m2", "c.id", "m2.channelId")
-        .where("c.type", "direct")
-        .where("c.isArchived", false)
-        .where("m1.userId", userId1)
-        .where("m1.status", "active")
-        .where("m2.userId", userId2)
-        .where("m2.status", "active")
+      const channel = await knex('chat_channels as c')
+        .select('c.*')
+        .join('chat_channel_members as m1', 'c.id', 'm1.channelId')
+        .join('chat_channel_members as m2', 'c.id', 'm2.channelId')
+        .where('c.type', 'direct')
+        .where('c.isArchived', false)
+        .where('m1.userId', userId1)
+        .where('m1.status', 'active')
+        .where('m2.userId', userId2)
+        .where('m2.status', 'active')
         .first();
 
       return channel || null;
     } catch (error) {
-      logger.error("Failed to find existing direct channel:", error);
+      logger.error('Failed to find existing direct channel:', error);
       return null;
     }
   }
 
   // 1:1 대화 상대방 온라인 상태 확인
-  static async getDirectMessageStatus(
-    req: Request,
-    res: Response,
-  ): Promise<void> {
+  static async getDirectMessageStatus(req: Request, res: Response): Promise<void> {
     try {
       const userId = (req as any).user.id;
       const { channelId } = req.params;
@@ -343,17 +313,17 @@ export class DirectMessageController {
       if (isNaN(channelIdNum)) {
         res.status(400).json({
           success: false,
-          error: "Invalid channel ID",
+          error: 'Invalid channel ID',
         });
         return;
       }
 
       // 채널 조회 및 권한 확인
       const channel = await ChannelModel.findById(channelIdNum);
-      if (!channel || channel.type !== "direct") {
+      if (!channel || channel.type !== 'direct') {
         res.status(404).json({
           success: false,
-          error: "Direct message channel not found",
+          error: 'Direct message channel not found',
         });
         return;
       }
@@ -362,7 +332,7 @@ export class DirectMessageController {
       if (!isMember) {
         res.status(403).json({
           success: false,
-          error: "You are not a member of this channel",
+          error: 'You are not a member of this channel',
         });
         return;
       }
@@ -374,13 +344,13 @@ export class DirectMessageController {
       if (!otherMember) {
         res.status(404).json({
           success: false,
-          error: "Other user not found",
+          error: 'Other user not found',
         });
         return;
       }
 
       // 실제 온라인 상태 확인 로직 구현
-      const { redisManager } = require("../config/redis");
+      const { redisManager } = require('../config/redis');
       const redisClient = redisManager.getClient();
 
       let isOnline = false;
@@ -388,17 +358,13 @@ export class DirectMessageController {
 
       try {
         // Redis에서 사용자 상태 확인
-        const userStatus = await redisClient.hgetall(
-          `user:${otherMember.userId}`,
-        );
+        const userStatus = await redisClient.hgetall(`user:${otherMember.userId}`);
         if (userStatus && userStatus.status) {
-          isOnline = userStatus.status === "online";
-          lastSeen = userStatus.lastSeen
-            ? new Date(parseInt(userStatus.lastSeen))
-            : null;
+          isOnline = userStatus.status === 'online';
+          lastSeen = userStatus.lastSeen ? new Date(parseInt(userStatus.lastSeen)) : null;
         }
       } catch (error) {
-        logger.warn("Failed to get user status from Redis:", error);
+        logger.warn('Failed to get user status from Redis:', error);
       }
 
       res.json({
@@ -410,10 +376,10 @@ export class DirectMessageController {
         },
       });
     } catch (error) {
-      logger.error("Failed to get direct message status:", error);
+      logger.error('Failed to get direct message status:', error);
       res.status(500).json({
         success: false,
-        error: "Failed to get direct message status",
+        error: 'Failed to get direct message status',
       });
     }
   }

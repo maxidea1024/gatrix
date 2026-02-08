@@ -16,11 +16,7 @@ const sidebars: SidebarsConfig = {
     {
       type: 'category',
       label: 'Feature Flags',
-      items: [
-        'features/feature-flags',
-        'features/segments',
-        'features/environments',
-      ],
+      items: ['features/feature-flags', 'features/segments', 'features/environments'],
     },
     {
       type: 'category',
@@ -60,27 +56,17 @@ const sidebars: SidebarsConfig = {
     {
       type: 'category',
       label: 'SDKs',
-      items: [
-        'sdks/server-side',
-        'sdks/client-side',
-        'sdks/game-engines',
-      ],
+      items: ['sdks/server-side', 'sdks/client-side', 'sdks/game-engines'],
     },
     {
       type: 'category',
       label: 'API Reference',
-      items: [
-        'api/client-api',
-        'api/server-sdk-api',
-      ],
+      items: ['api/client-api', 'api/server-sdk-api'],
     },
     {
       type: 'category',
       label: 'Deployment',
-      items: [
-        'deployment/docker',
-        'deployment/edge-server',
-      ],
+      items: ['deployment/docker', 'deployment/edge-server'],
     },
   ],
 };

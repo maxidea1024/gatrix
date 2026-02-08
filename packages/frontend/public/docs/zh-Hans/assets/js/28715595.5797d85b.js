@@ -1,1 +1,282 @@
-"use strict";(globalThis.webpackChunkdocs=globalThis.webpackChunkdocs||[]).push([[8633],{5999(e,n,l){l.r(n),l.d(n,{assets:()=>c,contentTitle:()=>t,default:()=>x,frontMatter:()=>r,metadata:()=>i,toc:()=>h});const i=JSON.parse('{"id":"guide/planning-data","title":"\u7b56\u5212\u6570\u636e","description":"\u6982\u8ff0","source":"@site/i18n/zh-Hans/docusaurus-plugin-content-docs/current/guide/planning-data.md","sourceDirName":"guide","slug":"/guide/planning-data","permalink":"/docs/zh-Hans/guide/planning-data","draft":false,"unlisted":false,"editUrl":"https://github.com/your-org/gatrix/tree/main/docs/docs/guide/planning-data.md","tags":[],"version":"current","sidebarPosition":7,"frontMatter":{"sidebar_position":7,"sidebar_label":"\u7b56\u5212\u6570\u636e"},"sidebar":"tutorialSidebar","previous":{"title":"\u5e7f\u544a\u6a2a\u5e45","permalink":"/docs/zh-Hans/guide/banners"},"next":{"title":"\u7ef4\u62a4\u7ba1\u7406","permalink":"/docs/zh-Hans/admin/maintenance"}}');var s=l(4848),d=l(8453);const r={sidebar_position:7,sidebar_label:"\u7b56\u5212\u6570\u636e"},t="\u7b56\u5212\u6570\u636e",c={},h=[{value:"\u6982\u8ff0",id:"\u6982\u8ff0",level:2},{value:"\u529f\u80fd",id:"\u529f\u80fd",level:2},{value:"\u4f7f\u7528\u573a\u666f",id:"\u4f7f\u7528\u573a\u666f",level:2},{value:"\u521b\u5efa\u7b56\u5212\u6570\u636e\u7684\u65b9\u6cd5",id:"\u521b\u5efa\u7b56\u5212\u6570\u636e\u7684\u65b9\u6cd5",level:2},{value:"\u793a\u4f8b",id:"\u793a\u4f8b",level:2},{value:"API \u8bbf\u95ee",id:"api-\u8bbf\u95ee",level:2}];function a(e){const n={code:"code",h1:"h1",h2:"h2",header:"header",li:"li",ol:"ol",p:"p",pre:"pre",strong:"strong",table:"table",tbody:"tbody",td:"td",th:"th",thead:"thead",tr:"tr",ul:"ul",...(0,d.R)(),...e.components};return(0,s.jsxs)(s.Fragment,{children:[(0,s.jsx)(n.header,{children:(0,s.jsx)(n.h1,{id:"\u7b56\u5212\u6570\u636e",children:"\u7b56\u5212\u6570\u636e"})}),"\n",(0,s.jsx)(n.h2,{id:"\u6982\u8ff0",children:"\u6982\u8ff0"}),"\n",(0,s.jsx)(n.p,{children:"\u7ba1\u7406\u6e38\u620f\u5e73\u8861\u548c\u914d\u7f6e\u6570\u636e\uff08\u6e38\u620f\u7b56\u5212\u6570\u636e\uff09\u3002"}),"\n",(0,s.jsxs)(n.p,{children:[(0,s.jsx)(n.strong,{children:"\u8bbf\u95ee\u8def\u5f84\uff1a"})," \u6e38\u620f\u8fd0\u8425 \u2192 \u7b56\u5212\u6570\u636e"]}),"\n",(0,s.jsx)(n.h2,{id:"\u529f\u80fd",children:"\u529f\u80fd"}),"\n",(0,s.jsxs)(n.ul,{children:["\n",(0,s.jsx)(n.li,{children:"\u5b58\u50a8 JSON \u683c\u5f0f\u7684\u914d\u7f6e\u6570\u636e"}),"\n",(0,s.jsx)(n.li,{children:"\u914d\u7f6e\u6587\u4ef6\u7248\u672c\u63a7\u5236"}),"\n",(0,s.jsx)(n.li,{children:"\u9488\u5bf9\u4e0d\u540c\u73af\u5883\u7684\u6570\u503c\u8bbe\u7f6e"}),"\n",(0,s.jsx)(n.li,{children:"\u65e0\u9700\u53d1\u5e03\u5373\u53ef\u5373\u65f6\u66f4\u65b0"}),"\n"]}),"\n",(0,s.jsx)(n.h2,{id:"\u4f7f\u7528\u573a\u666f",children:"\u4f7f\u7528\u573a\u666f"}),"\n",(0,s.jsxs)(n.ul,{children:["\n",(0,s.jsx)(n.li,{children:"\u6e38\u620f\u6570\u503c\u5e73\u8861\u53c2\u6570"}),"\n",(0,s.jsx)(n.li,{children:"\u7b49\u7ea7\u7ecf\u9a8c\u9700\u6c42"}),"\n",(0,s.jsx)(n.li,{children:"\u9053\u5177\u6389\u843d\u7387"}),"\n",(0,s.jsx)(n.li,{children:"\u6d3b\u52a8\u914d\u7f6e"}),"\n",(0,s.jsx)(n.li,{children:"\u5b63\u8282\u6027\u8bbe\u7f6e"}),"\n"]}),"\n",(0,s.jsx)(n.h2,{id:"\u521b\u5efa\u7b56\u5212\u6570\u636e\u7684\u65b9\u6cd5",children:"\u521b\u5efa\u7b56\u5212\u6570\u636e\u7684\u65b9\u6cd5"}),"\n",(0,s.jsxs)(n.ol,{children:["\n",(0,s.jsxs)(n.li,{children:["\u524d\u5f80 ",(0,s.jsx)(n.strong,{children:"\u6e38\u620f\u8fd0\u8425"})," > ",(0,s.jsx)(n.strong,{children:"\u7b56\u5212\u6570\u636e"}),"\u3002"]}),"\n",(0,s.jsxs)(n.li,{children:["\u70b9\u51fb ",(0,s.jsx)(n.strong,{children:"\u6dfb\u52a0\u6570\u636e"})," \u6309\u94ae\u3002"]}),"\n",(0,s.jsx)(n.li,{children:"\u914d\u7f6e\u5982\u4e0b\uff1a"}),"\n"]}),"\n",(0,s.jsxs)(n.table,{children:[(0,s.jsx)(n.thead,{children:(0,s.jsxs)(n.tr,{children:[(0,s.jsx)(n.th,{children:"\u5b57\u6bb5"}),(0,s.jsx)(n.th,{children:"\u7c7b\u578b"}),(0,s.jsx)(n.th,{children:"\u662f\u5426\u5fc5\u586b"}),(0,s.jsx)(n.th,{children:"\u8bf4\u660e"})]})}),(0,s.jsxs)(n.tbody,{children:[(0,s.jsxs)(n.tr,{children:[(0,s.jsx)(n.td,{children:"\u952e (Key)"}),(0,s.jsx)(n.td,{children:"\u6587\u672c"}),(0,s.jsx)(n.td,{children:"\u5fc5\u586b"}),(0,s.jsx)(n.td,{children:"\u552f\u4e00\u7684\u6570\u636e\u952e\u540d"})]}),(0,s.jsxs)(n.tr,{children:[(0,s.jsx)(n.td,{children:"\u540d\u79f0"}),(0,s.jsx)(n.td,{children:"\u6587\u672c"}),(0,s.jsx)(n.td,{children:"\u5fc5\u586b"}),(0,s.jsx)(n.td,{children:"\u663e\u793a\u540d\u79f0"})]}),(0,s.jsxs)(n.tr,{children:[(0,s.jsx)(n.td,{children:"\u8bf4\u660e"}),(0,s.jsx)(n.td,{children:"\u6587\u672c\u57df"}),(0,s.jsx)(n.td,{children:"-"}),(0,s.jsx)(n.td,{children:"\u7ba1\u7406\u5458\u5907\u6ce8"})]}),(0,s.jsxs)(n.tr,{children:[(0,s.jsx)(n.td,{children:"\u6570\u636e"}),(0,s.jsx)(n.td,{children:"JSON \u7f16\u8f91\u5668"}),(0,s.jsx)(n.td,{children:"\u5fc5\u586b"}),(0,s.jsx)(n.td,{children:"\u914d\u7f6e\u6570\u636e\u5185\u5bb9"})]}),(0,s.jsxs)(n.tr,{children:[(0,s.jsx)(n.td,{children:"\u73af\u5883"}),(0,s.jsx)(n.td,{children:"\u4e0b\u62c9\u9009\u62e9"}),(0,s.jsx)(n.td,{children:"-"}),(0,s.jsx)(n.td,{children:"\u76ee\u6807\u73af\u5883"})]})]})]}),"\n",(0,s.jsxs)(n.ol,{start:"4",children:["\n",(0,s.jsxs)(n.li,{children:["\u70b9\u51fb ",(0,s.jsx)(n.strong,{children:"\u521b\u5efa"})," \u4fdd\u5b58\u3002"]}),"\n"]}),"\n",(0,s.jsx)(n.h2,{id:"\u793a\u4f8b",children:"\u793a\u4f8b"}),"\n",(0,s.jsx)(n.pre,{children:(0,s.jsx)(n.code,{className:"language-json",children:'{\r\n  "key": "level_requirements",\r\n  "data": {\r\n    "levels": [\r\n      { "level": 1, "exp": 0 },\r\n      { "level": 2, "exp": 100 },\r\n      { "level": 3, "exp": 300 },\r\n      { "level": 4, "exp": 600 },\r\n      { "level": 5, "exp": 1000 }\r\n    ]\r\n  }\r\n}\n'})}),"\n",(0,s.jsx)(n.h2,{id:"api-\u8bbf\u95ee",children:"API \u8bbf\u95ee"}),"\n",(0,s.jsx)(n.pre,{children:(0,s.jsx)(n.code,{className:"language-bash",children:"GET /api/v1/planning-data/:key\n"})})]})}function x(e={}){const{wrapper:n}={...(0,d.R)(),...e.components};return n?(0,s.jsx)(n,{...e,children:(0,s.jsx)(a,{...e})}):a(e)}},8453(e,n,l){l.d(n,{R:()=>r,x:()=>t});var i=l(6540);const s={},d=i.createContext(s);function r(e){const n=i.useContext(d);return i.useMemo(function(){return"function"==typeof e?e(n):{...n,...e}},[n,e])}function t(e){let n;return n=e.disableParentContext?"function"==typeof e.components?e.components(s):e.components||s:r(e.components),i.createElement(d.Provider,{value:n},e.children)}}}]);
+'use strict';
+(globalThis.webpackChunkdocs = globalThis.webpackChunkdocs || []).push([
+  [8633],
+  {
+    5999(e, n, l) {
+      (l.r(n),
+        l.d(n, {
+          assets: () => c,
+          contentTitle: () => t,
+          default: () => x,
+          frontMatter: () => r,
+          metadata: () => i,
+          toc: () => h,
+        }));
+      const i = JSON.parse(
+        '{"id":"guide/planning-data","title":"\u7b56\u5212\u6570\u636e","description":"\u6982\u8ff0","source":"@site/i18n/zh-Hans/docusaurus-plugin-content-docs/current/guide/planning-data.md","sourceDirName":"guide","slug":"/guide/planning-data","permalink":"/docs/zh-Hans/guide/planning-data","draft":false,"unlisted":false,"editUrl":"https://github.com/your-org/gatrix/tree/main/docs/docs/guide/planning-data.md","tags":[],"version":"current","sidebarPosition":7,"frontMatter":{"sidebar_position":7,"sidebar_label":"\u7b56\u5212\u6570\u636e"},"sidebar":"tutorialSidebar","previous":{"title":"\u5e7f\u544a\u6a2a\u5e45","permalink":"/docs/zh-Hans/guide/banners"},"next":{"title":"\u7ef4\u62a4\u7ba1\u7406","permalink":"/docs/zh-Hans/admin/maintenance"}}'
+      );
+      var s = l(4848),
+        d = l(8453);
+      const r = { sidebar_position: 7, sidebar_label: '\u7b56\u5212\u6570\u636e' },
+        t = '\u7b56\u5212\u6570\u636e',
+        c = {},
+        h = [
+          { value: '\u6982\u8ff0', id: '\u6982\u8ff0', level: 2 },
+          { value: '\u529f\u80fd', id: '\u529f\u80fd', level: 2 },
+          { value: '\u4f7f\u7528\u573a\u666f', id: '\u4f7f\u7528\u573a\u666f', level: 2 },
+          {
+            value: '\u521b\u5efa\u7b56\u5212\u6570\u636e\u7684\u65b9\u6cd5',
+            id: '\u521b\u5efa\u7b56\u5212\u6570\u636e\u7684\u65b9\u6cd5',
+            level: 2,
+          },
+          { value: '\u793a\u4f8b', id: '\u793a\u4f8b', level: 2 },
+          { value: 'API \u8bbf\u95ee', id: 'api-\u8bbf\u95ee', level: 2 },
+        ];
+      function a(e) {
+        const n = {
+          code: 'code',
+          h1: 'h1',
+          h2: 'h2',
+          header: 'header',
+          li: 'li',
+          ol: 'ol',
+          p: 'p',
+          pre: 'pre',
+          strong: 'strong',
+          table: 'table',
+          tbody: 'tbody',
+          td: 'td',
+          th: 'th',
+          thead: 'thead',
+          tr: 'tr',
+          ul: 'ul',
+          ...(0, d.R)(),
+          ...e.components,
+        };
+        return (0, s.jsxs)(s.Fragment, {
+          children: [
+            (0, s.jsx)(n.header, {
+              children: (0, s.jsx)(n.h1, {
+                id: '\u7b56\u5212\u6570\u636e',
+                children: '\u7b56\u5212\u6570\u636e',
+              }),
+            }),
+            '\n',
+            (0, s.jsx)(n.h2, { id: '\u6982\u8ff0', children: '\u6982\u8ff0' }),
+            '\n',
+            (0, s.jsx)(n.p, {
+              children:
+                '\u7ba1\u7406\u6e38\u620f\u5e73\u8861\u548c\u914d\u7f6e\u6570\u636e\uff08\u6e38\u620f\u7b56\u5212\u6570\u636e\uff09\u3002',
+            }),
+            '\n',
+            (0, s.jsxs)(n.p, {
+              children: [
+                (0, s.jsx)(n.strong, { children: '\u8bbf\u95ee\u8def\u5f84\uff1a' }),
+                ' \u6e38\u620f\u8fd0\u8425 \u2192 \u7b56\u5212\u6570\u636e',
+              ],
+            }),
+            '\n',
+            (0, s.jsx)(n.h2, { id: '\u529f\u80fd', children: '\u529f\u80fd' }),
+            '\n',
+            (0, s.jsxs)(n.ul, {
+              children: [
+                '\n',
+                (0, s.jsx)(n.li, {
+                  children: '\u5b58\u50a8 JSON \u683c\u5f0f\u7684\u914d\u7f6e\u6570\u636e',
+                }),
+                '\n',
+                (0, s.jsx)(n.li, { children: '\u914d\u7f6e\u6587\u4ef6\u7248\u672c\u63a7\u5236' }),
+                '\n',
+                (0, s.jsx)(n.li, {
+                  children: '\u9488\u5bf9\u4e0d\u540c\u73af\u5883\u7684\u6570\u503c\u8bbe\u7f6e',
+                }),
+                '\n',
+                (0, s.jsx)(n.li, {
+                  children: '\u65e0\u9700\u53d1\u5e03\u5373\u53ef\u5373\u65f6\u66f4\u65b0',
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, s.jsx)(n.h2, {
+              id: '\u4f7f\u7528\u573a\u666f',
+              children: '\u4f7f\u7528\u573a\u666f',
+            }),
+            '\n',
+            (0, s.jsxs)(n.ul, {
+              children: [
+                '\n',
+                (0, s.jsx)(n.li, { children: '\u6e38\u620f\u6570\u503c\u5e73\u8861\u53c2\u6570' }),
+                '\n',
+                (0, s.jsx)(n.li, { children: '\u7b49\u7ea7\u7ecf\u9a8c\u9700\u6c42' }),
+                '\n',
+                (0, s.jsx)(n.li, { children: '\u9053\u5177\u6389\u843d\u7387' }),
+                '\n',
+                (0, s.jsx)(n.li, { children: '\u6d3b\u52a8\u914d\u7f6e' }),
+                '\n',
+                (0, s.jsx)(n.li, { children: '\u5b63\u8282\u6027\u8bbe\u7f6e' }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, s.jsx)(n.h2, {
+              id: '\u521b\u5efa\u7b56\u5212\u6570\u636e\u7684\u65b9\u6cd5',
+              children: '\u521b\u5efa\u7b56\u5212\u6570\u636e\u7684\u65b9\u6cd5',
+            }),
+            '\n',
+            (0, s.jsxs)(n.ol, {
+              children: [
+                '\n',
+                (0, s.jsxs)(n.li, {
+                  children: [
+                    '\u524d\u5f80 ',
+                    (0, s.jsx)(n.strong, { children: '\u6e38\u620f\u8fd0\u8425' }),
+                    ' > ',
+                    (0, s.jsx)(n.strong, { children: '\u7b56\u5212\u6570\u636e' }),
+                    '\u3002',
+                  ],
+                }),
+                '\n',
+                (0, s.jsxs)(n.li, {
+                  children: [
+                    '\u70b9\u51fb ',
+                    (0, s.jsx)(n.strong, { children: '\u6dfb\u52a0\u6570\u636e' }),
+                    ' \u6309\u94ae\u3002',
+                  ],
+                }),
+                '\n',
+                (0, s.jsx)(n.li, { children: '\u914d\u7f6e\u5982\u4e0b\uff1a' }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, s.jsxs)(n.table, {
+              children: [
+                (0, s.jsx)(n.thead, {
+                  children: (0, s.jsxs)(n.tr, {
+                    children: [
+                      (0, s.jsx)(n.th, { children: '\u5b57\u6bb5' }),
+                      (0, s.jsx)(n.th, { children: '\u7c7b\u578b' }),
+                      (0, s.jsx)(n.th, { children: '\u662f\u5426\u5fc5\u586b' }),
+                      (0, s.jsx)(n.th, { children: '\u8bf4\u660e' }),
+                    ],
+                  }),
+                }),
+                (0, s.jsxs)(n.tbody, {
+                  children: [
+                    (0, s.jsxs)(n.tr, {
+                      children: [
+                        (0, s.jsx)(n.td, { children: '\u952e (Key)' }),
+                        (0, s.jsx)(n.td, { children: '\u6587\u672c' }),
+                        (0, s.jsx)(n.td, { children: '\u5fc5\u586b' }),
+                        (0, s.jsx)(n.td, {
+                          children: '\u552f\u4e00\u7684\u6570\u636e\u952e\u540d',
+                        }),
+                      ],
+                    }),
+                    (0, s.jsxs)(n.tr, {
+                      children: [
+                        (0, s.jsx)(n.td, { children: '\u540d\u79f0' }),
+                        (0, s.jsx)(n.td, { children: '\u6587\u672c' }),
+                        (0, s.jsx)(n.td, { children: '\u5fc5\u586b' }),
+                        (0, s.jsx)(n.td, { children: '\u663e\u793a\u540d\u79f0' }),
+                      ],
+                    }),
+                    (0, s.jsxs)(n.tr, {
+                      children: [
+                        (0, s.jsx)(n.td, { children: '\u8bf4\u660e' }),
+                        (0, s.jsx)(n.td, { children: '\u6587\u672c\u57df' }),
+                        (0, s.jsx)(n.td, { children: '-' }),
+                        (0, s.jsx)(n.td, { children: '\u7ba1\u7406\u5458\u5907\u6ce8' }),
+                      ],
+                    }),
+                    (0, s.jsxs)(n.tr, {
+                      children: [
+                        (0, s.jsx)(n.td, { children: '\u6570\u636e' }),
+                        (0, s.jsx)(n.td, { children: 'JSON \u7f16\u8f91\u5668' }),
+                        (0, s.jsx)(n.td, { children: '\u5fc5\u586b' }),
+                        (0, s.jsx)(n.td, { children: '\u914d\u7f6e\u6570\u636e\u5185\u5bb9' }),
+                      ],
+                    }),
+                    (0, s.jsxs)(n.tr, {
+                      children: [
+                        (0, s.jsx)(n.td, { children: '\u73af\u5883' }),
+                        (0, s.jsx)(n.td, { children: '\u4e0b\u62c9\u9009\u62e9' }),
+                        (0, s.jsx)(n.td, { children: '-' }),
+                        (0, s.jsx)(n.td, { children: '\u76ee\u6807\u73af\u5883' }),
+                      ],
+                    }),
+                  ],
+                }),
+              ],
+            }),
+            '\n',
+            (0, s.jsxs)(n.ol, {
+              start: '4',
+              children: [
+                '\n',
+                (0, s.jsxs)(n.li, {
+                  children: [
+                    '\u70b9\u51fb ',
+                    (0, s.jsx)(n.strong, { children: '\u521b\u5efa' }),
+                    ' \u4fdd\u5b58\u3002',
+                  ],
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, s.jsx)(n.h2, { id: '\u793a\u4f8b', children: '\u793a\u4f8b' }),
+            '\n',
+            (0, s.jsx)(n.pre, {
+              children: (0, s.jsx)(n.code, {
+                className: 'language-json',
+                children:
+                  '{\r\n  "key": "level_requirements",\r\n  "data": {\r\n    "levels": [\r\n      { "level": 1, "exp": 0 },\r\n      { "level": 2, "exp": 100 },\r\n      { "level": 3, "exp": 300 },\r\n      { "level": 4, "exp": 600 },\r\n      { "level": 5, "exp": 1000 }\r\n    ]\r\n  }\r\n}\n',
+              }),
+            }),
+            '\n',
+            (0, s.jsx)(n.h2, { id: 'api-\u8bbf\u95ee', children: 'API \u8bbf\u95ee' }),
+            '\n',
+            (0, s.jsx)(n.pre, {
+              children: (0, s.jsx)(n.code, {
+                className: 'language-bash',
+                children: 'GET /api/v1/planning-data/:key\n',
+              }),
+            }),
+          ],
+        });
+      }
+      function x(e = {}) {
+        const { wrapper: n } = { ...(0, d.R)(), ...e.components };
+        return n ? (0, s.jsx)(n, { ...e, children: (0, s.jsx)(a, { ...e }) }) : a(e);
+      }
+    },
+    8453(e, n, l) {
+      l.d(n, { R: () => r, x: () => t });
+      var i = l(6540);
+      const s = {},
+        d = i.createContext(s);
+      function r(e) {
+        const n = i.useContext(d);
+        return i.useMemo(
+          function () {
+            return 'function' == typeof e ? e(n) : { ...n, ...e };
+          },
+          [n, e]
+        );
+      }
+      function t(e) {
+        let n;
+        return (
+          (n = e.disableParentContext
+            ? 'function' == typeof e.components
+              ? e.components(s)
+              : e.components || s
+            : r(e.components)),
+          i.createElement(d.Provider, { value: n }, e.children)
+        );
+      }
+    },
+  },
+]);

@@ -34,10 +34,10 @@ export const eventSchema = z.object({
   deviceId: z.string(),
   sessionId: z.string(),
   timestamp: z.string().datetime(),
-  
+
   // 선택 필드
   profileId: z.string().optional(),
-  
+
   // 디바이스 정보
   country: z.string().optional(),
   city: z.string().optional(),
@@ -49,24 +49,24 @@ export const eventSchema = z.object({
   device: z.enum(['desktop', 'mobile', 'tablet']).optional(),
   brand: z.string().optional(),
   model: z.string().optional(),
-  
+
   // 페이지 정보
   path: z.string().optional(),
   origin: z.string().optional(),
   referrer: z.string().optional(),
   referrerName: z.string().optional(),
   referrerType: z.enum(['direct', 'search', 'social', 'email', 'ad', 'other']).optional(),
-  
+
   // UTM 파라미터
   utmSource: z.string().optional(),
   utmMedium: z.string().optional(),
   utmCampaign: z.string().optional(),
   utmTerm: z.string().optional(),
   utmContent: z.string().optional(),
-  
+
   // 커스텀 속성
   properties: z.record(z.any()).optional(),
-  
+
   // 세션 메트릭
   duration: z.number().optional(),
   screenViews: z.number().optional(),
@@ -100,16 +100,16 @@ export class EventNormalizer {
   normalize(rawEvent: any): Event {
     // 1. 타임스탬프 정규화
     const timestamp = this.normalizeTimestamp(rawEvent.timestamp);
-    
+
     // 2. 경로 정규화 (쿼리 파라미터 제거 옵션)
     const path = this.normalizePath(rawEvent.path);
-    
+
     // 3. Referrer 분류
     const { referrerName, referrerType } = this.classifyReferrer(rawEvent.referrer);
-    
+
     // 4. 속성 정리 (예약어 제거, 타입 변환)
     const properties = this.sanitizeProperties(rawEvent.properties);
-    
+
     return {
       ...rawEvent,
       timestamp,
@@ -119,28 +119,28 @@ export class EventNormalizer {
       properties: JSON.stringify(properties),
     };
   }
-  
+
   private normalizeTimestamp(timestamp?: string): string {
     if (!timestamp) {
       return new Date().toISOString();
     }
-    
+
     const date = new Date(timestamp);
     if (isNaN(date.getTime())) {
       return new Date().toISOString();
     }
-    
+
     return date.toISOString();
   }
-  
+
   private normalizePath(path?: string): string {
     if (!path) return '/';
-    
+
     // 쿼리 파라미터 제거
     const url = new URL(path, 'http://dummy.com');
     return url.pathname;
   }
-  
+
   private classifyReferrer(referrer?: string): {
     referrerName: string | null;
     referrerType: string | null;
@@ -148,41 +148,41 @@ export class EventNormalizer {
     if (!referrer) {
       return { referrerName: null, referrerType: 'direct' };
     }
-    
+
     const url = new URL(referrer);
     const hostname = url.hostname;
-    
+
     // 검색 엔진
     const searchEngines = ['google', 'bing', 'yahoo', 'duckduckgo', 'baidu'];
-    if (searchEngines.some(engine => hostname.includes(engine))) {
+    if (searchEngines.some((engine) => hostname.includes(engine))) {
       return { referrerName: hostname, referrerType: 'search' };
     }
-    
+
     // 소셜 미디어
     const socialMedia = ['facebook', 'twitter', 'linkedin', 'instagram', 'reddit'];
-    if (socialMedia.some(social => hostname.includes(social))) {
+    if (socialMedia.some((social) => hostname.includes(social))) {
       return { referrerName: hostname, referrerType: 'social' };
     }
-    
+
     // 광고
     if (url.searchParams.has('utm_source') || url.searchParams.has('gclid')) {
       return { referrerName: hostname, referrerType: 'ad' };
     }
-    
+
     return { referrerName: hostname, referrerType: 'other' };
   }
-  
+
   private sanitizeProperties(properties?: Record<string, any>): Record<string, any> {
     if (!properties) return {};
-    
+
     const sanitized: Record<string, any> = {};
-    
+
     // 예약어 제거
     const reservedKeys = ['id', 'projectId', 'deviceId', 'sessionId', 'timestamp'];
-    
+
     for (const [key, value] of Object.entries(properties)) {
       if (reservedKeys.includes(key)) continue;
-      
+
       // 값 타입 변환
       if (typeof value === 'object' && value !== null) {
         sanitized[key] = JSON.stringify(value);
@@ -190,7 +190,7 @@ export class EventNormalizer {
         sanitized[key] = value;
       }
     }
-    
+
     return sanitized;
   }
 }
@@ -210,33 +210,33 @@ export class SessionManager {
   private lastActivityTime: number = 0;
   private screenViewCount: number = 0;
   private sessionTimeout: number = 30 * 60 * 1000; // 30분
-  
+
   constructor(private storage: Storage = localStorage) {
     this.loadSession();
   }
-  
+
   getSessionId(): string {
     if (!this.sessionId || this.isSessionExpired()) {
       this.createNewSession();
     }
-    
+
     this.updateActivity();
     return this.sessionId!;
   }
-  
+
   trackScreenView() {
     this.screenViewCount++;
     this.saveSession();
   }
-  
+
   getSessionDuration(): number {
     return Date.now() - this.sessionStartTime;
   }
-  
+
   getScreenViewCount(): number {
     return this.screenViewCount;
   }
-  
+
   private createNewSession() {
     this.sessionId = this.generateSessionId();
     this.sessionStartTime = Date.now();
@@ -244,16 +244,16 @@ export class SessionManager {
     this.screenViewCount = 0;
     this.saveSession();
   }
-  
+
   private isSessionExpired(): boolean {
     return Date.now() - this.lastActivityTime > this.sessionTimeout;
   }
-  
+
   private updateActivity() {
     this.lastActivityTime = Date.now();
     this.saveSession();
   }
-  
+
   private loadSession() {
     try {
       const stored = this.storage.getItem('op_session');
@@ -268,20 +268,23 @@ export class SessionManager {
       console.error('Failed to load session:', error);
     }
   }
-  
+
   private saveSession() {
     try {
-      this.storage.setItem('op_session', JSON.stringify({
-        id: this.sessionId,
-        startTime: this.sessionStartTime,
-        lastActivity: this.lastActivityTime,
-        screenViews: this.screenViewCount,
-      }));
+      this.storage.setItem(
+        'op_session',
+        JSON.stringify({
+          id: this.sessionId,
+          startTime: this.sessionStartTime,
+          lastActivity: this.lastActivityTime,
+          screenViews: this.screenViewCount,
+        })
+      );
     } catch (error) {
       console.error('Failed to save session:', error);
     }
   }
-  
+
   private generateSessionId(): string {
     return `${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
   }
@@ -314,43 +317,45 @@ export class SessionAggregator {
         AND sessionId = {sessionId:String}
       GROUP BY sessionId
     `;
-    
+
     const result = await clickhouse.query({
       query,
       query_params: { projectId, sessionId },
     });
-    
+
     const session = await result.json();
-    
+
     // 세션 메트릭 업데이트
     await this.updateSessionMetrics(session);
-    
+
     return session;
   }
-  
+
   private async updateSessionMetrics(session: any) {
     // 이탈률 계산 (1페이지만 본 경우)
     const isBounce = session.screen_views === 1;
-    
+
     // 세션 테이블에 저장 (또는 업데이트)
     await clickhouse.insert({
       table: 'sessions',
-      values: [{
-        sessionId: session.sessionId,
-        projectId: session.projectId,
-        deviceId: session.device_id,
-        profileId: session.profile_id,
-        startTime: session.start_time,
-        endTime: session.end_time,
-        duration: session.duration,
-        screenViews: session.screen_views,
-        isBounce,
-        country: session.country,
-        city: session.city,
-        browser: session.browser,
-        os: session.os,
-        referrer: session.referrer,
-      }],
+      values: [
+        {
+          sessionId: session.sessionId,
+          projectId: session.projectId,
+          deviceId: session.device_id,
+          profileId: session.profile_id,
+          startTime: session.start_time,
+          endTime: session.end_time,
+          duration: session.duration,
+          screenViews: session.screen_views,
+          isBounce,
+          country: session.country,
+          city: session.city,
+          browser: session.browser,
+          os: session.os,
+          referrer: session.referrer,
+        },
+      ],
     });
   }
 }
@@ -367,10 +372,10 @@ export class SessionAggregator {
 export class ProfileWorker {
   async identifyProfile(params: IdentifyParams) {
     const { projectId, profileId, deviceId, properties } = params;
-    
+
     // 1. 기존 프로필 조회
     const existingProfile = await this.getProfile(projectId, profileId);
-    
+
     if (existingProfile) {
       // 2. 프로필 업데이트
       await this.updateProfile(projectId, profileId, properties);
@@ -378,14 +383,14 @@ export class ProfileWorker {
       // 3. 새 프로필 생성
       await this.createProfile(projectId, profileId, deviceId, properties);
     }
-    
+
     // 4. 디바이스와 프로필 연결
     await this.linkDeviceToProfile(projectId, deviceId, profileId);
-    
+
     // 5. 과거 이벤트에 프로필 ID 업데이트
     await this.backfillProfileId(projectId, deviceId, profileId);
   }
-  
+
   private async getProfile(projectId: string, profileId: string) {
     const query = `
       SELECT *
@@ -395,16 +400,16 @@ export class ProfileWorker {
       ORDER BY createdAt DESC
       LIMIT 1
     `;
-    
+
     const result = await clickhouse.query({
       query,
       query_params: { projectId, profileId },
     });
-    
+
     const rows = await result.json();
     return rows[0] || null;
   }
-  
+
   private async updateProfile(
     projectId: string,
     profileId: string,
@@ -414,16 +419,18 @@ export class ProfileWorker {
     // ReplacingMergeTree를 사용하여 새 행 삽입
     await clickhouse.insert({
       table: 'profiles',
-      values: [{
-        projectId,
-        profileId,
-        ...properties,
-        lastSeenAt: new Date().toISOString(),
-        createdAt: new Date().toISOString(),
-      }],
+      values: [
+        {
+          projectId,
+          profileId,
+          ...properties,
+          lastSeenAt: new Date().toISOString(),
+          createdAt: new Date().toISOString(),
+        },
+      ],
     });
   }
-  
+
   private async createProfile(
     projectId: string,
     profileId: string,
@@ -432,22 +439,20 @@ export class ProfileWorker {
   ) {
     await clickhouse.insert({
       table: 'profiles',
-      values: [{
-        projectId,
-        profileId,
-        ...properties,
-        firstSeenAt: new Date().toISOString(),
-        lastSeenAt: new Date().toISOString(),
-        createdAt: new Date().toISOString(),
-      }],
+      values: [
+        {
+          projectId,
+          profileId,
+          ...properties,
+          firstSeenAt: new Date().toISOString(),
+          lastSeenAt: new Date().toISOString(),
+          createdAt: new Date().toISOString(),
+        },
+      ],
     });
   }
-  
-  private async linkDeviceToProfile(
-    projectId: string,
-    deviceId: string,
-    profileId: string
-  ) {
+
+  private async linkDeviceToProfile(projectId: string, deviceId: string, profileId: string) {
     await redis.set(
       `device:${projectId}:${deviceId}:profile`,
       profileId,
@@ -455,12 +460,8 @@ export class ProfileWorker {
       86400 * 365 // 1년
     );
   }
-  
-  private async backfillProfileId(
-    projectId: string,
-    deviceId: string,
-    profileId: string
-  ) {
+
+  private async backfillProfileId(projectId: string, deviceId: string, profileId: string) {
     // 과거 이벤트에 프로필 ID 업데이트
     // ClickHouse의 ALTER UPDATE 사용
     const query = `
@@ -470,7 +471,7 @@ export class ProfileWorker {
         AND deviceId = {deviceId:String}
         AND profileId IS NULL
     `;
-    
+
     await clickhouse.exec({
       query,
       query_params: { projectId, deviceId, profileId },
@@ -486,36 +487,38 @@ export class ProfileWorker {
 export class ProfileIncrementService {
   async increment(params: IncrementParams) {
     const { projectId, profileId, property, value = 1 } = params;
-    
+
     // 현재 값 조회
     const current = await this.getCurrentValue(projectId, profileId, property);
-    
+
     // 새 값 계산
     const newValue = (current || 0) + value;
-    
+
     // 프로필 업데이트
     await clickhouse.insert({
       table: 'profiles',
-      values: [{
-        projectId,
-        profileId,
-        properties: JSON.stringify({
-          [property]: newValue,
-        }),
-        createdAt: new Date().toISOString(),
-      }],
+      values: [
+        {
+          projectId,
+          profileId,
+          properties: JSON.stringify({
+            [property]: newValue,
+          }),
+          createdAt: new Date().toISOString(),
+        },
+      ],
     });
-    
+
     return { success: true, value: newValue };
   }
-  
+
   async decrement(params: DecrementParams) {
     return this.increment({
       ...params,
       value: -(params.value || 1),
     });
   }
-  
+
   private async getCurrentValue(
     projectId: string,
     profileId: string,
@@ -529,12 +532,12 @@ export class ProfileIncrementService {
       ORDER BY createdAt DESC
       LIMIT 1
     `;
-    
+
     const result = await clickhouse.query({
       query,
       query_params: { projectId, profileId, property },
     });
-    
+
     const rows = await result.json();
     return rows[0]?.value || null;
   }
@@ -549,13 +552,13 @@ export class ProfileIncrementService {
 
 ```typescript
 // packages/trpc/src/utils/filter-builder.ts
-export type FilterOperator = 
-  | 'is' 
-  | 'isNot' 
-  | 'contains' 
-  | 'doesNotContain' 
-  | 'startsWith' 
-  | 'endsWith' 
+export type FilterOperator =
+  | 'is'
+  | 'isNot'
+  | 'contains'
+  | 'doesNotContain'
+  | 'startsWith'
+  | 'endsWith'
   | 'regex'
   | 'gt'
   | 'gte'
@@ -573,53 +576,53 @@ export class FilterBuilder {
     if (!filters || filters.length === 0) {
       return '';
     }
-    
-    const conditions = filters.map(filter => this.buildCondition(filter));
+
+    const conditions = filters.map((filter) => this.buildCondition(filter));
     return `AND (${conditions.join(' AND ')})`;
   }
-  
+
   private buildCondition(filter: Filter): string {
     const { name, operator, value } = filter;
-    
+
     switch (operator) {
       case 'is':
-        return `${name} IN (${value.map(v => `'${this.escape(v)}'`).join(',')})`;
-      
+        return `${name} IN (${value.map((v) => `'${this.escape(v)}'`).join(',')})`;
+
       case 'isNot':
-        return `${name} NOT IN (${value.map(v => `'${this.escape(v)}'`).join(',')})`;
-      
+        return `${name} NOT IN (${value.map((v) => `'${this.escape(v)}'`).join(',')})`;
+
       case 'contains':
-        return value.map(v => `${name} LIKE '%${this.escape(v)}%'`).join(' OR ');
-      
+        return value.map((v) => `${name} LIKE '%${this.escape(v)}%'`).join(' OR ');
+
       case 'doesNotContain':
-        return value.map(v => `${name} NOT LIKE '%${this.escape(v)}%'`).join(' AND ');
-      
+        return value.map((v) => `${name} NOT LIKE '%${this.escape(v)}%'`).join(' AND ');
+
       case 'startsWith':
-        return value.map(v => `${name} LIKE '${this.escape(v)}%'`).join(' OR ');
-      
+        return value.map((v) => `${name} LIKE '${this.escape(v)}%'`).join(' OR ');
+
       case 'endsWith':
-        return value.map(v => `${name} LIKE '%${this.escape(v)}'`).join(' OR ');
-      
+        return value.map((v) => `${name} LIKE '%${this.escape(v)}'`).join(' OR ');
+
       case 'regex':
-        return value.map(v => `match(${name}, '${this.escape(v)}')`).join(' OR ');
-      
+        return value.map((v) => `match(${name}, '${this.escape(v)}')`).join(' OR ');
+
       case 'gt':
         return `${name} > ${value[0]}`;
-      
+
       case 'gte':
         return `${name} >= ${value[0]}`;
-      
+
       case 'lt':
         return `${name} < ${value[0]}`;
-      
+
       case 'lte':
         return `${name} <= ${value[0]}`;
-      
+
       default:
         throw new Error(`Unknown operator: ${operator}`);
     }
   }
-  
+
   private escape(value: string): string {
     return value.replace(/'/g, "\\'");
   }
@@ -643,33 +646,33 @@ interface FilterBuilderProps {
 
 export function FilterBuilder({ onFiltersChange }: FilterBuilderProps) {
   const [filters, setFilters] = useState<Filter[]>([]);
-  
+
   const addFilter = () => {
     const newFilter: Filter = {
       name: 'path',
       operator: 'is',
       value: [''],
     };
-    
+
     const updated = [...filters, newFilter];
     setFilters(updated);
     onFiltersChange(updated);
   };
-  
+
   const updateFilter = (index: number, updates: Partial<Filter>) => {
-    const updated = filters.map((filter, i) => 
+    const updated = filters.map((filter, i) =>
       i === index ? { ...filter, ...updates } : filter
     );
     setFilters(updated);
     onFiltersChange(updated);
   };
-  
+
   const removeFilter = (index: number) => {
     const updated = filters.filter((_, i) => i !== index);
     setFilters(updated);
     onFiltersChange(updated);
   };
-  
+
   return (
     <div className="space-y-4">
       {filters.map((filter, index) => (
@@ -684,7 +687,7 @@ export function FilterBuilder({ onFiltersChange }: FilterBuilderProps) {
             <option value="os">OS</option>
             <option value="referrer">Referrer</option>
           </Select>
-          
+
           <Select
             value={filter.operator}
             onValueChange={(operator) => updateFilter(index, { operator })}
@@ -694,13 +697,13 @@ export function FilterBuilder({ onFiltersChange }: FilterBuilderProps) {
             <option value="contains">contains</option>
             <option value="doesNotContain">does not contain</option>
           </Select>
-          
+
           <Input
             value={filter.value[0]}
             onChange={(e) => updateFilter(index, { value: [e.target.value] })}
             placeholder="Value"
           />
-          
+
           <Button
             variant="ghost"
             size="icon"
@@ -710,7 +713,7 @@ export function FilterBuilder({ onFiltersChange }: FilterBuilderProps) {
           </Button>
         </div>
       ))}
-      
+
       <Button onClick={addFilter}>Add Filter</Button>
     </div>
   );
@@ -725,23 +728,20 @@ export function FilterBuilder({ onFiltersChange }: FilterBuilderProps) {
 
 ```typescript
 // apps/dashboard/lib/chart-utils.ts
-export function transformTimeSeriesData(
-  data: any[],
-  metrics: string[]
-): ChartData[] {
-  return data.map(row => ({
+export function transformTimeSeriesData(data: any[], metrics: string[]): ChartData[] {
+  return data.map((row) => ({
     date: new Date(row.date).toLocaleDateString(),
-    ...metrics.reduce((acc, metric) => ({
-      ...acc,
-      [metric]: row[metric] || 0,
-    }), {}),
+    ...metrics.reduce(
+      (acc, metric) => ({
+        ...acc,
+        [metric]: row[metric] || 0,
+      }),
+      {}
+    ),
   }));
 }
 
-export function transformFunnelData(
-  steps: string[],
-  data: any
-): FunnelData[] {
+export function transformFunnelData(steps: string[], data: any): FunnelData[] {
   return steps.map((step, index) => ({
     name: step,
     count: data[`step${index}_count`],
@@ -749,14 +749,12 @@ export function transformFunnelData(
   }));
 }
 
-export function transformRetentionData(
-  data: any[]
-): RetentionData[] {
+export function transformRetentionData(data: any[]): RetentionData[] {
   const cohorts = new Map<string, any>();
-  
+
   for (const row of data) {
     const cohortDate = row.cohort_date;
-    
+
     if (!cohorts.has(cohortDate)) {
       cohorts.set(cohortDate, {
         cohortDate,
@@ -764,14 +762,14 @@ export function transformRetentionData(
         periods: [],
       });
     }
-    
+
     cohorts.get(cohortDate)!.periods.push({
       period: row.period_number,
       retainedUsers: row.retained_users,
       retentionRate: row.retention_rate,
     });
   }
-  
+
   return Array.from(cohorts.values());
 }
 ```
@@ -918,8 +916,9 @@ export const exportRoute: FastifyPluginAsync = async (fastify) => {
     const { startDate, endDate } = request.query;
 
     // 스트리밍 쿼리
-    const stream = await clickhouse.query({
-      query: `
+    const stream = await clickhouse
+      .query({
+        query: `
         SELECT *
         FROM events
         WHERE projectId = {projectId:String}
@@ -927,8 +926,9 @@ export const exportRoute: FastifyPluginAsync = async (fastify) => {
           AND createdAt <= {endDate:DateTime}
         FORMAT CSVWithNames
       `,
-      query_params: { projectId, startDate, endDate },
-    }).stream();
+        query_params: { projectId, startDate, endDate },
+      })
+      .stream();
 
     // 응답 헤더 설정
     reply.header('Content-Type', 'text/csv');
@@ -1034,12 +1034,7 @@ export class WebhookWorker {
     }
   }
 
-  private async retryWebhook(
-    webhookId: string,
-    event: string,
-    payload: any,
-    attempt: number
-  ) {
+  private async retryWebhook(webhookId: string, event: string, payload: any, attempt: number) {
     const maxAttempts = 3;
 
     if (attempt >= maxAttempts) {
@@ -1060,7 +1055,7 @@ export class WebhookWorker {
     // 지수 백오프로 재시도
     const delay = Math.pow(2, attempt) * 1000;
 
-    await new Promise(resolve => setTimeout(resolve, delay));
+    await new Promise((resolve) => setTimeout(resolve, delay));
 
     // 재시도
     await this.sendWebhook({ webhookId, event, payload });
@@ -1089,10 +1084,7 @@ export function verifyWebhookSignature(
   hmac.update(payload);
   const expectedSignature = hmac.digest('hex');
 
-  return crypto.timingSafeEqual(
-    Buffer.from(signature),
-    Buffer.from(expectedSignature)
-  );
+  return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSignature));
 }
 
 // Express 예제
@@ -1488,10 +1480,7 @@ export class CohortService {
     });
 
     // 코호트 멤버 저장 (Redis)
-    await redis.sadd(
-      `cohort:${cohort.id}:members`,
-      ...deviceIds.map((d: any) => d.deviceId)
-    );
+    await redis.sadd(`cohort:${cohort.id}:members`, ...deviceIds.map((d: any) => d.deviceId));
 
     return cohort;
   }
@@ -1506,7 +1495,7 @@ export class CohortService {
         toDate(createdAt) as date,
         ${this.getMetricQuery(metric)} as value
       FROM events
-      WHERE deviceId IN (${members.map(m => `'${m}'`).join(',')})
+      WHERE deviceId IN (${members.map((m) => `'${m}'`).join(',')})
       GROUP BY date
       ORDER BY date
     `;
@@ -1630,5 +1619,3 @@ export class PathAnalysisService {
 9. **고급 분석**: 코호트, 경로 분석
 
 각 기능은 실제 프로덕션 환경에서 사용 가능한 수준의 코드 예제와 함께 제공되었습니다.
-
-

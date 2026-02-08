@@ -1,31 +1,24 @@
-import knex, { Knex } from "knex";
-import path from "path";
-import fs from "fs";
-import { config } from "./index";
-import { createLogger } from "./logger";
+import knex, { Knex } from 'knex';
+import path from 'path';
+import fs from 'fs';
+import { config } from './index';
+import { createLogger } from './logger';
 
-const logger = createLogger("DatabaseManager");
+const logger = createLogger('DatabaseManager');
 
 // Determine migration directory based on environment
 const getMigrationDir = (): string => {
   // In production Docker, migrations are in dist/database/migrations
   // In development, they are in src/database/migrations
   // __dirname points to dist/config when compiled
-  const distPath = path.join(__dirname, "..", "database", "migrations");
+  const distPath = path.join(__dirname, '..', 'database', 'migrations');
 
   if (fs.existsSync(distPath)) {
     return distPath;
   }
 
   // Fallback to src directory (for development)
-  const srcPath = path.join(
-    __dirname,
-    "..",
-    "..",
-    "src",
-    "database",
-    "migrations",
-  );
+  const srcPath = path.join(__dirname, '..', '..', 'src', 'database', 'migrations');
   return srcPath;
 };
 
@@ -48,15 +41,15 @@ class DatabaseManager {
       await this.createDatabaseIfNotExists();
 
       const knexConfig: Knex.Config = {
-        client: "mysql2",
+        client: 'mysql2',
         connection: {
           host: config.database.host,
           port: config.database.port,
           user: config.database.user,
           password: config.database.password,
           database: config.database.name,
-          charset: "utf8mb4",
-          timezone: "+00:00", // MySQL2?먯꽌 ?щ컮瑜?UTC ??꾩〈 ?뺤떇
+          charset: 'utf8mb4',
+          timezone: '+00:00', // MySQL2?먯꽌 ?щ컮瑜?UTC ??꾩〈 ?뺤떇
         },
         pool: {
           min: 2,
@@ -71,10 +64,10 @@ class DatabaseManager {
         },
         migrations: {
           directory: getMigrationDir(),
-          tableName: "chat_migrations",
+          tableName: 'chat_migrations',
         },
         seeds: {
-          directory: "./seeds",
+          directory: './seeds',
         },
         debug: config.database.debug, // .env??DB_DEBUG ?ㅼ젙?쇰줈 ?쒖뼱
         asyncStackTraces: config.isDevelopment,
@@ -84,23 +77,23 @@ class DatabaseManager {
 
       // Test connection
       await this.testConnection();
-      logger.info("Database connection established successfully");
+      logger.info('Database connection established successfully');
 
       // Run migrations automatically
       try {
-        logger.info("Running database migrations...");
+        logger.info('Running database migrations...');
         const [executed] = await this.knexInstance.migrate.latest();
         if (executed.length > 0) {
           logger.info(`Executed ${executed.length} migrations:`, executed);
         } else {
-          logger.info("No pending migrations");
+          logger.info('No pending migrations');
         }
       } catch (error) {
-        logger.error("Migration failed:", error);
+        logger.error('Migration failed:', error);
         throw error;
       }
     } catch (error) {
-      logger.error("Failed to initialize database:", error);
+      logger.error('Failed to initialize database:', error);
       throw error;
     }
   }
@@ -109,13 +102,13 @@ class DatabaseManager {
     try {
       // Create a temporary connection without specifying database
       const tempKnex = knex({
-        client: "mysql2",
+        client: 'mysql2',
         connection: {
           host: config.database.host,
           port: config.database.port,
           user: config.database.user,
           password: config.database.password,
-          charset: "utf8mb4",
+          charset: 'utf8mb4',
         },
       });
 
@@ -123,23 +116,21 @@ class DatabaseManager {
         // Create database if not exists
         await tempKnex.raw(
           `CREATE DATABASE IF NOT EXISTS ?? CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`,
-          [config.database.name],
+          [config.database.name]
         );
-        logger.info(
-          `Database '${config.database.name}' created or already exists`,
-        );
+        logger.info(`Database '${config.database.name}' created or already exists`);
       } finally {
         await tempKnex.destroy();
       }
     } catch (error) {
-      logger.error("Failed to create database:", error);
+      logger.error('Failed to create database:', error);
       throw error;
     }
   }
 
   public getKnex(): Knex {
     if (!this.knexInstance) {
-      throw new Error("Database not initialized");
+      throw new Error('Database not initialized');
     }
     return this.knexInstance;
   }
@@ -147,27 +138,27 @@ class DatabaseManager {
   public async testConnection(): Promise<boolean> {
     try {
       if (!this.knexInstance) {
-        throw new Error("Database not initialized");
+        throw new Error('Database not initialized');
       }
 
       // Use a timeout for the test query
       const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error("Connection test timeout")), 10000); // Increased to 10s
+        setTimeout(() => reject(new Error('Connection test timeout')), 10000); // Increased to 10s
       });
 
-      const testPromise = this.knexInstance.raw("SELECT 1");
+      const testPromise = this.knexInstance.raw('SELECT 1');
 
       await Promise.race([testPromise, timeoutPromise]);
       return true;
     } catch (error) {
-      logger.error("Database connection test failed:", error);
+      logger.error('Database connection test failed:', error);
       throw error; // Throw exception to stop server startup on failure
     }
   }
 
   public getDatabase(): Knex {
     if (!this.knexInstance) {
-      throw new Error("Database not initialized. Call initialize() first.");
+      throw new Error('Database not initialized. Call initialize() first.');
     }
     return this.knexInstance;
   }
@@ -176,7 +167,7 @@ class DatabaseManager {
     if (this.knexInstance) {
       await this.knexInstance.destroy();
       this.knexInstance = null;
-      logger.info("Database connection closed");
+      logger.info('Database connection closed');
     }
   }
 
@@ -184,10 +175,10 @@ class DatabaseManager {
   public async batchInsert<T extends Record<string, any>>(
     tableName: string,
     data: T[],
-    batchSize = 1000,
+    batchSize = 1000
   ): Promise<void> {
     if (!this.knexInstance) {
-      throw new Error("Database not initialized");
+      throw new Error('Database not initialized');
     }
 
     const batches = [];
@@ -203,10 +194,10 @@ class DatabaseManager {
   public async batchUpdate<T>(
     tableName: string,
     updates: Array<{ where: any; update: T }>,
-    batchSize = 100,
+    batchSize = 100
   ): Promise<void> {
     if (!this.knexInstance) {
-      throw new Error("Database not initialized");
+      throw new Error('Database not initialized');
     }
 
     const batches = [];

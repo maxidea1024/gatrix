@@ -3,38 +3,13 @@
     ":type": {
       "id": "key",
       "name": "string",
-      "battleActionRangePath": [
-        "string",
-        "string",
-        "string",
-        "string"
-      ],
-      "battleActionRangeImage": [
-        "string",
-        "string",
-        "string",
-        "string"
-      ],
+      "battleActionRangePath": ["string", "string", "string", "string"],
+      "battleActionRangeImage": ["string", "string", "string", "string"],
       "image": "string",
-      "specialBattleActionRangePath": [
-        "string",
-        "string",
-        "string",
-        "string"
-      ],
-      "specialBattleActionRangeImage": [
-        "string",
-        "string",
-        "string",
-        "string"
-      ],
+      "specialBattleActionRangePath": ["string", "string", "string", "string"],
+      "specialBattleActionRangeImage": ["string", "string", "string", "string"],
       "specialImage": "string",
-      "ebattleActionRangePath": [
-        "string",
-        "string",
-        "string",
-        "string"
-      ],
+      "ebattleActionRangePath": ["string", "string", "string", "string"],
       "obstaclePassType": "number",
       "directionAngle": "number",
       "centralAngle": "number",

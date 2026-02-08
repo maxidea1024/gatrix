@@ -27,11 +27,11 @@ Send Gatrix notifications to Microsoft Teams.
 
 ## Notification Events
 
-| Event | Description |
-|-------|-------------|
+| Event                | Description                                     |
+| -------------------- | ----------------------------------------------- |
 | Feature flag changes | Notified when flags are created/updated/deleted |
-| Maintenance | Notified when maintenance starts/ends |
-| Errors | Notified on system errors |
+| Maintenance          | Notified when maintenance starts/ends           |
+| Errors               | Notified on system errors                       |
 
 ## Test
 

@@ -5,6 +5,7 @@
 ## 📋 개요
 
 Event Lens는 OpenPanel에서 영감을 받은 강력한 이벤트 추적 및 분석 서비스입니다.
+
 - **Phase 1-4 구현 완료**: 인프라, Event API, Worker, 분석 엔진
 - **Frontend 제외**: Backend API만 구현 (Frontend는 추후 검토)
 
@@ -27,20 +28,24 @@ Backend (Express :5000)
 ## 📦 설치된 구성 요소
 
 ### 1. Event Lens Server (packages/event-lens/)
+
 - **포트**: 3002
 - **역할**: 이벤트 수집 API, 분석 API
 - **기술**: Fastify, TypeScript, Zod
 
 ### 2. Event Lens Worker
+
 - **역할**: 배치 이벤트 처리, 프로필 관리, 세션 집계
 - **기술**: BullMQ, ClickHouse
 
 ### 3. ClickHouse
+
 - **포트**: 8123 (HTTP), 9000 (Native)
 - **역할**: 이벤트 데이터 저장 (시계열)
 - **버전**: 24.12.2.29-alpine
 
 ### 4. Backend Proxy
+
 - **경로**: `/api/v1/analytics/*`
 - **역할**: Event Lens로 요청 프록시
 
@@ -317,12 +322,14 @@ packages/event-lens/
 ## 🎯 구현된 기능 (Phase 1-4)
 
 ### ✅ Phase 1: 인프라
+
 - ClickHouse, Redis, MySQL 연결
 - Fastify 서버 설정
 - BullMQ 큐 설정
 - Winston 로깅
 
 ### ✅ Phase 2: Event API
+
 - POST /track - 이벤트 추적
 - POST /track/batch - 배치 이벤트
 - 클라이언트 인증 (헤더 기반)
@@ -330,11 +337,13 @@ packages/event-lens/
 - 이벤트 정규화 (User-Agent, Referrer)
 
 ### ✅ Phase 3: Worker
+
 - Event Worker (배치 삽입 1000개)
 - Profile Worker (identify, increment, decrement)
 - Session Worker (세션 집계)
 
 ### ✅ Phase 4: 분석 엔진
+
 - 기본 메트릭 (방문자, 세션, 이탈률)
 - 시계열 데이터
 - 상위 페이지
@@ -361,4 +370,3 @@ packages/event-lens/
 **구현 완료!** 🎉
 
 Event Lens가 성공적으로 Gatrix 프로젝트에 통합되었습니다.
-

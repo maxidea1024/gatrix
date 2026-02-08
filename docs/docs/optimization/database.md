@@ -37,5 +37,3 @@ Track slow queries and collect latency metrics exposed via Prometheus.
 ## Next
 
 - See caching strategies: [/docs/optimization/caching](/optimization/caching)
-
-

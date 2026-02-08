@@ -11,10 +11,7 @@
       "spear": "string",
       "sword": "string",
       "thSword": "string",
-      "twinBlade": [
-        "string",
-        "string"
-      ]
+      "twinBlade": ["string", "string"]
     },
     ":required": {},
     ":min": {},
@@ -34,10 +31,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Groggy_01": {
       "id": "Duel_Groggy_01",
@@ -50,10 +44,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Attack01_Rifle": {
       "id": "Duel_Attack01_Rifle",
@@ -66,10 +57,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Attack02_Rifle": {
       "id": "Duel_Attack02_Rifle",
@@ -82,10 +70,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Attack03_Rifle": {
       "id": "Duel_Attack03_Rifle",
@@ -98,10 +83,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Damage_Rifle": {
       "id": "Duel_Damage_Rifle",
@@ -114,10 +96,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Guard01_Rifle": {
       "id": "Duel_Guard01_Rifle",
@@ -130,10 +109,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Guard02_Rifle": {
       "id": "Duel_Guard02_Rifle",
@@ -146,10 +122,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Guard03_Rifle": {
       "id": "Duel_Guard03_Rifle",
@@ -162,10 +135,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Stand_Rifle": {
       "id": "Duel_Stand_Rifle",
@@ -178,10 +148,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Attack01_Spear": {
       "id": "Duel_Attack01_Spear",
@@ -194,10 +161,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Attack02_Spear": {
       "id": "Duel_Attack02_Spear",
@@ -210,10 +174,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Attack03_Spear": {
       "id": "Duel_Attack03_Spear",
@@ -226,10 +187,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Damage_Spear": {
       "id": "Duel_Damage_Spear",
@@ -242,10 +200,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Guard01_Spear": {
       "id": "Duel_Guard01_Spear",
@@ -258,10 +213,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Guard02_Spear": {
       "id": "Duel_Guard02_Spear",
@@ -274,10 +226,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Guard03_Spear": {
       "id": "Duel_Guard03_Spear",
@@ -290,10 +239,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Stand_Spear": {
       "id": "Duel_Stand_Spear",
@@ -306,10 +252,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Run_01": {
       "id": "Town_Run_01",
@@ -322,10 +265,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Run_02": {
       "id": "Town_Run_02",
@@ -338,10 +278,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Stand_01": {
       "id": "Town_Stand_01",
@@ -354,10 +291,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Walk_01": {
       "id": "Town_Walk_01",
@@ -370,10 +304,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Attack01_Bow": {
       "id": "Duel_Attack01_Bow",
@@ -386,10 +317,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Attack02_Bow": {
       "id": "Duel_Attack02_Bow",
@@ -402,10 +330,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Attack03_Bow": {
       "id": "Duel_Attack03_Bow",
@@ -418,10 +343,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Damage_Bow": {
       "id": "Duel_Damage_Bow",
@@ -434,10 +356,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Dodge01_Bow": {
       "id": "Duel_Dodge01_Bow",
@@ -450,10 +369,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Stand_Bow": {
       "id": "Duel_Stand_Bow",
@@ -466,10 +382,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Attack01_Crossbow": {
       "id": "Duel_Attack01_Crossbow",
@@ -482,10 +395,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Attack02_Crossbow": {
       "id": "Duel_Attack02_Crossbow",
@@ -498,10 +408,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Attack03_Crossbow": {
       "id": "Duel_Attack03_Crossbow",
@@ -514,10 +421,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Damage_Crossbow": {
       "id": "Duel_Damage_Crossbow",
@@ -530,10 +434,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Dodge01_Crossbow": {
       "id": "Duel_Dodge01_Crossbow",
@@ -546,10 +447,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Stand_Crossbow": {
       "id": "Duel_Stand_Crossbow",
@@ -562,10 +460,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Attack01_Pistol": {
       "id": "Duel_Attack01_Pistol",
@@ -578,10 +473,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Attack02_Pistol": {
       "id": "Duel_Attack02_Pistol",
@@ -594,10 +486,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Attack03_Pistol": {
       "id": "Duel_Attack03_Pistol",
@@ -610,10 +499,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Damage_Pistol": {
       "id": "Duel_Damage_Pistol",
@@ -626,10 +512,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Dodge01_Pistol": {
       "id": "Duel_Dodge01_Pistol",
@@ -642,10 +525,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Stand_Pistol": {
       "id": "Duel_Stand_Pistol",
@@ -658,10 +538,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Attack01_Blade": {
       "id": "Duel_Attack01_Blade",
@@ -674,10 +551,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Attack02_Blade": {
       "id": "Duel_Attack02_Blade",
@@ -690,10 +564,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Attack03_Blade": {
       "id": "Duel_Attack03_Blade",
@@ -706,10 +577,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Damage_Blade": {
       "id": "Duel_Damage_Blade",
@@ -722,10 +590,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Guard01_Blade": {
       "id": "Duel_Guard01_Blade",
@@ -738,10 +603,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Guard02_Blade": {
       "id": "Duel_Guard02_Blade",
@@ -754,10 +616,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Guard03_Blade": {
       "id": "Duel_Guard03_Blade",
@@ -770,10 +629,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Stand_Blade": {
       "id": "Duel_Stand_Blade",
@@ -786,10 +642,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Attack01_Sword": {
       "id": "Duel_Attack01_Sword",
@@ -802,10 +655,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Attack02_Sword": {
       "id": "Duel_Attack02_Sword",
@@ -818,10 +668,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Attack03_Sword": {
       "id": "Duel_Attack03_Sword",
@@ -834,10 +681,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Damage_Sword": {
       "id": "Duel_Damage_Sword",
@@ -850,10 +694,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Guard01_Sword": {
       "id": "Duel_Guard01_Sword",
@@ -866,10 +707,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Guard02_Sword": {
       "id": "Duel_Guard02_Sword",
@@ -882,10 +720,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Guard03_Sword": {
       "id": "Duel_Guard03_Sword",
@@ -898,10 +733,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Stand_Sword": {
       "id": "Duel_Stand_Sword",
@@ -914,10 +746,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Attack01_THSword": {
       "id": "Duel_Attack01_THSword",
@@ -930,10 +759,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Attack02_THSword": {
       "id": "Duel_Attack02_THSword",
@@ -946,10 +772,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Attack03_THSword": {
       "id": "Duel_Attack03_THSword",
@@ -962,10 +785,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Damage_THSword": {
       "id": "Duel_Damage_THSword",
@@ -978,10 +798,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Guard01_THSword": {
       "id": "Duel_Guard01_THSword",
@@ -994,10 +811,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Guard02_THSword": {
       "id": "Duel_Guard02_THSword",
@@ -1010,10 +824,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Guard03_THSword": {
       "id": "Duel_Guard03_THSword",
@@ -1026,10 +837,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Stand_THSword": {
       "id": "Duel_Stand_THSword",
@@ -1042,10 +850,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Attack01_TwinBlade": {
       "id": "Duel_Attack01_TwinBlade",
@@ -1058,10 +863,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Attack02_TwinBlade": {
       "id": "Duel_Attack02_TwinBlade",
@@ -1074,10 +876,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Attack03_TwinBlade": {
       "id": "Duel_Attack03_TwinBlade",
@@ -1090,10 +889,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Damage_TwinBlade": {
       "id": "Duel_Damage_TwinBlade",
@@ -1106,10 +902,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Guard01_TwinBlade": {
       "id": "Duel_Guard01_TwinBlade",
@@ -1122,10 +915,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Guard02_TwinBlade": {
       "id": "Duel_Guard02_TwinBlade",
@@ -1138,10 +928,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Guard03_TwinBlade": {
       "id": "Duel_Guard03_TwinBlade",
@@ -1154,10 +941,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Stand_TwinBlade": {
       "id": "Duel_Stand_TwinBlade",
@@ -1170,10 +954,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Ship_CaptainNPC_01": {
       "id": "Ship_CaptainNPC_01",
@@ -1186,10 +967,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Ship_inJuredLeg_01": {
       "id": "Ship_inJuredLeg_01",
@@ -1202,10 +980,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Ship_injuredArm_01": {
       "id": "Ship_injuredArm_01",
@@ -1218,10 +993,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Win_01": {
       "id": "Duel_Win_01",
@@ -1234,10 +1006,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Ship_CaptainNPC_02": {
       "id": "Ship_CaptainNPC_02",
@@ -1250,10 +1019,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Ship_CaptainNPC_03": {
       "id": "Ship_CaptainNPC_03",
@@ -1266,10 +1032,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Ship_Damaged_01": {
       "id": "Ship_Damaged_01",
@@ -1282,10 +1045,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Ship_Damaged_02": {
       "id": "Ship_Damaged_02",
@@ -1298,10 +1058,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Ship_DeckOutskirtsNPC_01": {
       "id": "Ship_DeckOutskirtsNPC_01",
@@ -1314,10 +1071,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Ship_DeckOutskirtsNPC_02": {
       "id": "Ship_DeckOutskirtsNPC_02",
@@ -1330,10 +1084,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Ship_DeckOutskirtsNPC_03": {
       "id": "Ship_DeckOutskirtsNPC_03",
@@ -1346,10 +1097,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Ship_DeckinteriorNPC_01": {
       "id": "Ship_DeckinteriorNPC_01",
@@ -1362,10 +1110,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Ship_DeckinteriorNPC_02": {
       "id": "Ship_DeckinteriorNPC_02",
@@ -1378,10 +1123,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Ship_DeckinteriorNPC_03": {
       "id": "Ship_DeckinteriorNPC_03",
@@ -1394,10 +1136,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Ship_DeckinteriorNPC_04": {
       "id": "Ship_DeckinteriorNPC_04",
@@ -1410,10 +1149,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Ship_Success_01": {
       "id": "Ship_Success_01",
@@ -1426,10 +1162,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Watchman01_Idle": {
       "id": "Town_Watchman01_Idle",
@@ -1442,10 +1175,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Watchman01_Run": {
       "id": "Town_Watchman01_Run",
@@ -1458,10 +1188,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Watchman01_Walk": {
       "id": "Town_Watchman01_Walk",
@@ -1474,10 +1201,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Watchman01_Walk_02": {
       "id": "Town_Watchman01_Walk_02",
@@ -1490,10 +1214,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Watchman02_Idle": {
       "id": "Town_Watchman02_Idle",
@@ -1506,10 +1227,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Watchman02_Run": {
       "id": "Town_Watchman02_Run",
@@ -1522,10 +1240,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Watchman02_Walk": {
       "id": "Town_Watchman02_Walk",
@@ -1538,10 +1253,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Watchman02_Walk_02": {
       "id": "Town_Watchman02_Walk_02",
@@ -1554,10 +1266,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Watchman03_Idle": {
       "id": "Town_Watchman03_Idle",
@@ -1570,10 +1279,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Watchman03_Run": {
       "id": "Town_Watchman03_Run",
@@ -1586,10 +1292,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Watchman03_Walk": {
       "id": "Town_Watchman03_Walk",
@@ -1602,10 +1305,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Watchman03_Walk_02": {
       "id": "Town_Watchman03_Walk_02",
@@ -1618,10 +1318,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Ship_Disaster_01": {
       "id": "Ship_Disaster_01",
@@ -1634,10 +1331,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Ship_Disaster_02": {
       "id": "Ship_Disaster_02",
@@ -1650,10 +1344,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Ship_Growth_01": {
       "id": "Ship_Growth_01",
@@ -1666,10 +1357,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Ship_LoyaltyHigh_01": {
       "id": "Ship_LoyaltyHigh_01",
@@ -1682,10 +1370,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Ship_LoyaltyLow_01": {
       "id": "Ship_LoyaltyLow_01",
@@ -1698,10 +1383,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Inn_Sit_01": {
       "id": "Inn_Sit_01"
@@ -1729,10 +1411,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Inn_Unable_02": {
       "id": "Inn_Unable_02",
@@ -1745,10 +1424,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Knockback_01": {
       "id": "Duel_Knockback_01",
@@ -1761,10 +1437,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Knockback_02": {
       "id": "Duel_Knockback_02",
@@ -1777,10 +1450,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Lute_01": {
       "id": "Town_Lute_01",
@@ -1793,10 +1463,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Ship_Command_01": {
       "id": "Ship_Command_01",
@@ -1809,10 +1476,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Salute_Start_01": {
       "id": "Town_Salute_Start_01",
@@ -1825,10 +1489,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Salute_Doing_01": {
       "id": "Town_Salute_Doing_01",
@@ -1841,10 +1502,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Salute_End_01": {
       "id": "Town_Salute_End_01",
@@ -1857,10 +1515,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_SAttack01_Sword": {
       "id": "Duel_SAttack01_Sword",
@@ -1873,10 +1528,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_SAttack01_Rifle": {
       "id": "Duel_SAttack01_Rifle",
@@ -1889,10 +1541,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_SAttack01_Spear": {
       "id": "Duel_SAttack01_Spear",
@@ -1905,10 +1554,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_SAttack01_Bow": {
       "id": "Duel_SAttack01_Bow",
@@ -1921,10 +1567,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_SAttack01_Crossbow": {
       "id": "Duel_SAttack01_Crossbow",
@@ -1937,10 +1580,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_SAttack01_Pistol": {
       "id": "Duel_SAttack01_Pistol",
@@ -1953,10 +1593,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_SAttack01_Blade": {
       "id": "Duel_SAttack01_Blade",
@@ -1969,10 +1606,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_SAttack01_THSword": {
       "id": "Duel_SAttack01_THSword",
@@ -1985,10 +1619,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_SAttack01_TwinBlade": {
       "id": "Duel_SAttack01_TwinBlade",
@@ -2001,10 +1632,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Inn_Sit_06": {
       "id": "Inn_Sit_06"
@@ -2020,10 +1648,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Think_Idle_01": {
       "id": "Town_Think_Idle_01",
@@ -2036,10 +1661,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Stretching_Idle_01": {
       "id": "Town_Stretching_Idle_01",
@@ -2052,10 +1674,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Map_Idle_01": {
       "id": "Town_Map_Idle_01",
@@ -2068,10 +1687,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_LookAround_Idle_01": {
       "id": "Town_LookAround_Idle_01",
@@ -2084,10 +1700,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_FoldArm_Idle_01": {
       "id": "Town_FoldArm_Idle_01",
@@ -2100,10 +1713,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Calculation_Idle_01": {
       "id": "Town_Calculation_Idle_01",
@@ -2116,10 +1726,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Threat_Idle_01": {
       "id": "Town_Threat_Idle_01",
@@ -2132,10 +1739,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Massage_Idle_01": {
       "id": "Town_Massage_Idle_01",
@@ -2148,10 +1752,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Walk_02": {
       "id": "Town_Walk_02",
@@ -2164,10 +1765,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Ship_FishingIde_01": {
       "id": "Ship_FishingIde_01",
@@ -2180,10 +1778,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Ship_FishingRodAngling_01": {
       "id": "Ship_FishingRodAngling_01",
@@ -2196,10 +1791,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Ship_FishingRodDraw_01": {
       "id": "Ship_FishingRodDraw_01",
@@ -2212,10 +1804,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Ship_FishingRodThrow_01": {
       "id": "Ship_FishingRodThrow_01",
@@ -2228,10 +1817,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Ship_FishingRodThrow_02": {
       "id": "Ship_FishingRodThrow_02",
@@ -2244,10 +1830,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Read_Start_01": {
       "id": "Town_Read_Start_01",
@@ -2260,10 +1843,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Read_Doing_01": {
       "id": "Town_Read_Doing_01",
@@ -2276,10 +1856,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Read_End_01": {
       "id": "Town_Read_End_01",
@@ -2292,10 +1869,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Workman_Walk_01": {
       "id": "Town_Workman_Walk_01",
@@ -2308,10 +1882,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Adventure_Gathering_Fruit_01": {
       "id": "Adventure_Gathering_Fruit_01",
@@ -2324,10 +1895,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Adventure_Gathering_Note_01": {
       "id": "Adventure_Gathering_Note_01",
@@ -2340,10 +1908,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Adventure_Gathering_Pick_01": {
       "id": "Adventure_Gathering_Pick_01",
@@ -2356,10 +1921,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Adventure_Gathering_Pluck_01": {
       "id": "Adventure_Gathering_Pluck_01",
@@ -2372,10 +1934,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Hello_Idle_01": {
       "id": "Town_Hello_Idle_01",
@@ -2388,10 +1947,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Clap_Idle_01": {
       "id": "Town_Clap_Idle_01",
@@ -2404,10 +1960,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_CheerUp_Idle_01": {
       "id": "Town_CheerUp_Idle_01",
@@ -2420,10 +1973,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Order_Idle_01": {
       "id": "Town_Order_Idle_01",
@@ -2436,10 +1986,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Cheers_01": {
       "id": "Town_Cheers_01",
@@ -2452,10 +1999,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Cheers_02": {
       "id": "Town_Cheers_02",
@@ -2468,10 +2012,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Cheers_Idle_01": {
       "id": "Town_Cheers_Idle_01",
@@ -2484,10 +2025,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Binding_Idle_01": {
       "id": "Town_Binding_Idle_01",
@@ -2500,10 +2038,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Binding_Walk_01": {
       "id": "Town_Binding_Walk_01",
@@ -2516,10 +2051,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Binding_Harass_01": {
       "id": "Town_Binding_Harass_01",
@@ -2532,10 +2064,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Groggy_Die_01": {
       "id": "Town_Groggy_Die_01",
@@ -2548,10 +2077,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Groggy_Die_Idle_01": {
       "id": "Town_Groggy_Die_Idle_01",
@@ -2564,10 +2090,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Pistol_Threat_Idle_01": {
       "id": "Town_Pistol_Threat_Idle_01",
@@ -2580,10 +2103,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Fado_Stand_01": {
       "id": "Town_Fado_Stand_01",
@@ -2596,10 +2116,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Dance_Indian_01": {
       "id": "Town_Dance_Indian_01",
@@ -2612,10 +2129,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Sitar_Sit_01": {
       "id": "Town_Sitar_Sit_01",
@@ -2628,10 +2142,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Sitar_Stand_01": {
       "id": "Town_Sitar_Stand_01",
@@ -2644,10 +2155,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Ocarina_01": {
       "id": "Town_Ocarina_01",
@@ -2660,10 +2168,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Swordetiquette_01": {
       "id": "Town_Swordetiquette_01",
@@ -2676,10 +2181,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Swordetiquette_02": {
       "id": "Town_Swordetiquette_02",
@@ -2692,10 +2194,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Binding_Harass_02": {
       "id": "Town_Binding_Harass_02",
@@ -2708,10 +2207,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Sea_Sinking_01": {
       "id": "Sea_Sinking_01",
@@ -2724,10 +2220,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Knockback_03": {
       "id": "Duel_Knockback_03",
@@ -2740,10 +2233,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Drop_01": {
       "id": "Town_Drop_01",
@@ -2756,10 +2246,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Drop_idle_01": {
       "id": "Town_Drop_idle_01",
@@ -2772,10 +2259,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Warkman_Walk_01": {
       "id": "Town_Warkman_Walk_01",
@@ -2788,10 +2272,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_BackWalk_01": {
       "id": "Town_BackWalk_01",
@@ -2804,10 +2285,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Surprise_01": {
       "id": "Town_Surprise_01",
@@ -2820,10 +2298,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Stand_02": {
       "id": "Town_Stand_02",
@@ -2836,10 +2311,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Walk_Blade": {
       "id": "Duel_Walk_Blade",
@@ -2852,10 +2324,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Walk_Bow": {
       "id": "Duel_Walk_Bow",
@@ -2868,10 +2337,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Walk_Crossbow": {
       "id": "Duel_Walk_Crossbow",
@@ -2884,10 +2350,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Walk_Pistol": {
       "id": "Duel_Walk_Pistol",
@@ -2900,10 +2363,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Walk_Rifle": {
       "id": "Duel_Walk_Rifle",
@@ -2916,10 +2376,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Walk_Spear": {
       "id": "Duel_Walk_Spear",
@@ -2932,10 +2389,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Walk_Sword": {
       "id": "Duel_Walk_Sword",
@@ -2948,10 +2402,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Walk_THSword": {
       "id": "Duel_Walk_THSword",
@@ -2964,10 +2415,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Duel_Walk_TwinBlade": {
       "id": "Duel_Walk_TwinBlade",
@@ -2980,10 +2428,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Jump_Start_01": {
       "id": "Town_Jump_Start_01",
@@ -2996,10 +2441,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Inn_Sit_08": {
       "id": "Inn_Sit_08",
@@ -3012,10 +2454,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Kick_01": {
       "id": "Town_Kick_01",
@@ -3028,10 +2467,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Wakeup_01": {
       "id": "Town_Wakeup_01",
@@ -3044,10 +2480,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Laugh_01": {
       "id": "Town_Laugh_01",
@@ -3060,10 +2493,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Walk_03": {
       "id": "Town_Walk_03",
@@ -3076,10 +2506,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Give_01": {
       "id": "Town_Give_01",
@@ -3092,10 +2519,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Receive_01": {
       "id": "Town_Receive_01",
@@ -3108,10 +2532,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Cheers_Idle_02": {
       "id": "Town_Cheers_Idle_02",
@@ -3124,10 +2545,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Cheers_03": {
       "id": "Town_Cheers_03",
@@ -3140,10 +2558,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Cheers_04": {
       "id": "Town_Cheers_04",
@@ -3156,10 +2571,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Nod_01": {
       "id": "Town_Nod_01",
@@ -3172,10 +2584,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Inn_Eat_01": {
       "id": "Inn_Eat_01",
@@ -3188,10 +2597,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Inn_Eat_Idle_01": {
       "id": "Inn_Eat_Idle_01",
@@ -3204,10 +2610,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Inn_Eat_02": {
       "id": "Inn_Eat_02",
@@ -3220,10 +2623,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Inn_Eat_Idle_02": {
       "id": "Inn_Eat_Idle_02",
@@ -3236,10 +2636,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Ship_FishingRodAngling_02": {
       "id": "Ship_FishingRodAngling_02",
@@ -3252,10 +2649,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Ship_FishingRodAngling_03": {
       "id": "Ship_FishingRodAngling_03",
@@ -3268,10 +2662,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Swordetiquette_03": {
       "id": "Town_Swordetiquette_03",
@@ -3284,10 +2675,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Swordetiquette_04": {
       "id": "Town_Swordetiquette_04",
@@ -3300,10 +2688,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Swordetiquette_05": {
       "id": "Town_Swordetiquette_05",
@@ -3316,10 +2701,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Swordetiquette_06": {
       "id": "Town_Swordetiquette_06",
@@ -3332,10 +2714,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Kneel_01": {
       "id": "Town_Kneel_01",
@@ -3348,10 +2727,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Kneeling_01": {
       "id": "Town_Kneeling_01",
@@ -3364,10 +2740,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Cheers_Idle_03": {
       "id": "Town_Cheers_Idle_03",
@@ -3380,10 +2753,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Cheers_Idle_04": {
       "id": "Town_Cheers_Idle_04",
@@ -3396,10 +2766,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Cheers_Idle_05": {
       "id": "Town_Cheers_Idle_05",
@@ -3412,10 +2779,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Cheers_05": {
       "id": "Town_Cheers_05",
@@ -3428,10 +2792,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Cheers_06": {
       "id": "Town_Cheers_06",
@@ -3444,10 +2805,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Cheers_07": {
       "id": "Town_Cheers_07",
@@ -3460,10 +2818,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Ship_FishingRodAngling_04": {
       "id": "Ship_FishingRodAngling_04",
@@ -3476,10 +2831,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Ship_FishingRodAngling_05": {
       "id": "Ship_FishingRodAngling_05",
@@ -3492,10 +2844,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Manufacture_Blacksmith_01": {
       "id": "Manufacture_Blacksmith_01",
@@ -3508,10 +2857,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Manufacture_Blacksmith_02": {
       "id": "Manufacture_Blacksmith_02",
@@ -3524,10 +2870,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Manufacture_Cooking_01": {
       "id": "Manufacture_Cooking_01",
@@ -3540,10 +2883,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Manufacture_Cooking_02": {
       "id": "Manufacture_Cooking_02",
@@ -3556,10 +2896,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Manufacture_Walk_01": {
       "id": "Manufacture_Walk_01",
@@ -3572,10 +2909,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Manufacture_Bellow_01": {
       "id": "Manufacture_Bellow_01",
@@ -3588,10 +2922,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Ship_DeckOutskirtsNPC_04": {
       "id": "Ship_DeckOutskirtsNPC_04",
@@ -3604,10 +2935,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Ship_DeckOutskirtsNPC_05": {
       "id": "Ship_DeckOutskirtsNPC_05",
@@ -3620,10 +2948,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Walk_04": {
       "id": "Town_Walk_04",
@@ -3636,10 +2961,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Shoot_01": {
       "id": "Town_Shoot_01",
@@ -3652,10 +2974,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Town_Shoot_02": {
       "id": "Town_Shoot_02",
@@ -3668,10 +2987,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Manufacture_Crafting_01": {
       "id": "Manufacture_Crafting_01",
@@ -3684,10 +3000,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Manufacture_Crafting_02": {
       "id": "Manufacture_Crafting_02",
@@ -3700,10 +3013,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     },
     "Manufacture_Crafting_03": {
       "id": "Manufacture_Crafting_03",
@@ -3716,10 +3026,7 @@
       "spear": "socket_Flame",
       "sword": "socket_Flame",
       "thSword": "socket_Flame",
-      "twinBlade": [
-        "socket_Flame",
-        "socket_Flame"
-      ]
+      "twinBlade": ["socket_Flame", "socket_Flame"]
     }
   }
 }

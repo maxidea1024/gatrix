@@ -28,10 +28,10 @@ Environments allow you to have different feature flag values for development, st
 
 Each feature flag can have different values per environment:
 
-| Flag | Development | Staging | Production |
-|------|-------------|---------|------------|
-| `new_feature` | true | true | false |
-| `max_items` | 1000 | 100 | 50 |
+| Flag          | Development | Staging | Production |
+| ------------- | ----------- | ------- | ---------- |
+| `new_feature` | true        | true    | false      |
+| `max_items`   | 1000        | 100     | 50         |
 
 ## SDK Configuration
 
@@ -40,7 +40,7 @@ Specify environment when initializing the SDK:
 ```typescript
 const gatrix = new GatrixServerSDK({
   apiKey: 'your-api-key',
-  environment: 'production'
+  environment: 'production',
 });
 ```
 

@@ -1,1 +1,670 @@
-"use strict";(globalThis.webpackChunkdocs=globalThis.webpackChunkdocs||[]).push([[5163],{4956(n,e,s){s.r(e),s.d(e,{assets:()=>t,contentTitle:()=>c,default:()=>o,frontMatter:()=>d,metadata:()=>l,toc:()=>a});const l=JSON.parse('{"id":"api/client-api","title":"\u5ba2\u6237\ufffd?API ?\ufffd\u6863","description":"??\ufffd\ufffd\u4ece\u6e38?\ufffd\ufffd??\ufffd\u7aef?\ufffd\u63a5\u8c03\u7528?\ufffd\u516c??API \ufffd?\ufffd\ufffd??","source":"@site/i18n/zh-Hans/docusaurus-plugin-content-docs/current/api/client-api.md","sourceDirName":"api","slug":"/api/client-api","permalink":"/docs/zh-Hans/api/client-api","draft":false,"unlisted":false,"editUrl":"https://github.com/your-org/gatrix/tree/main/docs/docs/api/client-api.md","tags":[],"version":"current","sidebarPosition":1,"frontMatter":{"sidebar_position":1},"sidebar":"tutorialSidebar","previous":{"title":"New Relic","permalink":"/docs/zh-Hans/integrations/new-relic"},"next":{"title":"Server SDK API","permalink":"/docs/zh-Hans/api/server-sdk-api"}}');var i=s(4848),r=s(8453);const d={sidebar_position:1},c="\u5ba2\u6237\ufffd?API ?\ufffd\u6863",t={},a=[{value:"?\ufffd\ufffd?",id:"",level:2},{value:"API \ufffd?\ufffd\ufffd",id:"api-",level:2},{value:"1. \u5ba2\u6237\ufffd?\ufffd\ufffd?\ufffd\u4fe1??",id:"1-\u5ba2\u6237\u4fe1",level:3},{value:"?\ufffd\ufffd??\ufffd\u6570",id:"\u6570",level:4},{value:"?\ufffd\u5e94",id:"\u5e94",level:4},{value:"\u7f13\u5b58\u4fe1\u606f",id:"\u7f13\u5b58\u4fe1\u606f",level:4},{value:"2. \u6e38\u620f\u4e16\u754c?\ufffd\u8868",id:"2-\u6e38\u620f\u4e16\u754c\u8868",level:3},{value:"?\ufffd\u5e94",id:"\u5e94-1",level:4},{value:"\u8fc7\u6ee4",id:"\u8fc7\u6ee4",level:4},{value:"\u7f13\u5b58\u4fe1\u606f",id:"\u7f13\u5b58\u4fe1\u606f-1",level:4},{value:"3. \u7f13\u5b58\u7edf\ufffd?",id:"3-\u7f13\u5b58\u7edf",level:3},{value:"?\ufffd\u5e94",id:"\u5e94-2",level:4},{value:"\u7f13\u5b58\u7cfb\u7edf",id:"\u7f13\u5b58\u7cfb\u7edf",level:2},{value:"?\ufffd\u5730?\ufffd\u5b58\u7f13\u5b58",id:"\u5730\u5b58\u7f13\u5b58",level:3},{value:"?\ufffd\u4e8e BullMQ ?\ufffd\u961f?\ufffd\u7cfb\ufffd?",id:"\u4e8e-bullmq-\u961f\u7cfb",level:3},{value:"\u7f13\u5b58\u5931\u6548?\ufffd\u666f",id:"\u7f13\u5b58\u5931\u6548\u666f",level:3},{value:"?\ufffd\u5217\u7cfb\u7edf?\ufffd\ufffd?",id:"\u5217\u7cfb\u7edf",level:3},{value:"?\ufffd\u80fd\u4f18\u5316",id:"\u80fd\u4f18\u5316",level:2},{value:"?\ufffd\u5e94?\ufffd\u95f4",id:"\u5e94\u95f4",level:3},{value:"?\ufffd\u5b58\u4f7f\u7528",id:"\u5b58\u4f7f\u7528",level:3},{value:"\u4f7f\u7528\u793a\u4f8b",id:"\u4f7f\u7528\u793a\u4f8b",level:2},{value:"JavaScript\uff08\u6e38?\ufffd\ufffd??\ufffd\u7aef\ufffd?",id:"javascript\u6e38\u7aef",level:3},{value:"Unity C#\uff08\u6e38?\ufffd\ufffd??\ufffd\u7aef\ufffd?",id:"unity-c\u6e38\u7aef",level:3},{value:"?\ufffd\u63a7",id:"\u63a7",level:2},{value:"?\ufffd\u5fd7\u68c0??",id:"\u5fd7\u68c0",level:3},{value:"\u7f13\u5b58?\ufffd\u961f?\ufffd\u7edf\u8ba1\u76d1??",id:"\u7f13\u5b58\u961f\u7edf\u8ba1\u76d1",level:3},{value:"BullMQ \u4eea\u8868?\ufffd\uff08??\ufffd\ufffd\uff09",id:"bullmq-\u4eea\u8868",level:3}];function h(n){const e={code:"code",em:"em",h1:"h1",h2:"h2",h3:"h3",h4:"h4",header:"header",li:"li",ol:"ol",p:"p",pre:"pre",strong:"strong",table:"table",tbody:"tbody",td:"td",th:"th",thead:"thead",tr:"tr",ul:"ul",...(0,r.R)(),...n.components};return(0,i.jsxs)(i.Fragment,{children:[(0,i.jsx)(e.header,{children:(0,i.jsx)(e.h1,{id:"\u5ba2\u6237api-\u6863",children:"\u5ba2\u6237\ufffd?API ?\ufffd\u6863"})}),"\n",(0,i.jsx)(e.p,{children:"??\ufffd\ufffd\u4ece\u6e38?\ufffd\ufffd??\ufffd\u7aef?\ufffd\u63a5\u8c03\u7528?\ufffd\u516c??API \ufffd?\ufffd\ufffd??"}),"\n",(0,i.jsx)(e.h2,{id:"",children:"?\ufffd\ufffd?"}),"\n",(0,i.jsxs)(e.ul,{children:["\n",(0,i.jsxs)(e.li,{children:[(0,i.jsx)(e.strong,{children:"?\ufffd\ufffd?\u8eab\u4efd\u9a8c\u8bc1"}),"\uff1a\u53ef\u4ee5\u4ece\u5ba2\u6237\ufffd?\ufffd\ufffd?\ufffd\u8c03??- ",(0,i.jsx)(e.strong,{children:"?\ufffd\u901f\u7387?\ufffd\u5236"}),"\uff1a\u5904?\ufffd\u5927?\ufffd\ufffd?\ufffd?- ",(0,i.jsx)(e.strong,{children:"\u9ad8\u6027\u80fd\u7f13\u5b58"}),"\uff1a\u672c?\ufffd\u5185\u5b58\u7f13\u5b58\u5feb?\ufffd\u54cd\ufffd?- ",(0,i.jsx)(e.strong,{children:"?\ufffd\u52a8\u7f13\u5b58\u5931\u6548"}),"\uff1a\ufffd??\ufffd\u5458\ufffd?\ufffd\ufffd?\ufffd\u901a\u8fc7 pub/sub \u5b9e\u65f6?\ufffd\u65b0\u7f13\u5b58"]}),"\n"]}),"\n",(0,i.jsx)(e.h2,{id:"api-",children:"API \ufffd?\ufffd\ufffd"}),"\n",(0,i.jsx)(e.h3,{id:"1-\u5ba2\u6237\u4fe1",children:"1. \u5ba2\u6237\ufffd?\ufffd\ufffd?\ufffd\u4fe1??"}),"\n",(0,i.jsx)(e.pre,{children:(0,i.jsx)(e.code,{children:"GET /api/v1/client/client-version\n"})}),"\n",(0,i.jsx)(e.p,{children:"\u68c0\u7d22\u6e38?\ufffd\ufffd??\ufffd\u7aef?\ufffd\u7248?\ufffd\u4fe1??\ufffd?"}),"\n",(0,i.jsx)(e.h4,{id:"\u6570",children:"?\ufffd\ufffd??\ufffd\u6570"}),"\n",(0,i.jsxs)(e.table,{children:[(0,i.jsx)(e.thead,{children:(0,i.jsxs)(e.tr,{children:[(0,i.jsx)(e.th,{children:"?\ufffd\u6570"}),(0,i.jsx)(e.th,{children:"\u7c7b\u578b"}),(0,i.jsx)(e.th,{children:"?\ufffd\u8ff0"})]})}),(0,i.jsxs)(e.tbody,{children:[(0,i.jsxs)(e.tr,{children:[(0,i.jsx)(e.td,{children:"channel"}),(0,i.jsx)(e.td,{children:"string"}),(0,i.jsx)(e.td,{children:"\u9891\u9053\u8fc7\u6ee4?\ufffd\uff08\u4f8b\u5982\uff1aA1, PC\ufffd?"})]}),(0,i.jsxs)(e.tr,{children:[(0,i.jsx)(e.td,{children:"subChannel"}),(0,i.jsx)(e.td,{children:"string"}),(0,i.jsx)(e.td,{children:"\u5b50\u9891?\ufffd\u8fc7\u6ee4\u5668\uff08\u4f8b\u5982\uff1aQQ, WeChat, iOS\ufffd?"})]})]})]}),"\n",(0,i.jsx)(e.h4,{id:"\u5e94",children:"?\ufffd\u5e94"}),"\n",(0,i.jsx)(e.pre,{children:(0,i.jsx)(e.code,{className:"language-json",children:'{\n  "success": true,\n  "data": {\n    "versions": [\n      {\n        "id": 1,\n        "channel": "PC",\n        "subChannel": "Steam",\n        "clientVersion": "1.0.0",\n        "gameServerAddress": "https://game.example.com",\n        "gameServerAddressForWhiteList": "https://game-vip.example.com",\n        "patchAddress": "https://patch.example.com",\n        "patchAddressForWhiteList": "https://patch-vip.example.com",\n        "guestModeAllowed": true,\n        "externalClickLink": "https://website.example.com",\n        "customPayload": {\n          "feature1": true,\n          "setting1": "value1"\n        },\n        "createdAt": "2024-01-01T00:00:00.000Z",\n        "updatedAt": "2024-01-01T00:00:00.000Z"\n      }\n    ],\n    "total": 1,\n    "timestamp": "2024-01-01T00:00:00.000Z"\n  },\n  "cached": false\n}\n'})}),"\n",(0,i.jsx)(e.h4,{id:"\u7f13\u5b58\u4fe1\u606f",children:"\u7f13\u5b58\u4fe1\u606f"}),"\n",(0,i.jsxs)(e.ul,{children:["\n",(0,i.jsx)(e.li,{children:"**\u7f13\u5b58??*\ufffd?CLIENT_VERSION.BY_CHANNEL(channel, subChannel)`"}),"\n",(0,i.jsxs)(e.li,{children:[(0,i.jsx)(e.strong,{children:"\u7f13\u5b58 TTL"}),"\ufffd??\ufffd\u949f\ufffd?DEFAULT_CONFIG.CLIENT_VERSION_TTL`\ufffd?- ",(0,i.jsx)(e.strong,{children:"\u5931\u6548"}),"\uff1a\u521b\ufffd??\ufffd\u65b0/?\ufffd\u9664\u5ba2\u6237\ufffd?\ufffd\ufffd?\ufffd\u65f6"]}),"\n"]}),"\n",(0,i.jsx)(e.h3,{id:"2-\u6e38\u620f\u4e16\u754c\u8868",children:"2. \u6e38\u620f\u4e16\u754c?\ufffd\u8868"}),"\n",(0,i.jsx)(e.pre,{children:(0,i.jsx)(e.code,{children:"GET /api/v1/client/game-worlds\n"})}),"\n",(0,i.jsx)(e.p,{children:"\u68c0\u7d22\u53ef?\ufffd\u7684\u6e38\u620f\u4e16\u754c?\ufffd\u8868??"}),"\n",(0,i.jsx)(e.h4,{id:"\u5e94-1",children:"?\ufffd\u5e94"}),"\n",(0,i.jsx)(e.pre,{children:(0,i.jsx)(e.code,{className:"language-json",children:'{\n  "success": true,\n  "data": {\n    "worlds": [\n      {\n        "id": 1,\n        "worldId": "world001",\n        "name": "\u4e3b\u4e16??,\n        "description": "\u9ed8\ufffd?\u6e38\u620f\u4e16\u754c",\n        "displayOrder": 1,\n        "createdAt": "2024-01-01T00:00:00.000Z",\n        "updatedAt": "2024-01-01T00:00:00.000Z"\n      }\n    ],\n    "total": 1,\n    "timestamp": "2024-01-01T00:00:00.000Z"\n  },\n  "cached": false\n}\n'})}),"\n",(0,i.jsx)(e.h4,{id:"\u8fc7\u6ee4",children:"\u8fc7\u6ee4"}),"\n",(0,i.jsxs)(e.ul,{children:["\n",(0,i.jsxs)(e.li,{children:[(0,i.jsx)(e.strong,{children:"visible"}),"\uff1a\u4ec5\u8fd4\u56de ",(0,i.jsx)(e.code,{children:"visible: true"})," ?\ufffd\u4e16??- ",(0,i.jsx)(e.strong,{children:"maintenance"}),"\uff1a\u4ec5\u8fd4\u56de ",(0,i.jsx)(e.code,{children:"maintenance: false"})," ?\ufffd\u4e16?\ufffd\uff08?\ufffd\u7ef4?\ufffd\u4e2d\ufffd?- ",(0,i.jsx)(e.strong,{children:"?\ufffd\u5e8f"}),"\uff1a\u6309 ",(0,i.jsx)(e.code,{children:"displayOrder"})," ?\ufffd\u5e8f?\ufffd\u5217"]}),"\n"]}),"\n",(0,i.jsx)(e.h4,{id:"\u7f13\u5b58\u4fe1\u606f-1",children:"\u7f13\u5b58\u4fe1\u606f"}),"\n",(0,i.jsxs)(e.ul,{children:["\n",(0,i.jsx)(e.li,{children:"**\u7f13\u5b58??*\ufffd?GAME_WORLDS.PUBLIC`"}),"\n",(0,i.jsxs)(e.li,{children:[(0,i.jsx)(e.strong,{children:"\u7f13\u5b58 TTL"}),"\ufffd?0?\ufffd\u949f\ufffd?DEFAULT_CONFIG.GAME_WORLDS_PUBLIC_TTL`\ufffd?- ",(0,i.jsx)(e.strong,{children:"\u5931\u6548"}),"\uff1a\u521b\ufffd??\ufffd\u65b0/?\ufffd\u9664\u6e38\u620f\u4e16\u754c??"]}),"\n"]}),"\n",(0,i.jsx)(e.h3,{id:"3-\u7f13\u5b58\u7edf",children:"3. \u7f13\u5b58\u7edf\ufffd?"}),"\n",(0,i.jsx)(e.pre,{children:(0,i.jsx)(e.code,{children:"GET /api/v1/client/cache-stats\n"})}),"\n",(0,i.jsx)(e.p,{children:"\u68c0\u7d22\u7f13\u5b58\u6027\u80fd\u7edf\ufffd?\u4fe1\u606f\uff08\u7528\u4e8e\u76d1?\ufffd\uff09??"}),"\n",(0,i.jsx)(e.h4,{id:"\u5e94-2",children:"?\ufffd\u5e94"}),"\n",(0,i.jsx)(e.pre,{children:(0,i.jsx)(e.code,{className:"language-json",children:'{\n  "success": true,\n  "data": {\n    "totalItems": 10,\n    "validItems": 8,\n    "expiredItems": 2,\n    "memoryUsage": {\n      "rss": 50331648,\n      "heapTotal": 20971520,\n      "heapUsed": 15728640,\n      "external": 1048576,\n      "arrayBuffers": 524288\n    }\n  }\n}\n'})}),"\n",(0,i.jsx)(e.h2,{id:"\u7f13\u5b58\u7cfb\u7edf",children:"\u7f13\u5b58\u7cfb\u7edf"}),"\n",(0,i.jsx)(e.h3,{id:"\u5730\u5b58\u7f13\u5b58",children:"?\ufffd\u5730?\ufffd\u5b58\u7f13\u5b58"}),"\n",(0,i.jsxs)(e.ul,{children:["\n",(0,i.jsxs)(e.li,{children:[(0,i.jsx)(e.strong,{children:"CacheService"}),"\uff1a\u5185\u5b58\u7f13\u5b58\ufffd???- ",(0,i.jsx)(e.strong,{children:"?\ufffd\u52a8\u8fc7\u671f"}),"\uff1a\u57fa\ufffd?TTL ?\ufffd\u81ea?\ufffd\u6e05??- ",(0,i.jsx)(e.strong,{children:"\u6a21\u5f0f?\ufffd\u914d"}),"\uff1a\u901a\u8fc7\u6b63\u5219\u8868\u8fbe\u5f0f\u6279?\ufffd\u5220??"]}),"\n"]}),"\n",(0,i.jsx)(e.h3,{id:"\u4e8e-bullmq-\u961f\u7cfb",children:"?\ufffd\u4e8e BullMQ ?\ufffd\u961f?\ufffd\u7cfb\ufffd?"}),"\n",(0,i.jsxs)(e.ul,{children:["\n",(0,i.jsxs)(e.li,{children:[(0,i.jsx)(e.strong,{children:"PubSubService"}),"\uff1a\u901a\u8fc7 BullMQ ?\ufffd\u53ef?\ufffd\u7f13\u5b58\u5931?\ufffd\u961f??- ",(0,i.jsx)(e.strong,{children:"QueueService"}),"\uff1a\u7528\u4e8e\u90ae\u4ef6\u3001\ufffd?\u8ba1\u65e5\u5fd7\u3001\u6e05?\ufffd\u4efb?\ufffd\u7684?\ufffd\u7528?\ufffd\u5217\u7cfb\u7edf"]}),"\n",(0,i.jsxs)(e.li,{children:[(0,i.jsx)(e.strong,{children:"\u5b9e\u65f6?\ufffd\ufffd?"}),"\uff1a\ufffd??\ufffd\u5458\ufffd?\ufffd\ufffd?\ufffd\u7acb?\ufffd\u5728?\ufffd?\ufffd\u5b9e\u4f8b\u4e2d\u5931\u6548\u7f13\u5b58"]}),"\n",(0,i.jsxs)(e.li,{children:[(0,i.jsx)(e.strong,{children:"?\ufffd\u8bd5?\ufffd\u5236"}),"\uff1a\u5931\u8d25\u4f5c\u4e1a\u7684?\ufffd\u52a8?\ufffd\u8bd5\uff08\u6307?\ufffd\u9000?\ufffd\uff09"]}),"\n",(0,i.jsx)(e.li,{children:"**\u5bb9\u9519??*\uff1a\u5373\ufffd?Redis \u8fde\u63a5\u5931\u8d25\uff0c\u672c?\ufffd\u7f13\u5b58\u4ecd\u7ee7\u7eed\u5de5\u4f5c"}),"\n"]}),"\n",(0,i.jsx)(e.h3,{id:"\u7f13\u5b58\u5931\u6548\u666f",children:"\u7f13\u5b58\u5931\u6548?\ufffd\u666f"}),"\n",(0,i.jsxs)(e.ol,{children:["\n",(0,i.jsxs)(e.li,{children:["\n",(0,i.jsxs)(e.p,{children:["*",(0,i.jsx)(e.em,{children:"\u5ba2\u6237\ufffd?\ufffd\ufffd?\ufffd\u66f4??"})]}),"\n",(0,i.jsxs)(e.ul,{children:["\n",(0,i.jsx)(e.li,{children:"?\ufffd\u5efa/?\ufffd\u65b0/?\ufffd\u9664/?\ufffd\u6001\u66f4?\ufffd\u65f6"}),"\n",(0,i.jsx)(e.li,{children:"\u6a21\u5f0f\ufffd?client_version:.*`"}),"\n",(0,i.jsx)(e.li,{children:"?\ufffd\u8fc7?\ufffd\u5217\u5f02\ufffd?\u5904\u7406"}),"\n"]}),"\n"]}),"\n",(0,i.jsxs)(e.li,{children:["\n",(0,i.jsx)(e.p,{children:(0,i.jsx)(e.strong,{children:"\u6e38\u620f\u4e16\u754c?\ufffd\u6539"})}),"\n",(0,i.jsxs)(e.ul,{children:["\n",(0,i.jsxs)(e.li,{children:["?\ufffd\u5efa/?\ufffd\u65b0/?\ufffd\u9664??   - ??\ufffd\ufffd",(0,i.jsx)(e.code,{children:"game_worlds:public"})]}),"\n",(0,i.jsx)(e.li,{children:"?\ufffd\u8fc7?\ufffd\u5217\u5f02\ufffd?\u5904\u7406"}),"\n"]}),"\n"]}),"\n"]}),"\n",(0,i.jsx)(e.h3,{id:"\u5217\u7cfb\u7edf",children:"?\ufffd\u5217\u7cfb\u7edf?\ufffd\ufffd?"}),"\n",(0,i.jsxs)(e.ul,{children:["\n",(0,i.jsxs)(e.li,{children:[(0,i.jsx)(e.strong,{children:"\u9ad8\u4f18?\ufffd\u7ea7"}),"\uff1a\u7f13\u5b58\u5931?\ufffd\u4f5c\u4e1a\u4ee5\u4f18\u5148\ufffd?10 \u5904\u7406"]}),"\n",(0,i.jsxs)(e.li,{children:[(0,i.jsx)(e.strong,{children:"?\ufffd\u52a8\u6e05\u7406"}),"\uff1a\u4fdd??100 \u4e2a\u5df2\u5b8c\u6210\u4f5c\u4e1a\ufffd?0 \u4e2a\u5931\u8d25\u4f5c\ufffd?- ",(0,i.jsx)(e.strong,{children:"\u5e76\u53d1?\ufffd\u5236"}),"\uff1a\u6bcf\u4e2a\u5de5\u4f5c\u5668?\ufffd\ufffd?5 \u4e2a\u5e76?\ufffd\u4f5c\ufffd?- ",(0,i.jsx)(e.strong,{children:"?\ufffd\u63a7"}),"\uff1a\u53ef?\ufffd\u7684\u5b9e\u65f6?\ufffd\u5217?\ufffd\u6001\u76d1??"]}),"\n"]}),"\n",(0,i.jsx)(e.h2,{id:"\u80fd\u4f18\u5316",children:"?\ufffd\u80fd\u4f18\u5316"}),"\n",(0,i.jsx)(e.h3,{id:"\u5e94\u95f4",children:"?\ufffd\u5e94?\ufffd\u95f4"}),"\n",(0,i.jsxs)(e.ul,{children:["\n",(0,i.jsxs)(e.li,{children:[(0,i.jsx)(e.strong,{children:"\u7f13\u5b58?\ufffd\u4e2d"}),"\ufffd?1ms"]}),"\n",(0,i.jsxs)(e.li,{children:["**\u7f13\u5b58?\ufffd\u547d\ufffd?*\ufffd?50-100ms\uff08\u6570??\ufffd\ufffd?\ufffd\ufffd?\ufffd?- ",(0,i.jsx)(e.strong,{children:"\u7f13\u5b58\u5931\u6548"}),"\ufffd?2-5ms\uff08BullMQ ?\ufffd\u5217\u6dfb\u52a0\ufffd?- ",(0,i.jsx)(e.strong,{children:"?\ufffd\u5217\u5904\u7406"}),"\ufffd?10-50ms\uff08\u540e?\ufffd\u5904?\ufffd\uff09"]}),"\n"]}),"\n",(0,i.jsx)(e.h3,{id:"\u5b58\u4f7f\u7528",children:"?\ufffd\u5b58\u4f7f\u7528"}),"\n",(0,i.jsxs)(e.ul,{children:["\n",(0,i.jsx)(e.li,{children:"**\u9884\u671f\u4f7f\u7528??*\uff1a\u6bcf\ufffd?~1-5KB"}),"\n",(0,i.jsxs)(e.li,{children:[(0,i.jsx)(e.strong,{children:"?\ufffd\u52a8\u6e05\u7406"}),"\uff1a\u6bcf?\ufffd\u949f\u6e05\u7406\u8fc7\u671f\ufffd?- ",(0,i.jsx)(e.strong,{children:"?\ufffd\u5217\u6e05\u7406"}),"\uff1a\u81ea?\ufffd\u6e05?\ufffd\u5df2\u5b8c\u6210/\u5931\u8d25?\ufffd\u4f5c\ufffd?- ",(0,i.jsx)(e.strong,{children:"?\ufffd\u5b58?\ufffd\u63a7"}),"\uff1a\u901a\u8fc7 ",(0,i.jsx)(e.code,{children:"/api/v1/client/cache-stats"})," \u68c0??"]}),"\n"]}),"\n",(0,i.jsx)(e.h2,{id:"\u4f7f\u7528\u793a\u4f8b",children:"\u4f7f\u7528\u793a\u4f8b"}),"\n",(0,i.jsx)(e.h3,{id:"javascript\u6e38\u7aef",children:"JavaScript\uff08\u6e38?\ufffd\ufffd??\ufffd\u7aef\ufffd?"}),"\n",(0,i.jsx)(e.pre,{children:(0,i.jsx)(e.code,{className:"language-javascript",children:"// ?\ufffd\u53d6\u5ba2\u6237\ufffd?\ufffd\ufffd?\ufffd\u4fe1??async function getClientVersion(channel, subChannel) {\n  const params = new URLSearchParams();\n  if (channel) params.append('channel', channel);\n  if (subChannel) params.append('subChannel', subChannel);\n  \n  const response = await fetch(`/api/v1/client/client-version?${params}`);\n  const data = await response.json();\n  \n  if (data.success) {\n    return data.data.versions;\n  }\n  throw new Error('?\ufffd\u53d6\u5ba2\u6237\ufffd?\ufffd\ufffd?\ufffd\u5931\ufffd?);\n}\n\n// ?\ufffd\u53d6\u6e38\u620f\u4e16\u754c?\ufffd\u8868\nasync function getGameWorlds() {\n  const response = await fetch('/api/v1/client/game-worlds');\n  const data = await response.json();\n  \n  if (data.success) {\n    return data.data.worlds;\n  }\n  throw new Error('?\ufffd\u53d6\u6e38\u620f\u4e16\u754c\u5931\u8d25');\n}\n"})}),"\n",(0,i.jsx)(e.h3,{id:"unity-c\u6e38\u7aef",children:"Unity C#\uff08\u6e38?\ufffd\ufffd??\ufffd\u7aef\ufffd?"}),"\n",(0,i.jsx)(e.pre,{children:(0,i.jsx)(e.code,{className:"language-csharp",children:'using UnityEngine;\nusing UnityEngine.Networking;\nusing System.Collections;\n\npublic class ClientAPI : MonoBehaviour\n{\n    private const string BASE_URL = "https://api.example.com/api/v1/client";\n    \n    public IEnumerator GetClientVersion(string channel, string subChannel)\n    {\n        string url = $"{BASE_URL}/client-version";\n        if (!string.IsNullOrEmpty(channel))\n            url += $"?channel={channel}";\n        if (!string.IsNullOrEmpty(subChannel))\n            url += $"&subChannel={subChannel}";\n            \n        using (UnityWebRequest request = UnityWebRequest.Get(url))\n        {\n            yield return request.SendWebRequest();\n            \n            if (request.result == UnityWebRequest.Result.Success)\n            {\n                string json = request.downloadHandler.text;\n                // JSON \u89e3\u6790?\ufffd\u5904??                Debug.Log($"\u5ba2\u6237\ufffd?\ufffd\ufffd?\ufffd\u6570??\ufffd\ufffd{json}");\n            }\n        }\n    }\n}\n'})}),"\n",(0,i.jsx)(e.h2,{id:"\u63a7",children:"?\ufffd\u63a7"}),"\n",(0,i.jsx)(e.h3,{id:"\u5fd7\u68c0",children:"?\ufffd\u5fd7\u68c0??"}),"\n",(0,i.jsx)(e.pre,{children:(0,i.jsx)(e.code,{className:"language-bash",children:"# \u68c0?\ufffd\u7f13\u5b58\u76f8?\ufffd\u65e5\ufffd?tail -f logs/app.log | grep -i cache\n\n# \u68c0??PubSub ?\ufffd\u5173?\ufffd\u5fd7\ntail -f logs/app.log | grep -i pubsub\n"})}),"\n",(0,i.jsx)(e.h3,{id:"\u7f13\u5b58\u961f\u7edf\u8ba1\u76d1",children:"\u7f13\u5b58?\ufffd\u961f?\ufffd\u7edf\u8ba1\u76d1??"}),"\n",(0,i.jsx)(e.pre,{children:(0,i.jsx)(e.code,{className:"language-bash",children:"# \u8c03\u7528\u7f13\u5b58?\ufffd\u961f?\ufffd\u7edf\ufffd?API\ncurl http://localhost:3000/api/v1/client/cache-stats\n"})}),"\n",(0,i.jsxs)(e.p,{children:["*",(0,i.jsx)(e.em,{children:"?\ufffd\u5e94\u793a\u4f8b\ufffd?"})]}),"\n",(0,i.jsx)(e.pre,{children:(0,i.jsx)(e.code,{className:"language-json",children:'{\n  "success": true,\n  "data": {\n    "cache": {\n      "totalItems": 10,\n      "validItems": 8,\n      "expiredItems": 2,\n      "memoryUsage": { ... }\n    },\n    "queue": {\n      "waiting": 0,\n      "active": 1,\n      "completed": 150,\n      "failed": 2,\n      "total": 153\n    },\n    "pubsub": {\n      "connected": true,\n      "timestamp": "2024-01-01T00:00:00.000Z"\n    }\n  }\n}\n'})}),"\n",(0,i.jsx)(e.h3,{id:"bullmq-\u4eea\u8868",children:"BullMQ \u4eea\u8868?\ufffd\uff08??\ufffd\ufffd\uff09"}),"\n",(0,i.jsx)(e.p,{children:"?\ufffd\u8fc7 BullMQ UI \u8fdb\u884c?\ufffd\u5217?\ufffd\u63a7\ufffd?"}),"\n",(0,i.jsx)(e.pre,{children:(0,i.jsx)(e.code,{className:"language-bash",children:"# \u5b89\u88c5 BullMQ UI\uff08\ufffd??\ufffd\u73af\u5883\uff09\nnpm install -g @bull-board/ui\n\n# \u8fd0\u884c\u4eea\u8868??bull-board\n"})})]})}function o(n={}){const{wrapper:e}={...(0,r.R)(),...n.components};return e?(0,i.jsx)(e,{...n,children:(0,i.jsx)(h,{...n})}):h(n)}},8453(n,e,s){s.d(e,{R:()=>d,x:()=>c});var l=s(6540);const i={},r=l.createContext(i);function d(n){const e=l.useContext(r);return l.useMemo(function(){return"function"==typeof n?n(e):{...e,...n}},[e,n])}function c(n){let e;return e=n.disableParentContext?"function"==typeof n.components?n.components(i):n.components||i:d(n.components),l.createElement(r.Provider,{value:e},n.children)}}}]);
+'use strict';
+(globalThis.webpackChunkdocs = globalThis.webpackChunkdocs || []).push([
+  [5163],
+  {
+    4956(n, e, s) {
+      (s.r(e),
+        s.d(e, {
+          assets: () => t,
+          contentTitle: () => c,
+          default: () => o,
+          frontMatter: () => d,
+          metadata: () => l,
+          toc: () => a,
+        }));
+      const l = JSON.parse(
+        '{"id":"api/client-api","title":"\u5ba2\u6237\ufffd?API ?\ufffd\u6863","description":"??\ufffd\ufffd\u4ece\u6e38?\ufffd\ufffd??\ufffd\u7aef?\ufffd\u63a5\u8c03\u7528?\ufffd\u516c??API \ufffd?\ufffd\ufffd??","source":"@site/i18n/zh-Hans/docusaurus-plugin-content-docs/current/api/client-api.md","sourceDirName":"api","slug":"/api/client-api","permalink":"/docs/zh-Hans/api/client-api","draft":false,"unlisted":false,"editUrl":"https://github.com/your-org/gatrix/tree/main/docs/docs/api/client-api.md","tags":[],"version":"current","sidebarPosition":1,"frontMatter":{"sidebar_position":1},"sidebar":"tutorialSidebar","previous":{"title":"New Relic","permalink":"/docs/zh-Hans/integrations/new-relic"},"next":{"title":"Server SDK API","permalink":"/docs/zh-Hans/api/server-sdk-api"}}'
+      );
+      var i = s(4848),
+        r = s(8453);
+      const d = { sidebar_position: 1 },
+        c = '\u5ba2\u6237\ufffd?API ?\ufffd\u6863',
+        t = {},
+        a = [
+          { value: '?\ufffd\ufffd?', id: '', level: 2 },
+          { value: 'API \ufffd?\ufffd\ufffd', id: 'api-', level: 2 },
+          {
+            value: '1. \u5ba2\u6237\ufffd?\ufffd\ufffd?\ufffd\u4fe1??',
+            id: '1-\u5ba2\u6237\u4fe1',
+            level: 3,
+          },
+          { value: '?\ufffd\ufffd??\ufffd\u6570', id: '\u6570', level: 4 },
+          { value: '?\ufffd\u5e94', id: '\u5e94', level: 4 },
+          { value: '\u7f13\u5b58\u4fe1\u606f', id: '\u7f13\u5b58\u4fe1\u606f', level: 4 },
+          {
+            value: '2. \u6e38\u620f\u4e16\u754c?\ufffd\u8868',
+            id: '2-\u6e38\u620f\u4e16\u754c\u8868',
+            level: 3,
+          },
+          { value: '?\ufffd\u5e94', id: '\u5e94-1', level: 4 },
+          { value: '\u8fc7\u6ee4', id: '\u8fc7\u6ee4', level: 4 },
+          { value: '\u7f13\u5b58\u4fe1\u606f', id: '\u7f13\u5b58\u4fe1\u606f-1', level: 4 },
+          { value: '3. \u7f13\u5b58\u7edf\ufffd?', id: '3-\u7f13\u5b58\u7edf', level: 3 },
+          { value: '?\ufffd\u5e94', id: '\u5e94-2', level: 4 },
+          { value: '\u7f13\u5b58\u7cfb\u7edf', id: '\u7f13\u5b58\u7cfb\u7edf', level: 2 },
+          {
+            value: '?\ufffd\u5730?\ufffd\u5b58\u7f13\u5b58',
+            id: '\u5730\u5b58\u7f13\u5b58',
+            level: 3,
+          },
+          {
+            value: '?\ufffd\u4e8e BullMQ ?\ufffd\u961f?\ufffd\u7cfb\ufffd?',
+            id: '\u4e8e-bullmq-\u961f\u7cfb',
+            level: 3,
+          },
+          {
+            value: '\u7f13\u5b58\u5931\u6548?\ufffd\u666f',
+            id: '\u7f13\u5b58\u5931\u6548\u666f',
+            level: 3,
+          },
+          { value: '?\ufffd\u5217\u7cfb\u7edf?\ufffd\ufffd?', id: '\u5217\u7cfb\u7edf', level: 3 },
+          { value: '?\ufffd\u80fd\u4f18\u5316', id: '\u80fd\u4f18\u5316', level: 2 },
+          { value: '?\ufffd\u5e94?\ufffd\u95f4', id: '\u5e94\u95f4', level: 3 },
+          { value: '?\ufffd\u5b58\u4f7f\u7528', id: '\u5b58\u4f7f\u7528', level: 3 },
+          { value: '\u4f7f\u7528\u793a\u4f8b', id: '\u4f7f\u7528\u793a\u4f8b', level: 2 },
+          {
+            value: 'JavaScript\uff08\u6e38?\ufffd\ufffd??\ufffd\u7aef\ufffd?',
+            id: 'javascript\u6e38\u7aef',
+            level: 3,
+          },
+          {
+            value: 'Unity C#\uff08\u6e38?\ufffd\ufffd??\ufffd\u7aef\ufffd?',
+            id: 'unity-c\u6e38\u7aef',
+            level: 3,
+          },
+          { value: '?\ufffd\u63a7', id: '\u63a7', level: 2 },
+          { value: '?\ufffd\u5fd7\u68c0??', id: '\u5fd7\u68c0', level: 3 },
+          {
+            value: '\u7f13\u5b58?\ufffd\u961f?\ufffd\u7edf\u8ba1\u76d1??',
+            id: '\u7f13\u5b58\u961f\u7edf\u8ba1\u76d1',
+            level: 3,
+          },
+          {
+            value: 'BullMQ \u4eea\u8868?\ufffd\uff08??\ufffd\ufffd\uff09',
+            id: 'bullmq-\u4eea\u8868',
+            level: 3,
+          },
+        ];
+      function h(n) {
+        const e = {
+          code: 'code',
+          em: 'em',
+          h1: 'h1',
+          h2: 'h2',
+          h3: 'h3',
+          h4: 'h4',
+          header: 'header',
+          li: 'li',
+          ol: 'ol',
+          p: 'p',
+          pre: 'pre',
+          strong: 'strong',
+          table: 'table',
+          tbody: 'tbody',
+          td: 'td',
+          th: 'th',
+          thead: 'thead',
+          tr: 'tr',
+          ul: 'ul',
+          ...(0, r.R)(),
+          ...n.components,
+        };
+        return (0, i.jsxs)(i.Fragment, {
+          children: [
+            (0, i.jsx)(e.header, {
+              children: (0, i.jsx)(e.h1, {
+                id: '\u5ba2\u6237api-\u6863',
+                children: '\u5ba2\u6237\ufffd?API ?\ufffd\u6863',
+              }),
+            }),
+            '\n',
+            (0, i.jsx)(e.p, {
+              children:
+                '??\ufffd\ufffd\u4ece\u6e38?\ufffd\ufffd??\ufffd\u7aef?\ufffd\u63a5\u8c03\u7528?\ufffd\u516c??API \ufffd?\ufffd\ufffd??',
+            }),
+            '\n',
+            (0, i.jsx)(e.h2, { id: '', children: '?\ufffd\ufffd?' }),
+            '\n',
+            (0, i.jsxs)(e.ul, {
+              children: [
+                '\n',
+                (0, i.jsxs)(e.li, {
+                  children: [
+                    (0, i.jsx)(e.strong, { children: '?\ufffd\ufffd?\u8eab\u4efd\u9a8c\u8bc1' }),
+                    '\uff1a\u53ef\u4ee5\u4ece\u5ba2\u6237\ufffd?\ufffd\ufffd?\ufffd\u8c03??- ',
+                    (0, i.jsx)(e.strong, { children: '?\ufffd\u901f\u7387?\ufffd\u5236' }),
+                    '\uff1a\u5904?\ufffd\u5927?\ufffd\ufffd?\ufffd?- ',
+                    (0, i.jsx)(e.strong, { children: '\u9ad8\u6027\u80fd\u7f13\u5b58' }),
+                    '\uff1a\u672c?\ufffd\u5185\u5b58\u7f13\u5b58\u5feb?\ufffd\u54cd\ufffd?- ',
+                    (0, i.jsx)(e.strong, { children: '?\ufffd\u52a8\u7f13\u5b58\u5931\u6548' }),
+                    '\uff1a\ufffd??\ufffd\u5458\ufffd?\ufffd\ufffd?\ufffd\u901a\u8fc7 pub/sub \u5b9e\u65f6?\ufffd\u65b0\u7f13\u5b58',
+                  ],
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, i.jsx)(e.h2, { id: 'api-', children: 'API \ufffd?\ufffd\ufffd' }),
+            '\n',
+            (0, i.jsx)(e.h3, {
+              id: '1-\u5ba2\u6237\u4fe1',
+              children: '1. \u5ba2\u6237\ufffd?\ufffd\ufffd?\ufffd\u4fe1??',
+            }),
+            '\n',
+            (0, i.jsx)(e.pre, {
+              children: (0, i.jsx)(e.code, { children: 'GET /api/v1/client/client-version\n' }),
+            }),
+            '\n',
+            (0, i.jsx)(e.p, {
+              children:
+                '\u68c0\u7d22\u6e38?\ufffd\ufffd??\ufffd\u7aef?\ufffd\u7248?\ufffd\u4fe1??\ufffd?',
+            }),
+            '\n',
+            (0, i.jsx)(e.h4, { id: '\u6570', children: '?\ufffd\ufffd??\ufffd\u6570' }),
+            '\n',
+            (0, i.jsxs)(e.table, {
+              children: [
+                (0, i.jsx)(e.thead, {
+                  children: (0, i.jsxs)(e.tr, {
+                    children: [
+                      (0, i.jsx)(e.th, { children: '?\ufffd\u6570' }),
+                      (0, i.jsx)(e.th, { children: '\u7c7b\u578b' }),
+                      (0, i.jsx)(e.th, { children: '?\ufffd\u8ff0' }),
+                    ],
+                  }),
+                }),
+                (0, i.jsxs)(e.tbody, {
+                  children: [
+                    (0, i.jsxs)(e.tr, {
+                      children: [
+                        (0, i.jsx)(e.td, { children: 'channel' }),
+                        (0, i.jsx)(e.td, { children: 'string' }),
+                        (0, i.jsx)(e.td, {
+                          children:
+                            '\u9891\u9053\u8fc7\u6ee4?\ufffd\uff08\u4f8b\u5982\uff1aA1, PC\ufffd?',
+                        }),
+                      ],
+                    }),
+                    (0, i.jsxs)(e.tr, {
+                      children: [
+                        (0, i.jsx)(e.td, { children: 'subChannel' }),
+                        (0, i.jsx)(e.td, { children: 'string' }),
+                        (0, i.jsx)(e.td, {
+                          children:
+                            '\u5b50\u9891?\ufffd\u8fc7\u6ee4\u5668\uff08\u4f8b\u5982\uff1aQQ, WeChat, iOS\ufffd?',
+                        }),
+                      ],
+                    }),
+                  ],
+                }),
+              ],
+            }),
+            '\n',
+            (0, i.jsx)(e.h4, { id: '\u5e94', children: '?\ufffd\u5e94' }),
+            '\n',
+            (0, i.jsx)(e.pre, {
+              children: (0, i.jsx)(e.code, {
+                className: 'language-json',
+                children:
+                  '{\n  "success": true,\n  "data": {\n    "versions": [\n      {\n        "id": 1,\n        "channel": "PC",\n        "subChannel": "Steam",\n        "clientVersion": "1.0.0",\n        "gameServerAddress": "https://game.example.com",\n        "gameServerAddressForWhiteList": "https://game-vip.example.com",\n        "patchAddress": "https://patch.example.com",\n        "patchAddressForWhiteList": "https://patch-vip.example.com",\n        "guestModeAllowed": true,\n        "externalClickLink": "https://website.example.com",\n        "customPayload": {\n          "feature1": true,\n          "setting1": "value1"\n        },\n        "createdAt": "2024-01-01T00:00:00.000Z",\n        "updatedAt": "2024-01-01T00:00:00.000Z"\n      }\n    ],\n    "total": 1,\n    "timestamp": "2024-01-01T00:00:00.000Z"\n  },\n  "cached": false\n}\n',
+              }),
+            }),
+            '\n',
+            (0, i.jsx)(e.h4, {
+              id: '\u7f13\u5b58\u4fe1\u606f',
+              children: '\u7f13\u5b58\u4fe1\u606f',
+            }),
+            '\n',
+            (0, i.jsxs)(e.ul, {
+              children: [
+                '\n',
+                (0, i.jsx)(e.li, {
+                  children:
+                    '**\u7f13\u5b58??*\ufffd?CLIENT_VERSION.BY_CHANNEL(channel, subChannel)`',
+                }),
+                '\n',
+                (0, i.jsxs)(e.li, {
+                  children: [
+                    (0, i.jsx)(e.strong, { children: '\u7f13\u5b58 TTL' }),
+                    '\ufffd??\ufffd\u949f\ufffd?DEFAULT_CONFIG.CLIENT_VERSION_TTL`\ufffd?- ',
+                    (0, i.jsx)(e.strong, { children: '\u5931\u6548' }),
+                    '\uff1a\u521b\ufffd??\ufffd\u65b0/?\ufffd\u9664\u5ba2\u6237\ufffd?\ufffd\ufffd?\ufffd\u65f6',
+                  ],
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, i.jsx)(e.h3, {
+              id: '2-\u6e38\u620f\u4e16\u754c\u8868',
+              children: '2. \u6e38\u620f\u4e16\u754c?\ufffd\u8868',
+            }),
+            '\n',
+            (0, i.jsx)(e.pre, {
+              children: (0, i.jsx)(e.code, { children: 'GET /api/v1/client/game-worlds\n' }),
+            }),
+            '\n',
+            (0, i.jsx)(e.p, {
+              children: '\u68c0\u7d22\u53ef?\ufffd\u7684\u6e38\u620f\u4e16\u754c?\ufffd\u8868??',
+            }),
+            '\n',
+            (0, i.jsx)(e.h4, { id: '\u5e94-1', children: '?\ufffd\u5e94' }),
+            '\n',
+            (0, i.jsx)(e.pre, {
+              children: (0, i.jsx)(e.code, {
+                className: 'language-json',
+                children:
+                  '{\n  "success": true,\n  "data": {\n    "worlds": [\n      {\n        "id": 1,\n        "worldId": "world001",\n        "name": "\u4e3b\u4e16??,\n        "description": "\u9ed8\ufffd?\u6e38\u620f\u4e16\u754c",\n        "displayOrder": 1,\n        "createdAt": "2024-01-01T00:00:00.000Z",\n        "updatedAt": "2024-01-01T00:00:00.000Z"\n      }\n    ],\n    "total": 1,\n    "timestamp": "2024-01-01T00:00:00.000Z"\n  },\n  "cached": false\n}\n',
+              }),
+            }),
+            '\n',
+            (0, i.jsx)(e.h4, { id: '\u8fc7\u6ee4', children: '\u8fc7\u6ee4' }),
+            '\n',
+            (0, i.jsxs)(e.ul, {
+              children: [
+                '\n',
+                (0, i.jsxs)(e.li, {
+                  children: [
+                    (0, i.jsx)(e.strong, { children: 'visible' }),
+                    '\uff1a\u4ec5\u8fd4\u56de ',
+                    (0, i.jsx)(e.code, { children: 'visible: true' }),
+                    ' ?\ufffd\u4e16??- ',
+                    (0, i.jsx)(e.strong, { children: 'maintenance' }),
+                    '\uff1a\u4ec5\u8fd4\u56de ',
+                    (0, i.jsx)(e.code, { children: 'maintenance: false' }),
+                    ' ?\ufffd\u4e16?\ufffd\uff08?\ufffd\u7ef4?\ufffd\u4e2d\ufffd?- ',
+                    (0, i.jsx)(e.strong, { children: '?\ufffd\u5e8f' }),
+                    '\uff1a\u6309 ',
+                    (0, i.jsx)(e.code, { children: 'displayOrder' }),
+                    ' ?\ufffd\u5e8f?\ufffd\u5217',
+                  ],
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, i.jsx)(e.h4, {
+              id: '\u7f13\u5b58\u4fe1\u606f-1',
+              children: '\u7f13\u5b58\u4fe1\u606f',
+            }),
+            '\n',
+            (0, i.jsxs)(e.ul, {
+              children: [
+                '\n',
+                (0, i.jsx)(e.li, { children: '**\u7f13\u5b58??*\ufffd?GAME_WORLDS.PUBLIC`' }),
+                '\n',
+                (0, i.jsxs)(e.li, {
+                  children: [
+                    (0, i.jsx)(e.strong, { children: '\u7f13\u5b58 TTL' }),
+                    '\ufffd?0?\ufffd\u949f\ufffd?DEFAULT_CONFIG.GAME_WORLDS_PUBLIC_TTL`\ufffd?- ',
+                    (0, i.jsx)(e.strong, { children: '\u5931\u6548' }),
+                    '\uff1a\u521b\ufffd??\ufffd\u65b0/?\ufffd\u9664\u6e38\u620f\u4e16\u754c??',
+                  ],
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, i.jsx)(e.h3, {
+              id: '3-\u7f13\u5b58\u7edf',
+              children: '3. \u7f13\u5b58\u7edf\ufffd?',
+            }),
+            '\n',
+            (0, i.jsx)(e.pre, {
+              children: (0, i.jsx)(e.code, { children: 'GET /api/v1/client/cache-stats\n' }),
+            }),
+            '\n',
+            (0, i.jsx)(e.p, {
+              children:
+                '\u68c0\u7d22\u7f13\u5b58\u6027\u80fd\u7edf\ufffd?\u4fe1\u606f\uff08\u7528\u4e8e\u76d1?\ufffd\uff09??',
+            }),
+            '\n',
+            (0, i.jsx)(e.h4, { id: '\u5e94-2', children: '?\ufffd\u5e94' }),
+            '\n',
+            (0, i.jsx)(e.pre, {
+              children: (0, i.jsx)(e.code, {
+                className: 'language-json',
+                children:
+                  '{\n  "success": true,\n  "data": {\n    "totalItems": 10,\n    "validItems": 8,\n    "expiredItems": 2,\n    "memoryUsage": {\n      "rss": 50331648,\n      "heapTotal": 20971520,\n      "heapUsed": 15728640,\n      "external": 1048576,\n      "arrayBuffers": 524288\n    }\n  }\n}\n',
+              }),
+            }),
+            '\n',
+            (0, i.jsx)(e.h2, {
+              id: '\u7f13\u5b58\u7cfb\u7edf',
+              children: '\u7f13\u5b58\u7cfb\u7edf',
+            }),
+            '\n',
+            (0, i.jsx)(e.h3, {
+              id: '\u5730\u5b58\u7f13\u5b58',
+              children: '?\ufffd\u5730?\ufffd\u5b58\u7f13\u5b58',
+            }),
+            '\n',
+            (0, i.jsxs)(e.ul, {
+              children: [
+                '\n',
+                (0, i.jsxs)(e.li, {
+                  children: [
+                    (0, i.jsx)(e.strong, { children: 'CacheService' }),
+                    '\uff1a\u5185\u5b58\u7f13\u5b58\ufffd???- ',
+                    (0, i.jsx)(e.strong, { children: '?\ufffd\u52a8\u8fc7\u671f' }),
+                    '\uff1a\u57fa\ufffd?TTL ?\ufffd\u81ea?\ufffd\u6e05??- ',
+                    (0, i.jsx)(e.strong, { children: '\u6a21\u5f0f?\ufffd\u914d' }),
+                    '\uff1a\u901a\u8fc7\u6b63\u5219\u8868\u8fbe\u5f0f\u6279?\ufffd\u5220??',
+                  ],
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, i.jsx)(e.h3, {
+              id: '\u4e8e-bullmq-\u961f\u7cfb',
+              children: '?\ufffd\u4e8e BullMQ ?\ufffd\u961f?\ufffd\u7cfb\ufffd?',
+            }),
+            '\n',
+            (0, i.jsxs)(e.ul, {
+              children: [
+                '\n',
+                (0, i.jsxs)(e.li, {
+                  children: [
+                    (0, i.jsx)(e.strong, { children: 'PubSubService' }),
+                    '\uff1a\u901a\u8fc7 BullMQ ?\ufffd\u53ef?\ufffd\u7f13\u5b58\u5931?\ufffd\u961f??- ',
+                    (0, i.jsx)(e.strong, { children: 'QueueService' }),
+                    '\uff1a\u7528\u4e8e\u90ae\u4ef6\u3001\ufffd?\u8ba1\u65e5\u5fd7\u3001\u6e05?\ufffd\u4efb?\ufffd\u7684?\ufffd\u7528?\ufffd\u5217\u7cfb\u7edf',
+                  ],
+                }),
+                '\n',
+                (0, i.jsxs)(e.li, {
+                  children: [
+                    (0, i.jsx)(e.strong, { children: '\u5b9e\u65f6?\ufffd\ufffd?' }),
+                    '\uff1a\ufffd??\ufffd\u5458\ufffd?\ufffd\ufffd?\ufffd\u7acb?\ufffd\u5728?\ufffd?\ufffd\u5b9e\u4f8b\u4e2d\u5931\u6548\u7f13\u5b58',
+                  ],
+                }),
+                '\n',
+                (0, i.jsxs)(e.li, {
+                  children: [
+                    (0, i.jsx)(e.strong, { children: '?\ufffd\u8bd5?\ufffd\u5236' }),
+                    '\uff1a\u5931\u8d25\u4f5c\u4e1a\u7684?\ufffd\u52a8?\ufffd\u8bd5\uff08\u6307?\ufffd\u9000?\ufffd\uff09',
+                  ],
+                }),
+                '\n',
+                (0, i.jsx)(e.li, {
+                  children:
+                    '**\u5bb9\u9519??*\uff1a\u5373\ufffd?Redis \u8fde\u63a5\u5931\u8d25\uff0c\u672c?\ufffd\u7f13\u5b58\u4ecd\u7ee7\u7eed\u5de5\u4f5c',
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, i.jsx)(e.h3, {
+              id: '\u7f13\u5b58\u5931\u6548\u666f',
+              children: '\u7f13\u5b58\u5931\u6548?\ufffd\u666f',
+            }),
+            '\n',
+            (0, i.jsxs)(e.ol, {
+              children: [
+                '\n',
+                (0, i.jsxs)(e.li, {
+                  children: [
+                    '\n',
+                    (0, i.jsxs)(e.p, {
+                      children: [
+                        '*',
+                        (0, i.jsx)(e.em, {
+                          children: '\u5ba2\u6237\ufffd?\ufffd\ufffd?\ufffd\u66f4??',
+                        }),
+                      ],
+                    }),
+                    '\n',
+                    (0, i.jsxs)(e.ul, {
+                      children: [
+                        '\n',
+                        (0, i.jsx)(e.li, {
+                          children:
+                            '?\ufffd\u5efa/?\ufffd\u65b0/?\ufffd\u9664/?\ufffd\u6001\u66f4?\ufffd\u65f6',
+                        }),
+                        '\n',
+                        (0, i.jsx)(e.li, { children: '\u6a21\u5f0f\ufffd?client_version:.*`' }),
+                        '\n',
+                        (0, i.jsx)(e.li, {
+                          children: '?\ufffd\u8fc7?\ufffd\u5217\u5f02\ufffd?\u5904\u7406',
+                        }),
+                        '\n',
+                      ],
+                    }),
+                    '\n',
+                  ],
+                }),
+                '\n',
+                (0, i.jsxs)(e.li, {
+                  children: [
+                    '\n',
+                    (0, i.jsx)(e.p, {
+                      children: (0, i.jsx)(e.strong, {
+                        children: '\u6e38\u620f\u4e16\u754c?\ufffd\u6539',
+                      }),
+                    }),
+                    '\n',
+                    (0, i.jsxs)(e.ul, {
+                      children: [
+                        '\n',
+                        (0, i.jsxs)(e.li, {
+                          children: [
+                            '?\ufffd\u5efa/?\ufffd\u65b0/?\ufffd\u9664??   - ??\ufffd\ufffd',
+                            (0, i.jsx)(e.code, { children: 'game_worlds:public' }),
+                          ],
+                        }),
+                        '\n',
+                        (0, i.jsx)(e.li, {
+                          children: '?\ufffd\u8fc7?\ufffd\u5217\u5f02\ufffd?\u5904\u7406',
+                        }),
+                        '\n',
+                      ],
+                    }),
+                    '\n',
+                  ],
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, i.jsx)(e.h3, {
+              id: '\u5217\u7cfb\u7edf',
+              children: '?\ufffd\u5217\u7cfb\u7edf?\ufffd\ufffd?',
+            }),
+            '\n',
+            (0, i.jsxs)(e.ul, {
+              children: [
+                '\n',
+                (0, i.jsxs)(e.li, {
+                  children: [
+                    (0, i.jsx)(e.strong, { children: '\u9ad8\u4f18?\ufffd\u7ea7' }),
+                    '\uff1a\u7f13\u5b58\u5931?\ufffd\u4f5c\u4e1a\u4ee5\u4f18\u5148\ufffd?10 \u5904\u7406',
+                  ],
+                }),
+                '\n',
+                (0, i.jsxs)(e.li, {
+                  children: [
+                    (0, i.jsx)(e.strong, { children: '?\ufffd\u52a8\u6e05\u7406' }),
+                    '\uff1a\u4fdd??100 \u4e2a\u5df2\u5b8c\u6210\u4f5c\u4e1a\ufffd?0 \u4e2a\u5931\u8d25\u4f5c\ufffd?- ',
+                    (0, i.jsx)(e.strong, { children: '\u5e76\u53d1?\ufffd\u5236' }),
+                    '\uff1a\u6bcf\u4e2a\u5de5\u4f5c\u5668?\ufffd\ufffd?5 \u4e2a\u5e76?\ufffd\u4f5c\ufffd?- ',
+                    (0, i.jsx)(e.strong, { children: '?\ufffd\u63a7' }),
+                    '\uff1a\u53ef?\ufffd\u7684\u5b9e\u65f6?\ufffd\u5217?\ufffd\u6001\u76d1??',
+                  ],
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, i.jsx)(e.h2, { id: '\u80fd\u4f18\u5316', children: '?\ufffd\u80fd\u4f18\u5316' }),
+            '\n',
+            (0, i.jsx)(e.h3, { id: '\u5e94\u95f4', children: '?\ufffd\u5e94?\ufffd\u95f4' }),
+            '\n',
+            (0, i.jsxs)(e.ul, {
+              children: [
+                '\n',
+                (0, i.jsxs)(e.li, {
+                  children: [
+                    (0, i.jsx)(e.strong, { children: '\u7f13\u5b58?\ufffd\u4e2d' }),
+                    '\ufffd?1ms',
+                  ],
+                }),
+                '\n',
+                (0, i.jsxs)(e.li, {
+                  children: [
+                    '**\u7f13\u5b58?\ufffd\u547d\ufffd?*\ufffd?50-100ms\uff08\u6570??\ufffd\ufffd?\ufffd\ufffd?\ufffd?- ',
+                    (0, i.jsx)(e.strong, { children: '\u7f13\u5b58\u5931\u6548' }),
+                    '\ufffd?2-5ms\uff08BullMQ ?\ufffd\u5217\u6dfb\u52a0\ufffd?- ',
+                    (0, i.jsx)(e.strong, { children: '?\ufffd\u5217\u5904\u7406' }),
+                    '\ufffd?10-50ms\uff08\u540e?\ufffd\u5904?\ufffd\uff09',
+                  ],
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, i.jsx)(e.h3, { id: '\u5b58\u4f7f\u7528', children: '?\ufffd\u5b58\u4f7f\u7528' }),
+            '\n',
+            (0, i.jsxs)(e.ul, {
+              children: [
+                '\n',
+                (0, i.jsx)(e.li, {
+                  children: '**\u9884\u671f\u4f7f\u7528??*\uff1a\u6bcf\ufffd?~1-5KB',
+                }),
+                '\n',
+                (0, i.jsxs)(e.li, {
+                  children: [
+                    (0, i.jsx)(e.strong, { children: '?\ufffd\u52a8\u6e05\u7406' }),
+                    '\uff1a\u6bcf?\ufffd\u949f\u6e05\u7406\u8fc7\u671f\ufffd?- ',
+                    (0, i.jsx)(e.strong, { children: '?\ufffd\u5217\u6e05\u7406' }),
+                    '\uff1a\u81ea?\ufffd\u6e05?\ufffd\u5df2\u5b8c\u6210/\u5931\u8d25?\ufffd\u4f5c\ufffd?- ',
+                    (0, i.jsx)(e.strong, { children: '?\ufffd\u5b58?\ufffd\u63a7' }),
+                    '\uff1a\u901a\u8fc7 ',
+                    (0, i.jsx)(e.code, { children: '/api/v1/client/cache-stats' }),
+                    ' \u68c0??',
+                  ],
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, i.jsx)(e.h2, {
+              id: '\u4f7f\u7528\u793a\u4f8b',
+              children: '\u4f7f\u7528\u793a\u4f8b',
+            }),
+            '\n',
+            (0, i.jsx)(e.h3, {
+              id: 'javascript\u6e38\u7aef',
+              children: 'JavaScript\uff08\u6e38?\ufffd\ufffd??\ufffd\u7aef\ufffd?',
+            }),
+            '\n',
+            (0, i.jsx)(e.pre, {
+              children: (0, i.jsx)(e.code, {
+                className: 'language-javascript',
+                children:
+                  "// ?\ufffd\u53d6\u5ba2\u6237\ufffd?\ufffd\ufffd?\ufffd\u4fe1??async function getClientVersion(channel, subChannel) {\n  const params = new URLSearchParams();\n  if (channel) params.append('channel', channel);\n  if (subChannel) params.append('subChannel', subChannel);\n  \n  const response = await fetch(`/api/v1/client/client-version?${params}`);\n  const data = await response.json();\n  \n  if (data.success) {\n    return data.data.versions;\n  }\n  throw new Error('?\ufffd\u53d6\u5ba2\u6237\ufffd?\ufffd\ufffd?\ufffd\u5931\ufffd?);\n}\n\n// ?\ufffd\u53d6\u6e38\u620f\u4e16\u754c?\ufffd\u8868\nasync function getGameWorlds() {\n  const response = await fetch('/api/v1/client/game-worlds');\n  const data = await response.json();\n  \n  if (data.success) {\n    return data.data.worlds;\n  }\n  throw new Error('?\ufffd\u53d6\u6e38\u620f\u4e16\u754c\u5931\u8d25');\n}\n",
+              }),
+            }),
+            '\n',
+            (0, i.jsx)(e.h3, {
+              id: 'unity-c\u6e38\u7aef',
+              children: 'Unity C#\uff08\u6e38?\ufffd\ufffd??\ufffd\u7aef\ufffd?',
+            }),
+            '\n',
+            (0, i.jsx)(e.pre, {
+              children: (0, i.jsx)(e.code, {
+                className: 'language-csharp',
+                children:
+                  'using UnityEngine;\nusing UnityEngine.Networking;\nusing System.Collections;\n\npublic class ClientAPI : MonoBehaviour\n{\n    private const string BASE_URL = "https://api.example.com/api/v1/client";\n    \n    public IEnumerator GetClientVersion(string channel, string subChannel)\n    {\n        string url = $"{BASE_URL}/client-version";\n        if (!string.IsNullOrEmpty(channel))\n            url += $"?channel={channel}";\n        if (!string.IsNullOrEmpty(subChannel))\n            url += $"&subChannel={subChannel}";\n            \n        using (UnityWebRequest request = UnityWebRequest.Get(url))\n        {\n            yield return request.SendWebRequest();\n            \n            if (request.result == UnityWebRequest.Result.Success)\n            {\n                string json = request.downloadHandler.text;\n                // JSON \u89e3\u6790?\ufffd\u5904??                Debug.Log($"\u5ba2\u6237\ufffd?\ufffd\ufffd?\ufffd\u6570??\ufffd\ufffd{json}");\n            }\n        }\n    }\n}\n',
+              }),
+            }),
+            '\n',
+            (0, i.jsx)(e.h2, { id: '\u63a7', children: '?\ufffd\u63a7' }),
+            '\n',
+            (0, i.jsx)(e.h3, { id: '\u5fd7\u68c0', children: '?\ufffd\u5fd7\u68c0??' }),
+            '\n',
+            (0, i.jsx)(e.pre, {
+              children: (0, i.jsx)(e.code, {
+                className: 'language-bash',
+                children:
+                  '# \u68c0?\ufffd\u7f13\u5b58\u76f8?\ufffd\u65e5\ufffd?tail -f logs/app.log | grep -i cache\n\n# \u68c0??PubSub ?\ufffd\u5173?\ufffd\u5fd7\ntail -f logs/app.log | grep -i pubsub\n',
+              }),
+            }),
+            '\n',
+            (0, i.jsx)(e.h3, {
+              id: '\u7f13\u5b58\u961f\u7edf\u8ba1\u76d1',
+              children: '\u7f13\u5b58?\ufffd\u961f?\ufffd\u7edf\u8ba1\u76d1??',
+            }),
+            '\n',
+            (0, i.jsx)(e.pre, {
+              children: (0, i.jsx)(e.code, {
+                className: 'language-bash',
+                children:
+                  '# \u8c03\u7528\u7f13\u5b58?\ufffd\u961f?\ufffd\u7edf\ufffd?API\ncurl http://localhost:3000/api/v1/client/cache-stats\n',
+              }),
+            }),
+            '\n',
+            (0, i.jsxs)(e.p, {
+              children: ['*', (0, i.jsx)(e.em, { children: '?\ufffd\u5e94\u793a\u4f8b\ufffd?' })],
+            }),
+            '\n',
+            (0, i.jsx)(e.pre, {
+              children: (0, i.jsx)(e.code, {
+                className: 'language-json',
+                children:
+                  '{\n  "success": true,\n  "data": {\n    "cache": {\n      "totalItems": 10,\n      "validItems": 8,\n      "expiredItems": 2,\n      "memoryUsage": { ... }\n    },\n    "queue": {\n      "waiting": 0,\n      "active": 1,\n      "completed": 150,\n      "failed": 2,\n      "total": 153\n    },\n    "pubsub": {\n      "connected": true,\n      "timestamp": "2024-01-01T00:00:00.000Z"\n    }\n  }\n}\n',
+              }),
+            }),
+            '\n',
+            (0, i.jsx)(e.h3, {
+              id: 'bullmq-\u4eea\u8868',
+              children: 'BullMQ \u4eea\u8868?\ufffd\uff08??\ufffd\ufffd\uff09',
+            }),
+            '\n',
+            (0, i.jsx)(e.p, {
+              children: '?\ufffd\u8fc7 BullMQ UI \u8fdb\u884c?\ufffd\u5217?\ufffd\u63a7\ufffd?',
+            }),
+            '\n',
+            (0, i.jsx)(e.pre, {
+              children: (0, i.jsx)(e.code, {
+                className: 'language-bash',
+                children:
+                  '# \u5b89\u88c5 BullMQ UI\uff08\ufffd??\ufffd\u73af\u5883\uff09\nnpm install -g @bull-board/ui\n\n# \u8fd0\u884c\u4eea\u8868??bull-board\n',
+              }),
+            }),
+          ],
+        });
+      }
+      function o(n = {}) {
+        const { wrapper: e } = { ...(0, r.R)(), ...n.components };
+        return e ? (0, i.jsx)(e, { ...n, children: (0, i.jsx)(h, { ...n }) }) : h(n);
+      }
+    },
+    8453(n, e, s) {
+      s.d(e, { R: () => d, x: () => c });
+      var l = s(6540);
+      const i = {},
+        r = l.createContext(i);
+      function d(n) {
+        const e = l.useContext(r);
+        return l.useMemo(
+          function () {
+            return 'function' == typeof n ? n(e) : { ...e, ...n };
+          },
+          [e, n]
+        );
+      }
+      function c(n) {
+        let e;
+        return (
+          (e = n.disableParentContext
+            ? 'function' == typeof n.components
+              ? n.components(i)
+              : n.components || i
+            : d(n.components)),
+          l.createElement(r.Provider, { value: e }, n.children)
+        );
+      }
+    },
+  },
+]);

@@ -1,9 +1,9 @@
-import { FastifyPluginAsync } from "fastify";
-import { MetricsService } from "../services/metrics";
-import { FunnelService } from "../services/funnel";
-import { RetentionService } from "../services/retention";
-import { authenticateClient, requireReadAccess } from "../middleware/auth";
-import logger from "../utils/logger";
+import { FastifyPluginAsync } from 'fastify';
+import { MetricsService } from '../services/metrics';
+import { FunnelService } from '../services/funnel';
+import { RetentionService } from '../services/retention';
+import { authenticateClient, requireReadAccess } from '../middleware/auth';
+import logger from '../utils/logger';
 
 const insightsRoutes: FastifyPluginAsync = async (fastify) => {
   const metricsService = new MetricsService();
@@ -12,7 +12,7 @@ const insightsRoutes: FastifyPluginAsync = async (fastify) => {
 
   // GET /insights/:projectId/metrics - 기본 메트릭
   fastify.get(
-    "/:projectId/metrics",
+    '/:projectId/metrics',
     {
       preHandler: [authenticateClient, requireReadAccess],
     },
@@ -26,7 +26,7 @@ const insightsRoutes: FastifyPluginAsync = async (fastify) => {
 
         if (!startDate || !endDate) {
           return reply.code(400).send({
-            error: "Missing required query parameters: startDate, endDate",
+            error: 'Missing required query parameters: startDate, endDate',
           });
         }
 
@@ -38,15 +38,15 @@ const insightsRoutes: FastifyPluginAsync = async (fastify) => {
 
         return metrics;
       } catch (error: any) {
-        logger.error("Metrics endpoint error", { error: error.message });
-        return reply.code(500).send({ error: "Internal Server Error" });
+        logger.error('Metrics endpoint error', { error: error.message });
+        return reply.code(500).send({ error: 'Internal Server Error' });
       }
-    },
+    }
   );
 
   // GET /insights/:projectId/timeseries - 시계열 데이터
   fastify.get(
-    "/:projectId/timeseries",
+    '/:projectId/timeseries',
     {
       preHandler: [authenticateClient, requireReadAccess],
     },
@@ -56,12 +56,12 @@ const insightsRoutes: FastifyPluginAsync = async (fastify) => {
         const { startDate, endDate, interval } = request.query as {
           startDate: string;
           endDate: string;
-          interval?: "hour" | "day" | "week" | "month";
+          interval?: 'hour' | 'day' | 'week' | 'month';
         };
 
         if (!startDate || !endDate) {
           return reply.code(400).send({
-            error: "Missing required query parameters: startDate, endDate",
+            error: 'Missing required query parameters: startDate, endDate',
           });
         }
 
@@ -69,20 +69,20 @@ const insightsRoutes: FastifyPluginAsync = async (fastify) => {
           projectId,
           startDate,
           endDate,
-          interval: interval || "day",
+          interval: interval || 'day',
         });
 
         return data;
       } catch (error: any) {
-        logger.error("Timeseries endpoint error", { error: error.message });
-        return reply.code(500).send({ error: "Internal Server Error" });
+        logger.error('Timeseries endpoint error', { error: error.message });
+        return reply.code(500).send({ error: 'Internal Server Error' });
       }
-    },
+    }
   );
 
   // GET /insights/:projectId/pages - 상위 페이지
   fastify.get(
-    "/:projectId/pages",
+    '/:projectId/pages',
     {
       preHandler: [authenticateClient, requireReadAccess],
     },
@@ -97,7 +97,7 @@ const insightsRoutes: FastifyPluginAsync = async (fastify) => {
 
         if (!startDate || !endDate) {
           return reply.code(400).send({
-            error: "Missing required query parameters: startDate, endDate",
+            error: 'Missing required query parameters: startDate, endDate',
           });
         }
 
@@ -110,15 +110,15 @@ const insightsRoutes: FastifyPluginAsync = async (fastify) => {
 
         return data;
       } catch (error: any) {
-        logger.error("Pages endpoint error", { error: error.message });
-        return reply.code(500).send({ error: "Internal Server Error" });
+        logger.error('Pages endpoint error', { error: error.message });
+        return reply.code(500).send({ error: 'Internal Server Error' });
       }
-    },
+    }
   );
 
   // GET /insights/:projectId/live - 실시간 방문자
   fastify.get(
-    "/:projectId/live",
+    '/:projectId/live',
     {
       preHandler: [authenticateClient, requireReadAccess],
     },
@@ -128,15 +128,15 @@ const insightsRoutes: FastifyPluginAsync = async (fastify) => {
         const count = await metricsService.getLiveVisitors(projectId);
         return { count };
       } catch (error: any) {
-        logger.error("Live visitors endpoint error", { error: error.message });
-        return reply.code(500).send({ error: "Internal Server Error" });
+        logger.error('Live visitors endpoint error', { error: error.message });
+        return reply.code(500).send({ error: 'Internal Server Error' });
       }
-    },
+    }
   );
 
   // GET /insights/:projectId/referrers - 상위 Referrer
   fastify.get(
-    "/:projectId/referrers",
+    '/:projectId/referrers',
     {
       preHandler: [authenticateClient, requireReadAccess],
     },
@@ -151,7 +151,7 @@ const insightsRoutes: FastifyPluginAsync = async (fastify) => {
 
         if (!startDate || !endDate) {
           return reply.code(400).send({
-            error: "Missing required query parameters: startDate, endDate",
+            error: 'Missing required query parameters: startDate, endDate',
           });
         }
 
@@ -164,15 +164,15 @@ const insightsRoutes: FastifyPluginAsync = async (fastify) => {
 
         return data;
       } catch (error: any) {
-        logger.error("Referrers endpoint error", { error: error.message });
-        return reply.code(500).send({ error: "Internal Server Error" });
+        logger.error('Referrers endpoint error', { error: error.message });
+        return reply.code(500).send({ error: 'Internal Server Error' });
       }
-    },
+    }
   );
 
   // GET /insights/:projectId/devices - 디바이스 통계
   fastify.get(
-    "/:projectId/devices",
+    '/:projectId/devices',
     {
       preHandler: [authenticateClient, requireReadAccess],
     },
@@ -186,7 +186,7 @@ const insightsRoutes: FastifyPluginAsync = async (fastify) => {
 
         if (!startDate || !endDate) {
           return reply.code(400).send({
-            error: "Missing required query parameters: startDate, endDate",
+            error: 'Missing required query parameters: startDate, endDate',
           });
         }
 
@@ -198,15 +198,15 @@ const insightsRoutes: FastifyPluginAsync = async (fastify) => {
 
         return data;
       } catch (error: any) {
-        logger.error("Devices endpoint error", { error: error.message });
-        return reply.code(500).send({ error: "Internal Server Error" });
+        logger.error('Devices endpoint error', { error: error.message });
+        return reply.code(500).send({ error: 'Internal Server Error' });
       }
-    },
+    }
   );
 
   // GET /insights/:projectId/geo - 지리 통계
   fastify.get(
-    "/:projectId/geo",
+    '/:projectId/geo',
     {
       preHandler: [authenticateClient, requireReadAccess],
     },
@@ -220,7 +220,7 @@ const insightsRoutes: FastifyPluginAsync = async (fastify) => {
 
         if (!startDate || !endDate) {
           return reply.code(400).send({
-            error: "Missing required query parameters: startDate, endDate",
+            error: 'Missing required query parameters: startDate, endDate',
           });
         }
 
@@ -232,15 +232,15 @@ const insightsRoutes: FastifyPluginAsync = async (fastify) => {
 
         return data;
       } catch (error: any) {
-        logger.error("Geo endpoint error", { error: error.message });
-        return reply.code(500).send({ error: "Internal Server Error" });
+        logger.error('Geo endpoint error', { error: error.message });
+        return reply.code(500).send({ error: 'Internal Server Error' });
       }
-    },
+    }
   );
 
   // POST /insights/:projectId/funnel - 퍼널 분석
   fastify.post(
-    "/:projectId/funnel",
+    '/:projectId/funnel',
     {
       preHandler: [authenticateClient, requireReadAccess],
     },
@@ -255,13 +255,13 @@ const insightsRoutes: FastifyPluginAsync = async (fastify) => {
 
         if (!steps || !Array.isArray(steps) || steps.length < 2) {
           return reply.code(400).send({
-            error: "steps must be an array with at least 2 elements",
+            error: 'steps must be an array with at least 2 elements',
           });
         }
 
         if (!startDate || !endDate) {
           return reply.code(400).send({
-            error: "Missing required fields: startDate, endDate",
+            error: 'Missing required fields: startDate, endDate',
           });
         }
 
@@ -274,15 +274,15 @@ const insightsRoutes: FastifyPluginAsync = async (fastify) => {
 
         return data;
       } catch (error: any) {
-        logger.error("Funnel endpoint error", { error: error.message });
-        return reply.code(500).send({ error: "Internal Server Error" });
+        logger.error('Funnel endpoint error', { error: error.message });
+        return reply.code(500).send({ error: 'Internal Server Error' });
       }
-    },
+    }
   );
 
   // GET /insights/:projectId/retention - 리텐션 분석
   fastify.get(
-    "/:projectId/retention",
+    '/:projectId/retention',
     {
       preHandler: [authenticateClient, requireReadAccess],
     },
@@ -292,12 +292,12 @@ const insightsRoutes: FastifyPluginAsync = async (fastify) => {
         const { startDate, endDate, period } = request.query as {
           startDate: string;
           endDate: string;
-          period?: "day" | "week" | "month";
+          period?: 'day' | 'week' | 'month';
         };
 
         if (!startDate || !endDate) {
           return reply.code(400).send({
-            error: "Missing required query parameters: startDate, endDate",
+            error: 'Missing required query parameters: startDate, endDate',
           });
         }
 
@@ -305,15 +305,15 @@ const insightsRoutes: FastifyPluginAsync = async (fastify) => {
           projectId,
           startDate,
           endDate,
-          period: period || "day",
+          period: period || 'day',
         });
 
         return data;
       } catch (error: any) {
-        logger.error("Retention endpoint error", { error: error.message });
-        return reply.code(500).send({ error: "Internal Server Error" });
+        logger.error('Retention endpoint error', { error: error.message });
+        return reply.code(500).send({ error: 'Internal Server Error' });
       }
-    },
+    }
   );
 };
 

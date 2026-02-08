@@ -51,19 +51,11 @@
     },
     ":enum": {},
     ":links": {
-      "itemId": [
-        "CEquip",
-        "Item",
-        "ShipSlot"
-      ],
-      "pointId": [
-        "Point"
-      ],
+      "itemId": ["CEquip", "Item", "ShipSlot"],
+      "pointId": ["Point"],
       "contentsTerms": [
         {
-          "Id": [
-            "ContentsTerms"
-          ]
+          "Id": ["ContentsTerms"]
         }
       ]
     }

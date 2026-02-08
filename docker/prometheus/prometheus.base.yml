@@ -88,4 +88,3 @@ scrape_configs:
           instance: loki
           hostname: loki
           ip: loki
-

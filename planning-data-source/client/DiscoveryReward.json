@@ -35,9 +35,7 @@
     },
     ":enum": {},
     ":links": {
-      "reward": [
-        "RewardFixed"
-      ]
+      "reward": ["RewardFixed"]
     }
   },
   "DiscoveryReward": {
@@ -48,12 +46,7 @@
       "sortingOrder": 1,
       "explorationNoteType": 4,
       "explorationNoteTargetType": 0,
-      "explorationNoteTarget": [
-        70414001,
-        70414021,
-        70414041,
-        70414066
-      ],
+      "explorationNoteTarget": [70414001, 70414021, 70414041, 70414066],
       "reward": 95992264
     },
     "99900001": {
@@ -63,11 +56,7 @@
       "sortingOrder": 2,
       "explorationNoteType": 4,
       "explorationNoteTargetType": 0,
-      "explorationNoteTarget": [
-        70414075,
-        70414088,
-        70414005
-      ],
+      "explorationNoteTarget": [70414075, 70414088, 70414005],
       "reward": 95992265
     },
     "99900002": {
@@ -77,12 +66,7 @@
       "sortingOrder": 3,
       "explorationNoteType": 4,
       "explorationNoteTargetType": 0,
-      "explorationNoteTarget": [
-        70414085,
-        70414076,
-        70414089,
-        70414041
-      ],
+      "explorationNoteTarget": [70414085, 70414076, 70414089, 70414041],
       "reward": 95992266
     },
     "99900003": {
@@ -92,12 +76,7 @@
       "sortingOrder": 4,
       "explorationNoteType": 4,
       "explorationNoteTargetType": 0,
-      "explorationNoteTarget": [
-        70414024,
-        70414115,
-        70414114,
-        70414008
-      ],
+      "explorationNoteTarget": [70414024, 70414115, 70414114, 70414008],
       "reward": 95992267
     },
     "99900004": {
@@ -107,11 +86,7 @@
       "sortingOrder": 1,
       "explorationNoteType": 0,
       "explorationNoteTargetType": 0,
-      "explorationNoteTarget": [
-        70414068,
-        70414069,
-        70414077
-      ],
+      "explorationNoteTarget": [70414068, 70414069, 70414077],
       "reward": 95992268
     },
     "99900005": {
@@ -121,11 +96,7 @@
       "sortingOrder": 5,
       "explorationNoteType": 4,
       "explorationNoteTargetType": 0,
-      "explorationNoteTarget": [
-        70414112,
-        70414095,
-        70414087
-      ],
+      "explorationNoteTarget": [70414112, 70414095, 70414087],
       "reward": 95992269
     },
     "99900006": {
@@ -135,11 +106,7 @@
       "sortingOrder": 6,
       "explorationNoteType": 4,
       "explorationNoteTargetType": 0,
-      "explorationNoteTarget": [
-        70414078,
-        70414031,
-        70414045
-      ],
+      "explorationNoteTarget": [70414078, 70414031, 70414045],
       "reward": 95992270
     },
     "99900007": {
@@ -149,13 +116,7 @@
       "sortingOrder": 2,
       "explorationNoteType": 0,
       "explorationNoteTargetType": 0,
-      "explorationNoteTarget": [
-        70414082,
-        70414006,
-        70414085,
-        70414096,
-        70414057
-      ],
+      "explorationNoteTarget": [70414082, 70414006, 70414085, 70414096, 70414057],
       "reward": 95992271
     },
     "99900008": {
@@ -165,10 +126,7 @@
       "sortingOrder": 7,
       "explorationNoteType": 4,
       "explorationNoteTargetType": 0,
-      "explorationNoteTarget": [
-        70414066,
-        70414005
-      ],
+      "explorationNoteTarget": [70414066, 70414005],
       "reward": 95992272
     },
     "99900009": {
@@ -178,10 +136,7 @@
       "sortingOrder": 8,
       "explorationNoteType": 4,
       "explorationNoteTargetType": 0,
-      "explorationNoteTarget": [
-        70414045,
-        70414004
-      ],
+      "explorationNoteTarget": [70414045, 70414004],
       "reward": 95992273
     },
     "99900010": {
@@ -191,10 +146,7 @@
       "sortingOrder": 3,
       "explorationNoteType": 0,
       "explorationNoteTargetType": 0,
-      "explorationNoteTarget": [
-        70414072,
-        70414007
-      ],
+      "explorationNoteTarget": [70414072, 70414007],
       "reward": 95992274
     },
     "99900011": {
@@ -204,10 +156,7 @@
       "sortingOrder": 4,
       "explorationNoteType": 0,
       "explorationNoteTargetType": 0,
-      "explorationNoteTarget": [
-        70414023,
-        70414113
-      ],
+      "explorationNoteTarget": [70414023, 70414113],
       "reward": 95992275
     },
     "99900012": {
@@ -217,11 +166,7 @@
       "sortingOrder": 5,
       "explorationNoteType": 0,
       "explorationNoteTargetType": 0,
-      "explorationNoteTarget": [
-        70414049,
-        70414038,
-        70414003
-      ],
+      "explorationNoteTarget": [70414049, 70414038, 70414003],
       "reward": 95992276
     },
     "99900013": {
@@ -231,10 +176,7 @@
       "sortingOrder": 6,
       "explorationNoteType": 0,
       "explorationNoteTargetType": 0,
-      "explorationNoteTarget": [
-        70414009,
-        70414105
-      ],
+      "explorationNoteTarget": [70414009, 70414105],
       "reward": 95992277
     },
     "99900017": {
@@ -245,18 +187,8 @@
       "explorationNoteType": 4,
       "explorationNoteTargetType": 0,
       "explorationNoteTarget": [
-        70414064,
-        70414108,
-        70414054,
-        70414003,
-        70414049,
-        70414078,
-        70414079,
-        70414077,
-        70414009,
-        70414067,
-        70414034,
-        70414033
+        70414064, 70414108, 70414054, 70414003, 70414049, 70414078, 70414079, 70414077, 70414009,
+        70414067, 70414034, 70414033
       ],
       "reward": 95997499
     },
@@ -267,11 +199,7 @@
       "sortingOrder": 11,
       "explorationNoteType": 4,
       "explorationNoteTargetType": 0,
-      "explorationNoteTarget": [
-        70401049,
-        70401051,
-        70412311
-      ],
+      "explorationNoteTarget": [70401049, 70401051, 70412311],
       "reward": 95992278
     },
     "99900019": {
@@ -281,13 +209,7 @@
       "sortingOrder": 12,
       "explorationNoteType": 4,
       "explorationNoteTargetType": 0,
-      "explorationNoteTarget": [
-        70413423,
-        70413426,
-        70413506,
-        70413209,
-        70413425
-      ],
+      "explorationNoteTarget": [70413423, 70413426, 70413506, 70413209, 70413425],
       "reward": 95992279
     },
     "99900020": {
@@ -298,15 +220,7 @@
       "explorationNoteType": 4,
       "explorationNoteTargetType": 0,
       "explorationNoteTarget": [
-        70408003,
-        70408032,
-        70408048,
-        70417136,
-        70417014,
-        70417051,
-        70417202,
-        70411024,
-        70411030,
+        70408003, 70408032, 70408048, 70417136, 70417014, 70417051, 70417202, 70411024, 70411030,
         70410022
       ],
       "reward": 95992280

@@ -105,39 +105,25 @@
     ":links": {
       "purchaseCnt": [
         {
-          "PointId": [
-            "Point"
-          ]
+          "PointId": ["Point"]
         },
         {
-          "PointId": [
-            "Point"
-          ]
+          "PointId": ["Point"]
         },
         {
-          "PointId": [
-            "Point"
-          ]
+          "PointId": ["Point"]
         },
         {
-          "PointId": [
-            "Point"
-          ]
+          "PointId": ["Point"]
         },
         {
-          "PointId": [
-            "Point"
-          ]
+          "PointId": ["Point"]
         },
         {
-          "PointId": [
-            "Point"
-          ]
+          "PointId": ["Point"]
         },
         {
-          "PointId": [
-            "Point"
-          ]
+          "PointId": ["Point"]
         }
       ]
     }

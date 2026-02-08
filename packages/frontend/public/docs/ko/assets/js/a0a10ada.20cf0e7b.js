@@ -1,1 +1,11 @@
-"use strict";(globalThis.webpackChunkdocs=globalThis.webpackChunkdocs||[]).push([[5386],{4958(a){a.exports=JSON.parse('{"tag":{"label":"API","permalink":"/docs/ko/blog/tags/api","description":"API documentation and usage","allTagsPath":"/docs/ko/blog/tags","count":1,"unlisted":false},"listMetadata":{"permalink":"/docs/ko/blog/tags/api","page":1,"postsPerPage":10,"totalPages":1,"totalCount":1,"blogDescription":"Blog","blogTitle":"Blog"}}')}}]);
+'use strict';
+(globalThis.webpackChunkdocs = globalThis.webpackChunkdocs || []).push([
+  [5386],
+  {
+    4958(a) {
+      a.exports = JSON.parse(
+        '{"tag":{"label":"API","permalink":"/docs/ko/blog/tags/api","description":"API documentation and usage","allTagsPath":"/docs/ko/blog/tags","count":1,"unlisted":false},"listMetadata":{"permalink":"/docs/ko/blog/tags/api","page":1,"postsPerPage":10,"totalPages":1,"totalCount":1,"blogDescription":"Blog","blogTitle":"Blog"}}'
+      );
+    },
+  },
+]);

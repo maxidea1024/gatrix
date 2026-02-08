@@ -126,7 +126,6 @@ function FlagCard({ flag, initialVersion, lastChangedTime, onSelect }: FlagCardP
             </span>
           </div>
 
-
           <div className="flag-payload">
             <div className="flag-payload-label">Payload</div>
             {hasPayload ? (
@@ -147,6 +146,5 @@ function FlagCard({ flag, initialVersion, lastChangedTime, onSelect }: FlagCardP
     </div>
   );
 }
-
 
 export default FlagCard;

@@ -46,24 +46,12 @@
     },
     ":enum": {},
     ":links": {
-      "mailId": [
-        "Mail"
-      ],
-      "rewardId": [
-        "Reward"
-      ],
-      "mailIdDefeat": [
-        "Mail"
-      ],
-      "mailIdLose": [
-        "Mail"
-      ],
-      "rewardDefeat": [
-        "Reward"
-      ],
-      "rewardLose": [
-        "Reward"
-      ]
+      "mailId": ["Mail"],
+      "rewardId": ["Reward"],
+      "mailIdDefeat": ["Mail"],
+      "mailIdLose": ["Mail"],
+      "rewardDefeat": ["Reward"],
+      "rewardLose": ["Reward"]
     }
   },
   "BossRaidRanking": {

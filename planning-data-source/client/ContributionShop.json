@@ -67,25 +67,15 @@
     ":enum": {},
     ":asset": {},
     ":links": {
-      "salePointId": [
-        "Point"
-      ],
-      "previousId": [
-        "CashShop"
-      ],
-      "productNationId": [
-        "Nation"
-      ],
+      "salePointId": ["Point"],
+      "previousId": ["CashShop"],
+      "productNationId": ["Nation"],
       "contentsTerms": [
         {
-          "Id": [
-            "ContentsTerms"
-          ]
+          "Id": ["ContentsTerms"]
         }
       ],
-      "productRewardFixedId": [
-        "RewardFixed"
-      ]
+      "productRewardFixedId": ["RewardFixed"]
     }
   },
   "ContributionShop": {

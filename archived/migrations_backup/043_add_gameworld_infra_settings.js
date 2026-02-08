@@ -51,6 +51,5 @@ module.exports = {
     } else {
       console.log('✓ infraSettings column does not exist in g_game_worlds');
     }
-  }
+  },
 };
-

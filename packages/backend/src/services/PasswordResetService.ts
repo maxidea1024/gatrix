@@ -17,7 +17,7 @@ export interface PasswordResetToken {
 export class PasswordResetService {
   private static instance: PasswordResetService;
 
-  private constructor() { }
+  private constructor() {}
 
   public static getInstance(): PasswordResetService {
     if (!PasswordResetService.instance) {

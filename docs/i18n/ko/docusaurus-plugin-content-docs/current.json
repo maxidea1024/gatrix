@@ -1,30 +1,30 @@
 {
-    "sidebar.tutorialSidebar.category.Getting Started": {
-        "message": "시작하기",
-        "description": "The label for category Getting Started"
-    },
-    "sidebar.tutorialSidebar.category.Feature Flags": {
-        "message": "피처 플래그",
-        "description": "The label for category Feature Flags"
-    },
-    "sidebar.tutorialSidebar.category.Game Operations": {
-        "message": "게임 운영",
-        "description": "The label for category Game Operations"
-    },
-    "sidebar.tutorialSidebar.category.System Management": {
-        "message": "시스템 관리",
-        "description": "The label for category System Management"
-    },
-    "sidebar.tutorialSidebar.category.Integrations": {
-        "message": "외부 연동",
-        "description": "The label for category Integrations"
-    },
-    "sidebar.tutorialSidebar.category.API Reference": {
-        "message": "API 레퍼런스",
-        "description": "The label for category API Reference"
-    },
-    "sidebar.tutorialSidebar.category.Deployment": {
-        "message": "배포 가이드",
-        "description": "The label for category Deployment"
-    }
+  "sidebar.tutorialSidebar.category.Getting Started": {
+    "message": "시작하기",
+    "description": "The label for category Getting Started"
+  },
+  "sidebar.tutorialSidebar.category.Feature Flags": {
+    "message": "피처 플래그",
+    "description": "The label for category Feature Flags"
+  },
+  "sidebar.tutorialSidebar.category.Game Operations": {
+    "message": "게임 운영",
+    "description": "The label for category Game Operations"
+  },
+  "sidebar.tutorialSidebar.category.System Management": {
+    "message": "시스템 관리",
+    "description": "The label for category System Management"
+  },
+  "sidebar.tutorialSidebar.category.Integrations": {
+    "message": "외부 연동",
+    "description": "The label for category Integrations"
+  },
+  "sidebar.tutorialSidebar.category.API Reference": {
+    "message": "API 레퍼런스",
+    "description": "The label for category API Reference"
+  },
+  "sidebar.tutorialSidebar.category.Deployment": {
+    "message": "배포 가이드",
+    "description": "The label for category Deployment"
+  }
 }

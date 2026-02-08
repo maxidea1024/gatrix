@@ -19,9 +19,7 @@
     },
     ":enum": {},
     ":links": {
-      "questId": [
-        "Quest"
-      ]
+      "questId": ["Quest"]
     }
   },
   "EventRequestGroup": {

@@ -2,12 +2,7 @@
   ":ManufactureText": {
     ":type": {
       "id": "key",
-      "dialogue": [
-        "text",
-        "text",
-        "text",
-        "text"
-      ]
+      "dialogue": ["text", "text", "text", "text"]
     },
     ":required": {},
     ":min": {},

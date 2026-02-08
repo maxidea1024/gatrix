@@ -1,1 +1,11 @@
-"use strict";(globalThis.webpackChunkdocs=globalThis.webpackChunkdocs||[]).push([[6998],{9945(s){s.exports=JSON.parse('{"tag":{"label":"Tips","permalink":"/docs/zh-Hans/blog/tags/tips","description":"Tips and best practices","allTagsPath":"/docs/zh-Hans/blog/tags","count":2,"unlisted":false},"listMetadata":{"permalink":"/docs/zh-Hans/blog/tags/tips","page":1,"postsPerPage":10,"totalPages":1,"totalCount":2,"blogDescription":"Blog","blogTitle":"Blog"}}')}}]);
+'use strict';
+(globalThis.webpackChunkdocs = globalThis.webpackChunkdocs || []).push([
+  [6998],
+  {
+    9945(s) {
+      s.exports = JSON.parse(
+        '{"tag":{"label":"Tips","permalink":"/docs/zh-Hans/blog/tags/tips","description":"Tips and best practices","allTagsPath":"/docs/zh-Hans/blog/tags","count":2,"unlisted":false},"listMetadata":{"permalink":"/docs/zh-Hans/blog/tags/tips","page":1,"postsPerPage":10,"totalPages":1,"totalCount":2,"blogDescription":"Blog","blogTitle":"Blog"}}'
+      );
+    },
+  },
+]);

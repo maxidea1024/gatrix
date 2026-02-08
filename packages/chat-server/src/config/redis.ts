@@ -1,8 +1,8 @@
-import Redis, { Cluster } from "ioredis";
-import { config } from "./index";
-import { createLogger } from "./logger";
+import Redis, { Cluster } from 'ioredis';
+import { config } from './index';
+import { createLogger } from './logger';
 
-const logger = createLogger("RedisManager");
+const logger = createLogger('RedisManager');
 
 export class RedisManager {
   private static instance: RedisManager;
@@ -21,10 +21,7 @@ export class RedisManager {
 
   public async initialize(): Promise<void> {
     try {
-      if (
-        config.redis.cluster.enabled &&
-        config.redis.cluster.nodes.length > 0
-      ) {
+      if (config.redis.cluster.enabled && config.redis.cluster.nodes.length > 0) {
         // Redis Cluster mode for high availability
         await this.initializeCluster();
       } else {
@@ -32,9 +29,9 @@ export class RedisManager {
         await this.initializeSingle();
       }
 
-      logger.info("Redis connection established successfully");
+      logger.info('Redis connection established successfully');
     } catch (error) {
-      logger.error("Failed to initialize Redis:", error);
+      logger.error('Failed to initialize Redis:', error);
       throw error;
     }
   }
@@ -94,21 +91,21 @@ export class RedisManager {
 
   public getClient(): Redis | Cluster {
     if (!this.redisClient) {
-      throw new Error("Redis client not initialized");
+      throw new Error('Redis client not initialized');
     }
     return this.redisClient;
   }
 
   public getPubClient(): Redis | Cluster {
     if (!this.pubClient) {
-      throw new Error("Redis pub client not initialized");
+      throw new Error('Redis pub client not initialized');
     }
     return this.pubClient;
   }
 
   public getSubClient(): Redis | Cluster {
     if (!this.subClient) {
-      throw new Error("Redis sub client not initialized");
+      throw new Error('Redis sub client not initialized');
     }
     return this.subClient;
   }
@@ -120,26 +117,22 @@ export class RedisManager {
         this.pubClient?.disconnect(),
         this.subClient?.disconnect(),
       ]);
-      logger.info("Redis connections closed");
+      logger.info('Redis connections closed');
     } catch (error) {
-      logger.error("Error closing Redis connections:", error);
+      logger.error('Error closing Redis connections:', error);
     }
   }
 
   // High-performance operations for chat
-  public async setUserOnline(
-    userId: number,
-    socketId: string,
-    serverId: string,
-  ): Promise<void> {
+  public async setUserOnline(userId: number, socketId: string, serverId: string): Promise<void> {
     const pipeline = this.redisClient!.pipeline();
     pipeline.hset(`user:${userId}`, {
       socketId,
       serverId,
       lastSeen: Date.now(),
-      status: "online",
+      status: 'online',
     });
-    pipeline.sadd("online_users", userId);
+    pipeline.sadd('online_users', userId);
     pipeline.expire(`user:${userId}`, 3600); // 1 hour TTL
     await pipeline.exec();
   }
@@ -148,43 +141,33 @@ export class RedisManager {
     const pipeline = this.redisClient!.pipeline();
     pipeline.hset(`user:${userId}`, {
       lastSeen: Date.now(),
-      status: "offline",
+      status: 'offline',
     });
-    pipeline.srem("online_users", userId);
+    pipeline.srem('online_users', userId);
     await pipeline.exec();
   }
 
   public async getUserSocketInfo(
-    userId: number,
+    userId: number
   ): Promise<{ socketId?: string; serverId?: string } | null> {
-    const userInfo = await this.redisClient!.hmget(
-      `user:${userId}`,
-      "socketId",
-      "serverId",
-    );
+    const userInfo = await this.redisClient!.hmget(`user:${userId}`, 'socketId', 'serverId');
     if (!userInfo[0] || !userInfo[1]) return null;
     return { socketId: userInfo[0], serverId: userInfo[1] };
   }
 
   public async getOnlineUsersCount(): Promise<number> {
-    return await this.redisClient!.scard("online_users");
+    return await this.redisClient!.scard('online_users');
   }
 
   // Channel membership caching for fast lookups
-  public async addUserToChannel(
-    userId: number,
-    channelId: number,
-  ): Promise<void> {
+  public async addUserToChannel(userId: number, channelId: number): Promise<void> {
     const pipeline = this.redisClient!.pipeline();
     pipeline.sadd(`channel:${channelId}:members`, userId);
     pipeline.sadd(`user:${userId}:channels`, channelId);
     await pipeline.exec();
   }
 
-  public async removeUserFromChannel(
-    userId: number,
-    channelId: number,
-  ): Promise<void> {
+  public async removeUserFromChannel(userId: number, channelId: number): Promise<void> {
     const pipeline = this.redisClient!.pipeline();
     pipeline.srem(`channel:${channelId}:members`, userId);
     pipeline.srem(`user:${userId}:channels`, channelId);
@@ -192,9 +175,7 @@ export class RedisManager {
   }
 
   public async getChannelMembers(channelId: number): Promise<number[]> {
-    const members = await this.redisClient!.smembers(
-      `channel:${channelId}:members`,
-    );
+    const members = await this.redisClient!.smembers(`channel:${channelId}:members`);
     return members.map((id) => parseInt(id, 10));
   }
 
@@ -206,14 +187,11 @@ export class RedisManager {
     await this.redisClient!.expire(key, 3600); // 1 hour TTL
   }
 
-  public async getRecentMessages(
-    channelId: number,
-    limit = 50,
-  ): Promise<any[]> {
+  public async getRecentMessages(channelId: number, limit = 50): Promise<any[]> {
     const messages = await this.redisClient!.lrange(
       `channel:${channelId}:recent_messages`,
       0,
-      limit - 1,
+      limit - 1
     );
     return messages.map((msg) => JSON.parse(msg));
   }

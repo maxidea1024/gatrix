@@ -11,7 +11,7 @@ console.log('ZH 최상위 키:', Object.keys(zh).length);
 const newZh = {};
 
 // Copy keys from en in the same order
-Object.keys(en).forEach(key => {
+Object.keys(en).forEach((key) => {
   if (zh[key]) {
     // Use existing zh translation
     newZh[key] = zh[key];
@@ -27,4 +27,3 @@ Object.keys(en).forEach(key => {
 fs.writeFileSync('src/locales/zh.json', JSON.stringify(newZh, null, 2), 'utf8');
 console.log('\n✅ zh.json 재구성 완료!');
 console.log('새로운 ZH 최상위 키:', Object.keys(newZh).length);
-

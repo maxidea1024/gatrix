@@ -5,10 +5,7 @@
       "nagativeName": "text",
       "buildingType": "number",
       "isDisplay": "bool",
-      "buildingMenuId": [
-        "number",
-        "number"
-      ],
+      "buildingMenuId": ["number", "number"],
       "contentsTerms": [
         {
           "Id": "number",
@@ -22,11 +19,7 @@
         }
       ],
       "nagativeDesc": "text",
-      "nagativeDescFormatTexts": [
-        "text",
-        "text",
-        "text"
-      ]
+      "nagativeDescFormatTexts": ["text", "text", "text"]
     },
     ":required": {
       "isDisplay": 1
@@ -45,10 +38,7 @@
     },
     ":min": {
       "buildingType": 0,
-      "buildingMenuId": [
-        38400000,
-        38400000
-      ],
+      "buildingMenuId": [38400000, 38400000],
       "contentsTerms": [
         {
           "Id": 81000000
@@ -60,10 +50,7 @@
     },
     ":max": {
       "buildingType": 54,
-      "buildingMenuId": [
-        38419999,
-        38419999
-      ],
+      "buildingMenuId": [38419999, 38419999],
       "contentsTerms": [
         {
           "Id": 81999999
@@ -76,24 +63,13 @@
     ":enum": {},
     ":asset": {},
     ":links": {
-      "buildingMenuId": [
-        [
-          "BuildingMenu"
-        ],
-        [
-          "BuildingMenu"
-        ]
-      ],
+      "buildingMenuId": [["BuildingMenu"], ["BuildingMenu"]],
       "contentsTerms": [
         {
-          "Id": [
-            "ContentsTerms"
-          ]
+          "Id": ["ContentsTerms"]
         },
         {
-          "Id": [
-            "ContentsTerms"
-          ]
+          "Id": ["ContentsTerms"]
         }
       ]
     }
@@ -116,9 +92,7 @@
       "nagativeName": "예금/출금",
       "buildingType": 9,
       "isDisplay": false,
-      "buildingMenuId": [
-        38400009
-      ],
+      "buildingMenuId": [38400009],
       "contentsTerms": [
         {
           "Id": 81000000,
@@ -126,18 +100,14 @@
         }
       ],
       "nagativeDesc": "언어 LV이 부족해 {0}|hpp(을,를) 이용할 수 없습니다.",
-      "nagativeDescFormatTexts": [
-        "예금/출금"
-      ]
+      "nagativeDescFormatTexts": ["예금/출금"]
     },
     "38300002": {
       "id": 38300002,
       "nagativeName": "적금",
       "buildingType": 9,
       "isDisplay": false,
-      "buildingMenuId": [
-        38400010
-      ],
+      "buildingMenuId": [38400010],
       "contentsTerms": [
         {
           "Id": 81000000,
@@ -145,18 +115,14 @@
         }
       ],
       "nagativeDesc": "언어 LV이 부족해 {0}|hpp(을,를) 이용할 수 없습니다.",
-      "nagativeDescFormatTexts": [
-        "적금"
-      ]
+      "nagativeDescFormatTexts": ["적금"]
     },
     "38300003": {
       "id": 38300003,
       "nagativeName": "보험",
       "buildingType": 9,
       "isDisplay": false,
-      "buildingMenuId": [
-        38400011
-      ],
+      "buildingMenuId": [38400011],
       "contentsTerms": [
         {
           "Id": 81000000,
@@ -164,18 +130,14 @@
         }
       ],
       "nagativeDesc": "언어 LV이 부족해 {0}|hpp(을,를) 이용할 수 없습니다.",
-      "nagativeDescFormatTexts": [
-        "보험"
-      ]
+      "nagativeDescFormatTexts": ["보험"]
     },
     "38300004": {
       "id": 38300004,
       "nagativeName": "선거",
       "buildingType": 12,
       "isDisplay": false,
-      "buildingMenuId": [
-        38400021
-      ],
+      "buildingMenuId": [38400021],
       "contentsTerms": [
         {
           "Id": 81000000,
@@ -188,9 +150,7 @@
       "nagativeName": "건조",
       "buildingType": 11,
       "isDisplay": false,
-      "buildingMenuId": [
-        38400014
-      ],
+      "buildingMenuId": [38400014],
       "contentsTerms": [
         {
           "Id": 81000000,
@@ -198,18 +158,14 @@
         }
       ],
       "nagativeDesc": "언어 LV이 부족해 {0}|hpp(을,를) 이용할 수 없습니다.",
-      "nagativeDescFormatTexts": [
-        "건조"
-      ]
+      "nagativeDescFormatTexts": ["건조"]
     },
     "38300006": {
       "id": 38300006,
       "nagativeName": "설계도",
       "buildingType": 11,
       "isDisplay": false,
-      "buildingMenuId": [
-        38400015
-      ],
+      "buildingMenuId": [38400015],
       "contentsTerms": [
         {
           "Id": 81000000,
@@ -217,19 +173,14 @@
         }
       ],
       "nagativeDesc": "언어 LV이 부족해 {0}|hpp(을,를) 이용할 수 없습니다.",
-      "nagativeDescFormatTexts": [
-        "설계도"
-      ]
+      "nagativeDescFormatTexts": ["설계도"]
     },
     "38300007": {
       "id": 38300007,
       "nagativeName": "수리/복원",
       "buildingType": 11,
       "isDisplay": false,
-      "buildingMenuId": [
-        38400017,
-        38400022
-      ],
+      "buildingMenuId": [38400017, 38400022],
       "contentsTerms": [
         {
           "Id": 81000000,
@@ -242,9 +193,7 @@
       "nagativeName": "해체",
       "buildingType": 11,
       "isDisplay": false,
-      "buildingMenuId": [
-        38400018
-      ],
+      "buildingMenuId": [38400018],
       "contentsTerms": [
         {
           "Id": 81000000,
@@ -252,18 +201,14 @@
         }
       ],
       "nagativeDesc": "언어 LV이 부족해 {0}|hpp(을,를) 이용할 수 없습니다.",
-      "nagativeDescFormatTexts": [
-        "해체"
-      ]
+      "nagativeDescFormatTexts": ["해체"]
     },
     "38300009": {
       "id": 38300009,
       "nagativeName": "선원 모집",
       "buildingType": 4,
       "isDisplay": false,
-      "buildingMenuId": [
-        38400003
-      ],
+      "buildingMenuId": [38400003],
       "contentsTerms": [
         {
           "Id": 81000000,
@@ -276,9 +221,7 @@
       "nagativeName": "투자",
       "buildingType": 2,
       "isDisplay": false,
-      "buildingMenuId": [
-        38400000
-      ],
+      "buildingMenuId": [38400000],
       "contentsTerms": [
         {
           "Id": 81000000,
@@ -286,9 +229,7 @@
         }
       ],
       "nagativeDesc": "언어 LV이 부족해 {0}|hpp(을,를) 이용할 수 없습니다.",
-      "nagativeDescFormatTexts": [
-        "투자"
-      ]
+      "nagativeDescFormatTexts": ["투자"]
     },
     "38300011": {
       "id": 38300011,
@@ -302,9 +243,7 @@
         }
       ],
       "nagativeDesc": "언어 LV이 부족해 {0}|hpp(을,를) 확인할 수 없습니다.",
-      "nagativeDescFormatTexts": [
-        "이전 투자 금액"
-      ]
+      "nagativeDescFormatTexts": ["이전 투자 금액"]
     },
     "38300012": {
       "id": 38300012,
@@ -318,9 +257,7 @@
         }
       ],
       "nagativeDesc": "언어 LV이 부족해 {0}|hpp(을,를) 확인할 수 없습니다.",
-      "nagativeDescFormatTexts": [
-        "예상 변화량"
-      ]
+      "nagativeDescFormatTexts": ["예상 변화량"]
     },
     "38300013": {
       "id": 38300013,
@@ -334,18 +271,14 @@
         }
       ],
       "nagativeDesc": "언어 LV이 부족해 {0}|hpp(을,를) 이용할 수 없습니다.",
-      "nagativeDescFormatTexts": [
-        "후원"
-      ]
+      "nagativeDescFormatTexts": ["후원"]
     },
     "38300014": {
       "id": 38300014,
       "nagativeName": "종업원",
       "buildingType": 4,
       "isDisplay": false,
-      "buildingMenuId": [
-        38400004
-      ],
+      "buildingMenuId": [38400004],
       "contentsTerms": [
         {
           "Id": 81000000,
@@ -353,18 +286,14 @@
         }
       ],
       "nagativeDesc": "언어 LV이 부족해 {0}|hpp(을,를) 이용할 수 없습니다.",
-      "nagativeDescFormatTexts": [
-        "종업원"
-      ]
+      "nagativeDescFormatTexts": ["종업원"]
     },
     "38300015": {
       "id": 38300015,
       "nagativeName": "장비",
       "buildingType": 5,
       "isDisplay": false,
-      "buildingMenuId": [
-        38400006
-      ],
+      "buildingMenuId": [38400006],
       "contentsTerms": [
         {
           "Id": 81000000,
@@ -372,18 +301,14 @@
         }
       ],
       "nagativeDesc": "언어 LV이 부족해 {0}|hpp(을,를) 이용할 수 없습니다.",
-      "nagativeDescFormatTexts": [
-        "장비"
-      ]
+      "nagativeDescFormatTexts": ["장비"]
     },
     "38300016": {
       "id": 38300016,
       "nagativeName": "도구",
       "buildingType": 5,
       "isDisplay": false,
-      "buildingMenuId": [
-        38400007
-      ],
+      "buildingMenuId": [38400007],
       "contentsTerms": [
         {
           "Id": 81000000,
@@ -391,18 +316,14 @@
         }
       ],
       "nagativeDesc": "언어 LV이 부족해 {0}|hpp(을,를) 이용할 수 없습니다.",
-      "nagativeDescFormatTexts": [
-        "도구"
-      ]
+      "nagativeDescFormatTexts": ["도구"]
     },
     "38300017": {
       "id": 38300017,
       "nagativeName": "암시장",
       "buildingType": 5,
       "isDisplay": false,
-      "buildingMenuId": [
-        38400008
-      ],
+      "buildingMenuId": [38400008],
       "contentsTerms": [
         {
           "Id": 81000000,
@@ -410,18 +331,14 @@
         }
       ],
       "nagativeDesc": "언어 LV이 부족해 {0}|hpp(을,를) 이용할 수 없습니다.",
-      "nagativeDescFormatTexts": [
-        "암시장"
-      ]
+      "nagativeDescFormatTexts": ["암시장"]
     },
     "38300018": {
       "id": 38300018,
       "nagativeName": "칙명",
       "buildingType": 1,
       "isDisplay": false,
-      "buildingMenuId": [
-        38400030
-      ],
+      "buildingMenuId": [38400030],
       "contentsTerms": [
         {
           "Id": 81000000,
@@ -429,18 +346,14 @@
         }
       ],
       "nagativeDesc": "언어 LV이 부족해 {0}|hpp(을,를) 이용할 수 없습니다.",
-      "nagativeDescFormatTexts": [
-        "칙명"
-      ]
+      "nagativeDescFormatTexts": ["칙명"]
     },
     "38300019": {
       "id": 38300019,
       "nagativeName": "면세",
       "buildingType": 1,
       "isDisplay": false,
-      "buildingMenuId": [
-        38400032
-      ],
+      "buildingMenuId": [38400032],
       "contentsTerms": [
         {
           "Id": 81000000,
@@ -452,18 +365,14 @@
         }
       ],
       "nagativeDesc": "언어 LV이 부족해 {0}|hpp(을,를) 이용할 수 없습니다.",
-      "nagativeDescFormatTexts": [
-        "면세"
-      ]
+      "nagativeDescFormatTexts": ["면세"]
     },
     "38300020": {
       "id": 38300020,
       "nagativeName": "이민",
       "buildingType": 1,
       "isDisplay": false,
-      "buildingMenuId": [
-        38400031
-      ],
+      "buildingMenuId": [38400031],
       "contentsTerms": [
         {
           "Id": 81000000,
@@ -471,9 +380,7 @@
         }
       ],
       "nagativeDesc": "언어 LV이 부족해 {0}|hpp(을,를) 이용할 수 없습니다.",
-      "nagativeDescFormatTexts": [
-        "이민"
-      ]
+      "nagativeDescFormatTexts": ["이민"]
     },
     "38300021": {
       "id": 38300021,
@@ -487,9 +394,7 @@
         }
       ],
       "nagativeDesc": "언어 LV이 부족해 {0}|hpp(을,를) 이용할 수 없습니다.",
-      "nagativeDescFormatTexts": [
-        "기도"
-      ]
+      "nagativeDescFormatTexts": ["기도"]
     },
     "38300022": {
       "id": 38300022,
@@ -503,18 +408,14 @@
         }
       ],
       "nagativeDesc": "언어 LV이 부족해 {0}|hpp(을,를) 이용할 수 없습니다.",
-      "nagativeDescFormatTexts": [
-        "기부"
-      ]
+      "nagativeDescFormatTexts": ["기부"]
     },
     "38300023": {
       "id": 38300023,
       "nagativeName": "순위",
       "buildingType": 8,
       "isDisplay": false,
-      "buildingMenuId": [
-        38400039
-      ],
+      "buildingMenuId": [38400039],
       "contentsTerms": [
         {
           "Id": 81000000,
@@ -527,9 +428,7 @@
       "nagativeName": "보고",
       "buildingType": 8,
       "isDisplay": false,
-      "buildingMenuId": [
-        38400033
-      ],
+      "buildingMenuId": [38400033],
       "contentsTerms": [
         {
           "Id": 81000000,
@@ -537,9 +436,7 @@
         }
       ],
       "nagativeDesc": "언어 LV이 부족해 {0}|hpp(을,를) 이용할 수 없습니다.",
-      "nagativeDescFormatTexts": [
-        "보고"
-      ]
+      "nagativeDescFormatTexts": ["보고"]
     },
     "38300025": {
       "id": 38300025,
@@ -553,18 +450,14 @@
         }
       ],
       "nagativeDesc": "언어 LV이 부족해 {0}|hpp(을,를) 이용할 수 없습니다.",
-      "nagativeDescFormatTexts": [
-        "의뢰"
-      ]
+      "nagativeDescFormatTexts": ["의뢰"]
     },
     "38300026": {
       "id": 38300026,
       "nagativeName": "교역소 구매",
       "buildingType": 10,
       "isDisplay": false,
-      "buildingMenuId": [
-        38400012
-      ],
+      "buildingMenuId": [38400012],
       "contentsTerms": [
         {
           "Id": 81000000,
@@ -572,18 +465,14 @@
         }
       ],
       "nagativeDesc": "언어 LV이 부족해 {0}|hpp(을,를) 이용할 수 없습니다.",
-      "nagativeDescFormatTexts": [
-        "구매"
-      ]
+      "nagativeDescFormatTexts": ["구매"]
     },
     "38300027": {
       "id": 38300027,
       "nagativeName": "교역소 판매",
       "buildingType": 10,
       "isDisplay": false,
-      "buildingMenuId": [
-        38400013
-      ],
+      "buildingMenuId": [38400013],
       "contentsTerms": [
         {
           "Id": 81000000,
@@ -591,18 +480,14 @@
         }
       ],
       "nagativeDesc": "언어 LV이 부족해 {0}|hpp(을,를) 이용할 수 없습니다.",
-      "nagativeDescFormatTexts": [
-        "판매"
-      ]
+      "nagativeDescFormatTexts": ["판매"]
     },
     "38300028": {
       "id": 38300028,
       "nagativeName": "항해사 관리",
       "buildingType": 4,
       "isDisplay": false,
-      "buildingMenuId": [
-        38400005
-      ],
+      "buildingMenuId": [38400005],
       "contentsTerms": [
         {
           "Id": 81000000,
@@ -615,9 +500,7 @@
       "nagativeName": "_운세",
       "buildingType": 13,
       "isDisplay": false,
-      "buildingMenuId": [
-        38400029
-      ],
+      "buildingMenuId": [38400029],
       "contentsTerms": [
         {
           "Id": 81000000,
@@ -625,18 +508,14 @@
         }
       ],
       "nagativeDesc": "언어 LV이 부족해 {0}|hpp(을,를) 이용할 수 없습니다.",
-      "nagativeDescFormatTexts": [
-        "_운세"
-      ]
+      "nagativeDescFormatTexts": ["_운세"]
     },
     "38300030": {
       "id": 38300030,
       "nagativeName": "자원 보고",
       "buildingType": 8,
       "isDisplay": false,
-      "buildingMenuId": [
-        38400034
-      ],
+      "buildingMenuId": [38400034],
       "contentsTerms": [
         {
           "Id": 81000000,
@@ -644,18 +523,14 @@
         }
       ],
       "nagativeDesc": "언어 LV이 부족해 {0}|hpp(을,를) 이용할 수 없습니다.",
-      "nagativeDescFormatTexts": [
-        "자원 보고"
-      ]
+      "nagativeDescFormatTexts": ["자원 보고"]
     },
     "38300031": {
       "id": 38300031,
       "nagativeName": "지도 제작",
       "buildingType": 8,
       "isDisplay": false,
-      "buildingMenuId": [
-        38400035
-      ],
+      "buildingMenuId": [38400035],
       "contentsTerms": [
         {
           "Id": 81000000,
@@ -663,18 +538,14 @@
         }
       ],
       "nagativeDesc": "언어 LV이 부족해 {0}|hpp(을,를) 이용할 수 없습니다.",
-      "nagativeDescFormatTexts": [
-        "지도 제작"
-      ]
+      "nagativeDescFormatTexts": ["지도 제작"]
     },
     "38300032": {
       "id": 38300032,
       "nagativeName": "계약서",
       "buildingType": 13,
       "isDisplay": false,
-      "buildingMenuId": [
-        38400037
-      ],
+      "buildingMenuId": [38400037],
       "contentsTerms": [
         {
           "Id": 81000000,
@@ -687,9 +558,7 @@
       "nagativeName": "도면",
       "buildingType": 13,
       "isDisplay": false,
-      "buildingMenuId": [
-        38400038
-      ],
+      "buildingMenuId": [38400038],
       "contentsTerms": [
         {
           "Id": 81000000,
@@ -702,9 +571,7 @@
       "nagativeName": "관세",
       "buildingType": 2,
       "isDisplay": false,
-      "buildingMenuId": [
-        38400040
-      ],
+      "buildingMenuId": [38400040],
       "contentsTerms": [
         {
           "Id": 81000000,
@@ -712,18 +579,14 @@
         }
       ],
       "nagativeDesc": "언어 LV이 부족해 {0}|hpp(을,를) 이용할 수 없습니다.",
-      "nagativeDescFormatTexts": [
-        "관세"
-      ]
+      "nagativeDescFormatTexts": ["관세"]
     },
     "38300035": {
       "id": 38300035,
       "nagativeName": "예인",
       "buildingType": 11,
       "isDisplay": false,
-      "buildingMenuId": [
-        38400041
-      ],
+      "buildingMenuId": [38400041],
       "contentsTerms": [
         {
           "Id": 81000000,
@@ -731,18 +594,14 @@
         }
       ],
       "nagativeDesc": "언어 LV이 부족해 {0}|hpp(을,를) 이용할 수 없습니다.",
-      "nagativeDescFormatTexts": [
-        "예인"
-      ]
+      "nagativeDescFormatTexts": ["예인"]
     },
     "38300036": {
       "id": 38300036,
       "nagativeName": "개조",
       "buildingType": 11,
       "isDisplay": false,
-      "buildingMenuId": [
-        38400042
-      ],
+      "buildingMenuId": [38400042],
       "contentsTerms": [
         {
           "Id": 81000000,
@@ -750,18 +609,14 @@
         }
       ],
       "nagativeDesc": "언어 LV이 부족해 {0}|hpp(을,를) 이용할 수 없습니다.",
-      "nagativeDescFormatTexts": [
-        "개조"
-      ]
+      "nagativeDescFormatTexts": ["개조"]
     },
     "38300037": {
       "id": 38300037,
       "nagativeName": "포상",
       "buildingType": 1,
       "isDisplay": false,
-      "buildingMenuId": [
-        38400043
-      ],
+      "buildingMenuId": [38400043],
       "contentsTerms": [
         {
           "Id": 81000000,
@@ -769,18 +624,14 @@
         }
       ],
       "nagativeDesc": "언어 LV이 부족해 {0}|hpp(을,를) 이용할 수 없습니다.",
-      "nagativeDescFormatTexts": [
-        "포상"
-      ]
+      "nagativeDescFormatTexts": ["포상"]
     },
     "38300038": {
       "id": 38300038,
       "nagativeName": "부품",
       "buildingType": 11,
       "isDisplay": false,
-      "buildingMenuId": [
-        38400016
-      ],
+      "buildingMenuId": [38400016],
       "contentsTerms": [
         {
           "Id": 81000000,
@@ -788,18 +639,14 @@
         }
       ],
       "nagativeDesc": "언어 LV이 부족해 {0}|hpp(을,를) 이용할 수 없습니다.",
-      "nagativeDescFormatTexts": [
-        "부품"
-      ]
+      "nagativeDescFormatTexts": ["부품"]
     },
     "38300039": {
       "id": 38300039,
       "nagativeName": "한정",
       "buildingType": 3,
       "isDisplay": false,
-      "buildingMenuId": [
-        38400044
-      ],
+      "buildingMenuId": [38400044],
       "contentsTerms": [
         {
           "Id": 81000000,
@@ -807,9 +654,7 @@
         }
       ],
       "nagativeDesc": "언어 LV이 부족해 {0}|hpp(을,를) 이용할 수 없습니다.",
-      "nagativeDescFormatTexts": [
-        "한정"
-      ]
+      "nagativeDescFormatTexts": ["한정"]
     },
     "38300040": {
       "id": 38300040,
@@ -823,18 +668,14 @@
         }
       ],
       "nagativeDesc": "언어 LV이 부족해 {0}|hpp(을,를) 이용할 수 없습니다.",
-      "nagativeDescFormatTexts": [
-        "저택"
-      ]
+      "nagativeDescFormatTexts": ["저택"]
     },
     "38300041": {
       "id": 38300041,
       "nagativeName": "티켓",
       "buildingType": 13,
       "isDisplay": false,
-      "buildingMenuId": [
-        38400048
-      ],
+      "buildingMenuId": [38400048],
       "contentsTerms": [
         {
           "Id": 81000000,
@@ -847,9 +688,7 @@
       "nagativeName": "도구",
       "buildingType": 13,
       "isDisplay": false,
-      "buildingMenuId": [
-        38400049
-      ],
+      "buildingMenuId": [38400049],
       "contentsTerms": [
         {
           "Id": 81000000,
@@ -862,9 +701,7 @@
       "nagativeName": "행사 관리",
       "buildingType": 2,
       "isDisplay": false,
-      "buildingMenuId": [
-        38400050
-      ],
+      "buildingMenuId": [38400050],
       "contentsTerms": [
         {
           "Id": 81000000,
@@ -877,9 +714,7 @@
       "nagativeName": "운하",
       "buildingType": 14,
       "isDisplay": false,
-      "buildingMenuId": [
-        38400051
-      ],
+      "buildingMenuId": [38400051],
       "contentsTerms": [
         {
           "Id": 81000000,
@@ -887,18 +722,14 @@
         }
       ],
       "nagativeDesc": "언어 LV이 부족해 {0}|hpp(을,를) 이용할 수 없습니다.",
-      "nagativeDescFormatTexts": [
-        "운하"
-      ]
+      "nagativeDescFormatTexts": ["운하"]
     },
     "38300045": {
       "id": 38300045,
       "nagativeName": "부품 강화",
       "buildingType": 11,
       "isDisplay": false,
-      "buildingMenuId": [
-        38400052
-      ],
+      "buildingMenuId": [38400052],
       "contentsTerms": [
         {
           "Id": 81000000,
@@ -906,18 +737,14 @@
         }
       ],
       "nagativeDesc": "언어 LV이 부족해 {0}|hpp(을,를) 이용할 수 없습니다.",
-      "nagativeDescFormatTexts": [
-        "부품 강화"
-      ]
+      "nagativeDescFormatTexts": ["부품 강화"]
     },
     "38300046": {
       "id": 38300046,
       "nagativeName": "장비 강화",
       "buildingType": 5,
       "isDisplay": false,
-      "buildingMenuId": [
-        38400053
-      ],
+      "buildingMenuId": [38400053],
       "contentsTerms": [
         {
           "Id": 81000000,
@@ -925,18 +752,14 @@
         }
       ],
       "nagativeDesc": "언어 LV이 부족해 {0}|hpp(을,를) 이용할 수 없습니다.",
-      "nagativeDescFormatTexts": [
-        "장비 강화"
-      ]
+      "nagativeDescFormatTexts": ["장비 강화"]
     },
     "38300047": {
       "id": 38300047,
       "nagativeName": "점술관_증표",
       "buildingType": 13,
       "isDisplay": false,
-      "buildingMenuId": [
-        38400054
-      ],
+      "buildingMenuId": [38400054],
       "contentsTerms": [
         {
           "Id": 81000000,
@@ -949,9 +772,7 @@
       "nagativeName": "조합 건조",
       "buildingType": 11,
       "isDisplay": false,
-      "buildingMenuId": [
-        38400055
-      ],
+      "buildingMenuId": [38400055],
       "contentsTerms": [
         {
           "Id": 81000000,
@@ -959,9 +780,7 @@
         }
       ],
       "nagativeDesc": "언어 LV이 부족해 {0}|hpp(을,를) 이용할 수 없습니다.",
-      "nagativeDescFormatTexts": [
-        "조합 건조"
-      ]
+      "nagativeDescFormatTexts": ["조합 건조"]
     }
   }
 }

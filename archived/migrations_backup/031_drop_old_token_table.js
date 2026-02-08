@@ -5,7 +5,7 @@
  * All API tokens are now managed through g_api_access_tokens table.
  */
 
-exports.up = async function(connection) {
+exports.up = async function (connection) {
   console.log('Dropping old g_remote_config_api_tokens table...');
 
   try {
@@ -16,8 +16,7 @@ exports.up = async function(connection) {
   }
 };
 
-exports.down = async function(connection) {
+exports.down = async function (connection) {
   console.log('Reverting: Cannot restore dropped table in down migration');
   console.log('⚠️ This migration cannot be reverted as the table structure is not preserved');
 };
-

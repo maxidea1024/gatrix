@@ -12,10 +12,13 @@
 
 // Helper function to check if a column exists
 async function columnExists(connection, tableName, columnName) {
-  const [rows] = await connection.execute(`
+  const [rows] = await connection.execute(
+    `
     SELECT COUNT(*) as cnt FROM INFORMATION_SCHEMA.COLUMNS
     WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = ?
-  `, [tableName, columnName]);
+  `,
+    [tableName, columnName]
+  );
   return rows[0].cnt > 0;
 }
 
@@ -49,11 +52,14 @@ exports.up = async function (connection) {
 
   // Insert default project
   const defaultProjectId = generateUlid();
-  await connection.execute(`
+  await connection.execute(
+    `
     INSERT INTO g_projects (id, projectName, displayName, description, isDefault, createdBy)
     VALUES (?, 'default', 'Default Project', 'Default project for all environments', TRUE, 1)
     ON DUPLICATE KEY UPDATE displayName = VALUES(displayName)
-  `, [defaultProjectId]);
+  `,
+    [defaultProjectId]
+  );
 
   console.log('✓ g_projects table created');
 
@@ -79,7 +85,7 @@ exports.up = async function (connection) {
   `);
 
   // Check and add environmentType column
-  if (!await columnExists(connection, 'g_environments', 'environmentType')) {
+  if (!(await columnExists(connection, 'g_environments', 'environmentType'))) {
     await connection.execute(`
       ALTER TABLE g_environments
       ADD COLUMN environmentType ENUM('development', 'staging', 'production') NOT NULL DEFAULT 'development'
@@ -89,7 +95,7 @@ exports.up = async function (connection) {
   }
 
   // Check and add isSystemDefined column
-  if (!await columnExists(connection, 'g_environments', 'isSystemDefined')) {
+  if (!(await columnExists(connection, 'g_environments', 'isSystemDefined'))) {
     await connection.execute(`
       ALTER TABLE g_environments
       ADD COLUMN isSystemDefined BOOLEAN NOT NULL DEFAULT FALSE
@@ -99,7 +105,7 @@ exports.up = async function (connection) {
   }
 
   // Check and add displayOrder column
-  if (!await columnExists(connection, 'g_environments', 'displayOrder')) {
+  if (!(await columnExists(connection, 'g_environments', 'displayOrder'))) {
     await connection.execute(`
       ALTER TABLE g_environments
       ADD COLUMN displayOrder INT NOT NULL DEFAULT 0
@@ -109,7 +115,7 @@ exports.up = async function (connection) {
   }
 
   // Check and add color column
-  if (!await columnExists(connection, 'g_environments', 'color')) {
+  if (!(await columnExists(connection, 'g_environments', 'color'))) {
     await connection.execute(`
       ALTER TABLE g_environments
       ADD COLUMN color VARCHAR(7) NOT NULL DEFAULT '#607D8B'
@@ -119,7 +125,7 @@ exports.up = async function (connection) {
   }
 
   // Check and add projectId column
-  if (!await columnExists(connection, 'g_environments', 'projectId')) {
+  if (!(await columnExists(connection, 'g_environments', 'projectId'))) {
     await connection.execute(`
       ALTER TABLE g_environments
       ADD COLUMN projectId VARCHAR(127) NULL
@@ -144,28 +150,37 @@ exports.up = async function (connection) {
   console.log('Creating predefined environments...');
 
   // Development environment
-  await connection.execute(`
+  await connection.execute(
+    `
     INSERT INTO g_environments
     (environment, displayName, description, environmentType, isSystemDefined, isDefault, displayOrder, color, projectId, requiresApproval, requiredApprovers, createdBy)
     VALUES ('development', 'Development', 'Development environment for testing and feature development', 'development', TRUE, TRUE, 1, '#4CAF50', ?, FALSE, 1, 1)
     ON DUPLICATE KEY UPDATE displayName = VALUES(displayName)
-  `, [projectId]);
+  `,
+    [projectId]
+  );
 
   // QA environment
-  await connection.execute(`
+  await connection.execute(
+    `
     INSERT INTO g_environments
     (environment, displayName, description, environmentType, isSystemDefined, isDefault, displayOrder, color, projectId, requiresApproval, requiredApprovers, createdBy)
     VALUES ('qa', 'QA', 'QA environment for quality assurance testing', 'staging', TRUE, FALSE, 2, '#FF9800', ?, TRUE, 1, 1)
     ON DUPLICATE KEY UPDATE displayName = VALUES(displayName)
-  `, [projectId]);
+  `,
+    [projectId]
+  );
 
   // Production environment
-  await connection.execute(`
+  await connection.execute(
+    `
     INSERT INTO g_environments
     (environment, displayName, description, environmentType, isSystemDefined, isDefault, displayOrder, color, projectId, requiresApproval, requiredApprovers, createdBy)
     VALUES ('production', 'Production', 'Production environment for live users', 'production', TRUE, FALSE, 3, '#F44336', ?, TRUE, 2, 1)
     ON DUPLICATE KEY UPDATE displayName = VALUES(displayName)
-  `, [projectId]);
+  `,
+    [projectId]
+  );
 
   console.log('✓ Predefined environments created');
   console.log('Multi-environment support migration completed successfully');
@@ -182,7 +197,13 @@ exports.down = async function (connection) {
   }
 
   // Remove added columns from g_environments
-  const columnsToRemove = ['projectId', 'color', 'displayOrder', 'isSystemDefined', 'environmentType'];
+  const columnsToRemove = [
+    'projectId',
+    'color',
+    'displayOrder',
+    'isSystemDefined',
+    'environmentType',
+  ];
 
   for (const column of columnsToRemove) {
     try {
@@ -196,7 +217,9 @@ exports.down = async function (connection) {
   }
 
   // Delete predefined environments
-  await connection.execute(`DELETE FROM g_environments WHERE environmentName IN ('development', 'qa', 'production')`);
+  await connection.execute(
+    `DELETE FROM g_environments WHERE environmentName IN ('development', 'qa', 'production')`
+  );
 
   // Drop projects table
   await connection.execute('DROP TABLE IF EXISTS g_projects');
@@ -204,4 +227,3 @@ exports.down = async function (connection) {
 
   console.log('Multi-environment support migration rollback completed');
 };
-

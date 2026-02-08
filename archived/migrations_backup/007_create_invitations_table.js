@@ -3,7 +3,7 @@
  * This table stores invitations sent to users to join the platform
  */
 
-exports.up = async function(connection) {
+exports.up = async function (connection) {
   // Connection is provided by the migration system
 
   console.log('Creating g_invitations table...');
@@ -41,7 +41,7 @@ exports.up = async function(connection) {
   console.log('✓ g_invitations table created successfully');
 };
 
-exports.down = async function(connection) {
+exports.down = async function (connection) {
   // Connection is provided by the migration system
   console.log('Dropping g_invitations table...');
 

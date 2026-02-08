@@ -5,36 +5,21 @@
       "order": "number",
       "unlockType": "number",
       "unlockTargetId": "number",
-      "recipeCategory": [
-        "bool",
-        "bool",
-        "bool",
-        "bool",
-        "bool"
-      ],
+      "recipeCategory": ["bool", "bool", "bool", "bool", "bool"],
       "liveEventPreview": "bool"
     },
     ":required": {
       "order": 1,
       "unlockType": 1,
       "unlockTargetId": 1,
-      "recipeCategory": [
-        1,
-        1,
-        1,
-        1,
-        1
-      ],
+      "recipeCategory": [1, 1, 1, 1, 1],
       "liveEventPreview": 1
     },
     ":min": {},
     ":max": {},
     ":enum": {},
     ":links": {
-      "unlockTargetId": [
-        "Item",
-        "LiveEvent"
-      ]
+      "unlockTargetId": ["Item", "LiveEvent"]
     }
   },
   "ManufactureGroup": {
@@ -43,13 +28,7 @@
       "order": 10200,
       "unlockType": 1,
       "unlockTargetId": 23523000,
-      "recipeCategory": [
-        true,
-        false,
-        false,
-        false,
-        false
-      ],
+      "recipeCategory": [true, false, false, false, false],
       "liveEventPreview": false
     },
     "100140001": {
@@ -57,13 +36,7 @@
       "order": 10100,
       "unlockType": 1,
       "unlockTargetId": 23523001,
-      "recipeCategory": [
-        true,
-        false,
-        false,
-        false,
-        false
-      ],
+      "recipeCategory": [true, false, false, false, false],
       "liveEventPreview": false
     },
     "100140002": {
@@ -71,13 +44,7 @@
       "order": 10600,
       "unlockType": 1,
       "unlockTargetId": 23523002,
-      "recipeCategory": [
-        true,
-        false,
-        false,
-        false,
-        false
-      ],
+      "recipeCategory": [true, false, false, false, false],
       "liveEventPreview": false
     },
     "100140003": {
@@ -85,13 +52,7 @@
       "order": 10500,
       "unlockType": 1,
       "unlockTargetId": 23523003,
-      "recipeCategory": [
-        true,
-        false,
-        false,
-        false,
-        false
-      ],
+      "recipeCategory": [true, false, false, false, false],
       "liveEventPreview": false
     },
     "100140004": {
@@ -99,13 +60,7 @@
       "order": 10300,
       "unlockType": 1,
       "unlockTargetId": 23523004,
-      "recipeCategory": [
-        true,
-        false,
-        false,
-        false,
-        false
-      ],
+      "recipeCategory": [true, false, false, false, false],
       "liveEventPreview": false
     },
     "100140005": {
@@ -113,13 +68,7 @@
       "order": 11000,
       "unlockType": 1,
       "unlockTargetId": 23523005,
-      "recipeCategory": [
-        true,
-        false,
-        false,
-        false,
-        false
-      ],
+      "recipeCategory": [true, false, false, false, false],
       "liveEventPreview": false
     },
     "100140006": {
@@ -127,13 +76,7 @@
       "order": 11200,
       "unlockType": 1,
       "unlockTargetId": 23523006,
-      "recipeCategory": [
-        true,
-        false,
-        false,
-        false,
-        false
-      ],
+      "recipeCategory": [true, false, false, false, false],
       "liveEventPreview": false
     },
     "100140007": {
@@ -141,13 +84,7 @@
       "order": 11400,
       "unlockType": 1,
       "unlockTargetId": 23523007,
-      "recipeCategory": [
-        true,
-        false,
-        false,
-        false,
-        false
-      ],
+      "recipeCategory": [true, false, false, false, false],
       "liveEventPreview": false
     },
     "100140008": {
@@ -155,13 +92,7 @@
       "order": 11100,
       "unlockType": 1,
       "unlockTargetId": 23523008,
-      "recipeCategory": [
-        true,
-        false,
-        false,
-        false,
-        false
-      ],
+      "recipeCategory": [true, false, false, false, false],
       "liveEventPreview": false
     },
     "100140009": {
@@ -169,13 +100,7 @@
       "order": 10900,
       "unlockType": 1,
       "unlockTargetId": 23523009,
-      "recipeCategory": [
-        true,
-        false,
-        false,
-        false,
-        false
-      ],
+      "recipeCategory": [true, false, false, false, false],
       "liveEventPreview": false
     },
     "100140010": {
@@ -183,13 +108,7 @@
       "order": 10800,
       "unlockType": 1,
       "unlockTargetId": 23523010,
-      "recipeCategory": [
-        true,
-        false,
-        false,
-        false,
-        false
-      ],
+      "recipeCategory": [true, false, false, false, false],
       "liveEventPreview": false
     },
     "100140011": {
@@ -197,13 +116,7 @@
       "order": 11500,
       "unlockType": 1,
       "unlockTargetId": 23523011,
-      "recipeCategory": [
-        true,
-        false,
-        false,
-        false,
-        false
-      ],
+      "recipeCategory": [true, false, false, false, false],
       "liveEventPreview": false
     },
     "100140012": {
@@ -211,13 +124,7 @@
       "order": 10000,
       "unlockType": 1,
       "unlockTargetId": 23523012,
-      "recipeCategory": [
-        true,
-        false,
-        false,
-        false,
-        false
-      ],
+      "recipeCategory": [true, false, false, false, false],
       "liveEventPreview": false
     },
     "100140013": {
@@ -225,13 +132,7 @@
       "order": 20100,
       "unlockType": 1,
       "unlockTargetId": 23523013,
-      "recipeCategory": [
-        false,
-        true,
-        false,
-        false,
-        false
-      ],
+      "recipeCategory": [false, true, false, false, false],
       "liveEventPreview": false
     },
     "100140014": {
@@ -239,13 +140,7 @@
       "order": 20200,
       "unlockType": 1,
       "unlockTargetId": 23523014,
-      "recipeCategory": [
-        false,
-        true,
-        false,
-        false,
-        false
-      ],
+      "recipeCategory": [false, true, false, false, false],
       "liveEventPreview": false
     },
     "100140015": {
@@ -253,13 +148,7 @@
       "order": 20300,
       "unlockType": 1,
       "unlockTargetId": 23523015,
-      "recipeCategory": [
-        false,
-        true,
-        false,
-        false,
-        false
-      ],
+      "recipeCategory": [false, true, false, false, false],
       "liveEventPreview": false
     },
     "100140016": {
@@ -267,13 +156,7 @@
       "order": 21200,
       "unlockType": 1,
       "unlockTargetId": 23523016,
-      "recipeCategory": [
-        false,
-        true,
-        false,
-        false,
-        false
-      ],
+      "recipeCategory": [false, true, false, false, false],
       "liveEventPreview": false
     },
     "100140017": {
@@ -281,13 +164,7 @@
       "order": 20700,
       "unlockType": 1,
       "unlockTargetId": 23523017,
-      "recipeCategory": [
-        false,
-        true,
-        false,
-        false,
-        false
-      ],
+      "recipeCategory": [false, true, false, false, false],
       "liveEventPreview": false
     },
     "100140018": {
@@ -295,13 +172,7 @@
       "order": 20500,
       "unlockType": 1,
       "unlockTargetId": 23523018,
-      "recipeCategory": [
-        false,
-        true,
-        false,
-        false,
-        false
-      ],
+      "recipeCategory": [false, true, false, false, false],
       "liveEventPreview": false
     },
     "100140019": {
@@ -309,13 +180,7 @@
       "order": 21000,
       "unlockType": 1,
       "unlockTargetId": 23523019,
-      "recipeCategory": [
-        false,
-        true,
-        false,
-        false,
-        false
-      ],
+      "recipeCategory": [false, true, false, false, false],
       "liveEventPreview": false
     },
     "100140020": {
@@ -323,13 +188,7 @@
       "order": 21100,
       "unlockType": 1,
       "unlockTargetId": 23523020,
-      "recipeCategory": [
-        false,
-        true,
-        false,
-        false,
-        false
-      ],
+      "recipeCategory": [false, true, false, false, false],
       "liveEventPreview": false
     },
     "100140021": {
@@ -337,13 +196,7 @@
       "order": 21900,
       "unlockType": 1,
       "unlockTargetId": 23523021,
-      "recipeCategory": [
-        false,
-        true,
-        false,
-        false,
-        false
-      ],
+      "recipeCategory": [false, true, false, false, false],
       "liveEventPreview": false
     },
     "100140022": {
@@ -351,13 +204,7 @@
       "order": 22200,
       "unlockType": 1,
       "unlockTargetId": 23523022,
-      "recipeCategory": [
-        false,
-        true,
-        false,
-        false,
-        false
-      ],
+      "recipeCategory": [false, true, false, false, false],
       "liveEventPreview": false
     },
     "100140023": {
@@ -365,13 +212,7 @@
       "order": 21500,
       "unlockType": 1,
       "unlockTargetId": 23523023,
-      "recipeCategory": [
-        false,
-        true,
-        false,
-        false,
-        false
-      ],
+      "recipeCategory": [false, true, false, false, false],
       "liveEventPreview": false
     },
     "100140024": {
@@ -379,13 +220,7 @@
       "order": 22100,
       "unlockType": 1,
       "unlockTargetId": 23523024,
-      "recipeCategory": [
-        false,
-        true,
-        false,
-        false,
-        false
-      ],
+      "recipeCategory": [false, true, false, false, false],
       "liveEventPreview": false
     },
     "100140025": {
@@ -393,13 +228,7 @@
       "order": 22400,
       "unlockType": 1,
       "unlockTargetId": 23523025,
-      "recipeCategory": [
-        false,
-        true,
-        false,
-        false,
-        false
-      ],
+      "recipeCategory": [false, true, false, false, false],
       "liveEventPreview": false
     },
     "100140026": {
@@ -407,13 +236,7 @@
       "order": 21400,
       "unlockType": 1,
       "unlockTargetId": 23523026,
-      "recipeCategory": [
-        false,
-        true,
-        false,
-        false,
-        false
-      ],
+      "recipeCategory": [false, true, false, false, false],
       "liveEventPreview": false
     },
     "100140027": {
@@ -421,13 +244,7 @@
       "order": 22000,
       "unlockType": 1,
       "unlockTargetId": 23523027,
-      "recipeCategory": [
-        false,
-        true,
-        false,
-        false,
-        false
-      ],
+      "recipeCategory": [false, true, false, false, false],
       "liveEventPreview": false
     },
     "100140028": {
@@ -435,13 +252,7 @@
       "order": 22300,
       "unlockType": 1,
       "unlockTargetId": 23523028,
-      "recipeCategory": [
-        false,
-        true,
-        false,
-        false,
-        false
-      ],
+      "recipeCategory": [false, true, false, false, false],
       "liveEventPreview": false
     },
     "100140029": {
@@ -449,13 +260,7 @@
       "order": 21800,
       "unlockType": 1,
       "unlockTargetId": 23523029,
-      "recipeCategory": [
-        false,
-        true,
-        false,
-        false,
-        false
-      ],
+      "recipeCategory": [false, true, false, false, false],
       "liveEventPreview": false
     },
     "100140030": {
@@ -463,13 +268,7 @@
       "order": 20800,
       "unlockType": 1,
       "unlockTargetId": 23523030,
-      "recipeCategory": [
-        false,
-        true,
-        false,
-        false,
-        false
-      ],
+      "recipeCategory": [false, true, false, false, false],
       "liveEventPreview": false
     },
     "100140031": {
@@ -477,13 +276,7 @@
       "order": 22600,
       "unlockType": 1,
       "unlockTargetId": 23523031,
-      "recipeCategory": [
-        false,
-        true,
-        false,
-        false,
-        false
-      ],
+      "recipeCategory": [false, true, false, false, false],
       "liveEventPreview": false
     },
     "100140032": {
@@ -491,13 +284,7 @@
       "order": 20400,
       "unlockType": 1,
       "unlockTargetId": 23523032,
-      "recipeCategory": [
-        false,
-        true,
-        false,
-        false,
-        false
-      ],
+      "recipeCategory": [false, true, false, false, false],
       "liveEventPreview": false
     },
     "100140033": {
@@ -505,13 +292,7 @@
       "order": 21600,
       "unlockType": 1,
       "unlockTargetId": 23523033,
-      "recipeCategory": [
-        false,
-        true,
-        false,
-        false,
-        false
-      ],
+      "recipeCategory": [false, true, false, false, false],
       "liveEventPreview": false
     },
     "100140034": {
@@ -519,13 +300,7 @@
       "order": 21300,
       "unlockType": 1,
       "unlockTargetId": 23523034,
-      "recipeCategory": [
-        false,
-        true,
-        false,
-        false,
-        false
-      ],
+      "recipeCategory": [false, true, false, false, false],
       "liveEventPreview": false
     },
     "100140035": {
@@ -533,13 +308,7 @@
       "order": 9999999,
       "unlockType": 1,
       "unlockTargetId": 23523035,
-      "recipeCategory": [
-        false,
-        true,
-        false,
-        false,
-        false
-      ],
+      "recipeCategory": [false, true, false, false, false],
       "liveEventPreview": false
     },
     "100140036": {
@@ -547,13 +316,7 @@
       "order": 9999999,
       "unlockType": 2,
       "unlockTargetId": 99800182,
-      "recipeCategory": [
-        true,
-        false,
-        false,
-        false,
-        false
-      ],
+      "recipeCategory": [true, false, false, false, false],
       "liveEventPreview": false
     },
     "100140037": {
@@ -561,13 +324,7 @@
       "order": 9999999,
       "unlockType": 2,
       "unlockTargetId": 99809014,
-      "recipeCategory": [
-        false,
-        true,
-        false,
-        false,
-        false
-      ],
+      "recipeCategory": [false, true, false, false, false],
       "liveEventPreview": false
     },
     "100140038": {
@@ -575,13 +332,7 @@
       "order": 9999999,
       "unlockType": 2,
       "unlockTargetId": 99809024,
-      "recipeCategory": [
-        true,
-        false,
-        false,
-        false,
-        false
-      ],
+      "recipeCategory": [true, false, false, false, false],
       "liveEventPreview": false
     },
     "100140039": {
@@ -589,13 +340,7 @@
       "order": 100,
       "unlockType": 1,
       "unlockTargetId": 23700301,
-      "recipeCategory": [
-        false,
-        true,
-        false,
-        false,
-        false
-      ],
+      "recipeCategory": [false, true, false, false, false],
       "liveEventPreview": false
     },
     "100140040": {
@@ -603,13 +348,7 @@
       "order": 100000,
       "unlockType": 2,
       "unlockTargetId": 99809038,
-      "recipeCategory": [
-        true,
-        false,
-        false,
-        false,
-        false
-      ],
+      "recipeCategory": [true, false, false, false, false],
       "liveEventPreview": false
     },
     "100140041": {
@@ -617,13 +356,7 @@
       "order": 100000,
       "unlockType": 2,
       "unlockTargetId": 99809039,
-      "recipeCategory": [
-        false,
-        true,
-        false,
-        false,
-        false
-      ],
+      "recipeCategory": [false, true, false, false, false],
       "liveEventPreview": false
     },
     "100140042": {
@@ -631,13 +364,7 @@
       "order": 1,
       "unlockType": 2,
       "unlockTargetId": 99809081,
-      "recipeCategory": [
-        true,
-        false,
-        false,
-        false,
-        false
-      ],
+      "recipeCategory": [true, false, false, false, false],
       "liveEventPreview": true
     },
     "100140043": {
@@ -645,13 +372,7 @@
       "order": 2,
       "unlockType": 2,
       "unlockTargetId": 99809080,
-      "recipeCategory": [
-        false,
-        true,
-        false,
-        false,
-        false
-      ],
+      "recipeCategory": [false, true, false, false, false],
       "liveEventPreview": true
     },
     "100140045": {
@@ -659,13 +380,7 @@
       "order": 10700,
       "unlockType": 1,
       "unlockTargetId": 23523037,
-      "recipeCategory": [
-        true,
-        false,
-        false,
-        false,
-        false
-      ],
+      "recipeCategory": [true, false, false, false, false],
       "liveEventPreview": false
     },
     "100140046": {
@@ -673,13 +388,7 @@
       "order": 11300,
       "unlockType": 1,
       "unlockTargetId": 23523041,
-      "recipeCategory": [
-        true,
-        false,
-        false,
-        false,
-        false
-      ],
+      "recipeCategory": [true, false, false, false, false],
       "liveEventPreview": false
     },
     "100140047": {
@@ -687,13 +396,7 @@
       "order": 20600,
       "unlockType": 1,
       "unlockTargetId": 23523036,
-      "recipeCategory": [
-        false,
-        true,
-        false,
-        false,
-        false
-      ],
+      "recipeCategory": [false, true, false, false, false],
       "liveEventPreview": false
     },
     "100140048": {
@@ -701,13 +404,7 @@
       "order": 21700,
       "unlockType": 1,
       "unlockTargetId": 23523160,
-      "recipeCategory": [
-        false,
-        true,
-        false,
-        false,
-        false
-      ],
+      "recipeCategory": [false, true, false, false, false],
       "liveEventPreview": false
     },
     "100140049": {
@@ -715,13 +412,7 @@
       "order": 10400,
       "unlockType": 1,
       "unlockTargetId": 23523161,
-      "recipeCategory": [
-        true,
-        false,
-        false,
-        false,
-        false
-      ],
+      "recipeCategory": [true, false, false, false, false],
       "liveEventPreview": false
     },
     "100140050": {
@@ -729,13 +420,7 @@
       "order": 20200,
       "unlockType": 1,
       "unlockTargetId": 23523055,
-      "recipeCategory": [
-        false,
-        true,
-        false,
-        false,
-        false
-      ],
+      "recipeCategory": [false, true, false, false, false],
       "liveEventPreview": false
     },
     "100140052": {
@@ -743,13 +428,7 @@
       "order": 20900,
       "unlockType": 1,
       "unlockTargetId": 23523162,
-      "recipeCategory": [
-        false,
-        true,
-        false,
-        false,
-        false
-      ],
+      "recipeCategory": [false, true, false, false, false],
       "liveEventPreview": false
     },
     "100140053": {
@@ -757,13 +436,7 @@
       "order": 20400,
       "unlockType": 1,
       "unlockTargetId": 23523163,
-      "recipeCategory": [
-        false,
-        true,
-        false,
-        false,
-        false
-      ],
+      "recipeCategory": [false, true, false, false, false],
       "liveEventPreview": false
     }
   }

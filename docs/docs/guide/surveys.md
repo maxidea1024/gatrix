@@ -25,13 +25,13 @@ Create and manage in-game surveys to collect player feedback.
 2. Click **Add Survey** button
 3. Configure the survey:
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| Title | Text | Required | Survey title |
-| Description | Textarea | - | Survey description |
-| Start Date | DateTime | - | When survey opens |
-| End Date | DateTime | - | When survey closes |
-| Target Segment | Select | - | Target audience |
+| Field          | Type     | Required | Description        |
+| -------------- | -------- | -------- | ------------------ |
+| Title          | Text     | Required | Survey title       |
+| Description    | Textarea | -        | Survey description |
+| Start Date     | DateTime | -        | When survey opens  |
+| End Date       | DateTime | -        | When survey closes |
+| Target Segment | Select   | -        | Target audience    |
 
 4. Add questions
 5. Click **Create** to save
@@ -47,6 +47,7 @@ Create and manage in-game surveys to collect player feedback.
 ## Response Analysis
 
 View survey results including:
+
 - Total responses
 - Response rate
 - Answer distribution

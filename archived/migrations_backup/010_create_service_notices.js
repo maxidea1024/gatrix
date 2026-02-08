@@ -2,7 +2,7 @@
  * Migration: Create service notices table
  */
 
-exports.up = async function(connection) {
+exports.up = async function (connection) {
   console.log('Creating service notices table...');
 
   // Create service notices table
@@ -32,11 +32,10 @@ exports.up = async function(connection) {
   console.log('✅ Created g_service_notices table');
 };
 
-exports.down = async function(connection) {
+exports.down = async function (connection) {
   console.log('Dropping service notices table...');
 
   await connection.execute('DROP TABLE IF EXISTS g_service_notices');
 
   console.log('✅ Dropped g_service_notices table');
 };
-

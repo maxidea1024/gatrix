@@ -39,12 +39,12 @@ export const getStoredDateTimeFormat = (): string => {
 export const setStoredTimezone = (tz: string) => {
   try {
     localStorage.setItem('settings.timezone', tz);
-  } catch { }
+  } catch {}
 };
 export const setStoredDateTimeFormat = (fmt: string) => {
   try {
     localStorage.setItem('settings.datetimeFormat', fmt);
-  } catch { }
+  } catch {}
 };
 
 // 내부: 다양한 문자열을 dayjs로 변환 (UTC -> 사용자 timezone)

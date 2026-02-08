@@ -10,61 +10,61 @@ import { IntegrationSystemEvent } from '../types/integrationEvents';
 import { formatTelegramMessage } from './EventFormatter';
 
 export class TelegramAddon extends Addon {
-    constructor() {
-        super(telegramDefinition);
+  constructor() {
+    super(telegramDefinition);
+  }
+
+  async handleEvent(
+    event: IntegrationSystemEvent,
+    parameters: Record<string, any>,
+    integrationId: string
+  ): Promise<void> {
+    const { botToken, chatId, parse_mode } = parameters;
+
+    if (!botToken || !chatId) {
+      this.logger.warn(`Missing Telegram configuration for integration ${integrationId}`);
+      await this.registerEvent(integrationId, event, 'failed', 'Missing bot token or chat ID');
+      return;
     }
 
-    async handleEvent(
-        event: IntegrationSystemEvent,
-        parameters: Record<string, any>,
-        integrationId: string
-    ): Promise<void> {
-        const { botToken, chatId, parse_mode } = parameters;
+    const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
 
-        if (!botToken || !chatId) {
-            this.logger.warn(`Missing Telegram configuration for integration ${integrationId}`);
-            await this.registerEvent(integrationId, event, 'failed', 'Missing bot token or chat ID');
-            return;
-        }
+    try {
+      const text = formatTelegramMessage(event);
 
-        const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
+      const payload = {
+        chat_id: chatId,
+        text,
+        parse_mode: parse_mode || 'Markdown',
+      };
 
-        try {
-            const text = formatTelegramMessage(event);
+      const response = await this.fetchRetry(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
 
-            const payload = {
-                chat_id: chatId,
-                text,
-                parse_mode: parse_mode || 'Markdown',
-            };
+      this.logger.info(
+        `Telegram notification sent for event ${event.type} (integration: ${integrationId})`
+      );
 
-            const response = await this.fetchRetry(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(payload),
-            });
+      await this.registerEvent(integrationId, event, 'success', '', {
+        chatId,
+        statusCode: response.status,
+      });
+    } catch (error) {
+      this.logger.error(
+        `Failed to send Telegram notification for integration ${integrationId}:`,
+        error
+      );
 
-            this.logger.info(
-                `Telegram notification sent for event ${event.type} (integration: ${integrationId})`
-            );
-
-            await this.registerEvent(integrationId, event, 'success', '', {
-                chatId,
-                statusCode: response.status,
-            });
-        } catch (error) {
-            this.logger.error(
-                `Failed to send Telegram notification for integration ${integrationId}:`,
-                error
-            );
-
-            await this.registerFailure(integrationId, event, error, {
-                chatId,
-            });
-        }
+      await this.registerFailure(integrationId, event, error, {
+        chatId,
+      });
     }
+  }
 }
 
 export default TelegramAddon;

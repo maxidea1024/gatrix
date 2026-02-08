@@ -9,11 +9,7 @@
       "obstacleType": "number",
       "icon": "string",
       "desc": "text",
-      "descFormatTexts": [
-        "text",
-        "text",
-        "text"
-      ]
+      "descFormatTexts": ["text", "text", "text"]
     },
     ":required": {
       "name": 1,

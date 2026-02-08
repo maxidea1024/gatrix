@@ -28,7 +28,7 @@ const cache = new Redis({
 async function getCachedFlag(key: string) {
   const cached = await cache.get(`flag:${key}`);
   if (cached) return JSON.parse(cached);
-  
+
   const flag = await fetchFlagFromDB(key);
   await cache.setex(`flag:${key}`, 60, JSON.stringify(flag));
   return flag;
@@ -68,6 +68,7 @@ Deploy edge servers close to your game servers for minimal latency:
 ## Monitoring
 
 Use Prometheus and Grafana to monitor:
+
 - API response times
 - Cache hit rates
 - Database query performance

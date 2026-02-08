@@ -24,18 +24,19 @@ Feature Flags allow you to turn features on/off without code deployment.
 2. Click **Create Flag** button
 3. Configure:
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| Key | Text | Required | Unique identifier (e.g., `new_checkout`) |
-| Name | Text | Required | Display name |
-| Description | Textarea | - | Purpose description |
-| Type | Select | Required | Boolean, String, Number, or JSON |
+| Field       | Type     | Required | Description                              |
+| ----------- | -------- | -------- | ---------------------------------------- |
+| Key         | Text     | Required | Unique identifier (e.g., `new_checkout`) |
+| Name        | Text     | Required | Display name                             |
+| Description | Textarea | -        | Purpose description                      |
+| Type        | Select   | Required | Boolean, String, Number, or JSON         |
 
 4. Click **Create**
 
 ## Flag Types
 
 ### Boolean
+
 Simple on/off toggle.
 
 ```json
@@ -43,6 +44,7 @@ Simple on/off toggle.
 ```
 
 ### String
+
 Return a string value.
 
 ```json
@@ -50,6 +52,7 @@ Return a string value.
 ```
 
 ### Number
+
 Return a numeric value.
 
 ```json
@@ -57,6 +60,7 @@ Return a numeric value.
 ```
 
 ### JSON
+
 Return complex configuration.
 
 ```json

@@ -23,8 +23,7 @@ function HeroBanner() {
             height="120"
           />
           <span className={styles.heroTitleText}>
-            <Translate id="homepage.welcome">Welcome to</Translate>{' '}
-            <b>{siteConfig.title}</b>
+            <Translate id="homepage.welcome">Welcome to</Translate> <b>{siteConfig.title}</b>
           </span>
         </Heading>
         <p className={styles.heroSubtitle}>{siteConfig.tagline}</p>
@@ -91,7 +90,14 @@ const FeatureList: FeatureItem[] = [
   },
 ];
 
-function FeatureCard({ titleId, titleDefault, descriptionId, descriptionDefault, icon, link }: FeatureItem) {
+function FeatureCard({
+  titleId,
+  titleDefault,
+  descriptionId,
+  descriptionDefault,
+  icon,
+  link,
+}: FeatureItem) {
   return (
     <Link to={link} className={styles.featureCard}>
       <div className={styles.featureIcon}>{icon}</div>

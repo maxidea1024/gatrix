@@ -28,12 +28,14 @@ Export metrics and traces to New Relic.
 ## Exported Data
 
 ### Metrics
+
 - API response times
 - Request counts
 - Error rates
 - Feature flag evaluation counts
 
 ### Custom Events
+
 - Feature flag changes
 - User actions
 - System events
@@ -41,6 +43,7 @@ Export metrics and traces to New Relic.
 ## Dashboard
 
 After integration, you can create New Relic dashboards to visualize:
+
 - Feature flag usage
 - Rollout progress
 - Error correlation with flag changes
@@ -48,6 +51,7 @@ After integration, you can create New Relic dashboards to visualize:
 ## Troubleshooting
 
 If data is not appearing:
+
 1. Verify the License Key is correct
 2. Check the connection status in Gatrix
 3. Allow 5 minutes for initial data to appear

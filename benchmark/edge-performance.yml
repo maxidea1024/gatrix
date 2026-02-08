@@ -1,5 +1,5 @@
 config:
-  target: "http://localhost:3400"
+  target: 'http://localhost:3400'
   phases:
     - duration: 30
       arrivalRate: 10
@@ -10,70 +10,70 @@ config:
       name: Sustained load phase
   defaults:
     headers:
-      x-application-name: "benchmark-test"
-      x-api-token: "gatrix-unsecured-edge-api-token"
-      x-platform: "pc"
+      x-application-name: 'benchmark-test'
+      x-api-token: 'gatrix-unsecured-edge-api-token'
+      x-platform: 'pc'
   variables:
-    environment: "development"
+    environment: 'development'
 
 scenarios:
   # Normal 200 responses
-  - name: "Normal 200 Flow"
+  - name: 'Normal 200 Flow'
     weight: 60
     flow:
       - get:
-          url: "/api/v1/client/{{ environment }}/game-worlds"
+          url: '/api/v1/client/{{ environment }}/game-worlds'
       - get:
-          url: "/api/v1/client/{{ environment }}/banners"
+          url: '/api/v1/client/{{ environment }}/banners'
       - get:
-          url: "/api/v1/client/{{ environment }}/service-notices"
+          url: '/api/v1/client/{{ environment }}/service-notices'
 
   # 304 Not Modified (with If-Modified-Since header)
-  - name: "304 Cached Flow"
+  - name: '304 Cached Flow'
     weight: 20
     flow:
       - get:
-          url: "/api/v1/client/{{ environment }}/service-notices"
+          url: '/api/v1/client/{{ environment }}/service-notices'
           headers:
-            If-Modified-Since: "Wed, 01 Jan 2099 00:00:00 GMT"
+            If-Modified-Since: 'Wed, 01 Jan 2099 00:00:00 GMT'
       - get:
-          url: "/api/v1/client/{{ environment }}/game-worlds"
+          url: '/api/v1/client/{{ environment }}/game-worlds'
           headers:
-            If-Modified-Since: "Wed, 01 Jan 2099 00:00:00 GMT"
+            If-Modified-Since: 'Wed, 01 Jan 2099 00:00:00 GMT'
 
   # 404 Not Found (invalid endpoints)
-  - name: "404 Not Found Flow"
+  - name: '404 Not Found Flow'
     weight: 10
     flow:
       - get:
-          url: "/api/v1/client/{{ environment }}/client-version?platform=pc"
+          url: '/api/v1/client/{{ environment }}/client-version?platform=pc'
       - get:
-          url: "/api/v1/client/{{ environment }}/ingame-popup-notices"
+          url: '/api/v1/client/{{ environment }}/ingame-popup-notices'
       - get:
-          url: "/api/v1/client/invalid-env/game-worlds"
+          url: '/api/v1/client/invalid-env/game-worlds'
 
   # 400 Bad Request (missing required params)
-  - name: "400 Bad Request Flow"
+  - name: '400 Bad Request Flow'
     weight: 5
     flow:
       - get:
-          url: "/api/v1/client/{{ environment }}/service-notices"
+          url: '/api/v1/client/{{ environment }}/service-notices'
           headers:
-            x-api-token: ""
+            x-api-token: ''
       - get:
-          url: "/api/v1/client/{{ environment }}/game-worlds"
+          url: '/api/v1/client/{{ environment }}/game-worlds'
           headers:
-            x-application-name: ""
+            x-application-name: ''
 
   # Mixed responses
-  - name: "Mixed Flow"
+  - name: 'Mixed Flow'
     weight: 5
     flow:
       - get:
-          url: "/api/v1/client/{{ environment }}/service-notices"
+          url: '/api/v1/client/{{ environment }}/service-notices'
       - get:
-          url: "/api/v1/client/{{ environment }}/client-version?platform=pc"
+          url: '/api/v1/client/{{ environment }}/client-version?platform=pc'
       - get:
-          url: "/api/v1/client/{{ environment }}/game-worlds"
+          url: '/api/v1/client/{{ environment }}/game-worlds'
           headers:
-            If-Modified-Since: "Wed, 01 Jan 2099 00:00:00 GMT"
+            If-Modified-Since: 'Wed, 01 Jan 2099 00:00:00 GMT'

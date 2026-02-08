@@ -2,7 +2,7 @@ const mysql = require('mysql2/promise');
 
 async function testMigrationLogs() {
   console.log('Testing migration logs...');
-  
+
   try {
     // Create connection
     const connection = await mysql.createConnection({
@@ -10,7 +10,7 @@ async function testMigrationLogs() {
       port: 3306,
       user: 'motif_dev',
       password: 'dev123$',
-      database: 'uwo_gate'
+      database: 'uwo_gate',
     });
 
     console.log('Connected to database');
@@ -25,10 +25,9 @@ async function testMigrationLogs() {
 
     await connection.end();
     console.log('Database connection closed');
-    
+
     console.log('\nNow run: yarn migrate:up');
     console.log('You should see improved log messages without error details');
-    
   } catch (error) {
     console.error('Error:', error.message);
   }

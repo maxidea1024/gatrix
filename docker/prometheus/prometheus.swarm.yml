@@ -100,4 +100,3 @@ scrape_configs:
   #         - 'tasks.node-exporter'
   #       type: 'A'
   #       port: 9100
-

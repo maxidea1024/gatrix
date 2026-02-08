@@ -21,12 +21,8 @@
           "Count": "number"
         }
       ],
-      "requiredConditionType": [
-        "number"
-      ],
-      "requiredConditionVal": [
-        "number"
-      ],
+      "requiredConditionType": ["number"],
+      "requiredConditionVal": ["number"],
       "effectType": "number",
       "effectRadius": "number",
       "eventDependencyType": "number",
@@ -80,9 +76,7 @@
           "Id": 81000000
         }
       ],
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "eventDependencyType": 0,
       "eventDependencyId": 1,
@@ -109,9 +103,7 @@
           "Id": 81999999
         }
       ],
-      "requiredConditionType": [
-        4
-      ],
+      "requiredConditionType": [4],
       "effectType": 3,
       "eventDependencyType": 7,
       "eventDependencyId": 99999999,
@@ -132,38 +124,18 @@
     ":links": {
       "contentsTerms": [
         {
-          "Id": [
-            "ContentsTerms"
-          ]
+          "Id": ["ContentsTerms"]
         },
         {
-          "Id": [
-            "ContentsTerms"
-          ]
+          "Id": ["ContentsTerms"]
         }
       ],
-      "eventDependencyId": [
-        "WorldBuff",
-        "OceanDisaster",
-        "Quest",
-        "Constellation",
-        "SalvageSpot"
-      ],
-      "discoveryId": [
-        "Discovery"
-      ],
-      "bossRaidId": [
-        "BossRaid"
-      ],
-      "reward": [
-        "Reward"
-      ],
-      "occuratePassiveEffects": [
-        "WorldPassiveEffect"
-      ],
-      "oceanTextId": [
-        "OceanText"
-      ]
+      "eventDependencyId": ["WorldBuff", "OceanDisaster", "Quest", "Constellation", "SalvageSpot"],
+      "discoveryId": ["Discovery"],
+      "bossRaidId": ["BossRaid"],
+      "reward": ["Reward"],
+      "occuratePassiveEffects": ["WorldPassiveEffect"],
+      "oceanTextId": ["OceanText"]
     }
   },
   "OceanDoodad": {
@@ -176,9 +148,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 10000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 100,
       "eventDependencyType": 4,
@@ -205,9 +175,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 10000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 0,
@@ -239,9 +207,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 10000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 4,
@@ -274,9 +240,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 10000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 0,
@@ -306,9 +270,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 10000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 0,
@@ -341,9 +303,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 10000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 0,
@@ -376,9 +336,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 10000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 0,
@@ -411,9 +369,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 10000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 0,
@@ -445,12 +401,8 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 10000,
-      "requiredConditionType": [
-        1
-      ],
-      "requiredConditionVal": [
-        20
-      ],
+      "requiredConditionType": [1],
+      "requiredConditionVal": [20],
       "effectType": 0,
       "effectRadius": 100,
       "eventDependencyType": 2,
@@ -479,12 +431,8 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 10000,
-      "requiredConditionType": [
-        1
-      ],
-      "requiredConditionVal": [
-        20
-      ],
+      "requiredConditionType": [1],
+      "requiredConditionVal": [20],
       "effectType": 0,
       "effectRadius": 100,
       "eventDependencyType": 2,
@@ -513,9 +461,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 10000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 100,
       "eventDependencyType": 1,
@@ -543,9 +489,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 10000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 100,
       "eventDependencyType": 0,
@@ -577,12 +521,8 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 10000,
-      "requiredConditionType": [
-        1
-      ],
-      "requiredConditionVal": [
-        20
-      ],
+      "requiredConditionType": [1],
+      "requiredConditionVal": [20],
       "effectType": 0,
       "effectRadius": 100,
       "eventDependencyType": 1,
@@ -612,12 +552,8 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 10000,
-      "requiredConditionType": [
-        1
-      ],
-      "requiredConditionVal": [
-        20
-      ],
+      "requiredConditionType": [1],
+      "requiredConditionVal": [20],
       "effectType": 0,
       "effectRadius": 100,
       "eventDependencyType": 1,
@@ -647,12 +583,8 @@
       "shipLifeRate3f": 100,
       "shipLifeValue": 1,
       "widgetRadius": 10000,
-      "requiredConditionType": [
-        1
-      ],
-      "requiredConditionVal": [
-        20
-      ],
+      "requiredConditionType": [1],
+      "requiredConditionVal": [20],
       "effectType": 0,
       "effectRadius": 100,
       "eventDependencyType": 1,
@@ -682,12 +614,8 @@
       "shipLifeRate3f": 100,
       "shipLifeValue": 1,
       "widgetRadius": 10000,
-      "requiredConditionType": [
-        1
-      ],
-      "requiredConditionVal": [
-        20
-      ],
+      "requiredConditionType": [1],
+      "requiredConditionVal": [20],
       "effectType": 0,
       "effectRadius": 100,
       "eventDependencyType": 2,
@@ -717,9 +645,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 10500,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 100,
       "eventDependencyType": 4,
@@ -746,12 +672,8 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 10000,
-      "requiredConditionType": [
-        1
-      ],
-      "requiredConditionVal": [
-        20
-      ],
+      "requiredConditionType": [1],
+      "requiredConditionVal": [20],
       "effectType": 0,
       "effectRadius": 100,
       "eventDependencyType": 1,
@@ -780,12 +702,8 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 10000,
-      "requiredConditionType": [
-        1
-      ],
-      "requiredConditionVal": [
-        20
-      ],
+      "requiredConditionType": [1],
+      "requiredConditionVal": [20],
       "effectType": 0,
       "effectRadius": 100,
       "eventDependencyType": 4,
@@ -813,12 +731,8 @@
       "shipLifeRate3f": 250,
       "shipLifeValue": 2,
       "widgetRadius": 10000,
-      "requiredConditionType": [
-        1
-      ],
-      "requiredConditionVal": [
-        20
-      ],
+      "requiredConditionType": [1],
+      "requiredConditionVal": [20],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 1,
@@ -848,9 +762,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 10000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 0,
@@ -879,9 +791,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 10000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -911,9 +821,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 10000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -941,9 +849,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 10000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 1,
@@ -974,9 +880,7 @@
       "shipLifeRate3f": 100,
       "shipLifeValue": 1,
       "widgetRadius": 10000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "eventDependencyType": 5,
       "discoveryId": 70409030,
@@ -1004,9 +908,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 10000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 100,
       "eventDependencyType": 4,
@@ -1033,9 +935,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 10000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 4,
@@ -1064,9 +964,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 10000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 4,
@@ -1095,9 +993,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 10000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 4,
@@ -1126,9 +1022,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 10000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 4,
@@ -1157,9 +1051,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 10000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 0,
@@ -1190,9 +1082,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 10000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 4,
@@ -1221,9 +1111,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 10000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 4,
@@ -1252,9 +1140,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 10000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 0,
@@ -1282,9 +1168,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 10000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 0,
@@ -1311,9 +1195,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 10000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 0,
@@ -1340,9 +1222,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 10000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 0,
@@ -1369,9 +1249,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 10000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 0,
@@ -1398,9 +1276,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 10000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 0,
@@ -1427,9 +1303,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 10000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 0,
@@ -1456,9 +1330,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 10000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 0,
@@ -1485,9 +1357,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 10000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 100,
       "eventDependencyType": 1,
@@ -1518,9 +1388,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 10000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 100,
       "eventDependencyType": 0,
@@ -1552,9 +1420,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 10000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 100,
       "eventDependencyType": 1,
@@ -1585,9 +1451,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 10000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 0,
@@ -1614,9 +1478,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 11000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -1650,9 +1512,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 22500,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -1686,9 +1546,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 17000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -1722,9 +1580,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 17000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -1758,9 +1614,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 16000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -1794,9 +1648,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 13500,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -1830,9 +1682,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 17000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -1866,9 +1716,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 16000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -1902,9 +1750,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 30000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -1938,9 +1784,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 30000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -1974,9 +1818,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 13000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -2010,9 +1852,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 12500,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -2046,9 +1886,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 17500,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -2082,9 +1920,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 15000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -2118,9 +1954,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 12500,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -2154,9 +1988,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 18000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -2190,9 +2022,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 14000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -2226,9 +2056,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 15500,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -2262,9 +2090,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 20000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -2298,9 +2124,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 17500,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -2334,9 +2158,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 14000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -2370,9 +2192,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 18000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -2406,9 +2226,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 11000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -2442,9 +2260,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 19000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -2478,9 +2294,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 15500,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -2514,9 +2328,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 18000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -2550,9 +2362,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 10000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -2586,9 +2396,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 9000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -2622,9 +2430,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 30000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -2658,9 +2464,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 11000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -2694,9 +2498,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 16500,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -2730,9 +2532,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 18000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -2766,9 +2566,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 13000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -2802,9 +2600,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 10000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -2838,9 +2634,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 17000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -2874,9 +2668,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 18500,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -2910,9 +2702,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 15500,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -2946,9 +2736,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 13000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -2982,9 +2770,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 11500,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -3018,9 +2804,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 19000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -3054,9 +2838,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 12500,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -3090,9 +2872,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 30000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -3126,9 +2906,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 12000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -3162,9 +2940,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 24000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -3200,9 +2976,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 24000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -3238,9 +3012,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 16000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -3276,9 +3048,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 30000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -3314,9 +3084,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 23000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -3352,9 +3120,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 22000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -3390,9 +3156,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 17000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -3428,9 +3192,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 26000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -3466,9 +3228,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 17000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -3504,9 +3264,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 18000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -3542,9 +3300,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 16000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -3580,9 +3336,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 19000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -3618,9 +3372,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 18000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -3655,9 +3407,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 53000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -3693,9 +3443,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 7500,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -3729,9 +3477,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 12500,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -3765,9 +3511,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 11000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -3801,9 +3545,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 8500,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -3837,9 +3579,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 13000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -3873,9 +3613,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 8500,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -3909,9 +3647,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 13000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -3945,9 +3681,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 7500,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -3981,9 +3715,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 10500,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -4017,9 +3749,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 7500,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -4053,9 +3783,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 15500,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -4089,9 +3817,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 7500,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -4125,9 +3851,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 8000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -4161,9 +3885,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 8000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -4197,9 +3919,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 8000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -4233,9 +3953,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 11500,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -4269,9 +3987,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 7500,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -4305,9 +4021,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 12000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -4341,9 +4055,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 11500,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -4377,9 +4089,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 10500,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -4413,9 +4123,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 12000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -4449,9 +4157,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 13000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -4485,9 +4191,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 11500,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -4521,9 +4225,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 7000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -4557,9 +4259,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 7000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -4593,9 +4293,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 7000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -4629,9 +4327,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 7000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -4665,9 +4361,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 7000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -4701,9 +4395,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 7000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -4737,9 +4429,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 23000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -4773,9 +4463,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 7500,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 1000,
       "eventDependencyType": 5,
@@ -4809,9 +4497,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 9000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 1000,
       "eventDependencyType": 5,
@@ -4845,9 +4531,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 12000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 1000,
       "eventDependencyType": 5,
@@ -4881,9 +4565,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 7500,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 1000,
       "eventDependencyType": 5,
@@ -4917,9 +4599,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 20000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 1000,
       "eventDependencyType": 5,
@@ -4953,9 +4633,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 14000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 1000,
       "eventDependencyType": 5,
@@ -4989,9 +4667,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 10000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 1000,
       "eventDependencyType": 5,
@@ -5025,9 +4701,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 13000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 1000,
       "eventDependencyType": 5,
@@ -5061,9 +4735,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 7000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 1000,
       "eventDependencyType": 5,
@@ -5097,9 +4769,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 30000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 1000,
       "eventDependencyType": 5,
@@ -5129,9 +4799,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 30000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 1000,
       "eventDependencyType": 5,
@@ -5161,9 +4829,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 30000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 1000,
       "eventDependencyType": 5,
@@ -5193,9 +4859,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 30000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 1000,
       "eventDependencyType": 5,
@@ -5225,9 +4889,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 30000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 1000,
       "eventDependencyType": 5,
@@ -5257,9 +4919,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 30000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 1000,
       "eventDependencyType": 5,
@@ -5289,9 +4949,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 30000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 1000,
       "eventDependencyType": 5,
@@ -5321,9 +4979,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 30000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 1000,
       "eventDependencyType": 5,
@@ -5353,9 +5009,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 30000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 1000,
       "eventDependencyType": 5,
@@ -5385,9 +5039,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 30000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 1000,
       "eventDependencyType": 5,
@@ -5417,9 +5069,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 30000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 1000,
       "eventDependencyType": 5,
@@ -5449,9 +5099,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 30000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 1000,
       "eventDependencyType": 5,
@@ -5481,9 +5129,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 30000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 1000,
       "eventDependencyType": 5,
@@ -5513,9 +5159,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 30000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 1000,
       "eventDependencyType": 5,
@@ -5545,9 +5189,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 30000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 1000,
       "eventDependencyType": 5,
@@ -5577,9 +5219,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 30000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 1000,
       "eventDependencyType": 5,
@@ -5609,9 +5249,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 30000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 1000,
       "eventDependencyType": 5,
@@ -5641,9 +5279,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 30000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 1000,
       "eventDependencyType": 5,
@@ -5673,9 +5309,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 30000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 1000,
       "eventDependencyType": 5,
@@ -5705,9 +5339,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 30000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 1000,
       "eventDependencyType": 5,
@@ -5737,9 +5369,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 11500,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -5772,9 +5402,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 7500,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -5807,9 +5435,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 22000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -5842,9 +5468,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 14000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -5877,9 +5501,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 17000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -5912,9 +5534,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 11000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -5947,9 +5567,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 7500,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -5982,9 +5600,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 14000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -6017,9 +5633,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 10000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -6052,9 +5666,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 18000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -6087,9 +5699,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 18000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -6122,9 +5732,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 19000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -6157,9 +5765,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 17000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -6192,9 +5798,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 13500,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -6227,9 +5831,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 62000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -6262,9 +5864,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 9000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -6297,9 +5897,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 10000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -6332,9 +5930,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 22000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -6367,9 +5963,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 21000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -6402,9 +5996,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 17000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -6437,9 +6029,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 26000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -6472,9 +6062,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 7500,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -6507,9 +6095,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 49000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -6542,9 +6128,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 17000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -6577,9 +6161,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 14000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -6612,9 +6194,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 15000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -6647,9 +6227,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 15500,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -6682,9 +6260,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 19000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -6717,9 +6293,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 11500,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -6752,9 +6326,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 13000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -6787,9 +6359,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 17000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -6822,9 +6392,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 10000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -6857,9 +6425,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 18000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -6892,9 +6458,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 18000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -6927,9 +6491,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 18000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -6962,9 +6524,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 14000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -6997,9 +6557,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 15500,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -7032,9 +6590,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 30000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -7067,9 +6623,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 30000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -7102,9 +6656,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 30000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -7137,9 +6689,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 30000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -7172,9 +6722,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 30000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -7207,9 +6755,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 30000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -7242,9 +6788,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 30000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -7277,9 +6821,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 18000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -7312,9 +6854,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 17000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -7347,9 +6887,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 17000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -7382,9 +6920,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 13000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -7417,9 +6953,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 9000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -7452,9 +6986,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 16500,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -7487,9 +7019,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 19000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -7522,9 +7052,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 18000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -7557,9 +7085,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 16000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -7592,9 +7118,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 19000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -7627,9 +7151,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 7000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -7662,9 +7184,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 17000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -7697,9 +7217,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 21000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -7732,9 +7250,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 17000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -7767,9 +7283,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 15000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -7802,9 +7316,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 13000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -7837,9 +7349,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 15000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -7872,9 +7382,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 20000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -7907,9 +7415,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 15000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -7942,9 +7448,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 13000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -7977,9 +7481,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 19000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -8012,9 +7514,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 14000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -8047,9 +7547,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 14000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -8082,9 +7580,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 14000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -8117,9 +7613,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 14000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -8152,9 +7646,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 14000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -8187,9 +7679,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 14000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -8222,9 +7712,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 14000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -8257,9 +7745,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 40000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -8292,9 +7778,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 14000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -8327,9 +7811,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 14000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -8362,9 +7844,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 14000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -8397,9 +7877,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 80000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,
@@ -8432,9 +7910,7 @@
       "shipLifeRate3f": 0,
       "shipLifeValue": 0,
       "widgetRadius": 14000,
-      "requiredConditionType": [
-        0
-      ],
+      "requiredConditionType": [0],
       "effectType": 0,
       "effectRadius": 300,
       "eventDependencyType": 5,

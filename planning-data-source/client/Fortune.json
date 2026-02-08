@@ -82,24 +82,16 @@
     ":links": {
       "fortune": [
         {
-          "PointId": [
-            "Point"
-          ]
+          "PointId": ["Point"]
         },
         {
-          "PointId": [
-            "Point"
-          ]
+          "PointId": ["Point"]
         },
         {
-          "PointId": [
-            "Point"
-          ]
+          "PointId": ["Point"]
         },
         {
-          "PointId": [
-            "Point"
-          ]
+          "PointId": ["Point"]
         }
       ]
     }

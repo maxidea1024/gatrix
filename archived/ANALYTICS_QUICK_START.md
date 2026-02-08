@@ -185,11 +185,14 @@ import { createProxyMiddleware } from 'http-proxy-middleware';
 
 const router = express.Router();
 
-router.use('/', createProxyMiddleware({
-  target: 'http://localhost:3002',
-  changeOrigin: true,
-  pathRewrite: { '^/api/v1/analytics': '' },
-}));
+router.use(
+  '/',
+  createProxyMiddleware({
+    target: 'http://localhost:3002',
+    changeOrigin: true,
+    pathRewrite: { '^/api/v1/analytics': '' },
+  })
+);
 
 export default router;
 ```
@@ -211,8 +214,8 @@ class Analytics {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         type: 'track',
-        payload: { name: event, properties }
-      })
+        payload: { name: event, properties },
+      }),
     });
   }
 }
@@ -247,12 +250,12 @@ ORDER BY (project_id, created_at, device_id);
 
 ## 🎯 주요 엔드포인트
 
-| 엔드포인트 | 메서드 | 설명 |
-|-----------|--------|------|
-| `/health` | GET | 헬스 체크 |
-| `/track` | POST | 이벤트 추적 |
-| `/insights/:projectId/metrics` | GET | 메트릭 조회 |
-| `/insights/:projectId/live` | GET | 실시간 방문자 |
+| 엔드포인트                     | 메서드 | 설명          |
+| ------------------------------ | ------ | ------------- |
+| `/health`                      | GET    | 헬스 체크     |
+| `/track`                       | POST   | 이벤트 추적   |
+| `/insights/:projectId/metrics` | GET    | 메트릭 조회   |
+| `/insights/:projectId/live`    | GET    | 실시간 방문자 |
 
 ---
 
@@ -316,5 +319,3 @@ MYSQL_DATABASE=gatrix
 ---
 
 **시작 준비 완료!** 🎉
-
-

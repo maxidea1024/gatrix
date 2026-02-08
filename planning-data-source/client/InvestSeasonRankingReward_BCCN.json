@@ -17,12 +17,8 @@
     ":enum": {},
     ":asset": {},
     ":links": {
-      "nationId": [
-        "Nation"
-      ],
-      "rewardFixedId": [
-        "RewardFixed"
-      ]
+      "nationId": ["Nation"],
+      "rewardFixedId": ["RewardFixed"]
     }
   },
   "InvestSeasonRankingReward": {

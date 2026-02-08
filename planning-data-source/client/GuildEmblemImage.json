@@ -21,9 +21,7 @@
     },
     ":enum": {},
     ":links": {
-      "guildLevel": [
-        "Guild"
-      ]
+      "guildLevel": ["Guild"]
     }
   },
   "GuildEmblemImage": {

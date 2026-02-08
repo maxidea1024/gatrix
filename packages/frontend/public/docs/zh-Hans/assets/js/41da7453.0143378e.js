@@ -1,1 +1,11 @@
-"use strict";(globalThis.webpackChunkdocs=globalThis.webpackChunkdocs||[]).push([[4202],{6835(a){a.exports=JSON.parse('{"tag":{"label":"optimization","permalink":"/docs/zh-Hans/blog/tags/optimization","allTagsPath":"/docs/zh-Hans/blog/tags","count":1,"unlisted":false},"listMetadata":{"permalink":"/docs/zh-Hans/blog/tags/optimization","page":1,"postsPerPage":10,"totalPages":1,"totalCount":1,"blogDescription":"Blog","blogTitle":"Blog"}}')}}]);
+'use strict';
+(globalThis.webpackChunkdocs = globalThis.webpackChunkdocs || []).push([
+  [4202],
+  {
+    6835(a) {
+      a.exports = JSON.parse(
+        '{"tag":{"label":"optimization","permalink":"/docs/zh-Hans/blog/tags/optimization","allTagsPath":"/docs/zh-Hans/blog/tags","count":1,"unlisted":false},"listMetadata":{"permalink":"/docs/zh-Hans/blog/tags/optimization","page":1,"postsPerPage":10,"totalPages":1,"totalCount":1,"blogDescription":"Blog","blogTitle":"Blog"}}'
+      );
+    },
+  },
+]);

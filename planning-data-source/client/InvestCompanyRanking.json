@@ -7,11 +7,7 @@
       "rankingType": "number",
       "rankingRange": "number",
       "mailId": "number",
-      "seasonRewardValue": [
-        "number",
-        "number",
-        "number"
-      ]
+      "seasonRewardValue": ["number", "number", "number"]
     },
     ":required": {
       "rankingGrade": 1,
@@ -25,9 +21,7 @@
     },
     ":enum": {},
     ":links": {
-      "mailId": [
-        "Mail"
-      ]
+      "mailId": ["Mail"]
     }
   },
   "InvestCompanyRanking": {
@@ -542,11 +536,7 @@
       "rankingType": 2,
       "rankingRange": 1,
       "mailId": 92001231,
-      "seasonRewardValue": [
-        1000,
-        50,
-        2000
-      ]
+      "seasonRewardValue": [1000, 50, 2000]
     },
     "27100308": {
       "id": 27100308,
@@ -555,11 +545,7 @@
       "rankingType": 2,
       "rankingRange": 2,
       "mailId": 92001239,
-      "seasonRewardValue": [
-        500,
-        40,
-        1600
-      ]
+      "seasonRewardValue": [500, 40, 1600]
     },
     "27100309": {
       "id": 27100309,
@@ -568,11 +554,7 @@
       "rankingType": 2,
       "rankingRange": 3,
       "mailId": 92001240,
-      "seasonRewardValue": [
-        300,
-        30,
-        1300
-      ]
+      "seasonRewardValue": [300, 30, 1300]
     },
     "27100310": {
       "id": 27100310,
@@ -581,11 +563,7 @@
       "rankingType": 2,
       "rankingRange": 5,
       "mailId": 92001241,
-      "seasonRewardValue": [
-        250,
-        20,
-        1000
-      ]
+      "seasonRewardValue": [250, 20, 1000]
     },
     "27100311": {
       "id": 27100311,
@@ -594,11 +572,7 @@
       "rankingType": 2,
       "rankingRange": 10,
       "mailId": 92001242,
-      "seasonRewardValue": [
-        150,
-        15,
-        800
-      ]
+      "seasonRewardValue": [150, 15, 800]
     },
     "27100312": {
       "id": 27100312,
@@ -607,11 +581,7 @@
       "rankingType": 2,
       "rankingRange": 15,
       "mailId": 92001243,
-      "seasonRewardValue": [
-        100,
-        10,
-        600
-      ]
+      "seasonRewardValue": [100, 10, 600]
     },
     "27100313": {
       "id": 27100313,
@@ -620,11 +590,7 @@
       "rankingType": 2,
       "rankingRange": 20,
       "mailId": 92001244,
-      "seasonRewardValue": [
-        75,
-        7,
-        400
-      ]
+      "seasonRewardValue": [75, 7, 400]
     },
     "27100314": {
       "id": 27100314,
@@ -633,11 +599,7 @@
       "rankingType": 2,
       "rankingRange": 30,
       "mailId": 92001245,
-      "seasonRewardValue": [
-        50,
-        5,
-        250
-      ]
+      "seasonRewardValue": [50, 5, 250]
     },
     "27100315": {
       "id": 27100315,
@@ -646,11 +608,7 @@
       "rankingType": 2,
       "rankingRange": 50,
       "mailId": 92001246,
-      "seasonRewardValue": [
-        50,
-        3,
-        150
-      ]
+      "seasonRewardValue": [50, 3, 150]
     },
     "27100316": {
       "id": 27100316,
@@ -659,11 +617,7 @@
       "rankingType": 1,
       "rankingRange": 100,
       "mailId": 92001247,
-      "seasonRewardValue": [
-        50,
-        1,
-        80
-      ]
+      "seasonRewardValue": [50, 1, 80]
     },
     "27100400": {
       "id": 27100400,
@@ -672,11 +626,7 @@
       "rankingType": 2,
       "rankingRange": 1,
       "mailId": 92001777,
-      "seasonRewardValue": [
-        2000,
-        50,
-        2000
-      ]
+      "seasonRewardValue": [2000, 50, 2000]
     },
     "27100401": {
       "id": 27100401,
@@ -685,11 +635,7 @@
       "rankingType": 2,
       "rankingRange": 2,
       "mailId": 92001778,
-      "seasonRewardValue": [
-        1000,
-        40,
-        1600
-      ]
+      "seasonRewardValue": [1000, 40, 1600]
     },
     "27100402": {
       "id": 27100402,
@@ -698,11 +644,7 @@
       "rankingType": 2,
       "rankingRange": 3,
       "mailId": 92001779,
-      "seasonRewardValue": [
-        700,
-        30,
-        1300
-      ]
+      "seasonRewardValue": [700, 30, 1300]
     },
     "27100403": {
       "id": 27100403,
@@ -711,11 +653,7 @@
       "rankingType": 2,
       "rankingRange": 5,
       "mailId": 92001780,
-      "seasonRewardValue": [
-        500,
-        20,
-        1000
-      ]
+      "seasonRewardValue": [500, 20, 1000]
     },
     "27100404": {
       "id": 27100404,
@@ -724,11 +662,7 @@
       "rankingType": 2,
       "rankingRange": 10,
       "mailId": 92001781,
-      "seasonRewardValue": [
-        300,
-        15,
-        800
-      ]
+      "seasonRewardValue": [300, 15, 800]
     },
     "27100405": {
       "id": 27100405,
@@ -737,11 +671,7 @@
       "rankingType": 2,
       "rankingRange": 15,
       "mailId": 92001782,
-      "seasonRewardValue": [
-        100,
-        10,
-        600
-      ]
+      "seasonRewardValue": [100, 10, 600]
     },
     "27100406": {
       "id": 27100406,
@@ -750,11 +680,7 @@
       "rankingType": 2,
       "rankingRange": 20,
       "mailId": 92001783,
-      "seasonRewardValue": [
-        75,
-        7,
-        400
-      ]
+      "seasonRewardValue": [75, 7, 400]
     },
     "27100407": {
       "id": 27100407,
@@ -763,11 +689,7 @@
       "rankingType": 2,
       "rankingRange": 30,
       "mailId": 92001784,
-      "seasonRewardValue": [
-        60,
-        5,
-        250
-      ]
+      "seasonRewardValue": [60, 5, 250]
     },
     "27100408": {
       "id": 27100408,
@@ -776,11 +698,7 @@
       "rankingType": 2,
       "rankingRange": 50,
       "mailId": 92001785,
-      "seasonRewardValue": [
-        50,
-        3,
-        150
-      ]
+      "seasonRewardValue": [50, 3, 150]
     },
     "27100409": {
       "id": 27100409,
@@ -789,11 +707,7 @@
       "rankingType": 1,
       "rankingRange": 100,
       "mailId": 92001786,
-      "seasonRewardValue": [
-        10,
-        1,
-        80
-      ]
+      "seasonRewardValue": [10, 1, 80]
     }
   }
 }

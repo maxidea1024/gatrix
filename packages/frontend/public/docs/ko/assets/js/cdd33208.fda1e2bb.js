@@ -1,1 +1,11 @@
-"use strict";(globalThis.webpackChunkdocs=globalThis.webpackChunkdocs||[]).push([[3146],{1373(a){a.exports=JSON.parse('{"tag":{"label":"performance","permalink":"/docs/ko/blog/tags/performance","allTagsPath":"/docs/ko/blog/tags","count":1,"unlisted":false},"listMetadata":{"permalink":"/docs/ko/blog/tags/performance","page":1,"postsPerPage":10,"totalPages":1,"totalCount":1,"blogDescription":"Blog","blogTitle":"Blog"}}')}}]);
+'use strict';
+(globalThis.webpackChunkdocs = globalThis.webpackChunkdocs || []).push([
+  [3146],
+  {
+    1373(a) {
+      a.exports = JSON.parse(
+        '{"tag":{"label":"performance","permalink":"/docs/ko/blog/tags/performance","allTagsPath":"/docs/ko/blog/tags","count":1,"unlisted":false},"listMetadata":{"permalink":"/docs/ko/blog/tags/performance","page":1,"postsPerPage":10,"totalPages":1,"totalCount":1,"blogDescription":"Blog","blogTitle":"Blog"}}'
+      );
+    },
+  },
+]);

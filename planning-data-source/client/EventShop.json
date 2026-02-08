@@ -37,9 +37,7 @@
     },
     ":enum": {},
     ":links": {
-      "saleItemId": [
-        "Item"
-      ],
+      "saleItemId": ["Item"],
       "productId": [
         "Point",
         "Item",
@@ -50,9 +48,7 @@
         "TaxFreePermit",
         "UserTitle"
       ],
-      "previousId": [
-        "EventShop"
-      ]
+      "previousId": ["EventShop"]
     }
   },
   "EventShop": {

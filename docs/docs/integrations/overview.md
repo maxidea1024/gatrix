@@ -9,22 +9,25 @@ Connect Gatrix with external services.
 
 ## Available Integrations
 
-| Integration | Description |
-|-------------|-------------|
-| [Slack](./slack) | Send notifications to Slack channels |
+| Integration                | Description                          |
+| -------------------------- | ------------------------------------ |
+| [Slack](./slack)           | Send notifications to Slack channels |
 | [Microsoft Teams](./teams) | Send notifications to Teams channels |
-| [Webhook](./webhook) | Custom HTTP webhooks |
-| [New Relic](./new-relic) | APM and monitoring |
+| [Webhook](./webhook)       | Custom HTTP webhooks                 |
+| [New Relic](./new-relic)   | APM and monitoring                   |
 
 ## Integration Types
 
 ### Notification Integrations
+
 Receive alerts and notifications when events occur in Gatrix:
+
 - Feature flag changes
 - Maintenance updates
 - Error alerts
 
 ### Monitoring Integrations
+
 Export metrics and traces to monitoring platforms.
 
 ## Setting Up Integrations
@@ -39,10 +42,10 @@ Export metrics and traces to monitoring platforms.
 
 Integrations can be triggered by:
 
-| Event | Description |
-|-------|-------------|
-| `feature_flag.created` | New flag created |
-| `feature_flag.updated` | Flag value changed |
-| `feature_flag.deleted` | Flag deleted |
-| `maintenance.started` | Maintenance began |
-| `maintenance.ended` | Maintenance completed |
+| Event                  | Description           |
+| ---------------------- | --------------------- |
+| `feature_flag.created` | New flag created      |
+| `feature_flag.updated` | Flag value changed    |
+| `feature_flag.deleted` | Flag deleted          |
+| `maintenance.started`  | Maintenance began     |
+| `maintenance.ended`    | Maintenance completed |

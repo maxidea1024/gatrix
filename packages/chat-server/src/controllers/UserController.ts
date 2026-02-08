@@ -1,5 +1,5 @@
-import { Request, Response } from "express";
-import { UserService, UserData } from "../services/UserService";
+import { Request, Response } from 'express';
+import { UserService, UserData } from '../services/UserService';
 
 export class UserController {
   /**
@@ -13,7 +13,7 @@ export class UserController {
       if (!userData.id || !userData.username) {
         res.status(400).json({
           success: false,
-          error: { message: "id and username are required" },
+          error: { message: 'id and username are required' },
         });
         return;
       }
@@ -25,14 +25,14 @@ export class UserController {
         success: true,
         data: {
           user: savedUser,
-          message: "User information updated successfully",
+          message: 'User information updated successfully',
         },
       });
     } catch (error: any) {
-      console.error("Error upserting user:", error);
+      console.error('Error upserting user:', error);
       res.status(500).json({
         success: false,
-        error: { message: "Failed to update user information" },
+        error: { message: 'Failed to update user information' },
       });
     }
   }
@@ -48,7 +48,7 @@ export class UserController {
       if (!Array.isArray(usersData) || usersData.length === 0) {
         res.status(400).json({
           success: false,
-          error: { message: "users array is required and cannot be empty" },
+          error: { message: 'users array is required and cannot be empty' },
         });
         return;
       }
@@ -58,7 +58,7 @@ export class UserController {
         if (!userData.id || !userData.username) {
           res.status(400).json({
             success: false,
-            error: { message: "All users must have id and username" },
+            error: { message: 'All users must have id and username' },
           });
           return;
         }
@@ -76,10 +76,10 @@ export class UserController {
         },
       });
     } catch (error: any) {
-      console.error("Error bulk upserting users:", error);
+      console.error('Error bulk upserting users:', error);
       res.status(500).json({
         success: false,
-        error: { message: "Failed to bulk update user information" },
+        error: { message: 'Failed to bulk update user information' },
       });
     }
   }
@@ -95,7 +95,7 @@ export class UserController {
       if (isNaN(userId)) {
         res.status(400).json({
           success: false,
-          error: { message: "Invalid userId" },
+          error: { message: 'Invalid userId' },
         });
         return;
       }
@@ -110,10 +110,10 @@ export class UserController {
         },
       });
     } catch (error: any) {
-      console.error("Error checking user:", error);
+      console.error('Error checking user:', error);
       res.status(500).json({
         success: false,
-        error: { message: "Failed to check user" },
+        error: { message: 'Failed to check user' },
       });
     }
   }
@@ -129,7 +129,7 @@ export class UserController {
       if (isNaN(userId)) {
         res.status(400).json({
           success: false,
-          error: { message: "Invalid userId" },
+          error: { message: 'Invalid userId' },
         });
         return;
       }
@@ -139,7 +139,7 @@ export class UserController {
       if (!user) {
         res.status(404).json({
           success: false,
-          error: { message: "User not found" },
+          error: { message: 'User not found' },
         });
         return;
       }
@@ -149,10 +149,10 @@ export class UserController {
         data: { user },
       });
     } catch (error: any) {
-      console.error("Error getting user:", error);
+      console.error('Error getting user:', error);
       res.status(500).json({
         success: false,
-        error: { message: "Failed to get user information" },
+        error: { message: 'Failed to get user information' },
       });
     }
   }
@@ -170,10 +170,10 @@ export class UserController {
         data: { users },
       });
     } catch (error: any) {
-      console.error("Error getting users:", error);
+      console.error('Error getting users:', error);
       res.status(500).json({
         success: false,
-        error: { message: "Failed to get users" },
+        error: { message: 'Failed to get users' },
       });
     }
   }
@@ -190,21 +190,17 @@ export class UserController {
       if (isNaN(userId)) {
         res.status(400).json({
           success: false,
-          error: { message: "Invalid userId" },
+          error: { message: 'Invalid userId' },
         });
         return;
       }
 
-      const success = await UserService.updateUserStatus(
-        userId,
-        status,
-        customStatus,
-      );
+      const success = await UserService.updateUserStatus(userId, status, customStatus);
 
       if (!success) {
         res.status(404).json({
           success: false,
-          error: { message: "User not found" },
+          error: { message: 'User not found' },
         });
         return;
       }
@@ -212,14 +208,14 @@ export class UserController {
       res.json({
         success: true,
         data: {
-          message: "User status updated successfully",
+          message: 'User status updated successfully',
         },
       });
     } catch (error: any) {
-      console.error("Error updating user status:", error);
+      console.error('Error updating user status:', error);
       res.status(500).json({
         success: false,
-        error: { message: "Failed to update user status" },
+        error: { message: 'Failed to update user status' },
       });
     }
   }
@@ -235,7 +231,7 @@ export class UserController {
       if (isNaN(userId)) {
         res.status(400).json({
           success: false,
-          error: { message: "Invalid userId" },
+          error: { message: 'Invalid userId' },
         });
         return;
       }
@@ -245,7 +241,7 @@ export class UserController {
       if (!success) {
         res.status(404).json({
           success: false,
-          error: { message: "User not found" },
+          error: { message: 'User not found' },
         });
         return;
       }
@@ -253,14 +249,14 @@ export class UserController {
       res.json({
         success: true,
         data: {
-          message: "User deleted successfully",
+          message: 'User deleted successfully',
         },
       });
     } catch (error: any) {
-      console.error("Error deleting user:", error);
+      console.error('Error deleting user:', error);
       res.status(500).json({
         success: false,
-        error: { message: "Failed to delete user" },
+        error: { message: 'Failed to delete user' },
       });
     }
   }

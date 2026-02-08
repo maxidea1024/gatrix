@@ -9,37 +9,45 @@
  * This eliminates expensive COUNT queries on large datasets
  */
 
-exports.up = async function(connection) {
+exports.up = async function (connection) {
   console.log('Adding count cache columns to g_coupon_settings...');
 
   try {
     // 1. Add issuedCount column
-    await connection.execute(`
+    await connection
+      .execute(
+        `
       ALTER TABLE g_coupon_settings 
       ADD COLUMN issuedCount BIGINT NOT NULL DEFAULT 0 COMMENT 'Cached count of issued coupons'
-    `).catch(err => {
-      if (err.code === 'ER_DUP_FIELDNAME') {
-        console.log('Column issuedCount already exists');
-      } else {
-        throw err;
-      }
-    });
+    `
+      )
+      .catch((err) => {
+        if (err.code === 'ER_DUP_FIELDNAME') {
+          console.log('Column issuedCount already exists');
+        } else {
+          throw err;
+        }
+      });
 
     // 2. Add usedCount column
-    await connection.execute(`
+    await connection
+      .execute(
+        `
       ALTER TABLE g_coupon_settings 
       ADD COLUMN usedCount BIGINT NOT NULL DEFAULT 0 COMMENT 'Cached count of used coupons'
-    `).catch(err => {
-      if (err.code === 'ER_DUP_FIELDNAME') {
-        console.log('Column usedCount already exists');
-      } else {
-        throw err;
-      }
-    });
+    `
+      )
+      .catch((err) => {
+        if (err.code === 'ER_DUP_FIELDNAME') {
+          console.log('Column usedCount already exists');
+        } else {
+          throw err;
+        }
+      });
 
     // 3. Initialize counts from existing data
     console.log('Initializing count cache from existing data...');
-    
+
     // Update issuedCount from g_coupons
     await connection.execute(`
       UPDATE g_coupon_settings cs
@@ -63,7 +71,7 @@ exports.up = async function(connection) {
   }
 };
 
-exports.down = async function(connection) {
+exports.down = async function (connection) {
   console.log('Rolling back count cache columns...');
 
   try {
@@ -83,4 +91,3 @@ exports.down = async function(connection) {
     throw error;
   }
 };
-

@@ -12,7 +12,7 @@ services:
       MYSQL_USER: ${DB_USER:-gatrix_user}
       MYSQL_PASSWORD: ${DB_PASSWORD:-gatrix_password}
     ports:
-      - "0.0.0.0:${MYSQL_HOST_PORT:-43306}:3306"
+      - '0.0.0.0:${MYSQL_HOST_PORT:-43306}:3306'
     volumes:
       - gatrix_mysql_dev_data:/var/lib/mysql
       - ./docker/mysql/init:/docker-entrypoint-initdb.d
@@ -20,7 +20,17 @@ services:
     networks:
       - gatrix-dev-network
     healthcheck:
-      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD:-gatrix_rootpassword}" ]
+      test:
+        [
+          'CMD',
+          'mysqladmin',
+          'ping',
+          '-h',
+          'localhost',
+          '-u',
+          'root',
+          '-p${DB_ROOT_PASSWORD:-gatrix_rootpassword}',
+        ]
       timeout: 20s
       retries: 10
       interval: 30s
@@ -35,13 +45,13 @@ services:
     # Used for detecting TTL expiration of service stat keys
     command: redis-server --appendonly yes --notify-keyspace-events Ex
     ports:
-      - "0.0.0.0:${REDIS_HOST_PORT:-46379}:6379"
+      - '0.0.0.0:${REDIS_HOST_PORT:-46379}:6379'
     volumes:
       - ${DATA_ROOT:-./data}/redis:/data
     networks:
       - gatrix-dev-network
     healthcheck:
-      test: [ "CMD", "redis-cli", "ping" ]
+      test: ['CMD', 'redis-cli', 'ping']
       timeout: 10s
       retries: 5
       interval: 30s
@@ -55,17 +65,17 @@ services:
     environment:
       MYSQLD_EXPORTER_PASSWORD: exporter_password
     command:
-      - "--mysqld.username=mysqld_exporter"
-      - "--mysqld.address=mysql:3306"
+      - '--mysqld.username=mysqld_exporter'
+      - '--mysqld.address=mysql:3306'
     ports:
-      - "0.0.0.0:49104:9104"
+      - '0.0.0.0:49104:9104'
     depends_on:
       mysql:
         condition: service_healthy
     networks:
       - gatrix-dev-network
     healthcheck:
-      test: [ "CMD", "wget", "--spider", "-q", "http://127.0.0.1:9104/metrics" ]
+      test: ['CMD', 'wget', '--spider', '-q', 'http://127.0.0.1:9104/metrics']
       timeout: 10s
       retries: 3
       interval: 30s
@@ -77,9 +87,9 @@ services:
     container_name: gatrix-redis-exporter-dev
     restart: unless-stopped
     environment:
-      REDIS_ADDR: "redis:6379"
+      REDIS_ADDR: 'redis:6379'
     ports:
-      - "0.0.0.0:49121:9121"
+      - '0.0.0.0:49121:9121'
     networks:
       - gatrix-dev-network
 
@@ -93,12 +103,12 @@ services:
     restart: unless-stopped
     environment:
       NODE_ENV: development
-      RUNNING_IN_DOCKER: "true"
+      RUNNING_IN_DOCKER: 'true'
       LOG_FORMAT: json
       LOG_SERVICE_NAME: gatrix-backend
-      MONITORING_ENABLED: "true"
-      GATRIX_LOKI_ENABLED: "true"
-      GATRIX_LOKI_URL: "http://loki:3100/loki/api/v1/push"
+      MONITORING_ENABLED: 'true'
+      GATRIX_LOKI_ENABLED: 'true'
+      GATRIX_LOKI_URL: 'http://loki:3100/loki/api/v1/push'
       PORT: 5000
       DB_HOST: mysql
       DB_PORT: 3306
@@ -133,8 +143,8 @@ services:
       SERVICE_DISCOVERY_TERMINATED_MARKER_TTL: ${SERVICE_DISCOVERY_TERMINATED_MARKER_TTL:-300}
       ETCD_HOSTS: http://etcd:2379
     ports:
-      - "0.0.0.0:${BACKEND_PORT:-45000}:5000"
-      - "0.0.0.0:49229:9229" # Debug port
+      - '0.0.0.0:${BACKEND_PORT:-45000}:5000'
+      - '0.0.0.0:49229:9229' # Debug port
     depends_on:
       mysql:
         condition: service_healthy
@@ -150,7 +160,13 @@ services:
       - ${DATA_ROOT:-./data}/backend/logs:/app/packages/backend/logs
     command: sh -c "mkdir -p /app/packages/backend/logs && chmod 777 /app/packages/backend/logs && yarn workspace @gatrix/backend dev"
     healthcheck:
-      test: [ "CMD", "node", "-e", "require('http').get('http://localhost:5000/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })" ]
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "require('http').get('http://localhost:5000/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })",
+        ]
       interval: 30s
       timeout: 10s
       retries: 10
@@ -165,8 +181,8 @@ services:
     container_name: gatrix-frontend-dev
     restart: unless-stopped
     environment:
-      DOCKER_ENV: "true" # Indicate running in Docker environment (for Node.js scripts)
-      VITE_DOCKER_ENV: "true" # Indicate running in Docker environment (for Vite config)
+      DOCKER_ENV: 'true' # Indicate running in Docker environment (for Node.js scripts)
+      VITE_DOCKER_ENV: 'true' # Indicate running in Docker environment (for Vite config)
       VITE_API_URL: ${VITE_API_URL:-/api/v1}
       VITE_APP_NAME: ${VITE_APP_NAME:-Gatrix}
       VITE_DEFAULT_LANGUAGE: ${VITE_DEFAULT_LANGUAGE:-ko}
@@ -175,7 +191,7 @@ services:
       VITE_EDGE_URL: ${VITE_EDGE_URL:-http://localhost:3400}
 
     ports:
-      - "0.0.0.0:${FRONTEND_PORT:-43000}:3000"
+      - '0.0.0.0:${FRONTEND_PORT:-43000}:3000'
     depends_on:
       backend-dev:
         condition: service_healthy
@@ -217,7 +233,7 @@ services:
     networks:
       - gatrix-dev-network
     healthcheck:
-      test: [ "CMD", "etcdctl", "endpoint", "health" ]
+      test: ['CMD', 'etcdctl', 'endpoint', 'health']
       interval: 30s
       timeout: 10s
       retries: 3
@@ -231,8 +247,8 @@ services:
     container_name: gatrix-clickhouse-dev
     restart: unless-stopped
     ports:
-      - "0.0.0.0:${CLICKHOUSE_HTTP_PORT:-48123}:8123"
-      - "0.0.0.0:${CLICKHOUSE_NATIVE_PORT:-49000}:9000"
+      - '0.0.0.0:${CLICKHOUSE_HTTP_PORT:-48123}:8123'
+      - '0.0.0.0:${CLICKHOUSE_NATIVE_PORT:-49000}:9000'
     volumes:
       - clickhouse-data:/var/lib/clickhouse
     networks:
@@ -246,7 +262,7 @@ services:
         hard: 262144
     healthcheck:
       # Simplified healthcheck - just check if HTTP endpoint responds
-      test: [ "CMD-SHELL", "wget --spider -q http://127.0.0.1:8123/ping || exit 1" ]
+      test: ['CMD-SHELL', 'wget --spider -q http://127.0.0.1:8123/ping || exit 1']
       interval: 15s
       timeout: 5s
       retries: 5
@@ -264,23 +280,23 @@ services:
       NODE_ENV: development
       LOG_FORMAT: json
       LOG_SERVICE_NAME: gatrix-event-lens
-      MONITORING_ENABLED: "true"
-      GATRIX_LOKI_ENABLED: "true"
-      GATRIX_LOKI_URL: "http://loki:3100/loki/api/v1/push"
+      MONITORING_ENABLED: 'true'
+      GATRIX_LOKI_ENABLED: 'true'
+      GATRIX_LOKI_URL: 'http://loki:3100/loki/api/v1/push'
       PORT: 5200
       LOG_LEVEL: ${EVENT_LENS_LOG_LEVEL:-debug}
       CLICKHOUSE_HOST: clickhouse
       CLICKHOUSE_PORT: 8123
       CLICKHOUSE_DATABASE: event_lens
       CLICKHOUSE_USERNAME: default
-      CLICKHOUSE_PASSWORD: ""
+      CLICKHOUSE_PASSWORD: ''
       # Service Discovery
       GATRIX_URL: http://backend-dev:5000
       GATRIX_ENVIRONMENT: development
       API_TOKEN: ${API_TOKEN:-gatrix-unsecured-server-api-token}
       REDIS_HOST: redis
       REDIS_PORT: 6379
-      REDIS_PASSWORD: ""
+      REDIS_PASSWORD: ''
       REDIS_DB: 0
       MYSQL_HOST: mysql
       MYSQL_PORT: 3306
@@ -292,7 +308,7 @@ services:
       WORKER_CONCURRENCY: ${WORKER_CONCURRENCY:-10}
 
     ports:
-      - "0.0.0.0:${EVENT_LENS_PORT:-45200}:5200"
+      - '0.0.0.0:${EVENT_LENS_PORT:-45200}:5200'
     depends_on:
       backend-dev:
         condition: service_healthy
@@ -314,7 +330,11 @@ services:
       - ${DATA_ROOT:-./data}/event-lens/logs:/app/packages/event-lens/logs
     command: yarn workspace @gatrix/event-lens dev
     healthcheck:
-      test: [ "CMD-SHELL", "node -e \"require('http').get('http://localhost:5200/health', (r) => { process.exit(r.statusCode === 200 ? 0 : 1); });\"" ]
+      test:
+        [
+          'CMD-SHELL',
+          'node -e "require(''http'').get(''http://localhost:5200/health'', (r) => { process.exit(r.statusCode === 200 ? 0 : 1); });"',
+        ]
       interval: 30s
       timeout: 10s
       retries: 10
@@ -332,18 +352,18 @@ services:
       NODE_ENV: development
       LOG_FORMAT: json
       LOG_SERVICE_NAME: gatrix-event-lens-worker
-      MONITORING_ENABLED: "true"
-      GATRIX_LOKI_ENABLED: "true"
-      GATRIX_LOKI_URL: "http://loki:3100/loki/api/v1/push"
+      MONITORING_ENABLED: 'true'
+      GATRIX_LOKI_ENABLED: 'true'
+      GATRIX_LOKI_URL: 'http://loki:3100/loki/api/v1/push'
       LOG_LEVEL: ${EVENT_LENS_LOG_LEVEL:-debug}
       CLICKHOUSE_HOST: clickhouse
       CLICKHOUSE_PORT: 8123
       CLICKHOUSE_DATABASE: event_lens
       CLICKHOUSE_USERNAME: default
-      CLICKHOUSE_PASSWORD: ""
+      CLICKHOUSE_PASSWORD: ''
       REDIS_HOST: redis
       REDIS_PORT: 6379
-      REDIS_PASSWORD: ""
+      REDIS_PASSWORD: ''
       REDIS_DB: 0
       MYSQL_HOST: mysql
       MYSQL_PORT: 3306
@@ -383,9 +403,9 @@ services:
       NODE_ENV: development
       LOG_FORMAT: json
       LOG_SERVICE_NAME: gatrix-chat-server
-      MONITORING_ENABLED: "true"
-      GATRIX_LOKI_ENABLED: "true"
-      GATRIX_LOKI_URL: "http://loki:3100/loki/api/v1/push"
+      MONITORING_ENABLED: 'true'
+      GATRIX_LOKI_ENABLED: 'true'
+      GATRIX_LOKI_URL: 'http://loki:3100/loki/api/v1/push'
       PORT: 5100
       HOST: 0.0.0.0
       # Database
@@ -398,13 +418,13 @@ services:
       # Redis
       REDIS_HOST: redis
       REDIS_PORT: 6379
-      REDIS_PASSWORD: ""
+      REDIS_PASSWORD: ''
       REDIS_DB: 1
       # JWT (must match backend)
       JWT_SECRET: ${JWT_SECRET:-dev-jwt-secret}
       JWT_EXPIRES_IN: 24h
       # CORS
-      CORS_ORIGIN: "*"
+      CORS_ORIGIN: '*'
       # Clustering (disabled for dev)
       CLUSTER_ENABLED: false
       CLUSTER_WORKERS: 0
@@ -426,7 +446,7 @@ services:
       # Logging
       LOG_LEVEL: ${CHAT_LOG_LEVEL:-debug}
     ports:
-      - "0.0.0.0:${CHAT_PORT:-45100}:5100"
+      - '0.0.0.0:${CHAT_PORT:-45100}:5100'
     depends_on:
       mysql:
         condition: service_healthy
@@ -445,7 +465,13 @@ services:
       - ${DATA_ROOT:-./data}/chat-server/logs:/app/packages/chat-server/logs
     command: sh -c "cd packages/chat-server && yarn migrate:safe && exec node_modules/.bin/ts-node src/index.ts"
     healthcheck:
-      test: [ "CMD", "node", "-e", "require('http').get('http://localhost:5100/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})" ]
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "require('http').get('http://localhost:5100/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})",
+        ]
       interval: 30s
       timeout: 10s
       retries: 10
@@ -460,8 +486,8 @@ services:
     restart: unless-stopped
     environment:
       NODE_ENV: development
-      GATRIX_LOKI_ENABLED: "true"
-      GATRIX_LOKI_URL: "http://loki:3100/loki/api/v1/push"
+      GATRIX_LOKI_ENABLED: 'true'
+      GATRIX_LOKI_URL: 'http://loki:3100/loki/api/v1/push'
       LOG_FORMAT: json
       LOG_SERVICE_NAME: gatrix-edge
       LOG_LEVEL: ${EDGE_LOG_LEVEL:-debug}
@@ -483,8 +509,8 @@ services:
       EDGE_CACHE_SYNC_METHOD: ${EDGE_CACHE_SYNC_METHOD:-event}
       EDGE_CACHE_POLLING_INTERVAL_MS: ${EDGE_CACHE_POLLING_INTERVAL_MS:-60000}
     ports:
-      - "0.0.0.0:${EDGE_PORT:-3400}:3400"
-      - "0.0.0.0:${EDGE_INTERNAL_PORT:-3410}:3410" # Internal port (default: 3410)
+      - '0.0.0.0:${EDGE_PORT:-3400}:3400'
+      - '0.0.0.0:${EDGE_INTERNAL_PORT:-3410}:3410' # Internal port (default: 3410)
       # Note: Metrics port (9400) is NOT exposed externally for security
     depends_on:
       backend-dev:
@@ -503,7 +529,13 @@ services:
       - ${DATA_ROOT:-./data}/edge/logs:/app/packages/edge/logs
     command: yarn workspace @gatrix/edge dev
     healthcheck:
-      test: [ "CMD", "node", "-e", "require('http').get('http://127.0.0.1:3400/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })" ]
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "require('http').get('http://127.0.0.1:3400/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })",
+        ]
       timeout: 10s
       retries: 10
       interval: 30s
@@ -514,9 +546,9 @@ services:
     image: grafana/loki:latest
     container_name: gatrix-loki-dev
     restart: unless-stopped
-    user: "0"
+    user: '0'
     ports:
-      - "0.0.0.0:${LOKI_PORT:-43100}:3100"
+      - '0.0.0.0:${LOKI_PORT:-43100}:3100'
     command: -config.file=/etc/loki/local-config.yaml
     volumes:
       - ./docker/loki/local-config.yaml:/etc/loki/local-config.yaml:ro
@@ -524,7 +556,7 @@ services:
     networks:
       - gatrix-dev-network
     healthcheck:
-      test: [ "CMD-SHELL", "wget --spider -q http://127.0.0.1:3100/ready || exit 1" ]
+      test: ['CMD-SHELL', 'wget --spider -q http://127.0.0.1:3100/ready || exit 1']
       interval: 30s
       timeout: 10s
       retries: 5
@@ -554,12 +586,12 @@ services:
       PROM_SCRAPE_INTERVAL: ${PROM_SCRAPE_INTERVAL:-15s}
       PROM_RETENTION_TIME: ${PROM_RETENTION_TIME:-14d}
     ports:
-      - "0.0.0.0:${PROMETHEUS_PORT:-49090}:9090"
+      - '0.0.0.0:${PROMETHEUS_PORT:-49090}:9090'
     volumes:
       - ./docker/prometheus/prometheus.base.yml:/etc/prometheus/prometheus.base.yml:ro
       - ./docker/prometheus/entrypoint.sh:/docker/prometheus/entrypoint.sh:ro
       - ${DATA_ROOT:-./data}/prometheus:/prometheus
-    entrypoint: [ "/bin/sh", "/docker/prometheus/entrypoint.sh" ]
+    entrypoint: ['/bin/sh', '/docker/prometheus/entrypoint.sh']
     depends_on:
       backend-dev:
         condition: service_started
@@ -574,32 +606,32 @@ services:
     networks:
       - gatrix-dev-network
     extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - 'host.docker.internal:host-gateway'
 
   # Grafana - Dashboards (development)
   grafana:
     image: grafana/grafana:latest
     container_name: gatrix-grafana-dev
     restart: unless-stopped
-    user: "0" # Run as root to avoid volume permission issues
+    user: '0' # Run as root to avoid volume permission issues
     environment:
       GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
-      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_USERS_ALLOW_SIGN_UP: 'false'
       GF_SERVER_ROOT_URL: ${GRAFANA_ROOT_URL:-http://localhost:${FRONTEND_PORT:-43000}/grafana/}
-      GF_SERVER_SERVE_FROM_SUB_PATH: "true"
+      GF_SERVER_SERVE_FROM_SUB_PATH: 'true'
       GF_SERVER_DOMAIN: localhost
-      GF_AUTH_ANONYMOUS_ENABLED: "false"
+      GF_AUTH_ANONYMOUS_ENABLED: 'false'
       # GF_AUTH_ANONYMOUS_ORG_ROLE: "Admin"
       # Allow embedding and relax CSRF for local development
-      GF_SECURITY_ALLOW_EMBEDDING: "true"
-      GF_SECURITY_CSRF_ALWAYS_CHECK: "false"
-      GF_SECURITY_CSRF_TRUSTED_ORIGINS: "http://localhost:43000,http://localhost:44000,http://127.0.0.1:43000,http://127.0.0.1:44000,http://localhost:3000"
-      GF_SECURITY_COOKIE_SAMESITE: "disabled"
+      GF_SECURITY_ALLOW_EMBEDDING: 'true'
+      GF_SECURITY_CSRF_ALWAYS_CHECK: 'false'
+      GF_SECURITY_CSRF_TRUSTED_ORIGINS: 'http://localhost:43000,http://localhost:44000,http://127.0.0.1:43000,http://127.0.0.1:44000,http://localhost:3000'
+      GF_SECURITY_COOKIE_SAMESITE: 'disabled'
       # Allow Live WebSockets from any origin during development
-      GF_LIVE_ALLOWED_ORIGINS: "*"
+      GF_LIVE_ALLOWED_ORIGINS: '*'
     ports:
-      - "0.0.0.0:${GRAFANA_PORT:-44000}:3000"
+      - '0.0.0.0:${GRAFANA_PORT:-44000}:3000'
     volumes:
       - ${DATA_ROOT:-./data}/grafana:/var/lib/grafana
       - ./docker/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro

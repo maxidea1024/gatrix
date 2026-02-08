@@ -12,4 +12,3 @@ for (let i = 842; i < 938; i++) {
 
 fs.writeFileSync('src/locales/ko.json', lines.join('\n'), 'utf8');
 console.log('✅ whitelist 섹션 들여쓰기 수정 완료');
-

@@ -48,6 +48,7 @@ docker-compose --version
 
 3. **Verify Installation:**
    - Open PowerShell and run:
+
    ```powershell
    docker --version
    docker-compose --version
@@ -63,11 +64,13 @@ docker-compose --version
 ### Choose Your Environment
 
 **Development Environment** (for local development):
+
 - Use `docker-compose.dev.yml`
 - Includes hot-reload and debugging tools
 - Suitable for development and testing
 
 **Production Environment** (for deployment):
+
 - Use `docker-compose.yml`
 - Optimized for performance and security
 - Suitable for production deployment
@@ -76,20 +79,23 @@ docker-compose --version
 
 Run the setup script to automatically generate the `.env` file with secure encryption keys.
 
-> **Important:** The `HostAddress` must be a **domain name** or **IP address literal** only. 
+> **Important:** The `HostAddress` must be a **domain name** or **IP address literal** only.
 > **Do not include protocols (`http://`, `https://`) or port numbers.**
 
 **For Development (Linux/Mac):**
+
 ```bash
 ./setup-env.sh localhost development
 ```
 
 **For Development (Windows PowerShell):**
+
 ```powershell
 .\setup-env.ps1 -HostAddress localhost -Environment development
 ```
 
 **For Production (Linux/Mac):**
+
 ```bash
 # English (default)
 ./setup-env.sh example.com production
@@ -99,6 +105,7 @@ Run the setup script to automatically generate the `.env` file with secure encry
 ```
 
 **For Production (Windows PowerShell):**
+
 ```powershell
 # English (default)
 .\setup-env.ps1 -HostAddress example.com -Environment production
@@ -110,16 +117,19 @@ Run the setup script to automatically generate the `.env` file with secure encry
 **With Custom Options:**
 
 **Custom Admin Password (Linux/Mac):**
+
 ```bash
 ./setup-env.sh localhost development ko --admin-password "MySecurePassword123"
 ```
 
 **Custom Admin Password (Windows PowerShell):**
+
 ```powershell
 .\setup-env.ps1 -HostAddress localhost -Environment development -AdminPassword "MySecurePassword123"
 ```
 
 **Custom Protocol (Linux/Mac):**
+
 ```bash
 # Use HTTPS in development
 ./setup-env.sh localhost development ko --protocol https
@@ -132,6 +142,7 @@ Run the setup script to automatically generate the `.env` file with secure encry
 ```
 
 **Custom Protocol (Windows PowerShell):**
+
 ```powershell
 # Use HTTPS in development
 .\setup-env.ps1 -HostAddress localhost -Environment development -Protocol https
@@ -144,6 +155,7 @@ Run the setup script to automatically generate the `.env` file with secure encry
 ```
 
 **Custom Data Root (Linux/Mac):**
+
 ```bash
 # Store all Docker volume data in /data/gatrix
 ./setup-env.sh example.com production en --data-root /data/gatrix
@@ -153,6 +165,7 @@ Run the setup script to automatically generate the `.env` file with secure encry
 ```
 
 **Custom Data Root (Windows PowerShell):**
+
 ```powershell
 # Store all Docker volume data in /data/gatrix
 .\setup-env.ps1 -HostAddress example.com -Environment production -DataRoot /data/gatrix
@@ -162,6 +175,7 @@ Run the setup script to automatically generate the `.env` file with secure encry
 ```
 
 The script will:
+
 - Generate secure encryption keys automatically
 - Configure database and Redis for Docker
 - Set up default language (Korean `ko`, English `en`, or Chinese `zh`)
@@ -172,6 +186,7 @@ The script will:
 - Automatically select the correct docker-compose file based on environment
 
 **Supported Languages:**
+
 - `ko` - Korean (한국어) - Default for development
 - `en` - English - Default for production
 - `zh` - Chinese (中文) - For China deployment
@@ -179,11 +194,13 @@ The script will:
 ### Step 2: Build Docker Environment
 
 **For Development:**
+
 ```bash
 docker-compose -f docker-compose.dev.yml build
 ```
 
 **For Production:**
+
 ```bash
 docker-compose -f docker-compose.yml build
 ```
@@ -191,11 +208,13 @@ docker-compose -f docker-compose.yml build
 ### Step 3: Start Services
 
 **For Development:**
+
 ```bash
 docker-compose -f docker-compose.dev.yml up -d
 ```
 
 **For Production:**
+
 ```bash
 docker-compose -f docker-compose.yml up -d
 ```
@@ -205,11 +224,13 @@ Wait for all services to be ready (usually 30-60 seconds).
 ### Step 4: Verify Installation
 
 **For Development:**
+
 ```bash
 docker-compose -f docker-compose.dev.yml ps
 ```
 
 **For Production:**
+
 ```bash
 docker-compose -f docker-compose.yml ps
 ```
@@ -221,16 +242,19 @@ You should see all containers with status "Up".
 Open your browser and navigate to:
 
 **Development:**
+
 ```
 http://localhost:43000
 ```
 
 **Production (HTTPS - default):**
+
 ```
 https://example.com
 ```
 
 **Production (HTTP - if configured with --protocol http):**
+
 ```
 http://example.com
 ```
@@ -251,6 +275,7 @@ http://example.com
    In production, you need to configure your cloud load balancer to handle HTTPS and forward to internal ports.
 
    **Port Forwarding Setup:**
+
    ```
    External HTTPS 443 → Internal 43000 (Frontend + Bull Board)
    External HTTPS 443/grafana → Internal 44000 (Grafana)
@@ -274,6 +299,7 @@ http://example.com
    - Note: `/bull-board` path is handled by Rule 2 (no separate rule needed)
 
    **Nginx Reverse Proxy Example:**
+
    ```nginx
    server {
        listen 443 ssl http2;
@@ -305,11 +331,13 @@ http://example.com
    - Restart services:
 
    **Development:**
+
    ```bash
    docker-compose -f docker-compose.dev.yml restart frontend-dev
    ```
 
    **Production:**
+
    ```bash
    docker-compose -f docker-compose.yml restart frontend
    ```
@@ -321,11 +349,13 @@ http://example.com
    - Restart services:
 
    **Development:**
+
    ```bash
    docker-compose -f docker-compose.dev.yml restart frontend-dev
    ```
 
    **Production:**
+
    ```bash
    docker-compose -f docker-compose.yml restart frontend
    ```
@@ -336,11 +366,13 @@ http://example.com
    - Restart services:
 
    **Development:**
+
    ```bash
    docker-compose -f docker-compose.dev.yml restart
    ```
 
    **Production:**
+
    ```bash
    docker-compose -f docker-compose.yml restart
    ```
@@ -348,11 +380,13 @@ http://example.com
 5. **View Logs**:
 
    **Development:**
+
    ```bash
    docker-compose -f docker-compose.dev.yml logs -f backend
    ```
 
    **Production:**
+
    ```bash
    docker-compose -f docker-compose.yml logs -f backend
    ```
@@ -360,11 +394,13 @@ http://example.com
 6. **Stop Services**:
 
    **Development:**
+
    ```bash
    docker-compose -f docker-compose.dev.yml down
    ```
 
    **Production:**
+
    ```bash
    docker-compose -f docker-compose.yml down
    ```
@@ -374,6 +410,7 @@ http://example.com
 ### Port Already in Use
 
 If you get a "port already in use" error, either:
+
 - Stop the service using that port
 - Or modify the port in your docker-compose file:
   - Development: `docker-compose.dev.yml`
@@ -384,11 +421,13 @@ If you get a "port already in use" error, either:
 Check the logs:
 
 **Development:**
+
 ```bash
 docker-compose -f docker-compose.dev.yml logs
 ```
 
 **Production:**
+
 ```bash
 docker-compose -f docker-compose.yml logs
 ```
@@ -398,11 +437,13 @@ docker-compose -f docker-compose.yml logs
 Make sure Docker is running:
 
 **Linux:**
+
 ```bash
 sudo systemctl start docker
 ```
 
 **Windows:**
+
 - Open Docker Desktop application
 - Wait for it to fully start
 
@@ -413,13 +454,15 @@ If you see the error: `Refused to display 'http://localhost:44000/' in a frame b
 This occurs when Grafana's security settings prevent iframe embedding. To fix this:
 
 1. **Update docker-compose.dev.yml** - Add these environment variables to the Grafana service:
+
    ```yaml
    environment:
-     GF_SECURITY_ALLOW_EMBEDDING: "true"
-     GF_SECURITY_COOKIE_SAMESITE: "Lax"
+     GF_SECURITY_ALLOW_EMBEDDING: 'true'
+     GF_SECURITY_COOKIE_SAMESITE: 'Lax'
    ```
 
 2. **Restart Docker containers:**
+
    ```bash
    docker-compose -f docker-compose.dev.yml down
    docker-compose -f docker-compose.dev.yml up -d
@@ -449,16 +492,19 @@ For automated builds and deployments, you can set up Jenkins with the provided s
 The project includes Jenkins setup scripts in the `scripts/` directory:
 
 **For Linux/Mac:**
+
 ```bash
 ./scripts/setup.sh
 ```
 
 **For Windows PowerShell:**
+
 ```powershell
 .\scripts\setup.ps1
 ```
 
 These scripts will:
+
 - Verify Node.js 22 LTS is installed
 - Install required dependencies
 - Configure environment variables
@@ -473,6 +519,7 @@ These scripts will:
    - Branch: `main` (or your default branch)
 
 3. **Pipeline script:**
+
    ```groovy
    pipeline {
      agent any
@@ -562,6 +609,7 @@ These scripts will:
 ### Example Configurations
 
 **Production with HTTP (default):**
+
 ```groovy
 environment {
   HOST_ADDRESS = 'example.com'
@@ -573,6 +621,7 @@ environment {
 ```
 
 **Production with HTTPS (secure):**
+
 ```groovy
 environment {
   HOST_ADDRESS = 'example.com'
@@ -584,6 +633,7 @@ environment {
 ```
 
 **Production for China (Chinese language):**
+
 ```groovy
 environment {
   HOST_ADDRESS = 'example.cn'
@@ -595,6 +645,7 @@ environment {
 ```
 
 **Development (Korean):**
+
 ```groovy
 environment {
   HOST_ADDRESS = 'dev.example.com'
@@ -617,21 +668,25 @@ environment {
 If you need to regenerate the `.env` file:
 
 **For Development (Linux/Mac):**
+
 ```bash
 ./setup-env.sh localhost development --force
 ```
 
 **For Development (Windows PowerShell):**
+
 ```powershell
 .\setup-env.ps1 -HostAddress localhost -Environment development -Force
 ```
 
 **For Production (Linux/Mac):**
+
 ```bash
 ./setup-env.sh example.com production --force
 ```
 
 **For Production (Windows PowerShell):**
+
 ```powershell
 .\setup-env.ps1 -HostAddress example.com -Environment production -Force
 ```
@@ -639,16 +694,19 @@ If you need to regenerate the `.env` file:
 **With Custom Options:**
 
 **Custom Admin Password (Linux/Mac):**
+
 ```bash
 ./setup-env.sh localhost development ko --admin-password "NewPassword123" --force
 ```
 
 **Custom Admin Password (Windows PowerShell):**
+
 ```powershell
 .\setup-env.ps1 -HostAddress localhost -Environment development -AdminPassword "NewPassword123" -Force
 ```
 
 **Custom Protocol (Linux/Mac):**
+
 ```bash
 # HTTPS with Korean
 ./setup-env.sh localhost development ko --protocol https --force
@@ -658,6 +716,7 @@ If you need to regenerate the `.env` file:
 ```
 
 **Custom Protocol (Windows PowerShell):**
+
 ```powershell
 # HTTPS with Korean
 .\setup-env.ps1 -HostAddress localhost -Environment development -Protocol https -Force
@@ -667,6 +726,7 @@ If you need to regenerate the `.env` file:
 ```
 
 This will:
+
 - Backup the existing `.env` file (`.env.backup.TIMESTAMP`)
 - Generate new encryption keys
 - Set new admin password (if provided)
@@ -680,11 +740,13 @@ If you need to completely reset the application and start fresh:
 ### Step 1: Stop and Remove All Containers
 
 **For Development:**
+
 ```bash
 docker-compose -f docker-compose.dev.yml down -v
 ```
 
 **For Production:**
+
 ```bash
 docker-compose -f docker-compose.yml down -v
 ```
@@ -696,11 +758,13 @@ The `-v` flag removes all volumes (databases, caches, etc.).
 If you want to rebuild everything from scratch:
 
 **For Development:**
+
 ```bash
 docker-compose -f docker-compose.dev.yml down -v --rmi all
 ```
 
 **For Production:**
+
 ```bash
 docker-compose -f docker-compose.yml down -v --rmi all
 ```
@@ -712,6 +776,7 @@ rm .env
 ```
 
 Or backup it first:
+
 ```bash
 mv .env .env.old
 ```
@@ -721,6 +786,7 @@ mv .env .env.old
 Follow the **Quick Start** section from the beginning:
 
 1. Generate new configuration:
+
    ```bash
    # Development (Korean)
    ./setup-env.sh localhost development
@@ -733,6 +799,7 @@ Follow the **Quick Start** section from the beginning:
    ```
 
 2. Build Docker environment:
+
    ```bash
    # Development
    docker-compose -f docker-compose.dev.yml build
@@ -742,6 +809,7 @@ Follow the **Quick Start** section from the beginning:
    ```
 
 3. Start services:
+
    ```bash
    # Development
    docker-compose -f docker-compose.dev.yml up -d
@@ -751,6 +819,7 @@ Follow the **Quick Start** section from the beginning:
    ```
 
 4. Verify installation:
+
    ```bash
    # Development
    docker-compose -f docker-compose.dev.yml ps
@@ -779,4 +848,3 @@ Follow the **Quick Start** section from the beginning:
 ---
 
 **Happy coding! 🚀**
-

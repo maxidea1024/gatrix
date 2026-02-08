@@ -23,9 +23,7 @@
     ":enum": {},
     ":asset": {},
     ":links": {
-      "rewardItemId": [
-        "Item"
-      ]
+      "rewardItemId": ["Item"]
     }
   },
   "InvestReward": {

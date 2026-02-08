@@ -32,18 +32,10 @@
     },
     ":enum": {},
     ":links": {
-      "oceanNpcId": [
-        "OceanNpc"
-      ],
-      "firstRewardId": [
-        "RewardFixed"
-      ],
-      "repeatRewardId": [
-        "Reward"
-      ],
-      "battleMissionGroupId": [
-        "BattleMissionGroup"
-      ]
+      "oceanNpcId": ["OceanNpc"],
+      "firstRewardId": ["RewardFixed"],
+      "repeatRewardId": ["Reward"],
+      "battleMissionGroupId": ["BattleMissionGroup"]
     }
   },
   "BattleChallengeStage": {

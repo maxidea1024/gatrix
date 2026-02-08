@@ -1,1 +1,119 @@
-"use strict";(globalThis.webpackChunkdocs=globalThis.webpackChunkdocs||[]).push([[360],{3912(e,n,t){t.r(n),t.d(n,{assets:()=>a,contentTitle:()=>d,default:()=>h,frontMatter:()=>o,metadata:()=>i,toc:()=>c});const i=JSON.parse('{"id":"admin/whitelist","title":"?\ufffd\uc774?\ufffd\ub9ac?\ufffd\ud2b8","description":"?\ufffd\ufffd? \uc911\uc5d0???\ufffd\uc18d?????\ufffd\ub294 \uacc4\uc815??\uad00\ub9ac\ud569?\ufffd\ub2e4.","source":"@site/docs/admin/whitelist.md","sourceDirName":"admin","slug":"/admin/whitelist","permalink":"/docs/admin/whitelist","draft":false,"unlisted":false,"editUrl":"https://github.com/your-org/gatrix/tree/main/docs/docs/admin/whitelist.md","tags":[],"version":"current","sidebarPosition":2,"frontMatter":{"sidebar_position":2},"sidebar":"tutorialSidebar","previous":{"title":"?\ufffd\ufffd? \uad00\ufffd?","permalink":"/docs/admin/maintenance"},"next":{"title":"\uac8c\uc784 ?\ufffd\ub4dc","permalink":"/docs/admin/game-worlds"}}');var s=t(4848),r=t(8453);const o={sidebar_position:2},d="?\ufffd\uc774?\ufffd\ub9ac?\ufffd\ud2b8",a={},c=[{value:"?\ufffd\uc774?\ufffd\ub9ac?\ufffd\ud2b8 ?\ufffd\ud615",id:"\uc774\ub9ac\ud2b8-\ud615",level:2}];function l(e){const n={h1:"h1",h2:"h2",header:"header",li:"li",p:"p",strong:"strong",ul:"ul",...(0,r.R)(),...e.components};return(0,s.jsxs)(s.Fragment,{children:[(0,s.jsx)(n.header,{children:(0,s.jsx)(n.h1,{id:"\uc774\ub9ac\ud2b8",children:"?\ufffd\uc774?\ufffd\ub9ac?\ufffd\ud2b8"})}),"\n",(0,s.jsx)(n.p,{children:"?\ufffd\ufffd? \uc911\uc5d0???\ufffd\uc18d?????\ufffd\ub294 \uacc4\uc815??\uad00\ub9ac\ud569?\ufffd\ub2e4."}),"\n",(0,s.jsx)(n.h2,{id:"\uc774\ub9ac\ud2b8-\ud615",children:"?\ufffd\uc774?\ufffd\ub9ac?\ufffd\ud2b8 ?\ufffd\ud615"}),"\n",(0,s.jsxs)(n.ul,{children:["\n",(0,s.jsxs)(n.li,{children:[(0,s.jsx)(n.strong,{children:"\uacc4\uc815 ?\ufffd\uc774?\ufffd\ub9ac?\ufffd\ud2b8"}),": ?\ufffd\uc815 \uacc4\uc815 ID"]}),"\n",(0,s.jsxs)(n.li,{children:[(0,s.jsx)(n.strong,{children:"IP ?\ufffd\uc774?\ufffd\ub9ac?\ufffd\ud2b8"}),": ?\ufffd\uc815 IP \uc8fc\uc18c"]}),"\n"]})]})}function h(e={}){const{wrapper:n}={...(0,r.R)(),...e.components};return n?(0,s.jsx)(n,{...e,children:(0,s.jsx)(l,{...e})}):l(e)}},8453(e,n,t){t.d(n,{R:()=>o,x:()=>d});var i=t(6540);const s={},r=i.createContext(s);function o(e){const n=i.useContext(r);return i.useMemo(function(){return"function"==typeof e?e(n):{...n,...e}},[n,e])}function d(e){let n;return n=e.disableParentContext?"function"==typeof e.components?e.components(s):e.components||s:o(e.components),i.createElement(r.Provider,{value:n},e.children)}}}]);
+'use strict';
+(globalThis.webpackChunkdocs = globalThis.webpackChunkdocs || []).push([
+  [360],
+  {
+    3912(e, n, t) {
+      (t.r(n),
+        t.d(n, {
+          assets: () => a,
+          contentTitle: () => d,
+          default: () => h,
+          frontMatter: () => o,
+          metadata: () => i,
+          toc: () => c,
+        }));
+      const i = JSON.parse(
+        '{"id":"admin/whitelist","title":"?\ufffd\uc774?\ufffd\ub9ac?\ufffd\ud2b8","description":"?\ufffd\ufffd? \uc911\uc5d0???\ufffd\uc18d?????\ufffd\ub294 \uacc4\uc815??\uad00\ub9ac\ud569?\ufffd\ub2e4.","source":"@site/docs/admin/whitelist.md","sourceDirName":"admin","slug":"/admin/whitelist","permalink":"/docs/admin/whitelist","draft":false,"unlisted":false,"editUrl":"https://github.com/your-org/gatrix/tree/main/docs/docs/admin/whitelist.md","tags":[],"version":"current","sidebarPosition":2,"frontMatter":{"sidebar_position":2},"sidebar":"tutorialSidebar","previous":{"title":"?\ufffd\ufffd? \uad00\ufffd?","permalink":"/docs/admin/maintenance"},"next":{"title":"\uac8c\uc784 ?\ufffd\ub4dc","permalink":"/docs/admin/game-worlds"}}'
+      );
+      var s = t(4848),
+        r = t(8453);
+      const o = { sidebar_position: 2 },
+        d = '?\ufffd\uc774?\ufffd\ub9ac?\ufffd\ud2b8',
+        a = {},
+        c = [
+          {
+            value: '?\ufffd\uc774?\ufffd\ub9ac?\ufffd\ud2b8 ?\ufffd\ud615',
+            id: '\uc774\ub9ac\ud2b8-\ud615',
+            level: 2,
+          },
+        ];
+      function l(e) {
+        const n = {
+          h1: 'h1',
+          h2: 'h2',
+          header: 'header',
+          li: 'li',
+          p: 'p',
+          strong: 'strong',
+          ul: 'ul',
+          ...(0, r.R)(),
+          ...e.components,
+        };
+        return (0, s.jsxs)(s.Fragment, {
+          children: [
+            (0, s.jsx)(n.header, {
+              children: (0, s.jsx)(n.h1, {
+                id: '\uc774\ub9ac\ud2b8',
+                children: '?\ufffd\uc774?\ufffd\ub9ac?\ufffd\ud2b8',
+              }),
+            }),
+            '\n',
+            (0, s.jsx)(n.p, {
+              children:
+                '?\ufffd\ufffd? \uc911\uc5d0???\ufffd\uc18d?????\ufffd\ub294 \uacc4\uc815??\uad00\ub9ac\ud569?\ufffd\ub2e4.',
+            }),
+            '\n',
+            (0, s.jsx)(n.h2, {
+              id: '\uc774\ub9ac\ud2b8-\ud615',
+              children: '?\ufffd\uc774?\ufffd\ub9ac?\ufffd\ud2b8 ?\ufffd\ud615',
+            }),
+            '\n',
+            (0, s.jsxs)(n.ul, {
+              children: [
+                '\n',
+                (0, s.jsxs)(n.li, {
+                  children: [
+                    (0, s.jsx)(n.strong, {
+                      children: '\uacc4\uc815 ?\ufffd\uc774?\ufffd\ub9ac?\ufffd\ud2b8',
+                    }),
+                    ': ?\ufffd\uc815 \uacc4\uc815 ID',
+                  ],
+                }),
+                '\n',
+                (0, s.jsxs)(n.li, {
+                  children: [
+                    (0, s.jsx)(n.strong, {
+                      children: 'IP ?\ufffd\uc774?\ufffd\ub9ac?\ufffd\ud2b8',
+                    }),
+                    ': ?\ufffd\uc815 IP \uc8fc\uc18c',
+                  ],
+                }),
+                '\n',
+              ],
+            }),
+          ],
+        });
+      }
+      function h(e = {}) {
+        const { wrapper: n } = { ...(0, r.R)(), ...e.components };
+        return n ? (0, s.jsx)(n, { ...e, children: (0, s.jsx)(l, { ...e }) }) : l(e);
+      }
+    },
+    8453(e, n, t) {
+      t.d(n, { R: () => o, x: () => d });
+      var i = t(6540);
+      const s = {},
+        r = i.createContext(s);
+      function o(e) {
+        const n = i.useContext(r);
+        return i.useMemo(
+          function () {
+            return 'function' == typeof e ? e(n) : { ...n, ...e };
+          },
+          [n, e]
+        );
+      }
+      function d(e) {
+        let n;
+        return (
+          (n = e.disableParentContext
+            ? 'function' == typeof e.components
+              ? e.components(s)
+              : e.components || s
+            : o(e.components)),
+          i.createElement(r.Provider, { value: n }, e.children)
+        );
+      }
+    },
+  },
+]);

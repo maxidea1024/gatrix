@@ -1,1 +1,256 @@
-"use strict";(globalThis.webpackChunkdocs=globalThis.webpackChunkdocs||[]).push([[4259],{1268(n,e,i){i.r(e),i.d(e,{assets:()=>c,contentTitle:()=>d,default:()=>a,frontMatter:()=>t,metadata:()=>s,toc:()=>o});const s=JSON.parse('{"id":"admin/whitelist","title":"\u767d\u540d\u5355","description":"\u6982\u8ff0","source":"@site/i18n/zh-Hans/docusaurus-plugin-content-docs/current/admin/whitelist.md","sourceDirName":"admin","slug":"/admin/whitelist","permalink":"/docs/zh-Hans/admin/whitelist","draft":false,"unlisted":false,"editUrl":"https://github.com/your-org/gatrix/tree/main/docs/docs/admin/whitelist.md","tags":[],"version":"current","sidebarPosition":2,"frontMatter":{"sidebar_position":2,"sidebar_label":"\u767d\u540d\u5355"},"sidebar":"tutorialSidebar","previous":{"title":"\u7ef4\u62a4\u7ba1\u7406","permalink":"/docs/zh-Hans/admin/maintenance"},"next":{"title":"\u6e38\u620f\u4e16\u754c","permalink":"/docs/zh-Hans/admin/game-worlds"}}');var l=i(4848),r=i(8453);const t={sidebar_position:2,sidebar_label:"\u767d\u540d\u5355"},d="\u767d\u540d\u5355",c={},o=[{value:"\u6982\u8ff0",id:"\u6982\u8ff0",level:2},{value:"\u529f\u80fd",id:"\u529f\u80fd",level:2},{value:"\u6dfb\u52a0\u8d26\u53f7\u7684\u65b9\u6cd5",id:"\u6dfb\u52a0\u8d26\u53f7\u7684\u65b9\u6cd5",level:2},{value:"\u6dfb\u52a0 IP \u7684\u65b9\u6cd5",id:"\u6dfb\u52a0-ip-\u7684\u65b9\u6cd5",level:2},{value:"\u4f7f\u7528\u573a\u666f",id:"\u4f7f\u7528\u573a\u666f",level:2},{value:"API \u96c6\u6210",id:"api-\u96c6\u6210",level:2}];function h(n){const e={code:"code",h1:"h1",h2:"h2",header:"header",li:"li",ol:"ol",p:"p",pre:"pre",strong:"strong",ul:"ul",...(0,r.R)(),...n.components};return(0,l.jsxs)(l.Fragment,{children:[(0,l.jsx)(e.header,{children:(0,l.jsx)(e.h1,{id:"\u767d\u540d\u5355",children:"\u767d\u540d\u5355"})}),"\n",(0,l.jsx)(e.h2,{id:"\u6982\u8ff0",children:"\u6982\u8ff0"}),"\n",(0,l.jsx)(e.p,{children:"\u7ba1\u7406\u5728\u7ef4\u62a4\u6216\u8bbf\u95ee\u53d7\u9650\u671f\u95f4\u5141\u8bb8\u7ed5\u8fc7\u9650\u5236\u8bbf\u95ee\u7684\u8d26\u53f7\u548c IP\u3002"}),"\n",(0,l.jsxs)(e.p,{children:[(0,l.jsx)(e.strong,{children:"\u8bbf\u95ee\u8def\u5f84\uff1a"})," \u7cfb\u7edf\u7ba1\u7406 \u2192 \u767d\u540d\u5355"]}),"\n",(0,l.jsx)(e.h2,{id:"\u529f\u80fd",children:"\u529f\u80fd"}),"\n",(0,l.jsxs)(e.ul,{children:["\n",(0,l.jsx)(e.li,{children:"\u6309\u8d26\u53f7 ID \u6dfb\u52a0\u767d\u540d\u5355"}),"\n",(0,l.jsx)(e.li,{children:"\u6309 IP \u6216 IP \u6bb5\u6dfb\u52a0\u767d\u540d\u5355"}),"\n",(0,l.jsx)(e.li,{children:"\u542f\u7528/\u7981\u7528\u6761\u76ee"}),"\n",(0,l.jsx)(e.li,{children:"\u4e3a\u6bcf\u4e2a\u6761\u76ee\u6dfb\u52a0\u5907\u6ce8"}),"\n"]}),"\n",(0,l.jsx)(e.h2,{id:"\u6dfb\u52a0\u8d26\u53f7\u7684\u65b9\u6cd5",children:"\u6dfb\u52a0\u8d26\u53f7\u7684\u65b9\u6cd5"}),"\n",(0,l.jsxs)(e.ol,{children:["\n",(0,l.jsxs)(e.li,{children:["\u524d\u5f80 ",(0,l.jsx)(e.strong,{children:"\u7cfb\u7edf\u7ba1\u7406"})," > ",(0,l.jsx)(e.strong,{children:"\u767d\u540d\u5355"}),"\u3002"]}),"\n",(0,l.jsxs)(e.li,{children:["\u70b9\u51fb ",(0,l.jsx)(e.strong,{children:"\u6dfb\u52a0\u8d26\u53f7"})," \u6309\u94ae\u3002"]}),"\n",(0,l.jsx)(e.li,{children:"\u8f93\u5165\u8d26\u53f7 ID\u3002"}),"\n",(0,l.jsx)(e.li,{children:"\uff08\u53ef\u9009\uff09\u6dfb\u52a0\u5907\u6ce8\u3002"}),"\n",(0,l.jsxs)(e.li,{children:["\u70b9\u51fb ",(0,l.jsx)(e.strong,{children:"\u6dfb\u52a0"}),"\u3002"]}),"\n"]}),"\n",(0,l.jsx)(e.h2,{id:"\u6dfb\u52a0-ip-\u7684\u65b9\u6cd5",children:"\u6dfb\u52a0 IP \u7684\u65b9\u6cd5"}),"\n",(0,l.jsxs)(e.ol,{children:["\n",(0,l.jsxs)(e.li,{children:["\u524d\u5f80 ",(0,l.jsx)(e.strong,{children:"\u7cfb\u7edf\u7ba1\u7406"})," > ",(0,l.jsx)(e.strong,{children:"\u767d\u540d\u5355"}),"\u3002"]}),"\n",(0,l.jsxs)(e.li,{children:["\u70b9\u51fb ",(0,l.jsx)(e.strong,{children:"\u6dfb\u52a0 IP"})," \u6309\u94ae\u3002"]}),"\n",(0,l.jsx)(e.li,{children:"\u8f93\u5165 IP \u5730\u5740\u6216 CIDR \u7f51\u6bb5\u3002"}),"\n",(0,l.jsx)(e.li,{children:"\uff08\u53ef\u9009\uff09\u6dfb\u52a0\u5907\u6ce8\u3002"}),"\n",(0,l.jsxs)(e.li,{children:["\u70b9\u51fb ",(0,l.jsx)(e.strong,{children:"\u6dfb\u52a0"}),"\u3002"]}),"\n"]}),"\n",(0,l.jsx)(e.h2,{id:"\u4f7f\u7528\u573a\u666f",children:"\u4f7f\u7528\u573a\u666f"}),"\n",(0,l.jsxs)(e.ul,{children:["\n",(0,l.jsx)(e.li,{children:"\u7ef4\u62a4\u671f\u95f4 QA \u56e2\u961f\u8fdb\u884c\u6d4b\u8bd5"}),"\n",(0,l.jsx)(e.li,{children:"\u5f00\u53d1\u4eba\u5458\u8bbf\u95ee"}),"\n",(0,l.jsx)(e.li,{children:"VIP \u62a2\u5148\u4f53\u9a8c"}),"\n",(0,l.jsx)(e.li,{children:"\u5408\u4f5c\u4f19\u4f34\u8d26\u53f7"}),"\n"]}),"\n",(0,l.jsx)(e.h2,{id:"api-\u96c6\u6210",children:"API \u96c6\u6210"}),"\n",(0,l.jsx)(e.p,{children:"\u901a\u8fc7 SDK \u68c0\u67e5\u767d\u540d\u5355\u72b6\u6001\uff1a"}),"\n",(0,l.jsx)(e.pre,{children:(0,l.jsx)(e.code,{className:"language-typescript",children:"const isWhitelisted = await medical.whitelist.isAccountWhitelisted(accountId);\r\nconst isIpWhitelisted = await medical.whitelist.isIpWhitelisted(ipAddress);\n"})})]})}function a(n={}){const{wrapper:e}={...(0,r.R)(),...n.components};return e?(0,l.jsx)(e,{...n,children:(0,l.jsx)(h,{...n})}):h(n)}},8453(n,e,i){i.d(e,{R:()=>t,x:()=>d});var s=i(6540);const l={},r=s.createContext(l);function t(n){const e=s.useContext(r);return s.useMemo(function(){return"function"==typeof n?n(e):{...e,...n}},[e,n])}function d(n){let e;return e=n.disableParentContext?"function"==typeof n.components?n.components(l):n.components||l:t(n.components),s.createElement(r.Provider,{value:e},n.children)}}}]);
+'use strict';
+(globalThis.webpackChunkdocs = globalThis.webpackChunkdocs || []).push([
+  [4259],
+  {
+    1268(n, e, i) {
+      (i.r(e),
+        i.d(e, {
+          assets: () => c,
+          contentTitle: () => d,
+          default: () => a,
+          frontMatter: () => t,
+          metadata: () => s,
+          toc: () => o,
+        }));
+      const s = JSON.parse(
+        '{"id":"admin/whitelist","title":"\u767d\u540d\u5355","description":"\u6982\u8ff0","source":"@site/i18n/zh-Hans/docusaurus-plugin-content-docs/current/admin/whitelist.md","sourceDirName":"admin","slug":"/admin/whitelist","permalink":"/docs/zh-Hans/admin/whitelist","draft":false,"unlisted":false,"editUrl":"https://github.com/your-org/gatrix/tree/main/docs/docs/admin/whitelist.md","tags":[],"version":"current","sidebarPosition":2,"frontMatter":{"sidebar_position":2,"sidebar_label":"\u767d\u540d\u5355"},"sidebar":"tutorialSidebar","previous":{"title":"\u7ef4\u62a4\u7ba1\u7406","permalink":"/docs/zh-Hans/admin/maintenance"},"next":{"title":"\u6e38\u620f\u4e16\u754c","permalink":"/docs/zh-Hans/admin/game-worlds"}}'
+      );
+      var l = i(4848),
+        r = i(8453);
+      const t = { sidebar_position: 2, sidebar_label: '\u767d\u540d\u5355' },
+        d = '\u767d\u540d\u5355',
+        c = {},
+        o = [
+          { value: '\u6982\u8ff0', id: '\u6982\u8ff0', level: 2 },
+          { value: '\u529f\u80fd', id: '\u529f\u80fd', level: 2 },
+          {
+            value: '\u6dfb\u52a0\u8d26\u53f7\u7684\u65b9\u6cd5',
+            id: '\u6dfb\u52a0\u8d26\u53f7\u7684\u65b9\u6cd5',
+            level: 2,
+          },
+          {
+            value: '\u6dfb\u52a0 IP \u7684\u65b9\u6cd5',
+            id: '\u6dfb\u52a0-ip-\u7684\u65b9\u6cd5',
+            level: 2,
+          },
+          { value: '\u4f7f\u7528\u573a\u666f', id: '\u4f7f\u7528\u573a\u666f', level: 2 },
+          { value: 'API \u96c6\u6210', id: 'api-\u96c6\u6210', level: 2 },
+        ];
+      function h(n) {
+        const e = {
+          code: 'code',
+          h1: 'h1',
+          h2: 'h2',
+          header: 'header',
+          li: 'li',
+          ol: 'ol',
+          p: 'p',
+          pre: 'pre',
+          strong: 'strong',
+          ul: 'ul',
+          ...(0, r.R)(),
+          ...n.components,
+        };
+        return (0, l.jsxs)(l.Fragment, {
+          children: [
+            (0, l.jsx)(e.header, {
+              children: (0, l.jsx)(e.h1, {
+                id: '\u767d\u540d\u5355',
+                children: '\u767d\u540d\u5355',
+              }),
+            }),
+            '\n',
+            (0, l.jsx)(e.h2, { id: '\u6982\u8ff0', children: '\u6982\u8ff0' }),
+            '\n',
+            (0, l.jsx)(e.p, {
+              children:
+                '\u7ba1\u7406\u5728\u7ef4\u62a4\u6216\u8bbf\u95ee\u53d7\u9650\u671f\u95f4\u5141\u8bb8\u7ed5\u8fc7\u9650\u5236\u8bbf\u95ee\u7684\u8d26\u53f7\u548c IP\u3002',
+            }),
+            '\n',
+            (0, l.jsxs)(e.p, {
+              children: [
+                (0, l.jsx)(e.strong, { children: '\u8bbf\u95ee\u8def\u5f84\uff1a' }),
+                ' \u7cfb\u7edf\u7ba1\u7406 \u2192 \u767d\u540d\u5355',
+              ],
+            }),
+            '\n',
+            (0, l.jsx)(e.h2, { id: '\u529f\u80fd', children: '\u529f\u80fd' }),
+            '\n',
+            (0, l.jsxs)(e.ul, {
+              children: [
+                '\n',
+                (0, l.jsx)(e.li, {
+                  children: '\u6309\u8d26\u53f7 ID \u6dfb\u52a0\u767d\u540d\u5355',
+                }),
+                '\n',
+                (0, l.jsx)(e.li, {
+                  children: '\u6309 IP \u6216 IP \u6bb5\u6dfb\u52a0\u767d\u540d\u5355',
+                }),
+                '\n',
+                (0, l.jsx)(e.li, { children: '\u542f\u7528/\u7981\u7528\u6761\u76ee' }),
+                '\n',
+                (0, l.jsx)(e.li, {
+                  children: '\u4e3a\u6bcf\u4e2a\u6761\u76ee\u6dfb\u52a0\u5907\u6ce8',
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, l.jsx)(e.h2, {
+              id: '\u6dfb\u52a0\u8d26\u53f7\u7684\u65b9\u6cd5',
+              children: '\u6dfb\u52a0\u8d26\u53f7\u7684\u65b9\u6cd5',
+            }),
+            '\n',
+            (0, l.jsxs)(e.ol, {
+              children: [
+                '\n',
+                (0, l.jsxs)(e.li, {
+                  children: [
+                    '\u524d\u5f80 ',
+                    (0, l.jsx)(e.strong, { children: '\u7cfb\u7edf\u7ba1\u7406' }),
+                    ' > ',
+                    (0, l.jsx)(e.strong, { children: '\u767d\u540d\u5355' }),
+                    '\u3002',
+                  ],
+                }),
+                '\n',
+                (0, l.jsxs)(e.li, {
+                  children: [
+                    '\u70b9\u51fb ',
+                    (0, l.jsx)(e.strong, { children: '\u6dfb\u52a0\u8d26\u53f7' }),
+                    ' \u6309\u94ae\u3002',
+                  ],
+                }),
+                '\n',
+                (0, l.jsx)(e.li, { children: '\u8f93\u5165\u8d26\u53f7 ID\u3002' }),
+                '\n',
+                (0, l.jsx)(e.li, {
+                  children: '\uff08\u53ef\u9009\uff09\u6dfb\u52a0\u5907\u6ce8\u3002',
+                }),
+                '\n',
+                (0, l.jsxs)(e.li, {
+                  children: [
+                    '\u70b9\u51fb ',
+                    (0, l.jsx)(e.strong, { children: '\u6dfb\u52a0' }),
+                    '\u3002',
+                  ],
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, l.jsx)(e.h2, {
+              id: '\u6dfb\u52a0-ip-\u7684\u65b9\u6cd5',
+              children: '\u6dfb\u52a0 IP \u7684\u65b9\u6cd5',
+            }),
+            '\n',
+            (0, l.jsxs)(e.ol, {
+              children: [
+                '\n',
+                (0, l.jsxs)(e.li, {
+                  children: [
+                    '\u524d\u5f80 ',
+                    (0, l.jsx)(e.strong, { children: '\u7cfb\u7edf\u7ba1\u7406' }),
+                    ' > ',
+                    (0, l.jsx)(e.strong, { children: '\u767d\u540d\u5355' }),
+                    '\u3002',
+                  ],
+                }),
+                '\n',
+                (0, l.jsxs)(e.li, {
+                  children: [
+                    '\u70b9\u51fb ',
+                    (0, l.jsx)(e.strong, { children: '\u6dfb\u52a0 IP' }),
+                    ' \u6309\u94ae\u3002',
+                  ],
+                }),
+                '\n',
+                (0, l.jsx)(e.li, {
+                  children: '\u8f93\u5165 IP \u5730\u5740\u6216 CIDR \u7f51\u6bb5\u3002',
+                }),
+                '\n',
+                (0, l.jsx)(e.li, {
+                  children: '\uff08\u53ef\u9009\uff09\u6dfb\u52a0\u5907\u6ce8\u3002',
+                }),
+                '\n',
+                (0, l.jsxs)(e.li, {
+                  children: [
+                    '\u70b9\u51fb ',
+                    (0, l.jsx)(e.strong, { children: '\u6dfb\u52a0' }),
+                    '\u3002',
+                  ],
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, l.jsx)(e.h2, {
+              id: '\u4f7f\u7528\u573a\u666f',
+              children: '\u4f7f\u7528\u573a\u666f',
+            }),
+            '\n',
+            (0, l.jsxs)(e.ul, {
+              children: [
+                '\n',
+                (0, l.jsx)(e.li, {
+                  children: '\u7ef4\u62a4\u671f\u95f4 QA \u56e2\u961f\u8fdb\u884c\u6d4b\u8bd5',
+                }),
+                '\n',
+                (0, l.jsx)(e.li, { children: '\u5f00\u53d1\u4eba\u5458\u8bbf\u95ee' }),
+                '\n',
+                (0, l.jsx)(e.li, { children: 'VIP \u62a2\u5148\u4f53\u9a8c' }),
+                '\n',
+                (0, l.jsx)(e.li, { children: '\u5408\u4f5c\u4f19\u4f34\u8d26\u53f7' }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, l.jsx)(e.h2, { id: 'api-\u96c6\u6210', children: 'API \u96c6\u6210' }),
+            '\n',
+            (0, l.jsx)(e.p, {
+              children: '\u901a\u8fc7 SDK \u68c0\u67e5\u767d\u540d\u5355\u72b6\u6001\uff1a',
+            }),
+            '\n',
+            (0, l.jsx)(e.pre, {
+              children: (0, l.jsx)(e.code, {
+                className: 'language-typescript',
+                children:
+                  'const isWhitelisted = await medical.whitelist.isAccountWhitelisted(accountId);\r\nconst isIpWhitelisted = await medical.whitelist.isIpWhitelisted(ipAddress);\n',
+              }),
+            }),
+          ],
+        });
+      }
+      function a(n = {}) {
+        const { wrapper: e } = { ...(0, r.R)(), ...n.components };
+        return e ? (0, l.jsx)(e, { ...n, children: (0, l.jsx)(h, { ...n }) }) : h(n);
+      }
+    },
+    8453(n, e, i) {
+      i.d(e, { R: () => t, x: () => d });
+      var s = i(6540);
+      const l = {},
+        r = s.createContext(l);
+      function t(n) {
+        const e = s.useContext(r);
+        return s.useMemo(
+          function () {
+            return 'function' == typeof n ? n(e) : { ...e, ...n };
+          },
+          [e, n]
+        );
+      }
+      function d(n) {
+        let e;
+        return (
+          (e = n.disableParentContext
+            ? 'function' == typeof n.components
+              ? n.components(l)
+              : n.components || l
+            : t(n.components)),
+          s.createElement(r.Provider, { value: e }, n.children)
+        );
+      }
+    },
+  },
+]);

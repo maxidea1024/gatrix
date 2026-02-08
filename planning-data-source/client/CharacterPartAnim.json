@@ -6,30 +6,18 @@
       "hair": "string",
       "hat": "string",
       "cape": "string",
-      "weapon": [
-        "string",
-        "string"
-      ],
+      "weapon": ["string", "string"],
       "face_acc": "string",
-      "tool": [
-        "string",
-        "string"
-      ]
+      "tool": ["string", "string"]
     },
     ":required": {
       "face": 1,
       "hair": 1,
       "hat": 1,
       "cape": 1,
-      "weapon": [
-        1,
-        1
-      ],
+      "weapon": [1, 1],
       "face_acc": 1,
-      "tool": [
-        1,
-        1
-      ]
+      "tool": [1, 1]
     },
     ":min": {},
     ":max": {},
@@ -43,15 +31,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Run_01",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Groggy_01": {
       "id": "Duel_Groggy_01",
@@ -59,15 +41,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "DEFAULT",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Attack01_Rifle": {
       "id": "Duel_Attack01_Rifle",
@@ -75,15 +51,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "Duel_Stand_Rifle",
-        "Duel_Stand_Rifle"
-      ],
+      "weapon": ["Duel_Stand_Rifle", "Duel_Stand_Rifle"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Attack02_Rifle": {
       "id": "Duel_Attack02_Rifle",
@@ -91,15 +61,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "Duel_Stand_Rifle",
-        "Duel_Stand_Rifle"
-      ],
+      "weapon": ["Duel_Stand_Rifle", "Duel_Stand_Rifle"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Attack03_Rifle": {
       "id": "Duel_Attack03_Rifle",
@@ -107,15 +71,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "Duel_Stand_Rifle",
-        "Duel_Stand_Rifle"
-      ],
+      "weapon": ["Duel_Stand_Rifle", "Duel_Stand_Rifle"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Damage_Rifle": {
       "id": "Duel_Damage_Rifle",
@@ -123,15 +81,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "Duel_Stand_Rifle",
-        "Duel_Stand_Rifle"
-      ],
+      "weapon": ["Duel_Stand_Rifle", "Duel_Stand_Rifle"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Guard01_Rifle": {
       "id": "Duel_Guard01_Rifle",
@@ -139,15 +91,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Guard02_Rifle": {
       "id": "Duel_Guard02_Rifle",
@@ -155,15 +101,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Guard03_Rifle": {
       "id": "Duel_Guard03_Rifle",
@@ -171,15 +111,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Stand_Rifle": {
       "id": "Duel_Stand_Rifle",
@@ -187,15 +121,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "Duel_Stand_Rifle",
-        "Duel_Stand_Rifle"
-      ],
+      "weapon": ["Duel_Stand_Rifle", "Duel_Stand_Rifle"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Attack01_Spear": {
       "id": "Duel_Attack01_Spear",
@@ -203,15 +131,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "Duel_Stand_Spear",
-        "Duel_Stand_Spear"
-      ],
+      "weapon": ["Duel_Stand_Spear", "Duel_Stand_Spear"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Attack02_Spear": {
       "id": "Duel_Attack02_Spear",
@@ -219,15 +141,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "Duel_Stand_Spear",
-        "Duel_Stand_Spear"
-      ],
+      "weapon": ["Duel_Stand_Spear", "Duel_Stand_Spear"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Attack03_Spear": {
       "id": "Duel_Attack03_Spear",
@@ -235,15 +151,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "Duel_Attack03_Spear",
-        "Duel_Attack03_Spear"
-      ],
+      "weapon": ["Duel_Attack03_Spear", "Duel_Attack03_Spear"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Damage_Spear": {
       "id": "Duel_Damage_Spear",
@@ -251,15 +161,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "Duel_Stand_Spear",
-        "Duel_Stand_Spear"
-      ],
+      "weapon": ["Duel_Stand_Spear", "Duel_Stand_Spear"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Guard01_Spear": {
       "id": "Duel_Guard01_Spear",
@@ -267,15 +171,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Guard02_Spear": {
       "id": "Duel_Guard02_Spear",
@@ -283,15 +181,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Guard03_Spear": {
       "id": "Duel_Guard03_Spear",
@@ -299,15 +191,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Stand_Spear": {
       "id": "Duel_Stand_Spear",
@@ -315,15 +201,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "DEFAULT",
-      "weapon": [
-        "Duel_Stand_Spear",
-        "Duel_Stand_Spear"
-      ],
+      "weapon": ["Duel_Stand_Spear", "Duel_Stand_Spear"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Run_01": {
       "id": "Town_Run_01",
@@ -331,15 +211,9 @@
       "hair": "DEFAULT",
       "hat": "Town_Stand_01",
       "cape": "DEFAULT",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Run_02": {
       "id": "Town_Run_02",
@@ -347,15 +221,9 @@
       "hair": "DEFAULT",
       "hat": "DEFAULT",
       "cape": "DEFAULT",
-      "weapon": [
-        "Town_Run_01",
-        "Town_Run_01"
-      ],
+      "weapon": ["Town_Run_01", "Town_Run_01"],
       "face_acc": "DEFAULT",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Stand_01": {
       "id": "Town_Stand_01",
@@ -363,15 +231,9 @@
       "hair": "DEFAULT",
       "hat": "Town_Stand_01",
       "cape": "DEFAULT",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Walk_01": {
       "id": "Town_Walk_01",
@@ -379,15 +241,9 @@
       "hair": "DEFAULT",
       "hat": "Town_Stand_01",
       "cape": "DEFAULT",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Attack01_Bow": {
       "id": "Duel_Attack01_Bow",
@@ -395,15 +251,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Attack02_Bow": {
       "id": "Duel_Attack02_Bow",
@@ -411,15 +261,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Attack03_Bow": {
       "id": "Duel_Attack03_Bow",
@@ -427,15 +271,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Damage_Bow": {
       "id": "Duel_Damage_Bow",
@@ -443,15 +281,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Dodge01_Bow": {
       "id": "Duel_Dodge01_Bow",
@@ -459,15 +291,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Stand_Bow": {
       "id": "Duel_Stand_Bow",
@@ -475,15 +301,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Attack01_Crossbow": {
       "id": "Duel_Attack01_Crossbow",
@@ -491,15 +311,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Attack02_Crossbow": {
       "id": "Duel_Attack02_Crossbow",
@@ -507,15 +321,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Attack03_Crossbow": {
       "id": "Duel_Attack03_Crossbow",
@@ -523,15 +331,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Damage_Crossbow": {
       "id": "Duel_Damage_Crossbow",
@@ -539,15 +341,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Dodge01_Crossbow": {
       "id": "Duel_Dodge01_Crossbow",
@@ -555,15 +351,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Stand_Crossbow": {
       "id": "Duel_Stand_Crossbow",
@@ -571,15 +361,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Attack01_Pistol": {
       "id": "Duel_Attack01_Pistol",
@@ -587,15 +371,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "Duel_Stand_Pistol",
-        "Duel_Stand_Pistol"
-      ],
+      "weapon": ["Duel_Stand_Pistol", "Duel_Stand_Pistol"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Attack02_Pistol": {
       "id": "Duel_Attack02_Pistol",
@@ -603,15 +381,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "Duel_Stand_Pistol",
-        "Duel_Stand_Pistol"
-      ],
+      "weapon": ["Duel_Stand_Pistol", "Duel_Stand_Pistol"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Attack03_Pistol": {
       "id": "Duel_Attack03_Pistol",
@@ -619,15 +391,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "Duel_Stand_Pistol",
-        "Duel_Stand_Pistol"
-      ],
+      "weapon": ["Duel_Stand_Pistol", "Duel_Stand_Pistol"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Damage_Pistol": {
       "id": "Duel_Damage_Pistol",
@@ -635,15 +401,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "Duel_Stand_Pistol",
-        "Duel_Stand_Pistol"
-      ],
+      "weapon": ["Duel_Stand_Pistol", "Duel_Stand_Pistol"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Dodge01_Pistol": {
       "id": "Duel_Dodge01_Pistol",
@@ -651,15 +411,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "Duel_Stand_Pistol",
-        "Duel_Stand_Pistol"
-      ],
+      "weapon": ["Duel_Stand_Pistol", "Duel_Stand_Pistol"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Stand_Pistol": {
       "id": "Duel_Stand_Pistol",
@@ -667,15 +421,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "Duel_Stand_Pistol",
-        "Duel_Stand_Pistol"
-      ],
+      "weapon": ["Duel_Stand_Pistol", "Duel_Stand_Pistol"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Attack01_Blade": {
       "id": "Duel_Attack01_Blade",
@@ -683,15 +431,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "Duel_Stand_Blade",
-        "Duel_Stand_Blade"
-      ],
+      "weapon": ["Duel_Stand_Blade", "Duel_Stand_Blade"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Attack02_Blade": {
       "id": "Duel_Attack02_Blade",
@@ -699,15 +441,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "Duel_Stand_Blade",
-        "Duel_Stand_Blade"
-      ],
+      "weapon": ["Duel_Stand_Blade", "Duel_Stand_Blade"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Attack03_Blade": {
       "id": "Duel_Attack03_Blade",
@@ -715,15 +451,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "Duel_Stand_Blade",
-        "Duel_Stand_Blade"
-      ],
+      "weapon": ["Duel_Stand_Blade", "Duel_Stand_Blade"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Damage_Blade": {
       "id": "Duel_Damage_Blade",
@@ -731,15 +461,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "Duel_Stand_Blade",
-        "Duel_Stand_Blade"
-      ],
+      "weapon": ["Duel_Stand_Blade", "Duel_Stand_Blade"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Guard01_Blade": {
       "id": "Duel_Guard01_Blade",
@@ -747,15 +471,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "Duel_Stand_Blade",
-        "Duel_Stand_Blade"
-      ],
+      "weapon": ["Duel_Stand_Blade", "Duel_Stand_Blade"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Guard02_Blade": {
       "id": "Duel_Guard02_Blade",
@@ -763,15 +481,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "Duel_Stand_Blade",
-        "Duel_Stand_Blade"
-      ],
+      "weapon": ["Duel_Stand_Blade", "Duel_Stand_Blade"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Guard03_Blade": {
       "id": "Duel_Guard03_Blade",
@@ -779,15 +491,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "Duel_Stand_Blade",
-        "Duel_Stand_Blade"
-      ],
+      "weapon": ["Duel_Stand_Blade", "Duel_Stand_Blade"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Stand_Blade": {
       "id": "Duel_Stand_Blade",
@@ -795,15 +501,9 @@
       "hair": "Town_Walk_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "Duel_Stand_Blade",
-        "Duel_Stand_Blade"
-      ],
+      "weapon": ["Duel_Stand_Blade", "Duel_Stand_Blade"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Attack01_Sword": {
       "id": "Duel_Attack01_Sword",
@@ -811,15 +511,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "Duel_Stand_Sword",
-        "Duel_Stand_Sword"
-      ],
+      "weapon": ["Duel_Stand_Sword", "Duel_Stand_Sword"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Attack02_Sword": {
       "id": "Duel_Attack02_Sword",
@@ -827,15 +521,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "Duel_Stand_Sword",
-        "Duel_Stand_Sword"
-      ],
+      "weapon": ["Duel_Stand_Sword", "Duel_Stand_Sword"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Attack03_Sword": {
       "id": "Duel_Attack03_Sword",
@@ -843,15 +531,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "Duel_Stand_Sword",
-        "Duel_Stand_Sword"
-      ],
+      "weapon": ["Duel_Stand_Sword", "Duel_Stand_Sword"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Damage_Sword": {
       "id": "Duel_Damage_Sword",
@@ -859,15 +541,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "Duel_Stand_Sword",
-        "Duel_Stand_Sword"
-      ],
+      "weapon": ["Duel_Stand_Sword", "Duel_Stand_Sword"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Guard01_Sword": {
       "id": "Duel_Guard01_Sword",
@@ -875,15 +551,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "Duel_Stand_Sword",
-        "Duel_Stand_Sword"
-      ],
+      "weapon": ["Duel_Stand_Sword", "Duel_Stand_Sword"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Guard02_Sword": {
       "id": "Duel_Guard02_Sword",
@@ -891,15 +561,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "Duel_Stand_Sword",
-        "Duel_Stand_Sword"
-      ],
+      "weapon": ["Duel_Stand_Sword", "Duel_Stand_Sword"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Guard03_Sword": {
       "id": "Duel_Guard03_Sword",
@@ -907,15 +571,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "Duel_Stand_Sword",
-        "Duel_Stand_Sword"
-      ],
+      "weapon": ["Duel_Stand_Sword", "Duel_Stand_Sword"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Stand_Sword": {
       "id": "Duel_Stand_Sword",
@@ -923,15 +581,9 @@
       "hair": "Town_Walk_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "Duel_Stand_Sword",
-        "Duel_Stand_Sword"
-      ],
+      "weapon": ["Duel_Stand_Sword", "Duel_Stand_Sword"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Attack01_THSword": {
       "id": "Duel_Attack01_THSword",
@@ -939,15 +591,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "Duel_Stand_THSword",
-        "Duel_Stand_THSword"
-      ],
+      "weapon": ["Duel_Stand_THSword", "Duel_Stand_THSword"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Attack02_THSword": {
       "id": "Duel_Attack02_THSword",
@@ -955,15 +601,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "Duel_Stand_THSword",
-        "Duel_Stand_THSword"
-      ],
+      "weapon": ["Duel_Stand_THSword", "Duel_Stand_THSword"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Attack03_THSword": {
       "id": "Duel_Attack03_THSword",
@@ -971,15 +611,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "Duel_Stand_THSword",
-        "Duel_Stand_THSword"
-      ],
+      "weapon": ["Duel_Stand_THSword", "Duel_Stand_THSword"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Damage_THSword": {
       "id": "Duel_Damage_THSword",
@@ -987,15 +621,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "Duel_Stand_THSword",
-        "Duel_Stand_THSword"
-      ],
+      "weapon": ["Duel_Stand_THSword", "Duel_Stand_THSword"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Guard01_THSword": {
       "id": "Duel_Guard01_THSword",
@@ -1003,15 +631,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "Duel_Stand_THSword",
-        "Duel_Stand_THSword"
-      ],
+      "weapon": ["Duel_Stand_THSword", "Duel_Stand_THSword"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Guard02_THSword": {
       "id": "Duel_Guard02_THSword",
@@ -1019,15 +641,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "Duel_Stand_THSword",
-        "Duel_Stand_THSword"
-      ],
+      "weapon": ["Duel_Stand_THSword", "Duel_Stand_THSword"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Guard03_THSword": {
       "id": "Duel_Guard03_THSword",
@@ -1035,15 +651,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "Duel_Stand_THSword",
-        "Duel_Stand_THSword"
-      ],
+      "weapon": ["Duel_Stand_THSword", "Duel_Stand_THSword"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Stand_THSword": {
       "id": "Duel_Stand_THSword",
@@ -1051,15 +661,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "Duel_Stand_THSword",
-        "Duel_Stand_THSword"
-      ],
+      "weapon": ["Duel_Stand_THSword", "Duel_Stand_THSword"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Attack01_TwinBlade": {
       "id": "Duel_Attack01_TwinBlade",
@@ -1067,15 +671,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "Duel_Stand_TwinBlade",
-        "Duel_Stand_TwinBlade"
-      ],
+      "weapon": ["Duel_Stand_TwinBlade", "Duel_Stand_TwinBlade"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Attack02_TwinBlade": {
       "id": "Duel_Attack02_TwinBlade",
@@ -1083,15 +681,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "Duel_Stand_TwinBlade",
-        "Duel_Stand_TwinBlade"
-      ],
+      "weapon": ["Duel_Stand_TwinBlade", "Duel_Stand_TwinBlade"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Attack03_TwinBlade": {
       "id": "Duel_Attack03_TwinBlade",
@@ -1099,15 +691,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "Duel_Stand_TwinBlade",
-        "Duel_Stand_TwinBlade"
-      ],
+      "weapon": ["Duel_Stand_TwinBlade", "Duel_Stand_TwinBlade"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Damage_TwinBlade": {
       "id": "Duel_Damage_TwinBlade",
@@ -1115,15 +701,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "Duel_Stand_TwinBlade",
-        "Duel_Stand_TwinBlade"
-      ],
+      "weapon": ["Duel_Stand_TwinBlade", "Duel_Stand_TwinBlade"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Guard01_TwinBlade": {
       "id": "Duel_Guard01_TwinBlade",
@@ -1131,15 +711,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "Duel_Stand_TwinBlade",
-        "Duel_Stand_TwinBlade"
-      ],
+      "weapon": ["Duel_Stand_TwinBlade", "Duel_Stand_TwinBlade"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Guard02_TwinBlade": {
       "id": "Duel_Guard02_TwinBlade",
@@ -1147,15 +721,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "Duel_Stand_TwinBlade",
-        "Duel_Stand_TwinBlade"
-      ],
+      "weapon": ["Duel_Stand_TwinBlade", "Duel_Stand_TwinBlade"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Guard03_TwinBlade": {
       "id": "Duel_Guard03_TwinBlade",
@@ -1163,15 +731,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "Duel_Stand_TwinBlade",
-        "Duel_Stand_TwinBlade"
-      ],
+      "weapon": ["Duel_Stand_TwinBlade", "Duel_Stand_TwinBlade"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Stand_TwinBlade": {
       "id": "Duel_Stand_TwinBlade",
@@ -1179,15 +741,9 @@
       "hair": "Town_Walk_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "Duel_Stand_TwinBlade",
-        "Duel_Stand_TwinBlade"
-      ],
+      "weapon": ["Duel_Stand_TwinBlade", "Duel_Stand_TwinBlade"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Ship_CaptainNPC_01": {
       "id": "Ship_CaptainNPC_01",
@@ -1195,15 +751,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "Town_Stand_01",
-        "Town_Stand_01"
-      ],
+      "weapon": ["Town_Stand_01", "Town_Stand_01"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Ship_inJuredLeg_01": {
       "id": "Ship_inJuredLeg_01",
@@ -1211,15 +761,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "Town_Stand_01",
-        "Town_Stand_01"
-      ],
+      "weapon": ["Town_Stand_01", "Town_Stand_01"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Ship_injuredArm_01": {
       "id": "Ship_injuredArm_01",
@@ -1227,15 +771,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "Town_Stand_01",
-        "Town_Stand_01"
-      ],
+      "weapon": ["Town_Stand_01", "Town_Stand_01"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Win_01": {
       "id": "Duel_Win_01",
@@ -1243,15 +781,9 @@
       "hair": "Town_Walk_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Ship_CaptainNPC_02": {
       "id": "Ship_CaptainNPC_02",
@@ -1259,15 +791,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "Town_Stand_01",
-        "Town_Stand_01"
-      ],
+      "weapon": ["Town_Stand_01", "Town_Stand_01"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Ship_CaptainNPC_03": {
       "id": "Ship_CaptainNPC_03",
@@ -1275,15 +801,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "Town_Stand_01",
-        "Town_Stand_01"
-      ],
+      "weapon": ["Town_Stand_01", "Town_Stand_01"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Ship_Damaged_01": {
       "id": "Ship_Damaged_01",
@@ -1291,15 +811,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "Town_Stand_01",
-        "Town_Stand_01"
-      ],
+      "weapon": ["Town_Stand_01", "Town_Stand_01"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Ship_Damaged_02": {
       "id": "Ship_Damaged_02",
@@ -1307,15 +821,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "Town_Stand_01",
-        "Town_Stand_01"
-      ],
+      "weapon": ["Town_Stand_01", "Town_Stand_01"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Ship_DeckOutskirtsNPC_01": {
       "id": "Ship_DeckOutskirtsNPC_01",
@@ -1323,15 +831,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "Town_Stand_01",
-        "Town_Stand_01"
-      ],
+      "weapon": ["Town_Stand_01", "Town_Stand_01"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Ship_DeckOutskirtsNPC_02": {
       "id": "Ship_DeckOutskirtsNPC_02",
@@ -1339,15 +841,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "Town_Stand_01",
-        "Town_Stand_01"
-      ],
+      "weapon": ["Town_Stand_01", "Town_Stand_01"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Ship_DeckOutskirtsNPC_03": {
       "id": "Ship_DeckOutskirtsNPC_03",
@@ -1355,15 +851,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "Town_Stand_01",
-        "Town_Stand_01"
-      ],
+      "weapon": ["Town_Stand_01", "Town_Stand_01"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Ship_DeckinteriorNPC_01": {
       "id": "Ship_DeckinteriorNPC_01",
@@ -1371,15 +861,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Knockback_02",
-      "weapon": [
-        "Town_Stand_01",
-        "Town_Stand_01"
-      ],
+      "weapon": ["Town_Stand_01", "Town_Stand_01"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Ship_DeckinteriorNPC_02": {
       "id": "Ship_DeckinteriorNPC_02",
@@ -1387,15 +871,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "Town_Stand_01",
-        "Town_Stand_01"
-      ],
+      "weapon": ["Town_Stand_01", "Town_Stand_01"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Ship_DeckinteriorNPC_03": {
       "id": "Ship_DeckinteriorNPC_03",
@@ -1403,15 +881,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "Town_Stand_01",
-        "Town_Stand_01"
-      ],
+      "weapon": ["Town_Stand_01", "Town_Stand_01"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Ship_DeckinteriorNPC_04": {
       "id": "Ship_DeckinteriorNPC_04",
@@ -1419,15 +891,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "DEFAULT",
-      "weapon": [
-        "Town_Stand_01",
-        "Town_Stand_01"
-      ],
+      "weapon": ["Town_Stand_01", "Town_Stand_01"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Ship_Success_01": {
       "id": "Ship_Success_01",
@@ -1435,15 +901,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "NOANIM",
-        "NOANIM"
-      ],
+      "weapon": ["NOANIM", "NOANIM"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Watchman01_Idle": {
       "id": "Town_Watchman01_Idle",
@@ -1451,15 +911,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Watchman01_Run": {
       "id": "Town_Watchman01_Run",
@@ -1467,15 +921,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Run_01",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Watchman01_Walk": {
       "id": "Town_Watchman01_Walk",
@@ -1483,15 +931,9 @@
       "hair": "Town_Walk_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Walk_01",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Watchman01_Walk_02": {
       "id": "Town_Watchman01_Walk_02",
@@ -1499,15 +941,9 @@
       "hair": "Town_Walk_02",
       "hat": "Town_Run_02",
       "cape": "Town_Walk_02",
-      "weapon": [
-        "Town_Watchman01_Walk",
-        "Town_Watchman01_Walk"
-      ],
+      "weapon": ["Town_Watchman01_Walk", "Town_Watchman01_Walk"],
       "face_acc": "Town_Run_02",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Watchman02_Idle": {
       "id": "Town_Watchman02_Idle",
@@ -1515,15 +951,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Watchman02_Run": {
       "id": "Town_Watchman02_Run",
@@ -1531,15 +961,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Run_01",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Watchman02_Walk": {
       "id": "Town_Watchman02_Walk",
@@ -1547,15 +971,9 @@
       "hair": "Town_Walk_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Walk_01",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Watchman02_Walk_02": {
       "id": "Town_Watchman02_Walk_02",
@@ -1563,15 +981,9 @@
       "hair": "Town_Walk_02",
       "hat": "Town_Run_02",
       "cape": "Town_Walk_02",
-      "weapon": [
-        "Town_Watchman02_Walk",
-        "Town_Watchman02_Walk"
-      ],
+      "weapon": ["Town_Watchman02_Walk", "Town_Watchman02_Walk"],
       "face_acc": "Town_Run_02",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Watchman03_Idle": {
       "id": "Town_Watchman03_Idle",
@@ -1579,15 +991,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Watchman03_Run": {
       "id": "Town_Watchman03_Run",
@@ -1595,15 +1001,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Run_01",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Watchman03_Walk": {
       "id": "Town_Watchman03_Walk",
@@ -1611,15 +1011,9 @@
       "hair": "Town_Walk_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Walk_01",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Watchman03_Walk_02": {
       "id": "Town_Watchman03_Walk_02",
@@ -1627,15 +1021,9 @@
       "hair": "Town_Walk_02",
       "hat": "Town_Run_02",
       "cape": "Town_Walk_02",
-      "weapon": [
-        "Town_Watchman03_Walk",
-        "Town_Watchman03_Walk"
-      ],
+      "weapon": ["Town_Watchman03_Walk", "Town_Watchman03_Walk"],
       "face_acc": "Town_Run_02",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Ship_Disaster_01": {
       "id": "Ship_Disaster_01",
@@ -1643,15 +1031,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "NOANIM",
-        "NOANIM"
-      ],
+      "weapon": ["NOANIM", "NOANIM"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Ship_Disaster_02": {
       "id": "Ship_Disaster_02",
@@ -1659,15 +1041,9 @@
       "hair": "Town_Walk_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "NOANIM",
-        "NOANIM"
-      ],
+      "weapon": ["NOANIM", "NOANIM"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Ship_Growth_01": {
       "id": "Ship_Growth_01",
@@ -1675,15 +1051,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "NOANIM",
-        "NOANIM"
-      ],
+      "weapon": ["NOANIM", "NOANIM"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Ship_LoyaltyHigh_01": {
       "id": "Ship_LoyaltyHigh_01",
@@ -1691,15 +1061,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "NOANIM",
-        "NOANIM"
-      ],
+      "weapon": ["NOANIM", "NOANIM"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Ship_LoyaltyLow_01": {
       "id": "Ship_LoyaltyLow_01",
@@ -1707,15 +1071,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "NOANIM",
-        "NOANIM"
-      ],
+      "weapon": ["NOANIM", "NOANIM"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Inn_Sit_01": {
       "id": "Inn_Sit_01",
@@ -1723,15 +1081,9 @@
       "hair": "DEFAULT",
       "hat": "Town_Stand_01",
       "cape": "DEFAULT",
-      "weapon": [
-        "NOANIM",
-        "NOANIM"
-      ],
+      "weapon": ["NOANIM", "NOANIM"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Inn_Sit_02": {
       "id": "Inn_Sit_02",
@@ -1739,15 +1091,9 @@
       "hair": "DEFAULT",
       "hat": "Town_Stand_01",
       "cape": "DEFAULT",
-      "weapon": [
-        "NOANIM",
-        "NOANIM"
-      ],
+      "weapon": ["NOANIM", "NOANIM"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Inn_Sit_03": {
       "id": "Inn_Sit_03",
@@ -1755,15 +1101,9 @@
       "hair": "DEFAULT",
       "hat": "Town_Stand_01",
       "cape": "DEFAULT",
-      "weapon": [
-        "NOANIM",
-        "NOANIM"
-      ],
+      "weapon": ["NOANIM", "NOANIM"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Inn_Sit_04": {
       "id": "Inn_Sit_04",
@@ -1771,15 +1111,9 @@
       "hair": "DEFAULT",
       "hat": "Town_Stand_01",
       "cape": "DEFAULT",
-      "weapon": [
-        "NOANIM",
-        "NOANIM"
-      ],
+      "weapon": ["NOANIM", "NOANIM"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Inn_Sit_05": {
       "id": "Inn_Sit_05",
@@ -1787,15 +1121,9 @@
       "hair": "DEFAULT",
       "hat": "Town_Stand_01",
       "cape": "DEFAULT",
-      "weapon": [
-        "NOANIM",
-        "NOANIM"
-      ],
+      "weapon": ["NOANIM", "NOANIM"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Inn_Unable_01": {
       "id": "Inn_Unable_01",
@@ -1803,15 +1131,9 @@
       "hair": "DEFAULT",
       "hat": "Town_Stand_01",
       "cape": "DEFAULT",
-      "weapon": [
-        "NOANIM",
-        "NOANIM"
-      ],
+      "weapon": ["NOANIM", "NOANIM"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Inn_Unable_02": {
       "id": "Inn_Unable_02",
@@ -1819,15 +1141,9 @@
       "hair": "DEFAULT",
       "hat": "Town_Stand_01",
       "cape": "DEFAULT",
-      "weapon": [
-        "NOANIM",
-        "NOANIM"
-      ],
+      "weapon": ["NOANIM", "NOANIM"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Knockback_01": {
       "id": "Duel_Knockback_01",
@@ -1835,15 +1151,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "NOANIM",
-        "NOANIM"
-      ],
+      "weapon": ["NOANIM", "NOANIM"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Knockback_02": {
       "id": "Duel_Knockback_02",
@@ -1851,15 +1161,9 @@
       "hair": "Duel_Knockback_02",
       "hat": "Town_Stand_01",
       "cape": "DEFAULT",
-      "weapon": [
-        "NOANIM",
-        "NOANIM"
-      ],
+      "weapon": ["NOANIM", "NOANIM"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Lute_01": {
       "id": "Town_Lute_01",
@@ -1867,15 +1171,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Inn_Sit_01",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Ship_Command_01": {
       "id": "Ship_Command_01",
@@ -1883,15 +1181,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "Town_Stand_01",
-        "Town_Stand_01"
-      ],
+      "weapon": ["Town_Stand_01", "Town_Stand_01"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Salute_Start_01": {
       "id": "Town_Salute_Start_01",
@@ -1899,15 +1191,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "Town_Stand_01",
-        "Town_Stand_01"
-      ],
+      "weapon": ["Town_Stand_01", "Town_Stand_01"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Salute_Doing_01": {
       "id": "Town_Salute_Doing_01",
@@ -1915,15 +1201,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "Town_Stand_01",
-        "Town_Stand_01"
-      ],
+      "weapon": ["Town_Stand_01", "Town_Stand_01"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Salute_End_01": {
       "id": "Town_Salute_End_01",
@@ -1931,15 +1211,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "Town_Stand_01",
-        "Town_Stand_01"
-      ],
+      "weapon": ["Town_Stand_01", "Town_Stand_01"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_SAttack01_Sword": {
       "id": "Duel_SAttack01_Sword",
@@ -1947,15 +1221,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "Duel_Stand_Sword",
-        "Duel_Stand_Sword"
-      ],
+      "weapon": ["Duel_Stand_Sword", "Duel_Stand_Sword"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_SAttack01_Rifle": {
       "id": "Duel_SAttack01_Rifle",
@@ -1963,15 +1231,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "Duel_Stand_Rifle",
-        "Duel_Stand_Rifle"
-      ],
+      "weapon": ["Duel_Stand_Rifle", "Duel_Stand_Rifle"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_SAttack01_Spear": {
       "id": "Duel_SAttack01_Spear",
@@ -1979,15 +1241,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "Duel_Attack03_Spear",
-        "Duel_Attack03_Spear"
-      ],
+      "weapon": ["Duel_Attack03_Spear", "Duel_Attack03_Spear"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_SAttack01_Bow": {
       "id": "Duel_SAttack01_Bow",
@@ -1995,15 +1251,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "Duel_Attack02_Bow",
-        "Duel_Attack02_Bow"
-      ],
+      "weapon": ["Duel_Attack02_Bow", "Duel_Attack02_Bow"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_SAttack01_Crossbow": {
       "id": "Duel_SAttack01_Crossbow",
@@ -2011,15 +1261,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "Duel_Attack02_Crossbow",
-        "Duel_Attack02_Crossbow"
-      ],
+      "weapon": ["Duel_Attack02_Crossbow", "Duel_Attack02_Crossbow"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_SAttack01_Pistol": {
       "id": "Duel_SAttack01_Pistol",
@@ -2027,15 +1271,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "Duel_Stand_Pistol",
-        "Duel_Stand_Pistol"
-      ],
+      "weapon": ["Duel_Stand_Pistol", "Duel_Stand_Pistol"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_SAttack01_Blade": {
       "id": "Duel_SAttack01_Blade",
@@ -2043,15 +1281,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "Duel_Stand_Blade",
-        "Duel_Stand_Blade"
-      ],
+      "weapon": ["Duel_Stand_Blade", "Duel_Stand_Blade"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_SAttack01_THSword": {
       "id": "Duel_SAttack01_THSword",
@@ -2059,15 +1291,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "Duel_Stand_THSword",
-        "Duel_Stand_THSword"
-      ],
+      "weapon": ["Duel_Stand_THSword", "Duel_Stand_THSword"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_SAttack01_TwinBlade": {
       "id": "Duel_SAttack01_TwinBlade",
@@ -2075,15 +1301,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "Duel_Stand_TwinBlade",
-        "Duel_Stand_TwinBlade"
-      ],
+      "weapon": ["Duel_Stand_TwinBlade", "Duel_Stand_TwinBlade"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Inn_Sit_06": {
       "id": "Inn_Sit_06",
@@ -2091,15 +1311,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "DEFAULT",
-      "weapon": [
-        "NOANIM",
-        "NOANIM"
-      ],
+      "weapon": ["NOANIM", "NOANIM"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Whisk_Idle_01": {
       "id": "Town_Whisk_Idle_01",
@@ -2107,15 +1321,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "Town_Stand_01",
-        "Town_Stand_01"
-      ],
+      "weapon": ["Town_Stand_01", "Town_Stand_01"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Think_Idle_01": {
       "id": "Town_Think_Idle_01",
@@ -2123,15 +1331,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "Town_Stand_01",
-        "Town_Stand_01"
-      ],
+      "weapon": ["Town_Stand_01", "Town_Stand_01"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Stretching_Idle_01": {
       "id": "Town_Stretching_Idle_01",
@@ -2139,15 +1341,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stretching_Idle_01",
-      "weapon": [
-        "Town_Stand_01",
-        "Town_Stand_01"
-      ],
+      "weapon": ["Town_Stand_01", "Town_Stand_01"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Map_Idle_01": {
       "id": "Town_Map_Idle_01",
@@ -2155,15 +1351,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "Town_Stand_01",
-        "Town_Stand_01"
-      ],
+      "weapon": ["Town_Stand_01", "Town_Stand_01"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_LookAround_Idle_01": {
       "id": "Town_LookAround_Idle_01",
@@ -2171,15 +1361,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "Town_Stand_01",
-        "Town_Stand_01"
-      ],
+      "weapon": ["Town_Stand_01", "Town_Stand_01"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_FoldArm_Idle_01": {
       "id": "Town_FoldArm_Idle_01",
@@ -2187,15 +1371,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "Town_Stand_01",
-        "Town_Stand_01"
-      ],
+      "weapon": ["Town_Stand_01", "Town_Stand_01"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Calculation_Idle_01": {
       "id": "Town_Calculation_Idle_01",
@@ -2203,15 +1381,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "Town_Stand_01",
-        "Town_Stand_01"
-      ],
+      "weapon": ["Town_Stand_01", "Town_Stand_01"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Threat_Idle_01": {
       "id": "Town_Threat_Idle_01",
@@ -2219,15 +1391,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "Town_Stand_01",
-        "Town_Stand_01"
-      ],
+      "weapon": ["Town_Stand_01", "Town_Stand_01"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Massage_Idle_01": {
       "id": "Town_Massage_Idle_01",
@@ -2235,15 +1401,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "Town_Stand_01",
-        "Town_Stand_01"
-      ],
+      "weapon": ["Town_Stand_01", "Town_Stand_01"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Walk_02": {
       "id": "Town_Walk_02",
@@ -2251,15 +1411,9 @@
       "hair": "DEFAULT",
       "hat": "Town_Run_02",
       "cape": "DEFAULT",
-      "weapon": [
-        "Town_Stand_01",
-        "Town_Stand_01"
-      ],
+      "weapon": ["Town_Stand_01", "Town_Stand_01"],
       "face_acc": "Town_Run_02",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Ship_FishingIde_01": {
       "id": "Ship_FishingIde_01",
@@ -2267,15 +1421,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Ship_FishingRodAngling_01": {
       "id": "Ship_FishingRodAngling_01",
@@ -2283,15 +1431,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Ship_FishingRodDraw_01": {
       "id": "Ship_FishingRodDraw_01",
@@ -2299,15 +1441,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Ship_FishingRodThrow_01": {
       "id": "Ship_FishingRodThrow_01",
@@ -2315,15 +1451,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Ship_FishingRodThrow_02": {
       "id": "Ship_FishingRodThrow_02",
@@ -2331,15 +1461,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Read_Start_01": {
       "id": "Town_Read_Start_01",
@@ -2347,15 +1471,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Read_Doing_01": {
       "id": "Town_Read_Doing_01",
@@ -2363,15 +1481,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Read_End_01": {
       "id": "Town_Read_End_01",
@@ -2379,15 +1491,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Workman_Walk_01": {
       "id": "Town_Workman_Walk_01",
@@ -2395,15 +1501,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Adventure_Gathering_Fruit_01": {
       "id": "Adventure_Gathering_Fruit_01",
@@ -2411,15 +1511,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "Town_Stand_01",
-        "Town_Stand_01"
-      ],
+      "weapon": ["Town_Stand_01", "Town_Stand_01"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Adventure_Gathering_Note_01": {
       "id": "Adventure_Gathering_Note_01",
@@ -2427,15 +1521,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "Town_Stand_01",
-        "Town_Stand_01"
-      ],
+      "weapon": ["Town_Stand_01", "Town_Stand_01"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Adventure_Gathering_Pick_01": {
       "id": "Adventure_Gathering_Pick_01",
@@ -2443,15 +1531,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "Town_Stand_01",
-        "Town_Stand_01"
-      ],
+      "weapon": ["Town_Stand_01", "Town_Stand_01"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Adventure_Gathering_Pluck_01": {
       "id": "Adventure_Gathering_Pluck_01",
@@ -2459,15 +1541,9 @@
       "hair": "Town_Run_01",
       "hat": "Town_Stand_01",
       "cape": "Ship_DeckinteriorNPC_04",
-      "weapon": [
-        "Town_Stand_01",
-        "Town_Stand_01"
-      ],
+      "weapon": ["Town_Stand_01", "Town_Stand_01"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Hello_Idle_01": {
       "id": "Town_Hello_Idle_01",
@@ -2475,15 +1551,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "Town_Stand_01",
-        "Town_Stand_01"
-      ],
+      "weapon": ["Town_Stand_01", "Town_Stand_01"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Clap_Idle_01": {
       "id": "Town_Clap_Idle_01",
@@ -2491,15 +1561,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "Town_Stand_01",
-        "Town_Stand_01"
-      ],
+      "weapon": ["Town_Stand_01", "Town_Stand_01"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_CheerUp_Idle_01": {
       "id": "Town_CheerUp_Idle_01",
@@ -2507,15 +1571,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "Town_Stand_01",
-        "Town_Stand_01"
-      ],
+      "weapon": ["Town_Stand_01", "Town_Stand_01"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Order_Idle_01": {
       "id": "Town_Order_Idle_01",
@@ -2523,15 +1581,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "Town_Stand_01",
-        "Town_Stand_01"
-      ],
+      "weapon": ["Town_Stand_01", "Town_Stand_01"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Cheers_01": {
       "id": "Town_Cheers_01",
@@ -2539,15 +1591,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Cheers_02": {
       "id": "Town_Cheers_02",
@@ -2555,15 +1601,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Cheers_Idle_01": {
       "id": "Town_Cheers_Idle_01",
@@ -2571,15 +1611,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Binding_Idle_01": {
       "id": "Town_Binding_Idle_01",
@@ -2587,15 +1621,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Binding_Walk_01": {
       "id": "Town_Binding_Walk_01",
@@ -2603,15 +1631,9 @@
       "hair": "DEFAULT",
       "hat": "Town_Stand_01",
       "cape": "DEFAULT",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Binding_Harass_01": {
       "id": "Town_Binding_Harass_01",
@@ -2619,15 +1641,9 @@
       "hair": "Town_Walk_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Groggy_Die_01": {
       "id": "Town_Groggy_Die_01",
@@ -2635,15 +1651,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "DEFAULT",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Groggy_Die_Idle_01": {
       "id": "Town_Groggy_Die_Idle_01",
@@ -2651,15 +1661,9 @@
       "hair": "Duel_Knockback_02",
       "hat": "Town_Stand_01",
       "cape": "DEFAULT",
-      "weapon": [
-        "NOANIM",
-        "NOANIM"
-      ],
+      "weapon": ["NOANIM", "NOANIM"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Pistol_Threat_Idle_01": {
       "id": "Town_Pistol_Threat_Idle_01",
@@ -2667,15 +1671,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "Duel_Stand_Pistol",
-        "Duel_Stand_Pistol"
-      ],
+      "weapon": ["Duel_Stand_Pistol", "Duel_Stand_Pistol"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Fado_Stand_01": {
       "id": "Town_Fado_Stand_01",
@@ -2683,15 +1681,9 @@
       "hair": "DEFAULT",
       "hat": "Town_Stand_01",
       "cape": "DEFAULT",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Dance_Indian_01": {
       "id": "Town_Dance_Indian_01",
@@ -2699,15 +1691,9 @@
       "hair": "DEFAULT",
       "hat": "Town_Stand_01",
       "cape": "DEFAULT",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Sitar_Sit_01": {
       "id": "Town_Sitar_Sit_01",
@@ -2715,15 +1701,9 @@
       "hair": "DEFAULT",
       "hat": "Town_Stand_01",
       "cape": "DEFAULT",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Sitar_Stand_01": {
       "id": "Town_Sitar_Stand_01",
@@ -2731,15 +1711,9 @@
       "hair": "DEFAULT",
       "hat": "Town_Stand_01",
       "cape": "DEFAULT",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Drop_01": {
       "id": "Town_Drop_01",
@@ -2747,15 +1721,9 @@
       "hair": "DEFAULT",
       "hat": "Town_Stand_01",
       "cape": "DEFAULT",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Ocarina_01": {
       "id": "Town_Ocarina_01",
@@ -2763,15 +1731,9 @@
       "hair": "DEFAULT",
       "hat": "Town_Stand_01",
       "cape": "DEFAULT",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Swordetiquette_01": {
       "id": "Town_Swordetiquette_01",
@@ -2779,15 +1741,9 @@
       "hair": "DEFAULT",
       "hat": "Town_Stand_01",
       "cape": "DEFAULT",
-      "weapon": [
-        "Duel_Stand_Sword",
-        "Duel_Stand_Sword"
-      ],
+      "weapon": ["Duel_Stand_Sword", "Duel_Stand_Sword"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Swordetiquette_02": {
       "id": "Town_Swordetiquette_02",
@@ -2795,15 +1751,9 @@
       "hair": "DEFAULT",
       "hat": "Town_Stand_01",
       "cape": "DEFAULT",
-      "weapon": [
-        "Duel_Stand_Sword",
-        "Duel_Stand_Sword"
-      ],
+      "weapon": ["Duel_Stand_Sword", "Duel_Stand_Sword"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Binding_Harass_02": {
       "id": "Town_Binding_Harass_02",
@@ -2811,15 +1761,9 @@
       "hair": "Town_Walk_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "Town_Binding_Harass_01"
-      ]
+      "tool": ["DEFAULT", "Town_Binding_Harass_01"]
     },
     "Sea_Sinking_01": {
       "id": "Sea_Sinking_01",
@@ -2827,15 +1771,9 @@
       "hair": "DEFAULT",
       "hat": "Town_Stand_01",
       "cape": "DEFAULT",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Knockback_03": {
       "id": "Duel_Knockback_03",
@@ -2843,15 +1781,9 @@
       "hair": "DEFAULT",
       "hat": "Town_Stand_01",
       "cape": "DEFAULT",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Drop_idle_01": {
       "id": "Town_Drop_idle_01",
@@ -2859,15 +1791,9 @@
       "hair": "DEFAULT",
       "hat": "Town_Stand_01",
       "cape": "Town_Drop_Idle_01",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Warkman_Walk_01": {
       "id": "Town_Warkman_Walk_01",
@@ -2875,15 +1801,9 @@
       "hair": "DEFAULT",
       "hat": "Town_Stand_01",
       "cape": "DEFAULT",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_BackWalk_01": {
       "id": "Town_BackWalk_01",
@@ -2891,15 +1811,9 @@
       "hair": "DEFAULT",
       "hat": "Town_Stand_01",
       "cape": "Town_Walk_01",
-      "weapon": [
-        "Town_Stand_01",
-        "Town_Stand_01"
-      ],
+      "weapon": ["Town_Stand_01", "Town_Stand_01"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Surprise_01": {
       "id": "Town_Surprise_01",
@@ -2907,15 +1821,9 @@
       "hair": "DEFAULT",
       "hat": "Town_Stand_01",
       "cape": "DEFAULT",
-      "weapon": [
-        "Town_Stand_01",
-        "Town_Stand_01"
-      ],
+      "weapon": ["Town_Stand_01", "Town_Stand_01"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Stand_02": {
       "id": "Town_Stand_02",
@@ -2923,15 +1831,9 @@
       "hair": "Town_Stand_02",
       "hat": "Town_Run_02",
       "cape": "Town_Stand_02",
-      "weapon": [
-        "Town_Stand_01",
-        "Town_Stand_01"
-      ],
+      "weapon": ["Town_Stand_01", "Town_Stand_01"],
       "face_acc": "Town_Run_02",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Walk_Blade": {
       "id": "Duel_Walk_Blade",
@@ -2939,15 +1841,9 @@
       "hair": "Town_Walk_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "Duel_Stand_Blade",
-        "Duel_Stand_Blade"
-      ],
+      "weapon": ["Duel_Stand_Blade", "Duel_Stand_Blade"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Walk_Bow": {
       "id": "Duel_Walk_Bow",
@@ -2955,15 +1851,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "Duel_Stand_Bow",
-        "Duel_Stand_Bow"
-      ],
+      "weapon": ["Duel_Stand_Bow", "Duel_Stand_Bow"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Walk_Crossbow": {
       "id": "Duel_Walk_Crossbow",
@@ -2971,15 +1861,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "Duel_Stand_Crossbow",
-        "Duel_Stand_Crossbow"
-      ],
+      "weapon": ["Duel_Stand_Crossbow", "Duel_Stand_Crossbow"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Walk_Pistol": {
       "id": "Duel_Walk_Pistol",
@@ -2987,15 +1871,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "Duel_Stand_Pistol",
-        "Duel_Stand_Pistol"
-      ],
+      "weapon": ["Duel_Stand_Pistol", "Duel_Stand_Pistol"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Walk_Rifle": {
       "id": "Duel_Walk_Rifle",
@@ -3003,15 +1881,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "Duel_Stand_Rifle",
-        "Duel_Stand_Rifle"
-      ],
+      "weapon": ["Duel_Stand_Rifle", "Duel_Stand_Rifle"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Walk_Spear": {
       "id": "Duel_Walk_Spear",
@@ -3019,15 +1891,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "DEFAULT",
-      "weapon": [
-        "Duel_Stand_Spear",
-        "Duel_Stand_Spear"
-      ],
+      "weapon": ["Duel_Stand_Spear", "Duel_Stand_Spear"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Walk_Sword": {
       "id": "Duel_Walk_Sword",
@@ -3035,15 +1901,9 @@
       "hair": "Town_Walk_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "Duel_Stand_Sword",
-        "Duel_Stand_Sword"
-      ],
+      "weapon": ["Duel_Stand_Sword", "Duel_Stand_Sword"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Walk_THSword": {
       "id": "Duel_Walk_THSword",
@@ -3051,15 +1911,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "Duel_Stand_THSword",
-        "Duel_Stand_THSword"
-      ],
+      "weapon": ["Duel_Stand_THSword", "Duel_Stand_THSword"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Duel_Walk_TwinBlade": {
       "id": "Duel_Walk_TwinBlade",
@@ -3067,15 +1921,9 @@
       "hair": "Town_Walk_01",
       "hat": "Town_Stand_01",
       "cape": "Duel_Default_01",
-      "weapon": [
-        "Duel_Stand_TwinBlade",
-        "Duel_Stand_TwinBlade"
-      ],
+      "weapon": ["Duel_Stand_TwinBlade", "Duel_Stand_TwinBlade"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Jump_Start_01": {
       "id": "Town_Jump_Start_01",
@@ -3083,15 +1931,9 @@
       "hair": "DEFAULT",
       "hat": "Town_Stand_01",
       "cape": "Town_Jump_Start_01",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Inn_Sit_08": {
       "id": "Inn_Sit_08",
@@ -3099,15 +1941,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Inn_Sit_08",
-      "weapon": [
-        "NOANIM",
-        "NOANIM"
-      ],
+      "weapon": ["NOANIM", "NOANIM"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Kick_01": {
       "id": "Town_Kick_01",
@@ -3115,15 +1951,9 @@
       "hair": "DEFAULT",
       "hat": "Town_Stand_01",
       "cape": "DEFAULT",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Wakeup_01": {
       "id": "Town_Wakeup_01",
@@ -3131,15 +1961,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Inn_Sit_08",
-      "weapon": [
-        "NOANIM",
-        "NOANIM"
-      ],
+      "weapon": ["NOANIM", "NOANIM"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Laugh_01": {
       "id": "Town_Laugh_01",
@@ -3147,15 +1971,9 @@
       "hair": "DEFAULT",
       "hat": "Town_Stand_01",
       "cape": "DEFAULT",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Walk_03": {
       "id": "Town_Walk_03",
@@ -3163,15 +1981,9 @@
       "hair": "DEFAULT",
       "hat": "Town_Stand_01",
       "cape": "DEFAULT",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Give_01": {
       "id": "Town_Give_01",
@@ -3179,15 +1991,9 @@
       "hair": "DEFAULT",
       "hat": "Town_Stand_01",
       "cape": "DEFAULT",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Receive_01": {
       "id": "Town_Receive_01",
@@ -3195,15 +2001,9 @@
       "hair": "DEFAULT",
       "hat": "Town_Stand_01",
       "cape": "DEFAULT",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Cheers_Idle_02": {
       "id": "Town_Cheers_Idle_02",
@@ -3211,15 +2011,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Cheers_03": {
       "id": "Town_Cheers_03",
@@ -3227,15 +2021,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Cheers_04": {
       "id": "Town_Cheers_04",
@@ -3243,15 +2031,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Nod_01": {
       "id": "Town_Nod_01",
@@ -3259,15 +2041,9 @@
       "hair": "DEFAULT",
       "hat": "Town_Stand_01",
       "cape": "DEFAULT",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Inn_Eat_01": {
       "id": "Inn_Eat_01",
@@ -3275,15 +2051,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Inn_Sit_02",
-      "weapon": [
-        "Inn_Eat_01",
-        "Inn_Eat_01"
-      ],
+      "weapon": ["Inn_Eat_01", "Inn_Eat_01"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "Inn_Eat_01",
-        "Inn_Eat_01"
-      ]
+      "tool": ["Inn_Eat_01", "Inn_Eat_01"]
     },
     "Inn_Eat_Idle_01": {
       "id": "Inn_Eat_Idle_01",
@@ -3291,15 +2061,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Inn_Sit_02",
-      "weapon": [
-        "Inn_Eat_Idle_01",
-        "Inn_Eat_Idle_01"
-      ],
+      "weapon": ["Inn_Eat_Idle_01", "Inn_Eat_Idle_01"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Inn_Eat_02": {
       "id": "Inn_Eat_02",
@@ -3307,15 +2071,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Inn_Sit_04",
-      "weapon": [
-        "Inn_Eat_02",
-        "Inn_Eat_02"
-      ],
+      "weapon": ["Inn_Eat_02", "Inn_Eat_02"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "Inn_Eat_02",
-        "Inn_Eat_02"
-      ]
+      "tool": ["Inn_Eat_02", "Inn_Eat_02"]
     },
     "Inn_Eat_Idle_02": {
       "id": "Inn_Eat_Idle_02",
@@ -3323,15 +2081,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Inn_Sit_04",
-      "weapon": [
-        "Inn_Eat_Idle_02",
-        "Inn_Eat_Idle_02"
-      ],
+      "weapon": ["Inn_Eat_Idle_02", "Inn_Eat_Idle_02"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Ship_FishingRodAngling_02": {
       "id": "Ship_FishingRodAngling_02",
@@ -3339,15 +2091,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "Ship_FishingRodAngling_02",
-        "Ship_FishingRodAngling_02"
-      ],
+      "weapon": ["Ship_FishingRodAngling_02", "Ship_FishingRodAngling_02"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Ship_FishingRodAngling_03": {
       "id": "Ship_FishingRodAngling_03",
@@ -3355,15 +2101,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "Ship_FishingRodAngling_03",
-        "Ship_FishingRodAngling_03"
-      ],
+      "weapon": ["Ship_FishingRodAngling_03", "Ship_FishingRodAngling_03"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Swordetiquette_03": {
       "id": "Town_Swordetiquette_03",
@@ -3371,15 +2111,9 @@
       "hair": "DEFAULT",
       "hat": "Town_Stand_01",
       "cape": "DEFAULT",
-      "weapon": [
-        "Duel_Stand_Sword",
-        "Duel_Stand_Sword"
-      ],
+      "weapon": ["Duel_Stand_Sword", "Duel_Stand_Sword"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Swordetiquette_04": {
       "id": "Town_Swordetiquette_04",
@@ -3387,15 +2121,9 @@
       "hair": "DEFAULT",
       "hat": "Town_Stand_01",
       "cape": "DEFAULT",
-      "weapon": [
-        "Duel_Stand_Sword",
-        "Duel_Stand_Sword"
-      ],
+      "weapon": ["Duel_Stand_Sword", "Duel_Stand_Sword"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Swordetiquette_05": {
       "id": "Town_Swordetiquette_05",
@@ -3403,15 +2131,9 @@
       "hair": "DEFAULT",
       "hat": "Town_Stand_01",
       "cape": "DEFAULT",
-      "weapon": [
-        "Duel_Stand_Sword",
-        "Duel_Stand_Sword"
-      ],
+      "weapon": ["Duel_Stand_Sword", "Duel_Stand_Sword"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Swordetiquette_06": {
       "id": "Town_Swordetiquette_06",
@@ -3419,15 +2141,9 @@
       "hair": "DEFAULT",
       "hat": "Town_Stand_01",
       "cape": "DEFAULT",
-      "weapon": [
-        "Duel_Stand_Sword",
-        "Duel_Stand_Sword"
-      ],
+      "weapon": ["Duel_Stand_Sword", "Duel_Stand_Sword"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Kneel_01": {
       "id": "Town_Kneel_01",
@@ -3435,15 +2151,9 @@
       "hair": "DEFAULT",
       "hat": "Town_Stand_01",
       "cape": "DEFAULT",
-      "weapon": [
-        "NOANIM",
-        "NOANIM"
-      ],
+      "weapon": ["NOANIM", "NOANIM"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Kneeling_01": {
       "id": "Town_Kneeling_01",
@@ -3451,15 +2161,9 @@
       "hair": "DEFAULT",
       "hat": "Town_Stand_01",
       "cape": "DEFAULT",
-      "weapon": [
-        "NOANIM",
-        "NOANIM"
-      ],
+      "weapon": ["NOANIM", "NOANIM"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Cheers_Idle_03": {
       "id": "Town_Cheers_Idle_03",
@@ -3467,15 +2171,9 @@
       "hair": "DEFAULT",
       "hat": "Town_Stand_01",
       "cape": "DEFAULT",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Cheers_Idle_04": {
       "id": "Town_Cheers_Idle_04",
@@ -3483,15 +2181,9 @@
       "hair": "DEFAULT",
       "hat": "Town_Stand_01",
       "cape": "Town_Cheers_Idle_04",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Cheers_Idle_05": {
       "id": "Town_Cheers_Idle_05",
@@ -3499,15 +2191,9 @@
       "hair": "DEFAULT",
       "hat": "Town_Stand_01",
       "cape": "DEFAULT",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Cheers_05": {
       "id": "Town_Cheers_05",
@@ -3515,15 +2201,9 @@
       "hair": "DEFAULT",
       "hat": "Town_Stand_01",
       "cape": "DEFAULT",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Cheers_06": {
       "id": "Town_Cheers_06",
@@ -3531,15 +2211,9 @@
       "hair": "DEFAULT",
       "hat": "Town_Stand_01",
       "cape": "Town_Cheers_Idle_04",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Cheers_07": {
       "id": "Town_Cheers_07",
@@ -3547,15 +2221,9 @@
       "hair": "DEFAULT",
       "hat": "Town_Stand_01",
       "cape": "DEFAULT",
-      "weapon": [
-        "DEFAULT",
-        "DEFAULT"
-      ],
+      "weapon": ["DEFAULT", "DEFAULT"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Ship_FishingRodAngling_04": {
       "id": "Ship_FishingRodAngling_04",
@@ -3563,15 +2231,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "Ship_FishingRodAngling_04",
-        "Ship_FishingRodAngling_04"
-      ],
+      "weapon": ["Ship_FishingRodAngling_04", "Ship_FishingRodAngling_04"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Ship_FishingRodAngling_05": {
       "id": "Ship_FishingRodAngling_05",
@@ -3579,15 +2241,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "Ship_FishingRodAngling_05",
-        "Ship_FishingRodAngling_05"
-      ],
+      "weapon": ["Ship_FishingRodAngling_05", "Ship_FishingRodAngling_05"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Manufacture_Blacksmith_01": {
       "id": "Manufacture_Blacksmith_01",
@@ -3595,15 +2251,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "DEFAULT",
-      "weapon": [
-        "Town_Stand_01",
-        "Town_Stand_01"
-      ],
+      "weapon": ["Town_Stand_01", "Town_Stand_01"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Manufacture_Blacksmith_02": {
       "id": "Manufacture_Blacksmith_02",
@@ -3611,15 +2261,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "DEFAULT",
-      "weapon": [
-        "Town_Stand_01",
-        "Town_Stand_01"
-      ],
+      "weapon": ["Town_Stand_01", "Town_Stand_01"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Manufacture_Cooking_01": {
       "id": "Manufacture_Cooking_01",
@@ -3627,15 +2271,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "DEFAULT",
-      "weapon": [
-        "Town_Stand_01",
-        "Town_Stand_01"
-      ],
+      "weapon": ["Town_Stand_01", "Town_Stand_01"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Manufacture_Cooking_02": {
       "id": "Manufacture_Cooking_02",
@@ -3643,15 +2281,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "DEFAULT",
-      "weapon": [
-        "Town_Stand_01",
-        "Town_Stand_01"
-      ],
+      "weapon": ["Town_Stand_01", "Town_Stand_01"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Manufacture_Walk_01": {
       "id": "Manufacture_Walk_01",
@@ -3659,15 +2291,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "DEFAULT",
-      "weapon": [
-        "Town_Stand_01",
-        "Town_Stand_01"
-      ],
+      "weapon": ["Town_Stand_01", "Town_Stand_01"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Manufacture_Bellow_01": {
       "id": "Manufacture_Bellow_01",
@@ -3675,15 +2301,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "DEFAULT",
-      "weapon": [
-        "Town_Stand_01",
-        "Town_Stand_01"
-      ],
+      "weapon": ["Town_Stand_01", "Town_Stand_01"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Ship_DeckOutskirtsNPC_04": {
       "id": "Ship_DeckOutskirtsNPC_04",
@@ -3691,15 +2311,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "DEFAULT",
-      "weapon": [
-        "Town_Stand_01",
-        "Town_Stand_01"
-      ],
+      "weapon": ["Town_Stand_01", "Town_Stand_01"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Ship_DeckOutskirtsNPC_05": {
       "id": "Ship_DeckOutskirtsNPC_05",
@@ -3707,15 +2321,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "DEFAULT",
-      "weapon": [
-        "Town_Stand_01",
-        "Town_Stand_01"
-      ],
+      "weapon": ["Town_Stand_01", "Town_Stand_01"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Walk_04": {
       "id": "Town_Walk_04",
@@ -3723,15 +2331,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "DEFAULT",
-      "weapon": [
-        "Town_Stand_01",
-        "Town_Stand_01"
-      ],
+      "weapon": ["Town_Stand_01", "Town_Stand_01"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Shoot_01": {
       "id": "Town_Shoot_01",
@@ -3739,15 +2341,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "NOANIM",
-        "NOANIM"
-      ],
+      "weapon": ["NOANIM", "NOANIM"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Town_Shoot_02": {
       "id": "Town_Shoot_02",
@@ -3755,15 +2351,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "NOANIM",
-        "NOANIM"
-      ],
+      "weapon": ["NOANIM", "NOANIM"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Manufacture_Crafting_01": {
       "id": "Manufacture_Crafting_01",
@@ -3771,15 +2361,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "NOANIM",
-        "NOANIM"
-      ],
+      "weapon": ["NOANIM", "NOANIM"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Manufacture_Crafting_02": {
       "id": "Manufacture_Crafting_02",
@@ -3787,15 +2371,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "NOANIM",
-        "NOANIM"
-      ],
+      "weapon": ["NOANIM", "NOANIM"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     },
     "Manufacture_Crafting_03": {
       "id": "Manufacture_Crafting_03",
@@ -3803,15 +2381,9 @@
       "hair": "Town_Stand_01",
       "hat": "Town_Stand_01",
       "cape": "Town_Stand_01",
-      "weapon": [
-        "NOANIM",
-        "NOANIM"
-      ],
+      "weapon": ["NOANIM", "NOANIM"],
       "face_acc": "Town_Stand_01",
-      "tool": [
-        "DEFAULT",
-        "DEFAULT"
-      ]
+      "tool": ["DEFAULT", "DEFAULT"]
     }
   }
 }

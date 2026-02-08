@@ -10,53 +10,53 @@ import { IntegrationSystemEvent } from '../types/integrationEvents';
 import { formatGoogleChatMessage } from './EventFormatter';
 
 export class GoogleChatAddon extends Addon {
-    constructor() {
-        super(googleChatDefinition);
+  constructor() {
+    super(googleChatDefinition);
+  }
+
+  async handleEvent(
+    event: IntegrationSystemEvent,
+    parameters: Record<string, any>,
+    integrationId: string
+  ): Promise<void> {
+    const { url } = parameters;
+
+    if (!url) {
+      this.logger.warn(`Missing Google Chat webhook URL for integration ${integrationId}`);
+      await this.registerEvent(integrationId, event, 'failed', 'Missing webhook URL');
+      return;
     }
 
-    async handleEvent(
-        event: IntegrationSystemEvent,
-        parameters: Record<string, any>,
-        integrationId: string
-    ): Promise<void> {
-        const { url } = parameters;
+    try {
+      const payload = formatGoogleChatMessage(event);
 
-        if (!url) {
-            this.logger.warn(`Missing Google Chat webhook URL for integration ${integrationId}`);
-            await this.registerEvent(integrationId, event, 'failed', 'Missing webhook URL');
-            return;
-        }
+      const response = await this.fetchRetry(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
 
-        try {
-            const payload = formatGoogleChatMessage(event);
+      this.logger.info(
+        `Google Chat notification sent for event ${event.type} (integration: ${integrationId})`
+      );
 
-            const response = await this.fetchRetry(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(payload),
-            });
+      await this.registerEvent(integrationId, event, 'success', '', {
+        url: '***',
+        statusCode: response.status,
+      });
+    } catch (error) {
+      this.logger.error(
+        `Failed to send Google Chat notification for integration ${integrationId}:`,
+        error
+      );
 
-            this.logger.info(
-                `Google Chat notification sent for event ${event.type} (integration: ${integrationId})`
-            );
-
-            await this.registerEvent(integrationId, event, 'success', '', {
-                url: '***',
-                statusCode: response.status,
-            });
-        } catch (error) {
-            this.logger.error(
-                `Failed to send Google Chat notification for integration ${integrationId}:`,
-                error
-            );
-
-            await this.registerFailure(integrationId, event, error, {
-                url: '***',
-            });
-        }
+      await this.registerFailure(integrationId, event, error, {
+        url: '***',
+      });
     }
+  }
 }
 
 export default GoogleChatAddon;

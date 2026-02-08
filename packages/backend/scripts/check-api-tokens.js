@@ -6,15 +6,17 @@ const config = {
   user: process.env.DB_USER || 'root',
   password: process.env.DB_PASSWORD || '',
   database: process.env.DB_NAME || 'gatrix_admin',
-  charset: 'utf8mb4'
+  charset: 'utf8mb4',
 };
 
 async function checkTokens() {
   const connection = await mysql.createConnection(config);
-  
+
   try {
     // Count total tokens
-    const [countResult] = await connection.execute('SELECT COUNT(*) as total FROM g_api_access_tokens');
+    const [countResult] = await connection.execute(
+      'SELECT COUNT(*) as total FROM g_api_access_tokens'
+    );
     console.log(`Total API tokens: ${countResult[0].total}`);
 
     // Count by type
@@ -24,7 +26,7 @@ async function checkTokens() {
       GROUP BY tokenType
     `);
     console.log('\nTokens by type:');
-    typeResult.forEach(row => {
+    typeResult.forEach((row) => {
       console.log(`  ${row.tokenType}: ${row.count}`);
     });
 
@@ -35,7 +37,7 @@ async function checkTokens() {
       GROUP BY isActive
     `);
     console.log('\nTokens by status:');
-    statusResult.forEach(row => {
+    statusResult.forEach((row) => {
       console.log(`  ${row.isActive ? 'Active' : 'Inactive'}: ${row.count}`);
     });
 
@@ -47,10 +49,11 @@ async function checkTokens() {
       LIMIT 10
     `);
     console.log('\nSample tokens (latest 10):');
-    sampleResult.forEach(row => {
-      console.log(`  ${row.tokenName} (${row.tokenType}) - ${row.isActive ? 'Active' : 'Inactive'} - ${row.createdAt}`);
+    sampleResult.forEach((row) => {
+      console.log(
+        `  ${row.tokenName} (${row.tokenType}) - ${row.isActive ? 'Active' : 'Inactive'} - ${row.createdAt}`
+      );
     });
-    
   } catch (error) {
     console.error('Error checking tokens:', error);
   } finally {

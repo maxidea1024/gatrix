@@ -398,25 +398,25 @@ export const CreateIntegrationWizard: React.FC<CreateIntegrationWizardProps> = (
         slotProps={
           isSensitive
             ? {
-              input: {
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      onClick={() =>
-                        setShowSensitive((prev) => ({
-                          ...prev,
-                          [param.name]: !prev[param.name],
-                        }))
-                      }
-                      edge="end"
-                      size="small"
-                    >
-                      {isVisible ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              },
-            }
+                input: {
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() =>
+                          setShowSensitive((prev) => ({
+                            ...prev,
+                            [param.name]: !prev[param.name],
+                          }))
+                        }
+                        edge="end"
+                        size="small"
+                      >
+                        {isVisible ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                },
+              }
             : undefined
         }
       />
@@ -510,7 +510,12 @@ export const CreateIntegrationWizard: React.FC<CreateIntegrationWizardProps> = (
                       >
                         <CardActionArea
                           onClick={() => setSelectedProvider(provider.name)}
-                          sx={{ height: '100%', display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-start' }}
+                          sx={{
+                            height: '100%',
+                            display: 'flex',
+                            alignItems: 'flex-start',
+                            justifyContent: 'flex-start',
+                          }}
                         >
                           <CardContent sx={{ p: 2.5, width: '100%' }}>
                             <Box display="flex" alignItems="center" gap={2}>
@@ -569,7 +574,14 @@ export const CreateIntegrationWizard: React.FC<CreateIntegrationWizardProps> = (
                                   </Typography>
                                 )}
                               </Box>
-                              <Box sx={{ width: 24, display: 'flex', justifyContent: 'center', flexShrink: 0 }}>
+                              <Box
+                                sx={{
+                                  width: 24,
+                                  display: 'flex',
+                                  justifyContent: 'center',
+                                  flexShrink: 0,
+                                }}
+                              >
                                 {isSelected && <CheckIcon sx={{ color: color }} />}
                               </Box>
                             </Box>
@@ -594,7 +606,8 @@ export const CreateIntegrationWizard: React.FC<CreateIntegrationWizardProps> = (
                       borderRadius: 3,
                       border: '1px solid',
                       borderColor: 'divider',
-                      background: (theme) => `linear-gradient(135deg, ${alpha(PROVIDER_COLORS[currentProvider.name.toLowerCase()] || '#607D8B', 0.08)} 0%, ${alpha(theme.palette.background.paper, 0.5)} 100%)`,
+                      background: (theme) =>
+                        `linear-gradient(135deg, ${alpha(PROVIDER_COLORS[currentProvider.name.toLowerCase()] || '#607D8B', 0.08)} 0%, ${alpha(theme.palette.background.paper, 0.5)} 100%)`,
                       display: 'flex',
                       alignItems: 'center',
                       gap: 3,
@@ -612,7 +625,10 @@ export const CreateIntegrationWizard: React.FC<CreateIntegrationWizardProps> = (
                         justifyContent: 'center',
                         flexShrink: 0,
                         border: '1px solid',
-                        borderColor: alpha(PROVIDER_COLORS[currentProvider.name.toLowerCase()] || '#607D8B', 0.1),
+                        borderColor: alpha(
+                          PROVIDER_COLORS[currentProvider.name.toLowerCase()] || '#607D8B',
+                          0.1
+                        ),
                       }}
                     >
                       <Box
@@ -623,7 +639,11 @@ export const CreateIntegrationWizard: React.FC<CreateIntegrationWizardProps> = (
                       />
                     </Box>
                     <Box sx={{ flex: 1 }}>
-                      <Typography variant="h6" fontWeight="bold" sx={{ color: 'text.primary', mb: 0.5 }}>
+                      <Typography
+                        variant="h6"
+                        fontWeight="bold"
+                        sx={{ color: 'text.primary', mb: 0.5 }}
+                      >
                         {t(currentProvider.displayName)}
                       </Typography>
                       <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.5 }}>

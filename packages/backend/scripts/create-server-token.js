@@ -6,7 +6,7 @@ async function createServerToken() {
     host: 'localhost',
     user: 'root',
     password: '',
-    database: 'gatrix'
+    database: 'gatrix',
   });
 
   try {
@@ -35,10 +35,10 @@ async function createServerToken() {
           'server:users:read',
           'server:notifications:send',
           'server:files:upload',
-          'server:chat:manage'
+          'server:chat:manage',
         ]),
         1,
-        1 // Assuming admin user ID is 1
+        1, // Assuming admin user ID is 1
       ]
     );
 
@@ -50,7 +50,6 @@ async function createServerToken() {
     console.log(`GATRIX_API_SECRET=${token}`);
     console.log('');
     console.log('⚠️  Keep this token secure and do not share it!');
-
   } catch (error) {
     console.error('❌ Failed to create server token:', error);
   } finally {

@@ -11,6 +11,7 @@ This document summarizes the fifth round of improvements to the Gatrix system co
 **Problem:** Only Shift+Arrow keys worked for selection. Users couldn't quickly select from cursor to start/end of line.
 
 **Solution:**
+
 - Added Shift+Home handler to select from cursor to beginning of line
 - Added Shift+End handler to select from cursor to end of line
 - Both keyboard event handler and ANSI sequence handler support
@@ -40,7 +41,8 @@ if (e.shiftKey && key === 'end') {
 }
 
 // ANSI sequence handler
-if (data === '\u001b[1;2H') { // Shift+Home
+if (data === '\u001b[1;2H') {
+  // Shift+Home
   if (selectionStartRef.current === null) {
     selectionStartRef.current = cursorRef.current;
   }
@@ -50,7 +52,8 @@ if (data === '\u001b[1;2H') { // Shift+Home
   return;
 }
 
-if (data === '\u001b[1;2F') { // Shift+End
+if (data === '\u001b[1;2F') {
+  // Shift+End
   if (selectionStartRef.current === null) {
     selectionStartRef.current = cursorRef.current;
   }
@@ -62,6 +65,7 @@ if (data === '\u001b[1;2F') { // Shift+End
 ```
 
 **Usage:**
+
 - **Shift+Home**: Select from current cursor position to start of line
 - **Shift+End**: Select from current cursor position to end of line
 
@@ -72,6 +76,7 @@ if (data === '\u001b[1;2F') { // Shift+End
 **Problem:** Console was limited to page layout. Users wanted immersive fullscreen experience.
 
 **Solution:**
+
 - Added fullscreen toggle with Ctrl+Enter
 - Fullscreen mode uses fixed positioning with z-index 9999
 - Removes padding and borders in fullscreen
@@ -96,11 +101,11 @@ if (ctrlOrMeta && key === 'enter') {
 }
 
 // Fullscreen styling
-<Box 
-  sx={{ 
-    p: isFullscreen ? 0 : 2, 
-    height: '100%', 
-    display: 'flex', 
+<Box
+  sx={{
+    p: isFullscreen ? 0 : 2,
+    height: '100%',
+    display: 'flex',
     flexDirection: 'column',
     ...(isFullscreen && {
       position: 'fixed',
@@ -116,6 +121,7 @@ if (ctrlOrMeta && key === 'enter') {
 ```
 
 **Features:**
+
 - **Ctrl+Enter**: Toggle fullscreen on/off
 - **Auto-resize**: Terminal automatically fits to fullscreen dimensions
 - **Clean UI**: No distractions in fullscreen mode
@@ -128,6 +134,7 @@ if (ctrlOrMeta && key === 'enter') {
 **Problem:** Users in fullscreen mode might not know how to exit.
 
 **Solution:**
+
 - Added floating button at top center of screen
 - Button appears on mouse hover at top
 - Shows "Exit Fullscreen (Ctrl+Enter)" message
@@ -195,6 +202,7 @@ if (ctrlOrMeta && key === 'enter') {
 ```
 
 **Features:**
+
 - **Hover to reveal**: Move mouse to top of screen
 - **Auto-hide**: Fades out when mouse moves away
 - **Click to exit**: Single click exits fullscreen
@@ -208,11 +216,13 @@ if (ctrlOrMeta && key === 'enter') {
 **Problem:** Pressing Ctrl+V caused text to be pasted 2-3 times.
 
 **Root Cause:**
+
 - `attachCustomKeyEventHandler` handles Ctrl+V
 - xterm.js might also trigger paste event
 - Multiple paste handlers executing simultaneously
 
 **Solution:**
+
 - Added `isPastingRef` flag to prevent duplicate pastes
 - Flag is set when paste starts
 - Flag is cleared after 100ms timeout
@@ -230,48 +240,56 @@ if (ctrlOrMeta && key === 'v') {
   if (isPastingRef.current) {
     return false;
   }
-  
+
   isPastingRef.current = true;
-  navigator.clipboard?.readText?.().then((text) => {
-    if (!text) {
+  navigator.clipboard
+    ?.readText?.()
+    .then((text) => {
+      if (!text) {
+        isPastingRef.current = false;
+        return;
+      }
+      saveUndo();
+
+      // If there's a selection, replace it
+      if (selectionStartRef.current !== null && selectionEndRef.current !== null) {
+        const start = Math.min(selectionStartRef.current, selectionEndRef.current);
+        const end = Math.max(selectionStartRef.current, selectionEndRef.current);
+        const before = inputBufRef.current.slice(0, start);
+        const after = inputBufRef.current.slice(end);
+        inputBufRef.current = before + text + after;
+        cursorRef.current = start + text.length;
+        selectionStartRef.current = null;
+        selectionEndRef.current = null;
+        redrawLine(term);
+      } else {
+        // Normal paste
+        const before = inputBufRef.current.slice(0, cursorRef.current);
+        const after = inputBufRef.current.slice(cursorRef.current);
+        inputBufRef.current = before + text + after;
+        cursorRef.current += text.length;
+        if (after) {
+          term.write(text + after);
+          term.write(`\u001b[${after.length}D`);
+        } else {
+          term.write(text);
+        }
+      }
+
+      // Reset flag after a short delay
+      setTimeout(() => {
+        isPastingRef.current = false;
+      }, 100);
+    })
+    .catch(() => {
       isPastingRef.current = false;
-      return;
-    }
-    saveUndo();
-    
-    // If there's a selection, replace it
-    if (selectionStartRef.current !== null && selectionEndRef.current !== null) {
-      const start = Math.min(selectionStartRef.current, selectionEndRef.current);
-      const end = Math.max(selectionStartRef.current, selectionEndRef.current);
-      const before = inputBufRef.current.slice(0, start);
-      const after = inputBufRef.current.slice(end);
-      inputBufRef.current = before + text + after;
-      cursorRef.current = start + text.length;
-      selectionStartRef.current = null;
-      selectionEndRef.current = null;
-      redrawLine(term);
-    } else {
-      // Normal paste
-      const before = inputBufRef.current.slice(0, cursorRef.current);
-      const after = inputBufRef.current.slice(cursorRef.current);
-      inputBufRef.current = before + text + after;
-      cursorRef.current += text.length;
-      if (after) { term.write(text + after); term.write(`\u001b[${after.length}D`); }
-      else { term.write(text); }
-    }
-    
-    // Reset flag after a short delay
-    setTimeout(() => {
-      isPastingRef.current = false;
-    }, 100);
-  }).catch(() => {
-    isPastingRef.current = false;
-  });
+    });
   return false;
 }
 ```
 
 **Additional Feature:**
+
 - Paste now supports replacing selected text
 - If text is selected, paste replaces the selection
 - Consistent with standard text editor behavior
@@ -282,18 +300,18 @@ if (ctrlOrMeta && key === 'v') {
 
 ### Keyboard Shortcuts
 
-| Shortcut | Action |
-|----------|--------|
-| **Shift+→** | Extend selection right by one character |
-| **Shift+←** | Extend selection left by one character |
-| **Shift+Home** | Select from cursor to start of line |
-| **Shift+End** | Select from cursor to end of line |
-| **Ctrl/Cmd+C** | Copy selected text (or interrupt if no selection) |
-| **Ctrl/Cmd+V** | Paste (replaces selection if any) |
-| **Backspace** | Delete selected text (or one char if no selection) |
-| **Delete** | Delete selected text (or one char if no selection) |
-| **Any character** | Replace selected text with typed character |
-| **Ctrl+Enter** | Toggle fullscreen mode |
+| Shortcut          | Action                                             |
+| ----------------- | -------------------------------------------------- |
+| **Shift+→**       | Extend selection right by one character            |
+| **Shift+←**       | Extend selection left by one character             |
+| **Shift+Home**    | Select from cursor to start of line                |
+| **Shift+End**     | Select from cursor to end of line                  |
+| **Ctrl/Cmd+C**    | Copy selected text (or interrupt if no selection)  |
+| **Ctrl/Cmd+V**    | Paste (replaces selection if any)                  |
+| **Backspace**     | Delete selected text (or one char if no selection) |
+| **Delete**        | Delete selected text (or one char if no selection) |
+| **Any character** | Replace selected text with typed character         |
+| **Ctrl+Enter**    | Toggle fullscreen mode                             |
 
 ### Visual Feedback
 
@@ -306,6 +324,7 @@ if (ctrlOrMeta && key === 'v') {
 ## Files Modified
 
 ### Frontend
+
 - `packages/frontend/src/pages/admin/SystemConsolePage.tsx`
   - Added `isFullscreen` state (line 87)
   - Added `isPastingRef` flag (line 89)
@@ -325,6 +344,7 @@ if (ctrlOrMeta && key === 'v') {
 ## Testing
 
 ### Build Status
+
 ✅ Frontend build successful
 ✅ No compilation errors
 ✅ No diagnostic issues
@@ -427,12 +447,14 @@ None currently identified.
 ## User Experience Improvements
 
 ### Before
+
 - ❌ Could only select with Shift+Arrow (slow for long lines)
 - ❌ Console limited to page layout
 - ❌ Paste duplicated text 2-3 times
 - ❌ No visual indication of how to exit fullscreen
 
 ### After
+
 - ✅ Quick selection with Shift+Home/End
 - ✅ Fullscreen mode for immersive experience
 - ✅ Paste works correctly (once per press)
@@ -461,4 +483,3 @@ The console now provides a professional, feature-rich terminal experience compar
 3. **Verify paste works correctly** with various clipboard content
 4. **Test floating button** hover behavior
 5. **Restart frontend server** to apply changes
-

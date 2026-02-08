@@ -18,6 +18,7 @@ Send Gatrix events to custom HTTP endpoints.
 ## Authentication
 
 Webhooks support:
+
 - **None** - No authentication
 - **Basic Auth** - Username and password
 - **Bearer Token** - Authorization header with token
@@ -41,13 +42,13 @@ Webhooks support:
 
 ## Events
 
-| Event | Description |
-|-------|-------------|
-| `feature_flag.created` | Flag created |
-| `feature_flag.updated` | Flag updated |
-| `feature_flag.deleted` | Flag deleted |
-| `maintenance.started` | Maintenance started |
-| `maintenance.ended` | Maintenance ended |
+| Event                  | Description         |
+| ---------------------- | ------------------- |
+| `feature_flag.created` | Flag created        |
+| `feature_flag.updated` | Flag updated        |
+| `feature_flag.deleted` | Flag deleted        |
+| `maintenance.started`  | Maintenance started |
+| `maintenance.ended`    | Maintenance ended   |
 
 ## Retry Policy
 

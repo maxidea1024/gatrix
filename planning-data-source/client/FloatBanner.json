@@ -24,10 +24,7 @@
     ":max": {},
     ":enum": {},
     ":links": {
-      "typeTargetId": [
-        "EventPage",
-        "LiveEvent"
-      ]
+      "typeTargetId": ["EventPage", "LiveEvent"]
     }
   },
   "FloatBanner": {

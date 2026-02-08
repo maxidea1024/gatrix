@@ -4,7 +4,7 @@
  * for supporting multi-language product names and descriptions
  */
 
-exports.up = async function(connection) {
+exports.up = async function (connection) {
   console.log('Adding multi-language columns to g_store_products...');
 
   // Check if columns already exist
@@ -108,10 +108,17 @@ exports.up = async function(connection) {
   console.log('✅ Multi-language columns added and data migrated successfully');
 };
 
-exports.down = async function(connection) {
+exports.down = async function (connection) {
   console.log('Removing multi-language columns from g_store_products...');
 
-  const columnsToRemove = ['nameKo', 'nameEn', 'nameZh', 'descriptionKo', 'descriptionEn', 'descriptionZh'];
+  const columnsToRemove = [
+    'nameKo',
+    'nameEn',
+    'nameZh',
+    'descriptionKo',
+    'descriptionEn',
+    'descriptionZh',
+  ];
 
   for (const column of columnsToRemove) {
     try {
@@ -126,4 +133,3 @@ exports.down = async function(connection) {
 };
 
 module.exports = exports;
-

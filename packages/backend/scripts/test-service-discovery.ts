@@ -23,31 +23,25 @@
  *   ETCD_HOSTS: etcd hosts (default: http://localhost:2379)
  */
 
-import { ulid } from "ulid";
-import Redis from "ioredis";
+import { ulid } from 'ulid';
+import Redis from 'ioredis';
 
 // Configuration
-const MODE = process.env.SERVICE_DISCOVERY_MODE || "redis";
-const REDIS_HOST = process.env.REDIS_HOST || "localhost";
-const REDIS_PORT = parseInt(process.env.REDIS_PORT || "6379", 10);
-const ETCD_HOSTS = process.env.ETCD_HOSTS || "http://localhost:2379";
+const MODE = process.env.SERVICE_DISCOVERY_MODE || 'redis';
+const REDIS_HOST = process.env.REDIS_HOST || 'localhost';
+const REDIS_PORT = parseInt(process.env.REDIS_PORT || '6379', 10);
+const ETCD_HOSTS = process.env.ETCD_HOSTS || 'http://localhost:2379';
 
 // etcd client (optional)
 let Etcd3: any;
 try {
-  Etcd3 = require("etcd3").Etcd3;
+  Etcd3 = require('etcd3').Etcd3;
 } catch (e) {
   // etcd3 is optional
 }
 
-const SERVER_TYPES = ["world", "auth", "channel", "chat", "lobby", "match"];
-const STATUSES = [
-  "initializing",
-  "ready",
-  "shutting_down",
-  "error",
-  "terminated",
-] as const;
+const SERVER_TYPES = ['world', 'auth', 'channel', 'chat', 'lobby', 'match'];
+const STATUSES = ['initializing', 'ready', 'shutting_down', 'error', 'terminated'] as const;
 const DEFAULT_TTL = 30; // seconds
 const HEARTBEAT_INTERVAL = 15; // seconds
 const INACTIVE_KEEP_TTL = 60; // How long to keep inactive services visible in UI
@@ -55,29 +49,29 @@ const INACTIVE_KEEP_TTL = 60; // How long to keep inactive services visible in U
 // Custom state templates
 const CUSTOM_STATES = {
   initializing: [
-    "Loading configuration...",
-    "Connecting to database...",
-    "Initializing game world...",
-    "Loading resources {{percent}}%",
-    "Warming up cache...",
+    'Loading configuration...',
+    'Connecting to database...',
+    'Initializing game world...',
+    'Loading resources {{percent}}%',
+    'Warming up cache...',
   ],
   ready: [
-    "Players: {{count}}/{{max}}",
-    "CPU: {{percent}}%",
-    "Memory: {{mb}}MB",
-    "Active sessions: {{count}}",
-    "Idle",
+    'Players: {{count}}/{{max}}',
+    'CPU: {{percent}}%',
+    'Memory: {{mb}}MB',
+    'Active sessions: {{count}}',
+    'Idle',
   ],
   shutting_down: [
-    "Graceful shutdown in progress...",
-    "Saving player data...",
-    "Closing connections...",
+    'Graceful shutdown in progress...',
+    'Saving player data...',
+    'Closing connections...',
   ],
   error: [
-    "Database connection lost",
-    "Out of memory",
-    "Critical error detected",
-    "Service unavailable",
+    'Database connection lost',
+    'Out of memory',
+    'Critical error detected',
+    'Service unavailable',
   ],
 };
 
@@ -119,12 +113,12 @@ let etcdClient: any = null;
  * Initialize storage client
  */
 async function initClient() {
-  if (MODE === "etcd") {
+  if (MODE === 'etcd') {
     if (!Etcd3) {
-      console.error("❌ etcd3 package not installed. Run: npm install etcd3");
+      console.error('❌ etcd3 package not installed. Run: npm install etcd3');
       process.exit(1);
     }
-    etcdClient = new Etcd3({ hosts: ETCD_HOSTS.split(",") });
+    etcdClient = new Etcd3({ hosts: ETCD_HOSTS.split(',') });
     console.log(`✅ Connected to etcd: ${ETCD_HOSTS}`);
   } else {
     redisClient = new Redis({
@@ -152,12 +146,12 @@ function generateInstanceStats(): InstanceStats {
 function generateMeta(type: string): Record<string, any> {
   const meta: Record<string, any> = {};
 
-  if (type === "lobby" || type === "channel" || type === "match") {
+  if (type === 'lobby' || type === 'channel' || type === 'match') {
     meta.userCount = Math.floor(Math.random() * 100);
     meta.maxUsers = 100 + Math.floor(Math.random() * 100);
   }
 
-  if (type === "channel" || type === "match") {
+  if (type === 'channel' || type === 'match') {
     meta.roomCount = Math.floor(Math.random() * 50);
   }
 
@@ -168,13 +162,13 @@ function generateMeta(type: string): Record<string, any> {
  * Generate random server data
  */
 function generateServerData(
-  status: (typeof STATUSES)[number] = "initializing",
-  internalAddress?: string,
+  status: (typeof STATUSES)[number] = 'initializing',
+  internalAddress?: string
 ) {
   const type = SERVER_TYPES[Math.floor(Math.random() * SERVER_TYPES.length)];
   const hostname = `${type}-server-${Math.floor(Math.random() * 1000)}`;
-  const externalAddress = "127.0.0.1";
-  const internal = internalAddress || "localhost";
+  const externalAddress = '127.0.0.1';
+  const internal = internalAddress || 'localhost';
 
   const tcpPort = 3000 + Math.floor(Math.random() * 1000);
   const udpPort = 4000 + Math.floor(Math.random() * 1000);
@@ -202,7 +196,7 @@ function generateServerData(
 async function registerToStorage(server: ActiveServer) {
   // etcd uses / separator, Redis uses :
   const key =
-    MODE === "etcd"
+    MODE === 'etcd'
       ? `/services/${server.type}/${server.instanceId}`
       : `services:${server.type}:${server.instanceId}`;
 
@@ -220,9 +214,9 @@ async function registerToStorage(server: ActiveServer) {
   });
 
   try {
-    if (MODE === "etcd") {
+    if (MODE === 'etcd') {
       if (!etcdClient) {
-        console.error("❌ etcd client not initialized");
+        console.error('❌ etcd client not initialized');
         return;
       }
       const lease = etcdClient.lease(DEFAULT_TTL);
@@ -231,10 +225,7 @@ async function registerToStorage(server: ActiveServer) {
       await redisClient.setex(key, DEFAULT_TTL, value);
     }
   } catch (error) {
-    console.error(
-      `❌ Failed to register ${server.type}:${server.instanceId}:`,
-      error,
-    );
+    console.error(`❌ Failed to register ${server.type}:${server.instanceId}:`, error);
   }
 }
 
@@ -244,7 +235,7 @@ async function registerToStorage(server: ActiveServer) {
 async function updateStatusInStorage(server: ActiveServer) {
   // etcd uses / separator, Redis uses :
   const key =
-    MODE === "etcd"
+    MODE === 'etcd'
       ? `/services/${server.type}/${server.instanceId}`
       : `services:${server.type}:${server.instanceId}`;
 
@@ -266,9 +257,9 @@ async function updateStatusInStorage(server: ActiveServer) {
   });
 
   try {
-    if (MODE === "etcd") {
+    if (MODE === 'etcd') {
       if (!etcdClient) {
-        console.error("❌ etcd client not initialized");
+        console.error('❌ etcd client not initialized');
         return;
       }
       const lease = etcdClient.lease(DEFAULT_TTL);
@@ -277,10 +268,7 @@ async function updateStatusInStorage(server: ActiveServer) {
       await redisClient.setex(key, DEFAULT_TTL, value);
     }
   } catch (error) {
-    console.error(
-      `❌ Failed to update ${server.type}:${server.instanceId}:`,
-      error,
-    );
+    console.error(`❌ Failed to update ${server.type}:${server.instanceId}:`, error);
   }
 }
 
@@ -297,14 +285,14 @@ async function sendHeartbeat(server: ActiveServer) {
 async function unregisterFromStorage(server: ActiveServer) {
   // etcd uses / separator, Redis uses :
   const key =
-    MODE === "etcd"
+    MODE === 'etcd'
       ? `/services/${server.type}/${server.instanceId}`
       : `services:${server.type}:${server.instanceId}`;
 
   try {
-    if (MODE === "etcd") {
+    if (MODE === 'etcd') {
       if (!etcdClient) {
-        console.error("❌ etcd client not initialized");
+        console.error('❌ etcd client not initialized');
         return;
       }
       await etcdClient.delete().key(key);
@@ -312,10 +300,7 @@ async function unregisterFromStorage(server: ActiveServer) {
       await redisClient.del(key);
     }
   } catch (error) {
-    console.error(
-      `❌ Failed to unregister ${server.type}:${server.instanceId}:`,
-      error,
-    );
+    console.error(`❌ Failed to unregister ${server.type}:${server.instanceId}:`, error);
   }
 }
 
@@ -325,10 +310,10 @@ async function unregisterFromStorage(server: ActiveServer) {
 async function registerServer(
   permanent: boolean = false,
   internalAddress?: string,
-  forceLifespan?: number,
+  forceLifespan?: number
 ) {
   try {
-    const serverData = generateServerData("initializing", internalAddress);
+    const serverData = generateServerData('initializing', internalAddress);
     const instanceId = ulid();
 
     // 30% chance of permanent server, or forced permanent
@@ -350,17 +335,17 @@ async function registerServer(
 
     if (isPermanent) {
       console.log(
-        `✅ Server registered: ${server.type}:${server.instanceId} (init delay: ${server.initDelay}ms, lifespan: PERMANENT)`,
+        `✅ Server registered: ${server.type}:${server.instanceId} (init delay: ${server.initDelay}ms, lifespan: PERMANENT)`
       );
     } else {
       console.log(
-        `✅ Server registered: ${server.type}:${server.instanceId} (init delay: ${server.initDelay}ms, lifespan: ${server.lifespan}ms)`,
+        `✅ Server registered: ${server.type}:${server.instanceId} (init delay: ${server.initDelay}ms, lifespan: ${server.lifespan}ms)`
       );
     }
 
     // Simulate initialization delay
     setTimeout(async () => {
-      server.status = "ready";
+      server.status = 'ready';
       await updateStatusInStorage(server);
       console.log(`🟢 Server ready: ${server.type}:${server.instanceId}`);
     }, server.initDelay);
@@ -373,11 +358,11 @@ async function registerServer(
     // Periodic state updates
     server.stateUpdateInterval = setInterval(
       async () => {
-        if (server.status === "ready") {
+        if (server.status === 'ready') {
           await updateStatusInStorage(server);
         }
       },
-      5000 + Math.floor(Math.random() * 5000),
+      5000 + Math.floor(Math.random() * 5000)
     ); // 5-10 seconds
 
     // Schedule crash/shutdown (only for non-permanent servers)
@@ -386,7 +371,7 @@ async function registerServer(
         const willCrash = Math.random() < 0.3; // 30% crash, 70% graceful shutdown
 
         if (willCrash) {
-          server.status = "error";
+          server.status = 'error';
           console.log(`💥 Server crashed: ${server.type}:${server.instanceId}`);
           await updateStatusInStorage(server);
 
@@ -395,22 +380,18 @@ async function registerServer(
             await unregisterServer(server.instanceId, server.type);
           }, 2000);
         } else {
-          server.status = "shutting_down";
-          console.log(
-            `🔴 Server shutting down: ${server.type}:${server.instanceId}`,
-          );
+          server.status = 'shutting_down';
+          console.log(`🔴 Server shutting down: ${server.type}:${server.instanceId}`);
           await updateStatusInStorage(server);
 
           // Change to terminated after 2 seconds
           setTimeout(async () => {
-            server.status = "terminated";
-            console.log(
-              `⚫ Server terminated: ${server.type}:${server.instanceId}`,
-            );
+            server.status = 'terminated';
+            console.log(`⚫ Server terminated: ${server.type}:${server.instanceId}`);
 
             // Update with long TTL (1 hour)
             const key =
-              MODE === "etcd"
+              MODE === 'etcd'
                 ? `/services/${server.type}/${server.instanceId}`
                 : `services:${server.type}:${server.instanceId}`;
 
@@ -427,7 +408,7 @@ async function registerServer(
               updatedAt: new Date().toISOString(),
             });
 
-            if (MODE === "etcd") {
+            if (MODE === 'etcd') {
               const lease = etcdClient.lease(INACTIVE_KEEP_TTL);
               await lease.put(key).value(value);
             } else if (redisClient) {
@@ -435,10 +416,8 @@ async function registerServer(
             }
 
             // Stop heartbeat
-            if (server.heartbeatInterval)
-              clearInterval(server.heartbeatInterval);
-            if (server.stateUpdateInterval)
-              clearInterval(server.stateUpdateInterval);
+            if (server.heartbeatInterval) clearInterval(server.heartbeatInterval);
+            if (server.stateUpdateInterval) clearInterval(server.stateUpdateInterval);
           }, 2000);
         }
       }, server.lifespan);
@@ -446,7 +425,7 @@ async function registerServer(
 
     return server;
   } catch (error: any) {
-    console.error("❌ Failed to register server:", error.message);
+    console.error('❌ Failed to register server:', error.message);
     throw error;
   }
 }
@@ -455,9 +434,7 @@ async function registerServer(
  * Unregister a server
  */
 async function unregisterServer(instanceId: string, type: string) {
-  const index = activeServers.findIndex(
-    (s) => s.instanceId === instanceId && s.type === type,
-  );
+  const index = activeServers.findIndex((s) => s.instanceId === instanceId && s.type === type);
   if (index === -1) {
     console.error(`❌ Server not found: ${type}:${instanceId}`);
     return;
@@ -482,44 +459,44 @@ async function unregisterServer(instanceId: string, type: string) {
  */
 async function listServers() {
   try {
-    if (MODE === "etcd") {
+    if (MODE === 'etcd') {
       if (!etcdClient) {
-        console.error("❌ etcd client not initialized");
+        console.error('❌ etcd client not initialized');
         return;
       }
       // Get all services from etcd
-      const keys = await etcdClient.getAll().prefix("/services/").keys();
+      const keys = await etcdClient.getAll().prefix('/services/').keys();
       console.log(`\n📋 Active Servers (${keys.length}):\n`);
 
       for (const key of keys) {
         const value = await etcdClient.get(key).string();
         if (value) {
           const server = JSON.parse(value);
-          const tcpPorts = server.ports?.tcp?.join(",") || "";
+          const tcpPorts = server.ports?.tcp?.join(',') || '';
           console.log(
-            `  ${server.type}:${server.instanceId} - ${server.status} - ${server.hostname} (${server.internalAddress}:${tcpPorts})`,
+            `  ${server.type}:${server.instanceId} - ${server.status} - ${server.hostname} (${server.internalAddress}:${tcpPorts})`
           );
         }
       }
     } else if (redisClient) {
       // Get all services from Redis
-      const keys = await redisClient.keys("service:instance:*");
+      const keys = await redisClient.keys('service:instance:*');
       console.log(`\n📋 Active Servers (${keys.length}):\n`);
 
       for (const key of keys) {
         const value = await redisClient.get(key);
         if (value) {
           const server = JSON.parse(value);
-          const tcpPorts = server.ports?.tcp?.join(",") || "";
+          const tcpPorts = server.ports?.tcp?.join(',') || '';
           console.log(
-            `  ${server.type}:${server.instanceId} - ${server.status} - ${server.hostname} (${server.internalAddress}:${tcpPorts})`,
+            `  ${server.type}:${server.instanceId} - ${server.status} - ${server.hostname} (${server.internalAddress}:${tcpPorts})`
           );
         }
       }
     }
-    console.log("");
+    console.log('');
   } catch (error) {
-    console.error("❌ Failed to list servers:", error);
+    console.error('❌ Failed to list servers:', error);
   }
 }
 
@@ -532,7 +509,7 @@ async function clearAllServers() {
   for (const server of allServers) {
     await unregisterServer(server.instanceId, server.type);
   }
-  console.log("✅ All servers cleared\n");
+  console.log('✅ All servers cleared\n');
 }
 
 /**
@@ -540,28 +517,28 @@ async function clearAllServers() {
  */
 async function main() {
   const args = process.argv.slice(2);
-  const command = args.find((arg) => arg.startsWith("--"));
-  const count = parseInt(args.find((arg) => !arg.startsWith("--")) || "1", 10);
+  const command = args.find((arg) => arg.startsWith('--'));
+  const count = parseInt(args.find((arg) => !arg.startsWith('--')) || '1', 10);
 
   // Parse optional lifespan parameters
   let minLifespan: number | undefined;
   let maxLifespan: number | undefined;
 
   for (let i = 0; i < args.length; i++) {
-    if (args[i] === "--min-lifespan" && args[i + 1]) {
+    if (args[i] === '--min-lifespan' && args[i + 1]) {
       minLifespan = parseInt(args[i + 1], 10);
-    } else if (args[i] === "--max-lifespan" && args[i + 1]) {
+    } else if (args[i] === '--max-lifespan' && args[i + 1]) {
       maxLifespan = parseInt(args[i + 1], 10);
     }
   }
 
-  console.log("\n🚀 Service Discovery Test Script");
+  console.log('\n🚀 Service Discovery Test Script');
   console.log(`Mode: ${MODE}\n`);
 
   // Initialize client
   await initClient();
 
-  if (command === "--spawn") {
+  if (command === '--spawn') {
     console.log(`\nSpawning ${count} dummy servers...\n`);
     if (minLifespan && maxLifespan) {
       console.log(`Lifespan: ${minLifespan}ms - ${maxLifespan}ms\n`);
@@ -569,8 +546,7 @@ async function main() {
     for (let i = 0; i < count; i++) {
       let lifespan: number | undefined;
       if (minLifespan && maxLifespan) {
-        lifespan =
-          minLifespan + Math.floor(Math.random() * (maxLifespan - minLifespan));
+        lifespan = minLifespan + Math.floor(Math.random() * (maxLifespan - minLifespan));
       }
       await registerServer(false, undefined, lifespan);
       // Small delay between spawns
@@ -579,11 +555,11 @@ async function main() {
     console.log(`\n✅ ${count} servers spawned\n`);
 
     // Keep running
-    console.log("Press Ctrl+C to stop and cleanup...\n");
+    console.log('Press Ctrl+C to stop and cleanup...\n');
 
     // Cleanup on exit
-    process.on("SIGINT", async () => {
-      console.log("\n\n🛑 Shutting down...\n");
+    process.on('SIGINT', async () => {
+      console.log('\n\n🛑 Shutting down...\n');
 
       // Unregister all servers
       const allServers = [...activeServers];
@@ -591,26 +567,26 @@ async function main() {
         await unregisterServer(server.instanceId, server.type);
       }
 
-      console.log("\n✅ Cleanup complete\n");
+      console.log('\n✅ Cleanup complete\n');
       process.exit(0);
     });
-  } else if (command === "--list") {
+  } else if (command === '--list') {
     await listServers();
     process.exit(0);
-  } else if (command === "--clear") {
+  } else if (command === '--clear') {
     await clearAllServers();
     process.exit(0);
   } else {
-    console.log("Usage:");
-    console.log("  ts-node scripts/test-service-discovery.ts --spawn 5");
-    console.log("  ts-node scripts/test-service-discovery.ts --list");
-    console.log("  ts-node scripts/test-service-discovery.ts --clear");
-    console.log("");
+    console.log('Usage:');
+    console.log('  ts-node scripts/test-service-discovery.ts --spawn 5');
+    console.log('  ts-node scripts/test-service-discovery.ts --list');
+    console.log('  ts-node scripts/test-service-discovery.ts --clear');
+    console.log('');
     process.exit(1);
   }
 }
 
 main().catch((error) => {
-  console.error("Fatal error:", error);
+  console.error('Fatal error:', error);
   process.exit(1);
 });

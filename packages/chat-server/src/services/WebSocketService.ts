@@ -1,18 +1,18 @@
-import { Server as SocketIOServer, Socket } from "socket.io";
-import { createAdapter } from "@socket.io/redis-adapter";
-import http from "http";
-import jwt from "jsonwebtoken";
-import express from "express";
-import { config } from "../config";
-import { redisManager } from "../config/redis";
-import BroadcastService from "./BroadcastService";
-import { getMetrics } from "./MetricsService";
-import { CacheService } from "./CacheService";
-import { UserService } from "./UserService";
-import { createLogger } from "../config/logger";
-import { SocketUser, WebSocketEvent } from "../types/chat";
+import { Server as SocketIOServer, Socket } from 'socket.io';
+import { createAdapter } from '@socket.io/redis-adapter';
+import http from 'http';
+import jwt from 'jsonwebtoken';
+import express from 'express';
+import { config } from '../config';
+import { redisManager } from '../config/redis';
+import BroadcastService from './BroadcastService';
+import { getMetrics } from './MetricsService';
+import { CacheService } from './CacheService';
+import { UserService } from './UserService';
+import { createLogger } from '../config/logger';
+import { SocketUser, WebSocketEvent } from '../types/chat';
 
-const logger = createLogger("WebSocketService");
+const logger = createLogger('WebSocketService');
 
 export class WebSocketService {
   private io: SocketIOServer;
@@ -42,14 +42,9 @@ export class WebSocketService {
     this.setupEventHandlers();
 
     // BroadcastService singleton 생성
-    this.broadcastService = BroadcastService.createInstance(
-      this.io,
-      this.serverId,
-    );
+    this.broadcastService = BroadcastService.createInstance(this.io, this.serverId);
 
-    logger.info(
-      `WebSocket service initialized with server ID: ${this.serverId}`,
-    );
+    logger.info(`WebSocket service initialized with server ID: ${this.serverId}`);
   }
 
   private async setupRedisAdapter(): Promise<void> {
@@ -58,9 +53,9 @@ export class WebSocketService {
       const subClient = redisManager.getSubClient();
 
       this.io.adapter(createAdapter(pubClient, subClient) as any);
-      logger.info("Redis adapter configured for Socket.IO");
+      logger.info('Redis adapter configured for Socket.IO');
     } catch (error) {
-      logger.error("Failed to setup Redis adapter:", error);
+      logger.error('Failed to setup Redis adapter:', error);
     }
   }
 
@@ -70,24 +65,24 @@ export class WebSocketService {
       try {
         const token =
           socket.handshake.auth.token ||
-          socket.handshake.headers.authorization?.replace("Bearer ", "");
+          socket.handshake.headers.authorization?.replace('Bearer ', '');
 
         if (!token) {
-          return next(new Error("Authentication token required"));
+          return next(new Error('Authentication token required'));
         }
 
         // Backend JWT 토큰 검증 (간단한 검증)
         const payload = jwt.decode(token) as any;
 
         if (!payload || !payload.userId) {
-          return next(new Error("Invalid token format"));
+          return next(new Error('Invalid token format'));
         }
 
         // 데이터베이스에서 사용자 정보 확인
         const userData = await UserService.getUserById(payload.userId);
 
         if (!userData) {
-          return next(new Error("User not found in chat server"));
+          return next(new Error('User not found in chat server'));
         }
 
         // 사용자 정보를 소켓에 저장
@@ -100,13 +95,11 @@ export class WebSocketService {
           avatarUrl: userData.avatarUrl,
         };
 
-        logger.info(
-          `🔌 User ${userData.id} (${userData.username}) connected via WebSocket`,
-        );
+        logger.info(`🔌 User ${userData.id} (${userData.username}) connected via WebSocket`);
         next();
       } catch (error) {
-        logger.error("Socket authentication failed:", error);
-        next(new Error("Authentication failed"));
+        logger.error('Socket authentication failed:', error);
+        next(new Error('Authentication failed'));
       }
     });
 
@@ -123,19 +116,19 @@ export class WebSocketService {
         await cacheService.set(rateLimitKey, current.toString(), 60 * 1000); // 1분 TTL
 
         if (current > config.rateLimit.maxRequests) {
-          return next(new Error("Rate limit exceeded"));
+          return next(new Error('Rate limit exceeded'));
         }
 
         next();
       } catch (error) {
-        logger.error("Rate limiting error:", error);
+        logger.error('Rate limiting error:', error);
         next();
       }
     });
   }
 
   private setupEventHandlers(): void {
-    this.io.on("connection", (socket: Socket) => {
+    this.io.on('connection', (socket: Socket) => {
       this.handleConnection(socket);
     });
 
@@ -162,8 +155,8 @@ export class WebSocketService {
         userId,
         channels: new Set(),
         lastActivity: new Date(),
-        deviceType: this.getDeviceType(socket.handshake.headers["user-agent"]),
-        userAgent: socket.handshake.headers["user-agent"],
+        deviceType: this.getDeviceType(socket.handshake.headers['user-agent']),
+        userAgent: socket.handshake.headers['user-agent'],
         ipAddress: socket.handshake.address,
       };
 
@@ -176,15 +169,11 @@ export class WebSocketService {
       this.userSockets.get(userId)!.add(socket.id);
 
       // 사용자 온라인 상태 업데이트
-      await UserService.updateUserStatus(userId, "online");
+      await UserService.updateUserStatus(userId, 'online');
 
       // 캐시에 소켓 정보 저장
       const cacheService = CacheService.getInstance();
-      await cacheService.set(
-        `socket:${userId}:${socket.id}`,
-        this.serverId,
-        24 * 60 * 60 * 1000,
-      ); // 24시간
+      await cacheService.set(`socket:${userId}:${socket.id}`, this.serverId, 24 * 60 * 60 * 1000); // 24시간
 
       // 사용자를 개인 룸에 추가
       socket.join(`user:${userId}`);
@@ -195,7 +184,7 @@ export class WebSocketService {
       this.setupSocketEventHandlers(socket, socketUser);
 
       // 연결 성공 응답
-      socket.emit("connected", {
+      socket.emit('connected', {
         serverId: this.serverId,
         socketId: socket.id,
         timestamp: Date.now(),
@@ -204,10 +193,7 @@ export class WebSocketService {
       // 메트릭스 업데이트
       const metrics = getMetrics(this.app);
       if (metrics.connectedUsers) {
-        metrics.connectedUsers.set(
-          { server_id: this.serverId },
-          this.connectedUsers.size,
-        );
+        metrics.connectedUsers.set({ server_id: this.serverId }, this.connectedUsers.size);
       }
     } catch (error) {
       logger.error(`Error handling connection for user ${userId}:`, error);
@@ -215,109 +201,84 @@ export class WebSocketService {
     }
   }
 
-  private setupSocketEventHandlers(
-    socket: Socket,
-    socketUser: SocketUser,
-  ): void {
+  private setupSocketEventHandlers(socket: Socket, socketUser: SocketUser): void {
     // 채널 참여
-    socket.on("join_channel", async (data: { channelId: number }) => {
+    socket.on('join_channel', async (data: { channelId: number }) => {
       try {
         await this.handleJoinChannel(socket, socketUser, data.channelId);
       } catch (error) {
-        logger.error("Error joining channel:", error);
-        socket.emit("error", { message: "Failed to join channel" });
+        logger.error('Error joining channel:', error);
+        socket.emit('error', { message: 'Failed to join channel' });
       }
     });
 
     // 채널 나가기
-    socket.on("leave_channel", async (data: { channelId: number }) => {
+    socket.on('leave_channel', async (data: { channelId: number }) => {
       try {
         await this.handleLeaveChannel(socket, socketUser, data.channelId);
       } catch (error) {
-        logger.error("Error leaving channel:", error);
-        socket.emit("error", { message: "Failed to leave channel" });
+        logger.error('Error leaving channel:', error);
+        socket.emit('error', { message: 'Failed to leave channel' });
       }
     });
 
     // 메시지 전송
-    socket.on("send_message", async (data: any) => {
+    socket.on('send_message', async (data: any) => {
       try {
         await this.handleSendMessage(socket, socketUser, data);
       } catch (error) {
-        logger.error("Error sending message:", error);
-        socket.emit("error", { message: "Failed to send message" });
+        logger.error('Error sending message:', error);
+        socket.emit('error', { message: 'Failed to send message' });
       }
     });
 
     // 타이핑 시작
-    socket.on(
-      "start_typing",
-      async (data: { channelId: number; threadId?: number }) => {
-        try {
-          await this.handleStartTyping(
-            socket,
-            socketUser,
-            data.channelId,
-            data.threadId,
-          );
-        } catch (error) {
-          logger.error("Error starting typing:", error);
-        }
-      },
-    );
+    socket.on('start_typing', async (data: { channelId: number; threadId?: number }) => {
+      try {
+        await this.handleStartTyping(socket, socketUser, data.channelId, data.threadId);
+      } catch (error) {
+        logger.error('Error starting typing:', error);
+      }
+    });
 
     // 타이핑 중지
-    socket.on(
-      "stop_typing",
-      async (data: { channelId: number; threadId?: number }) => {
-        try {
-          await this.handleStopTyping(
-            socket,
-            socketUser,
-            data.channelId,
-            data.threadId,
-          );
-        } catch (error) {
-          logger.error("Error stopping typing:", error);
-        }
-      },
-    );
+    socket.on('stop_typing', async (data: { channelId: number; threadId?: number }) => {
+      try {
+        await this.handleStopTyping(socket, socketUser, data.channelId, data.threadId);
+      } catch (error) {
+        logger.error('Error stopping typing:', error);
+      }
+    });
 
     // 메시지 읽음 처리
-    socket.on(
-      "mark_read",
-      async (data: { channelId: number; messageId: number }) => {
-        try {
-          await this.handleMarkRead(socket, socketUser, data);
-        } catch (error) {
-          logger.error("Error marking message as read:", error);
-        }
-      },
-    );
+    socket.on('mark_read', async (data: { channelId: number; messageId: number }) => {
+      try {
+        await this.handleMarkRead(socket, socketUser, data);
+      } catch (error) {
+        logger.error('Error marking message as read:', error);
+      }
+    });
 
     // 사용자 상태 변경
-    socket.on(
-      "update_status",
-      async (data: { status: string; customStatus?: string }) => {
-        try {
-          await this.handleUpdateStatus(socket, socketUser, data);
-        } catch (error) {
-          logger.error("Error updating status:", error);
-        }
-      },
-    );
+    socket.on('update_status', async (data: { status: string; customStatus?: string }) => {
+      try {
+        await this.handleUpdateStatus(socket, socketUser, data);
+      } catch (error) {
+        logger.error('Error updating status:', error);
+      }
+    });
 
     // 연결 해제
-    socket.on("disconnect", async (reason: string) => {
+    socket.on('disconnect', async (reason: string) => {
       try {
         await this.handleDisconnection(socket, socketUser, reason);
       } catch (error) {
-        logger.error("Error handling disconnection:", error);
+        logger.error('Error handling disconnection:', error);
       }
     });
 
     // 활동 업데이트
-    socket.on("activity", () => {
+    socket.on('activity', () => {
       socketUser.lastActivity = new Date();
     });
 
@@ -327,30 +288,27 @@ export class WebSocketService {
   private async handleJoinChannel(
     socket: Socket,
     socketUser: SocketUser,
-    channelId: number,
+    channelId: number
   ): Promise<void> {
     // 채널 권한 검사
-    const { ChannelModel } = require("../models/Channel");
+    const { ChannelModel } = require('../models/Channel');
 
     try {
       const channel = await ChannelModel.findById(channelId);
       if (!channel) {
-        socket.emit("error", { message: "Channel not found" });
+        socket.emit('error', { message: 'Channel not found' });
         return;
       }
 
       // 채널 멤버인지 확인
-      const isMember = await ChannelModel.isMember(
-        channelId,
-        socketUser.userId,
-      );
-      if (!isMember && channel.type !== "public") {
-        socket.emit("error", { message: "Access denied to channel" });
+      const isMember = await ChannelModel.isMember(channelId, socketUser.userId);
+      if (!isMember && channel.type !== 'public') {
+        socket.emit('error', { message: 'Access denied to channel' });
         return;
       }
     } catch (error) {
-      logger.error("Error checking channel permissions:", error);
-      socket.emit("error", { message: "Failed to join channel" });
+      logger.error('Error checking channel permissions:', error);
+      socket.emit('error', { message: 'Failed to join channel' });
       return;
     }
 
@@ -362,52 +320,50 @@ export class WebSocketService {
     await cacheService.set(
       `channel_member:${channelId}:${socketUser.userId}`,
       true,
-      24 * 60 * 60 * 1000,
+      24 * 60 * 60 * 1000
     ); // 24시간
 
     // 채널 참여 알림
-    await this.broadcastService.broadcastToChannel(channelId, "user_joined", {
+    await this.broadcastService.broadcastToChannel(channelId, 'user_joined', {
       userId: socketUser.userId,
       channelId,
       timestamp: Date.now(),
     });
 
-    socket.emit("channel_joined", { channelId });
+    socket.emit('channel_joined', { channelId });
     logger.info(`User ${socketUser.userId} joined channel ${channelId}`);
   }
 
   private async handleLeaveChannel(
     socket: Socket,
     socketUser: SocketUser,
-    channelId: number,
+    channelId: number
   ): Promise<void> {
     socket.leave(`channel:${channelId}`);
     socketUser.channels.delete(channelId);
 
     // 캐시에서 채널 멤버십 제거
     const cacheService = CacheService.getInstance();
-    await cacheService.delete(
-      `channel_member:${channelId}:${socketUser.userId}`,
-    );
+    await cacheService.delete(`channel_member:${channelId}:${socketUser.userId}`);
 
     // 채널 나가기 알림
-    await this.broadcastService.broadcastToChannel(channelId, "user_left", {
+    await this.broadcastService.broadcastToChannel(channelId, 'user_left', {
       userId: socketUser.userId,
       channelId,
       timestamp: Date.now(),
     });
 
-    socket.emit("channel_left", { channelId });
+    socket.emit('channel_left', { channelId });
     logger.info(`User ${socketUser.userId} left channel ${channelId}`);
   }
 
   private async handleSendMessage(
     socket: Socket,
     socketUser: SocketUser,
-    data: any,
+    data: any
   ): Promise<void> {
     // 메시지 저장 로직
-    const { MessageModel } = require("../models/MessageModel");
+    const { MessageModel } = require('../models/MessageModel');
 
     try {
       // 데이터베이스에 메시지 저장
@@ -415,7 +371,7 @@ export class WebSocketService {
         channelId: data.channelId,
         userId: socketUser.userId,
         content: data.content,
-        contentType: data.contentType || "text",
+        contentType: data.contentType || 'text',
         messageData: data.messageData,
         parentMessageId: data.parentMessageId || null,
         threadId: data.threadId || null,
@@ -429,23 +385,19 @@ export class WebSocketService {
         channelId: data.channelId,
         userId: socketUser.userId,
         content: data.content,
-        contentType: data.contentType || "text",
+        contentType: data.contentType || 'text',
         messageData: data.messageData,
         createdAt: savedMessage.createdAt,
         user: {
           id: socketUser.userId,
-          name: userData?.name || userData?.username || "Unknown User",
-          username: userData?.username || "Unknown",
+          name: userData?.name || userData?.username || 'Unknown User',
+          username: userData?.username || 'Unknown',
           avatarUrl: userData?.avatarUrl,
         },
       };
 
       // 채널에 메시지 브로드캐스트
-      await this.broadcastService.broadcastToChannel(
-        data.channelId,
-        "new_message",
-        message,
-      );
+      await this.broadcastService.broadcastToChannel(data.channelId, 'new_message', message);
 
       // 메트릭스 기록
       const metrics = getMetrics(this.app);
@@ -453,14 +405,14 @@ export class WebSocketService {
         metrics.messagesPerSecond.inc({
           server_id: this.serverId,
           channel_id: data.channelId.toString(),
-          message_type: data.contentType || "text",
+          message_type: data.contentType || 'text',
         });
       }
 
-      socket.emit("message_sent", { messageId: savedMessage.id });
+      socket.emit('message_sent', { messageId: savedMessage.id });
     } catch (error) {
-      logger.error("Error saving message:", error);
-      socket.emit("error", { message: "Failed to send message" });
+      logger.error('Error saving message:', error);
+      socket.emit('error', { message: 'Failed to send message' });
       return;
     }
   }
@@ -469,7 +421,7 @@ export class WebSocketService {
     socket: Socket,
     socketUser: SocketUser,
     channelId: number,
-    threadId?: number,
+    threadId?: number
   ): Promise<void> {
     const typingData = {
       userId: socketUser.userId,
@@ -479,7 +431,7 @@ export class WebSocketService {
     };
 
     // 스레드 타이핑인지 일반 채팅 타이핑인지 구분하여 이벤트 전송
-    const eventName = threadId ? "user_typing_thread" : "user_typing";
+    const eventName = threadId ? 'user_typing_thread' : 'user_typing';
     socket.to(`channel:${channelId}`).emit(eventName, typingData);
 
     // 캐시에 타이핑 상태 저장 (TTL 5초)
@@ -494,7 +446,7 @@ export class WebSocketService {
     socket: Socket,
     socketUser: SocketUser,
     channelId: number,
-    threadId?: number,
+    threadId?: number
   ): Promise<void> {
     const typingData = {
       userId: socketUser.userId,
@@ -504,7 +456,7 @@ export class WebSocketService {
     };
 
     // 스레드 타이핑인지 일반 채팅 타이핑인지 구분하여 이벤트 전송
-    const eventName = threadId ? "user_stop_typing_thread" : "user_stop_typing";
+    const eventName = threadId ? 'user_stop_typing_thread' : 'user_stop_typing';
     socket.to(`channel:${channelId}`).emit(eventName, typingData);
 
     // 캐시에서 타이핑 상태 제거
@@ -518,25 +470,19 @@ export class WebSocketService {
   private async handleMarkRead(
     socket: Socket,
     socketUser: SocketUser,
-    data: { channelId: number; messageId: number },
+    data: { channelId: number; messageId: number }
   ): Promise<void> {
     // 데이터베이스에 읽음 상태 업데이트
     try {
-      const {
-        MessageReadStatusModel,
-      } = require("../models/MessageReadStatusModel");
+      const { MessageReadStatusModel } = require('../models/MessageReadStatusModel');
 
-      await MessageReadStatusModel.markAsRead(
-        data.messageId,
-        socketUser.userId,
-        data.channelId,
-      );
+      await MessageReadStatusModel.markAsRead(data.messageId, socketUser.userId, data.channelId);
     } catch (error) {
-      logger.error("Error updating read status:", error);
+      logger.error('Error updating read status:', error);
     }
 
     // 채널의 다른 사용자들에게 읽음 상태 알림
-    socket.to(`channel:${data.channelId}`).emit("message_read", {
+    socket.to(`channel:${data.channelId}`).emit('message_read', {
       userId: socketUser.userId,
       channelId: data.channelId,
       messageId: data.messageId,
@@ -547,18 +493,18 @@ export class WebSocketService {
   private async handleUpdateStatus(
     socket: Socket,
     socketUser: SocketUser,
-    data: { status: string; customStatus?: string },
+    data: { status: string; customStatus?: string }
   ): Promise<void> {
     // 사용자 상태 업데이트
     await UserService.updateUserStatus(
       socketUser.userId,
-      data.status as "online" | "away" | "busy" | "offline",
-      data.customStatus,
+      data.status as 'online' | 'away' | 'busy' | 'offline',
+      data.customStatus
     );
 
     // 모든 채널에 상태 변경 알림
     for (const channelId of socketUser.channels) {
-      socket.to(`channel:${channelId}`).emit("user_status_changed", {
+      socket.to(`channel:${channelId}`).emit('user_status_changed', {
         userId: socketUser.userId,
         status: data.status,
         customStatus: data.customStatus,
@@ -570,7 +516,7 @@ export class WebSocketService {
   private async handleDisconnection(
     socket: Socket,
     socketUser: SocketUser,
-    reason: string,
+    reason: string
   ): Promise<void> {
     // 연결된 사용자 목록에서 제거
     this.connectedUsers.delete(socket.id);
@@ -582,14 +528,14 @@ export class WebSocketService {
       if (userSocketSet.size === 0) {
         this.userSockets.delete(socketUser.userId);
         // 마지막 연결이 끊어진 경우 오프라인 상태로 변경
-        await UserService.updateUserStatus(socketUser.userId, "offline");
+        await UserService.updateUserStatus(socketUser.userId, 'offline');
         await UserService.updateLastSeen(socketUser.userId);
       }
     }
 
     // 모든 채널에서 나가기 알림
     for (const channelId of socketUser.channels) {
-      socket.to(`channel:${channelId}`).emit("user_left", {
+      socket.to(`channel:${channelId}`).emit('user_left', {
         userId: socketUser.userId,
         channelId,
         timestamp: Date.now(),
@@ -599,24 +545,21 @@ export class WebSocketService {
     // 메트릭스 업데이트
     const metrics = getMetrics(this.app);
     if (metrics.connectedUsers) {
-      metrics.connectedUsers.set(
-        { server_id: this.serverId },
-        this.connectedUsers.size,
-      );
+      metrics.connectedUsers.set({ server_id: this.serverId }, this.connectedUsers.size);
     }
 
     logger.info(`User ${socketUser.userId} disconnected: ${reason}`);
   }
 
-  private getDeviceType(userAgent?: string): "web" | "mobile" | "desktop" {
-    if (!userAgent) return "web";
+  private getDeviceType(userAgent?: string): 'web' | 'mobile' | 'desktop' {
+    if (!userAgent) return 'web';
 
     if (/Mobile|Android|iPhone|iPad/.test(userAgent)) {
-      return "mobile";
+      return 'mobile';
     } else if (/Electron/.test(userAgent)) {
-      return "desktop";
+      return 'desktop';
     }
-    return "web";
+    return 'web';
   }
 
   private updateServerMetrics(): void {
@@ -635,15 +578,12 @@ export class WebSocketService {
       metrics.connectedUsers.set({ server_id: this.serverId }, connectedCount);
     }
     if (metrics.activeChannels) {
-      metrics.activeChannels.set(
-        { server_id: this.serverId },
-        channelCounts.size,
-      );
+      metrics.activeChannels.set({ server_id: this.serverId }, channelCounts.size);
     }
     if (metrics.websocketConnections) {
       metrics.websocketConnections.set(
-        { server_id: this.serverId, transport: "websocket" },
-        connectedCount,
+        { server_id: this.serverId, transport: 'websocket' },
+        connectedCount
       );
     }
   }
@@ -664,19 +604,11 @@ export class WebSocketService {
   }
 
   // 외부에서 사용할 수 있는 메서드들
-  public async sendToUser(
-    userId: number,
-    event: string,
-    data: any,
-  ): Promise<void> {
+  public async sendToUser(userId: number, event: string, data: any): Promise<void> {
     this.io.to(`user:${userId}`).emit(event, data);
   }
 
-  public async sendToChannel(
-    channelId: number,
-    event: string,
-    data: any,
-  ): Promise<void> {
+  public async sendToChannel(channelId: number, event: string, data: any): Promise<void> {
     this.io.to(`channel:${channelId}`).emit(event, data);
   }
 
@@ -695,7 +627,7 @@ export class WebSocketService {
   }
 
   public async shutdown(): Promise<void> {
-    logger.info("Shutting down WebSocket service...");
+    logger.info('Shutting down WebSocket service...');
 
     // 모든 연결 종료
     this.io.disconnectSockets(true);
@@ -706,7 +638,7 @@ export class WebSocketService {
     // 서버 종료
     this.io.close();
 
-    logger.info("WebSocket service shutdown complete");
+    logger.info('WebSocket service shutdown complete');
   }
 
   public getIO(): any {

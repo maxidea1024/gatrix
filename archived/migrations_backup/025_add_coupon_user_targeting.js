@@ -6,13 +6,12 @@
  * from the initial schema (012_create_coupon_system).
  */
 
-exports.up = async function(connection) {
+exports.up = async function (connection) {
   console.log('Skipping: coupon system already has user ID targeting support');
   // No-op: columns and tables already exist
 };
 
-exports.down = async function(connection) {
+exports.down = async function (connection) {
   console.log('Skipping rollback: no changes were made in this migration');
   // No-op: nothing to rollback
 };
-

@@ -37,10 +37,7 @@
  * // }
  * ```
  */
-export function toDots(
-  obj: Record<string, any>,
-  prefix: string = "",
-): Record<string, string> {
+export function toDots(obj: Record<string, any>, prefix: string = ''): Record<string, string> {
   const result: Record<string, string> = {};
 
   for (const [key, value] of Object.entries(obj)) {
@@ -56,7 +53,7 @@ export function toDots(
       result[newKey] = JSON.stringify(value);
     }
     // 객체는 재귀적으로 평탄화
-    else if (typeof value === "object" && value !== null) {
+    else if (typeof value === 'object' && value !== null) {
       // Date 객체는 ISO 문자열로 변환
       if (value instanceof Date) {
         result[newKey] = value.toISOString();
@@ -103,7 +100,7 @@ export function fromDots(obj: Record<string, string>): Record<string, any> {
   const result: Record<string, any> = {};
 
   for (const [key, value] of Object.entries(obj)) {
-    const keys = key.split(".");
+    const keys = key.split('.');
     let current = result;
 
     for (let i = 0; i < keys.length - 1; i++) {
@@ -187,7 +184,7 @@ export function removeEmpty(obj: Record<string, any>): Record<string, any> {
 
   for (const [key, value] of Object.entries(obj)) {
     // null, undefined, 빈 문자열 제거
-    if (value === null || value === undefined || value === "") {
+    if (value === null || value === undefined || value === '') {
       continue;
     }
 
@@ -197,11 +194,7 @@ export function removeEmpty(obj: Record<string, any>): Record<string, any> {
     }
 
     // 빈 객체 제거
-    if (
-      typeof value === "object" &&
-      !Array.isArray(value) &&
-      Object.keys(value).length === 0
-    ) {
+    if (typeof value === 'object' && !Array.isArray(value) && Object.keys(value).length === 0) {
       continue;
     }
 
@@ -216,20 +209,20 @@ export function removeEmpty(obj: Record<string, any>): Record<string, any> {
  * 이 필드들은 ClickHouse에서 LowCardinality 타입으로 저장됩니다.
  */
 export const LOW_CARDINALITY_FIELDS = [
-  "name",
-  "country",
-  "region",
-  "os",
-  "osVersion",
-  "browser",
-  "browserVersion",
-  "device",
-  "brand",
-  "model",
-  "referrerType",
-  "utmSource",
-  "utmMedium",
-  "utmCampaign",
+  'name',
+  'country',
+  'region',
+  'os',
+  'osVersion',
+  'browser',
+  'browserVersion',
+  'device',
+  'brand',
+  'model',
+  'referrerType',
+  'utmSource',
+  'utmMedium',
+  'utmCampaign',
 ] as const;
 
 /**
@@ -238,23 +231,23 @@ export const LOW_CARDINALITY_FIELDS = [
 export const COMPRESSED_FIELDS = {
   // ZSTD(3) 압축
   zstd: [
-    "projectId",
-    "deviceId",
-    "profileId",
-    "path",
-    "origin",
-    "referrer",
-    "referrerName",
-    "userAgent",
+    'projectId',
+    'deviceId',
+    'profileId',
+    'path',
+    'origin',
+    'referrer',
+    'referrerName',
+    'userAgent',
   ],
   // LZ4 압축
-  lz4: ["sessionId"],
+  lz4: ['sessionId'],
   // Delta + LZ4 압축 (시계열 데이터)
-  delta: ["duration", "screenViews"],
+  delta: ['duration', 'screenViews'],
   // DoubleDelta + ZSTD 압축 (타임스탬프)
-  doubleDelta: ["createdAt", "timestamp"],
+  doubleDelta: ['createdAt', 'timestamp'],
   // Gorilla + LZ4 압축 (Float 시계열)
-  gorilla: ["latitude", "longitude"],
+  gorilla: ['latitude', 'longitude'],
 } as const;
 
 /**
@@ -263,13 +256,11 @@ export const COMPRESSED_FIELDS = {
  * @param event - 정규화할 이벤트
  * @returns 정규화된 이벤트
  */
-export function normalizeEvent(
-  event: Record<string, any>,
-): Record<string, any> {
+export function normalizeEvent(event: Record<string, any>): Record<string, any> {
   const normalized = { ...event };
 
   // properties를 평탄화
-  if (normalized.properties && typeof normalized.properties === "object") {
+  if (normalized.properties && typeof normalized.properties === 'object') {
     normalized.properties = toDots(normalized.properties);
   }
 
@@ -283,8 +274,6 @@ export function normalizeEvent(
  * @param events - 정규화할 이벤트 배열
  * @returns 정규화된 이벤트 배열
  */
-export function normalizeEvents(
-  events: Record<string, any>[],
-): Record<string, any>[] {
+export function normalizeEvents(events: Record<string, any>[]): Record<string, any>[] {
   return events.map(normalizeEvent);
 }

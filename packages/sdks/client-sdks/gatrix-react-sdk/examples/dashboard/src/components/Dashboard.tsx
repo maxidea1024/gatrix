@@ -34,7 +34,8 @@ interface Stats {
 
 function Dashboard({ config }: DashboardProps) {
   const flags = useFlags();
-  const { flagsReady, flagsError, isExplicitSync, canSyncFlags, fetchFlags, syncFlags } = useGatrixContext();
+  const { flagsReady, flagsError, isExplicitSync, canSyncFlags, fetchFlags, syncFlags } =
+    useGatrixContext();
   const client = useGatrixClient();
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
   const [stats, setStats] = useState<Stats | null>(null);
@@ -128,10 +129,7 @@ function Dashboard({ config }: DashboardProps) {
   return (
     <div className={`dashboard-content ${showRecoveryEffect ? 'recovery-shimmer' : ''}`}>
       {selectedFlag && (
-        <FlagDetailModal
-          flag={selectedFlag}
-          onClose={() => setSelectedFlag(null)}
-        />
+        <FlagDetailModal flag={selectedFlag} onClose={() => setSelectedFlag(null)} />
       )}
       <StatsPanel
         config={config}
@@ -150,18 +148,27 @@ function Dashboard({ config }: DashboardProps) {
             FEATURE FLAGS ({flags.length})
           </p>
 
-          <div style={{ padding: '10px', display: 'flex', gap: '15px', justifyContent: 'flex-end', marginBottom: '10px' }}>
-            {!client.features.isOfflineMode() && client.features.getConfig().refreshInterval === 0 && (
-              <button
-                type="button"
-                className={`nes-btn is-primary ${isFetching ? 'is-disabled' : ''}`}
-                onClick={() => fetchFlags()}
-                disabled={isFetching}
-                title="Manual Fetch"
-              >
-                {isFetching ? 'FETCHING...' : 'FETCH FLAGS'}
-              </button>
-            )}
+          <div
+            style={{
+              padding: '10px',
+              display: 'flex',
+              gap: '15px',
+              justifyContent: 'flex-end',
+              marginBottom: '10px',
+            }}
+          >
+            {!client.features.isOfflineMode() &&
+              client.features.getConfig().refreshInterval === 0 && (
+                <button
+                  type="button"
+                  className={`nes-btn is-primary ${isFetching ? 'is-disabled' : ''}`}
+                  onClick={() => fetchFlags()}
+                  disabled={isFetching}
+                  title="Manual Fetch"
+                >
+                  {isFetching ? 'FETCHING...' : 'FETCH FLAGS'}
+                </button>
+              )}
 
             {isExplicitSync() && !client.features.isOfflineMode() && (
               <button
@@ -207,7 +214,6 @@ function Dashboard({ config }: DashboardProps) {
       </section>
     </div>
   );
-
 }
 
 export default Dashboard;

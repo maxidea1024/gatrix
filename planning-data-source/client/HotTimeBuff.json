@@ -11,13 +11,7 @@
       "minLv": "number",
       "maxLv": "number",
       "bitFlagDayOfWeek": "bit",
-      "worldBuffId": [
-        "number",
-        "number",
-        "number",
-        "number",
-        "number"
-      ]
+      "worldBuffId": ["number", "number", "number", "number", "number"]
     },
     ":required": {
       "icon": 1,
@@ -40,23 +34,7 @@
     },
     ":enum": {},
     ":links": {
-      "worldBuffId": [
-        [
-          "WorldBuff"
-        ],
-        [
-          "WorldBuff"
-        ],
-        [
-          "WorldBuff"
-        ],
-        [
-          "WorldBuff"
-        ],
-        [
-          "WorldBuff"
-        ]
-      ]
+      "worldBuffId": [["WorldBuff"], ["WorldBuff"], ["WorldBuff"], ["WorldBuff"], ["WorldBuff"]]
     }
   },
   "HotTimeBuff": {
@@ -71,9 +49,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 8,
-      "worldBuffId": [
-        38099003
-      ]
+      "worldBuffId": [38099003]
     },
     "58001002": {
       "id": 58001002,
@@ -86,9 +62,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 8,
-      "worldBuffId": [
-        38099012
-      ]
+      "worldBuffId": [38099012]
     },
     "58001003": {
       "id": 58001003,
@@ -101,9 +75,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 16,
-      "worldBuffId": [
-        38099014
-      ]
+      "worldBuffId": [38099014]
     },
     "58001004": {
       "id": 58001004,
@@ -116,9 +88,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 16,
-      "worldBuffId": [
-        38099010
-      ]
+      "worldBuffId": [38099010]
     },
     "58001005": {
       "id": 58001005,
@@ -131,9 +101,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 32,
-      "worldBuffId": [
-        38099010
-      ]
+      "worldBuffId": [38099010]
     },
     "58001006": {
       "id": 58001006,
@@ -146,9 +114,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 32,
-      "worldBuffId": [
-        38099012
-      ]
+      "worldBuffId": [38099012]
     },
     "58001007": {
       "id": 58001007,
@@ -161,10 +127,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 64,
-      "worldBuffId": [
-        38099003,
-        38099001
-      ]
+      "worldBuffId": [38099003, 38099001]
     },
     "58001008": {
       "id": 58001008,
@@ -177,9 +140,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 64,
-      "worldBuffId": [
-        38099000
-      ]
+      "worldBuffId": [38099000]
     },
     "58001009": {
       "id": 58001009,
@@ -192,10 +153,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 1,
-      "worldBuffId": [
-        38099003,
-        38099001
-      ]
+      "worldBuffId": [38099003, 38099001]
     },
     "58001010": {
       "id": 58001010,
@@ -208,9 +166,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 1,
-      "worldBuffId": [
-        38099000
-      ]
+      "worldBuffId": [38099000]
     },
     "58001011": {
       "id": 58001011,
@@ -223,9 +179,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 2,
-      "worldBuffId": [
-        38099007
-      ]
+      "worldBuffId": [38099007]
     },
     "58001012": {
       "id": 58001012,
@@ -238,9 +192,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 2,
-      "worldBuffId": [
-        38099009
-      ]
+      "worldBuffId": [38099009]
     },
     "58001013": {
       "id": 58001013,
@@ -253,9 +205,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 4,
-      "worldBuffId": [
-        38099013
-      ]
+      "worldBuffId": [38099013]
     },
     "58001014": {
       "id": 58001014,
@@ -268,9 +218,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 4,
-      "worldBuffId": [
-        38099010
-      ]
+      "worldBuffId": [38099010]
     },
     "58001015": {
       "id": 58001015,
@@ -283,11 +231,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 4,
-      "worldBuffId": [
-        38099000,
-        38099002,
-        38099003
-      ]
+      "worldBuffId": [38099000, 38099002, 38099003]
     },
     "58001046": {
       "id": 58001046,
@@ -300,9 +244,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 4,
-      "worldBuffId": [
-        38099013
-      ]
+      "worldBuffId": [38099013]
     },
     "58001047": {
       "id": 58001047,
@@ -315,9 +257,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 4,
-      "worldBuffId": [
-        38099010
-      ]
+      "worldBuffId": [38099010]
     },
     "58001016": {
       "id": 58001016,
@@ -330,11 +270,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 127,
-      "worldBuffId": [
-        38099006,
-        38099002,
-        38099003
-      ]
+      "worldBuffId": [38099006, 38099002, 38099003]
     },
     "58001017": {
       "id": 58001017,
@@ -347,9 +283,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 8,
-      "worldBuffId": [
-        38099003
-      ]
+      "worldBuffId": [38099003]
     },
     "58001018": {
       "id": 58001018,
@@ -362,9 +296,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 8,
-      "worldBuffId": [
-        38099012
-      ]
+      "worldBuffId": [38099012]
     },
     "58001019": {
       "id": 58001019,
@@ -377,9 +309,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 16,
-      "worldBuffId": [
-        38099014
-      ]
+      "worldBuffId": [38099014]
     },
     "58001020": {
       "id": 58001020,
@@ -392,9 +322,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 16,
-      "worldBuffId": [
-        38099010
-      ]
+      "worldBuffId": [38099010]
     },
     "58001021": {
       "id": 58001021,
@@ -407,9 +335,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 32,
-      "worldBuffId": [
-        38099010
-      ]
+      "worldBuffId": [38099010]
     },
     "58001022": {
       "id": 58001022,
@@ -422,9 +348,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 32,
-      "worldBuffId": [
-        38099012
-      ]
+      "worldBuffId": [38099012]
     },
     "58001023": {
       "id": 58001023,
@@ -437,10 +361,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 64,
-      "worldBuffId": [
-        38099003,
-        38099001
-      ]
+      "worldBuffId": [38099003, 38099001]
     },
     "58001024": {
       "id": 58001024,
@@ -453,9 +374,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 64,
-      "worldBuffId": [
-        38099000
-      ]
+      "worldBuffId": [38099000]
     },
     "58001025": {
       "id": 58001025,
@@ -468,10 +387,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 1,
-      "worldBuffId": [
-        38099003,
-        38099001
-      ]
+      "worldBuffId": [38099003, 38099001]
     },
     "58001026": {
       "id": 58001026,
@@ -484,9 +400,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 1,
-      "worldBuffId": [
-        38099000
-      ]
+      "worldBuffId": [38099000]
     },
     "58001027": {
       "id": 58001027,
@@ -499,9 +413,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 2,
-      "worldBuffId": [
-        38099007
-      ]
+      "worldBuffId": [38099007]
     },
     "58001028": {
       "id": 58001028,
@@ -514,9 +426,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 2,
-      "worldBuffId": [
-        38099009
-      ]
+      "worldBuffId": [38099009]
     },
     "58001029": {
       "id": 58001029,
@@ -529,9 +439,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 4,
-      "worldBuffId": [
-        38099013
-      ]
+      "worldBuffId": [38099013]
     },
     "58001030": {
       "id": 58001030,
@@ -544,9 +452,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 4,
-      "worldBuffId": [
-        38099010
-      ]
+      "worldBuffId": [38099010]
     },
     "58001031": {
       "id": 58001031,
@@ -559,11 +465,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 119,
-      "worldBuffId": [
-        38099002,
-        38099008,
-        38099005
-      ]
+      "worldBuffId": [38099002, 38099008, 38099005]
     },
     "58001032": {
       "id": 58001032,
@@ -576,9 +478,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 8,
-      "worldBuffId": [
-        38099003
-      ]
+      "worldBuffId": [38099003]
     },
     "58001033": {
       "id": 58001033,
@@ -591,9 +491,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 8,
-      "worldBuffId": [
-        38099012
-      ]
+      "worldBuffId": [38099012]
     },
     "58001034": {
       "id": 58001034,
@@ -606,9 +504,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 16,
-      "worldBuffId": [
-        38099014
-      ]
+      "worldBuffId": [38099014]
     },
     "58001035": {
       "id": 58001035,
@@ -621,9 +517,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 16,
-      "worldBuffId": [
-        38099010
-      ]
+      "worldBuffId": [38099010]
     },
     "58001036": {
       "id": 58001036,
@@ -636,9 +530,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 32,
-      "worldBuffId": [
-        38099010
-      ]
+      "worldBuffId": [38099010]
     },
     "58001037": {
       "id": 58001037,
@@ -651,9 +543,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 32,
-      "worldBuffId": [
-        38099012
-      ]
+      "worldBuffId": [38099012]
     },
     "58001038": {
       "id": 58001038,
@@ -666,10 +556,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 64,
-      "worldBuffId": [
-        38099003,
-        38099001
-      ]
+      "worldBuffId": [38099003, 38099001]
     },
     "58001039": {
       "id": 58001039,
@@ -682,9 +569,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 64,
-      "worldBuffId": [
-        38099000
-      ]
+      "worldBuffId": [38099000]
     },
     "58001040": {
       "id": 58001040,
@@ -697,10 +582,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 1,
-      "worldBuffId": [
-        38099003,
-        38099001
-      ]
+      "worldBuffId": [38099003, 38099001]
     },
     "58001041": {
       "id": 58001041,
@@ -713,9 +595,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 1,
-      "worldBuffId": [
-        38099000
-      ]
+      "worldBuffId": [38099000]
     },
     "58001042": {
       "id": 58001042,
@@ -728,9 +608,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 2,
-      "worldBuffId": [
-        38099007
-      ]
+      "worldBuffId": [38099007]
     },
     "58001043": {
       "id": 58001043,
@@ -743,9 +621,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 2,
-      "worldBuffId": [
-        38099009
-      ]
+      "worldBuffId": [38099009]
     },
     "58001044": {
       "id": 58001044,
@@ -758,9 +634,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 4,
-      "worldBuffId": [
-        38099013
-      ]
+      "worldBuffId": [38099013]
     },
     "58001045": {
       "id": 58001045,
@@ -773,9 +647,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 4,
-      "worldBuffId": [
-        38099010
-      ]
+      "worldBuffId": [38099010]
     },
     "58001050": {
       "id": 58001050,
@@ -788,11 +660,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 8,
-      "worldBuffId": [
-        38099002,
-        38099007,
-        38099005
-      ]
+      "worldBuffId": [38099002, 38099007, 38099005]
     },
     "58001051": {
       "id": 58001051,
@@ -805,11 +673,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 16,
-      "worldBuffId": [
-        38099003,
-        38099007,
-        38099005
-      ]
+      "worldBuffId": [38099003, 38099007, 38099005]
     },
     "58001052": {
       "id": 58001052,
@@ -822,11 +686,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 32,
-      "worldBuffId": [
-        38099002,
-        38099007,
-        38099005
-      ]
+      "worldBuffId": [38099002, 38099007, 38099005]
     },
     "58001053": {
       "id": 58001053,
@@ -839,12 +699,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 64,
-      "worldBuffId": [
-        38099004,
-        38099002,
-        38099007,
-        38099005
-      ]
+      "worldBuffId": [38099004, 38099002, 38099007, 38099005]
     },
     "58001054": {
       "id": 58001054,
@@ -857,12 +712,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 1,
-      "worldBuffId": [
-        38099004,
-        38099002,
-        38099007,
-        38099005
-      ]
+      "worldBuffId": [38099004, 38099002, 38099007, 38099005]
     },
     "58001055": {
       "id": 58001055,
@@ -875,12 +725,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 2,
-      "worldBuffId": [
-        38099004,
-        38099002,
-        38099007,
-        38099005
-      ]
+      "worldBuffId": [38099004, 38099002, 38099007, 38099005]
     },
     "58001056": {
       "id": 58001056,
@@ -893,11 +738,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 4,
-      "worldBuffId": [
-        38099003,
-        38099007,
-        38099005
-      ]
+      "worldBuffId": [38099003, 38099007, 38099005]
     },
     "58001057": {
       "id": 58001057,
@@ -910,9 +751,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 8,
-      "worldBuffId": [
-        38099003
-      ]
+      "worldBuffId": [38099003]
     },
     "58001058": {
       "id": 58001058,
@@ -925,9 +764,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 8,
-      "worldBuffId": [
-        38099012
-      ]
+      "worldBuffId": [38099012]
     },
     "58001059": {
       "id": 58001059,
@@ -940,9 +777,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 16,
-      "worldBuffId": [
-        38099014
-      ]
+      "worldBuffId": [38099014]
     },
     "58001060": {
       "id": 58001060,
@@ -955,9 +790,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 16,
-      "worldBuffId": [
-        38099010
-      ]
+      "worldBuffId": [38099010]
     },
     "58001061": {
       "id": 58001061,
@@ -970,9 +803,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 32,
-      "worldBuffId": [
-        38099010
-      ]
+      "worldBuffId": [38099010]
     },
     "58001062": {
       "id": 58001062,
@@ -985,9 +816,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 32,
-      "worldBuffId": [
-        38099012
-      ]
+      "worldBuffId": [38099012]
     },
     "58001063": {
       "id": 58001063,
@@ -1000,12 +829,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 64,
-      "worldBuffId": [
-        38099004,
-        38099002,
-        38099007,
-        38099005
-      ]
+      "worldBuffId": [38099004, 38099002, 38099007, 38099005]
     },
     "58001064": {
       "id": 58001064,
@@ -1018,12 +842,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 1,
-      "worldBuffId": [
-        38099004,
-        38099002,
-        38099007,
-        38099005
-      ]
+      "worldBuffId": [38099004, 38099002, 38099007, 38099005]
     },
     "58001065": {
       "id": 58001065,
@@ -1036,9 +855,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 2,
-      "worldBuffId": [
-        38099007
-      ]
+      "worldBuffId": [38099007]
     },
     "58001066": {
       "id": 58001066,
@@ -1051,9 +868,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 2,
-      "worldBuffId": [
-        38099009
-      ]
+      "worldBuffId": [38099009]
     },
     "58001067": {
       "id": 58001067,
@@ -1066,9 +881,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 4,
-      "worldBuffId": [
-        38099013
-      ]
+      "worldBuffId": [38099013]
     },
     "58001068": {
       "id": 58001068,
@@ -1081,9 +894,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 4,
-      "worldBuffId": [
-        38099010
-      ]
+      "worldBuffId": [38099010]
     },
     "58001069": {
       "id": 58001069,
@@ -1096,9 +907,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 8,
-      "worldBuffId": [
-        38099003
-      ]
+      "worldBuffId": [38099003]
     },
     "58001070": {
       "id": 58001070,
@@ -1111,9 +920,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 8,
-      "worldBuffId": [
-        38099012
-      ]
+      "worldBuffId": [38099012]
     },
     "58001071": {
       "id": 58001071,
@@ -1126,9 +933,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 16,
-      "worldBuffId": [
-        38099014
-      ]
+      "worldBuffId": [38099014]
     },
     "58001072": {
       "id": 58001072,
@@ -1141,9 +946,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 16,
-      "worldBuffId": [
-        38099010
-      ]
+      "worldBuffId": [38099010]
     },
     "58001073": {
       "id": 58001073,
@@ -1156,9 +959,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 32,
-      "worldBuffId": [
-        38099010
-      ]
+      "worldBuffId": [38099010]
     },
     "58001074": {
       "id": 58001074,
@@ -1171,9 +972,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 32,
-      "worldBuffId": [
-        38099012
-      ]
+      "worldBuffId": [38099012]
     },
     "58001075": {
       "id": 58001075,
@@ -1186,10 +985,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 64,
-      "worldBuffId": [
-        38099003,
-        38099001
-      ]
+      "worldBuffId": [38099003, 38099001]
     },
     "58001076": {
       "id": 58001076,
@@ -1202,9 +998,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 64,
-      "worldBuffId": [
-        38099000
-      ]
+      "worldBuffId": [38099000]
     },
     "58001077": {
       "id": 58001077,
@@ -1217,10 +1011,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 1,
-      "worldBuffId": [
-        38099003,
-        38099001
-      ]
+      "worldBuffId": [38099003, 38099001]
     },
     "58001078": {
       "id": 58001078,
@@ -1233,9 +1024,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 1,
-      "worldBuffId": [
-        38099000
-      ]
+      "worldBuffId": [38099000]
     },
     "58001079": {
       "id": 58001079,
@@ -1248,9 +1037,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 2,
-      "worldBuffId": [
-        38099007
-      ]
+      "worldBuffId": [38099007]
     },
     "58001080": {
       "id": 58001080,
@@ -1263,9 +1050,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 2,
-      "worldBuffId": [
-        38099009
-      ]
+      "worldBuffId": [38099009]
     },
     "58001081": {
       "id": 58001081,
@@ -1278,9 +1063,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 4,
-      "worldBuffId": [
-        38099013
-      ]
+      "worldBuffId": [38099013]
     },
     "58001082": {
       "id": 58001082,
@@ -1293,9 +1076,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 4,
-      "worldBuffId": [
-        38099010
-      ]
+      "worldBuffId": [38099010]
     },
     "58001083": {
       "id": 58001083,
@@ -1308,12 +1089,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 8,
-      "worldBuffId": [
-        38099004,
-        38099054,
-        38099055,
-        38099007
-      ]
+      "worldBuffId": [38099004, 38099054, 38099055, 38099007]
     },
     "58001084": {
       "id": 58001084,
@@ -1326,12 +1102,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 16,
-      "worldBuffId": [
-        38099004,
-        38099059,
-        38099012,
-        38099000
-      ]
+      "worldBuffId": [38099004, 38099059, 38099012, 38099000]
     },
     "58001085": {
       "id": 58001085,
@@ -1344,12 +1115,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 32,
-      "worldBuffId": [
-        38099004,
-        38099054,
-        38099055,
-        38099007
-      ]
+      "worldBuffId": [38099004, 38099054, 38099055, 38099007]
     },
     "58001086": {
       "id": 58001086,
@@ -1362,11 +1128,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 64,
-      "worldBuffId": [
-        38099004,
-        38099057,
-        38099058
-      ]
+      "worldBuffId": [38099004, 38099057, 38099058]
     },
     "58001087": {
       "id": 58001087,
@@ -1379,11 +1141,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 1,
-      "worldBuffId": [
-        38099004,
-        38099057,
-        38099058
-      ]
+      "worldBuffId": [38099004, 38099057, 38099058]
     },
     "58001088": {
       "id": 58001088,
@@ -1396,12 +1154,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 2,
-      "worldBuffId": [
-        38099004,
-        38099059,
-        38099012,
-        38099000
-      ]
+      "worldBuffId": [38099004, 38099059, 38099012, 38099000]
     },
     "58001089": {
       "id": 58001089,
@@ -1414,12 +1167,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 4,
-      "worldBuffId": [
-        38099004,
-        38099054,
-        38099055,
-        38099007
-      ]
+      "worldBuffId": [38099004, 38099054, 38099055, 38099007]
     },
     "58001090": {
       "id": 58001090,
@@ -1432,12 +1180,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 8,
-      "worldBuffId": [
-        38099004,
-        38099059,
-        38099012,
-        38099000
-      ]
+      "worldBuffId": [38099004, 38099059, 38099012, 38099000]
     },
     "58001091": {
       "id": 58001091,
@@ -1450,12 +1193,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 16,
-      "worldBuffId": [
-        38099004,
-        38099054,
-        38099055,
-        38099007
-      ]
+      "worldBuffId": [38099004, 38099054, 38099055, 38099007]
     },
     "58001092": {
       "id": 58001092,
@@ -1468,12 +1206,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 32,
-      "worldBuffId": [
-        38099004,
-        38099059,
-        38099012,
-        38099000
-      ]
+      "worldBuffId": [38099004, 38099059, 38099012, 38099000]
     },
     "58001093": {
       "id": 58001093,
@@ -1486,11 +1219,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 64,
-      "worldBuffId": [
-        38099004,
-        38099057,
-        38099058
-      ]
+      "worldBuffId": [38099004, 38099057, 38099058]
     },
     "58001094": {
       "id": 58001094,
@@ -1503,11 +1232,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 1,
-      "worldBuffId": [
-        38099004,
-        38099057,
-        38099058
-      ]
+      "worldBuffId": [38099004, 38099057, 38099058]
     },
     "58001095": {
       "id": 58001095,
@@ -1520,9 +1245,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 8,
-      "worldBuffId": [
-        38099003
-      ]
+      "worldBuffId": [38099003]
     },
     "58001096": {
       "id": 58001096,
@@ -1535,9 +1258,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 8,
-      "worldBuffId": [
-        38099012
-      ]
+      "worldBuffId": [38099012]
     },
     "58001097": {
       "id": 58001097,
@@ -1550,9 +1271,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 16,
-      "worldBuffId": [
-        38099014
-      ]
+      "worldBuffId": [38099014]
     },
     "58001098": {
       "id": 58001098,
@@ -1565,9 +1284,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 16,
-      "worldBuffId": [
-        38099010
-      ]
+      "worldBuffId": [38099010]
     },
     "58001099": {
       "id": 58001099,
@@ -1580,9 +1297,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 32,
-      "worldBuffId": [
-        38099010
-      ]
+      "worldBuffId": [38099010]
     },
     "58001100": {
       "id": 58001100,
@@ -1595,9 +1310,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 32,
-      "worldBuffId": [
-        38099012
-      ]
+      "worldBuffId": [38099012]
     },
     "58001101": {
       "id": 58001101,
@@ -1610,10 +1323,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 64,
-      "worldBuffId": [
-        38099003,
-        38099001
-      ]
+      "worldBuffId": [38099003, 38099001]
     },
     "58001102": {
       "id": 58001102,
@@ -1626,9 +1336,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 64,
-      "worldBuffId": [
-        38099000
-      ]
+      "worldBuffId": [38099000]
     },
     "58001103": {
       "id": 58001103,
@@ -1641,10 +1349,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 1,
-      "worldBuffId": [
-        38099003,
-        38099001
-      ]
+      "worldBuffId": [38099003, 38099001]
     },
     "58001104": {
       "id": 58001104,
@@ -1657,9 +1362,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 1,
-      "worldBuffId": [
-        38099000
-      ]
+      "worldBuffId": [38099000]
     },
     "58001105": {
       "id": 58001105,
@@ -1672,9 +1375,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 2,
-      "worldBuffId": [
-        38099007
-      ]
+      "worldBuffId": [38099007]
     },
     "58001106": {
       "id": 58001106,
@@ -1687,9 +1388,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 2,
-      "worldBuffId": [
-        38099009
-      ]
+      "worldBuffId": [38099009]
     },
     "58001107": {
       "id": 58001107,
@@ -1702,9 +1401,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 4,
-      "worldBuffId": [
-        38099013
-      ]
+      "worldBuffId": [38099013]
     },
     "58001108": {
       "id": 58001108,
@@ -1717,9 +1414,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 4,
-      "worldBuffId": [
-        38099010
-      ]
+      "worldBuffId": [38099010]
     },
     "58001109": {
       "id": 58001109,
@@ -1732,13 +1427,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 32,
-      "worldBuffId": [
-        38099004,
-        38099002,
-        38099057,
-        38099058,
-        38099055
-      ]
+      "worldBuffId": [38099004, 38099002, 38099057, 38099058, 38099055]
     },
     "58001110": {
       "id": 58001110,
@@ -1751,12 +1440,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 64,
-      "worldBuffId": [
-        38099004,
-        38099002,
-        38099058,
-        38099054
-      ]
+      "worldBuffId": [38099004, 38099002, 38099058, 38099054]
     },
     "58001111": {
       "id": 58001111,
@@ -1769,12 +1453,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 1,
-      "worldBuffId": [
-        38099004,
-        38099002,
-        38099057,
-        38099055
-      ]
+      "worldBuffId": [38099004, 38099002, 38099057, 38099055]
     },
     "58001112": {
       "id": 58001112,
@@ -1787,11 +1466,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 2,
-      "worldBuffId": [
-        38099001,
-        38099007,
-        38099005
-      ]
+      "worldBuffId": [38099001, 38099007, 38099005]
     },
     "58001113": {
       "id": 58001113,
@@ -1804,11 +1479,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 4,
-      "worldBuffId": [
-        38099001,
-        38099007,
-        38099005
-      ]
+      "worldBuffId": [38099001, 38099007, 38099005]
     },
     "58001114": {
       "id": 58001114,
@@ -1821,11 +1492,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 8,
-      "worldBuffId": [
-        38099001,
-        38099007,
-        38099005
-      ]
+      "worldBuffId": [38099001, 38099007, 38099005]
     },
     "58001115": {
       "id": 58001115,
@@ -1838,11 +1505,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 16,
-      "worldBuffId": [
-        38099001,
-        38099007,
-        38099005
-      ]
+      "worldBuffId": [38099001, 38099007, 38099005]
     },
     "58001116": {
       "id": 58001116,
@@ -1855,11 +1518,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 32,
-      "worldBuffId": [
-        38099001,
-        38099007,
-        38099005
-      ]
+      "worldBuffId": [38099001, 38099007, 38099005]
     },
     "58001117": {
       "id": 58001117,
@@ -1872,12 +1531,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 64,
-      "worldBuffId": [
-        38099004,
-        38099002,
-        38099007,
-        38099005
-      ]
+      "worldBuffId": [38099004, 38099002, 38099007, 38099005]
     },
     "58001118": {
       "id": 58001118,
@@ -1890,12 +1544,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 1,
-      "worldBuffId": [
-        38099004,
-        38099002,
-        38099008,
-        38099006
-      ]
+      "worldBuffId": [38099004, 38099002, 38099008, 38099006]
     },
     "58001119": {
       "id": 58001119,
@@ -1908,12 +1557,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 64,
-      "worldBuffId": [
-        38099004,
-        38099002,
-        38099057,
-        38099055
-      ]
+      "worldBuffId": [38099004, 38099002, 38099057, 38099055]
     },
     "58001120": {
       "id": 58001120,
@@ -1926,12 +1570,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 1,
-      "worldBuffId": [
-        38099004,
-        38099002,
-        38099058,
-        38099054
-      ]
+      "worldBuffId": [38099004, 38099002, 38099058, 38099054]
     },
     "58001121": {
       "id": 58001121,
@@ -1944,12 +1583,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 2,
-      "worldBuffId": [
-        38099004,
-        38099002,
-        38099057,
-        38099055
-      ]
+      "worldBuffId": [38099004, 38099002, 38099057, 38099055]
     },
     "58001122": {
       "id": 58001122,
@@ -1962,13 +1596,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 4,
-      "worldBuffId": [
-        38099004,
-        38099002,
-        38099057,
-        38099058,
-        38099054
-      ]
+      "worldBuffId": [38099004, 38099002, 38099057, 38099058, 38099054]
     },
     "58001123": {
       "id": 58001123,
@@ -1981,12 +1609,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 8,
-      "worldBuffId": [
-        38099004,
-        38099002,
-        38099057,
-        38099055
-      ]
+      "worldBuffId": [38099004, 38099002, 38099057, 38099055]
     },
     "58001124": {
       "id": 58001124,
@@ -1999,9 +1622,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 2,
-      "worldBuffId": [
-        38099007
-      ]
+      "worldBuffId": [38099007]
     },
     "58001125": {
       "id": 58001125,
@@ -2014,9 +1635,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 2,
-      "worldBuffId": [
-        38099000
-      ]
+      "worldBuffId": [38099000]
     },
     "58001126": {
       "id": 58001126,
@@ -2029,9 +1648,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 4,
-      "worldBuffId": [
-        38099010
-      ]
+      "worldBuffId": [38099010]
     },
     "58001127": {
       "id": 58001127,
@@ -2044,9 +1661,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 4,
-      "worldBuffId": [
-        38099012
-      ]
+      "worldBuffId": [38099012]
     },
     "58001128": {
       "id": 58001128,
@@ -2059,9 +1674,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 8,
-      "worldBuffId": [
-        38099003
-      ]
+      "worldBuffId": [38099003]
     },
     "58001129": {
       "id": 58001129,
@@ -2074,9 +1687,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 8,
-      "worldBuffId": [
-        38099010
-      ]
+      "worldBuffId": [38099010]
     },
     "58001130": {
       "id": 58001130,
@@ -2089,9 +1700,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 16,
-      "worldBuffId": [
-        38099014
-      ]
+      "worldBuffId": [38099014]
     },
     "58001131": {
       "id": 58001131,
@@ -2104,9 +1713,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 16,
-      "worldBuffId": [
-        38099012
-      ]
+      "worldBuffId": [38099012]
     },
     "58001132": {
       "id": 58001132,
@@ -2119,9 +1726,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 32,
-      "worldBuffId": [
-        38099013
-      ]
+      "worldBuffId": [38099013]
     },
     "58001133": {
       "id": 58001133,
@@ -2134,9 +1739,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 32,
-      "worldBuffId": [
-        38099009
-      ]
+      "worldBuffId": [38099009]
     },
     "58001134": {
       "id": 58001134,
@@ -2149,10 +1752,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 64,
-      "worldBuffId": [
-        38099003,
-        38099001
-      ]
+      "worldBuffId": [38099003, 38099001]
     },
     "58001135": {
       "id": 58001135,
@@ -2165,9 +1765,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 64,
-      "worldBuffId": [
-        38099055
-      ]
+      "worldBuffId": [38099055]
     },
     "58001136": {
       "id": 58001136,
@@ -2180,10 +1778,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 1,
-      "worldBuffId": [
-        38099003,
-        38099001
-      ]
+      "worldBuffId": [38099003, 38099001]
     },
     "58001137": {
       "id": 58001137,
@@ -2196,9 +1791,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 1,
-      "worldBuffId": [
-        38099054
-      ]
+      "worldBuffId": [38099054]
     },
     "58001138": {
       "id": 58001138,
@@ -2211,11 +1804,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 8,
-      "worldBuffId": [
-        38099003,
-        38099000,
-        38099012
-      ]
+      "worldBuffId": [38099003, 38099000, 38099012]
     },
     "58001139": {
       "id": 58001139,
@@ -2228,9 +1817,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 8,
-      "worldBuffId": [
-        38099010
-      ]
+      "worldBuffId": [38099010]
     },
     "58001140": {
       "id": 58001140,
@@ -2243,11 +1830,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 16,
-      "worldBuffId": [
-        38099014,
-        38099000,
-        38099012
-      ]
+      "worldBuffId": [38099014, 38099000, 38099012]
     },
     "58001141": {
       "id": 58001141,
@@ -2260,9 +1843,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 16,
-      "worldBuffId": [
-        38099012
-      ]
+      "worldBuffId": [38099012]
     },
     "58001142": {
       "id": 58001142,
@@ -2275,11 +1856,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 32,
-      "worldBuffId": [
-        38099013,
-        38099000,
-        38099012
-      ]
+      "worldBuffId": [38099013, 38099000, 38099012]
     },
     "58001143": {
       "id": 58001143,
@@ -2292,9 +1869,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 32,
-      "worldBuffId": [
-        38099005
-      ]
+      "worldBuffId": [38099005]
     },
     "58001144": {
       "id": 58001144,
@@ -2307,12 +1882,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 64,
-      "worldBuffId": [
-        38099003,
-        38099001,
-        38099000,
-        38099012
-      ]
+      "worldBuffId": [38099003, 38099001, 38099000, 38099012]
     },
     "58001145": {
       "id": 58001145,
@@ -2325,9 +1895,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 64,
-      "worldBuffId": [
-        38099055
-      ]
+      "worldBuffId": [38099055]
     },
     "58001146": {
       "id": 58001146,
@@ -2340,12 +1908,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 1,
-      "worldBuffId": [
-        38099003,
-        38099001,
-        38099000,
-        38099012
-      ]
+      "worldBuffId": [38099003, 38099001, 38099000, 38099012]
     },
     "58001147": {
       "id": 58001147,
@@ -2358,9 +1921,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 1,
-      "worldBuffId": [
-        38099054
-      ]
+      "worldBuffId": [38099054]
     },
     "58001148": {
       "id": 58001148,
@@ -2373,12 +1934,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 2,
-      "worldBuffId": [
-        38099007,
-        38090015,
-        38090016,
-        38090017
-      ]
+      "worldBuffId": [38099007, 38090015, 38090016, 38090017]
     },
     "58001149": {
       "id": 58001149,
@@ -2391,9 +1947,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 2,
-      "worldBuffId": [
-        38099000
-      ]
+      "worldBuffId": [38099000]
     },
     "58001150": {
       "id": 58001150,
@@ -2406,12 +1960,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 4,
-      "worldBuffId": [
-        38099010,
-        38090015,
-        38090016,
-        38090017
-      ]
+      "worldBuffId": [38099010, 38090015, 38090016, 38090017]
     },
     "58001151": {
       "id": 58001151,
@@ -2424,9 +1973,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 4,
-      "worldBuffId": [
-        38099012
-      ]
+      "worldBuffId": [38099012]
     },
     "58001152": {
       "id": 58001152,
@@ -2439,12 +1986,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 8,
-      "worldBuffId": [
-        38099003,
-        38090015,
-        38090016,
-        38090017
-      ]
+      "worldBuffId": [38099003, 38090015, 38090016, 38090017]
     },
     "58001153": {
       "id": 58001153,
@@ -2457,9 +1999,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 8,
-      "worldBuffId": [
-        38099010
-      ]
+      "worldBuffId": [38099010]
     },
     "58001154": {
       "id": 58001154,
@@ -2472,12 +2012,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 16,
-      "worldBuffId": [
-        38099014,
-        38090015,
-        38090016,
-        38090017
-      ]
+      "worldBuffId": [38099014, 38090015, 38090016, 38090017]
     },
     "58001155": {
       "id": 58001155,
@@ -2490,9 +2025,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 16,
-      "worldBuffId": [
-        38099012
-      ]
+      "worldBuffId": [38099012]
     },
     "58001156": {
       "id": 58001156,
@@ -2505,12 +2038,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 32,
-      "worldBuffId": [
-        38099013,
-        38090015,
-        38090016,
-        38090017
-      ]
+      "worldBuffId": [38099013, 38090015, 38090016, 38090017]
     },
     "58001157": {
       "id": 58001157,
@@ -2523,9 +2051,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 32,
-      "worldBuffId": [
-        38099005
-      ]
+      "worldBuffId": [38099005]
     },
     "58001158": {
       "id": 58001158,
@@ -2538,13 +2064,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 64,
-      "worldBuffId": [
-        38099003,
-        38099001,
-        38090015,
-        38090016,
-        38090017
-      ]
+      "worldBuffId": [38099003, 38099001, 38090015, 38090016, 38090017]
     },
     "58001159": {
       "id": 58001159,
@@ -2557,9 +2077,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 64,
-      "worldBuffId": [
-        38099055
-      ]
+      "worldBuffId": [38099055]
     },
     "58001160": {
       "id": 58001160,
@@ -2572,13 +2090,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 1,
-      "worldBuffId": [
-        38099003,
-        38099001,
-        38090015,
-        38090016,
-        38090017
-      ]
+      "worldBuffId": [38099003, 38099001, 38090015, 38090016, 38090017]
     },
     "58001161": {
       "id": 58001161,
@@ -2591,9 +2103,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 1,
-      "worldBuffId": [
-        38099054
-      ]
+      "worldBuffId": [38099054]
     },
     "58001162": {
       "id": 58001162,
@@ -2606,9 +2116,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 2,
-      "worldBuffId": [
-        38099007
-      ]
+      "worldBuffId": [38099007]
     },
     "58001163": {
       "id": 58001163,
@@ -2621,9 +2129,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 2,
-      "worldBuffId": [
-        38099079
-      ]
+      "worldBuffId": [38099079]
     },
     "58001164": {
       "id": 58001164,
@@ -2636,9 +2142,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 2,
-      "worldBuffId": [
-        38099080
-      ]
+      "worldBuffId": [38099080]
     },
     "58001165": {
       "id": 58001165,
@@ -2651,9 +2155,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 2,
-      "worldBuffId": [
-        38099000
-      ]
+      "worldBuffId": [38099000]
     },
     "58001166": {
       "id": 58001166,
@@ -2666,9 +2168,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 4,
-      "worldBuffId": [
-        38099010
-      ]
+      "worldBuffId": [38099010]
     },
     "58001167": {
       "id": 58001167,
@@ -2681,9 +2181,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 4,
-      "worldBuffId": [
-        38099081
-      ]
+      "worldBuffId": [38099081]
     },
     "58001168": {
       "id": 58001168,
@@ -2696,9 +2194,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 4,
-      "worldBuffId": [
-        38099082
-      ]
+      "worldBuffId": [38099082]
     },
     "58001169": {
       "id": 58001169,
@@ -2711,9 +2207,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 4,
-      "worldBuffId": [
-        38099012
-      ]
+      "worldBuffId": [38099012]
     },
     "58001170": {
       "id": 58001170,
@@ -2726,9 +2220,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 8,
-      "worldBuffId": [
-        38099003
-      ]
+      "worldBuffId": [38099003]
     },
     "58001171": {
       "id": 58001171,
@@ -2741,9 +2233,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 8,
-      "worldBuffId": [
-        38099083
-      ]
+      "worldBuffId": [38099083]
     },
     "58001172": {
       "id": 58001172,
@@ -2756,9 +2246,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 8,
-      "worldBuffId": [
-        38099084
-      ]
+      "worldBuffId": [38099084]
     },
     "58001173": {
       "id": 58001173,
@@ -2771,9 +2259,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 8,
-      "worldBuffId": [
-        38099085
-      ]
+      "worldBuffId": [38099085]
     },
     "58001174": {
       "id": 58001174,
@@ -2786,9 +2272,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 16,
-      "worldBuffId": [
-        38099014
-      ]
+      "worldBuffId": [38099014]
     },
     "58001175": {
       "id": 58001175,
@@ -2801,9 +2285,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 16,
-      "worldBuffId": [
-        38099081
-      ]
+      "worldBuffId": [38099081]
     },
     "58001176": {
       "id": 58001176,
@@ -2816,9 +2298,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 16,
-      "worldBuffId": [
-        38099082
-      ]
+      "worldBuffId": [38099082]
     },
     "58001177": {
       "id": 58001177,
@@ -2831,9 +2311,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 16,
-      "worldBuffId": [
-        38099012
-      ]
+      "worldBuffId": [38099012]
     },
     "58001178": {
       "id": 58001178,
@@ -2846,9 +2324,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 32,
-      "worldBuffId": [
-        38099013
-      ]
+      "worldBuffId": [38099013]
     },
     "58001179": {
       "id": 58001179,
@@ -2861,9 +2337,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 32,
-      "worldBuffId": [
-        38099086
-      ]
+      "worldBuffId": [38099086]
     },
     "58001180": {
       "id": 58001180,
@@ -2876,9 +2350,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 32,
-      "worldBuffId": [
-        38099087
-      ]
+      "worldBuffId": [38099087]
     },
     "58001181": {
       "id": 58001181,
@@ -2891,9 +2363,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 32,
-      "worldBuffId": [
-        38099088
-      ]
+      "worldBuffId": [38099088]
     },
     "58001182": {
       "id": 58001182,
@@ -2906,10 +2376,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 64,
-      "worldBuffId": [
-        38099003,
-        38099001
-      ]
+      "worldBuffId": [38099003, 38099001]
     },
     "58001183": {
       "id": 58001183,
@@ -2922,9 +2389,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 64,
-      "worldBuffId": [
-        38099077
-      ]
+      "worldBuffId": [38099077]
     },
     "58001184": {
       "id": 58001184,
@@ -2937,9 +2402,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 64,
-      "worldBuffId": [
-        38099078
-      ]
+      "worldBuffId": [38099078]
     },
     "58001185": {
       "id": 58001185,
@@ -2952,9 +2415,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 64,
-      "worldBuffId": [
-        38099055
-      ]
+      "worldBuffId": [38099055]
     },
     "58001186": {
       "id": 58001186,
@@ -2967,10 +2428,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 1,
-      "worldBuffId": [
-        38099003,
-        38099001
-      ]
+      "worldBuffId": [38099003, 38099001]
     },
     "58001187": {
       "id": 58001187,
@@ -2983,9 +2441,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 1,
-      "worldBuffId": [
-        38099075
-      ]
+      "worldBuffId": [38099075]
     },
     "58001188": {
       "id": 58001188,
@@ -2998,9 +2454,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 1,
-      "worldBuffId": [
-        38099076
-      ]
+      "worldBuffId": [38099076]
     },
     "58001189": {
       "id": 58001189,
@@ -3013,9 +2467,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 1,
-      "worldBuffId": [
-        38099054
-      ]
+      "worldBuffId": [38099054]
     },
     "58001190": {
       "id": 58001190,
@@ -3028,9 +2480,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 127,
-      "worldBuffId": [
-        38090018
-      ]
+      "worldBuffId": [38090018]
     },
     "58001191": {
       "id": 58001191,
@@ -3043,9 +2493,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 127,
-      "worldBuffId": [
-        38095410
-      ]
+      "worldBuffId": [38095410]
     },
     "58001192": {
       "id": 58001192,
@@ -3058,9 +2506,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 127,
-      "worldBuffId": [
-        38099093
-      ]
+      "worldBuffId": [38099093]
     },
     "58001193": {
       "id": 58001193,
@@ -3073,9 +2519,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 127,
-      "worldBuffId": [
-        38099093
-      ]
+      "worldBuffId": [38099093]
     },
     "58001194": {
       "id": 58001194,
@@ -3088,9 +2532,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 127,
-      "worldBuffId": [
-        38099093
-      ]
+      "worldBuffId": [38099093]
     },
     "58001195": {
       "id": 58001195,
@@ -3103,9 +2545,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 127,
-      "worldBuffId": [
-        38090031
-      ]
+      "worldBuffId": [38090031]
     },
     "58001196": {
       "id": 58001196,
@@ -3118,9 +2558,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 127,
-      "worldBuffId": [
-        38090032
-      ]
+      "worldBuffId": [38090032]
     },
     "58001197": {
       "id": 58001197,
@@ -3133,9 +2571,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 127,
-      "worldBuffId": [
-        38090033
-      ]
+      "worldBuffId": [38090033]
     },
     "58001198": {
       "id": 58001198,
@@ -3148,9 +2584,7 @@
       "minLv": 1,
       "maxLv": 200,
       "bitFlagDayOfWeek": 127,
-      "worldBuffId": [
-        38090034
-      ]
+      "worldBuffId": [38090034]
     }
   }
 }

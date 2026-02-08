@@ -1,7 +1,7 @@
-import { databaseManager } from "../config/database";
-import { createLogger } from "../config/logger";
+import { databaseManager } from '../config/database';
+import { createLogger } from '../config/logger';
 
-const logger = createLogger("MessageReaction");
+const logger = createLogger('MessageReaction');
 
 export interface MessageReaction {
   id: number;
@@ -39,21 +39,21 @@ export class MessageReactionModel {
   static async addReaction(
     messageId: number,
     userId: number,
-    emoji: string,
+    emoji: string
   ): Promise<MessageReaction> {
     try {
       const db = databaseManager.getKnex();
 
       // 이미 같은 리액션이 있는지 확인
-      const existingReaction = await db("chat_message_reactions")
+      const existingReaction = await db('chat_message_reactions')
         .where({ messageId, userId, emoji })
         .first();
 
       if (existingReaction) {
-        throw new Error("User has already reacted with this emoji");
+        throw new Error('User has already reacted with this emoji');
       }
 
-      const [reactionId] = await db("chat_message_reactions").insert({
+      const [reactionId] = await db('chat_message_reactions').insert({
         messageId,
         userId,
         emoji,
@@ -61,7 +61,7 @@ export class MessageReactionModel {
 
       return await this.findById(reactionId);
     } catch (error) {
-      logger.error("Error adding reaction:", error);
+      logger.error('Error adding reaction:', error);
       throw error;
     }
   }
@@ -69,21 +69,17 @@ export class MessageReactionModel {
   /**
    * 리액션 제거
    */
-  static async removeReaction(
-    messageId: number,
-    userId: number,
-    emoji: string,
-  ): Promise<boolean> {
+  static async removeReaction(messageId: number, userId: number, emoji: string): Promise<boolean> {
     try {
       const db = databaseManager.getKnex();
 
-      const deletedCount = await db("chat_message_reactions")
+      const deletedCount = await db('chat_message_reactions')
         .where({ messageId, userId, emoji })
         .del();
 
       return deletedCount > 0;
     } catch (error) {
-      logger.error("Error removing reaction:", error);
+      logger.error('Error removing reaction:', error);
       throw error;
     }
   }
@@ -94,24 +90,24 @@ export class MessageReactionModel {
   static async toggleReaction(
     messageId: number,
     userId: number,
-    emoji: string,
-  ): Promise<{ action: "added" | "removed"; reaction?: MessageReaction }> {
+    emoji: string
+  ): Promise<{ action: 'added' | 'removed'; reaction?: MessageReaction }> {
     try {
       const db = databaseManager.getKnex();
 
-      const existingReaction = await db("chat_message_reactions")
+      const existingReaction = await db('chat_message_reactions')
         .where({ messageId, userId, emoji })
         .first();
 
       if (existingReaction) {
         await this.removeReaction(messageId, userId, emoji);
-        return { action: "removed" };
+        return { action: 'removed' };
       } else {
         const reaction = await this.addReaction(messageId, userId, emoji);
-        return { action: "added", reaction };
+        return { action: 'added', reaction };
       }
     } catch (error) {
-      logger.error("Error toggling reaction:", error);
+      logger.error('Error toggling reaction:', error);
       throw error;
     }
   }
@@ -123,21 +119,21 @@ export class MessageReactionModel {
     try {
       const db = databaseManager.getKnex();
 
-      const reaction = await db("chat_message_reactions as r")
-        .leftJoin("chat_users as u", "r.userId", "u.gatrixUserId")
+      const reaction = await db('chat_message_reactions as r')
+        .leftJoin('chat_users as u', 'r.userId', 'u.gatrixUserId')
         .select(
-          "r.*",
-          "u.id as user_id",
-          "u.gatrixUserId as user_gatrixUserId",
-          "u.name as user_name",
-          "u.username as user_username",
-          "u.avatarUrl as user_avatarUrl",
+          'r.*',
+          'u.id as user_id',
+          'u.gatrixUserId as user_gatrixUserId',
+          'u.name as user_name',
+          'u.username as user_username',
+          'u.avatarUrl as user_avatarUrl'
         )
-        .where("r.id", id)
+        .where('r.id', id)
         .first();
 
       if (!reaction) {
-        throw new Error("Reaction not found");
+        throw new Error('Reaction not found');
       }
 
       return {
@@ -156,7 +152,7 @@ export class MessageReactionModel {
           : undefined,
       };
     } catch (error) {
-      logger.error("Error finding reaction by ID:", error);
+      logger.error('Error finding reaction by ID:', error);
       throw error;
     }
   }
@@ -166,24 +162,24 @@ export class MessageReactionModel {
    */
   static async getReactionSummary(
     messageId: number,
-    currentUserId?: number,
+    currentUserId?: number
   ): Promise<ReactionSummary[]> {
     try {
       const db = databaseManager.getKnex();
 
-      const reactions = await db("chat_message_reactions as r")
-        .leftJoin("chat_users as u", "r.userId", "u.gatrixUserId")
+      const reactions = await db('chat_message_reactions as r')
+        .leftJoin('chat_users as u', 'r.userId', 'u.gatrixUserId')
         .select(
-          "r.emoji",
-          "r.userId",
-          "u.id as user_id",
-          "u.gatrixUserId as user_gatrixUserId",
-          "u.name as user_name",
-          "u.username as user_username",
-          "u.avatarUrl as user_avatarUrl",
+          'r.emoji',
+          'r.userId',
+          'u.id as user_id',
+          'u.gatrixUserId as user_gatrixUserId',
+          'u.name as user_name',
+          'u.username as user_username',
+          'u.avatarUrl as user_avatarUrl'
         )
-        .where("r.messageId", messageId)
-        .orderBy("r.createdAt", "asc");
+        .where('r.messageId', messageId)
+        .orderBy('r.createdAt', 'asc');
 
       // 이모지별로 그룹화
       const groupedReactions: { [emoji: string]: ReactionSummary } = {};
@@ -214,7 +210,7 @@ export class MessageReactionModel {
 
       return Object.values(groupedReactions);
     } catch (error) {
-      logger.error("Error getting reaction summary:", error);
+      logger.error('Error getting reaction summary:', error);
       throw error;
     }
   }
@@ -226,11 +222,9 @@ export class MessageReactionModel {
     try {
       const db = databaseManager.getKnex();
 
-      return await db("chat_message_reactions")
-        .where("messageId", messageId)
-        .del();
+      return await db('chat_message_reactions').where('messageId', messageId).del();
     } catch (error) {
-      logger.error("Error deleting reactions by message ID:", error);
+      logger.error('Error deleting reactions by message ID:', error);
       throw error;
     }
   }

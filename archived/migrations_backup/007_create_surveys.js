@@ -5,7 +5,7 @@
  * Survey config: Uses g_vars table for global configuration
  */
 
-exports.up = async function(connection) {
+exports.up = async function (connection) {
   console.log('Creating surveys table...');
 
   // 1. Surveys table
@@ -58,7 +58,7 @@ exports.up = async function(connection) {
   console.log('Surveys table created successfully!');
 };
 
-exports.down = async function(connection) {
+exports.down = async function (connection) {
   console.log('Dropping surveys table...');
 
   await connection.execute('DROP TABLE IF EXISTS g_surveys');
@@ -75,4 +75,3 @@ exports.down = async function(connection) {
 
   console.log('Surveys table dropped successfully!');
 };
-

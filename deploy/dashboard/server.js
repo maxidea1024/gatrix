@@ -1,6 +1,6 @@
 /**
  * Gatrix Operations Dashboard Server
- * 
+ *
  * A simple web server for Docker Swarm management operations.
  * This is an internal tool - no authentication required.
  */
@@ -39,31 +39,31 @@ function execCommand(command) {
 
 // Get stack services
 app.get('/api/services', async (req, res) => {
-  const result = await execCommand(
-    `docker stack services ${STACK_NAME} --format "{{json .}}"`
-  );
+  const result = await execCommand(`docker stack services ${STACK_NAME} --format "{{json .}}"`);
   if (result.success) {
     const services = result.stdout
       .trim()
       .split('\n')
       .filter(Boolean)
-      .map(line => JSON.parse(line));
+      .map((line) => JSON.parse(line));
 
     // Get update status for each service
-    const servicesWithStatus = await Promise.all(services.map(async (svc) => {
-      const inspectResult = await execCommand(
-        `docker service inspect ${svc.Name} --format "{{json .UpdateStatus}}"`
-      );
-      if (inspectResult.success && inspectResult.stdout.trim()) {
-        try {
-          const updateStatus = JSON.parse(inspectResult.stdout.trim());
-          svc.UpdateStatus = updateStatus;
-        } catch (e) {
-          svc.UpdateStatus = null;
+    const servicesWithStatus = await Promise.all(
+      services.map(async (svc) => {
+        const inspectResult = await execCommand(
+          `docker service inspect ${svc.Name} --format "{{json .UpdateStatus}}"`
+        );
+        if (inspectResult.success && inspectResult.stdout.trim()) {
+          try {
+            const updateStatus = JSON.parse(inspectResult.stdout.trim());
+            svc.UpdateStatus = updateStatus;
+          } catch (e) {
+            svc.UpdateStatus = null;
+          }
         }
-      }
-      return svc;
-    }));
+        return svc;
+      })
+    );
 
     res.json({ success: true, services: servicesWithStatus });
   } else {
@@ -82,7 +82,7 @@ app.get('/api/services/:name/tasks', async (req, res) => {
       .trim()
       .split('\n')
       .filter(Boolean)
-      .map(line => JSON.parse(line));
+      .map((line) => JSON.parse(line));
     res.json({ success: true, tasks });
   } else {
     res.json({ success: false, error: result.error });
@@ -98,9 +98,9 @@ app.get('/api/services/:name/versions', async (req, res) => {
   if (result.success) {
     const images = result.stdout.trim().split('\n').filter(Boolean);
     // Extract unique full images (without hash) for accurate version tracking
-    const uniqueImages = [...new Set(images.map(img => img.split('@')[0]))];
+    const uniqueImages = [...new Set(images.map((img) => img.split('@')[0]))];
     // Extract tags from images
-    const versions = uniqueImages.map(img => img.split(':').pop() || 'latest');
+    const versions = uniqueImages.map((img) => img.split(':').pop() || 'latest');
     // Get current image and tag
     const inspectResult = await execCommand(
       `docker service inspect ${serviceName} --format "{{.Spec.TaskTemplate.ContainerSpec.Image}}"`
@@ -176,7 +176,12 @@ app.get('/api/services/:name/previous', async (req, res) => {
         const tagPart = imageWithoutHash.split(':').pop();
         prevVersion = tagPart || null;
       }
-      res.json({ success: true, hasPrevious: true, previousImage: prevImage, previousVersion: prevVersion });
+      res.json({
+        success: true,
+        hasPrevious: true,
+        previousImage: prevImage,
+        previousVersion: prevVersion,
+      });
     } catch (e) {
       res.json({ success: true, hasPrevious: false });
     }
@@ -205,16 +210,37 @@ app.get('/api/services/:name/logs', async (req, res) => {
 // Apply scaling preset
 app.post('/api/presets/:preset', async (req, res) => {
   const presets = {
-    minimal: { backend: 1, frontend: 1, 'event-lens': 1, 'event-lens-worker': 1, 'chat-server': 1, edge: 1 },
-    standard: { backend: 2, frontend: 2, 'event-lens': 1, 'event-lens-worker': 2, 'chat-server': 1, edge: 2 },
-    high: { backend: 4, frontend: 4, 'event-lens': 2, 'event-lens-worker': 4, 'chat-server': 1, edge: 8 }
+    minimal: {
+      backend: 1,
+      frontend: 1,
+      'event-lens': 1,
+      'event-lens-worker': 1,
+      'chat-server': 1,
+      edge: 1,
+    },
+    standard: {
+      backend: 2,
+      frontend: 2,
+      'event-lens': 1,
+      'event-lens-worker': 2,
+      'chat-server': 1,
+      edge: 2,
+    },
+    high: {
+      backend: 4,
+      frontend: 4,
+      'event-lens': 2,
+      'event-lens-worker': 4,
+      'chat-server': 1,
+      edge: 8,
+    },
   };
-  
+
   const preset = presets[req.params.preset];
   if (!preset) {
     return res.json({ success: false, error: 'Unknown preset' });
   }
-  
+
   const results = [];
   for (const [service, replicas] of Object.entries(preset)) {
     const serviceName = `${STACK_NAME}_${service}`;
@@ -229,7 +255,7 @@ app.post('/api/presets/:preset', async (req, res) => {
 app.get('/api/system', async (req, res) => {
   const [nodes, info] = await Promise.all([
     execCommand('docker node ls --format "{{json .}}"'),
-    execCommand('docker system info --format "{{json .}}"')
+    execCommand('docker system info --format "{{json .}}"'),
   ]);
   res.json({ nodes: nodes.stdout, info: info.stdout });
 });
@@ -240,7 +266,11 @@ app.get('/api/images', async (req, res) => {
     'docker images uwocn.tencentcloudcr.com/uwocn/uwocn --format "{{json .}}"'
   );
   if (result.success) {
-    const images = result.stdout.trim().split('\n').filter(Boolean).map(line => JSON.parse(line));
+    const images = result.stdout
+      .trim()
+      .split('\n')
+      .filter(Boolean)
+      .map((line) => JSON.parse(line));
     res.json({ success: true, images });
   } else {
     res.json(result);
@@ -269,8 +299,12 @@ wss.on('connection', (ws) => {
       if (tail) {
         // Realtime streaming with --follow
         logProcess = exec(`docker service logs ${serviceName} --follow --tail 50`);
-        logProcess.stdout.on('data', (chunk) => ws.send(JSON.stringify({ type: 'log', data: chunk })));
-        logProcess.stderr.on('data', (chunk) => ws.send(JSON.stringify({ type: 'log', data: chunk })));
+        logProcess.stdout.on('data', (chunk) =>
+          ws.send(JSON.stringify({ type: 'log', data: chunk }))
+        );
+        logProcess.stderr.on('data', (chunk) =>
+          ws.send(JSON.stringify({ type: 'log', data: chunk }))
+        );
       } else {
         // Static logs (last 100 lines, no follow)
         exec(`docker service logs ${serviceName} --tail 100`, (error, stdout, stderr) => {
@@ -328,4 +362,3 @@ server.listen(PORT, () => {
   console.log('  Do not expose to public internet.');
   console.log('');
 });
-

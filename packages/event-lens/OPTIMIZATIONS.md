@@ -11,6 +11,7 @@ Event Lens는 OpenPanel의 고급 최적화 기술을 모두 적용하여 대용
 ### 1. ClickHouse 인덱스 최적화
 
 #### Bloom Filter 인덱스
+
 ```sql
 -- 이벤트 이름, 세션, 프로필 검색 최적화
 ALTER TABLE events ADD INDEX idx_name name TYPE bloom_filter GRANULARITY 1;
@@ -41,18 +42,20 @@ ALTER TABLE events ADD INDEX idx_utm_campaign utmCampaign TYPE bloom_filter GRAN
 ### 2. 동적 Properties 키 추출
 
 #### Materialized Column
+
 ```sql
 -- JSON properties에서 키 자동 추출
-ALTER TABLE events 
-ADD COLUMN propertiesKeys Array(String) 
+ALTER TABLE events
+ADD COLUMN propertiesKeys Array(String)
 MATERIALIZED JSONExtractKeys(properties);
 
 -- 키 검색 인덱스
-ALTER TABLE events 
+ALTER TABLE events
 ADD INDEX idx_properties_keys propertiesKeys TYPE bloom_filter(0.01) GRANULARITY 1;
 ```
 
 #### 사용 예시
+
 ```typescript
 // 프로젝트의 모든 properties 키 조회 (필터 UI 자동완성용)
 const keys = await filterBuilder.getPropertyKeys('project-123');
@@ -63,7 +66,8 @@ const values = await filterBuilder.getPropertyValues('project-123', 'plan_type')
 // ['free', 'pro', 'enterprise']
 ```
 
-**효과**: 
+**효과**:
+
 - 필터 UI에서 키워드 자동완성 가능
 - JSON 필드 검색 속도 대폭 향상
 - 동적 필터링 성능 최적화
@@ -85,6 +89,7 @@ ALTER TABLE hourly_metrics MODIFY TTL hour + INTERVAL 90 DAY;
 ```
 
 **효과**:
+
 - 스토리지 비용 절감
 - 쿼리 성능 유지
 - 자동 데이터 관리
@@ -101,6 +106,7 @@ ALTER TABLE profiles MODIFY COLUMN properties String CODEC(ZSTD(3));
 ```
 
 **효과**:
+
 - 스토리지 사용량 50-70% 감소
 - I/O 성능 향상
 - 네트워크 전송량 감소
@@ -110,6 +116,7 @@ ALTER TABLE profiles MODIFY COLUMN properties String CODEC(ZSTD(3));
 ### 5. Materialized Views (사전 집계)
 
 #### 일별/시간별 메트릭
+
 ```sql
 -- 일별 집계 (AggregatingMergeTree)
 CREATE TABLE daily_metrics (
@@ -139,6 +146,7 @@ GROUP BY projectId, date;
 ```
 
 #### 경로별 집계
+
 ```sql
 CREATE TABLE path_metrics (
   projectId String,
@@ -151,6 +159,7 @@ CREATE TABLE path_metrics (
 ```
 
 #### Referrer별 집계
+
 ```sql
 CREATE TABLE referrer_metrics (
   projectId String,
@@ -163,6 +172,7 @@ CREATE TABLE referrer_metrics (
 ```
 
 #### 디바이스별 집계
+
 ```sql
 CREATE TABLE device_metrics (
   projectId String,
@@ -176,6 +186,7 @@ CREATE TABLE device_metrics (
 ```
 
 #### 지리별 집계
+
 ```sql
 CREATE TABLE geo_metrics (
   projectId String,
@@ -188,6 +199,7 @@ CREATE TABLE geo_metrics (
 ```
 
 **효과**:
+
 - 집계 쿼리 속도 10-100배 향상
 - 원본 데이터 스캔 불필요
 - 실시간 대시보드 성능 극대화
@@ -197,6 +209,7 @@ CREATE TABLE geo_metrics (
 ### 6. 최적화된 쿼리 전략
 
 #### OptimizedMetricsService
+
 ```typescript
 // 필터가 없으면 Materialized View 사용 (초고속)
 if (!filters || filters.length === 0) {
@@ -208,6 +221,7 @@ return await this.getMetricsWithFilters(projectId, startDate, endDate, filters);
 ```
 
 #### Materialized View 쿼리 예시
+
 ```typescript
 const query = `
   SELECT
@@ -222,6 +236,7 @@ const query = `
 ```
 
 **효과**:
+
 - 필터 없는 쿼리: 10-100배 빠름
 - 필터 있는 쿼리: Bloom Filter로 최적화
 - 자동 전략 선택
@@ -231,6 +246,7 @@ const query = `
 ### 7. 동적 필터 빌더
 
 #### FilterBuilder 클래스
+
 ```typescript
 // 다양한 연산자 지원
 const filters = [
@@ -244,12 +260,14 @@ const whereClause = filterBuilder.buildFilterClause(filters);
 ```
 
 **지원 연산자**:
+
 - `eq`, `ne`: 같음, 다름
 - `gt`, `gte`, `lt`, `lte`: 크기 비교
 - `in`, `nin`: 포함, 불포함
 - `contains`, `notContains`: 문자열 포함
 
 **효과**:
+
 - 복잡한 필터 조건 지원
 - SQL Injection 방지
 - 타입 안전성
@@ -272,6 +290,7 @@ await redis.setex(cacheKey, 300, JSON.stringify(metrics));
 ```
 
 **효과**:
+
 - 반복 쿼리 제거
 - 응답 시간 단축
 - ClickHouse 부하 감소
@@ -282,37 +301,39 @@ await redis.setex(cacheKey, 300, JSON.stringify(metrics));
 
 ### 기본 메트릭 조회 (30일 데이터, 1억 이벤트)
 
-| 방식 | 쿼리 시간 | 개선율 |
-|------|----------|--------|
-| 원본 테이블 (최적화 전) | 5,000ms | - |
-| 원본 테이블 + Bloom Filter | 500ms | 10배 |
-| Materialized View | 50ms | 100배 |
+| 방식                       | 쿼리 시간 | 개선율 |
+| -------------------------- | --------- | ------ |
+| 원본 테이블 (최적화 전)    | 5,000ms   | -      |
+| 원본 테이블 + Bloom Filter | 500ms     | 10배   |
+| Materialized View          | 50ms      | 100배  |
 
 ### Top Pages 조회
 
-| 방식 | 쿼리 시간 | 개선율 |
-|------|----------|--------|
-| 원본 테이블 GROUP BY | 2,000ms | - |
-| path_metrics Materialized View | 20ms | 100배 |
+| 방식                           | 쿼리 시간 | 개선율 |
+| ------------------------------ | --------- | ------ |
+| 원본 테이블 GROUP BY           | 2,000ms   | -      |
+| path_metrics Materialized View | 20ms      | 100배  |
 
 ### 동적 필터 검색
 
-| 방식 | 쿼리 시간 | 개선율 |
-|------|----------|--------|
-| Full Table Scan | 10,000ms | - |
-| Bloom Filter + propertiesKeys | 1,000ms | 10배 |
+| 방식                          | 쿼리 시간 | 개선율 |
+| ----------------------------- | --------- | ------ |
+| Full Table Scan               | 10,000ms  | -      |
+| Bloom Filter + propertiesKeys | 1,000ms   | 10배   |
 
 ---
 
 ## 🔧 사용 방법
 
 ### 1. 마이그레이션 실행
+
 ```bash
 cd packages/event-lens
 npm run migrate:clickhouse
 ```
 
 ### 2. 최적화된 API 사용
+
 ```bash
 # 기본 메트릭 (Materialized View 사용)
 GET /insights/project-123/metrics?startDate=2024-01-01&endDate=2024-01-31
@@ -342,4 +363,3 @@ GET /filters/project-123/property-values?propertyKey=plan_type
 - [Bloom Filter Indexes](https://clickhouse.com/docs/en/engines/table-engines/mergetree-family/mergetree#bloom-filter)
 - [TTL for Columns and Tables](https://clickhouse.com/docs/en/engines/table-engines/mergetree-family/mergetree#table_engine-mergetree-ttl)
 - [Data Compression](https://clickhouse.com/docs/en/sql-reference/statements/create/table#column-compression-codecs)
-

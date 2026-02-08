@@ -7,27 +7,33 @@
 ## 🎯 핵심 개선 목표
 
 ### 1. Template 기반 통합 관리
+
 - 현재: 설정별 개별 버저닝 (캠페인, 컨텍스트 필드, Variants 제외)
 - 개선: 모든 요소를 포함한 Template 단위 버저닝
 
 ### 2. 환경별 분리 관리
+
 - dev, staging, production 등 환경별 독립 관리
 - 환경별 승인 정책 및 제한 설정
 
 ### 3. 안전성 강화
+
 - Unleash 스타일 Four Eye Principle
 - 환경 변수 기반 제한 설정
 - API 스로틀링
 
 ### 4. 성능 최적화
+
 - cache-manager 기반 다층 캐싱 (메모리 + Redis/파일)
 - MySQL JSON 최적화
 
 ### 5. 메트릭 추적
+
 - Unleash 스타일 사용량 분석
 - 시간별 집계 및 시각화
 
 ### 6. UI 호환성 유지
+
 - Configuration Switch 기반 점진적 전환
 - Legacy 코드 최소화
 
@@ -535,7 +541,7 @@ interface RemoteConfigTemplate {
     created_at: string;
     status: 'draft' | 'staged' | 'published' | 'archived';
   };
-  
+
   // 모든 설정을 하나의 템플릿에 통합
   configs: {
     [key: string]: {
@@ -544,13 +550,13 @@ interface RemoteConfigTemplate {
       description?: string;
     };
   };
-  
+
   // 캠페인도 템플릿에 포함
   campaigns: Campaign[];
-  
+
   // 컨텍스트 필드도 템플릿에 포함
   contextFields: ContextField[];
-  
+
   // Variants도 템플릿에 포함
   variants: {
     [configKey: string]: Variant[];
@@ -655,190 +661,238 @@ CREATE TABLE g_remote_config_change_request_approvals (
 ## 📋 추가 요구사항
 
 ### 18. 테이블 명명 규칙
+
 - 모든 remote config 관련 테이블은 `g_remote_config_` 접두사 사용
 
 ### 19. 컬럼 명명 규칙
+
 - 모든 테이블의 컬럼명은 camelCase 사용
 
 ### 20. MySQL 예약어 처리
+
 - 예약어 사용 시 백틱(`) 대신 명확한 이름 사용
 - 예: `name` → `templateName`
 
 ### 14. 시스템 전체 제한 설정
+
 - 환경별이 아닌 시스템 전체 제한 적용
 - 환경 변수로 제어
 
 ### 17. SDK 기반 메트릭 집계
+
 - 개별 이벤트 추적이 아닌 SDK에서 집계 후 전송
 - Unleash Features 방식 채택
 
 ### 21. API 경로 규칙
+
 - 모든 remote config 관련 API는 `/api/v1/remote-config/` 접두사 사용
 
 ### 22. 서버 사이드 SDK API 경로
+
 - 서버 사이드 SDK API는 `/api/v1/remote-config/server/` 접두사 사용
 
 ### 23. API Access Token 관리 시스템
+
 - Client/Server SDK 접근을 위한 별도 API 토큰 시스템 구현
 - Unleash Features 방식 참고
 
 ### 24. 다이어그램 작성
+
 - 시스템 아키텍처 다이어그램 제공
 - 모든 다이어그램 내용은 영어로 작성
 
 ### 25. 환경 관리 권한
+
 - Environment 관리는 Admin 전용
 - Client API를 통한 환경 수정/접근 불필요
 
 ### 26. SDK 헤더 요구사항
+
 - Client/Server SDK는 헤더에 API 키 및 애플리케이션 이름 포함
 - Unleash Features 방식 참고
 
 ### 27. 메트릭 보존 기간 설정
+
 - 수집된 메트릭의 최대 보존 기간을 .env에서 설정 가능
 
 ### 28. 템플릿 Import/Export
+
 - 템플릿 Import/Export 기능 제공
 - Import는 전체 내용 변경이므로 approval workflow 활성화 시 승인 필요
 - Export는 JSON 형태로 단순 내보내기
 
 ### 29. 테이블 명명 규칙 수정
+
 - g_change_requests → g_remote_config_change_requests
 
 ### 30. SDK API 엔드포인트 명확화
+
 - Client SDK: /api/v1/remote-config/client/
 - Server SDK: /api/v1/remote-config/server/
 - SDK는 API access token으로 접근, app name으로 메트릭 수집
 
 ### 31. 캐싱 시스템 명확화
+
 - 캐싱 대상과 무효화 시점 명확히 정의
 
 ### 32. 시각적 차이점 표시
+
 - Change request, deployments 정보 표시 시 React diff viewer 사용
 - Git diff 스타일의 시각적 확인 제공
 
 ### 33. API Access Token 환경 제한 및 범용성
+
 - 하나의 토큰은 하나의 환경에만 접근 가능
 - Dev용, Live용 별도 토큰 발급 필요
 - API Access Token은 Remote Config 외에 모든 Client/Server SDK, DevOps Tooling 등에서 사용
 - Remote Config 전용이 아닌 범용 인증 토큰 시스템
 
 ### 34. API 토큰 테이블 명명 수정
+
 - g_remote_config_api_tokens → g_remote_config_api_access_tokens
 
 ### 35. Admin API Token 용도
+
 - Admin API token은 DevOps 등에서 사용
 
 ### 36. Approval 기본 설정
+
 - Approvals는 기본적으로 비활성화
 - 라이브 환경에서 필요 시 UI에서 환경별 활성화
 
 ### 37. 상세 메트릭 추적
+
 - 각 설정별 true/false 평가 결과 추적
 - Variants 평가 결과 추적
 - 캠페인 평가 결과 추적
 
 ### 38. Legacy 고려 최소화
+
 - Legacy 고려는 UI 체계 유지 수준만
 - API 호환성 불필요 (새로 구축)
 
 ### 39. UI 통일성 유지
+
 - 새 UI 추가 시 기존 UI와 통일성 고려
 - 일관된 디자인 시스템 적용
 
 ### 40. Environment 테이블 Description 추가
+
 - Environment 테이블에 description 컬럼 추가
 
 ### 41. Config 설정 타입 제한
+
 - Config 설정 타입을 5가지로 제한: string, number, boolean, json, yaml
 
 ### 42. SDK 평가 아키텍처
+
 - Client SDK: Gatrix 또는 Server SDK에서 평가 (보안상 자체 평가 금지)
 - Server SDK: Gatrix에서 템플릿 주기적 가져와 자체 캐싱 및 평가
 - Gatrix-remote-config-edge: 스케일링을 위한 별도 평가 엔진
 
 ### 43. 실시간 승인 알림
+
 - 승인 요청 시 실시간으로 모든 대시보드 접속 유저에게 알림
 - 대시보드 상단 바로 아래에 알림 표시
 
 ### 44. API Access Token 캐싱
+
 - API Access Token 검증 시 데이터베이스 부하 감소를 위한 캐싱
 - 매번 데이터베이스 접근 대신 캐시 활용
 
 ### 45. 용어 통일성
+
 - Feature Toggle 용어 사용 금지 (코드 및 문서에서)
 - Remote Config 시스템으로 일관된 용어 사용
 
 ### 46. Segments 기능
+
 - 자주 사용되는 타겟팅 조건을 미리 정의된 Segments로 관리
 - 베타 유저, 한국 유저 등 재사용 가능한 조건 셋트
 
 ### 47. 테이블명 일관성 확보
+
 - g_change_requests → g_remote_config_change_requests로 완전 변경
 - 모든 Remote Config 관련 테이블의 일관된 명명 규칙 적용
 
 ### 48. Node.js SDK 제작
+
 - gatrix/packages/sdks/nodejs 폴더에 클라이언트/서버사이드 SDK 제작
 - 클라이언트 SDK: 평가 요청 전용 (보안상 자체 평가 금지)
 - 서버 SDK: 템플릿 캐싱 + 자체 평가 기능
 
 ### 49. UserContext 단순화
+
 - UserContext에서 subscriptionType, country, userType 필드 제거
 - 과잉 설계 방지, 필수 필드만 유지
 
 ### 50. API Access Token 단순화
+
 - API Access Token에서 applicationName 필드 제거
 - 토큰 관리 복잡성 감소
 
 ### 51. 업데이트 추적 강화
+
 - updatedAt 필드가 있는 모든 테이블에 updatedBy 필드 추가
 - 변경 이력 추적 완성
 
 ### 52. 테이블명 일관성 개선
+
 - g_api_token* → g_api_access_tokens* 로 테이블명 변경
 - 명확한 의미 전달
 
 ### 53. Admin 페이지 API 토큰 관리
+
 - 대시보드 Admin 페이지에서 API Access Token 관리 기능
 - Unleash Features 스타일 참고
 
 ### 54. 용어 일관성 완전 확보
+
 - 문서 샘플에서 featureToggle 용어 완전 제거
 - Remote Config 용어로 일관성 유지
 
 ### 55. UI 로컬라이징 필수
+
 - 기존 UI 수정 또는 새로운 UI 추가 시 반드시 로컬라이징 적용
 - 다국어 지원을 통한 글로벌 사용성 확보
 
 ### 56. 데이터베이스 필드 타입 변경
+
 - ENUM 대신 VARCHAR/STRING 타입 사용
 - Migration 복잡성 감소 및 유연성 확보
 
 ### 57. Template 상태 상세 정의
+
 - 각 상태별 명확한 조건 및 전환 규칙 정의
 - 상태 기반 워크플로우 체계화
 
 ### 58. SSE 기반 실시간 알림
+
 - WebSocket 대신 기존 구현된 SSE 사용
 - 실시간 승인 알림 시스템 SSE로 구현
 
 ### 59. 환경 선택 UI 상단 고정
+
 - Remote Config 관리 페이지 상단에 환경 선택 UI 고정
 - 언제든지 환경 스위칭 가능한 UX 제공
 
 ### 60. SSE 기반 실시간 알림 완전 적용
+
 - "WebSocket 기반 실시간 알림" 섹션을 SSE로 완전 변경
 - 기존 구현된 SSE 인프라 활용
 
 ### 61. 기존 시스템 우선 활용
+
 - 새로운 시스템 구축 전 기존 인프라 활용 가능성 우선 검토
 - SSE, 캐싱, 인증 시스템 등 기존 구현 최대한 재사용
 
 ### 62. SDK UserContext 단순화
+
 - SDK에서 추적하는 유저 정보 중 country 필드 제거
 - 불필요한 개인정보 수집 방지
 
 ### 63. UI 통일성 강화
+
 - 모든 신규 UI는 기존 UI와 완전한 통일성 유지
 - 디자인 시스템 가이드라인 엄격 준수
 
@@ -855,7 +909,6 @@ export class ApprovalWorkflowService {
     changeDetails: any;
     requestedBy: number;
   }): Promise<ChangeRequest> {
-
     // 승인 정책 확인
     const policy = await this.getApprovalPolicy(data.environmentId);
 
@@ -873,7 +926,7 @@ export class ApprovalWorkflowService {
       change_details: JSON.stringify(data.changeDetails),
       requested_by: data.requestedBy,
       required_approvals: policy.min_approvers,
-      expires_at: new Date(Date.now() + policy.approval_timeout_hours * 60 * 60 * 1000)
+      expires_at: new Date(Date.now() + policy.approval_timeout_hours * 60 * 60 * 1000),
     });
 
     // 승인자들에게 알림 발송
@@ -889,7 +942,6 @@ export class ApprovalWorkflowService {
     decision: 'approve' | 'reject',
     comment?: string
   ): Promise<ApprovalResult> {
-
     const changeRequest = await this.getChangeRequest(changeRequestId);
 
     // 승인자 권한 확인
@@ -900,7 +952,7 @@ export class ApprovalWorkflowService {
       change_request_id: changeRequestId,
       approver_id: approverId,
       decision,
-      comment
+      comment,
     });
 
     if (decision === 'reject') {
@@ -927,7 +979,7 @@ export class ApprovalWorkflowService {
     return {
       approved: true,
       executed: false,
-      pendingApprovals: updatedRequest.required_approvals - updatedRequest.current_approvals
+      pendingApprovals: updatedRequest.required_approvals - updatedRequest.current_approvals,
     };
   }
 }
@@ -1084,18 +1136,22 @@ export class SystemValidationService {
     // 전체 템플릿 수 확인
     const totalTemplates = await db('g_remote_config_templates').count('id as count').first();
     if (totalTemplates.count >= SYSTEM_LIMITS.MAX_TOTAL_TEMPLATES) {
-      errors.push(`System template limit reached: ${totalTemplates.count}/${SYSTEM_LIMITS.MAX_TOTAL_TEMPLATES}`);
+      errors.push(
+        `System template limit reached: ${totalTemplates.count}/${SYSTEM_LIMITS.MAX_TOTAL_TEMPLATES}`
+      );
     }
 
     // 전체 환경 수 확인
     const totalEnvironments = await db('g_remote_config_environments').count('id as count').first();
     if (totalEnvironments.count >= SYSTEM_LIMITS.MAX_ENVIRONMENTS) {
-      errors.push(`System environment limit reached: ${totalEnvironments.count}/${SYSTEM_LIMITS.MAX_ENVIRONMENTS}`);
+      errors.push(
+        `System environment limit reached: ${totalEnvironments.count}/${SYSTEM_LIMITS.MAX_ENVIRONMENTS}`
+      );
     }
 
     return {
       isValid: errors.length === 0,
-      errors
+      errors,
     };
   }
 
@@ -1104,12 +1160,16 @@ export class SystemValidationService {
 
     // 설정 수 제한
     if (Object.keys(template.configs).length > SYSTEM_LIMITS.MAX_CONFIGS_PER_TEMPLATE) {
-      errors.push(`Too many configs: ${Object.keys(template.configs).length} > ${SYSTEM_LIMITS.MAX_CONFIGS_PER_TEMPLATE}`);
+      errors.push(
+        `Too many configs: ${Object.keys(template.configs).length} > ${SYSTEM_LIMITS.MAX_CONFIGS_PER_TEMPLATE}`
+      );
     }
 
     // 캠페인 수 제한
     if (template.campaigns.length > SYSTEM_LIMITS.MAX_CAMPAIGNS_PER_TEMPLATE) {
-      errors.push(`Too many campaigns: ${template.campaigns.length} > ${SYSTEM_LIMITS.MAX_CAMPAIGNS_PER_TEMPLATE}`);
+      errors.push(
+        `Too many campaigns: ${template.campaigns.length} > ${SYSTEM_LIMITS.MAX_CAMPAIGNS_PER_TEMPLATE}`
+      );
     }
 
     // 템플릿 크기 제한
@@ -1121,7 +1181,7 @@ export class SystemValidationService {
 
     return {
       isValid: errors.length === 0,
-      errors
+      errors,
     };
   }
 }
@@ -1142,29 +1202,29 @@ const THROTTLE_CONFIG = {
   client: {
     windowMs: 60 * 1000, // 1분
     max: parseInt(process.env.CLIENT_API_RATE_LIMIT || '1000'), // 1000 req/min
-    message: 'Too many requests from client API'
+    message: 'Too many requests from client API',
   },
 
   // 관리자 API (중간 트래픽)
   admin: {
     windowMs: 60 * 1000, // 1분
     max: parseInt(process.env.ADMIN_API_RATE_LIMIT || '100'), // 100 req/min
-    message: 'Too many requests from admin API'
+    message: 'Too many requests from admin API',
   },
 
   // 템플릿 업데이트 (낮은 트래픽)
   template_update: {
     windowMs: 60 * 1000, // 1분
     max: parseInt(process.env.TEMPLATE_UPDATE_RATE_LIMIT || '10'), // 10 req/min
-    message: 'Too many template updates'
+    message: 'Too many template updates',
   },
 
   // 메트릭 수집 (SDK에서 집계 후 전송)
   metrics_collection: {
     windowMs: 60 * 1000, // 1분
     max: parseInt(process.env.METRICS_COLLECTION_RATE_LIMIT || '500'), // 500 req/min
-    message: 'Too many metrics submissions'
-  }
+    message: 'Too many metrics submissions',
+  },
 };
 
 export class ThrottleService {
@@ -1181,9 +1241,11 @@ export class ThrottleService {
 
     return rateLimit({
       ...config,
-      store: this.redis ? new RedisStore({
-        sendCommand: (...args: string[]) => this.redis!.call(...args),
-      }) : undefined, // 메모리 스토어 사용 (Redis 없으면)
+      store: this.redis
+        ? new RedisStore({
+            sendCommand: (...args: string[]) => this.redis!.call(...args),
+          })
+        : undefined, // 메모리 스토어 사용 (Redis 없으면)
 
       // 사용자별 제한
       keyGenerator: (req) => {
@@ -1341,7 +1403,7 @@ export class RemoteConfigClient {
     applicationName: string;
     metricsConfig?: {
       flushInterval?: number; // 기본 30초
-      maxBatchSize?: number;  // 기본 100개
+      maxBatchSize?: number; // 기본 100개
     };
   }) {
     this.apiClient = new ApiClient(config);
@@ -1351,16 +1413,12 @@ export class RemoteConfigClient {
   }
 
   // 설정값 조회 (Gatrix에서 평가)
-  async getConfig<T = any>(
-    configKey: string,
-    defaultValue: T,
-    context?: UserContext
-  ): Promise<T> {
+  async getConfig<T = any>(configKey: string, defaultValue: T, context?: UserContext): Promise<T> {
     try {
       const response = await this.apiClient.post(`/client/${this.environment}/evaluate`, {
         configKey,
         context,
-        applicationName: this.applicationName
+        applicationName: this.applicationName,
       });
 
       // 메트릭 수집
@@ -1368,7 +1426,7 @@ export class RemoteConfigClient {
         configKey,
         result: response.value,
         evaluationTime: response.evaluationTime,
-        context
+        context,
       });
 
       return response.value ?? defaultValue;
@@ -1379,15 +1437,12 @@ export class RemoteConfigClient {
   }
 
   // 여러 설정값 일괄 조회
-  async getConfigs(
-    configKeys: string[],
-    context?: UserContext
-  ): Promise<Record<string, any>> {
+  async getConfigs(configKeys: string[], context?: UserContext): Promise<Record<string, any>> {
     try {
       const response = await this.apiClient.post(`/client/${this.environment}/evaluate-batch`, {
         configKeys,
         context,
-        applicationName: this.applicationName
+        applicationName: this.applicationName,
       });
 
       // 메트릭 수집
@@ -1396,7 +1451,7 @@ export class RemoteConfigClient {
           configKey: key,
           result: result.value,
           evaluationTime: result.evaluationTime,
-          context
+          context,
         });
       });
 
@@ -1433,13 +1488,13 @@ export class RemoteConfigServer {
     environment: string;
     applicationName: string;
     cacheConfig?: {
-      syncInterval?: number;    // 기본 60초
-      maxCacheSize?: number;    // 기본 1000개
-      cacheTtl?: number;        // 기본 5분
+      syncInterval?: number; // 기본 60초
+      maxCacheSize?: number; // 기본 1000개
+      cacheTtl?: number; // 기본 5분
     };
     metricsConfig?: {
       aggregationInterval?: number; // 기본 30초
-      maxBatchSize?: number;        // 기본 500개
+      maxBatchSize?: number; // 기본 500개
     };
   }) {
     this.apiClient = new ApiClient(config);
@@ -1454,11 +1509,7 @@ export class RemoteConfigServer {
   }
 
   // 설정값 조회 (로컬 평가)
-  async getConfig<T = any>(
-    configKey: string,
-    defaultValue: T,
-    context?: UserContext
-  ): Promise<T> {
+  async getConfig<T = any>(configKey: string, defaultValue: T, context?: UserContext): Promise<T> {
     try {
       // 캐시된 템플릿에서 평가
       const template = await this.templateCache.getTemplate();
@@ -1469,7 +1520,7 @@ export class RemoteConfigServer {
         configKey,
         result: result.value,
         evaluationDetails: result.details,
-        context
+        context,
       });
 
       return result.value ?? defaultValue;
@@ -1480,10 +1531,7 @@ export class RemoteConfigServer {
   }
 
   // 여러 설정값 일괄 조회
-  async getConfigs(
-    configKeys: string[],
-    context?: UserContext
-  ): Promise<Record<string, any>> {
+  async getConfigs(configKeys: string[], context?: UserContext): Promise<Record<string, any>> {
     try {
       const template = await this.templateCache.getTemplate();
       const results: Record<string, any> = {};
@@ -1497,7 +1545,7 @@ export class RemoteConfigServer {
           configKey,
           result: result.value,
           evaluationDetails: result.details,
-          context
+          context,
         });
       }
 
@@ -1579,21 +1627,19 @@ const client = new RemoteConfigClient({
   apiUrl: 'https://api.gatrix.com',
   accessToken: 'rc_client:your-token-here',
   environment: 'production',
-  applicationName: 'web-app'
+  applicationName: 'web-app',
 });
 
 // 단일 설정 조회
 const showNewFeature = await client.getConfig('show_new_feature', false, {
   userId: 'user123',
-  platform: 'web'
+  platform: 'web',
 });
 
 // 여러 설정 일괄 조회
-const configs = await client.getConfigs([
-  'show_new_feature',
-  'api_timeout',
-  'theme_color'
-], { userId: 'user123' });
+const configs = await client.getConfigs(['show_new_feature', 'api_timeout', 'theme_color'], {
+  userId: 'user123',
+});
 
 // Server SDK 사용 예시
 import { RemoteConfigServer } from '@gatrix/remote-config-server';
@@ -1605,14 +1651,14 @@ const server = new RemoteConfigServer({
   applicationName: 'api-server',
   cacheConfig: {
     syncInterval: 30000, // 30초마다 동기화
-    cacheTtl: 300000     // 5분 캐시
-  }
+    cacheTtl: 300000, // 5분 캐시
+  },
 });
 
 // 로컬 평가로 빠른 응답
 const featureEnabled = await server.getConfig('feature_enabled', false, {
   userId: 'user123',
-  userType: 'premium'
+  userType: 'premium',
 });
 ```
 
@@ -1642,169 +1688,173 @@ stateDiagram-v2
 ### 상태별 상세 정의
 
 #### 1. Draft (초안)
+
 ```typescript
 interface DraftState {
-  description: "템플릿 작성 및 편집 중인 상태";
+  description: '템플릿 작성 및 편집 중인 상태';
   conditions: {
-    creation: "새 템플릿 생성 시 기본 상태";
-    editing: "기존 템플릿 수정 중";
-    rejection: "Staged에서 거부된 경우";
-    restoration: "Archived에서 복원된 경우";
+    creation: '새 템플릿 생성 시 기본 상태';
+    editing: '기존 템플릿 수정 중';
+    rejection: 'Staged에서 거부된 경우';
+    restoration: 'Archived에서 복원된 경우';
   };
   permissions: {
-    read: ["owner", "editor", "admin"];
-    write: ["owner", "editor", "admin"];
-    delete: ["owner", "admin"];
+    read: ['owner', 'editor', 'admin'];
+    write: ['owner', 'editor', 'admin'];
+    delete: ['owner', 'admin'];
   };
   transitions: {
     to_staged: {
-      condition: "승인 워크플로우가 활성화된 환경에서 제출";
-      required_fields: ["templateName", "description", "templateData"];
-      validation: "템플릿 데이터 유효성 검사 통과";
+      condition: '승인 워크플로우가 활성화된 환경에서 제출';
+      required_fields: ['templateName', 'description', 'templateData'];
+      validation: '템플릿 데이터 유효성 검사 통과';
     };
     to_published: {
-      condition: "승인 워크플로우가 비활성화된 환경에서 직접 배포";
-      required_fields: ["templateName", "description", "templateData"];
-      validation: "템플릿 데이터 유효성 검사 통과";
+      condition: '승인 워크플로우가 비활성화된 환경에서 직접 배포';
+      required_fields: ['templateName', 'description', 'templateData'];
+      validation: '템플릿 데이터 유효성 검사 통과';
     };
     to_archived: {
-      condition: "60일간 수정되지 않은 경우 자동 Archive";
-      manual: "소유자 또는 관리자가 수동 Archive";
+      condition: '60일간 수정되지 않은 경우 자동 Archive';
+      manual: '소유자 또는 관리자가 수동 Archive';
     };
   };
   auto_actions: {
-    archive_after: "60 days of inactivity";
-    cleanup_sessions: "편집 세션 자동 정리";
+    archive_after: '60 days of inactivity';
+    cleanup_sessions: '편집 세션 자동 정리';
   };
 }
 ```
 
 #### 2. Staged (승인 대기)
+
 ```typescript
 interface StagedState {
-  description: "승인 대기 중인 상태";
+  description: '승인 대기 중인 상태';
   conditions: {
-    submission: "Draft에서 승인 요청 제출";
-    review_pending: "승인자 검토 대기 중";
+    submission: 'Draft에서 승인 요청 제출';
+    review_pending: '승인자 검토 대기 중';
   };
   permissions: {
-    read: ["owner", "editor", "approver", "admin"];
+    read: ['owner', 'editor', 'approver', 'admin'];
     write: []; // 승인 대기 중에는 편집 불가
-    approve: ["approver", "admin"];
-    reject: ["approver", "admin"];
+    approve: ['approver', 'admin'];
+    reject: ['approver', 'admin'];
   };
   transitions: {
     to_published: {
-      condition: "필요한 승인 수 달성";
-      process: "승인 완료 후 자동 배포";
-      notification: "승인 완료 알림 발송";
+      condition: '필요한 승인 수 달성';
+      process: '승인 완료 후 자동 배포';
+      notification: '승인 완료 알림 발송';
     };
     to_draft: {
-      condition: "승인 거부 또는 변경 요청";
+      condition: '승인 거부 또는 변경 요청';
       reason_required: true;
-      notification: "거부 사유와 함께 알림 발송";
+      notification: '거부 사유와 함께 알림 발송';
     };
     to_archived: {
-      condition: "30일간 승인되지 않은 경우 자동 Archive";
-      manual: "관리자가 수동 Archive";
+      condition: '30일간 승인되지 않은 경우 자동 Archive';
+      manual: '관리자가 수동 Archive';
     };
   };
   auto_actions: {
-    archive_after: "30 days without approval";
-    timeout_notification: "승인 기한 임박 알림";
+    archive_after: '30 days without approval';
+    timeout_notification: '승인 기한 임박 알림';
   };
   approval_tracking: {
-    required_approvals: "환경별 설정값";
-    current_approvals: "현재 승인 수";
-    approvers: "승인자 목록";
-    approval_history: "승인 이력";
+    required_approvals: '환경별 설정값';
+    current_approvals: '현재 승인 수';
+    approvers: '승인자 목록';
+    approval_history: '승인 이력';
   };
 }
 ```
 
 #### 3. Published (배포됨)
+
 ```typescript
 interface PublishedState {
-  description: "실제 서비스에 배포된 활성 상태";
+  description: '실제 서비스에 배포된 활성 상태';
   conditions: {
-    deployment: "승인 완료 후 배포";
-    direct_publish: "승인 워크플로우 없이 직접 배포";
-    active_serving: "SDK에서 실제 사용 중";
+    deployment: '승인 완료 후 배포';
+    direct_publish: '승인 워크플로우 없이 직접 배포';
+    active_serving: 'SDK에서 실제 사용 중';
   };
   permissions: {
-    read: ["all_authenticated_users"];
+    read: ['all_authenticated_users'];
     write: []; // Published 상태에서는 직접 편집 불가
-    create_version: ["owner", "editor", "admin"];
-    archive: ["admin"]; // 신중한 권한 관리
+    create_version: ['owner', 'editor', 'admin'];
+    archive: ['admin']; // 신중한 권한 관리
   };
   transitions: {
     to_staged: {
-      condition: "새 버전 생성 시 (승인 워크플로우 활성화)";
-      process: "기존 Published 버전은 유지, 새 버전이 Staged로";
-      versioning: "버전 번호 자동 증가";
+      condition: '새 버전 생성 시 (승인 워크플로우 활성화)';
+      process: '기존 Published 버전은 유지, 새 버전이 Staged로';
+      versioning: '버전 번호 자동 증가';
     };
     to_published: {
-      condition: "새 버전 생성 시 (승인 워크플로우 비활성화)";
-      process: "기존 버전을 새 버전으로 교체";
-      backup: "이전 버전 백업 보관";
+      condition: '새 버전 생성 시 (승인 워크플로우 비활성화)';
+      process: '기존 버전을 새 버전으로 교체';
+      backup: '이전 버전 백업 보관';
     };
     to_archived: {
-      condition: "수동 Archive만 가능";
-      restrictions: "유일한 Published 버전인 경우 Archive 불가";
-      replacement_required: "새 Published 버전 존재 시에만 가능";
+      condition: '수동 Archive만 가능';
+      restrictions: '유일한 Published 버전인 경우 Archive 불가';
+      replacement_required: '새 Published 버전 존재 시에만 가능';
     };
   };
   active_monitoring: {
-    usage_tracking: "실시간 사용량 모니터링";
-    performance_metrics: "응답 시간 및 성능 지표";
-    error_tracking: "오류 발생 추적";
+    usage_tracking: '실시간 사용량 모니터링';
+    performance_metrics: '응답 시간 및 성능 지표';
+    error_tracking: '오류 발생 추적';
   };
   sdk_integration: {
-    cache_invalidation: "배포 시 SDK 캐시 무효화";
-    gradual_rollout: "점진적 배포 지원";
-    rollback_capability: "이전 버전으로 롤백 가능";
+    cache_invalidation: '배포 시 SDK 캐시 무효화';
+    gradual_rollout: '점진적 배포 지원';
+    rollback_capability: '이전 버전으로 롤백 가능';
   };
 }
 ```
 
 #### 4. Archived (보관됨)
+
 ```typescript
 interface ArchivedState {
-  description: "사용 중단되어 보관된 상태";
+  description: '사용 중단되어 보관된 상태';
   conditions: {
-    auto_archive: "자동 Archive 정책에 의한 보관";
-    manual_archive: "수동 Archive 요청";
-    replacement: "새 버전으로 교체된 이전 버전";
+    auto_archive: '자동 Archive 정책에 의한 보관';
+    manual_archive: '수동 Archive 요청';
+    replacement: '새 버전으로 교체된 이전 버전';
   };
   permissions: {
-    read: ["owner", "admin"]; // 제한적 읽기 권한
+    read: ['owner', 'admin']; // 제한적 읽기 권한
     write: []; // 편집 불가
-    restore: ["owner", "admin"];
-    delete: ["admin"]; // 영구 삭제는 관리자만
+    restore: ['owner', 'admin'];
+    delete: ['admin']; // 영구 삭제는 관리자만
   };
   transitions: {
     to_draft: {
-      condition: "복원 요청";
-      process: "Draft 상태로 복원";
+      condition: '복원 요청';
+      process: 'Draft 상태로 복원';
       reason_required: true;
-      notification: "복원 알림 발송";
+      notification: '복원 알림 발송';
     };
     to_deleted: {
-      condition: "영구 삭제 (관리자만)";
+      condition: '영구 삭제 (관리자만)';
       confirmation_required: true;
-      backup_retention: "삭제 전 최종 백업";
+      backup_retention: '삭제 전 최종 백업';
     };
   };
   retention_policy: {
-    auto_delete_after: "1년 후 자동 삭제 (설정 가능)";
-    backup_storage: "압축된 형태로 백업 저장";
-    audit_trail: "Archive 이력 영구 보관";
+    auto_delete_after: '1년 후 자동 삭제 (설정 가능)';
+    backup_storage: '압축된 형태로 백업 저장';
+    audit_trail: 'Archive 이력 영구 보관';
   };
   archive_metadata: {
-    archived_at: "Archive 시점";
-    archived_by: "Archive 실행자";
-    archive_reason: "Archive 사유";
-    archive_type: "자동/수동 구분";
+    archived_at: 'Archive 시점';
+    archived_by: 'Archive 실행자';
+    archive_reason: 'Archive 사유';
+    archive_type: '자동/수동 구분';
   };
 }
 ```
@@ -1815,10 +1865,10 @@ interface ArchivedState {
 export const TEMPLATE_STATE_RULES = {
   // 상태 전환 매트릭스
   transitions: {
-    draft: ["staged", "published", "archived", "deleted"],
-    staged: ["published", "draft", "archived"],
-    published: ["staged", "published", "archived"], // 새 버전 생성
-    archived: ["draft", "deleted"]
+    draft: ['staged', 'published', 'archived', 'deleted'],
+    staged: ['published', 'draft', 'archived'],
+    published: ['staged', 'published', 'archived'], // 새 버전 생성
+    archived: ['draft', 'deleted'],
   },
 
   // 상태별 제약사항
@@ -1826,40 +1876,40 @@ export const TEMPLATE_STATE_RULES = {
     draft: {
       max_edit_sessions: 5,
       auto_save_interval: 30, // seconds
-      validation_required: true
+      validation_required: true,
     },
     staged: {
       edit_locked: true,
       approval_timeout: 7, // days
-      required_approvals: "environment_setting"
+      required_approvals: 'environment_setting',
     },
     published: {
       direct_edit_forbidden: true,
       usage_monitoring: true,
-      backup_required: true
+      backup_required: true,
     },
     archived: {
       read_only: true,
       restore_permission_required: true,
-      auto_delete_after: 365 // days
-    }
+      auto_delete_after: 365, // days
+    },
   },
 
   // 자동 액션 트리거
   auto_actions: {
     draft_cleanup: {
-      trigger: "60 days inactive",
-      action: "move_to_archived"
+      trigger: '60 days inactive',
+      action: 'move_to_archived',
     },
     staged_timeout: {
-      trigger: "30 days without approval",
-      action: "move_to_archived"
+      trigger: '30 days without approval',
+      action: 'move_to_archived',
     },
     archived_cleanup: {
-      trigger: "365 days in archive",
-      action: "permanent_delete"
-    }
-  }
+      trigger: '365 days in archive',
+      action: 'permanent_delete',
+    },
+  },
 };
 ```
 
@@ -1867,7 +1917,6 @@ export const TEMPLATE_STATE_RULES = {
 
 ```typescript
 export class TemplateStateManager {
-
   // 상태 전환 실행
   async transitionState(
     templateId: number,
@@ -1876,7 +1925,6 @@ export class TemplateStateManager {
     userId: number,
     reason?: string
   ): Promise<void> {
-
     // 1. 전환 가능성 검증
     const canTransition = await this.validateTransition(templateId, fromState, toState);
     if (!canTransition.allowed) {
@@ -1897,12 +1945,7 @@ export class TemplateStateManager {
   }
 
   // 상태별 권한 확인
-  async checkStatePermission(
-    templateId: number,
-    userId: number,
-    action: string
-  ): Promise<boolean> {
-
+  async checkStatePermission(templateId: number, userId: number, action: string): Promise<boolean> {
     const template = await this.getTemplate(templateId);
     const userRoles = await this.getUserRoles(userId, template.environmentId);
     const stateRules = TEMPLATE_STATE_RULES.constraints[template.templateStatus];
@@ -1940,59 +1983,59 @@ export class TemplateStateManager {
 export const EXISTING_SYSTEM_UTILIZATION = {
   // 1. 실시간 통신 - 기존 SSE 활용
   realtime_communication: {
-    existing: "SSE (Server-Sent Events) 구현됨",
-    reuse_strategy: "기존 SSE 인프라 확장하여 승인 알림 구현",
-    new_implementation: "WebSocket 대신 SSE 기반 실시간 알림",
-    benefits: ["기존 인프라 활용", "개발 시간 단축", "안정성 확보"]
+    existing: 'SSE (Server-Sent Events) 구현됨',
+    reuse_strategy: '기존 SSE 인프라 확장하여 승인 알림 구현',
+    new_implementation: 'WebSocket 대신 SSE 기반 실시간 알림',
+    benefits: ['기존 인프라 활용', '개발 시간 단축', '안정성 확보'],
   },
 
   // 2. 캐싱 시스템 - 기존 캐시 확장
   caching_system: {
-    existing: "Redis 기반 캐싱 시스템 구현됨",
-    reuse_strategy: "기존 cache-manager 확장하여 템플릿 캐싱",
-    new_implementation: "L1(Memory) + L2(Redis) 다층 캐싱",
-    benefits: ["검증된 캐시 전략", "운영 노하우 활용", "성능 최적화"]
+    existing: 'Redis 기반 캐싱 시스템 구현됨',
+    reuse_strategy: '기존 cache-manager 확장하여 템플릿 캐싱',
+    new_implementation: 'L1(Memory) + L2(Redis) 다층 캐싱',
+    benefits: ['검증된 캐시 전략', '운영 노하우 활용', '성능 최적화'],
   },
 
   // 3. 인증 시스템 - 기존 JWT 확장
   authentication: {
-    existing: "JWT 기반 사용자 인증 시스템",
-    reuse_strategy: "기존 JWT 토큰에 환경별 권한 추가",
-    new_implementation: "API Access Token을 기존 인증 시스템과 통합",
-    benefits: ["일관된 보안 정책", "기존 미들웨어 재사용", "통합 관리"]
+    existing: 'JWT 기반 사용자 인증 시스템',
+    reuse_strategy: '기존 JWT 토큰에 환경별 권한 추가',
+    new_implementation: 'API Access Token을 기존 인증 시스템과 통합',
+    benefits: ['일관된 보안 정책', '기존 미들웨어 재사용', '통합 관리'],
   },
 
   // 4. 데이터베이스 - 기존 스키마 확장
   database: {
-    existing: "MySQL 기반 데이터베이스",
-    reuse_strategy: "기존 테이블 구조 패턴 따라 Remote Config 테이블 설계",
-    new_implementation: "g_remote_config_ 접두사로 새 테이블 추가",
-    benefits: ["일관된 네이밍", "기존 ORM 활용", "백업/복구 정책 공유"]
+    existing: 'MySQL 기반 데이터베이스',
+    reuse_strategy: '기존 테이블 구조 패턴 따라 Remote Config 테이블 설계',
+    new_implementation: 'g_remote_config_ 접두사로 새 테이블 추가',
+    benefits: ['일관된 네이밍', '기존 ORM 활용', '백업/복구 정책 공유'],
   },
 
   // 5. API 구조 - 기존 REST API 패턴
   api_structure: {
-    existing: "/api/v1/ 기반 REST API 구조",
-    reuse_strategy: "기존 API 패턴 따라 /api/v1/remote-config/ 구현",
-    new_implementation: "기존 미들웨어, 에러 핸들링, 로깅 시스템 재사용",
-    benefits: ["일관된 API 설계", "기존 클라이언트 호환", "개발자 친화적"]
+    existing: '/api/v1/ 기반 REST API 구조',
+    reuse_strategy: '기존 API 패턴 따라 /api/v1/remote-config/ 구현',
+    new_implementation: '기존 미들웨어, 에러 핸들링, 로깅 시스템 재사용',
+    benefits: ['일관된 API 설계', '기존 클라이언트 호환', '개발자 친화적'],
   },
 
   // 6. UI 컴포넌트 - 기존 디자인 시스템
   ui_components: {
-    existing: "React 기반 컴포넌트 라이브러리",
-    reuse_strategy: "기존 UI 컴포넌트 최대한 재사용",
-    new_implementation: "기존 스타일 가이드 준수하여 새 컴포넌트 개발",
-    benefits: ["일관된 UX", "개발 속도 향상", "유지보수성"]
+    existing: 'React 기반 컴포넌트 라이브러리',
+    reuse_strategy: '기존 UI 컴포넌트 최대한 재사용',
+    new_implementation: '기존 스타일 가이드 준수하여 새 컴포넌트 개발',
+    benefits: ['일관된 UX', '개발 속도 향상', '유지보수성'],
   },
 
   // 7. 로깅 및 모니터링 - 기존 시스템 확장
   logging_monitoring: {
-    existing: "중앙화된 로깅 및 모니터링 시스템",
-    reuse_strategy: "기존 로그 포맷과 모니터링 대시보드 활용",
-    new_implementation: "Remote Config 관련 메트릭을 기존 시스템에 통합",
-    benefits: ["통합 모니터링", "기존 알람 정책 활용", "운영 효율성"]
-  }
+    existing: '중앙화된 로깅 및 모니터링 시스템',
+    reuse_strategy: '기존 로그 포맷과 모니터링 대시보드 활용',
+    new_implementation: 'Remote Config 관련 메트릭을 기존 시스템에 통합',
+    benefits: ['통합 모니터링', '기존 알람 정책 활용', '운영 효율성'],
+  },
 };
 ```
 
@@ -2001,7 +2044,6 @@ export const EXISTING_SYSTEM_UTILIZATION = {
 ```typescript
 // 기존 시스템과의 통합 서비스
 export class ExistingSystemIntegrationService {
-
   // 1. 기존 SSE 시스템 확장
   async extendSSEForRemoteConfig(): Promise<void> {
     // 기존 SSE 엔드포인트에 Remote Config 이벤트 추가
@@ -2012,7 +2054,7 @@ export class ExistingSystemIntegrationService {
       'remote_config:approval_request',
       'remote_config:approval_completed',
       'remote_config:template_updated',
-      'remote_config:environment_changed'
+      'remote_config:environment_changed',
     ]);
 
     // 기존 권한 시스템과 연동
@@ -2029,14 +2071,14 @@ export class ExistingSystemIntegrationService {
     existingCacheManager.addNamespace('remote_config', {
       ttl: 300, // 5분
       max: 1000, // 최대 1000개 항목
-      updateAgeOnGet: true
+      updateAgeOnGet: true,
     });
 
     // 기존 캐시 무효화 정책에 Remote Config 규칙 추가
     existingCacheManager.addInvalidationRule('remote_config:template:*', [
       'template_updated',
       'environment_changed',
-      'approval_completed'
+      'approval_completed',
     ]);
   }
 
@@ -2053,7 +2095,7 @@ export class ExistingSystemIntegrationService {
     existingAuthService.registerTokenType('api_access', {
       issuer: 'gatrix-remote-config',
       audience: 'api-access',
-      expiresIn: '90d'
+      expiresIn: '90d',
     });
   }
 
@@ -2065,7 +2107,7 @@ export class ExistingSystemIntegrationService {
     existingMigrationService.addMigrationGroup('remote_config', {
       prefix: 'g_remote_config_',
       naming_convention: 'camelCase',
-      foreign_key_checks: true
+      foreign_key_checks: true,
     });
   }
 
@@ -2076,10 +2118,10 @@ export class ExistingSystemIntegrationService {
     // 기존 미들웨어 체인에 Remote Config 전용 미들웨어 추가
     existingMiddleware.use('/api/v1/remote-config', [
       'authentication', // 기존 인증 미들웨어
-      'rate_limiting',   // 기존 레이트 리미팅
-      'logging',         // 기존 로깅
-      'error_handling',  // 기존 에러 핸들링
-      'remote_config_permissions' // 새로 추가되는 권한 체크
+      'rate_limiting', // 기존 레이트 리미팅
+      'logging', // 기존 로깅
+      'error_handling', // 기존 에러 핸들링
+      'remote_config_permissions', // 새로 추가되는 권한 체크
     ]);
   }
 }
@@ -2091,30 +2133,30 @@ export class ExistingSystemIntegrationService {
 export const COMPATIBILITY_MATRIX = {
   // 완전 재사용 가능 (100%)
   fully_reusable: {
-    sse_infrastructure: "기존 SSE 시스템 완전 활용",
-    cache_manager: "기존 캐시 매니저 확장 사용",
-    jwt_authentication: "기존 JWT 시스템 확장",
-    database_connection: "기존 DB 커넥션 풀 공유",
-    api_middleware: "기존 미들웨어 체인 재사용",
-    logging_system: "기존 로깅 인프라 활용",
-    error_handling: "기존 에러 핸들링 패턴 적용"
+    sse_infrastructure: '기존 SSE 시스템 완전 활용',
+    cache_manager: '기존 캐시 매니저 확장 사용',
+    jwt_authentication: '기존 JWT 시스템 확장',
+    database_connection: '기존 DB 커넥션 풀 공유',
+    api_middleware: '기존 미들웨어 체인 재사용',
+    logging_system: '기존 로깅 인프라 활용',
+    error_handling: '기존 에러 핸들링 패턴 적용',
   },
 
   // 부분 재사용 가능 (70-90%)
   partially_reusable: {
-    ui_components: "기존 컴포넌트 라이브러리 확장",
-    permission_system: "기존 권한 시스템에 Remote Config 권한 추가",
-    notification_system: "기존 알림 시스템 확장",
-    monitoring_dashboard: "기존 모니터링에 Remote Config 메트릭 추가"
+    ui_components: '기존 컴포넌트 라이브러리 확장',
+    permission_system: '기존 권한 시스템에 Remote Config 권한 추가',
+    notification_system: '기존 알림 시스템 확장',
+    monitoring_dashboard: '기존 모니터링에 Remote Config 메트릭 추가',
   },
 
   // 새로 구현 필요 (0-30%)
   new_implementation: {
-    template_management: "Template 관리 로직 (새로운 비즈니스 로직)",
-    approval_workflow: "승인 워크플로우 (새로운 프로세스)",
-    conflict_resolution: "충돌 해결 알고리즘 (새로운 기능)",
-    sdk_evaluation: "SDK 평가 엔진 (새로운 서비스)"
-  }
+    template_management: 'Template 관리 로직 (새로운 비즈니스 로직)',
+    approval_workflow: '승인 워크플로우 (새로운 프로세스)',
+    conflict_resolution: '충돌 해결 알고리즘 (새로운 기능)',
+    sdk_evaluation: 'SDK 평가 엔진 (새로운 서비스)',
+  },
 };
 ```
 
@@ -2125,46 +2167,46 @@ export const EXISTING_SYSTEM_UTILIZATION_ROADMAP = {
   // Phase 1: 기존 인프라 확장 (Week 1-2)
   phase1_infrastructure_extension: {
     tasks: [
-      "기존 SSE 시스템에 Remote Config 이벤트 타입 추가",
-      "기존 캐시 매니저에 Remote Config 네임스페이스 추가",
-      "기존 JWT에 Remote Config 권한 클레임 추가",
-      "기존 API 미들웨어 체인에 Remote Config 권한 체크 추가"
+      '기존 SSE 시스템에 Remote Config 이벤트 타입 추가',
+      '기존 캐시 매니저에 Remote Config 네임스페이스 추가',
+      '기존 JWT에 Remote Config 권한 클레임 추가',
+      '기존 API 미들웨어 체인에 Remote Config 권한 체크 추가',
     ],
-    benefits: "기존 검증된 인프라 활용으로 안정성 확보"
+    benefits: '기존 검증된 인프라 활용으로 안정성 확보',
   },
 
   // Phase 2: 데이터베이스 및 API 구현 (Week 3-5)
   phase2_core_implementation: {
     tasks: [
-      "기존 DB 마이그레이션 패턴으로 Remote Config 테이블 생성",
-      "기존 API 구조 패턴으로 Remote Config API 구현",
-      "기존 에러 핸들링 패턴 적용",
-      "기존 로깅 시스템에 Remote Config 로그 통합"
+      '기존 DB 마이그레이션 패턴으로 Remote Config 테이블 생성',
+      '기존 API 구조 패턴으로 Remote Config API 구현',
+      '기존 에러 핸들링 패턴 적용',
+      '기존 로깅 시스템에 Remote Config 로그 통합',
     ],
-    benefits: "일관된 개발 패턴으로 개발 속도 향상"
+    benefits: '일관된 개발 패턴으로 개발 속도 향상',
   },
 
   // Phase 3: UI 및 사용자 경험 (Week 6-8)
   phase3_ui_integration: {
     tasks: [
-      "기존 UI 컴포넌트 라이브러리로 Remote Config UI 구현",
-      "기존 디자인 시스템 가이드라인 준수",
-      "기존 라우팅 시스템에 Remote Config 페이지 통합",
-      "기존 상태 관리 패턴 적용"
+      '기존 UI 컴포넌트 라이브러리로 Remote Config UI 구현',
+      '기존 디자인 시스템 가이드라인 준수',
+      '기존 라우팅 시스템에 Remote Config 페이지 통합',
+      '기존 상태 관리 패턴 적용',
     ],
-    benefits: "일관된 UX로 사용자 학습 비용 최소화"
+    benefits: '일관된 UX로 사용자 학습 비용 최소화',
   },
 
   // Phase 4: 고급 기능 및 최적화 (Week 9-12)
   phase4_advanced_features: {
     tasks: [
-      "기존 모니터링 시스템에 Remote Config 메트릭 통합",
-      "기존 알림 시스템 확장하여 승인 알림 구현",
-      "기존 백업/복구 정책에 Remote Config 데이터 포함",
-      "기존 성능 최적화 패턴 적용"
+      '기존 모니터링 시스템에 Remote Config 메트릭 통합',
+      '기존 알림 시스템 확장하여 승인 알림 구현',
+      '기존 백업/복구 정책에 Remote Config 데이터 포함',
+      '기존 성능 최적화 패턴 적용',
     ],
-    benefits: "운영 효율성 극대화 및 유지보수성 향상"
-  }
+    benefits: '운영 효율성 극대화 및 유지보수성 향상',
+  },
 };
 ```
 
@@ -2414,11 +2456,16 @@ export const useEnvironmentData = <T>(
     loadData();
   }, [currentEnvironment?.id, ...dependencies]);
 
-  return { data, loading, error, reload: () => {
-    if (currentEnvironment) {
-      // 강제 리로드 트리거
-    }
-  }};
+  return {
+    data,
+    loading,
+    error,
+    reload: () => {
+      if (currentEnvironment) {
+        // 강제 리로드 트리거
+      }
+    },
+  };
 };
 ```
 
@@ -2579,211 +2626,211 @@ export const REMOTE_CONFIG_LOCALES = {
   'template.title': {
     en: 'Remote Config Templates',
     ko: '원격 설정 템플릿',
-    ja: 'リモート設定テンプレート'
+    ja: 'リモート設定テンプレート',
   },
   'template.create': {
     en: 'Create Template',
     ko: '템플릿 생성',
-    ja: 'テンプレート作成'
+    ja: 'テンプレート作成',
   },
   'template.edit': {
     en: 'Edit Template',
     ko: '템플릿 편집',
-    ja: 'テンプレート編集'
+    ja: 'テンプレート編集',
   },
 
   // 환경 관리
   'environment.title': {
     en: 'Environments',
     ko: '환경',
-    ja: '環境'
+    ja: '環境',
   },
   'environment.production': {
     en: 'Production',
     ko: '프로덕션',
-    ja: 'プロダクション'
+    ja: 'プロダクション',
   },
   'environment.development': {
     en: 'Development',
     ko: '개발',
-    ja: '開発'
+    ja: '開発',
   },
 
   // 승인 워크플로우
   'approval.pending': {
     en: 'Pending Approval',
     ko: '승인 대기',
-    ja: '承認待ち'
+    ja: '承認待ち',
   },
   'approval.approved': {
     en: 'Approved',
     ko: '승인됨',
-    ja: '承認済み'
+    ja: '承認済み',
   },
   'approval.rejected': {
     en: 'Rejected',
     ko: '거부됨',
-    ja: '拒否'
+    ja: '拒否',
   },
 
   // 설정 타입
   'config.type.string': {
     en: 'String',
     ko: '문자열',
-    ja: '文字列'
+    ja: '文字列',
   },
   'config.type.number': {
     en: 'Number',
     ko: '숫자',
-    ja: '数値'
+    ja: '数値',
   },
   'config.type.boolean': {
     en: 'Boolean',
     ko: '불린',
-    ja: 'ブール'
+    ja: 'ブール',
   },
   'config.type.json': {
     en: 'JSON',
     ko: 'JSON',
-    ja: 'JSON'
+    ja: 'JSON',
   },
   'config.type.yaml': {
     en: 'YAML',
     ko: 'YAML',
-    ja: 'YAML'
+    ja: 'YAML',
   },
 
   // 메트릭 및 분석
   'metrics.title': {
     en: 'Metrics & Analytics',
     ko: '메트릭 및 분석',
-    ja: 'メトリクス・分析'
+    ja: 'メトリクス・分析',
   },
   'metrics.evaluations': {
     en: 'Evaluations',
     ko: '평가 횟수',
-    ja: '評価回数'
+    ja: '評価回数',
   },
   'metrics.success_rate': {
     en: 'Success Rate',
     ko: '성공률',
-    ja: '成功率'
+    ja: '成功率',
   },
 
   // API 토큰 관리
   'token.title': {
     en: 'API Access Tokens',
     ko: 'API 액세스 토큰',
-    ja: 'APIアクセストークン'
+    ja: 'APIアクセストークン',
   },
   'token.create': {
     en: 'Create Token',
     ko: '토큰 생성',
-    ja: 'トークン作成'
+    ja: 'トークン作成',
   },
   'token.type.client': {
     en: 'Client Token',
     ko: '클라이언트 토큰',
-    ja: 'クライアントトークン'
+    ja: 'クライアントトークン',
   },
   'token.type.server': {
     en: 'Server Token',
     ko: '서버 토큰',
-    ja: 'サーバートークン'
+    ja: 'サーバートークン',
   },
   'token.type.admin': {
     en: 'Admin Token',
     ko: '관리자 토큰',
-    ja: '管理者トークン'
+    ja: '管理者トークン',
   },
 
   // 충돌 해결
   'conflict.title': {
     en: 'Merge Conflicts Detected',
     ko: '병합 충돌 감지됨',
-    ja: 'マージ競合が検出されました'
+    ja: 'マージ競合が検出されました',
   },
   'conflict.resolve': {
     en: 'Resolve Conflicts',
     ko: '충돌 해결',
-    ja: '競合解決'
+    ja: '競合解決',
   },
   'conflict.accept_yours': {
     en: 'Accept Your Changes',
     ko: '내 변경사항 적용',
-    ja: 'あなたの変更を適用'
+    ja: 'あなたの変更を適用',
   },
   'conflict.accept_theirs': {
     en: 'Accept Their Changes',
     ko: '상대방 변경사항 적용',
-    ja: '相手の変更を適用'
+    ja: '相手の変更を適用',
   },
 
   // 세그먼트
   'segment.title': {
     en: 'User Segments',
     ko: '사용자 세그먼트',
-    ja: 'ユーザーセグメント'
+    ja: 'ユーザーセグメント',
   },
   'segment.beta_users': {
     en: 'Beta Users',
     ko: '베타 사용자',
-    ja: 'ベータユーザー'
+    ja: 'ベータユーザー',
   },
   'segment.premium_users': {
     en: 'Premium Users',
     ko: '프리미엄 사용자',
-    ja: 'プレミアムユーザー'
+    ja: 'プレミアムユーザー',
   },
 
   // 공통 액션
   'action.save': {
     en: 'Save',
     ko: '저장',
-    ja: '保存'
+    ja: '保存',
   },
   'action.cancel': {
     en: 'Cancel',
     ko: '취소',
-    ja: 'キャンセル'
+    ja: 'キャンセル',
   },
   'action.delete': {
     en: 'Delete',
     ko: '삭제',
-    ja: '削除'
+    ja: '削除',
   },
   'action.edit': {
     en: 'Edit',
     ko: '편집',
-    ja: '編集'
+    ja: '編集',
   },
   'action.create': {
     en: 'Create',
     ko: '생성',
-    ja: '作成'
+    ja: '作成',
   },
 
   // 상태 메시지
   'status.loading': {
     en: 'Loading...',
     ko: '로딩 중...',
-    ja: '読み込み中...'
+    ja: '読み込み中...',
   },
   'status.success': {
     en: 'Success',
     ko: '성공',
-    ja: '成功'
+    ja: '成功',
   },
   'status.error': {
     en: 'Error',
     ko: '오류',
-    ja: 'エラー'
+    ja: 'エラー',
   },
   'status.warning': {
     en: 'Warning',
     ko: '경고',
-    ja: '警告'
-  }
+    ja: '警告',
+  },
 };
 ```
 
@@ -2956,11 +3003,7 @@ export const LOCALIZATION_GUIDELINES = {
   // 1. 키 명명 규칙
   keyNaming: {
     pattern: 'module.component.element',
-    examples: [
-      'template.form.title',
-      'approval.modal.confirm_button',
-      'metrics.chart.tooltip'
-    ]
+    examples: ['template.form.title', 'approval.modal.confirm_button', 'metrics.chart.tooltip'],
   },
 
   // 2. 필수 언어
@@ -2972,14 +3015,14 @@ export const LOCALIZATION_GUIDELINES = {
   // 4. 파라미터 사용
   parameterUsage: {
     syntax: '{{parameterName}}',
-    example: 'Hello {{userName}}, you have {{count}} notifications'
+    example: 'Hello {{userName}}, you have {{count}} notifications',
   },
 
   // 5. 복수형 처리
   pluralization: {
     pattern: 'key_zero|key_one|key_other',
-    example: 'item_zero|item_one|item_other'
-  }
+    example: 'item_zero|item_one|item_other',
+  },
 };
 ```
 
@@ -2997,8 +3040,8 @@ export class ApprovalNotificationService {
     this.io = new SocketIOServer(server, {
       cors: {
         origin: process.env.FRONTEND_URL,
-        credentials: true
-      }
+        credentials: true,
+      },
     });
 
     this.setupSocketHandlers();
@@ -3006,7 +3049,7 @@ export class ApprovalNotificationService {
 
   private setupSocketHandlers(): void {
     this.io.on('connection', (socket) => {
-      socket.on('admin:connect', async (data: { userId: number, token: string }) => {
+      socket.on('admin:connect', async (data: { userId: number; token: string }) => {
         // 관리자 권한 확인
         const isAdmin = await this.verifyAdminPermissions(data.userId, data.token);
         if (!isAdmin) {
@@ -3018,7 +3061,7 @@ export class ApprovalNotificationService {
         this.connectedAdmins.set(socket.id, {
           userId: data.userId,
           socketId: socket.id,
-          connectedAt: new Date()
+          connectedAt: new Date(),
         });
 
         console.log(`Admin ${data.userId} connected for approval notifications`);
@@ -3042,8 +3085,8 @@ export class ApprovalNotificationService {
       createdAt: new Date().toISOString(),
       actions: [
         { type: 'approve', label: 'Approve', url: `/approvals/${changeRequest.id}` },
-        { type: 'review', label: 'Review', url: `/approvals/${changeRequest.id}/diff` }
-      ]
+        { type: 'review', label: 'Review', url: `/approvals/${changeRequest.id}/diff` },
+      ],
     };
 
     // 모든 연결된 관리자에게 알림 전송
@@ -3054,7 +3097,10 @@ export class ApprovalNotificationService {
   }
 
   // 승인 상태 변경 알림
-  async broadcastApprovalStatusChange(changeRequest: ChangeRequest, status: 'approved' | 'rejected'): Promise<void> {
+  async broadcastApprovalStatusChange(
+    changeRequest: ChangeRequest,
+    status: 'approved' | 'rejected'
+  ): Promise<void> {
     const notification = {
       type: 'approval_status_change',
       id: changeRequest.id,
@@ -3062,7 +3108,7 @@ export class ApprovalNotificationService {
       message: `Change request has been ${status}`,
       environment: changeRequest.environmentName,
       status,
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
     };
 
     this.io.emit('approval:status_change', notification);
@@ -3076,7 +3122,7 @@ export class ApprovalNotificationService {
       environmentName: notification.environment,
       priority: notification.priority,
       notificationData: JSON.stringify(notification),
-      createdAt: new Date()
+      createdAt: new Date(),
     });
   }
 }
@@ -3316,7 +3362,6 @@ export class UniversalAPITokenService {
     allowedIps?: string[];
     createdBy: number;
   }): Promise<APIToken> {
-
     // 토큰 값 생성 (Unleash 스타일)
     const tokenPrefix = this.getTokenPrefix(data.tokenType);
     const randomBytes = crypto.randomBytes(32).toString('hex');
@@ -3331,7 +3376,7 @@ export class UniversalAPITokenService {
       serviceScopes: JSON.stringify(data.serviceScopes),
       expiresAt: data.expiresAt,
       allowedIps: data.allowedIps ? JSON.stringify(data.allowedIps) : null,
-      createdBy: data.createdBy
+      createdBy: data.createdBy,
     });
 
     // 캐시 무효화 (새 토큰 생성)
@@ -3366,7 +3411,7 @@ export class UniversalAPITokenService {
 
       return {
         isValid: true,
-        token: cachedResult
+        token: cachedResult,
       };
     }
 
@@ -3404,7 +3449,7 @@ export class UniversalAPITokenService {
       tokenType: token.tokenType,
       environmentId: token.environmentId,
       permissions,
-      serviceScopes
+      serviceScopes,
     };
 
     await this.cacheService.set(cacheKey, tokenInfo, 5 * 60 * 1000); // 5분
@@ -3414,15 +3459,13 @@ export class UniversalAPITokenService {
 
     return {
       isValid: true,
-      token: tokenInfo
+      token: tokenInfo,
     };
   }
 
   // IP 제한 확인
   async validateIPAccess(tokenId: number, clientIP: string): Promise<boolean> {
-    const token = await db('g_api_access_tokens')
-      .where('id', tokenId)
-      .first();
+    const token = await db('g_api_access_tokens').where('id', tokenId).first();
 
     if (!token.allowedIps) {
       return true; // IP 제한 없음
@@ -3433,15 +3476,18 @@ export class UniversalAPITokenService {
   }
 
   // 토큰 사용 로깅 (서비스 타입 포함)
-  async logTokenUsage(tokenId: number, requestData: {
-    path: string;
-    method: string;
-    ip: string;
-    userAgent?: string;
-    serviceType: string;
-    status: number;
-    responseTime: number;
-  }): Promise<void> {
+  async logTokenUsage(
+    tokenId: number,
+    requestData: {
+      path: string;
+      method: string;
+      ip: string;
+      userAgent?: string;
+      serviceType: string;
+      status: number;
+      responseTime: number;
+    }
+  ): Promise<void> {
     await db('g_api_token_logs').insert({
       tokenId,
       requestPath: requestData.path,
@@ -3450,16 +3496,20 @@ export class UniversalAPITokenService {
       userAgent: requestData.userAgent,
       serviceType: requestData.serviceType,
       responseStatus: requestData.status,
-      responseTime: requestData.responseTime
+      responseTime: requestData.responseTime,
     });
   }
 
   private getTokenPrefix(tokenType: string): string {
     switch (tokenType) {
-      case 'client': return 'rc_client';
-      case 'server': return 'rc_server';
-      case 'admin': return 'rc_admin';
-      default: return 'rc_unknown';
+      case 'client':
+        return 'rc_client';
+      case 'server':
+        return 'rc_server';
+      case 'admin':
+        return 'rc_admin';
+      default:
+        return 'rc_unknown';
     }
   }
 
@@ -3468,7 +3518,7 @@ export class UniversalAPITokenService {
       .where('id', tokenId)
       .update({
         lastUsedAt: new Date(),
-        usageCount: db.raw('usageCount + 1')
+        usageCount: db.raw('usageCount + 1'),
       });
   }
 }
@@ -3490,7 +3540,7 @@ export class APIAuthMiddleware {
         const authHeader = req.headers.authorization;
         if (!authHeader || !authHeader.startsWith('Bearer ')) {
           return res.status(401).json({
-            error: 'Missing or invalid authorization header'
+            error: 'Missing or invalid authorization header',
           });
         }
 
@@ -3498,14 +3548,14 @@ export class APIAuthMiddleware {
         const environmentName = req.params.environment;
         if (!environmentName) {
           return res.status(400).json({
-            error: 'Environment parameter required'
+            error: 'Environment parameter required',
           });
         }
 
         const environmentId = await this.getEnvironmentId(environmentName);
         if (!environmentId) {
           return res.status(404).json({
-            error: 'Environment not found'
+            error: 'Environment not found',
           });
         }
 
@@ -3513,7 +3563,7 @@ export class APIAuthMiddleware {
         const appName = req.headers['x-app-name'] as string;
         if (!appName) {
           return res.status(400).json({
-            error: 'X-App-Name header required'
+            error: 'X-App-Name header required',
           });
         }
 
@@ -3527,21 +3577,18 @@ export class APIAuthMiddleware {
         if (!validation.isValid) {
           await this.logFailedRequest(token, req, 401, Date.now() - startTime);
           return res.status(401).json({
-            error: validation.reason
+            error: validation.reason,
           });
         }
 
         // IP 제한 확인
         const clientIP = req.ip;
-        const ipAllowed = await this.tokenService.validateIPAccess(
-          validation.token!.id,
-          clientIP
-        );
+        const ipAllowed = await this.tokenService.validateIPAccess(validation.token!.id, clientIP);
 
         if (!ipAllowed) {
           await this.logFailedRequest(token, req, 403, Date.now() - startTime);
           return res.status(403).json({
-            error: 'IP access denied'
+            error: 'IP access denied',
           });
         }
 
@@ -3557,7 +3604,7 @@ export class APIAuthMiddleware {
             ip: clientIP,
             userAgent: req.headers['user-agent'],
             status: res.statusCode,
-            responseTime: Date.now() - startTime
+            responseTime: Date.now() - startTime,
           });
         });
 
@@ -3565,7 +3612,7 @@ export class APIAuthMiddleware {
       } catch (error) {
         console.error('Authentication error:', error);
         res.status(500).json({
-          error: 'Internal authentication error'
+          error: 'Internal authentication error',
         });
       }
     };
@@ -3578,7 +3625,12 @@ export class APIAuthMiddleware {
     return env?.id;
   }
 
-  private async logFailedRequest(token: string, req: Request, status: number, responseTime: number): Promise<void> {
+  private async logFailedRequest(
+    token: string,
+    req: Request,
+    status: number,
+    responseTime: number
+  ): Promise<void> {
     // 실패한 요청도 로깅 (보안 모니터링용)
     try {
       await db('g_remote_config_failed_auth_logs').insert({
@@ -3588,7 +3640,7 @@ export class APIAuthMiddleware {
         requestIp: req.ip,
         responseStatus: status,
         responseTime,
-        requestedAt: new Date()
+        requestedAt: new Date(),
       });
     } catch (error) {
       console.error('Failed to log authentication failure:', error);
@@ -3611,43 +3663,43 @@ export class CacheService {
     activeTemplates: {
       keyPattern: 'template:active:{environment}',
       ttl: 5 * 60 * 1000, // 5분
-      invalidateOn: ['template_publish', 'template_rollback']
+      invalidateOn: ['template_publish', 'template_rollback'],
     },
 
     // 2. 클라이언트 템플릿 (최적화된 데이터)
     clientTemplates: {
       keyPattern: 'template:client:{environment}',
       ttl: 10 * 60 * 1000, // 10분
-      invalidateOn: ['template_publish', 'template_rollback']
+      invalidateOn: ['template_publish', 'template_rollback'],
     },
 
     // 3. 템플릿 메타데이터 (리스팅용)
     templateMetadata: {
       keyPattern: 'templates:metadata:{environment}',
       ttl: 2 * 60 * 1000, // 2분
-      invalidateOn: ['template_create', 'template_update', 'template_delete']
+      invalidateOn: ['template_create', 'template_update', 'template_delete'],
     },
 
     // 4. 환경 설정
     environments: {
       keyPattern: 'environments:list',
       ttl: 30 * 60 * 1000, // 30분
-      invalidateOn: ['environment_create', 'environment_update', 'environment_delete']
+      invalidateOn: ['environment_create', 'environment_update', 'environment_delete'],
     },
 
     // 5. API 토큰 정보 (캐싱으로 DB 부하 감소)
     apiTokens: {
       keyPattern: 'token:{tokenValue}',
       ttl: 15 * 60 * 1000, // 15분
-      invalidateOn: ['token_update', 'token_revoke', 'token_create']
+      invalidateOn: ['token_update', 'token_revoke', 'token_create'],
     },
 
     // 6. API 토큰 검증 결과 (빠른 재검증)
     tokenValidation: {
       keyPattern: 'token:validation:{tokenValue}:{environmentId}',
       ttl: 5 * 60 * 1000, // 5분 (짧은 TTL로 보안 유지)
-      invalidateOn: ['token_update', 'token_revoke', 'environment_update']
-    }
+      invalidateOn: ['token_update', 'token_revoke', 'environment_update'],
+    },
   };
 
   // 캐시 무효화 트리거
@@ -3753,7 +3805,7 @@ export class EnhancedMetricsCollector {
       ...data,
       hourBucket,
       requestCount: 0,
-      uniqueUsers: new Set<string>()
+      uniqueUsers: new Set<string>(),
     };
 
     existing.requestCount++;
@@ -3766,7 +3818,7 @@ export class EnhancedMetricsCollector {
 
   // 집계된 상세 메트릭 전송
   private async flushDetailedMetrics(): Promise<void> {
-    const aggregatedMetrics = Array.from(this.metricsBuffer.values()).map(metric => ({
+    const aggregatedMetrics = Array.from(this.metricsBuffer.values()).map((metric) => ({
       environmentName: this.environment,
       configKey: metric.configKey,
       applicationName: this.applicationName,
@@ -3779,7 +3831,7 @@ export class EnhancedMetricsCollector {
       hourBucket: metric.hourBucket,
       platformType: metric.context.platform,
       countryCode: metric.context.country,
-      appVersion: metric.context.appVersion
+      appVersion: metric.context.appVersion,
     }));
 
     await this.apiClient.submitDetailedMetrics(aggregatedMetrics);
@@ -3795,9 +3847,7 @@ export class EnhancedMetricsCollector {
 export class TemplateImportExportService {
   // 템플릿 Export (JSON 형태)
   async exportTemplate(templateId: number): Promise<ExportedTemplate> {
-    const template = await db('g_remote_config_templates')
-      .where('id', templateId)
-      .first();
+    const template = await db('g_remote_config_templates').where('id', templateId).first();
 
     if (!template) {
       throw new Error('Template not found');
@@ -3809,10 +3859,10 @@ export class TemplateImportExportService {
         description: template.description,
         templateType: template.templateType,
         exportedAt: new Date().toISOString(),
-        exportedBy: template.createdBy
+        exportedBy: template.createdBy,
       },
       templateData: JSON.parse(template.templateData),
-      version: template.versionNumber
+      version: template.versionNumber,
     };
   }
 
@@ -3822,7 +3872,6 @@ export class TemplateImportExportService {
     importData: ExportedTemplate,
     importedBy: number
   ): Promise<Template | ChangeRequest> {
-
     // 시스템 제한 검증
     await SystemValidationService.validateSystemLimits();
 
@@ -3833,9 +3882,7 @@ export class TemplateImportExportService {
     }
 
     // 환경의 승인 정책 확인
-    const environment = await db('g_remote_config_environments')
-      .where('id', environmentId)
-      .first();
+    const environment = await db('g_remote_config_environments').where('id', environmentId).first();
 
     if (environment.requireApproval) {
       // 승인이 필요한 경우 Change Request 생성
@@ -3847,9 +3894,9 @@ export class TemplateImportExportService {
         changeDetails: {
           importData,
           templateName: `${importData.metadata.templateName}_imported_${Date.now()}`,
-          description: `Imported: ${importData.metadata.description}`
+          description: `Imported: ${importData.metadata.description}`,
         },
-        requestedBy: importedBy
+        requestedBy: importedBy,
       });
 
       return changeRequest;
@@ -3863,7 +3910,7 @@ export class TemplateImportExportService {
         description: `Imported: ${importData.metadata.description}`,
         templateData: JSON.stringify(importData.templateData),
         templateStatus: 'draft', // Draft 상태로 시작
-        createdBy: importedBy
+        createdBy: importedBy,
       });
 
       // 캐시 무효화
@@ -3939,220 +3986,206 @@ const throttle = new ThrottleService();
 // 기본 경로: /api/v1/remote-config
 
 // 환경 관리
-router.get('/environments',
-  throttle.createLimiter('admin'),
-  EnvironmentController.list
-);
+router.get('/environments', throttle.createLimiter('admin'), EnvironmentController.list);
 
-router.post('/environments',
-  throttle.createLimiter('admin'),
-  EnvironmentController.create
-);
+router.post('/environments', throttle.createLimiter('admin'), EnvironmentController.create);
 
-router.put('/environments/:id',
-  throttle.createLimiter('admin'),
-  EnvironmentController.update
-);
+router.put('/environments/:id', throttle.createLimiter('admin'), EnvironmentController.update);
 
-router.delete('/environments/:id',
-  throttle.createLimiter('admin'),
-  EnvironmentController.delete
-);
+router.delete('/environments/:id', throttle.createLimiter('admin'), EnvironmentController.delete);
 
 // 템플릿 관리
-router.get('/templates',
-  throttle.createLimiter('admin'),
-  TemplateController.list
-);
+router.get('/templates', throttle.createLimiter('admin'), TemplateController.list);
 
-router.post('/templates',
-  throttle.createLimiter('template_update'),
-  TemplateController.create
-);
+router.post('/templates', throttle.createLimiter('template_update'), TemplateController.create);
 
-router.get('/templates/:id',
-  throttle.createLimiter('admin'),
-  TemplateController.getById
-);
+router.get('/templates/:id', throttle.createLimiter('admin'), TemplateController.getById);
 
-router.put('/templates/:id',
-  throttle.createLimiter('template_update'),
-  TemplateController.update
-);
+router.put('/templates/:id', throttle.createLimiter('template_update'), TemplateController.update);
 
-router.delete('/templates/:id',
+router.delete(
+  '/templates/:id',
   throttle.createLimiter('template_update'),
   TemplateController.delete
 );
 
 // 환경별 템플릿
-router.get('/environments/:env/templates',
+router.get(
+  '/environments/:env/templates',
   throttle.createLimiter('admin'),
   TemplateController.listByEnvironment
 );
 
-router.get('/environments/:env/templates/active',
+router.get(
+  '/environments/:env/templates/active',
   throttle.createLimiter('admin'),
   TemplateController.getActiveTemplate
 );
 
-router.post('/environments/:env/templates/:id/publish',
+router.post(
+  '/environments/:env/templates/:id/publish',
   throttle.createLimiter('template_update'),
   TemplateController.publishTemplate
 );
 
 // 승인 워크플로우
-router.get('/change-requests',
+router.get(
+  '/change-requests',
   throttle.createLimiter('admin'),
   ApprovalController.listChangeRequests
 );
 
-router.post('/change-requests',
+router.post(
+  '/change-requests',
   throttle.createLimiter('admin'),
   ApprovalController.createChangeRequest
 );
 
-router.put('/change-requests/:id/approve',
+router.put(
+  '/change-requests/:id/approve',
   throttle.createLimiter('admin'),
   ApprovalController.approveChange
 );
 
-router.put('/change-requests/:id/reject',
+router.put(
+  '/change-requests/:id/reject',
   throttle.createLimiter('admin'),
   ApprovalController.rejectChange
 );
 
 // 메트릭
-router.post('/metrics/submit',
+router.post(
+  '/metrics/submit',
   throttle.createLimiter('metrics_collection'),
   MetricsController.submitMetrics
 );
 
-router.get('/metrics/chart',
-  throttle.createLimiter('admin'),
-  MetricsController.getChartData
-);
+router.get('/metrics/chart', throttle.createLimiter('admin'), MetricsController.getChartData);
 
-router.get('/metrics/ranking',
-  throttle.createLimiter('admin'),
-  MetricsController.getRanking
-);
+router.get('/metrics/ranking', throttle.createLimiter('admin'), MetricsController.getRanking);
 
 // 클라이언트 SDK API (토큰 인증, 높은 트래픽)
-router.get('/client/:environment',
+router.get(
+  '/client/:environment',
   throttle.createLimiter('client'),
   authMiddleware.authenticate('read'),
   ClientController.getConfigs
 );
 
-router.get('/client/:environment/configs/:key',
+router.get(
+  '/client/:environment/configs/:key',
   throttle.createLimiter('client'),
   authMiddleware.authenticate('read'),
   ClientController.getConfigByKey
 );
 
-router.post('/client/:environment/metrics',
+router.post(
+  '/client/:environment/metrics',
   throttle.createLimiter('metrics_collection'),
   authMiddleware.authenticate('write'),
   MetricsController.submitClientMetrics
 );
 
 // 서버 SDK API (토큰 인증)
-router.get('/server/:environment',
+router.get(
+  '/server/:environment',
   throttle.createLimiter('server'),
   authMiddleware.authenticate('read'),
   ServerController.getConfigs
 );
 
-router.get('/server/:environment/configs/:key',
+router.get(
+  '/server/:environment/configs/:key',
   throttle.createLimiter('server'),
   authMiddleware.authenticate('read'),
   ServerController.getConfigByKey
 );
 
-router.get('/server/:environment/bulk',
+router.get(
+  '/server/:environment/bulk',
   throttle.createLimiter('server'),
   authMiddleware.authenticate('read'),
   ServerController.getBulkConfigs
 );
 
-router.post('/server/:environment/metrics',
+router.post(
+  '/server/:environment/metrics',
   throttle.createLimiter('metrics_collection'),
   authMiddleware.authenticate('write'),
   MetricsController.submitServerMetrics
 );
 
 // 템플릿 Import/Export
-router.post('/templates/import',
+router.post(
+  '/templates/import',
   throttle.createLimiter('admin'),
   authMiddleware.authenticate('admin'),
   TemplateController.importTemplate
 );
 
-router.get('/templates/:id/export',
+router.get(
+  '/templates/:id/export',
   throttle.createLimiter('admin'),
   authMiddleware.authenticate('read'),
   TemplateController.exportTemplate
 );
 
 // API 토큰 관리
-router.get('/tokens',
+router.get(
+  '/tokens',
   throttle.createLimiter('admin'),
   authMiddleware.authenticate('admin'),
   TokenController.listTokens
 );
 
-router.post('/tokens',
+router.post(
+  '/tokens',
   throttle.createLimiter('admin'),
   authMiddleware.authenticate('admin'),
   TokenController.createToken
 );
 
-router.put('/tokens/:id',
+router.put(
+  '/tokens/:id',
   throttle.createLimiter('admin'),
   authMiddleware.authenticate('admin'),
   TokenController.updateToken
 );
 
-router.delete('/tokens/:id',
+router.delete(
+  '/tokens/:id',
   throttle.createLimiter('admin'),
   authMiddleware.authenticate('admin'),
   TokenController.deleteToken
 );
 
 // 변경사항 Diff 조회
-router.get('/change-requests/:id/diff',
+router.get(
+  '/change-requests/:id/diff',
   throttle.createLimiter('admin'),
   authMiddleware.authenticate('read'),
   ApprovalController.getChangeRequestDiff
 );
 
 // 편집 세션
-router.post('/edit-sessions',
-  throttle.createLimiter('admin'),
-  EditSessionController.startSession
-);
+router.post('/edit-sessions', throttle.createLimiter('admin'), EditSessionController.startSession);
 
-router.put('/edit-sessions/:id',
+router.put(
+  '/edit-sessions/:id',
   throttle.createLimiter('admin'),
   EditSessionController.updateSession
 );
 
-router.delete('/edit-sessions/:id',
+router.delete(
+  '/edit-sessions/:id',
   throttle.createLimiter('admin'),
   EditSessionController.endSession
 );
 
 // 시스템 관리
-router.get('/system/limits',
-  throttle.createLimiter('admin'),
-  SystemController.getLimits
-);
+router.get('/system/limits', throttle.createLimiter('admin'), SystemController.getLimits);
 
-router.get('/system/health',
-  throttle.createLimiter('admin'),
-  SystemController.getHealth
-);
+router.get('/system/health', throttle.createLimiter('admin'), SystemController.getHealth);
 
 export default router;
 ```
@@ -4191,7 +4224,7 @@ export class ClientMetricsCollector {
       requestCount: 0,
       uniqueUsers: new Set<string>(),
       successCount: 0,
-      errorCount: 0
+      errorCount: 0,
     };
 
     existing.requestCount++;
@@ -4211,7 +4244,7 @@ export class ClientMetricsCollector {
   private async flushMetrics(): Promise<void> {
     if (this.metricsBuffer.size === 0) return;
 
-    const aggregatedMetrics = Array.from(this.metricsBuffer.values()).map(metric => ({
+    const aggregatedMetrics = Array.from(this.metricsBuffer.values()).map((metric) => ({
       environmentName: this.environment,
       configKey: metric.configKey,
       variantName: metric.variantName,
@@ -4222,7 +4255,7 @@ export class ClientMetricsCollector {
       hourBucket: metric.hourBucket,
       platformType: metric.platform,
       countryCode: metric.country,
-      appVersion: metric.appVersion
+      appVersion: metric.appVersion,
     }));
 
     this.metricsBuffer.clear();
@@ -4265,27 +4298,39 @@ export class MetricsCollectionController {
               dateBucket: metric.hourBucket.toISOString().split('T')[0],
               platformType: metric.platformType,
               countryCode: metric.countryCode,
-              appVersion: metric.appVersion
+              appVersion: metric.appVersion,
             })
-            .onConflict(['environmentName', 'configKey', 'variantName', 'hourBucket', 'platformType', 'countryCode', 'appVersion'])
+            .onConflict([
+              'environmentName',
+              'configKey',
+              'variantName',
+              'hourBucket',
+              'platformType',
+              'countryCode',
+              'appVersion',
+            ])
             .merge({
-              requestCount: db.raw('g_remote_config_metrics.requestCount + ?', [metric.requestCount]),
+              requestCount: db.raw('g_remote_config_metrics.requestCount + ?', [
+                metric.requestCount,
+              ]),
               uniqueUsers: db.raw('g_remote_config_metrics.uniqueUsers + ?', [metric.uniqueUsers]),
-              successCount: db.raw('g_remote_config_metrics.successCount + ?', [metric.successCount]),
-              errorCount: db.raw('g_remote_config_metrics.errorCount + ?', [metric.errorCount])
+              successCount: db.raw('g_remote_config_metrics.successCount + ?', [
+                metric.successCount,
+              ]),
+              errorCount: db.raw('g_remote_config_metrics.errorCount + ?', [metric.errorCount]),
             });
         }
       });
 
       res.json({
         success: true,
-        message: `Processed ${metrics.length} metric entries`
+        message: `Processed ${metrics.length} metric entries`,
       });
     } catch (error) {
       console.error('Error processing metrics:', error);
       res.status(500).json({
         success: false,
-        message: 'Failed to process metrics'
+        message: 'Failed to process metrics',
       });
     }
   }
@@ -4326,7 +4371,11 @@ export class EditSessionService {
   private sessions = new Map<string, EditSession>();
 
   // 편집 세션 시작
-  async startEditSession(userId: number, templateId: number, environmentId: number): Promise<EditSession> {
+  async startEditSession(
+    userId: number,
+    templateId: number,
+    environmentId: number
+  ): Promise<EditSession> {
     // 기존 활성 세션 확인
     const existingSessions = await db('g_remote_config_edit_sessions')
       .where('templateId', templateId)
@@ -4336,18 +4385,19 @@ export class EditSessionService {
 
     if (existingSessions.length > 0) {
       const activeUsers = await db('g_users')
-        .whereIn('id', existingSessions.map(s => s.userId))
+        .whereIn(
+          'id',
+          existingSessions.map((s) => s.userId)
+        )
         .select('id', 'name');
 
       throw new ConflictError('Template is being edited by another user', {
-        activeUsers: activeUsers.map(u => u.name)
+        activeUsers: activeUsers.map((u) => u.name),
       });
     }
 
     // 현재 템플릿 버전 확인
-    const currentTemplate = await db('g_remote_config_templates')
-      .where('id', templateId)
-      .first();
+    const currentTemplate = await db('g_remote_config_templates').where('id', templateId).first();
 
     const sessionId = `${userId}-${templateId}-${Date.now()}`;
     const expiresAt = new Date(Date.now() + 2 * 60 * 60 * 1000); // 2시간
@@ -4358,7 +4408,7 @@ export class EditSessionService {
       templateId,
       environmentId,
       baseVersion: currentTemplate.versionNumber,
-      expiresAt
+      expiresAt,
     });
 
     return session;
@@ -4370,15 +4420,13 @@ export class EditSessionService {
       .where('id', sessionId)
       .update({
         currentChanges: JSON.stringify(changes),
-        lastActivity: new Date()
+        lastActivity: new Date(),
       });
   }
 
   // 충돌 감지 및 해결
   async resolveConflicts(sessionId: string): Promise<ConflictResolution> {
-    const session = await db('g_remote_config_edit_sessions')
-      .where('id', sessionId)
-      .first();
+    const session = await db('g_remote_config_edit_sessions').where('id', sessionId).first();
 
     if (!session) {
       throw new Error('Session not found');
@@ -4621,13 +4669,9 @@ export class MetricsRetentionService {
       cutoffDate.setDate(cutoffDate.getDate() - policy.retentionDays);
 
       if (policy.metricType === 'hourly') {
-        await db('g_remote_config_metrics')
-          .where('hourBucket', '<', cutoffDate)
-          .del();
+        await db('g_remote_config_metrics').where('hourBucket', '<', cutoffDate).del();
       } else if (policy.metricType === 'daily') {
-        await db('g_remote_config_metrics_daily')
-          .where('dateBucket', '<', cutoffDate)
-          .del();
+        await db('g_remote_config_metrics_daily').where('dateBucket', '<', cutoffDate).del();
       }
     }
   }
@@ -4638,7 +4682,8 @@ export class MetricsRetentionService {
     yesterday.setDate(yesterday.getDate() - 1);
     const dateStr = yesterday.toISOString().split('T')[0];
 
-    await db.raw(`
+    await db.raw(
+      `
       INSERT INTO g_remote_config_metrics_daily (
         environmentName, configKey, variantName, totalRequests,
         uniqueUsers, successRate, dateBucket
@@ -4658,7 +4703,9 @@ export class MetricsRetentionService {
         totalRequests = VALUES(totalRequests),
         uniqueUsers = VALUES(uniqueUsers),
         successRate = VALUES(successRate)
-    `, [dateStr]);
+    `,
+      [dateStr]
+    );
   }
 }
 ```
@@ -4666,6 +4713,7 @@ export class MetricsRetentionService {
 ## 🎯 최종 구현 로드맵
 
 ### Phase 1: 기반 구축 (3-4주)
+
 1. ✅ 새 데이터베이스 스키마 구축 (camelCase 컬럼명)
 2. ✅ Template 시스템 + 환경 관리
 3. ✅ 캐싱 시스템 (cache-manager)
@@ -4673,18 +4721,21 @@ export class MetricsRetentionService {
 5. ✅ 시스템 전체 제한 설정
 
 ### Phase 2: 안전성 강화 (2-3주)
+
 1. ✅ Unleash 스타일 Four Eye Principle
 2. ✅ API 스로틀링
 3. ✅ 충돌 해결 시스템 (편집 세션)
 4. ✅ 시스템 검증 로직
 
 ### Phase 3: 메트릭 및 분석 (2-3주)
+
 1. ✅ SDK 기반 메트릭 집계 시스템
 2. ✅ 시각화 대시보드 (Unleash 스타일)
 3. ✅ 데이터 보관 정책
 4. ✅ 성능 최적화
 
 ### Phase 4: UI 점진적 전환 (2-3주)
+
 1. ✅ Configuration Switch 기반 컴포넌트 교체
 2. ✅ Legacy 코드 최소화
 3. ✅ 사용자 테스트 및 피드백
@@ -4693,6 +4744,7 @@ export class MetricsRetentionService {
 ## 📝 주요 개선사항 요약
 
 ### ✅ 완료된 요구사항
+
 1. **Template 기반 통합 관리** - 모든 요소를 포함한 버저닝
 2. **환경별 분리 관리** - dev, staging, production
 3. **서버/클라이언트 템플릿 분리** - 각각의 장점 활용
@@ -4705,7 +4757,7 @@ export class MetricsRetentionService {
 10. **API 스로틀링** - express-rate-limit
 11. **Legacy 코드 최소화** - Feature Toggle 전환
 12. **SDK 기반 메트릭 집계** - Unleash 방식
-13. **테이블 명명 규칙** - g_remote_config_ 접두사
+13. **테이블 명명 규칙** - g*remote_config* 접두사
 14. **camelCase 컬럼명** - 모든 테이블 적용
 15. **MySQL 예약어 처리** - 명확한 이름 사용
 16. **API 경로 규칙** - `/api/v1/remote-config/` 접두사 사용
@@ -4730,6 +4782,7 @@ export class MetricsRetentionService {
 ## 🔗 API Endpoints Summary
 
 ### Main API Paths
+
 - **Environment Management**: `/api/v1/remote-config/environments`
 - **Template Management**: `/api/v1/remote-config/templates`
 - **Approval Workflow**: `/api/v1/remote-config/change-requests`
@@ -4743,6 +4796,7 @@ export class MetricsRetentionService {
 - **System Management**: `/api/v1/remote-config/system`
 
 ### Enhanced API Features
+
 - **Consistent Path Structure**: Easy management with clear naming conventions
 - **Functional Separation**: Admin, Client SDK, Server SDK APIs clearly separated
 - **Advanced Authentication**: Environment-specific token-based access control
@@ -4757,6 +4811,7 @@ export class MetricsRetentionService {
 ## 🎯 Implementation Benefits
 
 ### Enterprise-Grade Features
+
 - **Comprehensive Version Control**: Template-based versioning for all components
 - **Multi-Environment Isolation**: Environment-specific access control and policies
 - **Advanced Security**: Environment-restricted token authentication with IP filtering
@@ -4776,6 +4831,7 @@ export class MetricsRetentionService {
 - **SDK Integration**: Built-in application name tracking and metrics aggregation
 
 ### Technical Advantages
+
 - **Database Optimization**: Metadata separation with JSON optimization for fast operations
 - **API Consistency**: Standardized endpoint structure with environment-specific routing
 - **Minimal Legacy Burden**: Clean architecture without legacy API compatibility requirements
@@ -4799,6 +4855,7 @@ This comprehensive design delivers a **world-class, enterprise-grade Remote Conf
 ## 🎯 Final Implementation Summary
 
 ### 63개 모든 요구사항 완전 반영
+
 1. ✅ **Template 기반 통합 관리** - 모든 요소 포함 버저닝
 2. ✅ **환경별 완전 격리** - dev/staging/production 분리
 3. ✅ **서버/클라이언트 템플릿 분리** - 각각 최적화

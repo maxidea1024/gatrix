@@ -447,7 +447,9 @@ export class ClientController {
                 try {
                   payload = JSON.parse(payload);
                 } catch (e) {
-                  logger.warn(`Failed to parse variant payload for flag ${f.flagName}`, { payload });
+                  logger.warn(`Failed to parse variant payload for flag ${f.flagName}`, {
+                    payload,
+                  });
                 }
               }
               return {
@@ -585,7 +587,7 @@ export class ClientController {
         // Build variant object according to Unleash client specification
         let variant: {
           name: string;
-          payload?: any;  // Can be string, number, or object depending on variantType
+          payload?: any; // Can be string, number, or object depending on variantType
           enabled: boolean;
         };
 
@@ -619,7 +621,8 @@ export class ClientController {
               }
             } else {
               // String type or other: keep as string
-              variant.payload = typeof payloadValue === 'string' ? payloadValue : String(payloadValue);
+              variant.payload =
+                typeof payloadValue === 'string' ? payloadValue : String(payloadValue);
             }
           }
         } else {
@@ -654,7 +657,9 @@ export class ClientController {
         };
       }
 
-      const flagsArray = Object.values(results).sort((a, b) => (b.id || '').localeCompare(a.id || ''));
+      const flagsArray = Object.values(results).sort((a, b) =>
+        (b.id || '').localeCompare(a.id || '')
+      );
       const responseData = {
         success: true,
         data: {
@@ -676,7 +681,6 @@ export class ClientController {
         .join('|');
       const etag = `"${crypto.createHash('md5').update(etagSource).digest('hex')}"`;
 
-
       // Check If-None-Match header
       const requestEtag = req.headers['if-none-match'];
       if (requestEtag === etag) {
@@ -690,7 +694,7 @@ export class ClientController {
       res.status(500).json({
         success: false,
         message: 'Internal server error during flag evaluation',
-        error: error instanceof Error ? error.message : String(error)
+        error: error instanceof Error ? error.message : String(error),
       });
     }
   });

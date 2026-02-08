@@ -2,86 +2,52 @@
   ":AdvSpcEffTermsGroup": {
     ":type": {
       "id": "key",
-      "advSpcEffTerms": [
-        "number",
-        "number"
-      ]
+      "advSpcEffTerms": ["number", "number"]
     },
     ":required": {},
     ":min": {
-      "advSpcEffTerms": [
-        77460000,
-        77460000
-      ]
+      "advSpcEffTerms": [77460000, 77460000]
     },
     ":max": {
-      "advSpcEffTerms": [
-        77469999,
-        77469999
-      ]
+      "advSpcEffTerms": [77469999, 77469999]
     },
     ":enum": {},
     ":links": {
-      "advSpcEffTerms": [
-        [
-          "AdvSpcEffTerms"
-        ],
-        [
-          "AdvSpcEffTerms"
-        ]
-      ]
+      "advSpcEffTerms": [["AdvSpcEffTerms"], ["AdvSpcEffTerms"]]
     }
   },
   "AdvSpcEffTermsGroup": {
     "77450000": {
       "id": 77450000,
-      "advSpcEffTerms": [
-        77460000,
-        77460000
-      ]
+      "advSpcEffTerms": [77460000, 77460000]
     },
     "77450001": {
       "id": 77450001,
-      "advSpcEffTerms": [
-        77460001
-      ]
+      "advSpcEffTerms": [77460001]
     },
     "77450002": {
       "id": 77450002,
-      "advSpcEffTerms": [
-        77460002
-      ]
+      "advSpcEffTerms": [77460002]
     },
     "77450003": {
       "id": 77450003,
-      "advSpcEffTerms": [
-        77460003
-      ]
+      "advSpcEffTerms": [77460003]
     },
     "77450004": {
       "id": 77450004,
-      "advSpcEffTerms": [
-        77460004
-      ]
+      "advSpcEffTerms": [77460004]
     },
     "77450005": {
       "id": 77450005,
-      "advSpcEffTerms": [
-        77460005
-      ]
+      "advSpcEffTerms": [77460005]
     },
     "77450006": {
       "id": 77450006,
-      "advSpcEffTerms": [
-        77460006,
-        77460008
-      ]
+      "advSpcEffTerms": [77460006, 77460008]
     },
     "77450007": {
       "id": 77450007,
-      "advSpcEffTerms": [
-        77460007
-      ]
+      "advSpcEffTerms": [77460007]
     }
   }
 }

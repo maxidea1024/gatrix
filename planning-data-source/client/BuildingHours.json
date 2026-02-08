@@ -280,54 +280,34 @@
     ":links": {
       "questUnlock": [
         {
-          "Id": [
-            "Quest"
-          ]
+          "Id": ["Quest"]
         },
         {
-          "Id": [
-            "Quest"
-          ]
+          "Id": ["Quest"]
         },
         {
-          "Id": [
-            "Quest"
-          ]
+          "Id": ["Quest"]
         },
         {
-          "Id": [
-            "Quest"
-          ]
+          "Id": ["Quest"]
         },
         {
-          "Id": [
-            "Quest"
-          ]
+          "Id": ["Quest"]
         },
         {
-          "Id": [
-            "Quest"
-          ]
+          "Id": ["Quest"]
         },
         {
-          "Id": [
-            "Quest"
-          ]
+          "Id": ["Quest"]
         },
         {
-          "Id": [
-            "Quest"
-          ]
+          "Id": ["Quest"]
         },
         {
-          "Id": [
-            "Quest"
-          ]
+          "Id": ["Quest"]
         },
         {
-          "Id": [
-            "Quest"
-          ]
+          "Id": ["Quest"]
         }
       ]
     }

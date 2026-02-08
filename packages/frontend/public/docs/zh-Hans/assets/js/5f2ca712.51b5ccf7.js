@@ -1,1 +1,274 @@
-"use strict";(globalThis.webpackChunkdocs=globalThis.webpackChunkdocs||[]).push([[614],{2468(e,n,r){r.r(n),r.d(n,{assets:()=>o,contentTitle:()=>l,default:()=>h,frontMatter:()=>d,metadata:()=>t,toc:()=>c});const t=JSON.parse('{"id":"integrations/webhook","title":"Webhook \u96c6\u6210","description":"\u5c06 Gatrix \u4e8b\u4ef6\u53d1\u9001\u5230\u81ea\u5b9a\u4e49 HTTP \u7ec8\u70b9\u3002","source":"@site/i18n/zh-Hans/docusaurus-plugin-content-docs/current/integrations/webhook.md","sourceDirName":"integrations","slug":"/integrations/webhook","permalink":"/docs/zh-Hans/integrations/webhook","draft":false,"unlisted":false,"editUrl":"https://github.com/your-org/gatrix/tree/main/docs/docs/integrations/webhook.md","tags":[],"version":"current","sidebarPosition":4,"frontMatter":{"sidebar_position":4,"sidebar_label":"Webhook"},"sidebar":"tutorialSidebar","previous":{"title":"Microsoft Teams","permalink":"/docs/zh-Hans/integrations/teams"},"next":{"title":"New Relic","permalink":"/docs/zh-Hans/integrations/new-relic"}}');var s=r(4848),i=r(8453);const d={sidebar_position:4,sidebar_label:"Webhook"},l="Webhook \u96c6\u6210",o={},c=[{value:"\u8bbe\u7f6e\u6307\u5357",id:"\u8bbe\u7f6e\u6307\u5357",level:2},{value:"\u8eab\u4efd\u9a8c\u8bc1\u652f\u6301",id:"\u8eab\u4efd\u9a8c\u8bc1\u652f\u6301",level:2},{value:"\u6709\u6548\u8d1f\u8f7d\u683c\u5f0f (Payload)",id:"\u6709\u6548\u8d1f\u8f7d\u683c\u5f0f-payload",level:2},{value:"\u5173\u952e\u4e8b\u4ef6",id:"\u5173\u952e\u4e8b\u4ef6",level:2},{value:"\u91cd\u8bd5\u7b56\u7565",id:"\u91cd\u8bd5\u7b56\u7565",level:2}];function a(e){const n={code:"code",h1:"h1",h2:"h2",header:"header",li:"li",ol:"ol",p:"p",pre:"pre",strong:"strong",table:"table",tbody:"tbody",td:"td",th:"th",thead:"thead",tr:"tr",ul:"ul",...(0,i.R)(),...e.components};return(0,s.jsxs)(s.Fragment,{children:[(0,s.jsx)(n.header,{children:(0,s.jsx)(n.h1,{id:"webhook-\u96c6\u6210",children:"Webhook \u96c6\u6210"})}),"\n",(0,s.jsx)(n.p,{children:"\u5c06 Gatrix \u4e8b\u4ef6\u53d1\u9001\u5230\u81ea\u5b9a\u4e49 HTTP \u7ec8\u70b9\u3002"}),"\n",(0,s.jsx)(n.h2,{id:"\u8bbe\u7f6e\u6307\u5357",children:"\u8bbe\u7f6e\u6307\u5357"}),"\n",(0,s.jsxs)(n.ol,{children:["\n",(0,s.jsxs)(n.li,{children:["\u524d\u5f80 ",(0,s.jsx)(n.strong,{children:"\u8bbe\u7f6e"})," > ",(0,s.jsx)(n.strong,{children:"\u5916\u90e8\u96c6\u6210"})," > ",(0,s.jsx)(n.strong,{children:"Webhook"}),"\u3002"]}),"\n",(0,s.jsx)(n.li,{children:"\u8f93\u5165\u63a5\u6536 Webhook \u7684 URL\u3002"}),"\n",(0,s.jsx)(n.li,{children:"\u9009\u62e9\u8981\u53d1\u9001\u7684\u4e8b\u4ef6\u3002"}),"\n",(0,s.jsx)(n.li,{children:"\u5982\u679c\u9700\u8981\uff0c\u914d\u7f6e\u8eab\u4efd\u9a8c\u8bc1\u4fe1\u606f\uff08\u53ef\u9009\uff09\u3002"}),"\n",(0,s.jsxs)(n.li,{children:["\u70b9\u51fb ",(0,s.jsx)(n.strong,{children:"\u4fdd\u5b58"}),"\u3002"]}),"\n"]}),"\n",(0,s.jsx)(n.h2,{id:"\u8eab\u4efd\u9a8c\u8bc1\u652f\u6301",children:"\u8eab\u4efd\u9a8c\u8bc1\u652f\u6301"}),"\n",(0,s.jsx)(n.p,{children:"Webhook \u652f\u6301\u4ee5\u4e0b\u9a8c\u8bc1\u65b9\u5f0f\uff1a"}),"\n",(0,s.jsxs)(n.ul,{children:["\n",(0,s.jsxs)(n.li,{children:[(0,s.jsx)(n.strong,{children:"\u65e0"})," - \u65e0\u9a8c\u8bc1"]}),"\n",(0,s.jsxs)(n.li,{children:[(0,s.jsx)(n.strong,{children:"Basic Auth"})," - \u7528\u6237\u540d\u548c\u5bc6\u7801"]}),"\n",(0,s.jsxs)(n.li,{children:[(0,s.jsx)(n.strong,{children:"Bearer Token"})," - \u4ee4\u724c\u65b9\u5f0f"]}),"\n",(0,s.jsxs)(n.li,{children:[(0,s.jsx)(n.strong,{children:"Custom Header"})," - \u81ea\u5b9a\u4e49\u8bf7\u6c42\u5934\u540d\u79f0\u548c\u503c"]}),"\n"]}),"\n",(0,s.jsx)(n.h2,{id:"\u6709\u6548\u8d1f\u8f7d\u683c\u5f0f-payload",children:"\u6709\u6548\u8d1f\u8f7d\u683c\u5f0f (Payload)"}),"\n",(0,s.jsx)(n.pre,{children:(0,s.jsx)(n.code,{className:"language-json",children:'{\r\n  "event": "feature_flag.updated",\r\n  "timestamp": "2024-01-15T10:30:00Z",\r\n  "data": {\r\n    "flagKey": "new_feature",\r\n    "oldValue": false,\r\n    "newValue": true,\r\n    "environment": "production",\r\n    "changedBy": "admin@example.com"\r\n  }\r\n}\n'})}),"\n",(0,s.jsx)(n.h2,{id:"\u5173\u952e\u4e8b\u4ef6",children:"\u5173\u952e\u4e8b\u4ef6"}),"\n",(0,s.jsxs)(n.table,{children:[(0,s.jsx)(n.thead,{children:(0,s.jsxs)(n.tr,{children:[(0,s.jsx)(n.th,{children:"\u4e8b\u4ef6"}),(0,s.jsx)(n.th,{children:"\u8bf4\u660e"})]})}),(0,s.jsxs)(n.tbody,{children:[(0,s.jsxs)(n.tr,{children:[(0,s.jsx)(n.td,{children:(0,s.jsx)(n.code,{children:"feature_flag.created"})}),(0,s.jsx)(n.td,{children:"\u5df2\u521b\u5efa\u5f00\u5173"})]}),(0,s.jsxs)(n.tr,{children:[(0,s.jsx)(n.td,{children:(0,s.jsx)(n.code,{children:"feature_flag.updated"})}),(0,s.jsx)(n.td,{children:"\u5df2\u66f4\u65b0\u5f00\u5173"})]}),(0,s.jsxs)(n.tr,{children:[(0,s.jsx)(n.td,{children:(0,s.jsx)(n.code,{children:"feature_flag.deleted"})}),(0,s.jsx)(n.td,{children:"\u5df2\u5220\u9664\u5f00\u5173"})]}),(0,s.jsxs)(n.tr,{children:[(0,s.jsx)(n.td,{children:(0,s.jsx)(n.code,{children:"maintenance.started"})}),(0,s.jsx)(n.td,{children:"\u7ef4\u62a4\u5df2\u5f00\u59cb"})]}),(0,s.jsxs)(n.tr,{children:[(0,s.jsx)(n.td,{children:(0,s.jsx)(n.code,{children:"maintenance.ended"})}),(0,s.jsx)(n.td,{children:"\u7ef4\u62a4\u5df2\u7ed3\u675f"})]})]})]}),"\n",(0,s.jsx)(n.h2,{id:"\u91cd\u8bd5\u7b56\u7565",children:"\u91cd\u8bd5\u7b56\u7565"}),"\n",(0,s.jsx)(n.p,{children:"\u5931\u8d25\u7684 Webhook \u8bf7\u6c42\u5c06\u6839\u636e\u6307\u6570\u9000\u907f\u7b56\u7565\u6700\u591a\u91cd\u8bd5 3 \u6b21\u3002"})]})}function h(e={}){const{wrapper:n}={...(0,i.R)(),...e.components};return n?(0,s.jsx)(n,{...e,children:(0,s.jsx)(a,{...e})}):a(e)}},8453(e,n,r){r.d(n,{R:()=>d,x:()=>l});var t=r(6540);const s={},i=t.createContext(s);function d(e){const n=t.useContext(i);return t.useMemo(function(){return"function"==typeof e?e(n):{...n,...e}},[n,e])}function l(e){let n;return n=e.disableParentContext?"function"==typeof e.components?e.components(s):e.components||s:d(e.components),t.createElement(i.Provider,{value:n},e.children)}}}]);
+'use strict';
+(globalThis.webpackChunkdocs = globalThis.webpackChunkdocs || []).push([
+  [614],
+  {
+    2468(e, n, r) {
+      (r.r(n),
+        r.d(n, {
+          assets: () => o,
+          contentTitle: () => l,
+          default: () => h,
+          frontMatter: () => d,
+          metadata: () => t,
+          toc: () => c,
+        }));
+      const t = JSON.parse(
+        '{"id":"integrations/webhook","title":"Webhook \u96c6\u6210","description":"\u5c06 Gatrix \u4e8b\u4ef6\u53d1\u9001\u5230\u81ea\u5b9a\u4e49 HTTP \u7ec8\u70b9\u3002","source":"@site/i18n/zh-Hans/docusaurus-plugin-content-docs/current/integrations/webhook.md","sourceDirName":"integrations","slug":"/integrations/webhook","permalink":"/docs/zh-Hans/integrations/webhook","draft":false,"unlisted":false,"editUrl":"https://github.com/your-org/gatrix/tree/main/docs/docs/integrations/webhook.md","tags":[],"version":"current","sidebarPosition":4,"frontMatter":{"sidebar_position":4,"sidebar_label":"Webhook"},"sidebar":"tutorialSidebar","previous":{"title":"Microsoft Teams","permalink":"/docs/zh-Hans/integrations/teams"},"next":{"title":"New Relic","permalink":"/docs/zh-Hans/integrations/new-relic"}}'
+      );
+      var s = r(4848),
+        i = r(8453);
+      const d = { sidebar_position: 4, sidebar_label: 'Webhook' },
+        l = 'Webhook \u96c6\u6210',
+        o = {},
+        c = [
+          { value: '\u8bbe\u7f6e\u6307\u5357', id: '\u8bbe\u7f6e\u6307\u5357', level: 2 },
+          {
+            value: '\u8eab\u4efd\u9a8c\u8bc1\u652f\u6301',
+            id: '\u8eab\u4efd\u9a8c\u8bc1\u652f\u6301',
+            level: 2,
+          },
+          {
+            value: '\u6709\u6548\u8d1f\u8f7d\u683c\u5f0f (Payload)',
+            id: '\u6709\u6548\u8d1f\u8f7d\u683c\u5f0f-payload',
+            level: 2,
+          },
+          { value: '\u5173\u952e\u4e8b\u4ef6', id: '\u5173\u952e\u4e8b\u4ef6', level: 2 },
+          { value: '\u91cd\u8bd5\u7b56\u7565', id: '\u91cd\u8bd5\u7b56\u7565', level: 2 },
+        ];
+      function a(e) {
+        const n = {
+          code: 'code',
+          h1: 'h1',
+          h2: 'h2',
+          header: 'header',
+          li: 'li',
+          ol: 'ol',
+          p: 'p',
+          pre: 'pre',
+          strong: 'strong',
+          table: 'table',
+          tbody: 'tbody',
+          td: 'td',
+          th: 'th',
+          thead: 'thead',
+          tr: 'tr',
+          ul: 'ul',
+          ...(0, i.R)(),
+          ...e.components,
+        };
+        return (0, s.jsxs)(s.Fragment, {
+          children: [
+            (0, s.jsx)(n.header, {
+              children: (0, s.jsx)(n.h1, {
+                id: 'webhook-\u96c6\u6210',
+                children: 'Webhook \u96c6\u6210',
+              }),
+            }),
+            '\n',
+            (0, s.jsx)(n.p, {
+              children:
+                '\u5c06 Gatrix \u4e8b\u4ef6\u53d1\u9001\u5230\u81ea\u5b9a\u4e49 HTTP \u7ec8\u70b9\u3002',
+            }),
+            '\n',
+            (0, s.jsx)(n.h2, {
+              id: '\u8bbe\u7f6e\u6307\u5357',
+              children: '\u8bbe\u7f6e\u6307\u5357',
+            }),
+            '\n',
+            (0, s.jsxs)(n.ol, {
+              children: [
+                '\n',
+                (0, s.jsxs)(n.li, {
+                  children: [
+                    '\u524d\u5f80 ',
+                    (0, s.jsx)(n.strong, { children: '\u8bbe\u7f6e' }),
+                    ' > ',
+                    (0, s.jsx)(n.strong, { children: '\u5916\u90e8\u96c6\u6210' }),
+                    ' > ',
+                    (0, s.jsx)(n.strong, { children: 'Webhook' }),
+                    '\u3002',
+                  ],
+                }),
+                '\n',
+                (0, s.jsx)(n.li, { children: '\u8f93\u5165\u63a5\u6536 Webhook \u7684 URL\u3002' }),
+                '\n',
+                (0, s.jsx)(n.li, {
+                  children: '\u9009\u62e9\u8981\u53d1\u9001\u7684\u4e8b\u4ef6\u3002',
+                }),
+                '\n',
+                (0, s.jsx)(n.li, {
+                  children:
+                    '\u5982\u679c\u9700\u8981\uff0c\u914d\u7f6e\u8eab\u4efd\u9a8c\u8bc1\u4fe1\u606f\uff08\u53ef\u9009\uff09\u3002',
+                }),
+                '\n',
+                (0, s.jsxs)(n.li, {
+                  children: [
+                    '\u70b9\u51fb ',
+                    (0, s.jsx)(n.strong, { children: '\u4fdd\u5b58' }),
+                    '\u3002',
+                  ],
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, s.jsx)(n.h2, {
+              id: '\u8eab\u4efd\u9a8c\u8bc1\u652f\u6301',
+              children: '\u8eab\u4efd\u9a8c\u8bc1\u652f\u6301',
+            }),
+            '\n',
+            (0, s.jsx)(n.p, {
+              children: 'Webhook \u652f\u6301\u4ee5\u4e0b\u9a8c\u8bc1\u65b9\u5f0f\uff1a',
+            }),
+            '\n',
+            (0, s.jsxs)(n.ul, {
+              children: [
+                '\n',
+                (0, s.jsxs)(n.li, {
+                  children: [(0, s.jsx)(n.strong, { children: '\u65e0' }), ' - \u65e0\u9a8c\u8bc1'],
+                }),
+                '\n',
+                (0, s.jsxs)(n.li, {
+                  children: [
+                    (0, s.jsx)(n.strong, { children: 'Basic Auth' }),
+                    ' - \u7528\u6237\u540d\u548c\u5bc6\u7801',
+                  ],
+                }),
+                '\n',
+                (0, s.jsxs)(n.li, {
+                  children: [
+                    (0, s.jsx)(n.strong, { children: 'Bearer Token' }),
+                    ' - \u4ee4\u724c\u65b9\u5f0f',
+                  ],
+                }),
+                '\n',
+                (0, s.jsxs)(n.li, {
+                  children: [
+                    (0, s.jsx)(n.strong, { children: 'Custom Header' }),
+                    ' - \u81ea\u5b9a\u4e49\u8bf7\u6c42\u5934\u540d\u79f0\u548c\u503c',
+                  ],
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, s.jsx)(n.h2, {
+              id: '\u6709\u6548\u8d1f\u8f7d\u683c\u5f0f-payload',
+              children: '\u6709\u6548\u8d1f\u8f7d\u683c\u5f0f (Payload)',
+            }),
+            '\n',
+            (0, s.jsx)(n.pre, {
+              children: (0, s.jsx)(n.code, {
+                className: 'language-json',
+                children:
+                  '{\r\n  "event": "feature_flag.updated",\r\n  "timestamp": "2024-01-15T10:30:00Z",\r\n  "data": {\r\n    "flagKey": "new_feature",\r\n    "oldValue": false,\r\n    "newValue": true,\r\n    "environment": "production",\r\n    "changedBy": "admin@example.com"\r\n  }\r\n}\n',
+              }),
+            }),
+            '\n',
+            (0, s.jsx)(n.h2, {
+              id: '\u5173\u952e\u4e8b\u4ef6',
+              children: '\u5173\u952e\u4e8b\u4ef6',
+            }),
+            '\n',
+            (0, s.jsxs)(n.table, {
+              children: [
+                (0, s.jsx)(n.thead, {
+                  children: (0, s.jsxs)(n.tr, {
+                    children: [
+                      (0, s.jsx)(n.th, { children: '\u4e8b\u4ef6' }),
+                      (0, s.jsx)(n.th, { children: '\u8bf4\u660e' }),
+                    ],
+                  }),
+                }),
+                (0, s.jsxs)(n.tbody, {
+                  children: [
+                    (0, s.jsxs)(n.tr, {
+                      children: [
+                        (0, s.jsx)(n.td, {
+                          children: (0, s.jsx)(n.code, { children: 'feature_flag.created' }),
+                        }),
+                        (0, s.jsx)(n.td, { children: '\u5df2\u521b\u5efa\u5f00\u5173' }),
+                      ],
+                    }),
+                    (0, s.jsxs)(n.tr, {
+                      children: [
+                        (0, s.jsx)(n.td, {
+                          children: (0, s.jsx)(n.code, { children: 'feature_flag.updated' }),
+                        }),
+                        (0, s.jsx)(n.td, { children: '\u5df2\u66f4\u65b0\u5f00\u5173' }),
+                      ],
+                    }),
+                    (0, s.jsxs)(n.tr, {
+                      children: [
+                        (0, s.jsx)(n.td, {
+                          children: (0, s.jsx)(n.code, { children: 'feature_flag.deleted' }),
+                        }),
+                        (0, s.jsx)(n.td, { children: '\u5df2\u5220\u9664\u5f00\u5173' }),
+                      ],
+                    }),
+                    (0, s.jsxs)(n.tr, {
+                      children: [
+                        (0, s.jsx)(n.td, {
+                          children: (0, s.jsx)(n.code, { children: 'maintenance.started' }),
+                        }),
+                        (0, s.jsx)(n.td, { children: '\u7ef4\u62a4\u5df2\u5f00\u59cb' }),
+                      ],
+                    }),
+                    (0, s.jsxs)(n.tr, {
+                      children: [
+                        (0, s.jsx)(n.td, {
+                          children: (0, s.jsx)(n.code, { children: 'maintenance.ended' }),
+                        }),
+                        (0, s.jsx)(n.td, { children: '\u7ef4\u62a4\u5df2\u7ed3\u675f' }),
+                      ],
+                    }),
+                  ],
+                }),
+              ],
+            }),
+            '\n',
+            (0, s.jsx)(n.h2, {
+              id: '\u91cd\u8bd5\u7b56\u7565',
+              children: '\u91cd\u8bd5\u7b56\u7565',
+            }),
+            '\n',
+            (0, s.jsx)(n.p, {
+              children:
+                '\u5931\u8d25\u7684 Webhook \u8bf7\u6c42\u5c06\u6839\u636e\u6307\u6570\u9000\u907f\u7b56\u7565\u6700\u591a\u91cd\u8bd5 3 \u6b21\u3002',
+            }),
+          ],
+        });
+      }
+      function h(e = {}) {
+        const { wrapper: n } = { ...(0, i.R)(), ...e.components };
+        return n ? (0, s.jsx)(n, { ...e, children: (0, s.jsx)(a, { ...e }) }) : a(e);
+      }
+    },
+    8453(e, n, r) {
+      r.d(n, { R: () => d, x: () => l });
+      var t = r(6540);
+      const s = {},
+        i = t.createContext(s);
+      function d(e) {
+        const n = t.useContext(i);
+        return t.useMemo(
+          function () {
+            return 'function' == typeof e ? e(n) : { ...n, ...e };
+          },
+          [n, e]
+        );
+      }
+      function l(e) {
+        let n;
+        return (
+          (n = e.disableParentContext
+            ? 'function' == typeof e.components
+              ? e.components(s)
+              : e.components || s
+            : d(e.components)),
+          t.createElement(i.Provider, { value: n }, e.children)
+        );
+      }
+    },
+  },
+]);

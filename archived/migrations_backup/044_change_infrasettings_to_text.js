@@ -50,6 +50,5 @@ module.exports = {
     } else {
       console.log('✓ infraSettingsRaw column does not exist');
     }
-  }
+  },
 };
-

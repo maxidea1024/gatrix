@@ -1,15 +1,15 @@
-import { clickhouse } from "../config/clickhouse";
-import logger from "../utils/logger";
-import { RetentionData } from "../types";
+import { clickhouse } from '../config/clickhouse';
+import logger from '../utils/logger';
+import { RetentionData } from '../types';
 
 export class RetentionService {
   async analyzeRetention(params: {
     projectId: string;
     startDate: string;
     endDate: string;
-    period?: "day" | "week" | "month";
+    period?: 'day' | 'week' | 'month';
   }): Promise<RetentionData[]> {
-    const { projectId, startDate, endDate, period = "day" } = params;
+    const { projectId, startDate, endDate, period = 'day' } = params;
 
     try {
       const query = `
@@ -55,7 +55,7 @@ export class RetentionService {
       const data: any = await result.json();
       return data.data || [];
     } catch (error) {
-      logger.error("Failed to analyze retention", { error, params });
+      logger.error('Failed to analyze retention', { error, params });
       throw error;
     }
   }
@@ -63,10 +63,10 @@ export class RetentionService {
   async getCohortRetention(params: {
     projectId: string;
     cohortDate: string;
-    period?: "day" | "week" | "month";
+    period?: 'day' | 'week' | 'month';
     periods?: number;
   }): Promise<RetentionData[]> {
-    const { projectId, cohortDate, period = "day", periods = 30 } = params;
+    const { projectId, cohortDate, period = 'day', periods = 30 } = params;
 
     try {
       const query = `
@@ -108,7 +108,7 @@ export class RetentionService {
       const data: any = await result.json();
       return data.data || [];
     } catch (error) {
-      logger.error("Failed to get cohort retention", { error, params });
+      logger.error('Failed to get cohort retention', { error, params });
       throw error;
     }
   }

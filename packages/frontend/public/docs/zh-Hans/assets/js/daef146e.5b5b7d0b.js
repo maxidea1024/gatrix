@@ -1,1 +1,11 @@
-"use strict";(globalThis.webpackChunkdocs=globalThis.webpackChunkdocs||[]).push([[8127],{4786(a){a.exports=JSON.parse('{"tag":{"label":"Features","permalink":"/docs/zh-Hans/blog/tags/features","description":"Platform features and capabilities","allTagsPath":"/docs/zh-Hans/blog/tags","count":2,"unlisted":false},"listMetadata":{"permalink":"/docs/zh-Hans/blog/tags/features","page":1,"postsPerPage":10,"totalPages":1,"totalCount":2,"blogDescription":"Blog","blogTitle":"Blog"}}')}}]);
+'use strict';
+(globalThis.webpackChunkdocs = globalThis.webpackChunkdocs || []).push([
+  [8127],
+  {
+    4786(a) {
+      a.exports = JSON.parse(
+        '{"tag":{"label":"Features","permalink":"/docs/zh-Hans/blog/tags/features","description":"Platform features and capabilities","allTagsPath":"/docs/zh-Hans/blog/tags","count":2,"unlisted":false},"listMetadata":{"permalink":"/docs/zh-Hans/blog/tags/features","page":1,"postsPerPage":10,"totalPages":1,"totalCount":2,"blogDescription":"Blog","blogTitle":"Blog"}}'
+      );
+    },
+  },
+]);

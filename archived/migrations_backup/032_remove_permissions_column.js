@@ -5,7 +5,7 @@
  * Also updates token type enum to remove 'admin' type.
  */
 
-exports.up = async function(connection) {
+exports.up = async function (connection) {
   console.log('Removing permissions column from g_api_access_tokens table...');
 
   try {
@@ -36,8 +36,9 @@ exports.up = async function(connection) {
   }
 };
 
-exports.down = async function(connection) {
+exports.down = async function (connection) {
   console.log('Reverting: Cannot restore dropped column in down migration');
-  console.log('⚠️ This migration cannot be fully reverted as the column structure is not preserved');
+  console.log(
+    '⚠️ This migration cannot be fully reverted as the column structure is not preserved'
+  );
 };
-

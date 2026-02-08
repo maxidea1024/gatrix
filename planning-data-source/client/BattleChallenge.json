@@ -325,147 +325,69 @@
     ":links": {
       "contentsTerms": [
         {
-          "Id": [
-            "ContentsTerms"
-          ]
+          "Id": ["ContentsTerms"]
         },
         {
-          "Id": [
-            "ContentsTerms"
-          ]
+          "Id": ["ContentsTerms"]
         },
         {
-          "Id": [
-            "ContentsTerms"
-          ]
+          "Id": ["ContentsTerms"]
         }
       ],
       "stage": [
         {
-          "OceanNpcId": [
-            "OceanNpc"
-          ],
-          "FirstRewardId": [
-            "RewardFixed"
-          ],
-          "RepeatRewardId": [
-            "Reward"
-          ],
-          "BattleMissionGroupId": [
-            "BattleMissionGroup"
-          ]
+          "OceanNpcId": ["OceanNpc"],
+          "FirstRewardId": ["RewardFixed"],
+          "RepeatRewardId": ["Reward"],
+          "BattleMissionGroupId": ["BattleMissionGroup"]
         },
         {
-          "OceanNpcId": [
-            "OceanNpc"
-          ],
-          "FirstRewardId": [
-            "RewardFixed"
-          ],
-          "RepeatRewardId": [
-            "Reward"
-          ],
-          "BattleMissionGroupId": [
-            "BattleMissionGroup"
-          ]
+          "OceanNpcId": ["OceanNpc"],
+          "FirstRewardId": ["RewardFixed"],
+          "RepeatRewardId": ["Reward"],
+          "BattleMissionGroupId": ["BattleMissionGroup"]
         },
         {
-          "OceanNpcId": [
-            "OceanNpc"
-          ],
-          "FirstRewardId": [
-            "RewardFixed"
-          ],
-          "RepeatRewardId": [
-            "Reward"
-          ],
-          "BattleMissionGroupId": [
-            "BattleMissionGroup"
-          ]
+          "OceanNpcId": ["OceanNpc"],
+          "FirstRewardId": ["RewardFixed"],
+          "RepeatRewardId": ["Reward"],
+          "BattleMissionGroupId": ["BattleMissionGroup"]
         },
         {
-          "OceanNpcId": [
-            "OceanNpc"
-          ],
-          "FirstRewardId": [
-            "RewardFixed"
-          ],
-          "RepeatRewardId": [
-            "Reward"
-          ],
-          "BattleMissionGroupId": [
-            "BattleMissionGroup"
-          ]
+          "OceanNpcId": ["OceanNpc"],
+          "FirstRewardId": ["RewardFixed"],
+          "RepeatRewardId": ["Reward"],
+          "BattleMissionGroupId": ["BattleMissionGroup"]
         },
         {
-          "OceanNpcId": [
-            "OceanNpc"
-          ],
-          "FirstRewardId": [
-            "RewardFixed"
-          ],
-          "RepeatRewardId": [
-            "Reward"
-          ],
-          "BattleMissionGroupId": [
-            "BattleMissionGroup"
-          ]
+          "OceanNpcId": ["OceanNpc"],
+          "FirstRewardId": ["RewardFixed"],
+          "RepeatRewardId": ["Reward"],
+          "BattleMissionGroupId": ["BattleMissionGroup"]
         },
         {
-          "OceanNpcId": [
-            "OceanNpc"
-          ],
-          "FirstRewardId": [
-            "RewardFixed"
-          ],
-          "RepeatRewardId": [
-            "Reward"
-          ],
-          "BattleMissionGroupId": [
-            "BattleMissionGroup"
-          ]
+          "OceanNpcId": ["OceanNpc"],
+          "FirstRewardId": ["RewardFixed"],
+          "RepeatRewardId": ["Reward"],
+          "BattleMissionGroupId": ["BattleMissionGroup"]
         },
         {
-          "OceanNpcId": [
-            "OceanNpc"
-          ],
-          "FirstRewardId": [
-            "RewardFixed"
-          ],
-          "RepeatRewardId": [
-            "Reward"
-          ],
-          "BattleMissionGroupId": [
-            "BattleMissionGroup"
-          ]
+          "OceanNpcId": ["OceanNpc"],
+          "FirstRewardId": ["RewardFixed"],
+          "RepeatRewardId": ["Reward"],
+          "BattleMissionGroupId": ["BattleMissionGroup"]
         },
         {
-          "OceanNpcId": [
-            "OceanNpc"
-          ],
-          "FirstRewardId": [
-            "RewardFixed"
-          ],
-          "RepeatRewardId": [
-            "Reward"
-          ],
-          "BattleMissionGroupId": [
-            "BattleMissionGroup"
-          ]
+          "OceanNpcId": ["OceanNpc"],
+          "FirstRewardId": ["RewardFixed"],
+          "RepeatRewardId": ["Reward"],
+          "BattleMissionGroupId": ["BattleMissionGroup"]
         },
         {
-          "OceanNpcId": [
-            "OceanNpc"
-          ],
-          "FirstRewardId": [
-            "RewardFixed"
-          ],
-          "RepeatRewardId": [
-            "Reward"
-          ],
-          "BattleMissionGroupId": [
-            "BattleMissionGroup"
-          ]
+          "OceanNpcId": ["OceanNpc"],
+          "FirstRewardId": ["RewardFixed"],
+          "RepeatRewardId": ["Reward"],
+          "BattleMissionGroupId": ["BattleMissionGroup"]
         }
       ]
     }

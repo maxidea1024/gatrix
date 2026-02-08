@@ -31,14 +31,15 @@ const apiClient = axios.create({
   baseURL: 'https://api.gatrix.com',
   headers: {
     'X-API-Key': process.env.GATRIX_API_KEY,
-    'Content-Type': 'application/json'
-  }
+    'Content-Type': 'application/json',
+  },
 });
 ```
 
 ### 2. Key Endpoints
 
 #### User Management
+
 ```javascript
 // List users
 const users = await apiClient.get('/api/v1/users');
@@ -46,7 +47,7 @@ const users = await apiClient.get('/api/v1/users');
 // Create user
 const newUser = await apiClient.post('/api/v1/users', {
   username: 'player123',
-  email: 'player@example.com'
+  email: 'player@example.com',
 });
 ```
 
@@ -62,7 +63,7 @@ function verifySignature(payload, signature, secret) {
     .createHmac('sha256', secret)
     .update(JSON.stringify(payload))
     .digest('hex');
-  
+
   return signature === expectedSignature;
 }
 ```
@@ -74,6 +75,7 @@ Leveraging Gatrix APIs allows you to build a powerful and scalable game platform
 ---
 
 **Related Resources**:
+
 - [API Documentation](../../api/client-api)
 - [Server SDK API](../../api/server-sdk-api)
 - [GitHub Repository](https://github.com/your-org/gatrix)

@@ -61,11 +61,13 @@ ADMIN_PASSWORD=admin123
 ### 5. 启动基础设施
 
 **选项 A: 仅 Docker 基础设施 (推荐)**
+
 ```bash
 yarn infra:up
 ```
 
 **选项 B: 完整 Docker 环境**
+
 ```bash
 docker compose -f docker-compose.dev.yml up -d
 ```
@@ -96,20 +98,20 @@ docker compose -f docker-compose.dev.yml up -d
 
 ### 包含的服务
 
-| 服务 | 容器 | 端口 |
-|------|------|------|
-| MySQL | gatrix-mysql-dev | 43306 |
-| Redis | gatrix-redis-dev | 46379 |
-| etcd | gatrix-etcd-dev | (内部) |
-| ClickHouse | gatrix-clickhouse-dev | 48123, 49000 |
-| Backend | gatrix-backend-dev | 45000 |
-| Frontend | gatrix-frontend-dev | 43000 |
-| Edge | gatrix-edge-dev | 3400 |
-| Chat Server | gatrix-chat-server-dev | 45100 |
-| Event Lens | gatrix-event-lens-dev | 45200 |
-| Loki | gatrix-loki-dev | 43100 |
-| Prometheus | gatrix-prometheus-dev | 49090 |
-| Grafana | gatrix-grafana-dev | 44000 |
+| 服务        | 容器                   | 端口         |
+| ----------- | ---------------------- | ------------ |
+| MySQL       | gatrix-mysql-dev       | 43306        |
+| Redis       | gatrix-redis-dev       | 46379        |
+| etcd        | gatrix-etcd-dev        | (内部)       |
+| ClickHouse  | gatrix-clickhouse-dev  | 48123, 49000 |
+| Backend     | gatrix-backend-dev     | 45000        |
+| Frontend    | gatrix-frontend-dev    | 43000        |
+| Edge        | gatrix-edge-dev        | 3400         |
+| Chat Server | gatrix-chat-server-dev | 45100        |
+| Event Lens  | gatrix-event-lens-dev  | 45200        |
+| Loki        | gatrix-loki-dev        | 43100        |
+| Prometheus  | gatrix-prometheus-dev  | 49090        |
+| Grafana     | gatrix-grafana-dev     | 44000        |
 
 ## 生产部署
 

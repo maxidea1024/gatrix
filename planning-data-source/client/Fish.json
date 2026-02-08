@@ -28,12 +28,7 @@
       "discoveryId": "number",
       "condMonthStart": "number",
       "condMonthEnd": "number",
-      "condWeatherId": [
-        "number",
-        "number",
-        "number",
-        "number"
-      ],
+      "condWeatherId": ["number", "number", "number", "number"],
       "localBitFlag": "bit"
     },
     ":required": {
@@ -67,12 +62,8 @@
     ":max": {},
     ":enum": {},
     ":links": {
-      "bigCatchReward": [
-        "RewardFixed"
-      ],
-      "discoveryId": [
-        "Discovery"
-      ]
+      "bigCatchReward": ["RewardFixed"],
+      "discoveryId": ["Discovery"]
     }
   },
   "Fish": {
@@ -102,10 +93,7 @@
       "bigCatchSize": 46.5,
       "bigCatchReward": 95993001,
       "discoveryId": 70409000,
-      "condWeatherId": [
-        13200000,
-        13200003
-      ],
+      "condWeatherId": [13200000, 13200003],
       "localBitFlag": 27
     },
     "77800001": {
@@ -134,11 +122,7 @@
       "bigCatchSize": 66.5,
       "bigCatchReward": 95993001,
       "discoveryId": 70409002,
-      "condWeatherId": [
-        13200000,
-        13200001,
-        13200003
-      ],
+      "condWeatherId": [13200000, 13200001, 13200003],
       "localBitFlag": 27
     },
     "77800002": {
@@ -169,10 +153,7 @@
       "discoveryId": 70409003,
       "condMonthStart": 5,
       "condMonthEnd": 12,
-      "condWeatherId": [
-        13200000,
-        13200001
-      ],
+      "condWeatherId": [13200000, 13200001],
       "localBitFlag": 27
     },
     "77800003": {
@@ -203,12 +184,7 @@
       "discoveryId": 70409004,
       "condMonthStart": 1,
       "condMonthEnd": 10,
-      "condWeatherId": [
-        13200003,
-        13200006,
-        13200007,
-        13200008
-      ],
+      "condWeatherId": [13200003, 13200006, 13200007, 13200008],
       "localBitFlag": 219
     },
     "77800004": {
@@ -237,10 +213,7 @@
       "bigCatchSize": 27.7,
       "bigCatchReward": 95993001,
       "discoveryId": 70409005,
-      "condWeatherId": [
-        13200000,
-        13200001
-      ],
+      "condWeatherId": [13200000, 13200001],
       "localBitFlag": 27
     },
     "77800005": {
@@ -271,11 +244,7 @@
       "discoveryId": 70409006,
       "condMonthStart": 11,
       "condMonthEnd": 8,
-      "condWeatherId": [
-        13200000,
-        13200006,
-        13200008
-      ],
+      "condWeatherId": [13200000, 13200006, 13200008],
       "localBitFlag": 27
     },
     "77800006": {
@@ -333,11 +302,7 @@
       "discoveryId": 70409008,
       "condMonthStart": 7,
       "condMonthEnd": 4,
-      "condWeatherId": [
-        13200000,
-        13200003,
-        13200001
-      ],
+      "condWeatherId": [13200000, 13200003, 13200001],
       "localBitFlag": 27
     },
     "77800008": {
@@ -368,11 +333,7 @@
       "discoveryId": 70409009,
       "condMonthStart": 5,
       "condMonthEnd": 12,
-      "condWeatherId": [
-        13200008,
-        13200007,
-        13200010
-      ],
+      "condWeatherId": [13200008, 13200007, 13200010],
       "localBitFlag": 27
     },
     "77800009": {
@@ -403,10 +364,7 @@
       "discoveryId": 70409014,
       "condMonthStart": 7,
       "condMonthEnd": 1,
-      "condWeatherId": [
-        13200000,
-        13200012
-      ],
+      "condWeatherId": [13200000, 13200012],
       "localBitFlag": 27
     },
     "77800010": {
@@ -437,10 +395,7 @@
       "discoveryId": 70409015,
       "condMonthStart": 1,
       "condMonthEnd": 6,
-      "condWeatherId": [
-        13200009,
-        13200010
-      ],
+      "condWeatherId": [13200009, 13200010],
       "localBitFlag": 27
     },
     "77800011": {
@@ -471,11 +426,7 @@
       "discoveryId": 70409016,
       "condMonthStart": 2,
       "condMonthEnd": 11,
-      "condWeatherId": [
-        13200007,
-        13200008,
-        13200009
-      ],
+      "condWeatherId": [13200007, 13200008, 13200009],
       "localBitFlag": 27
     },
     "77800012": {
@@ -506,11 +457,7 @@
       "discoveryId": 70409017,
       "condMonthStart": 6,
       "condMonthEnd": 11,
-      "condWeatherId": [
-        13200008,
-        13200009,
-        13200010
-      ],
+      "condWeatherId": [13200008, 13200009, 13200010],
       "localBitFlag": 27
     },
     "77800013": {
@@ -541,10 +488,7 @@
       "discoveryId": 70409018,
       "condMonthStart": 8,
       "condMonthEnd": 4,
-      "condWeatherId": [
-        13200000,
-        13200003
-      ],
+      "condWeatherId": [13200000, 13200003],
       "localBitFlag": 27
     },
     "77800014": {
@@ -575,10 +519,7 @@
       "discoveryId": 70409020,
       "condMonthStart": 1,
       "condMonthEnd": 6,
-      "condWeatherId": [
-        13200008,
-        13200009
-      ],
+      "condWeatherId": [13200008, 13200009],
       "localBitFlag": 27
     },
     "77800015": {
@@ -607,11 +548,7 @@
       "bigCatchSize": 65.2,
       "bigCatchReward": 95993001,
       "discoveryId": 70409021,
-      "condWeatherId": [
-        13200000,
-        13200003,
-        13200008
-      ],
+      "condWeatherId": [13200000, 13200003, 13200008],
       "localBitFlag": 219
     },
     "77800016": {
@@ -640,11 +577,7 @@
       "bigCatchSize": 141,
       "bigCatchReward": 95993001,
       "discoveryId": 70409022,
-      "condWeatherId": [
-        13200000,
-        13200001,
-        13200003
-      ],
+      "condWeatherId": [13200000, 13200001, 13200003],
       "localBitFlag": 27
     },
     "77800017": {
@@ -675,11 +608,7 @@
       "discoveryId": 70409023,
       "condMonthStart": 8,
       "condMonthEnd": 4,
-      "condWeatherId": [
-        13200000,
-        13200006,
-        13200012
-      ],
+      "condWeatherId": [13200000, 13200006, 13200012],
       "localBitFlag": 27
     },
     "77800018": {
@@ -708,11 +637,7 @@
       "bigCatchSize": 22,
       "bigCatchReward": 95993001,
       "discoveryId": 70409024,
-      "condWeatherId": [
-        13200006,
-        13200000,
-        13200001
-      ],
+      "condWeatherId": [13200006, 13200000, 13200001],
       "localBitFlag": 27
     },
     "77800019": {
@@ -743,11 +668,7 @@
       "discoveryId": 70409025,
       "condMonthStart": 8,
       "condMonthEnd": 1,
-      "condWeatherId": [
-        13200002,
-        13200004,
-        13200006
-      ],
+      "condWeatherId": [13200002, 13200004, 13200006],
       "localBitFlag": 27
     },
     "77800020": {
@@ -778,11 +699,7 @@
       "discoveryId": 70409026,
       "condMonthStart": 1,
       "condMonthEnd": 6,
-      "condWeatherId": [
-        13200000,
-        13200003,
-        13200004
-      ],
+      "condWeatherId": [13200000, 13200003, 13200004],
       "localBitFlag": 27
     },
     "77800021": {
@@ -813,11 +730,7 @@
       "discoveryId": 70409027,
       "condMonthStart": 5,
       "condMonthEnd": 12,
-      "condWeatherId": [
-        13200000,
-        13200003,
-        13200005
-      ],
+      "condWeatherId": [13200000, 13200003, 13200005],
       "localBitFlag": 27
     },
     "77800022": {
@@ -846,12 +759,7 @@
       "bigCatchSize": 25.5,
       "bigCatchReward": 95993001,
       "discoveryId": 70409028,
-      "condWeatherId": [
-        13200000,
-        13200001,
-        13200003,
-        13200002
-      ],
+      "condWeatherId": [13200000, 13200001, 13200003, 13200002],
       "localBitFlag": 27
     },
     "77800023": {
@@ -882,12 +790,7 @@
       "discoveryId": 70409029,
       "condMonthStart": 10,
       "condMonthEnd": 8,
-      "condWeatherId": [
-        13200006,
-        13200007,
-        13200008,
-        13200009
-      ],
+      "condWeatherId": [13200006, 13200007, 13200008, 13200009],
       "localBitFlag": 27
     },
     "77800024": {
@@ -918,10 +821,7 @@
       "discoveryId": 70409030,
       "condMonthStart": 3,
       "condMonthEnd": 9,
-      "condWeatherId": [
-        13200000,
-        13200001
-      ],
+      "condWeatherId": [13200000, 13200001],
       "localBitFlag": 219
     },
     "77800025": {
@@ -980,10 +880,7 @@
       "discoveryId": 70409032,
       "condMonthStart": 10,
       "condMonthEnd": 4,
-      "condWeatherId": [
-        13200009,
-        13200010
-      ],
+      "condWeatherId": [13200009, 13200010],
       "localBitFlag": 27
     },
     "77800027": {
@@ -1014,10 +911,7 @@
       "discoveryId": 70409033,
       "condMonthStart": 7,
       "condMonthEnd": 12,
-      "condWeatherId": [
-        13200006,
-        13200012
-      ],
+      "condWeatherId": [13200006, 13200012],
       "localBitFlag": 27
     },
     "77800028": {
@@ -1048,10 +942,7 @@
       "discoveryId": 70409034,
       "condMonthStart": 10,
       "condMonthEnd": 2,
-      "condWeatherId": [
-        13200008,
-        13200012
-      ],
+      "condWeatherId": [13200008, 13200012],
       "localBitFlag": 27
     },
     "77800029": {
@@ -1082,11 +973,7 @@
       "discoveryId": 70409036,
       "condMonthStart": 3,
       "condMonthEnd": 10,
-      "condWeatherId": [
-        13200000,
-        13200001,
-        13200003
-      ],
+      "condWeatherId": [13200000, 13200001, 13200003],
       "localBitFlag": 219
     },
     "77800030": {
@@ -1117,10 +1004,7 @@
       "discoveryId": 70409037,
       "condMonthStart": 5,
       "condMonthEnd": 11,
-      "condWeatherId": [
-        13200000,
-        13200001
-      ],
+      "condWeatherId": [13200000, 13200001],
       "localBitFlag": 27
     },
     "77800031": {
@@ -1151,11 +1035,7 @@
       "discoveryId": 70409038,
       "condMonthStart": 4,
       "condMonthEnd": 10,
-      "condWeatherId": [
-        13200000,
-        13200001,
-        13200008
-      ],
+      "condWeatherId": [13200000, 13200001, 13200008],
       "localBitFlag": 219
     },
     "77800032": {
@@ -1186,10 +1066,7 @@
       "discoveryId": 70409039,
       "condMonthStart": 8,
       "condMonthEnd": 1,
-      "condWeatherId": [
-        13200013,
-        13200014
-      ],
+      "condWeatherId": [13200013, 13200014],
       "localBitFlag": 27
     },
     "77800033": {
@@ -1220,10 +1097,7 @@
       "discoveryId": 70409040,
       "condMonthStart": 10,
       "condMonthEnd": 3,
-      "condWeatherId": [
-        13200012,
-        13200011
-      ],
+      "condWeatherId": [13200012, 13200011],
       "localBitFlag": 27
     },
     "77800034": {
@@ -1254,11 +1128,7 @@
       "discoveryId": 70409041,
       "condMonthStart": 6,
       "condMonthEnd": 3,
-      "condWeatherId": [
-        13200006,
-        13200012,
-        13200011
-      ],
+      "condWeatherId": [13200006, 13200012, 13200011],
       "localBitFlag": 27
     },
     "77800035": {
@@ -1289,10 +1159,7 @@
       "discoveryId": 70409042,
       "condMonthStart": 5,
       "condMonthEnd": 11,
-      "condWeatherId": [
-        13200000,
-        13200003
-      ],
+      "condWeatherId": [13200000, 13200003],
       "localBitFlag": 27
     },
     "77800036": {
@@ -1323,11 +1190,7 @@
       "discoveryId": 70409043,
       "condMonthStart": 4,
       "condMonthEnd": 7,
-      "condWeatherId": [
-        13200000,
-        13200003,
-        13200001
-      ],
+      "condWeatherId": [13200000, 13200003, 13200001],
       "localBitFlag": 27
     },
     "77800037": {
@@ -1356,10 +1219,7 @@
       "bigCatchSize": 17.7,
       "bigCatchReward": 95993001,
       "discoveryId": 70409044,
-      "condWeatherId": [
-        13200011,
-        13200012
-      ],
+      "condWeatherId": [13200011, 13200012],
       "localBitFlag": 27
     },
     "77800038": {
@@ -1390,11 +1250,7 @@
       "discoveryId": 70409045,
       "condMonthStart": 9,
       "condMonthEnd": 5,
-      "condWeatherId": [
-        13200000,
-        13200004,
-        13200008
-      ],
+      "condWeatherId": [13200000, 13200004, 13200008],
       "localBitFlag": 27
     },
     "77800039": {
@@ -1423,10 +1279,7 @@
       "bigCatchSize": 52.2,
       "bigCatchReward": 95993000,
       "discoveryId": 70409047,
-      "condWeatherId": [
-        13200011,
-        13200012
-      ],
+      "condWeatherId": [13200011, 13200012],
       "localBitFlag": 27
     },
     "77800040": {
@@ -1457,11 +1310,7 @@
       "discoveryId": 70409048,
       "condMonthStart": 5,
       "condMonthEnd": 2,
-      "condWeatherId": [
-        13200000,
-        13200001,
-        13200003
-      ],
+      "condWeatherId": [13200000, 13200001, 13200003],
       "localBitFlag": 27
     },
     "77800041": {
@@ -1490,11 +1339,7 @@
       "bigCatchSize": 135.9,
       "bigCatchReward": 95993001,
       "discoveryId": 70409050,
-      "condWeatherId": [
-        13200000,
-        13200001,
-        13200003
-      ],
+      "condWeatherId": [13200000, 13200001, 13200003],
       "localBitFlag": 27
     },
     "77800042": {
@@ -1525,10 +1370,7 @@
       "discoveryId": 70409051,
       "condMonthStart": 11,
       "condMonthEnd": 4,
-      "condWeatherId": [
-        13200000,
-        13200012
-      ],
+      "condWeatherId": [13200000, 13200012],
       "localBitFlag": 27
     },
     "77800043": {
@@ -1559,11 +1401,7 @@
       "discoveryId": 70409052,
       "condMonthStart": 4,
       "condMonthEnd": 10,
-      "condWeatherId": [
-        13200000,
-        13200001,
-        13200002
-      ],
+      "condWeatherId": [13200000, 13200001, 13200002],
       "localBitFlag": 27
     },
     "77800044": {
@@ -1594,10 +1432,7 @@
       "discoveryId": 70409054,
       "condMonthStart": 3,
       "condMonthEnd": 9,
-      "condWeatherId": [
-        13200002,
-        13200003
-      ],
+      "condWeatherId": [13200002, 13200003],
       "localBitFlag": 27
     },
     "77800045": {
@@ -1628,10 +1463,7 @@
       "discoveryId": 70409055,
       "condMonthStart": 3,
       "condMonthEnd": 9,
-      "condWeatherId": [
-        13200011,
-        13200012
-      ],
+      "condWeatherId": [13200011, 13200012],
       "localBitFlag": 27
     },
     "77800046": {
@@ -1662,11 +1494,7 @@
       "discoveryId": 70409056,
       "condMonthStart": 11,
       "condMonthEnd": 6,
-      "condWeatherId": [
-        13200000,
-        13200001,
-        13200002
-      ],
+      "condWeatherId": [13200000, 13200001, 13200002],
       "localBitFlag": 27
     },
     "77800047": {
@@ -1697,11 +1525,7 @@
       "discoveryId": 70409057,
       "condMonthStart": 6,
       "condMonthEnd": 3,
-      "condWeatherId": [
-        13200000,
-        13200001,
-        13200003
-      ],
+      "condWeatherId": [13200000, 13200001, 13200003],
       "localBitFlag": 27
     },
     "77800048": {
@@ -1732,11 +1556,7 @@
       "discoveryId": 70409059,
       "condMonthStart": 8,
       "condMonthEnd": 4,
-      "condWeatherId": [
-        13200003,
-        13200004,
-        13200006
-      ],
+      "condWeatherId": [13200003, 13200004, 13200006],
       "localBitFlag": 27
     },
     "77800049": {
@@ -1767,11 +1587,7 @@
       "discoveryId": 70409060,
       "condMonthStart": 9,
       "condMonthEnd": 5,
-      "condWeatherId": [
-        13200000,
-        13200003,
-        13200006
-      ],
+      "condWeatherId": [13200000, 13200003, 13200006],
       "localBitFlag": 27
     },
     "77800050": {
@@ -1802,11 +1618,7 @@
       "discoveryId": 70409061,
       "condMonthStart": 3,
       "condMonthEnd": 12,
-      "condWeatherId": [
-        13200000,
-        13200001,
-        13200002
-      ],
+      "condWeatherId": [13200000, 13200001, 13200002],
       "localBitFlag": 27
     },
     "77800051": {
@@ -1835,10 +1647,7 @@
       "bigCatchSize": 3.44,
       "bigCatchReward": 95993001,
       "discoveryId": 70409062,
-      "condWeatherId": [
-        13200007,
-        13200008
-      ],
+      "condWeatherId": [13200007, 13200008],
       "localBitFlag": 27
     },
     "77800052": {
@@ -1867,11 +1676,7 @@
       "bigCatchSize": 82,
       "bigCatchReward": 95993001,
       "discoveryId": 70409063,
-      "condWeatherId": [
-        13200000,
-        13200001,
-        13200002
-      ],
+      "condWeatherId": [13200000, 13200001, 13200002],
       "localBitFlag": 219
     },
     "77800053": {
@@ -1902,11 +1707,7 @@
       "discoveryId": 70409064,
       "condMonthStart": 1,
       "condMonthEnd": 9,
-      "condWeatherId": [
-        13200000,
-        13200001,
-        13200002
-      ],
+      "condWeatherId": [13200000, 13200001, 13200002],
       "localBitFlag": 219
     },
     "77800054": {
@@ -1937,10 +1738,7 @@
       "discoveryId": 70409065,
       "condMonthStart": 9,
       "condMonthEnd": 4,
-      "condWeatherId": [
-        13200000,
-        13200003
-      ],
+      "condWeatherId": [13200000, 13200003],
       "localBitFlag": 27
     },
     "77800055": {
@@ -1969,11 +1767,7 @@
       "bigCatchSize": 93.5,
       "bigCatchReward": 95993001,
       "discoveryId": 70409066,
-      "condWeatherId": [
-        13200006,
-        13200008,
-        13200009
-      ],
+      "condWeatherId": [13200006, 13200008, 13200009],
       "localBitFlag": 219
     },
     "77800056": {
@@ -2002,12 +1796,7 @@
       "bigCatchSize": 173,
       "bigCatchReward": 95993001,
       "discoveryId": 70409068,
-      "condWeatherId": [
-        13200004,
-        13200006,
-        13200008,
-        13200012
-      ],
+      "condWeatherId": [13200004, 13200006, 13200008, 13200012],
       "localBitFlag": 27
     },
     "77800057": {
@@ -2038,11 +1827,7 @@
       "discoveryId": 70409069,
       "condMonthStart": 2,
       "condMonthEnd": 12,
-      "condWeatherId": [
-        13200000,
-        13200003,
-        13200004
-      ],
+      "condWeatherId": [13200000, 13200003, 13200004],
       "localBitFlag": 27
     },
     "77800058": {
@@ -2071,10 +1856,7 @@
       "bigCatchSize": 179.9,
       "bigCatchReward": 95993001,
       "discoveryId": 70409437,
-      "condWeatherId": [
-        13200011,
-        13200012
-      ],
+      "condWeatherId": [13200011, 13200012],
       "localBitFlag": 27
     },
     "77800059": {
@@ -2103,10 +1885,7 @@
       "bigCatchSize": 369,
       "bigCatchReward": 95993001,
       "discoveryId": 70409427,
-      "condWeatherId": [
-        13200011,
-        13200012
-      ],
+      "condWeatherId": [13200011, 13200012],
       "localBitFlag": 27
     },
     "77800060": {
@@ -2137,10 +1916,7 @@
       "discoveryId": 70409070,
       "condMonthStart": 3,
       "condMonthEnd": 9,
-      "condWeatherId": [
-        13200001,
-        13200002
-      ],
+      "condWeatherId": [13200001, 13200002],
       "localBitFlag": 27
     },
     "77800061": {
@@ -2171,12 +1947,7 @@
       "discoveryId": 70409071,
       "condMonthStart": 2,
       "condMonthEnd": 11,
-      "condWeatherId": [
-        13200007,
-        13200008,
-        13200011,
-        13200012
-      ],
+      "condWeatherId": [13200007, 13200008, 13200011, 13200012],
       "localBitFlag": 27
     },
     "77800062": {
@@ -2205,12 +1976,7 @@
       "bigCatchSize": 84.1,
       "bigCatchReward": 95993000,
       "discoveryId": 70409072,
-      "condWeatherId": [
-        13200006,
-        13200007,
-        13200008,
-        13200009
-      ],
+      "condWeatherId": [13200006, 13200007, 13200008, 13200009],
       "localBitFlag": 27
     },
     "77800063": {
@@ -2267,10 +2033,7 @@
       "bigCatchSize": 32,
       "bigCatchReward": 95993001,
       "discoveryId": 70409074,
-      "condWeatherId": [
-        13200007,
-        13200008
-      ],
+      "condWeatherId": [13200007, 13200008],
       "localBitFlag": 27
     },
     "77800065": {
@@ -2301,11 +2064,7 @@
       "discoveryId": 70409075,
       "condMonthStart": 4,
       "condMonthEnd": 11,
-      "condWeatherId": [
-        13200006,
-        13200008,
-        13200009
-      ],
+      "condWeatherId": [13200006, 13200008, 13200009],
       "localBitFlag": 27
     },
     "77800066": {
@@ -2336,10 +2095,7 @@
       "discoveryId": 70409076,
       "condMonthStart": 4,
       "condMonthEnd": 12,
-      "condWeatherId": [
-        13200000,
-        13200008
-      ],
+      "condWeatherId": [13200000, 13200008],
       "localBitFlag": 27
     },
     "77800067": {
@@ -2397,10 +2153,7 @@
       "discoveryId": 70409079,
       "condMonthStart": 4,
       "condMonthEnd": 10,
-      "condWeatherId": [
-        13200000,
-        13200004
-      ],
+      "condWeatherId": [13200000, 13200004],
       "localBitFlag": 27
     },
     "77800069": {
@@ -2429,11 +2182,7 @@
       "bigCatchSize": 17,
       "bigCatchReward": 95993001,
       "discoveryId": 70409082,
-      "condWeatherId": [
-        13200000,
-        13200001,
-        13200003
-      ],
+      "condWeatherId": [13200000, 13200001, 13200003],
       "localBitFlag": 27
     },
     "77800070": {
@@ -2464,10 +2213,7 @@
       "discoveryId": 70409083,
       "condMonthStart": 4,
       "condMonthEnd": 10,
-      "condWeatherId": [
-        13200000,
-        13200003
-      ],
+      "condWeatherId": [13200000, 13200003],
       "localBitFlag": 27
     },
     "77800071": {
@@ -2498,10 +2244,7 @@
       "discoveryId": 70409084,
       "condMonthStart": 7,
       "condMonthEnd": 12,
-      "condWeatherId": [
-        13200006,
-        13200003
-      ],
+      "condWeatherId": [13200006, 13200003],
       "localBitFlag": 27
     },
     "77800072": {
@@ -2559,10 +2302,7 @@
       "discoveryId": 70409086,
       "condMonthStart": 3,
       "condMonthEnd": 10,
-      "condWeatherId": [
-        13200000,
-        13200008
-      ],
+      "condWeatherId": [13200000, 13200008],
       "localBitFlag": 27
     },
     "77800074": {
@@ -2591,11 +2331,7 @@
       "bigCatchSize": 26.1,
       "bigCatchReward": 95993000,
       "discoveryId": 70409087,
-      "condWeatherId": [
-        13200006,
-        13200007,
-        13200008
-      ],
+      "condWeatherId": [13200006, 13200007, 13200008],
       "localBitFlag": 27
     },
     "77800075": {
@@ -2624,12 +2360,7 @@
       "bigCatchSize": 76.2,
       "bigCatchReward": 95993000,
       "discoveryId": 70409088,
-      "condWeatherId": [
-        13200000,
-        13200003,
-        13200001,
-        13200002
-      ],
+      "condWeatherId": [13200000, 13200003, 13200001, 13200002],
       "localBitFlag": 27
     },
     "77800076": {
@@ -2658,11 +2389,7 @@
       "bigCatchSize": 208.6,
       "bigCatchReward": 95993001,
       "discoveryId": 70409089,
-      "condWeatherId": [
-        13200000,
-        13200003,
-        13200008
-      ],
+      "condWeatherId": [13200000, 13200003, 13200008],
       "localBitFlag": 219
     },
     "77800077": {
@@ -2693,10 +2420,7 @@
       "discoveryId": 70409090,
       "condMonthStart": 2,
       "condMonthEnd": 8,
-      "condWeatherId": [
-        13200006,
-        13200008
-      ],
+      "condWeatherId": [13200006, 13200008],
       "localBitFlag": 27
     },
     "77800078": {
@@ -2727,11 +2451,7 @@
       "discoveryId": 70409091,
       "condMonthStart": 7,
       "condMonthEnd": 5,
-      "condWeatherId": [
-        13200000,
-        13200001,
-        13200002
-      ],
+      "condWeatherId": [13200000, 13200001, 13200002],
       "localBitFlag": 27
     },
     "77800079": {
@@ -2762,10 +2482,7 @@
       "discoveryId": 70409092,
       "condMonthStart": 11,
       "condMonthEnd": 6,
-      "condWeatherId": [
-        13200012,
-        13200013
-      ],
+      "condWeatherId": [13200012, 13200013],
       "localBitFlag": 27
     },
     "77800080": {
@@ -2796,10 +2513,7 @@
       "discoveryId": 70409093,
       "condMonthStart": 7,
       "condMonthEnd": 12,
-      "condWeatherId": [
-        13200000,
-        13200003
-      ],
+      "condWeatherId": [13200000, 13200003],
       "localBitFlag": 27
     },
     "77800081": {
@@ -2830,11 +2544,7 @@
       "discoveryId": 70409094,
       "condMonthStart": 2,
       "condMonthEnd": 10,
-      "condWeatherId": [
-        13200006,
-        13200008,
-        13200009
-      ],
+      "condWeatherId": [13200006, 13200008, 13200009],
       "localBitFlag": 219
     },
     "77800082": {
@@ -2865,10 +2575,7 @@
       "discoveryId": 70409095,
       "condMonthStart": 2,
       "condMonthEnd": 7,
-      "condWeatherId": [
-        13200008,
-        13200009
-      ],
+      "condWeatherId": [13200008, 13200009],
       "localBitFlag": 27
     },
     "77800083": {
@@ -2897,10 +2604,7 @@
       "bigCatchSize": 48.8,
       "bigCatchReward": 95993001,
       "discoveryId": 70409096,
-      "condWeatherId": [
-        13200000,
-        13200001
-      ],
+      "condWeatherId": [13200000, 13200001],
       "localBitFlag": 27
     },
     "77800084": {
@@ -2931,11 +2635,7 @@
       "discoveryId": 70409097,
       "condMonthStart": 4,
       "condMonthEnd": 10,
-      "condWeatherId": [
-        13200000,
-        13200001,
-        13200002
-      ],
+      "condWeatherId": [13200000, 13200001, 13200002],
       "localBitFlag": 219
     },
     "77800085": {
@@ -2966,11 +2666,7 @@
       "discoveryId": 70409099,
       "condMonthStart": 2,
       "condMonthEnd": 9,
-      "condWeatherId": [
-        13200000,
-        13200003,
-        13200006
-      ],
+      "condWeatherId": [13200000, 13200003, 13200006],
       "localBitFlag": 27
     },
     "77800086": {
@@ -3054,12 +2750,7 @@
       "bigCatchSize": 36.3,
       "bigCatchReward": 95993000,
       "discoveryId": 70409440,
-      "condWeatherId": [
-        13200005,
-        13200011,
-        13200012,
-        13200013
-      ],
+      "condWeatherId": [13200005, 13200011, 13200012, 13200013],
       "localBitFlag": 27
     },
     "77800089": {
@@ -3090,10 +2781,7 @@
       "discoveryId": 70409101,
       "condMonthStart": 7,
       "condMonthEnd": 1,
-      "condWeatherId": [
-        13200006,
-        13200008
-      ],
+      "condWeatherId": [13200006, 13200008],
       "localBitFlag": 27
     },
     "77800090": {
@@ -3122,11 +2810,7 @@
       "bigCatchSize": 17.9,
       "bigCatchReward": 95993001,
       "discoveryId": 70409102,
-      "condWeatherId": [
-        13200000,
-        13200001,
-        13200004
-      ],
+      "condWeatherId": [13200000, 13200001, 13200004],
       "localBitFlag": 27
     },
     "77800091": {
@@ -3157,10 +2841,7 @@
       "discoveryId": 70409103,
       "condMonthStart": 1,
       "condMonthEnd": 7,
-      "condWeatherId": [
-        13200006,
-        13200008
-      ],
+      "condWeatherId": [13200006, 13200008],
       "localBitFlag": 27
     },
     "77800092": {
@@ -3191,10 +2872,7 @@
       "discoveryId": 70409105,
       "condMonthStart": 3,
       "condMonthEnd": 10,
-      "condWeatherId": [
-        13200000,
-        13200008
-      ],
+      "condWeatherId": [13200000, 13200008],
       "localBitFlag": 27
     },
     "77800093": {
@@ -3223,11 +2901,7 @@
       "bigCatchSize": 163.8,
       "bigCatchReward": 95993001,
       "discoveryId": 70409106,
-      "condWeatherId": [
-        13200000,
-        13200001,
-        13200002
-      ],
+      "condWeatherId": [13200000, 13200001, 13200002],
       "localBitFlag": 27
     },
     "77800094": {
@@ -3258,10 +2932,7 @@
       "discoveryId": 70409107,
       "condMonthStart": 7,
       "condMonthEnd": 12,
-      "condWeatherId": [
-        13200006,
-        13200013
-      ],
+      "condWeatherId": [13200006, 13200013],
       "localBitFlag": 27
     },
     "77800095": {
@@ -3292,11 +2963,7 @@
       "discoveryId": 70409441,
       "condMonthStart": 6,
       "condMonthEnd": 12,
-      "condWeatherId": [
-        13200000,
-        13200004,
-        13200006
-      ],
+      "condWeatherId": [13200000, 13200004, 13200006],
       "localBitFlag": 27
     },
     "77800096": {
@@ -3327,10 +2994,7 @@
       "discoveryId": 70409108,
       "condMonthStart": 4,
       "condMonthEnd": 10,
-      "condWeatherId": [
-        13200000,
-        13200003
-      ],
+      "condWeatherId": [13200000, 13200003],
       "localBitFlag": 27
     },
     "77800097": {
@@ -3361,10 +3025,7 @@
       "discoveryId": 70409110,
       "condMonthStart": 5,
       "condMonthEnd": 12,
-      "condWeatherId": [
-        13200000,
-        13200007
-      ],
+      "condWeatherId": [13200000, 13200007],
       "localBitFlag": 27
     },
     "77800098": {
@@ -3395,10 +3056,7 @@
       "discoveryId": 70409113,
       "condMonthStart": 12,
       "condMonthEnd": 7,
-      "condWeatherId": [
-        13200000,
-        13200008
-      ],
+      "condWeatherId": [13200000, 13200008],
       "localBitFlag": 27
     },
     "77800099": {
@@ -3429,10 +3087,7 @@
       "discoveryId": 70409114,
       "condMonthStart": 5,
       "condMonthEnd": 11,
-      "condWeatherId": [
-        13200007,
-        13200008
-      ],
+      "condWeatherId": [13200007, 13200008],
       "localBitFlag": 27
     },
     "77800100": {
@@ -3463,11 +3118,7 @@
       "discoveryId": 70409115,
       "condMonthStart": 6,
       "condMonthEnd": 3,
-      "condWeatherId": [
-        13200004,
-        13200003,
-        13200006
-      ],
+      "condWeatherId": [13200004, 13200003, 13200006],
       "localBitFlag": 27
     },
     "77800101": {
@@ -3496,11 +3147,7 @@
       "bigCatchSize": 19.7,
       "bigCatchReward": 95993001,
       "discoveryId": 70409116,
-      "condWeatherId": [
-        13200000,
-        13200001,
-        13200003
-      ],
+      "condWeatherId": [13200000, 13200001, 13200003],
       "localBitFlag": 27
     },
     "77800102": {
@@ -3529,10 +3176,7 @@
       "bigCatchSize": 14.9,
       "bigCatchReward": 95993001,
       "discoveryId": 70409117,
-      "condWeatherId": [
-        13200000,
-        13200001
-      ],
+      "condWeatherId": [13200000, 13200001],
       "localBitFlag": 27
     },
     "77800103": {
@@ -3561,10 +3205,7 @@
       "bigCatchSize": 21.4,
       "bigCatchReward": 95993001,
       "discoveryId": 70409119,
-      "condWeatherId": [
-        13200000,
-        13200008
-      ],
+      "condWeatherId": [13200000, 13200008],
       "localBitFlag": 27
     },
     "77800104": {
@@ -3621,11 +3262,7 @@
       "bigCatchSize": 8.5,
       "bigCatchReward": 95993001,
       "discoveryId": 70409121,
-      "condWeatherId": [
-        13200000,
-        13200001,
-        13200003
-      ],
+      "condWeatherId": [13200000, 13200001, 13200003],
       "localBitFlag": 27
     },
     "77800106": {
@@ -3656,10 +3293,7 @@
       "discoveryId": 70409122,
       "condMonthStart": 2,
       "condMonthEnd": 8,
-      "condWeatherId": [
-        13200000,
-        13200003
-      ],
+      "condWeatherId": [13200000, 13200003],
       "localBitFlag": 27
     },
     "77800107": {
@@ -3690,11 +3324,7 @@
       "discoveryId": 70409123,
       "condMonthStart": 2,
       "condMonthEnd": 9,
-      "condWeatherId": [
-        13200000,
-        13200001,
-        13200003
-      ],
+      "condWeatherId": [13200000, 13200001, 13200003],
       "localBitFlag": 27
     },
     "77800108": {
@@ -3723,11 +3353,7 @@
       "bigCatchSize": 288.6,
       "bigCatchReward": 95993001,
       "discoveryId": 70409124,
-      "condWeatherId": [
-        13200000,
-        13200004,
-        13200006
-      ],
+      "condWeatherId": [13200000, 13200004, 13200006],
       "localBitFlag": 27
     },
     "77800109": {
@@ -3756,11 +3382,7 @@
       "bigCatchSize": 2.61,
       "bigCatchReward": 95993000,
       "discoveryId": 70409125,
-      "condWeatherId": [
-        13200000,
-        13200003,
-        13200001
-      ],
+      "condWeatherId": [13200000, 13200003, 13200001],
       "localBitFlag": 27
     },
     "77800110": {
@@ -3817,11 +3439,7 @@
       "bigCatchSize": 9.5,
       "bigCatchReward": 95993001,
       "discoveryId": 70409127,
-      "condWeatherId": [
-        13200011,
-        13200012,
-        13200013
-      ],
+      "condWeatherId": [13200011, 13200012, 13200013],
       "localBitFlag": 27
     },
     "77800112": {
@@ -3852,11 +3470,7 @@
       "discoveryId": 70409128,
       "condMonthStart": 7,
       "condMonthEnd": 4,
-      "condWeatherId": [
-        13200007,
-        13200008,
-        13200012
-      ],
+      "condWeatherId": [13200007, 13200008, 13200012],
       "localBitFlag": 27
     },
     "77800113": {
@@ -3885,11 +3499,7 @@
       "bigCatchSize": 22.3,
       "bigCatchReward": 95993001,
       "discoveryId": 70409129,
-      "condWeatherId": [
-        13200000,
-        13200001,
-        13200002
-      ],
+      "condWeatherId": [13200000, 13200001, 13200002],
       "localBitFlag": 27
     },
     "77800114": {
@@ -3918,12 +3528,7 @@
       "bigCatchSize": 65,
       "bigCatchReward": 95993000,
       "discoveryId": 70409130,
-      "condWeatherId": [
-        13200006,
-        13200011,
-        13200012,
-        13200013
-      ],
+      "condWeatherId": [13200006, 13200011, 13200012, 13200013],
       "localBitFlag": 27
     },
     "77800115": {
@@ -3952,11 +3557,7 @@
       "bigCatchSize": 26.1,
       "bigCatchReward": 95993000,
       "discoveryId": 70409131,
-      "condWeatherId": [
-        13200006,
-        13200007,
-        13200008
-      ],
+      "condWeatherId": [13200006, 13200007, 13200008],
       "localBitFlag": 27
     },
     "77800116": {
@@ -3987,10 +3588,7 @@
       "discoveryId": 70409132,
       "condMonthStart": 3,
       "condMonthEnd": 9,
-      "condWeatherId": [
-        13200001,
-        13200002
-      ],
+      "condWeatherId": [13200001, 13200002],
       "localBitFlag": 27
     },
     "77800117": {
@@ -4019,12 +3617,7 @@
       "bigCatchSize": 42.5,
       "bigCatchReward": 95993000,
       "discoveryId": 70409133,
-      "condWeatherId": [
-        13200007,
-        13200008,
-        13200011,
-        13200012
-      ],
+      "condWeatherId": [13200007, 13200008, 13200011, 13200012],
       "localBitFlag": 27
     },
     "77800118": {
@@ -4055,11 +3648,7 @@
       "discoveryId": 70409443,
       "condMonthStart": 9,
       "condMonthEnd": 2,
-      "condWeatherId": [
-        13200011,
-        13200012,
-        13200013
-      ],
+      "condWeatherId": [13200011, 13200012, 13200013],
       "localBitFlag": 27
     },
     "77800119": {
@@ -4118,12 +3707,7 @@
       "discoveryId": 70409138,
       "condMonthStart": 4,
       "condMonthEnd": 12,
-      "condWeatherId": [
-        13200006,
-        13200012,
-        13200013,
-        13200014
-      ],
+      "condWeatherId": [13200006, 13200012, 13200013, 13200014],
       "localBitFlag": 27
     },
     "77800121": {
@@ -4154,10 +3738,7 @@
       "discoveryId": 70409139,
       "condMonthStart": 9,
       "condMonthEnd": 3,
-      "condWeatherId": [
-        13200013,
-        13200014
-      ],
+      "condWeatherId": [13200013, 13200014],
       "localBitFlag": 27
     },
     "77800122": {
@@ -4188,10 +3769,7 @@
       "discoveryId": 70409140,
       "condMonthStart": 3,
       "condMonthEnd": 11,
-      "condWeatherId": [
-        13200000,
-        13200003
-      ],
+      "condWeatherId": [13200000, 13200003],
       "localBitFlag": 27
     },
     "77800123": {
@@ -4250,11 +3828,7 @@
       "discoveryId": 70409142,
       "condMonthStart": 4,
       "condMonthEnd": 10,
-      "condWeatherId": [
-        13200000,
-        13200001,
-        13200002
-      ],
+      "condWeatherId": [13200000, 13200001, 13200002],
       "localBitFlag": 219
     },
     "77800125": {
@@ -4285,11 +3859,7 @@
       "discoveryId": 70409144,
       "condMonthStart": 4,
       "condMonthEnd": 2,
-      "condWeatherId": [
-        13200000,
-        13200001,
-        13200002
-      ],
+      "condWeatherId": [13200000, 13200001, 13200002],
       "localBitFlag": 27
     },
     "77800126": {
@@ -4318,10 +3888,7 @@
       "bigCatchSize": 46.5,
       "bigCatchReward": 95993001,
       "discoveryId": 70409145,
-      "condWeatherId": [
-        13200000,
-        13200001
-      ],
+      "condWeatherId": [13200000, 13200001],
       "localBitFlag": 27
     },
     "77800127": {
@@ -4352,11 +3919,7 @@
       "discoveryId": 70409149,
       "condMonthStart": 4,
       "condMonthEnd": 12,
-      "condWeatherId": [
-        13200000,
-        13200001,
-        13200003
-      ],
+      "condWeatherId": [13200000, 13200001, 13200003],
       "localBitFlag": 27
     },
     "77800128": {
@@ -4412,10 +3975,7 @@
       "bigCatchSize": 74.8,
       "bigCatchReward": 95993001,
       "discoveryId": 70409151,
-      "condWeatherId": [
-        13200000,
-        13200004
-      ],
+      "condWeatherId": [13200000, 13200004],
       "localBitFlag": 27
     },
     "77800130": {
@@ -4446,10 +4006,7 @@
       "discoveryId": 70409152,
       "condMonthStart": 4,
       "condMonthEnd": 10,
-      "condWeatherId": [
-        13200008,
-        13200009
-      ],
+      "condWeatherId": [13200008, 13200009],
       "localBitFlag": 219
     },
     "77800131": {
@@ -4478,11 +4035,7 @@
       "bigCatchSize": 44.9,
       "bigCatchReward": 95993001,
       "discoveryId": 70409156,
-      "condWeatherId": [
-        13200000,
-        13200001,
-        13200002
-      ],
+      "condWeatherId": [13200000, 13200001, 13200002],
       "localBitFlag": 27
     },
     "77800132": {
@@ -4539,12 +4092,7 @@
       "bigCatchSize": 95.4,
       "bigCatchReward": 95993000,
       "discoveryId": 70409158,
-      "condWeatherId": [
-        13200000,
-        13200003,
-        13200004,
-        13200008
-      ],
+      "condWeatherId": [13200000, 13200003, 13200004, 13200008],
       "localBitFlag": 27
     },
     "77800134": {
@@ -4573,11 +4121,7 @@
       "bigCatchSize": 41.9,
       "bigCatchReward": 95993000,
       "discoveryId": 70409159,
-      "condWeatherId": [
-        13200004,
-        13200006,
-        13200008
-      ],
+      "condWeatherId": [13200004, 13200006, 13200008],
       "localBitFlag": 27
     },
     "77800135": {
@@ -4606,12 +4150,7 @@
       "bigCatchSize": 52.5,
       "bigCatchReward": 95993000,
       "discoveryId": 70409160,
-      "condWeatherId": [
-        13200000,
-        13200003,
-        13200001,
-        13200008
-      ],
+      "condWeatherId": [13200000, 13200003, 13200001, 13200008],
       "localBitFlag": 27
     },
     "77800136": {
@@ -4640,11 +4179,7 @@
       "bigCatchSize": 103.4,
       "bigCatchReward": 95993000,
       "discoveryId": 70409161,
-      "condWeatherId": [
-        13200000,
-        13200006,
-        13200007
-      ],
+      "condWeatherId": [13200000, 13200006, 13200007],
       "localBitFlag": 27
     },
     "77800137": {
@@ -4675,10 +4210,7 @@
       "discoveryId": 70409162,
       "condMonthStart": 6,
       "condMonthEnd": 12,
-      "condWeatherId": [
-        13200000,
-        13200003
-      ],
+      "condWeatherId": [13200000, 13200003],
       "localBitFlag": 27
     },
     "77800138": {
@@ -4763,11 +4295,7 @@
       "bigCatchSize": 6.4,
       "bigCatchReward": 95993001,
       "discoveryId": 70409167,
-      "condWeatherId": [
-        13200006,
-        13200008,
-        13200009
-      ],
+      "condWeatherId": [13200006, 13200008, 13200009],
       "localBitFlag": 27
     },
     "77800141": {
@@ -4798,11 +4326,7 @@
       "discoveryId": 70409168,
       "condMonthStart": 7,
       "condMonthEnd": 3,
-      "condWeatherId": [
-        13200006,
-        13200007,
-        13200008
-      ],
+      "condWeatherId": [13200006, 13200007, 13200008],
       "localBitFlag": 27
     },
     "77800142": {
@@ -4831,10 +4355,7 @@
       "bigCatchSize": 71,
       "bigCatchReward": 95993001,
       "discoveryId": 70409169,
-      "condWeatherId": [
-        13200003,
-        13200008
-      ],
+      "condWeatherId": [13200003, 13200008],
       "localBitFlag": 27
     },
     "77800143": {
@@ -4890,10 +4411,7 @@
       "bigCatchSize": 149.1,
       "bigCatchReward": 95993001,
       "discoveryId": 70409171,
-      "condWeatherId": [
-        13200006,
-        13200012
-      ],
+      "condWeatherId": [13200006, 13200012],
       "localBitFlag": 27
     },
     "77800145": {
@@ -4980,10 +4498,7 @@
       "discoveryId": 70409176,
       "condMonthStart": 1,
       "condMonthEnd": 6,
-      "condWeatherId": [
-        13200001,
-        13200002
-      ],
+      "condWeatherId": [13200001, 13200002],
       "localBitFlag": 27
     },
     "77800148": {
@@ -5014,10 +4529,7 @@
       "discoveryId": 70409177,
       "condMonthStart": 10,
       "condMonthEnd": 4,
-      "condWeatherId": [
-        13200008,
-        13200009
-      ],
+      "condWeatherId": [13200008, 13200009],
       "localBitFlag": 27
     },
     "77800149": {
@@ -5075,11 +4587,7 @@
       "discoveryId": 70409179,
       "condMonthStart": 10,
       "condMonthEnd": 4,
-      "condWeatherId": [
-        13200002,
-        13200001,
-        13200006
-      ],
+      "condWeatherId": [13200002, 13200001, 13200006],
       "localBitFlag": 27
     },
     "77800151": {
@@ -5110,10 +4618,7 @@
       "discoveryId": 70409180,
       "condMonthStart": 5,
       "condMonthEnd": 12,
-      "condWeatherId": [
-        13200000,
-        13200004
-      ],
+      "condWeatherId": [13200000, 13200004],
       "localBitFlag": 27
     },
     "77800152": {
@@ -5142,11 +4647,7 @@
       "bigCatchSize": 29.1,
       "bigCatchReward": 95993001,
       "discoveryId": 70409181,
-      "condWeatherId": [
-        13200006,
-        13200007,
-        13200008
-      ],
+      "condWeatherId": [13200006, 13200007, 13200008],
       "localBitFlag": 219
     },
     "77800153": {
@@ -5175,12 +4676,7 @@
       "bigCatchSize": 91.7,
       "bigCatchReward": 95993000,
       "discoveryId": 70409182,
-      "condWeatherId": [
-        13200005,
-        13200006,
-        13200012,
-        13200013
-      ],
+      "condWeatherId": [13200005, 13200006, 13200012, 13200013],
       "localBitFlag": 27
     },
     "77800154": {
@@ -5209,12 +4705,7 @@
       "bigCatchSize": 17,
       "bigCatchReward": 95993001,
       "discoveryId": 70409183,
-      "condWeatherId": [
-        13200005,
-        13200006,
-        13200008,
-        13200009
-      ],
+      "condWeatherId": [13200005, 13200006, 13200008, 13200009],
       "localBitFlag": 27
     },
     "77800155": {
@@ -5243,11 +4734,7 @@
       "bigCatchSize": 18.7,
       "bigCatchReward": 95993000,
       "discoveryId": 70409184,
-      "condWeatherId": [
-        13200000,
-        13200003,
-        13200001
-      ],
+      "condWeatherId": [13200000, 13200003, 13200001],
       "localBitFlag": 27
     },
     "77800156": {
@@ -5276,12 +4763,7 @@
       "bigCatchSize": 26.1,
       "bigCatchReward": 95993000,
       "discoveryId": 70409186,
-      "condWeatherId": [
-        13200006,
-        13200007,
-        13200008,
-        13200009
-      ],
+      "condWeatherId": [13200006, 13200007, 13200008, 13200009],
       "localBitFlag": 27
     },
     "77800157": {
@@ -5312,11 +4794,7 @@
       "discoveryId": 70409187,
       "condMonthStart": 8,
       "condMonthEnd": 2,
-      "condWeatherId": [
-        13200002,
-        13200001,
-        13200006
-      ],
+      "condWeatherId": [13200002, 13200001, 13200006],
       "localBitFlag": 27
     },
     "77800158": {
@@ -5347,10 +4825,7 @@
       "discoveryId": 70409188,
       "condMonthStart": 2,
       "condMonthEnd": 10,
-      "condWeatherId": [
-        13200000,
-        13200008
-      ],
+      "condWeatherId": [13200000, 13200008],
       "localBitFlag": 27
     },
     "77800159": {
@@ -5381,11 +4856,7 @@
       "discoveryId": 70409189,
       "condMonthStart": 7,
       "condMonthEnd": 12,
-      "condWeatherId": [
-        13200000,
-        13200001,
-        13200002
-      ],
+      "condWeatherId": [13200000, 13200001, 13200002],
       "localBitFlag": 27
     },
     "77800160": {
@@ -5416,10 +4887,7 @@
       "discoveryId": 70409190,
       "condMonthStart": 7,
       "condMonthEnd": 12,
-      "condWeatherId": [
-        13200006,
-        13200008
-      ],
+      "condWeatherId": [13200006, 13200008],
       "localBitFlag": 27
     },
     "77800161": {
@@ -5450,11 +4918,7 @@
       "discoveryId": 70409191,
       "condMonthStart": 4,
       "condMonthEnd": 10,
-      "condWeatherId": [
-        13200008,
-        13200009,
-        13200010
-      ],
+      "condWeatherId": [13200008, 13200009, 13200010],
       "localBitFlag": 27
     },
     "77800162": {
@@ -5485,10 +4949,7 @@
       "discoveryId": 70409192,
       "condMonthStart": 2,
       "condMonthEnd": 8,
-      "condWeatherId": [
-        13200000,
-        13200008
-      ],
+      "condWeatherId": [13200000, 13200008],
       "localBitFlag": 27
     },
     "77800163": {
@@ -5519,11 +4980,7 @@
       "discoveryId": 70409194,
       "condMonthStart": 7,
       "condMonthEnd": 5,
-      "condWeatherId": [
-        13200000,
-        13200006,
-        13200008
-      ],
+      "condWeatherId": [13200000, 13200006, 13200008],
       "localBitFlag": 27
     },
     "77800164": {
@@ -5554,11 +5011,7 @@
       "discoveryId": 70409195,
       "condMonthStart": 5,
       "condMonthEnd": 1,
-      "condWeatherId": [
-        13200011,
-        13200012,
-        13200009
-      ],
+      "condWeatherId": [13200011, 13200012, 13200009],
       "localBitFlag": 219
     },
     "77800165": {
@@ -5589,11 +5042,7 @@
       "discoveryId": 70409196,
       "condMonthStart": 3,
       "condMonthEnd": 10,
-      "condWeatherId": [
-        13200000,
-        13200001,
-        13200006
-      ],
+      "condWeatherId": [13200000, 13200001, 13200006],
       "localBitFlag": 27
     },
     "77800166": {
@@ -5622,10 +5071,7 @@
       "bigCatchSize": 100.9,
       "bigCatchReward": 95993001,
       "discoveryId": 70409197,
-      "condWeatherId": [
-        13200000,
-        13200006
-      ],
+      "condWeatherId": [13200000, 13200006],
       "localBitFlag": 27
     },
     "77800167": {
@@ -5682,11 +5128,7 @@
       "bigCatchSize": 24.6,
       "bigCatchReward": 95993000,
       "discoveryId": 70409200,
-      "condWeatherId": [
-        13200000,
-        13200004,
-        13200001
-      ],
+      "condWeatherId": [13200000, 13200004, 13200001],
       "localBitFlag": 27
     },
     "77800169": {
@@ -5743,10 +5185,7 @@
       "bigCatchSize": 175,
       "bigCatchReward": 95993001,
       "discoveryId": 70409202,
-      "condWeatherId": [
-        13200011,
-        13200012
-      ],
+      "condWeatherId": [13200011, 13200012],
       "localBitFlag": 27
     },
     "77800171": {
@@ -5805,11 +5244,7 @@
       "discoveryId": 70409204,
       "condMonthStart": 1,
       "condMonthEnd": 11,
-      "condWeatherId": [
-        13200000,
-        13200001,
-        13200002
-      ],
+      "condWeatherId": [13200000, 13200001, 13200002],
       "localBitFlag": 27
     },
     "77800173": {
@@ -5867,11 +5302,7 @@
       "discoveryId": 70409206,
       "condMonthStart": 4,
       "condMonthEnd": 12,
-      "condWeatherId": [
-        13200000,
-        13200003,
-        13200001
-      ],
+      "condWeatherId": [13200000, 13200003, 13200001],
       "localBitFlag": 27
     },
     "77800175": {
@@ -5902,11 +5333,7 @@
       "discoveryId": 70409207,
       "condMonthStart": 3,
       "condMonthEnd": 10,
-      "condWeatherId": [
-        13200000,
-        13200003,
-        13200004
-      ],
+      "condWeatherId": [13200000, 13200003, 13200004],
       "localBitFlag": 27
     },
     "77800176": {
@@ -5964,10 +5391,7 @@
       "discoveryId": 70409210,
       "condMonthStart": 7,
       "condMonthEnd": 12,
-      "condWeatherId": [
-        13200009,
-        13200010
-      ],
+      "condWeatherId": [13200009, 13200010],
       "localBitFlag": 27
     },
     "77800178": {
@@ -5998,11 +5422,7 @@
       "discoveryId": 70409212,
       "condMonthStart": 4,
       "condMonthEnd": 2,
-      "condWeatherId": [
-        13200000,
-        13200006,
-        13200007
-      ],
+      "condWeatherId": [13200000, 13200006, 13200007],
       "localBitFlag": 27
     },
     "77800179": {
@@ -6033,10 +5453,7 @@
       "discoveryId": 70409215,
       "condMonthStart": 10,
       "condMonthEnd": 4,
-      "condWeatherId": [
-        13200011,
-        13200013
-      ],
+      "condWeatherId": [13200011, 13200013],
       "localBitFlag": 27
     },
     "77800180": {
@@ -6065,12 +5482,7 @@
       "bigCatchSize": 75.9,
       "bigCatchReward": 95993000,
       "discoveryId": 70409216,
-      "condWeatherId": [
-        13200000,
-        13200003,
-        13200001,
-        13200008
-      ],
+      "condWeatherId": [13200000, 13200003, 13200001, 13200008],
       "localBitFlag": 27
     },
     "77800181": {
@@ -6155,10 +5567,7 @@
       "discoveryId": 70409219,
       "condMonthStart": 10,
       "condMonthEnd": 5,
-      "condWeatherId": [
-        13200006,
-        13200011
-      ],
+      "condWeatherId": [13200006, 13200011],
       "localBitFlag": 27
     },
     "77800184": {
@@ -6187,11 +5596,7 @@
       "bigCatchSize": 33.1,
       "bigCatchReward": 95993000,
       "discoveryId": 70409220,
-      "condWeatherId": [
-        13200000,
-        13200003,
-        13200001
-      ],
+      "condWeatherId": [13200000, 13200003, 13200001],
       "localBitFlag": 27
     },
     "77800185": {
@@ -6222,10 +5627,7 @@
       "discoveryId": 70409222,
       "condMonthStart": 7,
       "condMonthEnd": 12,
-      "condWeatherId": [
-        13200000,
-        13200003
-      ],
+      "condWeatherId": [13200000, 13200003],
       "localBitFlag": 27
     },
     "77800186": {
@@ -6254,11 +5656,7 @@
       "bigCatchSize": 77.2,
       "bigCatchReward": 95993001,
       "discoveryId": 70409223,
-      "condWeatherId": [
-        13200000,
-        13200001,
-        13200002
-      ],
+      "condWeatherId": [13200000, 13200001, 13200002],
       "localBitFlag": 27
     },
     "77800187": {
@@ -6314,12 +5712,7 @@
       "bigCatchSize": 164,
       "bigCatchReward": 95993000,
       "discoveryId": 70409225,
-      "condWeatherId": [
-        13200002,
-        13200001,
-        13200004,
-        13200006
-      ],
+      "condWeatherId": [13200002, 13200001, 13200004, 13200006],
       "localBitFlag": 27
     },
     "77800189": {
@@ -6348,11 +5741,7 @@
       "bigCatchSize": 80.5,
       "bigCatchReward": 95993001,
       "discoveryId": 70409226,
-      "condWeatherId": [
-        13200004,
-        13200008,
-        13200009
-      ],
+      "condWeatherId": [13200004, 13200008, 13200009],
       "localBitFlag": 219
     },
     "77800190": {
@@ -6383,11 +5772,7 @@
       "discoveryId": 70409227,
       "condMonthStart": 2,
       "condMonthEnd": 9,
-      "condWeatherId": [
-        13200000,
-        13200001,
-        13200003
-      ],
+      "condWeatherId": [13200000, 13200001, 13200003],
       "localBitFlag": 27
     },
     "77800191": {
@@ -6418,11 +5803,7 @@
       "discoveryId": 70409228,
       "condMonthStart": 8,
       "condMonthEnd": 5,
-      "condWeatherId": [
-        13200000,
-        13200012,
-        13200014
-      ],
+      "condWeatherId": [13200000, 13200012, 13200014],
       "localBitFlag": 27
     },
     "77800192": {
@@ -6478,12 +5859,7 @@
       "bigCatchSize": 25.8,
       "bigCatchReward": 95993000,
       "discoveryId": 70409231,
-      "condWeatherId": [
-        13200000,
-        13200003,
-        13200001,
-        13200008
-      ],
+      "condWeatherId": [13200000, 13200003, 13200001, 13200008],
       "localBitFlag": 27
     },
     "77800194": {
@@ -6570,11 +5946,7 @@
       "discoveryId": 70409234,
       "condMonthStart": 6,
       "condMonthEnd": 12,
-      "condWeatherId": [
-        13200002,
-        13200001,
-        13200006
-      ],
+      "condWeatherId": [13200002, 13200001, 13200006],
       "localBitFlag": 27
     },
     "77800197": {
@@ -6631,10 +6003,7 @@
       "bigCatchSize": 20.5,
       "bigCatchReward": 95993001,
       "discoveryId": 70409236,
-      "condWeatherId": [
-        13200007,
-        13200008
-      ],
+      "condWeatherId": [13200007, 13200008],
       "localBitFlag": 27
     },
     "77800199": {
@@ -6720,10 +6089,7 @@
       "discoveryId": 70409442,
       "condMonthStart": 10,
       "condMonthEnd": 4,
-      "condWeatherId": [
-        13200013,
-        13200014
-      ],
+      "condWeatherId": [13200013, 13200014],
       "localBitFlag": 27
     },
     "77800202": {
@@ -6754,11 +6120,7 @@
       "discoveryId": 70409242,
       "condMonthStart": 1,
       "condMonthEnd": 10,
-      "condWeatherId": [
-        13200000,
-        13200001,
-        13200002
-      ],
+      "condWeatherId": [13200000, 13200001, 13200002],
       "localBitFlag": 27
     },
     "77800203": {
@@ -6789,12 +6151,7 @@
       "discoveryId": 70409243,
       "condMonthStart": 5,
       "condMonthEnd": 3,
-      "condWeatherId": [
-        13200000,
-        13200006,
-        13200011,
-        13200012
-      ],
+      "condWeatherId": [13200000, 13200006, 13200011, 13200012],
       "localBitFlag": 27
     },
     "77800204": {
@@ -6851,10 +6208,7 @@
       "bigCatchSize": 185,
       "bigCatchReward": 95993001,
       "discoveryId": 70409245,
-      "condWeatherId": [
-        13200000,
-        13200001
-      ],
+      "condWeatherId": [13200000, 13200001],
       "localBitFlag": 27
     },
     "77800206": {
@@ -7073,12 +6427,7 @@
       "bigCatchSize": 57,
       "bigCatchReward": 95993001,
       "discoveryId": 70409253,
-      "condWeatherId": [
-        13200000,
-        13200001,
-        13200003,
-        13200002
-      ],
+      "condWeatherId": [13200000, 13200001, 13200003, 13200002],
       "localBitFlag": 27
     },
     "77800214": {
@@ -7109,11 +6458,7 @@
       "discoveryId": 70409254,
       "condMonthStart": 2,
       "condMonthEnd": 10,
-      "condWeatherId": [
-        13200006,
-        13200007,
-        13200008
-      ],
+      "condWeatherId": [13200006, 13200007, 13200008],
       "localBitFlag": 27
     },
     "77800215": {
@@ -7171,11 +6516,7 @@
       "discoveryId": 70409257,
       "condMonthStart": 2,
       "condMonthEnd": 8,
-      "condWeatherId": [
-        13200006,
-        13200008,
-        13200007
-      ],
+      "condWeatherId": [13200006, 13200008, 13200007],
       "localBitFlag": 27
     },
     "77800217": {
@@ -7233,10 +6574,7 @@
       "discoveryId": 70409261,
       "condMonthStart": 11,
       "condMonthEnd": 5,
-      "condWeatherId": [
-        13200007,
-        13200008
-      ],
+      "condWeatherId": [13200007, 13200008],
       "localBitFlag": 219
     },
     "77800219": {
@@ -7265,10 +6603,7 @@
       "bigCatchSize": 786,
       "bigCatchReward": 95993001,
       "discoveryId": 70409262,
-      "condWeatherId": [
-        13200000,
-        13200003
-      ],
+      "condWeatherId": [13200000, 13200003],
       "localBitFlag": 27
     },
     "77800220": {
@@ -7299,10 +6634,7 @@
       "discoveryId": 70409263,
       "condMonthStart": 8,
       "condMonthEnd": 2,
-      "condWeatherId": [
-        13200006,
-        13200008
-      ],
+      "condWeatherId": [13200006, 13200008],
       "localBitFlag": 27
     },
     "77800221": {
@@ -7331,11 +6663,7 @@
       "bigCatchSize": 12.2,
       "bigCatchReward": 95993000,
       "discoveryId": 70409264,
-      "condWeatherId": [
-        13200000,
-        13200003,
-        13200001
-      ],
+      "condWeatherId": [13200000, 13200003, 13200001],
       "localBitFlag": 27
     },
     "77800222": {
@@ -7393,10 +6721,7 @@
       "discoveryId": 70409267,
       "condMonthStart": 5,
       "condMonthEnd": 12,
-      "condWeatherId": [
-        13200000,
-        13200001
-      ],
+      "condWeatherId": [13200000, 13200001],
       "localBitFlag": 27
     },
     "77800224": {
@@ -7425,12 +6750,7 @@
       "bigCatchSize": 27.5,
       "bigCatchReward": 95993000,
       "discoveryId": 70409268,
-      "condWeatherId": [
-        13200000,
-        13200008,
-        13200012,
-        13200004
-      ],
+      "condWeatherId": [13200000, 13200008, 13200012, 13200004],
       "localBitFlag": 27
     },
     "77800225": {
@@ -7461,10 +6781,7 @@
       "discoveryId": 70409270,
       "condMonthStart": 4,
       "condMonthEnd": 10,
-      "condWeatherId": [
-        13200000,
-        13200001
-      ],
+      "condWeatherId": [13200000, 13200001],
       "localBitFlag": 27
     },
     "77800226": {
@@ -7548,11 +6865,7 @@
       "bigCatchSize": 88,
       "bigCatchReward": 95993001,
       "discoveryId": 70409274,
-      "condWeatherId": [
-        13200000,
-        13200001,
-        13200002
-      ],
+      "condWeatherId": [13200000, 13200001, 13200002],
       "localBitFlag": 27
     },
     "77800229": {
@@ -7583,10 +6896,7 @@
       "discoveryId": 70409275,
       "condMonthStart": 3,
       "condMonthEnd": 9,
-      "condWeatherId": [
-        13200000,
-        13200012
-      ],
+      "condWeatherId": [13200000, 13200012],
       "localBitFlag": 27
     },
     "77800230": {
@@ -7615,11 +6925,7 @@
       "bigCatchSize": 125.7,
       "bigCatchReward": 95993000,
       "discoveryId": 70409276,
-      "condWeatherId": [
-        13200000,
-        13200001,
-        13200002
-      ],
+      "condWeatherId": [13200000, 13200001, 13200002],
       "localBitFlag": 27
     },
     "77800231": {
@@ -7785,10 +7091,7 @@
       "discoveryId": 70409286,
       "condMonthStart": 11,
       "condMonthEnd": 4,
-      "condWeatherId": [
-        13200013,
-        13200014
-      ],
+      "condWeatherId": [13200013, 13200014],
       "localBitFlag": 27
     },
     "77800237": {
@@ -7819,10 +7122,7 @@
       "discoveryId": 70409287,
       "condMonthStart": 11,
       "condMonthEnd": 4,
-      "condWeatherId": [
-        13200000,
-        13200001
-      ],
+      "condWeatherId": [13200000, 13200001],
       "localBitFlag": 27
     },
     "77800238": {
@@ -7851,10 +7151,7 @@
       "bigCatchSize": 258,
       "bigCatchReward": 95993001,
       "discoveryId": 70409289,
-      "condWeatherId": [
-        13200000,
-        13200003
-      ],
+      "condWeatherId": [13200000, 13200003],
       "localBitFlag": 219
     },
     "77800239": {
@@ -7883,10 +7180,7 @@
       "bigCatchSize": 80.2,
       "bigCatchReward": 95993001,
       "discoveryId": 70409291,
-      "condWeatherId": [
-        13200000,
-        13200003
-      ],
+      "condWeatherId": [13200000, 13200003],
       "localBitFlag": 27
     },
     "77800240": {
@@ -7946,11 +7240,7 @@
       "discoveryId": 70409293,
       "condMonthStart": 2,
       "condMonthEnd": 10,
-      "condWeatherId": [
-        13200000,
-        13200003,
-        13200001
-      ],
+      "condWeatherId": [13200000, 13200003, 13200001],
       "localBitFlag": 27
     },
     "77800242": {
@@ -7981,10 +7271,7 @@
       "discoveryId": 70409295,
       "condMonthStart": 10,
       "condMonthEnd": 3,
-      "condWeatherId": [
-        13200000,
-        13200001
-      ],
+      "condWeatherId": [13200000, 13200001],
       "localBitFlag": 27
     },
     "77800243": {
@@ -8067,11 +7354,7 @@
       "bigCatchSize": 10.2,
       "bigCatchReward": 95993001,
       "discoveryId": 70409298,
-      "condWeatherId": [
-        13200007,
-        13200008,
-        13200009
-      ],
+      "condWeatherId": [13200007, 13200008, 13200009],
       "localBitFlag": 27
     },
     "77800246": {
@@ -8102,12 +7385,7 @@
       "discoveryId": 70409300,
       "condMonthStart": 2,
       "condMonthEnd": 10,
-      "condWeatherId": [
-        13200000,
-        13200006,
-        13200007,
-        13200008
-      ],
+      "condWeatherId": [13200000, 13200006, 13200007, 13200008],
       "localBitFlag": 219
     },
     "77800247": {
@@ -8136,11 +7414,7 @@
       "bigCatchSize": 106.6,
       "bigCatchReward": 95993001,
       "discoveryId": 70409448,
-      "condWeatherId": [
-        13200006,
-        13200007,
-        13200012
-      ],
+      "condWeatherId": [13200006, 13200007, 13200012],
       "localBitFlag": 27
     },
     "77800248": {
@@ -8171,10 +7445,7 @@
       "discoveryId": 70409301,
       "condMonthStart": 3,
       "condMonthEnd": 9,
-      "condWeatherId": [
-        13200000,
-        13200003
-      ],
+      "condWeatherId": [13200000, 13200003],
       "localBitFlag": 27
     },
     "77800249": {
@@ -8230,12 +7501,7 @@
       "bigCatchSize": 25.5,
       "bigCatchReward": 95993000,
       "discoveryId": 70409303,
-      "condWeatherId": [
-        13200003,
-        13200000,
-        13200001,
-        13200006
-      ],
+      "condWeatherId": [13200003, 13200000, 13200001, 13200006],
       "localBitFlag": 27
     },
     "77800251": {
@@ -8266,11 +7532,7 @@
       "discoveryId": 70409304,
       "condMonthStart": 5,
       "condMonthEnd": 12,
-      "condWeatherId": [
-        13200000,
-        13200003,
-        13200006
-      ],
+      "condWeatherId": [13200000, 13200003, 13200006],
       "localBitFlag": 27
     },
     "77800252": {
@@ -8301,11 +7563,7 @@
       "discoveryId": 70409306,
       "condMonthStart": 1,
       "condMonthEnd": 10,
-      "condWeatherId": [
-        13200000,
-        13200006,
-        13200012
-      ],
+      "condWeatherId": [13200000, 13200006, 13200012],
       "localBitFlag": 27
     },
     "77800253": {
@@ -8336,10 +7594,7 @@
       "discoveryId": 70409307,
       "condMonthStart": 1,
       "condMonthEnd": 9,
-      "condWeatherId": [
-        13200007,
-        13200008
-      ],
+      "condWeatherId": [13200007, 13200008],
       "localBitFlag": 27
     },
     "77800254": {
@@ -8449,11 +7704,7 @@
       "bigCatchSize": 109.4,
       "bigCatchReward": 95993001,
       "discoveryId": 70409312,
-      "condWeatherId": [
-        13200000,
-        13200003,
-        13200002
-      ],
+      "condWeatherId": [13200000, 13200003, 13200002],
       "localBitFlag": 219
     },
     "77800258": {
@@ -8482,11 +7733,7 @@
       "bigCatchSize": 170,
       "bigCatchReward": 95993001,
       "discoveryId": 70409313,
-      "condWeatherId": [
-        13200000,
-        13200001,
-        13200002
-      ],
+      "condWeatherId": [13200000, 13200001, 13200002],
       "localBitFlag": 27
     },
     "77800259": {
@@ -8517,11 +7764,7 @@
       "discoveryId": 70409314,
       "condMonthStart": 10,
       "condMonthEnd": 5,
-      "condWeatherId": [
-        13200000,
-        13200001,
-        13200003
-      ],
+      "condWeatherId": [13200000, 13200001, 13200003],
       "localBitFlag": 27
     },
     "77800260": {
@@ -8658,11 +7901,7 @@
       "bigCatchSize": 25.8,
       "bigCatchReward": 95993001,
       "discoveryId": 70409321,
-      "condWeatherId": [
-        13200000,
-        13200004,
-        13200006
-      ],
+      "condWeatherId": [13200000, 13200004, 13200006],
       "localBitFlag": 27
     },
     "77800265": {
@@ -8693,10 +7932,7 @@
       "discoveryId": 70409322,
       "condMonthStart": 4,
       "condMonthEnd": 1,
-      "condWeatherId": [
-        13200007,
-        13200011
-      ],
+      "condWeatherId": [13200007, 13200011],
       "localBitFlag": 27
     },
     "77800266": {
@@ -8727,10 +7963,7 @@
       "discoveryId": 70409324,
       "condMonthStart": 4,
       "condMonthEnd": 10,
-      "condWeatherId": [
-        13200008,
-        13200009
-      ],
+      "condWeatherId": [13200008, 13200009],
       "localBitFlag": 219
     },
     "77800267": {
@@ -8761,10 +7994,7 @@
       "discoveryId": 70409325,
       "condMonthStart": 3,
       "condMonthEnd": 11,
-      "condWeatherId": [
-        13200008,
-        13200009
-      ],
+      "condWeatherId": [13200008, 13200009],
       "localBitFlag": 219
     },
     "77800268": {
@@ -8795,10 +8025,7 @@
       "discoveryId": 70409326,
       "condMonthStart": 2,
       "condMonthEnd": 7,
-      "condWeatherId": [
-        13200005,
-        13200006
-      ],
+      "condWeatherId": [13200005, 13200006],
       "localBitFlag": 27
     },
     "77800269": {
@@ -8856,11 +8083,7 @@
       "discoveryId": 70409328,
       "condMonthStart": 2,
       "condMonthEnd": 12,
-      "condWeatherId": [
-        13200003,
-        13200004,
-        13200008
-      ],
+      "condWeatherId": [13200003, 13200004, 13200008],
       "localBitFlag": 27
     },
     "77800271": {
@@ -8972,11 +8195,7 @@
       "discoveryId": 70409333,
       "condMonthStart": 4,
       "condMonthEnd": 10,
-      "condWeatherId": [
-        13200000,
-        13200012,
-        13200013
-      ],
+      "condWeatherId": [13200000, 13200012, 13200013],
       "localBitFlag": 27
     },
     "77800275": {
@@ -9007,11 +8226,7 @@
       "discoveryId": 70409334,
       "condMonthStart": 8,
       "condMonthEnd": 5,
-      "condWeatherId": [
-        13200000,
-        13200001,
-        13200004
-      ],
+      "condWeatherId": [13200000, 13200001, 13200004],
       "localBitFlag": 27
     },
     "77800276": {
@@ -9042,10 +8257,7 @@
       "discoveryId": 70409335,
       "condMonthStart": 2,
       "condMonthEnd": 10,
-      "condWeatherId": [
-        13200000,
-        13200001
-      ],
+      "condWeatherId": [13200000, 13200001],
       "localBitFlag": 27
     },
     "77800277": {
@@ -9074,12 +8286,7 @@
       "bigCatchSize": 32.5,
       "bigCatchReward": 95993000,
       "discoveryId": 70409338,
-      "condWeatherId": [
-        13200006,
-        13200008,
-        13200012,
-        13200011
-      ],
+      "condWeatherId": [13200006, 13200008, 13200012, 13200011],
       "localBitFlag": 27
     },
     "77800278": {
@@ -9110,10 +8317,7 @@
       "discoveryId": 70409339,
       "condMonthStart": 7,
       "condMonthEnd": 12,
-      "condWeatherId": [
-        13200000,
-        13200012
-      ],
+      "condWeatherId": [13200000, 13200012],
       "localBitFlag": 27
     },
     "77800279": {
@@ -9144,10 +8348,7 @@
       "discoveryId": 70409340,
       "condMonthStart": 5,
       "condMonthEnd": 11,
-      "condWeatherId": [
-        13200000,
-        13200004
-      ],
+      "condWeatherId": [13200000, 13200004],
       "localBitFlag": 27
     },
     "77800280": {
@@ -9178,11 +8379,7 @@
       "discoveryId": 70409341,
       "condMonthStart": 2,
       "condMonthEnd": 9,
-      "condWeatherId": [
-        13200000,
-        13200003,
-        13200006
-      ],
+      "condWeatherId": [13200000, 13200003, 13200006],
       "localBitFlag": 27
     },
     "77800281": {
@@ -9213,10 +8410,7 @@
       "discoveryId": 70409342,
       "condMonthStart": 7,
       "condMonthEnd": 5,
-      "condWeatherId": [
-        13200000,
-        13200003
-      ],
+      "condWeatherId": [13200000, 13200003],
       "localBitFlag": 27
     },
     "77800282": {
@@ -9272,12 +8466,7 @@
       "bigCatchSize": 44.5,
       "bigCatchReward": 95993000,
       "discoveryId": 70409344,
-      "condWeatherId": [
-        13200000,
-        13200003,
-        13200001,
-        13200007
-      ],
+      "condWeatherId": [13200000, 13200003, 13200001, 13200007],
       "localBitFlag": 27
     },
     "77800284": {
@@ -9335,11 +8524,7 @@
       "discoveryId": 70409346,
       "condMonthStart": 2,
       "condMonthEnd": 10,
-      "condWeatherId": [
-        13200000,
-        13200004,
-        13200012
-      ],
+      "condWeatherId": [13200000, 13200004, 13200012],
       "localBitFlag": 219
     },
     "77800286": {
@@ -9398,10 +8583,7 @@
       "discoveryId": 70409348,
       "condMonthStart": 4,
       "condMonthEnd": 10,
-      "condWeatherId": [
-        13200006,
-        13200003
-      ],
+      "condWeatherId": [13200006, 13200003],
       "localBitFlag": 27
     },
     "77800288": {
@@ -9432,10 +8614,7 @@
       "discoveryId": 70409349,
       "condMonthStart": 2,
       "condMonthEnd": 8,
-      "condWeatherId": [
-        13200004,
-        13200008
-      ],
+      "condWeatherId": [13200004, 13200008],
       "localBitFlag": 27
     },
     "77800289": {
@@ -9520,10 +8699,7 @@
       "discoveryId": 70409353,
       "condMonthStart": 1,
       "condMonthEnd": 6,
-      "condWeatherId": [
-        13200000,
-        13200003
-      ],
+      "condWeatherId": [13200000, 13200003],
       "localBitFlag": 27
     },
     "77800292": {
@@ -9552,10 +8728,7 @@
       "bigCatchSize": 211,
       "bigCatchReward": 95993001,
       "discoveryId": 70409354,
-      "condWeatherId": [
-        13200000,
-        13200001
-      ],
+      "condWeatherId": [13200000, 13200001],
       "localBitFlag": 219
     },
     "77800293": {
@@ -9613,10 +8786,7 @@
       "discoveryId": 70409356,
       "condMonthStart": 7,
       "condMonthEnd": 1,
-      "condWeatherId": [
-        13200001,
-        13200002
-      ],
+      "condWeatherId": [13200001, 13200002],
       "localBitFlag": 27
     },
     "77800295": {
@@ -9647,10 +8817,7 @@
       "discoveryId": 70409357,
       "condMonthStart": 9,
       "condMonthEnd": 7,
-      "condWeatherId": [
-        13200008,
-        13200009
-      ],
+      "condWeatherId": [13200008, 13200009],
       "localBitFlag": 27
     },
     "77800296": {
@@ -9679,10 +8846,7 @@
       "bigCatchSize": 31.4,
       "bigCatchReward": 95993001,
       "discoveryId": 70409358,
-      "condWeatherId": [
-        13200000,
-        13200001
-      ],
+      "condWeatherId": [13200000, 13200001],
       "localBitFlag": 27
     },
     "77800297": {
@@ -9711,12 +8875,7 @@
       "bigCatchSize": 8.9,
       "bigCatchReward": 95993000,
       "discoveryId": 70409451,
-      "condWeatherId": [
-        13200006,
-        13200011,
-        13200012,
-        13200013
-      ],
+      "condWeatherId": [13200006, 13200011, 13200012, 13200013],
       "localBitFlag": 27
     },
     "77800298": {
@@ -9799,11 +8958,7 @@
       "bigCatchSize": 191,
       "bigCatchReward": 95993001,
       "discoveryId": 70409361,
-      "condWeatherId": [
-        13200007,
-        13200008,
-        13200009
-      ],
+      "condWeatherId": [13200007, 13200008, 13200009],
       "localBitFlag": 27
     },
     "77800301": {
@@ -9834,11 +8989,7 @@
       "discoveryId": 70409362,
       "condMonthStart": 9,
       "condMonthEnd": 2,
-      "condWeatherId": [
-        13200000,
-        13200001,
-        13200002
-      ],
+      "condWeatherId": [13200000, 13200001, 13200002],
       "localBitFlag": 27
     },
     "77800302": {
@@ -9894,12 +9045,7 @@
       "bigCatchSize": 2.34,
       "bigCatchReward": 95993000,
       "discoveryId": 70409365,
-      "condWeatherId": [
-        13200006,
-        13200007,
-        13200008,
-        13200009
-      ],
+      "condWeatherId": [13200006, 13200007, 13200008, 13200009],
       "localBitFlag": 27
     },
     "77800304": {
@@ -10011,11 +9157,7 @@
       "discoveryId": 70409369,
       "condMonthStart": 3,
       "condMonthEnd": 9,
-      "condWeatherId": [
-        13200000,
-        13200001,
-        13200002
-      ],
+      "condWeatherId": [13200000, 13200001, 13200002],
       "localBitFlag": 27
     },
     "77800308": {
@@ -10046,11 +9188,7 @@
       "discoveryId": 70409370,
       "condMonthStart": 11,
       "condMonthEnd": 1,
-      "condWeatherId": [
-        13200012,
-        13200013,
-        13200014
-      ],
+      "condWeatherId": [13200012, 13200013, 13200014],
       "localBitFlag": 27
     },
     "77800309": {
@@ -10108,12 +9246,7 @@
       "discoveryId": 70409372,
       "condMonthStart": 3,
       "condMonthEnd": 1,
-      "condWeatherId": [
-        13200006,
-        13200007,
-        13200008,
-        13200009
-      ],
+      "condWeatherId": [13200006, 13200007, 13200008, 13200009],
       "localBitFlag": 27
     },
     "77800311": {
@@ -10171,10 +9304,7 @@
       "discoveryId": 70409374,
       "condMonthStart": 4,
       "condMonthEnd": 12,
-      "condWeatherId": [
-        13200000,
-        13200003
-      ],
+      "condWeatherId": [13200000, 13200003],
       "localBitFlag": 27
     },
     "77800313": {
@@ -10203,11 +9333,7 @@
       "bigCatchSize": 55.1,
       "bigCatchReward": 95993001,
       "discoveryId": 70409288,
-      "condWeatherId": [
-        13200000,
-        13200001,
-        13200002
-      ],
+      "condWeatherId": [13200000, 13200001, 13200002],
       "localBitFlag": 27
     },
     "77800314": {
@@ -10265,11 +9391,7 @@
       "discoveryId": 70409377,
       "condMonthStart": 3,
       "condMonthEnd": 9,
-      "condWeatherId": [
-        13200000,
-        13200001,
-        13200002
-      ],
+      "condWeatherId": [13200000, 13200001, 13200002],
       "localBitFlag": 27
     },
     "77800316": {
@@ -10300,12 +9422,7 @@
       "discoveryId": 70409378,
       "condMonthStart": 3,
       "condMonthEnd": 11,
-      "condWeatherId": [
-        13200000,
-        13200001,
-        13200003,
-        13200006
-      ],
+      "condWeatherId": [13200000, 13200001, 13200003, 13200006],
       "localBitFlag": 219
     },
     "77800317": {
@@ -10336,11 +9453,7 @@
       "discoveryId": 70409379,
       "condMonthStart": 1,
       "condMonthEnd": 10,
-      "condWeatherId": [
-        13200001,
-        13200005,
-        13200006
-      ],
+      "condWeatherId": [13200001, 13200005, 13200006],
       "localBitFlag": 219
     },
     "77800318": {
@@ -10371,11 +9484,7 @@
       "discoveryId": 70409380,
       "condMonthStart": 4,
       "condMonthEnd": 10,
-      "condWeatherId": [
-        13200003,
-        13200004,
-        13200008
-      ],
+      "condWeatherId": [13200003, 13200004, 13200008],
       "localBitFlag": 27
     },
     "77800319": {
@@ -10406,11 +9515,7 @@
       "discoveryId": 70409382,
       "condMonthStart": 3,
       "condMonthEnd": 9,
-      "condWeatherId": [
-        13200006,
-        13200012,
-        13200013
-      ],
+      "condWeatherId": [13200006, 13200012, 13200013],
       "localBitFlag": 27
     },
     "77800320": {
@@ -10468,11 +9573,7 @@
       "discoveryId": 70409384,
       "condMonthStart": 2,
       "condMonthEnd": 8,
-      "condWeatherId": [
-        13200000,
-        13200001,
-        13200002
-      ],
+      "condWeatherId": [13200000, 13200001, 13200002],
       "localBitFlag": 27
     },
     "77800322": {
@@ -10503,10 +9604,7 @@
       "discoveryId": 70409386,
       "condMonthStart": 3,
       "condMonthEnd": 12,
-      "condWeatherId": [
-        13200012,
-        13200008
-      ],
+      "condWeatherId": [13200012, 13200008],
       "localBitFlag": 27
     },
     "77800323": {
@@ -10537,11 +9635,7 @@
       "discoveryId": 70409387,
       "condMonthStart": 4,
       "condMonthEnd": 12,
-      "condWeatherId": [
-        13200000,
-        13200006,
-        13200008
-      ],
+      "condWeatherId": [13200000, 13200006, 13200008],
       "localBitFlag": 27
     },
     "77800324": {
@@ -10626,10 +9720,7 @@
       "discoveryId": 70409390,
       "condMonthStart": 4,
       "condMonthEnd": 10,
-      "condWeatherId": [
-        13200006,
-        13200012
-      ],
+      "condWeatherId": [13200006, 13200012],
       "localBitFlag": 27
     },
     "77800327": {
@@ -10660,11 +9751,7 @@
       "discoveryId": 70409391,
       "condMonthStart": 2,
       "condMonthEnd": 10,
-      "condWeatherId": [
-        13200000,
-        13200001,
-        13200004
-      ],
+      "condWeatherId": [13200000, 13200001, 13200004],
       "localBitFlag": 27
     },
     "77800328": {
@@ -10693,10 +9780,7 @@
       "bigCatchSize": 76.6,
       "bigCatchReward": 95993001,
       "discoveryId": 70409392,
-      "condWeatherId": [
-        13200008,
-        13200009
-      ],
+      "condWeatherId": [13200008, 13200009],
       "localBitFlag": 27
     },
     "77800329": {
@@ -10754,11 +9838,7 @@
       "discoveryId": 70409394,
       "condMonthStart": 2,
       "condMonthEnd": 8,
-      "condWeatherId": [
-        13200000,
-        13200003,
-        13200004
-      ],
+      "condWeatherId": [13200000, 13200003, 13200004],
       "localBitFlag": 27
     },
     "77800331": {
@@ -10789,10 +9869,7 @@
       "discoveryId": 70409395,
       "condMonthStart": 7,
       "condMonthEnd": 12,
-      "condWeatherId": [
-        13200008,
-        13200009
-      ],
+      "condWeatherId": [13200008, 13200009],
       "localBitFlag": 27
     },
     "77800332": {
@@ -10875,11 +9952,7 @@
       "bigCatchSize": 17.6,
       "bigCatchReward": 95993001,
       "discoveryId": 70409398,
-      "condWeatherId": [
-        13200000,
-        13200001,
-        13200002
-      ],
+      "condWeatherId": [13200000, 13200001, 13200002],
       "localBitFlag": 27
     },
     "77800335": {
@@ -10908,11 +9981,7 @@
       "bigCatchSize": 198.2,
       "bigCatchReward": 95993001,
       "discoveryId": 70409399,
-      "condWeatherId": [
-        13200000,
-        13200003,
-        13200002
-      ],
+      "condWeatherId": [13200000, 13200003, 13200002],
       "localBitFlag": 219
     },
     "77800336": {
@@ -10995,11 +10064,7 @@
       "bigCatchSize": 34,
       "bigCatchReward": 95993001,
       "discoveryId": 70409403,
-      "condWeatherId": [
-        13200000,
-        13200003,
-        13200012
-      ],
+      "condWeatherId": [13200000, 13200003, 13200012],
       "localBitFlag": 219
     },
     "77800339": {
@@ -11030,10 +10095,7 @@
       "discoveryId": 70409404,
       "condMonthStart": 2,
       "condMonthEnd": 8,
-      "condWeatherId": [
-        13200000,
-        13200001
-      ],
+      "condWeatherId": [13200000, 13200001],
       "localBitFlag": 27
     },
     "77800340": {
@@ -11064,11 +10126,7 @@
       "discoveryId": 70409406,
       "condMonthStart": 2,
       "condMonthEnd": 9,
-      "condWeatherId": [
-        13200000,
-        13200001,
-        13200003
-      ],
+      "condWeatherId": [13200000, 13200001, 13200003],
       "localBitFlag": 27
     },
     "77800341": {
@@ -11097,12 +10155,7 @@
       "bigCatchSize": 33.9,
       "bigCatchReward": 95993000,
       "discoveryId": 70409407,
-      "condWeatherId": [
-        13200006,
-        13200007,
-        13200008,
-        13200009
-      ],
+      "condWeatherId": [13200006, 13200007, 13200008, 13200009],
       "localBitFlag": 27
     },
     "77800342": {
@@ -11133,11 +10186,7 @@
       "discoveryId": 70409408,
       "condMonthStart": 2,
       "condMonthEnd": 8,
-      "condWeatherId": [
-        13200000,
-        13200006,
-        13200007
-      ],
+      "condWeatherId": [13200000, 13200006, 13200007],
       "localBitFlag": 27
     },
     "77800343": {
@@ -11220,10 +10269,7 @@
       "bigCatchSize": 11.16,
       "bigCatchReward": 95993001,
       "discoveryId": 70409414,
-      "condWeatherId": [
-        13200007,
-        13200008
-      ],
+      "condWeatherId": [13200007, 13200008],
       "localBitFlag": 27
     },
     "77800346": {
@@ -11281,10 +10327,7 @@
       "discoveryId": 70409416,
       "condMonthStart": 4,
       "condMonthEnd": 10,
-      "condWeatherId": [
-        13200008,
-        13200009
-      ],
+      "condWeatherId": [13200008, 13200009],
       "localBitFlag": 27
     },
     "77800348": {
@@ -11395,11 +10438,7 @@
       "bigCatchSize": 51,
       "bigCatchReward": 95993001,
       "discoveryId": 70409439,
-      "condWeatherId": [
-        13200000,
-        13200011,
-        13200012
-      ],
+      "condWeatherId": [13200000, 13200011, 13200012],
       "localBitFlag": 27
     },
     "77800352": {
@@ -11428,11 +10467,7 @@
       "bigCatchSize": 25.2,
       "bigCatchReward": 95993001,
       "discoveryId": 70409211,
-      "condWeatherId": [
-        13200000,
-        13200004,
-        13200006
-      ],
+      "condWeatherId": [13200000, 13200004, 13200006],
       "localBitFlag": 27
     },
     "77800353": {
@@ -11463,10 +10498,7 @@
       "discoveryId": 70409428,
       "condMonthStart": 7,
       "condMonthEnd": 12,
-      "condWeatherId": [
-        13200000,
-        13200012
-      ],
+      "condWeatherId": [13200000, 13200012],
       "localBitFlag": 27
     },
     "77800354": {
@@ -11497,10 +10529,7 @@
       "discoveryId": 70409429,
       "condMonthStart": 10,
       "condMonthEnd": 3,
-      "condWeatherId": [
-        13200000,
-        13200006
-      ],
+      "condWeatherId": [13200000, 13200006],
       "localBitFlag": 27
     },
     "77800355": {
@@ -11531,10 +10560,7 @@
       "discoveryId": 70409053,
       "condMonthStart": 8,
       "condMonthEnd": 1,
-      "condWeatherId": [
-        13200006,
-        13200012
-      ],
+      "condWeatherId": [13200006, 13200012],
       "localBitFlag": 27
     },
     "77800356": {
@@ -11565,10 +10591,7 @@
       "discoveryId": 70409434,
       "condMonthStart": 1,
       "condMonthEnd": 6,
-      "condWeatherId": [
-        13200000,
-        13200012
-      ],
+      "condWeatherId": [13200000, 13200012],
       "localBitFlag": 27
     },
     "77800357": {
@@ -11599,10 +10622,7 @@
       "discoveryId": 70409078,
       "condMonthStart": 7,
       "condMonthEnd": 12,
-      "condWeatherId": [
-        13200000,
-        13200008
-      ],
+      "condWeatherId": [13200000, 13200008],
       "localBitFlag": 27
     },
     "77800358": {
@@ -11633,10 +10653,7 @@
       "discoveryId": 70409080,
       "condMonthStart": 3,
       "condMonthEnd": 9,
-      "condWeatherId": [
-        13200003,
-        13200000
-      ],
+      "condWeatherId": [13200003, 13200000],
       "localBitFlag": 27
     },
     "77800359": {
@@ -11667,10 +10684,7 @@
       "discoveryId": 70409112,
       "condMonthStart": 4,
       "condMonthEnd": 10,
-      "condWeatherId": [
-        13200000,
-        13200001
-      ],
+      "condWeatherId": [13200000, 13200001],
       "localBitFlag": 27
     },
     "77800360": {
@@ -11701,10 +10715,7 @@
       "discoveryId": 70409453,
       "condMonthStart": 10,
       "condMonthEnd": 3,
-      "condWeatherId": [
-        13200001,
-        13200002
-      ],
+      "condWeatherId": [13200001, 13200002],
       "localBitFlag": 27
     },
     "77800361": {
@@ -11735,10 +10746,7 @@
       "discoveryId": 70409229,
       "condMonthStart": 8,
       "condMonthEnd": 1,
-      "condWeatherId": [
-        13200000,
-        13200003
-      ],
+      "condWeatherId": [13200000, 13200003],
       "localBitFlag": 27
     },
     "77800362": {
@@ -11769,10 +10777,7 @@
       "discoveryId": 70409258,
       "condMonthStart": 9,
       "condMonthEnd": 3,
-      "condWeatherId": [
-        13200001,
-        13200002
-      ],
+      "condWeatherId": [13200001, 13200002],
       "localBitFlag": 27
     },
     "77800363": {
@@ -11831,10 +10836,7 @@
       "discoveryId": 70409432,
       "condMonthStart": 1,
       "condMonthEnd": 6,
-      "condWeatherId": [
-        13200012,
-        13200014
-      ],
+      "condWeatherId": [13200012, 13200014],
       "localBitFlag": 27
     },
     "77800365": {
@@ -11865,10 +10867,7 @@
       "discoveryId": 70409323,
       "condMonthStart": 3,
       "condMonthEnd": 9,
-      "condWeatherId": [
-        13200000,
-        13200001
-      ],
+      "condWeatherId": [13200000, 13200001],
       "localBitFlag": 27
     },
     "77800366": {
@@ -11899,10 +10898,7 @@
       "discoveryId": 70409433,
       "condMonthStart": 3,
       "condMonthEnd": 9,
-      "condWeatherId": [
-        13200000,
-        13200003
-      ],
+      "condWeatherId": [13200000, 13200003],
       "localBitFlag": 27
     },
     "77800367": {
@@ -11933,10 +10929,7 @@
       "discoveryId": 70409411,
       "condMonthStart": 12,
       "condMonthEnd": 5,
-      "condWeatherId": [
-        13200003,
-        13200007
-      ],
+      "condWeatherId": [13200003, 13200007],
       "localBitFlag": 27
     },
     "77800368": {
@@ -11995,10 +10988,7 @@
       "discoveryId": 70409010,
       "condMonthStart": 5,
       "condMonthEnd": 10,
-      "condWeatherId": [
-        13200006,
-        13200008
-      ],
+      "condWeatherId": [13200006, 13200008],
       "localBitFlag": 27
     },
     "77800370": {
@@ -12029,11 +11019,7 @@
       "discoveryId": 70409299,
       "condMonthStart": 3,
       "condMonthEnd": 12,
-      "condWeatherId": [
-        13200000,
-        13200003,
-        13200008
-      ],
+      "condWeatherId": [13200000, 13200003, 13200008],
       "localBitFlag": 27
     },
     "77800371": {
@@ -12092,11 +11078,7 @@
       "discoveryId": 70409436,
       "condMonthStart": 3,
       "condMonthEnd": 12,
-      "condWeatherId": [
-        13200000,
-        13200012,
-        13200014
-      ],
+      "condWeatherId": [13200000, 13200012, 13200014],
       "localBitFlag": 27
     },
     "77800373": {
@@ -12127,10 +11109,7 @@
       "discoveryId": 70409019,
       "condMonthStart": 3,
       "condMonthEnd": 9,
-      "condWeatherId": [
-        13200008,
-        13200009
-      ],
+      "condWeatherId": [13200008, 13200009],
       "localBitFlag": 27
     },
     "77800374": {
@@ -12187,11 +11166,7 @@
       "bigCatchSize": 76,
       "bigCatchReward": 95993001,
       "discoveryId": 70409454,
-      "condWeatherId": [
-        13200000,
-        13200003,
-        13200002
-      ],
+      "condWeatherId": [13200000, 13200003, 13200002],
       "localBitFlag": 27
     },
     "77800376": {
@@ -12248,10 +11223,7 @@
       "bigCatchSize": 18.2,
       "bigCatchReward": 95993001,
       "discoveryId": 70409046,
-      "condWeatherId": [
-        13200000,
-        13200003
-      ],
+      "condWeatherId": [13200000, 13200003],
       "localBitFlag": 27
     },
     "77800378": {
@@ -12280,10 +11252,7 @@
       "bigCatchSize": 17.9,
       "bigCatchReward": 95993001,
       "discoveryId": 70409067,
-      "condWeatherId": [
-        13200011,
-        13200012
-      ],
+      "condWeatherId": [13200011, 13200012],
       "localBitFlag": 27
     },
     "77800379": {
@@ -12314,10 +11283,7 @@
       "discoveryId": 70409146,
       "condMonthStart": 6,
       "condMonthEnd": 12,
-      "condWeatherId": [
-        13200000,
-        13200008
-      ],
+      "condWeatherId": [13200000, 13200008],
       "localBitFlag": 27
     },
     "77800380": {
@@ -12348,10 +11314,7 @@
       "discoveryId": 70409240,
       "condMonthStart": 1,
       "condMonthEnd": 6,
-      "condWeatherId": [
-        13200009,
-        13200010
-      ],
+      "condWeatherId": [13200009, 13200010],
       "localBitFlag": 27
     },
     "77800381": {
@@ -12382,11 +11345,7 @@
       "discoveryId": 70409155,
       "condMonthStart": 4,
       "condMonthEnd": 12,
-      "condWeatherId": [
-        13200006,
-        13200008,
-        13200009
-      ],
+      "condWeatherId": [13200006, 13200008, 13200009],
       "localBitFlag": 27
     },
     "77800382": {
@@ -12443,11 +11402,7 @@
       "bigCatchSize": 147.76,
       "bigCatchReward": 95993001,
       "discoveryId": 70409431,
-      "condWeatherId": [
-        13200000,
-        13200003,
-        13200006
-      ],
+      "condWeatherId": [13200000, 13200003, 13200006],
       "localBitFlag": 27
     },
     "77800384": {
@@ -12478,11 +11433,7 @@
       "discoveryId": 70409035,
       "condMonthStart": 2,
       "condMonthEnd": 10,
-      "condWeatherId": [
-        13200000,
-        13200003,
-        13200004
-      ],
+      "condWeatherId": [13200000, 13200003, 13200004],
       "localBitFlag": 27
     },
     "77800385": {
@@ -12513,10 +11464,7 @@
       "discoveryId": 70409456,
       "condMonthStart": 3,
       "condMonthEnd": 10,
-      "condWeatherId": [
-        13200000,
-        13200012
-      ],
+      "condWeatherId": [13200000, 13200012],
       "localBitFlag": 27
     },
     "77800386": {
@@ -12603,11 +11551,7 @@
       "bigCatchSize": 48.3,
       "bigCatchReward": 95993001,
       "discoveryId": 70409218,
-      "condWeatherId": [
-        13200000,
-        13200006,
-        13200008
-      ],
+      "condWeatherId": [13200000, 13200006, 13200008],
       "localBitFlag": 27
     },
     "77800389": {
@@ -12638,10 +11582,7 @@
       "discoveryId": 70409385,
       "condMonthStart": 7,
       "condMonthEnd": 12,
-      "condWeatherId": [
-        13200000,
-        13200008
-      ],
+      "condWeatherId": [13200000, 13200008],
       "localBitFlag": 27
     },
     "77800390": {
@@ -12672,10 +11613,7 @@
       "discoveryId": 70409012,
       "condMonthStart": 5,
       "condMonthEnd": 12,
-      "condWeatherId": [
-        13200006,
-        13200008
-      ],
+      "condWeatherId": [13200006, 13200008],
       "localBitFlag": 27
     },
     "77800391": {
@@ -12706,10 +11644,7 @@
       "discoveryId": 70409058,
       "condMonthStart": 1,
       "condMonthEnd": 6,
-      "condWeatherId": [
-        13200001,
-        13200008
-      ],
+      "condWeatherId": [13200001, 13200008],
       "localBitFlag": 27
     },
     "77800392": {
@@ -12766,11 +11701,7 @@
       "bigCatchSize": 20.6,
       "bigCatchReward": 95993001,
       "discoveryId": 70409148,
-      "condWeatherId": [
-        13200000,
-        13200001,
-        13200008
-      ],
+      "condWeatherId": [13200000, 13200001, 13200008],
       "localBitFlag": 27
     },
     "77800394": {
@@ -12801,11 +11732,7 @@
       "discoveryId": 70409154,
       "condMonthStart": 4,
       "condMonthEnd": 10,
-      "condWeatherId": [
-        13200000,
-        13200001,
-        13200002
-      ],
+      "condWeatherId": [13200000, 13200001, 13200002],
       "localBitFlag": 27
     },
     "77800395": {
@@ -12834,9 +11761,7 @@
       "bigCatchSize": 118.9,
       "bigCatchReward": 95993000,
       "discoveryId": 70409438,
-      "condWeatherId": [
-        13200001
-      ],
+      "condWeatherId": [13200001],
       "localBitFlag": 27
     },
     "77800396": {
@@ -12865,9 +11790,7 @@
       "bigCatchSize": 25.5,
       "bigCatchReward": 95993001,
       "discoveryId": 70409104,
-      "condWeatherId": [
-        13200001
-      ],
+      "condWeatherId": [13200001],
       "localBitFlag": 27
     },
     "77800397": {
@@ -12896,9 +11819,7 @@
       "bigCatchSize": 17,
       "bigCatchReward": 95993001,
       "discoveryId": 70409134,
-      "condWeatherId": [
-        13200001
-      ],
+      "condWeatherId": [13200001],
       "localBitFlag": 27
     },
     "77800398": {
@@ -12927,9 +11848,7 @@
       "bigCatchSize": 39,
       "bigCatchReward": 95993000,
       "discoveryId": 70409118,
-      "condWeatherId": [
-        13200001
-      ],
+      "condWeatherId": [13200001],
       "localBitFlag": 27
     },
     "77800399": {
@@ -12986,9 +11905,7 @@
       "bigCatchSize": 12.5,
       "bigCatchReward": 95993000,
       "discoveryId": 70409449,
-      "condWeatherId": [
-        13200001
-      ],
+      "condWeatherId": [13200001],
       "localBitFlag": 27
     },
     "77800401": {
@@ -13019,10 +11936,7 @@
       "discoveryId": 70409418,
       "condMonthStart": 4,
       "condMonthEnd": 9,
-      "condWeatherId": [
-        13200000,
-        13200001
-      ],
+      "condWeatherId": [13200000, 13200001],
       "localBitFlag": 27
     },
     "77800402": {

@@ -37,16 +37,7 @@
       "beforeAnimationName": "string",
       "actionAnimationName": "string",
       "desc": "text",
-      "descFormatTexts": [
-        "text",
-        "text",
-        "text",
-        "text",
-        "text",
-        "text",
-        "text",
-        "text"
-      ]
+      "descFormatTexts": ["text", "text", "text", "text", "text", "text", "text", "text"]
     },
     ":required": {
       "name": 1,
@@ -93,29 +84,19 @@
     ":enum": {},
     ":links": {
       "globalDuelEffect": {
-        "Id": [
-          "BattleDuelEffect"
-        ]
+        "Id": ["BattleDuelEffect"]
       },
       "selfDuelEffect": {
-        "Id": [
-          "BattleDuelEffect"
-        ]
+        "Id": ["BattleDuelEffect"]
       },
       "targetDuelEffect": {
-        "Id": [
-          "BattleDuelEffect"
-        ]
+        "Id": ["BattleDuelEffect"]
       },
       "guardSelfDuelEffect": {
-        "Id": [
-          "BattleDuelEffect"
-        ]
+        "Id": ["BattleDuelEffect"]
       },
       "guardTargetDuelEffect": {
-        "Id": [
-          "BattleDuelEffect"
-        ]
+        "Id": ["BattleDuelEffect"]
       }
     },
     ":asset": {
@@ -139,9 +120,7 @@
       "icon": "Icon_Battle_DuelSkill_2_Sprite",
       "actionAnimationName": "ForceAttack",
       "desc": "강력한 공격을 선보입니다.",
-      "descFormatTexts": [
-        "필사 공격"
-      ]
+      "descFormatTexts": ["필사 공격"]
     },
     "67600001": {
       "id": 67600001,
@@ -159,9 +138,7 @@
       "icon": "Icon_Battle_DuelSkill_2_Sprite",
       "actionAnimationName": "ForceAttack",
       "desc": "강력한 공격을 선보입니다.",
-      "descFormatTexts": [
-        "필사 공격"
-      ]
+      "descFormatTexts": ["필사 공격"]
     },
     "67600002": {
       "id": 67600002,
@@ -179,9 +156,7 @@
       "icon": "Icon_Battle_DuelSkill_2_Sprite",
       "actionAnimationName": "ForceAttack",
       "desc": "강력한 공격을 선보입니다.",
-      "descFormatTexts": [
-        "필사 공격"
-      ]
+      "descFormatTexts": ["필사 공격"]
     },
     "67600010": {
       "id": 67600010,
@@ -198,9 +173,7 @@
       },
       "icon": "Icon_Battle_DuelSkill_1_Sprite",
       "desc": "적의 공격을 반드시 반격합니다.",
-      "descFormatTexts": [
-        "절대 반격"
-      ]
+      "descFormatTexts": ["절대 반격"]
     },
     "67600011": {
       "id": 67600011,
@@ -217,9 +190,7 @@
       },
       "icon": "Icon_Battle_DuelSkill_1_Sprite",
       "desc": "적의 공격을 반드시 반격합니다.",
-      "descFormatTexts": [
-        "절대 반격"
-      ]
+      "descFormatTexts": ["절대 반격"]
     },
     "67600012": {
       "id": 67600012,
@@ -236,9 +207,7 @@
       },
       "icon": "Icon_Battle_DuelSkill_1_Sprite",
       "desc": "적의 공격을 반드시 반격합니다.",
-      "descFormatTexts": [
-        "절대 반격"
-      ]
+      "descFormatTexts": ["절대 반격"]
     },
     "67600020": {
       "id": 67600020,
@@ -256,9 +225,7 @@
       "icon": "Icon_Battle_DuelSkill_3_Sprite",
       "actionAnimationName": "ForceEnd",
       "desc": "결투를 강제로 종료합니다.",
-      "descFormatTexts": [
-        "강제 결투 종료"
-      ]
+      "descFormatTexts": ["강제 결투 종료"]
     },
     "67600021": {
       "id": 67600021,
@@ -276,9 +243,7 @@
       "icon": "Icon_Battle_DuelSkill_3_Sprite",
       "actionAnimationName": "ForceEnd",
       "desc": "결투를 강제로 종료합니다.",
-      "descFormatTexts": [
-        "강제 결투 종료"
-      ]
+      "descFormatTexts": ["강제 결투 종료"]
     },
     "67600022": {
       "id": 67600022,
@@ -296,9 +261,7 @@
       "icon": "Icon_Battle_DuelSkill_3_Sprite",
       "actionAnimationName": "ForceEnd",
       "desc": "결투를 강제로 종료합니다.",
-      "descFormatTexts": [
-        "강제 결투 종료"
-      ]
+      "descFormatTexts": ["강제 결투 종료"]
     },
     "67600030": {
       "id": 67600030,

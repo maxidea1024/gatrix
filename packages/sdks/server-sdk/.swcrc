@@ -1,13 +1,13 @@
 {
-    "jsc": {
-        "parser": {
-            "syntax": "typescript",
-            "dynamicImport": true
-        },
-        "target": "es2022"
+  "jsc": {
+    "parser": {
+      "syntax": "typescript",
+      "dynamicImport": true
     },
-    "module": {
-        "type": "commonjs"
-    },
-    "sourceMaps": true
+    "target": "es2022"
+  },
+  "module": {
+    "type": "commonjs"
+  },
+  "sourceMaps": true
 }

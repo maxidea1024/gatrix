@@ -3,8 +3,7 @@
  * Creates all tables for the new template-based remote config system
  */
 
-
-exports.up = async function(connection) {
+exports.up = async function (connection) {
   // Connection is provided by the migration system
 
   console.log('Creating Remote Config V2 system tables...');
@@ -193,7 +192,7 @@ exports.up = async function(connection) {
   console.log('Remote Config V2 system tables created successfully');
 };
 
-exports.down = async function(connection) {
+exports.down = async function (connection) {
   // Connection is provided by the migration system
 
   console.log('Dropping Remote Config V2 system tables...');

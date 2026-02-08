@@ -57,17 +57,11 @@
     ":links": {
       "contentsTerms": [
         {
-          "Id": [
-            "ContentsTerms"
-          ]
+          "Id": ["ContentsTerms"]
         }
       ],
-      "oceanNpcId": [
-        "OceanNpc"
-      ],
-      "rewardFixedId": [
-        "RewardFixed"
-      ]
+      "oceanNpcId": ["OceanNpc"],
+      "rewardFixedId": ["RewardFixed"]
     }
   },
   "InfiniteLighthouse": {

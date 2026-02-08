@@ -4,8 +4,7 @@
  * Updated: 2025-09-12 - Consolidated all migrations into one
  */
 
-
-exports.up = async function(connection) {
+exports.up = async function (connection) {
   // Connection is provided by the migration system
 
   console.log('Creating initial database schema...');
@@ -542,10 +541,13 @@ exports.up = async function(connection) {
   const passwordHash = await bcrypt.hash(adminPassword, 12);
 
   // Insert default admin user
-  await connection.execute(`
+  await connection.execute(
+    `
     INSERT IGNORE INTO g_users (id, name, email, passwordHash, role, status, emailVerified, createdAt, updatedAt)
     VALUES (1, ?, ?, ?, 'admin', 'active', TRUE, NOW(), NOW())
-  `, [adminName, adminEmail, passwordHash]);
+  `,
+    [adminName, adminEmail, passwordHash]
+  );
 
   // 30. Service notices table
   await connection.execute(`
@@ -1017,7 +1019,7 @@ exports.up = async function(connection) {
   console.log('🎉 Initial schema creation completed successfully!');
 };
 
-exports.down = async function(connection) {
+exports.down = async function (connection) {
   // Connection is provided by the migration system
 
   console.log('Rolling back initial schema...');
@@ -1066,7 +1068,7 @@ exports.down = async function(connection) {
     'g_audit_logs',
     'g_password_reset_tokens',
     'g_oauth_accounts',
-    'g_users'
+    'g_users',
   ];
 
   for (const table of tables) {

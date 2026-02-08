@@ -1,42 +1,43 @@
 const fs = require('fs');
-const path = 'c:/github/admin-templates/gatrix/packages/frontend/src/pages/admin/ServerListPage.tsx';
+const path =
+  'c:/github/admin-templates/gatrix/packages/frontend/src/pages/admin/ServerListPage.tsx';
 
 try {
-    let content = fs.readFileSync(path, 'utf8');
+  let content = fs.readFileSync(path, 'utf8');
 
-    // Find start of function
-    const startMarker = 'const handleBulkHealthCheckStart = async () => {';
-    const startIndex = content.indexOf(startMarker);
+  // Find start of function
+  const startMarker = 'const handleBulkHealthCheckStart = async () => {';
+  const startIndex = content.indexOf(startMarker);
 
-    if (startIndex === -1) {
-        console.error('Function start not found');
-        process.exit(1);
-    }
+  if (startIndex === -1) {
+    console.error('Function start not found');
+    process.exit(1);
+  }
 
-    // Find end of function. We look for the closing brace of the function.
-    // The function structure is:
-    // const handleBulkHealthCheckStart = async () => {
-    //   ...
-    //   setBulkHealthCheckRunning(false);
-    // };
+  // Find end of function. We look for the closing brace of the function.
+  // The function structure is:
+  // const handleBulkHealthCheckStart = async () => {
+  //   ...
+  //   setBulkHealthCheckRunning(false);
+  // };
 
-    // So we search for `setBulkHealthCheckRunning(false);` and then the next `};`.
-    const endLogicMarker = 'setBulkHealthCheckRunning(false);';
-    const endLogicIndex = content.indexOf(endLogicMarker, startIndex);
+  // So we search for `setBulkHealthCheckRunning(false);` and then the next `};`.
+  const endLogicMarker = 'setBulkHealthCheckRunning(false);';
+  const endLogicIndex = content.indexOf(endLogicMarker, startIndex);
 
-    if (endLogicIndex === -1) {
-        console.error('Function logic end not found');
-        process.exit(1);
-    }
+  if (endLogicIndex === -1) {
+    console.error('Function logic end not found');
+    process.exit(1);
+  }
 
-    const endIndex = content.indexOf('};', endLogicIndex);
-    if (endIndex === -1) {
-        console.error('Function closing brace not found');
-        process.exit(1);
-    }
+  const endIndex = content.indexOf('};', endLogicIndex);
+  if (endIndex === -1) {
+    console.error('Function closing brace not found');
+    process.exit(1);
+  }
 
-    // Define new function content
-    const newFunction = `const handleBulkHealthCheckStart = async () => {
+  // Define new function content
+  const newFunction = `const handleBulkHealthCheckStart = async () => {
     setBulkHealthCheckRunning(true);
 
     const selectedKeys = new Set(bulkHealthCheckSelected);
@@ -105,13 +106,13 @@ try {
     setBulkHealthCheckRunning(false);
   };`;
 
-    // Improve replacement logic: replace everything from startIndex to endIndex + 2 (length of '};')
-    const newContent = content.substring(0, startIndex) + newFunction + content.substring(endIndex + 2);
+  // Improve replacement logic: replace everything from startIndex to endIndex + 2 (length of '};')
+  const newContent =
+    content.substring(0, startIndex) + newFunction + content.substring(endIndex + 2);
 
-    fs.writeFileSync(path, newContent, 'utf8');
-    console.log('Function replaced successfully');
-
+  fs.writeFileSync(path, newContent, 'utf8');
+  console.log('Function replaced successfully');
 } catch (err) {
-    console.error('Error:', err);
-    process.exit(1);
+  console.error('Error:', err);
+  process.exit(1);
 }

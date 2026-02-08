@@ -55,8 +55,6 @@ limits_config:
   max_streams_per_user: 0
   max_global_streams_per_user: 0
 
-
 table_manager:
   retention_deletes_enabled: true
   retention_period: 168h
-

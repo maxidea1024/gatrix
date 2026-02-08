@@ -115,42 +115,20 @@
     },
     ":enum": {},
     ":links": {
-      "craftResultId": [
-        "ShipSlot",
-        "CEquip",
-        "Item"
-      ],
-      "craftPointId": [
-        "Point"
-      ],
+      "craftResultId": ["ShipSlot", "CEquip", "Item"],
+      "craftPointId": ["Point"],
       "material": [
         {
-          "Id": [
-            "ShipSlot",
-            "CEquip",
-            "Item"
-          ]
+          "Id": ["ShipSlot", "CEquip", "Item"]
         },
         {
-          "Id": [
-            "ShipSlot",
-            "CEquip",
-            "Item"
-          ]
+          "Id": ["ShipSlot", "CEquip", "Item"]
         },
         {
-          "Id": [
-            "ShipSlot",
-            "CEquip",
-            "Item"
-          ]
+          "Id": ["ShipSlot", "CEquip", "Item"]
         },
         {
-          "Id": [
-            "ShipSlot",
-            "CEquip",
-            "Item"
-          ]
+          "Id": ["ShipSlot", "CEquip", "Item"]
         }
       ]
     }

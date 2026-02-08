@@ -53,18 +53,10 @@
     },
     ":enum": {},
     ":links": {
-      "mailIdWeekly": [
-        "Mail"
-      ],
-      "mailIdGrade": [
-        "Mail"
-      ],
-      "rewardWeekly": [
-        "RewardFixed"
-      ],
-      "rewardGrade": [
-        "RewardFixed"
-      ]
+      "mailIdWeekly": ["Mail"],
+      "mailIdGrade": ["Mail"],
+      "rewardWeekly": ["RewardFixed"],
+      "rewardGrade": ["RewardFixed"]
     }
   },
   "ArenaTierList": {

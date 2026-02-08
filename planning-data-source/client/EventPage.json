@@ -100,27 +100,17 @@
     },
     ":enum": {},
     ":links": {
-      "saleItemId": [
-        "Item"
-      ],
-      "mail": [
-        "Mail"
-      ],
+      "saleItemId": ["Item"],
+      "mail": ["Mail"],
       "contentsTerms": [
         {
-          "Id": [
-            "ContentsTerms"
-          ]
+          "Id": ["ContentsTerms"]
         },
         {
-          "Id": [
-            "ContentsTerms"
-          ]
+          "Id": ["ContentsTerms"]
         },
         {
-          "Id": [
-            "ContentsTerms"
-          ]
+          "Id": ["ContentsTerms"]
         }
       ]
     }

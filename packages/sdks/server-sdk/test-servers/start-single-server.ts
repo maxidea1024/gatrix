@@ -4,21 +4,21 @@
  * Starts a single lobbyd server for testing purposes
  */
 
-import { GatrixServerSDK } from "../src";
-import chalk from "chalk";
+import { GatrixServerSDK } from '../src';
+import chalk from 'chalk';
 
-const GATRIX_URL = process.env.GATRIX_URL || "http://localhost:45000";
-const API_TOKEN = "gatrix-unsecured-server-api-token";
+const GATRIX_URL = process.env.GATRIX_URL || 'http://localhost:45000';
+const API_TOKEN = 'gatrix-unsecured-server-api-token';
 
 // Server configuration
 const SERVER_CONFIG = {
-  type: "lobbyd",
+  type: 'lobbyd',
   port: 8100,
   worldId: null,
   labels: {
-    env: "development",
-    region: "ap-northeast-2",
-    role: "lobby-server",
+    env: 'development',
+    region: 'ap-northeast-2',
+    role: 'lobby-server',
   },
 };
 
@@ -29,7 +29,7 @@ async function startServer() {
 
   const sdk = new GatrixServerSDK({
     gatrixUrl: GATRIX_URL,
-    applicationName: "test-server",
+    applicationName: 'test-server',
     apiToken: API_TOKEN,
   });
 
@@ -40,7 +40,7 @@ async function startServer() {
     const result = await sdk.serviceDiscovery.register({
       labels: {
         service: type,
-        group: worldId || "default",
+        group: worldId || 'default',
         ...labels,
       },
       hostname: `${type}-test`,
@@ -49,7 +49,7 @@ async function startServer() {
         externalApi: port,
       },
       meta: {
-        version: "1.0.0",
+        version: '1.0.0',
       },
     });
 
@@ -63,7 +63,7 @@ async function startServer() {
     // Update status to ready after 2 seconds
     setTimeout(async () => {
       await sdk.serviceDiscovery.updateStatus({
-        status: "ready",
+        status: 'ready',
         stats: {
           cpuUsage: Math.random() * 100,
           memoryUsage: Math.random() * 1024,
@@ -97,8 +97,8 @@ async function startServer() {
 }
 
 // Handle graceful shutdown
-process.on("SIGINT", async () => {
-  console.log(chalk.yellow("\n\n🛑 Shutting down server..."));
+process.on('SIGINT', async () => {
+  console.log(chalk.yellow('\n\n🛑 Shutting down server...'));
   const sdk = (global as any).sdk;
   const instanceId = (global as any).instanceId;
   const statsInterval = (global as any).statsInterval;
@@ -121,8 +121,8 @@ process.on("SIGINT", async () => {
   process.exit(0);
 });
 
-process.on("SIGTERM", async () => {
-  console.log(chalk.yellow("\n\n🛑 Shutting down server..."));
+process.on('SIGTERM', async () => {
+  console.log(chalk.yellow('\n\n🛑 Shutting down server...'));
   const sdk = (global as any).sdk;
   const instanceId = (global as any).instanceId;
   const statsInterval = (global as any).statsInterval;
@@ -146,13 +146,13 @@ process.on("SIGTERM", async () => {
 });
 
 // Handle uncaught exceptions
-process.on("uncaughtException", (error) => {
-  console.error(chalk.red("❌ Uncaught exception:"), error);
+process.on('uncaughtException', (error) => {
+  console.error(chalk.red('❌ Uncaught exception:'), error);
   process.exit(1);
 });
 
 // Start the server
 startServer().catch((error) => {
-  console.error(chalk.red("Failed to start server:"), error);
+  console.error(chalk.red('Failed to start server:'), error);
   process.exit(1);
 });

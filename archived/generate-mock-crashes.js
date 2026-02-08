@@ -4,7 +4,7 @@ require('dotenv').config();
 // Unreal Engine 4 + Lua 환경에서 발생할 수 있는 현실적인 크래시 타입들
 const CRASH_TYPES = [
   'NullPointerException',
-  'AccessViolation', 
+  'AccessViolation',
   'StackOverflow',
   'OutOfMemoryError',
   'LuaRuntimeError',
@@ -17,115 +17,145 @@ const CRASH_TYPES = [
   'AnimationBlendError',
   'AudioStreamError',
   'RenderingPipelineError',
-  'GarbageCollectionError'
+  'GarbageCollectionError',
 ];
 
 // UE4 + Lua에서 발생할 수 있는 크래시 메시지들
 const CRASH_MESSAGES = {
-  'NullPointerException': [
+  NullPointerException: [
     'Attempt to access null UObject reference in Blueprint',
     'Lua script tried to access destroyed actor',
     'Widget reference is null during UI update',
-    'Component reference lost during level transition'
+    'Component reference lost during level transition',
   ],
-  'AccessViolation': [
+  AccessViolation: [
     'Access violation reading location 0x00000000 in UE4 engine',
     'Invalid memory access in Slate UI rendering',
     'Corrupted mesh data causing access violation',
-    'Invalid texture memory access during streaming'
+    'Invalid texture memory access during streaming',
   ],
-  'StackOverflow': [
+  StackOverflow: [
     'Infinite recursion in Lua coroutine',
     'Blueprint execution stack overflow',
     'Recursive function call in game logic',
-    'Deep nested widget hierarchy causing stack overflow'
+    'Deep nested widget hierarchy causing stack overflow',
   ],
-  'OutOfMemoryError': [
+  OutOfMemoryError: [
     'Failed to allocate memory for large texture asset',
     'Lua heap exhausted during script execution',
     'UE4 memory pool exhausted',
-    'Too many actors spawned in level'
+    'Too many actors spawned in level',
   ],
-  'LuaRuntimeError': [
+  LuaRuntimeError: [
     'attempt to index a nil value in player controller script',
     'attempt to call method on nil object in inventory system',
     'bad argument #1 to pairs (table expected, got nil)',
-    'attempt to perform arithmetic on local variable (a nil value)'
+    'attempt to perform arithmetic on local variable (a nil value)',
   ],
-  'BlueprintCompileError': [
+  BlueprintCompileError: [
     'Blueprint compilation failed: missing node connection',
     'Invalid cast in Blueprint execution',
     'Blueprint circular dependency detected',
-    'Missing Blueprint class reference'
+    'Missing Blueprint class reference',
   ],
-  'TextureLoadFailure': [
+  TextureLoadFailure: [
     'Failed to load texture: corrupted file format',
     'Texture streaming error: insufficient VRAM',
     'DDS texture format not supported',
-    'Texture compression failed during runtime'
+    'Texture compression failed during runtime',
   ],
-  'NetworkTimeoutError': [
+  NetworkTimeoutError: [
     'Server connection timeout during matchmaking',
     'UDP packet loss exceeded threshold',
     'TCP connection reset by peer',
-    'Network replication timeout'
+    'Network replication timeout',
   ],
-  'FileIOException': [
+  FileIOException: [
     'Failed to read save game file: file corrupted',
     'Asset loading failed: file not found',
     'Config file write permission denied',
-    'Pak file integrity check failed'
+    'Pak file integrity check failed',
   ],
-  'ShaderCompileError': [
+  ShaderCompileError: [
     'HLSL shader compilation failed',
     'Material shader missing required input',
     'Vertex shader compilation error',
-    'Pixel shader optimization failed'
-  ]
+    'Pixel shader optimization failed',
+  ],
 };
 
 // 스택 트레이스 템플릿들
 const STACK_TRACES = {
-  'NullPointerException': `UE4Editor-Core.dll!FOutputDevice::Logf() [d:\\build\\++ue4\\sync\\engine\\source\\runtime\\core\\private\\misc\\outputdevice.cpp:145]
+  NullPointerException: `UE4Editor-Core.dll!FOutputDevice::Logf() [d:\\build\\++ue4\\sync\\engine\\source\\runtime\\core\\private\\misc\\outputdevice.cpp:145]
 UE4Editor-Core.dll!FDebug::AssertFailed() [d:\\build\\++ue4\\sync\\engine\\source\\runtime\\core\\private\\misc\\assertionmacros.cpp:349]
 UE4Editor-Engine.dll!UObject::CallFunction() [d:\\build\\++ue4\\sync\\engine\\source\\runtime\\coreuobject\\private\\uobject\\scriptcore.cpp:866]
 UE4Editor-Engine.dll!UGameplayStatics::SpawnActor() [d:\\build\\++ue4\\sync\\engine\\source\\runtime\\engine\\private\\kismet\\gameplaystatics.cpp:2156]`,
 
-  'AccessViolation': `UE4Editor-Core.dll!FWindowsPlatformMisc::RaiseException() [d:\\build\\++ue4\\sync\\engine\\source\\runtime\\core\\private\\windows\\windowsplatformmisc.cpp:434]
+  AccessViolation: `UE4Editor-Core.dll!FWindowsPlatformMisc::RaiseException() [d:\\build\\++ue4\\sync\\engine\\source\\runtime\\core\\private\\windows\\windowsplatformmisc.cpp:434]
 UE4Editor-RenderCore.dll!FRenderResource::InitResource() [d:\\build\\++ue4\\sync\\engine\\source\\runtime\\rendercore\\private\\renderresource.cpp:89]
 UE4Editor-Renderer.dll!FSceneRenderer::Render() [d:\\build\\++ue4\\sync\\engine\\source\\runtime\\renderer\\private\\scenerendering.cpp:1456]`,
 
-  'LuaRuntimeError': `lua_error() [lua\\src\\lapi.c:1369]
+  LuaRuntimeError: `lua_error() [lua\\src\\lapi.c:1369]
 luaL_error() [lua\\src\\lauxlib.c:178]
 PlayerController.lua:45: attempt to index field 'inventory' (a nil value)
 GameMode.lua:123: in function 'SpawnPlayer'
-LuaInterface.cpp:234: in function 'ExecuteLuaScript'`
+LuaInterface.cpp:234: in function 'ExecuteLuaScript'`,
 };
 
 // 플랫폼별 디바이스 타입
 const DEVICE_TYPES = {
-  'android': [
-    'Samsung Galaxy S21', 'Samsung Galaxy S20', 'Samsung Galaxy Note 20',
-    'Google Pixel 6', 'Google Pixel 5', 'OnePlus 9 Pro', 'OnePlus 8T',
-    'Xiaomi Mi 11', 'Xiaomi Redmi Note 10', 'Huawei P40 Pro',
-    'LG V60 ThinQ', 'Sony Xperia 1 III', 'Oppo Find X3 Pro'
+  android: [
+    'Samsung Galaxy S21',
+    'Samsung Galaxy S20',
+    'Samsung Galaxy Note 20',
+    'Google Pixel 6',
+    'Google Pixel 5',
+    'OnePlus 9 Pro',
+    'OnePlus 8T',
+    'Xiaomi Mi 11',
+    'Xiaomi Redmi Note 10',
+    'Huawei P40 Pro',
+    'LG V60 ThinQ',
+    'Sony Xperia 1 III',
+    'Oppo Find X3 Pro',
   ],
-  'ios': [
-    'iPhone 13 Pro Max', 'iPhone 13 Pro', 'iPhone 13', 'iPhone 12 Pro Max',
-    'iPhone 12 Pro', 'iPhone 12', 'iPhone 11 Pro', 'iPhone 11',
-    'iPad Pro 12.9', 'iPad Pro 11', 'iPad Air 4', 'iPad 9th Gen'
+  ios: [
+    'iPhone 13 Pro Max',
+    'iPhone 13 Pro',
+    'iPhone 13',
+    'iPhone 12 Pro Max',
+    'iPhone 12 Pro',
+    'iPhone 12',
+    'iPhone 11 Pro',
+    'iPhone 11',
+    'iPad Pro 12.9',
+    'iPad Pro 11',
+    'iPad Air 4',
+    'iPad 9th Gen',
   ],
-  'windows': [
-    'Windows 10 x64', 'Windows 11 x64', 'Windows 10 x86',
-    'Gaming Desktop RTX 3080', 'Gaming Laptop GTX 1660',
-    'Office PC Intel UHD', 'Surface Pro 8', 'Surface Book 3'
-  ]
+  windows: [
+    'Windows 10 x64',
+    'Windows 11 x64',
+    'Windows 10 x86',
+    'Gaming Desktop RTX 3080',
+    'Gaming Laptop GTX 1660',
+    'Office PC Intel UHD',
+    'Surface Pro 8',
+    'Surface Book 3',
+  ],
 };
 
 const PLATFORMS = ['android', 'ios', 'windows'];
 const BRANCHES = ['release', 'patch', 'beta', 'alpha', 'dev'];
 const MARKET_TYPES = ['google_play', 'app_store', 'huawei', 'xiaomi', 'oppo', 'direct'];
-const SERVER_GROUPS = ['kr_server', 'us_server', 'eu_server', 'jp_server', 'cn_server', 'sea_server'];
+const SERVER_GROUPS = [
+  'kr_server',
+  'us_server',
+  'eu_server',
+  'jp_server',
+  'cn_server',
+  'sea_server',
+];
 
 // 버전 생성 함수
 function generateVersion() {
@@ -133,7 +163,7 @@ function generateVersion() {
   const minor = Math.floor(Math.random() * 10); // 0-9
   const patch = Math.floor(Math.random() * 20); // 0-19
   const build = Math.floor(Math.random() * 1000) + 1000; // 1000-1999
-  
+
   return `${major}.${minor}.${patch}.${build}`;
 }
 
@@ -144,7 +174,8 @@ function randomChoice(array) {
 
 // 크래시 ID 생성 함수
 function generateCrashId(crashType, platform, version) {
-  const hash = require('crypto').createHash('md5')
+  const hash = require('crypto')
+    .createHash('md5')
     .update(`${crashType}_${platform}_${version}_${Math.random()}`)
     .digest('hex')
     .substring(0, 16);
@@ -166,7 +197,7 @@ async function generateMockCrashes() {
     port: process.env.DB_PORT || 3306,
     user: process.env.DB_USER || 'motif_dev',
     password: process.env.DB_PASSWORD || 'dev123$',
-    database: process.env.DB_NAME || 'uwo_gate'
+    database: process.env.DB_NAME || 'uwo_gate',
   });
 
   try {
@@ -202,8 +233,12 @@ async function generateMockCrashes() {
           user_nickname: generateUserNickname(),
           platform: platform,
           branch: branch,
-          market_type: platform === 'android' ? randomChoice(MARKET_TYPES.slice(0, 6)) :
-                      platform === 'ios' ? 'app_store' : null,
+          market_type:
+            platform === 'android'
+              ? randomChoice(MARKET_TYPES.slice(0, 6))
+              : platform === 'ios'
+                ? 'app_store'
+                : null,
           server_group: randomChoice(SERVER_GROUPS),
           device_type: randomChoice(DEVICE_TYPES[platform]),
           version: version,
@@ -211,10 +246,10 @@ async function generateMockCrashes() {
           crash_message: randomChoice(CRASH_MESSAGES[crashType] || ['Unknown error']),
           stack_trace_file: `/crashes/${new Date().getFullYear()}/${String(new Date().getMonth() + 1).padStart(2, '0')}/${String(new Date().getDate()).padStart(2, '0')}/${crashId}_stacktrace.txt`,
           logs_file: `/crashes/${new Date().getFullYear()}/${String(new Date().getMonth() + 1).padStart(2, '0')}/${String(new Date().getDate()).padStart(2, '0')}/${crashId}_logs.txt`,
-          state: Math.random() < 0.8 ? 0 : (Math.random() < 0.9 ? 1 : 2), // 80% OPEN, 18% CLOSED, 2% DELETED
+          state: Math.random() < 0.8 ? 0 : Math.random() < 0.9 ? 1 : 2, // 80% OPEN, 18% CLOSED, 2% DELETED
           first_occurred_at: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000), // 지난 30일 내
           last_occurred_at: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000), // 지난 7일 내
-          occurrence_count: Math.floor(Math.random() * 100) + 1 // 1-100
+          occurrence_count: Math.floor(Math.random() * 100) + 1, // 1-100
         };
 
         crashes.push(crash);
@@ -222,27 +257,45 @@ async function generateMockCrashes() {
 
       // 배치 삽입
       if (crashes.length > 0) {
-        const values = crashes.map(crash => [
-          crash.crash_id, crash.user_id, crash.user_nickname, crash.platform, crash.branch,
-          crash.market_type, crash.server_group, crash.device_type, crash.version, crash.crash_type,
-          crash.crash_message, crash.stack_trace_file, crash.logs_file, crash.state,
-          crash.first_occurred_at, crash.last_occurred_at, crash.occurrence_count
+        const values = crashes.map((crash) => [
+          crash.crash_id,
+          crash.user_id,
+          crash.user_nickname,
+          crash.platform,
+          crash.branch,
+          crash.market_type,
+          crash.server_group,
+          crash.device_type,
+          crash.version,
+          crash.crash_type,
+          crash.crash_message,
+          crash.stack_trace_file,
+          crash.logs_file,
+          crash.state,
+          crash.first_occurred_at,
+          crash.last_occurred_at,
+          crash.occurrence_count,
         ]);
 
-        await connection.query(`
+        await connection.query(
+          `
           INSERT INTO crashes (
             crash_id, user_id, user_nickname, platform, branch, market_type, server_group,
             device_type, version, crash_type, crash_message, stack_trace_file, logs_file,
             state, first_occurred_at, last_occurred_at, occurrence_count
           ) VALUES ?
-        `, [values]);
+        `,
+          [values]
+        );
       }
     }
 
     console.log('📊 Generating crash instances...');
 
     // 각 크래시에 대해 1-100개의 인스턴스 생성 (배치별로 처리)
-    const crashIds = await connection.query('SELECT id, crash_id, user_id, user_nickname, platform, branch, market_type, server_group, device_type, version, crash_type, crash_message, stack_trace_file, logs_file FROM crashes');
+    const crashIds = await connection.query(
+      'SELECT id, crash_id, user_id, user_nickname, platform, branch, market_type, server_group, device_type, version, crash_type, crash_message, stack_trace_file, logs_file FROM crashes'
+    );
 
     const instanceBatchSize = 2000;
     let totalInstances = 0;
@@ -251,7 +304,9 @@ async function generateMockCrashes() {
       const crashBatch = crashIds[0].slice(i, i + instanceBatchSize);
       const crashInstances = [];
 
-      console.log(`Processing crash instances batch ${Math.floor(i / instanceBatchSize) + 1}/${Math.ceil(crashIds[0].length / instanceBatchSize)}`);
+      console.log(
+        `Processing crash instances batch ${Math.floor(i / instanceBatchSize) + 1}/${Math.ceil(crashIds[0].length / instanceBatchSize)}`
+      );
 
       for (const crash of crashBatch) {
         const instanceCount = Math.floor(Math.random() * 100) + 1; // 1-100
@@ -271,7 +326,7 @@ async function generateMockCrashes() {
             crash_message: crash.crash_message,
             stack_trace_file: crash.stack_trace_file,
             logs_file: crash.logs_file,
-            occurred_at: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000)
+            occurred_at: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000),
           };
 
           crashInstances.push(instance);
@@ -280,33 +335,45 @@ async function generateMockCrashes() {
 
       // 인스턴스 배치 삽입
       if (crashInstances.length > 0) {
-        const values = crashInstances.map(instance => [
-          instance.cid, instance.user_id, instance.user_nickname, instance.platform, instance.branch,
-          instance.market_type, instance.server_group, instance.device_type, instance.version,
-          instance.crash_type, instance.crash_message, instance.stack_trace_file, instance.logs_file,
-          instance.occurred_at
+        const values = crashInstances.map((instance) => [
+          instance.cid,
+          instance.user_id,
+          instance.user_nickname,
+          instance.platform,
+          instance.branch,
+          instance.market_type,
+          instance.server_group,
+          instance.device_type,
+          instance.version,
+          instance.crash_type,
+          instance.crash_message,
+          instance.stack_trace_file,
+          instance.logs_file,
+          instance.occurred_at,
         ]);
 
-        await connection.query(`
+        await connection.query(
+          `
           INSERT INTO crash_instances (
             cid, user_id, user_nickname, platform, branch, market_type, server_group,
             device_type, version, crash_type, crash_message, stack_trace_file, logs_file, occurred_at
           ) VALUES ?
-        `, [values]);
+        `,
+          [values]
+        );
 
         totalInstances += crashInstances.length;
         console.log(`Inserted ${crashInstances.length} instances (Total: ${totalInstances})`);
       }
     }
-    
+
     // 통계 출력
     const [crashCount] = await connection.query('SELECT COUNT(*) as count FROM crashes');
     const [instanceCount] = await connection.query('SELECT COUNT(*) as count FROM crash_instances');
-    
+
     console.log('✅ Mock data generation completed!');
     console.log(`📊 Generated ${crashCount[0].count} crashes`);
     console.log(`📊 Generated ${instanceCount[0].count} crash instances`);
-    
   } catch (error) {
     console.error('❌ Error generating mock data:', error);
   } finally {

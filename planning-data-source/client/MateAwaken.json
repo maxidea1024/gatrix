@@ -67,14 +67,10 @@
     },
     ":enum": {},
     ":links": {
-      "awakenCostType": [
-        "Point"
-      ],
+      "awakenCostType": ["Point"],
       "awakenItem": [
         {
-          "Id": [
-            "Item"
-          ]
+          "Id": ["Item"]
         }
       ]
     }

@@ -14,13 +14,14 @@ Get started with Gatrix quickly.
 
 :::info Docker Compose Services
 In the Docker Compose development environment, the following services are automatically configured:
+
 - MySQL 8.0 (database)
 - Redis 7 Alpine (cache and message queue)
 - etcd v3.5 (service discovery)
 - ClickHouse (analytics database)
 - Prometheus / Grafana (monitoring)
 - Loki / Fluent Bit (log aggregation)
-:::
+  :::
 
 ## Starting Local Development Environment
 
@@ -73,15 +74,15 @@ yarn dev:all
 
 Once the development server starts:
 
-| Service | URL | Port |
-|---------|-----|------|
+| Service                | URL                    | Port  |
+| ---------------------- | ---------------------- | ----- |
 | **Frontend Dashboard** | http://localhost:43000 | 43000 |
-| **Backend API** | http://localhost:45000 | 45000 |
-| **Edge Server** | http://localhost:3400 | 3400 |
-| **Chat Server** | http://localhost:45100 | 45100 |
-| **Event Lens** | http://localhost:45200 | 45200 |
-| **Grafana** | http://localhost:44000 | 44000 |
-| **Prometheus** | http://localhost:49090 | 49090 |
+| **Backend API**        | http://localhost:45000 | 45000 |
+| **Edge Server**        | http://localhost:3400  | 3400  |
+| **Chat Server**        | http://localhost:45100 | 45100 |
+| **Event Lens**         | http://localhost:45200 | 45200 |
+| **Grafana**            | http://localhost:44000 | 44000 |
+| **Prometheus**         | http://localhost:49090 | 49090 |
 
 ## Default Admin Account
 
@@ -92,10 +93,12 @@ A default admin account is created on first run:
 
 :::warning Security Notice
 Be sure to change the default password in your `.env` file for production!
+
 ```env
 ADMIN_EMAIL=your-admin@example.com
 ADMIN_PASSWORD=your-secure-password
 ```
+
 :::
 
 ## Key Commands

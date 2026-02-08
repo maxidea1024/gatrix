@@ -9,16 +9,7 @@
       "mainTitle": "text",
       "mainTileFormatText": "text",
       "desc": "text",
-      "descFormatText": [
-        "text",
-        "text",
-        "text",
-        "text",
-        "text",
-        "text",
-        "text",
-        "text"
-      ],
+      "descFormatText": ["text", "text", "text", "text", "text", "text", "text", "text"],
       "LocalBitflag": "bit",
       "startDate": "string",
       "endDate": "string",
@@ -77,25 +68,15 @@
     },
     ":enum": {},
     ":links": {
-      "purchaseRewardId": [
-        "RewardFixed"
-      ],
-      "dailyRewardId": [
-        "RewardFixed"
-      ],
-      "mail": [
-        "Mail"
-      ],
+      "purchaseRewardId": ["RewardFixed"],
+      "dailyRewardId": ["RewardFixed"],
+      "mail": ["Mail"],
       "contentsTerms": [
         {
-          "Id": [
-            "ContentsTerms"
-          ]
+          "Id": ["ContentsTerms"]
         },
         {
-          "Id": [
-            "ContentsTerms"
-          ]
+          "Id": ["ContentsTerms"]
         }
       ]
     }
@@ -110,12 +91,7 @@
       "mainTitle": "매일{0} 구독",
       "mainTileFormatText": "[[BigR]]",
       "desc": "구매 시 {0} {1}개, 이후 매일 이벤트 페이지에서 {2} {3}개를 수령할 수 있습니다.",
-      "descFormatText": [
-        "[[BigR]]",
-        "1000",
-        "[[BigR]]",
-        "50"
-      ],
+      "descFormatText": ["[[BigR]]", "1000", "[[BigR]]", "50"],
       "LocalBitflag": 0,
       "durationDays": 28,
       "mail": 92100007,
@@ -131,12 +107,7 @@
       "mainTitle": "매일{0} 구독2",
       "mainTileFormatText": "오리나무판",
       "desc": "구매 시 {0} {1}개, 이후 매일 이벤트 페이지에서 {2} {3}개를 수령할 수 있습니다.",
-      "descFormatText": [
-        "오리나무판",
-        "5",
-        "오리나무판",
-        "1"
-      ],
+      "descFormatText": ["오리나무판", "5", "오리나무판", "1"],
       "LocalBitflag": 0,
       "startDate": "2023/03/13/00:00:00",
       "durationDays": 21,
@@ -159,12 +130,7 @@
       "mainTitle": "매일{0} 구독3",
       "mainTileFormatText": "커틀라스",
       "desc": "구매 시 {0} {1}개, 이후 매일 이벤트 페이지에서 {2} {3}개를 수령할 수 있습니다.",
-      "descFormatText": [
-        "커틀라스",
-        "5",
-        "커틀라스",
-        "1"
-      ],
+      "descFormatText": ["커틀라스", "5", "커틀라스", "1"],
       "LocalBitflag": 0,
       "endDate": "2023/03/30/00:00:00",
       "durationDays": 14,
@@ -188,12 +154,7 @@
       "mainTitle": "매일{0} 구독4",
       "mainTileFormatText": "특별 투자 증서",
       "desc": "구매 시 {0} {1}개, 이후 매일 이벤트 페이지에서 {2} {3}개를 수령할 수 있습니다.",
-      "descFormatText": [
-        "특별 투자 증서",
-        "3",
-        "특별 투자 증서",
-        "1"
-      ],
+      "descFormatText": ["특별 투자 증서", "3", "특별 투자 증서", "1"],
       "LocalBitflag": 0,
       "startDate": "2023/03/13/00:00:00",
       "endDate": "2023/03/30/00:00:00",
@@ -210,12 +171,7 @@
       "mainTitle": "{0}일 레드젬",
       "mainTileFormatText": "28",
       "desc": "구매 시 {0} {1}개, 이후 매일 이벤트 페이지에서 {2} {3}개를 수령할 수 있습니다.",
-      "descFormatText": [
-        "레드젬",
-        "2,000",
-        "레드젬",
-        "100"
-      ],
+      "descFormatText": ["레드젬", "2,000", "레드젬", "100"],
       "LocalBitflag": 0,
       "startDate": "2023/04/12/00:00:00",
       "endDate": "2024/03/19/00:00:00",
@@ -237,12 +193,7 @@
       "mainTitle": "{0}일 두카트",
       "mainTileFormatText": "28",
       "desc": "구매 시 {0} {1}개, 이후 매일 이벤트 페이지에서 {2} {3}개를 수령할 수 있습니다.",
-      "descFormatText": [
-        "두카트",
-        "10,000,000",
-        "두카트",
-        "3,000,000"
-      ],
+      "descFormatText": ["두카트", "10,000,000", "두카트", "3,000,000"],
       "LocalBitflag": 0,
       "startDate": "2023/04/12/00:00:00",
       "endDate": "2024/07/31/00:00:00",
@@ -258,12 +209,7 @@
       "mainTitle": "{0}일 대형 공용 도면",
       "mainTileFormatText": "14",
       "desc": "구매 시 {0} {1}개, 이후 매일 이벤트 페이지에서 {2} {3}개를 수령할 수 있습니다.",
-      "descFormatText": [
-        "대형 공용 도면",
-        "10",
-        "대형 공용 도면",
-        "5"
-      ],
+      "descFormatText": ["대형 공용 도면", "10", "대형 공용 도면", "5"],
       "LocalBitflag": 0,
       "startDate": "2023/04/26/12:00:00",
       "endDate": "2024/04/30/00:00:00",
@@ -279,12 +225,7 @@
       "mainTitle": "{0}일 대형 용골",
       "mainTileFormatText": "14",
       "desc": "구매 시 {0} {1}개, 이후 매일 이벤트 페이지에서 {2} {3}개를 수령할 수 있습니다.",
-      "descFormatText": [
-        "대형 용골",
-        "6",
-        "대형 용골",
-        "1"
-      ],
+      "descFormatText": ["대형 용골", "6", "대형 용골", "1"],
       "LocalBitflag": 0,
       "startDate": "2023/04/26/12:00:00",
       "endDate": "2024/03/19/00:00:00",
@@ -300,12 +241,7 @@
       "mainTitle": "{0}일 레드젬",
       "mainTileFormatText": "28",
       "desc": "구매 시 {0} {1}개, 이후 매일 이벤트 페이지에서 {2} {3}개를 수령할 수 있습니다.",
-      "descFormatText": [
-        "레드젬",
-        "2,000",
-        "레드젬",
-        "100"
-      ],
+      "descFormatText": ["레드젬", "2,000", "레드젬", "100"],
       "LocalBitflag": 0,
       "startDate": "2023/04/26/00:00:00",
       "endDate": "2028/04/30/00:00:00",
@@ -327,12 +263,7 @@
       "mainTitle": "{0}일 항해사 티켓",
       "mainTileFormatText": "10",
       "desc": "구매 시 {0} {1}개, 이후 매일 이벤트 페이지에서 {2} {3}개를 수령할 수 있습니다.",
-      "descFormatText": [
-        "레드젬",
-        "500",
-        "항해사 티켓",
-        "2"
-      ],
+      "descFormatText": ["레드젬", "500", "항해사 티켓", "2"],
       "LocalBitflag": 0,
       "startDate": "2023/04/26/00:00:00",
       "endDate": "2024/11/06/00:00:00",
@@ -348,12 +279,7 @@
       "mainTitle": "{0}일 고급 항해사 티켓",
       "mainTileFormatText": "10",
       "desc": "구매 시 {0} {1}개, 이후 매일 이벤트 페이지에서 {2} {3}개를 수령할 수 있습니다.",
-      "descFormatText": [
-        "레드젬",
-        "2,000",
-        "고급 항해사 티켓",
-        "1"
-      ],
+      "descFormatText": ["레드젬", "2,000", "고급 항해사 티켓", "1"],
       "LocalBitflag": 0,
       "startDate": "2023/04/26/00:00:00",
       "endDate": "2024/11/06/00:00:00",
@@ -369,12 +295,7 @@
       "mainTitle": "{0}일 고급 아이템 티켓",
       "mainTileFormatText": "10",
       "desc": "구매 시 {0} {1}개, 이후 매일 이벤트 페이지에서 {2} {3}개를 수령할 수 있습니다.",
-      "descFormatText": [
-        "레드젬",
-        "2,000",
-        "고급 아이템 티켓",
-        "1"
-      ],
+      "descFormatText": ["레드젬", "2,000", "고급 아이템 티켓", "1"],
       "LocalBitflag": 0,
       "startDate": "2023/04/26/00:00:00",
       "endDate": "2024/11/06/00:00:00",
@@ -390,12 +311,7 @@
       "mainTitle": "{0}일 대형 공용 도면",
       "mainTileFormatText": "14",
       "desc": "구매 시 {0} {1}개, 이후 매일 이벤트 페이지에서 {2} {3}개를 수령할 수 있습니다.",
-      "descFormatText": [
-        "레드젬",
-        "3,000",
-        "대형 공용 도면",
-        "5"
-      ],
+      "descFormatText": ["레드젬", "3,000", "대형 공용 도면", "5"],
       "LocalBitflag": 0,
       "startDate": "2023/05/31/12:00:00",
       "endDate": "2024/05/22/00:00:00",
@@ -411,12 +327,7 @@
       "mainTitle": "{0}일 대형 용골",
       "mainTileFormatText": "14",
       "desc": "구매 시 {0} {1}개, 이후 매일 이벤트 페이지에서 {2} {3}개를 수령할 수 있습니다.",
-      "descFormatText": [
-        "레드젬",
-        "2,000",
-        "대형 용골",
-        "1"
-      ],
+      "descFormatText": ["레드젬", "2,000", "대형 용골", "1"],
       "LocalBitflag": 0,
       "startDate": "2023/05/31/12:00:00",
       "durationDays": 14,
@@ -523,12 +434,7 @@
       "mainTitle": "초급 {0}일 두카트",
       "mainTileFormatText": "7",
       "desc": "구매 시 {0} {1}개, 이후 매일 이벤트 페이지에서 {2} {3}개를 수령할 수 있습니다.",
-      "descFormatText": [
-        "레드젬",
-        "500",
-        "두카트",
-        "10,000,000"
-      ],
+      "descFormatText": ["레드젬", "500", "두카트", "10,000,000"],
       "LocalBitflag": 0,
       "startDate": "2024/07/31/00:00:00",
       "endDate": "2024/03/19/00:00:00",
@@ -550,12 +456,7 @@
       "mainTitle": "{0}일 두카트",
       "mainTileFormatText": "7",
       "desc": "구매 시 {0} {1}개, 이후 매일 이벤트 페이지에서 {2} {3}개를 수령할 수 있습니다.",
-      "descFormatText": [
-        "레드젬",
-        "1,000",
-        "두카트",
-        "30,000,000"
-      ],
+      "descFormatText": ["레드젬", "1,000", "두카트", "30,000,000"],
       "LocalBitflag": 0,
       "startDate": "2024/07/31/00:00:00",
       "endDate": "2024/03/19/00:00:00",
@@ -581,12 +482,7 @@
       "mainTitle": "고급 {0}일 두카트",
       "mainTileFormatText": "7",
       "desc": "구매 시 {0} {1}개, 이후 매일 이벤트 페이지에서 {2} {3}개를 수령할 수 있습니다.",
-      "descFormatText": [
-        "레드젬",
-        "2,000",
-        "두카트",
-        "100,000,000"
-      ],
+      "descFormatText": ["레드젬", "2,000", "두카트", "100,000,000"],
       "LocalBitflag": 0,
       "startDate": "2024/07/31/00:00:00",
       "endDate": "2024/03/19/00:00:00",
@@ -608,12 +504,7 @@
       "mainTitle": "{0}일 티켓 교환권",
       "mainTileFormatText": "10",
       "desc": "구매 시 {0} {1}개, 이후 매일 이벤트 페이지에서 {2} {3}개를 수령할 수 있습니다.",
-      "descFormatText": [
-        "레드젬",
-        "6,000",
-        "고급 티켓 선택 교환권",
-        "3"
-      ],
+      "descFormatText": ["레드젬", "6,000", "고급 티켓 선택 교환권", "3"],
       "LocalBitflag": 0,
       "startDate": "2024/08/21/12:00:00",
       "endDate": "2024/11/06/00:00:00",
@@ -678,12 +569,7 @@
       "mainTitle": "고급 {0}일 레드젬",
       "mainTileFormatText": "7",
       "desc": "구매 시 {0} {1}개, 이후 매일 이벤트 페이지에서 {2} {3}개를 수령할 수 있습니다.",
-      "descFormatText": [
-        "레드젬",
-        "5,000",
-        "레드젬",
-        "1,000"
-      ],
+      "descFormatText": ["레드젬", "5,000", "레드젬", "1,000"],
       "LocalBitflag": 0,
       "startDate": "2024/11/20/00:00:00",
       "endDate": "2025/04/09/00:00:00",
@@ -705,12 +591,7 @@
       "mainTitle": "매일{0} 구독4",
       "mainTileFormatText": "7",
       "desc": "구매 시 {0} {1}개, 이후 매일 이벤트 페이지에서 {2} {3}개를 수령할 수 있습니다.",
-      "descFormatText": [
-        "7",
-        "3",
-        "7",
-        "1"
-      ],
+      "descFormatText": ["7", "3", "7", "1"],
       "LocalBitflag": 0,
       "startDate": "2023/03/13/00:00:00",
       "endDate": "2023/03/30/00:00:00",

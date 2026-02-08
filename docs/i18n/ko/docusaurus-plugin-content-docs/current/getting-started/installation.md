@@ -61,11 +61,13 @@ ADMIN_PASSWORD=admin123
 ### 5. 인프라 시작
 
 **옵션 A: Docker 인프라만 (권장)**
+
 ```bash
 yarn infra:up
 ```
 
 **옵션 B: 전체 Docker 환경**
+
 ```bash
 docker compose -f docker-compose.dev.yml up -d
 ```
@@ -96,20 +98,20 @@ docker compose -f docker-compose.dev.yml up -d
 
 ### 포함된 서비스
 
-| 서비스 | 컨테이너 | 포트 |
-|--------|----------|------|
-| MySQL | gatrix-mysql-dev | 43306 |
-| Redis | gatrix-redis-dev | 46379 |
-| etcd | gatrix-etcd-dev | (내부) |
-| ClickHouse | gatrix-clickhouse-dev | 48123, 49000 |
-| Backend | gatrix-backend-dev | 45000 |
-| Frontend | gatrix-frontend-dev | 43000 |
-| Edge | gatrix-edge-dev | 3400 |
-| Chat Server | gatrix-chat-server-dev | 45100 |
-| Event Lens | gatrix-event-lens-dev | 45200 |
-| Loki | gatrix-loki-dev | 43100 |
-| Prometheus | gatrix-prometheus-dev | 49090 |
-| Grafana | gatrix-grafana-dev | 44000 |
+| 서비스      | 컨테이너               | 포트         |
+| ----------- | ---------------------- | ------------ |
+| MySQL       | gatrix-mysql-dev       | 43306        |
+| Redis       | gatrix-redis-dev       | 46379        |
+| etcd        | gatrix-etcd-dev        | (내부)       |
+| ClickHouse  | gatrix-clickhouse-dev  | 48123, 49000 |
+| Backend     | gatrix-backend-dev     | 45000        |
+| Frontend    | gatrix-frontend-dev    | 43000        |
+| Edge        | gatrix-edge-dev        | 3400         |
+| Chat Server | gatrix-chat-server-dev | 45100        |
+| Event Lens  | gatrix-event-lens-dev  | 45200        |
+| Loki        | gatrix-loki-dev        | 43100        |
+| Prometheus  | gatrix-prometheus-dev  | 49090        |
+| Grafana     | gatrix-grafana-dev     | 44000        |
 
 ## 프로덕션 배포
 

@@ -1,15 +1,11 @@
-import { Request, Response } from "express";
-import { MessageModel } from "../models/Message";
-import { ChannelModel } from "../models/Channel";
-import {
-  CreateMessageData,
-  UpdateMessageData,
-  SearchQuery,
-} from "../types/chat";
-import { getMetrics } from "../services/MetricsService";
-import { createLogger } from "../config/logger";
+import { Request, Response } from 'express';
+import { MessageModel } from '../models/Message';
+import { ChannelModel } from '../models/Channel';
+import { CreateMessageData, UpdateMessageData, SearchQuery } from '../types/chat';
+import { getMetrics } from '../services/MetricsService';
+import { createLogger } from '../config/logger';
 
-const logger = createLogger("MessageController");
+const logger = createLogger('MessageController');
 
 export class MessageController {
   // 메시지 생성
@@ -20,26 +16,22 @@ export class MessageController {
       // FormData와 JSON 요청 모두 처리
       let data: CreateMessageData;
 
-      if (req.headers["content-type"]?.includes("multipart/form-data")) {
+      if (req.headers['content-type']?.includes('multipart/form-data')) {
         // FormData 처리
         data = {
           channelId: parseInt(req.body.channelId),
           content: req.body.content,
-          contentType: req.body.type || "text",
-          replyToMessageId: req.body.replyToId
-            ? parseInt(req.body.replyToId)
-            : undefined,
+          contentType: req.body.type || 'text',
+          replyToMessageId: req.body.replyToId ? parseInt(req.body.replyToId) : undefined,
           threadId: req.body.threadId ? parseInt(req.body.threadId) : undefined,
-          messageData: req.body.metadata
-            ? JSON.parse(req.body.metadata)
-            : undefined,
+          messageData: req.body.metadata ? JSON.parse(req.body.metadata) : undefined,
         };
       } else {
         // JSON 처리
         data = {
           channelId: req.body.channelId,
           content: req.body.content,
-          contentType: req.body.contentType || "text",
+          contentType: req.body.contentType || 'text',
           replyToMessageId: req.body.replyToMessageId,
           threadId: req.body.threadId,
           messageData: req.body.metadata,
@@ -47,9 +39,9 @@ export class MessageController {
       }
 
       // 🔍 요청 데이터 디버깅
-      logger.info("🔍 Message creation request:", {
+      logger.info('🔍 Message creation request:', {
         userId,
-        contentType: req.headers["content-type"],
+        contentType: req.headers['content-type'],
         requestBody: req.body,
         parsedData: data,
         threadId: data.threadId,
@@ -61,7 +53,7 @@ export class MessageController {
       if (!data.content || !data.channelId) {
         res.status(400).json({
           success: false,
-          error: "Content and channelId are required",
+          error: 'Content and channelId are required',
         });
         return;
       }
@@ -71,7 +63,7 @@ export class MessageController {
       if (!isMember) {
         res.status(403).json({
           success: false,
-          error: "Access denied to this channel",
+          error: 'Access denied to this channel',
         });
         return;
       }
@@ -81,7 +73,7 @@ export class MessageController {
       const latency = (Date.now() - startTime) / 1000;
 
       // 🔍 메시지 생성 후 사용자 정보 로깅
-      logger.info("🔍 Message created with user info:", {
+      logger.info('🔍 Message created with user info:', {
         messageId: message.id,
         channelId: data.channelId,
         userId: userId,
@@ -101,7 +93,7 @@ export class MessageController {
           // 스레드 정보 조회
           const threadInfo = await MessageModel.getThreadInfo(data.threadId);
 
-          console.log("🧵 Thread info calculated:", {
+          console.log('🧵 Thread info calculated:', {
             threadId: data.threadId,
             threadCount: threadInfo.threadCount,
             lastThreadMessageAt: threadInfo.lastThreadMessageAt,
@@ -110,8 +102,8 @@ export class MessageController {
           // WebSocket으로 스레드 정보 업데이트 이벤트 전송
           const io = (req as any).io;
           if (io) {
-            io.to(`channel:${data.channelId}`).emit("message", {
-              type: "thread_updated",
+            io.to(`channel:${data.channelId}`).emit('message', {
+              type: 'thread_updated',
               data: {
                 messageId: data.threadId,
                 threadCount: threadInfo.threadCount,
@@ -120,7 +112,7 @@ export class MessageController {
               channelId: data.channelId,
             });
 
-            console.log("🧵 Thread updated event sent:", {
+            console.log('🧵 Thread updated event sent:', {
               messageId: data.threadId,
               threadCount: threadInfo.threadCount,
               lastThreadMessageAt: threadInfo.lastThreadMessageAt,
@@ -130,36 +122,34 @@ export class MessageController {
       }
 
       const metrics = getMetrics((req as any).app);
-      const serverId = process.env.SERVER_ID || "unknown";
+      const serverId = process.env.SERVER_ID || 'unknown';
       if (metrics.messagesPerSecond) {
         metrics.messagesPerSecond.inc({
           server_id: serverId,
           channel_id: data.channelId.toString(),
-          message_type: data.contentType || "text",
+          message_type: data.contentType || 'text',
         });
       }
       if (metrics.messageLatency) {
         metrics.messageLatency.observe(
-          { server_id: serverId, operation: "message_create" },
-          latency,
+          { server_id: serverId, operation: 'message_create' },
+          latency
         );
       }
 
       res.status(201).json({
         success: true,
         data: message,
-        message: "Message created successfully",
+        message: 'Message created successfully',
       });
 
-      logger.info(
-        `Message created: ${message.id} in channel ${data.channelId} by user ${userId}`,
-      );
+      logger.info(`Message created: ${message.id} in channel ${data.channelId} by user ${userId}`);
     } catch (error) {
-      logger.error("Error creating message:", error);
+      logger.error('Error creating message:', error);
       res.status(500).json({
         success: false,
-        error: "Failed to create message",
-        message: error instanceof Error ? error.message : "Unknown error",
+        error: 'Failed to create message',
+        message: error instanceof Error ? error.message : 'Unknown error',
       });
     }
   }
@@ -173,7 +163,7 @@ export class MessageController {
       if (isNaN(messageId)) {
         res.status(400).json({
           success: false,
-          error: "Invalid message ID",
+          error: 'Invalid message ID',
         });
         return;
       }
@@ -182,7 +172,7 @@ export class MessageController {
       if (!message) {
         res.status(404).json({
           success: false,
-          error: "Message not found",
+          error: 'Message not found',
         });
         return;
       }
@@ -192,7 +182,7 @@ export class MessageController {
       if (!isMember) {
         res.status(403).json({
           success: false,
-          error: "Access denied",
+          error: 'Access denied',
         });
         return;
       }
@@ -202,10 +192,10 @@ export class MessageController {
         data: message,
       });
     } catch (error) {
-      logger.error("Error getting message:", error);
+      logger.error('Error getting message:', error);
       res.status(500).json({
         success: false,
-        error: "Failed to get message",
+        error: 'Failed to get message',
       });
     }
   }
@@ -220,7 +210,7 @@ export class MessageController {
       if (isNaN(channelId)) {
         res.status(400).json({
           success: false,
-          error: "Invalid channel ID",
+          error: 'Invalid channel ID',
         });
         return;
       }
@@ -230,7 +220,7 @@ export class MessageController {
       if (!hasAccess) {
         res.status(403).json({
           success: false,
-          error: "Access denied to this channel",
+          error: 'Access denied to this channel',
         });
         return;
       }
@@ -239,7 +229,7 @@ export class MessageController {
         limit: Number(limit),
         beforeMessageId: before ? parseInt(before as string) : undefined,
         afterMessageId: after ? parseInt(after as string) : undefined,
-        includeDeleted: includeDeleted === "true",
+        includeDeleted: includeDeleted === 'true',
       };
 
       const result = await MessageModel.findByChannelId(channelId, options);
@@ -254,10 +244,10 @@ export class MessageController {
         },
       });
     } catch (error) {
-      logger.error("Error getting channel messages:", error);
+      logger.error('Error getting channel messages:', error);
       res.status(500).json({
         success: false,
-        error: "Failed to get messages",
+        error: 'Failed to get messages',
       });
     }
   }
@@ -272,7 +262,7 @@ export class MessageController {
       if (isNaN(messageId)) {
         res.status(400).json({
           success: false,
-          error: "Invalid message ID",
+          error: 'Invalid message ID',
         });
         return;
       }
@@ -280,7 +270,7 @@ export class MessageController {
       if (!data.content) {
         res.status(400).json({
           success: false,
-          error: "Content is required",
+          error: 'Content is required',
         });
         return;
       }
@@ -289,7 +279,7 @@ export class MessageController {
       if (!message) {
         res.status(404).json({
           success: false,
-          error: "Message not found or no permission to edit",
+          error: 'Message not found or no permission to edit',
         });
         return;
       }
@@ -297,16 +287,16 @@ export class MessageController {
       res.json({
         success: true,
         data: message,
-        message: "Message updated successfully",
+        message: 'Message updated successfully',
       });
 
       logger.info(`Message updated: ${messageId} by user ${userId}`);
     } catch (error) {
-      logger.error("Error updating message:", error);
+      logger.error('Error updating message:', error);
       res.status(500).json({
         success: false,
-        error: "Failed to update message",
-        message: error instanceof Error ? error.message : "Unknown error",
+        error: 'Failed to update message',
+        message: error instanceof Error ? error.message : 'Unknown error',
       });
     }
   }
@@ -320,7 +310,7 @@ export class MessageController {
       if (isNaN(messageId)) {
         res.status(400).json({
           success: false,
-          error: "Invalid message ID",
+          error: 'Invalid message ID',
         });
         return;
       }
@@ -329,23 +319,23 @@ export class MessageController {
       if (!success) {
         res.status(404).json({
           success: false,
-          error: "Message not found or no permission to delete",
+          error: 'Message not found or no permission to delete',
         });
         return;
       }
 
       res.json({
         success: true,
-        message: "Message deleted successfully",
+        message: 'Message deleted successfully',
       });
 
       logger.info(`Message deleted: ${messageId} by user ${userId}`);
     } catch (error) {
-      logger.error("Error deleting message:", error);
+      logger.error('Error deleting message:', error);
       res.status(500).json({
         success: false,
-        error: "Failed to delete message",
-        message: error instanceof Error ? error.message : "Unknown error",
+        error: 'Failed to delete message',
+        message: error instanceof Error ? error.message : 'Unknown error',
       });
     }
   }
@@ -359,7 +349,7 @@ export class MessageController {
       if (isNaN(messageId)) {
         res.status(400).json({
           success: false,
-          error: "Invalid message ID",
+          error: 'Invalid message ID',
         });
         return;
       }
@@ -368,23 +358,23 @@ export class MessageController {
       if (!success) {
         res.status(404).json({
           success: false,
-          error: "Message not found or no permission to pin",
+          error: 'Message not found or no permission to pin',
         });
         return;
       }
 
       res.json({
         success: true,
-        message: "Message pin status updated successfully",
+        message: 'Message pin status updated successfully',
       });
 
       logger.info(`Message pin toggled: ${messageId} by user ${userId}`);
     } catch (error) {
-      logger.error("Error toggling message pin:", error);
+      logger.error('Error toggling message pin:', error);
       res.status(500).json({
         success: false,
-        error: "Failed to toggle message pin",
-        message: error instanceof Error ? error.message : "Unknown error",
+        error: 'Failed to toggle message pin',
+        message: error instanceof Error ? error.message : 'Unknown error',
       });
     }
   }
@@ -405,24 +395,21 @@ export class MessageController {
         limit = 20,
       } = req.query;
 
-      if (!query || typeof query !== "string") {
+      if (!query || typeof query !== 'string') {
         res.status(400).json({
           success: false,
-          error: "Search query is required",
+          error: 'Search query is required',
         });
         return;
       }
 
       // 채널 ID가 제공된 경우 접근 권한 확인
       if (channelId) {
-        const isMember = await ChannelModel.isMember(
-          parseInt(channelId as string),
-          userId,
-        );
+        const isMember = await ChannelModel.isMember(parseInt(channelId as string), userId);
         if (!isMember) {
           res.status(403).json({
             success: false,
-            error: "Access denied to this channel",
+            error: 'Access denied to this channel',
           });
           return;
         }
@@ -435,13 +422,8 @@ export class MessageController {
         dateFrom: dateFrom ? new Date(dateFrom as string) : undefined,
         dateTo: dateTo ? new Date(dateTo as string) : undefined,
         hasAttachments:
-          hasAttachments === "true"
-            ? true
-            : hasAttachments === "false"
-              ? false
-              : undefined,
-        isPinned:
-          isPinned === "true" ? true : isPinned === "false" ? false : undefined,
+          hasAttachments === 'true' ? true : hasAttachments === 'false' ? false : undefined,
+        isPinned: isPinned === 'true' ? true : isPinned === 'false' ? false : undefined,
         limit: Number(limit),
         offset,
       };
@@ -449,7 +431,7 @@ export class MessageController {
       const result = await MessageModel.search(
         query,
         channelId ? parseInt(channelId as string) : undefined,
-        options,
+        options
       );
 
       res.json({
@@ -465,10 +447,10 @@ export class MessageController {
         },
       });
     } catch (error) {
-      logger.error("Error searching messages:", error);
+      logger.error('Error searching messages:', error);
       res.status(500).json({
         success: false,
-        error: "Failed to search messages",
+        error: 'Failed to search messages',
       });
     }
   }
@@ -483,7 +465,7 @@ export class MessageController {
       if (isNaN(threadId)) {
         res.status(400).json({
           success: false,
-          error: "Invalid thread ID",
+          error: 'Invalid thread ID',
         });
         return;
       }
@@ -493,20 +475,17 @@ export class MessageController {
       if (!originalMessage) {
         res.status(404).json({
           success: false,
-          error: "Thread not found",
+          error: 'Thread not found',
         });
         return;
       }
 
       // 채널 접근 권한 확인
-      const isMember = await ChannelModel.isMember(
-        originalMessage.channelId,
-        userId,
-      );
+      const isMember = await ChannelModel.isMember(originalMessage.channelId, userId);
       if (!isMember) {
         res.status(403).json({
           success: false,
-          error: "Access denied",
+          error: 'Access denied',
         });
         return;
       }
@@ -532,10 +511,10 @@ export class MessageController {
         },
       });
     } catch (error) {
-      logger.error("Error getting thread messages:", error);
+      logger.error('Error getting thread messages:', error);
       res.status(500).json({
         success: false,
-        error: "Failed to get thread messages",
+        error: 'Failed to get thread messages',
       });
     }
   }
@@ -549,7 +528,7 @@ export class MessageController {
       if (!Array.isArray(messageIds) || messageIds.length === 0) {
         res.status(400).json({
           success: false,
-          error: "Message IDs array is required",
+          error: 'Message IDs array is required',
         });
         return;
       }
@@ -564,10 +543,10 @@ export class MessageController {
 
       logger.info(`Batch delete: ${deletedCount} messages by user ${userId}`);
     } catch (error) {
-      logger.error("Error batch deleting messages:", error);
+      logger.error('Error batch deleting messages:', error);
       res.status(500).json({
         success: false,
-        error: "Failed to delete messages",
+        error: 'Failed to delete messages',
       });
     }
   }
@@ -581,20 +560,14 @@ export class MessageController {
       if (isNaN(channelId)) {
         res.status(400).json({
           success: false,
-          error: "Invalid channel ID",
+          error: 'Invalid channel ID',
         });
         return;
       }
 
       // multipart/form-data 또는 JSON 데이터 처리
       let content: string;
-      let contentType:
-        | "text"
-        | "image"
-        | "video"
-        | "audio"
-        | "file"
-        | "location" = "text";
+      let contentType: 'text' | 'image' | 'video' | 'audio' | 'file' | 'location' = 'text';
       let attachments: any[] = [];
 
       if (req.body.content) {
@@ -603,14 +576,14 @@ export class MessageController {
       } else {
         res.status(400).json({
           success: false,
-          error: "Content is required",
+          error: 'Content is required',
         });
         return;
       }
 
       // 파일 첨부가 있는 경우 처리
       if ((req as any).files && (req as any).files.length > 0) {
-        contentType = "file";
+        contentType = 'file';
         attachments = (req as any).files.map((file: any) => ({
           filename: file.originalname,
           mimetype: file.mimetype,
@@ -623,13 +596,9 @@ export class MessageController {
         content,
         contentType,
         channelId,
-        replyToMessageId: req.body.replyToId
-          ? parseInt(req.body.replyToId)
-          : undefined,
+        replyToMessageId: req.body.replyToId ? parseInt(req.body.replyToId) : undefined,
         threadId: req.body.threadId ? parseInt(req.body.threadId) : undefined,
-        messageData: req.body.metadata
-          ? JSON.parse(req.body.metadata)
-          : undefined,
+        messageData: req.body.metadata ? JSON.parse(req.body.metadata) : undefined,
       };
 
       // 채널 접근 권한 확인
@@ -637,7 +606,7 @@ export class MessageController {
       if (!hasAccess) {
         res.status(403).json({
           success: false,
-          error: "Access denied to this channel",
+          error: 'Access denied to this channel',
         });
         return;
       }
@@ -648,25 +617,25 @@ export class MessageController {
       const latency = (Date.now() - startTime) / 1000;
 
       const metrics = getMetrics((req as any).app);
-      const serverId = process.env.SERVER_ID || "unknown";
+      const serverId = process.env.SERVER_ID || 'unknown';
       if (metrics.messagesPerSecond) {
         metrics.messagesPerSecond.inc({
           server_id: serverId,
           channel_id: channelId.toString(),
-          message_type: data.contentType || "text",
+          message_type: data.contentType || 'text',
         });
       }
       if (metrics.messageLatency) {
         metrics.messageLatency.observe(
-          { server_id: serverId, operation: "message_create" },
-          latency,
+          { server_id: serverId, operation: 'message_create' },
+          latency
         );
       }
 
       res.status(201).json({
         success: true,
         data: message,
-        message: "Message created successfully",
+        message: 'Message created successfully',
       });
 
       // 스레드 메시지인 경우 원본 메시지의 스레드 정보 업데이트
@@ -676,7 +645,7 @@ export class MessageController {
           // 스레드 정보 조회
           const threadInfo = await MessageModel.getThreadInfo(data.threadId);
 
-          console.log("🧵 Thread info calculated:", {
+          console.log('🧵 Thread info calculated:', {
             threadId: data.threadId,
             threadCount: threadInfo.threadCount,
             lastThreadMessageAt: threadInfo.lastThreadMessageAt,
@@ -685,8 +654,8 @@ export class MessageController {
           // WebSocket으로 스레드 정보 업데이트 이벤트 전송
           const io = (req as any).io;
           if (io) {
-            io.to(`channel:${channelId}`).emit("message", {
-              type: "thread_updated",
+            io.to(`channel:${channelId}`).emit('message', {
+              type: 'thread_updated',
               data: {
                 messageId: data.threadId,
                 threadCount: threadInfo.threadCount,
@@ -695,7 +664,7 @@ export class MessageController {
               channelId,
             });
 
-            console.log("🧵 Thread updated event sent:", {
+            console.log('🧵 Thread updated event sent:', {
               messageId: data.threadId,
               threadCount: threadInfo.threadCount,
               lastThreadMessageAt: threadInfo.lastThreadMessageAt,
@@ -711,7 +680,7 @@ export class MessageController {
         if (data.threadId) {
           // 스레드 메시지는 thread_message_created 이벤트로 전송
           const threadEventData = {
-            type: "thread_message_created",
+            type: 'thread_message_created',
             data: message,
             threadId: data.threadId,
             channelId,
@@ -721,18 +690,18 @@ export class MessageController {
           logger.info(`Emitting thread message event to channel:${channelId}`, {
             threadEventData,
           });
-          io.to(`channel:${channelId}`).emit("message", threadEventData);
+          io.to(`channel:${channelId}`).emit('message', threadEventData);
         } else {
           // 일반 메시지는 기존대로 처리
           const eventData = {
-            type: "message_created",
+            type: 'message_created',
             data: message,
             channelId,
             userId,
           };
 
           // 🔍 WebSocket으로 전송되는 메시지 데이터 확인
-          logger.info("🔍 WebSocket message data:", {
+          logger.info('🔍 WebSocket message data:', {
             messageId: message.id,
             hasUser: !!message.user,
             user: message.user,
@@ -743,25 +712,23 @@ export class MessageController {
           logger.info(`Emitting WebSocket event to channel:${channelId}`, {
             eventData,
           });
-          io.to(`channel:${channelId}`).emit("message", eventData);
+          io.to(`channel:${channelId}`).emit('message', eventData);
         }
 
         // 전체 연결된 클라이언트 수 확인
         const connectedClients = io.engine.clientsCount;
         logger.info(`Total connected clients: ${connectedClients}`);
       } else {
-        logger.warn("Socket.IO instance not available for message broadcast");
+        logger.warn('Socket.IO instance not available for message broadcast');
       }
 
-      logger.info(
-        `Message created: ${message.id} in channel ${channelId} by user ${userId}`,
-      );
+      logger.info(`Message created: ${message.id} in channel ${channelId} by user ${userId}`);
     } catch (error) {
-      logger.error("Error creating message in channel:", error);
+      logger.error('Error creating message in channel:', error);
       res.status(500).json({
         success: false,
-        error: "Failed to create message",
-        message: error instanceof Error ? error.message : "Unknown error",
+        error: 'Failed to create message',
+        message: error instanceof Error ? error.message : 'Unknown error',
       });
     }
   }

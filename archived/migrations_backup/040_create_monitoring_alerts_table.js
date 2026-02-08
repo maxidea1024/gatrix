@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 /**
  * Migration for monitoring_alerts table
@@ -34,4 +34,3 @@ module.exports = {
     `);
   },
 };
-

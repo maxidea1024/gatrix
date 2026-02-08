@@ -6,12 +6,12 @@ const BASE_URL = 'http://localhost:5001';
 
 async function testCrashUpload() {
   console.log('🔍 Testing crash upload API...');
-  
+
   const crashData = {
     pubId: 'test-crash-001',
     userId: 1,
     platform: 0, // Android
-    branch: 0,   // Release
+    branch: 0, // Release
     majorVer: 1,
     minorVer: 2,
     buildNum: 3,
@@ -31,7 +31,7 @@ async function testCrashUpload() {
     userMsg: 'Game crashed when trying to start new level',
     log: 'Game log content here...',
     serverGroup: 'kr_server',
-    marketType: 'google_play'
+    marketType: 'google_play',
   };
 
   try {
@@ -39,15 +39,14 @@ async function testCrashUpload() {
       headers: {
         'X-API-Token': API_TOKEN,
         'X-Application-Name': 'test-game',
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
-      timeout: 10000
+      timeout: 10000,
     });
-    
+
     console.log('✅ Crash upload successful!');
     console.log(`Status: ${response.status}`);
     console.log(`Response:`, response.data);
-    
   } catch (error) {
     console.log('❌ Crash upload failed!');
     if (error.response) {

@@ -1,1 +1,135 @@
-"use strict";(globalThis.webpackChunkdocs=globalThis.webpackChunkdocs||[]).push([[4583],{8198(e,t,i){i.r(t),i.d(t,{default:()=>g});var a=i(4164),n=i(8774),s=i(4586),o=i(1656),r=i(1107),l=i(1312);const d={heroBanner:"heroBanner_qdFl",buttons:"buttons_AeoN"};var c=i(4848);function u(){const{siteConfig:e}=(0,s.A)();return(0,c.jsx)("header",{className:(0,a.A)("hero hero--primary",d.heroBanner),children:(0,c.jsxs)("div",{className:"container",children:[(0,c.jsx)(r.A,{as:"h1",className:"hero__title",children:e.title}),(0,c.jsx)("p",{className:"hero__subtitle",children:e.tagline}),(0,c.jsx)("div",{className:d.buttons,children:(0,c.jsx)(n.A,{className:"button button--secondary button--lg",to:"/intro",children:(0,c.jsx)(l.A,{id:"homepage.getStarted",children:"Get Started \u2192"})})})]})})}const m=[{titleId:"homepage.feature.featureFlags.title",titleDefault:"Feature Flags",emoji:"\ud83d\ude80",descriptionId:"homepage.feature.featureFlags.description",descriptionDefault:"Enable safe deployments and gradual rollouts with real-time feature toggles. Easily implement A/B testing and canary deployments."},{titleId:"homepage.feature.gameOps.title",titleDefault:"Game Operations Tools",emoji:"\ud83c\udfae",descriptionId:"homepage.feature.gameOps.description",descriptionDefault:"Notices, popups, coupons, surveys, banners, store products, and more. All the tools you need for game operations."},{titleId:"homepage.feature.integrations.title",titleDefault:"Integrations",emoji:"\ud83d\udd17",descriptionId:"homepage.feature.integrations.description",descriptionDefault:"Connect with Slack, Microsoft Teams, Webhook, Lark, New Relic and more for notifications."},{titleId:"homepage.feature.maintenance.title",titleDefault:"Maintenance Management",emoji:"\ud83d\udd27",descriptionId:"homepage.feature.maintenance.description",descriptionDefault:"Easily manage scheduled and emergency maintenance. Control test accounts with whitelist."},{titleId:"homepage.feature.auditLog.title",titleDefault:"Audit Logs",emoji:"\ud83d\udccb",descriptionId:"homepage.feature.auditLog.description",descriptionDefault:"Track and record all system changes. See who changed what and when."},{titleId:"homepage.feature.i18n.title",titleDefault:"Multi-language Support",emoji:"\ud83c\udf0d",descriptionId:"homepage.feature.i18n.description",descriptionDefault:"Supports Korean, English, and Chinese for global team collaboration."}];function h({titleId:e,titleDefault:t,emoji:i,descriptionId:n,descriptionDefault:s}){return(0,c.jsxs)("div",{className:(0,a.A)("col col--4"),children:[(0,c.jsx)("div",{className:"text--center",style:{fontSize:"3rem",marginBottom:"1rem"},children:i}),(0,c.jsxs)("div",{className:"text--center padding-horiz--md",children:[(0,c.jsx)(r.A,{as:"h3",children:(0,c.jsx)(l.A,{id:e,children:t})}),(0,c.jsx)("p",{children:(0,c.jsx)(l.A,{id:n,children:s})})]})]})}function p(){return(0,c.jsx)("section",{className:d.features,children:(0,c.jsx)("div",{className:"container",children:(0,c.jsx)("div",{className:"row",children:m.map((e,t)=>(0,c.jsx)(h,{...e},t))})})})}function g(){const{siteConfig:e}=(0,s.A)();return(0,c.jsxs)(o.A,{title:"Home",description:"Gatrix - Online Game Platform Management System",children:[(0,c.jsx)(u,{}),(0,c.jsx)("main",{children:(0,c.jsx)(p,{})})]})}}}]);
+'use strict';
+(globalThis.webpackChunkdocs = globalThis.webpackChunkdocs || []).push([
+  [4583],
+  {
+    8198(e, t, i) {
+      (i.r(t), i.d(t, { default: () => g }));
+      var a = i(4164),
+        n = i(8774),
+        s = i(4586),
+        o = i(1656),
+        r = i(1107),
+        l = i(1312);
+      const d = { heroBanner: 'heroBanner_qdFl', buttons: 'buttons_AeoN' };
+      var c = i(4848);
+      function u() {
+        const { siteConfig: e } = (0, s.A)();
+        return (0, c.jsx)('header', {
+          className: (0, a.A)('hero hero--primary', d.heroBanner),
+          children: (0, c.jsxs)('div', {
+            className: 'container',
+            children: [
+              (0, c.jsx)(r.A, { as: 'h1', className: 'hero__title', children: e.title }),
+              (0, c.jsx)('p', { className: 'hero__subtitle', children: e.tagline }),
+              (0, c.jsx)('div', {
+                className: d.buttons,
+                children: (0, c.jsx)(n.A, {
+                  className: 'button button--secondary button--lg',
+                  to: '/intro',
+                  children: (0, c.jsx)(l.A, {
+                    id: 'homepage.getStarted',
+                    children: 'Get Started \u2192',
+                  }),
+                }),
+              }),
+            ],
+          }),
+        });
+      }
+      const m = [
+        {
+          titleId: 'homepage.feature.featureFlags.title',
+          titleDefault: 'Feature Flags',
+          emoji: '\ud83d\ude80',
+          descriptionId: 'homepage.feature.featureFlags.description',
+          descriptionDefault:
+            'Enable safe deployments and gradual rollouts with real-time feature toggles. Easily implement A/B testing and canary deployments.',
+        },
+        {
+          titleId: 'homepage.feature.gameOps.title',
+          titleDefault: 'Game Operations Tools',
+          emoji: '\ud83c\udfae',
+          descriptionId: 'homepage.feature.gameOps.description',
+          descriptionDefault:
+            'Notices, popups, coupons, surveys, banners, store products, and more. All the tools you need for game operations.',
+        },
+        {
+          titleId: 'homepage.feature.integrations.title',
+          titleDefault: 'Integrations',
+          emoji: '\ud83d\udd17',
+          descriptionId: 'homepage.feature.integrations.description',
+          descriptionDefault:
+            'Connect with Slack, Microsoft Teams, Webhook, Lark, New Relic and more for notifications.',
+        },
+        {
+          titleId: 'homepage.feature.maintenance.title',
+          titleDefault: 'Maintenance Management',
+          emoji: '\ud83d\udd27',
+          descriptionId: 'homepage.feature.maintenance.description',
+          descriptionDefault:
+            'Easily manage scheduled and emergency maintenance. Control test accounts with whitelist.',
+        },
+        {
+          titleId: 'homepage.feature.auditLog.title',
+          titleDefault: 'Audit Logs',
+          emoji: '\ud83d\udccb',
+          descriptionId: 'homepage.feature.auditLog.description',
+          descriptionDefault: 'Track and record all system changes. See who changed what and when.',
+        },
+        {
+          titleId: 'homepage.feature.i18n.title',
+          titleDefault: 'Multi-language Support',
+          emoji: '\ud83c\udf0d',
+          descriptionId: 'homepage.feature.i18n.description',
+          descriptionDefault:
+            'Supports Korean, English, and Chinese for global team collaboration.',
+        },
+      ];
+      function h({
+        titleId: e,
+        titleDefault: t,
+        emoji: i,
+        descriptionId: n,
+        descriptionDefault: s,
+      }) {
+        return (0, c.jsxs)('div', {
+          className: (0, a.A)('col col--4'),
+          children: [
+            (0, c.jsx)('div', {
+              className: 'text--center',
+              style: { fontSize: '3rem', marginBottom: '1rem' },
+              children: i,
+            }),
+            (0, c.jsxs)('div', {
+              className: 'text--center padding-horiz--md',
+              children: [
+                (0, c.jsx)(r.A, { as: 'h3', children: (0, c.jsx)(l.A, { id: e, children: t }) }),
+                (0, c.jsx)('p', { children: (0, c.jsx)(l.A, { id: n, children: s }) }),
+              ],
+            }),
+          ],
+        });
+      }
+      function p() {
+        return (0, c.jsx)('section', {
+          className: d.features,
+          children: (0, c.jsx)('div', {
+            className: 'container',
+            children: (0, c.jsx)('div', {
+              className: 'row',
+              children: m.map((e, t) => (0, c.jsx)(h, { ...e }, t)),
+            }),
+          }),
+        });
+      }
+      function g() {
+        const { siteConfig: e } = (0, s.A)();
+        return (0, c.jsxs)(o.A, {
+          title: 'Home',
+          description: 'Gatrix - Online Game Platform Management System',
+          children: [(0, c.jsx)(u, {}), (0, c.jsx)('main', { children: (0, c.jsx)(p, {}) })],
+        });
+      }
+    },
+  },
+]);

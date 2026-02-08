@@ -54,13 +54,13 @@ REGISTRY_NAMESPACE=uwocn/uwocn
 
 **选项：**
 
-| 选项 | 说明 |
-|------|------|
-| `-t, --tag <tag>` | 镜像标签（默认：`latest`） |
-| `-p, --push` | 构建后推送到镜像仓库 |
-| `-l, --latest` | 同时添加并推送 `latest` 标签 |
+| 选项                   | 说明                         |
+| ---------------------- | ---------------------------- |
+| `-t, --tag <tag>`      | 镜像标签（默认：`latest`）   |
+| `-p, --push`           | 构建后推送到镜像仓库         |
+| `-l, --latest`         | 同时添加并推送 `latest` 标签 |
 | `-s, --service <name>` | 仅构建指定服务（可重复使用） |
-| `-h, --help` | 显示帮助 |
+| `-h, --help`           | 显示帮助                     |
 
 **可用服务：** `backend`、`frontend`、`edge`、`chat-server`、`event-lens`
 
@@ -98,15 +98,15 @@ REGISTRY_NAMESPACE=uwocn/uwocn
 
 **选项：**
 
-| 选项 | 说明 |
-|------|------|
-| `-v, --version <version>` | 部署版本（默认：`latest`） |
-| `-e, --env-file <file>` | 环境文件路径（默认：`.env`） |
-| `-n, --stack <name>` | 栈名称（默认：`gatrix`） |
-| `-i, --init` | 初始化 Swarm 并创建密钥 |
-| `-u, --update` | 执行滚动更新 |
-| `--prune` | 部署后移除未使用的镜像 |
-| `-h, --help` | 显示帮助 |
+| 选项                      | 说明                         |
+| ------------------------- | ---------------------------- |
+| `-v, --version <version>` | 部署版本（默认：`latest`）   |
+| `-e, --env-file <file>`   | 环境文件路径（默认：`.env`） |
+| `-n, --stack <name>`      | 栈名称（默认：`gatrix`）     |
+| `-i, --init`              | 初始化 Swarm 并创建密钥      |
+| `-u, --update`            | 执行滚动更新                 |
+| `--prune`                 | 部署后移除未使用的镜像       |
+| `-h, --help`              | 显示帮助                     |
 
 **示例：**
 
@@ -134,14 +134,14 @@ REGISTRY_NAMESPACE=uwocn/uwocn
 
 **选项：**
 
-| 选项 | 说明 |
-|------|------|
-| `-v, --version <version>` | 目标版本（必需） |
-| `-s, --service <name>` | 仅更新指定服务 |
-| `-a, --all` | 更新所有应用服务 |
-| `-f, --force` | 强制更新（即使镜像相同） |
-| `-n, --stack <name>` | 栈名称（默认：`gatrix`） |
-| `-h, --help` | 显示帮助 |
+| 选项                      | 说明                     |
+| ------------------------- | ------------------------ |
+| `-v, --version <version>` | 目标版本（必需）         |
+| `-s, --service <name>`    | 仅更新指定服务           |
+| `-a, --all`               | 更新所有应用服务         |
+| `-f, --force`             | 强制更新（即使镜像相同） |
+| `-n, --stack <name>`      | 栈名称（默认：`gatrix`） |
+| `-h, --help`              | 显示帮助                 |
 
 **示例：**
 
@@ -167,12 +167,12 @@ REGISTRY_NAMESPACE=uwocn/uwocn
 
 **选项：**
 
-| 选项 | 说明 |
-|------|------|
-| `-s, --service <name>` | 回滚指定服务 |
-| `-a, --all` | 回滚所有应用服务 |
-| `-n, --stack <name>` | 栈名称（默认：`gatrix`） |
-| `-h, --help` | 显示帮助 |
+| 选项                   | 说明                     |
+| ---------------------- | ------------------------ |
+| `-s, --service <name>` | 回滚指定服务             |
+| `-a, --all`            | 回滚所有应用服务         |
+| `-n, --stack <name>`   | 栈名称（默认：`gatrix`） |
+| `-h, --help`           | 显示帮助                 |
 
 **示例：**
 
@@ -194,14 +194,14 @@ REGISTRY_NAMESPACE=uwocn/uwocn
 
 **选项：**
 
-| 选项 | 说明 |
-|------|------|
-| `-s, --service <name>` | 要扩展的服务 |
-| `-r, --replicas <n>` | 副本数量 |
-| `--preset <name>` | 使用预设：`minimal`、`standard`、`high` |
-| `--status` | 显示当前扩展状态 |
-| `-n, --stack <name>` | 栈名称（默认：`gatrix`） |
-| `-h, --help` | 显示帮助 |
+| 选项                   | 说明                                    |
+| ---------------------- | --------------------------------------- |
+| `-s, --service <name>` | 要扩展的服务                            |
+| `-r, --replicas <n>`   | 副本数量                                |
+| `--preset <name>`      | 使用预设：`minimal`、`standard`、`high` |
+| `--status`             | 显示当前扩展状态                        |
+| `-n, --stack <name>`   | 栈名称（默认：`gatrix`）                |
+| `-h, --help`           | 显示帮助                                |
 
 **预设：**
 
@@ -233,14 +233,14 @@ REGISTRY_NAMESPACE=uwocn/uwocn
 
 **选项：**
 
-| 选项 | 说明 |
-|------|------|
-| `-s, --services` | 仅显示服务列表 |
-| `-t, --tasks` | 仅显示运行中的任务 |
-| `-l, --logs <service>` | 流式查看服务日志 |
-| `--health` | 显示健康检查状态 |
-| `-n, --stack <name>` | 栈名称（默认：`gatrix`） |
-| `-h, --help` | 显示帮助 |
+| 选项                   | 说明                     |
+| ---------------------- | ------------------------ |
+| `-s, --services`       | 仅显示服务列表           |
+| `-t, --tasks`          | 仅显示运行中的任务       |
+| `-l, --logs <service>` | 流式查看服务日志         |
+| `--health`             | 显示健康检查状态         |
+| `-n, --stack <name>`   | 栈名称（默认：`gatrix`） |
+| `-h, --help`           | 显示帮助                 |
 
 **示例：**
 
@@ -293,6 +293,7 @@ REGISTRY_NAMESPACE=uwocn/uwocn
 ```
 
 如果仓库为空：
+
 ```
 Repository 'uwocn/uwocn' not found or has no images yet.
 ```
@@ -326,16 +327,16 @@ Repository 'uwocn/uwocn' not found or has no images yet.
 
 ## 文件参考
 
-| 文件 | 用途 |
-|------|------|
+| 文件                     | 用途                   |
+| ------------------------ | ---------------------- |
 | `build-and-push.ps1/.sh` | 构建和推送 Docker 镜像 |
-| `deploy.ps1/.sh` | 部署到 Docker Swarm |
-| `update.ps1/.sh` | 滚动更新 |
-| `rollback.ps1/.sh` | 服务回滚 |
-| `scale.ps1/.sh` | 副本扩展 |
-| `status.ps1/.sh` | 显示栈状态 |
-| `login-registry.ps1/.sh` | 镜像仓库登录 |
-| `list-images.ps1/.sh` | 列出镜像仓库镜像 |
-| `registry.env` | 镜像仓库凭证 |
-| `.env.example` | 环境配置模板 |
-| `docker-stack.yml` | Swarm 栈定义 |
+| `deploy.ps1/.sh`         | 部署到 Docker Swarm    |
+| `update.ps1/.sh`         | 滚动更新               |
+| `rollback.ps1/.sh`       | 服务回滚               |
+| `scale.ps1/.sh`          | 副本扩展               |
+| `status.ps1/.sh`         | 显示栈状态             |
+| `login-registry.ps1/.sh` | 镜像仓库登录           |
+| `list-images.ps1/.sh`    | 列出镜像仓库镜像       |
+| `registry.env`           | 镜像仓库凭证           |
+| `.env.example`           | 环境配置模板           |
+| `docker-stack.yml`       | Swarm 栈定义           |

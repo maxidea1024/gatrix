@@ -1,1 +1,356 @@
-"use strict";(globalThis.webpackChunkdocs=globalThis.webpackChunkdocs||[]).push([[6549],{6630(e,n,s){s.r(n),s.d(n,{assets:()=>c,contentTitle:()=>l,default:()=>x,frontMatter:()=>t,metadata:()=>r,toc:()=>h});const r=JSON.parse('{"id":"admin/client-versions","title":"\ud074\ub77c\uc774\uc5b8\ud2b8 \ubc84\uc804","description":"\uac1c\uc694","source":"@site/i18n/ko/docusaurus-plugin-content-docs/current/admin/client-versions.md","sourceDirName":"admin","slug":"/admin/client-versions","permalink":"/docs/ko/admin/client-versions","draft":false,"unlisted":false,"editUrl":"https://github.com/your-org/gatrix/tree/main/docs/docs/admin/client-versions.md","tags":[],"version":"current","sidebarPosition":4,"frontMatter":{"sidebar_position":4,"sidebar_label":"\ud074\ub77c\uc774\uc5b8\ud2b8 \ubc84\uc804"},"sidebar":"tutorialSidebar","previous":{"title":"\uac8c\uc784 \uc6d4\ub4dc","permalink":"/docs/ko/admin/game-worlds"},"next":{"title":"\uc0ac\uc6a9\uc790 \uad00\ub9ac","permalink":"/docs/ko/admin/users"}}');var d=s(4848),i=s(8453);const t={sidebar_position:4,sidebar_label:"\ud074\ub77c\uc774\uc5b8\ud2b8 \ubc84\uc804"},l="\ud074\ub77c\uc774\uc5b8\ud2b8 \ubc84\uc804",c={},h=[{value:"\uac1c\uc694",id:"\uac1c\uc694",level:2},{value:"\uae30\ub2a5",id:"\uae30\ub2a5",level:2},{value:"\ubc84\uc804 \uc124\uc815 \ud56d\ubaa9",id:"\ubc84\uc804-\uc124\uc815-\ud56d\ubaa9",level:2},{value:"\ubc84\uc804 \ucd94\uac00 \ubc29\ubc95",id:"\ubc84\uc804-\ucd94\uac00-\ubc29\ubc95",level:2},{value:"API \ud655\uc778",id:"api-\ud655\uc778",level:2}];function o(e){const n={code:"code",h1:"h1",h2:"h2",header:"header",li:"li",ol:"ol",p:"p",pre:"pre",strong:"strong",table:"table",tbody:"tbody",td:"td",th:"th",thead:"thead",tr:"tr",ul:"ul",...(0,i.R)(),...e.components};return(0,d.jsxs)(d.Fragment,{children:[(0,d.jsx)(n.header,{children:(0,d.jsx)(n.h1,{id:"\ud074\ub77c\uc774\uc5b8\ud2b8-\ubc84\uc804",children:"\ud074\ub77c\uc774\uc5b8\ud2b8 \ubc84\uc804"})}),"\n",(0,d.jsx)(n.h2,{id:"\uac1c\uc694",children:"\uac1c\uc694"}),"\n",(0,d.jsx)(n.p,{children:"\uac8c\uc784 \ud074\ub77c\uc774\uc5b8\ud2b8 \ubc84\uc804 \ubc0f \uc5c5\ub370\uc774\ud2b8 \uc694\uad6c \uc0ac\ud56d\uc744 \uad00\ub9ac\ud569\ub2c8\ub2e4."}),"\n",(0,d.jsxs)(n.p,{children:[(0,d.jsx)(n.strong,{children:"\uc811\uadfc \uacbd\ub85c:"})," \uc2dc\uc2a4\ud15c \uad00\ub9ac \u2192 \ud074\ub77c\uc774\uc5b8\ud2b8 \ubc84\uc804"]}),"\n",(0,d.jsx)(n.h2,{id:"\uae30\ub2a5",children:"\uae30\ub2a5"}),"\n",(0,d.jsxs)(n.ul,{children:["\n",(0,d.jsx)(n.li,{children:"\ucd5c\uc18c \ud5c8\uc6a9 \ubc84\uc804 \uc815\uc758"}),"\n",(0,d.jsx)(n.li,{children:"\uac15\uc81c \uc5c5\ub370\uc774\ud2b8 \uc54c\ub9bc \uc124\uc815"}),"\n",(0,d.jsx)(n.li,{children:"\ud50c\ub7ab\ud3fc\ubcc4 \ubc84\uc804 \uad00\ub9ac (iOS, Android, PC \ub4f1)"}),"\n",(0,d.jsx)(n.li,{children:"\uc5c5\ub370\uc774\ud2b8 URL \uad6c\uc131"}),"\n"]}),"\n",(0,d.jsx)(n.h2,{id:"\ubc84\uc804-\uc124\uc815-\ud56d\ubaa9",children:"\ubc84\uc804 \uc124\uc815 \ud56d\ubaa9"}),"\n",(0,d.jsxs)(n.table,{children:[(0,d.jsx)(n.thead,{children:(0,d.jsxs)(n.tr,{children:[(0,d.jsx)(n.th,{children:"\ud56d\ubaa9"}),(0,d.jsx)(n.th,{children:"\uc124\uba85"})]})}),(0,d.jsxs)(n.tbody,{children:[(0,d.jsxs)(n.tr,{children:[(0,d.jsx)(n.td,{children:(0,d.jsx)(n.strong,{children:"\ud50c\ub7ab\ud3fc"})}),(0,d.jsx)(n.td,{children:"iOS, Android, Windows, Mac \ub4f1"})]}),(0,d.jsxs)(n.tr,{children:[(0,d.jsx)(n.td,{children:(0,d.jsx)(n.strong,{children:"\ucd5c\uc18c \ubc84\uc804"})}),(0,d.jsx)(n.td,{children:"\ud5c8\uc6a9\ub418\ub294 \uac00\uc7a5 \uc624\ub798\ub41c \ubc84\uc804"})]}),(0,d.jsxs)(n.tr,{children:[(0,d.jsx)(n.td,{children:(0,d.jsx)(n.strong,{children:"\ucd5c\uc2e0 \ubc84\uc804"})}),(0,d.jsx)(n.td,{children:"\ud604\uc7ac \ubc30\ud3ec\ub41c \ucd5c\uc2e0 \ubc84\uc804"})]}),(0,d.jsxs)(n.tr,{children:[(0,d.jsx)(n.td,{children:(0,d.jsx)(n.strong,{children:"\uac15\uc81c \uc5c5\ub370\uc774\ud2b8"})}),(0,d.jsx)(n.td,{children:"\ucd5c\uc18c \ubc84\uc804 \ubbf8\ub9cc\uc77c \uacbd\uc6b0 \uc5c5\ub370\uc774\ud2b8 \ud544\uc218 \uc5ec\ubd80"})]}),(0,d.jsxs)(n.tr,{children:[(0,d.jsx)(n.td,{children:(0,d.jsx)(n.strong,{children:"\uc5c5\ub370\uc774\ud2b8 URL"})}),(0,d.jsx)(n.td,{children:"\uc2a4\ud1a0\uc5b4 \ub610\ub294 \ub2e4\uc6b4\ub85c\ub4dc \ub9c1\ud06c"})]})]})]}),"\n",(0,d.jsx)(n.h2,{id:"\ubc84\uc804-\ucd94\uac00-\ubc29\ubc95",children:"\ubc84\uc804 \ucd94\uac00 \ubc29\ubc95"}),"\n",(0,d.jsxs)(n.ol,{children:["\n",(0,d.jsxs)(n.li,{children:[(0,d.jsx)(n.strong,{children:"\uc2dc\uc2a4\ud15c \uad00\ub9ac"})," > ",(0,d.jsx)(n.strong,{children:"\ud074\ub77c\uc774\uc5b8\ud2b8 \ubc84\uc804"}),"\ub85c \uc774\ub3d9\ud569\ub2c8\ub2e4."]}),"\n",(0,d.jsxs)(n.li,{children:[(0,d.jsx)(n.strong,{children:"\ubc84\uc804 \ucd94\uac00"})," \ubc84\ud2bc\uc744 \ud074\ub9ad\ud569\ub2c8\ub2e4."]}),"\n",(0,d.jsx)(n.li,{children:"\ub2e4\uc74c\uc744 \uc124\uc815\ud569\ub2c8\ub2e4:"}),"\n"]}),"\n",(0,d.jsxs)(n.table,{children:[(0,d.jsx)(n.thead,{children:(0,d.jsxs)(n.tr,{children:[(0,d.jsx)(n.th,{children:"\ud544\ub4dc"}),(0,d.jsx)(n.th,{children:"\uc720\ud615"}),(0,d.jsx)(n.th,{children:"\ud544\uc218 \uc5ec\ubd80"}),(0,d.jsx)(n.th,{children:"\uc124\uba85"})]})}),(0,d.jsxs)(n.tbody,{children:[(0,d.jsxs)(n.tr,{children:[(0,d.jsx)(n.td,{children:"\ud50c\ub7ab\ud3fc"}),(0,d.jsx)(n.td,{children:"\uc120\ud0dd"}),(0,d.jsx)(n.td,{children:"\ud544\uc218"}),(0,d.jsx)(n.td,{children:"\ub300\uc0c1 \ud50c\ub7ab\ud3fc"})]}),(0,d.jsxs)(n.tr,{children:[(0,d.jsx)(n.td,{children:"\ubc84\uc804"}),(0,d.jsx)(n.td,{children:"\ud14d\uc2a4\ud2b8"}),(0,d.jsx)(n.td,{children:"\ud544\uc218"}),(0,d.jsx)(n.td,{children:"\ubc84\uc804 \ubb38\uc790\uc5f4 (\uc608: 1.2.3)"})]}),(0,d.jsxs)(n.tr,{children:[(0,d.jsx)(n.td,{children:"\ucd5c\uc18c \ubc84\uc804"}),(0,d.jsx)(n.td,{children:"\ud14d\uc2a4\ud2b8"}),(0,d.jsx)(n.td,{children:"\ud544\uc218"}),(0,d.jsx)(n.td,{children:"\ucd5c\uc18c \uc694\uad6c \ubc84\uc804"})]}),(0,d.jsxs)(n.tr,{children:[(0,d.jsx)(n.td,{children:"\uac15\uc81c \uc5c5\ub370\uc774\ud2b8"}),(0,d.jsx)(n.td,{children:"\uc2a4\uc704\uce58"}),(0,d.jsx)(n.td,{children:"-"}),(0,d.jsx)(n.td,{children:"\uc5c5\ub370\uc774\ud2b8 \uc548\ub0b4 \uac15\uc81c \uc5ec\ubd80"})]}),(0,d.jsxs)(n.tr,{children:[(0,d.jsx)(n.td,{children:"\uc5c5\ub370\uc774\ud2b8 URL"}),(0,d.jsx)(n.td,{children:"\ud14d\uc2a4\ud2b8"}),(0,d.jsx)(n.td,{children:"-"}),(0,d.jsx)(n.td,{children:"\ub2e4\uc6b4\ub85c\ub4dc/\uc2a4\ud1a0\uc5b4 \ub9c1\ud06c"})]})]})]}),"\n",(0,d.jsxs)(n.ol,{start:"4",children:["\n",(0,d.jsxs)(n.li,{children:[(0,d.jsx)(n.strong,{children:"\uc800\uc7a5"}),"\uc744 \ud074\ub9ad\ud569\ub2c8\ub2e4."]}),"\n"]}),"\n",(0,d.jsx)(n.h2,{id:"api-\ud655\uc778",children:"API \ud655\uc778"}),"\n",(0,d.jsx)(n.p,{children:"\ud074\ub77c\uc774\uc5b8\ud2b8\ub294 \uc2dc\uc791 \uc2dc \ubc84\uc804\uc744 \ud655\uc778\ud569\ub2c8\ub2e4:"}),"\n",(0,d.jsx)(n.pre,{children:(0,d.jsx)(n.code,{className:"language-bash",children:"GET /api/v1/client-version?platform=android&version=1.2.0\n"})}),"\n",(0,d.jsx)(n.p,{children:"\uc751\ub2f5 \uc608\uc2dc:"}),"\n",(0,d.jsx)(n.pre,{children:(0,d.jsx)(n.code,{className:"language-json",children:'{\r\n  "needsUpdate": true,\r\n  "forceUpdate": false,\r\n  "latestVersion": "1.3.0",\r\n  "updateUrl": "https://play.google.com/store/apps/..."\r\n}\n'})})]})}function x(e={}){const{wrapper:n}={...(0,i.R)(),...e.components};return n?(0,d.jsx)(n,{...e,children:(0,d.jsx)(o,{...e})}):o(e)}},8453(e,n,s){s.d(n,{R:()=>t,x:()=>l});var r=s(6540);const d={},i=r.createContext(d);function t(e){const n=r.useContext(i);return r.useMemo(function(){return"function"==typeof e?e(n):{...n,...e}},[n,e])}function l(e){let n;return n=e.disableParentContext?"function"==typeof e.components?e.components(d):e.components||d:t(e.components),r.createElement(i.Provider,{value:n},e.children)}}}]);
+'use strict';
+(globalThis.webpackChunkdocs = globalThis.webpackChunkdocs || []).push([
+  [6549],
+  {
+    6630(e, n, s) {
+      (s.r(n),
+        s.d(n, {
+          assets: () => c,
+          contentTitle: () => l,
+          default: () => x,
+          frontMatter: () => t,
+          metadata: () => r,
+          toc: () => h,
+        }));
+      const r = JSON.parse(
+        '{"id":"admin/client-versions","title":"\ud074\ub77c\uc774\uc5b8\ud2b8 \ubc84\uc804","description":"\uac1c\uc694","source":"@site/i18n/ko/docusaurus-plugin-content-docs/current/admin/client-versions.md","sourceDirName":"admin","slug":"/admin/client-versions","permalink":"/docs/ko/admin/client-versions","draft":false,"unlisted":false,"editUrl":"https://github.com/your-org/gatrix/tree/main/docs/docs/admin/client-versions.md","tags":[],"version":"current","sidebarPosition":4,"frontMatter":{"sidebar_position":4,"sidebar_label":"\ud074\ub77c\uc774\uc5b8\ud2b8 \ubc84\uc804"},"sidebar":"tutorialSidebar","previous":{"title":"\uac8c\uc784 \uc6d4\ub4dc","permalink":"/docs/ko/admin/game-worlds"},"next":{"title":"\uc0ac\uc6a9\uc790 \uad00\ub9ac","permalink":"/docs/ko/admin/users"}}'
+      );
+      var d = s(4848),
+        i = s(8453);
+      const t = {
+          sidebar_position: 4,
+          sidebar_label: '\ud074\ub77c\uc774\uc5b8\ud2b8 \ubc84\uc804',
+        },
+        l = '\ud074\ub77c\uc774\uc5b8\ud2b8 \ubc84\uc804',
+        c = {},
+        h = [
+          { value: '\uac1c\uc694', id: '\uac1c\uc694', level: 2 },
+          { value: '\uae30\ub2a5', id: '\uae30\ub2a5', level: 2 },
+          {
+            value: '\ubc84\uc804 \uc124\uc815 \ud56d\ubaa9',
+            id: '\ubc84\uc804-\uc124\uc815-\ud56d\ubaa9',
+            level: 2,
+          },
+          {
+            value: '\ubc84\uc804 \ucd94\uac00 \ubc29\ubc95',
+            id: '\ubc84\uc804-\ucd94\uac00-\ubc29\ubc95',
+            level: 2,
+          },
+          { value: 'API \ud655\uc778', id: 'api-\ud655\uc778', level: 2 },
+        ];
+      function o(e) {
+        const n = {
+          code: 'code',
+          h1: 'h1',
+          h2: 'h2',
+          header: 'header',
+          li: 'li',
+          ol: 'ol',
+          p: 'p',
+          pre: 'pre',
+          strong: 'strong',
+          table: 'table',
+          tbody: 'tbody',
+          td: 'td',
+          th: 'th',
+          thead: 'thead',
+          tr: 'tr',
+          ul: 'ul',
+          ...(0, i.R)(),
+          ...e.components,
+        };
+        return (0, d.jsxs)(d.Fragment, {
+          children: [
+            (0, d.jsx)(n.header, {
+              children: (0, d.jsx)(n.h1, {
+                id: '\ud074\ub77c\uc774\uc5b8\ud2b8-\ubc84\uc804',
+                children: '\ud074\ub77c\uc774\uc5b8\ud2b8 \ubc84\uc804',
+              }),
+            }),
+            '\n',
+            (0, d.jsx)(n.h2, { id: '\uac1c\uc694', children: '\uac1c\uc694' }),
+            '\n',
+            (0, d.jsx)(n.p, {
+              children:
+                '\uac8c\uc784 \ud074\ub77c\uc774\uc5b8\ud2b8 \ubc84\uc804 \ubc0f \uc5c5\ub370\uc774\ud2b8 \uc694\uad6c \uc0ac\ud56d\uc744 \uad00\ub9ac\ud569\ub2c8\ub2e4.',
+            }),
+            '\n',
+            (0, d.jsxs)(n.p, {
+              children: [
+                (0, d.jsx)(n.strong, { children: '\uc811\uadfc \uacbd\ub85c:' }),
+                ' \uc2dc\uc2a4\ud15c \uad00\ub9ac \u2192 \ud074\ub77c\uc774\uc5b8\ud2b8 \ubc84\uc804',
+              ],
+            }),
+            '\n',
+            (0, d.jsx)(n.h2, { id: '\uae30\ub2a5', children: '\uae30\ub2a5' }),
+            '\n',
+            (0, d.jsxs)(n.ul, {
+              children: [
+                '\n',
+                (0, d.jsx)(n.li, {
+                  children: '\ucd5c\uc18c \ud5c8\uc6a9 \ubc84\uc804 \uc815\uc758',
+                }),
+                '\n',
+                (0, d.jsx)(n.li, {
+                  children: '\uac15\uc81c \uc5c5\ub370\uc774\ud2b8 \uc54c\ub9bc \uc124\uc815',
+                }),
+                '\n',
+                (0, d.jsx)(n.li, {
+                  children:
+                    '\ud50c\ub7ab\ud3fc\ubcc4 \ubc84\uc804 \uad00\ub9ac (iOS, Android, PC \ub4f1)',
+                }),
+                '\n',
+                (0, d.jsx)(n.li, { children: '\uc5c5\ub370\uc774\ud2b8 URL \uad6c\uc131' }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, d.jsx)(n.h2, {
+              id: '\ubc84\uc804-\uc124\uc815-\ud56d\ubaa9',
+              children: '\ubc84\uc804 \uc124\uc815 \ud56d\ubaa9',
+            }),
+            '\n',
+            (0, d.jsxs)(n.table, {
+              children: [
+                (0, d.jsx)(n.thead, {
+                  children: (0, d.jsxs)(n.tr, {
+                    children: [
+                      (0, d.jsx)(n.th, { children: '\ud56d\ubaa9' }),
+                      (0, d.jsx)(n.th, { children: '\uc124\uba85' }),
+                    ],
+                  }),
+                }),
+                (0, d.jsxs)(n.tbody, {
+                  children: [
+                    (0, d.jsxs)(n.tr, {
+                      children: [
+                        (0, d.jsx)(n.td, {
+                          children: (0, d.jsx)(n.strong, { children: '\ud50c\ub7ab\ud3fc' }),
+                        }),
+                        (0, d.jsx)(n.td, { children: 'iOS, Android, Windows, Mac \ub4f1' }),
+                      ],
+                    }),
+                    (0, d.jsxs)(n.tr, {
+                      children: [
+                        (0, d.jsx)(n.td, {
+                          children: (0, d.jsx)(n.strong, { children: '\ucd5c\uc18c \ubc84\uc804' }),
+                        }),
+                        (0, d.jsx)(n.td, {
+                          children:
+                            '\ud5c8\uc6a9\ub418\ub294 \uac00\uc7a5 \uc624\ub798\ub41c \ubc84\uc804',
+                        }),
+                      ],
+                    }),
+                    (0, d.jsxs)(n.tr, {
+                      children: [
+                        (0, d.jsx)(n.td, {
+                          children: (0, d.jsx)(n.strong, { children: '\ucd5c\uc2e0 \ubc84\uc804' }),
+                        }),
+                        (0, d.jsx)(n.td, {
+                          children: '\ud604\uc7ac \ubc30\ud3ec\ub41c \ucd5c\uc2e0 \ubc84\uc804',
+                        }),
+                      ],
+                    }),
+                    (0, d.jsxs)(n.tr, {
+                      children: [
+                        (0, d.jsx)(n.td, {
+                          children: (0, d.jsx)(n.strong, {
+                            children: '\uac15\uc81c \uc5c5\ub370\uc774\ud2b8',
+                          }),
+                        }),
+                        (0, d.jsx)(n.td, {
+                          children:
+                            '\ucd5c\uc18c \ubc84\uc804 \ubbf8\ub9cc\uc77c \uacbd\uc6b0 \uc5c5\ub370\uc774\ud2b8 \ud544\uc218 \uc5ec\ubd80',
+                        }),
+                      ],
+                    }),
+                    (0, d.jsxs)(n.tr, {
+                      children: [
+                        (0, d.jsx)(n.td, {
+                          children: (0, d.jsx)(n.strong, {
+                            children: '\uc5c5\ub370\uc774\ud2b8 URL',
+                          }),
+                        }),
+                        (0, d.jsx)(n.td, {
+                          children:
+                            '\uc2a4\ud1a0\uc5b4 \ub610\ub294 \ub2e4\uc6b4\ub85c\ub4dc \ub9c1\ud06c',
+                        }),
+                      ],
+                    }),
+                  ],
+                }),
+              ],
+            }),
+            '\n',
+            (0, d.jsx)(n.h2, {
+              id: '\ubc84\uc804-\ucd94\uac00-\ubc29\ubc95',
+              children: '\ubc84\uc804 \ucd94\uac00 \ubc29\ubc95',
+            }),
+            '\n',
+            (0, d.jsxs)(n.ol, {
+              children: [
+                '\n',
+                (0, d.jsxs)(n.li, {
+                  children: [
+                    (0, d.jsx)(n.strong, { children: '\uc2dc\uc2a4\ud15c \uad00\ub9ac' }),
+                    ' > ',
+                    (0, d.jsx)(n.strong, {
+                      children: '\ud074\ub77c\uc774\uc5b8\ud2b8 \ubc84\uc804',
+                    }),
+                    '\ub85c \uc774\ub3d9\ud569\ub2c8\ub2e4.',
+                  ],
+                }),
+                '\n',
+                (0, d.jsxs)(n.li, {
+                  children: [
+                    (0, d.jsx)(n.strong, { children: '\ubc84\uc804 \ucd94\uac00' }),
+                    ' \ubc84\ud2bc\uc744 \ud074\ub9ad\ud569\ub2c8\ub2e4.',
+                  ],
+                }),
+                '\n',
+                (0, d.jsx)(n.li, {
+                  children: '\ub2e4\uc74c\uc744 \uc124\uc815\ud569\ub2c8\ub2e4:',
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, d.jsxs)(n.table, {
+              children: [
+                (0, d.jsx)(n.thead, {
+                  children: (0, d.jsxs)(n.tr, {
+                    children: [
+                      (0, d.jsx)(n.th, { children: '\ud544\ub4dc' }),
+                      (0, d.jsx)(n.th, { children: '\uc720\ud615' }),
+                      (0, d.jsx)(n.th, { children: '\ud544\uc218 \uc5ec\ubd80' }),
+                      (0, d.jsx)(n.th, { children: '\uc124\uba85' }),
+                    ],
+                  }),
+                }),
+                (0, d.jsxs)(n.tbody, {
+                  children: [
+                    (0, d.jsxs)(n.tr, {
+                      children: [
+                        (0, d.jsx)(n.td, { children: '\ud50c\ub7ab\ud3fc' }),
+                        (0, d.jsx)(n.td, { children: '\uc120\ud0dd' }),
+                        (0, d.jsx)(n.td, { children: '\ud544\uc218' }),
+                        (0, d.jsx)(n.td, { children: '\ub300\uc0c1 \ud50c\ub7ab\ud3fc' }),
+                      ],
+                    }),
+                    (0, d.jsxs)(n.tr, {
+                      children: [
+                        (0, d.jsx)(n.td, { children: '\ubc84\uc804' }),
+                        (0, d.jsx)(n.td, { children: '\ud14d\uc2a4\ud2b8' }),
+                        (0, d.jsx)(n.td, { children: '\ud544\uc218' }),
+                        (0, d.jsx)(n.td, {
+                          children: '\ubc84\uc804 \ubb38\uc790\uc5f4 (\uc608: 1.2.3)',
+                        }),
+                      ],
+                    }),
+                    (0, d.jsxs)(n.tr, {
+                      children: [
+                        (0, d.jsx)(n.td, { children: '\ucd5c\uc18c \ubc84\uc804' }),
+                        (0, d.jsx)(n.td, { children: '\ud14d\uc2a4\ud2b8' }),
+                        (0, d.jsx)(n.td, { children: '\ud544\uc218' }),
+                        (0, d.jsx)(n.td, { children: '\ucd5c\uc18c \uc694\uad6c \ubc84\uc804' }),
+                      ],
+                    }),
+                    (0, d.jsxs)(n.tr, {
+                      children: [
+                        (0, d.jsx)(n.td, { children: '\uac15\uc81c \uc5c5\ub370\uc774\ud2b8' }),
+                        (0, d.jsx)(n.td, { children: '\uc2a4\uc704\uce58' }),
+                        (0, d.jsx)(n.td, { children: '-' }),
+                        (0, d.jsx)(n.td, {
+                          children:
+                            '\uc5c5\ub370\uc774\ud2b8 \uc548\ub0b4 \uac15\uc81c \uc5ec\ubd80',
+                        }),
+                      ],
+                    }),
+                    (0, d.jsxs)(n.tr, {
+                      children: [
+                        (0, d.jsx)(n.td, { children: '\uc5c5\ub370\uc774\ud2b8 URL' }),
+                        (0, d.jsx)(n.td, { children: '\ud14d\uc2a4\ud2b8' }),
+                        (0, d.jsx)(n.td, { children: '-' }),
+                        (0, d.jsx)(n.td, {
+                          children: '\ub2e4\uc6b4\ub85c\ub4dc/\uc2a4\ud1a0\uc5b4 \ub9c1\ud06c',
+                        }),
+                      ],
+                    }),
+                  ],
+                }),
+              ],
+            }),
+            '\n',
+            (0, d.jsxs)(n.ol, {
+              start: '4',
+              children: [
+                '\n',
+                (0, d.jsxs)(n.li, {
+                  children: [
+                    (0, d.jsx)(n.strong, { children: '\uc800\uc7a5' }),
+                    '\uc744 \ud074\ub9ad\ud569\ub2c8\ub2e4.',
+                  ],
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, d.jsx)(n.h2, { id: 'api-\ud655\uc778', children: 'API \ud655\uc778' }),
+            '\n',
+            (0, d.jsx)(n.p, {
+              children:
+                '\ud074\ub77c\uc774\uc5b8\ud2b8\ub294 \uc2dc\uc791 \uc2dc \ubc84\uc804\uc744 \ud655\uc778\ud569\ub2c8\ub2e4:',
+            }),
+            '\n',
+            (0, d.jsx)(n.pre, {
+              children: (0, d.jsx)(n.code, {
+                className: 'language-bash',
+                children: 'GET /api/v1/client-version?platform=android&version=1.2.0\n',
+              }),
+            }),
+            '\n',
+            (0, d.jsx)(n.p, { children: '\uc751\ub2f5 \uc608\uc2dc:' }),
+            '\n',
+            (0, d.jsx)(n.pre, {
+              children: (0, d.jsx)(n.code, {
+                className: 'language-json',
+                children:
+                  '{\r\n  "needsUpdate": true,\r\n  "forceUpdate": false,\r\n  "latestVersion": "1.3.0",\r\n  "updateUrl": "https://play.google.com/store/apps/..."\r\n}\n',
+              }),
+            }),
+          ],
+        });
+      }
+      function x(e = {}) {
+        const { wrapper: n } = { ...(0, i.R)(), ...e.components };
+        return n ? (0, d.jsx)(n, { ...e, children: (0, d.jsx)(o, { ...e }) }) : o(e);
+      }
+    },
+    8453(e, n, s) {
+      s.d(n, { R: () => t, x: () => l });
+      var r = s(6540);
+      const d = {},
+        i = r.createContext(d);
+      function t(e) {
+        const n = r.useContext(i);
+        return r.useMemo(
+          function () {
+            return 'function' == typeof e ? e(n) : { ...n, ...e };
+          },
+          [n, e]
+        );
+      }
+      function l(e) {
+        let n;
+        return (
+          (n = e.disableParentContext
+            ? 'function' == typeof e.components
+              ? e.components(d)
+              : e.components || d
+            : t(e.components)),
+          r.createElement(i.Provider, { value: n }, e.children)
+        );
+      }
+    },
+  },
+]);

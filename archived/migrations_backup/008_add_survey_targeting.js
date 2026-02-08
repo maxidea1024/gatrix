@@ -6,13 +6,12 @@
  * These columns were added in 007_create_surveys or earlier migrations.
  */
 
-exports.up = async function(connection) {
+exports.up = async function (connection) {
   console.log('Skipping: g_surveys table already has targeting fields');
   // No-op: columns already exist
 };
 
-exports.down = async function(connection) {
+exports.down = async function (connection) {
   console.log('Skipping rollback: no changes were made in this migration');
   // No-op: nothing to rollback
 };
-

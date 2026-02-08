@@ -1,1 +1,71 @@
-"use strict";(globalThis.webpackChunkdocs=globalThis.webpackChunkdocs||[]).push([[8609],{2421(e){e.exports=JSON.parse('{"permalink":"/docs/zh-Hans/blog/welcome-to-gatrix","editUrl":"https://github.com/your-org/gatrix/tree/main/docs/blog/2019-05-28-first-blog-post.md","source":"@site/blog/2019-05-28-first-blog-post.md","title":"Welcome to Gatrix - A New Dimension of Game Platform Management","description":"Gatrix is an integrated management system for online game services. We provide a powerful and scalable game management platform using modern technologies.","date":"2019-05-28T00:00:00.000Z","tags":[{"inline":false,"label":"Gatrix","permalink":"/docs/zh-Hans/blog/tags/gatrix","description":"Gatrix game platform management system"},{"inline":false,"label":"Announcement","permalink":"/docs/zh-Hans/blog/tags/announcement","description":"Important announcements and updates"},{"inline":false,"label":"Features","permalink":"/docs/zh-Hans/blog/tags/features","description":"Platform features and capabilities"}],"readingTime":1.48,"hasTruncateMarker":true,"authors":[{"name":"Gatrix Team","title":"Game Platform Development Team","url":"https://github.com/your-org/gatrix","page":{"permalink":"/docs/zh-Hans/blog/authors/gatrix-team"},"socials":{"github":"https://github.com/your-org","email":"mailto:support@gatrix.com"},"imageURL":"https://avatars.githubusercontent.com/u/0?v=4","key":"gatrix-team"}],"frontMatter":{"slug":"welcome-to-gatrix","title":"Welcome to Gatrix - A New Dimension of Game Platform Management","authors":["gatrix-team"],"tags":["gatrix","announcement","features"]},"unlisted":false,"prevItem":{"title":"Mastering Gatrix Job Management System","permalink":"/docs/zh-Hans/blog/mastering-job-management-system"}}')},5026(e,t,a){a.r(t),a.d(t,{assets:()=>m,contentTitle:()=>i,default:()=>g,frontMatter:()=>s,metadata:()=>n,toc:()=>l});var n=a(2421),o=a(4848),r=a(8453);const s={slug:"welcome-to-gatrix",title:"Welcome to Gatrix - A New Dimension of Game Platform Management",authors:["gatrix-team"],tags:["gatrix","announcement","features"]},i=void 0,m={authorsImageUrls:[void 0]},l=[];function c(e){const t={p:"p",...(0,r.R)(),...e.components};return(0,o.jsx)(t.p,{children:"Gatrix is an integrated management system for online game services. We provide a powerful and scalable game management platform using modern technologies."})}function g(e={}){const{wrapper:t}={...(0,r.R)(),...e.components};return t?(0,o.jsx)(t,{...e,children:(0,o.jsx)(c,{...e})}):c(e)}},8453(e,t,a){a.d(t,{R:()=>s,x:()=>i});var n=a(6540);const o={},r=n.createContext(o);function s(e){const t=n.useContext(r);return n.useMemo(function(){return"function"==typeof e?e(t):{...t,...e}},[t,e])}function i(e){let t;return t=e.disableParentContext?"function"==typeof e.components?e.components(o):e.components||o:s(e.components),n.createElement(r.Provider,{value:t},e.children)}}}]);
+'use strict';
+(globalThis.webpackChunkdocs = globalThis.webpackChunkdocs || []).push([
+  [8609],
+  {
+    2421(e) {
+      e.exports = JSON.parse(
+        '{"permalink":"/docs/zh-Hans/blog/welcome-to-gatrix","editUrl":"https://github.com/your-org/gatrix/tree/main/docs/blog/2019-05-28-first-blog-post.md","source":"@site/blog/2019-05-28-first-blog-post.md","title":"Welcome to Gatrix - A New Dimension of Game Platform Management","description":"Gatrix is an integrated management system for online game services. We provide a powerful and scalable game management platform using modern technologies.","date":"2019-05-28T00:00:00.000Z","tags":[{"inline":false,"label":"Gatrix","permalink":"/docs/zh-Hans/blog/tags/gatrix","description":"Gatrix game platform management system"},{"inline":false,"label":"Announcement","permalink":"/docs/zh-Hans/blog/tags/announcement","description":"Important announcements and updates"},{"inline":false,"label":"Features","permalink":"/docs/zh-Hans/blog/tags/features","description":"Platform features and capabilities"}],"readingTime":1.48,"hasTruncateMarker":true,"authors":[{"name":"Gatrix Team","title":"Game Platform Development Team","url":"https://github.com/your-org/gatrix","page":{"permalink":"/docs/zh-Hans/blog/authors/gatrix-team"},"socials":{"github":"https://github.com/your-org","email":"mailto:support@gatrix.com"},"imageURL":"https://avatars.githubusercontent.com/u/0?v=4","key":"gatrix-team"}],"frontMatter":{"slug":"welcome-to-gatrix","title":"Welcome to Gatrix - A New Dimension of Game Platform Management","authors":["gatrix-team"],"tags":["gatrix","announcement","features"]},"unlisted":false,"prevItem":{"title":"Mastering Gatrix Job Management System","permalink":"/docs/zh-Hans/blog/mastering-job-management-system"}}'
+      );
+    },
+    5026(e, t, a) {
+      (a.r(t),
+        a.d(t, {
+          assets: () => m,
+          contentTitle: () => i,
+          default: () => g,
+          frontMatter: () => s,
+          metadata: () => n,
+          toc: () => l,
+        }));
+      var n = a(2421),
+        o = a(4848),
+        r = a(8453);
+      const s = {
+          slug: 'welcome-to-gatrix',
+          title: 'Welcome to Gatrix - A New Dimension of Game Platform Management',
+          authors: ['gatrix-team'],
+          tags: ['gatrix', 'announcement', 'features'],
+        },
+        i = void 0,
+        m = { authorsImageUrls: [void 0] },
+        l = [];
+      function c(e) {
+        const t = { p: 'p', ...(0, r.R)(), ...e.components };
+        return (0, o.jsx)(t.p, {
+          children:
+            'Gatrix is an integrated management system for online game services. We provide a powerful and scalable game management platform using modern technologies.',
+        });
+      }
+      function g(e = {}) {
+        const { wrapper: t } = { ...(0, r.R)(), ...e.components };
+        return t ? (0, o.jsx)(t, { ...e, children: (0, o.jsx)(c, { ...e }) }) : c(e);
+      }
+    },
+    8453(e, t, a) {
+      a.d(t, { R: () => s, x: () => i });
+      var n = a(6540);
+      const o = {},
+        r = n.createContext(o);
+      function s(e) {
+        const t = n.useContext(r);
+        return n.useMemo(
+          function () {
+            return 'function' == typeof e ? e(t) : { ...t, ...e };
+          },
+          [t, e]
+        );
+      }
+      function i(e) {
+        let t;
+        return (
+          (t = e.disableParentContext
+            ? 'function' == typeof e.components
+              ? e.components(o)
+              : e.components || o
+            : s(e.components)),
+          n.createElement(r.Provider, { value: t }, e.children)
+        );
+      }
+    },
+  },
+]);

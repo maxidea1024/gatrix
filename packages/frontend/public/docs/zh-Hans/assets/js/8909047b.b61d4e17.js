@@ -1,1 +1,305 @@
-"use strict";(globalThis.webpackChunkdocs=globalThis.webpackChunkdocs||[]).push([[4448],{5025(n,e,s){s.r(e),s.d(e,{assets:()=>c,contentTitle:()=>t,default:()=>o,frontMatter:()=>l,metadata:()=>i,toc:()=>h});const i=JSON.parse('{"id":"guide/surveys","title":"\u95ee\u5377\u8c03\u67e5","description":"\u6982\u8ff0","source":"@site/i18n/zh-Hans/docusaurus-plugin-content-docs/current/guide/surveys.md","sourceDirName":"guide","slug":"/guide/surveys","permalink":"/docs/zh-Hans/guide/surveys","draft":false,"unlisted":false,"editUrl":"https://github.com/your-org/gatrix/tree/main/docs/docs/guide/surveys.md","tags":[],"version":"current","sidebarPosition":4,"frontMatter":{"sidebar_position":4,"sidebar_label":"\u95ee\u5377\u8c03\u67e5"},"sidebar":"tutorialSidebar","previous":{"title":"\u4f18\u60e0\u5238","permalink":"/docs/zh-Hans/guide/coupons"},"next":{"title":"\u5546\u5e97\u5546\u54c1","permalink":"/docs/zh-Hans/guide/store-products"}}');var r=s(4848),d=s(8453);const l={sidebar_position:4,sidebar_label:"\u95ee\u5377\u8c03\u67e5"},t="\u95ee\u5377\u8c03\u67e5",c={},h=[{value:"\u6982\u8ff0",id:"\u6982\u8ff0",level:2},{value:"\u529f\u80fd",id:"\u529f\u80fd",level:2},{value:"\u521b\u5efa\u95ee\u5377\u7684\u65b9\u6cd5",id:"\u521b\u5efa\u95ee\u5377\u7684\u65b9\u6cd5",level:2},{value:"\u9898\u578b",id:"\u9898\u578b",level:2},{value:"\u7ed3\u679c\u5206\u6790",id:"\u7ed3\u679c\u5206\u6790",level:2}];function x(n){const e={h1:"h1",h2:"h2",header:"header",li:"li",ol:"ol",p:"p",strong:"strong",table:"table",tbody:"tbody",td:"td",th:"th",thead:"thead",tr:"tr",ul:"ul",...(0,d.R)(),...n.components};return(0,r.jsxs)(r.Fragment,{children:[(0,r.jsx)(e.header,{children:(0,r.jsx)(e.h1,{id:"\u95ee\u5377\u8c03\u67e5",children:"\u95ee\u5377\u8c03\u67e5"})}),"\n",(0,r.jsx)(e.h2,{id:"\u6982\u8ff0",children:"\u6982\u8ff0"}),"\n",(0,r.jsx)(e.p,{children:"\u521b\u5efa\u548c\u7ba1\u7406\u6e38\u620f\u5185\u95ee\u5377\uff0c\u4ee5\u6536\u96c6\u73a9\u5bb6\u53cd\u9988\u3002"}),"\n",(0,r.jsxs)(e.p,{children:[(0,r.jsx)(e.strong,{children:"\u8bbf\u95ee\u8def\u5f84\uff1a"})," \u6e38\u620f\u8fd0\u8425 \u2192 \u95ee\u5377\u8c03\u67e5"]}),"\n",(0,r.jsx)(e.h2,{id:"\u529f\u80fd",children:"\u529f\u80fd"}),"\n",(0,r.jsxs)(e.ul,{children:["\n",(0,r.jsx)(e.li,{children:"\u521b\u5efa\u5305\u542b\u591a\u79cd\u9898\u578b\u7684\u95ee\u5377"}),"\n",(0,r.jsx)(e.li,{children:"\u9488\u5bf9\u7279\u5b9a\u7528\u6237\u7fa4\u7ec4"}),"\n",(0,r.jsx)(e.li,{children:"\u8bbe\u7f6e\u8c03\u67e5\u5468\u671f"}),"\n",(0,r.jsx)(e.li,{children:"\u5206\u6790\u8c03\u7814\u6570\u636e"}),"\n",(0,r.jsx)(e.li,{children:"\u5bfc\u51fa\u7ed3\u679c"}),"\n"]}),"\n",(0,r.jsx)(e.h2,{id:"\u521b\u5efa\u95ee\u5377\u7684\u65b9\u6cd5",children:"\u521b\u5efa\u95ee\u5377\u7684\u65b9\u6cd5"}),"\n",(0,r.jsxs)(e.ol,{children:["\n",(0,r.jsxs)(e.li,{children:["\u524d\u5f80 ",(0,r.jsx)(e.strong,{children:"\u6e38\u620f\u8fd0\u8425"})," > ",(0,r.jsx)(e.strong,{children:"\u95ee\u5377\u8c03\u67e5"}),"\u3002"]}),"\n",(0,r.jsxs)(e.li,{children:["\u70b9\u51fb ",(0,r.jsx)(e.strong,{children:"\u6dfb\u52a0\u95ee\u5377"})," \u6309\u94ae\u3002"]}),"\n",(0,r.jsx)(e.li,{children:"\u914d\u7f6e\u95ee\u5377\uff1a"}),"\n"]}),"\n",(0,r.jsxs)(e.table,{children:[(0,r.jsx)(e.thead,{children:(0,r.jsxs)(e.tr,{children:[(0,r.jsx)(e.th,{children:"\u5b57\u6bb5"}),(0,r.jsx)(e.th,{children:"\u7c7b\u578b"}),(0,r.jsx)(e.th,{children:"\u662f\u5426\u5fc5\u586b"}),(0,r.jsx)(e.th,{children:"\u8bf4\u660e"})]})}),(0,r.jsxs)(e.tbody,{children:[(0,r.jsxs)(e.tr,{children:[(0,r.jsx)(e.td,{children:"\u6807\u9898"}),(0,r.jsx)(e.td,{children:"\u6587\u672c"}),(0,r.jsx)(e.td,{children:"\u5fc5\u586b"}),(0,r.jsx)(e.td,{children:"\u95ee\u5377\u6807\u9898"})]}),(0,r.jsxs)(e.tr,{children:[(0,r.jsx)(e.td,{children:"\u8bf4\u660e"}),(0,r.jsx)(e.td,{children:"\u6587\u672c\u57df"}),(0,r.jsx)(e.td,{children:"-"}),(0,r.jsx)(e.td,{children:"\u95ee\u5377\u63cf\u8ff0"})]}),(0,r.jsxs)(e.tr,{children:[(0,r.jsx)(e.td,{children:"\u5f00\u59cb\u65f6\u95f4"}),(0,r.jsx)(e.td,{children:"\u65e5\u671f\u65f6\u95f4\u9009\u62e9"}),(0,r.jsx)(e.td,{children:"-"}),(0,r.jsx)(e.td,{children:"\u95ee\u5377\u5f00\u59cb\u65f6\u95f4"})]}),(0,r.jsxs)(e.tr,{children:[(0,r.jsx)(e.td,{children:"\u7ed3\u675f\u65f6\u95f4"}),(0,r.jsx)(e.td,{children:"\u65e5\u671f\u65f6\u95f4\u9009\u62e9"}),(0,r.jsx)(e.td,{children:"-"}),(0,r.jsx)(e.td,{children:"\u95ee\u5377\u5173\u95ed\u65f6\u95f4"})]}),(0,r.jsxs)(e.tr,{children:[(0,r.jsx)(e.td,{children:"\u76ee\u6807\u7fa4\u7ec4"}),(0,r.jsx)(e.td,{children:"\u4e0b\u62c9\u9009\u62e9"}),(0,r.jsx)(e.td,{children:"-"}),(0,r.jsx)(e.td,{children:"\u76ee\u6807\u7fa4\u7ec4"})]})]})]}),"\n",(0,r.jsxs)(e.ol,{start:"4",children:["\n",(0,r.jsx)(e.li,{children:"\u6dfb\u52a0\u95ee\u9898\u3002"}),"\n",(0,r.jsxs)(e.li,{children:["\u70b9\u51fb ",(0,r.jsx)(e.strong,{children:"\u521b\u5efa"})," \u4fdd\u5b58\u3002"]}),"\n"]}),"\n",(0,r.jsx)(e.h2,{id:"\u9898\u578b",children:"\u9898\u578b"}),"\n",(0,r.jsxs)(e.ul,{children:["\n",(0,r.jsxs)(e.li,{children:[(0,r.jsx)(e.strong,{children:"\u5355\u9009\u9898"})," - \u5355\u9009\u6309\u94ae\uff0c\u4e00\u4e2a\u7b54\u6848"]}),"\n",(0,r.jsxs)(e.li,{children:[(0,r.jsx)(e.strong,{children:"\u591a\u9009\u9898"})," - \u590d\u9009\u6846\uff0c\u591a\u4e2a\u7b54\u6848"]}),"\n",(0,r.jsxs)(e.li,{children:[(0,r.jsx)(e.strong,{children:"\u6587\u672c\u9898"})," - \u5f00\u653e\u5f0f\u6587\u672c\u56de\u7b54"]}),"\n",(0,r.jsxs)(e.li,{children:[(0,r.jsx)(e.strong,{children:"\u8bc4\u5206\u9898"})," - 1-5 \u661f\u7ea7\u8bc4\u5206"]}),"\n",(0,r.jsxs)(e.li,{children:[(0,r.jsx)(e.strong,{children:"\u91cf\u8868\u9898"})," - \u6570\u5b57\u91cf\u8868 (1-10)"]}),"\n"]}),"\n",(0,r.jsx)(e.h2,{id:"\u7ed3\u679c\u5206\u6790",children:"\u7ed3\u679c\u5206\u6790"}),"\n",(0,r.jsx)(e.p,{children:"\u67e5\u770b\u95ee\u5377\u7ed3\u679c\uff0c\u5305\u62ec\uff1a"}),"\n",(0,r.jsxs)(e.ul,{children:["\n",(0,r.jsx)(e.li,{children:"\u603b\u56de\u590d\u6570"}),"\n",(0,r.jsx)(e.li,{children:"\u56de\u590d\u7387"}),"\n",(0,r.jsx)(e.li,{children:"\u7b54\u6848\u5206\u5e03"}),"\n",(0,r.jsx)(e.li,{children:"\u5e73\u5747\u8bc4\u5206"}),"\n",(0,r.jsx)(e.li,{children:"\u5bfc\u51fa\u4e3a CSV"}),"\n"]})]})}function o(n={}){const{wrapper:e}={...(0,d.R)(),...n.components};return e?(0,r.jsx)(e,{...n,children:(0,r.jsx)(x,{...n})}):x(n)}},8453(n,e,s){s.d(e,{R:()=>l,x:()=>t});var i=s(6540);const r={},d=i.createContext(r);function l(n){const e=i.useContext(d);return i.useMemo(function(){return"function"==typeof n?n(e):{...e,...n}},[e,n])}function t(n){let e;return e=n.disableParentContext?"function"==typeof n.components?n.components(r):n.components||r:l(n.components),i.createElement(d.Provider,{value:e},n.children)}}}]);
+'use strict';
+(globalThis.webpackChunkdocs = globalThis.webpackChunkdocs || []).push([
+  [4448],
+  {
+    5025(n, e, s) {
+      (s.r(e),
+        s.d(e, {
+          assets: () => c,
+          contentTitle: () => t,
+          default: () => o,
+          frontMatter: () => l,
+          metadata: () => i,
+          toc: () => h,
+        }));
+      const i = JSON.parse(
+        '{"id":"guide/surveys","title":"\u95ee\u5377\u8c03\u67e5","description":"\u6982\u8ff0","source":"@site/i18n/zh-Hans/docusaurus-plugin-content-docs/current/guide/surveys.md","sourceDirName":"guide","slug":"/guide/surveys","permalink":"/docs/zh-Hans/guide/surveys","draft":false,"unlisted":false,"editUrl":"https://github.com/your-org/gatrix/tree/main/docs/docs/guide/surveys.md","tags":[],"version":"current","sidebarPosition":4,"frontMatter":{"sidebar_position":4,"sidebar_label":"\u95ee\u5377\u8c03\u67e5"},"sidebar":"tutorialSidebar","previous":{"title":"\u4f18\u60e0\u5238","permalink":"/docs/zh-Hans/guide/coupons"},"next":{"title":"\u5546\u5e97\u5546\u54c1","permalink":"/docs/zh-Hans/guide/store-products"}}'
+      );
+      var r = s(4848),
+        d = s(8453);
+      const l = { sidebar_position: 4, sidebar_label: '\u95ee\u5377\u8c03\u67e5' },
+        t = '\u95ee\u5377\u8c03\u67e5',
+        c = {},
+        h = [
+          { value: '\u6982\u8ff0', id: '\u6982\u8ff0', level: 2 },
+          { value: '\u529f\u80fd', id: '\u529f\u80fd', level: 2 },
+          {
+            value: '\u521b\u5efa\u95ee\u5377\u7684\u65b9\u6cd5',
+            id: '\u521b\u5efa\u95ee\u5377\u7684\u65b9\u6cd5',
+            level: 2,
+          },
+          { value: '\u9898\u578b', id: '\u9898\u578b', level: 2 },
+          { value: '\u7ed3\u679c\u5206\u6790', id: '\u7ed3\u679c\u5206\u6790', level: 2 },
+        ];
+      function x(n) {
+        const e = {
+          h1: 'h1',
+          h2: 'h2',
+          header: 'header',
+          li: 'li',
+          ol: 'ol',
+          p: 'p',
+          strong: 'strong',
+          table: 'table',
+          tbody: 'tbody',
+          td: 'td',
+          th: 'th',
+          thead: 'thead',
+          tr: 'tr',
+          ul: 'ul',
+          ...(0, d.R)(),
+          ...n.components,
+        };
+        return (0, r.jsxs)(r.Fragment, {
+          children: [
+            (0, r.jsx)(e.header, {
+              children: (0, r.jsx)(e.h1, {
+                id: '\u95ee\u5377\u8c03\u67e5',
+                children: '\u95ee\u5377\u8c03\u67e5',
+              }),
+            }),
+            '\n',
+            (0, r.jsx)(e.h2, { id: '\u6982\u8ff0', children: '\u6982\u8ff0' }),
+            '\n',
+            (0, r.jsx)(e.p, {
+              children:
+                '\u521b\u5efa\u548c\u7ba1\u7406\u6e38\u620f\u5185\u95ee\u5377\uff0c\u4ee5\u6536\u96c6\u73a9\u5bb6\u53cd\u9988\u3002',
+            }),
+            '\n',
+            (0, r.jsxs)(e.p, {
+              children: [
+                (0, r.jsx)(e.strong, { children: '\u8bbf\u95ee\u8def\u5f84\uff1a' }),
+                ' \u6e38\u620f\u8fd0\u8425 \u2192 \u95ee\u5377\u8c03\u67e5',
+              ],
+            }),
+            '\n',
+            (0, r.jsx)(e.h2, { id: '\u529f\u80fd', children: '\u529f\u80fd' }),
+            '\n',
+            (0, r.jsxs)(e.ul, {
+              children: [
+                '\n',
+                (0, r.jsx)(e.li, {
+                  children: '\u521b\u5efa\u5305\u542b\u591a\u79cd\u9898\u578b\u7684\u95ee\u5377',
+                }),
+                '\n',
+                (0, r.jsx)(e.li, { children: '\u9488\u5bf9\u7279\u5b9a\u7528\u6237\u7fa4\u7ec4' }),
+                '\n',
+                (0, r.jsx)(e.li, { children: '\u8bbe\u7f6e\u8c03\u67e5\u5468\u671f' }),
+                '\n',
+                (0, r.jsx)(e.li, { children: '\u5206\u6790\u8c03\u7814\u6570\u636e' }),
+                '\n',
+                (0, r.jsx)(e.li, { children: '\u5bfc\u51fa\u7ed3\u679c' }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, r.jsx)(e.h2, {
+              id: '\u521b\u5efa\u95ee\u5377\u7684\u65b9\u6cd5',
+              children: '\u521b\u5efa\u95ee\u5377\u7684\u65b9\u6cd5',
+            }),
+            '\n',
+            (0, r.jsxs)(e.ol, {
+              children: [
+                '\n',
+                (0, r.jsxs)(e.li, {
+                  children: [
+                    '\u524d\u5f80 ',
+                    (0, r.jsx)(e.strong, { children: '\u6e38\u620f\u8fd0\u8425' }),
+                    ' > ',
+                    (0, r.jsx)(e.strong, { children: '\u95ee\u5377\u8c03\u67e5' }),
+                    '\u3002',
+                  ],
+                }),
+                '\n',
+                (0, r.jsxs)(e.li, {
+                  children: [
+                    '\u70b9\u51fb ',
+                    (0, r.jsx)(e.strong, { children: '\u6dfb\u52a0\u95ee\u5377' }),
+                    ' \u6309\u94ae\u3002',
+                  ],
+                }),
+                '\n',
+                (0, r.jsx)(e.li, { children: '\u914d\u7f6e\u95ee\u5377\uff1a' }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, r.jsxs)(e.table, {
+              children: [
+                (0, r.jsx)(e.thead, {
+                  children: (0, r.jsxs)(e.tr, {
+                    children: [
+                      (0, r.jsx)(e.th, { children: '\u5b57\u6bb5' }),
+                      (0, r.jsx)(e.th, { children: '\u7c7b\u578b' }),
+                      (0, r.jsx)(e.th, { children: '\u662f\u5426\u5fc5\u586b' }),
+                      (0, r.jsx)(e.th, { children: '\u8bf4\u660e' }),
+                    ],
+                  }),
+                }),
+                (0, r.jsxs)(e.tbody, {
+                  children: [
+                    (0, r.jsxs)(e.tr, {
+                      children: [
+                        (0, r.jsx)(e.td, { children: '\u6807\u9898' }),
+                        (0, r.jsx)(e.td, { children: '\u6587\u672c' }),
+                        (0, r.jsx)(e.td, { children: '\u5fc5\u586b' }),
+                        (0, r.jsx)(e.td, { children: '\u95ee\u5377\u6807\u9898' }),
+                      ],
+                    }),
+                    (0, r.jsxs)(e.tr, {
+                      children: [
+                        (0, r.jsx)(e.td, { children: '\u8bf4\u660e' }),
+                        (0, r.jsx)(e.td, { children: '\u6587\u672c\u57df' }),
+                        (0, r.jsx)(e.td, { children: '-' }),
+                        (0, r.jsx)(e.td, { children: '\u95ee\u5377\u63cf\u8ff0' }),
+                      ],
+                    }),
+                    (0, r.jsxs)(e.tr, {
+                      children: [
+                        (0, r.jsx)(e.td, { children: '\u5f00\u59cb\u65f6\u95f4' }),
+                        (0, r.jsx)(e.td, { children: '\u65e5\u671f\u65f6\u95f4\u9009\u62e9' }),
+                        (0, r.jsx)(e.td, { children: '-' }),
+                        (0, r.jsx)(e.td, { children: '\u95ee\u5377\u5f00\u59cb\u65f6\u95f4' }),
+                      ],
+                    }),
+                    (0, r.jsxs)(e.tr, {
+                      children: [
+                        (0, r.jsx)(e.td, { children: '\u7ed3\u675f\u65f6\u95f4' }),
+                        (0, r.jsx)(e.td, { children: '\u65e5\u671f\u65f6\u95f4\u9009\u62e9' }),
+                        (0, r.jsx)(e.td, { children: '-' }),
+                        (0, r.jsx)(e.td, { children: '\u95ee\u5377\u5173\u95ed\u65f6\u95f4' }),
+                      ],
+                    }),
+                    (0, r.jsxs)(e.tr, {
+                      children: [
+                        (0, r.jsx)(e.td, { children: '\u76ee\u6807\u7fa4\u7ec4' }),
+                        (0, r.jsx)(e.td, { children: '\u4e0b\u62c9\u9009\u62e9' }),
+                        (0, r.jsx)(e.td, { children: '-' }),
+                        (0, r.jsx)(e.td, { children: '\u76ee\u6807\u7fa4\u7ec4' }),
+                      ],
+                    }),
+                  ],
+                }),
+              ],
+            }),
+            '\n',
+            (0, r.jsxs)(e.ol, {
+              start: '4',
+              children: [
+                '\n',
+                (0, r.jsx)(e.li, { children: '\u6dfb\u52a0\u95ee\u9898\u3002' }),
+                '\n',
+                (0, r.jsxs)(e.li, {
+                  children: [
+                    '\u70b9\u51fb ',
+                    (0, r.jsx)(e.strong, { children: '\u521b\u5efa' }),
+                    ' \u4fdd\u5b58\u3002',
+                  ],
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, r.jsx)(e.h2, { id: '\u9898\u578b', children: '\u9898\u578b' }),
+            '\n',
+            (0, r.jsxs)(e.ul, {
+              children: [
+                '\n',
+                (0, r.jsxs)(e.li, {
+                  children: [
+                    (0, r.jsx)(e.strong, { children: '\u5355\u9009\u9898' }),
+                    ' - \u5355\u9009\u6309\u94ae\uff0c\u4e00\u4e2a\u7b54\u6848',
+                  ],
+                }),
+                '\n',
+                (0, r.jsxs)(e.li, {
+                  children: [
+                    (0, r.jsx)(e.strong, { children: '\u591a\u9009\u9898' }),
+                    ' - \u590d\u9009\u6846\uff0c\u591a\u4e2a\u7b54\u6848',
+                  ],
+                }),
+                '\n',
+                (0, r.jsxs)(e.li, {
+                  children: [
+                    (0, r.jsx)(e.strong, { children: '\u6587\u672c\u9898' }),
+                    ' - \u5f00\u653e\u5f0f\u6587\u672c\u56de\u7b54',
+                  ],
+                }),
+                '\n',
+                (0, r.jsxs)(e.li, {
+                  children: [
+                    (0, r.jsx)(e.strong, { children: '\u8bc4\u5206\u9898' }),
+                    ' - 1-5 \u661f\u7ea7\u8bc4\u5206',
+                  ],
+                }),
+                '\n',
+                (0, r.jsxs)(e.li, {
+                  children: [
+                    (0, r.jsx)(e.strong, { children: '\u91cf\u8868\u9898' }),
+                    ' - \u6570\u5b57\u91cf\u8868 (1-10)',
+                  ],
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, r.jsx)(e.h2, {
+              id: '\u7ed3\u679c\u5206\u6790',
+              children: '\u7ed3\u679c\u5206\u6790',
+            }),
+            '\n',
+            (0, r.jsx)(e.p, {
+              children: '\u67e5\u770b\u95ee\u5377\u7ed3\u679c\uff0c\u5305\u62ec\uff1a',
+            }),
+            '\n',
+            (0, r.jsxs)(e.ul, {
+              children: [
+                '\n',
+                (0, r.jsx)(e.li, { children: '\u603b\u56de\u590d\u6570' }),
+                '\n',
+                (0, r.jsx)(e.li, { children: '\u56de\u590d\u7387' }),
+                '\n',
+                (0, r.jsx)(e.li, { children: '\u7b54\u6848\u5206\u5e03' }),
+                '\n',
+                (0, r.jsx)(e.li, { children: '\u5e73\u5747\u8bc4\u5206' }),
+                '\n',
+                (0, r.jsx)(e.li, { children: '\u5bfc\u51fa\u4e3a CSV' }),
+                '\n',
+              ],
+            }),
+          ],
+        });
+      }
+      function o(n = {}) {
+        const { wrapper: e } = { ...(0, d.R)(), ...n.components };
+        return e ? (0, r.jsx)(e, { ...n, children: (0, r.jsx)(x, { ...n }) }) : x(n);
+      }
+    },
+    8453(n, e, s) {
+      s.d(e, { R: () => l, x: () => t });
+      var i = s(6540);
+      const r = {},
+        d = i.createContext(r);
+      function l(n) {
+        const e = i.useContext(d);
+        return i.useMemo(
+          function () {
+            return 'function' == typeof n ? n(e) : { ...e, ...n };
+          },
+          [e, n]
+        );
+      }
+      function t(n) {
+        let e;
+        return (
+          (e = n.disableParentContext
+            ? 'function' == typeof n.components
+              ? n.components(r)
+              : n.components || r
+            : l(n.components)),
+          i.createElement(d.Provider, { value: e }, n.children)
+        );
+      }
+    },
+  },
+]);

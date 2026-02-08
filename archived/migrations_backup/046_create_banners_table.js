@@ -3,7 +3,7 @@
  * Supports sequences, frames, actions, effects, and transitions
  */
 
-exports.up = async function(connection) {
+exports.up = async function (connection) {
   console.log('Creating banners table...');
 
   await connection.execute(`
@@ -34,11 +34,10 @@ exports.up = async function(connection) {
   console.log('Banners table created successfully');
 };
 
-exports.down = async function(connection) {
+exports.down = async function (connection) {
   console.log('Dropping banners table...');
 
   await connection.execute('DROP TABLE IF EXISTS g_banners');
 
   console.log('Banners table dropped successfully');
 };
-

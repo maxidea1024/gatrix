@@ -7,14 +7,8 @@
       "desc": "text",
       "isDisplay": "bool",
       "isDaily": "bool",
-      "advSpcEff": [
-        "number",
-        "number"
-      ],
-      "representativeItem": [
-        "number",
-        "number"
-      ],
+      "advSpcEff": ["number", "number"],
+      "representativeItem": ["number", "number"],
       "addEventSpot": [
         {
           "Id": "number",
@@ -106,14 +100,8 @@
       ]
     },
     ":min": {
-      "advSpcEff": [
-        77400000,
-        77400000
-      ],
-      "representativeItem": [
-        23000000,
-        23000000
-      ],
+      "advSpcEff": [77400000, 77400000],
+      "representativeItem": [23000000, 23000000],
       "addEventSpot": [
         {
           "Id": 77200000
@@ -144,14 +132,8 @@
       "trainingReward": 77300000
     },
     ":max": {
-      "advSpcEff": [
-        77499999,
-        77499999
-      ],
-      "representativeItem": [
-        23999999,
-        23999999
-      ],
+      "advSpcEff": [77499999, 77499999],
+      "representativeItem": [23999999, 23999999],
       "addEventSpot": [
         {
           "Id": 77299999
@@ -183,70 +165,36 @@
     },
     ":enum": {},
     ":links": {
-      "advSpcEff": [
-        [
-          "AdventureSpecialEffect"
-        ],
-        [
-          "AdventureSpecialEffect"
-        ]
-      ],
-      "representativeItem": [
-        [
-          "Item"
-        ],
-        [
-          "Item"
-        ]
-      ],
+      "advSpcEff": [["AdventureSpecialEffect"], ["AdventureSpecialEffect"]],
+      "representativeItem": [["Item"], ["Item"]],
       "addEventSpot": [
         {
-          "Id": [
-            "AdventureEventSpot"
-          ]
+          "Id": ["AdventureEventSpot"]
         },
         {
-          "Id": [
-            "AdventureEventSpot"
-          ]
+          "Id": ["AdventureEventSpot"]
         },
         {
-          "Id": [
-            "AdventureEventSpot"
-          ]
+          "Id": ["AdventureEventSpot"]
         },
         {
-          "Id": [
-            "AdventureEventSpot"
-          ]
+          "Id": ["AdventureEventSpot"]
         },
         {
-          "Id": [
-            "AdventureEventSpot"
-          ]
+          "Id": ["AdventureEventSpot"]
         },
         {
-          "Id": [
-            "AdventureEventSpot"
-          ]
+          "Id": ["AdventureEventSpot"]
         },
         {
-          "Id": [
-            "AdventureEventSpot"
-          ]
+          "Id": ["AdventureEventSpot"]
         },
         {
-          "Id": [
-            "AdventureEventSpot"
-          ]
+          "Id": ["AdventureEventSpot"]
         }
       ],
-      "firstReward": [
-        "AdventureEventReward"
-      ],
-      "trainingReward": [
-        "AdventureEventReward"
-      ]
+      "firstReward": ["AdventureEventReward"],
+      "trainingReward": ["AdventureEventReward"]
     }
   },
   "AdventureEventMode": {
@@ -265,9 +213,7 @@
       "desc": "탐험을 진행합니다.",
       "isDisplay": false,
       "isDaily": false,
-      "advSpcEff": [
-        77440000
-      ]
+      "advSpcEff": [77440000]
     },
     "77700002": {
       "id": 77700002,
@@ -276,9 +222,7 @@
       "desc": "식량과 물을 채집합니다.",
       "isDisplay": false,
       "isDaily": false,
-      "advSpcEff": [
-        77440001
-      ],
+      "advSpcEff": [77440001],
       "addEventSpot": [
         {
           "Id": 77223020,
@@ -294,14 +238,8 @@
       "desc": "수련을 통해 승급, 강화 재료를 획득합니다.",
       "isDisplay": false,
       "isDaily": true,
-      "advSpcEff": [
-        77440002,
-        77400771
-      ],
-      "representativeItem": [
-        23900101,
-        23410000
-      ],
+      "advSpcEff": [77440002, 77400771],
+      "representativeItem": [23900101, 23410000],
       "addEventSpot": [
         {
           "Id": 77230001,
@@ -354,14 +292,8 @@
       "desc": "수련을 통해 승급, 강화 재료를 획득합니다.",
       "isDisplay": false,
       "isDaily": true,
-      "advSpcEff": [
-        77440002,
-        77400771
-      ],
-      "representativeItem": [
-        23900101,
-        23410000
-      ],
+      "advSpcEff": [77440002, 77400771],
+      "representativeItem": [23900101, 23410000],
       "addEventSpot": [
         {
           "Id": 77230002,
@@ -414,14 +346,8 @@
       "desc": "수련을 통해 승급, 강화 재료를 획득합니다.",
       "isDisplay": false,
       "isDaily": true,
-      "advSpcEff": [
-        77440002,
-        77400771
-      ],
-      "representativeItem": [
-        23900101,
-        23410000
-      ],
+      "advSpcEff": [77440002, 77400771],
+      "representativeItem": [23900101, 23410000],
       "addEventSpot": [
         {
           "Id": 77230003,
@@ -474,14 +400,8 @@
       "desc": "수련을 통해 승급, 강화 재료를 획득합니다.",
       "isDisplay": false,
       "isDaily": true,
-      "advSpcEff": [
-        77440002,
-        77400771
-      ],
-      "representativeItem": [
-        23900101,
-        23410000
-      ],
+      "advSpcEff": [77440002, 77400771],
+      "representativeItem": [23900101, 23410000],
       "addEventSpot": [
         {
           "Id": 77230004,
@@ -534,14 +454,8 @@
       "desc": "수련을 통해 승급, 강화 재료를 획득합니다.",
       "isDisplay": false,
       "isDaily": true,
-      "advSpcEff": [
-        77440002,
-        77400771
-      ],
-      "representativeItem": [
-        23900101,
-        23410001
-      ],
+      "advSpcEff": [77440002, 77400771],
+      "representativeItem": [23900101, 23410001],
       "addEventSpot": [
         {
           "Id": 77230005,
@@ -594,14 +508,8 @@
       "desc": "수련을 통해 승급, 강화 재료를 획득합니다.",
       "isDisplay": false,
       "isDaily": true,
-      "advSpcEff": [
-        77440002,
-        77400771
-      ],
-      "representativeItem": [
-        23900101,
-        23410001
-      ],
+      "advSpcEff": [77440002, 77400771],
+      "representativeItem": [23900101, 23410001],
       "addEventSpot": [
         {
           "Id": 77230006,
@@ -654,14 +562,8 @@
       "desc": "수련을 통해 승급, 강화 재료를 획득합니다.",
       "isDisplay": false,
       "isDaily": true,
-      "advSpcEff": [
-        77440002,
-        77400771
-      ],
-      "representativeItem": [
-        23900101,
-        23410001
-      ],
+      "advSpcEff": [77440002, 77400771],
+      "representativeItem": [23900101, 23410001],
       "addEventSpot": [
         {
           "Id": 77230007,
@@ -714,14 +616,8 @@
       "desc": "수련을 통해 승급, 강화 재료를 획득합니다.",
       "isDisplay": false,
       "isDaily": true,
-      "advSpcEff": [
-        77440002,
-        77400771
-      ],
-      "representativeItem": [
-        23900101,
-        23410001
-      ],
+      "advSpcEff": [77440002, 77400771],
+      "representativeItem": [23900101, 23410001],
       "addEventSpot": [
         {
           "Id": 77230008,
@@ -774,14 +670,8 @@
       "desc": "수련을 통해 승급, 강화 재료를 획득합니다.",
       "isDisplay": false,
       "isDaily": true,
-      "advSpcEff": [
-        77440002,
-        77400771
-      ],
-      "representativeItem": [
-        23900101,
-        23410002
-      ],
+      "advSpcEff": [77440002, 77400771],
+      "representativeItem": [23900101, 23410002],
       "addEventSpot": [
         {
           "Id": 77230009,
@@ -834,14 +724,8 @@
       "desc": "수련을 통해 승급, 강화 재료를 획득합니다.",
       "isDisplay": false,
       "isDaily": true,
-      "advSpcEff": [
-        77440002,
-        77400771
-      ],
-      "representativeItem": [
-        23900101,
-        23410002
-      ],
+      "advSpcEff": [77440002, 77400771],
+      "representativeItem": [23900101, 23410002],
       "addEventSpot": [
         {
           "Id": 77230010,
@@ -894,14 +778,8 @@
       "desc": "수련을 통해 승급, 강화 재료를 획득합니다.",
       "isDisplay": false,
       "isDaily": true,
-      "advSpcEff": [
-        77440002,
-        77400771
-      ],
-      "representativeItem": [
-        23900101,
-        23410000
-      ],
+      "advSpcEff": [77440002, 77400771],
+      "representativeItem": [23900101, 23410000],
       "addEventSpot": [
         {
           "Id": 77230001,
@@ -954,14 +832,8 @@
       "desc": "수련을 통해 승급, 강화 재료를 획득합니다.",
       "isDisplay": false,
       "isDaily": true,
-      "advSpcEff": [
-        77440002,
-        77400771
-      ],
-      "representativeItem": [
-        23900101,
-        23410000
-      ],
+      "advSpcEff": [77440002, 77400771],
+      "representativeItem": [23900101, 23410000],
       "addEventSpot": [
         {
           "Id": 77230002,
@@ -1014,14 +886,8 @@
       "desc": "수련을 통해 승급, 강화 재료를 획득합니다.",
       "isDisplay": false,
       "isDaily": true,
-      "advSpcEff": [
-        77440002,
-        77400771
-      ],
-      "representativeItem": [
-        23900101,
-        23410000
-      ],
+      "advSpcEff": [77440002, 77400771],
+      "representativeItem": [23900101, 23410000],
       "addEventSpot": [
         {
           "Id": 77230003,
@@ -1074,14 +940,8 @@
       "desc": "수련을 통해 승급, 강화 재료를 획득합니다.",
       "isDisplay": false,
       "isDaily": true,
-      "advSpcEff": [
-        77440002,
-        77400771
-      ],
-      "representativeItem": [
-        23900101,
-        23410000
-      ],
+      "advSpcEff": [77440002, 77400771],
+      "representativeItem": [23900101, 23410000],
       "addEventSpot": [
         {
           "Id": 77230004,
@@ -1134,14 +994,8 @@
       "desc": "수련을 통해 승급, 강화 재료를 획득합니다.",
       "isDisplay": false,
       "isDaily": true,
-      "advSpcEff": [
-        77440002,
-        77400771
-      ],
-      "representativeItem": [
-        23900101,
-        23410001
-      ],
+      "advSpcEff": [77440002, 77400771],
+      "representativeItem": [23900101, 23410001],
       "addEventSpot": [
         {
           "Id": 77230005,
@@ -1194,14 +1048,8 @@
       "desc": "수련을 통해 승급, 강화 재료를 획득합니다.",
       "isDisplay": false,
       "isDaily": true,
-      "advSpcEff": [
-        77440002,
-        77400771
-      ],
-      "representativeItem": [
-        23900101,
-        23410001
-      ],
+      "advSpcEff": [77440002, 77400771],
+      "representativeItem": [23900101, 23410001],
       "addEventSpot": [
         {
           "Id": 77230006,
@@ -1254,14 +1102,8 @@
       "desc": "수련을 통해 승급, 강화 재료를 획득합니다.",
       "isDisplay": false,
       "isDaily": true,
-      "advSpcEff": [
-        77440002,
-        77400771
-      ],
-      "representativeItem": [
-        23900101,
-        23410001
-      ],
+      "advSpcEff": [77440002, 77400771],
+      "representativeItem": [23900101, 23410001],
       "addEventSpot": [
         {
           "Id": 77230007,
@@ -1314,14 +1156,8 @@
       "desc": "수련을 통해 승급, 강화 재료를 획득합니다.",
       "isDisplay": false,
       "isDaily": true,
-      "advSpcEff": [
-        77440002,
-        77400771
-      ],
-      "representativeItem": [
-        23900101,
-        23410001
-      ],
+      "advSpcEff": [77440002, 77400771],
+      "representativeItem": [23900101, 23410001],
       "addEventSpot": [
         {
           "Id": 77230008,
@@ -1374,14 +1210,8 @@
       "desc": "수련을 통해 승급, 강화 재료를 획득합니다.",
       "isDisplay": false,
       "isDaily": true,
-      "advSpcEff": [
-        77440002,
-        77400771
-      ],
-      "representativeItem": [
-        23900101,
-        23410002
-      ],
+      "advSpcEff": [77440002, 77400771],
+      "representativeItem": [23900101, 23410002],
       "addEventSpot": [
         {
           "Id": 77230009,
@@ -1434,14 +1264,8 @@
       "desc": "수련을 통해 승급, 강화 재료를 획득합니다.",
       "isDisplay": false,
       "isDaily": true,
-      "advSpcEff": [
-        77440002,
-        77400771
-      ],
-      "representativeItem": [
-        23900101,
-        23410002
-      ],
+      "advSpcEff": [77440002, 77400771],
+      "representativeItem": [23900101, 23410002],
       "addEventSpot": [
         {
           "Id": 77230010,
@@ -1494,14 +1318,8 @@
       "desc": "수련을 통해 승급, 강화 재료를 획득합니다.",
       "isDisplay": false,
       "isDaily": true,
-      "advSpcEff": [
-        77440002,
-        77400771
-      ],
-      "representativeItem": [
-        23900101,
-        23410000
-      ],
+      "advSpcEff": [77440002, 77400771],
+      "representativeItem": [23900101, 23410000],
       "addEventSpot": [
         {
           "Id": 77230001,
@@ -1554,14 +1372,8 @@
       "desc": "수련을 통해 승급, 강화 재료를 획득합니다.",
       "isDisplay": false,
       "isDaily": true,
-      "advSpcEff": [
-        77440002,
-        77400771
-      ],
-      "representativeItem": [
-        23900101,
-        23410000
-      ],
+      "advSpcEff": [77440002, 77400771],
+      "representativeItem": [23900101, 23410000],
       "addEventSpot": [
         {
           "Id": 77230002,
@@ -1614,14 +1426,8 @@
       "desc": "수련을 통해 승급, 강화 재료를 획득합니다.",
       "isDisplay": false,
       "isDaily": true,
-      "advSpcEff": [
-        77440002,
-        77400771
-      ],
-      "representativeItem": [
-        23900101,
-        23410000
-      ],
+      "advSpcEff": [77440002, 77400771],
+      "representativeItem": [23900101, 23410000],
       "addEventSpot": [
         {
           "Id": 77230003,
@@ -1674,14 +1480,8 @@
       "desc": "수련을 통해 승급, 강화 재료를 획득합니다.",
       "isDisplay": false,
       "isDaily": true,
-      "advSpcEff": [
-        77440002,
-        77400771
-      ],
-      "representativeItem": [
-        23900101,
-        23410000
-      ],
+      "advSpcEff": [77440002, 77400771],
+      "representativeItem": [23900101, 23410000],
       "addEventSpot": [
         {
           "Id": 77230004,
@@ -1734,14 +1534,8 @@
       "desc": "수련을 통해 승급, 강화 재료를 획득합니다.",
       "isDisplay": false,
       "isDaily": true,
-      "advSpcEff": [
-        77440002,
-        77400771
-      ],
-      "representativeItem": [
-        23900101,
-        23410001
-      ],
+      "advSpcEff": [77440002, 77400771],
+      "representativeItem": [23900101, 23410001],
       "addEventSpot": [
         {
           "Id": 77230005,
@@ -1794,14 +1588,8 @@
       "desc": "수련을 통해 승급, 강화 재료를 획득합니다.",
       "isDisplay": false,
       "isDaily": true,
-      "advSpcEff": [
-        77440002,
-        77400771
-      ],
-      "representativeItem": [
-        23900101,
-        23410001
-      ],
+      "advSpcEff": [77440002, 77400771],
+      "representativeItem": [23900101, 23410001],
       "addEventSpot": [
         {
           "Id": 77230006,
@@ -1854,14 +1642,8 @@
       "desc": "수련을 통해 승급, 강화 재료를 획득합니다.",
       "isDisplay": false,
       "isDaily": true,
-      "advSpcEff": [
-        77440002,
-        77400771
-      ],
-      "representativeItem": [
-        23900101,
-        23410001
-      ],
+      "advSpcEff": [77440002, 77400771],
+      "representativeItem": [23900101, 23410001],
       "addEventSpot": [
         {
           "Id": 77230007,
@@ -1914,14 +1696,8 @@
       "desc": "수련을 통해 승급, 강화 재료를 획득합니다.",
       "isDisplay": false,
       "isDaily": true,
-      "advSpcEff": [
-        77440002,
-        77400771
-      ],
-      "representativeItem": [
-        23900101,
-        23410001
-      ],
+      "advSpcEff": [77440002, 77400771],
+      "representativeItem": [23900101, 23410001],
       "addEventSpot": [
         {
           "Id": 77230008,
@@ -1974,14 +1750,8 @@
       "desc": "수련을 통해 승급, 강화 재료를 획득합니다.",
       "isDisplay": false,
       "isDaily": true,
-      "advSpcEff": [
-        77440002,
-        77400771
-      ],
-      "representativeItem": [
-        23900101,
-        23410002
-      ],
+      "advSpcEff": [77440002, 77400771],
+      "representativeItem": [23900101, 23410002],
       "addEventSpot": [
         {
           "Id": 77230009,
@@ -2034,14 +1804,8 @@
       "desc": "수련을 통해 승급, 강화 재료를 획득합니다.",
       "isDisplay": false,
       "isDaily": true,
-      "advSpcEff": [
-        77440002,
-        77400771
-      ],
-      "representativeItem": [
-        23900101,
-        23410002
-      ],
+      "advSpcEff": [77440002, 77400771],
+      "representativeItem": [23900101, 23410002],
       "addEventSpot": [
         {
           "Id": 77230010,
@@ -2094,14 +1858,8 @@
       "desc": "수련을 통해 승급, 강화 재료를 획득합니다.",
       "isDisplay": false,
       "isDaily": true,
-      "advSpcEff": [
-        77440002,
-        77400771
-      ],
-      "representativeItem": [
-        23900101,
-        23410002
-      ],
+      "advSpcEff": [77440002, 77400771],
+      "representativeItem": [23900101, 23410002],
       "addEventSpot": [
         {
           "Id": 77230010,
@@ -2154,14 +1912,8 @@
       "desc": "수련을 통해 승급, 강화 재료를 획득합니다.",
       "isDisplay": false,
       "isDaily": true,
-      "advSpcEff": [
-        77440002,
-        77400771
-      ],
-      "representativeItem": [
-        23900101,
-        23410002
-      ],
+      "advSpcEff": [77440002, 77400771],
+      "representativeItem": [23900101, 23410002],
       "addEventSpot": [
         {
           "Id": 77230010,
@@ -2214,14 +1966,8 @@
       "desc": "수련을 통해 승급, 강화 재료를 획득합니다.",
       "isDisplay": false,
       "isDaily": true,
-      "advSpcEff": [
-        77440002,
-        77400771
-      ],
-      "representativeItem": [
-        23900101,
-        23410002
-      ],
+      "advSpcEff": [77440002, 77400771],
+      "representativeItem": [23900101, 23410002],
       "addEventSpot": [
         {
           "Id": 77230011,
@@ -2274,14 +2020,8 @@
       "desc": "수련을 통해 승급, 강화 재료를 획득합니다.",
       "isDisplay": false,
       "isDaily": true,
-      "advSpcEff": [
-        77440002,
-        77400771
-      ],
-      "representativeItem": [
-        23900101,
-        23410002
-      ],
+      "advSpcEff": [77440002, 77400771],
+      "representativeItem": [23900101, 23410002],
       "addEventSpot": [
         {
           "Id": 77230012,
@@ -2334,14 +2074,8 @@
       "desc": "수련을 통해 승급, 강화 재료를 획득합니다.",
       "isDisplay": false,
       "isDaily": true,
-      "advSpcEff": [
-        77440002,
-        77400771
-      ],
-      "representativeItem": [
-        23900101,
-        23410002
-      ],
+      "advSpcEff": [77440002, 77400771],
+      "representativeItem": [23900101, 23410002],
       "addEventSpot": [
         {
           "Id": 77230013,
@@ -2394,14 +2128,8 @@
       "desc": "수련을 통해 승급, 강화 재료를 획득합니다.",
       "isDisplay": false,
       "isDaily": true,
-      "advSpcEff": [
-        77440002,
-        77400771
-      ],
-      "representativeItem": [
-        23900101,
-        23410002
-      ],
+      "advSpcEff": [77440002, 77400771],
+      "representativeItem": [23900101, 23410002],
       "addEventSpot": [
         {
           "Id": 77230014,
@@ -2454,14 +2182,8 @@
       "desc": "수련을 통해 승급, 강화 재료를 획득합니다.",
       "isDisplay": false,
       "isDaily": true,
-      "advSpcEff": [
-        77440002,
-        77400771
-      ],
-      "representativeItem": [
-        23900101,
-        23410003
-      ],
+      "advSpcEff": [77440002, 77400771],
+      "representativeItem": [23900101, 23410003],
       "addEventSpot": [
         {
           "Id": 77230015,
@@ -2514,14 +2236,8 @@
       "desc": "수련을 통해 승급, 강화 재료를 획득합니다.",
       "isDisplay": false,
       "isDaily": true,
-      "advSpcEff": [
-        77440002,
-        77400771
-      ],
-      "representativeItem": [
-        23900101,
-        23410003
-      ],
+      "advSpcEff": [77440002, 77400771],
+      "representativeItem": [23900101, 23410003],
       "addEventSpot": [
         {
           "Id": 77230016,
@@ -2574,14 +2290,8 @@
       "desc": "수련을 통해 승급, 강화 재료를 획득합니다.",
       "isDisplay": false,
       "isDaily": true,
-      "advSpcEff": [
-        77440002,
-        77400771
-      ],
-      "representativeItem": [
-        23900101,
-        23410003
-      ],
+      "advSpcEff": [77440002, 77400771],
+      "representativeItem": [23900101, 23410003],
       "addEventSpot": [
         {
           "Id": 77230017,
@@ -2634,14 +2344,8 @@
       "desc": "수련을 통해 승급, 강화 재료를 획득합니다.",
       "isDisplay": false,
       "isDaily": true,
-      "advSpcEff": [
-        77440002,
-        77400771
-      ],
-      "representativeItem": [
-        23900101,
-        23410003
-      ],
+      "advSpcEff": [77440002, 77400771],
+      "representativeItem": [23900101, 23410003],
       "addEventSpot": [
         {
           "Id": 77230018,
@@ -2694,14 +2398,8 @@
       "desc": "수련을 통해 승급, 강화 재료를 획득합니다.",
       "isDisplay": false,
       "isDaily": true,
-      "advSpcEff": [
-        77440002,
-        77400771
-      ],
-      "representativeItem": [
-        23900101,
-        23710157
-      ],
+      "advSpcEff": [77440002, 77400771],
+      "representativeItem": [23900101, 23710157],
       "addEventSpot": [
         {
           "Id": 77230019,
@@ -2754,14 +2452,8 @@
       "desc": "수련을 통해 승급, 강화 재료를 획득합니다.",
       "isDisplay": false,
       "isDaily": true,
-      "advSpcEff": [
-        77440002,
-        77400771
-      ],
-      "representativeItem": [
-        23900101,
-        23710157
-      ],
+      "advSpcEff": [77440002, 77400771],
+      "representativeItem": [23900101, 23710157],
       "addEventSpot": [
         {
           "Id": 77230020,
@@ -2814,14 +2506,8 @@
       "desc": "수련을 통해 승급, 강화 재료를 획득합니다.",
       "isDisplay": false,
       "isDaily": true,
-      "advSpcEff": [
-        77440002,
-        77400771
-      ],
-      "representativeItem": [
-        23900101,
-        23710157
-      ],
+      "advSpcEff": [77440002, 77400771],
+      "representativeItem": [23900101, 23710157],
       "addEventSpot": [
         {
           "Id": 77230021,
@@ -2874,14 +2560,8 @@
       "desc": "수련을 통해 승급, 강화 재료를 획득합니다.",
       "isDisplay": false,
       "isDaily": true,
-      "advSpcEff": [
-        77440002,
-        77400771
-      ],
-      "representativeItem": [
-        23900101,
-        23710157
-      ],
+      "advSpcEff": [77440002, 77400771],
+      "representativeItem": [23900101, 23710157],
       "addEventSpot": [
         {
           "Id": 77230022,
@@ -2934,14 +2614,8 @@
       "desc": "수련을 통해 승급, 강화 재료를 획득합니다.",
       "isDisplay": false,
       "isDaily": true,
-      "advSpcEff": [
-        77440002,
-        77400771
-      ],
-      "representativeItem": [
-        23900101,
-        23710157
-      ],
+      "advSpcEff": [77440002, 77400771],
+      "representativeItem": [23900101, 23710157],
       "addEventSpot": [
         {
           "Id": 77230023,
@@ -2994,14 +2668,8 @@
       "desc": "수련을 통해 승급, 강화 재료를 획득합니다.",
       "isDisplay": false,
       "isDaily": true,
-      "advSpcEff": [
-        77440002,
-        77400771
-      ],
-      "representativeItem": [
-        23410000,
-        23421093
-      ],
+      "advSpcEff": [77440002, 77400771],
+      "representativeItem": [23410000, 23421093],
       "addEventSpot": [
         {
           "Id": 77230001,
@@ -3054,14 +2722,8 @@
       "desc": "수련을 통해 승급, 강화 재료를 획득합니다.",
       "isDisplay": false,
       "isDaily": true,
-      "advSpcEff": [
-        77440002,
-        77400771
-      ],
-      "representativeItem": [
-        23410000,
-        23421093
-      ],
+      "advSpcEff": [77440002, 77400771],
+      "representativeItem": [23410000, 23421093],
       "addEventSpot": [
         {
           "Id": 77230001,
@@ -3114,14 +2776,8 @@
       "desc": "수련을 통해 승급, 강화 재료를 획득합니다.",
       "isDisplay": false,
       "isDaily": true,
-      "advSpcEff": [
-        77440002,
-        77400771
-      ],
-      "representativeItem": [
-        23410000,
-        23421093
-      ],
+      "advSpcEff": [77440002, 77400771],
+      "representativeItem": [23410000, 23421093],
       "addEventSpot": [
         {
           "Id": 77230001,
@@ -3174,14 +2830,8 @@
       "desc": "수련을 통해 승급, 강화 재료를 획득합니다.",
       "isDisplay": false,
       "isDaily": true,
-      "advSpcEff": [
-        77440002,
-        77400771
-      ],
-      "representativeItem": [
-        23410001,
-        23421094
-      ],
+      "advSpcEff": [77440002, 77400771],
+      "representativeItem": [23410001, 23421094],
       "addEventSpot": [
         {
           "Id": 77230001,
@@ -3234,14 +2884,8 @@
       "desc": "수련을 통해 승급, 강화 재료를 획득합니다.",
       "isDisplay": false,
       "isDaily": true,
-      "advSpcEff": [
-        77440002,
-        77400771
-      ],
-      "representativeItem": [
-        23410001,
-        23421094
-      ],
+      "advSpcEff": [77440002, 77400771],
+      "representativeItem": [23410001, 23421094],
       "addEventSpot": [
         {
           "Id": 77230001,
@@ -3294,14 +2938,8 @@
       "desc": "수련을 통해 승급, 강화 재료를 획득합니다.",
       "isDisplay": false,
       "isDaily": true,
-      "advSpcEff": [
-        77440002,
-        77400771
-      ],
-      "representativeItem": [
-        23410001,
-        23421094
-      ],
+      "advSpcEff": [77440002, 77400771],
+      "representativeItem": [23410001, 23421094],
       "addEventSpot": [
         {
           "Id": 77230001,
@@ -3354,14 +2992,8 @@
       "desc": "수련을 통해 승급, 강화 재료를 획득합니다.",
       "isDisplay": false,
       "isDaily": true,
-      "advSpcEff": [
-        77440002,
-        77400771
-      ],
-      "representativeItem": [
-        23410002,
-        23421095
-      ],
+      "advSpcEff": [77440002, 77400771],
+      "representativeItem": [23410002, 23421095],
       "addEventSpot": [
         {
           "Id": 77230001,
@@ -3414,14 +3046,8 @@
       "desc": "수련을 통해 승급, 강화 재료를 획득합니다.",
       "isDisplay": false,
       "isDaily": true,
-      "advSpcEff": [
-        77440002,
-        77400771
-      ],
-      "representativeItem": [
-        23410002,
-        23421095
-      ],
+      "advSpcEff": [77440002, 77400771],
+      "representativeItem": [23410002, 23421095],
       "addEventSpot": [
         {
           "Id": 77230001,
@@ -3474,9 +3100,7 @@
       "desc": "맹수의 왕 사냥",
       "isDisplay": false,
       "isDaily": false,
-      "advSpcEff": [
-        77440001
-      ]
+      "advSpcEff": [77440001]
     }
   }
 }

@@ -1,1 +1,279 @@
-"use strict";(globalThis.webpackChunkdocs=globalThis.webpackChunkdocs||[]).push([[7632],{8453(e,n,i){i.d(n,{R:()=>t,x:()=>o});var r=i(6540);const s={},d=r.createContext(s);function t(e){const n=r.useContext(d);return r.useMemo(function(){return"function"==typeof e?e(n):{...n,...e}},[n,e])}function o(e){let n;return n=e.disableParentContext?"function"==typeof e.components?e.components(s):e.components||s:t(e.components),r.createElement(d.Provider,{value:n},e.children)}},8887(e,n,i){i.r(n),i.d(n,{assets:()=>c,contentTitle:()=>o,default:()=>h,frontMatter:()=>t,metadata:()=>r,toc:()=>l});const r=JSON.parse('{"id":"guide/coupons","title":"Coupons","description":"Overview","source":"@site/docs/guide/coupons.md","sourceDirName":"guide","slug":"/guide/coupons","permalink":"/docs/zh-Hans/guide/coupons","draft":false,"unlisted":false,"editUrl":"https://github.com/your-org/gatrix/tree/main/docs/docs/guide/coupons.md","tags":[],"version":"current","sidebarPosition":3,"frontMatter":{"sidebar_position":3,"sidebar_label":"Coupons"},"sidebar":"tutorialSidebar","previous":{"title":"Popup Notices","permalink":"/docs/zh-Hans/guide/popup-notices"},"next":{"title":"Surveys","permalink":"/docs/zh-Hans/guide/surveys"}}');var s=i(4848),d=i(8453);const t={sidebar_position:3,sidebar_label:"Coupons"},o="Coupons",c={},l=[{value:"Overview",id:"overview",level:2},{value:"Features",id:"features",level:2},{value:"Creating a Coupon",id:"creating-a-coupon",level:2},{value:"Reward Configuration",id:"reward-configuration",level:2},{value:"Coupon Redemption",id:"coupon-redemption",level:2},{value:"Tracking",id:"tracking",level:2}];function a(e){const n={code:"code",h1:"h1",h2:"h2",header:"header",li:"li",ol:"ol",p:"p",pre:"pre",strong:"strong",table:"table",tbody:"tbody",td:"td",th:"th",thead:"thead",tr:"tr",ul:"ul",...(0,d.R)(),...e.components};return(0,s.jsxs)(s.Fragment,{children:[(0,s.jsx)(n.header,{children:(0,s.jsx)(n.h1,{id:"coupons",children:"Coupons"})}),"\n",(0,s.jsx)(n.h2,{id:"overview",children:"Overview"}),"\n",(0,s.jsx)(n.p,{children:"Create and manage reward coupons for players."}),"\n",(0,s.jsxs)(n.p,{children:[(0,s.jsx)(n.strong,{children:"Navigation:"})," Game Operations \u2192 Coupons"]}),"\n",(0,s.jsx)(n.h2,{id:"features",children:"Features"}),"\n",(0,s.jsxs)(n.ul,{children:["\n",(0,s.jsx)(n.li,{children:"Generate unique coupon codes"}),"\n",(0,s.jsx)(n.li,{children:"Set usage limits (per coupon, per user)"}),"\n",(0,s.jsx)(n.li,{children:"Configure expiration dates"}),"\n",(0,s.jsx)(n.li,{children:"Define rewards (items, currency, etc.)"}),"\n",(0,s.jsx)(n.li,{children:"Track redemption history"}),"\n"]}),"\n",(0,s.jsx)(n.h2,{id:"creating-a-coupon",children:"Creating a Coupon"}),"\n",(0,s.jsxs)(n.ol,{children:["\n",(0,s.jsxs)(n.li,{children:["Navigate to ",(0,s.jsx)(n.strong,{children:"Game Operations"})," > ",(0,s.jsx)(n.strong,{children:"Coupons"})]}),"\n",(0,s.jsxs)(n.li,{children:["Click ",(0,s.jsx)(n.strong,{children:"Add Coupon"})," button"]}),"\n",(0,s.jsx)(n.li,{children:"Configure the coupon:"}),"\n"]}),"\n",(0,s.jsxs)(n.table,{children:[(0,s.jsx)(n.thead,{children:(0,s.jsxs)(n.tr,{children:[(0,s.jsx)(n.th,{children:"Field"}),(0,s.jsx)(n.th,{children:"Type"}),(0,s.jsx)(n.th,{children:"Required"}),(0,s.jsx)(n.th,{children:"Description"})]})}),(0,s.jsxs)(n.tbody,{children:[(0,s.jsxs)(n.tr,{children:[(0,s.jsx)(n.td,{children:"Code"}),(0,s.jsx)(n.td,{children:"Text"}),(0,s.jsx)(n.td,{children:"Required"}),(0,s.jsx)(n.td,{children:"Unique coupon code"})]}),(0,s.jsxs)(n.tr,{children:[(0,s.jsx)(n.td,{children:"Description"}),(0,s.jsx)(n.td,{children:"Textarea"}),(0,s.jsx)(n.td,{children:"-"}),(0,s.jsx)(n.td,{children:"Admin notes"})]}),(0,s.jsxs)(n.tr,{children:[(0,s.jsx)(n.td,{children:"Start Date"}),(0,s.jsx)(n.td,{children:"DateTime"}),(0,s.jsx)(n.td,{children:"-"}),(0,s.jsx)(n.td,{children:"When coupon becomes valid"})]}),(0,s.jsxs)(n.tr,{children:[(0,s.jsx)(n.td,{children:"End Date"}),(0,s.jsx)(n.td,{children:"DateTime"}),(0,s.jsx)(n.td,{children:"-"}),(0,s.jsx)(n.td,{children:"When coupon expires"})]}),(0,s.jsxs)(n.tr,{children:[(0,s.jsx)(n.td,{children:"Max Uses"}),(0,s.jsx)(n.td,{children:"Number"}),(0,s.jsx)(n.td,{children:"-"}),(0,s.jsx)(n.td,{children:"Total redemption limit"})]}),(0,s.jsxs)(n.tr,{children:[(0,s.jsx)(n.td,{children:"Max Uses Per User"}),(0,s.jsx)(n.td,{children:"Number"}),(0,s.jsx)(n.td,{children:"-"}),(0,s.jsx)(n.td,{children:"Per-user limit"})]}),(0,s.jsxs)(n.tr,{children:[(0,s.jsx)(n.td,{children:"Rewards"}),(0,s.jsx)(n.td,{children:"Reward Config"}),(0,s.jsx)(n.td,{children:"Required"}),(0,s.jsx)(n.td,{children:"Items/currency to give"})]})]})]}),"\n",(0,s.jsxs)(n.ol,{start:"4",children:["\n",(0,s.jsxs)(n.li,{children:["Click ",(0,s.jsx)(n.strong,{children:"Create"})," to save"]}),"\n"]}),"\n",(0,s.jsx)(n.h2,{id:"reward-configuration",children:"Reward Configuration"}),"\n",(0,s.jsx)(n.p,{children:"Rewards can include:"}),"\n",(0,s.jsxs)(n.ul,{children:["\n",(0,s.jsx)(n.li,{children:"In-game items"}),"\n",(0,s.jsx)(n.li,{children:"Virtual currency"}),"\n",(0,s.jsx)(n.li,{children:"Premium time"}),"\n",(0,s.jsx)(n.li,{children:"Special titles/badges"}),"\n"]}),"\n",(0,s.jsx)(n.h2,{id:"coupon-redemption",children:"Coupon Redemption"}),"\n",(0,s.jsx)(n.p,{children:"Players redeem coupons via the game client. The API endpoint:"}),"\n",(0,s.jsx)(n.pre,{children:(0,s.jsx)(n.code,{className:"language-bash",children:'POST /api/v1/coupons/redeem\n{\n  "code": "SUMMER2024"\n}\n'})}),"\n",(0,s.jsx)(n.h2,{id:"tracking",children:"Tracking"}),"\n",(0,s.jsx)(n.p,{children:"View redemption history including:"}),"\n",(0,s.jsxs)(n.ul,{children:["\n",(0,s.jsx)(n.li,{children:"Redemption time"}),"\n",(0,s.jsx)(n.li,{children:"User ID"}),"\n",(0,s.jsx)(n.li,{children:"Rewards granted"}),"\n",(0,s.jsx)(n.li,{children:"Status (success/failed)"}),"\n"]})]})}function h(e={}){const{wrapper:n}={...(0,d.R)(),...e.components};return n?(0,s.jsx)(n,{...e,children:(0,s.jsx)(a,{...e})}):a(e)}}}]);
+'use strict';
+(globalThis.webpackChunkdocs = globalThis.webpackChunkdocs || []).push([
+  [7632],
+  {
+    8453(e, n, i) {
+      i.d(n, { R: () => t, x: () => o });
+      var r = i(6540);
+      const s = {},
+        d = r.createContext(s);
+      function t(e) {
+        const n = r.useContext(d);
+        return r.useMemo(
+          function () {
+            return 'function' == typeof e ? e(n) : { ...n, ...e };
+          },
+          [n, e]
+        );
+      }
+      function o(e) {
+        let n;
+        return (
+          (n = e.disableParentContext
+            ? 'function' == typeof e.components
+              ? e.components(s)
+              : e.components || s
+            : t(e.components)),
+          r.createElement(d.Provider, { value: n }, e.children)
+        );
+      }
+    },
+    8887(e, n, i) {
+      (i.r(n),
+        i.d(n, {
+          assets: () => c,
+          contentTitle: () => o,
+          default: () => h,
+          frontMatter: () => t,
+          metadata: () => r,
+          toc: () => l,
+        }));
+      const r = JSON.parse(
+        '{"id":"guide/coupons","title":"Coupons","description":"Overview","source":"@site/docs/guide/coupons.md","sourceDirName":"guide","slug":"/guide/coupons","permalink":"/docs/zh-Hans/guide/coupons","draft":false,"unlisted":false,"editUrl":"https://github.com/your-org/gatrix/tree/main/docs/docs/guide/coupons.md","tags":[],"version":"current","sidebarPosition":3,"frontMatter":{"sidebar_position":3,"sidebar_label":"Coupons"},"sidebar":"tutorialSidebar","previous":{"title":"Popup Notices","permalink":"/docs/zh-Hans/guide/popup-notices"},"next":{"title":"Surveys","permalink":"/docs/zh-Hans/guide/surveys"}}'
+      );
+      var s = i(4848),
+        d = i(8453);
+      const t = { sidebar_position: 3, sidebar_label: 'Coupons' },
+        o = 'Coupons',
+        c = {},
+        l = [
+          { value: 'Overview', id: 'overview', level: 2 },
+          { value: 'Features', id: 'features', level: 2 },
+          { value: 'Creating a Coupon', id: 'creating-a-coupon', level: 2 },
+          { value: 'Reward Configuration', id: 'reward-configuration', level: 2 },
+          { value: 'Coupon Redemption', id: 'coupon-redemption', level: 2 },
+          { value: 'Tracking', id: 'tracking', level: 2 },
+        ];
+      function a(e) {
+        const n = {
+          code: 'code',
+          h1: 'h1',
+          h2: 'h2',
+          header: 'header',
+          li: 'li',
+          ol: 'ol',
+          p: 'p',
+          pre: 'pre',
+          strong: 'strong',
+          table: 'table',
+          tbody: 'tbody',
+          td: 'td',
+          th: 'th',
+          thead: 'thead',
+          tr: 'tr',
+          ul: 'ul',
+          ...(0, d.R)(),
+          ...e.components,
+        };
+        return (0, s.jsxs)(s.Fragment, {
+          children: [
+            (0, s.jsx)(n.header, {
+              children: (0, s.jsx)(n.h1, { id: 'coupons', children: 'Coupons' }),
+            }),
+            '\n',
+            (0, s.jsx)(n.h2, { id: 'overview', children: 'Overview' }),
+            '\n',
+            (0, s.jsx)(n.p, { children: 'Create and manage reward coupons for players.' }),
+            '\n',
+            (0, s.jsxs)(n.p, {
+              children: [
+                (0, s.jsx)(n.strong, { children: 'Navigation:' }),
+                ' Game Operations \u2192 Coupons',
+              ],
+            }),
+            '\n',
+            (0, s.jsx)(n.h2, { id: 'features', children: 'Features' }),
+            '\n',
+            (0, s.jsxs)(n.ul, {
+              children: [
+                '\n',
+                (0, s.jsx)(n.li, { children: 'Generate unique coupon codes' }),
+                '\n',
+                (0, s.jsx)(n.li, { children: 'Set usage limits (per coupon, per user)' }),
+                '\n',
+                (0, s.jsx)(n.li, { children: 'Configure expiration dates' }),
+                '\n',
+                (0, s.jsx)(n.li, { children: 'Define rewards (items, currency, etc.)' }),
+                '\n',
+                (0, s.jsx)(n.li, { children: 'Track redemption history' }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, s.jsx)(n.h2, { id: 'creating-a-coupon', children: 'Creating a Coupon' }),
+            '\n',
+            (0, s.jsxs)(n.ol, {
+              children: [
+                '\n',
+                (0, s.jsxs)(n.li, {
+                  children: [
+                    'Navigate to ',
+                    (0, s.jsx)(n.strong, { children: 'Game Operations' }),
+                    ' > ',
+                    (0, s.jsx)(n.strong, { children: 'Coupons' }),
+                  ],
+                }),
+                '\n',
+                (0, s.jsxs)(n.li, {
+                  children: ['Click ', (0, s.jsx)(n.strong, { children: 'Add Coupon' }), ' button'],
+                }),
+                '\n',
+                (0, s.jsx)(n.li, { children: 'Configure the coupon:' }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, s.jsxs)(n.table, {
+              children: [
+                (0, s.jsx)(n.thead, {
+                  children: (0, s.jsxs)(n.tr, {
+                    children: [
+                      (0, s.jsx)(n.th, { children: 'Field' }),
+                      (0, s.jsx)(n.th, { children: 'Type' }),
+                      (0, s.jsx)(n.th, { children: 'Required' }),
+                      (0, s.jsx)(n.th, { children: 'Description' }),
+                    ],
+                  }),
+                }),
+                (0, s.jsxs)(n.tbody, {
+                  children: [
+                    (0, s.jsxs)(n.tr, {
+                      children: [
+                        (0, s.jsx)(n.td, { children: 'Code' }),
+                        (0, s.jsx)(n.td, { children: 'Text' }),
+                        (0, s.jsx)(n.td, { children: 'Required' }),
+                        (0, s.jsx)(n.td, { children: 'Unique coupon code' }),
+                      ],
+                    }),
+                    (0, s.jsxs)(n.tr, {
+                      children: [
+                        (0, s.jsx)(n.td, { children: 'Description' }),
+                        (0, s.jsx)(n.td, { children: 'Textarea' }),
+                        (0, s.jsx)(n.td, { children: '-' }),
+                        (0, s.jsx)(n.td, { children: 'Admin notes' }),
+                      ],
+                    }),
+                    (0, s.jsxs)(n.tr, {
+                      children: [
+                        (0, s.jsx)(n.td, { children: 'Start Date' }),
+                        (0, s.jsx)(n.td, { children: 'DateTime' }),
+                        (0, s.jsx)(n.td, { children: '-' }),
+                        (0, s.jsx)(n.td, { children: 'When coupon becomes valid' }),
+                      ],
+                    }),
+                    (0, s.jsxs)(n.tr, {
+                      children: [
+                        (0, s.jsx)(n.td, { children: 'End Date' }),
+                        (0, s.jsx)(n.td, { children: 'DateTime' }),
+                        (0, s.jsx)(n.td, { children: '-' }),
+                        (0, s.jsx)(n.td, { children: 'When coupon expires' }),
+                      ],
+                    }),
+                    (0, s.jsxs)(n.tr, {
+                      children: [
+                        (0, s.jsx)(n.td, { children: 'Max Uses' }),
+                        (0, s.jsx)(n.td, { children: 'Number' }),
+                        (0, s.jsx)(n.td, { children: '-' }),
+                        (0, s.jsx)(n.td, { children: 'Total redemption limit' }),
+                      ],
+                    }),
+                    (0, s.jsxs)(n.tr, {
+                      children: [
+                        (0, s.jsx)(n.td, { children: 'Max Uses Per User' }),
+                        (0, s.jsx)(n.td, { children: 'Number' }),
+                        (0, s.jsx)(n.td, { children: '-' }),
+                        (0, s.jsx)(n.td, { children: 'Per-user limit' }),
+                      ],
+                    }),
+                    (0, s.jsxs)(n.tr, {
+                      children: [
+                        (0, s.jsx)(n.td, { children: 'Rewards' }),
+                        (0, s.jsx)(n.td, { children: 'Reward Config' }),
+                        (0, s.jsx)(n.td, { children: 'Required' }),
+                        (0, s.jsx)(n.td, { children: 'Items/currency to give' }),
+                      ],
+                    }),
+                  ],
+                }),
+              ],
+            }),
+            '\n',
+            (0, s.jsxs)(n.ol, {
+              start: '4',
+              children: [
+                '\n',
+                (0, s.jsxs)(n.li, {
+                  children: ['Click ', (0, s.jsx)(n.strong, { children: 'Create' }), ' to save'],
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, s.jsx)(n.h2, { id: 'reward-configuration', children: 'Reward Configuration' }),
+            '\n',
+            (0, s.jsx)(n.p, { children: 'Rewards can include:' }),
+            '\n',
+            (0, s.jsxs)(n.ul, {
+              children: [
+                '\n',
+                (0, s.jsx)(n.li, { children: 'In-game items' }),
+                '\n',
+                (0, s.jsx)(n.li, { children: 'Virtual currency' }),
+                '\n',
+                (0, s.jsx)(n.li, { children: 'Premium time' }),
+                '\n',
+                (0, s.jsx)(n.li, { children: 'Special titles/badges' }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, s.jsx)(n.h2, { id: 'coupon-redemption', children: 'Coupon Redemption' }),
+            '\n',
+            (0, s.jsx)(n.p, {
+              children: 'Players redeem coupons via the game client. The API endpoint:',
+            }),
+            '\n',
+            (0, s.jsx)(n.pre, {
+              children: (0, s.jsx)(n.code, {
+                className: 'language-bash',
+                children: 'POST /api/v1/coupons/redeem\n{\n  "code": "SUMMER2024"\n}\n',
+              }),
+            }),
+            '\n',
+            (0, s.jsx)(n.h2, { id: 'tracking', children: 'Tracking' }),
+            '\n',
+            (0, s.jsx)(n.p, { children: 'View redemption history including:' }),
+            '\n',
+            (0, s.jsxs)(n.ul, {
+              children: [
+                '\n',
+                (0, s.jsx)(n.li, { children: 'Redemption time' }),
+                '\n',
+                (0, s.jsx)(n.li, { children: 'User ID' }),
+                '\n',
+                (0, s.jsx)(n.li, { children: 'Rewards granted' }),
+                '\n',
+                (0, s.jsx)(n.li, { children: 'Status (success/failed)' }),
+                '\n',
+              ],
+            }),
+          ],
+        });
+      }
+      function h(e = {}) {
+        const { wrapper: n } = { ...(0, d.R)(), ...e.components };
+        return n ? (0, s.jsx)(n, { ...e, children: (0, s.jsx)(a, { ...e }) }) : a(e);
+      }
+    },
+  },
+]);

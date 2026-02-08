@@ -29,37 +29,16 @@ Gatrix chat server provides the following advanced features:
 
 <Tabs>
   <TabItem value="npm" label="npm" default>
-    ```bash
-    # Navigate to chat server package
-    cd packages/chat-server
-    
-    # Install dependencies
-    npm install
-    
-    # Setup environment variables
-    cp .env.example .env
-    ```
+    ```bash # Navigate to chat server package cd packages/chat-server # Install dependencies npm
+    install # Setup environment variables cp .env.example .env ```
   </TabItem>
   <TabItem value="yarn" label="yarn">
-    ```bash
-    # Navigate to chat server package
-    cd packages/chat-server
-    
-    # Install dependencies
-    yarn install
-    
-    # Setup environment variables
-    cp .env.example .env
-    ```
+    ```bash # Navigate to chat server package cd packages/chat-server # Install dependencies yarn
+    install # Setup environment variables cp .env.example .env ```
   </TabItem>
   <TabItem value="docker" label="Docker">
-    ```bash
-    # Run full stack with Docker Compose
-    docker-compose up -d
-    
-    # Or run chat server only
-    docker-compose up chat-server
-    ```
+    ```bash # Run full stack with Docker Compose docker-compose up -d # Or run chat server only
+    docker-compose up chat-server ```
   </TabItem>
 </Tabs>
 
@@ -72,6 +51,7 @@ PORT=3001
 HOST=0.0.0.0
 
 # Database
+
 DB_HOST=localhost
 DB_PORT=3306
 DB_NAME=gatrix_chat
@@ -79,18 +59,22 @@ DB_USER=chat_user
 DB_PASSWORD=your_password
 
 # Redis Cluster
+
 REDIS_HOST=localhost
 REDIS_PORT=6379
 REDIS_PASSWORD=your_redis_password
 
 # Gatrix Main Server Integration
+
 GATRIX_API_URL=http://localhost:5000
 GATRIX_API_SECRET=shared_secret
 
 # Performance Tuning
+
 CLUSTER_ENABLED=true
 WS_MAX_CONNECTIONS=10000
 BROADCAST_BATCH_SIZE=1000`}
+
 </CodeBlock>
 
 ## 🔧 Core Features
@@ -101,7 +85,7 @@ BROADCAST_BATCH_SIZE=1000`}
 // Join channel with WebSocket
 socket.emit('join_channel', {
   channelId: 'channel_123',
-  userId: 'user_456'
+  userId: 'user_456',
 });
 ```
 
@@ -112,7 +96,7 @@ socket.emit('join_channel', {
 socket.emit('send_message', {
   channelId: 'channel_123',
   content: 'Hello!',
-  type: 'text'
+  type: 'text',
 });
 ```
 
@@ -136,5 +120,6 @@ Gatrix chat server provides a complete solution for high-performance real-time c
 ---
 
 **Related Resources**:
+
 - [API Documentation](../../api/client-api)
 - [GitHub Repository](https://github.com/motifgames/gatrix)

@@ -9,7 +9,7 @@ async function createTestClientVersion() {
     host: process.env.DB_HOST || 'localhost',
     user: process.env.DB_USER || 'motif_dev',
     password: process.env.DB_PASSWORD || 'dev123$',
-    database: process.env.DB_NAME || 'uwo_gate'
+    database: process.env.DB_NAME || 'uwo_gate',
   });
 
   try {
@@ -30,7 +30,9 @@ async function createTestClientVersion() {
     `);
     console.log('기존 클라이언트 버전 목록:');
     allData.forEach((item, index) => {
-      console.log(`${index + 1}. ID: ${item.id}, Platform: ${item.platform}, Version: ${item.clientVersion}, Status: ${item.clientStatus}`);
+      console.log(
+        `${index + 1}. ID: ${item.id}, Platform: ${item.platform}, Version: ${item.clientVersion}, Status: ${item.clientStatus}`
+      );
     });
 
     return; // 데이터 조회만 하고 종료
@@ -51,33 +53,36 @@ async function createTestClientVersion() {
       createdBy: 1,
       updatedBy: 1,
       createdAt: new Date(),
-      updatedAt: new Date()
+      updatedAt: new Date(),
     };
 
-    const [result] = await connection.execute(`
+    const [result] = await connection.execute(
+      `
       INSERT INTO g_client_versions (
         platform, clientVersion, clientStatus, gameServerAddress, 
         gameServerAddressForWhiteList, patchAddress, patchAddressForWhiteList,
         guestModeAllowed, externalClickLink, memo, customPayload,
         createdBy, updatedBy, createdAt, updatedAt
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `, [
-      testData.platform,
-      testData.clientVersion,
-      testData.clientStatus,
-      testData.gameServerAddress,
-      testData.gameServerAddressForWhiteList,
-      testData.patchAddress,
-      testData.patchAddressForWhiteList,
-      testData.guestModeAllowed,
-      testData.externalClickLink,
-      testData.memo,
-      testData.customPayload,
-      testData.createdBy,
-      testData.updatedBy,
-      testData.createdAt,
-      testData.updatedAt
-    ]);
+    `,
+      [
+        testData.platform,
+        testData.clientVersion,
+        testData.clientStatus,
+        testData.gameServerAddress,
+        testData.gameServerAddressForWhiteList,
+        testData.patchAddress,
+        testData.patchAddressForWhiteList,
+        testData.guestModeAllowed,
+        testData.externalClickLink,
+        testData.memo,
+        testData.customPayload,
+        testData.createdBy,
+        testData.updatedBy,
+        testData.createdAt,
+        testData.updatedAt,
+      ]
+    );
 
     console.log('테스트 클라이언트 버전 생성 완료. ID:', result.insertId);
 
@@ -88,11 +93,13 @@ async function createTestClientVersion() {
     console.log('현재 클라이언트 버전 수:', newCount[0].count);
 
     // 생성된 데이터 조회
-    const [created] = await connection.execute(`
+    const [created] = await connection.execute(
+      `
       SELECT * FROM g_client_versions WHERE id = ?
-    `, [result.insertId]);
+    `,
+      [result.insertId]
+    );
     console.log('생성된 데이터:', created[0]);
-
   } catch (error) {
     console.error('오류 발생:', error);
   } finally {

@@ -202,86 +202,54 @@
     ":links": {
       "battleMap": [
         {
-          "id": [
-            "BattleMap"
-          ]
+          "id": ["BattleMap"]
         },
         {
-          "id": [
-            "BattleMap"
-          ]
+          "id": ["BattleMap"]
         },
         {
-          "id": [
-            "BattleMap"
-          ]
+          "id": ["BattleMap"]
         },
         {
-          "id": [
-            "BattleMap"
-          ]
+          "id": ["BattleMap"]
         },
         {
-          "id": [
-            "BattleMap"
-          ]
+          "id": ["BattleMap"]
         },
         {
-          "id": [
-            "BattleMap"
-          ]
+          "id": ["BattleMap"]
         },
         {
-          "id": [
-            "BattleMap"
-          ]
+          "id": ["BattleMap"]
         },
         {
-          "id": [
-            "BattleMap"
-          ]
+          "id": ["BattleMap"]
         },
         {
-          "id": [
-            "BattleMap"
-          ]
+          "id": ["BattleMap"]
         },
         {
-          "id": [
-            "BattleMap"
-          ]
+          "id": ["BattleMap"]
         },
         {
-          "id": [
-            "BattleMap"
-          ]
+          "id": ["BattleMap"]
         }
       ],
       "battleMapLowLv": [
         {
-          "id": [
-            "BattleMap"
-          ]
+          "id": ["BattleMap"]
         },
         {
-          "id": [
-            "BattleMap"
-          ]
+          "id": ["BattleMap"]
         },
         {
-          "id": [
-            "BattleMap"
-          ]
+          "id": ["BattleMap"]
         },
         {
-          "id": [
-            "BattleMap"
-          ]
+          "id": ["BattleMap"]
         },
         {
-          "id": [
-            "BattleMap"
-          ]
+          "id": ["BattleMap"]
         }
       ]
     }

@@ -25,17 +25,17 @@ Manage in-app purchase products and virtual items.
 2. Click **Add Product** button
 3. Configure the product:
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| Product ID | Text | Required | Unique product identifier |
-| Name | Text | Required | Display name |
-| Description | Textarea | - | Product description |
-| Price | Number | Required | Price in cents/points |
-| Currency | Select | Required | USD, KRW, Gems, etc. |
-| Icon | Image | - | Product image |
-| Max Purchases | Number | - | Per-user limit |
-| Available From | DateTime | - | Start availability |
-| Available Until | DateTime | - | End availability |
+| Field           | Type     | Required | Description               |
+| --------------- | -------- | -------- | ------------------------- |
+| Product ID      | Text     | Required | Unique product identifier |
+| Name            | Text     | Required | Display name              |
+| Description     | Textarea | -        | Product description       |
+| Price           | Number   | Required | Price in cents/points     |
+| Currency        | Select   | Required | USD, KRW, Gems, etc.      |
+| Icon            | Image    | -        | Product image             |
+| Max Purchases   | Number   | -        | Per-user limit            |
+| Available From  | DateTime | -        | Start availability        |
+| Available Until | DateTime | -        | End availability          |
 
 4. Click **Create** to save
 

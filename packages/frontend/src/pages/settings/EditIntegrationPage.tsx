@@ -111,7 +111,6 @@ const PROVIDER_ICONS: Record<string, string> = {
   debug: debugIcon, // Use specific debug icon
 };
 
-
 // Event categories for UI grouping
 const EVENT_CATEGORIES: EventCategory[] = [
   {
@@ -192,7 +191,12 @@ const EVENT_CATEGORIES: EventCategory[] = [
   },
   {
     key: 'integration',
-    events: ['integration_created', 'integration_updated', 'integration_deleted', 'integration_test'],
+    events: [
+      'integration_created',
+      'integration_updated',
+      'integration_deleted',
+      'integration_test',
+    ],
   },
 ];
 
@@ -305,11 +309,7 @@ const LogDetailsRow: React.FC<{ log: EventLog; index: number }> = ({ log, index 
         }}
       >
         <TableCell>
-          <IconButton
-            aria-label="expand row"
-            size="small"
-            onClick={() => setOpen(!open)}
-          >
+          <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
             {open ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
           </IconButton>
         </TableCell>
@@ -335,10 +335,37 @@ const LogDetailsRow: React.FC<{ log: EventLog; index: number }> = ({ log, index 
               i18nKey={descriptionConfig.key}
               values={descriptionConfig.params}
               components={{
-                name: <LabelChip size="small" variant="outlined" sx={{ height: 20, fontSize: '0.75rem', fontWeight: 500 }} />,
-                environment: <LabelChip size="small" color="primary" variant="outlined" sx={{ height: 20, fontSize: '0.75rem' }} />,
-                enabled: <LabelChip size="small" color="success" variant="outlined" sx={{ height: 20, fontSize: '0.75rem', fontWeight: 600 }} />,
-                disabled: <LabelChip size="small" color="default" variant="outlined" sx={{ height: 20, fontSize: '0.75rem', fontWeight: 600 }} />,
+                name: (
+                  <LabelChip
+                    size="small"
+                    variant="outlined"
+                    sx={{ height: 20, fontSize: '0.75rem', fontWeight: 500 }}
+                  />
+                ),
+                environment: (
+                  <LabelChip
+                    size="small"
+                    color="primary"
+                    variant="outlined"
+                    sx={{ height: 20, fontSize: '0.75rem' }}
+                  />
+                ),
+                enabled: (
+                  <LabelChip
+                    size="small"
+                    color="success"
+                    variant="outlined"
+                    sx={{ height: 20, fontSize: '0.75rem', fontWeight: 600 }}
+                  />
+                ),
+                disabled: (
+                  <LabelChip
+                    size="small"
+                    color="default"
+                    variant="outlined"
+                    sx={{ height: 20, fontSize: '0.75rem', fontWeight: 600 }}
+                  />
+                ),
                 message: <span style={{ fontWeight: 500 }} />,
               }}
             />
@@ -347,7 +374,9 @@ const LogDetailsRow: React.FC<{ log: EventLog; index: number }> = ({ log, index 
           )}
         </TableCell>
         <TableCell>{log.statusCode ?? '-'}</TableCell>
-        <TableCell sx={{ whiteSpace: 'nowrap' }}>{formatRelativeTime(log.createdAt, { showSeconds: true })}</TableCell>
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>
+          {formatRelativeTime(log.createdAt, { showSeconds: true })}
+        </TableCell>
       </TableRow>
       <TableRow
         sx={{
@@ -362,7 +391,12 @@ const LogDetailsRow: React.FC<{ log: EventLog; index: number }> = ({ log, index 
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={7}>
           <Collapse in={open} timeout="auto" unmountOnExit>
             <Box sx={{ margin: 2 }}>
-              <Typography variant="h6" gutterBottom component="div" sx={{ fontSize: '0.9rem', fontWeight: 600 }}>
+              <Typography
+                variant="h6"
+                gutterBottom
+                component="div"
+                sx={{ fontSize: '0.9rem', fontWeight: 600 }}
+              >
                 {t('integrations.eventDetails')}
               </Typography>
 
@@ -375,8 +409,8 @@ const LogDetailsRow: React.FC<{ log: EventLog; index: number }> = ({ log, index 
                   <Box
                     sx={{
                       p: 2,
-                      bgcolor: (theme) => theme.palette.mode === 'dark' ? '#2b2b2b' : '#f5f5f5',
-                      color: (theme) => theme.palette.mode === 'dark' ? '#e6e6e6' : '#333333',
+                      bgcolor: (theme) => (theme.palette.mode === 'dark' ? '#2b2b2b' : '#f5f5f5'),
+                      color: (theme) => (theme.palette.mode === 'dark' ? '#e6e6e6' : '#333333'),
                       borderRadius: 1,
                       fontFamily: 'Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace',
                       fontSize: '0.85rem',
@@ -677,24 +711,24 @@ export const EditIntegrationPage: React.FC = () => {
         slotProps={
           isSensitive
             ? {
-              input: {
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      onClick={() =>
-                        setShowSensitive((prev) => ({
-                          ...prev,
-                          [param.name]: !prev[param.name],
-                        }))
-                      }
-                      edge="end"
-                    >
-                      {isVisible ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              },
-            }
+                input: {
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() =>
+                          setShowSensitive((prev) => ({
+                            ...prev,
+                            [param.name]: !prev[param.name],
+                          }))
+                        }
+                        edge="end"
+                      >
+                        {isVisible ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                },
+              }
             : undefined
         }
       />
@@ -953,7 +987,9 @@ export const EditIntegrationPage: React.FC = () => {
       <TabPanel value={tabValue} index={1}>
         <Box display="flex" justifyContent="flex-end" alignItems="center" mb={1}>
           <Button
-            startIcon={logsLoading ? <CircularProgress size={16} color="inherit" /> : <RefreshIcon />}
+            startIcon={
+              logsLoading ? <CircularProgress size={16} color="inherit" /> : <RefreshIcon />
+            }
             onClick={() => fetchEventLogs(true)}
             size="small"
             disabled={logsLoading}

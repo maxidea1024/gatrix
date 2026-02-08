@@ -1,4 +1,4 @@
-exports.up = async function(knex) {
+exports.up = async function (knex) {
   // Update chat_messages table to align with MessageModel expectations
   const messagesTable = 'chat_messages';
   const attachmentsTable = 'chat_message_attachments';
@@ -14,7 +14,9 @@ exports.up = async function(knex) {
 
     // Content type for richer messages
     await addIfMissing('contentType', (table) => {
-      table.enum('contentType', ['text', 'image', 'video', 'audio', 'file', 'location', 'system']).defaultTo('text');
+      table
+        .enum('contentType', ['text', 'image', 'video', 'audio', 'file', 'location', 'system'])
+        .defaultTo('text');
     });
 
     // JSON payload for structured message content
@@ -26,18 +28,24 @@ exports.up = async function(knex) {
     await addIfMissing('replyToMessageId', (table) => {
       table.integer('replyToMessageId').unsigned().nullable();
       // FK best-effort (ignore if fails)
-      knex.raw(
-        'ALTER TABLE ?? ADD INDEX ?? (??)',
-        [messagesTable, 'idx_messages_reply_to', 'replyToMessageId']
-      ).catch(() => {});
+      knex
+        .raw('ALTER TABLE ?? ADD INDEX ?? (??)', [
+          messagesTable,
+          'idx_messages_reply_to',
+          'replyToMessageId',
+        ])
+        .catch(() => {});
     });
 
     await addIfMissing('threadId', (table) => {
       table.integer('threadId').unsigned().nullable();
-      knex.raw(
-        'ALTER TABLE ?? ADD INDEX ?? (??)',
-        [messagesTable, 'idx_messages_thread_id', 'threadId']
-      ).catch(() => {});
+      knex
+        .raw('ALTER TABLE ?? ADD INDEX ?? (??)', [
+          messagesTable,
+          'idx_messages_thread_id',
+          'threadId',
+        ])
+        .catch(() => {});
     });
 
     // Flags and soft delete
@@ -47,10 +55,13 @@ exports.up = async function(knex) {
 
     await addIfMissing('isDeleted', (table) => {
       table.boolean('isDeleted').defaultTo(false);
-      knex.raw(
-        'ALTER TABLE ?? ADD INDEX ?? (??)',
-        [messagesTable, 'idx_messages_is_deleted', 'isDeleted']
-      ).catch(() => {});
+      knex
+        .raw('ALTER TABLE ?? ADD INDEX ?? (??)', [
+          messagesTable,
+          'idx_messages_is_deleted',
+          'isDeleted',
+        ])
+        .catch(() => {});
     });
 
     await addIfMissing('isPinned', (table) => {
@@ -83,7 +94,7 @@ exports.up = async function(knex) {
   }
 };
 
-exports.down = async function(knex) {
+exports.down = async function (knex) {
   const messagesTable = 'chat_messages';
   const attachmentsTable = 'chat_message_attachments';
 
@@ -114,4 +125,3 @@ exports.down = async function(knex) {
     }
   }
 };
-

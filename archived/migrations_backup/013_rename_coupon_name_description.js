@@ -7,13 +7,12 @@
  * - MySQL DATETIME unaffected
  */
 
-exports.up = async function(connection) {
+exports.up = async function (connection) {
   console.log('Skipping: g_coupon_settings already has correct column names (name, description)');
   // No-op: columns already exist with correct names from 012_create_coupon_system
 };
 
-exports.down = async function(connection) {
+exports.down = async function (connection) {
   console.log('Skipping rollback: no changes were made in this migration');
   // No-op: nothing to rollback
 };
-

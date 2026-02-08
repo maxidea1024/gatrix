@@ -1,1 +1,309 @@
-"use strict";(globalThis.webpackChunkdocs=globalThis.webpackChunkdocs||[]).push([[4539],{3841(e,n,i){i.r(n),i.d(n,{assets:()=>c,contentTitle:()=>t,default:()=>h,frontMatter:()=>d,metadata:()=>s,toc:()=>a});const s=JSON.parse('{"id":"api/client-api","title":"\ud074\ub77c\uc774\uc5b8\ud2b8 API","description":"\uac8c\uc784 \ud074\ub77c\uc774\uc5b8\ud2b8\uc5d0\uc11c \uc9c1\uc811 \ud638\ucd9c\ud560 \uc218 \uc788\ub294 \uacf5\uac1c API \uc5d4\ub4dc\ud3ec\uc778\ud2b8\uc785\ub2c8\ub2e4.","source":"@site/i18n/ko/docusaurus-plugin-content-docs/current/api/client-api.md","sourceDirName":"api","slug":"/api/client-api","permalink":"/docs/ko/api/client-api","draft":false,"unlisted":false,"editUrl":"https://github.com/your-org/gatrix/tree/main/docs/docs/api/client-api.md","tags":[],"version":"current","sidebarPosition":1,"frontMatter":{"sidebar_position":1,"sidebar_label":"\ud074\ub77c\uc774\uc5b8\ud2b8 API"},"sidebar":"tutorialSidebar","previous":{"title":"Game Engine SDKs","permalink":"/docs/ko/sdks/game-engines"},"next":{"title":"\uc11c\ubc84 SDK API","permalink":"/docs/ko/api/server-sdk-api"}}');var l=i(4848),r=i(8453);const d={sidebar_position:1,sidebar_label:"\ud074\ub77c\uc774\uc5b8\ud2b8 API"},t="\ud074\ub77c\uc774\uc5b8\ud2b8 API",c={},a=[{value:"\ud2b9\uc9d5",id:"\ud2b9\uc9d5",level:2},{value:"API \uc5d4\ub4dc\ud3ec\uc778\ud2b8",id:"api-\uc5d4\ub4dc\ud3ec\uc778\ud2b8",level:2},{value:"1. \ud074\ub77c\uc774\uc5b8\ud2b8 \ubc84\uc804 \uc815\ubcf4",id:"1-\ud074\ub77c\uc774\uc5b8\ud2b8-\ubc84\uc804-\uc815\ubcf4",level:3},{value:"\ucffc\ub9ac \ub9e4\uac1c\ubcc0\uc218",id:"\ucffc\ub9ac-\ub9e4\uac1c\ubcc0\uc218",level:4},{value:"\uc751\ub2f5 \uc608\uc2dc",id:"\uc751\ub2f5-\uc608\uc2dc",level:4},{value:"2. \uac8c\uc784 \uc6d4\ub4dc \ubaa9\ub85d",id:"2-\uac8c\uc784-\uc6d4\ub4dc-\ubaa9\ub85d",level:3},{value:"\uc751\ub2f5 \uc608\uc2dc",id:"\uc751\ub2f5-\uc608\uc2dc-1",level:4},{value:"3. \uc11c\ube44\uc2a4 \uacf5\uc9c0\uc0ac\ud56d",id:"3-\uc11c\ube44\uc2a4-\uacf5\uc9c0\uc0ac\ud56d",level:3},{value:"4. \ud53c\ucc98 \ud50c\ub798\uadf8 \ud3c9\uac00",id:"4-\ud53c\ucc98-\ud50c\ub798\uadf8-\ud3c9\uac00",level:3},{value:"\uc694\uccad \ubcf8\ubb38",id:"\uc694\uccad-\ubcf8\ubb38",level:4}];function o(e){const n={code:"code",h1:"h1",h2:"h2",h3:"h3",h4:"h4",header:"header",li:"li",p:"p",pre:"pre",strong:"strong",table:"table",tbody:"tbody",td:"td",th:"th",thead:"thead",tr:"tr",ul:"ul",...(0,r.R)(),...e.components};return(0,l.jsxs)(l.Fragment,{children:[(0,l.jsx)(n.header,{children:(0,l.jsx)(n.h1,{id:"\ud074\ub77c\uc774\uc5b8\ud2b8-api",children:"\ud074\ub77c\uc774\uc5b8\ud2b8 API"})}),"\n",(0,l.jsx)(n.p,{children:"\uac8c\uc784 \ud074\ub77c\uc774\uc5b8\ud2b8\uc5d0\uc11c \uc9c1\uc811 \ud638\ucd9c\ud560 \uc218 \uc788\ub294 \uacf5\uac1c API \uc5d4\ub4dc\ud3ec\uc778\ud2b8\uc785\ub2c8\ub2e4."}),"\n",(0,l.jsx)(n.h2,{id:"\ud2b9\uc9d5",children:"\ud2b9\uc9d5"}),"\n",(0,l.jsxs)(n.ul,{children:["\n",(0,l.jsxs)(n.li,{children:[(0,l.jsx)(n.strong,{children:"\uc778\uc99d \ubd88\ud544\uc694"}),": \ud074\ub77c\uc774\uc5b8\ud2b8\uc5d0\uc11c \uc9c1\uc811 \ud638\ucd9c \uac00\ub2a5"]}),"\n",(0,l.jsxs)(n.li,{children:[(0,l.jsx)(n.strong,{children:"Rate Limit \uc801\uc6a9"}),": \uacfc\ub3c4\ud55c \uc694\uccad \ucc98\ub9ac \uc81c\ud55c"]}),"\n",(0,l.jsxs)(n.li,{children:[(0,l.jsx)(n.strong,{children:"\uace0\uc131\ub2a5 \uce90\uc2f1"}),": \ub85c\uceec \uba54\ubaa8\ub9ac \uce90\uc2f1\uc744 \ud1b5\ud55c \ube60\ub978 \uc751\ub2f5"]}),"\n",(0,l.jsxs)(n.li,{children:[(0,l.jsx)(n.strong,{children:"\uc2e4\uc2dc\uac04 \uce90\uc2dc \ubb34\ud6a8\ud654"}),": \uad00\ub9ac\uc790 \uc124\uc815 \ubcc0\uacbd \uc2dc Pub/Sub\uc744 \ud1b5\ud55c \uc989\uac01\uc801\uc778 \uce90\uc2dc \uac31\uc2e0"]}),"\n"]}),"\n",(0,l.jsx)(n.h2,{id:"api-\uc5d4\ub4dc\ud3ec\uc778\ud2b8",children:"API \uc5d4\ub4dc\ud3ec\uc778\ud2b8"}),"\n",(0,l.jsx)(n.h3,{id:"1-\ud074\ub77c\uc774\uc5b8\ud2b8-\ubc84\uc804-\uc815\ubcf4",children:"1. \ud074\ub77c\uc774\uc5b8\ud2b8 \ubc84\uc804 \uc815\ubcf4"}),"\n",(0,l.jsx)(n.pre,{children:(0,l.jsx)(n.code,{children:"GET /api/v1/client/client-version\n"})}),"\n",(0,l.jsx)(n.p,{children:"\uac8c\uc784 \ud074\ub77c\uc774\uc5b8\ud2b8\uc758 \ubc84\uc804 \uc815\ubcf4\ub97c \uc870\ud68c\ud569\ub2c8\ub2e4."}),"\n",(0,l.jsx)(n.h4,{id:"\ucffc\ub9ac-\ub9e4\uac1c\ubcc0\uc218",children:"\ucffc\ub9ac \ub9e4\uac1c\ubcc0\uc218"}),"\n",(0,l.jsxs)(n.table,{children:[(0,l.jsx)(n.thead,{children:(0,l.jsxs)(n.tr,{children:[(0,l.jsx)(n.th,{children:"\ub9e4\uac1c\ubcc0\uc218"}),(0,l.jsx)(n.th,{children:"\uc720\ud615"}),(0,l.jsx)(n.th,{children:"\uc124\uba85"})]})}),(0,l.jsxs)(n.tbody,{children:[(0,l.jsxs)(n.tr,{children:[(0,l.jsx)(n.td,{children:"channel"}),(0,l.jsx)(n.td,{children:"string"}),(0,l.jsx)(n.td,{children:"\ucc44\ub110 \ud544\ud130 (\uc608: PC, Mobile)"})]}),(0,l.jsxs)(n.tr,{children:[(0,l.jsx)(n.td,{children:"subChannel"}),(0,l.jsx)(n.td,{children:"string"}),(0,l.jsx)(n.td,{children:"\uc11c\ube0c \ucc44\ub110 \ud544\ud130 (\uc608: Steam, Google, iOS)"})]})]})]}),"\n",(0,l.jsx)(n.h4,{id:"\uc751\ub2f5-\uc608\uc2dc",children:"\uc751\ub2f5 \uc608\uc2dc"}),"\n",(0,l.jsx)(n.pre,{children:(0,l.jsx)(n.code,{className:"language-json",children:'{\n  "success": true,\n  "data": {\n    "versions": [\n      {\n        "id": 1,\n        "channel": "PC",\n        "subChannel": "Steam",\n        "clientVersion": "1.0.0",\n        "gameServerAddress": "https://game.example.com",\n        "patchAddress": "https://patch.example.com",\n        "forceUpdate": false\n      }\n    ]\n  }\n}\n'})}),"\n",(0,l.jsx)(n.h3,{id:"2-\uac8c\uc784-\uc6d4\ub4dc-\ubaa9\ub85d",children:"2. \uac8c\uc784 \uc6d4\ub4dc \ubaa9\ub85d"}),"\n",(0,l.jsx)(n.pre,{children:(0,l.jsx)(n.code,{children:"GET /api/v1/client/game-worlds\n"})}),"\n",(0,l.jsx)(n.p,{children:"\uc0ac\uc6a9 \uac00\ub2a5\ud55c \uac8c\uc784 \uc6d4\ub4dc \ubaa9\ub85d\uc744 \uc870\ud68c\ud569\ub2c8\ub2e4."}),"\n",(0,l.jsx)(n.h4,{id:"\uc751\ub2f5-\uc608\uc2dc-1",children:"\uc751\ub2f5 \uc608\uc2dc"}),"\n",(0,l.jsx)(n.pre,{children:(0,l.jsx)(n.code,{className:"language-json",children:'{\n  "success": true,\n  "data": {\n    "worlds": [\n      {\n        "worldId": "world001",\n        "name": "\uba54\uc778 \uc6d4\ub4dc",\n        "status": "online"\n      }\n    ]\n  }\n}\n'})}),"\n",(0,l.jsx)(n.h3,{id:"3-\uc11c\ube44\uc2a4-\uacf5\uc9c0\uc0ac\ud56d",children:"3. \uc11c\ube44\uc2a4 \uacf5\uc9c0\uc0ac\ud56d"}),"\n",(0,l.jsx)(n.pre,{children:(0,l.jsx)(n.code,{children:"GET /api/v1/client/notices\n"})}),"\n",(0,l.jsx)(n.p,{children:"\ud65c\uc131 \uc11c\ube44\uc2a4 \uacf5\uc9c0\uc0ac\ud56d\uc744 \uc870\ud68c\ud569\ub2c8\ub2e4."}),"\n",(0,l.jsx)(n.h3,{id:"4-\ud53c\ucc98-\ud50c\ub798\uadf8-\ud3c9\uac00",children:"4. \ud53c\ucc98 \ud50c\ub798\uadf8 \ud3c9\uac00"}),"\n",(0,l.jsx)(n.pre,{children:(0,l.jsx)(n.code,{children:"POST /api/v1/client/evaluate\n"})}),"\n",(0,l.jsx)(n.p,{children:"\uc0ac\uc6a9\uc790 \ucee8\ud14d\uc2a4\ud2b8\uc5d0 \ub530\ub77c \ud53c\ucc98 \ud50c\ub798\uadf8\ub97c \ud3c9\uac00\ud569\ub2c8\ub2e4."}),"\n",(0,l.jsx)(n.h4,{id:"\uc694\uccad-\ubcf8\ubb38",children:"\uc694\uccad \ubcf8\ubb38"}),"\n",(0,l.jsx)(n.pre,{children:(0,l.jsx)(n.code,{className:"language-json",children:'{\n  "context": {\n    "userId": "user123",\n    "country": "KR"\n  },\n  "flags": ["new_ui", "event_mode"]\n}\n'})})]})}function h(e={}){const{wrapper:n}={...(0,r.R)(),...e.components};return n?(0,l.jsx)(n,{...e,children:(0,l.jsx)(o,{...e})}):o(e)}},8453(e,n,i){i.d(n,{R:()=>d,x:()=>t});var s=i(6540);const l={},r=s.createContext(l);function d(e){const n=s.useContext(r);return s.useMemo(function(){return"function"==typeof e?e(n):{...n,...e}},[n,e])}function t(e){let n;return n=e.disableParentContext?"function"==typeof e.components?e.components(l):e.components||l:d(e.components),s.createElement(r.Provider,{value:n},e.children)}}}]);
+'use strict';
+(globalThis.webpackChunkdocs = globalThis.webpackChunkdocs || []).push([
+  [4539],
+  {
+    3841(e, n, i) {
+      (i.r(n),
+        i.d(n, {
+          assets: () => c,
+          contentTitle: () => t,
+          default: () => h,
+          frontMatter: () => d,
+          metadata: () => s,
+          toc: () => a,
+        }));
+      const s = JSON.parse(
+        '{"id":"api/client-api","title":"\ud074\ub77c\uc774\uc5b8\ud2b8 API","description":"\uac8c\uc784 \ud074\ub77c\uc774\uc5b8\ud2b8\uc5d0\uc11c \uc9c1\uc811 \ud638\ucd9c\ud560 \uc218 \uc788\ub294 \uacf5\uac1c API \uc5d4\ub4dc\ud3ec\uc778\ud2b8\uc785\ub2c8\ub2e4.","source":"@site/i18n/ko/docusaurus-plugin-content-docs/current/api/client-api.md","sourceDirName":"api","slug":"/api/client-api","permalink":"/docs/ko/api/client-api","draft":false,"unlisted":false,"editUrl":"https://github.com/your-org/gatrix/tree/main/docs/docs/api/client-api.md","tags":[],"version":"current","sidebarPosition":1,"frontMatter":{"sidebar_position":1,"sidebar_label":"\ud074\ub77c\uc774\uc5b8\ud2b8 API"},"sidebar":"tutorialSidebar","previous":{"title":"Game Engine SDKs","permalink":"/docs/ko/sdks/game-engines"},"next":{"title":"\uc11c\ubc84 SDK API","permalink":"/docs/ko/api/server-sdk-api"}}'
+      );
+      var l = i(4848),
+        r = i(8453);
+      const d = { sidebar_position: 1, sidebar_label: '\ud074\ub77c\uc774\uc5b8\ud2b8 API' },
+        t = '\ud074\ub77c\uc774\uc5b8\ud2b8 API',
+        c = {},
+        a = [
+          { value: '\ud2b9\uc9d5', id: '\ud2b9\uc9d5', level: 2 },
+          {
+            value: 'API \uc5d4\ub4dc\ud3ec\uc778\ud2b8',
+            id: 'api-\uc5d4\ub4dc\ud3ec\uc778\ud2b8',
+            level: 2,
+          },
+          {
+            value: '1. \ud074\ub77c\uc774\uc5b8\ud2b8 \ubc84\uc804 \uc815\ubcf4',
+            id: '1-\ud074\ub77c\uc774\uc5b8\ud2b8-\ubc84\uc804-\uc815\ubcf4',
+            level: 3,
+          },
+          {
+            value: '\ucffc\ub9ac \ub9e4\uac1c\ubcc0\uc218',
+            id: '\ucffc\ub9ac-\ub9e4\uac1c\ubcc0\uc218',
+            level: 4,
+          },
+          { value: '\uc751\ub2f5 \uc608\uc2dc', id: '\uc751\ub2f5-\uc608\uc2dc', level: 4 },
+          {
+            value: '2. \uac8c\uc784 \uc6d4\ub4dc \ubaa9\ub85d',
+            id: '2-\uac8c\uc784-\uc6d4\ub4dc-\ubaa9\ub85d',
+            level: 3,
+          },
+          { value: '\uc751\ub2f5 \uc608\uc2dc', id: '\uc751\ub2f5-\uc608\uc2dc-1', level: 4 },
+          {
+            value: '3. \uc11c\ube44\uc2a4 \uacf5\uc9c0\uc0ac\ud56d',
+            id: '3-\uc11c\ube44\uc2a4-\uacf5\uc9c0\uc0ac\ud56d',
+            level: 3,
+          },
+          {
+            value: '4. \ud53c\ucc98 \ud50c\ub798\uadf8 \ud3c9\uac00',
+            id: '4-\ud53c\ucc98-\ud50c\ub798\uadf8-\ud3c9\uac00',
+            level: 3,
+          },
+          { value: '\uc694\uccad \ubcf8\ubb38', id: '\uc694\uccad-\ubcf8\ubb38', level: 4 },
+        ];
+      function o(e) {
+        const n = {
+          code: 'code',
+          h1: 'h1',
+          h2: 'h2',
+          h3: 'h3',
+          h4: 'h4',
+          header: 'header',
+          li: 'li',
+          p: 'p',
+          pre: 'pre',
+          strong: 'strong',
+          table: 'table',
+          tbody: 'tbody',
+          td: 'td',
+          th: 'th',
+          thead: 'thead',
+          tr: 'tr',
+          ul: 'ul',
+          ...(0, r.R)(),
+          ...e.components,
+        };
+        return (0, l.jsxs)(l.Fragment, {
+          children: [
+            (0, l.jsx)(n.header, {
+              children: (0, l.jsx)(n.h1, {
+                id: '\ud074\ub77c\uc774\uc5b8\ud2b8-api',
+                children: '\ud074\ub77c\uc774\uc5b8\ud2b8 API',
+              }),
+            }),
+            '\n',
+            (0, l.jsx)(n.p, {
+              children:
+                '\uac8c\uc784 \ud074\ub77c\uc774\uc5b8\ud2b8\uc5d0\uc11c \uc9c1\uc811 \ud638\ucd9c\ud560 \uc218 \uc788\ub294 \uacf5\uac1c API \uc5d4\ub4dc\ud3ec\uc778\ud2b8\uc785\ub2c8\ub2e4.',
+            }),
+            '\n',
+            (0, l.jsx)(n.h2, { id: '\ud2b9\uc9d5', children: '\ud2b9\uc9d5' }),
+            '\n',
+            (0, l.jsxs)(n.ul, {
+              children: [
+                '\n',
+                (0, l.jsxs)(n.li, {
+                  children: [
+                    (0, l.jsx)(n.strong, { children: '\uc778\uc99d \ubd88\ud544\uc694' }),
+                    ': \ud074\ub77c\uc774\uc5b8\ud2b8\uc5d0\uc11c \uc9c1\uc811 \ud638\ucd9c \uac00\ub2a5',
+                  ],
+                }),
+                '\n',
+                (0, l.jsxs)(n.li, {
+                  children: [
+                    (0, l.jsx)(n.strong, { children: 'Rate Limit \uc801\uc6a9' }),
+                    ': \uacfc\ub3c4\ud55c \uc694\uccad \ucc98\ub9ac \uc81c\ud55c',
+                  ],
+                }),
+                '\n',
+                (0, l.jsxs)(n.li, {
+                  children: [
+                    (0, l.jsx)(n.strong, { children: '\uace0\uc131\ub2a5 \uce90\uc2f1' }),
+                    ': \ub85c\uceec \uba54\ubaa8\ub9ac \uce90\uc2f1\uc744 \ud1b5\ud55c \ube60\ub978 \uc751\ub2f5',
+                  ],
+                }),
+                '\n',
+                (0, l.jsxs)(n.li, {
+                  children: [
+                    (0, l.jsx)(n.strong, {
+                      children: '\uc2e4\uc2dc\uac04 \uce90\uc2dc \ubb34\ud6a8\ud654',
+                    }),
+                    ': \uad00\ub9ac\uc790 \uc124\uc815 \ubcc0\uacbd \uc2dc Pub/Sub\uc744 \ud1b5\ud55c \uc989\uac01\uc801\uc778 \uce90\uc2dc \uac31\uc2e0',
+                  ],
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, l.jsx)(n.h2, {
+              id: 'api-\uc5d4\ub4dc\ud3ec\uc778\ud2b8',
+              children: 'API \uc5d4\ub4dc\ud3ec\uc778\ud2b8',
+            }),
+            '\n',
+            (0, l.jsx)(n.h3, {
+              id: '1-\ud074\ub77c\uc774\uc5b8\ud2b8-\ubc84\uc804-\uc815\ubcf4',
+              children: '1. \ud074\ub77c\uc774\uc5b8\ud2b8 \ubc84\uc804 \uc815\ubcf4',
+            }),
+            '\n',
+            (0, l.jsx)(n.pre, {
+              children: (0, l.jsx)(n.code, { children: 'GET /api/v1/client/client-version\n' }),
+            }),
+            '\n',
+            (0, l.jsx)(n.p, {
+              children:
+                '\uac8c\uc784 \ud074\ub77c\uc774\uc5b8\ud2b8\uc758 \ubc84\uc804 \uc815\ubcf4\ub97c \uc870\ud68c\ud569\ub2c8\ub2e4.',
+            }),
+            '\n',
+            (0, l.jsx)(n.h4, {
+              id: '\ucffc\ub9ac-\ub9e4\uac1c\ubcc0\uc218',
+              children: '\ucffc\ub9ac \ub9e4\uac1c\ubcc0\uc218',
+            }),
+            '\n',
+            (0, l.jsxs)(n.table, {
+              children: [
+                (0, l.jsx)(n.thead, {
+                  children: (0, l.jsxs)(n.tr, {
+                    children: [
+                      (0, l.jsx)(n.th, { children: '\ub9e4\uac1c\ubcc0\uc218' }),
+                      (0, l.jsx)(n.th, { children: '\uc720\ud615' }),
+                      (0, l.jsx)(n.th, { children: '\uc124\uba85' }),
+                    ],
+                  }),
+                }),
+                (0, l.jsxs)(n.tbody, {
+                  children: [
+                    (0, l.jsxs)(n.tr, {
+                      children: [
+                        (0, l.jsx)(n.td, { children: 'channel' }),
+                        (0, l.jsx)(n.td, { children: 'string' }),
+                        (0, l.jsx)(n.td, {
+                          children: '\ucc44\ub110 \ud544\ud130 (\uc608: PC, Mobile)',
+                        }),
+                      ],
+                    }),
+                    (0, l.jsxs)(n.tr, {
+                      children: [
+                        (0, l.jsx)(n.td, { children: 'subChannel' }),
+                        (0, l.jsx)(n.td, { children: 'string' }),
+                        (0, l.jsx)(n.td, {
+                          children:
+                            '\uc11c\ube0c \ucc44\ub110 \ud544\ud130 (\uc608: Steam, Google, iOS)',
+                        }),
+                      ],
+                    }),
+                  ],
+                }),
+              ],
+            }),
+            '\n',
+            (0, l.jsx)(n.h4, {
+              id: '\uc751\ub2f5-\uc608\uc2dc',
+              children: '\uc751\ub2f5 \uc608\uc2dc',
+            }),
+            '\n',
+            (0, l.jsx)(n.pre, {
+              children: (0, l.jsx)(n.code, {
+                className: 'language-json',
+                children:
+                  '{\n  "success": true,\n  "data": {\n    "versions": [\n      {\n        "id": 1,\n        "channel": "PC",\n        "subChannel": "Steam",\n        "clientVersion": "1.0.0",\n        "gameServerAddress": "https://game.example.com",\n        "patchAddress": "https://patch.example.com",\n        "forceUpdate": false\n      }\n    ]\n  }\n}\n',
+              }),
+            }),
+            '\n',
+            (0, l.jsx)(n.h3, {
+              id: '2-\uac8c\uc784-\uc6d4\ub4dc-\ubaa9\ub85d',
+              children: '2. \uac8c\uc784 \uc6d4\ub4dc \ubaa9\ub85d',
+            }),
+            '\n',
+            (0, l.jsx)(n.pre, {
+              children: (0, l.jsx)(n.code, { children: 'GET /api/v1/client/game-worlds\n' }),
+            }),
+            '\n',
+            (0, l.jsx)(n.p, {
+              children:
+                '\uc0ac\uc6a9 \uac00\ub2a5\ud55c \uac8c\uc784 \uc6d4\ub4dc \ubaa9\ub85d\uc744 \uc870\ud68c\ud569\ub2c8\ub2e4.',
+            }),
+            '\n',
+            (0, l.jsx)(n.h4, {
+              id: '\uc751\ub2f5-\uc608\uc2dc-1',
+              children: '\uc751\ub2f5 \uc608\uc2dc',
+            }),
+            '\n',
+            (0, l.jsx)(n.pre, {
+              children: (0, l.jsx)(n.code, {
+                className: 'language-json',
+                children:
+                  '{\n  "success": true,\n  "data": {\n    "worlds": [\n      {\n        "worldId": "world001",\n        "name": "\uba54\uc778 \uc6d4\ub4dc",\n        "status": "online"\n      }\n    ]\n  }\n}\n',
+              }),
+            }),
+            '\n',
+            (0, l.jsx)(n.h3, {
+              id: '3-\uc11c\ube44\uc2a4-\uacf5\uc9c0\uc0ac\ud56d',
+              children: '3. \uc11c\ube44\uc2a4 \uacf5\uc9c0\uc0ac\ud56d',
+            }),
+            '\n',
+            (0, l.jsx)(n.pre, {
+              children: (0, l.jsx)(n.code, { children: 'GET /api/v1/client/notices\n' }),
+            }),
+            '\n',
+            (0, l.jsx)(n.p, {
+              children:
+                '\ud65c\uc131 \uc11c\ube44\uc2a4 \uacf5\uc9c0\uc0ac\ud56d\uc744 \uc870\ud68c\ud569\ub2c8\ub2e4.',
+            }),
+            '\n',
+            (0, l.jsx)(n.h3, {
+              id: '4-\ud53c\ucc98-\ud50c\ub798\uadf8-\ud3c9\uac00',
+              children: '4. \ud53c\ucc98 \ud50c\ub798\uadf8 \ud3c9\uac00',
+            }),
+            '\n',
+            (0, l.jsx)(n.pre, {
+              children: (0, l.jsx)(n.code, { children: 'POST /api/v1/client/evaluate\n' }),
+            }),
+            '\n',
+            (0, l.jsx)(n.p, {
+              children:
+                '\uc0ac\uc6a9\uc790 \ucee8\ud14d\uc2a4\ud2b8\uc5d0 \ub530\ub77c \ud53c\ucc98 \ud50c\ub798\uadf8\ub97c \ud3c9\uac00\ud569\ub2c8\ub2e4.',
+            }),
+            '\n',
+            (0, l.jsx)(n.h4, {
+              id: '\uc694\uccad-\ubcf8\ubb38',
+              children: '\uc694\uccad \ubcf8\ubb38',
+            }),
+            '\n',
+            (0, l.jsx)(n.pre, {
+              children: (0, l.jsx)(n.code, {
+                className: 'language-json',
+                children:
+                  '{\n  "context": {\n    "userId": "user123",\n    "country": "KR"\n  },\n  "flags": ["new_ui", "event_mode"]\n}\n',
+              }),
+            }),
+          ],
+        });
+      }
+      function h(e = {}) {
+        const { wrapper: n } = { ...(0, r.R)(), ...e.components };
+        return n ? (0, l.jsx)(n, { ...e, children: (0, l.jsx)(o, { ...e }) }) : o(e);
+      }
+    },
+    8453(e, n, i) {
+      i.d(n, { R: () => d, x: () => t });
+      var s = i(6540);
+      const l = {},
+        r = s.createContext(l);
+      function d(e) {
+        const n = s.useContext(r);
+        return s.useMemo(
+          function () {
+            return 'function' == typeof e ? e(n) : { ...n, ...e };
+          },
+          [n, e]
+        );
+      }
+      function t(e) {
+        let n;
+        return (
+          (n = e.disableParentContext
+            ? 'function' == typeof e.components
+              ? e.components(l)
+              : e.components || l
+            : d(e.components)),
+          s.createElement(r.Provider, { value: n }, e.children)
+        );
+      }
+    },
+  },
+]);

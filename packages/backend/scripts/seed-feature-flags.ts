@@ -5,40 +5,46 @@
  * Run with: yarn ts-node scripts/seed-feature-flags.ts
  */
 
-import db from "../src/config/knex";
-import { ulid } from "ulid";
+import db from '../src/config/knex';
+import { ulid } from 'ulid';
 
-const ENVIRONMENT = "development";
+const ENVIRONMENT = 'development';
 const CREATED_BY = 1; // Admin user ID
 
 async function main() {
-  console.log("=".repeat(60));
-  console.log("Feature Flag Seed Script");
-  console.log("=".repeat(60));
+  console.log('='.repeat(60));
+  console.log('Feature Flag Seed Script');
+  console.log('='.repeat(60));
 
   try {
     // 1. Basic enabled flag
     await createFlag({
-      flagName: "test-basic-enabled",
-      displayName: "Test Basic Enabled",
-      description: "A simple flag that is always enabled",
-      variantType: "none",
-      strategies: [{ name: "flexibleRollout", parameters: { rollout: 0, stickiness: "default", groupId: "test-basic-enabled" }, isEnabled: true }],
+      flagName: 'test-basic-enabled',
+      displayName: 'Test Basic Enabled',
+      description: 'A simple flag that is always enabled',
+      variantType: 'none',
+      strategies: [
+        {
+          name: 'flexibleRollout',
+          parameters: { rollout: 0, stickiness: 'default', groupId: 'test-basic-enabled' },
+          isEnabled: true,
+        },
+      ],
     });
 
     // 2. Rollout 50% flag (for stickiness testing)
     await createFlag({
-      flagName: "test-rollout-50",
-      displayName: "Test 50% Rollout",
-      description: "Flag with 50% gradual rollout for stickiness testing",
-      variantType: "none",
+      flagName: 'test-rollout-50',
+      displayName: 'Test 50% Rollout',
+      description: 'Flag with 50% gradual rollout for stickiness testing',
+      variantType: 'none',
       strategies: [
         {
-          name: "flexibleRollout",
+          name: 'flexibleRollout',
           parameters: {
             rollout: 50,
-            stickiness: "default",
-            groupId: "test-rollout-50",
+            stickiness: 'default',
+            groupId: 'test-rollout-50',
           },
           isEnabled: true,
         },
@@ -47,21 +53,19 @@ async function main() {
 
     // 3. Constraint flag (admin only)
     await createFlag({
-      flagName: "test-admin-only",
-      displayName: "Test Admin Only",
-      description: "Flag enabled only for admin users",
-      variantType: "none",
+      flagName: 'test-admin-only',
+      displayName: 'Test Admin Only',
+      description: 'Flag enabled only for admin users',
+      variantType: 'none',
       strategies: [
         {
-          name: "flexibleRollout",
+          name: 'flexibleRollout',
           parameters: {
             rollout: 0,
-            stickiness: "default",
-            groupId: "test-admin-only",
+            stickiness: 'default',
+            groupId: 'test-admin-only',
           },
-          constraints: [
-            { contextName: "role", operator: "str_eq", values: ["admin"] },
-          ],
+          constraints: [{ contextName: 'role', operator: 'str_eq', values: ['admin'] }],
           isEnabled: true,
         },
       ],
@@ -69,56 +73,56 @@ async function main() {
 
     // 4. Variants flag (A/B test)
     await createFlag({
-      flagName: "test-variants-ab",
-      displayName: "Test A/B Variants",
-      description: "Flag with multiple variants for A/B testing",
-      variantType: "json",
+      flagName: 'test-variants-ab',
+      displayName: 'Test A/B Variants',
+      description: 'Flag with multiple variants for A/B testing',
+      variantType: 'json',
       strategies: [
         {
-          name: "flexibleRollout",
+          name: 'flexibleRollout',
           parameters: {
             rollout: 100,
-            stickiness: "default",
-            groupId: "test-variants-ab",
+            stickiness: 'default',
+            groupId: 'test-variants-ab',
           },
           isEnabled: true,
         },
       ],
       variants: [
         {
-          variantName: "control",
+          variantName: 'control',
           weight: 50,
-          payload: { version: "A" },
-          payloadType: "json",
+          payload: { version: 'A' },
+          payloadType: 'json',
         },
         {
-          variantName: "experiment",
+          variantName: 'experiment',
           weight: 50,
-          payload: { version: "B" },
-          payloadType: "json",
+          payload: { version: 'B' },
+          payloadType: 'json',
         },
       ],
     });
 
     // 5. Multiple strategies flag
     await createFlag({
-      flagName: "test-multi-strategy",
-      displayName: "Test Multiple Strategies",
-      description: "Flag with multiple strategies (first match wins)",
-      variantType: "none",
+      flagName: 'test-multi-strategy',
+      displayName: 'Test Multiple Strategies',
+      description: 'Flag with multiple strategies (first match wins)',
+      variantType: 'none',
       strategies: [
         {
-          name: "userWithId",
-          parameters: { userIds: ["vip-user-1", "vip-user-2"] },
+          name: 'userWithId',
+          parameters: { userIds: ['vip-user-1', 'vip-user-2'] },
           isEnabled: true,
           sortOrder: 0,
         },
         {
-          name: "flexibleRollout",
+          name: 'flexibleRollout',
           parameters: {
             rollout: 20,
-            stickiness: "default",
-            groupId: "test-multi",
+            stickiness: 'default',
+            groupId: 'test-multi',
           },
           isEnabled: true,
           sortOrder: 1,
@@ -128,19 +132,25 @@ async function main() {
 
     // 6. Disabled flag (for testing disabled state)
     await createFlag({
-      flagName: "test-disabled",
-      displayName: "Test Disabled Flag",
-      description: "A flag that is globally disabled",
+      flagName: 'test-disabled',
+      displayName: 'Test Disabled Flag',
+      description: 'A flag that is globally disabled',
       isEnabled: false,
-      variantType: "none",
-      strategies: [{ name: "flexibleRollout", parameters: { rollout: 0, stickiness: "default", groupId: "test-disabled" }, isEnabled: true }],
+      variantType: 'none',
+      strategies: [
+        {
+          name: 'flexibleRollout',
+          parameters: { rollout: 0, stickiness: 'default', groupId: 'test-disabled' },
+          isEnabled: true,
+        },
+      ],
     });
 
-    console.log("\n" + "=".repeat(60));
-    console.log("Seed completed successfully!");
-    console.log("=".repeat(60));
+    console.log('\n' + '='.repeat(60));
+    console.log('Seed completed successfully!');
+    console.log('='.repeat(60));
   } catch (error: any) {
-    console.error("Error:", error.message);
+    console.error('Error:', error.message);
     console.error(error.stack);
   } finally {
     await db.destroy();
@@ -152,7 +162,7 @@ interface FlagConfig {
   displayName: string;
   description: string;
   isEnabled?: boolean;
-  variantType?: "none" | "string" | "number" | "json";
+  variantType?: 'none' | 'string' | 'number' | 'json';
   strategies: Array<{
     name: string;
     parameters: Record<string, any>;
@@ -177,22 +187,20 @@ async function createFlag(config: FlagConfig) {
   const now = new Date();
 
   // Check if flag already exists
-  const existing = await db("g_feature_flags")
-    .where("flagName", config.flagName)
-    .first();
+  const existing = await db('g_feature_flags').where('flagName', config.flagName).first();
   if (existing) {
     console.log(`  ⚠ Flag "${config.flagName}" already exists, skipping`);
     return;
   }
 
   // Create flag
-  await db("g_feature_flags").insert({
+  await db('g_feature_flags').insert({
     id: flagId,
     flagName: config.flagName,
     displayName: config.displayName,
     description: config.description,
-    flagType: "release",
-    variantType: config.variantType || "none",
+    flagType: 'release',
+    variantType: config.variantType || 'none',
     isArchived: false,
     impressionDataEnabled: true,
     createdBy: CREATED_BY,
@@ -202,7 +210,7 @@ async function createFlag(config: FlagConfig) {
 
   // Create flag-environment link
   const envId = ulid();
-  await db("g_feature_flag_environments").insert({
+  await db('g_feature_flag_environments').insert({
     id: envId,
     flagId: flagId,
     environment: ENVIRONMENT,
@@ -217,7 +225,7 @@ async function createFlag(config: FlagConfig) {
     const strategy = config.strategies[i];
     const strategyId = ulid();
 
-    await db("g_feature_strategies").insert({
+    await db('g_feature_strategies').insert({
       id: strategyId,
       flagId: flagId,
       environment: ENVIRONMENT,
@@ -236,7 +244,7 @@ async function createFlag(config: FlagConfig) {
   if (config.variants) {
     for (const variant of config.variants) {
       const variantId = ulid();
-      await db("g_feature_variants").insert({
+      await db('g_feature_variants').insert({
         id: variantId,
         flagId: flagId,
         environment: ENVIRONMENT,

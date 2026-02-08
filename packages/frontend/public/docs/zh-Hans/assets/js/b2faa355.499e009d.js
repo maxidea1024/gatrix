@@ -1,1 +1,132 @@
-"use strict";(globalThis.webpackChunkdocs=globalThis.webpackChunkdocs||[]).push([[8866],{5684(e,n,t){t.r(n),t.d(n,{assets:()=>c,contentTitle:()=>l,default:()=>h,frontMatter:()=>r,metadata:()=>o,toc:()=>a});const o=JSON.parse('{"id":"integrations/webhook","title":"Webhook ?\ufffd\ub3d9","description":"\ucee4\uc2a4?\ufffd HTTP ?\ufffd\ub4dc?\ufffd\uc778?\ufffd\ub85c ?\ufffd\ubca4?\ufffd\ufffd? ?\ufffd\uc1a1?????\ufffd\uc2b5?\ufffd\ub2e4.","source":"@site/docs/integrations/webhook.md","sourceDirName":"integrations","slug":"/integrations/webhook","permalink":"/docs/zh-Hans/integrations/webhook","draft":false,"unlisted":false,"editUrl":"https://github.com/your-org/gatrix/tree/main/docs/docs/integrations/webhook.md","tags":[],"version":"current","sidebarPosition":4,"frontMatter":{"sidebar_position":4},"sidebar":"tutorialSidebar","previous":{"title":"Microsoft Teams ?\ufffd\ub3d9","permalink":"/docs/zh-Hans/integrations/teams"},"next":{"title":"New Relic ?\ufffd\ub3d9","permalink":"/docs/zh-Hans/integrations/new-relic"}}');var i=t(4848),s=t(8453);const r={sidebar_position:4},l="Webhook ?\ufffd\ub3d9",c={},a=[{value:"?\ufffd\uc815 \ubc29\ubc95",id:"\uc815-\ubc29\ubc95",level:2},{value:"?\ufffd\uc694 ?\ufffd\ubcf4",id:"\uc694-\ubcf4",level:2}];function d(e){const n={h1:"h1",h2:"h2",header:"header",li:"li",ol:"ol",p:"p",strong:"strong",ul:"ul",...(0,s.R)(),...e.components};return(0,i.jsxs)(i.Fragment,{children:[(0,i.jsx)(n.header,{children:(0,i.jsx)(n.h1,{id:"webhook-\ub3d9",children:"Webhook ?\ufffd\ub3d9"})}),"\n",(0,i.jsx)(n.p,{children:"\ucee4\uc2a4?\ufffd HTTP ?\ufffd\ub4dc?\ufffd\uc778?\ufffd\ub85c ?\ufffd\ubca4?\ufffd\ufffd? ?\ufffd\uc1a1?????\ufffd\uc2b5?\ufffd\ub2e4."}),"\n",(0,i.jsx)(n.h2,{id:"\uc815-\ubc29\ubc95",children:"?\ufffd\uc815 \ubc29\ubc95"}),"\n",(0,i.jsxs)(n.ol,{children:["\n",(0,i.jsx)(n.li,{children:"?\ufffd\ubca4?\ufffd\ufffd? ?\ufffd\uc2e0??HTTP ?\ufffd\ub4dc?\ufffd\uc778??\uc900\ufffd?"}),"\n",(0,i.jsx)(n.li,{children:"Gatrix?\ufffd\uc11c ?\ufffd\ub3d9 ?\ufffd\uc815"}),"\n"]}),"\n",(0,i.jsx)(n.h2,{id:"\uc694-\ubcf4",children:"?\ufffd\uc694 ?\ufffd\ubcf4"}),"\n",(0,i.jsxs)(n.ul,{children:["\n",(0,i.jsxs)(n.li,{children:[(0,i.jsx)(n.strong,{children:"Webhook URL"}),": ?\ufffd\ubca4?\ufffd\ufffd? ?\ufffd\uc2e0???\ufffd\ub4dc?\ufffd\uc778??URL"]}),"\n",(0,i.jsxs)(n.li,{children:[(0,i.jsx)(n.strong,{children:"Authorization"})," (?\ufffd\ud0dd): Authorization ?\ufffd\ub354 \ufffd?"]}),"\n",(0,i.jsxs)(n.li,{children:[(0,i.jsx)(n.strong,{children:"Body Template"})," (?\ufffd\ud0dd): \ucee4\uc2a4?\ufffd ?\ufffd\uccad \ubcf8\ubb38 ?\ufffd\ud50c\ufffd?"]}),"\n"]})]})}function h(e={}){const{wrapper:n}={...(0,s.R)(),...e.components};return n?(0,i.jsx)(n,{...e,children:(0,i.jsx)(d,{...e})}):d(e)}},8453(e,n,t){t.d(n,{R:()=>r,x:()=>l});var o=t(6540);const i={},s=o.createContext(i);function r(e){const n=o.useContext(s);return o.useMemo(function(){return"function"==typeof e?e(n):{...n,...e}},[n,e])}function l(e){let n;return n=e.disableParentContext?"function"==typeof e.components?e.components(i):e.components||i:r(e.components),o.createElement(s.Provider,{value:n},e.children)}}}]);
+'use strict';
+(globalThis.webpackChunkdocs = globalThis.webpackChunkdocs || []).push([
+  [8866],
+  {
+    5684(e, n, t) {
+      (t.r(n),
+        t.d(n, {
+          assets: () => c,
+          contentTitle: () => l,
+          default: () => h,
+          frontMatter: () => r,
+          metadata: () => o,
+          toc: () => a,
+        }));
+      const o = JSON.parse(
+        '{"id":"integrations/webhook","title":"Webhook ?\ufffd\ub3d9","description":"\ucee4\uc2a4?\ufffd HTTP ?\ufffd\ub4dc?\ufffd\uc778?\ufffd\ub85c ?\ufffd\ubca4?\ufffd\ufffd? ?\ufffd\uc1a1?????\ufffd\uc2b5?\ufffd\ub2e4.","source":"@site/docs/integrations/webhook.md","sourceDirName":"integrations","slug":"/integrations/webhook","permalink":"/docs/zh-Hans/integrations/webhook","draft":false,"unlisted":false,"editUrl":"https://github.com/your-org/gatrix/tree/main/docs/docs/integrations/webhook.md","tags":[],"version":"current","sidebarPosition":4,"frontMatter":{"sidebar_position":4},"sidebar":"tutorialSidebar","previous":{"title":"Microsoft Teams ?\ufffd\ub3d9","permalink":"/docs/zh-Hans/integrations/teams"},"next":{"title":"New Relic ?\ufffd\ub3d9","permalink":"/docs/zh-Hans/integrations/new-relic"}}'
+      );
+      var i = t(4848),
+        s = t(8453);
+      const r = { sidebar_position: 4 },
+        l = 'Webhook ?\ufffd\ub3d9',
+        c = {},
+        a = [
+          { value: '?\ufffd\uc815 \ubc29\ubc95', id: '\uc815-\ubc29\ubc95', level: 2 },
+          { value: '?\ufffd\uc694 ?\ufffd\ubcf4', id: '\uc694-\ubcf4', level: 2 },
+        ];
+      function d(e) {
+        const n = {
+          h1: 'h1',
+          h2: 'h2',
+          header: 'header',
+          li: 'li',
+          ol: 'ol',
+          p: 'p',
+          strong: 'strong',
+          ul: 'ul',
+          ...(0, s.R)(),
+          ...e.components,
+        };
+        return (0, i.jsxs)(i.Fragment, {
+          children: [
+            (0, i.jsx)(n.header, {
+              children: (0, i.jsx)(n.h1, {
+                id: 'webhook-\ub3d9',
+                children: 'Webhook ?\ufffd\ub3d9',
+              }),
+            }),
+            '\n',
+            (0, i.jsx)(n.p, {
+              children:
+                '\ucee4\uc2a4?\ufffd HTTP ?\ufffd\ub4dc?\ufffd\uc778?\ufffd\ub85c ?\ufffd\ubca4?\ufffd\ufffd? ?\ufffd\uc1a1?????\ufffd\uc2b5?\ufffd\ub2e4.',
+            }),
+            '\n',
+            (0, i.jsx)(n.h2, { id: '\uc815-\ubc29\ubc95', children: '?\ufffd\uc815 \ubc29\ubc95' }),
+            '\n',
+            (0, i.jsxs)(n.ol, {
+              children: [
+                '\n',
+                (0, i.jsx)(n.li, {
+                  children:
+                    '?\ufffd\ubca4?\ufffd\ufffd? ?\ufffd\uc2e0??HTTP ?\ufffd\ub4dc?\ufffd\uc778??\uc900\ufffd?',
+                }),
+                '\n',
+                (0, i.jsx)(n.li, { children: 'Gatrix?\ufffd\uc11c ?\ufffd\ub3d9 ?\ufffd\uc815' }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, i.jsx)(n.h2, { id: '\uc694-\ubcf4', children: '?\ufffd\uc694 ?\ufffd\ubcf4' }),
+            '\n',
+            (0, i.jsxs)(n.ul, {
+              children: [
+                '\n',
+                (0, i.jsxs)(n.li, {
+                  children: [
+                    (0, i.jsx)(n.strong, { children: 'Webhook URL' }),
+                    ': ?\ufffd\ubca4?\ufffd\ufffd? ?\ufffd\uc2e0???\ufffd\ub4dc?\ufffd\uc778??URL',
+                  ],
+                }),
+                '\n',
+                (0, i.jsxs)(n.li, {
+                  children: [
+                    (0, i.jsx)(n.strong, { children: 'Authorization' }),
+                    ' (?\ufffd\ud0dd): Authorization ?\ufffd\ub354 \ufffd?',
+                  ],
+                }),
+                '\n',
+                (0, i.jsxs)(n.li, {
+                  children: [
+                    (0, i.jsx)(n.strong, { children: 'Body Template' }),
+                    ' (?\ufffd\ud0dd): \ucee4\uc2a4?\ufffd ?\ufffd\uccad \ubcf8\ubb38 ?\ufffd\ud50c\ufffd?',
+                  ],
+                }),
+                '\n',
+              ],
+            }),
+          ],
+        });
+      }
+      function h(e = {}) {
+        const { wrapper: n } = { ...(0, s.R)(), ...e.components };
+        return n ? (0, i.jsx)(n, { ...e, children: (0, i.jsx)(d, { ...e }) }) : d(e);
+      }
+    },
+    8453(e, n, t) {
+      t.d(n, { R: () => r, x: () => l });
+      var o = t(6540);
+      const i = {},
+        s = o.createContext(i);
+      function r(e) {
+        const n = o.useContext(s);
+        return o.useMemo(
+          function () {
+            return 'function' == typeof e ? e(n) : { ...n, ...e };
+          },
+          [n, e]
+        );
+      }
+      function l(e) {
+        let n;
+        return (
+          (n = e.disableParentContext
+            ? 'function' == typeof e.components
+              ? e.components(i)
+              : e.components || i
+            : r(e.components)),
+          o.createElement(s.Provider, { value: n }, e.children)
+        );
+      }
+    },
+  },
+]);

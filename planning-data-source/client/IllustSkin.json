@@ -29,12 +29,8 @@
         }
       ],
       "reinforcePassiveId": "number",
-      "battlePassiveId": [
-        "number"
-      ],
-      "worldPassiveId": [
-        "number"
-      ],
+      "battlePassiveId": ["number"],
+      "worldPassiveId": ["number"],
       "shopShapeAsset": "string",
       "basicIllust": "bool"
     },
@@ -77,12 +73,8 @@
           "Modifier": 1
         }
       ],
-      "battlePassiveId": [
-        67000000
-      ],
-      "worldPassiveId": [
-        75200000
-      ]
+      "battlePassiveId": [67000000],
+      "worldPassiveId": [75200000]
     },
     ":max": {
       "mateId": 21399999,
@@ -98,37 +90,19 @@
           "Modifier": 3
         }
       ],
-      "battlePassiveId": [
-        67499999
-      ],
-      "worldPassiveId": [
-        75299999
-      ]
+      "battlePassiveId": [67499999],
+      "worldPassiveId": [75299999]
     },
     ":enum": {},
     ":links": {
       "statEffect": [
         {
-          "Id": [
-            "StatOperator",
-            "WorldPassiveEffect"
-          ]
+          "Id": ["StatOperator", "WorldPassiveEffect"]
         }
       ],
-      "reinforcePassiveId": [
-        "BattlePassive",
-        "WorldPassive"
-      ],
-      "battlePassiveId": [
-        [
-          "BattlePassive"
-        ]
-      ],
-      "worldPassiveId": [
-        [
-          "WorldPassive"
-        ]
-      ]
+      "reinforcePassiveId": ["BattlePassive", "WorldPassive"],
+      "battlePassiveId": [["BattlePassive"]],
+      "worldPassiveId": [["WorldPassive"]]
     }
   },
   "IllustSkin": {

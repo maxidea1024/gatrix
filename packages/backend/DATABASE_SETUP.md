@@ -13,6 +13,7 @@ This guide will help you set up the MySQL database for the Gatrix project.
 ### Option 1: Automated Script (Recommended)
 
 #### Windows:
+
 ```bash
 # Run the batch script
 yarn setup:db:win
@@ -22,6 +23,7 @@ scripts\setup-database.bat
 ```
 
 #### Linux/macOS:
+
 ```bash
 # Run the shell script
 yarn setup:db:unix
@@ -31,6 +33,7 @@ bash scripts/setup-database.sh
 ```
 
 #### Cross-platform:
+
 ```bash
 # Direct MySQL command (requires MySQL client in PATH)
 yarn setup:db
@@ -39,15 +42,17 @@ yarn setup:db
 ### Option 2: Manual Setup
 
 1. **Connect to MySQL as root:**
+
    ```bash
    mysql -u root -p
    ```
 
 2. **Run the SQL commands:**
+
    ```sql
    -- Create database
-   CREATE DATABASE IF NOT EXISTS uwo_gate 
-   CHARACTER SET utf8mb4 
+   CREATE DATABASE IF NOT EXISTS uwo_gate
+   CHARACTER SET utf8mb4
    COLLATE utf8mb4_unicode_ci;
 
    -- Create user
@@ -85,11 +90,13 @@ DB_PASSWORD=dev123$
 After setting up the database:
 
 1. **Run migrations:**
+
    ```bash
    yarn migrate:up
    ```
 
 2. **Seed initial data:**
+
    ```bash
    yarn seed:run
    ```
@@ -122,14 +129,16 @@ After setting up the database:
 ### Manual Verification
 
 Test the connection manually:
+
 ```bash
 mysql -h localhost -P 3306 -u motif_dev -p uwo_gate
 ```
 
 If successful, you should see:
+
 ```
 Welcome to the MySQL monitor...
-mysql> 
+mysql>
 ```
 
 ## Security Notes

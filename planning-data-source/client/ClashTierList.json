@@ -177,95 +177,49 @@
     },
     ":enum": {},
     ":links": {
-      "rewardVictory": [
-        "RewardFixed"
-      ],
-      "rewardDraw": [
-        "RewardFixed"
-      ],
-      "rewardDefeat": [
-        "RewardFixed"
-      ],
+      "rewardVictory": ["RewardFixed"],
+      "rewardDraw": ["RewardFixed"],
+      "rewardDefeat": ["RewardFixed"],
       "seasonReward": [
         {
-          "weekly": [
-            "Mail"
-          ],
-          "grade": [
-            "Mail"
-          ]
+          "weekly": ["Mail"],
+          "grade": ["Mail"]
         },
         {
-          "weekly": [
-            "Mail"
-          ],
-          "grade": [
-            "Mail"
-          ]
+          "weekly": ["Mail"],
+          "grade": ["Mail"]
         },
         {
-          "weekly": [
-            "Mail"
-          ],
-          "grade": [
-            "Mail"
-          ]
+          "weekly": ["Mail"],
+          "grade": ["Mail"]
         },
         {
-          "weekly": [
-            "Mail"
-          ],
-          "grade": [
-            "Mail"
-          ]
+          "weekly": ["Mail"],
+          "grade": ["Mail"]
         },
         {
-          "weekly": [
-            "Mail"
-          ],
-          "grade": [
-            "Mail"
-          ]
+          "weekly": ["Mail"],
+          "grade": ["Mail"]
         },
         {
-          "weekly": [
-            "Mail"
-          ],
-          "grade": [
-            "Mail"
-          ]
+          "weekly": ["Mail"],
+          "grade": ["Mail"]
         },
         {
-          "weekly": [
-            "Mail"
-          ],
-          "grade": [
-            "Mail"
-          ]
+          "weekly": ["Mail"],
+          "grade": ["Mail"]
         },
         {
-          "weekly": [
-            "Mail"
-          ],
-          "grade": [
-            "Mail"
-          ]
+          "weekly": ["Mail"],
+          "grade": ["Mail"]
         },
         {
-          "weekly": [
-            "Mail"
-          ],
-          "grade": [
-            "Mail"
-          ]
+          "weekly": ["Mail"],
+          "grade": ["Mail"]
         },
         {
-          "weekly": [
-            "Mail"
-          ],
-          "grade": [
-            "Mail"
-          ]
+          "weekly": ["Mail"],
+          "grade": ["Mail"]
         }
       ]
     }

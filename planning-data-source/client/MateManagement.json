@@ -21,9 +21,7 @@
     ":enum": {},
     ":asset": {},
     ":links": {
-      "defaultPointId": [
-        "Point"
-      ]
+      "defaultPointId": ["Point"]
     }
   },
   "MateManagement": {

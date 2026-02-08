@@ -10,11 +10,13 @@
 이 문서 모음은 OpenPanel의 모든 기능을 구현 관점에서 상세하게 분석하고 정리한 것입니다.
 
 ### 1. [OPENPANEL_IMPLEMENTATION_GUIDE.md](./OPENPANEL_IMPLEMENTATION_GUIDE.md)
+
 **핵심 구현 가이드 (698 → 1203 라인)**
 
 OpenPanel의 전체 시스템을 구현하기 위한 핵심 가이드입니다.
 
 **주요 내용:**
+
 - ✅ 시스템 아키텍처 개요
 - ✅ 기술 스택 상세 (Next.js, Fastify, ClickHouse, Redis, BullMQ)
 - ✅ 데이터베이스 설계 (PostgreSQL + ClickHouse)
@@ -33,11 +35,13 @@ OpenPanel의 전체 시스템을 구현하기 위한 핵심 가이드입니다.
 ---
 
 ### 2. [OPENPANEL_DETAILED_SPECS.md](./OPENPANEL_DETAILED_SPECS.md)
+
 **상세 구현 스펙 (1634 라인)**
 
 각 기능별 상세 구현 스펙과 실제 코드 예제를 제공합니다.
 
 **주요 내용:**
+
 - ✅ 이벤트 데이터 모델 (타입 정의, 정규화)
 - ✅ 세션 관리 시스템 (클라이언트/서버 사이드)
 - ✅ 사용자 프로필 시스템 (식별, 병합, 속성 관리)
@@ -53,11 +57,13 @@ OpenPanel의 전체 시스템을 구현하기 위한 핵심 가이드입니다.
 ---
 
 ### 3. [OPENPANEL_ARCHITECTURE.md](./OPENPANEL_ARCHITECTURE.md)
+
 **아키텍처 및 데이터 흐름 (300+ 라인)**
 
 시스템 아키텍처와 데이터 흐름을 시각화하고 설명합니다.
 
 **주요 내용:**
+
 - ✅ 전체 시스템 아키텍처 (ASCII 다이어그램)
 - ✅ 데이터 흐름 (이벤트 수집, 프로필 업데이트, 대시보드 쿼리, 실시간 업데이트)
 - ✅ 데이터베이스 스키마 (PostgreSQL, ClickHouse)
@@ -69,11 +75,13 @@ OpenPanel의 전체 시스템을 구현하기 위한 핵심 가이드입니다.
 ---
 
 ### 4. [OPENPANEL_IMPLEMENTATION_CHECKLIST.md](./OPENPANEL_IMPLEMENTATION_CHECKLIST.md)
+
 **구현 체크리스트 (300+ 라인)**
 
 단계별 구현 체크리스트와 우선순위를 제공합니다.
 
 **주요 내용:**
+
 - ✅ Phase 1: 기본 인프라 구축
 - ✅ Phase 2: 이벤트 수집 시스템
 - ✅ Phase 3: 데이터 처리 파이프라인
@@ -119,6 +127,7 @@ pnpm clickhouse-migrate
 ### 3단계: MVP 구현
 
 **우선순위 1 (High Priority):**
+
 1. Event API 구현
 2. Web SDK 구현
 3. Event Worker 구현
@@ -132,6 +141,7 @@ pnpm clickhouse-migrate
 ## 🏗️ 기술 스택
 
 ### Frontend
+
 - **Framework**: Next.js 15 (App Router)
 - **Styling**: Tailwind CSS
 - **UI Components**: Shadcn/ui
@@ -139,17 +149,20 @@ pnpm clickhouse-migrate
 - **Charts**: Recharts / Chart.js
 
 ### Backend
+
 - **Event API**: Fastify
 - **API Layer**: tRPC
 - **Queue**: BullMQ
 - **Authentication**: Arctic + Oslo + Lucia
 
 ### Database
+
 - **Metadata**: PostgreSQL 14
 - **Events**: ClickHouse 24.12
 - **Cache/Queue**: Redis 7.2
 
 ### Infrastructure
+
 - **Container**: Docker
 - **Orchestration**: Kubernetes (선택)
 - **Monitoring**: Prometheus + Grafana
@@ -160,6 +173,7 @@ pnpm clickhouse-migrate
 ## 📊 주요 기능
 
 ### 웹 분석
+
 - ✅ 방문자 추적 (Unique Visitors, Sessions)
 - ✅ 페이지 분석 (Top Pages, Entry/Exit Pages)
 - ✅ 소스 분석 (Referrers, UTM Parameters)
@@ -167,6 +181,7 @@ pnpm clickhouse-migrate
 - ✅ 지리 분석 (Country, City, Region)
 
 ### 제품 분석
+
 - ✅ 이벤트 추적 (Custom Events)
 - ✅ 퍼널 분석 (Conversion Funnel)
 - ✅ 리텐션 분석 (Cohort Retention)
@@ -174,6 +189,7 @@ pnpm clickhouse-migrate
 - ✅ 프로필 관리 (User Profiles)
 
 ### 고급 기능
+
 - ✅ 실시간 분석 (Live Visitors)
 - ✅ A/B 테스팅
 - ✅ Webhook 통합
@@ -185,6 +201,7 @@ pnpm clickhouse-migrate
 ## 🔧 핵심 구현 포인트
 
 ### 1. 이벤트 수집
+
 ```typescript
 // SDK에서 이벤트 전송
 openpanel.track('button_click', {
@@ -203,6 +220,7 @@ fastify.post('/track', async (request, reply) => {
 ```
 
 ### 2. 데이터 저장
+
 ```typescript
 // Worker에서 배치 처리
 const events = await eventQueue.getJobs(1000);
@@ -214,6 +232,7 @@ await clickhouse.insert({
 ```
 
 ### 3. 분석 쿼리
+
 ```sql
 -- 일별 방문자 수
 SELECT
@@ -229,13 +248,17 @@ ORDER BY date;
 ```
 
 ### 4. 실시간 업데이트
+
 ```typescript
 // Redis Pub/Sub로 실시간 브로드캐스트
-await redis.publish('metrics:update', JSON.stringify({
-  projectId: 'proj_123',
-  metric: 'live_visitors',
-  value: 42,
-}));
+await redis.publish(
+  'metrics:update',
+  JSON.stringify({
+    projectId: 'proj_123',
+    metric: 'live_visitors',
+    value: 42,
+  })
+);
 
 // 대시보드에서 수신
 socket.on('metric-update', (data) => {
@@ -248,17 +271,20 @@ socket.on('metric-update', (data) => {
 ## 📈 확장성 고려사항
 
 ### 수평 확장
+
 - **API 서버**: Kubernetes HPA로 자동 확장
 - **Worker**: 큐 크기에 따라 동적 확장
 - **ClickHouse**: 분산 테이블로 샤딩
 
 ### 성능 최적화
+
 - **배치 삽입**: 1000개씩 묶어서 삽입
 - **캐싱**: Redis로 5분 TTL 캐싱
 - **인덱스**: ClickHouse bloom filter 인덱스
 - **Materialized View**: 사전 집계
 
 ### 데이터 관리
+
 - **파티셔닝**: 월별 파티션
 - **TTL**: 90일 후 자동 삭제
 - **압축**: ZSTD(3) 압축
@@ -268,12 +294,14 @@ socket.on('metric-update', (data) => {
 ## 🚀 배포 전략
 
 ### 개발 환경
+
 ```bash
 docker-compose up -d
 pnpm dev
 ```
 
 ### 스테이징 환경
+
 ```bash
 docker build -t openpanel:staging .
 docker push registry.example.com/openpanel:staging
@@ -281,6 +309,7 @@ kubectl apply -f k8s/staging/
 ```
 
 ### 프로덕션 환경
+
 ```bash
 docker build -t openpanel:v1.0.0 .
 docker push registry.example.com/openpanel:v1.0.0
@@ -292,6 +321,7 @@ kubectl apply -f k8s/production/
 ## 🧪 테스트 전략
 
 ### 단위 테스트
+
 ```typescript
 describe('EventNormalizer', () => {
   it('should normalize timestamp', () => {
@@ -304,6 +334,7 @@ describe('EventNormalizer', () => {
 ```
 
 ### 통합 테스트
+
 ```typescript
 describe('Event API', () => {
   it('should accept valid event', async () => {
@@ -319,18 +350,19 @@ describe('Event API', () => {
         payload: { name: 'test_event' },
       },
     });
-    
+
     expect(response.statusCode).toBe(200);
   });
 });
 ```
 
 ### E2E 테스트
+
 ```typescript
 test('should track page view', async ({ page }) => {
   await page.goto('http://localhost:3000');
   await page.waitForSelector('[data-testid="live-visitors"]');
-  
+
   const liveVisitors = await page.textContent('[data-testid="live-visitors"]');
   expect(parseInt(liveVisitors)).toBeGreaterThan(0);
 });
@@ -341,18 +373,21 @@ test('should track page view', async ({ page }) => {
 ## 📝 개발 로드맵
 
 ### Phase 1: MVP (8주)
+
 - [x] 기본 인프라 구축
 - [x] 이벤트 수집 시스템
 - [x] 기본 메트릭
 - [x] 대시보드 UI
 
 ### Phase 2: 고급 기능 (6주)
+
 - [ ] 퍼널 분석
 - [ ] 리텐션 분석
 - [ ] 프로필 시스템
 - [ ] 실시간 업데이트
 
 ### Phase 3: 프로덕션 준비 (3주)
+
 - [ ] 성능 최적화
 - [ ] 보안 강화
 - [ ] 모니터링 설정
@@ -367,6 +402,7 @@ test('should track page view', async ({ page }) => {
 이 문서는 OpenPanel의 구현을 위한 참고 자료입니다. 실제 구현 과정에서 발견한 개선사항이나 추가 정보가 있다면 문서를 업데이트해주세요.
 
 ### 문서 업데이트 방법
+
 1. 해당 문서 파일 수정
 2. 변경 사항 커밋
 3. Pull Request 생성
@@ -376,11 +412,13 @@ test('should track page view', async ({ page }) => {
 ## 📚 참고 자료
 
 ### 공식 문서
+
 - [OpenPanel 공식 사이트](https://openpanel.dev/)
 - [OpenPanel GitHub](https://github.com/Openpanel-dev/openpanel)
 - [OpenPanel 문서](https://openpanel.dev/docs)
 
 ### 기술 스택 문서
+
 - [Next.js](https://nextjs.org/docs)
 - [Fastify](https://fastify.dev/)
 - [ClickHouse](https://clickhouse.com/docs)
@@ -389,6 +427,7 @@ test('should track page view', async ({ page }) => {
 - [Prisma](https://www.prisma.io/docs)
 
 ### 유사 프로젝트
+
 - [Plausible Analytics](https://github.com/plausible/analytics)
 - [Umami](https://github.com/umami-software/umami)
 - [PostHog](https://github.com/PostHog/posthog)
@@ -411,12 +450,15 @@ test('should track page view', async ({ page }) => {
 ## ⚠️ 주의사항
 
 ### 라이선스
+
 OpenPanel은 AGPL-3.0 라이선스를 사용합니다. 상업적 사용 시 라이선스를 확인하세요.
 
 ### 데이터 프라이버시
+
 사용자 데이터를 수집할 때는 GDPR, CCPA 등 관련 법규를 준수해야 합니다.
 
 ### 성능
+
 초기 구현 시 성능 최적화보다는 기능 구현에 집중하고, 이후 프로파일링을 통해 최적화하세요.
 
 ---
@@ -430,5 +472,3 @@ OpenPanel은 AGPL-3.0 라이선스를 사용합니다. 상업적 사용 시 라�
 **마지막 업데이트**: 2025-10-02  
 **문서 버전**: 1.0.0  
 **총 라인 수**: 약 3,500+ 라인
-
-

@@ -19,9 +19,7 @@
     },
     ":enum": {},
     ":links": {
-      "buildingContentsUnlockId": [
-        "BuildingContentsUnlock"
-      ]
+      "buildingContentsUnlockId": ["BuildingContentsUnlock"]
     }
   },
   "BuildingMenu": {

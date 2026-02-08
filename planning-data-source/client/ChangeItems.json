@@ -39,27 +39,16 @@
     ":max": {},
     ":enum": {},
     ":links": {
-      "beforeChangeId": [
-        "Item"
-      ],
+      "beforeChangeId": ["Item"],
       "afterChange": [
         {
-          "Id": [
-            "Item",
-            "Point"
-          ]
+          "Id": ["Item", "Point"]
         },
         {
-          "Id": [
-            "Item",
-            "Point"
-          ]
+          "Id": ["Item", "Point"]
         },
         {
-          "Id": [
-            "Item",
-            "Point"
-          ]
+          "Id": ["Item", "Point"]
         }
       ]
     }

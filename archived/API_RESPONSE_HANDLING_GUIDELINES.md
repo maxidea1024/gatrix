@@ -1,12 +1,15 @@
 # API Response Handling Guidelines
 
 ## Overview
+
 This document provides guidelines for handling API responses consistently across the frontend application to avoid common mistakes related to response structure and error handling.
 
 ## Response Structure Awareness
 
 ### Understanding the API Service Layer
+
 - **The `api.ts` service already unwraps `response.data` in the `request()` method**
+
   ```typescript
   // packages/frontend/src/services/api.ts (line 152)
   private async request<T = any>(config: AxiosRequestConfig): Promise<ApiResponse<T>> {
@@ -21,7 +24,9 @@ This document provides guidelines for handling API responses consistently across
 - This means `api.get()`, `api.post()`, `api.put()`, `api.patch()`, `api.delete()` all return `response.data`, **NOT** the full axios response
 
 ### Backend Response Pattern
+
 Backend responses follow this consistent pattern:
+
 ```json
 {
   "success": true,
@@ -36,6 +41,7 @@ Backend responses follow this consistent pattern:
 ```
 
 ### Response Flow
+
 1. **Backend sends:** `{ success: true, data: { items: [...], total: 10 }, message: "..." }`
 2. **Axios receives:** Full response with `response.data`, `response.status`, etc.
 3. **`api.request()` returns:** `response.data` → `{ success: true, data: { items: [...], total: 10 }, message: "..." }`
@@ -45,6 +51,7 @@ Backend responses follow this consistent pattern:
 ## Common Mistake Patterns
 
 ### ❌ WRONG: Double Unwrapping
+
 ```typescript
 // In service file (e.g., surveyService.ts)
 async getSurveys(params?: GetSurveysParams): Promise<GetSurveysResponse> {
@@ -55,6 +62,7 @@ async getSurveys(params?: GetSurveysParams): Promise<GetSurveysResponse> {
 ```
 
 ### ✅ CORRECT: Single Unwrapping
+
 ```typescript
 // In service file (e.g., surveyService.ts)
 async getSurveys(params?: GetSurveysParams): Promise<GetSurveysResponse> {
@@ -65,18 +73,21 @@ async getSurveys(params?: GetSurveysParams): Promise<GetSurveysResponse> {
 ```
 
 ### ❌ WRONG: Weak Response Validation
+
 ```typescript
 const result = await service.getData();
-if (result && result.items) {  // ❌ Weak validation - doesn't check types
+if (result && result.items) {
+  // ❌ Weak validation - doesn't check types
   setItems(result.items);
 }
 ```
 
 ### ✅ CORRECT: Explicit Response Validation
+
 ```typescript
 try {
   const result = await service.getData();
-  
+
   // Validate response structure explicitly with type checking
   if (result && typeof result === 'object' && 'items' in result && Array.isArray(result.items)) {
     setItems(result.items);
@@ -99,7 +110,9 @@ try {
 ## Error Handling Best Practices
 
 ### API Service Error Transformation
+
 The `api.ts` service transforms errors as follows:
+
 ```typescript
 // packages/frontend/src/services/api.ts (lines 153-180)
 catch (error: any) {
@@ -110,7 +123,7 @@ catch (error: any) {
     };
     throw errorData;  // Throws { success: false, error: { message: "..." }, status: 400 }
   }
-  
+
   throw {
     success: false,
     error: { message: error.message || 'Network error occurred' },
@@ -122,19 +135,21 @@ catch (error: any) {
 ```
 
 ### Handling Errors in Pages/Components
+
 Always handle multiple levels of error messages:
+
 ```typescript
 catch (error: any) {
   console.error('Failed to load data:', error);
-  
+
   // Check multiple possible error message locations
-  const errorMessage = 
+  const errorMessage =
     error.message ||           // Direct error message
     error.error?.message ||    // Nested error message from api.ts
     t('common.loadFailed');    // Fallback localized message
-  
+
   enqueueSnackbar(errorMessage, { variant: 'error' });
-  
+
   // Always reset state to safe defaults
   setItems([]);
   setTotal(0);
@@ -170,22 +185,23 @@ Before implementing any API call, follow this checklist:
 
 ## Quick Reference Table
 
-| Layer | What It Returns | Example |
-|-------|----------------|---------|
-| Backend | `{ success: true, data: { items: [...], total: 10 }, message: "..." }` | Full API response |
-| `axios.get()` | Full axios response with `response.data`, `response.status`, etc. | Axios response object |
-| `api.get()` | `response.data` (already unwrapped once) | `{ success: true, data: { items: [...] }, message: "..." }` |
-| Service method | `response.data` | `{ items: [...], total: 10 }` |
-| Page/Component | `{ items: [...], total: 10 }` | Actual data payload |
+| Layer          | What It Returns                                                        | Example                                                     |
+| -------------- | ---------------------------------------------------------------------- | ----------------------------------------------------------- |
+| Backend        | `{ success: true, data: { items: [...], total: 10 }, message: "..." }` | Full API response                                           |
+| `axios.get()`  | Full axios response with `response.data`, `response.status`, etc.      | Axios response object                                       |
+| `api.get()`    | `response.data` (already unwrapped once)                               | `{ success: true, data: { items: [...] }, message: "..." }` |
+| Service method | `response.data`                                                        | `{ items: [...], total: 10 }`                               |
+| Page/Component | `{ items: [...], total: 10 }`                                          | Actual data payload                                         |
 
 ## Real-World Example
 
 ### Backend Controller
+
 ```typescript
 // packages/backend/src/controllers/SurveyController.ts
 static getSurveys = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
   const result = await SurveyService.getSurveys({ page, limit, isActive, search });
-  
+
   res.json({
     success: true,
     data: result,  // { surveys: [...], total: 10, page: 1, limit: 10 }
@@ -195,6 +211,7 @@ static getSurveys = asyncHandler(async (req: AuthenticatedRequest, res: Response
 ```
 
 ### Service Layer
+
 ```typescript
 // packages/frontend/src/services/surveyService.ts
 async getSurveys(params?: GetSurveysParams): Promise<GetSurveysResponse> {
@@ -205,6 +222,7 @@ async getSurveys(params?: GetSurveysParams): Promise<GetSurveysResponse> {
 ```
 
 ### Page/Component
+
 ```typescript
 // packages/frontend/src/pages/game/SurveysPage.tsx
 const loadSurveys = async () => {
@@ -212,8 +230,13 @@ const loadSurveys = async () => {
   try {
     const result = await surveyService.getSurveys({ page: page + 1, limit: rowsPerPage });
     // result = { surveys: [...], total: 10, page: 1, limit: 10 }
-    
-    if (result && typeof result === 'object' && 'surveys' in result && Array.isArray(result.surveys)) {
+
+    if (
+      result &&
+      typeof result === 'object' &&
+      'surveys' in result &&
+      Array.isArray(result.surveys)
+    ) {
       setSurveys(result.surveys);
       setTotal(result.total || 0);
     } else {
@@ -238,6 +261,7 @@ const loadSurveys = async () => {
 If you encounter `undefined` or unexpected response structure:
 
 1. **Add console.log at each layer:**
+
    ```typescript
    // In service
    const response = await api.get('/admin/surveys', { params });
@@ -263,14 +287,15 @@ If you encounter `undefined` or unexpected response structure:
 **Golden Rule:** `api.get()` returns `response.data`, so service methods should return `response.data` (not `response.data.data`).
 
 **Always:**
+
 - Validate response structure with explicit type checks
 - Handle errors at multiple message levels
 - Provide safe fallback values
 - Log errors for debugging
 
 **Never:**
+
 - Assume response structure without validation
 - Access nested properties without checking existence
 - Ignore error cases
 - Leave state in undefined/null state
-

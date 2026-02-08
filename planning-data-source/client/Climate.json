@@ -98,34 +98,22 @@
     ":links": {
       "weather": [
         {
-          "Id": [
-            "Weather"
-          ]
+          "Id": ["Weather"]
         },
         {
-          "Id": [
-            "Weather"
-          ]
+          "Id": ["Weather"]
         },
         {
-          "Id": [
-            "Weather"
-          ]
+          "Id": ["Weather"]
         },
         {
-          "Id": [
-            "Weather"
-          ]
+          "Id": ["Weather"]
         },
         {
-          "Id": [
-            "Weather"
-          ]
+          "Id": ["Weather"]
         },
         {
-          "Id": [
-            "Weather"
-          ]
+          "Id": ["Weather"]
         }
       ]
     }

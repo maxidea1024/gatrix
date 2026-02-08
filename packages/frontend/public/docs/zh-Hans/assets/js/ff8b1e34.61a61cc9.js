@@ -1,1 +1,1361 @@
-"use strict";(globalThis.webpackChunkdocs=globalThis.webpackChunkdocs||[]).push([[6774],{8453(e,n,s){s.d(n,{R:()=>l,x:()=>c});var r=s(6540);const i={},d=r.createContext(i);function l(e){const n=r.useContext(d);return r.useMemo(function(){return"function"==typeof e?e(n):{...n,...e}},[n,e])}function c(e){let n;return n=e.disableParentContext?"function"==typeof e.components?e.components(i):e.components||i:l(e.components),r.createElement(d.Provider,{value:n},e.children)}},9026(e,n,s){s.r(n),s.d(n,{assets:()=>o,contentTitle:()=>c,default:()=>h,frontMatter:()=>l,metadata:()=>r,toc:()=>t});const r=JSON.parse('{"id":"deployment/docker","title":"Docker Deployment Guide","description":"This page explains how to run Gatrix with Docker in both development and production-like environments.","source":"@site/docs/deployment/docker.md","sourceDirName":"deployment","slug":"/deployment/docker","permalink":"/docs/zh-Hans/deployment/docker","draft":false,"unlisted":false,"editUrl":"https://github.com/your-org/gatrix/tree/main/docs/docs/deployment/docker.md","tags":[],"version":"current","sidebarPosition":50,"frontMatter":{"slug":"/deployment/docker","title":"Docker Deployment Guide","sidebar_position":50},"sidebar":"tutorialSidebar","previous":{"title":"\u670d\u52a1\u5668 SDK API","permalink":"/docs/zh-Hans/api/server-sdk-api"},"next":{"title":"Edge Server Guide","permalink":"/docs/zh-Hans/deployment/edge-server"}}');var i=s(4848),d=s(8453);const l={slug:"/deployment/docker",title:"Docker Deployment Guide",sidebar_position:50},c="Docker Deployment Guide",o={},t=[{value:"Prerequisites",id:"prerequisites",level:2},{value:"Ports",id:"ports",level:2},{value:"Environment Variables (selected)",id:"environment-variables-selected",level:2},{value:"Monitoring",id:"monitoring",level:3},{value:"Edge Server",id:"edge-server",level:3},{value:"Development",id:"development",level:2},{value:"Production-like (Local Build)",id:"production-like-local-build",level:2},{value:"Production Deployment (Pre-built Images)",id:"production-deployment-pre-built-images",level:2},{value:"Registry Information",id:"registry-information",level:3},{value:"Building and Pushing Images",id:"building-and-pushing-images",level:3},{value:"Available Commands",id:"available-commands",level:4},{value:"Script Options",id:"script-options",level:4},{value:"Running Production Stack",id:"running-production-stack",level:3},{value:"Production Environment Variables",id:"production-environment-variables",level:3},{value:"Image Tags",id:"image-tags",level:3},{value:"Docker Swarm Deployment",id:"docker-swarm-deployment",level:2},{value:"Available Commands",id:"available-commands-1",level:3},{value:"Quick Start",id:"quick-start",level:3},{value:"Key Features",id:"key-features",level:3},{value:"Data Persistence",id:"data-persistence",level:2},{value:"Volume Configuration",id:"volume-configuration",level:3},{value:"Environment Setup",id:"environment-setup",level:3},{value:"Directory Structure",id:"directory-structure",level:3},{value:"Important Notes",id:"important-notes",level:3},{value:"ClickHouse Named Volume",id:"clickhouse-named-volume",level:3},{value:"Why Named Volume?",id:"why-named-volume",level:4},{value:"Volume Management",id:"volume-management",level:4},{value:"If You Must Use Bind Mount (Linux Only)",id:"if-you-must-use-bind-mount-linux-only",level:4},{value:"Team Rule",id:"team-rule",level:2},{value:"Monitoring",id:"monitoring-1",level:2}];function a(e){const n={a:"a",code:"code",h1:"h1",h2:"h2",h3:"h3",h4:"h4",header:"header",li:"li",ol:"ol",p:"p",pre:"pre",strong:"strong",table:"table",tbody:"tbody",td:"td",th:"th",thead:"thead",tr:"tr",ul:"ul",...(0,d.R)(),...e.components};return(0,i.jsxs)(i.Fragment,{children:[(0,i.jsx)(n.header,{children:(0,i.jsx)(n.h1,{id:"docker-deployment-guide",children:"Docker Deployment Guide"})}),"\n",(0,i.jsx)(n.p,{children:"This page explains how to run Gatrix with Docker in both development and production-like environments."}),"\n",(0,i.jsx)(n.h2,{id:"prerequisites",children:"Prerequisites"}),"\n",(0,i.jsxs)(n.ul,{children:["\n",(0,i.jsx)(n.li,{children:"Docker 20.10+"}),"\n",(0,i.jsx)(n.li,{children:"Docker Compose v2+"}),"\n",(0,i.jsx)(n.li,{children:"Yarn workspaces installed (for local builds)"}),"\n"]}),"\n",(0,i.jsx)(n.h2,{id:"ports",children:"Ports"}),"\n",(0,i.jsxs)(n.ul,{children:["\n",(0,i.jsx)(n.li,{children:"Prometheus: host 49090 -> container 9090"}),"\n",(0,i.jsx)(n.li,{children:"Grafana: host 44000 -> container 3000"}),"\n",(0,i.jsx)(n.li,{children:"Backend API: host 45000 -> container 5000"}),"\n",(0,i.jsx)(n.li,{children:"Event Lens: host 45200 -> container 5200"}),"\n",(0,i.jsx)(n.li,{children:"Chat Server: host 45100 -> container 5100"}),"\n",(0,i.jsx)(n.li,{children:"Frontend: host 43000 -> container 80 / 3000"}),"\n",(0,i.jsx)(n.li,{children:"Loki: host 43100 -> container 3100"}),"\n",(0,i.jsx)(n.li,{children:"ClickHouse: host 48123 -> container 8123, host 49000 -> container 9000"}),"\n",(0,i.jsx)(n.li,{children:"Redis: host 46379 -> container 6379"}),"\n",(0,i.jsx)(n.li,{children:"MySQL: host 43306 -> container 3306"}),"\n",(0,i.jsx)(n.li,{children:"etcd: host 42379 -> container 2379, host 42380 -> container 2380"}),"\n"]}),"\n",(0,i.jsx)(n.h2,{id:"environment-variables-selected",children:"Environment Variables (selected)"}),"\n",(0,i.jsx)(n.h3,{id:"monitoring",children:"Monitoring"}),"\n",(0,i.jsxs)(n.ul,{children:["\n",(0,i.jsxs)(n.li,{children:[(0,i.jsx)(n.code,{children:"PROM_SCRAPE_INTERVAL"})," (default: 15s)"]}),"\n",(0,i.jsxs)(n.li,{children:[(0,i.jsx)(n.code,{children:"PROM_RETENTION_TIME"})," (default: 14d)"]}),"\n",(0,i.jsxs)(n.li,{children:[(0,i.jsx)(n.code,{children:"GRAFANA_ADMIN_USER"})," (default: admin)"]}),"\n",(0,i.jsxs)(n.li,{children:[(0,i.jsx)(n.code,{children:"GRAFANA_ADMIN_PASSWORD"})," (default: admin)"]}),"\n",(0,i.jsxs)(n.li,{children:[(0,i.jsx)(n.code,{children:"MONITORING_ENABLED"})," (true/false)"]}),"\n"]}),"\n",(0,i.jsx)(n.h3,{id:"edge-server",children:"Edge Server"}),"\n",(0,i.jsxs)(n.table,{children:[(0,i.jsx)(n.thead,{children:(0,i.jsxs)(n.tr,{children:[(0,i.jsx)(n.th,{children:"Variable"}),(0,i.jsx)(n.th,{children:"Default"}),(0,i.jsx)(n.th,{children:"Description"})]})}),(0,i.jsxs)(n.tbody,{children:[(0,i.jsxs)(n.tr,{children:[(0,i.jsx)(n.td,{children:(0,i.jsx)(n.code,{children:"EDGE_PORT"})}),(0,i.jsx)(n.td,{children:"3400"}),(0,i.jsx)(n.td,{children:"Edge server port"})]}),(0,i.jsxs)(n.tr,{children:[(0,i.jsx)(n.td,{children:(0,i.jsx)(n.code,{children:"EDGE_METRICS_PORT"})}),(0,i.jsx)(n.td,{children:"9400"}),(0,i.jsx)(n.td,{children:"Metrics endpoint port (internal only)"})]}),(0,i.jsxs)(n.tr,{children:[(0,i.jsx)(n.td,{children:(0,i.jsx)(n.code,{children:"EDGE_BYPASS_TOKEN"})}),(0,i.jsx)(n.td,{children:(0,i.jsx)(n.code,{children:"gatrix-edge-internal-bypass-token"})}),(0,i.jsx)(n.td,{children:"Bypass token for all environments and internal APIs"})]}),(0,i.jsxs)(n.tr,{children:[(0,i.jsx)(n.td,{children:(0,i.jsx)(n.code,{children:"EDGE_APPLICATION_NAME"})}),(0,i.jsx)(n.td,{children:(0,i.jsx)(n.code,{children:"edge-server"})}),(0,i.jsx)(n.td,{children:"Application name for SDK identification"})]}),(0,i.jsxs)(n.tr,{children:[(0,i.jsx)(n.td,{children:(0,i.jsx)(n.code,{children:"EDGE_ENVIRONMENTS"})}),(0,i.jsx)(n.td,{children:(0,i.jsx)(n.code,{children:"*"})}),(0,i.jsxs)(n.td,{children:["Target environments. Use ",(0,i.jsx)(n.code,{children:"*"})," for all environments (multi-env mode) or comma-separated IDs"]})]}),(0,i.jsxs)(n.tr,{children:[(0,i.jsx)(n.td,{children:(0,i.jsx)(n.code,{children:"CACHE_SYNC_METHOD"})}),(0,i.jsx)(n.td,{children:(0,i.jsx)(n.code,{children:"event"})}),(0,i.jsxs)(n.td,{children:["Cache sync method: ",(0,i.jsx)(n.code,{children:"event"})," (Redis PubSub real-time), ",(0,i.jsx)(n.code,{children:"polling"}),", or ",(0,i.jsx)(n.code,{children:"manual"})]})]}),(0,i.jsxs)(n.tr,{children:[(0,i.jsx)(n.td,{children:(0,i.jsx)(n.code,{children:"CACHE_POLLING_INTERVAL_MS"})}),(0,i.jsx)(n.td,{children:"60000"}),(0,i.jsxs)(n.td,{children:["Polling interval in ms (only used when ",(0,i.jsx)(n.code,{children:"CACHE_SYNC_METHOD=polling"}),")"]})]}),(0,i.jsxs)(n.tr,{children:[(0,i.jsx)(n.td,{children:(0,i.jsx)(n.code,{children:"EDGE_LOG_LEVEL"})}),(0,i.jsxs)(n.td,{children:[(0,i.jsx)(n.code,{children:"info"})," (prod) / ",(0,i.jsx)(n.code,{children:"debug"})," (dev)"]}),(0,i.jsx)(n.td,{children:"Log level"})]})]})]}),"\n",(0,i.jsx)(n.p,{children:(0,i.jsxs)(n.strong,{children:["Multi-Environment Mode (",(0,i.jsx)(n.code,{children:"EDGE_ENVIRONMENTS=*"}),"):"]})}),"\n",(0,i.jsxs)(n.ul,{children:["\n",(0,i.jsx)(n.li,{children:"Edge server caches data for ALL environments dynamically"}),"\n",(0,i.jsx)(n.li,{children:"Automatically syncs when new environments are created/deleted via Redis PubSub"}),"\n",(0,i.jsx)(n.li,{children:"Each API endpoint filters data by the requested environment"}),"\n"]}),"\n",(0,i.jsx)(n.p,{children:(0,i.jsxs)(n.strong,{children:["Event Mode (",(0,i.jsx)(n.code,{children:"CACHE_SYNC_METHOD=event"}),"):"]})}),"\n",(0,i.jsxs)(n.ul,{children:["\n",(0,i.jsx)(n.li,{children:"Uses Redis PubSub for real-time cache synchronization"}),"\n",(0,i.jsx)(n.li,{children:"Cache is updated immediately when backend publishes events"}),"\n",(0,i.jsx)(n.li,{children:"Requires Redis connection"}),"\n",(0,i.jsx)(n.li,{children:"Recommended for production use"}),"\n"]}),"\n",(0,i.jsx)(n.h2,{id:"development",children:"Development"}),"\n",(0,i.jsx)(n.pre,{children:(0,i.jsx)(n.code,{className:"language-bash",children:"# Bring up dev stack (includes Prometheus and Grafana)\ndocker compose -f docker-compose.dev.yml up -d\n\n# Tear down\ndocker compose -f docker-compose.dev.yml down --remove-orphans\n"})}),"\n",(0,i.jsx)(n.p,{children:"Access:"}),"\n",(0,i.jsxs)(n.ul,{children:["\n",(0,i.jsxs)(n.li,{children:["Grafana: ",(0,i.jsx)(n.a,{href:"http://localhost:44000",children:"http://localhost:44000"})]}),"\n",(0,i.jsxs)(n.li,{children:["Prometheus: ",(0,i.jsx)(n.a,{href:"http://localhost:49090",children:"http://localhost:49090"})]}),"\n",(0,i.jsxs)(n.li,{children:["Backend: ",(0,i.jsx)(n.a,{href:"http://localhost:45000",children:"http://localhost:45000"})]}),"\n"]}),"\n",(0,i.jsx)(n.h2,{id:"production-like-local-build",children:"Production-like (Local Build)"}),"\n",(0,i.jsx)(n.pre,{children:(0,i.jsx)(n.code,{className:"language-bash",children:"# Bring up production-like stack (builds images locally)\ndocker compose up -d\n\n# Tear down\ndocker compose down --remove-orphans\n"})}),"\n",(0,i.jsx)(n.p,{children:"Access:"}),"\n",(0,i.jsxs)(n.ul,{children:["\n",(0,i.jsxs)(n.li,{children:["Grafana: ",(0,i.jsx)(n.a,{href:"http://localhost:44000",children:"http://localhost:44000"})]}),"\n",(0,i.jsxs)(n.li,{children:["Prometheus: ",(0,i.jsx)(n.a,{href:"http://localhost:49090",children:"http://localhost:49090"})]}),"\n"]}),"\n",(0,i.jsx)(n.h2,{id:"production-deployment-pre-built-images",children:"Production Deployment (Pre-built Images)"}),"\n",(0,i.jsx)(n.p,{children:"Production environments use pre-built images from Tencent Cloud Registry."}),"\n",(0,i.jsx)(n.h3,{id:"registry-information",children:"Registry Information"}),"\n",(0,i.jsxs)(n.ul,{children:["\n",(0,i.jsxs)(n.li,{children:[(0,i.jsx)(n.strong,{children:"Registry"}),": ",(0,i.jsx)(n.code,{children:"your-registry.example.com"})]}),"\n",(0,i.jsxs)(n.li,{children:[(0,i.jsx)(n.strong,{children:"Namespace"}),": ",(0,i.jsx)(n.code,{children:"gatrix"})]}),"\n",(0,i.jsxs)(n.li,{children:[(0,i.jsx)(n.strong,{children:"Image"}),": ",(0,i.jsx)(n.code,{children:"gatrix"})]}),"\n",(0,i.jsxs)(n.li,{children:[(0,i.jsx)(n.strong,{children:"Tag Format"}),": ",(0,i.jsx)(n.code,{children:"{service}-{version}"})," (e.g., ",(0,i.jsx)(n.code,{children:"backend-1.0.0"}),", ",(0,i.jsx)(n.code,{children:"frontend-latest"}),")"]}),"\n"]}),"\n",(0,i.jsx)(n.h3,{id:"building-and-pushing-images",children:"Building and Pushing Images"}),"\n",(0,i.jsx)(n.h4,{id:"available-commands",children:"Available Commands"}),"\n",(0,i.jsxs)(n.table,{children:[(0,i.jsx)(n.thead,{children:(0,i.jsxs)(n.tr,{children:[(0,i.jsx)(n.th,{children:"Command"}),(0,i.jsx)(n.th,{children:"Description"})]})}),(0,i.jsxs)(n.tbody,{children:[(0,i.jsxs)(n.tr,{children:[(0,i.jsx)(n.td,{children:(0,i.jsx)(n.code,{children:"yarn docker:build:prod"})}),(0,i.jsx)(n.td,{children:"Build all service images (no version bump)"})]}),(0,i.jsxs)(n.tr,{children:[(0,i.jsx)(n.td,{children:(0,i.jsx)(n.code,{children:"yarn docker:build:prod:push"})}),(0,i.jsx)(n.td,{children:"Bump patch version, build and push all images"})]}),(0,i.jsxs)(n.tr,{children:[(0,i.jsx)(n.td,{children:(0,i.jsx)(n.code,{children:"yarn docker:push"})}),(0,i.jsx)(n.td,{children:"Push already built images"})]}),(0,i.jsxs)(n.tr,{children:[(0,i.jsx)(n.td,{children:(0,i.jsx)(n.code,{children:"yarn docker:login"})}),(0,i.jsx)(n.td,{children:"Login to Tencent Cloud Registry"})]})]})]}),"\n",(0,i.jsx)(n.h4,{id:"script-options",children:"Script Options"}),"\n",(0,i.jsx)(n.pre,{children:(0,i.jsx)(n.code,{className:"language-bash",children:"# Show help\nyarn docker:build:prod --help\n\n# Build all services without version bump\nyarn docker:build:prod\n\n# Bump patch version, build and push\nyarn docker:build:prod --bump patch --push\n\n# Bump minor version for a specific service\nyarn docker:build:prod --bump minor --service backend --push\n\n# Build only frontend\nyarn docker:build:prod --service frontend\n"})}),"\n",(0,i.jsx)(n.p,{children:(0,i.jsx)(n.strong,{children:"Options:"})}),"\n",(0,i.jsxs)(n.ul,{children:["\n",(0,i.jsxs)(n.li,{children:[(0,i.jsx)(n.code,{children:"--bump, -b <type>"}),": Version bump type (",(0,i.jsx)(n.code,{children:"patch"}),", ",(0,i.jsx)(n.code,{children:"minor"}),", ",(0,i.jsx)(n.code,{children:"major"}),")"]}),"\n",(0,i.jsxs)(n.li,{children:[(0,i.jsx)(n.code,{children:"--push, -p"}),": Push to registry after building"]}),"\n",(0,i.jsxs)(n.li,{children:[(0,i.jsx)(n.code,{children:"--service, -s <name>"}),": Service to build (",(0,i.jsx)(n.code,{children:"backend"}),", ",(0,i.jsx)(n.code,{children:"frontend"}),", ",(0,i.jsx)(n.code,{children:"event-lens"}),", ",(0,i.jsx)(n.code,{children:"chat-server"}),", ",(0,i.jsx)(n.code,{children:"edge"}),", ",(0,i.jsx)(n.code,{children:"all"}),")"]}),"\n",(0,i.jsxs)(n.li,{children:[(0,i.jsx)(n.code,{children:"--login, -l"}),": Login to registry before pushing"]}),"\n",(0,i.jsxs)(n.li,{children:[(0,i.jsx)(n.code,{children:"--help, -h"}),": Show help message"]}),"\n"]}),"\n",(0,i.jsx)(n.h3,{id:"running-production-stack",children:"Running Production Stack"}),"\n",(0,i.jsx)(n.pre,{children:(0,i.jsx)(n.code,{className:"language-bash",children:"# Set the version to deploy\nexport GATRIX_VERSION=1.0.0\n\n# Pull latest images\nyarn docker:prod:pull\n\n# Start production stack\nyarn docker:prod\n\n# View logs\nyarn docker:prod:logs\n\n# Stop production stack\nyarn docker:prod:down\n"})}),"\n",(0,i.jsx)(n.h3,{id:"production-environment-variables",children:"Production Environment Variables"}),"\n",(0,i.jsxs)(n.p,{children:["Create a ",(0,i.jsx)(n.code,{children:".env"})," file with production settings:"]}),"\n",(0,i.jsx)(n.pre,{children:(0,i.jsx)(n.code,{className:"language-env",children:"# Version\nGATRIX_VERSION=1.0.0\n\n# Data storage\nDATA_ROOT=/data/gatrix\n\n# Database\nDB_ROOT_PASSWORD=secure-root-password\nDB_NAME=gatrix\nDB_USER=gatrix_user\nDB_PASSWORD=secure-db-password\n\n# Security\nJWT_SECRET=your-production-jwt-secret\nJWT_REFRESH_SECRET=your-production-refresh-secret\nSESSION_SECRET=your-production-session-secret\n\n# Admin\nADMIN_EMAIL=admin@yourcompany.com\nADMIN_PASSWORD=secure-admin-password\n\n# Monitoring\nMONITORING_ENABLED=true\nGRAFANA_ADMIN_PASSWORD=secure-grafana-password\n"})}),"\n",(0,i.jsx)(n.h3,{id:"image-tags",children:"Image Tags"}),"\n",(0,i.jsx)(n.p,{children:"Each service generates two tags:"}),"\n",(0,i.jsxs)(n.ul,{children:["\n",(0,i.jsxs)(n.li,{children:[(0,i.jsx)(n.strong,{children:"Version tag"}),": ",(0,i.jsx)(n.code,{children:"{service}-{version}"})," (e.g., ",(0,i.jsx)(n.code,{children:"backend-1.2.3"}),")"]}),"\n",(0,i.jsxs)(n.li,{children:[(0,i.jsx)(n.strong,{children:"Latest tag"}),": ",(0,i.jsx)(n.code,{children:"{service}-latest"})," (e.g., ",(0,i.jsx)(n.code,{children:"backend-latest"}),")"]}),"\n"]}),"\n",(0,i.jsx)(n.p,{children:(0,i.jsx)(n.strong,{children:"Services:"})}),"\n",(0,i.jsxs)(n.ul,{children:["\n",(0,i.jsxs)(n.li,{children:[(0,i.jsx)(n.code,{children:"backend"})," - Backend API server"]}),"\n",(0,i.jsxs)(n.li,{children:[(0,i.jsx)(n.code,{children:"frontend"})," - Frontend Nginx server"]}),"\n",(0,i.jsxs)(n.li,{children:[(0,i.jsx)(n.code,{children:"event-lens"})," - Event analytics server"]}),"\n",(0,i.jsxs)(n.li,{children:[(0,i.jsx)(n.code,{children:"chat-server"})," - WebSocket chat server"]}),"\n",(0,i.jsxs)(n.li,{children:[(0,i.jsx)(n.code,{children:"edge"})," - Edge server for clients"]}),"\n"]}),"\n",(0,i.jsx)(n.h2,{id:"docker-swarm-deployment",children:"Docker Swarm Deployment"}),"\n",(0,i.jsx)(n.p,{children:"For production environments with high availability requirements, use Docker Swarm orchestration."}),"\n",(0,i.jsx)(n.h3,{id:"available-commands-1",children:"Available Commands"}),"\n",(0,i.jsxs)(n.table,{children:[(0,i.jsx)(n.thead,{children:(0,i.jsxs)(n.tr,{children:[(0,i.jsx)(n.th,{children:"Command"}),(0,i.jsx)(n.th,{children:"Description"})]})}),(0,i.jsxs)(n.tbody,{children:[(0,i.jsxs)(n.tr,{children:[(0,i.jsx)(n.td,{children:(0,i.jsx)(n.code,{children:"yarn swarm:deploy"})}),(0,i.jsx)(n.td,{children:"Deploy stack to Swarm"})]}),(0,i.jsxs)(n.tr,{children:[(0,i.jsx)(n.td,{children:(0,i.jsx)(n.code,{children:"yarn swarm:deploy:init"})}),(0,i.jsx)(n.td,{children:"Initial deployment (creates secrets)"})]}),(0,i.jsxs)(n.tr,{children:[(0,i.jsx)(n.td,{children:(0,i.jsx)(n.code,{children:"yarn swarm:update"})}),(0,i.jsx)(n.td,{children:"Rolling update services"})]}),(0,i.jsxs)(n.tr,{children:[(0,i.jsx)(n.td,{children:(0,i.jsx)(n.code,{children:"yarn swarm:rollback"})}),(0,i.jsx)(n.td,{children:"Rollback to previous version"})]}),(0,i.jsxs)(n.tr,{children:[(0,i.jsx)(n.td,{children:(0,i.jsx)(n.code,{children:"yarn swarm:scale"})}),(0,i.jsx)(n.td,{children:"Scale services"})]}),(0,i.jsxs)(n.tr,{children:[(0,i.jsx)(n.td,{children:(0,i.jsx)(n.code,{children:"yarn swarm:status"})}),(0,i.jsx)(n.td,{children:"View stack status"})]})]})]}),"\n",(0,i.jsx)(n.h3,{id:"quick-start",children:"Quick Start"}),"\n",(0,i.jsx)(n.pre,{children:(0,i.jsx)(n.code,{className:"language-bash",children:"# Initialize Swarm cluster\ndocker swarm init\n\n# Configure environment\ncd deploy\ncp .env.example .env\nvim .env\n\n# Initial deployment\n./deploy.sh --init --version 1.0.0\n"})}),"\n",(0,i.jsx)(n.h3,{id:"key-features",children:"Key Features"}),"\n",(0,i.jsxs)(n.ul,{children:["\n",(0,i.jsxs)(n.li,{children:[(0,i.jsx)(n.strong,{children:"Rolling Updates"}),": Zero-downtime deployments"]}),"\n",(0,i.jsxs)(n.li,{children:[(0,i.jsx)(n.strong,{children:"Auto-Rollback"}),": Automatic rollback on failure"]}),"\n",(0,i.jsxs)(n.li,{children:[(0,i.jsx)(n.strong,{children:"Scaling Presets"}),": minimal, standard, high"]}),"\n",(0,i.jsxs)(n.li,{children:[(0,i.jsx)(n.strong,{children:"Secret Management"}),": Secure credential storage"]}),"\n",(0,i.jsxs)(n.li,{children:[(0,i.jsx)(n.strong,{children:"Health Monitoring"}),": Automatic health checks"]}),"\n"]}),"\n",(0,i.jsxs)(n.p,{children:["For detailed Swarm documentation, see the ",(0,i.jsx)(n.code,{children:"deploy/README.md"})," file in the repository root."]}),"\n",(0,i.jsx)(n.h2,{id:"data-persistence",children:"Data Persistence"}),"\n",(0,i.jsxs)(n.p,{children:["All persistent data (MySQL, Redis, ClickHouse, logs, etc.) is stored under the ",(0,i.jsx)(n.code,{children:"DATA_ROOT"})," path."]}),"\n",(0,i.jsx)(n.h3,{id:"volume-configuration",children:"Volume Configuration"}),"\n",(0,i.jsxs)(n.p,{children:["The ",(0,i.jsx)(n.code,{children:"DATA_ROOT"})," environment variable controls where all Docker volumes are stored:"]}),"\n",(0,i.jsxs)(n.table,{children:[(0,i.jsx)(n.thead,{children:(0,i.jsxs)(n.tr,{children:[(0,i.jsx)(n.th,{children:"Service"}),(0,i.jsx)(n.th,{children:"Host Path / Volume"}),(0,i.jsx)(n.th,{children:"Container Path"})]})}),(0,i.jsxs)(n.tbody,{children:[(0,i.jsxs)(n.tr,{children:[(0,i.jsx)(n.td,{children:"MySQL"}),(0,i.jsx)(n.td,{children:(0,i.jsx)(n.code,{children:"${DATA_ROOT}/mysql"})}),(0,i.jsx)(n.td,{children:(0,i.jsx)(n.code,{children:"/var/lib/mysql"})})]}),(0,i.jsxs)(n.tr,{children:[(0,i.jsx)(n.td,{children:"Redis"}),(0,i.jsx)(n.td,{children:(0,i.jsx)(n.code,{children:"${DATA_ROOT}/redis"})}),(0,i.jsx)(n.td,{children:(0,i.jsx)(n.code,{children:"/data"})})]}),(0,i.jsxs)(n.tr,{children:[(0,i.jsx)(n.td,{children:"ClickHouse"}),(0,i.jsxs)(n.td,{children:[(0,i.jsx)(n.code,{children:"clickhouse-data"})," (named volume)"]}),(0,i.jsx)(n.td,{children:(0,i.jsx)(n.code,{children:"/var/lib/clickhouse"})})]}),(0,i.jsxs)(n.tr,{children:[(0,i.jsx)(n.td,{children:"Backend Logs"}),(0,i.jsx)(n.td,{children:(0,i.jsx)(n.code,{children:"${DATA_ROOT}/backend/logs"})}),(0,i.jsx)(n.td,{children:(0,i.jsx)(n.code,{children:"/app/logs"})})]}),(0,i.jsxs)(n.tr,{children:[(0,i.jsx)(n.td,{children:"Backend Data"}),(0,i.jsx)(n.td,{children:(0,i.jsx)(n.code,{children:"${DATA_ROOT}/backend/data"})}),(0,i.jsx)(n.td,{children:(0,i.jsx)(n.code,{children:"/app/data"})})]}),(0,i.jsxs)(n.tr,{children:[(0,i.jsx)(n.td,{children:"Event Lens Logs"}),(0,i.jsx)(n.td,{children:(0,i.jsx)(n.code,{children:"${DATA_ROOT}/event-lens/logs"})}),(0,i.jsx)(n.td,{children:(0,i.jsx)(n.code,{children:"/app/logs"})})]}),(0,i.jsxs)(n.tr,{children:[(0,i.jsx)(n.td,{children:"Chat Server Uploads"}),(0,i.jsx)(n.td,{children:(0,i.jsx)(n.code,{children:"${DATA_ROOT}/chat-server/uploads"})}),(0,i.jsx)(n.td,{children:(0,i.jsx)(n.code,{children:"/app/uploads"})})]}),(0,i.jsxs)(n.tr,{children:[(0,i.jsx)(n.td,{children:"Chat Server Logs"}),(0,i.jsx)(n.td,{children:(0,i.jsx)(n.code,{children:"${DATA_ROOT}/chat-server/logs"})}),(0,i.jsx)(n.td,{children:(0,i.jsx)(n.code,{children:"/app/logs"})})]}),(0,i.jsxs)(n.tr,{children:[(0,i.jsx)(n.td,{children:"etcd"}),(0,i.jsx)(n.td,{children:(0,i.jsx)(n.code,{children:"${DATA_ROOT}/etcd"})}),(0,i.jsx)(n.td,{children:(0,i.jsx)(n.code,{children:"/etcd-data"})})]}),(0,i.jsxs)(n.tr,{children:[(0,i.jsx)(n.td,{children:"Prometheus"}),(0,i.jsx)(n.td,{children:(0,i.jsx)(n.code,{children:"${DATA_ROOT}/prometheus"})}),(0,i.jsx)(n.td,{children:(0,i.jsx)(n.code,{children:"/prometheus"})})]}),(0,i.jsxs)(n.tr,{children:[(0,i.jsx)(n.td,{children:"Grafana"}),(0,i.jsx)(n.td,{children:(0,i.jsx)(n.code,{children:"${DATA_ROOT}/grafana"})}),(0,i.jsx)(n.td,{children:(0,i.jsx)(n.code,{children:"/var/lib/grafana"})})]}),(0,i.jsxs)(n.tr,{children:[(0,i.jsx)(n.td,{children:"Loki"}),(0,i.jsx)(n.td,{children:(0,i.jsx)(n.code,{children:"${DATA_ROOT}/loki"})}),(0,i.jsx)(n.td,{children:(0,i.jsx)(n.code,{children:"/loki"})})]})]})]}),"\n",(0,i.jsx)(n.h3,{id:"environment-setup",children:"Environment Setup"}),"\n",(0,i.jsxs)(n.p,{children:[(0,i.jsx)(n.strong,{children:"Development"})," (",(0,i.jsx)(n.code,{children:".env"}),"):"]}),"\n",(0,i.jsx)(n.pre,{children:(0,i.jsx)(n.code,{className:"language-env",children:"DATA_ROOT=./data\n"})}),"\n",(0,i.jsxs)(n.p,{children:["Result: All data stored in ",(0,i.jsx)(n.code,{children:"./data/mysql"}),", ",(0,i.jsx)(n.code,{children:"./data/redis"}),", etc. (relative to project root)"]}),"\n",(0,i.jsxs)(n.p,{children:[(0,i.jsx)(n.strong,{children:"Production"})," (",(0,i.jsx)(n.code,{children:".env"}),"):"]}),"\n",(0,i.jsx)(n.pre,{children:(0,i.jsx)(n.code,{className:"language-env",children:"DATA_ROOT=/data/gatrix\n"})}),"\n",(0,i.jsxs)(n.p,{children:["Result: All data stored in ",(0,i.jsx)(n.code,{children:"/data/gatrix/mysql"}),", ",(0,i.jsx)(n.code,{children:"/data/gatrix/redis"}),", etc. (absolute path)"]}),"\n",(0,i.jsx)(n.h3,{id:"directory-structure",children:"Directory Structure"}),"\n",(0,i.jsx)(n.pre,{children:(0,i.jsx)(n.code,{children:"${DATA_ROOT}/\n?\ufffd\ufffd??\ufffd mysql/              # MySQL database files\n?\ufffd\ufffd??\ufffd redis/              # Redis persistence\n?\ufffd\ufffd??\ufffd backend/\n??  ?\ufffd\ufffd??\ufffd logs/           # Backend application logs\n??  ?\ufffd\ufffd??\ufffd data/           # Backend data files\n?\ufffd\ufffd??\ufffd event-lens/\n??  ?\ufffd\ufffd??\ufffd logs/           # Event Lens logs\n?\ufffd\ufffd??\ufffd chat-server/\n??  ?\ufffd\ufffd??\ufffd uploads/        # User uploaded files\n??  ?\ufffd\ufffd??\ufffd logs/           # Chat server logs\n?\ufffd\ufffd??\ufffd etcd/               # etcd cluster data\n?\ufffd\ufffd??\ufffd prometheus/         # Prometheus metrics storage\n?\ufffd\ufffd??\ufffd grafana/            # Grafana dashboards & settings\n?\ufffd\ufffd??\ufffd loki/               # Loki log aggregation\n\n# Managed by Docker (named volumes):\n# - clickhouse-data     # ClickHouse data (use docker volume commands)\n"})}),"\n",(0,i.jsx)(n.h3,{id:"important-notes",children:"Important Notes"}),"\n",(0,i.jsxs)(n.ol,{children:["\n",(0,i.jsxs)(n.li,{children:[(0,i.jsx)(n.strong,{children:"Directory Permissions"}),": Ensure the ",(0,i.jsx)(n.code,{children:"DATA_ROOT"})," directory has proper permissions for Docker to read/write"]}),"\n",(0,i.jsxs)(n.li,{children:[(0,i.jsx)(n.strong,{children:"Data Migration"}),": When switching from named volumes to bind mounts, existing data needs to be migrated manually"]}),"\n",(0,i.jsxs)(n.li,{children:[(0,i.jsx)(n.strong,{children:"Backup"}),": All persistent data is in one location, making backup easier"]}),"\n"]}),"\n",(0,i.jsx)(n.h3,{id:"clickhouse-named-volume",children:"ClickHouse Named Volume"}),"\n",(0,i.jsxs)(n.p,{children:[(0,i.jsxs)(n.strong,{children:["ClickHouse uses a Docker named volume (",(0,i.jsx)(n.code,{children:"clickhouse-data"}),") instead of a bind mount."]})," This is intentional and should not be changed."]}),"\n",(0,i.jsx)(n.h4,{id:"why-named-volume",children:"Why Named Volume?"}),"\n",(0,i.jsx)(n.p,{children:"ClickHouse's MergeTree storage engine uses atomic file rename operations during data writes:"}),"\n",(0,i.jsxs)(n.ol,{children:["\n",(0,i.jsxs)(n.li,{children:["Data is first written to a temporary directory (",(0,i.jsx)(n.code,{children:"tmp_insert_*"}),")"]}),"\n",(0,i.jsx)(n.li,{children:"The directory is atomically renamed to its final location"}),"\n"]}),"\n",(0,i.jsxs)(n.p,{children:["This works perfectly on native Linux filesystems but ",(0,i.jsx)(n.strong,{children:"fails on certain configurations"}),":"]}),"\n",(0,i.jsxs)(n.ul,{children:["\n",(0,i.jsxs)(n.li,{children:[(0,i.jsx)(n.strong,{children:"Windows Docker Desktop"}),": NTFS bind mounts don't support atomic renames properly"]}),"\n",(0,i.jsxs)(n.li,{children:[(0,i.jsx)(n.strong,{children:"Some network filesystems"}),": NFS/CIFS may have similar issues"]}),"\n"]}),"\n",(0,i.jsx)(n.p,{children:(0,i.jsx)(n.strong,{children:"Symptoms of bind mount issues:"})}),"\n",(0,i.jsx)(n.pre,{children:(0,i.jsx)(n.code,{children:'filesystem error: in rename: No such file or directory\n["/var/lib/clickhouse/store/.../tmp_insert_202512_1_1_0/"]\n["/var/lib/clickhouse/store/.../202512_1_1_0/"]\n'})}),"\n",(0,i.jsx)(n.h4,{id:"volume-management",children:"Volume Management"}),"\n",(0,i.jsx)(n.p,{children:"Since ClickHouse uses a named volume, data is managed differently:"}),"\n",(0,i.jsx)(n.pre,{children:(0,i.jsx)(n.code,{className:"language-bash",children:"# List Docker volumes\ndocker volume ls | grep clickhouse\n\n# Inspect volume\ndocker volume inspect gatrix_clickhouse-data\n\n# Backup ClickHouse data\ndocker run --rm -v gatrix_clickhouse-data:/source -v $(pwd):/backup alpine \\\n  tar czf /backup/clickhouse-backup.tar.gz -C /source .\n\n# Restore ClickHouse data\ndocker run --rm -v gatrix_clickhouse-data:/target -v $(pwd):/backup alpine \\\n  tar xzf /backup/clickhouse-backup.tar.gz -C /target\n\n# Remove volume (WARNING: deletes all ClickHouse data)\ndocker volume rm gatrix_clickhouse-data\n"})}),"\n",(0,i.jsx)(n.h4,{id:"if-you-must-use-bind-mount-linux-only",children:"If You Must Use Bind Mount (Linux Only)"}),"\n",(0,i.jsx)(n.p,{children:"If you need bind mount for easier data access on a Linux server, ensure:"}),"\n",(0,i.jsxs)(n.ol,{children:["\n",(0,i.jsx)(n.li,{children:"The host is running native Linux (not WSL or Docker Desktop)"}),"\n",(0,i.jsx)(n.li,{children:"The filesystem is ext4 or XFS"}),"\n",(0,i.jsx)(n.li,{children:"Add to docker-compose:"}),"\n"]}),"\n",(0,i.jsx)(n.pre,{children:(0,i.jsx)(n.code,{className:"language-yaml",children:"volumes:\n  - ${DATA_ROOT}/clickhouse:/var/lib/clickhouse\n"})}),"\n",(0,i.jsxs)(n.p,{children:[(0,i.jsx)(n.strong,{children:"Note"}),": This is not recommended and may cause issues on some systems."]}),"\n",(0,i.jsx)(n.h2,{id:"team-rule",children:"Team Rule"}),"\n",(0,i.jsx)(n.p,{children:"Do not use restart on Docker; prefer down -> up for restarts."}),"\n",(0,i.jsx)(n.h2,{id:"monitoring-1",children:"Monitoring"}),"\n",(0,i.jsxs)(n.p,{children:["For Prometheus + Grafana setup details and environment variables, see: ",(0,i.jsx)(n.a,{href:"../features/monitoring",children:"Monitoring"})]})]})}function h(e={}){const{wrapper:n}={...(0,d.R)(),...e.components};return n?(0,i.jsx)(n,{...e,children:(0,i.jsx)(a,{...e})}):a(e)}}}]);
+'use strict';
+(globalThis.webpackChunkdocs = globalThis.webpackChunkdocs || []).push([
+  [6774],
+  {
+    8453(e, n, s) {
+      s.d(n, { R: () => l, x: () => c });
+      var r = s(6540);
+      const i = {},
+        d = r.createContext(i);
+      function l(e) {
+        const n = r.useContext(d);
+        return r.useMemo(
+          function () {
+            return 'function' == typeof e ? e(n) : { ...n, ...e };
+          },
+          [n, e]
+        );
+      }
+      function c(e) {
+        let n;
+        return (
+          (n = e.disableParentContext
+            ? 'function' == typeof e.components
+              ? e.components(i)
+              : e.components || i
+            : l(e.components)),
+          r.createElement(d.Provider, { value: n }, e.children)
+        );
+      }
+    },
+    9026(e, n, s) {
+      (s.r(n),
+        s.d(n, {
+          assets: () => o,
+          contentTitle: () => c,
+          default: () => h,
+          frontMatter: () => l,
+          metadata: () => r,
+          toc: () => t,
+        }));
+      const r = JSON.parse(
+        '{"id":"deployment/docker","title":"Docker Deployment Guide","description":"This page explains how to run Gatrix with Docker in both development and production-like environments.","source":"@site/docs/deployment/docker.md","sourceDirName":"deployment","slug":"/deployment/docker","permalink":"/docs/zh-Hans/deployment/docker","draft":false,"unlisted":false,"editUrl":"https://github.com/your-org/gatrix/tree/main/docs/docs/deployment/docker.md","tags":[],"version":"current","sidebarPosition":50,"frontMatter":{"slug":"/deployment/docker","title":"Docker Deployment Guide","sidebar_position":50},"sidebar":"tutorialSidebar","previous":{"title":"\u670d\u52a1\u5668 SDK API","permalink":"/docs/zh-Hans/api/server-sdk-api"},"next":{"title":"Edge Server Guide","permalink":"/docs/zh-Hans/deployment/edge-server"}}'
+      );
+      var i = s(4848),
+        d = s(8453);
+      const l = {
+          slug: '/deployment/docker',
+          title: 'Docker Deployment Guide',
+          sidebar_position: 50,
+        },
+        c = 'Docker Deployment Guide',
+        o = {},
+        t = [
+          { value: 'Prerequisites', id: 'prerequisites', level: 2 },
+          { value: 'Ports', id: 'ports', level: 2 },
+          {
+            value: 'Environment Variables (selected)',
+            id: 'environment-variables-selected',
+            level: 2,
+          },
+          { value: 'Monitoring', id: 'monitoring', level: 3 },
+          { value: 'Edge Server', id: 'edge-server', level: 3 },
+          { value: 'Development', id: 'development', level: 2 },
+          { value: 'Production-like (Local Build)', id: 'production-like-local-build', level: 2 },
+          {
+            value: 'Production Deployment (Pre-built Images)',
+            id: 'production-deployment-pre-built-images',
+            level: 2,
+          },
+          { value: 'Registry Information', id: 'registry-information', level: 3 },
+          { value: 'Building and Pushing Images', id: 'building-and-pushing-images', level: 3 },
+          { value: 'Available Commands', id: 'available-commands', level: 4 },
+          { value: 'Script Options', id: 'script-options', level: 4 },
+          { value: 'Running Production Stack', id: 'running-production-stack', level: 3 },
+          {
+            value: 'Production Environment Variables',
+            id: 'production-environment-variables',
+            level: 3,
+          },
+          { value: 'Image Tags', id: 'image-tags', level: 3 },
+          { value: 'Docker Swarm Deployment', id: 'docker-swarm-deployment', level: 2 },
+          { value: 'Available Commands', id: 'available-commands-1', level: 3 },
+          { value: 'Quick Start', id: 'quick-start', level: 3 },
+          { value: 'Key Features', id: 'key-features', level: 3 },
+          { value: 'Data Persistence', id: 'data-persistence', level: 2 },
+          { value: 'Volume Configuration', id: 'volume-configuration', level: 3 },
+          { value: 'Environment Setup', id: 'environment-setup', level: 3 },
+          { value: 'Directory Structure', id: 'directory-structure', level: 3 },
+          { value: 'Important Notes', id: 'important-notes', level: 3 },
+          { value: 'ClickHouse Named Volume', id: 'clickhouse-named-volume', level: 3 },
+          { value: 'Why Named Volume?', id: 'why-named-volume', level: 4 },
+          { value: 'Volume Management', id: 'volume-management', level: 4 },
+          {
+            value: 'If You Must Use Bind Mount (Linux Only)',
+            id: 'if-you-must-use-bind-mount-linux-only',
+            level: 4,
+          },
+          { value: 'Team Rule', id: 'team-rule', level: 2 },
+          { value: 'Monitoring', id: 'monitoring-1', level: 2 },
+        ];
+      function a(e) {
+        const n = {
+          a: 'a',
+          code: 'code',
+          h1: 'h1',
+          h2: 'h2',
+          h3: 'h3',
+          h4: 'h4',
+          header: 'header',
+          li: 'li',
+          ol: 'ol',
+          p: 'p',
+          pre: 'pre',
+          strong: 'strong',
+          table: 'table',
+          tbody: 'tbody',
+          td: 'td',
+          th: 'th',
+          thead: 'thead',
+          tr: 'tr',
+          ul: 'ul',
+          ...(0, d.R)(),
+          ...e.components,
+        };
+        return (0, i.jsxs)(i.Fragment, {
+          children: [
+            (0, i.jsx)(n.header, {
+              children: (0, i.jsx)(n.h1, {
+                id: 'docker-deployment-guide',
+                children: 'Docker Deployment Guide',
+              }),
+            }),
+            '\n',
+            (0, i.jsx)(n.p, {
+              children:
+                'This page explains how to run Gatrix with Docker in both development and production-like environments.',
+            }),
+            '\n',
+            (0, i.jsx)(n.h2, { id: 'prerequisites', children: 'Prerequisites' }),
+            '\n',
+            (0, i.jsxs)(n.ul, {
+              children: [
+                '\n',
+                (0, i.jsx)(n.li, { children: 'Docker 20.10+' }),
+                '\n',
+                (0, i.jsx)(n.li, { children: 'Docker Compose v2+' }),
+                '\n',
+                (0, i.jsx)(n.li, { children: 'Yarn workspaces installed (for local builds)' }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, i.jsx)(n.h2, { id: 'ports', children: 'Ports' }),
+            '\n',
+            (0, i.jsxs)(n.ul, {
+              children: [
+                '\n',
+                (0, i.jsx)(n.li, { children: 'Prometheus: host 49090 -> container 9090' }),
+                '\n',
+                (0, i.jsx)(n.li, { children: 'Grafana: host 44000 -> container 3000' }),
+                '\n',
+                (0, i.jsx)(n.li, { children: 'Backend API: host 45000 -> container 5000' }),
+                '\n',
+                (0, i.jsx)(n.li, { children: 'Event Lens: host 45200 -> container 5200' }),
+                '\n',
+                (0, i.jsx)(n.li, { children: 'Chat Server: host 45100 -> container 5100' }),
+                '\n',
+                (0, i.jsx)(n.li, { children: 'Frontend: host 43000 -> container 80 / 3000' }),
+                '\n',
+                (0, i.jsx)(n.li, { children: 'Loki: host 43100 -> container 3100' }),
+                '\n',
+                (0, i.jsx)(n.li, {
+                  children:
+                    'ClickHouse: host 48123 -> container 8123, host 49000 -> container 9000',
+                }),
+                '\n',
+                (0, i.jsx)(n.li, { children: 'Redis: host 46379 -> container 6379' }),
+                '\n',
+                (0, i.jsx)(n.li, { children: 'MySQL: host 43306 -> container 3306' }),
+                '\n',
+                (0, i.jsx)(n.li, {
+                  children: 'etcd: host 42379 -> container 2379, host 42380 -> container 2380',
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, i.jsx)(n.h2, {
+              id: 'environment-variables-selected',
+              children: 'Environment Variables (selected)',
+            }),
+            '\n',
+            (0, i.jsx)(n.h3, { id: 'monitoring', children: 'Monitoring' }),
+            '\n',
+            (0, i.jsxs)(n.ul, {
+              children: [
+                '\n',
+                (0, i.jsxs)(n.li, {
+                  children: [
+                    (0, i.jsx)(n.code, { children: 'PROM_SCRAPE_INTERVAL' }),
+                    ' (default: 15s)',
+                  ],
+                }),
+                '\n',
+                (0, i.jsxs)(n.li, {
+                  children: [
+                    (0, i.jsx)(n.code, { children: 'PROM_RETENTION_TIME' }),
+                    ' (default: 14d)',
+                  ],
+                }),
+                '\n',
+                (0, i.jsxs)(n.li, {
+                  children: [
+                    (0, i.jsx)(n.code, { children: 'GRAFANA_ADMIN_USER' }),
+                    ' (default: admin)',
+                  ],
+                }),
+                '\n',
+                (0, i.jsxs)(n.li, {
+                  children: [
+                    (0, i.jsx)(n.code, { children: 'GRAFANA_ADMIN_PASSWORD' }),
+                    ' (default: admin)',
+                  ],
+                }),
+                '\n',
+                (0, i.jsxs)(n.li, {
+                  children: [
+                    (0, i.jsx)(n.code, { children: 'MONITORING_ENABLED' }),
+                    ' (true/false)',
+                  ],
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, i.jsx)(n.h3, { id: 'edge-server', children: 'Edge Server' }),
+            '\n',
+            (0, i.jsxs)(n.table, {
+              children: [
+                (0, i.jsx)(n.thead, {
+                  children: (0, i.jsxs)(n.tr, {
+                    children: [
+                      (0, i.jsx)(n.th, { children: 'Variable' }),
+                      (0, i.jsx)(n.th, { children: 'Default' }),
+                      (0, i.jsx)(n.th, { children: 'Description' }),
+                    ],
+                  }),
+                }),
+                (0, i.jsxs)(n.tbody, {
+                  children: [
+                    (0, i.jsxs)(n.tr, {
+                      children: [
+                        (0, i.jsx)(n.td, {
+                          children: (0, i.jsx)(n.code, { children: 'EDGE_PORT' }),
+                        }),
+                        (0, i.jsx)(n.td, { children: '3400' }),
+                        (0, i.jsx)(n.td, { children: 'Edge server port' }),
+                      ],
+                    }),
+                    (0, i.jsxs)(n.tr, {
+                      children: [
+                        (0, i.jsx)(n.td, {
+                          children: (0, i.jsx)(n.code, { children: 'EDGE_METRICS_PORT' }),
+                        }),
+                        (0, i.jsx)(n.td, { children: '9400' }),
+                        (0, i.jsx)(n.td, { children: 'Metrics endpoint port (internal only)' }),
+                      ],
+                    }),
+                    (0, i.jsxs)(n.tr, {
+                      children: [
+                        (0, i.jsx)(n.td, {
+                          children: (0, i.jsx)(n.code, { children: 'EDGE_BYPASS_TOKEN' }),
+                        }),
+                        (0, i.jsx)(n.td, {
+                          children: (0, i.jsx)(n.code, {
+                            children: 'gatrix-edge-internal-bypass-token',
+                          }),
+                        }),
+                        (0, i.jsx)(n.td, {
+                          children: 'Bypass token for all environments and internal APIs',
+                        }),
+                      ],
+                    }),
+                    (0, i.jsxs)(n.tr, {
+                      children: [
+                        (0, i.jsx)(n.td, {
+                          children: (0, i.jsx)(n.code, { children: 'EDGE_APPLICATION_NAME' }),
+                        }),
+                        (0, i.jsx)(n.td, {
+                          children: (0, i.jsx)(n.code, { children: 'edge-server' }),
+                        }),
+                        (0, i.jsx)(n.td, { children: 'Application name for SDK identification' }),
+                      ],
+                    }),
+                    (0, i.jsxs)(n.tr, {
+                      children: [
+                        (0, i.jsx)(n.td, {
+                          children: (0, i.jsx)(n.code, { children: 'EDGE_ENVIRONMENTS' }),
+                        }),
+                        (0, i.jsx)(n.td, { children: (0, i.jsx)(n.code, { children: '*' }) }),
+                        (0, i.jsxs)(n.td, {
+                          children: [
+                            'Target environments. Use ',
+                            (0, i.jsx)(n.code, { children: '*' }),
+                            ' for all environments (multi-env mode) or comma-separated IDs',
+                          ],
+                        }),
+                      ],
+                    }),
+                    (0, i.jsxs)(n.tr, {
+                      children: [
+                        (0, i.jsx)(n.td, {
+                          children: (0, i.jsx)(n.code, { children: 'CACHE_SYNC_METHOD' }),
+                        }),
+                        (0, i.jsx)(n.td, { children: (0, i.jsx)(n.code, { children: 'event' }) }),
+                        (0, i.jsxs)(n.td, {
+                          children: [
+                            'Cache sync method: ',
+                            (0, i.jsx)(n.code, { children: 'event' }),
+                            ' (Redis PubSub real-time), ',
+                            (0, i.jsx)(n.code, { children: 'polling' }),
+                            ', or ',
+                            (0, i.jsx)(n.code, { children: 'manual' }),
+                          ],
+                        }),
+                      ],
+                    }),
+                    (0, i.jsxs)(n.tr, {
+                      children: [
+                        (0, i.jsx)(n.td, {
+                          children: (0, i.jsx)(n.code, { children: 'CACHE_POLLING_INTERVAL_MS' }),
+                        }),
+                        (0, i.jsx)(n.td, { children: '60000' }),
+                        (0, i.jsxs)(n.td, {
+                          children: [
+                            'Polling interval in ms (only used when ',
+                            (0, i.jsx)(n.code, { children: 'CACHE_SYNC_METHOD=polling' }),
+                            ')',
+                          ],
+                        }),
+                      ],
+                    }),
+                    (0, i.jsxs)(n.tr, {
+                      children: [
+                        (0, i.jsx)(n.td, {
+                          children: (0, i.jsx)(n.code, { children: 'EDGE_LOG_LEVEL' }),
+                        }),
+                        (0, i.jsxs)(n.td, {
+                          children: [
+                            (0, i.jsx)(n.code, { children: 'info' }),
+                            ' (prod) / ',
+                            (0, i.jsx)(n.code, { children: 'debug' }),
+                            ' (dev)',
+                          ],
+                        }),
+                        (0, i.jsx)(n.td, { children: 'Log level' }),
+                      ],
+                    }),
+                  ],
+                }),
+              ],
+            }),
+            '\n',
+            (0, i.jsx)(n.p, {
+              children: (0, i.jsxs)(n.strong, {
+                children: [
+                  'Multi-Environment Mode (',
+                  (0, i.jsx)(n.code, { children: 'EDGE_ENVIRONMENTS=*' }),
+                  '):',
+                ],
+              }),
+            }),
+            '\n',
+            (0, i.jsxs)(n.ul, {
+              children: [
+                '\n',
+                (0, i.jsx)(n.li, {
+                  children: 'Edge server caches data for ALL environments dynamically',
+                }),
+                '\n',
+                (0, i.jsx)(n.li, {
+                  children:
+                    'Automatically syncs when new environments are created/deleted via Redis PubSub',
+                }),
+                '\n',
+                (0, i.jsx)(n.li, {
+                  children: 'Each API endpoint filters data by the requested environment',
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, i.jsx)(n.p, {
+              children: (0, i.jsxs)(n.strong, {
+                children: [
+                  'Event Mode (',
+                  (0, i.jsx)(n.code, { children: 'CACHE_SYNC_METHOD=event' }),
+                  '):',
+                ],
+              }),
+            }),
+            '\n',
+            (0, i.jsxs)(n.ul, {
+              children: [
+                '\n',
+                (0, i.jsx)(n.li, {
+                  children: 'Uses Redis PubSub for real-time cache synchronization',
+                }),
+                '\n',
+                (0, i.jsx)(n.li, {
+                  children: 'Cache is updated immediately when backend publishes events',
+                }),
+                '\n',
+                (0, i.jsx)(n.li, { children: 'Requires Redis connection' }),
+                '\n',
+                (0, i.jsx)(n.li, { children: 'Recommended for production use' }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, i.jsx)(n.h2, { id: 'development', children: 'Development' }),
+            '\n',
+            (0, i.jsx)(n.pre, {
+              children: (0, i.jsx)(n.code, {
+                className: 'language-bash',
+                children:
+                  '# Bring up dev stack (includes Prometheus and Grafana)\ndocker compose -f docker-compose.dev.yml up -d\n\n# Tear down\ndocker compose -f docker-compose.dev.yml down --remove-orphans\n',
+              }),
+            }),
+            '\n',
+            (0, i.jsx)(n.p, { children: 'Access:' }),
+            '\n',
+            (0, i.jsxs)(n.ul, {
+              children: [
+                '\n',
+                (0, i.jsxs)(n.li, {
+                  children: [
+                    'Grafana: ',
+                    (0, i.jsx)(n.a, {
+                      href: 'http://localhost:44000',
+                      children: 'http://localhost:44000',
+                    }),
+                  ],
+                }),
+                '\n',
+                (0, i.jsxs)(n.li, {
+                  children: [
+                    'Prometheus: ',
+                    (0, i.jsx)(n.a, {
+                      href: 'http://localhost:49090',
+                      children: 'http://localhost:49090',
+                    }),
+                  ],
+                }),
+                '\n',
+                (0, i.jsxs)(n.li, {
+                  children: [
+                    'Backend: ',
+                    (0, i.jsx)(n.a, {
+                      href: 'http://localhost:45000',
+                      children: 'http://localhost:45000',
+                    }),
+                  ],
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, i.jsx)(n.h2, {
+              id: 'production-like-local-build',
+              children: 'Production-like (Local Build)',
+            }),
+            '\n',
+            (0, i.jsx)(n.pre, {
+              children: (0, i.jsx)(n.code, {
+                className: 'language-bash',
+                children:
+                  '# Bring up production-like stack (builds images locally)\ndocker compose up -d\n\n# Tear down\ndocker compose down --remove-orphans\n',
+              }),
+            }),
+            '\n',
+            (0, i.jsx)(n.p, { children: 'Access:' }),
+            '\n',
+            (0, i.jsxs)(n.ul, {
+              children: [
+                '\n',
+                (0, i.jsxs)(n.li, {
+                  children: [
+                    'Grafana: ',
+                    (0, i.jsx)(n.a, {
+                      href: 'http://localhost:44000',
+                      children: 'http://localhost:44000',
+                    }),
+                  ],
+                }),
+                '\n',
+                (0, i.jsxs)(n.li, {
+                  children: [
+                    'Prometheus: ',
+                    (0, i.jsx)(n.a, {
+                      href: 'http://localhost:49090',
+                      children: 'http://localhost:49090',
+                    }),
+                  ],
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, i.jsx)(n.h2, {
+              id: 'production-deployment-pre-built-images',
+              children: 'Production Deployment (Pre-built Images)',
+            }),
+            '\n',
+            (0, i.jsx)(n.p, {
+              children: 'Production environments use pre-built images from Tencent Cloud Registry.',
+            }),
+            '\n',
+            (0, i.jsx)(n.h3, { id: 'registry-information', children: 'Registry Information' }),
+            '\n',
+            (0, i.jsxs)(n.ul, {
+              children: [
+                '\n',
+                (0, i.jsxs)(n.li, {
+                  children: [
+                    (0, i.jsx)(n.strong, { children: 'Registry' }),
+                    ': ',
+                    (0, i.jsx)(n.code, { children: 'your-registry.example.com' }),
+                  ],
+                }),
+                '\n',
+                (0, i.jsxs)(n.li, {
+                  children: [
+                    (0, i.jsx)(n.strong, { children: 'Namespace' }),
+                    ': ',
+                    (0, i.jsx)(n.code, { children: 'gatrix' }),
+                  ],
+                }),
+                '\n',
+                (0, i.jsxs)(n.li, {
+                  children: [
+                    (0, i.jsx)(n.strong, { children: 'Image' }),
+                    ': ',
+                    (0, i.jsx)(n.code, { children: 'gatrix' }),
+                  ],
+                }),
+                '\n',
+                (0, i.jsxs)(n.li, {
+                  children: [
+                    (0, i.jsx)(n.strong, { children: 'Tag Format' }),
+                    ': ',
+                    (0, i.jsx)(n.code, { children: '{service}-{version}' }),
+                    ' (e.g., ',
+                    (0, i.jsx)(n.code, { children: 'backend-1.0.0' }),
+                    ', ',
+                    (0, i.jsx)(n.code, { children: 'frontend-latest' }),
+                    ')',
+                  ],
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, i.jsx)(n.h3, {
+              id: 'building-and-pushing-images',
+              children: 'Building and Pushing Images',
+            }),
+            '\n',
+            (0, i.jsx)(n.h4, { id: 'available-commands', children: 'Available Commands' }),
+            '\n',
+            (0, i.jsxs)(n.table, {
+              children: [
+                (0, i.jsx)(n.thead, {
+                  children: (0, i.jsxs)(n.tr, {
+                    children: [
+                      (0, i.jsx)(n.th, { children: 'Command' }),
+                      (0, i.jsx)(n.th, { children: 'Description' }),
+                    ],
+                  }),
+                }),
+                (0, i.jsxs)(n.tbody, {
+                  children: [
+                    (0, i.jsxs)(n.tr, {
+                      children: [
+                        (0, i.jsx)(n.td, {
+                          children: (0, i.jsx)(n.code, { children: 'yarn docker:build:prod' }),
+                        }),
+                        (0, i.jsx)(n.td, {
+                          children: 'Build all service images (no version bump)',
+                        }),
+                      ],
+                    }),
+                    (0, i.jsxs)(n.tr, {
+                      children: [
+                        (0, i.jsx)(n.td, {
+                          children: (0, i.jsx)(n.code, { children: 'yarn docker:build:prod:push' }),
+                        }),
+                        (0, i.jsx)(n.td, {
+                          children: 'Bump patch version, build and push all images',
+                        }),
+                      ],
+                    }),
+                    (0, i.jsxs)(n.tr, {
+                      children: [
+                        (0, i.jsx)(n.td, {
+                          children: (0, i.jsx)(n.code, { children: 'yarn docker:push' }),
+                        }),
+                        (0, i.jsx)(n.td, { children: 'Push already built images' }),
+                      ],
+                    }),
+                    (0, i.jsxs)(n.tr, {
+                      children: [
+                        (0, i.jsx)(n.td, {
+                          children: (0, i.jsx)(n.code, { children: 'yarn docker:login' }),
+                        }),
+                        (0, i.jsx)(n.td, { children: 'Login to Tencent Cloud Registry' }),
+                      ],
+                    }),
+                  ],
+                }),
+              ],
+            }),
+            '\n',
+            (0, i.jsx)(n.h4, { id: 'script-options', children: 'Script Options' }),
+            '\n',
+            (0, i.jsx)(n.pre, {
+              children: (0, i.jsx)(n.code, {
+                className: 'language-bash',
+                children:
+                  '# Show help\nyarn docker:build:prod --help\n\n# Build all services without version bump\nyarn docker:build:prod\n\n# Bump patch version, build and push\nyarn docker:build:prod --bump patch --push\n\n# Bump minor version for a specific service\nyarn docker:build:prod --bump minor --service backend --push\n\n# Build only frontend\nyarn docker:build:prod --service frontend\n',
+              }),
+            }),
+            '\n',
+            (0, i.jsx)(n.p, { children: (0, i.jsx)(n.strong, { children: 'Options:' }) }),
+            '\n',
+            (0, i.jsxs)(n.ul, {
+              children: [
+                '\n',
+                (0, i.jsxs)(n.li, {
+                  children: [
+                    (0, i.jsx)(n.code, { children: '--bump, -b <type>' }),
+                    ': Version bump type (',
+                    (0, i.jsx)(n.code, { children: 'patch' }),
+                    ', ',
+                    (0, i.jsx)(n.code, { children: 'minor' }),
+                    ', ',
+                    (0, i.jsx)(n.code, { children: 'major' }),
+                    ')',
+                  ],
+                }),
+                '\n',
+                (0, i.jsxs)(n.li, {
+                  children: [
+                    (0, i.jsx)(n.code, { children: '--push, -p' }),
+                    ': Push to registry after building',
+                  ],
+                }),
+                '\n',
+                (0, i.jsxs)(n.li, {
+                  children: [
+                    (0, i.jsx)(n.code, { children: '--service, -s <name>' }),
+                    ': Service to build (',
+                    (0, i.jsx)(n.code, { children: 'backend' }),
+                    ', ',
+                    (0, i.jsx)(n.code, { children: 'frontend' }),
+                    ', ',
+                    (0, i.jsx)(n.code, { children: 'event-lens' }),
+                    ', ',
+                    (0, i.jsx)(n.code, { children: 'chat-server' }),
+                    ', ',
+                    (0, i.jsx)(n.code, { children: 'edge' }),
+                    ', ',
+                    (0, i.jsx)(n.code, { children: 'all' }),
+                    ')',
+                  ],
+                }),
+                '\n',
+                (0, i.jsxs)(n.li, {
+                  children: [
+                    (0, i.jsx)(n.code, { children: '--login, -l' }),
+                    ': Login to registry before pushing',
+                  ],
+                }),
+                '\n',
+                (0, i.jsxs)(n.li, {
+                  children: [(0, i.jsx)(n.code, { children: '--help, -h' }), ': Show help message'],
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, i.jsx)(n.h3, {
+              id: 'running-production-stack',
+              children: 'Running Production Stack',
+            }),
+            '\n',
+            (0, i.jsx)(n.pre, {
+              children: (0, i.jsx)(n.code, {
+                className: 'language-bash',
+                children:
+                  '# Set the version to deploy\nexport GATRIX_VERSION=1.0.0\n\n# Pull latest images\nyarn docker:prod:pull\n\n# Start production stack\nyarn docker:prod\n\n# View logs\nyarn docker:prod:logs\n\n# Stop production stack\nyarn docker:prod:down\n',
+              }),
+            }),
+            '\n',
+            (0, i.jsx)(n.h3, {
+              id: 'production-environment-variables',
+              children: 'Production Environment Variables',
+            }),
+            '\n',
+            (0, i.jsxs)(n.p, {
+              children: [
+                'Create a ',
+                (0, i.jsx)(n.code, { children: '.env' }),
+                ' file with production settings:',
+              ],
+            }),
+            '\n',
+            (0, i.jsx)(n.pre, {
+              children: (0, i.jsx)(n.code, {
+                className: 'language-env',
+                children:
+                  '# Version\nGATRIX_VERSION=1.0.0\n\n# Data storage\nDATA_ROOT=/data/gatrix\n\n# Database\nDB_ROOT_PASSWORD=secure-root-password\nDB_NAME=gatrix\nDB_USER=gatrix_user\nDB_PASSWORD=secure-db-password\n\n# Security\nJWT_SECRET=your-production-jwt-secret\nJWT_REFRESH_SECRET=your-production-refresh-secret\nSESSION_SECRET=your-production-session-secret\n\n# Admin\nADMIN_EMAIL=admin@yourcompany.com\nADMIN_PASSWORD=secure-admin-password\n\n# Monitoring\nMONITORING_ENABLED=true\nGRAFANA_ADMIN_PASSWORD=secure-grafana-password\n',
+              }),
+            }),
+            '\n',
+            (0, i.jsx)(n.h3, { id: 'image-tags', children: 'Image Tags' }),
+            '\n',
+            (0, i.jsx)(n.p, { children: 'Each service generates two tags:' }),
+            '\n',
+            (0, i.jsxs)(n.ul, {
+              children: [
+                '\n',
+                (0, i.jsxs)(n.li, {
+                  children: [
+                    (0, i.jsx)(n.strong, { children: 'Version tag' }),
+                    ': ',
+                    (0, i.jsx)(n.code, { children: '{service}-{version}' }),
+                    ' (e.g., ',
+                    (0, i.jsx)(n.code, { children: 'backend-1.2.3' }),
+                    ')',
+                  ],
+                }),
+                '\n',
+                (0, i.jsxs)(n.li, {
+                  children: [
+                    (0, i.jsx)(n.strong, { children: 'Latest tag' }),
+                    ': ',
+                    (0, i.jsx)(n.code, { children: '{service}-latest' }),
+                    ' (e.g., ',
+                    (0, i.jsx)(n.code, { children: 'backend-latest' }),
+                    ')',
+                  ],
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, i.jsx)(n.p, { children: (0, i.jsx)(n.strong, { children: 'Services:' }) }),
+            '\n',
+            (0, i.jsxs)(n.ul, {
+              children: [
+                '\n',
+                (0, i.jsxs)(n.li, {
+                  children: [(0, i.jsx)(n.code, { children: 'backend' }), ' - Backend API server'],
+                }),
+                '\n',
+                (0, i.jsxs)(n.li, {
+                  children: [
+                    (0, i.jsx)(n.code, { children: 'frontend' }),
+                    ' - Frontend Nginx server',
+                  ],
+                }),
+                '\n',
+                (0, i.jsxs)(n.li, {
+                  children: [
+                    (0, i.jsx)(n.code, { children: 'event-lens' }),
+                    ' - Event analytics server',
+                  ],
+                }),
+                '\n',
+                (0, i.jsxs)(n.li, {
+                  children: [
+                    (0, i.jsx)(n.code, { children: 'chat-server' }),
+                    ' - WebSocket chat server',
+                  ],
+                }),
+                '\n',
+                (0, i.jsxs)(n.li, {
+                  children: [
+                    (0, i.jsx)(n.code, { children: 'edge' }),
+                    ' - Edge server for clients',
+                  ],
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, i.jsx)(n.h2, {
+              id: 'docker-swarm-deployment',
+              children: 'Docker Swarm Deployment',
+            }),
+            '\n',
+            (0, i.jsx)(n.p, {
+              children:
+                'For production environments with high availability requirements, use Docker Swarm orchestration.',
+            }),
+            '\n',
+            (0, i.jsx)(n.h3, { id: 'available-commands-1', children: 'Available Commands' }),
+            '\n',
+            (0, i.jsxs)(n.table, {
+              children: [
+                (0, i.jsx)(n.thead, {
+                  children: (0, i.jsxs)(n.tr, {
+                    children: [
+                      (0, i.jsx)(n.th, { children: 'Command' }),
+                      (0, i.jsx)(n.th, { children: 'Description' }),
+                    ],
+                  }),
+                }),
+                (0, i.jsxs)(n.tbody, {
+                  children: [
+                    (0, i.jsxs)(n.tr, {
+                      children: [
+                        (0, i.jsx)(n.td, {
+                          children: (0, i.jsx)(n.code, { children: 'yarn swarm:deploy' }),
+                        }),
+                        (0, i.jsx)(n.td, { children: 'Deploy stack to Swarm' }),
+                      ],
+                    }),
+                    (0, i.jsxs)(n.tr, {
+                      children: [
+                        (0, i.jsx)(n.td, {
+                          children: (0, i.jsx)(n.code, { children: 'yarn swarm:deploy:init' }),
+                        }),
+                        (0, i.jsx)(n.td, { children: 'Initial deployment (creates secrets)' }),
+                      ],
+                    }),
+                    (0, i.jsxs)(n.tr, {
+                      children: [
+                        (0, i.jsx)(n.td, {
+                          children: (0, i.jsx)(n.code, { children: 'yarn swarm:update' }),
+                        }),
+                        (0, i.jsx)(n.td, { children: 'Rolling update services' }),
+                      ],
+                    }),
+                    (0, i.jsxs)(n.tr, {
+                      children: [
+                        (0, i.jsx)(n.td, {
+                          children: (0, i.jsx)(n.code, { children: 'yarn swarm:rollback' }),
+                        }),
+                        (0, i.jsx)(n.td, { children: 'Rollback to previous version' }),
+                      ],
+                    }),
+                    (0, i.jsxs)(n.tr, {
+                      children: [
+                        (0, i.jsx)(n.td, {
+                          children: (0, i.jsx)(n.code, { children: 'yarn swarm:scale' }),
+                        }),
+                        (0, i.jsx)(n.td, { children: 'Scale services' }),
+                      ],
+                    }),
+                    (0, i.jsxs)(n.tr, {
+                      children: [
+                        (0, i.jsx)(n.td, {
+                          children: (0, i.jsx)(n.code, { children: 'yarn swarm:status' }),
+                        }),
+                        (0, i.jsx)(n.td, { children: 'View stack status' }),
+                      ],
+                    }),
+                  ],
+                }),
+              ],
+            }),
+            '\n',
+            (0, i.jsx)(n.h3, { id: 'quick-start', children: 'Quick Start' }),
+            '\n',
+            (0, i.jsx)(n.pre, {
+              children: (0, i.jsx)(n.code, {
+                className: 'language-bash',
+                children:
+                  '# Initialize Swarm cluster\ndocker swarm init\n\n# Configure environment\ncd deploy\ncp .env.example .env\nvim .env\n\n# Initial deployment\n./deploy.sh --init --version 1.0.0\n',
+              }),
+            }),
+            '\n',
+            (0, i.jsx)(n.h3, { id: 'key-features', children: 'Key Features' }),
+            '\n',
+            (0, i.jsxs)(n.ul, {
+              children: [
+                '\n',
+                (0, i.jsxs)(n.li, {
+                  children: [
+                    (0, i.jsx)(n.strong, { children: 'Rolling Updates' }),
+                    ': Zero-downtime deployments',
+                  ],
+                }),
+                '\n',
+                (0, i.jsxs)(n.li, {
+                  children: [
+                    (0, i.jsx)(n.strong, { children: 'Auto-Rollback' }),
+                    ': Automatic rollback on failure',
+                  ],
+                }),
+                '\n',
+                (0, i.jsxs)(n.li, {
+                  children: [
+                    (0, i.jsx)(n.strong, { children: 'Scaling Presets' }),
+                    ': minimal, standard, high',
+                  ],
+                }),
+                '\n',
+                (0, i.jsxs)(n.li, {
+                  children: [
+                    (0, i.jsx)(n.strong, { children: 'Secret Management' }),
+                    ': Secure credential storage',
+                  ],
+                }),
+                '\n',
+                (0, i.jsxs)(n.li, {
+                  children: [
+                    (0, i.jsx)(n.strong, { children: 'Health Monitoring' }),
+                    ': Automatic health checks',
+                  ],
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, i.jsxs)(n.p, {
+              children: [
+                'For detailed Swarm documentation, see the ',
+                (0, i.jsx)(n.code, { children: 'deploy/README.md' }),
+                ' file in the repository root.',
+              ],
+            }),
+            '\n',
+            (0, i.jsx)(n.h2, { id: 'data-persistence', children: 'Data Persistence' }),
+            '\n',
+            (0, i.jsxs)(n.p, {
+              children: [
+                'All persistent data (MySQL, Redis, ClickHouse, logs, etc.) is stored under the ',
+                (0, i.jsx)(n.code, { children: 'DATA_ROOT' }),
+                ' path.',
+              ],
+            }),
+            '\n',
+            (0, i.jsx)(n.h3, { id: 'volume-configuration', children: 'Volume Configuration' }),
+            '\n',
+            (0, i.jsxs)(n.p, {
+              children: [
+                'The ',
+                (0, i.jsx)(n.code, { children: 'DATA_ROOT' }),
+                ' environment variable controls where all Docker volumes are stored:',
+              ],
+            }),
+            '\n',
+            (0, i.jsxs)(n.table, {
+              children: [
+                (0, i.jsx)(n.thead, {
+                  children: (0, i.jsxs)(n.tr, {
+                    children: [
+                      (0, i.jsx)(n.th, { children: 'Service' }),
+                      (0, i.jsx)(n.th, { children: 'Host Path / Volume' }),
+                      (0, i.jsx)(n.th, { children: 'Container Path' }),
+                    ],
+                  }),
+                }),
+                (0, i.jsxs)(n.tbody, {
+                  children: [
+                    (0, i.jsxs)(n.tr, {
+                      children: [
+                        (0, i.jsx)(n.td, { children: 'MySQL' }),
+                        (0, i.jsx)(n.td, {
+                          children: (0, i.jsx)(n.code, { children: '${DATA_ROOT}/mysql' }),
+                        }),
+                        (0, i.jsx)(n.td, {
+                          children: (0, i.jsx)(n.code, { children: '/var/lib/mysql' }),
+                        }),
+                      ],
+                    }),
+                    (0, i.jsxs)(n.tr, {
+                      children: [
+                        (0, i.jsx)(n.td, { children: 'Redis' }),
+                        (0, i.jsx)(n.td, {
+                          children: (0, i.jsx)(n.code, { children: '${DATA_ROOT}/redis' }),
+                        }),
+                        (0, i.jsx)(n.td, { children: (0, i.jsx)(n.code, { children: '/data' }) }),
+                      ],
+                    }),
+                    (0, i.jsxs)(n.tr, {
+                      children: [
+                        (0, i.jsx)(n.td, { children: 'ClickHouse' }),
+                        (0, i.jsxs)(n.td, {
+                          children: [
+                            (0, i.jsx)(n.code, { children: 'clickhouse-data' }),
+                            ' (named volume)',
+                          ],
+                        }),
+                        (0, i.jsx)(n.td, {
+                          children: (0, i.jsx)(n.code, { children: '/var/lib/clickhouse' }),
+                        }),
+                      ],
+                    }),
+                    (0, i.jsxs)(n.tr, {
+                      children: [
+                        (0, i.jsx)(n.td, { children: 'Backend Logs' }),
+                        (0, i.jsx)(n.td, {
+                          children: (0, i.jsx)(n.code, { children: '${DATA_ROOT}/backend/logs' }),
+                        }),
+                        (0, i.jsx)(n.td, {
+                          children: (0, i.jsx)(n.code, { children: '/app/logs' }),
+                        }),
+                      ],
+                    }),
+                    (0, i.jsxs)(n.tr, {
+                      children: [
+                        (0, i.jsx)(n.td, { children: 'Backend Data' }),
+                        (0, i.jsx)(n.td, {
+                          children: (0, i.jsx)(n.code, { children: '${DATA_ROOT}/backend/data' }),
+                        }),
+                        (0, i.jsx)(n.td, {
+                          children: (0, i.jsx)(n.code, { children: '/app/data' }),
+                        }),
+                      ],
+                    }),
+                    (0, i.jsxs)(n.tr, {
+                      children: [
+                        (0, i.jsx)(n.td, { children: 'Event Lens Logs' }),
+                        (0, i.jsx)(n.td, {
+                          children: (0, i.jsx)(n.code, {
+                            children: '${DATA_ROOT}/event-lens/logs',
+                          }),
+                        }),
+                        (0, i.jsx)(n.td, {
+                          children: (0, i.jsx)(n.code, { children: '/app/logs' }),
+                        }),
+                      ],
+                    }),
+                    (0, i.jsxs)(n.tr, {
+                      children: [
+                        (0, i.jsx)(n.td, { children: 'Chat Server Uploads' }),
+                        (0, i.jsx)(n.td, {
+                          children: (0, i.jsx)(n.code, {
+                            children: '${DATA_ROOT}/chat-server/uploads',
+                          }),
+                        }),
+                        (0, i.jsx)(n.td, {
+                          children: (0, i.jsx)(n.code, { children: '/app/uploads' }),
+                        }),
+                      ],
+                    }),
+                    (0, i.jsxs)(n.tr, {
+                      children: [
+                        (0, i.jsx)(n.td, { children: 'Chat Server Logs' }),
+                        (0, i.jsx)(n.td, {
+                          children: (0, i.jsx)(n.code, {
+                            children: '${DATA_ROOT}/chat-server/logs',
+                          }),
+                        }),
+                        (0, i.jsx)(n.td, {
+                          children: (0, i.jsx)(n.code, { children: '/app/logs' }),
+                        }),
+                      ],
+                    }),
+                    (0, i.jsxs)(n.tr, {
+                      children: [
+                        (0, i.jsx)(n.td, { children: 'etcd' }),
+                        (0, i.jsx)(n.td, {
+                          children: (0, i.jsx)(n.code, { children: '${DATA_ROOT}/etcd' }),
+                        }),
+                        (0, i.jsx)(n.td, {
+                          children: (0, i.jsx)(n.code, { children: '/etcd-data' }),
+                        }),
+                      ],
+                    }),
+                    (0, i.jsxs)(n.tr, {
+                      children: [
+                        (0, i.jsx)(n.td, { children: 'Prometheus' }),
+                        (0, i.jsx)(n.td, {
+                          children: (0, i.jsx)(n.code, { children: '${DATA_ROOT}/prometheus' }),
+                        }),
+                        (0, i.jsx)(n.td, {
+                          children: (0, i.jsx)(n.code, { children: '/prometheus' }),
+                        }),
+                      ],
+                    }),
+                    (0, i.jsxs)(n.tr, {
+                      children: [
+                        (0, i.jsx)(n.td, { children: 'Grafana' }),
+                        (0, i.jsx)(n.td, {
+                          children: (0, i.jsx)(n.code, { children: '${DATA_ROOT}/grafana' }),
+                        }),
+                        (0, i.jsx)(n.td, {
+                          children: (0, i.jsx)(n.code, { children: '/var/lib/grafana' }),
+                        }),
+                      ],
+                    }),
+                    (0, i.jsxs)(n.tr, {
+                      children: [
+                        (0, i.jsx)(n.td, { children: 'Loki' }),
+                        (0, i.jsx)(n.td, {
+                          children: (0, i.jsx)(n.code, { children: '${DATA_ROOT}/loki' }),
+                        }),
+                        (0, i.jsx)(n.td, { children: (0, i.jsx)(n.code, { children: '/loki' }) }),
+                      ],
+                    }),
+                  ],
+                }),
+              ],
+            }),
+            '\n',
+            (0, i.jsx)(n.h3, { id: 'environment-setup', children: 'Environment Setup' }),
+            '\n',
+            (0, i.jsxs)(n.p, {
+              children: [
+                (0, i.jsx)(n.strong, { children: 'Development' }),
+                ' (',
+                (0, i.jsx)(n.code, { children: '.env' }),
+                '):',
+              ],
+            }),
+            '\n',
+            (0, i.jsx)(n.pre, {
+              children: (0, i.jsx)(n.code, {
+                className: 'language-env',
+                children: 'DATA_ROOT=./data\n',
+              }),
+            }),
+            '\n',
+            (0, i.jsxs)(n.p, {
+              children: [
+                'Result: All data stored in ',
+                (0, i.jsx)(n.code, { children: './data/mysql' }),
+                ', ',
+                (0, i.jsx)(n.code, { children: './data/redis' }),
+                ', etc. (relative to project root)',
+              ],
+            }),
+            '\n',
+            (0, i.jsxs)(n.p, {
+              children: [
+                (0, i.jsx)(n.strong, { children: 'Production' }),
+                ' (',
+                (0, i.jsx)(n.code, { children: '.env' }),
+                '):',
+              ],
+            }),
+            '\n',
+            (0, i.jsx)(n.pre, {
+              children: (0, i.jsx)(n.code, {
+                className: 'language-env',
+                children: 'DATA_ROOT=/data/gatrix\n',
+              }),
+            }),
+            '\n',
+            (0, i.jsxs)(n.p, {
+              children: [
+                'Result: All data stored in ',
+                (0, i.jsx)(n.code, { children: '/data/gatrix/mysql' }),
+                ', ',
+                (0, i.jsx)(n.code, { children: '/data/gatrix/redis' }),
+                ', etc. (absolute path)',
+              ],
+            }),
+            '\n',
+            (0, i.jsx)(n.h3, { id: 'directory-structure', children: 'Directory Structure' }),
+            '\n',
+            (0, i.jsx)(n.pre, {
+              children: (0, i.jsx)(n.code, {
+                children:
+                  '${DATA_ROOT}/\n?\ufffd\ufffd??\ufffd mysql/              # MySQL database files\n?\ufffd\ufffd??\ufffd redis/              # Redis persistence\n?\ufffd\ufffd??\ufffd backend/\n??  ?\ufffd\ufffd??\ufffd logs/           # Backend application logs\n??  ?\ufffd\ufffd??\ufffd data/           # Backend data files\n?\ufffd\ufffd??\ufffd event-lens/\n??  ?\ufffd\ufffd??\ufffd logs/           # Event Lens logs\n?\ufffd\ufffd??\ufffd chat-server/\n??  ?\ufffd\ufffd??\ufffd uploads/        # User uploaded files\n??  ?\ufffd\ufffd??\ufffd logs/           # Chat server logs\n?\ufffd\ufffd??\ufffd etcd/               # etcd cluster data\n?\ufffd\ufffd??\ufffd prometheus/         # Prometheus metrics storage\n?\ufffd\ufffd??\ufffd grafana/            # Grafana dashboards & settings\n?\ufffd\ufffd??\ufffd loki/               # Loki log aggregation\n\n# Managed by Docker (named volumes):\n# - clickhouse-data     # ClickHouse data (use docker volume commands)\n',
+              }),
+            }),
+            '\n',
+            (0, i.jsx)(n.h3, { id: 'important-notes', children: 'Important Notes' }),
+            '\n',
+            (0, i.jsxs)(n.ol, {
+              children: [
+                '\n',
+                (0, i.jsxs)(n.li, {
+                  children: [
+                    (0, i.jsx)(n.strong, { children: 'Directory Permissions' }),
+                    ': Ensure the ',
+                    (0, i.jsx)(n.code, { children: 'DATA_ROOT' }),
+                    ' directory has proper permissions for Docker to read/write',
+                  ],
+                }),
+                '\n',
+                (0, i.jsxs)(n.li, {
+                  children: [
+                    (0, i.jsx)(n.strong, { children: 'Data Migration' }),
+                    ': When switching from named volumes to bind mounts, existing data needs to be migrated manually',
+                  ],
+                }),
+                '\n',
+                (0, i.jsxs)(n.li, {
+                  children: [
+                    (0, i.jsx)(n.strong, { children: 'Backup' }),
+                    ': All persistent data is in one location, making backup easier',
+                  ],
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, i.jsx)(n.h3, {
+              id: 'clickhouse-named-volume',
+              children: 'ClickHouse Named Volume',
+            }),
+            '\n',
+            (0, i.jsxs)(n.p, {
+              children: [
+                (0, i.jsxs)(n.strong, {
+                  children: [
+                    'ClickHouse uses a Docker named volume (',
+                    (0, i.jsx)(n.code, { children: 'clickhouse-data' }),
+                    ') instead of a bind mount.',
+                  ],
+                }),
+                ' This is intentional and should not be changed.',
+              ],
+            }),
+            '\n',
+            (0, i.jsx)(n.h4, { id: 'why-named-volume', children: 'Why Named Volume?' }),
+            '\n',
+            (0, i.jsx)(n.p, {
+              children:
+                "ClickHouse's MergeTree storage engine uses atomic file rename operations during data writes:",
+            }),
+            '\n',
+            (0, i.jsxs)(n.ol, {
+              children: [
+                '\n',
+                (0, i.jsxs)(n.li, {
+                  children: [
+                    'Data is first written to a temporary directory (',
+                    (0, i.jsx)(n.code, { children: 'tmp_insert_*' }),
+                    ')',
+                  ],
+                }),
+                '\n',
+                (0, i.jsx)(n.li, {
+                  children: 'The directory is atomically renamed to its final location',
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, i.jsxs)(n.p, {
+              children: [
+                'This works perfectly on native Linux filesystems but ',
+                (0, i.jsx)(n.strong, { children: 'fails on certain configurations' }),
+                ':',
+              ],
+            }),
+            '\n',
+            (0, i.jsxs)(n.ul, {
+              children: [
+                '\n',
+                (0, i.jsxs)(n.li, {
+                  children: [
+                    (0, i.jsx)(n.strong, { children: 'Windows Docker Desktop' }),
+                    ": NTFS bind mounts don't support atomic renames properly",
+                  ],
+                }),
+                '\n',
+                (0, i.jsxs)(n.li, {
+                  children: [
+                    (0, i.jsx)(n.strong, { children: 'Some network filesystems' }),
+                    ': NFS/CIFS may have similar issues',
+                  ],
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, i.jsx)(n.p, {
+              children: (0, i.jsx)(n.strong, { children: 'Symptoms of bind mount issues:' }),
+            }),
+            '\n',
+            (0, i.jsx)(n.pre, {
+              children: (0, i.jsx)(n.code, {
+                children:
+                  'filesystem error: in rename: No such file or directory\n["/var/lib/clickhouse/store/.../tmp_insert_202512_1_1_0/"]\n["/var/lib/clickhouse/store/.../202512_1_1_0/"]\n',
+              }),
+            }),
+            '\n',
+            (0, i.jsx)(n.h4, { id: 'volume-management', children: 'Volume Management' }),
+            '\n',
+            (0, i.jsx)(n.p, {
+              children: 'Since ClickHouse uses a named volume, data is managed differently:',
+            }),
+            '\n',
+            (0, i.jsx)(n.pre, {
+              children: (0, i.jsx)(n.code, {
+                className: 'language-bash',
+                children:
+                  '# List Docker volumes\ndocker volume ls | grep clickhouse\n\n# Inspect volume\ndocker volume inspect gatrix_clickhouse-data\n\n# Backup ClickHouse data\ndocker run --rm -v gatrix_clickhouse-data:/source -v $(pwd):/backup alpine \\\n  tar czf /backup/clickhouse-backup.tar.gz -C /source .\n\n# Restore ClickHouse data\ndocker run --rm -v gatrix_clickhouse-data:/target -v $(pwd):/backup alpine \\\n  tar xzf /backup/clickhouse-backup.tar.gz -C /target\n\n# Remove volume (WARNING: deletes all ClickHouse data)\ndocker volume rm gatrix_clickhouse-data\n',
+              }),
+            }),
+            '\n',
+            (0, i.jsx)(n.h4, {
+              id: 'if-you-must-use-bind-mount-linux-only',
+              children: 'If You Must Use Bind Mount (Linux Only)',
+            }),
+            '\n',
+            (0, i.jsx)(n.p, {
+              children: 'If you need bind mount for easier data access on a Linux server, ensure:',
+            }),
+            '\n',
+            (0, i.jsxs)(n.ol, {
+              children: [
+                '\n',
+                (0, i.jsx)(n.li, {
+                  children: 'The host is running native Linux (not WSL or Docker Desktop)',
+                }),
+                '\n',
+                (0, i.jsx)(n.li, { children: 'The filesystem is ext4 or XFS' }),
+                '\n',
+                (0, i.jsx)(n.li, { children: 'Add to docker-compose:' }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, i.jsx)(n.pre, {
+              children: (0, i.jsx)(n.code, {
+                className: 'language-yaml',
+                children: 'volumes:\n  - ${DATA_ROOT}/clickhouse:/var/lib/clickhouse\n',
+              }),
+            }),
+            '\n',
+            (0, i.jsxs)(n.p, {
+              children: [
+                (0, i.jsx)(n.strong, { children: 'Note' }),
+                ': This is not recommended and may cause issues on some systems.',
+              ],
+            }),
+            '\n',
+            (0, i.jsx)(n.h2, { id: 'team-rule', children: 'Team Rule' }),
+            '\n',
+            (0, i.jsx)(n.p, {
+              children: 'Do not use restart on Docker; prefer down -> up for restarts.',
+            }),
+            '\n',
+            (0, i.jsx)(n.h2, { id: 'monitoring-1', children: 'Monitoring' }),
+            '\n',
+            (0, i.jsxs)(n.p, {
+              children: [
+                'For Prometheus + Grafana setup details and environment variables, see: ',
+                (0, i.jsx)(n.a, { href: '../features/monitoring', children: 'Monitoring' }),
+              ],
+            }),
+          ],
+        });
+      }
+      function h(e = {}) {
+        const { wrapper: n } = { ...(0, d.R)(), ...e.components };
+        return n ? (0, i.jsx)(n, { ...e, children: (0, i.jsx)(a, { ...e }) }) : a(e);
+      }
+    },
+  },
+]);

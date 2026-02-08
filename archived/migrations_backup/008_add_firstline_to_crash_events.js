@@ -1,10 +1,10 @@
 /**
  * Migration: Add firstLine column to crash_events table
- * 
+ *
  * Adds firstLine field to store the first line of the callstack
  */
 
-exports.up = async function(connection) {
+exports.up = async function (connection) {
   console.log('Adding firstLine column to crash_events table...');
 
   // Add firstLine column
@@ -24,7 +24,7 @@ exports.up = async function(connection) {
   console.log('✓ Added index on firstLine column');
 };
 
-exports.down = async function(connection) {
+exports.down = async function (connection) {
   console.log('Rolling back firstLine column from crash_events table...');
 
   // Drop index first
@@ -43,4 +43,3 @@ exports.down = async function(connection) {
 
   console.log('✓ Dropped firstLine column from crash_events table');
 };
-

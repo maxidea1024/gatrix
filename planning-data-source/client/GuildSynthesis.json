@@ -27,10 +27,7 @@
       "spacialMaterialCashShopId0": "number",
       "spacialMaterialCashShopId1": "number",
       "desc": "text",
-      "descFormatTexts": [
-        "text",
-        "text"
-      ],
+      "descFormatTexts": ["text", "text"],
       "synthesisTimeSec": "number",
       "mainItems": [
         {
@@ -119,114 +116,52 @@
     },
     ":enum": {},
     ":links": {
-      "synthesisPointId": [
-        "Point"
-      ],
-      "criticalRewardId": [
-        "Reward"
-      ],
-      "normalRewardId": [
-        "Reward"
-      ],
+      "synthesisPointId": ["Point"],
+      "criticalRewardId": ["Reward"],
+      "normalRewardId": ["Reward"],
       "spacialMaterial": [
         {
-          "Id": [
-            "Item",
-            "CEquip",
-            "ShipSlot"
-          ]
+          "Id": ["Item", "CEquip", "ShipSlot"]
         },
         {
-          "Id": [
-            "Item",
-            "CEquip",
-            "ShipSlot"
-          ]
+          "Id": ["Item", "CEquip", "ShipSlot"]
         }
       ],
-      "spacialMaterialCashShopId0": [
-        "CashShop"
-      ],
-      "spacialMaterialCashShopId1": [
-        "CashShop"
-      ],
+      "spacialMaterialCashShopId0": ["CashShop"],
+      "spacialMaterialCashShopId1": ["CashShop"],
       "mainItems": [
         {
-          "Id": [
-            "Item",
-            "CEquip",
-            "ShipSlot"
-          ]
+          "Id": ["Item", "CEquip", "ShipSlot"]
         },
         {
-          "Id": [
-            "Item",
-            "CEquip",
-            "ShipSlot"
-          ]
+          "Id": ["Item", "CEquip", "ShipSlot"]
         },
         {
-          "Id": [
-            "Item",
-            "CEquip",
-            "ShipSlot"
-          ]
+          "Id": ["Item", "CEquip", "ShipSlot"]
         },
         {
-          "Id": [
-            "Item",
-            "CEquip",
-            "ShipSlot"
-          ]
+          "Id": ["Item", "CEquip", "ShipSlot"]
         },
         {
-          "Id": [
-            "Item",
-            "CEquip",
-            "ShipSlot"
-          ]
+          "Id": ["Item", "CEquip", "ShipSlot"]
         },
         {
-          "Id": [
-            "Item",
-            "CEquip",
-            "ShipSlot"
-          ]
+          "Id": ["Item", "CEquip", "ShipSlot"]
         },
         {
-          "Id": [
-            "Item",
-            "CEquip",
-            "ShipSlot"
-          ]
+          "Id": ["Item", "CEquip", "ShipSlot"]
         },
         {
-          "Id": [
-            "Item",
-            "CEquip",
-            "ShipSlot"
-          ]
+          "Id": ["Item", "CEquip", "ShipSlot"]
         },
         {
-          "Id": [
-            "Item",
-            "CEquip",
-            "ShipSlot"
-          ]
+          "Id": ["Item", "CEquip", "ShipSlot"]
         },
         {
-          "Id": [
-            "Item",
-            "CEquip",
-            "ShipSlot"
-          ]
+          "Id": ["Item", "CEquip", "ShipSlot"]
         },
         {
-          "Id": [
-            "Item",
-            "CEquip",
-            "ShipSlot"
-          ]
+          "Id": ["Item", "CEquip", "ShipSlot"]
         }
       ]
     }
@@ -379,10 +314,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "지정된 A등급 부품",
-        "대포"
-      ],
+      "descFormatTexts": ["지정된 A등급 부품", "대포"],
       "synthesisTimeSec": 10800,
       "synthesisCritical": 100,
       "synthesisGuildPoint": 500
@@ -406,10 +338,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "지정된 A등급 부품",
-        "돛"
-      ],
+      "descFormatTexts": ["지정된 A등급 부품", "돛"],
       "synthesisTimeSec": 10800,
       "synthesisCritical": 100,
       "synthesisGuildPoint": 500
@@ -433,10 +362,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "지정된 A등급 부품",
-        "장갑"
-      ],
+      "descFormatTexts": ["지정된 A등급 부품", "장갑"],
       "synthesisTimeSec": 10800,
       "synthesisCritical": 100,
       "synthesisGuildPoint": 500
@@ -460,10 +386,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "지정된 A등급 부품",
-        "닻"
-      ],
+      "descFormatTexts": ["지정된 A등급 부품", "닻"],
       "synthesisTimeSec": 10800,
       "synthesisCritical": 100,
       "synthesisGuildPoint": 500
@@ -487,10 +410,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "지정된 A등급 부품",
-        "전투 충각"
-      ],
+      "descFormatTexts": ["지정된 A등급 부품", "전투 충각"],
       "synthesisTimeSec": 10800,
       "synthesisCritical": 100,
       "synthesisGuildPoint": 500
@@ -514,10 +434,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "지정된 A등급 부품",
-        "항해 충각"
-      ],
+      "descFormatTexts": ["지정된 A등급 부품", "항해 충각"],
       "synthesisTimeSec": 10800,
       "synthesisCritical": 100,
       "synthesisGuildPoint": 500
@@ -541,10 +458,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "지정된 A등급 부품",
-        "전투 선수상"
-      ],
+      "descFormatTexts": ["지정된 A등급 부품", "전투 선수상"],
       "synthesisTimeSec": 10800,
       "synthesisCritical": 100,
       "synthesisGuildPoint": 500
@@ -568,10 +482,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "지정된 A등급 부품",
-        "항해 선수상"
-      ],
+      "descFormatTexts": ["지정된 A등급 부품", "항해 선수상"],
       "synthesisTimeSec": 10800,
       "synthesisCritical": 100,
       "synthesisGuildPoint": 500
@@ -595,10 +506,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "지정된 A등급 장비",
-        "무기"
-      ],
+      "descFormatTexts": ["지정된 A등급 장비", "무기"],
       "synthesisTimeSec": 10800,
       "synthesisCritical": 100,
       "synthesisGuildPoint": 500
@@ -622,10 +530,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "지정된 A등급 장비",
-        "머리 장비"
-      ],
+      "descFormatTexts": ["지정된 A등급 장비", "머리 장비"],
       "synthesisTimeSec": 10800,
       "synthesisCritical": 100,
       "synthesisGuildPoint": 500
@@ -649,10 +554,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "지정된 A등급 장비",
-        "몸 장비"
-      ],
+      "descFormatTexts": ["지정된 A등급 장비", "몸 장비"],
       "synthesisTimeSec": 10800,
       "synthesisCritical": 100,
       "synthesisGuildPoint": 500
@@ -676,10 +578,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "지정된 A등급 장비",
-        "망토"
-      ],
+      "descFormatTexts": ["지정된 A등급 장비", "망토"],
       "synthesisTimeSec": 10800,
       "synthesisCritical": 100,
       "synthesisGuildPoint": 500
@@ -703,10 +602,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "지정된 A등급 장비",
-        "장신구"
-      ],
+      "descFormatTexts": ["지정된 A등급 장비", "장신구"],
       "synthesisTimeSec": 10800,
       "synthesisCritical": 100,
       "synthesisGuildPoint": 500
@@ -730,10 +626,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "지정된 A등급 장비",
-        "얼굴 장식"
-      ],
+      "descFormatTexts": ["지정된 A등급 장비", "얼굴 장식"],
       "synthesisTimeSec": 10800,
       "synthesisCritical": 100,
       "synthesisGuildPoint": 500
@@ -757,10 +650,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "지정된 S등급 부품",
-        "대포"
-      ],
+      "descFormatTexts": ["지정된 S등급 부품", "대포"],
       "synthesisTimeSec": 43200,
       "synthesisCritical": 100,
       "synthesisGuildPoint": 500
@@ -784,10 +674,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "지정된 S등급 부품",
-        "돛"
-      ],
+      "descFormatTexts": ["지정된 S등급 부품", "돛"],
       "synthesisTimeSec": 43200,
       "synthesisCritical": 100,
       "synthesisGuildPoint": 500
@@ -811,10 +698,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "지정된 S등급 부품",
-        "장갑"
-      ],
+      "descFormatTexts": ["지정된 S등급 부품", "장갑"],
       "synthesisTimeSec": 43200,
       "synthesisCritical": 100,
       "synthesisGuildPoint": 500
@@ -838,10 +722,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "지정된 S등급 부품",
-        "닻"
-      ],
+      "descFormatTexts": ["지정된 S등급 부품", "닻"],
       "synthesisTimeSec": 43200,
       "synthesisCritical": 100,
       "synthesisGuildPoint": 500
@@ -865,10 +746,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "지정된 S등급 부품",
-        "전투 충각"
-      ],
+      "descFormatTexts": ["지정된 S등급 부품", "전투 충각"],
       "synthesisTimeSec": 43200,
       "synthesisCritical": 100,
       "synthesisGuildPoint": 500
@@ -892,10 +770,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "지정된 S등급 부품",
-        "항해 충각"
-      ],
+      "descFormatTexts": ["지정된 S등급 부품", "항해 충각"],
       "synthesisTimeSec": 43200,
       "synthesisCritical": 100,
       "synthesisGuildPoint": 500
@@ -919,10 +794,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "지정된 S등급 부품",
-        "전투 선수상"
-      ],
+      "descFormatTexts": ["지정된 S등급 부품", "전투 선수상"],
       "synthesisTimeSec": 43200,
       "synthesisCritical": 100,
       "synthesisGuildPoint": 500
@@ -946,10 +818,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "지정된 S등급 부품",
-        "항해 선수상"
-      ],
+      "descFormatTexts": ["지정된 S등급 부품", "항해 선수상"],
       "synthesisTimeSec": 43200,
       "synthesisCritical": 100,
       "synthesisGuildPoint": 500
@@ -973,10 +842,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "지정된 S등급 장비",
-        "무기"
-      ],
+      "descFormatTexts": ["지정된 S등급 장비", "무기"],
       "synthesisTimeSec": 43200,
       "synthesisCritical": 100,
       "synthesisGuildPoint": 500
@@ -1000,10 +866,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "지정된 S등급 장비",
-        "머리 장비"
-      ],
+      "descFormatTexts": ["지정된 S등급 장비", "머리 장비"],
       "synthesisTimeSec": 43200,
       "synthesisCritical": 100,
       "synthesisGuildPoint": 500
@@ -1027,10 +890,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "지정된 S등급 장비",
-        "몸 장비"
-      ],
+      "descFormatTexts": ["지정된 S등급 장비", "몸 장비"],
       "synthesisTimeSec": 43200,
       "synthesisCritical": 100,
       "synthesisGuildPoint": 500
@@ -1054,10 +914,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "지정된 S등급 장비",
-        "장신구"
-      ],
+      "descFormatTexts": ["지정된 S등급 장비", "장신구"],
       "synthesisTimeSec": 43200,
       "synthesisCritical": 100,
       "synthesisGuildPoint": 500
@@ -1081,9 +938,7 @@
         }
       ],
       "desc": "{0} 중 하나를 확률적으로 획득합니다.",
-      "descFormatTexts": [
-        "창세기전 장비 세트"
-      ],
+      "descFormatTexts": ["창세기전 장비 세트"],
       "synthesisTimeSec": 86400,
       "synthesisCritical": 100,
       "synthesisGuildPoint": 500
@@ -1107,10 +962,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "창세기전 장비 세트",
-        "무기 세트"
-      ],
+      "descFormatTexts": ["창세기전 장비 세트", "무기 세트"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -1156,10 +1008,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "창세기전 장비 세트",
-        "크로우 세트"
-      ],
+      "descFormatTexts": ["창세기전 장비 세트", "크로우 세트"],
       "synthesisTimeSec": 86400,
       "mainItems": [
         {
@@ -1193,10 +1042,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "창세기전 장비 세트",
-        "G. S 세트"
-      ],
+      "descFormatTexts": ["창세기전 장비 세트", "G. S 세트"],
       "synthesisTimeSec": 86400,
       "mainItems": [
         {
@@ -1230,10 +1076,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "창세기전 장비 세트",
-        "사라 세트"
-      ],
+      "descFormatTexts": ["창세기전 장비 세트", "사라 세트"],
       "synthesisTimeSec": 86400,
       "mainItems": [
         {
@@ -1267,10 +1110,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "창세기전 장비 세트",
-        "칼스 세트"
-      ],
+      "descFormatTexts": ["창세기전 장비 세트", "칼스 세트"],
       "synthesisTimeSec": 86400,
       "mainItems": [
         {
@@ -1304,10 +1144,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "창세기전 장비 세트",
-        "라시드 세트"
-      ],
+      "descFormatTexts": ["창세기전 장비 세트", "라시드 세트"],
       "synthesisTimeSec": 86400,
       "mainItems": [
         {
@@ -1341,10 +1178,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "창세기전 장비 세트",
-        "하야 세트"
-      ],
+      "descFormatTexts": ["창세기전 장비 세트", "하야 세트"],
       "synthesisTimeSec": 86400,
       "mainItems": [
         {
@@ -1378,10 +1212,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "창세기전 장비 세트",
-        "로빈 세트"
-      ],
+      "descFormatTexts": ["창세기전 장비 세트", "로빈 세트"],
       "synthesisTimeSec": 86400,
       "mainItems": [
         {
@@ -1415,10 +1246,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "창세기전 장비 세트",
-        "카자 세트"
-      ],
+      "descFormatTexts": ["창세기전 장비 세트", "카자 세트"],
       "synthesisTimeSec": 86400,
       "mainItems": [
         {
@@ -1452,10 +1280,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "창세기전 장비 세트",
-        "쿤 세트"
-      ],
+      "descFormatTexts": ["창세기전 장비 세트", "쿤 세트"],
       "synthesisTimeSec": 86400,
       "mainItems": [
         {
@@ -1482,9 +1307,7 @@
       "criticalRewardId": 90120860,
       "normalRewardId": 90120860,
       "desc": "{0} 중 하나를 확률적으로 획득합니다.",
-      "descFormatTexts": [
-        "구름 사제 부품 세트"
-      ],
+      "descFormatTexts": ["구름 사제 부품 세트"],
       "synthesisTimeSec": 43200,
       "synthesisCritical": 100,
       "synthesisGuildPoint": 500
@@ -1508,10 +1331,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "구름 사제 부품 세트",
-        "대포"
-      ],
+      "descFormatTexts": ["구름 사제 부품 세트", "대포"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -1541,10 +1361,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "구름 사제 부품 세트",
-        "돛"
-      ],
+      "descFormatTexts": ["구름 사제 부품 세트", "돛"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -1574,10 +1391,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "구름 사제 부품 세트",
-        "장갑"
-      ],
+      "descFormatTexts": ["구름 사제 부품 세트", "장갑"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -1607,10 +1421,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "구름 사제 부품 세트",
-        "전투 충각"
-      ],
+      "descFormatTexts": ["구름 사제 부품 세트", "전투 충각"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -1640,10 +1451,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "구름 사제 부품 세트",
-        "항해 충각"
-      ],
+      "descFormatTexts": ["구름 사제 부품 세트", "항해 충각"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -1673,10 +1481,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "구름 사제 부품 세트",
-        "전투 선수상"
-      ],
+      "descFormatTexts": ["구름 사제 부품 세트", "전투 선수상"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -1706,10 +1511,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "구름 사제 부품 세트",
-        "항해 선수상"
-      ],
+      "descFormatTexts": ["구름 사제 부품 세트", "항해 선수상"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -1739,10 +1541,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "구름 사제 부품 세트",
-        "닻"
-      ],
+      "descFormatTexts": ["구름 사제 부품 세트", "닻"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -1772,10 +1571,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "구름 사제 부품 세트",
-        "특수 부품"
-      ],
+      "descFormatTexts": ["구름 사제 부품 세트", "특수 부품"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -1798,9 +1594,7 @@
       "criticalRewardId": 90120870,
       "normalRewardId": 90120870,
       "desc": "{0} 중 하나를 확률적으로 획득합니다.",
-      "descFormatTexts": [
-        "구름 사제 장비 세트"
-      ],
+      "descFormatTexts": ["구름 사제 장비 세트"],
       "synthesisTimeSec": 43200,
       "synthesisCritical": 100,
       "synthesisGuildPoint": 500
@@ -1824,10 +1618,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "구름 사제 장비 세트",
-        "무기"
-      ],
+      "descFormatTexts": ["구름 사제 장비 세트", "무기"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -1857,10 +1648,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "구름 사제 장비 세트",
-        "머리"
-      ],
+      "descFormatTexts": ["구름 사제 장비 세트", "머리"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -1890,10 +1678,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "구름 사제 장비 세트",
-        "몸"
-      ],
+      "descFormatTexts": ["구름 사제 장비 세트", "몸"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -1923,10 +1708,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "구름 사제 장비 세트",
-        "장신구"
-      ],
+      "descFormatTexts": ["구름 사제 장비 세트", "장신구"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -1949,9 +1731,7 @@
       "criticalRewardId": 90120958,
       "normalRewardId": 90120958,
       "desc": "{0} 중 하나를 확률적으로 획득합니다.",
-      "descFormatTexts": [
-        "신록 부품 세트"
-      ],
+      "descFormatTexts": ["신록 부품 세트"],
       "synthesisTimeSec": 43200,
       "synthesisCritical": 100,
       "synthesisGuildPoint": 500
@@ -1975,10 +1755,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "신록 부품 세트",
-        "대포"
-      ],
+      "descFormatTexts": ["신록 부품 세트", "대포"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -2008,10 +1785,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "신록 부품 세트",
-        "돛"
-      ],
+      "descFormatTexts": ["신록 부품 세트", "돛"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -2041,10 +1815,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "신록 부품 세트",
-        "장갑"
-      ],
+      "descFormatTexts": ["신록 부품 세트", "장갑"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -2074,10 +1845,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "신록 부품 세트",
-        "전투 충각"
-      ],
+      "descFormatTexts": ["신록 부품 세트", "전투 충각"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -2107,10 +1875,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "신록 부품 세트",
-        "항해 충각"
-      ],
+      "descFormatTexts": ["신록 부품 세트", "항해 충각"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -2140,10 +1905,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "신록 부품 세트",
-        "전투 선수상"
-      ],
+      "descFormatTexts": ["신록 부품 세트", "전투 선수상"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -2173,10 +1935,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "신록 부품 세트",
-        "항해 선수상"
-      ],
+      "descFormatTexts": ["신록 부품 세트", "항해 선수상"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -2206,10 +1965,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "신록 부품 세트",
-        "닻"
-      ],
+      "descFormatTexts": ["신록 부품 세트", "닻"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -2239,10 +1995,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "신록 부품 세트",
-        "특수 부품"
-      ],
+      "descFormatTexts": ["신록 부품 세트", "특수 부품"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -2265,9 +2018,7 @@
       "criticalRewardId": 90120968,
       "normalRewardId": 90120968,
       "desc": "{0} 중 하나를 확률적으로 획득합니다.",
-      "descFormatTexts": [
-        "신록 장비 세트"
-      ],
+      "descFormatTexts": ["신록 장비 세트"],
       "synthesisTimeSec": 43200,
       "synthesisCritical": 100,
       "synthesisGuildPoint": 500
@@ -2291,10 +2042,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "신록 장비 세트",
-        "무기"
-      ],
+      "descFormatTexts": ["신록 장비 세트", "무기"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -2324,10 +2072,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "신록 장비 세트",
-        "머리"
-      ],
+      "descFormatTexts": ["신록 장비 세트", "머리"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -2357,10 +2102,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "신록 장비 세트",
-        "몸"
-      ],
+      "descFormatTexts": ["신록 장비 세트", "몸"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -2390,10 +2132,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "신록 장비 세트",
-        "장신구"
-      ],
+      "descFormatTexts": ["신록 장비 세트", "장신구"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -2416,9 +2155,7 @@
       "criticalRewardId": 90121095,
       "normalRewardId": 90121095,
       "desc": "{0} 중 하나를 확률적으로 획득합니다.",
-      "descFormatTexts": [
-        "황금향 부품 세트"
-      ],
+      "descFormatTexts": ["황금향 부품 세트"],
       "synthesisTimeSec": 43200,
       "synthesisCritical": 100,
       "synthesisGuildPoint": 500
@@ -2442,10 +2179,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "황금향 부품 세트",
-        "대포"
-      ],
+      "descFormatTexts": ["황금향 부품 세트", "대포"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -2475,10 +2209,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "황금향 부품 세트",
-        "돛"
-      ],
+      "descFormatTexts": ["황금향 부품 세트", "돛"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -2508,10 +2239,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "황금향 부품 세트",
-        "장갑"
-      ],
+      "descFormatTexts": ["황금향 부품 세트", "장갑"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -2541,10 +2269,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "황금향 부품 세트",
-        "전투 충각"
-      ],
+      "descFormatTexts": ["황금향 부품 세트", "전투 충각"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -2574,10 +2299,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "황금향 부품 세트",
-        "항해 충각"
-      ],
+      "descFormatTexts": ["황금향 부품 세트", "항해 충각"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -2607,10 +2329,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "황금향 부품 세트",
-        "전투 선수상"
-      ],
+      "descFormatTexts": ["황금향 부품 세트", "전투 선수상"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -2640,10 +2359,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "황금향 부품 세트",
-        "항해 선수상"
-      ],
+      "descFormatTexts": ["황금향 부품 세트", "항해 선수상"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -2673,10 +2389,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "황금향 부품 세트",
-        "닻"
-      ],
+      "descFormatTexts": ["황금향 부품 세트", "닻"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -2706,10 +2419,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "황금향 부품 세트",
-        "특수 부품"
-      ],
+      "descFormatTexts": ["황금향 부품 세트", "특수 부품"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -2739,9 +2449,7 @@
         }
       ],
       "desc": "{0} 중 하나를 확률적으로 획득합니다.",
-      "descFormatTexts": [
-        "황금향 장비 세트"
-      ],
+      "descFormatTexts": ["황금향 장비 세트"],
       "synthesisTimeSec": 43200,
       "synthesisCritical": 100,
       "synthesisGuildPoint": 500
@@ -2765,10 +2473,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "황금향 장비 세트",
-        "무기"
-      ],
+      "descFormatTexts": ["황금향 장비 세트", "무기"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -2798,10 +2503,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "황금향 장비 세트",
-        "머리"
-      ],
+      "descFormatTexts": ["황금향 장비 세트", "머리"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -2831,10 +2533,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "황금향 장비 세트",
-        "몸"
-      ],
+      "descFormatTexts": ["황금향 장비 세트", "몸"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -2864,10 +2563,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "황금향 장비 세트",
-        "장신구"
-      ],
+      "descFormatTexts": ["황금향 장비 세트", "장신구"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -2890,9 +2586,7 @@
       "criticalRewardId": 90121182,
       "normalRewardId": 90121182,
       "desc": "{0} 중 하나를 확률적으로 획득합니다.",
-      "descFormatTexts": [
-        "파티 의상 세트"
-      ],
+      "descFormatTexts": ["파티 의상 세트"],
       "synthesisTimeSec": 43200,
       "synthesisCritical": 100,
       "synthesisGuildPoint": 500
@@ -2916,9 +2610,7 @@
         }
       ],
       "desc": "{0} 중 하나를 확률적으로 획득합니다.",
-      "descFormatTexts": [
-        "창공 부품 세트"
-      ],
+      "descFormatTexts": ["창공 부품 세트"],
       "synthesisTimeSec": 43200,
       "synthesisCritical": 100,
       "synthesisGuildPoint": 500
@@ -2942,10 +2634,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "창공 부품 세트",
-        "대포"
-      ],
+      "descFormatTexts": ["창공 부품 세트", "대포"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -2975,10 +2664,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "창공 부품 세트",
-        "돛"
-      ],
+      "descFormatTexts": ["창공 부품 세트", "돛"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -3008,10 +2694,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "창공 부품 세트",
-        "장갑"
-      ],
+      "descFormatTexts": ["창공 부품 세트", "장갑"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -3041,10 +2724,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "창공 부품 세트",
-        "전투 충각"
-      ],
+      "descFormatTexts": ["창공 부품 세트", "전투 충각"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -3074,10 +2754,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "창공 부품 세트",
-        "항해 충각"
-      ],
+      "descFormatTexts": ["창공 부품 세트", "항해 충각"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -3107,10 +2784,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "창공 부품 세트",
-        "전투 선수상"
-      ],
+      "descFormatTexts": ["창공 부품 세트", "전투 선수상"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -3140,10 +2814,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "창공 부품 세트",
-        "항해 선수상"
-      ],
+      "descFormatTexts": ["창공 부품 세트", "항해 선수상"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -3173,10 +2844,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "창공 부품 세트",
-        "닻"
-      ],
+      "descFormatTexts": ["창공 부품 세트", "닻"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -3206,10 +2874,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "창공 부품 세트",
-        "특수 부품"
-      ],
+      "descFormatTexts": ["창공 부품 세트", "특수 부품"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -3239,9 +2904,7 @@
         }
       ],
       "desc": "{0} 중 하나를 확률적으로 획득합니다.",
-      "descFormatTexts": [
-        "창공 장비 세트"
-      ],
+      "descFormatTexts": ["창공 장비 세트"],
       "synthesisTimeSec": 43200,
       "synthesisCritical": 100,
       "synthesisGuildPoint": 500
@@ -3265,10 +2928,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "창공 장비 세트",
-        "무기"
-      ],
+      "descFormatTexts": ["창공 장비 세트", "무기"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -3298,10 +2958,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "창공 장비 세트",
-        "머리"
-      ],
+      "descFormatTexts": ["창공 장비 세트", "머리"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -3331,10 +2988,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "창공 장비 세트",
-        "몸"
-      ],
+      "descFormatTexts": ["창공 장비 세트", "몸"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -3364,10 +3018,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "창공 장비 세트",
-        "장신구"
-      ],
+      "descFormatTexts": ["창공 장비 세트", "장신구"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -3461,9 +3112,7 @@
         }
       ],
       "desc": "{0} 중 하나를 확률적으로 획득합니다.",
-      "descFormatTexts": [
-        "은하 부품 세트"
-      ],
+      "descFormatTexts": ["은하 부품 세트"],
       "synthesisTimeSec": 43200,
       "synthesisCritical": 100,
       "synthesisGuildPoint": 500
@@ -3487,10 +3136,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "은하 부품 세트",
-        "대포"
-      ],
+      "descFormatTexts": ["은하 부품 세트", "대포"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -3520,10 +3166,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "은하 부품 세트",
-        "돛"
-      ],
+      "descFormatTexts": ["은하 부품 세트", "돛"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -3553,10 +3196,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "은하 부품 세트",
-        "장갑"
-      ],
+      "descFormatTexts": ["은하 부품 세트", "장갑"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -3586,10 +3226,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "은하 부품 세트",
-        "전투 충각"
-      ],
+      "descFormatTexts": ["은하 부품 세트", "전투 충각"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -3619,10 +3256,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "은하 부품 세트",
-        "항해 충각"
-      ],
+      "descFormatTexts": ["은하 부품 세트", "항해 충각"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -3652,10 +3286,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "은하 부품 세트",
-        "전투 선수상"
-      ],
+      "descFormatTexts": ["은하 부품 세트", "전투 선수상"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -3685,10 +3316,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "은하 부품 세트",
-        "항해 선수상"
-      ],
+      "descFormatTexts": ["은하 부품 세트", "항해 선수상"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -3718,10 +3346,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "은하 부품 세트",
-        "닻"
-      ],
+      "descFormatTexts": ["은하 부품 세트", "닻"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -3751,10 +3376,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "은하 부품 세트",
-        "특수 부품"
-      ],
+      "descFormatTexts": ["은하 부품 세트", "특수 부품"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -3784,9 +3406,7 @@
         }
       ],
       "desc": "{0} 중 하나를 확률적으로 획득합니다.",
-      "descFormatTexts": [
-        "은하 장비 세트"
-      ],
+      "descFormatTexts": ["은하 장비 세트"],
       "synthesisTimeSec": 43200,
       "synthesisCritical": 100,
       "synthesisGuildPoint": 500
@@ -3810,10 +3430,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "은하 장비 세트",
-        "무기"
-      ],
+      "descFormatTexts": ["은하 장비 세트", "무기"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -3843,10 +3460,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "은하 장비 세트",
-        "머리"
-      ],
+      "descFormatTexts": ["은하 장비 세트", "머리"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -3876,10 +3490,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "은하 장비 세트",
-        "몸"
-      ],
+      "descFormatTexts": ["은하 장비 세트", "몸"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -3909,10 +3520,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "은하 장비 세트",
-        "장신구"
-      ],
+      "descFormatTexts": ["은하 장비 세트", "장신구"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -3942,10 +3550,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "영옥 부품 세트",
-        "대포"
-      ],
+      "descFormatTexts": ["영옥 부품 세트", "대포"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -3975,10 +3580,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "영옥 부품 세트",
-        "돛"
-      ],
+      "descFormatTexts": ["영옥 부품 세트", "돛"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -4008,10 +3610,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "영옥 부품 세트",
-        "장갑"
-      ],
+      "descFormatTexts": ["영옥 부품 세트", "장갑"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -4041,10 +3640,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "영옥 부품 세트",
-        "충각"
-      ],
+      "descFormatTexts": ["영옥 부품 세트", "충각"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -4074,10 +3670,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "영옥 부품 세트",
-        "선수상"
-      ],
+      "descFormatTexts": ["영옥 부품 세트", "선수상"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -4107,10 +3700,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "영옥 부품 세트",
-        "닻"
-      ],
+      "descFormatTexts": ["영옥 부품 세트", "닻"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -4140,10 +3730,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "영옥 부품 세트",
-        "특수 부품"
-      ],
+      "descFormatTexts": ["영옥 부품 세트", "특수 부품"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -4173,10 +3760,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "영옥 장비 세트",
-        "무기"
-      ],
+      "descFormatTexts": ["영옥 장비 세트", "무기"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -4206,10 +3790,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "영옥 장비 세트",
-        "머리"
-      ],
+      "descFormatTexts": ["영옥 장비 세트", "머리"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -4239,10 +3820,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "영옥 장비 세트",
-        "몸"
-      ],
+      "descFormatTexts": ["영옥 장비 세트", "몸"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -4272,10 +3850,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "영옥 장비 세트",
-        "장신구"
-      ],
+      "descFormatTexts": ["영옥 장비 세트", "장신구"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -4305,10 +3880,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "광륜 부품 세트",
-        "대포"
-      ],
+      "descFormatTexts": ["광륜 부품 세트", "대포"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -4338,10 +3910,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "광륜 부품 세트",
-        "돛"
-      ],
+      "descFormatTexts": ["광륜 부품 세트", "돛"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -4371,10 +3940,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "광륜 부품 세트",
-        "장갑"
-      ],
+      "descFormatTexts": ["광륜 부품 세트", "장갑"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -4404,10 +3970,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "광륜 부품 세트",
-        "충각"
-      ],
+      "descFormatTexts": ["광륜 부품 세트", "충각"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -4437,10 +4000,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "광륜 부품 세트",
-        "선수상"
-      ],
+      "descFormatTexts": ["광륜 부품 세트", "선수상"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -4470,10 +4030,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "광륜 부품 세트",
-        "닻"
-      ],
+      "descFormatTexts": ["광륜 부품 세트", "닻"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -4503,10 +4060,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "광륜 부품 세트",
-        "특수 부품"
-      ],
+      "descFormatTexts": ["광륜 부품 세트", "특수 부품"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -4536,10 +4090,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "광륜 장비 세트",
-        "무기"
-      ],
+      "descFormatTexts": ["광륜 장비 세트", "무기"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -4569,10 +4120,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "광륜 장비 세트",
-        "머리"
-      ],
+      "descFormatTexts": ["광륜 장비 세트", "머리"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -4602,10 +4150,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "광륜 장비 세트",
-        "몸"
-      ],
+      "descFormatTexts": ["광륜 장비 세트", "몸"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -4635,10 +4180,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "광륜 장비 세트",
-        "장신구"
-      ],
+      "descFormatTexts": ["광륜 장비 세트", "장신구"],
       "synthesisTimeSec": 43200,
       "mainItems": [
         {
@@ -4668,10 +4210,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 낮은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "S 등급 대포",
-        "특수 합성 대포"
-      ],
+      "descFormatTexts": ["S 등급 대포", "특수 합성 대포"],
       "synthesisTimeSec": 10,
       "mainItems": [
         {
@@ -4721,10 +4260,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 낮은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "S 등급 돛",
-        "특수 합성 돛"
-      ],
+      "descFormatTexts": ["S 등급 돛", "특수 합성 돛"],
       "synthesisTimeSec": 10,
       "mainItems": [
         {
@@ -4774,10 +4310,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 낮은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "S 등급 장갑",
-        "특수 합성 장갑"
-      ],
+      "descFormatTexts": ["S 등급 장갑", "특수 합성 장갑"],
       "synthesisTimeSec": 10,
       "mainItems": [
         {
@@ -4827,10 +4360,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 낮은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "S 등급 충각",
-        "특수 합성 충각"
-      ],
+      "descFormatTexts": ["S 등급 충각", "특수 합성 충각"],
       "synthesisTimeSec": 10,
       "mainItems": [
         {
@@ -4900,10 +4430,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 낮은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "S 등급 선수상",
-        "특수 합성 선수상"
-      ],
+      "descFormatTexts": ["S 등급 선수상", "특수 합성 선수상"],
       "synthesisTimeSec": 10,
       "mainItems": [
         {
@@ -4973,10 +4500,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 낮은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "S 등급 닻",
-        "특수 합성 닻"
-      ],
+      "descFormatTexts": ["S 등급 닻", "특수 합성 닻"],
       "synthesisTimeSec": 10,
       "mainItems": [
         {
@@ -5026,10 +4550,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 낮은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "S 등급 특수 부품",
-        "특수 합성 특수 부품"
-      ],
+      "descFormatTexts": ["S 등급 특수 부품", "특수 합성 특수 부품"],
       "synthesisTimeSec": 10,
       "mainItems": [
         {
@@ -5079,10 +4600,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 낮은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "S 등급 무기",
-        "특수 합성 무기"
-      ],
+      "descFormatTexts": ["S 등급 무기", "특수 합성 무기"],
       "synthesisTimeSec": 10,
       "mainItems": [
         {
@@ -5132,10 +4650,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 낮은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "S 등급 머리",
-        "특수 합성 머리"
-      ],
+      "descFormatTexts": ["S 등급 머리", "특수 합성 머리"],
       "synthesisTimeSec": 10,
       "mainItems": [
         {
@@ -5185,10 +4700,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 낮은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "S 등급 몸",
-        "특수 합성 몸"
-      ],
+      "descFormatTexts": ["S 등급 몸", "특수 합성 몸"],
       "synthesisTimeSec": 10,
       "mainItems": [
         {
@@ -5238,10 +4750,7 @@
         }
       ],
       "desc": "{0} 중 {1}|hpp(을,를) 낮은 확률로 획득합니다.",
-      "descFormatTexts": [
-        "S 등급 장신구",
-        "특수 합성 장신구"
-      ],
+      "descFormatTexts": ["S 등급 장신구", "특수 합성 장신구"],
       "synthesisTimeSec": 10,
       "mainItems": [
         {

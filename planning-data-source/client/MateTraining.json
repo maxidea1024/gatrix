@@ -105,32 +105,20 @@
     },
     ":enum": {},
     ":links": {
-      "trainingCostType": [
-        "Point"
-      ],
-      "trainingPublicPieceId": [
-        "Item"
-      ],
+      "trainingCostType": ["Point"],
+      "trainingPublicPieceId": ["Item"],
       "trainingItem": [
         {
-          "Id": [
-            "Item"
-          ]
+          "Id": ["Item"]
         },
         {
-          "Id": [
-            "Item"
-          ]
+          "Id": ["Item"]
         },
         {
-          "Id": [
-            "Item"
-          ]
+          "Id": ["Item"]
         }
       ],
-      "resetPriceType": [
-        "Point"
-      ]
+      "resetPriceType": ["Point"]
     }
   },
   "MateTraining": {

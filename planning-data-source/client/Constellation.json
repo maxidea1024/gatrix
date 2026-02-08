@@ -49,25 +49,15 @@
     },
     ":enum": {},
     ":links": {
-      "discoveryId": [
-        "Discovery"
-      ],
+      "discoveryId": ["Discovery"],
       "hintStep": [
         {
-          "Target": [
-            "SpecialStat"
-          ]
+          "Target": ["SpecialStat"]
         }
       ],
-      "hintText": [
-        "DiscoveryText"
-      ],
-      "noHintText": [
-        "DiscoveryText"
-      ],
-      "cooltimeText": [
-        "DiscoveryText"
-      ]
+      "hintText": ["DiscoveryText"],
+      "noHintText": ["DiscoveryText"],
+      "cooltimeText": ["DiscoveryText"]
     }
   },
   "Constellation": {

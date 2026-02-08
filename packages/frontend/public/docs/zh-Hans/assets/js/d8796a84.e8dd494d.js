@@ -1,1 +1,254 @@
-"use strict";(globalThis.webpackChunkdocs=globalThis.webpackChunkdocs||[]).push([[8824],{1069(e,n,s){s.r(n),s.d(n,{assets:()=>c,contentTitle:()=>l,default:()=>h,frontMatter:()=>o,metadata:()=>t,toc:()=>d});const t=JSON.parse('{"id":"integrations/teams","title":"Microsoft Teams \u96c6\u6210","description":"\u53d1\u9001 Gatrix \u901a\u77e5\u5230 Microsoft Teams\u3002","source":"@site/i18n/zh-Hans/docusaurus-plugin-content-docs/current/integrations/teams.md","sourceDirName":"integrations","slug":"/integrations/teams","permalink":"/docs/zh-Hans/integrations/teams","draft":false,"unlisted":false,"editUrl":"https://github.com/your-org/gatrix/tree/main/docs/docs/integrations/teams.md","tags":[],"version":"current","sidebarPosition":3,"frontMatter":{"sidebar_position":3,"sidebar_label":"Microsoft Teams"},"sidebar":"tutorialSidebar","previous":{"title":"Slack","permalink":"/docs/zh-Hans/integrations/slack"},"next":{"title":"Webhook","permalink":"/docs/zh-Hans/integrations/webhook"}}');var i=s(4848),r=s(8453);const o={sidebar_position:3,sidebar_label:"Microsoft Teams"},l="Microsoft Teams \u96c6\u6210",c={},d=[{value:"\u8bbe\u7f6e\u6307\u5357",id:"\u8bbe\u7f6e\u6307\u5357",level:2},{value:"1. \u5728 Teams \u4e2d\u521b\u5efa Incoming Webhook",id:"1-\u5728-teams-\u4e2d\u521b\u5efa-incoming-webhook",level:3},{value:"2. \u5728 Gatrix \u4e2d\u6ce8\u518c",id:"2-\u5728-gatrix-\u4e2d\u6ce8\u518c",level:3},{value:"\u901a\u77e5\u4e8b\u4ef6",id:"\u901a\u77e5\u4e8b\u4ef6",level:2},{value:"\u6d4b\u8bd5",id:"\u6d4b\u8bd5",level:2}];function a(e){const n={h1:"h1",h2:"h2",h3:"h3",header:"header",li:"li",ol:"ol",p:"p",strong:"strong",table:"table",tbody:"tbody",td:"td",th:"th",thead:"thead",tr:"tr",...(0,r.R)(),...e.components};return(0,i.jsxs)(i.Fragment,{children:[(0,i.jsx)(n.header,{children:(0,i.jsx)(n.h1,{id:"microsoft-teams-\u96c6\u6210",children:"Microsoft Teams \u96c6\u6210"})}),"\n",(0,i.jsx)(n.p,{children:"\u53d1\u9001 Gatrix \u901a\u77e5\u5230 Microsoft Teams\u3002"}),"\n",(0,i.jsx)(n.h2,{id:"\u8bbe\u7f6e\u6307\u5357",children:"\u8bbe\u7f6e\u6307\u5357"}),"\n",(0,i.jsx)(n.h3,{id:"1-\u5728-teams-\u4e2d\u521b\u5efa-incoming-webhook",children:"1. \u5728 Teams \u4e2d\u521b\u5efa Incoming Webhook"}),"\n",(0,i.jsxs)(n.ol,{children:["\n",(0,i.jsx)(n.li,{children:"\u5728 Microsoft Teams \u4e2d\uff0c\u524d\u5f80\u60a8\u60f3\u8981\u63a5\u6536\u901a\u77e5\u7684\u9891\u9053\u3002"}),"\n",(0,i.jsxs)(n.li,{children:["\u70b9\u51fb ",(0,i.jsx)(n.strong,{children:"..."})," > ",(0,i.jsx)(n.strong,{children:"\u8fde\u63a5\u5668 (Connectors)"}),"\u3002"]}),"\n",(0,i.jsxs)(n.li,{children:["\u627e\u5230 ",(0,i.jsx)(n.strong,{children:"Incoming Webhook"})," \u5e76\u70b9\u51fb ",(0,i.jsx)(n.strong,{children:"\u914d\u7f6e (Configure)"}),"\u3002"]}),"\n",(0,i.jsx)(n.li,{children:"\u8f93\u5165\u540d\u79f0\u5e76\u53ef\u9009\u4e0a\u4f20\u56fe\u6807\u3002"}),"\n",(0,i.jsxs)(n.li,{children:["\u70b9\u51fb ",(0,i.jsx)(n.strong,{children:"\u521b\u5efa (Create)"}),"\u3002"]}),"\n",(0,i.jsx)(n.li,{children:"\u590d\u5236\u751f\u6210\u7684 Webhook URL\u3002"}),"\n"]}),"\n",(0,i.jsx)(n.h3,{id:"2-\u5728-gatrix-\u4e2d\u6ce8\u518c",children:"2. \u5728 Gatrix \u4e2d\u6ce8\u518c"}),"\n",(0,i.jsxs)(n.ol,{children:["\n",(0,i.jsxs)(n.li,{children:["\u524d\u5f80 ",(0,i.jsx)(n.strong,{children:"\u8bbe\u7f6e"})," > ",(0,i.jsx)(n.strong,{children:"\u5916\u90e8\u96c6\u6210"})," > ",(0,i.jsx)(n.strong,{children:"Microsoft Teams"}),"\u3002"]}),"\n",(0,i.jsx)(n.li,{children:"\u7c98\u8d34 Webhook URL\u3002"}),"\n",(0,i.jsx)(n.li,{children:"\u914d\u7f6e\u8981\u63a5\u6536\u901a\u77e5\u7684\u4e8b\u4ef6\u3002"}),"\n",(0,i.jsxs)(n.li,{children:["\u70b9\u51fb ",(0,i.jsx)(n.strong,{children:"\u4fdd\u5b58"}),"\u3002"]}),"\n"]}),"\n",(0,i.jsx)(n.h2,{id:"\u901a\u77e5\u4e8b\u4ef6",children:"\u901a\u77e5\u4e8b\u4ef6"}),"\n",(0,i.jsxs)(n.table,{children:[(0,i.jsx)(n.thead,{children:(0,i.jsxs)(n.tr,{children:[(0,i.jsx)(n.th,{children:"\u4e8b\u4ef6"}),(0,i.jsx)(n.th,{children:"\u8bf4\u660e"})]})}),(0,i.jsxs)(n.tbody,{children:[(0,i.jsxs)(n.tr,{children:[(0,i.jsx)(n.td,{children:"\u529f\u80fd\u5f00\u5173\u53d8\u66f4"}),(0,i.jsx)(n.td,{children:"\u521b\u5efa/\u66f4\u65b0/\u5220\u9664\u5f00\u5173\u65f6\u901a\u77e5"})]}),(0,i.jsxs)(n.tr,{children:[(0,i.jsx)(n.td,{children:"\u7ef4\u62a4\u72b6\u6001"}),(0,i.jsx)(n.td,{children:"\u7ef4\u62a4\u5f00\u59cb/\u7ed3\u675f\u65f6\u901a\u77e5"})]}),(0,i.jsxs)(n.tr,{children:[(0,i.jsx)(n.td,{children:"\u7cfb\u7edf\u9519\u8bef"}),(0,i.jsx)(n.td,{children:"\u53d1\u751f\u7cfb\u7edf\u9519\u8bef\u65f6\u901a\u77e5"})]})]})]}),"\n",(0,i.jsx)(n.h2,{id:"\u6d4b\u8bd5",children:"\u6d4b\u8bd5"}),"\n",(0,i.jsxs)(n.p,{children:["\u70b9\u51fb ",(0,i.jsx)(n.strong,{children:"\u53d1\u9001\u6d4b\u8bd5\u6d88\u606f"})," \u9a8c\u8bc1\u96c6\u6210\u662f\u5426\u6b63\u5e38\u5de5\u4f5c\u3002"]})]})}function h(e={}){const{wrapper:n}={...(0,r.R)(),...e.components};return n?(0,i.jsx)(n,{...e,children:(0,i.jsx)(a,{...e})}):a(e)}},8453(e,n,s){s.d(n,{R:()=>o,x:()=>l});var t=s(6540);const i={},r=t.createContext(i);function o(e){const n=t.useContext(r);return t.useMemo(function(){return"function"==typeof e?e(n):{...n,...e}},[n,e])}function l(e){let n;return n=e.disableParentContext?"function"==typeof e.components?e.components(i):e.components||i:o(e.components),t.createElement(r.Provider,{value:n},e.children)}}}]);
+'use strict';
+(globalThis.webpackChunkdocs = globalThis.webpackChunkdocs || []).push([
+  [8824],
+  {
+    1069(e, n, s) {
+      (s.r(n),
+        s.d(n, {
+          assets: () => c,
+          contentTitle: () => l,
+          default: () => h,
+          frontMatter: () => o,
+          metadata: () => t,
+          toc: () => d,
+        }));
+      const t = JSON.parse(
+        '{"id":"integrations/teams","title":"Microsoft Teams \u96c6\u6210","description":"\u53d1\u9001 Gatrix \u901a\u77e5\u5230 Microsoft Teams\u3002","source":"@site/i18n/zh-Hans/docusaurus-plugin-content-docs/current/integrations/teams.md","sourceDirName":"integrations","slug":"/integrations/teams","permalink":"/docs/zh-Hans/integrations/teams","draft":false,"unlisted":false,"editUrl":"https://github.com/your-org/gatrix/tree/main/docs/docs/integrations/teams.md","tags":[],"version":"current","sidebarPosition":3,"frontMatter":{"sidebar_position":3,"sidebar_label":"Microsoft Teams"},"sidebar":"tutorialSidebar","previous":{"title":"Slack","permalink":"/docs/zh-Hans/integrations/slack"},"next":{"title":"Webhook","permalink":"/docs/zh-Hans/integrations/webhook"}}'
+      );
+      var i = s(4848),
+        r = s(8453);
+      const o = { sidebar_position: 3, sidebar_label: 'Microsoft Teams' },
+        l = 'Microsoft Teams \u96c6\u6210',
+        c = {},
+        d = [
+          { value: '\u8bbe\u7f6e\u6307\u5357', id: '\u8bbe\u7f6e\u6307\u5357', level: 2 },
+          {
+            value: '1. \u5728 Teams \u4e2d\u521b\u5efa Incoming Webhook',
+            id: '1-\u5728-teams-\u4e2d\u521b\u5efa-incoming-webhook',
+            level: 3,
+          },
+          {
+            value: '2. \u5728 Gatrix \u4e2d\u6ce8\u518c',
+            id: '2-\u5728-gatrix-\u4e2d\u6ce8\u518c',
+            level: 3,
+          },
+          { value: '\u901a\u77e5\u4e8b\u4ef6', id: '\u901a\u77e5\u4e8b\u4ef6', level: 2 },
+          { value: '\u6d4b\u8bd5', id: '\u6d4b\u8bd5', level: 2 },
+        ];
+      function a(e) {
+        const n = {
+          h1: 'h1',
+          h2: 'h2',
+          h3: 'h3',
+          header: 'header',
+          li: 'li',
+          ol: 'ol',
+          p: 'p',
+          strong: 'strong',
+          table: 'table',
+          tbody: 'tbody',
+          td: 'td',
+          th: 'th',
+          thead: 'thead',
+          tr: 'tr',
+          ...(0, r.R)(),
+          ...e.components,
+        };
+        return (0, i.jsxs)(i.Fragment, {
+          children: [
+            (0, i.jsx)(n.header, {
+              children: (0, i.jsx)(n.h1, {
+                id: 'microsoft-teams-\u96c6\u6210',
+                children: 'Microsoft Teams \u96c6\u6210',
+              }),
+            }),
+            '\n',
+            (0, i.jsx)(n.p, {
+              children: '\u53d1\u9001 Gatrix \u901a\u77e5\u5230 Microsoft Teams\u3002',
+            }),
+            '\n',
+            (0, i.jsx)(n.h2, {
+              id: '\u8bbe\u7f6e\u6307\u5357',
+              children: '\u8bbe\u7f6e\u6307\u5357',
+            }),
+            '\n',
+            (0, i.jsx)(n.h3, {
+              id: '1-\u5728-teams-\u4e2d\u521b\u5efa-incoming-webhook',
+              children: '1. \u5728 Teams \u4e2d\u521b\u5efa Incoming Webhook',
+            }),
+            '\n',
+            (0, i.jsxs)(n.ol, {
+              children: [
+                '\n',
+                (0, i.jsx)(n.li, {
+                  children:
+                    '\u5728 Microsoft Teams \u4e2d\uff0c\u524d\u5f80\u60a8\u60f3\u8981\u63a5\u6536\u901a\u77e5\u7684\u9891\u9053\u3002',
+                }),
+                '\n',
+                (0, i.jsxs)(n.li, {
+                  children: [
+                    '\u70b9\u51fb ',
+                    (0, i.jsx)(n.strong, { children: '...' }),
+                    ' > ',
+                    (0, i.jsx)(n.strong, { children: '\u8fde\u63a5\u5668 (Connectors)' }),
+                    '\u3002',
+                  ],
+                }),
+                '\n',
+                (0, i.jsxs)(n.li, {
+                  children: [
+                    '\u627e\u5230 ',
+                    (0, i.jsx)(n.strong, { children: 'Incoming Webhook' }),
+                    ' \u5e76\u70b9\u51fb ',
+                    (0, i.jsx)(n.strong, { children: '\u914d\u7f6e (Configure)' }),
+                    '\u3002',
+                  ],
+                }),
+                '\n',
+                (0, i.jsx)(n.li, {
+                  children:
+                    '\u8f93\u5165\u540d\u79f0\u5e76\u53ef\u9009\u4e0a\u4f20\u56fe\u6807\u3002',
+                }),
+                '\n',
+                (0, i.jsxs)(n.li, {
+                  children: [
+                    '\u70b9\u51fb ',
+                    (0, i.jsx)(n.strong, { children: '\u521b\u5efa (Create)' }),
+                    '\u3002',
+                  ],
+                }),
+                '\n',
+                (0, i.jsx)(n.li, { children: '\u590d\u5236\u751f\u6210\u7684 Webhook URL\u3002' }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, i.jsx)(n.h3, {
+              id: '2-\u5728-gatrix-\u4e2d\u6ce8\u518c',
+              children: '2. \u5728 Gatrix \u4e2d\u6ce8\u518c',
+            }),
+            '\n',
+            (0, i.jsxs)(n.ol, {
+              children: [
+                '\n',
+                (0, i.jsxs)(n.li, {
+                  children: [
+                    '\u524d\u5f80 ',
+                    (0, i.jsx)(n.strong, { children: '\u8bbe\u7f6e' }),
+                    ' > ',
+                    (0, i.jsx)(n.strong, { children: '\u5916\u90e8\u96c6\u6210' }),
+                    ' > ',
+                    (0, i.jsx)(n.strong, { children: 'Microsoft Teams' }),
+                    '\u3002',
+                  ],
+                }),
+                '\n',
+                (0, i.jsx)(n.li, { children: '\u7c98\u8d34 Webhook URL\u3002' }),
+                '\n',
+                (0, i.jsx)(n.li, {
+                  children: '\u914d\u7f6e\u8981\u63a5\u6536\u901a\u77e5\u7684\u4e8b\u4ef6\u3002',
+                }),
+                '\n',
+                (0, i.jsxs)(n.li, {
+                  children: [
+                    '\u70b9\u51fb ',
+                    (0, i.jsx)(n.strong, { children: '\u4fdd\u5b58' }),
+                    '\u3002',
+                  ],
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, i.jsx)(n.h2, {
+              id: '\u901a\u77e5\u4e8b\u4ef6',
+              children: '\u901a\u77e5\u4e8b\u4ef6',
+            }),
+            '\n',
+            (0, i.jsxs)(n.table, {
+              children: [
+                (0, i.jsx)(n.thead, {
+                  children: (0, i.jsxs)(n.tr, {
+                    children: [
+                      (0, i.jsx)(n.th, { children: '\u4e8b\u4ef6' }),
+                      (0, i.jsx)(n.th, { children: '\u8bf4\u660e' }),
+                    ],
+                  }),
+                }),
+                (0, i.jsxs)(n.tbody, {
+                  children: [
+                    (0, i.jsxs)(n.tr, {
+                      children: [
+                        (0, i.jsx)(n.td, { children: '\u529f\u80fd\u5f00\u5173\u53d8\u66f4' }),
+                        (0, i.jsx)(n.td, {
+                          children:
+                            '\u521b\u5efa/\u66f4\u65b0/\u5220\u9664\u5f00\u5173\u65f6\u901a\u77e5',
+                        }),
+                      ],
+                    }),
+                    (0, i.jsxs)(n.tr, {
+                      children: [
+                        (0, i.jsx)(n.td, { children: '\u7ef4\u62a4\u72b6\u6001' }),
+                        (0, i.jsx)(n.td, {
+                          children: '\u7ef4\u62a4\u5f00\u59cb/\u7ed3\u675f\u65f6\u901a\u77e5',
+                        }),
+                      ],
+                    }),
+                    (0, i.jsxs)(n.tr, {
+                      children: [
+                        (0, i.jsx)(n.td, { children: '\u7cfb\u7edf\u9519\u8bef' }),
+                        (0, i.jsx)(n.td, {
+                          children: '\u53d1\u751f\u7cfb\u7edf\u9519\u8bef\u65f6\u901a\u77e5',
+                        }),
+                      ],
+                    }),
+                  ],
+                }),
+              ],
+            }),
+            '\n',
+            (0, i.jsx)(n.h2, { id: '\u6d4b\u8bd5', children: '\u6d4b\u8bd5' }),
+            '\n',
+            (0, i.jsxs)(n.p, {
+              children: [
+                '\u70b9\u51fb ',
+                (0, i.jsx)(n.strong, { children: '\u53d1\u9001\u6d4b\u8bd5\u6d88\u606f' }),
+                ' \u9a8c\u8bc1\u96c6\u6210\u662f\u5426\u6b63\u5e38\u5de5\u4f5c\u3002',
+              ],
+            }),
+          ],
+        });
+      }
+      function h(e = {}) {
+        const { wrapper: n } = { ...(0, r.R)(), ...e.components };
+        return n ? (0, i.jsx)(n, { ...e, children: (0, i.jsx)(a, { ...e }) }) : a(e);
+      }
+    },
+    8453(e, n, s) {
+      s.d(n, { R: () => o, x: () => l });
+      var t = s(6540);
+      const i = {},
+        r = t.createContext(i);
+      function o(e) {
+        const n = t.useContext(r);
+        return t.useMemo(
+          function () {
+            return 'function' == typeof e ? e(n) : { ...n, ...e };
+          },
+          [n, e]
+        );
+      }
+      function l(e) {
+        let n;
+        return (
+          (n = e.disableParentContext
+            ? 'function' == typeof e.components
+              ? e.components(i)
+              : e.components || i
+            : o(e.components)),
+          t.createElement(r.Provider, { value: n }, e.children)
+        );
+      }
+    },
+  },
+]);

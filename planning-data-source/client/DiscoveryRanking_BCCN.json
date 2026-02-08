@@ -24,9 +24,7 @@
     },
     ":enum": {},
     ":links": {
-      "mailId": [
-        "Mail"
-      ]
+      "mailId": ["Mail"]
     }
   },
   "DiscoveryRanking": {

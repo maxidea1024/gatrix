@@ -12,7 +12,7 @@
  * - After: OFFSET 10000000 LIMIT 20 takes milliseconds
  */
 
-exports.up = async function(connection) {
+exports.up = async function (connection) {
   console.log('Adding covering index for coupon pagination...');
 
   try {
@@ -20,16 +20,20 @@ exports.up = async function(connection) {
     // This index is used for queries like:
     // SELECT id, settingId, code, status, createdAt, usedAt FROM g_coupons
     // WHERE settingId = ? ORDER BY createdAt DESC LIMIT 20 OFFSET 10000000
-    await connection.execute(`
+    await connection
+      .execute(
+        `
       ALTER TABLE g_coupons 
       ADD INDEX idx_setting_createdAt_id (settingId, createdAt DESC, id)
-    `).catch(err => {
-      if (err.code === 'ER_DUP_KEYNAME') {
-        console.log('Index idx_setting_createdAt_id already exists');
-      } else {
-        throw err;
-      }
-    });
+    `
+      )
+      .catch((err) => {
+        if (err.code === 'ER_DUP_KEYNAME') {
+          console.log('Index idx_setting_createdAt_id already exists');
+        } else {
+          throw err;
+        }
+      });
 
     console.log('Covering index added successfully');
   } catch (error) {
@@ -38,7 +42,7 @@ exports.up = async function(connection) {
   }
 };
 
-exports.down = async function(connection) {
+exports.down = async function (connection) {
   console.log('Rolling back covering index...');
 
   try {
@@ -53,4 +57,3 @@ exports.down = async function(connection) {
     throw error;
   }
 };
-

@@ -81,10 +81,7 @@
         }
       ],
       "clearQuestId": "number",
-      "addPassivesId": [
-        "number",
-        "number"
-      ]
+      "addPassivesId": ["number", "number"]
     },
     ":required": {},
     ":requiredInObject": {
@@ -190,10 +187,7 @@
         }
       ],
       "clearQuestId": 82000000,
-      "addPassivesId": [
-        1,
-        1
-      ]
+      "addPassivesId": [1, 1]
     },
     ":max": {
       "passives": [
@@ -234,96 +228,45 @@
         }
       ],
       "clearQuestId": 82999999,
-      "addPassivesId": [
-        99999999,
-        99999999
-      ]
+      "addPassivesId": [99999999, 99999999]
     },
     ":enum": {},
     ":links": {
       "passives": [
         {
-          "id": [
-            "BattlePassive",
-            "WorldPassive"
-          ],
-          "learnPointId": [
-            "Point"
-          ],
-          "learnItemId1": [
-            "Item"
-          ]
+          "id": ["BattlePassive", "WorldPassive"],
+          "learnPointId": ["Point"],
+          "learnItemId1": ["Item"]
         },
         {
-          "id": [
-            "BattlePassive",
-            "WorldPassive"
-          ],
-          "learnPointId": [
-            "Point"
-          ],
-          "learnItemId1": [
-            "Item"
-          ]
+          "id": ["BattlePassive", "WorldPassive"],
+          "learnPointId": ["Point"],
+          "learnItemId1": ["Item"]
         },
         {
-          "id": [
-            "BattlePassive",
-            "WorldPassive"
-          ],
-          "learnPointId": [
-            "Point"
-          ],
-          "learnItemId1": [
-            "Item"
-          ]
+          "id": ["BattlePassive", "WorldPassive"],
+          "learnPointId": ["Point"],
+          "learnItemId1": ["Item"]
         },
         {
-          "id": [
-            "BattlePassive",
-            "WorldPassive"
-          ],
-          "learnPointId": [
-            "Point"
-          ],
-          "learnItemId1": [
-            "Item"
-          ]
+          "id": ["BattlePassive", "WorldPassive"],
+          "learnPointId": ["Point"],
+          "learnItemId1": ["Item"]
         },
         {
-          "id": [
-            "BattlePassive",
-            "WorldPassive"
-          ],
-          "learnPointId": [
-            "Point"
-          ]
+          "id": ["BattlePassive", "WorldPassive"],
+          "learnPointId": ["Point"]
         },
         {
-          "id": [
-            "BattlePassive",
-            "WorldPassive"
-          ],
-          "learnPointId": [
-            "Point"
-          ],
-          "learnItemId1": [
-            "Item"
-          ]
+          "id": ["BattlePassive", "WorldPassive"],
+          "learnPointId": ["Point"],
+          "learnItemId1": ["Item"]
         }
       ],
-      "clearQuestId": [
-        "Quest"
-      ],
+      "clearQuestId": ["Quest"],
       "addPassivesId": [
-        [
-          "BattlePassive",
-          "WorldPassive"
-        ],
-        [
-          "BattlePassive",
-          "WorldPassive"
-        ]
+        ["BattlePassive", "WorldPassive"],
+        ["BattlePassive", "WorldPassive"]
       ]
     }
   },

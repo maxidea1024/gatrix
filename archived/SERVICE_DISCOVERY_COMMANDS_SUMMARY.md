@@ -9,14 +9,17 @@ Added a complete set of Service Discovery (SD) management commands to the system
 ### Main Command
 
 #### `sd`
+
 Main Service Discovery command that shows available subcommands.
 
 **Usage:**
+
 ```bash
 sd
 ```
 
 **Output:**
+
 - Lists all available SD subcommands
 - Shows brief description of each
 - Indicates feature is not yet implemented
@@ -26,9 +29,11 @@ sd
 ### Service Management Commands
 
 #### `sd-list`
+
 List all registered services.
 
 **Usage:**
+
 ```bash
 # List all services
 sd-list
@@ -43,10 +48,12 @@ sd-list --status all
 ```
 
 **Options:**
+
 - `--filter` - Filter by service name or tag
 - `--status` - Filter by status (healthy|unhealthy|all)
 
 **Future Output:**
+
 - Service ID
 - Service Name
 - Host:Port
@@ -57,9 +64,11 @@ sd-list --status all
 ---
 
 #### `sd-register`
+
 Register a new service.
 
 **Usage:**
+
 ```bash
 sd-register --name "api-server" --host "localhost" --port "3000"
 sd-register --name "api-server" --host "localhost" --port "3000" --tags "api,backend"
@@ -67,6 +76,7 @@ sd-register --name "api-server" --host "localhost" --port "3000" --tags "api" --
 ```
 
 **Options:**
+
 - `--name` - Service name (required)
 - `--host` - Service host (required)
 - `--port` - Service port (required)
@@ -76,14 +86,17 @@ sd-register --name "api-server" --host "localhost" --port "3000" --tags "api" --
 ---
 
 #### `sd-deregister`
+
 Deregister a service.
 
 **Usage:**
+
 ```bash
 sd-deregister --id "service-123"
 ```
 
 **Options:**
+
 - `--id` - Service ID (required)
 
 ---
@@ -91,9 +104,11 @@ sd-deregister --id "service-123"
 ### Health & Discovery Commands
 
 #### `sd-health`
+
 Check service health status.
 
 **Usage:**
+
 ```bash
 # Check all services
 sd-health
@@ -106,15 +121,18 @@ sd-health --name "api-server"
 ```
 
 **Options:**
+
 - `--id` - Service ID (optional)
 - `--name` - Service name (optional)
 
 ---
 
 #### `sd-discover`
+
 Discover services by name or tag.
 
 **Usage:**
+
 ```bash
 # Discover by name
 sd-discover --name "api-server"
@@ -124,6 +142,7 @@ sd-discover --tag "backend"
 ```
 
 **Options:**
+
 - `--name` - Service name (optional)
 - `--tag` - Service tag (optional)
 
@@ -132,9 +151,11 @@ sd-discover --tag "backend"
 ### Monitoring Commands
 
 #### `sd-watch`
+
 Watch for service changes in real-time.
 
 **Usage:**
+
 ```bash
 # Watch all services
 sd-watch
@@ -144,9 +165,11 @@ sd-watch --name "api-server"
 ```
 
 **Options:**
+
 - `--name` - Service name to watch (optional)
 
 **Future Behavior:**
+
 - Real-time updates on service registration
 - Real-time updates on service deregistration
 - Health status changes
@@ -155,14 +178,17 @@ sd-watch --name "api-server"
 ---
 
 #### `sd-stats`
+
 Show service discovery statistics.
 
 **Usage:**
+
 ```bash
 sd-stats
 ```
 
 **Future Output:**
+
 - Total registered services
 - Healthy services count
 - Unhealthy services count
@@ -181,6 +207,7 @@ help
 ```
 
 **Output includes:**
+
 ```
 Service Discovery:
   sd                   Service Discovery management
@@ -213,11 +240,13 @@ sd-health --help
 **Current Status:** Placeholder implementations
 
 All commands currently return:
+
 - Informative messages about what the command will do
 - Parameter validation and examples
 - Clear indication that the feature is not yet implemented
 
 **Message Format:**
+
 ```
 Service Discovery feature is not yet implemented.
 ```
@@ -227,6 +256,7 @@ Service Discovery feature is not yet implemented.
 ## Files Modified
 
 ### Backend
+
 - `packages/backend/src/services/ConsoleService.ts`
   - Added 8 new SD command registrations (lines 195-253)
   - Added "Service Discovery" category to help (line 350)
@@ -239,30 +269,35 @@ Service Discovery feature is not yet implemented.
 When implementing the actual Service Discovery feature:
 
 ### 1. Service Registry
+
 - [ ] Create service registry data structure
 - [ ] Implement service registration logic
 - [ ] Implement service deregistration logic
 - [ ] Add service metadata storage
 
 ### 2. Health Checking
+
 - [ ] Implement health check mechanism
 - [ ] Add configurable health check intervals
 - [ ] Support multiple health check types (HTTP, TCP, gRPC)
 - [ ] Track health check history
 
 ### 3. Service Discovery
+
 - [ ] Implement service lookup by name
 - [ ] Implement service lookup by tag
 - [ ] Add load balancing strategies
 - [ ] Support service versioning
 
 ### 4. Monitoring & Events
+
 - [ ] Implement real-time service watching
 - [ ] Add event notifications (SSE/WebSocket)
 - [ ] Track service statistics
 - [ ] Add metrics collection
 
 ### 5. Integration
+
 - [ ] Database schema for service registry
 - [ ] API endpoints for service management
 - [ ] Web UI for service visualization
@@ -319,6 +354,7 @@ sd-discover --name "api-v2"
 ## Testing
 
 ### Build Status
+
 ✅ Backend build successful
 ✅ No compilation errors
 ✅ All commands registered
@@ -412,4 +448,3 @@ help
 All Service Discovery console commands are now in place with placeholder implementations. The command structure is complete and ready for actual implementation when the Service Discovery feature is developed.
 
 Users can explore the commands and understand the planned functionality through the help system and informative placeholder messages.
-

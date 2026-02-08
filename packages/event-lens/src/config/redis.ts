@@ -1,6 +1,6 @@
-import Redis from "ioredis";
-import { config } from "./index";
-import logger from "../utils/logger";
+import Redis from 'ioredis';
+import { config } from './index';
+import logger from '../utils/logger';
 
 let redisClient: Redis | null = null;
 
@@ -19,16 +19,16 @@ export function getRedisClient(): Redis {
       },
     });
 
-    redisClient.on("connect", () => {
-      logger.info("✅ Redis connected successfully");
+    redisClient.on('connect', () => {
+      logger.info('✅ Redis connected successfully');
     });
 
-    redisClient.on("error", (error) => {
-      logger.error("❌ Redis connection error", { error });
+    redisClient.on('error', (error) => {
+      logger.error('❌ Redis connection error', { error });
     });
 
-    redisClient.on("ready", () => {
-      logger.info("✅ Redis ready");
+    redisClient.on('ready', () => {
+      logger.info('✅ Redis ready');
     });
   }
 

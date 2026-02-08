@@ -62,7 +62,6 @@ function App() {
     setIsDisconnecting(false);
   }, []);
 
-
   // Show boot screen
   if (config && isBooting && !bootComplete) {
     return <BootScreen onComplete={handleBootComplete} />;
@@ -111,13 +110,25 @@ function App() {
                   &nbsp;GATRIX FEATURE FLAGS
                 </h1>
                 <div style={{ display: 'flex', gap: '12px' }}>
-                  <button type="button" className="nes-btn is-primary" onClick={() => setShowGame('rpg')}>
+                  <button
+                    type="button"
+                    className="nes-btn is-primary"
+                    onClick={() => setShowGame('rpg')}
+                  >
                     IDLE RPG
                   </button>
-                  <button type="button" className="nes-btn is-success" onClick={() => setShowGame('defense')}>
+                  <button
+                    type="button"
+                    className="nes-btn is-success"
+                    onClick={() => setShowGame('defense')}
+                  >
                     SLIME DEFENSE
                   </button>
-                  <button type="button" className="nes-btn is-error" onClick={handleDisconnectRequest}>
+                  <button
+                    type="button"
+                    className="nes-btn is-error"
+                    onClick={handleDisconnectRequest}
+                  >
                     POWER OFF
                   </button>
                 </div>

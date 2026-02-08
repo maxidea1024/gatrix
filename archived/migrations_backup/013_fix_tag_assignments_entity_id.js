@@ -1,12 +1,12 @@
 /**
  * Migration: Fix g_tag_assignments entityId column type
- * 
+ *
  * Changes entityId from INT to VARCHAR(26) to support ULID-based entity IDs
  * This fixes the issue where all reward templates were sharing the same tag assignments
  * because ULID strings were being converted to INT (resulting in 0 or 1)
  */
 
-exports.up = async function(connection) {
+exports.up = async function (connection) {
   console.log('Fixing g_tag_assignments entityId column type...');
 
   try {
@@ -52,7 +52,7 @@ exports.up = async function(connection) {
   }
 };
 
-exports.down = async function(connection) {
+exports.down = async function (connection) {
   console.log('Rolling back g_tag_assignments entityId column type fix...');
 
   try {
@@ -97,4 +97,3 @@ exports.down = async function(connection) {
     throw error;
   }
 };
-

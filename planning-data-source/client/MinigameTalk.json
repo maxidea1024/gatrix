@@ -46,36 +46,16 @@
     },
     ":enum": {},
     ":links": {
-      "mateId": [
-        "Mate"
-      ],
-      "commonStart": [
-        "MinigameText"
-      ],
-      "koikoiStart": [
-        "MinigameText"
-      ],
-      "holdumStart": [
-        "MinigameText"
-      ],
-      "diceStart": [
-        "MinigameText"
-      ],
-      "dartStart": [
-        "MinigameText"
-      ],
-      "blackjackStart": [
-        "MinigameText"
-      ],
-      "commonWin": [
-        "MinigameText"
-      ],
-      "commonLose": [
-        "MinigameText"
-      ],
-      "commonDraw": [
-        "MinigameText"
-      ]
+      "mateId": ["Mate"],
+      "commonStart": ["MinigameText"],
+      "koikoiStart": ["MinigameText"],
+      "holdumStart": ["MinigameText"],
+      "diceStart": ["MinigameText"],
+      "dartStart": ["MinigameText"],
+      "blackjackStart": ["MinigameText"],
+      "commonWin": ["MinigameText"],
+      "commonLose": ["MinigameText"],
+      "commonDraw": ["MinigameText"]
     }
   },
   "MinigameTalk": {

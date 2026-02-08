@@ -46,7 +46,9 @@ export class IntegrationEventModel {
 
     try {
       // Enforce max logs limit
-      const maxLogs = process.env.MAX_INTEGRATION_EVENTS_LOGS ? parseInt(process.env.MAX_INTEGRATION_EVENTS_LOGS) : 200;
+      const maxLogs = process.env.MAX_INTEGRATION_EVENTS_LOGS
+        ? parseInt(process.env.MAX_INTEGRATION_EVENTS_LOGS)
+        : 200;
 
       // Check current count
       const countResult = await db(this.TABLE)

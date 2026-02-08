@@ -47,5 +47,5 @@ module.exports = {
   async down(db) {
     await db.query('DROP TABLE IF EXISTS g_server_lifecycle_events');
     console.log('Migration 066_create_server_lifecycle_events reverted successfully');
-  }
+  },
 };

@@ -3,7 +3,7 @@ export interface Channel {
   id: number;
   name: string;
   description?: string;
-  type: "public" | "private" | "direct";
+  type: 'public' | 'private' | 'direct';
   maxMembers: number;
   isArchived: boolean;
   archiveReason?: string;
@@ -33,7 +33,7 @@ export interface ChannelSettings {
 export interface CreateChannelData {
   name: string;
   description?: string;
-  type: "public" | "private" | "direct";
+  type: 'public' | 'private' | 'direct';
   maxMembers?: number;
   settings?: Partial<ChannelSettings>;
   memberIds?: number[];
@@ -51,9 +51,9 @@ export interface ChannelMember {
   id: number;
   channelId: number;
   userId: number;
-  role: "owner" | "admin" | "moderator" | "member";
+  role: 'owner' | 'admin' | 'moderator' | 'member';
   permissions?: MemberPermissions;
-  status: "active" | "muted" | "banned" | "left";
+  status: 'active' | 'muted' | 'banned' | 'left';
   mutedUntil?: Date;
   banReason?: string;
   lastReadMessageId: number;
@@ -91,14 +91,7 @@ export interface Message {
   channelId: number;
   userId: number;
   content: string;
-  contentType:
-    | "text"
-    | "image"
-    | "video"
-    | "audio"
-    | "file"
-    | "location"
-    | "system";
+  contentType: 'text' | 'image' | 'video' | 'audio' | 'file' | 'location' | 'system';
   messageData?: MessageData;
   replyToMessageId?: number;
   threadId?: number;
@@ -183,7 +176,7 @@ export interface CodeBlock {
 export interface CreateMessageData {
   channelId: number;
   content: string;
-  contentType?: "text" | "image" | "video" | "audio" | "file" | "location";
+  contentType?: 'text' | 'image' | 'video' | 'audio' | 'file' | 'location';
   messageData?: Partial<MessageData>;
   replyToMessageId?: number;
   threadId?: number;
@@ -209,7 +202,7 @@ export interface MessageAttachment {
   thumbnailPath?: string;
   thumbnailWidth?: number;
   thumbnailHeight?: number;
-  uploadStatus: "uploading" | "completed" | "failed";
+  uploadStatus: 'uploading' | 'completed' | 'failed';
   uploadProgress: number;
   createdAt: Date;
 }
@@ -241,11 +234,11 @@ export interface User {
 
 export interface UserPresence {
   userId: number;
-  status: "online" | "away" | "busy" | "offline";
+  status: 'online' | 'away' | 'busy' | 'offline';
   customStatus?: string;
   socketId?: string;
   serverId?: string;
-  deviceType: "web" | "mobile" | "desktop";
+  deviceType: 'web' | 'mobile' | 'desktop';
   userAgent?: string;
   ipAddress?: string;
   lastSeenAt: Date;
@@ -269,7 +262,7 @@ export interface TypingIndicator {
 export interface Notification {
   id: number;
   userId: number;
-  type: "message" | "mention" | "channel_invite" | "system";
+  type: 'message' | 'mention' | 'channel_invite' | 'system';
   title: string;
   content: string;
   channelId?: number;
@@ -277,7 +270,7 @@ export interface Notification {
   senderUserId?: number;
   isRead: boolean;
   isDelivered: boolean;
-  deliveryMethod: "push" | "email" | "sms" | "in_app";
+  deliveryMethod: 'push' | 'email' | 'sms' | 'in_app';
   metadata?: any;
   createdAt: Date;
   readAt?: Date;
@@ -300,7 +293,7 @@ export interface SocketUser {
   userId: number;
   channels: Set<number>;
   lastActivity: Date;
-  deviceType: "web" | "mobile" | "desktop";
+  deviceType: 'web' | 'mobile' | 'desktop';
   userAgent?: string;
   ipAddress?: string;
 }
@@ -327,7 +320,7 @@ export interface PaginationQuery {
   page?: number;
   limit?: number;
   sortBy?: string;
-  sortOrder?: "asc" | "desc";
+  sortOrder?: 'asc' | 'desc';
 }
 
 // 검색 관련 타입

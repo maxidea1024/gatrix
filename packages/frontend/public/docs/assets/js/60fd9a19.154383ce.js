@@ -1,1 +1,11 @@
-"use strict";(globalThis.webpackChunkdocs=globalThis.webpackChunkdocs||[]).push([[3879],{5909(a){a.exports=JSON.parse('{"tag":{"label":"Gatrix","permalink":"/docs/blog/tags/gatrix","description":"Gatrix game platform management system","allTagsPath":"/docs/blog/tags","count":5,"unlisted":false},"listMetadata":{"permalink":"/docs/blog/tags/gatrix","page":1,"postsPerPage":10,"totalPages":1,"totalCount":5,"blogDescription":"Blog","blogTitle":"Blog"}}')}}]);
+'use strict';
+(globalThis.webpackChunkdocs = globalThis.webpackChunkdocs || []).push([
+  [3879],
+  {
+    5909(a) {
+      a.exports = JSON.parse(
+        '{"tag":{"label":"Gatrix","permalink":"/docs/blog/tags/gatrix","description":"Gatrix game platform management system","allTagsPath":"/docs/blog/tags","count":5,"unlisted":false},"listMetadata":{"permalink":"/docs/blog/tags/gatrix","page":1,"postsPerPage":10,"totalPages":1,"totalCount":5,"blogDescription":"Blog","blogTitle":"Blog"}}'
+      );
+    },
+  },
+]);

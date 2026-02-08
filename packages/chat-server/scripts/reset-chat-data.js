@@ -9,7 +9,7 @@ async function resetChatData() {
     console.log('📦 Redis 데이터 초기화 중...');
     await redisManager.initialize();
     const redisClient = redisManager.getClient();
-    
+
     // 모든 Redis 키 삭제
     await redisClient.flushall();
     console.log('✅ Redis 데이터 초기화 완료');
@@ -22,11 +22,11 @@ async function resetChatData() {
     // 채팅 관련 테이블들 초기화 (외래키 순서 고려)
     const tables = [
       'g_messages',
-      'g_channel_members', 
+      'g_channel_members',
       'g_channel_invitations',
       'g_channels',
       'g_direct_message_participants',
-      'g_user_privacy_settings'
+      'g_user_privacy_settings',
     ];
 
     for (const table of tables) {
@@ -51,7 +51,6 @@ async function resetChatData() {
     console.log('- 데이터베이스: 채널, 메시지, 초대, 멤버십 데이터');
     console.log('');
     console.log('이제 새로운 JWT 인증 시스템으로 채팅을 시작할 수 있습니다! 🚀');
-
   } catch (error) {
     console.error('❌ 채팅 데이터 초기화 실패:', error);
     process.exit(1);

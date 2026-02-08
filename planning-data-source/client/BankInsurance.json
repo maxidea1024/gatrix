@@ -15,10 +15,7 @@
         }
       ],
       "name": "text",
-      "nameFormatTexts": [
-        "text",
-        "text"
-      ],
+      "nameFormatTexts": ["text", "text"],
       "dayUpKeepGold": "number",
       "maxIndemnity": "number",
       "insuranceCoverage": "number"
@@ -64,14 +61,10 @@
     ":links": {
       "contentsTerms": [
         {
-          "Id": [
-            "ContentsTerms"
-          ]
+          "Id": ["ContentsTerms"]
         },
         {
-          "Id": [
-            "ContentsTerms"
-          ]
+          "Id": ["ContentsTerms"]
         }
       ]
     }
@@ -99,9 +92,7 @@
         }
       ],
       "name": "LV {0}",
-      "nameFormatTexts": [
-        "1"
-      ],
+      "nameFormatTexts": ["1"],
       "dayUpKeepGold": 0,
       "maxIndemnity": 50000,
       "insuranceCoverage": 30
@@ -115,9 +106,7 @@
         }
       ],
       "name": "LV {0}",
-      "nameFormatTexts": [
-        "2"
-      ],
+      "nameFormatTexts": ["2"],
       "dayUpKeepGold": 1000,
       "maxIndemnity": 250000,
       "insuranceCoverage": 40
@@ -131,9 +120,7 @@
         }
       ],
       "name": "LV {0}",
-      "nameFormatTexts": [
-        "3"
-      ],
+      "nameFormatTexts": ["3"],
       "dayUpKeepGold": 1100,
       "maxIndemnity": 500000,
       "insuranceCoverage": 50
@@ -147,9 +134,7 @@
         }
       ],
       "name": "LV {0}",
-      "nameFormatTexts": [
-        "4"
-      ],
+      "nameFormatTexts": ["4"],
       "dayUpKeepGold": 1800,
       "maxIndemnity": 1250000,
       "insuranceCoverage": 60
@@ -163,9 +148,7 @@
         }
       ],
       "name": "LV {0}",
-      "nameFormatTexts": [
-        "5"
-      ],
+      "nameFormatTexts": ["5"],
       "dayUpKeepGold": 2900,
       "maxIndemnity": 3700000,
       "insuranceCoverage": 65
@@ -179,9 +162,7 @@
         }
       ],
       "name": "LV {0}",
-      "nameFormatTexts": [
-        "6"
-      ],
+      "nameFormatTexts": ["6"],
       "dayUpKeepGold": 3200,
       "maxIndemnity": 5000000,
       "insuranceCoverage": 70

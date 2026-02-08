@@ -8,7 +8,10 @@ const LOCK_TIMEOUT = 300; // 5 minutes in seconds
 
 async function acquireLock(connection) {
   try {
-    const [rows] = await connection.query('SELECT GET_LOCK(?, ?) as lockResult', [LOCK_NAME, LOCK_TIMEOUT]);
+    const [rows] = await connection.query('SELECT GET_LOCK(?, ?) as lockResult', [
+      LOCK_NAME,
+      LOCK_TIMEOUT,
+    ]);
     const lockResult = rows[0]?.lockResult;
 
     if (lockResult === 1) {
@@ -103,4 +106,3 @@ async function migrate() {
 }
 
 migrate();
-

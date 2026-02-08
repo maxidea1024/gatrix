@@ -8,42 +8,46 @@ GET  /api/v1/client/features/evaluate
 ```
 
 - **POST**: Pass `context` object in the JSON body.
-- **GET**: 
-    - Pass context fields as individual query parameters (recommended for simple use cases).
-    - OR pass `context` query parameter (Base64 encoded JSON).
-    - OR pass `X-Gatrix-Feature-Context` header.
+- **GET**:
+  - Pass context fields as individual query parameters (recommended for simple use cases).
+  - OR pass `context` query parameter (Base64 encoded JSON).
+  - OR pass `X-Gatrix-Feature-Context` header.
 
 Example GET Query (Individual Params):
+
 ```
 GET /api/v1/client/features/evaluate?userId=user123&sessionId=abc&properties[region]=asia
 ```
 
 Example GET Query (Base64 Context):
+
 ```
 GET /api/v1/client/features/evaluate?context=eyJ1c2VySWQiOiAidXNlcjEifQ==
 ```
 
 Example GET Header:
+
 ```
 X-Gatrix-Feature-Context: eyJ1c2VySWQiOiAidXNlci0xMjM0NSIsICJzZXNzaW9uSWQiOiAiYWJjZGUifQ==
 ```
+
 (Decoded: `{"userId": "user-12345", "sessionId": "abcde"}`)
 
 ## Headers
 
-| Header | Required | Description |
-|--------|----------|-------------|
-| `X-API-Token` | Yes | Client API Token |
-| `X-Application-Name` | No | Name of the application |
-| `X-Environment` | No* | Environment name (e.g., `development`, `production`). Required if not inferred from token. |
-| `Content-Type` | Yes | `application/json` (for POST) |
-| `X-Gatrix-Feature-Context` | No | Base64 encoded JSON context for GET requests. |
+| Header                     | Required | Description                                                                                |
+| -------------------------- | -------- | ------------------------------------------------------------------------------------------ |
+| `X-API-Token`              | Yes      | Client API Token                                                                           |
+| `X-Application-Name`       | No       | Name of the application                                                                    |
+| `X-Environment`            | No\*     | Environment name (e.g., `development`, `production`). Required if not inferred from token. |
+| `Content-Type`             | Yes      | `application/json` (for POST)                                                              |
+| `X-Gatrix-Feature-Context` | No       | Base64 encoded JSON context for GET requests.                                              |
 
 ## Request Body (POST)
 
 ```json
 {
-  "flagNames": ["flag-1", "flag-2"],  // Optional: specific flags to evaluate
+  "flagNames": ["flag-1", "flag-2"], // Optional: specific flags to evaluate
   "context": {
     "userId": "user-123",
     "sessionId": "session-456",
@@ -72,7 +76,7 @@ X-Gatrix-Feature-Context: eyJ1c2VySWQiOiAidXNlci0xMjM0NSIsICJzZXNzaW9uSWQiOiAiYW
       },
       "variantType": "json",
       "version": 3,
-      "impressionData": true  // Only included when true
+      "impressionData": true // Only included when true
     },
     "disabled-flag": {
       "name": "disabled-flag",
@@ -80,7 +84,7 @@ X-Gatrix-Feature-Context: eyJ1c2VySWQiOiAidXNlci0xMjM0NSIsICJzZXNzaW9uSWQiOiAiYW
       "variant": {
         "name": "disabled",
         "enabled": false,
-        "payload": "baseline-value"  // baselinePayload if defined
+        "payload": "baseline-value" // baselinePayload if defined
       },
       "variantType": "string",
       "version": 1
@@ -109,12 +113,12 @@ X-Gatrix-Feature-Context: eyJ1c2VySWQiOiAidXNlci0xMjM0NSIsICJzZXNzaW9uSWQiOiAiYW
 
 ### Strategy-based Evaluation
 
-| Scenario | Result |
-|----------|--------|
-| No strategies defined | Flag's `isEnabled` value is used directly |
-| All strategies are disabled | `enabled: false` (no matching strategy) |
-| At least one enabled strategy passes | `enabled: true` |
-| All enabled strategies fail | `enabled: false` |
+| Scenario                             | Result                                    |
+| ------------------------------------ | ----------------------------------------- |
+| No strategies defined                | Flag's `isEnabled` value is used directly |
+| All strategies are disabled          | `enabled: false` (no matching strategy)   |
+| At least one enabled strategy passes | `enabled: true`                           |
+| All enabled strategies fail          | `enabled: false`                          |
 
 ### Flowchart
 
@@ -148,7 +152,7 @@ X-Gatrix-Feature-Context: eyJ1c2VySWQiOiAidXNlci0xMjM0NSIsICJzZXNzaW9uSWQiOiAiYW
                                     ┌────────┐ (try next strategy)
                                     │ true   │
                                     └────────┘
-                                    
+
                                If no strategy passes:
                                     ┌────────┐
                                     │ false  │
@@ -164,6 +168,7 @@ X-Gatrix-Feature-Context: eyJ1c2VySWQiOiAidXNlci0xMjM0NSIsICJzZXNzaW9uSWQiOiAiYW
 ### Sticky Consistency (Important)
 
 If you use strategy rollouts or variants, the result depends on the **stickiness**.
+
 - By default, stickiness is based on `userId`, then `sessionId`, then `random`.
 - If you do not provide `userId` or `sessionId` in the `context`, evaluation will be **random on every request**.
 - To ensure consistent results for a user, always provide a unique identifier.
@@ -172,17 +177,18 @@ If you use strategy rollouts or variants, the result depends on the **stickiness
 
 The `context` object supports the following standard Unleash fields:
 
-| Field | Description |
-|-------|-------------|
-| `userId` | Unique identifier for the user. Primary key for stickiness. |
-| `sessionId` | Session identifier. Used if `userId` is missing. |
-| `ip` | IP address of the client (automatically detected if not provided, but can be overridden). |
-| `remoteAddress` | Alias for `ip`. |
-| `properties` | Custom properties for constraints (e.g., `{ "region": "asia" }`). |
+| Field           | Description                                                                               |
+| --------------- | ----------------------------------------------------------------------------------------- |
+| `userId`        | Unique identifier for the user. Primary key for stickiness.                               |
+| `sessionId`     | Session identifier. Used if `userId` is missing.                                          |
+| `ip`            | IP address of the client (automatically detected if not provided, but can be overridden). |
+| `remoteAddress` | Alias for `ip`.                                                                           |
+| `properties`    | Custom properties for constraints (e.g., `{ "region": "asia" }`).                         |
 
 ## Version Field
 
 Each flag has a `version` field that increments whenever:
+
 - Flag settings are updated (isEnabled, variantType, baselinePayload, etc.)
 - Variants are added/modified/deleted
 - Strategies are added/modified/deleted

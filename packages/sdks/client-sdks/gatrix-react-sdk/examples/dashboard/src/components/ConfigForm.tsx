@@ -49,7 +49,9 @@ function ConfigForm({ onConnect }: ConfigFormProps) {
     if (savedApiUrl) setApiUrl(savedApiUrl);
     else {
       // Set default based on server type if no saved URL
-      setApiUrl(serverType === 'edge' ? 'http://localhost:45000/api/v1' : 'http://localhost:5000/api/v1');
+      setApiUrl(
+        serverType === 'edge' ? 'http://localhost:45000/api/v1' : 'http://localhost:5000/api/v1'
+      );
     }
 
     if (savedAppName) setAppName(savedAppName);
@@ -66,10 +68,15 @@ function ConfigForm({ onConnect }: ConfigFormProps) {
 
     setOfflineMode(localStorage.getItem(STORAGE_KEY_OFFLINE_MODE) === 'true');
     const savedManualPolling = localStorage.getItem(STORAGE_KEY_MANUAL_POLLING) === 'true';
-    const savedRefreshInterval = parseInt(localStorage.getItem(STORAGE_KEY_REFRESH_INTERVAL) || '30', 10);
+    const savedRefreshInterval = parseInt(
+      localStorage.getItem(STORAGE_KEY_REFRESH_INTERVAL) || '30',
+      10
+    );
 
     setManualPolling(savedManualPolling);
-    setRefreshInterval(!savedManualPolling && savedRefreshInterval === 0 ? 30 : savedRefreshInterval);
+    setRefreshInterval(
+      !savedManualPolling && savedRefreshInterval === 0 ? 30 : savedRefreshInterval
+    );
     setExplicitSyncMode(localStorage.getItem(STORAGE_KEY_EXPLICIT_SYNC) === 'true');
   }, []);
 
@@ -78,7 +85,9 @@ function ConfigForm({ onConnect }: ConfigFormProps) {
     // If no saved URL, update to default for the server type
     const savedApiUrl = localStorage.getItem(STORAGE_KEY_API_URL);
     if (!savedApiUrl) {
-      setApiUrl(serverType === 'edge' ? 'http://localhost:45000/api/v1' : 'http://localhost:5000/api/v1');
+      setApiUrl(
+        serverType === 'edge' ? 'http://localhost:45000/api/v1' : 'http://localhost:5000/api/v1'
+      );
     }
 
     if (useDevToken) {
@@ -203,7 +212,11 @@ function ConfigForm({ onConnect }: ConfigFormProps) {
                 className="nes-input is-dark"
                 value={apiUrl}
                 onChange={(e) => setApiUrl(e.target.value)}
-                placeholder={serverType === 'edge' ? "http://localhost:45000/api/v1" : "http://localhost:5000/api/v1"}
+                placeholder={
+                  serverType === 'edge'
+                    ? 'http://localhost:45000/api/v1'
+                    : 'http://localhost:5000/api/v1'
+                }
                 required
               />
             </div>
@@ -232,11 +245,14 @@ function ConfigForm({ onConnect }: ConfigFormProps) {
                     height: '38px',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center'
+                    justifyContent: 'center',
                   }}
-                  title={showToken ? "Hide Token" : "Show Token"}
+                  title={showToken ? 'Hide Token' : 'Show Token'}
                 >
-                  <i className={`nes-icon is-small ${showToken ? 'close' : 'eye'}`} style={{ transform: 'scale(1.2)' }}></i>
+                  <i
+                    className={`nes-icon is-small ${showToken ? 'close' : 'eye'}`}
+                    style={{ transform: 'scale(1.2)' }}
+                  ></i>
                 </button>
               </div>
             </div>
@@ -249,9 +265,7 @@ function ConfigForm({ onConnect }: ConfigFormProps) {
                   checked={useDevToken}
                   onChange={(e) => handleUseDevTokenChange(e.target.checked)}
                 />
-                <span className="checkbox-label">
-                  USE DEV TOKEN (unsecured)
-                </span>
+                <span className="checkbox-label">USE DEV TOKEN (unsecured)</span>
               </label>
             </div>
 
@@ -305,14 +319,14 @@ function ConfigForm({ onConnect }: ConfigFormProps) {
                   checked={offlineMode}
                   onChange={(e) => setOfflineMode(e.target.checked)}
                 />
-                <span className="checkbox-label">
-                  OFFLINE MODE
-                </span>
+                <span className="checkbox-label">OFFLINE MODE</span>
               </label>
             </div>
 
             <div className={`form-group ${offlineMode ? 'is-disabled-section' : ''}`}>
-              <label className="form-label" style={{ opacity: offlineMode ? 0.5 : 1 }}>POLLING INTERVAL (SEC)</label>
+              <label className="form-label" style={{ opacity: offlineMode ? 0.5 : 1 }}>
+                POLLING INTERVAL (SEC)
+              </label>
               <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
                 <input
                   type="number"
@@ -345,13 +359,15 @@ function ConfigForm({ onConnect }: ConfigFormProps) {
                   onChange={(e) => setExplicitSyncMode(e.target.checked)}
                   disabled={offlineMode}
                 />
-                <span className="checkbox-label">
-                  EXPLICIT SYNC
-                </span>
+                <span className="checkbox-label">EXPLICIT SYNC</span>
               </label>
             </div>
 
-            <button type="submit" className="nes-btn is-success rumble-on-click" style={{ width: '100%' }}>
+            <button
+              type="submit"
+              className="nes-btn is-success rumble-on-click"
+              style={{ width: '100%' }}
+            >
               START GAME
             </button>
           </form>

@@ -8,73 +8,39 @@
       "startHour": "number",
       "endHour": "number",
       "mailId": "number",
-      "levels": [
-        "number"
-      ],
-      "rewardFixeds": [
-        "number",
-        "number"
-      ]
+      "levels": ["number"],
+      "rewardFixeds": ["number", "number"]
     },
     ":required": {
       "startHour": 1,
       "endHour": 1,
-      "levels": [
-        1
-      ],
-      "rewardFixeds": [
-        1,
-        1
-      ]
+      "levels": [1],
+      "rewardFixeds": [1, 1]
     },
     ":requiredInObject": {
       "startHour": 1,
       "endHour": 1,
-      "levels": [
-        1
-      ],
-      "rewardFixeds": [
-        1,
-        1
-      ]
+      "levels": [1],
+      "rewardFixeds": [1, 1]
     },
     ":min": {
       "startHour": 1,
       "endHour": 1,
       "mailId": 92000000,
-      "levels": [
-        1
-      ],
-      "rewardFixeds": [
-        94000000,
-        94000000
-      ]
+      "levels": [1],
+      "rewardFixeds": [94000000, 94000000]
     },
     ":max": {
       "startHour": 24,
       "endHour": 24,
       "mailId": 92999999,
-      "levels": [
-        102
-      ],
-      "rewardFixeds": [
-        95999999,
-        95999999
-      ]
+      "levels": [102],
+      "rewardFixeds": [95999999, 95999999]
     },
     ":enum": {},
     ":links": {
-      "mailId": [
-        "Mail"
-      ],
-      "rewardFixeds": [
-        [
-          "RewardFixed"
-        ],
-        [
-          "RewardFixed"
-        ]
-      ]
+      "mailId": ["Mail"],
+      "rewardFixeds": [["RewardFixed"], ["RewardFixed"]]
     },
     ":asset": {}
   },
@@ -87,13 +53,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110000,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910865,
-        95910865
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910865, 95910865]
     },
     "2": {
       "id": 2,
@@ -103,13 +64,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110001,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910864,
-        95910864
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910864, 95910864]
     },
     "3": {
       "id": 3,
@@ -119,13 +75,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110002,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910864,
-        95910864
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910864, 95910864]
     },
     "4": {
       "id": 4,
@@ -135,13 +86,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110003,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910865,
-        95910865
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910865, 95910865]
     },
     "5": {
       "id": 5,
@@ -151,13 +97,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110004,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910864,
-        95910864
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910864, 95910864]
     },
     "6": {
       "id": 6,
@@ -167,13 +108,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110005,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910865,
-        95910865
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910865, 95910865]
     },
     "7": {
       "id": 7,
@@ -183,13 +119,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110006,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910865,
-        95910865
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910865, 95910865]
     },
     "8": {
       "id": 8,
@@ -199,13 +130,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110007,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910864,
-        95910864
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910864, 95910864]
     },
     "9": {
       "id": 9,
@@ -215,13 +141,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110008,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910864,
-        95910864
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910864, 95910864]
     },
     "10": {
       "id": 10,
@@ -231,13 +152,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110009,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910865,
-        95910865
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910865, 95910865]
     },
     "11": {
       "id": 11,
@@ -247,13 +163,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110010,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910865,
-        95910865
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910865, 95910865]
     },
     "12": {
       "id": 12,
@@ -263,13 +174,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110011,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910864,
-        95910864
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910864, 95910864]
     },
     "13": {
       "id": 13,
@@ -279,13 +185,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110012,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910865,
-        95910865
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910865, 95910865]
     },
     "14": {
       "id": 14,
@@ -295,13 +196,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110013,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910864,
-        95910864
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910864, 95910864]
     },
     "15": {
       "id": 15,
@@ -311,13 +207,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110014,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910865,
-        95910865
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910865, 95910865]
     },
     "16": {
       "id": 16,
@@ -327,13 +218,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110015,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910865,
-        95910865
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910865, 95910865]
     },
     "17": {
       "id": 17,
@@ -343,13 +229,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110016,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910864,
-        95910864
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910864, 95910864]
     },
     "18": {
       "id": 18,
@@ -359,13 +240,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110017,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910865,
-        95910865
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910865, 95910865]
     },
     "19": {
       "id": 19,
@@ -375,13 +251,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110018,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910865,
-        95910865
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910865, 95910865]
     },
     "20": {
       "id": 20,
@@ -391,13 +262,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110019,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910865,
-        95910865
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910865, 95910865]
     },
     "21": {
       "id": 21,
@@ -407,13 +273,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110020,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910864,
-        95910864
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910864, 95910864]
     },
     "22": {
       "id": 22,
@@ -423,13 +284,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110021,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910865,
-        95910865
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910865, 95910865]
     },
     "23": {
       "id": 23,
@@ -439,13 +295,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110022,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910865,
-        95910865
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910865, 95910865]
     },
     "24": {
       "id": 24,
@@ -455,13 +306,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110023,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910864,
-        95910864
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910864, 95910864]
     },
     "25": {
       "id": 25,
@@ -471,13 +317,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110024,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910865,
-        95910865
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910865, 95910865]
     },
     "26": {
       "id": 26,
@@ -487,13 +328,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110025,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910864,
-        95910864
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910864, 95910864]
     },
     "27": {
       "id": 27,
@@ -503,13 +339,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110026,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910864,
-        95910864
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910864, 95910864]
     },
     "28": {
       "id": 28,
@@ -519,13 +350,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110027,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910864,
-        95910864
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910864, 95910864]
     },
     "29": {
       "id": 29,
@@ -535,13 +361,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110028,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910865,
-        95910865
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910865, 95910865]
     },
     "30": {
       "id": 30,
@@ -551,13 +372,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110029,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910865,
-        95910865
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910865, 95910865]
     },
     "31": {
       "id": 31,
@@ -567,13 +383,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110030,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910865,
-        95910865
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910865, 95910865]
     },
     "32": {
       "id": 32,
@@ -583,13 +394,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110031,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910866,
-        95910866
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910866, 95910866]
     },
     "33": {
       "id": 33,
@@ -599,13 +405,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110032,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910864,
-        95910864
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910864, 95910864]
     },
     "34": {
       "id": 34,
@@ -615,13 +416,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110033,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910866,
-        95910866
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910866, 95910866]
     },
     "35": {
       "id": 35,
@@ -631,13 +427,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110034,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910865,
-        95910865
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910865, 95910865]
     },
     "36": {
       "id": 36,
@@ -647,13 +438,8 @@
       "startHour": 1,
       "endHour": 24,
       "mailId": 92110035,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910890,
-        95910890
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910890, 95910890]
     },
     "37": {
       "id": 37,
@@ -663,13 +449,8 @@
       "startHour": 1,
       "endHour": 24,
       "mailId": 92110035,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910890,
-        95910890
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910890, 95910890]
     },
     "38": {
       "id": 38,
@@ -679,13 +460,8 @@
       "startHour": 1,
       "endHour": 24,
       "mailId": 92110035,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910890,
-        95910890
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910890, 95910890]
     },
     "39": {
       "id": 39,
@@ -695,13 +471,8 @@
       "startHour": 1,
       "endHour": 24,
       "mailId": 92110035,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910890,
-        95910890
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910890, 95910890]
     },
     "40": {
       "id": 40,
@@ -711,13 +482,8 @@
       "startHour": 1,
       "endHour": 24,
       "mailId": 92110035,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910890,
-        95910890
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910890, 95910890]
     },
     "41": {
       "id": 41,
@@ -727,13 +493,8 @@
       "startHour": 1,
       "endHour": 24,
       "mailId": 92110035,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910890,
-        95910890
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910890, 95910890]
     },
     "42": {
       "id": 42,
@@ -743,13 +504,8 @@
       "startHour": 1,
       "endHour": 24,
       "mailId": 92110035,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910890,
-        95910890
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910890, 95910890]
     },
     "43": {
       "id": 43,
@@ -759,13 +515,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110036,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910866,
-        95910866
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910866, 95910866]
     },
     "44": {
       "id": 44,
@@ -775,13 +526,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110037,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910891,
-        95910891
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910891, 95910891]
     },
     "45": {
       "id": 45,
@@ -791,13 +537,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110038,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910867,
-        95910867
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910867, 95910867]
     },
     "46": {
       "id": 46,
@@ -807,13 +548,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110039,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910866,
-        95910866
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910866, 95910866]
     },
     "47": {
       "id": 47,
@@ -823,13 +559,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110040,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910865,
-        95910865
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910865, 95910865]
     },
     "48": {
       "id": 48,
@@ -839,13 +570,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110041,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910865,
-        95910865
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910865, 95910865]
     },
     "49": {
       "id": 49,
@@ -855,13 +581,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110042,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910865,
-        95910865
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910865, 95910865]
     },
     "50": {
       "id": 50,
@@ -871,13 +592,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110043,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910866,
-        95910866
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910866, 95910866]
     },
     "51": {
       "id": 51,
@@ -887,13 +603,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110044,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910865,
-        95910865
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910865, 95910865]
     },
     "52": {
       "id": 52,
@@ -903,13 +614,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110045,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910865,
-        95910865
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910865, 95910865]
     },
     "53": {
       "id": 53,
@@ -919,13 +625,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110046,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910865,
-        95910865
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910865, 95910865]
     },
     "54": {
       "id": 54,
@@ -935,13 +636,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110047,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910865,
-        95910865
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910865, 95910865]
     },
     "55": {
       "id": 55,
@@ -951,13 +647,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110048,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910865,
-        95910865
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910865, 95910865]
     },
     "56": {
       "id": 56,
@@ -967,13 +658,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110049,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910865,
-        95910865
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910865, 95910865]
     },
     "57": {
       "id": 57,
@@ -983,13 +669,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110050,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910865,
-        95910865
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910865, 95910865]
     },
     "58": {
       "id": 58,
@@ -999,13 +680,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110051,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910865,
-        95910865
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910865, 95910865]
     },
     "59": {
       "id": 59,
@@ -1015,13 +691,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110052,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910865,
-        95910865
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910865, 95910865]
     },
     "60": {
       "id": 60,
@@ -1031,13 +702,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110053,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910864,
-        95910864
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910864, 95910864]
     },
     "61": {
       "id": 61,
@@ -1047,13 +713,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110054,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910891,
-        95910891
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910891, 95910891]
     },
     "62": {
       "id": 62,
@@ -1063,13 +724,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110055,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910865,
-        95910865
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910865, 95910865]
     },
     "63": {
       "id": 63,
@@ -1079,13 +735,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110056,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910864,
-        95910864
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910864, 95910864]
     },
     "64": {
       "id": 64,
@@ -1095,13 +746,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110057,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910864,
-        95910864
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910864, 95910864]
     },
     "65": {
       "id": 65,
@@ -1111,13 +757,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110058,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910865,
-        95910865
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910865, 95910865]
     },
     "66": {
       "id": 66,
@@ -1127,13 +768,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110059,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910864,
-        95910864
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910864, 95910864]
     },
     "67": {
       "id": 67,
@@ -1143,13 +779,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110060,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910865,
-        95910865
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910865, 95910865]
     },
     "68": {
       "id": 68,
@@ -1159,13 +790,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110061,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910865,
-        95910865
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910865, 95910865]
     },
     "69": {
       "id": 69,
@@ -1175,13 +801,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110062,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910865,
-        95910865
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910865, 95910865]
     },
     "70": {
       "id": 70,
@@ -1191,13 +812,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110063,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910865,
-        95910865
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910865, 95910865]
     },
     "71": {
       "id": 71,
@@ -1207,13 +823,8 @@
       "startHour": 1,
       "endHour": 24,
       "mailId": 92110086,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910890,
-        95910890
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910890, 95910890]
     },
     "72": {
       "id": 72,
@@ -1223,13 +834,8 @@
       "startHour": 1,
       "endHour": 24,
       "mailId": 92110086,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910890,
-        95910890
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910890, 95910890]
     },
     "73": {
       "id": 73,
@@ -1239,13 +845,8 @@
       "startHour": 1,
       "endHour": 24,
       "mailId": 92110086,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910890,
-        95910890
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910890, 95910890]
     },
     "74": {
       "id": 74,
@@ -1255,13 +856,8 @@
       "startHour": 1,
       "endHour": 24,
       "mailId": 92110086,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910890,
-        95910890
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910890, 95910890]
     },
     "75": {
       "id": 75,
@@ -1271,13 +867,8 @@
       "startHour": 1,
       "endHour": 24,
       "mailId": 92110086,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910890,
-        95910890
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910890, 95910890]
     },
     "76": {
       "id": 76,
@@ -1287,13 +878,8 @@
       "startHour": 1,
       "endHour": 24,
       "mailId": 92110086,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910890,
-        95910890
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910890, 95910890]
     },
     "77": {
       "id": 77,
@@ -1303,13 +889,8 @@
       "startHour": 1,
       "endHour": 24,
       "mailId": 92110086,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910890,
-        95910890
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910890, 95910890]
     },
     "78": {
       "id": 78,
@@ -1319,13 +900,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110065,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910865,
-        95910865
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910865, 95910865]
     },
     "79": {
       "id": 79,
@@ -1335,13 +911,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110066,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910866,
-        95910866
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910866, 95910866]
     },
     "80": {
       "id": 80,
@@ -1351,13 +922,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110067,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910865,
-        95910865
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910865, 95910865]
     },
     "81": {
       "id": 81,
@@ -1367,13 +933,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110068,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910865,
-        95910865
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910865, 95910865]
     },
     "82": {
       "id": 82,
@@ -1383,13 +944,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110069,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910864,
-        95910864
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910864, 95910864]
     },
     "83": {
       "id": 83,
@@ -1399,13 +955,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110070,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910865,
-        95910865
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910865, 95910865]
     },
     "84": {
       "id": 84,
@@ -1415,13 +966,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110071,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910865,
-        95910865
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910865, 95910865]
     },
     "85": {
       "id": 85,
@@ -1431,13 +977,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110072,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910865,
-        95910865
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910865, 95910865]
     },
     "86": {
       "id": 86,
@@ -1447,13 +988,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110073,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910865,
-        95910865
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910865, 95910865]
     },
     "87": {
       "id": 87,
@@ -1463,13 +999,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110074,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910865,
-        95910865
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910865, 95910865]
     },
     "88": {
       "id": 88,
@@ -1479,13 +1010,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110075,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910865,
-        95910865
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910865, 95910865]
     },
     "89": {
       "id": 89,
@@ -1495,13 +1021,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110076,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910866,
-        95910866
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910866, 95910866]
     },
     "90": {
       "id": 90,
@@ -1511,13 +1032,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110077,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910866,
-        95910866
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910866, 95910866]
     },
     "91": {
       "id": 91,
@@ -1527,13 +1043,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110078,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910865,
-        95910865
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910865, 95910865]
     },
     "92": {
       "id": 92,
@@ -1543,13 +1054,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110079,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910866,
-        95910866
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910866, 95910866]
     },
     "93": {
       "id": 93,
@@ -1559,13 +1065,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110080,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910867,
-        95910867
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910867, 95910867]
     },
     "94": {
       "id": 94,
@@ -1575,13 +1076,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110081,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910866,
-        95910866
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910866, 95910866]
     },
     "95": {
       "id": 95,
@@ -1591,13 +1087,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110082,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910866,
-        95910866
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910866, 95910866]
     },
     "96": {
       "id": 96,
@@ -1607,13 +1098,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110083,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910865,
-        95910865
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910865, 95910865]
     },
     "97": {
       "id": 97,
@@ -1623,13 +1109,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110084,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910867,
-        95910867
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910867, 95910867]
     },
     "98": {
       "id": 98,
@@ -1639,13 +1120,8 @@
       "startHour": 17,
       "endHour": 19,
       "mailId": 92110085,
-      "levels": [
-        101
-      ],
-      "rewardFixeds": [
-        95910866,
-        95910866
-      ]
+      "levels": [101],
+      "rewardFixeds": [95910866, 95910866]
     }
   }
 }

@@ -5,7 +5,7 @@
  * and environments, allowing tokens to be restricted to specific environments.
  */
 
-exports.up = async function(connection) {
+exports.up = async function (connection) {
   console.log('Creating g_api_access_token_environments table...');
 
   // Create the linking table (both tokenId and environmentId are ULID CHAR(26))
@@ -28,11 +28,10 @@ exports.up = async function(connection) {
   console.log('g_api_access_token_environments table created successfully');
 };
 
-exports.down = async function(connection) {
+exports.down = async function (connection) {
   console.log('Dropping g_api_access_token_environments table...');
 
   // Drop the linking table
   await connection.execute('DROP TABLE IF EXISTS g_api_access_token_environments');
   console.log('g_api_access_token_environments table dropped');
 };
-

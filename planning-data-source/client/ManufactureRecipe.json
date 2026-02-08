@@ -181,46 +181,28 @@
     },
     ":enum": {},
     ":links": {
-      "manufactureGroupId": [
-        "ManufactureGroup"
-      ],
+      "manufactureGroupId": ["ManufactureGroup"],
       "workingMate": [
         {
-          "JobId": [
-            "Job"
-          ]
+          "JobId": ["Job"]
         },
         {
-          "JobId": [
-            "Job"
-          ]
+          "JobId": ["Job"]
         },
         {
-          "JobId": [
-            "Job"
-          ]
+          "JobId": ["Job"]
         },
         {
-          "JobId": [
-            "Job"
-          ]
+          "JobId": ["Job"]
         },
         {
-          "JobId": [
-            "Job"
-          ]
+          "JobId": ["Job"]
         }
       ],
-      "normalRewardFixedId": [
-        "RewardFixed"
-      ],
-      "criticalRewardFixedId": [
-        "RewardFixed"
-      ],
+      "normalRewardFixedId": ["RewardFixed"],
+      "criticalRewardFixedId": ["RewardFixed"],
       "costPoint": {
-        "Type": [
-          "Point"
-        ]
+        "Type": ["Point"]
       }
     }
   },

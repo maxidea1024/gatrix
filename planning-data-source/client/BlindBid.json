@@ -58,12 +58,7 @@
     ":links": {
       "rewardItem": [
         {
-          "Id": [
-            "Item",
-            "CEquip",
-            "Ship",
-            "ShipSlot"
-          ]
+          "Id": ["Item", "CEquip", "Ship", "ShipSlot"]
         }
       ]
     }

@@ -13,10 +13,12 @@
 ### 1. 동적 필터 키워드 추출 ✅
 
 #### 구현 파일
+
 - `packages/event-lens/src/services/filter-builder.ts` (300+ 라인)
 - `packages/event-lens/src/routes/filters.ts` (150+ 라인)
 
 #### 기능
+
 ```typescript
 // 1. Properties 키 자동 추출
 const keys = await filterBuilder.getPropertyKeys('project-123');
@@ -40,6 +42,7 @@ const countries = await filterBuilder.getCountries('project-123');
 ```
 
 #### API 엔드포인트
+
 ```bash
 GET /filters/:projectId/property-keys
 GET /filters/:projectId/property-values?propertyKey=plan_type
@@ -49,6 +52,7 @@ GET /filters/:projectId/countries
 ```
 
 #### 성능 최적화
+
 - Materialized Column: `propertiesKeys Array(String)`
 - Bloom Filter 인덱스로 초고속 검색
 - 필터 UI 자동완성 지원
@@ -75,6 +79,7 @@ ALTER TABLE geo_metrics MODIFY TTL date + INTERVAL 365 DAY;
 ```
 
 **효과**:
+
 - 스토리지 비용 자동 절감
 - 쿼리 성능 유지
 - 수동 관리 불필요
@@ -91,6 +96,7 @@ ALTER TABLE profiles MODIFY COLUMN properties String CODEC(ZSTD(3));
 ```
 
 **효과**:
+
 - 스토리지 50-70% 감소
 - I/O 성능 향상
 - 네트워크 전송량 감소
@@ -121,6 +127,7 @@ ALTER TABLE events ADD INDEX idx_properties_keys propertiesKeys TYPE bloom_filte
 ```
 
 **효과**:
+
 - 필터 검색 10-100배 빠름
 - 복잡한 조건 쿼리 최적화
 
@@ -129,6 +136,7 @@ ALTER TABLE events ADD INDEX idx_properties_keys propertiesKeys TYPE bloom_filte
 ### 5. 추가 Materialized Views ✅
 
 #### 이벤트 이름별 집계
+
 ```sql
 CREATE TABLE event_name_metrics (
   projectId String,
@@ -140,6 +148,7 @@ CREATE TABLE event_name_metrics (
 ```
 
 #### 경로별 집계
+
 ```sql
 CREATE TABLE path_metrics (
   projectId String,
@@ -152,6 +161,7 @@ CREATE TABLE path_metrics (
 ```
 
 #### Referrer별 집계
+
 ```sql
 CREATE TABLE referrer_metrics (
   projectId String,
@@ -164,6 +174,7 @@ CREATE TABLE referrer_metrics (
 ```
 
 #### 디바이스별 집계
+
 ```sql
 CREATE TABLE device_metrics (
   projectId String,
@@ -177,6 +188,7 @@ CREATE TABLE device_metrics (
 ```
 
 #### 지리별 집계
+
 ```sql
 CREATE TABLE geo_metrics (
   projectId String,
@@ -189,6 +201,7 @@ CREATE TABLE geo_metrics (
 ```
 
 **효과**:
+
 - Top Pages 쿼리: 100배 빠름
 - Top Referrers 쿼리: 100배 빠름
 - Device Stats 쿼리: 100배 빠름
@@ -199,6 +212,7 @@ CREATE TABLE geo_metrics (
 ### 6. OptimizedMetricsService ✅
 
 #### 자동 전략 선택
+
 ```typescript
 // 필터가 없으면 Materialized View 사용 (초고속)
 if (!filters || filters.length === 0) {
@@ -210,6 +224,7 @@ return await this.getMetricsWithFilters(projectId, startDate, endDate, filters);
 ```
 
 #### Materialized View 쿼리
+
 ```typescript
 const query = `
   SELECT
@@ -224,6 +239,7 @@ const query = `
 ```
 
 **효과**:
+
 - 필터 없는 쿼리: 10-100배 빠름
 - 필터 있는 쿼리: Bloom Filter로 최적화
 - 자동 최적 전략 선택
@@ -235,18 +251,19 @@ const query = `
 **✅ 이미 완료되었습니다!**
 
 #### docker-compose.yml (라인 94-150)
+
 ```yaml
 # ClickHouse
 clickhouse:
   image: clickhouse/clickhouse-server:24.12.2.29-alpine
   container_name: gatrix-clickhouse
   ports:
-    - "8123:8123"
-    - "9000:9000"
+    - '8123:8123'
+    - '9000:9000'
   volumes:
     - clickhouse_data:/var/lib/clickhouse
   healthcheck:
-    test: ["CMD", "wget", "--spider", "-q", "http://localhost:8123/ping"]
+    test: ['CMD', 'wget', '--spider', '-q', 'http://localhost:8123/ping']
 
 # Event Lens Server
 event-lens:
@@ -254,7 +271,7 @@ event-lens:
     context: .
     dockerfile: packages/event-lens/Dockerfile
   ports:
-    - "3002:3002"
+    - '3002:3002'
   depends_on:
     - mysql
     - redis
@@ -277,6 +294,7 @@ event-lens-worker:
 ## 📁 생성된 파일 목록
 
 ### 마이그레이션
+
 1. `packages/event-lens/migrations/clickhouse/005_add_advanced_optimizations.sql` (230 라인)
    - TTL 설정
    - ZSTD 압축
@@ -285,6 +303,7 @@ event-lens-worker:
    - 5개 추가 Materialized Views
 
 ### 서비스
+
 2. `packages/event-lens/src/services/filter-builder.ts` (300+ 라인)
    - 동적 필터 빌더
    - Properties 키/값 추출
@@ -296,11 +315,13 @@ event-lens-worker:
    - Top Pages, Referrers, Devices, Geo 최적화
 
 ### 라우트
+
 4. `packages/event-lens/src/routes/filters.ts` (150+ 라인)
    - 필터 API 엔드포인트
    - 키워드 추출 API
 
 ### 문서
+
 5. `packages/event-lens/OPTIMIZATIONS.md` (300+ 라인)
    - 최적화 기술 상세 문서
    - 성능 비교표
@@ -314,12 +335,14 @@ event-lens-worker:
 ## 🚀 실행 방법
 
 ### 1. 마이그레이션 실행
+
 ```bash
 cd packages/event-lens
 npm run migrate:clickhouse
 ```
 
 ### 2. 서버 실행
+
 ```bash
 # Docker Compose로 전체 실행
 docker-compose up -d clickhouse event-lens event-lens-worker
@@ -331,6 +354,7 @@ npm run dev:worker # 워커
 ```
 
 ### 3. API 테스트
+
 ```bash
 # 필터 키 조회
 curl http://localhost:3002/filters/project-123/property-keys
@@ -346,16 +370,16 @@ curl http://localhost:3002/insights/project-123/metrics?startDate=2024-01-01&end
 
 ## 📈 성능 개선 요약
 
-| 기능 | 이전 | 이후 | 개선율 |
-|------|------|------|--------|
-| 기본 메트릭 (필터 없음) | 5,000ms | 50ms | **100배** |
-| 기본 메트릭 (필터 있음) | 5,000ms | 500ms | **10배** |
-| Top Pages | 2,000ms | 20ms | **100배** |
-| Top Referrers | 2,000ms | 20ms | **100배** |
-| Device Stats | 2,000ms | 20ms | **100배** |
-| Geo Stats | 2,000ms | 20ms | **100배** |
-| Properties 키 추출 | 10,000ms | 1,000ms | **10배** |
-| 스토리지 사용량 | 100GB | 30-50GB | **50-70% 감소** |
+| 기능                    | 이전     | 이후    | 개선율          |
+| ----------------------- | -------- | ------- | --------------- |
+| 기본 메트릭 (필터 없음) | 5,000ms  | 50ms    | **100배**       |
+| 기본 메트릭 (필터 있음) | 5,000ms  | 500ms   | **10배**        |
+| Top Pages               | 2,000ms  | 20ms    | **100배**       |
+| Top Referrers           | 2,000ms  | 20ms    | **100배**       |
+| Device Stats            | 2,000ms  | 20ms    | **100배**       |
+| Geo Stats               | 2,000ms  | 20ms    | **100배**       |
+| Properties 키 추출      | 10,000ms | 1,000ms | **10배**        |
+| 스토리지 사용량         | 100GB    | 30-50GB | **50-70% 감소** |
 
 ---
 
@@ -383,4 +407,3 @@ Event Lens는 이제 **OpenPanel의 모든 고급 최적화 기술**을 적용�
 7. ✅ **Docker Compose 셋업** - 원클릭 배포
 
 **프로덕션 레벨의 초고속 분석 플랫폼이 완성되었습니다!** 🚀
-

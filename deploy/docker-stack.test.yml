@@ -13,7 +13,7 @@ services:
       rollback_config:
         parallelism: 1
     healthcheck:
-      test: ["CMD", "wget", "-q", "--spider", "http://localhost:80"]
+      test: ['CMD', 'wget', '-q', '--spider', 'http://localhost:80']
       interval: 10s
       timeout: 5s
       retries: 3

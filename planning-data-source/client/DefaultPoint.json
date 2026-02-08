@@ -105,34 +105,22 @@
     },
     ":enum": {},
     ":links": {
-      "mateId": [
-        "Mate"
-      ],
+      "mateId": ["Mate"],
       "point": [
         {
-          "Type": [
-            "Point"
-          ]
+          "Type": ["Point"]
         },
         {
-          "Type": [
-            "Point"
-          ]
+          "Type": ["Point"]
         },
         {
-          "Type": [
-            "Point"
-          ]
+          "Type": ["Point"]
         },
         {
-          "Type": [
-            "Point"
-          ]
+          "Type": ["Point"]
         },
         {
-          "Type": [
-            "Point"
-          ]
+          "Type": ["Point"]
         }
       ]
     }

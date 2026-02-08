@@ -1,6 +1,6 @@
 /**
  * Migration: Add wildcard permission to super admin
- * 
+ *
  * This migration replaces all individual permissions for admin@gatrix.com
  * with a single wildcard '*' permission that grants all permissions.
  * This ensures new permissions are automatically granted to super admin.
@@ -26,17 +26,13 @@ module.exports = {
     console.log(`Found super admin user with id: ${adminUserId}`);
 
     // Delete all existing permissions for this user
-    await db.query(
-      `DELETE FROM g_user_permissions WHERE userId = ?`,
-      [adminUserId]
-    );
+    await db.query(`DELETE FROM g_user_permissions WHERE userId = ?`, [adminUserId]);
     console.log('Removed all existing permissions for super admin');
 
     // Insert wildcard permission
-    await db.query(
-      `INSERT INTO g_user_permissions (userId, permission) VALUES (?, '*')`,
-      [adminUserId]
-    );
+    await db.query(`INSERT INTO g_user_permissions (userId, permission) VALUES (?, '*')`, [
+      adminUserId,
+    ]);
     console.log('Added wildcard (*) permission to super admin');
   },
 
@@ -56,10 +52,9 @@ module.exports = {
     const adminUserId = users[0].id;
 
     // Remove wildcard permission
-    await db.query(
-      `DELETE FROM g_user_permissions WHERE userId = ? AND permission = '*'`,
-      [adminUserId]
-    );
+    await db.query(`DELETE FROM g_user_permissions WHERE userId = ? AND permission = '*'`, [
+      adminUserId,
+    ]);
     console.log('Removed wildcard permission from super admin');
 
     // Re-add all individual permissions (from permissions.ts)
@@ -67,15 +62,14 @@ module.exports = {
 
     for (const permission of ALL_PERMISSIONS) {
       try {
-        await db.query(
-          `INSERT IGNORE INTO g_user_permissions (userId, permission) VALUES (?, ?)`,
-          [adminUserId, permission]
-        );
+        await db.query(`INSERT IGNORE INTO g_user_permissions (userId, permission) VALUES (?, ?)`, [
+          adminUserId,
+          permission,
+        ]);
       } catch (e) {
         // Ignore duplicate key errors
       }
     }
     console.log(`Re-added ${ALL_PERMISSIONS.length} individual permissions to super admin`);
-  }
+  },
 };
-

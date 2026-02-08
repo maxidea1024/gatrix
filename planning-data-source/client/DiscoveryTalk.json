@@ -61,51 +61,21 @@
     },
     ":enum": {},
     ":links": {
-      "mateId": [
-        "Mate"
-      ],
-      "LandingComplete": [
-        "DiscoveryText"
-      ],
-      "DiscoverySuccess": [
-        "DiscoveryText"
-      ],
-      "DiscoveryFail": [
-        "DiscoveryText"
-      ],
-      "clueOceanDoodadCave": [
-        "DiscoveryText"
-      ],
-      "clueOceanDoodadLandmark": [
-        "DiscoveryText"
-      ],
-      "clueOceanDoodadBluehole": [
-        "DiscoveryText"
-      ],
-      "clueOceanDoodadGlacial": [
-        "DiscoveryText"
-      ],
-      "clueOceanDoodadMountain": [
-        "DiscoveryText"
-      ],
-      "clueOceanDoodadDelta": [
-        "DiscoveryText"
-      ],
-      "clueOceanDoodadWaterfall": [
-        "DiscoveryText"
-      ],
-      "clueOceanDoodadBeach": [
-        "DiscoveryText"
-      ],
-      "clueOceanDoodadConstellation": [
-        "DiscoveryText"
-      ],
-      "clueOceanDoodadConstellationClueWreck": [
-        "DiscoveryText"
-      ],
-      "clueOceanDoodadConstellationClueLightHouse": [
-        "DiscoveryText"
-      ]
+      "mateId": ["Mate"],
+      "LandingComplete": ["DiscoveryText"],
+      "DiscoverySuccess": ["DiscoveryText"],
+      "DiscoveryFail": ["DiscoveryText"],
+      "clueOceanDoodadCave": ["DiscoveryText"],
+      "clueOceanDoodadLandmark": ["DiscoveryText"],
+      "clueOceanDoodadBluehole": ["DiscoveryText"],
+      "clueOceanDoodadGlacial": ["DiscoveryText"],
+      "clueOceanDoodadMountain": ["DiscoveryText"],
+      "clueOceanDoodadDelta": ["DiscoveryText"],
+      "clueOceanDoodadWaterfall": ["DiscoveryText"],
+      "clueOceanDoodadBeach": ["DiscoveryText"],
+      "clueOceanDoodadConstellation": ["DiscoveryText"],
+      "clueOceanDoodadConstellationClueWreck": ["DiscoveryText"],
+      "clueOceanDoodadConstellationClueLightHouse": ["DiscoveryText"]
     }
   },
   "DiscoveryTalk": {

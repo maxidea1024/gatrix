@@ -1,8 +1,8 @@
-import { z } from "zod";
+import { z } from 'zod';
 
 // Event Type
 export const eventSchema = z.object({
-  type: z.enum(["track", "identify", "increment", "decrement"]),
+  type: z.enum(['track', 'identify', 'increment', 'decrement']),
   payload: z.object({
     name: z.string().optional(),
     profileId: z.string().optional(),
@@ -106,7 +106,7 @@ export interface Session {
 export interface AnalyticsClient {
   id: string;
   name: string;
-  type: "write" | "read" | "root";
+  type: 'write' | 'read' | 'root';
   projectId: string;
   secret: string;
   cors?: string[];

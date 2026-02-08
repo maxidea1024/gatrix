@@ -1,7 +1,7 @@
-import { Router } from "express";
-import { MessageController } from "../controllers/MessageController";
-import { authenticate, rateLimiter, validateInput } from "../middleware/auth";
-import Joi from "joi";
+import { Router } from 'express';
+import { MessageController } from '../controllers/MessageController';
+import { authenticate, rateLimiter, validateInput } from '../middleware/auth';
+import Joi from 'joi';
 
 const router = Router();
 
@@ -9,9 +9,7 @@ const router = Router();
 const createMessageSchema = Joi.object({
   channelId: Joi.number().integer().required(),
   content: Joi.string().min(1).max(10000).required(),
-  contentType: Joi.string()
-    .valid("text", "image", "video", "audio", "file", "location")
-    .optional(),
+  contentType: Joi.string().valid('text', 'image', 'video', 'audio', 'file', 'location').optional(),
   messageData: Joi.object({
     mentions: Joi.array().items(Joi.number().integer()).optional(),
     hashtags: Joi.array().items(Joi.string()).optional(),
@@ -23,7 +21,7 @@ const createMessageSchema = Joi.object({
           description: Joi.string().optional(),
           image: Joi.string().uri().optional(),
           siteName: Joi.string().optional(),
-        }),
+        })
       )
       .optional(),
     location: Joi.object({
@@ -41,7 +39,7 @@ const createMessageSchema = Joi.object({
             text: Joi.string().required(),
             votes: Joi.number().integer().default(0),
             voters: Joi.array().items(Joi.number().integer()).default([]),
-          }),
+          })
         )
         .required(),
       allowMultiple: Joi.boolean().default(false),
@@ -53,7 +51,7 @@ const createMessageSchema = Joi.object({
           Joi.object({
             start: Joi.number().integer().required(),
             end: Joi.number().integer().required(),
-          }),
+          })
         )
         .optional(),
       italic: Joi.array()
@@ -61,7 +59,7 @@ const createMessageSchema = Joi.object({
           Joi.object({
             start: Joi.number().integer().required(),
             end: Joi.number().integer().required(),
-          }),
+          })
         )
         .optional(),
       underline: Joi.array()
@@ -69,7 +67,7 @@ const createMessageSchema = Joi.object({
           Joi.object({
             start: Joi.number().integer().required(),
             end: Joi.number().integer().required(),
-          }),
+          })
         )
         .optional(),
       strikethrough: Joi.array()
@@ -77,7 +75,7 @@ const createMessageSchema = Joi.object({
           Joi.object({
             start: Joi.number().integer().required(),
             end: Joi.number().integer().required(),
-          }),
+          })
         )
         .optional(),
       code: Joi.array()
@@ -85,7 +83,7 @@ const createMessageSchema = Joi.object({
           Joi.object({
             start: Joi.number().integer().required(),
             end: Joi.number().integer().required(),
-          }),
+          })
         )
         .optional(),
       codeBlock: Joi.array()
@@ -94,7 +92,7 @@ const createMessageSchema = Joi.object({
             start: Joi.number().integer().required(),
             end: Joi.number().integer().required(),
             language: Joi.string().optional(),
-          }),
+          })
         )
         .optional(),
     }).optional(),
@@ -116,7 +114,7 @@ const updateMessageSchema = Joi.object({
           description: Joi.string().optional(),
           image: Joi.string().uri().optional(),
           siteName: Joi.string().optional(),
-        }),
+        })
       )
       .optional(),
     formatting: Joi.object({
@@ -125,7 +123,7 @@ const updateMessageSchema = Joi.object({
           Joi.object({
             start: Joi.number().integer().required(),
             end: Joi.number().integer().required(),
-          }),
+          })
         )
         .optional(),
       italic: Joi.array()
@@ -133,7 +131,7 @@ const updateMessageSchema = Joi.object({
           Joi.object({
             start: Joi.number().integer().required(),
             end: Joi.number().integer().required(),
-          }),
+          })
         )
         .optional(),
       underline: Joi.array()
@@ -141,7 +139,7 @@ const updateMessageSchema = Joi.object({
           Joi.object({
             start: Joi.number().integer().required(),
             end: Joi.number().integer().required(),
-          }),
+          })
         )
         .optional(),
       strikethrough: Joi.array()
@@ -149,7 +147,7 @@ const updateMessageSchema = Joi.object({
           Joi.object({
             start: Joi.number().integer().required(),
             end: Joi.number().integer().required(),
-          }),
+          })
         )
         .optional(),
       code: Joi.array()
@@ -157,7 +155,7 @@ const updateMessageSchema = Joi.object({
           Joi.object({
             start: Joi.number().integer().required(),
             end: Joi.number().integer().required(),
-          }),
+          })
         )
         .optional(),
       codeBlock: Joi.array()
@@ -166,7 +164,7 @@ const updateMessageSchema = Joi.object({
             start: Joi.number().integer().required(),
             end: Joi.number().integer().required(),
             language: Joi.string().optional(),
-          }),
+          })
         )
         .optional(),
     }).optional(),
@@ -174,11 +172,7 @@ const updateMessageSchema = Joi.object({
 });
 
 const batchDeleteSchema = Joi.object({
-  messageIds: Joi.array()
-    .items(Joi.number().integer())
-    .min(1)
-    .max(100)
-    .required(),
+  messageIds: Joi.array().items(Joi.number().integer()).min(1).max(100).required(),
 });
 
 // 모든 라우트에 인증 미들웨어 적용
@@ -186,75 +180,75 @@ router.use(authenticate);
 
 // 메시지 생성
 router.post(
-  "/",
+  '/',
   rateLimiter(60000, 60), // 1분에 60개 메시지 생성 제한
   validateInput(createMessageSchema),
-  MessageController.create,
+  MessageController.create
 );
 
 // 메시지 검색
 router.get(
-  "/search",
+  '/search',
   rateLimiter(60000, 30), // 1분에 30회 검색 제한
-  MessageController.search,
+  MessageController.search
 );
 
 // 배치 메시지 삭제
 router.delete(
-  "/batch",
+  '/batch',
   rateLimiter(60000, 10), // 1분에 10회 배치 삭제 제한
   validateInput(batchDeleteSchema),
-  MessageController.batchDelete,
+  MessageController.batchDelete
 );
 
 // 채널의 메시지 목록 조회
 router.get(
-  "/channel/:channelId",
+  '/channel/:channelId',
   rateLimiter(60000, 200), // 1분에 200회 요청 제한
-  MessageController.getByChannelId,
+  MessageController.getByChannelId
 );
 
 // 스레드 메시지 조회
 router.get(
-  "/thread/:threadId",
+  '/thread/:threadId',
   rateLimiter(60000, 100), // 1분에 100회 요청 제한
-  MessageController.getThreadMessages,
+  MessageController.getThreadMessages
 );
 
 // 특정 메시지 조회
 router.get(
-  "/:id",
+  '/:id',
   rateLimiter(60000, 300), // 1분에 300회 요청 제한
-  MessageController.getById,
+  MessageController.getById
 );
 
 // 메시지 업데이트
 router.put(
-  "/:id",
+  '/:id',
   rateLimiter(60000, 30), // 1분에 30회 업데이트 제한
   validateInput(updateMessageSchema),
-  MessageController.update,
+  MessageController.update
 );
 
 // 메시지 삭제
 router.delete(
-  "/:id",
+  '/:id',
   rateLimiter(60000, 30), // 1분에 30회 삭제 제한
-  MessageController.delete,
+  MessageController.delete
 );
 
 // 메시지 핀 토글
 router.patch(
-  "/:id/pin",
+  '/:id/pin',
   rateLimiter(60000, 20), // 1분에 20회 핀 토글 제한
-  MessageController.togglePin,
+  MessageController.togglePin
 );
 
 // 스레드 메시지 조회
 router.get(
-  "/thread/:threadId",
+  '/thread/:threadId',
   rateLimiter(60000, 100), // 1분에 100회 조회 제한
-  MessageController.getThreadMessages,
+  MessageController.getThreadMessages
 );
 
 export default router;

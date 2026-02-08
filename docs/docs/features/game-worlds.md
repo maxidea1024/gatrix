@@ -23,15 +23,15 @@ The game world management system enables:
 
 ```typescript
 interface GameWorld {
-  id?: number;                    // Unique identifier
-  worldId: string;               // World identifier (unique)
-  name: string;                  // Display name
-  description?: string;          // World description
-  visible: boolean;              // Visibility in public listings
-  maintenance: boolean;          // Maintenance mode status
-  displayOrder: number;          // Display order (ascending)
-  createdAt?: Date;              // Creation timestamp
-  updatedAt?: Date;              // Last update timestamp
+  id?: number; // Unique identifier
+  worldId: string; // World identifier (unique)
+  name: string; // Display name
+  description?: string; // World description
+  visible: boolean; // Visibility in public listings
+  maintenance: boolean; // Maintenance mode status
+  displayOrder: number; // Display order (ascending)
+  createdAt?: Date; // Creation timestamp
+  updatedAt?: Date; // Last update timestamp
 }
 ```
 
@@ -105,6 +105,7 @@ PATCH /api/v1/game-worlds/:id/toggle-maintenance
 ### Response Examples
 
 #### Admin World List
+
 ```json
 {
   "success": true,
@@ -139,6 +140,7 @@ PATCH /api/v1/game-worlds/:id/toggle-maintenance
 ```
 
 #### Public World List (Client API)
+
 ```json
 {
   "success": true,
@@ -189,21 +191,21 @@ Invalidation is handled via BullMQ queue system for reliability.
 
 ```javascript
 const newWorld = {
-  worldId: "world003",
-  name: "PvP Arena",
-  description: "Player vs Player combat world",
+  worldId: 'world003',
+  name: 'PvP Arena',
+  description: 'Player vs Player combat world',
   visible: true,
   maintenance: false,
-  displayOrder: 3
+  displayOrder: 3,
 };
 
 const response = await fetch('/api/v1/game-worlds', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
-    'Authorization': 'Bearer ' + token
+    Authorization: 'Bearer ' + token,
   },
-  body: JSON.stringify(newWorld)
+  body: JSON.stringify(newWorld),
 });
 
 const result = await response.json();
@@ -214,18 +216,18 @@ console.log('Created world:', result.data);
 
 ```javascript
 const updates = {
-  name: "PvP Arena - Updated",
-  description: "Enhanced PvP world with new features",
-  displayOrder: 2
+  name: 'PvP Arena - Updated',
+  description: 'Enhanced PvP world with new features',
+  displayOrder: 2,
 };
 
 const response = await fetch('/api/v1/game-worlds/3', {
   method: 'PUT',
   headers: {
     'Content-Type': 'application/json',
-    'Authorization': 'Bearer ' + token
+    Authorization: 'Bearer ' + token,
   },
-  body: JSON.stringify(updates)
+  body: JSON.stringify(updates),
 });
 ```
 
@@ -236,8 +238,8 @@ const response = await fetch('/api/v1/game-worlds/3', {
 const response = await fetch('/api/v1/game-worlds/3/toggle-maintenance', {
   method: 'PATCH',
   headers: {
-    'Authorization': 'Bearer ' + token
-  }
+    Authorization: 'Bearer ' + token,
+  },
 });
 
 const result = await response.json();
@@ -252,13 +254,11 @@ async function getAvailableWorlds() {
   try {
     const response = await fetch('/api/v1/client/game-worlds');
     const data = await response.json();
-    
+
     if (data.success) {
-      return data.data.worlds.filter(world => 
-        world.visible && !world.maintenance
-      );
+      return data.data.worlds.filter((world) => world.visible && !world.maintenance);
     }
-    
+
     throw new Error('Failed to fetch worlds');
   } catch (error) {
     console.error('Error fetching worlds:', error);
@@ -295,7 +295,7 @@ export const WorldSelector: React.FC<WorldSelectorProps> = ({ onWorldSelect }) =
     try {
       const response = await fetch('/api/v1/client/game-worlds');
       const data = await response.json();
-      
+
       if (data.success) {
         setWorlds(data.data.worlds);
       }
@@ -314,8 +314,8 @@ export const WorldSelector: React.FC<WorldSelectorProps> = ({ onWorldSelect }) =
     <div className="world-selector">
       <h3>Select Game World</h3>
       {worlds.map(world => (
-        <div 
-          key={world.id} 
+        <div
+          key={world.id}
           className="world-option"
           onClick={() => onWorldSelect(world)}
         >
@@ -339,9 +339,9 @@ interface WorldManagementProps {
   onUpdate: (world: GameWorld) => void;
 }
 
-export const WorldManagement: React.FC<WorldManagementProps> = ({ 
-  worlds, 
-  onUpdate 
+export const WorldManagement: React.FC<WorldManagementProps> = ({
+  worlds,
+  onUpdate
 }) => {
   const toggleMaintenance = async (world: GameWorld) => {
     try {
@@ -349,7 +349,7 @@ export const WorldManagement: React.FC<WorldManagementProps> = ({
         `/api/v1/game-worlds/${world.id}/toggle-maintenance`,
         { method: 'PATCH' }
       );
-      
+
       const result = await response.json();
       if (result.success) {
         onUpdate(result.data);
@@ -365,7 +365,7 @@ export const WorldManagement: React.FC<WorldManagementProps> = ({
         `/api/v1/game-worlds/${world.id}/toggle-visibility`,
         { method: 'PATCH' }
       );
-      
+
       const result = await response.json();
       if (result.success) {
         onUpdate(result.data);
@@ -382,23 +382,23 @@ export const WorldManagement: React.FC<WorldManagementProps> = ({
         <div key={world.id} className="world-item">
           <h3>{world.name}</h3>
           <p>{world.description}</p>
-          
+
           <div className="world-controls">
-            <button 
+            <button
               onClick={() => toggleVisibility(world)}
               className={world.visible ? 'visible' : 'hidden'}
             >
               {world.visible ? 'Hide' : 'Show'}
             </button>
-            
-            <button 
+
+            <button
               onClick={() => toggleMaintenance(world)}
               className={world.maintenance ? 'maintenance' : 'active'}
             >
               {world.maintenance ? 'End Maintenance' : 'Start Maintenance'}
             </button>
           </div>
-          
+
           <div className="world-status">
             <span>Visible: {world.visible ? 'Yes' : 'No'}</span>
             <span>Maintenance: {world.maintenance ? 'Yes' : 'No'}</span>
@@ -446,6 +446,7 @@ export const WorldManagement: React.FC<WorldManagementProps> = ({
 ### Logging
 
 All world operations are logged including:
+
 - World creation, updates, and deletion
 - Visibility and maintenance toggles
 - Cache invalidation events
@@ -454,8 +455,8 @@ All world operations are logged including:
 ### Alerts
 
 Set up monitoring for:
+
 - Unexpected world downtime
 - High cache miss rates
 - Slow API response times
 - Failed world operations
-

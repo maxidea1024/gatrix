@@ -32,11 +32,13 @@ export API_URL="http://localhost:5000"
 ### Spawn Dummy Servers
 
 Spawn 5 dummy servers:
+
 ```bash
 ts-node scripts/test-service-discovery.ts --spawn 5
 ```
 
 Spawn 10 servers with etcd mode:
+
 ```bash
 ts-node scripts/test-service-discovery.ts --spawn 10 --mode etcd
 ```
@@ -44,6 +46,7 @@ ts-node scripts/test-service-discovery.ts --spawn 10 --mode etcd
 ### Despawn Servers
 
 Despawn 2 servers:
+
 ```bash
 ts-node scripts/test-service-discovery.ts --despawn 2
 ```
@@ -63,6 +66,7 @@ ts-node scripts/test-service-discovery.ts --clear
 ### Combined Operations
 
 Spawn 10 servers and list them:
+
 ```bash
 ts-node scripts/test-service-discovery.ts --spawn 10 --list
 ```
@@ -111,20 +115,23 @@ ts-node scripts/test-service-discovery.ts --spawn 5
 ## Troubleshooting
 
 ### "Failed to register server: 401 Unauthorized"
+
 - Make sure you've set the `API_TOKEN` environment variable
 - Verify the token is valid and has "Server SDK" type
 
 ### "Failed to list servers: 401 Unauthorized"
+
 - Make sure you've set the `ADMIN_TOKEN` environment variable
 - Verify you're logged in and the token is fresh
 
 ### Servers not appearing in UI
+
 - Check that the backend is running
 - Verify the SSE connection is established (look for "Real-time Connected" badge)
 - Check browser console for errors
 
 ### Servers disappearing after 60 seconds
+
 - This is expected behavior if the script is not running
 - The script must keep running to send heartbeats
 - Press Ctrl+C to gracefully shutdown and cleanup
-

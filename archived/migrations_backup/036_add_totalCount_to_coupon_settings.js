@@ -7,7 +7,7 @@
  * This is needed for async coupon generation progress tracking
  */
 
-exports.up = async function(connection) {
+exports.up = async function (connection) {
   console.log('Adding totalCount column to g_coupon_settings...');
 
   try {
@@ -39,7 +39,7 @@ exports.up = async function(connection) {
   }
 };
 
-exports.down = async function(connection) {
+exports.down = async function (connection) {
   console.log('Rolling back totalCount column...');
 
   try {
@@ -54,4 +54,3 @@ exports.down = async function(connection) {
     throw error;
   }
 };
-

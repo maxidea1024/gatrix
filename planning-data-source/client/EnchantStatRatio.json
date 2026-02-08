@@ -35,18 +35,10 @@
     },
     ":enum": {},
     ":links": {
-      "enchantItemId": [
-        "Item"
-      ],
-      "enchantPointId": [
-        "Point"
-      ],
-      "enchantKeepItemId": [
-        "Item"
-      ],
-      "enchantspecialItem": [
-        "Item"
-      ]
+      "enchantItemId": ["Item"],
+      "enchantPointId": ["Point"],
+      "enchantKeepItemId": ["Item"],
+      "enchantspecialItem": ["Item"]
     }
   },
   "EnchantStatRatio": {

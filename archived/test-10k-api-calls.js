@@ -14,9 +14,9 @@ let startTime = Date.now();
 async function makeApiCall(callNumber) {
   try {
     const response = await axios.get(API_URL, {
-      timeout: 10000
+      timeout: 10000,
     });
-    
+
     if (response.status === 200) {
       successCount++;
       if (callNumber % 1000 === 0) {
@@ -38,13 +38,13 @@ async function makeApiCall(callNumber) {
 async function processBatch(batchNumber, startIndex) {
   const promises = [];
   const endIndex = Math.min(startIndex + BATCH_SIZE, TOTAL_CALLS);
-  
+
   for (let i = startIndex; i < endIndex; i++) {
     promises.push(makeApiCall(i + 1));
   }
-  
+
   await Promise.all(promises);
-  
+
   const progress = ((endIndex / TOTAL_CALLS) * 100).toFixed(1);
   console.log(`📊 배치 ${batchNumber} 완료 - 진행률: ${progress}% (${endIndex}/${TOTAL_CALLS})`);
 }
@@ -59,24 +59,24 @@ async function runTest() {
   console.log(`   - 배치 간 지연: ${DELAY_BETWEEN_BATCHES}ms`);
   console.log(`   - API URL: ${API_URL}`);
   console.log('');
-  
+
   const totalBatches = Math.ceil(TOTAL_CALLS / BATCH_SIZE);
-  
+
   for (let batchNumber = 1; batchNumber <= totalBatches; batchNumber++) {
     const startIndex = (batchNumber - 1) * BATCH_SIZE;
-    
+
     await processBatch(batchNumber, startIndex);
-    
+
     // 마지막 배치가 아니면 지연
     if (batchNumber < totalBatches) {
-      await new Promise(resolve => setTimeout(resolve, DELAY_BETWEEN_BATCHES));
+      await new Promise((resolve) => setTimeout(resolve, DELAY_BETWEEN_BATCHES));
     }
   }
-  
+
   const endTime = Date.now();
   const duration = (endTime - startTime) / 1000;
   const rps = (TOTAL_CALLS / duration).toFixed(2);
-  
+
   console.log('');
   console.log(`🎯 테스트 완료!`);
   console.log(`📊 결과 요약:`);
@@ -86,7 +86,9 @@ async function runTest() {
   console.log(`   ⏱️  총 소요 시간: ${duration.toFixed(2)}초`);
   console.log(`   🚀 평균 RPS: ${rps}회/초`);
   console.log('');
-  console.log(`💡 이제 대시보드에서 토큰 사용량이 ${TOTAL_CALLS.toLocaleString()}개 증가했는지 확인해보세요!`);
+  console.log(
+    `💡 이제 대시보드에서 토큰 사용량이 ${TOTAL_CALLS.toLocaleString()}개 증가했는지 확인해보세요!`
+  );
 }
 
 // 에러 핸들링

@@ -15,9 +15,7 @@
     },
     ":enum": {},
     ":links": {
-      "defaultsailcrestId": [
-        "SailCrest"
-      ]
+      "defaultsailcrestId": ["SailCrest"]
     }
   },
   "DefaultSailCrest": {

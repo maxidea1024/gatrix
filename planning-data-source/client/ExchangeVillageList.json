@@ -176,39 +176,25 @@
     ":links": {
       "contentsTerms": [
         {
-          "Id": [
-            "ContentsTerms"
-          ]
+          "Id": ["ContentsTerms"]
         }
       ],
-      "getTradeGoodsId": [
-        "TradeGoods"
-      ],
+      "getTradeGoodsId": ["TradeGoods"],
       "materialTradeGoods": [
         {
-          "Id": [
-            "TradeGoods"
-          ]
+          "Id": ["TradeGoods"]
         },
         {
-          "Id": [
-            "TradeGoods"
-          ]
+          "Id": ["TradeGoods"]
         },
         {
-          "Id": [
-            "TradeGoods"
-          ]
+          "Id": ["TradeGoods"]
         },
         {
-          "Id": [
-            "TradeGoods"
-          ]
+          "Id": ["TradeGoods"]
         },
         {
-          "Id": [
-            "TradeGoods"
-          ]
+          "Id": ["TradeGoods"]
         }
       ]
     }

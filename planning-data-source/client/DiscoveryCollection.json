@@ -7,13 +7,7 @@
       "sortingOrder": "number",
       "discoveryCollectionType": "number",
       "collectionTargetType": "number",
-      "collectionTarget": [
-        "number",
-        "number",
-        "number",
-        "number",
-        "number"
-      ],
+      "collectionTarget": ["number", "number", "number", "number", "number"],
       "reward": "number"
     },
     ":required": {
@@ -28,9 +22,7 @@
     },
     ":enum": {},
     ":links": {
-      "reward": [
-        "RewardFixed"
-      ]
+      "reward": ["RewardFixed"]
     }
   },
   "DiscoveryCollection": {
@@ -41,13 +33,7 @@
       "sortingOrder": 0,
       "discoveryCollectionType": 0,
       "collectionTargetType": 0,
-      "collectionTarget": [
-        70414006,
-        70414085,
-        70414057,
-        70414082,
-        70414096
-      ],
+      "collectionTarget": [70414006, 70414085, 70414057, 70414082, 70414096],
       "reward": 94011001
     },
     "99900001": {
@@ -57,11 +43,7 @@
       "sortingOrder": 1,
       "discoveryCollectionType": 0,
       "collectionTargetType": 0,
-      "collectionTarget": [
-        70414005,
-        70414004,
-        70414045
-      ],
+      "collectionTarget": [70414005, 70414004, 70414045],
       "reward": 94011001
     },
     "99905000": {
@@ -71,10 +53,7 @@
       "sortingOrder": 2,
       "discoveryCollectionType": 0,
       "collectionTargetType": 1,
-      "collectionTarget": [
-        99900000,
-        99900001
-      ],
+      "collectionTarget": [99900000, 99900001],
       "reward": 94011001
     }
   }

@@ -11,7 +11,7 @@ sidebar_position: 3
 Gatrix는 기본적으로 다음 환경을 제공합니다:
 
 - **development** - 개발 환경
-- **staging** - 스테이징/QA 환경  
+- **staging** - 스테이징/QA 환경
 - **production** - 프로덕션 환경
 
 ## 환경별 피처 플래그 관리
@@ -19,6 +19,7 @@ Gatrix는 기본적으로 다음 환경을 제공합니다:
 각 환경에서 피처 플래그의 값을 독립적으로 설정할 수 있습니다.
 
 예를 들어, `new_feature` 플래그는:
+
 - **development**: `true` (개발자가 테스트)
 - **staging**: `true` (QA 팀이 검증)
 - **production**: `false` (아직 출시 전)
@@ -38,7 +39,7 @@ Gatrix는 기본적으로 다음 환경을 제공합니다:
 ```typescript
 const gatrix = new GatrixServerSDK({
   apiKey: 'your-api-key',
-  environment: 'production',  // 환경 지정
+  environment: 'production', // 환경 지정
 });
 
 const isEnabled = await gatrix.featureFlags.getBoolValue('new_feature');

@@ -8,32 +8,32 @@ const koOriginal = fs.readFileSync('src/locales/ko.json', 'utf8');
 function extractSection(text, sectionName) {
   const start = text.indexOf(`"${sectionName}": {`);
   if (start === -1) return null;
-  
+
   let depth = 0;
   let inString = false;
   let escape = false;
   let end = -1;
-  
+
   for (let i = start + `"${sectionName}": {`.length - 1; i < text.length; i++) {
     const char = text[i];
-    
+
     if (escape) {
       escape = false;
       continue;
     }
-    
+
     if (char === '\\') {
       escape = true;
       continue;
     }
-    
+
     if (char === '"') {
       inString = !inString;
       continue;
     }
-    
+
     if (inString) continue;
-    
+
     if (char === '{') {
       depth++;
     } else if (char === '}') {
@@ -44,9 +44,9 @@ function extractSection(text, sectionName) {
       }
     }
   }
-  
+
   if (end === -1) return null;
-  
+
   const section = text.substring(start, end + 1);
   try {
     const parsed = JSON.parse('{' + section + '}');
@@ -81,7 +81,7 @@ try {
 // Create new KO object with same key order as EN
 const newKo = {};
 
-Object.keys(en).forEach(key => {
+Object.keys(en).forEach((key) => {
   if (ko[key]) {
     // Use existing KO translation
     newKo[key] = ko[key];
@@ -113,4 +113,3 @@ fs.writeFileSync('src/locales/ko.json', JSON.stringify(newKo, null, 2), 'utf8');
 
 console.log('\n✅ Fixed ko.json successfully!');
 console.log('Total keys:', Object.keys(newKo).length);
-

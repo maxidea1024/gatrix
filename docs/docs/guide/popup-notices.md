@@ -25,16 +25,16 @@ Create in-game popup notices that appear when players log in or during gameplay.
 2. Click **Add Popup** button
 3. Configure the popup:
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| Enabled | Switch | - | Toggle popup visibility |
-| Title | Text | Required | Popup title |
-| Content | Rich Text | Required | Popup body content |
-| Image | Image Upload | - | Optional popup image |
-| Start Date | DateTime | - | When popup starts showing |
-| End Date | DateTime | - | When popup stops showing |
-| Display Frequency | Select | - | Once, Daily, Every login |
-| Target Segment | Select | - | Specific user segment |
+| Field             | Type         | Required | Description               |
+| ----------------- | ------------ | -------- | ------------------------- |
+| Enabled           | Switch       | -        | Toggle popup visibility   |
+| Title             | Text         | Required | Popup title               |
+| Content           | Rich Text    | Required | Popup body content        |
+| Image             | Image Upload | -        | Optional popup image      |
+| Start Date        | DateTime     | -        | When popup starts showing |
+| End Date          | DateTime     | -        | When popup stops showing  |
+| Display Frequency | Select       | -        | Once, Daily, Every login  |
+| Target Segment    | Select       | -        | Specific user segment     |
 
 4. Click **Create** to save
 
@@ -47,6 +47,7 @@ Create in-game popup notices that appear when players log in or during gameplay.
 ## Targeting
 
 You can target popups to specific user segments:
+
 - New users
 - Returning users
 - VIP users

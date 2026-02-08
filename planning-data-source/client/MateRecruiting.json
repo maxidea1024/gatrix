@@ -160,24 +160,16 @@
     ":links": {
       "contentsTerms": [
         {
-          "Id": [
-            "ContentsTerms"
-          ]
+          "Id": ["ContentsTerms"]
         }
       ],
-      "drinkPointId": [
-        "Point"
-      ],
+      "drinkPointId": ["Point"],
       "recruitPoint": [
         {
-          "Id": [
-            "Point"
-          ]
+          "Id": ["Point"]
         },
         {
-          "Id": [
-            "Point"
-          ]
+          "Id": ["Point"]
         }
       ]
     }

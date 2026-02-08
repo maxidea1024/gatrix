@@ -84,9 +84,7 @@
     },
     ":enum": {},
     ":links": {
-      "rewardId": [
-        "Reward"
-      ]
+      "rewardId": ["Reward"]
     }
   },
   "AdventureEventReward": {

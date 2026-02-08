@@ -12,13 +12,13 @@ console.log('EN keys:', enKeys.length);
 console.log('KO keys:', koKeys.length);
 
 // Find missing keys in KO
-const missingKeys = enKeys.filter(k => !koKeys.includes(k));
+const missingKeys = enKeys.filter((k) => !koKeys.includes(k));
 console.log('\nMissing keys in KO:', missingKeys);
 
 // Create new KO object with same key order as EN
 const newKo = {};
 
-enKeys.forEach(key => {
+enKeys.forEach((key) => {
   if (ko[key]) {
     // Use existing KO translation
     newKo[key] = ko[key];
@@ -33,5 +33,7 @@ enKeys.forEach(key => {
 fs.writeFileSync('src/locales/ko.json', JSON.stringify(newKo, null, 2), 'utf8');
 
 console.log('\n✅ Fixed ko.json - added', missingKeys.length, 'missing sections');
-console.log('⚠️  These sections are in English and need Korean translation:', missingKeys.join(', '));
-
+console.log(
+  '⚠️  These sections are in English and need Korean translation:',
+  missingKeys.join(', ')
+);

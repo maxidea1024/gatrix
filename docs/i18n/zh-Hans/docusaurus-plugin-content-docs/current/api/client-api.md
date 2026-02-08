@@ -25,9 +25,10 @@ GET /api/v1/client/client-version
 查询游戏客户端的版本信息。
 
 #### 查询参数
-| 参数 | 类型 | 说明 |
-|----------|------|------|
-| channel | string | 渠道筛选（例如：PC, Mobile） |
+
+| 参数       | 类型   | 说明                                   |
+| ---------- | ------ | -------------------------------------- |
+| channel    | string | 渠道筛选（例如：PC, Mobile）           |
 | subChannel | string | 子渠道筛选（例如：Steam, Google, iOS） |
 
 ### 2. 游戏世界列表

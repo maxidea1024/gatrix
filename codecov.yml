@@ -12,21 +12,21 @@ coverage:
         if_not_found: success
 
   ignore:
-    - "packages/*/dist"
-    - "packages/*/build"
-    - "packages/*/coverage"
-    - "packages/*/node_modules"
-    - "packages/*/*.config.*"
-    - "packages/*/src/test"
-    - "packages/*/cypress"
-    - "packages/backend/src/database/migrations"
-    - "packages/backend/src/config"
-    - "packages/backend/src/index.ts"
-    - "packages/frontend/src/main.tsx"
-    - "packages/frontend/src/vite-env.d.ts"
+    - 'packages/*/dist'
+    - 'packages/*/build'
+    - 'packages/*/coverage'
+    - 'packages/*/node_modules'
+    - 'packages/*/*.config.*'
+    - 'packages/*/src/test'
+    - 'packages/*/cypress'
+    - 'packages/backend/src/database/migrations'
+    - 'packages/backend/src/config'
+    - 'packages/backend/src/index.ts'
+    - 'packages/frontend/src/main.tsx'
+    - 'packages/frontend/src/vite-env.d.ts'
 
 comment:
-  layout: "reach,diff,flags,tree"
+  layout: 'reach,diff,flags,tree'
   behavior: default
   require_changes: false
 

@@ -187,106 +187,66 @@
     ":enum": {},
     ":asset": {},
     ":links": {
-      "nationId": [
-        "Nation"
-      ],
+      "nationId": ["Nation"],
       "character": [
         {
-          "Id": [
-            "Character"
-          ]
+          "Id": ["Character"]
         },
         {
-          "Id": [
-            "Character"
-          ]
+          "Id": ["Character"]
         }
       ],
       "dialogue": [
         {
-          "Id": [
-            "TownText"
-          ]
+          "Id": ["TownText"]
         },
         {
-          "Id": [
-            "TownText"
-          ]
+          "Id": ["TownText"]
         },
         {
-          "Id": [
-            "TownText"
-          ]
+          "Id": ["TownText"]
         },
         {
-          "Id": [
-            "TownText"
-          ]
+          "Id": ["TownText"]
         },
         {
-          "Id": [
-            "TownText"
-          ]
+          "Id": ["TownText"]
         },
         {
-          "Id": [
-            "TownText"
-          ]
+          "Id": ["TownText"]
         },
         {
-          "Id": [
-            "TownText"
-          ]
+          "Id": ["TownText"]
         },
         {
-          "Id": [
-            "TownText"
-          ]
+          "Id": ["TownText"]
         },
         {
-          "Id": [
-            "TownText"
-          ]
+          "Id": ["TownText"]
         },
         {
-          "Id": [
-            "TownText"
-          ]
+          "Id": ["TownText"]
         },
         {
-          "Id": [
-            "TownText"
-          ]
+          "Id": ["TownText"]
         },
         {
-          "Id": [
-            "TownText"
-          ]
+          "Id": ["TownText"]
         },
         {
-          "Id": [
-            "TownText"
-          ]
+          "Id": ["TownText"]
         },
         {
-          "Id": [
-            "TownText"
-          ]
+          "Id": ["TownText"]
         },
         {
-          "Id": [
-            "TownText"
-          ]
+          "Id": ["TownText"]
         },
         {
-          "Id": [
-            "TownText"
-          ]
+          "Id": ["TownText"]
         },
         {
-          "Id": [
-            "TownText"
-          ]
+          "Id": ["TownText"]
         }
       ]
     }

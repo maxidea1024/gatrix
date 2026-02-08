@@ -67,54 +67,22 @@
     },
     ":enum": {},
     ":links": {
-      "mateId": [
-        "Mate"
-      ],
-      "admiralAddress": [
-        "GlobalText"
-      ],
-      "kickEventRunBattle": [
-        "GlobalText"
-      ],
-      "employSpeech": [
-        "GlobalText"
-      ],
-      "levelUpDiaMsg": [
-        "GlobalText"
-      ],
-      "promotionDiaMsg": [
-        "GlobalText"
-      ],
-      "duelStart": [
-        "GlobalText"
-      ],
-      "duelStartAccept": [
-        "GlobalText"
-      ],
-      "duelStartRefuseAttacker": [
-        "GlobalText"
-      ],
-      "duelStartRefuseTarget": [
-        "GlobalText"
-      ],
-      "duelAttackerAttack": [
-        "GlobalText"
-      ],
-      "duelTargetDefense": [
-        "GlobalText"
-      ],
-      "duelTargetDamage": [
-        "GlobalText"
-      ],
-      "duelWin": [
-        "GlobalText"
-      ],
-      "duelLose": [
-        "GlobalText"
-      ],
-      "duelDraw": [
-        "GlobalText"
-      ]
+      "mateId": ["Mate"],
+      "admiralAddress": ["GlobalText"],
+      "kickEventRunBattle": ["GlobalText"],
+      "employSpeech": ["GlobalText"],
+      "levelUpDiaMsg": ["GlobalText"],
+      "promotionDiaMsg": ["GlobalText"],
+      "duelStart": ["GlobalText"],
+      "duelStartAccept": ["GlobalText"],
+      "duelStartRefuseAttacker": ["GlobalText"],
+      "duelStartRefuseTarget": ["GlobalText"],
+      "duelAttackerAttack": ["GlobalText"],
+      "duelTargetDefense": ["GlobalText"],
+      "duelTargetDamage": ["GlobalText"],
+      "duelWin": ["GlobalText"],
+      "duelLose": ["GlobalText"],
+      "duelDraw": ["GlobalText"]
     }
   },
   "GlobalTalk": {

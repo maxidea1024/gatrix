@@ -70,24 +70,16 @@
     ":links": {
       "specialStat": [
         {
-          "StatId": [
-            "SpecialStat"
-          ]
+          "StatId": ["SpecialStat"]
         },
         {
-          "StatId": [
-            "SpecialStat"
-          ]
+          "StatId": ["SpecialStat"]
         },
         {
-          "StatId": [
-            "SpecialStat"
-          ]
+          "StatId": ["SpecialStat"]
         },
         {
-          "StatId": [
-            "SpecialStat"
-          ]
+          "StatId": ["SpecialStat"]
         }
       ]
     }

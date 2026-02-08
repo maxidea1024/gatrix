@@ -2,64 +2,32 @@
   ":AutoMatePassiveFixed": {
     ":type": {
       "id": "key",
-      "beforePassivesId": [
-        "number",
-        "number"
-      ],
+      "beforePassivesId": ["number", "number"],
       "clearQuestId": "number",
-      "afterPassivesId": [
-        "number",
-        "number"
-      ]
+      "afterPassivesId": ["number", "number"]
     },
     ":required": {},
     ":requiredInObject": {},
     ":min": {
-      "beforePassivesId": [
-        1,
-        1
-      ],
+      "beforePassivesId": [1, 1],
       "clearQuestId": 82000000,
-      "afterPassivesId": [
-        1,
-        1
-      ]
+      "afterPassivesId": [1, 1]
     },
     ":max": {
-      "beforePassivesId": [
-        99999999,
-        99999999
-      ],
+      "beforePassivesId": [99999999, 99999999],
       "clearQuestId": 82999999,
-      "afterPassivesId": [
-        99999999,
-        99999999
-      ]
+      "afterPassivesId": [99999999, 99999999]
     },
     ":enum": {},
     ":links": {
       "beforePassivesId": [
-        [
-          "BattlePassive",
-          "WorldPassive"
-        ],
-        [
-          "BattlePassive",
-          "WorldPassive"
-        ]
+        ["BattlePassive", "WorldPassive"],
+        ["BattlePassive", "WorldPassive"]
       ],
-      "clearQuestId": [
-        "Quest"
-      ],
+      "clearQuestId": ["Quest"],
       "afterPassivesId": [
-        [
-          "BattlePassive",
-          "WorldPassive"
-        ],
-        [
-          "BattlePassive",
-          "WorldPassive"
-        ]
+        ["BattlePassive", "WorldPassive"],
+        ["BattlePassive", "WorldPassive"]
       ]
     }
   },

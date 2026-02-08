@@ -1,5 +1,4 @@
-
-exports.up = async function(connection) {
+exports.up = async function (connection) {
   console.log('Starting Remote Config Final System migration...');
 
   console.log('Creating Remote Config system tables...');
@@ -215,7 +214,7 @@ exports.up = async function(connection) {
   console.log('Remote Config Final System migration completed successfully!');
 };
 
-exports.down = async function(connection) {
+exports.down = async function (connection) {
   console.log('Rolling back Remote Config Final System migration...');
 
   const tables = [
@@ -225,7 +224,7 @@ exports.down = async function(connection) {
     'g_remote_config_change_requests',
     'g_remote_config_template_versions',
     'g_remote_config_templates',
-    'g_environments'
+    'g_environments',
   ];
 
   for (const table of tables) {

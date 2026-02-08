@@ -1,6 +1,6 @@
 /**
  * Migration: Create user environments table
- * 
+ *
  * Creates g_user_environments table for user-environment access mapping.
  * - Admin users can have allowAllEnvironments = true
  * - Regular users need explicit environment assignments
@@ -73,4 +73,3 @@ async function down(connection) {
 }
 
 module.exports = { up, down };
-

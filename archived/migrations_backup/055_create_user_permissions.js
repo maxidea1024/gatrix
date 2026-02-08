@@ -52,7 +52,7 @@ module.exports = {
 
       if (existingPerms[0].cnt === 0) {
         // Insert all permissions for admin user
-        const values = ALL_PERMISSIONS.map(p => `(${adminUserId}, '${p}')`).join(', ');
+        const values = ALL_PERMISSIONS.map((p) => `(${adminUserId}, '${p}')`).join(', ');
         await db.query(`INSERT INTO g_user_permissions (userId, permission) VALUES ${values}`);
         console.log(`Seeded ${ALL_PERMISSIONS.length} permissions to admin@gatrix.com`);
       } else {
@@ -68,6 +68,5 @@ module.exports = {
   async down(db) {
     await db.query('DROP TABLE IF EXISTS g_user_permissions');
     console.log('Dropped g_user_permissions table');
-  }
+  },
 };
-

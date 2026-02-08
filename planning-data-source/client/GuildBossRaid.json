@@ -15,12 +15,7 @@
       "repBattleType": "number",
       "recordHP": "number",
       "guildLevelRequired": "number",
-      "bossRaidBuffId": [
-        "number",
-        "number",
-        "number",
-        "number"
-      ],
+      "bossRaidBuffId": ["number", "number", "number", "number"],
       "mainRewardId": "number",
       "targetOceanNpc": "number",
       "ticketId": "number",
@@ -58,12 +53,7 @@
       "openGuildResourceId": 150000,
       "repBattleType": 1,
       "recordHP": 0,
-      "bossRaidBuffId": [
-        57070000,
-        57070000,
-        57070000,
-        57070000
-      ],
+      "bossRaidBuffId": [57070000, 57070000, 57070000, 57070000],
       "mainRewardId": 90000000,
       "targetOceanNpc": 15000000,
       "ticketId": 57030000,
@@ -77,12 +67,7 @@
       "openGuildResourceId": 199999,
       "repBattleType": 4,
       "recordHP": 2,
-      "bossRaidBuffId": [
-        57079999,
-        57079999,
-        57079999,
-        57079999
-      ],
+      "bossRaidBuffId": [57079999, 57079999, 57079999, 57079999],
       "mainRewardId": 90999999,
       "targetOceanNpc": 15099999,
       "ticketId": 57039999,
@@ -93,47 +78,16 @@
     },
     ":enum": {},
     ":links": {
-      "mateId": [
-        "Mate"
-      ],
-      "openGuildResourceId": [
-        "GuildResource"
-      ],
-      "bossRaidBuffId": [
-        [
-          "BossRaidBuff"
-        ],
-        [
-          "BossRaidBuff"
-        ],
-        [
-          "BossRaidBuff"
-        ],
-        [
-          "BossRaidBuff"
-        ]
-      ],
-      "mainRewardId": [
-        "Reward"
-      ],
-      "targetOceanNpc": [
-        "OceanNpc"
-      ],
-      "ticketId": [
-        "BossRaidTicket"
-      ],
-      "mailIdDefeat": [
-        "Mail"
-      ],
-      "mailIdLose": [
-        "Mail"
-      ],
-      "rewardDefeat": [
-        "Reward"
-      ],
-      "rewardLose": [
-        "Reward"
-      ]
+      "mateId": ["Mate"],
+      "openGuildResourceId": ["GuildResource"],
+      "bossRaidBuffId": [["BossRaidBuff"], ["BossRaidBuff"], ["BossRaidBuff"], ["BossRaidBuff"]],
+      "mainRewardId": ["Reward"],
+      "targetOceanNpc": ["OceanNpc"],
+      "ticketId": ["BossRaidTicket"],
+      "mailIdDefeat": ["Mail"],
+      "mailIdLose": ["Mail"],
+      "rewardDefeat": ["Reward"],
+      "rewardLose": ["Reward"]
     }
   },
   "GuildBossRaid": {
@@ -152,12 +106,7 @@
       "repBattleType": 1,
       "recordHP": 1,
       "guildLevelRequired": 3,
-      "bossRaidBuffId": [
-        57070000,
-        57070001,
-        57070002,
-        57070003
-      ],
+      "bossRaidBuffId": [57070000, 57070001, 57070002, 57070003],
       "mainRewardId": 90120505,
       "targetOceanNpc": 15019100,
       "ticketId": 57031000,
@@ -187,12 +136,7 @@
       "repBattleType": 1,
       "recordHP": 1,
       "guildLevelRequired": 5,
-      "bossRaidBuffId": [
-        57070000,
-        57070001,
-        57070002,
-        57070003
-      ],
+      "bossRaidBuffId": [57070000, 57070001, 57070002, 57070003],
       "mainRewardId": 90120513,
       "targetOceanNpc": 15019101,
       "ticketId": 57031000,
@@ -222,12 +166,7 @@
       "repBattleType": 1,
       "recordHP": 1,
       "guildLevelRequired": 7,
-      "bossRaidBuffId": [
-        57070000,
-        57070001,
-        57070002,
-        57070003
-      ],
+      "bossRaidBuffId": [57070000, 57070001, 57070002, 57070003],
       "mainRewardId": 90120521,
       "targetOceanNpc": 15019102,
       "ticketId": 57031000,
@@ -257,12 +196,7 @@
       "repBattleType": 1,
       "recordHP": 1,
       "guildLevelRequired": 9,
-      "bossRaidBuffId": [
-        57070000,
-        57070001,
-        57070002,
-        57070003
-      ],
+      "bossRaidBuffId": [57070000, 57070001, 57070002, 57070003],
       "mainRewardId": 90120529,
       "targetOceanNpc": 15019103,
       "ticketId": 57031000,
@@ -292,12 +226,7 @@
       "repBattleType": 1,
       "recordHP": 1,
       "guildLevelRequired": 11,
-      "bossRaidBuffId": [
-        57070000,
-        57070001,
-        57070002,
-        57070003
-      ],
+      "bossRaidBuffId": [57070000, 57070001, 57070002, 57070003],
       "mainRewardId": 90120537,
       "targetOceanNpc": 15019104,
       "ticketId": 57031000,
@@ -327,12 +256,7 @@
       "repBattleType": 4,
       "recordHP": 2,
       "guildLevelRequired": 3,
-      "bossRaidBuffId": [
-        57070000,
-        57070001,
-        57070002,
-        57070003
-      ],
+      "bossRaidBuffId": [57070000, 57070001, 57070002, 57070003],
       "mainRewardId": 90120921,
       "targetOceanNpc": 15019109,
       "ticketId": 57031001,
@@ -362,12 +286,7 @@
       "repBattleType": 4,
       "recordHP": 2,
       "guildLevelRequired": 5,
-      "bossRaidBuffId": [
-        57070000,
-        57070001,
-        57070002,
-        57070003
-      ],
+      "bossRaidBuffId": [57070000, 57070001, 57070002, 57070003],
       "mainRewardId": 90120929,
       "targetOceanNpc": 15019110,
       "ticketId": 57031001,
@@ -397,12 +316,7 @@
       "repBattleType": 4,
       "recordHP": 2,
       "guildLevelRequired": 7,
-      "bossRaidBuffId": [
-        57070000,
-        57070001,
-        57070002,
-        57070003
-      ],
+      "bossRaidBuffId": [57070000, 57070001, 57070002, 57070003],
       "mainRewardId": 90120937,
       "targetOceanNpc": 15019111,
       "ticketId": 57031001,
@@ -432,12 +346,7 @@
       "repBattleType": 4,
       "recordHP": 2,
       "guildLevelRequired": 9,
-      "bossRaidBuffId": [
-        57070000,
-        57070001,
-        57070002,
-        57070003
-      ],
+      "bossRaidBuffId": [57070000, 57070001, 57070002, 57070003],
       "mainRewardId": 90120945,
       "targetOceanNpc": 15019112,
       "ticketId": 57031001,
@@ -467,12 +376,7 @@
       "repBattleType": 4,
       "recordHP": 2,
       "guildLevelRequired": 11,
-      "bossRaidBuffId": [
-        57070000,
-        57070001,
-        57070002,
-        57070003
-      ],
+      "bossRaidBuffId": [57070000, 57070001, 57070002, 57070003],
       "mainRewardId": 90120953,
       "targetOceanNpc": 15019113,
       "ticketId": 57031001,

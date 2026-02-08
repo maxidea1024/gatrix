@@ -1,6 +1,7 @@
 # Error Response Standardization Plan
 
 ## Overview
+
 Standardize error responses across all backend services to use a consistent format:
 
 ```json
@@ -14,6 +15,7 @@ Standardize error responses across all backend services to use a consistent form
 ```
 
 ## Utility Created
+
 - `packages/backend/src/utils/apiResponse.ts` - Contains:
   - `ErrorCodes` - Standard error code constants
   - `sendErrorResponse()` - Main error response function
@@ -22,6 +24,7 @@ Standardize error responses across all backend services to use a consistent form
 ## Files to Update
 
 ### High Priority (Controllers)
+
 - [ ] `controllers/ServiceNoticeController.ts`
 - [ ] `controllers/ServiceDiscoveryController.ts`
 - [ ] `controllers/ServiceDiscoveryConfigController.ts`
@@ -46,6 +49,7 @@ Standardize error responses across all backend services to use a consistent form
 - [ ] `controllers/ServerLifecycleController.ts`
 
 ### Medium Priority (Routes)
+
 - [ ] `routes/mails.ts`
 - [ ] `routes/server/serviceDiscovery.ts`
 - [ ] `routes/public/serviceNotices.ts`
@@ -54,23 +58,27 @@ Standardize error responses across all backend services to use a consistent form
 - [ ] `routes/admin/notifications.ts`
 
 ### Medium Priority (Middleware)
+
 - [ ] `middleware/environmentResolver.ts`
 - [ ] `middleware/environmentMiddleware.ts`
 - [ ] `middleware/apiTokenAuth.ts`
 - [ ] `middleware/auth.ts`
 
 ### Other Packages
+
 - [ ] `packages/edge/src/**` - Edge service
 - [ ] `packages/chat-server/src/**` - Chat server
 - [ ] `packages/event-lens/src/**` - Event lens service
 
 ## Error Code Guidelines
+
 1. Use specific error codes (e.g., `GAME_WORLD_NOT_FOUND` instead of `NOT_FOUND`)
 2. Use `INTERNAL_SERVER_ERROR` only as a last resort when the error is truly unidentifiable
 3. Always include a meaningful human-readable message
 4. Log internal errors with full stack traces for debugging
 
 ## Migration Steps
+
 1. Import `apiResponse` utilities in each file
 2. Replace `res.status(XXX).json({ error: ... })` with appropriate helper functions
 3. Ensure error codes are specific and meaningful
@@ -79,6 +87,7 @@ Standardize error responses across all backend services to use a consistent form
 ## Example Conversion
 
 ### Before
+
 ```typescript
 catch (error) {
   res.status(500).json({
@@ -92,6 +101,7 @@ catch (error) {
 ```
 
 ### After
+
 ```typescript
 import { sendInternalError, ErrorCodes } from '../utils/apiResponse';
 

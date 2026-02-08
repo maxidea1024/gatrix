@@ -17,23 +17,23 @@ API 토큰 관리 페이지의 전체 화면입니다.
 
 ### 상단 툴바 버튼 설명
 
-| 버튼 | 설명 |
-|------|------|
+| 버튼          | 설명                          |
+| ------------- | ----------------------------- |
 | **토큰 생성** | 새로운 API 토큰을 생성합니다. |
 
 ### 테이블 컬럼 설명
 
-| 컬럼 | 설명 |
-|------|------|
-| **토큰 이름** | 토큰 식별용 이름 |
-| **토큰 유형** | API / Edge |
-| **환경** | 적용 환경 (dev, staging, production 등) |
-| **설명** | 토큰 용도 설명 |
-| **사용 횟수** | 토큰이 사용된 횟수 |
-| **마지막 사용일** | 최근 사용 일시 |
-| **만료일** | 토큰 만료 예정일 |
-| **생성일** | 토큰 생성 일시 |
-| **작업** | 복사, ✏️ 편집, 🔄 재생성, 🗑️ 삭제 버튼 |
+| 컬럼              | 설명                                    |
+| ----------------- | --------------------------------------- |
+| **토큰 이름**     | 토큰 식별용 이름                        |
+| **토큰 유형**     | API / Edge                              |
+| **환경**          | 적용 환경 (dev, staging, production 등) |
+| **설명**          | 토큰 용도 설명                          |
+| **사용 횟수**     | 토큰이 사용된 횟수                      |
+| **마지막 사용일** | 최근 사용 일시                          |
+| **만료일**        | 토큰 만료 예정일                        |
+| **생성일**        | 토큰 생성 일시                          |
+| **작업**          | 복사, ✏️ 편집, 🔄 재생성, 🗑️ 삭제 버튼  |
 
 ---
 
@@ -47,11 +47,12 @@ API 토큰 관리 페이지의 전체 화면입니다.
 flowchart LR
     A[게임 서버] -->|Server Token| B[Gatrix Backend API]
     B --> C[데이터 조회/수정]
-    
+
     style B fill:#e3f2fd
 ```
 
 **용도:**
+
 - 점검 상태 조회
 - 공지사항 조회
 - 쿠폰 검증
@@ -65,9 +66,10 @@ Edge 서버가 Gatrix Edge API를 호출할 때 사용합니다.
 flowchart LR
     A[게임 클라이언트] --> B[Edge 서버]
     B -->|Edge Token| C[Gatrix Edge API]
-    
+
     style C fill:#c8e6c9
 ```
+
 - 게임 월드 목록 조회
 - 실시간 설정 조회
 
@@ -79,13 +81,13 @@ flowchart LR
 
 ### 입력 항목
 
-| 항목 | 필수 | 설명 |
-|------|:----:|------|
-| 이름 | ✅ | 토큰 식별용 이름 (예: game-server-prod) |
-| 유형 | ✅ | API / Edge 선택 |
-| 환경 | ✅ | 적용 환경 선택 |
-| 설명 | | 토큰 용도 메모 |
-| 만료일 | | 토큰 유효 기간 (비워두면 무기한) |
+| 항목   | 필수 | 설명                                    |
+| ------ | :--: | --------------------------------------- |
+| 이름   |  ✅  | 토큰 식별용 이름 (예: game-server-prod) |
+| 유형   |  ✅  | API / Edge 선택                         |
+| 환경   |  ✅  | 적용 환경 선택                          |
+| 설명   |      | 토큰 용도 메모                          |
+| 만료일 |      | 토큰 유효 기간 (비워두면 무기한)        |
 
 ---
 
@@ -100,7 +102,7 @@ flowchart TD
     A[토큰 생성] --> B[전체 값 표시<br/>⚠️ 이때만 복사 가능!]
     B --> C[환경변수에 저장]
     C --> D[안전한 곳에 백업]
-    
+
     style B fill:#fff9c4
 ```
 
@@ -121,11 +123,11 @@ flowchart TD
 
 보안을 위해 환경별로 별도의 토큰을 사용하는 것이 좋습니다.
 
-| 환경 | 토큰 예시 | 보안 수준 |
-|------|----------|:--------:|
-| **Development** | dev-api-token | 🟢 낮음 |
-| **Staging** | staging-api-token | 🟡 중간 |
-| **Production** | prod-api-token | 🔴 높음 |
+| 환경            | 토큰 예시         | 보안 수준 |
+| --------------- | ----------------- | :-------: |
+| **Development** | dev-api-token     |  🟢 낮음  |
+| **Staging**     | staging-api-token |  🟡 중간  |
+| **Production**  | prod-api-token    |  🔴 높음  |
 
 > **💡 원칙:** Production 토큰은 최소한의 인원만 접근 가능하도록 관리하세요.
 
@@ -148,9 +150,9 @@ const GATRIX_API_TOKEN = process.env.GATRIX_API_TOKEN;
 
 const response = await fetch('https://api.gatrix.com/v1/game-worlds', {
   headers: {
-    'Authorization': `Bearer ${GATRIX_API_TOKEN}`,
-    'Content-Type': 'application/json'
-  }
+    Authorization: `Bearer ${GATRIX_API_TOKEN}`,
+    'Content-Type': 'application/json',
+  },
 });
 ```
 
@@ -179,6 +181,7 @@ A: 토큰 유출 또는 시스템 오류의 징후일 수 있습니다. 감사 �
 ## 8. 동영상 가이드
 
 ### API 토큰 관리 전체 흐름
+
 <video width="100%" controls>
   <source src="videos/07-apitokens.mp4" type="video/mp4">
   브라우저가 비디오를 지원하지 않습니다.
@@ -187,4 +190,3 @@ A: 토큰 유출 또는 시스템 오류의 징후일 수 있습니다. 감사 �
 ---
 
 **이전 장:** [← 제 15장: 감사 로그](15-audit-logs.md)
-

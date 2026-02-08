@@ -39,11 +39,11 @@ services.AddGatrixServerSDK(config =>
     config.GatrixUrl = "https://api.gatrix.com";
     config.ApiToken = "your-server-api-token";
     config.ApplicationName = "your-app-name";
-    
+
     // Optional: Configure cache
     config.Cache.RefreshMethod = CacheRefreshMethod.Polling;
     config.Cache.Ttl = 300;
-    
+
     // Optional: Configure logger
     config.Logger.Level = LogLevel.Information;
     config.Logger.TimeOffset = 9; // +09:00 (Korea)
@@ -75,7 +75,7 @@ services.AddGatrixServerSDK(config =>
     config.GatrixUrl = "https://api.gatrix.com";
     config.ApiToken = "your-server-api-token";
     config.ApplicationName = "your-app-name";
-    
+
     // Configure Redis
     config.Redis = new RedisConfig
     {
@@ -83,7 +83,7 @@ services.AddGatrixServerSDK(config =>
         Port = 6379,
         Password = "your-redis-password" // optional
     };
-    
+
     // Use event-based refresh
     config.Cache.RefreshMethod = CacheRefreshMethod.Event;
 });
@@ -94,6 +94,7 @@ services.AddGatrixServerSDK(config =>
 ### Cache Refresh Methods
 
 **1. Polling (Default)**
+
 - Periodically refreshes cache at fixed intervals
 - No Redis required
 
@@ -103,6 +104,7 @@ config.Cache.Ttl = 300; // Refresh every 300 seconds
 ```
 
 **2. Event-Based (Real-time)**
+
 - Refreshes cache immediately when backend sends events
 - Requires Redis for PubSub
 
@@ -112,6 +114,7 @@ config.Redis = new RedisConfig { Host = "localhost", Port = 6379 };
 ```
 
 **3. Manual**
+
 - No automatic cache refresh
 - Manual refresh only
 
@@ -245,6 +248,7 @@ Console.WriteLine($"External address: {response.ExternalAddress}");
 ```
 
 **Notes:**
+
 - `hostname` is optional; if omitted, `Environment.MachineName` will be used
 - `internalAddress` is optional; if omitted, the first non-internal IPv4 address will be used
 - `externalAddress` is auto-detected by the backend from the request IP
@@ -252,4 +256,3 @@ Console.WriteLine($"External address: {response.ExternalAddress}");
 ## License
 
 MIT
-

@@ -61,11 +61,13 @@ ADMIN_PASSWORD=admin123
 ### 5. Start Infrastructure
 
 **Option A: Docker infrastructure only (recommended)**
+
 ```bash
 yarn infra:up
 ```
 
 **Option B: Full Docker environment**
+
 ```bash
 docker compose -f docker-compose.dev.yml up -d
 ```
@@ -96,20 +98,20 @@ docker compose -f docker-compose.dev.yml up -d
 
 ### Included Services
 
-| Service | Container | Port |
-|---------|-----------|------|
-| MySQL | gatrix-mysql-dev | 43306 |
-| Redis | gatrix-redis-dev | 46379 |
-| etcd | gatrix-etcd-dev | (internal) |
-| ClickHouse | gatrix-clickhouse-dev | 48123, 49000 |
-| Backend | gatrix-backend-dev | 45000 |
-| Frontend | gatrix-frontend-dev | 43000 |
-| Edge | gatrix-edge-dev | 3400 |
-| Chat Server | gatrix-chat-server-dev | 45100 |
-| Event Lens | gatrix-event-lens-dev | 45200 |
-| Loki | gatrix-loki-dev | 43100 |
-| Prometheus | gatrix-prometheus-dev | 49090 |
-| Grafana | gatrix-grafana-dev | 44000 |
+| Service     | Container              | Port         |
+| ----------- | ---------------------- | ------------ |
+| MySQL       | gatrix-mysql-dev       | 43306        |
+| Redis       | gatrix-redis-dev       | 46379        |
+| etcd        | gatrix-etcd-dev        | (internal)   |
+| ClickHouse  | gatrix-clickhouse-dev  | 48123, 49000 |
+| Backend     | gatrix-backend-dev     | 45000        |
+| Frontend    | gatrix-frontend-dev    | 43000        |
+| Edge        | gatrix-edge-dev        | 3400         |
+| Chat Server | gatrix-chat-server-dev | 45100        |
+| Event Lens  | gatrix-event-lens-dev  | 45200        |
+| Loki        | gatrix-loki-dev        | 43100        |
+| Prometheus  | gatrix-prometheus-dev  | 49090        |
+| Grafana     | gatrix-grafana-dev     | 44000        |
 
 ## Production Deployment
 

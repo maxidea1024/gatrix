@@ -36,8 +36,11 @@ export class AuditLogModel {
         if (!isPrimaryValid) {
           // Special mappings for primary event replacement
           if (primaryEventType === 'game_world_toggle_maintenance' && auditData.newValues) {
-            const isActive = auditData.newValues.isMaintenance === true || auditData.newValues.isMaintenance === 1;
-            primaryEventType = isActive ? 'game_world_maintenance_on' : 'game_world_maintenance_off';
+            const isActive =
+              auditData.newValues.isMaintenance === true || auditData.newValues.isMaintenance === 1;
+            primaryEventType = isActive
+              ? 'game_world_maintenance_on'
+              : 'game_world_maintenance_off';
             isPrimaryValid = ALL_INTEGRATION_EVENTS.includes(primaryEventType as any);
           } else if (primaryEventType === 'game_world_toggle_visibility') {
             primaryEventType = 'game_world_visibility_changed';
@@ -59,9 +62,19 @@ export class AuditLogModel {
         }
 
         // 2. Check for side-effect events (e.g. Client Version Maintenance)
-        if (auditData.action === 'client_version_update' && auditData.newValues && auditData.oldValues) {
-          const newStatus = typeof auditData.newValues === 'string' ? JSON.parse(auditData.newValues).clientStatus : auditData.newValues.clientStatus;
-          const oldStatus = typeof auditData.oldValues === 'string' ? JSON.parse(auditData.oldValues).clientStatus : auditData.oldValues.clientStatus;
+        if (
+          auditData.action === 'client_version_update' &&
+          auditData.newValues &&
+          auditData.oldValues
+        ) {
+          const newStatus =
+            typeof auditData.newValues === 'string'
+              ? JSON.parse(auditData.newValues).clientStatus
+              : auditData.newValues.clientStatus;
+          const oldStatus =
+            typeof auditData.oldValues === 'string'
+              ? JSON.parse(auditData.oldValues).clientStatus
+              : auditData.oldValues.clientStatus;
 
           if (newStatus && oldStatus) {
             if (newStatus === 'MAINTENANCE' && oldStatus !== 'MAINTENANCE') {
@@ -83,14 +96,19 @@ export class AuditLogModel {
         for (const eventType of uniqueEvents) {
           // Construct event data from newValues and other audit info
           const eventData: Record<string, any> = {
-            ...(typeof auditData.newValues === 'string' ? JSON.parse(auditData.newValues) : (auditData.newValues || {})),
+            ...(typeof auditData.newValues === 'string'
+              ? JSON.parse(auditData.newValues)
+              : auditData.newValues || {}),
             resourceId: auditData.resourceId,
             resourceType: auditData.resourceType,
           };
 
           // Add oldValues if present
           if (auditData.oldValues) {
-            eventData.oldValues = typeof auditData.oldValues === 'string' ? JSON.parse(auditData.oldValues) : auditData.oldValues;
+            eventData.oldValues =
+              typeof auditData.oldValues === 'string'
+                ? JSON.parse(auditData.oldValues)
+                : auditData.oldValues;
           }
 
           await IntegrationService.handleEvent({

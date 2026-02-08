@@ -1,1 +1,96 @@
-"use strict";(globalThis.webpackChunkdocs=globalThis.webpackChunkdocs||[]).push([[7442],{4672(e,n,t){t.r(n),t.d(n,{assets:()=>d,contentTitle:()=>c,default:()=>u,frontMatter:()=>o,metadata:()=>i,toc:()=>a});const i=JSON.parse('{"id":"admin/client-versions","title":"?\ufffd\ub77c?\ufffd\uc5b8??\ubc84\uc804","description":"??\ubc84\uc804??\uad00\ub9ac\ud569?\ufffd\ub2e4.","source":"@site/docs/admin/client-versions.md","sourceDirName":"admin","slug":"/admin/client-versions","permalink":"/docs/ko/admin/client-versions","draft":false,"unlisted":false,"editUrl":"https://github.com/your-org/gatrix/tree/main/docs/docs/admin/client-versions.md","tags":[],"version":"current","sidebarPosition":4,"frontMatter":{"sidebar_position":4},"sidebar":"tutorialSidebar","previous":{"title":"\uac8c\uc784 ?\ufffd\ub4dc","permalink":"/docs/ko/admin/game-worlds"},"next":{"title":"?\ufffd\uc6a9??\uad00\ufffd?","permalink":"/docs/ko/admin/users"}}');var s=t(4848),r=t(8453);const o={sidebar_position:4},c="?\ufffd\ub77c?\ufffd\uc5b8??\ubc84\uc804",d={},a=[{value:"\uae30\ub2a5",id:"\uae30\ub2a5",level:2}];function l(e){const n={h1:"h1",h2:"h2",header:"header",li:"li",p:"p",ul:"ul",...(0,r.R)(),...e.components};return(0,s.jsxs)(s.Fragment,{children:[(0,s.jsx)(n.header,{children:(0,s.jsx)(n.h1,{id:"\ub77c\uc5b8\ubc84\uc804",children:"?\ufffd\ub77c?\ufffd\uc5b8??\ubc84\uc804"})}),"\n",(0,s.jsx)(n.p,{children:"??\ubc84\uc804??\uad00\ub9ac\ud569?\ufffd\ub2e4."}),"\n",(0,s.jsx)(n.h2,{id:"\uae30\ub2a5",children:"\uae30\ub2a5"}),"\n",(0,s.jsxs)(n.ul,{children:["\n",(0,s.jsx)(n.li,{children:"\ucd5c\uc18c \uc9c0??\ubc84\uc804 ?\ufffd\uc815"}),"\n",(0,s.jsx)(n.li,{children:"\uac15\uc81c ?\ufffd\ub370?\ufffd\ud2b8 ?\ufffd\uc815"}),"\n",(0,s.jsx)(n.li,{children:"\ubc84\uc804\ufffd?\uacf5\ufffd?"}),"\n"]})]})}function u(e={}){const{wrapper:n}={...(0,r.R)(),...e.components};return n?(0,s.jsx)(n,{...e,children:(0,s.jsx)(l,{...e})}):l(e)}},8453(e,n,t){t.d(n,{R:()=>o,x:()=>c});var i=t(6540);const s={},r=i.createContext(s);function o(e){const n=i.useContext(r);return i.useMemo(function(){return"function"==typeof e?e(n):{...n,...e}},[n,e])}function c(e){let n;return n=e.disableParentContext?"function"==typeof e.components?e.components(s):e.components||s:o(e.components),i.createElement(r.Provider,{value:n},e.children)}}}]);
+'use strict';
+(globalThis.webpackChunkdocs = globalThis.webpackChunkdocs || []).push([
+  [7442],
+  {
+    4672(e, n, t) {
+      (t.r(n),
+        t.d(n, {
+          assets: () => d,
+          contentTitle: () => c,
+          default: () => u,
+          frontMatter: () => o,
+          metadata: () => i,
+          toc: () => a,
+        }));
+      const i = JSON.parse(
+        '{"id":"admin/client-versions","title":"?\ufffd\ub77c?\ufffd\uc5b8??\ubc84\uc804","description":"??\ubc84\uc804??\uad00\ub9ac\ud569?\ufffd\ub2e4.","source":"@site/docs/admin/client-versions.md","sourceDirName":"admin","slug":"/admin/client-versions","permalink":"/docs/ko/admin/client-versions","draft":false,"unlisted":false,"editUrl":"https://github.com/your-org/gatrix/tree/main/docs/docs/admin/client-versions.md","tags":[],"version":"current","sidebarPosition":4,"frontMatter":{"sidebar_position":4},"sidebar":"tutorialSidebar","previous":{"title":"\uac8c\uc784 ?\ufffd\ub4dc","permalink":"/docs/ko/admin/game-worlds"},"next":{"title":"?\ufffd\uc6a9??\uad00\ufffd?","permalink":"/docs/ko/admin/users"}}'
+      );
+      var s = t(4848),
+        r = t(8453);
+      const o = { sidebar_position: 4 },
+        c = '?\ufffd\ub77c?\ufffd\uc5b8??\ubc84\uc804',
+        d = {},
+        a = [{ value: '\uae30\ub2a5', id: '\uae30\ub2a5', level: 2 }];
+      function l(e) {
+        const n = {
+          h1: 'h1',
+          h2: 'h2',
+          header: 'header',
+          li: 'li',
+          p: 'p',
+          ul: 'ul',
+          ...(0, r.R)(),
+          ...e.components,
+        };
+        return (0, s.jsxs)(s.Fragment, {
+          children: [
+            (0, s.jsx)(n.header, {
+              children: (0, s.jsx)(n.h1, {
+                id: '\ub77c\uc5b8\ubc84\uc804',
+                children: '?\ufffd\ub77c?\ufffd\uc5b8??\ubc84\uc804',
+              }),
+            }),
+            '\n',
+            (0, s.jsx)(n.p, { children: '??\ubc84\uc804??\uad00\ub9ac\ud569?\ufffd\ub2e4.' }),
+            '\n',
+            (0, s.jsx)(n.h2, { id: '\uae30\ub2a5', children: '\uae30\ub2a5' }),
+            '\n',
+            (0, s.jsxs)(n.ul, {
+              children: [
+                '\n',
+                (0, s.jsx)(n.li, { children: '\ucd5c\uc18c \uc9c0??\ubc84\uc804 ?\ufffd\uc815' }),
+                '\n',
+                (0, s.jsx)(n.li, {
+                  children: '\uac15\uc81c ?\ufffd\ub370?\ufffd\ud2b8 ?\ufffd\uc815',
+                }),
+                '\n',
+                (0, s.jsx)(n.li, { children: '\ubc84\uc804\ufffd?\uacf5\ufffd?' }),
+                '\n',
+              ],
+            }),
+          ],
+        });
+      }
+      function u(e = {}) {
+        const { wrapper: n } = { ...(0, r.R)(), ...e.components };
+        return n ? (0, s.jsx)(n, { ...e, children: (0, s.jsx)(l, { ...e }) }) : l(e);
+      }
+    },
+    8453(e, n, t) {
+      t.d(n, { R: () => o, x: () => c });
+      var i = t(6540);
+      const s = {},
+        r = i.createContext(s);
+      function o(e) {
+        const n = i.useContext(r);
+        return i.useMemo(
+          function () {
+            return 'function' == typeof e ? e(n) : { ...n, ...e };
+          },
+          [n, e]
+        );
+      }
+      function c(e) {
+        let n;
+        return (
+          (n = e.disableParentContext
+            ? 'function' == typeof e.components
+              ? e.components(s)
+              : e.components || s
+            : o(e.components)),
+          i.createElement(r.Provider, { value: n }, e.children)
+        );
+      }
+    },
+  },
+]);

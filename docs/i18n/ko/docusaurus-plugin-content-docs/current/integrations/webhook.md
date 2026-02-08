@@ -18,6 +18,7 @@ Gatrix 이벤트를 맞춤형 HTTP 엔드포인트로 전송합니다.
 ## 인증 지원
 
 웹훅은 다음 인증 방식을 지원합니다:
+
 - **없음** - 인증 없음
 - **Basic Auth** - 사용자 이름 및 비밀번호
 - **Bearer Token** - 토큰 방식
@@ -41,13 +42,13 @@ Gatrix 이벤트를 맞춤형 HTTP 엔드포인트로 전송합니다.
 
 ## 주요 이벤트
 
-| 이벤트 | 설명 |
-|-------|-------------|
+| 이벤트                 | 설명          |
+| ---------------------- | ------------- |
 | `feature_flag.created` | 플래그 생성됨 |
 | `feature_flag.updated` | 플래그 수정됨 |
 | `feature_flag.deleted` | 플래그 삭제됨 |
-| `maintenance.started` | 점검 시작됨 |
-| `maintenance.ended` | 점검 종료됨 |
+| `maintenance.started`  | 점검 시작됨   |
+| `maintenance.ended`    | 점검 종료됨   |
 
 ## 재시도 정책
 

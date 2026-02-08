@@ -9,20 +9,32 @@
  * - targetWorlds, targetWorldsInverted: World targeting
  */
 
-exports.up = async function(connection) {
+exports.up = async function (connection) {
   console.log('Adding missing columns to g_surveys table...');
 
   // List of columns to add with their definitions
   const columnsToAdd = [
     { name: 'rewardTemplateId', definition: 'VARCHAR(26) NULL COMMENT "Reward template ID"' },
     { name: 'targetPlatforms', definition: 'JSON NULL COMMENT "Target platforms"' },
-    { name: 'targetPlatformsInverted', definition: 'BOOLEAN DEFAULT FALSE COMMENT "Invert target platforms"' },
+    {
+      name: 'targetPlatformsInverted',
+      definition: 'BOOLEAN DEFAULT FALSE COMMENT "Invert target platforms"',
+    },
     { name: 'targetChannels', definition: 'JSON NULL COMMENT "Target channels"' },
-    { name: 'targetChannelsInverted', definition: 'BOOLEAN DEFAULT FALSE COMMENT "Invert target channels"' },
+    {
+      name: 'targetChannelsInverted',
+      definition: 'BOOLEAN DEFAULT FALSE COMMENT "Invert target channels"',
+    },
     { name: 'targetSubchannels', definition: 'JSON NULL COMMENT "Target subchannels"' },
-    { name: 'targetSubchannelsInverted', definition: 'BOOLEAN DEFAULT FALSE COMMENT "Invert target subchannels"' },
+    {
+      name: 'targetSubchannelsInverted',
+      definition: 'BOOLEAN DEFAULT FALSE COMMENT "Invert target subchannels"',
+    },
     { name: 'targetWorlds', definition: 'JSON NULL COMMENT "Target worlds"' },
-    { name: 'targetWorldsInverted', definition: 'BOOLEAN DEFAULT FALSE COMMENT "Invert target worlds"' },
+    {
+      name: 'targetWorldsInverted',
+      definition: 'BOOLEAN DEFAULT FALSE COMMENT "Invert target worlds"',
+    },
   ];
 
   // Check which columns already exist
@@ -33,8 +45,10 @@ exports.up = async function(connection) {
     AND TABLE_NAME = 'g_surveys'
   `);
 
-  const existingColumnNames = existingColumns.map(col => col.COLUMN_NAME);
-  const columnsToAddFiltered = columnsToAdd.filter(col => !existingColumnNames.includes(col.name));
+  const existingColumnNames = existingColumns.map((col) => col.COLUMN_NAME);
+  const columnsToAddFiltered = columnsToAdd.filter(
+    (col) => !existingColumnNames.includes(col.name)
+  );
 
   if (columnsToAddFiltered.length === 0) {
     console.log('✅ All required columns already exist in g_surveys table');
@@ -42,17 +56,21 @@ exports.up = async function(connection) {
   }
 
   // Build ALTER TABLE statement
-  const alterStatements = columnsToAddFiltered.map(col => `ADD COLUMN ${col.name} ${col.definition}`).join(', ');
+  const alterStatements = columnsToAddFiltered
+    .map((col) => `ADD COLUMN ${col.name} ${col.definition}`)
+    .join(', ');
 
   await connection.execute(`
     ALTER TABLE g_surveys
     ${alterStatements}
   `);
 
-  console.log(`✅ Added ${columnsToAddFiltered.length} missing columns to g_surveys table successfully`);
+  console.log(
+    `✅ Added ${columnsToAddFiltered.length} missing columns to g_surveys table successfully`
+  );
 };
 
-exports.down = async function(connection) {
+exports.down = async function (connection) {
   console.log('Removing added columns from g_surveys table...');
 
   const columnsToRemove = [
@@ -75,8 +93,10 @@ exports.down = async function(connection) {
     AND TABLE_NAME = 'g_surveys'
   `);
 
-  const existingColumnNames = existingColumns.map(col => col.COLUMN_NAME);
-  const columnsToRemoveFiltered = columnsToRemove.filter(col => existingColumnNames.includes(col));
+  const existingColumnNames = existingColumns.map((col) => col.COLUMN_NAME);
+  const columnsToRemoveFiltered = columnsToRemove.filter((col) =>
+    existingColumnNames.includes(col)
+  );
 
   if (columnsToRemoveFiltered.length === 0) {
     console.log('✅ No columns to remove from g_surveys table');
@@ -84,13 +104,14 @@ exports.down = async function(connection) {
   }
 
   // Build ALTER TABLE statement
-  const dropStatements = columnsToRemoveFiltered.map(col => `DROP COLUMN ${col}`).join(', ');
+  const dropStatements = columnsToRemoveFiltered.map((col) => `DROP COLUMN ${col}`).join(', ');
 
   await connection.execute(`
     ALTER TABLE g_surveys
     ${dropStatements}
   `);
 
-  console.log(`✅ Removed ${columnsToRemoveFiltered.length} columns from g_surveys table successfully`);
+  console.log(
+    `✅ Removed ${columnsToRemoveFiltered.length} columns from g_surveys table successfully`
+  );
 };
-

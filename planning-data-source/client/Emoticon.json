@@ -28,9 +28,7 @@
     },
     ":enum": {},
     ":links": {
-      "fxItemId": [
-        "Item"
-      ]
+      "fxItemId": ["Item"]
     }
   },
   "Emoticon": {

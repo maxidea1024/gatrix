@@ -25,10 +25,7 @@
           "Value": "number"
         }
       ],
-      "advSpcEff": [
-        "number",
-        "number"
-      ],
+      "advSpcEff": ["number", "number"],
       "addEventSpot": [
         {
           "Id": "number",
@@ -122,10 +119,7 @@
           "MathSign": 1
         }
       ],
-      "advSpcEff": [
-        77400000,
-        77400000
-      ],
+      "advSpcEff": [77400000, 77400000],
       "addEventSpot": [
         {
           "Id": 77200000
@@ -162,10 +156,7 @@
           "MathSign": 3
         }
       ],
-      "advSpcEff": [
-        77499999,
-        77499999
-      ],
+      "advSpcEff": [77499999, 77499999],
       "addEventSpot": [
         {
           "Id": 77299999
@@ -187,44 +178,25 @@
     },
     ":enum": {},
     ":links": {
-      "advSpcEff": [
-        [
-          "AdventureSpecialEffect"
-        ],
-        [
-          "AdventureSpecialEffect"
-        ]
-      ],
+      "advSpcEff": [["AdventureSpecialEffect"], ["AdventureSpecialEffect"]],
       "addEventSpot": [
         {
-          "Id": [
-            "AdventureEventSpot"
-          ]
+          "Id": ["AdventureEventSpot"]
         },
         {
-          "Id": [
-            "AdventureEventSpot"
-          ]
+          "Id": ["AdventureEventSpot"]
         },
         {
-          "Id": [
-            "AdventureEventSpot"
-          ]
+          "Id": ["AdventureEventSpot"]
         },
         {
-          "Id": [
-            "AdventureEventSpot"
-          ]
+          "Id": ["AdventureEventSpot"]
         },
         {
-          "Id": [
-            "AdventureEventSpot"
-          ]
+          "Id": ["AdventureEventSpot"]
         }
       ],
-      "eventMode": [
-        "AdventureEventMode"
-      ]
+      "eventMode": ["AdventureEventMode"]
     }
   },
   "LandFeature": {

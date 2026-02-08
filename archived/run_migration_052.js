@@ -4,13 +4,13 @@ const knex = require('knex')({
     host: 'gatrix-mysql-dev',
     user: 'root',
     password: 'root',
-    database: 'gatrix'
-  }
+    database: 'gatrix',
+  },
 });
 
 async function run() {
   const conn = await knex.client.pool.acquire().promise;
-  
+
   // Create g_user_environments table
   await conn.execute(`
     CREATE TABLE IF NOT EXISTS g_user_environments (
@@ -31,20 +31,26 @@ async function run() {
   // Check if column exists
   const [cols] = await conn.execute(`SHOW COLUMNS FROM g_users LIKE 'allowAllEnvironments'`);
   if (cols.length === 0) {
-    await conn.execute(`ALTER TABLE g_users ADD COLUMN allowAllEnvironments BOOLEAN NOT NULL DEFAULT FALSE`);
+    await conn.execute(
+      `ALTER TABLE g_users ADD COLUMN allowAllEnvironments BOOLEAN NOT NULL DEFAULT FALSE`
+    );
     console.log('Added allowAllEnvironments column');
   } else {
     console.log('allowAllEnvironments column already exists');
   }
 
   // Set for admin
-  await conn.execute(`UPDATE g_users SET allowAllEnvironments = TRUE WHERE email = 'admin@gatrix.com'`);
+  await conn.execute(
+    `UPDATE g_users SET allowAllEnvironments = TRUE WHERE email = 'admin@gatrix.com'`
+  );
   console.log('Set allowAllEnvironments for admin@gatrix.com');
-  
+
   knex.client.pool.release(conn);
   await knex.destroy();
   console.log('Migration complete');
 }
 
-run().catch(e => { console.error(e); process.exit(1); });
-
+run().catch((e) => {
+  console.error(e);
+  process.exit(1);
+});

@@ -1,9 +1,9 @@
-import crypto from "crypto";
-import { databaseManager } from "../config/database";
-import { CacheService } from "./CacheService";
-import { createLogger } from "../config/logger";
+import crypto from 'crypto';
+import { databaseManager } from '../config/database';
+import { CacheService } from './CacheService';
+import { createLogger } from '../config/logger';
 
-const logger = createLogger("ApiTokenService");
+const logger = createLogger('ApiTokenService');
 
 export interface ApiToken {
   id: string;
@@ -15,8 +15,8 @@ export interface ApiToken {
 }
 
 export class ApiTokenService {
-  private static readonly TOKEN_PREFIX = "gatrix-api-";
-  private static readonly CACHE_PREFIX = "api_token:";
+  private static readonly TOKEN_PREFIX = 'gatrix-api-';
+  private static readonly CACHE_PREFIX = 'api_token:';
   private static readonly CACHE_TTL = 3600; // 1시간 (초)
 
   /**
@@ -31,10 +31,10 @@ export class ApiTokenService {
    */
   static async generateToken(
     name: string,
-    permissions: string[] = ["read", "write"],
+    permissions: string[] = ['read', 'write']
   ): Promise<ApiToken> {
     const id = crypto.randomUUID();
-    const tokenSuffix = crypto.randomBytes(32).toString("hex");
+    const tokenSuffix = crypto.randomBytes(32).toString('hex');
     const token = `${this.TOKEN_PREFIX}${tokenSuffix}`;
 
     const apiToken: ApiToken = {
@@ -48,10 +48,10 @@ export class ApiTokenService {
 
     // 데이터베이스에 저장
     const db = databaseManager.getKnex();
-    await db("chat_api_tokens").insert({
+    await db('chat_api_tokens').insert({
       tokenName: name,
       tokenHash: token,
-      tokenType: "server",
+      tokenType: 'server',
       description: `Auto-generated token: ${name}`,
       permissions: JSON.stringify(permissions),
       createdAt: new Date(),
@@ -60,11 +60,7 @@ export class ApiTokenService {
     });
 
     // 캐시에 저장
-    await this.getCacheService().set(
-      `${this.CACHE_PREFIX}${token}`,
-      apiToken,
-      this.CACHE_TTL,
-    );
+    await this.getCacheService().set(`${this.CACHE_PREFIX}${token}`, apiToken, this.CACHE_TTL);
 
     logger.info(`API token generated: ${name}`);
     return apiToken;
@@ -76,14 +72,12 @@ export class ApiTokenService {
   static async verifyToken(token: string): Promise<ApiToken | null> {
     try {
       // 캐시에서 먼저 확인
-      let apiToken = await this.getCacheService().get<ApiToken>(
-        `${this.CACHE_PREFIX}${token}`,
-      );
+      let apiToken = await this.getCacheService().get<ApiToken>(`${this.CACHE_PREFIX}${token}`);
 
       if (!apiToken) {
         // 캐시에 없으면 데이터베이스에서 조회
         const db = databaseManager.getKnex();
-        const tokenData = await db("chat_api_tokens")
+        const tokenData = await db('chat_api_tokens')
           .where({ tokenHash: token, isActive: true })
           .first();
 
@@ -97,12 +91,10 @@ export class ApiTokenService {
           permissions = JSON.parse(tokenData.permissions);
         } catch (error) {
           // JSON 파싱 실패 시 문자열을 배열로 변환
-          if (typeof tokenData.permissions === "string") {
-            permissions = tokenData.permissions
-              .split(",")
-              .map((p: string) => p.trim());
+          if (typeof tokenData.permissions === 'string') {
+            permissions = tokenData.permissions.split(',').map((p: string) => p.trim());
           } else {
-            permissions = ["read"]; // 기본값
+            permissions = ['read']; // 기본값
           }
         }
 
@@ -116,16 +108,12 @@ export class ApiTokenService {
         };
 
         // 캐시에 저장
-        await this.getCacheService().set(
-          `${this.CACHE_PREFIX}${token}`,
-          apiToken,
-          this.CACHE_TTL,
-        );
+        await this.getCacheService().set(`${this.CACHE_PREFIX}${token}`, apiToken, this.CACHE_TTL);
       }
 
       return apiToken;
     } catch (error) {
-      logger.error("Error verifying API token:", error);
+      logger.error('Error verifying API token:', error);
       return null;
     }
   }
@@ -136,7 +124,7 @@ export class ApiTokenService {
   static async revokeToken(token: string): Promise<boolean> {
     try {
       const db = databaseManager.getKnex();
-      const result = await db("chat_api_tokens")
+      const result = await db('chat_api_tokens')
         .where({ tokenHash: token })
         .update({ isActive: false });
 
@@ -150,7 +138,7 @@ export class ApiTokenService {
       logger.info(`API token revoked: ${token}`);
       return true;
     } catch (error) {
-      logger.error("Error revoking API token:", error);
+      logger.error('Error revoking API token:', error);
       return false;
     }
   }
@@ -161,9 +149,9 @@ export class ApiTokenService {
   static async listTokens(): Promise<ApiToken[]> {
     try {
       const db = databaseManager.getKnex();
-      const tokenData = await db("chat_api_tokens")
+      const tokenData = await db('chat_api_tokens')
         .where({ isActive: true })
-        .orderBy("createdAt", "desc");
+        .orderBy('createdAt', 'desc');
 
       return tokenData.map((data: any) => {
         // permissions 안전 파싱
@@ -172,12 +160,10 @@ export class ApiTokenService {
           permissions = JSON.parse(data.permissions);
         } catch (error) {
           // JSON 파싱 실패 시 문자열을 배열로 변환
-          if (typeof data.permissions === "string") {
-            permissions = data.permissions
-              .split(",")
-              .map((p: string) => p.trim());
+          if (typeof data.permissions === 'string') {
+            permissions = data.permissions.split(',').map((p: string) => p.trim());
           } else {
-            permissions = ["read"]; // 기본값
+            permissions = ['read']; // 기본값
           }
         }
 
@@ -191,7 +177,7 @@ export class ApiTokenService {
         };
       });
     } catch (error) {
-      logger.error("Error listing API tokens:", error);
+      logger.error('Error listing API tokens:', error);
       return [];
     }
   }
@@ -200,13 +186,13 @@ export class ApiTokenService {
    * 기본 토큰 생성 (서버 시작 시)
    */
   static async ensureDefaultToken(): Promise<string> {
-    const defaultTokenName = "gatrix-backend-default";
+    const defaultTokenName = 'gatrix-backend-default';
 
     try {
       const db = databaseManager.getKnex();
 
       // 기본 토큰이 이미 있는지 확인
-      const existingToken = await db("chat_api_tokens")
+      const existingToken = await db('chat_api_tokens')
         .where({ tokenName: defaultTokenName, isActive: true })
         .first();
 
@@ -215,16 +201,12 @@ export class ApiTokenService {
       }
 
       // 기본 토큰 생성
-      const defaultToken = await this.generateToken(defaultTokenName, [
-        "read",
-        "write",
-        "admin",
-      ]);
+      const defaultToken = await this.generateToken(defaultTokenName, ['read', 'write', 'admin']);
       logger.info(`Default API token created: ${defaultToken.token}`);
 
       return defaultToken.token;
     } catch (error) {
-      logger.error("Error ensuring default token:", error);
+      logger.error('Error ensuring default token:', error);
       throw error;
     }
   }

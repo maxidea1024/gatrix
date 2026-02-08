@@ -1,9 +1,11 @@
 # 네트워크 기능 구현 계획
 
 ## 개요
+
 Unleash Network와 동일한 기능을 구현합니다. 어플리케이션별로 세그먼트와 플래그 정의를 몇 번 가져갔는지 1분 단위의 트래픽을 추적합니다.
 
 ## 기능 요구사항
+
 1. **네트워크 트래픽 추적**: SDK가 `/api/v1/server/:env/features` 및 `/api/v1/server/segments` API를 호출할 때마다 트래픽을 기록
 2. **1분 단위 집계**: 트래픽 데이터를 1분 단위로 집계하여 저장
 3. **어플리케이션별 분류**: `appName` 헤더를 기반으로 어플리케이션별 트래픽 분류
@@ -27,7 +29,7 @@ CREATE TABLE IF NOT EXISTS NetworkTraffic (
     requestCount INT NOT NULL DEFAULT 0,
     createdAt DATETIME DEFAULT UTC_TIMESTAMP(),
     updatedAt DATETIME DEFAULT UTC_TIMESTAMP() ON UPDATE UTC_TIMESTAMP(),
-    
+
     -- 인덱스
     INDEX idx_network_traffic_bucket (trafficBucket),
     INDEX idx_network_traffic_env_app (environment, appName),
@@ -41,20 +43,24 @@ CREATE TABLE IF NOT EXISTS NetworkTraffic (
 
 ```typescript
 class NetworkTrafficService {
-    // 트래픽 기록 (1분 버킷으로 집계)
-    async recordTraffic(environment: string, appName: string, endpoint: 'features' | 'segments'): Promise<void>
-    
-    // 특정 기간의 트래픽 조회
-    async getTraffic(params: {
-        environment?: string;
-        appName?: string;
-        startDate: Date;
-        endDate: Date;
-        groupBy?: 'minute' | 'hour' | 'day';
-    }): Promise<TrafficData[]>
-    
-    // 활성 어플리케이션 목록 조회
-    async getActiveApplications(environment?: string): Promise<string[]>
+  // 트래픽 기록 (1분 버킷으로 집계)
+  async recordTraffic(
+    environment: string,
+    appName: string,
+    endpoint: 'features' | 'segments'
+  ): Promise<void>;
+
+  // 특정 기간의 트래픽 조회
+  async getTraffic(params: {
+    environment?: string;
+    appName?: string;
+    startDate: Date;
+    endDate: Date;
+    groupBy?: 'minute' | 'hour' | 'day';
+  }): Promise<TrafficData[]>;
+
+  // 활성 어플리케이션 목록 조회
+  async getActiveApplications(environment?: string): Promise<string[]>;
 }
 ```
 
@@ -68,7 +74,7 @@ class NetworkTrafficService {
 
 ```typescript
 // getFeatureFlags 내부
-const appName = req.headers['x-application-name'] as string || 'unknown';
+const appName = (req.headers['x-application-name'] as string) || 'unknown';
 // Fire and forget - don't await
 networkTrafficService.recordTraffic(env, appName, 'features').catch(console.error);
 ```
@@ -90,6 +96,7 @@ async getNetworkApplications(req: Request, res: Response): Promise<void>
 ### Phase 5: 프론트엔드 - 라우팅 및 네비게이션
 
 **파일 수정**:
+
 1. `packages/frontend/src/config/navigation.tsx` - 네트워크 메뉴 추가
 2. `packages/frontend/src/App.tsx` - 라우트 추가
 3. `packages/frontend/src/locales/*.ini` - 로컬라이징 키 추가
@@ -104,6 +111,7 @@ async getNetworkApplications(req: Request, res: Response): Promise<void>
 **파일**: `packages/frontend/src/pages/game/FeatureNetworkPage.tsx`
 
 #### UI 구성요소:
+
 1. **필터 컨트롤**
    - 환경 선택 (토글 버튼)
    - 어플리케이션 선택 (토글 버튼)
@@ -128,23 +136,25 @@ async getNetworkApplications(req: Request, res: Response): Promise<void>
 ## 파일 목록
 
 ### 신규 생성 파일
-| 파일 | 설명 |
-|------|------|
-| `packages/backend/src/database/migrations/036_add_network_traffic_table.js` | 마이그레이션 |
-| `packages/backend/src/services/NetworkTrafficService.ts` | 트래픽 서비스 |
-| `packages/frontend/src/pages/game/FeatureNetworkPage.tsx` | 네트워크 페이지 |
+
+| 파일                                                                        | 설명            |
+| --------------------------------------------------------------------------- | --------------- |
+| `packages/backend/src/database/migrations/036_add_network_traffic_table.js` | 마이그레이션    |
+| `packages/backend/src/services/NetworkTrafficService.ts`                    | 트래픽 서비스   |
+| `packages/frontend/src/pages/game/FeatureNetworkPage.tsx`                   | 네트워크 페이지 |
 
 ### 수정 파일
-| 파일 | 설명 |
-|------|------|
-| `packages/backend/src/controllers/ServerFeatureFlagController.ts` | 트래픽 기록 추가 |
-| `packages/backend/src/controllers/AdminFeatureFlagController.ts` | Admin API 추가 |
-| `packages/backend/src/routes/admin.ts` | 라우트 추가 |
-| `packages/frontend/src/config/navigation.tsx` | 메뉴 추가 |
-| `packages/frontend/src/App.tsx` | 라우트 추가 |
-| `packages/frontend/src/locales/ko.ini` | 한국어 로컬라이징 |
-| `packages/frontend/src/locales/en.ini` | 영어 로컬라이징 |
-| `packages/frontend/src/locales/zh.ini` | 중국어 로컬라이징 |
+
+| 파일                                                              | 설명              |
+| ----------------------------------------------------------------- | ----------------- |
+| `packages/backend/src/controllers/ServerFeatureFlagController.ts` | 트래픽 기록 추가  |
+| `packages/backend/src/controllers/AdminFeatureFlagController.ts`  | Admin API 추가    |
+| `packages/backend/src/routes/admin.ts`                            | 라우트 추가       |
+| `packages/frontend/src/config/navigation.tsx`                     | 메뉴 추가         |
+| `packages/frontend/src/App.tsx`                                   | 라우트 추가       |
+| `packages/frontend/src/locales/ko.ini`                            | 한국어 로컬라이징 |
+| `packages/frontend/src/locales/en.ini`                            | 영어 로컬라이징   |
+| `packages/frontend/src/locales/zh.ini`                            | 중국어 로컬라이징 |
 
 ---
 
@@ -163,4 +173,5 @@ async getNetworkApplications(req: Request, res: Response): Promise<void>
 ---
 
 ## 예상 소요 시간
+
 - 전체 구현: 약 30-40분

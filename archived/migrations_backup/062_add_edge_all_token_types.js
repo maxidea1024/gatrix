@@ -6,7 +6,7 @@
  * - 'all': Token that works with both client and server SDKs
  */
 
-exports.up = async function(connection) {
+exports.up = async function (connection) {
   console.log('Adding edge and all token types to g_api_access_tokens...');
 
   try {
@@ -22,7 +22,7 @@ exports.up = async function(connection) {
   }
 };
 
-exports.down = async function(connection) {
+exports.down = async function (connection) {
   console.log('Reverting tokenType ENUM...');
 
   try {
@@ -42,4 +42,3 @@ exports.down = async function(connection) {
     throw error;
   }
 };
-

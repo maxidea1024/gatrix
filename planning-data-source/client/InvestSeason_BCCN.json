@@ -3,9 +3,7 @@
     ":type": {
       "id": "key",
       "name": "text",
-      "nameFormatTexts": [
-        "text"
-      ],
+      "nameFormatTexts": ["text"],
       "seasonNumber": "number",
       "seasonName": "text",
       "numberImage": "string",
@@ -32,11 +30,7 @@
           "Description": "text"
         }
       ],
-      "seasonRewardItemId": [
-        "number",
-        "number",
-        "number"
-      ],
+      "seasonRewardItemId": ["number", "number", "number"],
       "investRewardItemId": "number",
       "viewRankingReward": "bool",
       "rankingRewardGroup": "number",
@@ -67,16 +61,7 @@
       ],
       "viewRankingReward": 1,
       "rankingRewardGroup": 1,
-      "nationRankingRewardGroup": [
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1
-      ]
+      "nationRankingRewardGroup": [1, 1, 1, 1, 1, 1, 1, 1]
     },
     ":requiredInObject": {},
     ":min": {},
@@ -84,53 +69,31 @@
     ":enum": {},
     ":asset": {},
     ":links": {
-      "startSE": [
-        "SoundEvent"
-      ],
+      "startSE": ["SoundEvent"],
       "investItems": [
         {
-          "Id": [
-            "Item"
-          ]
+          "Id": ["Item"]
         },
         {
-          "Id": [
-            "Item"
-          ]
+          "Id": ["Item"]
         },
         {
-          "Id": [
-            "Item"
-          ]
+          "Id": ["Item"]
         }
       ],
       "seasonRewardItemId": [
-        [
-          "Point",
-          "Item"
-        ],
-        [
-          "Point",
-          "Item"
-        ],
-        [
-          "Point",
-          "Item"
-        ]
+        ["Point", "Item"],
+        ["Point", "Item"],
+        ["Point", "Item"]
       ],
-      "investRewardItemId": [
-        "Point",
-        "Item"
-      ]
+      "investRewardItemId": ["Point", "Item"]
     }
   },
   "InvestSeason": {
     "100070001": {
       "id": 100070001,
       "name": "투자 시즌 {0}",
-      "nameFormatTexts": [
-        "1"
-      ],
+      "nameFormatTexts": ["1"],
       "seasonNumber": 1,
       "seasonName": "북해의 연맹",
       "numberImage": "WT_SeasonStartNum_1_Sprite",
@@ -157,33 +120,18 @@
           "Description": "순위 보상, 이벤트 보상, 투자 상자에서 매우 낮은 확률로 획득할 수 있습니다."
         }
       ],
-      "seasonRewardItemId": [
-        100003,
-        23340192,
-        23401006
-      ],
+      "seasonRewardItemId": [100003, 23340192, 23401006],
       "investRewardItemId": 23401006,
       "viewRankingReward": false,
       "rankingRewardGroup": 1000,
-      "nationRankingRewardGroup": [
-        1001,
-        1002,
-        1003,
-        1004,
-        1005,
-        1006,
-        1007,
-        1008
-      ],
+      "nationRankingRewardGroup": [1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008],
       "titleImage": "WT_InfoHeadTitle_Season01_Sprite",
       "BGImage": "WT_InfoHeadBG_Season5_Sprite"
     },
     "100070002": {
       "id": 100070002,
       "name": "투자 시즌 {0}",
-      "nameFormatTexts": [
-        "2"
-      ],
+      "nameFormatTexts": ["2"],
       "seasonNumber": 2,
       "seasonName": "인도양의 패자",
       "numberImage": "WT_SeasonStartNum_2_Sprite",
@@ -209,33 +157,18 @@
           "Description": "순위 보상, 이벤트 보상, 투자 상자에서 매우 낮은 확률로 획득할 수 있습니다."
         }
       ],
-      "seasonRewardItemId": [
-        100003,
-        23710175,
-        23401010
-      ],
+      "seasonRewardItemId": [100003, 23710175, 23401010],
       "investRewardItemId": 23401010,
       "viewRankingReward": false,
       "rankingRewardGroup": 1000,
-      "nationRankingRewardGroup": [
-        1001,
-        1002,
-        1003,
-        1004,
-        1005,
-        1006,
-        1007,
-        1008
-      ],
+      "nationRankingRewardGroup": [1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008],
       "titleImage": "WT_InfoHeadTitle_Season02_Sprite",
       "BGImage": "WT_InfoHeadBG_Season3_Sprite"
     },
     "100070003": {
       "id": 100070003,
       "name": "투자 시즌 {0}",
-      "nameFormatTexts": [
-        "3"
-      ],
+      "nameFormatTexts": ["3"],
       "seasonNumber": 3,
       "seasonName": "황금의 시대",
       "numberImage": "WT_SeasonStartNum_3_Sprite",
@@ -261,24 +194,11 @@
           "Description": "순위 보상, 이벤트 보상, 투자 상자에서 매우 낮은 확률로 획득할 수 있습니다."
         }
       ],
-      "seasonRewardItemId": [
-        100003,
-        23810004,
-        23401014
-      ],
+      "seasonRewardItemId": [100003, 23810004, 23401014],
       "investRewardItemId": 23401014,
       "viewRankingReward": false,
       "rankingRewardGroup": 1000,
-      "nationRankingRewardGroup": [
-        1001,
-        1002,
-        1003,
-        1004,
-        1005,
-        1006,
-        1007,
-        1008
-      ],
+      "nationRankingRewardGroup": [1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008],
       "titleImage": "WT_InfoHeadTitle_Season3_Sprite",
       "BGImage": "WT_InfoHeadBG_Season3_Sprite"
     }

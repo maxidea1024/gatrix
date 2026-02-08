@@ -1,1 +1,330 @@
-"use strict";(globalThis.webpackChunkdocs=globalThis.webpackChunkdocs||[]).push([[552],{357(e,n,r){r.r(n),r.d(n,{assets:()=>c,contentTitle:()=>l,default:()=>a,frontMatter:()=>d,metadata:()=>i,toc:()=>h});const i=JSON.parse('{"id":"integrations/overview","title":"\uc678\ubd80 \uc5f0\ub3d9 \uac1c\uc694","description":"Gatrix\ub97c \ub2e4\uc591\ud55c \uc678\ubd80 \uc11c\ube44\uc2a4\uc640 \uc5f0\uacb0\ud569\ub2c8\ub2e4.","source":"@site/i18n/ko/docusaurus-plugin-content-docs/current/integrations/overview.md","sourceDirName":"integrations","slug":"/integrations/overview","permalink":"/docs/ko/integrations/overview","draft":false,"unlisted":false,"editUrl":"https://github.com/your-org/gatrix/tree/main/docs/docs/integrations/overview.md","tags":[],"version":"current","sidebarPosition":1,"frontMatter":{"sidebar_position":1,"sidebar_label":"\uac1c\uc694"},"sidebar":"tutorialSidebar","previous":{"title":"\uc0ac\uc6a9\uc790 \uad00\ub9ac","permalink":"/docs/ko/admin/users"},"next":{"title":"Slack","permalink":"/docs/ko/integrations/slack"}}');var s=r(4848),t=r(8453);const d={sidebar_position:1,sidebar_label:"\uac1c\uc694"},l="\uc678\ubd80 \uc5f0\ub3d9 \uac1c\uc694",c={},h=[{value:"\uc9c0\uc6d0\ub418\ub294 \uc5f0\ub3d9 \uc11c\ube44\uc2a4",id:"\uc9c0\uc6d0\ub418\ub294-\uc5f0\ub3d9-\uc11c\ube44\uc2a4",level:2},{value:"\uc5f0\ub3d9 \uc720\ud615",id:"\uc5f0\ub3d9-\uc720\ud615",level:2},{value:"\uc54c\ub9bc \uc5f0\ub3d9",id:"\uc54c\ub9bc-\uc5f0\ub3d9",level:3},{value:"\ubaa8\ub2c8\ud130\ub9c1 \uc5f0\ub3d9",id:"\ubaa8\ub2c8\ud130\ub9c1-\uc5f0\ub3d9",level:3},{value:"\uc5f0\ub3d9 \uc124\uc815 \ubc29\ubc95",id:"\uc5f0\ub3d9-\uc124\uc815-\ubc29\ubc95",level:2},{value:"\uc8fc\uc694 \uc774\ubca4\ud2b8",id:"\uc8fc\uc694-\uc774\ubca4\ud2b8",level:2}];function o(e){const n={a:"a",code:"code",h1:"h1",h2:"h2",h3:"h3",header:"header",li:"li",ol:"ol",p:"p",strong:"strong",table:"table",tbody:"tbody",td:"td",th:"th",thead:"thead",tr:"tr",ul:"ul",...(0,t.R)(),...e.components};return(0,s.jsxs)(s.Fragment,{children:[(0,s.jsx)(n.header,{children:(0,s.jsx)(n.h1,{id:"\uc678\ubd80-\uc5f0\ub3d9-\uac1c\uc694",children:"\uc678\ubd80 \uc5f0\ub3d9 \uac1c\uc694"})}),"\n",(0,s.jsx)(n.p,{children:"Gatrix\ub97c \ub2e4\uc591\ud55c \uc678\ubd80 \uc11c\ube44\uc2a4\uc640 \uc5f0\uacb0\ud569\ub2c8\ub2e4."}),"\n",(0,s.jsx)(n.h2,{id:"\uc9c0\uc6d0\ub418\ub294-\uc5f0\ub3d9-\uc11c\ube44\uc2a4",children:"\uc9c0\uc6d0\ub418\ub294 \uc5f0\ub3d9 \uc11c\ube44\uc2a4"}),"\n",(0,s.jsxs)(n.table,{children:[(0,s.jsx)(n.thead,{children:(0,s.jsxs)(n.tr,{children:[(0,s.jsx)(n.th,{children:"\uc11c\ube44\uc2a4"}),(0,s.jsx)(n.th,{children:"\uc124\uba85"})]})}),(0,s.jsxs)(n.tbody,{children:[(0,s.jsxs)(n.tr,{children:[(0,s.jsx)(n.td,{children:(0,s.jsx)(n.a,{href:"./slack",children:"Slack"})}),(0,s.jsx)(n.td,{children:"Slack \ucc44\ub110\ub85c \uc54c\ub9bc \uc804\uc1a1"})]}),(0,s.jsxs)(n.tr,{children:[(0,s.jsx)(n.td,{children:(0,s.jsx)(n.a,{href:"./teams",children:"Microsoft Teams"})}),(0,s.jsx)(n.td,{children:"Teams \ucc44\ub110\ub85c \uc54c\ub9bc \uc804\uc1a1"})]}),(0,s.jsxs)(n.tr,{children:[(0,s.jsx)(n.td,{children:(0,s.jsx)(n.a,{href:"./webhook",children:"Webhook"})}),(0,s.jsx)(n.td,{children:"\ub9de\ucda4\ud615 HTTP \uc6f9\ud6c5 \uc804\uc1a1"})]}),(0,s.jsxs)(n.tr,{children:[(0,s.jsx)(n.td,{children:(0,s.jsx)(n.a,{href:"./new-relic",children:"New Relic"})}),(0,s.jsx)(n.td,{children:"APM \ubc0f \ubaa8\ub2c8\ud130\ub9c1 \ub370\uc774\ud130 \uc5f0\ub3d9"})]})]})]}),"\n",(0,s.jsx)(n.h2,{id:"\uc5f0\ub3d9-\uc720\ud615",children:"\uc5f0\ub3d9 \uc720\ud615"}),"\n",(0,s.jsx)(n.h3,{id:"\uc54c\ub9bc-\uc5f0\ub3d9",children:"\uc54c\ub9bc \uc5f0\ub3d9"}),"\n",(0,s.jsx)(n.p,{children:"Gatrix\uc5d0\uc11c \uc774\ubca4\ud2b8\uac00 \ubc1c\uc0dd\ud560 \ub54c \uc54c\ub9bc\uc744 \ubc1b\uc2b5\ub2c8\ub2e4:"}),"\n",(0,s.jsxs)(n.ul,{children:["\n",(0,s.jsx)(n.li,{children:"\ud53c\ucc98 \ud50c\ub798\uadf8 \ubcc0\uacbd"}),"\n",(0,s.jsx)(n.li,{children:"\uc810\uac80 \uc0c1\ud0dc \uc5c5\ub370\uc774\ud2b8"}),"\n",(0,s.jsx)(n.li,{children:"\uc2dc\uc2a4\ud15c \uc624\ub958 \uc54c\ub9bc"}),"\n"]}),"\n",(0,s.jsx)(n.h3,{id:"\ubaa8\ub2c8\ud130\ub9c1-\uc5f0\ub3d9",children:"\ubaa8\ub2c8\ud130\ub9c1 \uc5f0\ub3d9"}),"\n",(0,s.jsx)(n.p,{children:"\ubaa8\ub2c8\ud130\ub9c1 \ud50c\ub7ab\ud3fc\uc73c\ub85c \uba54\ud2b8\ub9ad \ubc0f \ucd94\uc801 \ub370\uc774\ud130\ub97c \ub0b4\ubcf4\ub0c5\ub2c8\ub2e4."}),"\n",(0,s.jsx)(n.h2,{id:"\uc5f0\ub3d9-\uc124\uc815-\ubc29\ubc95",children:"\uc5f0\ub3d9 \uc124\uc815 \ubc29\ubc95"}),"\n",(0,s.jsxs)(n.ol,{children:["\n",(0,s.jsxs)(n.li,{children:[(0,s.jsx)(n.strong,{children:"\uc124\uc815"})," > ",(0,s.jsx)(n.strong,{children:"\uc678\ubd80 \uc5f0\ub3d9"}),"\uc73c\ub85c \uc774\ub3d9\ud569\ub2c8\ub2e4."]}),"\n",(0,s.jsx)(n.li,{children:"\uc6d0\ud558\ub294 \uc11c\ube44\uc2a4\ub97c \ud074\ub9ad\ud569\ub2c8\ub2e4."}),"\n",(0,s.jsx)(n.li,{children:"\uc124\uc815 \uc548\ub0b4\ub97c \ub530\ub985\ub2c8\ub2e4."}),"\n",(0,s.jsx)(n.li,{children:"\uc5f0\uacb0\uc744 \ud14c\uc2a4\ud2b8\ud569\ub2c8\ub2e4."}),"\n",(0,s.jsx)(n.li,{children:"\uad6c\uc131\uc744 \uc800\uc7a5\ud569\ub2c8\ub2e4."}),"\n"]}),"\n",(0,s.jsx)(n.h2,{id:"\uc8fc\uc694-\uc774\ubca4\ud2b8",children:"\uc8fc\uc694 \uc774\ubca4\ud2b8"}),"\n",(0,s.jsx)(n.p,{children:"\ub2e4\uc74c\uc5d0 \uc758\ud574 \uc5f0\ub3d9\uc774 \ud2b8\ub9ac\uac70\ub420 \uc218 \uc788\uc2b5\ub2c8\ub2e4:"}),"\n",(0,s.jsxs)(n.table,{children:[(0,s.jsx)(n.thead,{children:(0,s.jsxs)(n.tr,{children:[(0,s.jsx)(n.th,{children:"\uc774\ubca4\ud2b8"}),(0,s.jsx)(n.th,{children:"\uc124\uba85"})]})}),(0,s.jsxs)(n.tbody,{children:[(0,s.jsxs)(n.tr,{children:[(0,s.jsx)(n.td,{children:(0,s.jsx)(n.code,{children:"feature_flag.created"})}),(0,s.jsx)(n.td,{children:"\uc0c8 \ud50c\ub798\uadf8 \uc0dd\uc131\ub428"})]}),(0,s.jsxs)(n.tr,{children:[(0,s.jsx)(n.td,{children:(0,s.jsx)(n.code,{children:"feature_flag.updated"})}),(0,s.jsx)(n.td,{children:"\ud50c\ub798\uadf8 \uac12\uc774 \ubcc0\uacbd\ub428"})]}),(0,s.jsxs)(n.tr,{children:[(0,s.jsx)(n.td,{children:(0,s.jsx)(n.code,{children:"feature_flag.deleted"})}),(0,s.jsx)(n.td,{children:"\ud50c\ub798\uadf8 \uc0ad\uc81c\ub428"})]}),(0,s.jsxs)(n.tr,{children:[(0,s.jsx)(n.td,{children:(0,s.jsx)(n.code,{children:"maintenance.started"})}),(0,s.jsx)(n.td,{children:"\uc810\uac80\uc774 \uc2dc\uc791\ub428"})]}),(0,s.jsxs)(n.tr,{children:[(0,s.jsx)(n.td,{children:(0,s.jsx)(n.code,{children:"maintenance.ended"})}),(0,s.jsx)(n.td,{children:"\uc810\uac80\uc774 \uc644\ub8cc\ub428"})]})]})]})]})}function a(e={}){const{wrapper:n}={...(0,t.R)(),...e.components};return n?(0,s.jsx)(n,{...e,children:(0,s.jsx)(o,{...e})}):o(e)}},8453(e,n,r){r.d(n,{R:()=>d,x:()=>l});var i=r(6540);const s={},t=i.createContext(s);function d(e){const n=i.useContext(t);return i.useMemo(function(){return"function"==typeof e?e(n):{...n,...e}},[n,e])}function l(e){let n;return n=e.disableParentContext?"function"==typeof e.components?e.components(s):e.components||s:d(e.components),i.createElement(t.Provider,{value:n},e.children)}}}]);
+'use strict';
+(globalThis.webpackChunkdocs = globalThis.webpackChunkdocs || []).push([
+  [552],
+  {
+    357(e, n, r) {
+      (r.r(n),
+        r.d(n, {
+          assets: () => c,
+          contentTitle: () => l,
+          default: () => a,
+          frontMatter: () => d,
+          metadata: () => i,
+          toc: () => h,
+        }));
+      const i = JSON.parse(
+        '{"id":"integrations/overview","title":"\uc678\ubd80 \uc5f0\ub3d9 \uac1c\uc694","description":"Gatrix\ub97c \ub2e4\uc591\ud55c \uc678\ubd80 \uc11c\ube44\uc2a4\uc640 \uc5f0\uacb0\ud569\ub2c8\ub2e4.","source":"@site/i18n/ko/docusaurus-plugin-content-docs/current/integrations/overview.md","sourceDirName":"integrations","slug":"/integrations/overview","permalink":"/docs/ko/integrations/overview","draft":false,"unlisted":false,"editUrl":"https://github.com/your-org/gatrix/tree/main/docs/docs/integrations/overview.md","tags":[],"version":"current","sidebarPosition":1,"frontMatter":{"sidebar_position":1,"sidebar_label":"\uac1c\uc694"},"sidebar":"tutorialSidebar","previous":{"title":"\uc0ac\uc6a9\uc790 \uad00\ub9ac","permalink":"/docs/ko/admin/users"},"next":{"title":"Slack","permalink":"/docs/ko/integrations/slack"}}'
+      );
+      var s = r(4848),
+        t = r(8453);
+      const d = { sidebar_position: 1, sidebar_label: '\uac1c\uc694' },
+        l = '\uc678\ubd80 \uc5f0\ub3d9 \uac1c\uc694',
+        c = {},
+        h = [
+          {
+            value: '\uc9c0\uc6d0\ub418\ub294 \uc5f0\ub3d9 \uc11c\ube44\uc2a4',
+            id: '\uc9c0\uc6d0\ub418\ub294-\uc5f0\ub3d9-\uc11c\ube44\uc2a4',
+            level: 2,
+          },
+          { value: '\uc5f0\ub3d9 \uc720\ud615', id: '\uc5f0\ub3d9-\uc720\ud615', level: 2 },
+          { value: '\uc54c\ub9bc \uc5f0\ub3d9', id: '\uc54c\ub9bc-\uc5f0\ub3d9', level: 3 },
+          {
+            value: '\ubaa8\ub2c8\ud130\ub9c1 \uc5f0\ub3d9',
+            id: '\ubaa8\ub2c8\ud130\ub9c1-\uc5f0\ub3d9',
+            level: 3,
+          },
+          {
+            value: '\uc5f0\ub3d9 \uc124\uc815 \ubc29\ubc95',
+            id: '\uc5f0\ub3d9-\uc124\uc815-\ubc29\ubc95',
+            level: 2,
+          },
+          {
+            value: '\uc8fc\uc694 \uc774\ubca4\ud2b8',
+            id: '\uc8fc\uc694-\uc774\ubca4\ud2b8',
+            level: 2,
+          },
+        ];
+      function o(e) {
+        const n = {
+          a: 'a',
+          code: 'code',
+          h1: 'h1',
+          h2: 'h2',
+          h3: 'h3',
+          header: 'header',
+          li: 'li',
+          ol: 'ol',
+          p: 'p',
+          strong: 'strong',
+          table: 'table',
+          tbody: 'tbody',
+          td: 'td',
+          th: 'th',
+          thead: 'thead',
+          tr: 'tr',
+          ul: 'ul',
+          ...(0, t.R)(),
+          ...e.components,
+        };
+        return (0, s.jsxs)(s.Fragment, {
+          children: [
+            (0, s.jsx)(n.header, {
+              children: (0, s.jsx)(n.h1, {
+                id: '\uc678\ubd80-\uc5f0\ub3d9-\uac1c\uc694',
+                children: '\uc678\ubd80 \uc5f0\ub3d9 \uac1c\uc694',
+              }),
+            }),
+            '\n',
+            (0, s.jsx)(n.p, {
+              children:
+                'Gatrix\ub97c \ub2e4\uc591\ud55c \uc678\ubd80 \uc11c\ube44\uc2a4\uc640 \uc5f0\uacb0\ud569\ub2c8\ub2e4.',
+            }),
+            '\n',
+            (0, s.jsx)(n.h2, {
+              id: '\uc9c0\uc6d0\ub418\ub294-\uc5f0\ub3d9-\uc11c\ube44\uc2a4',
+              children: '\uc9c0\uc6d0\ub418\ub294 \uc5f0\ub3d9 \uc11c\ube44\uc2a4',
+            }),
+            '\n',
+            (0, s.jsxs)(n.table, {
+              children: [
+                (0, s.jsx)(n.thead, {
+                  children: (0, s.jsxs)(n.tr, {
+                    children: [
+                      (0, s.jsx)(n.th, { children: '\uc11c\ube44\uc2a4' }),
+                      (0, s.jsx)(n.th, { children: '\uc124\uba85' }),
+                    ],
+                  }),
+                }),
+                (0, s.jsxs)(n.tbody, {
+                  children: [
+                    (0, s.jsxs)(n.tr, {
+                      children: [
+                        (0, s.jsx)(n.td, {
+                          children: (0, s.jsx)(n.a, { href: './slack', children: 'Slack' }),
+                        }),
+                        (0, s.jsx)(n.td, {
+                          children: 'Slack \ucc44\ub110\ub85c \uc54c\ub9bc \uc804\uc1a1',
+                        }),
+                      ],
+                    }),
+                    (0, s.jsxs)(n.tr, {
+                      children: [
+                        (0, s.jsx)(n.td, {
+                          children: (0, s.jsx)(n.a, {
+                            href: './teams',
+                            children: 'Microsoft Teams',
+                          }),
+                        }),
+                        (0, s.jsx)(n.td, {
+                          children: 'Teams \ucc44\ub110\ub85c \uc54c\ub9bc \uc804\uc1a1',
+                        }),
+                      ],
+                    }),
+                    (0, s.jsxs)(n.tr, {
+                      children: [
+                        (0, s.jsx)(n.td, {
+                          children: (0, s.jsx)(n.a, { href: './webhook', children: 'Webhook' }),
+                        }),
+                        (0, s.jsx)(n.td, {
+                          children: '\ub9de\ucda4\ud615 HTTP \uc6f9\ud6c5 \uc804\uc1a1',
+                        }),
+                      ],
+                    }),
+                    (0, s.jsxs)(n.tr, {
+                      children: [
+                        (0, s.jsx)(n.td, {
+                          children: (0, s.jsx)(n.a, { href: './new-relic', children: 'New Relic' }),
+                        }),
+                        (0, s.jsx)(n.td, {
+                          children:
+                            'APM \ubc0f \ubaa8\ub2c8\ud130\ub9c1 \ub370\uc774\ud130 \uc5f0\ub3d9',
+                        }),
+                      ],
+                    }),
+                  ],
+                }),
+              ],
+            }),
+            '\n',
+            (0, s.jsx)(n.h2, {
+              id: '\uc5f0\ub3d9-\uc720\ud615',
+              children: '\uc5f0\ub3d9 \uc720\ud615',
+            }),
+            '\n',
+            (0, s.jsx)(n.h3, {
+              id: '\uc54c\ub9bc-\uc5f0\ub3d9',
+              children: '\uc54c\ub9bc \uc5f0\ub3d9',
+            }),
+            '\n',
+            (0, s.jsx)(n.p, {
+              children:
+                'Gatrix\uc5d0\uc11c \uc774\ubca4\ud2b8\uac00 \ubc1c\uc0dd\ud560 \ub54c \uc54c\ub9bc\uc744 \ubc1b\uc2b5\ub2c8\ub2e4:',
+            }),
+            '\n',
+            (0, s.jsxs)(n.ul, {
+              children: [
+                '\n',
+                (0, s.jsx)(n.li, { children: '\ud53c\ucc98 \ud50c\ub798\uadf8 \ubcc0\uacbd' }),
+                '\n',
+                (0, s.jsx)(n.li, {
+                  children: '\uc810\uac80 \uc0c1\ud0dc \uc5c5\ub370\uc774\ud2b8',
+                }),
+                '\n',
+                (0, s.jsx)(n.li, { children: '\uc2dc\uc2a4\ud15c \uc624\ub958 \uc54c\ub9bc' }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, s.jsx)(n.h3, {
+              id: '\ubaa8\ub2c8\ud130\ub9c1-\uc5f0\ub3d9',
+              children: '\ubaa8\ub2c8\ud130\ub9c1 \uc5f0\ub3d9',
+            }),
+            '\n',
+            (0, s.jsx)(n.p, {
+              children:
+                '\ubaa8\ub2c8\ud130\ub9c1 \ud50c\ub7ab\ud3fc\uc73c\ub85c \uba54\ud2b8\ub9ad \ubc0f \ucd94\uc801 \ub370\uc774\ud130\ub97c \ub0b4\ubcf4\ub0c5\ub2c8\ub2e4.',
+            }),
+            '\n',
+            (0, s.jsx)(n.h2, {
+              id: '\uc5f0\ub3d9-\uc124\uc815-\ubc29\ubc95',
+              children: '\uc5f0\ub3d9 \uc124\uc815 \ubc29\ubc95',
+            }),
+            '\n',
+            (0, s.jsxs)(n.ol, {
+              children: [
+                '\n',
+                (0, s.jsxs)(n.li, {
+                  children: [
+                    (0, s.jsx)(n.strong, { children: '\uc124\uc815' }),
+                    ' > ',
+                    (0, s.jsx)(n.strong, { children: '\uc678\ubd80 \uc5f0\ub3d9' }),
+                    '\uc73c\ub85c \uc774\ub3d9\ud569\ub2c8\ub2e4.',
+                  ],
+                }),
+                '\n',
+                (0, s.jsx)(n.li, {
+                  children:
+                    '\uc6d0\ud558\ub294 \uc11c\ube44\uc2a4\ub97c \ud074\ub9ad\ud569\ub2c8\ub2e4.',
+                }),
+                '\n',
+                (0, s.jsx)(n.li, {
+                  children: '\uc124\uc815 \uc548\ub0b4\ub97c \ub530\ub985\ub2c8\ub2e4.',
+                }),
+                '\n',
+                (0, s.jsx)(n.li, {
+                  children: '\uc5f0\uacb0\uc744 \ud14c\uc2a4\ud2b8\ud569\ub2c8\ub2e4.',
+                }),
+                '\n',
+                (0, s.jsx)(n.li, {
+                  children: '\uad6c\uc131\uc744 \uc800\uc7a5\ud569\ub2c8\ub2e4.',
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, s.jsx)(n.h2, {
+              id: '\uc8fc\uc694-\uc774\ubca4\ud2b8',
+              children: '\uc8fc\uc694 \uc774\ubca4\ud2b8',
+            }),
+            '\n',
+            (0, s.jsx)(n.p, {
+              children:
+                '\ub2e4\uc74c\uc5d0 \uc758\ud574 \uc5f0\ub3d9\uc774 \ud2b8\ub9ac\uac70\ub420 \uc218 \uc788\uc2b5\ub2c8\ub2e4:',
+            }),
+            '\n',
+            (0, s.jsxs)(n.table, {
+              children: [
+                (0, s.jsx)(n.thead, {
+                  children: (0, s.jsxs)(n.tr, {
+                    children: [
+                      (0, s.jsx)(n.th, { children: '\uc774\ubca4\ud2b8' }),
+                      (0, s.jsx)(n.th, { children: '\uc124\uba85' }),
+                    ],
+                  }),
+                }),
+                (0, s.jsxs)(n.tbody, {
+                  children: [
+                    (0, s.jsxs)(n.tr, {
+                      children: [
+                        (0, s.jsx)(n.td, {
+                          children: (0, s.jsx)(n.code, { children: 'feature_flag.created' }),
+                        }),
+                        (0, s.jsx)(n.td, {
+                          children: '\uc0c8 \ud50c\ub798\uadf8 \uc0dd\uc131\ub428',
+                        }),
+                      ],
+                    }),
+                    (0, s.jsxs)(n.tr, {
+                      children: [
+                        (0, s.jsx)(n.td, {
+                          children: (0, s.jsx)(n.code, { children: 'feature_flag.updated' }),
+                        }),
+                        (0, s.jsx)(n.td, {
+                          children: '\ud50c\ub798\uadf8 \uac12\uc774 \ubcc0\uacbd\ub428',
+                        }),
+                      ],
+                    }),
+                    (0, s.jsxs)(n.tr, {
+                      children: [
+                        (0, s.jsx)(n.td, {
+                          children: (0, s.jsx)(n.code, { children: 'feature_flag.deleted' }),
+                        }),
+                        (0, s.jsx)(n.td, { children: '\ud50c\ub798\uadf8 \uc0ad\uc81c\ub428' }),
+                      ],
+                    }),
+                    (0, s.jsxs)(n.tr, {
+                      children: [
+                        (0, s.jsx)(n.td, {
+                          children: (0, s.jsx)(n.code, { children: 'maintenance.started' }),
+                        }),
+                        (0, s.jsx)(n.td, { children: '\uc810\uac80\uc774 \uc2dc\uc791\ub428' }),
+                      ],
+                    }),
+                    (0, s.jsxs)(n.tr, {
+                      children: [
+                        (0, s.jsx)(n.td, {
+                          children: (0, s.jsx)(n.code, { children: 'maintenance.ended' }),
+                        }),
+                        (0, s.jsx)(n.td, { children: '\uc810\uac80\uc774 \uc644\ub8cc\ub428' }),
+                      ],
+                    }),
+                  ],
+                }),
+              ],
+            }),
+          ],
+        });
+      }
+      function a(e = {}) {
+        const { wrapper: n } = { ...(0, t.R)(), ...e.components };
+        return n ? (0, s.jsx)(n, { ...e, children: (0, s.jsx)(o, { ...e }) }) : o(e);
+      }
+    },
+    8453(e, n, r) {
+      r.d(n, { R: () => d, x: () => l });
+      var i = r(6540);
+      const s = {},
+        t = i.createContext(s);
+      function d(e) {
+        const n = i.useContext(t);
+        return i.useMemo(
+          function () {
+            return 'function' == typeof e ? e(n) : { ...n, ...e };
+          },
+          [n, e]
+        );
+      }
+      function l(e) {
+        let n;
+        return (
+          (n = e.disableParentContext
+            ? 'function' == typeof e.components
+              ? e.components(s)
+              : e.components || s
+            : d(e.components)),
+          i.createElement(t.Provider, { value: n }, e.children)
+        );
+      }
+    },
+  },
+]);

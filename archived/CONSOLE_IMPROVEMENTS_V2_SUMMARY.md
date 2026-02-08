@@ -11,6 +11,7 @@ This document summarizes the second round of improvements to the Gatrix system c
 Added 8 new commands to enhance system administration capabilities:
 
 #### Cache Management
+
 - **`cache-clear`** - Clear Redis cache by pattern
   - `--pattern` option for selective clearing
   - Placeholder implementation (requires Redis client integration)
@@ -19,11 +20,13 @@ Added 8 new commands to enhance system administration capabilities:
   - Placeholder implementation (requires Redis client integration)
 
 #### User Management
+
 - **`user-info`** - Get detailed user information
   - Accepts user ID or email
   - Shows: ID, name, email, role, status, email verification, created date, last login
 
 #### Utilities
+
 - **`timestamp`** - Timestamp conversion and utilities
   - Get current timestamp in multiple formats
   - Convert Unix timestamps (seconds/milliseconds)
@@ -46,6 +49,7 @@ Added 8 new commands to enhance system administration capabilities:
 Reorganized the `help` command to display commands by category:
 
 **Categories:**
+
 - Basic (help, echo, clear, whoami)
 - Date & Time (date, time, timezone, uptime, timestamp)
 - ID Generation (uuid, ulid)
@@ -58,6 +62,7 @@ Reorganized the `help` command to display commands by category:
 - Utilities (base64)
 
 Added helpful tips at the bottom:
+
 - Command help usage
 - Clipboard copy feature hint
 
@@ -66,6 +71,7 @@ Added helpful tips at the bottom:
 Fixed the issue where Korean, Chinese, and Japanese input was broken.
 
 **Implementation:**
+
 - Added IME (Input Method Editor) composition event listeners
 - Added `isComposingRef` and `compositionTextRef` state tracking
 - Implemented `compositionstart`, `compositionupdate`, `compositionend` handlers
@@ -74,6 +80,7 @@ Fixed the issue where Korean, Chinese, and Japanese input was broken.
 - Redraw line to show composed text correctly
 
 **Result:**
+
 - Korean input now works perfectly
 - No character breaking during composition
 - Proper display of multi-byte characters
@@ -83,12 +90,14 @@ Fixed the issue where Korean, Chinese, and Japanese input was broken.
 Fixed the issue where Shift+Arrow keys were inserting escape codes instead of selecting text.
 
 **Implementation:**
+
 - Added special handling in `attachCustomKeyEventHandler`
 - Detect Shift+Arrow key combinations
 - Return `true` to let xterm.js handle selection natively
 - Supported keys: ArrowLeft, ArrowRight, ArrowUp, ArrowDown
 
 **Result:**
+
 - Shift+Left/Right now selects text character by character
 - Shift+Up/Down selects text line by line
 - Native xterm.js selection behavior
@@ -98,18 +107,21 @@ Fixed the issue where Shift+Arrow keys were inserting escape codes instead of se
 Fixed the issue where `echo --red 123` and other colored commands showed no output.
 
 **Root Cause:**
+
 - Commands were sent via HTTP POST
 - Backend sent output via both HTTP response AND SSE
 - Frontend only listened to SSE events
 - If SSE failed or was delayed, no output was shown
 
 **Solution:**
+
 - Modified frontend to process HTTP response directly
 - Write output from HTTP response to terminal
 - Disabled SSE event handler to prevent duplicate output
 - ANSI color codes now properly rendered by xterm.js
 
 **Result:**
+
 - All colored output now displays correctly
 - Immediate response (no SSE delay)
 - Proper ANSI color rendering
@@ -119,6 +131,7 @@ Fixed the issue where `echo --red 123` and other colored commands showed no outp
 Added special `|clip` suffix to copy command output to clipboard.
 
 **Usage:**
+
 ```bash
 uuid |clip
 encrypt "secret" |clip
@@ -127,6 +140,7 @@ db-stats |clip
 ```
 
 **Implementation:**
+
 - Detect `|clip` suffix in command line
 - Remove suffix before executing command
 - After receiving output, copy to clipboard
@@ -134,6 +148,7 @@ db-stats |clip
 - Show success/failure message
 
 **Result:**
+
 - Easy clipboard copying for any command
 - Clean text without ANSI codes
 - Visual feedback on success/failure
@@ -141,12 +156,14 @@ db-stats |clip
 ## Files Modified
 
 ### Backend
+
 - `packages/backend/src/services/ConsoleService.ts`
   - Added 8 new command implementations
   - Reorganized help command with categories
   - Added command registrations
 
 ### Frontend
+
 - `packages/frontend/src/pages/admin/SystemConsolePage.tsx`
   - Added IME composition support
   - Added Shift+Arrow key handling
@@ -155,6 +172,7 @@ db-stats |clip
   - Disabled SSE handler to prevent duplicates
 
 ### Documentation
+
 - `packages/backend/docs/CONSOLE_COMMANDS.md`
   - Added new command sections
   - Added Special Features section
@@ -164,6 +182,7 @@ db-stats |clip
 ## Testing
 
 ### Build Status
+
 ✅ Backend build successful (TypeScript compilation)
 ✅ Frontend build successful (Vite production build)
 ✅ No compilation errors
@@ -296,4 +315,3 @@ All changes are backward compatible and require no migration effort. The console
 4. **Review help command** categorization
 5. **Plan Redis integration** for cache commands
 6. **Consider additional commands** based on user feedback
-

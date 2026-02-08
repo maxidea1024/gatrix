@@ -32,13 +32,13 @@ Manage game balance and configuration data (game planning data).
 2. Click **Add Data** button
 3. Configure:
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| Key | Text | Required | Unique data key |
-| Name | Text | Required | Display name |
-| Description | Textarea | - | Admin notes |
-| Data | JSON Editor | Required | Configuration data |
-| Environment | Select | - | Target environment |
+| Field       | Type        | Required | Description        |
+| ----------- | ----------- | -------- | ------------------ |
+| Key         | Text        | Required | Unique data key    |
+| Name        | Text        | Required | Display name       |
+| Description | Textarea    | -        | Admin notes        |
+| Data        | JSON Editor | Required | Configuration data |
+| Environment | Select      | -        | Target environment |
 
 4. Click **Create** to save
 

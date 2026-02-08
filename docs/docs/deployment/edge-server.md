@@ -10,7 +10,7 @@ The Edge server is a high-availability client-facing API gateway that caches Gat
 
 ## Overview
 
-```
+````
 ?��??�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�??    ?��??�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�??    ?��??�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�????  Game Client   ?��??�?�?�?�│   Edge Server   ?��??�?�?�?�│    Backend      ???��??�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�??    ?��??�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�??    ?��??�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�??                               ??                       ??                               ??                       ??                        ?��??�?�?�?�?�?�?�?�?�?�?�?�??         ?��??�?�?�?�?�?�?�?�?�?�?�?�??                        ??   Cache    ?��??�?�?�?�?�?�?�?�?�??   Redis    ??                        ?? (In-Memory)?? PubSub  ??  PubSub    ??                        ?��??�?�?�?�?�?�?�?�?�?�?�?�??         ?��??�?�?�?�?�?�?�?�?�?�?�?�??```
 
 ## Key Features
@@ -52,7 +52,7 @@ The Edge server is a high-availability client-facing API gateway that caches Gat
 
 ```yaml
 CACHE_SYNC_METHOD: event
-```
+````
 
 - Uses Redis PubSub for real-time synchronization
 - Cache is updated immediately when backend publishes events
@@ -60,6 +60,7 @@ CACHE_SYNC_METHOD: event
 - Recommended for production
 
 **Supported Events:**
+
 - `environment.created` / `environment.deleted`
 - `game_world.created` / `game_world.updated` / `game_world.deleted`
 - `popup_notice.created` / `popup_notice.updated` / `popup_notice.deleted`
@@ -82,46 +83,49 @@ CACHE_POLLING_INTERVAL_MS: 60000
 
 ### Health Checks
 
-| Endpoint | Description |
-|----------|-------------|
-| `GET /health` | Basic health check |
-| `GET /health/ready` | Readiness check |
-| `GET /health/live` | Liveness check |
+| Endpoint            | Description        |
+| ------------------- | ------------------ |
+| `GET /health`       | Basic health check |
+| `GET /health/ready` | Readiness check    |
+| `GET /health/live`  | Liveness check     |
 
 ### Client APIs
 
 All client APIs require authentication headers:
+
 - `X-API-Token`: API access token
 - `X-Application-Name`: Application name
 - `X-Environment`: Environment ID (optional, uses token's default)
 
-| Endpoint | Description |
-|----------|-------------|
-| `GET /api/v1/client/versions` | Client versions |
-| `GET /api/v1/client/banners` | Banners |
-| `GET /api/v1/client/notices` | Service notices |
-| `GET /api/v1/client/game-worlds` | Game worlds |
+| Endpoint                         | Description     |
+| -------------------------------- | --------------- |
+| `GET /api/v1/client/versions`    | Client versions |
+| `GET /api/v1/client/banners`     | Banners         |
+| `GET /api/v1/client/notices`     | Service notices |
+| `GET /api/v1/client/game-worlds` | Game worlds     |
 
 ### Internal APIs (Separate Port)
 
 ?�️ **Security Note**: Internal APIs run on a **separate port** (main port + 10) for security isolation. These endpoints should NOT be exposed to the public internet.
 
-| Port | Description |
-|------|-------------|
-| `3400` | Main Edge server (public-facing) |
+| Port   | Description                       |
+| ------ | --------------------------------- |
+| `3400` | Main Edge server (public-facing)  |
 | `3410` | Internal server (operations only) |
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/cache` | GET | Detailed cache status with per-environment counts and last refresh time |
-| `/cache/refresh` | POST | Force refresh all caches and return updated status |
+| Endpoint         | Method | Description                                                             |
+| ---------------- | ------ | ----------------------------------------------------------------------- |
+| `/cache`         | GET    | Detailed cache status with per-environment counts and last refresh time |
+| `/cache/refresh` | POST   | Force refresh all caches and return updated status                      |
 
 **Example: Check cache status**
+
 ```bash
 curl http://localhost:3410/cache
 ```
 
 **Example: Force cache refresh**
+
 ```bash
 curl -X POST http://localhost:3410/cache/refresh
 ```
@@ -213,5 +217,3 @@ edge-dev:
 1. Verify environment exists in backend
 2. Check `EDGE_ENVIRONMENTS` setting (`*` for all)
 3. Confirm API token has access to the environment
-
-

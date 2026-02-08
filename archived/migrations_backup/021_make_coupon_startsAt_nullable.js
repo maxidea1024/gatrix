@@ -3,7 +3,7 @@
  * Allow coupons to start immediately if startsAt is null
  */
 
-exports.up = async function(connection) {
+exports.up = async function (connection) {
   console.log('Making coupon startsAt nullable...');
 
   try {
@@ -37,7 +37,7 @@ exports.up = async function(connection) {
   }
 };
 
-exports.down = async function(connection) {
+exports.down = async function (connection) {
   console.log('Reverting startsAt to NOT NULL...');
 
   try {
@@ -51,4 +51,3 @@ exports.down = async function(connection) {
     throw error;
   }
 };
-

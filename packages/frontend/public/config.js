@@ -3,17 +3,17 @@
 // For development with Docker, these values can be overridden
 
 window.ENV = window.ENV || {
-    // These are default development values
-    // In production, docker-entrypoint.sh will replace this entire file
-    VITE_API_URL: '/api/v1',
-    VITE_APP_NAME: 'Gatrix',
-    VITE_DEFAULT_LANGUAGE: 'ko',
-    VITE_ROUTER_BASENAME: '/',
-    VITE_CHAT_SERVER_URL: '',
-    VITE_CHAT_SERVER_PORT: '45100',
-    VITE_EDGE_URL: '',
-    VITE_GRAFANA_URL: '',
-    VITE_BULL_BOARD_URL: ''
+  // These are default development values
+  // In production, docker-entrypoint.sh will replace this entire file
+  VITE_API_URL: '/api/v1',
+  VITE_APP_NAME: 'Gatrix',
+  VITE_DEFAULT_LANGUAGE: 'ko',
+  VITE_ROUTER_BASENAME: '/',
+  VITE_CHAT_SERVER_URL: '',
+  VITE_CHAT_SERVER_PORT: '45100',
+  VITE_EDGE_URL: '',
+  VITE_GRAFANA_URL: '',
+  VITE_BULL_BOARD_URL: '',
 };
 
 // Legacy support

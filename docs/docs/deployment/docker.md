@@ -31,6 +31,7 @@ This page explains how to run Gatrix with Docker in both development and product
 ## Environment Variables (selected)
 
 ### Monitoring
+
 - `PROM_SCRAPE_INTERVAL` (default: 15s)
 - `PROM_RETENTION_TIME` (default: 14d)
 - `GRAFANA_ADMIN_USER` (default: admin)
@@ -39,23 +40,25 @@ This page explains how to run Gatrix with Docker in both development and product
 
 ### Edge Server
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `EDGE_PORT` | 3400 | Edge server port |
-| `EDGE_METRICS_PORT` | 9400 | Metrics endpoint port (internal only) |
-| `EDGE_BYPASS_TOKEN` | `gatrix-edge-internal-bypass-token` | Bypass token for all environments and internal APIs |
-| `EDGE_APPLICATION_NAME` | `edge-server` | Application name for SDK identification |
-| `EDGE_ENVIRONMENTS` | `*` | Target environments. Use `*` for all environments (multi-env mode) or comma-separated IDs |
-| `CACHE_SYNC_METHOD` | `event` | Cache sync method: `event` (Redis PubSub real-time), `polling`, or `manual` |
-| `CACHE_POLLING_INTERVAL_MS` | 60000 | Polling interval in ms (only used when `CACHE_SYNC_METHOD=polling`) |
-| `EDGE_LOG_LEVEL` | `info` (prod) / `debug` (dev) | Log level |
+| Variable                    | Default                             | Description                                                                               |
+| --------------------------- | ----------------------------------- | ----------------------------------------------------------------------------------------- |
+| `EDGE_PORT`                 | 3400                                | Edge server port                                                                          |
+| `EDGE_METRICS_PORT`         | 9400                                | Metrics endpoint port (internal only)                                                     |
+| `EDGE_BYPASS_TOKEN`         | `gatrix-edge-internal-bypass-token` | Bypass token for all environments and internal APIs                                       |
+| `EDGE_APPLICATION_NAME`     | `edge-server`                       | Application name for SDK identification                                                   |
+| `EDGE_ENVIRONMENTS`         | `*`                                 | Target environments. Use `*` for all environments (multi-env mode) or comma-separated IDs |
+| `CACHE_SYNC_METHOD`         | `event`                             | Cache sync method: `event` (Redis PubSub real-time), `polling`, or `manual`               |
+| `CACHE_POLLING_INTERVAL_MS` | 60000                               | Polling interval in ms (only used when `CACHE_SYNC_METHOD=polling`)                       |
+| `EDGE_LOG_LEVEL`            | `info` (prod) / `debug` (dev)       | Log level                                                                                 |
 
 **Multi-Environment Mode (`EDGE_ENVIRONMENTS=*`):**
+
 - Edge server caches data for ALL environments dynamically
 - Automatically syncs when new environments are created/deleted via Redis PubSub
 - Each API endpoint filters data by the requested environment
 
 **Event Mode (`CACHE_SYNC_METHOD=event`):**
+
 - Uses Redis PubSub for real-time cache synchronization
 - Cache is updated immediately when backend publishes events
 - Requires Redis connection
@@ -72,6 +75,7 @@ docker compose -f docker-compose.dev.yml down --remove-orphans
 ```
 
 Access:
+
 - Grafana: http://localhost:44000
 - Prometheus: http://localhost:49090
 - Backend: http://localhost:45000
@@ -87,6 +91,7 @@ docker compose down --remove-orphans
 ```
 
 Access:
+
 - Grafana: http://localhost:44000
 - Prometheus: http://localhost:49090
 
@@ -105,12 +110,12 @@ Production environments use pre-built images from Tencent Cloud Registry.
 
 #### Available Commands
 
-| Command | Description |
-|---------|-------------|
-| `yarn docker:build:prod` | Build all service images (no version bump) |
+| Command                       | Description                                   |
+| ----------------------------- | --------------------------------------------- |
+| `yarn docker:build:prod`      | Build all service images (no version bump)    |
 | `yarn docker:build:prod:push` | Bump patch version, build and push all images |
-| `yarn docker:push` | Push already built images |
-| `yarn docker:login` | Login to Tencent Cloud Registry |
+| `yarn docker:push`            | Push already built images                     |
+| `yarn docker:login`           | Login to Tencent Cloud Registry               |
 
 #### Script Options
 
@@ -132,6 +137,7 @@ yarn docker:build:prod --service frontend
 ```
 
 **Options:**
+
 - `--bump, -b <type>`: Version bump type (`patch`, `minor`, `major`)
 - `--push, -p`: Push to registry after building
 - `--service, -s <name>`: Service to build (`backend`, `frontend`, `event-lens`, `chat-server`, `edge`, `all`)
@@ -191,10 +197,12 @@ GRAFANA_ADMIN_PASSWORD=secure-grafana-password
 ### Image Tags
 
 Each service generates two tags:
+
 - **Version tag**: `{service}-{version}` (e.g., `backend-1.2.3`)
 - **Latest tag**: `{service}-latest` (e.g., `backend-latest`)
 
 **Services:**
+
 - `backend` - Backend API server
 - `frontend` - Frontend Nginx server
 - `event-lens` - Event analytics server
@@ -207,14 +215,14 @@ For production environments with high availability requirements, use Docker Swar
 
 ### Available Commands
 
-| Command | Description |
-|---------|-------------|
-| `yarn swarm:deploy` | Deploy stack to Swarm |
+| Command                  | Description                          |
+| ------------------------ | ------------------------------------ |
+| `yarn swarm:deploy`      | Deploy stack to Swarm                |
 | `yarn swarm:deploy:init` | Initial deployment (creates secrets) |
-| `yarn swarm:update` | Rolling update services |
-| `yarn swarm:rollback` | Rollback to previous version |
-| `yarn swarm:scale` | Scale services |
-| `yarn swarm:status` | View stack status |
+| `yarn swarm:update`      | Rolling update services              |
+| `yarn swarm:rollback`    | Rollback to previous version         |
+| `yarn swarm:scale`       | Scale services                       |
+| `yarn swarm:status`      | View stack status                    |
 
 ### Quick Start
 
@@ -249,33 +257,37 @@ All persistent data (MySQL, Redis, ClickHouse, logs, etc.) is stored under the `
 
 The `DATA_ROOT` environment variable controls where all Docker volumes are stored:
 
-| Service | Host Path / Volume | Container Path |
-|---------|-----------|----------------|
-| MySQL | `${DATA_ROOT}/mysql` | `/var/lib/mysql` |
-| Redis | `${DATA_ROOT}/redis` | `/data` |
-| ClickHouse | `clickhouse-data` (named volume) | `/var/lib/clickhouse` |
-| Backend Logs | `${DATA_ROOT}/backend/logs` | `/app/logs` |
-| Backend Data | `${DATA_ROOT}/backend/data` | `/app/data` |
-| Event Lens Logs | `${DATA_ROOT}/event-lens/logs` | `/app/logs` |
-| Chat Server Uploads | `${DATA_ROOT}/chat-server/uploads` | `/app/uploads` |
-| Chat Server Logs | `${DATA_ROOT}/chat-server/logs` | `/app/logs` |
-| etcd | `${DATA_ROOT}/etcd` | `/etcd-data` |
-| Prometheus | `${DATA_ROOT}/prometheus` | `/prometheus` |
-| Grafana | `${DATA_ROOT}/grafana` | `/var/lib/grafana` |
-| Loki | `${DATA_ROOT}/loki` | `/loki` |
+| Service             | Host Path / Volume                 | Container Path        |
+| ------------------- | ---------------------------------- | --------------------- |
+| MySQL               | `${DATA_ROOT}/mysql`               | `/var/lib/mysql`      |
+| Redis               | `${DATA_ROOT}/redis`               | `/data`               |
+| ClickHouse          | `clickhouse-data` (named volume)   | `/var/lib/clickhouse` |
+| Backend Logs        | `${DATA_ROOT}/backend/logs`        | `/app/logs`           |
+| Backend Data        | `${DATA_ROOT}/backend/data`        | `/app/data`           |
+| Event Lens Logs     | `${DATA_ROOT}/event-lens/logs`     | `/app/logs`           |
+| Chat Server Uploads | `${DATA_ROOT}/chat-server/uploads` | `/app/uploads`        |
+| Chat Server Logs    | `${DATA_ROOT}/chat-server/logs`    | `/app/logs`           |
+| etcd                | `${DATA_ROOT}/etcd`                | `/etcd-data`          |
+| Prometheus          | `${DATA_ROOT}/prometheus`          | `/prometheus`         |
+| Grafana             | `${DATA_ROOT}/grafana`             | `/var/lib/grafana`    |
+| Loki                | `${DATA_ROOT}/loki`                | `/loki`               |
 
 ### Environment Setup
 
 **Development** (`.env`):
+
 ```env
 DATA_ROOT=./data
 ```
+
 Result: All data stored in `./data/mysql`, `./data/redis`, etc. (relative to project root)
 
 **Production** (`.env`):
+
 ```env
 DATA_ROOT=/data/gatrix
 ```
+
 Result: All data stored in `/data/gatrix/mysql`, `/data/gatrix/redis`, etc. (absolute path)
 
 ### Directory Structure
@@ -314,14 +326,17 @@ ${DATA_ROOT}/
 #### Why Named Volume?
 
 ClickHouse's MergeTree storage engine uses atomic file rename operations during data writes:
+
 1. Data is first written to a temporary directory (`tmp_insert_*`)
 2. The directory is atomically renamed to its final location
 
 This works perfectly on native Linux filesystems but **fails on certain configurations**:
+
 - **Windows Docker Desktop**: NTFS bind mounts don't support atomic renames properly
 - **Some network filesystems**: NFS/CIFS may have similar issues
 
 **Symptoms of bind mount issues:**
+
 ```
 filesystem error: in rename: No such file or directory
 ["/var/lib/clickhouse/store/.../tmp_insert_202512_1_1_0/"]
@@ -354,9 +369,11 @@ docker volume rm gatrix_clickhouse-data
 #### If You Must Use Bind Mount (Linux Only)
 
 If you need bind mount for easier data access on a Linux server, ensure:
+
 1. The host is running native Linux (not WSL or Docker Desktop)
 2. The filesystem is ext4 or XFS
 3. Add to docker-compose:
+
 ```yaml
 volumes:
   - ${DATA_ROOT}/clickhouse:/var/lib/clickhouse
@@ -371,5 +388,3 @@ Do not use restart on Docker; prefer down -> up for restarts.
 ## Monitoring
 
 For Prometheus + Grafana setup details and environment variables, see: [Monitoring](../features/monitoring)
-
-

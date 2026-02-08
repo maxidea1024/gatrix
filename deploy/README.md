@@ -54,13 +54,13 @@ Builds Docker images and optionally pushes them to the registry.
 
 **Options:**
 
-| Option | Description |
-|--------|-------------|
-| `-t, --tag <tag>` | Image tag (default: `latest`) |
-| `-p, --push` | Push images to registry after building |
-| `-l, --latest` | Also tag and push images as `latest` |
+| Option                 | Description                                 |
+| ---------------------- | ------------------------------------------- |
+| `-t, --tag <tag>`      | Image tag (default: `latest`)               |
+| `-p, --push`           | Push images to registry after building      |
+| `-l, --latest`         | Also tag and push images as `latest`        |
 | `-s, --service <name>` | Build specific service(s) only (repeatable) |
-| `-h, --help` | Show help |
+| `-h, --help`           | Show help                                   |
 
 **Available Services:** `backend`, `frontend`, `edge`, `chat-server`, `event-lens`
 
@@ -98,15 +98,15 @@ Deploys the Gatrix stack to Docker Swarm.
 
 **Options:**
 
-| Option | Description |
-|--------|-------------|
-| `-v, --version <version>` | Version to deploy (default: `latest`) |
-| `-e, --env-file <file>` | Environment file path (default: `.env`) |
-| `-n, --stack <name>` | Stack name (default: `gatrix`) |
-| `-i, --init` | Initialize swarm and create secrets |
-| `-u, --update` | Perform rolling update |
-| `--prune` | Remove unused images after deployment |
-| `-h, --help` | Show help |
+| Option                    | Description                             |
+| ------------------------- | --------------------------------------- |
+| `-v, --version <version>` | Version to deploy (default: `latest`)   |
+| `-e, --env-file <file>`   | Environment file path (default: `.env`) |
+| `-n, --stack <name>`      | Stack name (default: `gatrix`)          |
+| `-i, --init`              | Initialize swarm and create secrets     |
+| `-u, --update`            | Perform rolling update                  |
+| `--prune`                 | Remove unused images after deployment   |
+| `-h, --help`              | Show help                               |
 
 **Examples:**
 
@@ -134,14 +134,14 @@ Performs rolling updates on running services.
 
 **Options:**
 
-| Option | Description |
-|--------|-------------|
-| `-v, --version <version>` | Target version (required) |
-| `-s, --service <name>` | Update specific service |
-| `-a, --all` | Update all application services |
-| `-f, --force` | Force update even with same image |
-| `-n, --stack <name>` | Stack name (default: `gatrix`) |
-| `-h, --help` | Show help |
+| Option                    | Description                       |
+| ------------------------- | --------------------------------- |
+| `-v, --version <version>` | Target version (required)         |
+| `-s, --service <name>`    | Update specific service           |
+| `-a, --all`               | Update all application services   |
+| `-f, --force`             | Force update even with same image |
+| `-n, --stack <name>`      | Stack name (default: `gatrix`)    |
+| `-h, --help`              | Show help                         |
 
 **Examples:**
 
@@ -167,12 +167,12 @@ Rolls back services to their previous version.
 
 **Options:**
 
-| Option | Description |
-|--------|-------------|
-| `-s, --service <name>` | Rollback specific service |
-| `-a, --all` | Rollback all application services |
-| `-n, --stack <name>` | Stack name (default: `gatrix`) |
-| `-h, --help` | Show help |
+| Option                 | Description                       |
+| ---------------------- | --------------------------------- |
+| `-s, --service <name>` | Rollback specific service         |
+| `-a, --all`            | Rollback all application services |
+| `-n, --stack <name>`   | Stack name (default: `gatrix`)    |
+| `-h, --help`           | Show help                         |
 
 **Examples:**
 
@@ -194,14 +194,14 @@ Scales service replicas.
 
 **Options:**
 
-| Option | Description |
-|--------|-------------|
-| `-s, --service <name>` | Service to scale |
-| `-r, --replicas <n>` | Number of replicas |
-| `--preset <name>` | Use preset: `minimal`, `standard`, `high` |
-| `--status` | Show current scaling status |
-| `-n, --stack <name>` | Stack name (default: `gatrix`) |
-| `-h, --help` | Show help |
+| Option                 | Description                               |
+| ---------------------- | ----------------------------------------- |
+| `-s, --service <name>` | Service to scale                          |
+| `-r, --replicas <n>`   | Number of replicas                        |
+| `--preset <name>`      | Use preset: `minimal`, `standard`, `high` |
+| `--status`             | Show current scaling status               |
+| `-n, --stack <name>`   | Stack name (default: `gatrix`)            |
+| `-h, --help`           | Show help                                 |
 
 **Presets:**
 
@@ -233,14 +233,14 @@ Shows status of the deployed stack.
 
 **Options:**
 
-| Option | Description |
-|--------|-------------|
-| `-s, --services` | Show service list only |
-| `-t, --tasks` | Show running tasks only |
-| `-l, --logs <service>` | Stream logs for a service |
-| `--health` | Show health check status |
-| `-n, --stack <name>` | Stack name (default: `gatrix`) |
-| `-h, --help` | Show help |
+| Option                 | Description                    |
+| ---------------------- | ------------------------------ |
+| `-s, --services`       | Show service list only         |
+| `-t, --tasks`          | Show running tasks only        |
+| `-l, --logs <service>` | Stream logs for a service      |
+| `--health`             | Show health check status       |
+| `-n, --stack <name>`   | Stack name (default: `gatrix`) |
+| `-h, --help`           | Show help                      |
 
 **Examples:**
 
@@ -293,6 +293,7 @@ Lists all image tags in the registry namespace.
 ```
 
 If the repository is empty, you'll see:
+
 ```
 Repository 'uwocn/uwocn' not found or has no images yet.
 ```
@@ -326,18 +327,18 @@ Repository 'uwocn/uwocn' not found or has no images yet.
 
 ## File Reference
 
-| File | Purpose |
-|------|---------|
-| `build-and-push.ps1/.sh` | Build and push Docker images |
-| `deploy.ps1/.sh` | Deploy to Docker Swarm |
-| `update.ps1/.sh` | Rolling update |
-| `rollback.ps1/.sh` | Rollback services |
-| `scale.ps1/.sh` | Scale replicas |
-| `status.ps1/.sh` | Show stack status |
-| `login-registry.ps1/.sh` | Registry login |
-| `list-images.ps1/.sh` | List registry images |
-| `update-lite.sh` | Update docker-compose.lite.yml deployment |
-| `package-lite.sh` | Create deployment package (tgz) |
-| `registry.env` | Registry credentials |
-| `.env.example` | Environment template |
-| `docker-stack.yml` | Swarm stack definition |
+| File                     | Purpose                                   |
+| ------------------------ | ----------------------------------------- |
+| `build-and-push.ps1/.sh` | Build and push Docker images              |
+| `deploy.ps1/.sh`         | Deploy to Docker Swarm                    |
+| `update.ps1/.sh`         | Rolling update                            |
+| `rollback.ps1/.sh`       | Rollback services                         |
+| `scale.ps1/.sh`          | Scale replicas                            |
+| `status.ps1/.sh`         | Show stack status                         |
+| `login-registry.ps1/.sh` | Registry login                            |
+| `list-images.ps1/.sh`    | List registry images                      |
+| `update-lite.sh`         | Update docker-compose.lite.yml deployment |
+| `package-lite.sh`        | Create deployment package (tgz)           |
+| `registry.env`           | Registry credentials                      |
+| `.env.example`           | Environment template                      |
+| `docker-stack.yml`       | Swarm stack definition                    |

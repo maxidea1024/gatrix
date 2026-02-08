@@ -126,65 +126,35 @@
     },
     ":enum": {},
     ":links": {
-      "shapeId": [
-        "OceanNpcShape"
-      ],
+      "shapeId": ["OceanNpcShape"],
       "ship": [
         {
-          "TemplateId": [
-            "ShipTemplate"
-          ],
-          "shipTemplateGroupId": [
-            "ShipTemplateGroup"
-          ]
+          "TemplateId": ["ShipTemplate"],
+          "shipTemplateGroupId": ["ShipTemplateGroup"]
         },
         {
-          "TemplateId": [
-            "ShipTemplate"
-          ],
-          "shipTemplateGroupId": [
-            "ShipTemplateGroup"
-          ]
+          "TemplateId": ["ShipTemplate"],
+          "shipTemplateGroupId": ["ShipTemplateGroup"]
         },
         {
-          "TemplateId": [
-            "ShipTemplate"
-          ],
-          "shipTemplateGroupId": [
-            "ShipTemplateGroup"
-          ]
+          "TemplateId": ["ShipTemplate"],
+          "shipTemplateGroupId": ["ShipTemplateGroup"]
         },
         {
-          "TemplateId": [
-            "ShipTemplate"
-          ],
-          "shipTemplateGroupId": [
-            "ShipTemplateGroup"
-          ]
+          "TemplateId": ["ShipTemplate"],
+          "shipTemplateGroupId": ["ShipTemplateGroup"]
         },
         {
-          "TemplateId": [
-            "ShipTemplate"
-          ],
-          "shipTemplateGroupId": [
-            "ShipTemplateGroup"
-          ]
+          "TemplateId": ["ShipTemplate"],
+          "shipTemplateGroupId": ["ShipTemplateGroup"]
         },
         {
-          "TemplateId": [
-            "ShipTemplate"
-          ],
-          "shipTemplateGroupId": [
-            "ShipTemplateGroup"
-          ]
+          "TemplateId": ["ShipTemplate"],
+          "shipTemplateGroupId": ["ShipTemplateGroup"]
         },
         {
-          "TemplateId": [
-            "ShipTemplate"
-          ],
-          "shipTemplateGroupId": [
-            "ShipTemplateGroup"
-          ]
+          "TemplateId": ["ShipTemplate"],
+          "shipTemplateGroupId": ["ShipTemplateGroup"]
         }
       ]
     }

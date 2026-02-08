@@ -29,12 +29,8 @@
     },
     ":enum": {},
     ":links": {
-      "eventTaskId": [
-        "EventTask"
-      ],
-      "rewardId": [
-        "RewardFixed"
-      ]
+      "eventTaskId": ["EventTask"],
+      "rewardId": ["RewardFixed"]
     }
   },
   "EventMission": {

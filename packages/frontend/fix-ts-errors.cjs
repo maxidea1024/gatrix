@@ -6,61 +6,61 @@ const fixes = [
   // Remove unused imports and variables
   {
     pattern: /const { t } = useTranslations\(\);/g,
-    replacement: '// const { t } = useTranslations();'
+    replacement: '// const { t } = useTranslations();',
   },
   {
     pattern: /const { t, ([^}]+) } = useTranslations\(\);/g,
-    replacement: '// const { t, $1 } = useTranslations();'
+    replacement: '// const { t, $1 } = useTranslations();',
   },
   {
     pattern: /import { useTranslations } from '@\/contexts\/I18nContext';/g,
-    replacement: '// import { useTranslations } from \'@/contexts/I18nContext\';'
+    replacement: "// import { useTranslations } from '@/contexts/I18nContext';",
   },
   // Fix user property names
   {
     pattern: /user\.avatarUrl/g,
-    replacement: 'user.avatar_url'
+    replacement: 'user.avatar_url',
   },
   {
     pattern: /user\.emailVerified/g,
-    replacement: 'user.email_verified'
+    replacement: 'user.email_verified',
   },
   {
     pattern: /user\.lastLoginAt/g,
-    replacement: 'user.last_login_at'
+    replacement: 'user.last_login_at',
   },
   {
     pattern: /user\.createdAt/g,
-    replacement: 'user.created_at'
+    replacement: 'user.created_at',
   },
   // Fix unused variables
   {
     pattern: /const { ([^,]+), toggleTheme, isDark } = useTheme\(\);/g,
-    replacement: 'const { $1 } = useTheme();'
+    replacement: 'const { $1 } = useTheme();',
   },
   {
     pattern: /Tooltip,\s*$/gm,
-    replacement: '// Tooltip,'
+    replacement: '// Tooltip,',
   },
   {
     pattern: /Divider,\s*$/gm,
-    replacement: '// Divider,'
-  }
+    replacement: '// Divider,',
+  },
 ];
 
 function fixFile(filePath) {
   try {
     let content = fs.readFileSync(filePath, 'utf8');
     let modified = false;
-    
-    fixes.forEach(fix => {
+
+    fixes.forEach((fix) => {
       const newContent = content.replace(fix.pattern, fix.replacement);
       if (newContent !== content) {
         content = newContent;
         modified = true;
       }
     });
-    
+
     if (modified) {
       fs.writeFileSync(filePath, content, 'utf8');
       console.log(`Fixed: ${filePath}`);
@@ -72,14 +72,14 @@ function fixFile(filePath) {
 
 function findTsxFiles(dir) {
   const files = [];
-  
+
   function traverse(currentDir) {
     const items = fs.readdirSync(currentDir);
-    
-    items.forEach(item => {
+
+    items.forEach((item) => {
       const fullPath = path.join(currentDir, item);
       const stat = fs.statSync(fullPath);
-      
+
       if (stat.isDirectory() && !item.startsWith('.') && item !== 'node_modules') {
         traverse(fullPath);
       } else if (item.endsWith('.tsx') || item.endsWith('.ts')) {
@@ -87,7 +87,7 @@ function findTsxFiles(dir) {
       }
     });
   }
-  
+
   traverse(dir);
   return files;
 }

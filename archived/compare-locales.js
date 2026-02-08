@@ -8,16 +8,16 @@ const path = require('path');
 const localesDir = 'c:/work/uwo/gatrix/packages/frontend/src/locales';
 
 function getAllKeys(obj, prefix = '') {
-    const keys = [];
-    for (const key in obj) {
-        const fullKey = prefix ? `${prefix}.${key}` : key;
-        if (typeof obj[key] === 'object' && obj[key] !== null && !Array.isArray(obj[key])) {
-            keys.push(...getAllKeys(obj[key], fullKey));
-        } else {
-            keys.push(fullKey);
-        }
+  const keys = [];
+  for (const key in obj) {
+    const fullKey = prefix ? `${prefix}.${key}` : key;
+    if (typeof obj[key] === 'object' && obj[key] !== null && !Array.isArray(obj[key])) {
+      keys.push(...getAllKeys(obj[key], fullKey));
+    } else {
+      keys.push(fullKey);
     }
-    return keys;
+  }
+  return keys;
 }
 
 // Load all locale files
@@ -40,40 +40,40 @@ console.log(`zh.json: ${zhKeys.size} keys`);
 
 // Find keys missing in each file (compared to ko.json as reference)
 console.log('\n--- Keys in ko.json but MISSING in en.json ---');
-const missingInEn = [...koKeys].filter(k => !enKeys.has(k));
+const missingInEn = [...koKeys].filter((k) => !enKeys.has(k));
 if (missingInEn.length > 0) {
-    missingInEn.slice(0, 30).forEach(k => console.log(`  ${k}`));
-    if (missingInEn.length > 30) console.log(`  ... and ${missingInEn.length - 30} more`);
+  missingInEn.slice(0, 30).forEach((k) => console.log(`  ${k}`));
+  if (missingInEn.length > 30) console.log(`  ... and ${missingInEn.length - 30} more`);
 } else {
-    console.log('  (none)');
+  console.log('  (none)');
 }
 
 console.log('\n--- Keys in ko.json but MISSING in zh.json ---');
-const missingInZh = [...koKeys].filter(k => !zhKeys.has(k));
+const missingInZh = [...koKeys].filter((k) => !zhKeys.has(k));
 if (missingInZh.length > 0) {
-    missingInZh.slice(0, 30).forEach(k => console.log(`  ${k}`));
-    if (missingInZh.length > 30) console.log(`  ... and ${missingInZh.length - 30} more`);
+  missingInZh.slice(0, 30).forEach((k) => console.log(`  ${k}`));
+  if (missingInZh.length > 30) console.log(`  ... and ${missingInZh.length - 30} more`);
 } else {
-    console.log('  (none)');
+  console.log('  (none)');
 }
 
 // Find extra keys in en.json and zh.json (not in ko.json)
 console.log('\n--- Keys in en.json but NOT in ko.json (extra) ---');
-const extraInEn = [...enKeys].filter(k => !koKeys.has(k));
+const extraInEn = [...enKeys].filter((k) => !koKeys.has(k));
 if (extraInEn.length > 0) {
-    extraInEn.slice(0, 30).forEach(k => console.log(`  ${k}`));
-    if (extraInEn.length > 30) console.log(`  ... and ${extraInEn.length - 30} more`);
+  extraInEn.slice(0, 30).forEach((k) => console.log(`  ${k}`));
+  if (extraInEn.length > 30) console.log(`  ... and ${extraInEn.length - 30} more`);
 } else {
-    console.log('  (none)');
+  console.log('  (none)');
 }
 
 console.log('\n--- Keys in zh.json but NOT in ko.json (extra) ---');
-const extraInZh = [...zhKeys].filter(k => !koKeys.has(k));
+const extraInZh = [...zhKeys].filter((k) => !koKeys.has(k));
 if (extraInZh.length > 0) {
-    extraInZh.slice(0, 30).forEach(k => console.log(`  ${k}`));
-    if (extraInZh.length > 30) console.log(`  ... and ${extraInZh.length - 30} more`);
+  extraInZh.slice(0, 30).forEach((k) => console.log(`  ${k}`));
+  if (extraInZh.length > 30) console.log(`  ... and ${extraInZh.length - 30} more`);
 } else {
-    console.log('  (none)');
+  console.log('  (none)');
 }
 
 // Summary
@@ -84,8 +84,14 @@ console.log(`Extra in en.json: ${extraInEn.length} keys`);
 console.log(`Extra in zh.json: ${extraInZh.length} keys`);
 
 // Output to files for detailed review
-fs.writeFileSync(path.join('c:/work/uwo/gatrix/archived', 'missing_in_en.txt'), missingInEn.join('\n'));
-fs.writeFileSync(path.join('c:/work/uwo/gatrix/archived', 'missing_in_zh.txt'), missingInZh.join('\n'));
+fs.writeFileSync(
+  path.join('c:/work/uwo/gatrix/archived', 'missing_in_en.txt'),
+  missingInEn.join('\n')
+);
+fs.writeFileSync(
+  path.join('c:/work/uwo/gatrix/archived', 'missing_in_zh.txt'),
+  missingInZh.join('\n')
+);
 fs.writeFileSync(path.join('c:/work/uwo/gatrix/archived', 'extra_in_en.txt'), extraInEn.join('\n'));
 fs.writeFileSync(path.join('c:/work/uwo/gatrix/archived', 'extra_in_zh.txt'), extraInZh.join('\n'));
 

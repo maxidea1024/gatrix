@@ -33,8 +33,8 @@ const sdk = new GatrixServerSDK({
   gatrixUrl: 'https://api.gatrix.com',
   apiToken: 'your-server-api-token', // Optional: defaults to 'gatrix-unsecured-server-api-token' for testing
   applicationName: 'your-app-name',
-  service: 'worldd',     // Service name (e.g., 'auth', 'lobby', 'world', 'chat')
-  group: 'kr-1',         // Service group (e.g., 'kr', 'us', 'production')
+  service: 'worldd', // Service name (e.g., 'auth', 'lobby', 'world', 'chat')
+  group: 'kr-1', // Service group (e.g., 'kr', 'us', 'production')
   environment: 'env_prod', // Environment identifier (e.g., 'env_prod', 'env_staging')
 });
 
@@ -65,6 +65,7 @@ const sdk = new GatrixServerSDK({
 ```
 
 **Available Unsecured Tokens:**
+
 - Server SDK: `gatrix-unsecured-server-api-token`
 - Client SDK: `gatrix-unsecured-client-api-token`
 
@@ -80,8 +81,8 @@ const sdk = new GatrixServerSDK({
   gatrixUrl: 'https://api.gatrix.com',
   apiToken: 'your-server-api-token',
   applicationName: 'your-app-name',
-  service: 'worldd',       // Service name for identification
-  group: 'kr-1',           // Service group for categorization
+  service: 'worldd', // Service name for identification
+  group: 'kr-1', // Service group for categorization
   environment: 'env_prod', // Environment identifier
 });
 ```
@@ -116,8 +117,8 @@ const sdk = new GatrixServerSDK({
   gatrixUrl: 'https://api.gatrix.com',
   apiToken: 'your-server-api-token',
   applicationName: 'your-app-name',
-  service: 'worldd',       // Service name (e.g., 'auth', 'lobby', 'world', 'chat')
-  group: 'kr-1',           // Service group (e.g., 'kr', 'us', 'production')
+  service: 'worldd', // Service name (e.g., 'auth', 'lobby', 'world', 'chat')
+  group: 'kr-1', // Service group (e.g., 'kr', 'us', 'production')
   environment: 'env_prod', // Environment (e.g., 'env_prod', 'env_staging')
 
   // Optional - Redis (for event handling)
@@ -138,7 +139,7 @@ const sdk = new GatrixServerSDK({
   // Optional - Metrics
   metrics: {
     enabled: true, // Enable SDK internal metrics (default: true)
-    port: 9337,    // Metrics server port (default: 9337 or SDK_METRICS_PORT env)
+    port: 9337, // Metrics server port (default: 9337 or SDK_METRICS_PORT env)
   },
 
   // Optional - Logger
@@ -218,23 +219,23 @@ const authSDK = GatrixServerSDK.createInstance(baseConfig, {
 
 All fields in `GatrixSDKInitOptions` are optional. Unspecified fields use values from the base config.
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `service` | string | Override service name |
-| `group` | string | Override service group |
-| `environment` | string | Override environment identifier |
-| `region` | string | Override region identifier |
-| `gatrixUrl` | string | Override Gatrix backend URL |
-| `apiToken` | string | Override API token |
-| `applicationName` | string | Override application name |
-| `worldId` | string | Override world ID |
-| `redis` | Partial\<RedisConfig\> | Override Redis config (deep merged) |
-| `cache` | Partial\<CacheConfig\> | Override cache settings (deep merged) |
-| `logger` | Partial\<LoggerConfig\> | Override logger settings (deep merged) |
-| `retry` | Partial\<RetryConfig\> | Override retry settings (deep merged) |
-| `metrics` | Partial\<MetricsConfig\> | Override metrics settings (deep merged) |
-| `features` | Partial\<FeaturesConfig\> | Override feature toggles (deep merged) |
-| `environments` | string[] \| '*' | Override target environments |
+| Field             | Type                      | Description                             |
+| ----------------- | ------------------------- | --------------------------------------- |
+| `service`         | string                    | Override service name                   |
+| `group`           | string                    | Override service group                  |
+| `environment`     | string                    | Override environment identifier         |
+| `region`          | string                    | Override region identifier              |
+| `gatrixUrl`       | string                    | Override Gatrix backend URL             |
+| `apiToken`        | string                    | Override API token                      |
+| `applicationName` | string                    | Override application name               |
+| `worldId`         | string                    | Override world ID                       |
+| `redis`           | Partial\<RedisConfig\>    | Override Redis config (deep merged)     |
+| `cache`           | Partial\<CacheConfig\>    | Override cache settings (deep merged)   |
+| `logger`          | Partial\<LoggerConfig\>   | Override logger settings (deep merged)  |
+| `retry`           | Partial\<RetryConfig\>    | Override retry settings (deep merged)   |
+| `metrics`         | Partial\<MetricsConfig\>  | Override metrics settings (deep merged) |
+| `features`        | Partial\<FeaturesConfig\> | Override feature toggles (deep merged)  |
+| `environments`    | string[] \| '\*'          | Override target environments            |
 
 #### Using mergeConfig Directly
 
@@ -253,17 +254,18 @@ const sdk = new GatrixServerSDK(mergedConfig);
 
 ### Required Configuration Fields
 
-| Field | Type | Description | Example |
-|-------|------|-------------|---------|
-| `gatrixUrl` | string | Gatrix backend URL | `https://api.gatrix.com` |
-| `apiToken` | string | Server API Token | `your-server-api-token` |
-| `applicationName` | string | Application name | `my-game-server` |
-| `service` | string | Service name for identification | `auth`, `lobby`, `world`, `chat` |
-| `group` | string | Service group for categorization | `kr`, `us`, `production` |
-| `environment` | string or `'*'` | Environment identifier or `'*'` for multi-env mode | `env_prod`, `env_staging`, `*` |
-| `region` | string | (Optional) Region identifier for geographic identification | `kr`, `us`, `eu`, `asia` |
+| Field             | Type            | Description                                                | Example                          |
+| ----------------- | --------------- | ---------------------------------------------------------- | -------------------------------- |
+| `gatrixUrl`       | string          | Gatrix backend URL                                         | `https://api.gatrix.com`         |
+| `apiToken`        | string          | Server API Token                                           | `your-server-api-token`          |
+| `applicationName` | string          | Application name                                           | `my-game-server`                 |
+| `service`         | string          | Service name for identification                            | `auth`, `lobby`, `world`, `chat` |
+| `group`           | string          | Service group for categorization                           | `kr`, `us`, `production`         |
+| `environment`     | string or `'*'` | Environment identifier or `'*'` for multi-env mode         | `env_prod`, `env_staging`, `*`   |
+| `region`          | string          | (Optional) Region identifier for geographic identification | `kr`, `us`, `eu`, `asia`         |
 
 These required fields (`service`, `group`, `environment`) are used consistently across:
+
 - **Metrics labels**: All SDK metrics include these as default labels for filtering in Grafana
 - **Service Discovery**: Automatically applied when registering services
 
@@ -297,10 +299,14 @@ const prodWorlds = sdk.getCachedGameWorlds('production');
 
 // Get all cached environments
 const environments = sdk.getCachedEnvironments();
-console.log('Cached environments:', environments.map(e => e.id));
+console.log(
+  'Cached environments:',
+  environments.map((e) => e.id)
+);
 ```
 
 **Multi-Environment Mode Features:**
+
 - Automatically fetches all environments from backend on initialization
 - Caches data for each environment separately
 - Listens for `environment.created` and `environment.deleted` events via Redis PubSub
@@ -340,6 +346,7 @@ console.log('Worlds:', worlds);
 ```
 
 Each game world object includes:
+
 - `worldId`: Unique world identifier
 - `worldServerAddress`: Server address as a URL or host:port (e.g., `https://world.example.com` or `world.example.com:8080`)
 - `name`: World name (localized)
@@ -386,10 +393,10 @@ The SDK provides comprehensive maintenance status checking with clear naming con
 
 #### Naming Convention
 
-| Property/Method | Description |
-|-----------------|-------------|
-| `hasMaintenanceScheduled` | Whether maintenance is scheduled (configured in admin) |
-| `isMaintenanceActive` | Whether maintenance is currently active (time-based check) |
+| Property/Method           | Description                                                |
+| ------------------------- | ---------------------------------------------------------- |
+| `hasMaintenanceScheduled` | Whether maintenance is scheduled (configured in admin)     |
+| `isMaintenanceActive`     | Whether maintenance is currently active (time-based check) |
 
 #### Check Global Service Maintenance
 
@@ -546,13 +553,14 @@ console.log('Surveys for world-1:', surveys);
 
 The SDK supports three cache refresh methods:
 
-| Method | TTL Used | Redis Required | Refresh Trigger |
-|--------|----------|----------------|-----------------|
-| `polling` | ✅ Yes | ❌ No | Periodic interval based on `ttl` |
-| `event` | ❌ No | ✅ Yes | Redis PubSub events from backend |
-| `manual` | ❌ No | ❌ No | Manual `sdk.refreshCache()` calls only |
+| Method    | TTL Used | Redis Required | Refresh Trigger                        |
+| --------- | -------- | -------------- | -------------------------------------- |
+| `polling` | ✅ Yes   | ❌ No          | Periodic interval based on `ttl`       |
+| `event`   | ❌ No    | ✅ Yes         | Redis PubSub events from backend       |
+| `manual`  | ❌ No    | ❌ No          | Manual `sdk.refreshCache()` calls only |
 
 **1. Polling (Default)**
+
 - Periodically refreshes cache at fixed intervals based on `ttl`
 - No Redis required
 - Suitable for applications that don't need real-time updates
@@ -575,6 +583,7 @@ const sdk = new GatrixServerSDK({
 ```
 
 **2. Event-Based (Real-time)**
+
 - Refreshes cache immediately when backend sends events via Redis PubSub
 - Requires Redis for PubSub
 - `ttl` setting is **ignored** (no periodic polling)
@@ -603,6 +612,7 @@ const sdk = new GatrixServerSDK({
 > **Note:** In event mode, cache is refreshed only when Redis events are received. There is no periodic polling fallback. If Redis connection is lost, the cache will not be automatically refreshed until the connection is restored.
 
 **3. Manual**
+
 - No automatic cache refresh
 - `ttl` setting is **ignored** (no periodic polling)
 - Manual refresh only via `sdk.refreshCache()`
@@ -643,6 +653,7 @@ await sdk.refreshSurveysCache();
 ### Event Handling
 
 ⚠️ **Note:** Event handling requires:
+
 - Redis configured in SDK
 - `refreshMethod: 'event'` in cache configuration
 
@@ -650,22 +661,22 @@ await sdk.refreshSurveysCache();
 
 The SDK supports the following standard events that are automatically published by the Gatrix backend:
 
-| Event Type | Trigger | Data | Auto-Refresh |
-|---|---|---|---|
-| `gameworld.created` | New game world created | `{ id, timestamp }` | ✅ Game worlds cache |
-| `gameworld.updated` | Game world modified | `{ id, timestamp, isVisible }` | ✅ Game worlds cache |
-| `gameworld.deleted` | Game world deleted | `{ id, timestamp }` | ✅ Game worlds cache |
-| `gameworld.order_changed` | Game world display order changed | `{ id, timestamp }` | ✅ Game worlds cache |
-| `popup.created` | New popup notice created | `{ id, timestamp }` | ✅ Popup notices cache |
-| `popup.updated` | Popup notice modified | `{ id, timestamp, isVisible }` | ✅ Popup notices cache |
-| `popup.deleted` | Popup notice deleted | `{ id, timestamp }` | ✅ Popup notices cache |
-| `survey.created` | New survey created | `{ id, timestamp }` | ✅ Surveys cache |
-| `survey.updated` | Survey modified | `{ id, timestamp, isActive }` | ✅ Surveys cache |
-| `survey.deleted` | Survey deleted | `{ id, timestamp }` | ✅ Surveys cache |
-| `survey.settings.updated` | Survey settings changed | `{ id, timestamp }` | ✅ Surveys cache |
-| `maintenance.started` | Maintenance mode activated | `{ id, timestamp }` | ✅ Game worlds cache |
-| `maintenance.ended` | Maintenance mode deactivated | `{ id, timestamp }` | ✅ Game worlds cache |
-| `whitelist.updated` | IP or Account whitelist modified | `{ id, timestamp }` | ✅ Whitelists cache |
+| Event Type                | Trigger                          | Data                           | Auto-Refresh           |
+| ------------------------- | -------------------------------- | ------------------------------ | ---------------------- |
+| `gameworld.created`       | New game world created           | `{ id, timestamp }`            | ✅ Game worlds cache   |
+| `gameworld.updated`       | Game world modified              | `{ id, timestamp, isVisible }` | ✅ Game worlds cache   |
+| `gameworld.deleted`       | Game world deleted               | `{ id, timestamp }`            | ✅ Game worlds cache   |
+| `gameworld.order_changed` | Game world display order changed | `{ id, timestamp }`            | ✅ Game worlds cache   |
+| `popup.created`           | New popup notice created         | `{ id, timestamp }`            | ✅ Popup notices cache |
+| `popup.updated`           | Popup notice modified            | `{ id, timestamp, isVisible }` | ✅ Popup notices cache |
+| `popup.deleted`           | Popup notice deleted             | `{ id, timestamp }`            | ✅ Popup notices cache |
+| `survey.created`          | New survey created               | `{ id, timestamp }`            | ✅ Surveys cache       |
+| `survey.updated`          | Survey modified                  | `{ id, timestamp, isActive }`  | ✅ Surveys cache       |
+| `survey.deleted`          | Survey deleted                   | `{ id, timestamp }`            | ✅ Surveys cache       |
+| `survey.settings.updated` | Survey settings changed          | `{ id, timestamp }`            | ✅ Surveys cache       |
+| `maintenance.started`     | Maintenance mode activated       | `{ id, timestamp }`            | ✅ Game worlds cache   |
+| `maintenance.ended`       | Maintenance mode deactivated     | `{ id, timestamp }`            | ✅ Game worlds cache   |
+| `whitelist.updated`       | IP or Account whitelist modified | `{ id, timestamp }`            | ✅ Whitelists cache    |
 
 #### Listen to Standard Events
 
@@ -758,17 +769,17 @@ Service discovery is managed by the Backend. The SDK communicates with the Backe
 ```typescript
 const { instanceId, externalAddress } = await sdk.registerService({
   labels: {
-    service: 'worldd',      // Required: service type
-    group: 'kr-1',          // Optional: service group
-    env: 'production',      // Optional: custom labels
+    service: 'worldd', // Required: service type
+    group: 'kr-1', // Optional: service group
+    env: 'production', // Optional: custom labels
     region: 'ap-northeast-2',
   },
   hostname: 'game-server-1', // Optional: auto-detected from os.hostname() if omitted
   internalAddress: '10.0.0.1', // Optional: auto-detected from first NIC if omitted
   ports: {
-    game: 7777,             // Named port: { serviceName: port }
-    internalApi: 8080,      // Internal API port (for internal services)
-    externalApi: 8081,      // External API port (for external access like edge servers)
+    game: 7777, // Named port: { serviceName: port }
+    internalApi: 8080, // Internal API port (for internal services)
+    externalApi: 8081, // External API port (for external access like edge servers)
     // metricsApi is automatically added from SDK config (default: 9337)
   },
   status: 'ready',
@@ -786,6 +797,7 @@ console.log('External address:', externalAddress); // Auto-detected by backend
 ```
 
 **Notes:**
+
 - `externalAddress` is auto-detected by the backend from the request IP
 - `internalAddress` is optional and will be auto-detected from the first network interface if omitted
 - `labels.service` is required; other labels are optional
@@ -807,6 +819,7 @@ await sdk.updateServiceStatus({
 ```
 
 **Notes:**
+
 - `updateServiceStatus()` performs a partial merge - only provided fields are updated
 - `stats` can contain any key-value pairs for custom metrics
 
@@ -861,6 +874,7 @@ if (isActive) {
 ```
 
 **Supported Languages:**
+
 - `ko`: Korean
 - `en`: English
 - `zh`: Chinese
@@ -908,6 +922,7 @@ sdk.on('whitelist.updated', async (event) => {
 ```
 
 **Whitelist Features:**
+
 - IP whitelist supports both exact IP matching and CIDR notation (e.g., `192.168.1.0/24`)
 - Automatic CIDR range validation for IP whitelisting
 - Time-based validity with `validFrom` and `validUntil` dates
@@ -1029,6 +1044,7 @@ logger.info('User logged in', { userId: 12345 });
 ```
 
 JSON format automatically includes:
+
 - `hostname` - Server hostname
 - `internalIp` - Server's internal IP address
 
@@ -1101,10 +1117,10 @@ import { createMetricsServer, getLogger } from '@gatrix/server-sdk';
 
 const logger = getLogger('MY-SERVER');
 const metricsServer = createMetricsServer({
-  port: 9337,              // Default: 9337 or SDK_METRICS_PORT env
+  port: 9337, // Default: 9337 or SDK_METRICS_PORT env
   applicationName: 'my-game-server',
-  service: 'worldd',       // Service name (required)
-  group: 'kr-1',           // Service group (required)
+  service: 'worldd', // Service name (required)
+  group: 'kr-1', // Service group (required)
   environment: 'env_prod', // Environment (required)
   logger,
 });
@@ -1119,6 +1135,7 @@ await metricsServer.stop();
 ### Default Labels
 
 All metrics automatically include these default labels:
+
 - `sdk`: `gatrix-server-sdk`
 - `service`: Service name from config
 - `group`: Service group from config
@@ -1191,6 +1208,7 @@ const metrics = await registry.metrics();
 ### Metrics Endpoint
 
 The metrics server exposes:
+
 - `GET /metrics` - Prometheus metrics endpoint
 - `GET /health` - Health check endpoint (returns 200 OK)
 
@@ -1225,6 +1243,7 @@ const sdk = new GatrixServerSDK({
 ### Retry Delay Pattern
 
 With default settings, retry delays follow this pattern:
+
 - 1st retry: 2 seconds
 - 2nd retry: 4 seconds
 - 3rd retry: 8 seconds
@@ -1335,9 +1354,11 @@ npm run deploy:game -- --bump 2.0.0 --path /custom/path
 ```
 
 **Environment Variables:**
+
 - `GAME_SERVER_PATH`: Default game server path (default: `c:/work/uwo/game/server/node`)
 
 The deploy script automatically:
+
 1. Bumps version (with `--bump` flag, optionally to specific version)
 2. Builds the SDK
 3. Creates npm package (`.tgz`)
@@ -1363,4 +1384,3 @@ npm run test:worldd
 ## License
 
 Proprietary - Gatrix Team
-

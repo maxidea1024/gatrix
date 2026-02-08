@@ -7,6 +7,7 @@ Event Lens는 OpenPanel에서 영감을 받은 오픈소스 분석 플랫폼으�
 ## 🎯 주요 기능
 
 ### 웹 분석
+
 - ✅ 방문자 추적 (Unique Visitors)
 - ✅ 세션 분석 (Session Duration, Bounce Rate)
 - ✅ 페이지 뷰 추적
@@ -15,6 +16,7 @@ Event Lens는 OpenPanel에서 영감을 받은 오픈소스 분석 플랫폼으�
 - ✅ 지리적 위치 분석
 
 ### 제품 분석
+
 - ✅ 커스텀 이벤트 추적
 - ✅ 퍼널 분석 (Funnel Analysis)
 - ✅ 리텐션 분석 (Retention Analysis)
@@ -22,6 +24,7 @@ Event Lens는 OpenPanel에서 영감을 받은 오픈소스 분석 플랫폼으�
 - ✅ 실시간 분석
 
 ### 고급 기능
+
 - ✅ 배치 이벤트 처리 (1000개/배치)
 - ✅ 실시간 데이터 처리
 - ✅ Materialized Views (사전 집계)
@@ -89,6 +92,7 @@ npm run start:worker
 ### 이벤트 추적
 
 #### POST /track
+
 이벤트 추적
 
 ```bash
@@ -111,6 +115,7 @@ curl -X POST http://localhost:5200/track \
 ```
 
 #### POST /track/batch
+
 배치 이벤트 추적 (최대 100개)
 
 ```bash
@@ -135,6 +140,7 @@ curl -X POST http://localhost:5200/track/batch \
 ### 분석 API
 
 #### GET /insights/:projectId/metrics
+
 기본 메트릭 조회
 
 ```bash
@@ -144,6 +150,7 @@ curl "http://localhost:5200/insights/project-123/metrics?startDate=2024-01-01&en
 ```
 
 #### GET /insights/:projectId/timeseries
+
 시계열 데이터
 
 ```bash
@@ -153,6 +160,7 @@ curl "http://localhost:5200/insights/project-123/timeseries?startDate=2024-01-01
 ```
 
 #### GET /insights/:projectId/live
+
 실시간 방문자
 
 ```bash
@@ -162,6 +170,7 @@ curl "http://localhost:5200/insights/project-123/live" \
 ```
 
 #### POST /insights/:projectId/funnel
+
 퍼널 분석
 
 ```bash
@@ -177,6 +186,7 @@ curl -X POST "http://localhost:5200/insights/project-123/funnel" \
 ```
 
 #### GET /insights/:projectId/retention
+
 리텐션 분석
 
 ```bash
@@ -236,4 +246,3 @@ MIT
 ## 👥 기여
 
 Gatrix Team
-

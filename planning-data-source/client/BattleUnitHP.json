@@ -3,10 +3,7 @@
     ":type": {
       "id": "key",
       "minSailorHPPct3f": "number",
-      "orderChangedMessage": [
-        "text",
-        "text"
-      ],
+      "orderChangedMessage": ["text", "text"],
       "hp": [
         {
           "Name": "text",
@@ -104,14 +101,10 @@
     ":links": {
       "hp": [
         {
-          "StatOperator": [
-            "StatOperator"
-          ]
+          "StatOperator": ["StatOperator"]
         },
         {
-          "StatOperator": [
-            "StatOperator"
-          ]
+          "StatOperator": ["StatOperator"]
         }
       ]
     }
@@ -258,10 +251,7 @@
     "6": {
       "id": 6,
       "minSailorHPPct3f": 1000,
-      "orderChangedMessage": [
-        "점막이 소진되었습니다.",
-        "점막을 몸에 두르기 시작합니다."
-      ],
+      "orderChangedMessage": ["점막이 소진되었습니다.", "점막을 몸에 두르기 시작합니다."],
       "hp": [
         {
           "Name": "체력",
@@ -290,10 +280,7 @@
     "7": {
       "id": 7,
       "minSailorHPPct3f": 1000,
-      "orderChangedMessage": [
-        "점막이 소진되었습니다.",
-        "점막을 몸에 두르기 시작합니다."
-      ],
+      "orderChangedMessage": ["점막이 소진되었습니다.", "점막을 몸에 두르기 시작합니다."],
       "hp": [
         {
           "Name": "체력",
@@ -311,10 +298,7 @@
     "8": {
       "id": 8,
       "minSailorHPPct3f": 1000,
-      "orderChangedMessage": [
-        "점막이 소진되었습니다.",
-        "점막을 몸에 두르기 시작합니다."
-      ],
+      "orderChangedMessage": ["점막이 소진되었습니다.", "점막을 몸에 두르기 시작합니다."],
       "hp": [
         {
           "Name": "체력",
@@ -343,10 +327,7 @@
     "9": {
       "id": 9,
       "minSailorHPPct3f": 1000,
-      "orderChangedMessage": [
-        "점막이 소진되었습니다.",
-        "점막을 몸에 두르기 시작합니다."
-      ],
+      "orderChangedMessage": ["점막이 소진되었습니다.", "점막을 몸에 두르기 시작합니다."],
       "hp": [
         {
           "Name": "체력",

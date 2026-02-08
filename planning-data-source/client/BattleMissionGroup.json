@@ -18,11 +18,7 @@
         }
       ],
       "battleMissionRewardType": "number",
-      "battleMissionRewards": [
-        "number",
-        "number",
-        "number"
-      ]
+      "battleMissionRewards": ["number", "number", "number"]
     },
     ":required": {
       "battleTerms": [
@@ -40,11 +36,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        1,
-        1,
-        1
-      ]
+      "battleMissionRewards": [1, 1, 1]
     },
     ":requiredInObject": {
       "battleTerms": [
@@ -61,11 +53,7 @@
           "Id": 1
         }
       ],
-      "battleMissionRewards": [
-        1,
-        1,
-        1
-      ]
+      "battleMissionRewards": [1, 1, 1]
     },
     ":min": {
       "battleTerms": [
@@ -98,18 +86,9 @@
     ":enum": {},
     ":links": {
       "battleMissionRewards": [
-        [
-          "Reward",
-          "RewardFixed"
-        ],
-        [
-          "Reward",
-          "RewardFixed"
-        ],
-        [
-          "Reward",
-          "RewardFixed"
-        ]
+        ["Reward", "RewardFixed"],
+        ["Reward", "RewardFixed"],
+        ["Reward", "RewardFixed"]
       ]
     }
   },
@@ -132,11 +111,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        94000000,
-        94000000,
-        94000000
-      ]
+      "battleMissionRewards": [94000000, 94000000, 94000000]
     },
     "69100001": {
       "id": 69100001,
@@ -156,11 +131,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061000,
-        90061000,
-        90061000
-      ]
+      "battleMissionRewards": [90061000, 90061000, 90061000]
     },
     "69100002": {
       "id": 69100002,
@@ -180,11 +151,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061000,
-        90061000,
-        90061000
-      ]
+      "battleMissionRewards": [90061000, 90061000, 90061000]
     },
     "69100003": {
       "id": 69100003,
@@ -204,11 +171,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061000,
-        90061000,
-        90061000
-      ]
+      "battleMissionRewards": [90061000, 90061000, 90061000]
     },
     "69100004": {
       "id": 69100004,
@@ -228,11 +191,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061000,
-        90061000,
-        90061000
-      ]
+      "battleMissionRewards": [90061000, 90061000, 90061000]
     },
     "69100005": {
       "id": 69100005,
@@ -252,11 +211,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95000010,
-        95000050,
-        95000100
-      ]
+      "battleMissionRewards": [95000010, 95000050, 95000100]
     },
     "69101000": {
       "id": 69101000,
@@ -276,11 +231,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061000,
-        90061200,
-        90061400
-      ]
+      "battleMissionRewards": [90061000, 90061200, 90061400]
     },
     "69101001": {
       "id": 69101001,
@@ -300,11 +251,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061001,
-        90061201,
-        90061401
-      ]
+      "battleMissionRewards": [90061001, 90061201, 90061401]
     },
     "69101002": {
       "id": 69101002,
@@ -324,11 +271,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061002,
-        90061202,
-        90061402
-      ]
+      "battleMissionRewards": [90061002, 90061202, 90061402]
     },
     "69101003": {
       "id": 69101003,
@@ -348,11 +291,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061003,
-        90061203,
-        90061403
-      ]
+      "battleMissionRewards": [90061003, 90061203, 90061403]
     },
     "69101004": {
       "id": 69101004,
@@ -372,11 +311,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061004,
-        90061204,
-        90061404
-      ]
+      "battleMissionRewards": [90061004, 90061204, 90061404]
     },
     "69101005": {
       "id": 69101005,
@@ -396,11 +331,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061005,
-        90061205,
-        90061405
-      ]
+      "battleMissionRewards": [90061005, 90061205, 90061405]
     },
     "69101006": {
       "id": 69101006,
@@ -420,11 +351,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061006,
-        90061206,
-        90061406
-      ]
+      "battleMissionRewards": [90061006, 90061206, 90061406]
     },
     "69101007": {
       "id": 69101007,
@@ -444,11 +371,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061007,
-        90061207,
-        90061407
-      ]
+      "battleMissionRewards": [90061007, 90061207, 90061407]
     },
     "69101008": {
       "id": 69101008,
@@ -468,11 +391,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061008,
-        90061208,
-        90061408
-      ]
+      "battleMissionRewards": [90061008, 90061208, 90061408]
     },
     "69101009": {
       "id": 69101009,
@@ -492,11 +411,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061009,
-        90061209,
-        90061409
-      ]
+      "battleMissionRewards": [90061009, 90061209, 90061409]
     },
     "69101010": {
       "id": 69101010,
@@ -516,11 +431,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061010,
-        90061210,
-        90061410
-      ]
+      "battleMissionRewards": [90061010, 90061210, 90061410]
     },
     "69101011": {
       "id": 69101011,
@@ -540,11 +451,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061011,
-        90061211,
-        90061411
-      ]
+      "battleMissionRewards": [90061011, 90061211, 90061411]
     },
     "69101012": {
       "id": 69101012,
@@ -564,11 +471,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061012,
-        90061212,
-        90061412
-      ]
+      "battleMissionRewards": [90061012, 90061212, 90061412]
     },
     "69101013": {
       "id": 69101013,
@@ -588,11 +491,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061013,
-        90061213,
-        90061413
-      ]
+      "battleMissionRewards": [90061013, 90061213, 90061413]
     },
     "69101014": {
       "id": 69101014,
@@ -612,11 +511,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061014,
-        90061214,
-        90061414
-      ]
+      "battleMissionRewards": [90061014, 90061214, 90061414]
     },
     "69101015": {
       "id": 69101015,
@@ -636,11 +531,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061015,
-        90061215,
-        90061415
-      ]
+      "battleMissionRewards": [90061015, 90061215, 90061415]
     },
     "69101016": {
       "id": 69101016,
@@ -660,11 +551,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061016,
-        90061216,
-        90061416
-      ]
+      "battleMissionRewards": [90061016, 90061216, 90061416]
     },
     "69101017": {
       "id": 69101017,
@@ -684,11 +571,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061017,
-        90061217,
-        90061417
-      ]
+      "battleMissionRewards": [90061017, 90061217, 90061417]
     },
     "69101018": {
       "id": 69101018,
@@ -708,11 +591,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061018,
-        90061218,
-        90061418
-      ]
+      "battleMissionRewards": [90061018, 90061218, 90061418]
     },
     "69101019": {
       "id": 69101019,
@@ -732,11 +611,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061019,
-        90061219,
-        90061419
-      ]
+      "battleMissionRewards": [90061019, 90061219, 90061419]
     },
     "69101020": {
       "id": 69101020,
@@ -756,11 +631,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061020,
-        90061220,
-        90061420
-      ]
+      "battleMissionRewards": [90061020, 90061220, 90061420]
     },
     "69101021": {
       "id": 69101021,
@@ -780,11 +651,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061021,
-        90061221,
-        90061421
-      ]
+      "battleMissionRewards": [90061021, 90061221, 90061421]
     },
     "69101022": {
       "id": 69101022,
@@ -804,11 +671,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061022,
-        90061222,
-        90061422
-      ]
+      "battleMissionRewards": [90061022, 90061222, 90061422]
     },
     "69101023": {
       "id": 69101023,
@@ -828,11 +691,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061023,
-        90061223,
-        90061423
-      ]
+      "battleMissionRewards": [90061023, 90061223, 90061423]
     },
     "69101024": {
       "id": 69101024,
@@ -852,11 +711,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061024,
-        90061224,
-        90061424
-      ]
+      "battleMissionRewards": [90061024, 90061224, 90061424]
     },
     "69101025": {
       "id": 69101025,
@@ -876,11 +731,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061025,
-        90061225,
-        90061425
-      ]
+      "battleMissionRewards": [90061025, 90061225, 90061425]
     },
     "69101026": {
       "id": 69101026,
@@ -900,11 +751,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061026,
-        90061226,
-        90061426
-      ]
+      "battleMissionRewards": [90061026, 90061226, 90061426]
     },
     "69101027": {
       "id": 69101027,
@@ -924,11 +771,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061027,
-        90061227,
-        90061427
-      ]
+      "battleMissionRewards": [90061027, 90061227, 90061427]
     },
     "69101028": {
       "id": 69101028,
@@ -948,11 +791,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061028,
-        90061228,
-        90061428
-      ]
+      "battleMissionRewards": [90061028, 90061228, 90061428]
     },
     "69101029": {
       "id": 69101029,
@@ -972,11 +811,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061029,
-        90061229,
-        90061429
-      ]
+      "battleMissionRewards": [90061029, 90061229, 90061429]
     },
     "69101030": {
       "id": 69101030,
@@ -996,11 +831,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061030,
-        90061230,
-        90061430
-      ]
+      "battleMissionRewards": [90061030, 90061230, 90061430]
     },
     "69101031": {
       "id": 69101031,
@@ -1020,11 +851,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061031,
-        90061231,
-        90061431
-      ]
+      "battleMissionRewards": [90061031, 90061231, 90061431]
     },
     "69101032": {
       "id": 69101032,
@@ -1044,11 +871,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061032,
-        90061232,
-        90061432
-      ]
+      "battleMissionRewards": [90061032, 90061232, 90061432]
     },
     "69101033": {
       "id": 69101033,
@@ -1068,11 +891,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061033,
-        90061233,
-        90061433
-      ]
+      "battleMissionRewards": [90061033, 90061233, 90061433]
     },
     "69101034": {
       "id": 69101034,
@@ -1092,11 +911,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061034,
-        90061234,
-        90061434
-      ]
+      "battleMissionRewards": [90061034, 90061234, 90061434]
     },
     "69101035": {
       "id": 69101035,
@@ -1116,11 +931,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061035,
-        90061235,
-        90061435
-      ]
+      "battleMissionRewards": [90061035, 90061235, 90061435]
     },
     "69101036": {
       "id": 69101036,
@@ -1140,11 +951,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061036,
-        90061236,
-        90061436
-      ]
+      "battleMissionRewards": [90061036, 90061236, 90061436]
     },
     "69101037": {
       "id": 69101037,
@@ -1164,11 +971,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061037,
-        90061237,
-        90061437
-      ]
+      "battleMissionRewards": [90061037, 90061237, 90061437]
     },
     "69101038": {
       "id": 69101038,
@@ -1188,11 +991,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061038,
-        90061238,
-        90061438
-      ]
+      "battleMissionRewards": [90061038, 90061238, 90061438]
     },
     "69101039": {
       "id": 69101039,
@@ -1212,11 +1011,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061039,
-        90061239,
-        90061439
-      ]
+      "battleMissionRewards": [90061039, 90061239, 90061439]
     },
     "69101040": {
       "id": 69101040,
@@ -1236,11 +1031,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061040,
-        90061240,
-        90061440
-      ]
+      "battleMissionRewards": [90061040, 90061240, 90061440]
     },
     "69101041": {
       "id": 69101041,
@@ -1260,11 +1051,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061041,
-        90061241,
-        90061441
-      ]
+      "battleMissionRewards": [90061041, 90061241, 90061441]
     },
     "69101042": {
       "id": 69101042,
@@ -1284,11 +1071,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061042,
-        90061242,
-        90061442
-      ]
+      "battleMissionRewards": [90061042, 90061242, 90061442]
     },
     "69101043": {
       "id": 69101043,
@@ -1308,11 +1091,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061043,
-        90061243,
-        90061443
-      ]
+      "battleMissionRewards": [90061043, 90061243, 90061443]
     },
     "69101044": {
       "id": 69101044,
@@ -1332,11 +1111,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061044,
-        90061244,
-        90061444
-      ]
+      "battleMissionRewards": [90061044, 90061244, 90061444]
     },
     "69101045": {
       "id": 69101045,
@@ -1356,11 +1131,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061045,
-        90061245,
-        90061445
-      ]
+      "battleMissionRewards": [90061045, 90061245, 90061445]
     },
     "69101046": {
       "id": 69101046,
@@ -1380,11 +1151,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061046,
-        90061246,
-        90061446
-      ]
+      "battleMissionRewards": [90061046, 90061246, 90061446]
     },
     "69101047": {
       "id": 69101047,
@@ -1404,11 +1171,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061047,
-        90061247,
-        90061447
-      ]
+      "battleMissionRewards": [90061047, 90061247, 90061447]
     },
     "69101048": {
       "id": 69101048,
@@ -1428,11 +1191,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061048,
-        90061248,
-        90061448
-      ]
+      "battleMissionRewards": [90061048, 90061248, 90061448]
     },
     "69101049": {
       "id": 69101049,
@@ -1452,11 +1211,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061049,
-        90061249,
-        90061449
-      ]
+      "battleMissionRewards": [90061049, 90061249, 90061449]
     },
     "69101050": {
       "id": 69101050,
@@ -1476,11 +1231,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061050,
-        90061250,
-        90061450
-      ]
+      "battleMissionRewards": [90061050, 90061250, 90061450]
     },
     "69101051": {
       "id": 69101051,
@@ -1500,11 +1251,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061051,
-        90061251,
-        90061451
-      ]
+      "battleMissionRewards": [90061051, 90061251, 90061451]
     },
     "69101052": {
       "id": 69101052,
@@ -1524,11 +1271,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061052,
-        90061252,
-        90061452
-      ]
+      "battleMissionRewards": [90061052, 90061252, 90061452]
     },
     "69101053": {
       "id": 69101053,
@@ -1548,11 +1291,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061053,
-        90061253,
-        90061453
-      ]
+      "battleMissionRewards": [90061053, 90061253, 90061453]
     },
     "69101054": {
       "id": 69101054,
@@ -1572,11 +1311,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061054,
-        90061254,
-        90061454
-      ]
+      "battleMissionRewards": [90061054, 90061254, 90061454]
     },
     "69101055": {
       "id": 69101055,
@@ -1596,11 +1331,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061055,
-        90061255,
-        90061455
-      ]
+      "battleMissionRewards": [90061055, 90061255, 90061455]
     },
     "69101056": {
       "id": 69101056,
@@ -1620,11 +1351,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061056,
-        90061256,
-        90061456
-      ]
+      "battleMissionRewards": [90061056, 90061256, 90061456]
     },
     "69101057": {
       "id": 69101057,
@@ -1644,11 +1371,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061057,
-        90061257,
-        90061457
-      ]
+      "battleMissionRewards": [90061057, 90061257, 90061457]
     },
     "69101058": {
       "id": 69101058,
@@ -1668,11 +1391,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061058,
-        90061258,
-        90061458
-      ]
+      "battleMissionRewards": [90061058, 90061258, 90061458]
     },
     "69101059": {
       "id": 69101059,
@@ -1692,11 +1411,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061059,
-        90061259,
-        90061459
-      ]
+      "battleMissionRewards": [90061059, 90061259, 90061459]
     },
     "69101060": {
       "id": 69101060,
@@ -1716,11 +1431,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061060,
-        90061260,
-        90061460
-      ]
+      "battleMissionRewards": [90061060, 90061260, 90061460]
     },
     "69101061": {
       "id": 69101061,
@@ -1740,11 +1451,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061061,
-        90061261,
-        90061461
-      ]
+      "battleMissionRewards": [90061061, 90061261, 90061461]
     },
     "69101062": {
       "id": 69101062,
@@ -1764,11 +1471,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061062,
-        90061262,
-        90061462
-      ]
+      "battleMissionRewards": [90061062, 90061262, 90061462]
     },
     "69101063": {
       "id": 69101063,
@@ -1788,11 +1491,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061063,
-        90061263,
-        90061463
-      ]
+      "battleMissionRewards": [90061063, 90061263, 90061463]
     },
     "69101064": {
       "id": 69101064,
@@ -1812,11 +1511,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061064,
-        90061264,
-        90061464
-      ]
+      "battleMissionRewards": [90061064, 90061264, 90061464]
     },
     "69101065": {
       "id": 69101065,
@@ -1836,11 +1531,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061065,
-        90061265,
-        90061465
-      ]
+      "battleMissionRewards": [90061065, 90061265, 90061465]
     },
     "69101066": {
       "id": 69101066,
@@ -1860,11 +1551,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061066,
-        90061266,
-        90061466
-      ]
+      "battleMissionRewards": [90061066, 90061266, 90061466]
     },
     "69101067": {
       "id": 69101067,
@@ -1884,11 +1571,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061067,
-        90061267,
-        90061467
-      ]
+      "battleMissionRewards": [90061067, 90061267, 90061467]
     },
     "69101068": {
       "id": 69101068,
@@ -1908,11 +1591,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061068,
-        90061268,
-        90061468
-      ]
+      "battleMissionRewards": [90061068, 90061268, 90061468]
     },
     "69101069": {
       "id": 69101069,
@@ -1932,11 +1611,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061069,
-        90061269,
-        90061469
-      ]
+      "battleMissionRewards": [90061069, 90061269, 90061469]
     },
     "69101070": {
       "id": 69101070,
@@ -1956,11 +1631,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061070,
-        90061270,
-        90061470
-      ]
+      "battleMissionRewards": [90061070, 90061270, 90061470]
     },
     "69101071": {
       "id": 69101071,
@@ -1980,11 +1651,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061071,
-        90061271,
-        90061471
-      ]
+      "battleMissionRewards": [90061071, 90061271, 90061471]
     },
     "69101072": {
       "id": 69101072,
@@ -2004,11 +1671,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061072,
-        90061272,
-        90061472
-      ]
+      "battleMissionRewards": [90061072, 90061272, 90061472]
     },
     "69101073": {
       "id": 69101073,
@@ -2028,11 +1691,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061073,
-        90061273,
-        90061473
-      ]
+      "battleMissionRewards": [90061073, 90061273, 90061473]
     },
     "69101074": {
       "id": 69101074,
@@ -2052,11 +1711,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061074,
-        90061274,
-        90061474
-      ]
+      "battleMissionRewards": [90061074, 90061274, 90061474]
     },
     "69101075": {
       "id": 69101075,
@@ -2076,11 +1731,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061075,
-        90061275,
-        90061475
-      ]
+      "battleMissionRewards": [90061075, 90061275, 90061475]
     },
     "69101076": {
       "id": 69101076,
@@ -2100,11 +1751,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061076,
-        90061276,
-        90061476
-      ]
+      "battleMissionRewards": [90061076, 90061276, 90061476]
     },
     "69101077": {
       "id": 69101077,
@@ -2124,11 +1771,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061077,
-        90061277,
-        90061477
-      ]
+      "battleMissionRewards": [90061077, 90061277, 90061477]
     },
     "69101078": {
       "id": 69101078,
@@ -2148,11 +1791,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061078,
-        90061278,
-        90061478
-      ]
+      "battleMissionRewards": [90061078, 90061278, 90061478]
     },
     "69101079": {
       "id": 69101079,
@@ -2172,11 +1811,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061079,
-        90061279,
-        90061479
-      ]
+      "battleMissionRewards": [90061079, 90061279, 90061479]
     },
     "69101080": {
       "id": 69101080,
@@ -2196,11 +1831,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061080,
-        90061280,
-        90061480
-      ]
+      "battleMissionRewards": [90061080, 90061280, 90061480]
     },
     "69101081": {
       "id": 69101081,
@@ -2220,11 +1851,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061081,
-        90061281,
-        90061481
-      ]
+      "battleMissionRewards": [90061081, 90061281, 90061481]
     },
     "69101082": {
       "id": 69101082,
@@ -2244,11 +1871,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061082,
-        90061282,
-        90061482
-      ]
+      "battleMissionRewards": [90061082, 90061282, 90061482]
     },
     "69101083": {
       "id": 69101083,
@@ -2268,11 +1891,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061083,
-        90061283,
-        90061483
-      ]
+      "battleMissionRewards": [90061083, 90061283, 90061483]
     },
     "69101084": {
       "id": 69101084,
@@ -2292,11 +1911,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061084,
-        90061284,
-        90061484
-      ]
+      "battleMissionRewards": [90061084, 90061284, 90061484]
     },
     "69101085": {
       "id": 69101085,
@@ -2316,11 +1931,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061085,
-        90061285,
-        90061485
-      ]
+      "battleMissionRewards": [90061085, 90061285, 90061485]
     },
     "69101086": {
       "id": 69101086,
@@ -2340,11 +1951,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061086,
-        90061286,
-        90061486
-      ]
+      "battleMissionRewards": [90061086, 90061286, 90061486]
     },
     "69101087": {
       "id": 69101087,
@@ -2364,11 +1971,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061087,
-        90061287,
-        90061487
-      ]
+      "battleMissionRewards": [90061087, 90061287, 90061487]
     },
     "69101088": {
       "id": 69101088,
@@ -2388,11 +1991,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061088,
-        90061288,
-        90061488
-      ]
+      "battleMissionRewards": [90061088, 90061288, 90061488]
     },
     "69101089": {
       "id": 69101089,
@@ -2412,11 +2011,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061089,
-        90061289,
-        90061489
-      ]
+      "battleMissionRewards": [90061089, 90061289, 90061489]
     },
     "69101090": {
       "id": 69101090,
@@ -2436,11 +2031,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061090,
-        90061290,
-        90061490
-      ]
+      "battleMissionRewards": [90061090, 90061290, 90061490]
     },
     "69101091": {
       "id": 69101091,
@@ -2460,11 +2051,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061091,
-        90061291,
-        90061491
-      ]
+      "battleMissionRewards": [90061091, 90061291, 90061491]
     },
     "69101092": {
       "id": 69101092,
@@ -2484,11 +2071,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061092,
-        90061292,
-        90061492
-      ]
+      "battleMissionRewards": [90061092, 90061292, 90061492]
     },
     "69101093": {
       "id": 69101093,
@@ -2508,11 +2091,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061093,
-        90061293,
-        90061493
-      ]
+      "battleMissionRewards": [90061093, 90061293, 90061493]
     },
     "69101094": {
       "id": 69101094,
@@ -2532,11 +2111,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061094,
-        90061294,
-        90061494
-      ]
+      "battleMissionRewards": [90061094, 90061294, 90061494]
     },
     "69101095": {
       "id": 69101095,
@@ -2556,11 +2131,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061095,
-        90061295,
-        90061495
-      ]
+      "battleMissionRewards": [90061095, 90061295, 90061495]
     },
     "69101096": {
       "id": 69101096,
@@ -2580,11 +2151,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061096,
-        90061296,
-        90061496
-      ]
+      "battleMissionRewards": [90061096, 90061296, 90061496]
     },
     "69101097": {
       "id": 69101097,
@@ -2604,11 +2171,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061097,
-        90061297,
-        90061497
-      ]
+      "battleMissionRewards": [90061097, 90061297, 90061497]
     },
     "69101098": {
       "id": 69101098,
@@ -2628,11 +2191,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061098,
-        90061298,
-        90061498
-      ]
+      "battleMissionRewards": [90061098, 90061298, 90061498]
     },
     "69102000": {
       "id": 69102000,
@@ -2652,11 +2211,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062000,
-        90062200,
-        90062400
-      ]
+      "battleMissionRewards": [90062000, 90062200, 90062400]
     },
     "69102001": {
       "id": 69102001,
@@ -2676,11 +2231,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062001,
-        90062201,
-        90062401
-      ]
+      "battleMissionRewards": [90062001, 90062201, 90062401]
     },
     "69102002": {
       "id": 69102002,
@@ -2700,11 +2251,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062002,
-        90062202,
-        90062402
-      ]
+      "battleMissionRewards": [90062002, 90062202, 90062402]
     },
     "69102003": {
       "id": 69102003,
@@ -2724,11 +2271,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062003,
-        90062203,
-        90062403
-      ]
+      "battleMissionRewards": [90062003, 90062203, 90062403]
     },
     "69102004": {
       "id": 69102004,
@@ -2748,11 +2291,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062004,
-        90062204,
-        90062404
-      ]
+      "battleMissionRewards": [90062004, 90062204, 90062404]
     },
     "69102005": {
       "id": 69102005,
@@ -2772,11 +2311,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062005,
-        90062205,
-        90062405
-      ]
+      "battleMissionRewards": [90062005, 90062205, 90062405]
     },
     "69102006": {
       "id": 69102006,
@@ -2796,11 +2331,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062006,
-        90062206,
-        90062406
-      ]
+      "battleMissionRewards": [90062006, 90062206, 90062406]
     },
     "69102007": {
       "id": 69102007,
@@ -2820,11 +2351,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062007,
-        90062207,
-        90062407
-      ]
+      "battleMissionRewards": [90062007, 90062207, 90062407]
     },
     "69102008": {
       "id": 69102008,
@@ -2844,11 +2371,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062008,
-        90062208,
-        90062408
-      ]
+      "battleMissionRewards": [90062008, 90062208, 90062408]
     },
     "69102009": {
       "id": 69102009,
@@ -2868,11 +2391,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062009,
-        90062209,
-        90062409
-      ]
+      "battleMissionRewards": [90062009, 90062209, 90062409]
     },
     "69102010": {
       "id": 69102010,
@@ -2892,11 +2411,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062010,
-        90062210,
-        90062410
-      ]
+      "battleMissionRewards": [90062010, 90062210, 90062410]
     },
     "69102011": {
       "id": 69102011,
@@ -2916,11 +2431,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062011,
-        90062211,
-        90062411
-      ]
+      "battleMissionRewards": [90062011, 90062211, 90062411]
     },
     "69102012": {
       "id": 69102012,
@@ -2940,11 +2451,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062012,
-        90062212,
-        90062412
-      ]
+      "battleMissionRewards": [90062012, 90062212, 90062412]
     },
     "69102013": {
       "id": 69102013,
@@ -2964,11 +2471,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062013,
-        90062213,
-        90062413
-      ]
+      "battleMissionRewards": [90062013, 90062213, 90062413]
     },
     "69102014": {
       "id": 69102014,
@@ -2988,11 +2491,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062014,
-        90062214,
-        90062414
-      ]
+      "battleMissionRewards": [90062014, 90062214, 90062414]
     },
     "69102015": {
       "id": 69102015,
@@ -3012,11 +2511,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062015,
-        90062215,
-        90062415
-      ]
+      "battleMissionRewards": [90062015, 90062215, 90062415]
     },
     "69102016": {
       "id": 69102016,
@@ -3036,11 +2531,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062016,
-        90062216,
-        90062416
-      ]
+      "battleMissionRewards": [90062016, 90062216, 90062416]
     },
     "69102017": {
       "id": 69102017,
@@ -3060,11 +2551,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062017,
-        90062217,
-        90062417
-      ]
+      "battleMissionRewards": [90062017, 90062217, 90062417]
     },
     "69102018": {
       "id": 69102018,
@@ -3084,11 +2571,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062018,
-        90062218,
-        90062418
-      ]
+      "battleMissionRewards": [90062018, 90062218, 90062418]
     },
     "69102019": {
       "id": 69102019,
@@ -3108,11 +2591,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062019,
-        90062219,
-        90062419
-      ]
+      "battleMissionRewards": [90062019, 90062219, 90062419]
     },
     "69102020": {
       "id": 69102020,
@@ -3132,11 +2611,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062020,
-        90062220,
-        90062420
-      ]
+      "battleMissionRewards": [90062020, 90062220, 90062420]
     },
     "69102021": {
       "id": 69102021,
@@ -3156,11 +2631,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062021,
-        90062221,
-        90062421
-      ]
+      "battleMissionRewards": [90062021, 90062221, 90062421]
     },
     "69102022": {
       "id": 69102022,
@@ -3180,11 +2651,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062022,
-        90062222,
-        90062422
-      ]
+      "battleMissionRewards": [90062022, 90062222, 90062422]
     },
     "69102023": {
       "id": 69102023,
@@ -3204,11 +2671,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062023,
-        90062223,
-        90062423
-      ]
+      "battleMissionRewards": [90062023, 90062223, 90062423]
     },
     "69102024": {
       "id": 69102024,
@@ -3228,11 +2691,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062024,
-        90062224,
-        90062424
-      ]
+      "battleMissionRewards": [90062024, 90062224, 90062424]
     },
     "69102025": {
       "id": 69102025,
@@ -3252,11 +2711,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062025,
-        90062225,
-        90062425
-      ]
+      "battleMissionRewards": [90062025, 90062225, 90062425]
     },
     "69102026": {
       "id": 69102026,
@@ -3276,11 +2731,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062026,
-        90062226,
-        90062426
-      ]
+      "battleMissionRewards": [90062026, 90062226, 90062426]
     },
     "69102027": {
       "id": 69102027,
@@ -3300,11 +2751,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062027,
-        90062227,
-        90062427
-      ]
+      "battleMissionRewards": [90062027, 90062227, 90062427]
     },
     "69102028": {
       "id": 69102028,
@@ -3324,11 +2771,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062028,
-        90062228,
-        90062428
-      ]
+      "battleMissionRewards": [90062028, 90062228, 90062428]
     },
     "69102029": {
       "id": 69102029,
@@ -3348,11 +2791,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062029,
-        90062229,
-        90062429
-      ]
+      "battleMissionRewards": [90062029, 90062229, 90062429]
     },
     "69102030": {
       "id": 69102030,
@@ -3372,11 +2811,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062030,
-        90062230,
-        90062430
-      ]
+      "battleMissionRewards": [90062030, 90062230, 90062430]
     },
     "69102031": {
       "id": 69102031,
@@ -3396,11 +2831,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062031,
-        90062231,
-        90062431
-      ]
+      "battleMissionRewards": [90062031, 90062231, 90062431]
     },
     "69102032": {
       "id": 69102032,
@@ -3420,11 +2851,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062032,
-        90062232,
-        90062432
-      ]
+      "battleMissionRewards": [90062032, 90062232, 90062432]
     },
     "69102033": {
       "id": 69102033,
@@ -3444,11 +2871,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062033,
-        90062233,
-        90062433
-      ]
+      "battleMissionRewards": [90062033, 90062233, 90062433]
     },
     "69102034": {
       "id": 69102034,
@@ -3468,11 +2891,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062034,
-        90062234,
-        90062434
-      ]
+      "battleMissionRewards": [90062034, 90062234, 90062434]
     },
     "69102035": {
       "id": 69102035,
@@ -3492,11 +2911,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062035,
-        90062235,
-        90062435
-      ]
+      "battleMissionRewards": [90062035, 90062235, 90062435]
     },
     "69102036": {
       "id": 69102036,
@@ -3516,11 +2931,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062036,
-        90062236,
-        90062436
-      ]
+      "battleMissionRewards": [90062036, 90062236, 90062436]
     },
     "69102037": {
       "id": 69102037,
@@ -3540,11 +2951,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062037,
-        90062237,
-        90062437
-      ]
+      "battleMissionRewards": [90062037, 90062237, 90062437]
     },
     "69102038": {
       "id": 69102038,
@@ -3564,11 +2971,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062038,
-        90062238,
-        90062438
-      ]
+      "battleMissionRewards": [90062038, 90062238, 90062438]
     },
     "69102039": {
       "id": 69102039,
@@ -3588,11 +2991,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062039,
-        90062239,
-        90062439
-      ]
+      "battleMissionRewards": [90062039, 90062239, 90062439]
     },
     "69102040": {
       "id": 69102040,
@@ -3612,11 +3011,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062040,
-        90062240,
-        90062440
-      ]
+      "battleMissionRewards": [90062040, 90062240, 90062440]
     },
     "69102041": {
       "id": 69102041,
@@ -3636,11 +3031,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062041,
-        90062241,
-        90062441
-      ]
+      "battleMissionRewards": [90062041, 90062241, 90062441]
     },
     "69102042": {
       "id": 69102042,
@@ -3660,11 +3051,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062042,
-        90062242,
-        90062442
-      ]
+      "battleMissionRewards": [90062042, 90062242, 90062442]
     },
     "69102043": {
       "id": 69102043,
@@ -3684,11 +3071,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062043,
-        90062243,
-        90062443
-      ]
+      "battleMissionRewards": [90062043, 90062243, 90062443]
     },
     "69102044": {
       "id": 69102044,
@@ -3708,11 +3091,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062044,
-        90062244,
-        90062444
-      ]
+      "battleMissionRewards": [90062044, 90062244, 90062444]
     },
     "69102045": {
       "id": 69102045,
@@ -3732,11 +3111,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062045,
-        90062245,
-        90062445
-      ]
+      "battleMissionRewards": [90062045, 90062245, 90062445]
     },
     "69102046": {
       "id": 69102046,
@@ -3756,11 +3131,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062046,
-        90062246,
-        90062446
-      ]
+      "battleMissionRewards": [90062046, 90062246, 90062446]
     },
     "69102047": {
       "id": 69102047,
@@ -3780,11 +3151,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062047,
-        90062247,
-        90062447
-      ]
+      "battleMissionRewards": [90062047, 90062247, 90062447]
     },
     "69102048": {
       "id": 69102048,
@@ -3804,11 +3171,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062048,
-        90062248,
-        90062448
-      ]
+      "battleMissionRewards": [90062048, 90062248, 90062448]
     },
     "69102049": {
       "id": 69102049,
@@ -3828,11 +3191,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062049,
-        90062249,
-        90062449
-      ]
+      "battleMissionRewards": [90062049, 90062249, 90062449]
     },
     "69102050": {
       "id": 69102050,
@@ -3852,11 +3211,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062050,
-        90062250,
-        90062450
-      ]
+      "battleMissionRewards": [90062050, 90062250, 90062450]
     },
     "69102051": {
       "id": 69102051,
@@ -3876,11 +3231,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062051,
-        90062251,
-        90062451
-      ]
+      "battleMissionRewards": [90062051, 90062251, 90062451]
     },
     "69102052": {
       "id": 69102052,
@@ -3900,11 +3251,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062052,
-        90062252,
-        90062452
-      ]
+      "battleMissionRewards": [90062052, 90062252, 90062452]
     },
     "69102053": {
       "id": 69102053,
@@ -3924,11 +3271,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062053,
-        90062253,
-        90062453
-      ]
+      "battleMissionRewards": [90062053, 90062253, 90062453]
     },
     "69102054": {
       "id": 69102054,
@@ -3948,11 +3291,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062054,
-        90062254,
-        90062454
-      ]
+      "battleMissionRewards": [90062054, 90062254, 90062454]
     },
     "69102055": {
       "id": 69102055,
@@ -3972,11 +3311,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062055,
-        90062255,
-        90062455
-      ]
+      "battleMissionRewards": [90062055, 90062255, 90062455]
     },
     "69102056": {
       "id": 69102056,
@@ -3996,11 +3331,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062056,
-        90062256,
-        90062456
-      ]
+      "battleMissionRewards": [90062056, 90062256, 90062456]
     },
     "69102057": {
       "id": 69102057,
@@ -4020,11 +3351,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062057,
-        90062257,
-        90062457
-      ]
+      "battleMissionRewards": [90062057, 90062257, 90062457]
     },
     "69102058": {
       "id": 69102058,
@@ -4044,11 +3371,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062058,
-        90062258,
-        90062458
-      ]
+      "battleMissionRewards": [90062058, 90062258, 90062458]
     },
     "69102059": {
       "id": 69102059,
@@ -4068,11 +3391,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062059,
-        90062259,
-        90062459
-      ]
+      "battleMissionRewards": [90062059, 90062259, 90062459]
     },
     "69102060": {
       "id": 69102060,
@@ -4092,11 +3411,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062060,
-        90062260,
-        90062460
-      ]
+      "battleMissionRewards": [90062060, 90062260, 90062460]
     },
     "69102061": {
       "id": 69102061,
@@ -4116,11 +3431,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062061,
-        90062261,
-        90062461
-      ]
+      "battleMissionRewards": [90062061, 90062261, 90062461]
     },
     "69102062": {
       "id": 69102062,
@@ -4140,11 +3451,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062062,
-        90062262,
-        90062462
-      ]
+      "battleMissionRewards": [90062062, 90062262, 90062462]
     },
     "69102063": {
       "id": 69102063,
@@ -4164,11 +3471,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062063,
-        90062263,
-        90062463
-      ]
+      "battleMissionRewards": [90062063, 90062263, 90062463]
     },
     "69102064": {
       "id": 69102064,
@@ -4188,11 +3491,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062064,
-        90062264,
-        90062464
-      ]
+      "battleMissionRewards": [90062064, 90062264, 90062464]
     },
     "69102065": {
       "id": 69102065,
@@ -4212,11 +3511,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062065,
-        90062265,
-        90062465
-      ]
+      "battleMissionRewards": [90062065, 90062265, 90062465]
     },
     "69102066": {
       "id": 69102066,
@@ -4236,11 +3531,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062066,
-        90062266,
-        90062466
-      ]
+      "battleMissionRewards": [90062066, 90062266, 90062466]
     },
     "69102067": {
       "id": 69102067,
@@ -4260,11 +3551,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062067,
-        90062267,
-        90062467
-      ]
+      "battleMissionRewards": [90062067, 90062267, 90062467]
     },
     "69102068": {
       "id": 69102068,
@@ -4284,11 +3571,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062068,
-        90062268,
-        90062468
-      ]
+      "battleMissionRewards": [90062068, 90062268, 90062468]
     },
     "69102069": {
       "id": 69102069,
@@ -4308,11 +3591,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062069,
-        90062269,
-        90062469
-      ]
+      "battleMissionRewards": [90062069, 90062269, 90062469]
     },
     "69102070": {
       "id": 69102070,
@@ -4332,11 +3611,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062070,
-        90062270,
-        90062470
-      ]
+      "battleMissionRewards": [90062070, 90062270, 90062470]
     },
     "69102071": {
       "id": 69102071,
@@ -4356,11 +3631,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062071,
-        90062271,
-        90062471
-      ]
+      "battleMissionRewards": [90062071, 90062271, 90062471]
     },
     "69102072": {
       "id": 69102072,
@@ -4380,11 +3651,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062072,
-        90062272,
-        90062472
-      ]
+      "battleMissionRewards": [90062072, 90062272, 90062472]
     },
     "69102073": {
       "id": 69102073,
@@ -4404,11 +3671,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062073,
-        90062273,
-        90062473
-      ]
+      "battleMissionRewards": [90062073, 90062273, 90062473]
     },
     "69102074": {
       "id": 69102074,
@@ -4428,11 +3691,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062074,
-        90062274,
-        90062474
-      ]
+      "battleMissionRewards": [90062074, 90062274, 90062474]
     },
     "69102075": {
       "id": 69102075,
@@ -4452,11 +3711,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062075,
-        90062275,
-        90062475
-      ]
+      "battleMissionRewards": [90062075, 90062275, 90062475]
     },
     "69102076": {
       "id": 69102076,
@@ -4476,11 +3731,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062076,
-        90062276,
-        90062476
-      ]
+      "battleMissionRewards": [90062076, 90062276, 90062476]
     },
     "69102077": {
       "id": 69102077,
@@ -4500,11 +3751,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062077,
-        90062277,
-        90062477
-      ]
+      "battleMissionRewards": [90062077, 90062277, 90062477]
     },
     "69102078": {
       "id": 69102078,
@@ -4524,11 +3771,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062078,
-        90062278,
-        90062478
-      ]
+      "battleMissionRewards": [90062078, 90062278, 90062478]
     },
     "69102079": {
       "id": 69102079,
@@ -4548,11 +3791,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062079,
-        90062279,
-        90062479
-      ]
+      "battleMissionRewards": [90062079, 90062279, 90062479]
     },
     "69102080": {
       "id": 69102080,
@@ -4572,11 +3811,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062080,
-        90062280,
-        90062480
-      ]
+      "battleMissionRewards": [90062080, 90062280, 90062480]
     },
     "69102081": {
       "id": 69102081,
@@ -4596,11 +3831,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062081,
-        90062281,
-        90062481
-      ]
+      "battleMissionRewards": [90062081, 90062281, 90062481]
     },
     "69102082": {
       "id": 69102082,
@@ -4620,11 +3851,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062082,
-        90062282,
-        90062482
-      ]
+      "battleMissionRewards": [90062082, 90062282, 90062482]
     },
     "69102083": {
       "id": 69102083,
@@ -4644,11 +3871,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062083,
-        90062283,
-        90062483
-      ]
+      "battleMissionRewards": [90062083, 90062283, 90062483]
     },
     "69102084": {
       "id": 69102084,
@@ -4668,11 +3891,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062084,
-        90062284,
-        90062484
-      ]
+      "battleMissionRewards": [90062084, 90062284, 90062484]
     },
     "69102085": {
       "id": 69102085,
@@ -4692,11 +3911,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062085,
-        90062285,
-        90062485
-      ]
+      "battleMissionRewards": [90062085, 90062285, 90062485]
     },
     "69102086": {
       "id": 69102086,
@@ -4716,11 +3931,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062086,
-        90062286,
-        90062486
-      ]
+      "battleMissionRewards": [90062086, 90062286, 90062486]
     },
     "69102087": {
       "id": 69102087,
@@ -4740,11 +3951,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062087,
-        90062287,
-        90062487
-      ]
+      "battleMissionRewards": [90062087, 90062287, 90062487]
     },
     "69102088": {
       "id": 69102088,
@@ -4764,11 +3971,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062088,
-        90062288,
-        90062488
-      ]
+      "battleMissionRewards": [90062088, 90062288, 90062488]
     },
     "69102089": {
       "id": 69102089,
@@ -4788,11 +3991,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062089,
-        90062289,
-        90062489
-      ]
+      "battleMissionRewards": [90062089, 90062289, 90062489]
     },
     "69102090": {
       "id": 69102090,
@@ -4812,11 +4011,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062090,
-        90062290,
-        90062490
-      ]
+      "battleMissionRewards": [90062090, 90062290, 90062490]
     },
     "69102091": {
       "id": 69102091,
@@ -4836,11 +4031,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062091,
-        90062291,
-        90062491
-      ]
+      "battleMissionRewards": [90062091, 90062291, 90062491]
     },
     "69102092": {
       "id": 69102092,
@@ -4860,11 +4051,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062092,
-        90062292,
-        90062492
-      ]
+      "battleMissionRewards": [90062092, 90062292, 90062492]
     },
     "69102093": {
       "id": 69102093,
@@ -4884,11 +4071,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062093,
-        90062293,
-        90062493
-      ]
+      "battleMissionRewards": [90062093, 90062293, 90062493]
     },
     "69102094": {
       "id": 69102094,
@@ -4908,11 +4091,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062094,
-        90062294,
-        90062494
-      ]
+      "battleMissionRewards": [90062094, 90062294, 90062494]
     },
     "69102095": {
       "id": 69102095,
@@ -4932,11 +4111,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062095,
-        90062295,
-        90062495
-      ]
+      "battleMissionRewards": [90062095, 90062295, 90062495]
     },
     "69102096": {
       "id": 69102096,
@@ -4956,11 +4131,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062096,
-        90062296,
-        90062496
-      ]
+      "battleMissionRewards": [90062096, 90062296, 90062496]
     },
     "69102097": {
       "id": 69102097,
@@ -4980,11 +4151,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062097,
-        90062297,
-        90062497
-      ]
+      "battleMissionRewards": [90062097, 90062297, 90062497]
     },
     "69102098": {
       "id": 69102098,
@@ -5004,11 +4171,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90062098,
-        90062298,
-        90062498
-      ]
+      "battleMissionRewards": [90062098, 90062298, 90062498]
     },
     "69103000": {
       "id": 69103000,
@@ -5028,11 +4191,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063000,
-        90063200,
-        90063400
-      ]
+      "battleMissionRewards": [90063000, 90063200, 90063400]
     },
     "69103001": {
       "id": 69103001,
@@ -5052,11 +4211,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063001,
-        90063201,
-        90063401
-      ]
+      "battleMissionRewards": [90063001, 90063201, 90063401]
     },
     "69103002": {
       "id": 69103002,
@@ -5076,11 +4231,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063002,
-        90063202,
-        90063402
-      ]
+      "battleMissionRewards": [90063002, 90063202, 90063402]
     },
     "69103003": {
       "id": 69103003,
@@ -5100,11 +4251,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063003,
-        90063203,
-        90063403
-      ]
+      "battleMissionRewards": [90063003, 90063203, 90063403]
     },
     "69103004": {
       "id": 69103004,
@@ -5124,11 +4271,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063004,
-        90063204,
-        90063404
-      ]
+      "battleMissionRewards": [90063004, 90063204, 90063404]
     },
     "69103005": {
       "id": 69103005,
@@ -5148,11 +4291,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063005,
-        90063205,
-        90063405
-      ]
+      "battleMissionRewards": [90063005, 90063205, 90063405]
     },
     "69103006": {
       "id": 69103006,
@@ -5172,11 +4311,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063006,
-        90063206,
-        90063406
-      ]
+      "battleMissionRewards": [90063006, 90063206, 90063406]
     },
     "69103007": {
       "id": 69103007,
@@ -5196,11 +4331,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063007,
-        90063207,
-        90063407
-      ]
+      "battleMissionRewards": [90063007, 90063207, 90063407]
     },
     "69103008": {
       "id": 69103008,
@@ -5220,11 +4351,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063008,
-        90063208,
-        90063408
-      ]
+      "battleMissionRewards": [90063008, 90063208, 90063408]
     },
     "69103009": {
       "id": 69103009,
@@ -5244,11 +4371,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063009,
-        90063209,
-        90063409
-      ]
+      "battleMissionRewards": [90063009, 90063209, 90063409]
     },
     "69103010": {
       "id": 69103010,
@@ -5268,11 +4391,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063010,
-        90063210,
-        90063410
-      ]
+      "battleMissionRewards": [90063010, 90063210, 90063410]
     },
     "69103011": {
       "id": 69103011,
@@ -5292,11 +4411,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063011,
-        90063211,
-        90063411
-      ]
+      "battleMissionRewards": [90063011, 90063211, 90063411]
     },
     "69103012": {
       "id": 69103012,
@@ -5316,11 +4431,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063012,
-        90063212,
-        90063412
-      ]
+      "battleMissionRewards": [90063012, 90063212, 90063412]
     },
     "69103013": {
       "id": 69103013,
@@ -5340,11 +4451,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063013,
-        90063213,
-        90063413
-      ]
+      "battleMissionRewards": [90063013, 90063213, 90063413]
     },
     "69103014": {
       "id": 69103014,
@@ -5364,11 +4471,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063014,
-        90063214,
-        90063414
-      ]
+      "battleMissionRewards": [90063014, 90063214, 90063414]
     },
     "69103015": {
       "id": 69103015,
@@ -5388,11 +4491,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063015,
-        90063215,
-        90063415
-      ]
+      "battleMissionRewards": [90063015, 90063215, 90063415]
     },
     "69103016": {
       "id": 69103016,
@@ -5412,11 +4511,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063016,
-        90063216,
-        90063416
-      ]
+      "battleMissionRewards": [90063016, 90063216, 90063416]
     },
     "69103017": {
       "id": 69103017,
@@ -5436,11 +4531,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063017,
-        90063217,
-        90063417
-      ]
+      "battleMissionRewards": [90063017, 90063217, 90063417]
     },
     "69103018": {
       "id": 69103018,
@@ -5460,11 +4551,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063018,
-        90063218,
-        90063418
-      ]
+      "battleMissionRewards": [90063018, 90063218, 90063418]
     },
     "69103019": {
       "id": 69103019,
@@ -5484,11 +4571,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063019,
-        90063219,
-        90063419
-      ]
+      "battleMissionRewards": [90063019, 90063219, 90063419]
     },
     "69103020": {
       "id": 69103020,
@@ -5508,11 +4591,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063020,
-        90063220,
-        90063420
-      ]
+      "battleMissionRewards": [90063020, 90063220, 90063420]
     },
     "69103021": {
       "id": 69103021,
@@ -5532,11 +4611,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063021,
-        90063221,
-        90063421
-      ]
+      "battleMissionRewards": [90063021, 90063221, 90063421]
     },
     "69103022": {
       "id": 69103022,
@@ -5556,11 +4631,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063022,
-        90063222,
-        90063422
-      ]
+      "battleMissionRewards": [90063022, 90063222, 90063422]
     },
     "69103023": {
       "id": 69103023,
@@ -5580,11 +4651,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063023,
-        90063223,
-        90063423
-      ]
+      "battleMissionRewards": [90063023, 90063223, 90063423]
     },
     "69103024": {
       "id": 69103024,
@@ -5604,11 +4671,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063024,
-        90063224,
-        90063424
-      ]
+      "battleMissionRewards": [90063024, 90063224, 90063424]
     },
     "69103025": {
       "id": 69103025,
@@ -5628,11 +4691,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063025,
-        90063225,
-        90063425
-      ]
+      "battleMissionRewards": [90063025, 90063225, 90063425]
     },
     "69103026": {
       "id": 69103026,
@@ -5652,11 +4711,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063026,
-        90063226,
-        90063426
-      ]
+      "battleMissionRewards": [90063026, 90063226, 90063426]
     },
     "69103027": {
       "id": 69103027,
@@ -5676,11 +4731,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063027,
-        90063227,
-        90063427
-      ]
+      "battleMissionRewards": [90063027, 90063227, 90063427]
     },
     "69103028": {
       "id": 69103028,
@@ -5700,11 +4751,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063028,
-        90063228,
-        90063428
-      ]
+      "battleMissionRewards": [90063028, 90063228, 90063428]
     },
     "69103029": {
       "id": 69103029,
@@ -5724,11 +4771,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063029,
-        90063229,
-        90063429
-      ]
+      "battleMissionRewards": [90063029, 90063229, 90063429]
     },
     "69103030": {
       "id": 69103030,
@@ -5748,11 +4791,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063030,
-        90063230,
-        90063430
-      ]
+      "battleMissionRewards": [90063030, 90063230, 90063430]
     },
     "69103031": {
       "id": 69103031,
@@ -5772,11 +4811,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063031,
-        90063231,
-        90063431
-      ]
+      "battleMissionRewards": [90063031, 90063231, 90063431]
     },
     "69103032": {
       "id": 69103032,
@@ -5796,11 +4831,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063032,
-        90063232,
-        90063432
-      ]
+      "battleMissionRewards": [90063032, 90063232, 90063432]
     },
     "69103033": {
       "id": 69103033,
@@ -5820,11 +4851,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063033,
-        90063233,
-        90063433
-      ]
+      "battleMissionRewards": [90063033, 90063233, 90063433]
     },
     "69103034": {
       "id": 69103034,
@@ -5844,11 +4871,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063034,
-        90063234,
-        90063434
-      ]
+      "battleMissionRewards": [90063034, 90063234, 90063434]
     },
     "69103035": {
       "id": 69103035,
@@ -5868,11 +4891,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063035,
-        90063235,
-        90063435
-      ]
+      "battleMissionRewards": [90063035, 90063235, 90063435]
     },
     "69103036": {
       "id": 69103036,
@@ -5892,11 +4911,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063036,
-        90063236,
-        90063436
-      ]
+      "battleMissionRewards": [90063036, 90063236, 90063436]
     },
     "69103037": {
       "id": 69103037,
@@ -5916,11 +4931,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063037,
-        90063237,
-        90063437
-      ]
+      "battleMissionRewards": [90063037, 90063237, 90063437]
     },
     "69103038": {
       "id": 69103038,
@@ -5940,11 +4951,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063038,
-        90063238,
-        90063438
-      ]
+      "battleMissionRewards": [90063038, 90063238, 90063438]
     },
     "69103039": {
       "id": 69103039,
@@ -5964,11 +4971,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063039,
-        90063239,
-        90063439
-      ]
+      "battleMissionRewards": [90063039, 90063239, 90063439]
     },
     "69103040": {
       "id": 69103040,
@@ -5988,11 +4991,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063040,
-        90063240,
-        90063440
-      ]
+      "battleMissionRewards": [90063040, 90063240, 90063440]
     },
     "69103041": {
       "id": 69103041,
@@ -6012,11 +5011,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063041,
-        90063241,
-        90063441
-      ]
+      "battleMissionRewards": [90063041, 90063241, 90063441]
     },
     "69103042": {
       "id": 69103042,
@@ -6036,11 +5031,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063042,
-        90063242,
-        90063442
-      ]
+      "battleMissionRewards": [90063042, 90063242, 90063442]
     },
     "69103043": {
       "id": 69103043,
@@ -6060,11 +5051,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063043,
-        90063243,
-        90063443
-      ]
+      "battleMissionRewards": [90063043, 90063243, 90063443]
     },
     "69103044": {
       "id": 69103044,
@@ -6084,11 +5071,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063044,
-        90063244,
-        90063444
-      ]
+      "battleMissionRewards": [90063044, 90063244, 90063444]
     },
     "69103045": {
       "id": 69103045,
@@ -6108,11 +5091,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063045,
-        90063245,
-        90063445
-      ]
+      "battleMissionRewards": [90063045, 90063245, 90063445]
     },
     "69103046": {
       "id": 69103046,
@@ -6132,11 +5111,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063046,
-        90063246,
-        90063446
-      ]
+      "battleMissionRewards": [90063046, 90063246, 90063446]
     },
     "69103047": {
       "id": 69103047,
@@ -6156,11 +5131,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063047,
-        90063247,
-        90063447
-      ]
+      "battleMissionRewards": [90063047, 90063247, 90063447]
     },
     "69103048": {
       "id": 69103048,
@@ -6180,11 +5151,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063048,
-        90063248,
-        90063448
-      ]
+      "battleMissionRewards": [90063048, 90063248, 90063448]
     },
     "69103049": {
       "id": 69103049,
@@ -6204,11 +5171,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063049,
-        90063249,
-        90063449
-      ]
+      "battleMissionRewards": [90063049, 90063249, 90063449]
     },
     "69103050": {
       "id": 69103050,
@@ -6228,11 +5191,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063050,
-        90063250,
-        90063450
-      ]
+      "battleMissionRewards": [90063050, 90063250, 90063450]
     },
     "69103051": {
       "id": 69103051,
@@ -6252,11 +5211,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063051,
-        90063251,
-        90063451
-      ]
+      "battleMissionRewards": [90063051, 90063251, 90063451]
     },
     "69103052": {
       "id": 69103052,
@@ -6276,11 +5231,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063052,
-        90063252,
-        90063452
-      ]
+      "battleMissionRewards": [90063052, 90063252, 90063452]
     },
     "69103053": {
       "id": 69103053,
@@ -6300,11 +5251,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063053,
-        90063253,
-        90063453
-      ]
+      "battleMissionRewards": [90063053, 90063253, 90063453]
     },
     "69103054": {
       "id": 69103054,
@@ -6324,11 +5271,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063054,
-        90063254,
-        90063454
-      ]
+      "battleMissionRewards": [90063054, 90063254, 90063454]
     },
     "69103055": {
       "id": 69103055,
@@ -6348,11 +5291,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063055,
-        90063255,
-        90063455
-      ]
+      "battleMissionRewards": [90063055, 90063255, 90063455]
     },
     "69103056": {
       "id": 69103056,
@@ -6372,11 +5311,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063056,
-        90063256,
-        90063456
-      ]
+      "battleMissionRewards": [90063056, 90063256, 90063456]
     },
     "69103057": {
       "id": 69103057,
@@ -6396,11 +5331,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063057,
-        90063257,
-        90063457
-      ]
+      "battleMissionRewards": [90063057, 90063257, 90063457]
     },
     "69103058": {
       "id": 69103058,
@@ -6420,11 +5351,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063058,
-        90063258,
-        90063458
-      ]
+      "battleMissionRewards": [90063058, 90063258, 90063458]
     },
     "69103059": {
       "id": 69103059,
@@ -6444,11 +5371,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063059,
-        90063259,
-        90063459
-      ]
+      "battleMissionRewards": [90063059, 90063259, 90063459]
     },
     "69103060": {
       "id": 69103060,
@@ -6468,11 +5391,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063060,
-        90063260,
-        90063460
-      ]
+      "battleMissionRewards": [90063060, 90063260, 90063460]
     },
     "69103061": {
       "id": 69103061,
@@ -6492,11 +5411,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063061,
-        90063261,
-        90063461
-      ]
+      "battleMissionRewards": [90063061, 90063261, 90063461]
     },
     "69103062": {
       "id": 69103062,
@@ -6516,11 +5431,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063062,
-        90063262,
-        90063462
-      ]
+      "battleMissionRewards": [90063062, 90063262, 90063462]
     },
     "69103063": {
       "id": 69103063,
@@ -6540,11 +5451,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063063,
-        90063263,
-        90063463
-      ]
+      "battleMissionRewards": [90063063, 90063263, 90063463]
     },
     "69103064": {
       "id": 69103064,
@@ -6564,11 +5471,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063064,
-        90063264,
-        90063464
-      ]
+      "battleMissionRewards": [90063064, 90063264, 90063464]
     },
     "69103065": {
       "id": 69103065,
@@ -6588,11 +5491,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063065,
-        90063265,
-        90063465
-      ]
+      "battleMissionRewards": [90063065, 90063265, 90063465]
     },
     "69103066": {
       "id": 69103066,
@@ -6612,11 +5511,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063066,
-        90063266,
-        90063466
-      ]
+      "battleMissionRewards": [90063066, 90063266, 90063466]
     },
     "69103067": {
       "id": 69103067,
@@ -6636,11 +5531,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063067,
-        90063267,
-        90063467
-      ]
+      "battleMissionRewards": [90063067, 90063267, 90063467]
     },
     "69103068": {
       "id": 69103068,
@@ -6660,11 +5551,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063068,
-        90063268,
-        90063468
-      ]
+      "battleMissionRewards": [90063068, 90063268, 90063468]
     },
     "69103069": {
       "id": 69103069,
@@ -6684,11 +5571,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063069,
-        90063269,
-        90063469
-      ]
+      "battleMissionRewards": [90063069, 90063269, 90063469]
     },
     "69103070": {
       "id": 69103070,
@@ -6708,11 +5591,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063070,
-        90063270,
-        90063470
-      ]
+      "battleMissionRewards": [90063070, 90063270, 90063470]
     },
     "69103071": {
       "id": 69103071,
@@ -6732,11 +5611,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063071,
-        90063271,
-        90063471
-      ]
+      "battleMissionRewards": [90063071, 90063271, 90063471]
     },
     "69103072": {
       "id": 69103072,
@@ -6756,11 +5631,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063072,
-        90063272,
-        90063472
-      ]
+      "battleMissionRewards": [90063072, 90063272, 90063472]
     },
     "69103073": {
       "id": 69103073,
@@ -6780,11 +5651,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063073,
-        90063273,
-        90063473
-      ]
+      "battleMissionRewards": [90063073, 90063273, 90063473]
     },
     "69103074": {
       "id": 69103074,
@@ -6804,11 +5671,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063074,
-        90063274,
-        90063474
-      ]
+      "battleMissionRewards": [90063074, 90063274, 90063474]
     },
     "69103075": {
       "id": 69103075,
@@ -6828,11 +5691,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063075,
-        90063275,
-        90063475
-      ]
+      "battleMissionRewards": [90063075, 90063275, 90063475]
     },
     "69103076": {
       "id": 69103076,
@@ -6852,11 +5711,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063076,
-        90063276,
-        90063476
-      ]
+      "battleMissionRewards": [90063076, 90063276, 90063476]
     },
     "69103077": {
       "id": 69103077,
@@ -6876,11 +5731,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063077,
-        90063277,
-        90063477
-      ]
+      "battleMissionRewards": [90063077, 90063277, 90063477]
     },
     "69103078": {
       "id": 69103078,
@@ -6900,11 +5751,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063078,
-        90063278,
-        90063478
-      ]
+      "battleMissionRewards": [90063078, 90063278, 90063478]
     },
     "69103079": {
       "id": 69103079,
@@ -6924,11 +5771,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063079,
-        90063279,
-        90063479
-      ]
+      "battleMissionRewards": [90063079, 90063279, 90063479]
     },
     "69103080": {
       "id": 69103080,
@@ -6948,11 +5791,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063080,
-        90063280,
-        90063480
-      ]
+      "battleMissionRewards": [90063080, 90063280, 90063480]
     },
     "69103081": {
       "id": 69103081,
@@ -6972,11 +5811,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063081,
-        90063281,
-        90063481
-      ]
+      "battleMissionRewards": [90063081, 90063281, 90063481]
     },
     "69103082": {
       "id": 69103082,
@@ -6996,11 +5831,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063082,
-        90063282,
-        90063482
-      ]
+      "battleMissionRewards": [90063082, 90063282, 90063482]
     },
     "69103083": {
       "id": 69103083,
@@ -7020,11 +5851,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063083,
-        90063283,
-        90063483
-      ]
+      "battleMissionRewards": [90063083, 90063283, 90063483]
     },
     "69103084": {
       "id": 69103084,
@@ -7044,11 +5871,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063084,
-        90063284,
-        90063484
-      ]
+      "battleMissionRewards": [90063084, 90063284, 90063484]
     },
     "69103085": {
       "id": 69103085,
@@ -7068,11 +5891,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063085,
-        90063285,
-        90063485
-      ]
+      "battleMissionRewards": [90063085, 90063285, 90063485]
     },
     "69103086": {
       "id": 69103086,
@@ -7092,11 +5911,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063086,
-        90063286,
-        90063486
-      ]
+      "battleMissionRewards": [90063086, 90063286, 90063486]
     },
     "69103087": {
       "id": 69103087,
@@ -7116,11 +5931,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063087,
-        90063287,
-        90063487
-      ]
+      "battleMissionRewards": [90063087, 90063287, 90063487]
     },
     "69103088": {
       "id": 69103088,
@@ -7140,11 +5951,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063088,
-        90063288,
-        90063488
-      ]
+      "battleMissionRewards": [90063088, 90063288, 90063488]
     },
     "69103089": {
       "id": 69103089,
@@ -7164,11 +5971,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063089,
-        90063289,
-        90063489
-      ]
+      "battleMissionRewards": [90063089, 90063289, 90063489]
     },
     "69103090": {
       "id": 69103090,
@@ -7188,11 +5991,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063090,
-        90063290,
-        90063490
-      ]
+      "battleMissionRewards": [90063090, 90063290, 90063490]
     },
     "69103091": {
       "id": 69103091,
@@ -7212,11 +6011,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063091,
-        90063291,
-        90063491
-      ]
+      "battleMissionRewards": [90063091, 90063291, 90063491]
     },
     "69103092": {
       "id": 69103092,
@@ -7236,11 +6031,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063092,
-        90063292,
-        90063492
-      ]
+      "battleMissionRewards": [90063092, 90063292, 90063492]
     },
     "69103093": {
       "id": 69103093,
@@ -7260,11 +6051,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063093,
-        90063293,
-        90063493
-      ]
+      "battleMissionRewards": [90063093, 90063293, 90063493]
     },
     "69103094": {
       "id": 69103094,
@@ -7284,11 +6071,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063094,
-        90063294,
-        90063494
-      ]
+      "battleMissionRewards": [90063094, 90063294, 90063494]
     },
     "69103095": {
       "id": 69103095,
@@ -7308,11 +6091,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063095,
-        90063295,
-        90063495
-      ]
+      "battleMissionRewards": [90063095, 90063295, 90063495]
     },
     "69103096": {
       "id": 69103096,
@@ -7332,11 +6111,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063096,
-        90063296,
-        90063496
-      ]
+      "battleMissionRewards": [90063096, 90063296, 90063496]
     },
     "69103097": {
       "id": 69103097,
@@ -7356,11 +6131,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063097,
-        90063297,
-        90063497
-      ]
+      "battleMissionRewards": [90063097, 90063297, 90063497]
     },
     "69103098": {
       "id": 69103098,
@@ -7380,11 +6151,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90063098,
-        90063298,
-        90063498
-      ]
+      "battleMissionRewards": [90063098, 90063298, 90063498]
     },
     "69104000": {
       "id": 69104000,
@@ -7404,11 +6171,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064000,
-        90064200,
-        90064400
-      ]
+      "battleMissionRewards": [90064000, 90064200, 90064400]
     },
     "69104001": {
       "id": 69104001,
@@ -7428,11 +6191,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064001,
-        90064201,
-        90064401
-      ]
+      "battleMissionRewards": [90064001, 90064201, 90064401]
     },
     "69104002": {
       "id": 69104002,
@@ -7452,11 +6211,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064002,
-        90064202,
-        90064402
-      ]
+      "battleMissionRewards": [90064002, 90064202, 90064402]
     },
     "69104003": {
       "id": 69104003,
@@ -7476,11 +6231,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064003,
-        90064203,
-        90064403
-      ]
+      "battleMissionRewards": [90064003, 90064203, 90064403]
     },
     "69104004": {
       "id": 69104004,
@@ -7500,11 +6251,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064004,
-        90064204,
-        90064404
-      ]
+      "battleMissionRewards": [90064004, 90064204, 90064404]
     },
     "69104005": {
       "id": 69104005,
@@ -7524,11 +6271,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064005,
-        90064205,
-        90064405
-      ]
+      "battleMissionRewards": [90064005, 90064205, 90064405]
     },
     "69104006": {
       "id": 69104006,
@@ -7548,11 +6291,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064006,
-        90064206,
-        90064406
-      ]
+      "battleMissionRewards": [90064006, 90064206, 90064406]
     },
     "69104007": {
       "id": 69104007,
@@ -7572,11 +6311,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064007,
-        90064207,
-        90064407
-      ]
+      "battleMissionRewards": [90064007, 90064207, 90064407]
     },
     "69104008": {
       "id": 69104008,
@@ -7596,11 +6331,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064008,
-        90064208,
-        90064408
-      ]
+      "battleMissionRewards": [90064008, 90064208, 90064408]
     },
     "69104009": {
       "id": 69104009,
@@ -7620,11 +6351,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064009,
-        90064209,
-        90064409
-      ]
+      "battleMissionRewards": [90064009, 90064209, 90064409]
     },
     "69104010": {
       "id": 69104010,
@@ -7644,11 +6371,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064010,
-        90064210,
-        90064410
-      ]
+      "battleMissionRewards": [90064010, 90064210, 90064410]
     },
     "69104011": {
       "id": 69104011,
@@ -7668,11 +6391,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064011,
-        90064211,
-        90064411
-      ]
+      "battleMissionRewards": [90064011, 90064211, 90064411]
     },
     "69104012": {
       "id": 69104012,
@@ -7692,11 +6411,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064012,
-        90064212,
-        90064412
-      ]
+      "battleMissionRewards": [90064012, 90064212, 90064412]
     },
     "69104013": {
       "id": 69104013,
@@ -7716,11 +6431,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064013,
-        90064213,
-        90064413
-      ]
+      "battleMissionRewards": [90064013, 90064213, 90064413]
     },
     "69104014": {
       "id": 69104014,
@@ -7740,11 +6451,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064014,
-        90064214,
-        90064414
-      ]
+      "battleMissionRewards": [90064014, 90064214, 90064414]
     },
     "69104015": {
       "id": 69104015,
@@ -7764,11 +6471,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064015,
-        90064215,
-        90064415
-      ]
+      "battleMissionRewards": [90064015, 90064215, 90064415]
     },
     "69104016": {
       "id": 69104016,
@@ -7788,11 +6491,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064016,
-        90064216,
-        90064416
-      ]
+      "battleMissionRewards": [90064016, 90064216, 90064416]
     },
     "69104017": {
       "id": 69104017,
@@ -7812,11 +6511,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064017,
-        90064217,
-        90064417
-      ]
+      "battleMissionRewards": [90064017, 90064217, 90064417]
     },
     "69104018": {
       "id": 69104018,
@@ -7836,11 +6531,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064018,
-        90064218,
-        90064418
-      ]
+      "battleMissionRewards": [90064018, 90064218, 90064418]
     },
     "69104019": {
       "id": 69104019,
@@ -7860,11 +6551,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064019,
-        90064219,
-        90064419
-      ]
+      "battleMissionRewards": [90064019, 90064219, 90064419]
     },
     "69104020": {
       "id": 69104020,
@@ -7884,11 +6571,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064020,
-        90064220,
-        90064420
-      ]
+      "battleMissionRewards": [90064020, 90064220, 90064420]
     },
     "69104021": {
       "id": 69104021,
@@ -7908,11 +6591,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064021,
-        90064221,
-        90064421
-      ]
+      "battleMissionRewards": [90064021, 90064221, 90064421]
     },
     "69104022": {
       "id": 69104022,
@@ -7932,11 +6611,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064022,
-        90064222,
-        90064422
-      ]
+      "battleMissionRewards": [90064022, 90064222, 90064422]
     },
     "69104023": {
       "id": 69104023,
@@ -7956,11 +6631,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064023,
-        90064223,
-        90064423
-      ]
+      "battleMissionRewards": [90064023, 90064223, 90064423]
     },
     "69104024": {
       "id": 69104024,
@@ -7980,11 +6651,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064024,
-        90064224,
-        90064424
-      ]
+      "battleMissionRewards": [90064024, 90064224, 90064424]
     },
     "69104025": {
       "id": 69104025,
@@ -8004,11 +6671,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064025,
-        90064225,
-        90064425
-      ]
+      "battleMissionRewards": [90064025, 90064225, 90064425]
     },
     "69104026": {
       "id": 69104026,
@@ -8028,11 +6691,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064026,
-        90064226,
-        90064426
-      ]
+      "battleMissionRewards": [90064026, 90064226, 90064426]
     },
     "69104027": {
       "id": 69104027,
@@ -8052,11 +6711,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064027,
-        90064227,
-        90064427
-      ]
+      "battleMissionRewards": [90064027, 90064227, 90064427]
     },
     "69104028": {
       "id": 69104028,
@@ -8076,11 +6731,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064028,
-        90064228,
-        90064428
-      ]
+      "battleMissionRewards": [90064028, 90064228, 90064428]
     },
     "69104029": {
       "id": 69104029,
@@ -8100,11 +6751,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064029,
-        90064229,
-        90064429
-      ]
+      "battleMissionRewards": [90064029, 90064229, 90064429]
     },
     "69104030": {
       "id": 69104030,
@@ -8124,11 +6771,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064030,
-        90064230,
-        90064430
-      ]
+      "battleMissionRewards": [90064030, 90064230, 90064430]
     },
     "69104031": {
       "id": 69104031,
@@ -8148,11 +6791,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064031,
-        90064231,
-        90064431
-      ]
+      "battleMissionRewards": [90064031, 90064231, 90064431]
     },
     "69104032": {
       "id": 69104032,
@@ -8172,11 +6811,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064032,
-        90064232,
-        90064432
-      ]
+      "battleMissionRewards": [90064032, 90064232, 90064432]
     },
     "69104033": {
       "id": 69104033,
@@ -8196,11 +6831,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064033,
-        90064233,
-        90064433
-      ]
+      "battleMissionRewards": [90064033, 90064233, 90064433]
     },
     "69104034": {
       "id": 69104034,
@@ -8220,11 +6851,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064034,
-        90064234,
-        90064434
-      ]
+      "battleMissionRewards": [90064034, 90064234, 90064434]
     },
     "69104035": {
       "id": 69104035,
@@ -8244,11 +6871,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064035,
-        90064235,
-        90064435
-      ]
+      "battleMissionRewards": [90064035, 90064235, 90064435]
     },
     "69104036": {
       "id": 69104036,
@@ -8268,11 +6891,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064036,
-        90064236,
-        90064436
-      ]
+      "battleMissionRewards": [90064036, 90064236, 90064436]
     },
     "69104037": {
       "id": 69104037,
@@ -8292,11 +6911,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064037,
-        90064237,
-        90064437
-      ]
+      "battleMissionRewards": [90064037, 90064237, 90064437]
     },
     "69104038": {
       "id": 69104038,
@@ -8316,11 +6931,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064038,
-        90064238,
-        90064438
-      ]
+      "battleMissionRewards": [90064038, 90064238, 90064438]
     },
     "69104039": {
       "id": 69104039,
@@ -8340,11 +6951,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064039,
-        90064239,
-        90064439
-      ]
+      "battleMissionRewards": [90064039, 90064239, 90064439]
     },
     "69104040": {
       "id": 69104040,
@@ -8364,11 +6971,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064040,
-        90064240,
-        90064440
-      ]
+      "battleMissionRewards": [90064040, 90064240, 90064440]
     },
     "69104041": {
       "id": 69104041,
@@ -8388,11 +6991,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064041,
-        90064241,
-        90064441
-      ]
+      "battleMissionRewards": [90064041, 90064241, 90064441]
     },
     "69104042": {
       "id": 69104042,
@@ -8412,11 +7011,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064042,
-        90064242,
-        90064442
-      ]
+      "battleMissionRewards": [90064042, 90064242, 90064442]
     },
     "69104043": {
       "id": 69104043,
@@ -8436,11 +7031,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064043,
-        90064243,
-        90064443
-      ]
+      "battleMissionRewards": [90064043, 90064243, 90064443]
     },
     "69104044": {
       "id": 69104044,
@@ -8460,11 +7051,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064044,
-        90064244,
-        90064444
-      ]
+      "battleMissionRewards": [90064044, 90064244, 90064444]
     },
     "69104045": {
       "id": 69104045,
@@ -8484,11 +7071,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064045,
-        90064245,
-        90064445
-      ]
+      "battleMissionRewards": [90064045, 90064245, 90064445]
     },
     "69104046": {
       "id": 69104046,
@@ -8508,11 +7091,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064046,
-        90064246,
-        90064446
-      ]
+      "battleMissionRewards": [90064046, 90064246, 90064446]
     },
     "69104047": {
       "id": 69104047,
@@ -8532,11 +7111,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064047,
-        90064247,
-        90064447
-      ]
+      "battleMissionRewards": [90064047, 90064247, 90064447]
     },
     "69104048": {
       "id": 69104048,
@@ -8556,11 +7131,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064048,
-        90064248,
-        90064448
-      ]
+      "battleMissionRewards": [90064048, 90064248, 90064448]
     },
     "69104049": {
       "id": 69104049,
@@ -8580,11 +7151,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064049,
-        90064249,
-        90064449
-      ]
+      "battleMissionRewards": [90064049, 90064249, 90064449]
     },
     "69104050": {
       "id": 69104050,
@@ -8604,11 +7171,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064050,
-        90064250,
-        90064450
-      ]
+      "battleMissionRewards": [90064050, 90064250, 90064450]
     },
     "69104051": {
       "id": 69104051,
@@ -8628,11 +7191,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064051,
-        90064251,
-        90064451
-      ]
+      "battleMissionRewards": [90064051, 90064251, 90064451]
     },
     "69104052": {
       "id": 69104052,
@@ -8652,11 +7211,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064052,
-        90064252,
-        90064452
-      ]
+      "battleMissionRewards": [90064052, 90064252, 90064452]
     },
     "69104053": {
       "id": 69104053,
@@ -8676,11 +7231,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064053,
-        90064253,
-        90064453
-      ]
+      "battleMissionRewards": [90064053, 90064253, 90064453]
     },
     "69104054": {
       "id": 69104054,
@@ -8700,11 +7251,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064054,
-        90064254,
-        90064454
-      ]
+      "battleMissionRewards": [90064054, 90064254, 90064454]
     },
     "69104055": {
       "id": 69104055,
@@ -8724,11 +7271,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064055,
-        90064255,
-        90064455
-      ]
+      "battleMissionRewards": [90064055, 90064255, 90064455]
     },
     "69104056": {
       "id": 69104056,
@@ -8748,11 +7291,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064056,
-        90064256,
-        90064456
-      ]
+      "battleMissionRewards": [90064056, 90064256, 90064456]
     },
     "69104057": {
       "id": 69104057,
@@ -8772,11 +7311,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064057,
-        90064257,
-        90064457
-      ]
+      "battleMissionRewards": [90064057, 90064257, 90064457]
     },
     "69104058": {
       "id": 69104058,
@@ -8796,11 +7331,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064058,
-        90064258,
-        90064458
-      ]
+      "battleMissionRewards": [90064058, 90064258, 90064458]
     },
     "69104059": {
       "id": 69104059,
@@ -8820,11 +7351,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064059,
-        90064259,
-        90064459
-      ]
+      "battleMissionRewards": [90064059, 90064259, 90064459]
     },
     "69104060": {
       "id": 69104060,
@@ -8844,11 +7371,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064060,
-        90064260,
-        90064460
-      ]
+      "battleMissionRewards": [90064060, 90064260, 90064460]
     },
     "69104061": {
       "id": 69104061,
@@ -8868,11 +7391,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064061,
-        90064261,
-        90064461
-      ]
+      "battleMissionRewards": [90064061, 90064261, 90064461]
     },
     "69104062": {
       "id": 69104062,
@@ -8892,11 +7411,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064062,
-        90064262,
-        90064462
-      ]
+      "battleMissionRewards": [90064062, 90064262, 90064462]
     },
     "69104063": {
       "id": 69104063,
@@ -8916,11 +7431,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064063,
-        90064263,
-        90064463
-      ]
+      "battleMissionRewards": [90064063, 90064263, 90064463]
     },
     "69104064": {
       "id": 69104064,
@@ -8940,11 +7451,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064064,
-        90064264,
-        90064464
-      ]
+      "battleMissionRewards": [90064064, 90064264, 90064464]
     },
     "69104065": {
       "id": 69104065,
@@ -8964,11 +7471,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064065,
-        90064265,
-        90064465
-      ]
+      "battleMissionRewards": [90064065, 90064265, 90064465]
     },
     "69104066": {
       "id": 69104066,
@@ -8988,11 +7491,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064066,
-        90064266,
-        90064466
-      ]
+      "battleMissionRewards": [90064066, 90064266, 90064466]
     },
     "69104067": {
       "id": 69104067,
@@ -9012,11 +7511,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064067,
-        90064267,
-        90064467
-      ]
+      "battleMissionRewards": [90064067, 90064267, 90064467]
     },
     "69104068": {
       "id": 69104068,
@@ -9036,11 +7531,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064068,
-        90064268,
-        90064468
-      ]
+      "battleMissionRewards": [90064068, 90064268, 90064468]
     },
     "69104069": {
       "id": 69104069,
@@ -9060,11 +7551,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064069,
-        90064269,
-        90064469
-      ]
+      "battleMissionRewards": [90064069, 90064269, 90064469]
     },
     "69104070": {
       "id": 69104070,
@@ -9084,11 +7571,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064070,
-        90064270,
-        90064470
-      ]
+      "battleMissionRewards": [90064070, 90064270, 90064470]
     },
     "69104071": {
       "id": 69104071,
@@ -9108,11 +7591,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064071,
-        90064271,
-        90064471
-      ]
+      "battleMissionRewards": [90064071, 90064271, 90064471]
     },
     "69104072": {
       "id": 69104072,
@@ -9132,11 +7611,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064072,
-        90064272,
-        90064472
-      ]
+      "battleMissionRewards": [90064072, 90064272, 90064472]
     },
     "69104073": {
       "id": 69104073,
@@ -9156,11 +7631,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064073,
-        90064273,
-        90064473
-      ]
+      "battleMissionRewards": [90064073, 90064273, 90064473]
     },
     "69104074": {
       "id": 69104074,
@@ -9180,11 +7651,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064074,
-        90064274,
-        90064474
-      ]
+      "battleMissionRewards": [90064074, 90064274, 90064474]
     },
     "69104075": {
       "id": 69104075,
@@ -9204,11 +7671,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064075,
-        90064275,
-        90064475
-      ]
+      "battleMissionRewards": [90064075, 90064275, 90064475]
     },
     "69104076": {
       "id": 69104076,
@@ -9228,11 +7691,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064076,
-        90064276,
-        90064476
-      ]
+      "battleMissionRewards": [90064076, 90064276, 90064476]
     },
     "69104077": {
       "id": 69104077,
@@ -9252,11 +7711,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064077,
-        90064277,
-        90064477
-      ]
+      "battleMissionRewards": [90064077, 90064277, 90064477]
     },
     "69104078": {
       "id": 69104078,
@@ -9276,11 +7731,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064078,
-        90064278,
-        90064478
-      ]
+      "battleMissionRewards": [90064078, 90064278, 90064478]
     },
     "69104079": {
       "id": 69104079,
@@ -9300,11 +7751,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064079,
-        90064279,
-        90064479
-      ]
+      "battleMissionRewards": [90064079, 90064279, 90064479]
     },
     "69104080": {
       "id": 69104080,
@@ -9324,11 +7771,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064080,
-        90064280,
-        90064480
-      ]
+      "battleMissionRewards": [90064080, 90064280, 90064480]
     },
     "69104081": {
       "id": 69104081,
@@ -9348,11 +7791,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064081,
-        90064281,
-        90064481
-      ]
+      "battleMissionRewards": [90064081, 90064281, 90064481]
     },
     "69104082": {
       "id": 69104082,
@@ -9372,11 +7811,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064082,
-        90064282,
-        90064482
-      ]
+      "battleMissionRewards": [90064082, 90064282, 90064482]
     },
     "69104083": {
       "id": 69104083,
@@ -9396,11 +7831,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064083,
-        90064283,
-        90064483
-      ]
+      "battleMissionRewards": [90064083, 90064283, 90064483]
     },
     "69104084": {
       "id": 69104084,
@@ -9420,11 +7851,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064084,
-        90064284,
-        90064484
-      ]
+      "battleMissionRewards": [90064084, 90064284, 90064484]
     },
     "69104085": {
       "id": 69104085,
@@ -9444,11 +7871,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064085,
-        90064285,
-        90064485
-      ]
+      "battleMissionRewards": [90064085, 90064285, 90064485]
     },
     "69104086": {
       "id": 69104086,
@@ -9468,11 +7891,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064086,
-        90064286,
-        90064486
-      ]
+      "battleMissionRewards": [90064086, 90064286, 90064486]
     },
     "69104087": {
       "id": 69104087,
@@ -9492,11 +7911,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064087,
-        90064287,
-        90064487
-      ]
+      "battleMissionRewards": [90064087, 90064287, 90064487]
     },
     "69104088": {
       "id": 69104088,
@@ -9516,11 +7931,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064088,
-        90064288,
-        90064488
-      ]
+      "battleMissionRewards": [90064088, 90064288, 90064488]
     },
     "69104089": {
       "id": 69104089,
@@ -9540,11 +7951,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064089,
-        90064289,
-        90064489
-      ]
+      "battleMissionRewards": [90064089, 90064289, 90064489]
     },
     "69104090": {
       "id": 69104090,
@@ -9564,11 +7971,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064090,
-        90064290,
-        90064490
-      ]
+      "battleMissionRewards": [90064090, 90064290, 90064490]
     },
     "69104091": {
       "id": 69104091,
@@ -9588,11 +7991,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064091,
-        90064291,
-        90064491
-      ]
+      "battleMissionRewards": [90064091, 90064291, 90064491]
     },
     "69104092": {
       "id": 69104092,
@@ -9612,11 +8011,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064092,
-        90064292,
-        90064492
-      ]
+      "battleMissionRewards": [90064092, 90064292, 90064492]
     },
     "69104093": {
       "id": 69104093,
@@ -9636,11 +8031,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064093,
-        90064293,
-        90064493
-      ]
+      "battleMissionRewards": [90064093, 90064293, 90064493]
     },
     "69104094": {
       "id": 69104094,
@@ -9660,11 +8051,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064094,
-        90064294,
-        90064494
-      ]
+      "battleMissionRewards": [90064094, 90064294, 90064494]
     },
     "69104095": {
       "id": 69104095,
@@ -9684,11 +8071,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064095,
-        90064295,
-        90064495
-      ]
+      "battleMissionRewards": [90064095, 90064295, 90064495]
     },
     "69104096": {
       "id": 69104096,
@@ -9708,11 +8091,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064096,
-        90064296,
-        90064496
-      ]
+      "battleMissionRewards": [90064096, 90064296, 90064496]
     },
     "69104097": {
       "id": 69104097,
@@ -9732,11 +8111,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064097,
-        90064297,
-        90064497
-      ]
+      "battleMissionRewards": [90064097, 90064297, 90064497]
     },
     "69104098": {
       "id": 69104098,
@@ -9756,11 +8131,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90064098,
-        90064298,
-        90064498
-      ]
+      "battleMissionRewards": [90064098, 90064298, 90064498]
     },
     "69105000": {
       "id": 69105000,
@@ -9780,11 +8151,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060001,
-        90060200,
-        90060400
-      ]
+      "battleMissionRewards": [90060001, 90060200, 90060400]
     },
     "69105001": {
       "id": 69105001,
@@ -9804,11 +8171,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060002,
-        90060201,
-        90060401
-      ]
+      "battleMissionRewards": [90060002, 90060201, 90060401]
     },
     "69105002": {
       "id": 69105002,
@@ -9828,11 +8191,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060003,
-        90060202,
-        90060402
-      ]
+      "battleMissionRewards": [90060003, 90060202, 90060402]
     },
     "69105003": {
       "id": 69105003,
@@ -9852,11 +8211,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060004,
-        90060203,
-        90060403
-      ]
+      "battleMissionRewards": [90060004, 90060203, 90060403]
     },
     "69105004": {
       "id": 69105004,
@@ -9876,11 +8231,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060005,
-        90060204,
-        90060404
-      ]
+      "battleMissionRewards": [90060005, 90060204, 90060404]
     },
     "69105005": {
       "id": 69105005,
@@ -9900,11 +8251,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060006,
-        90060205,
-        90060405
-      ]
+      "battleMissionRewards": [90060006, 90060205, 90060405]
     },
     "69105006": {
       "id": 69105006,
@@ -9924,11 +8271,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060007,
-        90060206,
-        90060406
-      ]
+      "battleMissionRewards": [90060007, 90060206, 90060406]
     },
     "69105007": {
       "id": 69105007,
@@ -9948,11 +8291,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060008,
-        90060207,
-        90060407
-      ]
+      "battleMissionRewards": [90060008, 90060207, 90060407]
     },
     "69105008": {
       "id": 69105008,
@@ -9972,11 +8311,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060009,
-        90060208,
-        90060408
-      ]
+      "battleMissionRewards": [90060009, 90060208, 90060408]
     },
     "69105009": {
       "id": 69105009,
@@ -9996,11 +8331,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060010,
-        90060209,
-        90060409
-      ]
+      "battleMissionRewards": [90060010, 90060209, 90060409]
     },
     "69105010": {
       "id": 69105010,
@@ -10020,11 +8351,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060011,
-        90060210,
-        90060410
-      ]
+      "battleMissionRewards": [90060011, 90060210, 90060410]
     },
     "69105011": {
       "id": 69105011,
@@ -10044,11 +8371,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060012,
-        90060211,
-        90060411
-      ]
+      "battleMissionRewards": [90060012, 90060211, 90060411]
     },
     "69105012": {
       "id": 69105012,
@@ -10068,11 +8391,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060013,
-        90060212,
-        90060412
-      ]
+      "battleMissionRewards": [90060013, 90060212, 90060412]
     },
     "69105013": {
       "id": 69105013,
@@ -10092,11 +8411,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060014,
-        90060213,
-        90060413
-      ]
+      "battleMissionRewards": [90060014, 90060213, 90060413]
     },
     "69105014": {
       "id": 69105014,
@@ -10116,11 +8431,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060015,
-        90060214,
-        90060414
-      ]
+      "battleMissionRewards": [90060015, 90060214, 90060414]
     },
     "69105015": {
       "id": 69105015,
@@ -10140,11 +8451,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060016,
-        90060215,
-        90060415
-      ]
+      "battleMissionRewards": [90060016, 90060215, 90060415]
     },
     "69105016": {
       "id": 69105016,
@@ -10164,11 +8471,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060017,
-        90060216,
-        90060416
-      ]
+      "battleMissionRewards": [90060017, 90060216, 90060416]
     },
     "69105017": {
       "id": 69105017,
@@ -10188,11 +8491,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060018,
-        90060217,
-        90060417
-      ]
+      "battleMissionRewards": [90060018, 90060217, 90060417]
     },
     "69105018": {
       "id": 69105018,
@@ -10212,11 +8511,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060019,
-        90060218,
-        90060418
-      ]
+      "battleMissionRewards": [90060019, 90060218, 90060418]
     },
     "69105019": {
       "id": 69105019,
@@ -10236,11 +8531,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060020,
-        90060219,
-        90060419
-      ]
+      "battleMissionRewards": [90060020, 90060219, 90060419]
     },
     "69105020": {
       "id": 69105020,
@@ -10260,11 +8551,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060021,
-        90060220,
-        90060420
-      ]
+      "battleMissionRewards": [90060021, 90060220, 90060420]
     },
     "69105021": {
       "id": 69105021,
@@ -10284,11 +8571,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060022,
-        90060221,
-        90060421
-      ]
+      "battleMissionRewards": [90060022, 90060221, 90060421]
     },
     "69105022": {
       "id": 69105022,
@@ -10308,11 +8591,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060023,
-        90060222,
-        90060422
-      ]
+      "battleMissionRewards": [90060023, 90060222, 90060422]
     },
     "69105023": {
       "id": 69105023,
@@ -10332,11 +8611,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060024,
-        90060223,
-        90060423
-      ]
+      "battleMissionRewards": [90060024, 90060223, 90060423]
     },
     "69105024": {
       "id": 69105024,
@@ -10356,11 +8631,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060025,
-        90060224,
-        90060424
-      ]
+      "battleMissionRewards": [90060025, 90060224, 90060424]
     },
     "69105025": {
       "id": 69105025,
@@ -10380,11 +8651,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060026,
-        90060225,
-        90060425
-      ]
+      "battleMissionRewards": [90060026, 90060225, 90060425]
     },
     "69105026": {
       "id": 69105026,
@@ -10404,11 +8671,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060027,
-        90060226,
-        90060426
-      ]
+      "battleMissionRewards": [90060027, 90060226, 90060426]
     },
     "69105027": {
       "id": 69105027,
@@ -10428,11 +8691,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060028,
-        90060227,
-        90060427
-      ]
+      "battleMissionRewards": [90060028, 90060227, 90060427]
     },
     "69105028": {
       "id": 69105028,
@@ -10452,11 +8711,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060029,
-        90060228,
-        90060428
-      ]
+      "battleMissionRewards": [90060029, 90060228, 90060428]
     },
     "69105029": {
       "id": 69105029,
@@ -10476,11 +8731,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060030,
-        90060229,
-        90060429
-      ]
+      "battleMissionRewards": [90060030, 90060229, 90060429]
     },
     "69105030": {
       "id": 69105030,
@@ -10500,11 +8751,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060031,
-        90060230,
-        90060430
-      ]
+      "battleMissionRewards": [90060031, 90060230, 90060430]
     },
     "69105031": {
       "id": 69105031,
@@ -10524,11 +8771,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060032,
-        90060231,
-        90060431
-      ]
+      "battleMissionRewards": [90060032, 90060231, 90060431]
     },
     "69105032": {
       "id": 69105032,
@@ -10548,11 +8791,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060033,
-        90060232,
-        90060432
-      ]
+      "battleMissionRewards": [90060033, 90060232, 90060432]
     },
     "69105033": {
       "id": 69105033,
@@ -10572,11 +8811,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060034,
-        90060233,
-        90060433
-      ]
+      "battleMissionRewards": [90060034, 90060233, 90060433]
     },
     "69105034": {
       "id": 69105034,
@@ -10596,11 +8831,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060035,
-        90060234,
-        90060434
-      ]
+      "battleMissionRewards": [90060035, 90060234, 90060434]
     },
     "69105035": {
       "id": 69105035,
@@ -10620,11 +8851,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060036,
-        90060235,
-        90060435
-      ]
+      "battleMissionRewards": [90060036, 90060235, 90060435]
     },
     "69105036": {
       "id": 69105036,
@@ -10644,11 +8871,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060037,
-        90060236,
-        90060436
-      ]
+      "battleMissionRewards": [90060037, 90060236, 90060436]
     },
     "69105037": {
       "id": 69105037,
@@ -10668,11 +8891,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060038,
-        90060237,
-        90060437
-      ]
+      "battleMissionRewards": [90060038, 90060237, 90060437]
     },
     "69105038": {
       "id": 69105038,
@@ -10692,11 +8911,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060039,
-        90060238,
-        90060438
-      ]
+      "battleMissionRewards": [90060039, 90060238, 90060438]
     },
     "69105039": {
       "id": 69105039,
@@ -10716,11 +8931,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060040,
-        90060239,
-        90060439
-      ]
+      "battleMissionRewards": [90060040, 90060239, 90060439]
     },
     "69105040": {
       "id": 69105040,
@@ -10740,11 +8951,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060041,
-        90060240,
-        90060440
-      ]
+      "battleMissionRewards": [90060041, 90060240, 90060440]
     },
     "69105041": {
       "id": 69105041,
@@ -10764,11 +8971,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060042,
-        90060241,
-        90060441
-      ]
+      "battleMissionRewards": [90060042, 90060241, 90060441]
     },
     "69105042": {
       "id": 69105042,
@@ -10788,11 +8991,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060043,
-        90060242,
-        90060442
-      ]
+      "battleMissionRewards": [90060043, 90060242, 90060442]
     },
     "69105043": {
       "id": 69105043,
@@ -10812,11 +9011,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060044,
-        90060243,
-        90060443
-      ]
+      "battleMissionRewards": [90060044, 90060243, 90060443]
     },
     "69105044": {
       "id": 69105044,
@@ -10836,11 +9031,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060045,
-        90060244,
-        90060444
-      ]
+      "battleMissionRewards": [90060045, 90060244, 90060444]
     },
     "69105045": {
       "id": 69105045,
@@ -10860,11 +9051,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060046,
-        90060245,
-        90060445
-      ]
+      "battleMissionRewards": [90060046, 90060245, 90060445]
     },
     "69105046": {
       "id": 69105046,
@@ -10884,11 +9071,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060047,
-        90060246,
-        90060446
-      ]
+      "battleMissionRewards": [90060047, 90060246, 90060446]
     },
     "69105047": {
       "id": 69105047,
@@ -10908,11 +9091,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060048,
-        90060247,
-        90060447
-      ]
+      "battleMissionRewards": [90060048, 90060247, 90060447]
     },
     "69105048": {
       "id": 69105048,
@@ -10932,11 +9111,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060049,
-        90060248,
-        90060448
-      ]
+      "battleMissionRewards": [90060049, 90060248, 90060448]
     },
     "69105049": {
       "id": 69105049,
@@ -10956,11 +9131,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060050,
-        90060249,
-        90060449
-      ]
+      "battleMissionRewards": [90060050, 90060249, 90060449]
     },
     "69105050": {
       "id": 69105050,
@@ -10980,11 +9151,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060051,
-        90060250,
-        90060450
-      ]
+      "battleMissionRewards": [90060051, 90060250, 90060450]
     },
     "69105051": {
       "id": 69105051,
@@ -11004,11 +9171,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060052,
-        90060251,
-        90060451
-      ]
+      "battleMissionRewards": [90060052, 90060251, 90060451]
     },
     "69105052": {
       "id": 69105052,
@@ -11028,11 +9191,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060053,
-        90060252,
-        90060452
-      ]
+      "battleMissionRewards": [90060053, 90060252, 90060452]
     },
     "69105053": {
       "id": 69105053,
@@ -11052,11 +9211,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060054,
-        90060253,
-        90060453
-      ]
+      "battleMissionRewards": [90060054, 90060253, 90060453]
     },
     "69105054": {
       "id": 69105054,
@@ -11076,11 +9231,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060055,
-        90060254,
-        90060454
-      ]
+      "battleMissionRewards": [90060055, 90060254, 90060454]
     },
     "69105055": {
       "id": 69105055,
@@ -11100,11 +9251,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060056,
-        90060255,
-        90060455
-      ]
+      "battleMissionRewards": [90060056, 90060255, 90060455]
     },
     "69105056": {
       "id": 69105056,
@@ -11124,11 +9271,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060057,
-        90060256,
-        90060456
-      ]
+      "battleMissionRewards": [90060057, 90060256, 90060456]
     },
     "69105057": {
       "id": 69105057,
@@ -11148,11 +9291,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060058,
-        90060257,
-        90060457
-      ]
+      "battleMissionRewards": [90060058, 90060257, 90060457]
     },
     "69105058": {
       "id": 69105058,
@@ -11172,11 +9311,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060059,
-        90060258,
-        90060458
-      ]
+      "battleMissionRewards": [90060059, 90060258, 90060458]
     },
     "69105059": {
       "id": 69105059,
@@ -11196,11 +9331,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060060,
-        90060259,
-        90060459
-      ]
+      "battleMissionRewards": [90060060, 90060259, 90060459]
     },
     "69105060": {
       "id": 69105060,
@@ -11220,11 +9351,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060061,
-        90060260,
-        90060460
-      ]
+      "battleMissionRewards": [90060061, 90060260, 90060460]
     },
     "69105061": {
       "id": 69105061,
@@ -11244,11 +9371,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060062,
-        90060261,
-        90060461
-      ]
+      "battleMissionRewards": [90060062, 90060261, 90060461]
     },
     "69105062": {
       "id": 69105062,
@@ -11268,11 +9391,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060063,
-        90060262,
-        90060462
-      ]
+      "battleMissionRewards": [90060063, 90060262, 90060462]
     },
     "69105063": {
       "id": 69105063,
@@ -11292,11 +9411,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060064,
-        90060263,
-        90060463
-      ]
+      "battleMissionRewards": [90060064, 90060263, 90060463]
     },
     "69105064": {
       "id": 69105064,
@@ -11316,11 +9431,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060065,
-        90060264,
-        90060464
-      ]
+      "battleMissionRewards": [90060065, 90060264, 90060464]
     },
     "69105065": {
       "id": 69105065,
@@ -11340,11 +9451,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060066,
-        90060265,
-        90060465
-      ]
+      "battleMissionRewards": [90060066, 90060265, 90060465]
     },
     "69105066": {
       "id": 69105066,
@@ -11364,11 +9471,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060067,
-        90060266,
-        90060466
-      ]
+      "battleMissionRewards": [90060067, 90060266, 90060466]
     },
     "69105067": {
       "id": 69105067,
@@ -11388,11 +9491,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060068,
-        90060267,
-        90060467
-      ]
+      "battleMissionRewards": [90060068, 90060267, 90060467]
     },
     "69105068": {
       "id": 69105068,
@@ -11412,11 +9511,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060069,
-        90060268,
-        90060468
-      ]
+      "battleMissionRewards": [90060069, 90060268, 90060468]
     },
     "69105069": {
       "id": 69105069,
@@ -11436,11 +9531,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060070,
-        90060269,
-        90060469
-      ]
+      "battleMissionRewards": [90060070, 90060269, 90060469]
     },
     "69105070": {
       "id": 69105070,
@@ -11460,11 +9551,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060071,
-        90060270,
-        90060470
-      ]
+      "battleMissionRewards": [90060071, 90060270, 90060470]
     },
     "69105071": {
       "id": 69105071,
@@ -11484,11 +9571,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060072,
-        90060271,
-        90060471
-      ]
+      "battleMissionRewards": [90060072, 90060271, 90060471]
     },
     "69105072": {
       "id": 69105072,
@@ -11508,11 +9591,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060073,
-        90060272,
-        90060472
-      ]
+      "battleMissionRewards": [90060073, 90060272, 90060472]
     },
     "69105073": {
       "id": 69105073,
@@ -11532,11 +9611,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060074,
-        90060273,
-        90060473
-      ]
+      "battleMissionRewards": [90060074, 90060273, 90060473]
     },
     "69105074": {
       "id": 69105074,
@@ -11556,11 +9631,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060075,
-        90060274,
-        90060474
-      ]
+      "battleMissionRewards": [90060075, 90060274, 90060474]
     },
     "69105075": {
       "id": 69105075,
@@ -11580,11 +9651,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060076,
-        90060275,
-        90060475
-      ]
+      "battleMissionRewards": [90060076, 90060275, 90060475]
     },
     "69105076": {
       "id": 69105076,
@@ -11604,11 +9671,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060077,
-        90060276,
-        90060476
-      ]
+      "battleMissionRewards": [90060077, 90060276, 90060476]
     },
     "69105077": {
       "id": 69105077,
@@ -11628,11 +9691,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060078,
-        90060277,
-        90060477
-      ]
+      "battleMissionRewards": [90060078, 90060277, 90060477]
     },
     "69105078": {
       "id": 69105078,
@@ -11652,11 +9711,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060079,
-        90060278,
-        90060478
-      ]
+      "battleMissionRewards": [90060079, 90060278, 90060478]
     },
     "69105079": {
       "id": 69105079,
@@ -11676,11 +9731,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060080,
-        90060279,
-        90060479
-      ]
+      "battleMissionRewards": [90060080, 90060279, 90060479]
     },
     "69105080": {
       "id": 69105080,
@@ -11700,11 +9751,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060081,
-        90060280,
-        90060480
-      ]
+      "battleMissionRewards": [90060081, 90060280, 90060480]
     },
     "69105081": {
       "id": 69105081,
@@ -11724,11 +9771,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060082,
-        90060281,
-        90060481
-      ]
+      "battleMissionRewards": [90060082, 90060281, 90060481]
     },
     "69105082": {
       "id": 69105082,
@@ -11748,11 +9791,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060083,
-        90060282,
-        90060482
-      ]
+      "battleMissionRewards": [90060083, 90060282, 90060482]
     },
     "69105083": {
       "id": 69105083,
@@ -11772,11 +9811,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060084,
-        90060283,
-        90060483
-      ]
+      "battleMissionRewards": [90060084, 90060283, 90060483]
     },
     "69105084": {
       "id": 69105084,
@@ -11796,11 +9831,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060085,
-        90060284,
-        90060484
-      ]
+      "battleMissionRewards": [90060085, 90060284, 90060484]
     },
     "69105085": {
       "id": 69105085,
@@ -11820,11 +9851,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060086,
-        90060285,
-        90060485
-      ]
+      "battleMissionRewards": [90060086, 90060285, 90060485]
     },
     "69105086": {
       "id": 69105086,
@@ -11844,11 +9871,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060087,
-        90060286,
-        90060486
-      ]
+      "battleMissionRewards": [90060087, 90060286, 90060486]
     },
     "69105087": {
       "id": 69105087,
@@ -11868,11 +9891,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060088,
-        90060287,
-        90060487
-      ]
+      "battleMissionRewards": [90060088, 90060287, 90060487]
     },
     "69105088": {
       "id": 69105088,
@@ -11892,11 +9911,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060089,
-        90060288,
-        90060488
-      ]
+      "battleMissionRewards": [90060089, 90060288, 90060488]
     },
     "69105089": {
       "id": 69105089,
@@ -11916,11 +9931,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060090,
-        90060289,
-        90060489
-      ]
+      "battleMissionRewards": [90060090, 90060289, 90060489]
     },
     "69105090": {
       "id": 69105090,
@@ -11940,11 +9951,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060091,
-        90060290,
-        90060490
-      ]
+      "battleMissionRewards": [90060091, 90060290, 90060490]
     },
     "69105091": {
       "id": 69105091,
@@ -11964,11 +9971,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060092,
-        90060291,
-        90060491
-      ]
+      "battleMissionRewards": [90060092, 90060291, 90060491]
     },
     "69105092": {
       "id": 69105092,
@@ -11988,11 +9991,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060093,
-        90060292,
-        90060492
-      ]
+      "battleMissionRewards": [90060093, 90060292, 90060492]
     },
     "69105093": {
       "id": 69105093,
@@ -12012,11 +10011,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060094,
-        90060293,
-        90060493
-      ]
+      "battleMissionRewards": [90060094, 90060293, 90060493]
     },
     "69105094": {
       "id": 69105094,
@@ -12036,11 +10031,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060095,
-        90060294,
-        90060494
-      ]
+      "battleMissionRewards": [90060095, 90060294, 90060494]
     },
     "69105095": {
       "id": 69105095,
@@ -12060,11 +10051,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060096,
-        90060295,
-        90060495
-      ]
+      "battleMissionRewards": [90060096, 90060295, 90060495]
     },
     "69105096": {
       "id": 69105096,
@@ -12084,11 +10071,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060097,
-        90060296,
-        90060496
-      ]
+      "battleMissionRewards": [90060097, 90060296, 90060496]
     },
     "69105097": {
       "id": 69105097,
@@ -12108,11 +10091,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060098,
-        90060297,
-        90060497
-      ]
+      "battleMissionRewards": [90060098, 90060297, 90060497]
     },
     "69105098": {
       "id": 69105098,
@@ -12132,11 +10111,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060099,
-        90060298,
-        90060498
-      ]
+      "battleMissionRewards": [90060099, 90060298, 90060498]
     },
     "69150001": {
       "id": 69150001,
@@ -12156,11 +10131,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95905020,
-        95905021,
-        95905022
-      ]
+      "battleMissionRewards": [95905020, 95905021, 95905022]
     },
     "69150002": {
       "id": 69150002,
@@ -12180,11 +10151,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95905024,
-        95905025,
-        95905026
-      ]
+      "battleMissionRewards": [95905024, 95905025, 95905026]
     },
     "69150003": {
       "id": 69150003,
@@ -12204,11 +10171,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95905028,
-        95905029,
-        95905030
-      ]
+      "battleMissionRewards": [95905028, 95905029, 95905030]
     },
     "69150004": {
       "id": 69150004,
@@ -12228,11 +10191,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95905032,
-        95905033,
-        95905034
-      ]
+      "battleMissionRewards": [95905032, 95905033, 95905034]
     },
     "69150011": {
       "id": 69150011,
@@ -12252,11 +10211,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95905055,
-        95905056,
-        95905057
-      ]
+      "battleMissionRewards": [95905055, 95905056, 95905057]
     },
     "69150012": {
       "id": 69150012,
@@ -12276,11 +10231,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95905059,
-        95905060,
-        95905061
-      ]
+      "battleMissionRewards": [95905059, 95905060, 95905061]
     },
     "69150013": {
       "id": 69150013,
@@ -12300,11 +10251,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95905063,
-        95905064,
-        95905065
-      ]
+      "battleMissionRewards": [95905063, 95905064, 95905065]
     },
     "69150014": {
       "id": 69150014,
@@ -12324,11 +10271,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95905067,
-        95905068,
-        95905069
-      ]
+      "battleMissionRewards": [95905067, 95905068, 95905069]
     },
     "69150015": {
       "id": 69150015,
@@ -12348,11 +10291,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95905071,
-        95905072,
-        95905073
-      ]
+      "battleMissionRewards": [95905071, 95905072, 95905073]
     },
     "69150016": {
       "id": 69150016,
@@ -12372,11 +10311,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95905075,
-        95905076,
-        95905077
-      ]
+      "battleMissionRewards": [95905075, 95905076, 95905077]
     },
     "69150017": {
       "id": 69150017,
@@ -12396,11 +10331,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95905079,
-        95905080,
-        95905081
-      ]
+      "battleMissionRewards": [95905079, 95905080, 95905081]
     },
     "69150018": {
       "id": 69150018,
@@ -12420,11 +10351,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95905083,
-        95905084,
-        95905085
-      ]
+      "battleMissionRewards": [95905083, 95905084, 95905085]
     },
     "69150019": {
       "id": 69150019,
@@ -12444,11 +10371,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95905087,
-        95905088,
-        95905089
-      ]
+      "battleMissionRewards": [95905087, 95905088, 95905089]
     },
     "69150020": {
       "id": 69150020,
@@ -12468,11 +10391,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95905091,
-        95905092,
-        95905093
-      ]
+      "battleMissionRewards": [95905091, 95905092, 95905093]
     },
     "69150021": {
       "id": 69150021,
@@ -12492,11 +10411,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95905095,
-        95905096,
-        95905097
-      ]
+      "battleMissionRewards": [95905095, 95905096, 95905097]
     },
     "69150022": {
       "id": 69150022,
@@ -12516,11 +10431,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95905099,
-        95905100,
-        95905101
-      ]
+      "battleMissionRewards": [95905099, 95905100, 95905101]
     },
     "69150023": {
       "id": 69150023,
@@ -12540,11 +10451,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95905103,
-        95905104,
-        95905105
-      ]
+      "battleMissionRewards": [95905103, 95905104, 95905105]
     },
     "69150024": {
       "id": 69150024,
@@ -12564,11 +10471,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95905107,
-        95905108,
-        95905109
-      ]
+      "battleMissionRewards": [95905107, 95905108, 95905109]
     },
     "69150025": {
       "id": 69150025,
@@ -12588,11 +10491,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95905111,
-        95905112,
-        95905113
-      ]
+      "battleMissionRewards": [95905111, 95905112, 95905113]
     },
     "69150026": {
       "id": 69150026,
@@ -12612,11 +10511,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95905115,
-        95905116,
-        95905117
-      ]
+      "battleMissionRewards": [95905115, 95905116, 95905117]
     },
     "69150027": {
       "id": 69150027,
@@ -12636,11 +10531,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95905119,
-        95905120,
-        95905121
-      ]
+      "battleMissionRewards": [95905119, 95905120, 95905121]
     },
     "69150028": {
       "id": 69150028,
@@ -12660,11 +10551,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95905123,
-        95905124,
-        95905125
-      ]
+      "battleMissionRewards": [95905123, 95905124, 95905125]
     },
     "69150029": {
       "id": 69150029,
@@ -12684,11 +10571,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95991000,
-        95991001,
-        95991002
-      ]
+      "battleMissionRewards": [95991000, 95991001, 95991002]
     },
     "69150030": {
       "id": 69150030,
@@ -12708,11 +10591,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95991003,
-        95991004,
-        95991005
-      ]
+      "battleMissionRewards": [95991003, 95991004, 95991005]
     },
     "69150031": {
       "id": 69150031,
@@ -12732,11 +10611,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95991006,
-        95991007,
-        95991008
-      ]
+      "battleMissionRewards": [95991006, 95991007, 95991008]
     },
     "69150032": {
       "id": 69150032,
@@ -12756,11 +10631,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95991006,
-        95991007,
-        95991008
-      ]
+      "battleMissionRewards": [95991006, 95991007, 95991008]
     },
     "69150033": {
       "id": 69150033,
@@ -12780,11 +10651,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95991009,
-        95991010,
-        95991011
-      ]
+      "battleMissionRewards": [95991009, 95991010, 95991011]
     },
     "69150034": {
       "id": 69150034,
@@ -12804,11 +10671,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95991012,
-        95991013,
-        95991014
-      ]
+      "battleMissionRewards": [95991012, 95991013, 95991014]
     },
     "69150035": {
       "id": 69150035,
@@ -12828,11 +10691,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95991015,
-        95991016,
-        95991017
-      ]
+      "battleMissionRewards": [95991015, 95991016, 95991017]
     },
     "69150036": {
       "id": 69150036,
@@ -12852,11 +10711,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95991018,
-        95991019,
-        95991020
-      ]
+      "battleMissionRewards": [95991018, 95991019, 95991020]
     },
     "69150037": {
       "id": 69150037,
@@ -12876,11 +10731,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95991021,
-        95991022,
-        95991023
-      ]
+      "battleMissionRewards": [95991021, 95991022, 95991023]
     },
     "69150038": {
       "id": 69150038,
@@ -12900,11 +10751,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95991024,
-        95991025,
-        95991026
-      ]
+      "battleMissionRewards": [95991024, 95991025, 95991026]
     },
     "69150039": {
       "id": 69150039,
@@ -12924,11 +10771,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95991027,
-        95991028,
-        95991029
-      ]
+      "battleMissionRewards": [95991027, 95991028, 95991029]
     },
     "69150040": {
       "id": 69150040,
@@ -12948,11 +10791,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95991030,
-        95991031,
-        95991032
-      ]
+      "battleMissionRewards": [95991030, 95991031, 95991032]
     },
     "69150041": {
       "id": 69150041,
@@ -12972,11 +10811,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90060060,
-        90060259,
-        90060459
-      ]
+      "battleMissionRewards": [90060060, 90060259, 90060459]
     },
     "69150042": {
       "id": 69150042,
@@ -12996,11 +10831,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95905127,
-        95905128,
-        95905129
-      ]
+      "battleMissionRewards": [95905127, 95905128, 95905129]
     },
     "69150043": {
       "id": 69150043,
@@ -13020,11 +10851,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95905131,
-        95905132,
-        95905133
-      ]
+      "battleMissionRewards": [95905131, 95905132, 95905133]
     },
     "69150044": {
       "id": 69150044,
@@ -13044,11 +10871,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95905135,
-        95905136,
-        95905137
-      ]
+      "battleMissionRewards": [95905135, 95905136, 95905137]
     },
     "69150045": {
       "id": 69150045,
@@ -13068,11 +10891,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95905139,
-        95905140,
-        95905141
-      ]
+      "battleMissionRewards": [95905139, 95905140, 95905141]
     },
     "69150046": {
       "id": 69150046,
@@ -13092,11 +10911,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95905143,
-        95905144,
-        95905145
-      ]
+      "battleMissionRewards": [95905143, 95905144, 95905145]
     },
     "69150047": {
       "id": 69150047,
@@ -13116,11 +10931,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95905147,
-        95905148,
-        95905149
-      ]
+      "battleMissionRewards": [95905147, 95905148, 95905149]
     },
     "69150048": {
       "id": 69150048,
@@ -13140,11 +10951,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95905151,
-        95905152,
-        95905153
-      ]
+      "battleMissionRewards": [95905151, 95905152, 95905153]
     },
     "69150049": {
       "id": 69150049,
@@ -13164,11 +10971,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95905155,
-        95905156,
-        95905157
-      ]
+      "battleMissionRewards": [95905155, 95905156, 95905157]
     },
     "69150050": {
       "id": 69150050,
@@ -13188,11 +10991,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95905159,
-        95905160,
-        95905161
-      ]
+      "battleMissionRewards": [95905159, 95905160, 95905161]
     },
     "69150051": {
       "id": 69150051,
@@ -13212,11 +11011,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95991015,
-        95991016,
-        95991017
-      ]
+      "battleMissionRewards": [95991015, 95991016, 95991017]
     },
     "69150052": {
       "id": 69150052,
@@ -13236,11 +11031,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95991018,
-        95991019,
-        95991020
-      ]
+      "battleMissionRewards": [95991018, 95991019, 95991020]
     },
     "69150053": {
       "id": 69150053,
@@ -13260,11 +11051,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95991033,
-        95991034,
-        95991035
-      ]
+      "battleMissionRewards": [95991033, 95991034, 95991035]
     },
     "69150054": {
       "id": 69150054,
@@ -13284,11 +11071,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95991036,
-        95991037,
-        95991038
-      ]
+      "battleMissionRewards": [95991036, 95991037, 95991038]
     },
     "69150055": {
       "id": 69150055,
@@ -13308,11 +11091,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95991036,
-        95991037,
-        95991038
-      ]
+      "battleMissionRewards": [95991036, 95991037, 95991038]
     },
     "69150056": {
       "id": 69150056,
@@ -13332,11 +11111,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95960605,
-        95960606,
-        95960607
-      ]
+      "battleMissionRewards": [95960605, 95960606, 95960607]
     },
     "69150057": {
       "id": 69150057,
@@ -13356,11 +11131,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95960608,
-        95960609,
-        95960610
-      ]
+      "battleMissionRewards": [95960608, 95960609, 95960610]
     },
     "69150058": {
       "id": 69150058,
@@ -13380,11 +11151,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95960611,
-        95960612,
-        95960613
-      ]
+      "battleMissionRewards": [95960611, 95960612, 95960613]
     },
     "69150059": {
       "id": 69150059,
@@ -13404,11 +11171,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95960614,
-        95960615,
-        95960616
-      ]
+      "battleMissionRewards": [95960614, 95960615, 95960616]
     },
     "69150060": {
       "id": 69150060,
@@ -13428,11 +11191,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95960617,
-        95960618,
-        95960619
-      ]
+      "battleMissionRewards": [95960617, 95960618, 95960619]
     },
     "69150061": {
       "id": 69150061,
@@ -13452,11 +11211,7 @@
         }
       ],
       "battleMissionRewardType": 1,
-      "battleMissionRewards": [
-        90061000,
-        90061000,
-        90061000
-      ]
+      "battleMissionRewards": [90061000, 90061000, 90061000]
     },
     "69150062": {
       "id": 69150062,
@@ -13476,11 +11231,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95991039,
-        95991040,
-        95991041
-      ]
+      "battleMissionRewards": [95991039, 95991040, 95991041]
     },
     "69150063": {
       "id": 69150063,
@@ -13500,11 +11251,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95991042,
-        95991043,
-        95991044
-      ]
+      "battleMissionRewards": [95991042, 95991043, 95991044]
     },
     "69150064": {
       "id": 69150064,
@@ -13524,11 +11271,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95991045,
-        95991046,
-        95991047
-      ]
+      "battleMissionRewards": [95991045, 95991046, 95991047]
     },
     "69150065": {
       "id": 69150065,
@@ -13548,11 +11291,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95960995,
-        95960996,
-        95960997
-      ]
+      "battleMissionRewards": [95960995, 95960996, 95960997]
     },
     "69150066": {
       "id": 69150066,
@@ -13572,11 +11311,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95960998,
-        95960999,
-        95961000
-      ]
+      "battleMissionRewards": [95960998, 95960999, 95961000]
     },
     "69150067": {
       "id": 69150067,
@@ -13596,11 +11331,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95961001,
-        95961002,
-        95961003
-      ]
+      "battleMissionRewards": [95961001, 95961002, 95961003]
     },
     "69150068": {
       "id": 69150068,
@@ -13620,11 +11351,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95961004,
-        95961005,
-        95961006
-      ]
+      "battleMissionRewards": [95961004, 95961005, 95961006]
     },
     "69150069": {
       "id": 69150069,
@@ -13644,11 +11371,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95961007,
-        95961008,
-        95961009
-      ]
+      "battleMissionRewards": [95961007, 95961008, 95961009]
     },
     "69150070": {
       "id": 69150070,
@@ -13668,11 +11391,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95991048,
-        95991049,
-        95991050
-      ]
+      "battleMissionRewards": [95991048, 95991049, 95991050]
     },
     "69150071": {
       "id": 69150071,
@@ -13692,11 +11411,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95991051,
-        95991052,
-        95991053
-      ]
+      "battleMissionRewards": [95991051, 95991052, 95991053]
     },
     "69150072": {
       "id": 69150072,
@@ -13716,11 +11431,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95961315,
-        95961316,
-        95961317
-      ]
+      "battleMissionRewards": [95961315, 95961316, 95961317]
     },
     "69150073": {
       "id": 69150073,
@@ -13740,11 +11451,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95961318,
-        95961319,
-        95961320
-      ]
+      "battleMissionRewards": [95961318, 95961319, 95961320]
     },
     "69150074": {
       "id": 69150074,
@@ -13764,11 +11471,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95961321,
-        95961322,
-        95961323
-      ]
+      "battleMissionRewards": [95961321, 95961322, 95961323]
     },
     "69150075": {
       "id": 69150075,
@@ -13788,11 +11491,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95961324,
-        95961325,
-        95961326
-      ]
+      "battleMissionRewards": [95961324, 95961325, 95961326]
     },
     "69150076": {
       "id": 69150076,
@@ -13812,11 +11511,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95961327,
-        95961328,
-        95961329
-      ]
+      "battleMissionRewards": [95961327, 95961328, 95961329]
     },
     "69150077": {
       "id": 69150077,
@@ -13836,11 +11531,7 @@
         }
       ],
       "battleMissionRewardType": 0,
-      "battleMissionRewards": [
-        95961330,
-        95961331,
-        95961332
-      ]
+      "battleMissionRewards": [95961330, 95961331, 95961332]
     }
   }
 }

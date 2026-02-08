@@ -54,13 +54,13 @@ Docker 이미지를 빌드하고 선택적으로 레지스트리에 푸시합니
 
 **옵션:**
 
-| 옵션 | 설명 |
-|------|------|
-| `-t, --tag <tag>` | 이미지 태그 (기본값: `latest`) |
-| `-p, --push` | 빌드 후 레지스트리에 푸시 |
-| `-l, --latest` | `latest` 태그도 함께 추가 및 푸시 |
-| `-s, --service <name>` | 특정 서비스만 빌드 (반복 가능) |
-| `-h, --help` | 도움말 표시 |
+| 옵션                   | 설명                              |
+| ---------------------- | --------------------------------- |
+| `-t, --tag <tag>`      | 이미지 태그 (기본값: `latest`)    |
+| `-p, --push`           | 빌드 후 레지스트리에 푸시         |
+| `-l, --latest`         | `latest` 태그도 함께 추가 및 푸시 |
+| `-s, --service <name>` | 특정 서비스만 빌드 (반복 가능)    |
+| `-h, --help`           | 도움말 표시                       |
 
 **사용 가능한 서비스:** `backend`, `frontend`, `edge`, `chat-server`, `event-lens`
 
@@ -98,15 +98,15 @@ Docker Swarm에 Gatrix 스택을 배포합니다.
 
 **옵션:**
 
-| 옵션 | 설명 |
-|------|------|
-| `-v, --version <version>` | 배포할 버전 (기본값: `latest`) |
-| `-e, --env-file <file>` | 환경 파일 경로 (기본값: `.env`) |
-| `-n, --stack <name>` | 스택 이름 (기본값: `gatrix`) |
-| `-i, --init` | Swarm 초기화 및 시크릿 생성 |
-| `-u, --update` | 롤링 업데이트 수행 |
-| `--prune` | 배포 후 사용하지 않는 이미지 제거 |
-| `-h, --help` | 도움말 표시 |
+| 옵션                      | 설명                              |
+| ------------------------- | --------------------------------- |
+| `-v, --version <version>` | 배포할 버전 (기본값: `latest`)    |
+| `-e, --env-file <file>`   | 환경 파일 경로 (기본값: `.env`)   |
+| `-n, --stack <name>`      | 스택 이름 (기본값: `gatrix`)      |
+| `-i, --init`              | Swarm 초기화 및 시크릿 생성       |
+| `-u, --update`            | 롤링 업데이트 수행                |
+| `--prune`                 | 배포 후 사용하지 않는 이미지 제거 |
+| `-h, --help`              | 도움말 표시                       |
 
 **예시:**
 
@@ -134,14 +134,14 @@ Docker Swarm에 Gatrix 스택을 배포합니다.
 
 **옵션:**
 
-| 옵션 | 설명 |
-|------|------|
-| `-v, --version <version>` | 대상 버전 (필수) |
-| `-s, --service <name>` | 특정 서비스만 업데이트 |
-| `-a, --all` | 모든 애플리케이션 서비스 업데이트 |
-| `-f, --force` | 동일 이미지도 강제 업데이트 |
-| `-n, --stack <name>` | 스택 이름 (기본값: `gatrix`) |
-| `-h, --help` | 도움말 표시 |
+| 옵션                      | 설명                              |
+| ------------------------- | --------------------------------- |
+| `-v, --version <version>` | 대상 버전 (필수)                  |
+| `-s, --service <name>`    | 특정 서비스만 업데이트            |
+| `-a, --all`               | 모든 애플리케이션 서비스 업데이트 |
+| `-f, --force`             | 동일 이미지도 강제 업데이트       |
+| `-n, --stack <name>`      | 스택 이름 (기본값: `gatrix`)      |
+| `-h, --help`              | 도움말 표시                       |
 
 **예시:**
 
@@ -167,12 +167,12 @@ Docker Swarm에 Gatrix 스택을 배포합니다.
 
 **옵션:**
 
-| 옵션 | 설명 |
-|------|------|
-| `-s, --service <name>` | 특정 서비스 롤백 |
-| `-a, --all` | 모든 애플리케이션 서비스 롤백 |
-| `-n, --stack <name>` | 스택 이름 (기본값: `gatrix`) |
-| `-h, --help` | 도움말 표시 |
+| 옵션                   | 설명                          |
+| ---------------------- | ----------------------------- |
+| `-s, --service <name>` | 특정 서비스 롤백              |
+| `-a, --all`            | 모든 애플리케이션 서비스 롤백 |
+| `-n, --stack <name>`   | 스택 이름 (기본값: `gatrix`)  |
+| `-h, --help`           | 도움말 표시                   |
 
 **예시:**
 
@@ -194,14 +194,14 @@ Docker Swarm에 Gatrix 스택을 배포합니다.
 
 **옵션:**
 
-| 옵션 | 설명 |
-|------|------|
-| `-s, --service <name>` | 스케일할 서비스 |
-| `-r, --replicas <n>` | 레플리카 수 |
-| `--preset <name>` | 프리셋 사용: `minimal`, `standard`, `high` |
-| `--status` | 현재 스케일 상태 표시 |
-| `-n, --stack <name>` | 스택 이름 (기본값: `gatrix`) |
-| `-h, --help` | 도움말 표시 |
+| 옵션                   | 설명                                       |
+| ---------------------- | ------------------------------------------ |
+| `-s, --service <name>` | 스케일할 서비스                            |
+| `-r, --replicas <n>`   | 레플리카 수                                |
+| `--preset <name>`      | 프리셋 사용: `minimal`, `standard`, `high` |
+| `--status`             | 현재 스케일 상태 표시                      |
+| `-n, --stack <name>`   | 스택 이름 (기본값: `gatrix`)               |
+| `-h, --help`           | 도움말 표시                                |
 
 **프리셋:**
 
@@ -233,14 +233,14 @@ Docker Swarm에 Gatrix 스택을 배포합니다.
 
 **옵션:**
 
-| 옵션 | 설명 |
-|------|------|
-| `-s, --services` | 서비스 목록만 표시 |
-| `-t, --tasks` | 실행 중인 태스크만 표시 |
-| `-l, --logs <service>` | 서비스 로그 스트리밍 |
-| `--health` | 헬스 체크 상태 표시 |
-| `-n, --stack <name>` | 스택 이름 (기본값: `gatrix`) |
-| `-h, --help` | 도움말 표시 |
+| 옵션                   | 설명                         |
+| ---------------------- | ---------------------------- |
+| `-s, --services`       | 서비스 목록만 표시           |
+| `-t, --tasks`          | 실행 중인 태스크만 표시      |
+| `-l, --logs <service>` | 서비스 로그 스트리밍         |
+| `--health`             | 헬스 체크 상태 표시          |
+| `-n, --stack <name>`   | 스택 이름 (기본값: `gatrix`) |
+| `-h, --help`           | 도움말 표시                  |
 
 **예시:**
 
@@ -293,6 +293,7 @@ Docker Swarm에 Gatrix 스택을 배포합니다.
 ```
 
 리포지토리가 비어있으면:
+
 ```
 Repository 'uwocn/uwocn' not found or has no images yet.
 ```
@@ -326,16 +327,16 @@ Repository 'uwocn/uwocn' not found or has no images yet.
 
 ## 파일 참조
 
-| 파일 | 용도 |
-|------|------|
+| 파일                     | 용도                       |
+| ------------------------ | -------------------------- |
 | `build-and-push.ps1/.sh` | Docker 이미지 빌드 및 푸시 |
-| `deploy.ps1/.sh` | Docker Swarm 배포 |
-| `update.ps1/.sh` | 롤링 업데이트 |
-| `rollback.ps1/.sh` | 서비스 롤백 |
-| `scale.ps1/.sh` | 레플리카 스케일 |
-| `status.ps1/.sh` | 스택 상태 표시 |
-| `login-registry.ps1/.sh` | 레지스트리 로그인 |
-| `list-images.ps1/.sh` | 레지스트리 이미지 목록 |
-| `registry.env` | 레지스트리 인증 정보 |
-| `.env.example` | 환경 설정 템플릿 |
-| `docker-stack.yml` | Swarm 스택 정의 |
+| `deploy.ps1/.sh`         | Docker Swarm 배포          |
+| `update.ps1/.sh`         | 롤링 업데이트              |
+| `rollback.ps1/.sh`       | 서비스 롤백                |
+| `scale.ps1/.sh`          | 레플리카 스케일            |
+| `status.ps1/.sh`         | 스택 상태 표시             |
+| `login-registry.ps1/.sh` | 레지스트리 로그인          |
+| `list-images.ps1/.sh`    | 레지스트리 이미지 목록     |
+| `registry.env`           | 레지스트리 인증 정보       |
+| `.env.example`           | 환경 설정 템플릿           |
+| `docker-stack.yml`       | Swarm 스택 정의            |

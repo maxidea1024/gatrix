@@ -1,8 +1,8 @@
-import { Request, Response } from "express";
-import { ApiTokenService } from "../services/ApiTokenService";
-import { createLogger } from "../config/logger";
+import { Request, Response } from 'express';
+import { ApiTokenService } from '../services/ApiTokenService';
+import { createLogger } from '../config/logger';
 
-const logger = createLogger("ApiTokenController");
+const logger = createLogger('ApiTokenController');
 
 export class ApiTokenController {
   /**
@@ -11,12 +11,12 @@ export class ApiTokenController {
    */
   static async createToken(req: Request, res: Response): Promise<void> {
     try {
-      const { name, permissions = ["read", "write"] } = req.body;
+      const { name, permissions = ['read', 'write'] } = req.body;
 
       if (!name) {
         res.status(400).json({
           success: false,
-          error: { message: "Token name is required" },
+          error: { message: 'Token name is required' },
         });
         return;
       }
@@ -34,10 +34,10 @@ export class ApiTokenController {
         },
       });
     } catch (error: any) {
-      logger.error("Error creating API token:", error);
+      logger.error('Error creating API token:', error);
       res.status(500).json({
         success: false,
-        error: { message: "Failed to create API token" },
+        error: { message: 'Failed to create API token' },
       });
     }
   }
@@ -65,10 +65,10 @@ export class ApiTokenController {
         data: maskedTokens,
       });
     } catch (error: any) {
-      logger.error("Error listing API tokens:", error);
+      logger.error('Error listing API tokens:', error);
       res.status(500).json({
         success: false,
-        error: { message: "Failed to list API tokens" },
+        error: { message: 'Failed to list API tokens' },
       });
     }
   }
@@ -84,7 +84,7 @@ export class ApiTokenController {
       if (!token) {
         res.status(400).json({
           success: false,
-          error: { message: "Token is required" },
+          error: { message: 'Token is required' },
         });
         return;
       }
@@ -94,20 +94,20 @@ export class ApiTokenController {
       if (!success) {
         res.status(404).json({
           success: false,
-          error: { message: "Token not found" },
+          error: { message: 'Token not found' },
         });
         return;
       }
 
       res.json({
         success: true,
-        data: { message: "Token revoked successfully" },
+        data: { message: 'Token revoked successfully' },
       });
     } catch (error: any) {
-      logger.error("Error revoking API token:", error);
+      logger.error('Error revoking API token:', error);
       res.status(500).json({
         success: false,
-        error: { message: "Failed to revoke API token" },
+        error: { message: 'Failed to revoke API token' },
       });
     }
   }
@@ -123,7 +123,7 @@ export class ApiTokenController {
       if (!token) {
         res.status(400).json({
           success: false,
-          error: { message: "Token is required" },
+          error: { message: 'Token is required' },
         });
         return;
       }
@@ -133,7 +133,7 @@ export class ApiTokenController {
       if (!apiToken) {
         res.status(401).json({
           success: false,
-          error: { message: "Invalid token" },
+          error: { message: 'Invalid token' },
         });
         return;
       }
@@ -149,10 +149,10 @@ export class ApiTokenController {
         },
       });
     } catch (error: any) {
-      logger.error("Error verifying API token:", error);
+      logger.error('Error verifying API token:', error);
       res.status(500).json({
         success: false,
-        error: { message: "Failed to verify API token" },
+        error: { message: 'Failed to verify API token' },
       });
     }
   }

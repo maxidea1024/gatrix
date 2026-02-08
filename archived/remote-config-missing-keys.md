@@ -3,6 +3,7 @@
 ## RemoteConfigParametersPage.tsx에서 사용되는 키들
 
 ### 기본 키들
+
 - remoteConfig.title
 - remoteConfig.pendingChanges
 - remoteConfig.discardChanges
@@ -10,6 +11,7 @@
 - remoteConfig.environment
 
 ### Parameters 탭
+
 - remoteConfig.parameters
 - remoteConfig.addParameter
 - remoteConfig.editParameter
@@ -30,6 +32,7 @@
 - remoteConfig.duplicateKey
 
 ### Campaigns 탭
+
 - remoteConfig.campaigns
 - remoteConfig.addCampaign
 - remoteConfig.editCampaign
@@ -50,6 +53,7 @@
 - remoteConfig.campaignDeleted
 
 ### Context Fields 탭
+
 - remoteConfig.contextFields
 - remoteConfig.addContextField
 - remoteConfig.editContextField
@@ -65,6 +69,7 @@
 - remoteConfig.duplicateFieldName
 
 ### Segments 탭
+
 - remoteConfig.segments
 - remoteConfig.addSegment
 - remoteConfig.editSegment
@@ -82,6 +87,7 @@
 - remoteConfig.duplicateSegmentName
 
 ### Variants 탭
+
 - remoteConfig.variants
 - remoteConfig.addVariant
 - remoteConfig.editVariant
@@ -98,6 +104,7 @@
 - remoteConfig.variantDeleted
 
 ### Deployment History 탭
+
 - remoteConfig.deploymentHistory
 - remoteConfig.version
 - remoteConfig.message
@@ -122,6 +129,7 @@
 - remoteConfig.itemName
 
 ### Common 키들
+
 - common.actions
 - common.cancel
 - common.create
@@ -132,4 +140,3 @@
 - common.active
 - common.inactive
 - common.error
-

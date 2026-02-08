@@ -6,23 +6,23 @@ const config = {
   user: process.env.DB_USER || 'root',
   password: process.env.DB_PASSWORD || '',
   database: process.env.DB_NAME || 'gatrix_admin',
-  charset: 'utf8mb4'
+  charset: 'utf8mb4',
 };
 
 async function fixPermissions() {
   const connection = await mysql.createConnection(config);
-  
+
   try {
     console.log('Fixing permissions format...');
-    
+
     // Get all tokens with invalid permissions
     const [tokens] = await connection.execute(`
       SELECT id, permissions
       FROM g_api_access_tokens
     `);
-    
+
     console.log(`Found ${tokens.length} tokens to fix`);
-    
+
     let fixed = 0;
     for (const token of tokens) {
       try {
@@ -37,8 +37,8 @@ async function fixPermissions() {
           // Convert comma-separated string to array
           permissionsArray = token.permissions
             .split(',')
-            .map(p => p.trim())
-            .filter(p => p.length > 0);
+            .map((p) => p.trim())
+            .filter((p) => p.length > 0);
         } else if (Array.isArray(token.permissions)) {
           // Already an array
           permissionsArray = token.permissions;
@@ -50,18 +50,18 @@ async function fixPermissions() {
 
         const jsonPermissions = JSON.stringify(permissionsArray);
 
-        await connection.execute(
-          'UPDATE g_api_access_tokens SET permissions = ? WHERE id = ?',
-          [jsonPermissions, token.id]
-        );
+        await connection.execute('UPDATE g_api_access_tokens SET permissions = ? WHERE id = ?', [
+          jsonPermissions,
+          token.id,
+        ]);
 
         console.log(`Token ${token.id}: Fixed ${typeof token.permissions} -> ${jsonPermissions}`);
         fixed++;
       }
     }
-    
+
     console.log(`Fixed ${fixed} tokens`);
-    
+
     // Verify the fix
     console.log('\nVerifying fixes...');
     const [verifyResult] = await connection.execute(`
@@ -69,8 +69,8 @@ async function fixPermissions() {
       FROM g_api_access_tokens
       LIMIT 5
     `);
-    
-    verifyResult.forEach(row => {
+
+    verifyResult.forEach((row) => {
       try {
         const parsed = JSON.parse(row.permissions);
         console.log(`✅ Token ${row.id}: ${JSON.stringify(parsed)}`);
@@ -78,7 +78,6 @@ async function fixPermissions() {
         console.log(`❌ Token ${row.id}: Still invalid - ${e.message}`);
       }
     });
-    
   } catch (error) {
     console.error('Error fixing permissions:', error);
   } finally {

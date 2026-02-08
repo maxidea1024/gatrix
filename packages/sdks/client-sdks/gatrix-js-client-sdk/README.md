@@ -342,9 +342,9 @@ await client.features.syncFlags();
 | `watchFlag(flagName, callback)`                 | Watch for changes           |
 | `watchFlagWithInitialState(flagName, callback)` | Watch with initial callback |
 | `createWatchFlagGroup(name)`                    | Create a watch group        |
-| `isFetching()`                                | Check if currently fetching |
-| `isExplicitSync()`                             | Check if explicit mode      |
-| `canSyncFlags()`                               | Check if sync can be called |
+| `isFetching()`                                  | Check if currently fetching |
+| `isExplicitSync()`                              | Check if explicit mode      |
+| `canSyncFlags()`                                | Check if sync can be called |
 | `syncFlags(fetchNow?)`                          | Manual sync (explicit mode) |
 | `updateContext(context)`                        | Update evaluation context   |
 | `getContext()`                                  | Get current context         |

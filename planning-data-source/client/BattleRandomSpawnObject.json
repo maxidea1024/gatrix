@@ -7,10 +7,7 @@
       "groupOrder": "number",
       "battleTypeFlag": "bit",
       "oceanNpcTypeFlag": "bit",
-      "operator": [
-        "number",
-        "number"
-      ],
+      "operator": ["number", "number"],
       "condition": [
         {
           "CondType": "number",
@@ -40,10 +37,7 @@
       "groupOrder": 1,
       "battleTypeFlag": 1,
       "oceanNpcTypeFlag": 1,
-      "operator": [
-        1,
-        1
-      ],
+      "operator": [1, 1],
       "condition": [
         {
           "CondType": 1,
@@ -67,10 +61,7 @@
       }
     },
     ":requiredInObject": {
-      "operator": [
-        1,
-        1
-      ],
+      "operator": [1, 1],
       "condition": [
         {
           "CondType": 1
@@ -83,18 +74,12 @@
     ":min": {
       "battleTypeFlag": 0,
       "oceanNpcTypeFlag": 0,
-      "operator": [
-        1,
-        1
-      ]
+      "operator": [1, 1]
     },
     ":max": {
       "battleTypeFlag": 11111111,
       "oceanNpcTypeFlag": 11111111,
-      "operator": [
-        2,
-        2
-      ]
+      "operator": [2, 2]
     },
     ":enum": {},
     ":links": {}
@@ -107,10 +92,7 @@
       "groupOrder": 19,
       "battleTypeFlag": 1,
       "oceanNpcTypeFlag": 36,
-      "operator": [
-        1,
-        1
-      ],
+      "operator": [1, 1],
       "condition": [
         {
           "CondType": 1,
@@ -141,10 +123,7 @@
       "groupOrder": 18,
       "battleTypeFlag": 1,
       "oceanNpcTypeFlag": 36,
-      "operator": [
-        1,
-        1
-      ],
+      "operator": [1, 1],
       "condition": [
         {
           "CondType": 1,
@@ -175,10 +154,7 @@
       "groupOrder": 17,
       "battleTypeFlag": 1,
       "oceanNpcTypeFlag": 36,
-      "operator": [
-        1,
-        1
-      ],
+      "operator": [1, 1],
       "condition": [
         {
           "CondType": 1,
@@ -209,10 +185,7 @@
       "groupOrder": 16,
       "battleTypeFlag": 1,
       "oceanNpcTypeFlag": 36,
-      "operator": [
-        1,
-        1
-      ],
+      "operator": [1, 1],
       "condition": [
         {
           "CondType": 1,
@@ -243,10 +216,7 @@
       "groupOrder": 15,
       "battleTypeFlag": 1,
       "oceanNpcTypeFlag": 36,
-      "operator": [
-        1,
-        1
-      ],
+      "operator": [1, 1],
       "condition": [
         {
           "CondType": 1,
@@ -277,10 +247,7 @@
       "groupOrder": 14,
       "battleTypeFlag": 1,
       "oceanNpcTypeFlag": 36,
-      "operator": [
-        1,
-        1
-      ],
+      "operator": [1, 1],
       "condition": [
         {
           "CondType": 1,
@@ -311,10 +278,7 @@
       "groupOrder": 13,
       "battleTypeFlag": 1,
       "oceanNpcTypeFlag": 36,
-      "operator": [
-        1,
-        1
-      ],
+      "operator": [1, 1],
       "condition": [
         {
           "CondType": 1,
@@ -345,10 +309,7 @@
       "groupOrder": 12,
       "battleTypeFlag": 1,
       "oceanNpcTypeFlag": 36,
-      "operator": [
-        1,
-        1
-      ],
+      "operator": [1, 1],
       "condition": [
         {
           "CondType": 1,
@@ -379,10 +340,7 @@
       "groupOrder": 11,
       "battleTypeFlag": 1,
       "oceanNpcTypeFlag": 36,
-      "operator": [
-        1,
-        1
-      ],
+      "operator": [1, 1],
       "condition": [
         {
           "CondType": 1,
@@ -413,10 +371,7 @@
       "groupOrder": 10,
       "battleTypeFlag": 1,
       "oceanNpcTypeFlag": 36,
-      "operator": [
-        1,
-        1
-      ],
+      "operator": [1, 1],
       "condition": [
         {
           "CondType": 1,
@@ -447,10 +402,7 @@
       "groupOrder": 9,
       "battleTypeFlag": 1,
       "oceanNpcTypeFlag": 36,
-      "operator": [
-        1,
-        1
-      ],
+      "operator": [1, 1],
       "condition": [
         {
           "CondType": 1,
@@ -481,10 +433,7 @@
       "groupOrder": 8,
       "battleTypeFlag": 1,
       "oceanNpcTypeFlag": 36,
-      "operator": [
-        1,
-        1
-      ],
+      "operator": [1, 1],
       "condition": [
         {
           "CondType": 1,
@@ -515,10 +464,7 @@
       "groupOrder": 7,
       "battleTypeFlag": 1,
       "oceanNpcTypeFlag": 36,
-      "operator": [
-        1,
-        1
-      ],
+      "operator": [1, 1],
       "condition": [
         {
           "CondType": 1,
@@ -549,10 +495,7 @@
       "groupOrder": 6,
       "battleTypeFlag": 1,
       "oceanNpcTypeFlag": 36,
-      "operator": [
-        1,
-        1
-      ],
+      "operator": [1, 1],
       "condition": [
         {
           "CondType": 1,
@@ -583,10 +526,7 @@
       "groupOrder": 5,
       "battleTypeFlag": 1,
       "oceanNpcTypeFlag": 36,
-      "operator": [
-        1,
-        1
-      ],
+      "operator": [1, 1],
       "condition": [
         {
           "CondType": 1,
@@ -617,10 +557,7 @@
       "groupOrder": 4,
       "battleTypeFlag": 1,
       "oceanNpcTypeFlag": 36,
-      "operator": [
-        1,
-        1
-      ],
+      "operator": [1, 1],
       "condition": [
         {
           "CondType": 1,
@@ -651,10 +588,7 @@
       "groupOrder": 3,
       "battleTypeFlag": 1,
       "oceanNpcTypeFlag": 36,
-      "operator": [
-        1,
-        1
-      ],
+      "operator": [1, 1],
       "condition": [
         {
           "CondType": 1,
@@ -685,10 +619,7 @@
       "groupOrder": 2,
       "battleTypeFlag": 1,
       "oceanNpcTypeFlag": 36,
-      "operator": [
-        1,
-        1
-      ],
+      "operator": [1, 1],
       "condition": [
         {
           "CondType": 1,
@@ -719,10 +650,7 @@
       "groupOrder": 1,
       "battleTypeFlag": 1,
       "oceanNpcTypeFlag": 36,
-      "operator": [
-        1,
-        1
-      ],
+      "operator": [1, 1],
       "condition": [
         {
           "CondType": 1,

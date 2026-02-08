@@ -34,12 +34,12 @@ export class FeatureFlagEvaluator {
             const variant: Variant = variantData
               ? { ...variantData, enabled: true }
               : {
-                name: 'default',
-                weight: 100,
-                payload: flag.baselinePayload ?? null,
-                payloadType: flag.variantType || 'string',
-                enabled: true,
-              };
+                  name: 'default',
+                  weight: 100,
+                  payload: flag.baselinePayload ?? null,
+                  payloadType: flag.variantType || 'string',
+                  enabled: true,
+                };
 
             return {
               id: flag.id || '',
@@ -58,12 +58,12 @@ export class FeatureFlagEvaluator {
         const variant: Variant = variantData
           ? { ...variantData, enabled: true }
           : {
-            name: 'default',
-            weight: 100,
-            payload: flag.baselinePayload ?? null,
-            payloadType: flag.variantType || 'string',
-            enabled: true,
-          };
+              name: 'default',
+              weight: 100,
+              payload: flag.baselinePayload ?? null,
+              payloadType: flag.variantType || 'string',
+              enabled: true,
+            };
 
         return {
           id: flag.id || '',

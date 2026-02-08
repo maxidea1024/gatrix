@@ -18,6 +18,7 @@ sidebar_label: Webhook
 ## 身份验证支持
 
 Webhook 支持以下验证方式：
+
 - **无** - 无验证
 - **Basic Auth** - 用户名和密码
 - **Bearer Token** - 令牌方式
@@ -41,13 +42,13 @@ Webhook 支持以下验证方式：
 
 ## 关键事件
 
-| 事件 | 说明 |
-|-------|-------------|
+| 事件                   | 说明       |
+| ---------------------- | ---------- |
 | `feature_flag.created` | 已创建开关 |
 | `feature_flag.updated` | 已更新开关 |
 | `feature_flag.deleted` | 已删除开关 |
-| `maintenance.started` | 维护已开始 |
-| `maintenance.ended` | 维护已结束 |
+| `maintenance.started`  | 维护已开始 |
+| `maintenance.ended`    | 维护已结束 |
 
 ## 重试策略
 

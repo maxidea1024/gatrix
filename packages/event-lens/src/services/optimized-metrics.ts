@@ -1,7 +1,7 @@
-import { clickhouse } from "../config/clickhouse";
-import { redis } from "../config/redis";
-import logger from "../utils/logger";
-import FilterBuilder, { Filter } from "./filter-builder";
+import { clickhouse } from '../config/clickhouse';
+import { redis } from '../config/redis';
+import logger from '../utils/logger';
+import FilterBuilder, { Filter } from './filter-builder';
 
 const filterBuilder = new FilterBuilder();
 
@@ -10,7 +10,7 @@ const filterBuilder = new FilterBuilder();
  * OpenPanel 스타일의 고급 최적화 기술 적용
  */
 export class OptimizedMetricsService {
-  private cachePrefix = "optimized_metrics:";
+  private cachePrefix = 'optimized_metrics:';
   private cacheTTL = 300; // 5분
 
   /**
@@ -30,7 +30,7 @@ export class OptimizedMetricsService {
       // 캐시 확인
       const cached = await redis.get(cacheKey);
       if (cached) {
-        logger.debug("Optimized metrics cache hit", { projectId });
+        logger.debug('Optimized metrics cache hit', { projectId });
         return JSON.parse(cached);
       }
 
@@ -38,19 +38,10 @@ export class OptimizedMetricsService {
 
       // 필터가 없으면 Materialized View 사용 (10-100배 빠름)
       if (!filters || filters.length === 0) {
-        metrics = await this.getMetricsFromMaterializedView(
-          projectId,
-          startDate,
-          endDate,
-        );
+        metrics = await this.getMetricsFromMaterializedView(projectId, startDate, endDate);
       } else {
         // 필터가 있으면 원본 테이블 쿼리
-        metrics = await this.getMetricsWithFilters(
-          projectId,
-          startDate,
-          endDate,
-          filters,
-        );
+        metrics = await this.getMetricsWithFilters(projectId, startDate, endDate, filters);
       }
 
       // 캐시 저장
@@ -58,7 +49,7 @@ export class OptimizedMetricsService {
 
       return metrics;
     } catch (error: any) {
-      logger.error("Failed to get optimized metrics", {
+      logger.error('Failed to get optimized metrics', {
         error: error.message,
         params,
       });
@@ -72,7 +63,7 @@ export class OptimizedMetricsService {
   private async getMetricsFromMaterializedView(
     projectId: string,
     startDate: string,
-    endDate: string,
+    endDate: string
   ): Promise<any> {
     const query = `
       SELECT
@@ -97,9 +88,7 @@ export class OptimizedMetricsService {
 
     const bounceRate =
       row.totalSessions > 0
-        ? parseFloat(
-            ((row.totalScreenViews / row.totalSessions) * 100).toFixed(2),
-          )
+        ? parseFloat(((row.totalScreenViews / row.totalSessions) * 100).toFixed(2))
         : 0;
 
     return {
@@ -119,7 +108,7 @@ export class OptimizedMetricsService {
     projectId: string,
     startDate: string,
     endDate: string,
-    filters: Filter[],
+    filters: Filter[]
   ): Promise<any> {
     const filterClause = filterBuilder.buildFilterClause(filters);
 
@@ -147,9 +136,7 @@ export class OptimizedMetricsService {
 
     const bounceRate =
       row.totalSessions > 0
-        ? parseFloat(
-            ((row.totalScreenViews / row.totalSessions) * 100).toFixed(2),
-          )
+        ? parseFloat(((row.totalScreenViews / row.totalSessions) * 100).toFixed(2))
         : 0;
 
     return {
@@ -197,7 +184,7 @@ export class OptimizedMetricsService {
       const data: any = await result.json();
       return data.data || [];
     } catch (error: any) {
-      logger.error("Failed to get top pages", { error: error.message, params });
+      logger.error('Failed to get top pages', { error: error.message, params });
       throw error;
     }
   }
@@ -237,7 +224,7 @@ export class OptimizedMetricsService {
       const data: any = await result.json();
       return data.data || [];
     } catch (error: any) {
-      logger.error("Failed to get top referrers", {
+      logger.error('Failed to get top referrers', {
         error: error.message,
         params,
       });
@@ -279,7 +266,7 @@ export class OptimizedMetricsService {
       const data: any = await result.json();
       return data.data || [];
     } catch (error: any) {
-      logger.error("Failed to get device stats", {
+      logger.error('Failed to get device stats', {
         error: error.message,
         params,
       });
@@ -320,7 +307,7 @@ export class OptimizedMetricsService {
       const data: any = await result.json();
       return data.data || [];
     } catch (error: any) {
-      logger.error("Failed to get geo stats", { error: error.message, params });
+      logger.error('Failed to get geo stats', { error: error.message, params });
       throw error;
     }
   }

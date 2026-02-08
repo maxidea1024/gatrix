@@ -13,22 +13,21 @@ async function debugApiCall() {
       headers: {
         'X-API-Token': API_TOKEN,
         'X-Application-Name': 'test-app',
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
-      timeout: 10000
+      timeout: 10000,
     });
-    
+
     console.log('✅ Success!');
     console.log(`Status: ${response.status}`);
     console.log(`Response:`, response.data);
-    
   } catch (error) {
     console.log('❌ Error occurred:');
     console.log(`Status: ${error.response?.status}`);
     console.log(`Status Text: ${error.response?.statusText}`);
     console.log(`Response:`, error.response?.data);
     console.log(`Error Message:`, error.message);
-    
+
     if (error.response?.status === 400) {
       console.log('\n🔍 400 Bad Request - 가능한 원인:');
       console.log('1. 잘못된 헤더 형식');

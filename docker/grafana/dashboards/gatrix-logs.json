@@ -1,10 +1,7 @@
 {
   "uid": "gatrix-logs",
   "title": "Gatrix Logs",
-  "tags": [
-    "gatrix",
-    "logs"
-  ],
+  "tags": ["gatrix", "logs"],
   "timezone": "browser",
   "schemaVersion": 38,
   "version": 1,

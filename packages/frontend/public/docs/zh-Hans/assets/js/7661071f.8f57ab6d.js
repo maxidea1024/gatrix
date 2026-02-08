@@ -1,1 +1,72 @@
-"use strict";(globalThis.webpackChunkdocs=globalThis.webpackChunkdocs||[]).push([[8737],{4137(t,e,a){a.r(e),a.d(e,{assets:()=>l,contentTitle:()=>r,default:()=>u,frontMatter:()=>s,metadata:()=>i,toc:()=>c});var i=a(8811),o=a(4848),n=a(8453);const s={slug:"api-integration-webhooks",title:"Gatrix API \ud1b5\ud569 \ubc0f \uc6f9\ud6c5 \uc124\uc815 \uc644\uc804 \uac00\uc774\ub4dc",authors:["gatrix-team"],tags:["gatrix","api","tutorial","tips"]},r=void 0,l={authorsImageUrls:[void 0]},c=[];function p(t){const e={p:"p",...(0,n.R)(),...t.components};return(0,o.jsx)(e.p,{children:"Gatrix\uc758 \uac15\ub825\ud55c API \uc2dc\uc2a4\ud15c\uc744 \ud65c\uc6a9\ud558\uc5ec \uc678\ubd80 \uc11c\ube44\uc2a4\uc640\uc758 \ud1b5\ud569\uc744 \uad6c\ud604\ud558\uace0, \uc2e4\uc2dc\uac04 \uc774\ubca4\ud2b8\ub97c \ucc98\ub9ac\ud558\ub294 \uc6f9\ud6c5\uc744 \uc124\uc815\ud558\ub294 \ubc29\ubc95\uc744 \uc54c\uc544\ubcf4\uaca0\uc2b5\ub2c8\ub2e4. \uc774 \uac00\uc774\ub4dc\ub97c \ud1b5\ud574 \uac8c\uc784 \ud50c\ub7ab\ud3fc\uc744 \ub354\uc6b1 \ud655\uc7a5 \uac00\ub2a5\ud558\uace0 \uc720\uc5f0\ud558\uac8c \ub9cc\ub4e4 \uc218 \uc788\uc2b5\ub2c8\ub2e4."})}function u(t={}){const{wrapper:e}={...(0,n.R)(),...t.components};return e?(0,o.jsx)(e,{...t,children:(0,o.jsx)(p,{...t})}):p(t)}},8453(t,e,a){a.d(e,{R:()=>s,x:()=>r});var i=a(6540);const o={},n=i.createContext(o);function s(t){const e=i.useContext(n);return i.useMemo(function(){return"function"==typeof t?t(e):{...e,...t}},[e,t])}function r(t){let e;return e=t.disableParentContext?"function"==typeof t.components?t.components(o):t.components||o:s(t.components),i.createElement(n.Provider,{value:e},t.children)}},8811(t){t.exports=JSON.parse('{"permalink":"/docs/zh-Hans/blog/api-integration-webhooks","editUrl":"https://github.com/your-org/gatrix/tree/main/docs/blog/2021-08-26-welcome/index.md","source":"@site/blog/2021-08-26-welcome/index.md","title":"Gatrix API \ud1b5\ud569 \ubc0f \uc6f9\ud6c5 \uc124\uc815 \uc644\uc804 \uac00\uc774\ub4dc","description":"Gatrix\uc758 \uac15\ub825\ud55c API \uc2dc\uc2a4\ud15c\uc744 \ud65c\uc6a9\ud558\uc5ec \uc678\ubd80 \uc11c\ube44\uc2a4\uc640\uc758 \ud1b5\ud569\uc744 \uad6c\ud604\ud558\uace0, \uc2e4\uc2dc\uac04 \uc774\ubca4\ud2b8\ub97c \ucc98\ub9ac\ud558\ub294 \uc6f9\ud6c5\uc744 \uc124\uc815\ud558\ub294 \ubc29\ubc95\uc744 \uc54c\uc544\ubcf4\uaca0\uc2b5\ub2c8\ub2e4. \uc774 \uac00\uc774\ub4dc\ub97c \ud1b5\ud574 \uac8c\uc784 \ud50c\ub7ab\ud3fc\uc744 \ub354\uc6b1 \ud655\uc7a5 \uac00\ub2a5\ud558\uace0 \uc720\uc5f0\ud558\uac8c \ub9cc\ub4e4 \uc218 \uc788\uc2b5\ub2c8\ub2e4.","date":"2021-08-26T00:00:00.000Z","tags":[{"inline":false,"label":"Gatrix","permalink":"/docs/zh-Hans/blog/tags/gatrix","description":"Gatrix game platform management system"},{"inline":false,"label":"API","permalink":"/docs/zh-Hans/blog/tags/api","description":"API documentation and usage"},{"inline":false,"label":"Tutorial","permalink":"/docs/zh-Hans/blog/tags/tutorial","description":"Step-by-step tutorials and guides"},{"inline":false,"label":"Tips","permalink":"/docs/zh-Hans/blog/tags/tips","description":"Tips and best practices"}],"readingTime":4.61,"hasTruncateMarker":true,"authors":[{"name":"Gatrix Team","title":"Game Platform Development Team","url":"https://github.com/your-org/gatrix","page":{"permalink":"/docs/zh-Hans/blog/authors/gatrix-team"},"socials":{"github":"https://github.com/your-org","email":"mailto:support@gatrix.com"},"imageURL":"https://avatars.githubusercontent.com/u/0?v=4","key":"gatrix-team"}],"frontMatter":{"slug":"api-integration-webhooks","title":"Gatrix API \ud1b5\ud569 \ubc0f \uc6f9\ud6c5 \uc124\uc815 \uc644\uc804 \uac00\uc774\ub4dc","authors":["gatrix-team"],"tags":["gatrix","api","tutorial","tips"]},"unlisted":false,"prevItem":{"title":"Gatrix Production Deployment Tips and Best Practices","permalink":"/docs/zh-Hans/blog/production-deployment-tips"},"nextItem":{"title":"Gatrix \uc2e4\uc2dc\uac04 \ucc44\ud305 \uc11c\ubc84 \uc644\uc804 \uc124\uc815 \uac00\uc774\ub4dc","permalink":"/docs/zh-Hans/blog/real-time-chat-server-setup"}}')}}]);
+'use strict';
+(globalThis.webpackChunkdocs = globalThis.webpackChunkdocs || []).push([
+  [8737],
+  {
+    4137(t, e, a) {
+      (a.r(e),
+        a.d(e, {
+          assets: () => l,
+          contentTitle: () => r,
+          default: () => u,
+          frontMatter: () => s,
+          metadata: () => i,
+          toc: () => c,
+        }));
+      var i = a(8811),
+        o = a(4848),
+        n = a(8453);
+      const s = {
+          slug: 'api-integration-webhooks',
+          title:
+            'Gatrix API \ud1b5\ud569 \ubc0f \uc6f9\ud6c5 \uc124\uc815 \uc644\uc804 \uac00\uc774\ub4dc',
+          authors: ['gatrix-team'],
+          tags: ['gatrix', 'api', 'tutorial', 'tips'],
+        },
+        r = void 0,
+        l = { authorsImageUrls: [void 0] },
+        c = [];
+      function p(t) {
+        const e = { p: 'p', ...(0, n.R)(), ...t.components };
+        return (0, o.jsx)(e.p, {
+          children:
+            'Gatrix\uc758 \uac15\ub825\ud55c API \uc2dc\uc2a4\ud15c\uc744 \ud65c\uc6a9\ud558\uc5ec \uc678\ubd80 \uc11c\ube44\uc2a4\uc640\uc758 \ud1b5\ud569\uc744 \uad6c\ud604\ud558\uace0, \uc2e4\uc2dc\uac04 \uc774\ubca4\ud2b8\ub97c \ucc98\ub9ac\ud558\ub294 \uc6f9\ud6c5\uc744 \uc124\uc815\ud558\ub294 \ubc29\ubc95\uc744 \uc54c\uc544\ubcf4\uaca0\uc2b5\ub2c8\ub2e4. \uc774 \uac00\uc774\ub4dc\ub97c \ud1b5\ud574 \uac8c\uc784 \ud50c\ub7ab\ud3fc\uc744 \ub354\uc6b1 \ud655\uc7a5 \uac00\ub2a5\ud558\uace0 \uc720\uc5f0\ud558\uac8c \ub9cc\ub4e4 \uc218 \uc788\uc2b5\ub2c8\ub2e4.',
+        });
+      }
+      function u(t = {}) {
+        const { wrapper: e } = { ...(0, n.R)(), ...t.components };
+        return e ? (0, o.jsx)(e, { ...t, children: (0, o.jsx)(p, { ...t }) }) : p(t);
+      }
+    },
+    8453(t, e, a) {
+      a.d(e, { R: () => s, x: () => r });
+      var i = a(6540);
+      const o = {},
+        n = i.createContext(o);
+      function s(t) {
+        const e = i.useContext(n);
+        return i.useMemo(
+          function () {
+            return 'function' == typeof t ? t(e) : { ...e, ...t };
+          },
+          [e, t]
+        );
+      }
+      function r(t) {
+        let e;
+        return (
+          (e = t.disableParentContext
+            ? 'function' == typeof t.components
+              ? t.components(o)
+              : t.components || o
+            : s(t.components)),
+          i.createElement(n.Provider, { value: e }, t.children)
+        );
+      }
+    },
+    8811(t) {
+      t.exports = JSON.parse(
+        '{"permalink":"/docs/zh-Hans/blog/api-integration-webhooks","editUrl":"https://github.com/your-org/gatrix/tree/main/docs/blog/2021-08-26-welcome/index.md","source":"@site/blog/2021-08-26-welcome/index.md","title":"Gatrix API \ud1b5\ud569 \ubc0f \uc6f9\ud6c5 \uc124\uc815 \uc644\uc804 \uac00\uc774\ub4dc","description":"Gatrix\uc758 \uac15\ub825\ud55c API \uc2dc\uc2a4\ud15c\uc744 \ud65c\uc6a9\ud558\uc5ec \uc678\ubd80 \uc11c\ube44\uc2a4\uc640\uc758 \ud1b5\ud569\uc744 \uad6c\ud604\ud558\uace0, \uc2e4\uc2dc\uac04 \uc774\ubca4\ud2b8\ub97c \ucc98\ub9ac\ud558\ub294 \uc6f9\ud6c5\uc744 \uc124\uc815\ud558\ub294 \ubc29\ubc95\uc744 \uc54c\uc544\ubcf4\uaca0\uc2b5\ub2c8\ub2e4. \uc774 \uac00\uc774\ub4dc\ub97c \ud1b5\ud574 \uac8c\uc784 \ud50c\ub7ab\ud3fc\uc744 \ub354\uc6b1 \ud655\uc7a5 \uac00\ub2a5\ud558\uace0 \uc720\uc5f0\ud558\uac8c \ub9cc\ub4e4 \uc218 \uc788\uc2b5\ub2c8\ub2e4.","date":"2021-08-26T00:00:00.000Z","tags":[{"inline":false,"label":"Gatrix","permalink":"/docs/zh-Hans/blog/tags/gatrix","description":"Gatrix game platform management system"},{"inline":false,"label":"API","permalink":"/docs/zh-Hans/blog/tags/api","description":"API documentation and usage"},{"inline":false,"label":"Tutorial","permalink":"/docs/zh-Hans/blog/tags/tutorial","description":"Step-by-step tutorials and guides"},{"inline":false,"label":"Tips","permalink":"/docs/zh-Hans/blog/tags/tips","description":"Tips and best practices"}],"readingTime":4.61,"hasTruncateMarker":true,"authors":[{"name":"Gatrix Team","title":"Game Platform Development Team","url":"https://github.com/your-org/gatrix","page":{"permalink":"/docs/zh-Hans/blog/authors/gatrix-team"},"socials":{"github":"https://github.com/your-org","email":"mailto:support@gatrix.com"},"imageURL":"https://avatars.githubusercontent.com/u/0?v=4","key":"gatrix-team"}],"frontMatter":{"slug":"api-integration-webhooks","title":"Gatrix API \ud1b5\ud569 \ubc0f \uc6f9\ud6c5 \uc124\uc815 \uc644\uc804 \uac00\uc774\ub4dc","authors":["gatrix-team"],"tags":["gatrix","api","tutorial","tips"]},"unlisted":false,"prevItem":{"title":"Gatrix Production Deployment Tips and Best Practices","permalink":"/docs/zh-Hans/blog/production-deployment-tips"},"nextItem":{"title":"Gatrix \uc2e4\uc2dc\uac04 \ucc44\ud305 \uc11c\ubc84 \uc644\uc804 \uc124\uc815 \uac00\uc774\ub4dc","permalink":"/docs/zh-Hans/blog/real-time-chat-server-setup"}}'
+      );
+    },
+  },
+]);

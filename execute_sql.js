@@ -10,7 +10,7 @@ async function executeSqlFile() {
       user: process.env.DB_USER || 'gatrix_user',
       password: process.env.DB_PASSWORD || 'gatrix_password',
       database: process.env.DB_NAME || 'gatrix',
-      port: process.env.DB_PORT || 3306
+      port: process.env.DB_PORT || 3306,
     });
 
     console.log('[INFO] Connected to database successfully.');
@@ -21,10 +21,10 @@ async function executeSqlFile() {
     // Remove comments and split queries
     const queries = sqlContent
       .split('\n')
-      .filter(line => !line.trim().startsWith('--') && line.trim() !== '')
+      .filter((line) => !line.trim().startsWith('--') && line.trim() !== '')
       .join('\n')
       .split(';')
-      .filter(query => query.trim() !== '');
+      .filter((query) => query.trim() !== '');
 
     console.log(`[INFO] Executing ${queries.length} queries...`);
 
@@ -51,14 +51,15 @@ async function executeSqlFile() {
       user: process.env.DB_USER || 'gatrix_user',
       password: process.env.DB_PASSWORD || 'gatrix_password',
       database: process.env.DB_NAME || 'gatrix',
-      port: process.env.DB_PORT || 3306
+      port: process.env.DB_PORT || 3306,
     });
 
-    const [rows] = await checkConnection.execute('SELECT COUNT(*) as count FROM g_users WHERE role = "user"');
+    const [rows] = await checkConnection.execute(
+      'SELECT COUNT(*) as count FROM g_users WHERE role = "user"'
+    );
     console.log(`[INFO] Total users in database: ${rows[0].count}`);
 
     await checkConnection.end();
-
   } catch (error) {
     console.error('[ERROR] An error occurred:', error.message);
     process.exit(1);

@@ -3,7 +3,7 @@
  * Created: 2025-10-17
  */
 
-exports.up = async function(connection) {
+exports.up = async function (connection) {
   console.log('Recreating g_mails table with correct schema...');
 
   // Drop the table if it exists (to fix schema mismatch from 001_initial_schema.js)
@@ -61,9 +61,8 @@ exports.up = async function(connection) {
   console.log('g_mails table created successfully');
 };
 
-exports.down = async function(connection) {
+exports.down = async function (connection) {
   console.log('Dropping g_mails table...');
   await connection.execute('DROP TABLE IF EXISTS g_mails');
   console.log('g_mails table dropped');
 };
-

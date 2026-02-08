@@ -21,12 +21,15 @@ The job management system provides:
 ## 📦 Job Types
 
 ### 1. Email Jobs (`mailsend`)
+
 Send automated emails with template support.
 
 ### 2. HTTP Request Jobs (`http_request`)
+
 Execute webhooks or API calls.
 
 ### 3. SSH Command Jobs (`ssh_command`)
+
 Run commands on remote servers securely.
 
 ## 📊 Monitoring
@@ -36,6 +39,7 @@ Access the job monitoring dashboard at `/admin/queues` on the backend server.
 ---
 
 **Related Resources**:
+
 - [Job Management Features](../../features/job-management)
 - [Client API](../../api/client-api)
 - [GitHub Repository](https://github.com/your-org/gatrix)

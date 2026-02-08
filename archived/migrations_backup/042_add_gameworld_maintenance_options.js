@@ -19,7 +19,7 @@ module.exports = {
       AND COLUMN_NAME IN ('forceDisconnect', 'gracePeriodMinutes')
     `);
 
-    const existingColumns = columns.map(row => row.COLUMN_NAME);
+    const existingColumns = columns.map((row) => row.COLUMN_NAME);
 
     // Add forceDisconnect column if not exists
     if (!existingColumns.includes('forceDisconnect')) {
@@ -47,7 +47,9 @@ module.exports = {
       console.log('→ gracePeriodMinutes column already exists');
     }
 
-    console.log('✓ Migration completed: Add forceDisconnect and gracePeriodMinutes to g_game_worlds');
+    console.log(
+      '✓ Migration completed: Add forceDisconnect and gracePeriodMinutes to g_game_worlds'
+    );
   },
 
   down: async (connection) => {
@@ -59,7 +61,8 @@ module.exports = {
       DROP COLUMN IF EXISTS forceDisconnect
     `);
 
-    console.log('✓ Migration rolled back: Removed forceDisconnect and gracePeriodMinutes from g_game_worlds');
-  }
+    console.log(
+      '✓ Migration rolled back: Removed forceDisconnect and gracePeriodMinutes from g_game_worlds'
+    );
+  },
 };
-

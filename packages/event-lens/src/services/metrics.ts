@@ -1,10 +1,10 @@
-import { clickhouse } from "../config/clickhouse";
-import { redis } from "../config/redis";
-import logger from "../utils/logger";
-import { Metrics, TimeSeriesData, TopPage } from "../types";
+import { clickhouse } from '../config/clickhouse';
+import { redis } from '../config/redis';
+import logger from '../utils/logger';
+import { Metrics, TimeSeriesData, TopPage } from '../types';
 
 export class MetricsService {
-  private cachePrefix = "metrics:";
+  private cachePrefix = 'metrics:';
   private cacheTTL = 300; // 5분
 
   async getMetrics(params: {
@@ -19,7 +19,7 @@ export class MetricsService {
       // 캐시 확인
       const cached = await redis.get(cacheKey);
       if (cached) {
-        logger.debug("Metrics cache hit", { projectId });
+        logger.debug('Metrics cache hit', { projectId });
         return JSON.parse(cached);
       }
 
@@ -56,7 +56,7 @@ export class MetricsService {
 
       return metrics;
     } catch (error) {
-      logger.error("Failed to get metrics", { error, params });
+      logger.error('Failed to get metrics', { error, params });
       throw error;
     }
   }
@@ -65,16 +65,16 @@ export class MetricsService {
     projectId: string;
     startDate: string;
     endDate: string;
-    interval?: "hour" | "day" | "week" | "month";
+    interval?: 'hour' | 'day' | 'week' | 'month';
   }): Promise<TimeSeriesData[]> {
-    const { projectId, startDate, endDate, interval = "day" } = params;
+    const { projectId, startDate, endDate, interval = 'day' } = params;
 
     try {
       const intervalFunc = {
-        hour: "toStartOfHour",
-        day: "toDate",
-        week: "toMonday",
-        month: "toStartOfMonth",
+        hour: 'toStartOfHour',
+        day: 'toDate',
+        week: 'toMonday',
+        month: 'toStartOfMonth',
       }[interval];
 
       const query = `
@@ -99,7 +99,7 @@ export class MetricsService {
       const data: any = await result.json();
       return data.data || [];
     } catch (error) {
-      logger.error("Failed to get time series", { error, params });
+      logger.error('Failed to get time series', { error, params });
       throw error;
     }
   }
@@ -137,7 +137,7 @@ export class MetricsService {
       const data: any = await result.json();
       return data.data || [];
     } catch (error) {
-      logger.error("Failed to get top pages", { error, params });
+      logger.error('Failed to get top pages', { error, params });
       throw error;
     }
   }
@@ -159,7 +159,7 @@ export class MetricsService {
       const data: any = await result.json();
       return data.data?.[0]?.count || 0;
     } catch (error) {
-      logger.error("Failed to get live visitors", { error, projectId });
+      logger.error('Failed to get live visitors', { error, projectId });
       throw error;
     }
   }
@@ -197,7 +197,7 @@ export class MetricsService {
       const data: any = await result.json();
       return data.data || [];
     } catch (error) {
-      logger.error("Failed to get top referrers", { error, params });
+      logger.error('Failed to get top referrers', { error, params });
       throw error;
     }
   }
@@ -233,7 +233,7 @@ export class MetricsService {
       const data: any = await result.json();
       return data.data || [];
     } catch (error) {
-      logger.error("Failed to get device stats", { error, params });
+      logger.error('Failed to get device stats', { error, params });
       throw error;
     }
   }
@@ -268,7 +268,7 @@ export class MetricsService {
 
       return result.json();
     } catch (error) {
-      logger.error("Failed to get geo stats", { error, params });
+      logger.error('Failed to get geo stats', { error, params });
       throw error;
     }
   }

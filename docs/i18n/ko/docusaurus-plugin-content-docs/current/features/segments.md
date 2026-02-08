@@ -9,6 +9,7 @@ sidebar_position: 2
 ## 개요
 
 세그먼트를 사용하면 다음과 같은 타겟팅이 가능합니다:
+
 - 베타 테스터에게만 새 기능 노출
 - 특정 국가/지역 사용자에게 기능 제공
 - VIP 사용자에게 프리미엄 기능 제공
@@ -28,16 +29,16 @@ sidebar_position: 2
 
 ### 연산자
 
-| 연산자 | 설명 | 예시 |
-|--------|------|------|
-| `equals` | 정확히 일치 | `country equals "KR"` |
-| `notEquals` | 일치하지 않음 | `status notEquals "banned"` |
-| `contains` | 포함 | `email contains "@company.com"` |
-| `startsWith` | 시작 문자열 | `userId startsWith "test_"` |
-| `endsWith` | 끝 문자열 | `email endsWith ".kr"` |
-| `greaterThan` | 보다 큼 | `level greaterThan 10` |
-| `lessThan` | 보다 작음 | `age lessThan 18` |
-| `in` | 목록에 포함 | `country in ["KR", "JP", "CN"]` |
+| 연산자        | 설명          | 예시                            |
+| ------------- | ------------- | ------------------------------- |
+| `equals`      | 정확히 일치   | `country equals "KR"`           |
+| `notEquals`   | 일치하지 않음 | `status notEquals "banned"`     |
+| `contains`    | 포함          | `email contains "@company.com"` |
+| `startsWith`  | 시작 문자열   | `userId startsWith "test_"`     |
+| `endsWith`    | 끝 문자열     | `email endsWith ".kr"`          |
+| `greaterThan` | 보다 큼       | `level greaterThan 10`          |
+| `lessThan`    | 보다 작음     | `age lessThan 18`               |
+| `in`          | 목록에 포함   | `country in ["KR", "JP", "CN"]` |
 
 ### 예시: 베타 테스터 세그먼트
 

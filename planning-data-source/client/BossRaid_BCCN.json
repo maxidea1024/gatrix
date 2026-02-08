@@ -8,15 +8,8 @@
       "localBitFlag": "bit",
       "ticketId": "number",
       "mateId": "number",
-      "mainRewardPointId": [
-        "number"
-      ],
-      "mainRewardItemId": [
-        "number",
-        "number",
-        "number",
-        "number"
-      ],
+      "mainRewardPointId": ["number"],
+      "mainRewardItemId": ["number", "number", "number", "number"],
       "enterMail": "number",
       "enterReward": "number",
       "challengeEnterDmg": "number",
@@ -106,15 +99,8 @@
     ":min": {
       "ticketId": 57030000,
       "mateId": 21200000,
-      "mainRewardPointId": [
-        100000
-      ],
-      "mainRewardItemId": [
-        23000000,
-        23000000,
-        23000000,
-        23000000
-      ],
+      "mainRewardPointId": [100000],
+      "mainRewardItemId": [23000000, 23000000, 23000000, 23000000],
       "enterMail": 92000000,
       "enterReward": 90000000,
       "spawnHourUpdated": 0,
@@ -148,15 +134,8 @@
     ":max": {
       "ticketId": 57039999,
       "mateId": 21399999,
-      "mainRewardPointId": [
-        199999
-      ],
-      "mainRewardItemId": [
-        23999999,
-        23999999,
-        23999999,
-        23999999
-      ],
+      "mainRewardPointId": [199999],
+      "mainRewardItemId": [23999999, 23999999, 23999999, 23999999],
       "enterMail": 92999999,
       "enterReward": 90999999,
       "spawnTimeHour": 24,
@@ -185,77 +164,32 @@
     },
     ":enum": {},
     ":links": {
-      "ticketId": [
-        "BossRaidTicket"
-      ],
-      "mateId": [
-        "Mate"
-      ],
-      "mainRewardPointId": [
-        [
-          "Point"
-        ]
-      ],
-      "mainRewardItemId": [
-        [
-          "Item"
-        ],
-        [
-          "Item"
-        ],
-        [
-          "Item"
-        ],
-        [
-          "Item"
-        ]
-      ],
-      "enterMail": [
-        "Mail"
-      ],
-      "enterReward": [
-        "Reward"
-      ],
+      "ticketId": ["BossRaidTicket"],
+      "mateId": ["Mate"],
+      "mainRewardPointId": [["Point"]],
+      "mainRewardItemId": [["Item"], ["Item"], ["Item"], ["Item"]],
+      "enterMail": ["Mail"],
+      "enterReward": ["Reward"],
       "remoteContentsTerms": [
         {
-          "Id": [
-            "ContentsTerms"
-          ]
+          "Id": ["ContentsTerms"]
         }
       ],
       "contentsTerms": [
         {
-          "Id": [
-            "ContentsTerms"
-          ]
+          "Id": ["ContentsTerms"]
         },
         {
-          "Id": [
-            "ContentsTerms"
-          ]
+          "Id": ["ContentsTerms"]
         }
       ],
-      "oceanDoodadId": [
-        "OceanDoodad"
-      ],
-      "dmgRewardId": [
-        "BossRaidDmgReward"
-      ],
-      "guideInfoId": [
-        "BossRaidGuideInfo"
-      ],
-      "accu1stMailId": [
-        "Mail"
-      ],
-      "accu1stRewardId": [
-        "Reward"
-      ],
-      "targetOceanNpc": [
-        "OceanNpc"
-      ],
-      "allyOceanNpc": [
-        "OceanNpc"
-      ]
+      "oceanDoodadId": ["OceanDoodad"],
+      "dmgRewardId": ["BossRaidDmgReward"],
+      "guideInfoId": ["BossRaidGuideInfo"],
+      "accu1stMailId": ["Mail"],
+      "accu1stRewardId": ["Reward"],
+      "targetOceanNpc": ["OceanNpc"],
+      "allyOceanNpc": ["OceanNpc"]
     }
   },
   "BossRaid": {}

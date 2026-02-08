@@ -15,9 +15,7 @@
     },
     ":enum": {},
     ":links": {
-      "defaultshipbodyfirstcolorId": [
-        "ShipBodyFirstColor"
-      ]
+      "defaultshipbodyfirstcolorId": ["ShipBodyFirstColor"]
     }
   },
   "DefaultShipBodyFirstColor": {

@@ -1,1 +1,233 @@
-"use strict";(globalThis.webpackChunkdocs=globalThis.webpackChunkdocs||[]).push([[5557],{7447(e,t,n){n.r(t),n.d(t,{assets:()=>l,contentTitle:()=>o,default:()=>p,frontMatter:()=>s,metadata:()=>i,toc:()=>c});var i=n(8811),a=n(4848),r=n(8453);const s={slug:"api-integration-webhooks",title:"Gatrix API Integration and Webhook Setup Guide",authors:["gatrix-team"],tags:["gatrix","api","tutorial","tips"]},o=void 0,l={authorsImageUrls:[void 0]},c=[{value:"\ud83d\udd0c API Integration Overview",id:"-api-integration-overview",level:2},{value:"\ud83d\udce1 REST API Integration",id:"-rest-api-integration",level:2},{value:"1. Authentication",id:"1-authentication",level:3},{value:"2. Key Endpoints",id:"2-key-endpoints",level:3},{value:"User Management",id:"user-management",level:4},{value:"\ud83e\ude9d Webhook Setup",id:"-webhook-setup",level:2},{value:"1. Webhook Signature Verification",id:"1-webhook-signature-verification",level:3},{value:"\ud83c\udfaf Conclusion",id:"-conclusion",level:2}];function u(e){const t={a:"a",code:"code",h2:"h2",h3:"h3",h4:"h4",hr:"hr",li:"li",p:"p",pre:"pre",strong:"strong",ul:"ul",...(0,r.R)(),...e.components};return(0,a.jsxs)(a.Fragment,{children:[(0,a.jsx)(t.p,{children:"Learn how to leverage Gatrix's powerful API system to implement integrations with external services and set up webhooks to process real-time events."}),"\n",(0,a.jsx)(t.h2,{id:"-api-integration-overview",children:"\ud83d\udd0c API Integration Overview"}),"\n",(0,a.jsx)(t.p,{children:"Gatrix supports integration via RESTful API and WebSockets:"}),"\n",(0,a.jsxs)(t.ul,{children:["\n",(0,a.jsxs)(t.li,{children:[(0,a.jsx)(t.strong,{children:"REST API"}),": Data exchange using standard HTTP methods"]}),"\n",(0,a.jsxs)(t.li,{children:[(0,a.jsx)(t.strong,{children:"WebSocket"}),": Real-time event streaming"]}),"\n",(0,a.jsxs)(t.li,{children:[(0,a.jsx)(t.strong,{children:"Webhook"}),": Asynchronous server-to-server communication"]}),"\n",(0,a.jsxs)(t.li,{children:[(0,a.jsx)(t.strong,{children:"SDK"}),": Client libraries for various languages"]}),"\n"]}),"\n",(0,a.jsx)(t.h2,{id:"-rest-api-integration",children:"\ud83d\udce1 REST API Integration"}),"\n",(0,a.jsx)(t.h3,{id:"1-authentication",children:"1. Authentication"}),"\n",(0,a.jsx)(t.p,{children:"All API requests require proper authentication:"}),"\n",(0,a.jsx)(t.pre,{children:(0,a.jsx)(t.code,{className:"language-javascript",children:"const axios = require('axios');\n\nconst apiClient = axios.create({\n  baseURL: 'https://api.gatrix.com',\n  headers: {\n    'X-API-Key': process.env.GATRIX_API_KEY,\n    'Content-Type': 'application/json'\n  }\n});\n"})}),"\n",(0,a.jsx)(t.h3,{id:"2-key-endpoints",children:"2. Key Endpoints"}),"\n",(0,a.jsx)(t.h4,{id:"user-management",children:"User Management"}),"\n",(0,a.jsx)(t.pre,{children:(0,a.jsx)(t.code,{className:"language-javascript",children:"// List users\nconst users = await apiClient.get('/api/v1/users');\n\n// Create user\nconst newUser = await apiClient.post('/api/v1/users', {\n  username: 'player123',\n  email: 'player@example.com'\n});\n"})}),"\n",(0,a.jsx)(t.h2,{id:"-webhook-setup",children:"\ud83e\ude9d Webhook Setup"}),"\n",(0,a.jsx)(t.h3,{id:"1-webhook-signature-verification",children:"1. Webhook Signature Verification"}),"\n",(0,a.jsx)(t.pre,{children:(0,a.jsx)(t.code,{className:"language-javascript",children:"const crypto = require('crypto');\n\nfunction verifySignature(payload, signature, secret) {\n  const expectedSignature = crypto\n    .createHmac('sha256', secret)\n    .update(JSON.stringify(payload))\n    .digest('hex');\n  \n  return signature === expectedSignature;\n}\n"})}),"\n",(0,a.jsx)(t.h2,{id:"-conclusion",children:"\ud83c\udfaf Conclusion"}),"\n",(0,a.jsx)(t.p,{children:"Leveraging Gatrix APIs allows you to build a powerful and scalable game platform."}),"\n",(0,a.jsx)(t.hr,{}),"\n",(0,a.jsxs)(t.p,{children:[(0,a.jsx)(t.strong,{children:"Related Resources"}),":"]}),"\n",(0,a.jsxs)(t.ul,{children:["\n",(0,a.jsx)(t.li,{children:(0,a.jsx)(t.a,{href:"../../api/client-api",children:"API Documentation"})}),"\n",(0,a.jsx)(t.li,{children:(0,a.jsx)(t.a,{href:"../../api/server-sdk-api",children:"Server SDK API"})}),"\n",(0,a.jsx)(t.li,{children:(0,a.jsx)(t.a,{href:"https://github.com/your-org/gatrix",children:"GitHub Repository"})}),"\n"]})]})}function p(e={}){const{wrapper:t}={...(0,r.R)(),...e.components};return t?(0,a.jsx)(t,{...e,children:(0,a.jsx)(u,{...e})}):u(e)}},8453(e,t,n){n.d(t,{R:()=>s,x:()=>o});var i=n(6540);const a={},r=i.createContext(a);function s(e){const t=i.useContext(r);return i.useMemo(function(){return"function"==typeof e?e(t):{...t,...e}},[t,e])}function o(e){let t;return t=e.disableParentContext?"function"==typeof e.components?e.components(a):e.components||a:s(e.components),i.createElement(r.Provider,{value:t},e.children)}},8811(e){e.exports=JSON.parse('{"permalink":"/docs/zh-Hans/blog/api-integration-webhooks","editUrl":"https://github.com/your-org/gatrix/tree/main/docs/blog/2021-08-26-welcome/index.md","source":"@site/blog/2021-08-26-welcome/index.md","title":"Gatrix API Integration and Webhook Setup Guide","description":"Learn how to leverage Gatrix\'s powerful API system to implement integrations with external services and set up webhooks to process real-time events.","date":"2021-08-26T00:00:00.000Z","tags":[{"inline":false,"label":"Gatrix","permalink":"/docs/zh-Hans/blog/tags/gatrix","description":"Gatrix game platform management system"},{"inline":false,"label":"API","permalink":"/docs/zh-Hans/blog/tags/api","description":"API documentation and usage"},{"inline":false,"label":"Tutorial","permalink":"/docs/zh-Hans/blog/tags/tutorial","description":"Step-by-step tutorials and guides"},{"inline":false,"label":"Tips","permalink":"/docs/zh-Hans/blog/tags/tips","description":"Tips and best practices"}],"readingTime":0.93,"hasTruncateMarker":true,"authors":[{"name":"Gatrix Team","title":"Game Platform Development Team","url":"https://github.com/your-org/gatrix","page":{"permalink":"/docs/zh-Hans/blog/authors/gatrix-team"},"socials":{"github":"https://github.com/your-org","email":"mailto:support@gatrix.com"},"imageURL":"https://avatars.githubusercontent.com/u/0?v=4","key":"gatrix-team"}],"frontMatter":{"slug":"api-integration-webhooks","title":"Gatrix API Integration and Webhook Setup Guide","authors":["gatrix-team"],"tags":["gatrix","api","tutorial","tips"]},"unlisted":false,"prevItem":{"title":"Gatrix Production Deployment Tips and Best Practices","permalink":"/docs/zh-Hans/blog/production-deployment-tips"},"nextItem":{"title":"Gatrix Real-time Chat Server Setup Guide","permalink":"/docs/zh-Hans/blog/real-time-chat-server-setup"}}')}}]);
+'use strict';
+(globalThis.webpackChunkdocs = globalThis.webpackChunkdocs || []).push([
+  [5557],
+  {
+    7447(e, t, n) {
+      (n.r(t),
+        n.d(t, {
+          assets: () => l,
+          contentTitle: () => o,
+          default: () => p,
+          frontMatter: () => s,
+          metadata: () => i,
+          toc: () => c,
+        }));
+      var i = n(8811),
+        a = n(4848),
+        r = n(8453);
+      const s = {
+          slug: 'api-integration-webhooks',
+          title: 'Gatrix API Integration and Webhook Setup Guide',
+          authors: ['gatrix-team'],
+          tags: ['gatrix', 'api', 'tutorial', 'tips'],
+        },
+        o = void 0,
+        l = { authorsImageUrls: [void 0] },
+        c = [
+          {
+            value: '\ud83d\udd0c API Integration Overview',
+            id: '-api-integration-overview',
+            level: 2,
+          },
+          { value: '\ud83d\udce1 REST API Integration', id: '-rest-api-integration', level: 2 },
+          { value: '1. Authentication', id: '1-authentication', level: 3 },
+          { value: '2. Key Endpoints', id: '2-key-endpoints', level: 3 },
+          { value: 'User Management', id: 'user-management', level: 4 },
+          { value: '\ud83e\ude9d Webhook Setup', id: '-webhook-setup', level: 2 },
+          {
+            value: '1. Webhook Signature Verification',
+            id: '1-webhook-signature-verification',
+            level: 3,
+          },
+          { value: '\ud83c\udfaf Conclusion', id: '-conclusion', level: 2 },
+        ];
+      function u(e) {
+        const t = {
+          a: 'a',
+          code: 'code',
+          h2: 'h2',
+          h3: 'h3',
+          h4: 'h4',
+          hr: 'hr',
+          li: 'li',
+          p: 'p',
+          pre: 'pre',
+          strong: 'strong',
+          ul: 'ul',
+          ...(0, r.R)(),
+          ...e.components,
+        };
+        return (0, a.jsxs)(a.Fragment, {
+          children: [
+            (0, a.jsx)(t.p, {
+              children:
+                "Learn how to leverage Gatrix's powerful API system to implement integrations with external services and set up webhooks to process real-time events.",
+            }),
+            '\n',
+            (0, a.jsx)(t.h2, {
+              id: '-api-integration-overview',
+              children: '\ud83d\udd0c API Integration Overview',
+            }),
+            '\n',
+            (0, a.jsx)(t.p, {
+              children: 'Gatrix supports integration via RESTful API and WebSockets:',
+            }),
+            '\n',
+            (0, a.jsxs)(t.ul, {
+              children: [
+                '\n',
+                (0, a.jsxs)(t.li, {
+                  children: [
+                    (0, a.jsx)(t.strong, { children: 'REST API' }),
+                    ': Data exchange using standard HTTP methods',
+                  ],
+                }),
+                '\n',
+                (0, a.jsxs)(t.li, {
+                  children: [
+                    (0, a.jsx)(t.strong, { children: 'WebSocket' }),
+                    ': Real-time event streaming',
+                  ],
+                }),
+                '\n',
+                (0, a.jsxs)(t.li, {
+                  children: [
+                    (0, a.jsx)(t.strong, { children: 'Webhook' }),
+                    ': Asynchronous server-to-server communication',
+                  ],
+                }),
+                '\n',
+                (0, a.jsxs)(t.li, {
+                  children: [
+                    (0, a.jsx)(t.strong, { children: 'SDK' }),
+                    ': Client libraries for various languages',
+                  ],
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, a.jsx)(t.h2, {
+              id: '-rest-api-integration',
+              children: '\ud83d\udce1 REST API Integration',
+            }),
+            '\n',
+            (0, a.jsx)(t.h3, { id: '1-authentication', children: '1. Authentication' }),
+            '\n',
+            (0, a.jsx)(t.p, { children: 'All API requests require proper authentication:' }),
+            '\n',
+            (0, a.jsx)(t.pre, {
+              children: (0, a.jsx)(t.code, {
+                className: 'language-javascript',
+                children:
+                  "const axios = require('axios');\n\nconst apiClient = axios.create({\n  baseURL: 'https://api.gatrix.com',\n  headers: {\n    'X-API-Key': process.env.GATRIX_API_KEY,\n    'Content-Type': 'application/json'\n  }\n});\n",
+              }),
+            }),
+            '\n',
+            (0, a.jsx)(t.h3, { id: '2-key-endpoints', children: '2. Key Endpoints' }),
+            '\n',
+            (0, a.jsx)(t.h4, { id: 'user-management', children: 'User Management' }),
+            '\n',
+            (0, a.jsx)(t.pre, {
+              children: (0, a.jsx)(t.code, {
+                className: 'language-javascript',
+                children:
+                  "// List users\nconst users = await apiClient.get('/api/v1/users');\n\n// Create user\nconst newUser = await apiClient.post('/api/v1/users', {\n  username: 'player123',\n  email: 'player@example.com'\n});\n",
+              }),
+            }),
+            '\n',
+            (0, a.jsx)(t.h2, { id: '-webhook-setup', children: '\ud83e\ude9d Webhook Setup' }),
+            '\n',
+            (0, a.jsx)(t.h3, {
+              id: '1-webhook-signature-verification',
+              children: '1. Webhook Signature Verification',
+            }),
+            '\n',
+            (0, a.jsx)(t.pre, {
+              children: (0, a.jsx)(t.code, {
+                className: 'language-javascript',
+                children:
+                  "const crypto = require('crypto');\n\nfunction verifySignature(payload, signature, secret) {\n  const expectedSignature = crypto\n    .createHmac('sha256', secret)\n    .update(JSON.stringify(payload))\n    .digest('hex');\n  \n  return signature === expectedSignature;\n}\n",
+              }),
+            }),
+            '\n',
+            (0, a.jsx)(t.h2, { id: '-conclusion', children: '\ud83c\udfaf Conclusion' }),
+            '\n',
+            (0, a.jsx)(t.p, {
+              children:
+                'Leveraging Gatrix APIs allows you to build a powerful and scalable game platform.',
+            }),
+            '\n',
+            (0, a.jsx)(t.hr, {}),
+            '\n',
+            (0, a.jsxs)(t.p, {
+              children: [(0, a.jsx)(t.strong, { children: 'Related Resources' }), ':'],
+            }),
+            '\n',
+            (0, a.jsxs)(t.ul, {
+              children: [
+                '\n',
+                (0, a.jsx)(t.li, {
+                  children: (0, a.jsx)(t.a, {
+                    href: '../../api/client-api',
+                    children: 'API Documentation',
+                  }),
+                }),
+                '\n',
+                (0, a.jsx)(t.li, {
+                  children: (0, a.jsx)(t.a, {
+                    href: '../../api/server-sdk-api',
+                    children: 'Server SDK API',
+                  }),
+                }),
+                '\n',
+                (0, a.jsx)(t.li, {
+                  children: (0, a.jsx)(t.a, {
+                    href: 'https://github.com/your-org/gatrix',
+                    children: 'GitHub Repository',
+                  }),
+                }),
+                '\n',
+              ],
+            }),
+          ],
+        });
+      }
+      function p(e = {}) {
+        const { wrapper: t } = { ...(0, r.R)(), ...e.components };
+        return t ? (0, a.jsx)(t, { ...e, children: (0, a.jsx)(u, { ...e }) }) : u(e);
+      }
+    },
+    8453(e, t, n) {
+      n.d(t, { R: () => s, x: () => o });
+      var i = n(6540);
+      const a = {},
+        r = i.createContext(a);
+      function s(e) {
+        const t = i.useContext(r);
+        return i.useMemo(
+          function () {
+            return 'function' == typeof e ? e(t) : { ...t, ...e };
+          },
+          [t, e]
+        );
+      }
+      function o(e) {
+        let t;
+        return (
+          (t = e.disableParentContext
+            ? 'function' == typeof e.components
+              ? e.components(a)
+              : e.components || a
+            : s(e.components)),
+          i.createElement(r.Provider, { value: t }, e.children)
+        );
+      }
+    },
+    8811(e) {
+      e.exports = JSON.parse(
+        '{"permalink":"/docs/zh-Hans/blog/api-integration-webhooks","editUrl":"https://github.com/your-org/gatrix/tree/main/docs/blog/2021-08-26-welcome/index.md","source":"@site/blog/2021-08-26-welcome/index.md","title":"Gatrix API Integration and Webhook Setup Guide","description":"Learn how to leverage Gatrix\'s powerful API system to implement integrations with external services and set up webhooks to process real-time events.","date":"2021-08-26T00:00:00.000Z","tags":[{"inline":false,"label":"Gatrix","permalink":"/docs/zh-Hans/blog/tags/gatrix","description":"Gatrix game platform management system"},{"inline":false,"label":"API","permalink":"/docs/zh-Hans/blog/tags/api","description":"API documentation and usage"},{"inline":false,"label":"Tutorial","permalink":"/docs/zh-Hans/blog/tags/tutorial","description":"Step-by-step tutorials and guides"},{"inline":false,"label":"Tips","permalink":"/docs/zh-Hans/blog/tags/tips","description":"Tips and best practices"}],"readingTime":0.93,"hasTruncateMarker":true,"authors":[{"name":"Gatrix Team","title":"Game Platform Development Team","url":"https://github.com/your-org/gatrix","page":{"permalink":"/docs/zh-Hans/blog/authors/gatrix-team"},"socials":{"github":"https://github.com/your-org","email":"mailto:support@gatrix.com"},"imageURL":"https://avatars.githubusercontent.com/u/0?v=4","key":"gatrix-team"}],"frontMatter":{"slug":"api-integration-webhooks","title":"Gatrix API Integration and Webhook Setup Guide","authors":["gatrix-team"],"tags":["gatrix","api","tutorial","tips"]},"unlisted":false,"prevItem":{"title":"Gatrix Production Deployment Tips and Best Practices","permalink":"/docs/zh-Hans/blog/production-deployment-tips"},"nextItem":{"title":"Gatrix Real-time Chat Server Setup Guide","permalink":"/docs/zh-Hans/blog/real-time-chat-server-setup"}}'
+      );
+    },
+  },
+]);

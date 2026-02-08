@@ -31,38 +31,46 @@ This guide explains how Gatrix integrates Prometheus and Grafana for monitoring 
 - Grafana: host 44000 -> container 3000
 
 You can override host ports via environment variables:
+
 - `PROMETHEUS_PORT` (default 49090)
 - `GRAFANA_PORT` (default 44000)
 
 ## Environment Variables
 
 Prometheus (both dev/prod):
+
 - `PROM_SCRAPE_INTERVAL`: default `15s`
 - `PROM_RETENTION_TIME`: default `14d`
 
 Grafana (both dev/prod):
+
 - `GRAFANA_ADMIN_USER`: default `admin` (mapped to `GF_SECURITY_ADMIN_USER`)
 - `GRAFANA_ADMIN_PASSWORD`: default `admin` (mapped to `GF_SECURITY_ADMIN_PASSWORD`)
 - `GF_USERS_ALLOW_SIGN_UP`: defaults to `false`
 
 Backend:
+
 - `PROMETHEUS_IN_DOCKER`: default `true`. Set to `false` if Prometheus runs outside Docker (e.g., on host machine or separate monitoring server).
 
 Frontend:
+
 - `VITE_GRAFANA_URL`: Optional. If set, the Admin Panel shortcut uses this URL; otherwise it defaults to `http(s)://<host>:44000`.
 
 ## Docker Compose
 
 Development:
+
 - Services added: `prometheus`, `grafana`
 - Persistent volumes: `prometheus_dev_data`, `grafana_dev_data`
 - Prometheus entrypoint performs env substitution and starts Prometheus with `--web.enable-lifecycle`.
 
 Production:
+
 - Services added: `prometheus`, `grafana`
 - Persistent volumes: `prometheus_data`, `grafana_data`
 
 Files:
+
 - `docker/prometheus/prometheus.base.yml` (template; interval injected by entrypoint)
 - `docker/prometheus/entrypoint.sh`
 - `docker/grafana/provisioning/datasources/datasource.yml`
@@ -74,6 +82,7 @@ Files:
 Path: `/api/v1/public/monitoring/prometheus/targets`
 
 Behavior:
+
 - Returns an array of target groups in Prometheus HTTP-SD format.
 - Uses each service's `internalAddress` and determines a metrics port/path per service type (e.g., chat -> 9090 `/metrics`).
 - Safe fallback: returns `[]` on internal errors to avoid Prometheus failures.
@@ -103,11 +112,11 @@ const sdk = new GatrixServerSDK({
   gatrixUrl: 'http://localhost:45000',
   apiToken: 'your-api-token',
   applicationName: 'my-game-server',
-  service: 'worldd',       // Required: service name
-  group: 'kr-1',           // Required: service group
+  service: 'worldd', // Required: service name
+  group: 'kr-1', // Required: service group
   environment: 'env_prod', // Required: environment
   metrics: {
-    port: 9337,            // Optional: default is 9337
+    port: 9337, // Optional: default is 9337
   },
 });
 
@@ -128,6 +137,7 @@ metricsServer.start();
 ### Default Labels
 
 All SDK metrics automatically include these default labels:
+
 - `sdk`: `gatrix-server-sdk`
 - `service`: Service name from config
 - `group`: Service group from config
@@ -144,7 +154,7 @@ When registering a service, the SDK automatically reports the `metricsApi` port:
 const result = await sdk.registerService({
   labels: { service: 'worldd', group: 'kr-1' },
   ports: {
-    game: 7777,   // Named port: { serviceName: port }
+    game: 7777, // Named port: { serviceName: port }
     web: 8080,
     // metricsApi is automatically added from SDK config (default: 9337)
   },
@@ -176,29 +186,30 @@ playersOnline.labels('world-1').set(150);
 
 ## How to Run (Local/Docker)
 
-1) Build the monorepo
+1. Build the monorepo
 
 - `yarn build` (or `yarn build:backend && yarn build:frontend && yarn build:event-lens && yarn build:chat-server`)
 
-2) Development stack
+2. Development stack
 
 - `yarn docker:dev` to start all dev services (including Prometheus and Grafana)
 - Access Grafana: http://localhost:44000
 - Access Prometheus: http://localhost:49090
 
-3) Production-like stack
+3. Production-like stack
 
 - `yarn docker:up` to start services with production compose
 - Access Grafana: http://localhost:44000
 - Access Prometheus: http://localhost:49090
 
-4) Restart policy
+4. Restart policy
 
 - Please use `docker-compose down` then `up` (do not use `restart`), per team rules.
 
 ## Custom Metrics Guide (Preview)
 
 Once `prom-client` is enabled for Backend/Event Lens:
+
 - Counter example:
   - Name: `http_requests_total`
   - Labels: `method`, `route`, `status`
@@ -207,6 +218,7 @@ Once `prom-client` is enabled for Backend/Event Lens:
   - Labels: `method`, `route`, `status`
 
 Implementation pattern (Node.js/Express):
+
 - Initialize metrics registry on app start when `MONITORING_ENABLED=true`.
 - Expose `/metrics` endpoint returning `text/plain; version=0.0.4`.
 - Avoid side effects at import time; initialize explicitly inside a bootstrap function.
@@ -231,22 +243,26 @@ When Prometheus runs in Docker but game servers run on the host (via PM2), Prome
 **Solution**: The Backend automatically converts host IPs to `host.docker.internal` for Prometheus targeting.
 
 **How it works:**
+
 - The Backend's `/api/v1/public/monitoring/prometheus/targets` endpoint checks if game server IPs are Docker internal (172.x.x.x) or host machine IPs.
 - For host machine IPs, it automatically converts them to `host.docker.internal`.
 
 **Environment Variable:**
+
 - `PROMETHEUS_IN_DOCKER` (default: `true`): Controls whether host IPs should be converted to `host.docker.internal`.
   - `true` (default): Prometheus runs in Docker, convert host IPs to `host.docker.internal`
   - `false`: Prometheus runs externally (e.g., on host or separate machine), use actual IP addresses
 
 **Docker Configuration:**
 Add to `docker-compose.yml` (prometheus service):
+
 ```yaml
 extra_hosts:
-  - "host.docker.internal:host-gateway"
+  - 'host.docker.internal:host-gateway'
 ```
 
 **When to set `PROMETHEUS_IN_DOCKER=false`:**
+
 - Prometheus runs directly on host machine (not in Docker)
 - Prometheus runs on a separate monitoring server
 - Using Kubernetes with proper network policies
@@ -257,12 +273,14 @@ If the Grafana Logs dashboard only shows `info` logs even when `level=All` is se
 
 **Root Cause**: Loki requires labels in stream selectors to **exist** on log lines. If `externalIp` or `internalIp` labels are missing from some logs (e.g., error logs), those logs are filtered out.
 
-**Solution**: 
+**Solution**:
+
 1. Move optional labels (`internalIp`, `externalIp`) from **stream selector** to **log pipeline filter**:
    - Before: `{job="gatrix", level=~"$level", internalIp=~"...", externalIp=~"..."}`
    - After: `{job="gatrix", level=~"$level"} | json | internalIp=~"..." | externalIp=~"..."`
 
 2. Add `allValue: ".*"` to all multi-select variables in the dashboard JSON:
+
    ```json
    {
      "name": "service",
@@ -323,5 +341,3 @@ While configuration via `mconf` is preferred, the SDK also supports automatic ac
 ### Migration from Promtail
 
 Promtail is no longer required for game server log collection. All relevant `docker-compose` services and documentation have been updated to reflect this change. Host-based PM2 logs are now natively pushed by the application process itself.
-
-

@@ -14,13 +14,14 @@ sidebar_position: 1
 
 :::info Docker Compose 服务
 Docker Compose 开发环境会自动配置以下服务：
+
 - MySQL 8.0 (数据库)
 - Redis 7 Alpine (缓存和消息队列)
 - etcd v3.5 (服务发现)
 - ClickHouse (分析数据库)
 - Prometheus / Grafana (监控)
 - Loki / Fluent Bit (日志收集)
-:::
+  :::
 
 ## 启动本地开发环境
 
@@ -73,15 +74,15 @@ yarn dev:all
 
 开发服务器启动后：
 
-| 服务 | URL | 端口 |
-|------|-----|------|
+| 服务                   | URL                    | 端口  |
+| ---------------------- | ---------------------- | ----- |
 | **Frontend Dashboard** | http://localhost:43000 | 43000 |
-| **Backend API** | http://localhost:45000 | 45000 |
-| **Edge Server** | http://localhost:3400 | 3400 |
-| **Chat Server** | http://localhost:45100 | 45100 |
-| **Event Lens** | http://localhost:45200 | 45200 |
-| **Grafana** | http://localhost:44000 | 44000 |
-| **Prometheus** | http://localhost:49090 | 49090 |
+| **Backend API**        | http://localhost:45000 | 45000 |
+| **Edge Server**        | http://localhost:3400  | 3400  |
+| **Chat Server**        | http://localhost:45100 | 45100 |
+| **Event Lens**         | http://localhost:45200 | 45200 |
+| **Grafana**            | http://localhost:44000 | 44000 |
+| **Prometheus**         | http://localhost:49090 | 49090 |
 
 ## 默认管理员账户
 
@@ -92,10 +93,12 @@ yarn dev:all
 
 :::warning 安全提示
 生产环境请务必在 `.env` 文件中更改默认密码！
+
 ```env
 ADMIN_EMAIL=your-admin@example.com
 ADMIN_PASSWORD=your-secure-password
 ```
+
 :::
 
 ## 常用命令

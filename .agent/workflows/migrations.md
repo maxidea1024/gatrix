@@ -8,7 +8,7 @@ description: How to create database migrations in this project
 
 **THIS PROJECT DOES NOT USE KNEX FOR MIGRATIONS!**
 
-The migration system uses raw MySQL2 `connection.execute()` calls. 
+The migration system uses raw MySQL2 `connection.execute()` calls.
 If you use `knex.schema.alterTable()` or `knex.raw()`, IT WILL FAIL!
 
 ## Key Points
@@ -20,17 +20,18 @@ If you use `knex.schema.alterTable()` or `knex.raw()`, IT WILL FAIL!
    - **NEVER use `knex.schema.createTable()`, `knex.schema.alterTable()`, `knex.raw()`, etc.**
 
 2. **Correct format for migrations:**
+
    ```javascript
    exports.up = async function (connection) {
-       // Use raw SQL with connection.execute()
-       await connection.execute(`
+     // Use raw SQL with connection.execute()
+     await connection.execute(`
            ALTER TABLE my_table
            ADD COLUMN my_column VARCHAR(255)
        `);
    };
 
    exports.down = async function (connection) {
-       await connection.execute(`
+     await connection.execute(`
            ALTER TABLE my_table
            DROP COLUMN my_column
        `);
@@ -38,6 +39,7 @@ If you use `knex.schema.alterTable()` or `knex.raw()`, IT WILL FAIL!
    ```
 
 3. **❌ WRONG format (DO NOT USE - WILL CAUSE ERROR):**
+
    ```javascript
    // WRONG - knex is undefined! This will throw:
    // "Cannot read properties of undefined (reading 'alterTable')"
@@ -59,6 +61,7 @@ If you use `knex.schema.alterTable()` or `knex.raw()`, IT WILL FAIL!
 ## Database Connection Info (from packages/backend/.env)
 
 When you need to connect to the database using docker exec:
+
 ```bash
 docker exec gatrix-mysql-dev mysql -u gatrix_user -pgatrix_password -D gatrix -e "YOUR SQL QUERY"
 ```

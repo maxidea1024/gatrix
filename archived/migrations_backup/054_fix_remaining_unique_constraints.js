@@ -18,14 +18,14 @@ const FIXES = [
     table: 'g_job_types',
     dropKey: 'name',
     newColumns: ['environmentId', 'name'],
-    newKeyName: 'uk_env_job_type_name'
+    newKeyName: 'uk_env_job_type_name',
   },
   // Fix coupon_settings - add environment-scoped unique
   {
     table: 'g_coupon_settings',
     dropKey: 'code',
     newColumns: ['environmentId', 'code'],
-    newKeyName: 'uk_env_coupon_code'
+    newKeyName: 'uk_env_coupon_code',
   },
   // Fix coupons - add environment-scoped unique (via settingId which is env-scoped)
   // Note: coupons are linked to settings which are env-scoped, so this is fine
@@ -94,11 +94,13 @@ module.exports = {
         );
 
         if (newIndexExists[0].cnt === 0) {
-          console.log(`Creating new unique key ${newKeyName} on ${table} (${newColumns.join(', ')})...`);
+          console.log(
+            `Creating new unique key ${newKeyName} on ${table} (${newColumns.join(', ')})...`
+          );
           try {
             await db.query(`
               ALTER TABLE ${table}
-              ADD CONSTRAINT \`${newKeyName}\` UNIQUE (${newColumns.map(c => `\`${c}\``).join(', ')})
+              ADD CONSTRAINT \`${newKeyName}\` UNIQUE (${newColumns.map((c) => `\`${c}\``).join(', ')})
             `);
             console.log(`  Successfully created ${newKeyName}`);
           } catch (e) {
@@ -115,7 +117,7 @@ module.exports = {
 
   async down(db) {
     console.log('Warning: Rollback of unique constraint changes may fail if duplicate data exists');
-    
+
     // Reverse the changes
     for (const fix of FIXES.reverse()) {
       const { table, dropKey, newColumns, newKeyName } = fix;
@@ -152,12 +154,13 @@ module.exports = {
         const originalColumn = newColumns[newColumns.length - 1];
         console.log(`Recreating ${dropKey} on ${table} (${originalColumn})...`);
         try {
-          await db.query(`ALTER TABLE ${table} ADD CONSTRAINT \`${dropKey}\` UNIQUE (\`${originalColumn}\`)`);
+          await db.query(
+            `ALTER TABLE ${table} ADD CONSTRAINT \`${dropKey}\` UNIQUE (\`${originalColumn}\`)`
+          );
         } catch (e) {
           console.log(`Failed: ${e.message}`);
         }
       }
     }
-  }
+  },
 };
-

@@ -24,14 +24,8 @@
       "reRecruitFailResetCycleSec": "number",
       "reRecruitPointId": "number",
       "reRecruitPointVal": "number",
-      "reRecruitFixedPointId": [
-        "number",
-        "number"
-      ],
-      "reRecruitFixedPointVal": [
-        "number",
-        "number"
-      ]
+      "reRecruitFixedPointId": ["number", "number"],
+      "reRecruitFixedPointVal": ["number", "number"]
     },
     ":required": {
       "mateGrade": 1,
@@ -55,10 +49,7 @@
       ],
       "reRecruitFailResetCycleSec": 1,
       "reRecruitPointId": 1,
-      "reRecruitFixedPointId": [
-        1,
-        1
-      ]
+      "reRecruitFixedPointId": [1, 1]
     },
     ":requiredInObject": {
       "loyaltyLimit": [
@@ -77,14 +68,8 @@
       ],
       "reRecruitPointId": 1,
       "reRecruitPointVal": 1,
-      "reRecruitFixedPointId": [
-        1,
-        1
-      ],
-      "reRecruitFixedPointVal": [
-        1,
-        1
-      ]
+      "reRecruitFixedPointId": [1, 1],
+      "reRecruitFixedPointVal": [1, 1]
     },
     ":min": {
       "mateGrade": 0,
@@ -103,10 +88,7 @@
         }
       ],
       "reRecruitPointId": 100000,
-      "reRecruitFixedPointId": [
-        100000,
-        100000
-      ]
+      "reRecruitFixedPointId": [100000, 100000]
     },
     ":max": {
       "mateGrade": 5,
@@ -125,24 +107,12 @@
         }
       ],
       "reRecruitPointId": 199999,
-      "reRecruitFixedPointId": [
-        199999,
-        199999
-      ]
+      "reRecruitFixedPointId": [199999, 199999]
     },
     ":enum": {},
     ":links": {
-      "reRecruitPointId": [
-        "Point"
-      ],
-      "reRecruitFixedPointId": [
-        [
-          "Point"
-        ],
-        [
-          "Point"
-        ]
-      ]
+      "reRecruitPointId": ["Point"],
+      "reRecruitFixedPointId": [["Point"], ["Point"]]
     }
   },
   "MateReRecruiting": {
@@ -170,14 +140,8 @@
       "reRecruitFailResetCycleSec": 3600,
       "reRecruitPointId": 100001,
       "reRecruitPointVal": 2500000,
-      "reRecruitFixedPointId": [
-        100001,
-        100003
-      ],
-      "reRecruitFixedPointVal": [
-        7500000,
-        300
-      ]
+      "reRecruitFixedPointId": [100001, 100003],
+      "reRecruitFixedPointVal": [7500000, 300]
     },
     "2": {
       "id": 2,
@@ -203,14 +167,8 @@
       "reRecruitFailResetCycleSec": 1800,
       "reRecruitPointId": 100001,
       "reRecruitPointVal": 500000,
-      "reRecruitFixedPointId": [
-        100001,
-        100003
-      ],
-      "reRecruitFixedPointVal": [
-        1500000,
-        100
-      ]
+      "reRecruitFixedPointId": [100001, 100003],
+      "reRecruitFixedPointVal": [1500000, 100]
     },
     "3": {
       "id": 3,
@@ -236,14 +194,8 @@
       "reRecruitFailResetCycleSec": 600,
       "reRecruitPointId": 100001,
       "reRecruitPointVal": 50000,
-      "reRecruitFixedPointId": [
-        100001,
-        100003
-      ],
-      "reRecruitFixedPointVal": [
-        150000,
-        25
-      ]
+      "reRecruitFixedPointId": [100001, 100003],
+      "reRecruitFixedPointVal": [150000, 25]
     },
     "4": {
       "id": 4,
@@ -269,14 +221,8 @@
       "reRecruitFailResetCycleSec": 300,
       "reRecruitPointId": 100001,
       "reRecruitPointVal": 10000,
-      "reRecruitFixedPointId": [
-        100001,
-        100003
-      ],
-      "reRecruitFixedPointVal": [
-        30000,
-        10
-      ]
+      "reRecruitFixedPointId": [100001, 100003],
+      "reRecruitFixedPointVal": [30000, 10]
     }
   }
 }

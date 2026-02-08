@@ -1,6 +1,6 @@
 /**
  * Migration: Add channel and subchannel targeting to service notices
- * 
+ *
  * Adds support for channel and subchannel filtering in service notices,
  * similar to the coupon system.
  */
@@ -41,4 +41,3 @@ async function down(connection) {
 }
 
 module.exports = { up, down };
-

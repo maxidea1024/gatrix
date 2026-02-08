@@ -1,10 +1,10 @@
 {
-    "name": "gatrix-benchmark",
-    "version": "1.0.0",
-    "description": "Performance benchmarks for Gatrix Edge Server",
-    "private": true,
-    "scripts": {
-        "test:edge": "artillery run edge-performance.yml",
-        "report": "artillery report report.json"
-    }
+  "name": "gatrix-benchmark",
+  "version": "1.0.0",
+  "description": "Performance benchmarks for Gatrix Edge Server",
+  "private": true,
+  "scripts": {
+    "test:edge": "artillery run edge-performance.yml",
+    "report": "artillery report report.json"
+  }
 }

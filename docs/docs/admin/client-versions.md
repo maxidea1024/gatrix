@@ -20,13 +20,13 @@ Manage game client versions and update requirements.
 
 ## Version Configuration
 
-| Field | Description |
-|-------|-------------|
-| **Platform** | iOS, Android, Windows, Mac |
-| **Minimum Version** | Oldest allowed version |
-| **Latest Version** | Current version |
-| **Force Update** | Require update if below minimum |
-| **Update URL** | Store or download link |
+| Field               | Description                     |
+| ------------------- | ------------------------------- |
+| **Platform**        | iOS, Android, Windows, Mac      |
+| **Minimum Version** | Oldest allowed version          |
+| **Latest Version**  | Current version                 |
+| **Force Update**    | Require update if below minimum |
+| **Update URL**      | Store or download link          |
 
 ## Adding a Version
 
@@ -34,13 +34,13 @@ Manage game client versions and update requirements.
 2. Click **Add Version** button
 3. Configure:
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| Platform | Select | Required | Target platform |
-| Version | Text | Required | Version string (e.g., 1.2.3) |
-| Min Version | Text | Required | Minimum required version |
-| Force Update | Switch | - | Force update prompt |
-| Update URL | Text | - | Download/store link |
+| Field        | Type   | Required | Description                  |
+| ------------ | ------ | -------- | ---------------------------- |
+| Platform     | Select | Required | Target platform              |
+| Version      | Text   | Required | Version string (e.g., 1.2.3) |
+| Min Version  | Text   | Required | Minimum required version     |
+| Force Update | Switch | -        | Force update prompt          |
+| Update URL   | Text   | -        | Download/store link          |
 
 4. Click **Save**
 
@@ -53,6 +53,7 @@ GET /api/v1/client-version?platform=android&version=1.2.0
 ```
 
 Response:
+
 ```json
 {
   "needsUpdate": true,

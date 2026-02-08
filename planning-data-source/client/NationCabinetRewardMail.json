@@ -18,12 +18,8 @@
     ":enum": {},
     ":asset": {},
     ":links": {
-      "nationId": [
-        "Nation"
-      ],
-      "mailId": [
-        "Mail"
-      ]
+      "nationId": ["Nation"],
+      "mailId": ["Mail"]
     }
   },
   "NationCabinetRewardMail": {

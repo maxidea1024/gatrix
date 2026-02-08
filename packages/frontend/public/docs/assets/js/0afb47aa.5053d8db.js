@@ -1,1 +1,225 @@
-"use strict";(globalThis.webpackChunkdocs=globalThis.webpackChunkdocs||[]).push([[6355],{2794(e,n,i){i.r(n),i.d(n,{assets:()=>c,contentTitle:()=>o,default:()=>h,frontMatter:()=>l,metadata:()=>t,toc:()=>a});const t=JSON.parse('{"id":"integrations/new-relic","title":"New Relic Integration","description":"Export metrics and traces to New Relic.","source":"@site/docs/integrations/new-relic.md","sourceDirName":"integrations","slug":"/integrations/new-relic","permalink":"/docs/integrations/new-relic","draft":false,"unlisted":false,"editUrl":"https://github.com/your-org/gatrix/tree/main/docs/docs/integrations/new-relic.md","tags":[],"version":"current","sidebarPosition":5,"frontMatter":{"sidebar_position":5,"sidebar_label":"New Relic"},"sidebar":"tutorialSidebar","previous":{"title":"Webhook","permalink":"/docs/integrations/webhook"},"next":{"title":"Server-side SDKs","permalink":"/docs/sdks/server-side"}}');var s=i(4848),r=i(8453);const l={sidebar_position:5,sidebar_label:"New Relic"},o="New Relic Integration",c={},a=[{value:"Setup",id:"setup",level:2},{value:"1. Get New Relic License Key",id:"1-get-new-relic-license-key",level:3},{value:"2. Configure in Gatrix",id:"2-configure-in-gatrix",level:3},{value:"Exported Data",id:"exported-data",level:2},{value:"Metrics",id:"metrics",level:3},{value:"Custom Events",id:"custom-events",level:3},{value:"Dashboard",id:"dashboard",level:2},{value:"Troubleshooting",id:"troubleshooting",level:2}];function d(e){const n={h1:"h1",h2:"h2",h3:"h3",header:"header",li:"li",ol:"ol",p:"p",strong:"strong",ul:"ul",...(0,r.R)(),...e.components};return(0,s.jsxs)(s.Fragment,{children:[(0,s.jsx)(n.header,{children:(0,s.jsx)(n.h1,{id:"new-relic-integration",children:"New Relic Integration"})}),"\n",(0,s.jsx)(n.p,{children:"Export metrics and traces to New Relic."}),"\n",(0,s.jsx)(n.h2,{id:"setup",children:"Setup"}),"\n",(0,s.jsx)(n.h3,{id:"1-get-new-relic-license-key",children:"1. Get New Relic License Key"}),"\n",(0,s.jsxs)(n.ol,{children:["\n",(0,s.jsx)(n.li,{children:"Log in to New Relic"}),"\n",(0,s.jsxs)(n.li,{children:["Go to ",(0,s.jsx)(n.strong,{children:"API Keys"})]}),"\n",(0,s.jsxs)(n.li,{children:["Copy your ",(0,s.jsx)(n.strong,{children:"License Key"})]}),"\n"]}),"\n",(0,s.jsx)(n.h3,{id:"2-configure-in-gatrix",children:"2. Configure in Gatrix"}),"\n",(0,s.jsxs)(n.ol,{children:["\n",(0,s.jsxs)(n.li,{children:["Navigate to ",(0,s.jsx)(n.strong,{children:"Settings"})," > ",(0,s.jsx)(n.strong,{children:"Integrations"})," > ",(0,s.jsx)(n.strong,{children:"New Relic"})]}),"\n",(0,s.jsx)(n.li,{children:"Enter your License Key"}),"\n",(0,s.jsxs)(n.li,{children:["Select data to export:","\n",(0,s.jsxs)(n.ul,{children:["\n",(0,s.jsx)(n.li,{children:"Metrics"}),"\n",(0,s.jsx)(n.li,{children:"Custom events"}),"\n",(0,s.jsx)(n.li,{children:"Feature flag changes"}),"\n"]}),"\n"]}),"\n",(0,s.jsxs)(n.li,{children:["Click ",(0,s.jsx)(n.strong,{children:"Save"})]}),"\n"]}),"\n",(0,s.jsx)(n.h2,{id:"exported-data",children:"Exported Data"}),"\n",(0,s.jsx)(n.h3,{id:"metrics",children:"Metrics"}),"\n",(0,s.jsxs)(n.ul,{children:["\n",(0,s.jsx)(n.li,{children:"API response times"}),"\n",(0,s.jsx)(n.li,{children:"Request counts"}),"\n",(0,s.jsx)(n.li,{children:"Error rates"}),"\n",(0,s.jsx)(n.li,{children:"Feature flag evaluation counts"}),"\n"]}),"\n",(0,s.jsx)(n.h3,{id:"custom-events",children:"Custom Events"}),"\n",(0,s.jsxs)(n.ul,{children:["\n",(0,s.jsx)(n.li,{children:"Feature flag changes"}),"\n",(0,s.jsx)(n.li,{children:"User actions"}),"\n",(0,s.jsx)(n.li,{children:"System events"}),"\n"]}),"\n",(0,s.jsx)(n.h2,{id:"dashboard",children:"Dashboard"}),"\n",(0,s.jsx)(n.p,{children:"After integration, you can create New Relic dashboards to visualize:"}),"\n",(0,s.jsxs)(n.ul,{children:["\n",(0,s.jsx)(n.li,{children:"Feature flag usage"}),"\n",(0,s.jsx)(n.li,{children:"Rollout progress"}),"\n",(0,s.jsx)(n.li,{children:"Error correlation with flag changes"}),"\n"]}),"\n",(0,s.jsx)(n.h2,{id:"troubleshooting",children:"Troubleshooting"}),"\n",(0,s.jsx)(n.p,{children:"If data is not appearing:"}),"\n",(0,s.jsxs)(n.ol,{children:["\n",(0,s.jsx)(n.li,{children:"Verify the License Key is correct"}),"\n",(0,s.jsx)(n.li,{children:"Check the connection status in Gatrix"}),"\n",(0,s.jsx)(n.li,{children:"Allow 5 minutes for initial data to appear"}),"\n"]})]})}function h(e={}){const{wrapper:n}={...(0,r.R)(),...e.components};return n?(0,s.jsx)(n,{...e,children:(0,s.jsx)(d,{...e})}):d(e)}},8453(e,n,i){i.d(n,{R:()=>l,x:()=>o});var t=i(6540);const s={},r=t.createContext(s);function l(e){const n=t.useContext(r);return t.useMemo(function(){return"function"==typeof e?e(n):{...n,...e}},[n,e])}function o(e){let n;return n=e.disableParentContext?"function"==typeof e.components?e.components(s):e.components||s:l(e.components),t.createElement(r.Provider,{value:n},e.children)}}}]);
+'use strict';
+(globalThis.webpackChunkdocs = globalThis.webpackChunkdocs || []).push([
+  [6355],
+  {
+    2794(e, n, i) {
+      (i.r(n),
+        i.d(n, {
+          assets: () => c,
+          contentTitle: () => o,
+          default: () => h,
+          frontMatter: () => l,
+          metadata: () => t,
+          toc: () => a,
+        }));
+      const t = JSON.parse(
+        '{"id":"integrations/new-relic","title":"New Relic Integration","description":"Export metrics and traces to New Relic.","source":"@site/docs/integrations/new-relic.md","sourceDirName":"integrations","slug":"/integrations/new-relic","permalink":"/docs/integrations/new-relic","draft":false,"unlisted":false,"editUrl":"https://github.com/your-org/gatrix/tree/main/docs/docs/integrations/new-relic.md","tags":[],"version":"current","sidebarPosition":5,"frontMatter":{"sidebar_position":5,"sidebar_label":"New Relic"},"sidebar":"tutorialSidebar","previous":{"title":"Webhook","permalink":"/docs/integrations/webhook"},"next":{"title":"Server-side SDKs","permalink":"/docs/sdks/server-side"}}'
+      );
+      var s = i(4848),
+        r = i(8453);
+      const l = { sidebar_position: 5, sidebar_label: 'New Relic' },
+        o = 'New Relic Integration',
+        c = {},
+        a = [
+          { value: 'Setup', id: 'setup', level: 2 },
+          { value: '1. Get New Relic License Key', id: '1-get-new-relic-license-key', level: 3 },
+          { value: '2. Configure in Gatrix', id: '2-configure-in-gatrix', level: 3 },
+          { value: 'Exported Data', id: 'exported-data', level: 2 },
+          { value: 'Metrics', id: 'metrics', level: 3 },
+          { value: 'Custom Events', id: 'custom-events', level: 3 },
+          { value: 'Dashboard', id: 'dashboard', level: 2 },
+          { value: 'Troubleshooting', id: 'troubleshooting', level: 2 },
+        ];
+      function d(e) {
+        const n = {
+          h1: 'h1',
+          h2: 'h2',
+          h3: 'h3',
+          header: 'header',
+          li: 'li',
+          ol: 'ol',
+          p: 'p',
+          strong: 'strong',
+          ul: 'ul',
+          ...(0, r.R)(),
+          ...e.components,
+        };
+        return (0, s.jsxs)(s.Fragment, {
+          children: [
+            (0, s.jsx)(n.header, {
+              children: (0, s.jsx)(n.h1, {
+                id: 'new-relic-integration',
+                children: 'New Relic Integration',
+              }),
+            }),
+            '\n',
+            (0, s.jsx)(n.p, { children: 'Export metrics and traces to New Relic.' }),
+            '\n',
+            (0, s.jsx)(n.h2, { id: 'setup', children: 'Setup' }),
+            '\n',
+            (0, s.jsx)(n.h3, {
+              id: '1-get-new-relic-license-key',
+              children: '1. Get New Relic License Key',
+            }),
+            '\n',
+            (0, s.jsxs)(n.ol, {
+              children: [
+                '\n',
+                (0, s.jsx)(n.li, { children: 'Log in to New Relic' }),
+                '\n',
+                (0, s.jsxs)(n.li, {
+                  children: ['Go to ', (0, s.jsx)(n.strong, { children: 'API Keys' })],
+                }),
+                '\n',
+                (0, s.jsxs)(n.li, {
+                  children: ['Copy your ', (0, s.jsx)(n.strong, { children: 'License Key' })],
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, s.jsx)(n.h3, { id: '2-configure-in-gatrix', children: '2. Configure in Gatrix' }),
+            '\n',
+            (0, s.jsxs)(n.ol, {
+              children: [
+                '\n',
+                (0, s.jsxs)(n.li, {
+                  children: [
+                    'Navigate to ',
+                    (0, s.jsx)(n.strong, { children: 'Settings' }),
+                    ' > ',
+                    (0, s.jsx)(n.strong, { children: 'Integrations' }),
+                    ' > ',
+                    (0, s.jsx)(n.strong, { children: 'New Relic' }),
+                  ],
+                }),
+                '\n',
+                (0, s.jsx)(n.li, { children: 'Enter your License Key' }),
+                '\n',
+                (0, s.jsxs)(n.li, {
+                  children: [
+                    'Select data to export:',
+                    '\n',
+                    (0, s.jsxs)(n.ul, {
+                      children: [
+                        '\n',
+                        (0, s.jsx)(n.li, { children: 'Metrics' }),
+                        '\n',
+                        (0, s.jsx)(n.li, { children: 'Custom events' }),
+                        '\n',
+                        (0, s.jsx)(n.li, { children: 'Feature flag changes' }),
+                        '\n',
+                      ],
+                    }),
+                    '\n',
+                  ],
+                }),
+                '\n',
+                (0, s.jsxs)(n.li, {
+                  children: ['Click ', (0, s.jsx)(n.strong, { children: 'Save' })],
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, s.jsx)(n.h2, { id: 'exported-data', children: 'Exported Data' }),
+            '\n',
+            (0, s.jsx)(n.h3, { id: 'metrics', children: 'Metrics' }),
+            '\n',
+            (0, s.jsxs)(n.ul, {
+              children: [
+                '\n',
+                (0, s.jsx)(n.li, { children: 'API response times' }),
+                '\n',
+                (0, s.jsx)(n.li, { children: 'Request counts' }),
+                '\n',
+                (0, s.jsx)(n.li, { children: 'Error rates' }),
+                '\n',
+                (0, s.jsx)(n.li, { children: 'Feature flag evaluation counts' }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, s.jsx)(n.h3, { id: 'custom-events', children: 'Custom Events' }),
+            '\n',
+            (0, s.jsxs)(n.ul, {
+              children: [
+                '\n',
+                (0, s.jsx)(n.li, { children: 'Feature flag changes' }),
+                '\n',
+                (0, s.jsx)(n.li, { children: 'User actions' }),
+                '\n',
+                (0, s.jsx)(n.li, { children: 'System events' }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, s.jsx)(n.h2, { id: 'dashboard', children: 'Dashboard' }),
+            '\n',
+            (0, s.jsx)(n.p, {
+              children: 'After integration, you can create New Relic dashboards to visualize:',
+            }),
+            '\n',
+            (0, s.jsxs)(n.ul, {
+              children: [
+                '\n',
+                (0, s.jsx)(n.li, { children: 'Feature flag usage' }),
+                '\n',
+                (0, s.jsx)(n.li, { children: 'Rollout progress' }),
+                '\n',
+                (0, s.jsx)(n.li, { children: 'Error correlation with flag changes' }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, s.jsx)(n.h2, { id: 'troubleshooting', children: 'Troubleshooting' }),
+            '\n',
+            (0, s.jsx)(n.p, { children: 'If data is not appearing:' }),
+            '\n',
+            (0, s.jsxs)(n.ol, {
+              children: [
+                '\n',
+                (0, s.jsx)(n.li, { children: 'Verify the License Key is correct' }),
+                '\n',
+                (0, s.jsx)(n.li, { children: 'Check the connection status in Gatrix' }),
+                '\n',
+                (0, s.jsx)(n.li, { children: 'Allow 5 minutes for initial data to appear' }),
+                '\n',
+              ],
+            }),
+          ],
+        });
+      }
+      function h(e = {}) {
+        const { wrapper: n } = { ...(0, r.R)(), ...e.components };
+        return n ? (0, s.jsx)(n, { ...e, children: (0, s.jsx)(d, { ...e }) }) : d(e);
+      }
+    },
+    8453(e, n, i) {
+      i.d(n, { R: () => l, x: () => o });
+      var t = i(6540);
+      const s = {},
+        r = t.createContext(s);
+      function l(e) {
+        const n = t.useContext(r);
+        return t.useMemo(
+          function () {
+            return 'function' == typeof e ? e(n) : { ...n, ...e };
+          },
+          [n, e]
+        );
+      }
+      function o(e) {
+        let n;
+        return (
+          (n = e.disableParentContext
+            ? 'function' == typeof e.components
+              ? e.components(s)
+              : e.components || s
+            : l(e.components)),
+          t.createElement(r.Provider, { value: n }, e.children)
+        );
+      }
+    },
+  },
+]);

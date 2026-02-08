@@ -1,1 +1,467 @@
-"use strict";(globalThis.webpackChunkdocs=globalThis.webpackChunkdocs||[]).push([[6674],{1693(e,n,d){d.r(n),d.d(n,{assets:()=>c,contentTitle:()=>t,default:()=>j,frontMatter:()=>l,metadata:()=>s,toc:()=>h});const s=JSON.parse('{"id":"guide/service-notices","title":"?\ufffd\ube44??\uacf5\ufffd?","description":"\uae30\ub2a5 ?\ufffd\uba85","source":"@site/docs/guide/service-notices.md","sourceDirName":"guide","slug":"/guide/service-notices","permalink":"/docs/zh-Hans/guide/service-notices","draft":false,"unlisted":false,"editUrl":"https://github.com/your-org/gatrix/tree/main/docs/docs/guide/service-notices.md","tags":[],"version":"current","sidebarPosition":1,"frontMatter":{"sidebar_position":1},"sidebar":"tutorialSidebar","previous":{"title":"?\ufffd\uacbd","permalink":"/docs/zh-Hans/features/environments"},"next":{"title":"?\ufffd\uac8c???\ufffd\uc5c5 \uacf5\ufffd?","permalink":"/docs/zh-Hans/guide/popup-notices"}}');var i=d(4848),r=d(8453);const l={sidebar_position:1},t="?\ufffd\ube44??\uacf5\ufffd?",c={},h=[{value:"\uae30\ub2a5 ?\ufffd\uba85",id:"\uae30\ub2a5-\uba85",level:2},{value:"?\ufffd\uc6a9 \ubc29\ubc95",id:"\uc6a9-\ubc29\ubc95",level:2},{value:"\ubaa9\ub85d ?\ufffd\uba74",id:"\ubaa9\ub85d-\uba74",level:3},{value:"\uacf5\ufffd? \ucd94\ufffd?",id:"\uacf5-\ucd94",level:3},{value:"\uc989\uc2dc \ubc1c\uc0dd?\ufffd\ub294 \ubcc0??",id:"\uc989\uc2dc-\ubc1c\uc0dd\ub294-\ubcc0",level:2},{value:"??\uc8fc\uc758?\ufffd\ud56d",id:"\uc8fc\uc758\ud56d",level:2},{value:"?\ufffd\ufffd ?\ufffd\uc81c ?\ufffd\uace0 ?\ufffd\ufffd?",id:"-\uc81c-\uace0-",level:2}];function x(e){const n={h1:"h1",h2:"h2",h3:"h3",header:"header",img:"img",li:"li",p:"p",strong:"strong",table:"table",tbody:"tbody",td:"td",th:"th",thead:"thead",tr:"tr",ul:"ul",...(0,r.R)(),...e.components};return(0,i.jsxs)(i.Fragment,{children:[(0,i.jsx)(n.header,{children:(0,i.jsx)(n.h1,{id:"\ube44\uacf5",children:"?\ufffd\ube44??\uacf5\ufffd?"})}),"\n",(0,i.jsx)(n.h2,{id:"\uae30\ub2a5-\uba85",children:"\uae30\ub2a5 ?\ufffd\uba85"}),"\n",(0,i.jsx)(n.p,{children:"?\ufffd\ube44??\uacf5\ufffd??\ufffd\ud56d???\ufffd\uc131?\ufffd\uace0 \uad00\ub9ac\ud569?\ufffd\ub2e4."}),"\n",(0,i.jsxs)(n.p,{children:[(0,i.jsx)(n.strong,{children:"?\ufffd\uadfc \uacbd\ub85c:"})," \uac8c\uc784 \uad00\ufffd????\ufffd\ube44??\uacf5\ufffd?"]}),"\n",(0,i.jsx)(n.h2,{id:"\uc6a9-\ubc29\ubc95",children:"?\ufffd\uc6a9 \ubc29\ubc95"}),"\n",(0,i.jsx)(n.h3,{id:"\ubaa9\ub85d-\uba74",children:"\ubaa9\ub85d ?\ufffd\uba74"}),"\n",(0,i.jsx)(n.p,{children:(0,i.jsx)(n.img,{alt:"?\ufffd\ube44??\uacf5\ufffd? \ubaa9\ub85d",src:d(2914).A+"",width:"1920",height:"1065"})}),"\n",(0,i.jsx)(n.p,{children:(0,i.jsx)(n.strong,{children:"?\ufffd\uc774\uc9c0 ?\ufffd\ub354:"})}),"\n",(0,i.jsxs)(n.ul,{children:["\n",(0,i.jsx)(n.li,{children:"?\ufffd\ubaa9: ?\ufffd\ube44??\uacf5\ufffd?"}),"\n",(0,i.jsx)(n.li,{children:"?\ufffd\uba85: ?\ufffd\ube44??\uacf5\ufffd??\ufffd\ud56d???\ufffd\uc131?\ufffd\uace0 \uad00\ub9ac\ud569?\ufffd\ub2e4"}),"\n"]}),"\n",(0,i.jsx)(n.p,{children:(0,i.jsx)(n.strong,{children:"\ubc84\ud2bc:"})}),"\n",(0,i.jsxs)(n.ul,{children:["\n",(0,i.jsx)(n.li,{children:"\ubbf8\ub9ac\ubcf4\uae30"}),"\n",(0,i.jsx)(n.li,{children:"\uacf5\ufffd? \ucd94\ufffd?"}),"\n",(0,i.jsx)(n.li,{children:"?\ufffd\ubdf0 \ubbf8\ub9ac\ubcf4\uae30 (?\ufffd\uc774\ufffd?"}),"\n",(0,i.jsx)(n.li,{children:"URL \ubcf5\uc0ac (?\ufffd\uc774\ufffd?"}),"\n",(0,i.jsx)(n.li,{children:"?\ufffd\ud130"}),"\n",(0,i.jsx)(n.li,{children:"\uceec\ub7fc ?\ufffd\uc815 (?\ufffd\uc774\ufffd?"}),"\n",(0,i.jsx)(n.li,{children:"?\ufffd\ub85c\uace0\uce68 (?\ufffd\uc774\ufffd?"}),"\n"]}),"\n",(0,i.jsx)(n.p,{children:(0,i.jsx)(n.strong,{children:"\uac80??"})}),"\n",(0,i.jsxs)(n.ul,{children:["\n",(0,i.jsx)(n.li,{children:'?\ufffd\ub808?\ufffd\uc2a4?\ufffd?? "?\ufffd\ubaa9 ?\ufffd\ub294 ?\ufffd\uc6a9?\ufffd\ub85c \uac80??'}),"\n"]}),"\n",(0,i.jsx)(n.p,{children:(0,i.jsx)(n.strong,{children:"?\ufffd\uc774\ufffd?\uceec\ub7fc:"})}),"\n",(0,i.jsxs)(n.table,{children:[(0,i.jsx)(n.thead,{children:(0,i.jsxs)(n.tr,{children:[(0,i.jsx)(n.th,{children:"?\ufffd\uc11c"}),(0,i.jsx)(n.th,{children:"\uceec\ub7fc\ufffd?"})]})}),(0,i.jsxs)(n.tbody,{children:[(0,i.jsxs)(n.tr,{children:[(0,i.jsx)(n.td,{children:"1"}),(0,i.jsx)(n.td,{children:"(\uccb4\ud06c\ubc15\uc2a4)"})]}),(0,i.jsxs)(n.tr,{children:[(0,i.jsx)(n.td,{children:"2"}),(0,i.jsx)(n.td,{children:"?\ufffd\ubaa9"})]}),(0,i.jsxs)(n.tr,{children:[(0,i.jsx)(n.td,{children:"3"}),(0,i.jsx)(n.td,{children:"?\ufffd\uc7ac ?\ufffd\uc2dc"})]}),(0,i.jsxs)(n.tr,{children:[(0,i.jsx)(n.td,{children:"4"}),(0,i.jsx)(n.td,{children:"?\ufffd\ud0dc"})]}),(0,i.jsxs)(n.tr,{children:[(0,i.jsx)(n.td,{children:"5"}),(0,i.jsx)(n.td,{children:"\uce74\ud14c\uace0\ub9ac"})]}),(0,i.jsxs)(n.tr,{children:[(0,i.jsx)(n.td,{children:"6"}),(0,i.jsx)(n.td,{children:"?\ufffd\uc6a9 ?\ufffd??"})]}),(0,i.jsxs)(n.tr,{children:[(0,i.jsx)(n.td,{children:"7"}),(0,i.jsx)(n.td,{children:"?\ufffd\uc6a9 \uae30\uac04"})]}),(0,i.jsxs)(n.tr,{children:[(0,i.jsx)(n.td,{children:"8"}),(0,i.jsx)(n.td,{children:"?\ufffd\uc131??"})]}),(0,i.jsxs)(n.tr,{children:[(0,i.jsx)(n.td,{children:"9"}),(0,i.jsx)(n.td,{children:"?\ufffd\uc5c5"})]})]})]}),"\n",(0,i.jsx)(n.p,{children:(0,i.jsx)(n.strong,{children:"?\ufffd\uc774???\ufffd\uc74c ?\ufffd\ud0dc:"})}),"\n",(0,i.jsxs)(n.ul,{children:["\n",(0,i.jsx)(n.li,{children:'\uba54\uc2dc\uc9c0: "\uacf5\ufffd?\uac00 ?\ufffd\uc2b5?\ufffd\ub2e4"'}),"\n",(0,i.jsx)(n.li,{children:'\ubc84\ud2bc: "\ufffd???\ufffd\ufffd??\ucd94\ufffd???\ubcf4\uc138??'}),"\n"]}),"\n",(0,i.jsx)(n.h3,{id:"\uacf5-\ucd94",children:"\uacf5\ufffd? \ucd94\ufffd?"}),"\n",(0,i.jsx)(n.p,{children:'"\uacf5\ufffd? \ucd94\ufffd?" \ubc84\ud2bc ?\ufffd\ub9ad ???\ufffd\uc774 ?\ufffd\uc2dc?\ufffd\ub2c8??'}),"\n",(0,i.jsx)(n.p,{children:"![\uacf5\ufffd? \ucd94\ufffd? ??(./img/service-notice-add-form.png)"}),"\n",(0,i.jsx)(n.p,{children:(0,i.jsx)(n.strong,{children:"???\ufffd\ub354:"})}),"\n",(0,i.jsxs)(n.ul,{children:["\n",(0,i.jsx)(n.li,{children:"?\ufffd\ubaa9: \uacf5\ufffd? \ucd94\ufffd?"}),"\n",(0,i.jsx)(n.li,{children:"?\ufffd\uba85: ?\ufffd\ub85c???\ufffd\ube44??\uacf5\ufffd?\ufffd??\ufffd\uc131?\ufffd\ub2c8??"}),"\n"]}),"\n",(0,i.jsx)(n.p,{children:(0,i.jsx)(n.strong,{children:"?\ufffd\ub825 ?\ufffd\ub4dc:"})}),"\n",(0,i.jsxs)(n.table,{children:[(0,i.jsx)(n.thead,{children:(0,i.jsxs)(n.tr,{children:[(0,i.jsx)(n.th,{children:"?\ufffd\ub4dc\ufffd?"}),(0,i.jsx)(n.th,{children:"?\ufffd??"}),(0,i.jsx)(n.th,{children:"?\ufffd\uc218"}),(0,i.jsx)(n.th,{children:"?\ufffd\uba85"})]})}),(0,i.jsxs)(n.tbody,{children:[(0,i.jsxs)(n.tr,{children:[(0,i.jsx)(n.td,{children:"?\ufffd\uc6a9 ?\ufffd\ufffd?"}),(0,i.jsx)(n.td,{children:"Switch"}),(0,i.jsx)(n.td,{children:"-"}),(0,i.jsx)(n.td,{children:"\uacf5\ufffd????\ufffd\uc131???\ufffd\ud0dc\ufffd??\ufffd\uc815?\ufffd\ub2c8??"})]}),(0,i.jsxs)(n.tr,{children:[(0,i.jsx)(n.td,{children:"?\ufffd??\uc9c0??"}),(0,i.jsx)(n.td,{children:"?\ufffd\uc158"}),(0,i.jsx)(n.td,{children:"-"}),(0,i.jsx)(n.td,{children:"?\ufffd\uc138 ?\ufffd?\ufffd\uc744 \uc9c0?\ufffd\ud558\ufffd??\ufffd\ud55c ?\ufffd\uc158"})]}),(0,i.jsxs)(n.tr,{children:[(0,i.jsx)(n.td,{children:"?\ufffd\uc791?\ufffd\uc2dc"}),(0,i.jsx)(n.td,{children:"Date & Time Picker"}),(0,i.jsx)(n.td,{children:"-"}),(0,i.jsx)(n.td,{children:"\uacf5\ufffd?\uac00 ?\ufffd\uc2dc?\ufffd\uae30 ?\ufffd\uc791?\ufffd\ub294 ?\ufffd\uc2dc\ufffd??\ufffd\uc815?\ufffd\ub2c8??(?\ufffd\ud0dd?\ufffd\ud56d, \ubbf8\uc124????\ubc14\ub85c ?\ufffd\uc791)"})]}),(0,i.jsxs)(n.tr,{children:[(0,i.jsx)(n.td,{children:"\uc885\ub8cc?\ufffd\uc2dc"}),(0,i.jsx)(n.td,{children:"Date & Time Picker"}),(0,i.jsx)(n.td,{children:"-"}),(0,i.jsx)(n.td,{children:"\uacf5\ufffd?\uac00 ?\ufffd\uc2dc?\ufffd\ub294 \ub9c8\ufffd?\ufffd??\ufffd\uc2dc\ufffd??\ufffd\uc815?\ufffd\ub2c8??(?\ufffd\ud0dd?\ufffd\ud56d, \ubbf8\uc124?????\ufffd\uad6c \uacf5\ufffd?)"})]}),(0,i.jsxs)(n.tr,{children:[(0,i.jsx)(n.td,{children:"\uce74\ud14c\uace0\ub9ac"}),(0,i.jsx)(n.td,{children:"Select/Dropdown"}),(0,i.jsx)(n.td,{children:"?\ufffd\uc218"}),(0,i.jsx)(n.td,{children:"\uacf5\ufffd????\ufffd\ud615???\ufffd\ud0dd?\ufffd\ub2c8?? \uae30\ubcf8\ufffd? \uacf5\ufffd?"})]}),(0,i.jsxs)(n.tr,{children:[(0,i.jsx)(n.td,{children:"?\ufffd\ubaa9"}),(0,i.jsx)(n.td,{children:"Text Input"}),(0,i.jsx)(n.td,{children:"?\ufffd\uc218"}),(0,i.jsx)(n.td,{children:"\uacf5\ufffd????\ufffd\ubaa9???\ufffd\ub825?\ufffd\ub2c8??"})]}),(0,i.jsxs)(n.tr,{children:[(0,i.jsx)(n.td,{children:"???\ufffd\ubaa9"}),(0,i.jsx)(n.td,{children:"Text Input"}),(0,i.jsx)(n.td,{children:"-"}),(0,i.jsx)(n.td,{children:"\ubaa9\ub85d?\ufffd\uc11c ?\ufffd\uc2dc??\uc9e7\ufffd? ?\ufffd\ubaa9 (?\ufffd\ud0dd?\ufffd\ud56d)"})]}),(0,i.jsxs)(n.tr,{children:[(0,i.jsx)(n.td,{children:"?\ufffd\uc6a9"}),(0,i.jsx)(n.td,{children:"Rich Text Editor"}),(0,i.jsx)(n.td,{children:"?\ufffd\uc218"}),(0,i.jsx)(n.td,{children:'\uacf5\ufffd????\ufffd\uc138 ?\ufffd\uc6a9???\ufffd\uc131?\ufffd\ub2c8?? ?\ufffd\ub808?\ufffd\uc2a4?\ufffd?? "\uacf5\ufffd? ?\ufffd\uc6a9???\ufffd\ub825?\ufffd\uc138??(Rich Text \uc9c0??". ?\ufffd\uc2dd: \uad75\uac8c, \uae30\uc6b8?? \ubc11\uc904, \ucde8\uc18c?? \ubaa9\ub85d, \ub9c1\ud06c, ?\ufffd\ufffd?\uc9c0, ?\ufffd\uc601?? ?\ufffd\ubaa8\uc9c0 \uc9c0??'})]}),(0,i.jsxs)(n.tr,{children:[(0,i.jsx)(n.td,{children:"?\ufffd\uba85"}),(0,i.jsx)(n.td,{children:"Textarea"}),(0,i.jsx)(n.td,{children:"-"}),(0,i.jsx)(n.td,{children:"\uad00\ub9ac\uc6a9 ?\ufffd\uba85 (?\ufffd\ud0dd?\ufffd\ud56d)"})]})]})]}),"\n",(0,i.jsx)(n.p,{children:(0,i.jsx)(n.strong,{children:"\ubc84\ud2bc:"})}),"\n",(0,i.jsxs)(n.ul,{children:["\n",(0,i.jsx)(n.li,{children:"\ufffd??\ufffd\uae30 (X ?\ufffd\uc774\ufffd?"}),"\n",(0,i.jsx)(n.li,{children:"\ucde8\uc18c"}),"\n",(0,i.jsx)(n.li,{children:"?\ufffd\uc131"}),"\n"]}),"\n",(0,i.jsx)(n.h2,{id:"\uc989\uc2dc-\ubc1c\uc0dd\ub294-\ubcc0",children:"\uc989\uc2dc \ubc1c\uc0dd?\ufffd\ub294 \ubcc0??"}),"\n",(0,i.jsx)(n.p,{children:"[?\ufffd\uc778 ?\ufffd\uc694] ?\ufffd\uc131 \ubc84\ud2bc ?\ufffd\ub9ad ??\ubc1c\uc0dd?\ufffd\ub294 \ubcc0???\ufffd\uc778 ?\ufffd\uc694"}),"\n",(0,i.jsx)(n.h2,{id:"\uc8fc\uc758\ud56d",children:"??\uc8fc\uc758?\ufffd\ud56d"}),"\n",(0,i.jsx)(n.p,{children:"[?\ufffd\uc778 ?\ufffd\uc694] \uc8fc\uc758?\ufffd\ud56d ?\ufffd\uc778 ?\ufffd\uc694"}),"\n",(0,i.jsx)(n.h2,{id:"-\uc81c-\uace0-",children:"?\ufffd\ufffd ?\ufffd\uc81c ?\ufffd\uace0 ?\ufffd\ufffd?"}),"\n",(0,i.jsx)(n.p,{children:"?\ufffd\ub2f9 ?\ufffd\uc74c"})]})}function j(e={}){const{wrapper:n}={...(0,r.R)(),...e.components};return n?(0,i.jsx)(n,{...e,children:(0,i.jsx)(x,{...e})}):x(e)}},2914(e,n,d){d.d(n,{A:()=>s});const s=d.p+"assets/images/service-notice-list-7b006c76104ae499c8fddd5545d8d8d2.png"},8453(e,n,d){d.d(n,{R:()=>l,x:()=>t});var s=d(6540);const i={},r=s.createContext(i);function l(e){const n=s.useContext(r);return s.useMemo(function(){return"function"==typeof e?e(n):{...n,...e}},[n,e])}function t(e){let n;return n=e.disableParentContext?"function"==typeof e.components?e.components(i):e.components||i:l(e.components),s.createElement(r.Provider,{value:n},e.children)}}}]);
+'use strict';
+(globalThis.webpackChunkdocs = globalThis.webpackChunkdocs || []).push([
+  [6674],
+  {
+    1693(e, n, d) {
+      (d.r(n),
+        d.d(n, {
+          assets: () => c,
+          contentTitle: () => t,
+          default: () => j,
+          frontMatter: () => l,
+          metadata: () => s,
+          toc: () => h,
+        }));
+      const s = JSON.parse(
+        '{"id":"guide/service-notices","title":"?\ufffd\ube44??\uacf5\ufffd?","description":"\uae30\ub2a5 ?\ufffd\uba85","source":"@site/docs/guide/service-notices.md","sourceDirName":"guide","slug":"/guide/service-notices","permalink":"/docs/zh-Hans/guide/service-notices","draft":false,"unlisted":false,"editUrl":"https://github.com/your-org/gatrix/tree/main/docs/docs/guide/service-notices.md","tags":[],"version":"current","sidebarPosition":1,"frontMatter":{"sidebar_position":1},"sidebar":"tutorialSidebar","previous":{"title":"?\ufffd\uacbd","permalink":"/docs/zh-Hans/features/environments"},"next":{"title":"?\ufffd\uac8c???\ufffd\uc5c5 \uacf5\ufffd?","permalink":"/docs/zh-Hans/guide/popup-notices"}}'
+      );
+      var i = d(4848),
+        r = d(8453);
+      const l = { sidebar_position: 1 },
+        t = '?\ufffd\ube44??\uacf5\ufffd?',
+        c = {},
+        h = [
+          { value: '\uae30\ub2a5 ?\ufffd\uba85', id: '\uae30\ub2a5-\uba85', level: 2 },
+          { value: '?\ufffd\uc6a9 \ubc29\ubc95', id: '\uc6a9-\ubc29\ubc95', level: 2 },
+          { value: '\ubaa9\ub85d ?\ufffd\uba74', id: '\ubaa9\ub85d-\uba74', level: 3 },
+          { value: '\uacf5\ufffd? \ucd94\ufffd?', id: '\uacf5-\ucd94', level: 3 },
+          {
+            value: '\uc989\uc2dc \ubc1c\uc0dd?\ufffd\ub294 \ubcc0??',
+            id: '\uc989\uc2dc-\ubc1c\uc0dd\ub294-\ubcc0',
+            level: 2,
+          },
+          { value: '??\uc8fc\uc758?\ufffd\ud56d', id: '\uc8fc\uc758\ud56d', level: 2 },
+          {
+            value: '?\ufffd\ufffd ?\ufffd\uc81c ?\ufffd\uace0 ?\ufffd\ufffd?',
+            id: '-\uc81c-\uace0-',
+            level: 2,
+          },
+        ];
+      function x(e) {
+        const n = {
+          h1: 'h1',
+          h2: 'h2',
+          h3: 'h3',
+          header: 'header',
+          img: 'img',
+          li: 'li',
+          p: 'p',
+          strong: 'strong',
+          table: 'table',
+          tbody: 'tbody',
+          td: 'td',
+          th: 'th',
+          thead: 'thead',
+          tr: 'tr',
+          ul: 'ul',
+          ...(0, r.R)(),
+          ...e.components,
+        };
+        return (0, i.jsxs)(i.Fragment, {
+          children: [
+            (0, i.jsx)(n.header, {
+              children: (0, i.jsx)(n.h1, {
+                id: '\ube44\uacf5',
+                children: '?\ufffd\ube44??\uacf5\ufffd?',
+              }),
+            }),
+            '\n',
+            (0, i.jsx)(n.h2, { id: '\uae30\ub2a5-\uba85', children: '\uae30\ub2a5 ?\ufffd\uba85' }),
+            '\n',
+            (0, i.jsx)(n.p, {
+              children:
+                '?\ufffd\ube44??\uacf5\ufffd??\ufffd\ud56d???\ufffd\uc131?\ufffd\uace0 \uad00\ub9ac\ud569?\ufffd\ub2e4.',
+            }),
+            '\n',
+            (0, i.jsxs)(n.p, {
+              children: [
+                (0, i.jsx)(n.strong, { children: '?\ufffd\uadfc \uacbd\ub85c:' }),
+                ' \uac8c\uc784 \uad00\ufffd????\ufffd\ube44??\uacf5\ufffd?',
+              ],
+            }),
+            '\n',
+            (0, i.jsx)(n.h2, { id: '\uc6a9-\ubc29\ubc95', children: '?\ufffd\uc6a9 \ubc29\ubc95' }),
+            '\n',
+            (0, i.jsx)(n.h3, { id: '\ubaa9\ub85d-\uba74', children: '\ubaa9\ub85d ?\ufffd\uba74' }),
+            '\n',
+            (0, i.jsx)(n.p, {
+              children: (0, i.jsx)(n.img, {
+                alt: '?\ufffd\ube44??\uacf5\ufffd? \ubaa9\ub85d',
+                src: d(2914).A + '',
+                width: '1920',
+                height: '1065',
+              }),
+            }),
+            '\n',
+            (0, i.jsx)(n.p, {
+              children: (0, i.jsx)(n.strong, { children: '?\ufffd\uc774\uc9c0 ?\ufffd\ub354:' }),
+            }),
+            '\n',
+            (0, i.jsxs)(n.ul, {
+              children: [
+                '\n',
+                (0, i.jsx)(n.li, { children: '?\ufffd\ubaa9: ?\ufffd\ube44??\uacf5\ufffd?' }),
+                '\n',
+                (0, i.jsx)(n.li, {
+                  children:
+                    '?\ufffd\uba85: ?\ufffd\ube44??\uacf5\ufffd??\ufffd\ud56d???\ufffd\uc131?\ufffd\uace0 \uad00\ub9ac\ud569?\ufffd\ub2e4',
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, i.jsx)(n.p, { children: (0, i.jsx)(n.strong, { children: '\ubc84\ud2bc:' }) }),
+            '\n',
+            (0, i.jsxs)(n.ul, {
+              children: [
+                '\n',
+                (0, i.jsx)(n.li, { children: '\ubbf8\ub9ac\ubcf4\uae30' }),
+                '\n',
+                (0, i.jsx)(n.li, { children: '\uacf5\ufffd? \ucd94\ufffd?' }),
+                '\n',
+                (0, i.jsx)(n.li, {
+                  children: '?\ufffd\ubdf0 \ubbf8\ub9ac\ubcf4\uae30 (?\ufffd\uc774\ufffd?',
+                }),
+                '\n',
+                (0, i.jsx)(n.li, { children: 'URL \ubcf5\uc0ac (?\ufffd\uc774\ufffd?' }),
+                '\n',
+                (0, i.jsx)(n.li, { children: '?\ufffd\ud130' }),
+                '\n',
+                (0, i.jsx)(n.li, { children: '\uceec\ub7fc ?\ufffd\uc815 (?\ufffd\uc774\ufffd?' }),
+                '\n',
+                (0, i.jsx)(n.li, { children: '?\ufffd\ub85c\uace0\uce68 (?\ufffd\uc774\ufffd?' }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, i.jsx)(n.p, { children: (0, i.jsx)(n.strong, { children: '\uac80??' }) }),
+            '\n',
+            (0, i.jsxs)(n.ul, {
+              children: [
+                '\n',
+                (0, i.jsx)(n.li, {
+                  children:
+                    '?\ufffd\ub808?\ufffd\uc2a4?\ufffd?? "?\ufffd\ubaa9 ?\ufffd\ub294 ?\ufffd\uc6a9?\ufffd\ub85c \uac80??',
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, i.jsx)(n.p, {
+              children: (0, i.jsx)(n.strong, { children: '?\ufffd\uc774\ufffd?\uceec\ub7fc:' }),
+            }),
+            '\n',
+            (0, i.jsxs)(n.table, {
+              children: [
+                (0, i.jsx)(n.thead, {
+                  children: (0, i.jsxs)(n.tr, {
+                    children: [
+                      (0, i.jsx)(n.th, { children: '?\ufffd\uc11c' }),
+                      (0, i.jsx)(n.th, { children: '\uceec\ub7fc\ufffd?' }),
+                    ],
+                  }),
+                }),
+                (0, i.jsxs)(n.tbody, {
+                  children: [
+                    (0, i.jsxs)(n.tr, {
+                      children: [
+                        (0, i.jsx)(n.td, { children: '1' }),
+                        (0, i.jsx)(n.td, { children: '(\uccb4\ud06c\ubc15\uc2a4)' }),
+                      ],
+                    }),
+                    (0, i.jsxs)(n.tr, {
+                      children: [
+                        (0, i.jsx)(n.td, { children: '2' }),
+                        (0, i.jsx)(n.td, { children: '?\ufffd\ubaa9' }),
+                      ],
+                    }),
+                    (0, i.jsxs)(n.tr, {
+                      children: [
+                        (0, i.jsx)(n.td, { children: '3' }),
+                        (0, i.jsx)(n.td, { children: '?\ufffd\uc7ac ?\ufffd\uc2dc' }),
+                      ],
+                    }),
+                    (0, i.jsxs)(n.tr, {
+                      children: [
+                        (0, i.jsx)(n.td, { children: '4' }),
+                        (0, i.jsx)(n.td, { children: '?\ufffd\ud0dc' }),
+                      ],
+                    }),
+                    (0, i.jsxs)(n.tr, {
+                      children: [
+                        (0, i.jsx)(n.td, { children: '5' }),
+                        (0, i.jsx)(n.td, { children: '\uce74\ud14c\uace0\ub9ac' }),
+                      ],
+                    }),
+                    (0, i.jsxs)(n.tr, {
+                      children: [
+                        (0, i.jsx)(n.td, { children: '6' }),
+                        (0, i.jsx)(n.td, { children: '?\ufffd\uc6a9 ?\ufffd??' }),
+                      ],
+                    }),
+                    (0, i.jsxs)(n.tr, {
+                      children: [
+                        (0, i.jsx)(n.td, { children: '7' }),
+                        (0, i.jsx)(n.td, { children: '?\ufffd\uc6a9 \uae30\uac04' }),
+                      ],
+                    }),
+                    (0, i.jsxs)(n.tr, {
+                      children: [
+                        (0, i.jsx)(n.td, { children: '8' }),
+                        (0, i.jsx)(n.td, { children: '?\ufffd\uc131??' }),
+                      ],
+                    }),
+                    (0, i.jsxs)(n.tr, {
+                      children: [
+                        (0, i.jsx)(n.td, { children: '9' }),
+                        (0, i.jsx)(n.td, { children: '?\ufffd\uc5c5' }),
+                      ],
+                    }),
+                  ],
+                }),
+              ],
+            }),
+            '\n',
+            (0, i.jsx)(n.p, {
+              children: (0, i.jsx)(n.strong, {
+                children: '?\ufffd\uc774???\ufffd\uc74c ?\ufffd\ud0dc:',
+              }),
+            }),
+            '\n',
+            (0, i.jsxs)(n.ul, {
+              children: [
+                '\n',
+                (0, i.jsx)(n.li, {
+                  children: '\uba54\uc2dc\uc9c0: "\uacf5\ufffd?\uac00 ?\ufffd\uc2b5?\ufffd\ub2e4"',
+                }),
+                '\n',
+                (0, i.jsx)(n.li, {
+                  children: '\ubc84\ud2bc: "\ufffd???\ufffd\ufffd??\ucd94\ufffd???\ubcf4\uc138??',
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, i.jsx)(n.h3, { id: '\uacf5-\ucd94', children: '\uacf5\ufffd? \ucd94\ufffd?' }),
+            '\n',
+            (0, i.jsx)(n.p, {
+              children:
+                '"\uacf5\ufffd? \ucd94\ufffd?" \ubc84\ud2bc ?\ufffd\ub9ad ???\ufffd\uc774 ?\ufffd\uc2dc?\ufffd\ub2c8??',
+            }),
+            '\n',
+            (0, i.jsx)(n.p, {
+              children: '![\uacf5\ufffd? \ucd94\ufffd? ??(./img/service-notice-add-form.png)',
+            }),
+            '\n',
+            (0, i.jsx)(n.p, { children: (0, i.jsx)(n.strong, { children: '???\ufffd\ub354:' }) }),
+            '\n',
+            (0, i.jsxs)(n.ul, {
+              children: [
+                '\n',
+                (0, i.jsx)(n.li, { children: '?\ufffd\ubaa9: \uacf5\ufffd? \ucd94\ufffd?' }),
+                '\n',
+                (0, i.jsx)(n.li, {
+                  children:
+                    '?\ufffd\uba85: ?\ufffd\ub85c???\ufffd\ube44??\uacf5\ufffd?\ufffd??\ufffd\uc131?\ufffd\ub2c8??',
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, i.jsx)(n.p, {
+              children: (0, i.jsx)(n.strong, { children: '?\ufffd\ub825 ?\ufffd\ub4dc:' }),
+            }),
+            '\n',
+            (0, i.jsxs)(n.table, {
+              children: [
+                (0, i.jsx)(n.thead, {
+                  children: (0, i.jsxs)(n.tr, {
+                    children: [
+                      (0, i.jsx)(n.th, { children: '?\ufffd\ub4dc\ufffd?' }),
+                      (0, i.jsx)(n.th, { children: '?\ufffd??' }),
+                      (0, i.jsx)(n.th, { children: '?\ufffd\uc218' }),
+                      (0, i.jsx)(n.th, { children: '?\ufffd\uba85' }),
+                    ],
+                  }),
+                }),
+                (0, i.jsxs)(n.tbody, {
+                  children: [
+                    (0, i.jsxs)(n.tr, {
+                      children: [
+                        (0, i.jsx)(n.td, { children: '?\ufffd\uc6a9 ?\ufffd\ufffd?' }),
+                        (0, i.jsx)(n.td, { children: 'Switch' }),
+                        (0, i.jsx)(n.td, { children: '-' }),
+                        (0, i.jsx)(n.td, {
+                          children:
+                            '\uacf5\ufffd????\ufffd\uc131???\ufffd\ud0dc\ufffd??\ufffd\uc815?\ufffd\ub2c8??',
+                        }),
+                      ],
+                    }),
+                    (0, i.jsxs)(n.tr, {
+                      children: [
+                        (0, i.jsx)(n.td, { children: '?\ufffd??\uc9c0??' }),
+                        (0, i.jsx)(n.td, { children: '?\ufffd\uc158' }),
+                        (0, i.jsx)(n.td, { children: '-' }),
+                        (0, i.jsx)(n.td, {
+                          children:
+                            '?\ufffd\uc138 ?\ufffd?\ufffd\uc744 \uc9c0?\ufffd\ud558\ufffd??\ufffd\ud55c ?\ufffd\uc158',
+                        }),
+                      ],
+                    }),
+                    (0, i.jsxs)(n.tr, {
+                      children: [
+                        (0, i.jsx)(n.td, { children: '?\ufffd\uc791?\ufffd\uc2dc' }),
+                        (0, i.jsx)(n.td, { children: 'Date & Time Picker' }),
+                        (0, i.jsx)(n.td, { children: '-' }),
+                        (0, i.jsx)(n.td, {
+                          children:
+                            '\uacf5\ufffd?\uac00 ?\ufffd\uc2dc?\ufffd\uae30 ?\ufffd\uc791?\ufffd\ub294 ?\ufffd\uc2dc\ufffd??\ufffd\uc815?\ufffd\ub2c8??(?\ufffd\ud0dd?\ufffd\ud56d, \ubbf8\uc124????\ubc14\ub85c ?\ufffd\uc791)',
+                        }),
+                      ],
+                    }),
+                    (0, i.jsxs)(n.tr, {
+                      children: [
+                        (0, i.jsx)(n.td, { children: '\uc885\ub8cc?\ufffd\uc2dc' }),
+                        (0, i.jsx)(n.td, { children: 'Date & Time Picker' }),
+                        (0, i.jsx)(n.td, { children: '-' }),
+                        (0, i.jsx)(n.td, {
+                          children:
+                            '\uacf5\ufffd?\uac00 ?\ufffd\uc2dc?\ufffd\ub294 \ub9c8\ufffd?\ufffd??\ufffd\uc2dc\ufffd??\ufffd\uc815?\ufffd\ub2c8??(?\ufffd\ud0dd?\ufffd\ud56d, \ubbf8\uc124?????\ufffd\uad6c \uacf5\ufffd?)',
+                        }),
+                      ],
+                    }),
+                    (0, i.jsxs)(n.tr, {
+                      children: [
+                        (0, i.jsx)(n.td, { children: '\uce74\ud14c\uace0\ub9ac' }),
+                        (0, i.jsx)(n.td, { children: 'Select/Dropdown' }),
+                        (0, i.jsx)(n.td, { children: '?\ufffd\uc218' }),
+                        (0, i.jsx)(n.td, {
+                          children:
+                            '\uacf5\ufffd????\ufffd\ud615???\ufffd\ud0dd?\ufffd\ub2c8?? \uae30\ubcf8\ufffd? \uacf5\ufffd?',
+                        }),
+                      ],
+                    }),
+                    (0, i.jsxs)(n.tr, {
+                      children: [
+                        (0, i.jsx)(n.td, { children: '?\ufffd\ubaa9' }),
+                        (0, i.jsx)(n.td, { children: 'Text Input' }),
+                        (0, i.jsx)(n.td, { children: '?\ufffd\uc218' }),
+                        (0, i.jsx)(n.td, {
+                          children: '\uacf5\ufffd????\ufffd\ubaa9???\ufffd\ub825?\ufffd\ub2c8??',
+                        }),
+                      ],
+                    }),
+                    (0, i.jsxs)(n.tr, {
+                      children: [
+                        (0, i.jsx)(n.td, { children: '???\ufffd\ubaa9' }),
+                        (0, i.jsx)(n.td, { children: 'Text Input' }),
+                        (0, i.jsx)(n.td, { children: '-' }),
+                        (0, i.jsx)(n.td, {
+                          children:
+                            '\ubaa9\ub85d?\ufffd\uc11c ?\ufffd\uc2dc??\uc9e7\ufffd? ?\ufffd\ubaa9 (?\ufffd\ud0dd?\ufffd\ud56d)',
+                        }),
+                      ],
+                    }),
+                    (0, i.jsxs)(n.tr, {
+                      children: [
+                        (0, i.jsx)(n.td, { children: '?\ufffd\uc6a9' }),
+                        (0, i.jsx)(n.td, { children: 'Rich Text Editor' }),
+                        (0, i.jsx)(n.td, { children: '?\ufffd\uc218' }),
+                        (0, i.jsx)(n.td, {
+                          children:
+                            '\uacf5\ufffd????\ufffd\uc138 ?\ufffd\uc6a9???\ufffd\uc131?\ufffd\ub2c8?? ?\ufffd\ub808?\ufffd\uc2a4?\ufffd?? "\uacf5\ufffd? ?\ufffd\uc6a9???\ufffd\ub825?\ufffd\uc138??(Rich Text \uc9c0??". ?\ufffd\uc2dd: \uad75\uac8c, \uae30\uc6b8?? \ubc11\uc904, \ucde8\uc18c?? \ubaa9\ub85d, \ub9c1\ud06c, ?\ufffd\ufffd?\uc9c0, ?\ufffd\uc601?? ?\ufffd\ubaa8\uc9c0 \uc9c0??',
+                        }),
+                      ],
+                    }),
+                    (0, i.jsxs)(n.tr, {
+                      children: [
+                        (0, i.jsx)(n.td, { children: '?\ufffd\uba85' }),
+                        (0, i.jsx)(n.td, { children: 'Textarea' }),
+                        (0, i.jsx)(n.td, { children: '-' }),
+                        (0, i.jsx)(n.td, {
+                          children: '\uad00\ub9ac\uc6a9 ?\ufffd\uba85 (?\ufffd\ud0dd?\ufffd\ud56d)',
+                        }),
+                      ],
+                    }),
+                  ],
+                }),
+              ],
+            }),
+            '\n',
+            (0, i.jsx)(n.p, { children: (0, i.jsx)(n.strong, { children: '\ubc84\ud2bc:' }) }),
+            '\n',
+            (0, i.jsxs)(n.ul, {
+              children: [
+                '\n',
+                (0, i.jsx)(n.li, { children: '\ufffd??\ufffd\uae30 (X ?\ufffd\uc774\ufffd?' }),
+                '\n',
+                (0, i.jsx)(n.li, { children: '\ucde8\uc18c' }),
+                '\n',
+                (0, i.jsx)(n.li, { children: '?\ufffd\uc131' }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, i.jsx)(n.h2, {
+              id: '\uc989\uc2dc-\ubc1c\uc0dd\ub294-\ubcc0',
+              children: '\uc989\uc2dc \ubc1c\uc0dd?\ufffd\ub294 \ubcc0??',
+            }),
+            '\n',
+            (0, i.jsx)(n.p, {
+              children:
+                '[?\ufffd\uc778 ?\ufffd\uc694] ?\ufffd\uc131 \ubc84\ud2bc ?\ufffd\ub9ad ??\ubc1c\uc0dd?\ufffd\ub294 \ubcc0???\ufffd\uc778 ?\ufffd\uc694',
+            }),
+            '\n',
+            (0, i.jsx)(n.h2, { id: '\uc8fc\uc758\ud56d', children: '??\uc8fc\uc758?\ufffd\ud56d' }),
+            '\n',
+            (0, i.jsx)(n.p, {
+              children:
+                '[?\ufffd\uc778 ?\ufffd\uc694] \uc8fc\uc758?\ufffd\ud56d ?\ufffd\uc778 ?\ufffd\uc694',
+            }),
+            '\n',
+            (0, i.jsx)(n.h2, {
+              id: '-\uc81c-\uace0-',
+              children: '?\ufffd\ufffd ?\ufffd\uc81c ?\ufffd\uace0 ?\ufffd\ufffd?',
+            }),
+            '\n',
+            (0, i.jsx)(n.p, { children: '?\ufffd\ub2f9 ?\ufffd\uc74c' }),
+          ],
+        });
+      }
+      function j(e = {}) {
+        const { wrapper: n } = { ...(0, r.R)(), ...e.components };
+        return n ? (0, i.jsx)(n, { ...e, children: (0, i.jsx)(x, { ...e }) }) : x(e);
+      }
+    },
+    2914(e, n, d) {
+      d.d(n, { A: () => s });
+      const s = d.p + 'assets/images/service-notice-list-7b006c76104ae499c8fddd5545d8d8d2.png';
+    },
+    8453(e, n, d) {
+      d.d(n, { R: () => l, x: () => t });
+      var s = d(6540);
+      const i = {},
+        r = s.createContext(i);
+      function l(e) {
+        const n = s.useContext(r);
+        return s.useMemo(
+          function () {
+            return 'function' == typeof e ? e(n) : { ...n, ...e };
+          },
+          [n, e]
+        );
+      }
+      function t(e) {
+        let n;
+        return (
+          (n = e.disableParentContext
+            ? 'function' == typeof e.components
+              ? e.components(i)
+              : e.components || i
+            : l(e.components)),
+          s.createElement(r.Provider, { value: n }, e.children)
+        );
+      }
+    },
+  },
+]);

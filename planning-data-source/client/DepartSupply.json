@@ -25,9 +25,7 @@
       "icon": 1
     },
     ":links": {
-      "pointId": [
-        "Point"
-      ]
+      "pointId": ["Point"]
     }
   },
   "DepartSupply": {

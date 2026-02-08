@@ -230,7 +230,10 @@ export function formatDiscordMessage(event: IntegrationSystemEvent): Record<stri
 /**
  * Format PagerDuty message payload
  */
-export function formatPagerDutyMessage(event: IntegrationSystemEvent, routingKey: string): Record<string, any> {
+export function formatPagerDutyMessage(
+  event: IntegrationSystemEvent,
+  routingKey: string
+): Record<string, any> {
   const eventName = formatEventType(event.type);
   const actor = event.createdBy || 'System';
   const details = buildEventDetails(event);
@@ -241,7 +244,8 @@ export function formatPagerDutyMessage(event: IntegrationSystemEvent, routingKey
     payload: {
       summary: `${eventName} by ${actor}`,
       source: 'Gatrix',
-      severity: event.type.includes('deleted') || event.type.includes('archived') ? 'warning' : 'info',
+      severity:
+        event.type.includes('deleted') || event.type.includes('archived') ? 'warning' : 'info',
       timestamp: new Date(event.createdAt).toISOString(),
       custom_details: {
         eventType: event.type,
@@ -275,7 +279,10 @@ export function formatTelegramMessage(event: IntegrationSystemEvent): string {
 /**
  * Format WhatsApp message payload (Meta API)
  */
-export function formatWhatsAppMessage(event: IntegrationSystemEvent, to: string): Record<string, any> {
+export function formatWhatsAppMessage(
+  event: IntegrationSystemEvent,
+  to: string
+): Record<string, any> {
   const emoji = getEventEmoji(event.type);
   const eventName = formatEventType(event.type);
   const actor = event.createdBy || 'System';
@@ -386,7 +393,9 @@ export function formatGoogleChatMessage(event: IntegrationSystemEvent): Record<s
                     text: [
                       event.environment ? `<b>Environment:</b> ${event.environment}` : null,
                       `<b>Time:</b> ${formatTimestamp(event.createdAt)}`,
-                    ].filter(Boolean).join('<br>'),
+                    ]
+                      .filter(Boolean)
+                      .join('<br>'),
                   },
                 },
                 {

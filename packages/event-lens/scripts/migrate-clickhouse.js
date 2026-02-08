@@ -18,7 +18,10 @@ const targetDatabase = process.env.CLICKHOUSE_DATABASE || 'event_lens';
 
 async function acquireLock(connection) {
   try {
-    const [rows] = await connection.query('SELECT GET_LOCK(?, ?) as lockResult', [LOCK_NAME, LOCK_TIMEOUT]);
+    const [rows] = await connection.query('SELECT GET_LOCK(?, ?) as lockResult', [
+      LOCK_NAME,
+      LOCK_TIMEOUT,
+    ]);
     const lockResult = rows[0]?.lockResult;
 
     if (lockResult === 1) {
@@ -105,8 +108,8 @@ async function migrate() {
         // SQL 문을 세미콜론으로 분리
         const statements = sql
           .split(';')
-          .map(s => s.trim())
-          .filter(s => s.length > 0 && !s.startsWith('--') && !s.startsWith('/*'));
+          .map((s) => s.trim())
+          .filter((s) => s.length > 0 && !s.startsWith('--') && !s.startsWith('/*'));
 
         for (const statement of statements) {
           if (statement) {
@@ -135,4 +138,3 @@ async function migrate() {
 }
 
 migrate();
-

@@ -10,47 +10,47 @@ OpenPanel의 GitHub 저장소를 철저히 분석한 결과, **Event Lens는 Ope
 
 ### 1. ClickHouse 최적화
 
-| 기술 | OpenPanel | Event Lens | 상태 |
-|------|-----------|------------|------|
-| **ZSTD 압축** | ✅ ZSTD(3) | ✅ ZSTD(3) | ✅ 동일 |
-| **Bloom Filter 인덱스** | ✅ name, origin, path | ✅ name, sessionId, profileId, path, referrer, country, browser, os, device, UTM, propertiesKeys | ✅ **더 많음** |
-| **월별 파티셔닝** | ✅ `toYYYYMM(created_at)` | ✅ `toYYYYMM(createdAt)` | ✅ 동일 |
-| **TTL 자동 삭제** | ❌ 없음 | ✅ 90일/365일 | ✅ **Event Lens가 더 나음** |
-| **Materialized Views** | ✅ 4개 (dau_mv, cohort_events_mv, distinct_event_names_mv, event_property_values_mv) | ✅ 7개 (daily_metrics, hourly_metrics, event_name_metrics, path_metrics, referrer_metrics, device_metrics, geo_metrics) | ✅ **Event Lens가 더 많음** |
-| **LowCardinality 타입** | ✅ name, sdk_name, country, os, browser, device 등 | ❌ 사용 안 함 | ⚠️ **누락** |
-| **Delta/DoubleDelta 압축** | ✅ duration, created_at | ❌ 사용 안 함 | ⚠️ **누락** |
-| **Gorilla 압축** | ✅ longitude, latitude | ❌ 사용 안 함 | ⚠️ **누락** |
-| **Map 타입** | ✅ `Map(String, String)` | ❌ String (JSON) | ⚠️ **누락** |
+| 기술                       | OpenPanel                                                                            | Event Lens                                                                                                              | 상태                        |
+| -------------------------- | ------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------- | --------------------------- |
+| **ZSTD 압축**              | ✅ ZSTD(3)                                                                           | ✅ ZSTD(3)                                                                                                              | ✅ 동일                     |
+| **Bloom Filter 인덱스**    | ✅ name, origin, path                                                                | ✅ name, sessionId, profileId, path, referrer, country, browser, os, device, UTM, propertiesKeys                        | ✅ **더 많음**              |
+| **월별 파티셔닝**          | ✅ `toYYYYMM(created_at)`                                                            | ✅ `toYYYYMM(createdAt)`                                                                                                | ✅ 동일                     |
+| **TTL 자동 삭제**          | ❌ 없음                                                                              | ✅ 90일/365일                                                                                                           | ✅ **Event Lens가 더 나음** |
+| **Materialized Views**     | ✅ 4개 (dau_mv, cohort_events_mv, distinct_event_names_mv, event_property_values_mv) | ✅ 7개 (daily_metrics, hourly_metrics, event_name_metrics, path_metrics, referrer_metrics, device_metrics, geo_metrics) | ✅ **Event Lens가 더 많음** |
+| **LowCardinality 타입**    | ✅ name, sdk_name, country, os, browser, device 등                                   | ❌ 사용 안 함                                                                                                           | ⚠️ **누락**                 |
+| **Delta/DoubleDelta 압축** | ✅ duration, created_at                                                              | ❌ 사용 안 함                                                                                                           | ⚠️ **누락**                 |
+| **Gorilla 압축**           | ✅ longitude, latitude                                                               | ❌ 사용 안 함                                                                                                           | ⚠️ **누락**                 |
+| **Map 타입**               | ✅ `Map(String, String)`                                                             | ❌ String (JSON)                                                                                                        | ⚠️ **누락**                 |
 
 ### 2. 배치 처리 및 버퍼링
 
-| 기술 | OpenPanel | Event Lens | 상태 |
-|------|-----------|------------|------|
-| **Redis 버퍼링** | ✅ EventBuffer (복잡한 Lua 스크립트) | ✅ BullMQ 큐 | ⚠️ **다른 방식** |
-| **배치 삽입** | ✅ 4000개 (설정 가능) | ✅ 1000개 (설정 가능) | ✅ 유사 |
-| **청크 처리** | ✅ 1000개 청크 | ✅ 없음 (전체 배치) | ⚠️ **누락** |
-| **세션 이벤트 처리** | ✅ screen_view duration 계산 | ❌ 없음 | ⚠️ **누락** |
-| **Pending 이벤트 관리** | ✅ 마지막 screen_view 보류 | ❌ 없음 | ⚠️ **누락** |
+| 기술                    | OpenPanel                            | Event Lens            | 상태             |
+| ----------------------- | ------------------------------------ | --------------------- | ---------------- |
+| **Redis 버퍼링**        | ✅ EventBuffer (복잡한 Lua 스크립트) | ✅ BullMQ 큐          | ⚠️ **다른 방식** |
+| **배치 삽입**           | ✅ 4000개 (설정 가능)                | ✅ 1000개 (설정 가능) | ✅ 유사          |
+| **청크 처리**           | ✅ 1000개 청크                       | ✅ 없음 (전체 배치)   | ⚠️ **누락**      |
+| **세션 이벤트 처리**    | ✅ screen_view duration 계산         | ❌ 없음               | ⚠️ **누락**      |
+| **Pending 이벤트 관리** | ✅ 마지막 screen_view 보류           | ❌ 없음               | ⚠️ **누락**      |
 
 ### 3. 워커 및 큐 시스템
 
-| 기술 | OpenPanel | Event Lens | 상태 |
-|------|-----------|------------|------|
-| **BullMQ 사용** | ✅ | ✅ | ✅ 동일 |
-| **이벤트 큐** | ✅ eventsQueue | ✅ eventQueue | ✅ 동일 |
-| **세션 큐** | ✅ sessionsQueue | ✅ sessionQueue | ✅ 동일 |
-| **프로필 큐** | ❌ (버퍼 사용) | ✅ profileQueue | ✅ Event Lens 추가 |
-| **Cron 작업** | ✅ flushEvents (10초), flushProfiles (60초), flushSessions (10초) | ✅ 유사 | ✅ 동일 |
-| **재시도 로직** | ✅ 3회, exponential backoff | ✅ 3회, exponential backoff | ✅ 동일 |
+| 기술            | OpenPanel                                                         | Event Lens                  | 상태               |
+| --------------- | ----------------------------------------------------------------- | --------------------------- | ------------------ |
+| **BullMQ 사용** | ✅                                                                | ✅                          | ✅ 동일            |
+| **이벤트 큐**   | ✅ eventsQueue                                                    | ✅ eventQueue               | ✅ 동일            |
+| **세션 큐**     | ✅ sessionsQueue                                                  | ✅ sessionQueue             | ✅ 동일            |
+| **프로필 큐**   | ❌ (버퍼 사용)                                                    | ✅ profileQueue             | ✅ Event Lens 추가 |
+| **Cron 작업**   | ✅ flushEvents (10초), flushProfiles (60초), flushSessions (10초) | ✅ 유사                     | ✅ 동일            |
+| **재시도 로직** | ✅ 3회, exponential backoff                                       | ✅ 3회, exponential backoff | ✅ 동일            |
 
 ### 4. 데이터 모델링
 
-| 기술 | OpenPanel | Event Lens | 상태 |
-|------|-----------|------------|------|
-| **UUID 생성** | ✅ uuid v4 | ✅ ULID | ✅ **Event Lens가 더 나음** |
-| **프로필 병합** | ✅ ReplacingMergeTree | ✅ ReplacingMergeTree | ✅ 동일 |
-| **세션 추적** | ✅ | ✅ | ✅ 동일 |
-| **이벤트 정규화** | ✅ toDots() | ❌ 없음 | ⚠️ **누락** |
+| 기술              | OpenPanel             | Event Lens            | 상태                        |
+| ----------------- | --------------------- | --------------------- | --------------------------- |
+| **UUID 생성**     | ✅ uuid v4            | ✅ ULID               | ✅ **Event Lens가 더 나음** |
+| **프로필 병합**   | ✅ ReplacingMergeTree | ✅ ReplacingMergeTree | ✅ 동일                     |
+| **세션 추적**     | ✅                    | ✅                    | ✅ 동일                     |
+| **이벤트 정규화** | ✅ toDots()           | ❌ 없음               | ⚠️ **누락**                 |
 
 ---
 
@@ -72,6 +72,7 @@ OpenPanel은 다양한 압축 코덱을 사용하여 스토리지를 최적화�
 **Event Lens는 ZSTD만 사용하고 Delta/DoubleDelta/Gorilla 압축을 사용하지 않습니다.**
 
 **영향:**
+
 - 스토리지 사용량 10-20% 증가 가능
 - 시계열 데이터 (duration, created_at) 압축 효율 저하
 - 지리 데이터 (longitude, latitude) 압축 효율 저하
@@ -92,6 +93,7 @@ OpenPanel은 카디널리티가 낮은 필드에 `LowCardinality` 타입을 사�
 **Event Lens는 모든 필드를 일반 String으로 저장합니다.**
 
 **영향:**
+
 - 메모리 사용량 30-50% 증가 가능
 - 쿼리 성능 10-20% 저하 가능
 - 스토리지 사용량 20-30% 증가 가능
@@ -113,6 +115,7 @@ properties String DEFAULT '{}',
 ```
 
 **영향:**
+
 - Map 타입은 ClickHouse에서 네이티브 지원되어 쿼리 성능이 더 좋음
 - JSON 파싱 오버헤드 발생
 - 필터링 시 `JSONExtractString()` 함수 사용 필요 (느림)
@@ -129,6 +132,7 @@ OpenPanel은 매우 정교한 Redis 버퍼링 시스템을 사용합니다:
 **Event Lens는 단순한 BullMQ 큐만 사용합니다.**
 
 **영향:**
+
 - Duration 계산 누락 (모든 이벤트 duration = 0)
 - 세션 분석 정확도 저하
 - 실시간 세션 추적 불가능
@@ -148,6 +152,7 @@ properties: toDots(payload.properties),
 **Event Lens는 JSON.stringify만 사용합니다.**
 
 **영향:**
+
 - 중첩된 properties 쿼리 어려움
 - 필터링 성능 저하
 
@@ -163,6 +168,7 @@ OpenPanel은 고정 길이 문자열에 `FixedString`을 사용합니다:
 **Event Lens는 일반 String을 사용합니다.**
 
 **영향:**
+
 - 메모리 사용량 소폭 증가
 - 쿼리 성능 소폭 저하
 
@@ -173,6 +179,7 @@ OpenPanel은 고정 길이 문자열에 `FixedString`을 사용합니다:
 ### ClickHouse 스키마 비교
 
 #### OpenPanel Events 테이블
+
 ```sql
 CREATE TABLE IF NOT EXISTS events (
   `id` UUID DEFAULT generateUUIDv4(),
@@ -216,6 +223,7 @@ SETTINGS index_granularity = 8192;
 ```
 
 #### Event Lens Events 테이블
+
 ```sql
 CREATE TABLE IF NOT EXISTS event_lens.events (
   id String,
@@ -226,14 +234,14 @@ CREATE TABLE IF NOT EXISTS event_lens.events (
   sessionId String,
   createdAt DateTime,
   timestamp DateTime,
-  
+
   -- Geo
   country Nullable(String),
   city Nullable(String),
   region Nullable(String),
   latitude Nullable(Float64),
   longitude Nullable(Float64),
-  
+
   -- Device
   os Nullable(String),
   osVersion Nullable(String),
@@ -242,28 +250,28 @@ CREATE TABLE IF NOT EXISTS event_lens.events (
   device Nullable(String),
   brand Nullable(String),
   model Nullable(String),
-  
+
   -- Page
   path Nullable(String),
   origin Nullable(String),
   referrer Nullable(String),
   referrerName Nullable(String),
   referrerType Nullable(String),
-  
+
   -- UTM
   utmSource Nullable(String),
   utmMedium Nullable(String),
   utmCampaign Nullable(String),
   utmTerm Nullable(String),
   utmContent Nullable(String),
-  
+
   -- Custom
   properties String DEFAULT '{}',
-  
+
   -- Session metrics
   duration Nullable(UInt32),
   screenViews Nullable(UInt32),
-  
+
   -- Raw data
   ip Nullable(String),
   userAgent Nullable(String)
@@ -275,6 +283,7 @@ SETTINGS index_granularity = 8192;
 ```
 
 **주요 차이점:**
+
 1. ❌ LowCardinality 타입 미사용
 2. ❌ 고급 압축 코덱 미사용 (Delta, DoubleDelta, Gorilla)
 3. ❌ Map 타입 대신 JSON String 사용
@@ -287,28 +296,34 @@ SETTINGS index_granularity = 8192;
 ## 📈 성능 영향 예측
 
 ### 스토리지 사용량
+
 - **OpenPanel**: 100GB 기준
 - **Event Lens**: 약 130-150GB 예상 (30-50% 증가)
 
 **이유:**
+
 - LowCardinality 미사용: +20-30%
 - 고급 압축 미사용: +10-20%
 - Map 대신 JSON String: +5-10%
 
 ### 쿼리 성능
+
 - **OpenPanel**: 기준
 - **Event Lens**: 약 10-30% 느림 예상
 
 **이유:**
+
 - LowCardinality 미사용: +10-20% 느림
 - Map 대신 JSON String: +5-10% 느림
 - ORDER BY 최적화 부족: +5% 느림
 
 ### 메모리 사용량
+
 - **OpenPanel**: 기준
 - **Event Lens**: 약 30-50% 증가 예상
 
 **이유:**
+
 - LowCardinality 미사용: +30-50%
 
 ---
@@ -356,13 +371,13 @@ SETTINGS index_granularity = 8192;
 
 ## 📊 최종 평가
 
-| 항목 | 점수 | 설명 |
-|------|------|------|
-| **기본 기능** | ✅ 95% | 핵심 기능 모두 구현 |
-| **최적화 수준** | ⚠️ 70% | 고급 최적화 일부 누락 |
+| 항목                | 점수   | 설명                       |
+| ------------------- | ------ | -------------------------- |
+| **기본 기능**       | ✅ 95% | 핵심 기능 모두 구현        |
+| **최적화 수준**     | ⚠️ 70% | 고급 최적화 일부 누락      |
 | **프로덕션 준비도** | ✅ 85% | 대부분 준비됨, 최적화 필요 |
-| **확장성** | ✅ 90% | 좋은 아키텍처 |
-| **유지보수성** | ✅ 95% | 깔끔한 코드 구조 |
+| **확장성**          | ✅ 90% | 좋은 아키텍처              |
+| **유지보수성**      | ✅ 95% | 깔끔한 코드 구조           |
 
 **종합 점수: 87/100** ⭐⭐⭐⭐
 
@@ -386,4 +401,3 @@ SETTINGS index_granularity = 8192;
 ---
 
 **결론: Event Lens는 OpenPanel의 핵심 아이디어를 잘 구현했으나, 프로덕션 레벨의 성능 최적화를 위해서는 위의 권장 사항을 적용해야 합니다.**
-

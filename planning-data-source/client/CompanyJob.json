@@ -61,33 +61,19 @@
     },
     ":enum": {},
     ":links": {
-      "loadageRatio": [
-        "LoadageRatio"
-      ],
+      "loadageRatio": ["LoadageRatio"],
       "worldBuffs": [
         {
-          "Id": [
-            "WorldBuff"
-          ],
-          "companyLV": [
-            "CompanyExp"
-          ]
+          "Id": ["WorldBuff"],
+          "companyLV": ["CompanyExp"]
         },
         {
-          "Id": [
-            "WorldBuff"
-          ],
-          "companyLV": [
-            "CompanyExp"
-          ]
+          "Id": ["WorldBuff"],
+          "companyLV": ["CompanyExp"]
         },
         {
-          "Id": [
-            "WorldBuff"
-          ],
-          "companyLV": [
-            "CompanyExp"
-          ]
+          "Id": ["WorldBuff"],
+          "companyLV": ["CompanyExp"]
         }
       ]
     }

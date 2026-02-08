@@ -3,12 +3,14 @@
 ## [1.0.1] - 2025-10-02
 
 ### Changed
+
 - **UUID → ULID 마이그레이션** 🔄
   - `uuid` 패키지를 `ulid` 패키지로 교체
   - 이벤트 ID 생성에 ULID 사용
   - 시간순 정렬 가능한 ID 체계로 개선
 
 ### Benefits of ULID
+
 1. **시간순 정렬 가능** - 타임스탬프가 ID에 포함되어 자동 정렬
 2. **더 짧은 문자열** - 26자 (UUID는 36자)
 3. **대소문자 구분 없음** - Crockford's Base32 사용
@@ -18,6 +20,7 @@
 ### Technical Details
 
 #### Before (UUID v4)
+
 ```typescript
 import { v4 as uuidv4 } from 'uuid';
 
@@ -26,6 +29,7 @@ const eventId = uuidv4();
 ```
 
 #### After (ULID)
+
 ```typescript
 import { ulid } from 'ulid';
 
@@ -34,6 +38,7 @@ const eventId = ulid();
 ```
 
 ### Modified Files
+
 - `packages/event-lens/package.json`
   - Removed: `uuid@^9.0.1`, `@types/uuid@^9.0.7`
   - Added: `ulid@^2.3.0`
@@ -42,11 +47,13 @@ const eventId = ulid();
   - Updated ID generation logic
 
 ### Performance Impact
+
 - ✅ **ClickHouse 인덱스 성능 향상** - 시간순 정렬로 range 쿼리 최적화
 - ✅ **스토리지 절감** - 더 짧은 문자열 (36자 → 26자)
 - ✅ **정렬 성능 향상** - 타임스탬프 기반 자동 정렬
 
 ### Migration Notes
+
 - 기존 UUID 데이터와 호환성 유지
 - 새로운 이벤트부터 ULID 사용
 - 데이터베이스 스키마 변경 불필요 (String 타입 그대로 사용)
@@ -56,6 +63,7 @@ const eventId = ulid();
 ## [1.0.0] - 2025-10-02
 
 ### Added
+
 - **Phase 1-4 구현 완료**
   - ClickHouse, Redis, MySQL 연결
   - Event API (track, batch)
@@ -71,6 +79,7 @@ const eventId = ulid();
   - OptimizedMetricsService
 
 ### Features
+
 - Event tracking API
 - Real-time analytics
 - Funnel analysis
@@ -81,13 +90,14 @@ const eventId = ulid();
 - BullMQ job queue
 
 ### Performance
+
 - 기본 메트릭: 100배 빠름 (5,000ms → 50ms)
 - Top Pages: 100배 빠름 (2,000ms → 20ms)
 - 스토리지: 50-70% 절감
 
 ### Documentation
+
 - EVENT_LENS_SETUP_GUIDE.md
 - EVENT_LENS_IMPLEMENTATION_SUMMARY.md
 - OPTIMIZATIONS.md
 - EVENT_LENS_ADVANCED_OPTIMIZATIONS.md
-

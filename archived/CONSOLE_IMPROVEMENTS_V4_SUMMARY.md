@@ -11,11 +11,13 @@ This document summarizes the fourth round of improvements to the Gatrix system c
 **Problem:** Running `command --help` didn't show detailed help for the command. The `--help` flag was being treated as a regular argument.
 
 **Solution:**
+
 - Added `--help` option detection in the `execute` method
 - Created new `showCommandHelp` method to display command-specific help
 - Help shows: command name, description, options, and usage examples
 
 **Implementation:**
+
 ```typescript
 // In execute method
 if (opts.help === true) {
@@ -50,6 +52,7 @@ private showCommandHelp(command: string, built: BuiltCommandDef): ConsoleExecuti
 ```
 
 **Usage Examples:**
+
 ```bash
 # Show help for encrypt command
 encrypt --help
@@ -62,6 +65,7 @@ api-key --help
 ```
 
 **Output Example:**
+
 ```
 encrypt - Encrypt text using specified algorithm
 
@@ -74,6 +78,7 @@ Usage:
 ```
 
 **File Modified:**
+
 - `packages/backend/src/services/ConsoleService.ts`
 
 ---
@@ -84,15 +89,17 @@ Usage:
 
 **Root Cause:**
 The base64 command was checking for `--encode` in the `args` array and filtering it out:
+
 ```typescript
 // OLD CODE (BROKEN)
 const hasEncode = opts?.encode === true || args.includes('--encode');
 const hasDecode = opts?.decode === true || args.includes('--decode');
-const rest = args.filter(a => a !== '--encode' && a !== '--decode');
+const rest = args.filter((a) => a !== '--encode' && a !== '--decode');
 const text = rest.join(' ');
 ```
 
 However, `parseOptions` already separates options from arguments, so:
+
 - `opts` contains: `{ encode: true }`
 - `args` contains: `["1234"]` (no `--encode` here!)
 
@@ -100,6 +107,7 @@ The filtering was removing nothing, but the check `args.includes('--encode')` wa
 
 **Solution:**
 Simplified the logic to only check `opts`:
+
 ```typescript
 // NEW CODE (FIXED)
 const hasEncode = opts?.encode === true;
@@ -108,11 +116,13 @@ const text = args.join(' ');
 ```
 
 Now:
+
 - Options are checked from `opts` (where they actually are)
 - Text is taken directly from `args` (which already has options removed)
 - No unnecessary filtering
 
 **File Modified:**
+
 - `packages/backend/src/services/ConsoleService.ts`
 
 ---
@@ -120,6 +130,7 @@ Now:
 ## Testing
 
 ### Build Status
+
 ✅ Backend build successful (TypeScript compilation)
 ✅ No compilation errors
 ✅ No diagnostic issues
@@ -147,6 +158,7 @@ help --help
 ```
 
 **Expected Output:**
+
 - Command name and description
 - List of all options with descriptions
 - Usage example
@@ -207,11 +219,13 @@ timestamp --help
 ## Summary of Changes
 
 ### Backend Changes
+
 1. **Added `--help` option handling** in `execute` method
 2. **Created `showCommandHelp` method** to display command-specific help
 3. **Fixed base64 command** by removing unnecessary option filtering
 
 ### Files Modified
+
 - `packages/backend/src/services/ConsoleService.ts`
   - Added `showCommandHelp` method (lines 211-233)
   - Modified `execute` method to handle `--help` (lines 237-242)
@@ -294,21 +308,25 @@ Usage:
 ### For Developers
 
 **No Breaking Changes:**
+
 - All existing commands work as before
 - `--help` is a new feature, doesn't affect existing functionality
 - base64 fix is transparent to users
 
 **New Feature:**
+
 - All builder-pattern commands now support `--help`
 - Developers should use builder pattern for new commands
 
 ### For Users
 
 **New Feature Available:**
+
 - Run any command with `--help` to see detailed help
 - Example: `encrypt --help`, `api-key --help`
 
 **Fixed:**
+
 - `base64 --encode` now works correctly
 - No more "Usage" errors when providing valid arguments
 
@@ -330,4 +348,3 @@ These changes significantly improve the console's usability and make it more use
 3. **Consider migrating legacy commands** to builder pattern
 4. **Add examples section** to help output
 5. **Update user documentation** with `--help` feature
-

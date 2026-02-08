@@ -12,7 +12,7 @@ services:
       MYSQL_USER: ${DB_USER:-gatrix_user}
       MYSQL_PASSWORD: ${DB_PASSWORD:-gatrix_password}
     ports:
-      - "${MYSQL_HOST_PORT:-43306}:3306"
+      - '${MYSQL_HOST_PORT:-43306}:3306'
     volumes:
       - ${DATA_ROOT:-./data}/mysql:/var/lib/mysql
       - ./docker/mysql/init:/docker-entrypoint-initdb.d
@@ -20,7 +20,11 @@ services:
     networks:
       - gatrix-network
     healthcheck:
-      test: [ "CMD-SHELL", "mysqladmin ping -h localhost -u root -p${DB_ROOT_PASSWORD:-gatrix_rootpassword} && mysql -u root -p${DB_ROOT_PASSWORD:-gatrix_rootpassword} -e 'SELECT 1' >/dev/null 2>&1" ]
+      test:
+        [
+          'CMD-SHELL',
+          "mysqladmin ping -h localhost -u root -p${DB_ROOT_PASSWORD:-gatrix_rootpassword} && mysql -u root -p${DB_ROOT_PASSWORD:-gatrix_rootpassword} -e 'SELECT 1' >/dev/null 2>&1",
+        ]
       timeout: 20s
       retries: 10
       interval: 10s
@@ -33,14 +37,14 @@ services:
     restart: unless-stopped
     command: redis-server /usr/local/etc/redis/redis.conf --appendonly yes
     ports:
-      - "${REDIS_HOST_PORT:-46379}:6379"
+      - '${REDIS_HOST_PORT:-46379}:6379'
     volumes:
       - ${DATA_ROOT:-./data}/redis:/data
       - ./docker/redis/redis.conf:/usr/local/etc/redis/redis.conf
     networks:
       - gatrix-network
     healthcheck:
-      test: [ "CMD", "redis-cli", "ping" ]
+      test: ['CMD', 'redis-cli', 'ping']
       timeout: 10s
       retries: 5
       interval: 30s
@@ -54,17 +58,17 @@ services:
     environment:
       MYSQLD_EXPORTER_PASSWORD: ${DB_ROOT_PASSWORD:-gatrix_rootpassword}
     command:
-      - "--mysqld.username=root"
-      - "--mysqld.address=mysql:3306"
+      - '--mysqld.username=root'
+      - '--mysqld.address=mysql:3306'
     ports:
-      - "49104:9104"
+      - '49104:9104'
     depends_on:
       mysql:
         condition: service_healthy
     networks:
       - gatrix-network
     healthcheck:
-      test: [ "CMD", "wget", "--spider", "-q", "http://127.0.0.1:9104/metrics" ]
+      test: ['CMD', 'wget', '--spider', '-q', 'http://127.0.0.1:9104/metrics']
       timeout: 10s
       retries: 3
       interval: 30s
@@ -76,9 +80,9 @@ services:
     container_name: gatrix-redis-exporter
     restart: unless-stopped
     environment:
-      REDIS_ADDR: "redis:6379"
+      REDIS_ADDR: 'redis:6379'
     ports:
-      - "49121:9121"
+      - '49121:9121'
     networks:
       - gatrix-network
 
@@ -89,10 +93,10 @@ services:
       dockerfile: packages/backend/Dockerfile
     container_name: gatrix-backend
     restart: unless-stopped
-    user: "0" # Run as root to avoid volume permission issues
+    user: '0' # Run as root to avoid volume permission issues
     environment:
       NODE_ENV: ${NODE_ENV:-production}
-      RUNNING_IN_DOCKER: "true"
+      RUNNING_IN_DOCKER: 'true'
       LOG_FORMAT: json
       LOG_SERVICE_NAME: gatrix-backend
       PORT: 5000
@@ -110,7 +114,7 @@ services:
       ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@gatrix.com}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin123}
       ADMIN_NAME: ${ADMIN_NAME:-Administrator}
-      CORS_ORIGIN: "*"
+      CORS_ORIGIN: '*'
       DISABLE_X_POWERED_BY: true
       DEFAULT_LANGUAGE: ${DEFAULT_LANGUAGE:-ko}
       DISABLE_RATE_LIMIT: true
@@ -127,7 +131,7 @@ services:
       SERVICE_DISCOVERY_TERMINATED_MARKER_TTL: ${SERVICE_DISCOVERY_TERMINATED_MARKER_TTL:-300}
       ETCD_HOSTS: ${ETCD_HOSTS:-http://etcd:2379}
     ports:
-      - "${BACKEND_PORT:-45000}:5000"
+      - '${BACKEND_PORT:-45000}:5000'
     depends_on:
       mysql:
         condition: service_healthy
@@ -139,7 +143,13 @@ services:
       - ${DATA_ROOT:-./data}/backend/logs:/app/logs
       - ${DATA_ROOT:-./data}/backend/data:/app/data
     healthcheck:
-      test: [ "CMD", "node", "-e", "require('http').get('http://127.0.0.1:5000/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })" ]
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "require('http').get('http://127.0.0.1:5000/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })",
+        ]
       timeout: 10s
       retries: 10
       interval: 30s
@@ -153,16 +163,20 @@ services:
     image: clickhouse/clickhouse-server:24.12.2.29
     container_name: gatrix-clickhouse
     restart: unless-stopped
-    user: "0" # Run as root to avoid volume permission issues
+    user: '0' # Run as root to avoid volume permission issues
     ports:
-      - "${CLICKHOUSE_HTTP_PORT:-48123}:8123"
-      - "${CLICKHOUSE_NATIVE_PORT:-49000}:9000"
+      - '${CLICKHOUSE_HTTP_PORT:-48123}:8123'
+      - '${CLICKHOUSE_NATIVE_PORT:-49000}:9000'
     volumes:
       - clickhouse-data:/var/lib/clickhouse
     networks:
       - gatrix-network
     healthcheck:
-      test: [ "CMD-SHELL", "wget --spider -q http://127.0.0.1:8123/ping && wget -q -O- 'http://127.0.0.1:8123/?query=SELECT%201' | grep -q '^1$'" ]
+      test:
+        [
+          'CMD-SHELL',
+          "wget --spider -q http://127.0.0.1:8123/ping && wget -q -O- 'http://127.0.0.1:8123/?query=SELECT%201' | grep -q '^1$'",
+        ]
       interval: 10s
       timeout: 10s
       retries: 10
@@ -175,7 +189,7 @@ services:
       dockerfile: packages/event-lens/Dockerfile
     container_name: gatrix-event-lens
     restart: unless-stopped
-    user: "0" # Run as root to avoid volume permission issues
+    user: '0' # Run as root to avoid volume permission issues
     environment:
       NODE_ENV: ${NODE_ENV:-production}
       LOG_FORMAT: json
@@ -201,7 +215,7 @@ services:
       API_TOKEN: ${API_TOKEN:-gatrix-unsecured-server-api-token}
 
     ports:
-      - "${EVENT_LENS_PORT:-45200}:5200"
+      - '${EVENT_LENS_PORT:-45200}:5200'
     depends_on:
       mysql:
         condition: service_healthy
@@ -216,7 +230,13 @@ services:
     volumes:
       - ${DATA_ROOT:-./data}/event-lens/logs:/app/logs
     healthcheck:
-      test: [ "CMD", "node", "-e", "require('http').get('http://127.0.0.1:5200/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })" ]
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "require('http').get('http://127.0.0.1:5200/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })",
+        ]
       timeout: 10s
       retries: 10
       interval: 30s
@@ -229,8 +249,8 @@ services:
       dockerfile: packages/event-lens/Dockerfile
     container_name: gatrix-event-lens-worker
     restart: unless-stopped
-    user: "0" # Run as root to avoid volume permission issues
-    command: [ "node", "packages/event-lens/dist/worker.js" ]
+    user: '0' # Run as root to avoid volume permission issues
+    command: ['node', 'packages/event-lens/dist/worker.js']
     environment:
       NODE_ENV: ${NODE_ENV:-production}
       LOG_FORMAT: json
@@ -273,7 +293,7 @@ services:
       dockerfile: packages/chat-server/Dockerfile
     container_name: gatrix-chat-server
     restart: unless-stopped
-    user: "0" # Run as root to avoid volume permission issues
+    user: '0' # Run as root to avoid volume permission issues
     environment:
       NODE_ENV: ${NODE_ENV:-production}
       LOG_FORMAT: json
@@ -296,7 +316,7 @@ services:
       JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-key-change-this-in-production}
       JWT_EXPIRES_IN: 24h
       # CORS
-      CORS_ORIGIN: "*"
+      CORS_ORIGIN: '*'
       # Clustering
       CLUSTER_ENABLED: ${CHAT_CLUSTER_ENABLED:-true}
       CLUSTER_WORKERS: ${CHAT_CLUSTER_WORKERS:-0}
@@ -321,7 +341,7 @@ services:
       # Logging
       LOG_LEVEL: ${CHAT_LOG_LEVEL:-info}
     ports:
-      - "${CHAT_PORT:-45100}:5100"
+      - '${CHAT_PORT:-45100}:5100'
     depends_on:
       mysql:
         condition: service_healthy
@@ -335,7 +355,13 @@ services:
       - ${DATA_ROOT:-./data}/chat-server/uploads:/app/uploads
       - ${DATA_ROOT:-./data}/chat-server/logs:/app/logs
     healthcheck:
-      test: [ "CMD", "node", "-e", "require('http').get('http://127.0.0.1:5100/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) }).on('error', () => process.exit(1))" ]
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "require('http').get('http://127.0.0.1:5100/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) }).on('error', () => process.exit(1))",
+        ]
       timeout: 10s
       retries: 10
       interval: 10s
@@ -346,9 +372,9 @@ services:
     image: grafana/loki:latest
     container_name: gatrix-loki
     restart: unless-stopped
-    user: "0"
+    user: '0'
     ports:
-      - "${LOKI_PORT:-43100}:3100"
+      - '${LOKI_PORT:-43100}:3100'
     command: -config.file=/etc/loki/local-config.yaml
     volumes:
       - ./docker/loki/local-config.yaml:/etc/loki/local-config.yaml:ro
@@ -356,7 +382,7 @@ services:
     networks:
       - gatrix-network
     healthcheck:
-      test: [ "CMD-SHELL", "wget --spider -q http://127.0.0.1:3100/ready || exit 1" ]
+      test: ['CMD-SHELL', 'wget --spider -q http://127.0.0.1:3100/ready || exit 1']
       interval: 30s
       timeout: 10s
       retries: 5
@@ -381,18 +407,18 @@ services:
     image: prom/prometheus:latest
     container_name: gatrix-prometheus
     restart: unless-stopped
-    user: "0" # Run as root to avoid volume permission issues
+    user: '0' # Run as root to avoid volume permission issues
     environment:
       NODE_ENV: ${NODE_ENV:-production}
       PROM_SCRAPE_INTERVAL: ${PROM_SCRAPE_INTERVAL:-15s}
       PROM_RETENTION_TIME: ${PROM_RETENTION_TIME:-14d}
     ports:
-      - "${PROMETHEUS_PORT:-49090}:9090"
+      - '${PROMETHEUS_PORT:-49090}:9090'
     volumes:
       - ./docker/prometheus/prometheus.base.yml:/etc/prometheus/prometheus.base.yml:ro
       - ./docker/prometheus/entrypoint.sh:/docker/prometheus/entrypoint.sh:ro
       - ${DATA_ROOT:-./data}/prometheus:/prometheus
-    entrypoint: [ "/bin/sh", "/docker/prometheus/entrypoint.sh" ]
+    entrypoint: ['/bin/sh', '/docker/prometheus/entrypoint.sh']
     depends_on:
       backend:
         condition: service_healthy
@@ -407,32 +433,32 @@ services:
     networks:
       - gatrix-network
     extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - 'host.docker.internal:host-gateway'
 
   # Grafana - Dashboards
   grafana:
     image: grafana/grafana:latest
     container_name: gatrix-grafana
     restart: unless-stopped
-    user: "0" # Run as root to avoid volume permission issues
+    user: '0' # Run as root to avoid volume permission issues
     environment:
       GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
-      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_USERS_ALLOW_SIGN_UP: 'false'
       GF_SERVER_ROOT_URL: ${GRAFANA_ROOT_URL:-http://localhost:${FRONTEND_PORT:-53000}/grafana/}
-      GF_SERVER_SERVE_FROM_SUB_PATH: "true"
+      GF_SERVER_SERVE_FROM_SUB_PATH: 'true'
       GF_SERVER_DOMAIN: ${GRAFANA_DOMAIN:-localhost}
-      GF_AUTH_ANONYMOUS_ENABLED: "false"
+      GF_AUTH_ANONYMOUS_ENABLED: 'false'
       # GF_AUTH_ANONYMOUS_ORG_ROLE: "Admin"
       # Allow embedding and relax CSRF
-      GF_SECURITY_ALLOW_EMBEDDING: "true"
-      GF_SECURITY_CSRF_ALWAYS_CHECK: "false"
+      GF_SECURITY_ALLOW_EMBEDDING: 'true'
+      GF_SECURITY_CSRF_ALWAYS_CHECK: 'false'
       GF_SECURITY_CSRF_TRUSTED_ORIGINS: ${GRAFANA_TRUSTED_ORIGINS:-http://localhost:53000,http://localhost:54000,http://127.0.0.1:53000,http://127.0.0.1:54000}
-      GF_SECURITY_COOKIE_SAMESITE: "disabled"
+      GF_SECURITY_COOKIE_SAMESITE: 'disabled'
       # Allow Live WebSockets from any origin
       GF_LIVE_ALLOWED_ORIGINS: ${GRAFANA_ALLOWED_ORIGINS:-*}
     ports:
-      - "${GRAFANA_PORT:-44000}:3000"
+      - '${GRAFANA_PORT:-44000}:3000'
     volumes:
       - ${DATA_ROOT:-./data}/grafana:/var/lib/grafana
       - ./docker/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
@@ -460,7 +486,7 @@ services:
       VITE_EDGE_URL: ${VITE_EDGE_URL:-http://localhost:3400}
 
     ports:
-      - "${FRONTEND_PORT:-43000}:80"
+      - '${FRONTEND_PORT:-43000}:80'
     depends_on:
       backend:
         condition: service_healthy
@@ -469,7 +495,7 @@ services:
     volumes:
       - ./docker/nginx/ssl:/etc/nginx/ssl:ro
     healthcheck:
-      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:80/health" ]
+      test: ['CMD', 'wget', '--no-verbose', '--tries=1', '--spider', 'http://127.0.0.1:80/health']
       timeout: 10s
       retries: 5
       interval: 30s
@@ -482,7 +508,7 @@ services:
       dockerfile: packages/edge/Dockerfile
     container_name: gatrix-edge
     restart: unless-stopped
-    user: "0" # Run as root to avoid volume permission issues
+    user: '0' # Run as root to avoid volume permission issues
     environment:
       NODE_ENV: ${NODE_ENV:-production}
       LOG_LEVEL: ${EDGE_LOG_LEVEL:-info}
@@ -508,7 +534,7 @@ services:
       GATRIX_LOKI_ENABLED: ${GATRIX_LOKI_ENABLED:-true}
       GATRIX_LOKI_URL: ${GATRIX_LOKI_URL:-http://loki:3100/loki/api/v1/push}
     ports:
-      - "${EDGE_PORT:-3400}:3400"
+      - '${EDGE_PORT:-3400}:3400'
       # Note: Metrics port (9400) is NOT exposed externally for security
     depends_on:
       backend:
@@ -522,7 +548,13 @@ services:
     volumes:
       - ${DATA_ROOT:-./data}/edge/logs:/app/logs
     healthcheck:
-      test: [ "CMD", "node", "-e", "require('http').get('http://127.0.0.1:3400/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })" ]
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "require('http').get('http://127.0.0.1:3400/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })",
+        ]
       timeout: 10s
       retries: 10
       interval: 30s
@@ -534,7 +566,7 @@ services:
     image: quay.io/coreos/etcd:v3.5.12
     container_name: gatrix-etcd
     restart: unless-stopped
-    user: "0" # Run as root to avoid volume permission issues
+    user: '0' # Run as root to avoid volume permission issues
     command:
       - /usr/local/bin/etcd
       - --name=etcd0
@@ -553,14 +585,14 @@ services:
       - --quota-backend-bytes=4294967296
       - --snapshot-count=50000
     ports:
-      - "${ETCD_PORT:-42379}:2379"
-      - "42380:2380"
+      - '${ETCD_PORT:-42379}:2379'
+      - '42380:2380'
     volumes:
       - gatrix_etcd_data:/etcd-data
     networks:
       - gatrix-network
     healthcheck:
-      test: [ "CMD", "etcdctl", "endpoint", "health" ]
+      test: ['CMD', 'etcdctl', 'endpoint', 'health']
       interval: 30s
       timeout: 10s
       retries: 3

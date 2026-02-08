@@ -1,4 +1,4 @@
-exports.up = async function(knex) {
+exports.up = async function (knex) {
   const tableName = 'chat_channel_members';
   const hasTable = await knex.schema.hasTable(tableName);
   if (!hasTable) return;
@@ -31,7 +31,7 @@ exports.up = async function(knex) {
   });
 };
 
-exports.down = async function(knex) {
+exports.down = async function (knex) {
   const tableName = 'chat_channel_members';
   const hasTable = await knex.schema.hasTable(tableName);
   if (!hasTable) return;
@@ -43,4 +43,3 @@ exports.down = async function(knex) {
     table.dropColumn('status');
   });
 };
-

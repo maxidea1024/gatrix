@@ -7,10 +7,7 @@ module.exports = {
     tsconfigRootDir: __dirname,
   },
   plugins: ['@typescript-eslint'],
-  extends: [
-    'eslint:recommended',
-    'plugin:@typescript-eslint/recommended',
-  ],
+  extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended'],
   rules: {
     '@typescript-eslint/no-explicit-any': 'warn',
     '@typescript-eslint/explicit-function-return-type': 'off',
@@ -24,4 +21,3 @@ module.exports = {
     jest: true,
   },
 };
-

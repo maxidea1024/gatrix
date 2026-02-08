@@ -4,20 +4,12 @@
       "id": "key",
       "groupId": "number",
       "rate": "number",
-      "highEndPassiveGroupId": [
-        "number",
-        "number",
-        "number"
-      ]
+      "highEndPassiveGroupId": ["number", "number", "number"]
     },
     ":required": {
       "groupId": 1,
       "rate": 1,
-      "highEndPassiveGroupId": [
-        1,
-        1,
-        1
-      ]
+      "highEndPassiveGroupId": [1, 1, 1]
     },
     ":min": {
       "rate": 0
@@ -28,15 +20,9 @@
     ":enum": {},
     ":links": {
       "highEndPassiveGroupId": [
-        [
-          "HighEndPassiveGroup"
-        ],
-        [
-          "HighEndPassiveGroup"
-        ],
-        [
-          "HighEndPassiveGroup"
-        ]
+        ["HighEndPassiveGroup"],
+        ["HighEndPassiveGroup"],
+        ["HighEndPassiveGroup"]
       ]
     }
   },
@@ -45,271 +31,163 @@
       "id": 100170000,
       "groupId": 100170000,
       "rate": 10,
-      "highEndPassiveGroupId": [
-        100180000,
-        100180018,
-        100180036
-      ]
+      "highEndPassiveGroupId": [100180000, 100180018, 100180036]
     },
     "100170001": {
       "id": 100170001,
       "groupId": 100170000,
       "rate": 25,
-      "highEndPassiveGroupId": [
-        100180000,
-        100180018,
-        100180169
-      ]
+      "highEndPassiveGroupId": [100180000, 100180018, 100180169]
     },
     "100170002": {
       "id": 100170002,
       "groupId": 100170000,
       "rate": 25,
-      "highEndPassiveGroupId": [
-        100180000,
-        100180018,
-        100180275
-      ]
+      "highEndPassiveGroupId": [100180000, 100180018, 100180275]
     },
     "100170003": {
       "id": 100170003,
       "groupId": 100170000,
       "rate": 15,
-      "highEndPassiveGroupId": [
-        100180000,
-        100180111,
-        100180036
-      ]
+      "highEndPassiveGroupId": [100180000, 100180111, 100180036]
     },
     "100170004": {
       "id": 100170004,
       "groupId": 100170000,
       "rate": 25,
-      "highEndPassiveGroupId": [
-        100180000,
-        100180111,
-        100180169
-      ]
+      "highEndPassiveGroupId": [100180000, 100180111, 100180169]
     },
     "100170005": {
       "id": 100170005,
       "groupId": 100170000,
       "rate": 25,
-      "highEndPassiveGroupId": [
-        100180000,
-        100180111,
-        100180275
-      ]
+      "highEndPassiveGroupId": [100180000, 100180111, 100180275]
     },
     "100170006": {
       "id": 100170006,
       "groupId": 100170000,
       "rate": 15,
-      "highEndPassiveGroupId": [
-        100180000,
-        100180251,
-        100180036
-      ]
+      "highEndPassiveGroupId": [100180000, 100180251, 100180036]
     },
     "100170007": {
       "id": 100170007,
       "groupId": 100170000,
       "rate": 25,
-      "highEndPassiveGroupId": [
-        100180000,
-        100180251,
-        100180169
-      ]
+      "highEndPassiveGroupId": [100180000, 100180251, 100180169]
     },
     "100170008": {
       "id": 100170008,
       "groupId": 100170000,
       "rate": 25,
-      "highEndPassiveGroupId": [
-        100180000,
-        100180251,
-        100180275
-      ]
+      "highEndPassiveGroupId": [100180000, 100180251, 100180275]
     },
     "100170009": {
       "id": 100170009,
       "groupId": 100170000,
       "rate": 35,
-      "highEndPassiveGroupId": [
-        100180053,
-        100180018,
-        100180036
-      ]
+      "highEndPassiveGroupId": [100180053, 100180018, 100180036]
     },
     "100170010": {
       "id": 100170010,
       "groupId": 100170000,
       "rate": 35,
-      "highEndPassiveGroupId": [
-        100180053,
-        100180018,
-        100180169
-      ]
+      "highEndPassiveGroupId": [100180053, 100180018, 100180169]
     },
     "100170011": {
       "id": 100170011,
       "groupId": 100170000,
       "rate": 35,
-      "highEndPassiveGroupId": [
-        100180053,
-        100180018,
-        100180275
-      ]
+      "highEndPassiveGroupId": [100180053, 100180018, 100180275]
     },
     "100170012": {
       "id": 100170012,
       "groupId": 100170000,
       "rate": 50,
-      "highEndPassiveGroupId": [
-        100180053,
-        100180111,
-        100180036
-      ]
+      "highEndPassiveGroupId": [100180053, 100180111, 100180036]
     },
     "100170013": {
       "id": 100170013,
       "groupId": 100170000,
       "rate": 50,
-      "highEndPassiveGroupId": [
-        100180053,
-        100180111,
-        100180169
-      ]
+      "highEndPassiveGroupId": [100180053, 100180111, 100180169]
     },
     "100170014": {
       "id": 100170014,
       "groupId": 100170000,
       "rate": 50,
-      "highEndPassiveGroupId": [
-        100180053,
-        100180111,
-        100180275
-      ]
+      "highEndPassiveGroupId": [100180053, 100180111, 100180275]
     },
     "100170015": {
       "id": 100170015,
       "groupId": 100170000,
       "rate": 50,
-      "highEndPassiveGroupId": [
-        100180053,
-        100180251,
-        100180036
-      ]
+      "highEndPassiveGroupId": [100180053, 100180251, 100180036]
     },
     "100170016": {
       "id": 100170016,
       "groupId": 100170000,
       "rate": 50,
-      "highEndPassiveGroupId": [
-        100180053,
-        100180251,
-        100180169
-      ]
+      "highEndPassiveGroupId": [100180053, 100180251, 100180169]
     },
     "100170017": {
       "id": 100170017,
       "groupId": 100170000,
       "rate": 50,
-      "highEndPassiveGroupId": [
-        100180053,
-        100180251,
-        100180275
-      ]
+      "highEndPassiveGroupId": [100180053, 100180251, 100180275]
     },
     "100170018": {
       "id": 100170018,
       "groupId": 100170000,
       "rate": 35,
-      "highEndPassiveGroupId": [
-        100180227,
-        100180018,
-        100180036
-      ]
+      "highEndPassiveGroupId": [100180227, 100180018, 100180036]
     },
     "100170019": {
       "id": 100170019,
       "groupId": 100170000,
       "rate": 35,
-      "highEndPassiveGroupId": [
-        100180227,
-        100180018,
-        100180169
-      ]
+      "highEndPassiveGroupId": [100180227, 100180018, 100180169]
     },
     "100170020": {
       "id": 100170020,
       "groupId": 100170000,
       "rate": 35,
-      "highEndPassiveGroupId": [
-        100180227,
-        100180018,
-        100180275
-      ]
+      "highEndPassiveGroupId": [100180227, 100180018, 100180275]
     },
     "100170021": {
       "id": 100170021,
       "groupId": 100170000,
       "rate": 50,
-      "highEndPassiveGroupId": [
-        100180227,
-        100180111,
-        100180036
-      ]
+      "highEndPassiveGroupId": [100180227, 100180111, 100180036]
     },
     "100170022": {
       "id": 100170022,
       "groupId": 100170000,
       "rate": 50,
-      "highEndPassiveGroupId": [
-        100180227,
-        100180111,
-        100180169
-      ]
+      "highEndPassiveGroupId": [100180227, 100180111, 100180169]
     },
     "100170023": {
       "id": 100170023,
       "groupId": 100170000,
       "rate": 50,
-      "highEndPassiveGroupId": [
-        100180227,
-        100180111,
-        100180275
-      ]
+      "highEndPassiveGroupId": [100180227, 100180111, 100180275]
     },
     "100170024": {
       "id": 100170024,
       "groupId": 100170000,
       "rate": 50,
-      "highEndPassiveGroupId": [
-        100180227,
-        100180251,
-        100180036
-      ]
+      "highEndPassiveGroupId": [100180227, 100180251, 100180036]
     },
     "100170025": {
       "id": 100170025,
       "groupId": 100170000,
       "rate": 50,
-      "highEndPassiveGroupId": [
-        100180227,
-        100180251,
-        100180169
-      ]
+      "highEndPassiveGroupId": [100180227, 100180251, 100180169]
     },
     "100170026": {
       "id": 100170026,
       "groupId": 100170000,
       "rate": 50,
-      "highEndPassiveGroupId": [
-        100180227,
-        100180251,
-        100180275
-      ]
+      "highEndPassiveGroupId": [100180227, 100180251, 100180275]
     }
   }
 }

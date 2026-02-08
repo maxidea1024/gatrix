@@ -14,6 +14,5 @@ module.exports = {
   async down(connection) {
     console.log('Skipping rollback: no changes were made in this migration');
     // No-op: nothing to rollback
-  }
+  },
 };
-

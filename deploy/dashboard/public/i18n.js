@@ -188,7 +188,7 @@ const translations = {
     updatingTo: '正在更新到 {version}...',
     rollingBackTo: '正在回滚到 {version}...',
     scalingTo: '正在扩展到 {replicas} 个副本...',
-  }
+  },
 };
 
 let currentLang = localStorage.getItem('lang') || 'en';
@@ -212,7 +212,7 @@ function changeLang(lang) {
 }
 
 function updateI18n() {
-  document.querySelectorAll('[data-i18n]').forEach(el => {
+  document.querySelectorAll('[data-i18n]').forEach((el) => {
     el.textContent = t(el.dataset.i18n);
   });
   const langSelect = document.getElementById('langSelect');
@@ -223,4 +223,3 @@ function updateI18n() {
 document.addEventListener('DOMContentLoaded', () => {
   updateI18n();
 });
-

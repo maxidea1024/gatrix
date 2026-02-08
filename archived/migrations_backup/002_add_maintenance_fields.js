@@ -1,5 +1,4 @@
-
-exports.up = async function(connection) {
+exports.up = async function (connection) {
   console.log('Running migration: Add maintenance fields to game worlds and client versions...');
 
   try {
@@ -15,19 +14,27 @@ exports.up = async function(connection) {
       AND COLUMN_NAME IN ('maintenanceStartDate', 'maintenanceEndDate', 'maintenanceMessage', 'supportsMultiLanguage')
     `);
 
-    const existingColumns = gameWorldColumns[0].map(row => row.COLUMN_NAME);
+    const existingColumns = gameWorldColumns[0].map((row) => row.COLUMN_NAME);
 
     if (!existingColumns.includes('maintenanceStartDate')) {
-      await connection.execute(`ALTER TABLE g_game_worlds ADD COLUMN maintenanceStartDate DATETIME NULL COMMENT '점검 시작일시'`);
+      await connection.execute(
+        `ALTER TABLE g_game_worlds ADD COLUMN maintenanceStartDate DATETIME NULL COMMENT '점검 시작일시'`
+      );
     }
     if (!existingColumns.includes('maintenanceEndDate')) {
-      await connection.execute(`ALTER TABLE g_game_worlds ADD COLUMN maintenanceEndDate DATETIME NULL COMMENT '점검 종료일시'`);
+      await connection.execute(
+        `ALTER TABLE g_game_worlds ADD COLUMN maintenanceEndDate DATETIME NULL COMMENT '점검 종료일시'`
+      );
     }
     if (!existingColumns.includes('maintenanceMessage')) {
-      await connection.execute(`ALTER TABLE g_game_worlds ADD COLUMN maintenanceMessage TEXT NULL COMMENT '점검 메시지'`);
+      await connection.execute(
+        `ALTER TABLE g_game_worlds ADD COLUMN maintenanceMessage TEXT NULL COMMENT '점검 메시지'`
+      );
     }
     if (!existingColumns.includes('supportsMultiLanguage')) {
-      await connection.execute(`ALTER TABLE g_game_worlds ADD COLUMN supportsMultiLanguage BOOLEAN NOT NULL DEFAULT FALSE COMMENT '다국어 지원 여부'`);
+      await connection.execute(
+        `ALTER TABLE g_game_worlds ADD COLUMN supportsMultiLanguage BOOLEAN NOT NULL DEFAULT FALSE COMMENT '다국어 지원 여부'`
+      );
     }
     console.log('✓ Added maintenance fields to g_game_worlds');
 
@@ -62,19 +69,27 @@ exports.up = async function(connection) {
       AND COLUMN_NAME IN ('maintenanceStartDate', 'maintenanceEndDate', 'maintenanceMessage', 'supportsMultiLanguage')
     `);
 
-    const existingClientColumns = clientVersionColumns[0].map(row => row.COLUMN_NAME);
+    const existingClientColumns = clientVersionColumns[0].map((row) => row.COLUMN_NAME);
 
     if (!existingClientColumns.includes('maintenanceStartDate')) {
-      await connection.execute(`ALTER TABLE g_client_versions ADD COLUMN maintenanceStartDate DATETIME NULL COMMENT '점검 시작일시'`);
+      await connection.execute(
+        `ALTER TABLE g_client_versions ADD COLUMN maintenanceStartDate DATETIME NULL COMMENT '점검 시작일시'`
+      );
     }
     if (!existingClientColumns.includes('maintenanceEndDate')) {
-      await connection.execute(`ALTER TABLE g_client_versions ADD COLUMN maintenanceEndDate DATETIME NULL COMMENT '점검 종료일시'`);
+      await connection.execute(
+        `ALTER TABLE g_client_versions ADD COLUMN maintenanceEndDate DATETIME NULL COMMENT '점검 종료일시'`
+      );
     }
     if (!existingClientColumns.includes('maintenanceMessage')) {
-      await connection.execute(`ALTER TABLE g_client_versions ADD COLUMN maintenanceMessage TEXT NULL COMMENT '점검 메시지'`);
+      await connection.execute(
+        `ALTER TABLE g_client_versions ADD COLUMN maintenanceMessage TEXT NULL COMMENT '점검 메시지'`
+      );
     }
     if (!existingClientColumns.includes('supportsMultiLanguage')) {
-      await connection.execute(`ALTER TABLE g_client_versions ADD COLUMN supportsMultiLanguage BOOLEAN NOT NULL DEFAULT FALSE COMMENT '다국어 지원 여부'`);
+      await connection.execute(
+        `ALTER TABLE g_client_versions ADD COLUMN supportsMultiLanguage BOOLEAN NOT NULL DEFAULT FALSE COMMENT '다국어 지원 여부'`
+      );
     }
     console.log('✓ Added maintenance fields to g_client_versions');
 
@@ -98,21 +113,20 @@ exports.up = async function(connection) {
     console.log('✓ Created g_client_version_maintenance_locales table');
 
     console.log('✅ Migration completed successfully: Add maintenance fields');
-
   } catch (error) {
     console.error('❌ Migration failed:', error);
     throw error;
   }
 };
 
-exports.down = async function(connection) {
+exports.down = async function (connection) {
   console.log('Rolling back migration: Add maintenance fields...');
 
   try {
     // Drop maintenance locale tables
     await connection.execute('DROP TABLE IF EXISTS g_client_version_maintenance_locales');
     console.log('✓ Dropped g_client_version_maintenance_locales table');
-    
+
     await connection.execute('DROP TABLE IF EXISTS g_game_world_maintenance_locales');
     console.log('✓ Dropped g_game_world_maintenance_locales table');
 
@@ -137,7 +151,6 @@ exports.down = async function(connection) {
     console.log('✓ Removed maintenance fields from g_game_worlds');
 
     console.log('✅ Migration rollback completed successfully');
-
   } catch (error) {
     console.error('❌ Migration rollback failed:', error);
     throw error;

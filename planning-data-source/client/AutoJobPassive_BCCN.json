@@ -166,52 +166,24 @@
     ":links": {
       "passives": [
         {
-          "id": [
-            "BattlePassive",
-            "WorldPassive"
-          ],
-          "learnPointId": [
-            "Point"
-          ],
-          "learnItemId1": [
-            "Item"
-          ]
+          "id": ["BattlePassive", "WorldPassive"],
+          "learnPointId": ["Point"],
+          "learnItemId1": ["Item"]
         },
         {
-          "id": [
-            "BattlePassive",
-            "WorldPassive"
-          ],
-          "learnPointId": [
-            "Point"
-          ],
-          "learnItemId1": [
-            "Item"
-          ]
+          "id": ["BattlePassive", "WorldPassive"],
+          "learnPointId": ["Point"],
+          "learnItemId1": ["Item"]
         },
         {
-          "id": [
-            "BattlePassive",
-            "WorldPassive"
-          ],
-          "learnPointId": [
-            "Point"
-          ],
-          "learnItemId1": [
-            "Item"
-          ]
+          "id": ["BattlePassive", "WorldPassive"],
+          "learnPointId": ["Point"],
+          "learnItemId1": ["Item"]
         },
         {
-          "id": [
-            "BattlePassive",
-            "WorldPassive"
-          ],
-          "learnPointId": [
-            "Point"
-          ],
-          "learnItemId1": [
-            "Item"
-          ]
+          "id": ["BattlePassive", "WorldPassive"],
+          "learnPointId": ["Point"],
+          "learnItemId1": ["Item"]
         }
       ]
     }

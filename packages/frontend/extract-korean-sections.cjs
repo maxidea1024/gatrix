@@ -24,24 +24,24 @@ let gameWorldsEnd = -1;
 
 for (let i = gameWorldsStart + '"gameWorlds": {'.length - 1; i < koText.length; i++) {
   const char = koText[i];
-  
+
   if (escape) {
     escape = false;
     continue;
   }
-  
+
   if (char === '\\') {
     escape = true;
     continue;
   }
-  
+
   if (char === '"') {
     inString = !inString;
     continue;
   }
-  
+
   if (inString) continue;
-  
+
   if (char === '{') {
     depth++;
   } else if (char === '}') {
@@ -77,4 +77,3 @@ try {
 } catch (e) {
   console.log('⚠️  Could not parse as standalone JSON (this is expected if nested)');
 }
-

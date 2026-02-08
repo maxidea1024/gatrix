@@ -77,7 +77,12 @@ async function main() {
   // Each cell can be { text: string, display?: string } where display contains ANSI codes
   type Cell = string | { text: string; display: string };
   const COL_GAP = '    '; // 4 spaces between columns
-  function renderTable(headers: string[], rows: Cell[][], indent = '  ', minWidths: number[] = []): string {
+  function renderTable(
+    headers: string[],
+    rows: Cell[][],
+    indent = '  ',
+    minWidths: number[] = []
+  ): string {
     // Calculate max width for each column
     const colWidths = headers.map((h, i) => {
       const cellTexts = rows.map((row) => {
@@ -90,7 +95,8 @@ async function main() {
 
     let out = '';
     // Header
-    out += indent + DIM + headers.map((h, i) => h.padEnd(colWidths[i])).join(COL_GAP) + RESET + '\n';
+    out +=
+      indent + DIM + headers.map((h, i) => h.padEnd(colWidths[i])).join(COL_GAP) + RESET + '\n';
     out +=
       indent +
       DIM +
@@ -165,7 +171,8 @@ async function main() {
     };
 
     // Check if still initializing (no flags fetched yet)
-    const isInitializing = stats.totalFlagCount === 0 && stats.sdkState !== 'healthy' && stats.sdkState !== 'ready';
+    const isInitializing =
+      stats.totalFlagCount === 0 && stats.sdkState !== 'healthy' && stats.sdkState !== 'ready';
 
     if (isInitializing) {
       // Simplified initializing view
@@ -336,7 +343,7 @@ async function main() {
 
     setInterval(() => render(), 1000);
 
-    await new Promise(() => { });
+    await new Promise(() => {});
   } catch (error: any) {
     process.stdout.write(SHOW_CURSOR);
     console.error('Error:', error.message);

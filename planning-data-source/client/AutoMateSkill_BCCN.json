@@ -18,10 +18,7 @@
         }
       ],
       "clearQuestId": "number",
-      "addSkillsId": [
-        "number",
-        "number"
-      ]
+      "addSkillsId": ["number", "number"]
     },
     ":required": {
       "name": 1
@@ -54,10 +51,7 @@
         }
       ],
       "clearQuestId": 82000000,
-      "addSkillsId": [
-        1,
-        1
-      ]
+      "addSkillsId": [1, 1]
     },
     ":max": {
       "skills": [
@@ -71,39 +65,22 @@
         }
       ],
       "clearQuestId": 82999999,
-      "addSkillsId": [
-        99999999,
-        99999999
-      ]
+      "addSkillsId": [99999999, 99999999]
     },
     ":enum": {},
     ":links": {
       "skills": [
         {
-          "id": [
-            "BattleSkill",
-            "WorldSkill"
-          ]
+          "id": ["BattleSkill", "WorldSkill"]
         },
         {
-          "id": [
-            "BattleSkill",
-            "WorldSkill"
-          ]
+          "id": ["BattleSkill", "WorldSkill"]
         }
       ],
-      "clearQuestId": [
-        "Quest"
-      ],
+      "clearQuestId": ["Quest"],
       "addSkillsId": [
-        [
-          "BattleSkill",
-          "WorldSkill"
-        ],
-        [
-          "BattleSkill",
-          "WorldSkill"
-        ]
+        ["BattleSkill", "WorldSkill"],
+        ["BattleSkill", "WorldSkill"]
       ]
     }
   },
@@ -570,9 +547,7 @@
         }
       ],
       "clearQuestId": 82001009,
-      "addSkillsId": [
-        65417566
-      ]
+      "addSkillsId": [65417566]
     },
     "65010024": {
       "id": 65010024,
@@ -646,9 +621,7 @@
         }
       ],
       "clearQuestId": 82001003,
-      "addSkillsId": [
-        65417716
-      ]
+      "addSkillsId": [65417716]
     },
     "65010028": {
       "id": 65010028,
@@ -812,9 +785,7 @@
         }
       ],
       "clearQuestId": 82001004,
-      "addSkillsId": [
-        65417691
-      ]
+      "addSkillsId": [65417691]
     },
     "65010037": {
       "id": 65010037,
@@ -906,9 +877,7 @@
         }
       ],
       "clearQuestId": 82001008,
-      "addSkillsId": [
-        65417701
-      ]
+      "addSkillsId": [65417701]
     },
     "65010042": {
       "id": 65010042,
@@ -1090,9 +1059,7 @@
         }
       ],
       "clearQuestId": 82001005,
-      "addSkillsId": [
-        65417496
-      ]
+      "addSkillsId": [65417496]
     },
     "65010052": {
       "id": 65010052,
@@ -1202,9 +1169,7 @@
         }
       ],
       "clearQuestId": 82001002,
-      "addSkillsId": [
-        65417561
-      ]
+      "addSkillsId": [65417561]
     },
     "65010058": {
       "id": 65010058,
@@ -1278,9 +1243,7 @@
         }
       ],
       "clearQuestId": 82001008,
-      "addSkillsId": [
-        65417561
-      ]
+      "addSkillsId": [65417561]
     },
     "65010062": {
       "id": 65010062,
@@ -1300,9 +1263,7 @@
         }
       ],
       "clearQuestId": 82001008,
-      "addSkillsId": [
-        65417646
-      ]
+      "addSkillsId": [65417646]
     },
     "65010063": {
       "id": 65010063,
@@ -1340,9 +1301,7 @@
         }
       ],
       "clearQuestId": 82001003,
-      "addSkillsId": [
-        65417646
-      ]
+      "addSkillsId": [65417646]
     },
     "65010065": {
       "id": 65010065,
@@ -1380,9 +1339,7 @@
         }
       ],
       "clearQuestId": 82001003,
-      "addSkillsId": [
-        65417691
-      ]
+      "addSkillsId": [65417691]
     },
     "65010067": {
       "id": 65010067,
@@ -1438,9 +1395,7 @@
         }
       ],
       "clearQuestId": 82001009,
-      "addSkillsId": [
-        65417566
-      ]
+      "addSkillsId": [65417566]
     },
     "65010070": {
       "id": 65010070,
@@ -1838,9 +1793,7 @@
         }
       ],
       "clearQuestId": 82001005,
-      "addSkillsId": [
-        65417561
-      ]
+      "addSkillsId": [65417561]
     },
     "65010092": {
       "id": 65010092,
@@ -1896,9 +1849,7 @@
         }
       ],
       "clearQuestId": 82001007,
-      "addSkillsId": [
-        65417681
-      ]
+      "addSkillsId": [65417681]
     },
     "65010095": {
       "id": 65010095,
@@ -1954,9 +1905,7 @@
         }
       ],
       "clearQuestId": 82001004,
-      "addSkillsId": [
-        65417601
-      ]
+      "addSkillsId": [65417601]
     },
     "65010098": {
       "id": 65010098,
@@ -2012,9 +1961,7 @@
         }
       ],
       "clearQuestId": 82001002,
-      "addSkillsId": [
-        65417601
-      ]
+      "addSkillsId": [65417601]
     },
     "65010101": {
       "id": 65010101,
@@ -2106,9 +2053,7 @@
         }
       ],
       "clearQuestId": 82001004,
-      "addSkillsId": [
-        65417691
-      ]
+      "addSkillsId": [65417691]
     },
     "65010106": {
       "id": 65010106,
@@ -2236,9 +2181,7 @@
         }
       ],
       "clearQuestId": 82001007,
-      "addSkillsId": [
-        65417581
-      ]
+      "addSkillsId": [65417581]
     },
     "65010113": {
       "id": 65010113,
@@ -2276,9 +2219,7 @@
         }
       ],
       "clearQuestId": 82001010,
-      "addSkillsId": [
-        65417591
-      ]
+      "addSkillsId": [65417591]
     },
     "65010115": {
       "id": 65010115,
@@ -2352,9 +2293,7 @@
         }
       ],
       "clearQuestId": 82001002,
-      "addSkillsId": [
-        65417711
-      ]
+      "addSkillsId": [65417711]
     },
     "65010119": {
       "id": 65010119,
@@ -2410,9 +2349,7 @@
         }
       ],
       "clearQuestId": 82001006,
-      "addSkillsId": [
-        65417651
-      ]
+      "addSkillsId": [65417651]
     },
     "65010122": {
       "id": 65010122,
@@ -2432,9 +2369,7 @@
         }
       ],
       "clearQuestId": 82001001,
-      "addSkillsId": [
-        65417581
-      ]
+      "addSkillsId": [65417581]
     },
     "65010123": {
       "id": 65010123,
@@ -2508,9 +2443,7 @@
         }
       ],
       "clearQuestId": 82001001,
-      "addSkillsId": [
-        65417571
-      ]
+      "addSkillsId": [65417571]
     },
     "65010127": {
       "id": 65010127,
@@ -2530,9 +2463,7 @@
         }
       ],
       "clearQuestId": 82001003,
-      "addSkillsId": [
-        65417591
-      ]
+      "addSkillsId": [65417591]
     },
     "65010128": {
       "id": 65010128,
@@ -2966,9 +2897,7 @@
         }
       ],
       "clearQuestId": 82001007,
-      "addSkillsId": [
-        65417576
-      ]
+      "addSkillsId": [65417576]
     },
     "65010152": {
       "id": 65010152,
@@ -3042,9 +2971,7 @@
         }
       ],
       "clearQuestId": 82001010,
-      "addSkillsId": [
-        65417491
-      ]
+      "addSkillsId": [65417491]
     },
     "65010156": {
       "id": 65010156,
@@ -3226,9 +3153,7 @@
         }
       ],
       "clearQuestId": 82001005,
-      "addSkillsId": [
-        65417521
-      ]
+      "addSkillsId": [65417521]
     },
     "65010166": {
       "id": 65010166,
@@ -3446,9 +3371,7 @@
         }
       ],
       "clearQuestId": 82001009,
-      "addSkillsId": [
-        65417506
-      ]
+      "addSkillsId": [65417506]
     },
     "65010178": {
       "id": 65010178,
@@ -3468,9 +3391,7 @@
         }
       ],
       "clearQuestId": 82001010,
-      "addSkillsId": [
-        65417696
-      ]
+      "addSkillsId": [65417696]
     },
     "65010179": {
       "id": 65010179,
@@ -3976,9 +3897,7 @@
         }
       ],
       "clearQuestId": 82001005,
-      "addSkillsId": [
-        65417486
-      ]
+      "addSkillsId": [65417486]
     },
     "65010207": {
       "id": 65010207,
@@ -4232,9 +4151,7 @@
         }
       ],
       "clearQuestId": 82001008,
-      "addSkillsId": [
-        65417511
-      ]
+      "addSkillsId": [65417511]
     },
     "65010221": {
       "id": 65010221,
@@ -4524,9 +4441,7 @@
         }
       ],
       "clearQuestId": 82001004,
-      "addSkillsId": [
-        65417716
-      ]
+      "addSkillsId": [65417716]
     },
     "65010237": {
       "id": 65010237,
@@ -4654,9 +4569,7 @@
         }
       ],
       "clearQuestId": 82001007,
-      "addSkillsId": [
-        65417586
-      ]
+      "addSkillsId": [65417586]
     },
     "65010244": {
       "id": 65010244,
@@ -5108,9 +5021,7 @@
         }
       ],
       "clearQuestId": 82001001,
-      "addSkillsId": [
-        65417741
-      ]
+      "addSkillsId": [65417741]
     },
     "65010269": {
       "id": 65010269,
@@ -5238,9 +5149,7 @@
         }
       ],
       "clearQuestId": 82001001,
-      "addSkillsId": [
-        65417516
-      ]
+      "addSkillsId": [65417516]
     },
     "65010276": {
       "id": 65010276,
@@ -5494,9 +5403,7 @@
         }
       ],
       "clearQuestId": 82001009,
-      "addSkillsId": [
-        65417521
-      ]
+      "addSkillsId": [65417521]
     },
     "65010290": {
       "id": 65010290,
@@ -6146,9 +6053,7 @@
         }
       ],
       "clearQuestId": 82001010,
-      "addSkillsId": [
-        65417691
-      ]
+      "addSkillsId": [65417691]
     },
     "65010326": {
       "id": 65010326,
@@ -6222,9 +6127,7 @@
         }
       ],
       "clearQuestId": 82001008,
-      "addSkillsId": [
-        65417526
-      ]
+      "addSkillsId": [65417526]
     },
     "65010330": {
       "id": 65010330,
@@ -8980,9 +8883,7 @@
         }
       ],
       "clearQuestId": 82001010,
-      "addSkillsId": [
-        65417686
-      ]
+      "addSkillsId": [65417686]
     },
     "65010483": {
       "id": 65010483,
@@ -10334,9 +10235,7 @@
         }
       ],
       "clearQuestId": 82001006,
-      "addSkillsId": [
-        65417566
-      ]
+      "addSkillsId": [65417566]
     },
     "65010558": {
       "id": 65010558,
@@ -10356,9 +10255,7 @@
         }
       ],
       "clearQuestId": 82001006,
-      "addSkillsId": [
-        65417706
-      ]
+      "addSkillsId": [65417706]
     },
     "65010559": {
       "id": 65010559,
@@ -10396,9 +10293,7 @@
         }
       ],
       "clearQuestId": 82001006,
-      "addSkillsId": [
-        65417681
-      ]
+      "addSkillsId": [65417681]
     },
     "65010561": {
       "id": 65010561,

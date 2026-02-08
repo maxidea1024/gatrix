@@ -24,6 +24,7 @@ The job management system provides:
 Send emails with template support and dynamic content.
 
 **Configuration:**
+
 ```json
 {
   "to": "user@example.com",
@@ -37,6 +38,7 @@ Send emails with template support and dynamic content.
 ```
 
 **Features:**
+
 - HTML and plain text templates
 - Dynamic variable substitution
 - Attachment support
@@ -48,6 +50,7 @@ Send emails with template support and dynamic content.
 Execute HTTP requests to external APIs or webhooks.
 
 **Configuration:**
+
 ```json
 {
   "url": "https://api.example.com/webhook",
@@ -66,6 +69,7 @@ Execute HTTP requests to external APIs or webhooks.
 ```
 
 **Features:**
+
 - All HTTP methods (GET, POST, PUT, DELETE, etc.)
 - Custom headers and authentication
 - Request/response logging
@@ -77,6 +81,7 @@ Execute HTTP requests to external APIs or webhooks.
 Execute commands on remote servers via SSH.
 
 **Configuration:**
+
 ```json
 {
   "host": "server.example.com",
@@ -89,6 +94,7 @@ Execute commands on remote servers via SSH.
 ```
 
 **Features:**
+
 - Key-based or password authentication
 - Command output capture
 - Working directory specification
@@ -100,6 +106,7 @@ Execute commands on remote servers via SSH.
 Create structured log entries for audit trails and monitoring.
 
 **Configuration:**
+
 ```json
 {
   "level": "info",
@@ -115,6 +122,7 @@ Create structured log entries for audit trails and monitoring.
 ```
 
 **Features:**
+
 - Multiple log levels (debug, info, warn, error)
 - Structured metadata
 - Category-based organization
@@ -135,7 +143,7 @@ Jobs can be executed immediately through the admin interface:
 
 ```javascript
 // Execute job by ID
-POST /api/jobs/{id}/execute
+POST / api / jobs / { id } / execute;
 ```
 
 ### API Integration
@@ -147,9 +155,9 @@ For programmatic execution:
 fetch('/api/jobs/123/execute', {
   method: 'POST',
   headers: {
-    'Authorization': 'Bearer <token>',
-    'Content-Type': 'application/json'
-  }
+    Authorization: 'Bearer <token>',
+    'Content-Type': 'application/json',
+  },
 });
 ```
 
@@ -160,14 +168,14 @@ fetch('/api/jobs/123/execute', {
 ```typescript
 interface Job {
   id?: number;
-  name: string;                    // Job display name
-  jobTypeId: number;              // Job type (1=mailsend, 2=http_request, etc.)
-  jobDataMap: object;             // Job-specific configuration
-  memo?: string;                  // Additional notes
-  isEnabled: boolean;             // Enable/disable job
-  tags?: Tag[];                   // Associated tags
-  createdBy?: number;             // Creator user ID
-  updatedBy?: number;             // Last updater user ID
+  name: string; // Job display name
+  jobTypeId: number; // Job type (1=mailsend, 2=http_request, etc.)
+  jobDataMap: object; // Job-specific configuration
+  memo?: string; // Additional notes
+  isEnabled: boolean; // Enable/disable job
+  tags?: Tag[]; // Associated tags
+  createdBy?: number; // Creator user ID
+  updatedBy?: number; // Last updater user ID
 }
 ```
 
@@ -176,13 +184,13 @@ interface Job {
 ```typescript
 interface JobExecution {
   id?: number;
-  job_id: number;                 // Parent job ID
+  job_id: number; // Parent job ID
   status: 'pending' | 'running' | 'completed' | 'failed';
-  started_at?: Date;              // Execution start time
-  completed_at?: Date;            // Execution completion time
-  result?: object;                // Execution result
-  error_message?: string;         // Error details if failed
-  retry_count: number;            // Retry attempt number
+  started_at?: Date; // Execution start time
+  completed_at?: Date; // Execution completion time
+  result?: object; // Execution result
+  error_message?: string; // Error details if failed
+  retry_count: number; // Retry attempt number
 }
 ```
 
@@ -208,11 +216,13 @@ The job system uses BullMQ with the following configuration:
 ### Queue Monitoring
 
 Access the Bull Board dashboard at:
+
 ```
 http://localhost:5000/admin/queues
 ```
 
 Monitor:
+
 - Active, waiting, completed, and failed jobs
 - Job execution history and logs
 - Queue performance metrics
@@ -271,22 +281,22 @@ POST /api/v1/job-executions/:id/retry
 
 ```javascript
 const emailJob = {
-  name: "Welcome Email",
+  name: 'Welcome Email',
   job_type_id: 1, // mailsend
   job_data_map: {
-    to: "{{user.email}}",
-    subject: "Welcome to Gatrix",
-    template: "welcome",
+    to: '{{user.email}}',
+    subject: 'Welcome to Gatrix',
+    template: 'welcome',
     variables: {
-      username: "{{user.name}}",
-      activationLink: "{{activation.url}}"
-    }
+      username: '{{user.name}}',
+      activationLink: '{{activation.url}}',
+    },
   },
-  description: "Send welcome email to new users",
+  description: 'Send welcome email to new users',
   is_enabled: true,
   max_retry_count: 3,
   timeout_seconds: 60,
-  schedule: null // One-time execution
+  schedule: null, // One-time execution
 };
 
 // Create job
@@ -294,9 +304,9 @@ const response = await fetch('/api/v1/jobs', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
-    'Authorization': 'Bearer ' + token
+    Authorization: 'Bearer ' + token,
   },
-  body: JSON.stringify(emailJob)
+  body: JSON.stringify(emailJob),
 });
 ```
 
@@ -304,19 +314,19 @@ const response = await fetch('/api/v1/jobs', {
 
 ```javascript
 const backupJob = {
-  name: "Daily Database Backup",
+  name: 'Daily Database Backup',
   job_type_id: 3, // ssh_command
   job_data_map: {
-    host: "backup.example.com",
-    username: "backup",
-    command: "/scripts/backup-database.sh",
-    timeout: 1800000 // 30 minutes
+    host: 'backup.example.com',
+    username: 'backup',
+    command: '/scripts/backup-database.sh',
+    timeout: 1800000, // 30 minutes
   },
-  description: "Daily backup of main database",
+  description: 'Daily backup of main database',
   is_enabled: true,
   max_retry_count: 2,
   timeout_seconds: 1800,
-  schedule: "0 2 * * *" // Every day at 2 AM
+  schedule: '0 2 * * *', // Every day at 2 AM
 };
 ```
 
@@ -324,25 +334,25 @@ const backupJob = {
 
 ```javascript
 const webhookJob = {
-  name: "User Registration Webhook",
+  name: 'User Registration Webhook',
   job_type_id: 2, // http_request
   job_data_map: {
-    url: "https://analytics.example.com/events",
-    method: "POST",
+    url: 'https://analytics.example.com/events',
+    method: 'POST',
     headers: {
-      "Authorization": "Bearer analytics-token",
-      "Content-Type": "application/json"
+      Authorization: 'Bearer analytics-token',
+      'Content-Type': 'application/json',
     },
     body: {
-      event: "user_registered",
-      userId: "{{user.id}}",
-      timestamp: "{{timestamp}}"
-    }
+      event: 'user_registered',
+      userId: '{{user.id}}',
+      timestamp: '{{timestamp}}',
+    },
   },
-  description: "Send user registration event to analytics",
+  description: 'Send user registration event to analytics',
   is_enabled: true,
   max_retry_count: 5,
-  timeout_seconds: 30
+  timeout_seconds: 30,
 };
 ```
 
@@ -353,13 +363,14 @@ const webhookJob = {
 Jobs automatically retry on failure with exponential backoff:
 
 1. **First retry**: After 2 seconds
-2. **Second retry**: After 4 seconds  
+2. **Second retry**: After 4 seconds
 3. **Third retry**: After 8 seconds
 4. **Final failure**: Job marked as failed
 
 ### Error Logging
 
 All job errors are logged with:
+
 - Error message and stack trace
 - Job configuration and input data
 - Execution context and timing
@@ -368,6 +379,7 @@ All job errors are logged with:
 ### Monitoring and Alerts
 
 Set up monitoring for:
+
 - High failure rates
 - Queue backlog growth
 - Long-running jobs
@@ -410,4 +422,3 @@ Set up monitoring for:
 2. **Monitor Queues**: Use Bull Board to inspect queue status
 3. **Test Jobs**: Execute jobs manually to isolate issues
 4. **Validate Configuration**: Ensure job data is properly formatted
-

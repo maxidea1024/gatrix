@@ -17,9 +17,7 @@
     },
     ":enum": {},
     ":links": {
-      "questId": [
-        "Quest"
-      ]
+      "questId": ["Quest"]
     }
   },
   "BurstGroup": {

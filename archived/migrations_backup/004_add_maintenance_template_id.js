@@ -5,7 +5,7 @@
 module.exports = {
   up: async (connection) => {
     console.log('Adding maintenanceMessageTemplateId to g_game_worlds...');
-    
+
     // Check if column exists in g_game_worlds
     const gameWorldColumns = await connection.execute(`
       SELECT COLUMN_NAME
@@ -26,7 +26,7 @@ module.exports = {
     }
 
     console.log('Adding maintenanceMessageTemplateId to g_client_versions...');
-    
+
     // Check if column exists in g_client_versions
     const clientVersionColumns = await connection.execute(`
       SELECT COLUMN_NAME
@@ -59,6 +59,5 @@ module.exports = {
       ALTER TABLE g_client_versions
       DROP COLUMN IF EXISTS maintenanceMessageTemplateId
     `);
-  }
+  },
 };
-

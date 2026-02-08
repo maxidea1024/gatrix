@@ -21,9 +21,9 @@ Retrieves version information for game clients.
 
 #### Query Parameters
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| channel | string | 채널 필터 (예: A1, PC) |
+| Parameter  | Type   | Description                         |
+| ---------- | ------ | ----------------------------------- |
+| channel    | string | 채널 필터 (예: A1, PC)              |
 | subChannel | string | 서브채널 필터 (예: QQ, WeChat, iOS) |
 
 #### Response
@@ -274,6 +274,7 @@ curl http://localhost:3000/api/v1/client/cache-stats
 ```
 
 **Response Example:**
+
 ```json
 {
   "success": true,

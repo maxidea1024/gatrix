@@ -38,18 +38,9 @@
           "Value": "number"
         }
       ],
-      "battlePassiveIds": [
-        "number",
-        "number"
-      ],
-      "worldPassiveIds": [
-        "number",
-        "number"
-      ],
-      "battleDuelSkillIds": [
-        "number",
-        "number"
-      ],
+      "battlePassiveIds": ["number", "number"],
+      "worldPassiveIds": ["number", "number"],
+      "battleDuelSkillIds": ["number", "number"],
       "enchantFxId": "number",
       "CashMarketLowerLimitPrice": "number",
       "CashMarketLowerLimitPricePiece": "number"
@@ -111,18 +102,9 @@
           "Modifier": 1
         }
       ],
-      "battlePassiveIds": [
-        67000000,
-        67000000
-      ],
-      "worldPassiveIds": [
-        75200000,
-        75200000
-      ],
-      "battleDuelSkillIds": [
-        67600000,
-        67600000
-      ],
+      "battlePassiveIds": [67000000, 67000000],
+      "worldPassiveIds": [75200000, 75200000],
+      "battleDuelSkillIds": [67600000, 67600000],
       "enchantFxId": 48000000
     },
     ":max": {
@@ -154,75 +136,31 @@
           "Modifier": 3
         }
       ],
-      "battlePassiveIds": [
-        67499999,
-        67499999
-      ],
-      "worldPassiveIds": [
-        75299999,
-        75299999
-      ],
-      "battleDuelSkillIds": [
-        67699999,
-        67699999
-      ],
+      "battlePassiveIds": [67499999, 67499999],
+      "worldPassiveIds": [75299999, 75299999],
+      "battleDuelSkillIds": [67699999, 67699999],
       "enchantFxId": 48999999
     },
     ":enum": {},
     ":links": {
       "statEffect": [
         {
-          "Id": [
-            "StatOperator",
-            "WorldPassiveEffect"
-          ]
+          "Id": ["StatOperator", "WorldPassiveEffect"]
         },
         {
-          "Id": [
-            "StatOperator",
-            "WorldPassiveEffect"
-          ]
+          "Id": ["StatOperator", "WorldPassiveEffect"]
         },
         {
-          "Id": [
-            "StatOperator",
-            "WorldPassiveEffect"
-          ]
+          "Id": ["StatOperator", "WorldPassiveEffect"]
         },
         {
-          "Id": [
-            "StatOperator",
-            "WorldPassiveEffect"
-          ]
+          "Id": ["StatOperator", "WorldPassiveEffect"]
         }
       ],
-      "battlePassiveIds": [
-        [
-          "BattlePassive"
-        ],
-        [
-          "BattlePassive"
-        ]
-      ],
-      "worldPassiveIds": [
-        [
-          "WorldPassive"
-        ],
-        [
-          "WorldPassive"
-        ]
-      ],
-      "battleDuelSkillIds": [
-        [
-          "BattleDuelSkill"
-        ],
-        [
-          "BattleDuelSkill"
-        ]
-      ],
-      "enchantFxId": [
-        "ShipFxShape"
-      ]
+      "battlePassiveIds": [["BattlePassive"], ["BattlePassive"]],
+      "worldPassiveIds": [["WorldPassive"], ["WorldPassive"]],
+      "battleDuelSkillIds": [["BattleDuelSkill"], ["BattleDuelSkill"]],
+      "enchantFxId": ["ShipFxShape"]
     }
   },
   "CEquipEnchant": {
@@ -80413,9 +80351,7 @@
           "Value": 1500
         }
       ],
-      "worldPassiveIds": [
-        75280210
-      ],
+      "worldPassiveIds": [75280210],
       "CashMarketLowerLimitPrice": 4700,
       "CashMarketLowerLimitPricePiece": 4700000
     },
@@ -80676,9 +80612,7 @@
           "Value": 1500
         }
       ],
-      "worldPassiveIds": [
-        75280217
-      ],
+      "worldPassiveIds": [75280217],
       "CashMarketLowerLimitPrice": 4700,
       "CashMarketLowerLimitPricePiece": 4700000
     },
@@ -80939,9 +80873,7 @@
           "Value": 1500
         }
       ],
-      "worldPassiveIds": [
-        75280224
-      ],
+      "worldPassiveIds": [75280224],
       "CashMarketLowerLimitPrice": 4700,
       "CashMarketLowerLimitPricePiece": 4700000
     },
@@ -81202,9 +81134,7 @@
           "Value": 1500
         }
       ],
-      "worldPassiveIds": [
-        75280231
-      ],
+      "worldPassiveIds": [75280231],
       "CashMarketLowerLimitPrice": 4700,
       "CashMarketLowerLimitPricePiece": 4700000
     },
@@ -85345,9 +85275,7 @@
           "Value": 630
         }
       ],
-      "battlePassiveIds": [
-        67027010
-      ],
+      "battlePassiveIds": [67027010],
       "CashMarketLowerLimitPrice": 4700,
       "CashMarketLowerLimitPricePiece": 4700000
     },
@@ -85608,9 +85536,7 @@
           "Value": 630
         }
       ],
-      "battlePassiveIds": [
-        67027020
-      ],
+      "battlePassiveIds": [67027020],
       "CashMarketLowerLimitPrice": 4700,
       "CashMarketLowerLimitPricePiece": 4700000
     },
@@ -85871,9 +85797,7 @@
           "Value": 630
         }
       ],
-      "battlePassiveIds": [
-        67027000
-      ],
+      "battlePassiveIds": [67027000],
       "CashMarketLowerLimitPrice": 4700,
       "CashMarketLowerLimitPricePiece": 4700000
     },
@@ -86134,9 +86058,7 @@
           "Value": 630
         }
       ],
-      "battlePassiveIds": [
-        67027030
-      ],
+      "battlePassiveIds": [67027030],
       "CashMarketLowerLimitPrice": 4700,
       "CashMarketLowerLimitPricePiece": 4700000
     },
@@ -89717,9 +89639,7 @@
           "Value": 498
         }
       ],
-      "worldPassiveIds": [
-        75280369
-      ],
+      "worldPassiveIds": [75280369],
       "CashMarketLowerLimitPrice": 4700,
       "CashMarketLowerLimitPricePiece": 4700000
     },
@@ -90030,9 +89950,7 @@
           "Value": 498
         }
       ],
-      "worldPassiveIds": [
-        75280370
-      ],
+      "worldPassiveIds": [75280370],
       "CashMarketLowerLimitPrice": 4700,
       "CashMarketLowerLimitPricePiece": 4700000
     },
@@ -90343,9 +90261,7 @@
           "Value": 630
         }
       ],
-      "battlePassiveIds": [
-        67027069
-      ],
+      "battlePassiveIds": [67027069],
       "CashMarketLowerLimitPrice": 4700,
       "CashMarketLowerLimitPricePiece": 4700000
     },
@@ -90606,9 +90522,7 @@
           "Value": 630
         }
       ],
-      "battlePassiveIds": [
-        67027079
-      ],
+      "battlePassiveIds": [67027079],
       "CashMarketLowerLimitPrice": 4700,
       "CashMarketLowerLimitPricePiece": 4700000
     },
@@ -90869,9 +90783,7 @@
           "Value": 630
         }
       ],
-      "battlePassiveIds": [
-        67027059
-      ],
+      "battlePassiveIds": [67027059],
       "CashMarketLowerLimitPrice": 4700,
       "CashMarketLowerLimitPricePiece": 4700000
     },
@@ -91132,9 +91044,7 @@
           "Value": 630
         }
       ],
-      "battlePassiveIds": [
-        67027089
-      ],
+      "battlePassiveIds": [67027089],
       "CashMarketLowerLimitPrice": 4700,
       "CashMarketLowerLimitPricePiece": 4700000
     },
@@ -95845,9 +95755,7 @@
           "Value": 630
         }
       ],
-      "battlePassiveIds": [
-        67027111
-      ],
+      "battlePassiveIds": [67027111],
       "CashMarketLowerLimitPrice": 4700,
       "CashMarketLowerLimitPricePiece": 4700000
     },
@@ -96108,9 +96016,7 @@
           "Value": 630
         }
       ],
-      "battlePassiveIds": [
-        67027121
-      ],
+      "battlePassiveIds": [67027121],
       "CashMarketLowerLimitPrice": 4700,
       "CashMarketLowerLimitPricePiece": 4700000
     },
@@ -96371,9 +96277,7 @@
           "Value": 630
         }
       ],
-      "battlePassiveIds": [
-        67027101
-      ],
+      "battlePassiveIds": [67027101],
       "CashMarketLowerLimitPrice": 4700,
       "CashMarketLowerLimitPricePiece": 4700000
     },
@@ -96634,9 +96538,7 @@
           "Value": 630
         }
       ],
-      "battlePassiveIds": [
-        67027131
-      ],
+      "battlePassiveIds": [67027131],
       "CashMarketLowerLimitPrice": 4700,
       "CashMarketLowerLimitPricePiece": 4700000
     },
@@ -110597,9 +110499,7 @@
           "Value": 1500
         }
       ],
-      "battlePassiveIds": [
-        67027151
-      ],
+      "battlePassiveIds": [67027151],
       "CashMarketLowerLimitPrice": 4700,
       "CashMarketLowerLimitPricePiece": 4700000
     },
@@ -110860,9 +110760,7 @@
           "Value": 1500
         }
       ],
-      "battlePassiveIds": [
-        67027161
-      ],
+      "battlePassiveIds": [67027161],
       "CashMarketLowerLimitPrice": 4700,
       "CashMarketLowerLimitPricePiece": 4700000
     },
@@ -111123,9 +111021,7 @@
           "Value": 1500
         }
       ],
-      "battlePassiveIds": [
-        67027141
-      ],
+      "battlePassiveIds": [67027141],
       "CashMarketLowerLimitPrice": 4700,
       "CashMarketLowerLimitPricePiece": 4700000
     },
@@ -111386,9 +111282,7 @@
           "Value": 1500
         }
       ],
-      "battlePassiveIds": [
-        67027171
-      ],
+      "battlePassiveIds": [67027171],
       "CashMarketLowerLimitPrice": 4700,
       "CashMarketLowerLimitPricePiece": 4700000
     },

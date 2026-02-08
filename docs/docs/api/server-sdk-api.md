@@ -37,7 +37,7 @@ const gatrix = new GatrixServerSDK({
 ```typescript
 const isEnabled = await gatrix.featureFlags.getBoolValue('dark_mode', {
   userId: 'user123',
-  country: 'KR'
+  country: 'KR',
 });
 ```
 
@@ -101,7 +101,7 @@ await gatrix.gameWorlds.register({
   region: 'KR',
   capacity: 1000,
   currentPlayers: 500,
-  status: 'online'
+  status: 'online',
 });
 ```
 
@@ -110,7 +110,7 @@ await gatrix.gameWorlds.register({
 ```typescript
 await gatrix.gameWorlds.updateStatus('world-1', {
   currentPlayers: 600,
-  status: 'online'
+  status: 'online',
 });
 ```
 
@@ -124,8 +124,8 @@ await gatrix.events.send({
   userId: 'user123',
   properties: {
     platform: 'android',
-    version: '1.2.0'
-  }
+    version: '1.2.0',
+  },
 });
 ```
 

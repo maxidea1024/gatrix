@@ -5,7 +5,7 @@
  * API tokens used by client and server SDKs.
  */
 
-exports.up = async function(connection) {
+exports.up = async function (connection) {
   console.log('Creating g_api_access_tokens table...');
 
   await connection.execute(`
@@ -38,13 +38,12 @@ exports.up = async function(connection) {
   console.log('✅ g_api_access_tokens table created successfully');
 };
 
-exports.down = async function(connection) {
+exports.down = async function (connection) {
   console.log('Dropping g_api_access_tokens table...');
-  
+
   await connection.execute(`
     DROP TABLE IF EXISTS g_api_access_tokens
   `);
-  
+
   console.log('✅ g_api_access_tokens table dropped successfully');
 };
-

@@ -88,33 +88,19 @@
     },
     ":enum": {},
     ":links": {
-      "StartTown": [
-        "Town"
-      ],
-      "EndTown": [
-        "Town"
-      ],
-      "CamelPoint": [
-        "Point"
-      ],
-      "TradeMovePoint": [
-        "Point"
-      ],
+      "StartTown": ["Town"],
+      "EndTown": ["Town"],
+      "CamelPoint": ["Point"],
+      "TradeMovePoint": ["Point"],
       "contentsTerms": [
         {
-          "Id": [
-            "ContentsTerms"
-          ]
+          "Id": ["ContentsTerms"]
         },
         {
-          "Id": [
-            "ContentsTerms"
-          ]
+          "Id": ["ContentsTerms"]
         },
         {
-          "Id": [
-            "ContentsTerms"
-          ]
+          "Id": ["ContentsTerms"]
         }
       ]
     }

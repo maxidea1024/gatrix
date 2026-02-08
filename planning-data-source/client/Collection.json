@@ -137,68 +137,29 @@
     ":links": {
       "collectionItems": [
         {
-          "Id": [
-            "Mate",
-            "PubStaff",
-            "CEquip",
-            "ShipSlot",
-            "Ship",
-            "ShipBlueprint"
-          ]
+          "Id": ["Mate", "PubStaff", "CEquip", "ShipSlot", "Ship", "ShipBlueprint"]
         },
         {
-          "Id": [
-            "Mate",
-            "PubStaff",
-            "CEquip",
-            "ShipSlot",
-            "Ship",
-            "ShipBlueprint"
-          ]
+          "Id": ["Mate", "PubStaff", "CEquip", "ShipSlot", "Ship", "ShipBlueprint"]
         },
         {
-          "Id": [
-            "Mate",
-            "PubStaff",
-            "CEquip",
-            "ShipSlot",
-            "Ship",
-            "ShipBlueprint"
-          ]
+          "Id": ["Mate", "PubStaff", "CEquip", "ShipSlot", "Ship", "ShipBlueprint"]
         },
         {
-          "Id": [
-            "Mate",
-            "PubStaff",
-            "CEquip",
-            "ShipSlot",
-            "Ship",
-            "ShipBlueprint"
-          ]
+          "Id": ["Mate", "PubStaff", "CEquip", "ShipSlot", "Ship", "ShipBlueprint"]
         },
         {
-          "Id": [
-            "Mate",
-            "PubStaff",
-            "CEquip",
-            "ShipSlot",
-            "Ship",
-            "ShipBlueprint"
-          ]
+          "Id": ["Mate", "PubStaff", "CEquip", "ShipSlot", "Ship", "ShipBlueprint"]
         }
       ],
       "fleetStatEffect": [
         {
-          "Id": [
-            "WorldPassiveEffect"
-          ]
+          "Id": ["WorldPassiveEffect"]
         }
       ],
       "shipStatEffect": [
         {
-          "Id": [
-            "StatOperator"
-          ]
+          "Id": ["StatOperator"]
         }
       ]
     }

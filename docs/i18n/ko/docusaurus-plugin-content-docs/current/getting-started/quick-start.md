@@ -14,13 +14,14 @@ Gatrix를 빠르게 시작하는 방법을 안내합니다.
 
 :::info Docker Compose 서비스
 Docker Compose 개발 환경에서는 다음 서비스들이 자동으로 구성됩니다:
+
 - MySQL 8.0 (데이터베이스)
 - Redis 7 Alpine (캐시 및 메시지 큐)
 - etcd v3.5 (서비스 디스커버리)
 - ClickHouse (분석용 데이터베이스)
 - Prometheus / Grafana (모니터링)
 - Loki / Fluent Bit (로그 수집)
-:::
+  :::
 
 ## 로컬 개발 환경 시작하기
 
@@ -73,15 +74,15 @@ yarn dev:all
 
 개발 서버가 시작되면:
 
-| 서비스 | URL | 포트 |
-|--------|-----|------|
+| 서비스                 | URL                    | 포트  |
+| ---------------------- | ---------------------- | ----- |
 | **Frontend Dashboard** | http://localhost:43000 | 43000 |
-| **Backend API** | http://localhost:45000 | 45000 |
-| **Edge Server** | http://localhost:3400 | 3400 |
-| **Chat Server** | http://localhost:45100 | 45100 |
-| **Event Lens** | http://localhost:45200 | 45200 |
-| **Grafana** | http://localhost:44000 | 44000 |
-| **Prometheus** | http://localhost:49090 | 49090 |
+| **Backend API**        | http://localhost:45000 | 45000 |
+| **Edge Server**        | http://localhost:3400  | 3400  |
+| **Chat Server**        | http://localhost:45100 | 45100 |
+| **Event Lens**         | http://localhost:45200 | 45200 |
+| **Grafana**            | http://localhost:44000 | 44000 |
+| **Prometheus**         | http://localhost:49090 | 49090 |
 
 ## 기본 관리자 계정
 
@@ -92,10 +93,12 @@ yarn dev:all
 
 :::warning 보안 주의
 프로덕션 환경에서는 반드시 `.env` 파일에서 기본 비밀번호를 변경하세요!
+
 ```env
 ADMIN_EMAIL=your-admin@example.com
 ADMIN_PASSWORD=your-secure-password
 ```
+
 :::
 
 ## 주요 명령어

@@ -12,6 +12,7 @@ This folder contains performance testing scripts for the Gatrix Edge server usin
 ## Configuration
 
 The test scripts are configured to use the following by default:
+
 - **Target**: `http://localhost:3410` (Edge Server)
 - **Token**: `gatrix-unsecured-edge-api-token`
 - **Environment**: `production`
@@ -23,6 +24,7 @@ You can override these values using command-line arguments.
 ### 1. Basic Performance Test
 
 Run the standard performance test:
+
 ```bash
 artillery run edge-performance.yml
 ```
@@ -30,6 +32,7 @@ artillery run edge-performance.yml
 ### 2. Override Target or Environment
 
 To test a different environment or a remote Edge server:
+
 ```bash
 artillery run --target http://edge-server-address:3410 --variables '{"environment": "staging"}' edge-performance.yml
 ```
@@ -37,6 +40,7 @@ artillery run --target http://edge-server-address:3410 --variables '{"environmen
 ### 3. Quick Report
 
 To generate an HTML report after the test:
+
 ```bash
 artillery run --output report.json edge-performance.yml
 artillery report report.json
@@ -45,6 +49,7 @@ artillery report report.json
 ## Test Scenarios
 
 The `edge-performance.yml` script covers the following client endpoints:
+
 1. `GET /api/v1/client/{env}/client-version` (Public/Cached)
 2. `GET /api/v1/client/{env}/game-worlds` (Public/Cached)
 3. `GET /api/v1/client/{env}/banners` (Authenticated/Cached)

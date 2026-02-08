@@ -22,9 +22,7 @@
       "type": "stat",
       "title": "SDK Status",
       "datasource": "Prometheus",
-      "targets": [
-        { "expr": "edge_sdk_initialized", "refId": "A" }
-      ],
+      "targets": [{ "expr": "edge_sdk_initialized", "refId": "A" }],
       "fieldConfig": {
         "defaults": {
           "mappings": [
@@ -40,9 +38,7 @@
       "type": "stat",
       "title": "Requests/sec",
       "datasource": "Prometheus",
-      "targets": [
-        { "expr": "sum(rate(edge_http_requests_total[$window]))", "refId": "A" }
-      ],
+      "targets": [{ "expr": "sum(rate(edge_http_requests_total[$window]))", "refId": "A" }],
       "fieldConfig": { "defaults": { "unit": "reqps" } },
       "gridPos": { "x": 4, "y": 0, "w": 4, "h": 4 }
     },
@@ -52,7 +48,10 @@
       "title": "P95 Latency",
       "datasource": "Prometheus",
       "targets": [
-        { "expr": "histogram_quantile(0.95, sum by (le)(rate(edge_http_request_duration_seconds_bucket[$window])))", "refId": "A" }
+        {
+          "expr": "histogram_quantile(0.95, sum by (le)(rate(edge_http_request_duration_seconds_bucket[$window])))",
+          "refId": "A"
+        }
       ],
       "fieldConfig": { "defaults": { "unit": "s" } },
       "gridPos": { "x": 8, "y": 0, "w": 4, "h": 4 }
@@ -62,9 +61,7 @@
       "type": "stat",
       "title": "Memory Usage",
       "datasource": "Prometheus",
-      "targets": [
-        { "expr": "process_resident_memory_bytes{job=\"gatrix-edge\"}", "refId": "A" }
-      ],
+      "targets": [{ "expr": "process_resident_memory_bytes{job=\"gatrix-edge\"}", "refId": "A" }],
       "fieldConfig": { "defaults": { "unit": "bytes" } },
       "gridPos": { "x": 12, "y": 0, "w": 4, "h": 4 }
     },
@@ -74,7 +71,10 @@
       "title": "Cache Hit Rate",
       "datasource": "Prometheus",
       "targets": [
-        { "expr": "sum(rate(edge_cache_hits_total[$window])) / (sum(rate(edge_cache_hits_total[$window])) + sum(rate(edge_cache_misses_total[$window]))) * 100", "refId": "A" }
+        {
+          "expr": "sum(rate(edge_cache_hits_total[$window])) / (sum(rate(edge_cache_hits_total[$window])) + sum(rate(edge_cache_misses_total[$window]))) * 100",
+          "refId": "A"
+        }
       ],
       "fieldConfig": {
         "defaults": {
@@ -97,9 +97,7 @@
       "type": "stat",
       "title": "Event Loop Lag",
       "datasource": "Prometheus",
-      "targets": [
-        { "expr": "nodejs_eventloop_lag_seconds{job=\"gatrix-edge\"}", "refId": "A" }
-      ],
+      "targets": [{ "expr": "nodejs_eventloop_lag_seconds{job=\"gatrix-edge\"}", "refId": "A" }],
       "fieldConfig": { "defaults": { "unit": "s" } },
       "gridPos": { "x": 20, "y": 0, "w": 4, "h": 4 }
     },
@@ -109,7 +107,11 @@
       "title": "Requests per Second (by Path)",
       "datasource": "Prometheus",
       "targets": [
-        { "expr": "sum by (path)(rate(edge_http_requests_total[$window]))", "refId": "A", "legendFormat": "{{path}}" }
+        {
+          "expr": "sum by (path)(rate(edge_http_requests_total[$window]))",
+          "refId": "A",
+          "legendFormat": "{{path}}"
+        }
       ],
       "gridPos": { "x": 0, "y": 4, "w": 12, "h": 8 }
     },
@@ -119,10 +121,26 @@
       "title": "Request Latency by Percentile",
       "datasource": "Prometheus",
       "targets": [
-        { "expr": "histogram_quantile(0.50, sum by (le)(rate(edge_http_request_duration_seconds_bucket[$window])))", "refId": "A", "legendFormat": "p50" },
-        { "expr": "histogram_quantile(0.90, sum by (le)(rate(edge_http_request_duration_seconds_bucket[$window])))", "refId": "B", "legendFormat": "p90" },
-        { "expr": "histogram_quantile(0.95, sum by (le)(rate(edge_http_request_duration_seconds_bucket[$window])))", "refId": "C", "legendFormat": "p95" },
-        { "expr": "histogram_quantile(0.99, sum by (le)(rate(edge_http_request_duration_seconds_bucket[$window])))", "refId": "D", "legendFormat": "p99" }
+        {
+          "expr": "histogram_quantile(0.50, sum by (le)(rate(edge_http_request_duration_seconds_bucket[$window])))",
+          "refId": "A",
+          "legendFormat": "p50"
+        },
+        {
+          "expr": "histogram_quantile(0.90, sum by (le)(rate(edge_http_request_duration_seconds_bucket[$window])))",
+          "refId": "B",
+          "legendFormat": "p90"
+        },
+        {
+          "expr": "histogram_quantile(0.95, sum by (le)(rate(edge_http_request_duration_seconds_bucket[$window])))",
+          "refId": "C",
+          "legendFormat": "p95"
+        },
+        {
+          "expr": "histogram_quantile(0.99, sum by (le)(rate(edge_http_request_duration_seconds_bucket[$window])))",
+          "refId": "D",
+          "legendFormat": "p99"
+        }
       ],
       "fieldConfig": { "defaults": { "unit": "s" } },
       "gridPos": { "x": 12, "y": 4, "w": 12, "h": 8 }
@@ -133,7 +151,11 @@
       "title": "HTTP Status Codes",
       "datasource": "Prometheus",
       "targets": [
-        { "expr": "sum by (status)(rate(edge_http_requests_total[$window]))", "refId": "A", "legendFormat": "{{status}}" }
+        {
+          "expr": "sum by (status)(rate(edge_http_requests_total[$window]))",
+          "refId": "A",
+          "legendFormat": "{{status}}"
+        }
       ],
       "gridPos": { "x": 0, "y": 12, "w": 8, "h": 8 }
     },
@@ -143,8 +165,16 @@
       "title": "Cache Hits vs Misses",
       "datasource": "Prometheus",
       "targets": [
-        { "expr": "sum by (cache_type)(rate(edge_cache_hits_total[$window]))", "refId": "A", "legendFormat": "hits - {{cache_type}}" },
-        { "expr": "sum by (cache_type)(rate(edge_cache_misses_total[$window]))", "refId": "B", "legendFormat": "misses - {{cache_type}}" }
+        {
+          "expr": "sum by (cache_type)(rate(edge_cache_hits_total[$window]))",
+          "refId": "A",
+          "legendFormat": "hits - {{cache_type}}"
+        },
+        {
+          "expr": "sum by (cache_type)(rate(edge_cache_misses_total[$window]))",
+          "refId": "B",
+          "legendFormat": "misses - {{cache_type}}"
+        }
       ],
       "gridPos": { "x": 8, "y": 12, "w": 8, "h": 8 }
     },
@@ -153,9 +183,7 @@
       "type": "timeseries",
       "title": "Cache Size",
       "datasource": "Prometheus",
-      "targets": [
-        { "expr": "edge_cache_size", "refId": "A", "legendFormat": "{{cache_type}}" }
-      ],
+      "targets": [{ "expr": "edge_cache_size", "refId": "A", "legendFormat": "{{cache_type}}" }],
       "gridPos": { "x": 16, "y": 12, "w": 8, "h": 8 }
     },
     {
@@ -164,9 +192,21 @@
       "title": "Memory Usage",
       "datasource": "Prometheus",
       "targets": [
-        { "expr": "process_resident_memory_bytes{job=\"gatrix-edge\"}", "refId": "A", "legendFormat": "RSS" },
-        { "expr": "process_heap_bytes{job=\"gatrix-edge\"}", "refId": "B", "legendFormat": "Heap Total" },
-        { "expr": "nodejs_heap_size_used_bytes{job=\"gatrix-edge\"}", "refId": "C", "legendFormat": "Heap Used" }
+        {
+          "expr": "process_resident_memory_bytes{job=\"gatrix-edge\"}",
+          "refId": "A",
+          "legendFormat": "RSS"
+        },
+        {
+          "expr": "process_heap_bytes{job=\"gatrix-edge\"}",
+          "refId": "B",
+          "legendFormat": "Heap Total"
+        },
+        {
+          "expr": "nodejs_heap_size_used_bytes{job=\"gatrix-edge\"}",
+          "refId": "C",
+          "legendFormat": "Heap Used"
+        }
       ],
       "fieldConfig": { "defaults": { "unit": "bytes" } },
       "gridPos": { "x": 0, "y": 20, "w": 12, "h": 8 }
@@ -177,8 +217,16 @@
       "title": "CPU Usage",
       "datasource": "Prometheus",
       "targets": [
-        { "expr": "rate(process_cpu_user_seconds_total{job=\"gatrix-edge\"}[$window])", "refId": "A", "legendFormat": "User" },
-        { "expr": "rate(process_cpu_system_seconds_total{job=\"gatrix-edge\"}[$window])", "refId": "B", "legendFormat": "System" }
+        {
+          "expr": "rate(process_cpu_user_seconds_total{job=\"gatrix-edge\"}[$window])",
+          "refId": "A",
+          "legendFormat": "User"
+        },
+        {
+          "expr": "rate(process_cpu_system_seconds_total{job=\"gatrix-edge\"}[$window])",
+          "refId": "B",
+          "legendFormat": "System"
+        }
       ],
       "fieldConfig": { "defaults": { "unit": "percentunit" } },
       "gridPos": { "x": 12, "y": 20, "w": 12, "h": 8 }
@@ -189,8 +237,16 @@
       "title": "Event Loop Lag",
       "datasource": "Prometheus",
       "targets": [
-        { "expr": "nodejs_eventloop_lag_seconds{job=\"gatrix-edge\"}", "refId": "A", "legendFormat": "Lag" },
-        { "expr": "nodejs_eventloop_lag_p99_seconds{job=\"gatrix-edge\"}", "refId": "B", "legendFormat": "P99" }
+        {
+          "expr": "nodejs_eventloop_lag_seconds{job=\"gatrix-edge\"}",
+          "refId": "A",
+          "legendFormat": "Lag"
+        },
+        {
+          "expr": "nodejs_eventloop_lag_p99_seconds{job=\"gatrix-edge\"}",
+          "refId": "B",
+          "legendFormat": "P99"
+        }
       ],
       "fieldConfig": { "defaults": { "unit": "s" } },
       "gridPos": { "x": 0, "y": 28, "w": 12, "h": 8 }
@@ -201,11 +257,18 @@
       "title": "Active Handles & Requests",
       "datasource": "Prometheus",
       "targets": [
-        { "expr": "nodejs_active_handles_total{job=\"gatrix-edge\"}", "refId": "A", "legendFormat": "Active Handles" },
-        { "expr": "nodejs_active_requests_total{job=\"gatrix-edge\"}", "refId": "B", "legendFormat": "Active Requests" }
+        {
+          "expr": "nodejs_active_handles_total{job=\"gatrix-edge\"}",
+          "refId": "A",
+          "legendFormat": "Active Handles"
+        },
+        {
+          "expr": "nodejs_active_requests_total{job=\"gatrix-edge\"}",
+          "refId": "B",
+          "legendFormat": "Active Requests"
+        }
       ],
       "gridPos": { "x": 12, "y": 28, "w": 12, "h": 8 }
     }
   ]
 }
-

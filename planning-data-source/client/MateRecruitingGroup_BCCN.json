@@ -106,31 +106,21 @@
     },
     ":enum": {},
     ":links": {
-      "mateId": [
-        "Mate"
-      ],
+      "mateId": ["Mate"],
       "contentsTerms": [
         {
-          "Id": [
-            "ContentsTerms"
-          ]
+          "Id": ["ContentsTerms"]
         },
         {
-          "Id": [
-            "ContentsTerms"
-          ]
+          "Id": ["ContentsTerms"]
         }
       ],
       "mustAppearEvent": [
         {
-          "CashShopId": [
-            "CashShop"
-          ]
+          "CashShopId": ["CashShop"]
         },
         {
-          "CashShopId": [
-            "CashShop"
-          ]
+          "CashShopId": ["CashShop"]
         }
       ]
     }

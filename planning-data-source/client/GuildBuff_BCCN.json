@@ -88,30 +88,18 @@
     ":enum": {},
     ":asset": {},
     ":links": {
-      "groupNo": [
-        "GuildBuff"
-      ],
-      "getGuildResourceId": [
-        "GuildResource"
-      ],
-      "worldBuffId": [
-        "WorldBuff"
-      ],
+      "groupNo": ["GuildBuff"],
+      "getGuildResourceId": ["GuildResource"],
+      "worldBuffId": ["WorldBuff"],
       "needDonation": [
         {
-          "ItemId": [
-            "Item"
-          ]
+          "ItemId": ["Item"]
         },
         {
-          "ItemId": [
-            "Item"
-          ]
+          "ItemId": ["Item"]
         },
         {
-          "ItemId": [
-            "Item"
-          ]
+          "ItemId": ["Item"]
         }
       ]
     }

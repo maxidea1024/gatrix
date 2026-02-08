@@ -48,6 +48,7 @@ docker-compose --version
 
 3. **验证安装：**
    - 打开 PowerShell 并运行：
+
    ```powershell
    docker --version
    docker-compose --version
@@ -63,11 +64,13 @@ docker-compose --version
 ### 选择您的环境
 
 **开发环境**（用于本地开发）：
+
 - 使用 `docker-compose.dev.yml`
 - 包含热重载和调试工具
 - 适合开发和测试
 
 **生产环境**（用于部署）：
+
 - 使用 `docker-compose.yml`
 - 针对性能和安全性进行优化
 - 适合生产部署
@@ -77,16 +80,19 @@ docker-compose --version
 运行设置脚本以自动生成包含安全加密密钥的 `.env` 文件。
 
 **开发环境 (Linux/Mac)：**
+
 ```bash
 ./setup-env.sh localhost development
 ```
 
 **开发环境 (Windows PowerShell)：**
+
 ```powershell
 .\setup-env.ps1 -HostAddress localhost -Environment development
 ```
 
 **生产环境 (Linux/Mac)：**
+
 ```bash
 # 英语（默认）
 ./setup-env.sh example.com production
@@ -96,6 +102,7 @@ docker-compose --version
 ```
 
 **生产环境 (Windows PowerShell)：**
+
 ```powershell
 # 英语（默认）
 .\setup-env.ps1 -HostAddress example.com -Environment production
@@ -107,16 +114,19 @@ docker-compose --version
 **自定义选项：**
 
 **自定义管理员密码 (Linux/Mac)：**
+
 ```bash
 ./setup-env.sh localhost development ko --admin-password "MySecurePassword123"
 ```
 
 **自定义管理员密码 (Windows PowerShell)：**
+
 ```powershell
 .\setup-env.ps1 -HostAddress localhost -Environment development -AdminPassword "MySecurePassword123"
 ```
 
 **自定义协议 (Linux/Mac)：**
+
 ```bash
 # 在开发环境中使用 HTTPS
 ./setup-env.sh localhost development ko --protocol https
@@ -129,6 +139,7 @@ docker-compose --version
 ```
 
 **自定义协议 (Windows PowerShell)：**
+
 ```powershell
 # 在开发环境中使用 HTTPS
 .\setup-env.ps1 -HostAddress localhost -Environment development -Protocol https
@@ -141,6 +152,7 @@ docker-compose --version
 ```
 
 **自定义数据根路径 (Linux/Mac)：**
+
 ```bash
 # 将所有 Docker 卷数据存储在 /data/gatrix
 ./setup-env.sh example.com production en --data-root /data/gatrix
@@ -150,6 +162,7 @@ docker-compose --version
 ```
 
 **自定义数据根路径 (Windows PowerShell)：**
+
 ```powershell
 # 将所有 Docker 卷数据存储在 /data/gatrix
 .\setup-env.ps1 -HostAddress example.com -Environment production -DataRoot /data/gatrix
@@ -159,6 +172,7 @@ docker-compose --version
 ```
 
 脚本将执行以下操作：
+
 - 自动生成安全加密密钥
 - 为 Docker 配置数据库和 Redis
 - 设置默认语言（韩语 `ko`、英语 `en` 或中文 `zh`）
@@ -169,6 +183,7 @@ docker-compose --version
 - 根据环境自动选择正确的 docker-compose 文件
 
 **支持的语言：**
+
 - `ko` - 한국어（韩语）- 开发环境默认
 - `en` - English（英语）- 生产环境默认
 - `zh` - 中文 - 中国部署
@@ -176,11 +191,13 @@ docker-compose --version
 ### 步骤 2：构建 Docker 环境
 
 **开发环境：**
+
 ```bash
 docker-compose -f docker-compose.dev.yml build
 ```
 
 **生产环境：**
+
 ```bash
 docker-compose -f docker-compose.yml build
 ```
@@ -188,11 +205,13 @@ docker-compose -f docker-compose.yml build
 ### 步骤 3：启动服务
 
 **开发环境：**
+
 ```bash
 docker-compose -f docker-compose.dev.yml up -d
 ```
 
 **生产环境：**
+
 ```bash
 docker-compose -f docker-compose.yml up -d
 ```
@@ -202,11 +221,13 @@ docker-compose -f docker-compose.yml up -d
 ### 步骤 4：验证安装
 
 **开发环境：**
+
 ```bash
 docker-compose -f docker-compose.dev.yml ps
 ```
 
 **生产环境：**
+
 ```bash
 docker-compose -f docker-compose.yml ps
 ```
@@ -218,16 +239,19 @@ docker-compose -f docker-compose.yml ps
 打开浏览器并导航至：
 
 **开发环境：**
+
 ```
 http://localhost:43000
 ```
 
 **生产环境（HTTPS - 默认）：**
+
 ```
 https://example.com
 ```
 
 **生产环境（HTTP - 如果使用 --protocol http 配置）：**
+
 ```
 http://example.com
 ```
@@ -248,6 +272,7 @@ http://example.com
    在生产环境中，您需要配置云负载均衡器来处理 HTTPS 并转发到内部端口。
 
    **端口转发设置：**
+
    ```
    外部 HTTPS 443 → 内部 43000（前端 + Bull Board）
    外部 HTTPS 443/grafana → 内部 44000（Grafana）
@@ -271,6 +296,7 @@ http://example.com
    - 注意：`/bull-board` 路径由规则 2 处理（无需单独规则）
 
    **Nginx 反向代理示例：**
+
    ```nginx
    server {
        listen 443 ssl http2;
@@ -302,11 +328,13 @@ http://example.com
    - 重启服务：
 
    **开发环境：**
+
    ```bash
    docker-compose -f docker-compose.dev.yml restart frontend-dev
    ```
 
    **生产环境：**
+
    ```bash
    docker-compose -f docker-compose.yml restart frontend
    ```
@@ -318,11 +346,13 @@ http://example.com
    - 重启服务：
 
    **开发环境：**
+
    ```bash
    docker-compose -f docker-compose.dev.yml restart frontend-dev
    ```
 
    **生产环境：**
+
    ```bash
    docker-compose -f docker-compose.yml restart frontend
    ```
@@ -333,11 +363,13 @@ http://example.com
    - 重启服务：
 
    **开发环境：**
+
    ```bash
    docker-compose -f docker-compose.dev.yml restart
    ```
 
    **生产环境：**
+
    ```bash
    docker-compose -f docker-compose.yml restart
    ```
@@ -345,11 +377,13 @@ http://example.com
 5. **查看日志**：
 
    **开发环境：**
+
    ```bash
    docker-compose -f docker-compose.dev.yml logs -f backend
    ```
 
    **生产环境：**
+
    ```bash
    docker-compose -f docker-compose.yml logs -f backend
    ```
@@ -357,11 +391,13 @@ http://example.com
 6. **停止服务**：
 
    **开发环境：**
+
    ```bash
    docker-compose -f docker-compose.dev.yml down
    ```
 
    **生产环境：**
+
    ```bash
    docker-compose -f docker-compose.yml down
    ```
@@ -371,6 +407,7 @@ http://example.com
 ### 端口已被占用
 
 如果遇到 "port already in use" 错误：
+
 - 停止使用该端口的服务，或
 - 在 docker-compose 文件中修改端口：
   - 开发环境：`docker-compose.dev.yml`
@@ -381,26 +418,29 @@ http://example.com
 检查日志：
 
 **开发环境：**
+
 ```bash
 docker-compose -f docker-compose.dev.yml logs
 ```
 
 **生产环境：**
+
 ```bash
 docker-compose -f docker-compose.yml logs
 ```
-
 
 ### Docker 守护进程未运行
 
 确保 Docker 正在运行：
 
 **Linux：**
+
 ```bash
 sudo systemctl start docker
 ```
 
 **Windows：**
+
 - 打开 Docker Desktop 应用程序
 - 等待其完全启动
 
@@ -411,13 +451,15 @@ sudo systemctl start docker
 这是因为 Grafana 的安全设置阻止了 iframe 嵌入。解决方法：
 
 1. **更新 docker-compose.dev.yml** - 在 Grafana 服务中添加以下环境变量：
+
    ```yaml
    environment:
-     GF_SECURITY_ALLOW_EMBEDDING: "true"
-     GF_SECURITY_COOKIE_SAMESITE: "Lax"
+     GF_SECURITY_ALLOW_EMBEDDING: 'true'
+     GF_SECURITY_COOKIE_SAMESITE: 'Lax'
    ```
 
 2. **重启 Docker 容器：**
+
    ```bash
    docker-compose -f docker-compose.dev.yml down
    docker-compose -f docker-compose.dev.yml up -d
@@ -447,16 +489,19 @@ sudo systemctl start docker
 项目的 `scripts/` 目录中包含 Jenkins 设置脚本：
 
 **Linux/Mac：**
+
 ```bash
 ./scripts/setup.sh
 ```
 
 **Windows PowerShell：**
+
 ```powershell
 .\scripts\setup.ps1
 ```
 
 这些脚本将：
+
 - 验证已安装 Node.js 22 LTS
 - 安装所需的依赖项
 - 配置环境变量
@@ -471,6 +516,7 @@ sudo systemctl start docker
    - Branch：`main`（或您的默认分支）
 
 3. **管道脚本：**
+
    ```groovy
    pipeline {
      agent any
@@ -544,7 +590,6 @@ sudo systemctl start docker
 5. **配置 webhook**（可选）：
    - 设置 GitHub/GitLab webhook 以在推送时自动触发构建
 
-
 ### Jenkins 重要说明
 
 - **环境变量：** 在管道脚本中配置以下内容：
@@ -561,6 +606,7 @@ sudo systemctl start docker
 ### 配置示例
 
 **生产环境 HTTP（默认）：**
+
 ```groovy
 environment {
   HOST_ADDRESS = 'example.com'
@@ -572,6 +618,7 @@ environment {
 ```
 
 **生产环境 HTTPS（安全）：**
+
 ```groovy
 environment {
   HOST_ADDRESS = 'example.com'
@@ -583,6 +630,7 @@ environment {
 ```
 
 **中国生产环境（中文）：**
+
 ```groovy
 environment {
   HOST_ADDRESS = 'example.cn'
@@ -594,6 +642,7 @@ environment {
 ```
 
 **开发环境（韩语）：**
+
 ```groovy
 environment {
   HOST_ADDRESS = 'dev.example.com'
@@ -616,21 +665,25 @@ environment {
 如果需要重新生成 `.env` 文件：
 
 **开发环境 (Linux/Mac)：**
+
 ```bash
 ./setup-env.sh localhost development --force
 ```
 
 **开发环境 (Windows PowerShell)：**
+
 ```powershell
 .\setup-env.ps1 -HostAddress localhost -Environment development -Force
 ```
 
 **生产环境 (Linux/Mac)：**
+
 ```bash
 ./setup-env.sh example.com production --force
 ```
 
 **生产环境 (Windows PowerShell)：**
+
 ```powershell
 .\setup-env.ps1 -HostAddress example.com -Environment production -Force
 ```
@@ -638,16 +691,19 @@ environment {
 **自定义选项：**
 
 **自定义管理员密码 (Linux/Mac)：**
+
 ```bash
 ./setup-env.sh localhost development ko --admin-password "NewPassword123" --force
 ```
 
 **自定义管理员密码 (Windows PowerShell)：**
+
 ```powershell
 .\setup-env.ps1 -HostAddress localhost -Environment development -AdminPassword "NewPassword123" -Force
 ```
 
 **自定义协议 (Linux/Mac)：**
+
 ```bash
 # 韩语 HTTPS
 ./setup-env.sh localhost development ko --protocol https --force
@@ -657,6 +713,7 @@ environment {
 ```
 
 **自定义协议 (Windows PowerShell)：**
+
 ```powershell
 # 韩语 HTTPS
 .\setup-env.ps1 -HostAddress localhost -Environment development -Protocol https -Force
@@ -666,6 +723,7 @@ environment {
 ```
 
 这将：
+
 - 备份现有的 `.env` 文件（`.env.backup.TIMESTAMP`）
 - 生成新的加密密钥
 - 设置新的管理员密码（如果提供）
@@ -679,11 +737,13 @@ environment {
 ### 步骤 1：停止并删除所有容器
 
 **开发环境：**
+
 ```bash
 docker-compose -f docker-compose.dev.yml down -v
 ```
 
 **生产环境：**
+
 ```bash
 docker-compose -f docker-compose.yml down -v
 ```
@@ -695,11 +755,13 @@ docker-compose -f docker-compose.yml down -v
 如果要从头开始重建所有内容：
 
 **开发环境：**
+
 ```bash
 docker-compose -f docker-compose.dev.yml down -v --rmi all
 ```
 
 **生产环境：**
+
 ```bash
 docker-compose -f docker-compose.yml down -v --rmi all
 ```
@@ -711,6 +773,7 @@ rm .env
 ```
 
 或先备份：
+
 ```bash
 mv .env .env.old
 ```
@@ -720,6 +783,7 @@ mv .env .env.old
 从头开始按照**快速开始**部分操作：
 
 1. 生成新配置：
+
    ```bash
    # 开发环境（韩语）
    ./setup-env.sh localhost development
@@ -732,6 +796,7 @@ mv .env .env.old
    ```
 
 2. 构建 Docker 环境：
+
    ```bash
    # 开发环境
    docker-compose -f docker-compose.dev.yml build
@@ -741,6 +806,7 @@ mv .env .env.old
    ```
 
 3. 启动服务：
+
    ```bash
    # 开发环境
    docker-compose -f docker-compose.dev.yml up -d
@@ -750,6 +816,7 @@ mv .env .env.old
    ```
 
 4. 验证安装：
+
    ```bash
    # 开发环境
    docker-compose -f docker-compose.dev.yml ps

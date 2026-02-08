@@ -205,77 +205,47 @@
     ":links": {
       "contentsTerms": [
         {
-          "Id": [
-            "ContentsTerms"
-          ]
+          "Id": ["ContentsTerms"]
         }
       ],
-      "goalTownId": [
-        "Town"
-      ],
+      "goalTownId": ["Town"],
       "ticketItemId": {
-        "Enter": [
-          "Item"
-        ],
-        "Trade": [
-          "Item"
-        ]
+        "Enter": ["Item"],
+        "Trade": ["Item"]
       },
       "costMove": {
-        "PointId": [
-          "Point"
-        ]
+        "PointId": ["Point"]
       },
       "costWithTrade": [
         {
-          "PointId": [
-            "Point"
-          ]
+          "PointId": ["Point"]
         },
         {
-          "PointId": [
-            "Point"
-          ]
+          "PointId": ["Point"]
         },
         {
-          "PointId": [
-            "Point"
-          ]
+          "PointId": ["Point"]
         },
         {
-          "PointId": [
-            "Point"
-          ]
+          "PointId": ["Point"]
         },
         {
-          "PointId": [
-            "Point"
-          ]
+          "PointId": ["Point"]
         },
         {
-          "PointId": [
-            "Point"
-          ]
+          "PointId": ["Point"]
         },
         {
-          "PointId": [
-            "Point"
-          ]
+          "PointId": ["Point"]
         },
         {
-          "PointId": [
-            "Point"
-          ]
+          "PointId": ["Point"]
         },
         {
-          "PointId": [
-            "Point"
-          ]
+          "PointId": ["Point"]
         },
         {
-          "PointId": [
-            "Point"
-          ]
+          "PointId": ["Point"]
         }
       ]
     }

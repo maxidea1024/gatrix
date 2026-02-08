@@ -7,15 +7,15 @@ const config = {
   user: process.env.DB_USER || 'root',
   password: process.env.DB_PASSWORD || '',
   database: process.env.DB_NAME || 'gatrix_admin',
-  port: process.env.DB_PORT || 3306
+  port: process.env.DB_PORT || 3306,
 };
 
 async function debugInsert() {
   const connection = await mysql.createConnection(config);
-  
+
   try {
     console.log('🔍 Debugging insert statement...');
-    
+
     // Test data
     const tokenName = 'Test Token';
     const description = 'Test Description';
@@ -29,7 +29,7 @@ async function debugInsert() {
     const updatedBy = 1;
     const createdAt = new Date();
     const updatedAt = new Date();
-    
+
     const values = [
       tokenName,
       description,
@@ -41,25 +41,24 @@ async function debugInsert() {
       createdBy,
       updatedBy,
       createdAt,
-      updatedAt
+      updatedAt,
     ];
-    
+
     console.log('Values count:', values.length);
     console.log('Values:', values);
-    
+
     const sql = `
       INSERT INTO g_api_access_tokens (
         tokenName, description, tokenHash, tokenType, environmentId,
         expiresAt, lastUsedAt, createdBy, updatedBy, createdAt, updatedAt
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
-    
+
     console.log('SQL:', sql);
     console.log('Placeholder count:', (sql.match(/\?/g) || []).length);
-    
+
     await connection.execute(sql, values);
     console.log('✅ Insert successful!');
-    
   } catch (error) {
     console.error('❌ Insert failed:', error);
   } finally {

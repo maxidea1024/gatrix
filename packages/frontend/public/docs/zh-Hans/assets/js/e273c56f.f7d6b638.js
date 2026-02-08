@@ -1,1 +1,372 @@
-"use strict";(globalThis.webpackChunkdocs=globalThis.webpackChunkdocs||[]).push([[9328],{2421(e){e.exports=JSON.parse('{"permalink":"/docs/zh-Hans/blog/welcome-to-gatrix","editUrl":"https://github.com/your-org/gatrix/tree/main/docs/blog/2019-05-28-first-blog-post.md","source":"@site/blog/2019-05-28-first-blog-post.md","title":"Gatrix???\ufffd\uc2e0 \uac83\uc744 ?\ufffd\uc601?\ufffd\ub2c8?? \uac8c\uc784 ?\ufffd\ub7ab??\uad00\ub9ac\uc758 ?\ufffd\ub85c??\ucc28\uc6d0","description":"Gatrix???\ufffd\ub77c??\uac8c\uc784 ?\ufffd\ube44?\ufffd\ufffd? ?\ufffd\ud55c ?\ufffd\ud569 \uad00\ufffd??\ufffd\uc2a4?\ufffd\uc785?\ufffd\ub2e4. ?\ufffd\ufffd??\ufffd\uc778 ??\uae30\uc220???\ufffd\uc6a9?\ufffd\uc5ec \uac15\ub825?\ufffd\uace0 ?\ufffd\uc7a5 \uac00?\ufffd\ud55c \uac8c\uc784 \uad00\ufffd??\ufffd\ub7ab?\ufffd\uc744 ?\ufffd\uacf5?\ufffd\ub2c8??","date":"2019-05-28T00:00:00.000Z","tags":[{"inline":false,"label":"Gatrix","permalink":"/docs/zh-Hans/blog/tags/gatrix","description":"Gatrix game platform management system"},{"inline":false,"label":"Announcement","permalink":"/docs/zh-Hans/blog/tags/announcement","description":"Important announcements and updates"},{"inline":false,"label":"Features","permalink":"/docs/zh-Hans/blog/tags/features","description":"Platform features and capabilities"}],"readingTime":1.53,"hasTruncateMarker":true,"authors":[{"name":"Gatrix Team","title":"Game Platform Development Team","url":"https://github.com/your-org/gatrix","page":{"permalink":"/docs/zh-Hans/blog/authors/gatrix-team"},"socials":{"github":"https://github.com/your-org","email":"mailto:support@gatrix.com"},"imageURL":"https://avatars.githubusercontent.com/u/0?v=4","key":"gatrix-team"}],"frontMatter":{"slug":"welcome-to-gatrix","title":"Gatrix???\ufffd\uc2e0 \uac83\uc744 ?\ufffd\uc601?\ufffd\ub2c8?? \uac8c\uc784 ?\ufffd\ub7ab??\uad00\ub9ac\uc758 ?\ufffd\ub85c??\ucc28\uc6d0","authors":["gatrix-team"],"tags":["gatrix","announcement","features"]},"unlisted":false,"prevItem":{"title":"Gatrix ?\ufffd\uc5c5 \uad00\ufffd??\ufffd\uc2a4???\ufffd\uc804 \uac00?\ufffd\ub4dc: ?\ufffd\ub3d9?\ufffd\uc758 ?\ufffd\ub85c??\ucc28\uc6d0","permalink":"/docs/zh-Hans/blog/mastering-job-management-system"}}')},4014(e,n,t){t.r(n),t.d(n,{assets:()=>o,contentTitle:()=>a,default:()=>d,frontMatter:()=>i,metadata:()=>s,toc:()=>c});var s=t(2421),r=t(4848),l=t(8453);const i={slug:"welcome-to-gatrix",title:"Gatrix???\ufffd\uc2e0 \uac83\uc744 ?\ufffd\uc601?\ufffd\ub2c8?? \uac8c\uc784 ?\ufffd\ub7ab??\uad00\ub9ac\uc758 ?\ufffd\ub85c??\ucc28\uc6d0",authors:["gatrix-team"],tags:["gatrix","announcement","features"]},a=void 0,o={authorsImageUrls:[void 0]},c=[{value:"?\ufffd\ufffd Gatrix?\ufffd \ubb34\uc5c7?\ufffd\ufffd???",id:"-gatrix-\ubb34\uc5c7",level:2},{value:"\uc8fc\uc694 ?\ufffd\uc9d5",id:"\uc8fc\uc694-\uc9d5",level:3},{value:"?? \ube60\ub978 ?\ufffd\uc791",id:"-\ube60\ub978-\uc791",level:2},{value:"1. ?\ufffd\uc2a4???\ufffd\uad6c?\ufffd\ud56d",id:"1-\uc2a4\uad6c\ud56d",level:3},{value:"2. ?\ufffd\uce58",id:"2-\uce58",level:3},{value:"3. ?\ufffd\uc18d",id:"3-\uc18d",level:3},{value:"?\ufffd\ufffd ?\ufffd\uc74c ?\ufffd\uacc4",id:"-\uc74c-\uacc4",level:2},{value:"?\ufffd\ufffd \ucee4\ufffd??\ufffd\ud2f0",id:"-\ucee4\ud2f0",level:2}];function h(e){const n={a:"a",code:"code",em:"em",h2:"h2",h3:"h3",li:"li",ol:"ol",p:"p",pre:"pre",strong:"strong",ul:"ul",...(0,l.R)(),...e.components};return(0,r.jsxs)(r.Fragment,{children:[(0,r.jsx)(n.p,{children:"Gatrix???\ufffd\ub77c??\uac8c\uc784 ?\ufffd\ube44?\ufffd\ufffd? ?\ufffd\ud55c ?\ufffd\ud569 \uad00\ufffd??\ufffd\uc2a4?\ufffd\uc785?\ufffd\ub2e4. ?\ufffd\ufffd??\ufffd\uc778 ??\uae30\uc220???\ufffd\uc6a9?\ufffd\uc5ec \uac15\ub825?\ufffd\uace0 ?\ufffd\uc7a5 \uac00?\ufffd\ud55c \uac8c\uc784 \uad00\ufffd??\ufffd\ub7ab?\ufffd\uc744 ?\ufffd\uacf5?\ufffd\ub2c8??"}),"\n",(0,r.jsx)(n.h2,{id:"-gatrix-\ubb34\uc5c7",children:"?\ufffd\ufffd Gatrix?\ufffd \ubb34\uc5c7?\ufffd\ufffd???"}),"\n",(0,r.jsx)(n.p,{children:"Gatrix??TypeScript, React, MUI, Express.js\ufffd?\uad6c\ucd95???\ufffd\ufffd??\ufffd\uc778 ?\ufffd?\ufffd\ud0dd \uac8c\uc784 ?\ufffd\ub7ab??\uad00\ufffd??\ufffd\uc2a4?\ufffd\uc785?\ufffd\ub2e4. ???\ufffd\ub7ab?\ufffd\ufffd? \uac8c\uc784 ?\ufffd\uc601?\ufffd\ub4e4??\uac8c\uc784 ?\ufffd\ubc84, ?\ufffd\uc6a9?? \ucf58\ud150\uce20\ufffd? ?\ufffd\uc728?\ufffd\uc73c\ufffd?\uad00\ub9ac\ud560 ???\ufffd\ub3c4\ufffd??\ufffd\uacc4?\ufffd\uc5c8?\ufffd\ub2c8??"}),"\n",(0,r.jsx)(n.h3,{id:"\uc8fc\uc694-\uc9d5",children:"\uc8fc\uc694 ?\ufffd\uc9d5"}),"\n",(0,r.jsxs)(n.ul,{children:["\n",(0,r.jsxs)(n.li,{children:["**?\ufffd\ufffd \uac8c\uc784 ?\ufffd\ub7ab??\uad00\ufffd?",(0,r.jsx)(n.em,{children:": ?\ufffd\ub77c??\uac8c\uc784 \uad00\ub9ac\ufffd? ?\ufffd\ud55c \uc885\ud569?\ufffd\uc778 ?\ufffd\ub7ab??- **?\ufffd\ufffd \uac8c\uc784 ?\ufffd\ub4dc \uad00\ufffd?"}),": \uac1c\ubcc4 ?\ufffd\uc815??\uac00?\ufffd\ud55c ?\ufffd\uc911 ?\ufffd\ub4dc \uc9c0??- **?\ufffd\ufffd ?\ufffd\ub77c?\ufffd\uc5b8??\ubc84\uc804 \uad00\ufffd?*: \ubc84\uc804 ?\ufffd\uc5b4 \ufffd?\ubc30\ud3ec \uad00\ufffd?- ",(0,r.jsx)(n.strong,{children:"?\ufffd\ufffd ?\ufffd\ufffd?\ubcf4\uc218 \ubaa8\ub4dc"}),": ?\ufffd\uc6a9???\ufffd\uc758 \uba54\uc2dc\uc9c0\uac00 ?\ufffd\ub294 ?\ufffd\uc2a4???\ufffd\uccb4 ?\ufffd\ufffd?\ubcf4\uc218 ?\ufffd\uc5b4"]}),"\n",(0,r.jsx)(n.li,{children:"**?\ufffd\ufffd\ufffd??\ufffd\uae45 ?\ufffd\uc2a4??*: \ucf58\ud150\ufffd?\uad6c\uc131???\ufffd\uc5f0???\ufffd\uae45"}),"\n",(0,r.jsxs)(n.li,{children:["**?\ufffd\ufffd \uba54\uc2dc\uc9c0 ?\ufffd\ud50c\ufffd?*: ?\ufffd\uad6d??\uba54\uc2dc\uc9c0 ?\ufffd\ud50c\ufffd?\uad00\ufffd?- ",(0,r.jsx)(n.strong,{children:"?\ufffd\ufffd\ufffd?IP ?\ufffd\uc774?\ufffd\ub9ac?\ufffd\ud2b8"}),": \uace0\uae09 IP ?\ufffd\uadfc ?\ufffd\uc5b4 \ufffd?\uad00\ufffd?- ",(0,r.jsx)(n.strong,{children:"?\ufffd\ufffd ?\ufffd\uc2dc\ufffd?\ucc44\ud305"}),": Socket.IO?\ufffd Redis ?\ufffd\ub7ec?\ufffd\ud130\ub9c1\uc744 ?\ufffd\ud55c \uace0\uc131??\ucc44\ud305 ?\ufffd\ubc84"]}),"\n"]}),"\n",(0,r.jsx)(n.h2,{id:"-\ube60\ub978-\uc791",children:"?? \ube60\ub978 ?\ufffd\uc791"}),"\n",(0,r.jsx)(n.h3,{id:"1-\uc2a4\uad6c\ud56d",children:"1. ?\ufffd\uc2a4???\ufffd\uad6c?\ufffd\ud56d"}),"\n",(0,r.jsxs)(n.ul,{children:["\n",(0,r.jsx)(n.li,{children:"Node.js 22.0 ?\ufffd\uc0c1"}),"\n",(0,r.jsx)(n.li,{children:"Docker & Docker Compose"}),"\n",(0,r.jsx)(n.li,{children:"Yarn 1.22 ?\ufffd\uc0c1"}),"\n"]}),"\n",(0,r.jsx)(n.h3,{id:"2-\uce58",children:"2. ?\ufffd\uce58"}),"\n",(0,r.jsx)(n.pre,{children:(0,r.jsx)(n.code,{className:"language-bash",children:"# ?\ufffd?\ufffd\uc18c ?\ufffd\ub860\ngit clone https://github.com/your-org/gatrix.git\ncd gatrix\n\n# ?\ufffd\uacbd \ubcc0???\ufffd\uc815\ncp .env.example .env.local\n\n# ?\ufffd\uc874???\ufffd\uce58\nyarn install\n\n# ?\ufffd\ud504???\ufffd\uc791 (MySQL, Redis)\nyarn infra:up\n\n# ?\ufffd\uc774?\ufffd\ubca0?\ufffd\uc2a4 \ub9c8\uc774\uadf8\ub808?\ufffd\uc158\nyarn migrate\n\n# \uac1c\ubc1c ?\ufffd\ubc84 ?\ufffd\uc791\nyarn dev\n"})}),"\n",(0,r.jsx)(n.h3,{id:"3-\uc18d",children:"3. ?\ufffd\uc18d"}),"\n",(0,r.jsx)(n.p,{children:"?\ufffd\uce58\uac00 ?\ufffd\ub8cc?\ufffd\uba74 ?\ufffd\uc74c URL\ufffd??\ufffd\uc18d?????\ufffd\uc2b5?\ufffd\ub2e4:"}),"\n",(0,r.jsxs)(n.ul,{children:["\n",(0,r.jsxs)(n.li,{children:["**?\ufffd\ub860?\ufffd\uc5d4??*: ",(0,r.jsx)(n.a,{href:"http://localhost:43000",children:"http://localhost:43000"})]}),"\n",(0,r.jsxs)(n.li,{children:[(0,r.jsx)(n.strong,{children:"\ubc31\uc5d4??API"}),": ",(0,r.jsx)(n.a,{href:"http://localhost:45000",children:"http://localhost:45000"})]}),"\n",(0,r.jsxs)(n.li,{children:[(0,r.jsx)(n.strong,{children:"Edge ?\ufffd\ubc84"}),": ",(0,r.jsx)(n.a,{href:"http://localhost:3400",children:"http://localhost:3400"})]}),"\n",(0,r.jsxs)(n.li,{children:[(0,r.jsx)(n.strong,{children:"\ucc44\ud305 ?\ufffd\ubc84"}),": ",(0,r.jsx)(n.a,{href:"http://localhost:45100",children:"http://localhost:45100"})]}),"\n",(0,r.jsxs)(n.li,{children:[(0,r.jsx)(n.strong,{children:"Event Lens"}),": ",(0,r.jsx)(n.a,{href:"http://localhost:45200",children:"http://localhost:45200"})]}),"\n",(0,r.jsxs)(n.li,{children:[(0,r.jsx)(n.strong,{children:"Grafana"}),": ",(0,r.jsx)(n.a,{href:"http://localhost:44000",children:"http://localhost:44000"})]}),"\n"]}),"\n",(0,r.jsx)(n.h2,{id:"-\uc74c-\uacc4",children:"?\ufffd\ufffd ?\ufffd\uc74c ?\ufffd\uacc4"}),"\n",(0,r.jsxs)(n.ol,{children:["\n",(0,r.jsxs)(n.li,{children:[(0,r.jsx)(n.strong,{children:(0,r.jsx)(n.a,{href:"/api/client-api",children:"API \ubb38\uc11c ?\ufffd\uae30"})}),": ?\ufffd\ub77c?\ufffd\uc5b8??API ?\ufffd\uc6a9\ufffd??\ufffd\uc544\ubcf4\uae30"]}),"\n",(0,r.jsxs)(n.li,{children:[(0,r.jsx)(n.strong,{children:(0,r.jsx)(n.a,{href:"/features/feature-flags",children:"?\ufffd\ucc98 ?\ufffd\ub798\ufffd??\ufffd\uc2b5"})}),": \uae30\ub2a5 ?\ufffd\uc5b4 ?\ufffd\uc2a4???\ufffd\ud574"]}),"\n",(0,r.jsxs)(n.li,{children:[(0,r.jsx)(n.strong,{children:(0,r.jsx)(n.a,{href:"/features/job-management",children:"?\ufffd\uc5c5 \uad00\ufffd??\ufffd\uc0c9"})}),": ?\ufffd\ub3d9?\ufffd\ub41c ?\ufffd\uc5c5 ?\ufffd\ufffd?\uc904\ub9c1 ?\ufffd\uc815"]}),"\n",(0,r.jsxs)(n.li,{children:[(0,r.jsx)(n.strong,{children:(0,r.jsx)(n.a,{href:"/features/game-worlds",children:"\uac8c\uc784 ?\ufffd\ub4dc \uad6c\uc131"})}),": ?\ufffd\uc911 \uac8c\uc784 ?\ufffd\ub4dc ?\ufffd\uc815"]}),"\n"]}),"\n",(0,r.jsx)(n.h2,{id:"-\ucee4\ud2f0",children:"?\ufffd\ufffd \ucee4\ufffd??\ufffd\ud2f0"}),"\n",(0,r.jsxs)(n.ul,{children:["\n",(0,r.jsxs)(n.li,{children:[(0,r.jsx)(n.strong,{children:"GitHub"}),": ",(0,r.jsx)(n.a,{href:"https://github.com/your-org/gatrix",children:"your-org/gatrix"})]}),"\n",(0,r.jsxs)(n.li,{children:["**?\ufffd\uc288 \ub9ac\ud3ec??*: ",(0,r.jsx)(n.a,{href:"https://github.com/your-org/gatrix/issues",children:"GitHub Issues"})]}),"\n",(0,r.jsxs)(n.li,{children:[(0,r.jsx)(n.strong,{children:"\ubb38\uc11c"}),": [???\ufffd\uc774??(/intro)"]}),"\n"]}),"\n",(0,r.jsx)(n.p,{children:"Gatrix?\ufffd ?\ufffd\uaed8 \uac8c\uc784 ?\ufffd\ub7ab??\uad00\ub9ac\uc758 ?\ufffd\ub85c??\ucc28\uc6d0??\uacbd\ud5d8?\ufffd\ubcf4?\ufffd\uc694! ??"})]})}function d(e={}){const{wrapper:n}={...(0,l.R)(),...e.components};return n?(0,r.jsx)(n,{...e,children:(0,r.jsx)(h,{...e})}):h(e)}},8453(e,n,t){t.d(n,{R:()=>i,x:()=>a});var s=t(6540);const r={},l=s.createContext(r);function i(e){const n=s.useContext(l);return s.useMemo(function(){return"function"==typeof e?e(n):{...n,...e}},[n,e])}function a(e){let n;return n=e.disableParentContext?"function"==typeof e.components?e.components(r):e.components||r:i(e.components),s.createElement(l.Provider,{value:n},e.children)}}}]);
+'use strict';
+(globalThis.webpackChunkdocs = globalThis.webpackChunkdocs || []).push([
+  [9328],
+  {
+    2421(e) {
+      e.exports = JSON.parse(
+        '{"permalink":"/docs/zh-Hans/blog/welcome-to-gatrix","editUrl":"https://github.com/your-org/gatrix/tree/main/docs/blog/2019-05-28-first-blog-post.md","source":"@site/blog/2019-05-28-first-blog-post.md","title":"Gatrix???\ufffd\uc2e0 \uac83\uc744 ?\ufffd\uc601?\ufffd\ub2c8?? \uac8c\uc784 ?\ufffd\ub7ab??\uad00\ub9ac\uc758 ?\ufffd\ub85c??\ucc28\uc6d0","description":"Gatrix???\ufffd\ub77c??\uac8c\uc784 ?\ufffd\ube44?\ufffd\ufffd? ?\ufffd\ud55c ?\ufffd\ud569 \uad00\ufffd??\ufffd\uc2a4?\ufffd\uc785?\ufffd\ub2e4. ?\ufffd\ufffd??\ufffd\uc778 ??\uae30\uc220???\ufffd\uc6a9?\ufffd\uc5ec \uac15\ub825?\ufffd\uace0 ?\ufffd\uc7a5 \uac00?\ufffd\ud55c \uac8c\uc784 \uad00\ufffd??\ufffd\ub7ab?\ufffd\uc744 ?\ufffd\uacf5?\ufffd\ub2c8??","date":"2019-05-28T00:00:00.000Z","tags":[{"inline":false,"label":"Gatrix","permalink":"/docs/zh-Hans/blog/tags/gatrix","description":"Gatrix game platform management system"},{"inline":false,"label":"Announcement","permalink":"/docs/zh-Hans/blog/tags/announcement","description":"Important announcements and updates"},{"inline":false,"label":"Features","permalink":"/docs/zh-Hans/blog/tags/features","description":"Platform features and capabilities"}],"readingTime":1.53,"hasTruncateMarker":true,"authors":[{"name":"Gatrix Team","title":"Game Platform Development Team","url":"https://github.com/your-org/gatrix","page":{"permalink":"/docs/zh-Hans/blog/authors/gatrix-team"},"socials":{"github":"https://github.com/your-org","email":"mailto:support@gatrix.com"},"imageURL":"https://avatars.githubusercontent.com/u/0?v=4","key":"gatrix-team"}],"frontMatter":{"slug":"welcome-to-gatrix","title":"Gatrix???\ufffd\uc2e0 \uac83\uc744 ?\ufffd\uc601?\ufffd\ub2c8?? \uac8c\uc784 ?\ufffd\ub7ab??\uad00\ub9ac\uc758 ?\ufffd\ub85c??\ucc28\uc6d0","authors":["gatrix-team"],"tags":["gatrix","announcement","features"]},"unlisted":false,"prevItem":{"title":"Gatrix ?\ufffd\uc5c5 \uad00\ufffd??\ufffd\uc2a4???\ufffd\uc804 \uac00?\ufffd\ub4dc: ?\ufffd\ub3d9?\ufffd\uc758 ?\ufffd\ub85c??\ucc28\uc6d0","permalink":"/docs/zh-Hans/blog/mastering-job-management-system"}}'
+      );
+    },
+    4014(e, n, t) {
+      (t.r(n),
+        t.d(n, {
+          assets: () => o,
+          contentTitle: () => a,
+          default: () => d,
+          frontMatter: () => i,
+          metadata: () => s,
+          toc: () => c,
+        }));
+      var s = t(2421),
+        r = t(4848),
+        l = t(8453);
+      const i = {
+          slug: 'welcome-to-gatrix',
+          title:
+            'Gatrix???\ufffd\uc2e0 \uac83\uc744 ?\ufffd\uc601?\ufffd\ub2c8?? \uac8c\uc784 ?\ufffd\ub7ab??\uad00\ub9ac\uc758 ?\ufffd\ub85c??\ucc28\uc6d0',
+          authors: ['gatrix-team'],
+          tags: ['gatrix', 'announcement', 'features'],
+        },
+        a = void 0,
+        o = { authorsImageUrls: [void 0] },
+        c = [
+          {
+            value: '?\ufffd\ufffd Gatrix?\ufffd \ubb34\uc5c7?\ufffd\ufffd???',
+            id: '-gatrix-\ubb34\uc5c7',
+            level: 2,
+          },
+          { value: '\uc8fc\uc694 ?\ufffd\uc9d5', id: '\uc8fc\uc694-\uc9d5', level: 3 },
+          { value: '?? \ube60\ub978 ?\ufffd\uc791', id: '-\ube60\ub978-\uc791', level: 2 },
+          {
+            value: '1. ?\ufffd\uc2a4???\ufffd\uad6c?\ufffd\ud56d',
+            id: '1-\uc2a4\uad6c\ud56d',
+            level: 3,
+          },
+          { value: '2. ?\ufffd\uce58', id: '2-\uce58', level: 3 },
+          { value: '3. ?\ufffd\uc18d', id: '3-\uc18d', level: 3 },
+          { value: '?\ufffd\ufffd ?\ufffd\uc74c ?\ufffd\uacc4', id: '-\uc74c-\uacc4', level: 2 },
+          { value: '?\ufffd\ufffd \ucee4\ufffd??\ufffd\ud2f0', id: '-\ucee4\ud2f0', level: 2 },
+        ];
+      function h(e) {
+        const n = {
+          a: 'a',
+          code: 'code',
+          em: 'em',
+          h2: 'h2',
+          h3: 'h3',
+          li: 'li',
+          ol: 'ol',
+          p: 'p',
+          pre: 'pre',
+          strong: 'strong',
+          ul: 'ul',
+          ...(0, l.R)(),
+          ...e.components,
+        };
+        return (0, r.jsxs)(r.Fragment, {
+          children: [
+            (0, r.jsx)(n.p, {
+              children:
+                'Gatrix???\ufffd\ub77c??\uac8c\uc784 ?\ufffd\ube44?\ufffd\ufffd? ?\ufffd\ud55c ?\ufffd\ud569 \uad00\ufffd??\ufffd\uc2a4?\ufffd\uc785?\ufffd\ub2e4. ?\ufffd\ufffd??\ufffd\uc778 ??\uae30\uc220???\ufffd\uc6a9?\ufffd\uc5ec \uac15\ub825?\ufffd\uace0 ?\ufffd\uc7a5 \uac00?\ufffd\ud55c \uac8c\uc784 \uad00\ufffd??\ufffd\ub7ab?\ufffd\uc744 ?\ufffd\uacf5?\ufffd\ub2c8??',
+            }),
+            '\n',
+            (0, r.jsx)(n.h2, {
+              id: '-gatrix-\ubb34\uc5c7',
+              children: '?\ufffd\ufffd Gatrix?\ufffd \ubb34\uc5c7?\ufffd\ufffd???',
+            }),
+            '\n',
+            (0, r.jsx)(n.p, {
+              children:
+                'Gatrix??TypeScript, React, MUI, Express.js\ufffd?\uad6c\ucd95???\ufffd\ufffd??\ufffd\uc778 ?\ufffd?\ufffd\ud0dd \uac8c\uc784 ?\ufffd\ub7ab??\uad00\ufffd??\ufffd\uc2a4?\ufffd\uc785?\ufffd\ub2e4. ???\ufffd\ub7ab?\ufffd\ufffd? \uac8c\uc784 ?\ufffd\uc601?\ufffd\ub4e4??\uac8c\uc784 ?\ufffd\ubc84, ?\ufffd\uc6a9?? \ucf58\ud150\uce20\ufffd? ?\ufffd\uc728?\ufffd\uc73c\ufffd?\uad00\ub9ac\ud560 ???\ufffd\ub3c4\ufffd??\ufffd\uacc4?\ufffd\uc5c8?\ufffd\ub2c8??',
+            }),
+            '\n',
+            (0, r.jsx)(n.h3, { id: '\uc8fc\uc694-\uc9d5', children: '\uc8fc\uc694 ?\ufffd\uc9d5' }),
+            '\n',
+            (0, r.jsxs)(n.ul, {
+              children: [
+                '\n',
+                (0, r.jsxs)(n.li, {
+                  children: [
+                    '**?\ufffd\ufffd \uac8c\uc784 ?\ufffd\ub7ab??\uad00\ufffd?',
+                    (0, r.jsx)(n.em, {
+                      children:
+                        ': ?\ufffd\ub77c??\uac8c\uc784 \uad00\ub9ac\ufffd? ?\ufffd\ud55c \uc885\ud569?\ufffd\uc778 ?\ufffd\ub7ab??- **?\ufffd\ufffd \uac8c\uc784 ?\ufffd\ub4dc \uad00\ufffd?',
+                    }),
+                    ': \uac1c\ubcc4 ?\ufffd\uc815??\uac00?\ufffd\ud55c ?\ufffd\uc911 ?\ufffd\ub4dc \uc9c0??- **?\ufffd\ufffd ?\ufffd\ub77c?\ufffd\uc5b8??\ubc84\uc804 \uad00\ufffd?*: \ubc84\uc804 ?\ufffd\uc5b4 \ufffd?\ubc30\ud3ec \uad00\ufffd?- ',
+                    (0, r.jsx)(n.strong, {
+                      children: '?\ufffd\ufffd ?\ufffd\ufffd?\ubcf4\uc218 \ubaa8\ub4dc',
+                    }),
+                    ': ?\ufffd\uc6a9???\ufffd\uc758 \uba54\uc2dc\uc9c0\uac00 ?\ufffd\ub294 ?\ufffd\uc2a4???\ufffd\uccb4 ?\ufffd\ufffd?\ubcf4\uc218 ?\ufffd\uc5b4',
+                  ],
+                }),
+                '\n',
+                (0, r.jsx)(n.li, {
+                  children:
+                    '**?\ufffd\ufffd\ufffd??\ufffd\uae45 ?\ufffd\uc2a4??*: \ucf58\ud150\ufffd?\uad6c\uc131???\ufffd\uc5f0???\ufffd\uae45',
+                }),
+                '\n',
+                (0, r.jsxs)(n.li, {
+                  children: [
+                    '**?\ufffd\ufffd \uba54\uc2dc\uc9c0 ?\ufffd\ud50c\ufffd?*: ?\ufffd\uad6d??\uba54\uc2dc\uc9c0 ?\ufffd\ud50c\ufffd?\uad00\ufffd?- ',
+                    (0, r.jsx)(n.strong, {
+                      children: '?\ufffd\ufffd\ufffd?IP ?\ufffd\uc774?\ufffd\ub9ac?\ufffd\ud2b8',
+                    }),
+                    ': \uace0\uae09 IP ?\ufffd\uadfc ?\ufffd\uc5b4 \ufffd?\uad00\ufffd?- ',
+                    (0, r.jsx)(n.strong, {
+                      children: '?\ufffd\ufffd ?\ufffd\uc2dc\ufffd?\ucc44\ud305',
+                    }),
+                    ': Socket.IO?\ufffd Redis ?\ufffd\ub7ec?\ufffd\ud130\ub9c1\uc744 ?\ufffd\ud55c \uace0\uc131??\ucc44\ud305 ?\ufffd\ubc84',
+                  ],
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, r.jsx)(n.h2, {
+              id: '-\ube60\ub978-\uc791',
+              children: '?? \ube60\ub978 ?\ufffd\uc791',
+            }),
+            '\n',
+            (0, r.jsx)(n.h3, {
+              id: '1-\uc2a4\uad6c\ud56d',
+              children: '1. ?\ufffd\uc2a4???\ufffd\uad6c?\ufffd\ud56d',
+            }),
+            '\n',
+            (0, r.jsxs)(n.ul, {
+              children: [
+                '\n',
+                (0, r.jsx)(n.li, { children: 'Node.js 22.0 ?\ufffd\uc0c1' }),
+                '\n',
+                (0, r.jsx)(n.li, { children: 'Docker & Docker Compose' }),
+                '\n',
+                (0, r.jsx)(n.li, { children: 'Yarn 1.22 ?\ufffd\uc0c1' }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, r.jsx)(n.h3, { id: '2-\uce58', children: '2. ?\ufffd\uce58' }),
+            '\n',
+            (0, r.jsx)(n.pre, {
+              children: (0, r.jsx)(n.code, {
+                className: 'language-bash',
+                children:
+                  '# ?\ufffd?\ufffd\uc18c ?\ufffd\ub860\ngit clone https://github.com/your-org/gatrix.git\ncd gatrix\n\n# ?\ufffd\uacbd \ubcc0???\ufffd\uc815\ncp .env.example .env.local\n\n# ?\ufffd\uc874???\ufffd\uce58\nyarn install\n\n# ?\ufffd\ud504???\ufffd\uc791 (MySQL, Redis)\nyarn infra:up\n\n# ?\ufffd\uc774?\ufffd\ubca0?\ufffd\uc2a4 \ub9c8\uc774\uadf8\ub808?\ufffd\uc158\nyarn migrate\n\n# \uac1c\ubc1c ?\ufffd\ubc84 ?\ufffd\uc791\nyarn dev\n',
+              }),
+            }),
+            '\n',
+            (0, r.jsx)(n.h3, { id: '3-\uc18d', children: '3. ?\ufffd\uc18d' }),
+            '\n',
+            (0, r.jsx)(n.p, {
+              children:
+                '?\ufffd\uce58\uac00 ?\ufffd\ub8cc?\ufffd\uba74 ?\ufffd\uc74c URL\ufffd??\ufffd\uc18d?????\ufffd\uc2b5?\ufffd\ub2e4:',
+            }),
+            '\n',
+            (0, r.jsxs)(n.ul, {
+              children: [
+                '\n',
+                (0, r.jsxs)(n.li, {
+                  children: [
+                    '**?\ufffd\ub860?\ufffd\uc5d4??*: ',
+                    (0, r.jsx)(n.a, {
+                      href: 'http://localhost:43000',
+                      children: 'http://localhost:43000',
+                    }),
+                  ],
+                }),
+                '\n',
+                (0, r.jsxs)(n.li, {
+                  children: [
+                    (0, r.jsx)(n.strong, { children: '\ubc31\uc5d4??API' }),
+                    ': ',
+                    (0, r.jsx)(n.a, {
+                      href: 'http://localhost:45000',
+                      children: 'http://localhost:45000',
+                    }),
+                  ],
+                }),
+                '\n',
+                (0, r.jsxs)(n.li, {
+                  children: [
+                    (0, r.jsx)(n.strong, { children: 'Edge ?\ufffd\ubc84' }),
+                    ': ',
+                    (0, r.jsx)(n.a, {
+                      href: 'http://localhost:3400',
+                      children: 'http://localhost:3400',
+                    }),
+                  ],
+                }),
+                '\n',
+                (0, r.jsxs)(n.li, {
+                  children: [
+                    (0, r.jsx)(n.strong, { children: '\ucc44\ud305 ?\ufffd\ubc84' }),
+                    ': ',
+                    (0, r.jsx)(n.a, {
+                      href: 'http://localhost:45100',
+                      children: 'http://localhost:45100',
+                    }),
+                  ],
+                }),
+                '\n',
+                (0, r.jsxs)(n.li, {
+                  children: [
+                    (0, r.jsx)(n.strong, { children: 'Event Lens' }),
+                    ': ',
+                    (0, r.jsx)(n.a, {
+                      href: 'http://localhost:45200',
+                      children: 'http://localhost:45200',
+                    }),
+                  ],
+                }),
+                '\n',
+                (0, r.jsxs)(n.li, {
+                  children: [
+                    (0, r.jsx)(n.strong, { children: 'Grafana' }),
+                    ': ',
+                    (0, r.jsx)(n.a, {
+                      href: 'http://localhost:44000',
+                      children: 'http://localhost:44000',
+                    }),
+                  ],
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, r.jsx)(n.h2, {
+              id: '-\uc74c-\uacc4',
+              children: '?\ufffd\ufffd ?\ufffd\uc74c ?\ufffd\uacc4',
+            }),
+            '\n',
+            (0, r.jsxs)(n.ol, {
+              children: [
+                '\n',
+                (0, r.jsxs)(n.li, {
+                  children: [
+                    (0, r.jsx)(n.strong, {
+                      children: (0, r.jsx)(n.a, {
+                        href: '/api/client-api',
+                        children: 'API \ubb38\uc11c ?\ufffd\uae30',
+                      }),
+                    }),
+                    ': ?\ufffd\ub77c?\ufffd\uc5b8??API ?\ufffd\uc6a9\ufffd??\ufffd\uc544\ubcf4\uae30',
+                  ],
+                }),
+                '\n',
+                (0, r.jsxs)(n.li, {
+                  children: [
+                    (0, r.jsx)(n.strong, {
+                      children: (0, r.jsx)(n.a, {
+                        href: '/features/feature-flags',
+                        children: '?\ufffd\ucc98 ?\ufffd\ub798\ufffd??\ufffd\uc2b5',
+                      }),
+                    }),
+                    ': \uae30\ub2a5 ?\ufffd\uc5b4 ?\ufffd\uc2a4???\ufffd\ud574',
+                  ],
+                }),
+                '\n',
+                (0, r.jsxs)(n.li, {
+                  children: [
+                    (0, r.jsx)(n.strong, {
+                      children: (0, r.jsx)(n.a, {
+                        href: '/features/job-management',
+                        children: '?\ufffd\uc5c5 \uad00\ufffd??\ufffd\uc0c9',
+                      }),
+                    }),
+                    ': ?\ufffd\ub3d9?\ufffd\ub41c ?\ufffd\uc5c5 ?\ufffd\ufffd?\uc904\ub9c1 ?\ufffd\uc815',
+                  ],
+                }),
+                '\n',
+                (0, r.jsxs)(n.li, {
+                  children: [
+                    (0, r.jsx)(n.strong, {
+                      children: (0, r.jsx)(n.a, {
+                        href: '/features/game-worlds',
+                        children: '\uac8c\uc784 ?\ufffd\ub4dc \uad6c\uc131',
+                      }),
+                    }),
+                    ': ?\ufffd\uc911 \uac8c\uc784 ?\ufffd\ub4dc ?\ufffd\uc815',
+                  ],
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, r.jsx)(n.h2, {
+              id: '-\ucee4\ud2f0',
+              children: '?\ufffd\ufffd \ucee4\ufffd??\ufffd\ud2f0',
+            }),
+            '\n',
+            (0, r.jsxs)(n.ul, {
+              children: [
+                '\n',
+                (0, r.jsxs)(n.li, {
+                  children: [
+                    (0, r.jsx)(n.strong, { children: 'GitHub' }),
+                    ': ',
+                    (0, r.jsx)(n.a, {
+                      href: 'https://github.com/your-org/gatrix',
+                      children: 'your-org/gatrix',
+                    }),
+                  ],
+                }),
+                '\n',
+                (0, r.jsxs)(n.li, {
+                  children: [
+                    '**?\ufffd\uc288 \ub9ac\ud3ec??*: ',
+                    (0, r.jsx)(n.a, {
+                      href: 'https://github.com/your-org/gatrix/issues',
+                      children: 'GitHub Issues',
+                    }),
+                  ],
+                }),
+                '\n',
+                (0, r.jsxs)(n.li, {
+                  children: [
+                    (0, r.jsx)(n.strong, { children: '\ubb38\uc11c' }),
+                    ': [???\ufffd\uc774??(/intro)',
+                  ],
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, r.jsx)(n.p, {
+              children:
+                'Gatrix?\ufffd ?\ufffd\uaed8 \uac8c\uc784 ?\ufffd\ub7ab??\uad00\ub9ac\uc758 ?\ufffd\ub85c??\ucc28\uc6d0??\uacbd\ud5d8?\ufffd\ubcf4?\ufffd\uc694! ??',
+            }),
+          ],
+        });
+      }
+      function d(e = {}) {
+        const { wrapper: n } = { ...(0, l.R)(), ...e.components };
+        return n ? (0, r.jsx)(n, { ...e, children: (0, r.jsx)(h, { ...e }) }) : h(e);
+      }
+    },
+    8453(e, n, t) {
+      t.d(n, { R: () => i, x: () => a });
+      var s = t(6540);
+      const r = {},
+        l = s.createContext(r);
+      function i(e) {
+        const n = s.useContext(l);
+        return s.useMemo(
+          function () {
+            return 'function' == typeof e ? e(n) : { ...n, ...e };
+          },
+          [n, e]
+        );
+      }
+      function a(e) {
+        let n;
+        return (
+          (n = e.disableParentContext
+            ? 'function' == typeof e.components
+              ? e.components(r)
+              : e.components || r
+            : i(e.components)),
+          s.createElement(l.Provider, { value: n }, e.children)
+        );
+      }
+    },
+  },
+]);

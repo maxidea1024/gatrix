@@ -25,21 +25,22 @@ Create and manage reward coupons for players.
 2. Click **Add Coupon** button
 3. Configure the coupon:
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| Code | Text | Required | Unique coupon code |
-| Description | Textarea | - | Admin notes |
-| Start Date | DateTime | - | When coupon becomes valid |
-| End Date | DateTime | - | When coupon expires |
-| Max Uses | Number | - | Total redemption limit |
-| Max Uses Per User | Number | - | Per-user limit |
-| Rewards | Reward Config | Required | Items/currency to give |
+| Field             | Type          | Required | Description               |
+| ----------------- | ------------- | -------- | ------------------------- |
+| Code              | Text          | Required | Unique coupon code        |
+| Description       | Textarea      | -        | Admin notes               |
+| Start Date        | DateTime      | -        | When coupon becomes valid |
+| End Date          | DateTime      | -        | When coupon expires       |
+| Max Uses          | Number        | -        | Total redemption limit    |
+| Max Uses Per User | Number        | -        | Per-user limit            |
+| Rewards           | Reward Config | Required | Items/currency to give    |
 
 4. Click **Create** to save
 
 ## Reward Configuration
 
 Rewards can include:
+
 - In-game items
 - Virtual currency
 - Premium time
@@ -59,6 +60,7 @@ POST /api/v1/coupons/redeem
 ## Tracking
 
 View redemption history including:
+
 - Redemption time
 - User ID
 - Rewards granted

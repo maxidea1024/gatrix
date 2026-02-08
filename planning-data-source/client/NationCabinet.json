@@ -13,12 +13,7 @@
       "taxExemptionRate": "number",
       "nationCabinetGradeBenefit": "bit",
       "minimapSpriteIcon": "String",
-      "frameSprite": [
-        "String",
-        "String",
-        "String",
-        "String"
-      ]
+      "frameSprite": ["String", "String", "String", "String"]
     },
     ":required": {
       "name": 1,

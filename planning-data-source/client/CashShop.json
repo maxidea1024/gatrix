@@ -34,10 +34,7 @@
       "mileageBonusPer": "number",
       "originalPriceValue": "number",
       "cashShopBoxTicketVal": "number",
-      "cashShopBoxTicketId": [
-        "number",
-        "number"
-      ],
+      "cashShopBoxTicketId": ["number", "number"],
       "previousId": "number",
       "maxLv": "number",
       "contentsTerms": [
@@ -83,14 +80,7 @@
       "buffGroup": "number",
       "buffGroupName": "text",
       "buffGroupLevel": "number",
-      "productWorldBuffId": [
-        "number",
-        "number",
-        "number",
-        "number",
-        "number",
-        "number"
-      ],
+      "productWorldBuffId": ["number", "number", "number", "number", "number", "number"],
       "productWorldBuff": [
         {
           "Id": "number",
@@ -208,10 +198,7 @@
       "productType": 1,
       "saleType": 1,
       "salePointId": 100000,
-      "cashShopBoxTicketId": [
-        23000000,
-        23000000
-      ],
+      "cashShopBoxTicketId": [23000000, 23000000],
       "previousId": 10500000,
       "contentsTerms": [
         {
@@ -232,14 +219,7 @@
       "productBadge": 1,
       "productRewardFixedId": 94000000,
       "bonusRewardFixedId": 94000000,
-      "productWorldBuffId": [
-        38000000,
-        38000000,
-        38000000,
-        38000000,
-        38000000,
-        38000000
-      ],
+      "productWorldBuffId": [38000000, 38000000, 38000000, 38000000, 38000000, 38000000],
       "productWorldBuff": [
         {
           "Id": 38000000
@@ -280,10 +260,7 @@
       "productType": 15,
       "saleType": 13,
       "salePointId": 199999,
-      "cashShopBoxTicketId": [
-        23999999,
-        23999999
-      ],
+      "cashShopBoxTicketId": [23999999, 23999999],
       "previousId": 10599999,
       "contentsTerms": [
         {
@@ -304,14 +281,7 @@
       "productBadge": 5,
       "productRewardFixedId": 95999999,
       "bonusRewardFixedId": 95999999,
-      "productWorldBuffId": [
-        38099999,
-        38099999,
-        38099999,
-        38099999,
-        38099999,
-        38099999
-      ],
+      "productWorldBuffId": [38099999, 38099999, 38099999, 38099999, 38099999, 38099999],
       "productWorldBuff": [
         {
           "Id": 38099999
@@ -349,114 +319,59 @@
     ":enum": {},
     ":asset": {},
     ":links": {
-      "subProductCategory": [
-        "CashShopTab"
-      ],
-      "salePointId": [
-        "Point"
-      ],
-      "cashShopBoxTicketId": [
-        [
-          "Item"
-        ],
-        [
-          "Item"
-        ]
-      ],
-      "previousId": [
-        "CashShop"
-      ],
+      "subProductCategory": ["CashShopTab"],
+      "salePointId": ["Point"],
+      "cashShopBoxTicketId": [["Item"], ["Item"]],
+      "previousId": ["CashShop"],
       "contentsTerms": [
         {
-          "Id": [
-            "ContentsTerms"
-          ]
+          "Id": ["ContentsTerms"]
         },
         {
-          "Id": [
-            "ContentsTerms"
-          ]
+          "Id": ["ContentsTerms"]
         }
       ],
       "endContentsTerms": [
         {
-          "Id": [
-            "ContentsTerms"
-          ]
+          "Id": ["ContentsTerms"]
         },
         {
-          "Id": [
-            "ContentsTerms"
-          ]
+          "Id": ["ContentsTerms"]
         }
       ],
-      "productRewardFixedId": [
-        "RewardFixed"
-      ],
-      "bonusRewardFixedId": [
-        "RewardFixed"
-      ],
+      "productRewardFixedId": ["RewardFixed"],
+      "bonusRewardFixedId": ["RewardFixed"],
       "productWorldBuffId": [
-        [
-          "WorldBuff"
-        ],
-        [
-          "WorldBuff"
-        ],
-        [
-          "WorldBuff"
-        ],
-        [
-          "WorldBuff"
-        ],
-        [
-          "WorldBuff"
-        ],
-        [
-          "WorldBuff"
-        ]
+        ["WorldBuff"],
+        ["WorldBuff"],
+        ["WorldBuff"],
+        ["WorldBuff"],
+        ["WorldBuff"],
+        ["WorldBuff"]
       ],
       "productWorldBuff": [
         {
-          "Id": [
-            "WorldBuff"
-          ]
+          "Id": ["WorldBuff"]
         },
         {
-          "Id": [
-            "WorldBuff"
-          ]
+          "Id": ["WorldBuff"]
         },
         {
-          "Id": [
-            "WorldBuff"
-          ]
+          "Id": ["WorldBuff"]
         },
         {
-          "Id": [
-            "WorldBuff"
-          ]
+          "Id": ["WorldBuff"]
         },
         {
-          "Id": [
-            "WorldBuff"
-          ]
+          "Id": ["WorldBuff"]
         },
         {
-          "Id": [
-            "WorldBuff"
-          ]
+          "Id": ["WorldBuff"]
         }
       ],
-      "taxFreePermitId": [
-        "TaxFreePermit"
-      ],
-      "singleBoxCashShopId": [
-        "CashShop"
-      ],
-      "ceilingCashShopBoxRatioId": [
-        "CashShopBoxRatio"
-      ],
+      "taxFreePermitId": ["TaxFreePermit"],
+      "singleBoxCashShopId": ["CashShop"],
+      "ceilingCashShopBoxRatioId": ["CashShopBoxRatio"],
       "ceilingCashShopBoxIconId": [
         "Point",
         "Item",
@@ -470,30 +385,14 @@
         "Shield",
         "TaxFreePermit"
       ],
-      "questPassId": [
-        "QuestPass"
-      ],
-      "soundPackId": [
-        "SoundPack"
-      ],
-      "eventPageId": [
-        "EventPage"
-      ],
-      "dailySubscriptionId": [
-        "DailySubscription"
-      ],
-      "illustSkinId": [
-        "IllustSkin"
-      ],
-      "MateId": [
-        "Mate"
-      ],
-      "userTitleId": [
-        "UserTitle"
-      ],
-      "petId": [
-        "Pet"
-      ]
+      "questPassId": ["QuestPass"],
+      "soundPackId": ["SoundPack"],
+      "eventPageId": ["EventPage"],
+      "dailySubscriptionId": ["DailySubscription"],
+      "illustSkinId": ["IllustSkin"],
+      "MateId": ["Mate"],
+      "userTitleId": ["UserTitle"],
+      "petId": ["Pet"]
     }
   },
   "CashShop": {
@@ -2028,9 +1927,7 @@
       "HotSpotResetType": 0,
       "buffGroup": 100,
       "buffGroupLevel": 1,
-      "productWorldBuffId": [
-        38020500
-      ],
+      "productWorldBuffId": [38020500],
       "productWorldBuff": [
         {
           "Id": 38020500,
@@ -2106,9 +2003,7 @@
       "HotSpotResetType": 0,
       "buffGroup": 300,
       "buffGroupLevel": 1,
-      "productWorldBuffId": [
-        38020521
-      ],
+      "productWorldBuffId": [38020521],
       "productWorldBuff": [
         {
           "Id": 38020521,
@@ -2146,12 +2041,7 @@
       "buffGroup": 1,
       "buffGroupName": "명장의 축복",
       "buffGroupLevel": 1,
-      "productWorldBuffId": [
-        38020504,
-        38020507,
-        38020509,
-        38042800
-      ],
+      "productWorldBuffId": [38020504, 38020507, 38020509, 38042800],
       "productWorldBuff": [
         {
           "Id": 38020504,
@@ -2201,13 +2091,7 @@
       "buffGroup": 1,
       "buffGroupName": "명장의 축복",
       "buffGroupLevel": 2,
-      "productWorldBuffId": [
-        38020504,
-        38020507,
-        38020510,
-        38042801,
-        38020512
-      ],
+      "productWorldBuffId": [38020504, 38020507, 38020510, 38042801, 38020512],
       "productWorldBuff": [
         {
           "Id": 38020504,
@@ -2261,14 +2145,7 @@
       "buffGroup": 1,
       "buffGroupName": "명장의 축복",
       "buffGroupLevel": 3,
-      "productWorldBuffId": [
-        38020505,
-        38020508,
-        38020511,
-        38042802,
-        38020513,
-        38002000
-      ],
+      "productWorldBuffId": [38020505, 38020508, 38020511, 38042802, 38020513, 38002000],
       "productWorldBuff": [
         {
           "Id": 38020505,
@@ -2327,9 +2204,7 @@
       "buffGroup": 2,
       "buffGroupName": "부활의 축복",
       "buffGroupLevel": 1,
-      "productWorldBuffId": [
-        38020514
-      ],
+      "productWorldBuffId": [38020514],
       "productWorldBuff": [
         {
           "Id": 38020514,
@@ -2367,9 +2242,7 @@
       "buffGroup": 2,
       "buffGroupName": "부활의 축복",
       "buffGroupLevel": 2,
-      "productWorldBuffId": [
-        38020515
-      ],
+      "productWorldBuffId": [38020515],
       "productWorldBuff": [
         {
           "Id": 38020515,
@@ -2407,10 +2280,7 @@
       "buffGroup": 2,
       "buffGroupName": "부활의 축복",
       "buffGroupLevel": 3,
-      "productWorldBuffId": [
-        38020516,
-        38002001
-      ],
+      "productWorldBuffId": [38020516, 38002001],
       "productWorldBuff": [
         {
           "Id": 38020516,
@@ -2452,11 +2322,7 @@
       "buffGroup": 3,
       "buffGroupName": "엘모의 가호",
       "buffGroupLevel": 1,
-      "productWorldBuffId": [
-        38020518,
-        38020522,
-        38042900
-      ],
+      "productWorldBuffId": [38020518, 38020522, 38042900],
       "productWorldBuff": [
         {
           "Id": 38020518,
@@ -2503,12 +2369,7 @@
       "buffGroup": 3,
       "buffGroupName": "엘모의 가호",
       "buffGroupLevel": 2,
-      "productWorldBuffId": [
-        38020519,
-        38020522,
-        38020524,
-        38042901
-      ],
+      "productWorldBuffId": [38020519, 38020522, 38020524, 38042901],
       "productWorldBuff": [
         {
           "Id": 38020519,
@@ -2559,14 +2420,7 @@
       "buffGroup": 3,
       "buffGroupName": "엘모의 가호",
       "buffGroupLevel": 3,
-      "productWorldBuffId": [
-        38020520,
-        38020523,
-        38020525,
-        38020526,
-        38042902,
-        38002002
-      ],
+      "productWorldBuffId": [38020520, 38020523, 38020525, 38020526, 38042902, 38002002],
       "productWorldBuff": [
         {
           "Id": 38020520,
@@ -2624,10 +2478,7 @@
       "buffGroup": 4,
       "buffGroupName": "미카엘의 가호",
       "buffGroupLevel": 1,
-      "productWorldBuffId": [
-        38020528,
-        38020531
-      ],
+      "productWorldBuffId": [38020528, 38020531],
       "productWorldBuff": [
         {
           "Id": 38020528,
@@ -2669,10 +2520,7 @@
       "buffGroup": 4,
       "buffGroupName": "미카엘의 가호",
       "buffGroupLevel": 2,
-      "productWorldBuffId": [
-        38020529,
-        38020532
-      ],
+      "productWorldBuffId": [38020529, 38020532],
       "productWorldBuff": [
         {
           "Id": 38020529,
@@ -2714,11 +2562,7 @@
       "buffGroup": 4,
       "buffGroupName": "미카엘의 가호",
       "buffGroupLevel": 3,
-      "productWorldBuffId": [
-        38020529,
-        38020533,
-        38002003
-      ],
+      "productWorldBuffId": [38020529, 38020533, 38002003],
       "productWorldBuff": [
         {
           "Id": 38020529,
@@ -11132,10 +10976,7 @@
       "buffGroup": 5,
       "buffGroupName": "라파엘의 가호",
       "buffGroupLevel": 1,
-      "productWorldBuffId": [
-        38042400,
-        38042300
-      ],
+      "productWorldBuffId": [38042400, 38042300],
       "productWorldBuff": [
         {
           "Id": 38042400,
@@ -11177,11 +11018,7 @@
       "buffGroup": 5,
       "buffGroupName": "라파엘의 가호",
       "buffGroupLevel": 2,
-      "productWorldBuffId": [
-        38042401,
-        38042301,
-        38042200
-      ],
+      "productWorldBuffId": [38042401, 38042301, 38042200],
       "productWorldBuff": [
         {
           "Id": 38042401,
@@ -11227,12 +11064,7 @@
       "buffGroup": 5,
       "buffGroupName": "라파엘의 가호",
       "buffGroupLevel": 3,
-      "productWorldBuffId": [
-        38042402,
-        38042302,
-        38042201,
-        38002004
-      ],
+      "productWorldBuffId": [38042402, 38042302, 38042201, 38002004],
       "productWorldBuff": [
         {
           "Id": 38042402,
@@ -11797,9 +11629,7 @@
       "HotSpotResetType": 0,
       "buffGroup": 100,
       "buffGroupLevel": 1,
-      "productWorldBuffId": [
-        38020549
-      ],
+      "productWorldBuffId": [38020549],
       "productWorldBuff": [
         {
           "Id": 38020549,
@@ -12311,11 +12141,7 @@
       "buffGroup": 6,
       "buffGroupName": "대상인의 축복",
       "buffGroupLevel": 1,
-      "productWorldBuffId": [
-        38042500,
-        38042600,
-        38042700
-      ],
+      "productWorldBuffId": [38042500, 38042600, 38042700],
       "productWorldBuff": [
         {
           "Id": 38042500,
@@ -12361,11 +12187,7 @@
       "buffGroup": 6,
       "buffGroupName": "대상인의 축복",
       "buffGroupLevel": 2,
-      "productWorldBuffId": [
-        38042501,
-        38042601,
-        38042701
-      ],
+      "productWorldBuffId": [38042501, 38042601, 38042701],
       "productWorldBuff": [
         {
           "Id": 38042501,
@@ -12411,14 +12233,7 @@
       "buffGroup": 6,
       "buffGroupName": "대상인의 축복",
       "buffGroupLevel": 3,
-      "productWorldBuffId": [
-        38042502,
-        38042602,
-        38042702,
-        38020549,
-        38043000,
-        38002005
-      ],
+      "productWorldBuffId": [38042502, 38042602, 38042702, 38020549, 38043000, 38002005],
       "productWorldBuff": [
         {
           "Id": 38042502,
@@ -16222,14 +16037,7 @@
       "buffGroup": 7,
       "buffGroupName": "돌아온 항해자의 가호",
       "buffGroupLevel": 1,
-      "productWorldBuffId": [
-        38099015,
-        38099016,
-        38099017,
-        38099018,
-        38099019,
-        38099020
-      ],
+      "productWorldBuffId": [38099015, 38099016, 38099017, 38099018, 38099019, 38099020],
       "productWorldBuff": [
         {
           "Id": 38099015,
@@ -18141,9 +17949,7 @@
       "isEndDateMake": false,
       "durationDays": 0,
       "HotSpotResetType": 0,
-      "productWorldBuffId": [
-        38099200
-      ],
+      "productWorldBuffId": [38099200],
       "productWorldBuff": [
         {
           "Id": 38099200,
@@ -19997,10 +19803,7 @@
       "buffGroup": 8,
       "buffGroupName": "원격 건조 패키지",
       "buffGroupLevel": 1,
-      "productWorldBuffId": [
-        38043100,
-        38043200
-      ],
+      "productWorldBuffId": [38043100, 38043200],
       "productWorldBuff": [
         {
           "Id": 38043100,
@@ -23968,11 +23771,7 @@
       "buffGroup": 9,
       "buffGroupName": "새싹의 가호",
       "buffGroupLevel": 1,
-      "productWorldBuffId": [
-        38020550,
-        38020551,
-        38002006
-      ],
+      "productWorldBuffId": [38020550, 38020551, 38002006],
       "productWorldBuff": [
         {
           "Id": 38020550,
@@ -24023,11 +23822,7 @@
       "buffGroup": 10,
       "buffGroupName": "성장의 가호",
       "buffGroupLevel": 1,
-      "productWorldBuffId": [
-        38020552,
-        38020553,
-        38002007
-      ],
+      "productWorldBuffId": [38020552, 38020553, 38002007],
       "productWorldBuff": [
         {
           "Id": 38020552,
@@ -25511,9 +25306,7 @@
       "buffGroup": 11,
       "buffGroupName": "원격 투자",
       "buffGroupLevel": 1,
-      "productWorldBuffId": [
-        38099041
-      ],
+      "productWorldBuffId": [38099041],
       "productWorldBuff": [
         {
           "Id": 38099041,
@@ -28451,9 +28244,7 @@
       "buffGroup": 12,
       "buffGroupName": "선단 경험치 부스트",
       "buffGroupLevel": 1,
-      "productWorldBuffId": [
-        38042903
-      ],
+      "productWorldBuffId": [38042903],
       "productWorldBuff": [
         {
           "Id": 38042903,
@@ -39617,12 +39408,7 @@
       "buffGroup": 901,
       "buffGroupName": "항해의 가호",
       "buffGroupLevel": 1,
-      "productWorldBuffId": [
-        38095000,
-        38095003,
-        38095011,
-        38095006
-      ],
+      "productWorldBuffId": [38095000, 38095003, 38095011, 38095006],
       "productWorldBuff": [
         {
           "Id": 38095000,
@@ -39673,12 +39459,7 @@
       "buffGroup": 901,
       "buffGroupName": "항해의 가호",
       "buffGroupLevel": 2,
-      "productWorldBuffId": [
-        38095001,
-        38095004,
-        38095011,
-        38095007
-      ],
+      "productWorldBuffId": [38095001, 38095004, 38095011, 38095007],
       "productWorldBuff": [
         {
           "Id": 38095001,
@@ -39729,14 +39510,7 @@
       "buffGroup": 901,
       "buffGroupName": "항해의 가호",
       "buffGroupLevel": 3,
-      "productWorldBuffId": [
-        38095002,
-        38095005,
-        38095012,
-        38095008,
-        38095009,
-        38095010
-      ],
+      "productWorldBuffId": [38095002, 38095005, 38095012, 38095008, 38095009, 38095010],
       "productWorldBuff": [
         {
           "Id": 38095002,
@@ -39795,11 +39569,7 @@
       "buffGroup": 902,
       "buffGroupName": "보급의 가호",
       "buffGroupLevel": 1,
-      "productWorldBuffId": [
-        38095101,
-        38095104,
-        38095107
-      ],
+      "productWorldBuffId": [38095101, 38095104, 38095107],
       "productWorldBuff": [
         {
           "Id": 38095101,
@@ -39846,11 +39616,7 @@
       "buffGroup": 902,
       "buffGroupName": "보급의 가호",
       "buffGroupLevel": 2,
-      "productWorldBuffId": [
-        38095102,
-        38095105,
-        38095108
-      ],
+      "productWorldBuffId": [38095102, 38095105, 38095108],
       "productWorldBuff": [
         {
           "Id": 38095102,
@@ -39897,12 +39663,7 @@
       "buffGroup": 902,
       "buffGroupName": "보급의 가호",
       "buffGroupLevel": 3,
-      "productWorldBuffId": [
-        38095103,
-        38095106,
-        38095109,
-        38095110
-      ],
+      "productWorldBuffId": [38095103, 38095106, 38095109, 38095110],
       "productWorldBuff": [
         {
           "Id": 38095103,
@@ -39954,10 +39715,7 @@
       "buffGroup": 903,
       "buffGroupName": "모험의 가호",
       "buffGroupLevel": 1,
-      "productWorldBuffId": [
-        38095201,
-        38095204
-      ],
+      "productWorldBuffId": [38095201, 38095204],
       "productWorldBuff": [
         {
           "Id": 38095201,
@@ -40000,11 +39758,7 @@
       "buffGroup": 903,
       "buffGroupName": "모험의 가호",
       "buffGroupLevel": 2,
-      "productWorldBuffId": [
-        38095202,
-        38095205,
-        38095207
-      ],
+      "productWorldBuffId": [38095202, 38095205, 38095207],
       "productWorldBuff": [
         {
           "Id": 38095202,
@@ -40051,14 +39805,7 @@
       "buffGroup": 903,
       "buffGroupName": "모험의 가호",
       "buffGroupLevel": 3,
-      "productWorldBuffId": [
-        38095203,
-        38095206,
-        38095208,
-        38095209,
-        38095210,
-        38095211
-      ],
+      "productWorldBuffId": [38095203, 38095206, 38095208, 38095209, 38095210, 38095211],
       "productWorldBuff": [
         {
           "Id": 38095203,
@@ -40118,10 +39865,7 @@
       "buffGroup": 904,
       "buffGroupName": "교역의 가호",
       "buffGroupLevel": 1,
-      "productWorldBuffId": [
-        38095301,
-        38095304
-      ],
+      "productWorldBuffId": [38095301, 38095304],
       "productWorldBuff": [
         {
           "Id": 38095301,
@@ -40164,10 +39908,7 @@
       "buffGroup": 904,
       "buffGroupName": "교역의 가호",
       "buffGroupLevel": 2,
-      "productWorldBuffId": [
-        38095302,
-        38095305
-      ],
+      "productWorldBuffId": [38095302, 38095305],
       "productWorldBuff": [
         {
           "Id": 38095302,
@@ -40210,14 +39951,7 @@
       "buffGroup": 904,
       "buffGroupName": "교역의 가호",
       "buffGroupLevel": 3,
-      "productWorldBuffId": [
-        38095303,
-        38095306,
-        38095307,
-        38095308,
-        38095309,
-        38095310
-      ],
+      "productWorldBuffId": [38095303, 38095306, 38095307, 38095308, 38095309, 38095310],
       "productWorldBuff": [
         {
           "Id": 38095303,
@@ -40277,10 +40011,7 @@
       "buffGroup": 905,
       "buffGroupName": "전투의 가호",
       "buffGroupLevel": 1,
-      "productWorldBuffId": [
-        38095401,
-        38095404
-      ],
+      "productWorldBuffId": [38095401, 38095404],
       "productWorldBuff": [
         {
           "Id": 38095401,
@@ -40323,10 +40054,7 @@
       "buffGroup": 905,
       "buffGroupName": "전투의 가호",
       "buffGroupLevel": 2,
-      "productWorldBuffId": [
-        38095402,
-        38095405
-      ],
+      "productWorldBuffId": [38095402, 38095405],
       "productWorldBuff": [
         {
           "Id": 38095402,
@@ -40369,13 +40097,7 @@
       "buffGroup": 905,
       "buffGroupName": "전투의 가호",
       "buffGroupLevel": 3,
-      "productWorldBuffId": [
-        38095403,
-        38095406,
-        38095407,
-        38095408,
-        38095409
-      ],
+      "productWorldBuffId": [38095403, 38095406, 38095407, 38095408, 38095409],
       "productWorldBuff": [
         {
           "Id": 38095403,
@@ -41801,10 +41523,7 @@
       "buffGroup": 9999,
       "buffGroupName": "테스트 복귀",
       "buffGroupLevel": 1,
-      "productWorldBuffId": [
-        38020518,
-        38020522
-      ],
+      "productWorldBuffId": [38020518, 38020522],
       "productWorldBuff": [
         {
           "Id": 38020518,
@@ -41894,11 +41613,7 @@
       "buffGroup": 9998,
       "buffGroupName": "연속구매테스트",
       "buffGroupLevel": 1,
-      "productWorldBuffId": [
-        38020552,
-        38020553,
-        38002007
-      ],
+      "productWorldBuffId": [38020552, 38020553, 38002007],
       "productWorldBuff": [
         {
           "Id": 38020552,
@@ -41980,11 +41695,7 @@
       "HotSpotResetType": 0,
       "buffGroup": 9997,
       "buffGroupName": "프리미엄패스효과",
-      "productWorldBuffId": [
-        38020552,
-        38020553,
-        38002007
-      ],
+      "productWorldBuffId": [38020552, 38020553, 38002007],
       "productWorldBuff": [
         {
           "Id": 38020552,
@@ -42051,9 +41762,7 @@
       "salePointId": 100001,
       "salePointVal": 3000000,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510000
-      ],
+      "cashShopBoxTicketId": [23510000],
       "saleEndDate": "2025/01/08/00:00:00",
       "isEndDateMake": true,
       "HotSpotResetType": 0,
@@ -42088,9 +41797,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510001
-      ],
+      "cashShopBoxTicketId": [23510001],
       "saleEndDate": "2025/01/08/00:00:00",
       "isEndDateMake": true,
       "HotSpotResetType": 0,
@@ -42131,9 +41838,7 @@
       "salePointId": 100001,
       "salePointVal": 2500000,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510002
-      ],
+      "cashShopBoxTicketId": [23510002],
       "saleEndDate": "2025/01/08/00:00:00",
       "isEndDateMake": true,
       "HotSpotResetType": 0,
@@ -42168,9 +41873,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510003
-      ],
+      "cashShopBoxTicketId": [23510003],
       "saleEndDate": "2025/01/08/00:00:00",
       "isEndDateMake": true,
       "HotSpotResetType": 0,
@@ -42211,9 +41914,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/07/17/00:00:00",
       "saleEndDate": "2025/01/08/00:00:00",
       "isEndDateMake": true,
@@ -42252,9 +41953,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2023/10/25/12:00:00",
       "saleEndDate": "2023/11/25/00:00:00",
       "isEndDateMake": true,
@@ -42293,9 +41992,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/09/11/00:00:00",
       "saleEndDate": "2025/01/08/00:00:00",
       "isEndDateMake": true,
@@ -42334,9 +42031,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2023/11/22/12:00:00",
       "saleEndDate": "2023/12/22/00:00:00",
       "isEndDateMake": true,
@@ -42375,9 +42070,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/05/22/00:00:00",
       "saleEndDate": "2025/01/08/00:00:00",
       "isEndDateMake": true,
@@ -42416,9 +42109,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2023/12/06/00:00:00",
       "saleEndDate": "2024/01/06/00:00:00",
       "isEndDateMake": true,
@@ -42457,9 +42148,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/01/03/00:00:00",
       "saleEndDate": "2024/02/03/00:00:00",
       "isEndDateMake": true,
@@ -42498,9 +42187,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/01/17/12:00:00",
       "saleEndDate": "2024/02/17/00:00:00",
       "isEndDateMake": true,
@@ -42539,9 +42226,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/01/31/00:00:00",
       "saleEndDate": "2024/03/01/00:00:00",
       "isEndDateMake": true,
@@ -42580,10 +42265,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510013,
-        23510001
-      ],
+      "cashShopBoxTicketId": [23510013, 23510001],
       "contentsTerms": [
         {
           "Id": 81000018,
@@ -42630,9 +42312,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510110
-      ],
+      "cashShopBoxTicketId": [23510110],
       "contentsTerms": [
         {
           "Id": 81000018,
@@ -42680,9 +42360,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510110
-      ],
+      "cashShopBoxTicketId": [23510110],
       "contentsTerms": [
         {
           "Id": 81000018,
@@ -42730,9 +42408,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510110
-      ],
+      "cashShopBoxTicketId": [23510110],
       "contentsTerms": [
         {
           "Id": 81000018,
@@ -42780,9 +42456,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510110
-      ],
+      "cashShopBoxTicketId": [23510110],
       "contentsTerms": [
         {
           "Id": 81000018,
@@ -42830,9 +42504,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510018
-      ],
+      "cashShopBoxTicketId": [23510018],
       "contentsTerms": [
         {
           "Id": 81000018,
@@ -42872,9 +42544,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510110
-      ],
+      "cashShopBoxTicketId": [23510110],
       "contentsTerms": [
         {
           "Id": 81000018,
@@ -42922,9 +42592,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510110
-      ],
+      "cashShopBoxTicketId": [23510110],
       "contentsTerms": [
         {
           "Id": 81000018,
@@ -42972,9 +42640,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510110
-      ],
+      "cashShopBoxTicketId": [23510110],
       "contentsTerms": [
         {
           "Id": 81000018,
@@ -43022,9 +42688,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510110
-      ],
+      "cashShopBoxTicketId": [23510110],
       "contentsTerms": [
         {
           "Id": 81000018,
@@ -43072,9 +42736,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/06/05/12:00:00",
       "saleEndDate": "2024/07/03/00:00:00",
       "isEndDateMake": true,
@@ -43113,9 +42775,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510110
-      ],
+      "cashShopBoxTicketId": [23510110],
       "contentsTerms": [
         {
           "Id": 81000018,
@@ -43163,9 +42823,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510110
-      ],
+      "cashShopBoxTicketId": [23510110],
       "contentsTerms": [
         {
           "Id": 81000018,
@@ -43213,9 +42871,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510110
-      ],
+      "cashShopBoxTicketId": [23510110],
       "contentsTerms": [
         {
           "Id": 81000018,
@@ -43263,9 +42919,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510027
-      ],
+      "cashShopBoxTicketId": [23510027],
       "saleStartDate": "2023/04/12/12:00:00",
       "saleEndDate": "2023/05/12/00:00:00",
       "isEndDateMake": true,
@@ -43306,9 +42960,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/07/31/12:00:00",
       "saleEndDate": "2024/08/28/00:00:00",
       "isEndDateMake": true,
@@ -43347,9 +42999,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510029
-      ],
+      "cashShopBoxTicketId": [23510029],
       "saleStartDate": "2023/04/26/00:00:00",
       "saleEndDate": "2023/05/26/00:00:00",
       "isEndDateMake": true,
@@ -43391,9 +43041,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510030
-      ],
+      "cashShopBoxTicketId": [23510030],
       "saleStartDate": "2023/05/24/00:00:00",
       "saleEndDate": "2023/06/07/00:00:00",
       "isEndDateMake": true,
@@ -43435,9 +43083,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510031
-      ],
+      "cashShopBoxTicketId": [23510031],
       "saleStartDate": "2023/05/24/00:00:00",
       "saleEndDate": "2023/06/07/00:00:00",
       "isEndDateMake": true,
@@ -43479,9 +43125,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510032
-      ],
+      "cashShopBoxTicketId": [23510032],
       "saleStartDate": "2023/06/08/12:00:00",
       "saleEndDate": "2023/06/22/00:00:00",
       "isEndDateMake": true,
@@ -43523,9 +43167,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/08/28/12:00:00",
       "saleEndDate": "2024/09/25/00:00:00",
       "isEndDateMake": true,
@@ -43564,9 +43206,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510110
-      ],
+      "cashShopBoxTicketId": [23510110],
       "contentsTerms": [
         {
           "Id": 81000018,
@@ -43615,9 +43255,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510040
-      ],
+      "cashShopBoxTicketId": [23510040],
       "saleStartDate": "2023/06/21/00:00:00",
       "saleEndDate": "2023/07/05/00:00:00",
       "isEndDateMake": true,
@@ -43659,9 +43297,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/09/25/12:00:00",
       "saleEndDate": "2024/10/23/00:00:00",
       "isEndDateMake": true,
@@ -43700,9 +43336,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510042
-      ],
+      "cashShopBoxTicketId": [23510042],
       "saleStartDate": "2023/07/05/12:00:00",
       "saleEndDate": "2023/07/12/00:00:00",
       "isEndDateMake": true,
@@ -43744,9 +43378,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510043
-      ],
+      "cashShopBoxTicketId": [23510043],
       "saleStartDate": "2023/07/12/12:00:00",
       "saleEndDate": "2023/07/19/00:00:00",
       "isEndDateMake": true,
@@ -43788,9 +43420,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510110
-      ],
+      "cashShopBoxTicketId": [23510110],
       "contentsTerms": [
         {
           "Id": 81000018,
@@ -43839,9 +43469,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510044
-      ],
+      "cashShopBoxTicketId": [23510044],
       "saleStartDate": "2023/07/19/00:00:00",
       "saleEndDate": "2023/07/26/00:00:00",
       "isEndDateMake": true,
@@ -43883,9 +43511,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510045
-      ],
+      "cashShopBoxTicketId": [23510045],
       "saleStartDate": "2023/07/26/12:00:00",
       "saleEndDate": "2023/08/02/00:00:00",
       "isEndDateMake": true,
@@ -43927,9 +43553,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/10/23/12:00:00",
       "saleEndDate": "2024/11/22/00:00:00",
       "isEndDateMake": true,
@@ -43968,9 +43592,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510046
-      ],
+      "cashShopBoxTicketId": [23510046],
       "saleStartDate": "2023/08/02/12:00:00",
       "saleEndDate": "2023/08/09/00:00:00",
       "isEndDateMake": true,
@@ -44012,9 +43634,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510047
-      ],
+      "cashShopBoxTicketId": [23510047],
       "saleStartDate": "2023/08/09/12:00:00",
       "saleEndDate": "2023/08/16/00:00:00",
       "isEndDateMake": true,
@@ -44056,9 +43676,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510110
-      ],
+      "cashShopBoxTicketId": [23510110],
       "contentsTerms": [
         {
           "Id": 81000018,
@@ -44107,9 +43725,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2023/08/16/00:00:00",
       "saleEndDate": "2023/09/16/00:00:00",
       "isEndDateMake": true,
@@ -44148,9 +43764,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510050
-      ],
+      "cashShopBoxTicketId": [23510050],
       "saleStartDate": "2023/08/16/00:00:00",
       "saleEndDate": "2023/09/16/00:00:00",
       "isEndDateMake": true,
@@ -44192,9 +43806,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510051
-      ],
+      "cashShopBoxTicketId": [23510051],
       "saleStartDate": "2023/08/23/12:00:00",
       "saleEndDate": "2023/09/16/00:00:00",
       "isEndDateMake": true,
@@ -44236,9 +43848,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2023/08/30/12:00:00",
       "saleEndDate": "2023/09/30/00:00:00",
       "isEndDateMake": true,
@@ -44277,9 +43887,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510053
-      ],
+      "cashShopBoxTicketId": [23510053],
       "saleStartDate": "2023/09/06/12:00:00",
       "saleEndDate": "2023/09/13/00:00:00",
       "isEndDateMake": true,
@@ -44321,9 +43929,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510001
-      ],
+      "cashShopBoxTicketId": [23510001],
       "saleStartDate": "2023/08/23/12:00:00",
       "saleEndDate": "2023/09/16/00:00:00",
       "isEndDateMake": true,
@@ -44365,9 +43971,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510110
-      ],
+      "cashShopBoxTicketId": [23510110],
       "contentsTerms": [
         {
           "Id": 81000018,
@@ -44416,9 +44020,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2023/09/13/00:00:00",
       "saleEndDate": "2023/10/13/00:00:00",
       "isEndDateMake": true,
@@ -44457,9 +44059,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510056
-      ],
+      "cashShopBoxTicketId": [23510056],
       "saleStartDate": "2023/09/13/00:00:00",
       "saleEndDate": "2023/09/20/00:00:00",
       "isEndDateMake": true,
@@ -44501,9 +44101,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510060
-      ],
+      "cashShopBoxTicketId": [23510060],
       "saleStartDate": "2023/09/20/12:00:00",
       "saleEndDate": "2023/10/04/00:00:00",
       "isEndDateMake": true,
@@ -44545,9 +44143,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510057
-      ],
+      "cashShopBoxTicketId": [23510057],
       "saleStartDate": "2023/09/20/12:00:00",
       "saleEndDate": "2023/09/27/00:00:00",
       "isEndDateMake": true,
@@ -44589,9 +44185,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2023/09/27/12:00:00",
       "saleEndDate": "2023/10/27/00:00:00",
       "isEndDateMake": true,
@@ -44630,9 +44224,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510058
-      ],
+      "cashShopBoxTicketId": [23510058],
       "saleStartDate": "2023/09/27/12:00:00",
       "saleEndDate": "2023/10/04/00:00:00",
       "isEndDateMake": true,
@@ -44674,9 +44266,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510059
-      ],
+      "cashShopBoxTicketId": [23510059],
       "saleStartDate": "2023/10/04/12:00:00",
       "saleEndDate": "2023/10/11/00:00:00",
       "isEndDateMake": true,
@@ -44718,9 +44308,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510110
-      ],
+      "cashShopBoxTicketId": [23510110],
       "contentsTerms": [
         {
           "Id": 81000018,
@@ -44769,9 +44357,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/07/31/12:00:00",
       "saleEndDate": "2024/08/28/00:00:00",
       "isEndDateMake": true,
@@ -44810,9 +44396,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510067
-      ],
+      "cashShopBoxTicketId": [23510067],
       "saleStartDate": "2023/10/11/00:00:00",
       "saleEndDate": "2023/10/18/00:00:00",
       "isEndDateMake": true,
@@ -44855,9 +44439,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510069
-      ],
+      "cashShopBoxTicketId": [23510069],
       "saleStartDate": "2023/10/11/00:00:00",
       "saleEndDate": "2023/10/25/00:00:00",
       "isEndDateMake": true,
@@ -44898,9 +44480,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510070
-      ],
+      "cashShopBoxTicketId": [23510070],
       "saleStartDate": "2024/03/27/00:00:00",
       "saleEndDate": "2024/04/03/00:00:00",
       "isEndDateMake": true,
@@ -44942,9 +44522,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/08/14/00:00:00",
       "saleEndDate": "2024/09/11/00:00:00",
       "isEndDateMake": true,
@@ -44983,9 +44561,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510071
-      ],
+      "cashShopBoxTicketId": [23510071],
       "saleStartDate": "2023/10/25/00:00:00",
       "saleEndDate": "2023/11/08/00:00:00",
       "isEndDateMake": true,
@@ -45027,9 +44603,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510110
-      ],
+      "cashShopBoxTicketId": [23510110],
       "contentsTerms": [
         {
           "Id": 81000018,
@@ -45078,9 +44652,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/03/13/12:00:00",
       "saleEndDate": "2024/04/13/00:00:00",
       "isEndDateMake": true,
@@ -45120,9 +44692,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510074
-      ],
+      "cashShopBoxTicketId": [23510074],
       "saleStartDate": "2023/11/08/00:00:00",
       "saleEndDate": "2023/11/22/00:00:00",
       "isEndDateMake": true,
@@ -45164,9 +44734,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "contentsTerms": [
         {
           "Id": 81000021,
@@ -45213,9 +44781,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510075
-      ],
+      "cashShopBoxTicketId": [23510075],
       "saleStartDate": "2023/11/15/12:00:00",
       "saleEndDate": "2025/01/08/00:00:00",
       "isEndDateMake": true,
@@ -45257,9 +44823,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/10/09/12:00:00",
       "saleEndDate": "2024/11/08/00:00:00",
       "isEndDateMake": true,
@@ -45299,9 +44863,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510076
-      ],
+      "cashShopBoxTicketId": [23510076],
       "saleStartDate": "2023/11/22/12:00:00",
       "saleEndDate": "2023/12/06/00:00:00",
       "isEndDateMake": true,
@@ -45343,9 +44905,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510110
-      ],
+      "cashShopBoxTicketId": [23510110],
       "contentsTerms": [
         {
           "Id": 81000018,
@@ -45394,9 +44954,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/06/05/12:00:00",
       "saleEndDate": "2024/07/03/00:00:00",
       "isEndDateMake": true,
@@ -45435,9 +44993,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510079
-      ],
+      "cashShopBoxTicketId": [23510079],
       "saleStartDate": "2024/04/03/12:00:00",
       "saleEndDate": "2024/04/10/00:00:00",
       "isEndDateMake": true,
@@ -45479,9 +45035,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510080
-      ],
+      "cashShopBoxTicketId": [23510080],
       "saleStartDate": "2024/04/10/12:00:00",
       "saleEndDate": "2024/04/17/00:00:00",
       "isEndDateMake": true,
@@ -45523,9 +45077,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2023/12/20/12:00:00",
       "saleEndDate": "2024/01/20/00:00:00",
       "isEndDateMake": true,
@@ -45564,9 +45116,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510081
-      ],
+      "cashShopBoxTicketId": [23510081],
       "saleStartDate": "2024/04/17/12:00:00",
       "saleEndDate": "2024/04/24/00:00:00",
       "isEndDateMake": true,
@@ -45608,9 +45158,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510082
-      ],
+      "cashShopBoxTicketId": [23510082],
       "saleStartDate": "2024/05/08/12:00:00",
       "saleEndDate": "2024/05/15/00:00:00",
       "isEndDateMake": true,
@@ -45652,9 +45200,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510110
-      ],
+      "cashShopBoxTicketId": [23510110],
       "contentsTerms": [
         {
           "Id": 81000018,
@@ -45703,9 +45249,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/03/27/00:00:00",
       "saleEndDate": "2025/01/08/00:00:00",
       "isEndDateMake": true,
@@ -45744,9 +45288,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510083
-      ],
+      "cashShopBoxTicketId": [23510083],
       "saleStartDate": "2024/05/15/12:00:00",
       "saleEndDate": "2024/05/22/00:00:00",
       "isEndDateMake": true,
@@ -45788,9 +45330,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510084
-      ],
+      "cashShopBoxTicketId": [23510084],
       "saleStartDate": "2024/01/10/12:00:00",
       "saleEndDate": "2024/01/17/00:00:00",
       "isEndDateMake": true,
@@ -45832,9 +45372,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510085
-      ],
+      "cashShopBoxTicketId": [23510085],
       "saleStartDate": "2024/01/17/12:00:00",
       "saleEndDate": "2024/01/24/00:00:00",
       "isEndDateMake": true,
@@ -45876,9 +45414,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510086
-      ],
+      "cashShopBoxTicketId": [23510086],
       "saleStartDate": "2024/01/24/12:00:00",
       "saleEndDate": "2024/01/31/00:00:00",
       "isEndDateMake": true,
@@ -45920,9 +45456,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510110
-      ],
+      "cashShopBoxTicketId": [23510110],
       "contentsTerms": [
         {
           "Id": 81000018,
@@ -45971,9 +45505,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/01/31/00:00:00",
       "saleEndDate": "2024/03/02/00:00:00",
       "isEndDateMake": true,
@@ -46012,9 +45544,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510090
-      ],
+      "cashShopBoxTicketId": [23510090],
       "saleStartDate": "2024/01/31/00:00:00",
       "saleEndDate": "2024/02/07/00:00:00",
       "isEndDateMake": true,
@@ -46056,9 +45586,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510091
-      ],
+      "cashShopBoxTicketId": [23510091],
       "productBadge": 2,
       "saleStartDate": "2024/02/07/12:00:00",
       "saleEndDate": "2024/02/21/00:00:00",
@@ -46101,9 +45629,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/07/03/12:00:00",
       "saleEndDate": "2024/07/31/00:00:00",
       "isEndDateMake": true,
@@ -46142,9 +45668,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510001
-      ],
+      "cashShopBoxTicketId": [23510001],
       "saleStartDate": "2024/02/28/00:00:00",
       "saleEndDate": "2025/01/08/00:00:00",
       "isEndDateMake": true,
@@ -46186,9 +45710,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510001
-      ],
+      "cashShopBoxTicketId": [23510001],
       "saleStartDate": "2024/02/28/00:00:00",
       "saleEndDate": "2025/01/08/00:00:00",
       "isEndDateMake": true,
@@ -46230,9 +45752,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510001
-      ],
+      "cashShopBoxTicketId": [23510001],
       "saleStartDate": "2024/02/28/00:00:00",
       "saleEndDate": "2025/01/08/00:00:00",
       "isEndDateMake": true,
@@ -46274,9 +45794,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510110
-      ],
+      "cashShopBoxTicketId": [23510110],
       "contentsTerms": [
         {
           "Id": 81000018,
@@ -46325,9 +45843,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/06/19/00:00:00",
       "saleEndDate": "2024/07/17/00:00:00",
       "isEndDateMake": true,
@@ -46366,9 +45882,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510094
-      ],
+      "cashShopBoxTicketId": [23510094],
       "saleStartDate": "2024/02/28/00:00:00",
       "saleEndDate": "2024/03/06/00:00:00",
       "isEndDateMake": true,
@@ -46410,9 +45924,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510095
-      ],
+      "cashShopBoxTicketId": [23510095],
       "previousId": 10505104,
       "productBadge": 2,
       "saleStartDate": "2024/03/06/12:00:00",
@@ -46458,9 +45970,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510095
-      ],
+      "cashShopBoxTicketId": [23510095],
       "productBadge": 2,
       "saleStartDate": "2024/03/06/12:00:00",
       "saleEndDate": "2024/03/20/00:00:00",
@@ -46504,9 +46014,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510095
-      ],
+      "cashShopBoxTicketId": [23510095],
       "previousId": 10505100,
       "productBadge": 2,
       "saleStartDate": "2024/03/06/12:00:00",
@@ -46551,9 +46059,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510095
-      ],
+      "cashShopBoxTicketId": [23510095],
       "previousId": 10505101,
       "productBadge": 2,
       "saleStartDate": "2024/03/06/12:00:00",
@@ -46598,9 +46104,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510095
-      ],
+      "cashShopBoxTicketId": [23510095],
       "previousId": 10505102,
       "productBadge": 2,
       "saleStartDate": "2024/03/06/12:00:00",
@@ -46645,9 +46149,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510095
-      ],
+      "cashShopBoxTicketId": [23510095],
       "previousId": 10505103,
       "productBadge": 2,
       "saleStartDate": "2024/03/06/12:00:00",
@@ -46691,9 +46193,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510096
-      ],
+      "cashShopBoxTicketId": [23510096],
       "saleStartDate": "2024/03/20/12:00:00",
       "saleEndDate": "2024/03/27/00:00:00",
       "isEndDateMake": true,
@@ -46735,9 +46235,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510001
-      ],
+      "cashShopBoxTicketId": [23510001],
       "saleStartDate": "2024/02/28/00:00:00",
       "saleEndDate": "2025/01/08/00:00:00",
       "isEndDateMake": true,
@@ -46776,9 +46274,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/07/03/12:00:00",
       "saleEndDate": "2024/07/31/00:00:00",
       "isEndDateMake": true,
@@ -46817,9 +46313,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510110
-      ],
+      "cashShopBoxTicketId": [23510110],
       "contentsTerms": [
         {
           "Id": 81000074,
@@ -46870,9 +46364,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "productBadge": 2,
       "saleStartDate": "2024/03/27/00:00:00",
       "saleEndDate": "2024/04/10/00:00:00",
@@ -46913,9 +46405,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510107
-      ],
+      "cashShopBoxTicketId": [23510107],
       "productBadge": 2,
       "saleStartDate": "2024/03/27/00:00:00",
       "saleEndDate": "2024/04/27/00:00:00",
@@ -46955,9 +46445,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "productBadge": 2,
       "saleStartDate": "2024/04/03/12:00:00",
       "saleEndDate": "2024/04/17/00:00:00",
@@ -46998,9 +46486,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "productBadge": 2,
       "saleStartDate": "2024/04/10/12:00:00",
       "saleEndDate": "2024/04/24/00:00:00",
@@ -47041,9 +46527,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "productBadge": 2,
       "saleStartDate": "2024/04/17/12:00:00",
       "saleEndDate": "2024/05/01/00:00:00",
@@ -47084,9 +46568,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "productBadge": 2,
       "saleStartDate": "2024/04/24/00:00:00",
       "saleEndDate": "2024/05/08/00:00:00",
@@ -47127,9 +46609,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "productBadge": 2,
       "saleStartDate": "2024/05/01/12:00:00",
       "saleEndDate": "2024/05/15/00:00:00",
@@ -47170,9 +46650,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "productBadge": 2,
       "saleStartDate": "2024/05/08/12:00:00",
       "saleEndDate": "2024/05/22/00:00:00",
@@ -47213,9 +46691,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "productBadge": 2,
       "saleStartDate": "2024/05/15/12:00:00",
       "saleEndDate": "2024/05/29/00:00:00",
@@ -47256,9 +46732,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510110
-      ],
+      "cashShopBoxTicketId": [23510110],
       "contentsTerms": [
         {
           "Id": 81000018,
@@ -47307,9 +46781,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/04/24/00:00:00",
       "saleEndDate": "2024/05/24/00:00:00",
       "isEndDateMake": true,
@@ -47348,9 +46820,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510109
-      ],
+      "cashShopBoxTicketId": [23510109],
       "saleStartDate": "2024/04/24/00:00:00",
       "saleEndDate": "2024/05/08/00:00:00",
       "isEndDateMake": true,
@@ -47393,9 +46863,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510003
-      ],
+      "cashShopBoxTicketId": [23510003],
       "saleStartDate": "2024/05/22/00:00:00",
       "saleEndDate": "2025/01/08/00:00:00",
       "isEndDateMake": true,
@@ -47438,9 +46906,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510003
-      ],
+      "cashShopBoxTicketId": [23510003],
       "saleStartDate": "2024/05/22/00:00:00",
       "saleEndDate": "2025/01/08/00:00:00",
       "isEndDateMake": true,
@@ -47483,9 +46949,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510003
-      ],
+      "cashShopBoxTicketId": [23510003],
       "saleStartDate": "2024/05/22/00:00:00",
       "saleEndDate": "2025/01/08/00:00:00",
       "isEndDateMake": true,
@@ -47528,9 +46992,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510003
-      ],
+      "cashShopBoxTicketId": [23510003],
       "saleStartDate": "2024/05/22/00:00:00",
       "saleEndDate": "2025/01/08/00:00:00",
       "isEndDateMake": true,
@@ -47573,9 +47035,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510003
-      ],
+      "cashShopBoxTicketId": [23510003],
       "saleStartDate": "2024/05/22/00:00:00",
       "saleEndDate": "2025/01/08/00:00:00",
       "isEndDateMake": true,
@@ -47618,9 +47078,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510003
-      ],
+      "cashShopBoxTicketId": [23510003],
       "saleStartDate": "2024/05/22/00:00:00",
       "saleEndDate": "2025/01/08/00:00:00",
       "isEndDateMake": true,
@@ -47662,9 +47120,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/05/22/00:00:00",
       "saleEndDate": "2024/06/19/00:00:00",
       "isEndDateMake": true,
@@ -47703,9 +47159,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510112
-      ],
+      "cashShopBoxTicketId": [23510112],
       "saleStartDate": "2024/05/22/00:00:00",
       "saleEndDate": "2025/01/08/00:00:00",
       "isEndDateMake": true,
@@ -47747,9 +47201,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510110
-      ],
+      "cashShopBoxTicketId": [23510110],
       "contentsTerms": [
         {
           "Id": 81000018,
@@ -47798,9 +47250,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/06/19/00:00:00",
       "saleEndDate": "2024/07/17/00:00:00",
       "isEndDateMake": true,
@@ -47839,9 +47289,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510112
-      ],
+      "cashShopBoxTicketId": [23510112],
       "saleStartDate": "2024/06/19/00:00:00",
       "saleEndDate": "2025/01/08/00:00:00",
       "isEndDateMake": true,
@@ -47883,9 +47331,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/07/17/00:00:00",
       "saleEndDate": "2024/08/14/00:00:00",
       "isEndDateMake": true,
@@ -47924,9 +47370,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510112
-      ],
+      "cashShopBoxTicketId": [23510112],
       "saleStartDate": "2024/07/17/00:00:00",
       "saleEndDate": "2025/01/08/00:00:00",
       "isEndDateMake": true,
@@ -47968,9 +47412,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "productBadge": 2,
       "saleStartDate": "2024/07/17/00:00:00",
       "saleEndDate": "2024/08/30/00:00:00",
@@ -48012,9 +47454,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510110
-      ],
+      "cashShopBoxTicketId": [23510110],
       "contentsTerms": [
         {
           "Id": 81000018,
@@ -48063,9 +47503,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/08/14/00:00:00",
       "saleEndDate": "2024/09/11/00:00:00",
       "isEndDateMake": true,
@@ -48104,9 +47542,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510112
-      ],
+      "cashShopBoxTicketId": [23510112],
       "saleStartDate": "2024/08/14/00:00:00",
       "saleEndDate": "2025/01/08/00:00:00",
       "isEndDateMake": true,
@@ -48148,9 +47584,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/08/28/12:00:00",
       "saleEndDate": "2024/09/25/00:00:00",
       "isEndDateMake": true,
@@ -48189,9 +47623,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/09/11/00:00:00",
       "saleEndDate": "2024/10/09/00:00:00",
       "isEndDateMake": true,
@@ -48230,9 +47662,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510112
-      ],
+      "cashShopBoxTicketId": [23510112],
       "saleStartDate": "2024/09/11/00:00:00",
       "saleEndDate": "2025/01/08/00:00:00",
       "isEndDateMake": true,
@@ -48275,9 +47705,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "productBadge": 2,
       "saleStartDate": "2024/09/11/00:00:00",
       "saleEndDate": "2024/10/23/00:00:00",
@@ -48320,9 +47748,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/09/25/12:00:00",
       "saleEndDate": "2024/10/23/00:00:00",
       "isEndDateMake": true,
@@ -48361,9 +47787,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/10/11/00:00:00",
       "saleEndDate": "2024/11/06/00:00:00",
       "isEndDateMake": true,
@@ -48403,9 +47827,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/10/23/00:00:00",
       "saleEndDate": "2024/11/20/00:00:00",
       "isEndDateMake": true,
@@ -48445,9 +47867,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510110
-      ],
+      "cashShopBoxTicketId": [23510110],
       "contentsTerms": [
         {
           "Id": 81000018,
@@ -48496,9 +47916,7 @@
       "salePointId": 100004,
       "salePointVal": 400,
       "cashShopBoxTicketVal": 1,
-      "cashShopBoxTicketId": [
-        23510112
-      ],
+      "cashShopBoxTicketId": [23510112],
       "saleStartDate": "2024/10/11/00:00:00",
       "saleEndDate": "2025/01/08/00:00:00",
       "isEndDateMake": true,
@@ -48540,9 +47958,7 @@
       "salePointId": 100001,
       "salePointVal": 30000000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510000
-      ],
+      "cashShopBoxTicketId": [23510000],
       "saleEndDate": "2025/01/08/00:00:00",
       "isEndDateMake": true,
       "HotSpotResetType": 0,
@@ -48578,9 +47994,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510001
-      ],
+      "cashShopBoxTicketId": [23510001],
       "saleEndDate": "2025/01/08/00:00:00",
       "isEndDateMake": true,
       "HotSpotResetType": 0,
@@ -48622,9 +48036,7 @@
       "salePointId": 100001,
       "salePointVal": 2500000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510002
-      ],
+      "cashShopBoxTicketId": [23510002],
       "saleEndDate": "2025/01/08/00:00:00",
       "isEndDateMake": true,
       "HotSpotResetType": 0,
@@ -48659,9 +48071,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510003
-      ],
+      "cashShopBoxTicketId": [23510003],
       "saleEndDate": "2025/01/08/00:00:00",
       "isEndDateMake": true,
       "HotSpotResetType": 0,
@@ -48703,9 +48113,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/07/17/00:00:00",
       "saleEndDate": "2025/01/08/00:00:00",
       "isEndDateMake": true,
@@ -48745,9 +48153,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2023/10/25/12:00:00",
       "saleEndDate": "2023/11/25/00:00:00",
       "isEndDateMake": true,
@@ -48787,9 +48193,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/09/11/00:00:00",
       "saleEndDate": "2025/01/08/00:00:00",
       "isEndDateMake": true,
@@ -48829,9 +48233,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2023/11/22/12:00:00",
       "saleEndDate": "2023/12/22/00:00:00",
       "isEndDateMake": true,
@@ -48871,9 +48273,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/05/22/00:00:00",
       "saleEndDate": "2025/01/08/00:00:00",
       "isEndDateMake": true,
@@ -48913,9 +48313,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2023/12/06/00:00:00",
       "saleEndDate": "2024/01/06/00:00:00",
       "isEndDateMake": true,
@@ -48955,9 +48353,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/01/03/00:00:00",
       "saleEndDate": "2024/02/03/00:00:00",
       "isEndDateMake": true,
@@ -48997,9 +48393,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/01/17/12:00:00",
       "saleEndDate": "2024/02/17/00:00:00",
       "isEndDateMake": true,
@@ -49039,9 +48433,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/01/31/00:00:00",
       "saleEndDate": "2024/03/01/00:00:00",
       "isEndDateMake": true,
@@ -49081,9 +48473,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510013
-      ],
+      "cashShopBoxTicketId": [23510013],
       "contentsTerms": [
         {
           "Id": 81000018,
@@ -49131,9 +48521,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510110
-      ],
+      "cashShopBoxTicketId": [23510110],
       "contentsTerms": [
         {
           "Id": 81000018,
@@ -49182,9 +48570,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510110
-      ],
+      "cashShopBoxTicketId": [23510110],
       "contentsTerms": [
         {
           "Id": 81000018,
@@ -49233,9 +48619,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510110
-      ],
+      "cashShopBoxTicketId": [23510110],
       "contentsTerms": [
         {
           "Id": 81000018,
@@ -49284,9 +48668,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510110
-      ],
+      "cashShopBoxTicketId": [23510110],
       "contentsTerms": [
         {
           "Id": 81000018,
@@ -49335,9 +48717,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510018
-      ],
+      "cashShopBoxTicketId": [23510018],
       "contentsTerms": [
         {
           "Id": 81000018,
@@ -49378,9 +48758,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510110
-      ],
+      "cashShopBoxTicketId": [23510110],
       "contentsTerms": [
         {
           "Id": 81000018,
@@ -49429,9 +48807,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510110
-      ],
+      "cashShopBoxTicketId": [23510110],
       "contentsTerms": [
         {
           "Id": 81000018,
@@ -49480,9 +48856,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510110
-      ],
+      "cashShopBoxTicketId": [23510110],
       "contentsTerms": [
         {
           "Id": 81000018,
@@ -49531,9 +48905,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510110
-      ],
+      "cashShopBoxTicketId": [23510110],
       "contentsTerms": [
         {
           "Id": 81000018,
@@ -49582,9 +48954,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/06/05/12:00:00",
       "saleEndDate": "2024/07/03/00:00:00",
       "isEndDateMake": true,
@@ -49624,9 +48994,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510110
-      ],
+      "cashShopBoxTicketId": [23510110],
       "contentsTerms": [
         {
           "Id": 81000018,
@@ -49675,9 +49043,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510110
-      ],
+      "cashShopBoxTicketId": [23510110],
       "contentsTerms": [
         {
           "Id": 81000018,
@@ -49726,9 +49092,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510110
-      ],
+      "cashShopBoxTicketId": [23510110],
       "contentsTerms": [
         {
           "Id": 81000018,
@@ -49777,9 +49141,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510027
-      ],
+      "cashShopBoxTicketId": [23510027],
       "saleStartDate": "2023/04/12/12:00:00",
       "saleEndDate": "2023/05/12/00:00:00",
       "isEndDateMake": true,
@@ -49821,9 +49183,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/07/31/12:00:00",
       "saleEndDate": "2024/08/28/00:00:00",
       "isEndDateMake": true,
@@ -49863,9 +49223,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510029
-      ],
+      "cashShopBoxTicketId": [23510029],
       "saleStartDate": "2023/04/26/00:00:00",
       "saleEndDate": "2023/05/26/00:00:00",
       "isEndDateMake": true,
@@ -49908,9 +49266,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510030
-      ],
+      "cashShopBoxTicketId": [23510030],
       "saleStartDate": "2023/05/24/00:00:00",
       "saleEndDate": "2023/06/07/00:00:00",
       "isEndDateMake": true,
@@ -49953,9 +49309,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510031
-      ],
+      "cashShopBoxTicketId": [23510031],
       "saleStartDate": "2023/05/24/00:00:00",
       "saleEndDate": "2023/06/07/00:00:00",
       "isEndDateMake": true,
@@ -49998,9 +49352,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510032
-      ],
+      "cashShopBoxTicketId": [23510032],
       "saleStartDate": "2023/06/08/12:00:00",
       "saleEndDate": "2023/06/22/00:00:00",
       "isEndDateMake": true,
@@ -50043,9 +49395,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/08/28/12:00:00",
       "saleEndDate": "2024/09/25/00:00:00",
       "isEndDateMake": true,
@@ -50085,9 +49435,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510110
-      ],
+      "cashShopBoxTicketId": [23510110],
       "contentsTerms": [
         {
           "Id": 81000018,
@@ -50137,9 +49485,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510040
-      ],
+      "cashShopBoxTicketId": [23510040],
       "saleStartDate": "2023/06/21/00:00:00",
       "saleEndDate": "2023/07/05/00:00:00",
       "isEndDateMake": true,
@@ -50182,9 +49528,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/09/25/12:00:00",
       "saleEndDate": "2024/10/23/00:00:00",
       "isEndDateMake": true,
@@ -50224,9 +49568,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510042
-      ],
+      "cashShopBoxTicketId": [23510042],
       "saleStartDate": "2023/07/05/12:00:00",
       "saleEndDate": "2023/07/12/00:00:00",
       "isEndDateMake": true,
@@ -50269,9 +49611,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510043
-      ],
+      "cashShopBoxTicketId": [23510043],
       "saleStartDate": "2023/07/12/12:00:00",
       "saleEndDate": "2023/07/19/00:00:00",
       "isEndDateMake": true,
@@ -50314,9 +49654,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510110
-      ],
+      "cashShopBoxTicketId": [23510110],
       "contentsTerms": [
         {
           "Id": 81000018,
@@ -50366,9 +49704,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510044
-      ],
+      "cashShopBoxTicketId": [23510044],
       "saleStartDate": "2023/07/19/00:00:00",
       "saleEndDate": "2023/07/26/00:00:00",
       "isEndDateMake": true,
@@ -50411,9 +49747,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510045
-      ],
+      "cashShopBoxTicketId": [23510045],
       "saleStartDate": "2023/07/26/12:00:00",
       "saleEndDate": "2023/08/02/00:00:00",
       "isEndDateMake": true,
@@ -50456,9 +49790,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/10/23/12:00:00",
       "saleEndDate": "2024/11/22/00:00:00",
       "isEndDateMake": true,
@@ -50498,9 +49830,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510046
-      ],
+      "cashShopBoxTicketId": [23510046],
       "saleStartDate": "2023/08/02/12:00:00",
       "saleEndDate": "2023/08/09/00:00:00",
       "isEndDateMake": true,
@@ -50543,9 +49873,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510047
-      ],
+      "cashShopBoxTicketId": [23510047],
       "saleStartDate": "2023/08/09/12:00:00",
       "saleEndDate": "2023/08/16/00:00:00",
       "isEndDateMake": true,
@@ -50588,9 +49916,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510110
-      ],
+      "cashShopBoxTicketId": [23510110],
       "contentsTerms": [
         {
           "Id": 81000018,
@@ -50640,9 +49966,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2023/08/16/00:00:00",
       "saleEndDate": "2023/09/16/00:00:00",
       "isEndDateMake": true,
@@ -50682,9 +50006,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510050
-      ],
+      "cashShopBoxTicketId": [23510050],
       "saleStartDate": "2023/08/16/00:00:00",
       "saleEndDate": "2023/09/16/00:00:00",
       "isEndDateMake": true,
@@ -50727,9 +50049,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510051
-      ],
+      "cashShopBoxTicketId": [23510051],
       "saleStartDate": "2023/08/23/12:00:00",
       "saleEndDate": "2023/09/16/00:00:00",
       "isEndDateMake": true,
@@ -50772,9 +50092,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2023/08/30/12:00:00",
       "saleEndDate": "2023/09/30/00:00:00",
       "isEndDateMake": true,
@@ -50814,9 +50132,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510053
-      ],
+      "cashShopBoxTicketId": [23510053],
       "saleStartDate": "2023/09/06/12:00:00",
       "saleEndDate": "2023/09/13/00:00:00",
       "isEndDateMake": true,
@@ -50859,9 +50175,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510001
-      ],
+      "cashShopBoxTicketId": [23510001],
       "saleStartDate": "2023/08/23/12:00:00",
       "saleEndDate": "2023/09/16/00:00:00",
       "isEndDateMake": true,
@@ -50904,9 +50218,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510110
-      ],
+      "cashShopBoxTicketId": [23510110],
       "contentsTerms": [
         {
           "Id": 81000018,
@@ -50956,9 +50268,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2023/09/13/00:00:00",
       "saleEndDate": "2023/10/13/00:00:00",
       "isEndDateMake": true,
@@ -50998,9 +50308,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510056
-      ],
+      "cashShopBoxTicketId": [23510056],
       "saleStartDate": "2023/09/13/00:00:00",
       "saleEndDate": "2023/09/20/00:00:00",
       "isEndDateMake": true,
@@ -51043,9 +50351,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510060
-      ],
+      "cashShopBoxTicketId": [23510060],
       "saleStartDate": "2023/09/20/12:00:00",
       "saleEndDate": "2023/10/04/00:00:00",
       "isEndDateMake": true,
@@ -51088,9 +50394,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510057
-      ],
+      "cashShopBoxTicketId": [23510057],
       "saleStartDate": "2023/09/20/12:00:00",
       "saleEndDate": "2023/09/27/00:00:00",
       "isEndDateMake": true,
@@ -51133,9 +50437,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2023/09/27/12:00:00",
       "saleEndDate": "2023/10/27/00:00:00",
       "isEndDateMake": true,
@@ -51175,9 +50477,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510058
-      ],
+      "cashShopBoxTicketId": [23510058],
       "saleStartDate": "2023/09/27/12:00:00",
       "saleEndDate": "2023/10/04/00:00:00",
       "isEndDateMake": true,
@@ -51220,9 +50520,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510059
-      ],
+      "cashShopBoxTicketId": [23510059],
       "saleStartDate": "2023/10/04/12:00:00",
       "saleEndDate": "2023/10/11/00:00:00",
       "isEndDateMake": true,
@@ -51265,9 +50563,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510110
-      ],
+      "cashShopBoxTicketId": [23510110],
       "contentsTerms": [
         {
           "Id": 81000018,
@@ -51317,9 +50613,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/07/31/12:00:00",
       "saleEndDate": "2024/08/28/00:00:00",
       "isEndDateMake": true,
@@ -51359,9 +50653,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510067
-      ],
+      "cashShopBoxTicketId": [23510067],
       "saleStartDate": "2023/10/11/00:00:00",
       "saleEndDate": "2023/10/18/00:00:00",
       "isEndDateMake": true,
@@ -51404,9 +50696,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510069
-      ],
+      "cashShopBoxTicketId": [23510069],
       "saleStartDate": "2023/10/11/00:00:00",
       "saleEndDate": "2023/10/25/00:00:00",
       "isEndDateMake": true,
@@ -51448,9 +50738,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510070
-      ],
+      "cashShopBoxTicketId": [23510070],
       "saleStartDate": "2024/03/27/00:00:00",
       "saleEndDate": "2024/04/03/00:00:00",
       "isEndDateMake": true,
@@ -51493,9 +50781,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/08/14/00:00:00",
       "saleEndDate": "2024/09/11/00:00:00",
       "isEndDateMake": true,
@@ -51535,9 +50821,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510071
-      ],
+      "cashShopBoxTicketId": [23510071],
       "saleStartDate": "2023/10/25/00:00:00",
       "saleEndDate": "2023/11/08/00:00:00",
       "isEndDateMake": true,
@@ -51580,9 +50864,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510110
-      ],
+      "cashShopBoxTicketId": [23510110],
       "contentsTerms": [
         {
           "Id": 81000018,
@@ -51632,9 +50914,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/03/13/12:00:00",
       "saleEndDate": "2024/04/13/00:00:00",
       "isEndDateMake": true,
@@ -51674,9 +50954,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510074
-      ],
+      "cashShopBoxTicketId": [23510074],
       "saleStartDate": "2023/11/08/00:00:00",
       "saleEndDate": "2023/11/22/00:00:00",
       "isEndDateMake": true,
@@ -51719,9 +50997,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "contentsTerms": [
         {
           "Id": 81000021,
@@ -51768,9 +51044,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510075
-      ],
+      "cashShopBoxTicketId": [23510075],
       "saleStartDate": "2023/11/15/12:00:00",
       "saleEndDate": "2025/01/08/00:00:00",
       "isEndDateMake": true,
@@ -51813,9 +51087,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/10/09/12:00:00",
       "saleEndDate": "2024/11/08/00:00:00",
       "isEndDateMake": true,
@@ -51855,9 +51127,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510076
-      ],
+      "cashShopBoxTicketId": [23510076],
       "saleStartDate": "2023/11/22/12:00:00",
       "saleEndDate": "2023/12/06/00:00:00",
       "isEndDateMake": true,
@@ -51900,9 +51170,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510110
-      ],
+      "cashShopBoxTicketId": [23510110],
       "contentsTerms": [
         {
           "Id": 81000018,
@@ -51952,9 +51220,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/06/05/12:00:00",
       "saleEndDate": "2024/07/03/00:00:00",
       "isEndDateMake": true,
@@ -51994,9 +51260,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510079
-      ],
+      "cashShopBoxTicketId": [23510079],
       "saleStartDate": "2024/04/03/12:00:00",
       "saleEndDate": "2024/04/10/00:00:00",
       "isEndDateMake": true,
@@ -52039,9 +51303,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510080
-      ],
+      "cashShopBoxTicketId": [23510080],
       "saleStartDate": "2024/04/10/12:00:00",
       "saleEndDate": "2024/04/17/00:00:00",
       "isEndDateMake": true,
@@ -52084,9 +51346,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2023/12/20/12:00:00",
       "saleEndDate": "2024/01/20/00:00:00",
       "isEndDateMake": true,
@@ -52126,9 +51386,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510081
-      ],
+      "cashShopBoxTicketId": [23510081],
       "saleStartDate": "2024/04/17/12:00:00",
       "saleEndDate": "2024/04/24/00:00:00",
       "isEndDateMake": true,
@@ -52171,9 +51429,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510082
-      ],
+      "cashShopBoxTicketId": [23510082],
       "saleStartDate": "2024/05/08/12:00:00",
       "saleEndDate": "2024/05/15/00:00:00",
       "isEndDateMake": true,
@@ -52216,9 +51472,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510110
-      ],
+      "cashShopBoxTicketId": [23510110],
       "contentsTerms": [
         {
           "Id": 81000018,
@@ -52268,9 +51522,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/03/27/00:00:00",
       "saleEndDate": "2025/01/08/00:00:00",
       "isEndDateMake": true,
@@ -52310,9 +51562,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510083
-      ],
+      "cashShopBoxTicketId": [23510083],
       "saleStartDate": "2024/05/15/12:00:00",
       "saleEndDate": "2024/05/22/00:00:00",
       "isEndDateMake": true,
@@ -52355,9 +51605,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510084
-      ],
+      "cashShopBoxTicketId": [23510084],
       "saleStartDate": "2024/01/10/12:00:00",
       "saleEndDate": "2024/01/17/00:00:00",
       "isEndDateMake": true,
@@ -52400,9 +51648,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510085
-      ],
+      "cashShopBoxTicketId": [23510085],
       "saleStartDate": "2024/01/17/12:00:00",
       "saleEndDate": "2024/01/24/00:00:00",
       "isEndDateMake": true,
@@ -52445,9 +51691,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510086
-      ],
+      "cashShopBoxTicketId": [23510086],
       "saleStartDate": "2024/01/24/12:00:00",
       "saleEndDate": "2024/01/31/00:00:00",
       "isEndDateMake": true,
@@ -52490,9 +51734,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510110
-      ],
+      "cashShopBoxTicketId": [23510110],
       "contentsTerms": [
         {
           "Id": 81000018,
@@ -52542,9 +51784,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/01/31/00:00:00",
       "saleEndDate": "2024/03/02/00:00:00",
       "isEndDateMake": true,
@@ -52584,9 +51824,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510090
-      ],
+      "cashShopBoxTicketId": [23510090],
       "saleStartDate": "2024/01/31/00:00:00",
       "saleEndDate": "2024/02/07/00:00:00",
       "isEndDateMake": true,
@@ -52629,9 +51867,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510091
-      ],
+      "cashShopBoxTicketId": [23510091],
       "saleStartDate": "2024/02/07/12:00:00",
       "saleEndDate": "2024/02/21/00:00:00",
       "isEndDateMake": true,
@@ -52674,9 +51910,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/07/03/12:00:00",
       "saleEndDate": "2024/07/31/00:00:00",
       "isEndDateMake": true,
@@ -52716,9 +51950,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510001
-      ],
+      "cashShopBoxTicketId": [23510001],
       "saleStartDate": "2024/02/28/00:00:00",
       "saleEndDate": "2025/01/08/00:00:00",
       "isEndDateMake": true,
@@ -52761,9 +51993,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510001
-      ],
+      "cashShopBoxTicketId": [23510001],
       "saleStartDate": "2024/02/28/00:00:00",
       "saleEndDate": "2025/01/08/00:00:00",
       "isEndDateMake": true,
@@ -52806,9 +52036,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510001
-      ],
+      "cashShopBoxTicketId": [23510001],
       "saleStartDate": "2024/02/28/00:00:00",
       "saleEndDate": "2025/01/08/00:00:00",
       "isEndDateMake": true,
@@ -52851,9 +52079,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510110
-      ],
+      "cashShopBoxTicketId": [23510110],
       "contentsTerms": [
         {
           "Id": 81000018,
@@ -52903,9 +52129,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/06/19/00:00:00",
       "saleEndDate": "2024/07/17/00:00:00",
       "isEndDateMake": true,
@@ -52945,9 +52169,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510094
-      ],
+      "cashShopBoxTicketId": [23510094],
       "saleStartDate": "2024/02/28/00:00:00",
       "saleEndDate": "2024/03/06/00:00:00",
       "isEndDateMake": true,
@@ -52990,9 +52212,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510095
-      ],
+      "cashShopBoxTicketId": [23510095],
       "previousId": 10505104,
       "saleStartDate": "2024/03/06/12:00:00",
       "saleEndDate": "2024/03/20/00:00:00",
@@ -53037,9 +52257,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510095
-      ],
+      "cashShopBoxTicketId": [23510095],
       "saleStartDate": "2024/03/06/12:00:00",
       "saleEndDate": "2024/03/20/00:00:00",
       "isEndDateMake": true,
@@ -53082,9 +52300,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510095
-      ],
+      "cashShopBoxTicketId": [23510095],
       "previousId": 10505100,
       "saleStartDate": "2024/03/06/12:00:00",
       "saleEndDate": "2024/03/20/00:00:00",
@@ -53128,9 +52344,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510095
-      ],
+      "cashShopBoxTicketId": [23510095],
       "previousId": 10505101,
       "saleStartDate": "2024/03/06/12:00:00",
       "saleEndDate": "2024/03/20/00:00:00",
@@ -53174,9 +52388,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510095
-      ],
+      "cashShopBoxTicketId": [23510095],
       "previousId": 10505102,
       "saleStartDate": "2024/03/06/12:00:00",
       "saleEndDate": "2024/03/20/00:00:00",
@@ -53220,9 +52432,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510095
-      ],
+      "cashShopBoxTicketId": [23510095],
       "previousId": 10505103,
       "saleStartDate": "2024/03/06/12:00:00",
       "saleEndDate": "2024/03/20/00:00:00",
@@ -53266,9 +52476,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510096
-      ],
+      "cashShopBoxTicketId": [23510096],
       "saleStartDate": "2024/03/20/12:00:00",
       "saleEndDate": "2024/03/27/00:00:00",
       "isEndDateMake": true,
@@ -53311,9 +52519,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510001
-      ],
+      "cashShopBoxTicketId": [23510001],
       "saleStartDate": "2024/02/28/00:00:00",
       "saleEndDate": "2025/01/08/00:00:00",
       "isEndDateMake": true,
@@ -53353,9 +52559,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/07/03/12:00:00",
       "saleEndDate": "2024/07/31/00:00:00",
       "isEndDateMake": true,
@@ -53395,9 +52599,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510110
-      ],
+      "cashShopBoxTicketId": [23510110],
       "contentsTerms": [
         {
           "Id": 81000074,
@@ -53448,9 +52650,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/03/27/00:00:00",
       "saleEndDate": "2024/04/10/00:00:00",
       "isEndDateMake": true,
@@ -53491,9 +52691,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510107
-      ],
+      "cashShopBoxTicketId": [23510107],
       "saleStartDate": "2024/03/27/00:00:00",
       "saleEndDate": "2024/04/27/00:00:00",
       "isEndDateMake": true,
@@ -53533,9 +52731,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/04/03/12:00:00",
       "saleEndDate": "2024/04/17/00:00:00",
       "isEndDateMake": true,
@@ -53576,9 +52772,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/04/10/12:00:00",
       "saleEndDate": "2024/04/24/00:00:00",
       "isEndDateMake": true,
@@ -53619,9 +52813,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/04/17/12:00:00",
       "saleEndDate": "2024/05/01/00:00:00",
       "isEndDateMake": true,
@@ -53662,9 +52854,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/04/24/00:00:00",
       "saleEndDate": "2024/05/08/00:00:00",
       "isEndDateMake": true,
@@ -53705,9 +52895,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/05/01/12:00:00",
       "saleEndDate": "2024/05/15/00:00:00",
       "isEndDateMake": true,
@@ -53748,9 +52936,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/05/08/12:00:00",
       "saleEndDate": "2024/05/22/00:00:00",
       "isEndDateMake": true,
@@ -53791,9 +52977,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/05/15/12:00:00",
       "saleEndDate": "2024/05/29/00:00:00",
       "isEndDateMake": true,
@@ -53834,9 +53018,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510110
-      ],
+      "cashShopBoxTicketId": [23510110],
       "contentsTerms": [
         {
           "Id": 81000018,
@@ -53886,9 +53068,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/04/24/00:00:00",
       "saleEndDate": "2024/05/24/00:00:00",
       "isEndDateMake": true,
@@ -53928,9 +53108,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510109
-      ],
+      "cashShopBoxTicketId": [23510109],
       "saleStartDate": "2024/04/24/00:00:00",
       "saleEndDate": "2024/05/08/00:00:00",
       "isEndDateMake": true,
@@ -53974,9 +53152,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510003
-      ],
+      "cashShopBoxTicketId": [23510003],
       "saleStartDate": "2024/05/22/00:00:00",
       "saleEndDate": "2025/01/08/00:00:00",
       "isEndDateMake": true,
@@ -54020,9 +53196,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510003
-      ],
+      "cashShopBoxTicketId": [23510003],
       "saleStartDate": "2024/05/22/00:00:00",
       "saleEndDate": "2025/01/08/00:00:00",
       "isEndDateMake": true,
@@ -54066,9 +53240,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510003
-      ],
+      "cashShopBoxTicketId": [23510003],
       "saleStartDate": "2024/05/22/00:00:00",
       "saleEndDate": "2025/01/08/00:00:00",
       "isEndDateMake": true,
@@ -54112,9 +53284,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510003
-      ],
+      "cashShopBoxTicketId": [23510003],
       "saleStartDate": "2024/05/22/00:00:00",
       "saleEndDate": "2025/01/08/00:00:00",
       "isEndDateMake": true,
@@ -54158,9 +53328,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510003
-      ],
+      "cashShopBoxTicketId": [23510003],
       "saleStartDate": "2024/05/22/00:00:00",
       "saleEndDate": "2025/01/08/00:00:00",
       "isEndDateMake": true,
@@ -54204,9 +53372,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510003
-      ],
+      "cashShopBoxTicketId": [23510003],
       "saleStartDate": "2024/05/22/00:00:00",
       "saleEndDate": "2025/01/08/00:00:00",
       "isEndDateMake": true,
@@ -54249,9 +53415,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/05/22/00:00:00",
       "saleEndDate": "2024/06/19/00:00:00",
       "isEndDateMake": true,
@@ -54291,9 +53455,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510112
-      ],
+      "cashShopBoxTicketId": [23510112],
       "saleStartDate": "2024/05/22/00:00:00",
       "saleEndDate": "2025/01/08/00:00:00",
       "isEndDateMake": true,
@@ -54336,9 +53498,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510110
-      ],
+      "cashShopBoxTicketId": [23510110],
       "contentsTerms": [
         {
           "Id": 81000018,
@@ -54388,9 +53548,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/06/19/00:00:00",
       "saleEndDate": "2024/07/17/00:00:00",
       "isEndDateMake": true,
@@ -54430,9 +53588,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510112
-      ],
+      "cashShopBoxTicketId": [23510112],
       "saleStartDate": "2024/06/19/00:00:00",
       "saleEndDate": "2025/01/08/00:00:00",
       "isEndDateMake": true,
@@ -54475,9 +53631,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/07/17/00:00:00",
       "saleEndDate": "2024/08/14/00:00:00",
       "isEndDateMake": true,
@@ -54517,9 +53671,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510112
-      ],
+      "cashShopBoxTicketId": [23510112],
       "saleStartDate": "2024/07/17/00:00:00",
       "saleEndDate": "2025/01/08/00:00:00",
       "isEndDateMake": true,
@@ -54562,9 +53714,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/07/17/00:00:00",
       "saleEndDate": "2024/08/30/00:00:00",
       "isEndDateMake": true,
@@ -54606,9 +53756,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510110
-      ],
+      "cashShopBoxTicketId": [23510110],
       "contentsTerms": [
         {
           "Id": 81000018,
@@ -54658,9 +53806,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/08/14/00:00:00",
       "saleEndDate": "2024/09/11/00:00:00",
       "isEndDateMake": true,
@@ -54700,9 +53846,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510112
-      ],
+      "cashShopBoxTicketId": [23510112],
       "saleStartDate": "2024/08/14/00:00:00",
       "saleEndDate": "2025/01/08/00:00:00",
       "isEndDateMake": true,
@@ -54745,9 +53889,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/08/28/12:00:00",
       "saleEndDate": "2024/09/25/00:00:00",
       "isEndDateMake": true,
@@ -54787,9 +53929,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/09/11/00:00:00",
       "saleEndDate": "2024/10/09/00:00:00",
       "isEndDateMake": true,
@@ -54829,9 +53969,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510112
-      ],
+      "cashShopBoxTicketId": [23510112],
       "saleStartDate": "2024/09/11/00:00:00",
       "saleEndDate": "2025/01/08/00:00:00",
       "isEndDateMake": true,
@@ -54874,9 +54012,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/09/11/00:00:00",
       "saleEndDate": "2024/10/23/00:00:00",
       "isEndDateMake": true,
@@ -54919,9 +54055,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/09/25/12:00:00",
       "saleEndDate": "2024/10/23/00:00:00",
       "isEndDateMake": true,
@@ -54961,9 +54095,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/10/11/00:00:00",
       "saleEndDate": "2024/11/06/00:00:00",
       "isEndDateMake": true,
@@ -55004,9 +54136,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510111
-      ],
+      "cashShopBoxTicketId": [23510111],
       "saleStartDate": "2024/10/23/00:00:00",
       "saleEndDate": "2024/11/20/00:00:00",
       "isEndDateMake": true,
@@ -55047,9 +54177,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510110
-      ],
+      "cashShopBoxTicketId": [23510110],
       "contentsTerms": [
         {
           "Id": 81000018,
@@ -55099,9 +54227,7 @@
       "salePointId": 100004,
       "salePointVal": 4000,
       "cashShopBoxTicketVal": 10,
-      "cashShopBoxTicketId": [
-        23510112
-      ],
+      "cashShopBoxTicketId": [23510112],
       "saleStartDate": "2024/10/11/00:00:00",
       "saleEndDate": "2025/01/08/00:00:00",
       "isEndDateMake": true,
@@ -74004,9 +73130,7 @@
       "HotSpotResetType": 0,
       "buffGroup": 100,
       "buffGroupLevel": 1,
-      "productWorldBuffId": [
-        38020500
-      ],
+      "productWorldBuffId": [38020500],
       "productWorldBuff": [
         {
           "Id": 38020500,
@@ -74075,9 +73199,7 @@
       "HotSpotResetType": 0,
       "buffGroup": 300,
       "buffGroupLevel": 1,
-      "productWorldBuffId": [
-        38020521
-      ],
+      "productWorldBuffId": [38020521],
       "productWorldBuff": [
         {
           "Id": 38020521,
@@ -77209,10 +76331,7 @@
       "buffGroup": 8,
       "buffGroupName": "원격 건조 패키지",
       "buffGroupLevel": 1,
-      "productWorldBuffId": [
-        38043100,
-        38043200
-      ],
+      "productWorldBuffId": [38043100, 38043200],
       "productIcon": "WT_CashShop_Product120_Sprite",
       "productDesc": "원하는 도시에서 선박을 건조하고, 무료로 탁송을 받을 수 있습니다.\n건조할 도시의 조건을 만족해야 건조 가능합니다",
       "viewSchedule": false,
@@ -77835,11 +76954,7 @@
       "buffGroup": 9,
       "buffGroupName": "새싹의 가호",
       "buffGroupLevel": 1,
-      "productWorldBuffId": [
-        38020550,
-        38020551,
-        38002006
-      ],
+      "productWorldBuffId": [38020550, 38020551, 38002006],
       "productWorldBuff": [
         {
           "Id": 38020550,
@@ -77906,11 +77021,7 @@
       "buffGroup": 10,
       "buffGroupName": "성장의 가호",
       "buffGroupLevel": 1,
-      "productWorldBuffId": [
-        38020552,
-        38020553,
-        38002007
-      ],
+      "productWorldBuffId": [38020552, 38020553, 38002007],
       "productWorldBuff": [
         {
           "Id": 38020552,
@@ -78832,9 +77943,7 @@
       "buffGroup": 11,
       "buffGroupName": "원격 투자 패키지",
       "buffGroupLevel": 1,
-      "productWorldBuffId": [
-        38099041
-      ],
+      "productWorldBuffId": [38099041],
       "productWorldBuff": [
         {
           "Id": 38099041,
@@ -80900,9 +80009,7 @@
       "buffGroup": 12,
       "buffGroupName": "선단 경험치 부스트",
       "buffGroupLevel": 1,
-      "productWorldBuffId": [
-        38042903
-      ],
+      "productWorldBuffId": [38042903],
       "productWorldBuff": [
         {
           "Id": 38042903,
@@ -86444,12 +85551,7 @@
       "buffGroup": 1,
       "buffGroupName": "명장의 축복",
       "buffGroupLevel": 1,
-      "productWorldBuffId": [
-        38020504,
-        38020507,
-        38020509,
-        38042800
-      ],
+      "productWorldBuffId": [38020504, 38020507, 38020509, 38042800],
       "productWorldBuff": [
         {
           "Id": 38020504,
@@ -86499,13 +85601,7 @@
       "buffGroup": 1,
       "buffGroupName": "명장의 축복",
       "buffGroupLevel": 2,
-      "productWorldBuffId": [
-        38020504,
-        38020507,
-        38020510,
-        38042801,
-        38020512
-      ],
+      "productWorldBuffId": [38020504, 38020507, 38020510, 38042801, 38020512],
       "productWorldBuff": [
         {
           "Id": 38020504,
@@ -86559,14 +85655,7 @@
       "buffGroup": 1,
       "buffGroupName": "명장의 축복",
       "buffGroupLevel": 3,
-      "productWorldBuffId": [
-        38020505,
-        38020508,
-        38020511,
-        38042802,
-        38020513,
-        38002000
-      ],
+      "productWorldBuffId": [38020505, 38020508, 38020511, 38042802, 38020513, 38002000],
       "productWorldBuff": [
         {
           "Id": 38020505,
@@ -86625,11 +85714,7 @@
       "buffGroup": 2,
       "buffGroupName": "엘모의 가호",
       "buffGroupLevel": 1,
-      "productWorldBuffId": [
-        38020518,
-        38020522,
-        38042900
-      ],
+      "productWorldBuffId": [38020518, 38020522, 38042900],
       "productWorldBuff": [
         {
           "Id": 38020518,
@@ -86672,12 +85757,7 @@
       "buffGroup": 2,
       "buffGroupName": "엘모의 가호",
       "buffGroupLevel": 2,
-      "productWorldBuffId": [
-        38020519,
-        38020522,
-        38020524,
-        38042901
-      ],
+      "productWorldBuffId": [38020519, 38020522, 38020524, 38042901],
       "productWorldBuff": [
         {
           "Id": 38020519,
@@ -86724,14 +85804,7 @@
       "buffGroup": 2,
       "buffGroupName": "엘모의 가호",
       "buffGroupLevel": 3,
-      "productWorldBuffId": [
-        38020520,
-        38020523,
-        38020525,
-        38020526,
-        38042902,
-        38002002
-      ],
+      "productWorldBuffId": [38020520, 38020523, 38020525, 38020526, 38042902, 38002002],
       "productWorldBuff": [
         {
           "Id": 38020520,
@@ -86785,10 +85858,7 @@
       "buffGroup": 3,
       "buffGroupName": "미카엘의 가호",
       "buffGroupLevel": 1,
-      "productWorldBuffId": [
-        38020528,
-        38020531
-      ],
+      "productWorldBuffId": [38020528, 38020531],
       "productWorldBuff": [
         {
           "Id": 38020528,
@@ -86830,10 +85900,7 @@
       "buffGroup": 3,
       "buffGroupName": "미카엘의 가호",
       "buffGroupLevel": 2,
-      "productWorldBuffId": [
-        38020529,
-        38020532
-      ],
+      "productWorldBuffId": [38020529, 38020532],
       "productWorldBuff": [
         {
           "Id": 38020529,
@@ -86875,11 +85942,7 @@
       "buffGroup": 3,
       "buffGroupName": "미카엘의 가호",
       "buffGroupLevel": 3,
-      "productWorldBuffId": [
-        38020529,
-        38020533,
-        38002003
-      ],
+      "productWorldBuffId": [38020529, 38020533, 38002003],
       "productWorldBuff": [
         {
           "Id": 38020529,
@@ -86925,10 +85988,7 @@
       "buffGroup": 4,
       "buffGroupName": "라파엘의 가호",
       "buffGroupLevel": 1,
-      "productWorldBuffId": [
-        38042400,
-        38042300
-      ],
+      "productWorldBuffId": [38042400, 38042300],
       "productWorldBuff": [
         {
           "Id": 38042400,
@@ -86970,11 +86030,7 @@
       "buffGroup": 4,
       "buffGroupName": "라파엘의 가호",
       "buffGroupLevel": 2,
-      "productWorldBuffId": [
-        38042401,
-        38042301,
-        38042200
-      ],
+      "productWorldBuffId": [38042401, 38042301, 38042200],
       "productWorldBuff": [
         {
           "Id": 38042401,
@@ -87020,12 +86076,7 @@
       "buffGroup": 4,
       "buffGroupName": "라파엘의 가호",
       "buffGroupLevel": 3,
-      "productWorldBuffId": [
-        38042402,
-        38042302,
-        38042201,
-        38002004
-      ],
+      "productWorldBuffId": [38042402, 38042302, 38042201, 38002004],
       "productWorldBuff": [
         {
           "Id": 38042402,
@@ -87075,11 +86126,7 @@
       "buffGroup": 5,
       "buffGroupName": "대상인의 축복",
       "buffGroupLevel": 1,
-      "productWorldBuffId": [
-        38042500,
-        38042600,
-        38042700
-      ],
+      "productWorldBuffId": [38042500, 38042600, 38042700],
       "productWorldBuff": [
         {
           "Id": 38042500,
@@ -87125,11 +86172,7 @@
       "buffGroup": 5,
       "buffGroupName": "대상인의 축복",
       "buffGroupLevel": 2,
-      "productWorldBuffId": [
-        38042501,
-        38042601,
-        38042701
-      ],
+      "productWorldBuffId": [38042501, 38042601, 38042701],
       "productWorldBuff": [
         {
           "Id": 38042501,
@@ -87175,14 +86218,7 @@
       "buffGroup": 5,
       "buffGroupName": "대상인의 축복",
       "buffGroupLevel": 3,
-      "productWorldBuffId": [
-        38042502,
-        38042602,
-        38042702,
-        38020549,
-        38043000,
-        38002005
-      ],
+      "productWorldBuffId": [38042502, 38042602, 38042702, 38020549, 38043000, 38002005],
       "productWorldBuff": [
         {
           "Id": 38042502,
@@ -87239,14 +86275,7 @@
       "buffGroup": 6,
       "buffGroupName": "돌아온 항해자의 가호",
       "buffGroupLevel": 1,
-      "productWorldBuffId": [
-        38099015,
-        38099016,
-        38099017,
-        38099018,
-        38099019,
-        38099020
-      ],
+      "productWorldBuffId": [38099015, 38099016, 38099017, 38099018, 38099019, 38099020],
       "productWorldBuff": [
         {
           "Id": 38099015,
@@ -87306,12 +86335,7 @@
       "buffGroup": 101,
       "buffGroupName": "항해의 가호",
       "buffGroupLevel": 1,
-      "productWorldBuffId": [
-        38095000,
-        38095003,
-        38095011,
-        38095006
-      ],
+      "productWorldBuffId": [38095000, 38095003, 38095011, 38095006],
       "productWorldBuff": [
         {
           "Id": 38095000,
@@ -87363,12 +86387,7 @@
       "buffGroup": 101,
       "buffGroupName": "항해의 가호",
       "buffGroupLevel": 2,
-      "productWorldBuffId": [
-        38095001,
-        38095004,
-        38095011,
-        38095007
-      ],
+      "productWorldBuffId": [38095001, 38095004, 38095011, 38095007],
       "productWorldBuff": [
         {
           "Id": 38095001,
@@ -87420,14 +86439,7 @@
       "buffGroup": 101,
       "buffGroupName": "항해의 가호",
       "buffGroupLevel": 3,
-      "productWorldBuffId": [
-        38095002,
-        38095005,
-        38095012,
-        38095008,
-        38095009,
-        38095010
-      ],
+      "productWorldBuffId": [38095002, 38095005, 38095012, 38095008, 38095009, 38095010],
       "productWorldBuff": [
         {
           "Id": 38095002,
@@ -87487,11 +86499,7 @@
       "buffGroup": 102,
       "buffGroupName": "보급의 가호",
       "buffGroupLevel": 1,
-      "productWorldBuffId": [
-        38095101,
-        38095104,
-        38095107
-      ],
+      "productWorldBuffId": [38095101, 38095104, 38095107],
       "productWorldBuff": [
         {
           "Id": 38095101,
@@ -87539,11 +86547,7 @@
       "buffGroup": 102,
       "buffGroupName": "보급의 가호",
       "buffGroupLevel": 2,
-      "productWorldBuffId": [
-        38095102,
-        38095105,
-        38095108
-      ],
+      "productWorldBuffId": [38095102, 38095105, 38095108],
       "productWorldBuff": [
         {
           "Id": 38095102,
@@ -87591,12 +86595,7 @@
       "buffGroup": 102,
       "buffGroupName": "보급의 가호",
       "buffGroupLevel": 3,
-      "productWorldBuffId": [
-        38095103,
-        38095106,
-        38095109,
-        38095110
-      ],
+      "productWorldBuffId": [38095103, 38095106, 38095109, 38095110],
       "productWorldBuff": [
         {
           "Id": 38095103,
@@ -87648,10 +86647,7 @@
       "buffGroup": 103,
       "buffGroupName": "모험의 가호",
       "buffGroupLevel": 1,
-      "productWorldBuffId": [
-        38095201,
-        38095204
-      ],
+      "productWorldBuffId": [38095201, 38095204],
       "productWorldBuff": [
         {
           "Id": 38095201,
@@ -87695,11 +86691,7 @@
       "buffGroup": 103,
       "buffGroupName": "모험의 가호",
       "buffGroupLevel": 2,
-      "productWorldBuffId": [
-        38095202,
-        38095205,
-        38095207
-      ],
+      "productWorldBuffId": [38095202, 38095205, 38095207],
       "productWorldBuff": [
         {
           "Id": 38095202,
@@ -87747,14 +86739,7 @@
       "buffGroup": 103,
       "buffGroupName": "모험의 가호",
       "buffGroupLevel": 3,
-      "productWorldBuffId": [
-        38095203,
-        38095206,
-        38095208,
-        38095209,
-        38095210,
-        38095211
-      ],
+      "productWorldBuffId": [38095203, 38095206, 38095208, 38095209, 38095210, 38095211],
       "productWorldBuff": [
         {
           "Id": 38095203,
@@ -87814,10 +86799,7 @@
       "buffGroup": 104,
       "buffGroupName": "교역의 가호",
       "buffGroupLevel": 1,
-      "productWorldBuffId": [
-        38095301,
-        38095304
-      ],
+      "productWorldBuffId": [38095301, 38095304],
       "productWorldBuff": [
         {
           "Id": 38095301,
@@ -87861,10 +86843,7 @@
       "buffGroup": 104,
       "buffGroupName": "교역의 가호",
       "buffGroupLevel": 2,
-      "productWorldBuffId": [
-        38095302,
-        38095305
-      ],
+      "productWorldBuffId": [38095302, 38095305],
       "productWorldBuff": [
         {
           "Id": 38095302,
@@ -87908,14 +86887,7 @@
       "buffGroup": 104,
       "buffGroupName": "교역의 가호",
       "buffGroupLevel": 3,
-      "productWorldBuffId": [
-        38095303,
-        38095306,
-        38095307,
-        38095308,
-        38095309,
-        38095310
-      ],
+      "productWorldBuffId": [38095303, 38095306, 38095307, 38095308, 38095309, 38095310],
       "productWorldBuff": [
         {
           "Id": 38095303,
@@ -87975,10 +86947,7 @@
       "buffGroup": 105,
       "buffGroupName": "전투의 가호",
       "buffGroupLevel": 1,
-      "productWorldBuffId": [
-        38095401,
-        38095404
-      ],
+      "productWorldBuffId": [38095401, 38095404],
       "productWorldBuff": [
         {
           "Id": 38095401,
@@ -88022,10 +86991,7 @@
       "buffGroup": 105,
       "buffGroupName": "전투의 가호",
       "buffGroupLevel": 2,
-      "productWorldBuffId": [
-        38095402,
-        38095405
-      ],
+      "productWorldBuffId": [38095402, 38095405],
       "productWorldBuff": [
         {
           "Id": 38095402,
@@ -88069,13 +87035,7 @@
       "buffGroup": 105,
       "buffGroupName": "전투의 가호",
       "buffGroupLevel": 3,
-      "productWorldBuffId": [
-        38095403,
-        38095406,
-        38095407,
-        38095408,
-        38095409
-      ],
+      "productWorldBuffId": [38095403, 38095406, 38095407, 38095408, 38095409],
       "productWorldBuff": [
         {
           "Id": 38095403,
@@ -96654,9 +95614,7 @@
       "buffGroup": 13,
       "buffGroupName": "과제 자동 달성",
       "buffGroupLevel": 1,
-      "productWorldBuffId": [
-        38099074
-      ],
+      "productWorldBuffId": [38099074],
       "productWorldBuff": [
         {
           "Id": 38099074,
@@ -105131,9 +104089,7 @@
       "buffGroup": 14,
       "buffGroupName": "데일리샷 콜라보",
       "buffGroupLevel": 1,
-      "productWorldBuffId": [
-        38095413
-      ],
+      "productWorldBuffId": [38095413],
       "productWorldBuff": [
         {
           "Id": 38095413,
@@ -107730,9 +106686,7 @@
       "HotSpotResetType": 0,
       "buffGroup": 19,
       "buffGroupName": "항해사 프리미엄 패스",
-      "productWorldBuffId": [
-        38095418
-      ],
+      "productWorldBuffId": [38095418],
       "productWorldBuff": [
         {
           "Id": 38095418,
@@ -107812,9 +106766,7 @@
       "HotSpotResetType": 0,
       "buffGroup": 20,
       "buffGroupName": "선단 강화 프리미엄 패스",
-      "productWorldBuffId": [
-        38095419
-      ],
+      "productWorldBuffId": [38095419],
       "productWorldBuff": [
         {
           "Id": 38095419,
@@ -108424,9 +107376,7 @@
       "HotSpotResetType": 0,
       "buffGroup": 21,
       "buffGroupName": "항해사 프리미엄 패스2",
-      "productWorldBuffId": [
-        38095439
-      ],
+      "productWorldBuffId": [38095439],
       "productWorldBuff": [
         {
           "Id": 38095439,
@@ -108499,9 +107449,7 @@
       "HotSpotResetType": 0,
       "buffGroup": 22,
       "buffGroupName": "선단 강화 프리미엄 패스2",
-      "productWorldBuffId": [
-        38095440
-      ],
+      "productWorldBuffId": [38095440],
       "productWorldBuff": [
         {
           "Id": 38095440,
@@ -109820,12 +108768,7 @@
       "HotSpotResetType": 0,
       "buffGroup": 18,
       "buffGroupName": "황금의 시대 프리미엄 패스",
-      "productWorldBuffId": [
-        38095414,
-        38095415,
-        38095416,
-        38095417
-      ],
+      "productWorldBuffId": [38095414, 38095415, 38095416, 38095417],
       "productWorldBuff": [
         {
           "Id": 38095414,
@@ -110252,9 +109195,7 @@
       "HotSpotResetType": 0,
       "buffGroup": 21,
       "buffGroupName": "항해사 프리미엄 패스2",
-      "productWorldBuffId": [
-        38095439
-      ],
+      "productWorldBuffId": [38095439],
       "productWorldBuff": [
         {
           "Id": 38095439,
@@ -110335,9 +109276,7 @@
       "HotSpotResetType": 0,
       "buffGroup": 22,
       "buffGroupName": "선단 강화 프리미엄 패스2",
-      "productWorldBuffId": [
-        38095440
-      ],
+      "productWorldBuffId": [38095440],
       "productWorldBuff": [
         {
           "Id": 38095440,
@@ -110795,11 +109734,7 @@
       "buffGroup": 23,
       "buffGroupName": "첫 항해의 가호",
       "buffGroupLevel": 1,
-      "productWorldBuffId": [
-        38020554,
-        38020555,
-        38002008
-      ],
+      "productWorldBuffId": [38020554, 38020555, 38002008],
       "productWorldBuff": [
         {
           "Id": 38020554,
@@ -110991,11 +109926,7 @@
       "buffGroup": 24,
       "buffGroupName": "복귀자의 가호",
       "buffGroupLevel": 1,
-      "productWorldBuffId": [
-        38020556,
-        38020557,
-        38002009
-      ],
+      "productWorldBuffId": [38020556, 38020557, 38002009],
       "productWorldBuff": [
         {
           "Id": 38020556,
@@ -111781,13 +110712,7 @@
       "HotSpotResetType": 0,
       "buffGroup": 25,
       "buffGroupName": "동방의 물결 프리미엄 패스",
-      "productWorldBuffId": [
-        38095441,
-        38095442,
-        38095443,
-        38095444,
-        38095445
-      ],
+      "productWorldBuffId": [38095441, 38095442, 38095443, 38095444, 38095445],
       "productWorldBuff": [
         {
           "Id": 38095441,
@@ -112812,9 +111737,7 @@
       "HotSpotResetType": 0,
       "buffGroup": 26,
       "buffGroupName": "항해사 프리미엄 패스2",
-      "productWorldBuffId": [
-        38095439
-      ],
+      "productWorldBuffId": [38095439],
       "productWorldBuff": [
         {
           "Id": 38095439,
@@ -112895,9 +111818,7 @@
       "HotSpotResetType": 0,
       "buffGroup": 27,
       "buffGroupName": "선단 강화 프리미엄 패스2",
-      "productWorldBuffId": [
-        38095440
-      ],
+      "productWorldBuffId": [38095440],
       "productWorldBuff": [
         {
           "Id": 38095440,
@@ -114083,9 +113004,7 @@
       "HotSpotResetType": 0,
       "buffGroup": 26,
       "buffGroupName": "항해사 프리미엄 패스2",
-      "productWorldBuffId": [
-        38095439
-      ],
+      "productWorldBuffId": [38095439],
       "productWorldBuff": [
         {
           "Id": 38095439,
@@ -114164,9 +113083,7 @@
       "HotSpotResetType": 0,
       "buffGroup": 27,
       "buffGroupName": "선단 강화 프리미엄 패스2",
-      "productWorldBuffId": [
-        38095440
-      ],
+      "productWorldBuffId": [38095440],
       "productWorldBuff": [
         {
           "Id": 38095440,
@@ -114317,9 +113234,7 @@
       "buffGroup": 28,
       "buffGroupName": "할로윈 효과",
       "buffGroupLevel": 1,
-      "productWorldBuffId": [
-        38095446
-      ],
+      "productWorldBuffId": [38095446],
       "productWorldBuff": [
         {
           "Id": 38095446,
@@ -120792,9 +119707,7 @@
       "buffGroup": 14,
       "buffGroupName": "운하 무료 이용",
       "buffGroupLevel": 1,
-      "productWorldBuffId": [
-        38095410
-      ],
+      "productWorldBuffId": [38095410],
       "productWorldBuff": [
         {
           "Id": 38095410,
@@ -120835,9 +119748,7 @@
       "buffGroup": 15,
       "buffGroupName": "운하 무료 이용",
       "buffGroupLevel": 1,
-      "productWorldBuffId": [
-        38095411
-      ],
+      "productWorldBuffId": [38095411],
       "productWorldBuff": [
         {
           "Id": 38095411,
@@ -120878,9 +119789,7 @@
       "buffGroup": 16,
       "buffGroupName": "운하 무료 이용",
       "buffGroupLevel": 1,
-      "productWorldBuffId": [
-        38095412
-      ],
+      "productWorldBuffId": [38095412],
       "productWorldBuff": [
         {
           "Id": 38095412,

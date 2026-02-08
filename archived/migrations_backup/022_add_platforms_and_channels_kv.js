@@ -5,13 +5,12 @@
  * are already created in the initial schema or earlier migrations.
  */
 
-exports.up = async function(connection) {
+exports.up = async function (connection) {
   console.log('Skipping: platforms and channels KV items already exist');
   // No-op: KV items already exist
 };
 
-exports.down = async function(connection) {
+exports.down = async function (connection) {
   console.log('Skipping rollback: no changes were made in this migration');
   // No-op: nothing to rollback
 };
-

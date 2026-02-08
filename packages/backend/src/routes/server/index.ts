@@ -177,7 +177,11 @@ router.post(
 );
 
 // Feature flag routes
-router.get('/:env/features', serverSDKAuth as any, ServerFeatureFlagController.getFeatureFlags as any);
+router.get(
+  '/:env/features',
+  serverSDKAuth as any,
+  ServerFeatureFlagController.getFeatureFlags as any
+);
 router.get(
   '/:env/features/:flagName',
   serverSDKAuth as any,

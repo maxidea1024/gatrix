@@ -41,26 +41,9 @@
       "target": 0,
       "mateSearchingRule": 1,
       "shipSlotIds": [
-        70100000,
-        70100000,
-        70100000,
-        70100000,
-        70100000,
-        70100000,
-        70100000,
-        70100000,
-        70100000,
-        70100000,
-        70100000,
-        70100000,
-        70100000,
-        70100000,
-        70100000,
-        70100000,
-        70100000,
-        70100000,
-        70100000,
-        70100000
+        70100000, 70100000, 70100000, 70100000, 70100000, 70100000, 70100000, 70100000, 70100000,
+        70100000, 70100000, 70100000, 70100000, 70100000, 70100000, 70100000, 70100000, 70100000,
+        70100000, 70100000
       ]
     },
     ":max": {
@@ -68,94 +51,35 @@
       "target": 5,
       "mateSearchingRule": 3,
       "shipSlotIds": [
-        70199999,
-        70199999,
-        70199999,
-        70199999,
-        70199999,
-        70199999,
-        70199999,
-        70199999,
-        70199999,
-        70199999,
-        70199999,
-        70199999,
-        70199999,
-        70199999,
-        70199999,
-        70199999,
-        70199999,
-        70199999,
-        70199999,
-        70199999
+        70199999, 70199999, 70199999, 70199999, 70199999, 70199999, 70199999, 70199999, 70199999,
+        70199999, 70199999, 70199999, 70199999, 70199999, 70199999, 70199999, 70199999, 70199999,
+        70199999, 70199999
       ]
     },
     ":enum": {},
     ":links": {
-      "voiceTagType": [
-        "VoiceTag"
-      ],
+      "voiceTagType": ["VoiceTag"],
       "shipSlotIds": [
-        [
-          "ShipSlot"
-        ],
-        [
-          "ShipSlot"
-        ],
-        [
-          "ShipSlot"
-        ],
-        [
-          "ShipSlot"
-        ],
-        [
-          "ShipSlot"
-        ],
-        [
-          "ShipSlot"
-        ],
-        [
-          "ShipSlot"
-        ],
-        [
-          "ShipSlot"
-        ],
-        [
-          "ShipSlot"
-        ],
-        [
-          "ShipSlot"
-        ],
-        [
-          "ShipSlot"
-        ],
-        [
-          "ShipSlot"
-        ],
-        [
-          "ShipSlot"
-        ],
-        [
-          "ShipSlot"
-        ],
-        [
-          "ShipSlot"
-        ],
-        [
-          "ShipSlot"
-        ],
-        [
-          "ShipSlot"
-        ],
-        [
-          "ShipSlot"
-        ],
-        [
-          "ShipSlot"
-        ],
-        [
-          "ShipSlot"
-        ]
+        ["ShipSlot"],
+        ["ShipSlot"],
+        ["ShipSlot"],
+        ["ShipSlot"],
+        ["ShipSlot"],
+        ["ShipSlot"],
+        ["ShipSlot"],
+        ["ShipSlot"],
+        ["ShipSlot"],
+        ["ShipSlot"],
+        ["ShipSlot"],
+        ["ShipSlot"],
+        ["ShipSlot"],
+        ["ShipSlot"],
+        ["ShipSlot"],
+        ["ShipSlot"],
+        ["ShipSlot"],
+        ["ShipSlot"],
+        ["ShipSlot"],
+        ["ShipSlot"]
       ]
     }
   },
@@ -190,9 +114,7 @@
       "voiceTagType": 49,
       "target": 2,
       "mateSearchingRule": 2,
-      "shipSlotIds": [
-        70103001
-      ]
+      "shipSlotIds": [70103001]
     },
     "17600007": {
       "id": 17600007,
@@ -526,12 +448,7 @@
       "voiceTagType": 46,
       "target": 4,
       "mateSearchingRule": 1,
-      "shipSlotIds": [
-        70103008,
-        70103028,
-        70103048,
-        70103068
-      ]
+      "shipSlotIds": [70103008, 70103028, 70103048, 70103068]
     },
     "17600057": {
       "id": 17600057,
@@ -540,12 +457,7 @@
       "voiceTagType": 46,
       "target": 4,
       "mateSearchingRule": 1,
-      "shipSlotIds": [
-        70103008,
-        70103028,
-        70103048,
-        70103068
-      ]
+      "shipSlotIds": [70103008, 70103028, 70103048, 70103068]
     },
     "17600058": {
       "id": 17600058,
@@ -553,12 +465,7 @@
       "talkColumn": "buyBargainingStart",
       "target": 4,
       "mateSearchingRule": 1,
-      "shipSlotIds": [
-        70103008,
-        70103028,
-        70103048,
-        70103068
-      ]
+      "shipSlotIds": [70103008, 70103028, 70103048, 70103068]
     },
     "17600059": {
       "id": 17600059,
@@ -566,12 +473,7 @@
       "talkColumn": "sellBargainingStart",
       "target": 4,
       "mateSearchingRule": 1,
-      "shipSlotIds": [
-        70103008,
-        70103028,
-        70103048,
-        70103068
-      ]
+      "shipSlotIds": [70103008, 70103028, 70103048, 70103068]
     },
     "17600060": {
       "id": 17600060,
@@ -579,12 +481,7 @@
       "talkColumn": "BargainingProgress",
       "target": 4,
       "mateSearchingRule": 1,
-      "shipSlotIds": [
-        70103008,
-        70103028,
-        70103048,
-        70103068
-      ]
+      "shipSlotIds": [70103008, 70103028, 70103048, 70103068]
     },
     "17600061": {
       "id": 17600061,
@@ -592,12 +489,7 @@
       "talkColumn": "BargainingLastProgress",
       "target": 4,
       "mateSearchingRule": 1,
-      "shipSlotIds": [
-        70103008,
-        70103028,
-        70103048,
-        70103068
-      ]
+      "shipSlotIds": [70103008, 70103028, 70103048, 70103068]
     },
     "17600066": {
       "id": 17600066,
@@ -622,9 +514,7 @@
       "voiceTagType": 11,
       "target": 3,
       "mateSearchingRule": 1,
-      "shipSlotIds": [
-        70103001
-      ]
+      "shipSlotIds": [70103001]
     },
     "17600073": {
       "id": 17600073,
@@ -633,9 +523,7 @@
       "voiceTagType": 13,
       "target": 3,
       "mateSearchingRule": 1,
-      "shipSlotIds": [
-        70103001
-      ]
+      "shipSlotIds": [70103001]
     },
     "17600075": {
       "id": 17600075,
@@ -660,9 +548,7 @@
       "voiceTagType": 15,
       "target": 3,
       "mateSearchingRule": 1,
-      "shipSlotIds": [
-        70103001
-      ]
+      "shipSlotIds": [70103001]
     },
     "17600079": {
       "id": 17600079,
@@ -719,9 +605,7 @@
       "voiceTagType": 21,
       "target": 3,
       "mateSearchingRule": 2,
-      "shipSlotIds": [
-        70103001
-      ]
+      "shipSlotIds": [70103001]
     },
     "17600091": {
       "id": 17600091,

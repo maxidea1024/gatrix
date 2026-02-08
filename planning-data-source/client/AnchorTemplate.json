@@ -5,10 +5,7 @@
       "absDirectionType": "number",
       "absDistanceType": "number",
       "anchorType": "number",
-      "anchorAc": [
-        "number",
-        "number"
-      ]
+      "anchorAc": ["number", "number"]
     },
     ":required": {
       "absDirectionType": 1,
@@ -47,260 +44,182 @@
       "absDirectionType": 3,
       "absDistanceType": 0,
       "anchorType": 0,
-      "anchorAc": [
-        -15,
-        -5
-      ]
+      "anchorAc": [-15, -5]
     },
     "64250004": {
       "id": 64250004,
       "absDirectionType": 3,
       "absDistanceType": 0,
       "anchorType": 0,
-      "anchorAc": [
-        -17,
-        4
-      ]
+      "anchorAc": [-17, 4]
     },
     "64250005": {
       "id": 64250005,
       "absDirectionType": 3,
       "absDistanceType": 0,
       "anchorType": 0,
-      "anchorAc": [
-        5,
-        -7
-      ]
+      "anchorAc": [5, -7]
     },
     "64250006": {
       "id": 64250006,
       "absDirectionType": 3,
       "absDistanceType": 0,
       "anchorType": 0,
-      "anchorAc": [
-        2,
-        -1
-      ]
+      "anchorAc": [2, -1]
     },
     "64250007": {
       "id": 64250007,
       "absDirectionType": 3,
       "absDistanceType": 0,
       "anchorType": 0,
-      "anchorAc": [
-        17,
-        -6
-      ]
+      "anchorAc": [17, -6]
     },
     "64250008": {
       "id": 64250008,
       "absDirectionType": 3,
       "absDistanceType": 0,
       "anchorType": 0,
-      "anchorAc": [
-        12,
-        0
-      ]
+      "anchorAc": [12, 0]
     },
     "64250009": {
       "id": 64250009,
       "absDirectionType": 3,
       "absDistanceType": 0,
       "anchorType": 0,
-      "anchorAc": [
-        8,
-        -4
-      ]
+      "anchorAc": [8, -4]
     },
     "64250010": {
       "id": 64250010,
       "absDirectionType": 3,
       "absDistanceType": 0,
       "anchorType": 0,
-      "anchorAc": [
-        2,
-        -18
-      ]
+      "anchorAc": [2, -18]
     },
     "64250011": {
       "id": 64250011,
       "absDirectionType": 3,
       "absDistanceType": 0,
       "anchorType": 0,
-      "anchorAc": [
-        -8,
-        1
-      ]
+      "anchorAc": [-8, 1]
     },
     "64250012": {
       "id": 64250012,
       "absDirectionType": 3,
       "absDistanceType": 0,
       "anchorType": 0,
-      "anchorAc": [
-        13,
-        -19
-      ]
+      "anchorAc": [13, -19]
     },
     "64250013": {
       "id": 64250013,
       "absDirectionType": 3,
       "absDistanceType": 0,
       "anchorType": 0,
-      "anchorAc": [
-        6,
-        3
-      ]
+      "anchorAc": [6, 3]
     },
     "64250014": {
       "id": 64250014,
       "absDirectionType": 3,
       "absDistanceType": 0,
       "anchorType": 0,
-      "anchorAc": [
-        -15,
-        0
-      ]
+      "anchorAc": [-15, 0]
     },
     "64250015": {
       "id": 64250015,
       "absDirectionType": 3,
       "absDistanceType": 0,
       "anchorType": 0,
-      "anchorAc": [
-        -17,
-        7
-      ]
+      "anchorAc": [-17, 7]
     },
     "64250016": {
       "id": 64250016,
       "absDirectionType": 3,
       "absDistanceType": 0,
       "anchorType": 0,
-      "anchorAc": [
-        -8,
-        7
-      ]
+      "anchorAc": [-8, 7]
     },
     "64250017": {
       "id": 64250017,
       "absDirectionType": 3,
       "absDistanceType": 0,
       "anchorType": 0,
-      "anchorAc": [
-        -1,
-        7
-      ]
+      "anchorAc": [-1, 7]
     },
     "64250018": {
       "id": 64250018,
       "absDirectionType": 3,
       "absDistanceType": 0,
       "anchorType": 0,
-      "anchorAc": [
-        6,
-        10
-      ]
+      "anchorAc": [6, 10]
     },
     "64250019": {
       "id": 64250019,
       "absDirectionType": 3,
       "absDistanceType": 0,
       "anchorType": 0,
-      "anchorAc": [
-        0,
-        -1
-      ]
+      "anchorAc": [0, -1]
     },
     "64250020": {
       "id": 64250020,
       "absDirectionType": 3,
       "absDistanceType": 0,
       "anchorType": 0,
-      "anchorAc": [
-        -1,
-        1
-      ]
+      "anchorAc": [-1, 1]
     },
     "64250021": {
       "id": 64250021,
       "absDirectionType": 3,
       "absDistanceType": 0,
       "anchorType": 0,
-      "anchorAc": [
-        16,
-        -17
-      ]
+      "anchorAc": [16, -17]
     },
     "64250022": {
       "id": 64250022,
       "absDirectionType": 3,
       "absDistanceType": 0,
       "anchorType": 0,
-      "anchorAc": [
-        22,
-        -20
-      ]
+      "anchorAc": [22, -20]
     },
     "64250023": {
       "id": 64250023,
       "absDirectionType": 3,
       "absDistanceType": 0,
       "anchorType": 0,
-      "anchorAc": [
-        16,
-        -9
-      ]
+      "anchorAc": [16, -9]
     },
     "64250024": {
       "id": 64250024,
       "absDirectionType": 3,
       "absDistanceType": 0,
       "anchorType": 0,
-      "anchorAc": [
-        20,
-        -19
-      ]
+      "anchorAc": [20, -19]
     },
     "64250025": {
       "id": 64250025,
       "absDirectionType": 3,
       "absDistanceType": 0,
       "anchorType": 0,
-      "anchorAc": [
-        -8,
-        3
-      ]
+      "anchorAc": [-8, 3]
     },
     "64250026": {
       "id": 64250026,
       "absDirectionType": 3,
       "absDistanceType": 0,
       "anchorType": 0,
-      "anchorAc": [
-        -5,
-        -3
-      ]
+      "anchorAc": [-5, -3]
     },
     "64250027": {
       "id": 64250027,
       "absDirectionType": 3,
       "absDistanceType": 0,
       "anchorType": 0,
-      "anchorAc": [
-        -2,
-        -9
-      ]
+      "anchorAc": [-2, -9]
     },
     "64250028": {
       "id": 64250028,
       "absDirectionType": 3,
       "absDistanceType": 0,
       "anchorType": 0,
-      "anchorAc": [
-        16,
-        -9
-      ]
+      "anchorAc": [16, -9]
     },
     "64260001": {
       "id": 64260001,
@@ -2851,230 +2770,161 @@
       "absDirectionType": 0,
       "absDistanceType": 0,
       "anchorType": 0,
-      "anchorAc": [
-        5,
-        -5
-      ]
+      "anchorAc": [5, -5]
     },
     "64270004": {
       "id": 64270004,
       "absDirectionType": 3,
       "absDistanceType": 0,
       "anchorType": 0,
-      "anchorAc": [
-        -2,
-        -5
-      ]
+      "anchorAc": [-2, -5]
     },
     "64270005": {
       "id": 64270005,
       "absDirectionType": 1,
       "absDistanceType": 0,
       "anchorType": 0,
-      "anchorAc": [
-        2,
-        -2
-      ]
+      "anchorAc": [2, -2]
     },
     "64270006": {
       "id": 64270006,
       "absDirectionType": 4,
       "absDistanceType": 0,
       "anchorType": 0,
-      "anchorAc": [
-        -4,
-        1
-      ]
+      "anchorAc": [-4, 1]
     },
     "64270007": {
       "id": 64270007,
       "absDirectionType": 3,
       "absDistanceType": 0,
       "anchorType": 0,
-      "anchorAc": [
-        -7,
-        4
-      ]
+      "anchorAc": [-7, 4]
     },
     "64270008": {
       "id": 64270008,
       "absDirectionType": 1,
       "absDistanceType": 0,
       "anchorType": 0,
-      "anchorAc": [
-        1,
-        4
-      ]
+      "anchorAc": [1, 4]
     },
     "64270009": {
       "id": 64270009,
       "absDirectionType": 1,
       "absDistanceType": 0,
       "anchorType": 0,
-      "anchorAc": [
-        1,
-        6
-      ]
+      "anchorAc": [1, 6]
     },
     "64270010": {
       "id": 64270010,
       "absDirectionType": 4,
       "absDistanceType": 0,
       "anchorType": 0,
-      "anchorAc": [
-        -4,
-        -7
-      ]
+      "anchorAc": [-4, -7]
     },
     "64270011": {
       "id": 64270011,
       "absDirectionType": 1,
       "absDistanceType": 0,
       "anchorType": 0,
-      "anchorAc": [
-        0,
-        2
-      ]
+      "anchorAc": [0, 2]
     },
     "64270012": {
       "id": 64270012,
       "absDirectionType": 1,
       "absDistanceType": 0,
       "anchorType": 0,
-      "anchorAc": [
-        3,
-        -4
-      ]
+      "anchorAc": [3, -4]
     },
     "64270013": {
       "id": 64270013,
       "absDirectionType": 3,
       "absDistanceType": 0,
       "anchorType": 0,
-      "anchorAc": [
-        -3,
-        -1
-      ]
+      "anchorAc": [-3, -1]
     },
     "64270014": {
       "id": 64270014,
       "absDirectionType": 4,
       "absDistanceType": 0,
       "anchorType": 0,
-      "anchorAc": [
-        -3,
-        3
-      ]
+      "anchorAc": [-3, 3]
     },
     "64270015": {
       "id": 64270015,
       "absDirectionType": 1,
       "absDistanceType": 0,
       "anchorType": 0,
-      "anchorAc": [
-        -2,
-        0
-      ]
+      "anchorAc": [-2, 0]
     },
     "64270016": {
       "id": 64270016,
       "absDirectionType": 3,
       "absDistanceType": 0,
       "anchorType": 0,
-      "anchorAc": [
-        0,
-        0
-      ]
+      "anchorAc": [0, 0]
     },
     "64270017": {
       "id": 64270017,
       "absDirectionType": 4,
       "absDistanceType": 0,
       "anchorType": 0,
-      "anchorAc": [
-        -3,
-        1
-      ]
+      "anchorAc": [-3, 1]
     },
     "64270018": {
       "id": 64270018,
       "absDirectionType": 3,
       "absDistanceType": 0,
       "anchorType": 0,
-      "anchorAc": [
-        6,
-        -1
-      ]
+      "anchorAc": [6, -1]
     },
     "64270019": {
       "id": 64270019,
       "absDirectionType": 1,
       "absDistanceType": 0,
       "anchorType": 0,
-      "anchorAc": [
-        6,
-        4
-      ]
+      "anchorAc": [6, 4]
     },
     "64270020": {
       "id": 64270020,
       "absDirectionType": 4,
       "absDistanceType": 0,
       "anchorType": 0,
-      "anchorAc": [
-        -2,
-        -3
-      ]
+      "anchorAc": [-2, -3]
     },
     "64270021": {
       "id": 64270021,
       "absDirectionType": 3,
       "absDistanceType": 0,
       "anchorType": 0,
-      "anchorAc": [
-        2,
-        -2
-      ]
+      "anchorAc": [2, -2]
     },
     "64270022": {
       "id": 64270022,
       "absDirectionType": 1,
       "absDistanceType": 0,
       "anchorType": 0,
-      "anchorAc": [
-        5,
-        -6
-      ]
+      "anchorAc": [5, -6]
     },
     "64270023": {
       "id": 64270023,
       "absDirectionType": 0,
       "absDistanceType": 0,
       "anchorType": 0,
-      "anchorAc": [
-        18,
-        -8
-      ]
+      "anchorAc": [18, -8]
     },
     "64270024": {
       "id": 64270024,
       "absDirectionType": 5,
       "absDistanceType": 0,
       "anchorType": 0,
-      "anchorAc": [
-        9,
-        -1
-      ]
+      "anchorAc": [9, -1]
     },
     "64270025": {
       "id": 64270025,
       "absDirectionType": 2,
       "absDistanceType": 0,
       "anchorType": 0,
-      "anchorAc": [
-        11,
-        -8
-      ]
+      "anchorAc": [11, -8]
     },
     "64270026": {
       "id": 64270026,
@@ -3111,110 +2961,77 @@
       "absDirectionType": 3,
       "absDistanceType": 0,
       "anchorType": 0,
-      "anchorAc": [
-        12,
-        2
-      ]
+      "anchorAc": [12, 2]
     },
     "64280004": {
       "id": 64280004,
       "absDirectionType": 3,
       "absDistanceType": 0,
       "anchorType": 0,
-      "anchorAc": [
-        -14,
-        11
-      ]
+      "anchorAc": [-14, 11]
     },
     "64280005": {
       "id": 64280005,
       "absDirectionType": 3,
       "absDistanceType": 0,
       "anchorType": 0,
-      "anchorAc": [
-        0,
-        -2
-      ]
+      "anchorAc": [0, -2]
     },
     "64280006": {
       "id": 64280006,
       "absDirectionType": 3,
       "absDistanceType": 0,
       "anchorType": 0,
-      "anchorAc": [
-        -19,
-        2
-      ]
+      "anchorAc": [-19, 2]
     },
     "64280007": {
       "id": 64280007,
       "absDirectionType": 0,
       "absDistanceType": 0,
       "anchorType": 0,
-      "anchorAc": [
-        10,
-        0
-      ]
+      "anchorAc": [10, 0]
     },
     "64280008": {
       "id": 64280008,
       "absDirectionType": 3,
       "absDistanceType": 0,
       "anchorType": 0,
-      "anchorAc": [
-        -17,
-        0
-      ]
+      "anchorAc": [-17, 0]
     },
     "64280009": {
       "id": 64280009,
       "absDirectionType": 3,
       "absDistanceType": 0,
       "anchorType": 0,
-      "anchorAc": [
-        -2,
-        1
-      ]
+      "anchorAc": [-2, 1]
     },
     "64280010": {
       "id": 64280010,
       "absDirectionType": 3,
       "absDistanceType": 0,
       "anchorType": 0,
-      "anchorAc": [
-        -25,
-        2
-      ]
+      "anchorAc": [-25, 2]
     },
     "64280011": {
       "id": 64280011,
       "absDirectionType": 0,
       "absDistanceType": 0,
       "anchorType": 0,
-      "anchorAc": [
-        4,
-        -1
-      ]
+      "anchorAc": [4, -1]
     },
     "64280012": {
       "id": 64280012,
       "absDirectionType": 3,
       "absDistanceType": 0,
       "anchorType": 0,
-      "anchorAc": [
-        0,
-        -2
-      ]
+      "anchorAc": [0, -2]
     },
     "64280013": {
       "id": 64280013,
       "absDirectionType": 3,
       "absDistanceType": 0,
       "anchorType": 0,
-      "anchorAc": [
-        -19,
-        2
-      ]
+      "anchorAc": [-19, 2]
     },
     "64290001": {
       "id": 64290001,
@@ -3233,30 +3050,21 @@
       "absDirectionType": 1,
       "absDistanceType": 0,
       "anchorType": 4,
-      "anchorAc": [
-        -5,
-        0
-      ]
+      "anchorAc": [-5, 0]
     },
     "64290004": {
       "id": 64290004,
       "absDirectionType": 2,
       "absDistanceType": 0,
       "anchorType": 5,
-      "anchorAc": [
-        0,
-        5
-      ]
+      "anchorAc": [0, 5]
     },
     "64290005": {
       "id": 64290005,
       "absDirectionType": 4,
       "absDistanceType": 0,
       "anchorType": 1,
-      "anchorAc": [
-        5,
-        5
-      ]
+      "anchorAc": [5, 5]
     },
     "64290101": {
       "id": 64290101,

@@ -61,51 +61,21 @@
     },
     ":enum": {},
     ":links": {
-      "mateId": [
-        "Mate"
-      ],
-      "EncounterATK": [
-        "BattleText"
-      ],
-      "EncounterDEF": [
-        "BattleText"
-      ],
-      "GoBattle": [
-        "BattleText"
-      ],
-      "RunAttempt": [
-        "BattleText"
-      ],
-      "SurrenderAttempt": [
-        "BattleText"
-      ],
-      "SurrenderDonation": [
-        "BattleText"
-      ],
-      "NegotiationAttempt": [
-        "BattleText"
-      ],
-      "RunSuccess": [
-        "BattleText"
-      ],
-      "RunFail": [
-        "BattleText"
-      ],
-      "NotChase": [
-        "BattleText"
-      ],
-      "SurrenderSuccess": [
-        "BattleText"
-      ],
-      "SurrenderDeny": [
-        "BattleText"
-      ],
-      "NegotiationSuccess": [
-        "BattleText"
-      ],
-      "NegotiationDeny": [
-        "BattleText"
-      ]
+      "mateId": ["Mate"],
+      "EncounterATK": ["BattleText"],
+      "EncounterDEF": ["BattleText"],
+      "GoBattle": ["BattleText"],
+      "RunAttempt": ["BattleText"],
+      "SurrenderAttempt": ["BattleText"],
+      "SurrenderDonation": ["BattleText"],
+      "NegotiationAttempt": ["BattleText"],
+      "RunSuccess": ["BattleText"],
+      "RunFail": ["BattleText"],
+      "NotChase": ["BattleText"],
+      "SurrenderSuccess": ["BattleText"],
+      "SurrenderDeny": ["BattleText"],
+      "NegotiationSuccess": ["BattleText"],
+      "NegotiationDeny": ["BattleText"]
     }
   },
   "EncounterTalk": {

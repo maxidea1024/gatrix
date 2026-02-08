@@ -23,7 +23,7 @@ const TABLES_REQUIRING_ENVIRONMENT = [
   'g_banners',
   'g_service_maintenance',
   'g_reward_templates',
-  'g_reward_item_templates'
+  'g_reward_item_templates',
 ];
 
 module.exports = {
@@ -161,6 +161,5 @@ module.exports = {
         DROP COLUMN environmentId
       `);
     }
-  }
+  },
 };
-

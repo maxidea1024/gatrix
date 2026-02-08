@@ -62,14 +62,10 @@
     ":links": {
       "contentsTerms": [
         {
-          "Id": [
-            "ContentsTerms"
-          ]
+          "Id": ["ContentsTerms"]
         }
       ],
-      "pointId": [
-        "Point"
-      ]
+      "pointId": ["Point"]
     }
   },
   "BankInstallmentSavings": {

@@ -16,9 +16,7 @@
     },
     ":enum": {},
     ":links": {
-      "rewardId": [
-        "Reward"
-      ]
+      "rewardId": ["Reward"]
     }
   },
   "EnterSeaArea": {

@@ -1,1 +1,488 @@
-"use strict";(globalThis.webpackChunkdocs=globalThis.webpackChunkdocs||[]).push([[8506],{3892(e,n,s){s.r(n),s.d(n,{assets:()=>l,contentTitle:()=>a,default:()=>p,frontMatter:()=>o,metadata:()=>r,toc:()=>c});const r=JSON.parse('{"id":"api/server-sdk-api","title":"Server SDK API Documentation","description":"Server-side API endpoints for backend services and server applications.","source":"@site/docs/api/server-sdk-api.md","sourceDirName":"api","slug":"/api/server-sdk-api","permalink":"/docs/api/server-sdk-api","draft":false,"unlisted":false,"editUrl":"https://github.com/your-org/gatrix/tree/main/docs/docs/api/server-sdk-api.md","tags":[],"version":"current","sidebarPosition":3,"frontMatter":{"sidebar_position":3},"sidebar":"tutorialSidebar","previous":{"title":"Client API Documentation","permalink":"/docs/api/client-api"},"next":{"title":"Docker Deployment Guide","permalink":"/docs/deployment/docker"}}');var i=s(4848),t=s(8453);const o={sidebar_position:3},a="Server SDK API Documentation",l={},c=[{value:"Features",id:"features",level:2},{value:"Authentication",id:"authentication",level:2},{value:"API Endpoints",id:"api-endpoints",level:2},{value:"Environment-Specific Endpoints",id:"environment-specific-endpoints",level:3},{value:"1. Game Worlds",id:"1-game-worlds",level:3},{value:"Response",id:"response",level:4},{value:"2. Popup Notices",id:"2-popup-notices",level:3},{value:"3. Surveys",id:"3-surveys",level:3},{value:"4. Service Discovery",id:"4-service-discovery",level:3},{value:"Response",id:"response-1",level:4},{value:"5. Authentication Test",id:"5-authentication-test",level:3},{value:"Response",id:"response-2",level:4},{value:"6. Get Server Templates",id:"6-get-server-templates",level:3},{value:"Response",id:"response-3",level:4},{value:"3. Submit Metrics",id:"3-submit-metrics",level:3},{value:"Request Body",id:"request-body",level:4},{value:"Response",id:"response-4",level:4},{value:"Error Responses",id:"error-responses",level:2},{value:"Common Error Codes",id:"common-error-codes",level:3},{value:"Usage Examples",id:"usage-examples",level:2},{value:"Node.js Example",id:"nodejs-example",level:3},{value:"Python Example",id:"python-example",level:3},{value:"Rate Limits",id:"rate-limits",level:2},{value:"Best Practices",id:"best-practices",level:2}];function d(e){const n={code:"code",h1:"h1",h2:"h2",h3:"h3",h4:"h4",header:"header",li:"li",ol:"ol",p:"p",pre:"pre",strong:"strong",ul:"ul",...(0,t.R)(),...e.components};return(0,i.jsxs)(i.Fragment,{children:[(0,i.jsx)(n.header,{children:(0,i.jsx)(n.h1,{id:"server-sdk-api-documentation",children:"Server SDK API Documentation"})}),"\n",(0,i.jsx)(n.p,{children:"Server-side API endpoints for backend services and server applications."}),"\n",(0,i.jsx)(n.h2,{id:"features",children:"Features"}),"\n",(0,i.jsxs)(n.ul,{children:["\n",(0,i.jsxs)(n.li,{children:[(0,i.jsx)(n.strong,{children:"API Token Authentication"}),": Secure server-to-server communication"]}),"\n",(0,i.jsxs)(n.li,{children:[(0,i.jsx)(n.strong,{children:"High Performance"}),": Optimized for server-side usage"]}),"\n",(0,i.jsxs)(n.li,{children:[(0,i.jsx)(n.strong,{children:"Rate Limiting"}),": Appropriate limits for server applications"]}),"\n"]}),"\n",(0,i.jsx)(n.h2,{id:"authentication",children:"Authentication"}),"\n",(0,i.jsx)(n.p,{children:"All Server SDK endpoints require API token authentication:"}),"\n",(0,i.jsx)(n.pre,{children:(0,i.jsx)(n.code,{children:"Headers:\nX-API-Token: your-server-api-token\nX-Application-Name: your-application-name\n"})}),"\n",(0,i.jsx)(n.h2,{id:"api-endpoints",children:"API Endpoints"}),"\n",(0,i.jsx)(n.h3,{id:"environment-specific-endpoints",children:"Environment-Specific Endpoints"}),"\n",(0,i.jsx)(n.p,{children:"All environment-specific endpoints follow the pattern:"}),"\n",(0,i.jsx)(n.pre,{children:(0,i.jsx)(n.code,{children:"GET /api/v1/server/:env/resource\n"})}),"\n",(0,i.jsxs)(n.p,{children:["Where ",(0,i.jsx)(n.code,{children:":env"})," is the environment ID (e.g., ",(0,i.jsx)(n.code,{children:"development"}),", ",(0,i.jsx)(n.code,{children:"production"}),", ",(0,i.jsx)(n.code,{children:"qa"}),")."]}),"\n",(0,i.jsxs)(n.p,{children:[(0,i.jsx)(n.strong,{children:"Important:"})," Each endpoint returns data filtered by the specified environment. This ensures that:"]}),"\n",(0,i.jsxs)(n.ul,{children:["\n",(0,i.jsx)(n.li,{children:"Development data is only returned for development environment requests"}),"\n",(0,i.jsx)(n.li,{children:"Production data is only returned for production environment requests"}),"\n",(0,i.jsx)(n.li,{children:"No cross-environment data leakage occurs"}),"\n"]}),"\n",(0,i.jsx)(n.h3,{id:"1-game-worlds",children:"1. Game Worlds"}),"\n",(0,i.jsx)(n.pre,{children:(0,i.jsx)(n.code,{children:"GET /api/v1/server/:env/game-worlds\n"})}),"\n",(0,i.jsx)(n.p,{children:"Get all visible game worlds for the specified environment."}),"\n",(0,i.jsx)(n.h4,{id:"response",children:"Response"}),"\n",(0,i.jsx)(n.pre,{children:(0,i.jsx)(n.code,{className:"language-json",children:'{\n  "success": true,\n  "data": {\n    "worlds": [\n      {\n        "id": 1,\n        "worldId": "world-1",\n        "name": "Main Server",\n        "worldServerAddress": "world1.example.com:7777",\n        "status": "active",\n        "hasMaintenanceScheduled": false,\n        "isMaintenanceActive": false\n      }\n    ]\n  }\n}\n'})}),"\n",(0,i.jsx)(n.h3,{id:"2-popup-notices",children:"2. Popup Notices"}),"\n",(0,i.jsx)(n.pre,{children:(0,i.jsx)(n.code,{children:"GET /api/v1/server/:env/ingame-popup-notices\n"})}),"\n",(0,i.jsx)(n.p,{children:"Get active popup notices for the specified environment."}),"\n",(0,i.jsx)(n.h3,{id:"3-surveys",children:"3. Surveys"}),"\n",(0,i.jsx)(n.pre,{children:(0,i.jsx)(n.code,{children:"GET /api/v1/server/:env/surveys\n"})}),"\n",(0,i.jsx)(n.p,{children:"Get active surveys for the specified environment."}),"\n",(0,i.jsx)(n.h3,{id:"4-service-discovery",children:"4. Service Discovery"}),"\n",(0,i.jsx)(n.pre,{children:(0,i.jsx)(n.code,{children:"GET /api/v1/server/:env/service-discovery\n"})}),"\n",(0,i.jsx)(n.p,{children:"Get service discovery data including whitelists for the specified environment."}),"\n",(0,i.jsx)(n.h4,{id:"response-1",children:"Response"}),"\n",(0,i.jsx)(n.pre,{children:(0,i.jsx)(n.code,{className:"language-json",children:'{\n  "success": true,\n  "data": {\n    "ipWhitelist": [\n      { "ip": "192.168.1.0/24", "description": "Office network" }\n    ],\n    "accountWhitelist": [\n      { "accountId": "admin123", "description": "Admin account" }\n    ]\n  }\n}\n'})}),"\n",(0,i.jsx)(n.h3,{id:"5-authentication-test",children:"5. Authentication Test"}),"\n",(0,i.jsx)(n.pre,{children:(0,i.jsx)(n.code,{children:"GET /api/v1/server/test\n"})}),"\n",(0,i.jsx)(n.p,{children:"Test server SDK authentication."}),"\n",(0,i.jsx)(n.h4,{id:"response-2",children:"Response"}),"\n",(0,i.jsx)(n.pre,{children:(0,i.jsx)(n.code,{className:"language-json",children:'{\n  "success": true,\n  "message": "SDK authentication successful",\n  "data": {\n    "tokenId": "token-id",\n    "tokenName": "token-name",\n    "tokenType": "server",\n    "timestamp": "2024-01-01T00:00:00.000Z"\n  }\n}\n'})}),"\n",(0,i.jsx)(n.h3,{id:"6-get-server-templates",children:"6. Get Server Templates"}),"\n",(0,i.jsx)(n.pre,{children:(0,i.jsx)(n.code,{children:"GET /api/v1/server/templates\n"})}),"\n",(0,i.jsx)(n.p,{children:"Retrieve remote configuration templates for server-side usage."}),"\n",(0,i.jsx)(n.h4,{id:"response-3",children:"Response"}),"\n",(0,i.jsx)(n.pre,{children:(0,i.jsx)(n.code,{className:"language-json",children:'{\n  "success": true,\n  "data": {\n    "templates": [\n      {\n        "id": 1,\n        "key": "feature_flag",\n        "name": "Feature Flag",\n        "type": "boolean",\n        "defaultValue": false,\n        "description": "Enable/disable feature"\n      }\n    ],\n    "etag": "abc123",\n    "timestamp": "2024-01-01T00:00:00.000Z"\n  }\n}\n'})}),"\n",(0,i.jsx)(n.h3,{id:"3-submit-metrics",children:"3. Submit Metrics"}),"\n",(0,i.jsx)(n.pre,{children:(0,i.jsx)(n.code,{children:"POST /api/v1/server/metrics\n"})}),"\n",(0,i.jsx)(n.p,{children:"Submit usage metrics from server applications."}),"\n",(0,i.jsx)(n.h4,{id:"request-body",children:"Request Body"}),"\n",(0,i.jsx)(n.pre,{children:(0,i.jsx)(n.code,{className:"language-json",children:'{\n  "metrics": [\n    {\n      "configKey": "feature_flag",\n      "value": true,\n      "timestamp": "2024-01-01T00:00:00.000Z",\n      "metadata": {\n        "server_id": "server-001",\n        "environment": "production"\n      }\n    }\n  ]\n}\n'})}),"\n",(0,i.jsx)(n.h4,{id:"response-4",children:"Response"}),"\n",(0,i.jsx)(n.pre,{children:(0,i.jsx)(n.code,{className:"language-json",children:'{\n  "success": true,\n  "message": "Metrics submitted successfully",\n  "data": {\n    "processed": 1,\n    "timestamp": "2024-01-01T00:00:00.000Z"\n  }\n}\n'})}),"\n",(0,i.jsx)(n.h2,{id:"error-responses",children:"Error Responses"}),"\n",(0,i.jsx)(n.p,{children:"All endpoints return standardized error responses:"}),"\n",(0,i.jsx)(n.pre,{children:(0,i.jsx)(n.code,{className:"language-json",children:'{\n  "success": false,\n  "error": {\n    "message": "Error description",\n    "code": "ERROR_CODE"\n  }\n}\n'})}),"\n",(0,i.jsx)(n.h3,{id:"common-error-codes",children:"Common Error Codes"}),"\n",(0,i.jsxs)(n.ul,{children:["\n",(0,i.jsxs)(n.li,{children:[(0,i.jsx)(n.code,{children:"INVALID_API_TOKEN"}),": Invalid or missing API token"]}),"\n",(0,i.jsxs)(n.li,{children:[(0,i.jsx)(n.code,{children:"INSUFFICIENT_PERMISSIONS"}),": Token doesn't have required permissions"]}),"\n",(0,i.jsxs)(n.li,{children:[(0,i.jsx)(n.code,{children:"RATE_LIMIT_EXCEEDED"}),": Too many requests"]}),"\n",(0,i.jsxs)(n.li,{children:[(0,i.jsx)(n.code,{children:"ENVIRONMENT_NOT_FOUND"}),": Environment not found"]}),"\n",(0,i.jsxs)(n.li,{children:[(0,i.jsx)(n.code,{children:"VALIDATION_ERROR"}),": Request validation failed"]}),"\n"]}),"\n",(0,i.jsx)(n.h2,{id:"usage-examples",children:"Usage Examples"}),"\n",(0,i.jsx)(n.h3,{id:"nodejs-example",children:"Node.js Example"}),"\n",(0,i.jsx)(n.pre,{children:(0,i.jsx)(n.code,{className:"language-javascript",children:"const axios = require('axios');\n\nconst serverSDK = {\n  baseURL: 'https://api.example.com/api/v1/server',\n  apiKey: 'your-server-api-token',\n  appName: 'your-app-name',\n\n  async getTemplates() {\n    try {\n      const response = await axios.get(`${this.baseURL}/templates`, {\n        headers: {\n          'X-API-Key': this.apiKey,\n          'X-Application-Name': this.appName,\n          'Content-Type': 'application/json'\n        }\n      });\n      return response.data;\n    } catch (error) {\n      console.error('Error fetching templates:', error.response?.data);\n      throw error;\n    }\n  },\n\n  async submitMetrics(metrics) {\n    try {\n      const response = await axios.post(`${this.baseURL}/metrics`, \n        { metrics },\n        {\n          headers: {\n            'X-API-Key': this.apiKey,\n            'X-Application-Name': this.appName,\n            'Content-Type': 'application/json'\n          }\n        }\n      );\n      return response.data;\n    } catch (error) {\n      console.error('Error submitting metrics:', error.response?.data);\n      throw error;\n    }\n  }\n};\n\n// Usage\nasync function main() {\n  try {\n    const templates = await serverSDK.getTemplates();\n    console.log('Templates:', templates);\n\n    await serverSDK.submitMetrics([\n      {\n        configKey: 'feature_flag',\n        value: true,\n        timestamp: new Date().toISOString(),\n        metadata: { server_id: 'server-001' }\n      }\n    ]);\n  } catch (error) {\n    console.error('SDK Error:', error);\n  }\n}\n"})}),"\n",(0,i.jsx)(n.h3,{id:"python-example",children:"Python Example"}),"\n",(0,i.jsx)(n.pre,{children:(0,i.jsx)(n.code,{className:"language-python",children:"import requests\nimport json\nfrom datetime import datetime\n\nclass ServerSDK:\n    def __init__(self, base_url, api_key, app_name):\n        self.base_url = base_url\n        self.headers = {\n            'X-API-Key': api_key,\n            'X-Application-Name': app_name,\n            'Content-Type': 'application/json'\n        }\n    \n    def get_templates(self):\n        response = requests.get(\n            f\"{self.base_url}/templates\",\n            headers=self.headers\n        )\n        response.raise_for_status()\n        return response.json()\n    \n    def submit_metrics(self, metrics):\n        response = requests.post(\n            f\"{self.base_url}/metrics\",\n            headers=self.headers,\n            json={'metrics': metrics}\n        )\n        response.raise_for_status()\n        return response.json()\n\n# Usage\nsdk = ServerSDK(\n    'https://api.example.com/api/v1/server',\n    'your-server-api-token',\n    'your-app-name'\n)\n\ntry:\n    templates = sdk.get_templates()\n    print(f\"Templates: {templates}\")\n    \n    sdk.submit_metrics([{\n        'configKey': 'feature_flag',\n        'value': True,\n        'timestamp': datetime.utcnow().isoformat() + 'Z',\n        'metadata': {'server_id': 'server-001'}\n    }])\nexcept requests.RequestException as e:\n    print(f\"SDK Error: {e}\")\n"})}),"\n",(0,i.jsx)(n.h2,{id:"rate-limits",children:"Rate Limits"}),"\n",(0,i.jsxs)(n.ul,{children:["\n",(0,i.jsxs)(n.li,{children:[(0,i.jsx)(n.strong,{children:"Templates"}),": 1000 requests per minute"]}),"\n",(0,i.jsxs)(n.li,{children:[(0,i.jsx)(n.strong,{children:"Metrics"}),": 10000 requests per minute"]}),"\n",(0,i.jsxs)(n.li,{children:[(0,i.jsx)(n.strong,{children:"Test"}),": 100 requests per minute"]}),"\n"]}),"\n",(0,i.jsx)(n.h2,{id:"best-practices",children:"Best Practices"}),"\n",(0,i.jsxs)(n.ol,{children:["\n",(0,i.jsxs)(n.li,{children:[(0,i.jsx)(n.strong,{children:"Cache Templates"}),": Cache template responses using ETags"]}),"\n",(0,i.jsxs)(n.li,{children:[(0,i.jsx)(n.strong,{children:"Batch Metrics"}),": Submit metrics in batches for better performance"]}),"\n",(0,i.jsxs)(n.li,{children:[(0,i.jsx)(n.strong,{children:"Error Handling"}),": Implement proper retry logic with exponential backoff"]}),"\n",(0,i.jsxs)(n.li,{children:[(0,i.jsx)(n.strong,{children:"Token Security"}),": Store API tokens securely and rotate regularly"]}),"\n",(0,i.jsxs)(n.li,{children:[(0,i.jsx)(n.strong,{children:"Monitoring"}),": Monitor API usage and response times"]}),"\n"]})]})}function p(e={}){const{wrapper:n}={...(0,t.R)(),...e.components};return n?(0,i.jsx)(n,{...e,children:(0,i.jsx)(d,{...e})}):d(e)}},8453(e,n,s){s.d(n,{R:()=>o,x:()=>a});var r=s(6540);const i={},t=r.createContext(i);function o(e){const n=r.useContext(t);return r.useMemo(function(){return"function"==typeof e?e(n):{...n,...e}},[n,e])}function a(e){let n;return n=e.disableParentContext?"function"==typeof e.components?e.components(i):e.components||i:o(e.components),r.createElement(t.Provider,{value:n},e.children)}}}]);
+'use strict';
+(globalThis.webpackChunkdocs = globalThis.webpackChunkdocs || []).push([
+  [8506],
+  {
+    3892(e, n, s) {
+      (s.r(n),
+        s.d(n, {
+          assets: () => l,
+          contentTitle: () => a,
+          default: () => p,
+          frontMatter: () => o,
+          metadata: () => r,
+          toc: () => c,
+        }));
+      const r = JSON.parse(
+        '{"id":"api/server-sdk-api","title":"Server SDK API Documentation","description":"Server-side API endpoints for backend services and server applications.","source":"@site/docs/api/server-sdk-api.md","sourceDirName":"api","slug":"/api/server-sdk-api","permalink":"/docs/api/server-sdk-api","draft":false,"unlisted":false,"editUrl":"https://github.com/your-org/gatrix/tree/main/docs/docs/api/server-sdk-api.md","tags":[],"version":"current","sidebarPosition":3,"frontMatter":{"sidebar_position":3},"sidebar":"tutorialSidebar","previous":{"title":"Client API Documentation","permalink":"/docs/api/client-api"},"next":{"title":"Docker Deployment Guide","permalink":"/docs/deployment/docker"}}'
+      );
+      var i = s(4848),
+        t = s(8453);
+      const o = { sidebar_position: 3 },
+        a = 'Server SDK API Documentation',
+        l = {},
+        c = [
+          { value: 'Features', id: 'features', level: 2 },
+          { value: 'Authentication', id: 'authentication', level: 2 },
+          { value: 'API Endpoints', id: 'api-endpoints', level: 2 },
+          {
+            value: 'Environment-Specific Endpoints',
+            id: 'environment-specific-endpoints',
+            level: 3,
+          },
+          { value: '1. Game Worlds', id: '1-game-worlds', level: 3 },
+          { value: 'Response', id: 'response', level: 4 },
+          { value: '2. Popup Notices', id: '2-popup-notices', level: 3 },
+          { value: '3. Surveys', id: '3-surveys', level: 3 },
+          { value: '4. Service Discovery', id: '4-service-discovery', level: 3 },
+          { value: 'Response', id: 'response-1', level: 4 },
+          { value: '5. Authentication Test', id: '5-authentication-test', level: 3 },
+          { value: 'Response', id: 'response-2', level: 4 },
+          { value: '6. Get Server Templates', id: '6-get-server-templates', level: 3 },
+          { value: 'Response', id: 'response-3', level: 4 },
+          { value: '3. Submit Metrics', id: '3-submit-metrics', level: 3 },
+          { value: 'Request Body', id: 'request-body', level: 4 },
+          { value: 'Response', id: 'response-4', level: 4 },
+          { value: 'Error Responses', id: 'error-responses', level: 2 },
+          { value: 'Common Error Codes', id: 'common-error-codes', level: 3 },
+          { value: 'Usage Examples', id: 'usage-examples', level: 2 },
+          { value: 'Node.js Example', id: 'nodejs-example', level: 3 },
+          { value: 'Python Example', id: 'python-example', level: 3 },
+          { value: 'Rate Limits', id: 'rate-limits', level: 2 },
+          { value: 'Best Practices', id: 'best-practices', level: 2 },
+        ];
+      function d(e) {
+        const n = {
+          code: 'code',
+          h1: 'h1',
+          h2: 'h2',
+          h3: 'h3',
+          h4: 'h4',
+          header: 'header',
+          li: 'li',
+          ol: 'ol',
+          p: 'p',
+          pre: 'pre',
+          strong: 'strong',
+          ul: 'ul',
+          ...(0, t.R)(),
+          ...e.components,
+        };
+        return (0, i.jsxs)(i.Fragment, {
+          children: [
+            (0, i.jsx)(n.header, {
+              children: (0, i.jsx)(n.h1, {
+                id: 'server-sdk-api-documentation',
+                children: 'Server SDK API Documentation',
+              }),
+            }),
+            '\n',
+            (0, i.jsx)(n.p, {
+              children: 'Server-side API endpoints for backend services and server applications.',
+            }),
+            '\n',
+            (0, i.jsx)(n.h2, { id: 'features', children: 'Features' }),
+            '\n',
+            (0, i.jsxs)(n.ul, {
+              children: [
+                '\n',
+                (0, i.jsxs)(n.li, {
+                  children: [
+                    (0, i.jsx)(n.strong, { children: 'API Token Authentication' }),
+                    ': Secure server-to-server communication',
+                  ],
+                }),
+                '\n',
+                (0, i.jsxs)(n.li, {
+                  children: [
+                    (0, i.jsx)(n.strong, { children: 'High Performance' }),
+                    ': Optimized for server-side usage',
+                  ],
+                }),
+                '\n',
+                (0, i.jsxs)(n.li, {
+                  children: [
+                    (0, i.jsx)(n.strong, { children: 'Rate Limiting' }),
+                    ': Appropriate limits for server applications',
+                  ],
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, i.jsx)(n.h2, { id: 'authentication', children: 'Authentication' }),
+            '\n',
+            (0, i.jsx)(n.p, {
+              children: 'All Server SDK endpoints require API token authentication:',
+            }),
+            '\n',
+            (0, i.jsx)(n.pre, {
+              children: (0, i.jsx)(n.code, {
+                children:
+                  'Headers:\nX-API-Token: your-server-api-token\nX-Application-Name: your-application-name\n',
+              }),
+            }),
+            '\n',
+            (0, i.jsx)(n.h2, { id: 'api-endpoints', children: 'API Endpoints' }),
+            '\n',
+            (0, i.jsx)(n.h3, {
+              id: 'environment-specific-endpoints',
+              children: 'Environment-Specific Endpoints',
+            }),
+            '\n',
+            (0, i.jsx)(n.p, { children: 'All environment-specific endpoints follow the pattern:' }),
+            '\n',
+            (0, i.jsx)(n.pre, {
+              children: (0, i.jsx)(n.code, { children: 'GET /api/v1/server/:env/resource\n' }),
+            }),
+            '\n',
+            (0, i.jsxs)(n.p, {
+              children: [
+                'Where ',
+                (0, i.jsx)(n.code, { children: ':env' }),
+                ' is the environment ID (e.g., ',
+                (0, i.jsx)(n.code, { children: 'development' }),
+                ', ',
+                (0, i.jsx)(n.code, { children: 'production' }),
+                ', ',
+                (0, i.jsx)(n.code, { children: 'qa' }),
+                ').',
+              ],
+            }),
+            '\n',
+            (0, i.jsxs)(n.p, {
+              children: [
+                (0, i.jsx)(n.strong, { children: 'Important:' }),
+                ' Each endpoint returns data filtered by the specified environment. This ensures that:',
+              ],
+            }),
+            '\n',
+            (0, i.jsxs)(n.ul, {
+              children: [
+                '\n',
+                (0, i.jsx)(n.li, {
+                  children:
+                    'Development data is only returned for development environment requests',
+                }),
+                '\n',
+                (0, i.jsx)(n.li, {
+                  children: 'Production data is only returned for production environment requests',
+                }),
+                '\n',
+                (0, i.jsx)(n.li, { children: 'No cross-environment data leakage occurs' }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, i.jsx)(n.h3, { id: '1-game-worlds', children: '1. Game Worlds' }),
+            '\n',
+            (0, i.jsx)(n.pre, {
+              children: (0, i.jsx)(n.code, { children: 'GET /api/v1/server/:env/game-worlds\n' }),
+            }),
+            '\n',
+            (0, i.jsx)(n.p, {
+              children: 'Get all visible game worlds for the specified environment.',
+            }),
+            '\n',
+            (0, i.jsx)(n.h4, { id: 'response', children: 'Response' }),
+            '\n',
+            (0, i.jsx)(n.pre, {
+              children: (0, i.jsx)(n.code, {
+                className: 'language-json',
+                children:
+                  '{\n  "success": true,\n  "data": {\n    "worlds": [\n      {\n        "id": 1,\n        "worldId": "world-1",\n        "name": "Main Server",\n        "worldServerAddress": "world1.example.com:7777",\n        "status": "active",\n        "hasMaintenanceScheduled": false,\n        "isMaintenanceActive": false\n      }\n    ]\n  }\n}\n',
+              }),
+            }),
+            '\n',
+            (0, i.jsx)(n.h3, { id: '2-popup-notices', children: '2. Popup Notices' }),
+            '\n',
+            (0, i.jsx)(n.pre, {
+              children: (0, i.jsx)(n.code, {
+                children: 'GET /api/v1/server/:env/ingame-popup-notices\n',
+              }),
+            }),
+            '\n',
+            (0, i.jsx)(n.p, {
+              children: 'Get active popup notices for the specified environment.',
+            }),
+            '\n',
+            (0, i.jsx)(n.h3, { id: '3-surveys', children: '3. Surveys' }),
+            '\n',
+            (0, i.jsx)(n.pre, {
+              children: (0, i.jsx)(n.code, { children: 'GET /api/v1/server/:env/surveys\n' }),
+            }),
+            '\n',
+            (0, i.jsx)(n.p, { children: 'Get active surveys for the specified environment.' }),
+            '\n',
+            (0, i.jsx)(n.h3, { id: '4-service-discovery', children: '4. Service Discovery' }),
+            '\n',
+            (0, i.jsx)(n.pre, {
+              children: (0, i.jsx)(n.code, {
+                children: 'GET /api/v1/server/:env/service-discovery\n',
+              }),
+            }),
+            '\n',
+            (0, i.jsx)(n.p, {
+              children:
+                'Get service discovery data including whitelists for the specified environment.',
+            }),
+            '\n',
+            (0, i.jsx)(n.h4, { id: 'response-1', children: 'Response' }),
+            '\n',
+            (0, i.jsx)(n.pre, {
+              children: (0, i.jsx)(n.code, {
+                className: 'language-json',
+                children:
+                  '{\n  "success": true,\n  "data": {\n    "ipWhitelist": [\n      { "ip": "192.168.1.0/24", "description": "Office network" }\n    ],\n    "accountWhitelist": [\n      { "accountId": "admin123", "description": "Admin account" }\n    ]\n  }\n}\n',
+              }),
+            }),
+            '\n',
+            (0, i.jsx)(n.h3, { id: '5-authentication-test', children: '5. Authentication Test' }),
+            '\n',
+            (0, i.jsx)(n.pre, {
+              children: (0, i.jsx)(n.code, { children: 'GET /api/v1/server/test\n' }),
+            }),
+            '\n',
+            (0, i.jsx)(n.p, { children: 'Test server SDK authentication.' }),
+            '\n',
+            (0, i.jsx)(n.h4, { id: 'response-2', children: 'Response' }),
+            '\n',
+            (0, i.jsx)(n.pre, {
+              children: (0, i.jsx)(n.code, {
+                className: 'language-json',
+                children:
+                  '{\n  "success": true,\n  "message": "SDK authentication successful",\n  "data": {\n    "tokenId": "token-id",\n    "tokenName": "token-name",\n    "tokenType": "server",\n    "timestamp": "2024-01-01T00:00:00.000Z"\n  }\n}\n',
+              }),
+            }),
+            '\n',
+            (0, i.jsx)(n.h3, { id: '6-get-server-templates', children: '6. Get Server Templates' }),
+            '\n',
+            (0, i.jsx)(n.pre, {
+              children: (0, i.jsx)(n.code, { children: 'GET /api/v1/server/templates\n' }),
+            }),
+            '\n',
+            (0, i.jsx)(n.p, {
+              children: 'Retrieve remote configuration templates for server-side usage.',
+            }),
+            '\n',
+            (0, i.jsx)(n.h4, { id: 'response-3', children: 'Response' }),
+            '\n',
+            (0, i.jsx)(n.pre, {
+              children: (0, i.jsx)(n.code, {
+                className: 'language-json',
+                children:
+                  '{\n  "success": true,\n  "data": {\n    "templates": [\n      {\n        "id": 1,\n        "key": "feature_flag",\n        "name": "Feature Flag",\n        "type": "boolean",\n        "defaultValue": false,\n        "description": "Enable/disable feature"\n      }\n    ],\n    "etag": "abc123",\n    "timestamp": "2024-01-01T00:00:00.000Z"\n  }\n}\n',
+              }),
+            }),
+            '\n',
+            (0, i.jsx)(n.h3, { id: '3-submit-metrics', children: '3. Submit Metrics' }),
+            '\n',
+            (0, i.jsx)(n.pre, {
+              children: (0, i.jsx)(n.code, { children: 'POST /api/v1/server/metrics\n' }),
+            }),
+            '\n',
+            (0, i.jsx)(n.p, { children: 'Submit usage metrics from server applications.' }),
+            '\n',
+            (0, i.jsx)(n.h4, { id: 'request-body', children: 'Request Body' }),
+            '\n',
+            (0, i.jsx)(n.pre, {
+              children: (0, i.jsx)(n.code, {
+                className: 'language-json',
+                children:
+                  '{\n  "metrics": [\n    {\n      "configKey": "feature_flag",\n      "value": true,\n      "timestamp": "2024-01-01T00:00:00.000Z",\n      "metadata": {\n        "server_id": "server-001",\n        "environment": "production"\n      }\n    }\n  ]\n}\n',
+              }),
+            }),
+            '\n',
+            (0, i.jsx)(n.h4, { id: 'response-4', children: 'Response' }),
+            '\n',
+            (0, i.jsx)(n.pre, {
+              children: (0, i.jsx)(n.code, {
+                className: 'language-json',
+                children:
+                  '{\n  "success": true,\n  "message": "Metrics submitted successfully",\n  "data": {\n    "processed": 1,\n    "timestamp": "2024-01-01T00:00:00.000Z"\n  }\n}\n',
+              }),
+            }),
+            '\n',
+            (0, i.jsx)(n.h2, { id: 'error-responses', children: 'Error Responses' }),
+            '\n',
+            (0, i.jsx)(n.p, { children: 'All endpoints return standardized error responses:' }),
+            '\n',
+            (0, i.jsx)(n.pre, {
+              children: (0, i.jsx)(n.code, {
+                className: 'language-json',
+                children:
+                  '{\n  "success": false,\n  "error": {\n    "message": "Error description",\n    "code": "ERROR_CODE"\n  }\n}\n',
+              }),
+            }),
+            '\n',
+            (0, i.jsx)(n.h3, { id: 'common-error-codes', children: 'Common Error Codes' }),
+            '\n',
+            (0, i.jsxs)(n.ul, {
+              children: [
+                '\n',
+                (0, i.jsxs)(n.li, {
+                  children: [
+                    (0, i.jsx)(n.code, { children: 'INVALID_API_TOKEN' }),
+                    ': Invalid or missing API token',
+                  ],
+                }),
+                '\n',
+                (0, i.jsxs)(n.li, {
+                  children: [
+                    (0, i.jsx)(n.code, { children: 'INSUFFICIENT_PERMISSIONS' }),
+                    ": Token doesn't have required permissions",
+                  ],
+                }),
+                '\n',
+                (0, i.jsxs)(n.li, {
+                  children: [
+                    (0, i.jsx)(n.code, { children: 'RATE_LIMIT_EXCEEDED' }),
+                    ': Too many requests',
+                  ],
+                }),
+                '\n',
+                (0, i.jsxs)(n.li, {
+                  children: [
+                    (0, i.jsx)(n.code, { children: 'ENVIRONMENT_NOT_FOUND' }),
+                    ': Environment not found',
+                  ],
+                }),
+                '\n',
+                (0, i.jsxs)(n.li, {
+                  children: [
+                    (0, i.jsx)(n.code, { children: 'VALIDATION_ERROR' }),
+                    ': Request validation failed',
+                  ],
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, i.jsx)(n.h2, { id: 'usage-examples', children: 'Usage Examples' }),
+            '\n',
+            (0, i.jsx)(n.h3, { id: 'nodejs-example', children: 'Node.js Example' }),
+            '\n',
+            (0, i.jsx)(n.pre, {
+              children: (0, i.jsx)(n.code, {
+                className: 'language-javascript',
+                children:
+                  "const axios = require('axios');\n\nconst serverSDK = {\n  baseURL: 'https://api.example.com/api/v1/server',\n  apiKey: 'your-server-api-token',\n  appName: 'your-app-name',\n\n  async getTemplates() {\n    try {\n      const response = await axios.get(`${this.baseURL}/templates`, {\n        headers: {\n          'X-API-Key': this.apiKey,\n          'X-Application-Name': this.appName,\n          'Content-Type': 'application/json'\n        }\n      });\n      return response.data;\n    } catch (error) {\n      console.error('Error fetching templates:', error.response?.data);\n      throw error;\n    }\n  },\n\n  async submitMetrics(metrics) {\n    try {\n      const response = await axios.post(`${this.baseURL}/metrics`, \n        { metrics },\n        {\n          headers: {\n            'X-API-Key': this.apiKey,\n            'X-Application-Name': this.appName,\n            'Content-Type': 'application/json'\n          }\n        }\n      );\n      return response.data;\n    } catch (error) {\n      console.error('Error submitting metrics:', error.response?.data);\n      throw error;\n    }\n  }\n};\n\n// Usage\nasync function main() {\n  try {\n    const templates = await serverSDK.getTemplates();\n    console.log('Templates:', templates);\n\n    await serverSDK.submitMetrics([\n      {\n        configKey: 'feature_flag',\n        value: true,\n        timestamp: new Date().toISOString(),\n        metadata: { server_id: 'server-001' }\n      }\n    ]);\n  } catch (error) {\n    console.error('SDK Error:', error);\n  }\n}\n",
+              }),
+            }),
+            '\n',
+            (0, i.jsx)(n.h3, { id: 'python-example', children: 'Python Example' }),
+            '\n',
+            (0, i.jsx)(n.pre, {
+              children: (0, i.jsx)(n.code, {
+                className: 'language-python',
+                children:
+                  "import requests\nimport json\nfrom datetime import datetime\n\nclass ServerSDK:\n    def __init__(self, base_url, api_key, app_name):\n        self.base_url = base_url\n        self.headers = {\n            'X-API-Key': api_key,\n            'X-Application-Name': app_name,\n            'Content-Type': 'application/json'\n        }\n    \n    def get_templates(self):\n        response = requests.get(\n            f\"{self.base_url}/templates\",\n            headers=self.headers\n        )\n        response.raise_for_status()\n        return response.json()\n    \n    def submit_metrics(self, metrics):\n        response = requests.post(\n            f\"{self.base_url}/metrics\",\n            headers=self.headers,\n            json={'metrics': metrics}\n        )\n        response.raise_for_status()\n        return response.json()\n\n# Usage\nsdk = ServerSDK(\n    'https://api.example.com/api/v1/server',\n    'your-server-api-token',\n    'your-app-name'\n)\n\ntry:\n    templates = sdk.get_templates()\n    print(f\"Templates: {templates}\")\n    \n    sdk.submit_metrics([{\n        'configKey': 'feature_flag',\n        'value': True,\n        'timestamp': datetime.utcnow().isoformat() + 'Z',\n        'metadata': {'server_id': 'server-001'}\n    }])\nexcept requests.RequestException as e:\n    print(f\"SDK Error: {e}\")\n",
+              }),
+            }),
+            '\n',
+            (0, i.jsx)(n.h2, { id: 'rate-limits', children: 'Rate Limits' }),
+            '\n',
+            (0, i.jsxs)(n.ul, {
+              children: [
+                '\n',
+                (0, i.jsxs)(n.li, {
+                  children: [
+                    (0, i.jsx)(n.strong, { children: 'Templates' }),
+                    ': 1000 requests per minute',
+                  ],
+                }),
+                '\n',
+                (0, i.jsxs)(n.li, {
+                  children: [
+                    (0, i.jsx)(n.strong, { children: 'Metrics' }),
+                    ': 10000 requests per minute',
+                  ],
+                }),
+                '\n',
+                (0, i.jsxs)(n.li, {
+                  children: [
+                    (0, i.jsx)(n.strong, { children: 'Test' }),
+                    ': 100 requests per minute',
+                  ],
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, i.jsx)(n.h2, { id: 'best-practices', children: 'Best Practices' }),
+            '\n',
+            (0, i.jsxs)(n.ol, {
+              children: [
+                '\n',
+                (0, i.jsxs)(n.li, {
+                  children: [
+                    (0, i.jsx)(n.strong, { children: 'Cache Templates' }),
+                    ': Cache template responses using ETags',
+                  ],
+                }),
+                '\n',
+                (0, i.jsxs)(n.li, {
+                  children: [
+                    (0, i.jsx)(n.strong, { children: 'Batch Metrics' }),
+                    ': Submit metrics in batches for better performance',
+                  ],
+                }),
+                '\n',
+                (0, i.jsxs)(n.li, {
+                  children: [
+                    (0, i.jsx)(n.strong, { children: 'Error Handling' }),
+                    ': Implement proper retry logic with exponential backoff',
+                  ],
+                }),
+                '\n',
+                (0, i.jsxs)(n.li, {
+                  children: [
+                    (0, i.jsx)(n.strong, { children: 'Token Security' }),
+                    ': Store API tokens securely and rotate regularly',
+                  ],
+                }),
+                '\n',
+                (0, i.jsxs)(n.li, {
+                  children: [
+                    (0, i.jsx)(n.strong, { children: 'Monitoring' }),
+                    ': Monitor API usage and response times',
+                  ],
+                }),
+                '\n',
+              ],
+            }),
+          ],
+        });
+      }
+      function p(e = {}) {
+        const { wrapper: n } = { ...(0, t.R)(), ...e.components };
+        return n ? (0, i.jsx)(n, { ...e, children: (0, i.jsx)(d, { ...e }) }) : d(e);
+      }
+    },
+    8453(e, n, s) {
+      s.d(n, { R: () => o, x: () => a });
+      var r = s(6540);
+      const i = {},
+        t = r.createContext(i);
+      function o(e) {
+        const n = r.useContext(t);
+        return r.useMemo(
+          function () {
+            return 'function' == typeof e ? e(n) : { ...n, ...e };
+          },
+          [n, e]
+        );
+      }
+      function a(e) {
+        let n;
+        return (
+          (n = e.disableParentContext
+            ? 'function' == typeof e.components
+              ? e.components(i)
+              : e.components || i
+            : o(e.components)),
+          r.createElement(t.Provider, { value: n }, e.children)
+        );
+      }
+    },
+  },
+]);

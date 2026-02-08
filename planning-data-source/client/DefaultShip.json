@@ -33,15 +33,9 @@
     },
     ":enum": {},
     ":links": {
-      "mateId": [
-        "Mate"
-      ],
-      "shipId": [
-        "Ship"
-      ],
-      "captinId": [
-        "Mate"
-      ]
+      "mateId": ["Mate"],
+      "shipId": ["Ship"],
+      "captinId": ["Mate"]
     }
   },
   "DefaultShip": {

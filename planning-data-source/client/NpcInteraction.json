@@ -37,17 +37,13 @@
     },
     ":enum": {
       "contentsTerms": {
-        "Id": [
-          81999999
-        ]
+        "Id": [81999999]
       }
     },
     ":asset": {},
     ":links": {
       "contentsTerms": {
-        "Id": [
-          "ContentsTerms"
-        ]
+        "Id": ["ContentsTerms"]
       }
     }
   },

@@ -11,17 +11,20 @@ This document summarizes the final round of fixes for the Gatrix system console,
 **Reason:** More accurate terminology - the command generates API tokens, not keys.
 
 **Changes:**
+
 - Command name: `api-key` → `api-token`
 - Help category: Updated to show `api-token`
 - Command description: Unchanged (still "Generate API access token")
 
 **Files Modified:**
+
 - `packages/backend/src/services/ConsoleService.ts`
   - Line 131: Command registration
   - Line 347: Help category
   - Line 804: Command implementation comment
 
 **Usage:**
+
 ```bash
 # Old (no longer works)
 api-key --name "My Token" --type client
@@ -37,6 +40,7 @@ api-token --name "My Token" --type client
 **Problem:** Pressing Ctrl+Enter once toggled fullscreen twice (on → off or off → on → off).
 
 **Root Cause:**
+
 - Event was not being properly prevented
 - Event propagated to other handlers
 - Multiple handlers processed the same event
@@ -45,15 +49,18 @@ api-token --name "My Token" --type client
 Added `e.preventDefault()` and `e.stopPropagation()` to completely stop event propagation.
 
 **Implementation:**
+
 ```typescript
 // Ctrl+Enter: Toggle fullscreen
 if (ctrlOrMeta && key === 'enter') {
-  e.preventDefault();      // Prevent default browser behavior
-  e.stopPropagation();     // Stop event from bubbling
-  setIsFullscreen(prev => !prev);
+  e.preventDefault(); // Prevent default browser behavior
+  e.stopPropagation(); // Stop event from bubbling
+  setIsFullscreen((prev) => !prev);
   setTimeout(() => {
     if (termRef.current && fitAddonRef.current) {
-      try { fitAddonRef.current.fit(); } catch {}
+      try {
+        fitAddonRef.current.fit();
+      } catch {}
     }
   }, 100);
   return false;
@@ -61,6 +68,7 @@ if (ctrlOrMeta && key === 'enter') {
 ```
 
 **Result:**
+
 - ✅ Ctrl+Enter now toggles fullscreen exactly once per press
 - ✅ No double-triggering
 - ✅ Smooth transition
@@ -72,6 +80,7 @@ if (ctrlOrMeta && key === 'enter') {
 **Problem:** Shift+Home and Shift+End were not working reliably for text selection.
 
 **Root Cause:**
+
 - Events were not being prevented
 - Browser default behavior interfered
 - Event propagation caused conflicts
@@ -80,6 +89,7 @@ if (ctrlOrMeta && key === 'enter') {
 Added `e.preventDefault()` and `e.stopPropagation()` to both handlers.
 
 **Implementation:**
+
 ```typescript
 // Shift+Home: Select from cursor to start
 if (e.shiftKey && key === 'home') {
@@ -109,6 +119,7 @@ if (e.shiftKey && key === 'end') {
 ```
 
 **Result:**
+
 - ✅ Shift+Home selects from cursor to start of line
 - ✅ Shift+End selects from cursor to end of line
 - ✅ No browser interference
@@ -121,6 +132,7 @@ if (e.shiftKey && key === 'end') {
 **Problem:** Pressing Ctrl+V once pasted text 2-3 times.
 
 **Root Cause:**
+
 - Multiple paste handlers were triggered
 - Event propagated to xterm's native paste handler
 - No event prevention in place
@@ -129,58 +141,67 @@ if (e.shiftKey && key === 'end') {
 Added `e.preventDefault()` and `e.stopPropagation()` at the start of the paste handler.
 
 **Implementation:**
+
 ```typescript
 // Paste
 if (ctrlOrMeta && key === 'v') {
-  e.preventDefault();      // Prevent default paste
-  e.stopPropagation();     // Stop event propagation
-  
+  e.preventDefault(); // Prevent default paste
+  e.stopPropagation(); // Stop event propagation
+
   // Prevent duplicate paste
   if (isPastingRef.current) {
     return false;
   }
 
   isPastingRef.current = true;
-  navigator.clipboard?.readText?.().then((text) => {
-    if (!text) {
-      isPastingRef.current = false;
-      return;
-    }
-    saveUndo();
+  navigator.clipboard
+    ?.readText?.()
+    .then((text) => {
+      if (!text) {
+        isPastingRef.current = false;
+        return;
+      }
+      saveUndo();
 
-    // If there's a selection, replace it
-    if (selectionStartRef.current !== null && selectionEndRef.current !== null) {
-      const start = Math.min(selectionStartRef.current, selectionEndRef.current);
-      const end = Math.max(selectionStartRef.current, selectionEndRef.current);
-      const before = inputBufRef.current.slice(0, start);
-      const after = inputBufRef.current.slice(end);
-      inputBufRef.current = before + text + after;
-      cursorRef.current = start + text.length;
-      selectionStartRef.current = null;
-      selectionEndRef.current = null;
-      redrawLine(term);
-    } else {
-      // Normal paste
-      const before = inputBufRef.current.slice(0, cursorRef.current);
-      const after = inputBufRef.current.slice(cursorRef.current);
-      inputBufRef.current = before + text + after;
-      cursorRef.current += text.length;
-      if (after) { term.write(text + after); term.write(`\u001b[${after.length}D`); }
-      else { term.write(text); }
-    }
+      // If there's a selection, replace it
+      if (selectionStartRef.current !== null && selectionEndRef.current !== null) {
+        const start = Math.min(selectionStartRef.current, selectionEndRef.current);
+        const end = Math.max(selectionStartRef.current, selectionEndRef.current);
+        const before = inputBufRef.current.slice(0, start);
+        const after = inputBufRef.current.slice(end);
+        inputBufRef.current = before + text + after;
+        cursorRef.current = start + text.length;
+        selectionStartRef.current = null;
+        selectionEndRef.current = null;
+        redrawLine(term);
+      } else {
+        // Normal paste
+        const before = inputBufRef.current.slice(0, cursorRef.current);
+        const after = inputBufRef.current.slice(cursorRef.current);
+        inputBufRef.current = before + text + after;
+        cursorRef.current += text.length;
+        if (after) {
+          term.write(text + after);
+          term.write(`\u001b[${after.length}D`);
+        } else {
+          term.write(text);
+        }
+      }
 
-    // Reset flag after a short delay
-    setTimeout(() => {
+      // Reset flag after a short delay
+      setTimeout(() => {
+        isPastingRef.current = false;
+      }, 100);
+    })
+    .catch(() => {
       isPastingRef.current = false;
-    }, 100);
-  }).catch(() => {
-    isPastingRef.current = false;
-  });
+    });
   return false;
 }
 ```
 
 **Result:**
+
 - ✅ Ctrl+V pastes text exactly once
 - ✅ No duplicate pastes
 - ✅ Works with text selection (replaces selected text)
@@ -190,23 +211,25 @@ if (ctrlOrMeta && key === 'v') {
 
 ## Summary of All Fixes
 
-| Issue | Status | Solution |
-|-------|--------|----------|
-| **api-key → api-token** | ✅ Fixed | Renamed command and updated references |
+| Issue                         | Status   | Solution                               |
+| ----------------------------- | -------- | -------------------------------------- |
+| **api-key → api-token**       | ✅ Fixed | Renamed command and updated references |
 | **Ctrl+Enter double-trigger** | ✅ Fixed | Added preventDefault + stopPropagation |
-| **Shift+Home not working** | ✅ Fixed | Added preventDefault + stopPropagation |
-| **Shift+End not working** | ✅ Fixed | Added preventDefault + stopPropagation |
-| **Ctrl+V duplicate paste** | ✅ Fixed | Added preventDefault + stopPropagation |
+| **Shift+Home not working**    | ✅ Fixed | Added preventDefault + stopPropagation |
+| **Shift+End not working**     | ✅ Fixed | Added preventDefault + stopPropagation |
+| **Ctrl+V duplicate paste**    | ✅ Fixed | Added preventDefault + stopPropagation |
 
 ---
 
 ## Files Modified
 
 ### Backend
+
 - `packages/backend/src/services/ConsoleService.ts`
   - Renamed `api-key` to `api-token` (lines 131, 347, 804)
 
 ### Frontend
+
 - `packages/frontend/src/pages/admin/SystemConsolePage.tsx`
   - Fixed Ctrl+Enter (lines 325-336)
   - Fixed Shift+Home (lines 343-353)
@@ -305,14 +328,15 @@ All keyboard shortcuts now use proper event handling:
 
 ```typescript
 if (condition) {
-  e.preventDefault();      // Prevent browser default
-  e.stopPropagation();     // Stop event bubbling
+  e.preventDefault(); // Prevent browser default
+  e.stopPropagation(); // Stop event bubbling
   // ... handle the event
-  return false;            // Tell xterm to ignore
+  return false; // Tell xterm to ignore
 }
 ```
 
 This ensures:
+
 1. **No browser interference** - Default browser shortcuts don't interfere
 2. **No event bubbling** - Event doesn't trigger multiple handlers
 3. **Single execution** - Each shortcut executes exactly once
@@ -323,6 +347,7 @@ This ensures:
 ## Before vs After
 
 ### Before
+
 - ❌ `api-key` command (confusing terminology)
 - ❌ Ctrl+Enter toggles fullscreen 2+ times
 - ❌ Shift+Home/End unreliable or not working
@@ -330,6 +355,7 @@ This ensures:
 - ❌ Unpredictable keyboard behavior
 
 ### After
+
 - ✅ `api-token` command (clear terminology)
 - ✅ Ctrl+Enter toggles fullscreen exactly once
 - ✅ Shift+Home/End work reliably
@@ -359,4 +385,3 @@ The system console is now production-ready with professional-grade keyboard hand
 3. **Test all shortcuts** - Verify fixes work correctly
 4. **Update documentation** - Change api-key to api-token in docs
 5. **User training** - Inform users of new command name
-

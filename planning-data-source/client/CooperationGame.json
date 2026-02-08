@@ -115,46 +115,30 @@
     ":links": {
       "individualgoals": [
         {
-          "Reward": [
-            "RewardFixed"
-          ]
+          "Reward": ["RewardFixed"]
         },
         {
-          "Reward": [
-            "RewardFixed"
-          ]
+          "Reward": ["RewardFixed"]
         },
         {
-          "Reward": [
-            "RewardFixed"
-          ]
+          "Reward": ["RewardFixed"]
         }
       ],
       "cooperationgoals": [
         {
-          "Reward": [
-            "RewardFixed"
-          ]
+          "Reward": ["RewardFixed"]
         },
         {
-          "Reward": [
-            "RewardFixed"
-          ]
+          "Reward": ["RewardFixed"]
         },
         {
-          "Reward": [
-            "RewardFixed"
-          ]
+          "Reward": ["RewardFixed"]
         },
         {
-          "Reward": [
-            "RewardFixed"
-          ]
+          "Reward": ["RewardFixed"]
         },
         {
-          "Reward": [
-            "RewardFixed"
-          ]
+          "Reward": ["RewardFixed"]
         }
       ]
     }

@@ -1,4 +1,4 @@
-exports.up = async function(knex) {
+exports.up = async function (knex) {
   const tableName = 'chat_channels';
   const hasTable = await knex.schema.hasTable(tableName);
   if (!hasTable) return;
@@ -30,9 +30,7 @@ exports.up = async function(knex) {
     const hasOwnerId = await knex.schema.hasColumn(tableName, 'ownerId');
     const hasCreatedBy = await knex.schema.hasColumn(tableName, 'createdBy');
     if (hasOwnerId && hasCreatedBy) {
-      await knex(tableName)
-        .whereNull('ownerId')
-        .update('ownerId', knex.raw('`createdBy`'));
+      await knex(tableName).whereNull('ownerId').update('ownerId', knex.raw('`createdBy`'));
     }
   } catch (e) {
     // Best-effort backfill; ignore if it fails
@@ -46,31 +44,49 @@ exports.up = async function(knex) {
 
     if (hasUsers && hasOwnerId) {
       // MySQL requires separate raw statement to add FK conditionally; guard with try/catch
-      await knex.raw(`ALTER TABLE ?? ADD INDEX ?? (??)`, [tableName, 'idx_channels_owner_id', 'ownerId']).catch(() => {});
-      await knex.raw(`ALTER TABLE ?? ADD CONSTRAINT ?? FOREIGN KEY (??) REFERENCES ??(id) ON DELETE SET NULL`, [
-        tableName, 'fk_channels_owner_id', 'ownerId', 'chat_users'
-      ]).catch(() => {});
+      await knex
+        .raw(`ALTER TABLE ?? ADD INDEX ?? (??)`, [tableName, 'idx_channels_owner_id', 'ownerId'])
+        .catch(() => {});
+      await knex
+        .raw(
+          `ALTER TABLE ?? ADD CONSTRAINT ?? FOREIGN KEY (??) REFERENCES ??(id) ON DELETE SET NULL`,
+          [tableName, 'fk_channels_owner_id', 'ownerId', 'chat_users']
+        )
+        .catch(() => {});
     }
     if (hasUsers && hasUpdatedBy) {
-      await knex.raw(`ALTER TABLE ?? ADD INDEX ?? (??)`, [tableName, 'idx_channels_updated_by', 'updatedBy']).catch(() => {});
-      await knex.raw(`ALTER TABLE ?? ADD CONSTRAINT ?? FOREIGN KEY (??) REFERENCES ??(id) ON DELETE SET NULL`, [
-        tableName, 'fk_channels_updated_by', 'updatedBy', 'chat_users'
-      ]).catch(() => {});
+      await knex
+        .raw(`ALTER TABLE ?? ADD INDEX ?? (??)`, [
+          tableName,
+          'idx_channels_updated_by',
+          'updatedBy',
+        ])
+        .catch(() => {});
+      await knex
+        .raw(
+          `ALTER TABLE ?? ADD CONSTRAINT ?? FOREIGN KEY (??) REFERENCES ??(id) ON DELETE SET NULL`,
+          [tableName, 'fk_channels_updated_by', 'updatedBy', 'chat_users']
+        )
+        .catch(() => {});
     }
   } catch (e) {
     // Ignore FK add failures in dev
   }
 };
 
-exports.down = async function(knex) {
+exports.down = async function (knex) {
   const tableName = 'chat_channels';
   const hasTable = await knex.schema.hasTable(tableName);
   if (!hasTable) return;
 
   // Drop FKs first
   try {
-    await knex.raw(`ALTER TABLE ?? DROP FOREIGN KEY ??`, [tableName, 'fk_channels_owner_id']).catch(() => {});
-    await knex.raw(`ALTER TABLE ?? DROP FOREIGN KEY ??`, [tableName, 'fk_channels_updated_by']).catch(() => {});
+    await knex
+      .raw(`ALTER TABLE ?? DROP FOREIGN KEY ??`, [tableName, 'fk_channels_owner_id'])
+      .catch(() => {});
+    await knex
+      .raw(`ALTER TABLE ?? DROP FOREIGN KEY ??`, [tableName, 'fk_channels_updated_by'])
+      .catch(() => {});
   } catch (e) {}
 
   await knex.schema.alterTable(tableName, (table) => {
@@ -79,4 +95,3 @@ exports.down = async function(knex) {
     table.dropColumn('ownerId');
   });
 };
-

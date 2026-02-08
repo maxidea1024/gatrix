@@ -44,17 +44,11 @@
     },
     ":enum": {},
     ":links": {
-      "townGroup": [
-        "Town"
-      ],
-      "destinationGroup": [
-        "Town"
-      ],
+      "townGroup": ["Town"],
+      "destinationGroup": ["Town"],
       "questLock": [
         {
-          "Id": [
-            "Quest"
-          ]
+          "Id": ["Quest"]
         }
       ]
     }

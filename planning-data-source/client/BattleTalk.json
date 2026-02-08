@@ -70,60 +70,24 @@
     },
     ":enum": {},
     ":links": {
-      "mateId": [
-        "Mate"
-      ],
-      "battleStartNormalAttack": [
-        "BattleText"
-      ],
-      "battleWin": [
-        "BattleText"
-      ],
-      "cannonCaster": [
-        "BattleText"
-      ],
-      "cannonCriticalCaster": [
-        "BattleText"
-      ],
-      "cannonAvoidTarget": [
-        "BattleText"
-      ],
-      "cannonTarget": [
-        "BattleText"
-      ],
-      "repairTarget": [
-        "BattleText"
-      ],
-      "healTarget": [
-        "BattleText"
-      ],
-      "jointAttackNormal": [
-        "BattleText"
-      ],
-      "dead": [
-        "BattleText"
-      ],
-      "unitTriggerPositive": [
-        "BattleText"
-      ],
-      "unitTriggerNegative": [
-        "BattleText"
-      ],
-      "warning": [
-        "BattleText"
-      ],
-      "addBuff": [
-        "BattleText"
-      ],
-      "addDebuff": [
-        "BattleText"
-      ],
-      "clearBuff": [
-        "BattleText"
-      ],
-      "clearDebuff": [
-        "BattleText"
-      ]
+      "mateId": ["Mate"],
+      "battleStartNormalAttack": ["BattleText"],
+      "battleWin": ["BattleText"],
+      "cannonCaster": ["BattleText"],
+      "cannonCriticalCaster": ["BattleText"],
+      "cannonAvoidTarget": ["BattleText"],
+      "cannonTarget": ["BattleText"],
+      "repairTarget": ["BattleText"],
+      "healTarget": ["BattleText"],
+      "jointAttackNormal": ["BattleText"],
+      "dead": ["BattleText"],
+      "unitTriggerPositive": ["BattleText"],
+      "unitTriggerNegative": ["BattleText"],
+      "warning": ["BattleText"],
+      "addBuff": ["BattleText"],
+      "addDebuff": ["BattleText"],
+      "clearBuff": ["BattleText"],
+      "clearDebuff": ["BattleText"]
     }
   },
   "BattleTalk": {

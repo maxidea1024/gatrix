@@ -3,16 +3,9 @@
     ":type": {
       "id": "key",
       "funcType": "number",
-      "funcTypeTag": [
-        "number",
-        "number",
-        "number"
-      ],
+      "funcTypeTag": ["number", "number", "number"],
       "funcSpotType": "number",
-      "funcSpotTag": [
-        "number",
-        "number"
-      ],
+      "funcSpotTag": ["number", "number"],
       "funcValueOpt": {
         "MathSign": "number",
         "Value": "number"
@@ -66,9 +59,7 @@
     "77490001": {
       "id": 77490001,
       "funcType": 1,
-      "funcTypeTag": [
-        20001
-      ]
+      "funcTypeTag": [20001]
     },
     "77490002": {
       "id": 77490002,
@@ -97,10 +88,7 @@
     "77490006": {
       "id": 77490006,
       "funcType": 6,
-      "funcSpotTag": [
-        10003,
-        10004
-      ]
+      "funcSpotTag": [10003, 10004]
     },
     "77490007": {
       "id": 77490007,
@@ -165,10 +153,7 @@
     "77490022": {
       "id": 77490022,
       "funcType": 22,
-      "funcTypeTag": [
-        1041,
-        1042
-      ],
+      "funcTypeTag": [1041, 1042],
       "funcValue": {
         "MathSign": 1,
         "Value": 10
@@ -177,9 +162,7 @@
     "77490023": {
       "id": 77490023,
       "funcType": 23,
-      "funcTypeTag": [
-        1046
-      ],
+      "funcTypeTag": [1046],
       "funcValue": {
         "MathSign": 1,
         "Value": 10
@@ -188,9 +171,7 @@
     "77490024": {
       "id": 77490024,
       "funcType": 22,
-      "funcTypeTag": [
-        1041
-      ],
+      "funcTypeTag": [1041],
       "funcValue": {
         "MathSign": 2,
         "Value": 10
@@ -199,10 +180,7 @@
     "77490025": {
       "id": 77490025,
       "funcType": 23,
-      "funcTypeTag": [
-        1046,
-        1045
-      ],
+      "funcTypeTag": [1046, 1045],
       "funcValue": {
         "MathSign": 1,
         "Value": 10
@@ -211,22 +189,14 @@
     "77491000": {
       "id": 77491000,
       "funcType": 15,
-      "funcTypeTag": [
-        1021
-      ],
-      "funcSpotTag": [
-        10014
-      ]
+      "funcTypeTag": [1021],
+      "funcSpotTag": [10014]
     },
     "77491001": {
       "id": 77491001,
       "funcType": 15,
-      "funcTypeTag": [
-        1021
-      ],
-      "funcSpotTag": [
-        10015
-      ]
+      "funcTypeTag": [1021],
+      "funcSpotTag": [10015]
     }
   }
 }

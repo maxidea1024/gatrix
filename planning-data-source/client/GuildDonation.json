@@ -25,12 +25,8 @@
     ":enum": {},
     ":asset": {},
     ":links": {
-      "donationPointId": [
-        "Point"
-      ],
-      "donationGuildResourceId": [
-        "GuildResource"
-      ]
+      "donationPointId": ["Point"],
+      "donationGuildResourceId": ["GuildResource"]
     }
   },
   "GuildDonation": {

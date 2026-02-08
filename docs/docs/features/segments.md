@@ -19,25 +19,23 @@ Segments allow you to define user groups based on context properties.
 
 ## Rule Operators
 
-| Operator | Description | Example |
-|----------|-------------|---------|
-| `equals` | Exact match | `country equals "KR"` |
-| `notEquals` | Does not match | `status notEquals "banned"` |
-| `contains` | Contains substring | `email contains "@company.com"` |
-| `startsWith` | Starts with | `userId startsWith "test_"` |
-| `endsWith` | Ends with | `email endsWith ".kr"` |
-| `greaterThan` | Greater than | `level greaterThan 10` |
-| `lessThan` | Less than | `age lessThan 18` |
-| `in` | In list | `country in ["KR", "JP"]` |
+| Operator      | Description        | Example                         |
+| ------------- | ------------------ | ------------------------------- |
+| `equals`      | Exact match        | `country equals "KR"`           |
+| `notEquals`   | Does not match     | `status notEquals "banned"`     |
+| `contains`    | Contains substring | `email contains "@company.com"` |
+| `startsWith`  | Starts with        | `userId startsWith "test_"`     |
+| `endsWith`    | Ends with          | `email endsWith ".kr"`          |
+| `greaterThan` | Greater than       | `level greaterThan 10`          |
+| `lessThan`    | Less than          | `age lessThan 18`               |
+| `in`          | In list            | `country in ["KR", "JP"]`       |
 
 ## Example: Beta Testers
 
 ```json
 {
   "name": "Beta Testers",
-  "rules": [
-    { "field": "userType", "operator": "equals", "value": "beta" }
-  ]
+  "rules": [{ "field": "userType", "operator": "equals", "value": "beta" }]
 }
 ```
 

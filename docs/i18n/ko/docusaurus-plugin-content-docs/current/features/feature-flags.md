@@ -31,6 +31,7 @@ sidebar_position: 1
 ## 피처 플래그 타입
 
 ### Boolean
+
 가장 간단한 형태로, On/Off 상태를 나타냅니다.
 
 ```json
@@ -41,6 +42,7 @@ sidebar_position: 1
 ```
 
 ### String
+
 문자열 값을 반환합니다.
 
 ```json
@@ -51,6 +53,7 @@ sidebar_position: 1
 ```
 
 ### Number
+
 숫자 값을 반환합니다.
 
 ```json
@@ -61,6 +64,7 @@ sidebar_position: 1
 ```
 
 ### JSON
+
 복잡한 설정을 JSON 객체로 반환합니다.
 
 ```json

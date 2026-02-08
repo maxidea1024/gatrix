@@ -325,24 +325,24 @@ export const CreateIntegrationPage: React.FC = () => {
         slotProps={
           isSensitive
             ? {
-              input: {
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      onClick={() =>
-                        setShowSensitive((prev) => ({
-                          ...prev,
-                          [param.name]: !prev[param.name],
-                        }))
-                      }
-                      edge="end"
-                    >
-                      {isVisible ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              },
-            }
+                input: {
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() =>
+                          setShowSensitive((prev) => ({
+                            ...prev,
+                            [param.name]: !prev[param.name],
+                          }))
+                        }
+                        edge="end"
+                      >
+                        {isVisible ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                },
+              }
             : undefined
         }
       />

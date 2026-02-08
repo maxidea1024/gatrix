@@ -83,10 +83,7 @@
         }
       ],
       "clearQuestId": "number",
-      "addPassivesId": [
-        "number",
-        "number"
-      ]
+      "addPassivesId": ["number", "number"]
     },
     ":required": {},
     ":requiredInObject": {
@@ -195,10 +192,7 @@
         }
       ],
       "clearQuestId": 82000000,
-      "addPassivesId": [
-        1,
-        1
-      ]
+      "addPassivesId": [1, 1]
     },
     ":max": {
       "passives": [
@@ -240,99 +234,46 @@
         }
       ],
       "clearQuestId": 82999999,
-      "addPassivesId": [
-        99999999,
-        99999999
-      ]
+      "addPassivesId": [99999999, 99999999]
     },
     ":enum": {},
     ":links": {
       "passives": [
         {
-          "id": [
-            "BattlePassive",
-            "WorldPassive"
-          ],
-          "learnPointId": [
-            "Point"
-          ],
-          "learnItemId1": [
-            "Item"
-          ]
+          "id": ["BattlePassive", "WorldPassive"],
+          "learnPointId": ["Point"],
+          "learnItemId1": ["Item"]
         },
         {
-          "id": [
-            "BattlePassive",
-            "WorldPassive"
-          ],
-          "learnPointId": [
-            "Point"
-          ],
-          "learnItemId1": [
-            "Item"
-          ]
+          "id": ["BattlePassive", "WorldPassive"],
+          "learnPointId": ["Point"],
+          "learnItemId1": ["Item"]
         },
         {
-          "id": [
-            "BattlePassive",
-            "WorldPassive"
-          ],
-          "learnPointId": [
-            "Point"
-          ],
-          "learnItemId1": [
-            "Item"
-          ]
+          "id": ["BattlePassive", "WorldPassive"],
+          "learnPointId": ["Point"],
+          "learnItemId1": ["Item"]
         },
         {
-          "id": [
-            "BattlePassive",
-            "WorldPassive"
-          ],
-          "learnPointId": [
-            "Point"
-          ],
-          "learnItemId1": [
-            "Item"
-          ]
+          "id": ["BattlePassive", "WorldPassive"],
+          "learnPointId": ["Point"],
+          "learnItemId1": ["Item"]
         },
         {
-          "id": [
-            "BattlePassive",
-            "WorldPassive"
-          ],
-          "learnPointId": [
-            "Point"
-          ],
-          "learnItemId1": [
-            "Item"
-          ]
+          "id": ["BattlePassive", "WorldPassive"],
+          "learnPointId": ["Point"],
+          "learnItemId1": ["Item"]
         },
         {
-          "id": [
-            "BattlePassive",
-            "WorldPassive"
-          ],
-          "learnPointId": [
-            "Point"
-          ],
-          "learnItemId1": [
-            "Item"
-          ]
+          "id": ["BattlePassive", "WorldPassive"],
+          "learnPointId": ["Point"],
+          "learnItemId1": ["Item"]
         }
       ],
-      "clearQuestId": [
-        "Quest"
-      ],
+      "clearQuestId": ["Quest"],
       "addPassivesId": [
-        [
-          "BattlePassive",
-          "WorldPassive"
-        ],
-        [
-          "BattlePassive",
-          "WorldPassive"
-        ]
+        ["BattlePassive", "WorldPassive"],
+        ["BattlePassive", "WorldPassive"]
       ]
     }
   },
@@ -1356,9 +1297,7 @@
         }
       ],
       "clearQuestId": 82001009,
-      "addPassivesId": [
-        67302190
-      ]
+      "addPassivesId": [67302190]
     },
     "64920010": {
       "id": 64920010,
@@ -1834,9 +1773,7 @@
         }
       ],
       "clearQuestId": 82001004,
-      "addPassivesId": [
-        67302190
-      ]
+      "addPassivesId": [67302190]
     },
     "64920016": {
       "id": 64920016,
@@ -2312,9 +2249,7 @@
         }
       ],
       "clearQuestId": 82001005,
-      "addPassivesId": [
-        67302200
-      ]
+      "addPassivesId": [67302200]
     },
     "64920022": {
       "id": 64920022,
@@ -2790,9 +2725,7 @@
         }
       ],
       "clearQuestId": 82001008,
-      "addPassivesId": [
-        67302180
-      ]
+      "addPassivesId": [67302180]
     },
     "64920028": {
       "id": 64920028,
@@ -2873,9 +2806,7 @@
         }
       ],
       "clearQuestId": 82001003,
-      "addPassivesId": [
-        75259246
-      ]
+      "addPassivesId": [75259246]
     },
     "64920029": {
       "id": 64920029,
@@ -3035,9 +2966,7 @@
         }
       ],
       "clearQuestId": 82001009,
-      "addPassivesId": [
-        67302240
-      ]
+      "addPassivesId": [67302240]
     },
     "64920031": {
       "id": 64920031,
@@ -4066,9 +3995,7 @@
         }
       ],
       "clearQuestId": 82001005,
-      "addPassivesId": [
-        67302180
-      ]
+      "addPassivesId": [67302180]
     },
     "64920044": {
       "id": 64920044,
@@ -4781,9 +4708,7 @@
         }
       ],
       "clearQuestId": 82001007,
-      "addPassivesId": [
-        67301820
-      ]
+      "addPassivesId": [67301820]
     },
     "64920053": {
       "id": 64920053,
@@ -5101,9 +5026,7 @@
         }
       ],
       "clearQuestId": 82001001,
-      "addPassivesId": [
-        67301710
-      ]
+      "addPassivesId": [67301710]
     },
     "64920057": {
       "id": 64920057,
@@ -6132,9 +6055,7 @@
         }
       ],
       "clearQuestId": 82001007,
-      "addPassivesId": [
-        67301750
-      ]
+      "addPassivesId": [67301750]
     },
     "64920070": {
       "id": 64920070,
@@ -6610,9 +6531,7 @@
         }
       ],
       "clearQuestId": 82001005,
-      "addPassivesId": [
-        67301790
-      ]
+      "addPassivesId": [67301790]
     },
     "64920076": {
       "id": 64920076,
@@ -7641,9 +7560,7 @@
         }
       ],
       "clearQuestId": 82001005,
-      "addPassivesId": [
-        67301700
-      ]
+      "addPassivesId": [67301700]
     },
     "64920089": {
       "id": 64920089,
@@ -8435,9 +8352,7 @@
         }
       ],
       "clearQuestId": 82001007,
-      "addPassivesId": [
-        67301770
-      ]
+      "addPassivesId": [67301770]
     },
     "64920099": {
       "id": 64920099,
@@ -9150,9 +9065,7 @@
         }
       ],
       "clearQuestId": 82001001,
-      "addPassivesId": [
-        67301730
-      ]
+      "addPassivesId": [67301730]
     },
     "64920108": {
       "id": 64920108,
@@ -9391,9 +9304,7 @@
         }
       ],
       "clearQuestId": 82001001,
-      "addPassivesId": [
-        67301700
-      ]
+      "addPassivesId": [67301700]
     },
     "64920111": {
       "id": 64920111,
@@ -16663,9 +16574,7 @@
         }
       ],
       "clearQuestId": 82001002,
-      "addPassivesId": [
-        75258706
-      ]
+      "addPassivesId": [75258706]
     },
     "64950042": {
       "id": 64950042,
@@ -17062,9 +16971,7 @@
         }
       ],
       "clearQuestId": 82001004,
-      "addPassivesId": [
-        67302270
-      ]
+      "addPassivesId": [67302270]
     },
     "64950078": {
       "id": 64950078,
@@ -17461,9 +17368,7 @@
         }
       ],
       "clearQuestId": 82001002,
-      "addPassivesId": [
-        75258696
-      ]
+      "addPassivesId": [75258696]
     },
     "64950104": {
       "id": 64950104,
@@ -19519,9 +19424,7 @@
         }
       ],
       "clearQuestId": 82001009,
-      "addPassivesId": [
-        67302520
-      ]
+      "addPassivesId": [67302520]
     },
     "64950278": {
       "id": 64950278,
@@ -23289,9 +23192,7 @@
         }
       ],
       "clearQuestId": 82001002,
-      "addPassivesId": [
-        75258716
-      ]
+      "addPassivesId": [75258716]
     },
     "64950080": {
       "id": 64950080,
@@ -23372,9 +23273,7 @@
         }
       ],
       "clearQuestId": 82001004,
-      "addPassivesId": [
-        67301850
-      ]
+      "addPassivesId": [67301850]
     },
     "64950082": {
       "id": 64950082,
@@ -23534,9 +23433,7 @@
         }
       ],
       "clearQuestId": 82001006,
-      "addPassivesId": [
-        75258696
-      ]
+      "addPassivesId": [75258696]
     },
     "64950098": {
       "id": 64950098,
@@ -24249,9 +24146,7 @@
         }
       ],
       "clearQuestId": 82001010,
-      "addPassivesId": [
-        75258716
-      ]
+      "addPassivesId": [75258716]
     },
     "64950160": {
       "id": 64950160,
@@ -28045,9 +27940,7 @@
         }
       ],
       "clearQuestId": 82001010,
-      "addPassivesId": [
-        67302500
-      ]
+      "addPassivesId": [67302500]
     },
     "64950494": {
       "id": 64950494,
@@ -28918,9 +28811,7 @@
         }
       ],
       "clearQuestId": 82001003,
-      "addPassivesId": [
-        75259436
-      ]
+      "addPassivesId": [75259436]
     },
     "64950003": {
       "id": 64950003,
@@ -29238,9 +29129,7 @@
         }
       ],
       "clearQuestId": 82001008,
-      "addPassivesId": [
-        75259306
-      ]
+      "addPassivesId": [75259306]
     },
     "64950018": {
       "id": 64950018,
@@ -29637,9 +29526,7 @@
         }
       ],
       "clearQuestId": 82001008,
-      "addPassivesId": [
-        75259426
-      ]
+      "addPassivesId": [75259426]
     },
     "64950038": {
       "id": 64950038,
@@ -29799,9 +29686,7 @@
         }
       ],
       "clearQuestId": 82001003,
-      "addPassivesId": [
-        75259296
-      ]
+      "addPassivesId": [75259296]
     },
     "64950052": {
       "id": 64950052,
@@ -30277,9 +30162,7 @@
         }
       ],
       "clearQuestId": 82001007,
-      "addPassivesId": [
-        75259376
-      ]
+      "addPassivesId": [75259376]
     },
     "64950071": {
       "id": 64950071,
@@ -30597,9 +30480,7 @@
         }
       ],
       "clearQuestId": 82001010,
-      "addPassivesId": [
-        75259206
-      ]
+      "addPassivesId": [75259206]
     },
     "64950090": {
       "id": 64950090,
@@ -30838,9 +30719,7 @@
         }
       ],
       "clearQuestId": 82001001,
-      "addPassivesId": [
-        67301720
-      ]
+      "addPassivesId": [67301720]
     },
     "64950109": {
       "id": 64950109,
@@ -31474,9 +31353,7 @@
         }
       ],
       "clearQuestId": 82001010,
-      "addPassivesId": [
-        75259156
-      ]
+      "addPassivesId": [75259156]
     },
     "64950132": {
       "id": 64950132,
@@ -32189,9 +32066,7 @@
         }
       ],
       "clearQuestId": 82001009,
-      "addPassivesId": [
-        67302550
-      ]
+      "addPassivesId": [67302550]
     },
     "64950155": {
       "id": 64950155,
@@ -32983,9 +32858,7 @@
         }
       ],
       "clearQuestId": 82001008,
-      "addPassivesId": [
-        75259106
-      ]
+      "addPassivesId": [75259106]
     },
     "64950198": {
       "id": 64950198,
@@ -33698,9 +33571,7 @@
         }
       ],
       "clearQuestId": 82001004,
-      "addPassivesId": [
-        75259356
-      ]
+      "addPassivesId": [75259356]
     },
     "64950215": {
       "id": 64950215,
@@ -35835,9 +35706,7 @@
         }
       ],
       "clearQuestId": 82001010,
-      "addPassivesId": [
-        75258706
-      ]
+      "addPassivesId": [75258706]
     },
     "64950311": {
       "id": 64950311,
@@ -35997,9 +35866,7 @@
         }
       ],
       "clearQuestId": 82001008,
-      "addPassivesId": [
-        75258906
-      ]
+      "addPassivesId": [75258906]
     },
     "64950314": {
       "id": 64950314,
@@ -40188,9 +40055,7 @@
         }
       ],
       "clearQuestId": 82001003,
-      "addPassivesId": [
-        75259316
-      ]
+      "addPassivesId": [75259316]
     },
     "64950515": {
       "id": 64950515,
@@ -43972,9 +43837,7 @@
         }
       ],
       "clearQuestId": 82001006,
-      "addPassivesId": [
-        67301710
-      ]
+      "addPassivesId": [67301710]
     },
     "64930582": {
       "id": 64930582,
@@ -44055,9 +43918,7 @@
         }
       ],
       "clearQuestId": 82001006,
-      "addPassivesId": [
-        67302380
-      ]
+      "addPassivesId": [67302380]
     },
     "64930583": {
       "id": 64930583,
@@ -44217,9 +44078,7 @@
         }
       ],
       "clearQuestId": 82001006,
-      "addPassivesId": [
-        75258746
-      ]
+      "addPassivesId": [75258746]
     },
     "64930585": {
       "id": 64930585,

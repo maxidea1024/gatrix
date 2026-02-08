@@ -17,4 +17,3 @@ if (lines[839].trim() === '},') {
 
 fs.writeFileSync('src/locales/ko.json', lines.join('\n'), 'utf8');
 console.log('✅ 모든 섹션 들여쓰기 수정 완료');
-

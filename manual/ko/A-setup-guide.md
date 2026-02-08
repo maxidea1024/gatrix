@@ -1,6 +1,6 @@
 # 부록 A: 시스템 설정 가이드 (System Setup)
 
-본 문서는 시스템 엔지니어 및 서버 관리자를 위한 설정 가이드입니다. 
+본 문서는 시스템 엔지니어 및 서버 관리자를 위한 설정 가이드입니다.
 Gatrix의 이메일 발송 기능을 활성화하기 위한 SMTP 설정 방법을 안내합니다.
 
 ---
@@ -12,14 +12,14 @@ Gatrix는 사용자 초대, 비밀번호 재설정 등을 위해 SMTP 서버가 
 
 ### 필수 환경 변수
 
-| 변수명 | 설명 | 예시 |
-|--------|------|------|
-| `SMTP_HOST` | SMTP 서버 주소 | `smtp.gmail.com` 또는 `email-smtp.us-east-1.amazonaws.com` |
-| `SMTP_PORT` | 포트 번호 | `587` (TLS) 또는 `465` (SSL) |
-| `SMTP_USER` | SMTP 사용자 계정 | `admin@gatrix.com` |
-| `SMTP_PASS` | SMTP 비밀번호 | `app-password-xxxx` |
-| `SMTP_FROM` | 발신자 주소 | `"Gatrix Support" <noreply@gatrix.com>` |
-| `SMTP_SECURE` | 보안 연결 사용 여부 | `true` 또는 `false` |
+| 변수명        | 설명                | 예시                                                       |
+| ------------- | ------------------- | ---------------------------------------------------------- |
+| `SMTP_HOST`   | SMTP 서버 주소      | `smtp.gmail.com` 또는 `email-smtp.us-east-1.amazonaws.com` |
+| `SMTP_PORT`   | 포트 번호           | `587` (TLS) 또는 `465` (SSL)                               |
+| `SMTP_USER`   | SMTP 사용자 계정    | `admin@gatrix.com`                                         |
+| `SMTP_PASS`   | SMTP 비밀번호       | `app-password-xxxx`                                        |
+| `SMTP_FROM`   | 발신자 주소         | `"Gatrix Support" <noreply@gatrix.com>`                    |
+| `SMTP_SECURE` | 보안 연결 사용 여부 | `true` 또는 `false`                                        |
 
 ### 주요 서비스별 설정 예시
 

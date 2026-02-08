@@ -108,28 +108,16 @@
     ":links": {
       "buff": [
         {
-          "WorldBuffId": [
-            "WorldBuff"
-          ],
-          "PointId": [
-            "Point"
-          ]
+          "WorldBuffId": ["WorldBuff"],
+          "PointId": ["Point"]
         },
         {
-          "WorldBuffId": [
-            "WorldBuff"
-          ],
-          "PointId": [
-            "Point"
-          ]
+          "WorldBuffId": ["WorldBuff"],
+          "PointId": ["Point"]
         },
         {
-          "WorldBuffId": [
-            "WorldBuff"
-          ],
-          "PointId": [
-            "Point"
-          ]
+          "WorldBuffId": ["WorldBuff"],
+          "PointId": ["Point"]
         }
       ]
     }

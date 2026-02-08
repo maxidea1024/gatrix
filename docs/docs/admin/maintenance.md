@@ -24,14 +24,14 @@ Schedule and manage server maintenance windows.
 2. Click **Schedule Maintenance** button
 3. Configure:
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| Title | Text | Required | Maintenance title |
-| Description | Textarea | - | Description |
-| Start Time | DateTime | Required | Maintenance start |
-| End Time | DateTime | Required | Expected end |
-| Message | Rich Text | - | User-facing message |
-| Emergency | Switch | - | Mark as emergency |
+| Field       | Type      | Required | Description         |
+| ----------- | --------- | -------- | ------------------- |
+| Title       | Text      | Required | Maintenance title   |
+| Description | Textarea  | -        | Description         |
+| Start Time  | DateTime  | Required | Maintenance start   |
+| End Time    | DateTime  | Required | Expected end        |
+| Message     | Rich Text | -        | User-facing message |
+| Emergency   | Switch    | -        | Mark as emergency   |
 
 4. Click **Create** to save
 

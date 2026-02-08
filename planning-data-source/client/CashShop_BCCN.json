@@ -30,10 +30,7 @@
       "mileageBonusPer": "number",
       "originalPriceValue": "number",
       "cashShopBoxTicketVal": "number",
-      "cashShopBoxTicketId": [
-        "number",
-        "number"
-      ],
+      "cashShopBoxTicketId": ["number", "number"],
       "previousId": "number",
       "maxLv": "number",
       "contentsTerms": [
@@ -74,14 +71,7 @@
       "buffGroup": "number",
       "buffGroupName": "text",
       "buffGroupLevel": "number",
-      "productWorldBuffId": [
-        "number",
-        "number",
-        "number",
-        "number",
-        "number",
-        "number"
-      ],
+      "productWorldBuffId": ["number", "number", "number", "number", "number", "number"],
       "productWorldBuff": [
         {
           "Id": "number",
@@ -195,10 +185,7 @@
       "productType": 1,
       "saleType": 1,
       "salePointId": 100000,
-      "cashShopBoxTicketId": [
-        23000000,
-        23000000
-      ],
+      "cashShopBoxTicketId": [23000000, 23000000],
       "previousId": 10500000,
       "contentsTerms": [
         {
@@ -216,14 +203,7 @@
       "productBadge": 1,
       "productRewardFixedId": 94000000,
       "bonusRewardFixedId": 94000000,
-      "productWorldBuffId": [
-        38000000,
-        38000000,
-        38000000,
-        38000000,
-        38000000,
-        38000000
-      ],
+      "productWorldBuffId": [38000000, 38000000, 38000000, 38000000, 38000000, 38000000],
       "productWorldBuff": [
         {
           "Id": 38000000
@@ -264,10 +244,7 @@
       "productType": 15,
       "saleType": 13,
       "salePointId": 199999,
-      "cashShopBoxTicketId": [
-        23999999,
-        23999999
-      ],
+      "cashShopBoxTicketId": [23999999, 23999999],
       "previousId": 10599999,
       "contentsTerms": [
         {
@@ -285,14 +262,7 @@
       "productBadge": 5,
       "productRewardFixedId": 95999999,
       "bonusRewardFixedId": 95999999,
-      "productWorldBuffId": [
-        38099999,
-        38099999,
-        38099999,
-        38099999,
-        38099999,
-        38099999
-      ],
+      "productWorldBuffId": [38099999, 38099999, 38099999, 38099999, 38099999, 38099999],
       "productWorldBuff": [
         {
           "Id": 38099999
@@ -330,109 +300,56 @@
     ":enum": {},
     ":asset": {},
     ":links": {
-      "subProductCategory": [
-        "CashShopTab"
-      ],
-      "salePointId": [
-        "Point"
-      ],
-      "cashShopBoxTicketId": [
-        [
-          "Item"
-        ],
-        [
-          "Item"
-        ]
-      ],
-      "previousId": [
-        "CashShop"
-      ],
+      "subProductCategory": ["CashShopTab"],
+      "salePointId": ["Point"],
+      "cashShopBoxTicketId": [["Item"], ["Item"]],
+      "previousId": ["CashShop"],
       "contentsTerms": [
         {
-          "Id": [
-            "ContentsTerms"
-          ]
+          "Id": ["ContentsTerms"]
         },
         {
-          "Id": [
-            "ContentsTerms"
-          ]
+          "Id": ["ContentsTerms"]
         }
       ],
       "endContentsTerms": [
         {
-          "Id": [
-            "ContentsTerms"
-          ]
+          "Id": ["ContentsTerms"]
         }
       ],
-      "productRewardFixedId": [
-        "RewardFixed"
-      ],
-      "bonusRewardFixedId": [
-        "RewardFixed"
-      ],
+      "productRewardFixedId": ["RewardFixed"],
+      "bonusRewardFixedId": ["RewardFixed"],
       "productWorldBuffId": [
-        [
-          "WorldBuff"
-        ],
-        [
-          "WorldBuff"
-        ],
-        [
-          "WorldBuff"
-        ],
-        [
-          "WorldBuff"
-        ],
-        [
-          "WorldBuff"
-        ],
-        [
-          "WorldBuff"
-        ]
+        ["WorldBuff"],
+        ["WorldBuff"],
+        ["WorldBuff"],
+        ["WorldBuff"],
+        ["WorldBuff"],
+        ["WorldBuff"]
       ],
       "productWorldBuff": [
         {
-          "Id": [
-            "WorldBuff"
-          ]
+          "Id": ["WorldBuff"]
         },
         {
-          "Id": [
-            "WorldBuff"
-          ]
+          "Id": ["WorldBuff"]
         },
         {
-          "Id": [
-            "WorldBuff"
-          ]
+          "Id": ["WorldBuff"]
         },
         {
-          "Id": [
-            "WorldBuff"
-          ]
+          "Id": ["WorldBuff"]
         },
         {
-          "Id": [
-            "WorldBuff"
-          ]
+          "Id": ["WorldBuff"]
         },
         {
-          "Id": [
-            "WorldBuff"
-          ]
+          "Id": ["WorldBuff"]
         }
       ],
-      "taxFreePermitId": [
-        "TaxFreePermit"
-      ],
-      "singleBoxCashShopId": [
-        "CashShop"
-      ],
-      "ceilingCashShopBoxRatioId": [
-        "CashShopBoxRatio"
-      ],
+      "taxFreePermitId": ["TaxFreePermit"],
+      "singleBoxCashShopId": ["CashShop"],
+      "ceilingCashShopBoxRatioId": ["CashShopBoxRatio"],
       "ceilingCashShopBoxIconId": [
         "Point",
         "Item",
@@ -446,30 +363,14 @@
         "Shield",
         "TaxFreePermit"
       ],
-      "questPassId": [
-        "QuestPass"
-      ],
-      "soundPackId": [
-        "SoundPack"
-      ],
-      "eventPageId": [
-        "EventPage"
-      ],
-      "dailySubscriptionId": [
-        "DailySubscription"
-      ],
-      "illustSkinId": [
-        "IllustSkin"
-      ],
-      "MateId": [
-        "Mate"
-      ],
-      "userTitleId": [
-        "UserTitle"
-      ],
-      "petId": [
-        "Pet"
-      ]
+      "questPassId": ["QuestPass"],
+      "soundPackId": ["SoundPack"],
+      "eventPageId": ["EventPage"],
+      "dailySubscriptionId": ["DailySubscription"],
+      "illustSkinId": ["IllustSkin"],
+      "MateId": ["Mate"],
+      "userTitleId": ["UserTitle"],
+      "petId": ["Pet"]
     }
   },
   "CashShop": {
@@ -1285,9 +1186,7 @@
       "buffGroup": 1,
       "buffGroupName": "익명의 베일",
       "buffGroupLevel": 1,
-      "productWorldBuffId": [
-        38020500
-      ],
+      "productWorldBuffId": [38020500],
       "productWorldBuff": [
         {
           "Id": 38020500,
@@ -1333,9 +1232,7 @@
       "buffGroup": 2,
       "buffGroupName": "브렌던의 펜던트",
       "buffGroupLevel": 1,
-      "productWorldBuffId": [
-        38020521
-      ],
+      "productWorldBuffId": [38020521],
       "productWorldBuff": [
         {
           "Id": 38020521,
@@ -1618,9 +1515,7 @@
       "buffGroup": 4,
       "buffGroupName": "성장 부스터",
       "buffGroupLevel": 1,
-      "productWorldBuffId": [
-        38042903
-      ],
+      "productWorldBuffId": [38042903],
       "productWorldBuff": [
         {
           "Id": 38042903,
@@ -1666,13 +1561,7 @@
       "buffGroup": 5,
       "buffGroupName": "항해의 가호",
       "buffGroupLevel": 1,
-      "productWorldBuffId": [
-        38095454,
-        38095455,
-        38095456,
-        38095457,
-        38095458
-      ],
+      "productWorldBuffId": [38095454, 38095455, 38095456, 38095457, 38095458],
       "productWorldBuff": [
         {
           "Id": 38095454,
@@ -1734,13 +1623,7 @@
       "buffGroup": 11,
       "buffGroupName": "성장의 가호",
       "buffGroupLevel": 1,
-      "productWorldBuffId": [
-        38095459,
-        38095460,
-        38095461,
-        38095462,
-        38095463
-      ],
+      "productWorldBuffId": [38095459, 38095460, 38095461, 38095462, 38095463],
       "productWorldBuff": [
         {
           "Id": 38095459,
@@ -3241,11 +3124,7 @@
       "buffGroup": 6,
       "buffGroupName": "긴 모험의 출발",
       "buffGroupLevel": 1,
-      "productWorldBuffId": [
-        38095464,
-        38042910,
-        38042911
-      ],
+      "productWorldBuffId": [38095464, 38042910, 38042911],
       "productWorldBuff": [
         {
           "Id": 38095464,
@@ -5154,12 +5033,7 @@
       "buffGroup": 7,
       "buffGroupName": "시즌 1 프리미엄 패스",
       "buffGroupLevel": 1,
-      "productWorldBuffId": [
-        38042912,
-        38042913,
-        38042914,
-        38042915
-      ],
+      "productWorldBuffId": [38042912, 38042913, 38042914, 38042915],
       "productWorldBuff": [
         {
           "Id": 38042912,
@@ -5258,11 +5132,7 @@
       "buffGroup": 8,
       "buffGroupName": "CBT 항해사 프리미엄 패스",
       "buffGroupLevel": 1,
-      "productWorldBuffId": [
-        38042916,
-        38042917,
-        38042918
-      ],
+      "productWorldBuffId": [38042916, 38042917, 38042918],
       "productWorldBuff": [
         {
           "Id": 38042916,
@@ -5357,11 +5227,7 @@
       "buffGroup": 9,
       "buffGroupName": "CBT 고급 항해사 프리미엄 패스",
       "buffGroupLevel": 1,
-      "productWorldBuffId": [
-        38042919,
-        38042920,
-        38042921
-      ],
+      "productWorldBuffId": [38042919, 38042920, 38042921],
       "productWorldBuff": [
         {
           "Id": 38042919,
@@ -5454,9 +5320,7 @@
       "buffGroup": 10,
       "buffGroupName": "초 특가 7일 프리미엄 패스",
       "buffGroupLevel": 1,
-      "productWorldBuffId": [
-        38042922
-      ],
+      "productWorldBuffId": [38042922],
       "productWorldBuff": [
         {
           "Id": 38042922,

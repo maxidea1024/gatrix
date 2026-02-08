@@ -38,30 +38,14 @@
     },
     ":enum": {},
     ":links": {
-      "mateId": [
-        "Mate"
-      ],
-      "autoBodyId": [
-        "AutoMateEquip"
-      ],
-      "autoHeadId": [
-        "AutoMateEquip"
-      ],
-      "autoHandId": [
-        "AutoMateEquip"
-      ],
-      "autoFootId": [
-        "AutoMateEquip"
-      ],
-      "autoWeaponId": [
-        "AutoMateEquip"
-      ],
-      "autoAcc1Id": [
-        "AutoMateEquip"
-      ],
-      "autoAcc2Id": [
-        "AutoMateEquip"
-      ]
+      "mateId": ["Mate"],
+      "autoBodyId": ["AutoMateEquip"],
+      "autoHeadId": ["AutoMateEquip"],
+      "autoHandId": ["AutoMateEquip"],
+      "autoFootId": ["AutoMateEquip"],
+      "autoWeaponId": ["AutoMateEquip"],
+      "autoAcc1Id": ["AutoMateEquip"],
+      "autoAcc2Id": ["AutoMateEquip"]
     }
   },
   "MateTemplate": {

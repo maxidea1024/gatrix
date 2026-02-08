@@ -25,16 +25,16 @@ Manage promotional banners displayed in the game.
 2. Click **Add Banner** button
 3. Configure the banner:
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| Name | Text | Required | Banner name |
-| Image | Image Upload | Required | Banner image |
-| Position | Select | Required | Display position |
-| Action Type | Select | - | What happens on click |
-| Action URL | Text | - | URL or deep link |
-| Start Date | DateTime | - | Start showing |
-| End Date | DateTime | - | Stop showing |
-| Priority | Number | - | Display order |
+| Field       | Type         | Required | Description           |
+| ----------- | ------------ | -------- | --------------------- |
+| Name        | Text         | Required | Banner name           |
+| Image       | Image Upload | Required | Banner image          |
+| Position    | Select       | Required | Display position      |
+| Action Type | Select       | -        | What happens on click |
+| Action URL  | Text         | -        | URL or deep link      |
+| Start Date  | DateTime     | -        | Start showing         |
+| End Date    | DateTime     | -        | Stop showing          |
+| Priority    | Number       | -        | Display order         |
 
 4. Click **Create** to save
 

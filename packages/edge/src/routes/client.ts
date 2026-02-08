@@ -95,13 +95,13 @@ function updateCacheSizeMetrics(): void {
     ?.labels('total')
     .set(
       versionsCount +
-      bannersCount +
-      noticesCount +
-      worldsCount +
-      surveysCount +
-      popupNoticesCount +
-      storeProductsCount +
-      whitelistsCount
+        bannersCount +
+        noticesCount +
+        worldsCount +
+        surveysCount +
+        popupNoticesCount +
+        storeProductsCount +
+        whitelistsCount
     );
 }
 
@@ -1116,12 +1116,7 @@ router.post(
  * Evaluation helper to reduce code duplication
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function performEvaluation(
-  req: Request,
-  res: Response,
-  clientContext: any,
-  isPost: boolean
-) {
+async function performEvaluation(req: Request, res: Response, clientContext: any, isPost: boolean) {
   try {
     const sdk = getSDKOrError(res);
     if (!sdk) return;
@@ -1164,14 +1159,12 @@ async function performEvaluation(
       }
 
       // 3. Fallback: Parse individual query parameters
-      if (!context.userId && req.query.userId)
-        context.userId = req.query.userId as string;
+      if (!context.userId && req.query.userId) context.userId = req.query.userId as string;
       if (!context.sessionId && req.query.sessionId)
         context.sessionId = req.query.sessionId as string;
       if (!context.remoteAddress && req.query.remoteAddress)
         context.remoteAddress = req.query.remoteAddress as string;
-      if (!context.appName && req.query.appName)
-        context.appName = req.query.appName as string;
+      if (!context.appName && req.query.appName) context.appName = req.query.appName as string;
 
       const flagNamesParam = req.query.flagNames as string;
       if (flagNamesParam) {
@@ -1187,9 +1180,7 @@ async function performEvaluation(
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const results: Record<string, any> = {};
-    const evaluatedKeys: string[] = Array.isArray(flagNames)
-      ? (flagNames as string[])
-      : [];
+    const evaluatedKeys: string[] = Array.isArray(flagNames) ? (flagNames as string[]) : [];
 
     // If no keys specified, evaluate ALL (matching backend behavior for client)
     let keysToEvaluate =
@@ -1219,7 +1210,9 @@ async function performEvaluation(
           if (typeof payloadValue === 'string' && payloadValue.trim() !== '') {
             try {
               payloadValue = JSON.parse(payloadValue);
-            } catch (e) { /* ignore */ }
+            } catch (e) {
+              /* ignore */
+            }
           }
           variant.payload = payloadValue;
         } else if (variantType === 'number') {
@@ -1233,15 +1226,23 @@ async function performEvaluation(
           // Default to string for other types (config-txw0 case: payload: "")
           variant.payload = String(payloadValue);
         }
-      } else if (!result.enabled && flagDef && flagDef.baselinePayload !== undefined && flagDef.baselinePayload !== null) {
+      } else if (
+        !result.enabled &&
+        flagDef &&
+        flagDef.baselinePayload !== undefined &&
+        flagDef.baselinePayload !== null
+      ) {
         // Match backend's baselinePayload processing: baseline is stringified if object
         let baselineValue = flagDef.baselinePayload;
         if (typeof baselineValue === 'string' && baselineValue.trim() !== '') {
           try {
             baselineValue = JSON.parse(baselineValue);
-          } catch { /* ignore */ }
+          } catch {
+            /* ignore */
+          }
         }
-        variant.payload = typeof baselineValue === 'string' ? baselineValue : JSON.stringify(baselineValue);
+        variant.payload =
+          typeof baselineValue === 'string' ? baselineValue : JSON.stringify(baselineValue);
       }
 
       results[key] = {
@@ -1257,7 +1258,9 @@ async function performEvaluation(
 
     // Sort flags by id (ULID) DESCENDING to ensure consistent ETag generation and newest-first response
     // Fallback to empty string to prevent localeCompare crash if id is missing
-    const flagsArray = Object.values(results).sort((a, b) => (b.id || '').localeCompare(a.id || ''));
+    const flagsArray = Object.values(results).sort((a, b) =>
+      (b.id || '').localeCompare(a.id || '')
+    );
 
     const responseData = {
       success: true,
@@ -1267,7 +1270,7 @@ async function performEvaluation(
       meta: {
         environment,
         evaluatedAt: new Date().toISOString(),
-      }
+      },
     };
 
     // Generate ETag from flags data (hash of stringified flags with versions and variants)
@@ -1308,13 +1311,9 @@ router.post(
   }
 );
 
-router.get(
-  '/features/:environment/eval',
-  clientAuth,
-  async (req: ClientRequest, res: Response) => {
-    await performEvaluation(req, res, req.clientContext, false);
-  }
-);
+router.get('/features/:environment/eval', clientAuth, async (req: ClientRequest, res: Response) => {
+  await performEvaluation(req, res, req.clientContext, false);
+});
 
 /**
  * @openapi

@@ -20,12 +20,12 @@ Manage admin users and their permissions.
 
 ## User Roles
 
-| Role | Description |
-|------|-------------|
-| **Super Admin** | Full access to all features |
-| **Admin** | Access to most features |
-| **Operator** | Limited to operations features |
-| **Viewer** | Read-only access |
+| Role            | Description                    |
+| --------------- | ------------------------------ |
+| **Super Admin** | Full access to all features    |
+| **Admin**       | Access to most features        |
+| **Operator**    | Limited to operations features |
+| **Viewer**      | Read-only access               |
 
 ## Creating a User
 
@@ -33,13 +33,13 @@ Manage admin users and their permissions.
 2. Click **Add User** button
 3. Configure:
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| Email | Email | Required | Login email |
-| Name | Text | Required | Display name |
+| Field    | Type     | Required | Description      |
+| -------- | -------- | -------- | ---------------- |
+| Email    | Email    | Required | Login email      |
+| Name     | Text     | Required | Display name     |
 | Password | Password | Required | Initial password |
-| Role | Select | Required | User role |
-| Enabled | Switch | - | Account status |
+| Role     | Select   | Required | User role        |
+| Enabled  | Switch   | -        | Account status   |
 
 4. Click **Create**
 

@@ -3,7 +3,7 @@
  * Remove nameKey and descriptionKey columns that are no longer used
  */
 
-exports.up = async function(connection) {
+exports.up = async function (connection) {
   console.log('Removing old reward templates columns...');
 
   // Check if nameKey column exists
@@ -41,7 +41,7 @@ exports.up = async function(connection) {
   }
 };
 
-exports.down = async function(connection) {
+exports.down = async function (connection) {
   console.log('Restoring old reward templates columns...');
 
   // Check if nameKey column exists
@@ -64,4 +64,3 @@ exports.down = async function(connection) {
     console.log('✅ Old reward templates columns restored successfully');
   }
 };
-

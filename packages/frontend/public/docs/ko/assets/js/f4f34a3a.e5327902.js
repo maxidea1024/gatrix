@@ -1,1 +1,305 @@
-"use strict";(globalThis.webpackChunkdocs=globalThis.webpackChunkdocs||[]).push([[3637],{1470(e,t,a){a.d(t,{A:()=>I});var r=a(6540),n=a(4164),o=a(3104),s=a(6347),l=a(205),i=a(7485),u=a(1682),c=a(679);function d(e){return r.Children.toArray(e).filter(e=>"\n"!==e).map(e=>{if(!e||(0,r.isValidElement)(e)&&function(e){const{props:t}=e;return!!t&&"object"==typeof t&&"value"in t}(e))return e;throw new Error(`Docusaurus error: Bad <Tabs> child <${"string"==typeof e.type?e.type:e.type.name}>: all children of the <Tabs> component should be <TabItem>, and every <TabItem> should have a unique "value" prop.`)})?.filter(Boolean)??[]}function p(e){const{values:t,children:a}=e;return(0,r.useMemo)(()=>{const e=t??function(e){return d(e).map(({props:{value:e,label:t,attributes:a,default:r}})=>({value:e,label:t,attributes:a,default:r}))}(a);return function(e){const t=(0,u.XI)(e,(e,t)=>e.value===t.value);if(t.length>0)throw new Error(`Docusaurus error: Duplicate values "${t.map(e=>e.value).join(", ")}" found in <Tabs>. Every value needs to be unique.`)}(e),e},[t,a])}function m({value:e,tabValues:t}){return t.some(t=>t.value===e)}function h({queryString:e=!1,groupId:t}){const a=(0,s.W6)(),n=function({queryString:e=!1,groupId:t}){if("string"==typeof e)return e;if(!1===e)return null;if(!0===e&&!t)throw new Error('Docusaurus error: The <Tabs> component groupId prop is required if queryString=true, because this value is used as the search param name. You can also provide an explicit value such as queryString="my-search-param".');return t??null}({queryString:e,groupId:t});return[(0,i.aZ)(n),(0,r.useCallback)(e=>{if(!n)return;const t=new URLSearchParams(a.location.search);t.set(n,e),a.replace({...a.location,search:t.toString()})},[n,a])]}function g(e){const{defaultValue:t,queryString:a=!1,groupId:n}=e,o=p(e),[s,i]=(0,r.useState)(()=>function({defaultValue:e,tabValues:t}){if(0===t.length)throw new Error("Docusaurus error: the <Tabs> component requires at least one <TabItem> children component");if(e){if(!m({value:e,tabValues:t}))throw new Error(`Docusaurus error: The <Tabs> has a defaultValue "${e}" but none of its children has the corresponding value. Available values are: ${t.map(e=>e.value).join(", ")}. If you intend to show no default tab, use defaultValue={null} instead.`);return e}const a=t.find(e=>e.default)??t[0];if(!a)throw new Error("Unexpected error: 0 tabValues");return a.value}({defaultValue:t,tabValues:o})),[u,d]=h({queryString:a,groupId:n}),[g,b]=function({groupId:e}){const t=function(e){return e?`docusaurus.tab.${e}`:null}(e),[a,n]=(0,c.Dv)(t);return[a,(0,r.useCallback)(e=>{t&&n.set(e)},[t,n])]}({groupId:n}),f=(()=>{const e=u??g;return m({value:e,tabValues:o})?e:null})();(0,l.A)(()=>{f&&i(f)},[f]);return{selectedValue:s,selectValue:(0,r.useCallback)(e=>{if(!m({value:e,tabValues:o}))throw new Error(`Can't select invalid tab value=${e}`);i(e),d(e),b(e)},[d,b,o]),tabValues:o}}var b=a(2303);const f="tabList__CuJ",v="tabItem_LNqP";var x=a(4848);function k({className:e,block:t,selectedValue:a,selectValue:r,tabValues:s}){const l=[],{blockElementScrollPositionUntilNextRender:i}=(0,o.a_)(),u=e=>{const t=e.currentTarget,n=l.indexOf(t),o=s[n].value;o!==a&&(i(t),r(o))},c=e=>{let t=null;switch(e.key){case"Enter":u(e);break;case"ArrowRight":{const a=l.indexOf(e.currentTarget)+1;t=l[a]??l[0];break}case"ArrowLeft":{const a=l.indexOf(e.currentTarget)-1;t=l[a]??l[l.length-1];break}}t?.focus()};return(0,x.jsx)("ul",{role:"tablist","aria-orientation":"horizontal",className:(0,n.A)("tabs",{"tabs--block":t},e),children:s.map(({value:e,label:t,attributes:r})=>(0,x.jsx)("li",{role:"tab",tabIndex:a===e?0:-1,"aria-selected":a===e,ref:e=>{l.push(e)},onKeyDown:c,onClick:u,...r,className:(0,n.A)("tabs__item",v,r?.className,{"tabs__item--active":a===e}),children:t??e},e))})}function y({lazy:e,children:t,selectedValue:a}){const o=(Array.isArray(t)?t:[t]).filter(Boolean);if(e){const e=o.find(e=>e.props.value===a);return e?(0,r.cloneElement)(e,{className:(0,n.A)("margin-top--md",e.props.className)}):null}return(0,x.jsx)("div",{className:"margin-top--md",children:o.map((e,t)=>(0,r.cloneElement)(e,{key:t,hidden:e.props.value!==a}))})}function w(e){const t=g(e);return(0,x.jsxs)("div",{className:(0,n.A)("tabs-container",f),children:[(0,x.jsx)(k,{...t,...e}),(0,x.jsx)(y,{...t,...e})]})}function I(e){const t=(0,b.A)();return(0,x.jsx)(w,{...e,children:d(e.children)},String(t))}},1632(e){e.exports=JSON.parse('{"permalink":"/docs/ko/blog/real-time-chat-server-setup","editUrl":"https://github.com/your-org/gatrix/tree/main/docs/blog/2021-08-01-mdx-blog-post.mdx","source":"@site/blog/2021-08-01-mdx-blog-post.mdx","title":"Gatrix \uc2e4\uc2dc\uac04 \ucc44\ud305 \uc11c\ubc84 \uc644\uc804 \uc124\uc815 \uac00\uc774\ub4dc","description":"Gatrix\uc758 \uc2e4\uc2dc\uac04 \ucc44\ud305 \uc11c\ubc84\ub294 Socket.IO\uc640 Redis \ud074\ub7ec\uc2a4\ud130\ub9c1\uc744 \uc0ac\uc6a9\ud558\uc5ec \uace0\uc131\ub2a5 \uba54\uc2dc\uc9d5\uc744 \uc81c\uacf5\ud569\ub2c8\ub2e4. \uc774 \uac00\uc774\ub4dc\uc5d0\uc11c\ub294 \ucc44\ud305 \uc11c\ubc84\ub97c \uc124\uc815\ud558\uace0 \ucd5c\uc801\ud654\ud558\ub294 \ubc29\ubc95\uc744 \ub2e8\uacc4\ubcc4\ub85c \uc54c\uc544\ubcf4\uaca0\uc2b5\ub2c8\ub2e4.","date":"2021-08-01T00:00:00.000Z","tags":[{"inline":false,"label":"Gatrix","permalink":"/docs/ko/blog/tags/gatrix","description":"Gatrix game platform management system"},{"inline":false,"label":"Chat","permalink":"/docs/ko/blog/tags/chat","description":"Real-time chat server features"},{"inline":false,"label":"Tutorial","permalink":"/docs/ko/blog/tags/tutorial","description":"Step-by-step tutorials and guides"},{"inline":false,"label":"Setup","permalink":"/docs/ko/blog/tags/setup","description":"Installation and configuration guides"}],"readingTime":4.33,"hasTruncateMarker":true,"authors":[{"name":"Gatrix Team","title":"Game Platform Development Team","url":"https://github.com/your-org/gatrix","page":{"permalink":"/docs/ko/blog/authors/gatrix-team"},"socials":{"github":"https://github.com/your-org","email":"mailto:support@gatrix.com"},"imageURL":"https://avatars.githubusercontent.com/u/0?v=4","key":"gatrix-team"}],"frontMatter":{"slug":"real-time-chat-server-setup","title":"Gatrix \uc2e4\uc2dc\uac04 \ucc44\ud305 \uc11c\ubc84 \uc644\uc804 \uc124\uc815 \uac00\uc774\ub4dc","authors":["gatrix-team"],"tags":["gatrix","chat","tutorial","setup"]},"unlisted":false,"prevItem":{"title":"Gatrix API \ud1b5\ud569 \ubc0f \uc6f9\ud6c5 \uc124\uc815 \uc644\uc804 \uac00\uc774\ub4dc","permalink":"/docs/ko/blog/api-integration-webhooks"},"nextItem":{"title":"Gatrix ?\ufffd\uc5c5 \uad00\ufffd??\ufffd\uc2a4???\ufffd\uc804 \uac00?\ufffd\ub4dc: ?\ufffd\ub3d9?\ufffd\uc758 ?\ufffd\ub85c??\ucc28\uc6d0","permalink":"/docs/ko/blog/mastering-job-management-system"}}')},5512(e,t,a){a.r(t),a.d(t,{Highlight:()=>u,assets:()=>i,contentTitle:()=>l,default:()=>p,frontMatter:()=>s,metadata:()=>r,toc:()=>c});var r=a(1632),n=a(4848),o=a(8453);a(1470),a(9365),a(4907);const s={slug:"real-time-chat-server-setup",title:"Gatrix \uc2e4\uc2dc\uac04 \ucc44\ud305 \uc11c\ubc84 \uc644\uc804 \uc124\uc815 \uac00\uc774\ub4dc",authors:["gatrix-team"],tags:["gatrix","chat","tutorial","setup"]},l=void 0,i={authorsImageUrls:[void 0]},u=({children:e,color:t})=>(0,n.jsx)("span",{style:{backgroundColor:t,borderRadius:"2px",color:"#fff",padding:"0.2rem"},children:e}),c=[];function d(e){const t={p:"p",...(0,o.R)(),...e.components};return(0,n.jsxs)(n.Fragment,{children:[(0,n.jsx)(t.p,{children:"Gatrix\uc758 \uc2e4\uc2dc\uac04 \ucc44\ud305 \uc11c\ubc84\ub294 Socket.IO\uc640 Redis \ud074\ub7ec\uc2a4\ud130\ub9c1\uc744 \uc0ac\uc6a9\ud558\uc5ec \uace0\uc131\ub2a5 \uba54\uc2dc\uc9d5\uc744 \uc81c\uacf5\ud569\ub2c8\ub2e4. \uc774 \uac00\uc774\ub4dc\uc5d0\uc11c\ub294 \ucc44\ud305 \uc11c\ubc84\ub97c \uc124\uc815\ud558\uace0 \ucd5c\uc801\ud654\ud558\ub294 \ubc29\ubc95\uc744 \ub2e8\uacc4\ubcc4\ub85c \uc54c\uc544\ubcf4\uaca0\uc2b5\ub2c8\ub2e4."}),"\n","\n",(0,n.jsxs)(t.p,{children:[(0,n.jsx)(u,{color:"#25c2a0",children:"\uace0\uc131\ub2a5"})," \uc2e4\uc2dc\uac04 \ucc44\ud305 \uc11c\ubc84\ub85c \uac8c\uc784 \ucee4\ubba4\ub2c8\ud2f0\ub97c \uac15\ud654\ud558\uc138\uc694!"]})]})}function p(e={}){const{wrapper:t}={...(0,o.R)(),...e.components};return t?(0,n.jsx)(t,{...e,children:(0,n.jsx)(d,{...e})}):d(e)}},9365(e,t,a){a.d(t,{A:()=>s});a(6540);var r=a(4164);const n="tabItem_Ymn6";var o=a(4848);function s({children:e,hidden:t,className:a}){return(0,o.jsx)("div",{role:"tabpanel",className:(0,r.A)(n,a),hidden:t,children:e})}}}]);
+'use strict';
+(globalThis.webpackChunkdocs = globalThis.webpackChunkdocs || []).push([
+  [3637],
+  {
+    1470(e, t, a) {
+      a.d(t, { A: () => I });
+      var r = a(6540),
+        n = a(4164),
+        o = a(3104),
+        s = a(6347),
+        l = a(205),
+        i = a(7485),
+        u = a(1682),
+        c = a(679);
+      function d(e) {
+        return (
+          r.Children.toArray(e)
+            .filter((e) => '\n' !== e)
+            .map((e) => {
+              if (
+                !e ||
+                ((0, r.isValidElement)(e) &&
+                  (function (e) {
+                    const { props: t } = e;
+                    return !!t && 'object' == typeof t && 'value' in t;
+                  })(e))
+              )
+                return e;
+              throw new Error(
+                `Docusaurus error: Bad <Tabs> child <${'string' == typeof e.type ? e.type : e.type.name}>: all children of the <Tabs> component should be <TabItem>, and every <TabItem> should have a unique "value" prop.`
+              );
+            })
+            ?.filter(Boolean) ?? []
+        );
+      }
+      function p(e) {
+        const { values: t, children: a } = e;
+        return (0, r.useMemo)(() => {
+          const e =
+            t ??
+            (function (e) {
+              return d(e).map(({ props: { value: e, label: t, attributes: a, default: r } }) => ({
+                value: e,
+                label: t,
+                attributes: a,
+                default: r,
+              }));
+            })(a);
+          return (
+            (function (e) {
+              const t = (0, u.XI)(e, (e, t) => e.value === t.value);
+              if (t.length > 0)
+                throw new Error(
+                  `Docusaurus error: Duplicate values "${t.map((e) => e.value).join(', ')}" found in <Tabs>. Every value needs to be unique.`
+                );
+            })(e),
+            e
+          );
+        }, [t, a]);
+      }
+      function m({ value: e, tabValues: t }) {
+        return t.some((t) => t.value === e);
+      }
+      function h({ queryString: e = !1, groupId: t }) {
+        const a = (0, s.W6)(),
+          n = (function ({ queryString: e = !1, groupId: t }) {
+            if ('string' == typeof e) return e;
+            if (!1 === e) return null;
+            if (!0 === e && !t)
+              throw new Error(
+                'Docusaurus error: The <Tabs> component groupId prop is required if queryString=true, because this value is used as the search param name. You can also provide an explicit value such as queryString="my-search-param".'
+              );
+            return t ?? null;
+          })({ queryString: e, groupId: t });
+        return [
+          (0, i.aZ)(n),
+          (0, r.useCallback)(
+            (e) => {
+              if (!n) return;
+              const t = new URLSearchParams(a.location.search);
+              (t.set(n, e), a.replace({ ...a.location, search: t.toString() }));
+            },
+            [n, a]
+          ),
+        ];
+      }
+      function g(e) {
+        const { defaultValue: t, queryString: a = !1, groupId: n } = e,
+          o = p(e),
+          [s, i] = (0, r.useState)(() =>
+            (function ({ defaultValue: e, tabValues: t }) {
+              if (0 === t.length)
+                throw new Error(
+                  'Docusaurus error: the <Tabs> component requires at least one <TabItem> children component'
+                );
+              if (e) {
+                if (!m({ value: e, tabValues: t }))
+                  throw new Error(
+                    `Docusaurus error: The <Tabs> has a defaultValue "${e}" but none of its children has the corresponding value. Available values are: ${t.map((e) => e.value).join(', ')}. If you intend to show no default tab, use defaultValue={null} instead.`
+                  );
+                return e;
+              }
+              const a = t.find((e) => e.default) ?? t[0];
+              if (!a) throw new Error('Unexpected error: 0 tabValues');
+              return a.value;
+            })({ defaultValue: t, tabValues: o })
+          ),
+          [u, d] = h({ queryString: a, groupId: n }),
+          [g, b] = (function ({ groupId: e }) {
+            const t = (function (e) {
+                return e ? `docusaurus.tab.${e}` : null;
+              })(e),
+              [a, n] = (0, c.Dv)(t);
+            return [
+              a,
+              (0, r.useCallback)(
+                (e) => {
+                  t && n.set(e);
+                },
+                [t, n]
+              ),
+            ];
+          })({ groupId: n }),
+          f = (() => {
+            const e = u ?? g;
+            return m({ value: e, tabValues: o }) ? e : null;
+          })();
+        (0, l.A)(() => {
+          f && i(f);
+        }, [f]);
+        return {
+          selectedValue: s,
+          selectValue: (0, r.useCallback)(
+            (e) => {
+              if (!m({ value: e, tabValues: o }))
+                throw new Error(`Can't select invalid tab value=${e}`);
+              (i(e), d(e), b(e));
+            },
+            [d, b, o]
+          ),
+          tabValues: o,
+        };
+      }
+      var b = a(2303);
+      const f = 'tabList__CuJ',
+        v = 'tabItem_LNqP';
+      var x = a(4848);
+      function k({ className: e, block: t, selectedValue: a, selectValue: r, tabValues: s }) {
+        const l = [],
+          { blockElementScrollPositionUntilNextRender: i } = (0, o.a_)(),
+          u = (e) => {
+            const t = e.currentTarget,
+              n = l.indexOf(t),
+              o = s[n].value;
+            o !== a && (i(t), r(o));
+          },
+          c = (e) => {
+            let t = null;
+            switch (e.key) {
+              case 'Enter':
+                u(e);
+                break;
+              case 'ArrowRight': {
+                const a = l.indexOf(e.currentTarget) + 1;
+                t = l[a] ?? l[0];
+                break;
+              }
+              case 'ArrowLeft': {
+                const a = l.indexOf(e.currentTarget) - 1;
+                t = l[a] ?? l[l.length - 1];
+                break;
+              }
+            }
+            t?.focus();
+          };
+        return (0, x.jsx)('ul', {
+          role: 'tablist',
+          'aria-orientation': 'horizontal',
+          className: (0, n.A)('tabs', { 'tabs--block': t }, e),
+          children: s.map(({ value: e, label: t, attributes: r }) =>
+            (0, x.jsx)(
+              'li',
+              {
+                role: 'tab',
+                tabIndex: a === e ? 0 : -1,
+                'aria-selected': a === e,
+                ref: (e) => {
+                  l.push(e);
+                },
+                onKeyDown: c,
+                onClick: u,
+                ...r,
+                className: (0, n.A)('tabs__item', v, r?.className, {
+                  'tabs__item--active': a === e,
+                }),
+                children: t ?? e,
+              },
+              e
+            )
+          ),
+        });
+      }
+      function y({ lazy: e, children: t, selectedValue: a }) {
+        const o = (Array.isArray(t) ? t : [t]).filter(Boolean);
+        if (e) {
+          const e = o.find((e) => e.props.value === a);
+          return e
+            ? (0, r.cloneElement)(e, { className: (0, n.A)('margin-top--md', e.props.className) })
+            : null;
+        }
+        return (0, x.jsx)('div', {
+          className: 'margin-top--md',
+          children: o.map((e, t) =>
+            (0, r.cloneElement)(e, { key: t, hidden: e.props.value !== a })
+          ),
+        });
+      }
+      function w(e) {
+        const t = g(e);
+        return (0, x.jsxs)('div', {
+          className: (0, n.A)('tabs-container', f),
+          children: [(0, x.jsx)(k, { ...t, ...e }), (0, x.jsx)(y, { ...t, ...e })],
+        });
+      }
+      function I(e) {
+        const t = (0, b.A)();
+        return (0, x.jsx)(w, { ...e, children: d(e.children) }, String(t));
+      }
+    },
+    1632(e) {
+      e.exports = JSON.parse(
+        '{"permalink":"/docs/ko/blog/real-time-chat-server-setup","editUrl":"https://github.com/your-org/gatrix/tree/main/docs/blog/2021-08-01-mdx-blog-post.mdx","source":"@site/blog/2021-08-01-mdx-blog-post.mdx","title":"Gatrix \uc2e4\uc2dc\uac04 \ucc44\ud305 \uc11c\ubc84 \uc644\uc804 \uc124\uc815 \uac00\uc774\ub4dc","description":"Gatrix\uc758 \uc2e4\uc2dc\uac04 \ucc44\ud305 \uc11c\ubc84\ub294 Socket.IO\uc640 Redis \ud074\ub7ec\uc2a4\ud130\ub9c1\uc744 \uc0ac\uc6a9\ud558\uc5ec \uace0\uc131\ub2a5 \uba54\uc2dc\uc9d5\uc744 \uc81c\uacf5\ud569\ub2c8\ub2e4. \uc774 \uac00\uc774\ub4dc\uc5d0\uc11c\ub294 \ucc44\ud305 \uc11c\ubc84\ub97c \uc124\uc815\ud558\uace0 \ucd5c\uc801\ud654\ud558\ub294 \ubc29\ubc95\uc744 \ub2e8\uacc4\ubcc4\ub85c \uc54c\uc544\ubcf4\uaca0\uc2b5\ub2c8\ub2e4.","date":"2021-08-01T00:00:00.000Z","tags":[{"inline":false,"label":"Gatrix","permalink":"/docs/ko/blog/tags/gatrix","description":"Gatrix game platform management system"},{"inline":false,"label":"Chat","permalink":"/docs/ko/blog/tags/chat","description":"Real-time chat server features"},{"inline":false,"label":"Tutorial","permalink":"/docs/ko/blog/tags/tutorial","description":"Step-by-step tutorials and guides"},{"inline":false,"label":"Setup","permalink":"/docs/ko/blog/tags/setup","description":"Installation and configuration guides"}],"readingTime":4.33,"hasTruncateMarker":true,"authors":[{"name":"Gatrix Team","title":"Game Platform Development Team","url":"https://github.com/your-org/gatrix","page":{"permalink":"/docs/ko/blog/authors/gatrix-team"},"socials":{"github":"https://github.com/your-org","email":"mailto:support@gatrix.com"},"imageURL":"https://avatars.githubusercontent.com/u/0?v=4","key":"gatrix-team"}],"frontMatter":{"slug":"real-time-chat-server-setup","title":"Gatrix \uc2e4\uc2dc\uac04 \ucc44\ud305 \uc11c\ubc84 \uc644\uc804 \uc124\uc815 \uac00\uc774\ub4dc","authors":["gatrix-team"],"tags":["gatrix","chat","tutorial","setup"]},"unlisted":false,"prevItem":{"title":"Gatrix API \ud1b5\ud569 \ubc0f \uc6f9\ud6c5 \uc124\uc815 \uc644\uc804 \uac00\uc774\ub4dc","permalink":"/docs/ko/blog/api-integration-webhooks"},"nextItem":{"title":"Gatrix ?\ufffd\uc5c5 \uad00\ufffd??\ufffd\uc2a4???\ufffd\uc804 \uac00?\ufffd\ub4dc: ?\ufffd\ub3d9?\ufffd\uc758 ?\ufffd\ub85c??\ucc28\uc6d0","permalink":"/docs/ko/blog/mastering-job-management-system"}}'
+      );
+    },
+    5512(e, t, a) {
+      (a.r(t),
+        a.d(t, {
+          Highlight: () => u,
+          assets: () => i,
+          contentTitle: () => l,
+          default: () => p,
+          frontMatter: () => s,
+          metadata: () => r,
+          toc: () => c,
+        }));
+      var r = a(1632),
+        n = a(4848),
+        o = a(8453);
+      (a(1470), a(9365), a(4907));
+      const s = {
+          slug: 'real-time-chat-server-setup',
+          title:
+            'Gatrix \uc2e4\uc2dc\uac04 \ucc44\ud305 \uc11c\ubc84 \uc644\uc804 \uc124\uc815 \uac00\uc774\ub4dc',
+          authors: ['gatrix-team'],
+          tags: ['gatrix', 'chat', 'tutorial', 'setup'],
+        },
+        l = void 0,
+        i = { authorsImageUrls: [void 0] },
+        u = ({ children: e, color: t }) =>
+          (0, n.jsx)('span', {
+            style: { backgroundColor: t, borderRadius: '2px', color: '#fff', padding: '0.2rem' },
+            children: e,
+          }),
+        c = [];
+      function d(e) {
+        const t = { p: 'p', ...(0, o.R)(), ...e.components };
+        return (0, n.jsxs)(n.Fragment, {
+          children: [
+            (0, n.jsx)(t.p, {
+              children:
+                'Gatrix\uc758 \uc2e4\uc2dc\uac04 \ucc44\ud305 \uc11c\ubc84\ub294 Socket.IO\uc640 Redis \ud074\ub7ec\uc2a4\ud130\ub9c1\uc744 \uc0ac\uc6a9\ud558\uc5ec \uace0\uc131\ub2a5 \uba54\uc2dc\uc9d5\uc744 \uc81c\uacf5\ud569\ub2c8\ub2e4. \uc774 \uac00\uc774\ub4dc\uc5d0\uc11c\ub294 \ucc44\ud305 \uc11c\ubc84\ub97c \uc124\uc815\ud558\uace0 \ucd5c\uc801\ud654\ud558\ub294 \ubc29\ubc95\uc744 \ub2e8\uacc4\ubcc4\ub85c \uc54c\uc544\ubcf4\uaca0\uc2b5\ub2c8\ub2e4.',
+            }),
+            '\n',
+            '\n',
+            (0, n.jsxs)(t.p, {
+              children: [
+                (0, n.jsx)(u, { color: '#25c2a0', children: '\uace0\uc131\ub2a5' }),
+                ' \uc2e4\uc2dc\uac04 \ucc44\ud305 \uc11c\ubc84\ub85c \uac8c\uc784 \ucee4\ubba4\ub2c8\ud2f0\ub97c \uac15\ud654\ud558\uc138\uc694!',
+              ],
+            }),
+          ],
+        });
+      }
+      function p(e = {}) {
+        const { wrapper: t } = { ...(0, o.R)(), ...e.components };
+        return t ? (0, n.jsx)(t, { ...e, children: (0, n.jsx)(d, { ...e }) }) : d(e);
+      }
+    },
+    9365(e, t, a) {
+      a.d(t, { A: () => s });
+      a(6540);
+      var r = a(4164);
+      const n = 'tabItem_Ymn6';
+      var o = a(4848);
+      function s({ children: e, hidden: t, className: a }) {
+        return (0, o.jsx)('div', {
+          role: 'tabpanel',
+          className: (0, r.A)(n, a),
+          hidden: t,
+          children: e,
+        });
+      }
+    },
+  },
+]);

@@ -4,14 +4,14 @@
  * Simulates a game world server with full SDK features
  */
 
-import { BaseTestServer, BaseServerConfig } from "./base-server";
+import { BaseTestServer, BaseServerConfig } from './base-server';
 
 class WorldServer extends BaseTestServer {
   private players: Map<string, any> = new Map();
   private npcs: number = 0;
 
   protected async onStart(): Promise<void> {
-    this.log("World server specific initialization");
+    this.log('World server specific initialization');
 
     // Initialize NPCs
     this.npcs = Math.floor(Math.random() * 100) + 50;
@@ -74,7 +74,7 @@ class WorldServer extends BaseTestServer {
     if (this.config.enableServiceDiscovery) {
       this.sdk
         .updateServiceStatus({
-          status: "ready",
+          status: 'ready',
           stats: {
             cpuUsage: Math.random() * 100,
             memoryUsage: Math.random() * 2048,
@@ -83,7 +83,7 @@ class WorldServer extends BaseTestServer {
             npcs: this.npcs,
           },
         })
-        .catch((err) => this.logError("Failed to update service status", err));
+        .catch((err) => this.logError('Failed to update service status', err));
     }
   }
 
@@ -103,10 +103,10 @@ class WorldServer extends BaseTestServer {
         userId: playerId,
         userName: `Player_${playerId}`,
         characterId: `char_${playerId}`,
-        worldId: "world-1",
-        platform: "pc",
-        channel: "steam",
-        subChannel: "global",
+        worldId: 'world-1',
+        platform: 'pc',
+        channel: 'steam',
+        subChannel: 'global',
       });
       this.log(`Coupon redeemed successfully: ${JSON.stringify(result)}`);
     } catch (error: any) {
@@ -117,18 +117,18 @@ class WorldServer extends BaseTestServer {
 }
 
 // Parse command line arguments
-const instanceId = process.argv[2] || "1";
-const port = parseInt(process.argv[3] || "8004");
-const group = process.argv[4] || "kr-1";
-const enableDiscovery = process.argv[5] === "true" || false;
+const instanceId = process.argv[2] || '1';
+const port = parseInt(process.argv[3] || '8004');
+const group = process.argv[4] || 'kr-1';
+const enableDiscovery = process.argv[5] === 'true' || false;
 
 const config: BaseServerConfig = {
-  serviceType: "worldd",
+  serviceType: 'worldd',
   serviceGroup: group,
   customLabels: {
-    env: process.env.NODE_ENV || "development",
-    region: "ap-northeast-2",
-    role: "game-server",
+    env: process.env.NODE_ENV || 'development',
+    region: 'ap-northeast-2',
+    role: 'game-server',
   },
   instanceName: `worldd-${group}-${instanceId}`,
   port: port,
@@ -141,6 +141,6 @@ const server = new WorldServer(config);
 
 // Start server
 server.start().catch((error) => {
-  console.error("Failed to start world server:", error);
+  console.error('Failed to start world server:', error);
   process.exit(1);
 });

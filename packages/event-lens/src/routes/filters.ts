@@ -1,13 +1,13 @@
-import { FastifyPluginAsync } from "fastify";
-import FilterBuilder from "../services/filter-builder";
-import { authenticateClient, requireReadAccess } from "../middleware/auth";
+import { FastifyPluginAsync } from 'fastify';
+import FilterBuilder from '../services/filter-builder';
+import { authenticateClient, requireReadAccess } from '../middleware/auth';
 
 const filterBuilder = new FilterBuilder();
 
 const filtersRoutes: FastifyPluginAsync = async (fastify) => {
   // 모든 라우트에 인증 적용
-  fastify.addHook("onRequest", authenticateClient);
-  fastify.addHook("onRequest", requireReadAccess);
+  fastify.addHook('onRequest', authenticateClient);
+  fastify.addHook('onRequest', requireReadAccess);
 
   /**
    * GET /filters/:projectId/property-keys
@@ -16,7 +16,7 @@ const filtersRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.get<{
     Params: { projectId: string };
     Querystring: { eventName?: string };
-  }>("/:projectId/property-keys", async (request, reply) => {
+  }>('/:projectId/property-keys', async (request, reply) => {
     const { projectId } = request.params;
     const { eventName } = request.query;
 
@@ -42,14 +42,14 @@ const filtersRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.get<{
     Params: { projectId: string };
     Querystring: { propertyKey: string; eventName?: string; limit?: number };
-  }>("/:projectId/property-values", async (request, reply) => {
+  }>('/:projectId/property-values', async (request, reply) => {
     const { projectId } = request.params;
     const { propertyKey, eventName, limit } = request.query;
 
     if (!propertyKey) {
       return reply.status(400).send({
         success: false,
-        error: "propertyKey is required",
+        error: 'propertyKey is required',
       });
     }
 
@@ -58,7 +58,7 @@ const filtersRoutes: FastifyPluginAsync = async (fastify) => {
         projectId,
         propertyKey,
         eventName,
-        limit,
+        limit
       );
 
       return reply.send({
@@ -79,7 +79,7 @@ const filtersRoutes: FastifyPluginAsync = async (fastify) => {
    */
   fastify.get<{
     Params: { projectId: string };
-  }>("/:projectId/event-names", async (request, reply) => {
+  }>('/:projectId/event-names', async (request, reply) => {
     const { projectId } = request.params;
 
     try {
@@ -104,7 +104,7 @@ const filtersRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.get<{
     Params: { projectId: string };
     Querystring: { limit?: number };
-  }>("/:projectId/paths", async (request, reply) => {
+  }>('/:projectId/paths', async (request, reply) => {
     const { projectId } = request.params;
     const { limit } = request.query;
 
@@ -129,7 +129,7 @@ const filtersRoutes: FastifyPluginAsync = async (fastify) => {
    */
   fastify.get<{
     Params: { projectId: string };
-  }>("/:projectId/countries", async (request, reply) => {
+  }>('/:projectId/countries', async (request, reply) => {
     const { projectId } = request.params;
 
     try {

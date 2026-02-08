@@ -55,11 +55,13 @@ packages/chat-server/
 ### 1.3 Backend의 Chat Proxy 구조
 
 <augment_code_snippet path="packages/backend/src/app.ts" mode="EXCERPT">
+
 ```typescript
 // Chat proxy routes - MUST be before body parsing
 import chatRoutes from './routes/chat';
 app.use('/api/v1/chat', chatRoutes);
 ```
+
 </augment_code_snippet>
 
 **핵심 패턴**: Backend가 `/api/v1/chat`로 들어오는 요청을 chat-server로 프록시
@@ -116,6 +118,7 @@ app.use('/api/v1/chat', chatRoutes);
 ### 2.2 Analytics Server 역할
 
 #### **Event API (Fastify)**
+
 - **포트**: 3002
 - **역할**: 이벤트 수집 및 초기 처리
 - **엔드포인트**:
@@ -125,6 +128,7 @@ app.use('/api/v1/chat', chatRoutes);
   - `POST /decrement` - 프로필 속성 감소
 
 #### **Insights API (tRPC)**
+
 - **포트**: 3002 (동일 서버)
 - **역할**: 분석 데이터 조회
 - **엔드포인트**:
@@ -134,6 +138,7 @@ app.use('/api/v1/chat', chatRoutes);
   - `GET /insights/:projectId/live` - 실시간 방문자
 
 #### **Worker (BullMQ)**
+
 - **역할**: 백그라운드 작업 처리
 - **작업**:
   - 이벤트 배치 삽입
@@ -218,15 +223,15 @@ packages/analytics-server/
 
 ### 3.2 기술 스택
 
-| 레이어 | 기술 | 이유 |
-|--------|------|------|
-| **API Framework** | Fastify | 고성능, 낮은 오버헤드 |
-| **Worker** | BullMQ | Redis 기반 큐, 재시도 로직 |
-| **Event DB** | ClickHouse | 컬럼 기반, 시계열 데이터 최적화 |
-| **Metadata DB** | MySQL | 기존 Gatrix DB 활용 |
-| **Cache/Queue** | Redis | 기존 인프라 활용 |
-| **Validation** | Zod | 타입 안전성 |
-| **Logging** | Winston | 구조화된 로깅 |
+| 레이어            | 기술       | 이유                            |
+| ----------------- | ---------- | ------------------------------- |
+| **API Framework** | Fastify    | 고성능, 낮은 오버헤드           |
+| **Worker**        | BullMQ     | Redis 기반 큐, 재시도 로직      |
+| **Event DB**      | ClickHouse | 컬럼 기반, 시계열 데이터 최적화 |
+| **Metadata DB**   | MySQL      | 기존 Gatrix DB 활용             |
+| **Cache/Queue**   | Redis      | 기존 인프라 활용                |
+| **Validation**    | Zod        | 타입 안전성                     |
+| **Logging**       | Winston    | 구조화된 로깅                   |
 
 ---
 
@@ -288,8 +293,8 @@ services:
     container_name: gatrix-clickhouse
     restart: unless-stopped
     ports:
-      - "8123:8123"  # HTTP
-      - "9000:9000"  # Native
+      - '8123:8123' # HTTP
+      - '9000:9000' # Native
     volumes:
       - clickhouse_data:/var/lib/clickhouse
       - ./docker/clickhouse/config.xml:/etc/clickhouse-server/config.xml
@@ -300,7 +305,7 @@ services:
         soft: 262144
         hard: 262144
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8123/ping"]
+      test: ['CMD', 'wget', '--spider', '-q', 'http://localhost:8123/ping']
       interval: 30s
       timeout: 10s
       retries: 3
@@ -335,7 +340,7 @@ services:
       MYSQL_USER: ${DB_USER:-gatrix_user}
       MYSQL_PASSWORD: ${DB_PASSWORD:-gatrix_password}
     ports:
-      - "3002:3002"
+      - '3002:3002'
     depends_on:
       mysql:
         condition: service_healthy
@@ -348,7 +353,7 @@ services:
     volumes:
       - analytics_logs:/app/logs
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3002/health"]
+      test: ['CMD', 'wget', '--spider', '-q', 'http://localhost:3002/health']
       interval: 30s
       timeout: 10s
       retries: 3
@@ -441,28 +446,32 @@ const trackSchema = z.object({
 const trackRoutes: FastifyPluginAsync = async (fastify) => {
   const eventProcessor = new EventProcessor();
 
-  fastify.post('/', {
-    preHandler: authenticateClient,
-  }, async (request, reply) => {
-    try {
-      const body = trackSchema.parse(request.body);
-      
-      const event = {
-        ...body.payload,
-        projectId: (request as any).client.projectId,
-        ip: request.headers['x-client-ip'] || request.ip,
-        userAgent: request.headers['user-agent'],
-        createdAt: new Date().toISOString(),
-      };
+  fastify.post(
+    '/',
+    {
+      preHandler: authenticateClient,
+    },
+    async (request, reply) => {
+      try {
+        const body = trackSchema.parse(request.body);
 
-      await eventProcessor.process(event);
+        const event = {
+          ...body.payload,
+          projectId: (request as any).client.projectId,
+          ip: request.headers['x-client-ip'] || request.ip,
+          userAgent: request.headers['user-agent'],
+          createdAt: new Date().toISOString(),
+        };
 
-      return { success: true };
-    } catch (error) {
-      fastify.log.error(error);
-      return reply.code(400).send({ error: 'Invalid request' });
+        await eventProcessor.process(event);
+
+        return { success: true };
+      } catch (error) {
+        fastify.log.error(error);
+        return reply.code(400).send({ error: 'Invalid request' });
+      }
     }
-  });
+  );
 };
 
 export default trackRoutes;
@@ -527,7 +536,7 @@ export class EventWorker {
 
   private async processJob(job: Job) {
     const { event } = job.data;
-    
+
     this.batch.push(event);
 
     if (this.batch.length >= this.batchSize) {
@@ -572,23 +581,26 @@ import { config } from '../config';
 const router = express.Router();
 
 // Analytics Server로 프록시
-router.use('/', createProxyMiddleware({
-  target: config.analyticsServer.url, // http://analytics-server:3002
-  changeOrigin: true,
-  pathRewrite: {
-    '^/api/v1/analytics': '', // /api/v1/analytics/* → /*
-  },
-  onProxyReq: (proxyReq, req, res) => {
-    // 인증 헤더 전달
-    if (req.headers.authorization) {
-      proxyReq.setHeader('authorization', req.headers.authorization);
-    }
-  },
-  onError: (err, req, res) => {
-    console.error('Analytics proxy error:', err);
-    res.status(500).json({ error: 'Analytics service unavailable' });
-  },
-}));
+router.use(
+  '/',
+  createProxyMiddleware({
+    target: config.analyticsServer.url, // http://analytics-server:3002
+    changeOrigin: true,
+    pathRewrite: {
+      '^/api/v1/analytics': '', // /api/v1/analytics/* → /*
+    },
+    onProxyReq: (proxyReq, req, res) => {
+      // 인증 헤더 전달
+      if (req.headers.authorization) {
+        proxyReq.setHeader('authorization', req.headers.authorization);
+      }
+    },
+    onError: (err, req, res) => {
+      console.error('Analytics proxy error:', err);
+      res.status(500).json({ error: 'Analytics service unavailable' });
+    },
+  })
+);
 
 export default router;
 ```
@@ -692,14 +704,14 @@ docker-compose up -d analytics-server
 
 ## 8. 예상 일정
 
-| Phase | 기간 | 작업 |
-|-------|------|------|
-| Phase 1 | 1주 | 인프라 설정, ClickHouse 추가 |
-| Phase 2 | 2주 | Event API 구현 |
-| Phase 3 | 2주 | Worker 구현 |
-| Phase 4 | 3주 | 분석 엔진 (메트릭, 퍼널, 리텐션) |
-| Phase 5 | 2주 | Frontend 통합 |
-| **총계** | **10주** | **약 2.5개월** |
+| Phase    | 기간     | 작업                             |
+| -------- | -------- | -------------------------------- |
+| Phase 1  | 1주      | 인프라 설정, ClickHouse 추가     |
+| Phase 2  | 2주      | Event API 구현                   |
+| Phase 3  | 2주      | Worker 구현                      |
+| Phase 4  | 3주      | 분석 엔진 (메트릭, 퍼널, 리텐션) |
+| Phase 5  | 2주      | Frontend 통합                    |
+| **총계** | **10주** | **약 2.5개월**                   |
 
 ---
 
@@ -938,13 +950,13 @@ export class EventNormalizer {
 
       // 검색 엔진
       const searchEngines = ['google', 'bing', 'yahoo', 'duckduckgo', 'baidu', 'naver'];
-      if (searchEngines.some(engine => hostname.includes(engine))) {
+      if (searchEngines.some((engine) => hostname.includes(engine))) {
         return { referrerName: hostname, referrerType: 'search' };
       }
 
       // 소셜 미디어
       const socialMedia = ['facebook', 'twitter', 'linkedin', 'instagram', 'reddit'];
-      if (socialMedia.some(social => hostname.includes(social))) {
+      if (socialMedia.some((social) => hostname.includes(social))) {
         return { referrerName: hostname, referrerType: 'social' };
       }
 
@@ -975,11 +987,7 @@ export class EventNormalizer {
 import { clickhouse } from '../config/clickhouse';
 
 export class MetricsService {
-  async getMetrics(params: {
-    projectId: string;
-    startDate: string;
-    endDate: string;
-  }) {
+  async getMetrics(params: { projectId: string; startDate: string; endDate: string }) {
     const { projectId, startDate, endDate } = params;
 
     const query = `
@@ -1117,10 +1125,7 @@ function getPool() {
   return pool;
 }
 
-export async function authenticateClient(
-  request: FastifyRequest,
-  reply: FastifyReply
-) {
+export async function authenticateClient(request: FastifyRequest, reply: FastifyReply) {
   const clientId = request.headers['openpanel-client-id'] as string;
   const clientSecret = request.headers['openpanel-client-secret'] as string;
 
@@ -1130,10 +1135,10 @@ export async function authenticateClient(
 
   try {
     const pool = getPool();
-    const [rows] = await pool.query(
-      'SELECT * FROM analytics_clients WHERE id = ? AND secret = ?',
-      [clientId, clientSecret]
-    );
+    const [rows] = await pool.query('SELECT * FROM analytics_clients WHERE id = ? AND secret = ?', [
+      clientId,
+      clientSecret,
+    ]);
 
     const clients = rows as any[];
     if (clients.length === 0) {
@@ -1343,18 +1348,19 @@ class AnalyticsSDK {
 
     // 새 세션 생성
     const sessionId = `${Date.now()}-${Math.random().toString(36).substring(2)}`;
-    sessionStorage.setItem(sessionKey, JSON.stringify({
-      id: sessionId,
-      lastActivity: Date.now(),
-    }));
+    sessionStorage.setItem(
+      sessionKey,
+      JSON.stringify({
+        id: sessionId,
+        lastActivity: Date.now(),
+      })
+    );
 
     return sessionId;
   }
 }
 
-export const analytics = new AnalyticsSDK(
-  import.meta.env.VITE_ANALYTICS_CLIENT_ID || 'default'
-);
+export const analytics = new AnalyticsSDK(import.meta.env.VITE_ANALYTICS_CLIENT_ID || 'default');
 ```
 
 ### 10.2 React 통합
@@ -1416,10 +1422,7 @@ docker-compose logs -f clickhouse
 // src/middleware/metrics.ts
 import { FastifyRequest, FastifyReply } from 'fastify';
 
-export async function metricsMiddleware(
-  request: FastifyRequest,
-  reply: FastifyReply
-) {
+export async function metricsMiddleware(request: FastifyRequest, reply: FastifyReply) {
   const start = Date.now();
 
   reply.addHook('onSend', async () => {
@@ -1443,6 +1446,7 @@ export async function metricsMiddleware(
 ### 즉시 시작 가능한 작업
 
 1. **Phase 1 시작**
+
    ```bash
    # Analytics Server 디렉토리 생성
    mkdir -p packages/analytics-server/src
@@ -1470,5 +1474,3 @@ export async function metricsMiddleware(
 ---
 
 **준비 완료!** Phase 1부터 시작하시겠습니까?
-
-

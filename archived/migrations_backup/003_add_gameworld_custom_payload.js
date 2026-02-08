@@ -58,6 +58,5 @@ module.exports = {
       console.error('Error rolling back migration 003_add_gameworld_custom_payload:', error);
       throw error;
     }
-  }
+  },
 };
-

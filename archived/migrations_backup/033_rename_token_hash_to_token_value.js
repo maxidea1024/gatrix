@@ -4,7 +4,7 @@
  * This migration renames the tokenHash column to tokenValue for better naming consistency.
  */
 
-exports.up = async function(connection) {
+exports.up = async function (connection) {
   console.log('Renaming tokenHash column to tokenValue in g_api_access_tokens table...');
 
   try {
@@ -31,7 +31,7 @@ exports.up = async function(connection) {
   }
 };
 
-exports.down = async function(connection) {
+exports.down = async function (connection) {
   console.log('Reverting: Renaming tokenValue column back to tokenHash...');
 
   try {
@@ -55,4 +55,3 @@ exports.down = async function(connection) {
     console.log('⚠️ Error during revert:', error.message);
   }
 };
-

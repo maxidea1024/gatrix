@@ -1,6 +1,6 @@
 /**
  * Migration: Make worldServerAddress required (NOT NULL)
- * 
+ *
  * Changes worldServerAddress from nullable to NOT NULL with a default value.
  * This ensures all game worlds have a valid server address.
  */
@@ -14,7 +14,7 @@ async function up(connection) {
     SET worldServerAddress = '0.0.0.0:0'
     WHERE worldServerAddress IS NULL
   `);
-  
+
   if (result.affectedRows > 0) {
     console.log(`✓ Updated ${result.affectedRows} rows with default worldServerAddress`);
   }
@@ -54,4 +54,3 @@ async function down(connection) {
 }
 
 module.exports = { up, down };
-

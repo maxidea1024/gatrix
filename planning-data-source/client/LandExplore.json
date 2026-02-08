@@ -38,11 +38,7 @@
       "regionId": "number",
       "landCulture": "number",
       "landGrade": "number",
-      "landRewardType": [
-        "number",
-        "number",
-        "number"
-      ]
+      "landRewardType": ["number", "number", "number"]
     },
     ":required": {
       "randLandFeature": [
@@ -54,9 +50,7 @@
       ],
       "landCulture": 1,
       "landGrade": 1,
-      "landRewardType": [
-        1
-      ]
+      "landRewardType": [1]
     },
     ":requiredInObject": {
       "randLandFeature": [
@@ -112,45 +106,23 @@
     },
     ":enum": {},
     ":links": {
-      "inheritLandFeature": [
-        "LandExplore"
-      ],
-      "consumeItemId": [
-        "Item"
-      ],
-      "liveEvent": [
-        "LiveEvent"
-      ],
-      "liveEventReward": [
-        "Reward"
-      ],
-      "climateLandFeature": [
-        "LandFeature"
-      ],
+      "inheritLandFeature": ["LandExplore"],
+      "consumeItemId": ["Item"],
+      "liveEvent": ["LiveEvent"],
+      "liveEventReward": ["Reward"],
+      "climateLandFeature": ["LandFeature"],
       "randLandFeature": [
         {
-          "Id": [
-            "LandFeatureGroup"
-          ]
+          "Id": ["LandFeatureGroup"]
         },
         {
-          "Id": [
-            "LandFeatureGroup"
-          ]
+          "Id": ["LandFeatureGroup"]
         }
       ],
-      "exploreMode": [
-        "AdventureEventMode"
-      ],
-      "gatherMode": [
-        "AdventureEventMode"
-      ],
-      "trainingMode": [
-        "AdventureEventMode"
-      ],
-      "regionId": [
-        "Region"
-      ]
+      "exploreMode": ["AdventureEventMode"],
+      "gatherMode": ["AdventureEventMode"],
+      "trainingMode": ["AdventureEventMode"],
+      "regionId": ["Region"]
     }
   },
   "LandExplore": {
@@ -186,11 +158,7 @@
       "regionId": 12000000,
       "landCulture": 0,
       "landGrade": 1,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71400500": {
       "id": 71400500,
@@ -223,11 +191,7 @@
       "regionId": 12001000,
       "landCulture": 0,
       "landGrade": 1,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71401000": {
       "id": 71401000,
@@ -260,11 +224,7 @@
       "regionId": 12000200,
       "landCulture": 0,
       "landGrade": 1,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71401500": {
       "id": 71401500,
@@ -298,11 +258,7 @@
       "regionId": 12000400,
       "landCulture": 0,
       "landGrade": 1,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71402000": {
       "id": 71402000,
@@ -335,11 +291,7 @@
       "regionId": 12000400,
       "landCulture": 0,
       "landGrade": 1,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71402500": {
       "id": 71402500,
@@ -372,11 +324,7 @@
       "regionId": 12000500,
       "landCulture": 0,
       "landGrade": 1,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71403000": {
       "id": 71403000,
@@ -407,11 +355,7 @@
       "regionId": 12001503,
       "landCulture": 2,
       "landGrade": 19,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71403001": {
       "id": 71403001,
@@ -442,11 +386,7 @@
       "regionId": 12001504,
       "landCulture": 2,
       "landGrade": 13,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71403500": {
       "id": 71403500,
@@ -479,11 +419,7 @@
       "regionId": 12000700,
       "landCulture": 2,
       "landGrade": 1,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71403510": {
       "id": 71403510,
@@ -514,11 +450,7 @@
       "regionId": 12001500,
       "landCulture": 2,
       "landGrade": 13,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71404000": {
       "id": 71404000,
@@ -551,11 +483,7 @@
       "regionId": 12001200,
       "landCulture": 0,
       "landGrade": 1,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71404500": {
       "id": 71404500,
@@ -588,11 +516,7 @@
       "regionId": 12001200,
       "landCulture": 0,
       "landGrade": 1,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71404505": {
       "id": 71404505,
@@ -622,11 +546,7 @@
       "regionId": 12001200,
       "landCulture": 0,
       "landGrade": 1,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71404510": {
       "id": 71404510,
@@ -656,11 +576,7 @@
       "regionId": 12001200,
       "landCulture": 0,
       "landGrade": 1,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71405000": {
       "id": 71405000,
@@ -691,11 +607,7 @@
       "regionId": 12001500,
       "landCulture": 2,
       "landGrade": 13,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71405500": {
       "id": 71405500,
@@ -728,11 +640,7 @@
       "regionId": 12000400,
       "landCulture": 0,
       "landGrade": 1,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71406000": {
       "id": 71406000,
@@ -765,11 +673,7 @@
       "regionId": 12000700,
       "landCulture": 2,
       "landGrade": 1,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71410000": {
       "id": 71410000,
@@ -802,11 +706,7 @@
       "regionId": 12000000,
       "landCulture": 0,
       "landGrade": 1,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71410500": {
       "id": 71410500,
@@ -839,11 +739,7 @@
       "regionId": 12001600,
       "landCulture": 0,
       "landGrade": 1,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71411000": {
       "id": 71411000,
@@ -876,11 +772,7 @@
       "regionId": 12000900,
       "landCulture": 0,
       "landGrade": 2,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71411500": {
       "id": 71411500,
@@ -911,11 +803,7 @@
       "regionId": 12000900,
       "landCulture": 0,
       "landGrade": 3,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71411510": {
       "id": 71411510,
@@ -946,11 +834,7 @@
       "regionId": 12000900,
       "landCulture": 0,
       "landGrade": 3,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71411520": {
       "id": 71411520,
@@ -981,11 +865,7 @@
       "regionId": 12001800,
       "landCulture": 0,
       "landGrade": 4,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71412000": {
       "id": 71412000,
@@ -1016,11 +896,7 @@
       "regionId": 12001800,
       "landCulture": 0,
       "landGrade": 4,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71413000": {
       "id": 71413000,
@@ -1053,11 +929,7 @@
       "regionId": 12001800,
       "landCulture": 0,
       "landGrade": 5,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71413001": {
       "id": 71413001,
@@ -1088,11 +960,7 @@
       "regionId": 12001800,
       "landCulture": 0,
       "landGrade": 5,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71413002": {
       "id": 71413002,
@@ -1125,11 +993,7 @@
       "regionId": 12001800,
       "landCulture": 0,
       "landGrade": 5,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71413010": {
       "id": 71413010,
@@ -1160,11 +1024,7 @@
       "regionId": 12001800,
       "landCulture": 0,
       "landGrade": 5,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71413011": {
       "id": 71413011,
@@ -1195,11 +1055,7 @@
       "regionId": 12001800,
       "landCulture": 0,
       "landGrade": 5,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71413500": {
       "id": 71413500,
@@ -1232,11 +1088,7 @@
       "regionId": 12001800,
       "landCulture": 0,
       "landGrade": 5,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71413501": {
       "id": 71413501,
@@ -1269,11 +1121,7 @@
       "regionId": 12001800,
       "landCulture": 0,
       "landGrade": 5,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71413502": {
       "id": 71413502,
@@ -1306,11 +1154,7 @@
       "regionId": 12001800,
       "landCulture": 0,
       "landGrade": 5,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71414500": {
       "id": 71414500,
@@ -1342,11 +1186,7 @@
       "regionId": 12001800,
       "landCulture": 0,
       "landGrade": 5,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71414501": {
       "id": 71414501,
@@ -1380,11 +1220,7 @@
       "regionId": 12001800,
       "landCulture": 0,
       "landGrade": 5,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71414502": {
       "id": 71414502,
@@ -1418,11 +1254,7 @@
       "regionId": 12001800,
       "landCulture": 0,
       "landGrade": 5,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71414503": {
       "id": 71414503,
@@ -1456,11 +1288,7 @@
       "regionId": 12001800,
       "landCulture": 0,
       "landGrade": 5,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71415000": {
       "id": 71415000,
@@ -1493,11 +1321,7 @@
       "regionId": 12001600,
       "landCulture": 0,
       "landGrade": 4,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71420000": {
       "id": 71420000,
@@ -1530,11 +1354,7 @@
       "regionId": 12000301,
       "landCulture": 2,
       "landGrade": 11,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71420010": {
       "id": 71420010,
@@ -1567,11 +1387,7 @@
       "regionId": 12000301,
       "landCulture": 1,
       "landGrade": 8,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71420011": {
       "id": 71420011,
@@ -1602,11 +1418,7 @@
       "regionId": 12000301,
       "landCulture": 1,
       "landGrade": 8,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71420020": {
       "id": 71420020,
@@ -1639,11 +1451,7 @@
       "regionId": 12000301,
       "landCulture": 1,
       "landGrade": 8,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71420500": {
       "id": 71420500,
@@ -1674,11 +1482,7 @@
       "regionId": 12000302,
       "landCulture": 1,
       "landGrade": 8,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71420501": {
       "id": 71420501,
@@ -1711,11 +1515,7 @@
       "regionId": 12000302,
       "landCulture": 1,
       "landGrade": 8,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71420502": {
       "id": 71420502,
@@ -1748,11 +1548,7 @@
       "regionId": 12000302,
       "landCulture": 1,
       "landGrade": 8,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71420503": {
       "id": 71420503,
@@ -1783,11 +1579,7 @@
       "regionId": 12000302,
       "landCulture": 1,
       "landGrade": 8,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71420504": {
       "id": 71420504,
@@ -1818,11 +1610,7 @@
       "regionId": 12000302,
       "landCulture": 1,
       "landGrade": 8,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71420505": {
       "id": 71420505,
@@ -1853,11 +1641,7 @@
       "regionId": 12000302,
       "landCulture": 1,
       "landGrade": 8,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71420506": {
       "id": 71420506,
@@ -1890,11 +1674,7 @@
       "regionId": 12000302,
       "landCulture": 1,
       "landGrade": 8,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71420510": {
       "id": 71420510,
@@ -1927,11 +1707,7 @@
       "regionId": 12000300,
       "landCulture": 2,
       "landGrade": 11,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71420511": {
       "id": 71420511,
@@ -1962,11 +1738,7 @@
       "regionId": 12000300,
       "landCulture": 2,
       "landGrade": 11,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71420512": {
       "id": 71420512,
@@ -1997,11 +1769,7 @@
       "regionId": 12000300,
       "landCulture": 2,
       "landGrade": 11,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71420513": {
       "id": 71420513,
@@ -2034,11 +1802,7 @@
       "regionId": 12000300,
       "landCulture": 2,
       "landGrade": 11,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71420520": {
       "id": 71420520,
@@ -2071,11 +1835,7 @@
       "regionId": 12000300,
       "landCulture": 2,
       "landGrade": 11,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71420521": {
       "id": 71420521,
@@ -2108,11 +1868,7 @@
       "regionId": 12000300,
       "landCulture": 2,
       "landGrade": 11,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71420530": {
       "id": 71420530,
@@ -2143,11 +1899,7 @@
       "regionId": 12000302,
       "landCulture": 1,
       "landGrade": 8,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71420531": {
       "id": 71420531,
@@ -2178,11 +1930,7 @@
       "regionId": 12000302,
       "landCulture": 1,
       "landGrade": 8,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71421000": {
       "id": 71421000,
@@ -2213,11 +1961,7 @@
       "regionId": 12000800,
       "landCulture": 1,
       "landGrade": 8,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71421001": {
       "id": 71421001,
@@ -2250,11 +1994,7 @@
       "regionId": 12000800,
       "landCulture": 1,
       "landGrade": 8,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71421002": {
       "id": 71421002,
@@ -2287,11 +2027,7 @@
       "regionId": 12000800,
       "landCulture": 1,
       "landGrade": 8,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71421010": {
       "id": 71421010,
@@ -2324,11 +2060,7 @@
       "regionId": 12000800,
       "landCulture": 1,
       "landGrade": 7,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71421011": {
       "id": 71421011,
@@ -2359,11 +2091,7 @@
       "regionId": 12000800,
       "landCulture": 1,
       "landGrade": 7,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71421012": {
       "id": 71421012,
@@ -2394,11 +2122,7 @@
       "regionId": 12000800,
       "landCulture": 1,
       "landGrade": 7,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71421020": {
       "id": 71421020,
@@ -2431,11 +2155,7 @@
       "regionId": 12000800,
       "landCulture": 2,
       "landGrade": 8,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71421030": {
       "id": 71421030,
@@ -2468,11 +2188,7 @@
       "regionId": 12000800,
       "landCulture": 2,
       "landGrade": 8,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71421500": {
       "id": 71421500,
@@ -2503,11 +2219,7 @@
       "regionId": 12000100,
       "landCulture": 1,
       "landGrade": 6,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71421501": {
       "id": 71421501,
@@ -2537,11 +2249,7 @@
       "regionId": 12000100,
       "landCulture": 2,
       "landGrade": 23,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71421502": {
       "id": 71421502,
@@ -2574,11 +2282,7 @@
       "regionId": 12000100,
       "landCulture": 1,
       "landGrade": 6,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71421503": {
       "id": 71421503,
@@ -2611,11 +2315,7 @@
       "regionId": 12000100,
       "landCulture": 1,
       "landGrade": 6,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71421504": {
       "id": 71421504,
@@ -2648,11 +2348,7 @@
       "regionId": 12000100,
       "landCulture": 1,
       "landGrade": 6,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71421505": {
       "id": 71421505,
@@ -2685,11 +2381,7 @@
       "regionId": 12000100,
       "landCulture": 1,
       "landGrade": 6,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71421506": {
       "id": 71421506,
@@ -2720,11 +2412,7 @@
       "regionId": 12000100,
       "landCulture": 1,
       "landGrade": 6,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71421510": {
       "id": 71421510,
@@ -2755,11 +2443,7 @@
       "regionId": 12002000,
       "landCulture": 1,
       "landGrade": 6,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71421511": {
       "id": 71421511,
@@ -2792,11 +2476,7 @@
       "regionId": 12002000,
       "landCulture": 1,
       "landGrade": 6,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71422000": {
       "id": 71422000,
@@ -2827,11 +2507,7 @@
       "regionId": 12001100,
       "landCulture": 0,
       "landGrade": 5,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71422001": {
       "id": 71422001,
@@ -2864,11 +2540,7 @@
       "regionId": 12001100,
       "landCulture": 0,
       "landGrade": 5,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71422002": {
       "id": 71422002,
@@ -2901,11 +2573,7 @@
       "regionId": 12001100,
       "landCulture": 0,
       "landGrade": 5,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71422500": {
       "id": 71422500,
@@ -2938,11 +2606,7 @@
       "regionId": 12001100,
       "landCulture": 0,
       "landGrade": 5,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71422501": {
       "id": 71422501,
@@ -2975,11 +2639,7 @@
       "regionId": 12001100,
       "landCulture": 0,
       "landGrade": 5,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71422502": {
       "id": 71422502,
@@ -3012,11 +2672,7 @@
       "regionId": 12001100,
       "landCulture": 0,
       "landGrade": 5,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71422503": {
       "id": 71422503,
@@ -3047,11 +2703,7 @@
       "regionId": 12001100,
       "landCulture": 0,
       "landGrade": 5,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71423000": {
       "id": 71423000,
@@ -3082,11 +2734,7 @@
       "regionId": 12002000,
       "landCulture": 2,
       "landGrade": 5,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71423001": {
       "id": 71423001,
@@ -3119,11 +2767,7 @@
       "regionId": 12002000,
       "landCulture": 2,
       "landGrade": 5,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71423002": {
       "id": 71423002,
@@ -3156,11 +2800,7 @@
       "regionId": 12002000,
       "landCulture": 2,
       "landGrade": 5,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71423005": {
       "id": 71423005,
@@ -3190,11 +2830,7 @@
       "regionId": 12002000,
       "landCulture": 2,
       "landGrade": 21,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71423010": {
       "id": 71423010,
@@ -3227,11 +2863,7 @@
       "regionId": 12002000,
       "landCulture": 2,
       "landGrade": 6,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71423011": {
       "id": 71423011,
@@ -3264,11 +2896,7 @@
       "regionId": 12002000,
       "landCulture": 2,
       "landGrade": 6,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71423012": {
       "id": 71423012,
@@ -3299,11 +2927,7 @@
       "regionId": 12002000,
       "landCulture": 2,
       "landGrade": 6,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71423013": {
       "id": 71423013,
@@ -3336,11 +2960,7 @@
       "regionId": 12002000,
       "landCulture": 2,
       "landGrade": 6,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71423500": {
       "id": 71423500,
@@ -3373,11 +2993,7 @@
       "regionId": 12001400,
       "landCulture": 1,
       "landGrade": 7,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71423501": {
       "id": 71423501,
@@ -3408,11 +3024,7 @@
       "regionId": 12001400,
       "landCulture": 1,
       "landGrade": 7,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71423502": {
       "id": 71423502,
@@ -3445,11 +3057,7 @@
       "regionId": 12001400,
       "landCulture": 1,
       "landGrade": 7,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71423503": {
       "id": 71423503,
@@ -3482,11 +3090,7 @@
       "regionId": 12001400,
       "landCulture": 1,
       "landGrade": 7,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71423504": {
       "id": 71423504,
@@ -3519,11 +3123,7 @@
       "regionId": 12001400,
       "landCulture": 1,
       "landGrade": 7,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71423505": {
       "id": 71423505,
@@ -3554,11 +3154,7 @@
       "regionId": 12001400,
       "landCulture": 1,
       "landGrade": 7,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71423506": {
       "id": 71423506,
@@ -3591,11 +3187,7 @@
       "regionId": 12001400,
       "landCulture": 1,
       "landGrade": 7,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71423510": {
       "id": 71423510,
@@ -3628,11 +3220,7 @@
       "regionId": 12001400,
       "landCulture": 1,
       "landGrade": 7,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71423511": {
       "id": 71423511,
@@ -3665,11 +3253,7 @@
       "regionId": 12001400,
       "landCulture": 1,
       "landGrade": 7,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71423512": {
       "id": 71423512,
@@ -3702,11 +3286,7 @@
       "regionId": 12001400,
       "landCulture": 1,
       "landGrade": 7,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71423513": {
       "id": 71423513,
@@ -3739,11 +3319,7 @@
       "regionId": 12001400,
       "landCulture": 1,
       "landGrade": 7,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71423520": {
       "id": 71423520,
@@ -3776,11 +3352,7 @@
       "regionId": 12001400,
       "landCulture": 1,
       "landGrade": 7,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71423521": {
       "id": 71423521,
@@ -3811,11 +3383,7 @@
       "regionId": 12001400,
       "landCulture": 1,
       "landGrade": 7,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71423522": {
       "id": 71423522,
@@ -3848,11 +3416,7 @@
       "regionId": 12001400,
       "landCulture": 1,
       "landGrade": 7,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71423523": {
       "id": 71423523,
@@ -3885,11 +3449,7 @@
       "regionId": 12001400,
       "landCulture": 1,
       "landGrade": 7,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71423524": {
       "id": 71423524,
@@ -3922,11 +3482,7 @@
       "regionId": 12001400,
       "landCulture": 1,
       "landGrade": 7,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71424000": {
       "id": 71424000,
@@ -3960,11 +3516,7 @@
       "regionId": 12001400,
       "landCulture": 1,
       "landGrade": 8,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71424500": {
       "id": 71424500,
@@ -3997,11 +3549,7 @@
       "regionId": 12000302,
       "landCulture": 1,
       "landGrade": 8,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71425000": {
       "id": 71425000,
@@ -4031,11 +3579,7 @@
       "regionId": 12001504,
       "landCulture": 2,
       "landGrade": 11,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71430000": {
       "id": 71430000,
@@ -4068,11 +3612,7 @@
       "regionId": 12001300,
       "landCulture": 0,
       "landGrade": 2,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71430500": {
       "id": 71430500,
@@ -4103,11 +3643,7 @@
       "regionId": 12001900,
       "landCulture": 0,
       "landGrade": 2,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71430510": {
       "id": 71430510,
@@ -4138,11 +3674,7 @@
       "regionId": 12001900,
       "landCulture": 0,
       "landGrade": 2,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71430515": {
       "id": 71430515,
@@ -4174,11 +3706,7 @@
       "regionId": 12001900,
       "landCulture": 2,
       "landGrade": 22,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71430520": {
       "id": 71430520,
@@ -4209,11 +3737,7 @@
       "regionId": 12001900,
       "landCulture": 0,
       "landGrade": 2,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71431000": {
       "id": 71431000,
@@ -4244,11 +3768,7 @@
       "regionId": 12001300,
       "landCulture": 2,
       "landGrade": 12,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71431500": {
       "id": 71431500,
@@ -4279,11 +3799,7 @@
       "regionId": 12001300,
       "landCulture": 2,
       "landGrade": 11,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71432000": {
       "id": 71432000,
@@ -4314,11 +3830,7 @@
       "regionId": 12001900,
       "landCulture": 0,
       "landGrade": 2,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71432010": {
       "id": 71432010,
@@ -4349,11 +3861,7 @@
       "regionId": 12001900,
       "landCulture": 0,
       "landGrade": 2,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71432020": {
       "id": 71432020,
@@ -4384,11 +3892,7 @@
       "regionId": 12001900,
       "landCulture": 0,
       "landGrade": 2,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71432500": {
       "id": 71432500,
@@ -4419,11 +3923,7 @@
       "regionId": 12000600,
       "landCulture": 0,
       "landGrade": 5,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71432510": {
       "id": 71432510,
@@ -4454,11 +3954,7 @@
       "regionId": 12000600,
       "landCulture": 0,
       "landGrade": 6,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71433000": {
       "id": 71433000,
@@ -4489,11 +3985,7 @@
       "regionId": 12000600,
       "landCulture": 2,
       "landGrade": 7,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71433500": {
       "id": 71433500,
@@ -4524,11 +4016,7 @@
       "regionId": 12000600,
       "landCulture": 0,
       "landGrade": 6,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71434000": {
       "id": 71434000,
@@ -4559,11 +4047,7 @@
       "regionId": 12000600,
       "landCulture": 0,
       "landGrade": 6,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71434500": {
       "id": 71434500,
@@ -4594,11 +4078,7 @@
       "regionId": 12001900,
       "landCulture": 0,
       "landGrade": 2,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71435000": {
       "id": 71435000,
@@ -4629,11 +4109,7 @@
       "regionId": 12001900,
       "landCulture": 0,
       "landGrade": 2,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71440000": {
       "id": 71440000,
@@ -4666,11 +4142,7 @@
       "regionId": 12001700,
       "landCulture": 0,
       "landGrade": 10,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71440001": {
       "id": 71440001,
@@ -4701,11 +4173,7 @@
       "regionId": 12001700,
       "landCulture": 0,
       "landGrade": 10,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71440002": {
       "id": 71440002,
@@ -4738,11 +4206,7 @@
       "regionId": 12001700,
       "landCulture": 0,
       "landGrade": 10,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71440003": {
       "id": 71440003,
@@ -4775,11 +4239,7 @@
       "regionId": 12001700,
       "landCulture": 0,
       "landGrade": 10,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71440500": {
       "id": 71440500,
@@ -4812,11 +4272,7 @@
       "regionId": 12001700,
       "landCulture": 0,
       "landGrade": 9,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71440501": {
       "id": 71440501,
@@ -4849,11 +4305,7 @@
       "regionId": 12001700,
       "landCulture": 0,
       "landGrade": 9,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71440502": {
       "id": 71440502,
@@ -4884,11 +4336,7 @@
       "regionId": 12001700,
       "landCulture": 0,
       "landGrade": 9,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71440503": {
       "id": 71440503,
@@ -4921,11 +4369,7 @@
       "regionId": 12001700,
       "landCulture": 0,
       "landGrade": 9,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71440504": {
       "id": 71440504,
@@ -4958,11 +4402,7 @@
       "regionId": 12001700,
       "landCulture": 0,
       "landGrade": 9,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71441000": {
       "id": 71441000,
@@ -4995,11 +4435,7 @@
       "regionId": 12001700,
       "landCulture": 0,
       "landGrade": 9,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71441001": {
       "id": 71441001,
@@ -5032,11 +4468,7 @@
       "regionId": 12001700,
       "landCulture": 0,
       "landGrade": 9,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71441002": {
       "id": 71441002,
@@ -5069,11 +4501,7 @@
       "regionId": 12001700,
       "landCulture": 0,
       "landGrade": 9,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71441003": {
       "id": 71441003,
@@ -5106,11 +4534,7 @@
       "regionId": 12001700,
       "landCulture": 0,
       "landGrade": 9,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71441004": {
       "id": 71441004,
@@ -5143,11 +4567,7 @@
       "regionId": 12001700,
       "landCulture": 0,
       "landGrade": 9,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71441500": {
       "id": 71441500,
@@ -5180,11 +4600,7 @@
       "regionId": 12002000,
       "landCulture": 2,
       "landGrade": 10,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71441501": {
       "id": 71441501,
@@ -5217,11 +4633,7 @@
       "regionId": 12002000,
       "landCulture": 2,
       "landGrade": 10,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71441502": {
       "id": 71441502,
@@ -5252,11 +4664,7 @@
       "regionId": 12002000,
       "landCulture": 2,
       "landGrade": 10,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71441503": {
       "id": 71441503,
@@ -5287,11 +4695,7 @@
       "regionId": 12002000,
       "landCulture": 2,
       "landGrade": 10,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71441504": {
       "id": 71441504,
@@ -5324,11 +4728,7 @@
       "regionId": 12002000,
       "landCulture": 2,
       "landGrade": 10,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71442000": {
       "id": 71442000,
@@ -5360,11 +4760,7 @@
       "regionId": 12001400,
       "landCulture": 1,
       "landGrade": 8,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71442001": {
       "id": 71442001,
@@ -5396,11 +4792,7 @@
       "regionId": 12001400,
       "landCulture": 1,
       "landGrade": 8,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71442002": {
       "id": 71442002,
@@ -5430,11 +4822,7 @@
       "regionId": 12001400,
       "landCulture": 1,
       "landGrade": 8,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71442003": {
       "id": 71442003,
@@ -5466,11 +4854,7 @@
       "regionId": 12001400,
       "landCulture": 1,
       "landGrade": 8,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71442004": {
       "id": 71442004,
@@ -5502,11 +4886,7 @@
       "regionId": 12001400,
       "landCulture": 1,
       "landGrade": 8,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71442010": {
       "id": 71442010,
@@ -5537,11 +4917,7 @@
       "regionId": 12001700,
       "landCulture": 1,
       "landGrade": 10,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71442011": {
       "id": 71442011,
@@ -5574,11 +4950,7 @@
       "regionId": 12001700,
       "landCulture": 1,
       "landGrade": 10,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71442012": {
       "id": 71442012,
@@ -5609,11 +4981,7 @@
       "regionId": 12001700,
       "landCulture": 1,
       "landGrade": 10,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71442500": {
       "id": 71442500,
@@ -5644,11 +5012,7 @@
       "regionId": 12001700,
       "landCulture": 2,
       "landGrade": 14,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71442501": {
       "id": 71442501,
@@ -5681,11 +5045,7 @@
       "regionId": 12001700,
       "landCulture": 2,
       "landGrade": 14,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71442502": {
       "id": 71442502,
@@ -5716,11 +5076,7 @@
       "regionId": 12001700,
       "landCulture": 2,
       "landGrade": 14,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71442503": {
       "id": 71442503,
@@ -5751,11 +5107,7 @@
       "regionId": 12001700,
       "landCulture": 2,
       "landGrade": 14,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71442504": {
       "id": 71442504,
@@ -5786,11 +5138,7 @@
       "regionId": 12001700,
       "landCulture": 2,
       "landGrade": 14,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71442505": {
       "id": 71442505,
@@ -5823,11 +5171,7 @@
       "regionId": 12001700,
       "landCulture": 2,
       "landGrade": 14,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71442506": {
       "id": 71442506,
@@ -5858,11 +5202,7 @@
       "regionId": 12001700,
       "landCulture": 2,
       "landGrade": 14,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71442507": {
       "id": 71442507,
@@ -5895,11 +5235,7 @@
       "regionId": 12001700,
       "landCulture": 2,
       "landGrade": 14,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71443000": {
       "id": 71443000,
@@ -5930,11 +5266,7 @@
       "regionId": 12001700,
       "landCulture": 2,
       "landGrade": 14,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71443001": {
       "id": 71443001,
@@ -5967,11 +5299,7 @@
       "regionId": 12001700,
       "landCulture": 2,
       "landGrade": 14,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71443002": {
       "id": 71443002,
@@ -6004,11 +5332,7 @@
       "regionId": 12001700,
       "landCulture": 2,
       "landGrade": 14,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71443003": {
       "id": 71443003,
@@ -6041,11 +5365,7 @@
       "regionId": 12001700,
       "landCulture": 2,
       "landGrade": 14,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71443004": {
       "id": 71443004,
@@ -6078,11 +5398,7 @@
       "regionId": 12001700,
       "landCulture": 2,
       "landGrade": 14,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71445000": {
       "id": 71445000,
@@ -6113,11 +5429,7 @@
       "regionId": 12010100,
       "landCulture": 2,
       "landGrade": 15,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71445500": {
       "id": 71445500,
@@ -6147,11 +5459,7 @@
       "regionId": 12001503,
       "landCulture": 2,
       "landGrade": 12,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71445505": {
       "id": 71445505,
@@ -6181,11 +5489,7 @@
       "regionId": 12001504,
       "landCulture": 2,
       "landGrade": 20,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71445510": {
       "id": 71445510,
@@ -6215,11 +5519,7 @@
       "regionId": 12001504,
       "landCulture": 2,
       "landGrade": 20,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71445515": {
       "id": 71445515,
@@ -6249,11 +5549,7 @@
       "regionId": 12001504,
       "landCulture": 2,
       "landGrade": 20,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71445520": {
       "id": 71445520,
@@ -6283,11 +5579,7 @@
       "regionId": 12001504,
       "landCulture": 2,
       "landGrade": 20,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71446000": {
       "id": 71446000,
@@ -6317,11 +5609,7 @@
       "regionId": 12001505,
       "landCulture": 0,
       "landGrade": 10,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71446005": {
       "id": 71446005,
@@ -6351,11 +5639,7 @@
       "regionId": 12001504,
       "landCulture": 2,
       "landGrade": 20,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71446500": {
       "id": 71446500,
@@ -6386,11 +5670,7 @@
       "regionId": 12001300,
       "landCulture": 0,
       "landGrade": 6,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71447000": {
       "id": 71447000,
@@ -6420,11 +5700,7 @@
       "regionId": 12001503,
       "landCulture": 2,
       "landGrade": 12,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71447500": {
       "id": 71447500,
@@ -6454,11 +5730,7 @@
       "regionId": 12011000,
       "landCulture": 0,
       "landGrade": 10,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71447510": {
       "id": 71447510,
@@ -6488,11 +5760,7 @@
       "regionId": 12010400,
       "landCulture": 0,
       "landGrade": 10,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71447520": {
       "id": 71447520,
@@ -6522,11 +5790,7 @@
       "regionId": 12011200,
       "landCulture": 0,
       "landGrade": 10,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71447540": {
       "id": 71447540,
@@ -6556,11 +5820,7 @@
       "regionId": 12010300,
       "landCulture": 0,
       "landGrade": 10,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71448000": {
       "id": 71448000,
@@ -6591,11 +5851,7 @@
       "regionId": 12001300,
       "landCulture": 0,
       "landGrade": 7,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71448500": {
       "id": 71448500,
@@ -6626,11 +5882,7 @@
       "regionId": 12001500,
       "landCulture": 0,
       "landGrade": 6,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71449000": {
       "id": 71449000,
@@ -6661,11 +5913,7 @@
       "regionId": 12001500,
       "landCulture": 0,
       "landGrade": 6,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71449001": {
       "id": 71449001,
@@ -6696,11 +5944,7 @@
       "regionId": 12011400,
       "landCulture": 0,
       "landGrade": 101,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71449002": {
       "id": 71449002,
@@ -6731,11 +5975,7 @@
       "regionId": 12001500,
       "landCulture": 0,
       "landGrade": 101,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71449003": {
       "id": 71449003,
@@ -6764,11 +6004,7 @@
       "discoveryGroup": 77600148,
       "landCulture": 2,
       "landGrade": 13,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71449004": {
       "id": 71449004,
@@ -6797,11 +6033,7 @@
       "discoveryGroup": 77600149,
       "landCulture": 2,
       "landGrade": 13,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71449005": {
       "id": 71449005,
@@ -6829,11 +6061,7 @@
       "discoveryGroup": 77600150,
       "landCulture": 0,
       "landGrade": 1000,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71449006": {
       "id": 71449006,
@@ -6861,11 +6089,7 @@
       "discoveryGroup": 77600151,
       "landCulture": 0,
       "landGrade": 1000,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71449007": {
       "id": 71449007,
@@ -6893,11 +6117,7 @@
       "discoveryGroup": 77600152,
       "landCulture": 1,
       "landGrade": 1000,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71449008": {
       "id": 71449008,
@@ -6925,11 +6145,7 @@
       "discoveryGroup": 77600153,
       "landCulture": 1,
       "landGrade": 1000,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71449009": {
       "id": 71449009,
@@ -6957,11 +6173,7 @@
       "discoveryGroup": 77600154,
       "landCulture": 1,
       "landGrade": 1000,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71449010": {
       "id": 71449010,
@@ -6989,11 +6201,7 @@
       "discoveryGroup": 77600155,
       "landCulture": 1,
       "landGrade": 1000,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71449011": {
       "id": 71449011,
@@ -7021,11 +6229,7 @@
       "discoveryGroup": 77600156,
       "landCulture": 0,
       "landGrade": 1000,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71449012": {
       "id": 71449012,
@@ -7053,11 +6257,7 @@
       "discoveryGroup": 77600157,
       "landCulture": 0,
       "landGrade": 1000,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71449013": {
       "id": 71449013,
@@ -7085,11 +6285,7 @@
       "discoveryGroup": 77600158,
       "landCulture": 0,
       "landGrade": 1000,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71449014": {
       "id": 71449014,
@@ -7119,11 +6315,7 @@
       "dispatchGroup": 2601,
       "landCulture": 2,
       "landGrade": 16,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71449015": {
       "id": 71449015,
@@ -7153,11 +6345,7 @@
       "dispatchGroup": 2701,
       "landCulture": 2,
       "landGrade": 17,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71449016": {
       "id": 71449016,
@@ -7186,11 +6374,7 @@
       "discoveryGroup": 77600160,
       "landCulture": 2,
       "landGrade": 17,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71449017": {
       "id": 71449017,
@@ -7219,11 +6403,7 @@
       "discoveryGroup": 77600161,
       "landCulture": 2,
       "landGrade": 17,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71449018": {
       "id": 71449018,
@@ -7252,11 +6432,7 @@
       "discoveryGroup": 77600162,
       "landCulture": 2,
       "landGrade": 18,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71450001": {
       "id": 71450001,
@@ -7288,11 +6464,7 @@
       "discoveryGroup": 77600014,
       "landCulture": 0,
       "landGrade": 1,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71450002": {
       "id": 71450002,
@@ -7324,11 +6496,7 @@
       "discoveryGroup": 77600003,
       "landCulture": 0,
       "landGrade": 1,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71450003": {
       "id": 71450003,
@@ -7358,11 +6526,7 @@
       "discoveryGroup": 77600020,
       "landCulture": 0,
       "landGrade": 4,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71450004": {
       "id": 71450004,
@@ -7394,11 +6558,7 @@
       "discoveryGroup": 77600004,
       "landCulture": 0,
       "landGrade": 1,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71450005": {
       "id": 71450005,
@@ -7430,11 +6590,7 @@
       "discoveryGroup": 77600015,
       "landCulture": 0,
       "landGrade": 1,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71450006": {
       "id": 71450006,
@@ -7464,11 +6620,7 @@
       "discoveryGroup": 77600041,
       "landCulture": 2,
       "landGrade": 5,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71450007": {
       "id": 71450007,
@@ -7500,11 +6652,7 @@
       "discoveryGroup": 77600002,
       "landCulture": 0,
       "landGrade": 1,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71450008": {
       "id": 71450008,
@@ -7534,11 +6682,7 @@
       "discoveryGroup": 77600082,
       "landCulture": 0,
       "landGrade": 7,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71450009": {
       "id": 71450009,
@@ -7570,11 +6714,7 @@
       "discoveryGroup": 77600013,
       "landCulture": 0,
       "landGrade": 1,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71450010": {
       "id": 71450010,
@@ -7604,11 +6744,7 @@
       "discoveryGroup": 77600039,
       "landCulture": 0,
       "landGrade": 5,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71450011": {
       "id": 71450011,
@@ -7640,11 +6776,7 @@
       "discoveryGroup": 77600015,
       "landCulture": 0,
       "landGrade": 1,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71450012": {
       "id": 71450012,
@@ -7676,11 +6808,7 @@
       "discoveryGroup": 77600002,
       "landCulture": 0,
       "landGrade": 1,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71450013": {
       "id": 71450013,
@@ -7710,11 +6838,7 @@
       "discoveryGroup": 77600026,
       "landCulture": 1,
       "landGrade": 11,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71450015": {
       "id": 71450015,
@@ -7744,11 +6868,7 @@
       "discoveryGroup": 77600041,
       "landCulture": 2,
       "landGrade": 5,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71450016": {
       "id": 71450016,
@@ -7778,11 +6898,7 @@
       "discoveryGroup": 77600063,
       "landCulture": 0,
       "landGrade": 2,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71450020": {
       "id": 71450020,
@@ -7812,11 +6928,7 @@
       "discoveryGroup": 77600026,
       "landCulture": 1,
       "landGrade": 11,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71450021": {
       "id": 71450021,
@@ -7846,11 +6958,7 @@
       "discoveryGroup": 77600006,
       "landCulture": 2,
       "landGrade": 19,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71450023": {
       "id": 71450023,
@@ -7880,11 +6988,7 @@
       "discoveryGroup": 77600040,
       "landCulture": 0,
       "landGrade": 5,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71450024": {
       "id": 71450024,
@@ -7914,11 +7018,7 @@
       "discoveryGroup": 77600063,
       "landCulture": 0,
       "landGrade": 2,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71450025": {
       "id": 71450025,
@@ -7948,11 +7048,7 @@
       "discoveryGroup": 77600020,
       "landCulture": 0,
       "landGrade": 4,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71450026": {
       "id": 71450026,
@@ -7982,11 +7078,7 @@
       "discoveryGroup": 77600042,
       "landCulture": 2,
       "landGrade": 6,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71450027": {
       "id": 71450027,
@@ -8016,11 +7108,7 @@
       "discoveryGroup": 77600020,
       "landCulture": 0,
       "landGrade": 4,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71450028": {
       "id": 71450028,
@@ -8050,11 +7138,7 @@
       "discoveryGroup": 77600063,
       "landCulture": 0,
       "landGrade": 2,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71450029": {
       "id": 71450029,
@@ -8086,11 +7170,7 @@
       "discoveryGroup": 77600009,
       "landCulture": 0,
       "landGrade": 1,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71450030": {
       "id": 71450030,
@@ -8120,11 +7200,7 @@
       "discoveryGroup": 77600025,
       "landCulture": 0,
       "landGrade": 4,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71450031": {
       "id": 71450031,
@@ -8154,11 +7230,7 @@
       "discoveryGroup": 77600033,
       "landCulture": 1,
       "landGrade": 8,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71450032": {
       "id": 71450032,
@@ -8190,11 +7262,7 @@
       "discoveryGroup": 77600001,
       "landCulture": 0,
       "landGrade": 1,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71450033": {
       "id": 71450033,
@@ -8226,11 +7294,7 @@
       "discoveryGroup": 77600015,
       "landCulture": 0,
       "landGrade": 1,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71450034": {
       "id": 71450034,
@@ -8260,11 +7324,7 @@
       "discoveryGroup": 77600083,
       "landCulture": 0,
       "landGrade": 6,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71450035": {
       "id": 71450035,
@@ -8294,11 +7354,7 @@
       "discoveryGroup": 77600070,
       "landCulture": 0,
       "landGrade": 10,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71450036": {
       "id": 71450036,
@@ -8330,11 +7386,7 @@
       "discoveryGroup": 77600007,
       "landCulture": 0,
       "landGrade": 1,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71450037": {
       "id": 71450037,
@@ -8366,11 +7418,7 @@
       "discoveryGroup": 77600012,
       "landCulture": 0,
       "landGrade": 1,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71450038": {
       "id": 71450038,
@@ -8400,11 +7448,7 @@
       "discoveryGroup": 77600062,
       "landCulture": 0,
       "landGrade": 2,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71450039": {
       "id": 71450039,
@@ -8436,11 +7480,7 @@
       "discoveryGroup": 77600002,
       "landCulture": 0,
       "landGrade": 1,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71450040": {
       "id": 71450040,
@@ -8470,11 +7510,7 @@
       "discoveryGroup": 77600054,
       "landCulture": 0,
       "landGrade": 2,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71450041": {
       "id": 71450041,
@@ -8506,11 +7542,7 @@
       "discoveryGroup": 77600004,
       "landCulture": 0,
       "landGrade": 1,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71450042": {
       "id": 71450042,
@@ -8542,11 +7574,7 @@
       "discoveryGroup": 77600000,
       "landCulture": 0,
       "landGrade": 1,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71450043": {
       "id": 71450043,
@@ -8576,11 +7604,7 @@
       "discoveryGroup": 77600023,
       "landCulture": 0,
       "landGrade": 5,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71450044": {
       "id": 71450044,
@@ -8610,11 +7634,7 @@
       "discoveryGroup": 77600077,
       "landCulture": 0,
       "landGrade": 12,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71450045": {
       "id": 71450045,
@@ -8644,11 +7664,7 @@
       "discoveryGroup": 77600077,
       "landCulture": 0,
       "landGrade": 12,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71450046": {
       "id": 71450046,
@@ -8678,11 +7694,7 @@
       "discoveryGroup": 77600077,
       "landCulture": 0,
       "landGrade": 12,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71450047": {
       "id": 71450047,
@@ -8712,11 +7724,7 @@
       "discoveryGroup": 77600077,
       "landCulture": 0,
       "landGrade": 12,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71450048": {
       "id": 71450048,
@@ -8746,11 +7754,7 @@
       "discoveryGroup": 77600073,
       "landCulture": 0,
       "landGrade": 12,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71450049": {
       "id": 71450049,
@@ -8780,11 +7784,7 @@
       "discoveryGroup": 77600073,
       "landCulture": 0,
       "landGrade": 12,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71450050": {
       "id": 71450050,
@@ -8814,11 +7814,7 @@
       "discoveryGroup": 77600073,
       "landCulture": 0,
       "landGrade": 12,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71450051": {
       "id": 71450051,
@@ -8850,11 +7846,7 @@
       "discoveryGroup": 77600002,
       "landCulture": 0,
       "landGrade": 1,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71450052": {
       "id": 71450052,
@@ -8884,11 +7876,7 @@
       "discoveryGroup": 77600025,
       "landCulture": 0,
       "landGrade": 4,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71450053": {
       "id": 71450053,
@@ -8920,11 +7908,7 @@
       "discoveryGroup": 77600003,
       "landCulture": 0,
       "landGrade": 1,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71450054": {
       "id": 71450054,
@@ -8954,11 +7938,7 @@
       "discoveryGroup": 77600160,
       "landCulture": 2,
       "landGrade": 17,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71450055": {
       "id": 71450055,
@@ -8988,11 +7968,7 @@
       "discoveryGroup": 77600161,
       "landCulture": 2,
       "landGrade": 17,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71450056": {
       "id": 71450056,
@@ -9022,11 +7998,7 @@
       "discoveryGroup": 77600161,
       "landCulture": 2,
       "landGrade": 17,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71450057": {
       "id": 71450057,
@@ -9056,11 +8028,7 @@
       "discoveryGroup": 77600161,
       "landCulture": 2,
       "landGrade": 17,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71450058": {
       "id": 71450058,
@@ -9092,11 +8060,7 @@
       "discoveryGroup": 77600004,
       "landCulture": 0,
       "landGrade": 1,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71450059": {
       "id": 71450059,
@@ -9126,11 +8090,7 @@
       "discoveryGroup": 77600057,
       "landCulture": 0,
       "landGrade": 5,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71450060": {
       "id": 71450060,
@@ -9160,11 +8120,7 @@
       "discoveryGroup": 77600063,
       "landCulture": 0,
       "landGrade": 2,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71460001": {
       "id": 71460001,
@@ -9194,11 +8150,7 @@
       "discoveryGroup": 77600025,
       "landCulture": 0,
       "landGrade": 4,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71460002": {
       "id": 71460002,
@@ -9228,11 +8180,7 @@
       "discoveryGroup": 77600083,
       "landCulture": 0,
       "landGrade": 6,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71460003": {
       "id": 71460003,
@@ -9262,11 +8210,7 @@
       "discoveryGroup": 77600060,
       "landCulture": 0,
       "landGrade": 6,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71460004": {
       "id": 71460004,
@@ -9296,11 +8240,7 @@
       "discoveryGroup": 77600041,
       "landCulture": 2,
       "landGrade": 5,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71460005": {
       "id": 71460005,
@@ -9330,11 +8270,7 @@
       "discoveryGroup": 77600043,
       "landCulture": 1,
       "landGrade": 7,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71460006": {
       "id": 71460006,
@@ -9364,11 +8300,7 @@
       "discoveryGroup": 77600036,
       "landCulture": 1,
       "landGrade": 8,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71460007": {
       "id": 71460007,
@@ -9398,11 +8330,7 @@
       "discoveryGroup": 77600066,
       "landCulture": 0,
       "landGrade": 10,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71460008": {
       "id": 71460008,
@@ -9432,11 +8360,7 @@
       "discoveryGroup": 77600051,
       "landCulture": 0,
       "landGrade": 2,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71460009": {
       "id": 71460009,
@@ -9466,11 +8390,7 @@
       "discoveryGroup": 77600025,
       "landCulture": 0,
       "landGrade": 4,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71460010": {
       "id": 71460010,
@@ -9500,11 +8420,7 @@
       "discoveryGroup": 77600019,
       "landCulture": 0,
       "landGrade": 4,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71460011": {
       "id": 71460011,
@@ -9536,11 +8452,7 @@
       "discoveryGroup": 77600007,
       "landCulture": 0,
       "landGrade": 1,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71460012": {
       "id": 71460012,
@@ -9572,11 +8484,7 @@
       "discoveryGroup": 77600000,
       "landCulture": 0,
       "landGrade": 1,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71460013": {
       "id": 71460013,
@@ -9606,11 +8514,7 @@
       "discoveryGroup": 77600018,
       "landCulture": 0,
       "landGrade": 3,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71460014": {
       "id": 71460014,
@@ -9640,11 +8544,7 @@
       "discoveryGroup": 77600044,
       "landCulture": 1,
       "landGrade": 7,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71460015": {
       "id": 71460015,
@@ -9674,11 +8574,7 @@
       "discoveryGroup": 77600044,
       "landCulture": 1,
       "landGrade": 7,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71460016": {
       "id": 71460016,
@@ -9708,11 +8604,7 @@
       "discoveryGroup": 77600040,
       "landCulture": 0,
       "landGrade": 5,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71460017": {
       "id": 71460017,
@@ -9744,11 +8636,7 @@
       "discoveryGroup": 77600009,
       "landCulture": 0,
       "landGrade": 1,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71460018": {
       "id": 71460018,
@@ -9780,11 +8668,7 @@
       "discoveryGroup": 77600005,
       "landCulture": 0,
       "landGrade": 1,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71460020": {
       "id": 71460020,
@@ -9816,11 +8700,7 @@
       "discoveryGroup": 77600004,
       "landCulture": 0,
       "landGrade": 1,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71460021": {
       "id": 71460021,
@@ -9852,11 +8732,7 @@
       "discoveryGroup": 77600003,
       "landCulture": 0,
       "landGrade": 1,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71460022": {
       "id": 71460022,
@@ -9888,11 +8764,7 @@
       "discoveryGroup": 77600015,
       "landCulture": 0,
       "landGrade": 1,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71460023": {
       "id": 71460023,
@@ -9924,11 +8796,7 @@
       "discoveryGroup": 77600003,
       "landCulture": 0,
       "landGrade": 1,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71460024": {
       "id": 71460024,
@@ -9958,11 +8826,7 @@
       "discoveryGroup": 77600025,
       "landCulture": 0,
       "landGrade": 4,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71460025": {
       "id": 71460025,
@@ -9992,11 +8856,7 @@
       "discoveryGroup": 77600040,
       "landCulture": 0,
       "landGrade": 5,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71460026": {
       "id": 71460026,
@@ -10026,11 +8886,7 @@
       "discoveryGroup": 77600082,
       "landCulture": 0,
       "landGrade": 7,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71460027": {
       "id": 71460027,
@@ -10060,11 +8916,7 @@
       "discoveryGroup": 77600023,
       "landCulture": 0,
       "landGrade": 5,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71460028": {
       "id": 71460028,
@@ -10096,11 +8948,7 @@
       "discoveryGroup": 77600003,
       "landCulture": 0,
       "landGrade": 1,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71460029": {
       "id": 71460029,
@@ -10130,11 +8978,7 @@
       "discoveryGroup": 77600040,
       "landCulture": 0,
       "landGrade": 5,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71460030": {
       "id": 71460030,
@@ -10164,11 +9008,7 @@
       "discoveryGroup": 77600056,
       "landCulture": 0,
       "landGrade": 2,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71460300": {
       "id": 71460300,
@@ -10199,11 +9039,7 @@
       "regionId": 12001503,
       "landCulture": 2,
       "landGrade": 19,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71460301": {
       "id": 71460301,
@@ -10235,11 +9071,7 @@
       "regionId": 12001500,
       "landCulture": 0,
       "landGrade": 6,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71460302": {
       "id": 71460302,
@@ -10270,11 +9102,7 @@
       "regionId": 12001300,
       "landCulture": 0,
       "landGrade": 6,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71460303": {
       "id": 71460303,
@@ -10305,11 +9133,7 @@
       "regionId": 12001900,
       "landCulture": 0,
       "landGrade": 2,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71460304": {
       "id": 71460304,
@@ -10340,11 +9164,7 @@
       "regionId": 12000600,
       "landCulture": 0,
       "landGrade": 6,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71460305": {
       "id": 71460305,
@@ -10375,11 +9195,7 @@
       "regionId": 12001300,
       "landCulture": 2,
       "landGrade": 12,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71460306": {
       "id": 71460306,
@@ -10410,11 +9226,7 @@
       "regionId": 12000301,
       "landCulture": 1,
       "landGrade": 8,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71460307": {
       "id": 71460307,
@@ -10445,11 +9257,7 @@
       "regionId": 12000800,
       "landCulture": 1,
       "landGrade": 8,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71460308": {
       "id": 71460308,
@@ -10480,11 +9288,7 @@
       "regionId": 12002000,
       "landCulture": 2,
       "landGrade": 6,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71460309": {
       "id": 71460309,
@@ -10515,11 +9319,7 @@
       "regionId": 12002000,
       "landCulture": 2,
       "landGrade": 6,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71460310": {
       "id": 71460310,
@@ -10550,11 +9350,7 @@
       "regionId": 12001700,
       "landCulture": 0,
       "landGrade": 9,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71460311": {
       "id": 71460311,
@@ -10587,11 +9383,7 @@
       "regionId": 12001800,
       "landCulture": 0,
       "landGrade": 5,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71460312": {
       "id": 71460312,
@@ -10624,11 +9416,7 @@
       "regionId": 12000100,
       "landCulture": 1,
       "landGrade": 6,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71460313": {
       "id": 71460313,
@@ -10659,11 +9447,7 @@
       "regionId": 12002000,
       "landCulture": 2,
       "landGrade": 10,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71460314": {
       "id": 71460314,
@@ -10694,11 +9478,7 @@
       "regionId": 12010100,
       "landCulture": 2,
       "landGrade": 15,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71460315": {
       "id": 71460315,
@@ -10728,11 +9508,7 @@
       "dispatchGroup": 2601,
       "landCulture": 2,
       "landGrade": 16,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71460316": {
       "id": 71460316,
@@ -10764,11 +9540,7 @@
       "regionId": 12000800,
       "landCulture": 1,
       "landGrade": 6,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71460317": {
       "id": 71460317,
@@ -10800,11 +9572,7 @@
       "regionId": 12001700,
       "landCulture": 2,
       "landGrade": 13,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71460318": {
       "id": 71460318,
@@ -10836,11 +9604,7 @@
       "regionId": 12000800,
       "landCulture": 2,
       "landGrade": 20,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71460319": {
       "id": 71460319,
@@ -10872,11 +9636,7 @@
       "regionId": 12001700,
       "landCulture": 2,
       "landGrade": 22,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71460320": {
       "id": 71460320,
@@ -10908,11 +9668,7 @@
       "regionId": 12001800,
       "landCulture": 2,
       "landGrade": 23,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71460321": {
       "id": 71460321,
@@ -10943,11 +9699,7 @@
       "regionId": 12001800,
       "landCulture": 2,
       "landGrade": 23,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71460322": {
       "id": 71460322,
@@ -10978,11 +9730,7 @@
       "regionId": 12001800,
       "landCulture": 2,
       "landGrade": 23,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71460323": {
       "id": 71460323,
@@ -11013,11 +9761,7 @@
       "regionId": 12001800,
       "landCulture": 2,
       "landGrade": 23,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     },
     "71460324": {
       "id": 71460324,
@@ -11048,11 +9792,7 @@
       "regionId": 12001800,
       "landCulture": 2,
       "landGrade": 23,
-      "landRewardType": [
-        0,
-        1,
-        2
-      ]
+      "landRewardType": [0, 1, 2]
     }
   }
 }

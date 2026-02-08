@@ -69,12 +69,8 @@
     },
     ":enum": {},
     ":links": {
-      "achievementTermsId": [
-        "AchievementTerms"
-      ],
-      "oceanSearchFailedTalk": [
-        "DiscoveryTalk"
-      ]
+      "achievementTermsId": ["AchievementTerms"],
+      "oceanSearchFailedTalk": ["DiscoveryTalk"]
     }
   },
   "ContentsTerms": {

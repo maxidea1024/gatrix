@@ -3,7 +3,7 @@
  * Stores reusable reward item templates with tags
  */
 
-exports.up = async function(connection) {
+exports.up = async function (connection) {
   console.log('Creating reward item templates table...');
 
   // Create reward item templates table
@@ -36,7 +36,7 @@ exports.up = async function(connection) {
   console.log('✅ Reward item templates table created successfully');
 };
 
-exports.down = async function(connection) {
+exports.down = async function (connection) {
   console.log('Dropping reward item templates table...');
 
   await connection.execute(`
@@ -45,4 +45,3 @@ exports.down = async function(connection) {
 
   console.log('✅ Reward item templates table dropped successfully');
 };
-

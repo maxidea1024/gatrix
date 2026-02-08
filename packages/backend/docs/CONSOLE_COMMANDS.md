@@ -21,6 +21,7 @@ The Gatrix system console provides a powerful set of commands for system adminis
 ## Basic Commands
 
 ### help
+
 Show all available commands with descriptions.
 
 ```bash
@@ -28,6 +29,7 @@ help
 ```
 
 ### echo
+
 Echo back arguments with optional color formatting.
 
 ```bash
@@ -39,9 +41,11 @@ echo --blue Information
 ```
 
 **Options:**
+
 - `--red`, `--green`, `--yellow`, `--blue`, `--magenta`, `--cyan`, `--white`
 
 ### clear
+
 Clear the console screen.
 
 ```bash
@@ -53,6 +57,7 @@ clear
 ## ID Generation
 
 ### uuid
+
 Generate a random UUID v4.
 
 ```bash
@@ -60,11 +65,13 @@ uuid
 ```
 
 **Example output:**
+
 ```
 550e8400-e29b-41d4-a716-446655440000
 ```
 
 ### ulid
+
 Generate a ULID (Universally Unique Lexicographically Sortable Identifier).
 
 ```bash
@@ -73,12 +80,14 @@ ulid 5        # Generate 5 ULIDs
 ```
 
 **Features:**
+
 - Lexicographically sortable
 - 26 characters (vs UUID's 36)
 - Timestamp-based prefix
 - Case-insensitive
 
 **Example output:**
+
 ```
 01HQZX3Y4K9M2N5P6Q7R8S9T0V
 ```
@@ -88,6 +97,7 @@ ulid 5        # Generate 5 ULIDs
 ## Security & Cryptography
 
 ### jwt-secret
+
 Generate a secure JWT secret key.
 
 ```bash
@@ -96,6 +106,7 @@ jwt-secret --length 128   # Custom length
 ```
 
 **Example output:**
+
 ```
 JWT Secret Generated:
 
@@ -106,6 +117,7 @@ JWT_SECRET=xK9mP2nQ5rS8tU1vW4yZ7aC0dE3fG6hJ9kL2mN5pQ8rS1tU4vW7yZ0aC3dE6fG9h
 ```
 
 ### hash
+
 Hash text using bcrypt (for password hashing).
 
 ```bash
@@ -114,9 +126,11 @@ hash --rounds 14 mypassword123
 ```
 
 **Options:**
+
 - `--rounds <number>` - Salt rounds (4-20, default: 12)
 
 **Example output:**
+
 ```
 Bcrypt Hash:
 
@@ -126,6 +140,7 @@ Rounds: 12
 ```
 
 ### encrypt
+
 Encrypt text using AES-256-GCM.
 
 ```bash
@@ -134,9 +149,11 @@ encrypt --key 0123456789abcdef... "Secret message"
 ```
 
 **Options:**
+
 - `--key <hex>` - 64-character hex key (if not provided, generates new key)
 
 **Example output:**
+
 ```
 Encrypted:
 
@@ -150,6 +167,7 @@ decrypt --key 0123456789abcdef... a1b2c3d4e5f6...:1a2b3c4d...:9f8e7d6c...
 ```
 
 ### decrypt
+
 Decrypt text using AES-256-GCM.
 
 ```bash
@@ -157,14 +175,17 @@ decrypt --key <hex-key> <encrypted>:<iv>:<authTag>
 ```
 
 **Required:**
+
 - `--key <hex>` - 64-character hex encryption key
 
 **Example:**
+
 ```bash
 decrypt --key 0123456789abcdef... a1b2c3d4:1a2b3c4d:9f8e7d6c
 ```
 
 ### random
+
 Generate random strings in various formats.
 
 ```bash
@@ -175,6 +196,7 @@ random --alphanumeric       # Alphanumeric only
 ```
 
 **Options:**
+
 - `--length <number>` - Length in bytes (1-256, default: 32)
 - `--hex` - Output as hexadecimal (default)
 - `--base64` - Output as base64
@@ -185,6 +207,7 @@ random --alphanumeric       # Alphanumeric only
 ## API Token Management
 
 ### api-key
+
 Generate API access tokens for client or server applications.
 
 ```bash
@@ -193,14 +216,17 @@ api-key --name "Backend Service" --type server --description "Production API" --
 ```
 
 **Required Options:**
+
 - `--name <string>` - Token name
 - `--type <client|server>` - Token type
 
 **Optional Options:**
+
 - `--description <string>` - Token description
 - `--expires <days>` - Expiration in days (omit for no expiration)
 
 **Example output:**
+
 ```
 API Token Created:
 
@@ -220,6 +246,7 @@ X-API-Token: a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6a7b8c9d0e1f2
 ```
 
 **Token Types:**
+
 - `client` - For client applications (mobile apps, web apps)
 - `server` - For server-to-server communication
 
@@ -228,6 +255,7 @@ X-API-Token: a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6a7b8c9d0e1f2
 ## Database Operations
 
 ### db-stats
+
 Show database table statistics.
 
 ```bash
@@ -235,6 +263,7 @@ db-stats
 ```
 
 **Example output:**
+
 ```
 Database Statistics:
 
@@ -255,6 +284,7 @@ Total tables: 8
 ## System Information
 
 ### whoami
+
 Display current user information.
 
 ```bash
@@ -262,6 +292,7 @@ whoami
 ```
 
 **Example output:**
+
 ```
 ID: 1
 Name: Admin User
@@ -270,6 +301,7 @@ Role: admin
 ```
 
 ### date
+
 Print server date with various formats.
 
 ```bash
@@ -280,6 +312,7 @@ date +"%Y-%m-%d %H:%M:%S"     # Custom format
 ```
 
 **Format tokens:**
+
 - `%Y` - Year (4 digits)
 - `%m` - Month (01-12)
 - `%d` - Day (01-31)
@@ -291,6 +324,7 @@ date +"%Y-%m-%d %H:%M:%S"     # Custom format
 - `%T` - Time (HH:MM:SS)
 
 ### time
+
 Print server time.
 
 ```bash
@@ -299,6 +333,7 @@ time +"%H:%M"          # Custom format
 ```
 
 ### timezone
+
 Print server timezone information.
 
 ```bash
@@ -306,11 +341,13 @@ timezone
 ```
 
 **Example output:**
+
 ```
 Time zone: Asia/Seoul (KST, +09:00)
 ```
 
 ### uptime
+
 Show server uptime.
 
 ```bash
@@ -318,11 +355,13 @@ uptime
 ```
 
 **Example output:**
+
 ```
 up 5 days, 12:34, 56s
 ```
 
 ### sysinfo
+
 Show Node.js and system information.
 
 ```bash
@@ -330,6 +369,7 @@ sysinfo
 ```
 
 **Example output:**
+
 ```
 Node: v20.10.0
 Platform: win32
@@ -340,6 +380,7 @@ Uptime: 432000s
 ```
 
 ### env
+
 Show whitelisted environment variables.
 
 ```bash
@@ -347,6 +388,7 @@ env
 ```
 
 **Example output:**
+
 ```
 NODE_ENV=production
 PORT=3000
@@ -354,6 +396,7 @@ API_VERSION=v1
 ```
 
 ### health
+
 Server health check.
 
 ```bash
@@ -361,11 +404,13 @@ health
 ```
 
 **Example output:**
+
 ```
 ✓ Server is healthy
 ```
 
 ### base64
+
 Encode or decode base64 text.
 
 ```bash
@@ -374,6 +419,7 @@ base64 --decode SGVsbG8gV29ybGQ=
 ```
 
 **Options:**
+
 - `--encode` - Encode text to base64
 - `--decode` - Decode base64 to text
 
@@ -443,6 +489,7 @@ random --alphanumeric
 ## Cache Management
 
 ### cache-clear
+
 Clear Redis cache by pattern.
 
 ```bash
@@ -454,11 +501,13 @@ cache-clear --pattern "user:*"
 ```
 
 **Options:**
+
 - `--pattern` - Cache key pattern (default: all)
 
 **Note:** Requires Redis client integration.
 
 ### cache-stats
+
 Show Redis cache statistics.
 
 ```bash
@@ -472,6 +521,7 @@ cache-stats
 ## User Management
 
 ### user-info
+
 Get detailed user information by ID or email.
 
 ```bash
@@ -483,6 +533,7 @@ user-info user@example.com
 ```
 
 **Output:**
+
 - User ID
 - Name
 - Email
@@ -497,6 +548,7 @@ user-info user@example.com
 ## Utilities
 
 ### timestamp
+
 Convert timestamp or get current timestamp.
 
 ```bash
@@ -520,10 +572,12 @@ timestamp "2021-01-01T00:00:00Z"
 ```
 
 **Options:**
+
 - `--ms` - Output in milliseconds
 - `--iso` - Output in ISO format
 
 ### md5
+
 Generate MD5 hash of text.
 
 ```bash
@@ -533,6 +587,7 @@ md5 Hello World
 **Output:** Hexadecimal MD5 hash
 
 ### sha256
+
 Generate SHA256 hash of text.
 
 ```bash
@@ -542,6 +597,7 @@ sha256 Hello World
 **Output:** Hexadecimal SHA256 hash
 
 ### token-list
+
 List API tokens with filtering options.
 
 ```bash
@@ -559,10 +615,12 @@ token-list --limit 20
 ```
 
 **Options:**
+
 - `--type` - Filter by type (client|server)
 - `--limit` - Limit results (default: 10)
 
 **Output:**
+
 - Token ID
 - Name
 - Type
@@ -574,6 +632,7 @@ token-list --limit 20
 ## Special Features
 
 ### Clipboard Copy
+
 Copy command output to clipboard by appending `|clip` to any command.
 
 ```bash
@@ -593,20 +652,23 @@ db-stats |clip
 **Note:** ANSI color codes are automatically removed when copying to clipboard.
 
 ### Korean/CJK Input Support
+
 The console supports Korean, Chinese, and Japanese input through IME (Input Method Editor) composition.
 
 **Features:**
+
 - Full IME composition support
 - Proper character rendering with CJK-friendly fonts
 - No character breaking during composition
 
 ### Text Selection
+
 Use Shift+Arrow keys to select text in the console.
 
 **Keyboard Shortcuts:**
+
 - `Shift+Left/Right` - Select text character by character
 - `Shift+Up/Down` - Select text line by line
 - `Ctrl/Cmd+C` - Copy selected text
 - `Ctrl/Cmd+V` - Paste text
 - `Ctrl/Cmd+X` - Cut selected text (copy only)
-

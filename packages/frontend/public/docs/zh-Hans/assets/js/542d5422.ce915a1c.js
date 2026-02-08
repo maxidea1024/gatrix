@@ -1,1 +1,771 @@
-"use strict";(globalThis.webpackChunkdocs=globalThis.webpackChunkdocs||[]).push([[9985],{8329(e,n,s){s.r(n),s.d(n,{assets:()=>d,contentTitle:()=>c,default:()=>h,frontMatter:()=>r,metadata:()=>i,toc:()=>a});const i=JSON.parse('{"id":"backend/cache-keys","title":"Cache Keys Constants","description":"This directory provides centralized management of all cache keys used in the application.","source":"@site/docs/backend/cache-keys.md","sourceDirName":"backend","slug":"/backend/cache-keys","permalink":"/docs/zh-Hans/backend/cache-keys","draft":false,"unlisted":false,"editUrl":"https://github.com/your-org/gatrix/tree/main/docs/docs/backend/cache-keys.md","tags":[],"version":"current","sidebarPosition":1,"frontMatter":{"sidebar_position":1}}');var l=s(4848),t=s(8453);const r={sidebar_position:1},c="Cache Keys Constants",d={},a=[{value:"?\ufffd\ufffd File Structure",id:"-file-structure",level:2},{value:"?\ufffd\ufffd Purpose",id:"-purpose",level:2},{value:"??<strong>Previous Issues</strong>",id:"previous-issues",level:3},{value:"??<strong>Improved Approach</strong>",id:"improved-approach",level:3},{value:"?\ufffd\ufffd Usage",id:"-usage",level:2},{value:"1. <strong>Basic Cache Key Usage</strong>",id:"1-basic-cache-key-usage",level:3},{value:"2. <strong>TTL Constants Usage</strong>",id:"2-ttl-constants-usage",level:3},{value:"3. <strong>Pattern-based Cache Invalidation</strong>",id:"3-pattern-based-cache-invalidation",level:3},{value:"?\ufffd\ufffd Cache Key Categories",id:"-cache-key-categories",level:2},{value:"?\ufffd\ufffd <strong>Game World Related</strong>",id:"-game-world-related",level:3},{value:"?\ufffd\ufffd <strong>Client Version Related</strong>",id:"-client-version-related",level:3},{value:"?\ufffd\ufffd <strong>User Related</strong>",id:"-user-related",level:3},{value:"?\ufffd\ufffd\ufffd?<strong>Tag Related</strong>",id:"tag-related",level:3},{value:"?\ufffd\ufffd\ufffd?<strong>Whitelist Related</strong>",id:"whitelist-related",level:3},{value:"?\ufffd\ufffd <strong>Maintenance Related</strong>",id:"-maintenance-related",level:3},{value:"?\ufffd\ufffd <strong>Message Template Related</strong>",id:"-message-template-related",level:3},{value:"?\ufffd\ufffd <strong>Job Related</strong>",id:"-job-related",level:3},{value:"?\ufffd\ufffd <strong>Audit Log Related</strong>",id:"-audit-log-related",level:3},{value:"?\ufffd\ufe0f TTL Constants",id:"\ufe0f-ttl-constants",level:2},{value:"?\ufffd\ufffd Pattern Constants",id:"-pattern-constants",level:2},{value:"?\ufffd\ufffd Adding New Cache Keys",id:"-adding-new-cache-keys",level:2},{value:"1. <strong>Adding Simple Keys</strong>",id:"1-adding-simple-keys",level:3},{value:"2. <strong>Adding Dynamic Keys</strong>",id:"2-adding-dynamic-keys",level:3},{value:"3. <strong>Adding Patterns</strong>",id:"3-adding-patterns",level:3},{value:"4. <strong>Adding TTL Configuration</strong>",id:"4-adding-ttl-configuration",level:3},{value:"??Best Practices",id:"best-practices",level:2},{value:"1. <strong>Consistent Naming</strong>",id:"1-consistent-naming",level:3},{value:"2. <strong>Type Safety</strong>",id:"2-type-safety",level:3},{value:"3. <strong>Documentation</strong>",id:"3-documentation",level:3},{value:"4. <strong>Migration</strong>",id:"4-migration",level:3},{value:"?\ufffd\ufffd Testing",id:"-testing",level:2},{value:"?\ufffd\ufffd Related Files",id:"-related-files",level:2}];function o(e){const n={code:"code",h1:"h1",h2:"h2",h3:"h3",header:"header",li:"li",p:"p",pre:"pre",strong:"strong",ul:"ul",...(0,t.R)(),...e.components};return(0,l.jsxs)(l.Fragment,{children:[(0,l.jsx)(n.header,{children:(0,l.jsx)(n.h1,{id:"cache-keys-constants",children:"Cache Keys Constants"})}),"\n",(0,l.jsx)(n.p,{children:"This directory provides centralized management of all cache keys used in the application."}),"\n",(0,l.jsx)(n.h2,{id:"-file-structure",children:"?\ufffd\ufffd File Structure"}),"\n",(0,l.jsx)(n.pre,{children:(0,l.jsx)(n.code,{children:"constants/\n?\ufffd\ufffd??\ufffd cacheKeys.ts    # Cache key constants definition\n?\ufffd\ufffd??\ufffd README.md       # This file\n"})}),"\n",(0,l.jsx)(n.h2,{id:"-purpose",children:"?\ufffd\ufffd Purpose"}),"\n",(0,l.jsxs)(n.h3,{id:"previous-issues",children:["??",(0,l.jsx)(n.strong,{children:"Previous Issues"})]}),"\n",(0,l.jsx)(n.pre,{children:(0,l.jsx)(n.code,{className:"language-typescript",children:"// Hard-coded cache keys - difficult to maintain\nawait pubSubService.invalidateKey('game_worlds:public');\ncacheService.set('game_worlds:public', data, 10 * 60 * 1000);\n\n// Potential typos in different files\nawait pubSubService.invalidateKey('game_world:public'); // Typo!\n"})}),"\n",(0,l.jsxs)(n.h3,{id:"improved-approach",children:["??",(0,l.jsx)(n.strong,{children:"Improved Approach"})]}),"\n",(0,l.jsx)(n.pre,{children:(0,l.jsx)(n.code,{className:"language-typescript",children:"import { GAME_WORLDS, DEFAULT_CONFIG } from '../constants/cacheKeys';\n\n// Type-safe and consistent cache key usage\nawait pubSubService.invalidateKey(GAME_WORLDS.PUBLIC);\ncacheService.set(GAME_WORLDS.PUBLIC, data, DEFAULT_CONFIG.GAME_WORLDS_PUBLIC_TTL);\n"})}),"\n",(0,l.jsx)(n.h2,{id:"-usage",children:"?\ufffd\ufffd Usage"}),"\n",(0,l.jsxs)(n.h3,{id:"1-basic-cache-key-usage",children:["1. ",(0,l.jsx)(n.strong,{children:"Basic Cache Key Usage"})]}),"\n",(0,l.jsx)(n.pre,{children:(0,l.jsx)(n.code,{className:"language-typescript",children:"import { GAME_WORLDS, CLIENT_VERSION, USER } from '../constants/cacheKeys';\n\n// Game world public list\nconst cacheKey = GAME_WORLDS.PUBLIC; // 'game_worlds:public'\n\n// Client version (dynamic key)\nconst versionKey = CLIENT_VERSION.BY_CHANNEL('stable', 'main'); \n// 'client_version:stable:main'\n\n// User profile (dynamic key)\nconst profileKey = USER.PROFILE(123); // 'user:123:profile'\n"})}),"\n",(0,l.jsxs)(n.h3,{id:"2-ttl-constants-usage",children:["2. ",(0,l.jsx)(n.strong,{children:"TTL Constants Usage"})]}),"\n",(0,l.jsx)(n.pre,{children:(0,l.jsx)(n.code,{className:"language-typescript",children:"import { TTL, DEFAULT_CONFIG } from '../constants/cacheKeys';\n\n// Use basic TTL\ncacheService.set(key, data, TTL.TEN_MINUTES);\n\n// Use configured defaults\ncacheService.set(GAME_WORLDS.PUBLIC, data, DEFAULT_CONFIG.GAME_WORLDS_PUBLIC_TTL);\n"})}),"\n",(0,l.jsxs)(n.h3,{id:"3-pattern-based-cache-invalidation",children:["3. ",(0,l.jsx)(n.strong,{children:"Pattern-based Cache Invalidation"})]}),"\n",(0,l.jsx)(n.pre,{children:(0,l.jsx)(n.code,{className:"language-typescript",children:"import { PATTERNS } from '../constants/cacheKeys';\n\n// Delete all game world related cache\nawait pubSubService.invalidateByPattern(PATTERNS.GAME_WORLDS);\n\n// Delete all cache for specific user\nawait pubSubService.invalidateByPattern(PATTERNS.USER(123));\n"})}),"\n",(0,l.jsx)(n.h2,{id:"-cache-key-categories",children:"?\ufffd\ufffd Cache Key Categories"}),"\n",(0,l.jsxs)(n.h3,{id:"-game-world-related",children:["?\ufffd\ufffd ",(0,l.jsx)(n.strong,{children:"Game World Related"})]}),"\n",(0,l.jsxs)(n.ul,{children:["\n",(0,l.jsxs)(n.li,{children:[(0,l.jsx)(n.code,{children:"GAME_WORLDS.PUBLIC"})," - Public game world list"]}),"\n",(0,l.jsxs)(n.li,{children:[(0,l.jsx)(n.code,{children:"GAME_WORLDS.ADMIN"})," - Admin game world list"]}),"\n",(0,l.jsxs)(n.li,{children:[(0,l.jsx)(n.code,{children:"GAME_WORLDS.DETAIL(id)"})," - Specific game world details"]}),"\n",(0,l.jsxs)(n.li,{children:[(0,l.jsx)(n.code,{children:"GAME_WORLDS.BY_WORLD_ID(worldId)"})," - Query by world ID"]}),"\n"]}),"\n",(0,l.jsxs)(n.h3,{id:"-client-version-related",children:["?\ufffd\ufffd ",(0,l.jsx)(n.strong,{children:"Client Version Related"})]}),"\n",(0,l.jsxs)(n.ul,{children:["\n",(0,l.jsxs)(n.li,{children:[(0,l.jsx)(n.code,{children:"CLIENT_VERSION.BY_CHANNEL(channel, subChannel)"})," - Version by channel"]}),"\n",(0,l.jsxs)(n.li,{children:[(0,l.jsx)(n.code,{children:"CLIENT_VERSION.ALL"})," - All version list"]}),"\n",(0,l.jsxs)(n.li,{children:[(0,l.jsx)(n.code,{children:"CLIENT_VERSION.ACTIVE"})," - Active versions only"]}),"\n"]}),"\n",(0,l.jsxs)(n.h3,{id:"-user-related",children:["?\ufffd\ufffd ",(0,l.jsx)(n.strong,{children:"User Related"})]}),"\n",(0,l.jsxs)(n.ul,{children:["\n",(0,l.jsxs)(n.li,{children:[(0,l.jsx)(n.code,{children:"USER.PROFILE(userId)"})," - User profile"]}),"\n",(0,l.jsxs)(n.li,{children:[(0,l.jsx)(n.code,{children:"USER.PERMISSIONS(userId)"})," - User permissions"]}),"\n",(0,l.jsxs)(n.li,{children:[(0,l.jsx)(n.code,{children:"USER.SESSION(sessionId)"})," - Session information"]}),"\n"]}),"\n",(0,l.jsxs)(n.h3,{id:"tag-related",children:["?\ufffd\ufffd\ufffd?",(0,l.jsx)(n.strong,{children:"Tag Related"})]}),"\n",(0,l.jsxs)(n.ul,{children:["\n",(0,l.jsxs)(n.li,{children:[(0,l.jsx)(n.code,{children:"TAG.ALL"})," - All tag list"]}),"\n",(0,l.jsxs)(n.li,{children:[(0,l.jsx)(n.code,{children:"TAG.BY_ENTITY(entityType, entityId)"})," - Tags by entity"]}),"\n"]}),"\n",(0,l.jsxs)(n.h3,{id:"whitelist-related",children:["?\ufffd\ufffd\ufffd?",(0,l.jsx)(n.strong,{children:"Whitelist Related"})]}),"\n",(0,l.jsxs)(n.ul,{children:["\n",(0,l.jsxs)(n.li,{children:[(0,l.jsx)(n.code,{children:"WHITELIST.ALL"})," - All whitelist"]}),"\n",(0,l.jsxs)(n.li,{children:[(0,l.jsx)(n.code,{children:"WHITELIST.ACTIVE"})," - Active items only"]}),"\n",(0,l.jsxs)(n.li,{children:[(0,l.jsx)(n.code,{children:"WHITELIST.BY_IP(ip)"})," - Status by IP"]}),"\n"]}),"\n",(0,l.jsxs)(n.h3,{id:"-maintenance-related",children:["?\ufffd\ufffd ",(0,l.jsx)(n.strong,{children:"Maintenance Related"})]}),"\n",(0,l.jsxs)(n.ul,{children:["\n",(0,l.jsxs)(n.li,{children:[(0,l.jsx)(n.code,{children:"MAINTENANCE.STATUS"})," - Current maintenance status"]}),"\n",(0,l.jsxs)(n.li,{children:[(0,l.jsx)(n.code,{children:"MAINTENANCE.TEMPLATES"})," - Maintenance templates"]}),"\n"]}),"\n",(0,l.jsxs)(n.h3,{id:"-message-template-related",children:["?\ufffd\ufffd ",(0,l.jsx)(n.strong,{children:"Message Template Related"})]}),"\n",(0,l.jsxs)(n.ul,{children:["\n",(0,l.jsxs)(n.li,{children:[(0,l.jsx)(n.code,{children:"MESSAGE_TEMPLATE.ALL"})," - All templates"]}),"\n",(0,l.jsxs)(n.li,{children:[(0,l.jsx)(n.code,{children:"MESSAGE_TEMPLATE.BY_TYPE(type)"})," - Templates by type"]}),"\n"]}),"\n",(0,l.jsxs)(n.h3,{id:"-job-related",children:["?\ufffd\ufffd ",(0,l.jsx)(n.strong,{children:"Job Related"})]}),"\n",(0,l.jsxs)(n.ul,{children:["\n",(0,l.jsxs)(n.li,{children:[(0,l.jsx)(n.code,{children:"JOB.ALL"})," - All job list"]}),"\n",(0,l.jsxs)(n.li,{children:[(0,l.jsx)(n.code,{children:"JOB.TYPES"})," - Job type list"]}),"\n",(0,l.jsxs)(n.li,{children:[(0,l.jsx)(n.code,{children:"JOB.DETAIL(jobId)"})," - Job details"]}),"\n"]}),"\n",(0,l.jsxs)(n.h3,{id:"-audit-log-related",children:["?\ufffd\ufffd ",(0,l.jsx)(n.strong,{children:"Audit Log Related"})]}),"\n",(0,l.jsxs)(n.ul,{children:["\n",(0,l.jsxs)(n.li,{children:[(0,l.jsx)(n.code,{children:"AUDIT_LOG.RECENT(page, limit)"})," - Recent logs"]}),"\n",(0,l.jsxs)(n.li,{children:[(0,l.jsx)(n.code,{children:"AUDIT_LOG.BY_USER(userId, page)"})," - Logs by user"]}),"\n"]}),"\n",(0,l.jsx)(n.h2,{id:"\ufe0f-ttl-constants",children:"?\ufffd\ufe0f TTL Constants"}),"\n",(0,l.jsx)(n.pre,{children:(0,l.jsx)(n.code,{className:"language-typescript",children:"// Time constants\nTTL.ONE_MINUTE      // 1 minute\nTTL.FIVE_MINUTES    // 5 minutes\nTTL.TEN_MINUTES     // 10 minutes\nTTL.THIRTY_MINUTES  // 30 minutes\nTTL.ONE_HOUR        // 1 hour\nTTL.ONE_DAY         // 1 day\n\n// Default configurations\nDEFAULT_CONFIG.GAME_WORLDS_PUBLIC_TTL  // Game world public list TTL\nDEFAULT_CONFIG.CLIENT_VERSION_TTL      // Client version TTL\nDEFAULT_CONFIG.USER_PROFILE_TTL        // User profile TTL\nDEFAULT_CONFIG.TAGS_TTL                // Tag list TTL\nDEFAULT_CONFIG.WHITELIST_TTL           // Whitelist TTL\nDEFAULT_CONFIG.MAINTENANCE_TTL         // Maintenance status TTL\n"})}),"\n",(0,l.jsx)(n.h2,{id:"-pattern-constants",children:"?\ufffd\ufffd Pattern Constants"}),"\n",(0,l.jsx)(n.pre,{children:(0,l.jsx)(n.code,{className:"language-typescript",children:"// For pattern-based cache invalidation\nPATTERNS.GAME_WORLDS        // 'game_world*'\nPATTERNS.CLIENT_VERSIONS    // 'client_version*'\nPATTERNS.USER(userId)       // 'user:123*'\nPATTERNS.TAGS               // 'tags*'\nPATTERNS.WHITELIST          // 'whitelist*'\nPATTERNS.MAINTENANCE        // 'maintenance*'\nPATTERNS.MESSAGE_TEMPLATES  // 'message_template*'\nPATTERNS.JOBS               // 'job*'\nPATTERNS.AUDIT_LOGS         // 'audit_log*'\n"})}),"\n",(0,l.jsx)(n.h2,{id:"-adding-new-cache-keys",children:"?\ufffd\ufffd Adding New Cache Keys"}),"\n",(0,l.jsxs)(n.h3,{id:"1-adding-simple-keys",children:["1. ",(0,l.jsx)(n.strong,{children:"Adding Simple Keys"})]}),"\n",(0,l.jsx)(n.pre,{children:(0,l.jsx)(n.code,{className:"language-typescript",children:"export const NEW_FEATURE = {\n  ALL: 'new_feature:all',\n  ACTIVE: 'new_feature:active',\n} as const;\n"})}),"\n",(0,l.jsxs)(n.h3,{id:"2-adding-dynamic-keys",children:["2. ",(0,l.jsx)(n.strong,{children:"Adding Dynamic Keys"})]}),"\n",(0,l.jsx)(n.pre,{children:(0,l.jsx)(n.code,{className:"language-typescript",children:"export const NEW_FEATURE = {\n  BY_ID: (id: number) => `new_feature:${id}`,\n  BY_TYPE: (type: string) => `new_feature:type:${type}`,\n} as const;\n"})}),"\n",(0,l.jsxs)(n.h3,{id:"3-adding-patterns",children:["3. ",(0,l.jsx)(n.strong,{children:"Adding Patterns"})]}),"\n",(0,l.jsx)(n.pre,{children:(0,l.jsx)(n.code,{className:"language-typescript",children:"export const PATTERNS = {\n  // ... existing patterns\n  NEW_FEATURE: 'new_feature*',\n} as const;\n"})}),"\n",(0,l.jsxs)(n.h3,{id:"4-adding-ttl-configuration",children:["4. ",(0,l.jsx)(n.strong,{children:"Adding TTL Configuration"})]}),"\n",(0,l.jsx)(n.pre,{children:(0,l.jsx)(n.code,{className:"language-typescript",children:"export const DEFAULT_CONFIG = {\n  // ... existing configurations\n  NEW_FEATURE_TTL: TTL.FIVE_MINUTES,\n} as const;\n"})}),"\n",(0,l.jsx)(n.h2,{id:"best-practices",children:"??Best Practices"}),"\n",(0,l.jsxs)(n.h3,{id:"1-consistent-naming",children:["1. ",(0,l.jsx)(n.strong,{children:"Consistent Naming"})]}),"\n",(0,l.jsxs)(n.ul,{children:["\n",(0,l.jsxs)(n.li,{children:["Entity names use uppercase and underscores: ",(0,l.jsx)(n.code,{children:"GAME_WORLDS"}),", ",(0,l.jsx)(n.code,{children:"CLIENT_VERSION"})]}),"\n",(0,l.jsxs)(n.li,{children:["Key types are clear: ",(0,l.jsx)(n.code,{children:"ALL"}),", ",(0,l.jsx)(n.code,{children:"BY_ID"}),", ",(0,l.jsx)(n.code,{children:"DETAIL"}),", ",(0,l.jsx)(n.code,{children:"ACTIVE"})]}),"\n",(0,l.jsxs)(n.li,{children:["Patterns include wildcards: ",(0,l.jsx)(n.code,{children:"game_world*"})]}),"\n"]}),"\n",(0,l.jsxs)(n.h3,{id:"2-type-safety",children:["2. ",(0,l.jsx)(n.strong,{children:"Type Safety"})]}),"\n",(0,l.jsxs)(n.ul,{children:["\n",(0,l.jsxs)(n.li,{children:["Use ",(0,l.jsx)(n.code,{children:"as const"})," for all objects"]}),"\n",(0,l.jsx)(n.li,{children:"Define dynamic keys as functions for type checking"}),"\n"]}),"\n",(0,l.jsxs)(n.h3,{id:"3-documentation",children:["3. ",(0,l.jsx)(n.strong,{children:"Documentation"})]}),"\n",(0,l.jsxs)(n.ul,{children:["\n",(0,l.jsx)(n.li,{children:"Document purpose and TTL for each key with comments"}),"\n",(0,l.jsx)(n.li,{children:"Specify invalidation conditions"}),"\n"]}),"\n",(0,l.jsxs)(n.h3,{id:"4-migration",children:["4. ",(0,l.jsx)(n.strong,{children:"Migration"})]}),"\n",(0,l.jsxs)(n.ul,{children:["\n",(0,l.jsx)(n.li,{children:"Gradually replace existing hard-coded keys"}),"\n",(0,l.jsx)(n.li,{children:"Update related test code when making changes"}),"\n"]}),"\n",(0,l.jsx)(n.h2,{id:"-testing",children:"?\ufffd\ufffd Testing"}),"\n",(0,l.jsx)(n.p,{children:"Verify cache key constants work properly:"}),"\n",(0,l.jsx)(n.pre,{children:(0,l.jsx)(n.code,{className:"language-bash",children:'# Test visibility toggle (check cache invalidation)\ncurl -X PATCH http://localhost:5000/api/v1/game-worlds/12/toggle-visibility \\\n  -H "Authorization: Bearer $TOKEN"\n\n# Test client API cache\ncurl http://localhost:5000/api/v1/client/game-worlds\n'})}),"\n",(0,l.jsxs)(n.p,{children:["Check server logs for ",(0,l.jsx)(n.code,{children:"Cache delete attempted but key not found: game_worlds:public"})," message"]}),"\n",(0,l.jsx)(n.h2,{id:"-related-files",children:"?\ufffd\ufffd Related Files"}),"\n",(0,l.jsxs)(n.ul,{children:["\n",(0,l.jsxs)(n.li,{children:[(0,l.jsx)(n.code,{children:"src/services/GameWorldService.ts"})," - Game world cache invalidation"]}),"\n",(0,l.jsxs)(n.li,{children:[(0,l.jsx)(n.code,{children:"src/controllers/ClientController.ts"})," - Client API cache"]}),"\n",(0,l.jsxs)(n.li,{children:[(0,l.jsx)(n.code,{children:"src/services/CacheService.ts"})," - Cache service"]}),"\n",(0,l.jsxs)(n.li,{children:[(0,l.jsx)(n.code,{children:"src/services/PubSubService.ts"})," - Distributed cache invalidation"]}),"\n",(0,l.jsxs)(n.li,{children:[(0,l.jsx)(n.code,{children:"CLIENT_API.md"})," - Client API documentation"]}),"\n"]})]})}function h(e={}){const{wrapper:n}={...(0,t.R)(),...e.components};return n?(0,l.jsx)(n,{...e,children:(0,l.jsx)(o,{...e})}):o(e)}},8453(e,n,s){s.d(n,{R:()=>r,x:()=>c});var i=s(6540);const l={},t=i.createContext(l);function r(e){const n=i.useContext(t);return i.useMemo(function(){return"function"==typeof e?e(n):{...n,...e}},[n,e])}function c(e){let n;return n=e.disableParentContext?"function"==typeof e.components?e.components(l):e.components||l:r(e.components),i.createElement(t.Provider,{value:n},e.children)}}}]);
+'use strict';
+(globalThis.webpackChunkdocs = globalThis.webpackChunkdocs || []).push([
+  [9985],
+  {
+    8329(e, n, s) {
+      (s.r(n),
+        s.d(n, {
+          assets: () => d,
+          contentTitle: () => c,
+          default: () => h,
+          frontMatter: () => r,
+          metadata: () => i,
+          toc: () => a,
+        }));
+      const i = JSON.parse(
+        '{"id":"backend/cache-keys","title":"Cache Keys Constants","description":"This directory provides centralized management of all cache keys used in the application.","source":"@site/docs/backend/cache-keys.md","sourceDirName":"backend","slug":"/backend/cache-keys","permalink":"/docs/zh-Hans/backend/cache-keys","draft":false,"unlisted":false,"editUrl":"https://github.com/your-org/gatrix/tree/main/docs/docs/backend/cache-keys.md","tags":[],"version":"current","sidebarPosition":1,"frontMatter":{"sidebar_position":1}}'
+      );
+      var l = s(4848),
+        t = s(8453);
+      const r = { sidebar_position: 1 },
+        c = 'Cache Keys Constants',
+        d = {},
+        a = [
+          { value: '?\ufffd\ufffd File Structure', id: '-file-structure', level: 2 },
+          { value: '?\ufffd\ufffd Purpose', id: '-purpose', level: 2 },
+          { value: '??<strong>Previous Issues</strong>', id: 'previous-issues', level: 3 },
+          { value: '??<strong>Improved Approach</strong>', id: 'improved-approach', level: 3 },
+          { value: '?\ufffd\ufffd Usage', id: '-usage', level: 2 },
+          {
+            value: '1. <strong>Basic Cache Key Usage</strong>',
+            id: '1-basic-cache-key-usage',
+            level: 3,
+          },
+          {
+            value: '2. <strong>TTL Constants Usage</strong>',
+            id: '2-ttl-constants-usage',
+            level: 3,
+          },
+          {
+            value: '3. <strong>Pattern-based Cache Invalidation</strong>',
+            id: '3-pattern-based-cache-invalidation',
+            level: 3,
+          },
+          { value: '?\ufffd\ufffd Cache Key Categories', id: '-cache-key-categories', level: 2 },
+          {
+            value: '?\ufffd\ufffd <strong>Game World Related</strong>',
+            id: '-game-world-related',
+            level: 3,
+          },
+          {
+            value: '?\ufffd\ufffd <strong>Client Version Related</strong>',
+            id: '-client-version-related',
+            level: 3,
+          },
+          { value: '?\ufffd\ufffd <strong>User Related</strong>', id: '-user-related', level: 3 },
+          {
+            value: '?\ufffd\ufffd\ufffd?<strong>Tag Related</strong>',
+            id: 'tag-related',
+            level: 3,
+          },
+          {
+            value: '?\ufffd\ufffd\ufffd?<strong>Whitelist Related</strong>',
+            id: 'whitelist-related',
+            level: 3,
+          },
+          {
+            value: '?\ufffd\ufffd <strong>Maintenance Related</strong>',
+            id: '-maintenance-related',
+            level: 3,
+          },
+          {
+            value: '?\ufffd\ufffd <strong>Message Template Related</strong>',
+            id: '-message-template-related',
+            level: 3,
+          },
+          { value: '?\ufffd\ufffd <strong>Job Related</strong>', id: '-job-related', level: 3 },
+          {
+            value: '?\ufffd\ufffd <strong>Audit Log Related</strong>',
+            id: '-audit-log-related',
+            level: 3,
+          },
+          { value: '?\ufffd\ufe0f TTL Constants', id: '\ufe0f-ttl-constants', level: 2 },
+          { value: '?\ufffd\ufffd Pattern Constants', id: '-pattern-constants', level: 2 },
+          { value: '?\ufffd\ufffd Adding New Cache Keys', id: '-adding-new-cache-keys', level: 2 },
+          { value: '1. <strong>Adding Simple Keys</strong>', id: '1-adding-simple-keys', level: 3 },
+          {
+            value: '2. <strong>Adding Dynamic Keys</strong>',
+            id: '2-adding-dynamic-keys',
+            level: 3,
+          },
+          { value: '3. <strong>Adding Patterns</strong>', id: '3-adding-patterns', level: 3 },
+          {
+            value: '4. <strong>Adding TTL Configuration</strong>',
+            id: '4-adding-ttl-configuration',
+            level: 3,
+          },
+          { value: '??Best Practices', id: 'best-practices', level: 2 },
+          { value: '1. <strong>Consistent Naming</strong>', id: '1-consistent-naming', level: 3 },
+          { value: '2. <strong>Type Safety</strong>', id: '2-type-safety', level: 3 },
+          { value: '3. <strong>Documentation</strong>', id: '3-documentation', level: 3 },
+          { value: '4. <strong>Migration</strong>', id: '4-migration', level: 3 },
+          { value: '?\ufffd\ufffd Testing', id: '-testing', level: 2 },
+          { value: '?\ufffd\ufffd Related Files', id: '-related-files', level: 2 },
+        ];
+      function o(e) {
+        const n = {
+          code: 'code',
+          h1: 'h1',
+          h2: 'h2',
+          h3: 'h3',
+          header: 'header',
+          li: 'li',
+          p: 'p',
+          pre: 'pre',
+          strong: 'strong',
+          ul: 'ul',
+          ...(0, t.R)(),
+          ...e.components,
+        };
+        return (0, l.jsxs)(l.Fragment, {
+          children: [
+            (0, l.jsx)(n.header, {
+              children: (0, l.jsx)(n.h1, {
+                id: 'cache-keys-constants',
+                children: 'Cache Keys Constants',
+              }),
+            }),
+            '\n',
+            (0, l.jsx)(n.p, {
+              children:
+                'This directory provides centralized management of all cache keys used in the application.',
+            }),
+            '\n',
+            (0, l.jsx)(n.h2, { id: '-file-structure', children: '?\ufffd\ufffd File Structure' }),
+            '\n',
+            (0, l.jsx)(n.pre, {
+              children: (0, l.jsx)(n.code, {
+                children:
+                  'constants/\n?\ufffd\ufffd??\ufffd cacheKeys.ts    # Cache key constants definition\n?\ufffd\ufffd??\ufffd README.md       # This file\n',
+              }),
+            }),
+            '\n',
+            (0, l.jsx)(n.h2, { id: '-purpose', children: '?\ufffd\ufffd Purpose' }),
+            '\n',
+            (0, l.jsxs)(n.h3, {
+              id: 'previous-issues',
+              children: ['??', (0, l.jsx)(n.strong, { children: 'Previous Issues' })],
+            }),
+            '\n',
+            (0, l.jsx)(n.pre, {
+              children: (0, l.jsx)(n.code, {
+                className: 'language-typescript',
+                children:
+                  "// Hard-coded cache keys - difficult to maintain\nawait pubSubService.invalidateKey('game_worlds:public');\ncacheService.set('game_worlds:public', data, 10 * 60 * 1000);\n\n// Potential typos in different files\nawait pubSubService.invalidateKey('game_world:public'); // Typo!\n",
+              }),
+            }),
+            '\n',
+            (0, l.jsxs)(n.h3, {
+              id: 'improved-approach',
+              children: ['??', (0, l.jsx)(n.strong, { children: 'Improved Approach' })],
+            }),
+            '\n',
+            (0, l.jsx)(n.pre, {
+              children: (0, l.jsx)(n.code, {
+                className: 'language-typescript',
+                children:
+                  "import { GAME_WORLDS, DEFAULT_CONFIG } from '../constants/cacheKeys';\n\n// Type-safe and consistent cache key usage\nawait pubSubService.invalidateKey(GAME_WORLDS.PUBLIC);\ncacheService.set(GAME_WORLDS.PUBLIC, data, DEFAULT_CONFIG.GAME_WORLDS_PUBLIC_TTL);\n",
+              }),
+            }),
+            '\n',
+            (0, l.jsx)(n.h2, { id: '-usage', children: '?\ufffd\ufffd Usage' }),
+            '\n',
+            (0, l.jsxs)(n.h3, {
+              id: '1-basic-cache-key-usage',
+              children: ['1. ', (0, l.jsx)(n.strong, { children: 'Basic Cache Key Usage' })],
+            }),
+            '\n',
+            (0, l.jsx)(n.pre, {
+              children: (0, l.jsx)(n.code, {
+                className: 'language-typescript',
+                children:
+                  "import { GAME_WORLDS, CLIENT_VERSION, USER } from '../constants/cacheKeys';\n\n// Game world public list\nconst cacheKey = GAME_WORLDS.PUBLIC; // 'game_worlds:public'\n\n// Client version (dynamic key)\nconst versionKey = CLIENT_VERSION.BY_CHANNEL('stable', 'main'); \n// 'client_version:stable:main'\n\n// User profile (dynamic key)\nconst profileKey = USER.PROFILE(123); // 'user:123:profile'\n",
+              }),
+            }),
+            '\n',
+            (0, l.jsxs)(n.h3, {
+              id: '2-ttl-constants-usage',
+              children: ['2. ', (0, l.jsx)(n.strong, { children: 'TTL Constants Usage' })],
+            }),
+            '\n',
+            (0, l.jsx)(n.pre, {
+              children: (0, l.jsx)(n.code, {
+                className: 'language-typescript',
+                children:
+                  "import { TTL, DEFAULT_CONFIG } from '../constants/cacheKeys';\n\n// Use basic TTL\ncacheService.set(key, data, TTL.TEN_MINUTES);\n\n// Use configured defaults\ncacheService.set(GAME_WORLDS.PUBLIC, data, DEFAULT_CONFIG.GAME_WORLDS_PUBLIC_TTL);\n",
+              }),
+            }),
+            '\n',
+            (0, l.jsxs)(n.h3, {
+              id: '3-pattern-based-cache-invalidation',
+              children: [
+                '3. ',
+                (0, l.jsx)(n.strong, { children: 'Pattern-based Cache Invalidation' }),
+              ],
+            }),
+            '\n',
+            (0, l.jsx)(n.pre, {
+              children: (0, l.jsx)(n.code, {
+                className: 'language-typescript',
+                children:
+                  "import { PATTERNS } from '../constants/cacheKeys';\n\n// Delete all game world related cache\nawait pubSubService.invalidateByPattern(PATTERNS.GAME_WORLDS);\n\n// Delete all cache for specific user\nawait pubSubService.invalidateByPattern(PATTERNS.USER(123));\n",
+              }),
+            }),
+            '\n',
+            (0, l.jsx)(n.h2, {
+              id: '-cache-key-categories',
+              children: '?\ufffd\ufffd Cache Key Categories',
+            }),
+            '\n',
+            (0, l.jsxs)(n.h3, {
+              id: '-game-world-related',
+              children: [
+                '?\ufffd\ufffd ',
+                (0, l.jsx)(n.strong, { children: 'Game World Related' }),
+              ],
+            }),
+            '\n',
+            (0, l.jsxs)(n.ul, {
+              children: [
+                '\n',
+                (0, l.jsxs)(n.li, {
+                  children: [
+                    (0, l.jsx)(n.code, { children: 'GAME_WORLDS.PUBLIC' }),
+                    ' - Public game world list',
+                  ],
+                }),
+                '\n',
+                (0, l.jsxs)(n.li, {
+                  children: [
+                    (0, l.jsx)(n.code, { children: 'GAME_WORLDS.ADMIN' }),
+                    ' - Admin game world list',
+                  ],
+                }),
+                '\n',
+                (0, l.jsxs)(n.li, {
+                  children: [
+                    (0, l.jsx)(n.code, { children: 'GAME_WORLDS.DETAIL(id)' }),
+                    ' - Specific game world details',
+                  ],
+                }),
+                '\n',
+                (0, l.jsxs)(n.li, {
+                  children: [
+                    (0, l.jsx)(n.code, { children: 'GAME_WORLDS.BY_WORLD_ID(worldId)' }),
+                    ' - Query by world ID',
+                  ],
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, l.jsxs)(n.h3, {
+              id: '-client-version-related',
+              children: [
+                '?\ufffd\ufffd ',
+                (0, l.jsx)(n.strong, { children: 'Client Version Related' }),
+              ],
+            }),
+            '\n',
+            (0, l.jsxs)(n.ul, {
+              children: [
+                '\n',
+                (0, l.jsxs)(n.li, {
+                  children: [
+                    (0, l.jsx)(n.code, {
+                      children: 'CLIENT_VERSION.BY_CHANNEL(channel, subChannel)',
+                    }),
+                    ' - Version by channel',
+                  ],
+                }),
+                '\n',
+                (0, l.jsxs)(n.li, {
+                  children: [
+                    (0, l.jsx)(n.code, { children: 'CLIENT_VERSION.ALL' }),
+                    ' - All version list',
+                  ],
+                }),
+                '\n',
+                (0, l.jsxs)(n.li, {
+                  children: [
+                    (0, l.jsx)(n.code, { children: 'CLIENT_VERSION.ACTIVE' }),
+                    ' - Active versions only',
+                  ],
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, l.jsxs)(n.h3, {
+              id: '-user-related',
+              children: ['?\ufffd\ufffd ', (0, l.jsx)(n.strong, { children: 'User Related' })],
+            }),
+            '\n',
+            (0, l.jsxs)(n.ul, {
+              children: [
+                '\n',
+                (0, l.jsxs)(n.li, {
+                  children: [
+                    (0, l.jsx)(n.code, { children: 'USER.PROFILE(userId)' }),
+                    ' - User profile',
+                  ],
+                }),
+                '\n',
+                (0, l.jsxs)(n.li, {
+                  children: [
+                    (0, l.jsx)(n.code, { children: 'USER.PERMISSIONS(userId)' }),
+                    ' - User permissions',
+                  ],
+                }),
+                '\n',
+                (0, l.jsxs)(n.li, {
+                  children: [
+                    (0, l.jsx)(n.code, { children: 'USER.SESSION(sessionId)' }),
+                    ' - Session information',
+                  ],
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, l.jsxs)(n.h3, {
+              id: 'tag-related',
+              children: ['?\ufffd\ufffd\ufffd?', (0, l.jsx)(n.strong, { children: 'Tag Related' })],
+            }),
+            '\n',
+            (0, l.jsxs)(n.ul, {
+              children: [
+                '\n',
+                (0, l.jsxs)(n.li, {
+                  children: [(0, l.jsx)(n.code, { children: 'TAG.ALL' }), ' - All tag list'],
+                }),
+                '\n',
+                (0, l.jsxs)(n.li, {
+                  children: [
+                    (0, l.jsx)(n.code, { children: 'TAG.BY_ENTITY(entityType, entityId)' }),
+                    ' - Tags by entity',
+                  ],
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, l.jsxs)(n.h3, {
+              id: 'whitelist-related',
+              children: [
+                '?\ufffd\ufffd\ufffd?',
+                (0, l.jsx)(n.strong, { children: 'Whitelist Related' }),
+              ],
+            }),
+            '\n',
+            (0, l.jsxs)(n.ul, {
+              children: [
+                '\n',
+                (0, l.jsxs)(n.li, {
+                  children: [(0, l.jsx)(n.code, { children: 'WHITELIST.ALL' }), ' - All whitelist'],
+                }),
+                '\n',
+                (0, l.jsxs)(n.li, {
+                  children: [
+                    (0, l.jsx)(n.code, { children: 'WHITELIST.ACTIVE' }),
+                    ' - Active items only',
+                  ],
+                }),
+                '\n',
+                (0, l.jsxs)(n.li, {
+                  children: [
+                    (0, l.jsx)(n.code, { children: 'WHITELIST.BY_IP(ip)' }),
+                    ' - Status by IP',
+                  ],
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, l.jsxs)(n.h3, {
+              id: '-maintenance-related',
+              children: [
+                '?\ufffd\ufffd ',
+                (0, l.jsx)(n.strong, { children: 'Maintenance Related' }),
+              ],
+            }),
+            '\n',
+            (0, l.jsxs)(n.ul, {
+              children: [
+                '\n',
+                (0, l.jsxs)(n.li, {
+                  children: [
+                    (0, l.jsx)(n.code, { children: 'MAINTENANCE.STATUS' }),
+                    ' - Current maintenance status',
+                  ],
+                }),
+                '\n',
+                (0, l.jsxs)(n.li, {
+                  children: [
+                    (0, l.jsx)(n.code, { children: 'MAINTENANCE.TEMPLATES' }),
+                    ' - Maintenance templates',
+                  ],
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, l.jsxs)(n.h3, {
+              id: '-message-template-related',
+              children: [
+                '?\ufffd\ufffd ',
+                (0, l.jsx)(n.strong, { children: 'Message Template Related' }),
+              ],
+            }),
+            '\n',
+            (0, l.jsxs)(n.ul, {
+              children: [
+                '\n',
+                (0, l.jsxs)(n.li, {
+                  children: [
+                    (0, l.jsx)(n.code, { children: 'MESSAGE_TEMPLATE.ALL' }),
+                    ' - All templates',
+                  ],
+                }),
+                '\n',
+                (0, l.jsxs)(n.li, {
+                  children: [
+                    (0, l.jsx)(n.code, { children: 'MESSAGE_TEMPLATE.BY_TYPE(type)' }),
+                    ' - Templates by type',
+                  ],
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, l.jsxs)(n.h3, {
+              id: '-job-related',
+              children: ['?\ufffd\ufffd ', (0, l.jsx)(n.strong, { children: 'Job Related' })],
+            }),
+            '\n',
+            (0, l.jsxs)(n.ul, {
+              children: [
+                '\n',
+                (0, l.jsxs)(n.li, {
+                  children: [(0, l.jsx)(n.code, { children: 'JOB.ALL' }), ' - All job list'],
+                }),
+                '\n',
+                (0, l.jsxs)(n.li, {
+                  children: [(0, l.jsx)(n.code, { children: 'JOB.TYPES' }), ' - Job type list'],
+                }),
+                '\n',
+                (0, l.jsxs)(n.li, {
+                  children: [
+                    (0, l.jsx)(n.code, { children: 'JOB.DETAIL(jobId)' }),
+                    ' - Job details',
+                  ],
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, l.jsxs)(n.h3, {
+              id: '-audit-log-related',
+              children: ['?\ufffd\ufffd ', (0, l.jsx)(n.strong, { children: 'Audit Log Related' })],
+            }),
+            '\n',
+            (0, l.jsxs)(n.ul, {
+              children: [
+                '\n',
+                (0, l.jsxs)(n.li, {
+                  children: [
+                    (0, l.jsx)(n.code, { children: 'AUDIT_LOG.RECENT(page, limit)' }),
+                    ' - Recent logs',
+                  ],
+                }),
+                '\n',
+                (0, l.jsxs)(n.li, {
+                  children: [
+                    (0, l.jsx)(n.code, { children: 'AUDIT_LOG.BY_USER(userId, page)' }),
+                    ' - Logs by user',
+                  ],
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, l.jsx)(n.h2, {
+              id: '\ufe0f-ttl-constants',
+              children: '?\ufffd\ufe0f TTL Constants',
+            }),
+            '\n',
+            (0, l.jsx)(n.pre, {
+              children: (0, l.jsx)(n.code, {
+                className: 'language-typescript',
+                children:
+                  '// Time constants\nTTL.ONE_MINUTE      // 1 minute\nTTL.FIVE_MINUTES    // 5 minutes\nTTL.TEN_MINUTES     // 10 minutes\nTTL.THIRTY_MINUTES  // 30 minutes\nTTL.ONE_HOUR        // 1 hour\nTTL.ONE_DAY         // 1 day\n\n// Default configurations\nDEFAULT_CONFIG.GAME_WORLDS_PUBLIC_TTL  // Game world public list TTL\nDEFAULT_CONFIG.CLIENT_VERSION_TTL      // Client version TTL\nDEFAULT_CONFIG.USER_PROFILE_TTL        // User profile TTL\nDEFAULT_CONFIG.TAGS_TTL                // Tag list TTL\nDEFAULT_CONFIG.WHITELIST_TTL           // Whitelist TTL\nDEFAULT_CONFIG.MAINTENANCE_TTL         // Maintenance status TTL\n',
+              }),
+            }),
+            '\n',
+            (0, l.jsx)(n.h2, {
+              id: '-pattern-constants',
+              children: '?\ufffd\ufffd Pattern Constants',
+            }),
+            '\n',
+            (0, l.jsx)(n.pre, {
+              children: (0, l.jsx)(n.code, {
+                className: 'language-typescript',
+                children:
+                  "// For pattern-based cache invalidation\nPATTERNS.GAME_WORLDS        // 'game_world*'\nPATTERNS.CLIENT_VERSIONS    // 'client_version*'\nPATTERNS.USER(userId)       // 'user:123*'\nPATTERNS.TAGS               // 'tags*'\nPATTERNS.WHITELIST          // 'whitelist*'\nPATTERNS.MAINTENANCE        // 'maintenance*'\nPATTERNS.MESSAGE_TEMPLATES  // 'message_template*'\nPATTERNS.JOBS               // 'job*'\nPATTERNS.AUDIT_LOGS         // 'audit_log*'\n",
+              }),
+            }),
+            '\n',
+            (0, l.jsx)(n.h2, {
+              id: '-adding-new-cache-keys',
+              children: '?\ufffd\ufffd Adding New Cache Keys',
+            }),
+            '\n',
+            (0, l.jsxs)(n.h3, {
+              id: '1-adding-simple-keys',
+              children: ['1. ', (0, l.jsx)(n.strong, { children: 'Adding Simple Keys' })],
+            }),
+            '\n',
+            (0, l.jsx)(n.pre, {
+              children: (0, l.jsx)(n.code, {
+                className: 'language-typescript',
+                children:
+                  "export const NEW_FEATURE = {\n  ALL: 'new_feature:all',\n  ACTIVE: 'new_feature:active',\n} as const;\n",
+              }),
+            }),
+            '\n',
+            (0, l.jsxs)(n.h3, {
+              id: '2-adding-dynamic-keys',
+              children: ['2. ', (0, l.jsx)(n.strong, { children: 'Adding Dynamic Keys' })],
+            }),
+            '\n',
+            (0, l.jsx)(n.pre, {
+              children: (0, l.jsx)(n.code, {
+                className: 'language-typescript',
+                children:
+                  'export const NEW_FEATURE = {\n  BY_ID: (id: number) => `new_feature:${id}`,\n  BY_TYPE: (type: string) => `new_feature:type:${type}`,\n} as const;\n',
+              }),
+            }),
+            '\n',
+            (0, l.jsxs)(n.h3, {
+              id: '3-adding-patterns',
+              children: ['3. ', (0, l.jsx)(n.strong, { children: 'Adding Patterns' })],
+            }),
+            '\n',
+            (0, l.jsx)(n.pre, {
+              children: (0, l.jsx)(n.code, {
+                className: 'language-typescript',
+                children:
+                  "export const PATTERNS = {\n  // ... existing patterns\n  NEW_FEATURE: 'new_feature*',\n} as const;\n",
+              }),
+            }),
+            '\n',
+            (0, l.jsxs)(n.h3, {
+              id: '4-adding-ttl-configuration',
+              children: ['4. ', (0, l.jsx)(n.strong, { children: 'Adding TTL Configuration' })],
+            }),
+            '\n',
+            (0, l.jsx)(n.pre, {
+              children: (0, l.jsx)(n.code, {
+                className: 'language-typescript',
+                children:
+                  'export const DEFAULT_CONFIG = {\n  // ... existing configurations\n  NEW_FEATURE_TTL: TTL.FIVE_MINUTES,\n} as const;\n',
+              }),
+            }),
+            '\n',
+            (0, l.jsx)(n.h2, { id: 'best-practices', children: '??Best Practices' }),
+            '\n',
+            (0, l.jsxs)(n.h3, {
+              id: '1-consistent-naming',
+              children: ['1. ', (0, l.jsx)(n.strong, { children: 'Consistent Naming' })],
+            }),
+            '\n',
+            (0, l.jsxs)(n.ul, {
+              children: [
+                '\n',
+                (0, l.jsxs)(n.li, {
+                  children: [
+                    'Entity names use uppercase and underscores: ',
+                    (0, l.jsx)(n.code, { children: 'GAME_WORLDS' }),
+                    ', ',
+                    (0, l.jsx)(n.code, { children: 'CLIENT_VERSION' }),
+                  ],
+                }),
+                '\n',
+                (0, l.jsxs)(n.li, {
+                  children: [
+                    'Key types are clear: ',
+                    (0, l.jsx)(n.code, { children: 'ALL' }),
+                    ', ',
+                    (0, l.jsx)(n.code, { children: 'BY_ID' }),
+                    ', ',
+                    (0, l.jsx)(n.code, { children: 'DETAIL' }),
+                    ', ',
+                    (0, l.jsx)(n.code, { children: 'ACTIVE' }),
+                  ],
+                }),
+                '\n',
+                (0, l.jsxs)(n.li, {
+                  children: [
+                    'Patterns include wildcards: ',
+                    (0, l.jsx)(n.code, { children: 'game_world*' }),
+                  ],
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, l.jsxs)(n.h3, {
+              id: '2-type-safety',
+              children: ['2. ', (0, l.jsx)(n.strong, { children: 'Type Safety' })],
+            }),
+            '\n',
+            (0, l.jsxs)(n.ul, {
+              children: [
+                '\n',
+                (0, l.jsxs)(n.li, {
+                  children: [
+                    'Use ',
+                    (0, l.jsx)(n.code, { children: 'as const' }),
+                    ' for all objects',
+                  ],
+                }),
+                '\n',
+                (0, l.jsx)(n.li, {
+                  children: 'Define dynamic keys as functions for type checking',
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, l.jsxs)(n.h3, {
+              id: '3-documentation',
+              children: ['3. ', (0, l.jsx)(n.strong, { children: 'Documentation' })],
+            }),
+            '\n',
+            (0, l.jsxs)(n.ul, {
+              children: [
+                '\n',
+                (0, l.jsx)(n.li, {
+                  children: 'Document purpose and TTL for each key with comments',
+                }),
+                '\n',
+                (0, l.jsx)(n.li, { children: 'Specify invalidation conditions' }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, l.jsxs)(n.h3, {
+              id: '4-migration',
+              children: ['4. ', (0, l.jsx)(n.strong, { children: 'Migration' })],
+            }),
+            '\n',
+            (0, l.jsxs)(n.ul, {
+              children: [
+                '\n',
+                (0, l.jsx)(n.li, { children: 'Gradually replace existing hard-coded keys' }),
+                '\n',
+                (0, l.jsx)(n.li, { children: 'Update related test code when making changes' }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, l.jsx)(n.h2, { id: '-testing', children: '?\ufffd\ufffd Testing' }),
+            '\n',
+            (0, l.jsx)(n.p, { children: 'Verify cache key constants work properly:' }),
+            '\n',
+            (0, l.jsx)(n.pre, {
+              children: (0, l.jsx)(n.code, {
+                className: 'language-bash',
+                children:
+                  '# Test visibility toggle (check cache invalidation)\ncurl -X PATCH http://localhost:5000/api/v1/game-worlds/12/toggle-visibility \\\n  -H "Authorization: Bearer $TOKEN"\n\n# Test client API cache\ncurl http://localhost:5000/api/v1/client/game-worlds\n',
+              }),
+            }),
+            '\n',
+            (0, l.jsxs)(n.p, {
+              children: [
+                'Check server logs for ',
+                (0, l.jsx)(n.code, {
+                  children: 'Cache delete attempted but key not found: game_worlds:public',
+                }),
+                ' message',
+              ],
+            }),
+            '\n',
+            (0, l.jsx)(n.h2, { id: '-related-files', children: '?\ufffd\ufffd Related Files' }),
+            '\n',
+            (0, l.jsxs)(n.ul, {
+              children: [
+                '\n',
+                (0, l.jsxs)(n.li, {
+                  children: [
+                    (0, l.jsx)(n.code, { children: 'src/services/GameWorldService.ts' }),
+                    ' - Game world cache invalidation',
+                  ],
+                }),
+                '\n',
+                (0, l.jsxs)(n.li, {
+                  children: [
+                    (0, l.jsx)(n.code, { children: 'src/controllers/ClientController.ts' }),
+                    ' - Client API cache',
+                  ],
+                }),
+                '\n',
+                (0, l.jsxs)(n.li, {
+                  children: [
+                    (0, l.jsx)(n.code, { children: 'src/services/CacheService.ts' }),
+                    ' - Cache service',
+                  ],
+                }),
+                '\n',
+                (0, l.jsxs)(n.li, {
+                  children: [
+                    (0, l.jsx)(n.code, { children: 'src/services/PubSubService.ts' }),
+                    ' - Distributed cache invalidation',
+                  ],
+                }),
+                '\n',
+                (0, l.jsxs)(n.li, {
+                  children: [
+                    (0, l.jsx)(n.code, { children: 'CLIENT_API.md' }),
+                    ' - Client API documentation',
+                  ],
+                }),
+                '\n',
+              ],
+            }),
+          ],
+        });
+      }
+      function h(e = {}) {
+        const { wrapper: n } = { ...(0, t.R)(), ...e.components };
+        return n ? (0, l.jsx)(n, { ...e, children: (0, l.jsx)(o, { ...e }) }) : o(e);
+      }
+    },
+    8453(e, n, s) {
+      s.d(n, { R: () => r, x: () => c });
+      var i = s(6540);
+      const l = {},
+        t = i.createContext(l);
+      function r(e) {
+        const n = i.useContext(t);
+        return i.useMemo(
+          function () {
+            return 'function' == typeof e ? e(n) : { ...n, ...e };
+          },
+          [n, e]
+        );
+      }
+      function c(e) {
+        let n;
+        return (
+          (n = e.disableParentContext
+            ? 'function' == typeof e.components
+              ? e.components(l)
+              : e.components || l
+            : r(e.components)),
+          i.createElement(t.Provider, { value: n }, e.children)
+        );
+      }
+    },
+  },
+]);

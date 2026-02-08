@@ -2,731 +2,404 @@
   ":ButtonStatus": {
     ":type": {
       "id": "key",
-      "normalButtonTermsIds": [
-        "number",
-        "number"
-      ],
-      "lockButtonTermsIds": [
-        "number",
-        "number"
-      ],
-      "effectButtonTermsIds": [
-        "number",
-        "number"
-      ]
+      "normalButtonTermsIds": ["number", "number"],
+      "lockButtonTermsIds": ["number", "number"],
+      "effectButtonTermsIds": ["number", "number"]
     },
     ":required": {},
     ":requiredInObject": {},
     ":min": {
-      "normalButtonTermsIds": [
-        99230000,
-        99230000
-      ],
-      "lockButtonTermsIds": [
-        99230000,
-        99230000
-      ],
-      "effectButtonTermsIds": [
-        99230000,
-        99230000
-      ]
+      "normalButtonTermsIds": [99230000, 99230000],
+      "lockButtonTermsIds": [99230000, 99230000],
+      "effectButtonTermsIds": [99230000, 99230000]
     },
     ":max": {
-      "normalButtonTermsIds": [
-        99239999,
-        99239999
-      ],
-      "lockButtonTermsIds": [
-        99239999,
-        99239999
-      ],
-      "effectButtonTermsIds": [
-        99239999,
-        99239999
-      ]
+      "normalButtonTermsIds": [99239999, 99239999],
+      "lockButtonTermsIds": [99239999, 99239999],
+      "effectButtonTermsIds": [99239999, 99239999]
     },
     ":enum": {},
     ":links": {
-      "normalButtonTermsIds": [
-        [
-          "ButtonStatusTerms"
-        ],
-        [
-          "ButtonStatusTerms"
-        ]
-      ],
-      "lockButtonTermsIds": [
-        [
-          "ButtonStatusTerms"
-        ],
-        [
-          "ButtonStatusTerms"
-        ]
-      ],
-      "effectButtonTermsIds": [
-        [
-          "ButtonStatusTerms"
-        ],
-        [
-          "ButtonStatusTerms"
-        ]
-      ]
+      "normalButtonTermsIds": [["ButtonStatusTerms"], ["ButtonStatusTerms"]],
+      "lockButtonTermsIds": [["ButtonStatusTerms"], ["ButtonStatusTerms"]],
+      "effectButtonTermsIds": [["ButtonStatusTerms"], ["ButtonStatusTerms"]]
     }
   },
   "ButtonStatus": {
     "99200001": {
       "id": 99200001,
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "effectButtonTermsIds": [99230003]
     },
     "99200002": {
       "id": 99200002,
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "effectButtonTermsIds": [99230003]
     },
     "99200003": {
       "id": 99200003,
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "effectButtonTermsIds": [99230003]
     },
     "99200004": {
       "id": 99200004,
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "effectButtonTermsIds": [99230003]
     },
     "99200005": {
       "id": 99200005,
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "effectButtonTermsIds": [99230003]
     },
     "99200006": {
       "id": 99200006,
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "effectButtonTermsIds": [99230003]
     },
     "99200007": {
       "id": 99200007,
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "effectButtonTermsIds": [99230003]
     },
     "99200008": {
       "id": 99200008,
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "effectButtonTermsIds": [99230003]
     },
     "99200009": {
       "id": 99200009,
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "effectButtonTermsIds": [99230003]
     },
     "99200010": {
       "id": 99200010,
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "effectButtonTermsIds": [99230003]
     },
     "99200011": {
       "id": 99200011,
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "effectButtonTermsIds": [99230003]
     },
     "99200012": {
       "id": 99200012,
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "effectButtonTermsIds": [99230003]
     },
     "99200013": {
       "id": 99200013,
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "effectButtonTermsIds": [99230003]
     },
     "99200014": {
       "id": 99200014,
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "effectButtonTermsIds": [99230003]
     },
     "99200015": {
       "id": 99200015,
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "effectButtonTermsIds": [99230003]
     },
     "99200016": {
       "id": 99200016,
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "effectButtonTermsIds": [99230003]
     },
     "99200017": {
       "id": 99200017,
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "effectButtonTermsIds": [99230003]
     },
     "99200018": {
       "id": 99200018,
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "effectButtonTermsIds": [99230003]
     },
     "99200019": {
       "id": 99200019,
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "effectButtonTermsIds": [99230003]
     },
     "99200020": {
       "id": 99200020,
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "effectButtonTermsIds": [99230003]
     },
     "99200021": {
       "id": 99200021,
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "effectButtonTermsIds": [99230003]
     },
     "99200022": {
       "id": 99200022,
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "effectButtonTermsIds": [99230003]
     },
     "99200023": {
       "id": 99200023,
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "effectButtonTermsIds": [99230003]
     },
     "99200024": {
       "id": 99200024,
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "effectButtonTermsIds": [99230003]
     },
     "99200025": {
       "id": 99200025,
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "effectButtonTermsIds": [99230003]
     },
     "99200026": {
       "id": 99200026,
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "effectButtonTermsIds": [99230003]
     },
     "99200027": {
       "id": 99200027,
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "effectButtonTermsIds": [99230003]
     },
     "99200028": {
       "id": 99200028,
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "effectButtonTermsIds": [99230003]
     },
     "99200029": {
       "id": 99200029,
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "effectButtonTermsIds": [99230003]
     },
     "99200030": {
       "id": 99200030,
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "effectButtonTermsIds": [99230003]
     },
     "99200031": {
       "id": 99200031,
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "effectButtonTermsIds": [99230003]
     },
     "99200032": {
       "id": 99200032,
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "effectButtonTermsIds": [99230003]
     },
     "99200033": {
       "id": 99200033,
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "effectButtonTermsIds": [99230003]
     },
     "99200034": {
       "id": 99200034,
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "effectButtonTermsIds": [99230003]
     },
     "99200035": {
       "id": 99200035,
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "effectButtonTermsIds": [99230003]
     },
     "99200036": {
       "id": 99200036,
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "effectButtonTermsIds": [99230003]
     },
     "99200037": {
       "id": 99200037,
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "effectButtonTermsIds": [99230003]
     },
     "99200038": {
       "id": 99200038,
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "effectButtonTermsIds": [99230003]
     },
     "99200039": {
       "id": 99200039,
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "effectButtonTermsIds": [99230003]
     },
     "99200040": {
       "id": 99200040,
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "effectButtonTermsIds": [99230003]
     },
     "99200041": {
       "id": 99200041,
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "effectButtonTermsIds": [99230003]
     },
     "99200042": {
       "id": 99200042,
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "effectButtonTermsIds": [99230003]
     },
     "99200043": {
       "id": 99200043,
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "effectButtonTermsIds": [99230003]
     },
     "99200044": {
       "id": 99200044,
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "effectButtonTermsIds": [99230003]
     },
     "99200045": {
       "id": 99200045,
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "effectButtonTermsIds": [99230003]
     },
     "99200100": {
       "id": 99200100,
-      "normalButtonTermsIds": [
-        99230000
-      ],
-      "lockButtonTermsIds": [
-        99230001
-      ],
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "normalButtonTermsIds": [99230000],
+      "lockButtonTermsIds": [99230001],
+      "effectButtonTermsIds": [99230003]
     },
     "99200101": {
       "id": 99200101,
-      "normalButtonTermsIds": [
-        99230000
-      ],
-      "lockButtonTermsIds": [
-        99230001
-      ],
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "normalButtonTermsIds": [99230000],
+      "lockButtonTermsIds": [99230001],
+      "effectButtonTermsIds": [99230003]
     },
     "99200102": {
       "id": 99200102,
-      "normalButtonTermsIds": [
-        99230000
-      ],
-      "lockButtonTermsIds": [
-        99230001
-      ],
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "normalButtonTermsIds": [99230000],
+      "lockButtonTermsIds": [99230001],
+      "effectButtonTermsIds": [99230003]
     },
     "99200103": {
       "id": 99200103,
-      "normalButtonTermsIds": [
-        99230000
-      ],
-      "lockButtonTermsIds": [
-        99230001
-      ],
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "normalButtonTermsIds": [99230000],
+      "lockButtonTermsIds": [99230001],
+      "effectButtonTermsIds": [99230003]
     },
     "99200104": {
       "id": 99200104,
-      "normalButtonTermsIds": [
-        99230000
-      ],
-      "lockButtonTermsIds": [
-        99230001
-      ],
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "normalButtonTermsIds": [99230000],
+      "lockButtonTermsIds": [99230001],
+      "effectButtonTermsIds": [99230003]
     },
     "99200105": {
       "id": 99200105,
-      "normalButtonTermsIds": [
-        99230000
-      ],
-      "lockButtonTermsIds": [
-        99230001
-      ],
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "normalButtonTermsIds": [99230000],
+      "lockButtonTermsIds": [99230001],
+      "effectButtonTermsIds": [99230003]
     },
     "99200106": {
       "id": 99200106,
-      "normalButtonTermsIds": [
-        99230000
-      ],
-      "lockButtonTermsIds": [
-        99230001
-      ],
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "normalButtonTermsIds": [99230000],
+      "lockButtonTermsIds": [99230001],
+      "effectButtonTermsIds": [99230003]
     },
     "99200107": {
       "id": 99200107,
-      "normalButtonTermsIds": [
-        99230000
-      ],
-      "lockButtonTermsIds": [
-        99230001
-      ],
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "normalButtonTermsIds": [99230000],
+      "lockButtonTermsIds": [99230001],
+      "effectButtonTermsIds": [99230003]
     },
     "99200108": {
       "id": 99200108,
-      "normalButtonTermsIds": [
-        99230000
-      ],
-      "lockButtonTermsIds": [
-        99230001
-      ],
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "normalButtonTermsIds": [99230000],
+      "lockButtonTermsIds": [99230001],
+      "effectButtonTermsIds": [99230003]
     },
     "99200109": {
       "id": 99200109,
-      "normalButtonTermsIds": [
-        99230000
-      ],
-      "lockButtonTermsIds": [
-        99230001
-      ],
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "normalButtonTermsIds": [99230000],
+      "lockButtonTermsIds": [99230001],
+      "effectButtonTermsIds": [99230003]
     },
     "99200110": {
       "id": 99200110,
-      "normalButtonTermsIds": [
-        99230002
-      ],
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "normalButtonTermsIds": [99230002],
+      "effectButtonTermsIds": [99230003]
     },
     "99200111": {
       "id": 99200111,
-      "normalButtonTermsIds": [
-        99230000
-      ],
-      "lockButtonTermsIds": [
-        99230001
-      ],
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "normalButtonTermsIds": [99230000],
+      "lockButtonTermsIds": [99230001],
+      "effectButtonTermsIds": [99230003]
     },
     "99200112": {
       "id": 99200112,
-      "normalButtonTermsIds": [
-        99230000
-      ],
-      "lockButtonTermsIds": [
-        99230001
-      ],
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "normalButtonTermsIds": [99230000],
+      "lockButtonTermsIds": [99230001],
+      "effectButtonTermsIds": [99230003]
     },
     "99200113": {
       "id": 99200113,
-      "normalButtonTermsIds": [
-        99230000
-      ],
-      "lockButtonTermsIds": [
-        99230001
-      ],
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "normalButtonTermsIds": [99230000],
+      "lockButtonTermsIds": [99230001],
+      "effectButtonTermsIds": [99230003]
     },
     "99200114": {
       "id": 99200114,
-      "normalButtonTermsIds": [
-        99230000
-      ],
-      "lockButtonTermsIds": [
-        99230001
-      ],
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "normalButtonTermsIds": [99230000],
+      "lockButtonTermsIds": [99230001],
+      "effectButtonTermsIds": [99230003]
     },
     "99200115": {
       "id": 99200115,
-      "normalButtonTermsIds": [
-        99230000
-      ],
-      "lockButtonTermsIds": [
-        99230001
-      ],
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "normalButtonTermsIds": [99230000],
+      "lockButtonTermsIds": [99230001],
+      "effectButtonTermsIds": [99230003]
     },
     "99200116": {
       "id": 99200116,
-      "normalButtonTermsIds": [
-        99230000
-      ],
-      "lockButtonTermsIds": [
-        99230001
-      ],
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "normalButtonTermsIds": [99230000],
+      "lockButtonTermsIds": [99230001],
+      "effectButtonTermsIds": [99230003]
     },
     "99200117": {
       "id": 99200117,
-      "normalButtonTermsIds": [
-        99230000
-      ],
-      "lockButtonTermsIds": [
-        99230001
-      ],
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "normalButtonTermsIds": [99230000],
+      "lockButtonTermsIds": [99230001],
+      "effectButtonTermsIds": [99230003]
     },
     "99200118": {
       "id": 99200118,
-      "normalButtonTermsIds": [
-        99230000
-      ],
-      "lockButtonTermsIds": [
-        99230001
-      ],
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "normalButtonTermsIds": [99230000],
+      "lockButtonTermsIds": [99230001],
+      "effectButtonTermsIds": [99230003]
     },
     "99200119": {
       "id": 99200119,
-      "normalButtonTermsIds": [
-        99230004
-      ],
-      "lockButtonTermsIds": [
-        99230004
-      ],
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "normalButtonTermsIds": [99230004],
+      "lockButtonTermsIds": [99230004],
+      "effectButtonTermsIds": [99230003]
     },
     "99200120": {
       "id": 99200120,
-      "normalButtonTermsIds": [
-        99230000
-      ],
-      "lockButtonTermsIds": [
-        99230001
-      ],
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "normalButtonTermsIds": [99230000],
+      "lockButtonTermsIds": [99230001],
+      "effectButtonTermsIds": [99230003]
     },
     "99200121": {
       "id": 99200121,
-      "normalButtonTermsIds": [
-        99230000
-      ],
-      "lockButtonTermsIds": [
-        99230001
-      ],
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "normalButtonTermsIds": [99230000],
+      "lockButtonTermsIds": [99230001],
+      "effectButtonTermsIds": [99230003]
     },
     "99200122": {
       "id": 99200122,
-      "normalButtonTermsIds": [
-        99230000
-      ],
-      "lockButtonTermsIds": [
-        99230006,
-        99230001
-      ],
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "normalButtonTermsIds": [99230000],
+      "lockButtonTermsIds": [99230006, 99230001],
+      "effectButtonTermsIds": [99230003]
     },
     "99200123": {
       "id": 99200123,
-      "normalButtonTermsIds": [
-        99230000
-      ],
-      "lockButtonTermsIds": [
-        99230001
-      ],
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "normalButtonTermsIds": [99230000],
+      "lockButtonTermsIds": [99230001],
+      "effectButtonTermsIds": [99230003]
     },
     "99200124": {
       "id": 99200124,
-      "normalButtonTermsIds": [
-        99230007
-      ],
-      "lockButtonTermsIds": [
-        99230006,
-        99230001
-      ],
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "normalButtonTermsIds": [99230007],
+      "lockButtonTermsIds": [99230006, 99230001],
+      "effectButtonTermsIds": [99230003]
     },
     "99200125": {
       "id": 99200125,
-      "normalButtonTermsIds": [
-        99230000
-      ],
-      "lockButtonTermsIds": [
-        99230001
-      ],
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "normalButtonTermsIds": [99230000],
+      "lockButtonTermsIds": [99230001],
+      "effectButtonTermsIds": [99230003]
     },
     "99200126": {
       "id": 99200126,
-      "normalButtonTermsIds": [
-        99230004
-      ],
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "normalButtonTermsIds": [99230004],
+      "effectButtonTermsIds": [99230003]
     },
     "99200127": {
       "id": 99200127,
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "effectButtonTermsIds": [99230003]
     },
     "99200128": {
       "id": 99200128,
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "effectButtonTermsIds": [99230003]
     },
     "99200129": {
       "id": 99200129,
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "effectButtonTermsIds": [99230003]
     },
     "99200130": {
       "id": 99200130,
-      "normalButtonTermsIds": [
-        99230000
-      ],
-      "lockButtonTermsIds": [
-        99230001
-      ],
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "normalButtonTermsIds": [99230000],
+      "lockButtonTermsIds": [99230001],
+      "effectButtonTermsIds": [99230003]
     },
     "99200131": {
       "id": 99200131,
-      "normalButtonTermsIds": [
-        99230000
-      ],
-      "lockButtonTermsIds": [
-        99230001
-      ],
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "normalButtonTermsIds": [99230000],
+      "lockButtonTermsIds": [99230001],
+      "effectButtonTermsIds": [99230003]
     },
     "99200132": {
       "id": 99200132,
-      "normalButtonTermsIds": [
-        99230006,
-        99230001
-      ],
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "normalButtonTermsIds": [99230006, 99230001],
+      "effectButtonTermsIds": [99230003]
     },
     "99200133": {
       "id": 99200133,
-      "normalButtonTermsIds": [
-        99230000
-      ],
-      "lockButtonTermsIds": [
-        99230001
-      ],
-      "effectButtonTermsIds": [
-        99230003
-      ]
+      "normalButtonTermsIds": [99230000],
+      "lockButtonTermsIds": [99230001],
+      "effectButtonTermsIds": [99230003]
     }
   }
 }

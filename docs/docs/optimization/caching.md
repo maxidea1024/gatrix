@@ -33,5 +33,3 @@ This page summarizes a practical multi-tier caching approach used in Gatrix.
 ## Next
 
 - See database optimization: [/docs/optimization/database](/optimization/database)
-
-

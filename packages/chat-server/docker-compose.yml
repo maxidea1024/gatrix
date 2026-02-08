@@ -5,45 +5,45 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "5100:5100"
-      - "9090:9090" # Metrics port
+      - '5100:5100'
+      - '9090:9090' # Metrics port
     environment:
       - NODE_ENV=production
       - PORT=5100
       - HOST=0.0.0.0
-      
+
       # Database
       - DB_HOST=mysql
       - DB_PORT=3306
       - DB_NAME=gatrix_chat
       - DB_USER=chat_user
       - DB_PASSWORD=chat_password
-      
+
       # Redis
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - REDIS_PASSWORD=redis_password
       - REDIS_DB=1
-      
+
       # Clustering
       - CLUSTER_ENABLED=true
       - CLUSTER_WORKERS=0
       - STICKY_SESSION=true
-      
+
       # Performance
       - BROADCAST_BATCH_SIZE=1000
       - USE_MESSAGE_PACK=true
       - BROADCAST_COMPRESSION=true
       - WS_MAX_CONNECTIONS=10000
-      
+
       # Monitoring
       - MONITORING_ENABLED=true
       - METRICS_PORT=9090
-      
+
       # Gatrix Integration
       - GATRIX_API_URL=http://gatrix-main:3000
       - GATRIX_API_SECRET=shared-secret-between-servers
-      
+
     depends_on:
       - mysql
       - redis
@@ -61,7 +61,7 @@ services:
           memory: 512M
           cpus: '0.5'
     healthcheck:
-      test: ["CMD", "node", "dist/health-check.js"]
+      test: ['CMD', 'node', 'dist/health-check.js']
       interval: 30s
       timeout: 10s
       retries: 3
@@ -76,7 +76,7 @@ services:
       - MYSQL_USER=chat_user
       - MYSQL_PASSWORD=chat_password
     ports:
-      - "3306:3306"
+      - '3306:3306'
     volumes:
       - mysql_data:/var/lib/mysql
       - ./mysql/conf.d:/etc/mysql/conf.d
@@ -101,7 +101,7 @@ services:
       --save 300 10
       --save 60 10000
     ports:
-      - "6379:6379"
+      - '6379:6379'
     volumes:
       - redis_data:/data
     restart: unless-stopped
@@ -110,9 +110,9 @@ services:
   load-balancer:
     image: haproxy:2.8-alpine
     ports:
-      - "80:80"
-      - "443:443"
-      - "8080:8080" # Stats page
+      - '80:80'
+      - '443:443'
+      - '8080:8080' # Stats page
     volumes:
       - ./haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
       - ./ssl:/etc/ssl/certs:ro
@@ -124,7 +124,7 @@ services:
   prometheus:
     image: prom/prometheus:latest
     ports:
-      - "9091:9090"
+      - '9091:9090'
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus_data:/prometheus
@@ -141,7 +141,7 @@ services:
   grafana:
     image: grafana/grafana:latest
     ports:
-      - "3000:3000"
+      - '3000:3000'
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=admin
     volumes:

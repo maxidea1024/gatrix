@@ -3,8 +3,7 @@
  * Inserts default environments and segments
  */
 
-
-exports.up = async function(connection) {
+exports.up = async function (connection) {
   // Connection is provided by the migration system
 
   console.log('Inserting Remote Config V2 seed data...');
@@ -20,11 +19,14 @@ exports.up = async function(connection) {
   `);
 
   // Get environment IDs for segments
-  const [environments] = await connection.execute('SELECT id, environmentName FROM g_remote_config_v2_environments');
-  
+  const [environments] = await connection.execute(
+    'SELECT id, environmentName FROM g_remote_config_v2_environments'
+  );
+
   // Insert default segments for each environment
   for (const env of environments) {
-    await connection.execute(`
+    await connection.execute(
+      `
       INSERT IGNORE INTO g_remote_config_v2_segments 
       (environmentId, segmentName, displayName, description, segmentConditions, isActive, createdBy) 
       VALUES 
@@ -40,11 +42,13 @@ exports.up = async function(connection) {
       (?, 'new_users', 'New Users', 'Users registered within last 30 days', 
        JSON_OBJECT('conditions', JSON_ARRAY(JSON_OBJECT('field', 'registration_date', 'operator', 'greater_than', 'value', '30_days_ago'))), 
        TRUE, 1)
-    `, [env.id, env.id, env.id, env.id]);
+    `,
+      [env.id, env.id, env.id, env.id]
+    );
   }
 
   // Insert sample templates for development environment
-  const devEnv = environments.find(e => e.environmentName === 'development');
+  const devEnv = environments.find((e) => e.environmentName === 'development');
   if (devEnv) {
     const clientTemplateData = JSON.stringify({
       configs: {
@@ -52,73 +56,76 @@ exports.up = async function(connection) {
           type: 'boolean',
           defaultValue: false,
           description: 'Show new UI design',
-          campaigns: []
+          campaigns: [],
         },
         max_file_size: {
           type: 'number',
           defaultValue: 10485760,
           description: 'Maximum file upload size in bytes',
-          campaigns: []
+          campaigns: [],
         },
         welcome_message: {
           type: 'string',
           defaultValue: 'Welcome to our app!',
           description: 'Welcome message for new users',
-          campaigns: []
-        }
-      }
+          campaigns: [],
+        },
+      },
     });
-    
+
     const serverTemplateData = JSON.stringify({
       configs: {
         rate_limit_requests: {
           type: 'number',
           defaultValue: 1000,
           description: 'Rate limit requests per minute',
-          campaigns: []
+          campaigns: [],
         },
         enable_logging: {
           type: 'boolean',
           defaultValue: true,
           description: 'Enable detailed logging',
-          campaigns: []
+          campaigns: [],
         },
         database_config: {
           type: 'json',
           defaultValue: {
             maxConnections: 10,
-            timeout: 30000
+            timeout: 30000,
           },
           description: 'Database connection configuration',
-          campaigns: []
-        }
-      }
+          campaigns: [],
+        },
+      },
     });
-    
+
     const clientMetadata = JSON.stringify({
       configCount: 3,
       lastModified: new Date().toISOString(),
-      tags: ['client', 'features']
+      tags: ['client', 'features'],
     });
-    
+
     const serverMetadata = JSON.stringify({
       configCount: 3,
       lastModified: new Date().toISOString(),
-      tags: ['server', 'config']
+      tags: ['server', 'config'],
     });
-    
-    await connection.execute(`
+
+    await connection.execute(
+      `
       INSERT IGNORE INTO g_remote_config_v2_templates 
       (environmentId, templateName, displayName, description, templateType, status, version, templateData, metadata, createdBy, publishedAt) 
       VALUES 
       (?, 'client_features', 'Client Features', 'Feature flags for client applications', 'client', 'published', 1, ?, ?, 1, NOW()),
       (?, 'server_config', 'Server Configuration', 'Server-side configuration settings', 'server', 'published', 1, ?, ?, 1, NOW())
-    `, [devEnv.id, clientTemplateData, clientMetadata, devEnv.id, serverTemplateData, serverMetadata]);
+    `,
+      [devEnv.id, clientTemplateData, clientMetadata, devEnv.id, serverTemplateData, serverMetadata]
+    );
   }
   console.log('Remote Config V2 seed data inserted successfully');
 };
 
-exports.down = async function(connection) {
+exports.down = async function (connection) {
   // Connection is provided by the migration system
 
   console.log('Removing Remote Config V2 seed data...');

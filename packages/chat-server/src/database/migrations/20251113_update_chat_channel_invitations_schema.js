@@ -96,7 +96,9 @@ exports.down = async function down(knex) {
     // Map newer statuses back to closest legacy values
     await knex.raw(`UPDATE ${tableName} SET status = 'accepted' WHERE status = 'accepted'`);
     await knex.raw(`UPDATE ${tableName} SET status = 'pending' WHERE status IN ('pending')`);
-    await knex.raw(`UPDATE ${tableName} SET status = 'rejected' WHERE status IN ('declined','expired','cancelled')`);
+    await knex.raw(
+      `UPDATE ${tableName} SET status = 'rejected' WHERE status IN ('declined','expired','cancelled')`
+    );
     await knex.raw(
       `ALTER TABLE ${tableName} MODIFY COLUMN status ENUM('pending','accepted','rejected') DEFAULT 'pending'`
     );
@@ -106,4 +108,3 @@ exports.down = async function down(knex) {
 
   // No column drops in down() to avoid potential data loss
 };
-

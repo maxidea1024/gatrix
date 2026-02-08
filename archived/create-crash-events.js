@@ -65,7 +65,7 @@ const stackTraces = [
 
   `NotImplementedException: The method is not implemented
   at AbstractHandler.Handle () [0x00000] in Assets/Scripts/Handler.cs:20
-  at EventDispatcher.Dispatch (Event e) [0x00040] in Assets/Scripts/Events.cs:95`
+  at EventDispatcher.Dispatch (Event e) [0x00040] in Assets/Scripts/Events.cs:95`,
 ];
 
 const logData = `[2024-12-08 10:30:45] INFO: Game started
@@ -80,7 +80,16 @@ const environments = ['production', 'staging', 'development', 'qa'];
 const marketTypes = ['googleplay', 'appstore', 'steam', 'epic', 'direct'];
 const appVersions = ['1.0.0', '1.0.1', '1.1.0', '1.2.0', '2.0.0', '2.1.0', '2.2.0'];
 const resVersions = ['r100', 'r101', 'r102', 'r110', 'r200', 'r210'];
-const gameServerIds = ['server-001', 'server-002', 'server-003', 'server-004', 'server-005', 'server-006', 'server-007', 'server-008'];
+const gameServerIds = [
+  'server-001',
+  'server-002',
+  'server-003',
+  'server-004',
+  'server-005',
+  'server-006',
+  'server-007',
+  'server-008',
+];
 const userMessages = [
   'Game crashed while loading level',
   'Crash occurred during combat',
@@ -91,7 +100,10 @@ const userMessages = [
   'Random crash during gameplay',
   'Crashed when connecting to server',
   'Memory error during boss fight',
-  null, null, null, null // Some events without user message
+  null,
+  null,
+  null,
+  null, // Some events without user message
 ];
 
 // Helper function to get random item from array
@@ -138,26 +150,24 @@ async function createCrashEvent(index, totalCount) {
     userName: generateUsername(),
     gameServerId: getRandomItem(gameServerIds),
     userMessage: getRandomItem(userMessages),
-    log: logData
+    log: logData,
   };
 
   try {
-    const response = await axios.post(
-      `${BASE_URL}/api/v1/client/crashes/upload`,
-      crashData,
-      {
-        headers: {
-          'X-API-Token': API_TOKEN,
-          'X-Application-Name': APPLICATION_NAME,
-          'Content-Type': 'application/json'
-        },
-        timeout: 30000
-      }
-    );
+    const response = await axios.post(`${BASE_URL}/api/v1/client/crashes/upload`, crashData, {
+      headers: {
+        'X-API-Token': API_TOKEN,
+        'X-Application-Name': APPLICATION_NAME,
+        'Content-Type': 'application/json',
+      },
+      timeout: 30000,
+    });
 
     // Only log every 100 events to reduce console spam
     if ((index + 1) % 100 === 0 || index === 0) {
-      console.log(`✅ [${index + 1}/${totalCount}] Progress: ${((index + 1) / totalCount * 100).toFixed(1)}%`);
+      console.log(
+        `✅ [${index + 1}/${totalCount}] Progress: ${(((index + 1) / totalCount) * 100).toFixed(1)}%`
+      );
     }
 
     return {
@@ -165,7 +175,7 @@ async function createCrashEvent(index, totalCount) {
       index: index + 1,
       crashId: response.data.data.crashId,
       eventId: response.data.data.eventId,
-      isNewCrash: response.data.data.isNewCrash
+      isNewCrash: response.data.data.isNewCrash,
     };
   } catch (error) {
     console.error(`❌ [${index + 1}/${totalCount}] Failed to create crash event`);
@@ -186,7 +196,7 @@ async function createCrashEvent(index, totalCount) {
       success: false,
       index: index + 1,
       error: error.message || error.code || 'Unknown error',
-      crashData: crashData
+      crashData: crashData,
     };
   }
 }
@@ -211,10 +221,11 @@ async function createBatch(startIndex, batchSize, totalCount, results) {
       }
     } else {
       results.failed++;
-      if (results.errors.length < 10) { // Only keep first 10 errors
+      if (results.errors.length < 10) {
+        // Only keep first 10 errors
         results.errors.push({
           index: result.index,
-          error: result.error
+          error: result.error,
         });
       }
     }
@@ -235,7 +246,7 @@ async function createMultipleCrashEvents(count = 100) {
     failed: 0,
     newCrashes: 0,
     existingCrashes: 0,
-    errors: []
+    errors: [],
   };
 
   const startTime = Date.now();
@@ -247,7 +258,7 @@ async function createMultipleCrashEvents(count = 100) {
 
     // Small delay between batches
     if (i + BATCH_SIZE < count) {
-      await new Promise(resolve => setTimeout(resolve, 50));
+      await new Promise((resolve) => setTimeout(resolve, 50));
     }
   }
 
@@ -269,7 +280,7 @@ async function createMultipleCrashEvents(count = 100) {
 
   if (results.errors.length > 0) {
     console.log('\n❌ First 10 Errors:');
-    results.errors.forEach(err => {
+    results.errors.forEach((err) => {
       console.log(`   [${err.index}] ${err.error}`);
     });
   }
@@ -279,8 +290,7 @@ async function createMultipleCrashEvents(count = 100) {
 
 // Run the script
 const count = process.argv[2] ? parseInt(process.argv[2]) : 100;
-createMultipleCrashEvents(count).catch(error => {
+createMultipleCrashEvents(count).catch((error) => {
   console.error('Fatal error:', error);
   process.exit(1);
 });
-

@@ -37,9 +37,7 @@
     },
     ":enum": {},
     ":links": {
-      "reward": [
-        "RewardFixed"
-      ]
+      "reward": ["RewardFixed"]
     }
   },
   "AchievementCollection": {

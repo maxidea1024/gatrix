@@ -6,8 +6,8 @@ const options = {
   path: '/api/v1/admin/crash-events?page=1&limit=5',
   method: 'GET',
   headers: {
-    'Content-Type': 'application/json'
-  }
+    'Content-Type': 'application/json',
+  },
 };
 
 const req = http.request(options, (res) => {
@@ -20,7 +20,7 @@ const req = http.request(options, (res) => {
   res.on('end', () => {
     console.log('Status Code:', res.statusCode);
     console.log('Response:', data);
-    
+
     try {
       const json = JSON.parse(data);
       console.log('\nParsed Response:');
@@ -41,4 +41,3 @@ req.on('error', (error) => {
 });
 
 req.end();
-

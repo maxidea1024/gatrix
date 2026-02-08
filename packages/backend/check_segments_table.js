@@ -6,7 +6,7 @@ async function checkTable() {
     port: process.env.DB_PORT || 3306,
     user: process.env.DB_USER || 'motif_dev',
     password: process.env.DB_PASSWORD || 'dev123$',
-    database: process.env.DB_NAME || 'uwo_gate'
+    database: process.env.DB_NAME || 'uwo_gate',
   });
 
   try {

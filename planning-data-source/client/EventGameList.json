@@ -10,10 +10,7 @@
       "costUseRewardId": "number",
       "rewardRepresentativeItem": "number",
       "dailyLimit": "number",
-      "referPage": [
-        "number",
-        "number"
-      ],
+      "referPage": ["number", "number"],
       "ticketPurchaseId": "number",
       "ticketPurchaseVal": "number",
       "isLoop": "bool"
@@ -29,20 +26,9 @@
     ":max": {},
     ":enum": {},
     ":links": {
-      "costItem": [
-        "Item"
-      ],
-      "costUseRewardId": [
-        "RewardFixed"
-      ],
-      "referPage": [
-        [
-          "EventPage"
-        ],
-        [
-          "EventPage"
-        ]
-      ]
+      "costItem": ["Item"],
+      "costUseRewardId": ["RewardFixed"],
+      "referPage": [["EventPage"], ["EventPage"]]
     }
   },
   "EventGameList": {
@@ -53,10 +39,7 @@
       "groupId": 10001,
       "costItem": 23340003,
       "costCount": 1,
-      "referPage": [
-        99320024,
-        99320026
-      ],
+      "referPage": [99320024, 99320026],
       "isLoop": false
     },
     "10002": {
@@ -66,9 +49,7 @@
       "groupId": 10002,
       "costItem": 23340011,
       "costCount": 1,
-      "referPage": [
-        99320080
-      ],
+      "referPage": [99320080],
       "isLoop": false
     },
     "10003": {
@@ -78,9 +59,7 @@
       "groupId": 10003,
       "costItem": 23340011,
       "costCount": 1,
-      "referPage": [
-        99320081
-      ],
+      "referPage": [99320081],
       "isLoop": false
     },
     "10004": {
@@ -90,10 +69,7 @@
       "groupId": 10004,
       "costItem": 23340048,
       "costCount": 1,
-      "referPage": [
-        99320176,
-        99320178
-      ],
+      "referPage": [99320176, 99320178],
       "isLoop": false
     },
     "10006": {
@@ -103,9 +79,7 @@
       "groupId": 10006,
       "costItem": 23340011,
       "costCount": 1,
-      "referPage": [
-        99390005
-      ],
+      "referPage": [99390005],
       "ticketPurchaseId": 100003,
       "ticketPurchaseVal": 300,
       "isLoop": true
@@ -117,9 +91,7 @@
       "groupId": 10007,
       "costItem": 23340003,
       "costCount": 1,
-      "referPage": [
-        99390006
-      ],
+      "referPage": [99390006],
       "ticketPurchaseId": 10500339,
       "ticketPurchaseVal": 3,
       "isLoop": false
@@ -131,9 +103,7 @@
       "groupId": 10008,
       "costItem": 23340193,
       "costCount": 1,
-      "referPage": [
-        99310025
-      ],
+      "referPage": [99310025],
       "ticketPurchaseId": 100003,
       "ticketPurchaseVal": 30,
       "isLoop": true

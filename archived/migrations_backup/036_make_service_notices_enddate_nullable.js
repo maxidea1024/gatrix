@@ -1,6 +1,6 @@
 /**
  * Migration 036: Make endDate nullable in g_service_notices
- * 
+ *
  * This allows service notices to have no end date (permanent notices)
  */
 
@@ -61,4 +61,3 @@ async function down(connection) {
 }
 
 module.exports = { up, down };
-

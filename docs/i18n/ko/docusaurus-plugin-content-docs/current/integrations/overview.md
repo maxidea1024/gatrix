@@ -9,22 +9,25 @@ Gatrix를 다양한 외부 서비스와 연결합니다.
 
 ## 지원되는 연동 서비스
 
-| 서비스 | 설명 |
-|-------------|-------------|
-| [Slack](./slack) | Slack 채널로 알림 전송 |
-| [Microsoft Teams](./teams) | Teams 채널로 알림 전송 |
-| [Webhook](./webhook) | 맞춤형 HTTP 웹훅 전송 |
-| [New Relic](./new-relic) | APM 및 모니터링 데이터 연동 |
+| 서비스                     | 설명                        |
+| -------------------------- | --------------------------- |
+| [Slack](./slack)           | Slack 채널로 알림 전송      |
+| [Microsoft Teams](./teams) | Teams 채널로 알림 전송      |
+| [Webhook](./webhook)       | 맞춤형 HTTP 웹훅 전송       |
+| [New Relic](./new-relic)   | APM 및 모니터링 데이터 연동 |
 
 ## 연동 유형
 
 ### 알림 연동
+
 Gatrix에서 이벤트가 발생할 때 알림을 받습니다:
+
 - 피처 플래그 변경
 - 점검 상태 업데이트
 - 시스템 오류 알림
 
 ### 모니터링 연동
+
 모니터링 플랫폼으로 메트릭 및 추적 데이터를 내보냅니다.
 
 ## 연동 설정 방법
@@ -39,10 +42,10 @@ Gatrix에서 이벤트가 발생할 때 알림을 받습니다:
 
 다음에 의해 연동이 트리거될 수 있습니다:
 
-| 이벤트 | 설명 |
-|-------|-------------|
-| `feature_flag.created` | 새 플래그 생성됨 |
+| 이벤트                 | 설명               |
+| ---------------------- | ------------------ |
+| `feature_flag.created` | 새 플래그 생성됨   |
 | `feature_flag.updated` | 플래그 값이 변경됨 |
-| `feature_flag.deleted` | 플래그 삭제됨 |
-| `maintenance.started` | 점검이 시작됨 |
-| `maintenance.ended` | 점검이 완료됨 |
+| `feature_flag.deleted` | 플래그 삭제됨      |
+| `maintenance.started`  | 점검이 시작됨      |
+| `maintenance.ended`    | 점검이 완료됨      |

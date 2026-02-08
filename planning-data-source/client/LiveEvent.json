@@ -9,9 +9,7 @@
       "endDate": "string",
       "localBitflag": "bit",
       "isQuest": "bool",
-      "eventMateJob": [
-        "number"
-      ],
+      "eventMateJob": ["number"],
       "eventMateBuffGradeC": "number",
       "eventMateBuffGradeB": "number",
       "eventMateBuffGradeA": "number",
@@ -27,18 +25,14 @@
       "isQuest": 1
     },
     ":min": {
-      "eventMateJob": [
-        21400000
-      ],
+      "eventMateJob": [21400000],
       "eventMateBuffGradeC": 38000000,
       "eventMateBuffGradeB": 38000000,
       "eventMateBuffGradeA": 38000000,
       "eventMateBuffGradeS": 38000000
     },
     ":max": {
-      "eventMateJob": [
-        21499999
-      ],
+      "eventMateJob": [21499999],
       "eventMateBuffGradeC": 38099999,
       "eventMateBuffGradeB": 38099999,
       "eventMateBuffGradeA": 38099999,
@@ -46,23 +40,11 @@
     },
     ":enum": {},
     ":links": {
-      "eventMateJob": [
-        [
-          "Job"
-        ]
-      ],
-      "eventMateBuffGradeC": [
-        "WorldBuff"
-      ],
-      "eventMateBuffGradeB": [
-        "WorldBuff"
-      ],
-      "eventMateBuffGradeA": [
-        "WorldBuff"
-      ],
-      "eventMateBuffGradeS": [
-        "WorldBuff"
-      ]
+      "eventMateJob": [["Job"]],
+      "eventMateBuffGradeC": ["WorldBuff"],
+      "eventMateBuffGradeB": ["WorldBuff"],
+      "eventMateBuffGradeA": ["WorldBuff"],
+      "eventMateBuffGradeS": ["WorldBuff"]
     }
   },
   "LiveEvent": {
@@ -75,9 +57,7 @@
       "endDate": "2023/03/30/23:59:59",
       "localBitflag": 127,
       "isQuest": true,
-      "eventMateJob": [
-        21402003
-      ],
+      "eventMateJob": [21402003],
       "eventMateBuffGradeC": 38090003,
       "eventMateBuffGradeB": 38090004,
       "eventMateBuffGradeA": 38090005,

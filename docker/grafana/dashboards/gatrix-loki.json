@@ -20,97 +20,321 @@
   "panels": [
     {
       "datasource": "Prometheus",
-      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "mappings": [], "thresholds": { "mode": "absolute", "steps": [ { "color": "red", "value": null }, { "color": "green", "value": 1 } ] }, "unit": "short" }, "overrides": [] },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "green", "value": 1 }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
       "gridPos": { "h": 4, "w": 6, "x": 0, "y": 0 },
       "id": 1,
-      "options": { "colorMode": "background", "graphMode": "none", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "values": false, "fields": "", "calcs": ["lastNotNull"] }, "textMode": "auto" },
-      "targets": [ { "expr": "up{job=\"loki\", instance=~\"$instance\"}", "legendFormat": "", "refId": "A" } ],
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": { "values": false, "fields": "", "calcs": ["lastNotNull"] },
+        "textMode": "auto"
+      },
+      "targets": [
+        { "expr": "up{job=\"loki\", instance=~\"$instance\"}", "legendFormat": "", "refId": "A" }
+      ],
       "title": "Loki Up",
       "type": "stat"
     },
     {
       "datasource": "Prometheus",
-      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "mappings": [], "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null } ] }, "unit": "short" }, "overrides": [] },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] },
+          "unit": "short"
+        },
+        "overrides": []
+      },
       "gridPos": { "h": 4, "w": 6, "x": 6, "y": 0 },
       "id": 2,
-      "options": { "colorMode": "background", "graphMode": "none", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "values": false, "fields": "", "calcs": ["lastNotNull"] }, "textMode": "auto" },
-      "targets": [ { "expr": "sum(rate(loki_distributor_lines_received_total{job=\"loki\", tenant=~\"$tenant\"}[5m]))", "legendFormat": "", "refId": "A" } ],
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": { "values": false, "fields": "", "calcs": ["lastNotNull"] },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(loki_distributor_lines_received_total{job=\"loki\", tenant=~\"$tenant\"}[5m]))",
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
       "title": "Ingest Lines/sec",
       "type": "stat"
     },
     {
       "datasource": "Prometheus",
-      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "mappings": [], "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null } ] }, "unit": "Bps" }, "overrides": [] },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] },
+          "unit": "Bps"
+        },
+        "overrides": []
+      },
       "gridPos": { "h": 4, "w": 6, "x": 12, "y": 0 },
       "id": 3,
-      "options": { "colorMode": "background", "graphMode": "none", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "values": false, "fields": "", "calcs": ["lastNotNull"] }, "textMode": "auto" },
-      "targets": [ { "expr": "sum(rate(loki_distributor_bytes_received_total{job=\"loki\", tenant=~\"$tenant\"}[5m]))", "legendFormat": "", "refId": "A" } ],
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": { "values": false, "fields": "", "calcs": ["lastNotNull"] },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(loki_distributor_bytes_received_total{job=\"loki\", tenant=~\"$tenant\"}[5m]))",
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
       "title": "Ingest Bytes/sec",
       "type": "stat"
     },
     {
       "datasource": "Prometheus",
-      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "mappings": [], "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null } ] }, "unit": "short" }, "overrides": [] },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] },
+          "unit": "short"
+        },
+        "overrides": []
+      },
       "gridPos": { "h": 4, "w": 6, "x": 18, "y": 0 },
       "id": 4,
-      "options": { "colorMode": "background", "graphMode": "none", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "values": false, "fields": "", "calcs": ["lastNotNull"] }, "textMode": "auto" },
-      "targets": [ { "expr": "count(loki_distributor_lines_received_total{job=\"loki\", tenant=~\"$tenant\"})", "legendFormat": "", "refId": "A" } ],
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": { "values": false, "fields": "", "calcs": ["lastNotNull"] },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "expr": "count(loki_distributor_lines_received_total{job=\"loki\", tenant=~\"$tenant\"})",
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
       "title": "Active Tenants",
       "type": "stat"
     },
     {
       "datasource": "Prometheus",
-      "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom": { "drawStyle": "line", "lineInterpolation": "linear", "barAlignment": 0, "fillOpacity": 20, "gradientMode": "none", "showPoints": "never", "spanNulls": true }, "mappings": [], "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null } ] }, "unit": "short" }, "overrides": [] },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "barAlignment": 0,
+            "fillOpacity": 20,
+            "gradientMode": "none",
+            "showPoints": "never",
+            "spanNulls": true
+          },
+          "mappings": [],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] },
+          "unit": "short"
+        },
+        "overrides": []
+      },
       "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 },
       "id": 5,
-      "options": { "legend": { "displayMode": "list", "placement": "bottom", "calcs": [] }, "tooltip": { "mode": "single" } },
-      "targets": [ { "expr": "sum(rate(loki_distributor_lines_received_total{job=\"loki\", tenant=~\"$tenant\"}[5m])) by (tenant)", "legendFormat": "{{tenant}}", "refId": "A" } ],
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom", "calcs": [] },
+        "tooltip": { "mode": "single" }
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(loki_distributor_lines_received_total{job=\"loki\", tenant=~\"$tenant\"}[5m])) by (tenant)",
+          "legendFormat": "{{tenant}}",
+          "refId": "A"
+        }
+      ],
       "title": "Ingest Lines/sec by Tenant",
       "type": "timeseries"
     },
     {
       "datasource": "Prometheus",
-      "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom": { "drawStyle": "line", "lineInterpolation": "linear", "barAlignment": 0, "fillOpacity": 20, "gradientMode": "none", "showPoints": "never", "spanNulls": true }, "mappings": [], "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null } ] }, "unit": "short" }, "overrides": [] },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "barAlignment": 0,
+            "fillOpacity": 20,
+            "gradientMode": "none",
+            "showPoints": "never",
+            "spanNulls": true
+          },
+          "mappings": [],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] },
+          "unit": "short"
+        },
+        "overrides": []
+      },
       "gridPos": { "h": 8, "w": 12, "x": 12, "y": 4 },
       "id": 6,
-      "options": { "legend": { "displayMode": "list", "placement": "bottom", "calcs": [] }, "tooltip": { "mode": "single" } },
-      "targets": [ { "expr": "sum(rate(loki_request_duration_seconds_count{job=\"loki\", instance=~\"$instance\"}[5m])) by (route)", "legendFormat": "{{route}}", "refId": "A" } ],
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom", "calcs": [] },
+        "tooltip": { "mode": "single" }
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(loki_request_duration_seconds_count{job=\"loki\", instance=~\"$instance\"}[5m])) by (route)",
+          "legendFormat": "{{route}}",
+          "refId": "A"
+        }
+      ],
       "title": "Request Rate by Route",
       "type": "timeseries"
     },
     {
       "datasource": "Prometheus",
-      "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom": { "drawStyle": "line", "lineInterpolation": "linear", "barAlignment": 0, "fillOpacity": 20, "gradientMode": "none", "showPoints": "never", "spanNulls": true }, "mappings": [], "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null } ] }, "unit": "s" }, "overrides": [] },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "barAlignment": 0,
+            "fillOpacity": 20,
+            "gradientMode": "none",
+            "showPoints": "never",
+            "spanNulls": true
+          },
+          "mappings": [],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] },
+          "unit": "s"
+        },
+        "overrides": []
+      },
       "gridPos": { "h": 8, "w": 12, "x": 0, "y": 12 },
       "id": 7,
-      "options": { "legend": { "displayMode": "list", "placement": "bottom", "calcs": [] }, "tooltip": { "mode": "single" } },
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom", "calcs": [] },
+        "tooltip": { "mode": "single" }
+      },
       "targets": [
-        { "expr": "histogram_quantile(0.95, sum by (le) (rate(loki_request_duration_seconds_bucket{job=\"loki\", route=\"loki_api_v1_query_range\"}[5m])))", "legendFormat": "HTTP query_range p95", "refId": "A" },
-        { "expr": "histogram_quantile(0.95, sum by (le) (rate(loki_request_duration_seconds_bucket{job=\"loki\", route=\"loki_api_v1_query\"}[5m])))", "legendFormat": "HTTP query p95", "refId": "B" },
-        { "expr": "histogram_quantile(0.95, sum by (le) (rate(loki_request_duration_seconds_bucket{job=\"loki\", route=\"/logproto.Querier/Query\"}[5m])))", "legendFormat": "gRPC Query p95", "refId": "C" }
+        {
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(loki_request_duration_seconds_bucket{job=\"loki\", route=\"loki_api_v1_query_range\"}[5m])))",
+          "legendFormat": "HTTP query_range p95",
+          "refId": "A"
+        },
+        {
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(loki_request_duration_seconds_bucket{job=\"loki\", route=\"loki_api_v1_query\"}[5m])))",
+          "legendFormat": "HTTP query p95",
+          "refId": "B"
+        },
+        {
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(loki_request_duration_seconds_bucket{job=\"loki\", route=\"/logproto.Querier/Query\"}[5m])))",
+          "legendFormat": "gRPC Query p95",
+          "refId": "C"
+        }
       ],
       "title": "Query Latency (p95)",
       "type": "timeseries"
     },
     {
       "datasource": "Prometheus",
-      "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom": { "drawStyle": "line", "lineInterpolation": "linear", "barAlignment": 0, "fillOpacity": 20, "gradientMode": "none", "showPoints": "never", "spanNulls": true }, "mappings": [], "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null } ] }, "unit": "short" }, "overrides": [] },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "barAlignment": 0,
+            "fillOpacity": 20,
+            "gradientMode": "none",
+            "showPoints": "never",
+            "spanNulls": true
+          },
+          "mappings": [],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] },
+          "unit": "short"
+        },
+        "overrides": []
+      },
       "gridPos": { "h": 8, "w": 12, "x": 12, "y": 12 },
       "id": 8,
-      "options": { "legend": { "displayMode": "list", "placement": "bottom", "calcs": [] }, "tooltip": { "mode": "single" } },
-      "targets": [ { "expr": "loki_tcp_connections{job=\"loki\"}", "legendFormat": "{{protocol}}", "refId": "A" } ],
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom", "calcs": [] },
+        "tooltip": { "mode": "single" }
+      },
+      "targets": [
+        {
+          "expr": "loki_tcp_connections{job=\"loki\"}",
+          "legendFormat": "{{protocol}}",
+          "refId": "A"
+        }
+      ],
       "title": "TCP Connections by Protocol",
       "type": "timeseries"
     },
     {
       "datasource": "Prometheus",
-      "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom": { "drawStyle": "line", "lineInterpolation": "linear", "barAlignment": 0, "fillOpacity": 20, "gradientMode": "none", "showPoints": "never", "spanNulls": true }, "mappings": [], "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null } ] }, "unit": "short" }, "overrides": [] },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "barAlignment": 0,
+            "fillOpacity": 20,
+            "gradientMode": "none",
+            "showPoints": "never",
+            "spanNulls": true
+          },
+          "mappings": [],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] },
+          "unit": "short"
+        },
+        "overrides": []
+      },
       "gridPos": { "h": 8, "w": 24, "x": 0, "y": 20 },
       "id": 9,
-      "options": { "legend": { "displayMode": "list", "placement": "bottom", "calcs": [] }, "tooltip": { "mode": "single" } },
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom", "calcs": [] },
+        "tooltip": { "mode": "single" }
+      },
       "targets": [
-        { "expr": "loki_ring_members{job=\"loki\"}", "legendFormat": "members ({{ring}})", "refId": "A" },
-        { "expr": "loki_ring_tokens_total{job=\"loki\"}", "legendFormat": "tokens ({{ring}})", "refId": "B" }
+        {
+          "expr": "loki_ring_members{job=\"loki\"}",
+          "legendFormat": "members ({{ring}})",
+          "refId": "A"
+        },
+        {
+          "expr": "loki_ring_tokens_total{job=\"loki\"}",
+          "legendFormat": "tokens ({{ring}})",
+          "refId": "B"
+        }
       ],
       "title": "Ring Members & Tokens",
       "type": "timeseries"
@@ -122,8 +346,26 @@
   "tags": ["loki", "infrastructure"],
   "templating": {
     "list": [
-      { "name": "instance", "type": "query", "datasource": "Prometheus", "query": "label_values({job=\"loki\"}, instance)", "includeAll": true, "allValue": ".*", "multi": true, "refresh": 1 },
-      { "name": "tenant", "type": "query", "datasource": "Prometheus", "query": "label_values(loki_distributor_lines_received_total{job=\"loki\"}, tenant)", "includeAll": true, "allValue": ".*", "multi": true, "refresh": 1 }
+      {
+        "name": "instance",
+        "type": "query",
+        "datasource": "Prometheus",
+        "query": "label_values({job=\"loki\"}, instance)",
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": true,
+        "refresh": 1
+      },
+      {
+        "name": "tenant",
+        "type": "query",
+        "datasource": "Prometheus",
+        "query": "label_values(loki_distributor_lines_received_total{job=\"loki\"}, tenant)",
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": true,
+        "refresh": 1
+      }
     ]
   },
   "time": { "from": "now-1h", "to": "now" },
@@ -133,4 +375,3 @@
   "uid": "gatrix-loki",
   "version": 0
 }
-

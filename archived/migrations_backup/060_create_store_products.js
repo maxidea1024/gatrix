@@ -3,7 +3,7 @@
  * Stores in-app purchase products for game stores (Google Play, Apple App Store, etc.)
  */
 
-exports.up = async function(connection) {
+exports.up = async function (connection) {
   console.log('Creating store products table...');
 
   // Check if table already exists
@@ -54,11 +54,10 @@ exports.up = async function(connection) {
   console.log('✅ Store products table created successfully');
 };
 
-exports.down = async function(connection) {
+exports.down = async function (connection) {
   console.log('Dropping store products table...');
   await connection.execute('DROP TABLE IF EXISTS g_store_products');
   console.log('✅ Store products table dropped');
 };
 
 module.exports = exports;
-

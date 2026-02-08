@@ -1,70 +1,71 @@
 const fs = require('fs');
-const path = 'c:/github/admin-templates/gatrix/packages/frontend/src/pages/admin/ServerListPage.tsx';
+const path =
+  'c:/github/admin-templates/gatrix/packages/frontend/src/pages/admin/ServerListPage.tsx';
 
 try {
-    let content = fs.readFileSync(path, 'utf8');
+  let content = fs.readFileSync(path, 'utf8');
 
-    // Find the CheckerboardView component
-    const viewStart = content.indexOf('const CheckerboardView: React.FC<CheckerboardViewProps>');
-    if (viewStart === -1) {
-        console.error('Could not find CheckerboardView component');
-        process.exit(1);
-    }
+  // Find the CheckerboardView component
+  const viewStart = content.indexOf('const CheckerboardView: React.FC<CheckerboardViewProps>');
+  if (viewStart === -1) {
+    console.error('Could not find CheckerboardView component');
+    process.exit(1);
+  }
 
-    // Find Tooltip inside CheckerboardView
-    const tooltipStartMarker = '<Tooltip';
-    const tooltipStart = content.indexOf(tooltipStartMarker, viewStart);
-    if (tooltipStart === -1) {
-        console.error('Could not find Tooltip inside CheckerboardView');
-        process.exit(1);
-    }
+  // Find Tooltip inside CheckerboardView
+  const tooltipStartMarker = '<Tooltip';
+  const tooltipStart = content.indexOf(tooltipStartMarker, viewStart);
+  if (tooltipStart === -1) {
+    console.error('Could not find Tooltip inside CheckerboardView');
+    process.exit(1);
+  }
 
-    // Find where Tooltip props end (before children)
-    // We look for the closing '>' of the opening tag.
-    // The children starts with <Box...
-    const childrenStartMarker = '<Box';
-    const childrenStart = content.indexOf(childrenStartMarker, tooltipStart);
+  // Find where Tooltip props end (before children)
+  // We look for the closing '>' of the opening tag.
+  // The children starts with <Box...
+  const childrenStartMarker = '<Box';
+  const childrenStart = content.indexOf(childrenStartMarker, tooltipStart);
 
-    // Actually, we want to replace everything from <Tooltip ... up to the `title` prop ending.
-    // But the existing code has `title={ <Box ... </Box> } >`
-    // So the children <Box> is AFTER the opening tag of Tooltip.
+  // Actually, we want to replace everything from <Tooltip ... up to the `title` prop ending.
+  // But the existing code has `title={ <Box ... </Box> } >`
+  // So the children <Box> is AFTER the opening tag of Tooltip.
 
-    // Let's find the closing `>` of the Tooltip opening tag.   
-    // In the existing code:
-    // title={ ... } >
-    //               <Box ...
+  // Let's find the closing `>` of the Tooltip opening tag.
+  // In the existing code:
+  // title={ ... } >
+  //               <Box ...
 
-    // So we can search for the first `>` after `title` prop.
+  // So we can search for the first `>` after `title` prop.
 
-    // Let's verify the uniqueness of the block we want to replace.
-    // We want to replace from `<Tooltip` inside CheckerboardView
-    // up to the `>` that closes the Tooltip opening tag.
+  // Let's verify the uniqueness of the block we want to replace.
+  // We want to replace from `<Tooltip` inside CheckerboardView
+  // up to the `>` that closes the Tooltip opening tag.
 
-    // We will construct the replacement string which includes the opening tag and all props including title.
+  // We will construct the replacement string which includes the opening tag and all props including title.
 
-    // Find the exact range to replace.
-    // Start: tooltipStart
-    // End: the index of `>` before the children <Box> (the click handler box)
+  // Find the exact range to replace.
+  // Start: tooltipStart
+  // End: the index of `>` before the children <Box> (the click handler box)
 
-    // To identify the start of children box:
-    // It has `onContextMenu={(e) => onContextMenu(e, service)}`
-    const clickHandlerBoxMarker = 'onContextMenu={(e) => onContextMenu(e, service)}';
-    const clickHandlerBoxIndex = content.indexOf(clickHandlerBoxMarker, tooltipStart);
+  // To identify the start of children box:
+  // It has `onContextMenu={(e) => onContextMenu(e, service)}`
+  const clickHandlerBoxMarker = 'onContextMenu={(e) => onContextMenu(e, service)}';
+  const clickHandlerBoxIndex = content.indexOf(clickHandlerBoxMarker, tooltipStart);
 
-    if (clickHandlerBoxIndex === -1) {
-        console.error('Could not find click handler box');
-        process.exit(1);
-    }
+  if (clickHandlerBoxIndex === -1) {
+    console.error('Could not find click handler box');
+    process.exit(1);
+  }
 
-    // Find the `<Box` before the click handler.
-    const childrenBoxStart = content.lastIndexOf('<Box', clickHandlerBoxIndex);
+  // Find the `<Box` before the click handler.
+  const childrenBoxStart = content.lastIndexOf('<Box', clickHandlerBoxIndex);
 
-    // Find the `>` before `childrenBoxStart`. This `>` belongs to Tooltip opening tag.
-    const tooltipOpenTagEnd = content.lastIndexOf('>', childrenBoxStart);
+  // Find the `>` before `childrenBoxStart`. This `>` belongs to Tooltip opening tag.
+  const tooltipOpenTagEnd = content.lastIndexOf('>', childrenBoxStart);
 
-    // The replacement range is [tooltipStart, tooltipOpenTagEnd + 1]
+  // The replacement range is [tooltipStart, tooltipOpenTagEnd + 1]
 
-    const replacement = `            <Tooltip
+  const replacement = `            <Tooltip
               key={serviceKey}
               arrow
               placement="top"
@@ -131,12 +132,12 @@ try {
                 </Box>
               }`;
 
-    const newContent = content.substring(0, tooltipStart) + replacement + content.substring(tooltipOpenTagEnd + 1);
+  const newContent =
+    content.substring(0, tooltipStart) + replacement + content.substring(tooltipOpenTagEnd + 1);
 
-    fs.writeFileSync(path, newContent, 'utf8');
-    console.log('Successfully replaced tooltip in CheckerboardView.');
-
+  fs.writeFileSync(path, newContent, 'utf8');
+  console.log('Successfully replaced tooltip in CheckerboardView.');
 } catch (err) {
-    console.error('Error:', err);
-    process.exit(1);
+  console.error('Error:', err);
+  process.exit(1);
 }

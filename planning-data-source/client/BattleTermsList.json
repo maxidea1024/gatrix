@@ -10,11 +10,7 @@
       "battleTermsVal2": "number",
       "battleTermsVal3": "number",
       "desc": "text",
-      "descFormatTexts": [
-        "text",
-        "text",
-        "text"
-      ]
+      "descFormatTexts": ["text", "text", "text"]
     },
     ":required": {},
     ":requiredInObject": {},
@@ -22,9 +18,7 @@
     ":max": {},
     ":enum": {},
     ":links": {
-      "battleTermsId": [
-        "BattleTerms"
-      ]
+      "battleTermsId": ["BattleTerms"]
     }
   },
   "BattleTermsList": {
@@ -68,9 +62,7 @@
       "battleTermsVal2": 1,
       "battleTermsVal3": 0,
       "desc": "{0}턴 내로 적 기함 침몰",
-      "descFormatTexts": [
-        "20"
-      ]
+      "descFormatTexts": ["20"]
     },
     "68800101": {
       "id": 68800101,
@@ -91,9 +83,7 @@
       "battleTermsVal1": 1,
       "battleTermsVal2": 1,
       "desc": "{0}턴 내로 아무 적 선박 침몰",
-      "descFormatTexts": [
-        "5"
-      ]
+      "descFormatTexts": ["5"]
     },
     "68800103": {
       "id": 68800103,
@@ -114,9 +104,7 @@
       "battleTermsVal1": 0,
       "battleTermsVal2": 3,
       "desc": "아무 도구 {0}개 사용",
-      "descFormatTexts": [
-        "3"
-      ]
+      "descFormatTexts": ["3"]
     },
     "68800105": {
       "id": 68800105,
@@ -127,10 +115,7 @@
       "battleTermsVal1": 1,
       "battleTermsVal2": 3,
       "desc": "{0} {1}회 사용",
-      "descFormatTexts": [
-        "포격",
-        "3"
-      ]
+      "descFormatTexts": ["포격", "3"]
     },
     "68800106": {
       "id": 68800106,
@@ -141,10 +126,7 @@
       "battleTermsVal1": 2,
       "battleTermsVal2": 3,
       "desc": "{0} {1}회 사용",
-      "descFormatTexts": [
-        "백병",
-        "3"
-      ]
+      "descFormatTexts": ["백병", "3"]
     },
     "68800107": {
       "id": 68800107,
@@ -155,10 +137,7 @@
       "battleTermsVal1": 3,
       "battleTermsVal2": 3,
       "desc": "{0} {1}회 사용",
-      "descFormatTexts": [
-        "충파",
-        "3"
-      ]
+      "descFormatTexts": ["충파", "3"]
     },
     "68800108": {
       "id": 68800108,
@@ -169,10 +148,7 @@
       "battleTermsVal1": 4,
       "battleTermsVal2": 1,
       "desc": "{0} {1}회 사용",
-      "descFormatTexts": [
-        "결투",
-        "1"
-      ]
+      "descFormatTexts": ["결투", "1"]
     },
     "68800109": {
       "id": 68800109,
@@ -183,10 +159,7 @@
       "battleTermsVal1": 5,
       "battleTermsVal2": 3,
       "desc": "{0} {1}회 사용",
-      "descFormatTexts": [
-        "수리",
-        "3"
-      ]
+      "descFormatTexts": ["수리", "3"]
     },
     "68800110": {
       "id": 68800110,
@@ -197,10 +170,7 @@
       "battleTermsVal1": 6,
       "battleTermsVal2": 3,
       "desc": "{0} {1}회 사용",
-      "descFormatTexts": [
-        "의술",
-        "3"
-      ]
+      "descFormatTexts": ["의술", "3"]
     },
     "68800111": {
       "id": 68800111,
@@ -211,9 +181,7 @@
       "battleTermsVal1": 1,
       "battleTermsVal2": 0,
       "desc": "{0}턴 내로 모든 적 선박 침몰",
-      "descFormatTexts": [
-        "20"
-      ]
+      "descFormatTexts": ["20"]
     },
     "68800112": {
       "id": 68800112,
@@ -225,9 +193,7 @@
       "battleTermsVal2": 1,
       "battleTermsVal3": 0,
       "desc": "{0}턴 내로 적 기함 침몰",
-      "descFormatTexts": [
-        "15"
-      ]
+      "descFormatTexts": ["15"]
     },
     "68800113": {
       "id": 68800113,
@@ -238,10 +204,7 @@
       "battleTermsVal1": 1,
       "battleTermsVal2": 7,
       "desc": "{0} {1}회 사용",
-      "descFormatTexts": [
-        "포격",
-        "7"
-      ]
+      "descFormatTexts": ["포격", "7"]
     },
     "68800114": {
       "id": 68800114,
@@ -252,10 +215,7 @@
       "battleTermsVal1": 2,
       "battleTermsVal2": 7,
       "desc": "{0} {1}회 사용",
-      "descFormatTexts": [
-        "백병",
-        "7"
-      ]
+      "descFormatTexts": ["백병", "7"]
     },
     "68800115": {
       "id": 68800115,
@@ -266,10 +226,7 @@
       "battleTermsVal1": 3,
       "battleTermsVal2": 7,
       "desc": "{0} {1}회 사용",
-      "descFormatTexts": [
-        "충파",
-        "7"
-      ]
+      "descFormatTexts": ["충파", "7"]
     },
     "68800116": {
       "id": 68800116,
@@ -280,10 +237,7 @@
       "battleTermsVal1": 4,
       "battleTermsVal2": 2,
       "desc": "{0} {1}회 사용",
-      "descFormatTexts": [
-        "결투",
-        "2"
-      ]
+      "descFormatTexts": ["결투", "2"]
     },
     "68800117": {
       "id": 68800117,
@@ -294,10 +248,7 @@
       "battleTermsVal1": 5,
       "battleTermsVal2": 7,
       "desc": "{0} {1}회 사용",
-      "descFormatTexts": [
-        "수리",
-        "7"
-      ]
+      "descFormatTexts": ["수리", "7"]
     },
     "68800118": {
       "id": 68800118,
@@ -308,10 +259,7 @@
       "battleTermsVal1": 6,
       "battleTermsVal2": 7,
       "desc": "{0} {1}회 사용",
-      "descFormatTexts": [
-        "의술",
-        "7"
-      ]
+      "descFormatTexts": ["의술", "7"]
     },
     "68800119": {
       "id": 68800119,
@@ -322,9 +270,7 @@
       "battleTermsVal1": 1,
       "battleTermsVal2": 0,
       "desc": "{0}턴 내로 모든 적 선박 침몰",
-      "descFormatTexts": [
-        "15"
-      ]
+      "descFormatTexts": ["15"]
     },
     "68800120": {
       "id": 68800120,
@@ -336,9 +282,7 @@
       "battleTermsVal2": 1,
       "battleTermsVal3": 0,
       "desc": "{0}턴 내로 적 기함 침몰",
-      "descFormatTexts": [
-        "10"
-      ]
+      "descFormatTexts": ["10"]
     },
     "68800121": {
       "id": 68800121,
@@ -349,10 +293,7 @@
       "battleTermsVal1": 1,
       "battleTermsVal2": 10,
       "desc": "{0} {1}회 사용",
-      "descFormatTexts": [
-        "포격",
-        "10"
-      ]
+      "descFormatTexts": ["포격", "10"]
     },
     "68800122": {
       "id": 68800122,
@@ -363,10 +304,7 @@
       "battleTermsVal1": 2,
       "battleTermsVal2": 10,
       "desc": "{0} {1}회 사용",
-      "descFormatTexts": [
-        "백병",
-        "10"
-      ]
+      "descFormatTexts": ["백병", "10"]
     },
     "68800123": {
       "id": 68800123,
@@ -377,10 +315,7 @@
       "battleTermsVal1": 3,
       "battleTermsVal2": 10,
       "desc": "{0} {1}회 사용",
-      "descFormatTexts": [
-        "충파",
-        "10"
-      ]
+      "descFormatTexts": ["충파", "10"]
     },
     "68800124": {
       "id": 68800124,
@@ -391,10 +326,7 @@
       "battleTermsVal1": 4,
       "battleTermsVal2": 3,
       "desc": "{0} {1}회 사용",
-      "descFormatTexts": [
-        "결투",
-        "3"
-      ]
+      "descFormatTexts": ["결투", "3"]
     },
     "68800125": {
       "id": 68800125,
@@ -405,10 +337,7 @@
       "battleTermsVal1": 5,
       "battleTermsVal2": 10,
       "desc": "{0} {1}회 사용",
-      "descFormatTexts": [
-        "수리",
-        "10"
-      ]
+      "descFormatTexts": ["수리", "10"]
     },
     "68800126": {
       "id": 68800126,
@@ -419,10 +348,7 @@
       "battleTermsVal1": 6,
       "battleTermsVal2": 10,
       "desc": "{0} {1}회 사용",
-      "descFormatTexts": [
-        "의술",
-        "10"
-      ]
+      "descFormatTexts": ["의술", "10"]
     },
     "68800127": {
       "id": 68800127,
@@ -433,9 +359,7 @@
       "battleTermsVal1": 1,
       "battleTermsVal2": 0,
       "desc": "{0}턴 내로 모든 적 선박 침몰",
-      "descFormatTexts": [
-        "10"
-      ]
+      "descFormatTexts": ["10"]
     },
     "68800128": {
       "id": 68800128,
@@ -456,9 +380,7 @@
       "battleTermsVal2": 1,
       "battleTermsVal3": 3,
       "desc": "적 기함에 근접 {0}회",
-      "descFormatTexts": [
-        "3"
-      ]
+      "descFormatTexts": ["3"]
     },
     "68800130": {
       "id": 68800130,
@@ -470,9 +392,7 @@
       "battleTermsVal2": 1,
       "battleTermsVal3": 1,
       "desc": "적 기함의 선원 수 {0}",
-      "descFormatTexts": [
-        "0"
-      ]
+      "descFormatTexts": ["0"]
     },
     "68800131": {
       "id": 68800131,
@@ -484,9 +404,7 @@
       "battleTermsVal2": 1,
       "battleTermsVal3": 2,
       "desc": "적 기함의 내구도 {0}",
-      "descFormatTexts": [
-        "0"
-      ]
+      "descFormatTexts": ["0"]
     },
     "68800132": {
       "id": 68800132,
@@ -498,9 +416,7 @@
       "battleTermsVal2": 1,
       "battleTermsVal3": 0,
       "desc": "{0}턴 내로 적 기함 침몰",
-      "descFormatTexts": [
-        "20"
-      ]
+      "descFormatTexts": ["20"]
     },
     "68800133": {
       "id": 68800133,
@@ -521,9 +437,7 @@
       "battleTermsVal1": 1,
       "battleTermsVal2": 1,
       "desc": "{0}턴 내로 아무 적 선박 침몰",
-      "descFormatTexts": [
-        "5"
-      ]
+      "descFormatTexts": ["5"]
     },
     "68800135": {
       "id": 68800135,
@@ -544,9 +458,7 @@
       "battleTermsVal1": 0,
       "battleTermsVal2": 3,
       "desc": "아무 도구 {0}개 사용",
-      "descFormatTexts": [
-        "3"
-      ]
+      "descFormatTexts": ["3"]
     },
     "68800137": {
       "id": 68800137,
@@ -557,10 +469,7 @@
       "battleTermsVal1": 1,
       "battleTermsVal2": 3,
       "desc": "{0} {1}회 사용",
-      "descFormatTexts": [
-        "포격",
-        "3"
-      ]
+      "descFormatTexts": ["포격", "3"]
     },
     "68800138": {
       "id": 68800138,
@@ -571,10 +480,7 @@
       "battleTermsVal1": 2,
       "battleTermsVal2": 3,
       "desc": "{0} {1}회 사용",
-      "descFormatTexts": [
-        "백병",
-        "3"
-      ]
+      "descFormatTexts": ["백병", "3"]
     },
     "68800139": {
       "id": 68800139,
@@ -585,10 +491,7 @@
       "battleTermsVal1": 3,
       "battleTermsVal2": 3,
       "desc": "{0} {1}회 사용",
-      "descFormatTexts": [
-        "충파",
-        "3"
-      ]
+      "descFormatTexts": ["충파", "3"]
     },
     "68800140": {
       "id": 68800140,
@@ -599,10 +502,7 @@
       "battleTermsVal1": 4,
       "battleTermsVal2": 1,
       "desc": "{0} {1}회 사용",
-      "descFormatTexts": [
-        "결투",
-        "1"
-      ]
+      "descFormatTexts": ["결투", "1"]
     },
     "68800141": {
       "id": 68800141,
@@ -613,10 +513,7 @@
       "battleTermsVal1": 5,
       "battleTermsVal2": 3,
       "desc": "{0} {1}회 사용",
-      "descFormatTexts": [
-        "수리",
-        "3"
-      ]
+      "descFormatTexts": ["수리", "3"]
     },
     "68800142": {
       "id": 68800142,
@@ -627,10 +524,7 @@
       "battleTermsVal1": 6,
       "battleTermsVal2": 3,
       "desc": "{0} {1}회 사용",
-      "descFormatTexts": [
-        "의술",
-        "3"
-      ]
+      "descFormatTexts": ["의술", "3"]
     },
     "68800143": {
       "id": 68800143,
@@ -641,9 +535,7 @@
       "battleTermsVal1": 1,
       "battleTermsVal2": 0,
       "desc": "{0}턴 내로 모든 적 선박 침몰",
-      "descFormatTexts": [
-        "20"
-      ]
+      "descFormatTexts": ["20"]
     },
     "68801001": {
       "id": 68801001,
@@ -654,9 +546,7 @@
       "battleTermsVal1": 2,
       "battleTermsVal2": 1,
       "desc": "{0}턴 내로 적 기함 침몰",
-      "descFormatTexts": [
-        "10"
-      ]
+      "descFormatTexts": ["10"]
     },
     "68801002": {
       "id": 68801002,
@@ -666,9 +556,7 @@
       "turnNum": 0,
       "battleTermsVal1": 10,
       "desc": "{0}턴 내로 승리",
-      "descFormatTexts": [
-        "10"
-      ]
+      "descFormatTexts": ["10"]
     },
     "68801003": {
       "id": 68801003,
@@ -678,9 +566,7 @@
       "turnNum": 0,
       "battleTermsVal1": 11,
       "desc": "{0}턴 내로 승리",
-      "descFormatTexts": [
-        "11"
-      ]
+      "descFormatTexts": ["11"]
     },
     "68801004": {
       "id": 68801004,
@@ -690,9 +576,7 @@
       "turnNum": 0,
       "battleTermsVal1": 12,
       "desc": "{0}턴 내로 승리",
-      "descFormatTexts": [
-        "12"
-      ]
+      "descFormatTexts": ["12"]
     },
     "68801005": {
       "id": 68801005,
@@ -702,9 +586,7 @@
       "turnNum": 0,
       "battleTermsVal1": 13,
       "desc": "{0}턴 내로 승리",
-      "descFormatTexts": [
-        "13"
-      ]
+      "descFormatTexts": ["13"]
     },
     "68801006": {
       "id": 68801006,
@@ -714,9 +596,7 @@
       "turnNum": 0,
       "battleTermsVal1": 14,
       "desc": "{0}턴 내로 승리",
-      "descFormatTexts": [
-        "14"
-      ]
+      "descFormatTexts": ["14"]
     },
     "68801007": {
       "id": 68801007,
@@ -726,9 +606,7 @@
       "turnNum": 0,
       "battleTermsVal1": 15,
       "desc": "{0}턴 내로 승리",
-      "descFormatTexts": [
-        "15"
-      ]
+      "descFormatTexts": ["15"]
     },
     "68801013": {
       "id": 68801013,
@@ -759,9 +637,7 @@
       "battleTermsVal1": 1,
       "battleTermsVal2": 0,
       "desc": "{0}턴 내로 모든 적 선박 침몰",
-      "descFormatTexts": [
-        "10"
-      ]
+      "descFormatTexts": ["10"]
     },
     "68810003": {
       "id": 68810003,
@@ -772,9 +648,7 @@
       "battleTermsVal1": 1,
       "battleTermsVal2": 1,
       "desc": "{0}턴 내로 아무 적 선박 침몰",
-      "descFormatTexts": [
-        "3"
-      ]
+      "descFormatTexts": ["3"]
     },
     "68810004": {
       "id": 68810004,
@@ -785,9 +659,7 @@
       "battleTermsVal1": 2,
       "battleTermsVal2": 1,
       "desc": "{0}턴 내로 적 기함 침몰",
-      "descFormatTexts": [
-        "10"
-      ]
+      "descFormatTexts": ["10"]
     },
     "68810005": {
       "id": 68810005,
@@ -798,9 +670,7 @@
       "battleTermsVal1": 0,
       "battleTermsVal2": 0,
       "desc": "적 기함 {0}턴 이상 생존",
-      "descFormatTexts": [
-        "10"
-      ]
+      "descFormatTexts": ["10"]
     },
     "68810006": {
       "id": 68810006,
@@ -841,9 +711,7 @@
       "battleTermsVal1": 1,
       "battleTermsVal2": 0,
       "desc": "{0}턴 내로 모든 적 선박 침몰",
-      "descFormatTexts": [
-        "15"
-      ]
+      "descFormatTexts": ["15"]
     },
     "68810010": {
       "id": 68810010,
@@ -854,9 +722,7 @@
       "battleTermsVal1": 1,
       "battleTermsVal2": 1,
       "desc": "{0}턴 내로 아무 적 선박 침몰",
-      "descFormatTexts": [
-        "10"
-      ]
+      "descFormatTexts": ["10"]
     },
     "68810011": {
       "id": 68810011,
@@ -867,9 +733,7 @@
       "battleTermsVal1": 2,
       "battleTermsVal2": 1,
       "desc": "{0}턴 내로 적 기함 침몰",
-      "descFormatTexts": [
-        "10"
-      ]
+      "descFormatTexts": ["10"]
     },
     "68810012": {
       "id": 68810012,
@@ -880,9 +744,7 @@
       "battleTermsVal1": 0,
       "battleTermsVal2": 0,
       "desc": "적 기함 {0}턴 이상 생존",
-      "descFormatTexts": [
-        "10"
-      ]
+      "descFormatTexts": ["10"]
     },
     "68810013": {
       "id": 68810013,
@@ -893,9 +755,7 @@
       "battleTermsVal1": 1,
       "battleTermsVal2": 0,
       "desc": "아군 {0}회 도주",
-      "descFormatTexts": [
-        "1"
-      ]
+      "descFormatTexts": ["1"]
     },
     "68810014": {
       "id": 68810014,
@@ -948,9 +808,7 @@
       "battleTermsVal1": 1,
       "battleTermsVal2": 1,
       "desc": "{0}턴 내로 아무 적 선박 침몰",
-      "descFormatTexts": [
-        "5"
-      ]
+      "descFormatTexts": ["5"]
     },
     "68810019": {
       "id": 68810019,
@@ -982,9 +840,7 @@
       "battleTermsVal1": 2,
       "battleTermsVal2": 1,
       "desc": "{0}턴 내로 적의 기함을 제외한 선박 침몰",
-      "descFormatTexts": [
-        "20"
-      ]
+      "descFormatTexts": ["20"]
     },
     "68810022": {
       "id": 68810022,
@@ -994,9 +850,7 @@
       "turnNum": 0,
       "battleTermsVal1": 15,
       "desc": "{0}턴 내로 승리",
-      "descFormatTexts": [
-        "15"
-      ]
+      "descFormatTexts": ["15"]
     },
     "68810023": {
       "id": 68810023,
@@ -1006,9 +860,7 @@
       "turnNum": 0,
       "battleTermsVal1": 17,
       "desc": "{0}턴 내로 승리",
-      "descFormatTexts": [
-        "17"
-      ]
+      "descFormatTexts": ["17"]
     },
     "68810024": {
       "id": 68810024,
@@ -1018,9 +870,7 @@
       "turnNum": 0,
       "battleTermsVal1": 19,
       "desc": "{0}턴 내로 승리",
-      "descFormatTexts": [
-        "19"
-      ]
+      "descFormatTexts": ["19"]
     },
     "68810025": {
       "id": 68810025,
@@ -1031,10 +881,7 @@
       "battleTermsVal1": 1,
       "battleTermsVal2": 5,
       "desc": "{0} {1}회 사용",
-      "descFormatTexts": [
-        "포격",
-        "5"
-      ]
+      "descFormatTexts": ["포격", "5"]
     },
     "68810026": {
       "id": 68810026,
@@ -1045,10 +892,7 @@
       "battleTermsVal1": 2,
       "battleTermsVal2": 5,
       "desc": "{0} {1}회 사용",
-      "descFormatTexts": [
-        "백병",
-        "5"
-      ]
+      "descFormatTexts": ["백병", "5"]
     },
     "68810027": {
       "id": 68810027,
@@ -1059,10 +903,7 @@
       "battleTermsVal1": 3,
       "battleTermsVal2": 5,
       "desc": "{0} {1}회 사용",
-      "descFormatTexts": [
-        "충파",
-        "5"
-      ]
+      "descFormatTexts": ["충파", "5"]
     },
     "68810028": {
       "id": 68810028,
@@ -1072,9 +913,7 @@
       "turnNum": 0,
       "battleTermsVal1": 12,
       "desc": "{0}턴 내로 승리",
-      "descFormatTexts": [
-        "12"
-      ]
+      "descFormatTexts": ["12"]
     },
     "68810029": {
       "id": 68810029,
@@ -1084,9 +923,7 @@
       "turnNum": 0,
       "battleTermsVal1": 13,
       "desc": "{0}턴 내로 승리",
-      "descFormatTexts": [
-        "13"
-      ]
+      "descFormatTexts": ["13"]
     },
     "68810030": {
       "id": 68810030,
@@ -1096,9 +933,7 @@
       "turnNum": 0,
       "battleTermsVal1": 14,
       "desc": "{0}턴 내로 승리",
-      "descFormatTexts": [
-        "14"
-      ]
+      "descFormatTexts": ["14"]
     },
     "68810031": {
       "id": 68810031,
@@ -1109,9 +944,7 @@
       "battleTermsVal1": 2,
       "battleTermsVal2": 1,
       "desc": "{0}턴 내로 우군 선박의 내구도 전체 회복",
-      "descFormatTexts": [
-        "20"
-      ]
+      "descFormatTexts": ["20"]
     },
     "68810032": {
       "id": 68810032,
@@ -1121,9 +954,7 @@
       "turnNum": 0,
       "battleTermsVal1": 5,
       "desc": "{0}턴 내로 승리",
-      "descFormatTexts": [
-        "5"
-      ]
+      "descFormatTexts": ["5"]
     },
     "68810033": {
       "id": 68810033,
@@ -1133,9 +964,7 @@
       "turnNum": 0,
       "battleTermsVal1": 7,
       "desc": "{0}턴 내로 승리",
-      "descFormatTexts": [
-        "7"
-      ]
+      "descFormatTexts": ["7"]
     },
     "68810034": {
       "id": 68810034,
@@ -1145,9 +974,7 @@
       "turnNum": 0,
       "battleTermsVal1": 9,
       "desc": "{0}턴 내로 승리",
-      "descFormatTexts": [
-        "9"
-      ]
+      "descFormatTexts": ["9"]
     },
     "68810035": {
       "id": 68810035,
@@ -1168,9 +995,7 @@
       "battleTermsVal1": 1,
       "battleTermsVal2": 1,
       "desc": "{0}턴까지 아군 기함 생존",
-      "descFormatTexts": [
-        "5"
-      ]
+      "descFormatTexts": ["5"]
     },
     "68810037": {
       "id": 68810037,
@@ -1181,9 +1006,7 @@
       "battleTermsVal1": 1,
       "battleTermsVal2": 9999,
       "desc": "{0}턴 내로 적의 기함을 제외한 선박 침몰",
-      "descFormatTexts": [
-        "20"
-      ]
+      "descFormatTexts": ["20"]
     },
     "68820001": {
       "id": 68820001,
@@ -1193,9 +1016,7 @@
       "turnNum": 0,
       "battleTermsVal1": 1,
       "desc": "{0}턴 내로 승리",
-      "descFormatTexts": [
-        "1"
-      ]
+      "descFormatTexts": ["1"]
     },
     "68820002": {
       "id": 68820002,
@@ -1205,9 +1026,7 @@
       "turnNum": 0,
       "battleTermsVal1": 2,
       "desc": "{0}턴 내로 승리",
-      "descFormatTexts": [
-        "2"
-      ]
+      "descFormatTexts": ["2"]
     },
     "68820003": {
       "id": 68820003,
@@ -1217,9 +1036,7 @@
       "turnNum": 0,
       "battleTermsVal1": 3,
       "desc": "{0}턴 내로 승리",
-      "descFormatTexts": [
-        "3"
-      ]
+      "descFormatTexts": ["3"]
     },
     "68820004": {
       "id": 68820004,
@@ -1229,9 +1046,7 @@
       "turnNum": 0,
       "battleTermsVal1": 4,
       "desc": "{0}턴 내로 승리",
-      "descFormatTexts": [
-        "4"
-      ]
+      "descFormatTexts": ["4"]
     },
     "68820005": {
       "id": 68820005,
@@ -1241,9 +1056,7 @@
       "turnNum": 0,
       "battleTermsVal1": 5,
       "desc": "{0}턴 내로 승리",
-      "descFormatTexts": [
-        "5"
-      ]
+      "descFormatTexts": ["5"]
     },
     "68820006": {
       "id": 68820006,
@@ -1253,9 +1066,7 @@
       "turnNum": 0,
       "battleTermsVal1": 6,
       "desc": "{0}턴 내로 승리",
-      "descFormatTexts": [
-        "6"
-      ]
+      "descFormatTexts": ["6"]
     },
     "68820007": {
       "id": 68820007,
@@ -1265,9 +1076,7 @@
       "turnNum": 0,
       "battleTermsVal1": 7,
       "desc": "{0}턴 내로 승리",
-      "descFormatTexts": [
-        "7"
-      ]
+      "descFormatTexts": ["7"]
     },
     "68820008": {
       "id": 68820008,
@@ -1277,9 +1086,7 @@
       "turnNum": 0,
       "battleTermsVal1": 8,
       "desc": "{0}턴 내로 승리",
-      "descFormatTexts": [
-        "8"
-      ]
+      "descFormatTexts": ["8"]
     },
     "68820009": {
       "id": 68820009,
@@ -1289,9 +1096,7 @@
       "turnNum": 0,
       "battleTermsVal1": 9,
       "desc": "{0}턴 내로 승리",
-      "descFormatTexts": [
-        "9"
-      ]
+      "descFormatTexts": ["9"]
     },
     "68820010": {
       "id": 68820010,
@@ -1301,9 +1106,7 @@
       "turnNum": 0,
       "battleTermsVal1": 10,
       "desc": "{0}턴 내로 승리",
-      "descFormatTexts": [
-        "10"
-      ]
+      "descFormatTexts": ["10"]
     },
     "68820011": {
       "id": 68820011,
@@ -1313,9 +1116,7 @@
       "turnNum": 0,
       "battleTermsVal1": 11,
       "desc": "{0}턴 내로 승리",
-      "descFormatTexts": [
-        "11"
-      ]
+      "descFormatTexts": ["11"]
     },
     "68820012": {
       "id": 68820012,
@@ -1325,9 +1126,7 @@
       "turnNum": 0,
       "battleTermsVal1": 12,
       "desc": "{0}턴 내로 승리",
-      "descFormatTexts": [
-        "12"
-      ]
+      "descFormatTexts": ["12"]
     },
     "68820013": {
       "id": 68820013,
@@ -1337,9 +1136,7 @@
       "turnNum": 0,
       "battleTermsVal1": 13,
       "desc": "{0}턴 내로 승리",
-      "descFormatTexts": [
-        "13"
-      ]
+      "descFormatTexts": ["13"]
     },
     "68820014": {
       "id": 68820014,
@@ -1349,9 +1146,7 @@
       "turnNum": 0,
       "battleTermsVal1": 14,
       "desc": "{0}턴 내로 승리",
-      "descFormatTexts": [
-        "14"
-      ]
+      "descFormatTexts": ["14"]
     },
     "68820015": {
       "id": 68820015,
@@ -1361,9 +1156,7 @@
       "turnNum": 0,
       "battleTermsVal1": 15,
       "desc": "{0}턴 내로 승리",
-      "descFormatTexts": [
-        "15"
-      ]
+      "descFormatTexts": ["15"]
     },
     "68820016": {
       "id": 68820016,
@@ -1373,9 +1166,7 @@
       "turnNum": 0,
       "battleTermsVal1": 16,
       "desc": "{0}턴 내로 승리",
-      "descFormatTexts": [
-        "16"
-      ]
+      "descFormatTexts": ["16"]
     },
     "68820017": {
       "id": 68820017,
@@ -1385,9 +1176,7 @@
       "turnNum": 0,
       "battleTermsVal1": 17,
       "desc": "{0}턴 내로 승리",
-      "descFormatTexts": [
-        "17"
-      ]
+      "descFormatTexts": ["17"]
     },
     "68820018": {
       "id": 68820018,
@@ -1397,9 +1186,7 @@
       "turnNum": 0,
       "battleTermsVal1": 18,
       "desc": "{0}턴 내로 승리",
-      "descFormatTexts": [
-        "18"
-      ]
+      "descFormatTexts": ["18"]
     },
     "68820019": {
       "id": 68820019,
@@ -1409,9 +1196,7 @@
       "turnNum": 0,
       "battleTermsVal1": 19,
       "desc": "{0}턴 내로 승리",
-      "descFormatTexts": [
-        "19"
-      ]
+      "descFormatTexts": ["19"]
     },
     "68820020": {
       "id": 68820020,
@@ -1421,9 +1206,7 @@
       "turnNum": 0,
       "battleTermsVal1": 20,
       "desc": "{0}턴 내로 승리",
-      "descFormatTexts": [
-        "20"
-      ]
+      "descFormatTexts": ["20"]
     },
     "68820021": {
       "id": 68820021,
@@ -1433,9 +1216,7 @@
       "turnNum": 0,
       "battleTermsVal1": 21,
       "desc": "{0}턴 내로 승리",
-      "descFormatTexts": [
-        "21"
-      ]
+      "descFormatTexts": ["21"]
     },
     "68820022": {
       "id": 68820022,
@@ -1445,9 +1226,7 @@
       "turnNum": 0,
       "battleTermsVal1": 22,
       "desc": "{0}턴 내로 승리",
-      "descFormatTexts": [
-        "22"
-      ]
+      "descFormatTexts": ["22"]
     },
     "68820023": {
       "id": 68820023,
@@ -1457,9 +1236,7 @@
       "turnNum": 0,
       "battleTermsVal1": 23,
       "desc": "{0}턴 내로 승리",
-      "descFormatTexts": [
-        "23"
-      ]
+      "descFormatTexts": ["23"]
     },
     "68820024": {
       "id": 68820024,
@@ -1469,9 +1246,7 @@
       "turnNum": 0,
       "battleTermsVal1": 24,
       "desc": "{0}턴 내로 승리",
-      "descFormatTexts": [
-        "24"
-      ]
+      "descFormatTexts": ["24"]
     },
     "68820025": {
       "id": 68820025,
@@ -1481,9 +1256,7 @@
       "turnNum": 0,
       "battleTermsVal1": 25,
       "desc": "{0}턴 내로 승리",
-      "descFormatTexts": [
-        "25"
-      ]
+      "descFormatTexts": ["25"]
     },
     "68820026": {
       "id": 68820026,
@@ -1493,9 +1266,7 @@
       "turnNum": 0,
       "battleTermsVal1": 26,
       "desc": "{0}턴 내로 승리",
-      "descFormatTexts": [
-        "26"
-      ]
+      "descFormatTexts": ["26"]
     },
     "68820027": {
       "id": 68820027,
@@ -1505,9 +1276,7 @@
       "turnNum": 0,
       "battleTermsVal1": 27,
       "desc": "{0}턴 내로 승리",
-      "descFormatTexts": [
-        "27"
-      ]
+      "descFormatTexts": ["27"]
     },
     "68820028": {
       "id": 68820028,
@@ -1517,9 +1286,7 @@
       "turnNum": 0,
       "battleTermsVal1": 28,
       "desc": "{0}턴 내로 승리",
-      "descFormatTexts": [
-        "28"
-      ]
+      "descFormatTexts": ["28"]
     },
     "68820029": {
       "id": 68820029,
@@ -1529,9 +1296,7 @@
       "turnNum": 0,
       "battleTermsVal1": 29,
       "desc": "{0}턴 내로 승리",
-      "descFormatTexts": [
-        "29"
-      ]
+      "descFormatTexts": ["29"]
     },
     "68820030": {
       "id": 68820030,
@@ -1541,9 +1306,7 @@
       "turnNum": 0,
       "battleTermsVal1": 30,
       "desc": "{0}턴 내로 승리",
-      "descFormatTexts": [
-        "30"
-      ]
+      "descFormatTexts": ["30"]
     },
     "68820031": {
       "id": 68820031,
@@ -1553,9 +1316,7 @@
       "turnNum": 0,
       "battleTermsVal1": 1,
       "desc": "적보다 먼저 {0}개의 선박 침몰",
-      "descFormatTexts": [
-        "1"
-      ]
+      "descFormatTexts": ["1"]
     },
     "68820032": {
       "id": 68820032,
@@ -1565,9 +1326,7 @@
       "turnNum": 0,
       "battleTermsVal1": 1,
       "desc": "적보다 먼저 {0}개의 선박 침몰",
-      "descFormatTexts": [
-        "2"
-      ]
+      "descFormatTexts": ["2"]
     },
     "68820033": {
       "id": 68820033,
@@ -1579,9 +1338,7 @@
       "battleTermsVal2": 0,
       "battleTermsVal3": 800,
       "desc": "모든 아군 선박의 내구도와 선원수가 {0}%이상인 채로 승리",
-      "descFormatTexts": [
-        "80"
-      ]
+      "descFormatTexts": ["80"]
     },
     "68820034": {
       "id": 68820034,
@@ -1591,9 +1348,7 @@
       "turnNum": 0,
       "battleTermsVal1": 2,
       "desc": "한 턴에 적 선박 {0}개 침몰",
-      "descFormatTexts": [
-        "2"
-      ]
+      "descFormatTexts": ["2"]
     },
     "68820035": {
       "id": 68820035,
@@ -1603,9 +1358,7 @@
       "turnNum": 0,
       "battleTermsVal1": 3,
       "desc": "한 턴에 적 선박 {0}개 침몰",
-      "descFormatTexts": [
-        "3"
-      ]
+      "descFormatTexts": ["3"]
     },
     "68820036": {
       "id": 68820036,
@@ -1615,9 +1368,7 @@
       "turnNum": 0,
       "battleTermsVal1": 4,
       "desc": "한 턴에 적 선박 {0}개 침몰",
-      "descFormatTexts": [
-        "4"
-      ]
+      "descFormatTexts": ["4"]
     },
     "68820037": {
       "id": 68820037,
@@ -1628,11 +1379,7 @@
       "battleTermsVal1": 1,
       "battleTermsVal2": 2,
       "desc": "{0}턴 이내 {1}척 {2} 선박 침몰",
-      "descFormatTexts": [
-        "20",
-        "2",
-        "적"
-      ]
+      "descFormatTexts": ["20", "2", "적"]
     },
     "68820038": {
       "id": 68820038,
@@ -1643,11 +1390,7 @@
       "battleTermsVal1": 1,
       "battleTermsVal2": 3,
       "desc": "{0}턴 이내 {1}척 {2} 선박 침몰",
-      "descFormatTexts": [
-        "20",
-        "3",
-        "적"
-      ]
+      "descFormatTexts": ["20", "3", "적"]
     },
     "68820039": {
       "id": 68820039,
@@ -1658,11 +1401,7 @@
       "battleTermsVal1": 1,
       "battleTermsVal2": 4,
       "desc": "{0}턴 이내 {1}척 {2} 선박 침몰",
-      "descFormatTexts": [
-        "20",
-        "4",
-        "적"
-      ]
+      "descFormatTexts": ["20", "4", "적"]
     },
     "68820040": {
       "id": 68820040,
@@ -1673,11 +1412,7 @@
       "battleTermsVal1": 1,
       "battleTermsVal2": 1,
       "desc": "{0}턴 이내 {1}척 {2} 선박 침몰",
-      "descFormatTexts": [
-        "20",
-        "1",
-        "적"
-      ]
+      "descFormatTexts": ["20", "1", "적"]
     },
     "68820041": {
       "id": 68820041,
@@ -1688,11 +1423,7 @@
       "battleTermsVal1": 1,
       "battleTermsVal2": 5,
       "desc": "{0}턴 이내 {1}척 {2} 선박 침몰",
-      "descFormatTexts": [
-        "20",
-        "5",
-        "적"
-      ]
+      "descFormatTexts": ["20", "5", "적"]
     },
     "68820042": {
       "id": 68820042,
@@ -1703,11 +1434,7 @@
       "battleTermsVal1": 1,
       "battleTermsVal2": 1,
       "desc": "{0}턴까지 {1} {2} 생존",
-      "descFormatTexts": [
-        "10",
-        "아군",
-        "기함"
-      ]
+      "descFormatTexts": ["10", "아군", "기함"]
     },
     "68820043": {
       "id": 68820043,
@@ -1718,11 +1445,7 @@
       "battleTermsVal1": 0,
       "battleTermsVal2": 0,
       "desc": "{0}턴까지 {2} {1} 생존",
-      "descFormatTexts": [
-        "10",
-        "아군 선박",
-        "모든"
-      ]
+      "descFormatTexts": ["10", "아군 선박", "모든"]
     },
     "68820044": {
       "id": 68820044,
@@ -1788,9 +1511,7 @@
       "battleTermsVal1": 1,
       "battleTermsVal2": 0,
       "desc": "{0}턴까지 모든 아군 선박 생존",
-      "descFormatTexts": [
-        "5"
-      ]
+      "descFormatTexts": ["5"]
     },
     "68899902": {
       "id": 68899902,

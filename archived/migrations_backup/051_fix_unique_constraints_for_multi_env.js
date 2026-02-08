@@ -11,32 +11,32 @@ const UNIQUE_KEY_UPDATES = [
     table: 'g_game_worlds',
     oldKey: 'worldId',
     newColumns: ['environmentId', 'worldId'],
-    newKeyName: 'uk_env_worldId'
+    newKeyName: 'uk_env_worldId',
   },
   {
     table: 'g_tags',
     oldKey: 'name',
     newColumns: ['environmentId', 'name'],
-    newKeyName: 'uk_env_tag_name'
+    newKeyName: 'uk_env_tag_name',
   },
   {
     table: 'g_vars',
     oldKey: 'varKey',
     newColumns: ['environmentId', 'varKey'],
-    newKeyName: 'uk_env_varKey'
+    newKeyName: 'uk_env_varKey',
   },
   {
     table: 'g_message_templates',
     oldKey: 'name',
     newColumns: ['environmentId', 'name'],
-    newKeyName: 'uk_env_template_name'
+    newKeyName: 'uk_env_template_name',
   },
   {
     table: 'g_banners',
     oldKey: 'uk_banner_name',
     newColumns: ['environmentId', 'name'],
-    newKeyName: 'uk_env_banner_name'
-  }
+    newKeyName: 'uk_env_banner_name',
+  },
 ];
 
 module.exports = {
@@ -94,7 +94,9 @@ module.exports = {
       );
 
       if (newIndexExists[0].cnt === 0) {
-        console.log(`Creating new unique key ${newKeyName} on ${table} (${newColumns.join(', ')})...`);
+        console.log(
+          `Creating new unique key ${newKeyName} on ${table} (${newColumns.join(', ')})...`
+        );
         await db.query(`
           ALTER TABLE ${table}
           ADD CONSTRAINT ${newKeyName} UNIQUE (${newColumns.join(', ')})
@@ -156,6 +158,5 @@ module.exports = {
         console.log(`Failed to recreate index ${oldKey}: ${e.message} - duplicate data may exist`);
       }
     }
-  }
+  },
 };
-

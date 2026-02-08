@@ -56,9 +56,7 @@ function MyComponent() {
   }
 
   return (
-    <div className={darkMode ? 'dark' : 'light'}>
-      {isNewUIEnabled ? <NewUI /> : <OldUI />}
-    </div>
+    <div className={darkMode ? 'dark' : 'light'}>{isNewUIEnabled ? <NewUI /> : <OldUI />}</div>
   );
 }
 ```
@@ -73,10 +71,10 @@ Wraps your application to provide Gatrix context.
 
 ```tsx
 <GatrixProvider
-  config={GatrixClientConfig}      // Required: SDK configuration
-  gatrixClient={GatrixClient}       // Optional: Pre-created client instance
-  startClient={true}                // Optional: Auto-start client (default: true)
-  stopClient={true}                 // Optional: Auto-stop on unmount (default: true)
+  config={GatrixClientConfig} // Required: SDK configuration
+  gatrixClient={GatrixClient} // Optional: Pre-created client instance
+  startClient={true} // Optional: Auto-start client (default: true)
+  stopClient={true} // Optional: Auto-stop on unmount (default: true)
 >
   {children}
 </GatrixProvider>
@@ -84,27 +82,27 @@ Wraps your application to provide Gatrix context.
 
 ### Core Hooks
 
-| Hook | Description |
-|------|-------------|
-| `useGatrixClient()` | Returns the `GatrixClient` instance |
-| `useFlagsStatus()` | Returns `{ flagsReady: boolean, flagsError: any }` |
-| `useUpdateContext()` | Returns function to update context |
+| Hook                 | Description                                        |
+| -------------------- | -------------------------------------------------- |
+| `useGatrixClient()`  | Returns the `GatrixClient` instance                |
+| `useFlagsStatus()`   | Returns `{ flagsReady: boolean, flagsError: any }` |
+| `useUpdateContext()` | Returns function to update context                 |
 
 ### Flag Access Hooks
 
-| Hook | Description |
-|------|-------------|
-| `useFlag(flagName)` | Returns `boolean` - whether flag is enabled |
-| `useFlags()` | Returns `EvaluatedFlag[]` - all flags |
-| `useVariant(flagName)` | Returns `Variant` - variant object |
+| Hook                   | Description                                 |
+| ---------------------- | ------------------------------------------- |
+| `useFlag(flagName)`    | Returns `boolean` - whether flag is enabled |
+| `useFlags()`           | Returns `EvaluatedFlag[]` - all flags       |
+| `useVariant(flagName)` | Returns `Variant` - variant object          |
 
 ### Variation Hooks
 
-| Hook | Description |
-|------|-------------|
-| `useBoolVariation(flagName, defaultValue)` | Returns `boolean` |
-| `useStringVariation(flagName, defaultValue)` | Returns `string` |
-| `useNumberVariation(flagName, defaultValue)` | Returns `number` |
+| Hook                                          | Description               |
+| --------------------------------------------- | ------------------------- |
+| `useBoolVariation(flagName, defaultValue)`    | Returns `boolean`         |
+| `useStringVariation(flagName, defaultValue)`  | Returns `string`          |
+| `useNumberVariation(flagName, defaultValue)`  | Returns `number`          |
 | `useJsonVariation<T>(flagName, defaultValue)` | Returns `T` (JSON object) |
 
 ## Examples
@@ -134,7 +132,7 @@ interface Config {
 function ConfiguredComponent() {
   const config = useJsonVariation<Config>('app-config', {
     maxItems: 10,
-    theme: 'light'
+    theme: 'light',
   });
 
   return (

@@ -27,9 +27,7 @@
     ":max": {},
     ":enum": {},
     ":links": {
-      "worldbuffId": [
-        "WorldBuff"
-      ]
+      "worldbuffId": ["WorldBuff"]
     }
   },
   "MateSet": {

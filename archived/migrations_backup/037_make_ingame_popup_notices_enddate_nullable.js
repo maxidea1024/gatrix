@@ -1,6 +1,6 @@
 /**
  * Migration 037: Make endDate nullable in g_ingame_popup_notices
- * 
+ *
  * This allows ingame popup notices to have no end date (permanent notices)
  */
 
@@ -61,4 +61,3 @@ async function down(connection) {
 }
 
 module.exports = { up, down };
-

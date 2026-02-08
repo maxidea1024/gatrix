@@ -1,1 +1,117 @@
-"use strict";(globalThis.webpackChunkdocs=globalThis.webpackChunkdocs||[]).push([[3252],{8453(e,t,n){n.d(t,{R:()=>a,x:()=>o});var s=n(6540);const r={},i=s.createContext(r);function a(e){const t=s.useContext(i);return s.useMemo(function(){return"function"==typeof e?e(t):{...t,...e}},[t,e])}function o(e){let t;return t=e.disableParentContext?"function"==typeof e.components?e.components(r):e.components||r:a(e.components),s.createElement(i.Provider,{value:t},e.children)}},8563(e,t,n){n.r(t),n.d(t,{assets:()=>l,contentTitle:()=>o,default:()=>u,frontMatter:()=>a,metadata:()=>s,toc:()=>c});const s=JSON.parse('{"id":"features/feature-flags","title":"?\ufffd\ucc98 ?\ufffd\ub798\ufffd?","description":"?\ufffd\ucc98 ?\ufffd\ub798\uadf8\ufffd? ?\ufffd\uc6a9?\ufffd\uc5ec \uae30\ub2a5???\ufffd\uc804?\ufffd\uac8c \ubc30\ud3ec?\ufffd\uc138??","source":"@site/docs/features/feature-flags.md","sourceDirName":"features","slug":"/features/feature-flags","permalink":"/docs/zh-Hans/features/feature-flags","draft":false,"unlisted":false,"editUrl":"https://github.com/your-org/gatrix/tree/main/docs/docs/features/feature-flags.md","tags":[],"version":"current","sidebarPosition":1,"frontMatter":{"sidebar_position":1},"sidebar":"tutorialSidebar","previous":{"title":"\u914d\u7f6e\u6307\u5357","permalink":"/docs/zh-Hans/getting-started/configuration"},"next":{"title":"?\ufffd\uadf8\uba3c\ud2b8","permalink":"/docs/zh-Hans/features/segments"}}');var r=n(4848),i=n(8453);const a={sidebar_position:1},o="?\ufffd\ucc98 ?\ufffd\ub798\ufffd?",l={},c=[{value:"\uac1c\uc694",id:"\uac1c\uc694",level:2},{value:"\uc8fc\uc694 \uae30\ub2a5",id:"\uc8fc\uc694-\uae30\ub2a5",level:2}];function d(e){const t={h1:"h1",h2:"h2",header:"header",li:"li",p:"p",ul:"ul",...(0,i.R)(),...e.components};return(0,r.jsxs)(r.Fragment,{children:[(0,r.jsx)(t.header,{children:(0,r.jsx)(t.h1,{id:"\ucc98-\ub798",children:"?\ufffd\ucc98 ?\ufffd\ub798\ufffd?"})}),"\n",(0,r.jsx)(t.p,{children:"?\ufffd\ucc98 ?\ufffd\ub798\uadf8\ufffd? ?\ufffd\uc6a9?\ufffd\uc5ec \uae30\ub2a5???\ufffd\uc804?\ufffd\uac8c \ubc30\ud3ec?\ufffd\uc138??"}),"\n",(0,r.jsx)(t.h2,{id:"\uac1c\uc694",children:"\uac1c\uc694"}),"\n",(0,r.jsx)(t.p,{children:"?\ufffd\ucc98 ?\ufffd\ub798\ufffd?Feature Flags)??\ucf54\ub4dc \ubc30\ud3ec ?\ufffd\uc774 \uae30\ub2a5??\ucf1c\uace0 ?????\ufffd\ub294 \uba54\ucee4?\ufffd\uc998?\ufffd\ub2c8??"}),"\n",(0,r.jsx)(t.h2,{id:"\uc8fc\uc694-\uae30\ub2a5",children:"\uc8fc\uc694 \uae30\ub2a5"}),"\n",(0,r.jsxs)(t.ul,{children:["\n",(0,r.jsx)(t.li,{children:"?\ufffd\uc2dc\ufffd?\uae30\ub2a5 ?\ufffd\ufffd?"}),"\n",(0,r.jsx)(t.li,{children:"?\ufffd\uacbd\ufffd??\ufffd\uc815 (\uac1c\ubc1c/?\ufffd\ud14c?\ufffd\uc9d5/?\ufffd\ub85c?\ufffd\uc158)"}),"\n",(0,r.jsx)(t.li,{children:"?\ufffd\uadf8\uba3c\ud2b8\ufffd??\ufffd\uac9f\ud305"}),"\n",(0,r.jsx)(t.li,{children:"?\ufffd\uc9c4??\ub864\uc544??"}),"\n"]})]})}function u(e={}){const{wrapper:t}={...(0,i.R)(),...e.components};return t?(0,r.jsx)(t,{...e,children:(0,r.jsx)(d,{...e})}):d(e)}}}]);
+'use strict';
+(globalThis.webpackChunkdocs = globalThis.webpackChunkdocs || []).push([
+  [3252],
+  {
+    8453(e, t, n) {
+      n.d(t, { R: () => a, x: () => o });
+      var s = n(6540);
+      const r = {},
+        i = s.createContext(r);
+      function a(e) {
+        const t = s.useContext(i);
+        return s.useMemo(
+          function () {
+            return 'function' == typeof e ? e(t) : { ...t, ...e };
+          },
+          [t, e]
+        );
+      }
+      function o(e) {
+        let t;
+        return (
+          (t = e.disableParentContext
+            ? 'function' == typeof e.components
+              ? e.components(r)
+              : e.components || r
+            : a(e.components)),
+          s.createElement(i.Provider, { value: t }, e.children)
+        );
+      }
+    },
+    8563(e, t, n) {
+      (n.r(t),
+        n.d(t, {
+          assets: () => l,
+          contentTitle: () => o,
+          default: () => u,
+          frontMatter: () => a,
+          metadata: () => s,
+          toc: () => c,
+        }));
+      const s = JSON.parse(
+        '{"id":"features/feature-flags","title":"?\ufffd\ucc98 ?\ufffd\ub798\ufffd?","description":"?\ufffd\ucc98 ?\ufffd\ub798\uadf8\ufffd? ?\ufffd\uc6a9?\ufffd\uc5ec \uae30\ub2a5???\ufffd\uc804?\ufffd\uac8c \ubc30\ud3ec?\ufffd\uc138??","source":"@site/docs/features/feature-flags.md","sourceDirName":"features","slug":"/features/feature-flags","permalink":"/docs/zh-Hans/features/feature-flags","draft":false,"unlisted":false,"editUrl":"https://github.com/your-org/gatrix/tree/main/docs/docs/features/feature-flags.md","tags":[],"version":"current","sidebarPosition":1,"frontMatter":{"sidebar_position":1},"sidebar":"tutorialSidebar","previous":{"title":"\u914d\u7f6e\u6307\u5357","permalink":"/docs/zh-Hans/getting-started/configuration"},"next":{"title":"?\ufffd\uadf8\uba3c\ud2b8","permalink":"/docs/zh-Hans/features/segments"}}'
+      );
+      var r = n(4848),
+        i = n(8453);
+      const a = { sidebar_position: 1 },
+        o = '?\ufffd\ucc98 ?\ufffd\ub798\ufffd?',
+        l = {},
+        c = [
+          { value: '\uac1c\uc694', id: '\uac1c\uc694', level: 2 },
+          { value: '\uc8fc\uc694 \uae30\ub2a5', id: '\uc8fc\uc694-\uae30\ub2a5', level: 2 },
+        ];
+      function d(e) {
+        const t = {
+          h1: 'h1',
+          h2: 'h2',
+          header: 'header',
+          li: 'li',
+          p: 'p',
+          ul: 'ul',
+          ...(0, i.R)(),
+          ...e.components,
+        };
+        return (0, r.jsxs)(r.Fragment, {
+          children: [
+            (0, r.jsx)(t.header, {
+              children: (0, r.jsx)(t.h1, {
+                id: '\ucc98-\ub798',
+                children: '?\ufffd\ucc98 ?\ufffd\ub798\ufffd?',
+              }),
+            }),
+            '\n',
+            (0, r.jsx)(t.p, {
+              children:
+                '?\ufffd\ucc98 ?\ufffd\ub798\uadf8\ufffd? ?\ufffd\uc6a9?\ufffd\uc5ec \uae30\ub2a5???\ufffd\uc804?\ufffd\uac8c \ubc30\ud3ec?\ufffd\uc138??',
+            }),
+            '\n',
+            (0, r.jsx)(t.h2, { id: '\uac1c\uc694', children: '\uac1c\uc694' }),
+            '\n',
+            (0, r.jsx)(t.p, {
+              children:
+                '?\ufffd\ucc98 ?\ufffd\ub798\ufffd?Feature Flags)??\ucf54\ub4dc \ubc30\ud3ec ?\ufffd\uc774 \uae30\ub2a5??\ucf1c\uace0 ?????\ufffd\ub294 \uba54\ucee4?\ufffd\uc998?\ufffd\ub2c8??',
+            }),
+            '\n',
+            (0, r.jsx)(t.h2, {
+              id: '\uc8fc\uc694-\uae30\ub2a5',
+              children: '\uc8fc\uc694 \uae30\ub2a5',
+            }),
+            '\n',
+            (0, r.jsxs)(t.ul, {
+              children: [
+                '\n',
+                (0, r.jsx)(t.li, { children: '?\ufffd\uc2dc\ufffd?\uae30\ub2a5 ?\ufffd\ufffd?' }),
+                '\n',
+                (0, r.jsx)(t.li, {
+                  children:
+                    '?\ufffd\uacbd\ufffd??\ufffd\uc815 (\uac1c\ubc1c/?\ufffd\ud14c?\ufffd\uc9d5/?\ufffd\ub85c?\ufffd\uc158)',
+                }),
+                '\n',
+                (0, r.jsx)(t.li, {
+                  children: '?\ufffd\uadf8\uba3c\ud2b8\ufffd??\ufffd\uac9f\ud305',
+                }),
+                '\n',
+                (0, r.jsx)(t.li, { children: '?\ufffd\uc9c4??\ub864\uc544??' }),
+                '\n',
+              ],
+            }),
+          ],
+        });
+      }
+      function u(e = {}) {
+        const { wrapper: t } = { ...(0, i.R)(), ...e.components };
+        return t ? (0, r.jsx)(t, { ...e, children: (0, r.jsx)(d, { ...e }) }) : d(e);
+      }
+    },
+  },
+]);

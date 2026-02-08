@@ -7,7 +7,7 @@ async function checkUsersTable() {
       host: process.env.DB_HOST || 'localhost',
       user: process.env.DB_USER || 'root',
       password: process.env.DB_PASSWORD || '',
-      database: process.env.DB_NAME || 'gatrix'
+      database: process.env.DB_NAME || 'gatrix',
     });
 
     const [rows] = await connection.execute('DESCRIBE g_users');

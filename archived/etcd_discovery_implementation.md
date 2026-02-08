@@ -1,4 +1,3 @@
-
 # etcd 기반 서비스 디스커버리 구현 문서
 
 ## 1. 개요
@@ -66,6 +65,7 @@ TTL을 설정하여 heartbeat가 멈추면 일정 시간 후 자동 삭제됩니
 ## 4. 서버 사이드 구현
 
 ### 4.1 의존성
+
 ```bash
 npm install etcd3 express ulid
 npm install --save-dev typescript @types/express
@@ -90,7 +90,9 @@ const serverInfo = {
 const lease = etcd.lease(10); // TTL 10초
 
 async function register() {
-  await lease.put(`/services/${serverInfo.type}/${serverInfo.id}`).value(JSON.stringify(serverInfo));
+  await lease
+    .put(`/services/${serverInfo.type}/${serverInfo.id}`)
+    .value(JSON.stringify(serverInfo));
   console.log('Registered server to etcd.');
 }
 
@@ -111,7 +113,9 @@ async function updateStatus(status: string, customState?: string) {
   serverInfo.status = status;
   if (customState) serverInfo.customState = customState;
   serverInfo.updatedAt = new Date().toISOString();
-  await lease.put(`/services/${serverInfo.type}/${serverInfo.id}`).value(JSON.stringify(serverInfo));
+  await lease
+    .put(`/services/${serverInfo.type}/${serverInfo.id}`)
+    .value(JSON.stringify(serverInfo));
 }
 ```
 
@@ -148,7 +152,7 @@ app.get('/api/subscribe', (req, res) => {
 
   const watcher = etcd.watch().prefix('/services/').create();
 
-  watcher.then(w => {
+  watcher.then((w) => {
     w.on('put', (kv) => {
       const data = JSON.parse(kv.value.toString());
       servicesCache.set(kv.key.toString(), data);
@@ -184,6 +188,7 @@ React + MUI + React Query 기반으로 실시간 상태를 표시합니다.
 SSE를 통해 서버 목록 변화를 즉시 반영합니다.
 
 ### 주요 포인트
+
 - `/api/subscribe` SSE 이벤트 수신
 - 상태 컬러 태그 표시 (`ready=green`, `error=red`, `shutting_down=orange`)
 - “새로고침” 없이 자동 갱신

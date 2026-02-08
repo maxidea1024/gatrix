@@ -52,5 +52,6 @@ topLevelKeys.forEach(({ key, line }) => {
 });
 
 console.log('\n=== 중복 키 요약 ===');
-duplicates.forEach(d => console.log('중복:', d.key, '- 첫번째:', d.firstLine + '줄, 중복:', d.duplicateLine + '줄'));
-
+duplicates.forEach((d) =>
+  console.log('중복:', d.key, '- 첫번째:', d.firstLine + '줄, 중복:', d.duplicateLine + '줄')
+);

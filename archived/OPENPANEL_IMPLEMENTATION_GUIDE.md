@@ -80,6 +80,7 @@
 ### 1.2 핵심 컴포넌트
 
 #### **Apps (애플리케이션)**
+
 - `apps/api` - Fastify 기반 이벤트 수집 API
 - `apps/dashboard` - Next.js 기반 관리 대시보드
 - `apps/worker` - BullMQ 워커 (백그라운드 작업)
@@ -87,6 +88,7 @@
 - `apps/public` - 공개 웹사이트
 
 #### **Packages (공유 라이브러리)**
+
 - `packages/db` - Prisma 스키마 및 DB 클라이언트
 - `packages/queue` - BullMQ 설정
 - `packages/redis` - Redis 클라이언트
@@ -105,6 +107,7 @@
 ### 2.1 프론트엔드
 
 #### **Next.js 15 (App Router)**
+
 ```typescript
 // apps/dashboard/app/layout.tsx
 export default function RootLayout({ children }) {
@@ -123,12 +126,14 @@ export default function RootLayout({ children }) {
 ```
 
 **주요 기능**:
+
 - Server Components 활용
 - Streaming SSR
 - Route Groups로 레이아웃 분리
 - Parallel Routes로 모달 구현
 
 #### **Tailwind CSS + Shadcn/ui**
+
 ```typescript
 // 컴포넌트 예시
 import { Button } from '@/components/ui/button';
@@ -155,6 +160,7 @@ export function MetricCard({ title, value, change }) {
 ### 2.2 백엔드
 
 #### **Fastify (이벤트 API)**
+
 ```typescript
 // apps/api/src/index.ts
 import Fastify from 'fastify';
@@ -181,15 +187,15 @@ await fastify.register(rateLimit, {
 // 이벤트 수집 엔드포인트
 fastify.post('/track', async (request, reply) => {
   const { type, payload } = request.body;
-  
+
   // 클라이언트 인증
   const clientId = request.headers['openpanel-client-id'];
   const clientSecret = request.headers['openpanel-client-secret'];
-  
+
   // IP 및 User-Agent 추출
   const ip = request.headers['x-client-ip'] || request.ip;
   const userAgent = request.headers['user-agent'];
-  
+
   // 이벤트 처리
   await processEvent({
     type,
@@ -198,7 +204,7 @@ fastify.post('/track', async (request, reply) => {
     userAgent,
     clientId,
   });
-  
+
   return { success: true };
 });
 
@@ -206,12 +212,14 @@ await fastify.listen({ port: 3000, host: '0.0.0.0' });
 ```
 
 **Fastify 선택 이유**:
+
 - Express보다 2-3배 빠른 성능
 - TypeScript 네이티브 지원
 - 플러그인 아키텍처
 - 스키마 기반 검증 (JSON Schema)
 
 #### **tRPC (API 레이어)**
+
 ```typescript
 // packages/trpc/src/router/insights.ts
 import { z } from 'zod';
@@ -219,19 +227,25 @@ import { router, protectedProcedure } from '../trpc';
 
 export const insightsRouter = router({
   getMetrics: protectedProcedure
-    .input(z.object({
-      projectId: z.string(),
-      startDate: z.string(),
-      endDate: z.string(),
-      filters: z.array(z.object({
-        name: z.string(),
-        operator: z.enum(['is', 'isNot', 'contains']),
-        value: z.array(z.string()),
-      })).optional(),
-    }))
+    .input(
+      z.object({
+        projectId: z.string(),
+        startDate: z.string(),
+        endDate: z.string(),
+        filters: z
+          .array(
+            z.object({
+              name: z.string(),
+              operator: z.enum(['is', 'isNot', 'contains']),
+              value: z.array(z.string()),
+            })
+          )
+          .optional(),
+      })
+    )
     .query(async ({ input, ctx }) => {
       const { projectId, startDate, endDate, filters } = input;
-      
+
       // ClickHouse 쿼리
       const metrics = await ctx.clickhouse.query({
         query: `
@@ -248,7 +262,7 @@ export const insightsRouter = router({
         `,
         query_params: { projectId, startDate, endDate },
       });
-      
+
       return metrics.json();
     }),
 });
@@ -257,6 +271,7 @@ export const insightsRouter = router({
 ### 2.3 데이터베이스
 
 #### **PostgreSQL (메타데이터)**
+
 ```prisma
 // packages/db/prisma/schema.prisma
 model User {
@@ -265,7 +280,7 @@ model User {
   name      String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  
+
   projects  Project[]
   sessions  Session[]
 }
@@ -277,10 +292,10 @@ model Project {
   timezone    String   @default("UTC")
   userId      String
   createdAt   DateTime @default(now())
-  
+
   user        User     @relation(fields: [userId], references: [id])
   clients     Client[]
-  
+
   @@index([userId])
 }
 
@@ -292,9 +307,9 @@ model Client {
   secret      String
   cors        String[]
   createdAt   DateTime @default(now())
-  
+
   project     Project  @relation(fields: [projectId], references: [id])
-  
+
   @@index([projectId])
 }
 
@@ -306,6 +321,7 @@ enum ClientType {
 ```
 
 #### **ClickHouse (이벤트 데이터)**
+
 ```sql
 -- 이벤트 테이블
 CREATE TABLE events (
@@ -315,11 +331,11 @@ CREATE TABLE events (
     deviceId String,
     profileId Nullable(String),
     sessionId String,
-    
+
     -- 타임스탬프
     createdAt DateTime DEFAULT now(),
     timestamp DateTime,
-    
+
     -- 디바이스 정보
     country Nullable(String),
     city Nullable(String),
@@ -331,24 +347,24 @@ CREATE TABLE events (
     device Nullable(String),
     brand Nullable(String),
     model Nullable(String),
-    
+
     -- 페이지 정보
     path Nullable(String),
     origin Nullable(String),
     referrer Nullable(String),
     referrerName Nullable(String),
     referrerType Nullable(String),
-    
+
     -- UTM 파라미터
     utmSource Nullable(String),
     utmMedium Nullable(String),
     utmCampaign Nullable(String),
     utmTerm Nullable(String),
     utmContent Nullable(String),
-    
+
     -- 커스텀 속성 (JSON)
     properties String,
-    
+
     -- 세션 메트릭
     duration Nullable(UInt32),
     screenViews Nullable(UInt16)
@@ -363,20 +379,20 @@ CREATE TABLE profiles (
     id String,
     projectId String,
     profileId String,
-    
+
     -- 기본 정보
     firstName Nullable(String),
     lastName Nullable(String),
     email Nullable(String),
     avatar Nullable(String),
-    
+
     -- 커스텀 속성
     properties String,
-    
+
     -- 메트릭
     firstSeenAt DateTime,
     lastSeenAt DateTime,
-    
+
     createdAt DateTime DEFAULT now()
 )
 ENGINE = ReplacingMergeTree(createdAt)
@@ -386,6 +402,7 @@ SETTINGS index_granularity = 8192;
 ```
 
 **ClickHouse 선택 이유**:
+
 - 컬럼 기반 스토리지로 분석 쿼리 최적화
 - 초당 수백만 행 삽입 가능
 - 실시간 집계 쿼리 성능 우수
@@ -402,7 +419,9 @@ SETTINGS index_granularity = 8192;
 ```typescript
 // packages/db/src/schema.ts
 export const users = pgTable('users', {
-  id: text('id').primaryKey().$defaultFn(() => createId()),
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => createId()),
   email: text('email').notNull().unique(),
   name: text('name'),
   passwordHash: text('password_hash'),
@@ -411,34 +430,51 @@ export const users = pgTable('users', {
   updatedAt: timestamp('updated_at').defaultNow(),
 });
 
-export const projects = pgTable('projects', {
-  id: text('id').primaryKey().$defaultFn(() => createId()),
-  name: text('name').notNull(),
-  domain: text('domain').notNull(),
-  timezone: text('timezone').default('UTC'),
-  userId: text('user_id').notNull().references(() => users.id),
-  settings: jsonb('settings').$type<ProjectSettings>(),
-  createdAt: timestamp('created_at').defaultNow(),
-}, (table) => ({
-  userIdIdx: index('projects_user_id_idx').on(table.userId),
-}));
+export const projects = pgTable(
+  'projects',
+  {
+    id: text('id')
+      .primaryKey()
+      .$defaultFn(() => createId()),
+    name: text('name').notNull(),
+    domain: text('domain').notNull(),
+    timezone: text('timezone').default('UTC'),
+    userId: text('user_id')
+      .notNull()
+      .references(() => users.id),
+    settings: jsonb('settings').$type<ProjectSettings>(),
+    createdAt: timestamp('created_at').defaultNow(),
+  },
+  (table) => ({
+    userIdIdx: index('projects_user_id_idx').on(table.userId),
+  })
+);
 
-export const clients = pgTable('clients', {
-  id: text('id').primaryKey().$defaultFn(() => createId()),
-  name: text('name').notNull(),
-  type: text('type').$type<'write' | 'read' | 'root'>().notNull(),
-  projectId: text('project_id').notNull().references(() => projects.id),
-  secret: text('secret').notNull(),
-  cors: text('cors').array(),
-  createdAt: timestamp('created_at').defaultNow(),
-}, (table) => ({
-  projectIdIdx: index('clients_project_id_idx').on(table.projectId),
-}));
+export const clients = pgTable(
+  'clients',
+  {
+    id: text('id')
+      .primaryKey()
+      .$defaultFn(() => createId()),
+    name: text('name').notNull(),
+    type: text('type').$type<'write' | 'read' | 'root'>().notNull(),
+    projectId: text('project_id')
+      .notNull()
+      .references(() => projects.id),
+    secret: text('secret').notNull(),
+    cors: text('cors').array(),
+    createdAt: timestamp('created_at').defaultNow(),
+  },
+  (table) => ({
+    projectIdIdx: index('clients_project_id_idx').on(table.projectId),
+  })
+);
 ```
 
 ### 3.2 ClickHouse 스키마 최적화
 
 #### **파티셔닝 전략**
+
 ```sql
 -- 월별 파티셔닝으로 오래된 데이터 삭제 용이
 PARTITION BY toYYYYMM(createdAt)
@@ -448,6 +484,7 @@ ORDER BY (projectId, createdAt, deviceId)
 ```
 
 #### **Materialized View로 집계 최적화**
+
 ```sql
 -- 일별 집계 뷰
 CREATE MATERIALIZED VIEW daily_metrics
@@ -472,6 +509,7 @@ GROUP BY projectId, date;
 ### 4.1 SDK 구조
 
 #### **Web SDK (packages/sdks/web)**
+
 ```typescript
 // packages/sdks/web/src/index.ts
 export class OpenPanel {
@@ -479,25 +517,25 @@ export class OpenPanel {
   private apiUrl: string;
   private deviceId: string;
   private sessionId: string;
-  
+
   constructor(config: OpenPanelConfig) {
     this.clientId = config.clientId;
     this.apiUrl = config.apiUrl || 'https://api.openpanel.dev';
     this.deviceId = this.getOrCreateDeviceId();
     this.sessionId = this.getOrCreateSessionId();
-    
+
     // 자동 페이지뷰 추적
     if (config.trackScreenViews) {
       this.trackPageView();
       this.setupPageViewTracking();
     }
-    
+
     // 자동 아웃바운드 링크 추적
     if (config.trackOutgoingLinks) {
       this.setupLinkTracking();
     }
   }
-  
+
   track(eventName: string, properties?: Record<string, any>) {
     const event = {
       type: 'track',
@@ -512,10 +550,10 @@ export class OpenPanel {
         timestamp: new Date().toISOString(),
       },
     };
-    
+
     this.send(event);
   }
-  
+
   identify(profileId: string, traits?: Record<string, any>) {
     const event = {
       type: 'identify',
@@ -525,17 +563,14 @@ export class OpenPanel {
         deviceId: this.deviceId,
       },
     };
-    
+
     this.send(event);
   }
-  
+
   private send(event: Event) {
     // Beacon API 사용 (페이지 이탈 시에도 전송 보장)
     if (navigator.sendBeacon) {
-      navigator.sendBeacon(
-        `${this.apiUrl}/track`,
-        JSON.stringify(event)
-      );
+      navigator.sendBeacon(`${this.apiUrl}/track`, JSON.stringify(event));
     } else {
       // Fallback to fetch
       fetch(`${this.apiUrl}/track`, {
@@ -549,7 +584,7 @@ export class OpenPanel {
       });
     }
   }
-  
+
   private getDefaultProperties() {
     return {
       path: window.location.pathname,
@@ -571,25 +606,25 @@ export class EventProcessor {
   async processEvent(rawEvent: RawEvent) {
     // 1. 검증
     const validatedEvent = await this.validate(rawEvent);
-    
+
     // 2. 보강 (Enrichment)
     const enrichedEvent = await this.enrich(validatedEvent);
-    
+
     // 3. 큐에 추가
     await this.queue.add('process-event', enrichedEvent);
-    
+
     return { success: true };
   }
-  
+
   private async enrich(event: ValidatedEvent) {
     const { ip, userAgent } = event;
-    
+
     // GeoIP 조회
     const geo = await this.geoip.lookup(ip);
-    
+
     // User-Agent 파싱
     const ua = UAParser(userAgent);
-    
+
     return {
       ...event,
       country: geo.country,
@@ -618,7 +653,7 @@ export class EventProcessor {
 export class MetricsService {
   async getMetrics(params: MetricsParams) {
     const { projectId, startDate, endDate, filters } = params;
-    
+
     const query = `
       SELECT
         -- 방문자 수
@@ -646,19 +681,19 @@ export class MetricsService {
         AND createdAt <= {endDate:DateTime}
         ${this.buildFilterClause(filters)}
     `;
-    
+
     const result = await this.clickhouse.query({
       query,
       query_params: { projectId, startDate, endDate },
       format: 'JSONEachRow',
     });
-    
+
     return result.json();
   }
-  
+
   async getTimeSeries(params: TimeSeriesParams) {
     const { projectId, startDate, endDate, interval = 'day' } = params;
-    
+
     const query = `
       SELECT
         ${this.getTimeInterval(interval)} as date,
@@ -673,10 +708,10 @@ export class MetricsService {
       GROUP BY date
       ORDER BY date
     `;
-    
+
     return this.clickhouse.query({ query, query_params: params });
   }
-  
+
   private getTimeInterval(interval: string) {
     switch (interval) {
       case 'hour':
@@ -703,18 +738,24 @@ export class FunnelService {
     const { projectId, steps, startDate, endDate } = params;
 
     // 각 단계별 이벤트 필터링
-    const stepQueries = steps.map((step, index) => `
+    const stepQueries = steps
+      .map(
+        (step, index) => `
       SELECT DISTINCT deviceId
       FROM events
       WHERE projectId = {projectId:String}
         AND name = {step${index}:String}
         AND createdAt >= {startDate:DateTime}
         AND createdAt <= {endDate:DateTime}
-    `).join(' INTERSECT ');
+    `
+      )
+      .join(' INTERSECT ');
 
     const query = `
       WITH
-        ${steps.map((step, i) => `
+        ${steps
+          .map(
+            (step, i) => `
           step${i} AS (
             SELECT deviceId, min(createdAt) as timestamp
             FROM events
@@ -724,20 +765,35 @@ export class FunnelService {
               AND createdAt <= {endDate:DateTime}
             GROUP BY deviceId
           )
-        `).join(',')}
+        `
+          )
+          .join(',')}
 
       SELECT
-        ${steps.map((_, i) => `
+        ${steps
+          .map(
+            (_, i) => `
           count(DISTINCT step${i}.deviceId) as step${i}_count,
-          ${i > 0 ? `
-            step${i}_count / step${i-1}_count * 100 as step${i}_conversion
-          ` : '100 as step0_conversion'}
-        `).join(',')}
+          ${
+            i > 0
+              ? `
+            step${i}_count / step${i - 1}_count * 100 as step${i}_conversion
+          `
+              : '100 as step0_conversion'
+          }
+        `
+          )
+          .join(',')}
       FROM step0
-      ${steps.slice(1).map((_, i) => `
-        LEFT JOIN step${i+1} ON step${i+1}.deviceId = step${i}.deviceId
-          AND step${i+1}.timestamp > step${i}.timestamp
-      `).join('\n')}
+      ${steps
+        .slice(1)
+        .map(
+          (_, i) => `
+        LEFT JOIN step${i + 1} ON step${i + 1}.deviceId = step${i}.deviceId
+          AND step${i + 1}.timestamp > step${i}.timestamp
+      `
+        )
+        .join('\n')}
     `;
 
     return this.clickhouse.query({ query, query_params: params });
@@ -1021,42 +1077,46 @@ const trackSchema = z.object({
 });
 
 export const trackRoute: FastifyPluginAsync = async (fastify) => {
-  fastify.post('/track', {
-    schema: {
-      body: trackSchema,
-      response: {
-        200: z.object({
-          success: z.boolean(),
-        }),
+  fastify.post(
+    '/track',
+    {
+      schema: {
+        body: trackSchema,
+        response: {
+          200: z.object({
+            success: z.boolean(),
+          }),
+        },
       },
     },
-  }, async (request, reply) => {
-    // 클라이언트 인증
-    const clientId = request.headers['openpanel-client-id'] as string;
-    const clientSecret = request.headers['openpanel-client-secret'] as string;
+    async (request, reply) => {
+      // 클라이언트 인증
+      const clientId = request.headers['openpanel-client-id'] as string;
+      const clientSecret = request.headers['openpanel-client-secret'] as string;
 
-    const client = await validateClient(clientId, clientSecret);
+      const client = await validateClient(clientId, clientSecret);
 
-    if (!client) {
-      return reply.code(401).send({ error: 'Unauthorized' });
+      if (!client) {
+        return reply.code(401).send({ error: 'Unauthorized' });
+      }
+
+      // 이벤트 처리
+      const { type, payload } = request.body;
+
+      const event = {
+        ...payload,
+        projectId: client.projectId,
+        ip: request.headers['x-client-ip'] || request.ip,
+        userAgent: request.headers['user-agent'],
+        createdAt: new Date().toISOString(),
+      };
+
+      // 큐에 추가
+      await eventQueue.add('process-event', { event });
+
+      return { success: true };
     }
-
-    // 이벤트 처리
-    const { type, payload } = request.body;
-
-    const event = {
-      ...payload,
-      projectId: client.projectId,
-      ip: request.headers['x-client-ip'] || request.ip,
-      userAgent: request.headers['user-agent'],
-      createdAt: new Date().toISOString(),
-    };
-
-    // 큐에 추가
-    await eventQueue.add('process-event', { event });
-
-    return { success: true };
-  });
+  );
 };
 ```
 
@@ -1079,7 +1139,7 @@ services:
       POSTGRES_USER: openpanel
       POSTGRES_PASSWORD: password
     ports:
-      - "5432:5432"
+      - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
@@ -1087,7 +1147,7 @@ services:
   redis:
     image: redis:7.2.5-alpine
     ports:
-      - "6379:6379"
+      - '6379:6379'
     volumes:
       - redis_data:/data
 
@@ -1095,8 +1155,8 @@ services:
   clickhouse:
     image: clickhouse/clickhouse-server:24.12.2.29-alpine
     ports:
-      - "8123:8123"  # HTTP
-      - "9000:9000"  # Native
+      - '8123:8123' # HTTP
+      - '9000:9000' # Native
     volumes:
       - clickhouse_data:/var/lib/clickhouse
       - ./clickhouse/config.xml:/etc/clickhouse-server/config.xml
@@ -1168,10 +1228,12 @@ await cache.set(cacheKey, metrics, 300); // 5분 캐시
 ## 12. 참고 자료
 
 ### 12.1 공식 문서
+
 - OpenPanel Docs: https://openpanel.dev/docs
 - GitHub Repository: https://github.com/Openpanel-dev/openpanel
 
 ### 12.2 기술 스택 문서
+
 - Next.js: https://nextjs.org/docs
 - Fastify: https://fastify.dev/
 - ClickHouse: https://clickhouse.com/docs
@@ -1180,6 +1242,7 @@ await cache.set(cacheKey, metrics, 300); // 5분 캐시
 - BullMQ: https://docs.bullmq.io/
 
 ### 12.3 유사 프로젝트
+
 - Plausible: https://github.com/plausible/analytics
 - Umami: https://github.com/umami-software/umami
 - PostHog: https://github.com/PostHog/posthog
@@ -1199,4 +1262,3 @@ OpenPanel과 같은 분석 플랫폼을 구축하기 위한 핵심 요소:
 7. **성능 최적화**: 캐싱, 배치 처리, 인덱싱 전략
 
 이 가이드를 기반으로 단계적으로 구현하면 프로덕션 레벨의 분석 플랫폼을 구축할 수 있습니다.
-

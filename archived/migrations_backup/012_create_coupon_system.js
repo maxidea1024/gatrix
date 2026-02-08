@@ -7,7 +7,7 @@
  * - DATETIME is used (MySQL format). Do NOT store ISO 8601 strings directly
  */
 
-exports.up = async function(connection) {
+exports.up = async function (connection) {
   console.log('Creating coupon system tables...');
 
   // 1) Coupon settings (definition)
@@ -183,7 +183,7 @@ exports.up = async function(connection) {
   console.log('Coupon system tables created.');
 };
 
-exports.down = async function(connection) {
+exports.down = async function (connection) {
   console.log('Dropping coupon system tables...');
 
   await connection.execute('DROP TABLE IF EXISTS g_reward_items');
@@ -200,4 +200,3 @@ exports.down = async function(connection) {
 
   console.log('Coupon system tables dropped.');
 };
-

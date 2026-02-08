@@ -1,55 +1,55 @@
-import { GatrixServerSDK as GatrixSDK } from "../src";
-import { ServiceDiscoveryService } from "../src/services/ServiceDiscoveryService";
+import { GatrixServerSDK as GatrixSDK } from '../src';
+import { ServiceDiscoveryService } from '../src/services/ServiceDiscoveryService';
 
-describe("GatrixSDK", () => {
-  describe("constructor", () => {
-    it("should create an instance with valid configuration", () => {
+describe('GatrixSDK', () => {
+  describe('constructor', () => {
+    it('should create an instance with valid configuration', () => {
       const sdk = new GatrixSDK({
-        gatrixUrl: "http://localhost:3000",
-        apiToken: "test-token",
-        applicationName: "test-app",
+        gatrixUrl: 'http://localhost:3000',
+        apiToken: 'test-token',
+        applicationName: 'test-app',
       });
 
       expect(sdk).toBeInstanceOf(GatrixSDK);
     });
 
-    it("should throw error when gatrixUrl is missing", () => {
+    it('should throw error when gatrixUrl is missing', () => {
       expect(() => {
         new GatrixSDK({
-          gatrixUrl: "",
-          apiToken: "test-token",
-          applicationName: "test-app",
+          gatrixUrl: '',
+          apiToken: 'test-token',
+          applicationName: 'test-app',
         });
-      }).toThrow("gatrixUrl is required");
+      }).toThrow('gatrixUrl is required');
     });
 
-    it("should use default unsecured api token when apiToken is missing", () => {
+    it('should use default unsecured api token when apiToken is missing', () => {
       const sdk = new GatrixSDK({
-        gatrixUrl: "http://localhost:3000",
-        apiToken: "",
-        applicationName: "test-app",
+        gatrixUrl: 'http://localhost:3000',
+        apiToken: '',
+        applicationName: 'test-app',
       });
 
       expect(sdk).toBeInstanceOf(GatrixSDK);
     });
 
-    it("should throw error when applicationName is missing", () => {
+    it('should throw error when applicationName is missing', () => {
       expect(() => {
         new GatrixSDK({
-          gatrixUrl: "http://localhost:3000",
-          apiToken: "test-token",
-          applicationName: "",
+          gatrixUrl: 'http://localhost:3000',
+          apiToken: 'test-token',
+          applicationName: '',
         });
-      }).toThrow("applicationName is required");
+      }).toThrow('applicationName is required');
     });
   });
 
-  describe("configuration", () => {
-    it("should accept optional cache configuration", () => {
+  describe('configuration', () => {
+    it('should accept optional cache configuration', () => {
       const sdk = new GatrixSDK({
-        gatrixUrl: "http://localhost:3000",
-        apiToken: "test-token",
-        applicationName: "test-app",
+        gatrixUrl: 'http://localhost:3000',
+        apiToken: 'test-token',
+        applicationName: 'test-app',
         cache: {
           enabled: true,
           ttl: 300,
@@ -59,13 +59,13 @@ describe("GatrixSDK", () => {
       expect(sdk).toBeInstanceOf(GatrixSDK);
     });
 
-    it("should accept optional redis configuration", () => {
+    it('should accept optional redis configuration', () => {
       const sdk = new GatrixSDK({
-        gatrixUrl: "http://localhost:3000",
-        apiToken: "test-token",
-        applicationName: "test-app",
+        gatrixUrl: 'http://localhost:3000',
+        apiToken: 'test-token',
+        applicationName: 'test-app',
         redis: {
-          host: "localhost",
+          host: 'localhost',
           port: 6379,
         },
       });
@@ -73,11 +73,11 @@ describe("GatrixSDK", () => {
       expect(sdk).toBeInstanceOf(GatrixSDK);
     });
 
-    it("should accept optional retry and metrics configuration", () => {
+    it('should accept optional retry and metrics configuration', () => {
       const sdk = new GatrixSDK({
-        gatrixUrl: "http://localhost:3000",
-        apiToken: "test-token",
-        applicationName: "test-app",
+        gatrixUrl: 'http://localhost:3000',
+        apiToken: 'test-token',
+        applicationName: 'test-app',
         retry: {
           enabled: true,
           maxRetries: 3,
@@ -91,30 +91,30 @@ describe("GatrixSDK", () => {
       expect(sdk).toBeInstanceOf(GatrixSDK);
     });
 
-    it("should support config-based service discovery auto-registration", async () => {
+    it('should support config-based service discovery auto-registration', async () => {
       const registerMock = jest
-        .spyOn(ServiceDiscoveryService.prototype, "register")
+        .spyOn(ServiceDiscoveryService.prototype, 'register')
         .mockResolvedValue({
-          instanceId: "test-instance",
-          hostname: "test-host",
-          internalAddress: "10.0.0.1",
-          externalAddress: "1.2.3.4",
+          instanceId: 'test-instance',
+          hostname: 'test-host',
+          internalAddress: '10.0.0.1',
+          externalAddress: '1.2.3.4',
         });
 
       const sdk = new GatrixSDK({
-        gatrixUrl: "http://localhost:3000",
-        apiToken: "test-token",
-        applicationName: "test-app",
+        gatrixUrl: 'http://localhost:3000',
+        apiToken: 'test-token',
+        applicationName: 'test-app',
         serviceDiscovery: {
           autoRegister: true,
           labels: {
-            service: "worldd",
-            group: "kr-1",
+            service: 'worldd',
+            group: 'kr-1',
           },
           ports: {
             http: [8080],
           },
-          status: "ready",
+          status: 'ready',
         },
       });
 
@@ -124,14 +124,14 @@ describe("GatrixSDK", () => {
       expect(registerMock).toHaveBeenCalledWith(
         expect.objectContaining({
           labels: {
-            service: "worldd",
-            group: "kr-1",
+            service: 'worldd',
+            group: 'kr-1',
           },
           ports: {
             http: [8080],
           },
-          status: "ready",
-        }),
+          status: 'ready',
+        })
       );
 
       registerMock.mockRestore();

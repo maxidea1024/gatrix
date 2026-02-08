@@ -1,1 +1,187 @@
-"use strict";(globalThis.webpackChunkdocs=globalThis.webpackChunkdocs||[]).push([[3598],{3257(e,s,n){n.r(s),n.d(s,{assets:()=>d,contentTitle:()=>o,default:()=>h,frontMatter:()=>l,metadata:()=>i,toc:()=>c});const i=JSON.parse('{"id":"sdks/client-side","title":"Client-side SDKs","description":"Gatrix provides various client-side SDKs to integrate feature flagging into your frontend applications, mobile apps, and other client environments.","source":"@site/docs/sdks/client-side.md","sourceDirName":"sdks","slug":"/sdks/client-side","permalink":"/docs/zh-Hans/sdks/client-side","draft":false,"unlisted":false,"editUrl":"https://github.com/your-org/gatrix/tree/main/docs/docs/sdks/client-side.md","tags":[],"version":"current","sidebarPosition":2,"frontMatter":{"sidebar_position":2},"sidebar":"tutorialSidebar","previous":{"title":"Server-side SDKs","permalink":"/docs/zh-Hans/sdks/server-side"},"next":{"title":"\u5ba2\u6237\u7aef API","permalink":"/docs/zh-Hans/api/client-api"}}');var t=n(4848),r=n(8453);const l={sidebar_position:2},o="Client-side SDKs",d={},c=[{value:"Overview",id:"overview",level:2},{value:"Available SDKs",id:"available-sdks",level:2},{value:"Key Concepts",id:"key-concepts",level:2}];function a(e){const s={a:"a",h1:"h1",h2:"h2",header:"header",li:"li",p:"p",strong:"strong",ul:"ul",...(0,r.R)(),...e.components};return(0,t.jsxs)(t.Fragment,{children:[(0,t.jsx)(s.header,{children:(0,t.jsx)(s.h1,{id:"client-side-sdks",children:"Client-side SDKs"})}),"\n",(0,t.jsx)(s.p,{children:"Gatrix provides various client-side SDKs to integrate feature flagging into your frontend applications, mobile apps, and other client environments."}),"\n",(0,t.jsx)(s.h2,{id:"overview",children:"Overview"}),"\n",(0,t.jsx)(s.p,{children:"Client-side SDKs are designed to run in untrusted environments (browsers, mobile devices). They:"}),"\n",(0,t.jsxs)(s.ul,{children:["\n",(0,t.jsx)(s.li,{children:"Evaluate flags based on specific user contexts."}),"\n",(0,t.jsx)(s.li,{children:"Are optimized for low bandwidth and high availability."}),"\n",(0,t.jsx)(s.li,{children:"Often use a proxy or edge service to hide sensitive flag configuration."}),"\n"]}),"\n",(0,t.jsx)(s.h2,{id:"available-sdks",children:"Available SDKs"}),"\n",(0,t.jsxs)(s.ul,{children:["\n",(0,t.jsxs)(s.li,{children:[(0,t.jsx)(s.strong,{children:"React"}),": ",(0,t.jsx)(s.a,{href:"/docs/sdks/react",children:"Docs"})]}),"\n",(0,t.jsxs)(s.li,{children:[(0,t.jsx)(s.strong,{children:"Vue.js"}),": ",(0,t.jsx)(s.a,{href:"/docs/sdks/vue",children:"Docs"})]}),"\n",(0,t.jsxs)(s.li,{children:[(0,t.jsx)(s.strong,{children:"Android"}),": ",(0,t.jsx)(s.a,{href:"/docs/sdks/android",children:"Docs"})]}),"\n",(0,t.jsxs)(s.li,{children:[(0,t.jsx)(s.strong,{children:"iOS"}),": ",(0,t.jsx)(s.a,{href:"/docs/sdks/ios",children:"Docs"})]}),"\n",(0,t.jsxs)(s.li,{children:[(0,t.jsx)(s.strong,{children:"Flutter"}),": ",(0,t.jsx)(s.a,{href:"/docs/sdks/flutter",children:"Docs"})]}),"\n"]}),"\n",(0,t.jsx)(s.h2,{id:"key-concepts",children:"Key Concepts"}),"\n",(0,t.jsxs)(s.ul,{children:["\n",(0,t.jsxs)(s.li,{children:[(0,t.jsx)(s.strong,{children:"User Context"}),": Client-side flags are almost always user-specific."]}),"\n",(0,t.jsxs)(s.li,{children:[(0,t.jsx)(s.strong,{children:"Privacy"}),": Only the flags relevant to the current user are typically exposed to the client."]}),"\n",(0,t.jsxs)(s.li,{children:[(0,t.jsx)(s.strong,{children:"Bootstrapping"}),": Initial flag states can be provided during application load to avoid flicker."]}),"\n"]})]})}function h(e={}){const{wrapper:s}={...(0,r.R)(),...e.components};return s?(0,t.jsx)(s,{...e,children:(0,t.jsx)(a,{...e})}):a(e)}},8453(e,s,n){n.d(s,{R:()=>l,x:()=>o});var i=n(6540);const t={},r=i.createContext(t);function l(e){const s=i.useContext(r);return i.useMemo(function(){return"function"==typeof e?e(s):{...s,...e}},[s,e])}function o(e){let s;return s=e.disableParentContext?"function"==typeof e.components?e.components(t):e.components||t:l(e.components),i.createElement(r.Provider,{value:s},e.children)}}}]);
+'use strict';
+(globalThis.webpackChunkdocs = globalThis.webpackChunkdocs || []).push([
+  [3598],
+  {
+    3257(e, s, n) {
+      (n.r(s),
+        n.d(s, {
+          assets: () => d,
+          contentTitle: () => o,
+          default: () => h,
+          frontMatter: () => l,
+          metadata: () => i,
+          toc: () => c,
+        }));
+      const i = JSON.parse(
+        '{"id":"sdks/client-side","title":"Client-side SDKs","description":"Gatrix provides various client-side SDKs to integrate feature flagging into your frontend applications, mobile apps, and other client environments.","source":"@site/docs/sdks/client-side.md","sourceDirName":"sdks","slug":"/sdks/client-side","permalink":"/docs/zh-Hans/sdks/client-side","draft":false,"unlisted":false,"editUrl":"https://github.com/your-org/gatrix/tree/main/docs/docs/sdks/client-side.md","tags":[],"version":"current","sidebarPosition":2,"frontMatter":{"sidebar_position":2},"sidebar":"tutorialSidebar","previous":{"title":"Server-side SDKs","permalink":"/docs/zh-Hans/sdks/server-side"},"next":{"title":"\u5ba2\u6237\u7aef API","permalink":"/docs/zh-Hans/api/client-api"}}'
+      );
+      var t = n(4848),
+        r = n(8453);
+      const l = { sidebar_position: 2 },
+        o = 'Client-side SDKs',
+        d = {},
+        c = [
+          { value: 'Overview', id: 'overview', level: 2 },
+          { value: 'Available SDKs', id: 'available-sdks', level: 2 },
+          { value: 'Key Concepts', id: 'key-concepts', level: 2 },
+        ];
+      function a(e) {
+        const s = {
+          a: 'a',
+          h1: 'h1',
+          h2: 'h2',
+          header: 'header',
+          li: 'li',
+          p: 'p',
+          strong: 'strong',
+          ul: 'ul',
+          ...(0, r.R)(),
+          ...e.components,
+        };
+        return (0, t.jsxs)(t.Fragment, {
+          children: [
+            (0, t.jsx)(s.header, {
+              children: (0, t.jsx)(s.h1, { id: 'client-side-sdks', children: 'Client-side SDKs' }),
+            }),
+            '\n',
+            (0, t.jsx)(s.p, {
+              children:
+                'Gatrix provides various client-side SDKs to integrate feature flagging into your frontend applications, mobile apps, and other client environments.',
+            }),
+            '\n',
+            (0, t.jsx)(s.h2, { id: 'overview', children: 'Overview' }),
+            '\n',
+            (0, t.jsx)(s.p, {
+              children:
+                'Client-side SDKs are designed to run in untrusted environments (browsers, mobile devices). They:',
+            }),
+            '\n',
+            (0, t.jsxs)(s.ul, {
+              children: [
+                '\n',
+                (0, t.jsx)(s.li, { children: 'Evaluate flags based on specific user contexts.' }),
+                '\n',
+                (0, t.jsx)(s.li, {
+                  children: 'Are optimized for low bandwidth and high availability.',
+                }),
+                '\n',
+                (0, t.jsx)(s.li, {
+                  children:
+                    'Often use a proxy or edge service to hide sensitive flag configuration.',
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, t.jsx)(s.h2, { id: 'available-sdks', children: 'Available SDKs' }),
+            '\n',
+            (0, t.jsxs)(s.ul, {
+              children: [
+                '\n',
+                (0, t.jsxs)(s.li, {
+                  children: [
+                    (0, t.jsx)(s.strong, { children: 'React' }),
+                    ': ',
+                    (0, t.jsx)(s.a, { href: '/docs/sdks/react', children: 'Docs' }),
+                  ],
+                }),
+                '\n',
+                (0, t.jsxs)(s.li, {
+                  children: [
+                    (0, t.jsx)(s.strong, { children: 'Vue.js' }),
+                    ': ',
+                    (0, t.jsx)(s.a, { href: '/docs/sdks/vue', children: 'Docs' }),
+                  ],
+                }),
+                '\n',
+                (0, t.jsxs)(s.li, {
+                  children: [
+                    (0, t.jsx)(s.strong, { children: 'Android' }),
+                    ': ',
+                    (0, t.jsx)(s.a, { href: '/docs/sdks/android', children: 'Docs' }),
+                  ],
+                }),
+                '\n',
+                (0, t.jsxs)(s.li, {
+                  children: [
+                    (0, t.jsx)(s.strong, { children: 'iOS' }),
+                    ': ',
+                    (0, t.jsx)(s.a, { href: '/docs/sdks/ios', children: 'Docs' }),
+                  ],
+                }),
+                '\n',
+                (0, t.jsxs)(s.li, {
+                  children: [
+                    (0, t.jsx)(s.strong, { children: 'Flutter' }),
+                    ': ',
+                    (0, t.jsx)(s.a, { href: '/docs/sdks/flutter', children: 'Docs' }),
+                  ],
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, t.jsx)(s.h2, { id: 'key-concepts', children: 'Key Concepts' }),
+            '\n',
+            (0, t.jsxs)(s.ul, {
+              children: [
+                '\n',
+                (0, t.jsxs)(s.li, {
+                  children: [
+                    (0, t.jsx)(s.strong, { children: 'User Context' }),
+                    ': Client-side flags are almost always user-specific.',
+                  ],
+                }),
+                '\n',
+                (0, t.jsxs)(s.li, {
+                  children: [
+                    (0, t.jsx)(s.strong, { children: 'Privacy' }),
+                    ': Only the flags relevant to the current user are typically exposed to the client.',
+                  ],
+                }),
+                '\n',
+                (0, t.jsxs)(s.li, {
+                  children: [
+                    (0, t.jsx)(s.strong, { children: 'Bootstrapping' }),
+                    ': Initial flag states can be provided during application load to avoid flicker.',
+                  ],
+                }),
+                '\n',
+              ],
+            }),
+          ],
+        });
+      }
+      function h(e = {}) {
+        const { wrapper: s } = { ...(0, r.R)(), ...e.components };
+        return s ? (0, t.jsx)(s, { ...e, children: (0, t.jsx)(a, { ...e }) }) : a(e);
+      }
+    },
+    8453(e, s, n) {
+      n.d(s, { R: () => l, x: () => o });
+      var i = n(6540);
+      const t = {},
+        r = i.createContext(t);
+      function l(e) {
+        const s = i.useContext(r);
+        return i.useMemo(
+          function () {
+            return 'function' == typeof e ? e(s) : { ...s, ...e };
+          },
+          [s, e]
+        );
+      }
+      function o(e) {
+        let s;
+        return (
+          (s = e.disableParentContext
+            ? 'function' == typeof e.components
+              ? e.components(t)
+              : e.components || t
+            : l(e.components)),
+          i.createElement(r.Provider, { value: s }, e.children)
+        );
+      }
+    },
+  },
+]);

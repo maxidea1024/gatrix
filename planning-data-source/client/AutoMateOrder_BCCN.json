@@ -132,34 +132,19 @@
     ":links": {
       "order": [
         {
-          "id": [
-            "BattleSkill",
-            "WorldSkill"
-          ]
+          "id": ["BattleSkill", "WorldSkill"]
         },
         {
-          "id": [
-            "BattleSkill",
-            "WorldSkill"
-          ]
+          "id": ["BattleSkill", "WorldSkill"]
         },
         {
-          "id": [
-            "BattleSkill",
-            "WorldSkill"
-          ]
+          "id": ["BattleSkill", "WorldSkill"]
         },
         {
-          "id": [
-            "BattleSkill",
-            "WorldSkill"
-          ]
+          "id": ["BattleSkill", "WorldSkill"]
         },
         {
-          "id": [
-            "BattleSkill",
-            "WorldSkill"
-          ]
+          "id": ["BattleSkill", "WorldSkill"]
         }
       ]
     }

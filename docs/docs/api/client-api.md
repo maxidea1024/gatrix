@@ -30,9 +30,11 @@ GET /flags
 ```
 
 Query parameters:
+
 - `context` - JSON-encoded context object
 
 Response:
+
 ```json
 {
   "flags": {
@@ -50,10 +52,12 @@ GET /notices
 ```
 
 Query parameters:
+
 - `category` - Filter by category (optional)
 - `limit` - Max results (default: 20)
 
 Response:
+
 ```json
 {
   "notices": [
@@ -76,6 +80,7 @@ POST /coupons/redeem
 ```
 
 Request:
+
 ```json
 {
   "code": "SUMMER2024",
@@ -84,12 +89,11 @@ Request:
 ```
 
 Response:
+
 ```json
 {
   "success": true,
-  "rewards": [
-    { "type": "item", "id": "item_001", "quantity": 1 }
-  ]
+  "rewards": [{ "type": "item", "id": "item_001", "quantity": 1 }]
 }
 ```
 
@@ -100,10 +104,12 @@ GET /client-version
 ```
 
 Query parameters:
+
 - `platform` - ios, android, windows, mac
 - `version` - Current client version
 
 Response:
+
 ```json
 {
   "needsUpdate": true,
@@ -120,6 +126,7 @@ GET /status
 ```
 
 Response:
+
 ```json
 {
   "maintenance": false,

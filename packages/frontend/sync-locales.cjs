@@ -9,7 +9,7 @@ const zh = JSON.parse(fs.readFileSync('src/locales/zh.json', 'utf8'));
 function getValue(obj, path) {
   const keys = path.split('.');
   let current = obj;
-  
+
   for (const key of keys) {
     if (current && typeof current === 'object' && key in current) {
       current = current[key];
@@ -17,7 +17,7 @@ function getValue(obj, path) {
       return undefined;
     }
   }
-  
+
   return current;
 }
 
@@ -26,38 +26,38 @@ function setValue(obj, path, value) {
   const keys = path.split('.');
   const lastKey = keys.pop();
   let current = obj;
-  
+
   for (const key of keys) {
     if (!(key in current)) {
       current[key] = {};
     }
     current = current[key];
   }
-  
+
   current[lastKey] = value;
 }
 
 // Function to get all keys recursively
 function getAllKeys(obj, prefix = '') {
   const keys = [];
-  
+
   for (const key in obj) {
     const fullKey = prefix ? `${prefix}.${key}` : key;
-    
+
     if (typeof obj[key] === 'object' && obj[key] !== null && !Array.isArray(obj[key])) {
       keys.push(...getAllKeys(obj[key], fullKey));
     } else {
       keys.push(fullKey);
     }
   }
-  
+
   return keys;
 }
 
 // Function to rebuild object with same structure as reference
 function rebuildWithStructure(reference, source, fallback) {
   const result = {};
-  
+
   function copyStructure(refObj, srcObj, fbObj, targetObj) {
     for (const key in refObj) {
       if (typeof refObj[key] === 'object' && refObj[key] !== null && !Array.isArray(refObj[key])) {
@@ -80,7 +80,7 @@ function rebuildWithStructure(reference, source, fallback) {
       }
     }
   }
-  
+
   copyStructure(reference, source, fallback, result);
   return result;
 }
@@ -111,7 +111,7 @@ console.log('ZH 키 개수:', newZhKeys.length);
 
 if (enKeys.length === newKoKeys.length && enKeys.length === newZhKeys.length) {
   console.log('\n✅ 모든 로케일 파일의 키 개수가 동일합니다!');
-  
+
   // Check if all keys match
   const allMatch = enKeys.every((key, i) => key === newKoKeys[i] && key === newZhKeys[i]);
   if (allMatch) {
@@ -126,4 +126,3 @@ if (enKeys.length === newKoKeys.length && enKeys.length === newZhKeys.length) {
 console.log('\n백업 파일:');
 console.log('  - src/locales/ko.json.backup');
 console.log('  - src/locales/zh.json.backup');
-

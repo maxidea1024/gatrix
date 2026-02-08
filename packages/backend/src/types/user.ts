@@ -50,7 +50,7 @@ export interface UpdateUserData {
   lastLoginAt?: Date;
 }
 
-export interface UserWithoutPassword extends Omit<User, 'passwordHash'> { }
+export interface UserWithoutPassword extends Omit<User, 'passwordHash'> {}
 
 export interface OAuthAccount {
   id: number;

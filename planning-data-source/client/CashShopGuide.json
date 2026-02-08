@@ -2,10 +2,7 @@
   ":CashShopGuide": {
     ":type": {
       "id": "key",
-      "guideText": [
-        "text",
-        "text"
-      ]
+      "guideText": ["text", "text"]
     },
     ":required": {},
     ":requiredInObject": {},

@@ -1,1 +1,326 @@
-"use strict";(globalThis.webpackChunkdocs=globalThis.webpackChunkdocs||[]).push([[5240],{3322(n,e,s){s.r(e),s.d(e,{assets:()=>c,contentTitle:()=>t,default:()=>x,frontMatter:()=>l,metadata:()=>i,toc:()=>h});const i=JSON.parse('{"id":"guide/surveys","title":"\uc124\ubb38\uc870\uc0ac","description":"\uac1c\uc694","source":"@site/i18n/ko/docusaurus-plugin-content-docs/current/guide/surveys.md","sourceDirName":"guide","slug":"/guide/surveys","permalink":"/docs/ko/guide/surveys","draft":false,"unlisted":false,"editUrl":"https://github.com/your-org/gatrix/tree/main/docs/docs/guide/surveys.md","tags":[],"version":"current","sidebarPosition":4,"frontMatter":{"sidebar_position":4,"sidebar_label":"\uc124\ubb38\uc870\uc0ac"},"sidebar":"tutorialSidebar","previous":{"title":"\ucfe0\ud3f0","permalink":"/docs/ko/guide/coupons"},"next":{"title":"\uc0c1\uc810 \uc0c1\ud488","permalink":"/docs/ko/guide/store-products"}}');var r=s(4848),d=s(8453);const l={sidebar_position:4,sidebar_label:"\uc124\ubb38\uc870\uc0ac"},t="\uc124\ubb38\uc870\uc0ac",c={},h=[{value:"\uac1c\uc694",id:"\uac1c\uc694",level:2},{value:"\uae30\ub2a5",id:"\uae30\ub2a5",level:2},{value:"\uc124\ubb38\uc870\uc0ac \uc0dd\uc131 \ubc29\ubc95",id:"\uc124\ubb38\uc870\uc0ac-\uc0dd\uc131-\ubc29\ubc95",level:2},{value:"\uc9c8\ubb38 \uc720\ud615",id:"\uc9c8\ubb38-\uc720\ud615",level:2},{value:"\uc751\ub2f5 \ubd84\uc11d",id:"\uc751\ub2f5-\ubd84\uc11d",level:2}];function o(n){const e={h1:"h1",h2:"h2",header:"header",li:"li",ol:"ol",p:"p",strong:"strong",table:"table",tbody:"tbody",td:"td",th:"th",thead:"thead",tr:"tr",ul:"ul",...(0,d.R)(),...n.components};return(0,r.jsxs)(r.Fragment,{children:[(0,r.jsx)(e.header,{children:(0,r.jsx)(e.h1,{id:"\uc124\ubb38\uc870\uc0ac",children:"\uc124\ubb38\uc870\uc0ac"})}),"\n",(0,r.jsx)(e.h2,{id:"\uac1c\uc694",children:"\uac1c\uc694"}),"\n",(0,r.jsx)(e.p,{children:"\uc0ac\uc6a9\uc790 \ud53c\ub4dc\ubc31\uc744 \uc218\uc9d1\ud558\uae30 \uc704\ud574 \uc778\uac8c\uc784 \uc124\ubb38\uc870\uc0ac\ub97c \uc0dd\uc131\ud558\uace0 \uad00\ub9ac\ud569\ub2c8\ub2e4."}),"\n",(0,r.jsxs)(e.p,{children:[(0,r.jsx)(e.strong,{children:"\uc811\uadfc \uacbd\ub85c:"})," \uac8c\uc784 \uc6b4\uc601 \u2192 \uc124\ubb38\uc870\uc0ac"]}),"\n",(0,r.jsx)(e.h2,{id:"\uae30\ub2a5",children:"\uae30\ub2a5"}),"\n",(0,r.jsxs)(e.ul,{children:["\n",(0,r.jsx)(e.li,{children:"\ub2e4\uc591\ud55c \uc9c8\ubb38 \uc720\ud615\uc758 \uc124\ubb38 \uc0dd\uc131"}),"\n",(0,r.jsx)(e.li,{children:"\ud2b9\uc815 \uc0ac\uc6a9\uc790 \uc138\uadf8\uba3c\ud2b8 \ud0c0\uac9f\ud305"}),"\n",(0,r.jsx)(e.li,{children:"\uc124\ubb38 \uc218\uc9d1 \uae30\uac04 \uc124\uc815"}),"\n",(0,r.jsx)(e.li,{children:"\uc751\ub2f5 \ub370\uc774\ud130 \ubd84\uc11d"}),"\n",(0,r.jsx)(e.li,{children:"\uacb0\uacfc \ub0b4\ubcf4\ub0b4\uae30"}),"\n"]}),"\n",(0,r.jsx)(e.h2,{id:"\uc124\ubb38\uc870\uc0ac-\uc0dd\uc131-\ubc29\ubc95",children:"\uc124\ubb38\uc870\uc0ac \uc0dd\uc131 \ubc29\ubc95"}),"\n",(0,r.jsxs)(e.ol,{children:["\n",(0,r.jsxs)(e.li,{children:[(0,r.jsx)(e.strong,{children:"\uac8c\uc784 \uc6b4\uc601"})," > ",(0,r.jsx)(e.strong,{children:"\uc124\ubb38\uc870\uc0ac"}),"\ub85c \uc774\ub3d9\ud569\ub2c8\ub2e4."]}),"\n",(0,r.jsxs)(e.li,{children:[(0,r.jsx)(e.strong,{children:"\uc124\ubb38 \ucd94\uac00"})," \ubc84\ud2bc\uc744 \ud074\ub9ad\ud569\ub2c8\ub2e4."]}),"\n",(0,r.jsx)(e.li,{children:"\uc124\ubb38\uc744 \uc124\uc815\ud569\ub2c8\ub2e4:"}),"\n"]}),"\n",(0,r.jsxs)(e.table,{children:[(0,r.jsx)(e.thead,{children:(0,r.jsxs)(e.tr,{children:[(0,r.jsx)(e.th,{children:"\ud544\ub4dc"}),(0,r.jsx)(e.th,{children:"\uc720\ud615"}),(0,r.jsx)(e.th,{children:"\ud544\uc218 \uc5ec\ubd80"}),(0,r.jsx)(e.th,{children:"\uc124\uba85"})]})}),(0,r.jsxs)(e.tbody,{children:[(0,r.jsxs)(e.tr,{children:[(0,r.jsx)(e.td,{children:"\uc81c\ubaa9"}),(0,r.jsx)(e.td,{children:"\ud14d\uc2a4\ud2b8"}),(0,r.jsx)(e.td,{children:"\ud544\uc218"}),(0,r.jsx)(e.td,{children:"\uc124\ubb38 \uc81c\ubaa9"})]}),(0,r.jsxs)(e.tr,{children:[(0,r.jsx)(e.td,{children:"\uc124\uba85"}),(0,r.jsx)(e.td,{children:"\ud14d\uc2a4\ud2b8 \uc601\uc5ed"}),(0,r.jsx)(e.td,{children:"-"}),(0,r.jsx)(e.td,{children:"\uc124\ubb38 \uc124\uba85"})]}),(0,r.jsxs)(e.tr,{children:[(0,r.jsx)(e.td,{children:"\uc2dc\uc791 \uc77c\uc2dc"}),(0,r.jsx)(e.td,{children:"\ub0a0\uc9dc/\uc2dc\uac04 \uc120\ud0dd"}),(0,r.jsx)(e.td,{children:"-"}),(0,r.jsx)(e.td,{children:"\uc124\ubb38\uc774 \uc2dc\uc791\ub418\ub294 \uc77c\uc2dc"})]}),(0,r.jsxs)(e.tr,{children:[(0,r.jsx)(e.td,{children:"\uc885\ub8cc \uc77c\uc2dc"}),(0,r.jsx)(e.td,{children:"\ub0a0\uc9dc/\uc2dc\uac04 \uc120\ud0dd"}),(0,r.jsx)(e.td,{children:"-"}),(0,r.jsx)(e.td,{children:"\uc124\ubb38\uc774 \uc885\ub8cc\ub418\ub294 \uc77c\uc2dc"})]}),(0,r.jsxs)(e.tr,{children:[(0,r.jsx)(e.td,{children:"\ud0c0\uac9f \uc138\uadf8\uba3c\ud2b8"}),(0,r.jsx)(e.td,{children:"\uc120\ud0dd"}),(0,r.jsx)(e.td,{children:"-"}),(0,r.jsx)(e.td,{children:"\ud0c0\uac9f \ub300\uc0c1"})]})]})]}),"\n",(0,r.jsxs)(e.ol,{start:"4",children:["\n",(0,r.jsx)(e.li,{children:"\uc9c8\ubb38\uc744 \ucd94\uac00\ud569\ub2c8\ub2e4."}),"\n",(0,r.jsxs)(e.li,{children:[(0,r.jsx)(e.strong,{children:"\uc0dd\uc131"}),"\uc744 \ud074\ub9ad\ud558\uc5ec \uc800\uc7a5\ud569\ub2c8\ub2e4."]}),"\n"]}),"\n",(0,r.jsx)(e.h2,{id:"\uc9c8\ubb38-\uc720\ud615",children:"\uc9c8\ubb38 \uc720\ud615"}),"\n",(0,r.jsxs)(e.ul,{children:["\n",(0,r.jsxs)(e.li,{children:[(0,r.jsx)(e.strong,{children:"\uac1d\uad00\uc2dd (\ub2e8\uc77c \uc120\ud0dd)"})," - \ub77c\ub514\uc624 \ubc84\ud2bc, \ud558\ub098\uc758 \ub2f5\ubcc0"]}),"\n",(0,r.jsxs)(e.li,{children:[(0,r.jsx)(e.strong,{children:"\uac1d\uad00\uc2dd (\ub2e4\uc911 \uc120\ud0dd)"})," - \uccb4\ud06c\ubc15\uc2a4, \uc5ec\ub7ec \ub2f5\ubcc0"]}),"\n",(0,r.jsxs)(e.li,{children:[(0,r.jsx)(e.strong,{children:"\uc8fc\uad00\uc2dd (\ub2e8\ub2f5/\uc11c\uc220)"})," - \uc790\uc720 \uc785\ub825 \uc751\ub2f5"]}),"\n",(0,r.jsxs)(e.li,{children:[(0,r.jsx)(e.strong,{children:"\ud3c9\uc810"})," - 1~5\uc810 \ubcc4\uc810"]}),"\n",(0,r.jsxs)(e.li,{children:[(0,r.jsx)(e.strong,{children:"\ucc99\ub3c4"})," - \uc22b\uc790 \ucc99\ub3c4 (1~10)"]}),"\n"]}),"\n",(0,r.jsx)(e.h2,{id:"\uc751\ub2f5-\ubd84\uc11d",children:"\uc751\ub2f5 \ubd84\uc11d"}),"\n",(0,r.jsx)(e.p,{children:"\ub2e4\uc74c\uc744 \ud3ec\ud568\ud55c \uc124\ubb38 \uacb0\uacfc\ub97c \ud655\uc778\ud569\ub2c8\ub2e4:"}),"\n",(0,r.jsxs)(e.ul,{children:["\n",(0,r.jsx)(e.li,{children:"\ucd1d \uc751\ub2f5 \uc218"}),"\n",(0,r.jsx)(e.li,{children:"\uc751\ub2f5\ub960"}),"\n",(0,r.jsx)(e.li,{children:"\ub2f5\ubcc0 \ubd84\ud3ec"}),"\n",(0,r.jsx)(e.li,{children:"\ud3c9\uade0 \ud3c9\uc810"}),"\n",(0,r.jsx)(e.li,{children:"CSV\ub85c \ub0b4\ubcf4\ub0b4\uae30"}),"\n"]})]})}function x(n={}){const{wrapper:e}={...(0,d.R)(),...n.components};return e?(0,r.jsx)(e,{...n,children:(0,r.jsx)(o,{...n})}):o(n)}},8453(n,e,s){s.d(e,{R:()=>l,x:()=>t});var i=s(6540);const r={},d=i.createContext(r);function l(n){const e=i.useContext(d);return i.useMemo(function(){return"function"==typeof n?n(e):{...e,...n}},[e,n])}function t(n){let e;return e=n.disableParentContext?"function"==typeof n.components?n.components(r):n.components||r:l(n.components),i.createElement(d.Provider,{value:e},n.children)}}}]);
+'use strict';
+(globalThis.webpackChunkdocs = globalThis.webpackChunkdocs || []).push([
+  [5240],
+  {
+    3322(n, e, s) {
+      (s.r(e),
+        s.d(e, {
+          assets: () => c,
+          contentTitle: () => t,
+          default: () => x,
+          frontMatter: () => l,
+          metadata: () => i,
+          toc: () => h,
+        }));
+      const i = JSON.parse(
+        '{"id":"guide/surveys","title":"\uc124\ubb38\uc870\uc0ac","description":"\uac1c\uc694","source":"@site/i18n/ko/docusaurus-plugin-content-docs/current/guide/surveys.md","sourceDirName":"guide","slug":"/guide/surveys","permalink":"/docs/ko/guide/surveys","draft":false,"unlisted":false,"editUrl":"https://github.com/your-org/gatrix/tree/main/docs/docs/guide/surveys.md","tags":[],"version":"current","sidebarPosition":4,"frontMatter":{"sidebar_position":4,"sidebar_label":"\uc124\ubb38\uc870\uc0ac"},"sidebar":"tutorialSidebar","previous":{"title":"\ucfe0\ud3f0","permalink":"/docs/ko/guide/coupons"},"next":{"title":"\uc0c1\uc810 \uc0c1\ud488","permalink":"/docs/ko/guide/store-products"}}'
+      );
+      var r = s(4848),
+        d = s(8453);
+      const l = { sidebar_position: 4, sidebar_label: '\uc124\ubb38\uc870\uc0ac' },
+        t = '\uc124\ubb38\uc870\uc0ac',
+        c = {},
+        h = [
+          { value: '\uac1c\uc694', id: '\uac1c\uc694', level: 2 },
+          { value: '\uae30\ub2a5', id: '\uae30\ub2a5', level: 2 },
+          {
+            value: '\uc124\ubb38\uc870\uc0ac \uc0dd\uc131 \ubc29\ubc95',
+            id: '\uc124\ubb38\uc870\uc0ac-\uc0dd\uc131-\ubc29\ubc95',
+            level: 2,
+          },
+          { value: '\uc9c8\ubb38 \uc720\ud615', id: '\uc9c8\ubb38-\uc720\ud615', level: 2 },
+          { value: '\uc751\ub2f5 \ubd84\uc11d', id: '\uc751\ub2f5-\ubd84\uc11d', level: 2 },
+        ];
+      function o(n) {
+        const e = {
+          h1: 'h1',
+          h2: 'h2',
+          header: 'header',
+          li: 'li',
+          ol: 'ol',
+          p: 'p',
+          strong: 'strong',
+          table: 'table',
+          tbody: 'tbody',
+          td: 'td',
+          th: 'th',
+          thead: 'thead',
+          tr: 'tr',
+          ul: 'ul',
+          ...(0, d.R)(),
+          ...n.components,
+        };
+        return (0, r.jsxs)(r.Fragment, {
+          children: [
+            (0, r.jsx)(e.header, {
+              children: (0, r.jsx)(e.h1, {
+                id: '\uc124\ubb38\uc870\uc0ac',
+                children: '\uc124\ubb38\uc870\uc0ac',
+              }),
+            }),
+            '\n',
+            (0, r.jsx)(e.h2, { id: '\uac1c\uc694', children: '\uac1c\uc694' }),
+            '\n',
+            (0, r.jsx)(e.p, {
+              children:
+                '\uc0ac\uc6a9\uc790 \ud53c\ub4dc\ubc31\uc744 \uc218\uc9d1\ud558\uae30 \uc704\ud574 \uc778\uac8c\uc784 \uc124\ubb38\uc870\uc0ac\ub97c \uc0dd\uc131\ud558\uace0 \uad00\ub9ac\ud569\ub2c8\ub2e4.',
+            }),
+            '\n',
+            (0, r.jsxs)(e.p, {
+              children: [
+                (0, r.jsx)(e.strong, { children: '\uc811\uadfc \uacbd\ub85c:' }),
+                ' \uac8c\uc784 \uc6b4\uc601 \u2192 \uc124\ubb38\uc870\uc0ac',
+              ],
+            }),
+            '\n',
+            (0, r.jsx)(e.h2, { id: '\uae30\ub2a5', children: '\uae30\ub2a5' }),
+            '\n',
+            (0, r.jsxs)(e.ul, {
+              children: [
+                '\n',
+                (0, r.jsx)(e.li, {
+                  children:
+                    '\ub2e4\uc591\ud55c \uc9c8\ubb38 \uc720\ud615\uc758 \uc124\ubb38 \uc0dd\uc131',
+                }),
+                '\n',
+                (0, r.jsx)(e.li, {
+                  children:
+                    '\ud2b9\uc815 \uc0ac\uc6a9\uc790 \uc138\uadf8\uba3c\ud2b8 \ud0c0\uac9f\ud305',
+                }),
+                '\n',
+                (0, r.jsx)(e.li, {
+                  children: '\uc124\ubb38 \uc218\uc9d1 \uae30\uac04 \uc124\uc815',
+                }),
+                '\n',
+                (0, r.jsx)(e.li, { children: '\uc751\ub2f5 \ub370\uc774\ud130 \ubd84\uc11d' }),
+                '\n',
+                (0, r.jsx)(e.li, { children: '\uacb0\uacfc \ub0b4\ubcf4\ub0b4\uae30' }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, r.jsx)(e.h2, {
+              id: '\uc124\ubb38\uc870\uc0ac-\uc0dd\uc131-\ubc29\ubc95',
+              children: '\uc124\ubb38\uc870\uc0ac \uc0dd\uc131 \ubc29\ubc95',
+            }),
+            '\n',
+            (0, r.jsxs)(e.ol, {
+              children: [
+                '\n',
+                (0, r.jsxs)(e.li, {
+                  children: [
+                    (0, r.jsx)(e.strong, { children: '\uac8c\uc784 \uc6b4\uc601' }),
+                    ' > ',
+                    (0, r.jsx)(e.strong, { children: '\uc124\ubb38\uc870\uc0ac' }),
+                    '\ub85c \uc774\ub3d9\ud569\ub2c8\ub2e4.',
+                  ],
+                }),
+                '\n',
+                (0, r.jsxs)(e.li, {
+                  children: [
+                    (0, r.jsx)(e.strong, { children: '\uc124\ubb38 \ucd94\uac00' }),
+                    ' \ubc84\ud2bc\uc744 \ud074\ub9ad\ud569\ub2c8\ub2e4.',
+                  ],
+                }),
+                '\n',
+                (0, r.jsx)(e.li, {
+                  children: '\uc124\ubb38\uc744 \uc124\uc815\ud569\ub2c8\ub2e4:',
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, r.jsxs)(e.table, {
+              children: [
+                (0, r.jsx)(e.thead, {
+                  children: (0, r.jsxs)(e.tr, {
+                    children: [
+                      (0, r.jsx)(e.th, { children: '\ud544\ub4dc' }),
+                      (0, r.jsx)(e.th, { children: '\uc720\ud615' }),
+                      (0, r.jsx)(e.th, { children: '\ud544\uc218 \uc5ec\ubd80' }),
+                      (0, r.jsx)(e.th, { children: '\uc124\uba85' }),
+                    ],
+                  }),
+                }),
+                (0, r.jsxs)(e.tbody, {
+                  children: [
+                    (0, r.jsxs)(e.tr, {
+                      children: [
+                        (0, r.jsx)(e.td, { children: '\uc81c\ubaa9' }),
+                        (0, r.jsx)(e.td, { children: '\ud14d\uc2a4\ud2b8' }),
+                        (0, r.jsx)(e.td, { children: '\ud544\uc218' }),
+                        (0, r.jsx)(e.td, { children: '\uc124\ubb38 \uc81c\ubaa9' }),
+                      ],
+                    }),
+                    (0, r.jsxs)(e.tr, {
+                      children: [
+                        (0, r.jsx)(e.td, { children: '\uc124\uba85' }),
+                        (0, r.jsx)(e.td, { children: '\ud14d\uc2a4\ud2b8 \uc601\uc5ed' }),
+                        (0, r.jsx)(e.td, { children: '-' }),
+                        (0, r.jsx)(e.td, { children: '\uc124\ubb38 \uc124\uba85' }),
+                      ],
+                    }),
+                    (0, r.jsxs)(e.tr, {
+                      children: [
+                        (0, r.jsx)(e.td, { children: '\uc2dc\uc791 \uc77c\uc2dc' }),
+                        (0, r.jsx)(e.td, { children: '\ub0a0\uc9dc/\uc2dc\uac04 \uc120\ud0dd' }),
+                        (0, r.jsx)(e.td, { children: '-' }),
+                        (0, r.jsx)(e.td, {
+                          children: '\uc124\ubb38\uc774 \uc2dc\uc791\ub418\ub294 \uc77c\uc2dc',
+                        }),
+                      ],
+                    }),
+                    (0, r.jsxs)(e.tr, {
+                      children: [
+                        (0, r.jsx)(e.td, { children: '\uc885\ub8cc \uc77c\uc2dc' }),
+                        (0, r.jsx)(e.td, { children: '\ub0a0\uc9dc/\uc2dc\uac04 \uc120\ud0dd' }),
+                        (0, r.jsx)(e.td, { children: '-' }),
+                        (0, r.jsx)(e.td, {
+                          children: '\uc124\ubb38\uc774 \uc885\ub8cc\ub418\ub294 \uc77c\uc2dc',
+                        }),
+                      ],
+                    }),
+                    (0, r.jsxs)(e.tr, {
+                      children: [
+                        (0, r.jsx)(e.td, { children: '\ud0c0\uac9f \uc138\uadf8\uba3c\ud2b8' }),
+                        (0, r.jsx)(e.td, { children: '\uc120\ud0dd' }),
+                        (0, r.jsx)(e.td, { children: '-' }),
+                        (0, r.jsx)(e.td, { children: '\ud0c0\uac9f \ub300\uc0c1' }),
+                      ],
+                    }),
+                  ],
+                }),
+              ],
+            }),
+            '\n',
+            (0, r.jsxs)(e.ol, {
+              start: '4',
+              children: [
+                '\n',
+                (0, r.jsx)(e.li, {
+                  children: '\uc9c8\ubb38\uc744 \ucd94\uac00\ud569\ub2c8\ub2e4.',
+                }),
+                '\n',
+                (0, r.jsxs)(e.li, {
+                  children: [
+                    (0, r.jsx)(e.strong, { children: '\uc0dd\uc131' }),
+                    '\uc744 \ud074\ub9ad\ud558\uc5ec \uc800\uc7a5\ud569\ub2c8\ub2e4.',
+                  ],
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, r.jsx)(e.h2, {
+              id: '\uc9c8\ubb38-\uc720\ud615',
+              children: '\uc9c8\ubb38 \uc720\ud615',
+            }),
+            '\n',
+            (0, r.jsxs)(e.ul, {
+              children: [
+                '\n',
+                (0, r.jsxs)(e.li, {
+                  children: [
+                    (0, r.jsx)(e.strong, {
+                      children: '\uac1d\uad00\uc2dd (\ub2e8\uc77c \uc120\ud0dd)',
+                    }),
+                    ' - \ub77c\ub514\uc624 \ubc84\ud2bc, \ud558\ub098\uc758 \ub2f5\ubcc0',
+                  ],
+                }),
+                '\n',
+                (0, r.jsxs)(e.li, {
+                  children: [
+                    (0, r.jsx)(e.strong, {
+                      children: '\uac1d\uad00\uc2dd (\ub2e4\uc911 \uc120\ud0dd)',
+                    }),
+                    ' - \uccb4\ud06c\ubc15\uc2a4, \uc5ec\ub7ec \ub2f5\ubcc0',
+                  ],
+                }),
+                '\n',
+                (0, r.jsxs)(e.li, {
+                  children: [
+                    (0, r.jsx)(e.strong, {
+                      children: '\uc8fc\uad00\uc2dd (\ub2e8\ub2f5/\uc11c\uc220)',
+                    }),
+                    ' - \uc790\uc720 \uc785\ub825 \uc751\ub2f5',
+                  ],
+                }),
+                '\n',
+                (0, r.jsxs)(e.li, {
+                  children: [
+                    (0, r.jsx)(e.strong, { children: '\ud3c9\uc810' }),
+                    ' - 1~5\uc810 \ubcc4\uc810',
+                  ],
+                }),
+                '\n',
+                (0, r.jsxs)(e.li, {
+                  children: [
+                    (0, r.jsx)(e.strong, { children: '\ucc99\ub3c4' }),
+                    ' - \uc22b\uc790 \ucc99\ub3c4 (1~10)',
+                  ],
+                }),
+                '\n',
+              ],
+            }),
+            '\n',
+            (0, r.jsx)(e.h2, {
+              id: '\uc751\ub2f5-\ubd84\uc11d',
+              children: '\uc751\ub2f5 \ubd84\uc11d',
+            }),
+            '\n',
+            (0, r.jsx)(e.p, {
+              children:
+                '\ub2e4\uc74c\uc744 \ud3ec\ud568\ud55c \uc124\ubb38 \uacb0\uacfc\ub97c \ud655\uc778\ud569\ub2c8\ub2e4:',
+            }),
+            '\n',
+            (0, r.jsxs)(e.ul, {
+              children: [
+                '\n',
+                (0, r.jsx)(e.li, { children: '\ucd1d \uc751\ub2f5 \uc218' }),
+                '\n',
+                (0, r.jsx)(e.li, { children: '\uc751\ub2f5\ub960' }),
+                '\n',
+                (0, r.jsx)(e.li, { children: '\ub2f5\ubcc0 \ubd84\ud3ec' }),
+                '\n',
+                (0, r.jsx)(e.li, { children: '\ud3c9\uade0 \ud3c9\uc810' }),
+                '\n',
+                (0, r.jsx)(e.li, { children: 'CSV\ub85c \ub0b4\ubcf4\ub0b4\uae30' }),
+                '\n',
+              ],
+            }),
+          ],
+        });
+      }
+      function x(n = {}) {
+        const { wrapper: e } = { ...(0, d.R)(), ...n.components };
+        return e ? (0, r.jsx)(e, { ...n, children: (0, r.jsx)(o, { ...n }) }) : o(n);
+      }
+    },
+    8453(n, e, s) {
+      s.d(e, { R: () => l, x: () => t });
+      var i = s(6540);
+      const r = {},
+        d = i.createContext(r);
+      function l(n) {
+        const e = i.useContext(d);
+        return i.useMemo(
+          function () {
+            return 'function' == typeof n ? n(e) : { ...e, ...n };
+          },
+          [e, n]
+        );
+      }
+      function t(n) {
+        let e;
+        return (
+          (e = n.disableParentContext
+            ? 'function' == typeof n.components
+              ? n.components(r)
+              : n.components || r
+            : l(n.components)),
+          i.createElement(d.Provider, { value: e }, n.children)
+        );
+      }
+    },
+  },
+]);

@@ -1,10 +1,10 @@
 /**
  * Migration: Add crashEventUserAgent column to crash_events table
- * 
+ *
  * Adds crashEventUserAgent field to store the user agent of the crash reporter
  */
 
-exports.up = async function(connection) {
+exports.up = async function (connection) {
   console.log('Adding crashEventUserAgent column to crash_events table...');
 
   // Add crashEventUserAgent column
@@ -16,7 +16,7 @@ exports.up = async function(connection) {
   console.log('✓ Added crashEventUserAgent column to crash_events table');
 };
 
-exports.down = async function(connection) {
+exports.down = async function (connection) {
   console.log('Rolling back crashEventUserAgent column from crash_events table...');
 
   // Drop column
@@ -27,4 +27,3 @@ exports.down = async function(connection) {
 
   console.log('✓ Dropped crashEventUserAgent column from crash_events table');
 };
-

@@ -83,6 +83,7 @@
 ### 1.2 컴포넌트별 역할
 
 #### **Event API (Fastify)**
+
 - **역할**: 이벤트 수집 및 초기 처리
 - **책임**:
   - 클라이언트 인증
@@ -93,6 +94,7 @@
   - 큐에 이벤트 전달
 
 #### **Dashboard (Next.js)**
+
 - **역할**: 관리 대시보드 및 분석 UI
 - **책임**:
   - 사용자 인증
@@ -102,6 +104,7 @@
   - 사용자 관리
 
 #### **Worker Cluster**
+
 - **역할**: 백그라운드 작업 처리
 - **책임**:
   - 이벤트 배치 삽입
@@ -111,6 +114,7 @@
   - Webhook 전송
 
 #### **PostgreSQL**
+
 - **역할**: 메타데이터 저장
 - **데이터**:
   - 사용자 계정
@@ -119,6 +123,7 @@
   - Webhook 설정
 
 #### **ClickHouse**
+
 - **역할**: 이벤트 데이터 저장 및 분석
 - **데이터**:
   - 원시 이벤트
@@ -127,6 +132,7 @@
   - 집계 데이터
 
 #### **Redis**
+
 - **역할**: 캐싱, 큐, Pub/Sub
 - **용도**:
   - 메트릭 캐싱
@@ -401,18 +407,18 @@ CREATE TABLE events (
     device_id String,
     profile_id Nullable(String),
     session_id String,
-    
+
     -- 타임스탬프
     created_at DateTime DEFAULT now(),
     timestamp DateTime,
-    
+
     -- 지리 정보
     country Nullable(String),
     city Nullable(String),
     region Nullable(String),
     latitude Nullable(Float32),
     longitude Nullable(Float32),
-    
+
     -- 디바이스 정보
     os Nullable(String),
     os_version Nullable(String),
@@ -421,24 +427,24 @@ CREATE TABLE events (
     device Nullable(String),
     brand Nullable(String),
     model Nullable(String),
-    
+
     -- 페이지 정보
     path Nullable(String),
     origin Nullable(String),
     referrer Nullable(String),
     referrer_name Nullable(String),
     referrer_type Nullable(String),
-    
+
     -- UTM 파라미터
     utm_source Nullable(String),
     utm_medium Nullable(String),
     utm_campaign Nullable(String),
     utm_term Nullable(String),
     utm_content Nullable(String),
-    
+
     -- 커스텀 속성
     properties String,
-    
+
     -- 세션 메트릭
     duration Nullable(UInt32),
     screen_views Nullable(UInt16)
@@ -458,20 +464,20 @@ CREATE TABLE profiles (
     id String,
     project_id String,
     profile_id String,
-    
+
     -- 기본 정보
     first_name Nullable(String),
     last_name Nullable(String),
     email Nullable(String),
     avatar Nullable(String),
-    
+
     -- 커스텀 속성
     properties String,
-    
+
     -- 메트릭
     first_seen_at DateTime,
     last_seen_at DateTime,
-    
+
     created_at DateTime DEFAULT now()
 )
 ENGINE = ReplacingMergeTree(created_at)
@@ -485,23 +491,23 @@ CREATE TABLE sessions (
     project_id String,
     device_id String,
     profile_id Nullable(String),
-    
+
     -- 타임스탬프
     start_time DateTime,
     end_time DateTime,
-    
+
     -- 메트릭
     duration UInt32,
     screen_views UInt16,
     is_bounce Boolean,
-    
+
     -- 속성
     country Nullable(String),
     city Nullable(String),
     browser Nullable(String),
     os Nullable(String),
     referrer Nullable(String),
-    
+
     created_at DateTime DEFAULT now()
 )
 ENGINE = ReplacingMergeTree(created_at)
@@ -547,6 +553,7 @@ GROUP BY project_id, hour;
 ### 4.1 수평 확장 (Horizontal Scaling)
 
 #### **API 서버 확장**
+
 ```yaml
 # Kubernetes Horizontal Pod Autoscaler
 apiVersion: autoscaling/v2
@@ -561,30 +568,25 @@ spec:
   minReplicas: 3
   maxReplicas: 20
   metrics:
-  - type: Resource
-    resource:
-      name: cpu
-      target:
-        type: Utilization
-        averageUtilization: 70
-  - type: Resource
-    resource:
-      name: memory
-      target:
-        type: Utilization
-        averageUtilization: 80
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
 ```
 
 #### **Worker 확장**
+
 ```typescript
 // Worker 동적 확장
-const workerCount = Math.max(
-  2,
-  Math.min(
-    os.cpus().length,
-    Math.ceil(queueSize / 1000)
-  )
-);
+const workerCount = Math.max(2, Math.min(os.cpus().length, Math.ceil(queueSize / 1000)));
 
 for (let i = 0; i < workerCount; i++) {
   new Worker('events', processEvent, {
@@ -597,6 +599,7 @@ for (let i = 0; i < workerCount; i++) {
 ### 4.2 데이터베이스 샤딩
 
 #### **ClickHouse 분산 테이블**
+
 ```sql
 -- 로컬 테이블 (각 샤드에)
 CREATE TABLE events_local ON CLUSTER '{cluster}' (
@@ -617,16 +620,16 @@ ENGINE = Distributed('{cluster}', default, events_local, rand());
 export class CacheStrategy {
   // L1: 메모리 캐시 (Node.js)
   private memoryCache = new Map<string, any>();
-  
+
   // L2: Redis 캐시
   private redisCache: Redis;
-  
+
   async get<T>(key: string): Promise<T | null> {
     // L1 캐시 확인
     if (this.memoryCache.has(key)) {
       return this.memoryCache.get(key);
     }
-    
+
     // L2 캐시 확인
     const cached = await this.redisCache.get(key);
     if (cached) {
@@ -634,17 +637,17 @@ export class CacheStrategy {
       this.memoryCache.set(key, value);
       return value;
     }
-    
+
     return null;
   }
-  
+
   async set(key: string, value: any, ttl: number) {
     // L1 캐시 저장
     this.memoryCache.set(key, value);
-    
+
     // L2 캐시 저장
     await this.redisCache.setex(key, ttl, JSON.stringify(value));
-    
+
     // L1 캐시 크기 제한
     if (this.memoryCache.size > 1000) {
       const firstKey = this.memoryCache.keys().next().value;
@@ -688,7 +691,7 @@ const queueSize = new Gauge({
 // 사용 예시
 fastify.post('/track', async (request, reply) => {
   const end = processingDuration.startTimer();
-  
+
   try {
     await processEvent(request.body);
     eventCounter.inc({
@@ -718,20 +721,26 @@ const logger = pino({
 });
 
 // 컨텍스트 로깅
-logger.info({
-  event: 'event_processed',
-  projectId: 'proj_123',
-  eventName: 'page_view',
-  duration: 45,
-}, 'Event processed successfully');
+logger.info(
+  {
+    event: 'event_processed',
+    projectId: 'proj_123',
+    eventName: 'page_view',
+    duration: 45,
+  },
+  'Event processed successfully'
+);
 
 // 에러 로깅
-logger.error({
-  event: 'event_processing_failed',
-  projectId: 'proj_123',
-  error: error.message,
-  stack: error.stack,
-}, 'Failed to process event');
+logger.error(
+  {
+    event: 'event_processing_failed',
+    projectId: 'proj_123',
+    error: error.message,
+    stack: error.stack,
+  },
+  'Failed to process event'
+);
 ```
 
 ### 5.3 분산 추적 (Distributed Tracing)
@@ -746,9 +755,7 @@ const provider = new NodeTracerProvider();
 provider.register();
 
 registerInstrumentations({
-  instrumentations: [
-    new FastifyInstrumentation(),
-  ],
+  instrumentations: [new FastifyInstrumentation()],
 });
 
 // 커스텀 스팬
@@ -758,14 +765,14 @@ const tracer = trace.getTracer('openpanel');
 
 async function processEvent(event: Event) {
   const span = tracer.startSpan('process_event');
-  
+
   try {
     span.setAttribute('project_id', event.projectId);
     span.setAttribute('event_name', event.name);
-    
+
     await enrichEvent(event);
     await saveEvent(event);
-    
+
     span.setStatus({ code: SpanStatusCode.OK });
   } catch (error) {
     span.setStatus({
@@ -792,5 +799,3 @@ OpenPanel의 아키텍처는 다음과 같은 핵심 원칙을 따릅니다:
 5. **유연성**: 다양한 SDK와 통합 옵션 제공
 
 이 아키텍처를 기반으로 월 수억 건의 이벤트를 처리할 수 있는 확장 가능한 분석 플랫폼을 구축할 수 있습니다.
-
-

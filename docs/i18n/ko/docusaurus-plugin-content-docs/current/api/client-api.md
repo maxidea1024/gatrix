@@ -25,9 +25,10 @@ GET /api/v1/client/client-version
 게임 클라이언트의 버전 정보를 조회합니다.
 
 #### 쿼리 매개변수
-| 매개변수 | 유형 | 설명 |
-|----------|------|------|
-| channel | string | 채널 필터 (예: PC, Mobile) |
+
+| 매개변수   | 유형   | 설명                                    |
+| ---------- | ------ | --------------------------------------- |
+| channel    | string | 채널 필터 (예: PC, Mobile)              |
 | subChannel | string | 서브 채널 필터 (예: Steam, Google, iOS) |
 
 #### 응답 예시
@@ -93,6 +94,7 @@ POST /api/v1/client/evaluate
 사용자 컨텍스트에 따라 피처 플래그를 평가합니다.
 
 #### 요청 본문
+
 ```json
 {
   "context": {

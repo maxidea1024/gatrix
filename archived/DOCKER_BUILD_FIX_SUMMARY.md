@@ -3,6 +3,7 @@
 ## ✅ 최종 상태: 모든 문제 해결 완료
 
 **빌드 성공:**
+
 ```bash
 ✔ gatrix-event-lens   Built
 ✔ gatrix-chat-server  Built
@@ -41,7 +42,7 @@ Expected version "20 || >=22". Got "18.20.8"
 # docker-compose.yml
 event-lens:
   build:
-    context: .  # 루트 디렉토리
+    context: . # 루트 디렉토리
     dockerfile: packages/event-lens/Dockerfile
 ```
 
@@ -56,9 +57,9 @@ COPY src ./src         # ❌ 루트에서 src를 찾으려고 시도
 **문제**: `npm ci` 명령은 `package.json`과 `package-lock.json`이 완벽하게 동기화되어 있어야 하는데, monorepo 구조에서 각 패키지의 의존성이 루트의 lock 파일과 맞지 않았습니다.
 
 ```
-npm error `npm ci` can only install packages when your package.json and 
+npm error `npm ci` can only install packages when your package.json and
 package-lock.json are in sync.
-npm error Invalid: lock file's winston-daily-rotate-file@4.7.1 does not 
+npm error Invalid: lock file's winston-daily-rotate-file@4.7.1 does not
 satisfy winston-daily-rotate-file@5.0.0
 ```
 
@@ -156,21 +157,25 @@ COPY packages/event-lens/src ./src
 ## 🎯 최종 해결책의 장점
 
 ### 1. **일관성 (Consistency)**
+
 - 모든 서비스가 동일한 빌드 패턴 사용
 - Backend, Frontend와 동일한 구조
 - 명확한 명령어 규칙 (`yarn workspace @gatrix/[service]`)
 
 ### 2. **재현성 (Reproducibility)**
+
 - `--frozen-lockfile` 사용으로 동일한 의존성 버전 보장
 - 단일 yarn.lock 파일로 버전 충돌 방지
 - CI/CD 환경에서 안정적인 빌드
 
 ### 3. **성능 (Performance)**
+
 - Multi-stage 빌드로 Docker layer 캐싱 최적화
 - Production 이미지 크기 최소화
 - 병렬 빌드 지원
 
 ### 4. **유지보수성 (Maintainability)**
+
 - Root에서 모든 서비스 관리 가능
 - 통일된 스크립트 구조
 - 명확한 문서화
@@ -320,6 +325,7 @@ Successfully built:
 ```
 
 **검증:**
+
 ```bash
 ✅ docker compose -f docker-compose.yml config --quiet
 ✅ docker compose -f docker-compose.dev.yml config --quiet
@@ -351,26 +357,30 @@ Successfully built:
 
 ### 4. Lock 파일 전략
 
-| 파일 | 사용 여부 | 이유 |
-|------|-----------|------|
-| `yarn.lock` | ✅ 사용 | Yarn Workspace 표준, 단일 소스 |
-| `package-lock.json` | ❌ 제거 | npm과 충돌, 불필요 |
+| 파일                | 사용 여부 | 이유                           |
+| ------------------- | --------- | ------------------------------ |
+| `yarn.lock`         | ✅ 사용   | Yarn Workspace 표준, 단일 소스 |
+| `package-lock.json` | ❌ 제거   | npm과 충돌, 불필요             |
 
 ## ⚠️ 주의사항
 
 ### 1. **Node 버전 일치**
+
 - 모든 Dockerfile에서 Node 20 사용
 - 로컬 개발 환경도 Node 20 권장
 
 ### 2. **Lock 파일 관리**
+
 - `yarn.lock`만 사용, `package-lock.json` 생성 금지
 - 의존성 추가 시 `yarn add` 사용 (npm install 금지)
 
 ### 3. **Docker 캐시**
+
 - `--frozen-lockfile` 사용으로 재현 가능한 빌드 보장
 - 의존성 변경 시 캐시 무효화로 재빌드 필요
 
 ### 4. **Workspace 명령어**
+
 - 개별 패키지에서 직접 명령 실행 금지
 - 항상 `yarn workspace @gatrix/[service]` 패턴 사용
 
@@ -379,6 +389,7 @@ Successfully built:
 ## ✅ 검증 및 테스트
 
 ### 빌드 검증
+
 ```bash
 # 프로덕션 빌드
 docker compose build --no-cache event-lens chat-server
@@ -391,6 +402,7 @@ docker compose -f docker-compose.yml config --quiet
 ```
 
 ### 실행 테스트
+
 ```bash
 # 프로덕션 환경 실행
 docker compose up -d event-lens chat-server
@@ -407,6 +419,7 @@ curl http://localhost:3001/health  # Chat Server
 ```
 
 ### 로컬 개발 테스트
+
 ```bash
 # 의존성 설치
 yarn install
@@ -431,6 +444,7 @@ yarn typecheck
 모든 Docker 빌드 문제가 해결되었으며, **Yarn Workspace 패턴**으로 통일되어 일관되고 유지보수하기 쉬운 구조를 갖추게 되었습니다!
 
 ### 핵심 성과:
+
 - ✅ Yarn Workspace 통일 완료
 - ✅ Node 20 업그레이드 완료
 - ✅ Lock 파일 단일화 (yarn.lock)
@@ -438,7 +452,7 @@ yarn typecheck
 - ✅ 프로덕션/개발 환경 모두 검증 완료
 
 ### 다음 단계:
+
 1. CI/CD 파이프라인 업데이트
 2. 개발자 문서 업데이트
 3. 프로덕션 배포 테스트
-

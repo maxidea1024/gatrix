@@ -60,8 +60,7 @@ const config: Config = {
           routeBasePath: '/', // Serve docs at /docs/ instead of /docs/docs/
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
-          editUrl:
-            'https://github.com/your-org/gatrix/tree/main/docs/',
+          editUrl: 'https://github.com/your-org/gatrix/tree/main/docs/',
         },
         blog: {
           showReadingTime: true,
@@ -71,8 +70,7 @@ const config: Config = {
           },
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
-          editUrl:
-            'https://github.com/your-org/gatrix/tree/main/docs/',
+          editUrl: 'https://github.com/your-org/gatrix/tree/main/docs/',
           // Useful options to enforce blogging best practices
           onInlineTags: 'warn',
           onInlineAuthors: 'warn',

@@ -22,15 +22,6 @@
       "@/*": ["src/*"]
     }
   },
-  "include": [
-    "src/**/*",
-    "src/types/**/*"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "**/*.test.ts",
-    "**/*.spec.ts"
-  ]
+  "include": ["src/**/*", "src/types/**/*"],
+  "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.spec.ts"]
 }
-

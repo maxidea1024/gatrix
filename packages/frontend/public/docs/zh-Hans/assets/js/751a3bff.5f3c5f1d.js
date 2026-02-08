@@ -1,1 +1,112 @@
-"use strict";(globalThis.webpackChunkdocs=globalThis.webpackChunkdocs||[]).push([[6366],{6307(e,n,s){s.r(n),s.d(n,{assets:()=>c,contentTitle:()=>d,default:()=>u,frontMatter:()=>o,metadata:()=>t,toc:()=>a});const t=JSON.parse('{"id":"admin/users","title":"?\ufffd\uc6a9??\uad00\ufffd?","description":"\uad00\ub9ac\uc790 \uacc4\uc815??\uad00\ub9ac\ud569?\ufffd\ub2e4.","source":"@site/docs/admin/users.md","sourceDirName":"admin","slug":"/admin/users","permalink":"/docs/zh-Hans/admin/users","draft":false,"unlisted":false,"editUrl":"https://github.com/your-org/gatrix/tree/main/docs/docs/admin/users.md","tags":[],"version":"current","sidebarPosition":5,"frontMatter":{"sidebar_position":5},"sidebar":"tutorialSidebar","previous":{"title":"?\ufffd\ub77c?\ufffd\uc5b8??\ubc84\uc804","permalink":"/docs/zh-Hans/admin/client-versions"},"next":{"title":"?\ufffd\ufffd? ?\ufffd\ub3d9 \uac1c\uc694","permalink":"/docs/zh-Hans/integrations/overview"}}');var r=s(4848),i=s(8453);const o={sidebar_position:5},d="?\ufffd\uc6a9??\uad00\ufffd?",c={},a=[{value:"??\ufffd\ufffd",id:"",level:2}];function l(e){const n={h1:"h1",h2:"h2",header:"header",li:"li",p:"p",strong:"strong",ul:"ul",...(0,i.R)(),...e.components};return(0,r.jsxs)(r.Fragment,{children:[(0,r.jsx)(n.header,{children:(0,r.jsx)(n.h1,{id:"\uc6a9\uad00",children:"?\ufffd\uc6a9??\uad00\ufffd?"})}),"\n",(0,r.jsx)(n.p,{children:"\uad00\ub9ac\uc790 \uacc4\uc815??\uad00\ub9ac\ud569?\ufffd\ub2e4."}),"\n",(0,r.jsx)(n.h2,{id:"",children:"??\ufffd\ufffd"}),"\n",(0,r.jsxs)(n.ul,{children:["\n",(0,r.jsxs)(n.li,{children:[(0,r.jsx)(n.strong,{children:"Admin"}),": \ubaa8\ub4e0 \uad8c\ud55c"]}),"\n",(0,r.jsxs)(n.li,{children:[(0,r.jsx)(n.strong,{children:"Editor"}),": ?\ufffd\uc9d1 \uad8c\ud55c"]}),"\n",(0,r.jsxs)(n.li,{children:[(0,r.jsx)(n.strong,{children:"Viewer"}),": ?\ufffd\uae30 ?\ufffd\uc6a9"]}),"\n"]})]})}function u(e={}){const{wrapper:n}={...(0,i.R)(),...e.components};return n?(0,r.jsx)(n,{...e,children:(0,r.jsx)(l,{...e})}):l(e)}},8453(e,n,s){s.d(n,{R:()=>o,x:()=>d});var t=s(6540);const r={},i=t.createContext(r);function o(e){const n=t.useContext(i);return t.useMemo(function(){return"function"==typeof e?e(n):{...n,...e}},[n,e])}function d(e){let n;return n=e.disableParentContext?"function"==typeof e.components?e.components(r):e.components||r:o(e.components),t.createElement(i.Provider,{value:n},e.children)}}}]);
+'use strict';
+(globalThis.webpackChunkdocs = globalThis.webpackChunkdocs || []).push([
+  [6366],
+  {
+    6307(e, n, s) {
+      (s.r(n),
+        s.d(n, {
+          assets: () => c,
+          contentTitle: () => d,
+          default: () => u,
+          frontMatter: () => o,
+          metadata: () => t,
+          toc: () => a,
+        }));
+      const t = JSON.parse(
+        '{"id":"admin/users","title":"?\ufffd\uc6a9??\uad00\ufffd?","description":"\uad00\ub9ac\uc790 \uacc4\uc815??\uad00\ub9ac\ud569?\ufffd\ub2e4.","source":"@site/docs/admin/users.md","sourceDirName":"admin","slug":"/admin/users","permalink":"/docs/zh-Hans/admin/users","draft":false,"unlisted":false,"editUrl":"https://github.com/your-org/gatrix/tree/main/docs/docs/admin/users.md","tags":[],"version":"current","sidebarPosition":5,"frontMatter":{"sidebar_position":5},"sidebar":"tutorialSidebar","previous":{"title":"?\ufffd\ub77c?\ufffd\uc5b8??\ubc84\uc804","permalink":"/docs/zh-Hans/admin/client-versions"},"next":{"title":"?\ufffd\ufffd? ?\ufffd\ub3d9 \uac1c\uc694","permalink":"/docs/zh-Hans/integrations/overview"}}'
+      );
+      var r = s(4848),
+        i = s(8453);
+      const o = { sidebar_position: 5 },
+        d = '?\ufffd\uc6a9??\uad00\ufffd?',
+        c = {},
+        a = [{ value: '??\ufffd\ufffd', id: '', level: 2 }];
+      function l(e) {
+        const n = {
+          h1: 'h1',
+          h2: 'h2',
+          header: 'header',
+          li: 'li',
+          p: 'p',
+          strong: 'strong',
+          ul: 'ul',
+          ...(0, i.R)(),
+          ...e.components,
+        };
+        return (0, r.jsxs)(r.Fragment, {
+          children: [
+            (0, r.jsx)(n.header, {
+              children: (0, r.jsx)(n.h1, {
+                id: '\uc6a9\uad00',
+                children: '?\ufffd\uc6a9??\uad00\ufffd?',
+              }),
+            }),
+            '\n',
+            (0, r.jsx)(n.p, {
+              children: '\uad00\ub9ac\uc790 \uacc4\uc815??\uad00\ub9ac\ud569?\ufffd\ub2e4.',
+            }),
+            '\n',
+            (0, r.jsx)(n.h2, { id: '', children: '??\ufffd\ufffd' }),
+            '\n',
+            (0, r.jsxs)(n.ul, {
+              children: [
+                '\n',
+                (0, r.jsxs)(n.li, {
+                  children: [
+                    (0, r.jsx)(n.strong, { children: 'Admin' }),
+                    ': \ubaa8\ub4e0 \uad8c\ud55c',
+                  ],
+                }),
+                '\n',
+                (0, r.jsxs)(n.li, {
+                  children: [
+                    (0, r.jsx)(n.strong, { children: 'Editor' }),
+                    ': ?\ufffd\uc9d1 \uad8c\ud55c',
+                  ],
+                }),
+                '\n',
+                (0, r.jsxs)(n.li, {
+                  children: [
+                    (0, r.jsx)(n.strong, { children: 'Viewer' }),
+                    ': ?\ufffd\uae30 ?\ufffd\uc6a9',
+                  ],
+                }),
+                '\n',
+              ],
+            }),
+          ],
+        });
+      }
+      function u(e = {}) {
+        const { wrapper: n } = { ...(0, i.R)(), ...e.components };
+        return n ? (0, r.jsx)(n, { ...e, children: (0, r.jsx)(l, { ...e }) }) : l(e);
+      }
+    },
+    8453(e, n, s) {
+      s.d(n, { R: () => o, x: () => d });
+      var t = s(6540);
+      const r = {},
+        i = t.createContext(r);
+      function o(e) {
+        const n = t.useContext(i);
+        return t.useMemo(
+          function () {
+            return 'function' == typeof e ? e(n) : { ...n, ...e };
+          },
+          [n, e]
+        );
+      }
+      function d(e) {
+        let n;
+        return (
+          (n = e.disableParentContext
+            ? 'function' == typeof e.components
+              ? e.components(r)
+              : e.components || r
+            : o(e.components)),
+          t.createElement(i.Provider, { value: n }, e.children)
+        );
+      }
+    },
+  },
+]);

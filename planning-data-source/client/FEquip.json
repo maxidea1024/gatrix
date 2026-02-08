@@ -62,48 +62,20 @@
     },
     ":enum": {},
     ":links": {
-      "hatMaleShapedId": [
-        "HatShape"
-      ],
-      "hatFemaleShapedId": [
-        "HatShape"
-      ],
-      "bodyMaleShapedId": [
-        "BodyShape"
-      ],
-      "bodyFemaleShapedId": [
-        "BodyShape"
-      ],
-      "axeShapeId": [
-        "WeaponShape"
-      ],
-      "bladeShapeId": [
-        "WeaponShape"
-      ],
-      "bowShapeId": [
-        "WeaponShape"
-      ],
-      "crossbowShapeId": [
-        "WeaponShape"
-      ],
-      "pistolShapeId": [
-        "WeaponShape"
-      ],
-      "rifleShapeId": [
-        "WeaponShape"
-      ],
-      "spearShapeId": [
-        "WeaponShape"
-      ],
-      "swordShapeId": [
-        "WeaponShape"
-      ],
-      "thSwordShapeId": [
-        "WeaponShape"
-      ],
-      "twinBladeShapeId": [
-        "WeaponShape"
-      ]
+      "hatMaleShapedId": ["HatShape"],
+      "hatFemaleShapedId": ["HatShape"],
+      "bodyMaleShapedId": ["BodyShape"],
+      "bodyFemaleShapedId": ["BodyShape"],
+      "axeShapeId": ["WeaponShape"],
+      "bladeShapeId": ["WeaponShape"],
+      "bowShapeId": ["WeaponShape"],
+      "crossbowShapeId": ["WeaponShape"],
+      "pistolShapeId": ["WeaponShape"],
+      "rifleShapeId": ["WeaponShape"],
+      "spearShapeId": ["WeaponShape"],
+      "swordShapeId": ["WeaponShape"],
+      "thSwordShapeId": ["WeaponShape"],
+      "twinBladeShapeId": ["WeaponShape"]
     }
   },
   "FEquip": {

@@ -278,7 +278,10 @@ export const setSDKEnvironment = async (req: SDKRequest, res: Response, next: Ne
         logger.warn('Auth: Environment not found', { environmentName });
         return res.status(404).json({
           success: false,
-          error: { code: ErrorCodes.ENV_NOT_FOUND, message: `Environment not found: ${environmentName}` },
+          error: {
+            code: ErrorCodes.ENV_NOT_FOUND,
+            message: `Environment not found: ${environmentName}`,
+          },
         });
       }
       await CacheService.set(cacheKey, environment, CACHE_TTL);
@@ -356,4 +359,3 @@ export default {
   serverSDKAuth,
   serverAuthBase,
 };
-

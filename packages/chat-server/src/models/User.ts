@@ -1,7 +1,7 @@
-import { databaseManager } from "../config/database";
-import { createLogger } from "../config/logger";
+import { databaseManager } from '../config/database';
+import { createLogger } from '../config/logger';
 
-const logger = createLogger("UserModel");
+const logger = createLogger('UserModel');
 
 export interface ChatUser {
   id: number;
@@ -21,14 +21,10 @@ export class UserModel {
   /**
    * Gatrix User ID로 Chat User 조회
    */
-  static async findByGatrixUserId(
-    gatrixUserId: number,
-  ): Promise<ChatUser | null> {
+  static async findByGatrixUserId(gatrixUserId: number): Promise<ChatUser | null> {
     try {
       const db = databaseManager.getDatabase();
-      const user = await db("chat_users")
-        .where("gatrixUserId", gatrixUserId)
-        .first();
+      const user = await db('chat_users').where('gatrixUserId', gatrixUserId).first();
 
       if (!user) {
         logger.warn(`Chat user not found for Gatrix User ID: ${gatrixUserId}`);
@@ -37,7 +33,7 @@ export class UserModel {
 
       return user;
     } catch (error) {
-      logger.error("Error finding user by Gatrix User ID:", error);
+      logger.error('Error finding user by Gatrix User ID:', error);
       return null;
     }
   }
@@ -48,11 +44,11 @@ export class UserModel {
   static async findById(id: number): Promise<ChatUser | null> {
     try {
       const db = databaseManager.getDatabase();
-      const user = await db("chat_users").where("id", id).first();
+      const user = await db('chat_users').where('id', id).first();
 
       return user || null;
     } catch (error) {
-      logger.error("Error finding user by ID:", error);
+      logger.error('Error finding user by ID:', error);
       return null;
     }
   }
@@ -65,7 +61,7 @@ export class UserModel {
       const db = databaseManager.getDatabase();
 
       if (!userData.gatrixUserId) {
-        throw new Error("gatrixUserId is required");
+        throw new Error('gatrixUserId is required');
       }
 
       // 기존 사용자 확인
@@ -73,29 +69,27 @@ export class UserModel {
 
       if (existingUser) {
         // 업데이트
-        await db("chat_users")
-          .where("gatrixUserId", userData.gatrixUserId)
-          .update({
-            email: userData.email,
-            name: userData.name,
-            avatarUrl: userData.avatarUrl,
-            role: userData.role,
-            status: userData.status,
-            lastLoginAt: userData.lastLoginAt,
-            lastActivityAt: userData.lastActivityAt,
-            updatedAt: new Date(),
-          });
+        await db('chat_users').where('gatrixUserId', userData.gatrixUserId).update({
+          email: userData.email,
+          name: userData.name,
+          avatarUrl: userData.avatarUrl,
+          role: userData.role,
+          status: userData.status,
+          lastLoginAt: userData.lastLoginAt,
+          lastActivityAt: userData.lastActivityAt,
+          updatedAt: new Date(),
+        });
 
         return await this.findByGatrixUserId(userData.gatrixUserId);
       } else {
         // 생성
-        const [insertId] = await db("chat_users").insert({
+        const [insertId] = await db('chat_users').insert({
           gatrixUserId: userData.gatrixUserId,
           email: userData.email,
           name: userData.name,
           avatarUrl: userData.avatarUrl,
-          role: userData.role || "user",
-          status: userData.status || "active",
+          role: userData.role || 'user',
+          status: userData.status || 'active',
           lastLoginAt: userData.lastLoginAt,
           lastActivityAt: userData.lastActivityAt,
           createdAt: new Date(),
@@ -105,7 +99,7 @@ export class UserModel {
         return await this.findById(insertId);
       }
     } catch (error) {
-      logger.error("Error upserting user:", error);
+      logger.error('Error upserting user:', error);
       return null;
     }
   }
@@ -116,12 +110,12 @@ export class UserModel {
   static async updateLastActivity(gatrixUserId: number): Promise<void> {
     try {
       const db = databaseManager.getDatabase();
-      await db("chat_users").where("gatrixUserId", gatrixUserId).update({
+      await db('chat_users').where('gatrixUserId', gatrixUserId).update({
         lastActivityAt: new Date(),
         updatedAt: new Date(),
       });
     } catch (error) {
-      logger.error("Error updating last activity:", error);
+      logger.error('Error updating last activity:', error);
     }
   }
 
@@ -131,13 +125,11 @@ export class UserModel {
   static async findActiveUsers(): Promise<ChatUser[]> {
     try {
       const db = databaseManager.getDatabase();
-      const users = await db("chat_users")
-        .where("status", "active")
-        .orderBy("name");
+      const users = await db('chat_users').where('status', 'active').orderBy('name');
 
       return users;
     } catch (error) {
-      logger.error("Error finding active users:", error);
+      logger.error('Error finding active users:', error);
       return [];
     }
   }

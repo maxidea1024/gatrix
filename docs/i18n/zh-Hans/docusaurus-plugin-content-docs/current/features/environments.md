@@ -9,6 +9,7 @@ Gatrix 通过环境（Environments）支持多阶段的发布工作流。
 ## 默认环境
 
 系统通常预设以下环境：
+
 - **Development**: 开发和内部测试
 - **Staging**: 预发布和 QA 测试
 - **Production**: 对真实玩家开放的生产环境

@@ -12,28 +12,33 @@ For the complete guide, see: [/docs/features/monitoring](/features/monitoring)
 
 ## Quick Steps
 
-1) Start the dev stack (Prometheus + Grafana included)
+1. Start the dev stack (Prometheus + Grafana included)
 
 ```bash
 docker compose -f docker-compose.dev.yml up -d
 ```
 
-2) Access UIs
+2. Access UIs
+
 - Grafana: http://localhost:44000
 - Prometheus: http://localhost:49090
 
-3) Enable metrics per service
+3. Enable metrics per service
+
 - Set `MONITORING_ENABLED=true`
 - Default metrics path `/metrics`
 
-4) Service discovery
+4. Service discovery
+
 - Prometheus scrapes targets from Backend HTTP-SD endpoint:
   - `/api/v1/public/monitoring/prometheus/targets`
 
-5) Restart policy
+5. Restart policy
+
 - Use `docker compose down` then `up` (do not use `restart`).
 
-6) Direct Log Push (SDK)
+6. Direct Log Push (SDK)
+
 - Game servers now push logs directly to Loki via the `@gatrix/server-sdk`.
 - This eliminates the need for Promtail or file scraping.
 - Configuration in `mconf.ts` (or `default.json5`):
@@ -45,5 +50,3 @@ docker compose -f docker-compose.dev.yml up -d
     }
   }
   ```
-
-

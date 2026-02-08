@@ -251,8 +251,18 @@ export const IntegrationsPage: React.FC = () => {
                       }}
                     >
                       <CardContent sx={{ flex: 1, pb: 0 }}>
-                        <Box display="flex" alignItems="center" justifyContent="space-between" mb={1.5}>
-                          <Box display="flex" alignItems="center" gap={1} sx={{ minWidth: 0, flex: 1 }}>
+                        <Box
+                          display="flex"
+                          alignItems="center"
+                          justifyContent="space-between"
+                          mb={1.5}
+                        >
+                          <Box
+                            display="flex"
+                            alignItems="center"
+                            gap={1}
+                            sx={{ minWidth: 0, flex: 1 }}
+                          >
                             <Box position="relative" display="inline-flex">
                               <Box
                                 component="img"
@@ -266,7 +276,8 @@ export const IntegrationsPage: React.FC = () => {
                                   title={
                                     integration.lastEvent.state === 'success'
                                       ? t('integrations.eventState.success')
-                                      : integration.lastEvent.stateDetails || t('integrations.eventState.failed')
+                                      : integration.lastEvent.stateDetails ||
+                                        t('integrations.eventState.failed')
                                   }
                                 >
                                   <Box
@@ -286,14 +297,20 @@ export const IntegrationsPage: React.FC = () => {
                                     }}
                                     onClick={(e) => {
                                       e.stopPropagation();
-                                      navigate(`/settings/integrations/${integration.id}/edit?tab=1`);
+                                      navigate(
+                                        `/settings/integrations/${integration.id}/edit?tab=1`
+                                      );
                                     }}
                                   >
                                     {integration.lastEvent.state === 'success' ? (
                                       <CheckCircleIcon color="success" sx={{ fontSize: 16 }} />
                                     ) : (
                                       <ErrorIcon
-                                        color={integration.lastEvent.state === 'successWithErrors' ? 'warning' : 'error'}
+                                        color={
+                                          integration.lastEvent.state === 'successWithErrors'
+                                            ? 'warning'
+                                            : 'error'
+                                        }
                                         sx={{ fontSize: 16 }}
                                       />
                                     )}
@@ -301,11 +318,18 @@ export const IntegrationsPage: React.FC = () => {
                                 </Tooltip>
                               )}
                             </Box>
-                            <Typography variant="subtitle1" fontWeight="bold" noWrap sx={{ flexShrink: 1 }}>
+                            <Typography
+                              variant="subtitle1"
+                              fontWeight="bold"
+                              noWrap
+                              sx={{ flexShrink: 1 }}
+                            >
                               {t(provider?.displayName || integration.provider)}
                             </Typography>
                             <Chip
-                              label={integration.isEnabled ? t('common.enabled') : t('common.disabled')}
+                              label={
+                                integration.isEnabled ? t('common.enabled') : t('common.disabled')
+                              }
                               size="small"
                               color={integration.isEnabled ? 'success' : 'default'}
                               variant="outlined"
@@ -331,7 +355,7 @@ export const IntegrationsPage: React.FC = () => {
                             WebkitBoxOrient: 'vertical',
                             overflow: 'hidden',
                             height: '2.8em',
-                            lineHeight: '1.4em'
+                            lineHeight: '1.4em',
                           }}
                         >
                           {integration.description || (provider ? t(provider.description) : '')}
@@ -489,7 +513,7 @@ export const IntegrationsPage: React.FC = () => {
                       WebkitBoxOrient: 'vertical',
                       overflow: 'hidden',
                       height: '2.8em',
-                      lineHeight: '1.4em'
+                      lineHeight: '1.4em',
                     }}
                   >
                     {t(provider.description)}
@@ -527,8 +551,8 @@ export const IntegrationsPage: React.FC = () => {
         message={t('integrations.deleteConfirmMessage', {
           provider: t(
             providers.find((p) => p.name === deleteTarget?.provider)?.displayName ||
-            deleteTarget?.provider ||
-            ''
+              deleteTarget?.provider ||
+              ''
           ),
         })}
         onConfirm={handleDelete}

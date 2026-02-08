@@ -3,7 +3,7 @@
  * This column links the store product to the CMS CashShop product ID
  */
 
-exports.up = async function(connection) {
+exports.up = async function (connection) {
   console.log('Adding cmsProductId column to g_store_products...');
 
   // Check if column already exists
@@ -54,7 +54,7 @@ exports.up = async function(connection) {
   console.log('✅ cmsProductId column added successfully');
 };
 
-exports.down = async function(connection) {
+exports.down = async function (connection) {
   console.log('Removing cmsProductId column from g_store_products...');
 
   // Drop the new unique constraint
@@ -97,4 +97,3 @@ exports.down = async function(connection) {
 };
 
 module.exports = exports;
-

@@ -1,6 +1,7 @@
 # System Console Improvements Summary
 
 ## Overview
+
 시스템 콘솔에 다양한 유틸리티 커맨드를 추가하여 관리자가 시스템 관리, 보안, 디버깅 작업을 더 효율적으로 수행할 수 있도록 개선했습니다.
 
 ## Added Commands
@@ -8,8 +9,9 @@
 ### 1. ID Generation Commands
 
 #### `ulid` - ULID 생성
+
 - **기능**: Universally Unique Lexicographically Sortable Identifier 생성
-- **사용법**: 
+- **사용법**:
   ```bash
   ulid          # 1개 생성
   ulid 5        # 5개 생성
@@ -23,6 +25,7 @@
 ### 2. Security & Cryptography Commands
 
 #### `jwt-secret` - JWT Secret 키 생성
+
 - **기능**: 안전한 JWT secret 키 생성
 - **사용법**:
   ```bash
@@ -32,6 +35,7 @@
 - **출력**: Base64 인코딩된 랜덤 키 + .env 파일 설정 예시
 
 #### `hash` - Bcrypt 해싱
+
 - **기능**: 비밀번호 등을 bcrypt로 해싱
 - **사용법**:
   ```bash
@@ -42,6 +46,7 @@
   - `--rounds <4-20>`: Salt rounds (기본값: 12)
 
 #### `encrypt` - AES-256-GCM 암호화
+
 - **기능**: 텍스트를 AES-256-GCM으로 암호화
 - **사용법**:
   ```bash
@@ -54,6 +59,7 @@
   - IV, Auth Tag 포함
 
 #### `decrypt` - AES-256-GCM 복호화
+
 - **기능**: 암호화된 텍스트 복호화
 - **사용법**:
   ```bash
@@ -62,6 +68,7 @@
 - **필수**: `--key` 옵션
 
 #### `random` - 랜덤 문자열 생성
+
 - **기능**: 다양한 형식의 랜덤 문자열 생성
 - **사용법**:
   ```bash
@@ -74,6 +81,7 @@
 ### 3. API Token Management
 
 #### `api-key` - API 액세스 토큰 생성
+
 - **기능**: Client/Server API 토큰을 데이터베이스에 직접 생성
 - **사용법**:
   ```bash
@@ -94,6 +102,7 @@
 ### 4. Database Operations
 
 #### `db-stats` - 데이터베이스 통계
+
 - **기능**: 주요 테이블의 레코드 수 표시
 - **사용법**:
   ```bash
@@ -112,9 +121,11 @@
 ## Technical Implementation
 
 ### File Modified
+
 - `packages/backend/src/services/ConsoleService.ts`
 
 ### Dependencies Added
+
 - `crypto` (Node.js built-in)
 - `bcryptjs` (already in dependencies)
 - `knex` (already in dependencies)
@@ -147,6 +158,7 @@
 ## Documentation
 
 ### Created Files
+
 1. `packages/backend/docs/CONSOLE_COMMANDS.md`
    - Complete command reference
    - Usage examples
@@ -161,6 +173,7 @@
 ## Usage Examples
 
 ### Complete API Setup Workflow
+
 ```bash
 # 1. Generate JWT secret for authentication
 jwt-secret --length 64
@@ -176,6 +189,7 @@ db-stats
 ```
 
 ### Data Encryption Workflow
+
 ```bash
 # 1. Encrypt sensitive data
 encrypt "Credit card: 1234-5678-9012-3456"
@@ -187,6 +201,7 @@ decrypt --key <saved-key> <encrypted>:<iv>:<authTag>
 ```
 
 ### ID Generation
+
 ```bash
 # Generate UUIDs for general use
 uuid
@@ -300,4 +315,3 @@ To test the new commands:
 ## Conclusion
 
 시스템 콘솔이 단순한 명령어 실행 도구에서 강력한 시스템 관리 플랫폼으로 발전했습니다. 추가된 커맨드들은 일상적인 관리 작업을 크게 간소화하고, 보안 관련 작업을 더 안전하게 수행할 수 있게 해줍니다.
-

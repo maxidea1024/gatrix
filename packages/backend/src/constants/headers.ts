@@ -57,7 +57,6 @@ export const API_HEADERS = {
    */
   X_APPLICATION_NAME: 'x-application-name',
 
-
   /**
    * 환경 이름 헤더 (SDK용)
    */

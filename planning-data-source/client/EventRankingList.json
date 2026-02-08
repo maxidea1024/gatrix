@@ -8,17 +8,9 @@
       "useNationRank": "bool",
       "eventRankingTermsType": "number",
       "eventRankingTermsId": "number",
-      "eventRankingTermsTargets": [
-        "number",
-        "number",
-        "number"
-      ],
+      "eventRankingTermsTargets": ["number", "number", "number"],
       "achievementTermsId": "number",
-      "achievementTermsTargets": [
-        "number",
-        "number",
-        "number"
-      ],
+      "achievementTermsTargets": ["number", "number", "number"],
       "goals": [
         {
           "Count": "number",
@@ -394,138 +386,83 @@
     },
     ":enum": {},
     ":links": {
-      "eventRankingTermsId": [
-        "AchievementTerms",
-        "MaxTerms"
-      ],
-      "achievementTermsId": [
-        "AchievementTerms"
-      ],
+      "eventRankingTermsId": ["AchievementTerms", "MaxTerms"],
+      "achievementTermsId": ["AchievementTerms"],
       "goals": [
         {
-          "Reward": [
-            "RewardFixed"
-          ]
+          "Reward": ["RewardFixed"]
         },
         {
-          "Reward": [
-            "RewardFixed"
-          ]
+          "Reward": ["RewardFixed"]
         },
         {
-          "Reward": [
-            "RewardFixed"
-          ]
+          "Reward": ["RewardFixed"]
         },
         {
-          "Reward": [
-            "RewardFixed"
-          ]
+          "Reward": ["RewardFixed"]
         },
         {
-          "Reward": [
-            "RewardFixed"
-          ]
+          "Reward": ["RewardFixed"]
         },
         {
-          "Reward": [
-            "RewardFixed"
-          ]
+          "Reward": ["RewardFixed"]
         },
         {
-          "Reward": [
-            "RewardFixed"
-          ]
+          "Reward": ["RewardFixed"]
         },
         {
-          "Reward": [
-            "RewardFixed"
-          ]
+          "Reward": ["RewardFixed"]
         },
         {
-          "Reward": [
-            "RewardFixed"
-          ]
+          "Reward": ["RewardFixed"]
         },
         {
-          "Reward": [
-            "RewardFixed"
-          ]
+          "Reward": ["RewardFixed"]
         },
         {
-          "Reward": [
-            "RewardFixed"
-          ]
+          "Reward": ["RewardFixed"]
         },
         {
-          "Reward": [
-            "RewardFixed"
-          ]
+          "Reward": ["RewardFixed"]
         },
         {
-          "Reward": [
-            "RewardFixed"
-          ]
+          "Reward": ["RewardFixed"]
         },
         {
-          "Reward": [
-            "RewardFixed"
-          ]
+          "Reward": ["RewardFixed"]
         },
         {
-          "Reward": [
-            "RewardFixed"
-          ]
+          "Reward": ["RewardFixed"]
         },
         {
-          "Reward": [
-            "RewardFixed"
-          ]
+          "Reward": ["RewardFixed"]
         },
         {
-          "Reward": [
-            "RewardFixed"
-          ]
+          "Reward": ["RewardFixed"]
         },
         {
-          "Reward": [
-            "RewardFixed"
-          ]
+          "Reward": ["RewardFixed"]
         },
         {
-          "Reward": [
-            "RewardFixed"
-          ]
+          "Reward": ["RewardFixed"]
         },
         {
-          "Reward": [
-            "RewardFixed"
-          ]
+          "Reward": ["RewardFixed"]
         },
         {
-          "Reward": [
-            "RewardFixed"
-          ]
+          "Reward": ["RewardFixed"]
         },
         {
-          "Reward": [
-            "RewardFixed"
-          ]
+          "Reward": ["RewardFixed"]
         },
         {
-          "Reward": [
-            "RewardFixed"
-          ]
+          "Reward": ["RewardFixed"]
         },
         {
-          "Reward": [
-            "RewardFixed"
-          ]
+          "Reward": ["RewardFixed"]
         },
         {
-          "Reward": [
-            "RewardFixed"
-          ]
+          "Reward": ["RewardFixed"]
         }
       ]
     }
@@ -699,13 +636,9 @@
       "useNationRank": false,
       "eventRankingTermsType": 1,
       "eventRankingTermsId": 87000088,
-      "eventRankingTermsTargets": [
-        1
-      ],
+      "eventRankingTermsTargets": [1],
       "achievementTermsId": 87000088,
-      "achievementTermsTargets": [
-        1
-      ],
+      "achievementTermsTargets": [1],
       "goals": [
         {
           "Count": 2000,
@@ -813,13 +746,9 @@
       "useNationRank": false,
       "eventRankingTermsType": 1,
       "eventRankingTermsId": 87000088,
-      "eventRankingTermsTargets": [
-        3
-      ],
+      "eventRankingTermsTargets": [3],
       "achievementTermsId": 87000088,
-      "achievementTermsTargets": [
-        3
-      ],
+      "achievementTermsTargets": [3],
       "goals": [
         {
           "Count": 2000,
@@ -1143,13 +1072,9 @@
       "useNationRank": false,
       "eventRankingTermsType": 1,
       "eventRankingTermsId": 87000088,
-      "eventRankingTermsTargets": [
-        1
-      ],
+      "eventRankingTermsTargets": [1],
       "achievementTermsId": 87000088,
-      "achievementTermsTargets": [
-        1
-      ],
+      "achievementTermsTargets": [1],
       "goals": [
         {
           "Count": 2000,
@@ -1401,13 +1326,9 @@
       "useNationRank": false,
       "eventRankingTermsType": 1,
       "eventRankingTermsId": 87000149,
-      "eventRankingTermsTargets": [
-        0
-      ],
+      "eventRankingTermsTargets": [0],
       "achievementTermsId": 87000149,
-      "achievementTermsTargets": [
-        0
-      ],
+      "achievementTermsTargets": [0],
       "goals": [
         {
           "Count": 500000,
@@ -1515,13 +1436,9 @@
       "useNationRank": false,
       "eventRankingTermsType": 1,
       "eventRankingTermsId": 87000088,
-      "eventRankingTermsTargets": [
-        1
-      ],
+      "eventRankingTermsTargets": [1],
       "achievementTermsId": 87000088,
-      "achievementTermsTargets": [
-        1
-      ],
+      "achievementTermsTargets": [1],
       "goals": [
         {
           "Count": 2000,
@@ -1629,13 +1546,9 @@
       "useNationRank": false,
       "eventRankingTermsType": 1,
       "eventRankingTermsId": 87000088,
-      "eventRankingTermsTargets": [
-        3
-      ],
+      "eventRankingTermsTargets": [3],
       "achievementTermsId": 87000088,
-      "achievementTermsTargets": [
-        3
-      ],
+      "achievementTermsTargets": [3],
       "goals": [
         {
           "Count": 2500,
@@ -1831,13 +1744,9 @@
       "useNationRank": false,
       "eventRankingTermsType": 1,
       "eventRankingTermsId": 87000150,
-      "eventRankingTermsTargets": [
-        23340014
-      ],
+      "eventRankingTermsTargets": [23340014],
       "achievementTermsId": 87000150,
-      "achievementTermsTargets": [
-        23340014
-      ],
+      "achievementTermsTargets": [23340014],
       "goals": [
         {
           "Count": 1000,
@@ -1925,13 +1834,9 @@
       "useNationRank": false,
       "eventRankingTermsType": 1,
       "eventRankingTermsId": 87000150,
-      "eventRankingTermsTargets": [
-        23340012
-      ],
+      "eventRankingTermsTargets": [23340012],
       "achievementTermsId": 87000150,
-      "achievementTermsTargets": [
-        23340012
-      ],
+      "achievementTermsTargets": [23340012],
       "goals": [
         {
           "Count": 1000,
@@ -2127,13 +2032,9 @@
       "useNationRank": false,
       "eventRankingTermsType": 1,
       "eventRankingTermsId": 87000149,
-      "eventRankingTermsTargets": [
-        17
-      ],
+      "eventRankingTermsTargets": [17],
       "achievementTermsId": 87000149,
-      "achievementTermsTargets": [
-        17
-      ],
+      "achievementTermsTargets": [17],
       "goals": [
         {
           "Count": 1000000,
@@ -2241,13 +2142,9 @@
       "useNationRank": false,
       "eventRankingTermsType": 1,
       "eventRankingTermsId": 87000098,
-      "eventRankingTermsTargets": [
-        24000585
-      ],
+      "eventRankingTermsTargets": [24000585],
       "achievementTermsId": 87000098,
-      "achievementTermsTargets": [
-        24000585
-      ],
+      "achievementTermsTargets": [24000585],
       "goals": [
         {
           "Count": 1000000,
@@ -2335,13 +2232,9 @@
       "useNationRank": false,
       "eventRankingTermsType": 1,
       "eventRankingTermsId": 87000150,
-      "eventRankingTermsTargets": [
-        23340014
-      ],
+      "eventRankingTermsTargets": [23340014],
       "achievementTermsId": 87000150,
-      "achievementTermsTargets": [
-        23340014
-      ],
+      "achievementTermsTargets": [23340014],
       "goals": [
         {
           "Count": 1000,
@@ -2449,13 +2342,9 @@
       "useNationRank": false,
       "eventRankingTermsType": 1,
       "eventRankingTermsId": 87000150,
-      "eventRankingTermsTargets": [
-        23340012
-      ],
+      "eventRankingTermsTargets": [23340012],
       "achievementTermsId": 87000150,
-      "achievementTermsTargets": [
-        23340012
-      ],
+      "achievementTermsTargets": [23340012],
       "goals": [
         {
           "Count": 1000,
@@ -2671,13 +2560,9 @@
       "useNationRank": false,
       "eventRankingTermsType": 1,
       "eventRankingTermsId": 87000149,
-      "eventRankingTermsTargets": [
-        12
-      ],
+      "eventRankingTermsTargets": [12],
       "achievementTermsId": 87000149,
-      "achievementTermsTargets": [
-        12
-      ],
+      "achievementTermsTargets": [12],
       "goals": [
         {
           "Count": 4000000,
@@ -2785,13 +2670,9 @@
       "useNationRank": false,
       "eventRankingTermsType": 1,
       "eventRankingTermsId": 87000088,
-      "eventRankingTermsTargets": [
-        1
-      ],
+      "eventRankingTermsTargets": [1],
       "achievementTermsId": 87000088,
-      "achievementTermsTargets": [
-        1
-      ],
+      "achievementTermsTargets": [1],
       "goals": [
         {
           "Count": 2000,
@@ -2899,13 +2780,9 @@
       "useNationRank": false,
       "eventRankingTermsType": 1,
       "eventRankingTermsId": 87000150,
-      "eventRankingTermsTargets": [
-        23340020
-      ],
+      "eventRankingTermsTargets": [23340020],
       "achievementTermsId": 87000150,
-      "achievementTermsTargets": [
-        23340020
-      ],
+      "achievementTermsTargets": [23340020],
       "goals": [
         {
           "Count": 1000,
@@ -2993,13 +2870,9 @@
       "useNationRank": false,
       "eventRankingTermsType": 1,
       "eventRankingTermsId": 87000150,
-      "eventRankingTermsTargets": [
-        23340013
-      ],
+      "eventRankingTermsTargets": [23340013],
       "achievementTermsId": 87000150,
-      "achievementTermsTargets": [
-        23340013
-      ],
+      "achievementTermsTargets": [23340013],
       "goals": [
         {
           "Count": 1000,
@@ -3107,13 +2980,9 @@
       "useNationRank": false,
       "eventRankingTermsType": 1,
       "eventRankingTermsId": 87000150,
-      "eventRankingTermsTargets": [
-        23340012
-      ],
+      "eventRankingTermsTargets": [23340012],
       "achievementTermsId": 87000150,
-      "achievementTermsTargets": [
-        23340012
-      ],
+      "achievementTermsTargets": [23340012],
       "goals": [
         {
           "Count": 1000,
@@ -3317,13 +3186,9 @@
       "useNationRank": false,
       "eventRankingTermsType": 1,
       "eventRankingTermsId": 87000150,
-      "eventRankingTermsTargets": [
-        23340014
-      ],
+      "eventRankingTermsTargets": [23340014],
       "achievementTermsId": 87000150,
-      "achievementTermsTargets": [
-        23340014
-      ],
+      "achievementTermsTargets": [23340014],
       "goals": [
         {
           "Count": 2000,
@@ -3419,13 +3284,9 @@
       "useNationRank": false,
       "eventRankingTermsType": 1,
       "eventRankingTermsId": 87000150,
-      "eventRankingTermsTargets": [
-        23340013
-      ],
+      "eventRankingTermsTargets": [23340013],
       "achievementTermsId": 87000150,
-      "achievementTermsTargets": [
-        23340013
-      ],
+      "achievementTermsTargets": [23340013],
       "goals": [
         {
           "Count": 2000,
@@ -3521,13 +3382,9 @@
       "useNationRank": false,
       "eventRankingTermsType": 1,
       "eventRankingTermsId": 87000150,
-      "eventRankingTermsTargets": [
-        23340012
-      ],
+      "eventRankingTermsTargets": [23340012],
       "achievementTermsId": 87000150,
-      "achievementTermsTargets": [
-        23340012
-      ],
+      "achievementTermsTargets": [23340012],
       "goals": [
         {
           "Count": 2000,
@@ -3671,13 +3528,9 @@
       "useNationRank": false,
       "eventRankingTermsType": 1,
       "eventRankingTermsId": 87000088,
-      "eventRankingTermsTargets": [
-        1
-      ],
+      "eventRankingTermsTargets": [1],
       "achievementTermsId": 87000088,
-      "achievementTermsTargets": [
-        1
-      ],
+      "achievementTermsTargets": [1],
       "goals": [
         {
           "Count": 10000,
@@ -3737,13 +3590,9 @@
       "useNationRank": false,
       "eventRankingTermsType": 1,
       "eventRankingTermsId": 87000149,
-      "eventRankingTermsTargets": [
-        13
-      ],
+      "eventRankingTermsTargets": [13],
       "achievementTermsId": 87000149,
-      "achievementTermsTargets": [
-        13
-      ],
+      "achievementTermsTargets": [13],
       "goals": [
         {
           "Count": 20000000,
@@ -3791,13 +3640,9 @@
       "useNationRank": false,
       "eventRankingTermsType": 1,
       "eventRankingTermsId": 87000150,
-      "eventRankingTermsTargets": [
-        23340012
-      ],
+      "eventRankingTermsTargets": [23340012],
       "achievementTermsId": 87000150,
-      "achievementTermsTargets": [
-        23340012
-      ],
+      "achievementTermsTargets": [23340012],
       "goals": [
         {
           "Count": 2500,
@@ -3953,13 +3798,9 @@
       "useNationRank": false,
       "eventRankingTermsType": 1,
       "eventRankingTermsId": 87000088,
-      "eventRankingTermsTargets": [
-        1
-      ],
+      "eventRankingTermsTargets": [1],
       "achievementTermsId": 87000088,
-      "achievementTermsTargets": [
-        1
-      ],
+      "achievementTermsTargets": [1],
       "goals": [
         {
           "Count": 5000,
@@ -4151,13 +3992,9 @@
       "useNationRank": false,
       "eventRankingTermsType": 1,
       "eventRankingTermsId": 87000150,
-      "eventRankingTermsTargets": [
-        23340012
-      ],
+      "eventRankingTermsTargets": [23340012],
       "achievementTermsId": 87000150,
-      "achievementTermsTargets": [
-        23340012
-      ],
+      "achievementTermsTargets": [23340012],
       "goals": [
         {
           "Count": 2000,
@@ -4301,13 +4138,9 @@
       "useNationRank": false,
       "eventRankingTermsType": 1,
       "eventRankingTermsId": 87000088,
-      "eventRankingTermsTargets": [
-        1
-      ],
+      "eventRankingTermsTargets": [1],
       "achievementTermsId": 87000088,
-      "achievementTermsTargets": [
-        1
-      ],
+      "achievementTermsTargets": [1],
       "goals": [
         {
           "Count": 10000,
@@ -4415,13 +4248,9 @@
       "useNationRank": false,
       "eventRankingTermsType": 1,
       "eventRankingTermsId": 87000088,
-      "eventRankingTermsTargets": [
-        3
-      ],
+      "eventRankingTermsTargets": [3],
       "achievementTermsId": 87000088,
-      "achievementTermsTargets": [
-        3
-      ],
+      "achievementTermsTargets": [3],
       "goals": [
         {
           "Count": 2500,
@@ -4577,13 +4406,9 @@
       "useNationRank": false,
       "eventRankingTermsType": 1,
       "eventRankingTermsId": 87000088,
-      "eventRankingTermsTargets": [
-        1
-      ],
+      "eventRankingTermsTargets": [1],
       "achievementTermsId": 87000088,
-      "achievementTermsTargets": [
-        1
-      ],
+      "achievementTermsTargets": [1],
       "goals": [
         {
           "Count": 5000,
@@ -4775,13 +4600,9 @@
       "useNationRank": false,
       "eventRankingTermsType": 1,
       "eventRankingTermsId": 87000150,
-      "eventRankingTermsTargets": [
-        23340012
-      ],
+      "eventRankingTermsTargets": [23340012],
       "achievementTermsId": 87000150,
-      "achievementTermsTargets": [
-        23340012
-      ],
+      "achievementTermsTargets": [23340012],
       "goals": [
         {
           "Count": 2000,
@@ -4925,13 +4746,9 @@
       "useNationRank": false,
       "eventRankingTermsType": 1,
       "eventRankingTermsId": 87000088,
-      "eventRankingTermsTargets": [
-        1
-      ],
+      "eventRankingTermsTargets": [1],
       "achievementTermsId": 87000088,
-      "achievementTermsTargets": [
-        1
-      ],
+      "achievementTermsTargets": [1],
       "goals": [
         {
           "Count": 10000,
@@ -5039,13 +4856,9 @@
       "useNationRank": false,
       "eventRankingTermsType": 1,
       "eventRankingTermsId": 87000088,
-      "eventRankingTermsTargets": [
-        3
-      ],
+      "eventRankingTermsTargets": [3],
       "achievementTermsId": 87000088,
-      "achievementTermsTargets": [
-        3
-      ],
+      "achievementTermsTargets": [3],
       "goals": [
         {
           "Count": 2500,
@@ -5201,13 +5014,9 @@
       "useNationRank": false,
       "eventRankingTermsType": 1,
       "eventRankingTermsId": 87000088,
-      "eventRankingTermsTargets": [
-        1
-      ],
+      "eventRankingTermsTargets": [1],
       "achievementTermsId": 87000088,
-      "achievementTermsTargets": [
-        1
-      ],
+      "achievementTermsTargets": [1],
       "goals": [
         {
           "Count": 5000,
@@ -5303,13 +5112,9 @@
       "useNationRank": false,
       "eventRankingTermsType": 1,
       "eventRankingTermsId": 87000150,
-      "eventRankingTermsTargets": [
-        23340062
-      ],
+      "eventRankingTermsTargets": [23340062],
       "achievementTermsId": 87000150,
-      "achievementTermsTargets": [
-        23340062
-      ],
+      "achievementTermsTargets": [23340062],
       "goals": [
         {
           "Count": 50,
@@ -5473,13 +5278,9 @@
       "useNationRank": false,
       "eventRankingTermsType": 1,
       "eventRankingTermsId": 87000150,
-      "eventRankingTermsTargets": [
-        23340012
-      ],
+      "eventRankingTermsTargets": [23340012],
       "achievementTermsId": 87000150,
-      "achievementTermsTargets": [
-        23340012
-      ],
+      "achievementTermsTargets": [23340012],
       "goals": [
         {
           "Count": 2000,
@@ -5575,13 +5376,9 @@
       "useNationRank": false,
       "eventRankingTermsType": 1,
       "eventRankingTermsId": 87000088,
-      "eventRankingTermsTargets": [
-        1
-      ],
+      "eventRankingTermsTargets": [1],
       "achievementTermsId": 87000088,
-      "achievementTermsTargets": [
-        1
-      ],
+      "achievementTermsTargets": [1],
       "goals": [
         {
           "Count": 10000,
@@ -5689,13 +5486,9 @@
       "useNationRank": false,
       "eventRankingTermsType": 1,
       "eventRankingTermsId": 87000088,
-      "eventRankingTermsTargets": [
-        3
-      ],
+      "eventRankingTermsTargets": [3],
       "achievementTermsId": 87000088,
-      "achievementTermsTargets": [
-        3
-      ],
+      "achievementTermsTargets": [3],
       "goals": [
         {
           "Count": 5000,
@@ -5803,13 +5596,9 @@
       "useNationRank": false,
       "eventRankingTermsType": 1,
       "eventRankingTermsId": 87000149,
-      "eventRankingTermsTargets": [
-        17
-      ],
+      "eventRankingTermsTargets": [17],
       "achievementTermsId": 87000149,
-      "achievementTermsTargets": [
-        17
-      ],
+      "achievementTermsTargets": [17],
       "goals": [
         {
           "Count": 20000000,
@@ -5989,13 +5778,9 @@
       "useNationRank": false,
       "eventRankingTermsType": 1,
       "eventRankingTermsId": 87000088,
-      "eventRankingTermsTargets": [
-        1
-      ],
+      "eventRankingTermsTargets": [1],
       "achievementTermsId": 87000088,
-      "achievementTermsTargets": [
-        1
-      ],
+      "achievementTermsTargets": [1],
       "goals": [
         {
           "Count": 5000,
@@ -6091,13 +5876,9 @@
       "useNationRank": false,
       "eventRankingTermsType": 1,
       "eventRankingTermsId": 87000149,
-      "eventRankingTermsTargets": [
-        5
-      ],
+      "eventRankingTermsTargets": [5],
       "achievementTermsId": 87000149,
-      "achievementTermsTargets": [
-        5
-      ],
+      "achievementTermsTargets": [5],
       "goals": [
         {
           "Count": 10000000,
@@ -6137,13 +5918,9 @@
       "useNationRank": false,
       "eventRankingTermsType": 1,
       "eventRankingTermsId": 87000150,
-      "eventRankingTermsTargets": [
-        23340013
-      ],
+      "eventRankingTermsTargets": [23340013],
       "achievementTermsId": 87000150,
-      "achievementTermsTargets": [
-        23340013
-      ],
+      "achievementTermsTargets": [23340013],
       "goals": [
         {
           "Count": 1000,
@@ -6279,13 +6056,9 @@
       "useNationRank": false,
       "eventRankingTermsType": 1,
       "eventRankingTermsId": 87000150,
-      "eventRankingTermsTargets": [
-        23340012
-      ],
+      "eventRankingTermsTargets": [23340012],
       "achievementTermsId": 87000150,
-      "achievementTermsTargets": [
-        23340012
-      ],
+      "achievementTermsTargets": [23340012],
       "goals": [
         {
           "Count": 2000,
@@ -6381,13 +6154,9 @@
       "useNationRank": false,
       "eventRankingTermsType": 1,
       "eventRankingTermsId": 87000088,
-      "eventRankingTermsTargets": [
-        1
-      ],
+      "eventRankingTermsTargets": [1],
       "achievementTermsId": 87000088,
-      "achievementTermsTargets": [
-        1
-      ],
+      "achievementTermsTargets": [1],
       "goals": [
         {
           "Count": 10000,
@@ -6447,13 +6216,9 @@
       "useNationRank": false,
       "eventRankingTermsType": 1,
       "eventRankingTermsId": 87000149,
-      "eventRankingTermsTargets": [
-        15
-      ],
+      "eventRankingTermsTargets": [15],
       "achievementTermsId": 87000149,
-      "achievementTermsTargets": [
-        15
-      ],
+      "achievementTermsTargets": [15],
       "goals": [
         {
           "Count": 200000000,
@@ -6501,13 +6266,9 @@
       "useNationRank": false,
       "eventRankingTermsType": 1,
       "eventRankingTermsId": 87000088,
-      "eventRankingTermsTargets": [
-        3
-      ],
+      "eventRankingTermsTargets": [3],
       "achievementTermsId": 87000088,
-      "achievementTermsTargets": [
-        3
-      ],
+      "achievementTermsTargets": [3],
       "goals": [
         {
           "Count": 5000,
@@ -6615,13 +6376,9 @@
       "useNationRank": false,
       "eventRankingTermsType": 1,
       "eventRankingTermsId": 87000150,
-      "eventRankingTermsTargets": [
-        23340122
-      ],
+      "eventRankingTermsTargets": [23340122],
       "achievementTermsId": 87000150,
-      "achievementTermsTargets": [
-        23340122
-      ],
+      "achievementTermsTargets": [23340122],
       "goals": [
         {
           "Count": 1000,
@@ -6689,13 +6446,9 @@
       "useNationRank": false,
       "eventRankingTermsType": 1,
       "eventRankingTermsId": 87000149,
-      "eventRankingTermsTargets": [
-        11
-      ],
+      "eventRankingTermsTargets": [11],
       "achievementTermsId": 87000149,
-      "achievementTermsTargets": [
-        11
-      ],
+      "achievementTermsTargets": [11],
       "goals": [
         {
           "Count": 1000000,
@@ -6747,13 +6500,9 @@
       "useNationRank": false,
       "eventRankingTermsType": 1,
       "eventRankingTermsId": 87000150,
-      "eventRankingTermsTargets": [
-        23340012
-      ],
+      "eventRankingTermsTargets": [23340012],
       "achievementTermsId": 87000150,
-      "achievementTermsTargets": [
-        23340012
-      ],
+      "achievementTermsTargets": [23340012],
       "goals": [
         {
           "Count": 1000,
@@ -6805,13 +6554,9 @@
       "useNationRank": false,
       "eventRankingTermsType": 1,
       "eventRankingTermsId": 87000150,
-      "eventRankingTermsTargets": [
-        23340155
-      ],
+      "eventRankingTermsTargets": [23340155],
       "achievementTermsId": 87000150,
-      "achievementTermsTargets": [
-        23340155
-      ],
+      "achievementTermsTargets": [23340155],
       "goals": [
         {
           "Count": 1000,
@@ -6967,13 +6712,9 @@
       "useNationRank": false,
       "eventRankingTermsType": 1,
       "eventRankingTermsId": 87000150,
-      "eventRankingTermsTargets": [
-        23340012
-      ],
+      "eventRankingTermsTargets": [23340012],
       "achievementTermsId": 87000150,
-      "achievementTermsTargets": [
-        23340012
-      ],
+      "achievementTermsTargets": [23340012],
       "goals": [
         {
           "Count": 1000,
@@ -7025,13 +6766,9 @@
       "useNationRank": false,
       "eventRankingTermsType": 1,
       "eventRankingTermsId": 87000150,
-      "eventRankingTermsTargets": [
-        23340155
-      ],
+      "eventRankingTermsTargets": [23340155],
       "achievementTermsId": 87000150,
-      "achievementTermsTargets": [
-        23340155
-      ],
+      "achievementTermsTargets": [23340155],
       "goals": [
         {
           "Count": 500,
@@ -7083,13 +6820,9 @@
       "useNationRank": false,
       "eventRankingTermsType": 1,
       "eventRankingTermsId": 87000171,
-      "eventRankingTermsTargets": [
-        2
-      ],
+      "eventRankingTermsTargets": [2],
       "achievementTermsId": 87000171,
-      "achievementTermsTargets": [
-        2
-      ],
+      "achievementTermsTargets": [2],
       "goals": [
         {
           "Count": 1000000,
@@ -7193,13 +6926,9 @@
       "useNationRank": false,
       "eventRankingTermsType": 1,
       "eventRankingTermsId": 87000150,
-      "eventRankingTermsTargets": [
-        23340012
-      ],
+      "eventRankingTermsTargets": [23340012],
       "achievementTermsId": 87000150,
-      "achievementTermsTargets": [
-        23340012
-      ],
+      "achievementTermsTargets": [23340012],
       "goals": [
         {
           "Count": 1000,
@@ -7251,13 +6980,9 @@
       "useNationRank": false,
       "eventRankingTermsType": 1,
       "eventRankingTermsId": 87000150,
-      "eventRankingTermsTargets": [
-        23340155
-      ],
+      "eventRankingTermsTargets": [23340155],
       "achievementTermsId": 87000150,
-      "achievementTermsTargets": [
-        23340155
-      ],
+      "achievementTermsTargets": [23340155],
       "goals": [
         {
           "Count": 500,
@@ -7309,13 +7034,9 @@
       "useNationRank": false,
       "eventRankingTermsType": 1,
       "eventRankingTermsId": 87000171,
-      "eventRankingTermsTargets": [
-        10
-      ],
+      "eventRankingTermsTargets": [10],
       "achievementTermsId": 87000171,
-      "achievementTermsTargets": [
-        10
-      ],
+      "achievementTermsTargets": [10],
       "goals": [
         {
           "Count": 1000000,
@@ -7471,13 +7192,9 @@
       "useNationRank": false,
       "eventRankingTermsType": 1,
       "eventRankingTermsId": 87000150,
-      "eventRankingTermsTargets": [
-        23340012
-      ],
+      "eventRankingTermsTargets": [23340012],
       "achievementTermsId": 87000150,
-      "achievementTermsTargets": [
-        23340012
-      ],
+      "achievementTermsTargets": [23340012],
       "goals": [
         {
           "Count": 100,
@@ -7529,13 +7246,9 @@
       "useNationRank": false,
       "eventRankingTermsType": 1,
       "eventRankingTermsId": 87000150,
-      "eventRankingTermsTargets": [
-        23340187
-      ],
+      "eventRankingTermsTargets": [23340187],
       "achievementTermsId": 87000150,
-      "achievementTermsTargets": [
-        23340187
-      ],
+      "achievementTermsTargets": [23340187],
       "goals": [
         {
           "Count": 500,

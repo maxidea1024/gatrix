@@ -37,6 +37,7 @@ Gatrix provides two Docker Compose configurations:
 ### Development Stack (`docker-compose.dev.yml`)
 
 Additional services for development:
+
 - **Adminer** (:8080) - Database management UI
 - **Redis Commander** (:8081) - Redis management UI
 - **Hot Reload** - All services support live code updates
@@ -90,6 +91,7 @@ docker-compose -f docker-compose.dev.yml exec -u root frontend-dev yarn add @dnd
 ```
 
 **Notes:**
+
 - `-u root`: Run as root to avoid permission issues
 - `-W`: Install to workspace root (required for monorepo structure)
 - Package is immediately available without container restart
@@ -118,6 +120,7 @@ docker-compose -f docker-compose.dev.yml up -d frontend-dev
 ```
 
 **Why this approach?**
+
 - Container's `node_modules` is excluded from volume mount
 - Installing locally (`yarn add` on host) won't affect the running container
 - Direct installation in container is faster and doesn't require rebuild
@@ -127,21 +130,24 @@ docker-compose -f docker-compose.dev.yml up -d frontend-dev
 ### Core Services
 
 #### MySQL (Port: 3306)
+
 - **Image**: `mysql:8.0`
 - **Purpose**: Primary database
-- **Volumes**: 
+- **Volumes**:
   - `mysql_data` - Persistent data
   - `./docker/mysql/init` - Initialization scripts
   - `./docker/mysql/conf.d` - Configuration files
 - **Health Check**: MySQL ping command
 
 #### Redis (Port: 6379)
+
 - **Image**: `redis:7-alpine`
 - **Purpose**: Cache, sessions, job queues
 - **Volumes**: `redis_data` - Persistent data
 - **Health Check**: Redis ping command
 
 #### ClickHouse (Ports: 8123, 9000)
+
 - **Image**: `clickhouse/clickhouse-server:24.12.2.29-alpine`
 - **Purpose**: Analytics data storage (time-series)
 - **Volumes**: `clickhouse_data` - Persistent data
@@ -150,31 +156,35 @@ docker-compose -f docker-compose.dev.yml up -d frontend-dev
 ### Application Services
 
 #### Backend (Port: 5000)
+
 - **Build**: `packages/backend/Dockerfile`
 - **Purpose**: REST API server
 - **Dependencies**: MySQL, Redis
-- **Volumes** (dev): 
+- **Volumes** (dev):
   - `./packages/backend:/app` - Source code
   - `backend_logs` - Log files
 - **Health Check**: HTTP GET /health
 
 #### Frontend (Port: 3000 dev / 80 prod)
+
 - **Build**: `packages/frontend/Dockerfile`
 - **Purpose**: Web UI (Vite + React)
 - **Dependencies**: Backend
 - **Volumes** (dev): `./packages/frontend:/app` - Source code
 
 #### Chat Server (Ports: 3001, 9090)
+
 - **Build**: `packages/chat-server/Dockerfile`
 - **Purpose**: Real-time messaging (WebSocket)
 - **Dependencies**: MySQL, Redis, Backend
-- **Volumes**: 
+- **Volumes**:
   - `chat_server_uploads` - File uploads
   - `chat_server_logs` - Log files
 - **Health Check**: HTTP GET /health
 - **Metrics**: Prometheus metrics on port 9090
 
 #### Event Lens (Port: 3002)
+
 - **Build**: `packages/event-lens/Dockerfile`
 - **Purpose**: Analytics API server
 - **Dependencies**: MySQL, Redis, ClickHouse
@@ -182,6 +192,7 @@ docker-compose -f docker-compose.dev.yml up -d frontend-dev
 - **Health Check**: HTTP GET /health
 
 #### Event Lens Worker
+
 - **Build**: `packages/event-lens/Dockerfile`
 - **Purpose**: Background job processing
 - **Command**: `node dist/worker.js`
@@ -253,17 +264,20 @@ GATRIX_API_SECRET=shared-secret-between-servers
 ### Network Configuration
 
 Both compose files use custom bridge networks:
+
 - **Production**: `gatrix-network` (172.20.0.0/16)
 - **Development**: `gatrix-dev-network` (172.21.0.0/16)
 
 ## 📊 Volume Management
 
 ### List Volumes
+
 ```bash
 docker volume ls | grep gatrix
 ```
 
 ### Backup Volume
+
 ```bash
 # Backup MySQL data
 docker run --rm -v gatrix_mysql_data:/data -v $(pwd):/backup alpine tar czf /backup/mysql_backup.tar.gz -C /data .
@@ -273,6 +287,7 @@ docker run --rm -v gatrix_clickhouse_data:/data -v $(pwd):/backup alpine tar czf
 ```
 
 ### Restore Volume
+
 ```bash
 # Restore MySQL data
 docker run --rm -v gatrix_mysql_data:/data -v $(pwd):/backup alpine tar xzf /backup/mysql_backup.tar.gz -C /data
@@ -282,6 +297,7 @@ docker run --rm -v gatrix_clickhouse_data:/data -v $(pwd):/backup alpine tar xzf
 ```
 
 ### Remove Volumes (⚠️ Data Loss)
+
 ```bash
 # Remove all Gatrix volumes
 docker volume rm $(docker volume ls -q | grep gatrix)
@@ -290,11 +306,13 @@ docker volume rm $(docker volume ls -q | grep gatrix)
 ## 🔍 Troubleshooting
 
 ### Check Service Health
+
 ```bash
 docker compose ps
 ```
 
 ### View Service Logs
+
 ```bash
 # All services
 docker compose logs -f
@@ -307,16 +325,19 @@ docker compose logs --tail=100 backend
 ```
 
 ### Restart Service
+
 ```bash
 docker compose restart backend
 ```
 
 ### Rebuild Service
+
 ```bash
 docker compose up -d --build backend
 ```
 
 ### Access Service Shell
+
 ```bash
 docker compose exec backend sh
 docker compose exec mysql mysql -u root -p
@@ -324,6 +345,7 @@ docker compose exec redis redis-cli
 ```
 
 ### Check Resource Usage
+
 ```bash
 docker stats
 ```
@@ -331,6 +353,7 @@ docker stats
 ## 🚨 Common Issues
 
 ### Port Already in Use
+
 ```bash
 # Find process using port
 lsof -i :3306  # macOS/Linux
@@ -341,6 +364,7 @@ DB_PORT=3307
 ```
 
 ### Service Won't Start
+
 ```bash
 # Check logs
 docker compose logs backend
@@ -351,6 +375,7 @@ docker compose up -d
 ```
 
 ### Database Connection Failed
+
 ```bash
 # Wait for MySQL to be ready
 docker compose exec mysql mysqladmin ping -h localhost -u root -p
@@ -366,4 +391,3 @@ docker compose ps
 - [Gatrix Backend README](packages/backend/README.md)
 - [Gatrix Chat Server README](packages/chat-server/README.md)
 - [Event Lens Setup Guide](EVENT_LENS_SETUP_GUIDE.md)
-

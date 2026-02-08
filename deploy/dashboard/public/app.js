@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // ESC key to exit fullscreen
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
-      document.querySelectorAll('.logs-section.fullscreen').forEach(section => {
+      document.querySelectorAll('.logs-section.fullscreen').forEach((section) => {
         section.classList.remove('fullscreen');
         const btn = section.querySelector('.btn-fullscreen');
         if (btn) btn.textContent = '⛶';
@@ -63,13 +63,13 @@ async function loadServices(forceRender = false) {
     // First load or force render - full render
     if (!services.length || forceRender) {
       services = newServices;
-      grid.innerHTML = services.map(svc => renderServiceCard(svc)).join('');
+      grid.innerHTML = services.map((svc) => renderServiceCard(svc)).join('');
       updateLogServiceSelect();
       return;
     }
 
     // Incremental update - only update changed parts
-    newServices.forEach(svc => {
+    newServices.forEach((svc) => {
       const name = svc.Name.replace('gatrix_', '');
       const card = grid.querySelector(`[data-service="${name}"]`);
 
@@ -83,8 +83,8 @@ async function loadServices(forceRender = false) {
     });
 
     // Remove cards for services that no longer exist
-    const currentNames = newServices.map(s => s.Name.replace('gatrix_', ''));
-    grid.querySelectorAll('.service-card').forEach(card => {
+    const currentNames = newServices.map((s) => s.Name.replace('gatrix_', ''));
+    grid.querySelectorAll('.service-card').forEach((card) => {
       if (!currentNames.includes(card.dataset.service)) {
         card.remove();
       }
@@ -105,8 +105,8 @@ function updateServiceCard(card, svc) {
   const [running, desired] = svc.Replicas.split('/');
   const isHealthy = running === desired;
   const isPartial = parseInt(running) > 0 && parseInt(running) < parseInt(desired);
-  const statusClass = isHealthy ? 'healthy' : (isPartial ? 'partial' : 'unhealthy');
-  const statusText = isHealthy ? t('healthy') : (isPartial ? t('partial') : t('unhealthy'));
+  const statusClass = isHealthy ? 'healthy' : isPartial ? 'partial' : 'unhealthy';
+  const statusText = isHealthy ? t('healthy') : isPartial ? t('partial') : t('unhealthy');
 
   // Extract version from image (remove @sha256:... hash)
   const imageTag = svc.Image.split('@')[0].split(':').pop() || 'latest';
@@ -142,7 +142,7 @@ function updateServiceCard(card, svc) {
         card.appendChild(indicator);
       }
       // Disable buttons
-      card.querySelectorAll('.btn').forEach(btn => btn.disabled = true);
+      card.querySelectorAll('.btn').forEach((btn) => (btn.disabled = true));
     }
   } else {
     // Remove updating state if no longer updating
@@ -151,7 +151,7 @@ function updateServiceCard(card, svc) {
       const indicator = card.querySelector('.updating-indicator');
       if (indicator) indicator.remove();
       // Enable buttons
-      card.querySelectorAll('.btn').forEach(btn => btn.disabled = false);
+      card.querySelectorAll('.btn').forEach((btn) => (btn.disabled = false));
     }
   }
 }
@@ -162,8 +162,8 @@ function renderServiceCard(svc) {
   const [running, desired] = svc.Replicas.split('/');
   const isHealthy = running === desired;
   const isPartial = parseInt(running) > 0 && parseInt(running) < parseInt(desired);
-  const statusClass = isHealthy ? 'healthy' : (isPartial ? 'partial' : 'unhealthy');
-  const statusText = isHealthy ? t('healthy') : (isPartial ? t('partial') : t('unhealthy'));
+  const statusClass = isHealthy ? 'healthy' : isPartial ? 'partial' : 'unhealthy';
+  const statusText = isHealthy ? t('healthy') : isPartial ? t('partial') : t('unhealthy');
 
   // Extract version from image (remove @sha256:... hash)
   const imageTag = svc.Image.split('@')[0].split(':').pop() || 'latest';
@@ -264,7 +264,7 @@ function closeDialog(confirmed) {
 // Scale service
 async function scaleService(name) {
   // Get current replicas for this service
-  const currentService = services.find(s => s.Name === `gatrix_${name}`);
+  const currentService = services.find((s) => s.Name === `gatrix_${name}`);
   const currentReplicas = currentService ? currentService.Replicas.split('/')[1] : '1';
 
   const replicas = await showDialog(
@@ -284,7 +284,7 @@ async function scaleService(name) {
     const response = await fetch(`/api/services/${name}/scale`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ replicas: replicaCount })
+      body: JSON.stringify({ replicas: replicaCount }),
     });
     const data = await response.json();
     if (data.success) {
@@ -318,7 +318,7 @@ function startProgressPolling(targetService, targetReplicas) {
       const data = await response.json();
 
       if (data.success && data.services) {
-        const svc = data.services.find(s => s.Name === `gatrix_${targetService}`);
+        const svc = data.services.find((s) => s.Name === `gatrix_${targetService}`);
         if (svc) {
           const [running, desired] = svc.Replicas.split('/');
 
@@ -330,7 +330,10 @@ function startProgressPolling(targetService, targetReplicas) {
             clearInterval(pollingInterval);
             pollingInterval = null;
             setServiceScaling(targetService, false);
-            showToast('success', t('scalingComplete', { service: targetService, replicas: targetReplicas }));
+            showToast(
+              'success',
+              t('scalingComplete', { service: targetService, replicas: targetReplicas })
+            );
           }
         }
       }
@@ -363,13 +366,13 @@ function setServiceScaling(name, isScaling, targetReplicas = null) {
     }
     indicator.innerHTML = `<span class="updating-spinner"></span> ${t('scalingTo', { replicas: targetReplicas })}`;
     // Disable buttons
-    card.querySelectorAll('.btn').forEach(btn => btn.disabled = true);
+    card.querySelectorAll('.btn').forEach((btn) => (btn.disabled = true));
   } else {
     card.classList.remove('updating');
     const indicator = card.querySelector('.updating-indicator');
     if (indicator) indicator.remove();
     // Enable buttons
-    card.querySelectorAll('.btn').forEach(btn => btn.disabled = false);
+    card.querySelectorAll('.btn').forEach((btn) => (btn.disabled = false));
   }
 }
 
@@ -392,13 +395,13 @@ function setServiceUpdating(name, isUpdating, targetVersion = null, isRollback =
       : t('updatingTo', { version: targetVersion });
     indicator.innerHTML = `<span class="updating-spinner"></span> ${message}`;
     // Disable buttons
-    card.querySelectorAll('.btn').forEach(btn => btn.disabled = true);
+    card.querySelectorAll('.btn').forEach((btn) => (btn.disabled = true));
   } else {
     card.classList.remove('updating');
     const indicator = card.querySelector('.updating-indicator');
     if (indicator) indicator.remove();
     // Enable buttons
-    card.querySelectorAll('.btn').forEach(btn => btn.disabled = false);
+    card.querySelectorAll('.btn').forEach((btn) => (btn.disabled = false));
   }
 }
 
@@ -425,10 +428,13 @@ async function updateService(name) {
     const response = await fetch(`/api/services/${name}/update`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ version: selectedVersion, force: false })
+      body: JSON.stringify({ version: selectedVersion, force: false }),
     });
     const data = await response.json();
-    showToast(data.success ? 'success' : 'error', data.success ? t('operationSuccess') : data.error);
+    showToast(
+      data.success ? 'success' : 'error',
+      data.success ? t('operationSuccess') : data.error
+    );
     if (data.success) {
       // Keep updating state and poll for completion
       pollServiceUpdate(name);
@@ -469,10 +475,13 @@ async function rollbackService(name) {
     const response = await fetch(`/api/services/${name}/update`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ version: selectedVersion, force: true })
+      body: JSON.stringify({ version: selectedVersion, force: true }),
     });
     const data = await response.json();
-    showToast(data.success ? 'success' : 'error', data.success ? t('operationSuccess') : data.error);
+    showToast(
+      data.success ? 'success' : 'error',
+      data.success ? t('operationSuccess') : data.error
+    );
     if (data.success) {
       // Keep updating state and poll for completion
       pollServiceUpdate(name);
@@ -496,7 +505,7 @@ function pollServiceUpdate(name) {
       const response = await fetch('/api/services');
       const data = await response.json();
       if (data.success) {
-        const service = data.services.find(s => s.Name === `gatrix_${name}`);
+        const service = data.services.find((s) => s.Name === `gatrix_${name}`);
         if (service) {
           const [running, desired] = service.Replicas.split('/');
           // Check if update is complete (all replicas running)
@@ -536,17 +545,22 @@ function showVersionSelectDialog(title, message, versions, currentVersion, allow
     const list = document.getElementById('versionList');
 
     // Add new version input if allowed
-    const inputHtml = allowInput ? `
+    const inputHtml = allowInput
+      ? `
       <div class="version-input-wrapper">
         <input type="text" id="newVersionInput" class="version-input"
                placeholder="${t('enterNewVersion')}"
                oninput="onNewVersionInput(this)" />
       </div>
-    ` : '';
+    `
+      : '';
 
-    list.innerHTML = inputHtml + versions.map(v => {
-      const isCurrent = v === currentVersion;
-      return `
+    list.innerHTML =
+      inputHtml +
+      versions
+        .map((v) => {
+          const isCurrent = v === currentVersion;
+          return `
         <div class="version-item ${isCurrent ? 'current disabled' : ''}"
              ${isCurrent ? '' : `onclick="selectVersionItem(this, '${v}')"`}
              data-version="${v}">
@@ -554,7 +568,8 @@ function showVersionSelectDialog(title, message, versions, currentVersion, allow
           ${isCurrent ? `<span class="version-badge">${t('current')}</span>` : ''}
         </div>
       `;
-    }).join('');
+        })
+        .join('');
 
     // Disable confirm button initially
     document.getElementById('versionConfirmBtn').disabled = true;
@@ -565,7 +580,7 @@ function showVersionSelectDialog(title, message, versions, currentVersion, allow
 
 function selectVersionItem(element, version) {
   // Remove selected class from all items
-  document.querySelectorAll('.version-item').forEach(item => {
+  document.querySelectorAll('.version-item').forEach((item) => {
     item.classList.remove('selected');
   });
   // Clear new version input if exists
@@ -581,7 +596,7 @@ function selectVersionItem(element, version) {
 
 function onNewVersionInput(input) {
   // Deselect version items when typing new version
-  document.querySelectorAll('.version-item').forEach(item => {
+  document.querySelectorAll('.version-item').forEach((item) => {
     item.classList.remove('selected');
   });
   selectedVersionValue = input.value.trim();
@@ -623,7 +638,9 @@ async function viewTasks(name) {
       return;
     }
 
-    const tasksHtml = data.tasks.map(task => `
+    const tasksHtml = data.tasks
+      .map(
+        (task) => `
       <div style="padding: 10px; margin: 8px 0; background: var(--bg-tertiary); border-radius: 6px;">
         <strong>${task.Name || task.ID}</strong><br>
         <span style="color: var(--text-secondary);">
@@ -631,7 +648,9 @@ async function viewTasks(name) {
           ${t('node')}: ${task.Node || 'N/A'}
         </span>
       </div>
-    `).join('');
+    `
+      )
+      .join('');
 
     showModal(t('serviceDetails') + ': ' + name, tasksHtml || '<p>No tasks</p>');
   } catch (error) {
@@ -643,7 +662,7 @@ async function viewTasks(name) {
 const PRESETS = {
   minimal: { backend: 1, frontend: 1, 'event-lens': 1, 'chat-server': 1, edge: 1 },
   standard: { backend: 2, frontend: 2, 'event-lens': 1, 'chat-server': 1, edge: 2 },
-  high: { backend: 4, frontend: 4, 'event-lens': 2, 'chat-server': 1, edge: 8 }
+  high: { backend: 4, frontend: 4, 'event-lens': 2, 'chat-server': 1, edge: 8 },
 };
 
 // Apply preset
@@ -670,8 +689,10 @@ async function applyPreset(preset) {
 
     const response = await fetch(`/api/presets/${preset}`, { method: 'POST' });
     const data = await response.json();
-    showToast(data.success ? 'success' : 'error',
-      data.success ? t('presetApplied', { preset: t(preset) }) : data.error);
+    showToast(
+      data.success ? 'success' : 'error',
+      data.success ? t('presetApplied', { preset: t(preset) }) : data.error
+    );
     if (data.success) {
       // Start polling for each service
       Object.entries(presetConfig).forEach(([service, replicas]) => {
@@ -679,14 +700,14 @@ async function applyPreset(preset) {
       });
     } else {
       // Clear scaling state on error
-      Object.keys(presetConfig).forEach(service => {
+      Object.keys(presetConfig).forEach((service) => {
         setServiceScaling(service, false);
       });
     }
   } catch (error) {
     showToast('error', error.message);
     // Clear scaling state on error
-    Object.keys(presetConfig).forEach(service => {
+    Object.keys(presetConfig).forEach((service) => {
       setServiceScaling(service, false);
     });
   }
@@ -705,7 +726,7 @@ function startPresetPolling(targetService, targetReplicas) {
       const data = await response.json();
 
       if (data.success && data.services) {
-        const svc = data.services.find(s => s.Name === `gatrix_${targetService}`);
+        const svc = data.services.find((s) => s.Name === `gatrix_${targetService}`);
         if (svc) {
           const [running, desired] = svc.Replicas.split('/');
 
@@ -736,16 +757,25 @@ async function updateAllServices() {
     return;
   }
 
-  const appServices = ['backend', 'frontend', 'event-lens', 'event-lens-worker', 'chat-server', 'edge'];
+  const appServices = [
+    'backend',
+    'frontend',
+    'event-lens',
+    'event-lens-worker',
+    'chat-server',
+    'edge',
+  ];
 
   for (const svcName of appServices) {
     try {
       await fetch(`/api/services/${svcName}/update`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ version, force: false })
+        body: JSON.stringify({ version, force: false }),
       });
-    } catch (e) { /* continue */ }
+    } catch (e) {
+      /* continue */
+    }
   }
 
   showToast('success', t('allServicesUpdated'));
@@ -764,7 +794,7 @@ function updateLogServiceSelect() {
   const select = document.getElementById('logServiceSelect');
   const current = select.value;
   select.innerHTML = `<option value="">-- ${t('selectService')} --</option>`;
-  services.forEach(svc => {
+  services.forEach((svc) => {
     const svcName = svc.Name.replace('gatrix_', '');
     select.innerHTML += `<option value="${svcName}" ${current === svcName ? 'selected' : ''}>${svcName}</option>`;
   });
@@ -825,7 +855,7 @@ function subscribeToLogs(service, tail = true) {
 function appendLog(text) {
   const container = document.getElementById('logsContainer');
   const lines = text.split('\n').filter(Boolean);
-  lines.forEach(line => {
+  lines.forEach((line) => {
     const div = document.createElement('div');
     div.className = 'log-line';
     div.textContent = line;
@@ -857,8 +887,8 @@ function appendOpsLog(data) {
   const placeholder = container.querySelector('.log-placeholder');
   if (placeholder) placeholder.remove();
 
-  const lines = data.split('\n').filter(line => line.trim());
-  lines.forEach(line => {
+  const lines = data.split('\n').filter((line) => line.trim());
+  lines.forEach((line) => {
     const div = document.createElement('div');
     div.className = 'log-line ops-log-line';
 
