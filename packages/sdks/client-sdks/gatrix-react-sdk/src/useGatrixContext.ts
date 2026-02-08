@@ -55,6 +55,8 @@ const mockFeaturesClient = {
   stringVariation: () => '',
   numberVariation: () => 0,
   jsonVariation: () => ({}),
+  watchFlag: () => () => { },
+  watchFlagWithInitialState: () => () => { },
   getStats: () => ({}),
 } as unknown as FeaturesClient;
 
