@@ -57,7 +57,7 @@ const IdleRPGGame: React.FC<IdleRPGGameProps> = ({ onExit }) => {
 
     // Feature Flag Real-time Watcher (Demo: watchFlag)
     useEffect(() => {
-        const unwatchBoss = client.features.watchFlag('boss_mode', (isBossMode) => {
+        const unwatchBoss = client.features.watchFlag('idle-boss-mode', (isBossMode) => {
             addLog(`[WATCH] Boss Mode ${isBossMode ? 'ACTIVATED' : 'DEACTIVATED'}`);
             // Visual feedback for real-time change
             if (gameRef.current.enemy) {
@@ -68,7 +68,7 @@ const IdleRPGGame: React.FC<IdleRPGGameProps> = ({ onExit }) => {
             }
         });
 
-        const unwatchSpeed = client.features.watchFlag('game_speed', (speed) => {
+        const unwatchSpeed = client.features.watchFlag('idle-game-speed', (speed) => {
             addLog(`[WATCH] Game speed changed to x${speed}`);
         });
 
@@ -141,10 +141,10 @@ const IdleRPGGame: React.FC<IdleRPGGameProps> = ({ onExit }) => {
                 const delta = ticker.deltaTime;
 
                 // Read Feature Flags (Real-time)
-                const gameSpeed = client.features.getFlagValue('game_speed', 1);
-                const moveSpeedMult = client.features.getFlagValue('move_speed', 1);
-                const isAutoSkill = client.features.getFlagValue('auto_skill', false);
-                const bossModeFlag = client.features.getFlagValue('boss_mode', false);
+                const gameSpeed = client.features.getFlagValue('idle-game-speed', 1);
+                const moveSpeedMult = client.features.getFlagValue('idle-move-speed', 1);
+                const isAutoSkill = client.features.getFlagValue('idle-auto-skill', false);
+                const bossModeFlag = client.features.getFlagValue('idle-boss-mode', false);
 
                 const speed = gameSpeed * delta;
 
@@ -226,7 +226,7 @@ const IdleRPGGame: React.FC<IdleRPGGameProps> = ({ onExit }) => {
 
     const defeatEnemy = () => {
         const s = gameRef.current;
-        const expMult = client.features.getFlagValue('exp_booster', 1);
+        const expMult = client.features.getFlagValue('idle-exp-booster', 1);
         const gainExp = Math.floor(20 * expMult);
         const gainGold = stage * 10;
 
@@ -280,7 +280,7 @@ const IdleRPGGame: React.FC<IdleRPGGameProps> = ({ onExit }) => {
                     <div>
                         <h2 className="nes-text is-primary" style={{ margin: 0, fontSize: '20px' }}>GATRIX IDLE RPG</h2>
                         <p style={{ fontSize: '8px', color: '#adafbc', margin: '4px 0' }}>
-                            {client.features.getFlagValue('special_event_msg', 'Defend the pipeline!')}
+                            {client.features.getFlagValue('idle-special-event-msg', 'Defend the pipeline!')}
                         </p>
                     </div>
                     <div style={{ display: 'flex', gap: '20px' }}>
@@ -351,13 +351,13 @@ const IdleRPGGame: React.FC<IdleRPGGameProps> = ({ onExit }) => {
                 <div className="nes-container is-dark with-title" style={{ width: '300px', height: '100px' }}>
                     <p className="title">HOT-FLAGS</p>
                     <div style={{ fontSize: '7px', textAlign: 'left', lineHeight: '1.5' }}>
-                        <div>SPEED: x{client.features.getFlagValue('game_speed', 1)}</div>
-                        <div>BOOST: x{client.features.getFlagValue('exp_booster', 1)}</div>
-                        <div style={{ color: client.features.getFlagValue('auto_skill', false) ? '#92cc41' : '#888' }}>
-                            AUTO-SKILL: {client.features.getFlagValue('auto_skill', false) ? 'ENABLED' : 'DISABLED'}
+                        <div>SPEED: x{client.features.getFlagValue('idle-game-speed', 1)}</div>
+                        <div>BOOST: x{client.features.getFlagValue('idle-exp-booster', 1)}</div>
+                        <div style={{ color: client.features.getFlagValue('idle-auto-skill', false) ? '#92cc41' : '#888' }}>
+                            AUTO-SKILL: {client.features.getFlagValue('idle-auto-skill', false) ? 'ENABLED' : 'DISABLED'}
                         </div>
-                        <div style={{ color: client.features.getFlagValue('boss_mode', false) ? '#e76e55' : '#888' }}>
-                            BOSS-MODE: {client.features.getFlagValue('boss_mode', false) ? 'ON' : 'OFF'}
+                        <div style={{ color: client.features.getFlagValue('idle-boss-mode', false) ? '#e76e55' : '#888' }}>
+                            BOSS-MODE: {client.features.getFlagValue('idle-boss-mode', false) ? 'ON' : 'OFF'}
                         </div>
                     </div>
                 </div>
