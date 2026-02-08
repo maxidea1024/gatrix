@@ -1412,3 +1412,7 @@ body {
 .status-value.status-error {
   color: #e76e55;
 }
+
+.status-value.status-offline {
+  color: #888;
+}

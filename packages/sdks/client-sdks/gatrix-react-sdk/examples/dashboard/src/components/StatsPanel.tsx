@@ -288,8 +288,8 @@ function StatsPanel({
                                     </tr>
                                     <tr>
                                         <td className="stats-label">STATUS:</td>
-                                        <td className={`stats-value ${getStatusClass(stats?.sdkState || '')}`}>
-                                            {getStatusIcon(stats?.sdkState || '')} {stats?.sdkState || 'init'}
+                                        <td className={`stats-value ${client.features.isOfflineMode() ? 'status-offline' : getStatusClass(stats?.sdkState || '')}`}>
+                                            {client.features.isOfflineMode() ? '○ OFFLINE' : `${getStatusIcon(stats?.sdkState || '')} ${stats?.sdkState || 'init'}`}
                                         </td>
                                         <td className="stats-label">UP:</td>
                                         <td className="stats-value">{formatUptime(stats?.startTime || null)}</td>
