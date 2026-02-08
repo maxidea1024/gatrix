@@ -6,18 +6,18 @@ interface BootScreenProps {
 
 const BOOT_MESSAGES = [
   { text: 'GATRIX FEATURE FLAGS SYSTEM', delay: 0 },
-  { text: 'VERSION 1.0.0', delay: 400 },
-  { text: '', delay: 700 },
-  { text: 'INITIALIZING MEMORY... OK', delay: 1000 },
-  { text: 'CHECKING API CONNECTION... OK', delay: 1600 },
-  { text: 'LOADING SDK MODULES... OK', delay: 2200 },
-  { text: 'CONFIGURING FEATURE CLIENT...', delay: 2800 },
-  { text: 'PREPARING DASHBOARD... OK', delay: 3400 },
-  { text: '', delay: 4000 },
-  { text: 'SYSTEM READY!', delay: 4500 },
+  { text: 'VERSION 1.0.0', delay: 200 },
+  { text: '', delay: 350 },
+  { text: 'INITIALIZING MEMORY... OK', delay: 500 },
+  { text: 'CHECKING API CONNECTION... OK', delay: 800 },
+  { text: 'LOADING SDK MODULES... OK', delay: 1100 },
+  { text: 'CONFIGURING FEATURE CLIENT...', delay: 1400 },
+  { text: 'PREPARING DASHBOARD... OK', delay: 1700 },
+  { text: '', delay: 2000 },
+  { text: 'SYSTEM READY!', delay: 2200 },
 ];
 
-const MIN_BOOT_TIME = 6500; // Increased to allow 2s delay after 'SYSTEM READY!'
+const MIN_BOOT_TIME = 3000; // Reduced from 6500ms to 3000ms
 
 function BootScreen({ onComplete }: BootScreenProps) {
   const [visibleLines, setVisibleLines] = useState<number>(0);
@@ -40,7 +40,7 @@ function BootScreen({ onComplete }: BootScreenProps) {
         }
         return prev + 1;
       });
-    }, 65);
+    }, 30);
 
     // Complete after minimum boot time
     const completeTimeout = setTimeout(() => {
