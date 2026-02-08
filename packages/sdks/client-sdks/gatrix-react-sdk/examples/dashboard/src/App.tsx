@@ -5,7 +5,6 @@ import ConfigForm from './components/ConfigForm';
 import BootScreen from './components/BootScreen';
 import DisconnectScreen from './components/DisconnectScreen';
 import ConfirmDialog from './components/ConfirmDialog';
-import IdleRPGGame from './components/IdleRPGGame';
 import IdleDefenseGame from './components/IdleDefenseGame';
 import MatrixBackground from './components/MatrixBackground';
 import './styles.css';
@@ -27,7 +26,7 @@ function App() {
   const [bootComplete, setBootComplete] = useState(false);
   const [isDisconnecting, setIsDisconnecting] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
-  const [showGame, setShowGame] = useState<false | 'rpg' | 'defense'>(false);
+  const [showGame, setShowGame] = useState<false | 'defense'>(false);
 
   const handleConnect = useCallback((newConfig: GatrixClientConfig) => {
     localStorage.setItem('gatrix-dashboard-config', JSON.stringify(newConfig));
@@ -98,9 +97,7 @@ function App() {
             },
           }}
         >
-          {showGame === 'rpg' ? (
-            <IdleRPGGame onExit={() => setShowGame(false)} />
-          ) : showGame === 'defense' ? (
+          {showGame === 'defense' ? (
             <IdleDefenseGame onExit={() => setShowGame(false)} />
           ) : (
             <div className="dashboard-container">
@@ -110,13 +107,6 @@ function App() {
                   &nbsp;GATRIX FEATURE FLAGS
                 </h1>
                 <div style={{ display: 'flex', gap: '12px' }}>
-                  <button
-                    type="button"
-                    className="nes-btn is-primary"
-                    onClick={() => setShowGame('rpg')}
-                  >
-                    IDLE RPG
-                  </button>
                   <button
                     type="button"
                     className="nes-btn is-success"
