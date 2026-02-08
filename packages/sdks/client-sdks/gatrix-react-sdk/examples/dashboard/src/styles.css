@@ -229,6 +229,36 @@ body {
   box-shadow: 0 0 10px rgba(247, 213, 29, 0.4) !important;
 }
 
+@keyframes rumble-pop {
+  0% {
+    transform: scale(0.7) translate(0);
+  }
+
+  25% {
+    transform: scale(1.05) translate(-2px, 2px);
+  }
+
+  50% {
+    transform: scale(0.95) translate(2px, -1px);
+  }
+
+  75% {
+    transform: scale(1.02) translate(-1px, 2px);
+  }
+
+  100% {
+    transform: scale(1) translate(0);
+  }
+}
+
+.rumble-on-pop {
+  animation: rumble-pop 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.nes-btn.rumble-on-click:active {
+  animation: btn-rumble 0.1s infinite;
+}
+
 /* Center container for login */
 .center-container {
   min-height: 100vh;

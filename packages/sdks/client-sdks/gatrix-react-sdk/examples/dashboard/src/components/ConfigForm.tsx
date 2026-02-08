@@ -351,7 +351,7 @@ function ConfigForm({ onConnect }: ConfigFormProps) {
               </label>
             </div>
 
-            <button type="submit" className="nes-btn is-success" style={{ width: '100%' }}>
+            <button type="submit" className="nes-btn is-success rumble-on-click" style={{ width: '100%' }}>
               START GAME
             </button>
           </form>

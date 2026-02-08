@@ -32,7 +32,7 @@ function FlagDetailModal({ flag, onClose }: FlagDetailModalProps) {
     return (
         <div className="modal-overlay" onClick={onClose} style={{ zIndex: 5000 }}>
             <div
-                className={`modal-content flag-card-inner ${flag.enabled ? 'is-enabled' : 'is-disabled'}`}
+                className={`modal-content flag-card-inner rumble-on-pop ${flag.enabled ? 'is-enabled' : 'is-disabled'}`}
                 onClick={(e) => e.stopPropagation()}
                 style={{
                     maxWidth: '700px',

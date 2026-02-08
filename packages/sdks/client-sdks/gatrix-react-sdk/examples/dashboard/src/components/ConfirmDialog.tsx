@@ -8,7 +8,7 @@ interface ConfirmDialogProps {
 function ConfirmDialog({ title, message, onConfirm, onCancel }: ConfirmDialogProps) {
     return (
         <div className="confirm-overlay">
-            <div className="nes-container is-dark with-title confirm-dialog">
+            <div className="nes-container is-dark with-title confirm-dialog rumble-on-pop">
                 <p className="title" style={{ backgroundColor: '#000' }}>
                     {title}
                 </p>
