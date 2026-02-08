@@ -142,15 +142,12 @@ function FlagCard({
       >
         <div
           className={`flag-card-inner ${flag.enabled ? 'is-enabled' : 'is-disabled'}`}
-          style={{ padding: '8px 12px' }}
         >
-          <div className="flag-header" style={{ marginBottom: 0, borderBottom: 'none' }}>
+          <div className="flag-header">
             <span className="flag-name" style={{ fontSize: '10px' }}>
               <span className="status-dot"></span> {flag.name}
             </span>
-          </div>
-          <div style={{ marginTop: '4px' }}>
-            <span className="pixel-chip type-chip is-mini" style={{ fontSize: '6px' }}>
+            <span className="pixel-chip type-chip is-mini" style={{ fontSize: '6px', marginLeft: '8px' }}>
               {flag.variantType || 'none'}
             </span>
           </div>

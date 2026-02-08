@@ -975,10 +975,16 @@ body {
 
 .flag-list-item.is-enabled {
   border-left: 4px solid #92cc41;
+  background-color: rgba(46, 125, 50, 0.2);
 }
 
 .flag-list-item.is-disabled {
   border-left: 4px solid #e76e55;
+  background-color: rgba(198, 40, 40, 0.2);
+}
+
+.flag-list-item:hover {
+  background-color: rgba(255, 255, 255, 0.15) !important;
 }
 
 /* Custom Scrollbar specifically for the grid */
@@ -1106,9 +1112,24 @@ body {
   box-shadow: none !important;
 }
 
+.simple-mode .flag-card-inner.is-enabled {
+  background-color: #2e7d32 !important;
+}
+
+.simple-mode .flag-card-inner.is-disabled {
+  background-color: #c62828 !important;
+}
+
+.simple-mode .flag-card-inner {
+  height: auto !important;
+  padding: 4px 10px !important;
+  min-height: unset !important;
+  border-width: 2px !important;
+}
+
 .simple-mode .flag-name {
-  color: #000 !important;
-  text-shadow: none !important;
+  color: #fff !important;
+  text-shadow: 2px 2px 0px #000 !important;
   font-size: 10px;
 }
 
