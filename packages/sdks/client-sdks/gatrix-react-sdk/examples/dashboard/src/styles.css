@@ -871,6 +871,60 @@ body {
   scrollbar-gutter: stable;
 }
 
+.mode-simple .flags-grid {
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+/* List Mode Styles */
+.flags-display-container.mode-list {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.flag-list-header {
+  display: flex;
+  padding: 8px 12px;
+  background-color: #333;
+  border-bottom: 4px solid #000;
+  font-size: 8px;
+  color: #adafbc;
+  font-weight: bold;
+}
+
+.flag-list {
+  overflow-y: scroll;
+  flex: 1;
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.flag-list-item {
+  display: flex;
+  padding: 8px 12px;
+  border-bottom: 2px solid #333;
+  font-size: 9px;
+  align-items: center;
+  cursor: pointer;
+  transition: background-color 0.1s;
+}
+
+.flag-list-item:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.col-name { flex: 3; word-break: break-all; display: flex; align-items: center; }
+.col-status { flex: 1; text-align: center; }
+.col-version { flex: 0.5; text-align: center; }
+.col-changes { flex: 0.8; text-align: center; }
+.col-time { flex: 1.2; text-align: center; color: #adafbc; }
+.col-type { flex: 1; text-align: center; }
+
+.flag-list-item.is-enabled { border-left: 4px solid #92cc41; }
+.flag-list-item.is-disabled { border-left: 4px solid #e76e55; }
+
 /* Custom Scrollbar specifically for the grid */
 .flags-grid::-webkit-scrollbar {
   width: 12px;
@@ -1051,6 +1105,11 @@ body {
   font-size: 8px;
   color: #333;
   box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.1);
+}
+
+.pixel-chip.is-mini {
+  padding: 2px 4px;
+  font-size: 7px;
 }
 
 .type-chip {

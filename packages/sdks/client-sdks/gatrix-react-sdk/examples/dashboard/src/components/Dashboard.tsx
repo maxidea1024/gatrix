@@ -45,6 +45,7 @@ function Dashboard({ config }: DashboardProps) {
   const prevSdkStateRef = useRef<string | null>(null);
   const [context, setContext] = useState<Record<string, any>>({});
   const [isFetching, setIsFetching] = useState(false);
+  const [viewMode, setViewMode] = useState<'detailed' | 'simple' | 'list'>('detailed');
 
   useEffect(() => {
     const updateStats = () => {
@@ -181,6 +182,20 @@ function Dashboard({ config }: DashboardProps) {
                 SYNC FLAGS
               </button>
             )}
+
+            <div className="view-mode-selector nes-select is-dark" style={{ width: '200px' }}>
+              <select
+                id="view-mode-select"
+                value={viewMode}
+                onChange={(e) =>
+                  setViewMode(e.target.value as 'detailed' | 'simple' | 'list')
+                }
+              >
+                <option value="detailed">Detailed Card</option>
+                <option value="simple">Simple Card</option>
+                <option value="list">List View</option>
+              </select>
+            </div>
           </div>
 
           {isSearching ? (
@@ -198,16 +213,29 @@ function Dashboard({ config }: DashboardProps) {
               <p className="empty-text">NO FEATURE FLAGS FOUND</p>
             </div>
           ) : (
-            <div className="flags-grid">
-              {flags.map((flag) => (
-                <FlagCard
-                  key={flag.name}
-                  flag={flag}
-                  initialVersion={initialVersions.get(flag.name) ?? null}
-                  lastChangedTime={stats?.flagLastChangedTimes?.[flag.name] ?? null}
-                  onSelect={() => setSelectedFlag(flag)}
-                />
-              ))}
+            <div className={`flags-display-container mode-${viewMode}`}>
+              {viewMode === 'list' && (
+                <div className="flag-list-header">
+                  <div className="col-name">NAME</div>
+                  <div className="col-status">STATUS</div>
+                  <div className="col-version">VER</div>
+                  <div className="col-changes">CHG</div>
+                  <div className="col-time">LAST</div>
+                  <div className="col-type">TYPE</div>
+                </div>
+              )}
+              <div className={viewMode === 'list' ? 'flag-list' : 'flags-grid'}>
+                {flags.map((flag) => (
+                  <FlagCard
+                    key={flag.name}
+                    flag={flag}
+                    viewMode={viewMode}
+                    initialVersion={initialVersions.get(flag.name) ?? null}
+                    lastChangedTime={stats?.flagLastChangedTimes?.[flag.name] ?? null}
+                    onSelect={() => setSelectedFlag(flag)}
+                  />
+                ))}
+              </div>
             </div>
           )}
         </div>

@@ -3,6 +3,7 @@ import { useGatrixClient, type EvaluatedFlag } from '@gatrix/react-sdk';
 
 interface FlagCardProps {
   flag: EvaluatedFlag;
+  viewMode: 'detailed' | 'simple' | 'list';
   initialVersion: number | null;
   lastChangedTime: Date | null;
   onSelect: () => void;
@@ -24,7 +25,13 @@ function formatTimeAgo(date: Date | null): string {
   return 'just now';
 }
 
-function FlagCard({ flag, initialVersion, lastChangedTime, onSelect }: FlagCardProps) {
+function FlagCard({
+  flag,
+  viewMode,
+  initialVersion,
+  lastChangedTime,
+  onSelect,
+}: FlagCardProps) {
   const payload = flag.variant?.payload;
   const hasPayload = payload !== undefined && payload !== null;
   const isEmptyString = payload === '';
@@ -40,7 +47,10 @@ function FlagCard({ flag, initialVersion, lastChangedTime, onSelect }: FlagCardP
 
   // Detect flag changes and trigger rumble
   useEffect(() => {
-    if (prevVersionRef.current !== undefined && prevVersionRef.current !== flag.version) {
+    if (
+      prevVersionRef.current !== undefined &&
+      prevVersionRef.current !== flag.version
+    ) {
       setIsRumbling(true);
       const timeout = setTimeout(() => setIsRumbling(false), 500);
       return () => clearTimeout(timeout);
@@ -76,7 +86,69 @@ function FlagCard({ flag, initialVersion, lastChangedTime, onSelect }: FlagCardP
 
   // Calculate change count from initial version
   const changeCount =
-    initialVersion !== null ? Math.max(0, (flag.version || 0) - initialVersion) : 0;
+    initialVersion !== null
+      ? Math.max(0, (flag.version || 0) - initialVersion)
+      : 0;
+
+  if (viewMode === 'list') {
+    return (
+      <div
+        className={`flag-list-item ${isRumbling ? 'flag-card-rumble' : ''} ${flag.enabled ? 'is-enabled' : 'is-disabled'}`}
+        onClick={onSelect}
+      >
+        <div className="col-name">
+          <span className="status-dot"></span>
+          {flag.name}
+        </div>
+        <div className="col-status">
+          <span className={`badge is-small ${flag.enabled ? 'badge-success' : 'badge-error'}`}>
+            {flag.enabled ? 'ON' : 'OFF'}
+          </span>
+        </div>
+        <div className="col-version">{flag.version || 0}</div>
+        <div className="col-changes">
+          {changeCount > 0 ? (
+            <span className="has-changes">+{changeCount}</span>
+          ) : (
+            '-'
+          )}
+        </div>
+        <div className="col-time">{timeAgo}</div>
+        <div className="col-type">
+          <span className="pixel-chip type-chip is-mini">
+            {flag.variantType || 'none'}
+          </span>
+        </div>
+      </div>
+    );
+  }
+
+  if (viewMode === 'simple') {
+    return (
+      <div
+        className={`flag-card simple-mode ${isRumbling ? 'flag-card-rumble' : ''}`}
+        onClick={onSelect}
+        title={flag.name}
+      >
+        <div
+          className={`flag-card-inner ${flag.enabled ? 'is-enabled' : 'is-disabled'}`}
+        >
+          <div className="flag-header">
+            <span className="flag-name" style={{ fontSize: '10px' }}>
+              <span className="status-dot"></span> {flag.name}
+            </span>
+          </div>
+          <div style={{ marginTop: '4px' }}>
+            <span
+              className={`badge is-small ${flag.enabled ? 'badge-success' : 'badge-error'}`}
+            >
+              {flag.enabled ? 'ON' : 'OFF'}
+            </span>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -102,7 +174,9 @@ function FlagCard({ flag, initialVersion, lastChangedTime, onSelect }: FlagCardP
 
           <div className="flag-detail">
             <span className="flag-detail-label">Changes</span>
-            <span className={`flag-detail-value ${changeCount > 0 ? 'has-changes' : ''}`}>
+            <span
+              className={`flag-detail-value ${changeCount > 0 ? 'has-changes' : ''}`}
+            >
               {changeCount > 0 ? `+${changeCount}` : '-'}
             </span>
           </div>
@@ -122,7 +196,9 @@ function FlagCard({ flag, initialVersion, lastChangedTime, onSelect }: FlagCardP
           <div className="flag-detail">
             <span className="flag-detail-label">Variant</span>
             <span className="flag-detail-value">
-              <span className="pixel-chip variant-chip">{flag.variant?.name || '-'}</span>
+              <span className="pixel-chip variant-chip">
+                {flag.variant?.name || '-'}
+              </span>
             </span>
           </div>
 
