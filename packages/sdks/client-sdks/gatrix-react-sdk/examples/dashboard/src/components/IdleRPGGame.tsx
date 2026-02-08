@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as PIXI from 'pixi.js';
-import { useGatrixClient, useFlags, useGatrixContext } from '@gatrix/react-sdk';
+import { useGatrixClient, useGatrixContext } from '@gatrix/react-sdk';
 
 interface IdleRPGGameProps {
     onExit: () => void;
@@ -22,7 +22,6 @@ const IdleRPGGame: React.FC<IdleRPGGameProps> = ({ onExit }) => {
     const canvasRef = useRef<HTMLDivElement>(null);
     const client = useGatrixClient();
     const { syncFlags, canSyncFlags } = useGatrixContext();
-    const flags = useFlags(); // Reactively track flags (though we might read values directly for performance)
 
     // Game Local State
     const [gameState, setGameState] = useState<'playing' | 'loading' | 'stageComplete'>('playing');
@@ -316,6 +315,20 @@ const IdleRPGGame: React.FC<IdleRPGGameProps> = ({ onExit }) => {
                         <p style={{ color: COLORS.GOLD, margin: '2px 0' }}>GOLD: {gold}</p>
                         <p style={{ color: COLORS.EXP, margin: '2px 0' }}>LEVEL: {level}</p>
                         <p style={{ color: '#fff', margin: '2px 0' }}>EXP: {exp} / {level * 100}</p>
+                        <div style={{ marginTop: '10px' }}>
+                            <button
+                                type="button"
+                                className="nes-btn is-primary"
+                                style={{ fontSize: '10px', padding: '4px 8px' }}
+                                onClick={() => {
+                                    const damage = (level + 50);
+                                    gameRef.current.enemyHp -= damage;
+                                    addLog(`MANUAL SKILL: POWER STRIKE! -${damage} HP`);
+                                }}
+                            >
+                                USE SKILL
+                            </button>
+                        </div>
                     </div>
                 </div>
 
