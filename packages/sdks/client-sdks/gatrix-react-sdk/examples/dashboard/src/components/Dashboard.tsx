@@ -222,6 +222,8 @@ function Dashboard({ config }: DashboardProps) {
                   <div className="col-changes">CHG</div>
                   <div className="col-time">LAST</div>
                   <div className="col-type">TYPE</div>
+                  <div className="col-variant">VARIANT</div>
+                  <div className="col-payload">PAYLOAD</div>
                 </div>
               )}
               <div className={viewMode === 'list' ? 'flag-list' : 'flags-grid'}>

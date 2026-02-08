@@ -119,6 +119,16 @@ function FlagCard({
             {flag.variantType || 'none'}
           </span>
         </div>
+        <div className="col-variant">
+          <span className="pixel-chip variant-chip is-mini">
+            {flag.variant?.name || '-'}
+          </span>
+        </div>
+        <div className="col-payload">
+          <span className="payload-preview">
+            {hasPayload ? formatPayload(payload) : '-'}
+          </span>
+        </div>
       </div>
     );
   }
@@ -132,17 +142,16 @@ function FlagCard({
       >
         <div
           className={`flag-card-inner ${flag.enabled ? 'is-enabled' : 'is-disabled'}`}
+          style={{ padding: '8px 12px' }}
         >
-          <div className="flag-header">
+          <div className="flag-header" style={{ marginBottom: 0, borderBottom: 'none' }}>
             <span className="flag-name" style={{ fontSize: '10px' }}>
               <span className="status-dot"></span> {flag.name}
             </span>
           </div>
           <div style={{ marginTop: '4px' }}>
-            <span
-              className={`badge is-small ${flag.enabled ? 'badge-success' : 'badge-error'}`}
-            >
-              {flag.enabled ? 'ON' : 'OFF'}
+            <span className="pixel-chip type-chip is-mini" style={{ fontSize: '6px' }}>
+              {flag.variantType || 'none'}
             </span>
           </div>
         </div>

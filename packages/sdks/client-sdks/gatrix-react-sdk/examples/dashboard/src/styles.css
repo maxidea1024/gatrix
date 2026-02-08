@@ -95,14 +95,12 @@ body {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(146, 204, 65, 0.15),
-    rgba(146, 204, 65, 0.3),
-    rgba(146, 204, 65, 0.15),
-    transparent
-  );
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(146, 204, 65, 0.15),
+      rgba(146, 204, 65, 0.3),
+      rgba(146, 204, 65, 0.15),
+      transparent);
   pointer-events: none;
   z-index: 100;
 }
@@ -144,6 +142,7 @@ body {
 
 /* Animations */
 @keyframes pulse {
+
   0%,
   100% {
     transform: scale(1);
@@ -155,6 +154,7 @@ body {
 }
 
 @keyframes float {
+
   0%,
   100% {
     transform: translateY(0);
@@ -166,6 +166,7 @@ body {
 }
 
 @keyframes blink {
+
   0%,
   50% {
     opacity: 1;
@@ -178,6 +179,7 @@ body {
 }
 
 @keyframes shake {
+
   0%,
   100% {
     transform: translateX(0);
@@ -291,7 +293,7 @@ body {
   gap: 16px;
 }
 
-.form-row > * {
+.form-row>* {
   flex: 1;
 }
 
@@ -498,14 +500,12 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    to bottom,
-    transparent,
-    rgba(146, 204, 65, 0) 45%,
-    rgba(146, 204, 65, 0.9) 50%,
-    rgba(146, 204, 65, 0) 55%,
-    transparent
-  );
+  background: linear-gradient(to bottom,
+      transparent,
+      rgba(146, 204, 65, 0) 45%,
+      rgba(146, 204, 65, 0.9) 50%,
+      rgba(146, 204, 65, 0) 55%,
+      transparent);
   box-shadow: 0 0 15px rgba(146, 204, 65, 0.5);
   animation: mascot-scan-bar 0.8s ease-in-out;
   pointer-events: none;
@@ -581,6 +581,7 @@ body {
 }
 
 @keyframes talk-shake {
+
   0%,
   100% {
     transform: scale(0.6) translateY(0);
@@ -592,6 +593,7 @@ body {
 }
 
 @keyframes sad-sway {
+
   0%,
   100% {
     transform: scale(0.6) rotate(-3deg);
@@ -717,6 +719,7 @@ body {
 }
 
 @keyframes shake-slow {
+
   0%,
   100% {
     transform: translateX(0);
@@ -798,6 +801,7 @@ body {
 }
 
 @keyframes flicker {
+
   0%,
   100% {
     opacity: 1;
@@ -849,7 +853,7 @@ body {
   overflow: hidden;
 }
 
-.flags-section > .nes-container {
+.flags-section>.nes-container {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -872,7 +876,7 @@ body {
 }
 
 .mode-simple .flags-grid {
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 12px;
 }
 
@@ -915,15 +919,68 @@ body {
   background-color: rgba(255, 255, 255, 0.1);
 }
 
-.col-name { flex: 3; word-break: break-all; display: flex; align-items: center; }
-.col-status { flex: 1; text-align: center; }
-.col-version { flex: 0.5; text-align: center; }
-.col-changes { flex: 0.8; text-align: center; }
-.col-time { flex: 1.2; text-align: center; color: #adafbc; }
-.col-type { flex: 1; text-align: center; }
+.col-name {
+  flex: 1.5;
+  word-break: break-all;
+  display: flex;
+  align-items: center;
+}
 
-.flag-list-item.is-enabled { border-left: 4px solid #92cc41; }
-.flag-list-item.is-disabled { border-left: 4px solid #e76e55; }
+.col-status {
+  flex: 0.5;
+  text-align: left;
+}
+
+.col-version {
+  flex: 0.3;
+  text-align: left;
+}
+
+.col-changes {
+  flex: 0.4;
+  text-align: left;
+}
+
+.col-time {
+  flex: 0.8;
+  text-align: left;
+  color: #adafbc;
+}
+
+.col-type {
+  flex: 0.6;
+  text-align: left;
+}
+
+.col-variant {
+  flex: 0.8;
+  text-align: left;
+}
+
+.col-payload {
+  flex: 2;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 8px;
+  color: #92cc41;
+}
+
+.payload-preview {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.flag-list-item.is-enabled {
+  border-left: 4px solid #92cc41;
+}
+
+.flag-list-item.is-disabled {
+  border-left: 4px solid #e76e55;
+}
 
 /* Custom Scrollbar specifically for the grid */
 .flags-grid::-webkit-scrollbar {
@@ -1040,6 +1097,26 @@ body {
 .is-disabled .flag-header {
   background-color: #c62828;
   box-shadow: inset 0 3px 0 rgba(255, 255, 255, 0.3);
+}
+
+.simple-mode .flag-header {
+  padding: 0 !important;
+  margin: 0 !important;
+  background-color: transparent !important;
+  border-bottom: none !important;
+  box-shadow: none !important;
+}
+
+.simple-mode .flag-name {
+  color: #000 !important;
+  text-shadow: none !important;
+  font-size: 10px;
+}
+
+.simple-mode .status-dot {
+  width: 10px !important;
+  height: 10px !important;
+  margin-right: 6px !important;
 }
 
 .status-dot {
@@ -1181,7 +1258,7 @@ body {
   margin-top: 6px;
 }
 
-.flags-section .nes-container.with-title > .title {
+.flags-section .nes-container.with-title>.title {
   display: inline-block !important;
   width: auto !important;
   position: absolute !important;
@@ -1199,6 +1276,7 @@ body {
 }
 
 @keyframes talk {
+
   0%,
   100% {
     transform: scaleY(1);
@@ -1276,6 +1354,7 @@ body {
 }
 
 @keyframes search-swing {
+
   0%,
   100% {
     transform: translateX(0) rotate(0deg);
