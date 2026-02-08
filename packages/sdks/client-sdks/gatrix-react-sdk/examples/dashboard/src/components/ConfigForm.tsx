@@ -250,7 +250,7 @@ function ConfigForm({ onConnect }: ConfigFormProps) {
                   onChange={(e) => handleUseDevTokenChange(e.target.checked)}
                 />
                 <span className="checkbox-label">
-                  &nbsp;<i className="nes-icon trophy is-small"></i> USE DEV TOKEN (unsecured)
+                  USE DEV TOKEN (unsecured)
                 </span>
               </label>
             </div>
@@ -265,7 +265,7 @@ function ConfigForm({ onConnect }: ConfigFormProps) {
                   disabled={useDevToken}
                 />
                 <span className="checkbox-label" style={{ opacity: useDevToken ? 0.5 : 1 }}>
-                  &nbsp;<i className="nes-icon heart is-small"></i> REMEMBER LAST TOKEN
+                  REMEMBER LAST TOKEN
                 </span>
               </label>
             </div>
@@ -328,7 +328,7 @@ function ConfigForm({ onConnect }: ConfigFormProps) {
                   onChange={(e) => setOfflineMode(e.target.checked)}
                 />
                 <span className="checkbox-label">
-                  &nbsp;<i className="nes-icon is-small is-empty heart"></i>&nbsp;OFFLINE MODE
+                  OFFLINE MODE
                 </span>
               </label>
             </div>
@@ -342,14 +342,13 @@ function ConfigForm({ onConnect }: ConfigFormProps) {
                   onChange={(e) => setExplicitSyncMode(e.target.checked)}
                 />
                 <span className="checkbox-label">
-                  &nbsp;<i className="nes-icon is-small star"></i>&nbsp;EXPLICIT SYNC
+                  EXPLICIT SYNC
                 </span>
               </label>
             </div>
 
             <button type="submit" className="nes-btn is-success" style={{ width: '100%' }}>
-              <i className="nes-icon is-small star"></i>
-              &nbsp;START GAME
+              START GAME
             </button>
           </form>
         </div>
