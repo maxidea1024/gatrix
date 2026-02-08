@@ -121,6 +121,7 @@ export interface FeatureStrategy {
  * Contains only data fields required for runtime evaluation
  */
 export interface FeatureFlag {
+  id: string; // Unique identifier (ULID)
   name: string;
   isEnabled: boolean;
   impressionDataEnabled: boolean; // Whether to emit impression events
@@ -128,6 +129,7 @@ export interface FeatureFlag {
   variants: Variant[];
   variantType?: PayloadType; // Type of variant payload
   baselinePayload?: any; // Payload value when flag evaluates to false
+  version?: number; // Flag version (increments on update)
 }
 
 // ==================== Evaluation Result ====================
@@ -143,6 +145,7 @@ export type EvaluationReason =
   | 'error';
 
 export interface EvaluationResult {
+  id: string;
   flagName: string;
   enabled: boolean;
   variant: Variant;

@@ -1192,10 +1192,13 @@ async function performEvaluation(
       : [];
 
     // If no keys specified, evaluate ALL (matching backend behavior for client)
-    const keysToEvaluate =
+    let keysToEvaluate =
       evaluatedKeys.length > 0
         ? evaluatedKeys
         : sdk.featureFlag.getCached(environment).map((f) => f.name);
+
+    // Sort keys to ensure consistent iteration order
+    keysToEvaluate = [...keysToEvaluate].sort();
 
     for (const key of keysToEvaluate) {
       const result = sdk.featureFlag.evaluate(key, context, environment);
@@ -1242,16 +1245,20 @@ async function performEvaluation(
       }
 
       results[key] = {
+        id: result.id,
         name: key,
         enabled: result.enabled,
         variant,
         variantType: flagDef?.variantType || 'string',
-        version: 1, // Edge cache currently doesn't store version, default to 1
+        version: flagDef?.version || 1,
         ...(flagDef?.impressionDataEnabled && { impressionData: true }),
       };
     }
 
-    const flagsArray = Object.values(results);
+    // Sort flags by id (ULID) DESCENDING to ensure consistent ETag generation and newest-first response
+    // Fallback to empty string to prevent localeCompare crash if id is missing
+    const flagsArray = Object.values(results).sort((a, b) => (b.id || '').localeCompare(a.id || ''));
+
     const responseData = {
       success: true,
       data: {
@@ -1263,8 +1270,14 @@ async function performEvaluation(
       }
     };
 
-    // Generate ETag from flags data (hash of stringified flags with names and status)
-    const etagSource = flagsArray.map((f: any) => `${f.name}:${f.enabled}`).join('|');
+    // Generate ETag from flags data (hash of stringified flags with versions and variants)
+    // We include name, version, enabled state, and variant name for a robust hash
+    const etagSource = flagsArray
+      .map((f: any) => {
+        const variantPart = f.variant ? `${f.variant.name}:${f.variant.enabled}` : 'no-variant';
+        return `${f.name}:${f.version}:${f.enabled}:${variantPart}`;
+      })
+      .join('|');
     const etag = `"${crypto.createHash('md5').update(etagSource).digest('hex')}"`;
 
     // Check If-None-Match header

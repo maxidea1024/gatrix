@@ -69,6 +69,7 @@ app.use(
       'x-session-id',
       'x-gatrix-feature-context',
     ],
+    exposedHeaders: ['ETag'],
   })
 );
 

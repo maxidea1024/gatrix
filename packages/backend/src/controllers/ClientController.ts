@@ -644,6 +644,7 @@ export class ClientController {
         }
 
         results[dbFlag.flagName] = {
+          id: dbFlag.id,
           name: dbFlag.flagName,
           enabled: result.enabled,
           variant,
@@ -653,7 +654,7 @@ export class ClientController {
         };
       }
 
-      const flagsArray = Object.values(results);
+      const flagsArray = Object.values(results).sort((a, b) => (b.id || '').localeCompare(a.id || ''));
       const responseData = {
         success: true,
         data: {
@@ -665,8 +666,14 @@ export class ClientController {
         },
       };
 
-      // Generate ETag from flags data (hash of stringified flags with versions)
-      const etagSource = flagsArray.map((f: any) => `${f.name}:${f.version}:${f.enabled}`).join('|');
+      // Generate ETag from flags data (hash of stringified flags with versions and variants)
+      // We include name, version, enabled state, and variant name for consistency with Edge
+      const etagSource = flagsArray
+        .map((f: any) => {
+          const variantPart = f.variant ? `${f.variant.name}:${f.variant.enabled}` : 'no-variant';
+          return `${f.name}:${f.version}:${f.enabled}:${variantPart}`;
+        })
+        .join('|');
       const etag = `"${crypto.createHash('md5').update(etagSource).digest('hex')}"`;
 
 

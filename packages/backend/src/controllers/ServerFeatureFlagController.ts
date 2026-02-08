@@ -19,6 +19,7 @@ import { networkTrafficService } from '../services/NetworkTrafficService';
 
 // Type for minimal flag data needed for runtime evaluation
 interface EvaluationFlag {
+  id: string;
   name: string;
   isEnabled: boolean;
   impressionDataEnabled: boolean;
@@ -26,6 +27,7 @@ interface EvaluationFlag {
   variants: EvaluationVariant[];
   variantType?: string;
   baselinePayload?: any;
+  version?: number;
 }
 
 interface EvaluationStrategy {
@@ -68,7 +70,7 @@ export default class ServerFeatureFlagController {
 
       // Record network traffic (fire-and-forget)
       const appName = (req.headers['x-application-name'] as string) || 'unknown';
-      networkTrafficService.recordTraffic(environment, appName, 'features').catch(() => {});
+      networkTrafficService.recordTraffic(environment, appName, 'features').catch(() => { });
 
       // Get all enabled, non-archived flags for this environment
       const result = await FeatureFlagModel.findAll({
@@ -124,6 +126,7 @@ export default class ServerFeatureFlagController {
           );
 
           return {
+            id: flag.id,
             name: flag.flagName,
             isEnabled: flag.isEnabled,
             impressionDataEnabled: flag.impressionDataEnabled,
@@ -133,6 +136,7 @@ export default class ServerFeatureFlagController {
             baselinePayload:
               (flag as any).environments?.find((e: any) => e.environment === environment)
                 ?.baselinePayload ?? (flag as any).baselinePayload,
+            version: flag.version,
           };
         })
       );
@@ -190,6 +194,7 @@ export default class ServerFeatureFlagController {
       const variants = await FeatureVariantModel.findByFlagIdAndEnvironment(flag.id, environment);
 
       const evaluationFlag: EvaluationFlag = {
+        id: flag.id,
         name: flag.flagName,
         isEnabled: flag.isEnabled,
         impressionDataEnabled: flag.impressionDataEnabled,
@@ -215,6 +220,7 @@ export default class ServerFeatureFlagController {
         baselinePayload:
           flag.environments?.find((e) => e.environment === environment)?.baselinePayload ??
           flag.baselinePayload,
+        version: flag.version,
       };
 
       res.json({
@@ -237,7 +243,7 @@ export default class ServerFeatureFlagController {
       // Record network traffic (fire-and-forget)
       const appName = (req.headers['x-application-name'] as string) || 'unknown';
       const environment = req.params.env || 'global';
-      networkTrafficService.recordTraffic(environment, appName, 'segments').catch(() => {});
+      networkTrafficService.recordTraffic(environment, appName, 'segments').catch(() => { });
 
       const rawSegments = await FeatureSegmentModel.findAll();
 

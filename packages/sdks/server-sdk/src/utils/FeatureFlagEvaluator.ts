@@ -42,6 +42,7 @@ export class FeatureFlagEvaluator {
               };
 
             return {
+              id: flag.id || '',
               flagName: flag.name,
               enabled: true,
               reason: 'strategy_match',
@@ -65,6 +66,7 @@ export class FeatureFlagEvaluator {
           };
 
         return {
+          id: flag.id || '',
           flagName: flag.name,
           enabled: true,
           reason: 'default',
@@ -77,6 +79,7 @@ export class FeatureFlagEvaluator {
 
     // Default return path (disabled or no strategy matched)
     return {
+      id: flag.id || '',
       flagName: flag.name,
       enabled: false,
       reason,
