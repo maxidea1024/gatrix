@@ -163,7 +163,7 @@ function Dashboard({ config }: DashboardProps) {
               </button>
             )}
 
-            {isExplicitSync() && (
+            {isExplicitSync() && !client.features.isOfflineMode() && (
               <button
                 type="button"
                 className={`nes-btn is-warning ${!canSyncFlags() ? 'is-disabled' : ''}`}
