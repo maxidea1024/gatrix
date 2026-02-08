@@ -5,7 +5,7 @@ import ConfigForm from './components/ConfigForm';
 import BootScreen from './components/BootScreen';
 import DisconnectScreen from './components/DisconnectScreen';
 import ConfirmDialog from './components/ConfirmDialog';
-import ArkanoidGame from './components/ArkanoidGame';
+import IdleRPGGame from './components/IdleRPGGame';
 import MatrixBackground from './components/MatrixBackground';
 import './styles.css';
 
@@ -26,7 +26,7 @@ function App() {
   const [bootComplete, setBootComplete] = useState(false);
   const [isDisconnecting, setIsDisconnecting] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
-  const [showArkanoid, setShowArkanoid] = useState(false);
+  const [showGame, setShowGame] = useState(false);
 
   const handleConnect = useCallback((newConfig: GatrixClientConfig) => {
     localStorage.setItem('gatrix-dashboard-config', JSON.stringify(newConfig));
@@ -61,9 +61,9 @@ function App() {
     setIsDisconnecting(false);
   }, []);
 
-  // Show Arkanoid Fullscreen
-  if (showArkanoid) {
-    return <ArkanoidGame onExit={() => setShowArkanoid(false)} />;
+  // Show Game Fullscreen
+  if (showGame) {
+    return <IdleRPGGame onExit={() => setShowGame(false)} />;
   }
 
   // Show boot screen
@@ -109,7 +109,7 @@ function App() {
                 &nbsp;GATRIX FEATURE FLAGS
               </h1>
               <div style={{ display: 'flex', gap: '12px' }}>
-                <button type="button" className="nes-btn is-primary" onClick={() => setShowArkanoid(true)}>
+                <button type="button" className="nes-btn is-primary" onClick={() => setShowGame(true)}>
                   PLAY GAME
                 </button>
                 <button type="button" className="nes-btn is-error" onClick={handleDisconnectRequest}>
