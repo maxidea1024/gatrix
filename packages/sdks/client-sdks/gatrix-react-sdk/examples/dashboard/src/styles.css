@@ -1021,6 +1021,7 @@ body {
   position: relative;
   overflow: hidden;
   animation: card-flash 0.5s ease;
+  z-index: 50;
 }
 
 .flag-card-flash::after {
@@ -1042,13 +1043,29 @@ body {
 
 @keyframes card-flash {
   0% {
-    filter: brightness(2.5);
-    box-shadow: 0 0 30px #fff;
+    filter: brightness(2);
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
   }
 
   100% {
     filter: brightness(1);
     box-shadow: 4px 4px 0px rgba(0, 0, 0, 1);
+  }
+}
+
+.flag-list-item.flag-card-flash {
+  animation: list-flash 0.5s ease;
+  box-shadow: none !important;
+}
+
+@keyframes list-flash {
+  0% {
+    filter: brightness(1.8);
+    background-color: rgba(255, 255, 255, 0.3);
+  }
+
+  100% {
+    filter: brightness(1);
   }
 }
 
