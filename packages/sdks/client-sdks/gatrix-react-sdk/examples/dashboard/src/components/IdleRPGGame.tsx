@@ -266,7 +266,6 @@ const IdleRPGGame: React.FC<IdleRPGGameProps> = ({ onExit }) => {
     };
 
     const defeatEnemy = () => {
-        const s = gameRef.current;
         const expMult = client.features.numberVariation('idle-exp-booster', 1);
         const gainExp = Math.floor(20 * expMult);
         const gainGold = stage * 10;
