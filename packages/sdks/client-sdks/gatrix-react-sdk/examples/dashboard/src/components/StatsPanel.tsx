@@ -227,28 +227,10 @@ function StatsPanel({
                     {/* Left: Mascot with bubble */}
                     {renderMascotWithBubble()}
 
-                    {/* Mode Info */}
-                    <div className="stats-modes-compact">
-                        <div className={`mode-badge ${client.features.isOfflineMode() ? 'warning' : 'active'}`}>
-                            <span className="mode-label">NETWORK</span>
-                            <span className="mode-value">{client.features.isOfflineMode() ? 'OFFLINE' : 'ONLINE'}</span>
-                        </div>
-                        <div className={`mode-badge ${config.features?.refreshInterval === 0 && !client.features.isOfflineMode() ? 'warning' : 'active'}`}>
-                            <span className="mode-label">POLLING</span>
-                            <span className="mode-value">
-                                {client.features.isOfflineMode() ? 'OFF' : (config.features?.refreshInterval === 0 ? 'MANUAL' : `${config.features?.refreshInterval}s`)}
-                            </span>
-                        </div>
-                        <div className={`mode-badge ${config.features?.explicitSyncMode ? 'warning' : 'active'}`}>
-                            <span className="mode-label">SYNC</span>
-                            <span className="mode-value">{config.features?.explicitSyncMode && !client.features.isOfflineMode() ? 'EXPLICIT' : 'AUTO'}</span>
-                        </div>
-                    </div>
-
                     {/* Spacer - pushes everything else to the right */}
                     <div className="stats-spacer"></div>
 
-                    {/* Right Group: Flag Counts + Context + Stats */}
+                    {/* Right Group: Flag Counts + Context + Config + Stats */}
                     <div className="stats-right-group" style={{ display: 'flex', alignItems: 'center', gap: '0' }}>
                         {/* Flag Counts */}
                         <div className="stats-numbers-compact">
@@ -277,6 +259,26 @@ function StatsPanel({
                                     <span className="context-value">{String(value)}</span>
                                 </div>
                             ))}
+                        </div>
+
+                        <div className="stats-separator"></div>
+
+                        {/* Mode/Config Info */}
+                        <div className="stats-modes-compact">
+                            <div className={`mode-item ${client.features.isOfflineMode() ? 'is-warning' : 'is-success'}`}>
+                                <span className="mode-label">NETWORK</span>
+                                <span className="mode-value">{client.features.isOfflineMode() ? 'OFFLINE' : 'ONLINE'}</span>
+                            </div>
+                            <div className={`mode-item ${config.features?.refreshInterval === 0 && !client.features.isOfflineMode() ? 'is-warning' : 'is-info'}`}>
+                                <span className="mode-label">POLLING</span>
+                                <span className="mode-value">
+                                    {client.features.isOfflineMode() ? 'OFF' : (config.features?.refreshInterval === 0 ? 'MANUAL' : `${config.features?.refreshInterval}s`)}
+                                </span>
+                            </div>
+                            <div className={`mode-item ${config.features?.explicitSyncMode && !client.features.isOfflineMode() ? 'is-warning' : 'is-info'}`}>
+                                <span className="mode-label">SYNC</span>
+                                <span className="mode-value">{config.features?.explicitSyncMode && !client.features.isOfflineMode() ? 'EXPLICIT' : 'AUTO'}</span>
+                            </div>
                         </div>
 
                         {/* Vertical Separator */}

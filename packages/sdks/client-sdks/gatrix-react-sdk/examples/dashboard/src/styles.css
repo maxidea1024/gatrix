@@ -329,47 +329,58 @@ body {
 .stats-modes-compact {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
   flex-shrink: 0;
-  width: 110px;
+  width: 130px;
 }
 
-.mode-badge {
+.mode-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 4px 8px;
-  background-color: rgba(0, 0, 0, 0.3);
-  border: 1px solid #444;
-  font-size: 8px;
+  padding: 4px 6px;
+  background-color: #212529;
+  border: 2px solid #adafbc;
 }
 
-.mode-badge.active {
+.mode-item.is-success {
   border-left: 4px solid #92cc41;
-  background-color: rgba(146, 204, 65, 0.05);
 }
 
-.mode-badge.warning {
+.mode-item.is-warning {
   border-left: 4px solid #f7d51d;
-  background-color: rgba(247, 213, 29, 0.05);
+}
+
+.mode-item.is-info {
+  border-left: 4px solid #209cee;
 }
 
 .mode-label {
   color: #adafbc;
-  font-size: 7px;
+  font-size: 6px;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: pixelated;
 }
 
 .mode-value {
   color: #fff;
-  font-weight: bold;
+  font-size: 8px;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: pixelated;
 }
 
-.mode-badge.active .mode-value {
+.mode-item.is-success .mode-value {
   color: #92cc41;
 }
 
-.mode-badge.warning .mode-value {
+.mode-item.is-warning .mode-value {
   color: #f7d51d;
+}
+
+.mode-item.is-info .mode-value {
+  color: #209cee;
 }
 
 .stats-info {
