@@ -67,7 +67,6 @@ const IdleRPGGame: React.FC<IdleRPGGameProps> = ({ onExit }) => {
         enemyMaxHp: 100,
         isAttacking: false,
         attackTimer: 0,
-        moveTimer: 0,
         damageNumbers: [],
     });
 
@@ -207,8 +206,8 @@ const IdleRPGGame: React.FC<IdleRPGGameProps> = ({ onExit }) => {
         const s = gameRef.current;
 
         // Background scrolling (Parallax)
-        s.bgSky.tilePosition.x -= 0.2 * delta * gameSpeed;
-        s.bgTrees.tilePosition.x -= 1.0 * delta * gameSpeed;
+        s.bgSky.tilePosition.x -= 0.2 * delta * gameSpeed * moveSpeed;
+        s.bgTrees.tilePosition.x -= 1.0 * delta * gameSpeed * moveSpeed;
 
         // Enemy movement (entering world)
         if (s.enemy.x > 600) {
@@ -333,6 +332,7 @@ const IdleRPGGame: React.FC<IdleRPGGameProps> = ({ onExit }) => {
                     <div>STAGE: {stage}-{subStage}</div>
                     <div style={{ color: COLORS.GOLD }}>GOLD: {gold.toLocaleString()}</div>
                     <div>LEVEL: {level}</div>
+                    <div style={{ color: '#aaa' }}>KILLS: {kills}</div>
                 </div>
             </div>
 
@@ -363,7 +363,7 @@ const IdleRPGGame: React.FC<IdleRPGGameProps> = ({ onExit }) => {
                 <div style={{ position: 'absolute', top: '20px', right: '50px', width: '200px' }}>
                     <div style={{ fontSize: '8px', marginBottom: '4px', textAlign: 'right' }}>ENEMY MISSION</div>
                     <div style={{ height: '10px', background: COLORS.HP_BG, border: '2px solid #fff' }}>
-                        <div style={{ height: '100%', background: COLORS.HP, width: `${(gameRef.current.enemyHp / gameRef.current.enemyMaxHp) * 100}% transition: width 0.2s` }} />
+                        <div style={{ height: '100%', background: COLORS.HP, width: `${(gameRef.current.enemyHp / gameRef.current.enemyMaxHp) * 100}%`, transition: 'width 0.2s' }} />
                     </div>
                 </div>
 
