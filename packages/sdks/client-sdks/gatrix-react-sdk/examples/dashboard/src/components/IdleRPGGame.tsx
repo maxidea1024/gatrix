@@ -6,219 +6,155 @@ interface IdleRPGGameProps {
     onExit: () => void;
 }
 
-// Retro Color Palette
+// Assets from Sunny Land (Ansimuz) - CC0 License
+const ASSETS = {
+    HERO_IDLE: [
+        'https://raw.githubusercontent.com/ansimuz/sunny-land-assets/master/PNG/sprites/player/idle/player-idle-1.png',
+        'https://raw.githubusercontent.com/ansimuz/sunny-land-assets/master/PNG/sprites/player/idle/player-idle-2.png',
+        'https://raw.githubusercontent.com/ansimuz/sunny-land-assets/master/PNG/sprites/player/idle/player-idle-3.png',
+        'https://raw.githubusercontent.com/ansimuz/sunny-land-assets/master/PNG/sprites/player/idle/player-idle-4.png',
+    ],
+    HERO_RUN: [
+        'https://raw.githubusercontent.com/ansimuz/sunny-land-assets/master/PNG/sprites/player/run/player-run-1.png',
+        'https://raw.githubusercontent.com/ansimuz/sunny-land-assets/master/PNG/sprites/player/run/player-run-2.png',
+        'https://raw.githubusercontent.com/ansimuz/sunny-land-assets/master/PNG/sprites/player/run/player-run-3.png',
+        'https://raw.githubusercontent.com/ansimuz/sunny-land-assets/master/PNG/sprites/player/run/player-run-4.png',
+        'https://raw.githubusercontent.com/ansimuz/sunny-land-assets/master/PNG/sprites/player/run/player-run-5.png',
+        'https://raw.githubusercontent.com/ansimuz/sunny-land-assets/master/PNG/sprites/player/run/player-run-6.png',
+    ],
+    ENEMY_IDLE: [
+        'https://raw.githubusercontent.com/ansimuz/sunny-land-assets/master/PNG/sprites/opossum/opossum-1.png',
+        'https://raw.githubusercontent.com/ansimuz/sunny-land-assets/master/PNG/sprites/opossum/opossum-2.png',
+        'https://raw.githubusercontent.com/ansimuz/sunny-land-assets/master/PNG/sprites/opossum/opossum-3.png',
+        'https://raw.githubusercontent.com/ansimuz/sunny-land-assets/master/PNG/sprites/opossum/opossum-4.png',
+        'https://raw.githubusercontent.com/ansimuz/sunny-land-assets/master/PNG/sprites/opossum/opossum-5.png',
+        'https://raw.githubusercontent.com/ansimuz/sunny-land-assets/master/PNG/sprites/opossum/opossum-6.png',
+    ],
+    BG_SKY: 'https://raw.githubusercontent.com/ansimuz/sunny-land-assets/master/PNG/environment/layers/back.png',
+    BG_TREES: 'https://raw.githubusercontent.com/ansimuz/sunny-land-assets/master/PNG/environment/layers/middle.png',
+};
+
 const COLORS = {
-    BG: '#212529',
-    HERO: '#209cee',
-    ENEMY: '#e76e55',
-    BOSS: '#8c2020',
     GOLD: '#f7d51d',
     EXP: '#92cc41',
-    TEXT: '#ffffff',
-    BAR_BG: '#444444'
+    HP: '#ff4b2b',
+    HP_BG: '#444444',
 };
 
 const IdleRPGGame: React.FC<IdleRPGGameProps> = ({ onExit }) => {
     const canvasRef = useRef<HTMLDivElement>(null);
     const client = useGatrixClient();
-    const { syncFlags, canSyncFlags } = useGatrixContext();
+    const { syncFlags } = useGatrixContext();
 
     // Game Local State
-    const [gameState, setGameState] = useState<'playing' | 'loading' | 'stageComplete'>('playing');
+    const [gameState, setGameState] = useState<'playing' | 'loading' | 'stageClear'>('playing');
     const [level, setLevel] = useState(1);
     const [gold, setGold] = useState(0);
     const [exp, setExp] = useState(0);
+    const [kills, setKills] = useState(0);
     const [stage, setStage] = useState(1);
-    const [killCount, setKillCount] = useState(0);
-    const [log, setLog] = useState<string[]>(['Entering the Gatrix Realm...']);
+    const [subStage, setSubStage] = useState(1);
+    const [log, setLog] = useState<string[]>([]);
 
-    // Refs for game loop state (avoiding React render cycles for high frequency data)
-    const gameRef = useRef({
-        app: null as PIXI.Application | null,
-        hero: null as PIXI.Container | null,
-        enemy: null as PIXI.Container | null,
-        hpBar: null as PIXI.Graphics | null,
-        enemyHpBar: null as PIXI.Graphics | null,
-        playerHp: 100,
-        playerMaxHp: 100,
+    const gameRef = useRef<any>({
+        app: null,
+        hero: null,
+        enemy: null,
+        containers: {},
+        bgSky: null,
+        bgTrees: null,
         enemyHp: 100,
         enemyMaxHp: 100,
+        isAttacking: false,
         attackTimer: 0,
         moveTimer: 0,
-        stageProgress: 0,
-        isAttacking: false,
-        pendingSync: false,
-        lastFrameTime: 0
+        damageNumbers: [],
     });
 
     const addLog = (msg: string) => {
         setLog(prev => [msg, ...prev].slice(0, 5));
     };
 
-    // Feature Flag Real-time Watcher (Demo: watchFlag)
-    useEffect(() => {
-        const unwatchBoss = client.features.watchFlag('idle-boss-mode', (flag) => {
-            const isBossMode = flag.boolVariation(false);
-            addLog(`[WATCH] Boss Mode ${isBossMode ? 'ACTIVATED' : 'DEACTIVATED'}`);
-            // Visual feedback for real-time change
-            if (gameRef.current.enemy) {
-                gameRef.current.enemy.scale.set(1.5);
-                setTimeout(() => {
-                    if (gameRef.current.enemy) gameRef.current.enemy.scale.set(1);
-                }, 500);
-            }
-        });
-
-        const unwatchSpeed = client.features.watchFlag('idle-game-speed', (flag) => {
-            const speed = flag.numberVariation(1);
-            addLog(`[WATCH] Game speed changed to x${speed}`);
-        });
-
-        // Track sync availability for notification
-        const handleSyncAvailable = () => {
-            if (client.features.getConfig().explicitSyncMode) {
-                addLog('!! NEW VERSION DETECTED ON SERVER !!');
-            }
-        };
-        client.on('flags.can_sync', handleSyncAvailable);
-
-        return () => {
-            unwatchBoss();
-            unwatchSpeed();
-            client.off('flags.can_sync', handleSyncAvailable);
-        };
-    }, [client]);
-
-    // Initialize Pixi App
     useEffect(() => {
         const initPixi = async () => {
             const app = new PIXI.Application();
             await app.init({
                 width: 800,
-                height: 450,
-                backgroundColor: COLORS.BG,
+                height: 400,
+                backgroundColor: 0x212529,
                 antialias: false,
-                resolution: window.devicePixelRatio || 1
             });
 
-            if (canvasRef.current && !canvasRef.current.firstChild) {
+            if (canvasRef.current) {
                 canvasRef.current.appendChild(app.canvas);
             }
             gameRef.current.app = app;
 
-            // Character Container
-            const hero = new PIXI.Container();
-            const heroBody = new PIXI.Graphics().rect(-20, -40, 40, 40).fill(COLORS.HERO).stroke({ width: 2, color: 0xffffff });
-            const heroSword = new PIXI.Graphics().rect(15, -30, 30, 10).fill(0xcccccc);
-            hero.addChild(heroBody, heroSword);
+            // PIXI Settings
+            PIXI.AbstractRenderer.defaultOptions.resolution = 2; // pixel perfect scaling
+
+            // Create Layers
+            const bgLayer = new PIXI.Container();
+            const worldLayer = new PIXI.Container();
+            const uiLayer = new PIXI.Container();
+            app.stage.addChild(bgLayer, worldLayer, uiLayer);
+            gameRef.current.containers = { bgLayer, worldLayer, uiLayer };
+
+            // Load Assets
+            const textures = {
+                heroIdle: ASSETS.HERO_IDLE.map(url => PIXI.Texture.from(url)),
+                heroRun: ASSETS.HERO_RUN.map(url => PIXI.Texture.from(url)),
+                enemyIdle: ASSETS.ENEMY_IDLE.map(url => PIXI.Texture.from(url)),
+                bgSky: PIXI.Texture.from(ASSETS.BG_SKY),
+                bgTrees: PIXI.Texture.from(ASSETS.BG_TREES),
+            };
+
+            // Setup Background
+            const bgSky = new PIXI.TilingSprite({
+                texture: textures.bgSky,
+                width: 800,
+                height: 480,
+            });
+            bgSky.scale.set(1.5);
+            bgLayer.addChild(bgSky);
+            gameRef.current.bgSky = bgSky;
+
+            const bgTrees = new PIXI.TilingSprite({
+                texture: textures.bgTrees,
+                width: 800,
+                height: 480,
+            });
+            bgTrees.scale.set(1.5);
+            bgTrees.y = 100;
+            bgLayer.addChild(bgTrees);
+            gameRef.current.bgTrees = bgTrees;
+
+            // Setup Hero
+            const hero = new PIXI.AnimatedSprite(textures.heroIdle);
+            hero.animationSpeed = 0.1;
+            hero.play();
+            hero.scale.set(3);
+            hero.anchor.set(0.5, 1);
             hero.x = 200;
-            hero.y = 300;
-            app.stage.addChild(hero);
+            hero.y = 350;
+            worldLayer.addChild(hero);
             gameRef.current.hero = hero;
 
-            // Enemy Container
-            const enemy = new PIXI.Container();
-            const enemyBody = new PIXI.Graphics().rect(-25, -50, 50, 50).fill(COLORS.ENEMY).stroke({ width: 2, color: 0xffffff });
-            enemy.addChild(enemyBody);
-            enemy.x = 600;
-            enemy.y = 300;
-            app.stage.addChild(enemy);
-            gameRef.current.enemy = enemy;
-
-            // HP Bars
-            const hpBar = new PIXI.Graphics();
-            app.stage.addChild(hpBar);
-            gameRef.current.hpBar = hpBar;
-
-            const enemyHpBar = new PIXI.Graphics();
-            app.stage.addChild(enemyHpBar);
-            gameRef.current.enemyHpBar = enemyHpBar;
-
-            // Simple Shaders/Effects for "WebGL" feel (Particles)
-            const particles = new PIXI.Container();
-            app.stage.addChild(particles);
+            // Setup Enemy
+            spawnEnemy(textures);
 
             // Game Loop
             app.ticker.add((ticker) => {
                 const delta = ticker.deltaTime;
 
-                // Read Feature Flags (Real-time)
+                // Flags
                 const gameSpeed = client.features.numberVariation('idle-game-speed', 1);
-                const moveSpeedMult = client.features.numberVariation('idle-move-speed', 1);
+                const moveSpeed = client.features.numberVariation('idle-move-speed', 1);
                 const isAutoSkill = client.features.boolVariation('idle-auto-skill', false);
-                const bossModeFlag = client.features.boolVariation('idle-boss-mode', false);
+                const bossMode = client.features.boolVariation('idle-boss-mode', false);
 
-                const speed = gameSpeed * delta;
-
-                updateGame(speed, moveSpeedMult, isAutoSkill, bossModeFlag);
+                updateGame(delta, gameSpeed, moveSpeed, isAutoSkill, bossMode);
             });
-        };
-
-        const updateGame = (speed: number, moveMult: number, autoSkill: boolean, bossMode: boolean) => {
-            const s = gameRef.current;
-            if (!s.hero || !s.enemy || gameState !== 'playing') return;
-
-            // Floating effect
-            s.hero.y = 300 + Math.sin(Date.now() / 200) * 5;
-            s.enemy.y = 300 + Math.cos(Date.now() / 200) * 5;
-
-            // Apply boss mode effects
-            const targetScale = bossMode ? 1.5 : 1;
-            s.enemy.scale.x = targetScale;
-            s.enemy.scale.y = targetScale;
-
-            // Movement logic (simulated idle "approaching")
-            if (!s.isAttacking) {
-                s.moveTimer += 0.05 * speed * moveMult;
-                if (s.moveTimer > 10) {
-                    s.isAttacking = true;
-                    s.moveTimer = 0;
-                }
-            } else {
-                // Battle Simulation
-                s.attackTimer += 0.1 * speed;
-                if (s.attackTimer > 5) {
-                    s.attackTimer = 0;
-
-                    // Hit Enemy
-                    const crit = autoSkill && Math.random() > 0.7;
-                    const damage = (10 + level) * (crit ? 3 : 1);
-                    s.enemyHp -= damage;
-
-                    // Rumble/Hit Effect
-                    s.enemy.x += 10;
-                    setTimeout(() => { if (s.enemy) s.enemy.x -= 10; }, 50);
-
-                    if (crit) addLog('CRITICAL STRIKE! (Auto Skill Active)');
-
-                    if (s.enemyHp <= 0) {
-                        defeatEnemy();
-                    } else {
-                        // Enemy counter attack
-                        s.playerHp -= 5;
-                        s.hero.x -= 5;
-                        setTimeout(() => { if (s.hero) s.hero.x += 5; }, 50);
-                    }
-
-                    s.isAttacking = false;
-                }
-            }
-
-            // Draw HP Bars
-            renderHpBars();
-        };
-
-        const renderHpBars = () => {
-            const s = gameRef.current;
-            if (!s.hpBar || !s.enemyHpBar) return;
-
-            s.hpBar.clear();
-            s.hpBar.rect(150, 240, 100, 8).fill(COLORS.BAR_BG);
-            s.hpBar.rect(150, 240, (s.playerHp / s.playerMaxHp) * 100, 8).fill(COLORS.EXP);
-
-            s.enemyHpBar.clear();
-            s.enemyHpBar.rect(550, 230, 100, 10).fill(COLORS.BAR_BG);
-            s.enemyHpBar.rect(550, 230, (s.enemyHp / s.enemyMaxHp) * 100, 10).fill(COLORS.ENEMY);
         };
 
         initPixi();
@@ -226,10 +162,110 @@ const IdleRPGGame: React.FC<IdleRPGGameProps> = ({ onExit }) => {
         return () => {
             if (gameRef.current.app) {
                 gameRef.current.app.destroy(true, { children: true, texture: true });
-                gameRef.current.app = null;
             }
         };
-    }, [gameState, level]); // Re-init core on major state changes if needed, or keep loop external
+    }, []);
+
+    const spawnEnemy = (textures?: any) => {
+        const s = gameRef.current;
+        if (!textures) {
+            textures = {
+                enemyIdle: ASSETS.ENEMY_IDLE.map(url => PIXI.Texture.from(url)),
+            };
+        }
+
+        if (s.enemy) s.containers.worldLayer.removeChild(s.enemy);
+
+        const enemy = new PIXI.AnimatedSprite(textures.enemyIdle);
+        enemy.animationSpeed = 0.1;
+        enemy.play();
+        enemy.scale.set(3);
+        enemy.scale.x *= -1; // Face left
+        enemy.anchor.set(0.5, 1);
+        enemy.x = 1000; // Start off-screen
+        enemy.y = 350;
+
+        s.containers.worldLayer.addChild(enemy);
+        s.enemy = enemy;
+
+        const bossMode = client.features.boolVariation('idle-boss-mode', false);
+        const hpBase = stage * 100;
+        s.enemyMaxHp = bossMode ? hpBase * 5 : hpBase;
+        s.enemyHp = s.enemyMaxHp;
+
+        if (bossMode) {
+            enemy.tint = 0xff0000;
+            enemy.scale.set(4.5);
+            enemy.scale.x *= -1;
+        } else {
+            enemy.tint = 0xffffff;
+        }
+    };
+
+    const updateGame = (delta: number, gameSpeed: number, moveSpeed: number, isAuto: boolean, isBoss: boolean) => {
+        if (gameState !== 'playing') return;
+        const s = gameRef.current;
+
+        // Background scrolling (Parallax)
+        s.bgSky.tilePosition.x -= 0.2 * delta * gameSpeed;
+        s.bgTrees.tilePosition.x -= 1.0 * delta * gameSpeed;
+
+        // Enemy movement (entering world)
+        if (s.enemy.x > 600) {
+            s.enemy.x -= 5 * delta * gameSpeed;
+        }
+
+        // Combat logic
+        s.attackTimer += 0.05 * delta * gameSpeed;
+        if (s.attackTimer > 2) {
+            s.attackTimer = 0;
+            const damage = (10 + level * 2);
+            dealDamage(damage);
+
+            // Auto skill trigger
+            if (isAuto && Math.random() > 0.8) {
+                dealDamage(damage * 3, true);
+            }
+        }
+
+        // Update damage numbers
+        s.damageNumbers.forEach((txt: PIXI.Text, index: number) => {
+            txt.y -= 2 * delta;
+            txt.alpha -= 0.02 * delta;
+            if (txt.alpha <= 0) {
+                s.containers.worldLayer.removeChild(txt);
+                s.damageNumbers.splice(index, 1);
+            }
+        });
+    };
+
+    const dealDamage = (amount: number, isSkill = false) => {
+        const s = gameRef.current;
+        s.enemyHp -= amount;
+
+        // Damage Number
+        const txt = new PIXI.Text({
+            text: isSkill ? `!! ${amount} !!` : `${amount}`,
+            style: {
+                fontFamily: '"Press Start 2P", cursive',
+                fontSize: isSkill ? 24 : 16,
+                fill: isSkill ? 0xffff00 : 0xffffff,
+                stroke: { color: 0x000000, width: 4 },
+            }
+        });
+        txt.x = s.enemy.x + (Math.random() * 40 - 20);
+        txt.y = s.enemy.y - 100;
+        s.containers.worldLayer.addChild(txt);
+        s.damageNumbers.push(txt);
+
+        // Shake effect
+        s.enemy.x += 5;
+        setTimeout(() => s.enemy.x -= 5, 50);
+
+        if (s.enemyHp <= 0) {
+            defeatEnemy();
+        }
+    };
 
     const defeatEnemy = () => {
         const s = gameRef.current;
@@ -237,140 +273,139 @@ const IdleRPGGame: React.FC<IdleRPGGameProps> = ({ onExit }) => {
         const gainExp = Math.floor(20 * expMult);
         const gainGold = stage * 10;
 
-        setExp(prev => prev + gainExp);
+        setExp(prev => {
+            const next = prev + gainExp;
+            if (next >= level * 100) {
+                setLevel(l => l + 1);
+                addLog('LEVEL UP!');
+                return next - level * 100;
+            }
+            return next;
+        });
         setGold(prev => prev + gainGold);
-        setKillCount(prev => {
+        setKills(prev => {
             const next = prev + 1;
-            if (next >= 5) {
-                startTransition();
-                return 0;
+            if (next % 5 === 0) {
+                handleStageComplete();
             }
             return next;
         });
 
-        addLog(`Victory! +${gainExp} EXP, +${gainGold} GOLD`);
-        s.enemyHp = s.enemyMaxHp;
-        s.playerHp = Math.min(s.playerMaxHp, s.playerHp + 10);
+        addLog(`Defeated Opossum! +${gainExp} EXP, +${gainGold} Gold`);
+        spawnEnemy();
     };
 
-    const startTransition = () => {
-        setGameState('loading');
-        addLog('Moving to next area...');
-
-        // Demo: Explicit Sync during transition
+    const handleStageComplete = () => {
+        setGameState('stageClear');
         setTimeout(() => {
-            if (canSyncFlags()) {
-                syncFlags();
-                addLog('!! System Patch Applied (Flags Synced) !!');
-            }
-            setStage(prev => prev + 1);
+            setSubStage(prev => {
+                const next = prev + 1;
+                if (next > 3) {
+                    setStage(s => s + 1);
+                    return 1;
+                }
+                return next;
+            });
             setGameState('playing');
-            addLog(`Welcome to Floor ${stage + 1}`);
+        }, 1500);
+    };
+
+    const useSkill = () => {
+        if (gameState !== 'playing') return;
+        dealDamage(level * 10 + 100, true);
+        addLog('MANUAL SKILL: POWER BASH!');
+    };
+
+    const startStageTransition = async () => {
+        setGameState('loading');
+        await syncFlags(true);
+        setTimeout(() => {
+            setGameState('playing');
         }, 2000);
     };
 
-    // Level up check
-    useEffect(() => {
-        if (exp >= level * 100) {
-            setExp(0);
-            setLevel(prev => prev + 1);
-            gameRef.current.playerMaxHp += 20;
-            gameRef.current.playerHp = gameRef.current.playerMaxHp;
-            addLog(`LEVEL UP! REACHED Lv.${level + 1}`);
-        }
-    }, [exp, level]);
-
     return (
-        <div className="arkanoid-fullscreen">
-            <div className="game-header" style={{ padding: '10px 40px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-                    <div>
-                        <h2 className="nes-text is-primary" style={{ margin: 0, fontSize: '20px' }}>GATRIX IDLE RPG</h2>
-                        <p style={{ fontSize: '8px', color: '#adafbc', margin: '4px 0' }}>
-                            {client.features.stringVariation('idle-special-event-msg', 'Defend the pipeline!')}
-                        </p>
-                    </div>
-                    <div style={{ display: 'flex', gap: '20px' }}>
-                        <div className="nes-badge">
-                            <span className="is-success">STAGE {stage} ({killCount}/5)</span>
-                        </div>
-                        <button type="button" className="nes-btn is-error" onClick={onExit} style={{ fontSize: '10px' }}>EXIT</button>
-                    </div>
+        <div className="game-screen" style={{ background: '#000', height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+            {/* Header / Stats */}
+            <div className="nes-container is-dark with-title" style={{ width: '800px', marginBottom: '10px', display: 'flex', justifyContent: 'space-between', padding: '10px 20px' }}>
+                <p className="title">GATRIX ADVANTURE (IDLE)</p>
+                <div style={{ display: 'flex', gap: '30px', fontSize: '10px' }}>
+                    <div>STAGE: {stage}-{subStage}</div>
+                    <div style={{ color: COLORS.GOLD }}>GOLD: {gold.toLocaleString()}</div>
+                    <div>LEVEL: {level}</div>
                 </div>
             </div>
 
-            <div className="game-canvas-container" style={{ position: 'relative', border: '4px solid #fff' }}>
+            <div className="game-canvas-container" style={{ position: 'relative', border: '4px solid #fff', width: '800px', height: '400px', overflow: 'hidden' }}>
                 <div ref={canvasRef} />
 
+                {/* Overlays */}
                 {gameState === 'loading' && (
-                    <div className="game-over-overlay" style={{ background: 'rgba(0,0,0,0.85)' }}>
+                    <div className="game-over-overlay" style={{ background: 'rgba(0,0,0,0.85)', position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10 }}>
                         <div className="nes-container is-dark with-title" style={{ width: '400px' }}>
                             <p className="title">PATCHING SYSTEM</p>
                             <div style={{ textAlign: 'center' }}>
                                 <i className="nes-icon is-large star animate"></i>
-                                <p style={{ marginTop: '20px', fontSize: '12px' }}>SYNCHRONIZING FLAGS...</p>
+                                <p style={{ marginTop: '20px', fontSize: '12px' }}>LOADING NEW WORLD CONFIG...</p>
                                 <progress className="nes-progress is-success" max={100}></progress>
                             </div>
                         </div>
                     </div>
                 )}
 
-                {/* HUD Overlay */}
-                <div style={{ position: 'absolute', top: '10px', left: '10px', pointerEvents: 'none' }}>
-                    <div className="nes-container is-dark" style={{ padding: '10px', fontSize: '10px' }}>
-                        <p style={{ color: COLORS.GOLD, margin: '2px 0' }}>GOLD: {gold}</p>
-                        <p style={{ color: COLORS.EXP, margin: '2px 0' }}>LEVEL: {level}</p>
-                        <p style={{ color: '#fff', margin: '2px 0' }}>EXP: {exp} / {level * 100}</p>
-                        <div style={{ marginTop: '10px' }}>
-                            <button
-                                type="button"
-                                className="nes-btn is-primary"
-                                style={{ fontSize: '10px', padding: '4px 8px' }}
-                                onClick={() => {
-                                    const damage = (level + 50);
-                                    gameRef.current.enemyHp -= damage;
-                                    addLog(`MANUAL SKILL: POWER STRIKE! -${damage} HP`);
-                                }}
-                            >
-                                USE SKILL
-                            </button>
-                        </div>
+                {gameState === 'stageClear' && (
+                    <div className="game-over-overlay" style={{ background: 'rgba(0,0,0,0.5)', position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 5 }}>
+                        <h1 className="nes-text is-warning" style={{ fontSize: '40px', textAlign: 'center' }}>STAGE CLEAR!</h1>
+                    </div>
+                )}
+
+                {/* Enemy HP Bar */}
+                <div style={{ position: 'absolute', top: '20px', right: '50px', width: '200px' }}>
+                    <div style={{ fontSize: '8px', marginBottom: '4px', textAlign: 'right' }}>ENEMY MISSION</div>
+                    <div style={{ height: '10px', background: COLORS.HP_BG, border: '2px solid #fff' }}>
+                        <div style={{ height: '100%', background: COLORS.HP, width: `${(gameRef.current.enemyHp / gameRef.current.enemyMaxHp) * 100}% transition: width 0.2s` }} />
                     </div>
                 </div>
 
-                {/* Notification for Explicit Sync */}
-                {canSyncFlags() && gameState === 'playing' && (
-                    <div style={{ position: 'absolute', bottom: '100px', width: '100%', textAlign: 'center', pointerEvents: 'none' }}>
-                        <div className="nes-balloon from-right is-dark rumble-on-pop" style={{ display: 'inline-block', fontSize: '8px' }}>
-                            <span className="nes-text is-warning">NEW UPDATE DETECTED! STAGE END TO APPLY.</span>
-                        </div>
+                {/* EXP Bar (Bottom) */}
+                <div style={{ position: 'absolute', bottom: '0', left: '0', width: '100%', height: '6px', background: '#333' }}>
+                    <div style={{ height: '100%', background: COLORS.EXP, width: `${exp}%`, transition: 'width 0.3s' }} />
+                </div>
+            </div>
+
+            {/* Bottom Controls / Logs */}
+            <div style={{ display: 'flex', gap: '10px', width: '800px', marginTop: '10px', height: '120px' }}>
+                <div className="nes-container is-dark with-title" style={{ flex: 1 }}>
+                    <p className="title">SYSTEM LOG</p>
+                    <div style={{ fontSize: '9px', textAlign: 'left' }}>
+                        {log.map((m, i) => <div key={i} style={{ opacity: 1 - (i * 0.2) }}>{m}</div>)}
+                    </div>
+                </div>
+
+                <div className="nes-container is-dark with-title" style={{ width: '300px' }}>
+                    <p className="title">SKILLS</p>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                        <button className="nes-btn is-primary is-small" onClick={useSkill}>POWER BASH</button>
+                        <button className="nes-btn is-error is-small" onClick={onExit}>EXIT GAME</button>
+                    </div>
+                </div>
+
+                {/* Explicit Sync Demo Button */}
+                {client.features.canSyncFlags() && (
+                    <div style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 100 }}>
+                        <button className="nes-btn is-warning rumble-on-pop" onClick={startStageTransition}>
+                            WORLD UPDATE AVAILABLE! (SYNC NOW)
+                        </button>
                     </div>
                 )}
             </div>
 
-            <div className="game-footer" style={{ padding: '10px 40px', display: 'flex', gap: '20px' }}>
-                <div className="nes-container is-dark with-title" style={{ flex: 1, height: '100px' }}>
-                    <p className="title">BATTLE LOG</p>
-                    <div style={{ fontSize: '8px', textAlign: 'left' }}>
-                        {log.map((m, i) => <div key={i} style={{ opacity: 1 - (i * 0.2), padding: '2px 0' }}>{`> ${m}`}</div>)}
-                    </div>
-                </div>
-                <div className="nes-container is-dark with-title" style={{ width: '300px', height: '100px' }}>
-                    <p className="title">HOT-FLAGS</p>
-                    <div style={{ fontSize: '7px', textAlign: 'left', lineHeight: '1.5' }}>
-                        <div>SPEED: x{client.features.numberVariation('idle-game-speed', 1)}</div>
-                        <div>BOOST: x{client.features.numberVariation('idle-exp-booster', 1)}</div>
-                        <div style={{ color: client.features.boolVariation('idle-auto-skill', false) ? '#92cc41' : '#888' }}>
-                            AUTO-SKILL: {client.features.boolVariation('idle-auto-skill', false) ? 'ENABLED' : 'DISABLED'}
-                        </div>
-                        <div style={{ color: client.features.boolVariation('idle-boss-mode', false) ? '#e76e55' : '#888' }}>
-                            BOSS-MODE: {client.features.boolVariation('idle-boss-mode', false) ? 'ON' : 'OFF'}
-                        </div>
-                    </div>
-                </div>
+            {/* Legend / Info */}
+            <div style={{ marginTop: '10px', fontSize: '8px', color: '#888', textAlign: 'center' }}>
+                ADVENTURE MODE: {client.features.boolVariation('idle-boss-mode', false) ? '!! BOSS INVASION !!' : 'NORMAL'} |
+                SPEED: x{client.features.numberVariation('idle-game-speed', 1)} |
+                EXP x{client.features.numberVariation('idle-exp-booster', 1)}
             </div>
-
-            <div className="crt-overlay" style={{ pointerEvents: 'none' }}></div>
         </div>
     );
 };
