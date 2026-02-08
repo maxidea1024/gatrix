@@ -37,8 +37,8 @@ function FlagDetailModal({ flag, onClose }: FlagDetailModalProps) {
         style={{
           maxWidth: '700px',
           width: '90%',
-          maxHeight: '70vh',
-          padding: '0 !important',
+          maxHeight: '85vh',
+          padding: '0',
           overflow: 'hidden',
           backgroundColor: '#fff',
           boxShadow: '0 0 40px rgba(0,0,0,0.5)',
@@ -131,8 +131,6 @@ function FlagDetailModal({ flag, onClose }: FlagDetailModalProps) {
                   <pre
                     className={`flag-payload-value ${isEmptyString ? 'empty-string' : 'has-payload'}`}
                     style={{
-                      maxHeight: '200px',
-                      overflow: 'auto',
                       whiteSpace: 'pre-wrap',
                       fontSize: '9px',
                       lineHeight: '1.5',

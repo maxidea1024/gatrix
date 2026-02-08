@@ -875,18 +875,17 @@ body {
   scrollbar-gutter: stable;
 }
 
-.mode-simple .flags-grid {
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 12px;
-}
-
-/* List Mode Styles */
-.flags-display-container.mode-list {
+.flags-display-container {
   display: flex;
   flex-direction: column;
   flex: 1;
   min-height: 0;
   overflow: hidden;
+}
+
+.mode-simple .flags-grid {
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
 }
 
 .flag-list-header {
