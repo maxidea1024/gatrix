@@ -166,7 +166,7 @@ function Dashboard({ config }: DashboardProps) {
             {isExplicitSync() && !client.features.isOfflineMode() && (
               <button
                 type="button"
-                className={`nes-btn is-warning ${!canSyncFlags() ? 'is-disabled' : ''}`}
+                className={`nes-btn is-warning ${!canSyncFlags() ? 'is-disabled' : 'sync-available-rumble'}`}
                 onClick={() => syncFlags()}
                 disabled={!canSyncFlags()}
                 title="Synchronize Flags"

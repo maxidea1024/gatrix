@@ -202,6 +202,33 @@ body {
   }
 }
 
+@keyframes btn-rumble {
+  0% {
+    transform: translate(0);
+  }
+
+  25% {
+    transform: translate(-1px, 1px);
+  }
+
+  50% {
+    transform: translate(1px, -1px);
+  }
+
+  75% {
+    transform: translate(-1px, -1px);
+  }
+
+  100% {
+    transform: translate(0);
+  }
+}
+
+.sync-available-rumble {
+  animation: btn-rumble 0.1s infinite;
+  box-shadow: 0 0 10px rgba(247, 213, 29, 0.4) !important;
+}
+
 /* Center container for login */
 .center-container {
   min-height: 100vh;
