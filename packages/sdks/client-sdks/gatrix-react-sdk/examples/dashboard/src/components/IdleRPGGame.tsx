@@ -150,9 +150,8 @@ const IdleRPGGame: React.FC<IdleRPGGameProps> = ({ onExit }) => {
                 const gameSpeed = client.features.numberVariation('idle-game-speed', 1);
                 const moveSpeed = client.features.numberVariation('idle-move-speed', 1);
                 const isAutoSkill = client.features.boolVariation('idle-auto-skill', false);
-                const bossMode = client.features.boolVariation('idle-boss-mode', false);
 
-                updateGame(delta, gameSpeed, moveSpeed, isAutoSkill, bossMode);
+                updateGame(delta, gameSpeed, moveSpeed, isAutoSkill);
             });
         };
 
@@ -201,7 +200,7 @@ const IdleRPGGame: React.FC<IdleRPGGameProps> = ({ onExit }) => {
         }
     };
 
-    const updateGame = (delta: number, gameSpeed: number, moveSpeed: number, isAuto: boolean, isBoss: boolean) => {
+    const updateGame = (delta: number, gameSpeed: number, moveSpeed: number, isAuto: boolean) => {
         if (gameState !== 'playing') return;
         const s = gameRef.current;
 
