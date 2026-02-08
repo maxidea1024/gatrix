@@ -873,6 +873,7 @@ body {
   flex: 1;
   padding: 10px;
   scrollbar-gutter: stable;
+  align-content: start;
 }
 
 .flags-display-container {
