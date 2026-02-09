@@ -170,7 +170,7 @@ namespace Gatrix.Unity.SDK
     {
         // ==================== Required ====================
 
-        /// <summary>Base API URL (e.g., http://localhost:45000/api/v1)</summary>
+        /// <summary>Base API URL (e.g., http://localhost:3400/api/v1)</summary>
         public string ApiUrl { get; set; }
 
         /// <summary>Client API token</summary>

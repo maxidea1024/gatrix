@@ -1,0 +1,837 @@
+# Gatrix Features Client
+# Core SDK logic: HTTP fetching, ETag caching, polling, variations, watch, metrics
+class_name GatrixFeaturesClient
+extends RefCounted
+
+const SDK_NAME := "gatrix-godot-sdk"
+const SDK_VERSION := "1.0.0"
+const STORAGE_KEY_FLAGS := "gatrix_flags"
+const STORAGE_KEY_ETAG := "gatrix_etag"
+
+var _config: GatrixTypes.GatrixClientConfig
+var _emitter: GatrixEventEmitter
+var _storage: GatrixStorageProvider
+
+# Thread-safe flag storage
+var _mutex := Mutex.new()
+var _realtime_flags: Dictionary = {}  # flag_name -> EvaluatedFlag
+var _synchronized_flags: Dictionary = {}  # flag_name -> EvaluatedFlag
+
+# State
+var _sdk_state: GatrixTypes.SdkState = GatrixTypes.SdkState.INITIALIZING
+var _ready_emitted := false
+var _fetched_from_server := false
+var _is_fetching := false
+var _has_pending_sync := false
+var _started := false
+var _etag := ""
+var _connection_id := ""
+
+# HTTP
+var _http_request: HTTPRequest = null
+var _metrics_http: HTTPRequest = null
+
+# Timers
+var _poll_timer: Timer = null
+var _metrics_timer: Timer = null
+var _metrics_initial_timer: Timer = null
+
+# Statistics
+var _stats := GatrixTypes.FeaturesStats.new()
+
+# Per-flag watch callbacks
+var _watch_handles: Dictionary = {}  # handle -> { flag_name, callback }
+var _next_watch_handle: int = 1
+
+# Metrics tracking
+var _metrics_mutex := Mutex.new()
+var _metrics_flag_access: Dictionary = {}  # flag_name -> { "yes": n, "no": n, "variants": {} }
+var _metrics_missing: Dictionary = {}  # flag_name -> count
+var _metrics_start_time: String = ""
+
+# Scene tree reference for timers
+var _scene_tree: SceneTree = null
+
+
+func initialize(config: GatrixTypes.GatrixClientConfig, emitter: GatrixEventEmitter,
+		storage: GatrixStorageProvider, scene_tree: SceneTree) -> void:
+	_config = config
+	_emitter = emitter
+	_storage = storage
+	_scene_tree = scene_tree
+	_connection_id = _generate_uuid()
+	_stats.start_time = Time.get_unix_time_from_system()
+
+
+func start() -> void:
+	if _started:
+		return
+	_started = true
+
+	# Load from storage
+	_load_from_storage()
+
+	# Apply bootstrap if provided
+	if _config.bootstrap.size() > 0:
+		_apply_bootstrap()
+
+	if not _config.offline_mode:
+		# Initial fetch
+		_do_fetch_flags()
+
+		# Start polling
+		if not _config.disable_refresh:
+			_schedule_next_poll()
+
+		# Start metrics
+		if not _config.disable_metrics:
+			_start_metrics()
+
+
+func stop() -> void:
+	if not _started:
+		return
+	_started = false
+
+	# Stop polling
+	_stop_polling()
+
+	# Send final metrics
+	if not _config.disable_metrics:
+		_send_metrics()
+		_stop_metrics()
+
+
+# ==================== Flag Access ====================
+
+func is_enabled(flag_name: String) -> bool:
+	_mutex.lock()
+	var flags = _get_active_flags()
+	var flag = flags.get(flag_name)
+	_mutex.unlock()
+
+	var result := false
+	if flag != null:
+		result = flag.enabled
+		_track_access(flag_name, result, flag.variant.name)
+		_track_impression(flag_name, result, flag.variant.name, flag)
+	else:
+		_track_missing(flag_name)
+
+	return result
+
+
+func get_variant(flag_name: String) -> GatrixTypes.Variant:
+	_mutex.lock()
+	var flags = _get_active_flags()
+	var flag = flags.get(flag_name)
+	_mutex.unlock()
+
+	if flag != null:
+		_track_access(flag_name, flag.enabled, flag.variant.name)
+		return flag.variant
+	else:
+		_track_missing(flag_name)
+		return GatrixTypes.Variant.disabled()
+
+
+func get_flag(flag_name: String) -> GatrixFlagProxy:
+	_mutex.lock()
+	var flags = _get_active_flags()
+	var flag = flags.get(flag_name)
+	_mutex.unlock()
+
+	if flag != null:
+		_track_access(flag_name, flag.enabled, flag.variant.name)
+		_track_impression(flag_name, flag.enabled, flag.variant.name, flag)
+		return GatrixFlagProxy.new(flag)
+	else:
+		_track_missing(flag_name)
+		return GatrixFlagProxy.new(null)
+
+
+func get_all_flags() -> Array:
+	_mutex.lock()
+	var flags = _get_active_flags()
+	var result: Array = flags.values()
+	_mutex.unlock()
+	return result
+
+
+# ==================== Variation Methods ====================
+
+func bool_variation(flag_name: String, default_value: bool) -> bool:
+	var proxy := get_flag(flag_name)
+	return proxy.bool_variation(default_value)
+
+
+func string_variation(flag_name: String, default_value: String) -> String:
+	var proxy := get_flag(flag_name)
+	return proxy.string_variation(default_value)
+
+
+func number_variation(flag_name: String, default_value: float) -> float:
+	var proxy := get_flag(flag_name)
+	return proxy.number_variation(default_value)
+
+
+func json_variation(flag_name: String, default_value = null):
+	var proxy := get_flag(flag_name)
+	return proxy.json_variation(default_value)
+
+
+func variation(flag_name: String, default_value: String) -> String:
+	var proxy := get_flag(flag_name)
+	return proxy.variation(default_value)
+
+
+# ==================== Variation Details ====================
+
+func bool_variation_details(flag_name: String, default_value: bool) -> GatrixTypes.VariationResult:
+	var proxy := get_flag(flag_name)
+	return proxy.bool_variation_details(default_value)
+
+
+func string_variation_details(flag_name: String, default_value: String) -> GatrixTypes.VariationResult:
+	var proxy := get_flag(flag_name)
+	return proxy.string_variation_details(default_value)
+
+
+func number_variation_details(flag_name: String, default_value: float) -> GatrixTypes.VariationResult:
+	var proxy := get_flag(flag_name)
+	return proxy.number_variation_details(default_value)
+
+
+func json_variation_details(flag_name: String, default_value = null) -> GatrixTypes.VariationResult:
+	var proxy := get_flag(flag_name)
+	return proxy.json_variation_details(default_value)
+
+
+# ==================== Strict Variations ====================
+
+func bool_variation_or_throw(flag_name: String) -> bool:
+	var proxy := get_flag(flag_name)
+	return proxy.bool_variation_or_throw()
+
+
+func string_variation_or_throw(flag_name: String) -> String:
+	var proxy := get_flag(flag_name)
+	return proxy.string_variation_or_throw()
+
+
+func number_variation_or_throw(flag_name: String) -> float:
+	var proxy := get_flag(flag_name)
+	return proxy.number_variation_or_throw()
+
+
+func json_variation_or_throw(flag_name: String):
+	var proxy := get_flag(flag_name)
+	return proxy.json_variation_or_throw()
+
+
+# ==================== Context ====================
+
+func update_context(new_context: GatrixTypes.GatrixContext) -> void:
+	_config.context = new_context
+	_stats.context_change_count += 1
+	if _started and not _config.offline_mode:
+		_do_fetch_flags()
+
+
+func get_context() -> GatrixTypes.GatrixContext:
+	return _config.context
+
+
+# ==================== Explicit Sync ====================
+
+func is_explicit_sync() -> bool:
+	return _config.explicit_sync_mode
+
+
+func can_sync_flags() -> bool:
+	return _has_pending_sync
+
+
+func sync_flags(fetch_now := true) -> void:
+	_stats.sync_flags_count += 1
+
+	if fetch_now and not _config.offline_mode:
+		_do_fetch_flags()
+
+	_mutex.lock()
+	_synchronized_flags = _realtime_flags.duplicate(true)
+	_has_pending_sync = false
+	_mutex.unlock()
+
+	_emitter.emit_event(GatrixEvents.FLAGS_SYNC)
+
+
+# ==================== Watch ====================
+
+func watch_flag(flag_name: String, callback: Callable, watcher_name := "") -> Callable:
+	var handle := _next_watch_handle
+	_next_watch_handle += 1
+	_watch_handles[handle] = { "flag_name": flag_name, "callback": callback, "name": watcher_name }
+
+	# Return unwatch callable
+	return func(): _watch_handles.erase(handle)
+
+
+func watch_flag_with_initial_state(flag_name: String, callback: Callable, watcher_name := "") -> Callable:
+	var unwatch := watch_flag(flag_name, callback, watcher_name)
+
+	# Fire immediately with current state
+	var proxy := get_flag(flag_name)
+	callback.call(proxy)
+
+	return unwatch
+
+
+# ==================== Fetch ====================
+
+func fetch_flags() -> void:
+	if not _config.offline_mode:
+		_do_fetch_flags()
+
+
+# ==================== Stats ====================
+
+func get_stats() -> GatrixTypes.FeaturesStats:
+	_mutex.lock()
+	_stats.total_flag_count = _get_active_flags().size()
+	_stats.sdk_state = _sdk_state
+	_stats.etag = _etag
+	_stats.offline_mode = _config.offline_mode
+	var result := _stats
+	_mutex.unlock()
+	return result
+
+
+func is_ready() -> bool:
+	return _ready_emitted
+
+
+# ==================== Internal Methods ====================
+
+func _get_active_flags() -> Dictionary:
+	if _config.explicit_sync_mode:
+		return _synchronized_flags
+	return _realtime_flags
+
+
+func _load_from_storage() -> void:
+	var stored = _storage.get_value(STORAGE_KEY_FLAGS)
+	if stored != null and stored is Array:
+		_mutex.lock()
+		for flag_dict in stored:
+			if flag_dict is Dictionary:
+				var flag := GatrixTypes.EvaluatedFlag.from_dict(flag_dict)
+				_realtime_flags[flag.name] = flag
+				_synchronized_flags[flag.name] = flag
+		_mutex.unlock()
+
+		if _realtime_flags.size() > 0:
+			_emitter.emit_event(GatrixEvents.FLAGS_INIT)
+
+	var stored_etag = _storage.get_value(STORAGE_KEY_ETAG)
+	if stored_etag is String:
+		_etag = stored_etag
+
+
+func _apply_bootstrap() -> void:
+	if _config.bootstrap_override or _realtime_flags.is_empty():
+		_mutex.lock()
+		for flag in _config.bootstrap:
+			_realtime_flags[flag.name] = flag
+			_synchronized_flags[flag.name] = flag
+		_mutex.unlock()
+
+		if _realtime_flags.size() > 0:
+			_emitter.emit_event(GatrixEvents.FLAGS_INIT)
+
+
+func _do_fetch_flags() -> void:
+	if _is_fetching:
+		return
+	_is_fetching = true
+	_stats.fetch_flags_count += 1
+	_stats.last_fetch_time = Time.get_unix_time_from_system()
+
+	_emitter.emit_event(GatrixEvents.FLAGS_FETCH, [{ "etag": _etag }])
+	_emitter.emit_event(GatrixEvents.FLAGS_FETCH_START, [{ "etag": _etag }])
+
+	# Build URL
+	var url := _build_fetch_url()
+
+	# Create HTTP request node
+	if _http_request == null:
+		_http_request = HTTPRequest.new()
+		_http_request.timeout = 30.0
+		_scene_tree.root.call_deferred("add_child", _http_request)
+		# Wait a frame for the node to be added
+		await _scene_tree.process_frame
+
+	# Set headers
+	var headers: PackedStringArray = [
+		"Authorization: Bearer %s" % _config.api_token,
+		"Accept: application/json",
+		"Gatrix-Connection-Id: %s" % _connection_id,
+		"Gatrix-Sdk-Name: %s" % SDK_NAME,
+		"Gatrix-Sdk-Version: %s" % SDK_VERSION,
+		"Gatrix-App-Name: %s" % _config.app_name,
+	]
+
+	if _etag != "":
+		headers.append("If-None-Match: %s" % _etag)
+
+	for key in _config.custom_headers:
+		headers.append("%s: %s" % [key, _config.custom_headers[key]])
+
+	# Connect response handler
+	if _http_request.request_completed.get_connections().size() > 0:
+		for conn in _http_request.request_completed.get_connections():
+			_http_request.request_completed.disconnect(conn.callable)
+	_http_request.request_completed.connect(_on_fetch_completed)
+
+	# Make request
+	if _config.use_post_requests:
+		var body := JSON.stringify({ "context": _config.context.to_dict() })
+		headers.append("Content-Type: application/json")
+		_http_request.request(url, headers, HTTPClient.METHOD_POST, body)
+	else:
+		_http_request.request(url, headers, HTTPClient.METHOD_GET)
+
+
+func _on_fetch_completed(result: int, response_code: int, response_headers: PackedStringArray,
+		body: PackedByteArray) -> void:
+	_is_fetching = false
+
+	if result != HTTPRequest.RESULT_SUCCESS:
+		_handle_fetch_error("HTTP request failed (result=%d)" % result, response_code)
+		return
+
+	# 304 Not Modified
+	if response_code == 304:
+		_stats.not_modified_count += 1
+		_emitter.emit_event(GatrixEvents.FLAGS_FETCH_SUCCESS)
+		_emitter.emit_event(GatrixEvents.FLAGS_FETCH_END)
+
+		# Recovery from error state
+		if _sdk_state == GatrixTypes.SdkState.ERROR:
+			_sdk_state = GatrixTypes.SdkState.HEALTHY
+			_stats.recovery_count += 1
+			_stats.last_recovery_time = Time.get_unix_time_from_system()
+			_emitter.emit_event(GatrixEvents.FLAGS_RECOVERED)
+
+		if not _ready_emitted:
+			_set_ready()
+		return
+
+	# Success
+	if response_code >= 200 and response_code < 300:
+		var response_text := body.get_string_from_utf8()
+
+		# Extract ETag from headers
+		var new_etag := ""
+		for header in response_headers:
+			if header.to_lower().begins_with("etag:"):
+				new_etag = header.substr(5).strip_edges()
+				break
+
+		_handle_fetch_response(response_text, response_code, new_etag)
+	else:
+		_handle_fetch_error("HTTP %d" % response_code, response_code)
+
+
+func _handle_fetch_response(response_body: String, http_status: int, new_etag: String) -> void:
+	var json := JSON.new()
+	if json.parse(response_body) != OK:
+		_handle_fetch_error("Invalid JSON response", http_status)
+		return
+
+	var data = json.data
+	if not data is Dictionary:
+		_handle_fetch_error("Response is not an object", http_status)
+		return
+
+	# Parse flags from response
+	var flags_data = null
+	if data.has("data") and data["data"] is Dictionary and data["data"].has("flags"):
+		flags_data = data["data"]["flags"]
+	elif data.has("flags"):
+		flags_data = data["flags"]
+
+	if flags_data == null or not flags_data is Array:
+		_handle_fetch_error("No flags array in response", http_status)
+		return
+
+	# Parse flags
+	var new_flags: Array = []
+	for flag_dict in flags_data:
+		if flag_dict is Dictionary:
+			new_flags.append(GatrixTypes.EvaluatedFlag.from_dict(flag_dict))
+
+	# Update ETag
+	if new_etag != "":
+		_etag = new_etag
+		_storage.save_value(STORAGE_KEY_ETAG, _etag)
+
+	# Store flags
+	_store_flags(new_flags, not _fetched_from_server)
+	_fetched_from_server = true
+
+	_emitter.emit_event(GatrixEvents.FLAGS_FETCH_SUCCESS)
+	_emitter.emit_event(GatrixEvents.FLAGS_FETCH_END)
+
+	# Recovery from error state
+	if _sdk_state == GatrixTypes.SdkState.ERROR:
+		_sdk_state = GatrixTypes.SdkState.HEALTHY
+		_stats.recovery_count += 1
+		_stats.last_recovery_time = Time.get_unix_time_from_system()
+		_emitter.emit_event(GatrixEvents.FLAGS_RECOVERED)
+
+	if not _ready_emitted:
+		_set_ready()
+
+
+func _handle_fetch_error(message: String, status_code: int) -> void:
+	_stats.error_count += 1
+	_stats.last_error_time = Time.get_unix_time_from_system()
+	_sdk_state = GatrixTypes.SdkState.ERROR
+
+	var error_event := GatrixTypes.ErrorEvent.new()
+	error_event.type = "fetch_error"
+	error_event.message = message
+	error_event.code = status_code
+
+	_emitter.emit_event(GatrixEvents.FLAGS_FETCH_ERROR, [{ "status": status_code, "message": message }])
+	_emitter.emit_event(GatrixEvents.FLAGS_FETCH_END)
+	_emitter.emit_event(GatrixEvents.SDK_ERROR, [{ "type": "fetch_error", "message": message }])
+
+	push_warning("[GatrixSDK] Fetch error: %s (status=%d)" % [message, status_code])
+
+	# If first fetch failed but we have stored/bootstrap flags, still become ready
+	if not _ready_emitted and _realtime_flags.size() > 0:
+		_set_ready()
+
+
+func _store_flags(new_flags: Array, is_initial_fetch: bool) -> void:
+	_mutex.lock()
+	var old_flags := _realtime_flags.duplicate()
+
+	# Update realtime flags
+	_realtime_flags.clear()
+	for flag in new_flags:
+		_realtime_flags[flag.name] = flag
+
+	# Check for changes
+	var changed := _flags_differ(old_flags, _realtime_flags)
+
+	if changed:
+		_stats.update_count += 1
+		_stats.last_update_time = Time.get_unix_time_from_system()
+
+		if _config.explicit_sync_mode:
+			_has_pending_sync = true
+		else:
+			_synchronized_flags = _realtime_flags.duplicate(true)
+	else:
+		_stats.not_modified_count += 1
+
+	_mutex.unlock()
+
+	# Persist to storage
+	var flags_array: Array = []
+	for flag in new_flags:
+		flags_array.append(flag.to_dict())
+	_storage.save_value(STORAGE_KEY_FLAGS, flags_array)
+
+	# Emit change events
+	if changed and not is_initial_fetch:
+		_emitter.emit_event(GatrixEvents.FLAGS_CHANGE, [{ "flags": new_flags }])
+		_emit_flag_changes(old_flags, _realtime_flags)
+
+
+func _flags_differ(old_flags: Dictionary, new_flags: Dictionary) -> bool:
+	if old_flags.size() != new_flags.size():
+		return true
+	for key in new_flags:
+		if not old_flags.has(key):
+			return true
+		var old_flag = old_flags[key]
+		var new_flag = new_flags[key]
+		if old_flag.version != new_flag.version or old_flag.enabled != new_flag.enabled:
+			return true
+		if old_flag.variant.name != new_flag.variant.name:
+			return true
+	return false
+
+
+func _emit_flag_changes(old_flags: Dictionary, new_flags: Dictionary) -> void:
+	for flag_name in new_flags:
+		var new_flag = new_flags[flag_name]
+		var old_flag = old_flags.get(flag_name)
+
+		var changed := false
+		if old_flag == null:
+			changed = true
+		elif old_flag.version != new_flag.version or old_flag.enabled != new_flag.enabled:
+			changed = true
+		elif old_flag.variant.name != new_flag.variant.name:
+			changed = true
+
+		if changed:
+			_stats.flag_last_changed_times[flag_name] = Time.get_unix_time_from_system()
+
+			# Per-flag change event
+			_emitter.emit_event(GatrixEvents.flag_change_event(flag_name),
+					[new_flag, old_flag])
+
+			# Notify watch handlers
+			var proxy := GatrixFlagProxy.new(new_flag)
+			for handle in _watch_handles:
+				var watcher = _watch_handles[handle]
+				if watcher.flag_name == flag_name:
+					watcher.callback.call(proxy)
+
+
+func _set_ready() -> void:
+	_ready_emitted = true
+	_sdk_state = GatrixTypes.SdkState.READY
+	_emitter.emit_event(GatrixEvents.FLAGS_READY)
+
+
+func _build_fetch_url() -> String:
+	var base := _config.api_url.rstrip("/")
+	var url := "%s/client/features/%s" % [base, _config.environment.uri_encode()]
+
+	if not _config.use_post_requests:
+		var ctx_qs := _config.context.to_query_string()
+		if ctx_qs != "":
+			url += "?" + ctx_qs
+
+	return url
+
+
+# ==================== Polling ====================
+
+func _schedule_next_poll() -> void:
+	if not _started or _config.disable_refresh:
+		return
+
+	if _poll_timer == null:
+		_poll_timer = Timer.new()
+		_poll_timer.one_shot = true
+		_poll_timer.timeout.connect(_on_poll_timeout)
+		_scene_tree.root.call_deferred("add_child", _poll_timer)
+
+	_poll_timer.wait_time = _config.refresh_interval
+	_poll_timer.call_deferred("start")
+
+
+func _on_poll_timeout() -> void:
+	if _started and not _config.disable_refresh:
+		_do_fetch_flags()
+		_schedule_next_poll()
+
+
+func _stop_polling() -> void:
+	if _poll_timer != null:
+		_poll_timer.stop()
+
+
+# ==================== Metrics ====================
+
+func _track_access(flag_name: String, enabled: bool, variant_name: String) -> void:
+	if _config.disable_metrics:
+		return
+
+	_metrics_mutex.lock()
+	if not _metrics_flag_access.has(flag_name):
+		_metrics_flag_access[flag_name] = { "yes": 0, "no": 0, "variants": {} }
+
+	var entry = _metrics_flag_access[flag_name]
+	if enabled:
+		entry["yes"] += 1
+	else:
+		entry["no"] += 1
+
+	if variant_name != "" and variant_name != "disabled":
+		if not entry["variants"].has(variant_name):
+			entry["variants"][variant_name] = 0
+		entry["variants"][variant_name] += 1
+
+	# Stats
+	if not _config.disable_stats:
+		if not _stats.flag_enabled_counts.has(flag_name):
+			_stats.flag_enabled_counts[flag_name] = { "yes": 0, "no": 0 }
+		if enabled:
+			_stats.flag_enabled_counts[flag_name]["yes"] += 1
+		else:
+			_stats.flag_enabled_counts[flag_name]["no"] += 1
+
+		if variant_name != "" and variant_name != "disabled":
+			if not _stats.flag_variant_counts.has(flag_name):
+				_stats.flag_variant_counts[flag_name] = {}
+			if not _stats.flag_variant_counts[flag_name].has(variant_name):
+				_stats.flag_variant_counts[flag_name][variant_name] = 0
+			_stats.flag_variant_counts[flag_name][variant_name] += 1
+
+	_metrics_mutex.unlock()
+
+
+func _track_missing(flag_name: String) -> void:
+	if _config.disable_metrics:
+		return
+
+	_metrics_mutex.lock()
+	if not _metrics_missing.has(flag_name):
+		_metrics_missing[flag_name] = 0
+	_metrics_missing[flag_name] += 1
+
+	if not _config.disable_stats:
+		if not _stats.missing_flags.has(flag_name):
+			_stats.missing_flags[flag_name] = 0
+		_stats.missing_flags[flag_name] += 1
+	_metrics_mutex.unlock()
+
+
+func _track_impression(flag_name: String, enabled: bool, variant_name: String,
+		flag: GatrixTypes.EvaluatedFlag) -> void:
+	if not flag.impression_data and not _config.impression_data_all:
+		return
+
+	_stats.impression_count += 1
+
+	var event := GatrixTypes.ImpressionEvent.new()
+	event.event_type = "isEnabled"
+	event.event_id = _generate_uuid()
+	event.context = _config.context
+	event.enabled = enabled
+	event.feature_name = flag_name
+	event.impression_data = flag.impression_data
+	event.variant_name = variant_name
+
+	_emitter.emit_event(GatrixEvents.FLAGS_IMPRESSION, [event.to_dict()])
+
+
+func _start_metrics() -> void:
+	_metrics_start_time = Time.get_datetime_string_from_system(true)
+
+	# Initial delay
+	_metrics_initial_timer = Timer.new()
+	_metrics_initial_timer.one_shot = true
+	_metrics_initial_timer.wait_time = _config.metrics_interval_initial
+	_metrics_initial_timer.timeout.connect(_on_metrics_initial_timeout)
+	_scene_tree.root.call_deferred("add_child", _metrics_initial_timer)
+	_metrics_initial_timer.call_deferred("start")
+
+
+func _on_metrics_initial_timeout() -> void:
+	_send_metrics()
+
+	# Start periodic timer
+	_metrics_timer = Timer.new()
+	_metrics_timer.wait_time = _config.metrics_interval
+	_metrics_timer.timeout.connect(_on_metrics_timeout)
+	_scene_tree.root.call_deferred("add_child", _metrics_timer)
+	_metrics_timer.call_deferred("start")
+
+
+func _on_metrics_timeout() -> void:
+	_send_metrics()
+
+
+func _stop_metrics() -> void:
+	if _metrics_timer != null:
+		_metrics_timer.stop()
+	if _metrics_initial_timer != null:
+		_metrics_initial_timer.stop()
+
+
+func _send_metrics() -> void:
+	var payload := _build_metrics_payload()
+	if payload == "":
+		return
+
+	if _metrics_http == null:
+		_metrics_http = HTTPRequest.new()
+		_metrics_http.timeout = 10.0
+		_scene_tree.root.call_deferred("add_child", _metrics_http)
+		await _scene_tree.process_frame
+
+	var url := "%s/client/features/%s/metrics" % [
+		_config.api_url.rstrip("/"),
+		_config.environment.uri_encode()
+	]
+
+	var headers: PackedStringArray = [
+		"Authorization: Bearer %s" % _config.api_token,
+		"Content-Type: application/json",
+		"Gatrix-Connection-Id: %s" % _connection_id,
+		"Gatrix-Sdk-Name: %s" % SDK_NAME,
+		"Gatrix-Sdk-Version: %s" % SDK_VERSION,
+	]
+
+	if _metrics_http.request_completed.get_connections().size() > 0:
+		for conn in _metrics_http.request_completed.get_connections():
+			_metrics_http.request_completed.disconnect(conn.callable)
+	_metrics_http.request_completed.connect(_on_metrics_completed)
+
+	_metrics_http.request(url, headers, HTTPClient.METHOD_POST, payload)
+
+
+func _on_metrics_completed(result: int, response_code: int, _headers: PackedStringArray,
+		_body: PackedByteArray) -> void:
+	if result == HTTPRequest.RESULT_SUCCESS and response_code >= 200 and response_code < 300:
+		_stats.metrics_sent_count += 1
+		_emitter.emit_event(GatrixEvents.FLAGS_METRICS_SENT, [{ "count": 1 }])
+	else:
+		_stats.metrics_error_count += 1
+		push_warning("[GatrixSDK] Metrics send failed (result=%d, status=%d)" % [result, response_code])
+
+
+func _build_metrics_payload() -> String:
+	_metrics_mutex.lock()
+	var flag_access_copy := _metrics_flag_access.duplicate(true)
+	var missing_copy := _metrics_missing.duplicate()
+	var start_time := _metrics_start_time
+	_metrics_flag_access.clear()
+	_metrics_missing.clear()
+	_metrics_start_time = Time.get_datetime_string_from_system(true)
+	_metrics_mutex.unlock()
+
+	if flag_access_copy.is_empty() and missing_copy.is_empty():
+		return ""
+
+	var stop_time := Time.get_datetime_string_from_system(true)
+
+	var payload := {
+		"appName": _config.app_name,
+		"environment": _config.environment,
+		"sdkName": SDK_NAME,
+		"sdkVersion": SDK_VERSION,
+		"connectionId": _connection_id,
+		"bucket": {
+			"start": start_time,
+			"stop": stop_time,
+			"flags": flag_access_copy,
+			"missing": missing_copy,
+		}
+	}
+
+	return JSON.stringify(payload)
+
+
+func _generate_uuid() -> String:
+	var uuid := ""
+	var chars := "0123456789abcdef"
+	var pattern := "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"
+	for c in pattern:
+		if c == "x":
+			uuid += chars[randi() % 16]
+		elif c == "y":
+			uuid += chars[(randi() % 4) + 8]
+		else:
+			uuid += c
+	return uuid
