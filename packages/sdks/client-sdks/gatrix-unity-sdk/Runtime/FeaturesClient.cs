@@ -164,8 +164,8 @@ namespace Gatrix.Unity.SDK
             );
 
             // Handle metrics events for statistics
-            _emitter.On(GatrixEvents.MetricsSent, _ => { _metricsSentCount++; });
-            _emitter.On(GatrixEvents.MetricsError, _ => { _metricsErrorCount++; });
+            _emitter.On(GatrixEvents.FlagsMetricsSent, _ => { _metricsSentCount++; });
+            _emitter.On(GatrixEvents.FlagsMetricsError, _ => { _metricsErrorCount++; });
 
             // Bootstrap data
             var bootstrap = featCfg.Bootstrap;
@@ -210,7 +210,7 @@ namespace Gatrix.Unity.SDK
             var bootstrapOverride = featCfg.BootstrapOverride;
 
             _sdkState = SdkState.Healthy;
-            _emitter.Emit(GatrixEvents.Init);
+            _emitter.Emit(GatrixEvents.FlagsInit);
 
             if (hasBootstrap && (bootstrapOverride || _realtimeFlags.Count == 0))
             {
@@ -237,7 +237,7 @@ namespace Gatrix.Unity.SDK
                         "offlineMode requires bootstrap data or cached flags, but none are available");
                     _sdkState = SdkState.Error;
                     _lastError = error;
-                    _emitter.Emit(GatrixEvents.Error, new ErrorEvent
+                    _emitter.Emit(GatrixEvents.FlagsError, new ErrorEvent
                     {
                         Type = "offline_no_data", Error = error
                     });
@@ -890,7 +890,7 @@ namespace Gatrix.Unity.SDK
 
             _synchronizedFlags = new Dictionary<string, EvaluatedFlag>(_realtimeFlags);
             _syncFlagsCount++;
-            _emitter.Emit(GatrixEvents.Sync);
+            _emitter.Emit(GatrixEvents.FlagsSync);
         }
 
         /// <summary>Check if explicit sync mode is enabled</summary>
@@ -955,7 +955,7 @@ namespace Gatrix.Unity.SDK
             }
             else
             {
-                _emitter.Once(GatrixEvents.Ready, _ =>
+                _emitter.Once(GatrixEvents.FlagsReady, _ =>
                 {
                     var flags = SelectFlags();
                     flags.TryGetValue(flagName, out var flag);
@@ -987,7 +987,7 @@ namespace Gatrix.Unity.SDK
 
             if (_isFetchingFlags) return;
             _isFetchingFlags = true;
-            _emitter.Emit(GatrixEvents.FetchStart);
+            _emitter.Emit(GatrixEvents.FlagsFetchStart);
 
             // Cancel previous fetch
             _fetchCts?.Cancel();
@@ -1029,7 +1029,7 @@ namespace Gatrix.Unity.SDK
                     request.Headers.TryAddWithoutValidation("If-None-Match", _etag);
                 }
 
-                _emitter.Emit(GatrixEvents.Fetch, _etag);
+                _emitter.Emit(GatrixEvents.FlagsFetch, _etag);
 
                 // Send request with retry
                 HttpResponseMessage response = null;
@@ -1075,7 +1075,7 @@ namespace Gatrix.Unity.SDK
                     _sdkState = SdkState.Healthy;
                     _recoveryCount++;
                     _lastRecoveryTime = DateTime.UtcNow;
-                    _emitter.Emit(GatrixEvents.Recovered);
+                    _emitter.Emit(GatrixEvents.FlagsRecovered);
                 }
 
                 if (response.IsSuccessStatusCode)
@@ -1111,7 +1111,7 @@ namespace Gatrix.Unity.SDK
                     }
 
                     ScheduleNextRefresh();
-                    _emitter.Emit(GatrixEvents.FetchSuccess);
+                    _emitter.Emit(GatrixEvents.FlagsFetchSuccess);
                 }
                 else if (response.StatusCode == HttpStatusCode.NotModified)
                 {
@@ -1197,7 +1197,7 @@ namespace Gatrix.Unity.SDK
         private void SetReady()
         {
             _readyEventEmitted = true;
-            _emitter.Emit(GatrixEvents.Ready);
+            _emitter.Emit(GatrixEvents.FlagsReady);
         }
 
         private void StartMetrics()
@@ -1292,7 +1292,7 @@ namespace Gatrix.Unity.SDK
 
             if (!FeaturesConfig.ExplicitSyncMode || forceSync)
             {
-                _emitter.Emit(GatrixEvents.Change, flags);
+                _emitter.Emit(GatrixEvents.FlagsChange, flags);
             }
         }
 
@@ -1372,7 +1372,7 @@ namespace Gatrix.Unity.SDK
             };
 
             _impressionCount++;
-            _emitter.Emit(GatrixEvents.Impression, evt);
+            _emitter.Emit(GatrixEvents.FlagsImpression, evt);
         }
 
         private void TrackFlagEnabledCount(string flagName, bool enabled)

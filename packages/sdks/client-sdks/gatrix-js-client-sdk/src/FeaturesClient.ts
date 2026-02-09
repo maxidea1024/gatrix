@@ -14,7 +14,7 @@ import {
   ImpressionEvent,
   ErrorEvent,
   SdkState,
-  SdkStats,
+  FeaturesStats,
   VariationResult,
 } from './types';
 import { StorageProvider } from './StorageProvider';

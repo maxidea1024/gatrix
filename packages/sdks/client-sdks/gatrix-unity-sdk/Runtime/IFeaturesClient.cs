@@ -41,7 +41,7 @@ namespace Gatrix.Unity.SDK
         /// begins the polling loop for periodic refreshes, and starts the metrics sender.
         /// <para>
         /// After this method completes, the SDK transitions to the Ready state
-        /// and emits <see cref="GatrixEvents.Ready"/>. The polling interval is controlled
+        /// and emits <see cref="GatrixEvents.FlagsReady"/>. The polling interval is controlled
         /// by <see cref="FeaturesConfig.RefreshInterval"/>.
         /// </para>
         /// </summary>
@@ -150,7 +150,7 @@ namespace Gatrix.Unity.SDK
         /// Environment) are preserved from the original config.
         /// </para>
         /// <para>
-        /// Emits <see cref="GatrixEvents.ContextChanged"/> after the context is updated,
+        /// Emits <see cref="GatrixEvents.FlagsChange"/> after the context is updated,
         /// followed by a flag re-fetch.
         /// </para>
         /// </summary>
@@ -402,7 +402,7 @@ namespace Gatrix.Unity.SDK
         /// a fresh fetch before applying. With <c>false</c>, applies the last fetched buffer.
         /// </para>
         /// <para>
-        /// Emits <see cref="GatrixEvents.Sync"/> after flags are applied,
+        /// Emits <see cref="GatrixEvents.FlagsSync"/> after flags are applied,
         /// followed by individual <see cref="GatrixEvents.FlagChange"/> events for changed flags.
         /// </para>
         /// </summary>
@@ -418,9 +418,9 @@ namespace Gatrix.Unity.SDK
         /// the server returns 304 and no update is applied.
         /// </para>
         /// <para>
-        /// Emits <see cref="GatrixEvents.FetchStart"/> before the request and
-        /// <see cref="GatrixEvents.FetchEnd"/> after completion (success or failure).
-        /// On success with changes, also emits <see cref="GatrixEvents.Change"/>.
+        /// Emits <see cref="GatrixEvents.FlagsFetchStart"/> before the request and
+        /// <see cref="GatrixEvents.FlagsFetchEnd"/> after completion (success or failure).
+        /// On success with changes, also emits <see cref="GatrixEvents.FlagsChange"/>.
         /// </para>
         /// </summary>
         /// <returns>A <see cref="ValueTask"/> that completes when the fetch finishes.</returns>
@@ -461,7 +461,7 @@ namespace Gatrix.Unity.SDK
         /// <para>
         /// Behaves like <see cref="WatchFlag"/> but also fires the callback immediately
         /// with the flag's current state. If the SDK is not yet ready, defers the
-        /// initial callback until <see cref="GatrixEvents.Ready"/> fires.
+        /// initial callback until <see cref="GatrixEvents.FlagsReady"/> fires.
         /// </para>
         /// </summary>
         /// <param name="flagName">The feature flag key to watch.</param>

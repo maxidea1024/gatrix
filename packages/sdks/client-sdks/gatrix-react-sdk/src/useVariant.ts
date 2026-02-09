@@ -61,14 +61,14 @@ export function useVariant(flagName: string): Variant {
       setVariant(newVariant);
     };
 
-    client.on(EVENTS.CHANGE, updateHandler);
-    client.on(EVENTS.READY, readyHandler);
-    client.on(EVENTS.SYNC, updateHandler);
+    client.on(EVENTS.FLAGS_CHANGE, updateHandler);
+    client.on(EVENTS.FLAGS_READY, readyHandler);
+    client.on(EVENTS.FLAGS_SYNC, updateHandler);
 
     return () => {
-      client.off(EVENTS.CHANGE, updateHandler);
-      client.off(EVENTS.READY, readyHandler);
-      client.off(EVENTS.SYNC, updateHandler);
+      client.off(EVENTS.FLAGS_CHANGE, updateHandler);
+      client.off(EVENTS.FLAGS_READY, readyHandler);
+      client.off(EVENTS.FLAGS_SYNC, updateHandler);
     };
   }, [client, flagName]);
 

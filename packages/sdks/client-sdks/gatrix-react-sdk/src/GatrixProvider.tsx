@@ -60,8 +60,8 @@ const GatrixProvider: FC<PropsWithChildren<GatrixProviderProps>> = ({
     Boolean(
       gatrixClient
         ? (customConfig?.features?.bootstrap &&
-            customConfig?.features?.bootstrapOverride !== false) ||
-            gatrixClient.isReady?.()
+          customConfig?.features?.bootstrapOverride !== false) ||
+        gatrixClient.isReady?.()
         : config.features?.bootstrap && config.features?.bootstrapOverride !== false
     )
   );
@@ -99,9 +99,9 @@ const GatrixProvider: FC<PropsWithChildren<GatrixProviderProps>> = ({
       }, 0);
     };
 
-    client.current!.on(EVENTS.READY, readyCallback);
-    client.current!.on(EVENTS.ERROR, errorCallback);
-    client.current!.on(EVENTS.RECOVERED, clearErrorCallback);
+    client.current!.on(EVENTS.FLAGS_READY, readyCallback);
+    client.current!.on(EVENTS.SDK_ERROR, errorCallback);
+    client.current!.on(EVENTS.FLAGS_RECOVERED, clearErrorCallback);
 
     if (startClient && !client.current!.isReady() && !hasStarted.current) {
       hasStarted.current = true;
@@ -111,9 +111,9 @@ const GatrixProvider: FC<PropsWithChildren<GatrixProviderProps>> = ({
     // Stop client on unmount
     return function cleanup() {
       if (client.current) {
-        client.current.off(EVENTS.ERROR, errorCallback);
-        client.current.off(EVENTS.READY, readyCallback);
-        client.current.off(EVENTS.RECOVERED, clearErrorCallback);
+        client.current.off(EVENTS.SDK_ERROR, errorCallback);
+        client.current.off(EVENTS.FLAGS_READY, readyCallback);
+        client.current.off(EVENTS.FLAGS_RECOVERED, clearErrorCallback);
         if (stopClient) {
           client.current.stop();
         }

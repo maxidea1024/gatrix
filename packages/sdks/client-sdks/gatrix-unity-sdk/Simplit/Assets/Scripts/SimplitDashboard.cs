@@ -51,11 +51,11 @@ namespace Gatrix.Unity.SDK.Examples
             if (_client == null) return;
 
             // Subscribe to events
-            _client.On(GatrixEvents.Change, OnFlagsChanged);
-            _client.On(GatrixEvents.Ready, OnFlagsChanged);
-            _client.On(GatrixEvents.Sync, OnFlagsChanged);
-            _client.On(GatrixEvents.FetchStart, OnFetchStart);
-            _client.On(GatrixEvents.FetchEnd, OnFetchEnd);
+            _client.On(GatrixEvents.FlagsChange, OnFlagsChanged);
+            _client.On(GatrixEvents.FlagsReady, OnFlagsChanged);
+            _client.On(GatrixEvents.FlagsSync, OnFlagsChanged);
+            _client.On(GatrixEvents.FlagsFetchStart, OnFetchStart);
+            _client.On(GatrixEvents.FlagsFetchEnd, OnFetchEnd);
 
             // Initial render
             RenderFlags();
@@ -234,11 +234,11 @@ namespace Gatrix.Unity.SDK.Examples
         private void UnsubscribeEvents()
         {
             if (_client == null) return;
-            _client.Off(GatrixEvents.Change);
-            _client.Off(GatrixEvents.Ready);
-            _client.Off(GatrixEvents.Sync);
-            _client.Off(GatrixEvents.FetchStart);
-            _client.Off(GatrixEvents.FetchEnd);
+            _client.Off(GatrixEvents.FlagsChange);
+            _client.Off(GatrixEvents.FlagsReady);
+            _client.Off(GatrixEvents.FlagsSync);
+            _client.Off(GatrixEvents.FlagsFetchStart);
+            _client.Off(GatrixEvents.FlagsFetchEnd);
             _client = null;
         }
     }

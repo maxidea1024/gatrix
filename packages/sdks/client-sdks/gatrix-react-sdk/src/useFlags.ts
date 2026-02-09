@@ -40,14 +40,14 @@ export function useFlags(): EvaluatedFlag[] {
       setFlags(features.getAllFlags());
     };
 
-    client.on(EVENTS.CHANGE, onUpdate);
-    client.on(EVENTS.READY, onReady);
-    client.on(EVENTS.SYNC, onUpdate);
+    client.on(EVENTS.FLAGS_CHANGE, onUpdate);
+    client.on(EVENTS.FLAGS_READY, onReady);
+    client.on(EVENTS.FLAGS_SYNC, onUpdate);
 
     return () => {
-      client.off(EVENTS.CHANGE, onUpdate);
-      client.off(EVENTS.READY, onReady);
-      client.off(EVENTS.SYNC, onUpdate);
+      client.off(EVENTS.FLAGS_CHANGE, onUpdate);
+      client.off(EVENTS.FLAGS_READY, onReady);
+      client.off(EVENTS.FLAGS_SYNC, onUpdate);
     };
   }, [client, features]);
 

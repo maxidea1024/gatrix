@@ -16,7 +16,8 @@ export type {
   ImpressionEvent,
   ErrorEvent,
   SdkState,
-  SdkStats,
+  GatrixSdkStats,
+  FeaturesStats,
 } from '@gatrix/js-client-sdk';
 
 export {
