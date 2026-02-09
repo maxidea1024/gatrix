@@ -4,33 +4,33 @@
  */
 export const EVENTS = {
   /** SDK initialized (from storage/bootstrap) */
-  INIT: 'flags.init',
+  FLAGS_INIT: 'flags.init',
   /** First successful fetch completed */
-  READY: 'flags.ready',
+  FLAGS_READY: 'flags.ready',
   /** Started fetching flags from server */
-  FETCH: 'flags.fetch',
+  FLAGS_FETCH: 'flags.fetch',
   /** Started fetching flags from server (alias for FETCH) */
-  FETCH_START: 'flags.fetch_start',
+  FLAGS_FETCH_START: 'flags.fetch_start',
   /** Successfully fetched flags from server */
-  FETCH_SUCCESS: 'flags.fetch_success',
+  FLAGS_FETCH_SUCCESS: 'flags.fetch_success',
   /** Error occurred during fetching */
-  FETCH_ERROR: 'flags.fetch_error',
+  FLAGS_FETCH_ERROR: 'flags.fetch_error',
   /** Completed fetching flags (success or error) */
-  FETCH_END: 'flags.fetch_end',
+  FLAGS_FETCH_END: 'flags.fetch_end',
   /** Flags changed from server */
-  CHANGE: 'flags.change',
-  /** Error occurred */
-  ERROR: 'flags.error',
+  FLAGS_CHANGE: 'flags.change',
+  /** General SDK error occurred */
+  SDK_ERROR: 'flags.error',
   /** Flag accessed (if impressionData enabled) */
-  IMPRESSION: 'flags.impression',
+  FLAGS_IMPRESSION: 'flags.impression',
   /** Flags synchronized (explicitSyncMode) */
-  SYNC: 'flags.sync',
+  FLAGS_SYNC: 'flags.sync',
   /** SDK recovered from error state */
-  RECOVERED: 'flags.recovered',
+  FLAGS_RECOVERED: 'flags.recovered',
   /** Metrics sent to server */
-  METRICS_SENT: 'flags.metrics_sent',
+  FLAGS_METRICS_SENT: 'flags.metrics_sent',
   /** Error sending metrics */
-  METRICS_ERROR: 'flags.metrics_error',
+  FLAGS_METRICS_ERROR: 'flags.metrics_error',
 } as const;
 
 export type EventType = (typeof EVENTS)[keyof typeof EVENTS];

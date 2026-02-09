@@ -188,10 +188,10 @@ export class Metrics {
         timeout: 10000,
       });
       this.logger?.debug('Metrics sent successfully');
-      this.emitter?.emit(EVENTS.METRICS_SENT, payload);
+      this.emitter?.emit(EVENTS.FLAGS_METRICS_SENT, payload);
     } catch (e) {
       this.logger?.error('Failed to send metrics', e);
-      this.emitter?.emit(EVENTS.METRICS_ERROR, e);
+      this.emitter?.emit(EVENTS.FLAGS_METRICS_ERROR, e);
     }
   }
 

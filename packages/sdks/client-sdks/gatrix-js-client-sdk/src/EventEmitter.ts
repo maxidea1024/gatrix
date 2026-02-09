@@ -6,34 +6,68 @@
 type EventCallback = (...args: any[]) => void | Promise<void>;
 type AnyEventCallback = (event: string, ...args: any[]) => void | Promise<void>;
 
+interface Listener {
+  callback: EventCallback;
+  name: string;
+  callCount: number;
+  isOnce: boolean;
+  registeredAt: Date;
+}
+
+interface AnyListener {
+  callback: AnyEventCallback;
+  name: string;
+  callCount: number;
+  isOnce: boolean;
+  registeredAt: Date;
+}
+
 interface EventMap {
-  [event: string]: EventCallback[];
+  [event: string]: Listener[];
 }
 
 export class EventEmitter {
   private events: EventMap = {};
-  private anyListeners: AnyEventCallback[] = [];
+  private anyListeners: AnyListener[] = [];
+  private static autoNameCount = 0;
 
   /**
    * Subscribe to an event
    */
-  on(event: string, callback: EventCallback): this {
+  on(event: string, callback: EventCallback, name?: string): this {
     if (!this.events[event]) {
       this.events[event] = [];
     }
-    this.events[event].push(callback);
+    this.events[event].push({
+      callback,
+      name: name ?? `listener_${++EventEmitter.autoNameCount}`,
+      callCount: 0,
+      isOnce: false,
+      registeredAt: new Date(),
+    });
     return this;
   }
 
   /**
    * Subscribe to an event once
    */
-  once(event: string, callback: EventCallback): this {
+  once(event: string, callback: EventCallback, name?: string): this {
+    const handlerName = name ?? `once_${++EventEmitter.autoNameCount}`;
     const onceCallback: EventCallback = (...args) => {
       this.off(event, onceCallback);
       callback(...args);
     };
-    return this.on(event, onceCallback);
+    if (!this.events[event]) {
+      this.events[event] = [];
+    }
+    this.events[event].push({
+      callback: onceCallback,
+      name: handlerName,
+      callCount: 0,
+      isOnce: true,
+      registeredAt: new Date(),
+    });
+    return this;
   }
 
   /**
@@ -47,7 +81,7 @@ export class EventEmitter {
     if (!callback) {
       delete this.events[event];
     } else {
-      this.events[event] = this.events[event].filter((cb) => cb !== callback);
+      this.events[event] = this.events[event].filter((l) => l.callback !== callback);
     }
     return this;
   }
@@ -56,8 +90,14 @@ export class EventEmitter {
    * Subscribe to ALL events
    * Callback receives (eventName, ...args)
    */
-  onAny(callback: AnyEventCallback): this {
-    this.anyListeners.push(callback);
+  onAny(callback: AnyEventCallback, name?: string): this {
+    this.anyListeners.push({
+      callback,
+      name: name ?? `any_${++EventEmitter.autoNameCount}`,
+      callCount: 0,
+      isOnce: false,
+      registeredAt: new Date(),
+    });
     return this;
   }
 
@@ -68,7 +108,7 @@ export class EventEmitter {
     if (!callback) {
       this.anyListeners = [];
     } else {
-      this.anyListeners = this.anyListeners.filter((cb) => cb !== callback);
+      this.anyListeners = this.anyListeners.filter((l) => l.callback !== callback);
     }
     return this;
   }
@@ -78,11 +118,13 @@ export class EventEmitter {
    */
   emit(event: string, ...args: any[]): this {
     // Call specific event listeners
-    const callbacks = this.events[event];
-    if (callbacks) {
-      callbacks.forEach((callback) => {
+    const listeners = this.events[event];
+    if (listeners) {
+      // Use slice to avoid issues if listeners remove themselves during emit
+      listeners.slice().forEach((listener) => {
         try {
-          callback(...args);
+          listener.callCount++;
+          listener.callback(...args);
         } catch (e) {
           console.error(`EventEmitter: Error in callback for ${event}`, e);
         }
@@ -90,15 +132,45 @@ export class EventEmitter {
     }
 
     // Call "any" listeners
-    this.anyListeners.forEach((callback) => {
+    this.anyListeners.forEach((listener) => {
       try {
-        callback(event, ...args);
+        listener.callCount++;
+        listener.callback(event, ...args);
       } catch (e) {
         console.error(`EventEmitter: Error in onAny callback for ${event}`, e);
       }
     });
 
     return this;
+  }
+
+  /**
+   * Get event handler statistics
+   */
+  getHandlerStats(): Record<string, any[]> {
+    const stats: Record<string, any[]> = {};
+
+    // Per-event listeners
+    for (const [event, listeners] of Object.entries(this.events)) {
+      stats[event] = listeners.map((l) => ({
+        name: l.name,
+        callCount: l.callCount,
+        isOnce: l.isOnce,
+        registeredAt: l.registeredAt,
+      }));
+    }
+
+    // Any listeners (special key)
+    if (this.anyListeners.length > 0) {
+      stats['*'] = this.anyListeners.map((l) => ({
+        name: l.name,
+        callCount: l.callCount,
+        isOnce: l.isOnce,
+        registeredAt: l.registeredAt,
+      }));
+    }
+
+    return stats;
   }
 
   /**

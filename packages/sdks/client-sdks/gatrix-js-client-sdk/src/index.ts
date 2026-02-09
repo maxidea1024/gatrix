@@ -26,7 +26,8 @@ export type {
   ErrorEvent,
   FlagsApiResponse,
   SdkState,
-  SdkStats,
+  GatrixSdkStats,
+  FeaturesStats,
 } from './types';
 
 // Storage Providers

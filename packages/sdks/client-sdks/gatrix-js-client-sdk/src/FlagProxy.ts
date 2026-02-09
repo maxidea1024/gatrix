@@ -86,6 +86,16 @@ export class FlagProxy {
   }
 
   /**
+   * Get the variant name for this flag
+   */
+  variation(defaultValue: string): string {
+    if (!this.flag) {
+      return defaultValue;
+    }
+    return this.flag.variant?.name ?? defaultValue;
+  }
+
+  /**
    * Get string variation from variant payload
    */
   stringVariation(defaultValue: string): string {
@@ -144,20 +154,6 @@ export class FlagProxy {
     }
 
     return defaultValue;
-  }
-
-  /**
-   * Check if flag is enabled (alias for enabled getter)
-   */
-  isEnabled(): boolean {
-    return this.enabled;
-  }
-
-  /**
-   * Get variant name
-   */
-  getVariantName(): string {
-    return this.variant.name;
   }
 
   /**

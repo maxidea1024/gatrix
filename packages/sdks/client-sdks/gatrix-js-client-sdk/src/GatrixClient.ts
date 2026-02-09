@@ -7,7 +7,7 @@
  * - (future) maintenance: Maintenance status
  */
 import { EventEmitter } from './EventEmitter';
-import { GatrixClientConfig } from './types';
+import { GatrixClientConfig, GatrixSdkStats } from './types';
 import { FeaturesClient } from './FeaturesClient';
 import { EVENTS } from './events';
 import { SDK_VERSION } from './version';
@@ -104,21 +104,39 @@ export class GatrixClient {
     return this.featuresClient.getError();
   }
 
+  /**
+   * Get SDK statistics (combined from all services)
+   */
+  getStats(): GatrixSdkStats {
+    const featStats = this.featuresClient.getStats();
+    return {
+      sdkState: this.getError() ? 'error' : this.isReady() ? 'healthy' : 'initializing',
+      startTime: featStats.lastFetchTime, // Approximate
+      connectionId: this.featuresClient.getConnectionId(),
+      errorCount: featStats.metricsErrorCount, // Aggregate if more services
+      lastError: this.getError(),
+      lastErrorTime: null, // Should be tracked at client level
+      offlineMode: this.config.offlineMode ?? false,
+      features: featStats,
+      eventHandlerStats: this.emitter.getHandlerStats(),
+    };
+  }
+
   // ==================== Event Subscription ====================
 
   /**
    * Subscribe to an event
    */
-  on(event: string, callback: (...args: any[]) => void): this {
-    this.emitter.on(event, callback);
+  on(event: string, callback: (...args: any[]) => void, name?: string): this {
+    this.emitter.on(event, callback, name);
     return this;
   }
 
   /**
    * Subscribe to an event once
    */
-  once(event: string, callback: (...args: any[]) => void): this {
-    this.emitter.once(event, callback);
+  once(event: string, callback: (...args: any[]) => void, name?: string): this {
+    this.emitter.once(event, callback, name);
     return this;
   }
 
@@ -134,8 +152,8 @@ export class GatrixClient {
    * Subscribe to ALL events
    * Callback receives (eventName, ...args)
    */
-  onAny(callback: (event: string, ...args: any[]) => void): this {
-    this.emitter.onAny(callback);
+  onAny(callback: (event: string, ...args: any[]) => void, name?: string): this {
+    this.emitter.onAny(callback, name);
     return this;
   }
 

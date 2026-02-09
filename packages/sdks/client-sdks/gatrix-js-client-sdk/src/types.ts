@@ -197,9 +197,36 @@ export interface ErrorEvent {
 export type SdkState = 'initializing' | 'ready' | 'healthy' | 'error';
 
 /**
- * SDK statistics for debugging and monitoring
+ * Common SDK statistics
  */
-export interface SdkStats {
+export interface GatrixSdkStats {
+  sdkState: SdkState;
+  startTime: Date | null;
+  connectionId: string;
+  errorCount: number;
+  lastError: Error | unknown | null;
+  lastErrorTime: Date | null;
+  offlineMode: boolean;
+  /** Feature flag specific statistics */
+  features: FeaturesStats;
+  /** Event handler monitoring statistics */
+  eventHandlerStats: Record<string, EventHandlerStats[]>;
+}
+
+/**
+ * Event handler statistics
+ */
+export interface EventHandlerStats {
+  name: string;
+  callCount: number;
+  isOnce: boolean;
+  registeredAt: Date;
+}
+
+/**
+ * Feature flag specific statistics
+ */
+export interface FeaturesStats {
   /** Total number of flags in cache */
   totalFlagCount: number;
   /** Map of missing flag names to access count */
@@ -210,44 +237,30 @@ export interface SdkStats {
   updateCount: number;
   /** Number of 304 Not Modified responses */
   notModifiedCount: number;
-  /** Number of errors that occurred */
-  errorCount: number;
   /** Number of recoveries from error state */
   recoveryCount: number;
   /** Timestamp of last fetchFlags call */
   lastFetchTime: Date | null;
   /** Timestamp of last successful update */
   lastUpdateTime: Date | null;
-  /** Timestamp of last error */
-  lastErrorTime: Date | null;
   /** Timestamp of last recovery */
   lastRecoveryTime: Date | null;
-  /** Last error that occurred */
-  lastError: Error | null;
   /** Per-flag enabled/disabled access counts */
   flagEnabledCounts: Record<string, { yes: number; no: number }>;
   /** Per-flag variant access counts (flagName -> variantName -> count) */
   flagVariantCounts: Record<string, Record<string, number>>;
-  /** Whether SDK is in offline mode */
-  offlineMode: boolean;
   /** Number of syncFlags calls */
   syncFlagsCount: number;
   /** List of active watch group names */
   activeWatchGroups: string[];
-  /** Current SDK state */
-  sdkState: SdkState;
   /** Current ETag */
   etag: string | null;
-  /** SDK start time */
-  startTime: Date | null;
   /** Number of impression events sent */
   impressionCount: number;
   /** Number of context changes */
   contextChangeCount: number;
   /** Per-flag last changed times */
   flagLastChangedTimes: Record<string, Date>;
-  /** Client connection ID */
-  connectionId: string;
   /** Number of metrics payloads sent */
   metricsSentCount: number;
   /** Number of metrics send errors */

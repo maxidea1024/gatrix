@@ -1,17 +1,28 @@
-# Gatrix Client-Side SDK Specification
+# Gatrix Client SDK Specification
+
+This document defines the core architecture, API, and behavior for all Gatrix Client SDKs.
+
+## Scope and Future Expansion
+
+> [!IMPORTANT]
+> The Gatrix Client SDK is designed as a unified platform for multiple Gatrix services. While the initial focus is on **Feature Flags (Gatrix Features)**, the architecture allows for seamless integration of future services, including:
+>
+> - **Gatrix Features**: Feature flags and remote configuration (Current focus).
+> - **Gatrix Surveys**: Client-side survey triggering and responses.
+> - **Gatrix Maintenance**: Maintenance window management and whitelisting.
+> - **Gatrix Messaging**: In-app notifications and messaging.
+>
+> All naming conventions and event structures should be designed to be service-agnostic or explicitly namespaced (e.g., using `flags.` prefix for feature flag events) to avoid collisions with future features.
 
 ## Overview
 
-This specification defines the requirements and interfaces for Gatrix client-side feature flag SDKs. These SDKs are designed to run in browser environments (or similar client-side contexts like React Native) and communicate with the Gatrix Edge API to fetch evaluated feature flags.
-
-> [!IMPORTANT]
-> Client-side SDKs do NOT perform local evaluation. All flag evaluation is performed server-side through the Edge API.
+This specification defines the requirements and interfaces for Gatrix client-side SDKs. These SDKs are designed to run in browser environments, mobile applications, and game engines (like Unity), communicating with the Gatrix Edge API.
 
 ## Core Concepts
 
-### 1. Server-Side Evaluation
+### 1. Server-Side Evaluation (for Features)
 
-Unlike server SDKs that perform local evaluation, client-side SDKs:
+For the Feature Flag service, client-side SDKs:
 
 - Fetch pre-evaluated flags from the Edge API
 - Periodically poll for flag updates
@@ -172,10 +183,10 @@ class GatrixClient {
   getError(): unknown;
 
   // Event Subscription
-  on(event: string, callback: (...args: any[]) => void | Promise<void>): this;
-  once(event: string, callback: (...args: any[]) => void | Promise<void>): this;
+  on(event: string, callback: (...args: any[]) => void | Promise<void>, name?: string): this;
+  once(event: string, callback: (...args: any[]) => void | Promise<void>, name?: string): this;
   off(event: string, callback?: (...args: any[]) => void | Promise<void>): this;
-  onAny(callback: (event: string, ...args: any[]) => void): this; // Subscribe to ALL events
+  onAny(callback: (event: string, ...args: any[]) => void, name?: string): this; // Subscribe to ALL events
   offAny(callback?: (event: string, ...args: any[]) => void): this; // Unsubscribe from ALL events
 
   // Static
@@ -194,6 +205,7 @@ class FeaturesClient {
   getAllFlags(): EvaluatedFlag[];
 
   // Flag Access - Typed Variations (defaultValue is REQUIRED)
+  variation(flagName: string, defaultValue: string): string; // Variant name only
   boolVariation(flagName: string, defaultValue: boolean): boolean;
   stringVariation(flagName: string, defaultValue: string): string;
   numberVariation(flagName: string, defaultValue: number): number;
@@ -217,17 +229,30 @@ class FeaturesClient {
   syncFlags(fetchNow?: boolean): Promise<void>;
 
   // Watch (Change Detection) - Returns FlagProxy for convenience
-  watchFlag(flagName: string, callback: (flag: FlagProxy) => void | Promise<void>): () => void;
+  watchFlag(
+    flagName: string,
+    callback: (flag: FlagProxy) => void | Promise<void>,
+    name?: string
+  ): () => void;
   watchFlagWithInitialState(
     flagName: string,
-    callback: (flag: FlagProxy) => void | Promise<void>
+    callback: (flag: FlagProxy) => void | Promise<void>,
+    name?: string
   ): () => void;
   createWatchFlagGroup(name: string): WatchFlagGroup;
 
   // Statistics (Debugging & Monitoring)
-  getStats(): SdkStats;
+  getStats(): GatrixSdkStats;
 }
-```
+
+### Variation Metric Requirements
+
+Every flag access method (`isEnabled`, `variation`, `boolVariation`, etc.) MUST track the following metrics:
+- **Impression**: If the flag being accessed has `impressionData` enabled, an impression event must be sent.
+- **Missing**: If the requested `flagName` does not exist in the SDK's local cache, a `missing` metric MUST be recorded (visible in `SdkStats.missingFlags`).
+- **Access Counts**: Successful flag evaluations should increment internal access counters (`flagEnabledCounts`, `flagVariantCounts`).
+
+These requirements ensure consistent observability across both JS and Unity SDKs.
 
 ### SDK Statistics
 
@@ -265,6 +290,16 @@ interface SdkStats {
   flagVariantCounts: Record<string, Record<string, number>>;
   flagLastChangedTimes: Record<string, Date>; // Per-flag last change time
   activeWatchGroups: string[]; // Active watch group names
+
+  // Event Handler Monitoring
+  eventHandlerStats: Record<string, EventHandlerStats[]>; // eventName -> handlers
+}
+
+interface EventHandlerStats {
+  name: string; // User-provided name or auto-generated
+  callCount: number; // Total number of times this handler was called
+  isOnce: boolean; // Whether the handler is registered with once()
+  registeredAt: Date; // Timestamp of registration
 }
 ```
 
@@ -402,10 +437,8 @@ class FlagProxy {
   get impressionData(): boolean;
   get raw(): EvaluatedFlag | undefined;
 
-  isEnabled(): boolean;
-  getVariantName(): string;
-
   // Variation methods (defaultValue is REQUIRED)
+  variation(defaultValue: string): string; // Variant name only
   boolVariation(defaultValue: boolean): boolean;
   stringVariation(defaultValue: string): string;
   numberVariation(defaultValue: number): number;
@@ -496,21 +529,19 @@ unwatch();
 
 SDK emits the following events that you can subscribe to:
 
-| Event                 | Constant               | Description                                          | Data                                                |
-| --------------------- | ---------------------- | ---------------------------------------------------- | --------------------------------------------------- |
-| `flags.init`          | `EVENTS.INIT`          | SDK initialized (from storage/bootstrap)             | -                                                   |
-| `flags.ready`         | `EVENTS.READY`         | First successful fetch completed                     | -                                                   |
-| `flags.fetch`         | `EVENTS.FETCH`         | Started fetching flags from server                   | `{ etag: string \| null }`                          |
-| `flags.fetch_start`   | `EVENTS.FETCH_START`   | Started fetching flags from server (alias for fetch) | `{ etag: string \| null }`                          |
-| `flags.fetch_success` | `EVENTS.FETCH_SUCCESS` | Successfully fetched flags from server               | -                                                   |
-| `flags.fetch_error`   | `EVENTS.FETCH_ERROR`   | Error occurred during fetching                       | `{ status?: number, error?: Error }`                |
-| `flags.fetch_end`     | `EVENTS.FETCH_END`     | Completed fetching flags (success or error)          | -                                                   |
-| `flags.change`        | `EVENTS.CHANGE`        | Flags changed from server                            | `{ flags: EvaluatedFlag[] }`                        |
+| `flags.init`          | `EVENTS.FLAGS_INIT`    | SDK initialized (from storage/bootstrap)             | -                                                   |
+| `flags.ready`         | `EVENTS.FLAGS_READY`   | First successful fetch completed                     | -                                                   |
+| `flags.fetch`         | `EVENTS.FLAGS_FETCH`   | Started fetching flags from server                   | `{ etag: string \| null }`                          |
+| `flags.fetch_start`   | `EVENTS.FLAGS_FETCH_START` | Started fetching flags from server (alias for fetch) | `{ etag: string \| null }`                          |
+| `flags.fetch_success` | `EVENTS.FLAGS_FETCH_SUCCESS` | Successfully fetched flags from server               | -                                                   |
+| `flags.fetch_error`   | `EVENTS.FLAGS_FETCH_ERROR` | Error occurred during fetching                       | `{ status?: number, error?: Error }`                |
+| `flags.fetch_end`     | `EVENTS.FLAGS_FETCH_END` | Completed fetching flags (success or error)          | -                                                   |
+| `flags.change`        | `EVENTS.FLAGS_CHANGE`  | Flags changed from server                            | `{ flags: EvaluatedFlag[] }`                        |
 | `flags.{name}.change` | -                      | Individual flag changed                              | `(newFlag: EvaluatedFlag, oldFlag?: EvaluatedFlag)` |
-| `flags.error`         | `EVENTS.ERROR`         | General error occurred                               | `{ type: string, message: string }`                 |
-| `flags.recovered`     | `EVENTS.RECOVERED`     | SDK recovered from error state                       | -                                                   |
-| `flags.sync`          | `EVENTS.SYNC`          | Flags synchronized (explicitSyncMode)                | -                                                   |
-| `flags.impression`    | `EVENTS.IMPRESSION`    | Flag accessed (if impressionData enabled)            | `{ featureName, enabled, variant, ... }`            |
+| `flags.error`         | `EVENTS.SDK_ERROR`     | General error occurred                               | `{ type: string, message: string }`                 |
+| `flags.recovered`     | `EVENTS.FLAGS_RECOVERED` | SDK recovered from error state                       | -                                                   |
+| `flags.sync`          | `EVENTS.FLAGS_SYNC`    | Flags synchronized (explicitSyncMode)                | -                                                   |
+| `flags.impression`    | `EVENTS.FLAGS_IMPRESSION` | Flag accessed (if impressionData enabled)            | `{ featureName, enabled, variant, ... }`            |
 
 ### Event Subscription
 

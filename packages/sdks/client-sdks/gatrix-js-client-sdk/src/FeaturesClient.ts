@@ -143,10 +143,10 @@ export class FeaturesClient {
     });
 
     // Handle metrics events for statistics
-    this.emitter.on(EVENTS.METRICS_SENT, () => {
+    this.emitter.on(EVENTS.FLAGS_METRICS_SENT, () => {
       this.metricsSentCount++;
     });
-    this.emitter.on(EVENTS.METRICS_ERROR, () => {
+    this.emitter.on(EVENTS.FLAGS_METRICS_ERROR, () => {
       this.metricsErrorCount++;
     });
 
@@ -190,7 +190,7 @@ export class FeaturesClient {
     const bootstrapOverride = this.featuresConfig.bootstrapOverride !== false;
 
     this.sdkState = 'healthy';
-    this.emitter.emit(EVENTS.INIT);
+    this.emitter.emit(EVENTS.FLAGS_INIT);
 
     if (hasBootstrap && (bootstrapOverride || this.realtimeFlags.size === 0)) {
       await this.storage.save(STORAGE_KEY_FLAGS, bootstrap);
@@ -217,7 +217,7 @@ export class FeaturesClient {
         );
         this.sdkState = 'error';
         this.lastError = error;
-        this.emitter.emit(EVENTS.ERROR, { type: 'offline_no_data', error });
+        this.emitter.emit(EVENTS.SDK_ERROR, { type: 'offline_no_data', error });
         throw error;
       }
       this.setReady();
@@ -405,6 +405,7 @@ export class FeaturesClient {
     const flag = flags.get(flagName);
 
     if (!flag) {
+      this.metrics.countMissing(flagName);
       return defaultValue;
     }
 
@@ -728,7 +729,7 @@ export class FeaturesClient {
 
     this.synchronizedFlags = new Map(this.realtimeFlags);
     this.syncFlagsCount++;
-    this.emitter.emit(EVENTS.SYNC);
+    this.emitter.emit(EVENTS.FLAGS_SYNC);
   }
 
   /**
@@ -787,12 +788,16 @@ export class FeaturesClient {
   /**
    * Watch callback type - supports both sync and async callbacks
    */
-  watchFlag(flagName: string, callback: (flag: FlagProxy) => void | Promise<void>): () => void {
+  watchFlag(
+    flagName: string,
+    callback: (flag: FlagProxy) => void | Promise<void>,
+    name?: string
+  ): () => void {
     const eventName = `flags.${flagName}.change`;
     const wrappedCallback = (rawFlag: EvaluatedFlag | undefined) => {
       callback(new FlagProxy(rawFlag));
     };
-    this.emitter.on(eventName, wrappedCallback);
+    this.emitter.on(eventName, wrappedCallback, name);
 
     return () => {
       this.emitter.off(eventName, wrappedCallback);
@@ -801,23 +806,28 @@ export class FeaturesClient {
 
   watchFlagWithInitialState(
     flagName: string,
-    callback: (flag: FlagProxy) => void | Promise<void>
+    callback: (flag: FlagProxy) => void | Promise<void>,
+    name?: string
   ): () => void {
     const eventName = `flags.${flagName}.change`;
     const wrappedCallback = (rawFlag: EvaluatedFlag | undefined) => {
       callback(new FlagProxy(rawFlag));
     };
-    this.emitter.on(eventName, wrappedCallback);
+    this.emitter.on(eventName, wrappedCallback, name);
 
     // Emit initial state
     if (this.readyEventEmitted) {
       const flags = this.selectFlags();
       callback(new FlagProxy(flags.get(flagName)));
     } else {
-      this.emitter.once(EVENTS.READY, () => {
-        const flags = this.selectFlags();
-        callback(new FlagProxy(flags.get(flagName)));
-      });
+      this.emitter.once(
+        EVENTS.FLAGS_READY,
+        () => {
+          const flags = this.selectFlags();
+          callback(new FlagProxy(flags.get(flagName)));
+        },
+        name ? `${name}_initial` : undefined
+      );
     }
 
     return () => {
@@ -848,7 +858,7 @@ export class FeaturesClient {
     }
 
     this.isFetchingFlags = true;
-    this.emitter.emit(EVENTS.FETCH_START);
+    this.emitter.emit(EVENTS.FLAGS_FETCH_START);
 
     // Cancel existing polling timer if fetch is called manually or by polying
     if (this.timerRef) {
@@ -892,7 +902,7 @@ export class FeaturesClient {
       }
 
       // Emit FETCH event with current etag
-      this.emitter.emit(EVENTS.FETCH, { etag: this.etag || null });
+      this.emitter.emit(EVENTS.FLAGS_FETCH, { etag: this.etag || null });
 
       // Get retry options from config or use defaults
       const retryOptions = this.featuresConfig.fetchRetryOptions ?? {};
@@ -919,7 +929,7 @@ export class FeaturesClient {
         this.sdkState = 'healthy';
         this.recoveryCount++;
         this.lastRecoveryTime = new Date();
-        this.emitter.emit(EVENTS.RECOVERED);
+        this.emitter.emit(EVENTS.FLAGS_RECOVERED);
       }
 
       if (response.ok) {
@@ -945,7 +955,7 @@ export class FeaturesClient {
 
         // Restart polling timer only after successful fetch
         this.scheduleNextRefresh();
-        this.emitter.emit(EVENTS.FETCH_SUCCESS);
+        this.emitter.emit(EVENTS.FLAGS_FETCH_SUCCESS);
       } else if (response.status === 304) {
         // Not modified - ETag matched
         this.notModifiedCount++;
@@ -959,10 +969,10 @@ export class FeaturesClient {
 
         // Restart polling timer only after successful fetch
         this.scheduleNextRefresh();
-        this.emitter.emit(EVENTS.FETCH_SUCCESS);
+        this.emitter.emit(EVENTS.FLAGS_FETCH_SUCCESS);
       } else {
         this.handleFetchError(response.status);
-        this.emitter.emit(EVENTS.FETCH_ERROR, { status: response.status });
+        this.emitter.emit(EVENTS.FLAGS_FETCH_ERROR, { status: response.status });
       }
     } catch (e: unknown) {
       if (e instanceof Error && e.name === 'AbortError') {
@@ -977,15 +987,15 @@ export class FeaturesClient {
       this.lastError = e;
       this.errorCount++;
       this.lastErrorTime = new Date();
-      this.emitter.emit(EVENTS.ERROR, {
+      this.emitter.emit(EVENTS.SDK_ERROR, {
         type: 'fetch-flags',
         message: errorMessage,
       } as ErrorEvent);
-      this.emitter.emit(EVENTS.FETCH_ERROR, { error: e, message: errorMessage });
+      this.emitter.emit(EVENTS.FLAGS_FETCH_ERROR, { error: e, message: errorMessage });
     } finally {
       this.isFetchingFlags = false;
       this.abortController = null;
-      this.emitter.emit(EVENTS.FETCH_END);
+      this.emitter.emit(EVENTS.FLAGS_FETCH_END);
     }
   }
 
@@ -993,7 +1003,7 @@ export class FeaturesClient {
 
   private setReady(): void {
     this.readyEventEmitted = true;
-    this.emitter.emit(EVENTS.READY);
+    this.emitter.emit(EVENTS.FLAGS_READY);
   }
 
   private scheduleNextRefresh(): void {
@@ -1041,7 +1051,7 @@ export class FeaturesClient {
 
     // In synchronous mode or if forced, emit change
     if (!this.featuresConfig.explicitSyncMode || forceSync) {
-      this.emitter.emit(EVENTS.CHANGE, { flags });
+      this.emitter.emit(EVENTS.FLAGS_CHANGE, { flags });
     }
   }
 
@@ -1083,7 +1093,7 @@ export class FeaturesClient {
     this.lastError = { type: 'HttpError', code: statusCode };
     this.errorCount++;
     this.lastErrorTime = new Date();
-    this.emitter.emit(EVENTS.ERROR, {
+    this.emitter.emit(EVENTS.SDK_ERROR, {
       type: 'HttpError',
       code: statusCode,
     } as ErrorEvent);
@@ -1127,7 +1137,7 @@ export class FeaturesClient {
     };
 
     this.impressionCount++;
-    this.emitter.emit(EVENTS.IMPRESSION, event);
+    this.emitter.emit(EVENTS.FLAGS_IMPRESSION, event);
   }
 
   // ==================== Headers ====================
@@ -1203,9 +1213,9 @@ export class FeaturesClient {
   }
 
   /**
-   * Get SDK statistics for debugging and monitoring
+   * Get feature flag specific statistics
    */
-  getStats(): SdkStats {
+  getStats(): FeaturesStats {
     const flags = this.selectFlags();
 
     // Convert Map to Record for flagEnabledCounts
@@ -1237,25 +1247,18 @@ export class FeaturesClient {
       fetchFlagsCount: this.fetchFlagsCount,
       updateCount: this.updateCount,
       notModifiedCount: this.notModifiedCount,
-      errorCount: this.errorCount,
       recoveryCount: this.recoveryCount,
       lastFetchTime: this.lastFetchTime,
       lastUpdateTime: this.lastUpdateTime,
-      lastErrorTime: this.lastErrorTime,
       lastRecoveryTime: this.lastRecoveryTime,
-      lastError: this.lastError instanceof Error ? this.lastError : null,
       flagEnabledCounts,
       flagVariantCounts,
-      offlineMode: this.config.offlineMode ?? false,
       syncFlagsCount: this.syncFlagsCount,
       activeWatchGroups,
-      sdkState: this.sdkState,
       etag: this.etag || null,
-      startTime: this.startTime,
       impressionCount: this.impressionCount,
       contextChangeCount: this.contextChangeCount,
       flagLastChangedTimes: Object.fromEntries(this.flagLastChangedTimes),
-      connectionId: this.connectionId,
       metricsSentCount: this.metricsSentCount,
       metricsErrorCount: this.metricsErrorCount,
     };
