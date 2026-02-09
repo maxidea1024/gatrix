@@ -1,0 +1,47 @@
+{
+    "name": "@gatrix/svelte-sdk",
+    "version": "1.0.0",
+    "description": "Gatrix Svelte SDK for the Gatrix platform",
+    "type": "module",
+    "main": "./dist/gatrix-svelte.js",
+    "module": "./dist/gatrix-svelte.js",
+    "types": "./dist/index.d.ts",
+    "svelte": "./dist/index.js",
+    "exports": {
+        ".": {
+            "svelte": "./dist/index.js",
+            "import": "./dist/gatrix-svelte.js",
+            "types": "./dist/index.d.ts"
+        }
+    },
+    "files": [
+        "dist"
+    ],
+    "scripts": {
+        "build": "vite build",
+        "test": "vitest run",
+        "lint": "eslint src --ext .ts",
+        "clean": "rimraf dist"
+    },
+    "peerDependencies": {
+        "svelte": "^4.0.0 || ^5.0.0",
+        "@gatrix/js-client-sdk": "link:../gatrix-js-client-sdk"
+    },
+    "devDependencies": {
+        "@gatrix/js-client-sdk": "link:../gatrix-js-client-sdk",
+        "@sveltejs/vite-plugin-svelte": "^3.0.0",
+        "svelte": "^4.2.0",
+        "rimraf": "^5.0.5",
+        "typescript": "^5.3.3",
+        "vite": "^5.0.0",
+        "vite-plugin-dts": "^3.7.0",
+        "vitest": "^1.0.0"
+    },
+    "keywords": [
+        "gatrix",
+        "svelte",
+        "feature-flags",
+        "feature-toggle"
+    ],
+    "license": "MIT"
+}
