@@ -2,8 +2,9 @@ import 'models.dart';
 
 class FlagProxy {
   final EvaluatedFlag? _flag;
+  final Function(String, Map<String, dynamic>)? _onTrack;
 
-  FlagProxy(this._flag);
+  FlagProxy(this._flag, [this._onTrack]);
 
   static final Variant _fallbackVariant = Variant(
     name: 'disabled',
@@ -20,25 +21,40 @@ class FlagProxy {
   String? get reason => _flag?.reason;
   EvaluatedFlag? get raw => _flag;
 
+  void _track(String method, [dynamic value]) {
+    if (_flag != null && _onTrack != null) {
+      _onTrack!(name, {
+        'method': method,
+        'enabled': _flag!.enabled,
+        'variant': _flag!.variant?.name,
+        'value': value,
+      });
+    }
+  }
+
   // ==================== Variation Methods ====================
 
   bool boolVariation(bool defaultValue) {
+    _track('boolVariation');
     if (_flag == null) return defaultValue;
     return _flag!.enabled;
   }
 
   String variation(String defaultValue) {
+    _track('variation');
     if (_flag == null) return defaultValue;
     return _flag!.variant?.name ?? defaultValue;
   }
 
   String stringVariation(String defaultValue) {
+    _track('stringVariation');
     final payload = _flag?.variant?.payload;
     if (payload == null) return defaultValue;
     return payload.toString();
   }
 
   double numberVariation(double defaultValue) {
+    _track('numberVariation');
     final payload = _flag?.variant?.payload;
     if (payload == null) return defaultValue;
     if (payload is num) return payload.toDouble();
@@ -53,11 +69,57 @@ class FlagProxy {
   }
 
   T jsonVariation<T>(T defaultValue) {
+    _track('jsonVariation');
     final payload = _flag?.variant?.payload;
     if (payload == null) return defaultValue;
     if (payload is T) return payload;
     return defaultValue;
   }
 
-  //Details... (skipped for brevity unless needed)
+  // ==================== Variation Details ====================
+
+  VariationResult<bool> boolVariationDetails(bool defaultValue) {
+    _track('boolVariationDetails');
+    if (_flag == null) {
+      return VariationResult(value: defaultValue, reason: 'flag_not_found', flagExists: false, enabled: false);
+    }
+    return VariationResult(
+      value: _flag!.enabled,
+      reason: _flag!.reason ?? 'evaluated',
+      flagExists: true,
+      enabled: _flag!.enabled,
+      variant: _flag!.variant,
+    );
+  }
+
+  VariationResult<String> stringVariationDetails(String defaultValue) {
+    _track('stringVariationDetails');
+    if (_flag == null) {
+      return VariationResult(value: defaultValue, reason: 'flag_not_found', flagExists: false, enabled: false);
+    }
+    final payload = _flag!.variant?.payload;
+    return VariationResult(
+      value: payload?.toString() ?? defaultValue,
+      reason: _flag!.reason ?? (payload == null ? 'no_payload' : 'evaluated'),
+      flagExists: true,
+      enabled: _flag!.enabled,
+      variant: _flag!.variant,
+    );
+  }
+
+  // ==================== OrThrow Methods ====================
+
+  bool boolVariationOrThrow() {
+    if (_flag == null) throw GatrixException('Flag $name not found', code: 'FLAG_NOT_FOUND');
+    return boolVariation(false);
+  }
+
+  String stringVariationOrThrow() {
+    if (_flag == null) throw GatrixException('Flag $name not found', code: 'FLAG_NOT_FOUND');
+    final val = stringVariation('');
+    if (val.isEmpty && _flag!.variant?.payload == null) {
+       throw GatrixException('Flag $name has no payload', code: 'NO_PAYLOAD');
+    }
+    return val;
+  }
 }

@@ -2,12 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:gatrix_flutter_sdk/gatrix_flutter_sdk.dart';
 
 void main() async {
+  // Ensure Flutter is initialized for SharedPreferences
+  WidgetsFlutterBinding.ensureInitialized();
+
   final client = GatrixClient(
     GatrixClientConfig(
       apiUrl: 'https://your-gatrix-server.com/api/v1',
       apiToken: 'your-client-api-token',
       appName: 'flutter-example',
       environment: 'production',
+      refreshIntervalSeconds: 30,
     ),
   );
 
@@ -45,21 +49,40 @@ class HomeScreen extends StatelessWidget {
           children: [
             GatrixFlagBuilder(
               flagName: 'new_feature',
-              builder: (context, enabled) {
-                return Text(
-                  'New Feature is: ${enabled ? 'ON' : 'OFF'}',
-                  style: const TextStyle(fontSize: 24),
+              builder: (context, flag) {
+                return Column(
+                  children: [
+                    Text(
+                      'Flag: ${flag.name}',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    Icon(
+                      flag.enabled ? Icons.check_circle : Icons.cancel,
+                      color: flag.enabled ? Colors.green : Colors.red,
+                      size: 48,
+                    ),
+                    Text('Reason: ${flag.reason ?? "Unknown"}'),
+                  ],
                 );
               },
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 40),
             ElevatedButton(
+              onPressed: () async {
+                final client = GatrixProvider.of(context);
+                await client.features.updateContext(GatrixContext(
+                  userId: 'user_123',
+                  properties: {'premium': true},
+                ));
+              },
+              child: const Text('Update Context'),
+            ),
+            TextButton(
               onPressed: () {
                 final client = GatrixProvider.of(context);
-                final stats = client.getStats();
-                print('Stats: $stats');
+                print('SDK Stats: ${client.getStats()}');
               },
-              child: const Text('Check Stats'),
+              child: const Text('Print Debug Stats'),
             ),
           ],
         ),

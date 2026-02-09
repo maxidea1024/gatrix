@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import '../src/client.dart';
 import '../src/events.dart';
+import '../src/flag_proxy.dart';
 
 class GatrixProvider extends StatefulWidget {
   final GatrixClient client;
@@ -19,7 +20,7 @@ class GatrixProvider extends StatefulWidget {
   }
 
   @override
-  _GatrixProviderState createState() => _GatrixProviderState();
+  State<GatrixProvider> createState() => _GatrixProviderState();
 }
 
 class _GatrixProviderState extends State<GatrixProvider> {
@@ -29,6 +30,13 @@ class _GatrixProviderState extends State<GatrixProvider> {
     if (!widget.client.isReady()) {
       widget.client.start();
     }
+  }
+
+  @override
+  void dispose() {
+    // Optionally stop the client when the provider is disposed (typically app-level so never)
+    // widget.client.stop();
+    super.dispose();
   }
 
   @override
@@ -53,9 +61,10 @@ class _InheritedGatrix extends InheritedWidget {
   bool updateShouldNotify(_InheritedGatrix oldWidget) => client != oldWidget.client;
 }
 
+/// A widget that builds itself based on the state of a Gatrix feature flag.
 class GatrixFlagBuilder extends StatefulWidget {
   final String flagName;
-  final Widget Function(BuildContext context, bool enabled) builder;
+  final Widget Function(BuildContext context, FlagProxy flag) builder;
 
   const GatrixFlagBuilder({
     Key? key,
@@ -64,49 +73,49 @@ class GatrixFlagBuilder extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _GatrixFlagBuilderState createState() => _GatrixFlagBuilderState();
+  State<GatrixFlagBuilder> createState() => _GatrixFlagBuilderState();
 }
 
 class _GatrixFlagBuilderState extends State<GatrixFlagBuilder> {
-  late GatrixClient _client;
-  bool _enabled = false;
+  GatrixClient? _client;
+  late FlagProxy _flag;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _client = GatrixProvider.of(context);
-    _enabled = _client.features.boolVariation(widget.flagName, false);
+    final newClient = GatrixProvider.of(context);
     
-    // Listen for changes
-    _client.on(GatrixEvents.flagChange(widget.flagName), _onFlagChange, name: 'builder_${widget.flagName}');
-    _client.on(GatrixEvents.flagsReady, _onUpdate, name: 'builder_ready_${widget.flagName}');
-  }
-
-  void _onFlagChange(List<dynamic> args) {
-    if (mounted) {
-      setState(() {
-        _enabled = _client.features.boolVariation(widget.flagName, false);
-      });
+    if (_client != newClient) {
+      _client?.off(GatrixEvents.flagChange(widget.flagName));
+      _client?.off(GatrixEvents.flagsReady);
+      
+      _client = newClient;
+      _flag = _client!.features.getFlag(widget.flagName);
+      
+      _client!.on(GatrixEvents.flagChange(widget.flagName), _onUpdate, name: 'builder_${widget.flagName}');
+      _client!.on(GatrixEvents.flagsReady, _onUpdate, name: 'builder_ready_${widget.flagName}');
+      _client!.on(GatrixEvents.flagsSync, _onUpdate, name: 'builder_sync_${widget.flagName}');
     }
   }
 
   void _onUpdate(List<dynamic> args) {
     if (mounted) {
       setState(() {
-        _enabled = _client.features.boolVariation(widget.flagName, false);
+        _flag = _client!.features.getFlag(widget.flagName);
       });
     }
   }
 
   @override
   void dispose() {
-    _client.off(GatrixEvents.flagChange(widget.flagName));
-    _client.off(GatrixEvents.flagsReady);
+    _client?.off(GatrixEvents.flagChange(widget.flagName));
+    _client?.off(GatrixEvents.flagsReady);
+    _client?.off(GatrixEvents.flagsSync);
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return widget.builder(context, _enabled);
+    return widget.builder(context, _flag);
   }
 }

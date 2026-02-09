@@ -93,6 +93,29 @@ class EvaluatedFlag {
       };
 }
 
+class VariationResult<T> {
+  final T value;
+  final String reason;
+  final bool flagExists;
+  final bool enabled;
+  final Variant? variant;
+
+  VariationResult({
+    required this.value,
+    required this.reason,
+    required this.flagExists,
+    required this.enabled,
+    this.variant,
+  });
+}
+
+enum SdkState {
+  initializing,
+  ready,
+  error,
+  stopped,
+}
+
 class GatrixContext {
   String? userId;
   String? sessionId;
@@ -145,4 +168,14 @@ class GatrixContext {
       properties: properties != null ? Map<String, dynamic>.from(properties!) : null,
     );
   }
+}
+
+class GatrixException implements Exception {
+  final String message;
+  final String? code;
+
+  GatrixException(this.message, {this.code});
+
+  @override
+  String toString() => 'GatrixException: $message ${code != null ? '($code)' : ''}';
 }

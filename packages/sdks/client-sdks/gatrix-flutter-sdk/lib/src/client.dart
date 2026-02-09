@@ -8,7 +8,11 @@ class GatrixClientConfig {
   final String appName;
   final String environment;
   final bool offlineMode;
+  final bool explicitSyncMode;
+  final int refreshIntervalSeconds;
+  final int metricsIntervalSeconds;
   final GatrixContext? initialContext;
+  final List<EvaluatedFlag>? bootstrap;
 
   GatrixClientConfig({
     required this.apiUrl,
@@ -16,7 +20,11 @@ class GatrixClientConfig {
     required this.appName,
     required this.environment,
     this.offlineMode = false,
+    this.explicitSyncMode = false,
+    this.refreshIntervalSeconds = 60,
+    this.metricsIntervalSeconds = 30,
     this.initialContext,
+    this.bootstrap,
   });
 }
 
@@ -24,7 +32,7 @@ class GatrixClient {
   final GatrixClientConfig config;
   final EventEmitter _events = EventEmitter();
   late final FeaturesClient features;
-  bool _isReady = false;
+  SdkState _state = SdkState.initializing;
 
   GatrixClient(this.config) {
     features = FeaturesClient(
@@ -32,20 +40,37 @@ class GatrixClient {
       apiToken: config.apiToken,
       context: config.initialContext ?? GatrixContext(),
       events: _events,
+      explicitSyncMode: config.explicitSyncMode,
     );
   }
 
   Future<void> start() async {
-    if (config.offlineMode) {
-      _isReady = true;
-      _events.emit(GatrixEvents.flagsReady);
-      return;
+    if (_state != SdkState.initializing) return;
+
+    // 1. Initial Local State
+    await features.initFromStorage();
+
+    // 2. Start Services
+    if (!config.offlineMode) {
+      // Immediate fetch
+      await features.fetchFlags();
+      
+      // Setup periodic tasks
+      features.startPolling(config.refreshIntervalSeconds);
+      features.startMetricsReporting(config.metricsIntervalSeconds);
     }
-    await features.fetchFlags();
-    _isReady = true;
+
+    _state = SdkState.ready;
+    _events.emit(GatrixEvents.flagsReady);
   }
 
-  bool isReady() => _isReady;
+  void stop() {
+    features.stop();
+    _state = SdkState.stopped;
+  }
+
+  bool isReady() => _state == SdkState.ready;
+  SdkState get state => _state;
 
   void on(String event, GatrixEventHandler callback, {String? name}) => _events.on(event, callback, name: name);
   void off(String event, [GatrixEventHandler? callback]) => _events.off(event, callback);
@@ -53,8 +78,9 @@ class GatrixClient {
 
   Map<String, dynamic> getStats() {
     return {
+      'state': _state.toString(),
       'eventHandlerStats': _events.getHandlerStats(),
-      'missingFlags': features.getMissingFlags(),
+      ...features.getStats(),
     };
   }
 }

@@ -87,6 +87,7 @@ class GatrixEvents {
   static const String flagsRecovered = 'flags.recovered';
   static const String flagsFetchStart = 'flags.fetch_start';
   static const String flagsFetchEnd = 'flags.fetch_end';
+  static const String flagsImpression = 'flags.impression';
 
   static String flagChange(String flagName) => 'flags.change:$flagName';
 }
