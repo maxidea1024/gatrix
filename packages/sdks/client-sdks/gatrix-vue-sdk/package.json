@@ -1,0 +1,46 @@
+{
+    "name": "@gatrix/vue-sdk",
+    "version": "1.0.0",
+    "description": "Gatrix Vue SDK for feature flags",
+    "type": "module",
+    "main": "./dist/gatrix-vue.umd.cjs",
+    "module": "./dist/gatrix-vue.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+        ".": {
+            "import": "./dist/gatrix-vue.js",
+            "require": "./dist/gatrix-vue.umd.cjs",
+            "types": "./dist/index.d.ts"
+        }
+    },
+    "files": [
+        "dist"
+    ],
+    "scripts": {
+        "build": "vite build",
+        "test": "vitest run",
+        "lint": "eslint src --ext .ts,.vue",
+        "clean": "rimraf dist"
+    },
+    "peerDependencies": {
+        "vue": "^3.3.0",
+        "@gatrix/js-client-sdk": "link:../gatrix-js-client-sdk"
+    },
+    "devDependencies": {
+        "@gatrix/js-client-sdk": "link:../gatrix-js-client-sdk",
+        "@vitejs/plugin-vue": "^5.0.0",
+        "vue": "^3.4.0",
+        "rimraf": "^5.0.5",
+        "typescript": "^5.3.3",
+        "vite": "^5.0.0",
+        "vite-plugin-dts": "^3.7.0",
+        "vitest": "^1.0.0"
+    },
+    "keywords": [
+        "gatrix",
+        "vue",
+        "feature-flags",
+        "feature-toggle"
+    ],
+    "license": "MIT"
+}
