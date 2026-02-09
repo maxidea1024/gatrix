@@ -1,0 +1,23 @@
+{
+  "FileVersion": 3,
+  "Version": 1,
+  "VersionName": "1.0.0",
+  "FriendlyName": "Gatrix SDK",
+  "Description": "Client SDK for Gatrix feature flags - polling, caching, context, and metric reporting",
+  "Category": "Networking",
+  "CreatedBy": "Gatrix",
+  "CreatedByURL": "",
+  "DocsURL": "",
+  "MarketplaceURL": "",
+  "SupportURL": "",
+  "CanContainContent": false,
+  "IsBetaVersion": false,
+  "Installed": true,
+  "Modules": [
+    {
+      "Name": "GatrixSDK",
+      "Type": "Runtime",
+      "LoadingPhase": "Default"
+    }
+  ]
+}
