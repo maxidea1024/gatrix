@@ -6,13 +6,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GatrixEventEmitter.h"
-#include "GatrixEvents.h"
-#include "GatrixFeaturesClient.generated.h"
-#include "GatrixFlagProxy.h"
-#include "GatrixStorageProvider.h"
 #include "GatrixTypes.h"
-
+#include "GatrixEvents.h"
+#include "GatrixEventEmitter.h"
+#include "GatrixStorageProvider.h"
+#include "GatrixFlagProxy.h"
+#include "GatrixFeaturesClient.generated.h"
 
 // Blueprint-bindable delegates
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGatrixOnReady);

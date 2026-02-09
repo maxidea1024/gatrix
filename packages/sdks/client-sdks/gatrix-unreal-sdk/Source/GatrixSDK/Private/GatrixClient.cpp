@@ -27,7 +27,7 @@ void UGatrixClient::Init(const FGatrixClientConfig &InConfig) {
 
   Config = InConfig;
   ClientConnectionId =
-      FGuid::NewGuid().ToString(EGuidFormats::DigitsWithHyphensLower);
+      FGuid::NewGuid().ToString(EGuidFormats::DigitsWithHyphens).ToLower();
 
   // Create storage provider if not provided
   StorageProvider = MakeShareable(new FGatrixInMemoryStorageProvider());

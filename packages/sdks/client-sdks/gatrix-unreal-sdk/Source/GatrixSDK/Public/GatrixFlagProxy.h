@@ -4,9 +4,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GatrixFlagProxy.generated.h"
 #include "GatrixTypes.h"
-
+#include "GatrixFlagProxy.generated.h"
 
 /**
  * Proxy object wrapping a single evaluated flag.

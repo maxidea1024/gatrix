@@ -4,11 +4,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GatrixClient.generated.h"
+#include "GatrixTypes.h"
 #include "GatrixEventEmitter.h"
 #include "GatrixFeaturesClient.h"
 #include "GatrixStorageProvider.h"
-#include "GatrixTypes.h"
+#include "GatrixClient.generated.h"
 
 
 /**
@@ -19,7 +19,7 @@
  *
  * Usage (C++):
  *   FGatrixClientConfig Config;
- *   Config.ApiUrl = TEXT("http://localhost:45000/api/v1");
+ *   Config.ApiUrl = TEXT("http://localhost:3400/api/v1");
  *   Config.ApiToken = TEXT("your-token");
  *   Config.AppName = TEXT("MyGame");
  *   Config.Environment = TEXT("production");

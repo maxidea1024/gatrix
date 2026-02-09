@@ -1,6 +1,6 @@
 # Gatrix Unity SDK
 
-Gatrix Feature Flags Client SDK for Unity. Provides feature flag evaluation, context management, real-time updates, and editor monitoring tools.
+Gatrix Client SDK for Unity. Provides feature flag evaluation, context management, real-time updates, and editor monitoring tools.
 
 ## Installation
 

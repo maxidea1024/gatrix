@@ -1,6 +1,6 @@
 # gatrix-js-client-sdk
 
-Client-side JavaScript SDK for Gatrix feature flags.
+Client-side JavaScript SDK for the Gatrix platform.
 
 ## Installation
 

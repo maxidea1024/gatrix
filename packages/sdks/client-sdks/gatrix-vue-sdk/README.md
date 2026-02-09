@@ -1,6 +1,6 @@
 # @gatrix/vue-sdk
 
-Vue 3 SDK for Gatrix feature flags.
+Vue 3 SDK for the Gatrix platform.
 
 ## Installation
 

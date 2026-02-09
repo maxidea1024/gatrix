@@ -14,6 +14,47 @@ This document defines the core architecture, API, and behavior for all Gatrix Cl
 >
 > All naming conventions and event structures should be designed to be service-agnostic or explicitly namespaced (e.g., using `flags.` prefix for feature flag events) to avoid collisions with future features.
 
+## Terminology
+
+> [!CAUTION]
+> Gatrix uses the term **"flag"** (or **"feature flag"**) — never **"toggle"** or **"feature toggle"**.
+> All SDK code, APIs, metrics payloads, documentation, and comments MUST use `flag`/`flags` consistently.
+> For example, metrics payloads use `bucket.flags`, not `bucket.toggles`.
+
+## Metrics Payload Format
+
+When sending metrics to the backend, the payload MUST follow this structure:
+
+```json
+{
+  "appName": "MyApp",
+  "environment": "production",
+  "sdkName": "gatrix-js-client-sdk",
+  "sdkVersion": "1.0.0",
+  "connectionId": "uuid-string",
+  "bucket": {
+    "start": "2024-01-01T00:00:00.000Z",
+    "stop": "2024-01-01T00:01:00.000Z",
+    "flags": {
+      "my-flag": {
+        "yes": 10,
+        "no": 2,
+        "variants": {
+          "variant-a": 7,
+          "variant-b": 3
+        }
+      }
+    },
+    "missing": {
+      "unknown-flag": 5
+    }
+  }
+}
+```
+
+- `bucket.flags` — per-flag access counts (`yes` = enabled, `no` = disabled, `variants` = variant name counts)
+- `bucket.missing` — flags that were accessed but not found in the local cache
+
 ## Overview
 
 This specification defines the requirements and interfaces for Gatrix client-side SDKs. These SDKs are designed to run in browser environments, mobile applications, and game engines (like Unity), communicating with the Gatrix Edge API.

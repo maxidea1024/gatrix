@@ -1,7 +1,7 @@
 {
   "name": "@gatrix/js-client-sdk",
   "version": "1.0.0",
-  "description": "Gatrix client-side JavaScript SDK for feature flags",
+  "description": "Gatrix client-side JavaScript SDK for the Gatrix platform",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
   "browser": "dist/index.umd.js",

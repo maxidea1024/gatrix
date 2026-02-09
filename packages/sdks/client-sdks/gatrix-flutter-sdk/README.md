@@ -1,6 +1,6 @@
 # @gatrix/flutter-sdk
 
-Flutter SDK for Gatrix feature flags. Supports real-time flag updates, offline caching, and robust impression tracking.
+Flutter SDK for the Gatrix platform. Supports real-time flag updates, offline caching, and robust impression tracking.
 
 ## Installation
 

@@ -1,6 +1,6 @@
 # Gatrix Unreal SDK
 
-Client SDK for Gatrix feature flags in Unreal Engine 4.27+.
+Client SDK for the Gatrix platform in Unreal Engine 4.27+.
 
 ## Features
 

@@ -1,7 +1,7 @@
 {
     "name": "@gatrix/vue-sdk",
     "version": "1.0.0",
-    "description": "Gatrix Vue SDK for feature flags",
+    "description": "Gatrix Vue SDK for the Gatrix platform",
     "type": "module",
     "main": "./dist/gatrix-vue.umd.cjs",
     "module": "./dist/gatrix-vue.js",

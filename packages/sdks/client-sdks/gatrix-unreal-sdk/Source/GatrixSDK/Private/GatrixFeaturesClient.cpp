@@ -12,6 +12,7 @@
 #include "Engine/Engine.h"
 #include "Engine/World.h"
 #include "HttpModule.h"
+#include "GenericPlatform/GenericPlatformHttp.h"
 #include "Interfaces/IHttpRequest.h"
 #include "Interfaces/IHttpResponse.h"
 #include "Misc/Guid.h"
@@ -32,7 +33,7 @@ void UGatrixFeaturesClient::Initialize(
   EventEmitter = Emitter;
   StorageProvider = Storage;
   ConnectionId =
-      FGuid::NewGuid().ToString(EGuidFormats::DigitsWithHyphensLower);
+      FGuid::NewGuid().ToString(EGuidFormats::DigitsWithHyphens).ToLower();
   SdkState = EGatrixSdkState::Initializing;
 
   // Ensure context has system fields
@@ -775,7 +776,7 @@ void UGatrixFeaturesClient::TrackImpression(const FString &FlagName,
   FGatrixImpressionEvent Event;
   Event.EventType = TEXT("isEnabled");
   Event.EventId =
-      FGuid::NewGuid().ToString(EGuidFormats::DigitsWithHyphensLower);
+      FGuid::NewGuid().ToString(EGuidFormats::DigitsWithHyphens).ToLower();
   Event.Context = ClientConfig.Context;
   Event.bEnabled = bEnabled;
   Event.FeatureName = FlagName;
@@ -996,7 +997,7 @@ void UGatrixFeaturesClient::BuildMetricsPayload(FString &OutJson) const {
   Writer->WriteObjectStart(TEXT("bucket"));
 
   // Flag access counts
-  Writer->WriteObjectStart(TEXT("toggles"));
+  Writer->WriteObjectStart(TEXT("flags"));
   for (const auto &Pair : FlagAccessCopy) {
     Writer->WriteObjectStart(Pair.Key);
     Writer->WriteValue(TEXT("yes"), Pair.Value);

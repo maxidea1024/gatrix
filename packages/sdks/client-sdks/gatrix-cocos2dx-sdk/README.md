@@ -1,6 +1,6 @@
 # Gatrix Cocos2d-x SDK (C++)
 
-C++ SDK for Gatrix feature flags, designed for the Cocos2d-x game engine.
+C++ SDK for the Gatrix platform, designed for the Cocos2d-x game engine.
 Fully implements the [CLIENT_SDK_SPEC.md](../CLIENT_SDK_SPEC.md).
 
 ## Features

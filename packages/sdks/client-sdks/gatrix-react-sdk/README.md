@@ -1,6 +1,6 @@
 # @gatrix/react-sdk
 
-React SDK for Gatrix feature flags.
+React SDK for the Gatrix platform.
 
 ## Installation
 
