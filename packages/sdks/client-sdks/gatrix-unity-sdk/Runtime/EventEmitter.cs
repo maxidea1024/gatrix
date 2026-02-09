@@ -169,7 +169,16 @@ namespace Gatrix.Unity.SDK
 
                     for (int i = 0; i < count; i++)
                     {
-                        try { _emitBuffer[i](null); }
+                        var listener = _emitBuffer[i];
+                        try
+                        {
+                            listener.CallCount++;
+                            if (listener.IsOnce)
+                            {
+                                RemoveListener(eventName, listener.Callback);
+                            }
+                            listener.Callback.Invoke(null);
+                        }
                         catch (Exception e) { UnityEngine.Debug.LogError($"EventEmitter: Error in {eventName}: {e}"); }
                         _emitBuffer[i] = null;
                     }
@@ -183,7 +192,12 @@ namespace Gatrix.Unity.SDK
 
                     for (int i = 0; i < anyCount; i++)
                     {
-                        try { _anyEmitBuffer[i](eventName, null); }
+                        var anyListener = _anyEmitBuffer[i];
+                        try
+                        {
+                            anyListener.CallCount++;
+                            anyListener.Callback.Invoke(eventName, null);
+                        }
                         catch (Exception e) { UnityEngine.Debug.LogError($"EventEmitter: Error in onAny {eventName}: {e}"); }
                         _anyEmitBuffer[i] = null;
                     }

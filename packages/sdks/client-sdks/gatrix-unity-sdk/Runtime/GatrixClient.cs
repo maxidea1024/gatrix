@@ -123,8 +123,6 @@ namespace Gatrix.Unity.SDK
             var featStats = _featuresClient.GetStats();
             return new GatrixSdkStats
             {
-                SdkState = featStats.RecoveryCount >= 0 ? _featuresClient.IsReady() ? SdkState.Healthy : SdkState.Initializing : SdkState.Error, 
-                // Better state logic
                 SdkState = _featuresClient.GetError() != null ? SdkState.Error : 
                            _featuresClient.IsReady() ? SdkState.Healthy : SdkState.Initializing,
                 StartTime = featStats.LastFetchTime, // Approximate
