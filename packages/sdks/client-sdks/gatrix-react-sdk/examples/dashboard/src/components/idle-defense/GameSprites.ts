@@ -5,7 +5,7 @@ import * as PIXI from 'pixi.js';
  * '.' or null represents transparent.
  */
 export function createPixelTexture(
-  app: PIXI.Application,
+  _app: PIXI.Application,
   pixelMap: (string | null)[][],
   pixelSize: number = 4
 ): PIXI.Texture {
@@ -246,4 +246,4 @@ export const ORB_MAP: (string | null)[][] = [
   [_, BK, BK, BK, BK, _, _, _],
 ];
 
-export const BLOOD_RED = 0xff0000;
+

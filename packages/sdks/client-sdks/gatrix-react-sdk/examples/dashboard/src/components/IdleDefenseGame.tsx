@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useGatrixClient, useGatrixContext } from '@gatrix/react-sdk';
 import { createInitialState, tick, useSkill as engineUseSkill } from './idle-defense/GameEngine';
-import type { GameState, FeatureFlagReader } from './idle-defense/GameEngine';
+import type { GameState } from './idle-defense/GameEngine';
+import type { FeatureFlagReader } from './idle-defense/GameEngine';
 import { createRenderer, renderFrame, destroyRenderer } from './idle-defense/GameRenderer';
 import type { RendererObjects } from './idle-defense/GameRenderer';
 import type { UIPanel } from './idle-defense/GameTypes';
@@ -121,7 +122,7 @@ const IdleDefenseGame: React.FC<IdleDefenseGameProps> = ({ onExit }) => {
       gs.hero.gold -= item.price;
       const invItem = shopItemToInventory(item);
       const existing = gs.inventory.find(
-        (i) => i.name === invItem.name && i.rarity === invItem.rarity
+        (i: { name: string; rarity: string }) => i.name === invItem.name && i.rarity === invItem.rarity
       );
       if (existing) {
         existing.quantity += 1;
@@ -268,7 +269,7 @@ const IdleDefenseGame: React.FC<IdleDefenseGameProps> = ({ onExit }) => {
         hero={hudHero}
         skills={skills}
         activePanel={activePanel}
-        unreadMails={mails.filter((m) => !m.read).length}
+        unreadMails={mails.filter((m: { read: boolean }) => !m.read).length}
         inventoryCount={inventory.length}
         onSkillUse={handleSkillUse}
         onOpenPanel={setActivePanel}

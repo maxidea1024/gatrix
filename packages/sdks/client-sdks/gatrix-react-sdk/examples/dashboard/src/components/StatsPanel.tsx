@@ -27,6 +27,7 @@ interface StatsPanelProps {
   stats: Stats | null;
   errorMessage: string | null;
   context: Record<string, any>;
+  flagsReady: boolean;
 }
 
 // Typewriter hook with repeat
@@ -78,6 +79,7 @@ function StatsPanel({
   stats,
   errorMessage,
   context,
+  flagsReady,
 }: StatsPanelProps) {
   // Track previous counts for rumble effect
   const prevTotalRef = useRef(totalCount);
@@ -160,7 +162,16 @@ function StatsPanel({
     return '○';
   };
 
-  const isError = stats?.sdkState === 'error' || errorMessage;
+  // Determine effective SDK state using flagsReady as fallback
+  const effectiveSdkState = (() => {
+    const raw = stats?.sdkState || '';
+    if (raw === 'healthy' || raw === 'ready' || raw === 'error') return raw;
+    if (errorMessage) return 'error';
+    if (flagsReady) return 'ready';
+    return raw || 'init';
+  })();
+
+  const isError = effectiveSdkState === 'error' || !!errorMessage;
 
   const formatErrorMessage = (msg: string): string => {
     if (msg.includes('ECONNREFUSED')) return 'Connection refused!';
@@ -181,7 +192,7 @@ function StatsPanel({
 
   // Render mascot with speech bubble on the left side
   const renderMascotWithBubble = () => {
-    const state = stats?.sdkState || 'initializing';
+    const state = effectiveSdkState;
 
     let mascotIcon;
     if (state === 'error' || errorMessage) {
@@ -217,8 +228,19 @@ function StatsPanel({
           {mascotIcon}
         </div>
         {(state === 'error' || errorMessage) && formattedError && (
-          <div className="nes-balloon from-left is-dark error-balloon-inline">
-            <p>
+          <div
+            style={{
+              background: '#212529',
+              border: '2px solid #e76e55',
+              borderRadius: '4px',
+              padding: '8px 12px',
+              fontSize: '11px',
+              color: '#e76e55',
+              maxWidth: '280px',
+              position: 'relative',
+            }}
+          >
+            <p style={{ margin: 0 }}>
               {displayText}
               {isTyping && <span className="typewriter-cursor">_</span>}
             </p>
@@ -267,13 +289,17 @@ function StatsPanel({
             <div className="stats-separator"></div>
 
             {/* Context Info */}
-            <div className="stats-context-info">
-              {Object.entries(context || {}).map(([key, value]) => (
-                <div key={key} className="context-item">
-                  <span className="context-key">{key}:</span>
-                  <span className="context-value">{String(value)}</span>
-                </div>
-              ))}
+            <div className="stats-info">
+              <table className="stats-table">
+                <tbody>
+                  {Object.entries(context || {}).map(([key, value]) => (
+                    <tr key={key}>
+                      <td className="stats-label">{key}:</td>
+                      <td className="stats-value" colSpan={5}>{String(value)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
 
             <div className="stats-separator"></div>
@@ -340,11 +366,11 @@ function StatsPanel({
                   <tr>
                     <td className="stats-label">STATUS:</td>
                     <td
-                      className={`stats-value ${client.features.isOfflineMode() ? 'status-offline' : getStatusClass(stats?.sdkState || '')}`}
+                      className={`stats-value ${client.features.isOfflineMode() ? 'status-offline' : getStatusClass(effectiveSdkState)}`}
                     >
                       {client.features.isOfflineMode()
                         ? '○ OFFLINE'
-                        : `${getStatusIcon(stats?.sdkState || '')} ${stats?.sdkState || 'init'}`}
+                        : `${getStatusIcon(effectiveSdkState)} ${effectiveSdkState}`}
                     </td>
                     <td className="stats-label">UP:</td>
                     <td className="stats-value">{formatUptime(stats?.startTime || null)}</td>

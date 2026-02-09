@@ -279,9 +279,14 @@ namespace Gatrix.Unity.SDK
         public int UpdateCount { get; set; }
         public int NotModifiedCount { get; set; }
         public int RecoveryCount { get; set; }
+        public int ErrorCount { get; set; }
+        public SdkState SdkState { get; set; }
+        public Exception LastError { get; set; }
+        public DateTime? StartTime { get; set; }
         public DateTime? LastFetchTime { get; set; }
         public DateTime? LastUpdateTime { get; set; }
         public DateTime? LastRecoveryTime { get; set; }
+        public DateTime? LastErrorTime { get; set; }
         public Dictionary<string, EnabledCount> FlagEnabledCounts { get; set; }
         public Dictionary<string, Dictionary<string, int>> FlagVariantCounts { get; set; }
         public int SyncFlagsCount { get; set; }

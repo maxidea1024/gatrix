@@ -163,6 +163,8 @@ export interface GameState {
   isWaveTransition: boolean;
   waveCountdown: number;
   isDead: boolean;
+  bgDistOffset: number;
+  nextEnemyId: number;
 }
 
 export type UIPanel = 'none' | 'inventory' | 'shop' | 'mail';

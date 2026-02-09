@@ -5,32 +5,64 @@ interface ConfigFormProps {
   onConnect: (config: GatrixClientConfig) => void;
 }
 
-const DEV_TOKEN_ALL = 'gatrix-unsecured-edge-api-token';
-const DEV_TOKEN_CLIENT = 'gatrix-unsecured-client-api-token';
+// Dev tokens for local development
+const DEV_TOKEN_EDGE = 'gatrix-unsecured-edge-api-token';
+const DEV_TOKEN_BACKEND = 'gatrix-unsecured-client-api-token';
+
+// Storage keys
+const STORAGE_KEY_LOCATION = 'gatrix-dashboard-location';
+const STORAGE_KEY_SERVER_TYPE = 'gatrix-dashboard-server-type';
 const STORAGE_KEY_TOKEN = 'gatrix-dashboard-last-token';
-const STORAGE_KEY_USE_DEV = 'gatrix-dashboard-use-dev-token';
 const STORAGE_KEY_REMEMBER = 'gatrix-dashboard-remember-token';
 const STORAGE_KEY_API_URL = 'gatrix-dashboard-api-url';
 const STORAGE_KEY_APP_NAME = 'gatrix-dashboard-app-name';
 const STORAGE_KEY_ENVIRONMENT = 'gatrix-dashboard-environment';
-const STORAGE_KEY_SERVER_TYPE = 'gatrix-dashboard-server-type';
 const STORAGE_KEY_OFFLINE_MODE = 'gatrix-dashboard-offline-mode';
 const STORAGE_KEY_REFRESH_INTERVAL = 'gatrix-dashboard-refresh-interval';
 const STORAGE_KEY_EXPLICIT_SYNC = 'gatrix-dashboard-explicit-sync';
 const STORAGE_KEY_MANUAL_POLLING = 'gatrix-dashboard-manual-polling';
+const STORAGE_KEY_USER_ID = 'gatrix-dashboard-user-id';
+
+function generateRandomUserId(): string {
+  return 'user-' + Math.random().toString(36).substring(2, 10);
+}
+
+type ServerLocation = 'local' | 'remote';
+type ServerType = 'edge' | 'backend';
+
+function getLocalUrl(serverType: ServerType): string {
+  return serverType === 'edge'
+    ? 'http://localhost:3400/api/v1'
+    : 'http://localhost:45000/api/v1';
+}
+
+function getDevToken(serverType: ServerType): string {
+  return serverType === 'edge' ? DEV_TOKEN_EDGE : DEV_TOKEN_BACKEND;
+}
 
 function ConfigForm({ onConnect }: ConfigFormProps) {
-  const [serverType, setServerType] = useState<'edge' | 'backend'>(() => {
-    const saved = localStorage.getItem(STORAGE_KEY_SERVER_TYPE);
-    return (saved as 'edge' | 'backend') || 'edge';
+  // Step 1: Server location
+  const [location, setLocation] = useState<ServerLocation>(() => {
+    return (localStorage.getItem(STORAGE_KEY_LOCATION) as ServerLocation) || 'local';
   });
-  const [apiUrl, setApiUrl] = useState('http://localhost:45000/api/v1');
+
+  // Step 2: Server type (edge/backend for local)
+  const [serverType, setServerType] = useState<ServerType>(() => {
+    return (localStorage.getItem(STORAGE_KEY_SERVER_TYPE) as ServerType) || 'edge';
+  });
+
+  // Connection details
+  const [apiUrl, setApiUrl] = useState('');
   const [apiToken, setApiToken] = useState('');
   const [appName, setAppName] = useState('my-app');
   const [environment, setEnvironment] = useState('development');
-  const [useDevToken, setUseDevToken] = useState(false);
+  const [userId, setUserId] = useState(() => {
+    return localStorage.getItem(STORAGE_KEY_USER_ID) || generateRandomUserId();
+  });
   const [rememberToken, setRememberToken] = useState(false);
   const [showToken, setShowToken] = useState(false);
+
+  // Advanced options
   const [offlineMode, setOfflineMode] = useState(false);
   const [refreshInterval, setRefreshInterval] = useState(1);
   const [manualPolling, setManualPolling] = useState(false);
@@ -38,96 +70,61 @@ function ConfigForm({ onConnect }: ConfigFormProps) {
 
   // Load saved preferences on mount
   useEffect(() => {
-    const savedUseDevToken = localStorage.getItem(STORAGE_KEY_USE_DEV) === 'true';
     const savedRememberToken = localStorage.getItem(STORAGE_KEY_REMEMBER) === 'true';
     const savedToken = localStorage.getItem(STORAGE_KEY_TOKEN) || '';
     const savedApiUrl = localStorage.getItem(STORAGE_KEY_API_URL);
     const savedAppName = localStorage.getItem(STORAGE_KEY_APP_NAME);
     const savedEnvironment = localStorage.getItem(STORAGE_KEY_ENVIRONMENT);
 
-    // Restore saved form values
-    if (savedApiUrl) setApiUrl(savedApiUrl);
-    else {
-      // Set default based on server type if no saved URL
-      setApiUrl(
-        serverType === 'edge' ? 'http://localhost:45000/api/v1' : 'http://localhost:5000/api/v1'
-      );
-    }
-
     if (savedAppName) setAppName(savedAppName);
     if (savedEnvironment) setEnvironment(savedEnvironment);
 
-    setUseDevToken(savedUseDevToken);
     setRememberToken(savedRememberToken);
 
-    if (savedUseDevToken) {
-      setApiToken(serverType === 'edge' ? DEV_TOKEN_ALL : DEV_TOKEN_CLIENT);
-    } else if (savedRememberToken && savedToken) {
-      setApiToken(savedToken);
+    // Set URL and token based on location
+    if (location === 'local') {
+      setApiUrl(getLocalUrl(serverType));
+      setApiToken(getDevToken(serverType));
+    } else {
+      setApiUrl(savedApiUrl || '');
+      if (savedRememberToken && savedToken) {
+        setApiToken(savedToken);
+      }
     }
 
     setOfflineMode(localStorage.getItem(STORAGE_KEY_OFFLINE_MODE) === 'true');
     const savedManualPolling = localStorage.getItem(STORAGE_KEY_MANUAL_POLLING) === 'true';
     const savedRefreshInterval = parseInt(
-      localStorage.getItem(STORAGE_KEY_REFRESH_INTERVAL) || '30',
+      localStorage.getItem(STORAGE_KEY_REFRESH_INTERVAL) || '1',
       10
     );
 
     setManualPolling(savedManualPolling);
     setRefreshInterval(
-      !savedManualPolling && savedRefreshInterval === 0 ? 30 : savedRefreshInterval
+      !savedManualPolling && savedRefreshInterval === 0 ? 1 : savedRefreshInterval
     );
     setExplicitSyncMode(localStorage.getItem(STORAGE_KEY_EXPLICIT_SYNC) === 'true');
   }, []);
 
-  // Update token and URL when serverType or useDevToken changes
+  // When location or serverType changes, update URL and token
   useEffect(() => {
-    // If no saved URL, update to default for the server type
-    const savedApiUrl = localStorage.getItem(STORAGE_KEY_API_URL);
-    if (!savedApiUrl) {
-      setApiUrl(
-        serverType === 'edge' ? 'http://localhost:45000/api/v1' : 'http://localhost:5000/api/v1'
-      );
-    }
-
-    if (useDevToken) {
-      setApiToken(serverType === 'edge' ? DEV_TOKEN_ALL : DEV_TOKEN_CLIENT);
-    } else {
-      // Restore saved token if remember is enabled
-      const savedToken = localStorage.getItem(STORAGE_KEY_TOKEN) || '';
-      const isDevToken = savedToken === DEV_TOKEN_ALL || savedToken === DEV_TOKEN_CLIENT;
-
-      if (rememberToken && savedToken && !isDevToken) {
-        setApiToken(savedToken);
-      } else if (apiToken === DEV_TOKEN_ALL || apiToken === DEV_TOKEN_CLIENT) {
-        setApiToken('');
-      }
-    }
-
+    localStorage.setItem(STORAGE_KEY_LOCATION, location);
     localStorage.setItem(STORAGE_KEY_SERVER_TYPE, serverType);
-  }, [serverType, useDevToken]);
 
-  const handleUseDevTokenChange = (checked: boolean) => {
-    setUseDevToken(checked);
-    localStorage.setItem(STORAGE_KEY_USE_DEV, String(checked));
-    if (checked) {
-      setRememberToken(false);
-      localStorage.setItem(STORAGE_KEY_REMEMBER, 'false');
+    if (location === 'local') {
+      setApiUrl(getLocalUrl(serverType));
+      setApiToken(getDevToken(serverType));
+    } else {
+      // Remote: clear fields for manual input
+      setApiUrl('');
+      setApiToken('');
     }
-  };
+  }, [location, serverType]);
 
-  const handleRememberTokenChange = (checked: boolean) => {
-    setRememberToken(checked);
-    localStorage.setItem(STORAGE_KEY_REMEMBER, String(checked));
-    if (checked) {
-      setUseDevToken(false);
-      localStorage.setItem(STORAGE_KEY_USE_DEV, 'false');
-    }
-  };
   const handleManualPollingChange = (checked: boolean) => {
     setManualPolling(checked);
     if (!checked && refreshInterval === 0) {
-      setRefreshInterval(30); // Default to 30 seconds if it was 0
+      setRefreshInterval(1);
     }
   };
 
@@ -135,18 +132,24 @@ function ConfigForm({ onConnect }: ConfigFormProps) {
     e.preventDefault();
 
     // Save all form values for next session
-    localStorage.setItem(STORAGE_KEY_API_URL, apiUrl);
-    localStorage.setItem(STORAGE_KEY_ENVIRONMENT, environment);
+    localStorage.setItem(STORAGE_KEY_LOCATION, location);
     localStorage.setItem(STORAGE_KEY_SERVER_TYPE, serverType);
+    localStorage.setItem(STORAGE_KEY_ENVIRONMENT, environment);
+    localStorage.setItem(STORAGE_KEY_USER_ID, userId);
     localStorage.setItem(STORAGE_KEY_OFFLINE_MODE, String(offlineMode));
     localStorage.setItem(STORAGE_KEY_REFRESH_INTERVAL, String(manualPolling ? 0 : refreshInterval));
     localStorage.setItem(STORAGE_KEY_MANUAL_POLLING, String(manualPolling));
     localStorage.setItem(STORAGE_KEY_EXPLICIT_SYNC, String(explicitSyncMode));
 
-    // Save token if remember is enabled
-    const isDevToken = apiToken === DEV_TOKEN_ALL || apiToken === DEV_TOKEN_CLIENT;
-    if (rememberToken && !isDevToken) {
-      localStorage.setItem(STORAGE_KEY_TOKEN, apiToken);
+    if (location === 'remote') {
+      localStorage.setItem(STORAGE_KEY_API_URL, apiUrl);
+      if (rememberToken) {
+        localStorage.setItem(STORAGE_KEY_TOKEN, apiToken);
+        localStorage.setItem(STORAGE_KEY_REMEMBER, 'true');
+      } else {
+        localStorage.removeItem(STORAGE_KEY_TOKEN);
+        localStorage.setItem(STORAGE_KEY_REMEMBER, 'false');
+      }
     }
 
     onConnect({
@@ -155,6 +158,9 @@ function ConfigForm({ onConnect }: ConfigFormProps) {
       appName,
       environment,
       offlineMode,
+      context: {
+        userId,
+      },
       features: {
         refreshInterval: manualPolling ? 0 : refreshInterval,
         explicitSyncMode,
@@ -162,13 +168,7 @@ function ConfigForm({ onConnect }: ConfigFormProps) {
     });
   };
 
-  // Mask token for display
-  const getDisplayToken = (): string => {
-    if (useDevToken) {
-      return serverType === 'edge' ? DEV_TOKEN_ALL : DEV_TOKEN_CLIENT;
-    }
-    return apiToken;
-  };
+  const isLocal = location === 'local';
 
   return (
     <div className="login-container">
@@ -179,110 +179,127 @@ function ConfigForm({ onConnect }: ConfigFormProps) {
           </p>
 
           <form onSubmit={handleSubmit}>
+            {/* Step 1: Server Location */}
             <div className="form-group">
-              <label className="form-label">SERVER TYPE</label>
+              <label className="form-label">SERVER LOCATION</label>
               <div style={{ display: 'flex', gap: '40px', marginBottom: '20px' }}>
                 <label>
                   <input
                     type="radio"
                     className="nes-radio is-dark"
-                    name="serverType"
-                    checked={serverType === 'edge'}
-                    onChange={() => setServerType('edge')}
+                    name="serverLocation"
+                    checked={location === 'local'}
+                    onChange={() => setLocation('local')}
                   />
-                  <span>EDGE</span>
+                  <span>LOCAL</span>
                 </label>
                 <label>
                   <input
                     type="radio"
                     className="nes-radio is-dark"
-                    name="serverType"
-                    checked={serverType === 'backend'}
-                    onChange={() => setServerType('backend')}
+                    name="serverLocation"
+                    checked={location === 'remote'}
+                    onChange={() => setLocation('remote')}
                   />
-                  <span>BACKEND</span>
+                  <span>REMOTE</span>
                 </label>
               </div>
             </div>
 
-            <div className="form-group">
-              <label className="form-label">API URL</label>
-              <input
-                type="url"
-                className="nes-input is-dark"
-                value={apiUrl}
-                onChange={(e) => setApiUrl(e.target.value)}
-                placeholder={
-                  serverType === 'edge'
-                    ? 'http://localhost:45000/api/v1'
-                    : 'http://localhost:5000/api/v1'
-                }
-                required
-              />
-            </div>
-
-            <div className="form-group">
-              <label className="form-label">API TOKEN</label>
-              <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-                <input
-                  type={!showToken ? 'password' : 'text'}
-                  className="nes-input is-dark"
-                  value={getDisplayToken()}
-                  onChange={(e) => !useDevToken && setApiToken(e.target.value)}
-                  placeholder="Enter your API token"
-                  required
-                  readOnly={useDevToken}
-                  style={{ opacity: useDevToken ? 0.7 : 1, paddingRight: '50px' }}
-                />
-                <button
-                  type="button"
-                  className="nes-btn is-primary"
-                  onClick={() => setShowToken(!showToken)}
-                  style={{
-                    position: 'absolute',
-                    right: '4px',
-                    padding: '4px 8px',
-                    height: '38px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                  title={showToken ? 'Hide Token' : 'Show Token'}
-                >
-                  <i
-                    className={`nes-icon is-small ${showToken ? 'close' : 'eye'}`}
-                    style={{ transform: 'scale(1.2)' }}
-                  ></i>
-                </button>
+            {/* Step 2: For LOCAL - choose edge/backend */}
+            {isLocal && (
+              <div className="form-group">
+                <label className="form-label">SERVER TYPE</label>
+                <div style={{ display: 'flex', gap: '40px', marginBottom: '20px' }}>
+                  <label>
+                    <input
+                      type="radio"
+                      className="nes-radio is-dark"
+                      name="serverType"
+                      checked={serverType === 'edge'}
+                      onChange={() => setServerType('edge')}
+                    />
+                    <span>EDGE (:{3400})</span>
+                  </label>
+                  <label>
+                    <input
+                      type="radio"
+                      className="nes-radio is-dark"
+                      name="serverType"
+                      checked={serverType === 'backend'}
+                      onChange={() => setServerType('backend')}
+                    />
+                    <span>BACKEND (:{45000})</span>
+                  </label>
+                </div>
               </div>
-            </div>
+            )}
 
-            <div className="checkbox-group">
-              <label>
-                <input
-                  type="checkbox"
-                  className="nes-checkbox is-dark"
-                  checked={useDevToken}
-                  onChange={(e) => handleUseDevTokenChange(e.target.checked)}
-                />
-                <span className="checkbox-label">USE DEV TOKEN (unsecured)</span>
-              </label>
-            </div>
+            {/* API URL & TOKEN (remote only - local is auto-configured) */}
+            {!isLocal && (
+              <>
+                <div className="form-group">
+                  <label className="form-label">API URL</label>
+                  <input
+                    type="url"
+                    className="nes-input is-dark"
+                    value={apiUrl}
+                    onChange={(e) => setApiUrl(e.target.value)}
+                    placeholder="https://your-server.com/api/v1"
+                    required
+                  />
+                </div>
 
-            <div className="checkbox-group">
-              <label>
-                <input
-                  type="checkbox"
-                  className="nes-checkbox is-dark"
-                  checked={rememberToken}
-                  onChange={(e) => handleRememberTokenChange(e.target.checked)}
-                  disabled={useDevToken}
-                />
-                <span className="checkbox-label" style={{ opacity: useDevToken ? 0.5 : 1 }}>
-                  REMEMBER LAST TOKEN
-                </span>
-              </label>
-            </div>
+                <div className="form-group">
+                  <label className="form-label">API TOKEN</label>
+                  <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                    <input
+                      type={!showToken ? 'password' : 'text'}
+                      className="nes-input is-dark"
+                      value={apiToken}
+                      onChange={(e) => setApiToken(e.target.value)}
+                      placeholder="Enter your API token"
+                      required
+                      style={{ paddingRight: '50px' }}
+                    />
+                    <button
+                      type="button"
+                      className="nes-btn is-primary"
+                      onClick={() => setShowToken(!showToken)}
+                      style={{
+                        position: 'absolute',
+                        right: '4px',
+                        padding: '4px 8px',
+                        height: '38px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                      title={showToken ? 'Hide Token' : 'Show Token'}
+                    >
+                      <i
+                        className={`nes-icon is-small ${showToken ? 'close' : 'eye'}`}
+                        style={{ transform: 'scale(1.2)' }}
+                      ></i>
+                    </button>
+                  </div>
+                </div>
+
+                <div className="checkbox-group">
+                  <label>
+                    <input
+                      type="checkbox"
+                      className="nes-checkbox is-dark"
+                      checked={rememberToken}
+                      onChange={(e) => setRememberToken(e.target.checked)}
+                    />
+                    <span className="checkbox-label">REMEMBER TOKEN</span>
+                  </label>
+                </div>
+              </>
+            )}
+
+            <hr className="nes-hr" style={{ margin: '25px 0' }} />
 
             <div className="form-row">
               <div className="form-group">
@@ -306,6 +323,29 @@ function ConfigForm({ onConnect }: ConfigFormProps) {
                   placeholder="development"
                   required
                 />
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">USER ID (CONTEXT)</label>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <input
+                  type="text"
+                  className="nes-input is-dark"
+                  value={userId}
+                  onChange={(e) => setUserId(e.target.value)}
+                  placeholder="user-abc123"
+                  style={{ flex: 1 }}
+                />
+                <button
+                  type="button"
+                  className="nes-btn is-warning"
+                  onClick={() => setUserId(generateRandomUserId())}
+                  title="Generate random User ID"
+                  style={{ fontSize: '10px', whiteSpace: 'nowrap' }}
+                >
+                  🎲 RANDOM
+                </button>
               </div>
             </div>
 

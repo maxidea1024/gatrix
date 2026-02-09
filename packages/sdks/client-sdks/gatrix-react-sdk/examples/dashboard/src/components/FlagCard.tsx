@@ -46,16 +46,19 @@ function FlagCard({
   }, [client, flag.name, flag.version]);
 
   // Detect flag changes and trigger flash
+  const isInitialMount = useRef(true);
   useEffect(() => {
-    if (
-      prevVersionRef.current !== undefined &&
-      prevVersionRef.current !== flag.version
-    ) {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      prevVersionRef.current = flag.version;
+      return;
+    }
+    if (prevVersionRef.current !== flag.version) {
+      prevVersionRef.current = flag.version;
       setIsUpdating(true);
       const timeout = setTimeout(() => setIsUpdating(false), 500);
       return () => clearTimeout(timeout);
     }
-    prevVersionRef.current = flag.version;
   }, [flag.version]);
 
   // Update time ago every second

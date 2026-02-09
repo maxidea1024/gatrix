@@ -4,16 +4,9 @@
 
 import type {
   Enemy,
-  Projectile,
-  Particle,
-  DamageText,
-  HeroStats,
-  SkillDef,
-  InventoryItem,
-  MailItem,
   GameState,
-  ShopItem,
 } from './GameTypes';
+export type { Enemy, GameState } from './GameTypes';
 import { ENEMY_CONFIGS } from './GameTypes';
 import {
   getDefaultSkills,

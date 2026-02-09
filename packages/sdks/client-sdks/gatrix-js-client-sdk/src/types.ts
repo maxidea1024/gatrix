@@ -239,12 +239,22 @@ export interface FeaturesStats {
   notModifiedCount: number;
   /** Number of recoveries from error state */
   recoveryCount: number;
+  /** Number of fetch errors */
+  errorCount: number;
+  /** Current SDK state */
+  sdkState: SdkState;
+  /** Last error */
+  lastError: unknown;
+  /** SDK start time */
+  startTime: Date | null;
   /** Timestamp of last fetchFlags call */
   lastFetchTime: Date | null;
   /** Timestamp of last successful update */
   lastUpdateTime: Date | null;
   /** Timestamp of last recovery */
   lastRecoveryTime: Date | null;
+  /** Timestamp of last error */
+  lastErrorTime: Date | null;
   /** Per-flag enabled/disabled access counts */
   flagEnabledCounts: Record<string, { yes: number; no: number }>;
   /** Per-flag variant access counts (flagName -> variantName -> count) */

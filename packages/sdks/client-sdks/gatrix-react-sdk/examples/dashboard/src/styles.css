@@ -107,6 +107,22 @@ body {
 
 .dashboard-content.recovery-shimmer::before {
   animation: recovery-swipe 1s ease-out forwards;
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(255, 255, 255, 0.15),
+      rgba(255, 255, 255, 0.35),
+      rgba(255, 255, 255, 0.15),
+      transparent);
+}
+
+.dashboard-content.error-shimmer::before {
+  animation: recovery-swipe 1s ease-out forwards;
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(231, 110, 85, 0.15),
+      rgba(231, 110, 85, 0.35),
+      rgba(231, 110, 85, 0.15),
+      transparent);
 }
 
 @keyframes recovery-swipe {

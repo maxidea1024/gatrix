@@ -306,14 +306,16 @@ interface SdkStats {
   fetchFlagsCount: number; // Number of fetchFlags calls
   updateCount: number; // Successful updates (flag data changed)
   notModifiedCount: number; // 304 Not Modified responses
-  errorCount: number; // Total errors
+  errorCount: number; // Total fetch errors
   recoveryCount: number; // Recoveries from error state
   impressionCount: number; // Impression events sent
   contextChangeCount: number; // Context change count
   syncFlagsCount: number; // syncFlags calls
+  metricsSentCount: number; // Metrics payloads successfully sent
+  metricsErrorCount: number; // Metrics send errors
 
   // Timestamps
-  startTime: Date | null; // SDK start time
+  startTime: Date | null; // SDK start time (set when start() is called)
   lastFetchTime: Date | null; // Last fetch attempt
   lastUpdateTime: Date | null; // Last successful update
   lastErrorTime: Date | null; // Last error occurrence
@@ -321,6 +323,7 @@ interface SdkStats {
 
   // State
   sdkState: SdkState; // 'initializing' | 'ready' | 'healthy' | 'error'
+  connectionId: string; // Unique connection ID (UUID)
   etag: string | null; // Current ETag
   offlineMode: boolean; // Offline mode status
   lastError: Error | null; // Last error object
@@ -630,6 +633,44 @@ SDK should be resilient:
 - Graceful degradation with cached/bootstrap flags
 - Exponential backoff on fetch failures
 - Error events emitted, not thrown
+
+### Polling Resilience
+
+> [!IMPORTANT]
+> **Polling MUST continue after errors.** When `fetchFlags()` fails (network error, HTTP error, etc.), the SDK MUST schedule the next refresh. Polling must never stop permanently due to errors. The SDK relies on fetch retry (via HTTP client like `ky`) for individual request retries, and uses `scheduleNextRefresh()` to maintain the polling loop regardless of success or failure.
+
+Error path behavior:
+1. **HTTP errors (4xx/5xx):** Call `handleFetchError()`, emit error events, then `scheduleNextRefresh()`
+2. **Network errors (fetch exception):** Set `sdkState` to `error`, increment `errorCount`, emit error events, then `scheduleNextRefresh()`
+3. **Abort errors:** Ignore (intentional cancellation)
+
+### Cache-Based Ready State
+
+> [!IMPORTANT]
+> **Cached flags trigger ready state.** During `init()`, if cached flags are loaded from storage and the list is non-empty, the SDK MUST call `setReady()` immediately. This enables offline-first behavior where the application can start rendering flags from cache before the first network request completes.
+
+Ready state flow:
+1. `init()`: Load cached flags from storage → if non-empty, call `setReady()`
+2. `init()`: Load bootstrap flags → if present, call `setReady()` (may override cached)
+3. `start()`: First successful `fetchFlags()` → call `setReady()` if not already called
+
+### SDK State Reporting
+
+> [!IMPORTANT]
+> **Statistics must reflect actual state.** `GatrixClient.getStats()` MUST use actual values from `FeaturesClient`, not computed proxies:
+> - `sdkState`: Use `FeaturesClient._sdkState` directly (not derived from `getError()`)
+> - `errorCount`: Use `FeaturesClient._errorCount` (not `metricsErrorCount`)
+> - `startTime`: Use `FeaturesClient._startTime` (not `lastFetchTime`)
+> - `lastError`: Use `FeaturesClient._lastError` directly
+> - `lastErrorTime`: Use `FeaturesClient._lastErrorTime` directly
+
+### Error Recovery
+
+When the SDK transitions from `error` state to a successful fetch:
+1. Set `sdkState` to `healthy`
+2. Increment `recoveryCount`
+3. Set `lastRecoveryTime`
+4. Emit `flags.recovered` event
 
 ## Implementation Checklist (gatrix-js-client-sdk)
 

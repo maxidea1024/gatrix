@@ -110,12 +110,12 @@ export class GatrixClient {
   getStats(): GatrixSdkStats {
     const featStats = this.featuresClient.getStats();
     return {
-      sdkState: this.getError() ? 'error' : this.isReady() ? 'healthy' : 'initializing',
-      startTime: featStats.lastFetchTime, // Approximate
+      sdkState: featStats.sdkState || (this.getError() ? 'error' : this.isReady() ? 'healthy' : 'initializing'),
+      startTime: featStats.startTime || null,
       connectionId: this.featuresClient.getConnectionId(),
-      errorCount: featStats.metricsErrorCount, // Aggregate if more services
-      lastError: this.getError(),
-      lastErrorTime: null, // Should be tracked at client level
+      errorCount: featStats.errorCount ?? 0,
+      lastError: featStats.lastError ?? this.getError(),
+      lastErrorTime: featStats.lastErrorTime || null,
       offlineMode: this.config.offlineMode ?? false,
       features: featStats,
       eventHandlerStats: this.emitter.getHandlerStats(),

@@ -200,6 +200,11 @@ namespace Gatrix.Unity.SDK
                 if (cachedFlags != null && cachedFlags.Count > 0)
                 {
                     SetFlags(cachedFlags, forceSync: true);
+                    // Mark as ready if we have cached flags (provides offline-first experience)
+                    if (!_readyEventEmitted)
+                    {
+                        SetReady();
+                    }
                 }
             }
 
@@ -792,8 +797,6 @@ namespace Gatrix.Unity.SDK
                 };
             }
 
-            var payload = flag.Variant.Payload;
-
             if (flag.VariantType != VariantType.None && flag.VariantType != VariantType.Number)
             {
                 return new VariationResult<double>
@@ -1129,6 +1132,8 @@ namespace Gatrix.Unity.SDK
                     HandleFetchError((int)response.StatusCode);
                     _emitter.Emit(GatrixEvents.FlagsFetchError,
                         new ErrorEvent { Code = (int)response.StatusCode });
+                    // Continue polling even after HTTP errors
+                    ScheduleNextRefresh();
                 }
             }
             catch (OperationCanceledException)
@@ -1146,6 +1151,8 @@ namespace Gatrix.Unity.SDK
                     new ErrorEvent { Type = "fetch-flags", Error = e });
                 _emitter.Emit(GatrixEvents.FlagsFetchError,
                     new ErrorEvent { Error = e });
+                // Continue polling even after network errors
+                ScheduleNextRefresh();
             }
             finally
             {
@@ -1176,9 +1183,14 @@ namespace Gatrix.Unity.SDK
                 UpdateCount = _updateCount,
                 NotModifiedCount = _notModifiedCount,
                 RecoveryCount = _recoveryCount,
+                ErrorCount = _errorCount,
+                SdkState = _sdkState,
+                LastError = _lastError,
+                StartTime = _startTime,
                 LastFetchTime = _lastFetchTime,
                 LastUpdateTime = _lastUpdateTime,
                 LastRecoveryTime = _lastRecoveryTime,
+                LastErrorTime = _lastErrorTime,
                 FlagEnabledCounts = new Dictionary<string, EnabledCount>(_flagEnabledCounts),
                 FlagVariantCounts = CloneFlagVariantCounts(),
                 SyncFlagsCount = _syncFlagsCount,

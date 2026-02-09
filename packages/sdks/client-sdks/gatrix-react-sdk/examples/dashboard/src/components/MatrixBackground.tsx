@@ -13,61 +13,60 @@ const MatrixBackground: React.FC = () => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+    const fontSize = 20;
+    let columns = Math.floor(window.innerWidth / fontSize);
+    let drops: number[] = new Array(columns).fill(1).map(() => Math.floor(Math.random() * -100));
+
     // Set higher resolution for crisp text
     const updateSize = () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
+
+      const newColumns = Math.floor(canvas.width / fontSize);
+      if (newColumns !== columns) {
+        const newDrops = new Array(newColumns).fill(0).map((_, i) =>
+          i < drops.length ? drops[i] : Math.floor(Math.random() * -100)
+        );
+        columns = newColumns;
+        drops = newDrops;
+      }
     };
     updateSize();
     window.addEventListener('resize', updateSize);
-
-    const fontSize = 20;
-    const columns = Math.floor(canvas.width / fontSize);
 
     // Character array (Japanese Katakana + Latin + Numbers)
     const chars =
       'ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝabcdefghijklmnopqrstuvwxyz0123456789';
     const charArray = chars.split('');
 
-    // Falling positions for each column
-    const drops: number[] = new Array(columns).fill(1).map(() => Math.floor(Math.random() * -100));
-
     let animationId: number;
     let lastTime = 0;
-    const fps = 20; // Slightly slower for a more subtle feel
+    const fps = 20;
     const interval = 1000 / fps;
 
     const render = (timestamp: number) => {
       if (timestamp - lastTime > interval) {
         lastTime = timestamp;
 
-        // Translucent clear to create tail effect - more transparent for longer, subtler tails
         ctx.fillStyle = 'rgba(0, 0, 0, 0.08)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         ctx.font = `${fontSize}px "Courier New", Courier, monospace`;
 
         for (let i = 0; i < drops.length; i++) {
-          // Pick a random character
           const text = charArray[Math.floor(Math.random() * charArray.length)];
-
-          // X position
           const x = i * fontSize;
-          // Y position
           const y = drops[i] * fontSize;
 
-          // More visible green, with occasional soft white heads
           const isHead = Math.random() > 0.98;
           if (isHead) {
             ctx.fillStyle = 'rgba(200, 255, 200, 0.9)';
           } else {
-            // Brighter retro green
             ctx.fillStyle = 'rgba(0, 200, 80, 0.7)';
           }
 
           ctx.fillText(text, x, y);
 
-          // Reset when reaching bottom or randomly
           if (y > canvas.height && Math.random() > 0.975) {
             drops[i] = 0;
           }

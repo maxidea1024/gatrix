@@ -5,7 +5,7 @@ import {
   type GatrixClientConfig,
   type EvaluatedFlag,
 } from '@gatrix/react-sdk';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import FlagCard from './FlagCard';
 import StatsPanel from './StatsPanel';
 import FlagDetailModal from './FlagDetailModal';
@@ -33,7 +33,14 @@ interface Stats {
 }
 
 function Dashboard({ config }: DashboardProps) {
-  const flags = useFlags();
+  const rawFlags = useFlags();
+  const cachedFlagsRef = useRef(rawFlags);
+
+  // Update cached flags only when we get a non-empty result or initial load
+  if (rawFlags.length > 0 || cachedFlagsRef.current.length === 0) {
+    cachedFlagsRef.current = rawFlags;
+  }
+  const flags = cachedFlagsRef.current;
   const { flagsReady, flagsError, isExplicitSync, canSyncFlags, fetchFlags, syncFlags } =
     useGatrixContext();
   const client = useGatrixClient();
@@ -42,17 +49,34 @@ function Dashboard({ config }: DashboardProps) {
   const initialVersionsRef = useRef<Map<string, number>>(new Map());
   const [initialVersions, setInitialVersions] = useState<Map<string, number>>(new Map());
   const [showRecoveryEffect, setShowRecoveryEffect] = useState(false);
+  const [showErrorEffect, setShowErrorEffect] = useState(false);
   const prevSdkStateRef = useRef<string | null>(null);
   const [context, setContext] = useState<Record<string, any>>({});
   const [isFetching, setIsFetching] = useState(false);
-  const [viewMode, setViewMode] = useState<'detailed' | 'simple' | 'list'>('detailed');
+  const [viewMode, setViewMode] = useState<'detailed' | 'simple' | 'list'>(() => {
+    return (localStorage.getItem('gatrix-dashboard-view-mode') as 'detailed' | 'simple' | 'list') || 'simple';
+  });
+  const [searchInput, setSearchInput] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const searchTimerRef = useRef<ReturnType<typeof setTimeout>>();
+
+  // Debounced search
+  const handleSearchChange = useCallback((value: string) => {
+    setSearchInput(value);
+    if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
+    searchTimerRef.current = setTimeout(() => {
+      setSearchQuery(value.toLowerCase());
+    }, 300);
+  }, []);
 
   useEffect(() => {
     const updateStats = () => {
-      const clientStats = client.features.getStats();
-      setStats(clientStats as Stats);
-      if (clientStats.lastFetchTime) {
-        setLastUpdate(clientStats.lastFetchTime);
+      const clientStats = client.getStats();
+      // Flatten: merge top-level stats with features stats
+      const flatStats = { ...clientStats.features, ...clientStats };
+      setStats(flatStats as unknown as Stats);
+      if (clientStats.features?.lastFetchTime) {
+        setLastUpdate(clientStats.features.lastFetchTime);
       }
       setContext(client.features.getContext());
     };
@@ -100,35 +124,48 @@ function Dashboard({ config }: DashboardProps) {
     };
   }, [client]);
 
-  // Detect recovery from error state
+  // Detect recovery from error state and entering error state
   useEffect(() => {
     const currentState = stats?.sdkState || null;
     if (
       prevSdkStateRef.current === 'error' &&
       (currentState === 'healthy' || currentState === 'ready')
     ) {
+      // Recovery: white shimmer
       setShowRecoveryEffect(true);
       setTimeout(() => setShowRecoveryEffect(false), 1000);
+    } else if (
+      prevSdkStateRef.current !== 'error' &&
+      prevSdkStateRef.current !== null &&
+      currentState === 'error'
+    ) {
+      // Entering error: red shimmer
+      setShowErrorEffect(true);
+      setTimeout(() => setShowErrorEffect(false), 1000);
     }
     prevSdkStateRef.current = currentState;
   }, [stats?.sdkState]);
 
+  const filteredFlags = searchQuery
+    ? flags.filter((f) => f.name.toLowerCase().includes(searchQuery))
+    : flags;
+
   const enabledCount = flags.filter((f) => f.enabled).length;
   const disabledCount = flags.filter((f) => !f.enabled).length;
 
-  // Get error message for display - only show if currently in error state
+  // Get error message for display - only show when currently in error state
   const isInErrorState = stats?.sdkState === 'error';
   const errorMessage = isInErrorState
-    ? flagsError?.message || stats?.lastError?.message || null
+    ? (flagsError?.message || (stats?.lastError as Error)?.message || 'Unknown error')
     : null;
 
-  // Check if we haven't fetched any flags yet
+  // Check if we haven't fetched any flags yet (no cached data either)
   const isSearching = !flagsReady && flags.length === 0;
 
   const [selectedFlag, setSelectedFlag] = useState<EvaluatedFlag | null>(null);
 
   return (
-    <div className={`dashboard-content ${showRecoveryEffect ? 'recovery-shimmer' : ''}`}>
+    <div className={`dashboard-content ${showRecoveryEffect ? 'recovery-shimmer' : ''} ${showErrorEffect ? 'error-shimmer' : ''}`}>
       {selectedFlag && (
         <FlagDetailModal flag={selectedFlag} onClose={() => setSelectedFlag(null)} />
       )}
@@ -141,12 +178,13 @@ function Dashboard({ config }: DashboardProps) {
         stats={stats}
         errorMessage={errorMessage}
         context={context}
+        flagsReady={flagsReady}
       />
 
       <section className="flags-section">
         <div className="nes-container is-dark with-title">
           <p className="title" style={{ backgroundColor: '#000' }}>
-            FEATURE FLAGS ({flags.length})
+            FEATURE FLAGS ({filteredFlags.length}{searchQuery ? `/${flags.length}` : ''})
           </p>
 
           <div
@@ -154,10 +192,43 @@ function Dashboard({ config }: DashboardProps) {
               padding: '10px',
               display: 'flex',
               gap: '15px',
-              justifyContent: 'flex-end',
+              alignItems: 'center',
               marginBottom: '10px',
             }}
           >
+            {/* Search input */}
+            <div style={{ flex: 1, position: 'relative' }}>
+              <input
+                type="text"
+                className="nes-input is-dark"
+                value={searchInput}
+                onChange={(e) => handleSearchChange(e.target.value)}
+                placeholder="Search flags..."
+                style={{ width: '100%', fontSize: '12px' }}
+              />
+              {searchInput && (
+                <button
+                  type="button"
+                  onClick={() => { setSearchInput(''); setSearchQuery(''); }}
+                  style={{
+                    position: 'absolute',
+                    right: '8px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    background: 'none',
+                    border: 'none',
+                    color: '#e76e55',
+                    cursor: 'pointer',
+                    fontSize: '16px',
+                    fontWeight: 'bold',
+                    padding: '4px 8px',
+                  }}
+                  title="Clear search"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
             {!client.features.isOfflineMode() &&
               client.features.getConfig().refreshInterval === 0 && (
                 <button
@@ -187,9 +258,11 @@ function Dashboard({ config }: DashboardProps) {
               <select
                 id="view-mode-select"
                 value={viewMode}
-                onChange={(e) =>
-                  setViewMode(e.target.value as 'detailed' | 'simple' | 'list')
-                }
+                onChange={(e) => {
+                  const mode = e.target.value as 'detailed' | 'simple' | 'list';
+                  localStorage.setItem('gatrix-dashboard-view-mode', mode);
+                  setViewMode(mode);
+                }}
               >
                 <option value="detailed">Detailed Card</option>
                 <option value="simple">Simple Card</option>
@@ -227,7 +300,7 @@ function Dashboard({ config }: DashboardProps) {
                 </div>
               )}
               <div className={viewMode === 'list' ? 'flag-list' : 'flags-grid'}>
-                {flags.map((flag) => (
+                {filteredFlags.map((flag) => (
                   <FlagCard
                     key={flag.name}
                     flag={flag}

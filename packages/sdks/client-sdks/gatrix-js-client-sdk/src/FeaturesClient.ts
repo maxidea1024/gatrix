@@ -182,6 +182,10 @@ export class FeaturesClient {
     const cachedFlags = await this.storage.get(STORAGE_KEY_FLAGS);
     if (cachedFlags && Array.isArray(cachedFlags)) {
       this.setFlags(cachedFlags, true); // Force sync for initial cache load
+      // Mark as ready if we have cached flags (provides offline-first experience)
+      if (!this.readyEventEmitted && cachedFlags.length > 0) {
+        this.setReady();
+      }
     }
 
     // Handle bootstrap
@@ -973,6 +977,8 @@ export class FeaturesClient {
       } else {
         this.handleFetchError(response.status);
         this.emitter.emit(EVENTS.FLAGS_FETCH_ERROR, { status: response.status });
+        // Continue polling even after HTTP errors
+        this.scheduleNextRefresh();
       }
     } catch (e: unknown) {
       if (e instanceof Error && e.name === 'AbortError') {
@@ -992,6 +998,8 @@ export class FeaturesClient {
         message: errorMessage,
       } as ErrorEvent);
       this.emitter.emit(EVENTS.FLAGS_FETCH_ERROR, { error: e, message: errorMessage });
+      // Continue polling even after network errors
+      this.scheduleNextRefresh();
     } finally {
       this.isFetchingFlags = false;
       this.abortController = null;
@@ -1248,9 +1256,14 @@ export class FeaturesClient {
       updateCount: this.updateCount,
       notModifiedCount: this.notModifiedCount,
       recoveryCount: this.recoveryCount,
+      errorCount: this.errorCount,
+      sdkState: this.sdkState,
+      lastError: this.lastError,
+      startTime: this.startTime,
       lastFetchTime: this.lastFetchTime,
       lastUpdateTime: this.lastUpdateTime,
       lastRecoveryTime: this.lastRecoveryTime,
+      lastErrorTime: this.lastErrorTime,
       flagEnabledCounts,
       flagVariantCounts,
       syncFlagsCount: this.syncFlagsCount,

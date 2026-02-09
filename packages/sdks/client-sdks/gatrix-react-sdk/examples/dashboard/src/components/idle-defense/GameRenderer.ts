@@ -15,9 +15,6 @@ import {
     POTION_MAP,
     SWORD_MAP,
     SHIELD_MAP,
-    G1,
-    G2,
-    G3,
     ARROW_MAP,
     ORB_MAP,
 } from './GameSprites';
@@ -25,20 +22,6 @@ import {
 const CANVAS_W = 800;
 const CANVAS_H = 400;
 const HERO_X = 120;
-const P_SIZE = 4; // Pixel size for procedural art
-
-// ---- Pixel Art Helpers ----
-function pixelRect(
-    g: PIXI.Graphics,
-    x: number,
-    y: number,
-    w: number,
-    h: number,
-    color: number,
-    alpha = 1
-) {
-    g.rect(x * P_SIZE, y * P_SIZE, w * P_SIZE, h * P_SIZE).fill({ color, alpha });
-}
 
 // ---- Mario Style Backgrounds ----
 

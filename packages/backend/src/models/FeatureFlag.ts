@@ -410,15 +410,15 @@ export class FeatureFlagModel {
         variants,
         environments: envSettings
           ? [
-              {
-                id: envSettings.id,
-                flagId: id,
-                environment,
-                isEnabled: Boolean(envSettings.isEnabled),
-                baselinePayload: parseJsonField(envSettings.baselinePayload),
-                lastSeenAt: envSettings.lastSeenAt,
-              },
-            ]
+            {
+              id: envSettings.id,
+              flagId: id,
+              environment,
+              isEnabled: Boolean(envSettings.isEnabled),
+              baselinePayload: parseJsonField(envSettings.baselinePayload),
+              lastSeenAt: envSettings.lastSeenAt,
+            },
+          ]
           : [],
       };
     } catch (error) {

@@ -123,11 +123,12 @@ namespace Gatrix.Unity.SDK
             var featStats = _featuresClient.GetStats();
             return new GatrixSdkStats
             {
-                SdkState = _featuresClient.GetError() != null ? SdkState.Error : 
-                           _featuresClient.IsReady() ? SdkState.Healthy : SdkState.Initializing,
-                StartTime = featStats.LastFetchTime, // Approximate
+                SdkState = featStats.SdkState,
+                StartTime = featStats.StartTime,
                 ConnectionId = _featuresClient.GetConnectionId(),
-                ErrorCount = featStats.MetricsErrorCount, // etc. (Should be aggregated if more services)
+                ErrorCount = featStats.ErrorCount,
+                LastError = featStats.LastError,
+                LastErrorTime = featStats.LastErrorTime,
                 OfflineMode = _config.OfflineMode,
                 Features = featStats,
                 EventHandlerStats = _emitter.GetHandlerStats()

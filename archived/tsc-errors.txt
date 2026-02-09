@@ -1,0 +1,27 @@
+﻿src/components/idle-defense/GameEngine.ts(27,39): error TS2304: Cannot find name 'GameState'.
+src/components/idle-defense/GameEngine.ts(71,25): error TS2304: Cannot find name 'GameState'.
+src/components/idle-defense/GameEngine.ts(75,13): error TS2304: Cannot find name 'Enemy'.
+src/components/idle-defense/GameEngine.ts(86,15): error TS7053: Element implicitly has an 'any' type because expression of type 'Enemy' can't be used to index type '{ readonly normal: { readonly color: 4769652; readonly size: 1; readonly speedMult: 1; readonly hpMult: 1; }; readonly fast: { readonly color: 4114664; readonly size: 0.8; readonly speedMult: 2; readonly hpMult: 0.6; }; readonly tank: { ...; }; readonly boss: { ...; }; }'.
+src/components/idle-defense/GameEngine.ts(90,16): error TS2304: Cannot find name 'Enemy'.
+src/components/idle-defense/GameEngine.ts(112,7): error TS2304: Cannot find name 'GameState'.
+src/components/idle-defense/GameEngine.ts(134,7): error TS2304: Cannot find name 'GameState'.
+src/components/idle-defense/GameEngine.ts(151,32): error TS2304: Cannot find name 'GameState'.
+src/components/idle-defense/GameEngine.ts(151,50): error TS2304: Cannot find name 'Enemy'.
+src/components/idle-defense/GameEngine.ts(176,7): error TS2304: Cannot find name 'GameState'.
+src/components/idle-defense/GameEngine.ts(177,10): error TS2304: Cannot find name 'Enemy'.
+src/components/idle-defense/GameEngine.ts(229,7): error TS2304: Cannot find name 'GameState'.
+src/components/idle-defense/GameEngine.ts(234,33): error TS7006: Parameter 's' implicitly has an 'any' type.
+src/components/idle-defense/GameEngine.ts(258,38): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/components/idle-defense/GameEngine.ts(258,59): error TS7006: Parameter 'a' implicitly has an 'any' type.
+src/components/idle-defense/GameEngine.ts(258,62): error TS7006: Parameter 'b' implicitly has an 'any' type.
+src/components/idle-defense/GameEngine.ts(267,7): error TS2304: Cannot find name 'GameState'.
+src/components/idle-defense/GameEngine.ts(326,28): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/components/idle-defense/GameEngine.ts(393,38): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/components/idle-defense/GameEngine.ts(393,77): error TS7006: Parameter 'a' implicitly has an 'any' type.
+src/components/idle-defense/GameEngine.ts(393,80): error TS7006: Parameter 'b' implicitly has an 'any' type.
+src/components/idle-defense/GameEngine.ts(446,39): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/components/idle-defense/GameEngine.ts(465,41): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/components/idle-defense/GameEngine.ts(522,24): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/components/idle-defense/GameEngine.ts(535,49): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/components/idle-defense/GameEngine.ts(545,28): error TS2304: Cannot find name 'GameState'.
+src/components/idle-defense/GameEngine.ts(580,14): error TS7006: Parameter 'it' implicitly has an 'any' type.
