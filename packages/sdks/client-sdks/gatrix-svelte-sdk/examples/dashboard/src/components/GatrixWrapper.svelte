@@ -28,7 +28,7 @@
   <header class="header">
     <h1 class="header-title">
       <i class="nes-icon trophy is-small"></i>
-      &nbsp;GATRIX FEATURE FLAGS
+      &nbsp;GATRIX FEATURE FLAGS (Svelte SDK)
     </h1>
     <div style="display:flex;gap:12px">
       <button type="button" class="nes-btn is-error" on:click={onDisconnect}> POWER OFF </button>

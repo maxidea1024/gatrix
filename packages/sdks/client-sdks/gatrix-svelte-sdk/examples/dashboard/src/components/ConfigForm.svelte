@@ -38,7 +38,7 @@
   let serverType: ServerType = 'edge';
   let apiUrl = '';
   let apiToken = '';
-  let appName = 'my-app';
+  let appName = 'svelte-sdk-app';
   let environment = 'development';
   let userId = '';
   let rememberToken = false;
@@ -318,44 +318,42 @@
           </label>
         </div>
 
-        <div class="form-group {offlineMode ? 'is-disabled-section' : ''}">
-          <label class="form-label" style="opacity:{offlineMode ? 0.5 : 1}"
-            >POLLING INTERVAL (SEC)</label
-          >
-          <div style="display:flex;align-items:center;gap:20px">
-            <input
-              type="number"
-              class="nes-input is-dark {manualPolling || offlineMode ? 'is-disabled' : ''}"
-              bind:value={refreshInterval}
-              min="1"
-              disabled={manualPolling || offlineMode}
-              style="flex:1"
-            />
-            <label style="margin-bottom:0;opacity:{offlineMode ? 0.5 : 1}">
+        {#if !offlineMode}
+          <div class="form-group">
+            <label class="form-label">POLLING INTERVAL (SEC)</label>
+            <div style="display:flex;align-items:center;gap:20px">
+              <input
+                type="number"
+                class="nes-input is-dark {manualPolling ? 'is-disabled' : ''}"
+                bind:value={refreshInterval}
+                min="1"
+                disabled={manualPolling}
+                style="flex:1"
+              />
+              <label style="margin-bottom:0">
+                <input
+                  type="checkbox"
+                  class="nes-checkbox is-dark"
+                  checked={manualPolling}
+                  on:change={(e) => handleManualPollingChange(e.currentTarget.checked)}
+                />
+                <span class="checkbox-label">MANUAL</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="checkbox-group">
+            <label>
               <input
                 type="checkbox"
                 class="nes-checkbox is-dark"
-                checked={manualPolling && !offlineMode}
-                on:change={(e) => handleManualPollingChange(e.currentTarget.checked)}
-                disabled={offlineMode}
+                checked={explicitSyncMode}
+                on:change={(e) => (explicitSyncMode = e.currentTarget.checked)}
               />
-              <span class="checkbox-label">MANUAL</span>
+              <span class="checkbox-label">EXPLICIT SYNC</span>
             </label>
           </div>
-        </div>
-
-        <div class="checkbox-group" style="opacity:{offlineMode ? 0.5 : 1}">
-          <label>
-            <input
-              type="checkbox"
-              class="nes-checkbox is-dark"
-              checked={explicitSyncMode && !offlineMode}
-              on:change={(e) => (explicitSyncMode = e.currentTarget.checked)}
-              disabled={offlineMode}
-            />
-            <span class="checkbox-label">EXPLICIT SYNC</span>
-          </label>
-        </div>
+        {/if}
 
         <button type="submit" class="nes-btn is-success rumble-on-click" style="width:100%">
           START GAME

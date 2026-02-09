@@ -104,7 +104,7 @@ function App() {
               <header className="header">
                 <h1 className="header-title">
                   <i className="nes-icon trophy is-small"></i>
-                  &nbsp;GATRIX FEATURE FLAGS
+                  &nbsp;GATRIX FEATURE FLAGS (React SDK)
                 </h1>
                 <div style={{ display: 'flex', gap: '12px' }}>
                   <button

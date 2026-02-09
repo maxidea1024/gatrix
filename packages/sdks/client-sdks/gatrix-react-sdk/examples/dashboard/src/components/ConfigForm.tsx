@@ -54,7 +54,7 @@ function ConfigForm({ onConnect }: ConfigFormProps) {
   // Connection details
   const [apiUrl, setApiUrl] = useState('');
   const [apiToken, setApiToken] = useState('');
-  const [appName, setAppName] = useState('my-app');
+  const [appName, setAppName] = useState('react-sdk-app');
   const [environment, setEnvironment] = useState('development');
   const [userId, setUserId] = useState(() => {
     return localStorage.getItem(STORAGE_KEY_USER_ID) || generateRandomUserId();
@@ -309,7 +309,7 @@ function ConfigForm({ onConnect }: ConfigFormProps) {
                   className="nes-input is-dark"
                   value={appName}
                   onChange={(e) => setAppName(e.target.value)}
-                  placeholder="my-app"
+                  placeholder="react-sdk-app"
                   required
                 />
               </div>
@@ -363,45 +363,47 @@ function ConfigForm({ onConnect }: ConfigFormProps) {
               </label>
             </div>
 
-            <div className={`form-group ${offlineMode ? 'is-disabled-section' : ''}`}>
-              <label className="form-label" style={{ opacity: offlineMode ? 0.5 : 1 }}>
-                POLLING INTERVAL (SEC)
-              </label>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-                <input
-                  type="number"
-                  className={`nes-input is-dark ${manualPolling || offlineMode ? 'is-disabled' : ''}`}
-                  value={refreshInterval}
-                  onChange={(e) => setRefreshInterval(Math.max(1, parseInt(e.target.value) || 1))}
-                  min="1"
-                  disabled={manualPolling || offlineMode}
-                  style={{ flex: 1 }}
-                />
-                <label style={{ marginBottom: 0, opacity: offlineMode ? 0.5 : 1 }}>
-                  <input
-                    type="checkbox"
-                    className="nes-checkbox is-dark"
-                    checked={manualPolling && !offlineMode}
-                    onChange={(e) => handleManualPollingChange(e.target.checked)}
-                    disabled={offlineMode}
-                  />
-                  <span className="checkbox-label">MANUAL</span>
-                </label>
-              </div>
-            </div>
+            {!offlineMode && (
+              <>
+                <div className="form-group">
+                  <label className="form-label">
+                    POLLING INTERVAL (SEC)
+                  </label>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+                    <input
+                      type="number"
+                      className={`nes-input is-dark ${manualPolling ? 'is-disabled' : ''}`}
+                      value={refreshInterval}
+                      onChange={(e) => setRefreshInterval(Math.max(1, parseInt(e.target.value) || 1))}
+                      min="1"
+                      disabled={manualPolling}
+                      style={{ flex: 1 }}
+                    />
+                    <label style={{ marginBottom: 0 }}>
+                      <input
+                        type="checkbox"
+                        className="nes-checkbox is-dark"
+                        checked={manualPolling}
+                        onChange={(e) => handleManualPollingChange(e.target.checked)}
+                      />
+                      <span className="checkbox-label">MANUAL</span>
+                    </label>
+                  </div>
+                </div>
 
-            <div className="checkbox-group" style={{ opacity: offlineMode ? 0.5 : 1 }}>
-              <label>
-                <input
-                  type="checkbox"
-                  className="nes-checkbox is-dark"
-                  checked={explicitSyncMode && !offlineMode}
-                  onChange={(e) => setExplicitSyncMode(e.target.checked)}
-                  disabled={offlineMode}
-                />
-                <span className="checkbox-label">EXPLICIT SYNC</span>
-              </label>
-            </div>
+                <div className="checkbox-group">
+                  <label>
+                    <input
+                      type="checkbox"
+                      className="nes-checkbox is-dark"
+                      checked={explicitSyncMode}
+                      onChange={(e) => setExplicitSyncMode(e.target.checked)}
+                    />
+                    <span className="checkbox-label">EXPLICIT SYNC</span>
+                  </label>
+                </div>
+              </>
+            )}
 
             <button
               type="submit"
