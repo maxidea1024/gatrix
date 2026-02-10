@@ -26,13 +26,13 @@ export interface GatrixContext {
 export interface Variant {
   name: string;
   enabled: boolean;
-  payload?: string | number | object; // undefined(none), string, number, json
+  value?: string | number | object; // undefined(none), string, number, json
 }
 
 /**
  * Variant type enum
  */
-export type VariantType = 'none' | 'string' | 'number' | 'json';
+export type ValueType = 'none' | 'string' | 'number' | 'boolean' | 'json';
 
 /**
  * Evaluated flag from Edge API
@@ -41,7 +41,9 @@ export interface EvaluatedFlag {
   name: string;
   enabled: boolean;
   variant: Variant;
-  variantType: VariantType;
+  valueType: ValueType;
+  enabledValue?: any;
+  disabledValue?: any;
   version: number;
   reason?: string;
   impressionData?: boolean;

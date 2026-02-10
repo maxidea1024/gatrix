@@ -25,8 +25,9 @@ interface EvaluationFlag {
   impressionDataEnabled: boolean;
   strategies: EvaluationStrategy[];
   variants: EvaluationVariant[];
-  variantType?: string;
-  baselinePayload?: any;
+  valueType?: string;
+  enabledValue?: any;
+  disabledValue?: any;
   version?: number;
 }
 
@@ -41,8 +42,8 @@ interface EvaluationStrategy {
 interface EvaluationVariant {
   name: string;
   weight: number;
-  payload?: any;
-  payloadType?: string;
+  value?: any;
+  valueType?: string;
 }
 
 // Type for minimal segment data needed for runtime evaluation
@@ -120,8 +121,8 @@ export default class ServerFeatureFlagController {
             (v: FeatureVariantAttributes) => ({
               name: v.variantName,
               weight: v.weight,
-              payload: v.payload,
-              payloadType: v.payloadType,
+              value: v.value,
+              valueType: v.valueType,
             })
           );
 
@@ -132,10 +133,13 @@ export default class ServerFeatureFlagController {
             impressionDataEnabled: flag.impressionDataEnabled,
             strategies: evaluationStrategies,
             variants: evaluationVariants,
-            variantType: (flag as any).variantType,
-            baselinePayload:
+            valueType: (flag as any).valueType,
+            enabledValue:
               (flag as any).environments?.find((e: any) => e.environment === environment)
-                ?.baselinePayload ?? (flag as any).baselinePayload,
+                ?.enabledValue ?? (flag as any).enabledValue,
+            disabledValue:
+              (flag as any).environments?.find((e: any) => e.environment === environment)
+                ?.disabledValue ?? (flag as any).disabledValue,
             version: flag.version,
           };
         })
@@ -213,13 +217,16 @@ export default class ServerFeatureFlagController {
         variants: variants.map((v: FeatureVariantAttributes) => ({
           name: v.variantName,
           weight: v.weight,
-          payload: v.payload,
-          payloadType: v.payloadType,
+          value: v.value,
+          valueType: v.valueType,
         })),
-        variantType: flag.variantType,
-        baselinePayload:
-          flag.environments?.find((e) => e.environment === environment)?.baselinePayload ??
-          flag.baselinePayload,
+        valueType: flag.valueType,
+        enabledValue:
+          flag.environments?.find((e) => e.environment === environment)?.enabledValue ??
+          flag.enabledValue,
+        disabledValue:
+          flag.environments?.find((e) => e.environment === environment)?.disabledValue ??
+          flag.disabledValue,
         version: flag.version,
       };
 

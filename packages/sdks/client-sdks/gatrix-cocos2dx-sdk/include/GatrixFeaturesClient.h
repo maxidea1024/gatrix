@@ -35,26 +35,35 @@ public:
   Variant getVariant(const std::string &flagName);
   std::vector<EvaluatedFlag> getAllFlags() const;
 
-  // ==================== Flag Access - Typed Variations (defaultValue REQUIRED)
+  // ==================== Flag Access - Typed Variations (missingValue REQUIRED)
   // ====================
   std::string variation(const std::string &flagName,
-                        const std::string &defaultValue);
-  bool boolVariation(const std::string &flagName, bool defaultValue);
+                        const std::string &missingValue);
+  bool boolVariation(const std::string &flagName, bool missingValue);
   std::string stringVariation(const std::string &flagName,
-                              const std::string &defaultValue);
-  double numberVariation(const std::string &flagName, double defaultValue);
+                              const std::string &missingValue);
+  double numberVariation(const std::string &flagName, double missingValue);
+  int intVariation(const std::string &flagName, int missingValue);
+  float floatVariation(const std::string &flagName, float missingValue);
+  double doubleVariation(const std::string &flagName, double missingValue);
   std::string jsonVariation(const std::string &flagName,
-                            const std::string &defaultValue);
+                            const std::string &missingValue);
 
-  // ==================== Variation Details (defaultValue REQUIRED)
+  // ==================== Variation Details (missingValue REQUIRED)
   // ====================
   VariationResult<bool> boolVariationDetails(const std::string &flagName,
-                                             bool defaultValue);
+                                             bool missingValue);
   VariationResult<std::string>
   stringVariationDetails(const std::string &flagName,
-                         const std::string &defaultValue);
+                         const std::string &missingValue);
   VariationResult<double> numberVariationDetails(const std::string &flagName,
-                                                 double defaultValue);
+                                                 double missingValue);
+  VariationResult<int> intVariationDetails(const std::string &flagName,
+                                           int missingValue);
+  VariationResult<float> floatVariationDetails(const std::string &flagName,
+                                               float missingValue);
+  VariationResult<double> doubleVariationDetails(const std::string &flagName,
+                                                 double missingValue);
 
   // ==================== Strict Variations (Throw on missing)
   // ====================
@@ -65,6 +74,7 @@ public:
 
   // ==================== FlagProxy Access ====================
   FlagProxy getFlag(const std::string &flagName);
+  bool hasFlag(const std::string &flagName) const;
 
   // ==================== Explicit Sync Mode ====================
   bool isExplicitSync() const;
@@ -120,6 +130,10 @@ private:
   // Active flags getter
   const std::map<std::string, EvaluatedFlag> &activeFlags() const;
 
+  // Shared flag lookup with full metrics tracking (missing, access, impression)
+  const EvaluatedFlag *lookupFlag(const std::string &flagName,
+                                  const std::string &eventType);
+
   // Internal
   void initFromStorage();
   void initFromBootstrap();
@@ -128,8 +142,9 @@ private:
                        const std::string &etag);
   void onFetchError(int statusCode, const std::string &error);
   void trackAccess(const std::string &flagName, bool enabled,
-                   const std::string &variantName);
-  void trackImpression(const EvaluatedFlag &flag);
+                   const std::string &variantName,
+                   const std::string &eventType);
+  void trackImpression(const EvaluatedFlag &flag, const std::string &eventType);
   void scheduleNextRefresh();
   void unschedulePolling();
 };

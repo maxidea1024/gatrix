@@ -30,19 +30,23 @@ void UGatrixClient::Init(const FGatrixClientConfig &InConfig) {
 
   // Validate required fields
   if (InConfig.ApiUrl.IsEmpty()) {
-    UE_LOG(LogGatrix, Error, TEXT("Config validation failed: apiUrl is required"));
+    UE_LOG(LogGatrix, Error,
+           TEXT("Config validation failed: apiUrl is required"));
     return;
   }
   if (InConfig.ApiToken.IsEmpty()) {
-    UE_LOG(LogGatrix, Error, TEXT("Config validation failed: apiToken is required"));
+    UE_LOG(LogGatrix, Error,
+           TEXT("Config validation failed: apiToken is required"));
     return;
   }
   if (InConfig.AppName.IsEmpty()) {
-    UE_LOG(LogGatrix, Error, TEXT("Config validation failed: appName is required"));
+    UE_LOG(LogGatrix, Error,
+           TEXT("Config validation failed: appName is required"));
     return;
   }
   if (InConfig.Environment.IsEmpty()) {
-    UE_LOG(LogGatrix, Error, TEXT("Config validation failed: environment is required"));
+    UE_LOG(LogGatrix, Error,
+           TEXT("Config validation failed: environment is required"));
     return;
   }
 
@@ -50,7 +54,8 @@ void UGatrixClient::Init(const FGatrixClientConfig &InConfig) {
   if (!InConfig.ApiUrl.StartsWith(TEXT("http://")) &&
       !InConfig.ApiUrl.StartsWith(TEXT("https://"))) {
     UE_LOG(LogGatrix, Error,
-           TEXT("Config validation failed: apiUrl must start with http:// or https://. Got: %s"),
+           TEXT("Config validation failed: apiUrl must start with http:// or "
+                "https://. Got: %s"),
            *InConfig.ApiUrl);
     return;
   }
@@ -59,19 +64,23 @@ void UGatrixClient::Init(const FGatrixClientConfig &InConfig) {
   const auto &Feat = InConfig.Features;
   if (Feat.RefreshInterval < 1.0f || Feat.RefreshInterval > 86400.0f) {
     UE_LOG(LogGatrix, Error,
-           TEXT("Config validation failed: RefreshInterval must be between 1 and 86400, got %f"),
+           TEXT("Config validation failed: RefreshInterval must be between 1 "
+                "and 86400, got %f"),
            Feat.RefreshInterval);
     return;
   }
   if (Feat.MetricsInterval < 1.0f || Feat.MetricsInterval > 86400.0f) {
     UE_LOG(LogGatrix, Error,
-           TEXT("Config validation failed: MetricsInterval must be between 1 and 86400, got %f"),
+           TEXT("Config validation failed: MetricsInterval must be between 1 "
+                "and 86400, got %f"),
            Feat.MetricsInterval);
     return;
   }
-  if (Feat.MetricsIntervalInitial < 0.0f || Feat.MetricsIntervalInitial > 3600.0f) {
+  if (Feat.MetricsIntervalInitial < 0.0f ||
+      Feat.MetricsIntervalInitial > 3600.0f) {
     UE_LOG(LogGatrix, Error,
-           TEXT("Config validation failed: MetricsIntervalInitial must be between 0 and 3600, got %f"),
+           TEXT("Config validation failed: MetricsIntervalInitial must be "
+                "between 0 and 3600, got %f"),
            Feat.MetricsIntervalInitial);
     return;
   }
@@ -80,31 +89,36 @@ void UGatrixClient::Init(const FGatrixClientConfig &InConfig) {
   const auto &Retry = Feat.FetchRetryOptions;
   if (Retry.Limit < 0 || Retry.Limit > 10) {
     UE_LOG(LogGatrix, Error,
-           TEXT("Config validation failed: FetchRetryOptions.Limit must be between 0 and 10, got %d"),
+           TEXT("Config validation failed: FetchRetryOptions.Limit must be "
+                "between 0 and 10, got %d"),
            Retry.Limit);
     return;
   }
   if (Retry.TimeoutMs < 1000 || Retry.TimeoutMs > 120000) {
     UE_LOG(LogGatrix, Error,
-           TEXT("Config validation failed: FetchRetryOptions.TimeoutMs must be between 1000 and 120000, got %d"),
+           TEXT("Config validation failed: FetchRetryOptions.TimeoutMs must be "
+                "between 1000 and 120000, got %d"),
            Retry.TimeoutMs);
     return;
   }
   if (Retry.InitialBackoffMs < 100 || Retry.InitialBackoffMs > 60000) {
     UE_LOG(LogGatrix, Error,
-           TEXT("Config validation failed: InitialBackoffMs must be between 100 and 60000, got %d"),
+           TEXT("Config validation failed: InitialBackoffMs must be between "
+                "100 and 60000, got %d"),
            Retry.InitialBackoffMs);
     return;
   }
   if (Retry.MaxBackoffMs < 1000 || Retry.MaxBackoffMs > 600000) {
     UE_LOG(LogGatrix, Error,
-           TEXT("Config validation failed: MaxBackoffMs must be between 1000 and 600000, got %d"),
+           TEXT("Config validation failed: MaxBackoffMs must be between 1000 "
+                "and 600000, got %d"),
            Retry.MaxBackoffMs);
     return;
   }
   if (Retry.InitialBackoffMs > Retry.MaxBackoffMs) {
     UE_LOG(LogGatrix, Error,
-           TEXT("Config validation failed: InitialBackoffMs (%d) must be <= MaxBackoffMs (%d)"),
+           TEXT("Config validation failed: InitialBackoffMs (%d) must be <= "
+                "MaxBackoffMs (%d)"),
            Retry.InitialBackoffMs, Retry.MaxBackoffMs);
     return;
   }
@@ -190,7 +204,7 @@ float UGatrixClient::NumberVariation(const FString &FlagName,
 
 FGatrixVariant UGatrixClient::GetVariant(const FString &FlagName) const {
   return FeaturesClient ? FeaturesClient->GetVariant(FlagName)
-                        : FGatrixVariant::Disabled();
+                        : FGatrixVariant::Missing();
 }
 
 TArray<FGatrixEvaluatedFlag> UGatrixClient::GetAllFlags() const {

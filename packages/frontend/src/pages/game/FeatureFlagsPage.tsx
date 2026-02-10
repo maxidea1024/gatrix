@@ -109,6 +109,58 @@ interface FlagTypeInfo {
   lifetimeDays: number | null;
 }
 
+// Icon helpers for filter options
+const getStatusIcon = (status: string) => {
+  const iconProps = { sx: { fontSize: 16 } };
+  switch (status) {
+    case 'active':
+      return <CheckCircleIcon {...iconProps} color="success" />;
+    case 'archived':
+      return <ArchiveIcon {...iconProps} color="disabled" />;
+    case 'stale':
+      return <WarningIcon {...iconProps} color="error" />;
+    case 'potentiallyStale':
+      return <WarningIcon {...iconProps} color="warning" />;
+    default:
+      return null;
+  }
+};
+
+// Icon helpers for valueType filter options
+const getValueTypeIcon = (type: string) => {
+  const iconProps = { sx: { fontSize: 16 } };
+  switch (type) {
+    case 'boolean':
+      return <CheckCircleIcon {...iconProps} color="success" />;
+    case 'string':
+      return <StringIcon {...iconProps} color="info" />;
+    case 'number':
+      return <NumberIcon {...iconProps} color="success" />;
+    case 'json':
+      return <JsonIcon {...iconProps} color="warning" />;
+    default:
+      return null;
+  }
+};
+
+const getTypeIconSmall = (type: string) => {
+  const iconProps = { sx: { fontSize: 16 } };
+  switch (type) {
+    case 'release':
+      return <ReleaseIcon {...iconProps} color="primary" />;
+    case 'experiment':
+      return <ExperimentIcon {...iconProps} color="secondary" />;
+    case 'operational':
+      return <OperationalIcon {...iconProps} color="warning" />;
+    case 'killSwitch':
+      return <KillSwitchIcon {...iconProps} color="error" />;
+    case 'permission':
+      return <PermissionIcon {...iconProps} color="action" />;
+    default:
+      return <FlagIcon {...iconProps} />;
+  }
+};
+
 const FeatureFlagsPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
@@ -146,8 +198,10 @@ const FeatureFlagsPage: React.FC = () => {
     flagUsage: 'flag' as 'flag' | 'remoteConfig',
     tags: [] as string[],
     impressionDataEnabled: false,
-    variantType: 'none' as 'none' | 'string' | 'number' | 'json',
-    baselinePayload: '' as string | number | object,
+    valueType: 'boolean' as 'boolean' | 'string' | 'number' | 'json',
+    enabledValue: '' as any,
+    disabledValue: '' as any,
+    baselinePayload: '' as string | number | object,  // Legacy: kept for export compatibility
   });
 
   // Sorting state
@@ -184,7 +238,7 @@ const FeatureFlagsPage: React.FC = () => {
   const [cloningFlag, setCloningFlag] = useState<FeatureFlag | null>(null);
   const [cloneNewName, setCloneNewName] = useState('');
   const [cloning, setCloning] = useState(false);
-  const [newFlagBaselinePayloadJsonError, setNewFlagBaselinePayloadJsonError] = useState<
+  const [newFlagJsonError, setNewFlagJsonError] = useState<
     string | null
   >(null);
 
@@ -194,7 +248,7 @@ const FeatureFlagsPage: React.FC = () => {
     { id: 'flagName', labelKey: 'featureFlags.flagName', visible: true },
     { id: 'status', labelKey: 'featureFlags.status', visible: true },
     { id: 'flagUsage', labelKey: 'featureFlags.flagUsage', visible: true },
-    { id: 'variantType', labelKey: 'featureFlags.variantType', visible: true },
+    { id: 'valueType', labelKey: 'featureFlags.valueType', visible: true },
     { id: 'createdBy', labelKey: 'common.createdBy', visible: true },
     { id: 'createdAt', labelKey: 'featureFlags.createdAt', visible: true },
     { id: 'lastSeenAt', labelKey: 'featureFlags.lastSeenAt', visible: true },
@@ -242,40 +296,7 @@ const FeatureFlagsPage: React.FC = () => {
     return filter?.value as string[] | undefined;
   }, [activeFilters]);
 
-  // Icon helpers for filter options
-  const getStatusIcon = (status: string) => {
-    const iconProps = { sx: { fontSize: 16 } };
-    switch (status) {
-      case 'active':
-        return <CheckCircleIcon {...iconProps} color="success" />;
-      case 'archived':
-        return <ArchiveIcon {...iconProps} color="disabled" />;
-      case 'stale':
-        return <WarningIcon {...iconProps} color="error" />;
-      case 'potentiallyStale':
-        return <WarningIcon {...iconProps} color="warning" />;
-      default:
-        return null;
-    }
-  };
 
-  const getTypeIconSmall = (type: string) => {
-    const iconProps = { sx: { fontSize: 16 } };
-    switch (type) {
-      case 'release':
-        return <ReleaseIcon {...iconProps} color="primary" />;
-      case 'experiment':
-        return <ExperimentIcon {...iconProps} color="secondary" />;
-      case 'operational':
-        return <OperationalIcon {...iconProps} color="warning" />;
-      case 'killSwitch':
-        return <KillSwitchIcon {...iconProps} color="error" />;
-      case 'permission':
-        return <PermissionIcon {...iconProps} color="action" />;
-      default:
-        return <FlagIcon {...iconProps} />;
-    }
-  };
 
   // Filter definitions
   const availableFilterDefinitions: FilterDefinition[] = useMemo(
@@ -357,13 +378,14 @@ const FeatureFlagsPage: React.FC = () => {
         options: allTags.map((tag) => ({ value: tag.name, label: tag.name })),
       },
       {
-        key: 'variantType',
-        label: t('featureFlags.variantType'),
+        key: 'valueType',
+        label: t('featureFlags.valueType'),
         type: 'multiselect',
         options: [
-          { value: 'string', label: t('featureFlags.variantTypes.string') },
-          { value: 'number', label: t('featureFlags.variantTypes.number') },
-          { value: 'json', label: t('featureFlags.variantTypes.json') },
+          { value: 'boolean', label: t('featureFlags.valueTypes.boolean'), icon: getValueTypeIcon('boolean') },
+          { value: 'string', label: t('featureFlags.valueTypes.string'), icon: getValueTypeIcon('string') },
+          { value: 'number', label: t('featureFlags.valueTypes.number'), icon: getValueTypeIcon('number') },
+          { value: 'json', label: t('featureFlags.valueTypes.json'), icon: getValueTypeIcon('json') },
         ],
       },
     ],
@@ -609,8 +631,8 @@ const FeatureFlagsPage: React.FC = () => {
             const variants = ((flag as any).variants ?? []).map((v: any) => ({
               variantName: v.variantName,
               weight: v.weight,
-              payload: v.payload ?? null,
-              payloadType: v.payloadType,
+              value: v.value ?? null,
+              valueType: v.valueType,
               weightLock: Boolean(v.weightLock),
               overrides: v.overrides ?? null,
             }));
@@ -623,8 +645,9 @@ const FeatureFlagsPage: React.FC = () => {
               flagType: flag.flagType || 'flag',
               tags: flag.tags,
               impressionDataEnabled: flag.impressionDataEnabled,
-              variantType: flag.variantType || 'string',
-              baselinePayload: flag.baselinePayload,
+              valueType: flag.valueType || 'string',
+              enabledValue: flag.enabledValue,
+              disabledValue: flag.disabledValue,
               enabled: envData?.isEnabled ?? false,
               strategies,
               variants,
@@ -1152,11 +1175,11 @@ const FeatureFlagsPage: React.FC = () => {
       enqueueSnackbar(
         markAsStale
           ? t('featureFlags.bulkMarkStaleSuccess', {
-              count: targetFlags.length,
-            })
+            count: targetFlags.length,
+          })
           : t('featureFlags.bulkClearStaleSuccess', {
-              count: targetFlags.length,
-            }),
+            count: targetFlags.length,
+          }),
         { variant: 'success' }
       );
       setSelectedFlags(new Set());
@@ -1186,13 +1209,13 @@ const FeatureFlagsPage: React.FC = () => {
       enqueueSnackbar(
         enable
           ? t('featureFlags.bulkEnableSuccess', {
-              count: targetFlags.length,
-              env: environment,
-            })
+            count: targetFlags.length,
+            env: environment,
+          })
           : t('featureFlags.bulkDisableSuccess', {
-              count: targetFlags.length,
-              env: environment,
-            }),
+            count: targetFlags.length,
+            env: environment,
+          }),
         { variant: 'success' }
       );
       setSelectedFlags(new Set());
@@ -1242,8 +1265,9 @@ const FeatureFlagsPage: React.FC = () => {
         flagType: newFlag.flagType,
         tags: newFlag.tags,
         impressionDataEnabled: newFlag.impressionDataEnabled,
-        variantType: newFlag.variantType,
-        baselinePayload: newFlag.baselinePayload,
+        valueType: newFlag.valueType,
+        enabledValue: newFlag.enabledValue,
+        disabledValue: newFlag.disabledValue,
         strategies: [],
       });
 
@@ -1258,10 +1282,12 @@ const FeatureFlagsPage: React.FC = () => {
         flagType: 'release',
         tags: [],
         impressionDataEnabled: false,
-        variantType: 'none',
-        baselinePayload: '',
+        valueType: 'boolean',
+        enabledValue: 'true',
+        disabledValue: 'false',
+        baselinePayload: '',  // Legacy
       });
-      setNewFlagBaselinePayloadJsonError(null);
+      setNewFlagJsonError(null);
       // Navigate to the newly created flag's detail page
       navigate(`/feature-flags/${encodeURIComponent(createdFlagName)}`);
     } catch (error: any) {
@@ -1285,11 +1311,12 @@ const FeatureFlagsPage: React.FC = () => {
       flagUsage,
       tags: [],
       impressionDataEnabled: false,
-      // Remote Config requires a variant type, default to string
-      variantType: flagUsage === 'remoteConfig' ? 'string' : 'none',
-      baselinePayload: '',
+      valueType: 'boolean',
+      enabledValue: 'true',
+      disabledValue: 'false',
+      baselinePayload: '',  // Legacy
     });
-    setNewFlagBaselinePayloadJsonError(null);
+    setNewFlagJsonError(null);
     setCreateMenuAnchor(null);
     setCreateDialogOpen(true);
   };
@@ -1657,7 +1684,7 @@ const FeatureFlagsPage: React.FC = () => {
                             return <TableCell key={col.id}>{t('featureFlags.tags')}</TableCell>;
                           case 'variantType':
                             return (
-                              <TableCell key={col.id}>{t('featureFlags.variantType')}</TableCell>
+                              <TableCell key={col.id}>{t('featureFlags.valueType')}</TableCell>
                             );
                           case 'flagUsage':
                             return (
@@ -1897,22 +1924,22 @@ const FeatureFlagsPage: React.FC = () => {
                                   )}
                                 </TableCell>
                               );
-                            case 'variantType':
+                            case 'valueType':
                               return (
                                 <TableCell key={col.id}>
                                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                    {flag.variantType === 'none' ? (
-                                      <BlockIcon fontSize="small" color="disabled" />
-                                    ) : flag.variantType === 'json' ? (
+                                    {flag.valueType === 'boolean' ? (
+                                      <CheckCircleIcon fontSize="small" color="success" />
+                                    ) : flag.valueType === 'json' ? (
                                       <JsonIcon fontSize="small" color="secondary" />
-                                    ) : flag.variantType === 'number' ? (
+                                    ) : flag.valueType === 'number' ? (
                                       <NumberIcon fontSize="small" color="info" />
                                     ) : (
                                       <StringIcon fontSize="small" color="action" />
                                     )}
                                     <Typography variant="body2">
                                       {t(
-                                        `featureFlags.variantTypes.${flag.variantType || 'string'}`
+                                        `featureFlags.valueTypes.${flag.valueType || 'string'}`
                                       )}
                                     </Typography>
                                   </Box>
@@ -2566,14 +2593,14 @@ const FeatureFlagsPage: React.FC = () => {
               </Typography>
             </Box>
 
-            {/* Variant Type */}
+            {/* Value Type */}
             <Box>
               <Typography
                 variant="subtitle2"
                 sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1 }}
               >
-                {t('featureFlags.variantType')}
-                <Tooltip title={t('featureFlags.variantTypeHelp')}>
+                {t('featureFlags.valueType')}
+                <Tooltip title={t('featureFlags.valueTypeHelp')}>
                   <HelpOutlineIcon fontSize="small" color="action" />
                 </Tooltip>
               </Typography>
@@ -2583,20 +2610,28 @@ const FeatureFlagsPage: React.FC = () => {
                   color="text.secondary"
                   sx={{ display: 'block', mb: 1 }}
                 >
-                  {t('featureFlags.remoteConfigRequiresVariantType')}
+                  {t('featureFlags.remoteConfigRequiresValueType')}
                 </Typography>
               )}
               <FormControl size="small" sx={{ minWidth: 200 }}>
                 <Select
-                  value={newFlag.variantType}
+                  value={newFlag.valueType}
                   onChange={(e) => {
-                    const newType = e.target.value as 'none' | 'string' | 'json' | 'number';
+                    const newType = e.target.value as 'boolean' | 'string' | 'json' | 'number';
                     setNewFlag((prev) => ({
                       ...prev,
-                      variantType: newType,
-                      baselinePayload:
-                        newType === 'none'
-                          ? ''
+                      valueType: newType,
+                      enabledValue:
+                        newType === 'boolean'
+                          ? 'true'
+                          : newType === 'number'
+                            ? 1
+                            : newType === 'json'
+                              ? '{}'
+                              : '',
+                      disabledValue:
+                        newType === 'boolean'
+                          ? 'false'
                           : newType === 'number'
                             ? 0
                             : newType === 'json'
@@ -2608,135 +2643,147 @@ const FeatureFlagsPage: React.FC = () => {
                     }
                   }}
                 >
-                  <MenuItem value="none" disabled={newFlag.flagUsage === 'remoteConfig'}>
+                  <MenuItem value="boolean">
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <BlockIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
-                      {t('featureFlags.variantTypes.none')}
+                      <CheckCircleIcon sx={{ fontSize: 16, color: 'success.main' }} />
+                      {t('featureFlags.valueTypes.boolean')}
                     </Box>
                   </MenuItem>
                   <MenuItem value="string">
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                       <StringIcon sx={{ fontSize: 16, color: 'info.main' }} />
-                      {t('featureFlags.variantTypes.string')}
+                      {t('featureFlags.valueTypes.string')}
                     </Box>
                   </MenuItem>
                   <MenuItem value="number">
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                       <NumberIcon sx={{ fontSize: 16, color: 'success.main' }} />
-                      {t('featureFlags.variantTypes.number')}
+                      {t('featureFlags.valueTypes.number')}
                     </Box>
                   </MenuItem>
                   <MenuItem value="json">
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                       <JsonIcon sx={{ fontSize: 16, color: 'warning.main' }} />
-                      {t('featureFlags.variantTypes.json')}
+                      {t('featureFlags.valueTypes.json')}
                     </Box>
                   </MenuItem>
                 </Select>
               </FormControl>
             </Box>
 
-            {/* Baseline Payload - only show when variantType is not 'none' */}
-            {newFlag.variantType !== 'none' && (
-              <Box>
-                <Typography
-                  variant="subtitle2"
-                  sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1 }}
-                >
-                  {t('featureFlags.baselinePayload')}
-                  <Tooltip title={t('featureFlags.baselinePayloadHelp')}>
-                    <HelpOutlineIcon fontSize="small" color="action" />
-                  </Tooltip>
-                </Typography>
-                {newFlag.variantType === 'json' ? (
-                  <>
-                    <JsonEditor
-                      value={
-                        typeof newFlag.baselinePayload === 'object'
-                          ? JSON.stringify(newFlag.baselinePayload, null, 2)
-                          : String(newFlag.baselinePayload || '{}')
-                      }
-                      onChange={(value) => {
-                        let parsedValue: any = value;
-                        try {
-                          parsedValue = JSON.parse(value);
-                          setNewFlagBaselinePayloadJsonError(null);
-                        } catch (e: any) {
-                          setNewFlagBaselinePayloadJsonError(e.message || 'Invalid JSON');
-                        }
-                        setNewFlag((prev) => ({ ...prev, baselinePayload: parsedValue }));
-                      }}
-                      onValidation={(isValid, error) => {
-                        setNewFlagBaselinePayloadJsonError(
-                          isValid ? null : error || 'Invalid JSON'
-                        );
-                      }}
-                      height={200}
-                    />
-                    {newFlagBaselinePayloadJsonError && (
-                      <Typography
-                        variant="caption"
-                        color="error"
-                        sx={{ mt: 0.5, display: 'block' }}
-                      >
-                        {t('featureFlags.jsonError')}
-                      </Typography>
-                    )}
-                    {!newFlagBaselinePayloadJsonError && newFlag.baselinePayload !== '' && (
-                      <Typography
-                        variant="caption"
-                        color="text.secondary"
-                        sx={{ mt: 0.5, display: 'block' }}
-                      >
-                        {t('featureFlags.payloadSize', {
-                          size: new TextEncoder().encode(
-                            typeof newFlag.baselinePayload === 'object'
-                              ? JSON.stringify(newFlag.baselinePayload)
-                              : String(newFlag.baselinePayload || '')
-                          ).length,
-                        })}
-                      </Typography>
-                    )}
-                  </>
-                ) : newFlag.variantType === 'number' ? (
-                  <TextField
-                    fullWidth
-                    size="small"
-                    type="number"
-                    placeholder="0"
-                    value={newFlag.baselinePayload ?? ''}
-                    onChange={(e) => {
-                      const numValue = e.target.value === '' ? undefined : Number(e.target.value);
-                      setNewFlag((prev) => ({ ...prev, baselinePayload: numValue ?? 0 }));
-                    }}
-                  />
-                ) : (
-                  <>
-                    <TextField
-                      fullWidth
-                      size="small"
-                      placeholder={t('featureFlags.baselinePayloadPlaceholder')}
-                      value={newFlag.baselinePayload ?? ''}
-                      onChange={(e) => {
-                        setNewFlag((prev) => ({ ...prev, baselinePayload: e.target.value }));
-                      }}
-                    />
-                    {newFlag.baselinePayload !== '' && (
-                      <Typography
-                        variant="caption"
-                        color="text.secondary"
-                        sx={{ mt: 0.5, display: 'block' }}
-                      >
-                        {t('featureFlags.payloadSize', {
-                          size: new TextEncoder().encode(String(newFlag.baselinePayload || ''))
-                            .length,
-                        })}
-                      </Typography>
-                    )}
-                  </>
-                )}
-              </Box>
-            )}
+            {/* Enabled Value */}
+            <Box>
+              <Typography
+                variant="subtitle2"
+                sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1 }}
+              >
+                {t('featureFlags.enabledValue')}
+                <Tooltip title={t('featureFlags.enabledValueHelp')}>
+                  <HelpOutlineIcon fontSize="small" color="action" />
+                </Tooltip>
+              </Typography>
+              {newFlag.valueType === 'boolean' ? (
+                <FormControl size="small" fullWidth>
+                  <Select
+                    value={String(newFlag.enabledValue)}
+                    onChange={(e) =>
+                      setNewFlag((prev) => ({ ...prev, enabledValue: e.target.value }))
+                    }
+                  >
+                    <MenuItem value="true">true</MenuItem>
+                    <MenuItem value="false">false</MenuItem>
+                  </Select>
+                </FormControl>
+              ) : newFlag.valueType === 'json' ? (
+                <JsonEditor
+                  value={
+                    typeof newFlag.enabledValue === 'object'
+                      ? JSON.stringify(newFlag.enabledValue, null, 2)
+                      : String(newFlag.enabledValue || '{}')
+                  }
+                  onChange={(value) => {
+                    let parsedValue: any = value;
+                    try {
+                      parsedValue = JSON.parse(value);
+                    } catch (e) { }
+                    setNewFlag((prev) => ({ ...prev, enabledValue: parsedValue }));
+                  }}
+                  height={150}
+                />
+              ) : (
+                <TextField
+                  fullWidth
+                  size="small"
+                  type={newFlag.valueType === 'number' ? 'number' : 'text'}
+                  value={newFlag.enabledValue}
+                  onChange={(e) =>
+                    setNewFlag((prev) => ({
+                      ...prev,
+                      enabledValue:
+                        newFlag.valueType === 'number' ? Number(e.target.value) : e.target.value,
+                    }))
+                  }
+                />
+              )}
+            </Box>
+
+            {/* Disabled Value */}
+            <Box>
+              <Typography
+                variant="subtitle2"
+                sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1 }}
+              >
+                {t('featureFlags.disabledValue')}
+                <Tooltip title={t('featureFlags.disabledValueHelp')}>
+                  <HelpOutlineIcon fontSize="small" color="action" />
+                </Tooltip>
+              </Typography>
+              {newFlag.valueType === 'boolean' ? (
+                <FormControl size="small" fullWidth>
+                  <Select
+                    value={String(newFlag.disabledValue)}
+                    onChange={(e) =>
+                      setNewFlag((prev) => ({ ...prev, disabledValue: e.target.value }))
+                    }
+                  >
+                    <MenuItem value="true">true</MenuItem>
+                    <MenuItem value="false">false</MenuItem>
+                  </Select>
+                </FormControl>
+              ) : newFlag.valueType === 'json' ? (
+                <JsonEditor
+                  value={
+                    typeof newFlag.disabledValue === 'object'
+                      ? JSON.stringify(newFlag.disabledValue, null, 2)
+                      : String(newFlag.disabledValue || '{}')
+                  }
+                  onChange={(value) => {
+                    let parsedValue: any = value;
+                    try {
+                      parsedValue = JSON.parse(value);
+                    } catch (e) { }
+                    setNewFlag((prev) => ({ ...prev, disabledValue: parsedValue }));
+                  }}
+                  height={150}
+                />
+              ) : (
+                <TextField
+                  fullWidth
+                  size="small"
+                  type={newFlag.valueType === 'number' ? 'number' : 'text'}
+                  value={newFlag.disabledValue}
+                  onChange={(e) =>
+                    setNewFlag((prev) => ({
+                      ...prev,
+                      disabledValue:
+                        newFlag.valueType === 'number' ? Number(e.target.value) : e.target.value,
+                    }))
+                  }
+                />
+              )}
+            </Box>
+
+
 
             {/* Tags */}
             <Autocomplete
@@ -2794,7 +2841,7 @@ const FeatureFlagsPage: React.FC = () => {
             disabled={
               creating ||
               !newFlag.flagName.trim() ||
-              (newFlag.variantType === 'json' && newFlagBaselinePayloadJsonError !== null)
+              (newFlag.valueType === 'json' && newFlagJsonError !== null)
             }
             startIcon={creating ? <CircularProgress size={20} /> : undefined}
           >

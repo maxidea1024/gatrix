@@ -12,8 +12,8 @@ export enum GatrixFeatureErrorCode {
   FLAG_DISABLED = 'FLAG_DISABLED',
   /** Variant type mismatch */
   TYPE_MISMATCH = 'TYPE_MISMATCH',
-  /** No payload available */
-  NO_PAYLOAD = 'NO_PAYLOAD',
+  /** No value available */
+  NO_VALUE = 'NO_VALUE',
   /** No data available (offline mode without cache/bootstrap) */
   NO_DATA_AVAILABLE = 'NO_DATA_AVAILABLE',
   /** Network error */
@@ -123,12 +123,12 @@ export class GatrixFeatureError extends GatrixError {
   }
 
   /**
-   * Create a no payload error
+   * Create a no value error
    */
-  static noPayload(flagName: string): GatrixFeatureError {
+  static noValue(flagName: string): GatrixFeatureError {
     return new GatrixFeatureError(
-      GatrixFeatureErrorCode.NO_PAYLOAD,
-      `Flag "${flagName}" has no payload`,
+      GatrixFeatureErrorCode.NO_VALUE,
+      `Flag "${flagName}" has no value`,
       { flagName }
     );
   }
@@ -139,7 +139,7 @@ export class GatrixFeatureError extends GatrixError {
   static parseError(flagName: string, cause?: Error): GatrixFeatureError {
     return new GatrixFeatureError(
       GatrixFeatureErrorCode.PARSE_ERROR,
-      `Failed to parse payload for flag "${flagName}"`,
+      `Failed to parse value for flag "${flagName}"`,
       { flagName, cause }
     );
   }

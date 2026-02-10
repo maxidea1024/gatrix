@@ -1195,54 +1195,39 @@ async function performEvaluation(req: Request, res: Response, clientContext: any
       const result = sdk.featureFlag.evaluate(key, context, environment);
       const flagDef = sdk.featureFlag.getFlagByName(environment, key);
 
-      // Build variant object according to backend specification
+      // Build variant object according to SPEC_VALUE_RESOLUTION spec
       let variant: any = {
-        name: result.variant?.name || (result.enabled ? 'default' : 'disabled'),
+        name: result.variant?.name || (result.enabled ? '$default' : '$disabled'),
         enabled: result.enabled,
       };
 
-      // Check specifically for null/undefined to include empty strings/zero (e.g. config-txw0 case)
-      if (result.variant?.payload !== undefined && result.variant?.payload !== null) {
-        let payloadValue = result.variant.payload.value ?? result.variant.payload;
-        const variantType = flagDef?.variantType || 'string';
+      // The SDK evaluator already returns variant.value resolved per spec:
+      // - Enabled + variant matched → variant.value
+      // - Enabled + no variant → enabledValue (env override > global)
+      // - Disabled → disabledValue (env override > global)
+      if (result.variant?.value !== undefined && result.variant?.value !== null) {
+        let resolvedValue = result.variant.value;
+        const valueType = flagDef?.valueType || 'string';
 
-        if (variantType === 'json') {
-          if (typeof payloadValue === 'string' && payloadValue.trim() !== '') {
+        if (valueType === 'json') {
+          if (typeof resolvedValue === 'string' && resolvedValue.trim() !== '') {
             try {
-              payloadValue = JSON.parse(payloadValue);
+              resolvedValue = JSON.parse(resolvedValue);
             } catch (e) {
               /* ignore */
             }
           }
-          variant.payload = payloadValue;
-        } else if (variantType === 'number') {
-          if (typeof payloadValue === 'string') {
-            const parsed = Number(payloadValue);
-            variant.payload = isNaN(parsed) ? payloadValue : parsed;
+          variant.value = resolvedValue;
+        } else if (valueType === 'number') {
+          if (typeof resolvedValue === 'string') {
+            const parsed = Number(resolvedValue);
+            variant.value = isNaN(parsed) ? resolvedValue : parsed;
           } else {
-            variant.payload = payloadValue;
+            variant.value = resolvedValue;
           }
         } else {
-          // Default to string for other types (config-txw0 case: payload: "")
-          variant.payload = String(payloadValue);
+          variant.value = resolvedValue;
         }
-      } else if (
-        !result.enabled &&
-        flagDef &&
-        flagDef.baselinePayload !== undefined &&
-        flagDef.baselinePayload !== null
-      ) {
-        // Match backend's baselinePayload processing: baseline is stringified if object
-        let baselineValue = flagDef.baselinePayload;
-        if (typeof baselineValue === 'string' && baselineValue.trim() !== '') {
-          try {
-            baselineValue = JSON.parse(baselineValue);
-          } catch {
-            /* ignore */
-          }
-        }
-        variant.payload =
-          typeof baselineValue === 'string' ? baselineValue : JSON.stringify(baselineValue);
       }
 
       results[key] = {
@@ -1250,7 +1235,7 @@ async function performEvaluation(req: Request, res: Response, clientContext: any
         name: key,
         enabled: result.enabled,
         variant,
-        variantType: flagDef?.variantType || 'string',
+        valueType: flagDef?.valueType || 'string',
         version: flagDef?.version || 1,
         ...(flagDef?.impressionDataEnabled && { impressionData: true }),
       };

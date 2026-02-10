@@ -11,7 +11,7 @@ from typing import Any, Dict, List, Literal, Optional, Union
 # Enums / unions
 # ---------------------------------------------------------------------------
 
-VariantType = Literal["none", "string", "number", "json"]
+ValueType = Literal["none", "string", "number", "boolean", "json"]
 SdkState = Literal["initializing", "ready", "healthy", "error"]
 
 # ---------------------------------------------------------------------------
@@ -22,12 +22,12 @@ SdkState = Literal["initializing", "ready", "healthy", "error"]
 @dataclass
 class Variant:
     """Variant information from server evaluation."""
-    name: str = "disabled"
+    name: str = "$missing"
     enabled: bool = False
-    payload: Optional[Union[str, int, float, dict, list]] = None
+    value: Optional[Union[str, int, float, dict, list]] = None
 
 
-DISABLED_VARIANT = Variant(name="disabled", enabled=False, payload=None)
+MISSING_VARIANT = Variant(name="$missing", enabled=False, value=None)
 
 
 @dataclass
@@ -36,7 +36,7 @@ class EvaluatedFlag:
     name: str = ""
     enabled: bool = False
     variant: Variant = field(default_factory=lambda: Variant())
-    variant_type: VariantType = "none"
+    value_type: ValueType = "none"
     version: int = 0
     reason: Optional[str] = None
     impression_data: Optional[bool] = None

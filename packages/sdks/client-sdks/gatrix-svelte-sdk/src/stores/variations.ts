@@ -13,10 +13,10 @@ import { EVENTS, type Variant } from '@gatrix/js-client-sdk';
  * </script>
  * ```
  */
-export function boolVariation(flagName: string, defaultValue: boolean): Readable<boolean> {
+export function boolVariation(flagName: string, missingValue: boolean): Readable<boolean> {
     const client = getGatrixClient();
-    return readable<boolean>(client.features.boolVariation(flagName, defaultValue), (set) => {
-        const update = () => set(client.features.boolVariation(flagName, defaultValue));
+    return readable<boolean>(client.features.boolVariation(flagName, missingValue), (set) => {
+        const update = () => set(client.features.boolVariation(flagName, missingValue));
         client.on(EVENTS.FLAGS_CHANGE, update);
         client.on(EVENTS.FLAGS_READY, update);
         client.on(EVENTS.FLAGS_SYNC, update);
@@ -33,10 +33,10 @@ export function boolVariation(flagName: string, defaultValue: boolean): Readable
 /**
  * Reactive string variation store.
  */
-export function stringVariation(flagName: string, defaultValue: string): Readable<string> {
+export function stringVariation(flagName: string, missingValue: string): Readable<string> {
     const client = getGatrixClient();
-    return readable<string>(client.features.stringVariation(flagName, defaultValue), (set) => {
-        const update = () => set(client.features.stringVariation(flagName, defaultValue));
+    return readable<string>(client.features.stringVariation(flagName, missingValue), (set) => {
+        const update = () => set(client.features.stringVariation(flagName, missingValue));
         client.on(EVENTS.FLAGS_CHANGE, update);
         client.on(EVENTS.FLAGS_READY, update);
         client.on(EVENTS.FLAGS_SYNC, update);
@@ -53,10 +53,10 @@ export function stringVariation(flagName: string, defaultValue: string): Readabl
 /**
  * Reactive number variation store.
  */
-export function numberVariation(flagName: string, defaultValue: number): Readable<number> {
+export function numberVariation(flagName: string, missingValue: number): Readable<number> {
     const client = getGatrixClient();
-    return readable<number>(client.features.numberVariation(flagName, defaultValue), (set) => {
-        const update = () => set(client.features.numberVariation(flagName, defaultValue));
+    return readable<number>(client.features.numberVariation(flagName, missingValue), (set) => {
+        const update = () => set(client.features.numberVariation(flagName, missingValue));
         client.on(EVENTS.FLAGS_CHANGE, update);
         client.on(EVENTS.FLAGS_READY, update);
         client.on(EVENTS.FLAGS_SYNC, update);
@@ -73,10 +73,10 @@ export function numberVariation(flagName: string, defaultValue: number): Readabl
 /**
  * Reactive JSON variation store.
  */
-export function jsonVariation<T = unknown>(flagName: string, defaultValue: T): Readable<T> {
+export function jsonVariation<T = unknown>(flagName: string, missingValue: T): Readable<T> {
     const client = getGatrixClient();
-    return readable<T>(client.features.jsonVariation(flagName, defaultValue), (set) => {
-        const update = () => set(client.features.jsonVariation(flagName, defaultValue));
+    return readable<T>(client.features.jsonVariation(flagName, missingValue), (set) => {
+        const update = () => set(client.features.jsonVariation(flagName, missingValue));
         client.on(EVENTS.FLAGS_CHANGE, update);
         client.on(EVENTS.FLAGS_READY, update);
         client.on(EVENTS.FLAGS_SYNC, update);

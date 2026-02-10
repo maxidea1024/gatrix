@@ -107,23 +107,45 @@ class FeaturesClient {
 
   Map<String, EvaluatedFlag> get _activeFlags => _explicitSyncMode ? _synchronizedFlags : _realtimeFlags;
 
-  FlagProxy getFlag(String flagName) {
-    if (!_activeFlags.containsKey(flagName)) {
-      _countMissing(flagName);
-      return FlagProxy(null);
-    }
-    return FlagProxy(_activeFlags[flagName], _trackImpression);
+  FlagProxy _createProxy(String flagName) {
+    final flag = _activeFlags[flagName];
+    return FlagProxy(flag, _handleFlagAccess, flagName);
   }
 
-  void _trackImpression(String flagName, Map<String, dynamic> data) {
-    final impression = {
-      'flagName': flagName,
-      'timestamp': DateTime.now().toUtc().toIso8601String(),
-      ...data,
-    };
-    _pendingImpressions.add(impression);
-    _impressionCount++;
-    _events.emit(GatrixEvents.flagsImpression, [impression]);
+  FlagProxy getFlag(String flagName) {
+    return _createProxy(flagName);
+  }
+
+  void _handleFlagAccess(String flagName, EvaluatedFlag? flag, String eventType, String? variantName) {
+    if (flag == null) {
+      _countMissing(flagName);
+      return;
+    }
+    // Count flag access
+    _flagEnabledCounts[flagName] ??= {'yes': 0, 'no': 0};
+    if (flag.enabled) {
+      _flagEnabledCounts[flagName]!['yes'] = (_flagEnabledCounts[flagName]!['yes'] ?? 0) + 1;
+    } else {
+      _flagEnabledCounts[flagName]!['no'] = (_flagEnabledCounts[flagName]!['no'] ?? 0) + 1;
+    }
+    // Count variant access
+    if (variantName != null) {
+      _flagVariantCounts[flagName] ??= {};
+      _flagVariantCounts[flagName]![variantName] = (_flagVariantCounts[flagName]![variantName] ?? 0) + 1;
+    }
+    // Track impression if enabled
+    if (flag.impressionData) {
+      final impression = {
+        'flagName': flagName,
+        'timestamp': DateTime.now().toUtc().toIso8601String(),
+        'method': eventType,
+        'enabled': flag.enabled,
+        'variant': variantName,
+      };
+      _pendingImpressions.add(impression);
+      _impressionCount++;
+      _events.emit(GatrixEvents.flagsImpression, [impression]);
+    }
   }
 
   void _countMissing(String flagName) {

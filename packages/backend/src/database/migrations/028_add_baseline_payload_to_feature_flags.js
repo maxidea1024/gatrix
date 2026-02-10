@@ -1,27 +1,28 @@
 /**
- * Add baselinePayload column to g_feature_flags table
- * This column stores the default payload value when flag evaluates to false
+ * Add enabledValue and disabledValue columns to g_feature_flags table
+ * These columns store the default values when flag evaluates to true or false
  */
 
 exports.up = async function (connection) {
-  console.log('Adding baselinePayload column to g_feature_flags table...');
+  console.log('Adding enabledValue and disabledValue columns to g_feature_flags table...');
 
   await connection.execute(`
     ALTER TABLE g_feature_flags
-    ADD COLUMN baselinePayload JSON NULL
-    COMMENT 'Default payload value when flag evaluates to false' AFTER variantType
+    ADD COLUMN enabledValue JSON NULL COMMENT 'Value when flag evaluates to true',
+    ADD COLUMN disabledValue JSON NULL COMMENT 'Value when flag evaluates to false'
   `);
 
-  console.log('✓ baselinePayload column added to g_feature_flags table');
+  console.log('✓ enabledValue and disabledValue columns added to g_feature_flags table');
 };
 
 exports.down = async function (connection) {
-  console.log('Removing baselinePayload column from g_feature_flags table...');
+  console.log('Removing enabledValue and disabledValue columns from g_feature_flags table...');
 
   await connection.execute(`
     ALTER TABLE g_feature_flags
-    DROP COLUMN baselinePayload
+    DROP COLUMN enabledValue,
+    DROP COLUMN disabledValue
   `);
 
-  console.log('✓ baselinePayload column removed from g_feature_flags table');
+  console.log('✓ enabledValue and disabledValue columns removed from g_feature_flags table');
 };

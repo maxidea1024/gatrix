@@ -1,349 +1,341 @@
 /**
- * FlagProxy - Wrapper for EvaluatedFlag with helper methods
- * Provides convenient variation accessors like .boolVariation(), .stringVariation(), etc.
+ * FlagProxy - Single source of truth for flag value extraction.
+ *
+ * ALL variation logic lives here. FeaturesClient delegates to FlagProxy
+ * so that value extraction + metrics tracking happen in one place.
+ *
+ * Uses null object pattern: this.flag is never undefined.
+ * MISSING_FLAG sentinel is used for non-existent flags.
+ *
+ * onAccess callback is invoked on every variation/enabled call, enabling
+ * consistent metrics tracking regardless of how FlagProxy is obtained.
+ *
+ * Type safety: valueType is checked strictly to prevent misuse.
  */
-import { EvaluatedFlag, Variant, VariantType, VariationResult } from './types';
-import { GatrixFeatureError, GatrixFeatureErrorCode } from './errors';
+import { EvaluatedFlag, Variant, ValueType, VariationResult } from './types';
+import { GatrixFeatureError } from './errors';
 
-const FALLBACK_DISABLED_VARIANT: Variant = {
-  name: 'disabled',
+const MISSING_VARIANT: Variant = {
+  name: '$missing',
   enabled: false,
 };
 
+/** Null object for non-existent flags */
+const MISSING_FLAG: EvaluatedFlag = {
+  name: '',
+  enabled: false,
+  variant: MISSING_VARIANT,
+  valueType: 'none',
+  version: 0,
+};
+
+/**
+ * Callback invoked on every variation/enabled call.
+ * @param flagName - Name of the flag
+ * @param flag - The flag object (undefined = missing)
+ * @param eventType - 'isEnabled' for bool, 'getVariant' for value variations
+ * @param variantName - Variant name (for getVariant events)
+ */
+export type FlagAccessCallback = (
+  flagName: string,
+  flag: EvaluatedFlag | undefined,
+  eventType: string,
+  variantName?: string
+) => void;
+
 export class FlagProxy {
-  private flag: EvaluatedFlag | undefined;
+  private flag: EvaluatedFlag;
+  private _exists: boolean;
+  private onAccess?: FlagAccessCallback;
+  private _flagName: string;
 
-  constructor(flag: EvaluatedFlag | undefined) {
-    this.flag = flag;
+  constructor(flag: EvaluatedFlag | undefined, onAccess?: FlagAccessCallback, flagName?: string) {
+    this._exists = flag !== undefined;
+    this.flag = flag ?? MISSING_FLAG;
+    this.onAccess = onAccess;
+    this._flagName = flagName ?? this.flag.name;
   }
 
-  /**
-   * Get the flag name
-   */
+  // ==================== Properties ====================
+
   get name(): string {
-    return this.flag?.name ?? '';
+    return this._flagName;
   }
 
-  /**
-   * Check if the flag exists
-   */
   get exists(): boolean {
-    return this.flag !== undefined;
+    return this._exists;
   }
 
   /**
-   * Check if the flag is enabled
+   * Check if the flag is enabled.
+   * Triggers metrics tracking via onAccess callback.
    */
   get enabled(): boolean {
-    return this.flag?.enabled ?? false;
+    if (!this._exists) {
+      this.onAccess?.(this._flagName, undefined, 'isEnabled');
+      return false;
+    }
+    this.onAccess?.(this._flagName, this.flag, 'isEnabled', this.flag.variant.name);
+    return this.flag.enabled;
   }
 
-  /**
-   * Get the variant
-   */
   get variant(): Variant {
-    return this.flag?.variant ?? FALLBACK_DISABLED_VARIANT;
+    return this.flag.variant;
   }
 
-  /**
-   * Get the variant type
-   */
-  get variantType(): VariantType {
-    return this.flag?.variantType ?? 'none';
+  get valueType(): ValueType {
+    return this.flag.valueType;
   }
 
-  /**
-   * Get the flag version
-   */
   get version(): number {
-    return this.flag?.version ?? 0;
+    return this.flag.version;
   }
 
-  /**
-   * Check if impression data is enabled
-   */
   get impressionData(): boolean {
-    return this.flag?.impressionData ?? false;
+    return this.flag.impressionData ?? false;
   }
 
-  /**
-   * Get the raw flag object
-   */
   get raw(): EvaluatedFlag | undefined {
-    return this.flag;
+    return this._exists ? this.flag : undefined;
+  }
+
+  get reason(): string | undefined {
+    return this.flag.reason;
   }
 
   // ==================== Variation Methods ====================
+  // Single source of truth for value extraction.
+  // Each call tracks metrics via onAccess callback.
+  // Type safety: valueType is checked strictly to prevent misuse.
 
   /**
-   * Get boolean variation (flag enabled state)
+   * Get boolean variation from variant value.
+   * Strict: valueType must be 'boolean'.
    */
-  boolVariation(defaultValue: boolean): boolean {
-    if (!this.flag) {
-      return defaultValue;
+  boolVariation(missingValue: boolean): boolean {
+    if (!this._exists) {
+      this.onAccess?.(this._flagName, undefined, 'getVariant');
+      return missingValue;
     }
-    return this.flag.enabled;
+    this.onAccess?.(this._flagName, this.flag, 'getVariant', this.flag.variant.name);
+    if (this.flag.valueType !== 'boolean') {
+      return missingValue;
+    }
+    return Boolean(this.flag.variant.value);
   }
 
   /**
    * Get the variant name for this flag
    */
-  variation(defaultValue: string): string {
-    if (!this.flag) {
-      return defaultValue;
+  variation(missingValue: string): string {
+    if (!this._exists) {
+      this.onAccess?.(this._flagName, undefined, 'getVariant');
+      return missingValue;
     }
-    return this.flag.variant?.name ?? defaultValue;
+    this.onAccess?.(this._flagName, this.flag, 'getVariant', this.flag.variant.name);
+    return this.flag.variant.name;
   }
 
   /**
-   * Get string variation from variant payload
+   * Get string variation from variant value.
+   * Strict: valueType must be 'string'.
    */
-  stringVariation(defaultValue: string): string {
-    if (!this.flag || this.flag.variant?.payload == null) {
-      return defaultValue;
+  stringVariation(missingValue: string): string {
+    if (!this._exists) {
+      this.onAccess?.(this._flagName, undefined, 'getVariant');
+      return missingValue;
     }
-    return String(this.flag.variant.payload);
+    this.onAccess?.(this._flagName, this.flag, 'getVariant', this.flag.variant.name);
+    if (this.flag.valueType !== 'string') {
+      return missingValue;
+    }
+    return String(this.flag.variant.value);
   }
 
   /**
-   * Get number variation from variant payload
+   * Get number variation from variant value.
+   * Strict: valueType must be 'number'.
+   * Returns missingValue if the value cannot be converted to a valid number.
    */
-  numberVariation(defaultValue: number): number {
-    if (!this.flag || this.flag.variant?.payload == null) {
-      return defaultValue;
+  numberVariation(missingValue: number): number {
+    if (!this._exists) {
+      this.onAccess?.(this._flagName, undefined, 'getVariant');
+      return missingValue;
     }
-
-    const payload = this.flag.variant.payload;
-    if (typeof payload === 'number') {
-      return payload;
+    this.onAccess?.(this._flagName, this.flag, 'getVariant', this.flag.variant.name);
+    if (this.flag.valueType !== 'number') {
+      return missingValue;
     }
-
-    // Fallback: parse string number (for backward compatibility)
-    if (typeof payload === 'string') {
-      const parsed = Number(payload);
-      if (!isNaN(parsed)) {
-        return parsed;
-      }
-    }
-
-    return defaultValue;
+    const value = Number(this.flag.variant.value);
+    return isNaN(value) ? missingValue : value;
   }
 
   /**
-   * Get JSON variation from variant payload
+   * Get JSON variation from variant value.
+   * Strict: valueType must be 'json' and value must be an object.
    */
-  jsonVariation<T>(defaultValue: T): T {
-    if (!this.flag || this.flag.variant?.payload == null) {
-      return defaultValue;
+  jsonVariation<T>(missingValue: T): T {
+    if (!this._exists) {
+      this.onAccess?.(this._flagName, undefined, 'getVariant');
+      return missingValue;
     }
-
-    const payload = this.flag.variant.payload;
-
-    // Server sends object directly
-    if (typeof payload === 'object') {
-      return payload as T;
+    this.onAccess?.(this._flagName, this.flag, 'getVariant', this.flag.variant.name);
+    if (this.flag.valueType !== 'json') {
+      return missingValue;
     }
-
-    // Fallback: parse JSON string (for backward compatibility)
-    if (typeof payload === 'string') {
-      try {
-        return JSON.parse(payload) as T;
-      } catch {
-        return defaultValue;
-      }
+    const value = this.flag.variant.value;
+    if (typeof value !== 'object' || value === null) {
+      return missingValue;
     }
-
-    return defaultValue;
+    return value as T;
   }
 
-  /**
-   * Get evaluation reason
-   */
-  get reason(): string | undefined {
-    return this.flag?.reason;
-  }
+  // ==================== Variation Details ====================
 
-  // ==================== Variation Details Methods ====================
-
-  /**
-   * Get boolean variation with details
-   */
-  boolVariationDetails(defaultValue: boolean): VariationResult<boolean> {
-    if (!this.flag) {
-      return { value: defaultValue, reason: 'flag_not_found', flagExists: false, enabled: false };
+  boolVariationDetails(missingValue: boolean): VariationResult<boolean> {
+    if (!this._exists) {
+      this.onAccess?.(this._flagName, undefined, 'getVariant');
+      return { value: missingValue, reason: 'flag_not_found', flagExists: false, enabled: false };
+    }
+    this.onAccess?.(this._flagName, this.flag, 'getVariant', this.flag.variant.name);
+    if (this.flag.valueType !== 'boolean') {
+      return {
+        value: missingValue,
+        reason: `type_mismatch:expected_boolean_got_${this.flag.valueType}`,
+        flagExists: true, enabled: this.flag.enabled,
+      };
     }
     return {
-      value: this.flag.enabled,
+      value: Boolean(this.flag.variant.value),
       reason: this.flag.reason ?? 'evaluated',
-      flagExists: true,
-      enabled: this.flag.enabled,
+      flagExists: true, enabled: this.flag.enabled,
     };
   }
 
-  /**
-   * Get string variation with details
-   */
-  stringVariationDetails(defaultValue: string): VariationResult<string> {
-    if (!this.flag) {
-      return { value: defaultValue, reason: 'flag_not_found', flagExists: false, enabled: false };
+  stringVariationDetails(missingValue: string): VariationResult<string> {
+    if (!this._exists) {
+      this.onAccess?.(this._flagName, undefined, 'getVariant');
+      return { value: missingValue, reason: 'flag_not_found', flagExists: false, enabled: false };
     }
-    if (!this.flag.enabled) {
+    this.onAccess?.(this._flagName, this.flag, 'getVariant', this.flag.variant.name);
+    if (this.flag.valueType !== 'string') {
       return {
-        value: defaultValue,
-        reason: this.flag.reason ?? 'disabled',
-        flagExists: true,
-        enabled: false,
+        value: missingValue,
+        reason: `type_mismatch:expected_string_got_${this.flag.valueType}`,
+        flagExists: true, enabled: this.flag.enabled,
       };
     }
-    if (this.flag.variant?.payload == null) {
-      return { value: defaultValue, reason: 'no_payload', flagExists: true, enabled: true };
-    }
     return {
-      value: String(this.flag.variant.payload),
+      value: String(this.flag.variant.value),
       reason: this.flag.reason ?? 'evaluated',
-      flagExists: true,
-      enabled: true,
+      flagExists: true, enabled: this.flag.enabled,
     };
   }
 
-  /**
-   * Get number variation with details
-   */
-  numberVariationDetails(defaultValue: number): VariationResult<number> {
-    if (!this.flag) {
-      return { value: defaultValue, reason: 'flag_not_found', flagExists: false, enabled: false };
+  numberVariationDetails(missingValue: number): VariationResult<number> {
+    if (!this._exists) {
+      this.onAccess?.(this._flagName, undefined, 'getVariant');
+      return { value: missingValue, reason: 'flag_not_found', flagExists: false, enabled: false };
     }
-    if (!this.flag.enabled) {
+    this.onAccess?.(this._flagName, this.flag, 'getVariant', this.flag.variant.name);
+    if (this.flag.valueType !== 'number') {
       return {
-        value: defaultValue,
-        reason: this.flag.reason ?? 'disabled',
-        flagExists: true,
-        enabled: false,
+        value: missingValue,
+        reason: `type_mismatch:expected_number_got_${this.flag.valueType}`,
+        flagExists: true, enabled: this.flag.enabled,
       };
     }
-    if (this.flag.variant?.payload == null) {
-      return { value: defaultValue, reason: 'no_payload', flagExists: true, enabled: true };
-    }
-
-    const payload = this.flag.variant.payload;
-    if (typeof payload === 'number') {
-      return {
-        value: payload,
-        reason: this.flag.reason ?? 'evaluated',
-        flagExists: true,
-        enabled: true,
-      };
-    }
-
+    const value = Number(this.flag.variant.value);
     return {
-      value: defaultValue,
-      reason: 'type_mismatch:payload_not_number',
-      flagExists: true,
-      enabled: true,
+      value: isNaN(value) ? missingValue : value,
+      reason: isNaN(value) ? 'type_mismatch:value_not_number' : (this.flag.reason ?? 'evaluated'),
+      flagExists: true, enabled: this.flag.enabled,
     };
   }
 
-  /**
-   * Get JSON variation with details
-   */
-  jsonVariationDetails<T>(defaultValue: T): VariationResult<T> {
-    if (!this.flag) {
-      return { value: defaultValue, reason: 'flag_not_found', flagExists: false, enabled: false };
+  jsonVariationDetails<T>(missingValue: T): VariationResult<T> {
+    if (!this._exists) {
+      this.onAccess?.(this._flagName, undefined, 'getVariant');
+      return { value: missingValue, reason: 'flag_not_found', flagExists: false, enabled: false };
     }
-    if (!this.flag.enabled) {
+    this.onAccess?.(this._flagName, this.flag, 'getVariant', this.flag.variant.name);
+    if (this.flag.valueType !== 'json') {
       return {
-        value: defaultValue,
-        reason: this.flag.reason ?? 'disabled',
-        flagExists: true,
-        enabled: false,
+        value: missingValue,
+        reason: `type_mismatch:expected_json_got_${this.flag.valueType}`,
+        flagExists: true, enabled: this.flag.enabled,
       };
     }
-    if (this.flag.variant?.payload == null) {
-      return { value: defaultValue, reason: 'no_payload', flagExists: true, enabled: true };
-    }
-
-    const payload = this.flag.variant.payload;
-    if (typeof payload === 'object') {
+    const value = this.flag.variant.value;
+    if (typeof value !== 'object' || value === null) {
       return {
-        value: payload as T,
-        reason: this.flag.reason ?? 'evaluated',
-        flagExists: true,
-        enabled: true,
+        value: missingValue,
+        reason: 'type_mismatch:value_not_object',
+        flagExists: true, enabled: this.flag.enabled,
       };
     }
-
     return {
-      value: defaultValue,
-      reason: 'type_mismatch:payload_not_object',
-      flagExists: true,
-      enabled: true,
+      value: value as T,
+      reason: this.flag.reason ?? 'evaluated',
+      flagExists: true, enabled: this.flag.enabled,
     };
   }
 
   // ==================== Strict Variation Methods (OrThrow) ====================
 
-  /**
-   * Get boolean variation or throw if flag not found
-   */
   boolVariationOrThrow(): boolean {
-    if (!this.flag) {
-      throw GatrixFeatureError.flagNotFound(this.name || 'unknown');
+    if (!this._exists) {
+      this.onAccess?.(this._flagName, undefined, 'isEnabled');
+      throw GatrixFeatureError.flagNotFound(this._flagName);
     }
-    return this.flag.enabled;
+    this.onAccess?.(this._flagName, this.flag, 'isEnabled', this.flag.variant.name);
+    if (this.flag.valueType !== 'boolean') {
+      throw GatrixFeatureError.typeMismatch(this._flagName, 'boolean', this.flag.valueType);
+    }
+    return Boolean(this.flag.variant.value);
   }
 
-  /**
-   * Get string variation or throw if flag not found or no payload
-   * Note: disabled flag still returns payload if it exists
-   */
   stringVariationOrThrow(): string {
-    if (!this.flag) {
-      throw GatrixFeatureError.flagNotFound(this.name || 'unknown');
+    if (!this._exists) {
+      this.onAccess?.(this._flagName, undefined, 'getVariant');
+      throw GatrixFeatureError.flagNotFound(this._flagName);
     }
-    if (this.flag.variant?.payload == null) {
-      throw GatrixFeatureError.noPayload(this.flag.name);
+    this.onAccess?.(this._flagName, this.flag, 'getVariant', this.flag.variant.name);
+    if (this.flag.valueType !== 'string') {
+      throw GatrixFeatureError.typeMismatch(this._flagName, 'string', this.flag.valueType);
     }
-    return String(this.flag.variant.payload);
+    return String(this.flag.variant.value);
   }
 
-  /**
-   * Get number variation or throw if flag not found or invalid type
-   * Note: disabled flag still returns payload if it exists
-   */
   numberVariationOrThrow(): number {
-    if (!this.flag) {
-      throw GatrixFeatureError.flagNotFound('unknown');
+    if (!this._exists) {
+      this.onAccess?.(this._flagName, undefined, 'getVariant');
+      throw GatrixFeatureError.flagNotFound(this._flagName);
     }
-    if (this.flag.variant?.payload == null) {
-      throw GatrixFeatureError.noPayload(this.flag.name);
+    this.onAccess?.(this._flagName, this.flag, 'getVariant', this.flag.variant.name);
+    if (this.flag.valueType !== 'number') {
+      throw GatrixFeatureError.typeMismatch(this._flagName, 'number', this.flag.valueType);
     }
-
-    const payload = this.flag.variant.payload;
-    if (typeof payload === 'number') {
-      return payload;
+    const value = Number(this.flag.variant.value);
+    if (isNaN(value)) {
+      throw GatrixFeatureError.typeMismatch(this._flagName, 'number', typeof this.flag.variant.value);
     }
-
-    throw GatrixFeatureError.typeMismatch(this.flag.name, 'number', typeof payload);
+    return value;
   }
 
-  /**
-   * Get JSON variation or throw if flag not found or invalid type
-   * Note: disabled flag still returns payload if it exists
-   */
   jsonVariationOrThrow<T>(): T {
-    if (!this.flag) {
-      throw GatrixFeatureError.flagNotFound('unknown');
+    if (!this._exists) {
+      this.onAccess?.(this._flagName, undefined, 'getVariant');
+      throw GatrixFeatureError.flagNotFound(this._flagName);
     }
-    if (this.flag.variant?.payload == null) {
-      throw GatrixFeatureError.noPayload(this.flag.name);
+    this.onAccess?.(this._flagName, this.flag, 'getVariant', this.flag.variant.name);
+    if (this.flag.valueType !== 'json') {
+      throw GatrixFeatureError.typeMismatch(this._flagName, 'json', this.flag.valueType);
     }
-
-    const payload = this.flag.variant.payload;
-
-    if (typeof payload === 'object') {
-      return payload as T;
+    const value = this.flag.variant.value;
+    if (typeof value !== 'object' || value === null) {
+      throw GatrixFeatureError.typeMismatch(this._flagName, 'json', typeof value);
     }
-
-    throw GatrixFeatureError.typeMismatch(this.flag.name, 'object', typeof payload);
+    return value as T;
   }
 }

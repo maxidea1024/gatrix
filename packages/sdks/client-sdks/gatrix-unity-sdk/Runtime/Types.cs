@@ -53,17 +53,19 @@ namespace Gatrix.Unity.SDK
         public bool Enabled { get; set; }
 
         /// <summary>Payload value - can be string, number, or JSON object (as string)</summary>
-        public object Payload { get; set; }
+        /// <summary>Value - can be string, number, or JSON object (as string)</summary>
+        public object Value { get; set; }
     }
 
     /// <summary>
     /// Variant type enum
     /// </summary>
-    public enum VariantType
+    public enum ValueType
     {
         None,
         String,
         Number,
+        Boolean,
         Json
     }
 
@@ -76,7 +78,7 @@ namespace Gatrix.Unity.SDK
         public string Name { get; set; }
         public bool Enabled { get; set; }
         public Variant Variant { get; set; }
-        public VariantType VariantType { get; set; }
+        public ValueType ValueType { get; set; }
         public int Version { get; set; }
         public string Reason { get; set; }
         public bool ImpressionData { get; set; }
@@ -326,27 +328,29 @@ namespace Gatrix.Unity.SDK
     /// <summary>
     /// Helper to parse VariantType from string
     /// </summary>
-    public static class VariantTypeHelper
+    public static class ValueTypeHelper
     {
-        public static VariantType Parse(string value)
+        public static ValueType Parse(string value)
         {
-            if (string.IsNullOrEmpty(value)) return VariantType.None;
+            if (string.IsNullOrEmpty(value)) return ValueType.None;
             switch (value.ToLowerInvariant())
             {
-                case "string": return VariantType.String;
-                case "number": return VariantType.Number;
-                case "json": return VariantType.Json;
-                default: return VariantType.None;
+                case "string": return ValueType.String;
+                case "number": return ValueType.Number;
+                case "boolean": return ValueType.Boolean;
+                case "json": return ValueType.Json;
+                default: return ValueType.None;
             }
         }
 
-        public static string ToApiString(VariantType type)
+        public static string ToApiString(ValueType type)
         {
             switch (type)
             {
-                case VariantType.String: return "string";
-                case VariantType.Number: return "number";
-                case VariantType.Json: return "json";
+                case ValueType.String: return "string";
+                case ValueType.Number: return "number";
+                case ValueType.Boolean: return "boolean";
+                case ValueType.Json: return "json";
                 default: return "none";
             }
         }

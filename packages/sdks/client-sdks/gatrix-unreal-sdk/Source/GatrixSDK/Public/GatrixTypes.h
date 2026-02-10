@@ -17,12 +17,13 @@ enum class EGatrixSdkState : uint8 {
   Error UMETA(DisplayName = "Error")
 };
 
-/** Variant payload type */
+/** Value type hint for variant payload */
 UENUM(BlueprintType)
-enum class EGatrixVariantType : uint8 {
+enum class EGatrixValueType : uint8 {
   None UMETA(DisplayName = "None"),
   String UMETA(DisplayName = "String"),
   Number UMETA(DisplayName = "Number"),
+  Boolean UMETA(DisplayName = "Boolean"),
   Json UMETA(DisplayName = "Json")
 };
 
@@ -41,17 +42,17 @@ struct GATRIXSDK_API FGatrixVariant {
   UPROPERTY(BlueprintReadOnly, Category = "Gatrix")
   bool bEnabled = false;
 
-  /** Payload as string (type depends on VariantType) */
+  /** Value as string (type depends on ValueType) */
   UPROPERTY(BlueprintReadOnly, Category = "Gatrix")
-  FString Payload;
+  FString Value;
 
   FGatrixVariant() {}
   FGatrixVariant(const FString &InName, bool bInEnabled,
-                 const FString &InPayload = TEXT(""))
-      : Name(InName), bEnabled(bInEnabled), Payload(InPayload) {}
+                 const FString &InValue = TEXT(""))
+      : Name(InName), bEnabled(bInEnabled), Value(InValue) {}
 
-  static FGatrixVariant Disabled() {
-    return FGatrixVariant(TEXT("disabled"), false);
+  static FGatrixVariant Missing() {
+    return FGatrixVariant(TEXT("$missing"), false);
   }
 };
 
@@ -70,7 +71,7 @@ struct GATRIXSDK_API FGatrixEvaluatedFlag {
   FGatrixVariant Variant;
 
   UPROPERTY(BlueprintReadOnly, Category = "Gatrix")
-  EGatrixVariantType VariantType = EGatrixVariantType::None;
+  EGatrixValueType ValueType = EGatrixValueType::None;
 
   UPROPERTY(BlueprintReadOnly, Category = "Gatrix")
   int32 Version = 0;

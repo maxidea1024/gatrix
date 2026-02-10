@@ -32,9 +32,9 @@ function FlagCard({
   lastChangedTime,
   onSelect,
 }: FlagCardProps) {
-  const payload = flag.variant?.payload;
-  const hasPayload = payload !== undefined && payload !== null;
-  const isEmptyString = payload === '';
+  const value = flag.variant?.value;
+  const hasValue = value !== undefined && value !== null;
+  const isEmptyString = value === '';
   const [isUpdating, setIsUpdating] = useState(false);
   const [timeAgo, setTimeAgo] = useState(formatTimeAgo(lastChangedTime));
   const prevVersionRef = useRef(flag.version);
@@ -70,7 +70,7 @@ function FlagCard({
     return () => clearInterval(interval);
   }, [lastChangedTime]);
 
-  const formatPayload = (p: unknown): string => {
+  const formatValue = (p: unknown): string => {
     if (p === '') return 'EMPTY STRING';
     if (typeof p === 'object') {
       const str = JSON.stringify(p, null, 2);
@@ -79,13 +79,13 @@ function FlagCard({
     return String(p);
   };
 
-  const getPayloadSize = (p: unknown): number => {
+  const getValueSize = (p: unknown): number => {
     if (p === undefined || p === null) return 0;
     const str = typeof p === 'object' ? JSON.stringify(p) : String(p);
     return new Blob([str]).size;
   };
 
-  const payloadSize = hasPayload ? getPayloadSize(payload) : 0;
+  const valueSize = hasValue ? getValueSize(value) : 0;
 
   // Calculate change count from initial version
   const changeCount =
@@ -119,7 +119,7 @@ function FlagCard({
         <div className="col-time">{timeAgo}</div>
         <div className="col-type">
           <span className="pixel-chip type-chip is-mini">
-            {flag.variantType || 'none'}
+            {flag.valueType || 'none'}
           </span>
         </div>
         <div className="col-variant">
@@ -129,7 +129,7 @@ function FlagCard({
         </div>
         <div className="col-payload">
           <span className="payload-preview">
-            {hasPayload ? formatPayload(payload) : '-'}
+            {hasValue ? formatValue(value) : '-'}
           </span>
         </div>
       </div>
@@ -154,7 +154,7 @@ function FlagCard({
               className="pixel-chip type-chip is-mini"
               style={{ fontSize: '6px' }}
             >
-              {flag.variantType || 'none'}
+              {flag.valueType || 'none'}
             </span>
           </div>
           <div className="flag-details" style={{ marginTop: 0 }}>
@@ -214,7 +214,7 @@ function FlagCard({
           <div className="flag-detail">
             <span className="flag-detail-label">Type</span>
             <span className="flag-detail-value">
-              <span className="pixel-chip type-chip">{flag.variantType || 'none'}</span>
+              <span className="pixel-chip type-chip">{flag.valueType || 'none'}</span>
             </span>
           </div>
 
@@ -228,18 +228,18 @@ function FlagCard({
           </div>
 
           <div className="flag-payload">
-            <div className="flag-payload-label">Payload</div>
-            {hasPayload ? (
+            <div className="flag-payload-label">Value</div>
+            {hasValue ? (
               <>
                 <div
                   className={`flag-payload-value ${isEmptyString ? 'empty-string' : 'has-payload'}`}
                 >
-                  {formatPayload(payload)}
+                  {formatValue(value)}
                 </div>
-                <div className="flag-payload-size">{payloadSize} BYTES</div>
+                <div className="flag-payload-size">{valueSize} BYTES</div>
               </>
             ) : (
-              <div className="flag-payload-value no-payload">✕ NO PAYLOAD</div>
+              <div className="flag-payload-value no-payload">✕ NO VALUE</div>
             )}
           </div>
         </div>

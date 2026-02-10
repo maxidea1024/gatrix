@@ -634,9 +634,10 @@ router.put(
       req.params.flagName,
       req.body.variants || [],
       userId!,
-      req.body.variantType, // Pass variantType to service
-      req.body.baselinePayload, // Pass baselinePayload to service
-      req.body.clearVariantPayloads // Pass flag to clear existing variant payloads
+      req.body.valueType, // Pass valueType to service
+      req.body.enabledValue, // Pass enabledValue
+      req.body.disabledValue, // Pass disabledValue
+      req.body.clearVariantValues // Pass flag to clear existing variant values
     );
 
     res.json({ success: true, data: { variants } });
@@ -762,25 +763,42 @@ router.post(
           // Manual override if variant is somehow missing (already handled in evaluateFlagWithDetails now)
           // But kept for safety
           if (!evalResult.variant) {
-            const envSettings = flag.environments?.find((e) => e.environment === env);
-            let payload = envSettings?.baselinePayload;
-            let payloadSource: 'environment' | 'flag' | undefined;
+            const envSettings = (flag as any).environments?.find((e: any) => e.environment === env);
+            let value = (flag as any).isEnabled
+              ? (envSettings?.enabledValue ?? (flag as any).enabledValue)
+              : (envSettings?.disabledValue ?? (flag as any).disabledValue);
+            let valueSource: 'environment' | 'flag' | undefined;
 
-            if (payload !== undefined && payload !== null) {
-              payloadSource = 'environment';
-            } else if (
-              (flag as any).baselinePayload !== undefined &&
-              (flag as any).baselinePayload !== null
-            ) {
-              payload = (flag as any).baselinePayload;
-              payloadSource = 'flag';
+            // Check overrides
+            const envOverride = (flag as any).environments?.find((e: any) => e.environment === env);
+            if ((flag as any).isEnabled) {
+              if (envOverride?.enabledValue !== undefined) {
+                value = envOverride.enabledValue;
+                valueSource = 'environment';
+              }
+              else if ((flag as any).enabledValue !== undefined) {
+                value = (flag as any).enabledValue;
+                valueSource = 'flag';
+              }
+            } else {
+              if (envOverride?.disabledValue !== undefined) {
+                value = envOverride.disabledValue;
+                valueSource = 'environment';
+              }
+              else if ((flag as any).disabledValue !== undefined) {
+                value = (flag as any).disabledValue;
+                valueSource = 'flag';
+              }
             }
 
-            evalResult.variant = {
-              name: evalResult.enabled ? 'default' : 'disabled',
-              payload,
-              payloadType: (flag as any).variantType || 'string',
-              payloadSource,
+            // Note: evalResult.variant structure might need update in playground response if defined locally
+            // But here we are constructing a response object.
+            // Let's assume we want to return 'value' and 'valueType' in the response.
+            (evalResult as any).variant = {
+              name: (evalResult as any).variant?.name || (evalResult.enabled ? 'default' : 'disabled'),
+              value,
+              valueType: (flag as any).valueType || 'string',
+              valueSource,
             };
           }
 
@@ -789,7 +807,7 @@ router.post(
             displayName: flag.displayName,
             flagUsage: flag.flagUsage,
             enabled: evalResult.enabled,
-            variant: evalResult.variant,
+            variant: (evalResult as any).variant,
             reason: evalResult.reason,
             reasonDetails: evalResult.reasonDetails,
             evaluationSteps: evalResult.evaluationSteps,
@@ -816,7 +834,7 @@ function evaluateFlagWithDetails(
   environment?: string
 ): {
   enabled: boolean;
-  variant: { name: string; payload?: any; payloadType?: string; payloadSource?: string };
+  variant: { name: string; value?: any; valueType?: string; valueSource?: string };
   reason: string;
   reasonDetails?: any;
   evaluationSteps?: any[];
@@ -835,17 +853,17 @@ function evaluateFlagWithDetails(
       enabled: false,
       reason: 'FLAG_DISABLED',
       variant: {
-        name: 'disabled',
-        payload:
-          flag.environments?.find((e: any) => e.environment === environment)?.baselinePayload ??
-          flag.baselinePayload ??
+        name: '$disabled',
+        value:
+          flag.environments?.find((e: any) => e.environment === environment)?.disabledValue ??
+          flag.disabledValue ??
           null,
-        payloadType: flag.variantType || 'string',
-        payloadSource:
-          flag.environments?.find((e: any) => e.environment === environment)?.baselinePayload !==
-          undefined
+        valueType: flag.valueType || 'string',
+        valueSource:
+          flag.environments?.find((e: any) => e.environment === environment)?.disabledValue !==
+            undefined
             ? 'environment'
-            : flag.baselinePayload !== undefined
+            : flag.disabledValue !== undefined
               ? 'flag'
               : undefined,
       },
@@ -1036,17 +1054,17 @@ function evaluateFlagWithDetails(
     },
     evaluationSteps,
     variant: {
-      name: 'disabled',
-      payload:
-        flag.environments?.find((e: any) => e.environment === environment)?.baselinePayload ??
-        flag.baselinePayload ??
+      name: '$disabled',
+      value:
+        flag.environments?.find((e: any) => e.environment === environment)?.disabledValue ??
+        flag.disabledValue ??
         null,
-      payloadType: flag.variantType || 'string',
-      payloadSource:
-        flag.environments?.find((e: any) => e.environment === environment)?.baselinePayload !==
-        undefined
+      valueType: flag.valueType || 'string',
+      valueSource:
+        flag.environments?.find((e: any) => e.environment === environment)?.disabledValue !==
+          undefined
           ? 'environment'
-          : flag.baselinePayload !== undefined
+          : flag.disabledValue !== undefined
             ? 'flag'
             : undefined,
     },
@@ -1249,21 +1267,21 @@ function selectVariantForFlag(
   context: Record<string, any>,
   matchedStrategy?: any,
   environment?: string
-): { name: string; payload?: any; payloadType?: string; payloadSource?: string } {
+): { name: string; value?: any; valueType?: string; valueSource?: string } {
   const envSettings = environment
     ? flag.environments?.find((e: any) => e.environment === environment)
     : undefined;
 
-  const baselinePayload = envSettings?.baselinePayload ?? flag.baselinePayload;
-  const baselineSource = envSettings?.baselinePayload !== undefined ? 'environment' : 'flag';
+  const resolvedEnabledValue = envSettings?.enabledValue ?? flag.enabledValue;
+  const valueSource = envSettings?.enabledValue !== undefined ? 'environment' : 'flag';
 
   const variants = flag.variants || [];
   if (variants.length === 0) {
     return {
       name: 'default',
-      payload: baselinePayload ?? null,
-      payloadType: flag.variantType || 'string',
-      payloadSource: baselinePayload !== undefined ? baselineSource : undefined,
+      value: resolvedEnabledValue ?? null,
+      valueType: flag.valueType || 'string',
+      valueSource: resolvedEnabledValue !== undefined ? valueSource : undefined,
     };
   }
 
@@ -1271,9 +1289,9 @@ function selectVariantForFlag(
   if (totalWeight <= 0) {
     return {
       name: 'default',
-      payload: baselinePayload ?? null,
-      payloadType: flag.variantType || 'string',
-      payloadSource: baselinePayload !== undefined ? baselineSource : undefined,
+      value: resolvedEnabledValue ?? null,
+      valueType: flag.valueType || 'string',
+      valueSource: resolvedEnabledValue !== undefined ? valueSource : undefined,
     };
   }
 
@@ -1285,33 +1303,33 @@ function selectVariantForFlag(
   for (const variant of variants) {
     cumulativeWeight += variant.weight;
     if (targetWeight <= cumulativeWeight) {
-      // Determine payload and its source
-      let payload = variant.payload;
-      let payloadSource: 'variant' | 'environment' | 'flag' = 'variant';
-      if (payload === undefined || payload === null) {
-        payload = baselinePayload;
-        payloadSource = baselineSource as any;
+      // Determine value and its source
+      let value = variant.value;
+      let actualValueSource: 'variant' | 'environment' | 'flag' = 'variant';
+      if (value === undefined || value === null) {
+        value = resolvedEnabledValue;
+        actualValueSource = valueSource as any;
       }
       return {
         name: variant.variantName || variant.name,
-        payload,
-        payloadType: flag.variantType || 'string',
-        payloadSource: payload !== undefined ? payloadSource : undefined,
+        value,
+        valueType: flag.valueType || 'string',
+        valueSource: value !== undefined ? actualValueSource : undefined,
       };
     }
   }
   const lastVariant = variants[variants.length - 1];
-  let payload = lastVariant.payload;
-  let payloadSource: 'variant' | 'environment' | 'flag' = 'variant';
-  if (payload === undefined || payload === null) {
-    payload = baselinePayload;
-    payloadSource = baselineSource as any;
+  let value = lastVariant.value;
+  let actualValueSource: 'variant' | 'environment' | 'flag' = 'variant';
+  if (value === undefined || value === null) {
+    value = resolvedEnabledValue;
+    actualValueSource = valueSource as any;
   }
   return {
     name: lastVariant.variantName || lastVariant.name,
-    payload,
-    payloadType: flag.variantType || 'string',
-    payloadSource: payload !== undefined ? payloadSource : undefined,
+    value,
+    valueType: flag.valueType || 'string',
+    valueSource: value !== undefined ? actualValueSource : undefined,
   };
 }
 
@@ -1379,11 +1397,14 @@ router.post(
           sortOrder: s.sortOrder,
           isEnabled: s.isEnabled ?? true,
         })),
+        valueType: (sourceFlag as any).valueType || 'boolean',
+        enabledValue: (sourceFlag as any).enabledValue,
+        disabledValue: (sourceFlag as any).disabledValue,
         variants: (sourceFlag.variants || []).map((v: any) => ({
           variantName: v.variantName || v.name,
           weight: v.weight,
-          payload: v.payload,
-          payloadType: v.payloadType || 'json',
+          value: v.value,
+          valueType: v.valueType,
           weightLock: v.weightLock ?? false,
           overrides: v.overrides,
         })),
@@ -1477,8 +1498,9 @@ router.post(
             isEnabled: flagData.enabled ?? false,
             impressionDataEnabled: flagData.impressionDataEnabled ?? false,
             tags: flagData.tags,
-            variantType: flagData.variantType,
-            baselinePayload: flagData.baselinePayload,
+            valueType: flagData.valueType,
+            enabledValue: flagData.enabledValue,
+            disabledValue: flagData.disabledValue,
             strategies: (flagData.strategies || []).map((s: any) => ({
               strategyName: s.strategyName,
               parameters: s.parameters,
@@ -1490,8 +1512,8 @@ router.post(
             variants: (flagData.variants || []).map((v: any) => ({
               variantName: v.variantName,
               weight: v.weight,
-              payload: v.payload,
-              payloadType: v.payloadType || 'json',
+              value: v.value,
+              valueType: v.valueType || 'json',
               weightLock: v.weightLock ?? false,
               overrides: v.overrides,
             })),

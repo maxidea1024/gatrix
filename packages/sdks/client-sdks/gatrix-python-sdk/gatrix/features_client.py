@@ -36,7 +36,7 @@ def _flag_from_dict(d: dict) -> EvaluatedFlag:
     variant = Variant(
         name=variant_data.get("name", "disabled"),
         enabled=variant_data.get("enabled", False),
-        payload=variant_data.get("payload"),
+        value=variant_data.get("value"),
     )
     return EvaluatedFlag(
         name=d.get("name", ""),
@@ -57,9 +57,9 @@ def _flag_to_dict(f: EvaluatedFlag) -> dict:
         "variant": {
             "name": f.variant.name,
             "enabled": f.variant.enabled,
-            "payload": f.variant.payload,
+            "value": f.variant.value,
         },
-        "variantType": f.variant_type,
+        "valueType": f.value_type,
         "version": f.version,
         "reason": f.reason,
         "impressionData": f.impression_data,
@@ -326,94 +326,89 @@ class FeaturesClient:
             self.fetch_flags()
 
     # ============================================================= Flag Access
-    def is_enabled(self, flag_name: str) -> bool:
+    def _create_proxy(self, flag_name: str) -> FlagProxy:
+        """Create a FlagProxy with metrics callback injected."""
         flag = self._get_flag(flag_name)
+        return FlagProxy(flag, on_access=self._handle_flag_access, flag_name=flag_name)
+
+    def _handle_flag_access(
+        self,
+        flag_name: str,
+        flag: Optional[EvaluatedFlag],
+        event_type: str,
+        variant_name: Optional[str],
+    ) -> None:
+        """Metrics callback injected into every FlagProxy."""
         if flag is None:
             self._record_missing(flag_name)
-            self._count_flag(flag_name, enabled=False)
-            return False
+            return
         self._count_flag(flag_name, enabled=flag.enabled)
-        self._maybe_impression(flag, "isEnabled")
-        return flag.enabled
+        if variant_name:
+            self._count_variant(flag_name, variant_name)
+        self._maybe_impression(flag, event_type)
+
+    def is_enabled(self, flag_name: str) -> bool:
+        return self._create_proxy(flag_name).enabled
 
     def get_variant(self, flag_name: str) -> Variant:
-        """Never returns None – returns DISABLED_VARIANT for missing/disabled."""
-        flag = self._get_flag(flag_name)
-        if flag is None:
-            self._record_missing(flag_name)
-            self._count_flag(flag_name, enabled=False)
-            return DISABLED_VARIANT
-        self._count_flag(flag_name, enabled=flag.enabled)
-        self._maybe_impression(flag, "getVariant")
-        if flag.enabled and flag.variant and flag.variant.enabled:
-            return flag.variant
-        return DISABLED_VARIANT
+        """Never returns None – returns MISSING_VARIANT for missing flags."""
+        proxy = self._create_proxy(flag_name)
+        proxy.variation("")  # trigger metrics
+        return proxy.variant
 
     def get_all_flags(self) -> List[EvaluatedFlag]:
         return list(self._flags.values())
 
     # ----------------------------------------------------------- variations
-    def variation(self, flag_name: str, default_value: str) -> str:
-        proxy = self._get_proxy(flag_name)
-        return proxy.variation(default_value)
+    def variation(self, flag_name: str, missing_value: str) -> str:
+        return self._create_proxy(flag_name).variation(missing_value)
 
-    def bool_variation(self, flag_name: str, default_value: bool) -> bool:
-        proxy = self._get_proxy(flag_name)
-        return proxy.bool_variation(default_value)
+    def bool_variation(self, flag_name: str, missing_value: bool) -> bool:
+        return self._create_proxy(flag_name).bool_variation(missing_value)
 
-    def string_variation(self, flag_name: str, default_value: str) -> str:
-        proxy = self._get_proxy(flag_name)
-        return proxy.string_variation(default_value)
+    def string_variation(self, flag_name: str, missing_value: str) -> str:
+        return self._create_proxy(flag_name).string_variation(missing_value)
 
-    def number_variation(self, flag_name: str, default_value: float) -> float:
-        proxy = self._get_proxy(flag_name)
-        return proxy.number_variation(default_value)
+    def number_variation(self, flag_name: str, missing_value: float) -> float:
+        return self._create_proxy(flag_name).number_variation(missing_value)
 
-    def json_variation(self, flag_name: str, default_value: Any) -> Any:
-        proxy = self._get_proxy(flag_name)
-        return proxy.json_variation(default_value)
+    def json_variation(self, flag_name: str, missing_value: Any) -> Any:
+        return self._create_proxy(flag_name).json_variation(missing_value)
+
 
     # ------------------------------------------------- variation details
     def bool_variation_details(
-        self, flag_name: str, default_value: bool
+        self, flag_name: str, missing_value: bool
     ) -> VariationResult:
-        proxy = self._get_proxy(flag_name)
-        return proxy.bool_variation_details(default_value)
+        return self._create_proxy(flag_name).bool_variation_details(missing_value)
 
     def string_variation_details(
-        self, flag_name: str, default_value: str
+        self, flag_name: str, missing_value: str
     ) -> VariationResult:
-        proxy = self._get_proxy(flag_name)
-        return proxy.string_variation_details(default_value)
+        return self._create_proxy(flag_name).string_variation_details(missing_value)
 
     def number_variation_details(
-        self, flag_name: str, default_value: float
+        self, flag_name: str, missing_value: float
     ) -> VariationResult:
-        proxy = self._get_proxy(flag_name)
-        return proxy.number_variation_details(default_value)
+        return self._create_proxy(flag_name).number_variation_details(missing_value)
 
     def json_variation_details(
-        self, flag_name: str, default_value: Any
+        self, flag_name: str, missing_value: Any
     ) -> VariationResult:
-        proxy = self._get_proxy(flag_name)
-        return proxy.json_variation_details(default_value)
+        return self._create_proxy(flag_name).json_variation_details(missing_value)
 
     # ------------------------------------------------- or-throw variants
     def bool_variation_or_throw(self, flag_name: str) -> bool:
-        proxy = self._get_proxy(flag_name)
-        return proxy.bool_variation_or_throw()
+        return self._create_proxy(flag_name).bool_variation_or_throw()
 
     def string_variation_or_throw(self, flag_name: str) -> str:
-        proxy = self._get_proxy(flag_name)
-        return proxy.string_variation_or_throw()
+        return self._create_proxy(flag_name).string_variation_or_throw()
 
     def number_variation_or_throw(self, flag_name: str) -> float:
-        proxy = self._get_proxy(flag_name)
-        return proxy.number_variation_or_throw()
+        return self._create_proxy(flag_name).number_variation_or_throw()
 
     def json_variation_or_throw(self, flag_name: str) -> Any:
-        proxy = self._get_proxy(flag_name)
-        return proxy.json_variation_or_throw()
+        return self._create_proxy(flag_name).json_variation_or_throw()
 
     # ============================================================ Sync mode
     def is_explicit_sync(self) -> bool:
@@ -450,7 +445,7 @@ class FeaturesClient:
     ) -> Callable[[], None]:
         """Watch flag and fire callback immediately with current state."""
         flag = self._flags.get(flag_name)
-        proxy = FlagProxy(flag)
+        proxy = FlagProxy(flag, on_access=self._handle_flag_access, flag_name=flag_name)
         callback(proxy)
         return self.watch_flag(flag_name, callback, name=name)
 
@@ -634,15 +629,15 @@ class FeaturesClient:
                 # New flag
                 changed.append(new_flag)
                 self._flag_last_changed[name] = now
-                proxy = FlagProxy(new_flag)
+                proxy = FlagProxy(new_flag, on_access=self._handle_flag_access, flag_name=name)
                 self._emitter.emit(
                     f"flags.{name}.change", proxy, None, "created"
                 )
             elif self._flag_changed(old_flag, new_flag):
                 changed.append(new_flag)
                 self._flag_last_changed[name] = now
-                proxy = FlagProxy(new_flag)
-                old_proxy = FlagProxy(old_flag)
+                proxy = FlagProxy(new_flag, on_access=self._handle_flag_access, flag_name=name)
+                old_proxy = FlagProxy(old_flag, on_access=self._handle_flag_access, flag_name=name)
                 self._emitter.emit(
                     f"flags.{name}.change", proxy, old_proxy, "updated"
                 )
@@ -676,7 +671,7 @@ class FeaturesClient:
             return True
         if old.variant.enabled != new.variant.enabled:
             return True
-        if old.variant.payload != new.variant.payload:
+        if old.variant.value != new.variant.value:
             return True
         return False
 
@@ -756,7 +751,7 @@ class FeaturesClient:
             self._reset_bucket()
             return
 
-        payload = {
+        body = {
             "appName": self._app_name,
             "environment": self._environment,
             "sdkName": SDK_NAME,
@@ -781,7 +776,7 @@ class FeaturesClient:
         url = f"{self._api_url}/client/metrics"
         headers = self._common_headers()
         headers["Content-Type"] = "application/json"
-        data = json.dumps(payload).encode("utf-8")
+        data = json.dumps(body).encode("utf-8")
 
         max_retries = 2
         for attempt in range(max_retries + 1):
@@ -842,14 +837,6 @@ class FeaturesClient:
     def _get_flag(self, flag_name: str) -> Optional[EvaluatedFlag]:
         return self._flags.get(flag_name)
 
-    def _get_proxy(self, flag_name: str) -> FlagProxy:
-        flag = self._get_flag(flag_name)
-        if flag is None:
-            self._record_missing(flag_name)
-        else:
-            self._count_flag(flag_name, enabled=flag.enabled)
-            self._maybe_impression(flag, "getVariant")
-        return FlagProxy(flag)
 
     def _record_missing(self, flag_name: str) -> None:
         if not self._disable_stats:

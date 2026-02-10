@@ -34,19 +34,19 @@ export interface EvaluationContext {
 export interface EvaluationResult {
   enabled: boolean;
   variant?: string;
-  payload?: any;
+  value?: any;
   reason: EvaluationReason;
 }
 
 export interface EvaluationReason {
   kind:
-    | 'enabled'
-    | 'disabled'
-    | 'notFound'
-    | 'constraintFailed'
-    | 'rolloutFailed'
-    | 'fallback'
-    | 'archived';
+  | 'enabled'
+  | 'disabled'
+  | 'notFound'
+  | 'constraintFailed'
+  | 'rolloutFailed'
+  | 'fallback'
+  | 'archived';
   message?: string;
   failedConstraint?: {
     contextName: string;
@@ -66,7 +66,8 @@ export class FeatureEvaluator {
     if (!flag) {
       return {
         enabled: false,
-        reason: { kind: 'notFound', message: 'Flag not found' },
+        variant: '$missing',
+        reason: { kind: 'notFound', message: 'Flag not found' }, // Adjusted to match EvaluationReason interface
       };
     }
 
@@ -74,7 +75,8 @@ export class FeatureEvaluator {
     if (flag.isArchived) {
       return {
         enabled: false,
-        reason: { kind: 'archived', message: 'Flag is archived' },
+        variant: '$disabled', // Archived flags are disabled
+        reason: { kind: 'archived', message: 'Flag is archived' }, // Adjusted to match EvaluationReason interface
       };
     }
 
@@ -316,69 +318,94 @@ export class FeatureEvaluator {
    * Select a variant for the context if variants are defined
    */
   private selectVariant(
-    flag: FeatureFlagAttributes,
+    flag: FeatureFlagAttributes & {
+      enabledValue?: any;
+      disabledValue?: any;
+      valueType?: string;
+    },
     context: EvaluationContext,
     baseResult: EvaluationResult
   ): EvaluationResult {
-    if (!flag.variants || flag.variants.length === 0) {
-      return baseResult;
+    // If disabled, return disabled value with $disabled variant
+    if (!baseResult.enabled) {
+      return {
+        ...baseResult,
+        variant: '$disabled',
+        value: this.parseValueFromFlag(flag.disabledValue, flag.valueType),
+      };
     }
 
-    // Calculate variant based on stickiness (use default since stickiness is not per-variant)
-    const stickiness = 'userId';
-    const stickinessValue = String(
-      context[stickiness] || context.sessionId || context.userId || ''
-    );
-    const seed = `${flag.id}:${stickinessValue}`;
-    const hash = this.normalizedHash(flag.id, stickinessValue);
+    // Check variants only if enabled
+    if (flag.variants && flag.variants.length > 0) {
+      // Calculate variant based on stickiness
+      const stickiness = 'userId';
+      const stickinessValue = String(
+        context[stickiness] || context.sessionId || context.userId || ''
+      );
+      const hash = this.normalizedHash(flag.id, stickinessValue);
 
-    // Calculate cumulative weights
-    let cumulativeWeight = 0;
-    for (const variant of flag.variants) {
-      cumulativeWeight += variant.weight;
-      if (hash <= cumulativeWeight) {
+      // Calculate cumulative weights
+      let cumulativeWeight = 0;
+      for (const variant of flag.variants) {
+        cumulativeWeight += variant.weight;
+        if (hash <= cumulativeWeight) {
+          return {
+            ...baseResult,
+            variant: variant.variantName,
+            value: this.parseValue(variant),
+          };
+        }
+      }
+
+      // Fallback to first variant if weights don't sum to 100
+      if (flag.variants.length > 0) {
+        const firstVariant = flag.variants[0];
         return {
           ...baseResult,
-          variant: variant.variantName,
-          payload: this.parsePayload(variant),
+          variant: firstVariant.variantName,
+          value: this.parseValue(firstVariant),
         };
       }
     }
 
-    // Fallback to first variant if weights don't sum to 100
-    if (flag.variants.length > 0) {
-      const firstVariant = flag.variants[0];
-      return {
-        ...baseResult,
-        variant: firstVariant.variantName,
-        payload: this.parsePayload(firstVariant),
-      };
-    }
-
-    return baseResult;
+    // Enabled but no variant matched (or no variants) -> return enabled value with $default
+    return {
+      ...baseResult,
+      variant: '$default',
+      value: this.parseValueFromFlag(flag.enabledValue, flag.valueType),
+    };
   }
 
   /**
-   * Parse variant payload based on type
+   * Parse variant value based on type
    */
-  private parsePayload(variant: FeatureVariantAttributes): any {
-    if (!variant.payload) return undefined;
+  private parseValue(variant: FeatureVariantAttributes): any {
+    if (variant.value === undefined || variant.value === null) return undefined;
+    return this.parseValueFromFlag(variant.value, variant.valueType);
+  }
 
-    switch (variant.payloadType) {
+  private parseValueFromFlag(value: any, type?: string): any {
+    if (value === undefined || value === null) return undefined;
+
+    switch (type) {
       case 'number':
-        return Number(variant.payload);
+        return Number(value);
+      case 'boolean':
+        return typeof value === 'string'
+          ? value === 'true'
+          : Boolean(value);
       case 'json':
-        if (typeof variant.payload === 'string') {
+        if (typeof value === 'string') {
           try {
-            return JSON.parse(variant.payload);
+            return JSON.parse(value);
           } catch {
-            return variant.payload;
+            return value;
           }
         }
-        return variant.payload;
+        return value;
       case 'string':
       default:
-        return String(variant.payload);
+        return String(value);
     }
   }
 

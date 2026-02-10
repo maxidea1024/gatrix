@@ -416,6 +416,20 @@ export class FeatureFlagService {
     this.logger.debug('Segment removed from cache', { segmentName });
   }
 
+  // ==================== Flag Query Methods ====================
+
+  /**
+   * Check if a feature flag exists in the cache
+   * @param flagName Name of the flag
+   * @param environment Environment name
+   * @returns true if the flag is defined, false otherwise
+   */
+  hasFlag(flagName: string, environment: string): boolean {
+    const flagMap = this.cachedFlagsByEnv.get(environment);
+    if (!flagMap) return false;
+    return flagMap.has(flagName);
+  }
+
   // ==================== Evaluation Methods ====================
 
   /**
@@ -423,17 +437,17 @@ export class FeatureFlagService {
    * @param flagName Name of the flag
    * @param context Evaluation context
    * @param environment Environment name
-   * @param defaultValue Default value if flag not found
+   * @param missingValue Value to return if flag not found
    */
   isEnabled(
     flagName: string,
     context: EvaluationContext,
     environment: string,
-    defaultValue: boolean = false
+    missingValue: boolean = false
   ): boolean {
     const result = this.evaluate(flagName, context, environment);
     if (result.reason === 'not_found') {
-      return defaultValue;
+      return missingValue;
     }
     return result.enabled;
   }
@@ -448,9 +462,9 @@ export class FeatureFlagService {
     flagName: string,
     context: EvaluationContext,
     environment: string,
-    defaultValue: boolean = false
+    missingValue: boolean = false
   ): boolean {
-    return this.isEnabled(flagName, context, environment, defaultValue);
+    return this.isEnabled(flagName, context, environment, missingValue);
   }
 
   /**
@@ -460,30 +474,30 @@ export class FeatureFlagService {
     flagName: string,
     context: EvaluationContext,
     environment: string,
-    defaultValue: boolean = false
+    missingValue: boolean = false
   ): { value: boolean; reason: EvaluationResult['reason']; flagName: string } {
     const result = this.evaluate(flagName, context, environment);
     return {
-      value: result.reason === 'not_found' ? defaultValue : result.enabled,
+      value: result.reason === 'not_found' ? missingValue : result.enabled,
       reason: result.reason,
       flagName: result.flagName,
     };
   }
 
   /**
-   * Get string variation from variant payload
+   * Get string variation from variant value
    */
   stringVariation(
     flagName: string,
     context: EvaluationContext,
     environment: string,
-    defaultValue: string = ''
+    missingValue: string = ''
   ): string {
     const result = this.evaluate(flagName, context, environment);
-    if (!result.enabled || !result.variant?.payload) {
-      return defaultValue;
+    if (result.reason === 'not_found' || result.variant?.value == null) {
+      return missingValue;
     }
-    return String(result.variant.payload.value ?? result.variant.payload ?? defaultValue);
+    return String(result.variant.value);
   }
 
   /**
@@ -493,7 +507,7 @@ export class FeatureFlagService {
     flagName: string,
     context: EvaluationContext,
     environment: string,
-    defaultValue: string = ''
+    missingValue: string = ''
   ): {
     value: string;
     reason: EvaluationResult['reason'];
@@ -502,9 +516,9 @@ export class FeatureFlagService {
   } {
     const result = this.evaluate(flagName, context, environment);
     const value =
-      !result.enabled || !result.variant?.payload
-        ? defaultValue
-        : String(result.variant.payload.value ?? result.variant.payload ?? defaultValue);
+      result.reason === 'not_found' || result.variant?.value == null
+        ? missingValue
+        : String(result.variant.value);
     return {
       value,
       reason: result.reason,
@@ -514,21 +528,20 @@ export class FeatureFlagService {
   }
 
   /**
-   * Get number variation from variant payload
+   * Get number variation from variant value
    */
   numberVariation(
     flagName: string,
     context: EvaluationContext,
     environment: string,
-    defaultValue: number = 0
+    missingValue: number = 0
   ): number {
     const result = this.evaluate(flagName, context, environment);
-    if (!result.enabled || !result.variant?.payload) {
-      return defaultValue;
+    if (result.reason === 'not_found' || result.variant?.value == null) {
+      return missingValue;
     }
-    const rawValue = result.variant.payload.value ?? result.variant.payload;
-    const num = Number(rawValue);
-    return isNaN(num) ? defaultValue : num;
+    const num = Number(result.variant.value);
+    return isNaN(num) ? missingValue : num;
   }
 
   /**
@@ -538,7 +551,7 @@ export class FeatureFlagService {
     flagName: string,
     context: EvaluationContext,
     environment: string,
-    defaultValue: number = 0
+    missingValue: number = 0
   ): {
     value: number;
     reason: EvaluationResult['reason'];
@@ -546,11 +559,10 @@ export class FeatureFlagService {
     variantName?: string;
   } {
     const result = this.evaluate(flagName, context, environment);
-    let value = defaultValue;
-    if (result.enabled && result.variant?.payload) {
-      const rawValue = result.variant.payload.value ?? result.variant.payload;
-      const num = Number(rawValue);
-      value = isNaN(num) ? defaultValue : num;
+    let value = missingValue;
+    if (result.reason !== 'not_found' && result.variant?.value != null) {
+      const num = Number(result.variant.value);
+      value = isNaN(num) ? missingValue : num;
     }
     return {
       value,
@@ -561,19 +573,19 @@ export class FeatureFlagService {
   }
 
   /**
-   * Get JSON variation from variant payload
+   * Get JSON variation from variant value
    */
   jsonVariation<T = any>(
     flagName: string,
     context: EvaluationContext,
     environment: string,
-    defaultValue: T
+    missingValue: T
   ): T {
     const result = this.evaluate(flagName, context, environment);
-    if (!result.enabled || !result.variant?.payload) {
-      return defaultValue;
+    if (result.reason === 'not_found' || result.variant?.value == null) {
+      return missingValue;
     }
-    const rawValue = result.variant.payload.value ?? result.variant.payload;
+    const rawValue = result.variant.value;
     if (typeof rawValue === 'object') {
       return rawValue as T;
     }
@@ -581,10 +593,10 @@ export class FeatureFlagService {
       try {
         return JSON.parse(rawValue) as T;
       } catch {
-        return defaultValue;
+        return missingValue;
       }
     }
-    return defaultValue;
+    return missingValue;
   }
 
   /**
@@ -594,7 +606,7 @@ export class FeatureFlagService {
     flagName: string,
     context: EvaluationContext,
     environment: string,
-    defaultValue: T
+    missingValue: T
   ): {
     value: T;
     reason: EvaluationResult['reason'];
@@ -602,16 +614,16 @@ export class FeatureFlagService {
     variantName?: string;
   } {
     const result = this.evaluate(flagName, context, environment);
-    let value = defaultValue;
-    if (result.enabled && result.variant?.payload) {
-      const rawValue = result.variant.payload.value ?? result.variant.payload;
+    let value = missingValue;
+    if (result.reason !== 'not_found' && result.variant?.value != null) {
+      const rawValue = result.variant.value;
       if (typeof rawValue === 'object') {
         value = rawValue as T;
       } else if (typeof rawValue === 'string') {
         try {
           value = JSON.parse(rawValue) as T;
         } catch {
-          // Keep defaultValue
+          // Keep missingValue
         }
       }
     }
@@ -627,8 +639,7 @@ export class FeatureFlagService {
 
   /**
    * Get string variation or throw if not available
-   * Throws FeatureFlagError if flag not found, disabled, or no payload
-   * Use this when baselinePayload is required in server config
+   * Throws FeatureFlagError if flag not found or has no value
    */
   stringVariationOrThrow(
     flagName: string,
@@ -646,36 +657,21 @@ export class FeatureFlagService {
       );
     }
 
-    if (!result.enabled) {
-      // Flag disabled - check for baselinePayload
-      // Note: baselinePayload would be in result.variant if set
-      if (result.variant?.payload) {
-        const value = result.variant.payload.value ?? result.variant.payload;
-        return String(value);
-      }
+    if (result.variant?.value == null) {
       throw new FeatureFlagError(
-        FeatureFlagErrorCode.FLAG_DISABLED,
-        `Feature flag '${flagName}' is disabled and has no baseline payload`,
+        FeatureFlagErrorCode.NO_VALUE,
+        `Feature flag '${flagName}' has no variant value`,
         flagName,
         environment
       );
     }
 
-    if (!result.variant?.payload) {
-      throw new FeatureFlagError(
-        FeatureFlagErrorCode.NO_PAYLOAD,
-        `Feature flag '${flagName}' has no variant payload`,
-        flagName,
-        environment
-      );
-    }
-
-    return String(result.variant.payload.value ?? result.variant.payload);
+    return String(result.variant.value);
   }
 
   /**
    * Get number variation or throw if not available
-   * Throws FeatureFlagError if flag not found, disabled, no payload, or payload is not a valid number
+   * Throws FeatureFlagError if flag not found, has no value, or value is not a valid number
    */
   numberVariationOrThrow(
     flagName: string,
@@ -693,43 +689,20 @@ export class FeatureFlagService {
       );
     }
 
-    if (!result.enabled) {
-      if (result.variant?.payload) {
-        const value = result.variant.payload.value ?? result.variant.payload;
-        const num = Number(value);
-        if (isNaN(num)) {
-          throw new FeatureFlagError(
-            FeatureFlagErrorCode.INVALID_PAYLOAD_TYPE,
-            `Feature flag '${flagName}' baseline payload is not a valid number`,
-            flagName,
-            environment
-          );
-        }
-        return num;
-      }
+    if (result.variant?.value == null) {
       throw new FeatureFlagError(
-        FeatureFlagErrorCode.FLAG_DISABLED,
-        `Feature flag '${flagName}' is disabled and has no baseline payload`,
+        FeatureFlagErrorCode.NO_VALUE,
+        `Feature flag '${flagName}' has no variant value`,
         flagName,
         environment
       );
     }
 
-    if (!result.variant?.payload) {
-      throw new FeatureFlagError(
-        FeatureFlagErrorCode.NO_PAYLOAD,
-        `Feature flag '${flagName}' has no variant payload`,
-        flagName,
-        environment
-      );
-    }
-
-    const rawValue = result.variant.payload.value ?? result.variant.payload;
-    const num = Number(rawValue);
+    const num = Number(result.variant.value);
     if (isNaN(num)) {
       throw new FeatureFlagError(
-        FeatureFlagErrorCode.INVALID_PAYLOAD_TYPE,
-        `Feature flag '${flagName}' variant payload is not a valid number`,
+        FeatureFlagErrorCode.INVALID_VALUE_TYPE,
+        `Feature flag '${flagName}' variant value is not a valid number`,
         flagName,
         environment
       );
@@ -739,7 +712,7 @@ export class FeatureFlagService {
 
   /**
    * Get JSON variation or throw if not available
-   * Throws FeatureFlagError if flag not found, disabled, no payload, or payload is not valid JSON
+   * Throws FeatureFlagError if flag not found, has no value, or value is not valid JSON
    */
   jsonVariationOrThrow<T = any>(
     flagName: string,
@@ -757,49 +730,16 @@ export class FeatureFlagService {
       );
     }
 
-    if (!result.enabled) {
-      if (result.variant?.payload) {
-        const rawValue = result.variant.payload.value ?? result.variant.payload;
-        if (typeof rawValue === 'object') {
-          return rawValue as T;
-        }
-        if (typeof rawValue === 'string') {
-          try {
-            return JSON.parse(rawValue) as T;
-          } catch {
-            throw new FeatureFlagError(
-              FeatureFlagErrorCode.INVALID_PAYLOAD_TYPE,
-              `Feature flag '${flagName}' baseline payload is not valid JSON`,
-              flagName,
-              environment
-            );
-          }
-        }
-        throw new FeatureFlagError(
-          FeatureFlagErrorCode.INVALID_PAYLOAD_TYPE,
-          `Feature flag '${flagName}' baseline payload type is not supported`,
-          flagName,
-          environment
-        );
-      }
+    if (result.variant?.value == null) {
       throw new FeatureFlagError(
-        FeatureFlagErrorCode.FLAG_DISABLED,
-        `Feature flag '${flagName}' is disabled and has no baseline payload`,
+        FeatureFlagErrorCode.NO_VALUE,
+        `Feature flag '${flagName}' has no variant value`,
         flagName,
         environment
       );
     }
 
-    if (!result.variant?.payload) {
-      throw new FeatureFlagError(
-        FeatureFlagErrorCode.NO_PAYLOAD,
-        `Feature flag '${flagName}' has no variant payload`,
-        flagName,
-        environment
-      );
-    }
-
-    const rawValue = result.variant.payload.value ?? result.variant.payload;
+    const rawValue = result.variant.value;
     if (typeof rawValue === 'object') {
       return rawValue as T;
     }
@@ -808,16 +748,16 @@ export class FeatureFlagService {
         return JSON.parse(rawValue) as T;
       } catch {
         throw new FeatureFlagError(
-          FeatureFlagErrorCode.INVALID_PAYLOAD_TYPE,
-          `Feature flag '${flagName}' variant payload is not valid JSON`,
+          FeatureFlagErrorCode.INVALID_VALUE_TYPE,
+          `Feature flag '${flagName}' variant value is not valid JSON`,
           flagName,
           environment
         );
       }
     }
     throw new FeatureFlagError(
-      FeatureFlagErrorCode.INVALID_PAYLOAD_TYPE,
-      `Feature flag '${flagName}' variant payload type is not supported`,
+      FeatureFlagErrorCode.INVALID_VALUE_TYPE,
+      `Feature flag '${flagName}' variant value type is not supported`,
       flagName,
       environment
     );
@@ -866,11 +806,11 @@ export class FeatureFlagService {
         enabled: false,
         reason: 'not_found',
         variant: {
-          name: 'disabled',
+          name: '$missing',
           weight: 100,
           enabled: false,
-          payload: null,
-          payloadType: 'string',
+          value: null,
+          valueType: 'string',
         },
       };
     }

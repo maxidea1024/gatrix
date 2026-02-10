@@ -5,7 +5,7 @@
 // ==================== Core Types ====================
 
 export type FlagType = 'release' | 'experiment' | 'operational' | 'killSwitch' | 'permission';
-export type PayloadType = 'string' | 'number' | 'json';
+export type ValueType = 'string' | 'number' | 'boolean' | 'json';
 export type FieldType = 'string' | 'number' | 'boolean' | 'date' | 'semver';
 
 export type ConstraintOperator =
@@ -81,8 +81,8 @@ export interface Constraint {
 export interface Variant {
   name: string;
   weight: number;
-  payload?: any;
-  payloadType?: PayloadType;
+  value?: any;
+  valueType?: ValueType;
   enabled?: boolean;
 }
 
@@ -127,8 +127,9 @@ export interface FeatureFlag {
   impressionDataEnabled: boolean; // Whether to emit impression events
   strategies: FeatureStrategy[];
   variants: Variant[];
-  variantType?: PayloadType; // Type of variant payload
-  baselinePayload?: any; // Payload value when flag evaluates to false
+  valueType?: ValueType; // Type of flag value
+  enabledValue?: any; // Value when flag is enabled and no variant matched
+  disabledValue?: any; // Value when flag is disabled
   version?: number; // Flag version (increments on update)
 }
 

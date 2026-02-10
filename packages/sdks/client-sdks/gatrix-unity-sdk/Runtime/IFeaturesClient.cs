@@ -249,9 +249,9 @@ namespace Gatrix.Unity.SDK
         /// Get the variant name for a flag, or a default value if the flag is not found.
         /// </summary>
         /// <param name="flagName">The feature flag key.</param>
-        /// <param name="defaultValue">Default value if flag not found or has no variant.</param>
-        /// <returns>The variant name, or <paramref name="defaultValue"/>.</returns>
-        string Variation(string flagName, string defaultValue);
+        /// <param name="missingValue">Default value if flag not found or has no variant.</param>
+        /// <returns>The variant name, or <paramref name="missingValue"/>.</returns>
+        string Variation(string flagName, string missingValue);
 
         /// <summary>
         /// Get a boolean variation. Returns the flag's <c>Enabled</c> state.
@@ -261,62 +261,70 @@ namespace Gatrix.Unity.SDK
         /// </para>
         /// </summary>
         /// <param name="flagName">The feature flag key.</param>
-        /// <param name="defaultValue">Default value if flag not found.</param>
-        /// <returns>The flag's enabled state, or <paramref name="defaultValue"/>.</returns>
-        bool BoolVariation(string flagName, bool defaultValue);
+        /// <param name="missingValue">Default value if flag not found.</param>
+        /// <returns>The flag's enabled state, or <paramref name="missingValue"/>.</returns>
+        bool BoolVariation(string flagName, bool missingValue);
 
         /// <summary>
         /// Get a string variation from the variant's payload.
         /// <para>
         /// Reads the <c>Variant.Payload</c> as a string. If the flag has no variant,
-        /// no payload, or the flag doesn't exist, returns <paramref name="defaultValue"/>.
+        /// no payload, or the flag doesn't exist, returns <paramref name="missingValue"/>.
         /// </para>
         /// </summary>
         /// <param name="flagName">The feature flag key.</param>
-        /// <param name="defaultValue">Default value if flag not found or payload is empty.</param>
-        /// <returns>The payload as string, or <paramref name="defaultValue"/>.</returns>
-        string StringVariation(string flagName, string defaultValue);
+        /// <param name="missingValue">Default value if flag not found or payload is empty.</param>
+        /// <returns>The payload as string, or <paramref name="missingValue"/>.</returns>
+        string StringVariation(string flagName, string missingValue);
 
         /// <summary>
         /// Get a numeric variation from the variant's payload as <c>double</c>.
         /// <para>
         /// Parses the payload as a number. Supports int, long, float, double, and
-        /// string representations. If parsing fails, returns <paramref name="defaultValue"/>.
+        /// string representations. If parsing fails, returns <paramref name="missingValue"/>.
         /// </para>
         /// </summary>
         /// <param name="flagName">The feature flag key.</param>
-        /// <param name="defaultValue">Default value if flag not found or not a valid number.</param>
-        /// <returns>The payload as double, or <paramref name="defaultValue"/>.</returns>
-        double NumberVariation(string flagName, double defaultValue);
+        /// <param name="missingValue">Default value if flag not found or not a valid number.</param>
+        /// <returns>The payload as double, or <paramref name="missingValue"/>.</returns>
+        double NumberVariation(string flagName, double missingValue);
 
         /// <summary>
         /// Get an integer variation (convenience wrapper around <see cref="NumberVariation"/>).
         /// </summary>
         /// <param name="flagName">The feature flag key.</param>
-        /// <param name="defaultValue">Default value if flag not found.</param>
-        /// <returns>The payload as int, or <paramref name="defaultValue"/>.</returns>
-        int IntVariation(string flagName, int defaultValue);
+        /// <param name="missingValue">Default value if flag not found.</param>
+        /// <returns>The payload as int, or <paramref name="missingValue"/>.</returns>
+        int IntVariation(string flagName, int missingValue);
 
         /// <summary>
         /// Get a float variation (convenience wrapper around <see cref="NumberVariation"/>).
         /// </summary>
         /// <param name="flagName">The feature flag key.</param>
-        /// <param name="defaultValue">Default value if flag not found.</param>
-        /// <returns>The payload as float, or <paramref name="defaultValue"/>.</returns>
-        float FloatVariation(string flagName, float defaultValue);
+        /// <param name="missingValue">Default value if flag not found.</param>
+        /// <returns>The payload as float, or <paramref name="missingValue"/>.</returns>
+        float FloatVariation(string flagName, float missingValue);
+
+        /// <summary>
+        /// Get a double variation.
+        /// </summary>
+        /// <param name="flagName">The feature flag key.</param>
+        /// <param name="missingValue">Default value if flag not found.</param>
+        /// <returns>The payload as double, or <paramref name="missingValue"/>.</returns>
+        double DoubleVariation(string flagName, double missingValue);
 
         /// <summary>
         /// Get a JSON variation as a <see cref="Dictionary{TKey, TValue}"/>.
         /// <para>
         /// Parses the variant payload as a JSON object. If the payload is already
         /// a Dictionary, returns it directly. If it's a string, parses it as JSON.
-        /// Returns <paramref name="defaultValue"/> on parse failure or missing flag.
+        /// Returns <paramref name="missingValue"/> on parse failure or missing flag.
         /// </para>
         /// </summary>
         /// <param name="flagName">The feature flag key.</param>
-        /// <param name="defaultValue">Default value if flag not found or parse fails.</param>
-        /// <returns>The payload as Dictionary, or <paramref name="defaultValue"/>.</returns>
-        Dictionary<string, object> JsonVariation(string flagName, Dictionary<string, object> defaultValue);
+        /// <param name="missingValue">Default value if flag not found or parse fails.</param>
+        /// <returns>The payload as Dictionary, or <paramref name="missingValue"/>.</returns>
+        Dictionary<string, object> JsonVariation(string flagName, Dictionary<string, object> missingValue);
 
         // ==================== Variations (Strict, throws on missing) ====================
 
@@ -363,34 +371,34 @@ namespace Gatrix.Unity.SDK
         /// </para>
         /// </summary>
         /// <param name="flagName">The feature flag key.</param>
-        /// <param name="defaultValue">Default value if flag not found.</param>
+        /// <param name="missingValue">Default value if flag not found.</param>
         /// <returns>A <see cref="VariationResult{T}"/> with value and metadata.</returns>
-        VariationResult<bool> BoolVariationDetails(string flagName, bool defaultValue);
+        VariationResult<bool> BoolVariationDetails(string flagName, bool missingValue);
 
         /// <summary>
         /// Get a string variation with detailed evaluation metadata.
         /// </summary>
         /// <param name="flagName">The feature flag key.</param>
-        /// <param name="defaultValue">Default value if flag not found.</param>
+        /// <param name="missingValue">Default value if flag not found.</param>
         /// <returns>A <see cref="VariationResult{T}"/> with value and metadata.</returns>
-        VariationResult<string> StringVariationDetails(string flagName, string defaultValue);
+        VariationResult<string> StringVariationDetails(string flagName, string missingValue);
 
         /// <summary>
         /// Get a numeric variation with detailed evaluation metadata.
         /// </summary>
         /// <param name="flagName">The feature flag key.</param>
-        /// <param name="defaultValue">Default value if flag not found.</param>
+        /// <param name="missingValue">Default value if flag not found.</param>
         /// <returns>A <see cref="VariationResult{T}"/> with value and metadata.</returns>
-        VariationResult<double> NumberVariationDetails(string flagName, double defaultValue);
+        VariationResult<double> NumberVariationDetails(string flagName, double missingValue);
 
         /// <summary>
         /// Get a JSON variation with detailed evaluation metadata.
         /// </summary>
         /// <param name="flagName">The feature flag key.</param>
-        /// <param name="defaultValue">Default value if flag not found.</param>
+        /// <param name="missingValue">Default value if flag not found.</param>
         /// <returns>A <see cref="VariationResult{T}"/> with value and metadata.</returns>
         VariationResult<Dictionary<string, object>> JsonVariationDetails(
-            string flagName, Dictionary<string, object> defaultValue);
+            string flagName, Dictionary<string, object> missingValue);
 
         // ==================== Sync ====================
 

@@ -11,7 +11,7 @@ namespace gatrix {
 
 // ==================== Enums ====================
 
-enum class VariantType { NONE, STRING, NUMBER, JSON };
+enum class ValueType { NONE, STRING, NUMBER, BOOLEAN, JSON };
 
 enum class SdkState { INITIALIZING, READY, HEALTHY, ERROR, STOPPED };
 
@@ -20,11 +20,11 @@ enum class SdkState { INITIALIZING, READY, HEALTHY, ERROR, STOPPED };
 struct Variant {
   std::string name;
   bool enabled = false;
-  std::string payload; // raw payload string
+  std::string value; // raw value string
 
-  static Variant fallbackDisabled() {
+  static Variant fallbackMissing() {
     Variant v;
-    v.name = "disabled";
+    v.name = "$missing";
     v.enabled = false;
     return v;
   }
@@ -34,7 +34,7 @@ struct EvaluatedFlag {
   std::string name;
   bool enabled = false;
   Variant variant;
-  VariantType variantType = VariantType::NONE;
+  ValueType valueType = ValueType::NONE;
   int version = 0;
   std::string reason;
   bool impressionData = false;
@@ -59,7 +59,7 @@ struct ImpressionEvent {
   std::string featureName;
   bool enabled = false;
   std::string variantName;
-  std::string variantPayload;
+  std::string variantValue;
   int flagVersion = 0;
   std::string timestamp;
 };

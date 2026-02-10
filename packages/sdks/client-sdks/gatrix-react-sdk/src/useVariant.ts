@@ -12,7 +12,7 @@
  * const variant = useVariant('button-color');
  *
  * return (
- *   <Button color={variant.payload?.value || 'blue'}>
+ *   <Button color={variant.value || 'blue'}>
  *     Click me
  *   </Button>
  * );
@@ -31,16 +31,16 @@ export const variantHasChanged = (oldVariant: Variant, newVariant?: Variant): bo
   const variantsAreEqual =
     oldVariant.name === newVariant.name &&
     oldVariant.enabled === newVariant.enabled &&
-    JSON.stringify(oldVariant.payload) === JSON.stringify(newVariant.payload);
+    JSON.stringify(oldVariant.value) === JSON.stringify(newVariant.value);
 
   return !variantsAreEqual;
 };
 
-const DISABLED_VARIANT: Variant = { name: 'disabled', enabled: false };
+const MISSING_VARIANT: Variant = { name: '$missing', enabled: false };
 
 export function useVariant(flagName: string): Variant {
   const { getVariant, client } = useGatrixContext();
-  const [variant, setVariant] = useState<Variant>(() => getVariant(flagName) || DISABLED_VARIANT);
+  const [variant, setVariant] = useState<Variant>(() => getVariant(flagName) || MISSING_VARIANT);
   const variantRef = useRef<Variant>(variant);
   variantRef.current = variant;
 

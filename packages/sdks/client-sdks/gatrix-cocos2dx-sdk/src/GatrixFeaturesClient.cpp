@@ -117,93 +117,146 @@ FeaturesClient::activeFlags() const {
   return _config.explicitSyncMode ? _synchronizedFlags : _realtimeFlags;
 }
 
-bool FeaturesClient::isEnabled(const std::string &flagName) {
+// Shared flag lookup: handles missing count, trackAccess, trackImpression
+const EvaluatedFlag *FeaturesClient::lookupFlag(const std::string &flagName,
+                                                const std::string &eventType) {
   auto it = activeFlags().find(flagName);
   if (it == activeFlags().end()) {
     _stats.missingFlags[flagName]++;
-    return false;
+    return nullptr;
   }
-  trackAccess(flagName, it->second.enabled, it->second.variant.name);
+  trackAccess(flagName, it->second.enabled, it->second.variant.name, eventType);
   if (it->second.impressionData || _config.impressionDataAll)
-    trackImpression(it->second);
-  return it->second.enabled;
+    trackImpression(it->second, eventType);
+  return &it->second;
+}
+
+bool FeaturesClient::isEnabled(const std::string &flagName) {
+  auto *flag = lookupFlag(flagName, "isEnabled");
+  if (!flag)
+    return false;
+  return flag->enabled;
 }
 
 Variant FeaturesClient::getVariant(const std::string &flagName) {
-  auto it = activeFlags().find(flagName);
-  if (it == activeFlags().end()) {
-    _stats.missingFlags[flagName]++;
-    return Variant::fallbackDisabled();
+  auto *flag = lookupFlag(flagName, "getVariant");
+  if (!flag) {
+    return {"$missing", false};
   }
-  trackAccess(flagName, it->second.enabled, it->second.variant.name);
-  return it->second.variant;
+  return flag->variant;
 }
 
 std::vector<EvaluatedFlag> FeaturesClient::getAllFlags() const {
   std::vector<EvaluatedFlag> result;
-  for (const auto &[name, flag] : activeFlags()) {
-    result.push_back(flag);
+  for (const auto &[name, f] : activeFlags()) {
+    result.push_back(f);
   }
   return result;
 }
 
 FlagProxy FeaturesClient::getFlag(const std::string &flagName) {
   auto it = activeFlags().find(flagName);
-  if (it == activeFlags().end()) {
-    _stats.missingFlags[flagName]++;
-    return FlagProxy(nullptr);
-  }
-  trackAccess(flagName, it->second.enabled, it->second.variant.name);
-  if (it->second.impressionData || _config.impressionDataAll)
-    trackImpression(it->second);
-  return FlagProxy(&it->second);
+  const EvaluatedFlag *flag =
+      (it != activeFlags().end()) ? &it->second : nullptr;
+
+  auto onAccess = [this](const std::string &name, const EvaluatedFlag *f,
+                         const std::string &type, const std::string &vname) {
+    this->trackAccess(name, f ? f->enabled : false, vname, type);
+    if (f && (f->impressionData || this->_config.impressionDataAll)) {
+      this->trackImpression(*f, type);
+    } else if (!f) {
+      this->_stats.missingFlags[name]++;
+    }
+  };
+
+  return FlagProxy(flag, onAccess, flagName);
+}
+
+bool FeaturesClient::hasFlag(const std::string &flagName) const {
+  return activeFlags().find(flagName) != activeFlags().end();
 }
 
 // ==================== Variations ====================
 
 std::string FeaturesClient::variation(const std::string &flagName,
-                                      const std::string &defaultValue) {
-  return getFlag(flagName).variation(defaultValue);
+                                      const std::string &missingValue) {
+  auto *flag = lookupFlag(flagName, "getVariant");
+  if (!flag)
+    return missingValue;
+  return flag->variant.name.empty() ? missingValue : flag->variant.name;
 }
 
 bool FeaturesClient::boolVariation(const std::string &flagName,
-                                   bool defaultValue) {
-  return getFlag(flagName).boolVariation(defaultValue);
+                                   bool missingValue) {
+  return getFlag(flagName).boolVariation(missingValue);
 }
 
 std::string FeaturesClient::stringVariation(const std::string &flagName,
-                                            const std::string &defaultValue) {
-  return getFlag(flagName).stringVariation(defaultValue);
+                                            const std::string &missingValue) {
+  return getFlag(flagName).stringVariation(missingValue);
 }
 
 double FeaturesClient::numberVariation(const std::string &flagName,
-                                       double defaultValue) {
-  return getFlag(flagName).numberVariation(defaultValue);
+                                       double missingValue) {
+  return getFlag(flagName).numberVariation(missingValue);
+}
+
+int FeaturesClient::intVariation(const std::string &flagName,
+                                 int missingValue) {
+  return getFlag(flagName).intVariation(missingValue);
+}
+
+float FeaturesClient::floatVariation(const std::string &flagName,
+                                     float missingValue) {
+  return getFlag(flagName).floatVariation(missingValue);
+}
+
+double FeaturesClient::doubleVariation(const std::string &flagName,
+                                       double missingValue) {
+  return getFlag(flagName).doubleVariation(missingValue);
 }
 
 std::string FeaturesClient::jsonVariation(const std::string &flagName,
-                                          const std::string &defaultValue) {
-  return getFlag(flagName).jsonVariation(defaultValue);
+                                          const std::string &missingValue) {
+  return getFlag(flagName).jsonVariation(missingValue);
 }
 
 // ==================== Variation Details ====================
 
 VariationResult<bool>
 FeaturesClient::boolVariationDetails(const std::string &flagName,
-                                     bool defaultValue) {
-  return getFlag(flagName).boolVariationDetails(defaultValue);
+                                     bool missingValue) {
+  return getFlag(flagName).boolVariationDetails(missingValue);
 }
 
 VariationResult<std::string>
 FeaturesClient::stringVariationDetails(const std::string &flagName,
-                                       const std::string &defaultValue) {
-  return getFlag(flagName).stringVariationDetails(defaultValue);
+                                       const std::string &missingValue) {
+  return getFlag(flagName).stringVariationDetails(missingValue);
 }
 
 VariationResult<double>
 FeaturesClient::numberVariationDetails(const std::string &flagName,
-                                       double defaultValue) {
-  return getFlag(flagName).numberVariationDetails(defaultValue);
+                                       double missingValue) {
+  return doubleVariationDetails(flagName, missingValue);
+}
+
+VariationResult<int>
+FeaturesClient::intVariationDetails(const std::string &flagName,
+                                    int missingValue) {
+  return getFlag(flagName).intVariationDetails(missingValue);
+}
+
+VariationResult<float>
+FeaturesClient::floatVariationDetails(const std::string &flagName,
+                                      float missingValue) {
+  return getFlag(flagName).floatVariationDetails(missingValue);
+}
+
+VariationResult<double>
+FeaturesClient::doubleVariationDetails(const std::string &flagName,
+                                       double missingValue) {
+  return getFlag(flagName).doubleVariationDetails(missingValue);
 }
 
 // ==================== OrThrow ====================
@@ -455,28 +508,28 @@ void FeaturesClient::onFetchResponse(int statusCode, const std::string &body,
       const auto &vj = fj["variant"];
       flag.variant.name = vj["name"].GetString();
       flag.variant.enabled = vj["enabled"].GetBool();
-      if (vj.HasMember("payload")) {
-        if (vj["payload"].IsString()) {
-          flag.variant.payload = vj["payload"].GetString();
-        } else if (vj["payload"].IsNumber()) {
-          flag.variant.payload = std::to_string(vj["payload"].GetDouble());
-        } else if (vj["payload"].IsObject() || vj["payload"].IsArray()) {
+      if (vj.HasMember("value")) {
+        if (vj["value"].IsString()) {
+          flag.variant.value = vj["value"].GetString();
+        } else if (vj["value"].IsNumber()) {
+          flag.variant.value = std::to_string(vj["value"].GetDouble());
+        } else if (vj["value"].IsObject() || vj["value"].IsArray()) {
           rapidjson::StringBuffer sb;
           rapidjson::Writer<rapidjson::StringBuffer> w(sb);
-          vj["payload"].Accept(w);
-          flag.variant.payload = sb.GetString();
+          vj["value"].Accept(w);
+          flag.variant.value = sb.GetString();
         }
       }
     }
 
-    if (fj.HasMember("variantType") && fj["variantType"].IsString()) {
-      std::string vt = fj["variantType"].GetString();
+    if (fj.HasMember("valueType") && fj["valueType"].IsString()) {
+      std::string vt = fj["valueType"].GetString();
       if (vt == "string")
-        flag.variantType = VariantType::STRING;
+        flag.valueType = ValueType::STRING;
       else if (vt == "number")
-        flag.variantType = VariantType::NUMBER;
+        flag.valueType = ValueType::NUMBER;
       else if (vt == "json")
-        flag.variantType = VariantType::JSON;
+        flag.valueType = ValueType::JSON;
     }
 
     newFlags[flag.name] = flag;
@@ -552,7 +605,8 @@ void FeaturesClient::onFetchError(int statusCode, const std::string &error) {
 // ==================== Internal ====================
 
 void FeaturesClient::trackAccess(const std::string &flagName, bool enabled,
-                                 const std::string &variantName) {
+                                 const std::string &variantName,
+                                 const std::string &eventType) {
   if (_config.disableStats)
     return;
   if (enabled) {
@@ -565,13 +619,14 @@ void FeaturesClient::trackAccess(const std::string &flagName, bool enabled,
   }
 }
 
-void FeaturesClient::trackImpression(const EvaluatedFlag &flag) {
+void FeaturesClient::trackImpression(const EvaluatedFlag &flag,
+                                     const std::string &eventType) {
   if (_config.disableMetrics)
     return;
   _stats.impressionCount++;
-  _emitter.emit(
-      EVENTS::FLAGS_IMPRESSION,
-      {flag.name, flag.enabled ? "true" : "false", flag.variant.name});
+  _emitter.emit(EVENTS::FLAGS_IMPRESSION,
+                {flag.name, flag.enabled ? "true" : "false", flag.variant.name,
+                 eventType});
 }
 
 void FeaturesClient::initFromBootstrap() {
@@ -631,10 +686,9 @@ void FeaturesClient::saveToStorage() {
     varObj.AddMember("name", rapidjson::Value(flag.variant.name.c_str(), alloc),
                      alloc);
     varObj.AddMember("enabled", flag.variant.enabled, alloc);
-    if (!flag.variant.payload.empty()) {
-      varObj.AddMember("payload",
-                       rapidjson::Value(flag.variant.payload.c_str(), alloc),
-                       alloc);
+    if (!flag.variant.value.empty()) {
+      varObj.AddMember(
+          "value", rapidjson::Value(flag.variant.value.c_str(), alloc), alloc);
     }
     flagObj.AddMember("variant", varObj, alloc);
 

@@ -81,7 +81,7 @@ interface ContextField {
   fieldName: string;
   displayName: string;
   description?: string;
-  valueType: 'string' | 'number' | 'boolean' | 'date' | 'datetime' | 'semver';
+  fieldType: 'string' | 'number' | 'boolean' | 'date' | 'datetime' | 'semver';
   legalValues?: string[];
 }
 
@@ -98,9 +98,9 @@ interface EvaluationResult {
   enabled: boolean;
   variant?: {
     name: string;
-    payload?: any;
-    payloadType?: string;
-    payloadSource?: 'environment' | 'flag' | 'variant';
+    value?: any;
+    valueType?: string;
+    valueSource?: 'environment' | 'flag' | 'variant';
   };
   reason: string;
   reasonDetails?: {
@@ -359,8 +359,8 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
       ALL_STRATEGIES_DISABLED: t('playground.reasons.ALL_STRATEGIES_DISABLED'),
       STRATEGY_MATCHED: reasonDetails?.strategyName
         ? t('playground.reasons.strategyMatched', {
-            strategy: localizeStrategyName(reasonDetails.strategyName),
-          })
+          strategy: localizeStrategyName(reasonDetails.strategyName),
+        })
         : t('playground.reasons.defaultStrategy'),
       NO_MATCHING_STRATEGY: t('playground.reasons.NO_MATCHING_STRATEGY'),
     };
@@ -451,7 +451,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
     if (field === 'key') {
       const fieldDef = contextFields.find((f) => f.fieldName === value);
       if (fieldDef) {
-        updated[index].type = fieldDef.valueType;
+        updated[index].type = fieldDef.fieldType;
       }
     }
 
@@ -738,7 +738,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                 const contextField = getContextFieldByKey(entry.key);
                 const hasLegalValues =
                   contextField?.legalValues && contextField.legalValues.length > 0;
-                const fieldType = contextField?.valueType || 'string';
+                const fieldType = contextField?.fieldType || 'string';
 
                 // Render value input based on field type
                 const renderValueInput = () => {
@@ -847,7 +847,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                             );
                             return (
                               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                {selectedField && getFieldTypeIcon(selectedField.valueType)}
+                                {selectedField && getFieldTypeIcon(selectedField.fieldType)}
                                 {selectedField?.displayName || selected}
                               </Box>
                             );
@@ -865,9 +865,9 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                 disabled={isUsed}
                                 sx={{ display: 'flex', gap: 1.5, alignItems: 'flex-start', py: 1 }}
                               >
-                                <Tooltip title={field.valueType}>
+                                <Tooltip title={field.fieldType}>
                                   <Box sx={{ display: 'flex', alignItems: 'center', mt: 0.5 }}>
-                                    {getFieldTypeIcon(field.valueType)}
+                                    {getFieldTypeIcon(field.fieldType)}
                                   </Box>
                                 </Tooltip>
                                 <Box sx={{ flex: 1, minWidth: 0 }}>
@@ -1100,9 +1100,9 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                 transition: 'all 0.2s',
                                 '&:hover': hasDetails
                                   ? {
-                                      bgcolor: 'action.hover',
-                                      transform: 'scale(1.1)',
-                                    }
+                                    bgcolor: 'action.hover',
+                                    transform: 'scale(1.1)',
+                                  }
                                   : {},
                               }}
                               onClick={(e) => {
@@ -1431,24 +1431,24 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                 position: 'relative',
                                 '&::before': isMatched
                                   ? {
+                                    content: '""',
+                                    position: 'absolute',
+                                    left: 0,
+                                    top: 0,
+                                    bottom: 0,
+                                    width: 4,
+                                    bgcolor: 'success.main',
+                                  }
+                                  : wasEvaluated && !stepResult?.passed
+                                    ? {
                                       content: '""',
                                       position: 'absolute',
                                       left: 0,
                                       top: 0,
                                       bottom: 0,
                                       width: 4,
-                                      bgcolor: 'success.main',
+                                      bgcolor: 'error.main',
                                     }
-                                  : wasEvaluated && !stepResult?.passed
-                                    ? {
-                                        content: '""',
-                                        position: 'absolute',
-                                        left: 0,
-                                        top: 0,
-                                        bottom: 0,
-                                        width: 4,
-                                        bgcolor: 'error.main',
-                                      }
                                     : {},
                               }}
                             >
@@ -1731,7 +1731,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                               sx={{
                                 borderBottom:
                                   stepIdx <
-                                  (selectedEvaluation.result.evaluationSteps?.length || 1) - 1
+                                    (selectedEvaluation.result.evaluationSteps?.length || 1) - 1
                                     ? 1
                                     : 0,
                                 borderColor: 'divider',
@@ -2016,10 +2016,10 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                                         {check.rollout === 100
                                                           ? t('playground.checkMessages.rollout100')
                                                           : t('playground.rolloutDetail', {
-                                                              percentage:
-                                                                check.percentage?.toFixed(1) ?? '?',
-                                                              rollout: check.rollout ?? 100,
-                                                            })}
+                                                            percentage:
+                                                              check.percentage?.toFixed(1) ?? '?',
+                                                            rollout: check.rollout ?? 100,
+                                                          })}
                                                       </Typography>
                                                     ) : check.constraint ? (
                                                       <Box sx={{ mt: 0.5 }}>
@@ -2079,15 +2079,15 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                                         sx={{ display: 'block' }}
                                                       >
                                                         {check.message ===
-                                                        'Segment has no constraints - passed'
+                                                          'Segment has no constraints - passed'
                                                           ? t(
-                                                              'playground.checkMessages.segmentNoConstraints'
-                                                            )
+                                                            'playground.checkMessages.segmentNoConstraints'
+                                                          )
                                                           : check.message ===
-                                                              'Segment not found - skipped'
+                                                            'Segment not found - skipped'
                                                             ? t(
-                                                                'playground.checkMessages.segmentNotFound'
-                                                              )
+                                                              'playground.checkMessages.segmentNotFound'
+                                                            )
                                                             : check.message}
                                                       </Typography>
                                                     ) : null}
@@ -2146,13 +2146,13 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                     <IconButton
                       size="small"
                       onClick={() => {
-                        const payload = selectedEvaluation.result.variant?.payload;
+                        const value = selectedEvaluation.result.variant?.value;
                         const valueToCopy =
-                          typeof payload === 'object' && payload !== null && 'value' in payload
-                            ? String(payload.value)
-                            : typeof payload === 'object'
-                              ? JSON.stringify(payload)
-                              : String(payload ?? '');
+                          typeof value === 'object' && value !== null && 'value' in value
+                            ? String(value.value)
+                            : typeof value === 'object'
+                              ? JSON.stringify(value)
+                              : String(value ?? '');
                         copyToClipboardWithNotification(
                           valueToCopy,
                           () =>
@@ -2220,22 +2220,22 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                 {selectedEvaluation.result.variant ? (
                   <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
                     {(() => {
-                      const payloadType = selectedEvaluation.result.variant?.payloadType;
+                      const valueType = selectedEvaluation.result.variant?.valueType;
                       const iconSx = { fontSize: 20, color: 'text.secondary', mt: 0.3 };
-                      if (payloadType === 'json') return <JsonIcon sx={iconSx} />;
-                      if (payloadType === 'number') return <NumberIcon sx={iconSx} />;
-                      if (payloadType === 'string') return <StringIcon sx={iconSx} />;
+                      if (valueType === 'json') return <JsonIcon sx={iconSx} />;
+                      if (valueType === 'number') return <NumberIcon sx={iconSx} />;
+                      if (valueType === 'string') return <StringIcon sx={iconSx} />;
                       return <CodeIcon sx={iconSx} />;
                     })()}
                     <Box sx={{ flex: 1, minWidth: 0 }}>
                       {(() => {
-                        const payload = selectedEvaluation.result.variant?.payload;
-                        const payloadType = selectedEvaluation.result.variant?.payloadType;
+                        const value = selectedEvaluation.result.variant?.value;
+                        const valueType = selectedEvaluation.result.variant?.valueType;
 
                         // If it's the specific Gatrix JSON structure, extract just the value
-                        if (typeof payload === 'object' && payload !== null && 'value' in payload) {
-                          const innerValue = (payload as any).value;
-                          if (payloadType === 'json' || (payload as any).type === 'json') {
+                        if (typeof value === 'object' && value !== null && 'value' in value) {
+                          const innerValue = (value as any).value;
+                          if (valueType === 'json' || (value as any).type === 'json') {
                             return (
                               <Box
                                 sx={{
@@ -2292,7 +2292,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                         }
 
                         // Fallback for other formats
-                        if (payload === undefined || payload === null) {
+                        if (value === undefined || value === null) {
                           return (
                             <Typography variant="body2" color="text.disabled" fontStyle="italic">
                               {t('common.noValue')}
@@ -2300,7 +2300,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                           );
                         }
 
-                        if (payloadType === 'json') {
+                        if (valueType === 'json') {
                           return (
                             <Box
                               sx={{
@@ -2323,7 +2323,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                   wordBreak: 'break-word',
                                 }}
                               >
-                                {JSON.stringify(payload, null, 2)}
+                                {JSON.stringify(value, null, 2)}
                               </pre>
                             </Box>
                           );
@@ -2346,13 +2346,13 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                               wordBreak: 'break-all',
                             }}
                           >
-                            {typeof payload === 'object'
-                              ? JSON.stringify(payload)
-                              : String(payload)}
+                            {typeof value === 'object'
+                              ? JSON.stringify(value)
+                              : String(value)}
                           </Typography>
                         );
                       })()}
-                      {selectedEvaluation.result.variant.payloadSource && (
+                      {selectedEvaluation.result.variant.valueSource && (
                         <Typography
                           variant="caption"
                           color="text.secondary"
@@ -2363,11 +2363,11 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                           }}
                         >
                           •{' '}
-                          {selectedEvaluation.result.variant.payloadSource === 'environment'
-                            ? t('playground.payloadSourceEnvironmentDesc')
-                            : selectedEvaluation.result.variant.payloadSource === 'flag'
-                              ? t('playground.payloadSourceFlagDesc')
-                              : t('playground.payloadSourceVariantDesc')}
+                          {selectedEvaluation.result.variant.valueSource === 'environment'
+                            ? t('playground.valueSourceEnvironmentDesc')
+                            : selectedEvaluation.result.variant.valueSource === 'flag'
+                              ? t('playground.valueSourceFlagDesc')
+                              : t('playground.valueSourceVariantDesc')}
                         </Typography>
                       )}
                     </Box>
@@ -2440,7 +2440,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                     null,
                     2
                   )}
-                  onChange={() => {}}
+                  onChange={() => { }}
                   readOnly
                   height={200}
                 />

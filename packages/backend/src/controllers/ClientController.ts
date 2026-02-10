@@ -442,20 +442,20 @@ export class ClientController {
           const flagVariants = allVariants
             .filter((v: any) => v.flagId === f.id)
             .map((v: any) => {
-              let payload = v.payload;
-              if (typeof payload === 'string' && payload.trim() !== '') {
+              let value = v.value;
+              if (typeof value === 'string' && value.trim() !== '') {
                 try {
-                  payload = JSON.parse(payload);
+                  value = JSON.parse(value);
                 } catch (e) {
-                  logger.warn(`Failed to parse variant payload for flag ${f.flagName}`, {
-                    payload,
+                  logger.warn(`Failed to parse variant value for flag ${f.flagName}`, {
+                    value,
                   });
                 }
               }
               return {
                 variantName: v.variantName,
                 weight: v.weight,
-                payload,
+                value,
               };
             });
 
@@ -555,16 +555,19 @@ export class ClientController {
         : flags;
 
       for (const dbFlag of evaluableFlags) {
-        // Resolve priority baselinePayload (environment settings > global flag)
+        // Resolve enabled/disabled values (Environment > Global)
         const envSettings = dbFlag.environments?.find((e: any) => e.environment === environment);
-        const resolvedBaseline = envSettings?.baselinePayload ?? dbFlag.baselinePayload;
+
+        const resolvedEnabledValue = envSettings?.enabledValue ?? dbFlag.enabledValue;
+        const resolvedDisabledValue = envSettings?.disabledValue ?? dbFlag.disabledValue;
 
         // Map DB flag to SDK FeatureFlag type
+        // Note: SDK might still expect baselinePayload? We might need to update SDK type or abuse it.
+        // For now, we will manually handle the value resolution AFTER evaluation.
         const sdkFlag: FeatureFlag = {
           name: dbFlag.flagName,
           isEnabled: dbFlag.isEnabled,
           impressionDataEnabled: dbFlag.impressionDataEnabled,
-          baselinePayload: resolvedBaseline,
           strategies:
             dbFlag.strategies?.map((s: any) => ({
               name: s.strategyName,
@@ -577,72 +580,47 @@ export class ClientController {
             dbFlag.variants?.map((v: any) => ({
               name: v.variantName,
               weight: v.weight,
-              payload: v.payload,
-              payloadType: dbFlag.variantType || v.payloadType,
+              value: v.value,
+              valueType: v.valueType,
             })) || [],
         };
 
-        const result = FeatureFlagEvaluator.evaluate(sdkFlag, context, segmentsMap);
+        const result = FeatureFlagEvaluator.evaluate(sdkFlag as any, context, segmentsMap);
 
-        // Build variant object according to Unleash client specification
+        // Build variant object according to Gatrix client specification
+        // Updated to support separate enabled/disabled values
         let variant: {
           name: string;
-          payload?: any; // Can be string, number, or object depending on variantType
+          value?: any;
           enabled: boolean;
         };
 
         if (result.enabled && result.variant) {
-          // Active variant
+          // Active variant from strategy/rollout
           variant = {
             name: result.variant.name,
             enabled: true,
           };
-          if (result.variant.payload) {
-            let payloadValue = result.variant.payload.value ?? result.variant.payload;
-
-            // If variant type is JSON, ensure returning as parsed object
-            if (dbFlag.variantType === 'json') {
-              if (typeof payloadValue === 'string') {
-                try {
-                  payloadValue = JSON.parse(payloadValue);
-                } catch (e) {
-                  // If not valid JSON, keep as is
-                }
-              }
-              // Keep as object for JSON type
-              variant.payload = payloadValue;
-            } else if (dbFlag.variantType === 'number') {
-              // Number type: parse if string
-              if (typeof payloadValue === 'string') {
-                const parsed = Number(payloadValue);
-                variant.payload = isNaN(parsed) ? payloadValue : parsed;
-              } else {
-                variant.payload = payloadValue;
-              }
-            } else {
-              // String type or other: keep as string
-              variant.payload =
-                typeof payloadValue === 'string' ? payloadValue : String(payloadValue);
-            }
-          }
+          // result.variant from sdk already has the value (we mapped it from db)
+          variant.value = (result.variant as any).value;
         } else {
-          // Disabled or no variant - fallback "$none" variant with baselinePayload
+          // No variant match (or disabled)
+          // Determine correct value based on state
+          const valueToReturn = result.enabled ? resolvedEnabledValue : resolvedDisabledValue;
+
           variant = {
-            name: 'disabled',
-            enabled: false,
+            name: result.enabled ? '$default' : '$disabled',
+            enabled: result.enabled,
           };
-          // Add baselinePayload if defined
-          if (resolvedBaseline !== undefined && resolvedBaseline !== null) {
-            let baselineValue = resolvedBaseline;
-            if (typeof baselineValue === 'string') {
-              try {
-                baselineValue = JSON.parse(baselineValue);
-              } catch {
-                // Keep as string if not valid JSON
-              }
+
+          if (valueToReturn !== undefined && valueToReturn !== null) {
+            let parsedValue = valueToReturn;
+            if (dbFlag.valueType === 'json' && typeof parsedValue === 'string') {
+              try { parsedValue = JSON.parse(parsedValue); } catch { }
+            } else if (dbFlag.valueType === 'number') {
+              parsedValue = Number(parsedValue);
             }
-            variant.payload =
-              typeof baselineValue === 'string' ? baselineValue : JSON.stringify(baselineValue);
+            variant.value = parsedValue;
           }
         }
 
@@ -651,7 +629,7 @@ export class ClientController {
           name: dbFlag.flagName,
           enabled: result.enabled,
           variant,
-          variantType: dbFlag.variantType || 'string',
+          valueType: dbFlag.valueType || 'string', // Rename variantType -> valueType
           version: dbFlag.version || 1,
           ...(dbFlag.impressionDataEnabled && { impressionData: true }),
         };

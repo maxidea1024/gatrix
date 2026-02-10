@@ -4,39 +4,61 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GatrixTypes.h"
 #include "GatrixFlagProxy.generated.h"
+#include "GatrixTypes.h"
 
 /**
- * Proxy object wrapping a single evaluated flag.
- * Provides convenient typed access to flag values.
- * Blueprint-accessible via BlueprintCallable functions.
+ * Callback for flag access metrics tracking.
+ * Parameters: FlagName, Flag (nullable), EventType, VariantName
+ */
+DECLARE_DELEGATE_FourParams(FGatrixFlagAccessCallback,
+                            const FString & /*FlagName*/,
+                            const FGatrixEvaluatedFlag * /*Flag*/,
+                            const FString & /*EventType*/,
+                            const FString & /*VariantName*/);
+
+/**
+ * FlagProxy - Single source of truth for flag value extraction.
+ *
+ * Uses null object pattern: bExists tracks whether flag was found.
+ * onAccess callback is injected by FeaturesClient for metrics tracking.
+ * Type safety: ValueType is checked strictly.
+ *
+ * boolVariation returns variant.Value (NOT flag.bEnabled).
  */
 UCLASS(BlueprintType, Transient)
 class GATRIXSDK_API UGatrixFlagProxy : public UObject {
   GENERATED_BODY()
 
 public:
-  /** Initialize with evaluated flag data */
+  /** Initialize with evaluated flag data and metrics callback */
+  void Initialize(const FGatrixEvaluatedFlag &InFlag,
+                  const FGatrixFlagAccessCallback &InOnAccess);
+
+  /** Initialize without callback (for Blueprint/testing) */
   void Initialize(const FGatrixEvaluatedFlag &InFlag);
 
   // ==================== Basic Getters ====================
 
   /** Get the flag name */
   UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|FlagProxy")
-  FString GetName() const { return Flag.Name; }
+  FString GetName() const { return FlagName; }
 
-  /** Check if the flag is enabled */
+  /** Whether the flag exists */
   UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|FlagProxy")
-  bool IsEnabled() const { return Flag.bEnabled; }
+  bool Exists() const { return bExists; }
+
+  /** Check if the flag is enabled. Triggers metrics. */
+  UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|FlagProxy")
+  bool IsEnabled() const;
 
   /** Get the variant */
   UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|FlagProxy")
   FGatrixVariant GetVariant() const { return Flag.Variant; }
 
-  /** Get the variant type */
+  /** Get the value type */
   UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|FlagProxy")
-  EGatrixVariantType GetVariantType() const { return Flag.VariantType; }
+  EGatrixValueType GetValueType() const { return Flag.ValueType; }
 
   /** Get the version number */
   UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|FlagProxy")
@@ -52,43 +74,73 @@ public:
 
   // ==================== Variation Methods ====================
 
-  /** Get boolean variation (flag enabled state) */
+  /** Get boolean variation from variant value */
   UFUNCTION(BlueprintCallable, BlueprintPure,
             Category = "Gatrix|FlagProxy|Variation")
-  bool BoolVariation(bool DefaultValue) const;
+  bool BoolVariation(bool MissingValue) const;
 
-  /** Get string variation from payload */
+  /** Get string variation from value */
   UFUNCTION(BlueprintCallable, BlueprintPure,
             Category = "Gatrix|FlagProxy|Variation")
-  FString StringVariation(const FString &DefaultValue) const;
+  FString StringVariation(const FString &MissingValue) const;
 
-  /** Get number variation from payload */
+  /** Get number variation from value */
   UFUNCTION(BlueprintCallable, BlueprintPure,
             Category = "Gatrix|FlagProxy|Variation")
-  float NumberVariation(float DefaultValue) const;
+  float NumberVariation(float MissingValue) const;
+
+  /** Get integer variation from value */
+  UFUNCTION(BlueprintCallable, BlueprintPure,
+            Category = "Gatrix|FlagProxy|Variation")
+  int32 IntVariation(int32 MissingValue) const;
+
+  /** Get float variation from value */
+  UFUNCTION(BlueprintCallable, BlueprintPure,
+            Category = "Gatrix|FlagProxy|Variation")
+  float FloatVariation(float MissingValue) const;
+
+  /** Get double variation from value */
+  UFUNCTION(BlueprintCallable, BlueprintPure,
+            Category = "Gatrix|FlagProxy|Variation")
+  double DoubleVariation(double MissingValue) const;
 
   /** Get JSON variation as string */
   UFUNCTION(BlueprintCallable, BlueprintPure,
             Category = "Gatrix|FlagProxy|Variation")
-  FString JsonVariation(const FString &DefaultValue) const;
+  FString JsonVariation(const FString &MissingValue) const;
 
   // ==================== Variation Details ====================
 
   /** Get boolean variation with details */
   UFUNCTION(BlueprintCallable, BlueprintPure,
             Category = "Gatrix|FlagProxy|Variation")
-  FGatrixVariationResult BoolVariationDetails(bool DefaultValue) const;
+  FGatrixVariationResult BoolVariationDetails(bool MissingValue) const;
 
   /** Get string variation with details */
   UFUNCTION(BlueprintCallable, BlueprintPure,
             Category = "Gatrix|FlagProxy|Variation")
   FGatrixVariationResult
-  StringVariationDetails(const FString &DefaultValue) const;
+  StringVariationDetails(const FString &MissingValue) const;
 
   /** Get number variation with details */
   UFUNCTION(BlueprintCallable, BlueprintPure,
             Category = "Gatrix|FlagProxy|Variation")
-  FGatrixVariationResult NumberVariationDetails(float DefaultValue) const;
+  FGatrixVariationResult NumberVariationDetails(float MissingValue) const;
+
+  /** Get integer variation with details */
+  UFUNCTION(BlueprintCallable, BlueprintPure,
+            Category = "Gatrix|FlagProxy|Variation")
+  FGatrixVariationResult IntVariationDetails(int32 MissingValue) const;
+
+  /** Get float variation with details */
+  UFUNCTION(BlueprintCallable, BlueprintPure,
+            Category = "Gatrix|FlagProxy|Variation")
+  FGatrixVariationResult FloatVariationDetails(float MissingValue) const;
+
+  /** Get double variation with details */
+  UFUNCTION(BlueprintCallable, BlueprintPure,
+            Category = "Gatrix|FlagProxy|Variation")
+  FGatrixVariationResult DoubleVariationDetails(double MissingValue) const;
 
   /** Get the raw evaluated flag data */
   UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|FlagProxy")
@@ -96,5 +148,10 @@ public:
 
 private:
   FGatrixEvaluatedFlag Flag;
+  FString FlagName;
   bool bExists = false;
+  FGatrixFlagAccessCallback OnAccess;
+
+  /** Fire onAccess callback */
+  void TrackAccess(const FString &EventType) const;
 };

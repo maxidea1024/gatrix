@@ -5,8 +5,8 @@
  * Automatically updates when the flag value changes.
  *
  * @param flagName - The name of the feature flag
- * @param defaultValue - Default value to return if flag not found
- * @returns boolean - The flag's enabled state or default value
+ * @param missingValue - Value to return if flag not found
+ * @returns boolean - The flag's enabled state or missing value
  *
  * @example
  * ```tsx
@@ -19,12 +19,12 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import { useGatrixContext } from './useGatrixContext';
 import { EVENTS } from '@gatrix/js-client-sdk';
 
-export function useBoolVariation(flagName: string, defaultValue: boolean): boolean {
+export function useBoolVariation(flagName: string, missingValue: boolean): boolean {
   const { features, client } = useGatrixContext();
 
   const getValue = useCallback(
-    () => features.boolVariation(flagName, defaultValue),
-    [features, flagName, defaultValue]
+    () => features.boolVariation(flagName, missingValue),
+    [features, flagName, missingValue]
   );
 
   const [value, setValue] = useState<boolean>(() => getValue());

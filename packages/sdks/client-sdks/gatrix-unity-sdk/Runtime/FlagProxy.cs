@@ -1,5 +1,15 @@
-// FlagProxy - Wrapper for EvaluatedFlag with helper methods
-// Provides convenient variation accessors matching JS SDK's FlagProxy
+// FlagProxy - Single source of truth for flag value extraction.
+//
+// ALL variation logic lives here. FeaturesClient delegates to FlagProxy
+// so that value extraction + metrics tracking happen in one place.
+//
+// Uses null object pattern: _flag is never null.
+// MISSING_FLAG sentinel is used for non-existent flags.
+//
+// OnAccess callback is invoked on every variation/Enabled call, enabling
+// consistent metrics tracking regardless of how FlagProxy is obtained.
+//
+// Type safety: ValueType is checked strictly to prevent misuse.
 
 using System;
 using System.Collections.Generic;
@@ -8,327 +18,272 @@ using System.Globalization;
 namespace Gatrix.Unity.SDK
 {
     /// <summary>
+    /// Callback invoked on every variation/Enabled call.
+    /// </summary>
+    /// <param name="flagName">Name of the flag</param>
+    /// <param name="flag">The flag object (null = missing)</param>
+    /// <param name="eventType">'isEnabled' for bool, 'getVariant' for value variations</param>
+    /// <param name="variantName">Variant name (for getVariant events)</param>
+    public delegate void FlagAccessCallback(
+        string flagName, EvaluatedFlag flag, string eventType, string variantName);
+
+    /// <summary>
     /// Convenience wrapper for accessing flag values.
-    /// All variation methods return default values when flag is not found or disabled.
+    /// All variation methods return missing values when flag is not found.
     /// </summary>
     public class FlagProxy
     {
-        private static readonly Variant FallbackDisabledVariant = new Variant
+        private static readonly Variant MissingVariant = new Variant
         {
-            Name = "disabled",
-            Enabled = false
+            Name = "$missing",
+            Enabled = false,
+            Value = null
+        };
+
+        private static readonly EvaluatedFlag MissingFlag = new EvaluatedFlag
+        {
+            Name = "",
+            Enabled = false,
+            Variant = MissingVariant,
+            ValueType = ValueType.None,
+            Version = 0,
+            ImpressionData = false
         };
 
         private readonly EvaluatedFlag _flag;
+        private readonly bool _exists;
+        private readonly FlagAccessCallback _onAccess;
+        private readonly string _flagName;
 
-        public FlagProxy(EvaluatedFlag flag)
+        public FlagProxy(EvaluatedFlag flag, FlagAccessCallback onAccess = null, string flagName = null)
         {
-            _flag = flag;
+            _exists = flag != null;
+            _flag = flag ?? MissingFlag;
+            _onAccess = onAccess;
+            _flagName = flagName ?? _flag.Name;
         }
 
-        /// <summary>Get the flag name</summary>
-        public string Name => _flag?.Name ?? "";
+        #region Props
+        public bool Exists => _exists;
+        public string Name => _flagName;
 
-        /// <summary>Check if the flag exists</summary>
-        public bool Exists => _flag != null;
-
-        /// <summary>Check if the flag is enabled</summary>
-        public bool Enabled => _flag?.Enabled ?? false;
-
-        /// <summary>Get the variant (never null)</summary>
-        public Variant Variant => _flag?.Variant ?? FallbackDisabledVariant;
-
-        /// <summary>Get the variant type</summary>
-        public VariantType VariantType => _flag?.VariantType ?? VariantType.None;
-
-        /// <summary>Get the flag version</summary>
-        public int Version => _flag?.Version ?? 0;
-
-        /// <summary>Check if impression data is enabled</summary>
-        public bool ImpressionData => _flag?.ImpressionData ?? false;
-
-        /// <summary>Get the raw flag object</summary>
-        public EvaluatedFlag Raw => _flag;
-
-        /// <summary>Get evaluation reason</summary>
-        public string Reason => _flag?.Reason;
-
-        // ==================== Variation Methods ====================
-
-        /// <summary>Get boolean variation (flag enabled state)</summary>
-        public bool BoolVariation(bool defaultValue)
+        /// <summary>Check if flag is enabled. Triggers metrics.</summary>
+        public bool IsEnabled()
         {
-            return _flag != null ? _flag.Enabled : defaultValue;
-        }
-
-        /// <summary>Get string variation from variant payload</summary>
-        public string StringVariation(string defaultValue)
-        {
-            if (_flag == null || _flag.Variant?.Payload == null)
-                return defaultValue;
-            return _flag.Variant.Payload.ToString();
-        }
-
-        /// <summary>Get number variation from variant payload</summary>
-        public double NumberVariation(double defaultValue)
-        {
-            if (_flag == null || _flag.Variant?.Payload == null)
-                return defaultValue;
-
-            var payload = _flag.Variant.Payload;
-            if (payload is double d) return d;
-            if (payload is int i) return i;
-            if (payload is long l) return l;
-            if (payload is float f) return f;
-
-            // Fallback: parse string number
-            if (payload is string s &&
-                double.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out var parsed))
-            {
-                return parsed;
-            }
-
-            return defaultValue;
-        }
-
-        /// <summary>Get integer variation from variant payload</summary>
-        public int IntVariation(int defaultValue)
-        {
-            var result = NumberVariation(defaultValue);
-            return (int)result;
-        }
-
-        /// <summary>Get float variation from variant payload</summary>
-        public float FloatVariation(float defaultValue)
-        {
-            var result = NumberVariation(defaultValue);
-            return (float)result;
-        }
-
-        /// <summary>
-        /// Get JSON variation from variant payload as Dictionary.
-        /// For typed deserialization, use the string payload with your preferred JSON library.
-        /// </summary>
-        public Dictionary<string, object> JsonVariation(Dictionary<string, object> defaultValue)
-        {
-            if (_flag == null || _flag.Variant?.Payload == null)
-                return defaultValue;
-
-            if (_flag.Variant.Payload is Dictionary<string, object> dict)
-                return dict;
-
-            return defaultValue;
-        }
-
-        /// <summary>Get the raw payload as string for custom deserialization</summary>
-        public string RawPayload(string defaultValue = null)
-        {
-            if (_flag == null || _flag.Variant?.Payload == null)
-                return defaultValue;
-
-            if (_flag.Variant.Payload is string s)
-                return s;
-
-            return GatrixJson.Serialize(_flag.Variant.Payload);
-        }
-
-        // ==================== Variation Details Methods ====================
-
-        /// <summary>Get boolean variation with details</summary>
-        public VariationResult<bool> BoolVariationDetails(bool defaultValue)
-        {
-            if (_flag == null)
-            {
-                return new VariationResult<bool>
-                {
-                    Value = defaultValue, Reason = "flag_not_found",
-                    FlagExists = false, Enabled = false
-                };
-            }
-            return new VariationResult<bool>
-            {
-                Value = _flag.Enabled,
-                Reason = _flag.Reason ?? "evaluated",
-                FlagExists = true, Enabled = _flag.Enabled
-            };
-        }
-
-        /// <summary>Get string variation with details</summary>
-        public VariationResult<string> StringVariationDetails(string defaultValue)
-        {
-            if (_flag == null)
-            {
-                return new VariationResult<string>
-                {
-                    Value = defaultValue, Reason = "flag_not_found",
-                    FlagExists = false, Enabled = false
-                };
-            }
-            if (!_flag.Enabled)
-            {
-                return new VariationResult<string>
-                {
-                    Value = defaultValue, Reason = _flag.Reason ?? "disabled",
-                    FlagExists = true, Enabled = false
-                };
-            }
-            if (_flag.Variant?.Payload == null)
-            {
-                return new VariationResult<string>
-                {
-                    Value = defaultValue, Reason = "no_payload",
-                    FlagExists = true, Enabled = true
-                };
-            }
-            return new VariationResult<string>
-            {
-                Value = _flag.Variant.Payload.ToString(),
-                Reason = _flag.Reason ?? "evaluated",
-                FlagExists = true, Enabled = true
-            };
-        }
-
-        /// <summary>Get number variation with details</summary>
-        public VariationResult<double> NumberVariationDetails(double defaultValue)
-        {
-            if (_flag == null)
-            {
-                return new VariationResult<double>
-                {
-                    Value = defaultValue, Reason = "flag_not_found",
-                    FlagExists = false, Enabled = false
-                };
-            }
-            if (!_flag.Enabled)
-            {
-                return new VariationResult<double>
-                {
-                    Value = defaultValue, Reason = _flag.Reason ?? "disabled",
-                    FlagExists = true, Enabled = false
-                };
-            }
-            if (_flag.Variant?.Payload == null)
-            {
-                return new VariationResult<double>
-                {
-                    Value = defaultValue, Reason = "no_payload",
-                    FlagExists = true, Enabled = true
-                };
-            }
-
-            var payload = _flag.Variant.Payload;
-            if (payload is double d)
-            {
-                return new VariationResult<double>
-                {
-                    Value = d, Reason = _flag.Reason ?? "evaluated",
-                    FlagExists = true, Enabled = true
-                };
-            }
-            if (payload is int i)
-            {
-                return new VariationResult<double>
-                {
-                    Value = i, Reason = _flag.Reason ?? "evaluated",
-                    FlagExists = true, Enabled = true
-                };
-            }
-
-            return new VariationResult<double>
-            {
-                Value = defaultValue, Reason = "type_mismatch:payload_not_number",
-                FlagExists = true, Enabled = true
-            };
-        }
-
-        /// <summary>Get JSON variation with details</summary>
-        public VariationResult<Dictionary<string, object>> JsonVariationDetails(
-            Dictionary<string, object> defaultValue)
-        {
-            if (_flag == null)
-            {
-                return new VariationResult<Dictionary<string, object>>
-                {
-                    Value = defaultValue, Reason = "flag_not_found",
-                    FlagExists = false, Enabled = false
-                };
-            }
-            if (!_flag.Enabled)
-            {
-                return new VariationResult<Dictionary<string, object>>
-                {
-                    Value = defaultValue, Reason = _flag.Reason ?? "disabled",
-                    FlagExists = true, Enabled = false
-                };
-            }
-            if (_flag.Variant?.Payload == null)
-            {
-                return new VariationResult<Dictionary<string, object>>
-                {
-                    Value = defaultValue, Reason = "no_payload",
-                    FlagExists = true, Enabled = true
-                };
-            }
-
-            if (_flag.Variant.Payload is Dictionary<string, object> dict)
-            {
-                return new VariationResult<Dictionary<string, object>>
-                {
-                    Value = dict, Reason = _flag.Reason ?? "evaluated",
-                    FlagExists = true, Enabled = true
-                };
-            }
-
-            return new VariationResult<Dictionary<string, object>>
-            {
-                Value = defaultValue, Reason = "type_mismatch:payload_not_object",
-                FlagExists = true, Enabled = true
-            };
-        }
-
-        // ==================== Strict Variation Methods (OrThrow) ====================
-
-        /// <summary>Get boolean variation or throw if flag not found</summary>
-        public bool BoolVariationOrThrow()
-        {
-            if (_flag == null) throw GatrixFeatureException.FlagNotFoundError(Name);
+            TrackAccess("isEnabled");
             return _flag.Enabled;
         }
 
-        /// <summary>Get string variation or throw if flag not found or no payload</summary>
-        public string StringVariationOrThrow()
+        public Variant Variant => _flag.Variant;
+        public ValueType ValueType => _flag.ValueType;
+        public int Version => _flag.Version;
+        public string Reason => _flag.Reason;
+        public bool ImpressionData => _flag.ImpressionData;
+        public EvaluatedFlag Raw => _exists ? _flag : null;
+        #endregion
+
+        #region Variations (Single Source of Truth)
+
+        public string Variation(string missingValue)
         {
-            if (_flag == null) throw GatrixFeatureException.FlagNotFoundError(Name);
-            if (_flag.Variant?.Payload == null) throw GatrixFeatureException.NoPayloadError(_flag.Name);
-            return _flag.Variant.Payload.ToString();
+            TrackAccess("getVariant");
+            return _exists ? _flag.Variant.Name : missingValue;
         }
 
-        /// <summary>Get number variation or throw if flag not found or type mismatch</summary>
-        public double NumberVariationOrThrow()
+        public bool BoolVariation(bool missingValue)
         {
-            if (_flag == null) throw GatrixFeatureException.FlagNotFoundError(Name);
-            if (_flag.Variant?.Payload == null) throw GatrixFeatureException.NoPayloadError(_flag.Name);
+            TrackAccess("getVariant");
+            if (!_exists) return missingValue;
 
-            var payload = _flag.Variant.Payload;
-            if (payload is double d) return d;
-            if (payload is int i) return i;
-            if (payload is long l) return l;
-            if (payload is float f) return f;
+            // Strict: ValueType must be Boolean
+            if (_flag.ValueType != ValueType.None && _flag.ValueType != ValueType.Boolean)
+                return missingValue;
 
-            throw GatrixFeatureException.TypeMismatchError(_flag.Name, "number", payload.GetType().Name);
+            object value = _flag.Variant.Value;
+            if (value == null) return missingValue;
+
+            if (value is bool b) return b;
+            if (value is string s) return s.ToLowerInvariant() == "true";
+            
+            try {
+                return Convert.ToBoolean(value, CultureInfo.InvariantCulture);
+            } catch {
+                return missingValue;
+            }
         }
 
-        /// <summary>Get JSON variation or throw if flag not found or type mismatch</summary>
-        public Dictionary<string, object> JsonVariationOrThrow()
+        public int IntVariation(int missingValue)
         {
-            if (_flag == null) throw GatrixFeatureException.FlagNotFoundError(Name);
-            if (_flag.Variant?.Payload == null) throw GatrixFeatureException.NoPayloadError(_flag.Name);
+            TrackAccess("getVariant");
+            if (!_exists) return missingValue;
 
-            if (_flag.Variant.Payload is Dictionary<string, object> dict)
-                return dict;
+            // Strict: ValueType must be Number
+            if (_flag.ValueType != ValueType.None && _flag.ValueType != ValueType.Number)
+                return missingValue;
 
-            throw GatrixFeatureException.TypeMismatchError(
-                _flag.Name, "object", _flag.Variant.Payload.GetType().Name);
+            object value = _flag.Variant.Value;
+            if (value == null) return missingValue;
+
+            try {
+                return Convert.ToInt32(value, CultureInfo.InvariantCulture);
+            } catch {
+                return missingValue;
+            }
         }
+
+        public float FloatVariation(float missingValue)
+        {
+            TrackAccess("getVariant");
+            if (!_exists) return missingValue;
+
+            // Strict: ValueType must be Number
+            if (_flag.ValueType != ValueType.None && _flag.ValueType != ValueType.Number)
+                return missingValue;
+
+            object value = _flag.Variant.Value;
+            if (value == null) return missingValue;
+
+            try {
+                return Convert.ToSingle(value, CultureInfo.InvariantCulture);
+            } catch {
+                return missingValue;
+            }
+        }
+
+        public double DoubleVariation(double missingValue)
+        {
+            TrackAccess("getVariant");
+            if (!_exists) return missingValue;
+
+            // Strict: ValueType must be Number
+            if (_flag.ValueType != ValueType.None && _flag.ValueType != ValueType.Number)
+                return missingValue;
+
+            object value = _flag.Variant.Value;
+            if (value == null) return missingValue;
+
+            try {
+                return Convert.ToDouble(value, CultureInfo.InvariantCulture);
+            } catch {
+                return missingValue;
+            }
+        }
+
+        public string StringVariation(string missingValue)
+        {
+            TrackAccess("getVariant");
+            if (!_exists) return missingValue;
+
+            // Strict: ValueType must be String
+            if (_flag.ValueType != ValueType.None && _flag.ValueType != ValueType.String)
+                return missingValue;
+
+            object value = _flag.Variant.Value;
+            return value != null ? value.ToString() : missingValue;
+        }
+
+        public float NumberVariation(float missingValue)
+        {
+            return FloatVariation(missingValue);
+        }
+
+        public string JsonVariation(string missingValue)
+        {
+            TrackAccess("getVariant");
+            if (!_exists) return missingValue;
+
+            // Strict: ValueType must be Json
+            if (_flag.ValueType != ValueType.None && _flag.ValueType != ValueType.Json)
+                return missingValue;
+
+            object value = _flag.Variant.Value;
+            return value != null ? value.ToString() : missingValue;
+        }
+
+        #endregion
+
+        #region Variation Details
+
+        public VariationResult<bool> BoolVariationDetails(bool missingValue)
+        {
+            bool val = BoolVariation(missingValue);
+            return new VariationResult<bool>
+            {
+                Value = val,
+                Reason = GetResultReason(ValueType.Boolean),
+                FlagExists = _exists,
+                Enabled = _flag.Enabled
+            };
+        }
+
+        public VariationResult<string> StringVariationDetails(string missingValue)
+        {
+            string val = StringVariation(missingValue);
+            return new VariationResult<string>
+            {
+                Value = val,
+                Reason = GetResultReason(ValueType.String),
+                FlagExists = _exists,
+                Enabled = _flag.Enabled
+            };
+        }
+
+        public VariationResult<float> NumberVariationDetails(float missingValue)
+        {
+            float val = NumberVariation(missingValue);
+            return new VariationResult<float>
+            {
+                Value = val,
+                Reason = GetResultReason(ValueType.Number),
+                FlagExists = _exists,
+                Enabled = _flag.Enabled
+            };
+        }
+
+        public VariationResult<string> JsonVariationDetails(string missingValue)
+        {
+            string val = JsonVariation(missingValue);
+            return new VariationResult<string>
+            {
+                Value = val,
+                Reason = GetResultReason(ValueType.Json),
+                FlagExists = _exists,
+                Enabled = _flag.Enabled
+            };
+        }
+
+        #endregion
+
+        #region Helpers
+
+        private void TrackAccess(string eventType)
+        {
+            if (_onAccess != null)
+            {
+                _onAccess(_flagName, _exists ? _flag : null, eventType, _flag.Variant.Name);
+            }
+        }
+
+        private string GetResultReason(ValueType expectedType)
+        {
+            if (!_exists) return "flag_not_found";
+            if (_flag.ValueType != ValueType.None && _flag.ValueType != expectedType)
+                return "type_mismatch:expected_" + expectedType.ToString().ToLowerInvariant();
+            
+            return string.IsNullOrEmpty(_flag.Reason) ? "evaluated" : _flag.Reason;
+        }
+
+        #endregion
+    }
+
+    /// <summary>
+    /// Generic variation result
+    /// </summary>
+    public class VariationResult<T>
+    {
+        public T Value { get; set; }
+        public string Reason { get; set; }
+        public bool FlagExists { get; set; }
+        public bool Enabled { get; set; }
     }
 }

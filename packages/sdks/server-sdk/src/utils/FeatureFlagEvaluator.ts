@@ -9,7 +9,6 @@ import {
   FeatureSegment,
   Constraint,
   ConstraintOperator,
-  PayloadType,
 } from '../types/featureFlags';
 
 export class FeatureFlagEvaluator {
@@ -34,12 +33,12 @@ export class FeatureFlagEvaluator {
             const variant: Variant = variantData
               ? { ...variantData, enabled: true }
               : {
-                  name: 'default',
-                  weight: 100,
-                  payload: flag.baselinePayload ?? null,
-                  payloadType: flag.variantType || 'string',
-                  enabled: true,
-                };
+                name: '$default',
+                weight: 100,
+                value: flag.enabledValue ?? null,
+                valueType: flag.valueType || 'string',
+                enabled: true,
+              };
 
             return {
               id: flag.id || '',
@@ -58,12 +57,12 @@ export class FeatureFlagEvaluator {
         const variant: Variant = variantData
           ? { ...variantData, enabled: true }
           : {
-              name: 'default',
-              weight: 100,
-              payload: flag.baselinePayload ?? null,
-              payloadType: flag.variantType || 'string',
-              enabled: true,
-            };
+            name: '$default',
+            weight: 100,
+            value: flag.enabledValue ?? null,
+            valueType: flag.valueType || 'string',
+            enabled: true,
+          };
 
         return {
           id: flag.id || '',
@@ -84,10 +83,10 @@ export class FeatureFlagEvaluator {
       enabled: false,
       reason,
       variant: {
-        name: 'disabled',
+        name: '$disabled',
         weight: 100,
-        payload: flag.baselinePayload ?? null,
-        payloadType: flag.variantType || 'string',
+        value: flag.disabledValue ?? null,
+        valueType: flag.valueType || 'string',
         enabled: false,
       },
     };

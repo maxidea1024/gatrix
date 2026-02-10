@@ -12,6 +12,7 @@ import {
   FeatureContextFieldModel,
   FeatureMetricsModel,
   FeatureFlagAttributes,
+  FeatureFlagEnvironmentAttributes,
   FeatureStrategyAttributes,
   FeatureVariantAttributes,
   FeatureSegmentAttributes,
@@ -19,6 +20,9 @@ import {
   FeatureMetricsAttributes,
   Constraint,
   StrategyParameters,
+  ValueType,
+  FlagType,
+  FlagUsage,
 } from '../models/FeatureFlag';
 import { GatrixError } from '../middleware/errorHandler';
 import { ErrorCodes } from '../utils/apiResponse';
@@ -32,36 +36,40 @@ import { INTEGRATION_EVENTS, IntegrationEventType } from '../types/integrationEv
 
 // Types for service methods
 export interface CreateFlagInput {
-  environment: string;
-  flagName: string;
+  name?: string;
+  flagName?: string; // Alias for name (used in import)
   displayName?: string;
   description?: string;
-  flagType?: 'release' | 'experiment' | 'operational' | 'permission' | 'killSwitch';
-  flagUsage?: 'flag' | 'remoteConfig';
-  isEnabled?: boolean;
+  flagType?: FlagType;
+  valueType: ValueType;
+  enabledValue: any;
+  disabledValue: any;
+  flagUsage?: FlagUsage;
   impressionDataEnabled?: boolean;
   staleAfterDays?: number;
   tags?: string[];
-  variantType?: 'none' | 'string' | 'number' | 'json';
-  baselinePayload?: any;
-  // Optional: create strategies and variants along with the flag
-  strategies?: CreateStrategyInput[];
-  variants?: CreateVariantInput[];
+  links?: { url: string; title?: string }[];
+  environment?: string; // Optional: initialize for specific environment
+  isEnabled?: boolean; // Optional: combined with environment
+  strategies?: any[]; // Optional: strategies to create (used in import)
+  variants?: any[]; // Optional: variants to create (used in import)
 }
 
 export interface UpdateFlagInput {
   displayName?: string;
   description?: string;
-  flagType?: 'release' | 'experiment' | 'operational' | 'permission' | 'killSwitch';
+  flagType?: FlagType;
+  valueType?: ValueType;
+  enabledValue?: any;
+  disabledValue?: any;
+  flagUsage?: FlagUsage;
   isEnabled?: boolean;
+  isArchived?: boolean;
   impressionDataEnabled?: boolean;
   staleAfterDays?: number;
   stale?: boolean;
   tags?: string[];
   links?: { url: string; title?: string }[];
-  variantType?: 'none' | 'string' | 'number' | 'json';
-  baselinePayload?: any;
-  environmentBaselinePayload?: any; // Environment-specific baseline payload
 }
 
 export interface CreateStrategyInput {
@@ -84,8 +92,8 @@ export interface UpdateStrategyInput {
 export interface CreateVariantInput {
   variantName: string;
   weight: number;
-  payload?: any;
-  payloadType?: 'string' | 'number' | 'json';
+  value?: any;
+  valueType?: ValueType;
   weightLock?: boolean;
 }
 
@@ -193,11 +201,12 @@ class FeatureFlagService {
    * Create a new feature flag
    */
   async createFlag(input: CreateFlagInput, userId: number): Promise<FeatureFlagAttributes> {
+    const flagName = input.flagName || input.name;
     // Check for duplicate
-    const existing = await FeatureFlagModel.findByName(input.environment, input.flagName);
+    const existing = await FeatureFlagModel.findByName(input.environment!, flagName!);
     if (existing) {
       throw new GatrixError(
-        `Flag '${input.flagName}' already exists`,
+        `Flag '${flagName}' already exists`,
         409,
         true,
         ErrorCodes.DUPLICATE_ENTRY
@@ -207,10 +216,10 @@ class FeatureFlagService {
     // Remote Config validation
     const isRemoteConfig = input.flagUsage === 'remoteConfig';
     if (isRemoteConfig) {
-      // Remote Config must have variantType other than 'none'
-      if (!input.variantType || input.variantType === 'none') {
+      // Remote Config must have valueType
+      if (!input.valueType) {
         throw new GatrixError(
-          'Remote Config requires a variant type (string, number, or json)',
+          'Remote Config requires a value type (string, number, boolean, or json)',
           400,
           true,
           ErrorCodes.BAD_REQUEST
@@ -218,42 +227,46 @@ class FeatureFlagService {
       }
     }
 
-    // Determine variantType: for feature flags, default to 'none', for remote configs, it's required
-    const variantType = isRemoteConfig ? input.variantType : input.variantType || 'none';
+    // Determine valueType: for feature flags, default to 'boolean' (was none), for remote configs, it's required
+    const valueType = isRemoteConfig ? input.valueType : input.valueType || 'boolean';
 
     const flag = await FeatureFlagModel.create({
-      environment: input.environment,
-      flagName: input.flagName,
+      flagName: flagName!,
       displayName: input.displayName,
       description: input.description,
       flagType: input.flagType || 'release',
       flagUsage: input.flagUsage || 'flag',
-      isEnabled: input.isEnabled ?? false,
-      isArchived: false,
+      valueType: input.valueType,
+      enabledValue: input.enabledValue,
+      disabledValue: input.disabledValue,
       impressionDataEnabled: input.impressionDataEnabled ?? false,
       staleAfterDays: input.staleAfterDays ?? 30,
       tags: input.tags,
-      variantType,
-      baselinePayload: input.baselinePayload,
+      links: input.links,
       createdBy: userId,
+      environment: input.environment,
+      isEnabled: input.isEnabled ?? false,
+      isArchived: false,
     });
 
     // For Remote Config, auto-create a default variant with 100% weight
     if (isRemoteConfig && (!input.variants || input.variants.length === 0)) {
-      const defaultPayload =
-        input.variantType === 'number'
+      const defaultValue =
+        input.valueType === 'number'
           ? { type: 'number', value: '0' }
-          : input.variantType === 'json'
+          : input.valueType === 'json'
             ? { type: 'json', value: '{}' }
-            : { type: 'string', value: '' };
+            : input.valueType === 'boolean'
+              ? { type: 'boolean', value: 'false' }
+              : { type: 'string', value: '' };
 
       await FeatureVariantModel.create({
         flagId: flag.id,
-        environment: input.environment,
+        environment: input.environment!,
         variantName: 'config', // 'config' is default variant name for remote config
         weight: 100,
-        payload: defaultPayload,
-        payloadType: 'json',
+        value: defaultValue,
+        valueType: input.valueType || 'json',
         createdBy: userId,
       });
     }
@@ -264,7 +277,7 @@ class FeatureFlagService {
         const strategyInput = input.strategies[i];
         await FeatureStrategyModel.create({
           flagId: flag.id,
-          environment: input.environment,
+          environment: input.environment!,
           strategyName: strategyInput.strategyName,
           parameters: strategyInput.parameters,
           constraints: strategyInput.constraints,
@@ -280,11 +293,11 @@ class FeatureFlagService {
       for (const variantInput of input.variants) {
         await FeatureVariantModel.create({
           flagId: flag.id,
-          environment: input.environment,
+          environment: input.environment!,
           variantName: variantInput.variantName,
           weight: variantInput.weight,
-          payload: variantInput.payload,
-          payloadType: variantInput.payloadType || 'json',
+          value: variantInput.value,
+          valueType: variantInput.valueType || 'json',
           createdBy: userId,
         });
       }
@@ -304,12 +317,12 @@ class FeatureFlagService {
     });
 
     // Invalidate cache
-    await this.invalidateCache(input.environment);
+    await this.invalidateCache(input.environment!);
 
     // Trigger integration event
     await IntegrationService.handleEvent({
       type: INTEGRATION_EVENTS.FEATURE_FLAG_CREATED,
-      environment: input.environment,
+      environment: input.environment!,
       createdByUserId: userId,
       createdAt: new Date(),
       data: flag as any,
@@ -334,7 +347,7 @@ class FeatureFlagService {
     }
 
     // Separate environment-specific from global properties
-    const { isEnabled, environmentBaselinePayload, ...globalUpdates } = input;
+    const { isEnabled, ...globalUpdates } = input;
 
     // Update global flag properties if any
     if (Object.keys(globalUpdates).length > 0) {
@@ -344,11 +357,13 @@ class FeatureFlagService {
       });
     }
 
-    // Update environment-specific settings (isEnabled, baselinePayload)
-    if (isEnabled !== undefined || environmentBaselinePayload !== undefined) {
+    // Update environment-specific settings (isEnabled, enabledValue, disabledValue)
+    const { enabledValue, disabledValue } = input;
+    if (isEnabled !== undefined || enabledValue !== undefined || disabledValue !== undefined) {
       await FeatureFlagEnvironmentModel.update(flag.id, environment, {
         isEnabled,
-        baselinePayload: environmentBaselinePayload,
+        enabledValue,
+        disabledValue,
       });
     }
 
@@ -399,6 +414,18 @@ class FeatureFlagService {
     userId: number
   ): Promise<FeatureFlagAttributes> {
     return this.updateFlag(environment, flagName, { isEnabled }, userId);
+  }
+
+  async updateEnvironment(
+    flagId: string,
+    environment: string,
+    data: {
+      isEnabled?: boolean;
+      enabledValue?: any;
+      disabledValue?: any;
+    }
+  ): Promise<FeatureFlagEnvironmentAttributes> {
+    return FeatureFlagEnvironmentModel.update(flagId, environment, data);
   }
 
   /**
@@ -845,9 +872,10 @@ class FeatureFlagService {
     flagName: string,
     variants: CreateVariantInput[],
     userId: number,
-    variantType?: 'none' | 'string' | 'number' | 'json',
-    baselinePayload?: any,
-    clearVariantPayloads?: boolean
+    valueType?: ValueType,
+    enabledValue?: any,
+    disabledValue?: any,
+    clearVariantValues?: boolean
   ): Promise<FeatureVariantAttributes[]> {
     const flag = await this.getFlag(environment, flagName);
     if (!flag) {
@@ -886,15 +914,19 @@ class FeatureFlagService {
     const isRemoteConfigMetadataUpdate = isRemoteConfig && variants.length === 0;
 
     if (isRemoteConfig && !isRemoteConfigMetadataUpdate) {
-      // Cannot set variantType to 'none' for Remote Config
-      if (variantType === 'none') {
-        throw new GatrixError(
-          'Remote Config cannot have variant type set to none',
-          400,
-          true,
-          ErrorCodes.BAD_REQUEST
-        );
-      }
+      // Cannot set valueType to undefined/null check might be tricky if not passed.
+      // logic: if valueType passed, check it.
+      // But for remote config it must have a type.
+      // Let's assume input validation upstream handles required fields if they are missing?
+      // No, here we check constraints.
+
+      // If valueType is passed and it is invalid... wait, type signature says 'string'|... 
+      // check if it is explicitly missing when required?
+
+      // Original code checked: if (variantType === 'none')
+      // Now valueType includes 'boolean', so 'none' is not possible in type system (or passed as string).
+      // If user passes nothing, we might default or keep existing.
+
       // Remote Config must have exactly 1 variant
       if (variants.length !== 1) {
         throw new GatrixError(
@@ -906,32 +938,35 @@ class FeatureFlagService {
       }
     }
 
-    // Update variantType and baselinePayload on the flag if provided
-    if (variantType || baselinePayload !== undefined) {
-      const updateData: any = { updatedBy: userId };
-      if (variantType) updateData.variantType = variantType;
-      if (baselinePayload !== undefined) updateData.baselinePayload = baselinePayload;
-      await FeatureFlagModel.update(flag.id, updateData);
+    // Update valueType and values on the flag if provided
+    if (valueType || enabledValue !== undefined || disabledValue !== undefined) {
+      const updateData: any = {};
+      if (valueType) updateData.valueType = valueType;
+      if (enabledValue !== undefined) updateData.enabledValue = enabledValue;
+      if (disabledValue !== undefined) updateData.disabledValue = disabledValue;
+      await FeatureFlagModel.update(flag.id, { ...updateData, updatedBy: userId });
     }
 
-    // If clearVariantPayloads is true, reset payload for all existing variants across all environments
-    if (clearVariantPayloads) {
+    // If clearVariantValues is true, reset value for all existing variants across all environments
+    if (clearVariantValues) {
       // Get all variants for this flag (all environments)
       const allVariants = await db('g_feature_variants').where('flagId', flag.id).select('*');
 
-      // Reset payloads based on new variant type
-      const defaultPayload =
-        variantType === 'number'
-          ? { type: 'number', value: '' }
-          : variantType === 'json'
+      // Reset values based on new value type
+      const defaultValue =
+        valueType === 'number'
+          ? { type: 'number', value: '0' }
+          : valueType === 'json'
             ? { type: 'json', value: '{}' }
-            : { type: 'string', value: '' };
+            : valueType === 'boolean'
+              ? { type: 'boolean', value: 'false' }
+              : { type: 'string', value: '' };
 
       for (const variant of allVariants) {
         await db('g_feature_variants')
           .where('id', variant.id)
           .update({
-            payload: JSON.stringify(defaultPayload),
+            value: JSON.stringify(defaultValue),
             updatedBy: userId,
             updatedAt: new Date(),
           });
@@ -952,8 +987,8 @@ class FeatureFlagService {
           environment,
           variantName: variant.variantName,
           weight: variant.weight,
-          payload: variant.payload,
-          payloadType: variant.payloadType || 'json',
+          value: variant.value,
+          valueType: variant.valueType || 'json',
           weightLock: variant.weightLock || false,
           createdBy: userId,
         });

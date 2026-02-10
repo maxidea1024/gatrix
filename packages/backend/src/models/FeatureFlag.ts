@@ -6,7 +6,7 @@ import { ulid } from 'ulid';
 
 export type FlagType = 'release' | 'experiment' | 'operational' | 'killSwitch' | 'permission'; // Purpose
 export type FlagUsage = 'flag' | 'remoteConfig'; // Classification: Feature Flag vs Remote Config
-export type PayloadType = 'string' | 'number' | 'json';
+export type ValueType = 'string' | 'number' | 'boolean' | 'json';
 export type FieldType = 'string' | 'number' | 'boolean' | 'date' | 'semver';
 
 export type ConstraintOperator =
@@ -76,8 +76,9 @@ export interface FeatureFlagAttributes {
   stale?: boolean;
   tags?: string[];
   links?: { url: string; title?: string }[];
-  variantType?: 'none' | 'string' | 'number' | 'json';
-  baselinePayload?: any; // Payload value when flag evaluates to false
+  valueType: ValueType;
+  enabledValue: any; // Value when flag evaluates to true
+  disabledValue: any; // Value when flag evaluates to false
   createdBy: number;
   createdByName?: string; // Joined from g_users
   updatedBy?: number;
@@ -98,7 +99,8 @@ export interface FeatureFlagEnvironmentAttributes {
   flagId: string;
   environment: string;
   isEnabled: boolean;
-  baselinePayload?: any; // Environment-specific baseline payload
+  enabledValue?: any; // Environment-specific enabled value override
+  disabledValue?: any; // Environment-specific disabled value override
   lastSeenAt?: Date;
   createdAt?: Date;
   updatedAt?: Date;
@@ -130,8 +132,8 @@ export interface FeatureVariantAttributes {
   environment: string;
   variantName: string;
   weight: number;
-  payload?: any;
-  payloadType: PayloadType;
+  value?: any;
+  valueType: ValueType;
   weightLock?: boolean;
   createdBy: number;
   updatedBy?: number;
@@ -307,7 +309,8 @@ export class FeatureFlagModel {
             flagId: e.flagId,
             environment: e.environment,
             isEnabled: Boolean(e.isEnabled),
-            baselinePayload: parseJsonField(e.baselinePayload),
+            enabledValue: parseJsonField(e.enabledValue),
+            disabledValue: parseJsonField(e.disabledValue),
             lastSeenAt: e.lastSeenAt,
           })),
         };
@@ -367,7 +370,8 @@ export class FeatureFlagModel {
           flagId: e.flagId,
           environment: e.environment,
           isEnabled: Boolean(e.isEnabled),
-          baselinePayload: parseJsonField(e.baselinePayload),
+          enabledValue: parseJsonField(e.enabledValue),
+          disabledValue: parseJsonField(e.disabledValue),
           lastSeenAt: e.lastSeenAt,
         })),
       };
@@ -415,7 +419,8 @@ export class FeatureFlagModel {
               flagId: id,
               environment,
               isEnabled: Boolean(envSettings.isEnabled),
-              baselinePayload: parseJsonField(envSettings.baselinePayload),
+              enabledValue: parseJsonField(envSettings.enabledValue),
+              disabledValue: parseJsonField(envSettings.disabledValue),
               lastSeenAt: envSettings.lastSeenAt,
             },
           ]
@@ -431,7 +436,7 @@ export class FeatureFlagModel {
    * Create a new global flag and optionally initialize environment settings
    */
   static async create(
-    data: Omit<FeatureFlagAttributes, 'id' | 'createdAt' | 'updatedAt'> & {
+    data: Omit<FeatureFlagAttributes, 'id' | 'createdAt' | 'updatedAt' | 'variants' | 'strategies' | 'environments' | 'lastSeenAt' | 'createdByName'> & {
       environment?: string;
       isEnabled?: boolean;
     }
@@ -449,9 +454,9 @@ export class FeatureFlagModel {
         impressionDataEnabled: data.impressionDataEnabled ?? false,
         staleAfterDays: data.staleAfterDays ?? 30,
         tags: data.tags ? JSON.stringify(data.tags) : null,
-        variantType: data.variantType || 'none',
-        baselinePayload:
-          data.baselinePayload !== undefined ? JSON.stringify(data.baselinePayload) : null,
+        valueType: data.valueType,
+        enabledValue: JSON.stringify(data.enabledValue),
+        disabledValue: JSON.stringify(data.disabledValue),
         createdBy: data.createdBy,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -495,9 +500,11 @@ export class FeatureFlagModel {
       if (data.stale !== undefined) updateData.stale = data.stale;
       if (data.tags !== undefined) updateData.tags = JSON.stringify(data.tags);
       if (data.links !== undefined) updateData.links = JSON.stringify(data.links);
-      if (data.variantType !== undefined) updateData.variantType = data.variantType;
-      if (data.baselinePayload !== undefined)
-        updateData.baselinePayload = JSON.stringify(data.baselinePayload);
+      if (data.valueType !== undefined) updateData.valueType = data.valueType;
+      if (data.enabledValue !== undefined)
+        updateData.enabledValue = JSON.stringify(data.enabledValue);
+      if (data.disabledValue !== undefined)
+        updateData.disabledValue = JSON.stringify(data.disabledValue);
       if (data.updatedBy !== undefined) updateData.updatedBy = data.updatedBy;
 
       await db('g_feature_flags').where('id', id).update(updateData);
@@ -539,7 +546,8 @@ export class FeatureFlagEnvironmentModel {
       return envs.map((e: any) => ({
         ...e,
         isEnabled: Boolean(e.isEnabled),
-        baselinePayload: parseJsonField(e.baselinePayload),
+        enabledValue: parseJsonField(e.enabledValue),
+        disabledValue: parseJsonField(e.disabledValue),
       }));
     } catch (error) {
       logger.error('Error finding flag environments:', error);
@@ -560,7 +568,8 @@ export class FeatureFlagEnvironmentModel {
       return {
         ...env,
         isEnabled: Boolean(env.isEnabled),
-        baselinePayload: parseJsonField(env.baselinePayload),
+        enabledValue: parseJsonField(env.enabledValue),
+        disabledValue: parseJsonField(env.disabledValue),
       };
     } catch (error) {
       logger.error('Error finding flag environment:', error);
@@ -578,8 +587,8 @@ export class FeatureFlagEnvironmentModel {
         flagId: data.flagId,
         environment: data.environment,
         isEnabled: data.isEnabled ?? false,
-        baselinePayload:
-          data.baselinePayload !== undefined ? JSON.stringify(data.baselinePayload) : null,
+        enabledValue: data.enabledValue !== undefined ? JSON.stringify(data.enabledValue) : null,
+        disabledValue: data.disabledValue !== undefined ? JSON.stringify(data.disabledValue) : null,
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -633,14 +642,17 @@ export class FeatureFlagEnvironmentModel {
           flagId,
           environment,
           isEnabled: data.isEnabled ?? false,
-          baselinePayload: data.baselinePayload,
+          enabledValue: data.enabledValue,
+          disabledValue: data.disabledValue,
         });
       }
 
       const updateData: any = { updatedAt: new Date() };
       if (data.isEnabled !== undefined) updateData.isEnabled = data.isEnabled;
-      if (data.baselinePayload !== undefined)
-        updateData.baselinePayload = JSON.stringify(data.baselinePayload);
+      if (data.enabledValue !== undefined)
+        updateData.enabledValue = JSON.stringify(data.enabledValue);
+      if (data.disabledValue !== undefined)
+        updateData.disabledValue = JSON.stringify(data.disabledValue);
 
       await db('g_feature_flag_environments')
         .where('flagId', flagId)
@@ -822,7 +834,7 @@ export class FeatureVariantModel {
 
       return variants.map((v: any) => ({
         ...v,
-        payload: parseJsonField(v.payload),
+        value: parseJsonField(v.value),
       }));
     } catch (error) {
       logger.error('Error finding variants by flag ID:', error);
@@ -841,7 +853,7 @@ export class FeatureVariantModel {
 
       return variants.map((v: any) => ({
         ...v,
-        payload: parseJsonField(v.payload),
+        value: parseJsonField(v.value),
       }));
     } catch (error) {
       logger.error('Error finding variants by flag ID and environment:', error);
@@ -860,8 +872,8 @@ export class FeatureVariantModel {
         environment: data.environment,
         variantName: data.variantName,
         weight: data.weight,
-        payload: data.payload ? JSON.stringify(data.payload) : null,
-        payloadType: data.payloadType || 'json',
+        value: data.value ? JSON.stringify(data.value) : null,
+        valueType: data.valueType || 'json',
         weightLock: data.weightLock || false,
         createdBy: data.createdBy,
         createdAt: new Date(),
@@ -871,7 +883,7 @@ export class FeatureVariantModel {
       const variant = await db('g_feature_variants').where('id', id).first();
       return {
         ...variant,
-        payload: parseJsonField(variant.payload),
+        value: parseJsonField(variant.value),
       };
     } catch (error) {
       logger.error('Error creating variant:', error);

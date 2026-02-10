@@ -10,7 +10,7 @@ export interface FlagState {
     enabled: boolean;
     variantName: string;
     variantEnabled: boolean;
-    variantPayload: string;
+    variantValue: string;
 }
 
 function getFlagState(flagName: string, client: ReturnType<typeof getGatrixClient>): FlagState {
@@ -19,7 +19,7 @@ function getFlagState(flagName: string, client: ReturnType<typeof getGatrixClien
         enabled: client.features.isEnabled(flagName),
         variantName: variant.name,
         variantEnabled: variant.enabled,
-        variantPayload: (variant as unknown as { payload?: string }).payload ?? '',
+        variantValue: variant.value != null ? String(variant.value) : '',
     };
 }
 

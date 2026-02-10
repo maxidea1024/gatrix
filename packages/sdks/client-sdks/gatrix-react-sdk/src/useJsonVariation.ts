@@ -1,12 +1,12 @@
 /**
  * useJsonVariation - Get a JSON flag variation
  *
- * Returns the JSON payload value for a feature flag.
+ * Returns the JSON value for a feature flag.
  * Automatically updates when the flag value changes.
  *
  * @param flagName - The name of the feature flag
- * @param defaultValue - Default value to return if flag not found or has no payload
- * @returns T - The variant payload as JSON object or default value
+ * @param missingValue - Value to return if flag not found
+ * @returns T - The variant value as JSON object or missing value
  *
  * @example
  * ```tsx
@@ -31,12 +31,12 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import { useGatrixContext } from './useGatrixContext';
 import { EVENTS } from '@gatrix/js-client-sdk';
 
-export function useJsonVariation<T>(flagName: string, defaultValue: T): T {
+export function useJsonVariation<T>(flagName: string, missingValue: T): T {
   const { features, client } = useGatrixContext();
 
   const getValue = useCallback(
-    () => features.jsonVariation<T>(flagName, defaultValue),
-    [features, flagName, defaultValue]
+    () => features.jsonVariation<T>(flagName, missingValue),
+    [features, flagName, missingValue]
   );
 
   const [value, setValue] = useState<T>(() => getValue());

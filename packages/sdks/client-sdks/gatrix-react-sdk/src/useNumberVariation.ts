@@ -1,12 +1,12 @@
 /**
  * useNumberVariation - Get a number flag variation
  *
- * Returns the number payload value for a feature flag.
+ * Returns the number value for a feature flag.
  * Automatically updates when the flag value changes.
  *
  * @param flagName - The name of the feature flag
- * @param defaultValue - Default value to return if flag not found or has no payload
- * @returns number - The variant payload as number or default value
+ * @param missingValue - Value to return if flag not found
+ * @returns number - The variant value as number or missing value
  *
  * @example
  * ```tsx
@@ -19,12 +19,12 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import { useGatrixContext } from './useGatrixContext';
 import { EVENTS } from '@gatrix/js-client-sdk';
 
-export function useNumberVariation(flagName: string, defaultValue: number): number {
+export function useNumberVariation(flagName: string, missingValue: number): number {
   const { features, client } = useGatrixContext();
 
   const getValue = useCallback(
-    () => features.numberVariation(flagName, defaultValue),
-    [features, flagName, defaultValue]
+    () => features.numberVariation(flagName, missingValue),
+    [features, flagName, missingValue]
   );
 
   const [value, setValue] = useState<number>(() => getValue());

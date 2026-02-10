@@ -20,7 +20,7 @@ export type {
   FeaturesConfig,
   EvaluatedFlag,
   Variant,
-  VariantType,
+  ValueType,
   VariationResult,
   ImpressionEvent,
   ErrorEvent,

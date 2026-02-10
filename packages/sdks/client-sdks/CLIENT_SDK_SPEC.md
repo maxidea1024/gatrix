@@ -129,8 +129,8 @@ The Edge API returns evaluated flags in this format:
 | `variant` | object | Selected variant details |
 | `variant.name` | string | Variant name |
 | `variant.enabled` | boolean | Whether variant is enabled |
-| `variant.payload` | string \| number \| object | Variant payload (flexible type) |
-| `variantType` | "none" \| "string" \| "number" \| "json" | Payload type hint |
+| `variant.payload` | string \| number \| boolean \| object | Variant payload (flexible type) |
+| `variantType` | "none" \| "string" \| "number" \| "boolean" \| "json" | Payload type hint |
 | `version` | number | Flag version for change detection |
 | `impressionData` | boolean? | Whether to track impressions |
 | `reason` | string? | Evaluation reason (e.g., "targeting_match", "disabled", "not_found") |
@@ -422,18 +422,18 @@ class FeaturesClient {
   getVariant(flagName: string): Variant; // Never returns null/undefined
   getAllFlags(): EvaluatedFlag[];
 
-  // Flag Access - Typed Variations (defaultValue is REQUIRED)
-  variation(flagName: string, defaultValue: string): string; // Variant name only
-  boolVariation(flagName: string, defaultValue: boolean): boolean;
-  stringVariation(flagName: string, defaultValue: string): string;
-  numberVariation(flagName: string, defaultValue: number): number;
-  jsonVariation<T>(flagName: string, defaultValue: T): T;
+  // Flag Access - Typed Variations (missingValue is REQUIRED)
+  variation(flagName: string, missingValue: string): string; // Variant name only
+  boolVariation(flagName: string, missingValue: boolean): boolean;
+  stringVariation(flagName: string, missingValue: string): string;
+  numberVariation(flagName: string, missingValue: number): number;
+  jsonVariation<T>(flagName: string, missingValue: T): T;
 
-  // Variation Details - Returns detailed result with reason (defaultValue is REQUIRED)
-  boolVariationDetails(flagName: string, defaultValue: boolean): VariationResult<boolean>;
-  stringVariationDetails(flagName: string, defaultValue: string): VariationResult<string>;
-  numberVariationDetails(flagName: string, defaultValue: number): VariationResult<number>;
-  jsonVariationDetails<T>(flagName: string, defaultValue: T): VariationResult<T>;
+  // Variation Details - Returns detailed result with reason (missingValue is REQUIRED)
+  boolVariationDetails(flagName: string, missingValue: boolean): VariationResult<boolean>;
+  stringVariationDetails(flagName: string, missingValue: string): VariationResult<string>;
+  numberVariationDetails(flagName: string, missingValue: number): VariationResult<number>;
+  jsonVariationDetails<T>(flagName: string, missingValue: T): VariationResult<T>;
 
   // Strict Variations - Throws GatrixFeatureError on not found/disabled/invalid
   boolVariationOrThrow(flagName: string): boolean;
@@ -624,10 +624,10 @@ All variation methods require an explicit default value parameter. This is a del
 | Function           | Return Type | Description                    |
 | ------------------ | ----------- | ------------------------------ |
 | `variation`        | string      | Variant name only              |
-| `boolVariation`    | boolean     | Flag enabled state             |
-| `stringVariation`  | string      | Variant payload as string      |
-| `numberVariation`  | number      | Variant payload as number      |
-| `jsonVariation<T>` | T           | Variant payload parsed as JSON |
+| `boolVariation`    | boolean     | Boolean variant value (`variant.value`/`variant.payload`). Strict: `variantType` must be `boolean`. |
+| `stringVariation`  | string      | Variant payload as string. Strict: `variantType` must be `string`. |
+| `numberVariation`  | number      | Variant payload as number. Strict: `variantType` must be `number`. |
+| `jsonVariation<T>` | T           | Variant payload parsed as JSON. Strict: `variantType` must be `json`. |
 
 ### VariationResult Interface
 
@@ -642,14 +642,37 @@ interface VariationResult<T> {
 
 ### FlagProxy Class
 
-Convenience wrapper for accessing flag values:
+FlagProxy is the **single source of truth** for all flag value extraction logic.
+
+**Architecture:**
+- Uses **null object pattern**: `this.flag` is never null/undefined. A `MISSING_FLAG` sentinel is used for non-existent flags.
+- `FeaturesClient` delegates all variation methods to `FlagProxy`.
+- **`onAccess` callback**: Injected by `FeaturesClient` during proxy creation, invoked on every variation/enabled call to track metrics, impressions, and stats in one place.
+- **Strict type checking**: All variation methods validate `variantType` to prevent misuse.
+
+**`boolVariation` behavior:**
+- Checks `variantType === 'boolean'` strictly.
+- Returns `Boolean(variant.value)` (or equivalent `variant.payload` in non-JS SDKs), NOT `flag.enabled`.
+- `flag.enabled` is purely the flag's on/off state; `boolVariation` extracts the actual boolean value from the variant payload.
 
 ```typescript
+// Callback type injected by FeaturesClient for metrics tracking
+type FlagAccessCallback = (
+  flagName: string,
+  flag: EvaluatedFlag | undefined,
+  eventType: string, // 'isEnabled' or 'getVariant'
+  variantName?: string
+) => void;
+
 class FlagProxy {
-  constructor(flag: EvaluatedFlag | undefined);
+  constructor(
+    flag: EvaluatedFlag | undefined,
+    onAccess?: FlagAccessCallback,
+    flagName?: string
+  );
 
   get exists(): boolean;
-  get enabled(): boolean;
+  get enabled(): boolean; // Triggers onAccess('isEnabled')
   get name(): string;
   get variant(): Variant; // Never null/undefined
   get variantType(): VariantType;
@@ -658,18 +681,19 @@ class FlagProxy {
   get impressionData(): boolean;
   get raw(): EvaluatedFlag | undefined;
 
-  // Variation methods (defaultValue is REQUIRED)
-  variation(defaultValue: string): string; // Variant name only
-  boolVariation(defaultValue: boolean): boolean;
-  stringVariation(defaultValue: string): string;
-  numberVariation(defaultValue: number): number;
-  jsonVariation<T>(defaultValue: T): T;
+  // Variation methods (missingValue is REQUIRED)
+  // Each call triggers onAccess callback for metrics
+  variation(missingValue: string): string; // Variant name only
+  boolVariation(missingValue: boolean): boolean; // Returns variant.value (NOT flag.enabled)
+  stringVariation(missingValue: string): string;
+  numberVariation(missingValue: number): number;
+  jsonVariation<T>(missingValue: T): T;
 
-  // Variation details (defaultValue is REQUIRED)
-  boolVariationDetails(defaultValue: boolean): VariationResult<boolean>;
-  stringVariationDetails(defaultValue: string): VariationResult<string>;
-  numberVariationDetails(defaultValue: number): VariationResult<number>;
-  jsonVariationDetails<T>(defaultValue: T): VariationResult<T>;
+  // Variation details (missingValue is REQUIRED)
+  boolVariationDetails(missingValue: boolean): VariationResult<boolean>;
+  stringVariationDetails(missingValue: string): VariationResult<string>;
+  numberVariationDetails(missingValue: number): VariationResult<number>;
+  jsonVariationDetails<T>(missingValue: T): VariationResult<T>;
 
   // Strict variations - throws GatrixFeatureError on not found or invalid type
   boolVariationOrThrow(): boolean;
@@ -678,6 +702,22 @@ class FlagProxy {
   jsonVariationOrThrow<T>(): T;
 }
 ```
+
+#### FlagProxy Variation Logic Summary
+
+| Method | variantType Check | Value Source | Fallback |
+|--------|------------------|--------------|----------|
+| `enabled` | none | `flag.enabled` | `false` |
+| `variation` | none | `variant.name` | missingValue |
+| `boolVariation` | `boolean` | `Boolean(variant.value)` | missingValue |
+| `stringVariation` | `string` | `String(variant.value)` | missingValue |
+| `numberVariation` | `number` | `Number(variant.value)` | missingValue |
+| `jsonVariation` | `json` + object check | `variant.value` | missingValue |
+
+> [!IMPORTANT]
+> **`boolVariation` ≠ `isEnabled`**: `isEnabled()` returns `flag.enabled`, while `boolVariation()` returns the boolean *value* from `variant.value`/`variant.payload`. These serve different purposes:
+> - `isEnabled()`: Is the feature flag turned on?
+> - `boolVariation()`: What boolean value did the flag evaluate to?
 
 ### WatchFlagGroup Class
 

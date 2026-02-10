@@ -21,22 +21,19 @@ import { StorageProvider } from './StorageProvider';
 import { LocalStorageProvider } from './LocalStorageProvider';
 import { InMemoryStorageProvider } from './InMemoryStorageProvider';
 import { uuidv4, resolveAbortController, deepClone, computeContextHash } from './utils';
-import { FlagProxy } from './FlagProxy';
+import { FlagProxy, FlagAccessCallback } from './FlagProxy';
 import { WatchFlagGroup } from './WatchFlagGroup';
 import { Logger, ConsoleLogger } from './Logger';
 import { Metrics } from './Metrics';
-import { GatrixError, GatrixFeatureError } from './errors';
+import { GatrixError } from './errors';
 import { SDK_NAME, SDK_VERSION } from './version';
-import ky, { HTTPError } from 'ky';
+import ky from 'ky';
 
 const STORAGE_KEY_FLAGS = 'flags';
 const STORAGE_KEY_SESSION = 'sessionId';
 const STORAGE_KEY_ETAG = 'etag';
 
-const FALLBACK_DISABLED_VARIANT: Variant = {
-  name: 'disabled',
-  enabled: false,
-};
+// MISSING_VARIANT is now defined in FlagProxy.ts
 
 export class FeaturesClient {
   private emitter: EventEmitter;
@@ -358,51 +355,53 @@ export class FeaturesClient {
 
   // ==================== Flag Access ====================
 
-  isEnabled(flagName: string): boolean {
+  /**
+   * Create a FlagProxy for a given flag name, injecting metrics callback.
+   * This is the single entry point for all flag access - ensures consistent metrics.
+   */
+  private createProxy(flagName: string): FlagProxy {
     const flags = this.selectFlags();
     const flag = flags.get(flagName);
-    const enabled = flag?.enabled ?? false;
+    return new FlagProxy(flag, this.handleFlagAccess, flagName);
+  }
 
-    // Track undefined flag access
+  /**
+   * Metrics callback injected into every FlagProxy.
+   * Called on every variation method invocation.
+   */
+  private handleFlagAccess: FlagAccessCallback = (
+    flagName: string,
+    flag: EvaluatedFlag | undefined,
+    eventType: string,
+    variantName?: string
+  ): void => {
     if (!flag) {
       this.metrics.countMissing(flagName);
-    } else {
-      this.metrics.count(flagName, enabled);
-      if (flag.variant) {
-        this.metrics.countVariant(flagName, flag.variant.name);
-      }
-
-      // Track local statistics
-      this.trackFlagEnabledCount(flagName, enabled);
-      if (flag.variant) {
-        this.trackVariantCount(flagName, flag.variant.name);
-      }
+      return;
     }
 
-    this.trackImpression(flagName, enabled, flag, 'isEnabled');
+    this.metrics.count(flagName, flag.enabled);
+    if (variantName) {
+      this.metrics.countVariant(flagName, variantName);
+    }
 
-    return enabled;
+    this.trackFlagEnabledCount(flagName, flag.enabled);
+    if (variantName) {
+      this.trackVariantCount(flagName, variantName);
+    }
+
+    this.trackImpression(flagName, flag.enabled, flag, eventType as 'isEnabled' | 'getVariant', variantName);
+  };
+
+  isEnabled(flagName: string): boolean {
+    return this.createProxy(flagName).enabled;
   }
 
   getVariant(flagName: string): Variant {
-    const flags = this.selectFlags();
-    const flag = flags.get(flagName);
-    const enabled = flag?.enabled ?? false;
-    const variant = flag?.variant ?? FALLBACK_DISABLED_VARIANT;
-
-    // Track undefined flag access or normal metrics
-    if (!flag) {
-      this.metrics.countMissing(flagName);
-    } else {
-      this.metrics.count(flagName, enabled);
-      this.metrics.countVariant(flagName, variant.name);
-    }
-
-    this.trackImpression(flagName, enabled, flag, 'getVariant', variant.name);
-
-    return {
-      ...variant,
-    };
+    const proxy = this.createProxy(flagName);
+    // Access to trigger metrics
+    proxy.variation('');
+    return { ...proxy.variant };
   }
 
   getAllFlags(): EvaluatedFlag[] {
@@ -410,328 +409,70 @@ export class FeaturesClient {
     return Array.from(flags.values());
   }
 
+  // ==================== Flag Query Methods ====================
+
+  hasFlag(flagName: string): boolean {
+    const flags = this.selectFlags();
+    return flags.has(flagName);
+  }
+
   // ==================== Variation Methods ====================
+  // All delegate to FlagProxy - single source of truth for value extraction.
 
-  /**
-   * Get the variant name for a flag
-   * Returns the variant name or 'disabled' if flag is not found/enabled
-   */
-  variation(flagName: string, defaultValue: string): string {
-    const flags = this.selectFlags();
-    const flag = flags.get(flagName);
-
-    if (!flag) {
-      this.metrics.countMissing(flagName);
-      return defaultValue;
-    }
-
-    this.trackImpression(flagName, flag.enabled, flag, 'getVariant', flag.variant.name);
-
-    return flag.variant?.name ?? defaultValue;
+  variation(flagName: string, missingValue: string): string {
+    return this.createProxy(flagName).variation(missingValue);
   }
 
-  boolVariation(flagName: string, defaultValue: boolean): boolean {
-    const flags = this.selectFlags();
-    const flag = flags.get(flagName);
-
-    if (!flag) {
-      this.metrics.countMissing(flagName);
-      return defaultValue;
-    }
-
-    this.trackImpression(flagName, flag.enabled, flag, 'isEnabled');
-
-    return flag.enabled;
+  boolVariation(flagName: string, missingValue: boolean): boolean {
+    return this.createProxy(flagName).boolVariation(missingValue);
   }
 
-  stringVariation(flagName: string, defaultValue: string): string {
-    const flags = this.selectFlags();
-    const flag = flags.get(flagName);
-
-    if (!flag) {
-      this.metrics.countMissing(flagName);
-      return defaultValue;
-    }
-    if (flag.variant?.payload == null) {
-      return defaultValue;
-    }
-
-    this.trackImpression(flagName, flag.enabled, flag, 'getVariant', flag.variant.name);
-
-    return String(flag.variant.payload);
+  stringVariation(flagName: string, missingValue: string): string {
+    return this.createProxy(flagName).stringVariation(missingValue);
   }
 
-  numberVariation(flagName: string, defaultValue: number): number {
-    const flags = this.selectFlags();
-    const flag = flags.get(flagName);
-
-    if (!flag) {
-      this.metrics.countMissing(flagName);
-      return defaultValue;
-    }
-    if (flag.variant?.payload == null) {
-      return defaultValue;
-    }
-
-    // Server sends number directly, no parsing needed
-    const payload = flag.variant.payload;
-    if (typeof payload === 'number') {
-      this.trackImpression(flagName, flag.enabled, flag, 'getVariant', flag.variant.name);
-      return payload;
-    }
-
-    return defaultValue;
+  numberVariation(flagName: string, missingValue: number): number {
+    return this.createProxy(flagName).numberVariation(missingValue);
   }
 
-  jsonVariation<T>(flagName: string, defaultValue: T): T {
-    const flags = this.selectFlags();
-    const flag = flags.get(flagName);
-
-    if (!flag) {
-      this.metrics.countMissing(flagName);
-      return defaultValue;
-    }
-    if (flag.variant?.payload == null) {
-      return defaultValue;
-    }
-
-    const payload = flag.variant.payload;
-
-    // Server sends object directly, no parsing needed
-    if (typeof payload === 'object') {
-      this.trackImpression(flagName, flag.enabled, flag, 'getVariant', flag.variant.name);
-      return payload as T;
-    }
-
-    return defaultValue;
+  jsonVariation<T>(flagName: string, missingValue: T): T {
+    return this.createProxy(flagName).jsonVariation(missingValue);
   }
 
   // ==================== Strict Variation Methods (OrThrow) ====================
 
   boolVariationOrThrow(flagName: string): boolean {
-    const flags = this.selectFlags();
-    const flag = flags.get(flagName);
-
-    if (!flag) {
-      throw GatrixFeatureError.flagNotFound(flagName);
-    }
-
-    this.trackImpression(flagName, flag.enabled, flag, 'isEnabled');
-    return flag.enabled;
+    return this.createProxy(flagName).boolVariationOrThrow();
   }
 
   stringVariationOrThrow(flagName: string): string {
-    const flags = this.selectFlags();
-    const flag = flags.get(flagName);
-
-    if (!flag) {
-      throw GatrixFeatureError.flagNotFound(flagName);
-    }
-    if (flag.variant?.payload == null) {
-      throw GatrixFeatureError.noPayload(flagName);
-    }
-
-    this.trackImpression(flagName, flag.enabled, flag, 'getVariant', flag.variant.name);
-    return String(flag.variant.payload);
+    return this.createProxy(flagName).stringVariationOrThrow();
   }
 
   numberVariationOrThrow(flagName: string): number {
-    const flags = this.selectFlags();
-    const flag = flags.get(flagName);
-
-    if (!flag) {
-      throw GatrixFeatureError.flagNotFound(flagName);
-    }
-    if (flag.variant?.payload == null) {
-      throw GatrixFeatureError.noPayload(flagName);
-    }
-
-    const payload = flag.variant.payload;
-    if (typeof payload !== 'number') {
-      throw GatrixFeatureError.typeMismatch(flagName, 'number', typeof payload);
-    }
-
-    this.trackImpression(flagName, flag.enabled, flag, 'getVariant', flag.variant.name);
-    return payload;
+    return this.createProxy(flagName).numberVariationOrThrow();
   }
 
   jsonVariationOrThrow<T>(flagName: string): T {
-    const flags = this.selectFlags();
-    const flag = flags.get(flagName);
-
-    if (!flag) {
-      throw GatrixFeatureError.flagNotFound(flagName);
-    }
-    if (flag.variant?.payload == null) {
-      throw GatrixFeatureError.noPayload(flagName);
-    }
-
-    const payload = flag.variant.payload;
-    if (typeof payload !== 'object') {
-      throw GatrixFeatureError.typeMismatch(flagName, 'object', typeof payload);
-    }
-
-    this.trackImpression(flagName, flag.enabled, flag, 'getVariant', flag.variant.name);
-    return payload as T;
+    return this.createProxy(flagName).jsonVariationOrThrow<T>();
   }
 
   // ==================== Variation Details ====================
 
-  boolVariationDetails(flagName: string, defaultValue: boolean): VariationResult<boolean> {
-    const flags = this.selectFlags();
-    const flag = flags.get(flagName);
-
-    if (!flag) {
-      this.metrics.countMissing(flagName);
-      return {
-        value: defaultValue,
-        reason: 'flag_not_found',
-        flagExists: false,
-        enabled: false,
-      };
-    }
-
-    this.trackImpression(flagName, flag.enabled, flag, 'isEnabled');
-
-    return {
-      value: flag.enabled,
-      reason: flag.reason ?? 'evaluated',
-      flagExists: true,
-      enabled: flag.enabled,
-    };
+  boolVariationDetails(flagName: string, missingValue: boolean): VariationResult<boolean> {
+    return this.createProxy(flagName).boolVariationDetails(missingValue);
   }
 
-  stringVariationDetails(flagName: string, defaultValue: string): VariationResult<string> {
-    const flags = this.selectFlags();
-    const flag = flags.get(flagName);
-
-    if (!flag) {
-      this.metrics.countMissing(flagName);
-      return {
-        value: defaultValue,
-        reason: 'flag_not_found',
-        flagExists: false,
-        enabled: false,
-      };
-    }
-
-    this.trackImpression(flagName, flag.enabled, flag, 'getVariant', flag.variant.name);
-
-    const payload = flag.variant?.payload;
-    return {
-      value: payload != null ? String(payload) : defaultValue,
-      reason: flag.reason ?? 'evaluated',
-      flagExists: true,
-      enabled: flag.enabled,
-    };
+  stringVariationDetails(flagName: string, missingValue: string): VariationResult<string> {
+    return this.createProxy(flagName).stringVariationDetails(missingValue);
   }
 
-  numberVariationDetails(flagName: string, defaultValue: number): VariationResult<number> {
-    const flags = this.selectFlags();
-    const flag = flags.get(flagName);
-
-    if (!flag) {
-      this.metrics.countMissing(flagName);
-      return {
-        value: defaultValue,
-        reason: 'flag_not_found',
-        flagExists: false,
-        enabled: false,
-      };
-    }
-
-    if (flag.variant?.payload == null) {
-      return {
-        value: defaultValue,
-        reason: 'no_payload',
-        flagExists: true,
-        enabled: flag.enabled,
-      };
-    }
-
-    const payload = flag.variant.payload;
-
-    // Check variantType hint for better error messages
-    if (flag.variantType && flag.variantType !== 'number') {
-      return {
-        value: defaultValue,
-        reason: `type_mismatch:expected_number_got_${flag.variantType}`,
-        flagExists: true,
-        enabled: flag.enabled,
-      };
-    }
-
-    if (typeof payload !== 'number') {
-      return {
-        value: defaultValue,
-        reason: `type_mismatch:payload_not_number`,
-        flagExists: true,
-        enabled: flag.enabled,
-      };
-    }
-
-    this.trackImpression(flagName, flag.enabled, flag, 'getVariant', flag.variant.name);
-
-    return {
-      value: payload,
-      reason: flag.reason ?? 'evaluated',
-      flagExists: true,
-      enabled: flag.enabled,
-    };
+  numberVariationDetails(flagName: string, missingValue: number): VariationResult<number> {
+    return this.createProxy(flagName).numberVariationDetails(missingValue);
   }
 
-  jsonVariationDetails<T>(flagName: string, defaultValue: T): VariationResult<T> {
-    const flags = this.selectFlags();
-    const flag = flags.get(flagName);
-
-    if (!flag) {
-      this.metrics.countMissing(flagName);
-      return {
-        value: defaultValue,
-        reason: 'flag_not_found',
-        flagExists: false,
-        enabled: false,
-      };
-    }
-
-    if (flag.variant?.payload == null) {
-      return {
-        value: defaultValue,
-        reason: 'no_payload',
-        flagExists: true,
-        enabled: flag.enabled,
-      };
-    }
-
-    const payload = flag.variant.payload;
-
-    // Check variantType hint for better error messages
-    if (flag.variantType && flag.variantType !== 'json') {
-      return {
-        value: defaultValue,
-        reason: `type_mismatch:expected_json_got_${flag.variantType}`,
-        flagExists: true,
-        enabled: flag.enabled,
-      };
-    }
-
-    // Server sends object directly, no parsing needed
-    if (typeof payload === 'object') {
-      this.trackImpression(flagName, flag.enabled, flag, 'getVariant', flag.variant.name);
-      return {
-        value: payload as T,
-        reason: flag.reason ?? 'evaluated',
-        flagExists: true,
-        enabled: flag.enabled,
-      };
-    }
-
-    return {
-      value: defaultValue,
-      reason: 'type_mismatch:payload_not_object',
-      flagExists: true,
-      enabled: flag.enabled,
-    };
+  jsonVariationDetails<T>(flagName: string, missingValue: T): VariationResult<T> {
+    return this.createProxy(flagName).jsonVariationDetails(missingValue);
   }
 
   async syncFlags(fetchNow: boolean = true): Promise<void> {
@@ -811,7 +552,7 @@ export class FeaturesClient {
   ): () => void {
     const eventName = `flags.${flagName}.change`;
     const wrappedCallback = (rawFlag: EvaluatedFlag | undefined) => {
-      callback(new FlagProxy(rawFlag));
+      callback(new FlagProxy(rawFlag, this.handleFlagAccess, flagName));
     };
     this.emitter.on(eventName, wrappedCallback, name);
 
@@ -827,20 +568,20 @@ export class FeaturesClient {
   ): () => void {
     const eventName = `flags.${flagName}.change`;
     const wrappedCallback = (rawFlag: EvaluatedFlag | undefined) => {
-      callback(new FlagProxy(rawFlag));
+      callback(new FlagProxy(rawFlag, this.handleFlagAccess, flagName));
     };
     this.emitter.on(eventName, wrappedCallback, name);
 
     // Emit initial state
     if (this.readyEventEmitted) {
       const flags = this.selectFlags();
-      callback(new FlagProxy(flags.get(flagName)));
+      callback(new FlagProxy(flags.get(flagName), this.handleFlagAccess, flagName));
     } else {
       this.emitter.once(
         EVENTS.FLAGS_READY,
         () => {
           const flags = this.selectFlags();
-          callback(new FlagProxy(flags.get(flagName)));
+          callback(new FlagProxy(flags.get(flagName), this.handleFlagAccess, flagName));
         },
         name ? `${name}_initial` : undefined
       );

@@ -6,12 +6,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GatrixTypes.h"
-#include "GatrixEvents.h"
 #include "GatrixEventEmitter.h"
-#include "GatrixStorageProvider.h"
-#include "GatrixFlagProxy.h"
+#include "GatrixEvents.h"
 #include "GatrixFeaturesClient.generated.h"
+#include "GatrixFlagProxy.h"
+#include "GatrixStorageProvider.h"
+#include "GatrixTypes.h"
 
 // Blueprint-bindable delegates
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGatrixOnReady);
@@ -73,24 +73,39 @@ public:
   /** Get boolean variation */
   UFUNCTION(BlueprintCallable, BlueprintPure,
             Category = "Gatrix|Features|Variation")
-  bool BoolVariation(const FString &FlagName, bool DefaultValue) const;
+  bool BoolVariation(const FString &FlagName, bool MissingValue) const;
 
   /** Get string variation */
   UFUNCTION(BlueprintCallable, BlueprintPure,
             Category = "Gatrix|Features|Variation")
   FString StringVariation(const FString &FlagName,
-                          const FString &DefaultValue) const;
+                          const FString &MissingValue) const;
 
   /** Get number variation */
   UFUNCTION(BlueprintCallable, BlueprintPure,
             Category = "Gatrix|Features|Variation")
-  float NumberVariation(const FString &FlagName, float DefaultValue) const;
+  float NumberVariation(const FString &FlagName, float MissingValue) const;
+
+  /** Get integer variation */
+  UFUNCTION(BlueprintCallable, BlueprintPure,
+            Category = "Gatrix|Features|Variation")
+  int32 IntVariation(const FString &FlagName, int32 MissingValue) const;
+
+  /** Get float variation */
+  UFUNCTION(BlueprintCallable, BlueprintPure,
+            Category = "Gatrix|Features|Variation")
+  float FloatVariation(const FString &FlagName, float MissingValue) const;
+
+  /** Get double variation */
+  UFUNCTION(BlueprintCallable, BlueprintPure,
+            Category = "Gatrix|Features|Variation")
+  double DoubleVariation(const FString &FlagName, double MissingValue) const;
 
   /** Get JSON variation as string */
   UFUNCTION(BlueprintCallable, BlueprintPure,
             Category = "Gatrix|Features|Variation")
   FString JsonVariation(const FString &FlagName,
-                        const FString &DefaultValue) const;
+                        const FString &MissingValue) const;
 
   // ==================== Variation Details ====================
 
@@ -98,20 +113,38 @@ public:
   UFUNCTION(BlueprintCallable, BlueprintPure,
             Category = "Gatrix|Features|Variation")
   FGatrixVariationResult BoolVariationDetails(const FString &FlagName,
-                                              bool DefaultValue) const;
+                                              bool MissingValue) const;
 
   /** Get string variation with details */
   UFUNCTION(BlueprintCallable, BlueprintPure,
             Category = "Gatrix|Features|Variation")
   FGatrixVariationResult
   StringVariationDetails(const FString &FlagName,
-                         const FString &DefaultValue) const;
+                         const FString &MissingValue) const;
 
   /** Get number variation with details */
   UFUNCTION(BlueprintCallable, BlueprintPure,
             Category = "Gatrix|Features|Variation")
   FGatrixVariationResult NumberVariationDetails(const FString &FlagName,
-                                                float DefaultValue) const;
+                                                float MissingValue) const;
+
+  /** Get integer variation with details */
+  UFUNCTION(BlueprintCallable, BlueprintPure,
+            Category = "Gatrix|Features|Variation")
+  FGatrixVariationResult IntVariationDetails(const FString &FlagName,
+                                             int32 MissingValue) const;
+
+  /** Get float variation with details */
+  UFUNCTION(BlueprintCallable, BlueprintPure,
+            Category = "Gatrix|Features|Variation")
+  FGatrixVariationResult FloatVariationDetails(const FString &FlagName,
+                                               float MissingValue) const;
+
+  /** Get double variation with details */
+  UFUNCTION(BlueprintCallable, BlueprintPure,
+            Category = "Gatrix|Features|Variation")
+  FGatrixVariationResult DoubleVariationDetails(const FString &FlagName,
+                                                double MissingValue) const;
 
   // ==================== Context ====================
 
@@ -204,7 +237,9 @@ private:
   void EmitFlagChanges(const TMap<FString, FGatrixEvaluatedFlag> &OldFlags,
                        const TMap<FString, FGatrixEvaluatedFlag> &NewFlags);
   void TrackImpression(const FString &FlagName, bool bEnabled,
-                       const FString &VariantName);
+                       const FString &VariantName, const FString &EventType);
+  void TrackAccess(const FString &FlagName, const FGatrixEvaluatedFlag *Flag,
+                   const FString &EventType, const FString &VariantName) const;
   void ScheduleNextPoll();
   void StopPolling();
 
@@ -255,9 +290,15 @@ private:
   int32 MetricsErrorCount = 0;
 
   // Metrics tracking
+  struct FFlagMetrics {
+    int32 Yes = 0;
+    int32 No = 0;
+    TMap<FString, int32> Variants;
+  };
+
   mutable FCriticalSection MetricsCriticalSection;
-  TMap<FString, int32> MetricsFlagAccess;
-  TArray<FString> MissingFlagNames;
+  TMap<FString, FFlagMetrics> MetricsFlagBucket;
+  TMap<FString, int32> MetricsMissingFlags;
 
   // Polling timer
   FTimerHandle PollTimerHandle;

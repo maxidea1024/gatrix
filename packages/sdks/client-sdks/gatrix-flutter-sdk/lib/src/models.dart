@@ -4,6 +4,7 @@ enum VariantType {
   none,
   string,
   number,
+  boolean,
   json;
 
   static VariantType parse(String? value) {
@@ -13,6 +14,8 @@ enum VariantType {
         return VariantType.string;
       case 'number':
         return VariantType.number;
+      case 'boolean':
+        return VariantType.boolean;
       case 'json':
         return VariantType.json;
       default:
