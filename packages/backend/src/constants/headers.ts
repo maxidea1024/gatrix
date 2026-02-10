@@ -83,6 +83,11 @@ export const API_HEADERS = {
   X_CONNECTION_ID: 'x-connection-id',
 
   /**
+   * SDK 버전 헤더 (SDK 이름/버전)
+   */
+  X_SDK_VERSION: 'x-sdk-version',
+
+  /**
    * 세션 ID 헤더 (SDK용)
    */
   X_SESSION_ID: 'x-session-id',
@@ -213,6 +218,7 @@ export const ALLOWED_HEADERS: string[] = [
   HEADERS.X_CONNECTION_ID,
   HEADERS.X_SESSION_ID,
   HEADERS.IF_NONE_MATCH,
+  HEADERS.X_SDK_VERSION,
 ];
 
 export default HEADERS;

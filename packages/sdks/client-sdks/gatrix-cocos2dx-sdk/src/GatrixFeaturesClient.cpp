@@ -301,7 +301,7 @@ void FeaturesClient::fetchFlags() {
   headers.push_back("X-Application-Name: " + _config.appName);
   headers.push_back("X-Environment: " + _config.environment);
   headers.push_back("X-Connection-Id: " + _connectionId);
-  headers.push_back("X-Gatrix-SDK: " + std::string(SDK_NAME) + ":" +
+  headers.push_back("X-SDK-Version: " + std::string(SDK_NAME) + "/" +
                     std::string(SDK_VERSION));
   if (!_etag.empty())
     headers.push_back("If-None-Match: " + _etag);

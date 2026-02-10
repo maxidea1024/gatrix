@@ -211,7 +211,7 @@ All client SDKs MUST include the following standard headers on every HTTP reques
 | `X-API-Token` | `{apiToken}` | Client API token for authentication |
 | `X-Application-Name` | `{appName}` | Application name from config |
 | `X-Connection-Id` | `{connectionId}` | Unique connection identifier (UUID, generated once per SDK instance) |
-| `X-Gatrix-SDK` | `{sdkName}:{sdkVersion}` | SDK identification string (e.g., `gatrix-js-client-sdk:1.0.0`) |
+| `X-SDK-Version` | `{sdkName}/{sdkVersion}` | SDK identification string (e.g., `@gatrix/js-client-sdk/1.0.0`) |
 | `Content-Type` | `application/json` | Required for POST requests |
 | `...customHeaders` | User-defined | Spread/merged from `config.customHeaders` |
 
@@ -222,9 +222,9 @@ All client SDKs MUST include the following standard headers on every HTTP reques
 | `X-Environment` | `{environment}` | Environment name from config |
 | `If-None-Match` | `{etag}` | ETag from previous response (only when etag exists, enables 304 Not Modified) |
 
-#### X-Gatrix-SDK Format
+#### X-SDK-Version Format
 
-The `X-Gatrix-SDK` header combines SDK name and version in a single value using the format `{sdkName}:{sdkVersion}`.
+The `X-SDK-Version` header combines SDK name and version in a single value using the format `{sdkName}/{sdkVersion}`.
 
 Standard SDK names:
 - `@gatrix/js-client-sdk` (JavaScript)

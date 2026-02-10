@@ -391,7 +391,7 @@ func _do_fetch_flags() -> void:
 		"X-Application-Name: %s" % _config.app_name,
 		"X-Environment: %s" % _config.environment,
 		"X-Connection-Id: %s" % _connection_id,
-		"X-Gatrix-SDK: %s:%s" % [SDK_NAME, SDK_VERSION],
+		"X-SDK-Version: %s/%s" % [SDK_NAME, SDK_VERSION],
 	]
 
 	if _etag != "":
@@ -798,7 +798,7 @@ func _do_send_metrics(payload: String) -> void:
 		"Content-Type: application/json",
 		"X-Application-Name: %s" % _config.app_name,
 		"X-Connection-Id: %s" % _connection_id,
-		"X-Gatrix-SDK: %s:%s" % [SDK_NAME, SDK_VERSION],
+		"X-SDK-Version: %s/%s" % [SDK_NAME, SDK_VERSION],
 	]
 
 	for key in _config.custom_headers:

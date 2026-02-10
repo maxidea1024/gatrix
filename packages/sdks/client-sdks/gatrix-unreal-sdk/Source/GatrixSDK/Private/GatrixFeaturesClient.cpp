@@ -357,8 +357,8 @@ void UGatrixFeaturesClient::DoFetchFlags() {
   HttpRequest->SetHeader(TEXT("X-Application-Name"), ClientConfig.AppName);
   HttpRequest->SetHeader(TEXT("X-Environment"), ClientConfig.Environment);
   HttpRequest->SetHeader(TEXT("X-Connection-Id"), ConnectionId);
-  HttpRequest->SetHeader(TEXT("X-Gatrix-SDK"),
-                         FString::Printf(TEXT("%s:%s"), *UGatrixClient::SdkName,
+  HttpRequest->SetHeader(TEXT("X-SDK-Version"),
+                         FString::Printf(TEXT("%s/%s"), *UGatrixClient::SdkName,
                                          *UGatrixClient::SdkVersion));
 
   // ETag for conditional requests
@@ -1024,8 +1024,8 @@ void UGatrixFeaturesClient::SendMetrics() {
     HttpRequest->SetHeader(TEXT("X-API-Token"), ClientConfig.ApiToken);
     HttpRequest->SetHeader(TEXT("X-Application-Name"), ClientConfig.AppName);
     HttpRequest->SetHeader(TEXT("X-Connection-Id"), ConnectionId);
-    HttpRequest->SetHeader(TEXT("X-Gatrix-SDK"),
-                           FString::Printf(TEXT("%s:%s"),
+    HttpRequest->SetHeader(TEXT("X-SDK-Version"),
+                           FString::Printf(TEXT("%s/%s"),
                                            *UGatrixClient::SdkName,
                                            *UGatrixClient::SdkVersion));
 

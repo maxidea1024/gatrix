@@ -250,7 +250,7 @@ export class Metrics {
       'X-API-Token': this.apiToken,
       'X-Application-Name': this.appName,
       'X-Connection-Id': this.connectionId,
-      'X-Gatrix-SDK': `${SDK_NAME}:${SDK_VERSION}`,
+      'X-SDK-Version': `${SDK_NAME}/${SDK_VERSION}`,
       ...this.customHeaders,
     };
     return headers;

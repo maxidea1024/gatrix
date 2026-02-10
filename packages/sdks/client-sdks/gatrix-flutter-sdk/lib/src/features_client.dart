@@ -462,7 +462,7 @@ class FeaturesClient {
       'X-Application-Name': _appName,
       'X-Environment': _environment,
       'X-Connection-Id': _connectionId,
-      'X-Gatrix-SDK': '${GatrixClient.sdkName}:${GatrixClient.sdkVersion}',
+      'X-SDK-Version': '${GatrixClient.sdkName}/${GatrixClient.sdkVersion}',
     };
     if (_customHeaders != null) {
       headers.addAll(_customHeaders!);

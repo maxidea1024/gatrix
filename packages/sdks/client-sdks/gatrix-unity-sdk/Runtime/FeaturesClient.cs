@@ -1045,7 +1045,7 @@ namespace Gatrix.Unity.SDK
                 request.Headers.TryAddWithoutValidation("X-Application-Name", _config.AppName);
                 request.Headers.TryAddWithoutValidation("X-Environment", _config.Environment);
                 request.Headers.TryAddWithoutValidation("X-Connection-Id", _connectionId);
-                request.Headers.TryAddWithoutValidation("X-Gatrix-SDK", $"{GatrixClient.SdkName}:{GatrixClient.SdkVersion}");
+                request.Headers.TryAddWithoutValidation("X-SDK-Version", $"{GatrixClient.SdkName}/{GatrixClient.SdkVersion}");
                 if (_config.CustomHeaders != null)
                 {
                     foreach (var kvp in _config.CustomHeaders)

@@ -1225,7 +1225,7 @@ export class FeaturesClient {
       'X-Application-Name': this.config.appName,
       'X-Environment': this.config.environment,
       'X-Connection-Id': this.connectionId,
-      'X-Gatrix-SDK': `${SDK_NAME}:${SDK_VERSION}`,
+      'X-SDK-Version': `${SDK_NAME}/${SDK_VERSION}`,
       ...this.config.customHeaders,
     };
   }
