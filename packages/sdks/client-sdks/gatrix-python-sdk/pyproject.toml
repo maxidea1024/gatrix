@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gatrix-python-client-sdk"
+version = "1.0.0"
+description = "Gatrix Python Client SDK for feature flags"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+keywords = ["gatrix", "feature-flags", "sdk"]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0"]
+
+[tool.setuptools.packages.find]
+include = ["gatrix*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

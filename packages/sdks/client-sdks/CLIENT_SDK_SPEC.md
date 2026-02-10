@@ -233,6 +233,7 @@ Standard SDK names:
 - `gatrix-cocos2dx-client-sdk` (Cocos2d-x)
 - `gatrix-flutter-client-sdk` (Flutter)
 - `gatrix-godot-client-sdk` (Godot)
+- `gatrix-python-client-sdk` (Python)
 
 #### Authentication Note
 
