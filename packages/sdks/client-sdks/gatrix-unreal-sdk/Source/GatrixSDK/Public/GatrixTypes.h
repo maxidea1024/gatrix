@@ -191,6 +191,18 @@ struct GATRIXSDK_API FGatrixFetchRetryOptions {
   /** Request timeout in ms (default: 30000) */
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gatrix")
   int32 TimeoutMs = 30000;
+
+  /** HTTP status codes that should stop polling entirely (default: 401, 403) */
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gatrix")
+  TArray<int32> NonRetryableStatusCodes = {401, 403};
+
+  /** Initial backoff delay in ms for retries (default: 1000) */
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gatrix")
+  int32 InitialBackoffMs = 1000;
+
+  /** Maximum backoff delay in ms for retries (default: 60000) */
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gatrix")
+  int32 MaxBackoffMs = 60000;
 };
 
 /** Feature flags configuration */
@@ -279,6 +291,14 @@ struct GATRIXSDK_API FGatrixClientConfig {
   /** Start in offline mode */
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gatrix|Optional")
   bool bOfflineMode = false;
+
+  /** Enable dev mode for detailed debug logging */
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gatrix|Optional")
+  bool bEnableDevMode = false;
+
+  /** Cache key prefix for storage keys (default: "gatrix_cache") */
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gatrix|Optional")
+  FString CacheKeyPrefix = TEXT("gatrix_cache");
 
   /** Feature flags configuration */
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gatrix|Optional")

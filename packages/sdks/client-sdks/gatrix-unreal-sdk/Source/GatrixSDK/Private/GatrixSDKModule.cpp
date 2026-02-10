@@ -5,12 +5,14 @@
 
 #define LOCTEXT_NAMESPACE "FGatrixSDKModule"
 
+DEFINE_LOG_CATEGORY(LogGatrix);
+
 void FGatrixSDKModule::StartupModule() {
-  UE_LOG(LogTemp, Log, TEXT("[GatrixSDK] Module loaded."));
+  UE_LOG(LogGatrix, Log, TEXT("Module loaded."));
 }
 
 void FGatrixSDKModule::ShutdownModule() {
-  UE_LOG(LogTemp, Log, TEXT("[GatrixSDK] Module unloaded."));
+  UE_LOG(LogGatrix, Log, TEXT("Module unloaded."));
 }
 
 #undef LOCTEXT_NAMESPACE

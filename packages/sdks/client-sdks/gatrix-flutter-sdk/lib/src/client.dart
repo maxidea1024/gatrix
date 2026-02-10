@@ -1,6 +1,7 @@
 import 'events.dart';
 import 'models.dart';
 import 'features_client.dart';
+import 'version.dart' as sdk_version;
 
 class GatrixClientConfig {
   final String apiUrl;
@@ -13,6 +14,7 @@ class GatrixClientConfig {
   final int metricsIntervalSeconds;
   final GatrixContext? initialContext;
   final List<EvaluatedFlag>? bootstrap;
+  final Map<String, String>? customHeaders;
 
   GatrixClientConfig({
     required this.apiUrl,
@@ -25,10 +27,14 @@ class GatrixClientConfig {
     this.metricsIntervalSeconds = 30,
     this.initialContext,
     this.bootstrap,
+    this.customHeaders,
   });
 }
 
 class GatrixClient {
+  static String get sdkName => sdk_version.sdkName;
+  static String get sdkVersion => sdk_version.sdkVersion;
+
   final GatrixClientConfig config;
   final EventEmitter _events = EventEmitter();
   late final FeaturesClient features;
@@ -38,9 +44,12 @@ class GatrixClient {
     features = FeaturesClient(
       apiUrl: config.apiUrl,
       apiToken: config.apiToken,
+      appName: config.appName,
+      environment: config.environment,
       context: config.initialContext ?? GatrixContext(),
       events: _events,
       explicitSyncMode: config.explicitSyncMode,
+      customHeaders: config.customHeaders,
     );
   }
 

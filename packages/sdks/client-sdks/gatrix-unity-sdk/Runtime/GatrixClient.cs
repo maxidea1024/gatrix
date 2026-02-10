@@ -14,8 +14,8 @@ namespace Gatrix.Unity.SDK
     /// </summary>
     public class GatrixClient : IDisposable
     {
-        public const string SdkName = "gatrix-unity-client-sdk";
-        public const string SdkVersion = "1.0.0";
+        public static string SdkName => SdkInfo.Name;
+        public static string SdkVersion => SdkInfo.Version;
 
         private readonly GatrixEventEmitter _emitter;
         private readonly GatrixClientConfig _config;

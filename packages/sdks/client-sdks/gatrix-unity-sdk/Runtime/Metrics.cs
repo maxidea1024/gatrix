@@ -185,37 +185,65 @@ namespace Gatrix.Unity.SDK
             var payload = GetPayload();
             if (BucketIsEmpty(payload)) return;
 
-            try
-            {
-                var url = $"{_apiUrl}/client/features/{_environment}/metrics";
-                var json = GatrixJson.SerializeMetrics(payload);
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
+            const int maxRetries = 2;
+            var url = $"{_apiUrl}/client/features/{_environment}/metrics";
+            var json = GatrixJson.SerializeMetrics(payload);
 
-                var request = new HttpRequestMessage(HttpMethod.Post, url)
+            for (int attempt = 0; attempt <= maxRetries; attempt++)
+            {
+                try
                 {
-                    Content = content
-                };
-                request.Headers.TryAddWithoutValidation("X-API-Token", _apiToken);
-                request.Headers.TryAddWithoutValidation("X-Application-Name", _appName);
-                request.Headers.TryAddWithoutValidation("X-Connection-Id", _connectionId);
-                if (_customHeaders != null)
-                {
-                    foreach (var kvp in _customHeaders)
+                    var content = new StringContent(json, Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, url)
                     {
-                        request.Headers.TryAddWithoutValidation(kvp.Key, kvp.Value);
+                        Content = content
+                    };
+                    request.Headers.TryAddWithoutValidation("X-API-Token", _apiToken);
+                    request.Headers.TryAddWithoutValidation("X-Application-Name", _appName);
+                    request.Headers.TryAddWithoutValidation("X-Connection-Id", _connectionId);
+                    request.Headers.TryAddWithoutValidation("X-Gatrix-SDK", $"{GatrixClient.SdkName}:{GatrixClient.SdkVersion}");
+                    if (_customHeaders != null)
+                    {
+                        foreach (var kvp in _customHeaders)
+                        {
+                            request.Headers.TryAddWithoutValidation(kvp.Key, kvp.Value);
+                        }
+                    }
+
+                    var response = await _httpClient.SendAsync(request);
+                    var statusCode = (int)response.StatusCode;
+
+                    if (statusCode < 400)
+                    {
+                        _logger?.Debug("Metrics sent successfully");
+                        EmitOnMainThread(GatrixEvents.FlagsMetricsSent, payload);
+                        return;
+                    }
+
+                    // Retry on retryable status codes
+                    bool retryable = statusCode == 408 || statusCode == 429 || statusCode >= 500;
+                    if (retryable && attempt < maxRetries)
+                    {
+                        var delay = (int)Math.Pow(2, attempt + 1) * 1000;
+                        await Task.Delay(delay);
+                        continue;
+                    }
+
+                    throw new Exception($"HTTP {statusCode}");
+                }
+                catch (Exception e)
+                {
+                    if (attempt >= maxRetries)
+                    {
+                        _logger?.Error($"Failed to send metrics: {e.Message}");
+                        EmitOnMainThread(GatrixEvents.FlagsMetricsError, e);
+                    }
+                    else
+                    {
+                        var delay = (int)Math.Pow(2, attempt + 1) * 1000;
+                        await Task.Delay(delay);
                     }
                 }
-
-                await _httpClient.SendAsync(request);
-                _logger?.Debug("Metrics sent successfully");
-
-                // Dispatch event emissions to main thread
-                EmitOnMainThread(GatrixEvents.FlagsMetricsSent, payload);
-            }
-            catch (Exception e)
-            {
-                _logger?.Error($"Failed to send metrics: {e.Message}");
-                EmitOnMainThread(GatrixEvents.FlagsMetricsError, e);
             }
         }
 

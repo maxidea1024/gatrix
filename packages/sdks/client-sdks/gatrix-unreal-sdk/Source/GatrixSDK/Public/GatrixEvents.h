@@ -29,6 +29,9 @@ static const FString SdkError = TEXT("flags.error");
 static const FString FlagsImpression = TEXT("flags.impression");
 /** Flags synchronized (explicitSyncMode) */
 static const FString FlagsSync = TEXT("flags.sync");
+/** One or more flags removed from server. Payload: comma-separated removed flag
+ * names */
+static const FString FlagsRemoved = TEXT("flags.removed");
 /** SDK recovered from error state */
 static const FString FlagsRecovered = TEXT("flags.recovered");
 /** Metrics sent to server */

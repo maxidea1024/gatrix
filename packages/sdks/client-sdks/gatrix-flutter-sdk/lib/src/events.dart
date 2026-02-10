@@ -84,10 +84,11 @@ class GatrixEvents {
   static const String flagsMetricSent = 'flags.metrics_sent';
   static const String flagsMetricError = 'flags.metrics_error';
   static const String flagsSync = 'flags.sync';
+  static const String flagsRemoved = 'flags.removed';
   static const String flagsRecovered = 'flags.recovered';
   static const String flagsFetchStart = 'flags.fetch_start';
   static const String flagsFetchEnd = 'flags.fetch_end';
   static const String flagsImpression = 'flags.impression';
 
-  static String flagChange(String flagName) => 'flags.change:$flagName';
+  static String flagChange(String flagName) => 'flags.$flagName.change';
 }

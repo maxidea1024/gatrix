@@ -178,6 +178,12 @@ export interface GatrixClientConfig {
   /** Start in offline mode (no network requests, use cached/bootstrap flags) */
   offlineMode?: boolean;
 
+  /** Enable dev mode for detailed debug logging (default: false) */
+  enableDevMode?: boolean;
+
+  /** Cache key prefix for storage keys (default: 'gatrix_cache') */
+  cacheKeyPrefix?: string;
+
   /** Feature flags configuration */
   features?: FeaturesConfig;
 }

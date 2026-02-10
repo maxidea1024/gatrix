@@ -198,6 +198,15 @@ class GatrixClientConfig:
 	var metrics_interval_initial: float = 2.0
 	var metrics_interval: float = 60.0
 
+	# Fetch retry options
+	var non_retryable_status_codes: Array[int] = [401, 403]
+	var initial_backoff_ms: int = 1000
+	var max_backoff_ms: int = 60000
+
+	# Debug / Storage
+	var enable_dev_mode: bool = false
+	var cache_key_prefix: String = "gatrix_cache"
+
 
 # Feature flag statistics
 class FeaturesStats:

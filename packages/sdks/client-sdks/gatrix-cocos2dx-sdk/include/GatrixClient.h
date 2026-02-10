@@ -5,9 +5,9 @@
 #include "GatrixEvents.h"
 #include "GatrixFeaturesClient.h"
 #include "GatrixTypes.h"
+#include "GatrixVersion.h"
 #include <functional>
 #include <string>
-
 
 namespace gatrix {
 
@@ -17,7 +17,9 @@ namespace gatrix {
 class GatrixClient {
 public:
   static GatrixClient *getInstance();
-  static const char *version() { return "1.0.0"; }
+  static const char *sdkName() { return SDK_NAME; }
+  static const char *sdkVersion() { return SDK_VERSION; }
+  static const char *version() { return SDK_VERSION; }
 
   void init(const GatrixClientConfig &config);
   void start();

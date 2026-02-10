@@ -33,16 +33,16 @@ export class GatrixClient {
   constructor(config: GatrixClientConfig) {
     // Validate required config
     if (!config.apiUrl) {
-      throw new GatrixError('GatrixClient: apiUrl is required');
+      throw new GatrixError('apiUrl is required');
     }
     if (!config.apiToken) {
-      throw new GatrixError('GatrixClient: apiToken is required');
+      throw new GatrixError('apiToken is required');
     }
     if (!config.appName) {
-      throw new GatrixError('GatrixClient: appName is required');
+      throw new GatrixError('appName is required');
     }
     if (!config.environment) {
-      throw new GatrixError('GatrixClient: environment is required');
+      throw new GatrixError('environment is required');
     }
 
     this.config = config;

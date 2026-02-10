@@ -236,6 +236,8 @@ private:
   bool bIsFetching = false;
   bool bHasPendingSync = false;
   bool bStarted = false;
+  int32 ConsecutiveFailures = 0;
+  bool bPollingStopped = false;
 
   // ETag for conditional requests
   FString Etag;

@@ -20,10 +20,10 @@ namespace Gatrix.Unity.SDK
     /// </summary>
     public class FeaturesClient : IFeaturesClient
     {
-        // Storage keys
-        private const string StorageKeyFlags = "flags";
-        private const string StorageKeySession = "sessionId";
-        private const string StorageKeyEtag = "etag";
+        // Storage keys (built with CacheKeyPrefix at construction time)
+        private string StorageKeyFlags;
+        private string StorageKeySession;
+        private string StorageKeyEtag;
 
         private static readonly Variant FallbackDisabledVariant = new Variant
         {
@@ -66,6 +66,8 @@ namespace Gatrix.Unity.SDK
         private readonly int _refreshIntervalMs;
         private readonly string _connectionId;
         private string _lastContextHash = "";
+        private int _consecutiveFailures;
+        private bool _pollingStopped;
 
         // Captured Unity SynchronizationContext for thread-safe callbacks
         private readonly SynchronizationContext _syncContext;
@@ -98,6 +100,17 @@ namespace Gatrix.Unity.SDK
         // Feature-specific config shortcut
         private FeaturesConfig FeaturesConfig => _config.Features ?? new FeaturesConfig();
 
+        /// <summary>
+        /// Log detailed debug information only when devMode is enabled
+        /// </summary>
+        private void DevLog(string message)
+        {
+            if (_config.EnableDevMode)
+            {
+                _logger?.Debug($"[DEV] {message}");
+            }
+        }
+
         public FeaturesClient(GatrixEventEmitter emitter, GatrixClientConfig config, HttpClient httpClient)
         {
             _emitter = emitter;
@@ -112,6 +125,8 @@ namespace Gatrix.Unity.SDK
                 CustomHeaders = config.CustomHeaders,
                 Logger = config.Logger,
                 OfflineMode = config.OfflineMode,
+                EnableDevMode = config.EnableDevMode,
+                CacheKeyPrefix = config.CacheKeyPrefix,
                 Features = config.Features
             };
             _httpClient = httpClient;
@@ -120,6 +135,12 @@ namespace Gatrix.Unity.SDK
             // Capture the SynchronizationContext (Unity main thread)
             // This ensures polling callbacks always run on the main thread
             _syncContext = SynchronizationContext.Current;
+
+            // Initialize storage keys with prefix
+            var prefix = _config.CacheKeyPrefix ?? "gatrix_cache";
+            StorageKeyFlags = $"{prefix}_flags";
+            StorageKeySession = $"{prefix}_sessionId";
+            StorageKeyEtag = $"{prefix}_etag";
 
             // Initialize storage
             _storage = config.StorageProvider ?? new InMemoryStorageProvider();
@@ -232,6 +253,10 @@ namespace Gatrix.Unity.SDK
             if (_started) return;
             _started = true;
             _startTime = DateTime.UtcNow;
+            _consecutiveFailures = 0;
+            _pollingStopped = false;
+
+            DevLog($"start() called. offlineMode={_config.OfflineMode}, refreshIntervalMs={_refreshIntervalMs}, explicitSyncMode={FeaturesConfig.ExplicitSyncMode}");
 
             // Offline mode: use cached/bootstrap flags only
             if (_config.OfflineMode)
@@ -253,19 +278,17 @@ namespace Gatrix.Unity.SDK
                 return;
             }
 
-            // Initial fetch
+            // Initial fetch (ScheduleNextRefresh is called inside FetchFlagsAsync on completion)
             await FetchFlagsAsync();
 
             // Start metrics
             StartMetrics();
-
-            // Schedule polling
-            ScheduleNextRefresh();
         }
 
         /// <summary>Stop polling</summary>
         public void Stop()
         {
+            DevLog("stop() called");
             _pollCts?.Cancel();
             _pollCts?.Dispose();
             _pollCts = null;
@@ -276,6 +299,8 @@ namespace Gatrix.Unity.SDK
 
             _metrics.Stop();
             _started = false;
+            _pollingStopped = true;
+            _consecutiveFailures = 0;
         }
 
         /// <summary>Check if SDK is ready</summary>
@@ -1020,6 +1045,7 @@ namespace Gatrix.Unity.SDK
                 request.Headers.TryAddWithoutValidation("X-Application-Name", _config.AppName);
                 request.Headers.TryAddWithoutValidation("X-Environment", _config.Environment);
                 request.Headers.TryAddWithoutValidation("X-Connection-Id", _connectionId);
+                request.Headers.TryAddWithoutValidation("X-Gatrix-SDK", $"{GatrixClient.SdkName}:{GatrixClient.SdkVersion}");
                 if (_config.CustomHeaders != null)
                 {
                     foreach (var kvp in _config.CustomHeaders)
@@ -1113,6 +1139,8 @@ namespace Gatrix.Unity.SDK
                         }
                     }
 
+                    // Success: reset failure counter and schedule at normal interval
+                    _consecutiveFailures = 0;
                     ScheduleNextRefresh();
                     _emitter.Emit(GatrixEvents.FlagsFetchSuccess);
                 }
@@ -1124,16 +1152,33 @@ namespace Gatrix.Unity.SDK
                         _fetchedFromServer = true;
                         SetReady();
                     }
+                    // 304: reset failure counter and schedule at normal interval
+                    _consecutiveFailures = 0;
                     ScheduleNextRefresh();
                     _emitter.Emit(GatrixEvents.FlagsFetchSuccess);
                 }
                 else
                 {
-                    HandleFetchError((int)response.StatusCode);
+                    var statusCode = (int)response.StatusCode;
+                    var nonRetryable = FeaturesConfig.NonRetryableStatusCodes ?? new int[] { 401, 403 };
+                    var isNonRetryable = Array.IndexOf(nonRetryable, statusCode) >= 0;
+
+                    HandleFetchError(statusCode);
                     _emitter.Emit(GatrixEvents.FlagsFetchError,
-                        new ErrorEvent { Code = (int)response.StatusCode });
-                    // Continue polling even after HTTP errors
-                    ScheduleNextRefresh();
+                        new ErrorEvent { Code = statusCode });
+
+                    if (isNonRetryable)
+                    {
+                        // Non-retryable error: stop polling entirely
+                        _pollingStopped = true;
+                        _logger.Error($"Polling stopped due to non-retryable status code {statusCode}.");
+                    }
+                    else
+                    {
+                        // Retryable error: schedule with backoff
+                        _consecutiveFailures++;
+                        ScheduleNextRefresh();
+                    }
                 }
             }
             catch (OperationCanceledException)
@@ -1151,7 +1196,8 @@ namespace Gatrix.Unity.SDK
                     new ErrorEvent { Type = "fetch-flags", Error = e });
                 _emitter.Emit(GatrixEvents.FlagsFetchError,
                     new ErrorEvent { Error = e });
-                // Continue polling even after network errors
+                // Network error: schedule with backoff
+                _consecutiveFailures++;
                 ScheduleNextRefresh();
             }
             finally
@@ -1220,23 +1266,40 @@ namespace Gatrix.Unity.SDK
 
         private void ScheduleNextRefresh()
         {
-            if (_refreshIntervalMs <= 0 || !_started) return;
+            if (_refreshIntervalMs <= 0 || !_started || _pollingStopped) return;
 
             _pollCts?.Cancel();
             _pollCts?.Dispose();
             _pollCts = new CancellationTokenSource();
             var ct = _pollCts.Token;
 
+            int delayMs = _refreshIntervalMs;
+
+            // Apply exponential backoff on consecutive failures
+            if (_consecutiveFailures > 0)
+            {
+                var featCfg = FeaturesConfig;
+                var initialBackoff = featCfg.InitialBackoffMs;
+                var maxBackoff = featCfg.MaxBackoffMs;
+                var backoff = (int)Math.Min(
+                    initialBackoff * Math.Pow(2, _consecutiveFailures - 1),
+                    maxBackoff);
+                delayMs = backoff;
+                _logger.Warn($"Scheduling retry after {delayMs}ms (consecutive failures: {_consecutiveFailures})");
+            }
+
+            DevLog($"ScheduleNextRefresh: delay={delayMs}ms, consecutiveFailures={_consecutiveFailures}, pollingStopped={_pollingStopped}");
+
             // Use async continuation that returns to the captured SynchronizationContext
             // so that FetchFlagsAsync and all event callbacks run on the main thread.
-            _ = ScheduleRefreshAsync(ct);
+            _ = ScheduleRefreshAsync(delayMs, ct);
         }
 
-        private async ValueTask ScheduleRefreshAsync(CancellationToken ct)
+        private async ValueTask ScheduleRefreshAsync(int delayMs, CancellationToken ct)
         {
             try
             {
-                await Task.Delay(_refreshIntervalMs, ct);
+                await Task.Delay(delayMs, ct);
                 if (ct.IsCancellationRequested) return;
 
                 // Ensure we're back on the main thread for the fetch
@@ -1321,22 +1384,28 @@ namespace Gatrix.Unity.SDK
                 oldFlags.TryGetValue(kvp.Key, out var oldFlag);
                 if (oldFlag == null || oldFlag.Version != kvp.Value.Version)
                 {
+                    var changeType = oldFlag == null ? "created" : "updated";
                     if (!isInitialLoad)
                     {
                         _flagLastChangedTimes[kvp.Key] = now;
                     }
-                    _emitter.Emit(GatrixEvents.FlagChange(kvp.Key), kvp.Value, oldFlag);
+                    _emitter.Emit(GatrixEvents.FlagChange(kvp.Key), kvp.Value, oldFlag, changeType);
                 }
             }
 
-            // Check for removed flags
+            // Check for removed flags - emit bulk event, not per-flag change
+            var removedNames = new List<string>();
             foreach (var kvp in oldFlags)
             {
                 if (!newFlags.ContainsKey(kvp.Key))
                 {
+                    removedNames.Add(kvp.Key);
                     _flagLastChangedTimes[kvp.Key] = now;
-                    _emitter.Emit(GatrixEvents.FlagChange(kvp.Key), null, kvp.Value);
                 }
+            }
+            if (removedNames.Count > 0)
+            {
+                _emitter.Emit(GatrixEvents.FlagsRemoved, removedNames.ToArray());
             }
         }
 

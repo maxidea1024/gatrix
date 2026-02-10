@@ -10,7 +10,6 @@
 #include <string>
 #include <vector>
 
-
 namespace gatrix {
 
 class WatchFlagGroup;
@@ -107,7 +106,10 @@ private:
   bool _readyEventEmitted = false;
   bool _hasPendingChanges = false;
   std::string _etag;
+  std::string _connectionId;
   std::string _lastError;
+  int _consecutiveFailures = 0;
+  bool _pollingStopped = false;
 
   // Stats
   GatrixSdkStats _stats;
@@ -128,7 +130,7 @@ private:
   void trackAccess(const std::string &flagName, bool enabled,
                    const std::string &variantName);
   void trackImpression(const EvaluatedFlag &flag);
-  void schedulePolling();
+  void scheduleNextRefresh();
   void unschedulePolling();
 };
 

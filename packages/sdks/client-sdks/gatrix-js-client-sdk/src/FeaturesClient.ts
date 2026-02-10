@@ -26,6 +26,7 @@ import { WatchFlagGroup } from './WatchFlagGroup';
 import { Logger, ConsoleLogger } from './Logger';
 import { Metrics } from './Metrics';
 import { GatrixError, GatrixFeatureError } from './errors';
+import { SDK_NAME, SDK_VERSION } from './version';
 import ky, { HTTPError } from 'ky';
 
 const STORAGE_KEY_FLAGS = 'flags';
@@ -65,6 +66,7 @@ export class FeaturesClient {
   private pollingStopped: boolean = false;
   private refreshInterval: number;
   private connectionId: string;
+  private devMode: boolean;
 
   // Metrics
   private metrics: Metrics;
@@ -108,13 +110,17 @@ export class FeaturesClient {
     };
     this.connectionId = uuidv4();
 
-    // Initialize storage
+    // Initialize storage (pass cacheKeyPrefix to default providers)
+    const cachePrefix = config.cacheKeyPrefix ? `${config.cacheKeyPrefix}:` : undefined;
     this.storage =
       config.storageProvider ??
-      (typeof window !== 'undefined' ? new LocalStorageProvider() : new InMemoryStorageProvider());
+      (typeof window !== 'undefined' ? new LocalStorageProvider(cachePrefix) : new InMemoryStorageProvider());
 
     // Initialize logger
     this.logger = config.logger ?? new ConsoleLogger('GatrixFeatureClient');
+
+    // Dev mode
+    this.devMode = config.enableDevMode ?? false;
 
     // Initialize abort controller
     this.createAbortController = resolveAbortController();
@@ -217,6 +223,8 @@ export class FeaturesClient {
     this.consecutiveFailures = 0;
     this.pollingStopped = false;
 
+    this.devLog(`start() called. offlineMode=${this.config.offlineMode}, refreshInterval=${this.refreshInterval}ms, explicitSyncMode=${this.featuresConfig.explicitSyncMode}`);
+
     // Offline mode: skip all network requests, use cached/bootstrap flags only
     if (this.config.offlineMode) {
       if (this.realtimeFlags.size === 0) {
@@ -244,6 +252,7 @@ export class FeaturesClient {
    * Stop polling
    */
   stop(): void {
+    this.devLog('stop() called');
     if (this.timerRef) {
       clearTimeout(this.timerRef);
       this.timerRef = undefined;
@@ -866,6 +875,7 @@ export class FeaturesClient {
 
     this.isFetchingFlags = true;
     this.pollingStopped = false;
+    this.devLog(`fetchFlags: starting fetch. etag=${this.etag}`);
     this.emitter.emit(EVENTS.FLAGS_FETCH_START);
 
     // Cancel existing polling timer (manual call or re-entry)
@@ -1027,6 +1037,7 @@ export class FeaturesClient {
 
   private setReady(): void {
     this.readyEventEmitted = true;
+    this.devLog(`SDK ready. Total flags: ${this.realtimeFlags.size}`);
     this.emitter.emit(EVENTS.FLAGS_READY);
   }
 
@@ -1059,9 +1070,20 @@ export class FeaturesClient {
       );
     }
 
+    this.devLog(`scheduleNextRefresh: delay=${delay}ms, consecutiveFailures=${this.consecutiveFailures}, pollingStopped=${this.pollingStopped}`);
+
     this.timerRef = setTimeout(async () => {
       await this.fetchFlags();
     }, delay);
+  }
+
+  /**
+   * Log detailed debug information only when devMode is enabled
+   */
+  private devLog(message: string): void {
+    if (this.devMode) {
+      this.logger.debug(`[DEV] ${message}`);
+    }
   }
 
   private selectFlags(): Map<string, EvaluatedFlag> {
@@ -1073,6 +1095,8 @@ export class FeaturesClient {
     for (const flag of flags) {
       this.realtimeFlags.set(flag.name, flag);
     }
+
+    this.devLog(`setFlags: ${flags.length} flags loaded, forceSync=${forceSync}`);
 
     if (!this.featuresConfig.explicitSyncMode || forceSync) {
       this.synchronizedFlags = new Map(this.realtimeFlags);
@@ -1099,8 +1123,9 @@ export class FeaturesClient {
   }
 
   /**
-   * Emit flag change events using version field for comparison
-   * Emits (newFlag, oldFlag) for changes, (undefined, oldFlag) for removals
+   * Emit flag change events using version field for comparison.
+   * Per-flag change events include changeType: 'created' | 'updated'.
+   * Removed flags emit a bulk 'flags.removed' event (not per-flag change).
    */
   private emitRealtimeFlagChanges(
     oldFlags: Map<string, EvaluatedFlag>,
@@ -1114,20 +1139,25 @@ export class FeaturesClient {
     for (const [name, newFlag] of newFlags) {
       const oldFlag = oldFlags.get(name);
       if (!oldFlag || oldFlag.version !== newFlag.version) {
+        const changeType = oldFlag ? 'updated' : 'created';
         // Only record change time for actual changes, not initial load
         if (!isInitialLoad) {
           this.flagLastChangedTimes.set(name, now);
         }
-        this.emitter.emit(`flags.${name}.change`, newFlag, oldFlag);
+        this.emitter.emit(`flags.${name}.change`, newFlag, oldFlag, changeType);
       }
     }
 
-    // Check for removed flags
-    for (const [name, oldFlag] of oldFlags) {
+    // Check for removed flags - emit bulk event, not per-flag change
+    const removedNames: string[] = [];
+    for (const [name] of oldFlags) {
       if (!newFlags.has(name)) {
+        removedNames.push(name);
         this.flagLastChangedTimes.set(name, now);
-        this.emitter.emit(`flags.${name}.change`, undefined, oldFlag);
       }
+    }
+    if (removedNames.length > 0) {
+      this.emitter.emit(EVENTS.FLAGS_REMOVED, removedNames);
     }
   }
 
@@ -1195,6 +1225,7 @@ export class FeaturesClient {
       'X-Application-Name': this.config.appName,
       'X-Environment': this.config.environment,
       'X-Connection-Id': this.connectionId,
+      'X-Gatrix-SDK': `${SDK_NAME}:${SDK_VERSION}`,
       ...this.config.customHeaders,
     };
   }

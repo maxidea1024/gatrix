@@ -2,10 +2,13 @@
 
 #include "GatrixClient.h"
 #include "GatrixEvents.h"
+#include "GatrixFileStorageProvider.h"
+#include "GatrixSDKModule.h"
+#include "GatrixVersion.h"
 #include "Misc/Guid.h"
 
-const FString UGatrixClient::SdkVersion = TEXT("1.0.0");
-const FString UGatrixClient::SdkName = TEXT("gatrix-unreal-client-sdk");
+const FString UGatrixClient::SdkVersion = GATRIX_SDK_VERSION;
+const FString UGatrixClient::SdkName = GATRIX_SDK_NAME;
 
 UGatrixClient *UGatrixClient::Singleton = nullptr;
 
@@ -19,8 +22,8 @@ UGatrixClient *UGatrixClient::Get() {
 
 void UGatrixClient::Init(const FGatrixClientConfig &InConfig) {
   if (bInitialized) {
-    UE_LOG(LogTemp, Warning,
-           TEXT("[GatrixSDK] Already initialized. Call Stop() first to "
+    UE_LOG(LogGatrix, Warning,
+           TEXT("Already initialized. Call Stop() first to "
                 "re-initialize."));
     return;
   }
@@ -29,8 +32,9 @@ void UGatrixClient::Init(const FGatrixClientConfig &InConfig) {
   ClientConnectionId =
       FGuid::NewGuid().ToString(EGuidFormats::DigitsWithHyphens).ToLower();
 
-  // Create storage provider if not provided
-  StorageProvider = MakeShareable(new FGatrixInMemoryStorageProvider());
+  // Create file-based storage provider (persists flags across sessions)
+  StorageProvider =
+      MakeShareable(new FGatrixFileStorageProvider(Config.CacheKeyPrefix));
 
   // Create features client
   FeaturesClient = NewObject<UGatrixFeaturesClient>(this);
@@ -38,28 +42,26 @@ void UGatrixClient::Init(const FGatrixClientConfig &InConfig) {
 
   bInitialized = true;
 
-  UE_LOG(LogTemp, Log,
-         TEXT("[GatrixSDK] Initialized. App=%s Env=%s ConnectionId=%s"),
+  UE_LOG(LogGatrix, Log, TEXT("Initialized. App=%s Env=%s ConnectionId=%s"),
          *Config.AppName, *Config.Environment, *ClientConnectionId);
 }
 
 void UGatrixClient::Start() {
   if (!bInitialized) {
-    UE_LOG(
-        LogTemp, Error,
-        TEXT("[GatrixSDK] Cannot start - not initialized. Call Init() first."));
+    UE_LOG(LogGatrix, Error,
+           TEXT("Cannot start - not initialized. Call Init() first."));
     return;
   }
 
   if (bStarted) {
-    UE_LOG(LogTemp, Warning, TEXT("[GatrixSDK] Already started."));
+    UE_LOG(LogGatrix, Warning, TEXT("Already started."));
     return;
   }
 
   bStarted = true;
   FeaturesClient->Start();
 
-  UE_LOG(LogTemp, Log, TEXT("[GatrixSDK] Started."));
+  UE_LOG(LogGatrix, Log, TEXT("Started."));
 }
 
 void UGatrixClient::Stop() {
@@ -74,7 +76,7 @@ void UGatrixClient::Stop() {
 
   EventEmitter.RemoveAll();
 
-  UE_LOG(LogTemp, Log, TEXT("[GatrixSDK] Stopped."));
+  UE_LOG(LogGatrix, Log, TEXT("Stopped."));
 }
 
 bool UGatrixClient::IsReady() const {

@@ -7,7 +7,6 @@
 #include <string>
 #include <vector>
 
-
 namespace gatrix {
 
 // ==================== Enums ====================
@@ -90,6 +89,8 @@ struct GatrixSdkStats {
   int impressionCount = 0;
   int contextChangeCount = 0;
   int syncFlagsCount = 0;
+  int metricsSentCount = 0;
+  int metricsErrorCount = 0;
 
   // Timestamps (empty string means null)
   std::string startTime;
@@ -116,6 +117,12 @@ struct GatrixSdkStats {
 };
 
 // ==================== Config ====================
+
+struct FetchRetryOptions {
+  std::vector<int> nonRetryableStatusCodes = {401, 403};
+  int initialBackoffMs = 1000; // Initial backoff delay in ms
+  int maxBackoffMs = 60000;    // Maximum backoff delay in ms
+};
 
 struct GatrixClientConfig {
   // Required
@@ -146,6 +153,11 @@ struct GatrixClientConfig {
   bool disableMetrics = false;
   bool disableStats = false;
   bool impressionDataAll = false;
+  FetchRetryOptions fetchRetryOptions;
+
+  // Debug / Storage
+  bool enableDevMode = false;
+  std::string cacheKeyPrefix = "gatrix_cache";
 };
 
 // ==================== Error ====================

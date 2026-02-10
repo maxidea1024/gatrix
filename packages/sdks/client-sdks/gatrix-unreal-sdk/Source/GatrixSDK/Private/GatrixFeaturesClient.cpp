@@ -5,21 +5,20 @@
 #include "GatrixFeaturesClient.h"
 #include "GatrixClient.h"
 #include "GatrixEvents.h"
-
+#include "GatrixSDKModule.h"
 
 #include "Async/Async.h"
 #include "Dom/JsonObject.h"
 #include "Engine/Engine.h"
 #include "Engine/World.h"
-#include "HttpModule.h"
 #include "GenericPlatform/GenericPlatformHttp.h"
+#include "HttpModule.h"
 #include "Interfaces/IHttpRequest.h"
 #include "Interfaces/IHttpResponse.h"
 #include "Misc/Guid.h"
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
 #include "TimerManager.h"
-
 
 const FString UGatrixFeaturesClient::StorageKeyFlags = TEXT("gatrix_flags");
 const FString UGatrixFeaturesClient::StorageKeyEtag = TEXT("gatrix_etag");
@@ -56,6 +55,18 @@ void UGatrixFeaturesClient::Start() {
   if (bStarted)
     return;
   bStarted = true;
+  ConsecutiveFailures = 0;
+  bPollingStopped = false;
+
+  if (ClientConfig.bEnableDevMode) {
+    UE_LOG(LogGatrix, Log,
+           TEXT("[DEV] Start() called. offlineMode=%s, "
+                "refreshInterval=%.1f, disableRefresh=%s"),
+           ClientConfig.bOfflineMode ? TEXT("True") : TEXT("False"),
+           ClientConfig.Features.RefreshInterval,
+           ClientConfig.Features.bDisableRefresh ? TEXT("True")
+                                                 : TEXT("False"));
+  }
 
   if (ClientConfig.bOfflineMode) {
     if (RealtimeFlags.Num() == 0) {
@@ -84,7 +95,12 @@ void UGatrixFeaturesClient::Start() {
 }
 
 void UGatrixFeaturesClient::Stop() {
+  if (ClientConfig.bEnableDevMode) {
+    UE_LOG(LogGatrix, Log, TEXT("[DEV] Stop() called"));
+  }
   bStarted = false;
+  bPollingStopped = true;
+  ConsecutiveFailures = 0;
   StopPolling();
   StopMetrics();
 }
@@ -310,6 +326,12 @@ void UGatrixFeaturesClient::FetchFlags() {
     return;
 
   bIsFetching = true;
+
+  if (ClientConfig.bEnableDevMode) {
+    UE_LOG(LogGatrix, Log, TEXT("[DEV] FetchFlags: starting fetch. etag=%s"),
+           *Etag);
+  }
+
   if (EventEmitter) {
     EventEmitter->Emit(GatrixEvents::FlagsFetchStart);
   }
@@ -331,12 +353,13 @@ void UGatrixFeaturesClient::DoFetchFlags() {
   HttpRequest->SetURL(Url);
   HttpRequest->SetVerb(bUsePOST ? TEXT("POST") : TEXT("GET"));
   HttpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
-  HttpRequest->SetHeader(
-      TEXT("Authorization"),
-      FString::Printf(TEXT("Bearer %s"), *ClientConfig.ApiToken));
-  HttpRequest->SetHeader(TEXT("X-Gatrix-SDK"), UGatrixClient::SdkName);
-  HttpRequest->SetHeader(TEXT("X-Gatrix-SDK-Version"),
-                         UGatrixClient::SdkVersion);
+  HttpRequest->SetHeader(TEXT("X-API-Token"), ClientConfig.ApiToken);
+  HttpRequest->SetHeader(TEXT("X-Application-Name"), ClientConfig.AppName);
+  HttpRequest->SetHeader(TEXT("X-Environment"), ClientConfig.Environment);
+  HttpRequest->SetHeader(TEXT("X-Connection-Id"), ConnectionId);
+  HttpRequest->SetHeader(TEXT("X-Gatrix-SDK"),
+                         FString::Printf(TEXT("%s:%s"), *UGatrixClient::SdkName,
+                                         *UGatrixClient::SdkVersion));
 
   // ETag for conditional requests
   if (!Etag.IsEmpty()) {
@@ -382,6 +405,8 @@ void UGatrixFeaturesClient::DoFetchFlags() {
           OnError.Broadcast(ErrorEvent);
 
           SdkState = EGatrixSdkState::Error;
+          // Network error: schedule with backoff
+          ConsecutiveFailures++;
           ScheduleNextPoll();
           return;
         }
@@ -397,8 +422,6 @@ void UGatrixFeaturesClient::DoFetchFlags() {
         if (EventEmitter) {
           EventEmitter->Emit(GatrixEvents::FlagsFetchEnd);
         }
-
-        ScheduleNextPoll();
       });
 
   HttpRequest->ProcessRequest();
@@ -435,8 +458,7 @@ void UGatrixFeaturesClient::HandleFetchResponse(const FString &ResponseBody,
         TJsonReaderFactory<>::Create(ResponseBody);
     if (!FJsonSerializer::Deserialize(Reader, JsonObject) ||
         !JsonObject.IsValid()) {
-      UE_LOG(LogTemp, Error,
-             TEXT("[GatrixSDK] Failed to parse flags response JSON"));
+      UE_LOG(LogGatrix, Error, TEXT("Failed to parse flags response JSON"));
       if (EventEmitter) {
         EventEmitter->Emit(GatrixEvents::FlagsFetchError,
                            TEXT("JSON parse error"));
@@ -448,8 +470,7 @@ void UGatrixFeaturesClient::HandleFetchResponse(const FString &ResponseBody,
     bool bSuccess = false;
     JsonObject->TryGetBoolField(TEXT("success"), bSuccess);
     if (!bSuccess) {
-      UE_LOG(LogTemp, Warning,
-             TEXT("[GatrixSDK] Flags response success=false"));
+      UE_LOG(LogGatrix, Warning, TEXT("Flags response success=false"));
       return;
     }
 
@@ -544,6 +565,10 @@ void UGatrixFeaturesClient::HandleFetchResponse(const FString &ResponseBody,
     if (EventEmitter) {
       EventEmitter->Emit(GatrixEvents::FlagsFetchSuccess);
     }
+
+    // Success: reset failure counter and schedule at normal interval
+    ConsecutiveFailures = 0;
+    ScheduleNextPoll();
   } else if (HttpStatus == 304) {
     // Not Modified
     {
@@ -559,6 +584,10 @@ void UGatrixFeaturesClient::HandleFetchResponse(const FString &ResponseBody,
     if (EventEmitter) {
       EventEmitter->Emit(GatrixEvents::FlagsFetchSuccess);
     }
+
+    // 304: reset failure counter and schedule at normal interval
+    ConsecutiveFailures = 0;
+    ScheduleNextPoll();
   } else {
     // Error response
     SdkState = EGatrixSdkState::Error;
@@ -574,6 +603,23 @@ void UGatrixFeaturesClient::HandleFetchResponse(const FString &ResponseBody,
     ErrorEvent.Code = HttpStatus;
     ErrorEvent.Message = ErrorMsg;
     OnError.Broadcast(ErrorEvent);
+
+    // Check for non-retryable status codes
+    bool bIsNonRetryable = ClientConfig.Features.FetchRetryOptions
+                               .NonRetryableStatusCodes.Contains(HttpStatus);
+
+    if (bIsNonRetryable) {
+      // Non-retryable error: stop polling entirely
+      bPollingStopped = true;
+      UE_LOG(LogGatrix, Error,
+             TEXT("Polling stopped due to non-retryable status "
+                  "code %d"),
+             HttpStatus);
+    } else {
+      // Retryable error: schedule with backoff
+      ConsecutiveFailures++;
+      ScheduleNextPoll();
+    }
   }
 }
 
@@ -736,7 +782,7 @@ void UGatrixFeaturesClient::SetReady() {
   }
   OnReady.Broadcast();
 
-  UE_LOG(LogTemp, Log, TEXT("[GatrixSDK] Features ready. %d flags loaded."),
+  UE_LOG(LogGatrix, Log, TEXT("Features ready. %d flags loaded."),
          RealtimeFlags.Num());
 }
 
@@ -748,23 +794,28 @@ void UGatrixFeaturesClient::EmitFlagChanges(
   if (!EventEmitter)
     return;
 
-  // Detect changed flags
+  // Detect changed/created flags
   for (const auto &Pair : NewFlags) {
     const FGatrixEvaluatedFlag *OldFlag = OldFlags.Find(Pair.Key);
     if (!OldFlag || OldFlag->bEnabled != Pair.Value.bEnabled ||
         OldFlag->Variant.Name != Pair.Value.Variant.Name ||
         OldFlag->Variant.Payload != Pair.Value.Variant.Payload) {
-      // Flag changed
+      FString ChangeType = OldFlag ? TEXT("updated") : TEXT("created");
       EventEmitter->Emit(GatrixEvents::FlagChange(Pair.Key),
-                         Pair.Value.Variant.Name);
+                         Pair.Value.Variant.Name, ChangeType);
     }
   }
 
-  // Detect removed flags
+  // Detect removed flags - emit bulk event, not per-flag change
+  TArray<FString> RemovedNames;
   for (const auto &Pair : OldFlags) {
     if (!NewFlags.Contains(Pair.Key)) {
-      EventEmitter->Emit(GatrixEvents::FlagChange(Pair.Key), TEXT("removed"));
+      RemovedNames.Add(Pair.Key);
     }
+  }
+  if (RemovedNames.Num() > 0) {
+    EventEmitter->Emit(GatrixEvents::FlagsRemoved,
+                       FString::Join(RemovedNames, TEXT(",")));
   }
 }
 
@@ -821,15 +872,43 @@ void UGatrixFeaturesClient::UnwatchFlag(int32 Handle) {
 
 void UGatrixFeaturesClient::ScheduleNextPoll() {
   if (!bStarted || ClientConfig.Features.bDisableRefresh ||
-      ClientConfig.bOfflineMode) {
+      ClientConfig.bOfflineMode || bPollingStopped) {
     return;
   }
+
+  // Stop existing timer
+  StopPolling();
 
   float Interval = ClientConfig.Features.RefreshInterval;
   if (Interval <= 0.0f)
     Interval = 30.0f;
 
-  // Use engine world timer if available, otherwise use FTSTicker
+  // Apply exponential backoff on consecutive failures
+  if (ConsecutiveFailures > 0) {
+    int32 InitialBackoff =
+        ClientConfig.Features.FetchRetryOptions.InitialBackoffMs;
+    int32 MaxBackoff = ClientConfig.Features.FetchRetryOptions.MaxBackoffMs;
+    int32 BackoffMs = FMath::Min(
+        static_cast<int32>(
+            InitialBackoff *
+            FMath::Pow(2.0f, static_cast<float>(ConsecutiveFailures - 1))),
+        MaxBackoff);
+    Interval = static_cast<float>(BackoffMs) / 1000.0f;
+    UE_LOG(LogGatrix, Warning,
+           TEXT("Scheduling retry after %.1fs (consecutive "
+                "failures: %d)"),
+           Interval, ConsecutiveFailures);
+  }
+
+  if (ClientConfig.bEnableDevMode) {
+    UE_LOG(LogGatrix, Log,
+           TEXT("[DEV] ScheduleNextPoll: delay=%.1fs, "
+                "consecutiveFailures=%d, pollingStopped=%s"),
+           Interval, ConsecutiveFailures,
+           bPollingStopped ? TEXT("True") : TEXT("False"));
+  }
+
+  // Use engine world timer if available
   UWorld *World = nullptr;
   if (GEngine) {
     World = GEngine->GetWorldContexts().Num() > 0
@@ -931,19 +1010,41 @@ void UGatrixFeaturesClient::SendMetrics() {
   FString MetricsUrl =
       FString::Printf(TEXT("%s/client/metrics"), *ClientConfig.ApiUrl);
 
-  TSharedRef<IHttpRequest, ESPMode::ThreadSafe> HttpRequest =
-      FHttpModule::Get().CreateRequest();
-  HttpRequest->SetURL(MetricsUrl);
-  HttpRequest->SetVerb(TEXT("POST"));
-  HttpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
-  HttpRequest->SetHeader(
-      TEXT("Authorization"),
-      FString::Printf(TEXT("Bearer %s"), *ClientConfig.ApiToken));
-  HttpRequest->SetContentAsString(PayloadJson);
+  // Retry with a simple attempt counter via shared pointer
+  auto RetryCount = MakeShared<int32>(0);
+  const int32 MaxRetries = 2;
+
+  auto DoSendMetrics = [this, MetricsUrl, PayloadJson, RetryCount,
+                        MaxRetries]() {
+    TSharedRef<IHttpRequest, ESPMode::ThreadSafe> HttpRequest =
+        FHttpModule::Get().CreateRequest();
+    HttpRequest->SetURL(MetricsUrl);
+    HttpRequest->SetVerb(TEXT("POST"));
+    HttpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
+    HttpRequest->SetHeader(TEXT("X-API-Token"), ClientConfig.ApiToken);
+    HttpRequest->SetHeader(TEXT("X-Application-Name"), ClientConfig.AppName);
+    HttpRequest->SetHeader(TEXT("X-Connection-Id"), ConnectionId);
+    HttpRequest->SetHeader(TEXT("X-Gatrix-SDK"),
+                           FString::Printf(TEXT("%s:%s"),
+                                           *UGatrixClient::SdkName,
+                                           *UGatrixClient::SdkVersion));
+
+    // Custom headers
+    for (const auto &Header : ClientConfig.CustomHeaders) {
+      HttpRequest->SetHeader(Header.Key, Header.Value);
+    }
+
+    HttpRequest->SetContentAsString(PayloadJson);
+    return HttpRequest;
+  };
+
+  // Use a weak lambda to handle response and retry
+  TSharedRef<IHttpRequest, ESPMode::ThreadSafe> HttpRequest = DoSendMetrics();
 
   HttpRequest->OnProcessRequestComplete().BindLambda(
-      [this](FHttpRequestPtr Request, FHttpResponsePtr Response,
-             bool bWasSuccessful) {
+      [this, RetryCount, MaxRetries, DoSendMetrics](FHttpRequestPtr Request,
+                                                    FHttpResponsePtr Response,
+                                                    bool bWasSuccessful) {
         if (bWasSuccessful && Response.IsValid() &&
             Response->GetResponseCode() < 400) {
           {
@@ -954,6 +1055,27 @@ void UGatrixFeaturesClient::SendMetrics() {
             EventEmitter->Emit(GatrixEvents::FlagsMetricsSent);
           }
         } else {
+          // Retry on retryable status codes
+          int32 StatusCode =
+              Response.IsValid() ? Response->GetResponseCode() : 0;
+          bool bRetryable = !bWasSuccessful || StatusCode == 408 ||
+                            StatusCode == 429 || StatusCode >= 500;
+
+          if (bRetryable && *RetryCount < MaxRetries) {
+            (*RetryCount)++;
+            float Delay = FMath::Pow(2.0f, (float)*RetryCount);
+
+            FTimerHandle TimerHandle;
+            GetWorld()->GetTimerManager().SetTimer(
+                TimerHandle,
+                [DoSendMetrics]() {
+                  auto Req = DoSendMetrics();
+                  Req->ProcessRequest();
+                },
+                Delay, false);
+            return;
+          }
+
           {
             FScopeLock Lock(&StatsCriticalSection);
             MetricsErrorCount++;

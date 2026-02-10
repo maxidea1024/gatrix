@@ -1,12 +1,13 @@
 #include "GatrixFeaturesClient.h"
+#include "GatrixClient.h"
 #include "cocos2d.h"
 #include "network/HttpClient.h"
 #include "json/document.h"
 #include "json/stringbuffer.h"
 #include "json/writer.h"
 #include <algorithm>
+#include <cmath>
 #include <sstream>
-
 
 using namespace cocos2d;
 using namespace cocos2d::network;
@@ -18,6 +19,18 @@ namespace gatrix {
 FeaturesClient::FeaturesClient(const GatrixClientConfig &config,
                                GatrixEventEmitter &emitter)
     : _config(config), _emitter(emitter), _context(config.context) {
+  // Generate connection ID
+  auto genHex = [](int len) {
+    static const char chars[] = "0123456789abcdef";
+    std::string s;
+    s.reserve(len);
+    for (int i = 0; i < len; i++)
+      s += chars[rand() % 16];
+    return s;
+  };
+  _connectionId = genHex(8) + "-" + genHex(4) + "-" + genHex(4) + "-" +
+                  genHex(4) + "-" + genHex(12);
+
   // Set system context
   _context.properties["appName"] = _config.appName;
   _context.properties["environment"] = _config.environment;
@@ -38,6 +51,14 @@ void FeaturesClient::start() {
   if (_started)
     return;
   _started = true;
+  _consecutiveFailures = 0;
+  _pollingStopped = false;
+  if (_config.enableDevMode) {
+    CCLOG("[GatrixSDK][DEV] start() called. offlineMode=%s, "
+          "refreshInterval=%d, explicitSyncMode=%s",
+          _config.offlineMode ? "True" : "False", _config.refreshInterval,
+          _config.explicitSyncMode ? "True" : "False");
+  }
   _stats.startTime = GatrixEventEmitter::nowISO(); // Would need to make this
                                                    // public or use a utility
 
@@ -50,18 +71,21 @@ void FeaturesClient::start() {
   initFromStorage();
 
   // 3. Fetch from server (unless offline mode)
+  // scheduleNextRefresh() is called by the response callback after each fetch
   if (!_config.offlineMode) {
     fetchFlags();
-    if (!_config.disableRefresh) {
-      schedulePolling();
-    }
   }
 }
 
 void FeaturesClient::stop() {
+  if (_config.enableDevMode) {
+    CCLOG("[GatrixSDK][DEV] stop() called");
+  }
   unschedulePolling();
   _started = false;
   _sdkState = SdkState::STOPPED;
+  _pollingStopped = true;
+  _consecutiveFailures = 0;
 }
 
 // ==================== Context ====================
@@ -259,6 +283,10 @@ WatchFlagGroup *FeaturesClient::createWatchFlagGroup(const std::string &name) {
 // ==================== Network ====================
 
 void FeaturesClient::fetchFlags() {
+  if (_config.enableDevMode) {
+    CCLOG("[GatrixSDK][DEV] fetchFlags: starting fetch. etag=%s",
+          _etag.c_str());
+  }
   _emitter.emit(EVENTS::FLAGS_FETCH_START, {_etag});
   _stats.fetchFlagsCount++;
 
@@ -269,7 +297,12 @@ void FeaturesClient::fetchFlags() {
   // Headers
   std::vector<std::string> headers;
   headers.push_back("Content-Type: application/json");
-  headers.push_back("Authorization: Bearer " + _config.apiToken);
+  headers.push_back("X-API-Token: " + _config.apiToken);
+  headers.push_back("X-Application-Name: " + _config.appName);
+  headers.push_back("X-Environment: " + _config.environment);
+  headers.push_back("X-Connection-Id: " + _connectionId);
+  headers.push_back("X-Gatrix-SDK: " + std::string(SDK_NAME) + ":" +
+                    std::string(SDK_VERSION));
   if (!_etag.empty())
     headers.push_back("If-None-Match: " + _etag);
   for (const auto &[key, val] : _config.customHeaders) {
@@ -310,6 +343,9 @@ void FeaturesClient::fetchFlags() {
                                       HttpResponse *response) {
     if (!response) {
       onFetchError(-1, "No response");
+      // Network error: schedule with backoff
+      _consecutiveFailures++;
+      scheduleNextRefresh();
       return;
     }
 
@@ -335,14 +371,37 @@ void FeaturesClient::fetchFlags() {
         }
       }
       onFetchResponse(statusCode, body, newEtag);
+
+      // Success: reset failure counter and schedule at normal interval
+      _consecutiveFailures = 0;
+      scheduleNextRefresh();
     } else if (statusCode == 304) {
       _stats.notModifiedCount++;
       _emitter.emit(EVENTS::FLAGS_FETCH_END);
+
+      // 304 Not Modified: reset failure counter and schedule at normal interval
+      _consecutiveFailures = 0;
+      scheduleNextRefresh();
     } else {
+      // Check for non-retryable status codes
+      const auto &nonRetryable =
+          _config.fetchRetryOptions.nonRetryableStatusCodes;
+      bool isNonRetryable = std::find(nonRetryable.begin(), nonRetryable.end(),
+                                      statusCode) != nonRetryable.end();
+
       auto *data = response->getResponseData();
       std::string errBody =
           data ? std::string(data->begin(), data->end()) : "unknown error";
       onFetchError(statusCode, errBody);
+
+      if (isNonRetryable) {
+        // Non-retryable error: stop polling entirely
+        _pollingStopped = true;
+      } else {
+        // Retryable error: schedule with backoff
+        _consecutiveFailures++;
+        scheduleNextRefresh();
+      }
     }
   });
 
@@ -427,9 +486,23 @@ void FeaturesClient::onFetchResponse(int statusCode, const std::string &body,
     if (oldIt == _realtimeFlags.end() ||
         oldIt->second.version != flag.version) {
       changed = true;
+      std::string changeType =
+          (oldIt == _realtimeFlags.end()) ? "created" : "updated";
       _stats.flagLastChangedTimes[flag.name] = "now"; // simplified
       _emitter.emit(EVENTS::flagChange(flag.name));
     }
+  }
+
+  // Detect removed flags - emit bulk event
+  std::vector<std::string> removedNames;
+  for (const auto &pair : _realtimeFlags) {
+    if (newFlags.find(pair.first) == newFlags.end()) {
+      removedNames.push_back(pair.first);
+      changed = true;
+    }
+  }
+  if (!removedNames.empty()) {
+    _emitter.emit(EVENTS::FLAGS_REMOVED);
   }
 
   if (changed || _realtimeFlags.size() != newFlags.size()) {
@@ -577,10 +650,35 @@ void FeaturesClient::saveToStorage() {
     _storage->save("gatrix_etag", _etag);
 }
 
-void FeaturesClient::schedulePolling() {
+void FeaturesClient::scheduleNextRefresh() {
+  if (!_started || _config.disableRefresh || _pollingStopped) {
+    return;
+  }
+
+  // Cancel existing timer
+  unschedulePolling();
+
+  float delay = static_cast<float>(_config.refreshInterval);
+
+  // Apply exponential backoff on consecutive failures
+  if (_consecutiveFailures > 0) {
+    int initialBackoff = _config.fetchRetryOptions.initialBackoffMs;
+    int maxBackoff = _config.fetchRetryOptions.maxBackoffMs;
+    int backoffMs =
+        std::min(static_cast<int>(initialBackoff *
+                                  std::pow(2, _consecutiveFailures - 1)),
+                 maxBackoff);
+    delay = static_cast<float>(backoffMs) / 1000.0f;
+  }
+
+  if (_config.enableDevMode) {
+    CCLOG("[GatrixSDK][DEV] scheduleNextRefresh: delay=%.1fs, "
+          "consecutiveFailures=%d, pollingStopped=%s",
+          delay, _consecutiveFailures, _pollingStopped ? "True" : "False");
+  }
+
   Director::getInstance()->getScheduler()->schedule(
-      [this](float) { this->fetchFlags(); }, this,
-      static_cast<float>(_config.refreshInterval), CC_REPEAT_FOREVER, 0, false,
+      [this](float) { this->fetchFlags(); }, this, delay, 0, 0, false,
       "GatrixPolling");
 }
 
@@ -592,8 +690,22 @@ void FeaturesClient::unschedulePolling() {
 
 GatrixSdkStats FeaturesClient::getStats() const {
   auto stats = _stats;
+  stats.totalFlagCount = static_cast<int>(activeFlags().size());
   stats.sdkState = _sdkState;
+  stats.etag = _etag;
   stats.offlineMode = _config.offlineMode;
+  stats.missingFlags = stats.missingFlags;
+  stats.flagEnabledCounts = stats.flagEnabledCounts;
+  stats.flagVariantCounts = stats.flagVariantCounts;
+  stats.flagLastChangedTimes = stats.flagLastChangedTimes;
+
+  // Active watch groups
+  std::vector<std::string> groups;
+  for (const auto &wg : _watchGroups) {
+    if (wg->size() > 0)
+      groups.push_back(wg->getName());
+  }
+  stats.activeWatchGroups = groups;
   stats.eventHandlerStats = _emitter.getHandlerStats();
   return stats;
 }

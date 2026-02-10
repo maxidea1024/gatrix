@@ -3,8 +3,8 @@
 class_name GatrixFeaturesClient
 extends RefCounted
 
-const SDK_NAME := "gatrix-godot-sdk"
-const SDK_VERSION := "1.0.0"
+const SDK_NAME := GatrixVersion.NAME
+const SDK_VERSION := GatrixVersion.VERSION
 const STORAGE_KEY_FLAGS := "gatrix_flags"
 const STORAGE_KEY_ETAG := "gatrix_etag"
 
@@ -30,6 +30,8 @@ var _connection_id := ""
 # HTTP
 var _http_request: HTTPRequest = null
 var _metrics_http: HTTPRequest = null
+var _metrics_retry_count: int = 0
+var _metrics_pending_payload: String = ""
 
 # Timers
 var _poll_timer: Timer = null
@@ -63,10 +65,16 @@ func initialize(config: GatrixTypes.GatrixClientConfig, emitter: GatrixEventEmit
 	_stats.start_time = Time.get_unix_time_from_system()
 
 
+func _dev_log(message: String) -> void:
+	if _config.enable_dev_mode:
+		print("[GatrixSDK][DEV] %s" % message)
+
+
 func start() -> void:
 	if _started:
 		return
 	_started = true
+	_dev_log("start() called. offlineMode=%s, refreshInterval=%.1f" % [_config.offline_mode, _config.refresh_interval])
 
 	# Load from storage
 	_load_from_storage()
@@ -91,6 +99,7 @@ func start() -> void:
 func stop() -> void:
 	if not _started:
 		return
+	_dev_log("stop() called")
 	_started = false
 
 	# Stop polling
@@ -302,6 +311,10 @@ func get_stats() -> GatrixTypes.FeaturesStats:
 	_stats.sdk_state = _sdk_state
 	_stats.etag = _etag
 	_stats.offline_mode = _config.offline_mode
+	_stats.missing_flags = _stats.missing_flags.duplicate()
+	_stats.flag_enabled_counts = _stats.flag_enabled_counts.duplicate(true)
+	_stats.flag_variant_counts = _stats.flag_variant_counts.duplicate(true)
+	_stats.flag_last_changed_times = _stats.flag_last_changed_times.duplicate()
 	var result := _stats
 	_mutex.unlock()
 	return result
@@ -373,12 +386,12 @@ func _do_fetch_flags() -> void:
 
 	# Set headers
 	var headers: PackedStringArray = [
-		"Authorization: Bearer %s" % _config.api_token,
+		"X-API-Token: %s" % _config.api_token,
 		"Accept: application/json",
-		"Gatrix-Connection-Id: %s" % _connection_id,
-		"Gatrix-Sdk-Name: %s" % SDK_NAME,
-		"Gatrix-Sdk-Version: %s" % SDK_VERSION,
-		"Gatrix-App-Name: %s" % _config.app_name,
+		"X-Application-Name: %s" % _config.app_name,
+		"X-Environment: %s" % _config.environment,
+		"X-Connection-Id: %s" % _connection_id,
+		"X-Gatrix-SDK: %s:%s" % [SDK_NAME, SDK_VERSION],
 	]
 
 	if _etag != "":
@@ -581,11 +594,12 @@ func _emit_flag_changes(old_flags: Dictionary, new_flags: Dictionary) -> void:
 			changed = true
 
 		if changed:
+			var change_type := "created" if old_flag == null else "updated"
 			_stats.flag_last_changed_times[flag_name] = Time.get_unix_time_from_system()
 
-			# Per-flag change event
+			# Per-flag change event (created/updated only)
 			_emitter.emit_event(GatrixEvents.flag_change_event(flag_name),
-					[new_flag, old_flag])
+					[new_flag, old_flag, change_type])
 
 			# Notify watch handlers
 			var proxy := GatrixFlagProxy.new(new_flag)
@@ -593,6 +607,14 @@ func _emit_flag_changes(old_flags: Dictionary, new_flags: Dictionary) -> void:
 				var watcher = _watch_handles[handle]
 				if watcher.flag_name == flag_name:
 					watcher.callback.call(proxy)
+
+	# Detect removed flags - emit bulk event
+	var removed_names: Array[String] = []
+	for flag_name in old_flags:
+		if not new_flags.has(flag_name):
+			removed_names.append(flag_name)
+	if removed_names.size() > 0:
+		_emitter.emit_event(GatrixEvents.FLAGS_REMOVED, [removed_names])
 
 
 func _set_ready() -> void:
@@ -754,6 +776,12 @@ func _send_metrics() -> void:
 	if payload == "":
 		return
 
+	_metrics_retry_count = 0
+	_metrics_pending_payload = payload
+	_do_send_metrics(payload)
+
+
+func _do_send_metrics(payload: String) -> void:
 	if _metrics_http == null:
 		_metrics_http = HTTPRequest.new()
 		_metrics_http.timeout = 10.0
@@ -766,12 +794,15 @@ func _send_metrics() -> void:
 	]
 
 	var headers: PackedStringArray = [
-		"Authorization: Bearer %s" % _config.api_token,
+		"X-API-Token: %s" % _config.api_token,
 		"Content-Type: application/json",
-		"Gatrix-Connection-Id: %s" % _connection_id,
-		"Gatrix-Sdk-Name: %s" % SDK_NAME,
-		"Gatrix-Sdk-Version: %s" % SDK_VERSION,
+		"X-Application-Name: %s" % _config.app_name,
+		"X-Connection-Id: %s" % _connection_id,
+		"X-Gatrix-SDK: %s:%s" % [SDK_NAME, SDK_VERSION],
 	]
+
+	for key in _config.custom_headers:
+		headers.append("%s: %s" % [key, _config.custom_headers[key]])
 
 	if _metrics_http.request_completed.get_connections().size() > 0:
 		for conn in _metrics_http.request_completed.get_connections():
@@ -787,6 +818,16 @@ func _on_metrics_completed(result: int, response_code: int, _headers: PackedStri
 		_stats.metrics_sent_count += 1
 		_emitter.emit_event(GatrixEvents.FLAGS_METRICS_SENT, [{ "count": 1 }])
 	else:
+		# Retry on retryable status codes
+		var retryable := result != HTTPRequest.RESULT_SUCCESS or \
+			response_code == 408 or response_code == 429 or response_code >= 500
+		if retryable and _metrics_retry_count < 2:
+			_metrics_retry_count += 1
+			var delay := pow(2.0, _metrics_retry_count)
+			await _scene_tree.create_timer(delay).timeout
+			_do_send_metrics(_metrics_pending_payload)
+			return
+
 		_stats.metrics_error_count += 1
 		push_warning("[GatrixSDK] Metrics send failed (result=%d, status=%d)" % [result, response_code])
 

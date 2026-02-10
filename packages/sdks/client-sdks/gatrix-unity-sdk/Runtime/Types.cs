@@ -161,6 +161,15 @@ namespace Gatrix.Unity.SDK
 
         /// <summary>Request timeout in seconds (default: 30)</summary>
         public int FetchTimeout { get; set; } = 30;
+
+        /// <summary>HTTP status codes that should stop polling entirely (default: 401, 403)</summary>
+        public int[] NonRetryableStatusCodes { get; set; } = new int[] { 401, 403 };
+
+        /// <summary>Initial backoff delay in ms for retries (default: 1000)</summary>
+        public int InitialBackoffMs { get; set; } = 1000;
+
+        /// <summary>Maximum backoff delay in ms for retries (default: 60000)</summary>
+        public int MaxBackoffMs { get; set; } = 60000;
     }
 
     /// <summary>
@@ -200,6 +209,12 @@ namespace Gatrix.Unity.SDK
 
         /// <summary>Start in offline mode (no network requests, use cached/bootstrap flags)</summary>
         public bool OfflineMode { get; set; }
+
+        /// <summary>Enable dev mode for detailed debug logging (default: false)</summary>
+        public bool EnableDevMode { get; set; }
+
+        /// <summary>Cache key prefix for storage keys (default: "gatrix_cache")</summary>
+        public string CacheKeyPrefix { get; set; } = "gatrix_cache";
 
         /// <summary>Feature flags configuration</summary>
         public FeaturesConfig Features { get; set; }

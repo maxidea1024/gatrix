@@ -6,6 +6,9 @@
 #include "CoreMinimal.h"
 #include "Modules/ModuleManager.h"
 
+/** Gatrix SDK log category */
+DECLARE_LOG_CATEGORY_EXTERN(LogGatrix, Log, All);
+
 class FGatrixSDKModule : public IModuleInterface {
 public:
   virtual void StartupModule() override;

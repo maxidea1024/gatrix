@@ -171,8 +171,127 @@ interface GatrixClientConfig {
   disableMetrics?: boolean; // Disable server-side metrics collection
   disableStats?: boolean; // Disable local statistics tracking (default: false)
   impressionDataAll?: boolean; // Track impressions for all flags
+
+  // Optional - Debug
+  enableDevMode?: boolean; // Enable detailed debug logging (default: false)
+
+  // Optional - Storage
+  cacheKeyPrefix?: string; // Prefix for cache storage keys (default: "gatrix_cache")
+
+  // Optional - Fetch Retry Options
+  fetchRetryOptions?: FetchRetryOptions; // Configure retry/backoff behavior
+}
+
+interface FetchRetryOptions {
+  nonRetryableStatusCodes?: number[]; // HTTP status codes that stop polling (default: [401, 403])
+  initialBackoffMs?: number; // Initial backoff delay in ms (default: 1000)
+  maxBackoffMs?: number; // Maximum backoff delay in ms (default: 60000)
 }
 ```
+
+### Fetch Retry & Backoff Behavior
+
+All client SDKs implement a **schedule-after-completion** pattern for polling:
+
+1. **Normal polling**: After a successful fetch (200) or not-modified response (304), the SDK schedules the next fetch after `refreshInterval` seconds.
+2. **Retryable errors**: On HTTP errors not in `nonRetryableStatusCodes` or network errors, the SDK increments a `consecutiveFailures` counter and schedules the next fetch with exponential backoff: `min(initialBackoffMs * 2^(failures-1), maxBackoffMs)`.
+3. **Non-retryable errors**: On HTTP status codes listed in `nonRetryableStatusCodes` (default: 401, 403), polling is stopped entirely. Call `fetchFlags()` manually to resume.
+4. **Recovery**: On any successful response after errors, `consecutiveFailures` is reset to 0 and normal polling resumes.
+5. **Manual fetchFlags()**: Calling `fetchFlags()` manually resets `pollingStopped` and cancels any pending timer, allowing recovery from non-retryable errors.
+6. **start()/stop()**: `start()` resets `consecutiveFailures` and `pollingStopped`. `stop()` sets `pollingStopped = true` and resets `consecutiveFailures`.
+
+### HTTP Headers
+
+All client SDKs MUST include the following standard headers on every HTTP request. This ensures consistent authentication, identification, and traceability across all platforms.
+
+#### Common Headers (fetchFlags + sendMetrics)
+
+| Header | Value | Description |
+|--------|-------|-------------|
+| `X-API-Token` | `{apiToken}` | Client API token for authentication |
+| `X-Application-Name` | `{appName}` | Application name from config |
+| `X-Connection-Id` | `{connectionId}` | Unique connection identifier (UUID, generated once per SDK instance) |
+| `X-Gatrix-SDK` | `{sdkName}:{sdkVersion}` | SDK identification string (e.g., `gatrix-js-client-sdk:1.0.0`) |
+| `Content-Type` | `application/json` | Required for POST requests |
+| `...customHeaders` | User-defined | Spread/merged from `config.customHeaders` |
+
+#### fetchFlags-Only Headers
+
+| Header | Value | Description |
+|--------|-------|-------------|
+| `X-Environment` | `{environment}` | Environment name from config |
+| `If-None-Match` | `{etag}` | ETag from previous response (only when etag exists, enables 304 Not Modified) |
+
+#### X-Gatrix-SDK Format
+
+The `X-Gatrix-SDK` header combines SDK name and version in a single value using the format `{sdkName}:{sdkVersion}`.
+
+Standard SDK names:
+- `@gatrix/js-client-sdk` (JavaScript)
+- `gatrix-unity-client-sdk` (Unity)
+- `gatrix-unreal-client-sdk` (Unreal Engine)
+- `gatrix-cocos2dx-client-sdk` (Cocos2d-x)
+- `gatrix-flutter-client-sdk` (Flutter)
+- `gatrix-godot-client-sdk` (Godot)
+
+#### Authentication Note
+
+All SDKs use `X-API-Token` as the primary authentication header. The server also accepts `Authorization: Bearer {token}` as a fallback, but SDKs SHOULD prefer `X-API-Token` for consistency.
+
+### Metrics Retry Behavior
+
+All client SDKs implement retry logic for `sendMetrics` requests:
+
+1. **Max retries**: Up to 2 retry attempts after the initial failure.
+2. **Retryable conditions**: Network errors, HTTP 408 (Timeout), 429 (Too Many Requests), or 5xx (Server Error).
+3. **Backoff**: Exponential backoff with delay = `2^attempt` seconds (2s, 4s).
+4. **Non-retryable**: HTTP 4xx errors (except 408, 429) are not retried.
+5. **On final failure**: Emit `FLAGS_METRICS_ERROR` event and increment error counter.
+
+### Dev Mode Logging
+
+When `enableDevMode` is set to `true`, the SDK outputs detailed debug logs at key lifecycle points:
+
+- **start()**: Logs configuration values (offlineMode, refreshInterval, explicitSyncMode, disableRefresh)
+- **stop()**: Logs that stop was called
+- **fetchFlags()**: Logs fetch initiation with current etag
+- **scheduleNextRefresh()**: Logs scheduled delay, consecutive failures count, and polling stopped state
+- **setFlags()**: Logs number of flags loaded and sync mode
+- **setReady()**: Logs total flag count when SDK becomes ready
+- **initFromStorage()**: Logs number of cached flags loaded
+
+All dev mode log messages are prefixed with `[DEV]` for easy filtering. By default, `enableDevMode` is `false` and no debug logs are emitted.
+
+### Cache Key Prefix
+
+The `cacheKeyPrefix` option (default: `"gatrix_cache"`) allows customization of the prefix used for all storage keys. This is useful when multiple SDK instances share the same storage space (e.g., multiple app environments).
+
+- **JS SDK**: Used in localStorage key names (e.g., `gatrix_cache_flags`, `gatrix_cache_etag`)
+- **Flutter SDK**: Used in SharedPreferences key names
+- **Unity SDK**: Used in storage provider key names
+- **Unreal SDK**: Used as file name prefix in file-based storage
+- **Cocos2d-x SDK**: Available in config for custom storage implementations
+- **Godot SDK**: Available in config for storage key customization
+
+### Unreal SDK Specifics
+
+#### Log Category
+
+The Unreal SDK declares a dedicated log category `LogGatrix` for all log output. Use this in the Output Log filter to isolate Gatrix SDK messages:
+
+```
+LogGatrix: Log: Features ready. 12 flags loaded.
+LogGatrix: Log: [DEV] Start() called. offlineMode=False, refreshInterval=30.0, disableRefresh=False
+```
+
+#### File-Based Caching
+
+The Unreal SDK uses `FGatrixFileStorageProvider` by default, which persists flag data as JSON files in `{ProjectSaved}/Gatrix/`. Files are named using the pattern `{cacheKeyPrefix}_{key}.json`. This provides:
+
+- **Persistent storage** across game sessions
+- **Thread-safe** access via `FCriticalSection`
+- **Automatic directory creation** on first use
+- **Safe filename sanitization** for keys containing special characters
 
 ## Context Interface
 
@@ -200,11 +319,30 @@ All events use the `flags.*` prefix for namespacing:
 | `flags.fetch_error`       | Error occurred during fetching                       | `{ status?: number, error?: Error }` |
 | `flags.fetch_end`         | Completed fetching flags (success or error)          | -                                    |
 | `flags.change`            | Flags changed from server                            | `{ flags: EvaluatedFlag[] }`         |
+| `flags.removed`           | One or more flags removed from server                | `string[]` (removed flag names)      |
 | `flags.error`             | General SDK error occurred                           | `{ type: string, error: Error }`     |
 | `flags.recovered`         | SDK recovered from error state                       | -                                    |
 | `flags.impression`        | Flag accessed (if impressionData enabled)            | `ImpressionEvent`                    |
-| `flags.{flagName}.change` | Specific flag changed                                | `FlagProxy`                          |
+| `flags.{flagName}.change` | Specific flag created or updated                     | `(newFlag, oldFlag, changeType)` where changeType is `'created'` or `'updated'` |
 | `flags.metrics.sent`      | Metrics successfully sent to server                  | `{ count: number }`                  |
+
+### Per-Flag Change Events (`flags.{flagName}.change`)
+
+Per-flag change events are emitted when a flag is **created** (new flag) or **updated** (existing flag value changed). Each event includes a `changeType` parameter:
+
+- `'created'`: The flag is new and did not exist in the previous fetch
+- `'updated'`: The flag existed before but its value, enabled state, or variant changed
+
+**Flag removals are NOT emitted as per-flag change events.** Instead, a bulk `flags.removed` event is emitted with an array of removed flag names.
+
+### watchFlag Behavior
+
+`watchFlag(flagName, callback)` subscribes to `flags.{flagName}.change` events only. This means:
+
+- ✅ **Reacts to**: Flag created (`changeType: 'created'`), Flag updated (`changeType: 'updated'`)
+- ❌ **Does NOT react to**: Flag removal — use `on('flags.removed', callback)` to handle removals separately
+
+This design prevents ambiguous callback behavior when a watched flag is removed from the server.
 
 ## Main Interface
 
