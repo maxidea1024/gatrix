@@ -95,13 +95,13 @@ function updateCacheSizeMetrics(): void {
     ?.labels('total')
     .set(
       versionsCount +
-        bannersCount +
-        noticesCount +
-        worldsCount +
-        surveysCount +
-        popupNoticesCount +
-        storeProductsCount +
-        whitelistsCount
+      bannersCount +
+      noticesCount +
+      worldsCount +
+      surveysCount +
+      popupNoticesCount +
+      storeProductsCount +
+      whitelistsCount
     );
 }
 
@@ -1330,13 +1330,14 @@ router.post(
     try {
       const { environment, applicationName } = req.clientContext!;
       const { bucket } = req.body;
+      const sdkVersion = (req.headers['x-sdk-version'] as string) || req.body.sdkVersion;
 
       if (!bucket) {
         return res.status(400).json({ success: false, error: 'bucket is required' });
       }
 
       // Add to aggregator for buffering
-      metricsAggregator.addClientMetrics(environment, applicationName, bucket);
+      metricsAggregator.addClientMetrics(environment, applicationName, bucket, sdkVersion);
 
       // Return success immediately (fire and forget from client perspective)
       res.json({ success: true, buffered: true });

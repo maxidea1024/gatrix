@@ -26,6 +26,7 @@ interface MetricsJobPayload {
   metrics: AggregatedMetric[];
   reportedAt: string;
   bucketStart?: string; // Start of metrics collection window for accurate hourBucket
+  sdkVersion?: string;
 }
 
 class FeatureMetricsService {
@@ -70,7 +71,8 @@ class FeatureMetricsService {
     metrics: AggregatedMetric[],
     timestamp?: string,
     appName?: string,
-    bucketStart?: string
+    bucketStart?: string,
+    sdkVersion?: string
   ): Promise<void> {
     if (!metrics || metrics.length === 0) {
       return;
@@ -84,7 +86,8 @@ class FeatureMetricsService {
       appName,
       metrics,
       reportedAt,
-      bucketStart, // Pass bucket start time for accurate hourBucket calculation
+      bucketStart,
+      sdkVersion,
     } as MetricsJobPayload);
 
     logger.debug('Feature metrics queued for processing', {
@@ -101,7 +104,7 @@ class FeatureMetricsService {
   private async processMetricsJob(
     job: Job<{ type: string; payload: MetricsJobPayload; timestamp: number }>
   ): Promise<void> {
-    const { environment, appName, metrics, reportedAt, bucketStart } = job.data.payload;
+    const { environment, appName, metrics, reportedAt, bucketStart, sdkVersion } = job.data.payload;
 
     // Use bucketStart for more accurate hourBucket calculation (bucket window start)
     // Fallback to reportedAt for backward compatibility
@@ -115,7 +118,7 @@ class FeatureMetricsService {
 
       // Batch upsert metrics
       for (const metric of metrics) {
-        await this.upsertMetric(environment, appName, metric, hourBucket);
+        await this.upsertMetric(environment, appName, sdkVersion, metric, hourBucket);
         uniqueFlagNames.add(metric.flagName);
       }
 
@@ -155,6 +158,7 @@ class FeatureMetricsService {
   private async upsertMetric(
     environment: string,
     appName: string | undefined,
+    sdkVersion: string | undefined,
     metric: AggregatedMetric,
     hourBucket: Date
   ): Promise<void> {
@@ -167,11 +171,11 @@ class FeatureMetricsService {
     const yesIncrement = enabled ? count : 0;
     const noIncrement = enabled ? 0 : count;
 
-    // Upsert main metrics (yesCount, noCount) with appName
+    // Upsert main metrics (yesCount, noCount) with appName and sdkVersion
     await db.raw(
       `
-            INSERT INTO g_feature_metrics (id, environment, appName, flagName, metricsBucket, yesCount, noCount, createdAt)
-            VALUES (?, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP())
+            INSERT INTO g_feature_metrics (id, environment, appName, sdkVersion, flagName, metricsBucket, yesCount, noCount, createdAt)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP())
             ON DUPLICATE KEY UPDATE 
                 yesCount = yesCount + VALUES(yesCount), 
                 noCount = noCount + VALUES(noCount)
@@ -180,6 +184,7 @@ class FeatureMetricsService {
         require('ulid').ulid(),
         environment,
         appName || null,
+        sdkVersion || null,
         flagName,
         bucketDateTime,
         yesIncrement,
@@ -187,12 +192,12 @@ class FeatureMetricsService {
       ]
     );
 
-    // If there's a variant, upsert to variant metrics table with appName
+    // If there's a variant, upsert to variant metrics table with appName and sdkVersion
     if (variantName) {
       await db.raw(
         `
-                INSERT INTO g_feature_variant_metrics (id, environment, appName, flagName, metricsBucket, variantName, count, createdAt)
-                VALUES (?, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP())
+                INSERT INTO g_feature_variant_metrics (id, environment, appName, sdkVersion, flagName, metricsBucket, variantName, count, createdAt)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP())
                 ON DUPLICATE KEY UPDATE 
                     count = count + VALUES(count)
             `,
@@ -200,6 +205,7 @@ class FeatureMetricsService {
           require('ulid').ulid(),
           environment,
           appName || null,
+          sdkVersion || null,
           flagName,
           bucketDateTime,
           variantName,

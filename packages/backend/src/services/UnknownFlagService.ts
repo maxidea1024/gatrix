@@ -84,12 +84,12 @@ export class UnknownFlagService {
       .where({
         flagName: input.flagName,
         environment: input.environment,
+        appName: input.appName || null,
+        sdkVersion: input.sdkVersion || null,
       })
       .update({
         accessCount: db.raw(`accessCount + ${count}`),
         lastReportedAt: db.raw('UTC_TIMESTAMP()'),
-        appName: input.appName || db.raw('appName'),
-        sdkVersion: input.sdkVersion || db.raw('sdkVersion'),
       });
 
     if (updated === 0) {
@@ -186,12 +186,12 @@ export class UnknownFlagService {
       .where({
         flagName: data.flagName,
         environment: data.environment,
+        appName: data.appName,
+        sdkVersion: data.sdkVersion,
       })
       .update({
         accessCount: db.raw(`accessCount + ${data.count}`),
         lastReportedAt: db.raw('UTC_TIMESTAMP()'),
-        appName: data.appName || db.raw('appName'),
-        sdkVersion: data.sdkVersion || db.raw('sdkVersion'),
       });
 
     if (updated === 0) {

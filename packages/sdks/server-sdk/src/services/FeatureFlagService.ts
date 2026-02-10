@@ -27,6 +27,7 @@ import {
 import { FeatureFlagError, FeatureFlagErrorCode } from '../utils/errors';
 import { FeatureFlagEvaluator } from '../utils/FeatureFlagEvaluator';
 import murmurhash from 'murmurhash';
+import { SDK_VERSION } from '../version';
 
 export class FeatureFlagService {
   private apiClient: ApiClient;
@@ -1284,15 +1285,24 @@ export class FeatureFlagService {
 
         // Send aggregated metrics to backend (per environment) with time window
         const bucketStop = new Date();
-        await this.apiClient.post(`/api/v1/server/${environment}/features/metrics`, {
-          metrics: aggregatedMetrics,
-          bucket: {
-            start: this.metricsBucketStartTime.toISOString(),
-            stop: bucketStop.toISOString(),
+        await this.apiClient.post(
+          `/api/v1/server/${environment}/features/metrics`,
+          {
+            metrics: aggregatedMetrics,
+            bucket: {
+              start: this.metricsBucketStartTime.toISOString(),
+              stop: bucketStop.toISOString(),
+            },
+            // Legacy field for backward compatibility
+            timestamp: bucketStop.toISOString(),
+            sdkVersion: SDK_VERSION, // Also send in body for robustness
           },
-          // Legacy field for backward compatibility
-          timestamp: bucketStop.toISOString(),
-        });
+          {
+            headers: {
+              'X-SDK-Version': SDK_VERSION,
+            },
+          }
+        );
       }
 
       // Reset bucket start time for next window

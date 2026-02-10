@@ -746,18 +746,21 @@ export class ClientController {
 
     // Process using service (which adds to queue)
     const { featureMetricsService } = await import('../services/FeatureMetricsService');
+    const sdkVersion = (req.headers['x-sdk-version'] as string) || req.body.sdkVersion;
+
     await featureMetricsService.processAggregatedMetrics(
       environment!,
       aggregatedMetrics,
       bucket.stop,
       appName || req.body.appName,
-      bucket.start
+      bucket.start,
+      sdkVersion
     );
 
     // Handle missing flags (unknown flag reporting)
     if (bucket.missing && Object.keys(bucket.missing).length > 0) {
       const { unknownFlagService } = await import('../services/UnknownFlagService');
-      const sdkVersion = req.headers['x-sdk-version'] as string | undefined;
+      const sdkVersion = (req.headers['x-sdk-version'] as string) || req.body.sdkVersion;
 
       for (const [flagName, count] of Object.entries(bucket.missing as any)) {
         await unknownFlagService.reportUnknownFlag({

@@ -58,6 +58,7 @@ interface MetricsPayload {
   };
   appName: string;
   instanceId: string;
+  sdkVersion?: string;
 }
 
 export class Metrics {
@@ -236,6 +237,7 @@ export class Metrics {
       bucket,
       appName: this.appName,
       instanceId: this.connectionId,
+      sdkVersion: `${SDK_NAME}/${SDK_VERSION}`,
     };
   }
 

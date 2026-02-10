@@ -98,13 +98,14 @@ router.post('/:env/features/metrics', serverAuth, async (req: Request, res: Resp
   try {
     const env = req.params.env;
     const appName = (req.headers['x-application-name'] as string) || 'unknown';
+    const sdkVersion = req.headers['x-sdk-version'] as string | undefined;
     const { metrics } = req.body;
 
     if (!Array.isArray(metrics)) {
       return res.status(400).json({ success: false, error: 'metrics must be an array' });
     }
 
-    metricsAggregator.addServerMetrics(env, appName, metrics);
+    metricsAggregator.addServerMetrics(env, appName, metrics, sdkVersion);
     res.json({ success: true, buffered: true });
   } catch (error) {
     logger.error('Error buffering server metrics:', error);
@@ -120,13 +121,14 @@ router.post('/:env/features/unknown', serverAuth, async (req: Request, res: Resp
   try {
     const env = req.params.env;
     const appName = (req.headers['x-application-name'] as string) || 'unknown';
+    const sdkVersion = req.headers['x-sdk-version'] as string | undefined;
     const { flagName, count = 1 } = req.body;
 
     if (!flagName) {
       return res.status(400).json({ success: false, error: 'flagName is required' });
     }
 
-    metricsAggregator.addServerUnknownReport(env, appName, flagName, count);
+    metricsAggregator.addServerUnknownReport(env, appName, flagName, count, sdkVersion);
     res.json({ success: true, buffered: true });
   } catch (error) {
     logger.error('Error buffering server unknown flag report:', error);

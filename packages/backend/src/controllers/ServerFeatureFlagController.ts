@@ -70,7 +70,7 @@ export default class ServerFeatureFlagController {
 
       // Record network traffic (fire-and-forget)
       const appName = (req.headers['x-application-name'] as string) || 'unknown';
-      networkTrafficService.recordTraffic(environment, appName, 'features').catch(() => {});
+      networkTrafficService.recordTraffic(environment, appName, 'features').catch(() => { });
 
       // Get all enabled, non-archived flags for this environment
       const result = await FeatureFlagModel.findAll({
@@ -243,7 +243,7 @@ export default class ServerFeatureFlagController {
       // Record network traffic (fire-and-forget)
       const appName = (req.headers['x-application-name'] as string) || 'unknown';
       const environment = req.params.env || 'global';
-      networkTrafficService.recordTraffic(environment, appName, 'segments').catch(() => {});
+      networkTrafficService.recordTraffic(environment, appName, 'segments').catch(() => { });
 
       const rawSegments = await FeatureSegmentModel.findAll();
 
@@ -284,6 +284,7 @@ export default class ServerFeatureFlagController {
       const reportedAt = bucket?.stop || timestamp;
       // bucket.start is used for more accurate hourBucket calculation
       const bucketStart = bucket?.start;
+      const sdkVersion = (req.headers['x-sdk-version'] as string) || req.body.sdkVersion;
 
       // Process aggregated metrics via queue with appName and bucket info
       await featureMetricsService.processAggregatedMetrics(
@@ -291,7 +292,8 @@ export default class ServerFeatureFlagController {
         metrics,
         reportedAt,
         appName,
-        bucketStart
+        bucketStart,
+        sdkVersion
       );
 
       res.json({ success: true });
@@ -309,8 +311,8 @@ export default class ServerFeatureFlagController {
     try {
       const { flagName } = req.body;
       const environment = req.params.env || 'production';
-      const appName = req.headers['x-application-name'] as string | undefined;
-      const sdkVersion = req.headers['x-sdk-version'] as string | undefined;
+      const appName = (req.headers['x-application-name'] as string) || req.body.appName;
+      const sdkVersion = (req.headers['x-sdk-version'] as string) || req.body.sdkVersion;
 
       if (!flagName || typeof flagName !== 'string') {
         res.status(400).json({ success: false, error: 'flagName is required' });

@@ -7,6 +7,7 @@ interface ClientMetricBucket {
   stop: Date;
   flags: Record<string, { yes: number; no: number; variants: Record<string, number> }>;
   missing: Record<string, number>;
+  sdkVersion?: string;
 }
 
 interface ServerMetric {
@@ -16,6 +17,16 @@ interface ServerMetric {
   count: number;
 }
 
+interface ServerMetricBuffer {
+  metrics: Map<string, ServerMetric>;
+  sdkVersion?: string;
+}
+
+interface ServerUnknownBuffer {
+  flags: Map<string, number>;
+  sdkVersion?: string;
+}
+
 /**
  * MetricsAggregator - Buffers and aggregates metrics from SDKs before flushing to backend.
  * Reduces backend load by collapsing high-frequency requests from multiple SDK instances.
@@ -23,8 +34,8 @@ interface ServerMetric {
 class MetricsAggregator {
   // Key: environment:appName
   private clientBuffers: Map<string, ClientMetricBucket> = new Map();
-  private serverBuffers: Map<string, Map<string, ServerMetric>> = new Map();
-  private serverUnknownBuffers: Map<string, Map<string, number>> = new Map(); // Key: env:app, Val: Map<flagName, count>
+  private serverBuffers: Map<string, ServerMetricBuffer> = new Map();
+  private serverUnknownBuffers: Map<string, ServerUnknownBuffer> = new Map();
 
   private flushTimer: NodeJS.Timeout | null = null;
   private readonly FLUSH_INTERVAL_MS = 30000; // 30 seconds
@@ -36,7 +47,7 @@ class MetricsAggregator {
   /**
    * Add Client SDK metrics to buffer
    */
-  addClientMetrics(environment: string, appName: string, bucket: any): void {
+  addClientMetrics(environment: string, appName: string, bucket: any, sdkVersion?: string): void {
     const key = `${environment}:${appName}`;
     let buffer = this.clientBuffers.get(key);
 
@@ -46,8 +57,14 @@ class MetricsAggregator {
         stop: new Date(bucket.stop || Date.now()),
         flags: {},
         missing: {},
+        sdkVersion,
       };
       this.clientBuffers.set(key, buffer);
+    }
+
+    // Update sdkVersion if provided (latest wins)
+    if (sdkVersion) {
+      buffer.sdkVersion = sdkVersion;
     }
 
     // Update stop time to the latest
@@ -88,23 +105,35 @@ class MetricsAggregator {
   /**
    * Add Server SDK metrics to buffer
    */
-  addServerMetrics(environment: string, appName: string, metrics: ServerMetric[]): void {
+  addServerMetrics(
+    environment: string,
+    appName: string,
+    metrics: ServerMetric[],
+    sdkVersion?: string
+  ): void {
     const key = `${environment}:${appName}`;
     let buffer = this.serverBuffers.get(key);
 
     if (!buffer) {
-      buffer = new Map();
+      buffer = {
+        metrics: new Map(),
+        sdkVersion,
+      };
       this.serverBuffers.set(key, buffer);
+    }
+
+    if (sdkVersion) {
+      buffer.sdkVersion = sdkVersion;
     }
 
     for (const metric of metrics) {
       const metricKey = `${metric.flagName}:${metric.enabled}:${metric.variantName || ''}`;
-      const existing = buffer.get(metricKey);
+      const existing = buffer.metrics.get(metricKey);
 
       if (existing) {
         existing.count += metric.count;
       } else {
-        buffer.set(metricKey, { ...metric });
+        buffer.metrics.set(metricKey, { ...metric });
       }
     }
   }
@@ -116,18 +145,26 @@ class MetricsAggregator {
     environment: string,
     appName: string,
     flagName: string,
-    count: number = 1
+    count: number = 1,
+    sdkVersion?: string
   ): void {
     const key = `${environment}:${appName}`;
     let buffer = this.serverUnknownBuffers.get(key);
 
     if (!buffer) {
-      buffer = new Map();
+      buffer = {
+        flags: new Map(),
+        sdkVersion,
+      };
       this.serverUnknownBuffers.set(key, buffer);
     }
 
-    const currentCount = buffer.get(flagName) || 0;
-    buffer.set(flagName, currentCount + count);
+    if (sdkVersion) {
+      buffer.sdkVersion = sdkVersion;
+    }
+
+    const currentCount = buffer.flags.get(flagName) || 0;
+    buffer.flags.set(flagName, currentCount + count);
   }
 
   /**
@@ -167,6 +204,7 @@ class MetricsAggregator {
           `${config.gatrixUrl}/api/v1/client/features/${environment}/metrics`,
           {
             appName,
+            sdkVersion: buffer.sdkVersion,
             bucket: {
               start: buffer.start.toISOString(),
               stop: buffer.stop.toISOString(),
@@ -178,6 +216,7 @@ class MetricsAggregator {
             headers: {
               'x-api-token': config.apiToken,
               'x-application-name': config.applicationName,
+              ...(buffer.sdkVersion && { 'x-sdk-version': buffer.sdkVersion }),
             },
             timeout: 10000,
           }
@@ -188,9 +227,9 @@ class MetricsAggregator {
     });
 
     // Process Server Metrics
-    const serverPromises = serverJobs.map(async ([key, bufferMap]) => {
+    const serverPromises = serverJobs.map(async ([key, buffer]) => {
       const [environment, appName] = key.split(':');
-      const metrics = Array.from(bufferMap.values());
+      const metrics = Array.from(buffer.metrics.values());
       try {
         await axios.post(
           `${config.gatrixUrl}/api/v1/server/${environment}/features/metrics`,
@@ -206,6 +245,7 @@ class MetricsAggregator {
             headers: {
               'x-api-token': config.apiToken,
               'x-application-name': appName,
+              ...(buffer.sdkVersion && { 'x-sdk-version': buffer.sdkVersion }),
             },
             timeout: 10000,
           }
@@ -216,17 +256,18 @@ class MetricsAggregator {
     });
 
     // Process Server Unknown Reports
-    const unknownPromises = unknownJobs.flatMap(([key, bufferMap]) => {
+    const unknownPromises = unknownJobs.flatMap(([key, buffer]) => {
       const [environment, appName] = key.split(':');
-      return Array.from(bufferMap.entries()).map(async ([flagName, count]) => {
+      return Array.from(buffer.flags.entries()).map(async ([flagName, count]) => {
         try {
           await axios.post(
             `${config.gatrixUrl}/api/v1/server/${environment}/features/unknown`,
-            { flagName, count },
+            { flagName, count, sdkVersion: buffer.sdkVersion },
             {
               headers: {
                 'x-api-token': config.apiToken,
                 'x-application-name': appName,
+                ...(buffer.sdkVersion && { 'x-sdk-version': buffer.sdkVersion }),
               },
               timeout: 10000,
             }
