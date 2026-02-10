@@ -194,7 +194,7 @@
             </div>
           {:else}
             <div class="mascot-waiting">
-              <i class="nes-kirby"></i>
+              <i class="nes-octocat animate"></i>
             </div>
           {/if}
         </div>

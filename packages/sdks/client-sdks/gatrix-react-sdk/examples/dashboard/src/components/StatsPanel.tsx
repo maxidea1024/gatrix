@@ -210,7 +210,7 @@ function StatsPanel({
     } else {
       mascotIcon = (
         <div className="mascot-waiting">
-          <i className="nes-kirby"></i>
+          <i className="nes-octocat animate"></i>
         </div>
       );
     }

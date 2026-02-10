@@ -242,7 +242,7 @@ export class FeaturesClient {
     }
 
     // Initial fetch (scheduleNextRefresh is called inside fetchFlags on completion)
-    await this.fetchFlags();
+    await this.fetchFlagsInternal('init');
 
     // Start metrics collection
     this.metrics.start();
@@ -300,7 +300,7 @@ export class FeaturesClient {
     this.context = newContext;
     this.lastContextHash = newHash;
     this.contextChangeCount++;
-    await this.fetchFlags();
+    await this.fetchFlagsInternal('contextChange');
   }
 
   async setContextField(field: string, value: string | number | boolean): Promise<void> {
@@ -328,7 +328,7 @@ export class FeaturesClient {
     }
     this.lastContextHash = newHash;
     this.contextChangeCount++;
-    await this.fetchFlags();
+    await this.fetchFlagsInternal('contextChange');
   }
 
   async removeContextField(field: string): Promise<void> {
@@ -353,7 +353,7 @@ export class FeaturesClient {
     }
     this.lastContextHash = newHash;
     this.contextChangeCount++;
-    await this.fetchFlags();
+    await this.fetchFlagsInternal('contextChange');
   }
 
   // ==================== Flag Access ====================
@@ -740,7 +740,7 @@ export class FeaturesClient {
     }
 
     if (fetchNow) {
-      await this.fetchFlags();
+      await this.fetchFlagsInternal('syncFlags');
     }
 
     this.synchronizedFlags = new Map(this.realtimeFlags);
@@ -863,6 +863,10 @@ export class FeaturesClient {
   // ==================== Fetch ====================
 
   async fetchFlags(): Promise<void> {
+    return this.fetchFlagsInternal('manual');
+  }
+
+  private async fetchFlagsInternal(caller: 'init' | 'polling' | 'manual' | 'syncFlags' | 'contextChange'): Promise<void> {
     // Offline mode: no network requests allowed
     if (this.config.offlineMode) {
       this.logger.warn('fetchFlags called but client is in offline mode, ignoring');
@@ -875,7 +879,7 @@ export class FeaturesClient {
 
     this.isFetchingFlags = true;
     this.pollingStopped = false;
-    this.devLog(`fetchFlags: starting fetch. etag=${this.etag}`);
+    this.logger.info(`fetchFlags [${caller}]: starting fetch. etag=${this.etag}`);
     this.emitter.emit(EVENTS.FLAGS_FETCH_START);
 
     // Cancel existing polling timer (manual call or re-entry)
@@ -941,6 +945,7 @@ export class FeaturesClient {
         this.sdkState = 'healthy';
         this.recoveryCount++;
         this.lastRecoveryTime = new Date();
+        this.logger.info(`SDK recovered from error state (recovery #${this.recoveryCount})`);
         this.emitter.emit(EVENTS.FLAGS_RECOVERED);
       }
 
@@ -1073,7 +1078,7 @@ export class FeaturesClient {
     this.devLog(`scheduleNextRefresh: delay=${delay}ms, consecutiveFailures=${this.consecutiveFailures}, pollingStopped=${this.pollingStopped}`);
 
     this.timerRef = setTimeout(async () => {
-      await this.fetchFlags();
+      await this.fetchFlagsInternal('polling');
     }, delay);
   }
 

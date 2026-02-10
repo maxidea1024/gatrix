@@ -1,0 +1,25 @@
+{
+    "name": "gatrix-vue-dashboard",
+    "private": true,
+    "version": "0.0.0",
+    "type": "module",
+    "scripts": {
+        "dev": "vite",
+        "build": "vue-tsc && vite build",
+        "preview": "vite preview",
+        "clean": "rimraf dist node_modules"
+    },
+    "dependencies": {
+        "@gatrix/js-client-sdk": "link:../../gatrix-js-client-sdk",
+        "@gatrix/vue-sdk": "link:../..",
+        "nes.css": "^2.3.0",
+        "vue": "^3.4.0"
+    },
+    "devDependencies": {
+        "@vitejs/plugin-vue": "^5.0.0",
+        "rimraf": "^5.0.5",
+        "typescript": "^5.2.2",
+        "vite": "^5.0.8",
+        "vue-tsc": "^2.0.0"
+    }
+}

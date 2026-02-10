@@ -63,10 +63,63 @@ client.stop();
 | Field                      | Type              | Default | Description                        |
 | -------------------------- | ----------------- | ------- | ---------------------------------- |
 | `context`                  | `object`          | `{}`    | Initial evaluation context.        |
+| `enableDevMode`            | `boolean`         | `false` | Enable detailed debug logging.     |
+| `logger`                   | `Logger`          | Console | Custom logger implementation.      |
 | `features.refreshInterval` | `number`          | `30`    | Polling interval in seconds.       |
 | `features.disableRefresh`  | `boolean`         | `false` | Disable automatic polling.         |
 | `features.bootstrap`       | `EvaluatedFlag[]` | -       | Initial flag data for offline/SSR. |
 | `features.offlineMode`     | `boolean`         | `false` | Use only cached/bootstrap data.    |
+
+## Logging & Debug Mode
+
+### Enable Dev Mode
+
+Set `enableDevMode: true` to enable detailed debug logging for SDK internals:
+
+```typescript
+const client = new GatrixClient({
+  // ...
+  enableDevMode: true,
+});
+```
+
+### Custom Logger
+
+Provide a custom logger to capture all SDK log messages:
+
+```typescript
+const client = new GatrixClient({
+  // ...
+  logger: {
+    debug: (msg, ...args) => myLogger.debug(msg, ...args),
+    info: (msg, ...args) => myLogger.info(msg, ...args),
+    warn: (msg, ...args) => myLogger.warn(msg, ...args),
+    error: (msg, ...args) => myLogger.error(msg, ...args),
+  },
+});
+```
+
+### Fetch Caller Identification
+
+When `fetchFlags` is called, the SDK logs identify the caller:
+
+| Caller           | Description                                              |
+| ---------------- | -------------------------------------------------------- |
+| `init`           | Initial fetch during `start()`                           |
+| `polling`        | Automatic periodic polling (via `refreshInterval`)       |
+| `manual`         | External call via `client.features.fetchFlags()`         |
+| `syncFlags`      | Explicit sync via `client.features.syncFlags()`          |
+| `contextChange`  | Triggered by `updateContext()` / `setContextField()` etc |
+
+Log format: `fetchFlags [caller]: starting fetch. etag=...`
+
+### Recovery Logging
+
+When the SDK recovers from an error state, it always logs (regardless of `enableDevMode`):
+
+```
+SDK recovered from error state (recovery #1)
+```
 
 ## Understanding Flag Evaluation
 
