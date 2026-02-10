@@ -447,8 +447,7 @@ const FeatureFlagDetailPage: React.FC = () => {
   const [expandedConstraints, setExpandedConstraints] = useState<Set<string>>(new Set());
   const [allTags, setAllTags] = useState<Tag[]>([]);
   const [originalFlag, setOriginalFlag] = useState<FeatureFlag | null>(null);
-  const [jsonPayloadErrors, setJsonPayloadErrors] = useState<Record<number, string | null>>({});
-  const [baselinePayloadJsonError, setBaselinePayloadJsonError] = useState<string | null>(null); // Legacy: used for value tab JSON validation
+  const [valueJsonError, setValueJsonError] = useState<string | null>(null);
   // Environment-specific strategies - key is environment name, value is array of strategies
   const [envStrategies, setEnvStrategies] = useState<Record<string, Strategy[]>>({});
   // Environment-specific variants - key is environment name, value is array of variants
@@ -651,7 +650,8 @@ const FeatureFlagDetailPage: React.FC = () => {
         const flagVariants = (data.variants || []).map((v: any) => ({
           name: v.variantName || v.name,
           weight: v.weight,
-          payload: v.payload,
+          value: v.value,
+          valueType: v.valueType || 'string',
           stickiness: v.stickiness || 'default',
           weightLock: v.weightLock || false,
         }));
@@ -1020,17 +1020,19 @@ const FeatureFlagDetailPage: React.FC = () => {
     const lastVariant = currentVariants[currentVariants.length - 1];
     const variantType = flag?.valueType || 'string';
 
-    // Determine default payload value based on type and existing variants
-    let defaultPayload: { type: 'string' | 'json' | 'csv'; value: string } | undefined = undefined;
-    if (lastVariant?.payload?.value !== undefined) {
-      // Copy last variant's payload
-      defaultPayload = {
-        type: lastVariant.payload.type || 'string',
-        value: String(lastVariant.payload.value),
-      };
+    // Determine default value based on type and existing variants
+    let defaultValue: any = undefined;
+    if (lastVariant?.value !== undefined) {
+      // Copy last variant's value
+      defaultValue = lastVariant.value;
     } else if (variantType === 'number') {
-      // Default to '0' for number type
-      defaultPayload = { type: 'string', value: '0' };
+      defaultValue = 0;
+    } else if (variantType === 'json') {
+      defaultValue = '{}';
+    } else if (variantType === 'boolean') {
+      defaultValue = 'true';
+    } else {
+      defaultValue = '';
     }
 
     const newVariant: Variant = {
@@ -1038,7 +1040,8 @@ const FeatureFlagDetailPage: React.FC = () => {
       weight: 0, // Will be recalculated
       weightLock: false,
       stickiness: 'default',
-      payload: defaultPayload,
+      value: defaultValue,
+      valueType: variantType as 'boolean' | 'string' | 'json' | 'number',
     };
     const updatedVariants = distributeWeights([...currentVariants, newVariant]);
     setEditingStrategy({
@@ -1243,7 +1246,8 @@ const FeatureFlagDetailPage: React.FC = () => {
         const apiVariants = variants.map((v) => ({
           variantName: v.name,
           weight: v.weight,
-          payload: v.payload,
+          value: v.value,
+          valueType: v.valueType,
           stickiness: v.stickiness || 'default',
           weightLock: v.weightLock,
         }));
@@ -3403,7 +3407,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                         prev ? { ...prev, valueType: newType, enabledValue: newEnabled, disabledValue: newDisabled } : prev
                       );
                       if (newType !== 'json') {
-                        setBaselinePayloadJsonError(null);
+                        setValueJsonError(null);
                       }
                     }}
                     renderValue={(value) => (

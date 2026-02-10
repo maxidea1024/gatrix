@@ -561,9 +561,7 @@ export class ClientController {
         const resolvedEnabledValue = envSettings?.enabledValue ?? dbFlag.enabledValue;
         const resolvedDisabledValue = envSettings?.disabledValue ?? dbFlag.disabledValue;
 
-        // Map DB flag to SDK FeatureFlag type
-        // Note: SDK might still expect baselinePayload? We might need to update SDK type or abuse it.
-        // For now, we will manually handle the value resolution AFTER evaluation.
+        // Map DB flag to SDK FeatureFlag type for evaluation
         const sdkFlag: FeatureFlag = {
           name: dbFlag.flagName,
           isEnabled: dbFlag.isEnabled,

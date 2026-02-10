@@ -201,7 +201,6 @@ const FeatureFlagsPage: React.FC = () => {
     valueType: 'boolean' as 'boolean' | 'string' | 'number' | 'json',
     enabledValue: '' as any,
     disabledValue: '' as any,
-    baselinePayload: '' as string | number | object,  // Legacy: kept for export compatibility
   });
 
   // Sorting state
@@ -1285,7 +1284,6 @@ const FeatureFlagsPage: React.FC = () => {
         valueType: 'boolean',
         enabledValue: 'true',
         disabledValue: 'false',
-        baselinePayload: '',  // Legacy
       });
       setNewFlagJsonError(null);
       // Navigate to the newly created flag's detail page
@@ -1314,7 +1312,6 @@ const FeatureFlagsPage: React.FC = () => {
       valueType: 'boolean',
       enabledValue: 'true',
       disabledValue: 'false',
-      baselinePayload: '',  // Legacy
     });
     setNewFlagJsonError(null);
     setCreateMenuAnchor(null);
@@ -2639,7 +2636,7 @@ const FeatureFlagsPage: React.FC = () => {
                               : '',
                     }));
                     if (newType !== 'json') {
-                      setNewFlagBaselinePayloadJsonError(null);
+                      setNewFlagJsonError(null);
                     }
                   }}
                 >
