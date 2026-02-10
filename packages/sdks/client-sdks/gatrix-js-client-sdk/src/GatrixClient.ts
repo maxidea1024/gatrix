@@ -11,8 +11,8 @@ import { GatrixClientConfig, GatrixSdkStats } from './types';
 import { FeaturesClient } from './FeaturesClient';
 import { EVENTS } from './events';
 import { SDK_VERSION } from './version';
-import { GatrixError } from './errors';
 import { Logger, ConsoleLogger } from './Logger';
+import { validateConfig } from './validateConfig';
 
 export class GatrixClient {
   private emitter: EventEmitter;
@@ -31,19 +31,7 @@ export class GatrixClient {
   }
 
   constructor(config: GatrixClientConfig) {
-    // Validate required config
-    if (!config.apiUrl) {
-      throw new GatrixError('apiUrl is required');
-    }
-    if (!config.apiToken) {
-      throw new GatrixError('apiToken is required');
-    }
-    if (!config.appName) {
-      throw new GatrixError('appName is required');
-    }
-    if (!config.environment) {
-      throw new GatrixError('environment is required');
-    }
+    validateConfig(config);
 
     this.config = config;
     this.emitter = new EventEmitter();

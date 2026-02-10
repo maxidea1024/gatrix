@@ -152,14 +152,66 @@ namespace Gatrix.Unity.SDK
         {
             if (config == null)
                 throw new ArgumentNullException(nameof(config));
-            if (string.IsNullOrEmpty(config.ApiUrl))
+            if (string.IsNullOrWhiteSpace(config.ApiUrl))
                 throw new ArgumentException("apiUrl is required", nameof(config));
-            if (string.IsNullOrEmpty(config.ApiToken))
+            if (string.IsNullOrWhiteSpace(config.ApiToken))
                 throw new ArgumentException("apiToken is required", nameof(config));
-            if (string.IsNullOrEmpty(config.AppName))
+            if (string.IsNullOrWhiteSpace(config.AppName))
                 throw new ArgumentException("appName is required", nameof(config));
-            if (string.IsNullOrEmpty(config.Environment))
+            if (string.IsNullOrWhiteSpace(config.Environment))
                 throw new ArgumentException("environment is required", nameof(config));
+
+            // URL format validation
+            if (!Uri.TryCreate(config.ApiUrl, UriKind.Absolute, out var uri) ||
+                (uri.Scheme != "http" && uri.Scheme != "https"))
+                throw new ArgumentException(
+                    $"Invalid apiUrl: \"{config.ApiUrl}\". Must be a valid HTTP/HTTPS URL.", nameof(config));
+
+            // Whitespace validation
+            if (config.ApiUrl.Trim() != config.ApiUrl)
+                throw new ArgumentException("apiUrl must not have leading or trailing whitespace", nameof(config));
+            if (config.ApiToken.Trim() != config.ApiToken)
+                throw new ArgumentException("apiToken must not have leading or trailing whitespace", nameof(config));
+
+            // CacheKeyPrefix
+            if (config.CacheKeyPrefix != null && config.CacheKeyPrefix.Length > 100)
+                throw new ArgumentException("cacheKeyPrefix must be <= 100 characters", nameof(config));
+
+            // Features config
+            var feat = config.Features;
+            if (feat != null)
+            {
+                ValidateRange(feat.RefreshInterval, "RefreshInterval", 1, 86400);
+                ValidateRange(feat.MetricsInterval, "MetricsInterval", 1, 86400);
+                ValidateRange(feat.MetricsIntervalInitial, "MetricsIntervalInitial", 0, 3600);
+                ValidateRange(feat.FetchRetryLimit, "FetchRetryLimit", 0, 10);
+                ValidateRange(feat.FetchTimeout, "FetchTimeout", 1, 120);
+                ValidateRange(feat.InitialBackoffMs, "InitialBackoffMs", 100, 60000);
+                ValidateRange(feat.MaxBackoffMs, "MaxBackoffMs", 1000, 600000);
+
+                if (feat.InitialBackoffMs > feat.MaxBackoffMs)
+                    throw new ArgumentException(
+                        $"InitialBackoffMs ({feat.InitialBackoffMs}) must be <= MaxBackoffMs ({feat.MaxBackoffMs})",
+                        nameof(config));
+
+                if (feat.NonRetryableStatusCodes != null)
+                {
+                    foreach (var code in feat.NonRetryableStatusCodes)
+                    {
+                        if (code < 400 || code > 599)
+                            throw new ArgumentException(
+                                $"NonRetryableStatusCodes contains invalid status code: {code} (must be 400-599)",
+                                nameof(config));
+                    }
+                }
+            }
+        }
+
+        private static void ValidateRange(int value, string name, int min, int max)
+        {
+            if (value < min || value > max)
+                throw new ArgumentException(
+                    $"{name} must be between {min} and {max}, got {value}");
         }
     }
 }

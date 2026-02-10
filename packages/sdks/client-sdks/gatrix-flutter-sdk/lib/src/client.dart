@@ -41,6 +41,7 @@ class GatrixClient {
   SdkState _state = SdkState.initializing;
 
   GatrixClient(this.config) {
+    _validateConfig(config);
     features = FeaturesClient(
       apiUrl: config.apiUrl,
       apiToken: config.apiToken,
@@ -51,6 +52,48 @@ class GatrixClient {
       explicitSyncMode: config.explicitSyncMode,
       customHeaders: config.customHeaders,
     );
+  }
+
+  static void _validateConfig(GatrixClientConfig config) {
+    // Required fields
+    if (config.apiUrl.trim().isEmpty) {
+      throw ArgumentError('Config validation failed: apiUrl is required');
+    }
+    if (config.apiToken.trim().isEmpty) {
+      throw ArgumentError('Config validation failed: apiToken is required');
+    }
+    if (config.appName.trim().isEmpty) {
+      throw ArgumentError('Config validation failed: appName is required');
+    }
+    if (config.environment.trim().isEmpty) {
+      throw ArgumentError('Config validation failed: environment is required');
+    }
+
+    // URL format
+    final uri = Uri.tryParse(config.apiUrl);
+    if (uri == null || (!uri.hasScheme) || (uri.scheme != 'http' && uri.scheme != 'https')) {
+      throw ArgumentError(
+          'Config validation failed: apiUrl must be a valid HTTP/HTTPS URL. Got: ${config.apiUrl}');
+    }
+
+    // Whitespace
+    if (config.apiUrl != config.apiUrl.trim()) {
+      throw ArgumentError('Config validation failed: apiUrl must not have leading or trailing whitespace');
+    }
+    if (config.apiToken != config.apiToken.trim()) {
+      throw ArgumentError('Config validation failed: apiToken must not have leading or trailing whitespace');
+    }
+
+    // Numeric ranges
+    _validateRange(config.refreshIntervalSeconds, 'refreshIntervalSeconds', 1, 86400);
+    _validateRange(config.metricsIntervalSeconds, 'metricsIntervalSeconds', 1, 86400);
+  }
+
+  static void _validateRange(int value, String name, int min, int max) {
+    if (value < min || value > max) {
+      throw ArgumentError(
+          'Config validation failed: $name must be between $min and $max, got $value');
+    }
   }
 
   Future<void> start() async {

@@ -248,6 +248,44 @@ All client SDKs implement retry logic for `sendMetrics` requests:
 4. **Non-retryable**: HTTP 4xx errors (except 408, 429) are not retried.
 5. **On final failure**: Emit `FLAGS_METRICS_ERROR` event and increment error counter.
 
+### Config Validation
+
+All client SDKs MUST validate configuration at initialization time and fail fast with clear error messages. Validation runs in the constructor/init before any network calls.
+
+#### Required Fields
+
+| Field | Rule | Error |
+|-------|------|-------|
+| `apiUrl` | Non-empty, trimmed | `"apiUrl is required"` |
+| `apiToken` | Non-empty, trimmed | `"apiToken is required"` |
+| `appName` | Non-empty, trimmed | `"appName is required"` |
+| `environment` | Non-empty, trimmed | `"environment is required"` |
+
+#### Format Validation
+
+| Field | Rule | Error |
+|-------|------|-------|
+| `apiUrl` | Must be valid HTTP/HTTPS URL | `"apiUrl must be a valid HTTP/HTTPS URL"` |
+| `apiUrl`, `apiToken` | No leading/trailing whitespace | `"must not have leading or trailing whitespace"` |
+| `cacheKeyPrefix` | <= 100 characters | `"cacheKeyPrefix must be <= 100 characters"` |
+
+#### Numeric Range Validation
+
+| Field | Min | Max | Unit |
+|-------|-----|-----|------|
+| `refreshInterval` | 1 | 86400 | seconds |
+| `metricsInterval` | 1 | 86400 | seconds |
+| `metricsIntervalInitial` | 0 | 3600 | seconds |
+| `fetchRetryLimit` | 0 | 10 | count |
+| `fetchTimeout` | 1 (or 1000ms) | 120 (or 120000ms) | seconds/ms |
+| `initialBackoffMs` | 100 | 60000 | ms |
+| `maxBackoffMs` | 1000 | 600000 | ms |
+
+#### Cross-Field Validation
+
+- `initialBackoffMs` must be <= `maxBackoffMs`
+- `nonRetryableStatusCodes` entries must be in range 400-599
+
 ### Dev Mode Logging
 
 When `enableDevMode` is set to `true`, the SDK outputs detailed debug logs at key lifecycle points:

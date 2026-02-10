@@ -27,9 +27,47 @@ func init_sdk(config: GatrixTypes.GatrixClientConfig, storage: GatrixStorageProv
 	_config = config
 
 	# Validate required fields
-	assert(config.api_token != "", "GatrixSDK: api_token is required")
-	assert(config.app_name != "", "GatrixSDK: app_name is required")
-	assert(config.environment != "", "GatrixSDK: environment is required")
+	assert(config.api_url.strip_edges() != "", "GatrixSDK: api_url is required")
+	assert(config.api_token.strip_edges() != "", "GatrixSDK: api_token is required")
+	assert(config.app_name.strip_edges() != "", "GatrixSDK: app_name is required")
+	assert(config.environment.strip_edges() != "", "GatrixSDK: environment is required")
+
+	# Validate URL format
+	assert(
+		config.api_url.begins_with("http://") or config.api_url.begins_with("https://"),
+		"GatrixSDK: api_url must start with http:// or https://. Got: %s" % config.api_url
+	)
+
+	# Validate whitespace
+	assert(config.api_url == config.api_url.strip_edges(),
+		"GatrixSDK: api_url must not have leading or trailing whitespace")
+	assert(config.api_token == config.api_token.strip_edges(),
+		"GatrixSDK: api_token must not have leading or trailing whitespace")
+
+	# Validate numeric ranges
+	assert(config.refresh_interval >= 1.0 and config.refresh_interval <= 86400.0,
+		"GatrixSDK: refresh_interval must be between 1 and 86400, got %f" % config.refresh_interval)
+	assert(config.metrics_interval >= 1.0 and config.metrics_interval <= 86400.0,
+		"GatrixSDK: metrics_interval must be between 1 and 86400, got %f" % config.metrics_interval)
+	assert(config.metrics_interval_initial >= 0.0 and config.metrics_interval_initial <= 3600.0,
+		"GatrixSDK: metrics_interval_initial must be between 0 and 3600, got %f" % config.metrics_interval_initial)
+
+	# Validate backoff settings
+	assert(config.initial_backoff_ms >= 100 and config.initial_backoff_ms <= 60000,
+		"GatrixSDK: initial_backoff_ms must be between 100 and 60000, got %d" % config.initial_backoff_ms)
+	assert(config.max_backoff_ms >= 1000 and config.max_backoff_ms <= 600000,
+		"GatrixSDK: max_backoff_ms must be between 1000 and 600000, got %d" % config.max_backoff_ms)
+	assert(config.initial_backoff_ms <= config.max_backoff_ms,
+		"GatrixSDK: initial_backoff_ms (%d) must be <= max_backoff_ms (%d)" % [config.initial_backoff_ms, config.max_backoff_ms])
+
+	# Validate non-retryable status codes
+	for code in config.non_retryable_status_codes:
+		assert(code >= 400 and code <= 599,
+			"GatrixSDK: non_retryable_status_codes must be 400-599, got %d" % code)
+
+	# Validate cache key prefix
+	assert(config.cache_key_prefix.length() <= 100,
+		"GatrixSDK: cache_key_prefix must be <= 100 characters")
 
 	# Set up storage
 	if storage != null:
