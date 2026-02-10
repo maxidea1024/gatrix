@@ -59,8 +59,10 @@ export class FeaturesClient {
   private readyEventEmitted = false;
   private fetchedFromServer = false;
   private isFetchingFlags = false;
-  private timerRef?: ReturnType<typeof setInterval>;
+  private timerRef?: ReturnType<typeof setTimeout>;
   private etag = '';
+  private consecutiveFailures: number = 0;
+  private pollingStopped: boolean = false;
   private refreshInterval: number;
   private connectionId: string;
 
@@ -212,6 +214,8 @@ export class FeaturesClient {
     }
     this.started = true;
     this.startTime = new Date();
+    this.consecutiveFailures = 0;
+    this.pollingStopped = false;
 
     // Offline mode: skip all network requests, use cached/bootstrap flags only
     if (this.config.offlineMode) {
@@ -229,14 +233,11 @@ export class FeaturesClient {
       return;
     }
 
-    // Initial fetch
+    // Initial fetch (scheduleNextRefresh is called inside fetchFlags on completion)
     await this.fetchFlags();
 
     // Start metrics collection
     this.metrics.start();
-
-    // Schedule next refresh using setTimeout (not setInterval)
-    this.scheduleNextRefresh();
   }
 
   /**
@@ -247,6 +248,8 @@ export class FeaturesClient {
       clearTimeout(this.timerRef);
       this.timerRef = undefined;
     }
+    this.pollingStopped = true;
+    this.consecutiveFailures = 0;
     this.metrics.stop();
     this.started = false;
   }
@@ -862,9 +865,10 @@ export class FeaturesClient {
     }
 
     this.isFetchingFlags = true;
+    this.pollingStopped = false;
     this.emitter.emit(EVENTS.FLAGS_FETCH_START);
 
-    // Cancel existing polling timer if fetch is called manually or by polying
+    // Cancel existing polling timer (manual call or re-entry)
     if (this.timerRef) {
       clearTimeout(this.timerRef);
       this.timerRef = undefined;
@@ -908,22 +912,16 @@ export class FeaturesClient {
       // Emit FETCH event with current etag
       this.emitter.emit(EVENTS.FLAGS_FETCH, { etag: this.etag || null });
 
-      // Get retry options from config or use defaults
+      // Get retry options from config
       const retryOptions = this.featuresConfig.fetchRetryOptions ?? {};
-      const retryLimit = retryOptions.limit ?? 3;
-      const backoffLimit = retryOptions.backoffLimit ?? 8000;
       const timeout = retryOptions.timeout ?? 30000;
+      const nonRetryableStatusCodes = retryOptions.nonRetryableStatusCodes ?? [401, 403];
 
-      // Use ky with retry and exponential backoff
+      // SDK manages retry/backoff, so disable ky's built-in retry
       const response = await ky.get(url.toString(), {
         headers,
         signal: this.abortController?.signal,
-        retry: {
-          limit: retryLimit,
-          methods: ['get', 'post'],
-          statusCodes: [408, 429, 500, 502, 503, 504],
-          backoffLimit,
-        },
+        retry: 0,
         timeout,
         throwHttpErrors: false, // Handle status codes manually for ETag support
       });
@@ -957,27 +955,43 @@ export class FeaturesClient {
           }
         }
 
-        // Restart polling timer only after successful fetch
+        // Success: reset failure counter and schedule at normal interval
+        this.consecutiveFailures = 0;
         this.scheduleNextRefresh();
         this.emitter.emit(EVENTS.FLAGS_FETCH_SUCCESS);
       } else if (response.status === 304) {
         // Not modified - ETag matched
         this.notModifiedCount++;
 
-        // If this was our first fetch and we got a 304, it means our cached/bootstrap
-        // flags are up to date. We should mark the SDK as ready.
         if (!this.fetchedFromServer) {
           this.fetchedFromServer = true;
           this.setReady();
         }
 
-        // Restart polling timer only after successful fetch
+        // Success: reset failure counter and schedule at normal interval
+        this.consecutiveFailures = 0;
         this.scheduleNextRefresh();
         this.emitter.emit(EVENTS.FLAGS_FETCH_SUCCESS);
-      } else {
+      } else if (nonRetryableStatusCodes.includes(response.status)) {
+        // Non-retryable error: stop polling entirely
         this.handleFetchError(response.status);
-        this.emitter.emit(EVENTS.FLAGS_FETCH_ERROR, { status: response.status });
-        // Continue polling even after HTTP errors
+        this.pollingStopped = true;
+        this.logger.error(
+          `Polling stopped due to non-retryable status code ${response.status}. ` +
+          `Call fetchFlags() manually to retry.`
+        );
+        this.emitter.emit(EVENTS.FLAGS_FETCH_ERROR, {
+          status: response.status,
+          retryable: false,
+        });
+      } else {
+        // Retryable HTTP error: schedule with backoff
+        this.handleFetchError(response.status);
+        this.consecutiveFailures++;
+        this.emitter.emit(EVENTS.FLAGS_FETCH_ERROR, {
+          status: response.status,
+          retryable: true,
+        });
         this.scheduleNextRefresh();
       }
     } catch (e: unknown) {
@@ -998,7 +1012,9 @@ export class FeaturesClient {
         message: errorMessage,
       } as ErrorEvent);
       this.emitter.emit(EVENTS.FLAGS_FETCH_ERROR, { error: e, message: errorMessage });
-      // Continue polling even after network errors
+
+      // Network error: schedule with backoff
+      this.consecutiveFailures++;
       this.scheduleNextRefresh();
     } finally {
       this.isFetchingFlags = false;
@@ -1015,7 +1031,7 @@ export class FeaturesClient {
   }
 
   private scheduleNextRefresh(): void {
-    if (this.refreshInterval <= 0 || !this.started) {
+    if (this.refreshInterval <= 0 || !this.started || this.pollingStopped) {
       return;
     }
 
@@ -1024,9 +1040,28 @@ export class FeaturesClient {
       clearTimeout(this.timerRef);
     }
 
+    let delay = this.refreshInterval;
+
+    // Apply exponential backoff on consecutive failures
+    if (this.consecutiveFailures > 0) {
+      const retryOptions = this.featuresConfig.fetchRetryOptions ?? {};
+      const initialBackoff = retryOptions.initialBackoffMs ?? 1000;
+      const maxBackoff = retryOptions.maxBackoffMs ?? 60000;
+
+      // Exponential backoff: initialBackoff * 2^(failures-1), capped at maxBackoff
+      const backoffDelay = Math.min(
+        initialBackoff * Math.pow(2, this.consecutiveFailures - 1),
+        maxBackoff
+      );
+      delay = backoffDelay;
+      this.logger.warn(
+        `Scheduling retry after ${delay}ms (consecutive failures: ${this.consecutiveFailures})`
+      );
+    }
+
     this.timerRef = setTimeout(async () => {
       await this.fetchFlags();
-    }, this.refreshInterval);
+    }, delay);
   }
 
   private selectFlags(): Map<string, EvaluatedFlag> {

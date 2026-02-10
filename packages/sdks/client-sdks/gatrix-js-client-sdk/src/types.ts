@@ -123,12 +123,22 @@ export interface FeaturesConfig {
  * Fetch Retry Options
  */
 export interface FetchRetryOptions {
-  /** Number of retry attempts (default: 3) */
+  /** Number of retry attempts for ky (default: 2) */
   limit?: number;
-  /** Backoff limit in ms (default: 8000) */
+  /** Backoff limit for ky in ms (default: 8000) */
   backoffLimit?: number;
   /** Request timeout in ms (default: 30000) */
   timeout?: number;
+  /**
+   * Status codes that should stop polling entirely (default: [401, 403]).
+   * When a response with one of these codes is received, polling stops
+   * and must be restarted manually via fetchFlags().
+   */
+  nonRetryableStatusCodes?: number[];
+  /** Initial SDK-level backoff delay in ms for consecutive failures (default: 1000) */
+  initialBackoffMs?: number;
+  /** Maximum SDK-level backoff delay in ms (default: 60000) */
+  maxBackoffMs?: number;
 }
 
 /**
