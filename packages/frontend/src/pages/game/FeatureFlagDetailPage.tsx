@@ -1165,6 +1165,14 @@ const FeatureFlagDetailPage: React.FC = () => {
           sortOrder: s.sortOrder,
           isEnabled: !s.disabled,
         }));
+        // Save strategies to the environment
+        await api.put(
+          `/admin/features/${flag.flagName}/strategies`,
+          { strategies: apiStrategies },
+          {
+            headers: { 'x-environment': editingEnv },
+          }
+        );
         // Save global properties
         await api.put(`/admin/features/${flag.flagName}`, {
           valueType: flag.valueType,

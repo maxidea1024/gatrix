@@ -1681,7 +1681,7 @@ const FeatureFlagsPage: React.FC = () => {
                             );
                           case 'tags':
                             return <TableCell key={col.id}>{t('featureFlags.tags')}</TableCell>;
-                          case 'variantType':
+                          case 'valueType':
                             return (
                               <TableCell key={col.id}>{t('featureFlags.valueType')}</TableCell>
                             );
@@ -2603,30 +2603,6 @@ const FeatureFlagsPage: React.FC = () => {
               </Select>
             </FormControl>
 
-            {/* Impression Data */}
-            <Box>
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                }}
-              >
-                <Typography variant="body2">{t('featureFlags.impressionData')}</Typography>
-                <Switch
-                  checked={newFlag.impressionDataEnabled}
-                  onChange={(e) =>
-                    setNewFlag({
-                      ...newFlag,
-                      impressionDataEnabled: e.target.checked,
-                    })
-                  }
-                />
-              </Box>
-              <Typography variant="caption" color="text.secondary">
-                {t('featureFlags.impressionDataHelp')}
-              </Typography>
-            </Box>
 
             {/* Value Settings Group */}
             <Paper variant="outlined" sx={{ p: 2 }}>
@@ -2785,6 +2761,31 @@ const FeatureFlagsPage: React.FC = () => {
                 </Box>
               </Stack>
             </Paper>
+
+            {/* Impression Data */}
+            <Box>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}
+              >
+                <Typography variant="body2">{t('featureFlags.impressionData')}</Typography>
+                <Switch
+                  checked={newFlag.impressionDataEnabled}
+                  onChange={(e) =>
+                    setNewFlag({
+                      ...newFlag,
+                      impressionDataEnabled: e.target.checked,
+                    })
+                  }
+                />
+              </Box>
+              <Typography variant="caption" color="text.secondary">
+                {t('featureFlags.impressionDataHelp')}
+              </Typography>
+            </Box>
 
             {/* Info Alert */}
             <Alert severity="info">
