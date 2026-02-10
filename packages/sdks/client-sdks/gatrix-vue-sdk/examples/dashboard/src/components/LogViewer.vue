@@ -110,10 +110,17 @@ const countByLevel = computed(() => {
 // Auto-scroll when new logs come in
 watch(() => props.logs.length, () => {
   if (autoScroll.value) {
-    nextTick(() => {
-      const el = logListRef.value;
-      if (el) el.scrollTop = el.scrollHeight;
-    });
+    const el = logListRef.value;
+    if (!el) return;
+    
+    // Check if we are close to the bottom (within 50px)
+    const isAtBottom = el.scrollHeight - el.scrollTop <= el.clientHeight + 50;
+
+    if (isAtBottom) {
+      nextTick(() => {
+        el.scrollTop = el.scrollHeight;
+      });
+    }
   }
 });
 </script>
@@ -322,7 +329,7 @@ watch(() => props.logs.length, () => {
   font-size: 9px;
   line-height: 1.5;
   border-bottom: 1px solid #1a1c1e;
-  font-family: 'Courier New', Consolas, monospace;
+  font-family: 'Inconsolata', monospace;
 }
 
 .log-entry-error {

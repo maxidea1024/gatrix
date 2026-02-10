@@ -75,8 +75,14 @@ export default function LogViewer({ logs, onClose, onClear }: LogViewerProps) {
 
     // Auto-scroll
     useEffect(() => {
-        if (autoScroll && logListRef.current) {
-            logListRef.current.scrollTop = logListRef.current.scrollHeight;
+        const el = logListRef.current;
+        if (!el || !autoScroll) return;
+
+        // Check if we are close to the bottom (within 50px)
+        const isAtBottom = el.scrollHeight - el.scrollTop <= el.clientHeight + 50;
+
+        if (isAtBottom) {
+            el.scrollTop = el.scrollHeight;
         }
     }, [logs.length, autoScroll]);
 

@@ -144,48 +144,50 @@ function App() {
             },
           }}
         >
-          {showGame === 'defense' ? (
-            <IdleDefenseGame onExit={() => setShowGame(false)} />
-          ) : (
-            <div style={{ display: 'flex', height: '100%', overflow: 'hidden' }}>
-              <div className="dashboard-container" style={{ flex: 1, minWidth: 0, overflowY: 'auto' }}>
-                <header className="header">
-                  <h1 className="header-title">
-                    <i className="nes-icon trophy is-small"></i>
-                    &nbsp;GATRIX FEATURE FLAGS (React SDK)
-                  </h1>
-                  <div style={{ display: 'flex', gap: '12px' }}>
-                    <button
-                      type="button"
-                      className="nes-btn is-success"
-                      onClick={() => setShowGame('defense')}
-                    >
-                      SLIME DEFENSE
-                    </button>
-                    <button
-                      type="button"
-                      className="nes-btn is-error"
-                      onClick={handleDisconnectRequest}
-                    >
-                      POWER OFF
-                    </button>
-                  </div>
-                </header>
-                <Dashboard config={config} />
-              </div>
-
-              {showLogViewer && (
-                <LogViewer
-                  logs={logsRef.current}
-                  onClose={() => setShowLogViewer(false)}
-                  onClear={handleClearLogs}
-                />
+          <div style={{ display: 'flex', height: '100%', overflow: 'hidden' }}>
+            <div style={{ flex: 1, minWidth: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+              {showGame === 'defense' ? (
+                <IdleDefenseGame onExit={() => setShowGame(false)} />
+              ) : (
+                <div className="dashboard-container" style={{ flex: 1, overflowY: 'auto' }}>
+                  <header className="header">
+                    <h1 className="header-title">
+                      <i className="nes-icon trophy is-small"></i>
+                      &nbsp;GATRIX FEATURE FLAGS (React SDK)
+                    </h1>
+                    <div style={{ display: 'flex', gap: '12px' }}>
+                      <button
+                        type="button"
+                        className="nes-btn is-success"
+                        onClick={() => setShowGame('defense')}
+                      >
+                        SLIME DEFENSE
+                      </button>
+                      <button
+                        type="button"
+                        className="nes-btn is-error"
+                        onClick={handleDisconnectRequest}
+                      >
+                        POWER OFF
+                      </button>
+                    </div>
+                  </header>
+                  <Dashboard config={config} />
+                </div>
               )}
             </div>
-          )}
+
+            {showLogViewer && (
+              <LogViewer
+                logs={logsRef.current}
+                onClose={() => setShowLogViewer(false)}
+                onClear={handleClearLogs}
+              />
+            )}
+          </div>
 
           {/* Floating log toggle button */}
-          {!showLogViewer && !showGame && (
+          {!showLogViewer && (
             <button
               type="button"
               className="log-fab"

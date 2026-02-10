@@ -32,28 +32,43 @@
 
   // Auto-scroll when logs change
   $: if (autoScroll && logs.length && logListEl) {
-    requestAnimationFrame(() => {
-      if (logListEl) logListEl.scrollTop = logListEl.scrollHeight;
-    });
+    // Check if we are close to the bottom (within 50px)
+    const isAtBottom = logListEl.scrollHeight - logListEl.scrollTop <= logListEl.clientHeight + 50;
+
+    if (isAtBottom) {
+      requestAnimationFrame(() => {
+        if (logListEl) logListEl.scrollTop = logListEl.scrollHeight;
+      });
+    }
   }
 
   function getLevelColor(level: string): string {
     switch (level) {
-      case 'debug': return '#adafbc';
-      case 'info': return '#209cee';
-      case 'warn': return '#f7d51d';
-      case 'error': return '#e76e55';
-      default: return '#fff';
+      case 'debug':
+        return '#adafbc';
+      case 'info':
+        return '#209cee';
+      case 'warn':
+        return '#f7d51d';
+      case 'error':
+        return '#e76e55';
+      default:
+        return '#fff';
     }
   }
 
   function getLevelIcon(level: string): string {
     switch (level) {
-      case 'debug': return '⚙';
-      case 'info': return 'ℹ';
-      case 'warn': return '⚠';
-      case 'error': return '✕';
-      default: return '•';
+      case 'debug':
+        return '⚙';
+      case 'info':
+        return 'ℹ';
+      case 'warn':
+        return '⚠';
+      case 'error':
+        return '✕';
+      default:
+        return '•';
     }
   }
 
@@ -67,12 +82,16 @@
 
   function formatArgs(args: any[]): string {
     if (!args || args.length === 0) return '';
-    return args.map((a) => {
-      try {
-        if (typeof a === 'object') return JSON.stringify(a);
-        return String(a);
-      } catch { return String(a); }
-    }).join(' ');
+    return args
+      .map((a) => {
+        try {
+          if (typeof a === 'object') return JSON.stringify(a);
+          return String(a);
+        } catch {
+          return String(a);
+        }
+      })
+      .join(' ');
   }
 
   function onResizeStart(e: MouseEvent) {
@@ -97,7 +116,13 @@
     document.addEventListener('mouseup', onMouseUp);
   }
 
-  const levels: Array<'all' | 'debug' | 'info' | 'warn' | 'error'> = ['all', 'debug', 'info', 'warn', 'error'];
+  const levels: Array<'all' | 'debug' | 'info' | 'warn' | 'error'> = [
+    'all',
+    'debug',
+    'info',
+    'warn',
+    'error',
+  ];
 </script>
 
 <div class="log-panel" style="width:{panelWidth}px">
@@ -122,10 +147,18 @@
         <input type="checkbox" bind:checked={autoScroll} />
         <span>AUTO</span>
       </label>
-      <button type="button" class="nes-btn is-warning" on:click={onClear}
-        style="font-size:7px;padding:2px 6px">CLR</button>
-      <button type="button" class="nes-btn is-error" on:click={onClose}
-        style="font-size:7px;padding:2px 6px">✕</button>
+      <button
+        type="button"
+        class="nes-btn is-warning"
+        on:click={onClear}
+        style="font-size:7px;padding:2px 6px">CLR</button
+      >
+      <button
+        type="button"
+        class="nes-btn is-error"
+        on:click={onClose}
+        style="font-size:7px;padding:2px 6px">✕</button
+      >
     </div>
   </div>
 
@@ -144,8 +177,12 @@
       </button>
     {/each}
     <div style="flex:1"></div>
-    <input type="text" class="nes-input is-dark log-panel-search" bind:value={searchQuery}
-      placeholder="Filter..." />
+    <input
+      type="text"
+      class="nes-input is-dark log-panel-search"
+      bind:value={searchQuery}
+      placeholder="Filter..."
+    />
   </div>
 
   <!-- Log list -->
