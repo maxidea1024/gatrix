@@ -2642,15 +2642,6 @@ const FeatureFlagsPage: React.FC = () => {
                       <HelpOutlineIcon fontSize="small" color="action" />
                     </Tooltip>
                   </Typography>
-                  {newFlag.flagUsage === 'remoteConfig' && (
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      sx={{ display: 'block', mb: 1 }}
-                    >
-                      {t('featureFlags.remoteConfigRequiresValueType')}
-                    </Typography>
-                  )}
                   <FormControl size="small" fullWidth>
                     <Select
                       value={newFlag.valueType}
