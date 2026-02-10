@@ -94,7 +94,7 @@ interface ContextEntry {
 interface EvaluationResult {
   flagName: string;
   displayName?: string;
-  flagUsage?: string;
+  flagType?: string;
   enabled: boolean;
   variant?: {
     name: string;
@@ -934,14 +934,14 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
 
     // Group results by flagName
     const flagResultsMap: Record<string, Record<string, any>> = {};
-    const flagInfoMap: Record<string, { flagUsage: string; displayName?: string }> = {};
+    const flagInfoMap: Record<string, { flagType: string; displayName?: string }> = {};
 
     evaluatedEnvs.forEach((env) => {
       (filteredResults[env] || []).forEach((result: any) => {
         if (!flagResultsMap[result.flagName]) {
           flagResultsMap[result.flagName] = {};
           flagInfoMap[result.flagName] = {
-            flagUsage: result.flagUsage || 'flag',
+            flagType: result.flagType || 'release',
             displayName: result.displayName,
           };
         }
@@ -1041,7 +1041,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                           onClick={() => handleFlagClick(flagName)}
                         >
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                            {flagInfo.flagUsage === 'remoteConfig' ? (
+                            {flagInfo.flagType === 'remoteConfig' ? (
                               <JsonIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
                             ) : (
                               <FlagIcon sx={{ fontSize: 16, color: 'text.secondary' }} />

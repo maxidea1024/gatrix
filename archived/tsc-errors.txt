@@ -1,27 +1,451 @@
-﻿src/components/idle-defense/GameEngine.ts(27,39): error TS2304: Cannot find name 'GameState'.
-src/components/idle-defense/GameEngine.ts(71,25): error TS2304: Cannot find name 'GameState'.
-src/components/idle-defense/GameEngine.ts(75,13): error TS2304: Cannot find name 'Enemy'.
-src/components/idle-defense/GameEngine.ts(86,15): error TS7053: Element implicitly has an 'any' type because expression of type 'Enemy' can't be used to index type '{ readonly normal: { readonly color: 4769652; readonly size: 1; readonly speedMult: 1; readonly hpMult: 1; }; readonly fast: { readonly color: 4114664; readonly size: 0.8; readonly speedMult: 2; readonly hpMult: 0.6; }; readonly tank: { ...; }; readonly boss: { ...; }; }'.
-src/components/idle-defense/GameEngine.ts(90,16): error TS2304: Cannot find name 'Enemy'.
-src/components/idle-defense/GameEngine.ts(112,7): error TS2304: Cannot find name 'GameState'.
-src/components/idle-defense/GameEngine.ts(134,7): error TS2304: Cannot find name 'GameState'.
-src/components/idle-defense/GameEngine.ts(151,32): error TS2304: Cannot find name 'GameState'.
-src/components/idle-defense/GameEngine.ts(151,50): error TS2304: Cannot find name 'Enemy'.
-src/components/idle-defense/GameEngine.ts(176,7): error TS2304: Cannot find name 'GameState'.
-src/components/idle-defense/GameEngine.ts(177,10): error TS2304: Cannot find name 'Enemy'.
-src/components/idle-defense/GameEngine.ts(229,7): error TS2304: Cannot find name 'GameState'.
-src/components/idle-defense/GameEngine.ts(234,33): error TS7006: Parameter 's' implicitly has an 'any' type.
-src/components/idle-defense/GameEngine.ts(258,38): error TS7006: Parameter 'e' implicitly has an 'any' type.
-src/components/idle-defense/GameEngine.ts(258,59): error TS7006: Parameter 'a' implicitly has an 'any' type.
-src/components/idle-defense/GameEngine.ts(258,62): error TS7006: Parameter 'b' implicitly has an 'any' type.
-src/components/idle-defense/GameEngine.ts(267,7): error TS2304: Cannot find name 'GameState'.
-src/components/idle-defense/GameEngine.ts(326,28): error TS7006: Parameter 'e' implicitly has an 'any' type.
-src/components/idle-defense/GameEngine.ts(393,38): error TS7006: Parameter 'e' implicitly has an 'any' type.
-src/components/idle-defense/GameEngine.ts(393,77): error TS7006: Parameter 'a' implicitly has an 'any' type.
-src/components/idle-defense/GameEngine.ts(393,80): error TS7006: Parameter 'b' implicitly has an 'any' type.
-src/components/idle-defense/GameEngine.ts(446,39): error TS7006: Parameter 'e' implicitly has an 'any' type.
-src/components/idle-defense/GameEngine.ts(465,41): error TS7006: Parameter 'e' implicitly has an 'any' type.
-src/components/idle-defense/GameEngine.ts(522,24): error TS7006: Parameter 'e' implicitly has an 'any' type.
-src/components/idle-defense/GameEngine.ts(535,49): error TS7006: Parameter 'e' implicitly has an 'any' type.
-src/components/idle-defense/GameEngine.ts(545,28): error TS2304: Cannot find name 'GameState'.
-src/components/idle-defense/GameEngine.ts(580,14): error TS7006: Parameter 'it' implicitly has an 'any' type.
+﻿yarn run v1.22.22
+$ C:\work\uwo\gatrix\node_modules\.bin\tsc --noEmit
+src/components/admin/BulkClientVersionForm.tsx(191,5): error TS2322: Type 'Resolver<{ clientVersion: string; clientStatus: ClientStatus; guestModeAllowed: boolean; externalClickLink: string; memo: string; customPayload: string; platforms: { platform?: string; gameServerAddress?: string; gameServerAddressForWhiteList?: string; patchAddress?: string; patchAddressForWhiteList?: string; }[]; ....' is not assignable to type 'Resolver<BulkCreateFormData, any, BulkCreateFormData>'.
+  Types of parameters 'values' and 'values' are incompatible.
+    Type 'BulkCreateFormData' is not assignable to type '{ clientVersion: string; clientStatus: ClientStatus; guestModeAllowed: boolean; externalClickLink: string; memo: string; customPayload: string; platforms: { platform?: string; gameServerAddress?: string; gameServerAddressForWhiteList?: string; patchAddress?: string; patchAddressForWhiteList?: string; }[]; ... 4 more...'.
+      Property 'externalClickLink' is optional in type 'BulkCreateFormData' but required in type '{ clientVersion: string; clientStatus: ClientStatus; guestModeAllowed: boolean; externalClickLink: string; memo: string; customPayload: string; platforms: { platform?: string; gameServerAddress?: string; gameServerAddressForWhiteList?: string; patchAddress?: string; patchAddressForWhiteList?: string; }[]; ... 4 more...'.
+src/components/admin/BulkClientVersionForm.tsx(436,32): error TS2345: Argument of type '(data: BulkCreateFormData) => Promise<void>' is not assignable to parameter of type 'SubmitHandler<TFieldValues>'.
+  Types of parameters 'data' and 'data' are incompatible.
+    Type 'TFieldValues' is not assignable to type 'BulkCreateFormData'.
+      Type 'FieldValues' is missing the following properties from type 'BulkCreateFormData': clientVersion, clientStatus, guestModeAllowed, platforms
+src/components/admin/BulkClientVersionForm.tsx(514,21): error TS2322: Type 'string[]' is not assignable to type 'string'.
+src/components/admin/BulkClientVersionForm.tsx(515,21): error TS2322: Type '(event: SelectChangeEvent<string[]>) => void' is not assignable to type '(event: ChangeEvent<Omit<HTMLInputElement, "value"> & { value: string; }> | (Event & { target: { value: string; name: string; }; }), child: ReactNode) => void'.
+  Types of parameters 'event' and 'event' are incompatible.
+    Type 'ChangeEvent<Omit<HTMLInputElement, "value"> & { value: string; }> | (Event & { target: { value: string; name: string; }; })' is not assignable to type 'ChangeEvent<HTMLInputElement> | (Event & { target: { value: string[]; name: string; }; })'.
+      Type 'Event & { target: { value: string; name: string; }; }' is not assignable to type 'ChangeEvent<HTMLInputElement> | (Event & { target: { value: string[]; name: string; }; })'.
+        Type 'Event & { target: { value: string; name: string; }; }' is not assignable to type 'Event & { target: { value: string[]; name: string; }; }'.
+          Type 'Event & { target: { value: string; name: string; }; }' is not assignable to type '{ target: { value: string[]; name: string; }; }'.
+            The types of 'target.value' are incompatible between these types.
+              Type 'string' is not assignable to type 'string[]'.
+src/components/admin/BulkClientVersionForm.tsx(529,35): error TS2339: Property 'map' does not exist on type 'string'.
+src/components/admin/BulkClientVersionForm.tsx(687,39): error TS2339: Property 'description' does not exist on type '{ id: number; name: string; color: string; }'.
+src/components/admin/BulkClientVersionForm.tsx(724,31): error TS2339: Property 'description' does not exist on type '{ id: number; name: string; color: string; }'.
+src/components/admin/ChangeRequestDetailDrawer.tsx(58,3): error TS2304: Cannot find name 'ChangeRequestStatus'.
+src/components/admin/ChangeRequestDetailDrawer.tsx(1143,79): error TS2367: This comparison appears to be unintentional because the types 'string' and 'number' have no overlap.
+src/components/admin/ChangeRequestDetailDrawer.tsx(1210,79): error TS2367: This comparison appears to be unintentional because the types 'string' and 'number' have no overlap.
+src/components/admin/ChangeRequestDetailDrawer.tsx(1519,50): error TS2339: Property 'afterData' does not exist on type '{ table: any; targetId: any; operation: string; changes: FieldChange[]; actionGroupId: any; }'.
+src/components/admin/ChangeRequestDetailDrawer.tsx(1953,9): error TS2322: Type '{ open: boolean; onClose: () => void; changeRequestId: string; onRollbackCreated: () => void; }' is not assignable to type 'IntrinsicAttributes & RevertPreviewDrawerProps'.
+  Property 'onRollbackCreated' does not exist on type 'IntrinsicAttributes & RevertPreviewDrawerProps'.
+src/components/admin/ClientVersionForm.tsx(206,5): error TS2322: Type 'Resolver<{ platform: string; clientVersion: string; clientStatus: ClientStatus; gameServerAddress: string; gameServerAddressForWhiteList: string; patchAddress: string; patchAddressForWhiteList: string; ... 9 more ...; tags: any[]; }, any, { ...; }>' is not assignable to type 'Resolver<ClientVersionFormData, any, ClientVersionFormData>'.
+  Types of parameters 'options' and 'options' are incompatible.
+    Type 'ResolverOptions<ClientVersionFormData>' is not assignable to type 'ResolverOptions<{ platform: string; clientVersion: string; clientStatus: ClientStatus; gameServerAddress: string; gameServerAddressForWhiteList: string; patchAddress: string; patchAddressForWhiteList: string; ... 9 more ...; tags: any[]; }>'.
+      Type 'ClientVersionFormData' is not assignable to type '{ platform: string; clientVersion: string; clientStatus: ClientStatus; gameServerAddress: string; gameServerAddressForWhiteList: string; patchAddress: string; patchAddressForWhiteList: string; ... 9 more ...; tags: any[]; }'.
+        Property 'gameServerAddressForWhiteList' is optional in type 'ClientVersionFormData' but required in type '{ platform: string; clientVersion: string; clientStatus: ClientStatus; gameServerAddress: string; gameServerAddressForWhiteList: string; patchAddress: string; patchAddressForWhiteList: string; ... 9 more ...; tags: any[]; }'.
+src/components/admin/ClientVersionForm.tsx(653,32): error TS2345: Argument of type 'SubmitHandler<ClientVersionFormData>' is not assignable to parameter of type 'SubmitHandler<TFieldValues>'.
+  Type 'ClientVersionFormData' is not assignable to type 'TFieldValues'.
+    'ClientVersionFormData' is assignable to the constraint of type 'TFieldValues', but 'TFieldValues' could be instantiated with a different subtype of constraint 'FieldValues'.
+src/components/admin/ClientVersionForm.tsx(1075,39): error TS2339: Property 'description' does not exist on type '{ id: number; name: string; color: string; }'.
+src/components/admin/ClientVersionForm.tsx(1110,29): error TS2339: Property 'description' does not exist on type '{ id: number; name: string; color: string; }'.
+src/components/admin/ClientVersionGuideDrawer.tsx(368,6): error TS2741: Property 'storageKey' is missing in type '{ children: Element; open: boolean; onClose: () => void; title: string; subtitle: string; defaultWidth: number; }' but required in type 'ResizableDrawerProps'.
+src/components/admin/GameWorldForm.tsx(170,47): error TS2345: Argument of type 'string' is not assignable to parameter of type '() => void'.
+src/components/admin/GameWorldForm.tsx(411,36): error TS2345: Argument of type '(prev: any) => any' is not assignable to parameter of type 'CreateGameWorldData'.
+src/components/admin/RevertPreviewDrawer.tsx(227,7): error TS2322: Type '{ children: Element; anchor: string; open: boolean; onClose: () => void; title: string; defaultWidth: number; minWidth: number; }' is not assignable to type 'IntrinsicAttributes & ResizableDrawerProps'.
+  Property 'anchor' does not exist on type 'IntrinsicAttributes & ResizableDrawerProps'.
+src/components/admin/SubmitPreviewDrawer.tsx(210,7): error TS2322: Type '{ children: Element; anchor: string; open: boolean; onClose: () => void; title: string; defaultWidth: number; minWidth: number; }' is not assignable to type 'IntrinsicAttributes & ResizableDrawerProps'.
+  Property 'anchor' does not exist on type 'IntrinsicAttributes & ResizableDrawerProps'.
+src/components/admin/UserForm.tsx(22,10): error TS2724: '"@/services/tagService"' has no exported member named 'TagService'. Did you mean 'tagService'?
+src/components/chat/__tests__/ChatScrollBehavior.test.tsx(97,34): error TS2322: Type 'string' is not assignable to type 'number'.
+src/components/chat/AdvancedMessageInput.tsx(50,40): error TS2339: Property 'members' does not exist on type 'Channel'.
+src/components/chat/MentionAutocomplete.tsx(121,8): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: { component: ElementType<any, keyof IntrinsicElements>; } & ListOwnProps & CommonProps & Omit<any, "style" | ... 6 more ... | "subheader">): Element', gave the following error.
+    Property 'component' is missing in type '{ children: Element[]; ref: MutableRefObject<HTMLDivElement>; dense: true; sx: { maxHeight: number; overflow: "auto"; py: number; }; }' but required in type '{ component: ElementType<any, keyof IntrinsicElements>; }'.
+  Overload 2 of 2, '(props: DefaultComponentProps<ExtendListTypeMap<ListTypeMap<{}, "ul">>>): Element', gave the following error.
+    Type 'MutableRefObject<HTMLDivElement>' is not assignable to type 'Ref<HTMLUListElement>'.
+      Type 'MutableRefObject<HTMLDivElement>' is not assignable to type 'RefObject<HTMLUListElement>'.
+        Types of property 'current' are incompatible.
+          Type 'HTMLDivElement' is missing the following properties from type 'HTMLUListElement': compact, type
+src/components/chat/MentionAutocomplete.tsx(157,27): error TS2339: Property 'role' does not exist on type 'User'.
+src/components/chat/MentionAutocomplete.tsx(166,27): error TS2339: Property 'status' does not exist on type 'User'.
+src/components/chat/MessageContent.tsx(136,25): error TS2339: Property 'name' does not exist on type 'MessageAttachment'.
+src/components/chat/MessageContent.tsx(147,30): error TS2339: Property 'location' does not exist on type 'Message'.
+src/components/chat/MessageList.tsx(96,5): error TS2322: Type '{ message: string; sentTime: string; sender: string; direction: any; position: "normal" | "first" | "last" | "single"; type: "text" | "audio" | "video" | "image" | "custom"; }[]' is not assignable to type 'MessageModel[]'.
+  Type '{ message: string; sentTime: string; sender: string; direction: any; position: "normal" | "first" | "last" | "single"; type: "text" | "audio" | "video" | "image" | "custom"; }' is not assignable to type 'MessageModel'.
+    Types of property 'type' are incompatible.
+      Type '"text" | "audio" | "video" | "image" | "custom"' is not assignable to type 'MessageType'.
+        Type '"audio"' is not assignable to type 'MessageType'.
+src/components/chat/MessageList.tsx(174,13): error TS2322: Type '(innerHtml: string, textContent: string, innerText: string, nodes: any[]) => Promise<void>' is not assignable to type '(innerHtml: string, textContent: string, innerText: string, nodes: NodeList) => void'.
+  Types of parameters 'nodes' and 'nodes' are incompatible.
+    Type 'NodeList' is missing the following properties from type 'any[]': pop, push, concat, join, and 23 more.
+src/components/chat/MessageList.tsx(195,14): error TS2552: Cannot find name 'InfoButton'. Did you mean 'IconButton'?
+src/components/chat/MessageList.tsx(243,11): error TS2322: Type '(innerHtml: string, textContent: string, innerText: string, nodes: any[]) => Promise<void>' is not assignable to type '(innerHtml: string, textContent: string, innerText: string, nodes: NodeList) => void'.
+  Types of parameters 'nodes' and 'nodes' are incompatible.
+    Type 'NodeList' is missing the following properties from type 'any[]': pop, push, concat, join, and 23 more.
+src/components/chat/NotificationManager.tsx(209,32): error TS2554: Expected 1 arguments, but got 0.
+src/components/chat/ReadReceipts.tsx(11,19): error TS2305: Module '"../../types/chat"' has no exported member 'MessageStatus'.
+src/components/chat/ReadReceipts.tsx(79,31): error TS2339: Property 'readBy' does not exist on type 'Message'.
+src/components/chat/ReadReceipts.tsx(104,47): error TS2339: Property 'status' does not exist on type 'Message'.
+src/components/chat/ReadReceipts.tsx(105,86): error TS2339: Property 'status' does not exist on type 'Message'.
+src/components/chat/ReadReceipts.tsx(197,32): error TS2339: Property 'status' does not exist on type 'Message'.
+src/components/chat/SimpleMessageList.tsx(120,10): error TS2304: Cannot find name 'Paper'.
+src/components/chat/SimpleMessageList.tsx(134,11): error TS2304: Cannot find name 'Paper'.
+src/components/chat/SimpleMessageList.tsx(160,23): error TS2554: Expected 2 arguments, but got 1.
+src/components/chat/SimpleMessageList.tsx(178,8): error TS2304: Cannot find name 'Paper'.
+src/components/chat/SimpleMessageList.tsx(188,9): error TS2304: Cannot find name 'Paper'.
+src/components/chat/SimpleMessageList.tsx(242,20): error TS2304: Cannot find name 'Paper'.
+src/components/chat/SimpleMessageList.tsx(262,21): error TS2304: Cannot find name 'Paper'.
+src/components/chat/SimpleMessageList.tsx(280,21): error TS2554: Expected 2 arguments, but got 1.
+src/components/chat/UserPresence.tsx(10,16): error TS2305: Module '"../../types/chat"' has no exported member 'UserStatus'.
+src/components/chat/UserPresence.tsx(148,52): error TS2339: Property 'status' does not exist on type 'User'.
+src/components/chat/UserPresence.tsx(175,15): error TS2339: Property 'role' does not exist on type 'User'.
+src/components/chat/UserPresence.tsx(197,31): error TS2339: Property 'status' does not exist on type 'User'.
+src/components/chat/UserPresence.tsx(199,33): error TS2339: Property 'status' does not exist on type 'User'.
+src/components/chat/UserPresence.tsx(204,29): error TS2339: Property 'status' does not exist on type 'User'.
+src/components/chat/UserPresence.tsx(206,32): error TS2551: Property 'lastSeenAt' does not exist on type 'User'. Did you mean 'lastSeen'?
+src/components/chat/UserPresence.tsx(229,48): error TS2339: Property 'status' does not exist on type 'User'.
+src/components/chat/UserPresence.tsx(230,87): error TS2339: Property 'status' does not exist on type 'User'.
+src/components/chat/UserPresence.tsx(251,37): error TS2339: Property 'status' does not exist on type 'User'.
+src/components/chat/UserPresence.tsx(253,37): error TS2339: Property 'status' does not exist on type 'User'.
+src/components/chat/UserPresence.tsx(255,40): error TS2551: Property 'lastSeenAt' does not exist on type 'User'. Did you mean 'lastSeen'?
+src/components/chat/UserSearchDialog.tsx(89,31): error TS2345: Argument of type 'Set<unknown>' is not assignable to parameter of type 'SetStateAction<Set<number>>'.
+  Type 'Set<unknown>' is not assignable to type 'Set<number>'.
+    Type 'unknown' is not assignable to type 'number'.
+src/components/chat/UserSearchDialog.tsx(116,34): error TS2345: Argument of type 'Set<unknown>' is not assignable to parameter of type 'SetStateAction<Set<number>>'.
+  Type 'Set<unknown>' is not assignable to type 'Set<number>'.
+    Type 'unknown' is not assignable to type 'number'.
+src/components/common/DateRangePicker.tsx(270,29): error TS2315: Type 'PickersDayProps' is not generic.
+src/components/common/JsonEditor.tsx(260,15): error TS2322: Type 'false' is not assignable to type '"off" | "singleFile" | "multiFile"'.
+src/components/common/SelectField.tsx(41,8): error TS2322: Type '{ children: ReactNode; error?: boolean; input?: ReactElement<unknown, any>; slot?: string; style?: CSSProperties; title?: string; ref?: Ref<unknown>; components?: { ...; }; ... 301 more ...; displayEmpty: boolean; }' is not assignable to type 'IntrinsicAttributes & SelectProps<any>'.
+  Type '{ children: ReactNode; error?: boolean; input?: ReactElement<unknown, any>; slot?: string; style?: CSSProperties; title?: string; ref?: Ref<unknown>; components?: { ...; }; ... 301 more ...; displayEmpty: boolean; }' is not assignable to type 'OutlinedSelectProps'.
+    Types of property 'variant' are incompatible.
+      Type '"outlined" | "filled" | "standard"' is not assignable to type '"outlined"'.
+        Type '"filled"' is not assignable to type '"outlined"'.
+src/components/coupons/SDKGuideDrawer.tsx(425,6): error TS2741: Property 'storageKey' is missing in type '{ children: Element; open: boolean; onClose: () => void; title: string; subtitle: string; defaultWidth: number; }' but required in type 'ResizableDrawerProps'.
+src/components/features/ConstraintEditor.tsx(204,5): error TS2367: This comparison appears to be unintentional because the types 'ConstraintOperator' and '"str_in"' have no overlap.
+src/components/features/ConstraintEditor.tsx(205,5): error TS2367: This comparison appears to be unintentional because the types 'ConstraintOperator' and '"str_not_in"' have no overlap.
+src/components/features/ConstraintEditor.tsx(866,23): error TS2322: Type 'TFunction<"translation", undefined>' is not assignable to type '(key: string, fallback?: string) => string'.
+  Types of parameters 'args' and 'key' are incompatible.
+    Type '[key: string, fallback?: string]' is not assignable to type '[key: string | string[], options: TOptionsBase & $Dictionary & { defaultValue: string; }] | [key: string | string[], defaultValue: string, options?: TOptionsBase & $Dictionary] | [key: ...]'.
+      Type '[key: string, fallback?: string]' is not assignable to type '[key: string | string[], options?: TOptionsBase & $Dictionary]'.
+        Type at position 1 in source is not compatible with type at position 1 in target.
+          Type 'string' is not assignable to type 'TOptionsBase & $Dictionary'.
+            Type 'string' is not assignable to type '$Dictionary'.
+src/components/features/EnvironmentVariantsEditor.tsx(731,16): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: { component: ElementType<any, keyof IntrinsicElements>; } & GridBaseProps & { sx?: SxProps<Theme>; } & SystemProps<Theme> & Omit<...>): Element', gave the following error.
+    Property 'component' is missing in type '{ children: Element[]; item: true; xs: number; md: number; }' but required in type '{ component: ElementType<any, keyof IntrinsicElements>; }'.
+  Overload 2 of 2, '(props: DefaultComponentProps<GridTypeMap<{}, "div">>): Element', gave the following error.
+    Type '{ children: Element[]; item: true; xs: number; md: number; }' is not assignable to type 'IntrinsicAttributes & GridBaseProps & { sx?: SxProps<Theme>; } & SystemProps<Theme> & Omit<Omit<DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement>, "ref"> & { ...; }, "sx" | ... 1 more ... | keyof GridBaseProps>'.
+      Property 'item' does not exist on type 'IntrinsicAttributes & GridBaseProps & { sx?: SxProps<Theme>; } & SystemProps<Theme> & Omit<Omit<DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement>, "ref"> & { ...; }, "sx" | ... 1 more ... | keyof GridBaseProps>'.
+src/components/features/EnvironmentVariantsEditor.tsx(737,16): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: { component: ElementType<any, keyof IntrinsicElements>; } & GridBaseProps & { sx?: SxProps<Theme>; } & SystemProps<Theme> & Omit<...>): Element', gave the following error.
+    Property 'component' is missing in type '{ children: Element[]; item: true; xs: number; md: number; }' but required in type '{ component: ElementType<any, keyof IntrinsicElements>; }'.
+  Overload 2 of 2, '(props: DefaultComponentProps<GridTypeMap<{}, "div">>): Element', gave the following error.
+    Type '{ children: Element[]; item: true; xs: number; md: number; }' is not assignable to type 'IntrinsicAttributes & GridBaseProps & { sx?: SxProps<Theme>; } & SystemProps<Theme> & Omit<Omit<DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement>, "ref"> & { ...; }, "sx" | ... 1 more ... | keyof GridBaseProps>'.
+      Property 'item' does not exist on type 'IntrinsicAttributes & GridBaseProps & { sx?: SxProps<Theme>; } & SystemProps<Theme> & Omit<Omit<DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement>, "ref"> & { ...; }, "sx" | ... 1 more ... | keyof GridBaseProps>'.
+src/components/features/FeatureFlagAuditLogs.tsx(357,80): error TS2551: Property 'created_at' does not exist on type 'AuditLog'. Did you mean 'createdAt'?
+src/components/features/FeatureFlagAuditLogs.tsx(359,65): error TS2551: Property 'created_at' does not exist on type 'AuditLog'. Did you mean 'createdAt'?
+src/components/features/FeatureFlagAuditLogs.tsx(364,20): error TS2551: Property 'user_name' does not exist on type 'AuditLog'. Did you mean 'userName'?
+src/components/features/FeatureFlagAuditLogs.tsx(367,20): error TS2551: Property 'user_name' does not exist on type 'AuditLog'. Did you mean 'userName'?
+src/components/features/FeatureFlagAuditLogs.tsx(370,20): error TS2551: Property 'user_email' does not exist on type 'AuditLog'. Did you mean 'userEmail'?
+src/components/features/FeatureFlagAuditLogs.tsx(392,15): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: { component: ElementType<any, keyof IntrinsicElements>; } & TypographyOwnProps & CommonProps & Omit<any, "p" | ... 112 more ... | "variantMapping">): Element', gave the following error.
+    Type 'string | $SpecialObject | TFunctionDetailedResult<string | $SpecialObject, any>' is not assignable to type 'ReactNode'.
+      Type 'object' is not assignable to type 'ReactNode'.
+  Overload 2 of 2, '(props: DefaultComponentProps<TypographyTypeMap<{}, "span">>): Element', gave the following error.
+    Type 'string | $SpecialObject | TFunctionDetailedResult<string | $SpecialObject, any>' is not assignable to type 'ReactNode'.
+      Type 'object' is not assignable to type 'ReactNode'.
+src/components/features/FeatureFlagAuditLogs.tsx(426,18): error TS2551: Property 'ip_address' does not exist on type 'AuditLog'. Did you mean 'ipAddress'?
+src/components/game/BannerPreview.tsx(487,29): error TS2339: Property 'clickUrl' does not exist on type '{ sequenceIndex: number; frameIndex: number; sequenceName: string; speedMultiplier: number; loopMode: LoopModeType; frameId: string; imageUrl: string; type: FrameType; ... 7 more ...; link?: string; }'.
+src/components/game/BannerPreview.tsx(488,38): error TS2339: Property 'clickUrl' does not exist on type '{ sequenceIndex: number; frameIndex: number; sequenceName: string; speedMultiplier: number; loopMode: LoopModeType; frameId: string; imageUrl: string; type: FrameType; ... 7 more ...; link?: string; }'.
+src/components/game/BannerPreview.tsx(498,33): error TS2339: Property 'clickUrl' does not exist on type '{ sequenceIndex: number; frameIndex: number; sequenceName: string; speedMultiplier: number; loopMode: LoopModeType; frameId: string; imageUrl: string; type: FrameType; ... 7 more ...; link?: string; }'.
+src/components/game/BannerPreview.tsx(588,26): error TS2339: Property 'clickUrl' does not exist on type '{ sequenceIndex: number; frameIndex: number; sequenceName: string; speedMultiplier: number; loopMode: LoopModeType; frameId: string; imageUrl: string; type: FrameType; ... 7 more ...; link?: string; }'.
+src/components/game/BannerPreview.tsx(604,30): error TS2339: Property 'clickUrl' does not exist on type '{ sequenceIndex: number; frameIndex: number; sequenceName: string; speedMultiplier: number; loopMode: LoopModeType; frameId: string; imageUrl: string; type: FrameType; ... 7 more ...; link?: string; }'.
+src/components/game/BannerPreview.tsx(627,35): error TS2339: Property 'clickUrl' does not exist on type '{ sequenceIndex: number; frameIndex: number; sequenceName: string; speedMultiplier: number; loopMode: LoopModeType; frameId: string; imageUrl: string; type: FrameType; ... 7 more ...; link?: string; }'.
+src/components/game/BannerPreview.tsx(637,39): error TS2339: Property 'clickUrl' does not exist on type '{ sequenceIndex: number; frameIndex: number; sequenceName: string; speedMultiplier: number; loopMode: LoopModeType; frameId: string; imageUrl: string; type: FrameType; ... 7 more ...; link?: string; }'.
+src/components/game/IngamePopupNoticeFormDialog.tsx(549,34): error TS2345: Argument of type 'number | ""' is not assignable to parameter of type 'SetStateAction<number>'.
+  Type 'string' is not assignable to type 'SetStateAction<number>'.
+src/components/game/IngamePopupNoticeGuideDrawer.tsx(267,6): error TS2741: Property 'storageKey' is missing in type '{ children: Element; open: boolean; onClose: () => void; title: string; subtitle: string; defaultWidth: number; }' but required in type 'ResizableDrawerProps'.
+src/components/game/RewardDisplay.tsx(49,29): error TS2345: Argument of type '{ type: any; id: any; quantity: any; }[]' is not assignable to parameter of type 'SetStateAction<Reward[]>'.
+  Type '{ type: any; id: any; quantity: any; }[]' is not assignable to type 'Reward[]'.
+    Type '{ type: any; id: any; quantity: any; }' is missing the following properties from type 'Reward': rewardType, itemId
+src/components/game/RewardDisplay.tsx(62,31): error TS2345: Argument of type '{ type: any; id: any; quantity: any; }[]' is not assignable to parameter of type 'SetStateAction<Reward[]>'.
+  Type '{ type: any; id: any; quantity: any; }[]' is not assignable to type 'Reward[]'.
+    Type '{ type: any; id: any; quantity: any; }' is missing the following properties from type 'Reward': rewardType, itemId
+src/components/game/StoreProductFormDrawer.tsx(478,32): error TS2345: Argument of type 'number | ""' is not assignable to parameter of type 'SetStateAction<number>'.
+  Type 'string' is not assignable to type 'SetStateAction<number>'.
+src/components/game/SurveyConfigDialog.tsx(64,6): error TS2739: Type '{ children: Element[]; open: boolean; onClose: () => void; defaultWidth: number; minWidth: number; maxWidth: number; }' is missing the following properties from type 'ResizableDrawerProps': title, storageKey
+src/components/game/TargetSelector.tsx(23,18): error TS2395: Individual declarations in merged declaration 'ChannelSubchannelData' must be all exported or all local.
+src/components/game/TargetSelector.tsx(54,11): error TS2395: Individual declarations in merged declaration 'ChannelSubchannelData' must be all exported or all local.
+src/components/game/TargetSelector.tsx(88,23): error TS2345: Argument of type '(string | ChannelSubchannelData)[]' is not assignable to parameter of type 'string[] | ChannelSubchannelData[]'.
+  Type '(string | ChannelSubchannelData)[]' is not assignable to type 'string[]'.
+    Type 'string | ChannelSubchannelData' is not assignable to type 'string'.
+      Type 'ChannelSubchannelData' is not assignable to type 'string'.
+src/components/game/TargetSelector.tsx(93,25): error TS2345: Argument of type '(string | ChannelSubchannelData)[]' is not assignable to parameter of type 'string[] | ChannelSubchannelData[]'.
+  Type '(string | ChannelSubchannelData)[]' is not assignable to type 'string[]'.
+    Type 'string | ChannelSubchannelData' is not assignable to type 'string'.
+      Type 'ChannelSubchannelData' is not assignable to type 'string'.
+src/components/game/TargetSelector.tsx(95,25): error TS2345: Argument of type '(string | ChannelSubchannelData)[]' is not assignable to parameter of type 'string[] | ChannelSubchannelData[]'.
+  Type '(string | ChannelSubchannelData)[]' is not assignable to type 'string[]'.
+    Type 'string | ChannelSubchannelData' is not assignable to type 'string'.
+      Type 'ChannelSubchannelData' is not assignable to type 'string'.
+src/components/game/TargetSelector.tsx(132,54): error TS2345: Argument of type 'string' is not assignable to parameter of type 'string & ChannelSubchannelData'.
+  Type 'string' is not assignable to type 'ChannelSubchannelData'.
+src/components/gameWorlds/GameWorldSDKGuideDrawer.tsx(299,6): error TS2741: Property 'storageKey' is missing in type '{ children: Element; open: boolean; onClose: () => void; title: string; subtitle: string; defaultWidth: number; }' but required in type 'ResizableDrawerProps'.
+src/components/jobs/DynamicJobDataForm.tsx(252,22): error TS2339: Property 'label' does not exist on type 'JobSchemaField'.
+src/components/jobs/JobExecutionHistory.tsx(184,22): error TS2551: Property 'error_message' does not exist on type 'JobExecution'. Did you mean 'errorMessage'?
+src/components/jobs/JobExecutionHistory.tsx(191,30): error TS2551: Property 'error_message' does not exist on type 'JobExecution'. Did you mean 'errorMessage'?
+src/components/jobs/JobForm.tsx(85,9): error TS2304: Cannot find name 'fetchJobDetails'.
+src/components/jobs/JobForm.tsx(258,20): error TS1345: An expression of type 'void' cannot be tested for truthiness.
+src/components/jobs/JobForm.tsx(499,45): error TS2339: Property 'schema' does not exist on type 'JobType'.
+src/components/jobs/JobForm.tsx(506,42): error TS2339: Property 'schema' does not exist on type 'JobType'.
+src/components/mailbox/RichTextEditor.tsx(1102,50): error TS2559: Type 'string' has no properties in common with type '{ html?: string; text?: string; }'.
+src/components/ProtectedRoute.tsx(62,24): error TS2345: Argument of type 'string[]' is not assignable to parameter of type 'Permission | Permission[]'.
+  Type 'string[]' is not assignable to type 'Permission[]'.
+    Type 'string' is not assignable to type 'Permission'.
+src/components/server-list/ServerGroupRenderer.tsx(3,33): error TS2307: Cannot find module '../../../services/serviceDiscoveryService' or its corresponding type declarations.
+src/components/server-list/types.ts(1,33): error TS2307: Cannot find module '../../../services/serviceDiscoveryService' or its corresponding type declarations.
+src/contexts/AuthContext.tsx(206,32): error TS2345: Argument of type '"*"' is not assignable to parameter of type 'Permission'.
+src/contexts/ChatContext.tsx(591,44): error TS2739: Type 'User' is missing the following properties from type 'User': username, isOnline
+src/contexts/ChatContext.tsx(861,43): error TS2739: Type '{ id: number; content: string; type: "system"; channelId: any; userId: number; createdAt: string; updatedAt: string; isDeleted: boolean; isEdited: boolean; }' is missing the following properties from type 'Message': user, reactions, attachments, mentions, hashtags
+src/contexts/ChatContext.tsx(939,36): error TS2339: Property 'channelId' does not exist on type 'ApiResponse<any>'.
+src/contexts/ChatContext.tsx(942,36): error TS2339: Property 'channelId' does not exist on type 'ApiResponse<any>'.
+src/contexts/ChatContext.tsx(946,45): error TS2339: Property 'channelId' does not exist on type 'ApiResponse<any>'.
+src/contexts/ChatContext.tsx(1035,13): error TS2339: Property 'userId' does not exist on type 'User'.
+src/contexts/GameWorldContext.tsx(49,61): error TS2353: Object literal may only specify known properties, and 'limit' does not exist in type 'GameWorldListParams'.
+src/contexts/PlanningDataContext.tsx(77,64): error TS2554: Expected 0 arguments, but got 1.
+src/pages/admin/ApiTokensPage.tsx(619,66): error TS2339: Property 'tokenValue' does not exist on type 'CreateTokenResponse'.
+src/pages/admin/ApiTokensPage.tsx(648,41): error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.
+src/pages/admin/ApiTokensPage.tsx(681,41): error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.
+src/pages/admin/ApiTokensPage.tsx(699,62): error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.
+src/pages/admin/ApiTokensPage.tsx(703,66): error TS2339: Property 'tokenValue' does not exist on type 'CreateTokenResponse'.
+src/pages/admin/ApiTokensPage.tsx(854,27): error TS2345: Argument of type 'string[]' is not assignable to parameter of type 'SetStateAction<number[]>'.
+  Type 'string[]' is not assignable to type 'number[]'.
+    Type 'string' is not assignable to type 'number'.
+src/pages/admin/ApiTokensPage.tsx(917,12): error TS2678: Type '"admin"' is not comparable to type 'TokenType'.
+src/pages/admin/ApiTokensPage.tsx(1134,88): error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.
+src/pages/admin/ApiTokensPage.tsx(1138,64): error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.
+src/pages/admin/ApiTokensPage.tsx(1139,64): error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.
+src/pages/admin/ApiTokensPage.tsx(2155,62): error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.
+src/pages/admin/ApiTokensPage.tsx(2329,21): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: { component: ElementType<any, keyof IntrinsicElements>; } & ChipOwnProps & ChipSlotsAndSlotProps & CommonProps & Omit<...>): Element', gave the following error.
+    Type 'string | $SpecialObject | TFunctionDetailedResult<string | $SpecialObject, any>' is not assignable to type 'ReactNode'.
+      Type 'object' is not assignable to type 'ReactNode'.
+  Overload 2 of 2, '(props: DefaultComponentProps<ChipTypeMap<{}, "div">>): Element', gave the following error.
+    Type 'string | $SpecialObject | TFunctionDetailedResult<string | $SpecialObject, any>' is not assignable to type 'ReactNode'.
+      Type 'object' is not assignable to type 'ReactNode'.
+src/pages/admin/AuditLogsPage.tsx(463,80): error TS2551: Property 'created_at' does not exist on type 'AuditLog'. Did you mean 'createdAt'?
+src/pages/admin/AuditLogsPage.tsx(465,65): error TS2551: Property 'created_at' does not exist on type 'AuditLog'. Did you mean 'createdAt'?
+src/pages/admin/AuditLogsPage.tsx(470,20): error TS2551: Property 'user_name' does not exist on type 'AuditLog'. Did you mean 'userName'?
+src/pages/admin/AuditLogsPage.tsx(473,20): error TS2551: Property 'user_name' does not exist on type 'AuditLog'. Did you mean 'userName'?
+src/pages/admin/AuditLogsPage.tsx(476,20): error TS2551: Property 'user_email' does not exist on type 'AuditLog'. Did you mean 'userEmail'?
+src/pages/admin/AuditLogsPage.tsx(498,15): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: { component: ElementType<any, keyof IntrinsicElements>; } & TypographyOwnProps & CommonProps & Omit<any, "p" | ... 112 more ... | "variantMapping">): Element', gave the following error.
+    Type 'string | $SpecialObject | TFunctionDetailedResult<string | $SpecialObject, any>' is not assignable to type 'ReactNode'.
+      Type 'object' is not assignable to type 'ReactNode'.
+  Overload 2 of 2, '(props: DefaultComponentProps<TypographyTypeMap<{}, "span">>): Element', gave the following error.
+    Type 'string | $SpecialObject | TFunctionDetailedResult<string | $SpecialObject, any>' is not assignable to type 'ReactNode'.
+      Type 'object' is not assignable to type 'ReactNode'.
+src/pages/admin/AuditLogsPage.tsx(532,18): error TS2551: Property 'ip_address' does not exist on type 'AuditLog'. Did you mean 'ipAddress'?
+src/pages/admin/AuditLogsPage.tsx(813,39): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: { component: ElementType<any, keyof IntrinsicElements>; } & ChipOwnProps & ChipSlotsAndSlotProps & CommonProps & Omit<...>): Element', gave the following error.
+    Type 'string | $SpecialObject | TFunctionDetailedResult<string | $SpecialObject, any>' is not assignable to type 'ReactNode'.
+      Type 'object' is not assignable to type 'ReactNode'.
+  Overload 2 of 2, '(props: DefaultComponentProps<ChipTypeMap<{}, "div">>): Element', gave the following error.
+    Type 'string | $SpecialObject | TFunctionDetailedResult<string | $SpecialObject, any>' is not assignable to type 'ReactNode'.
+      Type 'object' is not assignable to type 'ReactNode'.
+src/pages/admin/AuditLogsPage.tsx(853,73): error TS2551: Property 'created_at' does not exist on type 'AuditLog'. Did you mean 'createdAt'?
+src/pages/admin/AuditLogsPage.tsx(858,75): error TS2551: Property 'created_at' does not exist on type 'AuditLog'. Did you mean 'createdAt'?
+src/pages/admin/AuditLogsPage.tsx(883,44): error TS2551: Property 'user_name' does not exist on type 'AuditLog'. Did you mean 'userName'?
+src/pages/admin/AuditLogsPage.tsx(886,50): error TS2551: Property 'user_name' does not exist on type 'AuditLog'. Did you mean 'userName'?
+src/pages/admin/AuditLogsPage.tsx(896,50): error TS2551: Property 'user_email' does not exist on type 'AuditLog'. Did you mean 'userEmail'?
+src/pages/admin/AuditLogsPage.tsx(994,44): error TS2551: Property 'ip_address' does not exist on type 'AuditLog'. Did you mean 'ipAddress'?
+src/pages/admin/AuditLogsPage.tsx(999,41): error TS2551: Property 'user_agent' does not exist on type 'AuditLog'. Did you mean 'userAgent'?
+src/pages/admin/AuditLogsPage.tsx(1024,48): error TS2551: Property 'user_agent' does not exist on type 'AuditLog'. Did you mean 'userAgent'?
+src/pages/admin/ChangeRequestDetailPage.tsx(47,7): error TS2741: Property 'conflict' is missing in type '{ draft: { color: "default"; labelKey: string; bgColor: string; }; open: { color: "primary"; labelKey: string; bgColor: string; }; approved: { color: "success"; labelKey: string; bgColor: string; }; applied: { ...; }; rejected: { ...; }; }' but required in type 'Record<ChangeRequestStatus, { color: "success" | "error" | "warning" | "info" | "default" | "primary" | "secondary"; labelKey: string; bgColor: string; }>'.
+src/pages/admin/ChangeRequestDetailPage.tsx(869,75): error TS2367: This comparison appears to be unintentional because the types 'string' and 'number' have no overlap.
+src/pages/admin/ChangeRequestsPage.tsx(565,9): error TS2322: Type '{ open: boolean; onClose: () => void; changeRequestId: string; onRollbackCreated: () => void; }' is not assignable to type 'IntrinsicAttributes & RevertPreviewDrawerProps'.
+  Property 'onRollbackCreated' does not exist on type 'IntrinsicAttributes & RevertPreviewDrawerProps'.
+src/pages/admin/CustomQueueMonitorPage.tsx(41,10): error TS2614: Module '"@/services/api"' has no exported member 'apiClient'. Did you mean to use 'import apiClient from "@/services/api"' instead?
+src/pages/admin/GatrixEdgesPage.tsx(654,7): error TS2554: Expected 3 arguments, but got 2.
+src/pages/admin/JobsPage.tsx(146,11): error TS2353: Object literal may only specify known properties, and 'tags' does not exist in type 'JobFilters'.
+src/pages/admin/JobsPage.tsx(343,49): error TS2339: Property 'cronExpression' does not exist on type 'Job'.
+src/pages/admin/JobsPage.tsx(347,18): error TS2339: Property 'lastExecutedAt' does not exist on type 'Job'.
+src/pages/admin/JobsPage.tsx(347,62): error TS2339: Property 'lastExecutedAt' does not exist on type 'Job'.
+src/pages/admin/JobsPage.tsx(353,18): error TS2339: Property 'nextExecutionAt' does not exist on type 'Job'.
+src/pages/admin/JobsPage.tsx(353,63): error TS2339: Property 'nextExecutionAt' does not exist on type 'Job'.
+src/pages/admin/JobsPage.tsx(513,20): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(props: { href: string; } & MenuItemOwnProps & Omit<ButtonBaseOwnProps, "classes"> & CommonProps & Omit<Omit<DetailedHTMLProps<AnchorHTMLAttributes<HTMLAnchorElement>, HTMLAnchorElement>, "ref"> & { ...; }, "style" | ... 20 more ... | "disableGutters">): Element', gave the following error.
+    Type '{ children: string; value: boolean; }' is not assignable to type 'IntrinsicAttributes & { href: string; } & MenuItemOwnProps & Omit<ButtonBaseOwnProps, "classes"> & CommonProps & Omit<...>'.
+      Property 'value' does not exist on type 'IntrinsicAttributes & { href: string; } & MenuItemOwnProps & Omit<ButtonBaseOwnProps, "classes"> & CommonProps & Omit<...>'.
+  Overload 2 of 3, '(props: { component: ElementType<any, keyof IntrinsicElements>; } & MenuItemOwnProps & Omit<ButtonBaseOwnProps, "classes"> & CommonProps & Omit<...>): Element', gave the following error.
+    Property 'component' is missing in type '{ children: string; value: boolean; }' but required in type '{ component: ElementType<any, keyof IntrinsicElements>; }'.
+  Overload 3 of 3, '(props: DefaultComponentProps<ExtendButtonBaseTypeMap<MenuItemTypeMap<{}, "li">>>): Element', gave the following error.
+    Type 'boolean' is not assignable to type 'string | number | readonly string[]'.
+src/pages/admin/JobsPage.tsx(514,20): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(props: { href: string; } & MenuItemOwnProps & Omit<ButtonBaseOwnProps, "classes"> & CommonProps & Omit<Omit<DetailedHTMLProps<AnchorHTMLAttributes<HTMLAnchorElement>, HTMLAnchorElement>, "ref"> & { ...; }, "style" | ... 20 more ... | "disableGutters">): Element', gave the following error.
+    Type '{ children: string; value: boolean; }' is not assignable to type 'IntrinsicAttributes & { href: string; } & MenuItemOwnProps & Omit<ButtonBaseOwnProps, "classes"> & CommonProps & Omit<...>'.
+      Property 'value' does not exist on type 'IntrinsicAttributes & { href: string; } & MenuItemOwnProps & Omit<ButtonBaseOwnProps, "classes"> & CommonProps & Omit<...>'.
+  Overload 2 of 3, '(props: { component: ElementType<any, keyof IntrinsicElements>; } & MenuItemOwnProps & Omit<ButtonBaseOwnProps, "classes"> & CommonProps & Omit<...>): Element', gave the following error.
+    Property 'component' is missing in type '{ children: string; value: boolean; }' but required in type '{ component: ElementType<any, keyof IntrinsicElements>; }'.
+  Overload 3 of 3, '(props: DefaultComponentProps<ExtendButtonBaseTypeMap<MenuItemTypeMap<{}, "li">>>): Element', gave the following error.
+    Type 'boolean' is not assignable to type 'string | number | readonly string[]'.
+src/pages/admin/MaintenancePage.tsx(422,7): error TS2304: Cannot find name 'showChangeRequestCreatedToast'.
+src/pages/admin/MaintenancePage.tsx(482,7): error TS2304: Cannot find name 'showChangeRequestCreatedToast'.
+src/pages/admin/MessageTemplatesPage.tsx(175,48): error TS2339: Property 'REMOTE_CONFIG_MANAGE' does not exist on type '{ readonly USERS_VIEW: "users.view"; readonly USERS_MANAGE: "users.manage"; readonly CLIENT_VERSIONS_VIEW: "client-versions.view"; readonly CLIENT_VERSIONS_MANAGE: "client-versions.manage"; ... 50 more ...; readonly CHAT_ACCESS: "chat.access"; }'.
+src/pages/admin/MessageTemplatesPage.tsx(1226,15): error TS2322: Type '{ children: Element[]; select: true; multiple: true; label: string; value: number[]; onChange: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void; SelectProps: { ...; }; helperText: string; }' is not assignable to type 'IntrinsicAttributes & { variant?: TextFieldVariants; } & Omit<OutlinedTextFieldProps | FilledTextFieldProps | StandardTextFieldProps, "variant">'.
+  Property 'multiple' does not exist on type 'IntrinsicAttributes & { variant?: TextFieldVariants; } & Omit<OutlinedTextFieldProps | FilledTextFieldProps | StandardTextFieldProps, "variant">'. Did you mean 'multiline'?
+src/pages/admin/MessageTemplatesPage.tsx(1409,15): error TS2322: Type '{ children: Element[]; select: true; multiple: true; label: string; value: number[]; onChange: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void; SelectProps: { ...; }; fullWidth: true; }' is not assignable to type 'IntrinsicAttributes & { variant?: TextFieldVariants; } & Omit<OutlinedTextFieldProps | FilledTextFieldProps | StandardTextFieldProps, "variant">'.
+  Property 'multiple' does not exist on type 'IntrinsicAttributes & { variant?: TextFieldVariants; } & Omit<OutlinedTextFieldProps | FilledTextFieldProps | StandardTextFieldProps, "variant">'. Did you mean 'multiline'?
+src/pages/admin/SchedulerPage.tsx(233,17): error TS2345: Argument of type '{ title: string; start: any; end: any; description: string; allDay: any; }' is not assignable to parameter of type 'SetStateAction<CreateScheduleEventData>'.
+  Type '{ title: string; start: any; end: any; description: string; allDay: any; }' is missing the following properties from type 'CreateScheduleEventData': scheduleType, cronExpression, intervalMinutes, repeatCount
+src/pages/admin/SchedulerPage.tsx(255,17): error TS2345: Argument of type '{ title: any; start: any; end: any; description: any; allDay: any; }' is not assignable to parameter of type 'SetStateAction<CreateScheduleEventData>'.
+  Type '{ title: any; start: any; end: any; description: any; allDay: any; }' is missing the following properties from type 'CreateScheduleEventData': scheduleType, cronExpression, intervalMinutes, repeatCount
+src/pages/admin/SchedulerPage.tsx(268,17): error TS2345: Argument of type '{ title: string; start: Date; end: undefined; description: string; allDay: false; }' is not assignable to parameter of type 'SetStateAction<CreateScheduleEventData>'.
+  Type '{ title: string; start: Date; end: undefined; description: string; allDay: false; }' is missing the following properties from type 'CreateScheduleEventData': scheduleType, cronExpression, intervalMinutes, repeatCount
+src/pages/admin/SchedulerPage.tsx(418,24): error TS2304: Cannot find name 'LinearProgress'.
+src/pages/admin/SchedulerPage.tsx(468,19): error TS2741: Property 'offsetName' is missing in type 'Moment' but required in type 'Dayjs'.
+src/pages/admin/SchedulerPage.tsx(487,19): error TS2741: Property 'offsetName' is missing in type 'Moment' but required in type 'Dayjs'.
+src/pages/admin/SchedulerPage.tsx(578,23): error TS2322: Type 'string | number' is not assignable to type 'number'.
+  Type 'string' is not assignable to type 'number'.
+src/pages/admin/ServerListPage.tsx(3680,12): error TS2678: Type '"busy"' is not comparable to type '"error" | "initializing" | "ready" | "shutting_down" | "terminated" | "no-response"'.
+src/pages/chat/ChatPage.tsx(186,54): error TS2304: Cannot find name 'Message'.
+src/pages/chat/ChatPage.tsx(419,25): error TS2554: Expected 1 arguments, but got 0.
+src/pages/chat/ChatPage.tsx(435,38): error TS2304: Cannot find name 'Message'.
+src/pages/chat/ChatPage.tsx(917,30): error TS2339: Property 'members' does not exist on type 'Channel'.
+src/pages/chat/ChatPage.tsx(964,27): error TS2339: Property 'loadChannels' does not exist on type '{ setCurrentChannel: (channelId: number) => void; sendMessage: (channelId: number, message: SendMessageRequest) => Promise<Message>; editMessage: (messageId: number, content: string) => Promise<...>; ... 17 more ...; clearError: () => void; }'.
+src/pages/common/DashboardPage.tsx(326,27): error TS2339: Property 'suspendedUsers' does not exist on type '{ totalUsers: number; activeUsers: number; pendingUsers: number; adminUsers: number; }'.
+src/pages/common/DashboardPage.tsx(635,11): error TS2820: Type '"desc"' is not assignable to type '"ASC" | "DESC"'. Did you mean '"DESC"'?
+src/pages/common/DashboardPage.tsx(757,85): error TS2339: Property 'environment' does not exist on type 'Environment'.
+src/pages/common/DashboardPage.tsx(770,66): error TS2339: Property 'environment' does not exist on type 'Environment'.
+src/pages/common/DashboardPage.tsx(1150,17): error TS2322: Type 'Element' is not assignable to type 'string | number'.
+src/pages/common/DashboardPage.tsx(1194,23): error TS2339: Property 'environment' does not exist on type 'EnvironmentWithCounts'.
+src/pages/common/DashboardPage.tsx(1195,23): error TS2339: Property 'environment' does not exist on type 'EnvironmentWithCounts'.
+src/pages/common/DashboardPage.tsx(1201,44): error TS2339: Property 'environment' does not exist on type 'EnvironmentWithCounts'.
+src/pages/common/DashboardPage.tsx(1203,36): error TS2339: Property 'environment' does not exist on type 'EnvironmentWithCounts'.
+src/pages/common/DashboardPage.tsx(1268,72): error TS2339: Property 'environment' does not exist on type 'EnvironmentWithCounts'.
+src/pages/common/DashboardPage.tsx(1364,45): error TS2339: Property 'environment' does not exist on type 'EnvironmentWithCounts'.
+src/pages/common/DashboardPage.tsx(1365,61): error TS2339: Property 'environment' does not exist on type 'EnvironmentWithCounts'.
+src/pages/common/DashboardPage.tsx(1716,46): error TS2339: Property 'firstLine' does not exist on type 'CrashEvent'.
+src/pages/features/UnknownFlagsPage.tsx(166,22): error TS2345: Argument of type '(prev: ActiveFilter[]) => (ActiveFilter | { key: string; value: any; })[]' is not assignable to parameter of type 'SetStateAction<ActiveFilter[]>'.
+  Type '(prev: ActiveFilter[]) => (ActiveFilter | { key: string; value: any; })[]' is not assignable to type '(prevState: ActiveFilter[]) => ActiveFilter[]'.
+    Type '(ActiveFilter | { key: string; value: any; })[]' is not assignable to type 'ActiveFilter[]'.
+      Type 'ActiveFilter | { key: string; value: any; }' is not assignable to type 'ActiveFilter'.
+        Property 'label' is missing in type '{ key: string; value: any; }' but required in type 'ActiveFilter'.
+src/pages/features/UnknownFlagsPage.tsx(302,47): error TS2345: Argument of type 'string' is not assignable to parameter of type '() => void'.
+src/pages/features/UnknownFlagsPage.tsx(601,9): error TS2322: Type '{ open: boolean; anchorEl: HTMLElement; columns: ColumnConfig[]; defaultColumns: ColumnConfig[]; onColumnsChange: (newColumns: ColumnConfig[]) => void; onClose: () => void; }' is not assignable to type 'IntrinsicAttributes & ColumnSettingsDialogProps'.
+  Property 'open' does not exist on type 'IntrinsicAttributes & ColumnSettingsDialogProps'.
+src/pages/game/FeatureContextFieldsPage.tsx(690,49): error TS2345: Argument of type 'EnqueueSnackbar' is not assignable to parameter of type '() => void'.
+  Target signature provides too few arguments. Expected 1 or more, but got 0.
+src/pages/game/FeatureContextFieldsPage.tsx(840,46): error TS2339: Property 'createdByName' does not exist on type 'FeatureContextField'.
+src/pages/game/FeatureContextFieldsPage.tsx(842,44): error TS2339: Property 'createdByEmail' does not exist on type 'FeatureContextField'.
+src/pages/game/FeatureContextFieldsPage.tsx(848,48): error TS2339: Property 'createdByEmail' does not exist on type 'FeatureContextField'.
+src/pages/game/FeatureContextFieldsPage.tsx(1095,55): error TS2339: Property 'description' does not exist on type '{ id: number; name: string; color: string; description?: string; } | { name: never; color: string; }'.
+  Property 'description' does not exist on type '{ name: never; color: string; }'.
+src/pages/game/FeatureFlagsPage.tsx(455,26): error TS2339: Property 'potentiallyStale' does not exist on type 'FeatureFlag'.
+src/pages/game/FeatureFlagsPage.tsx(664,5): error TS2552: Cannot find name 'setExportMenuAnchor'. Did you mean 'setImportExportMenuAnchor'?
+src/pages/game/FeatureFlagsPage.tsx(969,67): error TS2345: Argument of type 'EnqueueSnackbar' is not assignable to parameter of type '() => void'.
+  Target signature provides too few arguments. Expected 1 or more, but got 0.
+src/pages/game/FeatureFlagsPage.tsx(1749,47): error TS2345: Argument of type 'EnqueueSnackbar' is not assignable to parameter of type '() => void'.
+  Target signature provides too few arguments. Expected 1 or more, but got 0.
+src/pages/game/FeatureFlagsPage.tsx(1867,45): error TS2551: Property 'createdByName' does not exist on type 'FeatureFlag'. Did you mean 'createdBy'?
+src/pages/game/FeatureFlagsPage.tsx(1869,43): error TS2339: Property 'createdByEmail' does not exist on type 'FeatureFlag'.
+src/pages/game/FeatureFlagsPage.tsx(1875,47): error TS2339: Property 'createdByEmail' does not exist on type 'FeatureFlag'.
+src/pages/game/FeatureFlagsPage.tsx(2795,9): error TS2322: Type '{ open: boolean; anchorEl: HTMLElement; columns: ColumnConfig[]; onColumnsChange: (newColumns: ColumnConfig[]) => void; onReset: () => void; onClose: () => void; }' is not assignable to type 'IntrinsicAttributes & ColumnSettingsDialogProps'.
+  Property 'open' does not exist on type 'IntrinsicAttributes & ColumnSettingsDialogProps'.
+src/pages/game/FeatureSegmentsPage.tsx(165,11): error TS2322: Type '"datetime"' is not assignable to type '"string" | "number" | "boolean" | "date" | "semver"'.
+src/pages/game/FeatureSegmentsPage.tsx(365,28): error TS2367: This comparison appears to be unintentional because the types 'ConstraintOperator' and '"str_in"' have no overlap.
+src/pages/game/FeatureSegmentsPage.tsx(365,64): error TS2367: This comparison appears to be unintentional because the types 'ConstraintOperator' and '"str_not_in"' have no overlap.
+src/pages/game/FeatureSegmentsPage.tsx(659,49): error TS2345: Argument of type 'EnqueueSnackbar' is not assignable to parameter of type '() => void'.
+  Target signature provides too few arguments. Expected 1 or more, but got 0.
+src/pages/game/FeatureSegmentsPage.tsx(778,48): error TS2339: Property 'createdByName' does not exist on type 'FeatureSegment'.
+src/pages/game/FeatureSegmentsPage.tsx(780,46): error TS2339: Property 'createdByEmail' does not exist on type 'FeatureSegment'.
+src/pages/game/FeatureSegmentsPage.tsx(786,50): error TS2339: Property 'createdByEmail' does not exist on type 'FeatureSegment'.
+src/pages/game/FeatureSegmentsPage.tsx(968,55): error TS2339: Property 'description' does not exist on type '{ id: number; name: string; color: string; description?: string; } | { name: never; color: string; }'.
+  Property 'description' does not exist on type '{ name: never; color: string; }'.
+src/pages/game/IngamePopupNoticesPage.tsx(692,43): error TS2339: Property 'targetMarkets' does not exist on type 'IngamePopupNotice'.
+src/pages/game/IngamePopupNoticesPage.tsx(692,67): error TS2339: Property 'targetMarkets' does not exist on type 'IngamePopupNotice'.
+src/pages/game/IngamePopupNoticesPage.tsx(694,98): error TS2339: Property 'targetMarkets' does not exist on type 'IngamePopupNotice'.
+src/pages/game/IngamePopupNoticesPage.tsx(698,43): error TS2339: Property 'targetClientVersions' does not exist on type 'IngamePopupNotice'.
+src/pages/game/IngamePopupNoticesPage.tsx(699,44): error TS2339: Property 'targetClientVersions' does not exist on type 'IngamePopupNotice'.
+src/pages/game/IngamePopupNoticesPage.tsx(701,107): error TS2339: Property 'targetClientVersions' does not exist on type 'IngamePopupNotice'.
+src/pages/game/IngamePopupNoticesPage.tsx(705,43): error TS2339: Property 'targetAccountIds' does not exist on type 'IngamePopupNotice'.
+src/pages/game/IngamePopupNoticesPage.tsx(706,44): error TS2339: Property 'targetAccountIds' does not exist on type 'IngamePopupNotice'.
+src/pages/game/IngamePopupNoticesPage.tsx(708,103): error TS2339: Property 'targetAccountIds' does not exist on type 'IngamePopupNotice'.
+src/pages/game/PlanningDataPage.tsx(423,83): error TS2554: Expected 1 arguments, but got 2.
+src/pages/game/PlanningDataPage.tsx(631,32): error TS2339: Property 'icon' does not exist on type 'HotTimeBuffItem'.
+src/pages/game/PlanningDataPage.tsx(1855,56): error TS2551: Property 'worldBuffNamesKr' does not exist on type 'HotTimeBuffItem'. Did you mean 'worldBuffNames'?
+src/pages/game/PlanningDataPage.tsx(1857,69): error TS2551: Property 'worldBuffNamesEn' does not exist on type 'HotTimeBuffItem'. Did you mean 'worldBuffNames'?
+src/pages/game/PlanningDataPage.tsx(1858,69): error TS2551: Property 'worldBuffNamesCn' does not exist on type 'HotTimeBuffItem'. Did you mean 'worldBuffNames'?
+src/pages/game/SurveysPage.tsx(611,52): error TS2345: Argument of type '[string]' is not assignable to parameter of type '[key: string | string[], options: TOptionsBase & $Dictionary & { defaultValue: never; }] | [key: string | string[], defaultValue: never, options?: TOptionsBase & $Dictionary] | [key: ...]'.
+  Type '[string]' is not assignable to type '[key: never[], options?: TOptionsBase & $Dictionary]'.
+    Type at position 0 in source is not compatible with type at position 0 in target.
+      Type 'string' is not assignable to type 'never[]'.
+src/pages/mailbox/MailboxPage.tsx(718,13): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: { component: ElementType<any, keyof IntrinsicElements>; } & PaperOwnProps & CommonProps & Omit<any, "style" | ... 6 more ... | "variant">): Element', gave the following error.
+    Type 'void' is not assignable to type 'ReactNode'.
+  Overload 2 of 2, '(props: DefaultComponentProps<PaperTypeMap<{}, "div">>): Element', gave the following error.
+    Type 'void' is not assignable to type 'ReactNode'.
+src/pages/settings/SystemSettingsPage.tsx(189,23): error TS2322: Type 'string | number' is not assignable to type 'number'.
+  Type 'string' is not assignable to type 'number'.
+src/pages/settings/SystemSettingsPage.tsx(203,23): error TS2322: Type 'string | number' is not assignable to type 'number'.
+  Type 'string' is not assignable to type 'number'.
+src/pages/user/ProfilePage.tsx(550,39): error TS2345: Argument of type '"*"' is not assignable to parameter of type 'Permission'.
+src/services/auditLogService.ts(68,7): error TS2739: Type '{ success: boolean; data: AuditLogListResponse; }' is missing the following properties from type 'AuditLogListResponse': logs, total, page, limit
+src/services/chatService.ts(30,5): error TS2322: Type 'undefined[] | { data: Channel[]; pagination: any; }' is not assignable to type 'Channel[]'.
+  Type '{ data: Channel[]; pagination: any; }' is missing the following properties from type 'Channel[]': length, pop, push, concat, and 29 more.
+src/services/chatService.ts(102,19): error TS2339: Property 'pagination' does not exist on type 'ApiResponse<any>'.
+src/services/chatService.ts(103,16): error TS2339: Property 'pagination' does not exist on type 'ApiResponse<any>'.
+src/services/chatService.ts(108,19): error TS2339: Property 'pagination' does not exist on type 'ApiResponse<any>'.
+src/services/chatService.ts(109,16): error TS2339: Property 'pagination' does not exist on type 'ApiResponse<any>'.
+src/services/chatService.ts(110,18): error TS2339: Property 'pagination' does not exist on type 'ApiResponse<any>'.
+src/services/chatService.ts(349,7): error TS2322: Type 'undefined[] | { success: boolean; data: User[]; }' is not assignable to type 'User[]'.
+  Type '{ success: boolean; data: User[]; }' is missing the following properties from type 'User[]': length, pop, push, concat, and 29 more.
+src/services/chatService.ts(470,16): error TS2339: Property 'pagination' does not exist on type 'ApiResponse<any>'.
+src/services/chatService.ts(470,46): error TS2339: Property 'pagination' does not exist on type 'ApiResponse<any>'.
+src/services/chatService.ts(471,20): error TS2339: Property 'pagination' does not exist on type 'ApiResponse<any>'.
+src/services/clientVersionService.ts(96,7): error TS2739: Type 'ApiResponse<ClientVersionListResponse>' is missing the following properties from type 'ClientVersionListResponse': clientVersions, total, page, limit, totalPages
+src/services/clientVersionService.ts(97,26): error TS2339: Property 'clientVersions' does not exist on type 'ApiResponse<ApiResponse<ClientVersionListResponse>>'.
+src/services/clientVersionService.ts(99,7): error TS2739: Type 'ApiResponse<ApiResponse<ClientVersionListResponse>>' is missing the following properties from type 'ClientVersionListResponse': clientVersions, total, page, limit, totalPages
+src/services/clientVersionService.ts(120,7): error TS2740: Type 'ApiResponse<ClientVersion>' is missing the following properties from type 'ClientVersion': id, platform, clientVersion, clientStatus, and 7 more.
+src/services/clientVersionService.ts(204,7): error TS2740: Type 'ApiResponse<ClientVersion[]>' is missing the following properties from type 'ClientVersion[]': length, pop, push, concat, and 29 more.
+src/services/clientVersionService.ts(261,37): error TS2339: Property 'changeRequestId' does not exist on type 'ApiResponse<{ changeRequestId?: string; status?: string; }>'.
+src/services/clientVersionService.ts(264,30): error TS2339: Property 'changeRequestId' does not exist on type 'ApiResponse<{ changeRequestId?: string; status?: string; }>'.
+src/services/clientVersionService.ts(283,7): error TS2741: Property 'updatedCount' is missing in type 'ApiResponse<{ updatedCount: number; message: string; }>' but required in type '{ updatedCount: number; message: string; }'.
+src/services/ipWhitelistService.ts(106,7): error TS2739: Type '{ success: boolean; data: IpWhitelistListResponse; }' is missing the following properties from type 'IpWhitelistListResponse': ipWhitelists, total, page, limit, totalPages
+src/services/ipWhitelistService.ts(127,7): error TS2740: Type '{ success: boolean; data: IpWhitelist; }' is missing the following properties from type 'IpWhitelist': id, ipAddress, purpose, isEnabled, and 3 more.
+src/services/ipWhitelistService.ts(140,7): error TS2740: Type '{ success: boolean; data: IpWhitelist; }' is missing the following properties from type 'IpWhitelist': id, ipAddress, purpose, isEnabled, and 3 more.
+src/services/ipWhitelistService.ts(153,7): error TS2740: Type '{ success: boolean; data: IpWhitelist; }' is missing the following properties from type 'IpWhitelist': id, ipAddress, purpose, isEnabled, and 3 more.
+src/services/ipWhitelistService.ts(177,7): error TS2740: Type '{ success: boolean; data: IpWhitelist; }' is missing the following properties from type 'IpWhitelist': id, ipAddress, purpose, isEnabled, and 3 more.
+src/services/ipWhitelistService.ts(191,7): error TS2739: Type '{ success: boolean; data: BulkCreateResponse; message: string; }' is missing the following properties from type 'BulkCreateResponse': requestedCount, createdCount
+src/services/ipWhitelistService.ts(205,7): error TS2739: Type '{ success: boolean; data: IpCheckResponse; }' is missing the following properties from type 'IpCheckResponse': ipAddress, isWhitelisted
+src/services/linkPreviewService.ts(1,10): error TS2614: Module '"./api"' has no exported member 'apiClient'. Did you mean to use 'import apiClient from "./api"' instead?
+src/services/mailService.ts(57,5): error TS2741: Property 'pagination' is missing in type 'ApiResponse<Mail[]>' but required in type 'MailListResponse'.
+src/services/mailService.ts(65,5): error TS2741: Property 'pagination' is missing in type 'ApiResponse<Mail[]>' but required in type 'MailListResponse'.
+src/services/mailService.ts(72,5): error TS2322: Type 'ApiResponse<Mail>' is not assignable to type 'MailResponse'.
+  Property 'data' is optional in type 'ApiResponse<Mail>' but required in type 'MailResponse'.
+src/services/mailService.ts(79,11): error TS2741: Property 'count' is missing in type 'ApiResponse<any>' but required in type 'UnreadCountResponse'.
+src/services/mailService.ts(87,11): error TS2322: Type 'ApiResponse<MailStats>' is not assignable to type 'MailStatsResponse'.
+  Property 'data' is optional in type 'ApiResponse<MailStats>' but required in type 'MailStatsResponse'.
+src/services/mailService.ts(95,5): error TS2322: Type 'ApiResponse<Mail>' is not assignable to type 'MailResponse'.
+  Property 'data' is optional in type 'ApiResponse<Mail>' but required in type 'MailResponse'.
+src/services/unknownFlagService.ts(35,5): error TS2739: Type '{ success: boolean; data: { flags: UnknownFlag[]; total: number; }; }' is missing the following properties from type '{ flags: UnknownFlag[]; total: number; }': flags, total
+src/services/unknownFlagService.ts(43,26): error TS2339: Property 'count' does not exist on type '{ success: boolean; data: { count: number; }; }'.
+src/services/whitelistService.ts(113,7): error TS2739: Type '{ success: boolean; data: WhitelistListResponse; }' is missing the following properties from type 'WhitelistListResponse': whitelists, total, page, limit, totalPages
+src/services/whitelistService.ts(134,46): error TS2339: Property 'whitelist' does not exist on type '{ success: boolean; data: { whitelist: Whitelist; }; }'.
+src/services/whitelistService.ts(135,28): error TS2339: Property 'whitelist' does not exist on type '{ success: boolean; data: { whitelist: Whitelist; }; }'.
+src/services/whitelistService.ts(136,26): error TS2339: Property 'whitelist' does not exist on type 'ApiResponse<{ success: boolean; data: { whitelist: Whitelist; }; }>'.
+src/services/whitelistService.ts(137,23): error TS2339: Property 'whitelist' does not exist on type 'ApiResponse<{ success: boolean; data: { whitelist: Whitelist; }; }>'.
+src/services/whitelistService.ts(155,46): error TS2339: Property 'whitelist' does not exist on type '{ success: boolean; data: { whitelist: Whitelist; }; }'.
+src/services/whitelistService.ts(156,28): error TS2339: Property 'whitelist' does not exist on type '{ success: boolean; data: { whitelist: Whitelist; }; }'.
+src/services/whitelistService.ts(157,26): error TS2339: Property 'whitelist' does not exist on type 'ApiResponse<{ success: boolean; data: { whitelist: Whitelist; }; }>'.
+src/services/whitelistService.ts(160,23): error TS2339: Property 'whitelist' does not exist on type 'ApiResponse<{ success: boolean; data: { whitelist: Whitelist; }; }>'.
+src/services/whitelistService.ts(176,46): error TS2339: Property 'whitelist' does not exist on type '{ success: boolean; data: { whitelist: Whitelist; }; }'.
+src/services/whitelistService.ts(177,28): error TS2339: Property 'whitelist' does not exist on type '{ success: boolean; data: { whitelist: Whitelist; }; }'.
+src/services/whitelistService.ts(178,26): error TS2339: Property 'whitelist' does not exist on type 'ApiResponse<{ success: boolean; data: { whitelist: Whitelist; }; }>'.
+src/services/whitelistService.ts(180,23): error TS2339: Property 'whitelist' does not exist on type 'ApiResponse<{ success: boolean; data: { whitelist: Whitelist; }; }>'.
+src/services/whitelistService.ts(198,7): error TS2740: Type '{ success: boolean; data: Whitelist; }' is missing the following properties from type 'Whitelist': id, accountId, isEnabled, createdBy, and 2 more.
+src/services/whitelistService.ts(214,7): error TS2739: Type '{ success: boolean; data: { createdCount: number; requestedCount: number; }; }' is missing the following properties from type '{ createdCount: number; requestedCount: number; }': createdCount, requestedCount
+src/services/whitelistService.ts(228,7): error TS2739: Type '{ success: boolean; data: WhitelistTestResult; }' is missing the following properties from type 'WhitelistTestResult': isAllowed, matchedRules
+src/test/setup.ts(15,1): error TS2322: Type 'typeof IntersectionObserver' is not assignable to type '{ new (callback: IntersectionObserverCallback, options?: IntersectionObserverInit): IntersectionObserver; prototype: IntersectionObserver; }'.
+  Types of property 'prototype' are incompatible.
+    Type 'IntersectionObserver' is missing the following properties from type 'IntersectionObserver': root, rootMargin, thresholds, takeRecords
+src/utils/linkPreview.ts(31,9): error TS2741: Property 'url' is missing in type '{ success: boolean; data: LinkPreview; }' but required in type 'LinkPreview'.
+src/utils/linkPreview.ts(35,7): error TS2741: Property 'url' is missing in type '{ success: boolean; data: LinkPreview; }' but required in type 'LinkPreview'.
+src/utils/linkPreview.ts(142,23): error TS2339: Property 'forEach' does not exist on type '{ success: boolean; data: { url: string; success: boolean; data: LinkPreview; }[]; }'.
+node.exe : error Command failed with exit code 1.
+위치 C:\Users\jhseo\AppData\Roaming\npm\yarn.ps1:24 문자:5
++     & "node$exe"  "$basedir/node_modules/yarn/bin/yarn.js" $args
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (error Command failed with exit code 1.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command.

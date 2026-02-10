@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import {
     Dialog,
     DialogTitle,
@@ -67,6 +67,7 @@ const ValueEditorField: React.FC<ValueEditorFieldProps> = ({
     const [dialogOpen, setDialogOpen] = useState(false);
     const [editingValue, setEditingValue] = useState('');
     const [dialogError, setDialogError] = useState<string | null>(null);
+    const dialogValidationTimer = useRef<ReturnType<typeof setTimeout>>();
 
     // Format value for display
     const getDisplayValue = useCallback((): string => {
@@ -137,17 +138,28 @@ const ValueEditorField: React.FC<ValueEditorFieldProps> = ({
         }
     };
 
+    // Debounced JSON validation for inline editing
+    const inlineValidationTimer = useRef<ReturnType<typeof setTimeout>>();
+    useEffect(() => {
+        return () => { if (inlineValidationTimer.current) clearTimeout(inlineValidationTimer.current); };
+    }, []);
+
     // Handle inline changes for string type
     const handleInlineChange = (newValue: string) => {
         if (valueType === 'json') {
-            try {
-                const parsed = JSON.parse(newValue);
-                onChange(parsed);
-                onValidationError?.(null);
-            } catch (e: any) {
-                onChange(newValue);
-                onValidationError?.(e.message || 'Invalid JSON');
-            }
+            // Always pass the raw string immediately
+            onChange(newValue);
+            // Debounce JSON validation
+            if (inlineValidationTimer.current) clearTimeout(inlineValidationTimer.current);
+            inlineValidationTimer.current = setTimeout(() => {
+                try {
+                    const parsed = JSON.parse(newValue);
+                    onChange(parsed);
+                    onValidationError?.(null);
+                } catch (e: any) {
+                    onValidationError?.(e.message || 'Invalid JSON');
+                }
+            }, 500);
         } else {
             onChange(newValue);
         }
@@ -191,7 +203,10 @@ const ValueEditorField: React.FC<ValueEditorFieldProps> = ({
                     error={!!error}
                     helperText={helperText}
                     placeholder={placeholder}
+                    onClick={valueType === 'json' && !disabled ? handleOpenDialog : undefined}
                     InputProps={{
+                        readOnly: valueType === 'json',
+                        sx: valueType === 'json' ? { cursor: 'pointer' } : undefined,
                         endAdornment: !disabled && (
                             <InputAdornment position="end">
                                 <IconButton
@@ -239,12 +254,16 @@ const ValueEditorField: React.FC<ValueEditorFieldProps> = ({
                                 value={editingValue}
                                 onChange={(val) => {
                                     setEditingValue(val);
-                                    try {
-                                        JSON.parse(val);
-                                        setDialogError(null);
-                                    } catch (e: any) {
-                                        setDialogError(e.message || 'Invalid JSON');
-                                    }
+                                    // Debounce dialog JSON validation
+                                    if (dialogValidationTimer.current) clearTimeout(dialogValidationTimer.current);
+                                    dialogValidationTimer.current = setTimeout(() => {
+                                        try {
+                                            JSON.parse(val);
+                                            setDialogError(null);
+                                        } catch (e: any) {
+                                            setDialogError(e.message || 'Invalid JSON');
+                                        }
+                                    }, 300);
                                 }}
                                 height={350}
                             />

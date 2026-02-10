@@ -138,6 +138,7 @@ import EnvironmentVariantsEditor, {
 } from '../../components/features/EnvironmentVariantsEditor';
 import FeatureFlagAuditLogs from '../../components/features/FeatureFlagAuditLogs';
 import PlaygroundDialog from '../../components/features/PlaygroundDialog';
+import { getFlagTypeIcon } from '../../utils/flagTypeIcons';
 
 // Playground panel constants (outside component for stable references)
 const PLAYGROUND_VISIBLE_KEY = 'gatrix.embeddedPlaygroundVisible';
@@ -210,7 +211,7 @@ interface FeatureFlag {
   lastSeenAt?: string;
   archivedAt?: string;
   stale?: boolean;
-  flagUsage?: 'flag' | 'remoteConfig';
+
   createdBy?: number;
   createdByName?: string;
   updatedBy?: number;
@@ -282,23 +283,7 @@ const FLAG_TYPES = [
 ];
 
 // Get icon for flag type
-const getTypeIcon = (type: string, size: number = 16) => {
-  const iconProps = { sx: { fontSize: size } };
-  switch (type) {
-    case 'release':
-      return <ReleaseIcon {...iconProps} color="primary" />;
-    case 'experiment':
-      return <ExperimentIcon {...iconProps} color="secondary" />;
-    case 'operational':
-      return <OperationalIcon {...iconProps} color="warning" />;
-    case 'killSwitch':
-      return <KillSwitchIcon {...iconProps} color="error" />;
-    case 'permission':
-      return <PermissionIcon {...iconProps} color="action" />;
-    default:
-      return null;
-  }
-};
+const getTypeIcon = (type: string, size: number = 16) => getFlagTypeIcon(type, size);
 
 // ==================== Components ====================
 
@@ -1294,7 +1279,9 @@ const FeatureFlagDetailPage: React.FC = () => {
       // Update flag with environment-specific enabledValue/disabledValue
       await api.put(
         `/admin/features/${flag.flagName}`,
-        { environmentEnabledValue: useGlobal ? null : value },
+        useGlobal
+          ? { enabledValue: null, disabledValue: null }
+          : { enabledValue: value.enabledValue, disabledValue: value.disabledValue },
         { headers: { 'x-environment': envName } }
       );
       // Reload flag data
@@ -1424,23 +1411,31 @@ const FeatureFlagDetailPage: React.FC = () => {
           type="number"
           value={value ?? ''}
           onChange={(e) => {
-            const val = e.target.value === '' ? undefined : Number(e.target.value);
+            const val = e.target.value === '' ? 0 : Number(e.target.value);
             setFlag((prev) => (prev ? { ...prev, [field]: val } : prev));
           }}
         />
       );
     }
 
-    if (type === 'json') {
-      return (
-        <Box>
-          <JsonEditor
-            value={(() => {
-              if (value === null || value === undefined) return '{}';
-              if (typeof value === 'object') return JSON.stringify(value, null, 2);
-              return String(value);
-            })()}
-            onChange={(val) => {
+    // string and json types both use ValueEditorField (same as create form)
+    return (
+      <ValueEditorField
+        value={(() => {
+          if (type === 'json') {
+            if (value === null || value === undefined || value === '[object Object]') return '{}';
+            if (typeof value === 'object') return JSON.stringify(value, null, 2);
+            return String(value);
+          }
+          return value ?? '';
+        })()}
+        onChange={(val) => {
+          if (type === 'json') {
+            // val can be an already-parsed object (from dialog) or a string (from inline)
+            if (typeof val === 'object' && val !== null) {
+              setFlag((prev) => (prev ? { ...prev, [field]: val } : prev));
+              setJsonError(field, null);
+            } else {
               try {
                 const parsed = JSON.parse(val);
                 setFlag((prev) => (prev ? { ...prev, [field]: parsed } : prev));
@@ -1448,29 +1443,14 @@ const FeatureFlagDetailPage: React.FC = () => {
               } catch (e: any) {
                 setJsonError(field, e.message || 'Invalid JSON');
               }
-            }}
-            onValidation={(isValid, errorMsg) => {
-              setJsonError(field, isValid ? null : errorMsg || 'Invalid JSON');
-            }}
-            height={200}
-          />
-          {error && (
-            <Typography variant="caption" color="error" sx={{ mt: 0.5, display: 'block' }}>
-              {error}
-            </Typography>
-          )}
-        </Box>
-      );
-    }
-
-    return (
-      <ValueEditorField
-        value={value ?? ''}
-        onChange={(val) => {
-          setFlag((prev) => (prev ? { ...prev, [field]: val } : prev));
+            }
+          } else {
+            setFlag((prev) => (prev ? { ...prev, [field]: val } : prev));
+          }
         }}
-        valueType="string"
+        valueType={type}
         label={field === 'enabledValue' ? t('featureFlags.enabledValue') : t('featureFlags.disabledValue')}
+        onValidationError={type === 'json' ? (err) => setJsonError(field, err) : undefined}
       />
     );
   };
@@ -1670,31 +1650,7 @@ const FeatureFlagDetailPage: React.FC = () => {
               </Typography>
 
               <Stack spacing={1.5}>
-                {/* Flag Usage (Classification: flag vs remoteConfig) */}
-                {!isCreating && (
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography variant="body2" color="text.secondary">
-                      {t('featureFlags.flagUsageLabel')}
-                    </Typography>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                      {flag.flagUsage === 'remoteConfig' ? (
-                        <>
-                          <JsonIcon sx={{ fontSize: 16, color: 'secondary.main' }} />
-                          <Typography variant="body2">
-                            {t('featureFlags.flagUsages.remoteConfig')}
-                          </Typography>
-                        </>
-                      ) : (
-                        <>
-                          <FlagIcon sx={{ fontSize: 16, color: 'primary.main' }} />
-                          <Typography variant="body2">
-                            {t('featureFlags.flagUsages.flag')}
-                          </Typography>
-                        </>
-                      )}
-                    </Box>
-                  </Box>
-                )}
+
 
                 {/* Flag Type */}
                 <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -2363,7 +2319,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                   environment={env.environment}
                                   variants={(envVariants[env.environment] || []) as EditorVariant[]}
                                   valueType={flag.valueType || 'boolean'}
-                                  flagUsage={flag.flagUsage || 'flag'}
+                                  flagType={flag.flagType || 'release'}
                                   enabledValue={flag.enabledValue}
                                   disabledValue={flag.disabledValue}
                                   envEnabledValue={
@@ -3240,7 +3196,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                   environment={env.environment}
                                   variants={(envVariants[env.environment] || []) as EditorVariant[]}
                                   valueType={flag.valueType || 'boolean'}
-                                  flagUsage={flag.flagUsage || 'flag'}
+                                  flagType={flag.flagType || 'release'}
                                   enabledValue={flag.enabledValue}
                                   disabledValue={flag.disabledValue}
                                   envEnabledValue={
@@ -3357,7 +3313,7 @@ const FeatureFlagDetailPage: React.FC = () => {
 
       {/* Flag Values Tab */}
       <TabPanel value={tabValue} index={1}>
-        <Box sx={{ maxWidth: 800 }}>
+        <Box>
           <Paper
             variant="outlined"
             sx={{
@@ -3397,14 +3353,14 @@ const FeatureFlagDetailPage: React.FC = () => {
                         newEnabled = true;
                         newDisabled = false;
                       } else if (newType === 'number') {
-                        newEnabled = 0;
-                        newDisabled = 0;
+                        newEnabled = '';
+                        newDisabled = '';
                       } else if (newType === 'json') {
                         newEnabled = {};
                         newDisabled = {};
                       } else {
-                        newEnabled = 'enabled';
-                        newDisabled = 'disabled';
+                        newEnabled = '';
+                        newDisabled = '';
                       }
                       setFlag((prev) =>
                         prev ? { ...prev, valueType: newType, enabledValue: newEnabled, disabledValue: newDisabled } : prev
@@ -3474,7 +3430,7 @@ const FeatureFlagDetailPage: React.FC = () => {
 
               {/* Flag Values */}
               <Grid container spacing={3}>
-                <Grid item xs={12}>
+                <Grid size={{ xs: 12 }}>
                   <Typography
                     variant="subtitle2"
                     sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1 }}
@@ -3486,7 +3442,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                   </Typography>
                   {renderValueInput('enabledValue')}
                 </Grid>
-                <Grid item xs={12}>
+                <Grid size={{ xs: 12 }}>
                   <Typography
                     variant="subtitle2"
                     sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1 }}
@@ -4670,7 +4626,7 @@ const FeatureFlagDetailPage: React.FC = () => {
       </Dialog>
 
       {/* Floating Playground Toggle Button - positioned on right edge, only when panel is hidden */}
-      {!isCreating && flag && !embeddedPlaygroundVisible && (
+      {!isCreating && flag && !embeddedPlaygroundVisible && tabValue === 0 && (
         <Tooltip title={t('playground.title')} placement="left">
           <IconButton
             onClick={() => setEmbeddedPlaygroundVisible(true)}

@@ -22,7 +22,6 @@ import {
   StrategyParameters,
   ValueType,
   FlagType,
-  FlagUsage,
 } from '../models/FeatureFlag';
 import { GatrixError } from '../middleware/errorHandler';
 import { ErrorCodes } from '../utils/apiResponse';
@@ -44,7 +43,7 @@ export interface CreateFlagInput {
   valueType: ValueType;
   enabledValue: any;
   disabledValue: any;
-  flagUsage?: FlagUsage;
+
   impressionDataEnabled?: boolean;
   staleAfterDays?: number;
   tags?: string[];
@@ -62,7 +61,7 @@ export interface UpdateFlagInput {
   valueType?: ValueType;
   enabledValue?: any;
   disabledValue?: any;
-  flagUsage?: FlagUsage;
+
   isEnabled?: boolean;
   isArchived?: boolean;
   impressionDataEnabled?: boolean;
@@ -118,7 +117,7 @@ export interface FlagListQuery {
   environment: string;
   search?: string;
   flagType?: string;
-  flagUsage?: 'flag' | 'remoteConfig';
+
   isEnabled?: boolean;
   isArchived?: boolean;
   tags?: string[];
@@ -214,7 +213,7 @@ class FeatureFlagService {
     }
 
     // Remote Config validation
-    const isRemoteConfig = input.flagUsage === 'remoteConfig';
+    const isRemoteConfig = input.flagType === 'remoteConfig';
     if (isRemoteConfig) {
       // Remote Config must have valueType
       if (!input.valueType) {
@@ -235,7 +234,6 @@ class FeatureFlagService {
       displayName: input.displayName,
       description: input.description,
       flagType: input.flagType || 'release',
-      flagUsage: input.flagUsage || 'flag',
       valueType: input.valueType,
       enabledValue: input.enabledValue,
       disabledValue: input.disabledValue,
@@ -263,7 +261,7 @@ class FeatureFlagService {
       await FeatureVariantModel.create({
         flagId: flag.id,
         environment: input.environment!,
-        variantName: 'config', // 'config' is default variant name for remote config
+        variantName: '$config', // '$config' is default variant name for remote config
         weight: 100,
         value: defaultValue,
         valueType: input.valueType || 'json',
@@ -906,7 +904,7 @@ class FeatureFlagService {
     }
 
     // Remote Config specific validations
-    const isRemoteConfig = (flag as any).flagUsage === 'remoteConfig';
+    const isRemoteConfig = (flag as any).flagType === 'remoteConfig';
 
     // Check if this is just a metadata update (no variants provided) for Remote Config
     // For Remote Config, we treat empty variants as "keep existing variants" because it must always have 1 variant
@@ -920,7 +918,7 @@ class FeatureFlagService {
       // Let's assume input validation upstream handles required fields if they are missing?
       // No, here we check constraints.
 
-      // If valueType is passed and it is invalid... wait, type signature says 'string'|... 
+      // If valueType is passed and it is invalid... wait, type signature says 'string'|...
       // check if it is explicitly missing when required?
 
       // Original code checked: if (variantType === 'none')
@@ -952,15 +950,15 @@ class FeatureFlagService {
       // Get all variants for this flag (all environments)
       const allVariants = await db('g_feature_variants').where('flagId', flag.id).select('*');
 
-      // Reset values based on new value type
+      // Reset values based on new value type - store the raw value, not a wrapper object
       const defaultValue =
         valueType === 'number'
-          ? { type: 'number', value: '0' }
+          ? 0
           : valueType === 'json'
-            ? { type: 'json', value: '{}' }
+            ? {}
             : valueType === 'boolean'
-              ? { type: 'boolean', value: 'false' }
-              : { type: 'string', value: '' };
+              ? false
+              : '';
 
       for (const variant of allVariants) {
         await db('g_feature_variants')

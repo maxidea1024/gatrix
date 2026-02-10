@@ -4,8 +4,7 @@ import { ulid } from 'ulid';
 
 // ==================== Types ====================
 
-export type FlagType = 'release' | 'experiment' | 'operational' | 'killSwitch' | 'permission'; // Purpose
-export type FlagUsage = 'flag' | 'remoteConfig'; // Classification: Feature Flag vs Remote Config
+export type FlagType = 'release' | 'experiment' | 'operational' | 'killSwitch' | 'permission' | 'remoteConfig'; // Purpose
 export type ValueType = 'string' | 'number' | 'boolean' | 'json';
 export type FieldType = 'string' | 'number' | 'boolean' | 'date' | 'semver';
 
@@ -66,8 +65,7 @@ export interface FeatureFlagAttributes {
   flagName: string;
   displayName?: string;
   description?: string;
-  flagType: FlagType; // Purpose: release, experiment, operational, killSwitch, permission
-  flagUsage: FlagUsage; // Classification: 'flag' = Feature Flag, 'remoteConfig' = Remote Config
+  flagType: FlagType; // Purpose: release, experiment, operational, killSwitch, permission, remoteConfig
   isArchived: boolean;
   isFavorite?: boolean;
   archivedAt?: Date;
@@ -187,12 +185,33 @@ export interface FeatureMetricsAttributes {
 // ==================== Helper Functions ====================
 
 function parseJsonField<T>(value: any): T | undefined {
-  if (!value) return undefined;
+  if (value === null || value === undefined) return undefined;
   if (typeof value === 'object') return value as T;
   try {
     return JSON.parse(value) as T;
   } catch {
     return undefined;
+  }
+}
+
+// Coerce a flag value to its proper JS type based on valueType
+function coerceValueByType(value: any, valueType: string | undefined): any {
+  if (value === null || value === undefined) return value;
+  switch (valueType) {
+    case 'boolean':
+      if (typeof value === 'boolean') return value;
+      if (value === 'true') return true;
+      if (value === 'false') return false;
+      return Boolean(value);
+    case 'number':
+      if (typeof value === 'number') return value;
+      return Number(value) || 0;
+    case 'json':
+      if (typeof value === 'object') return value;
+      try { return JSON.parse(value); } catch { return {}; }
+    default:
+      if (typeof value === 'string') return value;
+      return String(value);
   }
 }
 
@@ -207,7 +226,7 @@ export class FeatureFlagModel {
     environment: string;
     search?: string;
     flagType?: string;
-    flagUsage?: 'flag' | 'remoteConfig';
+
     isEnabled?: boolean;
     isArchived?: boolean;
     tags?: string[];
@@ -224,7 +243,7 @@ export class FeatureFlagModel {
         environment,
         search,
         flagType,
-        flagUsage,
+
         isEnabled,
         isArchived,
         tags,
@@ -262,7 +281,7 @@ export class FeatureFlagModel {
           });
         }
         if (flagType) query.where('f.flagType', flagType);
-        if (flagUsage) query.where('f.flagUsage', flagUsage);
+
         if (typeof isEnabled === 'boolean') query.where('e.isEnabled', isEnabled);
         if (typeof isArchived === 'boolean') query.where('f.isArchived', isArchived);
         if (tags && tags.length > 0) {
@@ -449,14 +468,14 @@ export class FeatureFlagModel {
         displayName: data.displayName || data.flagName,
         description: data.description || null,
         flagType: data.flagType || 'release',
-        flagUsage: data.flagUsage || 'flag',
+
         isArchived: false,
         impressionDataEnabled: data.impressionDataEnabled ?? false,
         staleAfterDays: data.staleAfterDays ?? 30,
         tags: data.tags ? JSON.stringify(data.tags) : null,
         valueType: data.valueType,
-        enabledValue: JSON.stringify(data.enabledValue),
-        disabledValue: JSON.stringify(data.disabledValue),
+        enabledValue: JSON.stringify(coerceValueByType(data.enabledValue, data.valueType)),
+        disabledValue: JSON.stringify(coerceValueByType(data.disabledValue, data.valueType)),
         createdBy: data.createdBy,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -501,10 +520,11 @@ export class FeatureFlagModel {
       if (data.tags !== undefined) updateData.tags = JSON.stringify(data.tags);
       if (data.links !== undefined) updateData.links = JSON.stringify(data.links);
       if (data.valueType !== undefined) updateData.valueType = data.valueType;
+      const effectiveValueType = data.valueType || updateData.valueType;
       if (data.enabledValue !== undefined)
-        updateData.enabledValue = JSON.stringify(data.enabledValue);
+        updateData.enabledValue = JSON.stringify(coerceValueByType(data.enabledValue, effectiveValueType));
       if (data.disabledValue !== undefined)
-        updateData.disabledValue = JSON.stringify(data.disabledValue);
+        updateData.disabledValue = JSON.stringify(coerceValueByType(data.disabledValue, effectiveValueType));
       if (data.updatedBy !== undefined) updateData.updatedBy = data.updatedBy;
 
       await db('g_feature_flags').where('id', id).update(updateData);
@@ -872,7 +892,7 @@ export class FeatureVariantModel {
         environment: data.environment,
         variantName: data.variantName,
         weight: data.weight,
-        value: data.value ? JSON.stringify(data.value) : null,
+        value: data.value !== null && data.value !== undefined ? JSON.stringify(data.value) : null,
         valueType: data.valueType || 'json',
         weightLock: data.weightLock || false,
         createdBy: data.createdBy,

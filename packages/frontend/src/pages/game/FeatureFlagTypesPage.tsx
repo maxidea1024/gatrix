@@ -36,6 +36,7 @@ import { useSnackbar } from 'notistack';
 import { parseApiErrorMessage } from '../../utils/errorUtils';
 import api from '../../services/api';
 import ResizableDrawer from '../../components/common/ResizableDrawer';
+import { getFlagTypeIconByName } from '../../utils/flagTypeIcons';
 
 interface FlagType {
   flagType: string;
@@ -47,22 +48,7 @@ interface FlagType {
 }
 
 // Icon mapping
-const getTypeIcon = (iconName: string | null) => {
-  switch (iconName) {
-    case 'RocketLaunch':
-      return <ReleaseIcon sx={{ color: 'primary.main' }} />;
-    case 'Science':
-      return <ExperimentIcon sx={{ color: 'secondary.main' }} />;
-    case 'Build':
-      return <OperationalIcon sx={{ color: 'warning.main' }} />;
-    case 'PowerSettingsNew':
-      return <KillSwitchIcon sx={{ color: 'error.main' }} />;
-    case 'VpnKey':
-      return <PermissionIcon sx={{ color: 'info.main' }} />;
-    default:
-      return <DefaultIcon />;
-  }
-};
+const getTypeIcon = (iconName: string | null) => getFlagTypeIconByName(iconName);
 
 const FeatureFlagTypesPage: React.FC = () => {
   const { t } = useTranslation();
@@ -211,10 +197,12 @@ const FeatureFlagTypesPage: React.FC = () => {
                     </TableCell>
                     {canManage && (
                       <TableCell align="center">
-                        <Tooltip title={t('common.edit')}>
-                          <IconButton size="small" onClick={() => handleEdit(type)}>
-                            <EditIcon fontSize="small" />
-                          </IconButton>
+                        <Tooltip title={type.flagType === 'remoteConfig' ? t('featureFlags.systemTypeCannotEdit') : t('common.edit')}>
+                          <span>
+                            <IconButton size="small" onClick={() => handleEdit(type)} disabled={type.flagType === 'remoteConfig'}>
+                              <EditIcon fontSize="small" />
+                            </IconButton>
+                          </span>
                         </Tooltip>
                       </TableCell>
                     )}
@@ -249,9 +237,9 @@ const FeatureFlagTypesPage: React.FC = () => {
                       setEditingType((prev) =>
                         prev
                           ? {
-                              ...prev,
-                              lifetimeDays: e.target.checked ? null : 40,
-                            }
+                            ...prev,
+                            lifetimeDays: e.target.checked ? null : 40,
+                          }
                           : prev
                       )
                     }

@@ -79,6 +79,7 @@ import {
   PlayArrow as PlaygroundIcon,
   SportsEsports as JoystickIcon,
   SwapVert as ImportExportIcon,
+  Tune as RemoteConfigIcon,
 } from '@mui/icons-material';
 import ValueEditorField from '../../components/common/ValueEditorField';
 import BooleanSwitch from '../../components/common/BooleanSwitch';
@@ -105,10 +106,31 @@ import ResizableDrawer from '../../components/common/ResizableDrawer';
 import FeatureSwitch from '../../components/common/FeatureSwitch';
 import api from '../../services/api';
 import PlaygroundDialog from '../../components/features/PlaygroundDialog';
+import { getFlagTypeIcon } from '../../utils/flagTypeIcons';
 
 interface FlagTypeInfo {
   flagType: string;
   lifetimeDays: number | null;
+}
+
+// Coerce flag value to its proper JS type based on valueType
+function coerceValue(value: any, valueType: string): any {
+  if (value === null || value === undefined) return value;
+  switch (valueType) {
+    case 'boolean':
+      if (typeof value === 'boolean') return value;
+      if (value === 'true') return true;
+      if (value === 'false') return false;
+      return Boolean(value);
+    case 'number':
+      if (typeof value === 'number') return value;
+      return Number(value) || 0;
+    case 'json':
+      if (typeof value === 'object') return value;
+      try { return JSON.parse(value); } catch { return {}; }
+    default:
+      return String(value);
+  }
 }
 
 // Icon helpers for filter options
@@ -145,23 +167,7 @@ const getValueTypeIcon = (type: string) => {
   }
 };
 
-const getTypeIconSmall = (type: string) => {
-  const iconProps = { sx: { fontSize: 16 } };
-  switch (type) {
-    case 'release':
-      return <ReleaseIcon {...iconProps} color="primary" />;
-    case 'experiment':
-      return <ExperimentIcon {...iconProps} color="secondary" />;
-    case 'operational':
-      return <OperationalIcon {...iconProps} color="warning" />;
-    case 'killSwitch':
-      return <KillSwitchIcon {...iconProps} color="error" />;
-    case 'permission':
-      return <PermissionIcon {...iconProps} color="action" />;
-    default:
-      return <FlagIcon {...iconProps} />;
-  }
-};
+const getTypeIconSmall = (type: string) => getFlagTypeIcon(type, 16);
 
 const FeatureFlagsPage: React.FC = () => {
   const { t } = useTranslation();
@@ -196,8 +202,7 @@ const FeatureFlagsPage: React.FC = () => {
     flagName: '',
     displayName: '',
     description: '',
-    flagType: 'release' as 'release' | 'experiment' | 'operational' | 'killSwitch' | 'permission',
-    flagUsage: 'flag' as 'flag' | 'remoteConfig',
+    flagType: 'release' as 'release' | 'experiment' | 'operational' | 'killSwitch' | 'permission' | 'remoteConfig',
     tags: [] as string[],
     impressionDataEnabled: false,
     valueType: 'boolean' as 'boolean' | 'string' | 'number' | 'json',
@@ -248,7 +253,7 @@ const FeatureFlagsPage: React.FC = () => {
   const defaultColumns: ColumnConfig[] = [
     { id: 'flagName', labelKey: 'featureFlags.flagName', visible: true },
     { id: 'status', labelKey: 'featureFlags.status', visible: true },
-    { id: 'flagUsage', labelKey: 'featureFlags.flagUsage', visible: true },
+
     { id: 'valueType', labelKey: 'featureFlags.valueType', visible: true },
     { id: 'createdBy', labelKey: 'common.createdBy', visible: true },
     { id: 'createdAt', labelKey: 'featureFlags.createdAt', visible: true },
@@ -292,10 +297,7 @@ const FeatureFlagsPage: React.FC = () => {
     return filter?.value as string[] | undefined;
   }, [activeFilters]);
 
-  const flagUsageFilter = useMemo(() => {
-    const filter = activeFilters.find((f) => f.key === 'flagUsage');
-    return filter?.value as string[] | undefined;
-  }, [activeFilters]);
+
 
 
 
@@ -329,15 +331,7 @@ const FeatureFlagsPage: React.FC = () => {
           },
         ],
       },
-      {
-        key: 'flagUsage',
-        label: t('featureFlags.flagUsage'),
-        type: 'multiselect',
-        options: [
-          { value: 'flag', label: t('featureFlags.flagUsages.flag') },
-          { value: 'remoteConfig', label: t('featureFlags.flagUsages.remoteConfig') },
-        ],
-      },
+
       {
         key: 'flagType',
         label: t('featureFlags.flagType'),
@@ -480,12 +474,7 @@ const FeatureFlagsPage: React.FC = () => {
           );
         }
 
-        // Filter by flagUsage
-        if (flagUsageFilter && flagUsageFilter.length > 0) {
-          filteredFlags = filteredFlags.filter((f) =>
-            flagUsageFilter.includes(f.flagUsage || 'flag')
-          );
-        }
+
 
         // Sort favorites first (always show favorites at top, then apply normal sort)
         filteredFlags.sort((a, b) => {
@@ -642,8 +631,7 @@ const FeatureFlagsPage: React.FC = () => {
               flagName: flag.flagName,
               displayName: flag.displayName,
               description: flag.description,
-              flagUsage: flag.flagUsage,
-              flagType: flag.flagType || 'flag',
+              flagType: flag.flagType || 'release',
               tags: flag.tags,
               impressionDataEnabled: flag.impressionDataEnabled,
               valueType: flag.valueType || 'string',
@@ -795,7 +783,7 @@ const FeatureFlagsPage: React.FC = () => {
     flagTypeFilter,
     statusFilter,
     tagFilter,
-    flagUsageFilter,
+
   ]);
 
   useEffect(() => {
@@ -1262,13 +1250,13 @@ const FeatureFlagsPage: React.FC = () => {
         flagName: newFlag.flagName.trim(),
         displayName: newFlag.displayName.trim() || undefined,
         description: newFlag.description.trim(),
-        flagUsage: newFlag.flagUsage,
+
         flagType: newFlag.flagType,
         tags: newFlag.tags,
         impressionDataEnabled: newFlag.impressionDataEnabled,
         valueType: newFlag.valueType,
-        enabledValue: newFlag.enabledValue,
-        disabledValue: newFlag.disabledValue,
+        enabledValue: coerceValue(newFlag.enabledValue, newFlag.valueType),
+        disabledValue: coerceValue(newFlag.disabledValue, newFlag.valueType),
         strategies: [],
       });
 
@@ -1279,13 +1267,12 @@ const FeatureFlagsPage: React.FC = () => {
         flagName: '',
         displayName: '',
         description: '',
-        flagUsage: 'flag',
         flagType: 'release',
         tags: [],
         impressionDataEnabled: false,
         valueType: 'boolean',
-        enabledValue: 'true',
-        disabledValue: 'false',
+        enabledValue: true,
+        disabledValue: false,
       });
       setNewFlagJsonError(null);
       // Navigate to the newly created flag's detail page
@@ -1299,21 +1286,20 @@ const FeatureFlagsPage: React.FC = () => {
     }
   };
 
-  const handleOpenCreateDialog = (flagUsage: 'flag' | 'remoteConfig' = 'flag') => {
+  const handleOpenCreateDialog = (isRemoteConfig: boolean = false) => {
     // Generate default flag name with timestamp
     const timestamp = Date.now().toString(36).slice(-4);
-    const prefix = flagUsage === 'remoteConfig' ? 'config' : 'new-feature';
+    const prefix = isRemoteConfig ? 'config' : 'new-feature';
     setNewFlag({
       flagName: `${prefix}-${timestamp}`,
       displayName: '',
       description: '',
-      flagType: 'release',
-      flagUsage,
+      flagType: isRemoteConfig ? 'remoteConfig' : 'release',
       tags: [],
       impressionDataEnabled: false,
-      valueType: 'boolean',
-      enabledValue: 'true',
-      disabledValue: 'false',
+      valueType: isRemoteConfig ? 'string' : 'boolean',
+      enabledValue: isRemoteConfig ? '' : true,
+      disabledValue: isRemoteConfig ? '' : false,
     });
     setNewFlagJsonError(null);
     setCreateMenuAnchor(null);
@@ -1341,23 +1327,7 @@ const FeatureFlagsPage: React.FC = () => {
   };
 
   // Get icon for flag type
-  const getTypeIcon = (type: FlagType) => {
-    const iconProps = { sx: { fontSize: 18 } };
-    switch (type) {
-      case 'release':
-        return <ReleaseIcon {...iconProps} color="primary" />;
-      case 'experiment':
-        return <ExperimentIcon {...iconProps} color="secondary" />;
-      case 'operational':
-        return <OperationalIcon {...iconProps} color="warning" />;
-      case 'killSwitch':
-        return <KillSwitchIcon {...iconProps} color="error" />;
-      case 'permission':
-        return <PermissionIcon {...iconProps} color="action" />;
-      default:
-        return <FlagIcon {...iconProps} />;
-    }
-  };
+  const getTypeIcon = (type: FlagType) => getFlagTypeIcon(type, 18);
 
   // Get flag status for display
   const getFlagStatus = (
@@ -1427,7 +1397,7 @@ const FeatureFlagsPage: React.FC = () => {
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
                 transformOrigin={{ vertical: 'top', horizontal: 'left' }}
               >
-                <MenuItem onClick={() => handleOpenCreateDialog('flag')}>
+                <MenuItem onClick={() => handleOpenCreateDialog(false)}>
                   <ListItemIcon>
                     <FlagIcon fontSize="small" />
                   </ListItemIcon>
@@ -1436,7 +1406,7 @@ const FeatureFlagsPage: React.FC = () => {
                     secondary={t('featureFlags.createFlagSubtitle')}
                   />
                 </MenuItem>
-                <MenuItem onClick={() => handleOpenCreateDialog('remoteConfig')}>
+                <MenuItem onClick={() => handleOpenCreateDialog(true)}>
                   <ListItemIcon>
                     <JsonIcon fontSize="small" />
                   </ListItemIcon>
@@ -1685,10 +1655,7 @@ const FeatureFlagsPage: React.FC = () => {
                             return (
                               <TableCell key={col.id}>{t('featureFlags.valueType')}</TableCell>
                             );
-                          case 'flagUsage':
-                            return (
-                              <TableCell key={col.id}>{t('featureFlags.flagUsage')}</TableCell>
-                            );
+
                           default:
                             return null;
                         }
@@ -1944,21 +1911,7 @@ const FeatureFlagsPage: React.FC = () => {
                                   </Box>
                                 </TableCell>
                               );
-                            case 'flagUsage':
-                              return (
-                                <TableCell key={col.id}>
-                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                    {flag.flagUsage === 'remoteConfig' ? (
-                                      <JsonIcon fontSize="small" color="secondary" />
-                                    ) : (
-                                      <FlagIcon fontSize="small" color="primary" />
-                                    )}
-                                    <Typography variant="body2">
-                                      {t(`featureFlags.flagUsages.${flag.flagUsage || 'flag'}`)}
-                                    </Typography>
-                                  </Box>
-                                </TableCell>
-                              );
+
                             case 'tags':
                               return (
                                 <TableCell key={col.id}>
@@ -2396,12 +2349,12 @@ const FeatureFlagsPage: React.FC = () => {
         open={createDialogOpen}
         onClose={() => setCreateDialogOpen(false)}
         title={
-          newFlag.flagUsage === 'remoteConfig'
+          newFlag.flagType === 'remoteConfig'
             ? t('featureFlags.createRemoteConfig')
             : t('featureFlags.createFlag')
         }
         subtitle={
-          newFlag.flagUsage === 'remoteConfig'
+          newFlag.flagType === 'remoteConfig'
             ? t('featureFlags.createRemoteConfigSubtitle')
             : t('featureFlags.createFlagSubtitle')
         }
@@ -2414,7 +2367,7 @@ const FeatureFlagsPage: React.FC = () => {
             <Box>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1 }}>
                 <Typography variant="subtitle2">
-                  {t('featureFlags.flagName')}{' '}
+                  {newFlag.flagType === 'remoteConfig' ? t('featureFlags.remoteConfigFlagName') : t('featureFlags.flagName')}{' '}
                   <Box component="span" sx={{ color: 'error.main' }}>
                     *
                   </Box>
@@ -2431,7 +2384,7 @@ const FeatureFlagsPage: React.FC = () => {
                     flagName: e.target.value.replace(/[^a-zA-Z0-9_-]/g, ''),
                   })
                 }
-                helperText={t('featureFlags.flagNameHelp')}
+                helperText={newFlag.flagType === 'remoteConfig' ? t('featureFlags.remoteConfigFlagNameHelp') : t('featureFlags.flagNameHelp')}
                 inputProps={{ maxLength: 100 }}
               />
             </Box>
@@ -2439,10 +2392,10 @@ const FeatureFlagsPage: React.FC = () => {
             {/* Display Name */}
             <TextField
               fullWidth
-              label={t('featureFlags.displayName')}
+              label={newFlag.flagType === 'remoteConfig' ? t('featureFlags.remoteConfigDisplayName') : t('featureFlags.displayName')}
               value={newFlag.displayName || ''}
               onChange={(e) => setNewFlag({ ...newFlag, displayName: e.target.value })}
-              helperText={t('featureFlags.displayNameHelp')}
+              helperText={newFlag.flagType === 'remoteConfig' ? t('featureFlags.remoteConfigDisplayNameHelp') : t('featureFlags.displayNameHelp')}
             />
 
             {/* Description */}
@@ -2453,7 +2406,7 @@ const FeatureFlagsPage: React.FC = () => {
               label={t('featureFlags.description')}
               value={newFlag.description}
               onChange={(e) => setNewFlag({ ...newFlag, description: e.target.value })}
-              helperText={t('featureFlags.descriptionHelp')}
+              helperText={newFlag.flagType === 'remoteConfig' ? t('featureFlags.remoteConfigDescriptionHelp') : t('featureFlags.descriptionHelp')}
             />
 
             {/* Tags - moved here after description */}
@@ -2492,116 +2445,118 @@ const FeatureFlagsPage: React.FC = () => {
 
             <Divider />
 
-            {/* Flag Type */}
-            <FormControl fullWidth>
-              <InputLabel>{t('featureFlags.flagType')}</InputLabel>
-              <Select
-                value={newFlag.flagType}
-                label={t('featureFlags.flagType')}
-                onChange={(e) =>
-                  setNewFlag({
-                    ...newFlag,
-                    flagType: e.target.value as FlagType,
-                  })
-                }
-              >
-                <MenuItem value="release">
-                  <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
-                    <Box sx={{ mt: 0.3 }}>
-                      <ReleaseIcon sx={{ fontSize: 18 }} color="primary" />
+            {/* Flag Type - hidden for remote config */}
+            {newFlag.flagType !== 'remoteConfig' && (
+              <FormControl fullWidth>
+                <InputLabel>{t('featureFlags.flagType')}</InputLabel>
+                <Select
+                  value={newFlag.flagType}
+                  label={t('featureFlags.flagType')}
+                  onChange={(e) =>
+                    setNewFlag({
+                      ...newFlag,
+                      flagType: e.target.value as FlagType,
+                    })
+                  }
+                >
+                  <MenuItem value="release">
+                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
+                      <Box sx={{ mt: 0.3 }}>
+                        <ReleaseIcon sx={{ fontSize: 18 }} color="primary" />
+                      </Box>
+                      <Box>
+                        <Typography variant="body2" fontWeight={500}>
+                          {t('featureFlags.types.release')}
+                        </Typography>
+                        <Typography
+                          variant="caption"
+                          color="text.secondary"
+                          sx={{ display: 'block' }}
+                        >
+                          {t('featureFlags.flagTypes.release.desc')}
+                        </Typography>
+                      </Box>
                     </Box>
-                    <Box>
-                      <Typography variant="body2" fontWeight={500}>
-                        {t('featureFlags.types.release')}
-                      </Typography>
-                      <Typography
-                        variant="caption"
-                        color="text.secondary"
-                        sx={{ display: 'block' }}
-                      >
-                        {t('featureFlags.flagTypes.release.desc')}
-                      </Typography>
+                  </MenuItem>
+                  <MenuItem value="experiment">
+                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
+                      <Box sx={{ mt: 0.3 }}>
+                        <ExperimentIcon sx={{ fontSize: 18 }} color="secondary" />
+                      </Box>
+                      <Box>
+                        <Typography variant="body2" fontWeight={500}>
+                          {t('featureFlags.types.experiment')}
+                        </Typography>
+                        <Typography
+                          variant="caption"
+                          color="text.secondary"
+                          sx={{ display: 'block' }}
+                        >
+                          {t('featureFlags.flagTypes.experiment.desc')}
+                        </Typography>
+                      </Box>
                     </Box>
-                  </Box>
-                </MenuItem>
-                <MenuItem value="experiment">
-                  <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
-                    <Box sx={{ mt: 0.3 }}>
-                      <ExperimentIcon sx={{ fontSize: 18 }} color="secondary" />
+                  </MenuItem>
+                  <MenuItem value="operational">
+                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
+                      <Box sx={{ mt: 0.3 }}>
+                        <OperationalIcon sx={{ fontSize: 18 }} color="warning" />
+                      </Box>
+                      <Box>
+                        <Typography variant="body2" fontWeight={500}>
+                          {t('featureFlags.types.operational')}
+                        </Typography>
+                        <Typography
+                          variant="caption"
+                          color="text.secondary"
+                          sx={{ display: 'block' }}
+                        >
+                          {t('featureFlags.flagTypes.operational.desc')}
+                        </Typography>
+                      </Box>
                     </Box>
-                    <Box>
-                      <Typography variant="body2" fontWeight={500}>
-                        {t('featureFlags.types.experiment')}
-                      </Typography>
-                      <Typography
-                        variant="caption"
-                        color="text.secondary"
-                        sx={{ display: 'block' }}
-                      >
-                        {t('featureFlags.flagTypes.experiment.desc')}
-                      </Typography>
+                  </MenuItem>
+                  <MenuItem value="killSwitch">
+                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
+                      <Box sx={{ mt: 0.3 }}>
+                        <KillSwitchIcon sx={{ fontSize: 18 }} color="error" />
+                      </Box>
+                      <Box>
+                        <Typography variant="body2" fontWeight={500}>
+                          {t('featureFlags.types.killSwitch')}
+                        </Typography>
+                        <Typography
+                          variant="caption"
+                          color="text.secondary"
+                          sx={{ display: 'block' }}
+                        >
+                          {t('featureFlags.flagTypes.killSwitch.desc')}
+                        </Typography>
+                      </Box>
                     </Box>
-                  </Box>
-                </MenuItem>
-                <MenuItem value="operational">
-                  <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
-                    <Box sx={{ mt: 0.3 }}>
-                      <OperationalIcon sx={{ fontSize: 18 }} color="warning" />
+                  </MenuItem>
+                  <MenuItem value="permission">
+                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
+                      <Box sx={{ mt: 0.3 }}>
+                        <PermissionIcon sx={{ fontSize: 18 }} color="action" />
+                      </Box>
+                      <Box>
+                        <Typography variant="body2" fontWeight={500}>
+                          {t('featureFlags.types.permission')}
+                        </Typography>
+                        <Typography
+                          variant="caption"
+                          color="text.secondary"
+                          sx={{ display: 'block' }}
+                        >
+                          {t('featureFlags.flagTypes.permission.desc')}
+                        </Typography>
+                      </Box>
                     </Box>
-                    <Box>
-                      <Typography variant="body2" fontWeight={500}>
-                        {t('featureFlags.types.operational')}
-                      </Typography>
-                      <Typography
-                        variant="caption"
-                        color="text.secondary"
-                        sx={{ display: 'block' }}
-                      >
-                        {t('featureFlags.flagTypes.operational.desc')}
-                      </Typography>
-                    </Box>
-                  </Box>
-                </MenuItem>
-                <MenuItem value="killSwitch">
-                  <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
-                    <Box sx={{ mt: 0.3 }}>
-                      <KillSwitchIcon sx={{ fontSize: 18 }} color="error" />
-                    </Box>
-                    <Box>
-                      <Typography variant="body2" fontWeight={500}>
-                        {t('featureFlags.types.killSwitch')}
-                      </Typography>
-                      <Typography
-                        variant="caption"
-                        color="text.secondary"
-                        sx={{ display: 'block' }}
-                      >
-                        {t('featureFlags.flagTypes.killSwitch.desc')}
-                      </Typography>
-                    </Box>
-                  </Box>
-                </MenuItem>
-                <MenuItem value="permission">
-                  <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
-                    <Box sx={{ mt: 0.3 }}>
-                      <PermissionIcon sx={{ fontSize: 18 }} color="action" />
-                    </Box>
-                    <Box>
-                      <Typography variant="body2" fontWeight={500}>
-                        {t('featureFlags.types.permission')}
-                      </Typography>
-                      <Typography
-                        variant="caption"
-                        color="text.secondary"
-                        sx={{ display: 'block' }}
-                      >
-                        {t('featureFlags.flagTypes.permission.desc')}
-                      </Typography>
-                    </Box>
-                  </Box>
-                </MenuItem>
-              </Select>
-            </FormControl>
+                  </MenuItem>
+                </Select>
+              </FormControl>
+            )}
 
 
             {/* Value Settings Group */}
@@ -2628,19 +2583,19 @@ const FeatureFlagsPage: React.FC = () => {
                           valueType: newType,
                           enabledValue:
                             newType === 'boolean'
-                              ? 'true'
+                              ? true
                               : newType === 'number'
                                 ? 0
                                 : newType === 'json'
-                                  ? '{}'
+                                  ? {}
                                   : '',
                           disabledValue:
                             newType === 'boolean'
-                              ? 'false'
+                              ? false
                               : newType === 'number'
                                 ? 0
                                 : newType === 'json'
-                                  ? '{}'
+                                  ? {}
                                   : '',
                         }));
                         if (newType !== 'json') {
@@ -2691,7 +2646,7 @@ const FeatureFlagsPage: React.FC = () => {
                     <BooleanSwitch
                       checked={newFlag.enabledValue === true || newFlag.enabledValue === 'true'}
                       onChange={(e) =>
-                        setNewFlag((prev) => ({ ...prev, enabledValue: e.target.checked ? 'true' : 'false' }))
+                        setNewFlag((prev) => ({ ...prev, enabledValue: e.target.checked }))
                       }
                     />
                   ) : newFlag.valueType === 'number' ? (
@@ -2733,7 +2688,7 @@ const FeatureFlagsPage: React.FC = () => {
                     <BooleanSwitch
                       checked={newFlag.disabledValue === true || newFlag.disabledValue === 'true'}
                       onChange={(e) =>
-                        setNewFlag((prev) => ({ ...prev, disabledValue: e.target.checked ? 'true' : 'false' }))
+                        setNewFlag((prev) => ({ ...prev, disabledValue: e.target.checked }))
                       }
                     />
                   ) : newFlag.valueType === 'number' ? (
@@ -2762,34 +2717,36 @@ const FeatureFlagsPage: React.FC = () => {
               </Stack>
             </Paper>
 
-            {/* Impression Data */}
-            <Box>
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                }}
-              >
-                <Typography variant="body2">{t('featureFlags.impressionData')}</Typography>
-                <Switch
-                  checked={newFlag.impressionDataEnabled}
-                  onChange={(e) =>
-                    setNewFlag({
-                      ...newFlag,
-                      impressionDataEnabled: e.target.checked,
-                    })
-                  }
-                />
+            {/* Impression Data - hidden for remote config */}
+            {newFlag.flagType !== 'remoteConfig' && (
+              <Box>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  <Typography variant="body2">{t('featureFlags.impressionData')}</Typography>
+                  <Switch
+                    checked={newFlag.impressionDataEnabled}
+                    onChange={(e) =>
+                      setNewFlag({
+                        ...newFlag,
+                        impressionDataEnabled: e.target.checked,
+                      })
+                    }
+                  />
+                </Box>
+                <Typography variant="caption" color="text.secondary">
+                  {t('featureFlags.impressionDataHelp')}
+                </Typography>
               </Box>
-              <Typography variant="caption" color="text.secondary">
-                {t('featureFlags.impressionDataHelp')}
-              </Typography>
-            </Box>
+            )}
 
             {/* Info Alert */}
             <Alert severity="info">
-              {t('featureFlags.createFlagDetailSettingsInfo')}
+              {newFlag.flagType === 'remoteConfig' ? t('featureFlags.remoteConfigCreateDetailSettingsInfo') : t('featureFlags.createFlagDetailSettingsInfo')}
             </Alert>
           </Stack>
         </Box>
@@ -2818,7 +2775,7 @@ const FeatureFlagsPage: React.FC = () => {
             }
             startIcon={creating ? <CircularProgress size={20} /> : undefined}
           >
-            {newFlag.flagUsage === 'remoteConfig' ? t('featureFlags.createRemoteConfig') : t('featureFlags.createFlag')}
+            {newFlag.flagType === 'remoteConfig' ? t('featureFlags.createRemoteConfig') : t('featureFlags.createFlag')}
           </Button>
         </Box>
       </ResizableDrawer >

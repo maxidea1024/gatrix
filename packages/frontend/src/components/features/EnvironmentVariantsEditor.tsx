@@ -8,6 +8,7 @@
  * - Shows guidance to flag values tab when valueType is set
  */
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { styled } from '@mui/material/styles';
 import {
   Box,
   Paper,
@@ -38,10 +39,83 @@ import {
   Numbers as NumberIcon,
   DataObject as JsonIcon,
   CheckCircle as CheckCircleIcon,
+  Info as InfoIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import JsonEditor from '../common/JsonEditor';
 import ValueEditorField from '../common/ValueEditorField';
+import BooleanSwitch from '../common/BooleanSwitch';
+
+const OverrideSwitch = styled(Switch)(({ theme }) => ({
+  width: 100,
+  height: 28,
+  padding: 0,
+  '& .MuiSwitch-switchBase': {
+    padding: 0,
+    margin: 2,
+    transitionDuration: '200ms',
+    // Expand input to cover the whole switch width (100px)
+    '& .MuiSwitch-input': {
+      width: 100,
+      left: -2, // Adjusting for the margin: 2
+      top: -2,
+      height: 28,
+      margin: 0,
+    },
+    '&.Mui-checked': {
+      transform: 'translateX(72px)',
+      color: '#fff',
+      '& .MuiSwitch-input': {
+        left: -74, // Compensate for translateX(72px) + margin: 2 to keep input at left: 0 relative to parent
+      },
+      '& + .MuiSwitch-track': {
+        backgroundColor: theme.palette.primary.main,
+        opacity: 1,
+        border: 0,
+        '&:before': {
+          opacity: 1,
+        },
+        '&:after': {
+          opacity: 0,
+        },
+      },
+    },
+  },
+  '& .MuiSwitch-thumb': {
+    boxSizing: 'border-box',
+    width: 24,
+    height: 24,
+  },
+  '& .MuiSwitch-track': {
+    borderRadius: 14,
+    backgroundColor: theme.palette.mode === 'dark' ? '#616161' : '#bdbdbd',
+    opacity: 1,
+    position: 'relative',
+    '&:before, &:after': {
+      position: 'absolute',
+      top: '50%',
+      transform: 'translateY(-50%)',
+      fontSize: 10,
+      fontWeight: 600,
+      fontFamily: theme.typography.fontFamily,
+      transition: 'opacity 200ms',
+      whiteSpace: 'nowrap',
+      pointerEvents: 'none',
+    },
+    '&:before': {
+      content: '"개별 설정"',
+      left: 10,
+      color: '#fff',
+      opacity: 0,
+    },
+    '&:after': {
+      content: '"전역 설정"',
+      right: 10,
+      color: '#fff',
+      opacity: 1,
+    },
+  },
+}));
 
 export interface Variant {
   name: string;
@@ -56,7 +130,7 @@ interface EnvironmentVariantsEditorProps {
   environment: string;
   variants: Variant[];
   valueType: 'boolean' | 'string' | 'json' | 'number';
-  flagUsage?: 'flag' | 'remoteConfig';
+  flagType?: string;
   enabledValue: any; // Global enabled value
   disabledValue: any; // Global disabled value
   envEnabledValue?: any; // Environment-specific enabled value
@@ -100,7 +174,7 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
   environment,
   variants: initialVariants,
   valueType,
-  flagUsage = 'flag',
+  flagType = 'flag',
   enabledValue,
   disabledValue,
   envEnabledValue,
@@ -151,15 +225,62 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
     if (preserveExpandedRef.current) {
       setExpanded(true);
       preserveExpandedRef.current = false;
-    } else if (flagUsage === 'remoteConfig' && initialVariants.length > 0) {
+    } else if (flagType === 'remoteConfig' && initialVariants.length > 0) {
       setExpanded(true);
     }
-  }, [initialVariantsJson, flagUsage, initialVariants.length]);
+  }, [initialVariantsJson, flagType, initialVariants.length]);
 
   // --- Environment Values State & Logic ---
   const originalUseEnvOverride = useMemo(() => {
-    return envEnabledValue !== undefined && envEnabledValue !== null;
-  }, [envEnabledValue]);
+    return (envEnabledValue !== undefined && envEnabledValue !== null) ||
+      (envDisabledValue !== undefined && envDisabledValue !== null);
+  }, [envEnabledValue, envDisabledValue]);
+
+  // Canonicalize helper for robust comparison and display
+  const canonicalize = useCallback((val: any) => {
+    // Basic null/undefined handling
+    if (val === null || val === undefined) return valueType === 'json' ? '{}' : '';
+
+    // Fix for corrupted "[object Object]" strings coming from server/previous state
+    if (val === '[object Object]') return '{}';
+
+    if (valueType === 'json') {
+      try {
+        // Normalize strings by parsing and re-stringifying
+        if (typeof val === 'string') {
+          if (val.trim() === '') return '{}';
+          return JSON.stringify(JSON.parse(val));
+        }
+        // Objects are stringified directly
+        return JSON.stringify(val);
+      } catch {
+        // Fallback for invalid JSON
+        return typeof val === 'object' ? JSON.stringify(val) : String(val);
+      }
+    }
+    // Avoid [object Object] for non-JSON types as well
+    return typeof val === 'object' ? JSON.stringify(val) : String(val ?? '');
+  }, [valueType]);
+
+  // Helper to prepare value for API (ensures JSON fields receive objects, not strings)
+  const toApiValue = useCallback((val: any) => {
+    if (valueType === 'json') {
+      try {
+        if (typeof val === 'string') return JSON.parse(val === '' ? '{}' : val);
+        return val ?? {};
+      } catch {
+        return {};
+      }
+    }
+    return val;
+  }, [valueType]);
+
+  // Unified props snapshot for synchronization
+  const propsSnapshot = useMemo(() => JSON.stringify({
+    override: originalUseEnvOverride,
+    enabled: canonicalize(envEnabledValue ?? enabledValue),
+    disabled: canonicalize(envDisabledValue ?? disabledValue)
+  }), [originalUseEnvOverride, envEnabledValue, enabledValue, envDisabledValue, disabledValue, canonicalize]);
 
   const [useEnvOverride, setUseEnvOverride] = useState(originalUseEnvOverride);
   const [editingEnabledValue, setEditingEnabledValue] = useState(envEnabledValue ?? enabledValue);
@@ -169,20 +290,11 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
     disabledValue?: string | null;
   }>({});
 
-  const [prevOriginalOverride, setPrevOriginalOverride] = useState(originalUseEnvOverride);
-  const [prevEnabledValue, setPrevEnabledValue] = useState(envEnabledValue ?? enabledValue);
-  const [prevDisabledValue, setPrevDisabledValue] = useState(envDisabledValue ?? disabledValue);
+  const [prevPropsSnapshot, setPrevPropsSnapshot] = useState(propsSnapshot);
 
-  // Render-time Synchronization
-  if (
-    !isSavingRef.current &&
-    (originalUseEnvOverride !== prevOriginalOverride ||
-      (envEnabledValue ?? enabledValue) !== prevEnabledValue ||
-      (envDisabledValue ?? disabledValue) !== prevDisabledValue)
-  ) {
-    setPrevOriginalOverride(originalUseEnvOverride);
-    setPrevEnabledValue(envEnabledValue ?? enabledValue);
-    setPrevDisabledValue(envDisabledValue ?? disabledValue);
+  // Sync state if props change (and we are not currently saving)
+  if (!isSavingRef.current && propsSnapshot !== prevPropsSnapshot) {
+    setPrevPropsSnapshot(propsSnapshot);
     setUseEnvOverride(originalUseEnvOverride);
     setEditingEnabledValue(envEnabledValue ?? enabledValue);
     setEditingDisabledValue(envDisabledValue ?? disabledValue);
@@ -190,10 +302,17 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
   }
 
   const valuesHasChanges = useMemo(() => {
-    return useEnvOverride !== originalUseEnvOverride ||
-      JSON.stringify(editingEnabledValue) !== JSON.stringify(envEnabledValue ?? enabledValue) ||
-      JSON.stringify(editingDisabledValue) !== JSON.stringify(envDisabledValue ?? disabledValue);
-  }, [useEnvOverride, editingEnabledValue, editingDisabledValue, originalUseEnvOverride, envEnabledValue, enabledValue, envDisabledValue, disabledValue]);
+    // 1. Toggle change is always a change
+    if (useEnvOverride !== originalUseEnvOverride) return true;
+
+    // 2. If overridden, compare current values with what's on server
+    if (useEnvOverride) {
+      return canonicalize(editingEnabledValue) !== canonicalize(envEnabledValue ?? enabledValue) ||
+        canonicalize(editingDisabledValue) !== canonicalize(envDisabledValue ?? disabledValue);
+    }
+
+    return false;
+  }, [useEnvOverride, editingEnabledValue, editingDisabledValue, originalUseEnvOverride, envEnabledValue, enabledValue, envDisabledValue, disabledValue, canonicalize]);
 
   // Handle save fallback values
   const handleSaveValuesClick = useCallback(async () => {
@@ -210,16 +329,19 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
     setSavingValues(true);
     try {
       if (useEnvOverride) {
-        await onSaveValues(editingEnabledValue, editingDisabledValue, false);
+        // Send actual objects for JSON to backend
+        await onSaveValues(toApiValue(editingEnabledValue), toApiValue(editingDisabledValue), false);
       } else {
         // Clear env-specific, use global
         await onSaveValues(null, null, true);
       }
-      isSavingRef.current = false;
     } catch (error) {
+      // Error handled by parent or snackbar
       isSavingRef.current = false;
     } finally {
       setSavingValues(false);
+      // Let the sync happen in a subsequent render after props are updated
+      setTimeout(() => { isSavingRef.current = false; }, 100);
     }
   }, [onSaveValues, valueType, useEnvOverride, editingEnabledValue, editingDisabledValue, valueJsonErrors, t]);
 
@@ -230,6 +352,14 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
     setEditingDisabledValue(envDisabledValue ?? disabledValue);
     setValueJsonErrors({});
   }, [originalUseEnvOverride, envEnabledValue, enabledValue, envDisabledValue, disabledValue]);
+
+  // Unwrap legacy wrapped values like {type: 'string', value: ''} from old clearVariantValues code
+  const unwrapValue = useCallback((val: any): any => {
+    if (val !== null && typeof val === 'object' && 'type' in val && 'value' in val && Object.keys(val).length === 2) {
+      return val.value;
+    }
+    return val;
+  }, []);
 
   const addVariant = useCallback(() => {
     const lastVariant = editingVariants[editingVariants.length - 1];
@@ -249,10 +379,10 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
 
     const newVariant: Variant = {
       name:
-        flagUsage === 'remoteConfig' && editingVariants.length === 0
-          ? 'default'
+        flagType === 'remoteConfig'
+          ? 'config'
           : `variant-${editingVariants.length + 1}`,
-      weight: 0,
+      weight: 100, // Remote config variant always gets 100% weight as it's the only one
       weightLock: false,
       stickiness: 'default',
       value: defaultValue,
@@ -262,7 +392,7 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
     const updatedVariants = distributeWeights([...editingVariants, newVariant]);
     setEditingVariants(updatedVariants);
     setExpanded(true);
-  }, [editingVariants, valueType, flagUsage]);
+  }, [editingVariants, valueType, flagType]);
 
   const removeVariant = useCallback(
     (index: number) => {
@@ -380,21 +510,16 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
 
     if (valueType === 'boolean') {
       return (
-        <FormControlLabel
-          control={
-            <Switch
-              size="small"
-              checked={isEditing ? (value === true || value === 'true') : (globalValue === true || globalValue === 'true')}
-              onChange={(e) => isEditing && updateValue(e.target.checked)}
-              disabled={!isEditing || !canManage || isArchived}
-            />
-          }
-          label={
-            <Typography variant="body2">
-              {isEditing ? (value === true || value === 'true' ? 'True' : 'False') : (globalValue === true || globalValue === 'true' ? 'True' : 'False')}
-            </Typography>
-          }
-        />
+        <Box sx={{ display: 'flex', alignItems: 'center', minHeight: 40 }}>
+          <BooleanSwitch
+            checked={isEditing ? (value === true || value === 'true') : (globalValue === true || globalValue === 'true')}
+            onChange={(e) => isEditing && updateValue(e.target.checked)}
+            disabled={!isEditing || !canManage || isArchived}
+          />
+          <Typography variant="body2" sx={{ ml: 1, color: isEditing ? 'text.primary' : 'text.secondary' }}>
+            {isEditing ? (value === true || value === 'true' ? 'True' : 'False') : (globalValue === true || globalValue === 'true' ? 'True' : 'False')}
+          </Typography>
+        </Box>
       );
     }
 
@@ -405,57 +530,49 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
           size="small"
           type="number"
           value={isEditing ? (value ?? '') : (globalValue ?? '')}
-          onChange={(e) => isEditing && updateValue(e.target.value === '' ? undefined : Number(e.target.value))}
+          onChange={(e) => isEditing && updateValue(e.target.value === '' ? 0 : Number(e.target.value))}
           disabled={!isEditing || !canManage || isArchived}
         />
       );
     }
 
-    if (valueType === 'json') {
-      return (
-        <Box>
-          <JsonEditor
-            value={(() => {
-              const val = isEditing ? value : globalValue;
-              if (val === null || val === undefined) return '{}';
-              if (typeof val === 'object') return JSON.stringify(val, null, 2);
-              return String(val);
-            })()}
-            onChange={(val) => {
-              if (isEditing) {
-                try {
-                  const parsed = JSON.parse(val);
-                  updateValue(parsed);
-                  setValueJsonErrors(prev => ({ ...prev, [field]: null }));
-                } catch (e: any) {
-                  setValueJsonErrors(prev => ({ ...prev, [field]: e.message || 'Invalid JSON' }));
-                }
-              }
-            }}
-            onValidation={(isValid, errorMsg) => {
-              if (isEditing) {
-                setValueJsonErrors(prev => ({ ...prev, [field]: isValid ? null : errorMsg || 'Invalid JSON' }));
-              }
-            }}
-            readOnly={!isEditing || !canManage || isArchived}
-            height={120}
-          />
-          {error && (
-            <Typography variant="caption" color="error" sx={{ mt: 0.5, display: 'block' }}>
-              {error}
-            </Typography>
-          )}
-        </Box>
-      );
-    }
-
+    // JSON and String use ValueEditorField
     return (
       <ValueEditorField
-        value={isEditing ? (value ?? '') : (globalValue ?? '')}
-        onChange={(val) => isEditing && updateValue(val)}
-        valueType="string"
+        value={(() => {
+          const val = isEditing ? value : globalValue;
+          if (valueType === 'json') {
+            if (val === null || val === undefined) return '{}';
+            if (typeof val === 'object') return JSON.stringify(val, null, 2);
+            if (val === '[object Object]') return '{}';
+            return String(val);
+          }
+          return val ?? '';
+        })()}
+        onChange={(val) => {
+          if (!isEditing) return;
+          if (valueType === 'json') {
+            if (typeof val === 'object' && val !== null) {
+              updateValue(val);
+              setValueJsonErrors(prev => ({ ...prev, [field]: null }));
+            } else {
+              try {
+                const parsed = JSON.parse(val);
+                updateValue(parsed);
+                setValueJsonErrors(prev => ({ ...prev, [field]: null }));
+              } catch (e: any) {
+                updateValue(val);
+                setValueJsonErrors(prev => ({ ...prev, [field]: e.message || 'Invalid JSON' }));
+              }
+            }
+          } else {
+            updateValue(val);
+          }
+        }}
+        valueType={valueType}
         disabled={!isEditing || !canManage || isArchived}
         label={field === 'enabledValue' ? t('featureFlags.enabledValue') : t('featureFlags.disabledValue')}
+        onValidationError={(err) => setValueJsonErrors(prev => ({ ...prev, [field]: err }))}
       />
     );
   };
@@ -473,7 +590,7 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <Typography variant="subtitle2" fontWeight={600}>
-            {flagUsage === 'remoteConfig'
+            {flagType === 'remoteConfig'
               ? t('featureFlags.fallbackAndConfiguration')
               : t('featureFlags.envSpecificSettings')}
           </Typography>
@@ -494,7 +611,7 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
       </Box>
 
       {/* Weight Distribution Bar - hide for remoteConfig */}
-      {variantCount > 0 && flagUsage !== 'remoteConfig' && (
+      {variantCount > 0 && flagType !== 'remoteConfig' && (
         <Box
           sx={{
             height: 28,
@@ -533,52 +650,52 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
 
       {/* Expanded content */}
       <Collapse in={expanded}>
-        {/* Variants Section - always shown to allow adding variants */}
-        {(
-          <Box sx={{ mb: 3 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
-              <Typography variant="subtitle2" fontWeight={600}>
-                {flagUsage === 'remoteConfig' ? t('featureFlags.configuration') : t('featureFlags.variants')}
+        <Box sx={{ mb: 3 }}>
+          {variantCount === 0 && (
+            <Box sx={{ textAlign: 'center', py: 3, border: '1px dashed', borderColor: 'divider', borderRadius: 2, mb: 2, bgcolor: 'action.hover' }}>
+              <Typography variant="body2" color="text.secondary" fontWeight={500}>
+                {flagType === 'remoteConfig' ? t('featureFlags.noRemoteConfigValues') : t('featureFlags.noVariantsConfigured')}
               </Typography>
-              {variantCount === 0 && canManage && !isArchived && !(valueType === 'boolean' && variantCount >= 2) && (
-                <Button variant="outlined" size="small" startIcon={<AddIcon />} onClick={addVariant} sx={{ ml: 2 }}>
-                  {t('featureFlags.addConfiguration')}
+              {flagType === 'remoteConfig' && (
+                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5, px: 2 }}>
+                  {t('featureFlags.noRemoteConfigValuesGuide')}
+                </Typography>
+              )}
+              {canManage && !isArchived && (
+                <Button
+                  variant="contained"
+                  size="small"
+                  startIcon={<AddIcon />}
+                  onClick={addVariant}
+                  sx={{ mt: 1.5 }}
+                >
+                  {flagType === 'remoteConfig' ? t('featureFlags.setConfiguration') : t('featureFlags.addVariant')}
                 </Button>
               )}
             </Box>
+          )}
 
-            {variantCount === 0 && flagUsage !== 'remoteConfig' && (
-              <Box sx={{ textAlign: 'center', py: 2, border: '1px dashed', borderColor: 'divider', borderRadius: 1, mb: 2 }}>
-                <Typography variant="body2" color="text.secondary">
-                  {t('featureFlags.noVariantsConfigured')}
-                </Typography>
-                {canManage && !isArchived && !(valueType === 'boolean' && variantCount >= 2) && (
-                  <Button variant="outlined" size="small" startIcon={<AddIcon />} onClick={addVariant} sx={{ mt: 1 }}>
-                    {t('featureFlags.addVariant')}
-                  </Button>
-                )}
-              </Box>
-            )}
+          <Stack spacing={2}>
+            {editingVariants.map((variant, index) => {
+              const variantColor = VARIANT_COLORS[index % VARIANT_COLORS.length];
+              const isCurrentLocked = variant.weightLock;
+              const showWeightControls = variantCount > 1;
+              const isDuplicateName = editingVariants.some((v, i) => i !== index && v.name.trim().toLowerCase() === variant.name.trim().toLowerCase());
 
-            <Stack spacing={2}>
-              {editingVariants.map((variant, index) => {
-                const variantColor = VARIANT_COLORS[index % VARIANT_COLORS.length];
-                const isCurrentLocked = variant.weightLock;
-                const showWeightControls = variantCount > 1;
-                const isDuplicateName = editingVariants.some((v, i) => i !== index && v.name.trim().toLowerCase() === variant.name.trim().toLowerCase());
-
-                return (
-                  <Paper
-                    key={index}
-                    variant="outlined"
-                    sx={{
-                      p: 2,
-                      borderRadius: 2,
-                      borderLeft: 4,
-                      borderLeftColor: variantColor,
-                    }}
-                  >
-                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5, mb: 1.5 }}>
+              return (
+                <Paper
+                  key={index}
+                  variant="outlined"
+                  sx={{
+                    p: 2,
+                    borderRadius: 2,
+                    borderLeft: flagType === 'remoteConfig' ? 1 : 4,
+                    borderColor: flagType === 'remoteConfig' ? 'divider' : undefined,
+                    borderLeftColor: flagType === 'remoteConfig' ? 'divider' : variantColor,
+                  }}
+                >
+                  <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5, mb: variant.name === '$config' || flagType === 'remoteConfig' ? 0 : 1.5 }}>
+                    {(variant.name !== '$config' && flagType !== 'remoteConfig') && (
                       <TextField
                         size="small"
                         label={t('featureFlags.variantName')}
@@ -588,159 +705,223 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                         error={isDuplicateName}
                         sx={{ flex: 1 }}
                       />
-                      {showWeightControls && (
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <TextField
-                            size="small"
-                            label={t('featureFlags.weight')}
-                            type="number"
-                            value={variant.weight}
-                            onChange={(e) => updateVariantWeight(index, parseInt(e.target.value) || 0, isCurrentLocked || false)}
-                            disabled={!canManage || isArchived}
-                            sx={{ width: 90 }}
-                            InputProps={{ endAdornment: <InputAdornment position="end">%</InputAdornment> }}
-                          />
-                          <IconButton
-                            size="small"
-                            onClick={() => toggleWeightLock(index, !isCurrentLocked)}
-                            disabled={!canManage || isArchived}
-                            sx={{ color: isCurrentLocked ? 'warning.main' : 'action.disabled' }}
-                          >
-                            {isCurrentLocked ? <LockIcon fontSize="small" /> : <LockOpenIcon fontSize="small" />}
-                          </IconButton>
+                    )}
+                    {(showWeightControls && flagType !== 'remoteConfig') && (
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <TextField
+                          size="small"
+                          label={t('featureFlags.weight')}
+                          type="number"
+                          value={variant.weight}
+                          onChange={(e) => updateVariantWeight(index, parseInt(e.target.value) || 0, isCurrentLocked || false)}
+                          disabled={!canManage || isArchived}
+                          sx={{ width: 90 }}
+                          InputProps={{ endAdornment: <InputAdornment position="end">%</InputAdornment> }}
+                        />
+                        <IconButton
+                          size="small"
+                          onClick={() => toggleWeightLock(index, !isCurrentLocked)}
+                          disabled={!canManage || isArchived}
+                          sx={{ color: isCurrentLocked ? 'warning.main' : 'action.disabled' }}
+                        >
+                          {isCurrentLocked ? <LockIcon fontSize="small" /> : <LockOpenIcon fontSize="small" />}
+                        </IconButton>
+                      </Box>
+                    )}
+                    {canManage && !isArchived && flagType !== 'remoteConfig' && (
+                      <IconButton size="small" color="error" onClick={() => removeVariant(index)}>
+                        <DeleteIcon fontSize="small" />
+                      </IconButton>
+                    )}
+                  </Box>
+
+                  <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
+                    {(valueType === 'string' || valueType === 'json') && (
+                      <Box sx={{ mt: 1 }}>
+                        {valueType === 'string' && <StringIcon sx={{ fontSize: 18, color: 'text.secondary' }} />}
+                        {valueType === 'json' && <JsonIcon sx={{ fontSize: 18, color: 'text.secondary' }} />}
+                      </Box>
+                    )}
+                    <Box sx={{ flex: 1 }}>
+                      {(valueType === 'json' || valueType === 'string') ? (
+                        <ValueEditorField
+                          value={(() => {
+                            const raw = unwrapValue(variant.value);
+                            if (valueType === 'json') {
+                              if (raw === null || raw === undefined) return '{}';
+                              if (typeof raw === 'object') return JSON.stringify(raw, null, 2);
+                              if (raw === '[object Object]') return '{}';
+                              return String(raw);
+                            }
+                            // For string type, if value is still an object somehow, stringify it
+                            if (typeof raw === 'object' && raw !== null) return JSON.stringify(raw);
+                            return raw ?? '';
+                          })()}
+                          onChange={(val) => {
+                            if (valueType === 'json') {
+                              // Value can be an object (from dialog) or a string (from inline)
+                              if (typeof val === 'object' && val !== null) {
+                                updateVariant(index, { value: val });
+                                setJsonErrors(prev => ({ ...prev, [index]: null }));
+                              } else {
+                                try {
+                                  const parsed = JSON.parse(val);
+                                  updateVariant(index, { value: parsed });
+                                  setJsonErrors(prev => ({ ...prev, [index]: null }));
+                                } catch (e: any) {
+                                  updateVariant(index, { value: val });
+                                  setJsonErrors(prev => ({ ...prev, [index]: e.message || 'Invalid JSON' }));
+                                }
+                              }
+                            } else {
+                              updateVariant(index, { value: val });
+                            }
+                          }}
+                          valueType={valueType}
+                          disabled={!canManage || isArchived}
+                          label={flagType === 'remoteConfig' ? t('featureFlags.configuration') : t('featureFlags.variantValue')}
+                          onValidationError={(error) => setJsonErrors(prev => ({ ...prev, [index]: error }))}
+                        />
+                      ) : (
+                        <Box sx={{ display: 'flex', alignItems: 'center', minHeight: 40 }}>
+                          {valueType === 'boolean' ? (
+                            <BooleanSwitch
+                              checked={unwrapValue(variant.value) === true || unwrapValue(variant.value) === 'true'}
+                              onChange={(e) => updateVariant(index, { value: e.target.checked })}
+                              disabled={!canManage || isArchived}
+                            />
+                          ) : (
+                            <TextField
+                              fullWidth
+                              size="small"
+                              type="number"
+                              value={unwrapValue(variant.value) ?? ''}
+                              onChange={(e) => updateVariant(index, { value: e.target.value === '' ? 0 : Number(e.target.value) })}
+                              disabled={!canManage || isArchived}
+                            />
+                          )}
                         </Box>
                       )}
-                      {canManage && !isArchived && (
-                        <IconButton size="small" color="error" onClick={() => removeVariant(index)}>
-                          <DeleteIcon fontSize="small" />
-                        </IconButton>
-                      )}
                     </Box>
+                  </Box>
+                </Paper>
+              );
+            })}
+          </Stack>
 
-                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
-                      <Box sx={{ mt: 1 }}>
-                        {valueType === 'boolean' && <CheckCircleIcon sx={{ fontSize: 20, color: 'success.main' }} />}
-                        {valueType === 'string' && <StringIcon sx={{ fontSize: 20, color: 'info.main' }} />}
-                        {valueType === 'number' && <NumberIcon sx={{ fontSize: 20, color: 'success.main' }} />}
-                        {valueType === 'json' && <JsonIcon sx={{ fontSize: 20, color: 'warning.main' }} />}
-                      </Box>
-                      <Box sx={{ flex: 1 }}>
-                        {valueType === 'json' ? (
-                          <JsonEditor
-                            value={typeof variant.value === 'object' ? JSON.stringify(variant.value, null, 2) : variant.value || '{}'}
-                            onChange={(val) => {
-                              try {
-                                const parsed = JSON.parse(val);
-                                updateVariant(index, { value: parsed });
-                                setJsonErrors(prev => ({ ...prev, [index]: null }));
-                              } catch (e: any) {
-                                setJsonErrors(prev => ({ ...prev, [index]: e.message || 'Invalid JSON' }));
-                              }
-                            }}
-                            onValidationError={(error) => setJsonErrors(prev => ({ ...prev, [index]: error }))}
-                            readOnly={!canManage || isArchived}
-                            height={120}
-                          />
-                        ) : (
-                          <TextField
-                            fullWidth
-                            size="small"
-                            type={valueType === 'number' ? 'number' : 'text'}
-                            value={variant.value ?? ''}
-                            onChange={(e) => updateVariant(index, { value: valueType === 'number' ? Number(e.target.value) : e.target.value })}
-                            disabled={!canManage || isArchived}
-                          />
-                        )}
-                        {jsonErrors[index] && (
-                          <Typography variant="caption" color="error" sx={{ display: 'block', mt: 0.5 }}>
-                            {jsonErrors[index]}
-                          </Typography>
-                        )}
-                      </Box>
-                    </Box>
-                  </Paper>
-                );
-              })}
-            </Stack>
-
-            {canManage && !isArchived && (
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-                {!(valueType === 'boolean' && variantCount >= 2) ? (
+          {canManage && !isArchived && (
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
+              {(flagType !== 'remoteConfig' && variantCount > 0) ? (
+                !(valueType === 'boolean' && variantCount >= 2) ? (
                   <Button variant="outlined" size="small" startIcon={<AddIcon />} onClick={addVariant}>
-                    {flagUsage === 'remoteConfig' ? t('featureFlags.addConfiguration') : t('featureFlags.addVariant')}
+                    {t('featureFlags.addVariant')}
                   </Button>
                 ) : (
-                  <Typography variant="caption" color="text.secondary" sx={{ alignSelf: 'center' }}>
-                    {t('featureFlags.booleanVariantLimit')}
-                  </Typography>
-                )}
-                <Box sx={{ display: 'flex', gap: 1 }}>
-                  {hasChanges && (
-                    <Button variant="text" size="small" onClick={handleResetVariants} disabled={saving}>
-                      {t('common.reset')}
-                    </Button>
-                  )}
-                  <Button
-                    variant="contained"
-                    size="small"
-                    startIcon={<SaveIcon />}
-                    onClick={handleSaveVariants}
-                    disabled={saving || !hasChanges || hasDuplicateNames || hasJsonErrors}
-                  >
-                    {saving ? t('common.saving') : t('common.save')}
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, px: 1.5, py: 0.5, borderRadius: 1, bgcolor: 'info.main', color: 'info.contrastText' }}>
+                    <InfoIcon sx={{ fontSize: 16 }} />
+                    <Typography variant="caption" sx={{ fontWeight: 600 }}>
+                      {t('featureFlags.booleanVariantLimit')}
+                    </Typography>
+                  </Box>
+                )
+              ) : <Box />}
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                {hasChanges && (
+                  <Button variant="text" size="small" onClick={handleResetVariants} disabled={saving}>
+                    {t('common.reset')}
                   </Button>
-                </Box>
+                )}
+                <Button
+                  variant="contained"
+                  size="small"
+                  startIcon={<SaveIcon />}
+                  onClick={handleSaveVariants}
+                  disabled={saving || !hasChanges || hasDuplicateNames || hasJsonErrors}
+                >
+                  {saving ? t('common.saving') : t('common.save')}
+                </Button>
               </Box>
-            )}
-          </Box>
-        )}
+            </Box>
+          )}
+        </Box>
 
         {/* Flag Values Section - shown for both types but more critical for 'flag' usage */}
         {onSaveValues && (
-          <Box sx={{ mt: 2, pt: 2, borderTop: variantCount > 0 ? 1 : 0, borderColor: 'divider' }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Typography variant="subtitle2" fontWeight={600}>
-                  {t('featureFlags.envValues')}
-                </Typography>
-                <FormControlLabel
-                  control={
-                    <Switch
-                      size="small"
-                      checked={useEnvOverride}
-                      onChange={(e) => setUseEnvOverride(e.target.checked)}
-                      disabled={!canManage || isArchived}
-                    />
-                  }
-                  label={
-                    <Typography variant="body2" color="text.secondary">
-                      {t('featureFlags.overrideForEnv')}
-                    </Typography>
-                  }
-                  labelPlacement="end"
+          <Box sx={{ mt: 2, pt: 2, borderTop: 1, borderColor: 'divider' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                <OverrideSwitch
+                  checked={useEnvOverride}
+                  onChange={(e) => setUseEnvOverride(e.target.checked)}
+                  disabled={!canManage || isArchived}
                 />
-              </Box>
-              {!useEnvOverride && (
-                <Typography variant="caption" color="text.secondary">
-                  {t('featureFlags.usingGlobalDefault')}
+                <Typography variant="subtitle2" fontWeight={600} color={useEnvOverride ? 'primary.main' : 'text.secondary'}>
+                  {useEnvOverride ? t('featureFlags.overrideForEnv') : t('featureFlags.usingGlobalDefault')}
                 </Typography>
-              )}
+              </Box>
             </Box>
 
-            <Grid container spacing={2}>
-              <Grid item xs={12} md={6}>
-                <Typography variant="caption" color="text.secondary" gutterBottom sx={{ display: 'block' }}>
+            <Stack spacing={2.5} sx={{ mt: 1 }}>
+              <Box
+                sx={{
+                  p: 1.5,
+                  borderRadius: 1,
+                  bgcolor: variantCount > 0 ? 'action.hover' : 'transparent',
+                  border: '1px solid',
+                  borderStyle: variantCount > 0 ? 'dashed' : 'solid',
+                  borderColor: variantCount > 0 ? 'warning.light' : 'divider',
+                  position: 'relative'
+                }}
+              >
+                <Typography
+                  variant="subtitle2"
+                  gutterBottom
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 0.5,
+                    color: variantCount > 0 ? 'text.secondary' : 'text.primary',
+                    fontWeight: 600
+                  }}
+                >
                   {t('featureFlags.enabledValue')}
                 </Typography>
-                {renderValueInputField('enabledValue')}
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <Typography variant="caption" color="text.secondary" gutterBottom sx={{ display: 'block' }}>
+                <Box sx={{ opacity: variantCount > 0 ? 0.5 : 1, pointerEvents: variantCount > 0 ? 'none' : 'auto' }}>
+                  {renderValueInputField('enabledValue')}
+                </Box>
+                {variantCount > 0 && (
+                  <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 0.75, mt: 1, color: 'warning.main' }}>
+                    <InfoIcon sx={{ fontSize: 16, mt: 0.2 }} />
+                    <Typography variant="caption" sx={{ fontWeight: 500, lineHeight: 1.4 }}>
+                      {t('featureFlags.enabledValueRedundantHint')}
+                    </Typography>
+                  </Box>
+                )}
+              </Box>
+              <Box
+                sx={{
+                  p: 1.5,
+                  borderRadius: 1,
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  bgcolor: 'transparent'
+                }}
+              >
+                <Typography
+                  variant="subtitle2"
+                  gutterBottom
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 0.5,
+                    fontWeight: 600
+                  }}
+                >
                   {t('featureFlags.disabledValue')}
                 </Typography>
                 {renderValueInputField('disabledValue')}
-              </Grid>
-            </Grid>
+              </Box>
+            </Stack>
 
             {canManage && !isArchived && (
               <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, mt: 2 }}>
@@ -763,7 +944,7 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
           </Box>
         )}
       </Collapse>
-    </Paper>
+    </Paper >
   );
 };
 
