@@ -22,7 +22,9 @@ async function main() {
       flagName: 'test-basic-enabled',
       displayName: 'Test Basic Enabled',
       description: 'A simple flag that is always enabled',
-      variantType: 'none',
+      valueType: 'boolean',
+      enabledValue: true,
+      disabledValue: false,
       strategies: [
         {
           name: 'flexibleRollout',
@@ -37,7 +39,9 @@ async function main() {
       flagName: 'test-rollout-50',
       displayName: 'Test 50% Rollout',
       description: 'Flag with 50% gradual rollout for stickiness testing',
-      variantType: 'none',
+      valueType: 'boolean',
+      enabledValue: true,
+      disabledValue: false,
       strategies: [
         {
           name: 'flexibleRollout',
@@ -56,7 +60,9 @@ async function main() {
       flagName: 'test-admin-only',
       displayName: 'Test Admin Only',
       description: 'Flag enabled only for admin users',
-      variantType: 'none',
+      valueType: 'boolean',
+      enabledValue: true,
+      disabledValue: false,
       strategies: [
         {
           name: 'flexibleRollout',
@@ -76,7 +82,9 @@ async function main() {
       flagName: 'test-variants-ab',
       displayName: 'Test A/B Variants',
       description: 'Flag with multiple variants for A/B testing',
-      variantType: 'json',
+      valueType: 'json',
+      enabledValue: { version: 'default' },
+      disabledValue: { version: 'disabled' },
       strategies: [
         {
           name: 'flexibleRollout',
@@ -92,14 +100,14 @@ async function main() {
         {
           variantName: 'control',
           weight: 50,
-          payload: { version: 'A' },
-          payloadType: 'json',
+          value: { version: 'A' },
+          valueType: 'json',
         },
         {
           variantName: 'experiment',
           weight: 50,
-          payload: { version: 'B' },
-          payloadType: 'json',
+          value: { version: 'B' },
+          valueType: 'json',
         },
       ],
     });
@@ -109,7 +117,9 @@ async function main() {
       flagName: 'test-multi-strategy',
       displayName: 'Test Multiple Strategies',
       description: 'Flag with multiple strategies (first match wins)',
-      variantType: 'none',
+      valueType: 'boolean',
+      enabledValue: true,
+      disabledValue: false,
       strategies: [
         {
           name: 'userWithId',
@@ -136,7 +146,9 @@ async function main() {
       displayName: 'Test Disabled Flag',
       description: 'A flag that is globally disabled',
       isEnabled: false,
-      variantType: 'none',
+      valueType: 'boolean',
+      enabledValue: true,
+      disabledValue: false,
       strategies: [
         {
           name: 'flexibleRollout',
@@ -144,6 +156,28 @@ async function main() {
           isEnabled: true,
         },
       ],
+    });
+
+    // 7. Remote Config (string)
+    await createFlag({
+      flagName: 'config-welcome-message',
+      displayName: 'Welcome Message Config',
+      description: 'Remote configuration for welcome message',
+      valueType: 'string',
+      enabledValue: 'Welcome to Gatrix!',
+      disabledValue: 'Hello!',
+      strategies: [],
+    });
+
+    // 8. Remote Config (number)
+    await createFlag({
+      flagName: 'config-max-retry',
+      displayName: 'Max Retry Config',
+      description: 'Remote configuration for max retry count',
+      valueType: 'number',
+      enabledValue: 5,
+      disabledValue: 3,
+      strategies: [],
     });
 
     console.log('\n' + '='.repeat(60));
@@ -162,7 +196,9 @@ interface FlagConfig {
   displayName: string;
   description: string;
   isEnabled?: boolean;
-  variantType?: 'none' | 'string' | 'number' | 'json';
+  valueType: 'string' | 'number' | 'boolean' | 'json';
+  enabledValue: any;
+  disabledValue: any;
   strategies: Array<{
     name: string;
     parameters: Record<string, any>;
@@ -177,8 +213,8 @@ interface FlagConfig {
   variants?: Array<{
     variantName: string;
     weight: number;
-    payload?: any;
-    payloadType: string;
+    value?: any;
+    valueType: 'string' | 'number' | 'boolean' | 'json';
   }>;
 }
 
@@ -200,7 +236,9 @@ async function createFlag(config: FlagConfig) {
     displayName: config.displayName,
     description: config.description,
     flagType: 'release',
-    variantType: config.variantType || 'none',
+    valueType: config.valueType,
+    enabledValue: JSON.stringify(config.enabledValue),
+    disabledValue: JSON.stringify(config.disabledValue),
     isArchived: false,
     impressionDataEnabled: true,
     createdBy: CREATED_BY,
@@ -215,7 +253,8 @@ async function createFlag(config: FlagConfig) {
     flagId: flagId,
     environment: ENVIRONMENT,
     isEnabled: config.isEnabled !== false,
-    createdBy: CREATED_BY,
+    enabledValue: null, // Initial environment override is null
+    disabledValue: null,
     createdAt: now,
     updatedAt: now,
   });
@@ -250,8 +289,8 @@ async function createFlag(config: FlagConfig) {
         environment: ENVIRONMENT,
         variantName: variant.variantName,
         weight: variant.weight,
-        payload: JSON.stringify(variant.payload),
-        payloadType: variant.payloadType,
+        value: JSON.stringify(variant.value),
+        valueType: variant.valueType,
         createdBy: CREATED_BY,
         createdAt: now,
         updatedAt: now,

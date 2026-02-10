@@ -245,18 +245,33 @@ export class Environment extends Model implements EnvironmentData {
    * Get related data counts for deletion check
    */
   async getRelatedDataDetails(): Promise<{
-    templates: { count: number; items: Array<{ id: string; name: string }> };
     gameWorlds: {
       count: number;
       items: Array<{ id: string; worldId: string; name: string }>;
     };
-    segments: { count: number; items: Array<{ id: string; name: string }> };
-    tags: { count: number; items: Array<{ id: string; name: string }> };
+    clientVersions: {
+      count: number;
+      items: Array<{ id: string; clientVersion: string; platform: string }>;
+    };
+    accountWhitelist: { count: number; items: Array<{ id: string; accountId: string }> };
+    ipWhitelist: { count: number; items: Array<{ id: string; ipAddress: string }> };
     vars: { count: number; items: Array<{ id: string; varKey: string }> };
+    featureFlags: { count: number; items: Array<{ id: string; flagId: string }> };
+    featureStrategies: { count: number; items: Array<{ id: string; strategyName: string }> };
+    featureVariants: { count: number; items: Array<{ id: string; variantName: string }> };
+    featureSegments: { count: number; items: Array<{ id: string; segmentName: string }> };
+    featureMetrics: { count: number; items: Array<{ id: string; flagName: string }> };
+    featureVariantMetrics: { count: number; items: Array<{ id: string; flagName: string }> };
+    networkTraffic: { count: number; items: Array<{ id: number; appName: string }> };
+    unknownFlags: { count: number; items: Array<{ id: number; flagName: string }> };
+    changeRequests: { count: number; items: Array<{ id: string; title: string }> };
+    entityLocks: { count: number; items: Array<{ id: string; entityType: string }> };
     messageTemplates: {
       count: number;
       items: Array<{ id: string; name: string }>;
     };
+    jobTypes: { count: number; items: Array<{ id: string; name: string }> };
+    jobs: { count: number; items: Array<{ id: string; name: string }> };
     serviceNotices: {
       count: number;
       items: Array<{ id: string; title: string }>;
@@ -269,21 +284,24 @@ export class Environment extends Model implements EnvironmentData {
       count: number;
       items: Array<{ id: string; surveyTitle: string }>;
     };
-    coupons: { count: number; items: Array<{ id: string; name: string }> };
-    banners: {
-      count: number;
-      items: Array<{ bannerId: string; name: string }>;
-    };
-    jobs: { count: number; items: Array<{ id: string; name: string }> };
-    clientVersions: {
-      count: number;
-      items: Array<{ id: string; clientVersion: string; platform: string }>;
-    };
-    apiTokens: { count: number; items: Array<{ id: string; name: string }> };
+    crashes: { count: number; items: Array<{ id: string; branch: string }> };
+    crashEvents: { count: number; items: Array<{ id: string; platform: string }> };
+    rewardItemTemplates: { count: number; items: Array<{ id: string; name: string }> };
+    rewardTemplates: { count: number; items: Array<{ id: string; name: string }> };
+    couponSettings: { count: number; items: Array<{ id: string; name: string }> };
+    coupons: { count: number; items: Array<{ id: string; code: string }> };
     storeProducts: {
       count: number;
       items: Array<{ id: string; productId: string; productName: string }>;
     };
+    banners: {
+      count: number;
+      items: Array<{ bannerId: string; name: string }>;
+    };
+    apiTokens: { count: number; items: Array<{ id: string; name: string }> };
+    serverLifecycleEvents: { count: number; items: Array<{ id: string; eventType: string }> };
+    userEnvironments: { count: number; items: Array<{ id: string; userId: number }> };
+    auditLogs: { count: number; items: Array<{ id: string; action: string }> };
     total: number;
   }> {
     const { default: knex } = await import('../config/knex');
@@ -321,51 +339,97 @@ export class Environment extends Model implements EnvironmentData {
     };
 
     const [
-      templates,
       gameWorlds,
-      segments,
-      tags,
+      clientVersions,
+      accountWhitelist,
+      ipWhitelist,
       vars,
+      featureFlags,
+      featureStrategies,
+      featureVariants,
+      featureSegments,
+      featureMetrics,
+      featureVariantMetrics,
+      networkTraffic,
+      unknownFlags,
+      changeRequests,
+      entityLocks,
       messageTemplates,
+      jobTypes,
+      jobs,
       serviceNotices,
       ingamePopups,
       surveys,
+      crashes,
+      crashEvents,
+      rewardItemTemplates,
+      rewardTemplates,
+      couponSettings,
       coupons,
-      banners,
-      jobs,
-      clientVersions,
-      apiTokenEnvs,
       storeProducts,
+      banners,
+      apiTokenEnvs,
+      serverLifecycleEvents,
+      userEnvironments,
+      auditLogs,
     ] = await Promise.all([
-      safeQuery<{ id: string; name: string }>('g_remote_config_templates', ['id', 'name']),
       safeQuery<{ id: string; worldId: string; name: string }>('g_game_worlds', [
         'id',
         'worldId',
         'name',
       ]),
-      safeQuery<{ id: string; name: string }>('g_remote_config_segments', ['id', 'name']),
-      safeQuery<{ id: string; name: string }>('g_tags', ['id', 'name']),
+      safeQuery<{ id: string; clientVersion: string; platform: string }>('g_client_versions', [
+        'id',
+        'clientVersion',
+        'platform',
+      ]),
+      safeQuery<{ id: string; accountId: string }>('g_account_whitelist', ['id', 'accountId']),
+      safeQuery<{ id: string; ipAddress: string }>('g_ip_whitelist', ['id', 'ipAddress']),
       safeQuery<{ id: string; varKey: string }>('g_vars', ['id', 'varKey'], (qb) => {
         qb.where(function (this: any) {
           this.where('varKey', 'like', 'kv:%').orWhere('varKey', 'like', '$%');
         });
       }),
+      safeQuery<{ id: string; flagId: string }>('g_feature_flag_environments', [
+        'id',
+        'flagId',
+      ]),
+      safeQuery<{ id: string; strategyName: string }>('g_feature_strategies', [
+        'id',
+        'strategyName',
+      ]),
+      safeQuery<{ id: string; variantName: string }>('g_feature_variants', [
+        'id',
+        'variantName',
+      ]),
+      safeQuery<{ id: string; segmentName: string }>('g_feature_segments', [
+        'id',
+        'segmentName',
+      ]),
+      safeQuery<{ id: string; flagName: string }>('g_feature_metrics', ['id', 'flagName']),
+      safeQuery<{ id: string; flagName: string }>('g_feature_variant_metrics', [
+        'id',
+        'flagName',
+      ]),
+      safeQuery<{ id: number; appName: string }>('NetworkTraffic', ['id', 'appName']),
+      safeQuery<{ id: number; flagName: string }>('unknown_flags', ['id', 'flagName']),
+      safeQuery<{ id: string; title: string }>('g_change_requests', ['id', 'title']),
+      safeQuery<{ id: string; entityType: string }>('g_entity_locks', ['id', 'entityType']),
       safeQuery<{ id: string; name: string }>('g_message_templates', ['id', 'name']),
+      safeQuery<{ id: string; name: string }>('g_job_types', ['id', 'name']),
+      safeQuery<{ id: string; name: string }>('g_jobs', ['id', 'name']),
       safeQuery<{ id: string; title: string }>('g_service_notices', ['id', 'title']),
       safeQuery<{ id: string; description: string }>('g_ingame_popup_notices', [
         'id',
         'description',
       ]),
       safeQuery<{ id: string; surveyTitle: string }>('g_surveys', ['id', 'surveyTitle']),
+      safeQuery<{ id: string; branch: string }>('crashes', ['id', 'branch']),
+      safeQuery<{ id: string; platform: string }>('crash_events', ['id', 'platform']),
+      safeQuery<{ id: string; name: string }>('g_reward_item_templates', ['id', 'name']),
+      safeQuery<{ id: string; name: string }>('g_reward_templates', ['id', 'name']),
       safeQuery<{ id: string; name: string }>('g_coupon_settings', ['id', 'name']),
-      safeQuery<{ bannerId: string; name: string }>('g_banners', ['bannerId', 'name']),
-      safeQuery<{ id: string; name: string }>('g_jobs', ['id', 'name']),
-      safeQuery<{ id: string; clientVersion: string; platform: string }>('g_client_versions', [
-        'id',
-        'clientVersion',
-        'platform',
-      ]),
-      safeQuery<{ tokenId: string }>('g_api_access_token_environments', ['tokenId']),
+      safeQuery<{ id: string; code: string }>('g_coupons', ['id', 'code']),
       safeQuery<{ id: string; productId: string; productName: string }>(
         'g_store_products',
         ['id', 'productId', 'productName'],
@@ -373,6 +437,14 @@ export class Environment extends Model implements EnvironmentData {
           qb.where('isActive', true);
         }
       ),
+      safeQuery<{ bannerId: string; name: string }>('g_banners', ['bannerId', 'name']),
+      safeQuery<{ tokenId: string }>('g_api_access_token_environments', ['tokenId']),
+      safeQuery<{ id: string; eventType: string }>('g_server_lifecycle_events', [
+        'id',
+        'eventType',
+      ]),
+      safeQuery<{ id: string; userId: number }>('g_user_environments', ['id', 'userId']),
+      safeQuery<{ id: string; action: string }>('g_audit_logs', ['id', 'action']),
     ]);
 
     // For API tokens, we need to get the token names
@@ -390,40 +462,76 @@ export class Environment extends Model implements EnvironmentData {
     }
 
     const result = {
-      templates,
       gameWorlds,
-      segments,
-      tags,
+      clientVersions,
+      accountWhitelist,
+      ipWhitelist,
       vars,
+      featureFlags,
+      featureStrategies,
+      featureVariants,
+      featureSegments,
+      featureMetrics,
+      featureVariantMetrics,
+      networkTraffic,
+      unknownFlags,
+      changeRequests,
+      entityLocks,
       messageTemplates,
+      jobTypes,
+      jobs,
       serviceNotices,
       ingamePopups,
       surveys,
+      crashes,
+      crashEvents,
+      rewardItemTemplates,
+      rewardTemplates,
+      couponSettings,
       coupons,
-      banners,
-      jobs,
-      clientVersions,
-      apiTokens,
       storeProducts,
+      banners,
+      apiTokens,
+      serverLifecycleEvents,
+      userEnvironments,
+      auditLogs,
       total: 0,
     };
 
     result.total =
-      templates.count +
       gameWorlds.count +
-      segments.count +
-      tags.count +
+      clientVersions.count +
+      accountWhitelist.count +
+      ipWhitelist.count +
       vars.count +
+      featureFlags.count +
+      featureStrategies.count +
+      featureVariants.count +
+      featureSegments.count +
+      featureMetrics.count +
+      featureVariantMetrics.count +
+      networkTraffic.count +
+      unknownFlags.count +
+      changeRequests.count +
+      entityLocks.count +
       messageTemplates.count +
+      jobTypes.count +
+      jobs.count +
       serviceNotices.count +
       ingamePopups.count +
       surveys.count +
+      crashes.count +
+      crashEvents.count +
+      rewardItemTemplates.count +
+      rewardTemplates.count +
+      couponSettings.count +
       coupons.count +
+      storeProducts.count +
       banners.count +
-      jobs.count +
-      clientVersions.count +
       apiTokens.count +
-      storeProducts.count;
+      serverLifecycleEvents.count +
+      userEnvironments.count +
+      auditLogs.count;
 
     return result;
   }
@@ -432,40 +540,76 @@ export class Environment extends Model implements EnvironmentData {
    * Get related data counts only
    */
   async getRelatedDataCounts(): Promise<{
-    templates: number;
     gameWorlds: number;
-    segments: number;
-    tags: number;
+    clientVersions: number;
+    accountWhitelist: number;
+    ipWhitelist: number;
     vars: number;
+    featureFlags: number;
+    featureStrategies: number;
+    featureVariants: number;
+    featureSegments: number;
+    featureMetrics: number;
+    featureVariantMetrics: number;
+    networkTraffic: number;
+    unknownFlags: number;
+    changeRequests: number;
+    entityLocks: number;
     messageTemplates: number;
+    jobTypes: number;
+    jobs: number;
     serviceNotices: number;
     ingamePopups: number;
     surveys: number;
+    crashes: number;
+    crashEvents: number;
+    rewardItemTemplates: number;
+    rewardTemplates: number;
+    couponSettings: number;
     coupons: number;
-    banners: number;
-    jobs: number;
-    clientVersions: number;
-    apiTokens: number;
     storeProducts: number;
+    banners: number;
+    apiTokens: number;
+    serverLifecycleEvents: number;
+    userEnvironments: number;
+    auditLogs: number;
     total: number;
   }> {
     const details = await this.getRelatedDataDetails();
     return {
-      templates: details.templates.count,
       gameWorlds: details.gameWorlds.count,
-      segments: details.segments.count,
-      tags: details.tags.count,
+      clientVersions: details.clientVersions.count,
+      accountWhitelist: details.accountWhitelist.count,
+      ipWhitelist: details.ipWhitelist.count,
       vars: details.vars.count,
+      featureFlags: details.featureFlags.count,
+      featureStrategies: details.featureStrategies.count,
+      featureVariants: details.featureVariants.count,
+      featureSegments: details.featureSegments.count,
+      featureMetrics: details.featureMetrics.count,
+      featureVariantMetrics: details.featureVariantMetrics.count,
+      networkTraffic: details.networkTraffic.count,
+      unknownFlags: details.unknownFlags.count,
+      changeRequests: details.changeRequests.count,
+      entityLocks: details.entityLocks.count,
       messageTemplates: details.messageTemplates.count,
+      jobTypes: details.jobTypes.count,
+      jobs: details.jobs.count,
       serviceNotices: details.serviceNotices.count,
       ingamePopups: details.ingamePopups.count,
       surveys: details.surveys.count,
+      crashes: details.crashes.count,
+      crashEvents: details.crashEvents.count,
+      rewardItemTemplates: details.rewardItemTemplates.count,
+      rewardTemplates: details.rewardTemplates.count,
+      couponSettings: details.couponSettings.count,
       coupons: details.coupons.count,
-      banners: details.banners.count,
-      jobs: details.jobs.count,
-      clientVersions: details.clientVersions.count,
-      apiTokens: details.apiTokens.count,
       storeProducts: details.storeProducts.count,
+      banners: details.banners.count,
+      apiTokens: details.apiTokens.count,
+      serverLifecycleEvents: details.serverLifecycleEvents.count,
+      userEnvironments: details.userEnvironments.count,
+      auditLogs: details.auditLogs.count,
       total: details.total,
     };
   }
@@ -513,33 +657,41 @@ export class Environment extends Model implements EnvironmentData {
       };
 
       await knex.transaction(async (trx) => {
-        // Delete remote config related data first
-        try {
-          await trx('g_remote_config_template_versions')
-            .whereIn(
-              'templateId',
-              trx('g_remote_config_templates').select('id').where('environment', environment)
-            )
-            .del();
-        } catch {
-          // Template versions table might not exist
-        }
-
-        await safeDelete(trx, 'g_remote_config_templates');
-        await safeDelete(trx, 'g_remote_config_segments');
-
         // Delete other environment-scoped data
+        await safeDelete(trx, 'g_audit_logs');
         await safeDelete(trx, 'g_game_worlds');
-        await safeDelete(trx, 'g_tags');
+        await safeDelete(trx, 'g_client_versions');
+        await safeDelete(trx, 'g_account_whitelist');
+        await safeDelete(trx, 'g_ip_whitelist');
         await safeDelete(trx, 'g_vars');
+        await safeDelete(trx, 'g_feature_flag_environments');
+        await safeDelete(trx, 'g_feature_strategies');
+        await safeDelete(trx, 'g_feature_variants');
+        await safeDelete(trx, 'g_feature_segments');
+        await safeDelete(trx, 'g_feature_metrics');
+        await safeDelete(trx, 'g_feature_variant_metrics');
+        await safeDelete(trx, 'NetworkTraffic');
+        await safeDelete(trx, 'unknown_flags');
+        await safeDelete(trx, 'g_change_requests');
+        await safeDelete(trx, 'g_entity_locks');
         await safeDelete(trx, 'g_message_templates');
+        await safeDelete(trx, 'g_job_types');
+        await safeDelete(trx, 'g_jobs');
         await safeDelete(trx, 'g_service_notices');
         await safeDelete(trx, 'g_ingame_popup_notices');
         await safeDelete(trx, 'g_surveys');
+        await safeDelete(trx, 'crashes');
+        await safeDelete(trx, 'crash_events');
+        await safeDelete(trx, 'g_reward_item_templates');
+        await safeDelete(trx, 'g_reward_templates');
+        await safeDelete(trx, 'g_coupon_settings');
         await safeDelete(trx, 'g_coupons');
+        await safeDelete(trx, 'g_store_products');
         await safeDelete(trx, 'g_banners');
-        await safeDelete(trx, 'g_jobs');
-        await safeDelete(trx, 'g_client_versions');
+        await safeDelete(trx, 'g_api_access_token_environments');
+        await safeDelete(trx, 'g_server_lifecycle_events');
+        await safeDelete(trx, 'g_user_environments');
+        await safeDelete(trx, 'g_tags'); // Tags are global, but check for environment column just in case schema changes
 
         // Finally delete the environment itself
         await trx('g_environments').where('environment', environment).del();

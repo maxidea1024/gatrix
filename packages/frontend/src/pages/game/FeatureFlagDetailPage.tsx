@@ -109,6 +109,8 @@ import ResizableDrawer from '../../components/common/ResizableDrawer';
 import { tagService, Tag } from '../../services/tagService';
 import { getContrastColor } from '../../utils/colorUtils';
 import JsonEditor from '../../components/common/JsonEditor';
+import ValueEditorField from '../../components/common/ValueEditorField';
+import BooleanSwitch from '../../components/common/BooleanSwitch';
 import EmptyState from '../../components/common/EmptyState';
 import { environmentService, Environment } from '../../services/environmentService';
 import { useEnvironment } from '../../contexts/EnvironmentContext';
@@ -1395,21 +1397,14 @@ const FeatureFlagDetailPage: React.FC = () => {
 
     if (type === 'boolean') {
       return (
-        <FormControl component="fieldset">
-          <FormControlLabel
-            control={
-              <Switch
-                checked={value === true || value === 'true'}
-                onChange={(e) => {
-                  setFlag((prev) =>
-                    prev ? { ...prev, [field]: e.target.checked } : prev
-                  );
-                }}
-              />
-            }
-            label={value === true || value === 'true' ? 'True' : 'False'}
-          />
-        </FormControl>
+        <BooleanSwitch
+          checked={value === true || value === 'true'}
+          onChange={(e) => {
+            setFlag((prev) =>
+              prev ? { ...prev, [field]: e.target.checked } : prev
+            );
+          }}
+        />
       );
     }
 
@@ -1461,13 +1456,13 @@ const FeatureFlagDetailPage: React.FC = () => {
     }
 
     return (
-      <TextField
-        fullWidth
-        size="small"
+      <ValueEditorField
         value={value ?? ''}
-        onChange={(e) => {
-          setFlag((prev) => (prev ? { ...prev, [field]: e.target.value } : prev));
+        onChange={(val) => {
+          setFlag((prev) => (prev ? { ...prev, [field]: val } : prev));
         }}
+        valueType="string"
+        label={field === 'enabledValue' ? t('featureFlags.enabledValue') : t('featureFlags.disabledValue')}
       />
     );
   };
@@ -3382,7 +3377,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                     <HelpOutlineIcon fontSize="small" color="action" />
                   </Tooltip>
                 </Typography>
-                <FormControl size="small" sx={{ minWidth: 200 }}>
+                <FormControl size="small" fullWidth>
                   <Select
                     value={flag.valueType || 'boolean'}
                     onChange={(e) => {
@@ -3394,7 +3389,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                         newEnabled = true;
                         newDisabled = false;
                       } else if (newType === 'number') {
-                        newEnabled = 1;
+                        newEnabled = 0;
                         newDisabled = 0;
                       } else if (newType === 'json') {
                         newEnabled = {};

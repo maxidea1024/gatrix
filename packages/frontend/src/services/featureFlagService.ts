@@ -28,7 +28,9 @@ export interface FeatureFlag {
   staleAfterDays?: number;
   stale?: boolean;
   tags?: string[];
-  variantType?: 'none' | 'string' | 'number' | 'json';
+  valueType: 'string' | 'number' | 'boolean' | 'json';
+  enabledValue: any;
+  disabledValue: any;
   archivedAt?: string;
   createdBy?: number;
   updatedBy?: number;
@@ -66,7 +68,9 @@ export interface CreateFeatureFlagInput {
   description?: string;
   flagType?: FlagType;
   flagUsage?: FlagUsage;
-  variantType?: 'none' | 'string' | 'number' | 'json';
+  valueType: 'string' | 'number' | 'boolean' | 'json';
+  enabledValue: any;
+  disabledValue: any;
   isEnabled?: boolean;
   impressionDataEnabled?: boolean;
   staleAfterDays?: number;
@@ -77,6 +81,9 @@ export interface UpdateFeatureFlagInput {
   displayName?: string;
   description?: string;
   isEnabled?: boolean;
+  valueType?: 'string' | 'number' | 'boolean' | 'json';
+  enabledValue?: any;
+  disabledValue?: any;
   impressionDataEnabled?: boolean;
   staleAfterDays?: number;
   tags?: string[];

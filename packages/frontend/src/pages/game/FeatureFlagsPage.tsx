@@ -40,6 +40,7 @@ import {
   ListItemIcon,
   ListItemText,
   ClickAwayListener,
+  Alert,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -79,7 +80,8 @@ import {
   SportsEsports as JoystickIcon,
   SwapVert as ImportExportIcon,
 } from '@mui/icons-material';
-import JsonEditor from '../../components/common/JsonEditor';
+import ValueEditorField from '../../components/common/ValueEditorField';
+import BooleanSwitch from '../../components/common/BooleanSwitch';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { parseApiErrorMessage } from '../../utils/errorUtils';
@@ -2454,6 +2456,42 @@ const FeatureFlagsPage: React.FC = () => {
               helperText={t('featureFlags.descriptionHelp')}
             />
 
+            {/* Tags - moved here after description */}
+            <Autocomplete
+              multiple
+              size="small"
+              options={allTags.map((tag) => tag.name)}
+              value={newFlag.tags}
+              onChange={(_, newValue) => setNewFlag({ ...newFlag, tags: newValue })}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label={t('featureFlags.tags')}
+                  placeholder={t('featureFlags.selectTags')}
+                  helperText={t('featureFlags.tagsHelp')}
+                />
+              )}
+              renderTags={(value, getTagProps) =>
+                value.map((option, index) => {
+                  const tag = allTags.find((t) => t.name === option);
+                  return (
+                    <Chip
+                      {...getTagProps({ index })}
+                      key={option}
+                      label={option}
+                      size="small"
+                      sx={{
+                        bgcolor: tag?.color || '#888',
+                        color: getContrastColor(tag?.color || '#888'),
+                      }}
+                    />
+                  );
+                })
+              }
+            />
+
+            <Divider />
+
             {/* Flag Type */}
             <FormControl fullWidth>
               <InputLabel>{t('featureFlags.flagType')}</InputLabel>
@@ -2590,231 +2628,177 @@ const FeatureFlagsPage: React.FC = () => {
               </Typography>
             </Box>
 
-            {/* Value Type */}
-            <Box>
-              <Typography
-                variant="subtitle2"
-                sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1 }}
-              >
-                {t('featureFlags.valueType')}
-                <Tooltip title={t('featureFlags.valueTypeHelp')}>
-                  <HelpOutlineIcon fontSize="small" color="action" />
-                </Tooltip>
-              </Typography>
-              {newFlag.flagUsage === 'remoteConfig' && (
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  sx={{ display: 'block', mb: 1 }}
-                >
-                  {t('featureFlags.remoteConfigRequiresValueType')}
-                </Typography>
-              )}
-              <FormControl size="small" sx={{ minWidth: 200 }}>
-                <Select
-                  value={newFlag.valueType}
-                  onChange={(e) => {
-                    const newType = e.target.value as 'boolean' | 'string' | 'json' | 'number';
-                    setNewFlag((prev) => ({
-                      ...prev,
-                      valueType: newType,
-                      enabledValue:
-                        newType === 'boolean'
-                          ? 'true'
-                          : newType === 'number'
-                            ? 1
-                            : newType === 'json'
-                              ? '{}'
-                              : '',
-                      disabledValue:
-                        newType === 'boolean'
-                          ? 'false'
-                          : newType === 'number'
-                            ? 0
-                            : newType === 'json'
-                              ? '{}'
-                              : '',
-                    }));
-                    if (newType !== 'json') {
-                      setNewFlagJsonError(null);
-                    }
-                  }}
-                >
-                  <MenuItem value="boolean">
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <CheckCircleIcon sx={{ fontSize: 16, color: 'success.main' }} />
-                      {t('featureFlags.valueTypes.boolean')}
-                    </Box>
-                  </MenuItem>
-                  <MenuItem value="string">
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <StringIcon sx={{ fontSize: 16, color: 'info.main' }} />
-                      {t('featureFlags.valueTypes.string')}
-                    </Box>
-                  </MenuItem>
-                  <MenuItem value="number">
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <NumberIcon sx={{ fontSize: 16, color: 'success.main' }} />
-                      {t('featureFlags.valueTypes.number')}
-                    </Box>
-                  </MenuItem>
-                  <MenuItem value="json">
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <JsonIcon sx={{ fontSize: 16, color: 'warning.main' }} />
-                      {t('featureFlags.valueTypes.json')}
-                    </Box>
-                  </MenuItem>
-                </Select>
-              </FormControl>
-            </Box>
-
-            {/* Enabled Value */}
-            <Box>
-              <Typography
-                variant="subtitle2"
-                sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1 }}
-              >
-                {t('featureFlags.enabledValue')}
-                <Tooltip title={t('featureFlags.enabledValueHelp')}>
-                  <HelpOutlineIcon fontSize="small" color="action" />
-                </Tooltip>
-              </Typography>
-              {newFlag.valueType === 'boolean' ? (
-                <FormControl size="small" fullWidth>
-                  <Select
-                    value={String(newFlag.enabledValue)}
-                    onChange={(e) =>
-                      setNewFlag((prev) => ({ ...prev, enabledValue: e.target.value }))
-                    }
+            {/* Value Settings Group */}
+            <Paper variant="outlined" sx={{ p: 2 }}>
+              <Stack spacing={2}>
+                {/* Value Type */}
+                <Box>
+                  <Typography
+                    variant="subtitle2"
+                    sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1 }}
                   >
-                    <MenuItem value="true">true</MenuItem>
-                    <MenuItem value="false">false</MenuItem>
-                  </Select>
-                </FormControl>
-              ) : newFlag.valueType === 'json' ? (
-                <JsonEditor
-                  value={
-                    typeof newFlag.enabledValue === 'object'
-                      ? JSON.stringify(newFlag.enabledValue, null, 2)
-                      : String(newFlag.enabledValue || '{}')
-                  }
-                  onChange={(value) => {
-                    let parsedValue: any = value;
-                    try {
-                      parsedValue = JSON.parse(value);
-                    } catch (e) { }
-                    setNewFlag((prev) => ({ ...prev, enabledValue: parsedValue }));
-                  }}
-                  height={150}
-                />
-              ) : (
-                <TextField
-                  fullWidth
-                  size="small"
-                  type={newFlag.valueType === 'number' ? 'number' : 'text'}
-                  value={newFlag.enabledValue}
-                  onChange={(e) =>
-                    setNewFlag((prev) => ({
-                      ...prev,
-                      enabledValue:
-                        newFlag.valueType === 'number' ? Number(e.target.value) : e.target.value,
-                    }))
-                  }
-                />
-              )}
-            </Box>
-
-            {/* Disabled Value */}
-            <Box>
-              <Typography
-                variant="subtitle2"
-                sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1 }}
-              >
-                {t('featureFlags.disabledValue')}
-                <Tooltip title={t('featureFlags.disabledValueHelp')}>
-                  <HelpOutlineIcon fontSize="small" color="action" />
-                </Tooltip>
-              </Typography>
-              {newFlag.valueType === 'boolean' ? (
-                <FormControl size="small" fullWidth>
-                  <Select
-                    value={String(newFlag.disabledValue)}
-                    onChange={(e) =>
-                      setNewFlag((prev) => ({ ...prev, disabledValue: e.target.value }))
-                    }
-                  >
-                    <MenuItem value="true">true</MenuItem>
-                    <MenuItem value="false">false</MenuItem>
-                  </Select>
-                </FormControl>
-              ) : newFlag.valueType === 'json' ? (
-                <JsonEditor
-                  value={
-                    typeof newFlag.disabledValue === 'object'
-                      ? JSON.stringify(newFlag.disabledValue, null, 2)
-                      : String(newFlag.disabledValue || '{}')
-                  }
-                  onChange={(value) => {
-                    let parsedValue: any = value;
-                    try {
-                      parsedValue = JSON.parse(value);
-                    } catch (e) { }
-                    setNewFlag((prev) => ({ ...prev, disabledValue: parsedValue }));
-                  }}
-                  height={150}
-                />
-              ) : (
-                <TextField
-                  fullWidth
-                  size="small"
-                  type={newFlag.valueType === 'number' ? 'number' : 'text'}
-                  value={newFlag.disabledValue}
-                  onChange={(e) =>
-                    setNewFlag((prev) => ({
-                      ...prev,
-                      disabledValue:
-                        newFlag.valueType === 'number' ? Number(e.target.value) : e.target.value,
-                    }))
-                  }
-                />
-              )}
-            </Box>
-
-
-
-            {/* Tags */}
-            <Autocomplete
-              multiple
-              size="small"
-              options={allTags.map((tag) => tag.name)}
-              value={newFlag.tags}
-              onChange={(_, newValue) => setNewFlag({ ...newFlag, tags: newValue })}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label={t('featureFlags.tags')}
-                  placeholder={t('featureFlags.selectTags')}
-                  helperText={t('featureFlags.tagsHelp')}
-                />
-              )}
-              renderTags={(value, getTagProps) =>
-                value.map((option, index) => {
-                  const tag = allTags.find((t) => t.name === option);
-                  return (
-                    <Chip
-                      {...getTagProps({ index })}
-                      key={option}
-                      label={option}
-                      size="small"
-                      sx={{
-                        bgcolor: tag?.color || '#888',
-                        color: getContrastColor(tag?.color || '#888'),
+                    {t('featureFlags.valueType')}
+                    <Tooltip title={t('featureFlags.valueTypeHelp')}>
+                      <HelpOutlineIcon fontSize="small" color="action" />
+                    </Tooltip>
+                  </Typography>
+                  {newFlag.flagUsage === 'remoteConfig' && (
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      sx={{ display: 'block', mb: 1 }}
+                    >
+                      {t('featureFlags.remoteConfigRequiresValueType')}
+                    </Typography>
+                  )}
+                  <FormControl size="small" fullWidth>
+                    <Select
+                      value={newFlag.valueType}
+                      onChange={(e) => {
+                        const newType = e.target.value as 'boolean' | 'string' | 'json' | 'number';
+                        setNewFlag((prev) => ({
+                          ...prev,
+                          valueType: newType,
+                          enabledValue:
+                            newType === 'boolean'
+                              ? 'true'
+                              : newType === 'number'
+                                ? 0
+                                : newType === 'json'
+                                  ? '{}'
+                                  : '',
+                          disabledValue:
+                            newType === 'boolean'
+                              ? 'false'
+                              : newType === 'number'
+                                ? 0
+                                : newType === 'json'
+                                  ? '{}'
+                                  : '',
+                        }));
+                        if (newType !== 'json') {
+                          setNewFlagJsonError(null);
+                        }
                       }}
+                    >
+                      <MenuItem value="boolean">
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <CheckCircleIcon sx={{ fontSize: 16, color: 'success.main' }} />
+                          {t('featureFlags.valueTypes.boolean')}
+                        </Box>
+                      </MenuItem>
+                      <MenuItem value="string">
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <StringIcon sx={{ fontSize: 16, color: 'info.main' }} />
+                          {t('featureFlags.valueTypes.string')}
+                        </Box>
+                      </MenuItem>
+                      <MenuItem value="number">
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <NumberIcon sx={{ fontSize: 16, color: 'success.main' }} />
+                          {t('featureFlags.valueTypes.number')}
+                        </Box>
+                      </MenuItem>
+                      <MenuItem value="json">
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <JsonIcon sx={{ fontSize: 16, color: 'warning.main' }} />
+                          {t('featureFlags.valueTypes.json')}
+                        </Box>
+                      </MenuItem>
+                    </Select>
+                  </FormControl>
+                </Box>
+
+                {/* Enabled Value */}
+                <Box>
+                  <Typography
+                    variant="subtitle2"
+                    sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1 }}
+                  >
+                    {t('featureFlags.enabledValue')}
+                    <Tooltip title={t('featureFlags.enabledValueHelp')}>
+                      <HelpOutlineIcon fontSize="small" color="action" />
+                    </Tooltip>
+                  </Typography>
+                  {newFlag.valueType === 'boolean' ? (
+                    <BooleanSwitch
+                      checked={newFlag.enabledValue === true || newFlag.enabledValue === 'true'}
+                      onChange={(e) =>
+                        setNewFlag((prev) => ({ ...prev, enabledValue: e.target.checked ? 'true' : 'false' }))
+                      }
                     />
-                  );
-                })
-              }
-            />
+                  ) : newFlag.valueType === 'number' ? (
+                    <TextField
+                      fullWidth
+                      size="small"
+                      type="number"
+                      value={newFlag.enabledValue}
+                      onChange={(e) =>
+                        setNewFlag((prev) => ({
+                          ...prev,
+                          enabledValue: Number(e.target.value),
+                        }))
+                      }
+                    />
+                  ) : (
+                    <ValueEditorField
+                      value={newFlag.enabledValue}
+                      onChange={(val) => setNewFlag((prev) => ({ ...prev, enabledValue: val }))}
+                      valueType={newFlag.valueType}
+                      label={t('featureFlags.enabledValue')}
+                      onValidationError={(err) => setNewFlagJsonError(err)}
+                    />
+                  )}
+                </Box>
+
+                {/* Disabled Value */}
+                <Box>
+                  <Typography
+                    variant="subtitle2"
+                    sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1 }}
+                  >
+                    {t('featureFlags.disabledValue')}
+                    <Tooltip title={t('featureFlags.disabledValueHelp')}>
+                      <HelpOutlineIcon fontSize="small" color="action" />
+                    </Tooltip>
+                  </Typography>
+                  {newFlag.valueType === 'boolean' ? (
+                    <BooleanSwitch
+                      checked={newFlag.disabledValue === true || newFlag.disabledValue === 'true'}
+                      onChange={(e) =>
+                        setNewFlag((prev) => ({ ...prev, disabledValue: e.target.checked ? 'true' : 'false' }))
+                      }
+                    />
+                  ) : newFlag.valueType === 'number' ? (
+                    <TextField
+                      fullWidth
+                      size="small"
+                      type="number"
+                      value={newFlag.disabledValue}
+                      onChange={(e) =>
+                        setNewFlag((prev) => ({
+                          ...prev,
+                          disabledValue: Number(e.target.value),
+                        }))
+                      }
+                    />
+                  ) : (
+                    <ValueEditorField
+                      value={newFlag.disabledValue}
+                      onChange={(val) => setNewFlag((prev) => ({ ...prev, disabledValue: val }))}
+                      valueType={newFlag.valueType}
+                      label={t('featureFlags.disabledValue')}
+                      onValidationError={(err) => setNewFlagJsonError(err)}
+                    />
+                  )}
+                </Box>
+              </Stack>
+            </Paper>
+
+            {/* Info Alert */}
+            <Alert severity="info">
+              {t('featureFlags.createFlagDetailSettingsInfo')}
+            </Alert>
           </Stack>
         </Box>
 
@@ -2842,13 +2826,13 @@ const FeatureFlagsPage: React.FC = () => {
             }
             startIcon={creating ? <CircularProgress size={20} /> : undefined}
           >
-            {t('featureFlags.createFlag')}
+            {newFlag.flagUsage === 'remoteConfig' ? t('featureFlags.createRemoteConfig') : t('featureFlags.createFlag')}
           </Button>
         </Box>
-      </ResizableDrawer>
+      </ResizableDrawer >
 
       {/* Column Settings Dialog */}
-      <ColumnSettingsDialog
+      < ColumnSettingsDialog
         open={Boolean(columnSettingsAnchor)}
         anchorEl={columnSettingsAnchor}
         columns={columns}
@@ -3018,7 +3002,7 @@ const FeatureFlagsPage: React.FC = () => {
         initialFlags={playgroundInitialFlags}
         autoExecute={playgroundAutoExecute}
       />
-    </Box>
+    </Box >
   );
 };
 

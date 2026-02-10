@@ -41,6 +41,7 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import JsonEditor from '../common/JsonEditor';
+import ValueEditorField from '../common/ValueEditorField';
 
 export interface Variant {
   name: string;
@@ -449,12 +450,12 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
     }
 
     return (
-      <TextField
-        fullWidth
-        size="small"
+      <ValueEditorField
         value={isEditing ? (value ?? '') : (globalValue ?? '')}
-        onChange={(e) => isEditing && updateValue(e.target.value)}
+        onChange={(val) => isEditing && updateValue(val)}
+        valueType="string"
         disabled={!isEditing || !canManage || isArchived}
+        label={field === 'enabledValue' ? t('featureFlags.enabledValue') : t('featureFlags.disabledValue')}
       />
     );
   };
@@ -539,7 +540,7 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
               <Typography variant="subtitle2" fontWeight={600}>
                 {flagUsage === 'remoteConfig' ? t('featureFlags.configuration') : t('featureFlags.variants')}
               </Typography>
-              {variantCount === 0 && canManage && !isArchived && (
+              {variantCount === 0 && canManage && !isArchived && !(valueType === 'boolean' && variantCount >= 2) && (
                 <Button variant="outlined" size="small" startIcon={<AddIcon />} onClick={addVariant} sx={{ ml: 2 }}>
                   {t('featureFlags.addConfiguration')}
                 </Button>
@@ -551,7 +552,7 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                 <Typography variant="body2" color="text.secondary">
                   {t('featureFlags.noVariantsConfigured')}
                 </Typography>
-                {canManage && !isArchived && (
+                {canManage && !isArchived && !(valueType === 'boolean' && variantCount >= 2) && (
                   <Button variant="outlined" size="small" startIcon={<AddIcon />} onClick={addVariant} sx={{ mt: 1 }}>
                     {t('featureFlags.addVariant')}
                   </Button>
@@ -664,9 +665,15 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
 
             {canManage && !isArchived && (
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-                <Button variant="outlined" size="small" startIcon={<AddIcon />} onClick={addVariant}>
-                  {flagUsage === 'remoteConfig' ? t('featureFlags.addConfiguration') : t('featureFlags.addVariant')}
-                </Button>
+                {!(valueType === 'boolean' && variantCount >= 2) ? (
+                  <Button variant="outlined" size="small" startIcon={<AddIcon />} onClick={addVariant}>
+                    {flagUsage === 'remoteConfig' ? t('featureFlags.addConfiguration') : t('featureFlags.addVariant')}
+                  </Button>
+                ) : (
+                  <Typography variant="caption" color="text.secondary" sx={{ alignSelf: 'center' }}>
+                    {t('featureFlags.booleanVariantLimit')}
+                  </Typography>
+                )}
                 <Box sx={{ display: 'flex', gap: 1 }}>
                   {hasChanges && (
                     <Button variant="text" size="small" onClick={handleResetVariants} disabled={saving}>

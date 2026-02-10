@@ -402,197 +402,7 @@ exports.up = async function (connection) {
 
   console.log('✓ Job system tables created');
 
-  // 16. Remote configs table
-  await connection.execute(`
-    CREATE TABLE IF NOT EXISTS g_remote_configs (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      environment VARCHAR(100) NOT NULL COMMENT 'Environment name',
-      keyName VARCHAR(255) NOT NULL,
-      defaultValue TEXT NULL,
-      valueType ENUM('string', 'number', 'boolean', 'json', 'yaml') NOT NULL DEFAULT 'string',
-      description TEXT NULL,
-      isActive BOOLEAN NOT NULL DEFAULT TRUE,
-      createdBy INT NULL,
-      updatedBy INT NULL,
-      createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-      CONSTRAINT fk_remote_configs_creator FOREIGN KEY (createdBy) REFERENCES g_users(id) ON DELETE SET NULL,
-      CONSTRAINT fk_remote_configs_updater FOREIGN KEY (updatedBy) REFERENCES g_users(id) ON DELETE SET NULL,
-      UNIQUE KEY unique_env_key (environment, keyName),
-      INDEX idx_environment (environment),
-      INDEX idx_key_name (keyName),
-      INDEX idx_value_type (valueType),
-      INDEX idx_active (isActive)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-  `);
-
-  // 17. Remote config versions table
-  await connection.execute(`
-    CREATE TABLE IF NOT EXISTS g_remote_config_versions (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      configId INT NOT NULL,
-      versionNumber INT NOT NULL,
-      value TEXT NULL,
-      status ENUM('draft', 'staged', 'published', 'archived') NOT NULL DEFAULT 'draft',
-      changeDescription TEXT NULL,
-      publishedAt TIMESTAMP NULL,
-      createdBy INT NULL,
-      updatedBy INT NULL,
-      createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-      CONSTRAINT fk_config_versions_config FOREIGN KEY (configId) REFERENCES g_remote_configs(id) ON DELETE CASCADE,
-      CONSTRAINT fk_config_versions_creator FOREIGN KEY (createdBy) REFERENCES g_users(id) ON DELETE SET NULL,
-      CONSTRAINT fk_config_versions_updater FOREIGN KEY (updatedBy) REFERENCES g_users(id) ON DELETE SET NULL,
-      INDEX idx_config_version (configId, versionNumber),
-      INDEX idx_status (status),
-      INDEX idx_published (publishedAt)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-  `);
-
-  // 17.5. Remote config rules table (Segmentation)
-  await connection.execute(`
-    CREATE TABLE IF NOT EXISTS g_remote_config_rules (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      configId INT NOT NULL,
-      ruleName VARCHAR(255) NOT NULL,
-      conditions JSON NOT NULL,
-      value TEXT NULL,
-      priority INT NOT NULL DEFAULT 0,
-      isActive BOOLEAN NOT NULL DEFAULT TRUE,
-      createdBy INT NULL,
-      updatedBy INT NULL,
-      createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-      CONSTRAINT fk_rules_config FOREIGN KEY (configId) REFERENCES g_remote_configs(id) ON DELETE CASCADE,
-      CONSTRAINT fk_rules_creator FOREIGN KEY (createdBy) REFERENCES g_users(id) ON DELETE SET NULL,
-      CONSTRAINT fk_rules_updater FOREIGN KEY (updatedBy) REFERENCES g_users(id) ON DELETE SET NULL,
-      INDEX idx_config_id (configId),
-      INDEX idx_priority (priority),
-      INDEX idx_is_active (isActive)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-  `);
-
-  // 18. Remote config deployments table
-  await connection.execute(`
-    CREATE TABLE IF NOT EXISTS g_remote_config_deployments (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      deploymentName VARCHAR(255) NULL,
-      description TEXT NULL,
-      configsSnapshot JSON NULL,
-      deployedBy INT NULL,
-      deployedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      rollbackDeploymentId INT NULL,
-      CONSTRAINT fk_deployments_deployer FOREIGN KEY (deployedBy) REFERENCES g_users(id) ON DELETE SET NULL,
-      CONSTRAINT fk_deployments_rollback FOREIGN KEY (rollbackDeploymentId) REFERENCES g_remote_config_deployments(id) ON DELETE SET NULL,
-      INDEX idx_deployed_at (deployedAt),
-      INDEX idx_deployed_by (deployedBy)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-  `);
-
-  // 19. Remote config campaigns table
-  await connection.execute(`
-    CREATE TABLE IF NOT EXISTS g_remote_config_campaigns (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      campaignName VARCHAR(255) NOT NULL,
-      description TEXT NULL,
-      startDate TIMESTAMP NULL,
-      endDate TIMESTAMP NULL,
-      targetConditions JSON NULL,
-      trafficPercentage DECIMAL(5,2) NOT NULL DEFAULT 100.00,
-      isActive BOOLEAN NOT NULL DEFAULT FALSE,
-      priority INT NOT NULL DEFAULT 0,
-      status ENUM('draft', 'scheduled', 'running', 'completed', 'paused') NOT NULL DEFAULT 'draft',
-      createdBy INT NULL,
-      updatedBy INT NULL,
-      createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-      CONSTRAINT fk_campaigns_creator FOREIGN KEY (createdBy) REFERENCES g_users(id) ON DELETE SET NULL,
-      CONSTRAINT fk_campaigns_updater FOREIGN KEY (updatedBy) REFERENCES g_users(id) ON DELETE SET NULL,
-      INDEX idx_campaign_name (campaignName),
-      INDEX idx_active (isActive),
-      INDEX idx_status (status),
-      INDEX idx_priority (priority),
-      INDEX idx_traffic_percentage (trafficPercentage),
-      INDEX idx_start_date (startDate),
-      INDEX idx_end_date (endDate)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-  `);
-
-  // 20. Remote config variants table (A/B Testing)
-  await connection.execute(`
-    CREATE TABLE IF NOT EXISTS g_remote_config_variants (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      configId INT NOT NULL,
-      variantName VARCHAR(255) NOT NULL,
-      value TEXT NULL,
-      trafficPercentage DECIMAL(5,2) NOT NULL DEFAULT 0.00,
-      conditions JSON NULL,
-      isActive BOOLEAN NOT NULL DEFAULT TRUE,
-      createdBy INT NULL,
-      updatedBy INT NULL,
-      createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-      CONSTRAINT fk_variants_config FOREIGN KEY (configId) REFERENCES g_remote_configs(id) ON DELETE CASCADE,
-      CONSTRAINT fk_variants_creator FOREIGN KEY (createdBy) REFERENCES g_users(id) ON DELETE SET NULL,
-      CONSTRAINT fk_variants_updater FOREIGN KEY (updatedBy) REFERENCES g_users(id) ON DELETE SET NULL,
-      INDEX idx_config_id (configId),
-      INDEX idx_variant_name (variantName),
-      INDEX idx_traffic_percentage (trafficPercentage),
-      INDEX idx_is_active (isActive),
-      INDEX idx_created_at (createdAt),
-      UNIQUE KEY unique_config_variant (configId, variantName)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-  `);
-
-  // 21. Remote config context fields table
-  await connection.execute(`
-    CREATE TABLE IF NOT EXISTS g_remote_config_context_fields (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      fieldName VARCHAR(255) NOT NULL UNIQUE,
-      fieldType ENUM('string', 'number', 'boolean', 'array') NOT NULL,
-      description TEXT NULL,
-      isRequired BOOLEAN NOT NULL DEFAULT FALSE,
-      defaultValue TEXT NULL,
-      validationRules JSON NULL,
-      createdBy INT NULL,
-      updatedBy INT NULL,
-      createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-      CONSTRAINT fk_rc_context_fields_creator FOREIGN KEY (createdBy) REFERENCES g_users(id) ON DELETE SET NULL,
-      CONSTRAINT fk_rc_context_fields_updater FOREIGN KEY (updatedBy) REFERENCES g_users(id) ON DELETE SET NULL,
-      INDEX idx_field_name (fieldName),
-      INDEX idx_field_type (fieldType),
-      INDEX idx_required (isRequired)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-  `);
-
-  // 22. Remote config segments table (formerly rules)
-  await connection.execute(`
-    CREATE TABLE IF NOT EXISTS g_remote_config_segments (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      environment VARCHAR(100) NOT NULL COMMENT 'Environment name',
-      segmentName VARCHAR(255) NOT NULL,
-      displayName VARCHAR(300) NOT NULL DEFAULT '',
-      conditions JSON NOT NULL,
-      value TEXT NULL COMMENT 'Segment description',
-      priority INT NOT NULL DEFAULT 0,
-      isActive BOOLEAN NOT NULL DEFAULT TRUE,
-      createdBy INT NULL,
-      updatedBy INT NULL,
-      createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-
-      CONSTRAINT fk_segments_creator FOREIGN KEY (createdBy) REFERENCES g_users(id) ON DELETE SET NULL,
-      CONSTRAINT fk_segments_updater FOREIGN KEY (updatedBy) REFERENCES g_users(id) ON DELETE SET NULL,
-      UNIQUE KEY unique_env_segment (environment, segmentName),
-      INDEX idx_environment (environment),
-      INDEX idx_segments_active (isActive),
-      INDEX idx_segments_priority (priority),
-      INDEX idx_segments_name (segmentName)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-  `);
-
-  console.log('✓ Remote config and context tables created');
+  console.log('✓ Extended tables created');
 
   // Get admin credentials from environment variables
   const adminEmail = process.env.ADMIN_EMAIL || 'admin@gatrix.com';
@@ -1129,47 +939,7 @@ exports.up = async function (connection) {
     ('log_message', 'Log Message', 'Log messages', '{"level":{"type":"select","required":true,"description":"Log level","options":["debug","info","warn","error"],"default":"info"},"message":{"type":"text","required":true,"description":"Log message content"}}', TRUE)
   `);
 
-  // Insert sample context fields
-  await connection.execute(`
-    INSERT IGNORE INTO g_remote_config_context_fields
-    (id, fieldName, fieldType, description, isRequired, defaultValue, createdBy) VALUES
-    (1, 'player_vip_level', 'number', 'VIP 레벨 (0-10)', FALSE, '0', 1),
-    (2, 'player_level', 'number', '플레이어 레벨', FALSE, '1', 1),
-    (3, 'device_platform', 'string', '디바이스 플랫폼 (ios, android, web)', FALSE, 'web', 1),
-    (4, 'user_country', 'string', '사용자 국가 코드', FALSE, 'KR', 1),
-    (5, 'app_version', 'string', '앱 버전', FALSE, '1.0.0', 1)
-  `);
-
-  // Insert sample segments
-  await connection.execute(`
-    INSERT IGNORE INTO g_remote_config_segments
-    (id, segmentName, conditions, value, priority, isActive, createdBy) VALUES
-    (1, 'VIP 사용자',
-     JSON_OBJECT('conditions', JSON_ARRAY(
-       JSON_OBJECT('field', 'player_vip_level', 'operator', 'greater_than_or_equal', 'value', 3)
-     )),
-     'VIP 레벨 3 이상인 사용자', 1, TRUE, 1),
-    (2, '신규 사용자',
-     JSON_OBJECT('conditions', JSON_ARRAY(
-       JSON_OBJECT('field', 'player_level', 'operator', 'less_than', 'value', 10)
-     )),
-     '플레이어 레벨 10 미만인 신규 사용자', 2, TRUE, 1),
-    (3, '모바일 사용자',
-     JSON_OBJECT('conditions', JSON_ARRAY(
-       JSON_OBJECT('field', 'device_platform', 'operator', 'in', 'value', 'ios,android')
-     )),
-     'iOS 또는 Android 플랫폼 사용자', 3, TRUE, 1),
-    (4, '고레벨 사용자',
-     JSON_OBJECT('conditions', JSON_ARRAY(
-       JSON_OBJECT('field', 'player_level', 'operator', 'greater_than_or_equal', 'value', 50)
-     )),
-     '플레이어 레벨 50 이상인 고레벨 사용자', 4, TRUE, 1),
-    (5, '웹 사용자',
-     JSON_OBJECT('conditions', JSON_ARRAY(
-       JSON_OBJECT('field', 'device_platform', 'operator', 'equals', 'value', 'web')
-     )),
-     '웹 플랫폼 사용자', 5, TRUE, 1)
-  `);
+  // No sample data for remote config system as it is deprecated
 
   // 50. Store Products table
   await connection.execute(`
@@ -1322,69 +1092,11 @@ exports.up = async function (connection) {
   `);
 
   // Seed all permissions to admin@gatrix.com
-  const ALL_PERMISSIONS = [
-    'users.view',
-    'users.manage',
-    'client-versions.view',
-    'client-versions.manage',
-    'game-worlds.view',
-    'game-worlds.manage',
-    'maintenance.view',
-    'maintenance.manage',
-    'maintenance-templates.view',
-    'maintenance-templates.manage',
-    'scheduler.view',
-    'scheduler.manage',
-    'audit-logs.view',
-    'realtime-events.view',
-    'crash-events.view',
-    'remote-config.view',
-    'remote-config.manage',
-    'security.view',
-    'security.manage',
-    'servers.view',
-    'servers.manage',
-    'monitoring.view',
-    'open-api.view',
-    'console.access',
-    'service-notices.view',
-    'service-notices.manage',
-    'ingame-popup-notices.view',
-    'ingame-popup-notices.manage',
-    'coupons.view',
-    'coupons.manage',
-    'surveys.view',
-    'surveys.manage',
-    'operation-events.view',
-    'operation-events.manage',
-    'store-products.view',
-    'store-products.manage',
-    'reward-templates.view',
-    'reward-templates.manage',
-    'banners.view',
-    'banners.manage',
-    'planning-data.view',
-    'planning-data.manage',
-    'change-requests.view',
-    'change-requests.manage',
-    'event-lens.view',
-    'event-lens.manage',
-    'tags.view',
-    'tags.manage',
-    'data-management.view',
-    'data-management.manage',
-    'environments.view',
-    'environments.manage',
-    'system-settings.view',
-    'system-settings.manage',
-    'chat.access',
-  ];
-
   const adminUserId = 1; // From initial seed
   if (adminUserId) {
-    const permValues = ALL_PERMISSIONS.map((p) => `(${adminUserId}, '${p}')`).join(', ');
     await connection.execute(
-      `INSERT IGNORE INTO g_user_permissions (userId, permission) VALUES ${permValues}`
+      `INSERT IGNORE INTO g_user_permissions (userId, permission) VALUES (?, '*')`,
+      [adminUserId]
     );
   }
 
@@ -1457,128 +1169,7 @@ exports.up = async function (connection) {
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   `);
 
-  // 60. Remote Config Templates table
-  await connection.execute(`
-    CREATE TABLE IF NOT EXISTS g_remote_config_templates (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      environment VARCHAR(100) NOT NULL COMMENT 'Environment name',
-      templateName VARCHAR(200) NOT NULL,
-      displayName VARCHAR(300) NOT NULL,
-      description TEXT NULL,
-      templateType VARCHAR(50) NOT NULL,
-      status VARCHAR(50) NOT NULL DEFAULT 'draft',
-      templateData JSON NOT NULL,
-      metadata JSON NULL COMMENT 'Additional template metadata',
-      version INT NOT NULL DEFAULT 1,
-      etag VARCHAR(64) NOT NULL,
-      publishedAt TIMESTAMP NULL,
-      archivedAt TIMESTAMP NULL,
-      createdBy INT NOT NULL,
-      updatedBy INT NULL,
-      createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-      UNIQUE KEY uk_template_env_name (environment, templateName),
-      INDEX idx_template_type (templateType),
-      INDEX idx_template_status (status),
-      INDEX idx_template_etag (etag),
-      INDEX idx_template_published (publishedAt),
-      CONSTRAINT fk_rc_template_created_by FOREIGN KEY (createdBy) REFERENCES g_users(id),
-      CONSTRAINT fk_rc_template_updated_by FOREIGN KEY (updatedBy) REFERENCES g_users(id)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-  `);
-
-  // 61. Remote Config Template Versions table
-  await connection.execute(`
-    CREATE TABLE IF NOT EXISTS g_remote_config_template_versions (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      templateId INT NOT NULL,
-      version INT NOT NULL,
-      templateData JSON NOT NULL,
-      changeDescription TEXT NULL,
-      etag VARCHAR(64) NOT NULL,
-      createdBy INT NOT NULL,
-      createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      UNIQUE KEY uk_template_version (templateId, version),
-      INDEX idx_version_etag (etag),
-      INDEX idx_version_created (createdAt),
-      CONSTRAINT fk_rc_version_template FOREIGN KEY (templateId) REFERENCES g_remote_config_templates(id) ON DELETE CASCADE,
-      CONSTRAINT fk_rc_version_created_by FOREIGN KEY (createdBy) REFERENCES g_users(id)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-  `);
-
-  // 62. Remote Config Change Requests table
-  await connection.execute(`
-    CREATE TABLE IF NOT EXISTS g_remote_config_change_requests (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      templateId INT NOT NULL,
-      requestType VARCHAR(50) NOT NULL,
-      title VARCHAR(300) NOT NULL,
-      description TEXT NULL,
-      proposedData JSON NOT NULL,
-      currentData JSON NULL,
-      status VARCHAR(50) NOT NULL DEFAULT 'pending',
-      requiredApprovals INT NOT NULL DEFAULT 1,
-      receivedApprovals INT NOT NULL DEFAULT 0,
-      approvers JSON NULL,
-      rejectionReason TEXT NULL,
-      scheduledAt TIMESTAMP NULL,
-      completedAt TIMESTAMP NULL,
-      createdBy INT NOT NULL,
-      updatedBy INT NULL,
-      createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-      INDEX idx_request_status (status),
-      INDEX idx_request_type (requestType),
-      INDEX idx_request_scheduled (scheduledAt),
-      INDEX idx_request_completed (completedAt),
-      CONSTRAINT fk_rc_request_template FOREIGN KEY (templateId) REFERENCES g_remote_config_templates(id) ON DELETE CASCADE,
-      CONSTRAINT fk_rc_request_created_by FOREIGN KEY (createdBy) REFERENCES g_users(id),
-      CONSTRAINT fk_rc_request_updated_by FOREIGN KEY (updatedBy) REFERENCES g_users(id)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-  `);
-
-  // 63. Remote Config Metrics table
-  await connection.execute(`
-    CREATE TABLE IF NOT EXISTS g_remote_config_metrics (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      environment VARCHAR(100) NOT NULL COMMENT 'Environment name',
-      templateId INT NULL,
-      configKey VARCHAR(200) NOT NULL,
-      eventType VARCHAR(50) NOT NULL,
-      value JSON NULL,
-      userContext JSON NULL,
-      applicationName VARCHAR(255) NULL,
-      sdkVersion VARCHAR(50) NULL,
-      evaluationTime INT NULL,
-      timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      INDEX idx_metrics_env (environment),
-      INDEX idx_metrics_template (templateId),
-      INDEX idx_metrics_key (configKey),
-      INDEX idx_metrics_event (eventType),
-      INDEX idx_metrics_timestamp (timestamp),
-      INDEX idx_metrics_app (applicationName),
-      CONSTRAINT fk_rc_metrics_template FOREIGN KEY (templateId) REFERENCES g_remote_config_templates(id) ON DELETE SET NULL
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-  `);
-
-  // 64. Remote Config Edit Sessions table
-  await connection.execute(`
-    CREATE TABLE IF NOT EXISTS g_remote_config_edit_sessions (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      templateId INT NOT NULL,
-      userId INT NOT NULL,
-      sessionToken VARCHAR(255) NOT NULL UNIQUE,
-      lockedFields JSON NULL,
-      lastActivity TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-      expiresAt TIMESTAMP NOT NULL,
-      INDEX idx_session_template (templateId),
-      INDEX idx_session_user (userId),
-      INDEX idx_session_token (sessionToken),
-      INDEX idx_session_expires (expiresAt),
-      CONSTRAINT fk_rc_session_template FOREIGN KEY (templateId) REFERENCES g_remote_config_templates(id) ON DELETE CASCADE,
-      CONSTRAINT fk_rc_session_user FOREIGN KEY (userId) REFERENCES g_users(id) ON DELETE CASCADE
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-  `);
+  // Service Maintenance table initialization
 
   // 65. Service Maintenance table
   await connection.execute(`
@@ -1694,11 +1285,6 @@ exports.down = async function (connection) {
     'g_game_world_maintenance_locales',
     'g_service_maintenance_locales',
     'g_service_maintenance',
-    'g_remote_config_edit_sessions',
-    'g_remote_config_metrics',
-    'g_remote_config_change_requests',
-    'g_remote_config_template_versions',
-    'g_remote_config_templates',
     'monitoring_alerts',
     'g_user_environments',
     'g_mails',
@@ -1729,12 +1315,6 @@ exports.down = async function (connection) {
     'g_mails',
     'g_ingame_popup_notices',
     'g_service_notices',
-    'g_remote_config_context_fields',
-    'g_remote_config_variants',
-    'g_remote_config_campaigns',
-    'g_remote_config_deployments',
-    'g_remote_config_versions',
-    'g_remote_configs',
     'g_job_executions',
     'g_jobs',
     'g_job_types',

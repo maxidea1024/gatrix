@@ -197,7 +197,7 @@ class FeatureMetricsService {
       await db.raw(
         `
                 INSERT INTO g_feature_variant_metrics (id, environment, appName, sdkVersion, flagName, metricsBucket, variantName, count, createdAt)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP())
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP())
                 ON DUPLICATE KEY UPDATE 
                     count = count + VALUES(count)
             `,
