@@ -28,9 +28,9 @@ export interface GatrixContextValue {
   /** Update context */
   updateContext: FeaturesClient['updateContext'];
   /** Check if explicit sync mode is enabled */
-  isExplicitSync: () => boolean;
-  /** Check if syncFlags can be called */
-  canSyncFlags: () => boolean;
+  isExplicitSyncEnabled: () => boolean;
+  /** Check if there are pending sync flags */
+  hasPendingSyncFlags: () => boolean;
   /** Manually fetch flags from server */
   fetchFlags: () => Promise<void>;
   /** Synchronize flags in explicit sync mode */

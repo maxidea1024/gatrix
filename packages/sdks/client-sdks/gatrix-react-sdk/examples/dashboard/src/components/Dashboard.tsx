@@ -41,7 +41,7 @@ function Dashboard({ config }: DashboardProps) {
     cachedFlagsRef.current = rawFlags;
   }
   const flags = cachedFlagsRef.current;
-  const { flagsReady, flagsError, isExplicitSync, canSyncFlags, fetchFlags, syncFlags } =
+  const { flagsReady, flagsError, isExplicitSyncEnabled, hasPendingSyncFlags, fetchFlags, syncFlags } =
     useGatrixContext();
   const client = useGatrixClient();
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
@@ -242,12 +242,12 @@ function Dashboard({ config }: DashboardProps) {
                 </button>
               )}
 
-            {isExplicitSync() && !client.features.isOfflineMode() && (
+            {isExplicitSyncEnabled() && !client.features.isOfflineMode() && (
               <button
                 type="button"
-                className={`nes-btn is-warning ${!canSyncFlags() ? 'is-disabled' : 'sync-available-rumble'}`}
+                className={`nes-btn is-warning ${!hasPendingSyncFlags() ? 'is-disabled' : 'sync-available-rumble'}`}
                 onClick={() => syncFlags()}
-                disabled={!canSyncFlags()}
+                disabled={!hasPendingSyncFlags()}
                 title="Synchronize Flags"
               >
                 SYNC FLAGS

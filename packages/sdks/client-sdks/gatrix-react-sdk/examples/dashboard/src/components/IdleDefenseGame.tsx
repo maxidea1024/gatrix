@@ -344,7 +344,7 @@ const IdleDefenseGame: React.FC<IdleDefenseGameProps> = ({ onExit }) => {
         )}
 
         {/* Sync button */}
-        {client.features.canSyncFlags() && (
+        {client.features.hasPendingSyncFlags() && (
           <div
             style={{
               position: 'absolute',

@@ -4,26 +4,26 @@
   export let flag: EvaluatedFlag;
   export let onClose: () => void;
 
-  $: payload = flag.variant?.payload;
-  $: hasPayload = payload !== undefined && payload !== null;
-  $: isEmptyString = payload === '';
+  $: flagValue = flag.variant?.value;
+  $: hasValue = flagValue !== undefined && flagValue !== null;
+  $: isEmptyString = flagValue === '';
 
-  function formatPayload(p: unknown): string {
+  function formatValue(v: unknown): string {
     try {
-      if (typeof p === 'object') return JSON.stringify(p, null, 2);
-      return String(p);
+      if (typeof v === 'object') return JSON.stringify(v, null, 2);
+      return String(v);
     } catch {
-      return String(p);
+      return String(v);
     }
   }
 
-  function getPayloadSize(p: unknown): number {
-    if (p === undefined || p === null) return 0;
-    const str = typeof p === 'object' ? JSON.stringify(p) : String(p);
+  function getValueSize(v: unknown): number {
+    if (v === undefined || v === null) return 0;
+    const str = typeof v === 'object' ? JSON.stringify(v) : String(v);
     return new Blob([str]).size;
   }
 
-  $: payloadSize = hasPayload ? getPayloadSize(payload) : 0;
+  $: valueSize = hasValue ? getValueSize(flagValue) : 0;
 
   function handleOverlayClick() {
     onClose();
@@ -73,7 +73,7 @@
           >
             <span class="flag-detail-label">Type</span>
             <span class="flag-detail-value">
-              <span class="pixel-chip type-chip">{flag.variantType || 'none'}</span>
+              <span class="pixel-chip type-chip">{flag.valueType || 'none'}</span>
             </span>
           </div>
           <div
@@ -88,21 +88,21 @@
         </div>
 
         <div class="flag-payload" style="margin-top:12px">
-          <div class="flag-payload-label" style="margin-bottom:6px">Payload Detail</div>
-          {#if hasPayload}
+          <div class="flag-payload-label" style="margin-bottom:6px">Value Detail</div>
+          {#if hasValue}
             <pre
               class="flag-payload-value {isEmptyString ? 'empty-string' : 'has-payload'}"
-              style="white-space:pre-wrap;font-size:9px;line-height:1.5;border:4px solid #ddd;background-color:#f9f9f9;color:#1b5e20;padding:12px;margin:0">{formatPayload(
-                payload
+              style="white-space:pre-wrap;font-size:9px;line-height:1.5;border:4px solid #ddd;background-color:#f9f9f9;color:#1b5e20;padding:12px;margin:0">{formatValue(
+                flagValue
               )}</pre>
             <div
               class="flag-payload-size"
               style="font-size:8px;color:#888;margin-top:6px;text-align:right"
             >
-              {payloadSize} BYTES
+              {valueSize} BYTES
             </div>
           {:else}
-            <div class="flag-payload-value no-payload" style="padding:20px">✕ NO PAYLOAD</div>
+            <div class="flag-payload-value no-payload" style="padding:20px">✕ NO VALUE</div>
           {/if}
         </div>
 

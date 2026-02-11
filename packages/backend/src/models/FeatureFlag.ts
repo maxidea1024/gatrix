@@ -194,6 +194,8 @@ function parseJsonField<T>(value: any): T | undefined {
   try {
     return JSON.parse(value) as T;
   } catch {
+    // 이게참 모호한 경우구만... postgresql로 갈아타야하나.
+
     // mysql2 auto-parses JSON columns, so string values are already unwrapped.
     // JSON.parse("hello") fails but the value is the correct parsed result.
     return value as T;

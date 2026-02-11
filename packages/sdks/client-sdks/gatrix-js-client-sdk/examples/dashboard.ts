@@ -241,7 +241,7 @@ async function main() {
     output += `\n`;
 
     // Build table data as 2D array
-    const headers = ['', 'NAME', 'VER', 'CHG', 'VARIANT', 'TYPE', 'LAST_CHG', 'PAYLOAD'];
+    const headers = ['', 'NAME', 'VER', 'CHG', 'VARIANT', 'TYPE', 'LAST_CHG', 'VALUE'];
     const tableRows: Cell[][] = [];
     const currentFlagNames = new Set(flags.map((f) => f.name));
 
@@ -282,27 +282,27 @@ async function main() {
         variant = { text: rawVariant, display: `${GREEN}${rawVariant}${RESET}` };
       }
 
-      const type = flag.variantType || 'none';
+      const type = flag.valueType || 'none';
 
       // Last changed time (relative)
       const lastChangedTime = stats.flagLastChangedTimes[flag.name];
       const lastChg = lastChangedTime ? formatTimeAgo(lastChangedTime) : '-';
 
-      // Payload
-      let payload = '-';
+      // Value
+      let valueStr = '-';
       if (
-        flag.variant?.payload !== undefined &&
-        flag.variant?.payload !== null &&
-        flag.variant?.payload !== ''
+        flag.variant?.value !== undefined &&
+        flag.variant?.value !== null &&
+        flag.variant?.value !== ''
       ) {
-        const payloadStr =
-          typeof flag.variant.payload === 'object'
-            ? JSON.stringify(flag.variant.payload)
-            : String(flag.variant.payload);
-        payload = payloadStr.length > 40 ? payloadStr.substring(0, 37) + '...' : payloadStr;
+        const rawValueStr =
+          typeof flag.variant.value === 'object'
+            ? JSON.stringify(flag.variant.value)
+            : String(flag.variant.value);
+        valueStr = rawValueStr.length > 40 ? rawValueStr.substring(0, 37) + '...' : rawValueStr;
       }
 
-      tableRows.push([icon, name, ver, chg, variant, type, lastChg, payload]);
+      tableRows.push([icon, name, ver, chg, variant, type, lastChg, valueStr]);
     }
 
     // Process deleted flags
@@ -343,7 +343,7 @@ async function main() {
 
     setInterval(() => render(), 1000);
 
-    await new Promise(() => {});
+    await new Promise(() => { });
   } catch (error: any) {
     process.stdout.write(SHOW_CURSOR);
     console.error('Error:', error.message);

@@ -78,8 +78,8 @@ async function main() {
         const json = JSON.stringify({
           enabled: proxy.enabled,
           variant: proxy.variant.name,
-          variantType: proxy.variantType,
-          payload: proxy.variant.payload,
+          valueType: proxy.valueType,
+          value: proxy.variant.value,
         });
         console.log(`[${timestamp()}] 🚨 FLAG CHANGED: ${proxy.name}: ${json}`);
       });
@@ -98,15 +98,15 @@ async function main() {
       const json = JSON.stringify({
         enabled: f.enabled,
         variant: f.variant?.name,
-        variantType: f.variantType,
-        payload: f.variant?.payload,
+        valueType: f.valueType,
+        value: f.variant?.value,
       });
       console.log(`  ${state} ${name}: ${json}`);
     });
     console.log('');
 
     // Keep the process running
-    await new Promise(() => {}); // Never resolves
+    await new Promise(() => { }); // Never resolves
   } catch (error: any) {
     console.error('Error:', error.message);
     await client.stop();

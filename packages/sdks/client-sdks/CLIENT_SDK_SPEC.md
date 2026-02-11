@@ -105,19 +105,15 @@ The Edge API returns evaluated flags in this format:
         "name": "feature-name",
         "enabled": true,
         "variant": {
-          "name": "variant-name",
+          "name": "dark-theme",
           "enabled": true,
-          "payload": "{\"key\":\"value\"}"
+          "value": {"key": "value"}
         },
-        "variantType": "json",
+        "valueType": "json",
         "version": 12,
         "impressionData": true
       }
     ]
-  },
-  "meta": {
-    "environment": "development",
-    "evaluatedAt": "2026-02-05T14:14:38.727Z"
   }
 }
 ```
@@ -129,8 +125,8 @@ The Edge API returns evaluated flags in this format:
 | `variant` | object | Selected variant details |
 | `variant.name` | string | Variant name |
 | `variant.enabled` | boolean | Whether variant is enabled |
-| `variant.payload` | string \| number \| boolean \| object | Variant payload (flexible type) |
-| `variantType` | "none" \| "string" \| "number" \| "boolean" \| "json" | Payload type hint |
+| `variant.value` | string \| number \| boolean \| object | Variant value (flexible type) |
+| `valueType` | "string" \| "number" \| "boolean" \| "json" | Value type hint (server response never contains "none"; "none" is SDK-internal only for missing/disabled flags) |
 | `version` | number | Flag version for change detection |
 | `impressionData` | boolean? | Whether to track impressions |
 | `reason` | string? | Evaluation reason (e.g., "targeting_match", "disabled", "not_found") |
@@ -411,7 +407,7 @@ class GatrixClient {
   static get EVENTS(): typeof EVENTS;
 }
 
-class FeaturesClient {
+class FeaturesClient implements VariationProvider {
   // Context Management
   getContext(): GatrixContext;
   updateContext(context: Partial<GatrixContext>): Promise<void>;
@@ -420,12 +416,13 @@ class FeaturesClient {
   isEnabled(flagName: string): boolean;
   getVariant(flagName: string): Variant; // Never returns null/undefined
   getAllFlags(): EvaluatedFlag[];
+  hasFlag(flagName: string): boolean;
 
   // Flag Access - Typed Variations (missingValue is REQUIRED)
   variation(flagName: string, missingValue: string): string; // Variant name only
   boolVariation(flagName: string, missingValue: boolean): boolean;
   stringVariation(flagName: string, missingValue: string): string;
-  numberVariation(flagName: string, missingValue: number): number;
+  numberVariation(flagName: string, missingValue: number): number; // JS/TS only. Other SDKs: intVariation + floatVariation/doubleVariation
   jsonVariation<T>(flagName: string, missingValue: T): T;
 
   // Variation Details - Returns detailed result with reason (missingValue is REQUIRED)
@@ -441,8 +438,8 @@ class FeaturesClient {
   jsonVariationOrThrow<T>(flagName: string): T;
 
   // Explicit Sync Mode
-  isExplicitSync(): boolean;
-  canSyncFlags(): boolean;
+  isExplicitSyncEnabled(): boolean;
+  hasPendingSyncFlags(): boolean;
   syncFlags(fetchNow?: boolean): Promise<void>;
 
   // Watch (Change Detection) - Returns FlagProxy for convenience
@@ -458,9 +455,16 @@ class FeaturesClient {
   ): () => void;
   createWatchFlagGroup(name: string): WatchFlagGroup;
 
+  // Event Tracking (future implementation)
+  track(eventName: string, ...eventArgs: any[]): void;
+
   // Statistics (Debugging & Monitoring)
   getStats(): GatrixSdkStats;
 }
+```
+
+> [!IMPORTANT]
+> **`numberVariation` availability**: JS/TS SDKs retain `numberVariation` because TypeScript's `number` type covers both integers and floats. All other SDKs (C++, C#, GDScript, Dart, Python) MUST use type-specific functions instead: `intVariation` + `floatVariation` (or `doubleVariation`).
 
 ### Variation Metric Requirements
 
@@ -469,7 +473,7 @@ Every flag access method (`isEnabled`, `variation`, `boolVariation`, etc.) MUST 
 - **Missing**: If the requested `flagName` does not exist in the SDK's local cache, a `missing` metric MUST be recorded (visible in `SdkStats.missingFlags`).
 - **Access Counts**: Successful flag evaluations should increment internal access counters (`flagEnabledCounts`, `flagVariantCounts`).
 
-These requirements ensure consistent observability across both JS and Unity SDKs.
+These requirements ensure consistent observability across all SDKs.
 
 ### SDK Statistics
 
@@ -615,7 +619,7 @@ All variation functions:
 
 All variation methods require an explicit default value parameter. This is a deliberate design decision:
 
-1. **Prevents Ambiguity:** When a flag doesn't exist or has no payload, the SDK returns your specified default—not `undefined` or `null`.
+1. **Prevents Ambiguity:** When a flag doesn't exist or has no value, the SDK returns your specified default—not `undefined` or `null`.
 2. **Type Safety:** The default value establishes the expected return type.
 3. **Fail-Safe Behavior:** Your application always receives a usable value, even during network failures or SDK initialization.
 4. **Explicit Intent:** Forces developers to consider the fallback scenario, reducing bugs.
@@ -623,10 +627,12 @@ All variation methods require an explicit default value parameter. This is a del
 | Function           | Return Type | Description                    |
 | ------------------ | ----------- | ------------------------------ |
 | `variation`        | string      | Variant name only              |
-| `boolVariation`    | boolean     | Boolean variant value (`variant.value`/`variant.payload`). Strict: `variantType` must be `boolean`. |
-| `stringVariation`  | string      | Variant payload as string. Strict: `variantType` must be `string`. |
-| `numberVariation`  | number      | Variant payload as number. Strict: `variantType` must be `number`. |
-| `jsonVariation<T>` | T           | Variant payload parsed as JSON. Strict: `variantType` must be `json`. |
+| `boolVariation`    | boolean     | Boolean variant value (`variant.value`). Strict: `valueType` must be `boolean`. |
+| `stringVariation`  | string      | Variant value as string. Strict: `valueType` must be `string`. |
+| `numberVariation`  | number      | Variant value as number (JS/TS only). Strict: `valueType` must be `number`. |
+| `intVariation`     | int         | Variant value as integer (non-JS SDKs). Strict: `valueType` must be `number`. |
+| `floatVariation`   | float/double | Variant value as float (non-JS SDKs). Strict: `valueType` must be `number`. |
+| `jsonVariation<T>` | T           | Variant value parsed as JSON. Strict: `valueType` must be `json`. |
 
 ### VariationResult Interface
 
@@ -639,62 +645,114 @@ interface VariationResult<T> {
 }
 ```
 
+### Reserved Variant Names
+
+The following variant names are system-reserved and use a `$` prefix:
+
+| Name | Meaning |
+|------|---------|
+| `$missing` | Flag does not exist in cache |
+| `$disabled` | Flag is disabled |
+| `$config` | Flag uses configuration value |
+
+SDKs MUST NOT allow user-defined variant names starting with `$`.
+
+### VariationInternal Pattern
+
+All SDKs MUST implement the `variationInternal` pattern for centralized flag logic:
+
+**Architecture:**
+- `FeaturesClient` contains `*VariationInternal()` methods that handle **all** logic: flag lookup + value extraction + metrics tracking.
+- Public variation methods (e.g., `boolVariation`) simply delegate to the internal methods.
+- `FlagProxy` is a **convenience shell** that delegates all variation calls back to `FeaturesClient`'s internal methods.
+
+```typescript
+// VariationProvider interface (separate file to avoid circular deps)
+interface VariationProvider {
+  isEnabledInternal(flagName: string): boolean;
+  getVariantInternal(flagName: string): Variant;
+  variationInternal(flagName: string, missingValue: string): string;
+  boolVariationInternal(flagName: string, missingValue: boolean): boolean;
+  stringVariationInternal(flagName: string, missingValue: string): string;
+  numberVariationInternal(flagName: string, missingValue: number): number;
+  jsonVariationInternal<T>(flagName: string, missingValue: T): T;
+  // ... Details and OrThrow variants follow the same pattern
+}
+
+// FeaturesClient implements VariationProvider
+class FeaturesClient implements VariationProvider {
+  // Internal: does flag lookup + value extraction + metrics tracking
+  boolVariationInternal(flagName: string, missingValue: boolean): boolean {
+    const flag = this.lookupFlag(flagName);
+    if (!flag) {
+      this.trackFlagAccess(flagName, undefined, 'getVariant');
+      return missingValue;
+    }
+    this.trackFlagAccess(flagName, flag, 'getVariant', flag.variant.name);
+    if (flag.valueType !== 'boolean') return missingValue;
+    return Boolean(flag.variant.value);
+  }
+
+  // Public: delegates to internal
+  boolVariation(flagName: string, missingValue: boolean): boolean {
+    return this.boolVariationInternal(flagName, missingValue);
+  }
+}
+```
+
 ### FlagProxy Class
 
-FlagProxy is the **single source of truth** for all flag value extraction logic.
+FlagProxy is a **convenience shell** that delegates all variation logic to `FeaturesClient`.
 
 **Architecture:**
 - Uses **null object pattern**: `this.flag` is never null/undefined. A `MISSING_FLAG` sentinel is used for non-existent flags.
-- `FeaturesClient` delegates all variation methods to `FlagProxy`.
-- **`onAccess` callback**: Injected by `FeaturesClient` during proxy creation, invoked on every variation/enabled call to track metrics, impressions, and stats in one place.
-- **Strict type checking**: All variation methods validate `variantType` to prevent misuse.
+- Holds a reference to `VariationProvider` (interface, not `FeaturesClient` directly) to avoid circular dependencies.
+- All variation methods delegate to `VariationProvider`'s internal methods.
+- Read-only property accessors (`variant`, `valueType`, `version`, etc.) access flag data directly.
+- **No `onAccess` callback** — metrics tracking is handled entirely by the internal methods.
+- **Strict type checking**: All variation methods validate `valueType` to prevent misuse.
+
+> [!WARNING]
+> **GC and Circular Reference Considerations**: FlagProxy holds a reference to VariationProvider (FeaturesClient). In languages with reference counting GC (C++, Swift), use weak pointers/references. In managed languages (JS, C#, Dart, Python) with mark-and-sweep GC, cycles are handled automatically. FlagProxy instances are typically short-lived (created for one-shot variation calls and immediately discarded).
 
 **`boolVariation` behavior:**
-- Checks `variantType === 'boolean'` strictly.
-- Returns `Boolean(variant.value)` (or equivalent `variant.payload` in non-JS SDKs), NOT `flag.enabled`.
-- `flag.enabled` is purely the flag's on/off state; `boolVariation` extracts the actual boolean value from the variant payload.
+- Checks `valueType === 'boolean'` strictly.
+- Returns `Boolean(variant.value)`, NOT `flag.enabled`.
+- `flag.enabled` is purely the flag's on/off state; `boolVariation` extracts the actual boolean value from the variant.
 
 ```typescript
-// Callback type injected by FeaturesClient for metrics tracking
-type FlagAccessCallback = (
-  flagName: string,
-  flag: EvaluatedFlag | undefined,
-  eventType: string, // 'isEnabled' or 'getVariant'
-  variantName?: string
-) => void;
-
 class FlagProxy {
   constructor(
     flag: EvaluatedFlag | undefined,
-    onAccess?: FlagAccessCallback,
+    client: VariationProvider, // Replaces onAccess callback
     flagName?: string
   );
 
+  // Read-only property accessors
   get exists(): boolean;
-  get enabled(): boolean; // Triggers onAccess('isEnabled')
+  get enabled(): boolean; // Delegates to client.isEnabledInternal()
   get name(): string;
   get variant(): Variant; // Never null/undefined
-  get variantType(): VariantType;
+  get valueType(): ValueType;
   get version(): number;
   get reason(): string | undefined;
   get impressionData(): boolean;
   get raw(): EvaluatedFlag | undefined;
 
-  // Variation methods (missingValue is REQUIRED)
-  // Each call triggers onAccess callback for metrics
-  variation(missingValue: string): string; // Variant name only
-  boolVariation(missingValue: boolean): boolean; // Returns variant.value (NOT flag.enabled)
+  // All variation methods delegate to VariationProvider
+  variation(missingValue: string): string;
+  boolVariation(missingValue: boolean): boolean;
   stringVariation(missingValue: string): string;
-  numberVariation(missingValue: number): number;
+  numberVariation(missingValue: number): number; // JS/TS only
   jsonVariation<T>(missingValue: T): T;
 
-  // Variation details (missingValue is REQUIRED)
+  // Variation details
   boolVariationDetails(missingValue: boolean): VariationResult<boolean>;
   stringVariationDetails(missingValue: string): VariationResult<string>;
   numberVariationDetails(missingValue: number): VariationResult<number>;
   jsonVariationDetails<T>(missingValue: T): VariationResult<T>;
 
-  // Strict variations - throws GatrixFeatureError on not found or invalid type
+  // Strict variations
   boolVariationOrThrow(): boolean;
   stringVariationOrThrow(): string;
   numberVariationOrThrow(): number;
@@ -704,17 +762,19 @@ class FlagProxy {
 
 #### FlagProxy Variation Logic Summary
 
-| Method | variantType Check | Value Source | Fallback |
-|--------|------------------|--------------|----------|
+| Method | valueType Check | Value Source | Fallback |
+|--------|----------------|--------------|----------|
 | `enabled` | none | `flag.enabled` | `false` |
 | `variation` | none | `variant.name` | missingValue |
 | `boolVariation` | `boolean` | `Boolean(variant.value)` | missingValue |
 | `stringVariation` | `string` | `String(variant.value)` | missingValue |
 | `numberVariation` | `number` | `Number(variant.value)` | missingValue |
+| `intVariation` | `number` | `int(variant.value)` | missingValue |
+| `floatVariation` | `number` | `float(variant.value)` | missingValue |
 | `jsonVariation` | `json` + object check | `variant.value` | missingValue |
 
 > [!IMPORTANT]
-> **`boolVariation` ≠ `isEnabled`**: `isEnabled()` returns `flag.enabled`, while `boolVariation()` returns the boolean *value* from `variant.value`/`variant.payload`. These serve different purposes:
+> **`boolVariation` ≠ `isEnabled`**: `isEnabled()` returns `flag.enabled`, while `boolVariation()` returns the boolean *value* from `variant.value`. These serve different purposes:
 > - `isEnabled()`: Is the feature flag turned on?
 > - `boolVariation()`: What boolean value did the flag evaluate to?
 
@@ -832,15 +892,47 @@ When metrics enabled, SDK tracks:
 
 Metrics are batched and sent periodically to the Edge API.
 
+## Fetch Method Support
+
+All SDKs MUST support both **GET** and **POST** HTTP methods for flag evaluation requests:
+
+### GET (default)
+
+- Context fields are sent as query parameters
+- Suitable for small context payloads
+- Endpoint: `GET /client/features/{environment}/eval?userId=xxx&sessionId=yyy`
+
+### POST
+
+- Context fields are sent in the request body as JSON
+- Required when context contains large or complex data (e.g., many properties)
+- Endpoint: `POST /client/features/{environment}/eval`
+- Body: `{ "userId": "xxx", "sessionId": "yyy", "properties": { ... } }`
+
+SDKs SHOULD default to GET and provide a configuration option to switch to POST.
+
+## Event Tracking (track)
+
+All SDKs MUST provide a `track()` method for sending custom events to the analytics system.
+
+```typescript
+// Signature
+track(eventName: string, ...eventArgs: any[]): void;
+```
+
+> [!NOTE]
+> The `track()` method is currently a stub (no-op). Implementation will be added in a future release. The interface is defined now to ensure consistent API surface across all SDKs.
+
 ## Design Rules
 
 > [!IMPORTANT]
-> **getVariant never returns null/undefined** - Always returns a fallback variant (`{ name: 'disabled', enabled: false }`) when flag not found or disabled.
+> **getVariant never returns null/undefined** - Always returns a fallback variant (`{ name: '$missing', enabled: false }`) when flag not found.
 
 - All variation functions return default values for disabled/not-found flags
 - `*VariationOrThrow` methods throw for strict checking scenarios
 - Context updates trigger automatic re-fetch of flags
 - SessionId is automatically generated if not provided
+- `deviceId` is NOT a standard context field — SDKs MUST NOT include it automatically
 
 ## Error Handling
 
@@ -895,11 +987,14 @@ When the SDK transitions from `error` state to a successful fetch:
 - [x] Repository pattern with storage providers
 - [x] Polling mechanism with backoff
 - [x] Context management (global)
-- [x] Explicit sync mode (with isExplicitSync, canSyncFlags)
+- [x] Explicit sync mode (isExplicitSyncEnabled, hasPendingSyncFlags)
 - [x] Watch pattern for change detection (watchFlag, WatchFlagGroup)
 - [x] Variation functions (bool, string, number, json)
 - [x] Variation details and OrThrow variants
-- [x] FlagProxy convenience wrapper
+- [x] FlagProxy convenience shell (delegates to VariationProvider)
+- [x] VariationInternal pattern (centralized flag logic)
 - [x] Metrics collection with notFound tracking
 - [x] TypeScript types and exports
 - [x] Browser build (ES modules + CJS + UMD)
+- [ ] track() event tracking
+- [ ] GET/POST method support

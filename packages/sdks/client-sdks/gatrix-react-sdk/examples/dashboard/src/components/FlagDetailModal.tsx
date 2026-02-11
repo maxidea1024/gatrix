@@ -6,28 +6,28 @@ interface FlagDetailModalProps {
 }
 
 function FlagDetailModal({ flag, onClose }: FlagDetailModalProps) {
-  const payload = flag.variant?.payload;
-  const hasPayload = payload !== undefined && payload !== null;
-  const isEmptyString = payload === '';
+  const value = flag.variant?.value;
+  const hasValue = value !== undefined && value !== null;
+  const isEmptyString = value === '';
 
-  const formatPayload = (p: unknown): string => {
+  const formatValue = (v: unknown): string => {
     try {
-      if (typeof p === 'object') {
-        return JSON.stringify(p, null, 2);
+      if (typeof v === 'object') {
+        return JSON.stringify(v, null, 2);
       }
-      return String(p);
+      return String(v);
     } catch {
-      return String(p);
+      return String(v);
     }
   };
 
-  const getPayloadSize = (p: unknown): number => {
-    if (p === undefined || p === null) return 0;
-    const str = typeof p === 'object' ? JSON.stringify(p) : String(p);
+  const getValueSize = (v: unknown): number => {
+    if (v === undefined || v === null) return 0;
+    const str = typeof v === 'object' ? JSON.stringify(v) : String(v);
     return new Blob([str]).size;
   };
 
-  const payloadSize = hasPayload ? getPayloadSize(payload) : 0;
+  const valueSize = hasValue ? getValueSize(value) : 0;
 
   return (
     <div className="modal-overlay" onClick={onClose} style={{ zIndex: 5000 }}>
@@ -101,7 +101,7 @@ function FlagDetailModal({ flag, onClose }: FlagDetailModalProps) {
               >
                 <span className="flag-detail-label">Type</span>
                 <span className="flag-detail-value">
-                  <span className="pixel-chip type-chip">{flag.variantType || 'none'}</span>
+                  <span className="pixel-chip type-chip">{flag.valueType || 'none'}</span>
                 </span>
               </div>
 

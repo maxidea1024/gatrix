@@ -7,6 +7,7 @@
 export { GatrixClient } from './GatrixClient';
 export { FeaturesClient } from './FeaturesClient';
 export { FlagProxy } from './FlagProxy';
+export { VariationProvider } from './VariationProvider';
 export { WatchFlagGroup } from './WatchFlagGroup';
 
 // Events

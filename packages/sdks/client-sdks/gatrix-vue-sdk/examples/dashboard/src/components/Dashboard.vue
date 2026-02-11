@@ -116,8 +116,8 @@ const errorMessage = computed(() => {
 
 const isSearching = computed(() => !(flagsReady as any)?.value && flags.value.length === 0);
 
-function isExplicitSync() { return (client.features as any).isExplicitSyncMode?.() ?? false; }
-function canSyncFlags() { return (client.features as any).canSyncFlags?.() ?? false; }
+function isExplicitSyncEnabled() { return (client.features as any).isExplicitSyncEnabled?.() ?? false; }
+function hasPendingSyncFlags() { return (client.features as any).hasPendingSyncFlags?.() ?? false; }
 
 function handleViewModeChange(mode: 'detailed' | 'simple' | 'list') {
   localStorage.setItem('gatrix-dashboard-view-mode', mode);
@@ -170,9 +170,9 @@ function handleViewModeChange(mode: 'detailed' | 'simple' | 'list') {
           </button>
 
           <!-- Sync button -->
-          <button v-if="isExplicitSync() && !client.features.isOfflineMode()"
-            type="button" :class="`nes-btn is-warning ${!canSyncFlags() ? 'is-disabled' : 'sync-available-rumble'}`"
-            @click="syncFlags()" :disabled="!canSyncFlags()" title="Synchronize Flags">
+          <button v-if="isExplicitSyncEnabled() && !client.features.isOfflineMode()"
+            type="button" :class="`nes-btn is-warning ${!hasPendingSyncFlags() ? 'is-disabled' : 'sync-available-rumble'}`"
+            @click="syncFlags()" :disabled="!hasPendingSyncFlags()" title="Synchronize Flags">
             SYNC FLAGS
           </button>
 

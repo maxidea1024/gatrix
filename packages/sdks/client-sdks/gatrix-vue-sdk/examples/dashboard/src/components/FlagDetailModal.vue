@@ -5,24 +5,24 @@ import type { EvaluatedFlag } from '@gatrix/js-client-sdk';
 const props = defineProps<{ flag: EvaluatedFlag }>();
 const emit = defineEmits<{ (e: 'close'): void }>();
 
-const payload = computed(() => props.flag.variant?.payload);
-const hasPayload = computed(() => payload.value !== undefined && payload.value !== null);
-const isEmptyString = computed(() => payload.value === '');
+const flagValue = computed(() => props.flag.variant?.value);
+const hasValue = computed(() => flagValue.value !== undefined && flagValue.value !== null);
+const isEmptyString = computed(() => flagValue.value === '');
 
-function formatPayload(p: unknown): string {
+function formatValue(v: unknown): string {
   try {
-    if (typeof p === 'object') return JSON.stringify(p, null, 2);
-    return String(p);
-  } catch { return String(p); }
+    if (typeof v === 'object') return JSON.stringify(v, null, 2);
+    return String(v);
+  } catch { return String(v); }
 }
 
-function getPayloadSize(p: unknown): number {
-  if (p === undefined || p === null) return 0;
-  const str = typeof p === 'object' ? JSON.stringify(p) : String(p);
+function getValueSize(v: unknown): number {
+  if (v === undefined || v === null) return 0;
+  const str = typeof v === 'object' ? JSON.stringify(v) : String(v);
   return new Blob([str]).size;
 }
 
-const payloadSize = computed(() => hasPayload.value ? getPayloadSize(payload.value) : 0);
+const valueSize = computed(() => hasValue.value ? getValueSize(flagValue.value) : 0);
 </script>
 
 <template>
@@ -56,7 +56,7 @@ const payloadSize = computed(() => hasPayload.value ? getPayloadSize(payload.val
             <div class="flag-detail" style="margin: 0; border: none; flex-direction: column; align-items: flex-start; gap: 4px">
               <span class="flag-detail-label">Type</span>
               <span class="flag-detail-value">
-                <span class="pixel-chip type-chip">{{ flag.variantType || 'none' }}</span>
+                <span class="pixel-chip type-chip">{{ flag.valueType || 'none' }}</span>
               </span>
             </div>
             <div class="flag-detail" style="margin: 0; border: none; flex-direction: column; align-items: flex-start; gap: 4px">
@@ -68,8 +68,8 @@ const payloadSize = computed(() => hasPayload.value ? getPayloadSize(payload.val
           </div>
 
           <div class="flag-payload" style="margin-top: 12px">
-            <div class="flag-payload-label" style="margin-bottom: 6px">Payload Detail</div>
-            <template v-if="hasPayload">
+            <div class="flag-payload-label" style="margin-bottom: 6px">Value Detail</div>
+            <template v-if="hasValue">
               <pre
                 :class="`flag-payload-value ${isEmptyString ? 'empty-string' : 'has-payload'}`"
                 :style="{
@@ -77,12 +77,12 @@ const payloadSize = computed(() => hasPayload.value ? getPayloadSize(payload.val
                   border: '4px solid #ddd', backgroundColor: '#f9f9f9', color: '#1b5e20',
                   padding: '12px', margin: '0',
                 }"
-              >{{ formatPayload(payload) }}</pre>
+              >{{ formatValue(flagValue) }}</pre>
               <div class="flag-payload-size" style="font-size: 8px; color: #888; margin-top: 6px; text-align: right">
-                {{ payloadSize }} BYTES
+                {{ valueSize }} BYTES
               </div>
             </template>
-            <div v-else class="flag-payload-value no-payload" style="padding: 20px">✕ NO PAYLOAD</div>
+            <div v-else class="flag-payload-value no-payload" style="padding: 20px">✕ NO VALUE</div>
           </div>
 
           <div v-if="flag.impressionData" class="flag-detail"

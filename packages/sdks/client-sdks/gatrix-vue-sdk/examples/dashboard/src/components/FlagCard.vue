@@ -30,25 +30,25 @@ function formatTimeAgo(date: Date | null): string {
   return 'just now';
 }
 
-function formatPayload(p: unknown): string {
-  if (p === '') return 'EMPTY STRING';
-  if (typeof p === 'object') {
-    const str = JSON.stringify(p, null, 2);
+function formatValue(v: unknown): string {
+  if (v === '') return 'EMPTY STRING';
+  if (typeof v === 'object') {
+    const str = JSON.stringify(v, null, 2);
     return str.length > 80 ? str.substring(0, 77) + '...' : str;
   }
-  return String(p);
+  return String(v);
 }
 
-function getPayloadSize(p: unknown): number {
-  if (p === undefined || p === null) return 0;
-  const str = typeof p === 'object' ? JSON.stringify(p) : String(p);
+function getValueSize(v: unknown): number {
+  if (v === undefined || v === null) return 0;
+  const str = typeof v === 'object' ? JSON.stringify(v) : String(v);
   return new Blob([str]).size;
 }
 
-const payload = computed(() => props.flag.variant?.payload);
-const hasPayload = computed(() => payload.value !== undefined && payload.value !== null);
-const isEmptyString = computed(() => payload.value === '');
-const payloadSize = computed(() => hasPayload.value ? getPayloadSize(payload.value) : 0);
+const flagValue = computed(() => props.flag.variant?.value);
+const hasValue = computed(() => flagValue.value !== undefined && flagValue.value !== null);
+const isEmptyString = computed(() => flagValue.value === '');
+const valueSize = computed(() => hasValue.value ? getValueSize(flagValue.value) : 0);
 const changeCount = computed(() =>
   props.initialVersion !== null ? Math.max(0, (props.flag.version || 0) - props.initialVersion) : 0,
 );
@@ -111,13 +111,13 @@ watch(() => props.lastChangedTime, (val) => {
     </div>
     <div class="col-time">{{ timeAgo }}</div>
     <div class="col-type">
-      <span class="pixel-chip type-chip is-mini">{{ flag.variantType || 'none' }}</span>
+      <span class="pixel-chip type-chip is-mini">{{ flag.valueType || 'none' }}</span>
     </div>
     <div class="col-variant">
       <span class="pixel-chip variant-chip is-mini">{{ flag.variant?.name || '-' }}</span>
     </div>
     <div class="col-payload">
-      <span class="payload-preview">{{ hasPayload ? formatPayload(payload) : '-' }}</span>
+      <span class="payload-preview">{{ hasValue ? formatValue(flagValue) : '-' }}</span>
     </div>
   </div>
 
@@ -131,7 +131,7 @@ watch(() => props.lastChangedTime, (val) => {
           <span class="status-dot"></span> {{ flag.name }}
         </span>
         <span class="pixel-chip type-chip is-mini" style="font-size: 6px">
-          {{ flag.variantType || 'none' }}
+          {{ flag.valueType || 'none' }}
         </span>
       </div>
       <div class="flag-details" style="margin-top: 0">
@@ -177,7 +177,7 @@ watch(() => props.lastChangedTime, (val) => {
         <div class="flag-detail">
           <span class="flag-detail-label">Type</span>
           <span class="flag-detail-value">
-            <span class="pixel-chip type-chip">{{ flag.variantType || 'none' }}</span>
+            <span class="pixel-chip type-chip">{{ flag.valueType || 'none' }}</span>
           </span>
         </div>
         <div class="flag-detail">
@@ -188,14 +188,14 @@ watch(() => props.lastChangedTime, (val) => {
         </div>
 
         <div class="flag-payload">
-          <div class="flag-payload-label">Payload</div>
-          <template v-if="hasPayload">
+          <div class="flag-payload-label">Value</div>
+          <template v-if="hasValue">
             <div :class="`flag-payload-value ${isEmptyString ? 'empty-string' : 'has-payload'}`">
-              {{ formatPayload(payload) }}
+              {{ formatValue(flagValue) }}
             </div>
-            <div class="flag-payload-size">{{ payloadSize }} BYTES</div>
+            <div class="flag-payload-size">{{ valueSize }} BYTES</div>
           </template>
-          <div v-else class="flag-payload-value no-payload">✕ NO PAYLOAD</div>
+          <div v-else class="flag-payload-value no-payload">✕ NO VALUE</div>
         </div>
       </div>
     </div>

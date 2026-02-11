@@ -150,13 +150,13 @@
     localStorage.setItem('gatrix-dashboard-view-mode', mode);
   }
 
-  function isExplicitSync(): boolean {
+  function isExplicitSyncEnabled(): boolean {
     return config.features?.explicitSyncMode === true;
   }
 
-  function canSync(): boolean {
+  function hasPendingSyncFlags(): boolean {
     // Check if there are pending changes
-    return client.features.hasPendingChanges?.() ?? false;
+    return client.features.hasPendingSyncFlags?.() ?? false;
   }
 
   function doFetchFlags() {
@@ -228,12 +228,12 @@
           </button>
         {/if}
 
-        {#if isExplicitSync() && !client.features.isOfflineMode()}
+        {#if isExplicitSyncEnabled() && !client.features.isOfflineMode()}
           <button
             type="button"
-            class="nes-btn is-warning {!canSync() ? 'is-disabled' : 'sync-available-rumble'}"
+            class="nes-btn is-warning {!hasPendingSyncFlags() ? 'is-disabled' : 'sync-available-rumble'}"
             on:click={doSyncFlags}
-            disabled={!canSync()}
+            disabled={!hasPendingSyncFlags()}
             title="Synchronize Flags"
           >
             SYNC FLAGS
