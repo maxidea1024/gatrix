@@ -517,7 +517,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
     setAutoExecutePending(false);
     try {
       // Add intentional delay for UX testing
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
       const context = buildContext();
       // If no environments selected, use all available environments
@@ -2047,9 +2047,11 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                                                 borderRadius: 2,
                                                               }}
                                                             >
-                                                              {String(
-                                                                check.contextValue ?? 'undefined'
-                                                              )}
+                                                              {check.contextValue === ''
+                                                                ? t('common.emptyString')
+                                                                : String(
+                                                                  check.contextValue ?? 'undefined'
+                                                                )}
                                                             </code>
                                                           </Typography>
                                                         )}
@@ -2284,9 +2286,14 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                 borderRadius: 1,
                                 fontFamily: 'monospace',
                                 wordBreak: 'break-all',
+                                ...(innerValue === '' && { fontStyle: 'italic', color: 'text.disabled' }),
                               }}
                             >
-                              {innerValue}
+                              {innerValue === ''
+                                ? t('common.emptyString')
+                                : (typeof innerValue === 'object' && innerValue !== null && Object.keys(innerValue).length === 0)
+                                  ? t('common.emptyObject')
+                                  : innerValue}
                             </Typography>
                           );
                         }
@@ -2301,6 +2308,31 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                         }
 
                         if (valueType === 'json') {
+                          // Check if JSON value is an empty object
+                          const isEmptyObj = typeof value === 'object' && value !== null && Object.keys(value).length === 0;
+                          if (isEmptyObj) {
+                            return (
+                              <Typography
+                                variant="body1"
+                                sx={{
+                                  py: 1.5,
+                                  px: 2,
+                                  minHeight: 44,
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  bgcolor: 'action.hover',
+                                  border: '1px solid',
+                                  borderColor: 'divider',
+                                  borderRadius: 1,
+                                  fontFamily: 'monospace',
+                                  fontStyle: 'italic',
+                                  color: 'text.disabled',
+                                }}
+                              >
+                                {t('common.emptyObject')}
+                              </Typography>
+                            );
+                          }
                           return (
                             <Box
                               sx={{
@@ -2329,6 +2361,10 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                           );
                         }
 
+                        const displayValue = typeof value === 'object'
+                          ? JSON.stringify(value)
+                          : String(value);
+                        const isEmpty = displayValue === '';
                         return (
                           <Typography
                             variant="body1"
@@ -2344,11 +2380,10 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                               borderRadius: 1,
                               fontFamily: 'monospace',
                               wordBreak: 'break-all',
+                              ...(isEmpty && { fontStyle: 'italic', color: 'text.disabled' }),
                             }}
                           >
-                            {typeof value === 'object'
-                              ? JSON.stringify(value)
-                              : String(value)}
+                            {isEmpty ? t('common.emptyString') : displayValue}
                           </Typography>
                         );
                       })()}

@@ -99,7 +99,8 @@
     "chat:reset-safe": "node scripts/reset-chat-data.js",
     "deploy:ftp": "node scripts/deploy-ftp.js",
     "planning-data:convert": "node scripts/convert-planning-data.js",
-    "upload-planning-data": "node scripts/upload-planning-data.js"
+    "upload-planning-data": "node scripts/upload-planning-data.js",
+    "format": "prettier --write \"packages/**/*.{ts,tsx}\""
   },
   "keywords": [
     "gatrix",

@@ -1676,7 +1676,7 @@
 "@gatrix/server-sdk@file:packages/sdks/server-sdk":
   version "1.0.65"
   dependencies:
-    "@gatrix/shared" "file:../../../Users/jhseo/AppData/Local/Yarn/Cache/v6/npm-@gatrix-server-sdk-1.0.65-692a0953-039a-442c-b3b4-489ed9122760-1770392760994/node_modules/shared"
+    "@gatrix/shared" "file:../../../Users/jhseo/AppData/Local/Yarn/Cache/v6/npm-@gatrix-server-sdk-1.0.65-ec0a4576-129d-4a1b-a878-72b4a09331b8-1770775995175/node_modules/shared"
     axios "^1.7.9"
     ioredis "^5.8.2"
     murmurhash "^2.0.1"
@@ -1685,6 +1685,8 @@
 
 "@gatrix/shared@file:packages/shared":
   version "1.0.0"
+  dependencies:
+    murmurhash "^2.0.1"
 
 "@grpc/grpc-js@^1.8.20":
   version "1.14.1"

@@ -1,3 +1,13 @@
+/**
+ * Feature Flag Evaluator
+ * Central evaluation logic shared across all Gatrix packages.
+ *
+ * Key design decisions:
+ * - isArchived is NOT checked here. It is a management-only field.
+ * - Segment constraints are evaluated BEFORE strategy constraints.
+ * - isActive on segments is for UI display only, not for evaluation.
+ */
+
 const murmurhash = require('murmurhash');
 import {
   FeatureFlag,
@@ -8,8 +18,7 @@ import {
   Variant,
   FeatureSegment,
   Constraint,
-  ConstraintOperator,
-} from '../types/featureFlags';
+} from './types';
 
 export class FeatureFlagEvaluator {
   /**
@@ -20,7 +29,6 @@ export class FeatureFlagEvaluator {
     context: EvaluationContext,
     segmentsMap: Map<string, FeatureSegment>
   ): EvaluationResult {
-    // Basic state
     let reason: EvaluationReason = 'disabled';
 
     if (flag.isEnabled) {
@@ -33,12 +41,12 @@ export class FeatureFlagEvaluator {
             const variant: Variant = variantData
               ? { ...variantData, enabled: true }
               : {
-                name: '$default',
-                weight: 100,
-                value: flag.enabledValue ?? null,
-                valueType: flag.valueType || 'string',
-                enabled: true,
-              };
+                  name: '$default',
+                  weight: 100,
+                  value: flag.enabledValue ?? null,
+                  valueType: flag.valueType || 'string',
+                  enabled: true,
+                };
 
             return {
               id: flag.id || '',
@@ -49,20 +57,20 @@ export class FeatureFlagEvaluator {
             };
           }
         }
-        // If we have strategies but none matched
+        // Strategies exist but none matched
         reason = 'default';
       } else {
-        // No strategies or all strategies are disabled - enabled by default
+        // No strategies or all disabled - enabled by default
         const variantData = this.selectVariant(flag, context);
         const variant: Variant = variantData
           ? { ...variantData, enabled: true }
           : {
-            name: '$default',
-            weight: 100,
-            value: flag.enabledValue ?? null,
-            valueType: flag.valueType || 'string',
-            enabled: true,
-          };
+              name: '$default',
+              weight: 100,
+              value: flag.enabledValue ?? null,
+              valueType: flag.valueType || 'string',
+              enabled: true,
+            };
 
         return {
           id: flag.id || '',
@@ -76,7 +84,7 @@ export class FeatureFlagEvaluator {
       reason = 'disabled';
     }
 
-    // Default return path (disabled or no strategy matched)
+    // Disabled or no strategy matched
     return {
       id: flag.id || '',
       flagName: flag.name,
@@ -92,12 +100,17 @@ export class FeatureFlagEvaluator {
     };
   }
 
+  /**
+   * Evaluate a single strategy
+   * Order: segments -> constraints -> rollout
+   */
   private static evaluateStrategy(
     strategy: FeatureStrategy,
     context: EvaluationContext,
     flag: FeatureFlag,
     segmentsMap: Map<string, FeatureSegment>
   ): boolean {
+    // 1. Check segment constraints (all referenced segments must pass)
     if (strategy.segments && strategy.segments.length > 0) {
       for (const segmentName of strategy.segments) {
         const segment = segmentsMap.get(segmentName);
@@ -111,6 +124,7 @@ export class FeatureFlagEvaluator {
       }
     }
 
+    // 2. Check strategy constraints
     if (strategy.constraints && strategy.constraints.length > 0) {
       const allConstraintsPass = strategy.constraints.every((c) =>
         this.evaluateConstraint(c, context)
@@ -118,6 +132,7 @@ export class FeatureFlagEvaluator {
       if (!allConstraintsPass) return false;
     }
 
+    // 3. Check rollout percentage
     const rollout = strategy.parameters?.rollout ?? 100;
     if (rollout < 100) {
       const stickiness = strategy.parameters?.stickiness || 'default';
@@ -248,7 +263,10 @@ export class FeatureFlagEvaluator {
     return constraint.inverted ? !result : result;
   }
 
-  private static getContextValue(name: string, context: EvaluationContext): any {
+  private static getContextValue(
+    name: string,
+    context: EvaluationContext
+  ): string | number | boolean | undefined {
     switch (name) {
       case 'userId':
         return context.userId;

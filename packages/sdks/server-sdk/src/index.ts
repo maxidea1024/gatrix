@@ -47,8 +47,8 @@ export { EnvironmentResolver } from './utils/EnvironmentResolver';
 // Export cloud metadata detection utilities
 export { CloudMetadata, CloudProvider, detectCloudMetadata } from './utils/cloudMetadata';
 
-// Export Feature Flag Evaluator
-export { FeatureFlagEvaluator } from './utils/FeatureFlagEvaluator';
+// Export Feature Flag Evaluator (from @gatrix/shared)
+export { FeatureFlagEvaluator } from '@gatrix/shared';
 
 // Export SDK version
 export { SDK_VERSION } from './version';

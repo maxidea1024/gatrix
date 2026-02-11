@@ -40,7 +40,8 @@
     "mysql:docker:win": "scripts\\start-mysql-docker.bat",
     "planning-data:convert": "ts-node scripts/convert-planning-data.ts",
     "planning-data:convert:help": "ts-node scripts/convert-planning-data.ts --help",
-    "clean": "rimraf dist"
+    "clean": "rimraf dist",
+    "format": "prettier --write \"src/**/*.ts\""
   },
   "dependencies": {
     "@bull-board/api": "^6.12.6",

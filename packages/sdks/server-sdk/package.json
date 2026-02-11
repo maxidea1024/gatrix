@@ -21,7 +21,8 @@
     "test:chatd": "ts-node test-servers/chatd.ts",
     "test:worldd": "ts-node test-servers/worldd.ts",
     "deploy:game": "ts-node scripts/deploy-to-game-server.ts",
-    "deploy:game:bump": "ts-node scripts/deploy-to-game-server.ts --bump"
+    "deploy:game:bump": "ts-node scripts/deploy-to-game-server.ts --bump",
+    "format": "prettier --write \"src/**/*.ts\""
   },
   "keywords": [
     "gatrix",

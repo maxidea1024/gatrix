@@ -14,6 +14,10 @@
     "./errors": {
       "types": "./dist/errors/index.d.ts",
       "default": "./dist/errors/index.js"
+    },
+    "./evaluation": {
+      "types": "./dist/evaluation/index.d.ts",
+      "default": "./dist/evaluation/index.js"
     }
   },
   "files": [
@@ -23,7 +27,11 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc --watch",
-    "clean": "rimraf dist"
+    "clean": "rimraf dist",
+    "format": "prettier --write \"src/**/*.ts\""
+  },
+  "dependencies": {
+    "murmurhash": "^2.0.1"
   },
   "devDependencies": {
     "typescript": "^5.0.0",

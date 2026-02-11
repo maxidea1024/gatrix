@@ -4,6 +4,7 @@
  */
 import React from 'react';
 import { Box, Typography, Chip, Paper, Stack, Tooltip } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 import { formatDateTime } from '../../utils/dateFormat';
 
 export interface ConstraintValue {
@@ -87,6 +88,7 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({
   contextFields = [],
   noBorder = false,
 }) => {
+  const { t } = useTranslation();
   // Find context field info for tooltip (ensure contextFields is an array)
   const fieldsArray = Array.isArray(contextFields) ? contextFields : [];
   const contextFieldInfo = fieldsArray.find((f) => f.fieldName === constraint.contextName);
@@ -100,6 +102,7 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({
         return constraint.value ? 'true' : 'false';
       }
       const value = String(constraint.value);
+      if (value === '') return t('common.emptyString');
       // Format date values
       if (isDateOperator(constraint.operator)) {
         return formatDateValueDisplay(value);
@@ -341,7 +344,7 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({
           {constraint.values!.map((val, idx) => (
             <Chip
               key={idx}
-              label={val}
+              label={val === '' ? t('common.emptyString') : val}
               size="small"
               sx={{
                 height: 22,
@@ -350,6 +353,7 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({
                 bgcolor: 'action.selected',
                 color: 'text.primary',
                 borderRadius: '16px',
+                ...(val === '' && { fontStyle: 'italic', color: 'text.secondary' }),
                 '& .MuiChip-label': {
                   px: 1.25,
                 },
@@ -368,6 +372,7 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({
             bgcolor: 'action.selected',
             color: 'text.primary',
             borderRadius: '16px',
+            ...(getSingleValueDisplay() === t('common.emptyString') && { fontStyle: 'italic', color: 'text.secondary' }),
             '& .MuiChip-label': {
               px: 1.25,
             },

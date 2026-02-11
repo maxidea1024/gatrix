@@ -19,7 +19,7 @@ import {
   FeatureFlag,
   FeatureSegment,
   EvaluationContext,
-} from '@gatrix/server-sdk';
+} from '@gatrix/shared';
 import db from '../config/knex';
 
 export class ClientController {
@@ -563,6 +563,7 @@ export class ClientController {
 
         // Map DB flag to SDK FeatureFlag type for evaluation
         const sdkFlag: FeatureFlag = {
+          id: dbFlag.id?.toString() || '',
           name: dbFlag.flagName,
           isEnabled: dbFlag.isEnabled,
           impressionDataEnabled: dbFlag.impressionDataEnabled,
@@ -583,7 +584,7 @@ export class ClientController {
             })) || [],
         };
 
-        const result = FeatureFlagEvaluator.evaluate(sdkFlag as any, context, segmentsMap);
+        const result = FeatureFlagEvaluator.evaluate(sdkFlag, context, segmentsMap);
 
         // Build variant object according to Gatrix client specification
         // Updated to support separate enabled/disabled values
@@ -614,7 +615,9 @@ export class ClientController {
           if (valueToReturn !== undefined && valueToReturn !== null) {
             let parsedValue = valueToReturn;
             if (dbFlag.valueType === 'json' && typeof parsedValue === 'string') {
-              try { parsedValue = JSON.parse(parsedValue); } catch { }
+              try {
+                parsedValue = JSON.parse(parsedValue);
+              } catch {}
             } else if (dbFlag.valueType === 'number') {
               parsedValue = Number(parsedValue);
             }

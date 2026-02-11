@@ -69,10 +69,22 @@ const ValueEditorField: React.FC<ValueEditorFieldProps> = ({
     const [dialogError, setDialogError] = useState<string | null>(null);
     const dialogValidationTimer = useRef<ReturnType<typeof setTimeout>>();
 
+    // Check if value is an empty string (for display purposes)
+    const isEmptyString = valueType === 'string' && value === '';
+    // Check if value is an empty JSON object
+    const isEmptyObject = valueType === 'json' && (
+        (typeof value === 'object' && value !== null && Object.keys(value).length === 0) ||
+        (typeof value === 'string' && (value.trim() === '{}' || value.trim() === ''))
+    );
+    const showEmptyHint = isEmptyString || isEmptyObject;
+
     // Format value for display
     const getDisplayValue = useCallback((): string => {
         if (value === null || value === undefined) return '';
         if (valueType === 'json') {
+            // Return empty for empty objects so placeholder shows
+            if (typeof value === 'object' && Object.keys(value).length === 0) return '';
+            if (typeof value === 'string' && (value.trim() === '{}' || value.trim() === '')) return '';
             if (typeof value === 'object') return JSON.stringify(value);
             return String(value);
         }
@@ -178,8 +190,9 @@ const ValueEditorField: React.FC<ValueEditorFieldProps> = ({
                     disabled={disabled}
                     error={!!error}
                     helperText={helperText}
-                    placeholder={placeholder}
+                    placeholder={showEmptyHint ? (isEmptyObject ? t('common.emptyObject') : t('common.emptyString')) : placeholder}
                     InputProps={{
+                        sx: showEmptyHint ? { fontStyle: 'italic' } : undefined,
                         endAdornment: !disabled && (
                             <InputAdornment position="end" sx={{ alignSelf: 'flex-start', mt: 1 }}>
                                 <IconButton
@@ -202,11 +215,14 @@ const ValueEditorField: React.FC<ValueEditorFieldProps> = ({
                     disabled={disabled}
                     error={!!error}
                     helperText={helperText}
-                    placeholder={placeholder}
+                    placeholder={showEmptyHint ? (isEmptyObject ? t('common.emptyObject') : t('common.emptyString')) : placeholder}
                     onClick={valueType === 'json' && !disabled ? handleOpenDialog : undefined}
                     InputProps={{
                         readOnly: valueType === 'json',
-                        sx: valueType === 'json' ? { cursor: 'pointer' } : undefined,
+                        sx: {
+                            ...(valueType === 'json' ? { cursor: 'pointer' } : {}),
+                            ...(showEmptyHint ? { fontStyle: 'italic' } : {}),
+                        },
                         endAdornment: !disabled && (
                             <InputAdornment position="end">
                                 <IconButton

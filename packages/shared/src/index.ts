@@ -3,4 +3,7 @@
  */
 
 // Error handling
-export * from './errors/index.js';
+export * from './errors/index';
+
+// Feature flag evaluation
+export * from './evaluation/index';
