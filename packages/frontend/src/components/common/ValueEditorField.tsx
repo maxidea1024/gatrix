@@ -245,7 +245,7 @@ const ValueEditorField: React.FC<ValueEditorFieldProps> = ({
                 maxWidth="md"
                 fullWidth
                 PaperProps={{
-                    sx: { minHeight: valueType === 'json' ? 500 : 300 },
+                    sx: { minHeight: valueType === 'json' ? 650 : 450 },
                 }}
             >
                 <DialogTitle
@@ -265,7 +265,7 @@ const ValueEditorField: React.FC<ValueEditorFieldProps> = ({
                 </DialogTitle>
                 <DialogContent dividers sx={{ overflow: 'visible', display: 'flex', flexDirection: 'column' }}>
                     {valueType === 'json' ? (
-                        <Box sx={{ flex: 1, minHeight: 350 }}>
+                        <Box sx={{ flex: 1, minHeight: 500 }}>
                             <JsonEditor
                                 value={editingValue}
                                 onChange={(val) => {
@@ -281,7 +281,7 @@ const ValueEditorField: React.FC<ValueEditorFieldProps> = ({
                                         }
                                     }, 300);
                                 }}
-                                height={350}
+                                height={500}
                             />
                             {dialogError && (
                                 <Typography
@@ -302,17 +302,28 @@ const ValueEditorField: React.FC<ValueEditorFieldProps> = ({
                         <TextField
                             fullWidth
                             multiline
-                            minRows={14}
-                            maxRows={20}
+                            minRows={20}
+                            maxRows={25}
                             value={editingValue}
                             onChange={(e) => setEditingValue(e.target.value)}
                             placeholder={placeholder}
                             autoFocus
                             sx={{
                                 '& .MuiOutlinedInput-root': {
-                                    '& fieldset': { border: 'none' },
-                                    '&:hover fieldset': { border: 'none' },
-                                    '&.Mui-focused fieldset': { border: 'none' },
+                                    '& fieldset': {
+                                        border: '1px solid',
+                                        borderColor: 'divider',
+                                        opacity: 0.5
+                                    },
+                                    '&:hover fieldset': {
+                                        borderColor: 'divider',
+                                        opacity: 1
+                                    },
+                                    '&.Mui-focused fieldset': {
+                                        border: '1px solid',
+                                        borderColor: 'primary.main',
+                                        opacity: 1
+                                    },
                                 },
                             }}
                         />

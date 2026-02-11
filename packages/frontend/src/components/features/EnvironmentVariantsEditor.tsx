@@ -340,8 +340,7 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
       isSavingRef.current = false;
     } finally {
       setSavingValues(false);
-      // Let the sync happen in a subsequent render after props are updated
-      setTimeout(() => { isSavingRef.current = false; }, 100);
+      isSavingRef.current = false;
     }
   }, [onSaveValues, valueType, useEnvOverride, editingEnabledValue, editingDisabledValue, valueJsonErrors, t]);
 
