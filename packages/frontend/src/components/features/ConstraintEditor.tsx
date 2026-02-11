@@ -441,7 +441,7 @@ const SortableConstraintCard: React.FC<SortableConstraintCardProps> = ({
         </FormControl>
 
         {/* Inverted (!) - placed before operator for natural reading order */}
-        <Tooltip title={t('featureFlags.invertedHelp')}>
+        <Tooltip title={t('featureFlags.invertedHelp')} disableFocusListener>
           <span>
             <IconButton
               size="small"
@@ -519,7 +519,7 @@ const SortableConstraintCard: React.FC<SortableConstraintCardProps> = ({
           }}
         >
           {/* Case Insensitive - always show but disable for non-string operators */}
-          <Tooltip title={t('featureFlags.caseInsensitiveHelp')}>
+          <Tooltip title={t('featureFlags.caseInsensitiveHelp')} disableFocusListener>
             <span>
               <IconButton
                 size="small"
@@ -543,7 +543,7 @@ const SortableConstraintCard: React.FC<SortableConstraintCardProps> = ({
           </Tooltip>
 
           {/* Delete Button */}
-          <Tooltip title={t('common.delete')}>
+          <Tooltip title={t('common.delete')} disableFocusListener>
             <span>
               <IconButton
                 size="small"
@@ -872,11 +872,6 @@ export const ConstraintEditor: React.FC<ConstraintEditorProps> = ({
         <Typography variant="subtitle2" color="text.secondary">
           {t('featureFlags.constraintsList')}
         </Typography>
-        {!disabled && constraints.length > 0 && (
-          <Button size="small" startIcon={<AddIcon />} onClick={handleAddConstraint}>
-            {t('featureFlags.addConstraint')}
-          </Button>
-        )}
       </Box>
 
       {constraints.length === 0 ? (
@@ -962,6 +957,18 @@ export const ConstraintEditor: React.FC<ConstraintEditorProps> = ({
             </Box>
           </SortableContext>
         </DndContext>
+      )}
+      {!disabled && constraints.length > 0 && (
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1.5 }}>
+          <Button
+            size="small"
+            startIcon={<AddIcon />}
+            onClick={handleAddConstraint}
+            sx={{ fontWeight: 600 }}
+          >
+            {t('featureFlags.addConstraint')}
+          </Button>
+        </Box>
       )}
     </Box>
   );

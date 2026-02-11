@@ -450,12 +450,13 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
     const updated = [...contextEntries];
     updated[index] = { ...updated[index], [field]: value };
 
-    // Update type if key changes
+    // Update type and reset value if key changes
     if (field === 'key') {
       const fieldDef = contextFields.find((f) => f.fieldName === value);
       if (fieldDef) {
         updated[index].type = fieldDef.fieldType;
       }
+      updated[index].value = ''; // Reset value when key changes
     }
 
     setContextEntries(updated);
@@ -928,7 +929,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                       <Box sx={{ flex: '2 1 200px', minWidth: 150 }}>{renderValueInput()}</Box>
 
                       {/* Delete Button */}
-                      <Tooltip title={t('common.delete')}>
+                      <Tooltip title={t('common.delete')} disableFocusListener>
                         <IconButton
                           size="small"
                           onClick={() => handleRemoveContextEntry(index)}
@@ -2346,7 +2347,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                   {t('playground.appliedVariant')}
                 </Typography>
                 {selectedEvaluation.result.variant && (
-                  <Tooltip title={t('common.copy')}>
+                  <Tooltip title={t('common.copy')} disableFocusListener>
                     <IconButton
                       size="small"
                       onClick={() => {
@@ -2647,7 +2648,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                   <Typography variant="subtitle2" color="text.secondary">
                     {t('playground.rawResponse')}
                   </Typography>
-                  <Tooltip title={t('common.copyToClipboard')}>
+                  <Tooltip title={t('common.copyToClipboard')} disableFocusListener>
                     <IconButton
                       size="small"
                       onClick={() => {

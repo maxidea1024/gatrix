@@ -28,6 +28,7 @@ export interface LocalizedDateTimePickerProps {
 
   // Styling
   sx?: any;
+  size?: 'small' | 'medium';
 }
 
 /**
@@ -58,6 +59,7 @@ const LocalizedDateTimePicker: React.FC<LocalizedDateTimePickerProps> = ({
   minDateTime,
   maxDateTime,
   sx,
+  size = 'small',
 }) => {
   const { i18n } = useTranslation();
 
@@ -98,6 +100,7 @@ const LocalizedDateTimePicker: React.FC<LocalizedDateTimePickerProps> = ({
         slotProps={{
           textField: {
             fullWidth,
+            size,
             helperText,
             slotProps: { input: { readOnly: true } },
             sx,
