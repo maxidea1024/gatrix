@@ -108,7 +108,6 @@ namespace Gatrix.Unity.SDK.Editor
                 EditorGUILayout.LabelField($"Environment: {ctx.Environment ?? "-"}");
                 EditorGUILayout.LabelField($"UserId: {ctx.UserId ?? "-"}");
                 EditorGUILayout.LabelField($"SessionId: {ctx.SessionId ?? "-"}");
-                EditorGUILayout.LabelField($"DeviceId: {ctx.DeviceId ?? "-"}");
                 if (ctx.Properties != null)
                 {
                     foreach (var kvp in ctx.Properties)

@@ -161,7 +161,7 @@ namespace Gatrix.Unity.SDK
         /// <summary>
         /// Set a single context field and re-fetch flags.
         /// <para>
-        /// Supported field names: "userId", "sessionId", "deviceId", "currentTime",
+        /// Supported field names: "userId", "sessionId", "currentTime",
         /// "ipAddress", and any custom property key (stored in Properties dictionary).
         /// Unknown field names are stored as custom properties.
         /// </para>
@@ -223,14 +223,31 @@ namespace Gatrix.Unity.SDK
         /// <summary>
         /// Get the variant for a feature flag. Never returns <c>null</c>.
         /// <para>
-        /// If the flag does not exist or has no variant, returns a default
-        /// <see cref="Variant"/> with <c>Name</c> set to "disabled" and
-        /// <c>Enabled</c> set to <c>false</c>.
+        /// If the flag does not exist, returns a <see cref="Variant"/> with
+        /// <c>Name</c> set to "$missing" and <c>Enabled</c> set to <c>false</c>.
         /// </para>
         /// </summary>
         /// <param name="flagName">The feature flag key (case-sensitive).</param>
         /// <returns>The <see cref="Variant"/>, never <c>null</c>.</returns>
         Variant GetVariant(string flagName);
+
+        /// <summary>
+        /// Check if a flag exists in the cache.
+        /// </summary>
+        /// <param name="flagName">The feature flag key (case-sensitive).</param>
+        /// <returns><c>true</c> if the flag exists.</returns>
+        bool HasFlag(string flagName);
+
+        /// <summary>
+        /// Get a FlagProxy for convenient flag access.
+        /// <para>
+        /// The returned proxy delegates all variation methods to the client's
+        /// internal methods for centralized type checking and metrics tracking.
+        /// </para>
+        /// </summary>
+        /// <param name="flagName">The feature flag key (case-sensitive).</param>
+        /// <returns>A <see cref="FlagProxy"/> instance (never null).</returns>
+        FlagProxy GetFlag(string flagName);
 
         /// <summary>
         /// Get all evaluated flags currently in the cache.

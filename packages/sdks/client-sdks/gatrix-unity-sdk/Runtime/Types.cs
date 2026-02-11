@@ -20,7 +20,6 @@ namespace Gatrix.Unity.SDK
 
         public string UserId { get; set; }
         public string SessionId { get; set; }
-        public string DeviceId { get; set; }
         public string CurrentTime { get; set; }
         public Dictionary<string, object> Properties { get; set; }
 
@@ -32,7 +31,6 @@ namespace Gatrix.Unity.SDK
                 Environment = Environment,
                 UserId = UserId,
                 SessionId = SessionId,
-                DeviceId = DeviceId,
                 CurrentTime = CurrentTime
             };
             if (Properties != null)
@@ -52,8 +50,7 @@ namespace Gatrix.Unity.SDK
         public string Name { get; set; }
         public bool Enabled { get; set; }
 
-        /// <summary>Payload value - can be string, number, or JSON object (as string)</summary>
-        /// <summary>Value - can be string, number, or JSON object (as string)</summary>
+        /// <summary>Value - can be bool, string, number, or JSON object</summary>
         public object Value { get; set; }
     }
 

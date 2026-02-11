@@ -422,7 +422,6 @@ namespace Gatrix.Unity.SDK.Editor
             EditorGUILayout.LabelField("Context Fields", _subHeaderStyle);
             DrawField("UserId", _cachedContext.UserId ?? "-");
             DrawField("SessionId", _cachedContext.SessionId ?? "-");
-            DrawField("DeviceId", _cachedContext.DeviceId ?? "-");
             DrawField("CurrentTime", _cachedContext.CurrentTime ?? "-");
 
             if (_cachedContext.Properties != null && _cachedContext.Properties.Count > 0)

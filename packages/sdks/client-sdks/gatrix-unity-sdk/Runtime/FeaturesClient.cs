@@ -18,24 +18,25 @@ namespace Gatrix.Unity.SDK
     /// Feature flags client. Handles fetching, caching, polling, and flag access.
     /// All flag access methods (IsEnabled, *Variation, etc.) are synchronous and read from in-memory cache.
     /// </summary>
-    public class FeaturesClient : IFeaturesClient
+    public class FeaturesClient : IFeaturesClient, IVariationProvider
     {
         // Storage keys (built with CacheKeyPrefix at construction time)
         private string StorageKeyFlags;
         private string StorageKeySession;
         private string StorageKeyEtag;
 
-        private static readonly Variant FallbackDisabledVariant = new Variant
+        private static readonly Variant MissingVariant = new Variant
         {
-            Name = "disabled",
-            Enabled = false
+            Name = "$missing",
+            Enabled = false,
+            Value = null
         };
 
         // System context fields that cannot be removed
         private static readonly HashSet<string> SystemContextFields
             = new HashSet<string> { "appName", "environment" };
         private static readonly HashSet<string> DefinedFields
-            = new HashSet<string> { "userId", "sessionId", "deviceId", "currentTime" };
+            = new HashSet<string> { "userId", "sessionId", "currentTime" };
 
         private readonly GatrixEventEmitter _emitter;
         private readonly GatrixClientConfig _config;
@@ -162,7 +163,6 @@ namespace Gatrix.Unity.SDK
             {
                 _context.UserId = config.Context.UserId;
                 _context.SessionId = config.Context.SessionId;
-                _context.DeviceId = config.Context.DeviceId;
                 _context.CurrentTime = config.Context.CurrentTime;
                 if (config.Context.Properties != null)
                 {
@@ -320,7 +320,6 @@ namespace Gatrix.Unity.SDK
             // Filter out system fields; apply user context
             if (context.UserId != null) _context.UserId = context.UserId;
             if (context.SessionId != null) _context.SessionId = context.SessionId;
-            if (context.DeviceId != null) _context.DeviceId = context.DeviceId;
             if (context.CurrentTime != null) _context.CurrentTime = context.CurrentTime;
             if (context.Properties != null)
             {
@@ -356,7 +355,6 @@ namespace Gatrix.Unity.SDK
                 {
                     case "userId": _context.UserId = value?.ToString(); break;
                     case "sessionId": _context.SessionId = value?.ToString(); break;
-                    case "deviceId": _context.DeviceId = value?.ToString(); break;
                     case "currentTime": _context.CurrentTime = value?.ToString(); break;
                 }
             }
@@ -385,7 +383,6 @@ namespace Gatrix.Unity.SDK
                 {
                     case "userId": _context.UserId = value; break;
                     case "sessionId": _context.SessionId = value; break;
-                    case "deviceId": _context.DeviceId = value; break;
                     case "currentTime": _context.CurrentTime = value; break;
                 }
             }
@@ -414,7 +411,6 @@ namespace Gatrix.Unity.SDK
                 {
                     case "userId": _context.UserId = value.ToString(); break;
                     case "sessionId": _context.SessionId = value.ToString(); break;
-                    case "deviceId": _context.DeviceId = value.ToString(); break;
                     case "currentTime": _context.CurrentTime = value.ToString(); break;
                 }
             }
@@ -443,7 +439,6 @@ namespace Gatrix.Unity.SDK
                 {
                     case "userId": _context.UserId = value.ToString(CultureInfo.InvariantCulture); break;
                     case "sessionId": _context.SessionId = value.ToString(CultureInfo.InvariantCulture); break;
-                    case "deviceId": _context.DeviceId = value.ToString(CultureInfo.InvariantCulture); break;
                     case "currentTime": _context.CurrentTime = value.ToString(CultureInfo.InvariantCulture); break;
                 }
             }
@@ -478,7 +473,6 @@ namespace Gatrix.Unity.SDK
                 {
                     case "userId": _context.UserId = null; break;
                     case "sessionId": _context.SessionId = null; break;
-                    case "deviceId": _context.DeviceId = null; break;
                     case "currentTime": _context.CurrentTime = null; break;
                 }
             }
@@ -501,58 +495,22 @@ namespace Gatrix.Unity.SDK
 
         // ==================== Flag Access ====================
 
-        /// <summary>
-        /// Create a FlagProxy for a given flag name, injecting metrics callback.
-        /// This is the single entry point for all flag access.
-        /// </summary>
-        private FlagProxy CreateProxy(string flagName)
+        /// <summary>Lookup a flag from the active cache.</summary>
+        private EvaluatedFlag LookupFlag(string flagName)
         {
             var flags = SelectFlags();
             flags.TryGetValue(flagName, out var flag);
-            return new FlagProxy(flag, HandleFlagAccess, flagName);
+            return flag;
         }
 
-        /// <summary>
-        /// Metrics callback injected into every FlagProxy.
-        /// Called on every variation method invocation.
-        /// </summary>
-        private void HandleFlagAccess(
-            string flagName, EvaluatedFlag flag, string eventType, string variantName)
+        /// <summary>Check if a flag exists</summary>
+        public bool HasFlag(string flagName) => LookupFlag(flagName) != null;
+
+        /// <summary>Get a FlagProxy for convenient flag access. Delegates to self for all operations.</summary>
+        public FlagProxy GetFlag(string flagName)
         {
-            if (flag == null)
-            {
-                _metrics.CountMissing(flagName);
-                return;
-            }
-
-            _metrics.Count(flagName, flag.Enabled);
-            if (variantName != null)
-            {
-                _metrics.CountVariant(flagName, variantName);
-            }
-
-            TrackFlagEnabledCount(flagName, flag.Enabled);
-            if (variantName != null)
-            {
-                TrackVariantCount(flagName, variantName);
-            }
-
-            TrackImpression(flagName, flag.Enabled, flag, eventType, variantName);
-        }
-
-        /// <summary>Check if a flag is enabled</summary>
-        public bool IsEnabled(string flagName)
-        {
-            return CreateProxy(flagName).Enabled;
-        }
-
-        /// <summary>Get variant (never returns null)</summary>
-        public Variant GetVariant(string flagName)
-        {
-            var proxy = CreateProxy(flagName);
-            proxy.Variation(""); // trigger metrics
-            var v = proxy.Variant;
-            return new Variant { Name = v.Name, Enabled = v.Enabled, Value = v.Value };
+            var flag = LookupFlag(flagName);
+            return new FlagProxy(flag, this, flagName);
         }
 
         /// <summary>Get all flags</summary>
@@ -567,67 +525,335 @@ namespace Gatrix.Unity.SDK
             return result;
         }
 
-        // ==================== Variation Methods ====================
-        // All delegate to FlagProxy - single source of truth.
+        // ==================== VariationProvider Internal Methods ====================
+        // All flag lookup + value extraction + metrics tracking happen here.
+
+        public bool IsEnabledInternal(string flagName)
+        {
+            var flag = LookupFlag(flagName);
+            if (flag == null)
+            {
+                TrackFlagAccess(flagName, null, "isEnabled");
+                return false;
+            }
+            TrackFlagAccess(flagName, flag, "isEnabled", flag.Variant?.Name);
+            return flag.Enabled;
+        }
+
+        public Variant GetVariantInternal(string flagName)
+        {
+            var flag = LookupFlag(flagName);
+            if (flag == null)
+            {
+                TrackFlagAccess(flagName, null, "getVariant");
+                return MissingVariant;
+            }
+            TrackFlagAccess(flagName, flag, "getVariant", flag.Variant?.Name);
+            return flag.Variant;
+        }
+
+        public string VariationInternal(string flagName, string missingValue)
+        {
+            var flag = LookupFlag(flagName);
+            if (flag == null)
+            {
+                TrackFlagAccess(flagName, null, "getVariant");
+                return missingValue;
+            }
+            TrackFlagAccess(flagName, flag, "getVariant", flag.Variant?.Name);
+            return flag.Variant?.Name ?? missingValue;
+        }
+
+        public bool BoolVariationInternal(string flagName, bool missingValue)
+        {
+            var flag = LookupFlag(flagName);
+            if (flag == null)
+            {
+                TrackFlagAccess(flagName, null, "getVariant");
+                return missingValue;
+            }
+            TrackFlagAccess(flagName, flag, "getVariant", flag.Variant?.Name);
+            if (flag.ValueType != ValueType.Boolean) return missingValue;
+            var val = flag.Variant?.Value;
+            if (val == null) return missingValue;
+            if (val is bool b) return b;
+            if (val is string s) return s.ToLowerInvariant() == "true";
+            try { return Convert.ToBoolean(val, CultureInfo.InvariantCulture); }
+            catch { return missingValue; }
+        }
+
+        public string StringVariationInternal(string flagName, string missingValue)
+        {
+            var flag = LookupFlag(flagName);
+            if (flag == null)
+            {
+                TrackFlagAccess(flagName, null, "getVariant");
+                return missingValue;
+            }
+            TrackFlagAccess(flagName, flag, "getVariant", flag.Variant?.Name);
+            if (flag.ValueType != ValueType.String) return missingValue;
+            var val = flag.Variant?.Value;
+            return val?.ToString() ?? missingValue;
+        }
+
+        public int IntVariationInternal(string flagName, int missingValue)
+        {
+            var flag = LookupFlag(flagName);
+            if (flag == null)
+            {
+                TrackFlagAccess(flagName, null, "getVariant");
+                return missingValue;
+            }
+            TrackFlagAccess(flagName, flag, "getVariant", flag.Variant?.Name);
+            if (flag.ValueType != ValueType.Number) return missingValue;
+            var val = flag.Variant?.Value;
+            if (val == null) return missingValue;
+            try { return Convert.ToInt32(val, CultureInfo.InvariantCulture); }
+            catch { return missingValue; }
+        }
+
+        public float FloatVariationInternal(string flagName, float missingValue)
+        {
+            var flag = LookupFlag(flagName);
+            if (flag == null)
+            {
+                TrackFlagAccess(flagName, null, "getVariant");
+                return missingValue;
+            }
+            TrackFlagAccess(flagName, flag, "getVariant", flag.Variant?.Name);
+            if (flag.ValueType != ValueType.Number) return missingValue;
+            var val = flag.Variant?.Value;
+            if (val == null) return missingValue;
+            try { return Convert.ToSingle(val, CultureInfo.InvariantCulture); }
+            catch { return missingValue; }
+        }
+
+        public double DoubleVariationInternal(string flagName, double missingValue)
+        {
+            var flag = LookupFlag(flagName);
+            if (flag == null)
+            {
+                TrackFlagAccess(flagName, null, "getVariant");
+                return missingValue;
+            }
+            TrackFlagAccess(flagName, flag, "getVariant", flag.Variant?.Name);
+            if (flag.ValueType != ValueType.Number) return missingValue;
+            var val = flag.Variant?.Value;
+            if (val == null) return missingValue;
+            try { return Convert.ToDouble(val, CultureInfo.InvariantCulture); }
+            catch { return missingValue; }
+        }
+
+        public Dictionary<string, object> JsonVariationInternal(
+            string flagName, Dictionary<string, object> missingValue)
+        {
+            var flag = LookupFlag(flagName);
+            if (flag == null)
+            {
+                TrackFlagAccess(flagName, null, "getVariant");
+                return missingValue;
+            }
+            TrackFlagAccess(flagName, flag, "getVariant", flag.Variant?.Name);
+            if (flag.ValueType != ValueType.Json) return missingValue;
+            var val = flag.Variant?.Value;
+            if (val == null) return missingValue;
+            if (val is Dictionary<string, object> dict) return dict;
+            if (val is string jsonStr)
+            {
+                var parsed = GatrixJson.DeserializeDictionary(jsonStr);
+                return parsed ?? missingValue;
+            }
+            return missingValue;
+        }
+
+        // -------------------- Variation Details Internal --------------------
+
+        private VariationResult<T> MakeDetails<T>(string flagName, T value, string expectedType)
+        {
+            var flag = LookupFlag(flagName);
+            var exists = flag != null;
+            string reason;
+            if (!exists)
+            {
+                reason = "flag_not_found";
+            }
+            else if (ValueTypeHelper.ToApiString(flag.ValueType) != expectedType)
+            {
+                reason = $"type_mismatch:expected_{expectedType}_got_{ValueTypeHelper.ToApiString(flag.ValueType)}";
+            }
+            else
+            {
+                reason = string.IsNullOrEmpty(flag.Reason) ? "evaluated" : flag.Reason;
+            }
+            return new VariationResult<T>
+            {
+                Value = value,
+                Reason = reason,
+                FlagExists = exists,
+                Enabled = exists && flag.Enabled
+            };
+        }
+
+        public VariationResult<bool> BoolVariationDetailsInternal(string flagName, bool missingValue)
+            => MakeDetails(flagName, BoolVariationInternal(flagName, missingValue), "boolean");
+
+        public VariationResult<string> StringVariationDetailsInternal(string flagName, string missingValue)
+            => MakeDetails(flagName, StringVariationInternal(flagName, missingValue), "string");
+
+        public VariationResult<int> IntVariationDetailsInternal(string flagName, int missingValue)
+            => MakeDetails(flagName, IntVariationInternal(flagName, missingValue), "number");
+
+        public VariationResult<float> FloatVariationDetailsInternal(string flagName, float missingValue)
+            => MakeDetails(flagName, FloatVariationInternal(flagName, missingValue), "number");
+
+        public VariationResult<double> DoubleVariationDetailsInternal(string flagName, double missingValue)
+            => MakeDetails(flagName, DoubleVariationInternal(flagName, missingValue), "number");
+
+        public VariationResult<Dictionary<string, object>> JsonVariationDetailsInternal(
+            string flagName, Dictionary<string, object> missingValue)
+            => MakeDetails(flagName, JsonVariationInternal(flagName, missingValue), "json");
+
+        // -------------------- OrThrow Internal --------------------
+
+        private EvaluatedFlag LookupFlagOrThrow(string flagName)
+        {
+            var flag = LookupFlag(flagName);
+            if (flag == null)
+            {
+                TrackFlagAccess(flagName, null, "getVariant");
+                throw new GatrixFeatureException($"Flag '{flagName}' not found");
+            }
+            TrackFlagAccess(flagName, flag, "getVariant", flag.Variant?.Name);
+            return flag;
+        }
+
+        private void ThrowTypeMismatch(string flagName, string expected, ValueType actual)
+        {
+            throw new GatrixFeatureException(
+                $"Flag '{flagName}' type mismatch: expected {expected}, got {ValueTypeHelper.ToApiString(actual)}");
+        }
+
+        public bool BoolVariationOrThrowInternal(string flagName)
+        {
+            var flag = LookupFlagOrThrow(flagName);
+            if (flag.ValueType != ValueType.Boolean) ThrowTypeMismatch(flagName, "boolean", flag.ValueType);
+            var val = flag.Variant?.Value;
+            if (val == null) throw new GatrixFeatureException($"Flag '{flagName}' has no boolean value");
+            if (val is bool b) return b;
+            if (val is string s) return s.ToLowerInvariant() == "true";
+            return Convert.ToBoolean(val, CultureInfo.InvariantCulture);
+        }
+
+        public string StringVariationOrThrowInternal(string flagName)
+        {
+            var flag = LookupFlagOrThrow(flagName);
+            if (flag.ValueType != ValueType.String) ThrowTypeMismatch(flagName, "string", flag.ValueType);
+            var val = flag.Variant?.Value;
+            if (val == null) throw new GatrixFeatureException($"Flag '{flagName}' has no string value");
+            return val.ToString();
+        }
+
+        public int IntVariationOrThrowInternal(string flagName)
+        {
+            var flag = LookupFlagOrThrow(flagName);
+            if (flag.ValueType != ValueType.Number) ThrowTypeMismatch(flagName, "number", flag.ValueType);
+            var val = flag.Variant?.Value;
+            if (val == null) throw new GatrixFeatureException($"Flag '{flagName}' has no number value");
+            return Convert.ToInt32(val, CultureInfo.InvariantCulture);
+        }
+
+        public float FloatVariationOrThrowInternal(string flagName)
+        {
+            var flag = LookupFlagOrThrow(flagName);
+            if (flag.ValueType != ValueType.Number) ThrowTypeMismatch(flagName, "number", flag.ValueType);
+            var val = flag.Variant?.Value;
+            if (val == null) throw new GatrixFeatureException($"Flag '{flagName}' has no number value");
+            return Convert.ToSingle(val, CultureInfo.InvariantCulture);
+        }
+
+        public double DoubleVariationOrThrowInternal(string flagName)
+        {
+            var flag = LookupFlagOrThrow(flagName);
+            if (flag.ValueType != ValueType.Number) ThrowTypeMismatch(flagName, "number", flag.ValueType);
+            var val = flag.Variant?.Value;
+            if (val == null) throw new GatrixFeatureException($"Flag '{flagName}' has no number value");
+            return Convert.ToDouble(val, CultureInfo.InvariantCulture);
+        }
+
+        public Dictionary<string, object> JsonVariationOrThrowInternal(string flagName)
+        {
+            var flag = LookupFlagOrThrow(flagName);
+            if (flag.ValueType != ValueType.Json) ThrowTypeMismatch(flagName, "json", flag.ValueType);
+            var val = flag.Variant?.Value;
+            if (val == null) throw new GatrixFeatureException($"Flag '{flagName}' has no JSON value");
+            if (val is Dictionary<string, object> dict) return dict;
+            if (val is string jsonStr)
+            {
+                var parsed = GatrixJson.DeserializeDictionary(jsonStr);
+                if (parsed != null) return parsed;
+            }
+            throw new GatrixFeatureException($"Flag '{flagName}' value is not valid JSON");
+        }
+
+        // ==================== Public Methods (delegate to internal) ====================
+
+        /// <summary>Check if a flag is enabled</summary>
+        public bool IsEnabled(string flagName) => IsEnabledInternal(flagName);
+
+        /// <summary>Get variant (never returns null)</summary>
+        public Variant GetVariant(string flagName) => GetVariantInternal(flagName);
 
         public string Variation(string flagName, string missingValue)
-            => CreateProxy(flagName).Variation(missingValue);
+            => VariationInternal(flagName, missingValue);
 
         public bool BoolVariation(string flagName, bool missingValue)
-            => CreateProxy(flagName).BoolVariation(missingValue);
+            => BoolVariationInternal(flagName, missingValue);
 
         public string StringVariation(string flagName, string missingValue)
-            => CreateProxy(flagName).StringVariation(missingValue);
-
-        public double NumberVariation(string flagName, double missingValue)
-            => CreateProxy(flagName).DoubleVariation(missingValue);
+            => StringVariationInternal(flagName, missingValue);
 
         public int IntVariation(string flagName, int missingValue)
-            => CreateProxy(flagName).IntVariation(missingValue);
+            => IntVariationInternal(flagName, missingValue);
 
         public float FloatVariation(string flagName, float missingValue)
-            => CreateProxy(flagName).FloatVariation(missingValue);
+            => FloatVariationInternal(flagName, missingValue);
 
         public double DoubleVariation(string flagName, double missingValue)
-            => CreateProxy(flagName).DoubleVariation(missingValue);
+            => DoubleVariationInternal(flagName, missingValue);
+
+        public double NumberVariation(string flagName, double missingValue)
+            => DoubleVariationInternal(flagName, missingValue);
 
         public Dictionary<string, object> JsonVariation(
             string flagName, Dictionary<string, object> missingValue)
-        {
-            var jsonStr = CreateProxy(flagName).JsonVariation(null);
-            if (jsonStr == null) return missingValue;
-            // Parse logic should be here or in FlagProxy. 
-            // In Unity FlagProxy, JsonVariation returns string.
-            return missingValue; // Placeholder for now, existing logic was just proxying.
-        }
+            => JsonVariationInternal(flagName, missingValue);
 
-        // ==================== Strict Variation Methods (OrThrow) ====================
-
+        // Strict variations - delegate
         public bool BoolVariationOrThrow(string flagName)
-            => CreateProxy(flagName).BoolVariationOrThrow();
+            => BoolVariationOrThrowInternal(flagName);
 
         public string StringVariationOrThrow(string flagName)
-            => CreateProxy(flagName).StringVariationOrThrow();
+            => StringVariationOrThrowInternal(flagName);
 
         public double NumberVariationOrThrow(string flagName)
-            => CreateProxy(flagName).NumberVariationOrThrow();
+            => DoubleVariationOrThrowInternal(flagName);
 
         public Dictionary<string, object> JsonVariationOrThrow(string flagName)
-            => CreateProxy(flagName).JsonVariationOrThrow();
+            => JsonVariationOrThrowInternal(flagName);
 
-        // ==================== Variation Details ====================
-
+        // Variation details - delegate
         public VariationResult<bool> BoolVariationDetails(string flagName, bool missingValue)
-            => CreateProxy(flagName).BoolVariationDetails(missingValue);
+            => BoolVariationDetailsInternal(flagName, missingValue);
 
         public VariationResult<string> StringVariationDetails(string flagName, string missingValue)
-            => CreateProxy(flagName).StringVariationDetails(missingValue);
+            => StringVariationDetailsInternal(flagName, missingValue);
 
-        public VariationResult<float> NumberVariationDetails(string flagName, float missingValue)
-            => CreateProxy(flagName).NumberVariationDetails(missingValue);
+        public VariationResult<double> NumberVariationDetails(string flagName, double missingValue)
+            => DoubleVariationDetailsInternal(flagName, missingValue);
 
-        public VariationResult<string> JsonVariationDetails(string flagName, string missingValue)
-            => CreateProxy(flagName).JsonVariationDetails(missingValue);
+        public VariationResult<Dictionary<string, object>> JsonVariationDetails(
+            string flagName, Dictionary<string, object> missingValue)
+            => JsonVariationDetailsInternal(flagName, missingValue);
 
         // ==================== Explicit Sync Mode ====================
 
@@ -678,7 +904,7 @@ namespace Gatrix.Unity.SDK
             GatrixEventHandler wrappedCallback = args =>
             {
                 var rawFlag = args.Length > 0 ? args[0] as EvaluatedFlag : null;
-                callback(new FlagProxy(rawFlag, HandleFlagAccess, flagName));
+                callback(new FlagProxy(rawFlag, this, flagName));
             };
             _emitter.On(eventName, wrappedCallback, name);
 
@@ -692,7 +918,7 @@ namespace Gatrix.Unity.SDK
             GatrixEventHandler wrappedCallback = args =>
             {
                 var rawFlag = args.Length > 0 ? args[0] as EvaluatedFlag : null;
-                callback(new FlagProxy(rawFlag, HandleFlagAccess, flagName));
+                callback(new FlagProxy(rawFlag, this, flagName));
             };
             _emitter.On(eventName, wrappedCallback, name);
 
@@ -701,7 +927,7 @@ namespace Gatrix.Unity.SDK
             {
                 var flags = SelectFlags();
                 flags.TryGetValue(flagName, out var flag);
-                callback(new FlagProxy(flag, HandleFlagAccess, flagName));
+                callback(new FlagProxy(flag, this, flagName));
             }
             else
             {
@@ -709,7 +935,7 @@ namespace Gatrix.Unity.SDK
                 {
                     var flags = SelectFlags();
                     flags.TryGetValue(flagName, out var flag);
-                    callback(new FlagProxy(flag, HandleFlagAccess, flagName));
+                    callback(new FlagProxy(flag, this, flagName));
                 }, name != null ? $"{name}_initial" : null);
             }
 
@@ -1155,6 +1381,33 @@ namespace Gatrix.Unity.SDK
             return sessionId;
         }
 
+        /// <summary>Unified flag access tracking - metrics, stats, and impressions.</summary>
+        private void TrackFlagAccess(string flagName, EvaluatedFlag flag, string eventType, string variantName = null)
+        {
+            if (flag == null)
+            {
+                _metrics.CountMissing(flagName);
+                return;
+            }
+
+            // Metrics
+            _metrics.Count(flagName, flag.Enabled);
+            if (variantName != null)
+            {
+                _metrics.CountVariant(flagName, variantName);
+            }
+
+            // Stats
+            TrackFlagEnabledCount(flagName, flag.Enabled);
+            if (variantName != null)
+            {
+                TrackVariantCount(flagName, variantName);
+            }
+
+            // Impression
+            TrackImpression(flagName, flag.Enabled, flag, eventType, variantName);
+        }
+
         private void TrackImpression(
             string flagName, bool enabled, EvaluatedFlag flag,
             string eventType, string variantName = null)
@@ -1228,7 +1481,6 @@ namespace Gatrix.Unity.SDK
             AppendParam("environment", context.Environment);
             AppendParam("userId", context.UserId);
             AppendParam("sessionId", context.SessionId);
-            AppendParam("deviceId", context.DeviceId);
             AppendParam("currentTime", context.CurrentTime);
 
             if (context.Properties != null)
@@ -1254,8 +1506,6 @@ namespace Gatrix.Unity.SDK
             sb.Append(context.UserId ?? "");
             sb.Append('|');
             sb.Append(context.SessionId ?? "");
-            sb.Append('|');
-            sb.Append(context.DeviceId ?? "");
             sb.Append('|');
             sb.Append(context.CurrentTime ?? "");
 

@@ -63,7 +63,7 @@ float speed = GatrixBehaviour.Client.FloatVariation("game-speed", 1.0f);
 
 // Get full variant info
 Variant variant = GatrixBehaviour.Client.GetVariant("experiment-a");
-Debug.Log($"Variant: {variant.Name}, Payload: {variant.Payload}");
+Debug.Log($"Variant: {variant.Name}, Value: {variant.Value}");
 
 // Variation with details (includes reason)
 var details = GatrixBehaviour.Client.Features.BoolVariationDetails("feature-x", false);
@@ -80,17 +80,16 @@ catch (GatrixFeatureException e)
 }
 ```
 
-## FlagProxy
-
-```csharp
 // Get a FlagProxy for convenient access
-var flags = GatrixBehaviour.Client.Features;
-var allFlags = flags.GetAllFlags();
+var proxy = GatrixBehaviour.Client.GetFlag("new-ui");
+Debug.Log($"{proxy.Name}: exists={proxy.Exists}, enabled={proxy.Enabled}, variant={proxy.Variant.Name}");
 
+// You can also get proxies for all flags
+var allFlags = GatrixBehaviour.Client.GetAllFlags();
 foreach (var flag in allFlags)
 {
-    var proxy = new FlagProxy(flag);
-    Debug.Log($"{proxy.Name}: enabled={proxy.Enabled}, variant={proxy.GetVariantName()}");
+    var p = GatrixBehaviour.Client.GetFlag(flag.Name);
+    Debug.Log($"{p.Name}: {p.Enabled}");
 }
 ```
 
@@ -291,10 +290,12 @@ client.Dispose();
 | `StartAsync()` | Initialize and start the SDK |
 | `Stop()` | Stop polling and metrics |
 | `IsEnabled(flagName)` | Check if flag is enabled |
-| `GetVariant(flagName)` | Get variant (never null) |
+| `HasFlag(flagName)` | Check if flag exists in cache |
+| `GetFlag(flagName)` | Get a `FlagProxy` (factory method) |
+| `GetVariant(flagName)` | Get variant (never null, returns `$missing` if not found) |
 | `BoolVariation(flagName, default)` | Get boolean value |
 | `StringVariation(flagName, default)` | Get string value |
-| `NumberVariation(flagName, default)` | Get number value |
+| `NumberVariation(flagName, default)` | Get number value (double) |
 | `IntVariation(flagName, default)` | Get int value |
 | `FloatVariation(flagName, default)` | Get float value |
 | `JsonVariation(flagName, default)` | Get JSON as Dictionary |

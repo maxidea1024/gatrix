@@ -1,46 +1,31 @@
-// FlagProxy - Single source of truth for flag value extraction.
+// FlagProxy - Thin shell that delegates ALL variation logic to VariationProvider.
 //
-// ALL variation logic lives here. FeaturesClient delegates to FlagProxy
-// so that value extraction + metrics tracking happen in one place.
-//
-// Uses null object pattern: _flag is never null.
-// MISSING_FLAG sentinel is used for non-existent flags.
-//
-// OnAccess callback is invoked on every variation/Enabled call, enabling
-// consistent metrics tracking regardless of how FlagProxy is obtained.
-//
-// Type safety: ValueType is checked strictly to prevent misuse.
+// Architecture per CLIENT_SDK_SPEC:
+// - Property accessors: enabled/variant delegate to client for metrics tracking.
+//   Other properties read flag data directly (read-only).
+// - ALL variation / details / orThrow methods delegate to VariationProvider (FeaturesClient).
+// - No type checking logic here - that's the VariationProvider's job.
+// - Client is always present (never null).
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 
 namespace Gatrix.Unity.SDK
 {
     /// <summary>
-    /// Callback invoked on every variation/Enabled call.
-    /// </summary>
-    /// <param name="flagName">Name of the flag</param>
-    /// <param name="flag">The flag object (null = missing)</param>
-    /// <param name="eventType">'isEnabled' for bool, 'getVariant' for value variations</param>
-    /// <param name="variantName">Variant name (for getVariant events)</param>
-    public delegate void FlagAccessCallback(
-        string flagName, EvaluatedFlag flag, string eventType, string variantName);
-
-    /// <summary>
     /// Convenience wrapper for accessing flag values.
-    /// All variation methods return missing values when flag is not found.
+    /// Delegates all variation logic to FeaturesClient via *Internal methods.
     /// </summary>
     public class FlagProxy
     {
-        private static readonly Variant MissingVariant = new Variant
+        internal static readonly Variant MissingVariant = new Variant
         {
             Name = "$missing",
             Enabled = false,
             Value = null
         };
 
-        private static readonly EvaluatedFlag MissingFlag = new EvaluatedFlag
+        internal static readonly EvaluatedFlag MissingFlag = new EvaluatedFlag
         {
             Name = "",
             Enabled = false,
@@ -52,238 +37,104 @@ namespace Gatrix.Unity.SDK
 
         private readonly EvaluatedFlag _flag;
         private readonly bool _exists;
-        private readonly FlagAccessCallback _onAccess;
+        private readonly IVariationProvider _client;
         private readonly string _flagName;
 
-        public FlagProxy(EvaluatedFlag flag, FlagAccessCallback onAccess = null, string flagName = null)
+        public FlagProxy(EvaluatedFlag flag, IVariationProvider client, string flagName)
         {
             _exists = flag != null;
             _flag = flag ?? MissingFlag;
-            _onAccess = onAccess;
+            _client = client;
             _flagName = flagName ?? _flag.Name;
         }
 
-        #region Props
+        #region Properties
+
         public bool Exists => _exists;
         public string Name => _flagName;
 
-        /// <summary>Check if flag is enabled. Triggers metrics.</summary>
-        public bool IsEnabled()
-        {
-            TrackAccess("isEnabled");
-            return _flag.Enabled;
-        }
+        /// <summary>Check if flag is enabled. Delegates to client for metrics tracking.</summary>
+        public bool Enabled => _client.IsEnabledInternal(_flagName);
 
-        public Variant Variant => _flag.Variant;
+        /// <summary>Get variant object. Delegates to client for metrics tracking.</summary>
+        public Variant Variant => _client.GetVariantInternal(_flagName);
+
+        // Read-only metadata (no metrics needed)
         public ValueType ValueType => _flag.ValueType;
         public int Version => _flag.Version;
         public string Reason => _flag.Reason;
         public bool ImpressionData => _flag.ImpressionData;
         public EvaluatedFlag Raw => _exists ? _flag : null;
+
         #endregion
 
-        #region Variations (Single Source of Truth)
+        #region Variations (pure delegation)
 
         public string Variation(string missingValue)
-        {
-            TrackAccess("getVariant");
-            return _exists ? _flag.Variant.Name : missingValue;
-        }
+            => _client.VariationInternal(_flagName, missingValue);
 
         public bool BoolVariation(bool missingValue)
-        {
-            TrackAccess("getVariant");
-            if (!_exists) return missingValue;
-
-            // Strict: ValueType must be Boolean
-            if (_flag.ValueType != ValueType.None && _flag.ValueType != ValueType.Boolean)
-                return missingValue;
-
-            object value = _flag.Variant.Value;
-            if (value == null) return missingValue;
-
-            if (value is bool b) return b;
-            if (value is string s) return s.ToLowerInvariant() == "true";
-            
-            try {
-                return Convert.ToBoolean(value, CultureInfo.InvariantCulture);
-            } catch {
-                return missingValue;
-            }
-        }
-
-        public int IntVariation(int missingValue)
-        {
-            TrackAccess("getVariant");
-            if (!_exists) return missingValue;
-
-            // Strict: ValueType must be Number
-            if (_flag.ValueType != ValueType.None && _flag.ValueType != ValueType.Number)
-                return missingValue;
-
-            object value = _flag.Variant.Value;
-            if (value == null) return missingValue;
-
-            try {
-                return Convert.ToInt32(value, CultureInfo.InvariantCulture);
-            } catch {
-                return missingValue;
-            }
-        }
-
-        public float FloatVariation(float missingValue)
-        {
-            TrackAccess("getVariant");
-            if (!_exists) return missingValue;
-
-            // Strict: ValueType must be Number
-            if (_flag.ValueType != ValueType.None && _flag.ValueType != ValueType.Number)
-                return missingValue;
-
-            object value = _flag.Variant.Value;
-            if (value == null) return missingValue;
-
-            try {
-                return Convert.ToSingle(value, CultureInfo.InvariantCulture);
-            } catch {
-                return missingValue;
-            }
-        }
-
-        public double DoubleVariation(double missingValue)
-        {
-            TrackAccess("getVariant");
-            if (!_exists) return missingValue;
-
-            // Strict: ValueType must be Number
-            if (_flag.ValueType != ValueType.None && _flag.ValueType != ValueType.Number)
-                return missingValue;
-
-            object value = _flag.Variant.Value;
-            if (value == null) return missingValue;
-
-            try {
-                return Convert.ToDouble(value, CultureInfo.InvariantCulture);
-            } catch {
-                return missingValue;
-            }
-        }
+            => _client.BoolVariationInternal(_flagName, missingValue);
 
         public string StringVariation(string missingValue)
-        {
-            TrackAccess("getVariant");
-            if (!_exists) return missingValue;
+            => _client.StringVariationInternal(_flagName, missingValue);
 
-            // Strict: ValueType must be String
-            if (_flag.ValueType != ValueType.None && _flag.ValueType != ValueType.String)
-                return missingValue;
+        public int IntVariation(int missingValue)
+            => _client.IntVariationInternal(_flagName, missingValue);
 
-            object value = _flag.Variant.Value;
-            return value != null ? value.ToString() : missingValue;
-        }
+        public float FloatVariation(float missingValue)
+            => _client.FloatVariationInternal(_flagName, missingValue);
 
-        public float NumberVariation(float missingValue)
-        {
-            return FloatVariation(missingValue);
-        }
+        public double DoubleVariation(double missingValue)
+            => _client.DoubleVariationInternal(_flagName, missingValue);
 
-        public string JsonVariation(string missingValue)
-        {
-            TrackAccess("getVariant");
-            if (!_exists) return missingValue;
-
-            // Strict: ValueType must be Json
-            if (_flag.ValueType != ValueType.None && _flag.ValueType != ValueType.Json)
-                return missingValue;
-
-            object value = _flag.Variant.Value;
-            return value != null ? value.ToString() : missingValue;
-        }
+        public Dictionary<string, object> JsonVariation(Dictionary<string, object> missingValue)
+            => _client.JsonVariationInternal(_flagName, missingValue);
 
         #endregion
 
-        #region Variation Details
+        #region Variation Details (pure delegation)
 
         public VariationResult<bool> BoolVariationDetails(bool missingValue)
-        {
-            bool val = BoolVariation(missingValue);
-            return new VariationResult<bool>
-            {
-                Value = val,
-                Reason = GetResultReason(ValueType.Boolean),
-                FlagExists = _exists,
-                Enabled = _flag.Enabled
-            };
-        }
+            => _client.BoolVariationDetailsInternal(_flagName, missingValue);
 
         public VariationResult<string> StringVariationDetails(string missingValue)
-        {
-            string val = StringVariation(missingValue);
-            return new VariationResult<string>
-            {
-                Value = val,
-                Reason = GetResultReason(ValueType.String),
-                FlagExists = _exists,
-                Enabled = _flag.Enabled
-            };
-        }
+            => _client.StringVariationDetailsInternal(_flagName, missingValue);
 
-        public VariationResult<float> NumberVariationDetails(float missingValue)
-        {
-            float val = NumberVariation(missingValue);
-            return new VariationResult<float>
-            {
-                Value = val,
-                Reason = GetResultReason(ValueType.Number),
-                FlagExists = _exists,
-                Enabled = _flag.Enabled
-            };
-        }
+        public VariationResult<int> IntVariationDetails(int missingValue)
+            => _client.IntVariationDetailsInternal(_flagName, missingValue);
 
-        public VariationResult<string> JsonVariationDetails(string missingValue)
-        {
-            string val = JsonVariation(missingValue);
-            return new VariationResult<string>
-            {
-                Value = val,
-                Reason = GetResultReason(ValueType.Json),
-                FlagExists = _exists,
-                Enabled = _flag.Enabled
-            };
-        }
+        public VariationResult<float> FloatVariationDetails(float missingValue)
+            => _client.FloatVariationDetailsInternal(_flagName, missingValue);
+
+        public VariationResult<double> DoubleVariationDetails(double missingValue)
+            => _client.DoubleVariationDetailsInternal(_flagName, missingValue);
+
+        public VariationResult<Dictionary<string, object>> JsonVariationDetails(Dictionary<string, object> missingValue)
+            => _client.JsonVariationDetailsInternal(_flagName, missingValue);
 
         #endregion
 
-        #region Helpers
+        #region OrThrow (pure delegation)
 
-        private void TrackAccess(string eventType)
-        {
-            if (_onAccess != null)
-            {
-                _onAccess(_flagName, _exists ? _flag : null, eventType, _flag.Variant.Name);
-            }
-        }
+        public bool BoolVariationOrThrow()
+            => _client.BoolVariationOrThrowInternal(_flagName);
 
-        private string GetResultReason(ValueType expectedType)
-        {
-            if (!_exists) return "flag_not_found";
-            if (_flag.ValueType != ValueType.None && _flag.ValueType != expectedType)
-                return "type_mismatch:expected_" + expectedType.ToString().ToLowerInvariant();
-            
-            return string.IsNullOrEmpty(_flag.Reason) ? "evaluated" : _flag.Reason;
-        }
+        public string StringVariationOrThrow()
+            => _client.StringVariationOrThrowInternal(_flagName);
+
+        public int IntVariationOrThrow()
+            => _client.IntVariationOrThrowInternal(_flagName);
+
+        public float FloatVariationOrThrow()
+            => _client.FloatVariationOrThrowInternal(_flagName);
+
+        public double DoubleVariationOrThrow()
+            => _client.DoubleVariationOrThrowInternal(_flagName);
+
+        public Dictionary<string, object> JsonVariationOrThrow()
+            => _client.JsonVariationOrThrowInternal(_flagName);
 
         #endregion
-    }
-
-    /// <summary>
-    /// Generic variation result
-    /// </summary>
-    public class VariationResult<T>
-    {
-        public T Value { get; set; }
-        public string Reason { get; set; }
-        public bool FlagExists { get; set; }
-        public bool Enabled { get; set; }
     }
 }
