@@ -517,7 +517,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
     setAutoExecutePending(false);
     try {
       // Add intentional delay for UX testing
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       const context = buildContext();
       // If no environments selected, use all available environments
@@ -927,6 +927,167 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
 
   // Shared render function for results table
   const renderResultsTable = () => {
+    // Show skeleton while evaluating
+    if (loading) {
+      return (
+        <Paper
+          variant="outlined"
+          sx={{
+            overflow: 'hidden',
+            boxShadow: '0 2px 12px rgba(0,0,0,0.1)',
+            animation: 'evalFadeIn 0.3s ease-out',
+            '@keyframes evalFadeIn': {
+              from: { opacity: 0, transform: 'translateY(12px)' },
+              to: { opacity: 1, transform: 'translateY(0)' },
+            },
+            '@keyframes evalShimmer': {
+              '0%': { backgroundPosition: '-200% 0' },
+              '100%': { backgroundPosition: '200% 0' },
+            },
+            '@keyframes evalGlow': {
+              '0%, 100%': { opacity: 0.4, boxShadow: '0 0 4px currentColor' },
+              '50%': { opacity: 1, boxShadow: '0 0 12px currentColor' },
+            },
+            '@keyframes evalBounce': {
+              '0%, 80%, 100%': { transform: 'translateY(0)' },
+              '40%': { transform: 'translateY(-4px)' },
+            },
+            '@keyframes evalScan': {
+              '0%': { left: '-30%', opacity: 0 },
+              '10%': { opacity: 1 },
+              '90%': { opacity: 1 },
+              '100%': { left: '130%', opacity: 0 },
+            },
+            '@keyframes evalBreathe': {
+              '0%, 100%': { opacity: 0.6 },
+              '50%': { opacity: 1 },
+            },
+          }}
+        >
+          {/* Top shimmer progress bar */}
+          <Box sx={{
+            height: 3,
+            background: (theme) =>
+              `linear-gradient(90deg, transparent 0%, ${theme.palette.primary.main}44 25%, ${theme.palette.primary.main} 50%, ${theme.palette.primary.main}44 75%, transparent 100%)`,
+            backgroundSize: '200% 100%',
+            animation: 'evalShimmer 1.2s infinite linear',
+          }} />
+
+          <Box sx={{ p: embedded ? 1.5 : 2 }}>
+            {/* Header with glowing dot and bouncing dots text */}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
+              <Box sx={{
+                width: 8,
+                height: 8,
+                borderRadius: '50%',
+                bgcolor: 'primary.main',
+                color: 'primary.main',
+                animation: 'evalGlow 1.2s infinite ease-in-out',
+              }} />
+              <Typography
+                variant="subtitle2"
+                color="text.secondary"
+                sx={{ display: 'flex', alignItems: 'baseline', gap: '1px' }}
+              >
+                {t('playground.evaluating')}
+                <Box component="span" sx={{ display: 'inline-flex', gap: '2px', ml: '2px' }}>
+                  {[0, 1, 2].map((d) => (
+                    <Box
+                      key={d}
+                      component="span"
+                      sx={{
+                        display: 'inline-block',
+                        width: 3,
+                        height: 3,
+                        borderRadius: '50%',
+                        bgcolor: 'text.secondary',
+                        animation: `evalBounce 1.4s infinite ease-in-out ${d * 0.16}s`,
+                      }}
+                    />
+                  ))}
+                </Box>
+              </Typography>
+            </Box>
+
+            {/* Animated rows with scanning highlight */}
+            <Stack spacing={0.75}>
+              {[0, 1, 2, 3].map((i) => (
+                <Box
+                  key={i}
+                  sx={{
+                    position: 'relative',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 2,
+                    py: 1,
+                    px: 1.5,
+                    borderRadius: 1,
+                    bgcolor: 'action.hover',
+                    opacity: 0,
+                    animation: `evalFadeIn 0.25s ease-out ${0.05 + i * 0.1}s forwards, evalBreathe 2.5s infinite ease-in-out ${i * 0.3}s`,
+                    overflow: 'hidden',
+                    '&::after': {
+                      content: '""',
+                      position: 'absolute',
+                      top: 0,
+                      left: '-30%',
+                      width: '30%',
+                      height: '100%',
+                      background: (theme) =>
+                        `linear-gradient(90deg, transparent, ${theme.palette.primary.main}15, transparent)`,
+                      animation: `evalScan 2.5s infinite ease-in-out ${0.3 + i * 0.4}s`,
+                    },
+                  }}
+                >
+                  <Box sx={{
+                    width: 18,
+                    height: 18,
+                    borderRadius: '50%',
+                    border: '2px solid',
+                    borderColor: 'divider',
+                    background: (theme) =>
+                      `linear-gradient(90deg, ${theme.palette.action.selected}, ${theme.palette.action.hover}, ${theme.palette.action.selected})`,
+                    backgroundSize: '200% 100%',
+                    animation: 'evalShimmer 2s infinite linear',
+                    flexShrink: 0,
+                  }} />
+                  <Box sx={{
+                    height: 12,
+                    borderRadius: 1,
+                    flex: `0 0 ${20 + i * 7}%`,
+                    background: (theme) =>
+                      `linear-gradient(90deg, ${theme.palette.action.selected}, ${theme.palette.action.hover}, ${theme.palette.action.selected})`,
+                    backgroundSize: '200% 100%',
+                    animation: `evalShimmer 2s infinite linear ${i * 0.15}s`,
+                  }} />
+                  <Box sx={{ ml: 'auto', display: 'flex', gap: 0.75 }}>
+                    <Box sx={{
+                      width: 48,
+                      height: 20,
+                      borderRadius: 2.5,
+                      background: (theme) =>
+                        `linear-gradient(90deg, ${theme.palette.action.selected}, ${theme.palette.action.hover}, ${theme.palette.action.selected})`,
+                      backgroundSize: '200% 100%',
+                      animation: `evalShimmer 2s infinite linear ${0.1 + i * 0.15}s`,
+                    }} />
+                    <Box sx={{
+                      width: 64,
+                      height: 20,
+                      borderRadius: 2.5,
+                      background: (theme) =>
+                        `linear-gradient(90deg, ${theme.palette.action.selected}, ${theme.palette.action.hover}, ${theme.palette.action.selected})`,
+                      backgroundSize: '200% 100%',
+                      animation: `evalShimmer 2s infinite linear ${0.2 + i * 0.15}s`,
+                    }} />
+                  </Box>
+                </Box>
+              ))}
+            </Stack>
+          </Box>
+        </Paper>
+      );
+    }
+
     if (Object.keys(results).length === 0) return null;
 
     // Get list of environments evaluated
@@ -954,7 +1115,15 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
     return (
       <Paper
         variant="outlined"
-        sx={{ p: embedded ? 1.5 : 2, boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}
+        sx={{
+          p: embedded ? 1.5 : 2,
+          boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+          animation: 'resultsAppear 0.4s ease-out',
+          '@keyframes resultsAppear': {
+            from: { opacity: 0, transform: 'translateY(8px)' },
+            to: { opacity: 1, transform: 'translateY(0)' },
+          },
+        }}
       >
         <Box
           sx={{
@@ -2253,8 +2422,9 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                 <pre
                                   style={{
                                     margin: 0,
-                                    fontSize: '12px',
-                                    fontFamily: 'monospace',
+                                    fontSize: '13px',
+                                    fontFamily: "'Consolas', 'Monaco', 'Courier New', monospace",
+                                    fontWeight: 500,
                                     color: 'var(--mui-palette-text-primary)',
                                     whiteSpace: 'pre-wrap',
                                     wordBreak: 'break-word',
@@ -2284,7 +2454,8 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                 border: '1px solid',
                                 borderColor: 'divider',
                                 borderRadius: 1,
-                                fontFamily: 'monospace',
+                                fontFamily: "'Consolas', 'Monaco', 'Courier New', monospace",
+                                fontWeight: 500,
                                 wordBreak: 'break-all',
                                 ...(innerValue === '' && { fontStyle: 'italic', color: 'text.disabled' }),
                               }}
@@ -2324,7 +2495,8 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                   border: '1px solid',
                                   borderColor: 'divider',
                                   borderRadius: 1,
-                                  fontFamily: 'monospace',
+                                  fontFamily: "'Consolas', 'Monaco', 'Courier New', monospace",
+                                  fontWeight: 500,
                                   fontStyle: 'italic',
                                   color: 'text.disabled',
                                 }}
@@ -2348,8 +2520,9 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                               <pre
                                 style={{
                                   margin: 0,
-                                  fontSize: '12px',
-                                  fontFamily: 'monospace',
+                                  fontSize: '13px',
+                                  fontFamily: "'Consolas', 'Monaco', 'Courier New', monospace",
+                                  fontWeight: 500,
                                   color: 'var(--mui-palette-text-primary)',
                                   whiteSpace: 'pre-wrap',
                                   wordBreak: 'break-word',
@@ -2378,7 +2551,8 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                               border: '1px solid',
                               borderColor: 'divider',
                               borderRadius: 1,
-                              fontFamily: 'monospace',
+                              fontFamily: "'Consolas', 'Monaco', 'Courier New', monospace",
+                              fontWeight: 500,
                               wordBreak: 'break-all',
                               ...(isEmpty && { fontStyle: 'italic', color: 'text.disabled' }),
                             }}
@@ -2491,7 +2665,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
   if (embedded) {
     return (
       <Collapse in={open} timeout={400} unmountOnExit>
-        <Box sx={{ py: 1 }}>
+        <Box sx={{ py: 1, overflow: 'hidden' }}>
           <Stack spacing={1.5}>
             {/* Context Fields - Use shared render function */}
             {renderContextFields()}

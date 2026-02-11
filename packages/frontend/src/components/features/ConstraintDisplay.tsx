@@ -465,6 +465,7 @@ export const SegmentPreview: React.FC<SegmentPreviewProps> = ({
   displayName,
   constraints,
 }) => {
+  const { t } = useTranslation();
   return (
     <Paper
       variant="outlined"
@@ -478,7 +479,7 @@ export const SegmentPreview: React.FC<SegmentPreviewProps> = ({
     >
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
         <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
-          세그먼트 조건
+          {t('featureFlags.segmentConditions')}
         </Typography>
       </Box>
       <ConstraintList constraints={constraints} />
