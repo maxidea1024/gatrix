@@ -1,25 +1,25 @@
 import 'package:collection/collection.dart';
 
-enum VariantType {
+enum ValueType {
   none,
   string,
   number,
   boolean,
   json;
 
-  static VariantType parse(String? value) {
-    if (value == null) return VariantType.none;
+  static ValueType parse(String? value) {
+    if (value == null) return ValueType.none;
     switch (value.toLowerCase()) {
       case 'string':
-        return VariantType.string;
+        return ValueType.string;
       case 'number':
-        return VariantType.number;
+        return ValueType.number;
       case 'boolean':
-        return VariantType.boolean;
+        return ValueType.boolean;
       case 'json':
-        return VariantType.json;
+        return ValueType.json;
       default:
-        return VariantType.none;
+        return ValueType.none;
     }
   }
 
@@ -31,34 +31,40 @@ enum VariantType {
 class Variant {
   final String name;
   final bool enabled;
-  final dynamic payload;
+  final dynamic value;
 
-  Variant({
+  const Variant({
     required this.name,
     required this.enabled,
-    this.payload,
+    this.value,
   });
 
   factory Variant.fromJson(Map<String, dynamic> json) {
     return Variant(
       name: json['name'] as String,
       enabled: json['enabled'] as bool,
-      payload: json['payload'],
+      value: json['value'] ?? json['payload'],
     );
   }
 
   Map<String, dynamic> toJson() => {
         'name': name,
         'enabled': enabled,
-        'payload': payload,
+        'value': value,
       };
 }
+
+/// Sentinel variant for missing flags
+const Variant missingVariant = Variant(name: r'$missing', enabled: false);
+
+/// Sentinel variant for disabled flags
+const Variant disabledVariant = Variant(name: r'$disabled', enabled: false);
 
 class EvaluatedFlag {
   final String name;
   final bool enabled;
-  final Variant? variant;
-  final VariantType variantType;
+  final Variant variant;
+  final ValueType valueType;
   final int version;
   final String? reason;
   final bool impressionData;
@@ -66,19 +72,22 @@ class EvaluatedFlag {
   EvaluatedFlag({
     required this.name,
     required this.enabled,
-    this.variant,
-    this.variantType = VariantType.none,
+    Variant? variant,
+    this.valueType = ValueType.none,
     this.version = 0,
     this.reason,
     this.impressionData = false,
-  });
+  }) : variant = variant ?? disabledVariant;
 
   factory EvaluatedFlag.fromJson(Map<String, dynamic> json) {
     return EvaluatedFlag(
       name: json['name'] as String,
       enabled: json['enabled'] as bool,
-      variant: json['variant'] != null ? Variant.fromJson(json['variant'] as Map<String, dynamic>) : null,
-      variantType: VariantType.parse(json['variantType'] as String?),
+      variant: json['variant'] != null
+          ? Variant.fromJson(json['variant'] as Map<String, dynamic>)
+          : null,
+      valueType: ValueType.parse(
+          (json['valueType'] ?? json['variantType']) as String?),
       version: json['version'] as int? ?? 0,
       reason: json['reason'] as String?,
       impressionData: json['impressionData'] as bool? ?? false,
@@ -88,13 +97,22 @@ class EvaluatedFlag {
   Map<String, dynamic> toJson() => {
         'name': name,
         'enabled': enabled,
-        'variant': variant?.toJson(),
-        'variantType': variantType.toApiString(),
+        'variant': variant.toJson(),
+        'valueType': valueType.toApiString(),
         'version': version,
         'reason': reason,
         'impressionData': impressionData,
       };
 }
+
+/// Sentinel flag for non-existent flags
+final EvaluatedFlag missingFlag = EvaluatedFlag(
+  name: '',
+  enabled: false,
+  variant: missingVariant,
+  valueType: ValueType.none,
+  version: 0,
+);
 
 class VariationResult<T> {
   final T value;
@@ -122,14 +140,12 @@ enum SdkState {
 class GatrixContext {
   String? userId;
   String? sessionId;
-  String? deviceId;
   String? currentTime;
   Map<String, dynamic>? properties;
 
   GatrixContext({
     this.userId,
     this.sessionId,
-    this.deviceId,
     this.currentTime,
     this.properties,
   });
@@ -138,7 +154,6 @@ class GatrixContext {
     final Map<String, dynamic> data = <String, dynamic>{};
     if (userId != null) data['userId'] = userId;
     if (sessionId != null) data['sessionId'] = sessionId;
-    if (deviceId != null) data['deviceId'] = deviceId;
     if (currentTime != null) data['currentTime'] = currentTime;
     if (properties != null) {
       properties!.forEach((key, value) {
@@ -154,21 +169,24 @@ class GatrixContext {
       other is GatrixContext &&
           userId == other.userId &&
           sessionId == other.sessionId &&
-          deviceId == other.deviceId &&
           currentTime == other.currentTime &&
           const DeepCollectionEquality().equals(properties, other.properties);
 
   @override
   int get hashCode =>
-      userId.hashCode ^ sessionId.hashCode ^ deviceId.hashCode ^ currentTime.hashCode ^ const DeepCollectionEquality().hash(properties);
+      userId.hashCode ^
+      sessionId.hashCode ^
+      currentTime.hashCode ^
+      const DeepCollectionEquality().hash(properties);
 
   GatrixContext clone() {
     return GatrixContext(
       userId: userId,
       sessionId: sessionId,
-      deviceId: deviceId,
       currentTime: currentTime,
-      properties: properties != null ? Map<String, dynamic>.from(properties!) : null,
+      properties: properties != null
+          ? Map<String, dynamic>.from(properties!)
+          : null,
     );
   }
 }
@@ -180,5 +198,6 @@ class GatrixException implements Exception {
   GatrixException(this.message, {this.code});
 
   @override
-  String toString() => 'GatrixException: $message ${code != null ? '($code)' : ''}';
+  String toString() =>
+      'GatrixException: $message ${code != null ? '($code)' : ''}';
 }

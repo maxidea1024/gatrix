@@ -5,4 +5,5 @@ export 'src/events.dart';
 export 'src/models.dart';
 export 'src/flag_proxy.dart';
 export 'src/features_client.dart';
+export 'src/variation_provider.dart';
 export 'widgets/gatrix_widgets.dart';

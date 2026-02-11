@@ -8,8 +8,9 @@ import 'models.dart';
 import 'events.dart';
 import 'flag_proxy.dart';
 import 'client.dart';
+import 'variation_provider.dart';
 
-class FeaturesClient {
+class FeaturesClient implements VariationProvider {
   final String _apiUrl;
   final String _apiToken;
   final String _appName;
@@ -18,19 +19,19 @@ class FeaturesClient {
   final EventEmitter _events;
   final Map<String, String>? _customHeaders;
   final String _connectionId;
-  
+
   Map<String, EvaluatedFlag> _realtimeFlags = {};
   Map<String, EvaluatedFlag> _synchronizedFlags = {};
-  
+
   final Map<String, int> _missingFlags = {};
   final List<Map<String, dynamic>> _pendingImpressions = [];
-  
+
   bool _explicitSyncMode = false;
   Timer? _pollTimer;
   Timer? _metricsTimer;
   String? _etag;
   bool _started = false;
-  
+
   // Retry/backoff state
   int _consecutiveFailures = 0;
   bool _pollingStopped = false;
@@ -40,7 +41,7 @@ class FeaturesClient {
   final List<int> _nonRetryableStatusCodes;
   final int _initialBackoffMs;
   final int _maxBackoffMs;
-  
+
   // Stats
   int _fetchCount = 0;
   int _updateCount = 0;
@@ -65,7 +66,7 @@ class FeaturesClient {
   // Debug / Storage
   final bool _enableDevMode;
   final String _cacheKeyPrefix;
-  
+
   FeaturesClient({
     required String apiUrl,
     required String apiToken,
@@ -97,26 +98,44 @@ class FeaturesClient {
         _customHeaders = customHeaders,
         _connectionId = const Uuid().v4();
 
-
   /// Log detailed debug information only when devMode is enabled
   void _devLog(String message) {
     if (_enableDevMode) {
+      // ignore: avoid_print
       print('[GatrixSDK][DEV] $message');
     }
   }
 
-  Map<String, EvaluatedFlag> get _activeFlags => _explicitSyncMode ? _synchronizedFlags : _realtimeFlags;
+  Map<String, EvaluatedFlag> get _activeFlags =>
+      _explicitSyncMode ? _synchronizedFlags : _realtimeFlags;
+
+  // ============================================================= Flag Access
 
   FlagProxy _createProxy(String flagName) {
     final flag = _activeFlags[flagName];
-    return FlagProxy(flag, _handleFlagAccess, flagName);
+    return FlagProxy(flag, client: this, flagName: flagName);
   }
 
   FlagProxy getFlag(String flagName) {
     return _createProxy(flagName);
   }
 
-  void _handleFlagAccess(String flagName, EvaluatedFlag? flag, String eventType, String? variantName) {
+  EvaluatedFlag? _getFlag(String flagName) {
+    return _activeFlags[flagName];
+  }
+
+  List<EvaluatedFlag> getAllFlags() {
+    return _activeFlags.values.toList();
+  }
+
+  bool hasFlag(String flagName) {
+    return _activeFlags.containsKey(flagName);
+  }
+
+  // ============================================================= Metrics
+
+  void _trackFlagAccess(String flagName, EvaluatedFlag? flag,
+      String eventType, [String? variantName]) {
     if (flag == null) {
       _countMissing(flagName);
       return;
@@ -124,14 +143,17 @@ class FeaturesClient {
     // Count flag access
     _flagEnabledCounts[flagName] ??= {'yes': 0, 'no': 0};
     if (flag.enabled) {
-      _flagEnabledCounts[flagName]!['yes'] = (_flagEnabledCounts[flagName]!['yes'] ?? 0) + 1;
+      _flagEnabledCounts[flagName]!['yes'] =
+          (_flagEnabledCounts[flagName]!['yes'] ?? 0) + 1;
     } else {
-      _flagEnabledCounts[flagName]!['no'] = (_flagEnabledCounts[flagName]!['no'] ?? 0) + 1;
+      _flagEnabledCounts[flagName]!['no'] =
+          (_flagEnabledCounts[flagName]!['no'] ?? 0) + 1;
     }
     // Count variant access
     if (variantName != null) {
       _flagVariantCounts[flagName] ??= {};
-      _flagVariantCounts[flagName]![variantName] = (_flagVariantCounts[flagName]![variantName] ?? 0) + 1;
+      _flagVariantCounts[flagName]![variantName] =
+          (_flagVariantCounts[flagName]![variantName] ?? 0) + 1;
     }
     // Track impression if enabled
     if (flag.impressionData) {
@@ -152,22 +174,403 @@ class FeaturesClient {
     _missingFlags[flagName] = (_missingFlags[flagName] ?? 0) + 1;
   }
 
+  // ===================================================== Internal methods
+  // These implement the VariationProvider interface.
+  // All flag lookup + value extraction + metrics tracking happen here.
+
+  @override
+  bool isEnabledInternal(String flagName) {
+    final flag = _getFlag(flagName);
+    if (flag == null) {
+      _trackFlagAccess(flagName, null, 'isEnabled');
+      return false;
+    }
+    _trackFlagAccess(flagName, flag, 'isEnabled', flag.variant.name);
+    return flag.enabled;
+  }
+
+  @override
+  Variant getVariantInternal(String flagName) {
+    final flag = _getFlag(flagName);
+    if (flag == null) {
+      _trackFlagAccess(flagName, null, 'getVariant');
+      return missingVariant;
+    }
+    _trackFlagAccess(flagName, flag, 'getVariant', flag.variant.name);
+    return flag.variant;
+  }
+
+  @override
+  String variationInternal(String flagName, String missingValue) {
+    final flag = _getFlag(flagName);
+    if (flag == null) {
+      _trackFlagAccess(flagName, null, 'getVariant');
+      return missingValue;
+    }
+    _trackFlagAccess(flagName, flag, 'getVariant', flag.variant.name);
+    return flag.variant.name;
+  }
+
+  @override
+  bool boolVariationInternal(String flagName, bool missingValue) {
+    final flag = _getFlag(flagName);
+    if (flag == null) {
+      _trackFlagAccess(flagName, null, 'getVariant');
+      return missingValue;
+    }
+    _trackFlagAccess(flagName, flag, 'getVariant', flag.variant.name);
+    if (flag.valueType != ValueType.boolean) return missingValue;
+    final val = flag.variant.value;
+    if (val == null) return missingValue;
+    if (val is bool) return val;
+    if (val is String) return val.toLowerCase() == 'true';
+    return missingValue;
+  }
+
+  @override
+  String stringVariationInternal(String flagName, String missingValue) {
+    final flag = _getFlag(flagName);
+    if (flag == null) {
+      _trackFlagAccess(flagName, null, 'getVariant');
+      return missingValue;
+    }
+    _trackFlagAccess(flagName, flag, 'getVariant', flag.variant.name);
+    if (flag.valueType != ValueType.string) return missingValue;
+    final val = flag.variant.value;
+    if (val == null) return missingValue;
+    return val.toString();
+  }
+
+  @override
+  int intVariationInternal(String flagName, int missingValue) {
+    final flag = _getFlag(flagName);
+    if (flag == null) {
+      _trackFlagAccess(flagName, null, 'getVariant');
+      return missingValue;
+    }
+    _trackFlagAccess(flagName, flag, 'getVariant', flag.variant.name);
+    if (flag.valueType != ValueType.number) return missingValue;
+    final val = flag.variant.value;
+    if (val == null) return missingValue;
+    if (val is num) return val.toInt();
+    if (val is String) return int.tryParse(val) ?? missingValue;
+    return missingValue;
+  }
+
+  @override
+  double doubleVariationInternal(String flagName, double missingValue) {
+    final flag = _getFlag(flagName);
+    if (flag == null) {
+      _trackFlagAccess(flagName, null, 'getVariant');
+      return missingValue;
+    }
+    _trackFlagAccess(flagName, flag, 'getVariant', flag.variant.name);
+    if (flag.valueType != ValueType.number) return missingValue;
+    final val = flag.variant.value;
+    if (val == null) return missingValue;
+    if (val is num) return val.toDouble();
+    if (val is String) return double.tryParse(val) ?? missingValue;
+    return missingValue;
+  }
+
+  @override
+  T jsonVariationInternal<T>(String flagName, T missingValue) {
+    final flag = _getFlag(flagName);
+    if (flag == null) {
+      _trackFlagAccess(flagName, null, 'getVariant');
+      return missingValue;
+    }
+    _trackFlagAccess(flagName, flag, 'getVariant', flag.variant.name);
+    if (flag.valueType != ValueType.json) return missingValue;
+    final val = flag.variant.value;
+    if (val == null) return missingValue;
+    if (val is T) return val;
+    // Try JSON string parsing
+    if (val is String) {
+      try {
+        final parsed = jsonDecode(val);
+        if (parsed is T) return parsed;
+      } catch (_) {}
+    }
+    return missingValue;
+  }
+
+  // --------------------------------------------- Variation details internal
+
+  VariationResult<T> _makeDetails<T>(
+      String flagName, T value, String expectedType) {
+    final flag = _getFlag(flagName);
+    final exists = flag != null;
+    var reason = (flag?.reason) ?? (exists ? 'evaluated' : 'flag_not_found');
+    if (exists && flag!.valueType.toApiString() != expectedType) {
+      reason =
+          'type_mismatch:expected_${expectedType}_got_${flag.valueType.toApiString()}';
+    }
+    return VariationResult(
+      value: value,
+      reason: reason,
+      flagExists: exists,
+      enabled: flag?.enabled ?? false,
+      variant: exists ? flag!.variant : null,
+    );
+  }
+
+  @override
+  VariationResult<bool> boolVariationDetailsInternal(
+      String flagName, bool missingValue) {
+    final value = boolVariationInternal(flagName, missingValue);
+    return _makeDetails(flagName, value, 'boolean');
+  }
+
+  @override
+  VariationResult<String> stringVariationDetailsInternal(
+      String flagName, String missingValue) {
+    final value = stringVariationInternal(flagName, missingValue);
+    return _makeDetails(flagName, value, 'string');
+  }
+
+  @override
+  VariationResult<int> intVariationDetailsInternal(
+      String flagName, int missingValue) {
+    final value = intVariationInternal(flagName, missingValue);
+    return _makeDetails(flagName, value, 'number');
+  }
+
+  @override
+  VariationResult<double> doubleVariationDetailsInternal(
+      String flagName, double missingValue) {
+    final value = doubleVariationInternal(flagName, missingValue);
+    return _makeDetails(flagName, value, 'number');
+  }
+
+  @override
+  VariationResult<T> jsonVariationDetailsInternal<T>(
+      String flagName, T missingValue) {
+    final value = jsonVariationInternal<T>(flagName, missingValue);
+    return _makeDetails(flagName, value, 'json');
+  }
+
+  // ------------------------------------------------ Or-throw internal
+
+  @override
+  bool boolVariationOrThrowInternal(String flagName) {
+    final flag = _getFlag(flagName);
+    if (flag == null) {
+      _trackFlagAccess(flagName, null, 'getVariant');
+      throw GatrixException("Flag '$flagName' not found",
+          code: 'FLAG_NOT_FOUND');
+    }
+    _trackFlagAccess(flagName, flag, 'getVariant', flag.variant.name);
+    if (flag.valueType != ValueType.boolean) {
+      throw GatrixException(
+        "Flag '$flagName' type mismatch: expected boolean, got ${flag.valueType.toApiString()}",
+        code: 'TYPE_MISMATCH',
+      );
+    }
+    final val = flag.variant.value;
+    if (val == null) {
+      throw GatrixException("Flag '$flagName' has no boolean value",
+          code: 'NO_VALUE');
+    }
+    if (val is bool) return val;
+    if (val is String) return val.toLowerCase() == 'true';
+    throw GatrixException(
+      "Flag '$flagName' value is not a valid boolean",
+      code: 'TYPE_MISMATCH',
+    );
+  }
+
+  @override
+  String stringVariationOrThrowInternal(String flagName) {
+    final flag = _getFlag(flagName);
+    if (flag == null) {
+      _trackFlagAccess(flagName, null, 'getVariant');
+      throw GatrixException("Flag '$flagName' not found",
+          code: 'FLAG_NOT_FOUND');
+    }
+    _trackFlagAccess(flagName, flag, 'getVariant', flag.variant.name);
+    if (flag.valueType != ValueType.string) {
+      throw GatrixException(
+        "Flag '$flagName' type mismatch: expected string, got ${flag.valueType.toApiString()}",
+        code: 'TYPE_MISMATCH',
+      );
+    }
+    final val = flag.variant.value;
+    if (val == null) {
+      throw GatrixException("Flag '$flagName' has no string value",
+          code: 'NO_VALUE');
+    }
+    return val.toString();
+  }
+
+  @override
+  int intVariationOrThrowInternal(String flagName) {
+    final flag = _getFlag(flagName);
+    if (flag == null) {
+      _trackFlagAccess(flagName, null, 'getVariant');
+      throw GatrixException("Flag '$flagName' not found",
+          code: 'FLAG_NOT_FOUND');
+    }
+    _trackFlagAccess(flagName, flag, 'getVariant', flag.variant.name);
+    if (flag.valueType != ValueType.number) {
+      throw GatrixException(
+        "Flag '$flagName' type mismatch: expected number, got ${flag.valueType.toApiString()}",
+        code: 'TYPE_MISMATCH',
+      );
+    }
+    final val = flag.variant.value;
+    if (val == null) {
+      throw GatrixException("Flag '$flagName' has no number value",
+          code: 'NO_VALUE');
+    }
+    if (val is num) return val.toInt();
+    if (val is String) {
+      final parsed = int.tryParse(val);
+      if (parsed != null) return parsed;
+    }
+    throw GatrixException(
+      "Flag '$flagName' value is not a valid integer",
+      code: 'TYPE_MISMATCH',
+    );
+  }
+
+  @override
+  double doubleVariationOrThrowInternal(String flagName) {
+    final flag = _getFlag(flagName);
+    if (flag == null) {
+      _trackFlagAccess(flagName, null, 'getVariant');
+      throw GatrixException("Flag '$flagName' not found",
+          code: 'FLAG_NOT_FOUND');
+    }
+    _trackFlagAccess(flagName, flag, 'getVariant', flag.variant.name);
+    if (flag.valueType != ValueType.number) {
+      throw GatrixException(
+        "Flag '$flagName' type mismatch: expected number, got ${flag.valueType.toApiString()}",
+        code: 'TYPE_MISMATCH',
+      );
+    }
+    final val = flag.variant.value;
+    if (val == null) {
+      throw GatrixException("Flag '$flagName' has no number value",
+          code: 'NO_VALUE');
+    }
+    if (val is num) return val.toDouble();
+    if (val is String) {
+      final parsed = double.tryParse(val);
+      if (parsed != null) return parsed;
+    }
+    throw GatrixException(
+      "Flag '$flagName' value is not a valid number",
+      code: 'TYPE_MISMATCH',
+    );
+  }
+
+  @override
+  T jsonVariationOrThrowInternal<T>(String flagName) {
+    final flag = _getFlag(flagName);
+    if (flag == null) {
+      _trackFlagAccess(flagName, null, 'getVariant');
+      throw GatrixException("Flag '$flagName' not found",
+          code: 'FLAG_NOT_FOUND');
+    }
+    _trackFlagAccess(flagName, flag, 'getVariant', flag.variant.name);
+    if (flag.valueType != ValueType.json) {
+      throw GatrixException(
+        "Flag '$flagName' type mismatch: expected json, got ${flag.valueType.toApiString()}",
+        code: 'TYPE_MISMATCH',
+      );
+    }
+    final val = flag.variant.value;
+    if (val == null) {
+      throw GatrixException("Flag '$flagName' has no JSON value",
+          code: 'NO_VALUE');
+    }
+    if (val is T) return val;
+    // Try JSON string parsing
+    if (val is String) {
+      try {
+        final parsed = jsonDecode(val);
+        if (parsed is T) return parsed;
+      } catch (_) {}
+    }
+    throw GatrixException(
+      "Flag '$flagName' value is not a valid object",
+      code: 'TYPE_MISMATCH',
+    );
+  }
+
+  // ============================================= Public methods (delegate)
+
+  bool isEnabled(String flagName) => isEnabledInternal(flagName);
+  Variant getVariant(String flagName) => getVariantInternal(flagName);
+  String variation(String flagName, String missingValue) =>
+      variationInternal(flagName, missingValue);
+  bool boolVariation(String flagName, bool missingValue) =>
+      boolVariationInternal(flagName, missingValue);
+  String stringVariation(String flagName, String missingValue) =>
+      stringVariationInternal(flagName, missingValue);
+  int intVariation(String flagName, int missingValue) =>
+      intVariationInternal(flagName, missingValue);
+  double doubleVariation(String flagName, double missingValue) =>
+      doubleVariationInternal(flagName, missingValue);
+  T jsonVariation<T>(String flagName, T missingValue) =>
+      jsonVariationInternal<T>(flagName, missingValue);
+
+  // Details delegates
+  VariationResult<bool> boolVariationDetails(
+          String flagName, bool missingValue) =>
+      boolVariationDetailsInternal(flagName, missingValue);
+  VariationResult<String> stringVariationDetails(
+          String flagName, String missingValue) =>
+      stringVariationDetailsInternal(flagName, missingValue);
+  VariationResult<int> intVariationDetails(
+          String flagName, int missingValue) =>
+      intVariationDetailsInternal(flagName, missingValue);
+  VariationResult<double> doubleVariationDetails(
+          String flagName, double missingValue) =>
+      doubleVariationDetailsInternal(flagName, missingValue);
+  VariationResult<T> jsonVariationDetails<T>(
+          String flagName, T missingValue) =>
+      jsonVariationDetailsInternal<T>(flagName, missingValue);
+
+  // OrThrow delegates
+  bool boolVariationOrThrow(String flagName) =>
+      boolVariationOrThrowInternal(flagName);
+  String stringVariationOrThrow(String flagName) =>
+      stringVariationOrThrowInternal(flagName);
+  int intVariationOrThrow(String flagName) =>
+      intVariationOrThrowInternal(flagName);
+  double doubleVariationOrThrow(String flagName) =>
+      doubleVariationOrThrowInternal(flagName);
+  T jsonVariationOrThrow<T>(String flagName) =>
+      jsonVariationOrThrowInternal<T>(flagName);
+
+  // ============================================= Explicit Sync
+
+  bool isExplicitSyncEnabled() => _explicitSyncMode;
+  bool hasPendingSyncFlags() =>
+      _explicitSyncMode && _realtimeFlags.isNotEmpty;
+
+  // ============================================= Storage
+
   Future<void> initFromStorage() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final flagsJson = prefs.getString('${_cacheKeyPrefix}_flags');
       _etag = prefs.getString('${_cacheKeyPrefix}_etag');
-      
+
       if (flagsJson != null) {
         final Map<String, dynamic> decoded = jsonDecode(flagsJson);
         decoded.forEach((key, value) {
           _realtimeFlags[key] = EvaluatedFlag.fromJson(value);
         });
         _synchronizedFlags = Map.from(_realtimeFlags);
-        _devLog('initFromStorage: loaded ${_realtimeFlags.length} flags from cache');
+        _devLog(
+            'initFromStorage: loaded ${_realtimeFlags.length} flags from cache');
         _events.emit(GatrixEvents.flagsInit);
       }
     } catch (e) {
+      // ignore: avoid_print
       print('Gatrix: Failed to init from storage: $e');
     }
   }
@@ -175,13 +578,20 @@ class FeaturesClient {
   Future<void> _saveToStorage() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final flagsMap = _realtimeFlags.map((key, value) => MapEntry(key, value.toJson()));
-      await prefs.setString('${_cacheKeyPrefix}_flags', jsonEncode(flagsMap));
-      if (_etag != null) await prefs.setString('${_cacheKeyPrefix}_etag', _etag!);
+      final flagsMap =
+          _realtimeFlags.map((key, value) => MapEntry(key, value.toJson()));
+      await prefs.setString(
+          '${_cacheKeyPrefix}_flags', jsonEncode(flagsMap));
+      if (_etag != null) {
+        await prefs.setString('${_cacheKeyPrefix}_etag', _etag!);
+      }
     } catch (e) {
+      // ignore: avoid_print
       print('Gatrix: Failed to save to storage: $e');
     }
   }
+
+  // ============================================= Polling
 
   /// Start polling with schedule-after-completion pattern
   void startPolling(int intervalSeconds) {
@@ -190,21 +600,21 @@ class FeaturesClient {
     _pollingStopped = false;
     _started = true;
     _devLog('startPolling: intervalMs=$_refreshIntervalMs');
-    // Initial fetch triggers the first scheduleNextRefresh on completion
   }
 
   void startMetricsReporting(int intervalSeconds) {
     _metricsTimer?.cancel();
     if (intervalSeconds <= 0) return;
-    _metricsTimer = Timer.periodic(Duration(seconds: intervalSeconds), (_) => _reportMetrics());
+    _metricsTimer = Timer.periodic(
+        Duration(seconds: intervalSeconds), (_) => _reportMetrics());
   }
 
   Future<void> _reportMetrics() async {
     if (_pendingImpressions.isEmpty && _missingFlags.isEmpty) return;
-    
+
     final impressions = List<Map<String, dynamic>>.from(_pendingImpressions);
     final missing = Map<String, int>.from(_missingFlags);
-    
+
     _pendingImpressions.clear();
     _missingFlags.clear();
 
@@ -236,27 +646,28 @@ class FeaturesClient {
     } catch (e) {
       // Restore on failure
       _pendingImpressions.addAll(impressions);
-      missing.forEach((k, v) => _missingFlags[k] = (_missingFlags[k] ?? 0) + v);
+      missing.forEach(
+          (k, v) => _missingFlags[k] = (_missingFlags[k] ?? 0) + v);
       _metricsErrorCount++;
       _events.emit(GatrixEvents.flagsMetricError, [e.toString()]);
     }
   }
 
   /// Retry metrics send with exponential backoff
-  Future<void> _retryMetrics(
-      List<Map<String, dynamic>> impressions,
-      Map<String, int> missing,
-      int attempt) async {
+  Future<void> _retryMetrics(List<Map<String, dynamic>> impressions,
+      Map<String, int> missing, int attempt) async {
     const maxRetries = 2;
     if (attempt >= maxRetries) {
       _pendingImpressions.addAll(impressions);
-      missing.forEach((k, v) => _missingFlags[k] = (_missingFlags[k] ?? 0) + v);
+      missing.forEach(
+          (k, v) => _missingFlags[k] = (_missingFlags[k] ?? 0) + v);
       _metricsErrorCount++;
       _events.emit(GatrixEvents.flagsMetricError, ['Max retries exceeded']);
       return;
     }
 
-    await Future.delayed(Duration(milliseconds: pow(2, attempt + 1).toInt() * 1000));
+    await Future.delayed(
+        Duration(milliseconds: pow(2, attempt + 1).toInt() * 1000));
 
     try {
       final headers = _buildHeaders();
@@ -278,6 +689,8 @@ class FeaturesClient {
       await _retryMetrics(impressions, missing, attempt + 1);
     }
   }
+
+  // ============================================= Fetch Flags
 
   Future<void> fetchFlags() async {
     _devLog('fetchFlags: starting fetch. etag=$_etag');
@@ -306,21 +719,22 @@ class FeaturesClient {
         _etag = response.headers['etag'];
         final data = jsonDecode(response.body);
         final List<dynamic> flagsList = data['flags'] ?? [];
-        
+
         bool changed = false;
         final newFlags = <String, EvaluatedFlag>{};
         final oldFlags = Map<String, EvaluatedFlag>.from(_realtimeFlags);
-        
+
         for (var flagJson in flagsList) {
-          final flag = EvaluatedFlag.fromJson(flagJson as Map<String, dynamic>);
+          final flag =
+              EvaluatedFlag.fromJson(flagJson as Map<String, dynamic>);
           newFlags[flag.name] = flag;
-          
+
           final oldFlag = _realtimeFlags[flag.name];
           if (oldFlag == null || oldFlag.version != flag.version) {
             changed = true;
             final changeType = oldFlag == null ? 'created' : 'updated';
-            _events.emit(GatrixEvents.flagChange(flag.name),
-                [flag, oldFlag, changeType]);
+            _events.emit(
+                GatrixEvents.flagChange(flag.name), [flag, oldFlag, changeType]);
           }
         }
 
@@ -338,7 +752,7 @@ class FeaturesClient {
 
         if (changed || _realtimeFlags.length != newFlags.length) {
           _realtimeFlags = newFlags;
-           _updateCount++;
+          _updateCount++;
           _lastUpdateTime = DateTime.now();
           if (!_explicitSyncMode) {
             _synchronizedFlags = Map.from(_realtimeFlags);
@@ -370,14 +784,16 @@ class FeaturesClient {
         _lastError = 'Non-retryable HTTP ${response.statusCode}';
         _lastErrorTime = DateTime.now();
         _pollingStopped = true;
-        _events.emit(GatrixEvents.sdkError, ['Non-retryable HTTP ${response.statusCode}']);
+        _events.emit(GatrixEvents.sdkError,
+            ['Non-retryable HTTP ${response.statusCode}']);
       } else {
         // Retryable error: schedule with backoff
         _errorCount++;
         _lastError = 'HTTP ${response.statusCode}';
         _lastErrorTime = DateTime.now();
         _consecutiveFailures++;
-        _events.emit(GatrixEvents.sdkError, ['HTTP ${response.statusCode}']);
+        _events.emit(
+            GatrixEvents.sdkError, ['HTTP ${response.statusCode}']);
         _scheduleNextRefresh();
       }
     } catch (e) {
@@ -428,8 +844,8 @@ class FeaturesClient {
     if (_context == newContext) return;
     _context.userId = newContext.userId;
     _context.sessionId = newContext.sessionId;
-    _context.deviceId = newContext.deviceId;
     _context.properties = newContext.properties;
+    _contextChangeCount++;
     await fetchFlags();
   }
 
@@ -459,15 +875,17 @@ class FeaturesClient {
       'lastRecoveryTime': _lastRecoveryTime?.toIso8601String(),
       'lastErrorTime': _lastErrorTime?.toIso8601String(),
       'flagEnabledCounts': Map<String, Map<String, int>>.from(
-        _flagEnabledCounts.map((k, v) => MapEntry(k, Map<String, int>.from(v)))),
+          _flagEnabledCounts
+              .map((k, v) => MapEntry(k, Map<String, int>.from(v)))),
       'flagVariantCounts': Map<String, Map<String, int>>.from(
-        _flagVariantCounts.map((k, v) => MapEntry(k, Map<String, int>.from(v)))),
+          _flagVariantCounts
+              .map((k, v) => MapEntry(k, Map<String, int>.from(v)))),
       'syncFlagsCount': _syncFlagsCount,
       'etag': _etag,
       'impressionCount': _impressionCount,
       'contextChangeCount': _contextChangeCount,
-      'flagLastChangedTimes': _flagLastChangedTimes.map(
-        (k, v) => MapEntry(k, v.toIso8601String())),
+      'flagLastChangedTimes':
+          _flagLastChangedTimes.map((k, v) => MapEntry(k, v.toIso8601String())),
       'metricsSentCount': _metricsSentCount,
       'metricsErrorCount': _metricsErrorCount,
       'pendingImpressions': _pendingImpressions.length,
@@ -490,5 +908,15 @@ class FeaturesClient {
       headers.addAll(_customHeaders!);
     }
     return headers;
+  }
+
+  /// Allow injecting flags for testing (bootstrap)
+  void applyBootstrapFlags(List<EvaluatedFlag> flags) {
+    for (final flag in flags) {
+      _realtimeFlags[flag.name] = flag;
+    }
+    _synchronizedFlags = Map.from(_realtimeFlags);
+    _events.emit(GatrixEvents.flagsInit);
+    _events.emit(GatrixEvents.flagsReady);
   }
 }
