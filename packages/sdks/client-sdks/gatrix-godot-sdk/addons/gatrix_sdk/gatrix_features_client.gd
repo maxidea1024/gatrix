@@ -61,7 +61,7 @@ func initialize(config: GatrixTypes.GatrixClientConfig, emitter: GatrixEventEmit
 	_emitter = emitter
 	_storage = storage
 	_scene_tree = scene_tree
-	_connection_id = _generate_uuid()
+	_connection_id = GatrixTypes.generate_uuid()
 	_stats.start_time = Time.get_unix_time_from_system()
 
 
@@ -113,50 +113,21 @@ func stop() -> void:
 
 # ==================== Flag Access ====================
 
-func is_enabled(flag_name: String) -> bool:
+func _lookup_flag(flag_name: String) -> GatrixTypes.EvaluatedFlag:
 	_mutex.lock()
 	var flags = _get_active_flags()
 	var flag = flags.get(flag_name)
 	_mutex.unlock()
-
-	var result := false
-	if flag != null:
-		result = flag.enabled
-		_track_access(flag_name, result, flag.variant.name)
-		_track_impression(flag_name, result, flag.variant.name, flag)
-	else:
-		_track_missing(flag_name)
-
-	return result
+	return flag
 
 
-func get_variant(flag_name: String) -> GatrixTypes.Variant:
-	_mutex.lock()
-	var flags = _get_active_flags()
-	var flag = flags.get(flag_name)
-	_mutex.unlock()
-
-	if flag != null:
-		_track_access(flag_name, flag.enabled, flag.variant.name)
-		return flag.variant
-	else:
-		_track_missing(flag_name)
-		return GatrixTypes.Variant.disabled()
+func has_flag(flag_name: String) -> bool:
+	return _lookup_flag(flag_name) != null
 
 
 func get_flag(flag_name: String) -> GatrixFlagProxy:
-	_mutex.lock()
-	var flags = _get_active_flags()
-	var flag = flags.get(flag_name)
-	_mutex.unlock()
-
-	if flag != null:
-		_track_access(flag_name, flag.enabled, flag.variant.name)
-		_track_impression(flag_name, flag.enabled, flag.variant.name, flag)
-		return GatrixFlagProxy.new(flag)
-	else:
-		_track_missing(flag_name)
-		return GatrixFlagProxy.new(null)
+	var flag = _lookup_flag(flag_name)
+	return GatrixFlagProxy.new(flag, self, flag_name)
 
 
 func get_all_flags() -> Array:
@@ -167,75 +138,365 @@ func get_all_flags() -> Array:
 	return result
 
 
-# ==================== Variation Methods ====================
+# ==================== VariationProvider Internal Methods ====================
+# All flag lookup + value extraction + metrics tracking happen here.
 
-func bool_variation(flag_name: String, default_value: bool) -> bool:
-	var proxy := get_flag(flag_name)
-	return proxy.bool_variation(default_value)
-
-
-func string_variation(flag_name: String, default_value: String) -> String:
-	var proxy := get_flag(flag_name)
-	return proxy.string_variation(default_value)
-
-
-func number_variation(flag_name: String, default_value: float) -> float:
-	var proxy := get_flag(flag_name)
-	return proxy.number_variation(default_value)
+func is_enabled_internal(flag_name: String) -> bool:
+	var flag = _lookup_flag(flag_name)
+	if flag == null:
+		_track_flag_access(flag_name, null, "isEnabled")
+		return false
+	_track_flag_access(flag_name, flag, "isEnabled", flag.variant.name)
+	return flag.enabled
 
 
-func json_variation(flag_name: String, default_value = null):
-	var proxy := get_flag(flag_name)
-	return proxy.json_variation(default_value)
+func get_variant_internal(flag_name: String) -> GatrixTypes.Variant:
+	var flag = _lookup_flag(flag_name)
+	if flag == null:
+		_track_flag_access(flag_name, null, "getVariant")
+		return GatrixTypes.MISSING_VARIANT
+	_track_flag_access(flag_name, flag, "getVariant", flag.variant.name)
+	return flag.variant
 
 
-func variation(flag_name: String, default_value: String) -> String:
-	var proxy := get_flag(flag_name)
-	return proxy.variation(default_value)
+func variation_internal(flag_name: String, missing_value: String) -> String:
+	var flag = _lookup_flag(flag_name)
+	if flag == null:
+		_track_flag_access(flag_name, null, "getVariant")
+		return missing_value
+	_track_flag_access(flag_name, flag, "getVariant", flag.variant.name)
+	return flag.variant.name
 
 
-# ==================== Variation Details ====================
-
-func bool_variation_details(flag_name: String, default_value: bool) -> GatrixTypes.VariationResult:
-	var proxy := get_flag(flag_name)
-	return proxy.bool_variation_details(default_value)
-
-
-func string_variation_details(flag_name: String, default_value: String) -> GatrixTypes.VariationResult:
-	var proxy := get_flag(flag_name)
-	return proxy.string_variation_details(default_value)
-
-
-func number_variation_details(flag_name: String, default_value: float) -> GatrixTypes.VariationResult:
-	var proxy := get_flag(flag_name)
-	return proxy.number_variation_details(default_value)
-
-
-func json_variation_details(flag_name: String, default_value = null) -> GatrixTypes.VariationResult:
-	var proxy := get_flag(flag_name)
-	return proxy.json_variation_details(default_value)
+func bool_variation_internal(flag_name: String, missing_value: bool) -> bool:
+	var flag = _lookup_flag(flag_name)
+	if flag == null:
+		_track_flag_access(flag_name, null, "getVariant")
+		return missing_value
+	_track_flag_access(flag_name, flag, "getVariant", flag.variant.name)
+	if flag.value_type != GatrixTypes.ValueType.BOOLEAN:
+		return missing_value
+	var val = flag.variant.value
+	if val == null:
+		return missing_value
+	if val is bool:
+		return val
+	if val is String:
+		return val.to_lower() == "true"
+	return missing_value
 
 
-# ==================== Strict Variations ====================
+func string_variation_internal(flag_name: String, missing_value: String) -> String:
+	var flag = _lookup_flag(flag_name)
+	if flag == null:
+		_track_flag_access(flag_name, null, "getVariant")
+		return missing_value
+	_track_flag_access(flag_name, flag, "getVariant", flag.variant.name)
+	if flag.value_type != GatrixTypes.ValueType.STRING:
+		return missing_value
+	var val = flag.variant.value
+	if val == null:
+		return missing_value
+	return str(val)
 
+
+func int_variation_internal(flag_name: String, missing_value: int) -> int:
+	var flag = _lookup_flag(flag_name)
+	if flag == null:
+		_track_flag_access(flag_name, null, "getVariant")
+		return missing_value
+	_track_flag_access(flag_name, flag, "getVariant", flag.variant.name)
+	if flag.value_type != GatrixTypes.ValueType.NUMBER:
+		return missing_value
+	var val = flag.variant.value
+	if val == null:
+		return missing_value
+	if val is int or val is float:
+		return int(val)
+	if val is String and val.is_valid_int():
+		return val.to_int()
+	return missing_value
+
+
+func float_variation_internal(flag_name: String, missing_value: float) -> float:
+	var flag = _lookup_flag(flag_name)
+	if flag == null:
+		_track_flag_access(flag_name, null, "getVariant")
+		return missing_value
+	_track_flag_access(flag_name, flag, "getVariant", flag.variant.name)
+	if flag.value_type != GatrixTypes.ValueType.NUMBER:
+		return missing_value
+	var val = flag.variant.value
+	if val == null:
+		return missing_value
+	if val is int or val is float:
+		return float(val)
+	if val is String and val.is_valid_float():
+		return val.to_float()
+	return missing_value
+
+
+func json_variation_internal(flag_name: String, missing_value = null):
+	var flag = _lookup_flag(flag_name)
+	if flag == null:
+		_track_flag_access(flag_name, null, "getVariant")
+		return missing_value
+	_track_flag_access(flag_name, flag, "getVariant", flag.variant.name)
+	if flag.value_type != GatrixTypes.ValueType.JSON:
+		return missing_value
+	var val = flag.variant.value
+	if val == null:
+		return missing_value
+	if val is Dictionary or val is Array:
+		return val
+	# Try JSON string parsing
+	if val is String:
+		var json := JSON.new()
+		if json.parse(val) == OK:
+			return json.data
+	return missing_value
+
+
+# -------------------- Variation Details Internal --------------------
+
+func _make_details(flag_name: String, value, expected_type: String) -> GatrixTypes.VariationResult:
+	var flag = _lookup_flag(flag_name)
+	var exists := flag != null
+	var r := flag.reason if exists else "flag_not_found"
+	if exists and GatrixTypes.EvaluatedFlag._value_type_to_string(flag.value_type) != expected_type:
+		r = "type_mismatch:expected_%s_got_%s" % [expected_type, GatrixTypes.EvaluatedFlag._value_type_to_string(flag.value_type)]
+	return GatrixTypes.VariationResult.new(
+		value, r, exists, flag.enabled if exists else false, flag.variant if exists else null
+	)
+
+
+func bool_variation_details_internal(flag_name: String, missing_value: bool) -> GatrixTypes.VariationResult:
+	var value := bool_variation_internal(flag_name, missing_value)
+	return _make_details(flag_name, value, "boolean")
+
+
+func string_variation_details_internal(flag_name: String, missing_value: String) -> GatrixTypes.VariationResult:
+	var value := string_variation_internal(flag_name, missing_value)
+	return _make_details(flag_name, value, "string")
+
+
+func int_variation_details_internal(flag_name: String, missing_value: int) -> GatrixTypes.VariationResult:
+	var value := int_variation_internal(flag_name, missing_value)
+	return _make_details(flag_name, value, "number")
+
+
+func float_variation_details_internal(flag_name: String, missing_value: float) -> GatrixTypes.VariationResult:
+	var value := float_variation_internal(flag_name, missing_value)
+	return _make_details(flag_name, value, "number")
+
+
+func json_variation_details_internal(flag_name: String, missing_value = null) -> GatrixTypes.VariationResult:
+	var value = json_variation_internal(flag_name, missing_value)
+	return _make_details(flag_name, value, "json")
+
+
+# -------------------- OrThrow Internal --------------------
+
+func bool_variation_or_throw_internal(flag_name: String) -> bool:
+	var flag = _lookup_flag(flag_name)
+	if flag == null:
+		_track_flag_access(flag_name, null, "getVariant")
+		push_error("[GatrixSDK] Flag '%s' not found" % flag_name)
+		assert(false, "GatrixFeatureError: flag not found")
+		return false
+	_track_flag_access(flag_name, flag, "getVariant", flag.variant.name)
+	if flag.value_type != GatrixTypes.ValueType.BOOLEAN:
+		push_error("[GatrixSDK] Flag '%s' type mismatch: expected boolean, got %s" % [flag_name, GatrixTypes.EvaluatedFlag._value_type_to_string(flag.value_type)])
+		assert(false, "GatrixFeatureError: type mismatch")
+		return false
+	var val = flag.variant.value
+	if val == null:
+		push_error("[GatrixSDK] Flag '%s' has no boolean value" % flag_name)
+		assert(false, "GatrixFeatureError: no value")
+		return false
+	if val is bool:
+		return val
+	if val is String:
+		return val.to_lower() == "true"
+	push_error("[GatrixSDK] Flag '%s' value is not a valid boolean" % flag_name)
+	assert(false, "GatrixFeatureError: invalid boolean")
+	return false
+
+
+func string_variation_or_throw_internal(flag_name: String) -> String:
+	var flag = _lookup_flag(flag_name)
+	if flag == null:
+		_track_flag_access(flag_name, null, "getVariant")
+		push_error("[GatrixSDK] Flag '%s' not found" % flag_name)
+		assert(false, "GatrixFeatureError: flag not found")
+		return ""
+	_track_flag_access(flag_name, flag, "getVariant", flag.variant.name)
+	if flag.value_type != GatrixTypes.ValueType.STRING:
+		push_error("[GatrixSDK] Flag '%s' type mismatch: expected string, got %s" % [flag_name, GatrixTypes.EvaluatedFlag._value_type_to_string(flag.value_type)])
+		assert(false, "GatrixFeatureError: type mismatch")
+		return ""
+	var val = flag.variant.value
+	if val == null:
+		push_error("[GatrixSDK] Flag '%s' has no string value" % flag_name)
+		assert(false, "GatrixFeatureError: no value")
+		return ""
+	return str(val)
+
+
+func int_variation_or_throw_internal(flag_name: String) -> int:
+	var flag = _lookup_flag(flag_name)
+	if flag == null:
+		_track_flag_access(flag_name, null, "getVariant")
+		push_error("[GatrixSDK] Flag '%s' not found" % flag_name)
+		assert(false, "GatrixFeatureError: flag not found")
+		return 0
+	_track_flag_access(flag_name, flag, "getVariant", flag.variant.name)
+	if flag.value_type != GatrixTypes.ValueType.NUMBER:
+		push_error("[GatrixSDK] Flag '%s' type mismatch: expected number, got %s" % [flag_name, GatrixTypes.EvaluatedFlag._value_type_to_string(flag.value_type)])
+		assert(false, "GatrixFeatureError: type mismatch")
+		return 0
+	var val = flag.variant.value
+	if val == null:
+		push_error("[GatrixSDK] Flag '%s' has no number value" % flag_name)
+		assert(false, "GatrixFeatureError: no value")
+		return 0
+	if val is int or val is float:
+		return int(val)
+	if val is String and val.is_valid_int():
+		return val.to_int()
+	push_error("[GatrixSDK] Flag '%s' value is not a valid integer" % flag_name)
+	assert(false, "GatrixFeatureError: invalid integer")
+	return 0
+
+
+func float_variation_or_throw_internal(flag_name: String) -> float:
+	var flag = _lookup_flag(flag_name)
+	if flag == null:
+		_track_flag_access(flag_name, null, "getVariant")
+		push_error("[GatrixSDK] Flag '%s' not found" % flag_name)
+		assert(false, "GatrixFeatureError: flag not found")
+		return 0.0
+	_track_flag_access(flag_name, flag, "getVariant", flag.variant.name)
+	if flag.value_type != GatrixTypes.ValueType.NUMBER:
+		push_error("[GatrixSDK] Flag '%s' type mismatch: expected number, got %s" % [flag_name, GatrixTypes.EvaluatedFlag._value_type_to_string(flag.value_type)])
+		assert(false, "GatrixFeatureError: type mismatch")
+		return 0.0
+	var val = flag.variant.value
+	if val == null:
+		push_error("[GatrixSDK] Flag '%s' has no number value" % flag_name)
+		assert(false, "GatrixFeatureError: no value")
+		return 0.0
+	if val is int or val is float:
+		return float(val)
+	if val is String and val.is_valid_float():
+		return val.to_float()
+	push_error("[GatrixSDK] Flag '%s' value is not a valid number" % flag_name)
+	assert(false, "GatrixFeatureError: invalid number")
+	return 0.0
+
+
+func json_variation_or_throw_internal(flag_name: String):
+	var flag = _lookup_flag(flag_name)
+	if flag == null:
+		_track_flag_access(flag_name, null, "getVariant")
+		push_error("[GatrixSDK] Flag '%s' not found" % flag_name)
+		assert(false, "GatrixFeatureError: flag not found")
+		return null
+	_track_flag_access(flag_name, flag, "getVariant", flag.variant.name)
+	if flag.value_type != GatrixTypes.ValueType.JSON:
+		push_error("[GatrixSDK] Flag '%s' type mismatch: expected json, got %s" % [flag_name, GatrixTypes.EvaluatedFlag._value_type_to_string(flag.value_type)])
+		assert(false, "GatrixFeatureError: type mismatch")
+		return null
+	var val = flag.variant.value
+	if val == null:
+		push_error("[GatrixSDK] Flag '%s' has no JSON value" % flag_name)
+		assert(false, "GatrixFeatureError: no value")
+		return null
+	if val is Dictionary or val is Array:
+		return val
+	if val is String:
+		var json := JSON.new()
+		if json.parse(val) == OK:
+			return json.data
+	push_error("[GatrixSDK] Flag '%s' value is not valid JSON" % flag_name)
+	assert(false, "GatrixFeatureError: invalid JSON")
+	return null
+
+
+# ==================== Public Methods (delegate to internal) ====================
+
+func is_enabled(flag_name: String) -> bool:
+	return is_enabled_internal(flag_name)
+
+
+func get_variant(flag_name: String) -> GatrixTypes.Variant:
+	return get_variant_internal(flag_name)
+
+
+func variation(flag_name: String, missing_value: String) -> String:
+	return variation_internal(flag_name, missing_value)
+
+
+func bool_variation(flag_name: String, missing_value: bool) -> bool:
+	return bool_variation_internal(flag_name, missing_value)
+
+
+func string_variation(flag_name: String, missing_value: String) -> String:
+	return string_variation_internal(flag_name, missing_value)
+
+
+func int_variation(flag_name: String, missing_value: int) -> int:
+	return int_variation_internal(flag_name, missing_value)
+
+
+func float_variation(flag_name: String, missing_value: float) -> float:
+	return float_variation_internal(flag_name, missing_value)
+
+
+func json_variation(flag_name: String, missing_value = null):
+	return json_variation_internal(flag_name, missing_value)
+
+
+# Variation details - delegate
+func bool_variation_details(flag_name: String, missing_value: bool) -> GatrixTypes.VariationResult:
+	return bool_variation_details_internal(flag_name, missing_value)
+
+
+func string_variation_details(flag_name: String, missing_value: String) -> GatrixTypes.VariationResult:
+	return string_variation_details_internal(flag_name, missing_value)
+
+
+func int_variation_details(flag_name: String, missing_value: int) -> GatrixTypes.VariationResult:
+	return int_variation_details_internal(flag_name, missing_value)
+
+
+func float_variation_details(flag_name: String, missing_value: float) -> GatrixTypes.VariationResult:
+	return float_variation_details_internal(flag_name, missing_value)
+
+
+func json_variation_details(flag_name: String, missing_value = null) -> GatrixTypes.VariationResult:
+	return json_variation_details_internal(flag_name, missing_value)
+
+
+# OrThrow - delegate
 func bool_variation_or_throw(flag_name: String) -> bool:
-	var proxy := get_flag(flag_name)
-	return proxy.bool_variation_or_throw()
+	return bool_variation_or_throw_internal(flag_name)
 
 
 func string_variation_or_throw(flag_name: String) -> String:
-	var proxy := get_flag(flag_name)
-	return proxy.string_variation_or_throw()
+	return string_variation_or_throw_internal(flag_name)
 
 
-func number_variation_or_throw(flag_name: String) -> float:
-	var proxy := get_flag(flag_name)
-	return proxy.number_variation_or_throw()
+func int_variation_or_throw(flag_name: String) -> int:
+	return int_variation_or_throw_internal(flag_name)
+
+
+func float_variation_or_throw(flag_name: String) -> float:
+	return float_variation_or_throw_internal(flag_name)
 
 
 func json_variation_or_throw(flag_name: String):
-	var proxy := get_flag(flag_name)
-	return proxy.json_variation_or_throw()
+	return json_variation_or_throw_internal(flag_name)
 
 
 # ==================== Context ====================
@@ -602,7 +863,7 @@ func _emit_flag_changes(old_flags: Dictionary, new_flags: Dictionary) -> void:
 					[new_flag, old_flag, change_type])
 
 			# Notify watch handlers
-			var proxy := GatrixFlagProxy.new(new_flag)
+			var proxy := GatrixFlagProxy.new(new_flag, self, flag_name)
 			for handle in _watch_handles:
 				var watcher = _watch_handles[handle]
 				if watcher.flag_name == flag_name:
@@ -664,42 +925,50 @@ func _stop_polling() -> void:
 
 # ==================== Metrics ====================
 
-func _track_access(flag_name: String, enabled: bool, variant_name: String) -> void:
-	if _config.disable_metrics:
+func _track_flag_access(flag_name: String, flag, event_type: String, variant_name := "") -> void:
+	if flag == null:
+		_track_missing(flag_name)
 		return
 
-	_metrics_mutex.lock()
-	if not _metrics_flag_access.has(flag_name):
-		_metrics_flag_access[flag_name] = { "yes": 0, "no": 0, "variants": {} }
+	var is_enabled: bool = flag.enabled
 
-	var entry = _metrics_flag_access[flag_name]
-	if enabled:
-		entry["yes"] += 1
-	else:
-		entry["no"] += 1
+	# Metrics
+	if not _config.disable_metrics:
+		_metrics_mutex.lock()
+		if not _metrics_flag_access.has(flag_name):
+			_metrics_flag_access[flag_name] = { "yes": 0, "no": 0, "variants": {} }
 
-	if variant_name != "" and variant_name != "disabled":
-		if not entry["variants"].has(variant_name):
-			entry["variants"][variant_name] = 0
-		entry["variants"][variant_name] += 1
+		var entry = _metrics_flag_access[flag_name]
+		if is_enabled:
+			entry["yes"] += 1
+		else:
+			entry["no"] += 1
+
+		if variant_name != "":
+			if not entry["variants"].has(variant_name):
+				entry["variants"][variant_name] = 0
+			entry["variants"][variant_name] += 1
+		_metrics_mutex.unlock()
 
 	# Stats
 	if not _config.disable_stats:
 		if not _stats.flag_enabled_counts.has(flag_name):
 			_stats.flag_enabled_counts[flag_name] = { "yes": 0, "no": 0 }
-		if enabled:
+		if is_enabled:
 			_stats.flag_enabled_counts[flag_name]["yes"] += 1
 		else:
 			_stats.flag_enabled_counts[flag_name]["no"] += 1
 
-		if variant_name != "" and variant_name != "disabled":
+		if variant_name != "":
 			if not _stats.flag_variant_counts.has(flag_name):
 				_stats.flag_variant_counts[flag_name] = {}
 			if not _stats.flag_variant_counts[flag_name].has(variant_name):
 				_stats.flag_variant_counts[flag_name][variant_name] = 0
 			_stats.flag_variant_counts[flag_name][variant_name] += 1
 
-	_metrics_mutex.unlock()
+	# Impression
+	if flag.impression_data or _config.impression_data_all:
+		_track_impression(flag_name, is_enabled, variant_name, flag)
 
 
 func _track_missing(flag_name: String) -> void:
@@ -727,7 +996,7 @@ func _track_impression(flag_name: String, enabled: bool, variant_name: String,
 
 	var event := GatrixTypes.ImpressionEvent.new()
 	event.event_type = "isEnabled"
-	event.event_id = _generate_uuid()
+	event.event_id = GatrixTypes.generate_uuid()
 	event.context = _config.context
 	event.enabled = enabled
 	event.feature_name = flag_name
@@ -864,15 +1133,3 @@ func _build_metrics_payload() -> String:
 	return JSON.stringify(payload)
 
 
-func _generate_uuid() -> String:
-	var uuid := ""
-	var chars := "0123456789abcdef"
-	var pattern := "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"
-	for c in pattern:
-		if c == "x":
-			uuid += chars[randi() % 16]
-		elif c == "y":
-			uuid += chars[(randi() % 4) + 8]
-		else:
-			uuid += c
-	return uuid

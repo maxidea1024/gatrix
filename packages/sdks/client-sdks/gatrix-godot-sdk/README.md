@@ -42,7 +42,7 @@ if GatrixClient.is_enabled("dark-mode"):
     apply_dark_mode()
 
 # Typed variations (with required default values)
-var speed := GatrixClient.number_variation("game-speed", 1.0)
+var speed := GatrixClient.float_variation("game-speed", 1.0)
 var welcome := GatrixClient.string_variation("welcome-message", "Hello!")
 var ui_config = GatrixClient.json_variation("ui-config", { "theme": "default" })
 
@@ -50,7 +50,7 @@ var ui_config = GatrixClient.json_variation("ui-config", { "theme": "default" })
 var flag := GatrixClient.get_flag("my-feature")
 if flag.exists and flag.enabled:
     print("Variant: ", flag.variant.name)
-    print("Payload: ", flag.string_variation("fallback"))
+    print("Value: ", flag.string_variation("fallback"))
 ```
 
 ## Variation Details
@@ -67,7 +67,7 @@ print("Enabled: ", result.enabled)
 
 ```gdscript
 # These will assert/error if flag not found or disabled
-var speed := GatrixClient.number_variation_or_throw("game-speed")
+var speed := GatrixClient.float_variation_or_throw("game-speed")
 var config = GatrixClient.json_variation_or_throw("game-config")
 ```
 
@@ -81,7 +81,7 @@ var unwatch := GatrixClient.watch_flag("my-feature", func(flag: GatrixFlagProxy)
 
 # Watch with immediate initial state
 var unwatch2 := GatrixClient.watch_flag_with_initial_state("speed", func(flag: GatrixFlagProxy):
-    player.speed = flag.number_variation(5.0)
+    player.speed = flag.float_variation(5.0)
 )
 
 # Stop watching
@@ -95,7 +95,7 @@ unwatch.call()
 var group := GatrixWatchFlagGroup.new(GatrixClient.get_features(), "gameplay")
 
 group.watch_flag("speed", func(flag: GatrixFlagProxy):
-    player.speed = flag.number_variation(5.0)
+    player.speed = flag.float_variation(5.0)
 ).watch_flag("dark-mode", func(flag: GatrixFlagProxy):
     apply_theme("dark" if flag.enabled else "light")
 )

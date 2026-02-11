@@ -77,7 +77,7 @@ func init_sdk(config: GatrixTypes.GatrixClientConfig, storage: GatrixStorageProv
 
 	# Auto-generate sessionId if not set
 	if config.context.session_id == "":
-		config.context.session_id = _generate_uuid()
+		config.context.session_id = GatrixTypes.generate_uuid()
 
 	# Create features client
 	_features = GatrixFeaturesClient.new()
@@ -149,10 +149,16 @@ func string_variation(flag_name: String, default_value: String) -> String:
 	return _features.string_variation(flag_name, default_value)
 
 
-## Get number variation.
-func number_variation(flag_name: String, default_value: float) -> float:
+## Get int variation.
+func int_variation(flag_name: String, missing_value: int) -> int:
 	assert(_initialized, "GatrixSDK: Not initialized")
-	return _features.number_variation(flag_name, default_value)
+	return _features.int_variation(flag_name, missing_value)
+
+
+## Get float variation.
+func float_variation(flag_name: String, missing_value: float) -> float:
+	assert(_initialized, "GatrixSDK: Not initialized")
+	return _features.float_variation(flag_name, missing_value)
 
 
 ## Get JSON variation (returns Dictionary or Array).
@@ -191,9 +197,14 @@ func string_variation_details(flag_name: String, default_value: String) -> Gatri
 	return _features.string_variation_details(flag_name, default_value)
 
 
-func number_variation_details(flag_name: String, default_value: float) -> GatrixTypes.VariationResult:
+func int_variation_details(flag_name: String, missing_value: int) -> GatrixTypes.VariationResult:
 	assert(_initialized, "GatrixSDK: Not initialized")
-	return _features.number_variation_details(flag_name, default_value)
+	return _features.int_variation_details(flag_name, missing_value)
+
+
+func float_variation_details(flag_name: String, missing_value: float) -> GatrixTypes.VariationResult:
+	assert(_initialized, "GatrixSDK: Not initialized")
+	return _features.float_variation_details(flag_name, missing_value)
 
 
 func json_variation_details(flag_name: String, default_value = null) -> GatrixTypes.VariationResult:
@@ -213,9 +224,14 @@ func string_variation_or_throw(flag_name: String) -> String:
 	return _features.string_variation_or_throw(flag_name)
 
 
-func number_variation_or_throw(flag_name: String) -> float:
+func int_variation_or_throw(flag_name: String) -> int:
 	assert(_initialized, "GatrixSDK: Not initialized")
-	return _features.number_variation_or_throw(flag_name)
+	return _features.int_variation_or_throw(flag_name)
+
+
+func float_variation_or_throw(flag_name: String) -> float:
+	assert(_initialized, "GatrixSDK: Not initialized")
+	return _features.float_variation_or_throw(flag_name)
 
 
 func json_variation_or_throw(flag_name: String):
@@ -316,20 +332,6 @@ static func get_events() -> Object:
 	return GatrixEvents
 
 
-# ==================== Internal ====================
-
-func _generate_uuid() -> String:
-	var uuid := ""
-	var chars := "0123456789abcdef"
-	var pattern := "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"
-	for c in pattern:
-		if c == "x":
-			uuid += chars[randi() % 16]
-		elif c == "y":
-			uuid += chars[(randi() % 4) + 8]
-		else:
-			uuid += c
-	return uuid
 
 
 func _exit_tree() -> void:

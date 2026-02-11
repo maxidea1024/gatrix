@@ -5,33 +5,43 @@ class_name GatrixTypes
 # SDK State
 enum SdkState { INITIALIZING, READY, HEALTHY, ERROR }
 
-# Variant payload type hint
-enum VariantType { NONE, STRING, NUMBER, JSON }
+# Value type for variant
+enum ValueType { NONE, BOOLEAN, STRING, NUMBER, JSON }
 
 
 # Variant information from server evaluation
 class Variant:
-	var name: String = "disabled"
+	var name: String = "$disabled"
 	var enabled: bool = false
-	var payload: String = ""
+	var value = null  # Dynamic type: bool, string, float, Dictionary, Array, or null
 
-	func _init(p_name := "disabled", p_enabled := false, p_payload := "") -> void:
+	func _init(p_name := "$disabled", p_enabled := false, p_value = null) -> void:
 		name = p_name
 		enabled = p_enabled
-		payload = p_payload
+		value = p_value
+
+	static func missing() -> Variant:
+		return Variant.new("$missing", false, null)
 
 	static func disabled() -> Variant:
-		return Variant.new("disabled", false, "")
+		return Variant.new("$disabled", false, null)
 
 	func to_dict() -> Dictionary:
-		return { "name": name, "enabled": enabled, "payload": payload }
+		return { "name": name, "enabled": enabled, "value": value }
 
 	static func from_dict(d: Dictionary) -> Variant:
+		# Support both 'value' (new) and 'payload' (legacy)
+		var val = d.get("value", d.get("payload"))
 		return Variant.new(
-			d.get("name", "disabled"),
+			d.get("name", "$disabled"),
 			d.get("enabled", false),
-			str(d.get("payload", ""))
+			val
 		)
+
+
+# Sentinel values
+static var MISSING_VARIANT := Variant.missing()
+static var DISABLED_VARIANT := Variant.disabled()
 
 
 # Evaluated feature flag from the server
@@ -39,7 +49,7 @@ class EvaluatedFlag:
 	var name: String = ""
 	var enabled: bool = false
 	var variant: Variant = Variant.disabled()
-	var variant_type: VariantType = VariantType.NONE
+	var value_type: ValueType = ValueType.NONE
 	var version: int = 0
 	var reason: String = ""
 	var impression_data: bool = false
@@ -49,7 +59,7 @@ class EvaluatedFlag:
 			"name": name,
 			"enabled": enabled,
 			"variant": variant.to_dict(),
-			"variantType": _variant_type_to_string(variant_type),
+			"valueType": _value_type_to_string(value_type),
 			"version": version,
 			"reason": reason,
 			"impressionData": impression_data,
@@ -63,8 +73,9 @@ class EvaluatedFlag:
 		flag.reason = d.get("reason", "")
 		flag.impression_data = d.get("impressionData", false)
 
-		var vt_str: String = d.get("variantType", "none")
-		flag.variant_type = _string_to_variant_type(vt_str)
+		# Support both 'valueType' (new) and 'variantType' (legacy)
+		var vt_str: String = d.get("valueType", d.get("variantType", "none"))
+		flag.value_type = _string_to_value_type(vt_str)
 
 		var v_dict = d.get("variant", {})
 		if v_dict is Dictionary:
@@ -74,26 +85,39 @@ class EvaluatedFlag:
 
 		return flag
 
-	static func _variant_type_to_string(vt: VariantType) -> String:
+	static func _value_type_to_string(vt: ValueType) -> String:
 		match vt:
-			VariantType.STRING: return "string"
-			VariantType.NUMBER: return "number"
-			VariantType.JSON: return "json"
+			ValueType.BOOLEAN: return "boolean"
+			ValueType.STRING: return "string"
+			ValueType.NUMBER: return "number"
+			ValueType.JSON: return "json"
 			_: return "none"
 
-	static func _string_to_variant_type(s: String) -> VariantType:
+	static func _string_to_value_type(s: String) -> ValueType:
 		match s.to_lower():
-			"string": return VariantType.STRING
-			"number": return VariantType.NUMBER
-			"json": return VariantType.JSON
-			_: return VariantType.NONE
+			"boolean": return ValueType.BOOLEAN
+			"string": return ValueType.STRING
+			"number": return ValueType.NUMBER
+			"json": return ValueType.JSON
+			_: return ValueType.NONE
+
+
+# Missing flag sentinel
+static var MISSING_FLAG := _create_missing_flag()
+
+static func _create_missing_flag() -> EvaluatedFlag:
+	var f := EvaluatedFlag.new()
+	f.name = ""
+	f.enabled = false
+	f.variant = Variant.missing()
+	f.value_type = ValueType.NONE
+	return f
 
 
 # Evaluation context (global for client-side)
 class GatrixContext:
 	var user_id: String = ""
 	var session_id: String = ""
-	var device_id: String = ""
 	var current_time: String = ""
 	var properties: Dictionary = {}
 
@@ -101,16 +125,15 @@ class GatrixContext:
 		var d := {}
 		if user_id != "": d["userId"] = user_id
 		if session_id != "": d["sessionId"] = session_id
-		if device_id != "": d["deviceId"] = device_id
 		if current_time != "": d["currentTime"] = current_time
-		if not properties.is_empty(): d["properties"] = properties
+		for key in properties:
+			d[key] = properties[key]
 		return d
 
 	func to_query_string() -> String:
 		var parts: PackedStringArray = []
 		if user_id != "": parts.append("userId=%s" % user_id.uri_encode())
 		if session_id != "": parts.append("sessionId=%s" % session_id.uri_encode())
-		if device_id != "": parts.append("deviceId=%s" % device_id.uri_encode())
 		if current_time != "": parts.append("currentTime=%s" % current_time.uri_encode())
 		for key in properties:
 			parts.append("properties[%s]=%s" % [key.uri_encode(), str(properties[key]).uri_encode()])
@@ -119,16 +142,18 @@ class GatrixContext:
 
 # Variation result with details
 class VariationResult:
-	var value  # Can be bool, string, float, or Variant
+	var value  # Can be bool, string, float, int, Dictionary, Array
 	var reason: String = ""
 	var flag_exists: bool = false
 	var enabled: bool = false
+	var variant: Variant = null
 
-	func _init(p_value = null, p_reason := "", p_exists := false, p_enabled := false) -> void:
+	func _init(p_value = null, p_reason := "", p_exists := false, p_enabled := false, p_variant: Variant = null) -> void:
 		value = p_value
 		reason = p_reason
 		flag_exists = p_exists
 		enabled = p_enabled
+		variant = p_variant
 
 
 # Impression event data
@@ -239,3 +264,19 @@ class FeaturesStats:
 	var flag_enabled_counts: Dictionary = {}  # flag_name -> { "yes": n, "no": n }
 	var flag_variant_counts: Dictionary = {}  # flag_name -> { variant_name: count }
 	var flag_last_changed_times: Dictionary = {}  # flag_name -> timestamp
+
+
+# ==================== Utility ====================
+
+static func generate_uuid() -> String:
+	var uuid := ""
+	var chars := "0123456789abcdef"
+	var pattern := "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"
+	for c in pattern:
+		if c == "x":
+			uuid += chars[randi() % 16]
+		elif c == "y":
+			uuid += chars[(randi() % 4) + 8]
+		else:
+			uuid += c
+	return uuid
