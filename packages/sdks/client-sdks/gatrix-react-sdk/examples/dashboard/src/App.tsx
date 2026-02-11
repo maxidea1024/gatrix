@@ -6,6 +6,7 @@ import BootScreen from './components/BootScreen';
 import DisconnectScreen from './components/DisconnectScreen';
 import ConfirmDialog from './components/ConfirmDialog';
 import IdleDefenseGame from './components/IdleDefenseGame';
+import SlotMachineGame from './components/SlotMachineGame';
 import MatrixBackground from './components/MatrixBackground';
 import LogViewer, { type LogEntry } from './components/LogViewer';
 import './styles.css';
@@ -55,7 +56,7 @@ function App() {
   const [bootComplete, setBootComplete] = useState(false);
   const [isDisconnecting, setIsDisconnecting] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
-  const [showGame, setShowGame] = useState<false | 'defense'>(false);
+  const [showGame, setShowGame] = useState<false | 'defense' | 'slot'>(false);
   const [showLogViewer, setShowLogViewer] = useState(false);
   const [, setLogVersion] = useState(0); // Force re-render on log changes
 
@@ -146,7 +147,9 @@ function App() {
         >
           <div style={{ display: 'flex', height: '100%', overflow: 'hidden' }}>
             <div style={{ flex: 1, minWidth: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-              {showGame === 'defense' ? (
+              {showGame === 'slot' ? (
+                <SlotMachineGame onExit={() => setShowGame(false)} />
+              ) : showGame === 'defense' ? (
                 <IdleDefenseGame onExit={() => setShowGame(false)} />
               ) : (
                 <div className="dashboard-container" style={{ flex: 1, overflowY: 'auto' }}>
@@ -156,6 +159,13 @@ function App() {
                       &nbsp;GATRIX FEATURE FLAGS (React SDK)
                     </h1>
                     <div style={{ display: 'flex', gap: '12px' }}>
+                      <button
+                        type="button"
+                        className="nes-btn is-warning"
+                        onClick={() => setShowGame('slot')}
+                      >
+                        🎰 SLOT SAGA
+                      </button>
                       <button
                         type="button"
                         className="nes-btn is-success"

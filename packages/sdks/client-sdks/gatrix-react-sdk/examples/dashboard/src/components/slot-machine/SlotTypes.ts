@@ -1,15 +1,15 @@
 // Slot Machine Type Definitions and Constants
 
-export type SlotSymbol = 'cherry' | 'lemon' | 'orange' | 'bell' | 'star' | 'seven' | 'diamond' | 'wild';
+export type SlotSymbol = 'cherry' | 'apple' | 'banana' | 'lemon' | 'wild';
 
 export interface SymbolConfig {
     key: SlotSymbol;
     label: string;
-    emoji: string;
+    imageFile: string; // Image filename in /assets/slot/
     color: string;
     glowColor: string;
-    payout3: number; // 3 matching = this multiplier
-    payout2: number; // 2 matching = this multiplier
+    payout3: number;
+    payout2: number;
 }
 
 export interface SlotConfig {
@@ -33,14 +33,11 @@ export interface FlagChangeLog {
 }
 
 export const SYMBOL_CONFIGS: SymbolConfig[] = [
-    { key: 'cherry', label: 'Cherry', emoji: '🍒', color: '#ff1744', glowColor: '#ff5252', payout3: 10, payout2: 3 },
-    { key: 'lemon', label: 'Lemon', emoji: '🍋', color: '#ffd600', glowColor: '#ffff00', payout3: 15, payout2: 5 },
-    { key: 'orange', label: 'Orange', emoji: '🍊', color: '#ff9100', glowColor: '#ffab40', payout3: 20, payout2: 5 },
-    { key: 'bell', label: 'Bell', emoji: '🔔', color: '#ffab00', glowColor: '#ffd740', payout3: 30, payout2: 8 },
-    { key: 'star', label: 'Star', emoji: '⭐', color: '#ffc107', glowColor: '#ffe082', payout3: 50, payout2: 10 },
-    { key: 'seven', label: 'Seven', emoji: '7️⃣', color: '#d50000', glowColor: '#ff5252', payout3: 100, payout2: 20 },
-    { key: 'diamond', label: 'Diamond', emoji: '💎', color: '#2979ff', glowColor: '#82b1ff', payout3: 200, payout2: 40 },
-    { key: 'wild', label: 'Wild', emoji: '🃏', color: '#aa00ff', glowColor: '#ea80fc', payout3: 0, payout2: 0 },
+    { key: 'cherry', label: 'Cherry', imageFile: 'cherry.png', color: '#ff1744', glowColor: '#ff5252', payout3: 10, payout2: 3 },
+    { key: 'apple', label: 'Apple', imageFile: 'apple.png', color: '#4caf50', glowColor: '#81c784', payout3: 15, payout2: 5 },
+    { key: 'banana', label: 'Banana', imageFile: 'banana.png', color: '#ffd600', glowColor: '#ffff00', payout3: 25, payout2: 8 },
+    { key: 'lemon', label: 'Lemon', imageFile: 'lemon.png', color: '#ffc107', glowColor: '#ffe082', payout3: 40, payout2: 12 },
+    { key: 'wild', label: 'Wild', imageFile: 'coin.png', color: '#ffd700', glowColor: '#ffeb3b', payout3: 0, payout2: 0 },
 ];
 
 // Symbols available for reels (without wild by default)
@@ -93,12 +90,9 @@ export const THEMES = {
 
 export type ThemeKey = keyof typeof THEMES;
 
-// Reel layout constants
-export const REEL_COLS = 3;
-export const REEL_ROWS = 3;
-export const SYMBOL_SIZE = 100;
-export const SYMBOL_GAP = 8;
-export const REEL_CELL = SYMBOL_SIZE + SYMBOL_GAP;
+// Layout constants
+export const SYM_DISPLAY = 96;
+export const CELL = 110;
 
 // Flag names (all prefixed with slot-)
 export const FLAG_NAMES = {
@@ -112,3 +106,5 @@ export const FLAG_NAMES = {
     PAYOUT_TABLE: 'slot-payout-table',
     SOUND: 'slot-sound',
 } as const;
+
+export const ASSET_PATH = '/assets/slot';
