@@ -50,7 +50,6 @@ template <typename T> struct VariationResult {
 struct GatrixContext {
   std::string userId;
   std::string sessionId;
-  std::string deviceId;
   std::string currentTime;
   std::map<std::string, std::string> properties;
 };

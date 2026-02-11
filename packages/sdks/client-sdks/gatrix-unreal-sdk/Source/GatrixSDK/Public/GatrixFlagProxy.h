@@ -7,36 +7,23 @@
 #include "GatrixFlagProxy.generated.h"
 #include "GatrixTypes.h"
 
-/**
- * Callback for flag access metrics tracking.
- * Parameters: FlagName, Flag (nullable), EventType, VariantName
- */
-DECLARE_DELEGATE_FourParams(FGatrixFlagAccessCallback,
-                            const FString & /*FlagName*/,
-                            const FGatrixEvaluatedFlag * /*Flag*/,
-                            const FString & /*EventType*/,
-                            const FString & /*VariantName*/);
+class IGatrixVariationProvider;
 
 /**
  * FlagProxy - Single source of truth for flag value extraction.
  *
- * Uses null object pattern: bExists tracks whether flag was found.
- * onAccess callback is injected by FeaturesClient for metrics tracking.
- * Type safety: ValueType is checked strictly.
- *
- * boolVariation returns variant.Value (NOT flag.bEnabled).
+ * This is a thin shell that delegates all evaluation and metrics tracking
+ * to an IGatrixVariationProvider (typically the FeaturesClient).
  */
 UCLASS(BlueprintType, Transient)
 class GATRIXSDK_API UGatrixFlagProxy : public UObject {
   GENERATED_BODY()
 
 public:
-  /** Initialize with evaluated flag data and metrics callback */
+  /** Initialize with evaluated flag data and variation provider */
   void Initialize(const FGatrixEvaluatedFlag &InFlag,
-                  const FGatrixFlagAccessCallback &InOnAccess);
-
-  /** Initialize without callback (for Blueprint/testing) */
-  void Initialize(const FGatrixEvaluatedFlag &InFlag);
+                  IGatrixVariationProvider *InProvider,
+                  const FString &InFlagName);
 
   // ==================== Basic Getters ====================
 
@@ -84,11 +71,6 @@ public:
             Category = "Gatrix|FlagProxy|Variation")
   FString StringVariation(const FString &MissingValue) const;
 
-  /** Get number variation from value */
-  UFUNCTION(BlueprintCallable, BlueprintPure,
-            Category = "Gatrix|FlagProxy|Variation")
-  float NumberVariation(float MissingValue) const;
-
   /** Get integer variation from value */
   UFUNCTION(BlueprintCallable, BlueprintPure,
             Category = "Gatrix|FlagProxy|Variation")
@@ -122,11 +104,6 @@ public:
   FGatrixVariationResult
   StringVariationDetails(const FString &MissingValue) const;
 
-  /** Get number variation with details */
-  UFUNCTION(BlueprintCallable, BlueprintPure,
-            Category = "Gatrix|FlagProxy|Variation")
-  FGatrixVariationResult NumberVariationDetails(float MissingValue) const;
-
   /** Get integer variation with details */
   UFUNCTION(BlueprintCallable, BlueprintPure,
             Category = "Gatrix|FlagProxy|Variation")
@@ -142,6 +119,32 @@ public:
             Category = "Gatrix|FlagProxy|Variation")
   FGatrixVariationResult DoubleVariationDetails(double MissingValue) const;
 
+  /** Get JSON variation with details */
+  UFUNCTION(BlueprintCallable, BlueprintPure,
+            Category = "Gatrix|FlagProxy|Variation")
+  FGatrixVariationResult
+  JsonVariationDetails(const FString &MissingValue) const;
+
+  // ==================== OrThrow Variations ====================
+
+  UFUNCTION(BlueprintCallable, Category = "Gatrix|FlagProxy|Variation")
+  bool BoolVariationOrThrow();
+
+  UFUNCTION(BlueprintCallable, Category = "Gatrix|FlagProxy|Variation")
+  FString StringVariationOrThrow();
+
+  UFUNCTION(BlueprintCallable, Category = "Gatrix|FlagProxy|Variation")
+  float FloatVariationOrThrow();
+
+  UFUNCTION(BlueprintCallable, Category = "Gatrix|FlagProxy|Variation")
+  int32 IntVariationOrThrow();
+
+  UFUNCTION(BlueprintCallable, Category = "Gatrix|FlagProxy|Variation")
+  double DoubleVariationOrThrow();
+
+  UFUNCTION(BlueprintCallable, Category = "Gatrix|FlagProxy|Variation")
+  FString JsonVariationOrThrow();
+
   /** Get the raw evaluated flag data */
   UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|FlagProxy")
   FGatrixEvaluatedFlag GetEvaluatedFlag() const { return Flag; }
@@ -150,7 +153,7 @@ private:
   FGatrixEvaluatedFlag Flag;
   FString FlagName;
   bool bExists = false;
-  FGatrixFlagAccessCallback OnAccess;
+  IGatrixVariationProvider *Provider = nullptr;
 
   /** Fire onAccess callback */
   void TrackAccess(const FString &EventType) const;

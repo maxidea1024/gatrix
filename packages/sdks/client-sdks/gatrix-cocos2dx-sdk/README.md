@@ -6,9 +6,9 @@ Fully implements the [CLIENT_SDK_SPEC.md](../CLIENT_SDK_SPEC.md).
 ## Features
 
 - **Full CLIENT_SDK_SPEC compliance**: All required interfaces implemented
-- **Typed Variations**: `boolVariation`, `stringVariation`, `numberVariation`, `jsonVariation` (default value REQUIRED)
-- **Variation Details**: `boolVariationDetails`, `stringVariationDetails`, `numberVariationDetails` with reason, flagExists, enabled
-- **OrThrow Variations**: `boolVariationOrThrow`, `stringVariationOrThrow`, `numberVariationOrThrow`, `jsonVariationOrThrow`
+- **Typed Variations**: `boolVariation`, `stringVariation`, `intVariation`, `floatVariation`, `doubleVariation`, `jsonVariation` (default value REQUIRED)
+- **Variation Details**: `boolVariationDetails`, `stringVariationDetails`, `intVariationDetails`, `floatVariationDetails`, `doubleVariationDetails`, `jsonVariationDetails` with reason, flagExists, enabled
+- **OrThrow Variations**: `boolVariationOrThrow`, `stringVariationOrThrow`, `intVariationOrThrow`, `floatVariationOrThrow`, `doubleVariationOrThrow`, `jsonVariationOrThrow`
 - **FlagProxy**: Full property access (exists, enabled, name, variant, variantType, version, reason, impressionData, raw)
 - **Watch Pattern**: `watchFlag`, `watchFlagWithInitialState`, `WatchFlagGroup` with chain API
 - **Explicit Sync Mode**: `isExplicitSync`, `canSyncFlags`, `syncFlags`
@@ -101,7 +101,9 @@ if (features->isEnabled("new-boss")) {
 // Typed variations (default value REQUIRED)
 bool showTutorial = features->boolVariation("show-tutorial", true);
 std::string theme = features->stringVariation("holiday-theme", "default");
-double speed = features->numberVariation("game-speed", 1.0);
+double speed = features->floatVariation("game-speed", 1.0f);
+int level = features->intVariation("start-level", 1);
+double gravity = features->doubleVariation("gravity", 9.8);
 
 // Variation details (with evaluation reason)
 auto details = features->boolVariationDetails("premium-feature", false);
@@ -111,7 +113,7 @@ if (details.flagExists && details.enabled) {
 
 // Strict mode (throws GatrixFeatureError if flag missing)
 try {
-    double discount = features->numberVariationOrThrow("discount-rate");
+    double discount = features->doubleVariationOrThrow("discount-rate");
 } catch (const gatrix::GatrixFeatureError& e) {
     // Handle missing/invalid flag
 }
@@ -135,7 +137,9 @@ flag.raw();             // const EvaluatedFlag*
 // Variations on proxy
 flag.boolVariation(false);
 flag.stringVariation("default");
-flag.numberVariation(0.0);
+flag.intVariation(0);
+flag.floatVariation(0.0f);
+flag.doubleVariation(0.0);
 flag.jsonVariation("{}");
 
 // Details on proxy

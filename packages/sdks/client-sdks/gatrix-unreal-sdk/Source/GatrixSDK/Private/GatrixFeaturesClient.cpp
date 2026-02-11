@@ -116,40 +116,27 @@ TMap<FString, FGatrixEvaluatedFlag> UGatrixFeaturesClient::SelectFlags() const {
 }
 
 bool UGatrixFeaturesClient::IsEnabled(const FString &FlagName) const {
-  TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags();
-  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
-  TrackAccess(FlagName, Found, TEXT("isEnabled"),
-              Found ? Found->Variant.Name : TEXT(""));
-  return Found ? Found->bEnabled : false;
+  return const_cast<UGatrixFeaturesClient *>(this)->IsEnabledInternal(FlagName);
 }
 
 FGatrixVariant
 UGatrixFeaturesClient::GetVariant(const FString &FlagName) const {
-  TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags();
-  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
-  TrackAccess(FlagName, Found, TEXT("getVariant"),
-              Found ? Found->Variant.Name : TEXT(""));
-  if (!Found) {
-    return FGatrixVariant::Missing();
-  }
-  return Found->Variant;
+  return const_cast<UGatrixFeaturesClient *>(this)->GetVariantInternal(
+      FlagName);
 }
 
 UGatrixFlagProxy *UGatrixFeaturesClient::GetFlag(const FString &FlagName) {
+  FScopeLock Lock(&FlagsCriticalSection);
   TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags();
   UGatrixFlagProxy *Proxy = NewObject<UGatrixFlagProxy>(this);
 
-  FGatrixFlagAccessCallback Callback;
-  Callback.BindUObject(this, &UGatrixFeaturesClient::TrackAccess);
-
   const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
   if (Found) {
-    Proxy->Initialize(*Found, Callback);
+    Proxy->Initialize(*Found, this, FlagName);
   } else {
-    // Return proxy with empty data (bExists will be false)
     FGatrixEvaluatedFlag EmptyFlag;
     EmptyFlag.Name = FlagName;
-    Proxy->Initialize(EmptyFlag, Callback);
+    Proxy->Initialize(EmptyFlag, this, FlagName);
   }
 
   return Proxy;
@@ -166,105 +153,40 @@ TArray<FGatrixEvaluatedFlag> UGatrixFeaturesClient::GetAllFlags() const {
 
 bool UGatrixFeaturesClient::BoolVariation(const FString &FlagName,
                                           bool MissingValue) const {
-  TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags();
-  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
-  TrackAccess(FlagName, Found, TEXT("getVariant"),
-              Found ? Found->Variant.Name : TEXT(""));
-  if (!Found)
-    return MissingValue;
-  // Strict: ValueType must be Boolean
-  if (Found->ValueType != EGatrixValueType::None &&
-      Found->ValueType != EGatrixValueType::Boolean) {
-    return MissingValue;
-  }
-  if (Found->Variant.Value.IsEmpty())
-    return MissingValue;
-  return Found->Variant.Value.ToBool();
+  return const_cast<UGatrixFeaturesClient *>(this)->BoolVariationInternal(
+      FlagName, MissingValue);
 }
 
 FString
 UGatrixFeaturesClient::StringVariation(const FString &FlagName,
                                        const FString &MissingValue) const {
-  TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags();
-  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
-  TrackAccess(FlagName, Found, TEXT("getVariant"),
-              Found ? Found->Variant.Name : TEXT(""));
-  if (!Found)
-    return MissingValue;
-  // Strict: ValueType must be String
-  if (Found->ValueType != EGatrixValueType::None &&
-      Found->ValueType != EGatrixValueType::String)
-    return MissingValue;
-  return Found->Variant.Value;
-}
-
-float UGatrixFeaturesClient::NumberVariation(const FString &FlagName,
-                                             float MissingValue) const {
-  return FloatVariation(FlagName, MissingValue);
-}
-
-int32 UGatrixFeaturesClient::IntVariation(const FString &FlagName,
-                                          int32 MissingValue) const {
-  TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags();
-  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
-  TrackAccess(FlagName, Found, TEXT("getVariant"),
-              Found ? Found->Variant.Name : TEXT(""));
-  if (!Found)
-    return MissingValue;
-  if (Found->ValueType != EGatrixValueType::None &&
-      Found->ValueType != EGatrixValueType::Number)
-    return MissingValue;
-  if (Found->Variant.Value.IsEmpty())
-    return MissingValue;
-  return FCString::Atoi(*Found->Variant.Value);
+  return const_cast<UGatrixFeaturesClient *>(this)->StringVariationInternal(
+      FlagName, MissingValue);
 }
 
 float UGatrixFeaturesClient::FloatVariation(const FString &FlagName,
                                             float MissingValue) const {
-  TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags();
-  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
-  TrackAccess(FlagName, Found, TEXT("getVariant"),
-              Found ? Found->Variant.Name : TEXT(""));
-  if (!Found)
-    return MissingValue;
-  if (Found->ValueType != EGatrixValueType::None &&
-      Found->ValueType != EGatrixValueType::Number)
-    return MissingValue;
-  if (Found->Variant.Value.IsEmpty())
-    return MissingValue;
-  return FCString::Atof(*Found->Variant.Value);
+  return const_cast<UGatrixFeaturesClient *>(this)->FloatVariationInternal(
+      FlagName, MissingValue);
+}
+
+int32 UGatrixFeaturesClient::IntVariation(const FString &FlagName,
+                                          int32 MissingValue) const {
+  return const_cast<UGatrixFeaturesClient *>(this)->IntVariationInternal(
+      FlagName, MissingValue);
 }
 
 double UGatrixFeaturesClient::DoubleVariation(const FString &FlagName,
                                               double MissingValue) const {
-  TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags();
-  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
-  TrackAccess(FlagName, Found, TEXT("getVariant"),
-              Found ? Found->Variant.Name : TEXT(""));
-  if (!Found)
-    return MissingValue;
-  if (Found->ValueType != EGatrixValueType::None &&
-      Found->ValueType != EGatrixValueType::Number)
-    return MissingValue;
-  if (Found->Variant.Value.IsEmpty())
-    return MissingValue;
-  return FCString::Atod(*Found->Variant.Value);
+  return const_cast<UGatrixFeaturesClient *>(this)->DoubleVariationInternal(
+      FlagName, MissingValue);
 }
 
 FString
 UGatrixFeaturesClient::JsonVariation(const FString &FlagName,
                                      const FString &MissingValue) const {
-  TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags();
-  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
-  TrackAccess(FlagName, Found, TEXT("getVariant"),
-              Found ? Found->Variant.Name : TEXT(""));
-  if (!Found)
-    return MissingValue;
-  // Strict: ValueType must be Json
-  if (Found->ValueType != EGatrixValueType::None &&
-      Found->ValueType != EGatrixValueType::Json)
-    return MissingValue;
-  return Found->Variant.Value;
+  return const_cast<UGatrixFeaturesClient *>(this)->JsonVariationInternal(
+      FlagName, MissingValue);
 }
 
 // ==================== Variation Details ====================
@@ -272,114 +194,68 @@ UGatrixFeaturesClient::JsonVariation(const FString &FlagName,
 FGatrixVariationResult
 UGatrixFeaturesClient::BoolVariationDetails(const FString &FlagName,
                                             bool MissingValue) const {
-  FGatrixVariationResult Result;
-  TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags();
-  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
-  Result.bFlagExists = Found != nullptr;
-  Result.bEnabled = Found ? Found->bEnabled : false;
-
-  bool Val = BoolVariation(FlagName, MissingValue);
-  Result.Value = Val ? TEXT("true") : TEXT("false");
-
-  if (!Found) {
-    Result.Reason = TEXT("flag_not_found");
-  } else if (Found->ValueType != EGatrixValueType::None &&
-             Found->ValueType != EGatrixValueType::Boolean) {
-    Result.Reason = TEXT("type_mismatch:expected_boolean");
-  } else {
-    Result.Reason = Found->Reason.IsEmpty() ? TEXT("evaluated") : Found->Reason;
-  }
-  return Result;
+  return const_cast<UGatrixFeaturesClient *>(this)
+      ->BoolVariationDetailsInternal(FlagName, MissingValue);
 }
 
 FGatrixVariationResult UGatrixFeaturesClient::StringVariationDetails(
     const FString &FlagName, const FString &MissingValue) const {
-  FGatrixVariationResult Result;
-  TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags();
-  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
-  Result.bFlagExists = Found != nullptr;
-  Result.bEnabled = Found ? Found->bEnabled : false;
-  Result.Value = StringVariation(FlagName, MissingValue);
-
-  if (!Found) {
-    Result.Reason = TEXT("flag_not_found");
-  } else if (Found->ValueType != EGatrixValueType::None &&
-             Found->ValueType != EGatrixValueType::String) {
-    Result.Reason = TEXT("type_mismatch:expected_string");
-  } else {
-    Result.Reason = Found->Reason.IsEmpty() ? TEXT("evaluated") : Found->Reason;
-  }
-  return Result;
-}
-
-FGatrixVariationResult
-UGatrixFeaturesClient::NumberVariationDetails(const FString &FlagName,
-                                              float MissingValue) const {
-  return FloatVariationDetails(FlagName, MissingValue);
+  return const_cast<UGatrixFeaturesClient *>(this)
+      ->StringVariationDetailsInternal(FlagName, MissingValue);
 }
 
 FGatrixVariationResult
 UGatrixFeaturesClient::IntVariationDetails(const FString &FlagName,
                                            int32 MissingValue) const {
-  FGatrixVariationResult Result;
-  TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags();
-  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
-  Result.bFlagExists = Found != nullptr;
-  Result.bEnabled = Found ? Found->bEnabled : false;
-  Result.Value = FString::FromInt(IntVariation(FlagName, MissingValue));
-
-  if (!Found) {
-    Result.Reason = TEXT("flag_not_found");
-  } else if (Found->ValueType != EGatrixValueType::None &&
-             Found->ValueType != EGatrixValueType::Number) {
-    Result.Reason = TEXT("type_mismatch:expected_number");
-  } else {
-    Result.Reason = Found->Reason.IsEmpty() ? TEXT("evaluated") : Found->Reason;
-  }
-  return Result;
+  return const_cast<UGatrixFeaturesClient *>(this)->IntVariationDetailsInternal(
+      FlagName, MissingValue);
 }
 
 FGatrixVariationResult
 UGatrixFeaturesClient::FloatVariationDetails(const FString &FlagName,
                                              float MissingValue) const {
-  FGatrixVariationResult Result;
-  TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags();
-  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
-  Result.bFlagExists = Found != nullptr;
-  Result.bEnabled = Found ? Found->bEnabled : false;
-  Result.Value = FString::SanitizeFloat(FloatVariation(FlagName, MissingValue));
-
-  if (!Found) {
-    Result.Reason = TEXT("flag_not_found");
-  } else if (Found->ValueType != EGatrixValueType::None &&
-             Found->ValueType != EGatrixValueType::Number) {
-    Result.Reason = TEXT("type_mismatch:expected_number");
-  } else {
-    Result.Reason = Found->Reason.IsEmpty() ? TEXT("evaluated") : Found->Reason;
-  }
-  return Result;
+  return const_cast<UGatrixFeaturesClient *>(this)
+      ->FloatVariationDetailsInternal(FlagName, MissingValue);
 }
 
 FGatrixVariationResult
 UGatrixFeaturesClient::DoubleVariationDetails(const FString &FlagName,
                                               double MissingValue) const {
-  FGatrixVariationResult Result;
-  TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags();
-  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
-  Result.bFlagExists = Found != nullptr;
-  Result.bEnabled = Found ? Found->bEnabled : false;
-  Result.Value =
-      FString::Printf(TEXT("%f"), DoubleVariation(FlagName, MissingValue));
+  return const_cast<UGatrixFeaturesClient *>(this)
+      ->DoubleVariationDetailsInternal(FlagName, MissingValue);
+}
 
-  if (!Found) {
-    Result.Reason = TEXT("flag_not_found");
-  } else if (Found->ValueType != EGatrixValueType::None &&
-             Found->ValueType != EGatrixValueType::Number) {
-    Result.Reason = TEXT("type_mismatch:expected_number");
-  } else {
-    Result.Reason = Found->Reason.IsEmpty() ? TEXT("evaluated") : Found->Reason;
-  }
-  return Result;
+FGatrixVariationResult
+UGatrixFeaturesClient::JsonVariationDetails(const FString &FlagName,
+                                            const FString &MissingValue) const {
+  return const_cast<UGatrixFeaturesClient *>(this)
+      ->JsonVariationDetailsInternal(FlagName, MissingValue);
+}
+
+// ==================== OrThrow Variations ====================
+
+bool UGatrixFeaturesClient::BoolVariationOrThrow(const FString &FlagName) {
+  return BoolVariationOrThrowInternal(FlagName);
+}
+
+FString UGatrixFeaturesClient::StringVariationOrThrow(const FString &FlagName) {
+  return StringVariationOrThrowInternal(FlagName);
+}
+
+float UGatrixFeaturesClient::FloatVariationOrThrow(const FString &FlagName) {
+  return FloatVariationOrThrowInternal(FlagName);
+}
+
+int32 UGatrixFeaturesClient::IntVariationOrThrow(const FString &FlagName) {
+  return IntVariationOrThrowInternal(FlagName);
+}
+
+double UGatrixFeaturesClient::DoubleVariationOrThrow(const FString &FlagName) {
+  return DoubleVariationOrThrowInternal(FlagName);
+}
+
+FString UGatrixFeaturesClient::JsonVariationOrThrow(const FString &FlagName) {
+  return JsonVariationOrThrowInternal(FlagName);
 }
 
 // ==================== Context ====================
@@ -1349,10 +1225,6 @@ FString UGatrixFeaturesClient::BuildContextQueryString() const {
     Params.Add(FString::Printf(
         TEXT("sessionId=%s"),
         *FGenericPlatformHttp::UrlEncode(ClientConfig.Context.SessionId)));
-  if (!ClientConfig.Context.DeviceId.IsEmpty())
-    Params.Add(FString::Printf(
-        TEXT("deviceId=%s"),
-        *FGenericPlatformHttp::UrlEncode(ClientConfig.Context.DeviceId)));
 
   for (const auto &Prop : ClientConfig.Context.Properties) {
     Params.Add(FString::Printf(TEXT("properties[%s]=%s"),
@@ -1376,8 +1248,6 @@ FString UGatrixFeaturesClient::ContextToJson() const {
     Writer->WriteValue(TEXT("userId"), ClientConfig.Context.UserId);
   if (!ClientConfig.Context.SessionId.IsEmpty())
     Writer->WriteValue(TEXT("sessionId"), ClientConfig.Context.SessionId);
-  if (!ClientConfig.Context.DeviceId.IsEmpty())
-    Writer->WriteValue(TEXT("deviceId"), ClientConfig.Context.DeviceId);
 
   if (ClientConfig.Context.Properties.Num() > 0) {
     Writer->WriteObjectStart(TEXT("properties"));
@@ -1413,4 +1283,295 @@ FGatrixFeaturesStats UGatrixFeaturesClient::GetStats() const {
   Stats.Etag = Etag;
 
   return Stats;
+}
+
+// ==================== IGatrixVariationProvider Implementation
+// ====================
+
+bool UGatrixFeaturesClient::IsEnabledInternal(const FString &FlagName) {
+  TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags();
+  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
+  TrackAccess(FlagName, Found, TEXT("isEnabled"),
+              Found ? Found->Variant.Name : TEXT(""));
+  return Found ? Found->bEnabled : false;
+}
+
+FGatrixVariant
+UGatrixFeaturesClient::GetVariantInternal(const FString &FlagName) {
+  TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags();
+  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
+  TrackAccess(FlagName, Found, TEXT("getVariant"),
+              Found ? Found->Variant.Name : TEXT(""));
+  if (!Found) {
+    return FGatrixVariant::Missing();
+  }
+  return Found->Variant;
+}
+
+FString UGatrixFeaturesClient::VariationInternal(const FString &FlagName,
+                                                 const FString &MissingValue) {
+  return GetVariantInternal(FlagName).Name;
+}
+
+bool UGatrixFeaturesClient::BoolVariationInternal(const FString &FlagName,
+                                                  bool MissingValue) {
+  TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags();
+  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
+  TrackAccess(FlagName, Found, TEXT("getVariant"),
+              Found ? Found->Variant.Name : TEXT(""));
+  if (!Found)
+    return MissingValue;
+  if (Found->ValueType != EGatrixValueType::Boolean &&
+      Found->ValueType != EGatrixValueType::None)
+    return MissingValue;
+  if (Found->Variant.Value.IsEmpty())
+    return MissingValue;
+  return Found->Variant.Value.ToBool();
+}
+
+FString
+UGatrixFeaturesClient::StringVariationInternal(const FString &FlagName,
+                                               const FString &MissingValue) {
+  TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags();
+  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
+  TrackAccess(FlagName, Found, TEXT("getVariant"),
+              Found ? Found->Variant.Name : TEXT(""));
+  if (!Found)
+    return MissingValue;
+  if (Found->ValueType != EGatrixValueType::String &&
+      Found->ValueType != EGatrixValueType::None)
+    return MissingValue;
+  return Found->Variant.Value;
+}
+
+float UGatrixFeaturesClient::FloatVariationInternal(const FString &FlagName,
+                                                    float MissingValue) {
+  TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags();
+  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
+  TrackAccess(FlagName, Found, TEXT("getVariant"),
+              Found ? Found->Variant.Name : TEXT(""));
+  if (!Found)
+    return MissingValue;
+  if (Found->ValueType != EGatrixValueType::Number &&
+      Found->ValueType != EGatrixValueType::None)
+    return MissingValue;
+  if (Found->Variant.Value.IsEmpty())
+    return MissingValue;
+  return FCString::Atof(*Found->Variant.Value);
+}
+
+int32 UGatrixFeaturesClient::IntVariationInternal(const FString &FlagName,
+                                                  int32 MissingValue) {
+  TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags();
+  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
+  TrackAccess(FlagName, Found, TEXT("getVariant"),
+              Found ? Found->Variant.Name : TEXT(""));
+  if (!Found)
+    return MissingValue;
+  if (Found->ValueType != EGatrixValueType::Number &&
+      Found->ValueType != EGatrixValueType::None)
+    return MissingValue;
+  if (Found->Variant.Value.IsEmpty())
+    return MissingValue;
+  return FCString::Atoi(*Found->Variant.Value);
+}
+
+double UGatrixFeaturesClient::DoubleVariationInternal(const FString &FlagName,
+                                                      double MissingValue) {
+  TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags();
+  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
+  TrackAccess(FlagName, Found, TEXT("getVariant"),
+              Found ? Found->Variant.Name : TEXT(""));
+  if (!Found)
+    return MissingValue;
+  if (Found->ValueType != EGatrixValueType::Number &&
+      Found->ValueType != EGatrixValueType::None)
+    return MissingValue;
+  if (Found->Variant.Value.IsEmpty())
+    return MissingValue;
+  return FCString::Atod(*Found->Variant.Value);
+}
+
+FString
+UGatrixFeaturesClient::JsonVariationInternal(const FString &FlagName,
+                                             const FString &MissingValue) {
+  TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags();
+  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
+  TrackAccess(FlagName, Found, TEXT("getVariant"),
+              Found ? Found->Variant.Name : TEXT(""));
+  if (!Found)
+    return MissingValue;
+  if (Found->ValueType != EGatrixValueType::Json &&
+      Found->ValueType != EGatrixValueType::None)
+    return MissingValue;
+  return Found->Variant.Value;
+}
+
+FGatrixVariationResult
+UGatrixFeaturesClient::BoolVariationDetailsInternal(const FString &FlagName,
+                                                    bool MissingValue) {
+  FGatrixVariationResult Result;
+  TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags();
+  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
+  Result.bFlagExists = Found != nullptr;
+  Result.bEnabled = Found ? Found->bEnabled : false;
+  bool Val = BoolVariationInternal(FlagName, MissingValue);
+  Result.Value = Val ? TEXT("true") : TEXT("false");
+  if (!Found)
+    Result.Reason = TEXT("flag_not_found");
+  else if (Found->ValueType != EGatrixValueType::Boolean &&
+           Found->ValueType != EGatrixValueType::None)
+    Result.Reason = TEXT("type_mismatch:expected_boolean");
+  else
+    Result.Reason = Found->Reason.IsEmpty() ? TEXT("evaluated") : Found->Reason;
+  return Result;
+}
+
+FGatrixVariationResult UGatrixFeaturesClient::StringVariationDetailsInternal(
+    const FString &FlagName, const FString &MissingValue) {
+  FGatrixVariationResult Result;
+  TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags();
+  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
+  Result.bFlagExists = Found != nullptr;
+  Result.bEnabled = Found ? Found->bEnabled : false;
+  Result.Value = StringVariationInternal(FlagName, MissingValue);
+  if (!Found)
+    Result.Reason = TEXT("flag_not_found");
+  else if (Found->ValueType != EGatrixValueType::String &&
+           Found->ValueType != EGatrixValueType::None)
+    Result.Reason = TEXT("type_mismatch:expected_string");
+  else
+    Result.Reason = Found->Reason.IsEmpty() ? TEXT("evaluated") : Found->Reason;
+  return Result;
+}
+
+FGatrixVariationResult
+UGatrixFeaturesClient::FloatVariationDetailsInternal(const FString &FlagName,
+                                                     float MissingValue) {
+  FGatrixVariationResult Result;
+  TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags();
+  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
+  Result.bFlagExists = Found != nullptr;
+  Result.bEnabled = Found ? Found->bEnabled : false;
+  Result.Value =
+      FString::SanitizeFloat(FloatVariationInternal(FlagName, MissingValue));
+  if (!Found)
+    Result.Reason = TEXT("flag_not_found");
+  else if (Found->ValueType != EGatrixValueType::Number &&
+           Found->ValueType != EGatrixValueType::None)
+    Result.Reason = TEXT("type_mismatch:expected_number");
+  else
+    Result.Reason = Found->Reason.IsEmpty() ? TEXT("evaluated") : Found->Reason;
+  return Result;
+}
+
+FGatrixVariationResult
+UGatrixFeaturesClient::IntVariationDetailsInternal(const FString &FlagName,
+                                                   int32 MissingValue) {
+  FGatrixVariationResult Result;
+  TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags();
+  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
+  Result.bFlagExists = Found != nullptr;
+  Result.bEnabled = Found ? Found->bEnabled : false;
+  Result.Value = FString::FromInt(IntVariationInternal(FlagName, MissingValue));
+  if (!Found)
+    Result.Reason = TEXT("flag_not_found");
+  else if (Found->ValueType != EGatrixValueType::Number &&
+           Found->ValueType != EGatrixValueType::None)
+    Result.Reason = TEXT("type_mismatch:expected_number");
+  else
+    Result.Reason = Found->Reason.IsEmpty() ? TEXT("evaluated") : Found->Reason;
+  return Result;
+}
+
+FGatrixVariationResult
+UGatrixFeaturesClient::DoubleVariationDetailsInternal(const FString &FlagName,
+                                                      double MissingValue) {
+  FGatrixVariationResult Result;
+  TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags();
+  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
+  Result.bFlagExists = Found != nullptr;
+  Result.bEnabled = Found ? Found->bEnabled : false;
+  Result.Value = FString::Printf(
+      TEXT("%lf"), DoubleVariationInternal(FlagName, MissingValue));
+  if (!Found)
+    Result.Reason = TEXT("flag_not_found");
+  else if (Found->ValueType != EGatrixValueType::Number &&
+           Found->ValueType != EGatrixValueType::None)
+    Result.Reason = TEXT("type_mismatch:expected_number");
+  else
+    Result.Reason = Found->Reason.IsEmpty() ? TEXT("evaluated") : Found->Reason;
+  return Result;
+}
+
+FGatrixVariationResult UGatrixFeaturesClient::JsonVariationDetailsInternal(
+    const FString &FlagName, const FString &MissingValue) {
+  FGatrixVariationResult Result;
+  TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags();
+  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
+  Result.bFlagExists = Found != nullptr;
+  Result.bEnabled = Found ? Found->bEnabled : false;
+  Result.Value = JsonVariationInternal(FlagName, MissingValue);
+  if (!Found)
+    Result.Reason = TEXT("flag_not_found");
+  else if (Found->ValueType != EGatrixValueType::Json &&
+           Found->ValueType != EGatrixValueType::None)
+    Result.Reason = TEXT("type_mismatch:expected_json");
+  else
+    Result.Reason = Found->Reason.IsEmpty() ? TEXT("evaluated") : Found->Reason;
+  return Result;
+}
+
+bool UGatrixFeaturesClient::BoolVariationOrThrowInternal(
+    const FString &FlagName) {
+  TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags();
+  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
+  if (!Found)
+    throw TEXT("Flag not found");
+  return BoolVariationInternal(FlagName, false);
+}
+
+FString
+UGatrixFeaturesClient::StringVariationOrThrowInternal(const FString &FlagName) {
+  TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags();
+  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
+  if (!Found)
+    throw TEXT("Flag not found");
+  return StringVariationInternal(FlagName, TEXT(""));
+}
+
+float UGatrixFeaturesClient::FloatVariationOrThrowInternal(
+    const FString &FlagName) {
+  TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags();
+  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
+  if (!Found)
+    throw TEXT("Flag not found");
+  return FloatVariationInternal(FlagName, 0.0f);
+}
+
+int32 UGatrixFeaturesClient::IntVariationOrThrowInternal(
+    const FString &FlagName) {
+  TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags();
+  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
+  if (!Found)
+    throw TEXT("Flag not found");
+  return IntVariationInternal(FlagName, 0);
+}
+
+double
+UGatrixFeaturesClient::DoubleVariationOrThrowInternal(const FString &FlagName) {
+  TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags();
+  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
+  if (!Found)
+    throw TEXT("Flag not found");
+  return DoubleVariationInternal(FlagName, 0.0);
+}
+
+FString
+UGatrixFeaturesClient::JsonVariationOrThrowInternal(const FString &FlagName) {
+  TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags();
+  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
+  if (!Found)
+    throw TEXT("Flag not found");
+  return JsonVariationInternal(FlagName, TEXT(""));
 }

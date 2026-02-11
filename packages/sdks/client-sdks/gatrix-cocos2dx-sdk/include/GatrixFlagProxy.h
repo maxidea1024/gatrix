@@ -2,52 +2,34 @@
 #define GATRIX_FLAG_PROXY_H
 
 #include "GatrixTypes.h"
-#include <algorithm>
-#include <cstdlib>
-#include <functional>
-#include <stdexcept>
+#include "GatrixVariationProvider.h"
+#include <cassert>
+#include <string>
+#include <vector>
 
 namespace gatrix {
 
 /**
- * Callback invoked on every variation/enabled call for metrics tracking.
- */
-using FlagAccessCallback = std::function<void(
-    const std::string &flagName, const EvaluatedFlag *flag,
-    const std::string &eventType, const std::string &variantName)>;
-
-/**
  * FlagProxy - Single source of truth for flag value extraction.
  *
- * Uses null object pattern: _flag is never null internally.
- * onAccess callback is injected by FeaturesClient for metrics tracking.
- * Type safety: valueType is checked strictly to prevent misuse.
- *
- * boolVariation returns variant.value (NOT flag.enabled).
+ * This is a thin shell that delegates all evaluation and metrics tracking
+ * to an IVariationProvider (typically the FeaturesClient).
  */
 class FlagProxy {
 public:
-  explicit FlagProxy(const EvaluatedFlag *flag = nullptr,
-                     FlagAccessCallback onAccess = nullptr,
-                     const std::string &flagName = "")
-      : _flag(flag), _exists(flag != nullptr), _onAccess(onAccess),
-        _flagName(flagName.empty() ? (flag ? flag->name : "") : flagName) {}
+  FlagProxy(const EvaluatedFlag *flag, IVariationProvider *provider,
+            const std::string &flagName)
+      : _flag(flag), _provider(provider), _flagName(flagName) {
+    assert(_provider != nullptr);
+    _exists = (_flag != nullptr && _flag->variant.name != "$missing");
+  }
 
   // ==================== Properties ====================
 
   bool exists() const { return _exists; }
 
   /// Check if the flag is enabled. Triggers metrics.
-  bool enabled() const {
-    if (!_exists) {
-      if (_onAccess)
-        _onAccess(_flagName, nullptr, "isEnabled", "");
-      return false;
-    }
-    if (_onAccess)
-      _onAccess(_flagName, _flag, "isEnabled", _flag->variant.name);
-    return _flag->enabled;
-  }
+  bool enabled() const { return _provider->isEnabledInternal(_flagName); }
 
   const std::string &name() const { return _flagName; }
 
@@ -70,255 +52,94 @@ public:
   const EvaluatedFlag *raw() const { return _exists ? _flag : nullptr; }
 
   // ==================== Variation Methods ====================
-  // Single source of truth. valueType checked strictly.
 
   std::string variation(const std::string &missingValue) const {
-    if (!_exists) {
-      if (_onAccess)
-        _onAccess(_flagName, nullptr, "getVariant", "");
-      return missingValue;
-    }
-    if (_onAccess)
-      _onAccess(_flagName, _flag, "getVariant", _flag->variant.name);
-    return _flag->variant.name.empty() ? missingValue : _flag->variant.name;
+    return _provider->variationInternal(_flagName, missingValue);
   }
 
-  /// Get boolean variation from variant payload.
-  /// Strict: valueType must be BOOLEAN.
-  /// Returns actual variant value, NOT flag.enabled.
   bool boolVariation(bool missingValue) const {
-    if (!_exists) {
-      if (_onAccess)
-        _onAccess(_flagName, nullptr, "getVariant", "");
-      return missingValue;
-    }
-    if (_onAccess)
-      _onAccess(_flagName, _flag, "getVariant", _flag->variant.name);
-    if (_flag->valueType != ValueType::NONE &&
-        _flag->valueType != ValueType::BOOLEAN) {
-      return missingValue;
-    }
-    const std::string &val = _flag->variant.value;
-    if (val.empty())
-      return missingValue;
-    // Case-insensitive "true"/"false" check
-    std::string lower = val;
-    std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
-    return lower == "true";
+    return _provider->boolVariationInternal(_flagName, missingValue);
   }
 
-  /// Get string variation. Strict: valueType must be STRING.
   std::string stringVariation(const std::string &missingValue) const {
-    if (!_exists) {
-      if (_onAccess)
-        _onAccess(_flagName, nullptr, "getVariant", "");
-      return missingValue;
-    }
-    if (_onAccess)
-      _onAccess(_flagName, _flag, "getVariant", _flag->variant.name);
-    if (_flag->valueType != ValueType::NONE &&
-        _flag->valueType != ValueType::STRING) {
-      return missingValue;
-    }
-    return _flag->variant.value;
-  }
-
-  /// Get number variation. Strict: valueType must be NUMBER.
-  double numberVariation(double missingValue) const {
-    if (!_exists) {
-      if (_onAccess)
-        _onAccess(_flagName, nullptr, "getVariant", "");
-      return missingValue;
-    }
-    if (_onAccess)
-      _onAccess(_flagName, _flag, "getVariant", _flag->variant.name);
-    if (_flag->valueType != ValueType::NONE &&
-        _flag->valueType != ValueType::NUMBER) {
-      return missingValue;
-    }
-    char *end;
-    double val = std::strtod(_flag->variant.value.c_str(), &end);
-    if (end == _flag->variant.value.c_str())
-      return missingValue;
-    return val;
+    return _provider->stringVariationInternal(_flagName, missingValue);
   }
 
   int intVariation(int missingValue) const {
-    return static_cast<int>(numberVariation(static_cast<double>(missingValue)));
+    return _provider->intVariationInternal(_flagName, missingValue);
   }
 
   float floatVariation(float missingValue) const {
-    return static_cast<float>(
-        numberVariation(static_cast<double>(missingValue)));
+    return _provider->floatVariationInternal(_flagName, missingValue);
   }
 
   double doubleVariation(double missingValue) const {
-    return numberVariation(missingValue);
+    return _provider->doubleVariationInternal(_flagName, missingValue);
   }
 
-  /// Get JSON variation. Strict: valueType must be JSON.
   std::string jsonVariation(const std::string &missingValue) const {
-    if (!_exists) {
-      if (_onAccess)
-        _onAccess(_flagName, nullptr, "getVariant", "");
-      return missingValue;
-    }
-    if (_onAccess)
-      _onAccess(_flagName, _flag, "getVariant", _flag->variant.name);
-    if (_flag->valueType != ValueType::NONE &&
-        _flag->valueType != ValueType::JSON) {
-      return missingValue;
-    }
-    return _flag->variant.value;
+    return _provider->jsonVariationInternal(_flagName, missingValue);
   }
 
   // ==================== Variation Details ====================
 
   VariationResult<bool> boolVariationDetails(bool missingValue) const {
-    if (!_exists) {
-      if (_onAccess)
-        _onAccess(_flagName, nullptr, "getVariant", "");
-      return {missingValue, "flag_not_found", false, false};
-    }
-    if (_onAccess)
-      _onAccess(_flagName, _flag, "getVariant", _flag->variant.name);
-    if (_flag->valueType != ValueType::NONE &&
-        _flag->valueType != ValueType::BOOLEAN) {
-      return {missingValue, "type_mismatch:expected_boolean", true,
-              _flag->enabled};
-    }
-    bool val = boolVariation(missingValue);
-    return {val, _flag->reason.empty() ? "evaluated" : _flag->reason, true,
-            _flag->enabled};
+    return _provider->boolVariationDetailsInternal(_flagName, missingValue);
   }
 
   VariationResult<std::string>
   stringVariationDetails(const std::string &missingValue) const {
-    if (!_exists) {
-      if (_onAccess)
-        _onAccess(_flagName, nullptr, "getVariant", "");
-      return {missingValue, "flag_not_found", false, false};
-    }
-    if (_onAccess)
-      _onAccess(_flagName, _flag, "getVariant", _flag->variant.name);
-    if (_flag->valueType != ValueType::NONE &&
-        _flag->valueType != ValueType::STRING) {
-      return {missingValue, "type_mismatch:expected_string", true,
-              _flag->enabled};
-    }
-    return {_flag->variant.value,
-            _flag->reason.empty() ? "evaluated" : _flag->reason, true,
-            _flag->enabled};
+    return _provider->stringVariationDetailsInternal(_flagName, missingValue);
   }
 
-  VariationResult<double> numberVariationDetails(double missingValue) const {
-    if (!_exists) {
-      if (_onAccess)
-        _onAccess(_flagName, nullptr, "getVariant", "");
-      return {missingValue, "flag_not_found", false, false};
-    }
-    if (_onAccess)
-      _onAccess(_flagName, _flag, "getVariant", _flag->variant.name);
-    if (_flag->valueType != ValueType::NONE &&
-        _flag->valueType != ValueType::NUMBER) {
-      return {missingValue, "type_mismatch:expected_number", true,
-              _flag->enabled};
-    }
-    double val = numberVariation(missingValue);
-    return {val, _flag->reason.empty() ? "evaluated" : _flag->reason, true,
-            _flag->enabled};
+  VariationResult<float> floatVariationDetails(float missingValue) const {
+    return _provider->floatVariationDetailsInternal(_flagName, missingValue);
+  }
+
+  VariationResult<int> intVariationDetails(int missingValue) const {
+    return _provider->intVariationDetailsInternal(_flagName, missingValue);
+  }
+
+  VariationResult<double> doubleVariationDetails(double missingValue) const {
+    return _provider->doubleVariationDetailsInternal(_flagName, missingValue);
+  }
+
+  VariationResult<std::string>
+  jsonVariationDetails(const std::string &missingValue) const {
+    return _provider->jsonVariationDetailsInternal(_flagName, missingValue);
   }
 
   // ==================== OrThrow Methods ====================
 
   bool boolVariationOrThrow() const {
-    if (!_exists) {
-      if (_onAccess)
-        _onAccess(_flagName, nullptr, "getVariant", "");
-      throw GatrixFeatureError("Flag '" + _flagName + "' not found",
-                               "FLAG_NOT_FOUND");
-    }
-    if (_onAccess)
-      _onAccess(_flagName, _flag, "getVariant", _flag->variant.name);
-    if (_flag->valueType != ValueType::NONE &&
-        _flag->valueType != ValueType::BOOLEAN) {
-      throw GatrixFeatureError("Flag '" + _flagName +
-                                   "' type mismatch: expected boolean",
-                               "TYPE_MISMATCH");
-    }
-    const std::string &val = _flag->variant.value;
-    if (val.empty()) {
-      throw GatrixFeatureError(
-          "Flag '" + _flagName + "' has no boolean payload", "NO_PAYLOAD");
-    }
-    std::string lower = val;
-    std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
-    return lower == "true";
+    return _provider->boolVariationOrThrowInternal(_flagName);
   }
 
   std::string stringVariationOrThrow() const {
-    if (!_exists) {
-      if (_onAccess)
-        _onAccess(_flagName, nullptr, "getVariant", "");
-      throw GatrixFeatureError("Flag '" + _flagName + "' not found",
-                               "FLAG_NOT_FOUND");
-    }
-    if (_onAccess)
-      _onAccess(_flagName, _flag, "getVariant", _flag->variant.name);
-    if (_flag->valueType != ValueType::NONE &&
-        _flag->valueType != ValueType::STRING) {
-      throw GatrixFeatureError("Flag '" + _flagName +
-                                   "' type mismatch: expected string",
-                               "TYPE_MISMATCH");
-    }
-    return _flag->variant.value;
+    return _provider->stringVariationOrThrowInternal(_flagName);
   }
 
-  double numberVariationOrThrow() const {
-    if (!_exists) {
-      if (_onAccess)
-        _onAccess(_flagName, nullptr, "getVariant", "");
-      throw GatrixFeatureError("Flag '" + _flagName + "' not found",
-                               "FLAG_NOT_FOUND");
-    }
-    if (_onAccess)
-      _onAccess(_flagName, _flag, "getVariant", _flag->variant.name);
-    if (_flag->valueType != ValueType::NONE &&
-        _flag->valueType != ValueType::NUMBER) {
-      throw GatrixFeatureError("Flag '" + _flagName +
-                                   "' type mismatch: expected number",
-                               "TYPE_MISMATCH");
-    }
-    char *end;
-    double val = std::strtod(_flag->variant.value.c_str(), &end);
-    if (end == _flag->variant.value.c_str())
-      throw GatrixFeatureError("Invalid number value", "INVALID_TYPE");
-    return val;
+  float floatVariationOrThrow() const {
+    return _provider->floatVariationOrThrowInternal(_flagName);
+  }
+
+  int intVariationOrThrow() const {
+    return _provider->intVariationOrThrowInternal(_flagName);
+  }
+
+  double doubleVariationOrThrow() const {
+    return _provider->doubleVariationOrThrowInternal(_flagName);
   }
 
   std::string jsonVariationOrThrow() const {
-    if (!_exists) {
-      if (_onAccess)
-        _onAccess(_flagName, nullptr, "getVariant", "");
-      throw GatrixFeatureError("Flag '" + _flagName + "' not found",
-                               "FLAG_NOT_FOUND");
-    }
-    if (_onAccess)
-      _onAccess(_flagName, _flag, "getVariant", _flag->variant.name);
-    if (_flag->valueType != ValueType::NONE &&
-        _flag->valueType != ValueType::JSON) {
-      throw GatrixFeatureError("Flag '" + _flagName +
-                                   "' type mismatch: expected json",
-                               "TYPE_MISMATCH");
-    }
-    return _flag->variant.value;
+    return _provider->jsonVariationOrThrowInternal(_flagName);
   }
 
 private:
   const EvaluatedFlag *_flag;
-  bool _exists;
-  FlagAccessCallback _onAccess;
+  IVariationProvider *_provider;
   std::string _flagName;
+  bool _exists;
 };
 
 } // namespace gatrix

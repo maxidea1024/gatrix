@@ -1,246 +1,100 @@
 // Copyright Gatrix. All Rights Reserved.
 
 #include "GatrixFlagProxy.h"
+#include "GatrixVariationProvider.h"
 
 void UGatrixFlagProxy::Initialize(const FGatrixEvaluatedFlag &InFlag,
-                                  const FGatrixFlagAccessCallback &InOnAccess) {
+                                  IGatrixVariationProvider *InProvider,
+                                  const FString &InFlagName) {
+  check(InProvider); // Provider must not be null
   Flag = InFlag;
-  FlagName = InFlag.Name;
-  bExists = true;
-  OnAccess = InOnAccess;
-}
-
-void UGatrixFlagProxy::Initialize(const FGatrixEvaluatedFlag &InFlag) {
-  Flag = InFlag;
-  FlagName = InFlag.Name;
-  bExists = true;
+  FlagName = InFlagName;
+  bExists = InProvider->GetVariantInternal(InFlagName).Name != TEXT("$missing");
+  Provider = InProvider;
 }
 
 void UGatrixFlagProxy::TrackAccess(const FString &EventType) const {
-  if (OnAccess.IsBound()) {
-    if (bExists) {
-      OnAccess.Execute(FlagName, &Flag, EventType, Flag.Variant.Name);
-    } else {
-      OnAccess.Execute(FlagName, nullptr, EventType, TEXT(""));
-    }
-  }
+  // Logic centralized in VariationProvider
 }
 
 bool UGatrixFlagProxy::IsEnabled() const {
-  TrackAccess(TEXT("isEnabled"));
-  if (!bExists)
-    return false;
-  return Flag.bEnabled;
+  return Provider->IsEnabledInternal(FlagName);
 }
 
 bool UGatrixFlagProxy::BoolVariation(bool MissingValue) const {
-  TrackAccess(TEXT("getVariant"));
-  if (!bExists)
-    return MissingValue;
-  // Strict: ValueType must be Boolean
-  if (Flag.ValueType != EGatrixValueType::None &&
-      Flag.ValueType != EGatrixValueType::Boolean) {
-    return MissingValue;
-  }
-  if (Flag.Variant.Value.IsEmpty())
-    return MissingValue;
-  return Flag.Variant.Value.ToBool();
+  return Provider->BoolVariationInternal(FlagName, MissingValue);
 }
 
 FString UGatrixFlagProxy::StringVariation(const FString &MissingValue) const {
-  TrackAccess(TEXT("getVariant"));
-  if (!bExists)
-    return MissingValue;
-  // Strict: ValueType must be String
-  if (Flag.ValueType != EGatrixValueType::None &&
-      Flag.ValueType != EGatrixValueType::String) {
-    return MissingValue;
-  }
-  if (Flag.Variant.Value.IsEmpty())
-    return MissingValue;
-  return Flag.Variant.Value;
-}
-
-float UGatrixFlagProxy::NumberVariation(float MissingValue) const {
-  return FloatVariation(MissingValue);
+  return Provider->StringVariationInternal(FlagName, MissingValue);
 }
 
 int32 UGatrixFlagProxy::IntVariation(int32 MissingValue) const {
-  TrackAccess(TEXT("getVariant"));
-  if (!bExists)
-    return MissingValue;
-  if (Flag.ValueType != EGatrixValueType::None &&
-      Flag.ValueType != EGatrixValueType::Number) {
-    return MissingValue;
-  }
-  if (Flag.Variant.Value.IsEmpty())
-    return MissingValue;
-  return FCString::Atoi(*Flag.Variant.Value);
+  return Provider->IntVariationInternal(FlagName, MissingValue);
 }
 
 float UGatrixFlagProxy::FloatVariation(float MissingValue) const {
-  TrackAccess(TEXT("getVariant"));
-  if (!bExists)
-    return MissingValue;
-  if (Flag.ValueType != EGatrixValueType::None &&
-      Flag.ValueType != EGatrixValueType::Number) {
-    return MissingValue;
-  }
-  if (Flag.Variant.Value.IsEmpty())
-    return MissingValue;
-  return FCString::Atof(*Flag.Variant.Value);
+  return Provider->FloatVariationInternal(FlagName, MissingValue);
 }
 
 double UGatrixFlagProxy::DoubleVariation(double MissingValue) const {
-  TrackAccess(TEXT("getVariant"));
-  if (!bExists)
-    return MissingValue;
-  if (Flag.ValueType != EGatrixValueType::None &&
-      Flag.ValueType != EGatrixValueType::Number) {
-    return MissingValue;
-  }
-  if (Flag.Variant.Value.IsEmpty())
-    return MissingValue;
-  return FCString::Atod(*Flag.Variant.Value);
+  return Provider->DoubleVariationInternal(FlagName, MissingValue);
 }
 
 FString UGatrixFlagProxy::JsonVariation(const FString &MissingValue) const {
-  TrackAccess(TEXT("getVariant"));
-  if (!bExists)
-    return MissingValue;
-  // Strict: ValueType must be Json
-  if (Flag.ValueType != EGatrixValueType::None &&
-      Flag.ValueType != EGatrixValueType::Json) {
-    return MissingValue;
-  }
-  if (Flag.Variant.Value.IsEmpty())
-    return MissingValue;
-  return Flag.Variant.Value;
+  return Provider->JsonVariationInternal(FlagName, MissingValue);
 }
 
 FGatrixVariationResult
 UGatrixFlagProxy::BoolVariationDetails(bool MissingValue) const {
-  FGatrixVariationResult Result;
-  Result.bFlagExists = bExists;
-  Result.bEnabled = bExists ? Flag.bEnabled : false;
-  TrackAccess(TEXT("getVariant"));
-  if (!bExists) {
-    Result.Value = MissingValue ? TEXT("true") : TEXT("false");
-    Result.Reason = TEXT("flag_not_found");
-    return Result;
-  }
-  if (Flag.ValueType != EGatrixValueType::None &&
-      Flag.ValueType != EGatrixValueType::Boolean) {
-    Result.Value = MissingValue ? TEXT("true") : TEXT("false");
-    Result.Reason = TEXT("type_mismatch:expected_boolean");
-    return Result;
-  }
-  bool Val =
-      Flag.Variant.Value.IsEmpty() ? MissingValue : Flag.Variant.Value.ToBool();
-  Result.Value = Val ? TEXT("true") : TEXT("false");
-  Result.Reason = Flag.Reason.IsEmpty() ? TEXT("evaluated") : Flag.Reason;
-  return Result;
+  return Provider->BoolVariationDetailsInternal(FlagName, MissingValue);
 }
 
 FGatrixVariationResult
 UGatrixFlagProxy::StringVariationDetails(const FString &MissingValue) const {
-  FGatrixVariationResult Result;
-  Result.bFlagExists = bExists;
-  Result.bEnabled = bExists ? Flag.bEnabled : false;
-  TrackAccess(TEXT("getVariant"));
-  if (!bExists) {
-    Result.Value = MissingValue;
-    Result.Reason = TEXT("flag_not_found");
-    return Result;
-  }
-  if (Flag.ValueType != EGatrixValueType::None &&
-      Flag.ValueType != EGatrixValueType::String) {
-    Result.Value = MissingValue;
-    Result.Reason = TEXT("type_mismatch:expected_string");
-    return Result;
-  }
-  Result.Value =
-      Flag.Variant.Value.IsEmpty() ? MissingValue : Flag.Variant.Value;
-  Result.Reason = Flag.Reason.IsEmpty() ? TEXT("evaluated") : Flag.Reason;
-  return Result;
-}
-
-FGatrixVariationResult
-UGatrixFlagProxy::NumberVariationDetails(float MissingValue) const {
-  return FloatVariationDetails(MissingValue);
+  return Provider->StringVariationDetailsInternal(FlagName, MissingValue);
 }
 
 FGatrixVariationResult
 UGatrixFlagProxy::IntVariationDetails(int32 MissingValue) const {
-  FGatrixVariationResult Result;
-  Result.bFlagExists = bExists;
-  Result.bEnabled = bExists ? Flag.bEnabled : false;
-  TrackAccess(TEXT("getVariant"));
-  if (!bExists) {
-    Result.Value = FString::FromInt(MissingValue);
-    Result.Reason = TEXT("flag_not_found");
-    return Result;
-  }
-  if (Flag.ValueType != EGatrixValueType::None &&
-      Flag.ValueType != EGatrixValueType::Number) {
-    Result.Value = FString::FromInt(MissingValue);
-    Result.Reason = TEXT("type_mismatch:expected_number");
-    return Result;
-  }
-  int32 Val = Flag.Variant.Value.IsEmpty()
-                  ? MissingValue
-                  : FCString::Atoi(*Flag.Variant.Value);
-  Result.Value = FString::FromInt(Val);
-  Result.Reason = Flag.Reason.IsEmpty() ? TEXT("evaluated") : Flag.Reason;
-  return Result;
+  return Provider->IntVariationDetailsInternal(FlagName, MissingValue);
 }
 
 FGatrixVariationResult
 UGatrixFlagProxy::FloatVariationDetails(float MissingValue) const {
-  FGatrixVariationResult Result;
-  Result.bFlagExists = bExists;
-  Result.bEnabled = bExists ? Flag.bEnabled : false;
-  TrackAccess(TEXT("getVariant"));
-  if (!bExists) {
-    Result.Value = FString::SanitizeFloat(MissingValue);
-    Result.Reason = TEXT("flag_not_found");
-    return Result;
-  }
-  if (Flag.ValueType != EGatrixValueType::None &&
-      Flag.ValueType != EGatrixValueType::Number) {
-    Result.Value = FString::SanitizeFloat(MissingValue);
-    Result.Reason = TEXT("type_mismatch:expected_number");
-    return Result;
-  }
-  float Val = Flag.Variant.Value.IsEmpty()
-                  ? MissingValue
-                  : FCString::Atof(*Flag.Variant.Value);
-  Result.Value = FString::SanitizeFloat(Val);
-  Result.Reason = Flag.Reason.IsEmpty() ? TEXT("evaluated") : Flag.Reason;
-  return Result;
+  return Provider->FloatVariationDetailsInternal(FlagName, MissingValue);
 }
 
 FGatrixVariationResult
 UGatrixFlagProxy::DoubleVariationDetails(double MissingValue) const {
-  FGatrixVariationResult Result;
-  Result.bFlagExists = bExists;
-  Result.bEnabled = bExists ? Flag.bEnabled : false;
-  TrackAccess(TEXT("getVariant"));
-  if (!bExists) {
-    Result.Value = FString::Printf(TEXT("%f"), MissingValue);
-    Result.Reason = TEXT("flag_not_found");
-    return Result;
-  }
-  if (Flag.ValueType != EGatrixValueType::None &&
-      Flag.ValueType != EGatrixValueType::Number) {
-    Result.Value = FString::Printf(TEXT("%f"), MissingValue);
-    Result.Reason = TEXT("type_mismatch:expected_number");
-    return Result;
-  }
-  double Val = Flag.Variant.Value.IsEmpty()
-                   ? MissingValue
-                   : FCString::Atod(*Flag.Variant.Value);
-  Result.Value = FString::Printf(TEXT("%f"), Val);
-  Result.Reason = Flag.Reason.IsEmpty() ? TEXT("evaluated") : Flag.Reason;
-  return Result;
+  return Provider->DoubleVariationDetailsInternal(FlagName, MissingValue);
+}
+
+FGatrixVariationResult
+UGatrixFlagProxy::JsonVariationDetails(const FString &MissingValue) const {
+  return Provider->JsonVariationDetailsInternal(FlagName, MissingValue);
+}
+
+bool UGatrixFlagProxy::BoolVariationOrThrow() {
+  return Provider->BoolVariationOrThrowInternal(FlagName);
+}
+
+FString UGatrixFlagProxy::StringVariationOrThrow() {
+  return Provider->StringVariationOrThrowInternal(FlagName);
+}
+
+float UGatrixFlagProxy::FloatVariationOrThrow() {
+  return Provider->FloatVariationOrThrowInternal(FlagName);
+}
+
+int32 UGatrixFlagProxy::IntVariationOrThrow() {
+  return Provider->IntVariationOrThrowInternal(FlagName);
+}
+
+double UGatrixFlagProxy::DoubleVariationOrThrow() {
+  return Provider->DoubleVariationOrThrowInternal(FlagName);
+}
+
+FString UGatrixFlagProxy::JsonVariationOrThrow() {
+  return Provider->JsonVariationOrThrowInternal(FlagName);
 }

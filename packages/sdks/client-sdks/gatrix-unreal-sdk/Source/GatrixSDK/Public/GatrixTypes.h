@@ -103,9 +103,6 @@ struct GATRIXSDK_API FGatrixContext {
   FString SessionId;
 
   UPROPERTY(BlueprintReadWrite, Category = "Gatrix")
-  FString DeviceId;
-
-  UPROPERTY(BlueprintReadWrite, Category = "Gatrix")
   FString CurrentTime;
 
   /** Custom properties */

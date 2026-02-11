@@ -1,74 +1,79 @@
 // Copyright Gatrix. All Rights Reserved.
-// Features client for Gatrix Unreal SDK
-// Handles flag fetching, caching, polling, variations, watch pattern, and
-// metrics
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "GatrixEventEmitter.h"
-#include "GatrixEvents.h"
 #include "GatrixFeaturesClient.generated.h"
 #include "GatrixFlagProxy.h"
-#include "GatrixStorageProvider.h"
 #include "GatrixTypes.h"
+#include "GatrixVariationProvider.h"
+#include "Http.h"
+#include "IGatrixVariationProvider.h"
+#include "Runtime/Engine/Public/TimerManager.h"
 
-// Blueprint-bindable delegates
+
+// Delegates for Blueprint events
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGatrixOnReady);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGatrixOnChange);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGatrixOnSync);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGatrixOnRecovered);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGatrixOnError,
-                                            const FGatrixErrorEvent &,
-                                            ErrorEvent);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGatrixOnImpression,
-                                            const FGatrixImpressionEvent &,
-                                            ImpressionEvent);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FGatrixOnError, FString, Code,
+                                             FString, Message);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FGatrixOnImpression, FString,
+                                              FlagName, bool, bEnabled, FString,
+                                              VariantName, FString, EventType);
 
-// C++ flag watch callback
+// Delegate for internal flag watching
 DECLARE_DELEGATE_OneParam(FGatrixFlagWatchDelegate, UGatrixFlagProxy *);
 
 /**
- * Features client managing all feature flag operations.
- * Thread-safe: protects internal flag storage with FCriticalSection,
- * HTTP callbacks are marshalled to game thread via AsyncTask.
+ * UGatrixFeaturesClient - Central client for feature flag management in Unreal
+ * SDK. Implementation of CLIENT_SDK_SPEC.md.
  */
 UCLASS(BlueprintType)
-class GATRIXSDK_API UGatrixFeaturesClient : public UObject {
+class GATRIXSDK_API UGatrixFeaturesClient : public UObject,
+                                            public IGatrixVariationProvider {
   GENERATED_BODY()
 
 public:
-  /** Initialize the features client with config and event emitter */
-  void Initialize(const FGatrixClientConfig &Config,
-                  FGatrixEventEmitter *Emitter,
-                  TSharedPtr<IGatrixStorageProvider> Storage);
+  UGatrixFeaturesClient();
 
-  /** Start fetching and polling */
+  /**
+   * Start the client - initializes storage, bootstrap, and starts polling.
+   */
+  UFUNCTION(BlueprintCallable, Category = "Gatrix|Features")
   void Start();
 
-  /** Stop polling and cleanup */
+  /**
+   * Stop the client - stops polling and metrics.
+   */
+  UFUNCTION(BlueprintCallable, Category = "Gatrix|Features")
   void Stop();
 
-  // ==================== Flag Access ====================
+  // ==================== Flag Access - Basic ====================
 
   /** Check if a flag is enabled */
   UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|Features")
   bool IsEnabled(const FString &FlagName) const;
 
-  /** Get variant for a flag (never null - returns disabled variant if missing)
-   */
+  /** Get variant for a flag */
   UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|Features")
   FGatrixVariant GetVariant(const FString &FlagName) const;
-
-  /** Get a FlagProxy for a flag */
-  UFUNCTION(BlueprintCallable, Category = "Gatrix|Features")
-  UGatrixFlagProxy *GetFlag(const FString &FlagName);
 
   /** Get all evaluated flags */
   UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|Features")
   TArray<FGatrixEvaluatedFlag> GetAllFlags() const;
 
-  // ==================== Variation Methods ====================
+  /** Get a FlagProxy for convenient access */
+  UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|Features")
+  UGatrixFlagProxy *GetFlag(const FString &FlagName) const;
+
+  /** Check if a flag is registered in the cache */
+  UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|Features")
+  bool HasFlag(const FString &FlagName) const;
+
+  // ==================== Flag Access - Typed Variations ====================
 
   /** Get boolean variation */
   UFUNCTION(BlueprintCallable, BlueprintPure,
@@ -80,11 +85,6 @@ public:
             Category = "Gatrix|Features|Variation")
   FString StringVariation(const FString &FlagName,
                           const FString &MissingValue) const;
-
-  /** Get number variation */
-  UFUNCTION(BlueprintCallable, BlueprintPure,
-            Category = "Gatrix|Features|Variation")
-  float NumberVariation(const FString &FlagName, float MissingValue) const;
 
   /** Get integer variation */
   UFUNCTION(BlueprintCallable, BlueprintPure,
@@ -122,12 +122,6 @@ public:
   StringVariationDetails(const FString &FlagName,
                          const FString &MissingValue) const;
 
-  /** Get number variation with details */
-  UFUNCTION(BlueprintCallable, BlueprintPure,
-            Category = "Gatrix|Features|Variation")
-  FGatrixVariationResult NumberVariationDetails(const FString &FlagName,
-                                                float MissingValue) const;
-
   /** Get integer variation with details */
   UFUNCTION(BlueprintCallable, BlueprintPure,
             Category = "Gatrix|Features|Variation")
@@ -146,7 +140,34 @@ public:
   FGatrixVariationResult DoubleVariationDetails(const FString &FlagName,
                                                 double MissingValue) const;
 
-  // ==================== Context ====================
+  /** Get JSON variation with details */
+  UFUNCTION(BlueprintCallable, BlueprintPure,
+            Category = "Gatrix|Features|Variation")
+  FGatrixVariationResult
+  JsonVariationDetails(const FString &FlagName,
+                       const FString &MissingValue) const;
+
+  // ==================== OrThrow Variations ====================
+
+  UFUNCTION(BlueprintCallable, Category = "Gatrix|Features|Variation")
+  bool BoolVariationOrThrow(const FString &FlagName);
+
+  UFUNCTION(BlueprintCallable, Category = "Gatrix|Features|Variation")
+  FString StringVariationOrThrow(const FString &FlagName);
+
+  UFUNCTION(BlueprintCallable, Category = "Gatrix|Features|Variation")
+  float FloatVariationOrThrow(const FString &FlagName);
+
+  UFUNCTION(BlueprintCallable, Category = "Gatrix|Features|Variation")
+  int32 IntVariationOrThrow(const FString &FlagName);
+
+  UFUNCTION(BlueprintCallable, Category = "Gatrix|Features|Variation")
+  double DoubleVariationOrThrow(const FString &FlagName);
+
+  UFUNCTION(BlueprintCallable, Category = "Gatrix|Features|Variation")
+  FString JsonVariationOrThrow(const FString &FlagName);
+
+  // ==================== Context Management ====================
 
   /** Update the evaluation context and re-fetch flags */
   UFUNCTION(BlueprintCallable, Category = "Gatrix|Features|Context")
@@ -221,6 +242,56 @@ public:
   /** Fires on impression events */
   UPROPERTY(BlueprintAssignable, Category = "Gatrix|Events")
   FGatrixOnImpression OnImpression;
+
+  // ==================== IGatrixVariationProvider Implementation
+  // ====================
+
+  virtual bool IsEnabledInternal(const FString &FlagName) override;
+  virtual FGatrixVariant GetVariantInternal(const FString &FlagName) override;
+
+  virtual FString VariationInternal(const FString &FlagName,
+                                    const FString &MissingValue) override;
+  virtual bool BoolVariationInternal(const FString &FlagName,
+                                     bool MissingValue) override;
+  virtual FString StringVariationInternal(const FString &FlagName,
+                                          const FString &MissingValue) override;
+  virtual float FloatVariationInternal(const FString &FlagName,
+                                       float MissingValue) override;
+  virtual int32 IntVariationInternal(const FString &FlagName,
+                                     int32 MissingValue) override;
+  virtual double DoubleVariationInternal(const FString &FlagName,
+                                         double MissingValue) override;
+  virtual FString JsonVariationInternal(const FString &FlagName,
+                                        const FString &MissingValue) override;
+
+  virtual FGatrixVariationResult
+  BoolVariationDetailsInternal(const FString &FlagName,
+                               bool MissingValue) override;
+  virtual FGatrixVariationResult
+  StringVariationDetailsInternal(const FString &FlagName,
+                                 const FString &MissingValue) override;
+  virtual FGatrixVariationResult
+  FloatVariationDetailsInternal(const FString &FlagName,
+                                float MissingValue) override;
+  virtual FGatrixVariationResult
+  IntVariationDetailsInternal(const FString &FlagName,
+                              int32 MissingValue) override;
+  virtual FGatrixVariationResult
+  DoubleVariationDetailsInternal(const FString &FlagName,
+                                 double MissingValue) override;
+  virtual FGatrixVariationResult
+  JsonVariationDetailsInternal(const FString &FlagName,
+                               const FString &MissingValue) override;
+
+  virtual bool BoolVariationOrThrowInternal(const FString &FlagName) override;
+  virtual FString
+  StringVariationOrThrowInternal(const FString &FlagName) override;
+  virtual float FloatVariationOrThrowInternal(const FString &FlagName) override;
+  virtual int32 IntVariationOrThrowInternal(const FString &FlagName) override;
+  virtual double
+  DoubleVariationOrThrowInternal(const FString &FlagName) override;
+  virtual FString
+  JsonVariationOrThrowInternal(const FString &FlagName) override;
 
 private:
   // ==================== Internal Methods ====================

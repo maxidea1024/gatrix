@@ -5,7 +5,7 @@ Client SDK for the Gatrix platform in Unreal Engine 4.27+.
 ## Features
 
 - **Feature Flags**: Real-time flag evaluation with polling
-- **Variations**: Bool, String, Number, JSON variation methods
+- **Variations**: Bool, String, Float, Int, Double, JSON variation methods
 - **Context**: Dynamic evaluation context with custom properties
 - **ETag Caching**: Conditional requests to minimize bandwidth
 - **Explicit Sync Mode**: Control when flag changes are applied
@@ -54,15 +54,17 @@ Client->On(GatrixEvents::FlagsReady, [](const TArray<FString>& Args)
 
 Client->On(GatrixEvents::FlagsChange, [Client](const TArray<FString>& Args)
 {
-    bool bDarkMode = Client->BoolVariation(TEXT("dark-mode"), false);
-    float GameSpeed = Client->NumberVariation(TEXT("game-speed"), 1.0f);
+    float GameSpeed = Client->FloatVariation(TEXT("game-speed"), 1.0f);
+    int32 Difficulty = Client->IntVariation(TEXT("difficulty"), 1);
+    double Gravity = Client->DoubleVariation(TEXT("gravity"), 9.8);
 });
 
 // Direct flag access
 bool bFeatureOn = Client->IsEnabled(TEXT("new-feature"));
 bool bBool = Client->BoolVariation(TEXT("my-flag"), false);
 FString Str = Client->StringVariation(TEXT("theme"), TEXT("default"));
-float Num = Client->NumberVariation(TEXT("speed"), 1.0f);
+float Num = Client->FloatVariation(TEXT("speed"), 1.0f);
+int32 Level = Client->IntVariation(TEXT("level"), 1);
 
 // Watch a specific flag
 UGatrixFeaturesClient* Features = Client->GetFeatures();
