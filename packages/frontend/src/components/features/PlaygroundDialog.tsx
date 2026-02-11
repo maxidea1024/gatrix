@@ -64,7 +64,10 @@ import {
   LocalOffer as SemverIcon,
   SportsEsports as JoystickIcon,
   ContentCopy as CopyIcon,
+  DataArray as ArrayIcon,
+  Public as CountryIcon,
 } from '@mui/icons-material';
+import CountrySelect from '../common/CountrySelect';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { useNavigate } from 'react-router-dom';
@@ -81,14 +84,14 @@ interface ContextField {
   fieldName: string;
   displayName: string;
   description?: string;
-  fieldType: 'string' | 'number' | 'boolean' | 'date' | 'datetime' | 'semver';
+  fieldType: 'string' | 'number' | 'boolean' | 'date' | 'datetime' | 'semver' | 'array' | 'country';
   legalValues?: string[];
 }
 
 interface ContextEntry {
   key: string;
   value: string;
-  type: 'string' | 'number' | 'boolean' | 'date' | 'datetime' | 'semver';
+  type: 'string' | 'number' | 'boolean' | 'date' | 'datetime' | 'semver' | 'array' | 'country';
 }
 
 interface EvaluationResult {
@@ -656,6 +659,10 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
         return <DateTimeIcon sx={{ fontSize: 16, color: 'secondary.main' }} />;
       case 'semver':
         return <SemverIcon sx={{ fontSize: 16, color: 'primary.main' }} />;
+      case 'array':
+        return <ArrayIcon sx={{ fontSize: 16, color: 'info.dark' }} />;
+      case 'country':
+        return <CountryIcon sx={{ fontSize: 16, color: 'success.dark' }} />;
       default:
         return <StringIcon sx={{ fontSize: 16, color: 'text.disabled' }} />;
     }
@@ -765,6 +772,32 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                         onChange={(isoString: string) =>
                           handleUpdateContextEntry(index, 'value', isoString)
                         }
+                      />
+                    );
+                  }
+
+                  // Country type - use CountrySelect
+                  if (fieldType === 'country') {
+                    return (
+                      <CountrySelect
+                        value={entry.value || null}
+                        onChange={(val) => handleUpdateContextEntry(index, 'value', val || '')}
+                        size="small"
+                        placeholder={t('playground.selectValue')}
+                      />
+                    );
+                  }
+
+                  // Array type - comma separated values
+                  if (fieldType === 'array') {
+                    return (
+                      <TextField
+                        fullWidth
+                        size="small"
+                        placeholder={t('playground.enterArrayValue', 'e.g., val1, val2, val3')}
+                        value={entry.value}
+                        onChange={(e) => handleUpdateContextEntry(index, 'value', e.target.value)}
+                        helperText={t('playground.arrayHelp', 'Comma separated values')}
                       />
                     );
                   }

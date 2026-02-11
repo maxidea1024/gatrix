@@ -60,6 +60,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import LocalizedDateTimePicker from '@/components/common/LocalizedDateTimePicker';
+import CountrySelect from '@/components/common/CountrySelect';
 
 // Constraint types matching backend FeatureFlag.ts
 export interface Constraint {
@@ -725,6 +726,31 @@ export const ConstraintEditor: React.FC<ConstraintEditorProps> = ({
       );
     }
 
+    // Country type - use CountrySelect component
+    if (fieldType === 'country') {
+      if (isMultiValue) {
+        return (
+          <CountrySelect
+            multiple
+            value={constraint.values || []}
+            onChange={(newValue) => handleConstraintChange(index, 'values', newValue || [])}
+            placeholder={t('featureFlags.selectValues')}
+            disabled={disabled}
+            size="small"
+          />
+        );
+      }
+      return (
+        <CountrySelect
+          value={constraint.value || null}
+          onChange={(newValue) => handleConstraintChange(index, 'value', newValue || '')}
+          placeholder={t('featureFlags.selectValue')}
+          disabled={disabled}
+          size="small"
+        />
+      );
+    }
+
     // Multi-value operators (IN, NOT_IN)
     if (isMultiValue) {
       if (legalValues.length > 0) {
@@ -884,9 +910,11 @@ export const ConstraintEditor: React.FC<ConstraintEditorProps> = ({
                 const operators = getOperatorsForField(constraint.contextName);
                 const usedFieldNames = getUsedFieldNames(index);
                 const isFieldEmpty = !constraint.contextName;
-                const isValueEmpty = isMultiValueOperator(constraint.operator)
-                  ? !constraint.values?.length
-                  : !constraint.value;
+                const isValueEmpty = isValuelessOperator(constraint.operator)
+                  ? false
+                  : isMultiValueOperator(constraint.operator)
+                    ? !constraint.values?.length
+                    : !constraint.value;
 
                 return (
                   <React.Fragment key={constraintIds[index]}>

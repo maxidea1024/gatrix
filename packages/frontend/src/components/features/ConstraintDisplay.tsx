@@ -6,6 +6,8 @@ import React from 'react';
 import { Box, Typography, Chip, Paper, Stack, Tooltip } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { formatDateTime } from '../../utils/dateFormat';
+import { FlagImage } from '../common/CountrySelect';
+import { getCountryByCode } from '../../utils/countries';
 
 export interface ConstraintValue {
   contextName: string;
@@ -128,6 +130,9 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({
 
   const isMultiValue = constraint.values && constraint.values.length > 0;
   const showCaseSensitivity = constraint.operator?.startsWith('str_');
+  const isCountryField = contextFields?.find(
+    (f) => f.fieldName === constraint.contextName
+  )?.fieldType === 'country';
 
   if (compact) {
     const displayValue = isMultiValue ? constraint.values!.join(', ') : getSingleValueDisplay();
@@ -366,10 +371,48 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({
             alignItems: 'center',
           }}
         >
-          {constraint.values!.map((val, idx) => (
+          {constraint.values!.map((val, idx) => {
+            const countryInfo = isCountryField ? getCountryByCode(val) : null;
+            const displayLabel = countryInfo
+              ? `${countryInfo.name} (${val.toUpperCase()})`
+              : val === '' ? t('common.emptyString') : val;
+            return (
+              <Chip
+                key={idx}
+                icon={isCountryField ? <FlagImage code={val} size={14} /> : undefined}
+                label={displayLabel}
+                size="small"
+                sx={{
+                  height: 22,
+                  fontSize: '0.75rem',
+                  fontWeight: 500,
+                  bgcolor: 'action.selected',
+                  color: 'text.primary',
+                  borderRadius: '16px',
+                  ...(val === '' && { fontStyle: 'italic', color: 'text.secondary' }),
+                  '& .MuiChip-icon': {
+                    ml: 0.5,
+                  },
+                  '& .MuiChip-label': {
+                    px: 1.25,
+                  },
+                }}
+              />
+            );
+          })}
+        </Box>
+      ) : (
+        (() => {
+          const singleVal = getSingleValueDisplay();
+          const countryCode = isCountryField ? (constraint.value || '') : '';
+          const countryInfo = isCountryField ? getCountryByCode(countryCode) : null;
+          const displayLabel = countryInfo
+            ? `${countryInfo.name} (${countryCode.toUpperCase()})`
+            : singleVal;
+          return (
             <Chip
-              key={idx}
-              label={val === '' ? t('common.emptyString') : val}
+              icon={isCountryField && countryCode ? <FlagImage code={countryCode} size={14} /> : undefined}
+              label={displayLabel}
               size="small"
               sx={{
                 height: 22,
@@ -378,31 +421,17 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({
                 bgcolor: 'action.selected',
                 color: 'text.primary',
                 borderRadius: '16px',
-                ...(val === '' && { fontStyle: 'italic', color: 'text.secondary' }),
+                ...(singleVal === t('common.emptyString') && { fontStyle: 'italic', color: 'text.secondary' }),
+                '& .MuiChip-icon': {
+                  ml: 0.5,
+                },
                 '& .MuiChip-label': {
                   px: 1.25,
                 },
               }}
             />
-          ))}
-        </Box>
-      ) : (
-        <Chip
-          label={getSingleValueDisplay()}
-          size="small"
-          sx={{
-            height: 22,
-            fontSize: '0.75rem',
-            fontWeight: 500,
-            bgcolor: 'action.selected',
-            color: 'text.primary',
-            borderRadius: '16px',
-            ...(getSingleValueDisplay() === t('common.emptyString') && { fontStyle: 'italic', color: 'text.secondary' }),
-            '& .MuiChip-label': {
-              px: 1.25,
-            },
-          }}
-        />
+          );
+        })()
       )}
     </Box>
   );

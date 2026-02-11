@@ -43,6 +43,8 @@ import {
   ToggleOn as BooleanIcon,
   Schedule as DateTimeIcon,
   LocalOffer as SemverIcon,
+  DataArray as ArrayIcon,
+  Public as CountryIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -70,7 +72,7 @@ interface FeatureContextField {
   fieldName: string;
   displayName: string;
   description: string;
-  fieldType: 'string' | 'number' | 'boolean' | 'date' | 'semver';
+  fieldType: 'string' | 'number' | 'boolean' | 'date' | 'semver' | 'array' | 'country';
   legalValues: string[];
   isEnabled: boolean;
   tags: string[];
@@ -211,6 +213,10 @@ const FeatureContextFieldsPage: React.FC = () => {
         return <DateTimeIcon sx={{ fontSize: 16 }} color="secondary" />;
       case 'semver':
         return <SemverIcon sx={{ fontSize: 16 }} color="primary" />;
+      case 'array':
+        return <ArrayIcon sx={{ fontSize: 16 }} color="info" />;
+      case 'country':
+        return <CountryIcon sx={{ fontSize: 16 }} color="success" />;
       default:
         return <StringIcon sx={{ fontSize: 16 }} color="disabled" />;
     }
@@ -248,6 +254,16 @@ const FeatureContextFieldsPage: React.FC = () => {
             value: 'semver',
             label: t('featureFlags.fieldTypes.semver'),
             icon: getFieldTypeIcon('semver'),
+          },
+          {
+            value: 'array',
+            label: t('featureFlags.fieldTypes.array'),
+            icon: getFieldTypeIcon('array'),
+          },
+          {
+            value: 'country',
+            label: t('featureFlags.fieldTypes.country'),
+            icon: getFieldTypeIcon('country'),
           },
         ],
       },
@@ -320,6 +336,10 @@ const FeatureContextFieldsPage: React.FC = () => {
         return <DateTimeIcon {...iconProps} color="secondary" />;
       case 'semver':
         return <SemverIcon {...iconProps} color="primary" />;
+      case 'array':
+        return <ArrayIcon {...iconProps} color="info" />;
+      case 'country':
+        return <CountryIcon {...iconProps} color="success" />;
       default:
         return <StringIcon {...iconProps} color="disabled" />;
     }
@@ -444,6 +464,10 @@ const FeatureContextFieldsPage: React.FC = () => {
         return t('featureFlags.fieldTypes.date');
       case 'semver':
         return t('featureFlags.fieldTypes.semver');
+      case 'array':
+        return t('featureFlags.fieldTypes.array');
+      case 'country':
+        return t('featureFlags.fieldTypes.country');
       default:
         return type;
     }
@@ -780,8 +804,8 @@ const FeatureContextFieldsPage: React.FC = () => {
                                           {expandedLegalValues.has(field.id)
                                             ? t('featureFlags.showLess')
                                             : t('featureFlags.showMore', {
-                                                count: field.legalValues.length - 3,
-                                              })}
+                                              count: field.legalValues.length - 3,
+                                            })}
                                         </Typography>
                                       )}
                                     </Box>
@@ -989,36 +1013,31 @@ const FeatureContextFieldsPage: React.FC = () => {
                   </Box>
                 )}
               >
-                <MenuItem value="string">
-                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    {getTypeIcon('string')}
-                    {t('featureFlags.fieldTypes.string')}
-                  </Box>
-                </MenuItem>
-                <MenuItem value="number">
-                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    {getTypeIcon('number')}
-                    {t('featureFlags.fieldTypes.number')}
-                  </Box>
-                </MenuItem>
-                <MenuItem value="boolean">
-                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    {getTypeIcon('boolean')}
-                    {t('featureFlags.fieldTypes.boolean')}
-                  </Box>
-                </MenuItem>
-                <MenuItem value="date">
-                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    {getTypeIcon('date')}
-                    {t('featureFlags.fieldTypes.date')}
-                  </Box>
-                </MenuItem>
-                <MenuItem value="semver">
-                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    {getTypeIcon('semver')}
-                    {t('featureFlags.fieldTypes.semver')}
-                  </Box>
-                </MenuItem>
+                {[
+                  { value: 'string', descKey: 'featureFlags.fieldTypeDesc.string' },
+                  { value: 'number', descKey: 'featureFlags.fieldTypeDesc.number' },
+                  { value: 'boolean', descKey: 'featureFlags.fieldTypeDesc.boolean' },
+                  { value: 'date', descKey: 'featureFlags.fieldTypeDesc.date' },
+                  { value: 'semver', descKey: 'featureFlags.fieldTypeDesc.semver' },
+                  { value: 'array', descKey: 'featureFlags.fieldTypeDesc.array' },
+                  { value: 'country', descKey: 'featureFlags.fieldTypeDesc.country' },
+                ].map((item) => (
+                  <MenuItem key={item.value} value={item.value} sx={{ py: 1.5 }}>
+                    <Box>
+                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        {getTypeIcon(item.value)}
+                        {t(`featureFlags.fieldTypes.${item.value}`)}
+                      </Box>
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        sx={{ ml: 3.5, display: 'block', mt: 0.25, lineHeight: 1.3 }}
+                      >
+                        {t(item.descKey)}
+                      </Typography>
+                    </Box>
+                  </MenuItem>
+                ))}
               </Select>
               <FormHelperText>{t('featureFlags.fieldTypeHelp')}</FormHelperText>
             </FormControl>

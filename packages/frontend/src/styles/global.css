@@ -20,6 +20,14 @@ input:-webkit-autofill {
 /* Ensure snackbar notifications appear above all modals and backdrops */
 .snackbar-container-root {
   z-index: 9999 !important;
+  top: 64px !important;
+}
+
+/* Force zero margins on snackbar wrappers and items to remove the large gaps */
+.snackbar-container-root .notistack-CollapseWrapper,
+.snackbar-container-root .notistack-Snackbar {
+  margin: 0 !important;
+  padding: 1px 0 !important;
 }
 
 /* Notistack container override */

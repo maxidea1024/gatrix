@@ -1,0 +1,30 @@
+﻿yarn run v1.22.22
+$ C:\work\uwo\gatrix\node_modules\.bin\eslint src/components/common/CountrySelect.tsx --format compact
+node.exe : 
+위치 C:\Users\jhseo\AppData\Roaming\npm\yarn.ps1:24 문자:5
++     & "node$exe"  "$basedir/node_modules/yarn/bin/yarn.js" $args
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteE 
+   xception
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+Oops! Something went wrong! :(
+
+ESLint: 9.39.1
+
+ESLint couldn't find an eslint.config.(js|mjs|cjs) file.
+
+From ESLint v9.0.0, the default configuration file is now eslint.c
+onfig.js.
+If you are using a .eslintrc.* file, please follow the migration g
+uide
+to update your configuration file to the new format:
+
+https://eslint.org/docs/latest/use/configure/migration-guide
+
+If you still have problems after following the migration guide, pl
+ease stop by
+https://eslint.org/chat/help to chat with the team.
+
+error Command failed with exit code 2.
+info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command.

@@ -355,15 +355,22 @@ const FeatureSegmentsPage: React.FC = () => {
   const isSegmentValid = (): boolean => {
     if (!editingSegment?.segmentName) return false;
 
+    // Valueless operators - no value required
+    const valuelessOps = ['exists', 'not_exists', 'arr_empty'];
+    // Multi-value operators - require values array
+    const multiValueOps = ['str_in', 'num_in', 'semver_in'];
+
     // All constraints must have valid contextName and value
     const constraints = editingSegment.constraints || [];
     for (const constraint of constraints) {
       // Must have a context field selected
       if (!constraint.contextName) return false;
 
+      // Valueless operators don't need a value
+      if (valuelessOps.includes(constraint.operator)) continue;
+
       // Must have value(s) based on operator type
-      const isMultiValue = constraint.operator === 'str_in' || constraint.operator === 'str_not_in';
-      if (isMultiValue) {
+      if (multiValueOps.includes(constraint.operator)) {
         if (!constraint.values?.length) return false;
       } else {
         if (constraint.value === undefined || constraint.value === '') return false;

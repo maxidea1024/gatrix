@@ -1427,7 +1427,7 @@ const FeatureFlagsPage: React.FC = () => {
             {t('featureFlags.importExport')}
           </Button>
           <Divider orientation="vertical" sx={{ height: 32, mx: 0.5 }} />
-          <Tooltip title={t('playground.title')}>
+          <Tooltip title={t('playground.title')} disableFocusListener>
             <IconButton
               size="small"
               onClick={() => setPlaygroundOpen(true)}
@@ -1521,7 +1521,7 @@ const FeatureFlagsPage: React.FC = () => {
                 refreshDisabled={loading}
                 noWrap={true}
                 afterFilterAddActions={
-                  <Tooltip title={t('common.columnSettings')}>
+                  <Tooltip title={t('common.columnSettings')} disableFocusListener>
                     <IconButton
                       onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
                       sx={{
@@ -1729,7 +1729,7 @@ const FeatureFlagsPage: React.FC = () => {
                                       >
                                         {flag.flagName}
                                       </Typography>
-                                      <Tooltip title={t('common.copy')}>
+                                      <Tooltip title={t('common.copy')} disableFocusListener>
                                         <IconButton
                                           size="small"
                                           onClick={(e) => {
@@ -1828,6 +1828,7 @@ const FeatureFlagsPage: React.FC = () => {
                                             }
                                             arrow
                                             placement="top"
+                                            disableFocusListener
                                           >
                                             <span>
                                               <FeatureSwitch

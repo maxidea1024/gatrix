@@ -364,6 +364,7 @@ const AppContent: React.FC = () => {
                   />
                   <SnackbarProvider
                     maxSnack={3}
+                    dense
                     autoHideDuration={3000}
                     anchorOrigin={{
                       vertical: 'top',
@@ -372,7 +373,6 @@ const AppContent: React.FC = () => {
                     classes={{
                       containerRoot: 'snackbar-container-root',
                     }}
-                    style={{ zIndex: 9999, marginTop: 56 }}
                     action={(snackbarId) => (
                       <IconButton
                         size="small"
