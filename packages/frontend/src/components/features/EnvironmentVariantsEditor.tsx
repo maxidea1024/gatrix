@@ -8,7 +8,7 @@
  * - Shows guidance to flag values tab when valueType is set
  */
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { styled } from '@mui/material/styles';
+import { styled, alpha } from '@mui/material/styles';
 import {
   Box,
   Paper,
@@ -210,25 +210,17 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
     }
   }, [saving, savingValues]);
 
-  // Render-time Status Synchronization (prevents flicker)
-  if (!isSavingRef.current && initialVariantsJson !== prevVariantsJson) {
-    setPrevVariantsJson(initialVariantsJson);
-    setEditingVariants(initialVariants);
-  }
+  // --- Sync variations when props change ---
+  useEffect(() => {
+    if (initialVariantsJson !== prevVariantsJson) {
+      setPrevVariantsJson(initialVariantsJson);
+      setEditingVariants(initialVariants);
+    }
+  }, [initialVariantsJson, initialVariants, prevVariantsJson]);
 
   const hasChanges = useMemo(() => {
     return JSON.stringify(editingVariants) !== initialVariantsJson;
   }, [editingVariants, initialVariantsJson]);
-
-  // Effect to handle expansion logic on data reload
-  useEffect(() => {
-    if (preserveExpandedRef.current) {
-      setExpanded(true);
-      preserveExpandedRef.current = false;
-    } else if (flagType === 'remoteConfig' && initialVariants.length > 0) {
-      setExpanded(true);
-    }
-  }, [initialVariantsJson, flagType, initialVariants.length]);
 
   // --- Environment Values State & Logic ---
   const originalUseEnvOverride = useMemo(() => {
@@ -239,30 +231,35 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
   // Canonicalize helper for robust comparison and display
   const canonicalize = useCallback((val: any) => {
     // Basic null/undefined handling
-    if (val === null || val === undefined) return valueType === 'json' ? '{}' : '';
+    if (val === null || val === undefined) {
+      if (valueType === 'json') return '{}';
+      if (valueType === 'boolean') return 'false';
+      return '';
+    }
 
-    // Fix for corrupted "[object Object]" strings coming from server/previous state
+    // Fix for corrupted "[object Object]" strings
     if (val === '[object Object]') return '{}';
 
     if (valueType === 'json') {
       try {
-        // Normalize strings by parsing and re-stringifying
         if (typeof val === 'string') {
           if (val.trim() === '') return '{}';
           return JSON.stringify(JSON.parse(val));
         }
-        // Objects are stringified directly
         return JSON.stringify(val);
       } catch {
-        // Fallback for invalid JSON
         return typeof val === 'object' ? JSON.stringify(val) : String(val);
       }
     }
-    // Avoid [object Object] for non-JSON types as well
+
+    if (valueType === 'boolean') {
+      return (val === true || val === 'true') ? 'true' : 'false';
+    }
+
     return typeof val === 'object' ? JSON.stringify(val) : String(val ?? '');
   }, [valueType]);
 
-  // Helper to prepare value for API (ensures JSON fields receive objects, not strings)
+  // Helper to prepare value for API
   const toApiValue = useCallback((val: any) => {
     if (valueType === 'json') {
       try {
@@ -292,23 +289,29 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
 
   const [prevPropsSnapshot, setPrevPropsSnapshot] = useState(propsSnapshot);
 
-  // Sync state if props change (and we are not currently saving)
-  if (!isSavingRef.current && propsSnapshot !== prevPropsSnapshot) {
-    setPrevPropsSnapshot(propsSnapshot);
-    setUseEnvOverride(originalUseEnvOverride);
-    setEditingEnabledValue(envEnabledValue ?? enabledValue);
-    setEditingDisabledValue(envDisabledValue ?? disabledValue);
-    setValueJsonErrors({});
-  }
+  // Sync fallback values when props change
+  useEffect(() => {
+    if (propsSnapshot !== prevPropsSnapshot) {
+      setPrevPropsSnapshot(propsSnapshot);
+      setUseEnvOverride(originalUseEnvOverride);
+      setEditingEnabledValue(envEnabledValue ?? enabledValue);
+      setEditingDisabledValue(envDisabledValue ?? disabledValue);
+      setValueJsonErrors({});
+    }
+  }, [propsSnapshot, prevPropsSnapshot, originalUseEnvOverride, envEnabledValue, enabledValue, envDisabledValue, disabledValue]);
 
   const valuesHasChanges = useMemo(() => {
-    // 1. Toggle change is always a change
+    // 1. If toggle state changed, it's a change
     if (useEnvOverride !== originalUseEnvOverride) return true;
 
-    // 2. If overridden, compare current values with what's on server
+    // 2. If it's currently overridden, check if values changed compared to what's on server
     if (useEnvOverride) {
-      return canonicalize(editingEnabledValue) !== canonicalize(envEnabledValue ?? enabledValue) ||
-        canonicalize(editingDisabledValue) !== canonicalize(envDisabledValue ?? disabledValue);
+      const currentE = canonicalize(editingEnabledValue);
+      const serverE = canonicalize(envEnabledValue ?? enabledValue);
+      const currentD = canonicalize(editingDisabledValue);
+      const serverD = canonicalize(envDisabledValue ?? disabledValue);
+
+      return currentE !== serverE || currentD !== serverD;
     }
 
     return false;
@@ -328,13 +331,13 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
     isSavingRef.current = true;
     setSavingValues(true);
     try {
-      if (useEnvOverride) {
-        // Send actual objects for JSON to backend
-        await onSaveValues(toApiValue(editingEnabledValue), toApiValue(editingDisabledValue), false);
-      } else {
-        // Clear env-specific, use global
-        await onSaveValues(null, null, true);
-      }
+      // If useEnvOverride is true, send current values and set useGlobal: false
+      // If someone turns it OFF, send nulls and set useGlobal: true
+      await onSaveValues(
+        useEnvOverride ? toApiValue(editingEnabledValue) : null,
+        useEnvOverride ? toApiValue(editingDisabledValue) : null,
+        !useEnvOverride
+      );
     } catch (error) {
       // Error handled by parent or snackbar
       isSavingRef.current = false;
@@ -342,7 +345,7 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
       setSavingValues(false);
       isSavingRef.current = false;
     }
-  }, [onSaveValues, valueType, useEnvOverride, editingEnabledValue, editingDisabledValue, valueJsonErrors, t]);
+  }, [onSaveValues, useEnvOverride, editingEnabledValue, editingDisabledValue, toApiValue, valueJsonErrors]);
 
   // Handle reset values
   const handleResetValues = useCallback(() => {
@@ -476,6 +479,7 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
       isSavingRef.current = false;
       throw error;
     } finally {
+      isSavingRef.current = false;
       setSaving(false);
     }
   }, [editingVariants, jsonErrors, onSave]);
@@ -499,6 +503,8 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
 
   const renderValueInputField = (field: 'enabledValue' | 'disabledValue') => {
     const isEditing = useEnvOverride;
+    const isActuallyEditable = isEditing && canManage && !isArchived;
+
     const value = field === 'enabledValue' ? editingEnabledValue : editingDisabledValue;
     const globalValue = field === 'enabledValue' ? enabledValue : disabledValue;
     const error = valueJsonErrors[field];
@@ -507,15 +513,29 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
       else setEditingDisabledValue(val);
     };
 
+    const viewOnlyStyle = !isActuallyEditable ? {
+      bgcolor: (theme: any) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.02)',
+      '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
+      '&:hover .MuiOutlinedInput-notchedOutline': { border: 'none' },
+      '&.Mui-focused .MuiOutlinedInput-notchedOutline': { border: 'none' },
+      borderRadius: 1,
+    } : {};
+
     if (valueType === 'boolean') {
       return (
-        <Box sx={{ display: 'flex', alignItems: 'center', minHeight: 40 }}>
+        <Box sx={{
+          display: 'flex',
+          alignItems: 'center',
+          minHeight: 40,
+          px: !isActuallyEditable ? 1 : 0,
+          ...viewOnlyStyle
+        }}>
           <BooleanSwitch
             checked={isEditing ? (value === true || value === 'true') : (globalValue === true || globalValue === 'true')}
-            onChange={(e) => isEditing && updateValue(e.target.checked)}
-            disabled={!isEditing || !canManage || isArchived}
+            onChange={(e) => isActuallyEditable && updateValue(e.target.checked)}
+            disabled={!isActuallyEditable}
           />
-          <Typography variant="body2" sx={{ ml: 1, color: isEditing ? 'text.primary' : 'text.secondary' }}>
+          <Typography variant="body2" sx={{ ml: 1, color: isActuallyEditable ? 'text.primary' : 'text.secondary', fontWeight: !isActuallyEditable ? 500 : 400 }}>
             {isEditing ? (value === true || value === 'true' ? 'True' : 'False') : (globalValue === true || globalValue === 'true' ? 'True' : 'False')}
           </Typography>
         </Box>
@@ -529,8 +549,9 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
           size="small"
           type="number"
           value={isEditing ? (value ?? '') : (globalValue ?? '')}
-          onChange={(e) => isEditing && updateValue(e.target.value === '' ? 0 : Number(e.target.value))}
-          disabled={!isEditing || !canManage || isArchived}
+          onChange={(e) => isActuallyEditable && updateValue(e.target.value === '' ? 0 : Number(e.target.value))}
+          disabled={!isActuallyEditable}
+          sx={viewOnlyStyle}
         />
       );
     }
@@ -569,9 +590,10 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
           }
         }}
         valueType={valueType}
-        disabled={!isEditing || !canManage || isArchived}
+        disabled={!isActuallyEditable}
         label={field === 'enabledValue' ? t('featureFlags.enabledValue') : t('featureFlags.disabledValue')}
         onValidationError={(err) => setValueJsonErrors(prev => ({ ...prev, [field]: err }))}
+        sx={viewOnlyStyle}
       />
     );
   };
@@ -892,25 +914,40 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                 >
                   {t('featureFlags.enabledValue')}
                 </Typography>
-                <Box sx={{ opacity: variantCount > 0 ? 0.5 : 1, pointerEvents: variantCount > 0 ? 'none' : 'auto' }}>
-                  {renderValueInputField('enabledValue')}
-                </Box>
+                {variantCount === 0 && (
+                  <Box sx={{ mt: 0.5 }}>
+                    {renderValueInputField('enabledValue')}
+                  </Box>
+                )}
                 {variantCount > 0 && (
-                  <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 0.75, mt: 1, color: 'warning.main' }}>
-                    <InfoIcon sx={{ fontSize: 16, mt: 0.2 }} />
-                    <Typography variant="caption" sx={{ fontWeight: 500, lineHeight: 1.4 }}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 1.5,
+                      p: 1.5,
+                      borderRadius: 1,
+                      bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 152, 0, 0.1)' : 'rgba(255, 152, 0, 0.04)',
+                      border: '1px solid',
+                      borderColor: (theme) => alpha(theme.palette.warning.light, 0.4),
+                      color: 'warning.main'
+                    }}
+                  >
+                    <InfoIcon sx={{ fontSize: 20 }} />
+                    <Typography variant="body2" sx={{ fontWeight: 500, lineHeight: 1.5 }}>
                       {t('featureFlags.enabledValueRedundantHint')}
                     </Typography>
                   </Box>
                 )}
               </Box>
+
               <Box
                 sx={{
                   p: 1.5,
                   borderRadius: 1,
                   border: '1px solid',
                   borderColor: 'divider',
-                  bgcolor: 'transparent'
+                  bgcolor: (theme) => theme.palette.mode === 'dark' ? 'transparent' : '#fff'
                 }}
               >
                 <Typography
@@ -925,7 +962,9 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                 >
                   {t('featureFlags.disabledValue')}
                 </Typography>
-                {renderValueInputField('disabledValue')}
+                <Box sx={{ mt: 0.5 }}>
+                  {renderValueInputField('disabledValue')}
+                </Box>
               </Box>
             </Stack>
 
@@ -950,7 +989,7 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
           </Box>
         )}
       </Collapse>
-    </Paper >
+    </Paper>
   );
 };
 

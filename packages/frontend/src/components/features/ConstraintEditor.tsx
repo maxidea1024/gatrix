@@ -340,7 +340,7 @@ const SortableConstraintCard: React.FC<SortableConstraintCardProps> = ({
               if (!selectedField) {
                 return (
                   <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <Tooltip title={t('featureFlags.missingContextField')}>
+                    <Tooltip title={t('featureFlags.missingContextField')} disableFocusListener>
                       <MissingIcon sx={{ fontSize: 16, color: 'error.main', mr: 1 }} />
                     </Tooltip>
                     <Typography sx={{ color: 'error.main' }}>{selected}</Typography>
@@ -413,7 +413,7 @@ const SortableConstraintCard: React.FC<SortableConstraintCardProps> = ({
                     py: 1,
                   }}
                 >
-                  <Tooltip title={field.fieldType}>
+                  <Tooltip title={field.fieldType} disableFocusListener>
                     <Box sx={{ display: 'flex', alignItems: 'center', mt: 0.5 }}>
                       {getTypeIcon(field.fieldType)}
                     </Box>

@@ -678,7 +678,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
             <Typography variant="body2" color="text.secondary">
               {t('playground.contextFields')}
             </Typography>
-            <Tooltip title={t('playground.contextFieldsHelp')}>
+            <Tooltip title={t('playground.contextFieldsHelp')} disableFocusListener>
               <HelpIcon sx={{ fontSize: 16, color: 'text.disabled', cursor: 'help' }} />
             </Tooltip>
           </Box>
@@ -899,7 +899,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                 disabled={isUsed}
                                 sx={{ display: 'flex', gap: 1.5, alignItems: 'flex-start', py: 1 }}
                               >
-                                <Tooltip title={field.fieldType}>
+                                <Tooltip title={field.fieldType} disableFocusListener>
                                   <Box sx={{ display: 'flex', alignItems: 'center', mt: 0.5 }}>
                                     {getFieldTypeIcon(field.fieldType)}
                                   </Box>
@@ -1197,7 +1197,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                       align="center"
                       sx={{ minWidth: 40, maxWidth: 56, px: 0.25, py: 1 }}
                     >
-                      <Tooltip title={label}>
+                      <Tooltip title={label} disableFocusListener>
                         <Chip
                           label={label}
                           size="small"
@@ -1291,6 +1291,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                         >
                           <Tooltip
                             title={hasDetails ? t('playground.clickToViewEvaluationResult') : ''}
+                            disableFocusListener
                           >
                             <Box
                               sx={{

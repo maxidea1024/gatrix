@@ -32,6 +32,8 @@ interface ValueEditorFieldProps {
     multiline?: boolean;
     /** Number of rows for inline multiline mode */
     rows?: number;
+    /** Optional SX prop for additional styling */
+    sx?: any;
 }
 
 // Calculate byte length of a value
@@ -62,6 +64,7 @@ const ValueEditorField: React.FC<ValueEditorFieldProps> = ({
     placeholder,
     multiline = false,
     rows = 3,
+    sx,
 }) => {
     const { t } = useTranslation();
     const [dialogOpen, setDialogOpen] = useState(false);
@@ -191,8 +194,9 @@ const ValueEditorField: React.FC<ValueEditorFieldProps> = ({
                     error={!!error}
                     helperText={helperText}
                     placeholder={showEmptyHint ? (isEmptyObject ? t('common.emptyObject') : t('common.emptyString')) : placeholder}
+                    sx={sx}
                     InputProps={{
-                        sx: showEmptyHint ? { fontStyle: 'italic' } : undefined,
+                        sx: showEmptyHint ? { fontStyle: 'italic', ...sx } : sx,
                         endAdornment: !disabled && (
                             <InputAdornment position="end" sx={{ alignSelf: 'flex-start', mt: 1 }}>
                                 <IconButton
@@ -217,11 +221,13 @@ const ValueEditorField: React.FC<ValueEditorFieldProps> = ({
                     helperText={helperText}
                     placeholder={showEmptyHint ? (isEmptyObject ? t('common.emptyObject') : t('common.emptyString')) : placeholder}
                     onClick={valueType === 'json' && !disabled ? handleOpenDialog : undefined}
+                    sx={sx}
                     InputProps={{
                         readOnly: valueType === 'json',
                         sx: {
                             ...(valueType === 'json' ? { cursor: 'pointer' } : {}),
                             ...(showEmptyHint ? { fontStyle: 'italic' } : {}),
+                            ...sx,
                         },
                         endAdornment: !disabled && (
                             <InputAdornment position="end">
