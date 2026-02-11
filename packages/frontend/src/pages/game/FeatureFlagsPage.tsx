@@ -1829,17 +1829,23 @@ const FeatureFlagsPage: React.FC = () => {
                                             arrow
                                             placement="top"
                                             disableFocusListener
+                                            enterDelay={500}
+                                            leaveDelay={0}
                                           >
                                             <span>
                                               <FeatureSwitch
                                                 key={`${flag.flagName}-${env.environment}-${isEnabled}`}
                                                 size="small"
                                                 checked={isEnabled}
-                                                onChange={() =>
-                                                  handleToggle(flag, env.environment, isEnabled)
-                                                }
+                                                onChange={(e: any) => {
+                                                  handleToggle(flag, env.environment, isEnabled);
+                                                  if (e.target) (e.target as any).blur();
+                                                }}
                                                 disabled={flag.isArchived || !canManage}
-                                                onClick={(e) => e.stopPropagation()}
+                                                onClick={(e) => {
+                                                  e.stopPropagation();
+                                                  (e.currentTarget as any).blur();
+                                                }}
                                                 color={env.color}
                                               />
                                             </span>

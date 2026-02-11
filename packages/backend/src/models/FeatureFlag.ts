@@ -194,7 +194,9 @@ function parseJsonField<T>(value: any): T | undefined {
   try {
     return JSON.parse(value) as T;
   } catch {
-    return undefined;
+    // mysql2 auto-parses JSON columns, so string values are already unwrapped.
+    // JSON.parse("hello") fails but the value is the correct parsed result.
+    return value as T;
   }
 }
 

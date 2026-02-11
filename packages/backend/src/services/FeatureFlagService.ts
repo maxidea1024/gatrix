@@ -345,7 +345,8 @@ class FeatureFlagService {
     }
 
     // Separate environment-specific from global properties
-    const { isEnabled, ...globalUpdates } = input;
+    // enabledValue/disabledValue are per-environment, must not update global flag record
+    const { isEnabled, enabledValue, disabledValue, ...globalUpdates } = input;
 
     // Update global flag properties if any
     if (Object.keys(globalUpdates).length > 0) {
@@ -356,7 +357,6 @@ class FeatureFlagService {
     }
 
     // Update environment-specific settings (isEnabled, enabledValue, disabledValue)
-    const { enabledValue, disabledValue } = input;
     if (isEnabled !== undefined || enabledValue !== undefined || disabledValue !== undefined) {
       await FeatureFlagEnvironmentModel.update(flag.id, environment, {
         isEnabled,
@@ -366,6 +366,7 @@ class FeatureFlagService {
     }
 
     const updated = await this.getFlag(environment, flagName);
+
 
     // Audit log
     await AuditLogModel.create({

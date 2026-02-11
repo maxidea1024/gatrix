@@ -1253,7 +1253,8 @@ const FeatureFlagDetailPage: React.FC = () => {
             headers: { 'x-environment': envName },
           }
         );
-        // Reload strategies and variants from server after save
+        // Reload everything from server after save
+        await loadFlag(flag.flagName, false);
         await loadEnvStrategies(environments, flag.flagName);
         enqueueSnackbar(t('featureFlags.variantsSaved'), { variant: 'success' });
       } else {
@@ -1284,8 +1285,9 @@ const FeatureFlagDetailPage: React.FC = () => {
           : { enabledValue: value.enabledValue, disabledValue: value.disabledValue },
         { headers: { 'x-environment': envName } }
       );
-      // Reload flag data
+      // Reload everything to ensure sync
       await loadFlag(flag.flagName, false);
+      await loadEnvStrategies(environments, flag.flagName);
       enqueueSnackbar(t('featureFlags.fallbackValueSaved'), { variant: 'success' });
     } catch (error: any) {
       enqueueSnackbar(parseApiErrorMessage(error, 'featureFlags.fallbackValueSaveFailed'), {
@@ -2120,15 +2122,29 @@ const FeatureFlagDetailPage: React.FC = () => {
                             }}
                           >
                             {/* Toggle switch */}
-                            <Box onClick={(e) => e.stopPropagation()}>
-                              <FeatureSwitch
-                                size="small"
-                                checked={isEnabled}
-                                onChange={() => handleEnvToggle(env.environment, isEnabled)}
-                                disabled={!canManage || flag.isArchived}
-                                color={env.color}
-                              />
-                            </Box>
+                            <Tooltip
+                              title={isEnabled ? t('common.disable') : t('common.enable')}
+                              disableFocusListener
+                              enterDelay={500}
+                              leaveDelay={0}
+                            >
+                              <Box onClick={(e) => e.stopPropagation()}>
+                                <FeatureSwitch
+                                  size="small"
+                                  checked={isEnabled}
+                                  onChange={(e: any) => {
+                                    handleEnvToggle(env.environment, isEnabled);
+                                    if (e.target) (e.target as any).blur();
+                                  }}
+                                  disabled={!canManage || flag.isArchived}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    (e.currentTarget as any).blur();
+                                  }}
+                                  color={env.color}
+                                />
+                              </Box>
+                            </Tooltip>
 
                             {/* Environment info */}
                             <Box sx={{ flex: 1 }}>
@@ -3269,7 +3285,16 @@ const FeatureFlagDetailPage: React.FC = () => {
                   height: '100%',
                 }}
               >
-                <Box sx={{ position: 'sticky', top: 16 }}>
+                <Box
+                  sx={{
+                    position: 'sticky',
+                    top: 80, // Account for top navigation bar
+                    maxHeight: 'calc(100vh - 100px)',
+                    overflow: 'hidden',
+                    display: 'flex',
+                    flexDirection: 'column'
+                  }}
+                >
                   <Box
                     sx={{
                       display: 'flex',
@@ -3295,7 +3320,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                   >
                     {t('playground.subtitle')}
                   </Typography>
-                  <Box sx={{ maxHeight: 'calc(100vh - 200px)', overflow: 'auto' }}>
+                  <Box sx={{ flex: 1, overflow: 'auto' }}>
                     <PlaygroundDialog
                       open={true}
                       onClose={() => setEmbeddedPlaygroundVisible(false)}

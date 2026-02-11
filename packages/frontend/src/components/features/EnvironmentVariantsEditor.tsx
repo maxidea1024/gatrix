@@ -289,10 +289,12 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
 
   const [prevPropsSnapshot, setPrevPropsSnapshot] = useState(propsSnapshot);
 
-  // Sync fallback values when props change
+  // Synchronize state when external fallback values or override status change
   useEffect(() => {
+    // Check if anything fundamentally changed in the props compared to our tracking snapshot
     if (propsSnapshot !== prevPropsSnapshot) {
       setPrevPropsSnapshot(propsSnapshot);
+
       setUseEnvOverride(originalUseEnvOverride);
       setEditingEnabledValue(envEnabledValue ?? enabledValue);
       setEditingDisabledValue(envDisabledValue ?? disabledValue);
@@ -301,10 +303,10 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
   }, [propsSnapshot, prevPropsSnapshot, originalUseEnvOverride, envEnabledValue, enabledValue, envDisabledValue, disabledValue]);
 
   const valuesHasChanges = useMemo(() => {
-    // 1. If toggle state changed, it's a change
+    // 1. If override toggle state differs from original status on server
     if (useEnvOverride !== originalUseEnvOverride) return true;
 
-    // 2. If it's currently overridden, check if values changed compared to what's on server
+    // 2. If it's currently overridden (or user wants it to be), check if values changed compared to server
     if (useEnvOverride) {
       const currentE = canonicalize(editingEnabledValue);
       const serverE = canonicalize(envEnabledValue ?? enabledValue);
@@ -331,13 +333,24 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
     isSavingRef.current = true;
     setSavingValues(true);
     try {
+      // Ensure non-null values when override is enabled.
+      // If value is null/undefined, use type-appropriate default so the backend
+      // can distinguish "override ON with default value" from "no override".
+      const ensureNonNull = (val: any) => {
+        if (val !== null && val !== undefined) return val;
+        switch (valueType) {
+          case 'boolean': return false;
+          case 'number': return 0;
+          case 'json': return {};
+          default: return '';
+        }
+      };
+
       // If useEnvOverride is true, send current values and set useGlobal: false
       // If someone turns it OFF, send nulls and set useGlobal: true
-      await onSaveValues(
-        useEnvOverride ? toApiValue(editingEnabledValue) : null,
-        useEnvOverride ? toApiValue(editingDisabledValue) : null,
-        !useEnvOverride
-      );
+      const sendEnabled = useEnvOverride ? ensureNonNull(toApiValue(editingEnabledValue)) : null;
+      const sendDisabled = useEnvOverride ? ensureNonNull(toApiValue(editingDisabledValue)) : null;
+      await onSaveValues(sendEnabled, sendDisabled, !useEnvOverride);
     } catch (error) {
       // Error handled by parent or snackbar
       isSavingRef.current = false;
@@ -914,6 +927,11 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                 >
                   {t('featureFlags.enabledValue')}
                 </Typography>
+                {variantCount === 0 && (
+                  <Typography variant="caption" sx={{ display: 'block', mb: 1, color: 'text.secondary', fontWeight: 500 }}>
+                    {t('featureFlags.enabledValueDesc')}
+                  </Typography>
+                )}
                 {variantCount === 0 && (
                   <Box sx={{ mt: 0.5 }}>
                     {renderValueInputField('enabledValue')}
