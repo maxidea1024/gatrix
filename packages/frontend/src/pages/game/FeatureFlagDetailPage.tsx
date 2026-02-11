@@ -2132,9 +2132,8 @@ const FeatureFlagDetailPage: React.FC = () => {
                                 <FeatureSwitch
                                   size="small"
                                   checked={isEnabled}
-                                  onChange={(e: any) => {
+                                  onChange={() => {
                                     handleEnvToggle(env.environment, isEnabled);
-                                    if (e.target) (e.target as any).blur();
                                   }}
                                   disabled={!canManage || flag.isArchived}
                                   onClick={(e) => {
@@ -3519,6 +3518,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                         valueType: flag.valueType,
                         enabledValue: flag.enabledValue,
                         disabledValue: flag.disabledValue,
+                        isGlobal: true,
                       });
                       setOriginalFlag((prev) =>
                         prev

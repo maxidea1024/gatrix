@@ -567,6 +567,9 @@ export class ClientController {
           name: dbFlag.flagName,
           isEnabled: dbFlag.isEnabled,
           impressionDataEnabled: dbFlag.impressionDataEnabled,
+          valueType: dbFlag.valueType || 'string',
+          enabledValue: resolvedEnabledValue,
+          disabledValue: resolvedDisabledValue,
           strategies:
             dbFlag.strategies?.map((s: any) => ({
               name: s.strategyName,
@@ -603,26 +606,19 @@ export class ClientController {
           // result.variant from sdk already has the value (we mapped it from db)
           variant.value = (result.variant as any).value;
         } else {
-          // No variant match (or disabled)
           // Determine correct value based on state
-          const valueToReturn = result.enabled ? resolvedEnabledValue : resolvedDisabledValue;
+          const rawValue = result.enabled ? resolvedEnabledValue : resolvedDisabledValue;
+          const valueToReturn = rawValue ?? (
+            dbFlag.valueType === 'boolean' ? false :
+              dbFlag.valueType === 'number' ? 0 :
+                dbFlag.valueType === 'json' ? {} : ''
+          );
 
           variant = {
             name: result.enabled ? '$default' : '$disabled',
             enabled: result.enabled,
+            value: valueToReturn,
           };
-
-          if (valueToReturn !== undefined && valueToReturn !== null) {
-            let parsedValue = valueToReturn;
-            if (dbFlag.valueType === 'json' && typeof parsedValue === 'string') {
-              try {
-                parsedValue = JSON.parse(parsedValue);
-              } catch {}
-            } else if (dbFlag.valueType === 'number') {
-              parsedValue = Number(parsedValue);
-            }
-            variant.value = parsedValue;
-          }
         }
 
         results[dbFlag.flagName] = {

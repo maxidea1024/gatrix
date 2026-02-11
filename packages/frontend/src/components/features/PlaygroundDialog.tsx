@@ -755,7 +755,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                     return (
                       <FormControl size="small" fullWidth>
                         <Select
-                          value={entry.value || 'true'}
+                          value={(entry.value === 'true' || entry.value === 'false') ? entry.value : 'true'}
                           onChange={(e) => handleUpdateContextEntry(index, 'value', e.target.value)}
                         >
                           <MenuItem value="true">True</MenuItem>
@@ -806,22 +806,31 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                   // Legal values - use Select dropdown
                   if (hasLegalValues) {
                     return (
-                      <FormControl size="small" fullWidth>
-                        <Select
-                          value={entry.value || ''}
-                          onChange={(e) => handleUpdateContextEntry(index, 'value', e.target.value)}
-                          displayEmpty
-                        >
-                          <MenuItem value="" disabled>
-                            <em>{t('playground.selectValue')}</em>
-                          </MenuItem>
-                          {(contextField?.legalValues || []).map((lv) => (
-                            <MenuItem key={lv} value={lv}>
-                              {lv}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
+                      <Autocomplete
+                        size="small"
+                        fullWidth
+                        value={entry.value || ''}
+                        options={contextField?.legalValues || []}
+                        freeSolo
+                        autoHighlight
+                        onChange={(_, newValue) =>
+                          handleUpdateContextEntry(index, 'value', newValue || '')
+                        }
+                        onInputChange={(_, newValue) =>
+                          handleUpdateContextEntry(index, 'value', newValue || '')
+                        }
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            placeholder={t('playground.selectValue')}
+                            sx={{
+                              '& .MuiInputBase-root': {
+                                px: '8px !important',
+                              },
+                            }}
+                          />
+                        )}
+                      />
                     );
                   }
 
@@ -865,65 +874,83 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                       sx={{ display: 'flex', gap: 1, alignItems: 'flex-start', flexWrap: 'wrap' }}
                     >
                       {/* Context Field Selector */}
-                      <FormControl size="small" sx={{ minWidth: 180, flex: '1 1 180px' }}>
-                        <Select
-                          value={entry.key}
-                          onChange={(e) => handleUpdateContextEntry(index, 'key', e.target.value)}
-                          displayEmpty
-                          renderValue={(selected) => {
-                            if (!selected) {
-                              return (
-                                <em style={{ color: 'gray' }}>{t('playground.selectField')}</em>
-                              );
-                            }
-                            const selectedField = contextFields.find(
-                              (f) => f.fieldName === selected
-                            );
-                            return (
-                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                {selectedField && getFieldTypeIcon(selectedField.fieldType)}
-                                {selectedField?.displayName || selected}
-                              </Box>
-                            );
-                          }}
-                        >
-                          <MenuItem value="" disabled>
-                            <em>{t('playground.selectField')}</em>
-                          </MenuItem>
-                          {contextFields.map((field) => {
-                            const isUsed = usedFieldNames.includes(field.fieldName);
-                            return (
-                              <MenuItem
-                                key={field.fieldName}
-                                value={field.fieldName}
-                                disabled={isUsed}
-                                sx={{ display: 'flex', gap: 1.5, alignItems: 'flex-start', py: 1 }}
-                              >
-                                <Tooltip title={field.fieldType} disableFocusListener>
-                                  <Box sx={{ display: 'flex', alignItems: 'center', mt: 0.5 }}>
-                                    {getFieldTypeIcon(field.fieldType)}
-                                  </Box>
-                                </Tooltip>
-                                <Box sx={{ flex: 1, minWidth: 0 }}>
-                                  <Typography variant="body2">
-                                    {field.displayName || field.fieldName}
-                                    {isUsed && ` (${t('featureFlags.alreadyUsed')})`}
-                                  </Typography>
-                                  {field.description && (
+                      <Autocomplete
+                        size="small"
+                        sx={{ minWidth: 200, flex: '1 1 200px' }}
+                        value={entry.key}
+                        options={contextFields.map((f) => f.fieldName)}
+                        freeSolo
+                        autoHighlight
+                        onChange={(_, newValue) =>
+                          handleUpdateContextEntry(index, 'key', newValue || '')
+                        }
+                        onInputChange={(_, newValue) =>
+                          handleUpdateContextEntry(index, 'key', newValue || '')
+                        }
+                        renderOption={(props, option) => {
+                          const field = contextFields.find((f) => f.fieldName === option);
+                          if (!field) return <li {...props}>{option}</li>;
+
+                          const isUsed = usedFieldNames.includes(field.fieldName);
+                          const { key, ...restProps } = props as any;
+
+                          return (
+                            <Box
+                              component="li"
+                              key={key}
+                              {...restProps}
+                              sx={{
+                                display: 'flex',
+                                gap: 1.5,
+                                alignItems: 'flex-start',
+                                py: '8px !important',
+                                opacity: isUsed ? 0.6 : 1,
+                              }}
+                            >
+                              <Tooltip title={field.fieldType} disableFocusListener>
+                                <Box sx={{ display: 'flex', alignItems: 'center', mt: 0.5 }}>
+                                  {getFieldTypeIcon(field.fieldType)}
+                                </Box>
+                              </Tooltip>
+                              <Box sx={{ flex: 1, minWidth: 0 }}>
+                                <Typography variant="body2" fontWeight={500}>
+                                  {field.displayName || field.fieldName}
+                                  {isUsed && (
                                     <Typography
+                                      component="span"
                                       variant="caption"
-                                      color="text.secondary"
-                                      sx={{ display: 'block' }}
+                                      color="text.disabled"
+                                      sx={{ ml: 1 }}
                                     >
-                                      {field.description}
+                                      ({t('featureFlags.alreadyUsed')})
                                     </Typography>
                                   )}
-                                </Box>
-                              </MenuItem>
-                            );
-                          })}
-                        </Select>
-                      </FormControl>
+                                </Typography>
+                                {field.description && (
+                                  <Typography
+                                    variant="caption"
+                                    color="text.secondary"
+                                    sx={{ display: 'block', mt: 0.25 }}
+                                  >
+                                    {field.description}
+                                  </Typography>
+                                )}
+                              </Box>
+                            </Box>
+                          );
+                        }}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            placeholder={t('playground.selectField')}
+                            sx={{
+                              '& .MuiInputBase-root': {
+                                px: '8px !important',
+                              },
+                            }}
+                          />
+                        )}
+                      />
 
                       {/* Value Input */}
                       <Box sx={{ flex: '2 1 200px', minWidth: 150 }}>{renderValueInput()}</Box>

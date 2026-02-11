@@ -69,6 +69,7 @@ export interface UpdateFlagInput {
   stale?: boolean;
   tags?: string[];
   links?: { url: string; title?: string }[];
+  isGlobal?: boolean;
 }
 
 export interface CreateStrategyInput {
@@ -345,23 +346,34 @@ class FeatureFlagService {
     }
 
     // Separate environment-specific from global properties
-    // enabledValue/disabledValue are per-environment, must not update global flag record
-    const { isEnabled, enabledValue, disabledValue, ...globalUpdates } = input;
-
-    // Update global flag properties if any
-    if (Object.keys(globalUpdates).length > 0) {
-      await FeatureFlagModel.update(flag.id, {
-        ...globalUpdates,
-        updatedBy: userId,
-      });
-    }
+    // isGlobal: if true, we are updating the base flag values even if an environment is provided
+    const { isEnabled, enabledValue, disabledValue, isGlobal, ...globalUpdates } = input;
 
     // Update environment-specific settings (isEnabled, enabledValue, disabledValue)
-    if (isEnabled !== undefined || enabledValue !== undefined || disabledValue !== undefined) {
-      await FeatureFlagEnvironmentModel.update(flag.id, environment, {
-        isEnabled,
-        enabledValue,
-        disabledValue,
+    // ONLY if not explicitly requested to be a global-only update, or if environment is provided
+    if (environment && !isGlobal) {
+      if (isEnabled !== undefined || enabledValue !== undefined || disabledValue !== undefined) {
+        await FeatureFlagEnvironmentModel.update(flag.id, environment, {
+          isEnabled,
+          enabledValue,
+          disabledValue,
+        });
+      }
+    }
+
+    // Update global flag properties
+    // If isGlobal is true, enabledValue/disabledValue are applied as base values
+    const baseValues: any = {};
+    if (isGlobal || !environment) {
+      if (enabledValue !== undefined) baseValues.enabledValue = enabledValue;
+      if (disabledValue !== undefined) baseValues.disabledValue = disabledValue;
+    }
+
+    if (Object.keys(globalUpdates).length > 0 || Object.keys(baseValues).length > 0) {
+      await FeatureFlagModel.update(flag.id, {
+        ...globalUpdates,
+        ...baseValues,
+        updatedBy: userId,
       });
     }
 

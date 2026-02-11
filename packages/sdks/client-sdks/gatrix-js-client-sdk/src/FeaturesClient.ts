@@ -423,6 +423,10 @@ export class FeaturesClient implements VariationProvider {
     return flags.has(flagName);
   }
 
+  getFlag(flagName: string): FlagProxy {
+    return this.createProxy(flagName);
+  }
+
   // ==================== Internal Variation Methods ====================
   // Central implementation: flag lookup + value extraction + metrics tracking.
   // FlagProxy delegates to these. Public variation methods also call these directly.

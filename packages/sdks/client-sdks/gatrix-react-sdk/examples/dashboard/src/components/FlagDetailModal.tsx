@@ -126,7 +126,7 @@ function FlagDetailModal({ flag, onClose }: FlagDetailModalProps) {
               <div className="flag-payload-label" style={{ marginBottom: '6px' }}>
                 Payload Detail
               </div>
-              {hasPayload ? (
+              {hasValue ? (
                 <>
                   <pre
                     className={`flag-payload-value ${isEmptyString ? 'empty-string' : 'has-payload'}`}
@@ -141,13 +141,13 @@ function FlagDetailModal({ flag, onClose }: FlagDetailModalProps) {
                       margin: '0',
                     }}
                   >
-                    {formatPayload(payload)}
+                    {formatValue(value)}
                   </pre>
                   <div
                     className="flag-payload-size"
                     style={{ fontSize: '8px', color: '#888', marginTop: '6px', textAlign: 'right' }}
                   >
-                    {payloadSize} BYTES
+                    {valueSize} BYTES
                   </div>
                 </>
               ) : (

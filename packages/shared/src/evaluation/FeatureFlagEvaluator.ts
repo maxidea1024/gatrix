@@ -38,15 +38,13 @@ export class FeatureFlagEvaluator {
         for (const strategy of activeStrategies) {
           if (this.evaluateStrategy(strategy, context, flag, segmentsMap)) {
             const variantData = this.selectVariant(flag, context, strategy);
-            const variant: Variant = variantData
-              ? { ...variantData, enabled: true }
-              : {
-                name: '$default',
-                weight: 100,
-                value: flag.enabledValue ?? null,
-                valueType: flag.valueType || 'string',
-                enabled: true,
-              };
+            const variant: Variant = {
+              name: variantData?.name || '$default',
+              weight: variantData?.weight || 100,
+              value: this.getFallbackValue(variantData?.value ?? flag.enabledValue, flag.valueType),
+              valueType: flag.valueType || 'string',
+              enabled: true,
+            };
 
             return {
               id: flag.id || '',
@@ -62,15 +60,13 @@ export class FeatureFlagEvaluator {
       } else {
         // No strategies or all disabled - enabled by default
         const variantData = this.selectVariant(flag, context);
-        const variant: Variant = variantData
-          ? { ...variantData, enabled: true }
-          : {
-            name: '$default',
-            weight: 100,
-            value: flag.enabledValue ?? null,
-            valueType: flag.valueType || 'string',
-            enabled: true,
-          };
+        const variant: Variant = {
+          name: variantData?.name || '$default',
+          weight: variantData?.weight || 100,
+          value: this.getFallbackValue(variantData?.value ?? flag.enabledValue, flag.valueType),
+          valueType: flag.valueType || 'string',
+          enabled: true,
+        };
 
         return {
           id: flag.id || '',
@@ -93,7 +89,7 @@ export class FeatureFlagEvaluator {
       variant: {
         name: '$disabled',
         weight: 100,
-        value: flag.disabledValue ?? null,
+        value: this.getFallbackValue(flag.disabledValue, flag.valueType),
         valueType: flag.valueType || 'string',
         enabled: false,
       },
@@ -327,6 +323,27 @@ export class FeatureFlagEvaluator {
     const seed = `${groupId}:${stickinessValue}`;
     const hash = murmurhash.v3(seed);
     return (hash % 10000) / 100;
+  }
+
+  /**
+   * Get a fallback value for a given type if the primary value is null/undefined.
+   */
+  public static getFallbackValue(value: any, valueType?: string): any {
+    if (value !== undefined && value !== null) {
+      return value;
+    }
+
+    switch (valueType) {
+      case 'boolean':
+        return false;
+      case 'number':
+        return 0;
+      case 'json':
+        return {};
+      case 'string':
+      default:
+        return '';
+    }
   }
 
   private static selectVariant(

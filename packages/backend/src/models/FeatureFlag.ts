@@ -189,13 +189,13 @@ export interface FeatureMetricsAttributes {
 // ==================== Helper Functions ====================
 
 function parseJsonField<T>(value: any): T | undefined {
-  if (value === null || value === undefined) return undefined;
+  if (value === null || value === undefined || value === 'null') return undefined;
   if (typeof value === 'object') return value as T;
   try {
-    return JSON.parse(value) as T;
+    const parsed = JSON.parse(value);
+    if (parsed === null) return undefined;
+    return parsed as T;
   } catch {
-    // 이게참 모호한 경우구만... postgresql로 갈아타야하나.
-
     // mysql2 auto-parses JSON columns, so string values are already unwrapped.
     // JSON.parse("hello") fails but the value is the correct parsed result.
     return value as T;
@@ -331,6 +331,8 @@ export class FeatureFlagModel {
           stale: Boolean(f.stale),
           impressionDataEnabled: Boolean(f.impressionDataEnabled),
           tags: parseJsonField<string[]>(f.tags) || [],
+          enabledValue: parseJsonField(f.enabledValue),
+          disabledValue: parseJsonField(f.disabledValue),
           environments: envStates.map((e) => ({
             id: e.id,
             flagId: e.flagId,
@@ -390,6 +392,8 @@ export class FeatureFlagModel {
         impressionDataEnabled: Boolean(flag.impressionDataEnabled),
         tags: parseJsonField<string[]>(flag.tags) || [],
         links: parseJsonField<{ url: string; title?: string }[]>(flag.links) || [],
+        enabledValue: parseJsonField(flag.enabledValue),
+        disabledValue: parseJsonField(flag.disabledValue),
         strategies,
         variants,
         environments: allEnvSettings.map((e) => ({
@@ -437,6 +441,8 @@ export class FeatureFlagModel {
         stale: Boolean(flag.stale),
         impressionDataEnabled: Boolean(flag.impressionDataEnabled),
         tags: parseJsonField<string[]>(flag.tags) || [],
+        enabledValue: parseJsonField(flag.enabledValue),
+        disabledValue: parseJsonField(flag.disabledValue),
         strategies,
         variants,
         environments: envSettings
@@ -527,8 +533,14 @@ export class FeatureFlagModel {
       if (data.stale !== undefined) updateData.stale = data.stale;
       if (data.tags !== undefined) updateData.tags = JSON.stringify(data.tags);
       if (data.links !== undefined) updateData.links = JSON.stringify(data.links);
+      let effectiveValueType = data.valueType;
       if (data.valueType !== undefined) updateData.valueType = data.valueType;
-      const effectiveValueType = data.valueType || updateData.valueType;
+
+      if (effectiveValueType === undefined && (data.enabledValue !== undefined || data.disabledValue !== undefined)) {
+        const flag = await db('g_feature_flags').where('id', id).select('valueType').first();
+        effectiveValueType = flag?.valueType;
+      }
+
       if (data.enabledValue !== undefined)
         updateData.enabledValue = JSON.stringify(coerceValueByType(data.enabledValue, effectiveValueType));
       if (data.disabledValue !== undefined)
@@ -663,6 +675,12 @@ export class FeatureFlagEnvironmentModel {
     data: Partial<FeatureFlagEnvironmentAttributes>
   ): Promise<FeatureFlagEnvironmentAttributes> {
     try {
+      let valueType: string | undefined;
+      if (data.enabledValue !== undefined || data.disabledValue !== undefined) {
+        const flag = await db('g_feature_flags').where('id', flagId).select('valueType').first();
+        valueType = flag?.valueType;
+      }
+
       // Upsert - create if not exists
       const existing = await this.findByFlagIdAndEnvironment(flagId, environment);
       if (!existing) {
@@ -670,17 +688,17 @@ export class FeatureFlagEnvironmentModel {
           flagId,
           environment,
           isEnabled: data.isEnabled ?? false,
-          enabledValue: data.enabledValue,
-          disabledValue: data.disabledValue,
+          enabledValue: data.enabledValue !== undefined ? coerceValueByType(data.enabledValue, valueType) : undefined,
+          disabledValue: data.disabledValue !== undefined ? coerceValueByType(data.disabledValue, valueType) : undefined,
         });
       }
 
       const updateData: any = { updatedAt: new Date() };
       if (data.isEnabled !== undefined) updateData.isEnabled = data.isEnabled;
       if (data.enabledValue !== undefined)
-        updateData.enabledValue = JSON.stringify(data.enabledValue);
+        updateData.enabledValue = JSON.stringify(coerceValueByType(data.enabledValue, valueType));
       if (data.disabledValue !== undefined)
-        updateData.disabledValue = JSON.stringify(data.disabledValue);
+        updateData.disabledValue = JSON.stringify(coerceValueByType(data.disabledValue, valueType));
 
       await db('g_feature_flag_environments')
         .where('flagId', flagId)

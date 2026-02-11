@@ -794,7 +794,7 @@ router.post(
             // Let's assume we want to return 'value' and 'valueType' in the response.
             (evalResult as any).variant = {
               name: (evalResult as any).variant?.name || (evalResult.enabled ? 'default' : 'disabled'),
-              value,
+              value: getFallbackValue(value, (flag as any).valueType),
               valueType: (flag as any).valueType || 'string',
               valueSource,
             };
@@ -816,6 +816,7 @@ router.post(
         envResults.sort((a, b) => a.flagName.localeCompare(b.flagName));
         results[env] = envResults;
       } catch (error: any) {
+        console.error(`Playground evaluation failed for environment '${env}':`, error);
         results[env] = [];
       }
     }
@@ -852,10 +853,11 @@ function evaluateFlagWithDetails(
       reason: 'FLAG_DISABLED',
       variant: {
         name: '$disabled',
-        value:
+        value: getFallbackValue(
           flag.environments?.find((e: any) => e.environment === environment)?.disabledValue ??
-          flag.disabledValue ??
-          null,
+          flag.disabledValue,
+          flag.valueType
+        ),
         valueType: flag.valueType || 'string',
         valueSource:
           flag.environments?.find((e: any) => e.environment === environment)?.disabledValue !==
@@ -863,7 +865,7 @@ function evaluateFlagWithDetails(
             ? 'environment'
             : flag.disabledValue !== undefined
               ? 'flag'
-              : undefined,
+              : 'default',
       },
       evaluationSteps,
     };
@@ -883,7 +885,7 @@ function evaluateFlagWithDetails(
       passed: true,
       message: 'No strategies defined - enabled by default',
     });
-    const variant = selectVariantForFlag(flag, context, undefined, environment);
+    const variant = selectVariantForFlag(flag, flag.variants || [], context, undefined, environment);
     return {
       enabled: true,
       variant,
@@ -1013,7 +1015,7 @@ function evaluateFlagWithDetails(
     evaluationSteps.push(strategyStep);
 
     if (strategyMatched) {
-      const variant = selectVariantForFlag(flag, context, strategy, environment);
+      const variant = selectVariantForFlag(flag, flag.variants || [], context, strategy, environment);
       return {
         enabled: true,
         variant,
@@ -1034,7 +1036,7 @@ function evaluateFlagWithDetails(
   const allStrategiesDisabled = strategies.length > 0 && activeStrategies.length === 0;
 
   if (allStrategiesDisabled) {
-    const variant = selectVariantForFlag(flag, context, undefined, environment);
+    const variant = selectVariantForFlag(flag, flag.variants || [], context, undefined, environment);
     return {
       enabled: true,
       variant,
@@ -1290,6 +1292,7 @@ function calculatePercentage(
 
 function selectVariantForFlag(
   flag: any,
+  variants: any[],
   context: Record<string, any>,
   matchedStrategy?: any,
   environment?: string
@@ -1301,23 +1304,22 @@ function selectVariantForFlag(
   const resolvedEnabledValue = envSettings?.enabledValue ?? flag.enabledValue;
   const valueSource = envSettings?.enabledValue !== undefined ? 'environment' : 'flag';
 
-  const variants = flag.variants || [];
   if (variants.length === 0) {
     return {
-      name: 'default',
-      value: resolvedEnabledValue ?? null,
+      name: '$default',
+      value: getFallbackValue(resolvedEnabledValue, flag.valueType),
       valueType: flag.valueType || 'string',
-      valueSource: resolvedEnabledValue !== undefined ? valueSource : undefined,
+      valueSource: resolvedEnabledValue !== undefined ? valueSource : 'default',
     };
   }
 
   const totalWeight = variants.reduce((sum: number, v: any) => sum + v.weight, 0);
   if (totalWeight <= 0) {
     return {
-      name: 'default',
-      value: resolvedEnabledValue ?? null,
+      name: '$default',
+      value: getFallbackValue(resolvedEnabledValue, flag.valueType),
       valueType: flag.valueType || 'string',
-      valueSource: resolvedEnabledValue !== undefined ? valueSource : undefined,
+      valueSource: resolvedEnabledValue !== undefined ? valueSource : 'default',
     };
   }
 
@@ -1338,9 +1340,9 @@ function selectVariantForFlag(
       }
       return {
         name: variant.variantName || variant.name,
-        value,
+        value: getFallbackValue(value, flag.valueType),
         valueType: flag.valueType || 'string',
-        valueSource: value !== undefined ? actualValueSource : undefined,
+        valueSource: value !== undefined ? actualValueSource : 'default',
       };
     }
   }
@@ -1353,9 +1355,9 @@ function selectVariantForFlag(
   }
   return {
     name: lastVariant.variantName || lastVariant.name,
-    value,
+    value: getFallbackValue(value, flag.valueType),
     valueType: flag.valueType || 'string',
-    valueSource: value !== undefined ? actualValueSource : undefined,
+    valueSource: value !== undefined ? actualValueSource : 'default',
   };
 }
 
@@ -1572,5 +1574,23 @@ router.post(
     });
   })
 );
+
+function getFallbackValue(value: any, valueType?: string): any {
+  if (value !== undefined && value !== null) {
+    return value;
+  }
+
+  switch (valueType) {
+    case 'boolean':
+      return false;
+    case 'number':
+      return 0;
+    case 'json':
+      return {};
+    case 'string':
+    default:
+      return '';
+  }
+}
 
 export default router;
