@@ -307,7 +307,7 @@ export class FeaturesClient {
       return;
     }
 
-    const definedFields = ['userId', 'sessionId', 'deviceId', 'currentTime'];
+    const definedFields = ['userId', 'sessionId', 'currentTime'];
 
     if (definedFields.includes(field)) {
       (this.context as Record<string, any>)[field] = value;
@@ -335,7 +335,7 @@ export class FeaturesClient {
       return;
     }
 
-    const definedFields = ['userId', 'sessionId', 'deviceId', 'currentTime'];
+    const definedFields = ['userId', 'sessionId', 'currentTime'];
 
     if (definedFields.includes(field)) {
       delete (this.context as Record<string, any>)[field];

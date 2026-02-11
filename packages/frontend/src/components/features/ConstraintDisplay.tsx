@@ -31,15 +31,13 @@ interface ConstraintDisplayProps {
 }
 
 // Get operator display label
-const getOperatorLabel = (op: string): string => {
+const getOperatorLabel = (op: string, inverted?: boolean): string => {
   const opLabels: Record<string, string> = {
     str_eq: '=',
-    str_neq: '≠',
     str_contains: '⊃',
     str_starts_with: '^',
     str_ends_with: '$',
     str_in: '∈',
-    str_not_in: '∉',
     str_regex: '~',
     num_eq: '=',
     num_gt: '>',
@@ -47,8 +45,8 @@ const getOperatorLabel = (op: string): string => {
     num_lt: '<',
     num_lte: '≤',
     num_in: '∈',
-    num_not_in: '∉',
     bool_is: '=',
+    date_eq: '=',
     date_gt: '>',
     date_gte: '≥',
     date_lt: '<',
@@ -59,8 +57,24 @@ const getOperatorLabel = (op: string): string => {
     semver_lt: '<',
     semver_lte: '≤',
     semver_in: '∈',
-    semver_not_in: '∉',
+    exists: '∃',
+    not_exists: '∄',
+    arr_includes: '⊃',
+    arr_all: '⊇',
+    arr_empty: '∅',
   };
+  const invertedLabels: Record<string, string> = {
+    str_eq: '≠',
+    str_in: '∉',
+    num_eq: '≠',
+    num_in: '∉',
+    semver_eq: '≠',
+    semver_in: '∉',
+    arr_includes: '⊅',
+    exists: '∄',
+    not_exists: '∃',
+  };
+  if (inverted && invertedLabels[op]) return invertedLabels[op];
   return opLabels[op] || op;
 };
 
@@ -123,7 +137,7 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({
           {constraint.contextName}
         </Typography>
         <Typography variant="caption" color="text.secondary">
-          {getOperatorLabel(constraint.operator)}
+          {getOperatorLabel(constraint.operator, constraint.inverted)}
         </Typography>
         <Typography variant="caption" fontWeight={500}>
           {displayValue}
@@ -136,7 +150,6 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({
   const getOperatorInfo = (op: string): { text: string; description: string } => {
     const opInfo: Record<string, { text: string; description: string }> = {
       str_eq: { text: 'equals', description: 'String equals (exact match)' },
-      str_neq: { text: 'not equals', description: 'String not equals' },
       str_contains: {
         text: 'contains',
         description: 'String contains substring',
@@ -152,10 +165,6 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({
       str_in: {
         text: 'is one of',
         description: 'Value matches one of the listed values',
-      },
-      str_not_in: {
-        text: 'is not one of',
-        description: 'Value does not match any of the listed values',
       },
       str_regex: {
         text: 'matches regex',
@@ -176,11 +185,11 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({
         text: 'is one of',
         description: 'Value matches one of the listed values',
       },
-      num_not_in: {
-        text: 'is not one of',
-        description: 'Value does not match any of the listed values',
-      },
       bool_is: { text: 'is', description: 'Boolean equals' },
+      date_eq: {
+        text: 'equals',
+        description: 'Date equals the specified time',
+      },
       date_gt: {
         text: 'is after',
         description: 'Date is after the specified time',
@@ -218,9 +227,25 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({
         text: 'is one of',
         description: 'Value matches one of the listed values',
       },
-      semver_not_in: {
-        text: 'is not one of',
-        description: 'Value does not match any of the listed values',
+      exists: {
+        text: 'has a value',
+        description: 'Context field has a value (is not empty)',
+      },
+      not_exists: {
+        text: 'has no value',
+        description: 'Context field has no value (is empty)',
+      },
+      arr_includes: {
+        text: 'includes',
+        description: 'Array includes at least one of the values',
+      },
+      arr_all: {
+        text: 'includes all',
+        description: 'Array includes all of the specified values',
+      },
+      arr_empty: {
+        text: 'is empty',
+        description: 'Array is empty or has no elements',
       },
     };
     return opInfo[op] || { text: op, description: op };
@@ -397,10 +422,12 @@ export const ConstraintList: React.FC<ConstraintListProps> = ({
   title,
   contextFields = [],
 }) => {
+  const { t } = useTranslation();
+
   if (!constraints || constraints.length === 0) {
     return (
       <Typography variant="caption" color="text.secondary" fontStyle="italic">
-        No constraints defined
+        {t('featureFlags.noConstraints')}
       </Typography>
     );
   }

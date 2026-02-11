@@ -338,7 +338,6 @@ The Unreal SDK uses `FGatrixFileStorageProvider` by default, which persists flag
 interface GatrixContext {
   userId?: string;
   sessionId?: string;
-  deviceId?: string;
   currentTime?: string;
   properties?: Record<string, string | number | boolean>;
 }

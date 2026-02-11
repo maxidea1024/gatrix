@@ -41,12 +41,12 @@ export class FeatureFlagEvaluator {
             const variant: Variant = variantData
               ? { ...variantData, enabled: true }
               : {
-                  name: '$default',
-                  weight: 100,
-                  value: flag.enabledValue ?? null,
-                  valueType: flag.valueType || 'string',
-                  enabled: true,
-                };
+                name: '$default',
+                weight: 100,
+                value: flag.enabledValue ?? null,
+                valueType: flag.valueType || 'string',
+                enabled: true,
+              };
 
             return {
               id: flag.id || '',
@@ -65,12 +65,12 @@ export class FeatureFlagEvaluator {
         const variant: Variant = variantData
           ? { ...variantData, enabled: true }
           : {
-              name: '$default',
-              weight: 100,
-              value: flag.enabledValue ?? null,
-              valueType: flag.valueType || 'string',
-              enabled: true,
-            };
+            name: '$default',
+            weight: 100,
+            value: flag.enabledValue ?? null,
+            valueType: flag.valueType || 'string',
+            enabled: true,
+          };
 
         return {
           id: flag.id || '',
@@ -147,8 +147,42 @@ export class FeatureFlagEvaluator {
   private static evaluateConstraint(constraint: Constraint, context: EvaluationContext): boolean {
     const contextValue = this.getContextValue(constraint.contextName, context);
 
+    // Handle exists/not_exists BEFORE undefined check
+    if (constraint.operator === 'exists') {
+      const result = contextValue !== undefined && contextValue !== null;
+      return constraint.inverted ? !result : result;
+    }
+    if (constraint.operator === 'not_exists') {
+      const result = contextValue === undefined || contextValue === null;
+      return constraint.inverted ? !result : result;
+    }
+
+    // Handle arr_empty BEFORE undefined check (undefined is considered empty)
+    if (constraint.operator === 'arr_empty') {
+      const result = !Array.isArray(contextValue) || contextValue.length === 0;
+      return constraint.inverted ? !result : result;
+    }
+
     if (contextValue === undefined) {
       return constraint.inverted ? true : false;
+    }
+
+    // Array operators
+    if (constraint.operator === 'arr_includes' || constraint.operator === 'arr_all') {
+      const arr = Array.isArray(contextValue) ? contextValue.map(String) : [];
+      const targetValues =
+        constraint.values?.map((v) => (constraint.caseInsensitive ? v.toLowerCase() : v)) || [];
+      const compareArr = constraint.caseInsensitive ? arr.map((v) => v.toLowerCase()) : arr;
+
+      let result = false;
+      if (constraint.operator === 'arr_includes') {
+        // At least one target value is in the array
+        result = targetValues.some((tv) => compareArr.includes(tv));
+      } else {
+        // All target values are in the array
+        result = targetValues.length > 0 && targetValues.every((tv) => compareArr.includes(tv));
+      }
+      return constraint.inverted ? !result : result;
     }
 
     const stringValue = String(contextValue);
@@ -168,9 +202,6 @@ export class FeatureFlagEvaluator {
       case 'str_eq':
         result = compareValue === targetValue;
         break;
-      case 'str_neq':
-        result = compareValue !== targetValue;
-        break;
       case 'str_contains':
         result = compareValue.includes(targetValue);
         break;
@@ -182,9 +213,6 @@ export class FeatureFlagEvaluator {
         break;
       case 'str_in':
         result = targetValues.includes(compareValue);
-        break;
-      case 'str_not_in':
-        result = !targetValues.includes(compareValue);
         break;
       case 'str_regex':
         try {
@@ -214,14 +242,14 @@ export class FeatureFlagEvaluator {
       case 'num_in':
         result = targetValues.map(Number).includes(Number(contextValue));
         break;
-      case 'num_not_in':
-        result = !targetValues.map(Number).includes(Number(contextValue));
-        break;
       // Boolean
       case 'bool_is':
         result = Boolean(contextValue) === (constraint.value === 'true');
         break;
       // Date
+      case 'date_eq':
+        result = new Date(stringValue).getTime() === new Date(targetValue).getTime();
+        break;
       case 'date_gt':
         result = new Date(stringValue) > new Date(targetValue);
         break;
@@ -253,9 +281,6 @@ export class FeatureFlagEvaluator {
       case 'semver_in':
         result = targetValues.some((v) => this.compareSemver(stringValue, v) === 0);
         break;
-      case 'semver_not_in':
-        result = !targetValues.some((v) => this.compareSemver(stringValue, v) === 0);
-        break;
       default:
         result = false;
     }
@@ -266,7 +291,7 @@ export class FeatureFlagEvaluator {
   private static getContextValue(
     name: string,
     context: EvaluationContext
-  ): string | number | boolean | undefined {
+  ): string | number | boolean | string[] | undefined {
     switch (name) {
       case 'userId':
         return context.userId;

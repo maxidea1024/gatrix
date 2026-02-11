@@ -6,17 +6,15 @@ import { ulid } from 'ulid';
 
 export type FlagType = 'release' | 'experiment' | 'operational' | 'killSwitch' | 'permission' | 'remoteConfig'; // Purpose
 export type ValueType = 'string' | 'number' | 'boolean' | 'json';
-export type FieldType = 'string' | 'number' | 'boolean' | 'date' | 'semver';
+export type FieldType = 'string' | 'number' | 'boolean' | 'date' | 'semver' | 'array' | 'country';
 
 export type ConstraintOperator =
-  // String operators
+  // String operators (use inverted flag for negation)
   | 'str_eq'
-  | 'str_neq'
   | 'str_contains'
   | 'str_starts_with'
   | 'str_ends_with'
   | 'str_in'
-  | 'str_not_in'
   | 'str_regex'
   // Number operators
   | 'num_eq'
@@ -25,10 +23,10 @@ export type ConstraintOperator =
   | 'num_lt'
   | 'num_lte'
   | 'num_in'
-  | 'num_not_in'
   // Boolean operators
   | 'bool_is'
   // Date operators
+  | 'date_eq'
   | 'date_gt'
   | 'date_gte'
   | 'date_lt'
@@ -40,7 +38,13 @@ export type ConstraintOperator =
   | 'semver_lt'
   | 'semver_lte'
   | 'semver_in'
-  | 'semver_not_in';
+  // Common operators (type-agnostic)
+  | 'exists'
+  | 'not_exists'
+  // Array operators
+  | 'arr_includes'
+  | 'arr_all'
+  | 'arr_empty';
 
 export interface StrategyParameters {
   rollout?: number;

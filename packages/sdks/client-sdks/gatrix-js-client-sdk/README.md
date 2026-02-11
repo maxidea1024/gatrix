@@ -22,7 +22,6 @@ const client = new GatrixClient({
   environment: 'production', // Environment name (required)
   context: {
     userId: 'user-123',
-    deviceId: 'device-456',
   },
   features: {
     refreshInterval: 30, // seconds (default: 30)

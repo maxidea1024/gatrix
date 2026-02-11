@@ -103,13 +103,13 @@ const OverrideSwitch = styled(Switch)(({ theme }) => ({
       pointerEvents: 'none',
     },
     '&:before': {
-      content: '"개별 설정"',
+      content: 'attr(data-label-on)',
       left: 10,
       color: '#fff',
       opacity: 0,
     },
     '&:after': {
-      content: '"전역 설정"',
+      content: 'attr(data-label-off)',
       right: 10,
       color: '#fff',
       opacity: 1,
@@ -854,6 +854,13 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                   checked={useEnvOverride}
                   onChange={(e) => setUseEnvOverride(e.target.checked)}
                   disabled={!canManage || isArchived}
+                  slotProps={{
+                    track: {
+                      // @ts-expect-error data attributes are valid HTML but not typed
+                      'data-label-on': t('featureFlags.overrideSwitchOn'),
+                      'data-label-off': t('featureFlags.overrideSwitchOff'),
+                    },
+                  }}
                 />
                 <Typography variant="subtitle2" fontWeight={600} color={useEnvOverride ? 'primary.main' : 'text.secondary'}>
                   {useEnvOverride ? t('featureFlags.overrideForEnv') : t('featureFlags.usingGlobalDefault')}

@@ -15,7 +15,6 @@ export interface GatrixContext {
   environment?: string;
   userId?: string;
   sessionId?: string;
-  deviceId?: string;
   currentTime?: string;
   properties?: Record<string, string | number | boolean>;
 }

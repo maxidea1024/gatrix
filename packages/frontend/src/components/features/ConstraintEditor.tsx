@@ -36,6 +36,8 @@ import {
   ToggleOn as BooleanIcon,
   Schedule as DateTimeIcon,
   LocalOffer as SemverIcon,
+  DataArray as ArrayIcon,
+  Public as CountryIcon,
   HelpOutline as MissingIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
@@ -70,12 +72,12 @@ export interface Constraint {
 }
 
 export type ConstraintOperator =
-  // String operators
+  // String operators (use inverted flag for negation)
   | 'str_eq'
-  | 'str_neq'
   | 'str_contains'
   | 'str_starts_with'
   | 'str_ends_with'
+  | 'str_in'
   | 'str_regex'
   // Number operators
   | 'num_eq'
@@ -84,10 +86,10 @@ export type ConstraintOperator =
   | 'num_lt'
   | 'num_lte'
   | 'num_in'
-  | 'num_not_in'
   // Boolean operators
   | 'bool_is'
   // Date operators
+  | 'date_eq'
   | 'date_gt'
   | 'date_gte'
   | 'date_lt'
@@ -99,13 +101,19 @@ export type ConstraintOperator =
   | 'semver_lt'
   | 'semver_lte'
   | 'semver_in'
-  | 'semver_not_in';
+  // Common operators (type-agnostic)
+  | 'exists'
+  | 'not_exists'
+  // Array operators
+  | 'arr_includes'
+  | 'arr_all'
+  | 'arr_empty';
 
 export interface ContextField {
   fieldName: string;
   displayName: string;
   description?: string;
-  fieldType: 'string' | 'number' | 'boolean' | 'date' | 'semver';
+  fieldType: 'string' | 'number' | 'boolean' | 'date' | 'semver' | 'array' | 'country';
   legalValues?: string[];
 }
 
@@ -116,17 +124,22 @@ interface ConstraintEditorProps {
   disabled?: boolean;
 }
 
+// Common operators available for all field types
+const COMMON_OPERATORS = [
+  { value: 'exists', label: 'has a value' },
+  { value: 'not_exists', label: 'has no value' },
+];
+
 // Operator options grouped by type
 const OPERATORS_BY_TYPE: Record<string, { value: string; label: string }[]> = {
   string: [
     { value: 'str_eq', label: 'equals' },
-    { value: 'str_neq', label: 'not equals' },
     { value: 'str_contains', label: 'contains' },
     { value: 'str_starts_with', label: 'starts with' },
     { value: 'str_ends_with', label: 'ends with' },
     { value: 'str_in', label: 'in list' },
-    { value: 'str_not_in', label: 'not in list' },
     { value: 'str_regex', label: 'matches regex' },
+    ...COMMON_OPERATORS,
   ],
   number: [
     { value: 'num_eq', label: '=' },
@@ -135,14 +148,19 @@ const OPERATORS_BY_TYPE: Record<string, { value: string; label: string }[]> = {
     { value: 'num_lt', label: '<' },
     { value: 'num_lte', label: '<=' },
     { value: 'num_in', label: 'in list' },
-    { value: 'num_not_in', label: 'not in list' },
+    ...COMMON_OPERATORS,
   ],
-  boolean: [{ value: 'bool_is', label: 'is' }],
+  boolean: [
+    { value: 'bool_is', label: 'is' },
+    ...COMMON_OPERATORS,
+  ],
   date: [
+    { value: 'date_eq', label: 'equals' },
     { value: 'date_gt', label: 'after' },
     { value: 'date_gte', label: 'on or after' },
     { value: 'date_lt', label: 'before' },
     { value: 'date_lte', label: 'on or before' },
+    ...COMMON_OPERATORS,
   ],
   semver: [
     { value: 'semver_eq', label: '=' },
@@ -151,19 +169,28 @@ const OPERATORS_BY_TYPE: Record<string, { value: string; label: string }[]> = {
     { value: 'semver_lt', label: '<' },
     { value: 'semver_lte', label: '<=' },
     { value: 'semver_in', label: 'in list' },
-    { value: 'semver_not_in', label: 'not in list' },
+    ...COMMON_OPERATORS,
+  ],
+  array: [
+    { value: 'arr_includes', label: 'includes' },
+    { value: 'arr_all', label: 'includes all' },
+    { value: 'arr_empty', label: 'is empty' },
+    ...COMMON_OPERATORS,
+  ],
+  country: [
+    { value: 'str_eq', label: 'equals' },
+    { value: 'str_in', label: 'in list' },
+    ...COMMON_OPERATORS,
   ],
 };
 
 // Inverted operator labels (shown when constraint.inverted is true)
 const INVERTED_OPERATOR_LABELS: Record<string, string> = {
   str_eq: 'does not equal',
-  str_neq: 'equals',
   str_contains: 'does not contain',
   str_starts_with: 'does not start with',
   str_ends_with: 'does not end with',
   str_in: 'not in list',
-  str_not_in: 'in list',
   str_regex: 'does not match regex',
   num_eq: '≠',
   num_gt: '≤',
@@ -171,8 +198,8 @@ const INVERTED_OPERATOR_LABELS: Record<string, string> = {
   num_lt: '≥',
   num_lte: '>',
   num_in: 'not in list',
-  num_not_in: 'in list',
   bool_is: 'is not',
+  date_eq: 'does not equal',
   date_gt: 'on or before',
   date_gte: 'before',
   date_lt: 'on or after',
@@ -183,7 +210,11 @@ const INVERTED_OPERATOR_LABELS: Record<string, string> = {
   semver_lt: '≥',
   semver_lte: '>',
   semver_in: 'not in list',
-  semver_not_in: 'in list',
+  arr_includes: 'does not include',
+  arr_all: 'does not include all',
+  arr_empty: 'is not empty',
+  exists: 'has no value',
+  not_exists: 'has a value',
 };
 
 // Get operator label based on inverted state
@@ -202,11 +233,19 @@ const getOperatorLabel = (
 const isMultiValueOperator = (operator: ConstraintOperator): boolean => {
   return (
     operator === 'str_in' ||
-    operator === 'str_not_in' ||
     operator === 'num_in' ||
-    operator === 'num_not_in' ||
     operator === 'semver_in' ||
-    operator === 'semver_not_in'
+    operator === 'arr_includes' ||
+    operator === 'arr_all'
+  );
+};
+
+// Check if operator requires no value input
+const isValuelessOperator = (operator: ConstraintOperator): boolean => {
+  return (
+    operator === 'exists' ||
+    operator === 'not_exists' ||
+    operator === 'arr_empty'
   );
 };
 
@@ -319,6 +358,10 @@ const SortableConstraintCard: React.FC<SortableConstraintCardProps> = ({
                     return <DateTimeIcon sx={{ fontSize: 16, color: 'secondary.main', mr: 1 }} />;
                   case 'semver':
                     return <SemverIcon sx={{ fontSize: 16, color: 'primary.main', mr: 1 }} />;
+                  case 'array':
+                    return <ArrayIcon sx={{ fontSize: 16, color: 'info.dark', mr: 1 }} />;
+                  case 'country':
+                    return <CountryIcon sx={{ fontSize: 16, color: 'success.dark', mr: 1 }} />;
                   default:
                     return <StringIcon sx={{ fontSize: 16, color: 'text.disabled', mr: 1 }} />;
                 }
@@ -349,6 +392,10 @@ const SortableConstraintCard: React.FC<SortableConstraintCardProps> = ({
                     return <DateTimeIcon sx={{ fontSize: 16, color: 'secondary.main' }} />;
                   case 'semver':
                     return <SemverIcon sx={{ fontSize: 16, color: 'primary.main' }} />;
+                  case 'array':
+                    return <ArrayIcon sx={{ fontSize: 16, color: 'info.dark' }} />;
+                  case 'country':
+                    return <CountryIcon sx={{ fontSize: 16, color: 'success.dark' }} />;
                   default:
                     return <StringIcon sx={{ fontSize: 16, color: 'text.disabled' }} />;
                 }
@@ -627,8 +674,12 @@ export const ConstraintEditor: React.FC<ConstraintEditorProps> = ({
       constraint.values = [];
     } else if (field === 'operator') {
       constraint.operator = value as ConstraintOperator;
-      // Reset values when switching between single/multi value operators
-      if (isMultiValueOperator(value)) {
+      // Clear values for valueless operators (exists, not_exists, arr_empty)
+      if (isValuelessOperator(value)) {
+        constraint.value = undefined;
+        constraint.values = undefined;
+      } else if (isMultiValueOperator(value)) {
+        // Reset values when switching between single/multi value operators
         constraint.value = undefined;
         constraint.values = constraint.values || [];
       } else {
@@ -644,6 +695,15 @@ export const ConstraintEditor: React.FC<ConstraintEditorProps> = ({
   };
 
   const renderValueInput = (constraint: Constraint, index: number) => {
+    // Valueless operators (exists, not_exists, arr_empty) - no input needed
+    if (isValuelessOperator(constraint.operator)) {
+      return (
+        <Typography variant="body2" color="text.secondary" sx={{ py: 1, fontStyle: 'italic' }}>
+          {t('featureFlags.noValueRequired')}
+        </Typography>
+      );
+    }
+
     const fieldType = getFieldType(constraint.contextName);
     const legalValues = getLegalValues(constraint.contextName);
     const isMultiValue = isMultiValueOperator(constraint.operator);

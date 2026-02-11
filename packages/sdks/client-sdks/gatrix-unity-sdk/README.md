@@ -39,8 +39,7 @@ public class GameManager : MonoBehaviour
             // Optional: initial context
             Context = new GatrixContext
             {
-                UserId = "user-123",
-                DeviceId = SystemInfo.deviceUniqueIdentifier
+                UserId = "user-123"
             }
         };
 
@@ -115,7 +114,7 @@ await client.UpdateContextAsync(new GatrixContext
 await client.SetContextFieldAsync("userId", "user-789");
 
 // Remove a field
-await client.RemoveContextFieldAsync("deviceId");
+await client.RemoveContextFieldAsync("plan");
 ```
 
 ## Watch for Changes

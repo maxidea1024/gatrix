@@ -422,7 +422,7 @@ describe('FeaturesClient', () => {
     beforeEach(async () => {
       await client.init();
       // Mock console.error to suppress expected error output during context changes
-      consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+      consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => { });
       // Mock fetch to return empty flags response
       mockFetch.mockResolvedValue({
         ok: true,
@@ -438,13 +438,15 @@ describe('FeaturesClient', () => {
     it('should get initial context from config', () => {
       const configWithContext: GatrixClientConfig = {
         ...defaultConfig,
-        context: { userId: 'user-123', deviceId: 'device-456' },
+        context: { userId: 'user-123', properties: { region: 'us-west' } },
       };
       const clientWithContext = new FeaturesClient(emitter, configWithContext);
 
       expect(clientWithContext.getContext()).toMatchObject({
         userId: 'user-123',
-        deviceId: 'device-456',
+      });
+      expect(clientWithContext.getContext().properties).toMatchObject({
+        region: 'us-west',
       });
     });
 
@@ -456,11 +458,10 @@ describe('FeaturesClient', () => {
 
     it('should merge context with updateContext', async () => {
       await client.updateContext({ userId: 'user-1' });
-      await client.updateContext({ deviceId: 'device-1' });
+      await client.updateContext({ properties: { region: 'us-east' } });
 
       expect(client.getContext()).toMatchObject({
         userId: 'user-1',
-        deviceId: 'device-1',
       });
     });
 
@@ -471,10 +472,10 @@ describe('FeaturesClient', () => {
     });
 
     it('should remove context field', async () => {
-      await client.updateContext({ userId: 'user-1', deviceId: 'device-1' });
+      await client.updateContext({ userId: 'user-1', sessionId: 'session-1' });
       await client.removeContextField('userId');
 
-      expect(client.getContext()).toMatchObject({ deviceId: 'device-1' });
+      expect(client.getContext()).toMatchObject({ sessionId: 'session-1' });
       expect(client.getContext().userId).toBeUndefined();
     });
   });

@@ -1132,6 +1132,23 @@ function evaluateStrategyWithDetails(
 
 function evaluateConstraint(constraint: any, context: Record<string, any>): boolean {
   const contextValue = getContextValue(constraint.contextName, context);
+
+  // Handle exists / not_exists before undefined check
+  if (constraint.operator === 'exists') {
+    const result = contextValue !== undefined && contextValue !== null;
+    return constraint.inverted ? !result : result;
+  }
+  if (constraint.operator === 'not_exists') {
+    const result = contextValue === undefined || contextValue === null;
+    return constraint.inverted ? !result : result;
+  }
+
+  // Handle arr_empty before undefined check (undefined treated as empty)
+  if (constraint.operator === 'arr_empty') {
+    const result = !Array.isArray(contextValue) || contextValue.length === 0;
+    return constraint.inverted ? !result : result;
+  }
+
   if (contextValue === undefined) {
     return constraint.inverted ? true : false;
   }
@@ -1149,11 +1166,9 @@ function evaluateConstraint(constraint: any, context: Record<string, any>): bool
   let result = false;
 
   switch (constraint.operator) {
+    // String operators (use inverted flag for negation)
     case 'str_eq':
       result = compareValue === targetValue;
-      break;
-    case 'str_neq':
-      result = compareValue !== targetValue;
       break;
     case 'str_contains':
       result = compareValue.includes(targetValue);
@@ -1167,9 +1182,6 @@ function evaluateConstraint(constraint: any, context: Record<string, any>): bool
     case 'str_in':
       result = targetValues.includes(compareValue);
       break;
-    case 'str_not_in':
-      result = !targetValues.includes(compareValue);
-      break;
     case 'str_regex':
       try {
         const flags = constraint.caseInsensitive ? 'i' : '';
@@ -1179,6 +1191,7 @@ function evaluateConstraint(constraint: any, context: Record<string, any>): bool
         result = false;
       }
       break;
+    // Number operators
     case 'num_eq':
       result = Number(contextValue) === Number(constraint.value);
       break;
@@ -1194,8 +1207,16 @@ function evaluateConstraint(constraint: any, context: Record<string, any>): bool
     case 'num_lte':
       result = Number(contextValue) <= Number(constraint.value);
       break;
+    case 'num_in':
+      result = targetValues.map(Number).includes(Number(contextValue));
+      break;
+    // Boolean operators
     case 'bool_is':
       result = Boolean(contextValue) === (constraint.value === 'true');
+      break;
+    // Date operators
+    case 'date_eq':
+      result = new Date(stringValue).getTime() === new Date(targetValue).getTime();
       break;
     case 'date_gt':
       result = new Date(stringValue) > new Date(targetValue);
@@ -1208,6 +1229,13 @@ function evaluateConstraint(constraint: any, context: Record<string, any>): bool
       break;
     case 'date_lte':
       result = new Date(stringValue) <= new Date(targetValue);
+      break;
+    // Array operators
+    case 'arr_includes':
+      result = Array.isArray(contextValue) && contextValue.some((v: any) => targetValues.includes(String(v)));
+      break;
+    case 'arr_all':
+      result = Array.isArray(contextValue) && targetValues.every((tv: string) => contextValue.map(String).includes(tv));
       break;
     default:
       result = false;
