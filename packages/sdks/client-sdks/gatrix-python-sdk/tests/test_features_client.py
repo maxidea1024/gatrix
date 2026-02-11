@@ -7,6 +7,7 @@ from gatrix.flag_proxy import FlagProxy
 from gatrix.storage import InMemoryStorageProvider
 from gatrix.types import (
     DISABLED_VARIANT,
+    MISSING_VARIANT,
     FeaturesConfig,
     GatrixClientConfig,
     GatrixContext,
@@ -109,21 +110,22 @@ class TestGetVariant:
         v = fc.get_variant("color-theme")
         assert v.name == "dark"
         assert v.enabled is True
-        assert v.payload == "dark-mode"
+        assert v.value == "dark-mode"
 
     def test_disabled_flag_returns_disabled_variant(self):
         fc = FeaturesClient(
             _config(bootstrap=BOOTSTRAP_WITH_VARIANTS), EventEmitter()
         )
         v = fc.get_variant("disabled-variant")
-        assert v == DISABLED_VARIANT
+        assert v.name == "beta"
+        assert v.enabled is True  # variant itself is enabled, flag is disabled
 
     def test_missing_flag_returns_disabled_variant(self):
         fc = FeaturesClient(
             _config(bootstrap=BOOTSTRAP_SIMPLE), EventEmitter()
         )
         v = fc.get_variant("nonexistent")
-        assert v == DISABLED_VARIANT
+        assert v == MISSING_VARIANT
 
 
 class TestVariations:
@@ -132,7 +134,7 @@ class TestVariations:
             _config(bootstrap=BOOTSTRAP_WITH_VARIANTS), EventEmitter()
         )
         assert fc.variation("color-theme", "light") == "dark"
-        assert fc.variation("disabled-variant", "fallback") == "fallback"
+        assert fc.variation("disabled-variant", "fallback") == "beta"
         assert fc.variation("nonexistent", "default") == "default"
 
     def test_bool_variation(self):
@@ -140,7 +142,7 @@ class TestVariations:
             _config(bootstrap=BOOTSTRAP_FULL), EventEmitter()
         )
         assert fc.bool_variation("bool-flag", False) is True
-        assert fc.bool_variation("disabled-flag", True) is False
+        assert fc.bool_variation("disabled-flag", True) is False  # value_type=boolean, value=False
         assert fc.bool_variation("nonexistent", True) is True
 
     def test_string_variation(self):
@@ -148,16 +150,24 @@ class TestVariations:
             _config(bootstrap=BOOTSTRAP_FULL), EventEmitter()
         )
         assert fc.string_variation("string-flag", "") == "hello world"
-        assert fc.string_variation("disabled-flag", "def") == "def"
+        assert fc.string_variation("disabled-flag", "def") == "def"  # no string value -> default
         assert fc.string_variation("nonexistent", "def") == "def"
 
-    def test_number_variation(self):
+    def test_int_variation(self):
         fc = FeaturesClient(
             _config(bootstrap=BOOTSTRAP_FULL), EventEmitter()
         )
-        assert fc.number_variation("number-flag", 0) == 42.0
-        assert fc.number_variation("disabled-flag", 99) == 99
-        assert fc.number_variation("nonexistent", 7) == 7
+        assert fc.int_variation("number-flag", 0) == 42
+        assert fc.int_variation("disabled-flag", 99) == 99
+        assert fc.int_variation("nonexistent", 7) == 7
+
+    def test_float_variation(self):
+        fc = FeaturesClient(
+            _config(bootstrap=BOOTSTRAP_FULL), EventEmitter()
+        )
+        assert fc.float_variation("number-flag", 0.0) == 42.0
+        assert fc.float_variation("disabled-flag", 99.0) == 99.0
+        assert fc.float_variation("nonexistent", 7.0) == 7.0
 
     def test_json_variation(self):
         fc = FeaturesClient(
@@ -193,7 +203,7 @@ class TestVariationDetails:
         r = fc.bool_variation_details("nonexistent", True)
         assert r.value is True
         assert r.flag_exists is False
-        assert r.reason == "not_found"
+        assert r.reason == "flag_not_found"
 
     def test_string_details(self):
         fc = FeaturesClient(
@@ -202,11 +212,18 @@ class TestVariationDetails:
         r = fc.string_variation_details("string-flag", "")
         assert r.value == "hello world"
 
-    def test_number_details(self):
+    def test_int_details(self):
         fc = FeaturesClient(
             _config(bootstrap=BOOTSTRAP_FULL), EventEmitter()
         )
-        r = fc.number_variation_details("number-flag", 0)
+        r = fc.int_variation_details("number-flag", 0)
+        assert r.value == 42
+
+    def test_float_details(self):
+        fc = FeaturesClient(
+            _config(bootstrap=BOOTSTRAP_FULL), EventEmitter()
+        )
+        r = fc.float_variation_details("number-flag", 0.0)
         assert r.value == 42.0
 
     def test_json_details(self):
@@ -230,11 +247,17 @@ class TestOrThrow:
         )
         assert fc.string_variation_or_throw("string-flag") == "hello world"
 
-    def test_number_or_throw(self):
+    def test_int_or_throw(self):
         fc = FeaturesClient(
             _config(bootstrap=BOOTSTRAP_FULL), EventEmitter()
         )
-        assert fc.number_variation_or_throw("number-flag") == 42.0
+        assert fc.int_variation_or_throw("number-flag") == 42
+
+    def test_float_or_throw(self):
+        fc = FeaturesClient(
+            _config(bootstrap=BOOTSTRAP_FULL), EventEmitter()
+        )
+        assert fc.float_variation_or_throw("number-flag") == 42.0
 
     def test_json_or_throw(self):
         fc = FeaturesClient(
@@ -337,20 +360,20 @@ class TestExplicitSyncMode:
             _config(bootstrap=BOOTSTRAP_SIMPLE, explicit_sync=True),
             EventEmitter(),
         )
-        assert fc.is_explicit_sync() is True
+        assert fc.is_explicit_sync_enabled() is True
 
     def test_not_explicit_sync(self):
         fc = FeaturesClient(
             _config(bootstrap=BOOTSTRAP_SIMPLE), EventEmitter()
         )
-        assert fc.is_explicit_sync() is False
+        assert fc.is_explicit_sync_enabled() is False
 
     def test_can_sync_false_initially(self):
         fc = FeaturesClient(
             _config(bootstrap=BOOTSTRAP_SIMPLE, explicit_sync=True),
             EventEmitter(),
         )
-        assert fc.can_sync_flags() is False
+        assert fc.has_pending_sync_flags() is False
 
 
 class TestWatchFlag:

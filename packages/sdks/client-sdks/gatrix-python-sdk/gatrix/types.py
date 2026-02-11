@@ -28,6 +28,7 @@ class Variant:
 
 
 MISSING_VARIANT = Variant(name="$missing", enabled=False, value=None)
+DISABLED_VARIANT = Variant(name="$disabled", enabled=False, value=None)
 
 
 @dataclass
@@ -47,7 +48,6 @@ class GatrixContext:
     """Evaluation context (global for client-side)."""
     user_id: Optional[str] = None
     session_id: Optional[str] = None
-    device_id: Optional[str] = None
     current_time: Optional[str] = None
     properties: Optional[Dict[str, Union[str, int, float, bool]]] = None
 

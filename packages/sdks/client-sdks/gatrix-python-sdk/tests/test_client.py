@@ -147,7 +147,7 @@ class TestFeaturesAccess:
     def test_variations(self):
         client = GatrixClient(_config(bootstrap=BOOTSTRAP_FULL))
         assert client.features.string_variation("string-flag", "") == "hello world"
-        assert client.features.number_variation("number-flag", 0) == 42.0
+        assert client.features.float_variation("number-flag", 0.0) == 42.0
         assert client.features.json_variation("json-flag", {}) == {
             "key": "value",
             "nested": {"a": 1},

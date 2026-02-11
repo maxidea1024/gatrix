@@ -1,4 +1,8 @@
-"""FeaturesClient – feature flag management with polling, metrics, caching."""
+"""FeaturesClient – feature flag management with polling, metrics, caching.
+
+Implements VariationProvider protocol. All variation logic lives in
+*_internal methods. Public methods + FlagProxy delegate to them.
+"""
 from __future__ import annotations
 
 import json
@@ -6,7 +10,7 @@ import logging
 import threading
 import uuid
 from datetime import datetime, timezone
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any, Callable, Dict, List, Optional
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
@@ -16,13 +20,12 @@ from gatrix.flag_proxy import FlagProxy
 from gatrix.storage import InMemoryStorageProvider, StorageProvider
 from gatrix.types import (
     DISABLED_VARIANT,
+    MISSING_VARIANT,
     EvaluatedFlag,
     GatrixClientConfig,
     GatrixContext,
     ImpressionEvent,
-    SdkState,
     Variant,
-    VariantType,
     VariationResult,
 )
 from gatrix.version import SDK_NAME, SDK_VERSION
@@ -42,7 +45,7 @@ def _flag_from_dict(d: dict) -> EvaluatedFlag:
         name=d.get("name", ""),
         enabled=d.get("enabled", False),
         variant=variant,
-        variant_type=d.get("variantType", d.get("variant_type", "none")),
+        value_type=d.get("valueType", d.get("value_type", "none")),
         version=d.get("version", 0),
         reason=d.get("reason"),
         impression_data=d.get("impressionData", d.get("impression_data")),
@@ -81,7 +84,6 @@ def _context_to_qs(ctx: Optional[GatrixContext], app_name: str,
     if ctx:
         add("userId", ctx.user_id)
         add("sessionId", ctx.session_id)
-        add("deviceId", ctx.device_id)
         add("currentTime", ctx.current_time)
         if ctx.properties:
             for k, v in ctx.properties.items():
@@ -98,8 +100,6 @@ def _context_to_body(ctx: Optional[GatrixContext], app_name: str,
             body["userId"] = ctx.user_id
         if ctx.session_id:
             body["sessionId"] = ctx.session_id
-        if ctx.device_id:
-            body["deviceId"] = ctx.device_id
         if ctx.current_time:
             body["currentTime"] = ctx.current_time
         if ctx.properties:
@@ -148,7 +148,11 @@ class WatchFlagGroup:
 
 
 class FeaturesClient:
-    """Manages feature flags: polling, caching, metrics, context."""
+    """Manages feature flags: polling, caching, metrics, context.
+
+    Implements VariationProvider protocol – all variation logic lives in
+    *_internal methods. FlagProxy delegates to these methods.
+    """
 
     def __init__(
         self,
@@ -199,7 +203,7 @@ class FeaturesClient:
         self._flags: Dict[str, EvaluatedFlag] = {}
         self._pending_flags: Optional[Dict[str, EvaluatedFlag]] = None
         self._etag: Optional[str] = None
-        self._sdk_state: SdkState = "initializing"
+        self._sdk_state = "initializing"
         self._ready = False
         self._started = False
         self._last_error: Optional[Exception] = None
@@ -243,7 +247,6 @@ class FeaturesClient:
     # ================================================================ Init
     def _init(self) -> None:
         """Load flags from storage/bootstrap."""
-        # Load from storage
         cached = self._storage.get(f"{self._cache_prefix}_flags")
         if cached and isinstance(cached, list):
             for d in cached:
@@ -327,18 +330,19 @@ class FeaturesClient:
 
     # ============================================================= Flag Access
     def _create_proxy(self, flag_name: str) -> FlagProxy:
-        """Create a FlagProxy with metrics callback injected."""
+        """Create a FlagProxy backed by this client as VariationProvider."""
         flag = self._get_flag(flag_name)
-        return FlagProxy(flag, on_access=self._handle_flag_access, flag_name=flag_name)
+        return FlagProxy(flag, client=self, flag_name=flag_name)
 
-    def _handle_flag_access(
+    # ---------------------------------------------- Metrics tracking helpers
+    def _track_flag_access(
         self,
         flag_name: str,
         flag: Optional[EvaluatedFlag],
         event_type: str,
-        variant_name: Optional[str],
+        variant_name: Optional[str] = None,
     ) -> None:
-        """Metrics callback injected into every FlagProxy."""
+        """Central metrics tracking for flag access."""
         if flag is None:
             self._record_missing(flag_name)
             return
@@ -347,74 +351,338 @@ class FeaturesClient:
             self._count_variant(flag_name, variant_name)
         self._maybe_impression(flag, event_type)
 
+    # ===================================================== Internal methods
+    # These implement the VariationProvider protocol.
+    # All flag lookup + value extraction + metrics tracking happen here.
+
+    def is_enabled_internal(self, flag_name: str) -> bool:
+        flag = self._get_flag(flag_name)
+        if flag is None:
+            self._track_flag_access(flag_name, None, "isEnabled")
+            return False
+        self._track_flag_access(flag_name, flag, "isEnabled", flag.variant.name)
+        return flag.enabled
+
+    def get_variant_internal(self, flag_name: str) -> Variant:
+        flag = self._get_flag(flag_name)
+        if flag is None:
+            self._track_flag_access(flag_name, None, "getVariant")
+            return MISSING_VARIANT
+        self._track_flag_access(flag_name, flag, "getVariant", flag.variant.name)
+        return flag.variant
+
+    def variation_internal(self, flag_name: str, missing_value: str) -> str:
+        """Return variant name."""
+        flag = self._get_flag(flag_name)
+        if flag is None:
+            self._track_flag_access(flag_name, None, "getVariant")
+            return missing_value
+        self._track_flag_access(flag_name, flag, "getVariant", flag.variant.name)
+        return flag.variant.name
+
+    def bool_variation_internal(self, flag_name: str, missing_value: bool) -> bool:
+        flag = self._get_flag(flag_name)
+        if flag is None:
+            self._track_flag_access(flag_name, None, "getVariant")
+            return missing_value
+        self._track_flag_access(flag_name, flag, "getVariant", flag.variant.name)
+        if flag.value_type != "boolean":
+            return missing_value
+        val = flag.variant.value
+        if val is None:
+            return missing_value
+        if isinstance(val, bool):
+            return val
+        if isinstance(val, str):
+            return val.lower() == "true"
+        return bool(val)
+
+    def string_variation_internal(self, flag_name: str, missing_value: str) -> str:
+        flag = self._get_flag(flag_name)
+        if flag is None:
+            self._track_flag_access(flag_name, None, "getVariant")
+            return missing_value
+        self._track_flag_access(flag_name, flag, "getVariant", flag.variant.name)
+        if flag.value_type != "string":
+            return missing_value
+        if flag.variant.value is None:
+            return missing_value
+        return str(flag.variant.value)
+
+    def int_variation_internal(self, flag_name: str, missing_value: int) -> int:
+        flag = self._get_flag(flag_name)
+        if flag is None:
+            self._track_flag_access(flag_name, None, "getVariant")
+            return missing_value
+        self._track_flag_access(flag_name, flag, "getVariant", flag.variant.name)
+        if flag.value_type != "number":
+            return missing_value
+        if flag.variant.value is None:
+            return missing_value
+        try:
+            return int(flag.variant.value)  # type: ignore[arg-type]
+        except (ValueError, TypeError):
+            return missing_value
+
+    def float_variation_internal(self, flag_name: str, missing_value: float) -> float:
+        flag = self._get_flag(flag_name)
+        if flag is None:
+            self._track_flag_access(flag_name, None, "getVariant")
+            return missing_value
+        self._track_flag_access(flag_name, flag, "getVariant", flag.variant.name)
+        if flag.value_type != "number":
+            return missing_value
+        if flag.variant.value is None:
+            return missing_value
+        try:
+            return float(flag.variant.value)  # type: ignore[arg-type]
+        except (ValueError, TypeError):
+            return missing_value
+
+    def json_variation_internal(self, flag_name: str, missing_value: Any) -> Any:
+        flag = self._get_flag(flag_name)
+        if flag is None:
+            self._track_flag_access(flag_name, None, "getVariant")
+            return missing_value
+        self._track_flag_access(flag_name, flag, "getVariant", flag.variant.name)
+        if flag.value_type != "json":
+            return missing_value
+        if flag.variant.value is None:
+            return missing_value
+        if isinstance(flag.variant.value, (dict, list)):
+            return flag.variant.value
+        try:
+            return json.loads(str(flag.variant.value))
+        except (json.JSONDecodeError, TypeError):
+            return missing_value
+
+    # --------------------------------------------- Variation details internal
+    def _make_details(
+        self, flag_name: str, value: Any, expected_type: str
+    ) -> VariationResult:
+        flag = self._get_flag(flag_name)
+        exists = flag is not None
+        reason = (flag.reason if flag else None) or (
+            "evaluated" if exists else "flag_not_found"
+        )
+        if exists and flag.value_type != expected_type:
+            reason = f"type_mismatch:expected_{expected_type}_got_{flag.value_type}"
+        return VariationResult(
+            value=value,
+            reason=reason,
+            flag_exists=exists,
+            enabled=flag.enabled if exists else False,
+        )
+
+    def bool_variation_details_internal(
+        self, flag_name: str, missing_value: bool
+    ) -> VariationResult:
+        value = self.bool_variation_internal(flag_name, missing_value)
+        return self._make_details(flag_name, value, "boolean")
+
+    def string_variation_details_internal(
+        self, flag_name: str, missing_value: str
+    ) -> VariationResult:
+        value = self.string_variation_internal(flag_name, missing_value)
+        return self._make_details(flag_name, value, "string")
+
+    def int_variation_details_internal(
+        self, flag_name: str, missing_value: int
+    ) -> VariationResult:
+        value = self.int_variation_internal(flag_name, missing_value)
+        return self._make_details(flag_name, value, "number")
+
+    def float_variation_details_internal(
+        self, flag_name: str, missing_value: float
+    ) -> VariationResult:
+        value = self.float_variation_internal(flag_name, missing_value)
+        return self._make_details(flag_name, value, "number")
+
+    def json_variation_details_internal(
+        self, flag_name: str, missing_value: Any
+    ) -> VariationResult:
+        value = self.json_variation_internal(flag_name, missing_value)
+        return self._make_details(flag_name, value, "json")
+
+    # ------------------------------------------------ Or-throw internal
+    def bool_variation_or_throw_internal(self, flag_name: str) -> bool:
+        flag = self._get_flag(flag_name)
+        if flag is None:
+            self._track_flag_access(flag_name, None, "getVariant")
+            raise GatrixFeatureError(f"Flag '{flag_name}' not found")
+        self._track_flag_access(flag_name, flag, "getVariant", flag.variant.name)
+        if flag.value_type != "boolean":
+            raise GatrixFeatureError(
+                f"Flag '{flag_name}' type mismatch: "
+                f"expected boolean, got {flag.value_type}"
+            )
+        val = flag.variant.value
+        if val is None:
+            raise GatrixFeatureError(f"Flag '{flag_name}' has no boolean value")
+        if isinstance(val, bool):
+            return val
+        if isinstance(val, str):
+            return val.lower() == "true"
+        return bool(val)
+
+    def string_variation_or_throw_internal(self, flag_name: str) -> str:
+        flag = self._get_flag(flag_name)
+        if flag is None:
+            self._track_flag_access(flag_name, None, "getVariant")
+            raise GatrixFeatureError(f"Flag '{flag_name}' not found")
+        self._track_flag_access(flag_name, flag, "getVariant", flag.variant.name)
+        if flag.value_type != "string":
+            raise GatrixFeatureError(
+                f"Flag '{flag_name}' type mismatch: "
+                f"expected string, got {flag.value_type}"
+            )
+        if flag.variant.value is None:
+            raise GatrixFeatureError(f"Flag '{flag_name}' has no string value")
+        return str(flag.variant.value)
+
+    def int_variation_or_throw_internal(self, flag_name: str) -> int:
+        flag = self._get_flag(flag_name)
+        if flag is None:
+            self._track_flag_access(flag_name, None, "getVariant")
+            raise GatrixFeatureError(f"Flag '{flag_name}' not found")
+        self._track_flag_access(flag_name, flag, "getVariant", flag.variant.name)
+        if flag.value_type != "number":
+            raise GatrixFeatureError(
+                f"Flag '{flag_name}' type mismatch: "
+                f"expected number, got {flag.value_type}"
+            )
+        if flag.variant.value is None:
+            raise GatrixFeatureError(f"Flag '{flag_name}' has no number value")
+        try:
+            return int(flag.variant.value)  # type: ignore[arg-type]
+        except (ValueError, TypeError) as e:
+            raise GatrixFeatureError(
+                f"Flag '{flag_name}' value is not a valid integer"
+            ) from e
+
+    def float_variation_or_throw_internal(self, flag_name: str) -> float:
+        flag = self._get_flag(flag_name)
+        if flag is None:
+            self._track_flag_access(flag_name, None, "getVariant")
+            raise GatrixFeatureError(f"Flag '{flag_name}' not found")
+        self._track_flag_access(flag_name, flag, "getVariant", flag.variant.name)
+        if flag.value_type != "number":
+            raise GatrixFeatureError(
+                f"Flag '{flag_name}' type mismatch: "
+                f"expected number, got {flag.value_type}"
+            )
+        if flag.variant.value is None:
+            raise GatrixFeatureError(f"Flag '{flag_name}' has no number value")
+        try:
+            return float(flag.variant.value)  # type: ignore[arg-type]
+        except (ValueError, TypeError) as e:
+            raise GatrixFeatureError(
+                f"Flag '{flag_name}' value is not a valid number"
+            ) from e
+
+    def json_variation_or_throw_internal(self, flag_name: str) -> Any:
+        flag = self._get_flag(flag_name)
+        if flag is None:
+            self._track_flag_access(flag_name, None, "getVariant")
+            raise GatrixFeatureError(f"Flag '{flag_name}' not found")
+        self._track_flag_access(flag_name, flag, "getVariant", flag.variant.name)
+        if flag.value_type != "json":
+            raise GatrixFeatureError(
+                f"Flag '{flag_name}' type mismatch: "
+                f"expected json, got {flag.value_type}"
+            )
+        if flag.variant.value is None:
+            raise GatrixFeatureError(f"Flag '{flag_name}' has no JSON value")
+        if isinstance(flag.variant.value, (dict, list)):
+            return flag.variant.value
+        try:
+            return json.loads(str(flag.variant.value))
+        except (json.JSONDecodeError, TypeError) as e:
+            raise GatrixFeatureError(
+                f"Flag '{flag_name}' value is not valid JSON"
+            ) from e
+
+    # ============================================= Public methods (delegate)
+
     def is_enabled(self, flag_name: str) -> bool:
-        return self._create_proxy(flag_name).enabled
+        return self.is_enabled_internal(flag_name)
 
     def get_variant(self, flag_name: str) -> Variant:
         """Never returns None – returns MISSING_VARIANT for missing flags."""
-        proxy = self._create_proxy(flag_name)
-        proxy.variation("")  # trigger metrics
-        return proxy.variant
+        return self.get_variant_internal(flag_name)
 
     def get_all_flags(self) -> List[EvaluatedFlag]:
         return list(self._flags.values())
 
+    def has_flag(self, flag_name: str) -> bool:
+        return flag_name in self._flags
+
     # ----------------------------------------------------------- variations
     def variation(self, flag_name: str, missing_value: str) -> str:
-        return self._create_proxy(flag_name).variation(missing_value)
+        return self.variation_internal(flag_name, missing_value)
 
     def bool_variation(self, flag_name: str, missing_value: bool) -> bool:
-        return self._create_proxy(flag_name).bool_variation(missing_value)
+        return self.bool_variation_internal(flag_name, missing_value)
 
     def string_variation(self, flag_name: str, missing_value: str) -> str:
-        return self._create_proxy(flag_name).string_variation(missing_value)
+        return self.string_variation_internal(flag_name, missing_value)
 
-    def number_variation(self, flag_name: str, missing_value: float) -> float:
-        return self._create_proxy(flag_name).number_variation(missing_value)
+    def int_variation(self, flag_name: str, missing_value: int) -> int:
+        return self.int_variation_internal(flag_name, missing_value)
+
+    def float_variation(self, flag_name: str, missing_value: float) -> float:
+        return self.float_variation_internal(flag_name, missing_value)
 
     def json_variation(self, flag_name: str, missing_value: Any) -> Any:
-        return self._create_proxy(flag_name).json_variation(missing_value)
-
+        return self.json_variation_internal(flag_name, missing_value)
 
     # ------------------------------------------------- variation details
     def bool_variation_details(
         self, flag_name: str, missing_value: bool
     ) -> VariationResult:
-        return self._create_proxy(flag_name).bool_variation_details(missing_value)
+        return self.bool_variation_details_internal(flag_name, missing_value)
 
     def string_variation_details(
         self, flag_name: str, missing_value: str
     ) -> VariationResult:
-        return self._create_proxy(flag_name).string_variation_details(missing_value)
+        return self.string_variation_details_internal(flag_name, missing_value)
 
-    def number_variation_details(
+    def int_variation_details(
+        self, flag_name: str, missing_value: int
+    ) -> VariationResult:
+        return self.int_variation_details_internal(flag_name, missing_value)
+
+    def float_variation_details(
         self, flag_name: str, missing_value: float
     ) -> VariationResult:
-        return self._create_proxy(flag_name).number_variation_details(missing_value)
+        return self.float_variation_details_internal(flag_name, missing_value)
 
     def json_variation_details(
         self, flag_name: str, missing_value: Any
     ) -> VariationResult:
-        return self._create_proxy(flag_name).json_variation_details(missing_value)
+        return self.json_variation_details_internal(flag_name, missing_value)
 
     # ------------------------------------------------- or-throw variants
     def bool_variation_or_throw(self, flag_name: str) -> bool:
-        return self._create_proxy(flag_name).bool_variation_or_throw()
+        return self.bool_variation_or_throw_internal(flag_name)
 
     def string_variation_or_throw(self, flag_name: str) -> str:
-        return self._create_proxy(flag_name).string_variation_or_throw()
+        return self.string_variation_or_throw_internal(flag_name)
 
-    def number_variation_or_throw(self, flag_name: str) -> float:
-        return self._create_proxy(flag_name).number_variation_or_throw()
+    def int_variation_or_throw(self, flag_name: str) -> int:
+        return self.int_variation_or_throw_internal(flag_name)
+
+    def float_variation_or_throw(self, flag_name: str) -> float:
+        return self.float_variation_or_throw_internal(flag_name)
 
     def json_variation_or_throw(self, flag_name: str) -> Any:
-        return self._create_proxy(flag_name).json_variation_or_throw()
+        return self.json_variation_or_throw_internal(flag_name)
 
     # ============================================================ Sync mode
-    def is_explicit_sync(self) -> bool:
+    def is_explicit_sync_enabled(self) -> bool:
         return self._explicit_sync_mode
 
-    def can_sync_flags(self) -> bool:
+    def has_pending_sync_flags(self) -> bool:
         return self._explicit_sync_mode and self._pending_flags is not None
 
     def sync_flags(self, fetch_now: bool = False) -> None:
@@ -445,7 +713,7 @@ class FeaturesClient:
     ) -> Callable[[], None]:
         """Watch flag and fire callback immediately with current state."""
         flag = self._flags.get(flag_name)
-        proxy = FlagProxy(flag, on_access=self._handle_flag_access, flag_name=flag_name)
+        proxy = FlagProxy(flag, client=self, flag_name=flag_name)
         callback(proxy)
         return self.watch_flag(flag_name, callback, name=name)
 
@@ -629,15 +897,15 @@ class FeaturesClient:
                 # New flag
                 changed.append(new_flag)
                 self._flag_last_changed[name] = now
-                proxy = FlagProxy(new_flag, on_access=self._handle_flag_access, flag_name=name)
+                proxy = FlagProxy(new_flag, client=self, flag_name=name)
                 self._emitter.emit(
                     f"flags.{name}.change", proxy, None, "created"
                 )
             elif self._flag_changed(old_flag, new_flag):
                 changed.append(new_flag)
                 self._flag_last_changed[name] = now
-                proxy = FlagProxy(new_flag, on_access=self._handle_flag_access, flag_name=name)
-                old_proxy = FlagProxy(old_flag, on_access=self._handle_flag_access, flag_name=name)
+                proxy = FlagProxy(new_flag, client=self, flag_name=name)
+                old_proxy = FlagProxy(old_flag, client=self, flag_name=name)
                 self._emitter.emit(
                     f"flags.{name}.change", proxy, old_proxy, "updated"
                 )
@@ -770,7 +1038,6 @@ class FeaturesClient:
         }
 
         self._reset_bucket()
-        sent_missing = dict(self._missing_flags)
         self._missing_flags.clear()
 
         url = f"{self._api_url}/client/metrics"
@@ -836,7 +1103,6 @@ class FeaturesClient:
 
     def _get_flag(self, flag_name: str) -> Optional[EvaluatedFlag]:
         return self._flags.get(flag_name)
-
 
     def _record_missing(self, flag_name: str) -> None:
         if not self._disable_stats:
