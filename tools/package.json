@@ -1,0 +1,53 @@
+{
+  "name": "gatrix-flag-code-refs",
+  "version": "1.0.0",
+  "description": "Enterprise-Grade Multi-Language Feature Flag Static Analysis and Governance Platform",
+  "main": "dist/cli.js",
+  "bin": {
+    "gatrix-flag-code-refs": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "build:bundle": "tsc && node scripts/bundle.js",
+    "build:exe": "tsc && node scripts/bundle.js && pkg dist/bundle.js --targets node18-win-x64,node18-linux-x64,node18-linux-arm64,node18-macos-x64,node18-macos-arm64 --output dist/bin/gatrix-flag-code-refs",
+    "build:exe:win": "tsc && node scripts/bundle.js && pkg dist/bundle.js --targets node18-win-x64 --output dist/bin/gatrix-flag-code-refs",
+    "build:exe:linux": "tsc && node scripts/bundle.js && pkg dist/bundle.js --targets node18-linux-x64,node18-linux-arm64 --output dist/bin/gatrix-flag-code-refs",
+    "build:exe:macos": "tsc && node scripts/bundle.js && pkg dist/bundle.js --targets node18-macos-x64,node18-macos-arm64 --output dist/bin/gatrix-flag-code-refs",
+    "dev": "ts-node src/cli.ts",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "format:check": "prettier --check \"src/**/*.ts\"",
+    "lint": "eslint src/**/*.ts",
+    "start": "node dist/cli.js"
+  },
+  "keywords": [
+    "feature-flags",
+    "static-analysis",
+    "code-references",
+    "gatrix",
+    "cli"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@yao-pkg/pkg": "^6.13.1",
+    "esbuild": "^0.27.3",
+    "prettier": "^3.2.0",
+    "typescript": "^5.3.0"
+  },
+  "dependencies": {
+    "axios": "^1.6.0",
+    "chalk": "^4.1.2",
+    "commander": "^12.0.0",
+    "fast-glob": "^3.3.0",
+    "p-limit": "^3.1.0",
+    "simple-git": "^3.22.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "pkg": {
+    "scripts": "dist/bundle.js",
+    "assets": [],
+    "outputPath": "dist/bin"
+  }
+}

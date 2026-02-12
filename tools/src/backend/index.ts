@@ -1,0 +1,1 @@
+export { uploadReport } from './client';

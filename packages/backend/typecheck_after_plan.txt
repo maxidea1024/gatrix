@@ -1,3 +1,0 @@
-﻿yarn run v1.22.22
-$ tsc --noEmit
-Done in 6.31s.

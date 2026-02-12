@@ -101,6 +101,20 @@ router.get('/chat/servers', serverAuthBase, ServerChatController.getRegisteredSe
 // Service discovery routes
 router.use('/services', serviceDiscoveryRoutes);
 
+// Feature flag definitions (global, no environment required) - for code scanner tools
+router.get(
+  '/features/definitions',
+  serverAuthBase,
+  ServerFeatureFlagController.getFlagDefinitions as any
+);
+
+// Code references report (global, no environment required) - for code scanner tools
+router.post(
+  '/features/code-references/report',
+  serverAuthBase,
+  ServerFeatureFlagController.receiveCodeReferences as any
+);
+
 // ============================================================================
 // Environment-specific routes: /api/v1/server/:env/...
 // ============================================================================

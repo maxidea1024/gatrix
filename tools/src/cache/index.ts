@@ -1,0 +1,1 @@
+export { ScanCache } from './scanCache';

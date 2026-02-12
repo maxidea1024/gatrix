@@ -1,0 +1,24 @@
+{
+    "flags": {
+        "new_shop_ui": {
+            "type": "bool",
+            "archived": false
+        },
+        "discount_rate": {
+            "type": "number",
+            "archived": false
+        },
+        "welcome_message": {
+            "type": "string",
+            "archived": false
+        },
+        "legacy_checkout": {
+            "type": "bool",
+            "archived": true
+        },
+        "experiment_config": {
+            "type": "json",
+            "archived": false
+        }
+    }
+}

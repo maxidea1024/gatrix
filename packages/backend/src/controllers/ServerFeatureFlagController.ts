@@ -14,6 +14,7 @@ import {
   FeatureStrategyAttributes,
   FeatureVariantAttributes,
 } from '../models/FeatureFlag';
+import db from '../config/knex';
 import { featureMetricsService } from '../services/FeatureMetricsService';
 import { networkTrafficService } from '../services/NetworkTrafficService';
 
@@ -71,7 +72,7 @@ export default class ServerFeatureFlagController {
 
       // Record network traffic (fire-and-forget)
       const appName = (req.headers['x-application-name'] as string) || 'unknown';
-      networkTrafficService.recordTraffic(environment, appName, 'features').catch(() => {});
+      networkTrafficService.recordTraffic(environment, appName, 'features').catch(() => { });
 
       // Get all enabled, non-archived flags for this environment
       const result = await FeatureFlagModel.findAll({
@@ -250,7 +251,7 @@ export default class ServerFeatureFlagController {
       // Record network traffic (fire-and-forget)
       const appName = (req.headers['x-application-name'] as string) || 'unknown';
       const environment = req.params.env || 'global';
-      networkTrafficService.recordTraffic(environment, appName, 'segments').catch(() => {});
+      networkTrafficService.recordTraffic(environment, appName, 'segments').catch(() => { });
 
       const rawSegments = await FeatureSegmentModel.findAll();
 
@@ -339,6 +340,133 @@ export default class ServerFeatureFlagController {
     } catch (error: any) {
       console.error('Error reporting unknown flag:', error);
       res.status(500).json({ success: false, error: 'Failed to report unknown flag' });
+    }
+  }
+
+  /**
+   * Get all flag definitions (global, no environment required)
+   * GET /api/v1/server/features/definitions
+   * Returns lightweight flag definitions for code scanner tools
+   */
+  static async getFlagDefinitions(req: Request, res: Response): Promise<void> {
+    try {
+      const rows = await db('g_feature_flags').select(
+        'flagName',
+        'flagType',
+        'valueType',
+        'isArchived'
+      );
+
+      const flags: Record<string, { type: string; flagType: string; archived: boolean }> = {};
+      for (const row of rows) {
+        // Map valueType to scanner-compatible type
+        const typeMap: Record<string, string> = {
+          boolean: 'bool',
+          string: 'string',
+          number: 'number',
+          json: 'json',
+        };
+
+        flags[row.flagName] = {
+          type: typeMap[row.valueType] || 'string',
+          flagType: row.flagType,
+          archived: Boolean(row.isArchived),
+        };
+      }
+
+      res.json({
+        success: true,
+        data: { flags },
+      });
+    } catch (error: any) {
+      console.error('Error fetching flag definitions:', error);
+      res.status(500).json({ success: false, error: 'Failed to fetch flag definitions' });
+    }
+  }
+
+  /**
+   * Receive code references report from scanner tool
+   * POST /api/v1/server/features/code-references/report
+   */
+  static async receiveCodeReferences(req: Request, res: Response): Promise<void> {
+    try {
+      const report = req.body;
+
+      if (!report || !report.usages) {
+        res
+          .status(400)
+          .json({ success: false, error: 'Invalid report format: usages array required' });
+        return;
+      }
+
+      const repository = report.metadata?.repository || 'unknown';
+      const branch = report.metadata?.branch || 'unknown';
+      const commitHash = report.metadata?.commit || null;
+      const scanId = report.metadata?.scanId || `scan-${Date.now()}`;
+      const scanTime = report.metadata?.scanTime ? new Date(report.metadata.scanTime) : new Date();
+
+      // Map usages to code reference records
+      const references = report.usages.map((usage: any) => ({
+        flagName: usage.flagName,
+        filePath: usage.filePath,
+        lineNumber: usage.line,
+        columnNumber: usage.column || null,
+        codeSnippet: usage.codeSnippet || null,
+        functionName: usage.methodName || null,
+        receiver: usage.receiver || null,
+        language: usage.language || null,
+        confidence: usage.confidenceScore || 0,
+        detectionStrategy: usage.detectionStrategy || null,
+        codeUrl: usage.codeUrl || null,
+        repository,
+        branch,
+        commitHash,
+        scanId,
+        scanTime,
+      }));
+
+      const { FeatureCodeReferenceModel } = await import('../models/FeatureCodeReference');
+      const insertedCount = await FeatureCodeReferenceModel.replaceForScan(
+        scanId,
+        repository,
+        branch,
+        references
+      );
+
+      // Add audit log
+      try {
+        const { AuditLogModel } = await import('../models/AuditLog');
+        await AuditLogModel.create({
+          action: 'feature_code_references_report',
+          resourceType: 'feature_flag',
+          resourceId: `scan:${scanId}`,
+          newValues: {
+            scanId,
+            repository,
+            branch,
+            commitHash,
+            insertedCount,
+            uniqueFlags: new Set(references.map((r: any) => r.flagName)).size,
+          },
+          ipAddress: req.ip,
+          userAgent: req.get('user-agent'),
+        });
+      } catch (logError) {
+        console.error('Failed to create audit log for code references:', logError);
+      }
+
+      res.json({
+        success: true,
+        data: {
+          insertedCount,
+          scanId,
+          repository,
+          branch,
+        },
+      });
+    } catch (error: any) {
+      console.error('Error receiving code references:', error.message, error.stack);
+      res.status(500).json({ success: false, error: 'Failed to store code references' });
     }
   }
 }

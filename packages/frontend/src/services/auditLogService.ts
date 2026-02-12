@@ -156,6 +156,7 @@ export class AuditLogService {
       'whitelist_toggle_status',
       'change_request_executed',
       'change_request_rejected',
+      'feature_code_references_report',
       'api_token_create',
       'api_token_update',
       'api_token_regenerate',
