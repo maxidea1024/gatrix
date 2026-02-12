@@ -4,7 +4,13 @@ import { ulid } from 'ulid';
 
 // ==================== Types ====================
 
-export type FlagType = 'release' | 'experiment' | 'operational' | 'killSwitch' | 'permission' | 'remoteConfig'; // Purpose
+export type FlagType =
+  | 'release'
+  | 'experiment'
+  | 'operational'
+  | 'killSwitch'
+  | 'permission'
+  | 'remoteConfig'; // Purpose
 export type ValueType = 'string' | 'number' | 'boolean' | 'json';
 export type FieldType = 'string' | 'number' | 'boolean' | 'date' | 'semver' | 'array' | 'country';
 
@@ -42,7 +48,7 @@ export type ConstraintOperator =
   | 'exists'
   | 'not_exists'
   // Array operators
-  | 'arr_includes'
+  | 'arr_any'
   | 'arr_all'
   | 'arr_empty';
 
@@ -216,7 +222,11 @@ function coerceValueByType(value: any, valueType: string | undefined): any {
       return Number(value) || 0;
     case 'json':
       if (typeof value === 'object') return value;
-      try { return JSON.parse(value); } catch { return {}; }
+      try {
+        return JSON.parse(value);
+      } catch {
+        return {};
+      }
     default:
       if (typeof value === 'string') return value;
       return String(value);
@@ -447,16 +457,16 @@ export class FeatureFlagModel {
         variants,
         environments: envSettings
           ? [
-            {
-              id: envSettings.id,
-              flagId: id,
-              environment,
-              isEnabled: Boolean(envSettings.isEnabled),
-              enabledValue: parseJsonField(envSettings.enabledValue),
-              disabledValue: parseJsonField(envSettings.disabledValue),
-              lastSeenAt: envSettings.lastSeenAt,
-            },
-          ]
+              {
+                id: envSettings.id,
+                flagId: id,
+                environment,
+                isEnabled: Boolean(envSettings.isEnabled),
+                enabledValue: parseJsonField(envSettings.enabledValue),
+                disabledValue: parseJsonField(envSettings.disabledValue),
+                lastSeenAt: envSettings.lastSeenAt,
+              },
+            ]
           : [],
       };
     } catch (error) {
@@ -469,7 +479,17 @@ export class FeatureFlagModel {
    * Create a new global flag and optionally initialize environment settings
    */
   static async create(
-    data: Omit<FeatureFlagAttributes, 'id' | 'createdAt' | 'updatedAt' | 'variants' | 'strategies' | 'environments' | 'lastSeenAt' | 'createdByName'> & {
+    data: Omit<
+      FeatureFlagAttributes,
+      | 'id'
+      | 'createdAt'
+      | 'updatedAt'
+      | 'variants'
+      | 'strategies'
+      | 'environments'
+      | 'lastSeenAt'
+      | 'createdByName'
+    > & {
       environment?: string;
       isEnabled?: boolean;
     }
@@ -536,15 +556,22 @@ export class FeatureFlagModel {
       let effectiveValueType = data.valueType;
       if (data.valueType !== undefined) updateData.valueType = data.valueType;
 
-      if (effectiveValueType === undefined && (data.enabledValue !== undefined || data.disabledValue !== undefined)) {
+      if (
+        effectiveValueType === undefined &&
+        (data.enabledValue !== undefined || data.disabledValue !== undefined)
+      ) {
         const flag = await db('g_feature_flags').where('id', id).select('valueType').first();
         effectiveValueType = flag?.valueType;
       }
 
       if (data.enabledValue !== undefined)
-        updateData.enabledValue = JSON.stringify(coerceValueByType(data.enabledValue, effectiveValueType));
+        updateData.enabledValue = JSON.stringify(
+          coerceValueByType(data.enabledValue, effectiveValueType)
+        );
       if (data.disabledValue !== undefined)
-        updateData.disabledValue = JSON.stringify(coerceValueByType(data.disabledValue, effectiveValueType));
+        updateData.disabledValue = JSON.stringify(
+          coerceValueByType(data.disabledValue, effectiveValueType)
+        );
       if (data.updatedBy !== undefined) updateData.updatedBy = data.updatedBy;
 
       await db('g_feature_flags').where('id', id).update(updateData);
@@ -688,8 +715,14 @@ export class FeatureFlagEnvironmentModel {
           flagId,
           environment,
           isEnabled: data.isEnabled ?? false,
-          enabledValue: data.enabledValue !== undefined ? coerceValueByType(data.enabledValue, valueType) : undefined,
-          disabledValue: data.disabledValue !== undefined ? coerceValueByType(data.disabledValue, valueType) : undefined,
+          enabledValue:
+            data.enabledValue !== undefined
+              ? coerceValueByType(data.enabledValue, valueType)
+              : undefined,
+          disabledValue:
+            data.disabledValue !== undefined
+              ? coerceValueByType(data.disabledValue, valueType)
+              : undefined,
         });
       }
 
@@ -1189,6 +1222,7 @@ export class FeatureContextFieldModel {
         id,
         fieldName: data.fieldName,
         fieldType: data.fieldType,
+        displayName: data.displayName || null,
         description: data.description || null,
         legalValues: data.legalValues ? JSON.stringify(data.legalValues) : null,
         tags: data.tags ? JSON.stringify(data.tags) : null,

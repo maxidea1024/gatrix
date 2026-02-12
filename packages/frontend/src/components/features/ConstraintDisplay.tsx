@@ -1,5 +1,5 @@
 /**
- * ConstraintDisplay - Unleash-style constraint display component
+ * ConstraintDisplay - Constraint display component with structured layout
  * Reusable component for displaying constraints in a clean, readable format
  */
 import React from 'react';
@@ -8,6 +8,8 @@ import { useTranslation } from 'react-i18next';
 import { formatDateTime } from '../../utils/dateFormat';
 import { FlagImage } from '../common/CountrySelect';
 import { getCountryByCode } from '../../utils/countries';
+import FieldTypeIcon from '../common/FieldTypeIcon';
+import OperatorIcon from '../common/OperatorIcon';
 
 export interface ConstraintValue {
   contextName: string;
@@ -32,54 +34,6 @@ interface ConstraintDisplayProps {
   noBorder?: boolean;
 }
 
-// Get operator display label
-const getOperatorLabel = (op: string, inverted?: boolean): string => {
-  const opLabels: Record<string, string> = {
-    str_eq: '=',
-    str_contains: '⊃',
-    str_starts_with: '^',
-    str_ends_with: '$',
-    str_in: '∈',
-    str_regex: '~',
-    num_eq: '=',
-    num_gt: '>',
-    num_gte: '≥',
-    num_lt: '<',
-    num_lte: '≤',
-    num_in: '∈',
-    bool_is: '=',
-    date_eq: '=',
-    date_gt: '>',
-    date_gte: '≥',
-    date_lt: '<',
-    date_lte: '≤',
-    semver_eq: '=',
-    semver_gt: '>',
-    semver_gte: '≥',
-    semver_lt: '<',
-    semver_lte: '≤',
-    semver_in: '∈',
-    exists: '∃',
-    not_exists: '∄',
-    arr_includes: '⊃',
-    arr_all: '⊇',
-    arr_empty: '∅',
-  };
-  const invertedLabels: Record<string, string> = {
-    str_eq: '≠',
-    str_in: '∉',
-    num_eq: '≠',
-    num_in: '∉',
-    semver_eq: '≠',
-    semver_in: '∉',
-    arr_includes: '⊅',
-    exists: '∄',
-    not_exists: '∃',
-  };
-  if (inverted && invertedLabels[op]) return invertedLabels[op];
-  return opLabels[op] || op;
-};
-
 // Format date using utility function
 const formatDateValueDisplay = (value: string): string => {
   if (!value) return value;
@@ -96,7 +50,7 @@ const isDateOperator = (op: string): boolean => {
 };
 
 /**
- * Single constraint display row - Unleash style
+ * Single constraint display row - structured 3-column layout
  */
 export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({
   constraint,
@@ -105,11 +59,12 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({
   noBorder = false,
 }) => {
   const { t } = useTranslation();
-  // Find context field info for tooltip (ensure contextFields is an array)
+  // Find context field info for tooltip
   const fieldsArray = Array.isArray(contextFields) ? contextFields : [];
   const contextFieldInfo = fieldsArray.find((f) => f.fieldName === constraint.contextName);
   const contextFieldDescription =
     contextFieldInfo?.description || contextFieldInfo?.displayName || '';
+  const fieldType = contextFieldInfo?.fieldType || 'string';
 
   // Get constraint value display (for single values)
   const getSingleValueDisplay = (): string => {
@@ -130,9 +85,7 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({
 
   const isMultiValue = constraint.values && constraint.values.length > 0;
   const showCaseSensitivity = constraint.operator?.startsWith('str_');
-  const isCountryField = contextFields?.find(
-    (f) => f.fieldName === constraint.contextName
-  )?.fieldType === 'country';
+  const isCountryField = fieldType === 'country';
 
   if (compact) {
     const displayValue = isMultiValue ? constraint.values!.join(', ') : getSingleValueDisplay();
@@ -141,9 +94,7 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({
         <Typography variant="caption" fontWeight={500}>
           {constraint.contextName}
         </Typography>
-        <Typography variant="caption" color="text.secondary">
-          {getOperatorLabel(constraint.operator, constraint.inverted)}
-        </Typography>
+        <OperatorIcon operator={constraint.operator} inverted={constraint.inverted} size={16} />
         <Typography variant="caption" fontWeight={500}>
           {displayValue}
         </Typography>
@@ -151,288 +102,239 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({
     );
   }
 
-  // Get readable operator text and description for tooltip
-  const getOperatorInfo = (op: string): { text: string; description: string } => {
-    const opInfo: Record<string, { text: string; description: string }> = {
-      str_eq: { text: 'equals', description: 'String equals (exact match)' },
-      str_contains: {
-        text: 'contains',
-        description: 'String contains substring',
-      },
-      str_starts_with: {
-        text: 'starts with',
-        description: 'String starts with prefix',
-      },
-      str_ends_with: {
-        text: 'ends with',
-        description: 'String ends with suffix',
-      },
-      str_in: {
-        text: 'is one of',
-        description: 'Value matches one of the listed values',
-      },
-      str_regex: {
-        text: 'matches regex',
-        description: 'Value matches regular expression',
-      },
-      num_eq: { text: 'equals', description: 'Number equals' },
-      num_gt: { text: 'greater than', description: 'Number is greater than' },
-      num_gte: {
-        text: 'greater or equal',
-        description: 'Number is greater than or equal to',
-      },
-      num_lt: { text: 'less than', description: 'Number is less than' },
-      num_lte: {
-        text: 'less or equal',
-        description: 'Number is less than or equal to',
-      },
-      num_in: {
-        text: 'is one of',
-        description: 'Value matches one of the listed values',
-      },
-      bool_is: { text: 'is', description: 'Boolean equals' },
-      date_eq: {
-        text: 'equals',
-        description: 'Date equals the specified time',
-      },
-      date_gt: {
-        text: 'is after',
-        description: 'Date is after the specified time',
-      },
-      date_gte: {
-        text: 'is on or after',
-        description: 'Date is on or after the specified time',
-      },
-      date_lt: {
-        text: 'is before',
-        description: 'Date is before the specified time',
-      },
-      date_lte: {
-        text: 'is on or before',
-        description: 'Date is on or before the specified time',
-      },
-      semver_eq: { text: 'equals', description: 'Semantic version equals' },
-      semver_gt: {
-        text: 'greater than',
-        description: 'Semantic version is greater than',
-      },
-      semver_gte: {
-        text: 'greater or equal',
-        description: 'Semantic version is greater than or equal to',
-      },
-      semver_lt: {
-        text: 'less than',
-        description: 'Semantic version is less than',
-      },
-      semver_lte: {
-        text: 'less or equal',
-        description: 'Semantic version is less than or equal to',
-      },
-      semver_in: {
-        text: 'is one of',
-        description: 'Value matches one of the listed values',
-      },
-      exists: {
-        text: 'has a value',
-        description: 'Context field has a value (is not empty)',
-      },
-      not_exists: {
-        text: 'has no value',
-        description: 'Context field has no value (is empty)',
-      },
-      arr_includes: {
-        text: 'includes',
-        description: 'Array includes at least one of the values',
-      },
-      arr_all: {
-        text: 'includes all',
-        description: 'Array includes all of the specified values',
-      },
-      arr_empty: {
-        text: 'is empty',
-        description: 'Array is empty or has no elements',
-      },
-    };
-    return opInfo[op] || { text: op, description: op };
-  };
-
-  const operatorInfo = getOperatorInfo(constraint.operator);
+  // Localized operator text, description and example
+  const operatorText = t(`constraints.operators.${constraint.operator}`, constraint.operator);
+  const operatorDesc = t(`constraints.operatorDesc.${constraint.operator}`, constraint.operator);
+  const operatorExample = t(`constraints.operatorExample.${constraint.operator}`, '');
+  const operatorTooltip = (
+    <Box sx={{ maxWidth: 320 }}>
+      <Box sx={{ fontWeight: 600, fontSize: '0.8rem' }}>{operatorDesc}</Box>
+      {operatorExample && (
+        <>
+          <Box sx={{ my: 0.5, borderTop: '1px solid rgba(255,255,255,0.2)' }} />
+          <Box sx={{ fontSize: '0.75rem', opacity: 0.85, fontFamily: 'monospace' }}>
+            {operatorExample}
+          </Box>
+        </>
+      )}
+    </Box>
+  );
 
   return (
     <Box
       sx={{
         display: 'flex',
-        alignItems: 'center',
-        gap: 1.5,
+        alignItems: 'flex-start',
         px: noBorder ? 0 : 2,
         py: noBorder ? 0 : 1.25,
-        border: noBorder ? 0 : 1,
-        borderColor: 'divider',
-        borderRadius: noBorder ? 0 : 6,
+        border: noBorder ? 0 : '1px solid',
+        borderColor: noBorder ? 'transparent' : 'rgba(128,128,128,0.15)',
+        borderRadius: noBorder ? 0 : '6px',
         bgcolor: noBorder ? 'transparent' : 'action.hover',
-        flexWrap: 'wrap',
+        gap: 0,
       }}
     >
-      {/* Context Name - Bold text with tooltip for description */}
+      {/* Column 1: Field name with type icon */}
       <Tooltip
         title={contextFieldDescription}
         arrow
         placement="top"
         disableHoverListener={!contextFieldDescription}
       >
-        <Typography
-          variant="body2"
+        <Box
           sx={{
-            fontWeight: 600,
-            fontSize: '0.85rem',
-            color: 'text.primary',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 0.75,
+            minWidth: 120,
+            maxWidth: 200,
+            flexShrink: 0,
+            py: 0.25,
             cursor: contextFieldDescription ? 'help' : 'default',
           }}
         >
-          {constraint.contextName}
-        </Typography>
+          <FieldTypeIcon type={fieldType} size={18} />
+          <Typography
+            variant="body2"
+            sx={{
+              fontWeight: 600,
+              fontSize: '0.85rem',
+              color: 'text.primary',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {constraint.contextName}
+          </Typography>
+        </Box>
       </Tooltip>
 
-      {/* Inverted indicator - shows NOT when constraint is inverted */}
-      {constraint.inverted && (
-        <Tooltip title="This condition is inverted (NOT)">
+      {/* Column 2: Operator area (NOT + unified operator chip) */}
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 0.5,
+          width: 160,
+          flexShrink: 0,
+          px: 1,
+          py: 0.25,
+        }}
+      >
+        {/* NOT chip */}
+        {constraint.inverted && (
+          <Tooltip title={t('constraints.inverted')}>
+            <Chip
+              label="NOT"
+              size="small"
+              sx={{
+                height: 22,
+                fontSize: '0.65rem',
+                fontWeight: 700,
+                bgcolor: 'error.main',
+                color: 'error.contrastText',
+                borderRadius: 1.5,
+                '& .MuiChip-label': {
+                  px: 0.75,
+                },
+              }}
+            />
+          </Tooltip>
+        )}
+
+        {/* Unified operator + case sensitivity chip */}
+        <Tooltip title={operatorTooltip} arrow>
           <Chip
-            label="NOT"
+            label={
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                <OperatorIcon
+                  operator={constraint.operator}
+                  inverted={constraint.inverted}
+                  size={16}
+                  showTooltip={false}
+                />
+                <span>{operatorText}</span>
+                {showCaseSensitivity && (
+                  <Box
+                    component="span"
+                    sx={{
+                      fontSize: '0.6rem',
+                      fontWeight: 700,
+                      fontFamily: 'monospace',
+                      bgcolor: 'rgba(128,128,128,0.15)',
+                      borderRadius: 0.5,
+                      px: 0.5,
+                      py: 0.125,
+                      lineHeight: 1,
+                    }}
+                  >
+                    {constraint.caseInsensitive ? 'Aa' : 'AA'}
+                  </Box>
+                )}
+              </Box>
+            }
             size="small"
             sx={{
               height: 22,
-              fontSize: '0.7rem',
-              fontWeight: 600,
-              bgcolor: 'error.main',
-              color: 'error.contrastText',
-              borderRadius: 3,
-              '& .MuiChip-label': {
-                px: 0.75,
-              },
-            }}
-          />
-        </Tooltip>
-      )}
-
-      {/* Operator - Rounded chip with tooltip description */}
-      <Tooltip title={operatorInfo.description} arrow>
-        <Chip
-          label={operatorInfo.text}
-          size="small"
-          sx={{
-            height: 24,
-            fontSize: '0.75rem',
-            fontWeight: 400,
-            bgcolor: 'action.selected',
-            color: 'text.secondary',
-            border: 1,
-            borderColor: 'divider',
-            borderRadius: 3,
-            cursor: 'help',
-            '& .MuiChip-label': {
-              px: 1.5,
-            },
-          }}
-        />
-      </Tooltip>
-
-      {/* Case sensitivity indicator for string operators */}
-      {showCaseSensitivity && (
-        <Tooltip title={constraint.caseInsensitive ? 'Case insensitive' : 'Case sensitive'}>
-          <Chip
-            label={constraint.caseInsensitive ? 'Aa' : 'AA'}
-            size="small"
-            sx={{
-              height: 24,
-              fontSize: '0.7rem',
+              fontSize: '0.75rem',
               fontWeight: 500,
-              minWidth: 32,
-              fontFamily: 'monospace',
-              borderRadius: 3,
               bgcolor: 'action.selected',
               color: 'text.secondary',
               border: 1,
               borderColor: 'divider',
+              borderRadius: 1.5,
+              cursor: 'help',
               '& .MuiChip-label': {
                 px: 1,
               },
             }}
           />
         </Tooltip>
-      )}
+      </Box>
 
-      {/* Values - Always display as chips */}
-      {isMultiValue ? (
-        <Box
-          sx={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: 0.5,
-            alignItems: 'center',
-          }}
-        >
-          {constraint.values!.map((val, idx) => {
-            const countryInfo = isCountryField ? getCountryByCode(val) : null;
-            const displayLabel = countryInfo
-              ? `${countryInfo.name} (${val.toUpperCase()})`
-              : val === '' ? t('common.emptyString') : val;
-            return (
-              <Chip
-                key={idx}
-                icon={isCountryField ? <FlagImage code={val} size={14} /> : undefined}
-                label={displayLabel}
-                size="small"
-                sx={{
-                  height: 22,
-                  fontSize: '0.75rem',
-                  fontWeight: 500,
-                  bgcolor: 'action.selected',
-                  color: 'text.primary',
-                  borderRadius: '16px',
-                  ...(val === '' && { fontStyle: 'italic', color: 'text.secondary' }),
-                  '& .MuiChip-icon': {
-                    ml: 0.5,
-                  },
-                  '& .MuiChip-label': {
-                    px: 1.25,
-                  },
-                }}
-              />
-            );
-          })}
-        </Box>
-      ) : (
-        (() => {
-          const singleVal = getSingleValueDisplay();
-          const countryCode = isCountryField ? (constraint.value || '') : '';
-          const countryInfo = isCountryField ? getCountryByCode(countryCode) : null;
-          const displayLabel = countryInfo
-            ? `${countryInfo.name} (${countryCode.toUpperCase()})`
-            : singleVal;
-          return (
-            <Chip
-              icon={isCountryField && countryCode ? <FlagImage code={countryCode} size={14} /> : undefined}
-              label={displayLabel}
-              size="small"
-              sx={{
-                height: 22,
-                fontSize: '0.75rem',
-                fontWeight: 500,
-                bgcolor: 'action.selected',
-                color: 'text.primary',
-                borderRadius: '16px',
-                ...(singleVal === t('common.emptyString') && { fontStyle: 'italic', color: 'text.secondary' }),
-                '& .MuiChip-icon': {
-                  ml: 0.5,
-                },
-                '& .MuiChip-label': {
-                  px: 1.25,
-                },
-              }}
-            />
-          );
-        })()
-      )}
+      {/* Column 3: Values */}
+      <Box
+        sx={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: 0.5,
+          alignItems: 'center',
+          flex: 1,
+          minWidth: 100,
+          py: 0.25,
+        }}
+      >
+        {isMultiValue
+          ? constraint.values!.map((val, idx) => {
+              const countryInfo = isCountryField ? getCountryByCode(val) : null;
+              const displayLabel = countryInfo
+                ? `${countryInfo.name} (${val.toUpperCase()})`
+                : val === ''
+                  ? t('common.emptyString')
+                  : val;
+              return (
+                <Chip
+                  key={idx}
+                  icon={isCountryField ? <FlagImage code={val} size={14} /> : undefined}
+                  label={displayLabel}
+                  size="small"
+                  sx={{
+                    height: 22,
+                    fontSize: '0.75rem',
+                    fontWeight: 500,
+                    bgcolor: 'action.selected',
+                    color: 'text.primary',
+                    borderRadius: '16px',
+                    ...(val === '' && { fontStyle: 'italic', color: 'text.secondary' }),
+                    '& .MuiChip-icon': {
+                      ml: 0.5,
+                    },
+                    '& .MuiChip-label': {
+                      px: 1.25,
+                    },
+                  }}
+                />
+              );
+            })
+          : (() => {
+              const singleVal = getSingleValueDisplay();
+              const countryCode = isCountryField ? constraint.value || '' : '';
+              const countryInfo = isCountryField ? getCountryByCode(countryCode) : null;
+              const displayLabel = countryInfo
+                ? `${countryInfo.name} (${countryCode.toUpperCase()})`
+                : singleVal;
+              return (
+                <Chip
+                  icon={
+                    isCountryField && countryCode ? (
+                      <FlagImage code={countryCode} size={14} />
+                    ) : undefined
+                  }
+                  label={displayLabel}
+                  size="small"
+                  sx={{
+                    height: 22,
+                    fontSize: '0.75rem',
+                    fontWeight: 500,
+                    bgcolor: 'action.selected',
+                    color: 'text.primary',
+                    borderRadius: '16px',
+                    ...(singleVal === t('common.emptyString') && {
+                      fontStyle: 'italic',
+                      color: 'text.secondary',
+                    }),
+                    '& .MuiChip-icon': {
+                      ml: 0.5,
+                    },
+                    '& .MuiChip-label': {
+                      px: 1.25,
+                    },
+                  }}
+                />
+              );
+            })()}
+      </Box>
     </Box>
   );
 };

@@ -31,15 +31,10 @@ import {
   DragIndicator,
   TextFields as TextFieldsIcon,
   PriorityHigh as InvertIcon,
-  Abc as StringIcon,
-  Numbers as NumberIcon,
-  ToggleOn as BooleanIcon,
-  Schedule as DateTimeIcon,
-  LocalOffer as SemverIcon,
-  DataArray as ArrayIcon,
-  Public as CountryIcon,
   HelpOutline as MissingIcon,
 } from '@mui/icons-material';
+import FieldTypeIcon from '../common/FieldTypeIcon';
+import OperatorIcon from '../common/OperatorIcon';
 import { useTranslation } from 'react-i18next';
 import {
   DndContext,
@@ -61,6 +56,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import LocalizedDateTimePicker from '@/components/common/LocalizedDateTimePicker';
 import CountrySelect from '@/components/common/CountrySelect';
+import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
 
 // Constraint types matching backend FeatureFlag.ts
 export interface Constraint {
@@ -106,7 +102,7 @@ export type ConstraintOperator =
   | 'exists'
   | 'not_exists'
   // Array operators
-  | 'arr_includes'
+  | 'arr_any'
   | 'arr_all'
   | 'arr_empty';
 
@@ -151,10 +147,7 @@ const OPERATORS_BY_TYPE: Record<string, { value: string; label: string }[]> = {
     { value: 'num_in', label: 'in list' },
     ...COMMON_OPERATORS,
   ],
-  boolean: [
-    { value: 'bool_is', label: 'is' },
-    ...COMMON_OPERATORS,
-  ],
+  boolean: [{ value: 'bool_is', label: 'is' }, ...COMMON_OPERATORS],
   date: [
     { value: 'date_eq', label: 'equals' },
     { value: 'date_gt', label: 'after' },
@@ -173,7 +166,7 @@ const OPERATORS_BY_TYPE: Record<string, { value: string; label: string }[]> = {
     ...COMMON_OPERATORS,
   ],
   array: [
-    { value: 'arr_includes', label: 'includes' },
+    { value: 'arr_any', label: 'includes' },
     { value: 'arr_all', label: 'includes all' },
     { value: 'arr_empty', label: 'is empty' },
     ...COMMON_OPERATORS,
@@ -211,7 +204,7 @@ const INVERTED_OPERATOR_LABELS: Record<string, string> = {
   semver_lt: '≥',
   semver_lte: '>',
   semver_in: 'not in list',
-  arr_includes: 'does not include',
+  arr_any: 'does not include',
   arr_all: 'does not include all',
   arr_empty: 'is not empty',
   exists: 'has no value',
@@ -236,18 +229,14 @@ const isMultiValueOperator = (operator: ConstraintOperator): boolean => {
     operator === 'str_in' ||
     operator === 'num_in' ||
     operator === 'semver_in' ||
-    operator === 'arr_includes' ||
+    operator === 'arr_any' ||
     operator === 'arr_all'
   );
 };
 
 // Check if operator requires no value input
 const isValuelessOperator = (operator: ConstraintOperator): boolean => {
-  return (
-    operator === 'exists' ||
-    operator === 'not_exists' ||
-    operator === 'arr_empty'
-  );
+  return operator === 'exists' || operator === 'not_exists' || operator === 'arr_empty';
 };
 
 // Sortable constraint card component
@@ -347,29 +336,9 @@ const SortableConstraintCard: React.FC<SortableConstraintCardProps> = ({
                   </Box>
                 );
               }
-              const getTypeIconForRender = (type: string) => {
-                switch (type) {
-                  case 'string':
-                    return <StringIcon sx={{ fontSize: 16, color: 'info.main', mr: 1 }} />;
-                  case 'number':
-                    return <NumberIcon sx={{ fontSize: 16, color: 'success.main', mr: 1 }} />;
-                  case 'boolean':
-                    return <BooleanIcon sx={{ fontSize: 16, color: 'warning.main', mr: 1 }} />;
-                  case 'date':
-                    return <DateTimeIcon sx={{ fontSize: 16, color: 'secondary.main', mr: 1 }} />;
-                  case 'semver':
-                    return <SemverIcon sx={{ fontSize: 16, color: 'primary.main', mr: 1 }} />;
-                  case 'array':
-                    return <ArrayIcon sx={{ fontSize: 16, color: 'info.dark', mr: 1 }} />;
-                  case 'country':
-                    return <CountryIcon sx={{ fontSize: 16, color: 'success.dark', mr: 1 }} />;
-                  default:
-                    return <StringIcon sx={{ fontSize: 16, color: 'text.disabled', mr: 1 }} />;
-                }
-              };
               return (
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  {getTypeIconForRender(selectedField.fieldType)}
+                  <FieldTypeIcon type={selectedField.fieldType} size={16} sx={{ mr: 1 }} />
                   {selectedField.displayName || selectedField.fieldName}
                 </Box>
               );
@@ -380,27 +349,6 @@ const SortableConstraintCard: React.FC<SortableConstraintCardProps> = ({
             </MenuItem>
             {contextFields.map((field) => {
               const isUsed = usedFieldNames.includes(field.fieldName);
-              // Get icon for field type
-              const getTypeIcon = (type: string) => {
-                switch (type) {
-                  case 'string':
-                    return <StringIcon sx={{ fontSize: 16, color: 'info.main' }} />;
-                  case 'number':
-                    return <NumberIcon sx={{ fontSize: 16, color: 'success.main' }} />;
-                  case 'boolean':
-                    return <BooleanIcon sx={{ fontSize: 16, color: 'warning.main' }} />;
-                  case 'date':
-                    return <DateTimeIcon sx={{ fontSize: 16, color: 'secondary.main' }} />;
-                  case 'semver':
-                    return <SemverIcon sx={{ fontSize: 16, color: 'primary.main' }} />;
-                  case 'array':
-                    return <ArrayIcon sx={{ fontSize: 16, color: 'info.dark' }} />;
-                  case 'country':
-                    return <CountryIcon sx={{ fontSize: 16, color: 'success.dark' }} />;
-                  default:
-                    return <StringIcon sx={{ fontSize: 16, color: 'text.disabled' }} />;
-                }
-              };
               return (
                 <MenuItem
                   key={field.fieldName}
@@ -415,7 +363,7 @@ const SortableConstraintCard: React.FC<SortableConstraintCardProps> = ({
                 >
                   <Tooltip title={field.fieldType} disableFocusListener>
                     <Box sx={{ display: 'flex', alignItems: 'center', mt: 0.5 }}>
-                      {getTypeIcon(field.fieldType)}
+                      <FieldTypeIcon type={field.fieldType} size={16} />
                     </Box>
                   </Tooltip>
                   <Box sx={{ flex: 1, minWidth: 0 }}>
@@ -476,6 +424,12 @@ const SortableConstraintCard: React.FC<SortableConstraintCardProps> = ({
               );
               return (
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                  <OperatorIcon
+                    operator={selected as string}
+                    inverted={constraint.inverted}
+                    size={16}
+                    showTooltip={false}
+                  />
                   {constraint.inverted && (
                     <Typography component="span" sx={{ color: 'warning.main', fontWeight: 600 }}>
                       NOT
@@ -492,7 +446,12 @@ const SortableConstraintCard: React.FC<SortableConstraintCardProps> = ({
             }}
           >
             {operators.map((op) => (
-              <MenuItem key={op.value} value={op.value}>
+              <MenuItem
+                key={op.value}
+                value={op.value}
+                sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+              >
+                <OperatorIcon operator={op.value} size={16} showTooltip={false} />
                 {t(`featureFlags.operators.${op.value}`, op.label)}
               </MenuItem>
             ))}
@@ -875,21 +834,12 @@ export const ConstraintEditor: React.FC<ConstraintEditorProps> = ({
       </Box>
 
       {constraints.length === 0 ? (
-        <Paper variant="outlined" sx={{ borderStyle: 'dashed', p: 3, textAlign: 'center' }}>
-          <Typography variant="body2" color="text.secondary">
-            {t('featureFlags.noConstraints')}
-          </Typography>
-          {!disabled && (
-            <Button
-              size="small"
-              startIcon={<AddIcon />}
-              onClick={handleAddConstraint}
-              sx={{ mt: 1 }}
-            >
-              {t('featureFlags.addFirstConstraint')}
-            </Button>
-          )}
-        </Paper>
+        <EmptyPlaceholder
+          message={t('featureFlags.noConstraints')}
+          description={t('featureFlags.noConstraintsGuide')}
+          onAddClick={disabled ? undefined : handleAddConstraint}
+          addButtonLabel={t('featureFlags.addFirstConstraint')}
+        />
       ) : (
         <DndContext
           sensors={sensors}

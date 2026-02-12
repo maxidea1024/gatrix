@@ -35,9 +35,6 @@ import {
   Lock as LockIcon,
   LockOpen as LockOpenIcon,
   HelpOutline as HelpOutlineIcon,
-  Abc as StringIcon,
-  Numbers as NumberIcon,
-  DataObject as JsonIcon,
   CheckCircle as CheckCircleIcon,
   Info as InfoIcon,
 } from '@mui/icons-material';
@@ -45,6 +42,8 @@ import { useTranslation } from 'react-i18next';
 import JsonEditor from '../common/JsonEditor';
 import ValueEditorField from '../common/ValueEditorField';
 import BooleanSwitch from '../common/BooleanSwitch';
+import EmptyPlaceholder from '../common/EmptyPlaceholder';
+import FieldTypeIcon from '../common/FieldTypeIcon';
 
 const OverrideSwitch = styled(Switch)(({ theme }) => ({
   width: 100,
@@ -224,64 +223,85 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
 
   // --- Environment Values State & Logic ---
   const originalUseEnvOverride = useMemo(() => {
-    return (envEnabledValue !== undefined && envEnabledValue !== null) ||
-      (envDisabledValue !== undefined && envDisabledValue !== null);
+    return (
+      (envEnabledValue !== undefined && envEnabledValue !== null) ||
+      (envDisabledValue !== undefined && envDisabledValue !== null)
+    );
   }, [envEnabledValue, envDisabledValue]);
 
   // Canonicalize helper for robust comparison and display
-  const canonicalize = useCallback((val: any) => {
-    // Basic null/undefined handling
-    if (val === null || val === undefined) {
-      if (valueType === 'json') return '{}';
-      if (valueType === 'boolean') return 'false';
-      return '';
-    }
-
-    // Fix for corrupted "[object Object]" strings
-    if (val === '[object Object]') return '{}';
-
-    if (valueType === 'json') {
-      try {
-        if (typeof val === 'string') {
-          if (val.trim() === '') return '{}';
-          return JSON.stringify(JSON.parse(val));
-        }
-        return JSON.stringify(val);
-      } catch {
-        return typeof val === 'object' ? JSON.stringify(val) : String(val);
+  const canonicalize = useCallback(
+    (val: any) => {
+      // Basic null/undefined handling
+      if (val === null || val === undefined) {
+        if (valueType === 'json') return '{}';
+        if (valueType === 'boolean') return 'false';
+        return '';
       }
-    }
 
-    if (valueType === 'boolean') {
-      return (val === true || val === 'true') ? 'true' : 'false';
-    }
+      // Fix for corrupted "[object Object]" strings
+      if (val === '[object Object]') return '{}';
 
-    return typeof val === 'object' ? JSON.stringify(val) : String(val ?? '');
-  }, [valueType]);
+      if (valueType === 'json') {
+        try {
+          if (typeof val === 'string') {
+            if (val.trim() === '') return '{}';
+            return JSON.stringify(JSON.parse(val));
+          }
+          return JSON.stringify(val);
+        } catch {
+          return typeof val === 'object' ? JSON.stringify(val) : String(val);
+        }
+      }
+
+      if (valueType === 'boolean') {
+        return val === true || val === 'true' ? 'true' : 'false';
+      }
+
+      return typeof val === 'object' ? JSON.stringify(val) : String(val ?? '');
+    },
+    [valueType]
+  );
 
   // Helper to prepare value for API
-  const toApiValue = useCallback((val: any) => {
-    if (valueType === 'json') {
-      try {
-        if (typeof val === 'string') return JSON.parse(val === '' ? '{}' : val);
-        return val ?? {};
-      } catch {
-        return {};
+  const toApiValue = useCallback(
+    (val: any) => {
+      if (valueType === 'json') {
+        try {
+          if (typeof val === 'string') return JSON.parse(val === '' ? '{}' : val);
+          return val ?? {};
+        } catch {
+          return {};
+        }
       }
-    }
-    return val;
-  }, [valueType]);
+      return val;
+    },
+    [valueType]
+  );
 
   // Unified props snapshot for synchronization
-  const propsSnapshot = useMemo(() => JSON.stringify({
-    override: originalUseEnvOverride,
-    enabled: canonicalize(envEnabledValue ?? enabledValue),
-    disabled: canonicalize(envDisabledValue ?? disabledValue)
-  }), [originalUseEnvOverride, envEnabledValue, enabledValue, envDisabledValue, disabledValue, canonicalize]);
+  const propsSnapshot = useMemo(
+    () =>
+      JSON.stringify({
+        override: originalUseEnvOverride,
+        enabled: canonicalize(envEnabledValue ?? enabledValue),
+        disabled: canonicalize(envDisabledValue ?? disabledValue),
+      }),
+    [
+      originalUseEnvOverride,
+      envEnabledValue,
+      enabledValue,
+      envDisabledValue,
+      disabledValue,
+      canonicalize,
+    ]
+  );
 
   const [useEnvOverride, setUseEnvOverride] = useState(originalUseEnvOverride);
   const [editingEnabledValue, setEditingEnabledValue] = useState(envEnabledValue ?? enabledValue);
-  const [editingDisabledValue, setEditingDisabledValue] = useState(envDisabledValue ?? disabledValue);
+  const [editingDisabledValue, setEditingDisabledValue] = useState(
+    envDisabledValue ?? disabledValue
+  );
   const [valueJsonErrors, setValueJsonErrors] = useState<{
     enabledValue?: string | null;
     disabledValue?: string | null;
@@ -300,7 +320,15 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
       setEditingDisabledValue(envDisabledValue ?? disabledValue);
       setValueJsonErrors({});
     }
-  }, [propsSnapshot, prevPropsSnapshot, originalUseEnvOverride, envEnabledValue, enabledValue, envDisabledValue, disabledValue]);
+  }, [
+    propsSnapshot,
+    prevPropsSnapshot,
+    originalUseEnvOverride,
+    envEnabledValue,
+    enabledValue,
+    envDisabledValue,
+    disabledValue,
+  ]);
 
   const valuesHasChanges = useMemo(() => {
     // 1. If override toggle state differs from original status on server
@@ -317,7 +345,17 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
     }
 
     return false;
-  }, [useEnvOverride, editingEnabledValue, editingDisabledValue, originalUseEnvOverride, envEnabledValue, enabledValue, envDisabledValue, disabledValue, canonicalize]);
+  }, [
+    useEnvOverride,
+    editingEnabledValue,
+    editingDisabledValue,
+    originalUseEnvOverride,
+    envEnabledValue,
+    enabledValue,
+    envDisabledValue,
+    disabledValue,
+    canonicalize,
+  ]);
 
   // Handle save fallback values
   const handleSaveValuesClick = useCallback(async () => {
@@ -339,10 +377,14 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
       const ensureNonNull = (val: any) => {
         if (val !== null && val !== undefined) return val;
         switch (valueType) {
-          case 'boolean': return false;
-          case 'number': return 0;
-          case 'json': return {};
-          default: return '';
+          case 'boolean':
+            return false;
+          case 'number':
+            return 0;
+          case 'json':
+            return {};
+          default:
+            return '';
         }
       };
 
@@ -358,7 +400,14 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
       setSavingValues(false);
       isSavingRef.current = false;
     }
-  }, [onSaveValues, useEnvOverride, editingEnabledValue, editingDisabledValue, toApiValue, valueJsonErrors]);
+  }, [
+    onSaveValues,
+    useEnvOverride,
+    editingEnabledValue,
+    editingDisabledValue,
+    toApiValue,
+    valueJsonErrors,
+  ]);
 
   // Handle reset values
   const handleResetValues = useCallback(() => {
@@ -370,7 +419,13 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
 
   // Unwrap legacy wrapped values like {type: 'string', value: ''} from old clearVariantValues code
   const unwrapValue = useCallback((val: any): any => {
-    if (val !== null && typeof val === 'object' && 'type' in val && 'value' in val && Object.keys(val).length === 2) {
+    if (
+      val !== null &&
+      typeof val === 'object' &&
+      'type' in val &&
+      'value' in val &&
+      Object.keys(val).length === 2
+    ) {
       return val.value;
     }
     return val;
@@ -393,10 +448,7 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
     }
 
     const newVariant: Variant = {
-      name:
-        flagType === 'remoteConfig'
-          ? 'config'
-          : `variant-${editingVariants.length + 1}`,
+      name: flagType === 'remoteConfig' ? 'config' : `variant-${editingVariants.length + 1}`,
       weight: 100, // Remote config variant always gets 100% weight as it's the only one
       weightLock: false,
       stickiness: 'default',
@@ -526,30 +578,52 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
       else setEditingDisabledValue(val);
     };
 
-    const viewOnlyStyle = !isActuallyEditable ? {
-      bgcolor: (theme: any) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.02)',
-      '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
-      '&:hover .MuiOutlinedInput-notchedOutline': { border: 'none' },
-      '&.Mui-focused .MuiOutlinedInput-notchedOutline': { border: 'none' },
-      borderRadius: 1,
-    } : {};
+    const viewOnlyStyle = !isActuallyEditable
+      ? {
+          bgcolor: (theme: any) =>
+            theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.02)',
+          '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
+          '&:hover .MuiOutlinedInput-notchedOutline': { border: 'none' },
+          '&.Mui-focused .MuiOutlinedInput-notchedOutline': { border: 'none' },
+          borderRadius: 1,
+        }
+      : {};
 
     if (valueType === 'boolean') {
       return (
-        <Box sx={{
-          display: 'flex',
-          alignItems: 'center',
-          minHeight: 40,
-          px: !isActuallyEditable ? 1 : 0,
-          ...viewOnlyStyle
-        }}>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            minHeight: 40,
+            px: !isActuallyEditable ? 1 : 0,
+            ...viewOnlyStyle,
+          }}
+        >
           <BooleanSwitch
-            checked={isEditing ? (value === true || value === 'true') : (globalValue === true || globalValue === 'true')}
+            checked={
+              isEditing
+                ? value === true || value === 'true'
+                : globalValue === true || globalValue === 'true'
+            }
             onChange={(e) => isActuallyEditable && updateValue(e.target.checked)}
             disabled={!isActuallyEditable}
           />
-          <Typography variant="body2" sx={{ ml: 1, color: isActuallyEditable ? 'text.primary' : 'text.secondary', fontWeight: !isActuallyEditable ? 500 : 400 }}>
-            {isEditing ? (value === true || value === 'true' ? 'True' : 'False') : (globalValue === true || globalValue === 'true' ? 'True' : 'False')}
+          <Typography
+            variant="body2"
+            sx={{
+              ml: 1,
+              color: isActuallyEditable ? 'text.primary' : 'text.secondary',
+              fontWeight: !isActuallyEditable ? 500 : 400,
+            }}
+          >
+            {isEditing
+              ? value === true || value === 'true'
+                ? 'True'
+                : 'False'
+              : globalValue === true || globalValue === 'true'
+                ? 'True'
+                : 'False'}
           </Typography>
         </Box>
       );
@@ -562,7 +636,9 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
           size="small"
           type="number"
           value={isEditing ? (value ?? '') : (globalValue ?? '')}
-          onChange={(e) => isActuallyEditable && updateValue(e.target.value === '' ? 0 : Number(e.target.value))}
+          onChange={(e) =>
+            isActuallyEditable && updateValue(e.target.value === '' ? 0 : Number(e.target.value))
+          }
           disabled={!isActuallyEditable}
           sx={viewOnlyStyle}
         />
@@ -587,15 +663,15 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
           if (valueType === 'json') {
             if (typeof val === 'object' && val !== null) {
               updateValue(val);
-              setValueJsonErrors(prev => ({ ...prev, [field]: null }));
+              setValueJsonErrors((prev) => ({ ...prev, [field]: null }));
             } else {
               try {
                 const parsed = JSON.parse(val);
                 updateValue(parsed);
-                setValueJsonErrors(prev => ({ ...prev, [field]: null }));
+                setValueJsonErrors((prev) => ({ ...prev, [field]: null }));
               } catch (e: any) {
                 updateValue(val);
-                setValueJsonErrors(prev => ({ ...prev, [field]: e.message || 'Invalid JSON' }));
+                setValueJsonErrors((prev) => ({ ...prev, [field]: e.message || 'Invalid JSON' }));
               }
             }
           } else {
@@ -604,8 +680,12 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
         }}
         valueType={valueType}
         disabled={!isActuallyEditable}
-        label={field === 'enabledValue' ? t('featureFlags.enabledValue') : t('featureFlags.disabledValue')}
-        onValidationError={(err) => setValueJsonErrors(prev => ({ ...prev, [field]: err }))}
+        label={
+          field === 'enabledValue'
+            ? t('featureFlags.enabledValue')
+            : t('featureFlags.disabledValue')
+        }
+        onValidationError={(err) => setValueJsonErrors((prev) => ({ ...prev, [field]: err }))}
         sx={viewOnlyStyle}
       />
     );
@@ -671,7 +751,14 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                 }}
               >
                 {variant.weight > 15 && (
-                  <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', lineHeight: 1.2 }}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      lineHeight: 1.2,
+                    }}
+                  >
                     <span style={{ fontSize: '0.65rem' }}>{variant.weight}%</span>
                     <span>{variant.name}</span>
                   </Box>
@@ -686,27 +773,24 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
       <Collapse in={expanded}>
         <Box sx={{ mb: 3 }}>
           {variantCount === 0 && (
-            <Box sx={{ textAlign: 'center', py: 3, border: '1px dashed', borderColor: 'divider', borderRadius: 2, mb: 2, bgcolor: 'action.hover' }}>
-              <Typography variant="body2" color="text.secondary" fontWeight={500}>
-                {flagType === 'remoteConfig' ? t('featureFlags.noRemoteConfigValues') : t('featureFlags.noVariantsConfigured')}
-              </Typography>
-              {flagType === 'remoteConfig' && (
-                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5, px: 2 }}>
-                  {t('featureFlags.noRemoteConfigValuesGuide')}
-                </Typography>
-              )}
-              {canManage && !isArchived && (
-                <Button
-                  variant="contained"
-                  size="small"
-                  startIcon={<AddIcon />}
-                  onClick={addVariant}
-                  sx={{ mt: 1.5 }}
-                >
-                  {flagType === 'remoteConfig' ? t('featureFlags.setConfiguration') : t('featureFlags.addVariant')}
-                </Button>
-              )}
-            </Box>
+            <EmptyPlaceholder
+              message={
+                flagType === 'remoteConfig'
+                  ? t('featureFlags.noRemoteConfigValues')
+                  : t('featureFlags.noVariantsConfigured')
+              }
+              description={
+                flagType === 'remoteConfig'
+                  ? t('featureFlags.noRemoteConfigValuesGuide')
+                  : t('featureFlags.noVariantsGuide')
+              }
+              onAddClick={canManage && !isArchived ? addVariant : undefined}
+              addButtonLabel={
+                flagType === 'remoteConfig'
+                  ? t('featureFlags.setConfiguration')
+                  : t('featureFlags.addVariant')
+              }
+            />
           )}
 
           <Stack spacing={2}>
@@ -714,7 +798,10 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
               const variantColor = VARIANT_COLORS[index % VARIANT_COLORS.length];
               const isCurrentLocked = variant.weightLock;
               const showWeightControls = variantCount > 1;
-              const isDuplicateName = editingVariants.some((v, i) => i !== index && v.name.trim().toLowerCase() === variant.name.trim().toLowerCase());
+              const isDuplicateName = editingVariants.some(
+                (v, i) =>
+                  i !== index && v.name.trim().toLowerCase() === variant.name.trim().toLowerCase()
+              );
 
               return (
                 <Paper
@@ -728,8 +815,15 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                     borderLeftColor: flagType === 'remoteConfig' ? 'divider' : variantColor,
                   }}
                 >
-                  <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5, mb: variant.name === '$config' || flagType === 'remoteConfig' ? 0 : 1.5 }}>
-                    {(variant.name !== '$config' && flagType !== 'remoteConfig') && (
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      gap: 1.5,
+                      mb: variant.name === '$config' || flagType === 'remoteConfig' ? 0 : 1.5,
+                    }}
+                  >
+                    {variant.name !== '$config' && flagType !== 'remoteConfig' && (
                       <TextField
                         size="small"
                         label={t('featureFlags.variantName')}
@@ -740,17 +834,25 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                         sx={{ flex: 1 }}
                       />
                     )}
-                    {(showWeightControls && flagType !== 'remoteConfig') && (
+                    {showWeightControls && flagType !== 'remoteConfig' && (
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                         <TextField
                           size="small"
                           label={t('featureFlags.weight')}
                           type="number"
                           value={variant.weight}
-                          onChange={(e) => updateVariantWeight(index, parseInt(e.target.value) || 0, isCurrentLocked || false)}
+                          onChange={(e) =>
+                            updateVariantWeight(
+                              index,
+                              parseInt(e.target.value) || 0,
+                              isCurrentLocked || false
+                            )
+                          }
                           disabled={!canManage || isArchived}
                           sx={{ width: 90 }}
-                          InputProps={{ endAdornment: <InputAdornment position="end">%</InputAdornment> }}
+                          InputProps={{
+                            endAdornment: <InputAdornment position="end">%</InputAdornment>,
+                          }}
                         />
                         <IconButton
                           size="small"
@@ -758,7 +860,11 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                           disabled={!canManage || isArchived}
                           sx={{ color: isCurrentLocked ? 'warning.main' : 'action.disabled' }}
                         >
-                          {isCurrentLocked ? <LockIcon fontSize="small" /> : <LockOpenIcon fontSize="small" />}
+                          {isCurrentLocked ? (
+                            <LockIcon fontSize="small" />
+                          ) : (
+                            <LockOpenIcon fontSize="small" />
+                          )}
                         </IconButton>
                       </Box>
                     )}
@@ -772,12 +878,11 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                   <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
                     {(valueType === 'string' || valueType === 'json') && (
                       <Box sx={{ mt: 1 }}>
-                        {valueType === 'string' && <StringIcon sx={{ fontSize: 18, color: 'text.secondary' }} />}
-                        {valueType === 'json' && <JsonIcon sx={{ fontSize: 18, color: 'text.secondary' }} />}
+                        <FieldTypeIcon type={valueType} size={18} />
                       </Box>
                     )}
                     <Box sx={{ flex: 1 }}>
-                      {(valueType === 'json' || valueType === 'string') ? (
+                      {valueType === 'json' || valueType === 'string' ? (
                         <ValueEditorField
                           value={(() => {
                             const raw = unwrapValue(variant.value);
@@ -796,15 +901,18 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                               // Value can be an object (from dialog) or a string (from inline)
                               if (typeof val === 'object' && val !== null) {
                                 updateVariant(index, { value: val });
-                                setJsonErrors(prev => ({ ...prev, [index]: null }));
+                                setJsonErrors((prev) => ({ ...prev, [index]: null }));
                               } else {
                                 try {
                                   const parsed = JSON.parse(val);
                                   updateVariant(index, { value: parsed });
-                                  setJsonErrors(prev => ({ ...prev, [index]: null }));
+                                  setJsonErrors((prev) => ({ ...prev, [index]: null }));
                                 } catch (e: any) {
                                   updateVariant(index, { value: val });
-                                  setJsonErrors(prev => ({ ...prev, [index]: e.message || 'Invalid JSON' }));
+                                  setJsonErrors((prev) => ({
+                                    ...prev,
+                                    [index]: e.message || 'Invalid JSON',
+                                  }));
                                 }
                               }
                             } else {
@@ -813,14 +921,23 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                           }}
                           valueType={valueType}
                           disabled={!canManage || isArchived}
-                          label={flagType === 'remoteConfig' ? t('featureFlags.configuration') : t('featureFlags.variantValue')}
-                          onValidationError={(error) => setJsonErrors(prev => ({ ...prev, [index]: error }))}
+                          label={
+                            flagType === 'remoteConfig'
+                              ? t('featureFlags.configuration')
+                              : t('featureFlags.variantValue')
+                          }
+                          onValidationError={(error) =>
+                            setJsonErrors((prev) => ({ ...prev, [index]: error }))
+                          }
                         />
                       ) : (
                         <Box sx={{ display: 'flex', alignItems: 'center', minHeight: 40 }}>
                           {valueType === 'boolean' ? (
                             <BooleanSwitch
-                              checked={unwrapValue(variant.value) === true || unwrapValue(variant.value) === 'true'}
+                              checked={
+                                unwrapValue(variant.value) === true ||
+                                unwrapValue(variant.value) === 'true'
+                              }
                               onChange={(e) => updateVariant(index, { value: e.target.checked })}
                               disabled={!canManage || isArchived}
                             />
@@ -830,7 +947,11 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                               size="small"
                               type="number"
                               value={unwrapValue(variant.value) ?? ''}
-                              onChange={(e) => updateVariant(index, { value: e.target.value === '' ? 0 : Number(e.target.value) })}
+                              onChange={(e) =>
+                                updateVariant(index, {
+                                  value: e.target.value === '' ? 0 : Number(e.target.value),
+                                })
+                              }
                               disabled={!canManage || isArchived}
                             />
                           )}
@@ -845,23 +966,46 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
 
           {canManage && !isArchived && (
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-              {(flagType !== 'remoteConfig' && variantCount > 0) ? (
+              {flagType !== 'remoteConfig' && variantCount > 0 ? (
                 !(valueType === 'boolean' && variantCount >= 2) ? (
-                  <Button variant="outlined" size="small" startIcon={<AddIcon />} onClick={addVariant}>
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    startIcon={<AddIcon />}
+                    onClick={addVariant}
+                  >
                     {t('featureFlags.addVariant')}
                   </Button>
                 ) : (
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, px: 1.5, py: 0.5, borderRadius: 1, bgcolor: 'info.main', color: 'info.contrastText' }}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 0.75,
+                      px: 1.5,
+                      py: 0.5,
+                      borderRadius: 1,
+                      bgcolor: 'info.main',
+                      color: 'info.contrastText',
+                    }}
+                  >
                     <InfoIcon sx={{ fontSize: 16 }} />
                     <Typography variant="caption" sx={{ fontWeight: 600 }}>
                       {t('featureFlags.booleanVariantLimit')}
                     </Typography>
                   </Box>
                 )
-              ) : <Box />}
+              ) : (
+                <Box />
+              )}
               <Box sx={{ display: 'flex', gap: 1 }}>
                 {hasChanges && (
-                  <Button variant="text" size="small" onClick={handleResetVariants} disabled={saving}>
+                  <Button
+                    variant="text"
+                    size="small"
+                    onClick={handleResetVariants}
+                    disabled={saving}
+                  >
                     {t('common.reset')}
                   </Button>
                 )}
@@ -896,8 +1040,14 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                     },
                   }}
                 />
-                <Typography variant="subtitle2" fontWeight={600} color={useEnvOverride ? 'primary.main' : 'text.secondary'}>
-                  {useEnvOverride ? t('featureFlags.overrideForEnv') : t('featureFlags.usingGlobalDefault')}
+                <Typography
+                  variant="subtitle2"
+                  fontWeight={600}
+                  color={useEnvOverride ? 'primary.main' : 'text.secondary'}
+                >
+                  {useEnvOverride
+                    ? t('featureFlags.overrideForEnv')
+                    : t('featureFlags.usingGlobalDefault')}
                 </Typography>
               </Box>
             </Box>
@@ -911,7 +1061,7 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                   border: '1px solid',
                   borderStyle: variantCount > 0 ? 'dashed' : 'solid',
                   borderColor: variantCount > 0 ? 'warning.light' : 'divider',
-                  position: 'relative'
+                  position: 'relative',
                 }}
               >
                 <Typography
@@ -922,20 +1072,21 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                     alignItems: 'center',
                     gap: 0.5,
                     color: variantCount > 0 ? 'text.secondary' : 'text.primary',
-                    fontWeight: 600
+                    fontWeight: 600,
                   }}
                 >
                   {t('featureFlags.enabledValue')}
                 </Typography>
                 {variantCount === 0 && (
-                  <Typography variant="caption" sx={{ display: 'block', mb: 1, color: 'text.secondary', fontWeight: 500 }}>
+                  <Typography
+                    variant="caption"
+                    sx={{ display: 'block', mb: 1, color: 'text.secondary', fontWeight: 500 }}
+                  >
                     {t('featureFlags.enabledValueDesc')}
                   </Typography>
                 )}
                 {variantCount === 0 && (
-                  <Box sx={{ mt: 0.5 }}>
-                    {renderValueInputField('enabledValue')}
-                  </Box>
+                  <Box sx={{ mt: 0.5 }}>{renderValueInputField('enabledValue')}</Box>
                 )}
                 {variantCount > 0 && (
                   <Box
@@ -945,10 +1096,13 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                       gap: 1.5,
                       p: 1.5,
                       borderRadius: 1,
-                      bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 152, 0, 0.1)' : 'rgba(255, 152, 0, 0.04)',
+                      bgcolor: (theme) =>
+                        theme.palette.mode === 'dark'
+                          ? 'rgba(255, 152, 0, 0.1)'
+                          : 'rgba(255, 152, 0, 0.04)',
                       border: '1px solid',
                       borderColor: (theme) => alpha(theme.palette.warning.light, 0.4),
-                      color: 'warning.main'
+                      color: 'warning.main',
                     }}
                   >
                     <InfoIcon sx={{ fontSize: 20 }} />
@@ -965,7 +1119,7 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                   borderRadius: 1,
                   border: '1px solid',
                   borderColor: 'divider',
-                  bgcolor: (theme) => theme.palette.mode === 'dark' ? 'transparent' : '#fff'
+                  bgcolor: (theme) => (theme.palette.mode === 'dark' ? 'transparent' : '#fff'),
                 }}
               >
                 <Typography
@@ -975,21 +1129,24 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                     display: 'flex',
                     alignItems: 'center',
                     gap: 0.5,
-                    fontWeight: 600
+                    fontWeight: 600,
                   }}
                 >
                   {t('featureFlags.disabledValue')}
                 </Typography>
-                <Box sx={{ mt: 0.5 }}>
-                  {renderValueInputField('disabledValue')}
-                </Box>
+                <Box sx={{ mt: 0.5 }}>{renderValueInputField('disabledValue')}</Box>
               </Box>
             </Stack>
 
             {canManage && !isArchived && (
               <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, mt: 2 }}>
                 {valuesHasChanges && (
-                  <Button variant="text" size="small" onClick={handleResetValues} disabled={savingValues}>
+                  <Button
+                    variant="text"
+                    size="small"
+                    onClick={handleResetValues}
+                    disabled={savingValues}
+                  >
                     {t('common.reset')}
                   </Button>
                 )}
@@ -998,7 +1155,12 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                   size="small"
                   startIcon={<SaveIcon />}
                   onClick={handleSaveValuesClick}
-                  disabled={savingValues || !valuesHasChanges || !!valueJsonErrors.enabledValue || !!valueJsonErrors.disabledValue}
+                  disabled={
+                    savingValues ||
+                    !valuesHasChanges ||
+                    !!valueJsonErrors.enabledValue ||
+                    !!valueJsonErrors.disabledValue
+                  }
                 >
                   {savingValues ? t('common.saving') : t('common.save')}
                 </Button>

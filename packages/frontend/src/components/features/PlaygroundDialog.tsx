@@ -57,16 +57,10 @@ import {
   Tune as RemoteConfigIcon,
   DataObject as JsonIcon,
   Code as CodeIcon,
-  Abc as StringIcon,
-  Numbers as NumberIcon,
-  ToggleOn as BooleanIcon,
-  Schedule as DateTimeIcon,
-  LocalOffer as SemverIcon,
   SportsEsports as JoystickIcon,
   ContentCopy as CopyIcon,
-  DataArray as ArrayIcon,
-  Public as CountryIcon,
 } from '@mui/icons-material';
+import FieldTypeIcon from '../common/FieldTypeIcon';
 import CountrySelect from '../common/CountrySelect';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -362,8 +356,8 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
       ALL_STRATEGIES_DISABLED: t('playground.reasons.ALL_STRATEGIES_DISABLED'),
       STRATEGY_MATCHED: reasonDetails?.strategyName
         ? t('playground.reasons.strategyMatched', {
-          strategy: localizeStrategyName(reasonDetails.strategyName),
-        })
+            strategy: localizeStrategyName(reasonDetails.strategyName),
+          })
         : t('playground.reasons.defaultStrategy'),
       NO_MATCHING_STRATEGY: t('playground.reasons.NO_MATCHING_STRATEGY'),
     };
@@ -647,26 +641,8 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
   const canEvaluate = environments.length > 0;
 
   // Helper function to get context field type icon
-  const getFieldTypeIcon = (type: string) => {
-    switch (type) {
-      case 'string':
-        return <StringIcon sx={{ fontSize: 16, color: 'info.main' }} />;
-      case 'number':
-        return <NumberIcon sx={{ fontSize: 16, color: 'success.main' }} />;
-      case 'boolean':
-        return <BooleanIcon sx={{ fontSize: 16, color: 'warning.main' }} />;
-      case 'date':
-      case 'datetime':
-        return <DateTimeIcon sx={{ fontSize: 16, color: 'secondary.main' }} />;
-      case 'semver':
-        return <SemverIcon sx={{ fontSize: 16, color: 'primary.main' }} />;
-      case 'array':
-        return <ArrayIcon sx={{ fontSize: 16, color: 'info.dark' }} />;
-      case 'country':
-        return <CountryIcon sx={{ fontSize: 16, color: 'success.dark' }} />;
-      default:
-        return <StringIcon sx={{ fontSize: 16, color: 'text.disabled' }} />;
-    }
+  const getFieldTypeIcon = (type: string, size = 16) => {
+    return <FieldTypeIcon type={type} size={size} />;
   };
 
   // Shared render function for context fields
@@ -755,7 +731,9 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                     return (
                       <FormControl size="small" fullWidth>
                         <Select
-                          value={(entry.value === 'true' || entry.value === 'false') ? entry.value : 'true'}
+                          value={
+                            entry.value === 'true' || entry.value === 'false' ? entry.value : 'true'
+                          }
                           onChange={(e) => handleUpdateContextEntry(index, 'value', e.target.value)}
                         >
                           <MenuItem value="true">True</MenuItem>
@@ -939,17 +917,33 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                             </Box>
                           );
                         }}
-                        renderInput={(params) => (
-                          <TextField
-                            {...params}
-                            placeholder={t('playground.selectField')}
-                            sx={{
-                              '& .MuiInputBase-root': {
-                                px: '8px !important',
-                              },
-                            }}
-                          />
-                        )}
+                        renderInput={(params) => {
+                          const matchedField = contextFields.find((f) => f.fieldName === entry.key);
+                          return (
+                            <TextField
+                              {...params}
+                              placeholder={t('playground.selectField')}
+                              sx={{
+                                '& .MuiInputBase-root': {
+                                  px: '8px !important',
+                                },
+                              }}
+                              InputProps={{
+                                ...params.InputProps,
+                                startAdornment: matchedField ? (
+                                  <Box
+                                    component="span"
+                                    sx={{ display: 'flex', alignItems: 'center', mr: 0.5 }}
+                                  >
+                                    {getFieldTypeIcon(matchedField.fieldType)}
+                                  </Box>
+                                ) : (
+                                  params.InputProps.startAdornment
+                                ),
+                              }}
+                            />
+                          );
+                        }}
                       />
 
                       {/* Value Input */}
@@ -1026,25 +1020,29 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
           }}
         >
           {/* Top shimmer progress bar */}
-          <Box sx={{
-            height: 3,
-            background: (theme) =>
-              `linear-gradient(90deg, transparent 0%, ${theme.palette.primary.main}44 25%, ${theme.palette.primary.main} 50%, ${theme.palette.primary.main}44 75%, transparent 100%)`,
-            backgroundSize: '200% 100%',
-            animation: 'evalShimmer 1.2s infinite linear',
-          }} />
+          <Box
+            sx={{
+              height: 3,
+              background: (theme) =>
+                `linear-gradient(90deg, transparent 0%, ${theme.palette.primary.main}44 25%, ${theme.palette.primary.main} 50%, ${theme.palette.primary.main}44 75%, transparent 100%)`,
+              backgroundSize: '200% 100%',
+              animation: 'evalShimmer 1.2s infinite linear',
+            }}
+          />
 
           <Box sx={{ p: embedded ? 1.5 : 2 }}>
             {/* Header with glowing dot and bouncing dots text */}
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
-              <Box sx={{
-                width: 8,
-                height: 8,
-                borderRadius: '50%',
-                bgcolor: 'primary.main',
-                color: 'primary.main',
-                animation: 'evalGlow 1.2s infinite ease-in-out',
-              }} />
+              <Box
+                sx={{
+                  width: 8,
+                  height: 8,
+                  borderRadius: '50%',
+                  bgcolor: 'primary.main',
+                  color: 'primary.main',
+                  animation: 'evalGlow 1.2s infinite ease-in-out',
+                }}
+              />
               <Typography
                 variant="subtitle2"
                 color="text.secondary"
@@ -1100,46 +1098,54 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                     },
                   }}
                 >
-                  <Box sx={{
-                    width: 18,
-                    height: 18,
-                    borderRadius: '50%',
-                    border: '2px solid',
-                    borderColor: 'divider',
-                    background: (theme) =>
-                      `linear-gradient(90deg, ${theme.palette.action.selected}, ${theme.palette.action.hover}, ${theme.palette.action.selected})`,
-                    backgroundSize: '200% 100%',
-                    animation: 'evalShimmer 2s infinite linear',
-                    flexShrink: 0,
-                  }} />
-                  <Box sx={{
-                    height: 12,
-                    borderRadius: 1,
-                    flex: `0 0 ${20 + i * 7}%`,
-                    background: (theme) =>
-                      `linear-gradient(90deg, ${theme.palette.action.selected}, ${theme.palette.action.hover}, ${theme.palette.action.selected})`,
-                    backgroundSize: '200% 100%',
-                    animation: `evalShimmer 2s infinite linear ${i * 0.15}s`,
-                  }} />
+                  <Box
+                    sx={{
+                      width: 18,
+                      height: 18,
+                      borderRadius: '50%',
+                      border: '2px solid',
+                      borderColor: 'divider',
+                      background: (theme) =>
+                        `linear-gradient(90deg, ${theme.palette.action.selected}, ${theme.palette.action.hover}, ${theme.palette.action.selected})`,
+                      backgroundSize: '200% 100%',
+                      animation: 'evalShimmer 2s infinite linear',
+                      flexShrink: 0,
+                    }}
+                  />
+                  <Box
+                    sx={{
+                      height: 12,
+                      borderRadius: 1,
+                      flex: `0 0 ${20 + i * 7}%`,
+                      background: (theme) =>
+                        `linear-gradient(90deg, ${theme.palette.action.selected}, ${theme.palette.action.hover}, ${theme.palette.action.selected})`,
+                      backgroundSize: '200% 100%',
+                      animation: `evalShimmer 2s infinite linear ${i * 0.15}s`,
+                    }}
+                  />
                   <Box sx={{ ml: 'auto', display: 'flex', gap: 0.75 }}>
-                    <Box sx={{
-                      width: 48,
-                      height: 20,
-                      borderRadius: 2.5,
-                      background: (theme) =>
-                        `linear-gradient(90deg, ${theme.palette.action.selected}, ${theme.palette.action.hover}, ${theme.palette.action.selected})`,
-                      backgroundSize: '200% 100%',
-                      animation: `evalShimmer 2s infinite linear ${0.1 + i * 0.15}s`,
-                    }} />
-                    <Box sx={{
-                      width: 64,
-                      height: 20,
-                      borderRadius: 2.5,
-                      background: (theme) =>
-                        `linear-gradient(90deg, ${theme.palette.action.selected}, ${theme.palette.action.hover}, ${theme.palette.action.selected})`,
-                      backgroundSize: '200% 100%',
-                      animation: `evalShimmer 2s infinite linear ${0.2 + i * 0.15}s`,
-                    }} />
+                    <Box
+                      sx={{
+                        width: 48,
+                        height: 20,
+                        borderRadius: 2.5,
+                        background: (theme) =>
+                          `linear-gradient(90deg, ${theme.palette.action.selected}, ${theme.palette.action.hover}, ${theme.palette.action.selected})`,
+                        backgroundSize: '200% 100%',
+                        animation: `evalShimmer 2s infinite linear ${0.1 + i * 0.15}s`,
+                      }}
+                    />
+                    <Box
+                      sx={{
+                        width: 64,
+                        height: 20,
+                        borderRadius: 2.5,
+                        background: (theme) =>
+                          `linear-gradient(90deg, ${theme.palette.action.selected}, ${theme.palette.action.hover}, ${theme.palette.action.selected})`,
+                        backgroundSize: '200% 100%',
+                        animation: `evalShimmer 2s infinite linear ${0.2 + i * 0.15}s`,
+                      }}
+                    />
                   </Box>
                 </Box>
               ))}
@@ -1331,9 +1337,9 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                 transition: 'all 0.2s',
                                 '&:hover': hasDetails
                                   ? {
-                                    bgcolor: 'action.hover',
-                                    transform: 'scale(1.1)',
-                                  }
+                                      bgcolor: 'action.hover',
+                                      transform: 'scale(1.1)',
+                                    }
                                   : {},
                               }}
                               onClick={(e) => {
@@ -1662,24 +1668,24 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                 position: 'relative',
                                 '&::before': isMatched
                                   ? {
-                                    content: '""',
-                                    position: 'absolute',
-                                    left: 0,
-                                    top: 0,
-                                    bottom: 0,
-                                    width: 4,
-                                    bgcolor: 'success.main',
-                                  }
-                                  : wasEvaluated && !stepResult?.passed
-                                    ? {
                                       content: '""',
                                       position: 'absolute',
                                       left: 0,
                                       top: 0,
                                       bottom: 0,
                                       width: 4,
-                                      bgcolor: 'error.main',
+                                      bgcolor: 'success.main',
                                     }
+                                  : wasEvaluated && !stepResult?.passed
+                                    ? {
+                                        content: '""',
+                                        position: 'absolute',
+                                        left: 0,
+                                        top: 0,
+                                        bottom: 0,
+                                        width: 4,
+                                        bgcolor: 'error.main',
+                                      }
                                     : {},
                               }}
                             >
@@ -1962,7 +1968,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                               sx={{
                                 borderBottom:
                                   stepIdx <
-                                    (selectedEvaluation.result.evaluationSteps?.length || 1) - 1
+                                  (selectedEvaluation.result.evaluationSteps?.length || 1) - 1
                                     ? 1
                                     : 0,
                                 borderColor: 'divider',
@@ -2247,10 +2253,10 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                                         {check.rollout === 100
                                                           ? t('playground.checkMessages.rollout100')
                                                           : t('playground.rolloutDetail', {
-                                                            percentage:
-                                                              check.percentage?.toFixed(1) ?? '?',
-                                                            rollout: check.rollout ?? 100,
-                                                          })}
+                                                              percentage:
+                                                                check.percentage?.toFixed(1) ?? '?',
+                                                              rollout: check.rollout ?? 100,
+                                                            })}
                                                       </Typography>
                                                     ) : check.constraint ? (
                                                       <Box sx={{ mt: 0.5 }}>
@@ -2281,8 +2287,9 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                                               {check.contextValue === ''
                                                                 ? t('common.emptyString')
                                                                 : String(
-                                                                  check.contextValue ?? 'undefined'
-                                                                )}
+                                                                    check.contextValue ??
+                                                                      'undefined'
+                                                                  )}
                                                             </code>
                                                           </Typography>
                                                         )}
@@ -2312,15 +2319,15 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                                         sx={{ display: 'block' }}
                                                       >
                                                         {check.message ===
-                                                          'Segment has no constraints - passed'
+                                                        'Segment has no constraints - passed'
                                                           ? t(
-                                                            'playground.checkMessages.segmentNoConstraints'
-                                                          )
-                                                          : check.message ===
-                                                            'Segment not found - skipped'
-                                                            ? t(
-                                                              'playground.checkMessages.segmentNotFound'
+                                                              'playground.checkMessages.segmentNoConstraints'
                                                             )
+                                                          : check.message ===
+                                                              'Segment not found - skipped'
+                                                            ? t(
+                                                                'playground.checkMessages.segmentNotFound'
+                                                              )
                                                             : check.message}
                                                       </Typography>
                                                     ) : null}
@@ -2452,14 +2459,11 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
 
                 {selectedEvaluation.result.variant ? (
                   <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
-                    {(() => {
-                      const valueType = selectedEvaluation.result.variant?.valueType;
-                      const iconSx = { fontSize: 20, color: 'text.secondary', mt: 0.3 };
-                      if (valueType === 'json') return <JsonIcon sx={iconSx} />;
-                      if (valueType === 'number') return <NumberIcon sx={iconSx} />;
-                      if (valueType === 'string') return <StringIcon sx={iconSx} />;
-                      return <CodeIcon sx={iconSx} />;
-                    })()}
+                    <FieldTypeIcon
+                      type={selectedEvaluation.result.variant?.valueType || 'string'}
+                      size={20}
+                      sx={{ mt: 0.3 }}
+                    />
                     <Box sx={{ flex: 1, minWidth: 0 }}>
                       {(() => {
                         const value = selectedEvaluation.result.variant?.value;
@@ -2519,12 +2523,17 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                 fontFamily: "'Consolas', 'Monaco', 'Courier New', monospace",
                                 fontWeight: 500,
                                 wordBreak: 'break-all',
-                                ...(innerValue === '' && { fontStyle: 'italic', color: 'text.disabled' }),
+                                ...(innerValue === '' && {
+                                  fontStyle: 'italic',
+                                  color: 'text.disabled',
+                                }),
                               }}
                             >
                               {innerValue === ''
                                 ? t('common.emptyString')
-                                : (typeof innerValue === 'object' && innerValue !== null && Object.keys(innerValue).length === 0)
+                                : typeof innerValue === 'object' &&
+                                    innerValue !== null &&
+                                    Object.keys(innerValue).length === 0
                                   ? t('common.emptyObject')
                                   : innerValue}
                             </Typography>
@@ -2542,7 +2551,10 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
 
                         if (valueType === 'json') {
                           // Check if JSON value is an empty object
-                          const isEmptyObj = typeof value === 'object' && value !== null && Object.keys(value).length === 0;
+                          const isEmptyObj =
+                            typeof value === 'object' &&
+                            value !== null &&
+                            Object.keys(value).length === 0;
                           if (isEmptyObj) {
                             return (
                               <Typography
@@ -2596,9 +2608,8 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                           );
                         }
 
-                        const displayValue = typeof value === 'object'
-                          ? JSON.stringify(value)
-                          : String(value);
+                        const displayValue =
+                          typeof value === 'object' ? JSON.stringify(value) : String(value);
                         const isEmpty = displayValue === '';
                         return (
                           <Typography
@@ -2711,7 +2722,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                     null,
                     2
                   )}
-                  onChange={() => { }}
+                  onChange={() => {}}
                   readOnly
                   height={200}
                 />
