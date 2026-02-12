@@ -50,6 +50,9 @@ export class TypeScriptScanner extends RegexScanner implements LanguageScanner {
     const sortedKeys = Array.from(combinedAliases.keys()).sort((a, b) => b.length - a.length);
 
     for (const alias of sortedKeys) {
+      // Optimization: skip regex if alias not present in content
+      if (!content.includes(alias)) continue;
+
       const value = combinedAliases.get(alias)!;
       // Escape dots for regex
       const escapedAlias = alias.replace(/\./g, '\\.');

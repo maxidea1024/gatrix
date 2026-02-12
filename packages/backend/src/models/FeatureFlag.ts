@@ -93,6 +93,7 @@ export interface FeatureFlagAttributes {
   createdAt?: Date;
   updatedAt?: Date;
   version?: number;
+  codeReferenceCount?: number;
   // Environment-specific fields (joined from g_feature_flag_environments)
   lastSeenAt?: Date;
   // Relations - loaded per environment when needed
@@ -287,7 +288,10 @@ export class FeatureFlagModel {
             'e.isEnabled',
             'e.lastSeenAt',
             'u.name as createdByName',
-            'u.email as createdByEmail'
+            'u.email as createdByEmail',
+            db.raw(
+              '(SELECT COUNT(*) FROM g_feature_code_references WHERE flagName = f.flagName) as codeReferenceCount'
+            )
           );
 
       const applyFilters = (query: any) => {
@@ -340,6 +344,7 @@ export class FeatureFlagModel {
           isFavorite: Boolean(f.isFavorite),
           stale: Boolean(f.stale),
           impressionDataEnabled: Boolean(f.impressionDataEnabled),
+          codeReferenceCount: Number(f.codeReferenceCount || 0),
           tags: parseJsonField<string[]>(f.tags) || [],
           enabledValue: parseJsonField(f.enabledValue),
           disabledValue: parseJsonField(f.disabledValue),
@@ -457,16 +462,16 @@ export class FeatureFlagModel {
         variants,
         environments: envSettings
           ? [
-              {
-                id: envSettings.id,
-                flagId: id,
-                environment,
-                isEnabled: Boolean(envSettings.isEnabled),
-                enabledValue: parseJsonField(envSettings.enabledValue),
-                disabledValue: parseJsonField(envSettings.disabledValue),
-                lastSeenAt: envSettings.lastSeenAt,
-              },
-            ]
+            {
+              id: envSettings.id,
+              flagId: id,
+              environment,
+              isEnabled: Boolean(envSettings.isEnabled),
+              enabledValue: parseJsonField(envSettings.enabledValue),
+              disabledValue: parseJsonField(envSettings.disabledValue),
+              lastSeenAt: envSettings.lastSeenAt,
+            },
+          ]
           : [],
       };
     } catch (error) {

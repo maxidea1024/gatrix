@@ -123,10 +123,14 @@ export const DEFAULT_SCAN_CONFIG: ScanConfig = {
   definitions: '',
   include: ['**/*'],
   exclude: [
+    'node_modules/**',
     '**/node_modules/**',
+    'dist/**',
     '**/dist/**',
+    'build/**',
     '**/build/**',
     '**/.git/**',
+    '.git/**',
     '**/vendor/**',
     '**/target/**',
     '**/bin/**',
@@ -134,6 +138,7 @@ export const DEFAULT_SCAN_CONFIG: ScanConfig = {
     '**/*.test.*',
     '**/*.spec.*',
     '**/__tests__/**',
+    '**/*.d.ts',
   ],
   extensions: [
     '.ts',

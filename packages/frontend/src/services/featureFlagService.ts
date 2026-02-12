@@ -44,7 +44,9 @@ export interface FeatureFlag {
   environments?: FeatureFlagEnvironment[];
   // Legacy: for backward compatibility (current env's value)
   isEnabled?: boolean;
+  isEnabled?: boolean;
   lastSeenAt?: string;
+  codeReferenceCount?: number;
 }
 
 export interface FeatureFlagListParams {

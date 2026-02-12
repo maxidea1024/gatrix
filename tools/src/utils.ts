@@ -355,6 +355,8 @@ export function loadIgnorePatterns(root: string): string[] {
           // Convert to glob pattern that fast-glob understands
           if (trimmed.startsWith('/')) {
             patterns.push(trimmed.slice(1));
+          } else if (trimmed.startsWith('**/')) {
+            patterns.push(trimmed);
           } else {
             patterns.push(`**/${trimmed}`);
           }
