@@ -107,15 +107,25 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({
   const operatorDesc = t(`constraints.operatorDesc.${constraint.operator}`, constraint.operator);
   const operatorExample = t(`constraints.operatorExample.${constraint.operator}`, '');
   const operatorTooltip = (
-    <Box sx={{ maxWidth: 320 }}>
-      <Box sx={{ fontWeight: 600, fontSize: '0.8rem' }}>{operatorDesc}</Box>
+    <Box sx={{ maxWidth: 340 }}>
+      <Box sx={{ fontWeight: 500, fontSize: '0.8rem', mb: operatorExample ? 0.75 : 0 }}>{operatorDesc}</Box>
       {operatorExample && (
-        <>
-          <Box sx={{ my: 0.5, borderTop: '1px solid rgba(255,255,255,0.2)' }} />
-          <Box sx={{ fontSize: '0.75rem', opacity: 0.85, fontFamily: 'monospace' }}>
-            {operatorExample}
-          </Box>
-        </>
+        <Box
+          sx={{
+            bgcolor: 'rgba(255,255,255,0.08)',
+            border: '1px solid rgba(255,255,255,0.12)',
+            borderRadius: '4px',
+            px: 1,
+            py: 0.6,
+            fontSize: '0.75rem',
+            fontWeight: 500,
+            fontFamily: "'Consolas','Monaco','Courier New',monospace",
+            lineHeight: 1.5,
+            opacity: 0.9,
+          }}
+        >
+          {operatorExample}
+        </Box>
       )}
     </Box>
   );
@@ -267,73 +277,73 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({
       >
         {isMultiValue
           ? constraint.values!.map((val, idx) => {
-              const countryInfo = isCountryField ? getCountryByCode(val) : null;
-              const displayLabel = countryInfo
-                ? `${countryInfo.name} (${val.toUpperCase()})`
-                : val === ''
-                  ? t('common.emptyString')
-                  : val;
-              return (
-                <Chip
-                  key={idx}
-                  icon={isCountryField ? <FlagImage code={val} size={14} /> : undefined}
-                  label={displayLabel}
-                  size="small"
-                  sx={{
-                    height: 22,
-                    fontSize: '0.75rem',
-                    fontWeight: 500,
-                    bgcolor: 'action.selected',
-                    color: 'text.primary',
-                    borderRadius: '16px',
-                    ...(val === '' && { fontStyle: 'italic', color: 'text.secondary' }),
-                    '& .MuiChip-icon': {
-                      ml: 0.5,
-                    },
-                    '& .MuiChip-label': {
-                      px: 1.25,
-                    },
-                  }}
-                />
-              );
-            })
+            const countryInfo = isCountryField ? getCountryByCode(val) : null;
+            const displayLabel = countryInfo
+              ? `${countryInfo.name} (${val.toUpperCase()})`
+              : val === ''
+                ? t('common.emptyString')
+                : val;
+            return (
+              <Chip
+                key={idx}
+                icon={isCountryField ? <FlagImage code={val} size={14} /> : undefined}
+                label={displayLabel}
+                size="small"
+                sx={{
+                  height: 22,
+                  fontSize: '0.75rem',
+                  fontWeight: 500,
+                  bgcolor: 'action.selected',
+                  color: 'text.primary',
+                  borderRadius: '16px',
+                  ...(val === '' && { fontStyle: 'italic', color: 'text.secondary' }),
+                  '& .MuiChip-icon': {
+                    ml: 0.5,
+                  },
+                  '& .MuiChip-label': {
+                    px: 1.25,
+                  },
+                }}
+              />
+            );
+          })
           : (() => {
-              const singleVal = getSingleValueDisplay();
-              const countryCode = isCountryField ? constraint.value || '' : '';
-              const countryInfo = isCountryField ? getCountryByCode(countryCode) : null;
-              const displayLabel = countryInfo
-                ? `${countryInfo.name} (${countryCode.toUpperCase()})`
-                : singleVal;
-              return (
-                <Chip
-                  icon={
-                    isCountryField && countryCode ? (
-                      <FlagImage code={countryCode} size={14} />
-                    ) : undefined
-                  }
-                  label={displayLabel}
-                  size="small"
-                  sx={{
-                    height: 22,
-                    fontSize: '0.75rem',
-                    fontWeight: 500,
-                    bgcolor: 'action.selected',
-                    color: 'text.primary',
-                    borderRadius: '16px',
-                    ...(singleVal === t('common.emptyString') && {
-                      fontStyle: 'italic',
-                      color: 'text.secondary',
-                    }),
-                    '& .MuiChip-icon': {
-                      ml: 0.5,
-                    },
-                    '& .MuiChip-label': {
-                      px: 1.25,
-                    },
-                  }}
-                />
-              );
-            })()}
+            const singleVal = getSingleValueDisplay();
+            const countryCode = isCountryField ? constraint.value || '' : '';
+            const countryInfo = isCountryField ? getCountryByCode(countryCode) : null;
+            const displayLabel = countryInfo
+              ? `${countryInfo.name} (${countryCode.toUpperCase()})`
+              : singleVal;
+            return (
+              <Chip
+                icon={
+                  isCountryField && countryCode ? (
+                    <FlagImage code={countryCode} size={14} />
+                  ) : undefined
+                }
+                label={displayLabel}
+                size="small"
+                sx={{
+                  height: 22,
+                  fontSize: '0.75rem',
+                  fontWeight: 500,
+                  bgcolor: 'action.selected',
+                  color: 'text.primary',
+                  borderRadius: '16px',
+                  ...(singleVal === t('common.emptyString') && {
+                    fontStyle: 'italic',
+                    color: 'text.secondary',
+                  }),
+                  '& .MuiChip-icon': {
+                    ml: 0.5,
+                  },
+                  '& .MuiChip-label': {
+                    px: 1.25,
+                  },
+                }}
+              />
+            );
+          })()}
       </Box>
     </Box>
   );

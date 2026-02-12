@@ -449,10 +449,17 @@ const SortableConstraintCard: React.FC<SortableConstraintCardProps> = ({
               <MenuItem
                 key={op.value}
                 value={op.value}
-                sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+                sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, py: 1 }}
               >
-                <OperatorIcon operator={op.value} size={16} showTooltip={false} />
-                {t(`featureFlags.operators.${op.value}`, op.label)}
+                <OperatorIcon operator={op.value} size={18} showTooltip={false} sx={{ mt: 0.25 }} />
+                <Box sx={{ minWidth: 0 }}>
+                  <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                    {t(`featureFlags.operators.${op.value}`, op.label)}
+                  </Typography>
+                  <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', lineHeight: 1.3 }}>
+                    {t(`constraints.operatorDesc.${op.value}`, '')}
+                  </Typography>
+                </Box>
               </MenuItem>
             ))}
           </Select>
