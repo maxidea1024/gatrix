@@ -424,3 +424,41 @@ export class LuaScanner extends RegexScanner {
     return true;
   }
 }
+
+/**
+ * GDScript language scanner (Tier 2).
+ * GDScript is the primary scripting language for the Godot Engine (.gd files).
+ * It has Python-like syntax with preload/load for imports.
+ */
+export class GDScriptScanner extends RegexScanner {
+  constructor() {
+    super('gdscript', ['.gd'], TIER2_INFO);
+  }
+
+  protected detectImports(content: string, config: ScanConfig): ImportDetectionResult {
+    const result = super.detectImports(content, config);
+
+    // GDScript: var client = preload("res://addons/gatrix/sdk.gd")
+    // GDScript: var client = load("res://addons/gatrix/sdk.gd")
+    const preloadRe = /(?:preload|load)\s*\(\s*['"]([^'"]+)['"]\s*\)/g;
+    let m: ReturnType<RegExp['exec']>;
+    while ((m = preloadRe.exec(content)) !== null) {
+      const path = m[1].toLowerCase();
+      if (config.sdkPackages.some((pkg) => path.includes(pkg.toLowerCase()))) {
+        result.hasImport = true;
+      }
+    }
+
+    // GDScript: var client = GatrixClient.new()
+    for (const pkg of config.sdkPackages) {
+      const escapedPkg = pkg.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const classRe = new RegExp(`${escapedPkg}\\s*\\.\\s*new\\s*\\(`, 'gi');
+      if (classRe.test(content)) {
+        result.hasImport = true;
+      }
+    }
+
+    return result;
+  }
+}
+

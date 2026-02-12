@@ -307,7 +307,8 @@ export type SupportedLanguage =
     | 'python'
     | 'go'
     | 'swift'
-    | 'php';
+    | 'php'
+    | 'gdscript';
 
 export interface RawFlagReference {
     flagName: string;

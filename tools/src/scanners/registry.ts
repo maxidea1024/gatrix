@@ -14,6 +14,7 @@ import {
   PythonScanner,
   RubyScanner,
   PhpScanner,
+  GDScriptScanner,
 } from './languageScanners';
 
 // ============================================================
@@ -46,6 +47,7 @@ export class ScannerRegistry {
     this.register(new PhpScanner());
     this.register(new CScanner());
     this.register(new CppScanner());
+    this.register(new GDScriptScanner());
 
     // Tier 3: Pattern-based with guard rails
     this.register(new LuaScanner());
