@@ -18,7 +18,29 @@ export function computeFileHash(content: string): string {
  */
 export function readFileSafe(filePath: string): string | null {
   try {
-    return fs.readFileSync(filePath, 'utf-8');
+    const buf = fs.readFileSync(filePath);
+
+    // Detect encoding from BOM (Byte Order Mark)
+    if (buf.length >= 3 && buf[0] === 0xef && buf[1] === 0xbb && buf[2] === 0xbf) {
+      // UTF-8 BOM: strip BOM and decode as UTF-8
+      return buf.subarray(3).toString('utf-8').replace(/\r\n?/g, '\n');
+    }
+    if (buf.length >= 2 && buf[0] === 0xff && buf[1] === 0xfe) {
+      // UTF-16 LE BOM
+      return buf.subarray(2).toString('utf16le').replace(/\r\n?/g, '\n');
+    }
+    if (buf.length >= 2 && buf[0] === 0xfe && buf[1] === 0xff) {
+      // UTF-16 BE BOM: swap bytes to LE then decode
+      const swapped = Buffer.alloc(buf.length - 2);
+      for (let i = 2; i < buf.length - 1; i += 2) {
+        swapped[i - 2] = buf[i + 1];
+        swapped[i - 1] = buf[i];
+      }
+      return swapped.toString('utf16le').replace(/\r\n?/g, '\n');
+    }
+
+    // Default: UTF-8 without BOM
+    return buf.toString('utf-8').replace(/\r\n?/g, '\n');
   } catch {
     return null;
   }

@@ -261,10 +261,23 @@ export class ScannerEngine {
   private async scanFiles(root: string, files: string[]): Promise<RawFlagReference[]> {
     const limit = pLimit(this.config.parallel);
     const allRefs: RawFlagReference[] = [];
+    const total = files.length;
+    let completed = 0;
 
-    const tasks = files.map((file) => limit(() => this.scanSingleFile(root, file)));
+    const tasks = files.map((file) =>
+      limit(() => {
+        const refs = this.scanSingleFile(root, file);
+        completed++;
+        if (completed % 500 === 0 || completed === total) {
+          const pct = Math.round((completed / total) * 100);
+          process.stderr.write(`\r[INFO] Scanning files... ${completed}/${total} (${pct}%)`);
+        }
+        return refs;
+      }),
+    );
 
     const results = await Promise.all(tasks);
+    if (total > 0) process.stderr.write('\n');
     for (const refs of results) {
       allRefs.push(...refs);
     }
@@ -276,8 +289,21 @@ export class ScannerEngine {
    */
   private async collectAllAliases(root: string, files: string[]): Promise<void> {
     const limit = pLimit(this.config.parallel);
-    const tasks = files.map((file) => limit(() => this.collectAliasesFromFile(root, file)));
+    const total = files.length;
+    let completed = 0;
+
+    const tasks = files.map((file) =>
+      limit(() => {
+        this.collectAliasesFromFile(root, file);
+        completed++;
+        if (completed % 200 === 0 || completed === total) {
+          const pct = Math.round((completed / total) * 100);
+          process.stderr.write(`\r[INFO] Collecting aliases... ${completed}/${total} (${pct}%)`);
+        }
+      }),
+    );
     await Promise.all(tasks);
+    if (total > 0) process.stderr.write('\n');
   }
 
   /**
