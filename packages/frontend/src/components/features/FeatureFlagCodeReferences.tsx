@@ -22,13 +22,13 @@ import {
 import {
     OpenInNew as OpenInNewIcon,
     Code as CodeIcon,
-    History as HistoryIcon,
     GitHub as GitHubIcon,
+    Refresh as RefreshIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import api from '../../services/api';
 import EmptyPlaceholder from '../common/EmptyPlaceholder';
-import { formatDateTimeDetailed } from '../../utils/dateFormat';
+import { formatRelativeTime } from '../../utils/dateFormat';
 import { getLanguageIcon } from '../../utils/languageIcons';
 
 // Syntax Highlighter
@@ -89,16 +89,22 @@ const FeatureFlagCodeReferences: React.FC<FeatureFlagCodeReferencesProps> = ({ f
     const { t } = useTranslation();
     const theme = useTheme();
     const [loading, setLoading] = useState(true);
+    const [isRefetching, setIsRefetching] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [references, setReferences] = useState<CodeReference[]>([]);
     const [scanInfo, setScanInfo] = useState<ScanInfo | null>(null);
+    const [refreshKey, setRefreshKey] = useState(0);
 
     const isDarkMode = theme.palette.mode === 'dark';
     const syntaxStyle = isDarkMode ? oneDark : oneLight;
 
     useEffect(() => {
         const fetchReferences = async () => {
-            setLoading(true);
+            if (refreshKey === 0) {
+                setLoading(true);
+            } else {
+                setIsRefetching(true);
+            }
             setError(null);
             try {
                 const response = await api.get(`/admin/features/${flagName}/code-references`);
@@ -115,15 +121,16 @@ const FeatureFlagCodeReferences: React.FC<FeatureFlagCodeReferencesProps> = ({ f
                 setError(t('featureFlags.codeReferences.loadFailed'));
             } finally {
                 setLoading(false);
+                setIsRefetching(false);
             }
         };
 
         if (flagName) {
             fetchReferences();
         }
-    }, [flagName, t, onLoad]);
+    }, [flagName, t, onLoad, refreshKey]);
 
-    if (loading) {
+    if (loading && refreshKey === 0) {
         return (
             <Box sx={{ display: 'flex', justifyContent: 'center', p: 5 }}>
                 <CircularProgress />
@@ -131,7 +138,7 @@ const FeatureFlagCodeReferences: React.FC<FeatureFlagCodeReferencesProps> = ({ f
         );
     }
 
-    if (error) {
+    if (error && !references.length) {
         return (
             <Alert severity="error" sx={{ mb: 2 }}>
                 {error}
@@ -141,37 +148,86 @@ const FeatureFlagCodeReferences: React.FC<FeatureFlagCodeReferencesProps> = ({ f
 
     return (
         <Box>
-            <Box sx={{ mb: 2, display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-start' }}>
+            <Box sx={{ mb: 2, display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 2 }}>
                 {scanInfo && (
-                    <Paper variant="outlined" sx={{ p: 1.5, bgcolor: 'action.hover', minWidth: 200 }}>
-                        <Stack spacing={0.5}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                <HistoryIcon fontSize="small" color="action" />
-                                <Typography variant="caption" fontWeight={600}>
-                                    {t('featureFlags.codeReferences.scanInfo')}
-                                </Typography>
-                            </Box>
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 2 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, color: 'text.secondary', fontSize: '0.8rem' }}>
+                        <Typography variant="caption" color="text.secondary">
+                            {t('featureFlags.codeReferences.lastScan')}: {formatRelativeTime(scanInfo.scanTime)}
+                        </Typography>
+                        {scanInfo.commitHash && (
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                                 <Typography variant="caption" color="text.secondary">
-                                    {t('featureFlags.codeReferences.lastScan')}
+                                    {t('featureFlags.codeReferences.commit')}:
                                 </Typography>
-                                <Typography variant="caption" fontWeight={500}>
-                                    {formatDateTimeDetailed(scanInfo.scanTime)}
+                                <Typography
+                                    variant="caption"
+                                    component={references.length > 0 && references[0].codeUrl ? Link : 'span'}
+                                    href={
+                                        references.length > 0 && references[0].codeUrl
+                                            ? (() => {
+                                                // Attempt to construct commit URL from codeURL
+                                                // e.g. https://github.com/user/repo/blob/hash/file... -> https://github.com/user/repo/commit/hash
+                                                try {
+                                                    const url = new URL(references[0].codeUrl);
+                                                    if (url.hostname.includes('github.com') || url.hostname.includes('gitlab.com')) {
+                                                        const parts = url.pathname.split('/');
+                                                        // find 'blob' or 'tree' and replace with 'commit' logic?
+                                                        // GitHub: /user/repo/blob/hash/file
+                                                        // Commit: /user/repo/commit/hash
+                                                        const blobIndex = parts.indexOf('blob');
+                                                        if (blobIndex !== -1 && parts.length > blobIndex + 1) {
+                                                            const hash = parts[blobIndex + 1];
+                                                            // Reconstruct base
+                                                            const basePath = parts.slice(0, blobIndex).join('/');
+                                                            return `${url.origin}${basePath}/commit/${hash}`;
+                                                        }
+                                                    }
+                                                    return undefined;
+                                                } catch {
+                                                    return undefined;
+                                                }
+                                            })()
+                                            : undefined
+                                    }
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    sx={{
+                                        fontFamily: 'monospace',
+                                        cursor: references.length > 0 && references[0].codeUrl ? 'pointer' : 'default',
+                                        textDecoration: references.length > 0 && references[0].codeUrl ? 'underline' : 'none',
+                                        color: references.length > 0 && references[0].codeUrl ? 'primary.main' : 'inherit'
+                                    }}
+                                >
+                                    {scanInfo.commitHash.substring(0, 7)}
                                 </Typography>
                             </Box>
-                            {scanInfo.commitHash && (
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 2 }}>
-                                    <Typography variant="caption" color="text.secondary">
-                                        {t('featureFlags.codeReferences.commit')}
-                                    </Typography>
-                                    <Typography variant="caption" sx={{ fontFamily: 'monospace' }}>
-                                        {scanInfo.commitHash.substring(0, 7)}
-                                    </Typography>
-                                </Box>
-                            )}
-                        </Stack>
-                    </Paper>
+                        )}
+                    </Box>
                 )}
+                <Tooltip title={t('common.refresh')}>
+                    <span>
+                        <IconButton
+                            size="small"
+                            onClick={() => setRefreshKey((prev) => prev + 1)}
+                            disabled={isRefetching}
+                        >
+                            <RefreshIcon
+                                fontSize="small"
+                                sx={{
+                                    animation: isRefetching ? 'spin 1s linear infinite' : 'none',
+                                    '@keyframes spin': {
+                                        '0%': {
+                                            transform: 'rotate(0deg)',
+                                        },
+                                        '100%': {
+                                            transform: 'rotate(360deg)',
+                                        },
+                                    },
+                                }}
+                            />
+                        </IconButton>
+                    </span>
+                </Tooltip>
             </Box>
 
             {references.length === 0 ? (
@@ -232,12 +288,12 @@ const FeatureFlagCodeReferences: React.FC<FeatureFlagCodeReferencesProps> = ({ f
                                                     label={ref.language}
                                                     size="small"
                                                     variant="outlined"
-                                                    sx={{ '& .MuiChip-icon': { ml: 0.5 } }}
+                                                    sx={{ pl: 0.5, '& .MuiChip-icon': { ml: 0 } }}
                                                 />
                                             )}
                                         </TableCell>
                                         <TableCell>
-                                            <Tooltip title={`${ref.confidence}% confidence`}>
+                                            <Tooltip title={t('featureFlags.codeReferences.confidenceLevel', { value: ref.confidence })}>
                                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                                                     <Box
                                                         sx={{

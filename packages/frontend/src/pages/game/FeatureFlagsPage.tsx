@@ -78,6 +78,7 @@ import {
   SwapVert as ImportExportIcon,
   Tune as RemoteConfigIcon,
   ViewList as ViewListIcon,
+  GitHub as GitHubIcon,
 } from '@mui/icons-material';
 import FieldTypeIcon from '../../components/common/FieldTypeIcon';
 import ValueEditorField from '../../components/common/ValueEditorField';
@@ -1192,11 +1193,11 @@ const FeatureFlagsPage: React.FC = () => {
       enqueueSnackbar(
         markAsStale
           ? t('featureFlags.bulkMarkStaleSuccess', {
-              count: targetFlags.length,
-            })
+            count: targetFlags.length,
+          })
           : t('featureFlags.bulkClearStaleSuccess', {
-              count: targetFlags.length,
-            }),
+            count: targetFlags.length,
+          }),
         { variant: 'success' }
       );
       setSelectedFlags(new Set());
@@ -1226,13 +1227,13 @@ const FeatureFlagsPage: React.FC = () => {
       enqueueSnackbar(
         enable
           ? t('featureFlags.bulkEnableSuccess', {
-              count: targetFlags.length,
-              env: environment,
-            })
+            count: targetFlags.length,
+            env: environment,
+          })
           : t('featureFlags.bulkDisableSuccess', {
-              count: targetFlags.length,
-              env: environment,
-            }),
+            count: targetFlags.length,
+            env: environment,
+          }),
         { variant: enable ? 'success' : 'warning' }
       );
       setSelectedFlags(new Set());
@@ -1662,6 +1663,30 @@ const FeatureFlagsPage: React.FC = () => {
                         >
                           {flag.flagName}
                         </Typography>
+                        {flag.codeReferenceCount !== undefined &&
+                          flag.codeReferenceCount > 0 && (
+                            <Chip
+                              icon={<GitHubIcon sx={{ fontSize: 14 }} />}
+                              label={flag.codeReferenceCount}
+                              size="small"
+                              variant="outlined"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigate(
+                                  `/feature-flags/${flag.flagName}?tab=code-references`
+                                );
+                              }}
+                              sx={{
+                                height: 20,
+                                fontSize: '0.7rem',
+                                cursor: 'pointer',
+                                mr: 0.5,
+                                pl: 0.5,
+                                borderRadius: 1,
+                                '& .MuiChip-icon': { ml: 0 },
+                              }}
+                            />
+                          )}
                         {flag.isFavorite && (
                           <StarIcon sx={{ fontSize: 16, color: 'warning.main' }} />
                         )}
@@ -1705,32 +1730,32 @@ const FeatureFlagsPage: React.FC = () => {
                       {/* Row 2: Display name + description (when available) */}
                       {((flag.displayName && flag.displayName !== flag.flagName) ||
                         flag.description) && (
-                        <Box
-                          sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 1.5,
-                            mt: 0.25,
-                            pl: 3.5,
-                          }}
-                        >
-                          {flag.displayName && flag.displayName !== flag.flagName && (
-                            <Typography variant="body2" color="text.secondary" noWrap>
-                              {flag.displayName}
-                            </Typography>
-                          )}
-                          {flag.description && (
-                            <Typography
-                              variant="body2"
-                              color="text.disabled"
-                              noWrap
-                              sx={{ flex: 1, minWidth: 0 }}
-                            >
-                              — {flag.description}
-                            </Typography>
-                          )}
-                        </Box>
-                      )}
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 1.5,
+                              mt: 0.25,
+                              pl: 3.5,
+                            }}
+                          >
+                            {flag.displayName && flag.displayName !== flag.flagName && (
+                              <Typography variant="body2" color="text.secondary" noWrap>
+                                {flag.displayName}
+                              </Typography>
+                            )}
+                            {flag.description && (
+                              <Typography
+                                variant="body2"
+                                color="text.disabled"
+                                noWrap
+                                sx={{ flex: 1, minWidth: 0 }}
+                              >
+                                — {flag.description}
+                              </Typography>
+                            )}
+                          </Box>
+                        )}
 
                       {/* Row 3: Env switches + value info + tags + times */}
                       <Box
@@ -2053,6 +2078,30 @@ const FeatureFlagsPage: React.FC = () => {
                                       >
                                         {flag.flagName}
                                       </Typography>
+                                      {flag.codeReferenceCount !== undefined &&
+                                        flag.codeReferenceCount > 0 && (
+                                          <Chip
+                                            icon={<GitHubIcon sx={{ fontSize: 14 }} />}
+                                            label={flag.codeReferenceCount}
+                                            size="small"
+                                            variant="outlined"
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              navigate(
+                                                `/feature-flags/${flag.flagName}?tab=code-references`
+                                              );
+                                            }}
+                                            sx={{
+                                              height: 20,
+                                              fontSize: '0.7rem',
+                                              cursor: 'pointer',
+                                              ml: 0.5,
+                                              pl: 0.5,
+                                              borderRadius: 1,
+                                              '& .MuiChip-icon': { ml: 0 },
+                                            }}
+                                          />
+                                        )}
                                       <Tooltip title={t('common.copy')} disableFocusListener>
                                         <IconButton
                                           size="small"

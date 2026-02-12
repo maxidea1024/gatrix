@@ -357,9 +357,9 @@ const FeatureFlagDetailPage: React.FC = () => {
       ? 1
       : tabParam === 'metrics'
         ? 2
-        : tabParam === 'history'
+        : tabParam === 'code-references'
           ? 3
-          : tabParam === 'code-references'
+          : tabParam === 'history'
             ? 4
             : 0;
 
@@ -383,9 +383,9 @@ const FeatureFlagDetailPage: React.FC = () => {
     } else if (newValue === 2) {
       newParams.set('tab', 'metrics');
     } else if (newValue === 3) {
-      newParams.set('tab', 'history');
-    } else if (newValue === 4) {
       newParams.set('tab', 'code-references');
+    } else if (newValue === 4) {
+      newParams.set('tab', 'history');
     } else {
       newParams.delete('tab');
     }
@@ -449,6 +449,20 @@ const FeatureFlagDetailPage: React.FC = () => {
   // Environment-specific variants - key is environment name, value is array of variants
   const [envVariants, setEnvVariants] = useState<Record<string, Variant[]>>({});
   const [codeReferenceCount, setCodeReferenceCount] = useState<number | null>(null);
+
+  // Fetch code reference count on mount
+  useEffect(() => {
+    if (flagName) {
+      api.get(`/admin/features/${flagName}/code-references`)
+        .then((response) => {
+          if (response.success && response.data?.references) {
+            setCodeReferenceCount(response.data.references.length);
+          }
+        })
+        // limit fetch frequency or error handling? silent fail is fine for badge
+        .catch(() => setCodeReferenceCount(null));
+    }
+  }, [flagName]);
 
   // Playground dialog state
   const [playgroundOpen, setPlaygroundOpen] = useState(false);
@@ -1644,7 +1658,6 @@ const FeatureFlagDetailPage: React.FC = () => {
           <Tab label={t('featureFlags.overview')} />
           <Tab label={t('featureFlags.flagValues')} disabled={isCreating} />
           <Tab label={t('featureFlags.metrics')} disabled={isCreating} />
-          <Tab label={t('featureFlags.tabs.history')} disabled={isCreating} />
           <Tab
             label={
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
@@ -1661,6 +1674,7 @@ const FeatureFlagDetailPage: React.FC = () => {
             }
             disabled={isCreating}
           />
+          <Tab label={t('featureFlags.tabs.history')} disabled={isCreating} />
         </Tabs>
       </Box>
 
@@ -3582,13 +3596,13 @@ const FeatureFlagDetailPage: React.FC = () => {
         />
       </TabPanel>
       <TabPanel value={tabValue} index={3}>
-        <FeatureFlagAuditLogs flagName={flag.flagName} />
-      </TabPanel>
-      <TabPanel value={tabValue} index={4}>
         <FeatureFlagCodeReferences
           flagName={flag.flagName}
           onLoad={(count) => setCodeReferenceCount(count)}
         />
+      </TabPanel>
+      <TabPanel value={tabValue} index={4}>
+        <FeatureFlagAuditLogs flagName={flag.flagName} />
       </TabPanel>
 
       {/* Delete Confirmation Dialog */}
