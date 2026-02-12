@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import NamingGuide from '../../components/common/NamingGuide';
+
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { PERMISSIONS } from '../../types/permissions';
@@ -105,6 +105,7 @@ import FeatureSwitch from '../../components/common/FeatureSwitch';
 import api from '../../services/api';
 import PlaygroundDialog from '../../components/features/PlaygroundDialog';
 import { getFlagTypeIcon } from '../../utils/flagTypeIcons';
+import FlagStatusIcon from '../../components/common/FlagStatusIcon';
 
 interface FlagTypeInfo {
   flagType: string;
@@ -136,21 +137,7 @@ function coerceValue(value: any, valueType: string): any {
 }
 
 // Icon helpers for filter options
-const getStatusIcon = (status: string) => {
-  const iconProps = { sx: { fontSize: 16 } };
-  switch (status) {
-    case 'active':
-      return <CheckCircleIcon {...iconProps} color="success" />;
-    case 'archived':
-      return <ArchiveIcon {...iconProps} color="disabled" />;
-    case 'stale':
-      return <WarningIcon {...iconProps} color="error" />;
-    case 'potentiallyStale':
-      return <WarningIcon {...iconProps} color="warning" />;
-    default:
-      return null;
-  }
-};
+const getStatusIcon = (status: string) => <FlagStatusIcon status={status} size={16} />;
 
 // Icon helpers for valueType filter options
 const getValueTypeIcon = (type: string) => {
@@ -188,6 +175,8 @@ const FeatureFlagsPage: React.FC = () => {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [createMenuAnchor, setCreateMenuAnchor] = useState<null | HTMLElement>(null);
   const [creating, setCreating] = useState(false);
+  const [showCreateDescription, setShowCreateDescription] = useState(false);
+  const [showCreateTags, setShowCreateTags] = useState(false);
   const [newFlag, setNewFlag] = useState({
     flagName: '',
     displayName: '',
@@ -291,6 +280,11 @@ const FeatureFlagsPage: React.FC = () => {
     return filter?.value as string[] | undefined;
   }, [activeFilters]);
 
+  const valueTypeFilter = useMemo(() => {
+    const filter = activeFilters.find((f) => f.key === 'valueType');
+    return filter?.value as string[] | undefined;
+  }, [activeFilters]);
+
   // Filter definitions
   const availableFilterDefinitions: FilterDefinition[] = useMemo(
     () => [
@@ -351,6 +345,11 @@ const FeatureFlagsPage: React.FC = () => {
             value: 'permission',
             label: t('featureFlags.types.permission'),
             icon: getTypeIconSmall('permission'),
+          },
+          {
+            value: 'remoteConfig',
+            label: t('featureFlags.types.remoteConfig'),
+            icon: getTypeIconSmall('remoteConfig'),
           },
         ],
       },
@@ -477,6 +476,13 @@ const FeatureFlagsPage: React.FC = () => {
         if (tagFilter && tagFilter.length > 0) {
           filteredFlags = filteredFlags.filter((f) =>
             tagFilter.some((tag) => f.tags?.includes(tag))
+          );
+        }
+
+        // Filter by valueType
+        if (valueTypeFilter && valueTypeFilter.length > 0) {
+          filteredFlags = filteredFlags.filter((f) =>
+            valueTypeFilter.includes(f.valueType)
           );
         }
 
@@ -787,6 +793,7 @@ const FeatureFlagsPage: React.FC = () => {
     flagTypeFilter,
     statusFilter,
     tagFilter,
+    valueTypeFilter,
   ]);
 
   useEffect(() => {
@@ -1167,11 +1174,11 @@ const FeatureFlagsPage: React.FC = () => {
       enqueueSnackbar(
         markAsStale
           ? t('featureFlags.bulkMarkStaleSuccess', {
-              count: targetFlags.length,
-            })
+            count: targetFlags.length,
+          })
           : t('featureFlags.bulkClearStaleSuccess', {
-              count: targetFlags.length,
-            }),
+            count: targetFlags.length,
+          }),
         { variant: 'success' }
       );
       setSelectedFlags(new Set());
@@ -1201,13 +1208,13 @@ const FeatureFlagsPage: React.FC = () => {
       enqueueSnackbar(
         enable
           ? t('featureFlags.bulkEnableSuccess', {
-              count: targetFlags.length,
-              env: environment,
-            })
+            count: targetFlags.length,
+            env: environment,
+          })
           : t('featureFlags.bulkDisableSuccess', {
-              count: targetFlags.length,
-              env: environment,
-            }),
+            count: targetFlags.length,
+            env: environment,
+          }),
         { variant: 'success' }
       );
       setSelectedFlags(new Set());
@@ -1306,6 +1313,8 @@ const FeatureFlagsPage: React.FC = () => {
     });
     setNewFlagJsonError(null);
     setCreateMenuAnchor(null);
+    setShowCreateDescription(false);
+    setShowCreateTags(false);
     setCreateDialogOpen(true);
   };
 
@@ -2362,104 +2371,131 @@ const FeatureFlagsPage: React.FC = () => {
         defaultWidth={500}
       >
         <Box sx={{ p: 3, flex: 1, overflow: 'auto' }}>
-          <Stack spacing={3}>
-            {/* Flag Name */}
-            <Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1 }}>
-                <Typography variant="subtitle2">
-                  {newFlag.flagType === 'remoteConfig'
-                    ? t('featureFlags.remoteConfigFlagName')
-                    : t('featureFlags.flagName')}{' '}
-                  <Box component="span" sx={{ color: 'error.main' }}>
-                    *
-                  </Box>
-                </Typography>
-                <NamingGuide type="flag" />
+          <Stack spacing={2.5}>
+            {/* Flag Name + Display Name on same row */}
+            <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'flex-start' }}>
+              <Box sx={{ flex: 1 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1 }}>
+                  <Typography variant="subtitle2">
+                    {newFlag.flagType === 'remoteConfig'
+                      ? t('featureFlags.remoteConfigFlagName')
+                      : t('featureFlags.flagName')}{' '}
+                    <Box component="span" sx={{ color: 'error.main' }}>
+                      *
+                    </Box>
+                  </Typography>
+                </Box>
+                <TextField
+                  fullWidth
+                  size="small"
+                  autoFocus
+                  value={newFlag.flagName}
+                  onChange={(e) =>
+                    setNewFlag({
+                      ...newFlag,
+                      flagName: e.target.value.replace(/[^a-zA-Z0-9_-]/g, ''),
+                    })
+                  }
+                  helperText={
+                    newFlag.flagType === 'remoteConfig'
+                      ? t('featureFlags.remoteConfigFlagNameHelp')
+                      : t('featureFlags.flagNameHelp')
+                  }
+                  inputProps={{ maxLength: 100 }}
+                />
               </Box>
               <TextField
-                fullWidth
+                sx={{ flex: 1, mt: 3.5 }}
                 size="small"
-                value={newFlag.flagName}
-                onChange={(e) =>
-                  setNewFlag({
-                    ...newFlag,
-                    flagName: e.target.value.replace(/[^a-zA-Z0-9_-]/g, ''),
-                  })
+                label={
+                  newFlag.flagType === 'remoteConfig'
+                    ? t('featureFlags.remoteConfigDisplayName')
+                    : t('featureFlags.displayName')
                 }
+                value={newFlag.displayName || ''}
+                onChange={(e) => setNewFlag({ ...newFlag, displayName: e.target.value })}
                 helperText={
                   newFlag.flagType === 'remoteConfig'
-                    ? t('featureFlags.remoteConfigFlagNameHelp')
-                    : t('featureFlags.flagNameHelp')
+                    ? t('featureFlags.remoteConfigDisplayNameHelp')
+                    : t('featureFlags.displayNameHelp')
                 }
-                inputProps={{ maxLength: 100 }}
               />
             </Box>
 
-            {/* Display Name */}
-            <TextField
-              fullWidth
-              label={
-                newFlag.flagType === 'remoteConfig'
-                  ? t('featureFlags.remoteConfigDisplayName')
-                  : t('featureFlags.displayName')
-              }
-              value={newFlag.displayName || ''}
-              onChange={(e) => setNewFlag({ ...newFlag, displayName: e.target.value })}
-              helperText={
-                newFlag.flagType === 'remoteConfig'
-                  ? t('featureFlags.remoteConfigDisplayNameHelp')
-                  : t('featureFlags.displayNameHelp')
-              }
-            />
-
-            {/* Description */}
-            <TextField
-              fullWidth
-              multiline
-              rows={3}
-              label={t('featureFlags.description')}
-              value={newFlag.description}
-              onChange={(e) => setNewFlag({ ...newFlag, description: e.target.value })}
-              helperText={
-                newFlag.flagType === 'remoteConfig'
-                  ? t('featureFlags.remoteConfigDescriptionHelp')
-                  : t('featureFlags.descriptionHelp')
-              }
-            />
-
-            {/* Tags - moved here after description */}
-            <Autocomplete
-              multiple
-              size="small"
-              options={allTags.map((tag) => tag.name)}
-              value={newFlag.tags}
-              onChange={(_, newValue) => setNewFlag({ ...newFlag, tags: newValue })}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label={t('featureFlags.tags')}
-                  placeholder={t('featureFlags.selectTags')}
-                  helperText={t('featureFlags.tagsHelp')}
-                />
+            {/* Expandable Description + Tags buttons */}
+            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+              {!showCreateDescription && !newFlag.description && (
+                <Button
+                  size="small"
+                  onClick={() => setShowCreateDescription(true)}
+                  sx={{ textTransform: 'none', color: 'text.secondary', fontSize: '0.8rem' }}
+                >
+                  {t('common.addDescription')}
+                </Button>
               )}
-              renderTags={(value, getTagProps) =>
-                value.map((option, index) => {
-                  const tag = allTags.find((t) => t.name === option);
-                  return (
-                    <Chip
-                      {...getTagProps({ index })}
-                      key={option}
-                      label={option}
-                      size="small"
-                      sx={{
-                        bgcolor: tag?.color || '#888',
-                        color: getContrastColor(tag?.color || '#888'),
-                      }}
-                    />
-                  );
-                })
-              }
-            />
+              {!showCreateTags && !newFlag.tags?.length && (
+                <Button
+                  size="small"
+                  onClick={() => setShowCreateTags(true)}
+                  sx={{ textTransform: 'none', color: 'text.secondary', fontSize: '0.8rem' }}
+                >
+                  + {t('common.addTag')}
+                </Button>
+              )}
+            </Box>
+
+            {/* Collapsible Description */}
+            {(showCreateDescription || !!newFlag.description) && (
+              <TextField
+                fullWidth
+                multiline
+                rows={3}
+                label={t('featureFlags.description')}
+                value={newFlag.description}
+                onChange={(e) => setNewFlag({ ...newFlag, description: e.target.value })}
+                helperText={
+                  newFlag.flagType === 'remoteConfig'
+                    ? t('featureFlags.remoteConfigDescriptionHelp')
+                    : t('featureFlags.descriptionHelp')
+                }
+              />
+            )}
+
+            {/* Collapsible Tags */}
+            {(showCreateTags || !!newFlag.tags?.length) && (
+              <Autocomplete
+                multiple
+                size="small"
+                options={allTags.map((tag) => tag.name)}
+                value={newFlag.tags}
+                onChange={(_, newValue) => setNewFlag({ ...newFlag, tags: newValue })}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label={t('featureFlags.tags')}
+                    placeholder={t('featureFlags.selectTags')}
+                    helperText={t('featureFlags.tagsHelp')}
+                  />
+                )}
+                renderTags={(value, getTagProps) =>
+                  value.map((option, index) => {
+                    const tag = allTags.find((t) => t.name === option);
+                    return (
+                      <Chip
+                        {...getTagProps({ index })}
+                        key={option}
+                        label={option}
+                        size="small"
+                        sx={{
+                          bgcolor: tag?.color || '#888',
+                          color: getContrastColor(tag?.color || '#888'),
+                        }}
+                      />
+                    );
+                  })
+                }
+              />
+            )}
 
             <Divider />
 

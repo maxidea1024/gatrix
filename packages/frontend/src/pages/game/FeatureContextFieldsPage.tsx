@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import NamingGuide from '../../components/common/NamingGuide';
+
 import { useAuth } from '../../hooks/useAuth';
 import { PERMISSIONS } from '../../types/permissions';
 import {
@@ -99,6 +99,8 @@ const FeatureContextFieldsPage: React.FC = () => {
     { id: number; name: string; color: string; description?: string }[]
   >([]);
   const [columnSettingsAnchor, setColumnSettingsAnchor] = useState<null | HTMLElement>(null);
+  const [showFieldDescription, setShowFieldDescription] = useState(false);
+  const [showFieldTags, setShowFieldTags] = useState(false);
 
   // Column settings
   const defaultColumns: ColumnConfig[] = [
@@ -323,6 +325,8 @@ const FeatureContextFieldsPage: React.FC = () => {
     };
     setEditingField(newField);
     setOriginalField(null);
+    setShowFieldDescription(false);
+    setShowFieldTags(false);
     setEditDialogOpen(true);
   };
 
@@ -763,8 +767,8 @@ const FeatureContextFieldsPage: React.FC = () => {
                                           {expandedLegalValues.has(field.id)
                                             ? t('featureFlags.showLess')
                                             : t('featureFlags.showMore', {
-                                                count: field.legalValues.length - 3,
-                                              })}
+                                              count: field.legalValues.length - 3,
+                                            })}
                                         </Typography>
                                       )}
                                     </Box>
@@ -900,7 +904,7 @@ const FeatureContextFieldsPage: React.FC = () => {
         defaultWidth={500}
       >
         <Box sx={{ p: 3, flex: 1, overflow: 'auto' }}>
-          <Stack spacing={3}>
+          <Stack spacing={2.5}>
             <Box>
               <FormControlLabel
                 control={
@@ -921,9 +925,10 @@ const FeatureContextFieldsPage: React.FC = () => {
               </FormHelperText>
             </Box>
 
-            <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 0.5 }}>
+            {/* Name + Display Name on same row */}
+            <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'flex-start' }}>
               <TextField
-                fullWidth
+                sx={{ flex: 1 }}
                 required
                 label={t('featureFlags.fieldName')}
                 value={editingField?.fieldName || ''}
@@ -937,21 +942,130 @@ const FeatureContextFieldsPage: React.FC = () => {
                 helperText={t('featureFlags.fieldNameHelp')}
                 placeholder="userId, deviceType, country..."
               />
-              {!editingField?.id && <NamingGuide type="contextField" />}
+              <TextField
+                sx={{ flex: 1 }}
+                label={t('featureFlags.displayName')}
+                value={editingField?.displayName || ''}
+                onChange={(e) =>
+                  setEditingField((prev) => ({
+                    ...prev,
+                    displayName: e.target.value,
+                  }))
+                }
+                helperText={t('featureFlags.displayNameHelp')}
+              />
             </Box>
 
-            <TextField
-              fullWidth
-              label={t('featureFlags.displayName')}
-              value={editingField?.displayName || ''}
-              onChange={(e) =>
-                setEditingField((prev) => ({
-                  ...prev,
-                  displayName: e.target.value,
-                }))
-              }
-              helperText={t('featureFlags.displayNameHelp')}
-            />
+            {/* Expandable Description + Tags buttons */}
+            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+              {!showFieldDescription && !(editingField?.description) && (
+                <Button
+                  size="small"
+                  onClick={() => setShowFieldDescription(true)}
+                  sx={{ textTransform: 'none', color: 'text.secondary', fontSize: '0.8rem' }}
+                >
+                  {t('common.addDescription')}
+                </Button>
+              )}
+              {!showFieldTags && !(editingField?.tags?.length) && (
+                <Button
+                  size="small"
+                  onClick={() => setShowFieldTags(true)}
+                  sx={{ textTransform: 'none', color: 'text.secondary', fontSize: '0.8rem' }}
+                >
+                  + {t('common.addTag')}
+                </Button>
+              )}
+            </Box>
+
+            {/* Collapsible Description */}
+            {(showFieldDescription || !!(editingField?.description)) && (
+              <TextField
+                fullWidth
+                multiline
+                rows={3}
+                label={t('featureFlags.description')}
+                value={editingField?.description || ''}
+                onChange={(e) =>
+                  setEditingField((prev) => ({
+                    ...prev,
+                    description: e.target.value,
+                  }))
+                }
+                helperText={t('featureFlags.descriptionHelp')}
+              />
+            )}
+
+            {/* Collapsible Tags */}
+            {(showFieldTags || !!(editingField?.tags?.length)) && (
+              <Autocomplete
+                multiple
+                options={allTags}
+                getOptionLabel={(option) => (typeof option === 'string' ? option : option.name)}
+                filterSelectedOptions
+                isOptionEqualToValue={(option, value) => {
+                  const optName = typeof option === 'string' ? option : option.name;
+                  const valName = typeof value === 'string' ? value : value.name;
+                  return optName === valName;
+                }}
+                value={(editingField?.tags || []).map((tagName) => {
+                  const found = allTags.find((t) => t.name === tagName);
+                  return found || { id: 0, name: tagName, color: '#888888' };
+                })}
+                onChange={(_, newValue) => {
+                  const tagNames = newValue.map((v) => (typeof v === 'string' ? v : v.name));
+                  setEditingField((prev) => ({ ...prev, tags: tagNames }));
+                }}
+                renderTags={(value, getTagProps) =>
+                  value.map((option, idx) => {
+                    const { key, ...chipProps } = getTagProps({ index: idx });
+                    const tagData =
+                      typeof option === 'string' ? { name: option, color: '#888888' } : option;
+                    return (
+                      <Tooltip key={key} title={tagData.description || ''} arrow>
+                        <Chip
+                          size="small"
+                          label={tagData.name}
+                          sx={{
+                            bgcolor: tagData.color,
+                            color: getContrastColor(tagData.color),
+                          }}
+                          {...chipProps}
+                        />
+                      </Tooltip>
+                    );
+                  })
+                }
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label={t('featureFlags.tags')}
+                    placeholder={t('featureFlags.tagsPlaceholder')}
+                    helperText={t('featureFlags.tagsHelp')}
+                  />
+                )}
+                renderOption={(props, option) => {
+                  const tagData =
+                    typeof option === 'string'
+                      ? { name: option, color: '#888888', description: '' }
+                      : option;
+                  return (
+                    <Box component="li" {...props}>
+                      <Chip
+                        label={tagData.name}
+                        size="small"
+                        sx={{
+                          bgcolor: tagData.color,
+                          color: getContrastColor(tagData.color),
+                          mr: 1,
+                        }}
+                      />
+                      {tagData.description || t('tags.noDescription')}
+                    </Box>
+                  );
+                }}
+              />
+            )}
 
             <FormControl fullWidth>
               <InputLabel>{t('featureFlags.fieldType')}</InputLabel>
@@ -1001,21 +1115,6 @@ const FeatureContextFieldsPage: React.FC = () => {
               <FormHelperText>{t('featureFlags.fieldTypeHelp')}</FormHelperText>
             </FormControl>
 
-            <TextField
-              fullWidth
-              multiline
-              rows={3}
-              label={t('featureFlags.description')}
-              value={editingField?.description || ''}
-              onChange={(e) =>
-                setEditingField((prev) => ({
-                  ...prev,
-                  description: e.target.value,
-                }))
-              }
-              helperText={t('featureFlags.descriptionHelp')}
-            />
-
             {/* Legal Values - only show for string and number types */}
             {(editingField?.fieldType === 'string' || editingField?.fieldType === 'number') && (
               <Autocomplete
@@ -1044,75 +1143,6 @@ const FeatureContextFieldsPage: React.FC = () => {
                 )}
               />
             )}
-
-            {/* Tags */}
-            <Autocomplete
-              multiple
-              options={allTags}
-              getOptionLabel={(option) => (typeof option === 'string' ? option : option.name)}
-              filterSelectedOptions
-              isOptionEqualToValue={(option, value) => {
-                const optName = typeof option === 'string' ? option : option.name;
-                const valName = typeof value === 'string' ? value : value.name;
-                return optName === valName;
-              }}
-              value={(editingField?.tags || []).map((tagName) => {
-                const found = allTags.find((t) => t.name === tagName);
-                return found || { id: 0, name: tagName, color: '#888888' };
-              })}
-              onChange={(_, newValue) => {
-                const tagNames = newValue.map((v) => (typeof v === 'string' ? v : v.name));
-                setEditingField((prev) => ({ ...prev, tags: tagNames }));
-              }}
-              renderTags={(value, getTagProps) =>
-                value.map((option, idx) => {
-                  const { key, ...chipProps } = getTagProps({ index: idx });
-                  const tagData =
-                    typeof option === 'string' ? { name: option, color: '#888888' } : option;
-                  return (
-                    <Tooltip key={key} title={tagData.description || ''} arrow>
-                      <Chip
-                        size="small"
-                        label={tagData.name}
-                        sx={{
-                          bgcolor: tagData.color,
-                          color: getContrastColor(tagData.color),
-                        }}
-                        {...chipProps}
-                      />
-                    </Tooltip>
-                  );
-                })
-              }
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label={t('featureFlags.tags')}
-                  placeholder={t('featureFlags.tagsPlaceholder')}
-                  helperText={t('featureFlags.tagsHelp')}
-                />
-              )}
-              renderOption={(props, option) => {
-                const tagData =
-                  typeof option === 'string'
-                    ? { name: option, color: '#888888', description: '' }
-                    : option;
-                return (
-                  <Box component="li" {...props}>
-                    <Chip
-                      label={tagData.name}
-                      size="small"
-                      sx={{
-                        bgcolor: tagData.color,
-                        color: getContrastColor(tagData.color),
-                        mr: 1,
-                      }}
-                    />
-                    {tagData.description || t('tags.noDescription')}
-                  </Box>
-                );
-              }}
-            />
           </Stack>
         </Box>
 
