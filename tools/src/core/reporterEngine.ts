@@ -13,9 +13,13 @@ import { uploadReport } from '../backend/client';
 /**
  * Generate all configured reports.
  */
-export async function generateReports(report: ScanReport, config: ScanConfig): Promise<void> {
+export async function generateReports(
+  report: ScanReport,
+  config: ScanConfig,
+  locale?: string,
+): Promise<void> {
   for (const format of config.report) {
-    await generateSingleReport(report, format, config);
+    await generateSingleReport(report, format, config, locale);
   }
 
   if (config.reportBackend) {
@@ -27,6 +31,7 @@ async function generateSingleReport(
   report: ScanReport,
   format: ReportFormat,
   config: ScanConfig,
+  locale?: string,
 ): Promise<void> {
   switch (format) {
     case 'console':
@@ -39,7 +44,8 @@ async function generateSingleReport(
     }
     case 'html': {
       const htmlPath = config.outputPath ?? 'gatrix-flag-report.html';
-      reportToHtml(report, htmlPath);
+      const htmlLocale = (locale === 'ko' ? 'ko' : 'en') as 'en' | 'ko';
+      reportToHtml(report, htmlPath, htmlLocale);
       break;
     }
     case 'sarif': {

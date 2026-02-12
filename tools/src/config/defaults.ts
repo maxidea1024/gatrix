@@ -139,6 +139,7 @@ export const DEFAULT_SCAN_CONFIG: ScanConfig = {
     '**/*.spec.*',
     '**/__tests__/**',
     '**/*.d.ts',
+    '**/.gatrix-reference-codes/**',
   ],
   extensions: [
     '.ts',
@@ -164,6 +165,7 @@ export const DEFAULT_SCAN_CONFIG: ScanConfig = {
     '.go',
     '.swift',
     '.php',
+    '.gd',
   ],
   languages: [],
   root: '.',

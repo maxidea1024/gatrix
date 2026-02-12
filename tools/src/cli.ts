@@ -48,6 +48,7 @@ program
   .option('--allow-global-lua-detection', 'Allow global Lua function calls', false)
   .option('--dry-run', 'Run scan without sending results to backend', false)
   .option('--include-tests', 'Include test files in scan (*.test.*, *.spec.*, __tests__)', false)
+  .option('--lang <locale>', 'Report language: en (default), ko', 'en')
   .option(
     '--min-flag-key-length <n>',
     'Minimum flag key length (shorter keys are omitted)',
@@ -169,7 +170,8 @@ async function runScan(rootArg: string, options: Record<string, unknown>): Promi
   const report = await engine.execute();
 
   // Generate reports
-  await generateReports(report, config);
+  const locale = (options.lang as string) || 'en';
+  await generateReports(report, config, locale);
 
   // Determine exit code for CI
   const exitCode = determineExitCode(report, config);
