@@ -890,6 +890,7 @@ const FeatureSegmentsPage: React.FC = () => {
               <TextField
                 sx={{ flex: 1 }}
                 required
+                autoFocus={!editingSegment?.id}
                 label={t('featureFlags.segmentName')}
                 value={editingSegment?.segmentName || ''}
                 onChange={(e) =>
@@ -918,7 +919,7 @@ const FeatureSegmentsPage: React.FC = () => {
 
             {/* Expandable Description + Tags buttons */}
             <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-              {!showDescription && !(editingSegment?.description) && (
+              {!showDescription && !editingSegment?.description && (
                 <Button
                   size="small"
                   onClick={() => setShowDescription(true)}
@@ -927,7 +928,7 @@ const FeatureSegmentsPage: React.FC = () => {
                   {t('common.addDescription')}
                 </Button>
               )}
-              {!showTags && !(editingSegment?.tags?.length) && (
+              {!showTags && !editingSegment?.tags?.length && (
                 <Button
                   size="small"
                   onClick={() => setShowTags(true)}
@@ -939,7 +940,7 @@ const FeatureSegmentsPage: React.FC = () => {
             </Box>
 
             {/* Collapsible Description */}
-            {(showDescription || !!(editingSegment?.description)) && (
+            {(showDescription || !!editingSegment?.description) && (
               <TextField
                 fullWidth
                 multiline
@@ -957,7 +958,7 @@ const FeatureSegmentsPage: React.FC = () => {
             )}
 
             {/* Collapsible Tags */}
-            {(showTags || !!(editingSegment?.tags?.length)) && (
+            {(showTags || !!editingSegment?.tags?.length) && (
               <Autocomplete
                 multiple
                 options={allTags}

@@ -767,8 +767,8 @@ const FeatureContextFieldsPage: React.FC = () => {
                                           {expandedLegalValues.has(field.id)
                                             ? t('featureFlags.showLess')
                                             : t('featureFlags.showMore', {
-                                              count: field.legalValues.length - 3,
-                                            })}
+                                                count: field.legalValues.length - 3,
+                                              })}
                                         </Typography>
                                       )}
                                     </Box>
@@ -958,7 +958,7 @@ const FeatureContextFieldsPage: React.FC = () => {
 
             {/* Expandable Description + Tags buttons */}
             <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-              {!showFieldDescription && !(editingField?.description) && (
+              {!showFieldDescription && !editingField?.description && (
                 <Button
                   size="small"
                   onClick={() => setShowFieldDescription(true)}
@@ -967,7 +967,7 @@ const FeatureContextFieldsPage: React.FC = () => {
                   {t('common.addDescription')}
                 </Button>
               )}
-              {!showFieldTags && !(editingField?.tags?.length) && (
+              {!showFieldTags && !editingField?.tags?.length && (
                 <Button
                   size="small"
                   onClick={() => setShowFieldTags(true)}
@@ -979,7 +979,7 @@ const FeatureContextFieldsPage: React.FC = () => {
             </Box>
 
             {/* Collapsible Description */}
-            {(showFieldDescription || !!(editingField?.description)) && (
+            {(showFieldDescription || !!editingField?.description) && (
               <TextField
                 fullWidth
                 multiline
@@ -997,7 +997,7 @@ const FeatureContextFieldsPage: React.FC = () => {
             )}
 
             {/* Collapsible Tags */}
-            {(showFieldTags || !!(editingField?.tags?.length)) && (
+            {(showFieldTags || !!editingField?.tags?.length) && (
               <Autocomplete
                 multiple
                 options={allTags}

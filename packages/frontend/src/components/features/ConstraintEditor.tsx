@@ -456,7 +456,10 @@ const SortableConstraintCard: React.FC<SortableConstraintCardProps> = ({
                   <Typography variant="body2" sx={{ fontWeight: 500 }}>
                     {t(`featureFlags.operators.${op.value}`, op.label)}
                   </Typography>
-                  <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', lineHeight: 1.3 }}>
+                  <Typography
+                    variant="caption"
+                    sx={{ color: 'text.secondary', display: 'block', lineHeight: 1.3 }}
+                  >
                     {t(`constraints.operatorDesc.${op.value}`, '')}
                   </Typography>
                 </Box>
@@ -827,19 +830,6 @@ export const ConstraintEditor: React.FC<ConstraintEditorProps> = ({
 
   return (
     <Box>
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          mb: 2,
-        }}
-      >
-        <Typography variant="subtitle2" color="text.secondary">
-          {t('featureFlags.constraintsList')}
-        </Typography>
-      </Box>
-
       {constraints.length === 0 ? (
         <EmptyPlaceholder
           message={t('featureFlags.noConstraints')}

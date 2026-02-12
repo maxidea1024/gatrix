@@ -201,6 +201,14 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
   const preserveExpandedRef = React.useRef(false);
   // Ref to track saving status to prevent state reset during data reload
   const isSavingRef = React.useRef(false);
+  // Ref to suppress unsaved changes badge on initial mount
+  const [isInitialMount, setIsInitialMount] = useState(true);
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsInitialMount(false);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Sync state if savingRef is true (meaning we just finished saving)
   useEffect(() => {
@@ -708,7 +716,7 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
               ? t('featureFlags.fallbackAndConfiguration')
               : t('featureFlags.envSpecificSettings')}
           </Typography>
-          {(hasChanges || valuesHasChanges) && (
+          {!isInitialMount && (hasChanges || valuesHasChanges) && (
             <Chip
               label={t('common.unsavedChanges')}
               size="small"

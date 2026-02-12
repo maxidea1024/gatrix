@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { PERMISSIONS } from '../../types/permissions';
 import {
@@ -77,6 +77,7 @@ import {
   SportsEsports as JoystickIcon,
   SwapVert as ImportExportIcon,
   Tune as RemoteConfigIcon,
+  ViewList as ViewListIcon,
 } from '@mui/icons-material';
 import FieldTypeIcon from '../../components/common/FieldTypeIcon';
 import ValueEditorField from '../../components/common/ValueEditorField';
@@ -152,6 +153,20 @@ const FeatureFlagsPage: React.FC = () => {
   const { hasPermission } = useAuth();
   const canManage = hasPermission([PERMISSIONS.FEATURE_FLAGS_MANAGE]);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  // Compact view state - query param overrides localStorage
+  const [compactView, setCompactView] = useState<boolean>(() => {
+    const queryVal = searchParams.get('compact');
+    if (queryVal !== null) return queryVal === 'true' || queryVal === '1';
+    return localStorage.getItem('featureFlagsCompactView') === 'true';
+  });
+
+  const handleCompactViewToggle = () => {
+    const newVal = !compactView;
+    setCompactView(newVal);
+    localStorage.setItem('featureFlagsCompactView', String(newVal));
+  };
 
   // State
   const [flags, setFlags] = useState<FeatureFlag[]>([]);
@@ -236,8 +251,8 @@ const FeatureFlagsPage: React.FC = () => {
   const defaultColumns: ColumnConfig[] = [
     { id: 'flagName', labelKey: 'featureFlags.flagName', visible: true },
     { id: 'status', labelKey: 'featureFlags.status', visible: true },
-
     { id: 'valueType', labelKey: 'featureFlags.valueType', visible: true },
+    { id: 'environments', labelKey: 'featureFlags.enabledByEnv', visible: true },
     { id: 'createdBy', labelKey: 'common.createdBy', visible: true },
     { id: 'createdAt', labelKey: 'featureFlags.createdAt', visible: true },
     { id: 'lastSeenAt', labelKey: 'featureFlags.lastSeenAt', visible: true },
@@ -481,9 +496,7 @@ const FeatureFlagsPage: React.FC = () => {
 
         // Filter by valueType
         if (valueTypeFilter && valueTypeFilter.length > 0) {
-          filteredFlags = filteredFlags.filter((f) =>
-            valueTypeFilter.includes(f.valueType)
-          );
+          filteredFlags = filteredFlags.filter((f) => valueTypeFilter.includes(f.valueType));
         }
 
         // Sort favorites first (always show favorites at top, then apply normal sort)
@@ -881,9 +894,14 @@ const FeatureFlagsPage: React.FC = () => {
 
     try {
       await featureFlagService.toggleFeatureFlag(flag.flagName, newEnabled, environment);
+      const envDisplayName =
+        environments.find((e) => e.environment === environment)?.displayName || environment;
       enqueueSnackbar(
-        t(currentEnabled ? 'featureFlags.disableSuccess' : 'featureFlags.enableSuccess'),
-        { variant: 'success' }
+        <span>
+          <strong>{flag.flagName}</strong> ({envDisplayName}){' '}
+          {t(currentEnabled ? 'featureFlags.disabled' : 'featureFlags.enabled')}
+        </span>,
+        { variant: currentEnabled ? 'warning' : 'success' }
       );
     } catch (error: any) {
       // Rollback on error
@@ -1174,11 +1192,11 @@ const FeatureFlagsPage: React.FC = () => {
       enqueueSnackbar(
         markAsStale
           ? t('featureFlags.bulkMarkStaleSuccess', {
-            count: targetFlags.length,
-          })
+              count: targetFlags.length,
+            })
           : t('featureFlags.bulkClearStaleSuccess', {
-            count: targetFlags.length,
-          }),
+              count: targetFlags.length,
+            }),
         { variant: 'success' }
       );
       setSelectedFlags(new Set());
@@ -1208,14 +1226,14 @@ const FeatureFlagsPage: React.FC = () => {
       enqueueSnackbar(
         enable
           ? t('featureFlags.bulkEnableSuccess', {
-            count: targetFlags.length,
-            env: environment,
-          })
+              count: targetFlags.length,
+              env: environment,
+            })
           : t('featureFlags.bulkDisableSuccess', {
-            count: targetFlags.length,
-            env: environment,
-          }),
-        { variant: 'success' }
+              count: targetFlags.length,
+              env: environment,
+            }),
+        { variant: enable ? 'success' : 'warning' }
       );
       setSelectedFlags(new Set());
       loadFlags();
@@ -1533,19 +1551,39 @@ const FeatureFlagsPage: React.FC = () => {
                 refreshDisabled={loading}
                 noWrap={true}
                 afterFilterAddActions={
-                  <Tooltip title={t('common.columnSettings')} disableFocusListener>
-                    <IconButton
-                      onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
-                      sx={{
-                        bgcolor: 'background.paper',
-                        border: 1,
-                        borderColor: 'divider',
-                        '&:hover': { bgcolor: 'action.hover' },
-                      }}
-                    >
-                      <ViewColumnIcon />
-                    </IconButton>
-                  </Tooltip>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    {!compactView && (
+                      <Tooltip title={t('common.columnSettings')} disableFocusListener>
+                        <IconButton
+                          onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
+                          sx={{
+                            bgcolor: 'background.paper',
+                            border: 1,
+                            borderColor: 'divider',
+                            '&:hover': { bgcolor: 'action.hover' },
+                          }}
+                        >
+                          <ViewColumnIcon />
+                        </IconButton>
+                      </Tooltip>
+                    )}
+                    <Tooltip title={t('featureFlags.compactView')} disableFocusListener>
+                      <IconButton
+                        onClick={handleCompactViewToggle}
+                        sx={{
+                          bgcolor: compactView ? 'primary.main' : 'background.paper',
+                          color: compactView ? 'primary.contrastText' : 'text.primary',
+                          border: 1,
+                          borderColor: compactView ? 'primary.main' : 'divider',
+                          '&:hover': {
+                            bgcolor: compactView ? 'primary.dark' : 'action.hover',
+                          },
+                        }}
+                      >
+                        <ViewListIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </Box>
                 }
               />
             </Box>
@@ -1553,7 +1591,7 @@ const FeatureFlagsPage: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Table */}
+      {/* Table / Compact View */}
       <Card>
         <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
           {loading && isInitialLoad ? (
@@ -1567,6 +1605,305 @@ const FeatureFlagsPage: React.FC = () => {
               addButtonLabel={t('featureFlags.createFlag')}
               subtitle={canManage ? t('common.addFirstItem') : undefined}
             />
+          ) : compactView ? (
+            <>
+              <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                {flags.map((flag, index) => {
+                  // Value preview helper
+                  const formatValuePreview = (val: any): string => {
+                    if (val === null || val === undefined) return '-';
+                    if (typeof val === 'boolean') return val ? 'true' : 'false';
+                    if (typeof val === 'object') {
+                      const str = JSON.stringify(val);
+                      return str.length > 40 ? str.slice(0, 40) + '…' : str;
+                    }
+                    const str = String(val);
+                    return str.length > 40 ? str.slice(0, 40) + '…' : str;
+                  };
+                  // Get the most recent lastSeenAt across all environments
+                  const lastSeen =
+                    flag.environments?.reduce((latest, env) => {
+                      if (!env.lastSeenAt) return latest;
+                      if (!latest) return env.lastSeenAt;
+                      return new Date(env.lastSeenAt) > new Date(latest) ? env.lastSeenAt : latest;
+                    }, flag.lastSeenAt || '') || flag.lastSeenAt;
+
+                  return (
+                    <Box
+                      key={flag.id}
+                      sx={{
+                        px: 2.5,
+                        py: 1.5,
+                        borderBottom: '1px solid',
+                        borderColor: 'divider',
+                        cursor: 'pointer',
+                        transition: 'background-color 0.15s',
+                        bgcolor: index % 2 === 1 ? 'action.hover' : 'transparent',
+                        '&:hover': { bgcolor: 'action.selected' },
+                        ...(flag.isArchived ? { opacity: 0.6 } : {}),
+                      }}
+                      onClick={() => navigate(`/feature-flags/${flag.flagName}`)}
+                    >
+                      {/* Row 1: Flag name + status + action */}
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Tooltip title={t(`featureFlags.types.${flag.flagType}`)}>
+                          {getTypeIcon(flag.flagType)}
+                        </Tooltip>
+                        {isStale(flag) && (
+                          <Tooltip title={t('featureFlags.staleWarning')}>
+                            <WarningIcon sx={{ fontSize: 16, color: 'warning.main' }} />
+                          </Tooltip>
+                        )}
+                        <Typography
+                          fontWeight={600}
+                          variant="body1"
+                          noWrap
+                          sx={{ flex: 1, minWidth: 0 }}
+                        >
+                          {flag.flagName}
+                        </Typography>
+                        {flag.isFavorite && (
+                          <StarIcon sx={{ fontSize: 16, color: 'warning.main' }} />
+                        )}
+                        {(() => {
+                          const { status: flagStatus, color } = getFlagStatus(flag);
+                          return (
+                            <Box
+                              sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 0.5,
+                                flexShrink: 0,
+                              }}
+                            >
+                              <FlagStatusIcon status={flagStatus} size={16} />
+                              <Chip
+                                label={t(
+                                  `featureFlags.status${flagStatus.charAt(0).toUpperCase() + flagStatus.slice(1)}`
+                                )}
+                                size="small"
+                                color={color}
+                                variant={flagStatus === 'active' ? 'outlined' : 'filled'}
+                                sx={{ height: 20, fontSize: '0.7rem' }}
+                              />
+                            </Box>
+                          );
+                        })()}
+                        {canManage && (
+                          <IconButton
+                            size="small"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleActionMenuOpen(e, flag);
+                            }}
+                          >
+                            <MoreVertIcon fontSize="small" />
+                          </IconButton>
+                        )}
+                      </Box>
+
+                      {/* Row 2: Display name + description (when available) */}
+                      {((flag.displayName && flag.displayName !== flag.flagName) ||
+                        flag.description) && (
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 1.5,
+                            mt: 0.25,
+                            pl: 3.5,
+                          }}
+                        >
+                          {flag.displayName && flag.displayName !== flag.flagName && (
+                            <Typography variant="body2" color="text.secondary" noWrap>
+                              {flag.displayName}
+                            </Typography>
+                          )}
+                          {flag.description && (
+                            <Typography
+                              variant="body2"
+                              color="text.disabled"
+                              noWrap
+                              sx={{ flex: 1, minWidth: 0 }}
+                            >
+                              — {flag.description}
+                            </Typography>
+                          )}
+                        </Box>
+                      )}
+
+                      {/* Row 3: Env switches + value info + tags + times */}
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 1.5,
+                          mt: 0.75,
+                          pl: 3.5,
+                        }}
+                      >
+                        {/* Environment switches */}
+                        <Box
+                          sx={{ display: 'flex', alignItems: 'center', gap: 0.25, flexShrink: 0 }}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          {environments.map((env) => {
+                            const isEnabled = getEnvEnabled(flag, env.environment);
+                            return (
+                              <FeatureSwitch
+                                key={`${flag.flagName}-${env.environment}-${isEnabled}`}
+                                size="small"
+                                checked={isEnabled}
+                                onChange={() => handleToggle(flag, env.environment, isEnabled)}
+                                disabled={flag.isArchived || !canManage}
+                                onClick={(e) => e.stopPropagation()}
+                                color={env.color}
+                                label={env.displayName}
+                              />
+                            );
+                          })}
+                        </Box>
+
+                        {/* Divider */}
+                        <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+
+                        {/* Value type + value previews */}
+                        <Box
+                          sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexShrink: 0 }}
+                        >
+                          <FieldTypeIcon type={flag.valueType || 'string'} size={14} />
+                          <Tooltip
+                            title={`${t('featureFlags.enabledValue')}: ${formatValuePreview(flag.enabledValue)}`}
+                            disableFocusListener
+                          >
+                            <Chip
+                              label={formatValuePreview(flag.enabledValue)}
+                              size="small"
+                              sx={{
+                                height: 20,
+                                fontSize: '0.7rem',
+                                maxWidth: 120,
+                                bgcolor: 'success.main',
+                                color: 'success.contrastText',
+                                opacity: 0.85,
+                              }}
+                            />
+                          </Tooltip>
+                          <Typography variant="caption" color="text.disabled">
+                            /
+                          </Typography>
+                          <Tooltip
+                            title={`${t('featureFlags.disabledValue')}: ${formatValuePreview(flag.disabledValue)}`}
+                            disableFocusListener
+                          >
+                            <Chip
+                              label={formatValuePreview(flag.disabledValue)}
+                              size="small"
+                              sx={{
+                                height: 20,
+                                fontSize: '0.7rem',
+                                maxWidth: 120,
+                                bgcolor: 'action.disabledBackground',
+                                color: 'text.secondary',
+                              }}
+                            />
+                          </Tooltip>
+                        </Box>
+
+                        {/* Tags */}
+                        {flag.tags && flag.tags.length > 0 && (
+                          <>
+                            <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+                            <Box
+                              sx={{ display: 'flex', gap: 0.5, flexShrink: 0, flexWrap: 'wrap' }}
+                            >
+                              {flag.tags.slice(0, 5).map((tagName) => {
+                                const tagObj = allTags.find((tItem) => tItem.tagName === tagName);
+                                const color = tagObj?.color || '#888';
+                                return (
+                                  <Chip
+                                    key={tagName}
+                                    label={tagName}
+                                    size="small"
+                                    sx={{
+                                      height: 20,
+                                      fontSize: '0.7rem',
+                                      bgcolor: color,
+                                      color: getContrastColor(color),
+                                    }}
+                                  />
+                                );
+                              })}
+                              {flag.tags.length > 5 && (
+                                <Chip
+                                  label={`+${flag.tags.length - 5}`}
+                                  size="small"
+                                  sx={{ height: 20, fontSize: '0.7rem' }}
+                                />
+                              )}
+                            </Box>
+                          </>
+                        )}
+
+                        {/* Impression data indicator */}
+                        {flag.impressionDataEnabled && (
+                          <Tooltip title={t('featureFlags.impressionDataOn')} disableFocusListener>
+                            <Chip
+                              label="📊"
+                              size="small"
+                              variant="outlined"
+                              sx={{ height: 20, fontSize: '0.7rem', borderColor: 'info.main' }}
+                            />
+                          </Tooltip>
+                        )}
+
+                        {/* Spacer */}
+                        <Box sx={{ flex: 1 }} />
+
+                        {/* Last seen */}
+                        {lastSeen && (
+                          <Tooltip
+                            title={`${t('featureFlags.lastSeenAt')}: ${formatDateTimeDetailed(lastSeen)}`}
+                            disableFocusListener
+                          >
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                              noWrap
+                              sx={{ fontSize: '0.7rem' }}
+                            >
+                              ⚡ {formatRelativeTime(lastSeen)}
+                            </Typography>
+                          </Tooltip>
+                        )}
+
+                        {/* Created time */}
+                        <Tooltip
+                          title={formatDateTimeDetailed(flag.createdAt)}
+                          disableFocusListener
+                        >
+                          <Typography variant="caption" color="text.secondary" noWrap>
+                            {formatRelativeTime(flag.createdAt)}
+                          </Typography>
+                        </Tooltip>
+                      </Box>
+                    </Box>
+                  );
+                })}
+              </Box>
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end', pr: 1 }}>
+                <SimplePagination
+                  page={page}
+                  rowsPerPage={rowsPerPage}
+                  count={total}
+                  onPageChange={(event, newPage) => setPage(newPage)}
+                  onRowsPerPageChange={(event) => {
+                    setRowsPerPage(Number(event.target.value));
+                    setPage(0);
+                  }}
+                />
+              </Box>
+            </>
           ) : (
             <>
               <TableContainer>
@@ -1606,22 +1943,18 @@ const FeatureFlagsPage: React.FC = () => {
                               </TableCell>
                             );
                           case 'status':
-                            // Status column followed by environment columns
-                            return (
-                              <React.Fragment key={col.id}>
-                                <TableCell>{t('featureFlags.status')}</TableCell>
-                                {/* Merged environment columns header */}
-                                {environments.length > 0 && (
-                                  <TableCell
-                                    align="center"
-                                    colSpan={environments.length}
-                                    sx={{ px: 0.5 }}
-                                  >
-                                    {t('featureFlags.enabledByEnv')}
-                                  </TableCell>
-                                )}
-                              </React.Fragment>
-                            );
+                            return <TableCell key={col.id}>{t('featureFlags.status')}</TableCell>;
+                          case 'environments':
+                            return environments.length > 0 ? (
+                              <TableCell
+                                key={col.id}
+                                align="center"
+                                colSpan={environments.length}
+                                sx={{ px: 0.5 }}
+                              >
+                                {t('featureFlags.enabledByEnv')}
+                              </TableCell>
+                            ) : null;
                           case 'createdBy':
                             return <TableCell key={col.id}>{t('common.createdBy')}</TableCell>;
                           case 'createdAt':
@@ -1780,22 +2113,31 @@ const FeatureFlagsPage: React.FC = () => {
                                     {(() => {
                                       const { status, color } = getFlagStatus(flag);
                                       return (
-                                        <Chip
-                                          label={t(
-                                            `featureFlags.status${status.charAt(0).toUpperCase() + status.slice(1)}`
-                                          )}
-                                          size="small"
-                                          color={color}
-                                          variant={status === 'active' ? 'outlined' : 'filled'}
-                                          sx={{
-                                            height: 20,
-                                            fontSize: '0.75rem',
-                                          }}
-                                        />
+                                        <Box
+                                          sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
+                                        >
+                                          <FlagStatusIcon status={status} size={16} />
+                                          <Chip
+                                            label={t(
+                                              `featureFlags.status${status.charAt(0).toUpperCase() + status.slice(1)}`
+                                            )}
+                                            size="small"
+                                            color={color}
+                                            variant={status === 'active' ? 'outlined' : 'filled'}
+                                            sx={{
+                                              height: 20,
+                                              fontSize: '0.75rem',
+                                            }}
+                                          />
+                                        </Box>
                                       );
                                     })()}
                                   </TableCell>
-                                  {/* Environment columns - right after status */}
+                                </React.Fragment>
+                              );
+                            case 'environments':
+                              return (
+                                <React.Fragment key={col.id}>
                                   {environments.map((env, envIndex) => {
                                     const isEnabled = getEnvEnabled(flag, env.environment);
                                     const tooltipText = `${t('featureFlags.toggleTooltip', { env: env.displayName })}\n${isEnabled ? t('featureFlags.toggleTooltipEnabled') : t('featureFlags.toggleTooltipDisabled')}`;

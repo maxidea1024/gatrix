@@ -83,23 +83,33 @@ const PillTrack = styled(Box, {
     userSelect: 'none' as const,
     background: checked
       ? disabled
-        ? isDark ? darkenColor(base, 35) : lightenColor(base, 35)
+        ? isDark
+          ? darkenColor(base, 35)
+          : lightenColor(base, 35)
         : base
       : disabled
-        ? isDark ? '#2a2a2a' : '#e0e0e0'
-        : isDark ? '#3d3d4d' : '#d4d4dc',
+        ? isDark
+          ? '#2a2a2a'
+          : '#e0e0e0'
+        : isDark
+          ? '#3d3d4d'
+          : '#d4d4dc',
     boxShadow: checked
       ? `inset 0 1px 3px ${darkenColor(base, 20)}66`
       : isDark
         ? 'inset 0 1px 3px rgba(0,0,0,0.4)'
         : 'inset 0 1px 3px rgba(0,0,0,0.15)',
     opacity: disabled ? 0.45 : 1,
-    '&:hover': disabled ? {} : {
-      filter: 'brightness(1.08)',
-    },
-    '&:active': disabled ? {} : {
-      transform: 'scale(0.98)',
-    },
+    '&:hover': disabled
+      ? {}
+      : {
+          filter: 'brightness(1.08)',
+        },
+    '&:active': disabled
+      ? {}
+      : {
+          transform: 'scale(0.98)',
+        },
   };
 });
 
@@ -153,23 +163,33 @@ const ClassicTrack = styled(Box, {
     transition: 'background 0.25s ease, box-shadow 0.25s ease',
     background: checked
       ? disabled
-        ? isDark ? darkenColor(base, 35) : lightenColor(base, 35)
+        ? isDark
+          ? darkenColor(base, 35)
+          : lightenColor(base, 35)
         : base
       : disabled
-        ? isDark ? '#2a2a2a' : '#e0e0e0'
-        : isDark ? '#3d3d4d' : '#ccc',
+        ? isDark
+          ? '#2a2a2a'
+          : '#e0e0e0'
+        : isDark
+          ? '#3d3d4d'
+          : '#ccc',
     boxShadow: checked
       ? `inset 0 1px 3px ${darkenColor(base, 20)}66`
       : isDark
         ? 'inset 0 1px 3px rgba(0,0,0,0.4)'
         : 'inset 0 1px 3px rgba(0,0,0,0.15)',
     opacity: disabled ? 0.45 : 1,
-    '&:hover': disabled ? {} : {
-      filter: 'brightness(1.08)',
-    },
-    '&:active': disabled ? {} : {
-      transform: 'scale(0.98)',
-    },
+    '&:hover': disabled
+      ? {}
+      : {
+          filter: 'brightness(1.08)',
+        },
+    '&:active': disabled
+      ? {}
+      : {
+          transform: 'scale(0.98)',
+        },
   };
 });
 
@@ -256,8 +276,8 @@ const FeatureSwitch: React.FC<FeatureSwitchProps> = ({
             transform: 'translateY(-50%)',
             // Precisely constrain text to the area NOT occupied by the grip
             // grip pad = (h - grip) / 2; gap between grip and text = 4px
-            left: checked ? ((PILL[size].h - grip) / 2) : (grip + (PILL[size].h - grip) / 2 + 4),
-            right: checked ? (grip + (PILL[size].h - grip) / 2 + 4) : ((PILL[size].h - grip) / 2),
+            left: checked ? (PILL[size].h - grip) / 2 : grip + (PILL[size].h - grip) / 2 + 4,
+            right: checked ? grip + (PILL[size].h - grip) / 2 + 4 : (PILL[size].h - grip) / 2,
             textAlign: 'center',
             fontSize: font,
             fontWeight: 600,
@@ -265,9 +285,7 @@ const FeatureSwitch: React.FC<FeatureSwitchProps> = ({
             color: checked
               ? textColor
               : (theme) =>
-                theme.palette.mode === 'dark'
-                  ? 'rgba(255,255,255,0.45)'
-                  : 'rgba(0,0,0,0.38)',
+                  theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.38)',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
