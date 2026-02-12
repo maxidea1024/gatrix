@@ -20,26 +20,109 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
     ? '"Microsoft YaHei", "微软雅黑", "Source Han Sans SC", "思源黑体", "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Roboto", "Helvetica", "Arial", sans-serif'
     : '"Roboto", "Helvetica", "Arial", sans-serif';
 
+  // -- Curated color palette --
+  const colors = {
+    // Primary: Indigo-violet family
+    primary: {
+      light: {
+        main: '#4f46e5',
+        light: '#6366f1',
+        dark: '#4338ca',
+        contrastText: '#ffffff',
+      },
+      dark: {
+        main: '#818cf8',
+        light: '#a5b4fc',
+        dark: '#6366f1',
+        contrastText: '#0f1225',
+      },
+    },
+    // Secondary: Warm rose for accent
+    secondary: {
+      light: {
+        main: '#e11d48',
+        light: '#fb7185',
+        dark: '#be123c',
+      },
+      dark: {
+        main: '#fb7185',
+        light: '#fda4af',
+        dark: '#f43f5e',
+      },
+    },
+    // Backgrounds
+    bg: {
+      light: {
+        default: '#f8f7ff',
+        paper: '#ffffff',
+      },
+      dark: {
+        default: '#0f1225',
+        paper: '#1a1d36',
+      },
+    },
+    // Text
+    text: {
+      light: {
+        primary: '#1e1b4b',
+        secondary: '#64748b',
+      },
+      dark: {
+        primary: '#e8e8f4',
+        secondary: '#94a3b8',
+      },
+    },
+    // Accent: Success, Warning, Error (harmonized)
+    success: mode === 'dark' ? '#34d399' : '#059669',
+    warning: mode === 'dark' ? '#fbbf24' : '#d97706',
+    error: mode === 'dark' ? '#f87171' : '#dc2626',
+    info: mode === 'dark' ? '#60a5fa' : '#2563eb',
+    // Borders
+    border: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : '#e0e2eb',
+    borderHover: mode === 'dark' ? 'rgba(255, 255, 255, 0.18)' : '#c7c9d9',
+    borderFocus: mode === 'dark' ? '#818cf8' : '#4f46e5',
+    // Surfaces
+    hoverBg: mode === 'dark' ? 'rgba(129, 140, 248, 0.08)' : 'rgba(79, 70, 229, 0.04)',
+    activeBg: mode === 'dark' ? 'rgba(129, 140, 248, 0.12)' : 'rgba(79, 70, 229, 0.08)',
+    stripeBg: mode === 'dark' ? 'rgba(255, 255, 255, 0.025)' : 'rgba(79, 70, 229, 0.02)',
+    // Drawer / Sidebar
+    drawerBg: mode === 'dark' ? '#161935' : '#ffffff',
+    // Input
+    inputBg: mode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : 'transparent',
+    // Table head
+    theadBg: mode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : 'rgba(79, 70, 229, 0.03)',
+  };
+
+  const p = mode === 'dark' ? colors.primary.dark : colors.primary.light;
+  const s = mode === 'dark' ? colors.secondary.dark : colors.secondary.light;
+  const bg = mode === 'dark' ? colors.bg.dark : colors.bg.light;
+  const txt = mode === 'dark' ? colors.text.dark : colors.text.light;
+
   return createTheme({
     palette: {
       mode,
       primary: {
-        main: mode === 'dark' ? '#6EA8FF' : '#1976d2',
-        light: mode === 'dark' ? '#8FB9FF' : '#42a5f5',
-        dark: mode === 'dark' ? '#3D7DFF' : '#1565c0',
+        main: p.main,
+        light: p.light,
+        dark: p.dark,
+        contrastText: p.contrastText,
       },
       secondary: {
-        main: mode === 'dark' ? '#f48fb1' : '#dc004e',
-        light: mode === 'dark' ? '#f8bbd9' : '#e91e63',
-        dark: mode === 'dark' ? '#f06292' : '#c51162',
+        main: s.main,
+        light: s.light,
+        dark: s.dark,
       },
+      success: { main: colors.success },
+      warning: { main: colors.warning },
+      error: { main: colors.error },
+      info: { main: colors.info },
       background: {
-        default: mode === 'dark' ? '#0D0F12' : '#fafafa',
-        paper: mode === 'dark' ? '#15181D' : '#ffffff',
+        default: bg.default,
+        paper: bg.paper,
       },
       text: {
-        primary: mode === 'dark' ? '#FFFFFF' : '#000000',
-        secondary: mode === 'dark' ? '#9AA4AF' : '#666666',
+        primary: txt.primary,
+        secondary: txt.secondary,
       },
     },
     zIndex: {
@@ -48,36 +131,18 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
       speedDial: 1050,
       appBar: 1100,
       drawer: 1300,
-      modal: 1500, // Popover/Menu가 Drawer 위로 오도록
+      modal: 1500,
       snackbar: 1400,
       tooltip: 1600,
     },
     typography: {
       fontFamily,
-      h1: {
-        fontSize: '2.5rem',
-        fontWeight: 500,
-      },
-      h2: {
-        fontSize: '2rem',
-        fontWeight: 500,
-      },
-      h3: {
-        fontSize: '1.75rem',
-        fontWeight: 500,
-      },
-      h4: {
-        fontSize: '1.5rem',
-        fontWeight: 500,
-      },
-      h5: {
-        fontSize: '1.25rem',
-        fontWeight: 500,
-      },
-      h6: {
-        fontSize: '1rem',
-        fontWeight: 500,
-      },
+      h1: { fontSize: '2.5rem', fontWeight: 600 },
+      h2: { fontSize: '2rem', fontWeight: 600 },
+      h3: { fontSize: '1.75rem', fontWeight: 600 },
+      h4: { fontSize: '1.5rem', fontWeight: 600 },
+      h5: { fontSize: '1.25rem', fontWeight: 600 },
+      h6: { fontSize: '1rem', fontWeight: 600 },
     },
     shape: {
       borderRadius: 0,
@@ -87,7 +152,9 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
         styleOverrides: {
           root: {
             boxShadow:
-              mode === 'dark' ? '0px 2px 4px rgba(0, 0, 0, 0.3)' : '0px 2px 4px rgba(0, 0, 0, 0.1)',
+              mode === 'dark'
+                ? '0 1px 0 rgba(255,255,255,0.06)'
+                : '0 1px 0 rgba(0,0,0,0.08)',
           },
         },
       },
@@ -101,7 +168,7 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
       MuiDrawer: {
         styleOverrides: {
           paper: {
-            backgroundColor: mode === 'dark' ? '#1e1e1e' : '#ffffff',
+            backgroundColor: colors.drawerBg,
             borderRight: 'none',
             borderRadius: 0,
           },
@@ -112,7 +179,9 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
           root: {
             borderRadius: 0,
             boxShadow:
-              mode === 'dark' ? '0px 2px 8px rgba(0, 0, 0, 0.3)' : '0px 2px 8px rgba(0, 0, 0, 0.1)',
+              mode === 'dark'
+                ? '0 1px 3px rgba(0,0,0,0.4)'
+                : '0 1px 3px rgba(0,0,0,0.08)',
           },
         },
       },
@@ -132,15 +201,14 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
               borderRadius: 0,
               fontWeight: 500,
               '&.Mui-selected': {
-                backgroundColor: mode === 'dark' ? '#6EA8FF' : '#1976d2',
-                color: '#fff',
+                backgroundColor: p.main,
+                color: p.contrastText,
                 '&:hover': {
-                  backgroundColor: mode === 'dark' ? '#5A96E6' : '#1565c0',
+                  backgroundColor: p.dark,
                 },
               },
               '&:hover': {
-                backgroundColor:
-                  mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)',
+                backgroundColor: colors.hoverBg,
               },
             },
           },
@@ -151,15 +219,15 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
           root: {
             '& .MuiOutlinedInput-root': {
               borderRadius: 0,
-              backgroundColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : 'inherit',
+              backgroundColor: colors.inputBg,
               '& fieldset': {
-                borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.12)',
+                borderColor: colors.border,
               },
               '&:hover fieldset': {
-                borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
+                borderColor: colors.borderHover,
               },
               '&.Mui-focused fieldset': {
-                borderColor: mode === 'dark' ? '#6EA8FF' : '#1976d2',
+                borderColor: colors.borderFocus,
               },
             },
           },
@@ -168,9 +236,9 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
       MuiInputLabel: {
         styleOverrides: {
           root: {
-            color: mode === 'dark' ? 'rgba(255, 255, 255, 0.7)' : undefined,
+            color: txt.secondary,
             '&.Mui-focused': {
-              color: mode === 'dark' ? '#6EA8FF' : undefined,
+              color: p.main,
             },
           },
         },
@@ -184,14 +252,12 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
                 borderBottom: 'none',
               },
             },
-            // Zebra stripes for better row separation
+            // Zebra stripes
             '&:nth-of-type(even)': {
-              backgroundColor:
-                mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : 'rgba(0, 0, 0, 0.025)',
+              backgroundColor: colors.stripeBg,
             },
             '&:hover': {
-              backgroundColor:
-                mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)',
+              backgroundColor: colors.hoverBg,
             },
           },
         },
@@ -202,11 +268,8 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
             borderBottom: 'none',
           },
           head: {
-            backgroundColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : 'rgba(0, 0, 0, 0.02)',
-            borderBottom:
-              mode === 'dark'
-                ? '1px solid rgba(255, 255, 255, 0.12)'
-                : '1px solid rgba(0, 0, 0, 0.12)',
+            backgroundColor: colors.theadBg,
+            borderBottom: `1px solid ${colors.border}`,
           },
         },
       },
@@ -214,9 +277,9 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
         styleOverrides: {
           root: {
             '& .MuiBackdrop-root': {
-              backgroundColor: mode === 'dark' ? 'rgba(0, 0, 0, 0.7)' : 'rgba(0, 0, 0, 0.5)',
+              backgroundColor: mode === 'dark' ? 'rgba(0,0,0,0.7)' : 'rgba(15,18,37,0.4)',
               backdropFilter: 'blur(8px)',
-              WebkitBackdropFilter: 'blur(8px)', // Safari support
+              WebkitBackdropFilter: 'blur(8px)',
             },
           },
           paper: {
@@ -227,13 +290,11 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
       MuiModal: {
         styleOverrides: {
           root: {
-            // Dialog와 Drawer에만 블러 효과 적용, Select는 제외
             '&:not(.MuiSelect-root) .MuiBackdrop-root': {
-              backgroundColor: mode === 'dark' ? 'rgba(0, 0, 0, 0.7)' : 'rgba(0, 0, 0, 0.5)',
+              backgroundColor: mode === 'dark' ? 'rgba(0,0,0,0.7)' : 'rgba(15,18,37,0.4)',
               backdropFilter: 'blur(8px)',
-              WebkitBackdropFilter: 'blur(8px)', // Safari support
+              WebkitBackdropFilter: 'blur(8px)',
             },
-            // Select 드롭다운용 투명한 배경
             '&.MuiSelect-root .MuiBackdrop-root': {
               backgroundColor: 'transparent',
             },
@@ -244,7 +305,6 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
         defaultProps: {
           MenuProps: {
             disableScrollLock: true,
-            // Portal은 기본값(false)을 사용하고, z-index는 theme.zIndex.modal을 따르게 함
             BackdropProps: {
               style: {
                 backgroundColor: 'transparent',
@@ -294,6 +354,37 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
               WebkitBackdropFilter: 'none',
             },
             invisible: true,
+          },
+        },
+      },
+      MuiSwitch: {
+        styleOverrides: {
+          switchBase: {
+            '&.Mui-checked': {
+              color: p.main,
+              '& + .MuiSwitch-track': {
+                backgroundColor: p.main,
+                opacity: 0.5,
+              },
+            },
+          },
+        },
+      },
+      MuiTab: {
+        styleOverrides: {
+          root: {
+            textTransform: 'none',
+            fontWeight: 500,
+            '&.Mui-selected': {
+              color: p.main,
+            },
+          },
+        },
+      },
+      MuiTabs: {
+        styleOverrides: {
+          indicator: {
+            backgroundColor: p.main,
           },
         },
       },

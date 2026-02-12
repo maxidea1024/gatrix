@@ -1610,37 +1610,16 @@ const FeatureFlagsPage: React.FC = () => {
                             return (
                               <React.Fragment key={col.id}>
                                 <TableCell>{t('featureFlags.status')}</TableCell>
-                                {/* Environment columns - right after status */}
-                                {environments.map((env) => (
+                                {/* Merged environment columns header */}
+                                {environments.length > 0 && (
                                   <TableCell
-                                    key={env.environment}
                                     align="center"
-                                    sx={{
-                                      minWidth: 70,
-                                      maxWidth: 100,
-                                      px: 0.5,
-                                    }}
+                                    colSpan={environments.length}
+                                    sx={{ px: 0.5 }}
                                   >
-                                    <Tooltip title={`${env.displayName} (${env.environment})`}>
-                                      <Chip
-                                        label={env.displayName}
-                                        size="small"
-                                        sx={{
-                                          bgcolor: env.color || '#888',
-                                          color: getContrastColor(env.color || '#888'),
-                                          fontSize: '0.7rem',
-                                          height: 20,
-                                          maxWidth: 90,
-                                          '& .MuiChip-label': {
-                                            overflow: 'hidden',
-                                            textOverflow: 'ellipsis',
-                                            whiteSpace: 'nowrap',
-                                          },
-                                        }}
-                                      />
-                                    </Tooltip>
+                                    {t('featureFlags.enabledByEnv')}
                                   </TableCell>
-                                ))}
+                                )}
                               </React.Fragment>
                             );
                           case 'createdBy':
@@ -1817,11 +1796,24 @@ const FeatureFlagsPage: React.FC = () => {
                                     })()}
                                   </TableCell>
                                   {/* Environment columns - right after status */}
-                                  {environments.map((env) => {
+                                  {environments.map((env, envIndex) => {
                                     const isEnabled = getEnvEnabled(flag, env.environment);
                                     const tooltipText = `${t('featureFlags.toggleTooltip', { env: env.displayName })}\n${isEnabled ? t('featureFlags.toggleTooltipEnabled') : t('featureFlags.toggleTooltipDisabled')}`;
                                     return (
-                                      <TableCell key={env.environment} align="center">
+                                      <TableCell
+                                        key={env.environment}
+                                        align="center"
+                                        sx={{
+                                          px: 0.25,
+                                          py: 0.5,
+                                          borderLeft: (theme) =>
+                                            `1px dashed ${theme.palette.divider}`,
+                                          ...(envIndex === environments.length - 1 && {
+                                            borderRight: (theme: any) =>
+                                              `1px dashed ${theme.palette.divider}`,
+                                          }),
+                                        }}
+                                      >
                                         <Box
                                           sx={{
                                             display: 'flex',
@@ -1849,16 +1841,15 @@ const FeatureFlagsPage: React.FC = () => {
                                                 key={`${flag.flagName}-${env.environment}-${isEnabled}`}
                                                 size="small"
                                                 checked={isEnabled}
-                                                onChange={(e: any) => {
+                                                onChange={() => {
                                                   handleToggle(flag, env.environment, isEnabled);
-                                                  if (e.target) (e.target as any).blur();
                                                 }}
                                                 disabled={flag.isArchived || !canManage}
                                                 onClick={(e) => {
                                                   e.stopPropagation();
-                                                  (e.currentTarget as any).blur();
                                                 }}
                                                 color={env.color}
+                                                label={env.displayName}
                                               />
                                             </span>
                                           </Tooltip>
