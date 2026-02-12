@@ -41,7 +41,7 @@ export type ConstraintOperator =
   | 'exists'
   | 'not_exists'
   // Array operators
-  | 'arr_includes'
+  | 'arr_any'
   | 'arr_all'
   | 'arr_empty';
 

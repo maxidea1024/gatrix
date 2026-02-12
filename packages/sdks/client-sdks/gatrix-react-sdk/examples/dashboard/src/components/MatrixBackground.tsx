@@ -24,9 +24,9 @@ const MatrixBackground: React.FC = () => {
 
       const newColumns = Math.floor(canvas.width / fontSize);
       if (newColumns !== columns) {
-        const newDrops = new Array(newColumns).fill(0).map((_, i) =>
-          i < drops.length ? drops[i] : Math.floor(Math.random() * -100)
-        );
+        const newDrops = new Array(newColumns)
+          .fill(0)
+          .map((_, i) => (i < drops.length ? drops[i] : Math.floor(Math.random() * -100)));
         columns = newColumns;
         drops = newDrops;
       }

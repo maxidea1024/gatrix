@@ -25,13 +25,7 @@ function formatTimeAgo(date: Date | null): string {
   return 'just now';
 }
 
-function FlagCard({
-  flag,
-  viewMode,
-  initialVersion,
-  lastChangedTime,
-  onSelect,
-}: FlagCardProps) {
+function FlagCard({ flag, viewMode, initialVersion, lastChangedTime, onSelect }: FlagCardProps) {
   const value = flag.variant?.value;
   const hasValue = value !== undefined && value !== null;
   const isEmptyString = value === '';
@@ -89,9 +83,7 @@ function FlagCard({
 
   // Calculate change count from initial version
   const changeCount =
-    initialVersion !== null
-      ? Math.max(0, (flag.version || 0) - initialVersion)
-      : 0;
+    initialVersion !== null ? Math.max(0, (flag.version || 0) - initialVersion) : 0;
 
   if (viewMode === 'list') {
     return (
@@ -110,27 +102,17 @@ function FlagCard({
         </div>
         <div className="col-version">{flag.version || 0}</div>
         <div className="col-changes">
-          {changeCount > 0 ? (
-            <span className="has-changes">+{changeCount}</span>
-          ) : (
-            '-'
-          )}
+          {changeCount > 0 ? <span className="has-changes">+{changeCount}</span> : '-'}
         </div>
         <div className="col-time">{timeAgo}</div>
         <div className="col-type">
-          <span className="pixel-chip type-chip is-mini">
-            {flag.valueType || 'none'}
-          </span>
+          <span className="pixel-chip type-chip is-mini">{flag.valueType || 'none'}</span>
         </div>
         <div className="col-variant">
-          <span className="pixel-chip variant-chip is-mini">
-            {flag.variant?.name || '-'}
-          </span>
+          <span className="pixel-chip variant-chip is-mini">{flag.variant?.name || '-'}</span>
         </div>
         <div className="col-payload">
-          <span className="payload-preview">
-            {hasValue ? formatValue(value) : '-'}
-          </span>
+          <span className="payload-preview">{hasValue ? formatValue(value) : '-'}</span>
         </div>
       </div>
     );
@@ -143,17 +125,12 @@ function FlagCard({
         onClick={onSelect}
         title={flag.name}
       >
-        <div
-          className={`flag-card-inner ${flag.enabled ? 'is-enabled' : 'is-disabled'}`}
-        >
+        <div className={`flag-card-inner ${flag.enabled ? 'is-enabled' : 'is-disabled'}`}>
           <div className="flag-header">
             <span className="flag-name" style={{ fontSize: '10px' }}>
               <span className="status-dot"></span> {flag.name}
             </span>
-            <span
-              className="pixel-chip type-chip is-mini"
-              style={{ fontSize: '6px' }}
-            >
+            <span className="pixel-chip type-chip is-mini" style={{ fontSize: '6px' }}>
               {flag.valueType || 'none'}
             </span>
           </div>
@@ -164,7 +141,13 @@ function FlagCard({
             >
               <span
                 className="pixel-chip variant-chip is-mini"
-                style={{ fontSize: '8px', width: '100%', textAlign: 'center', color: '#000', fontWeight: 'bold' }}
+                style={{
+                  fontSize: '8px',
+                  width: '100%',
+                  textAlign: 'center',
+                  color: '#000',
+                  fontWeight: 'bold',
+                }}
               >
                 {flag.variant?.name || '-'}
               </span>
@@ -199,9 +182,7 @@ function FlagCard({
 
           <div className="flag-detail">
             <span className="flag-detail-label">Changes</span>
-            <span
-              className={`flag-detail-value ${changeCount > 0 ? 'has-changes' : ''}`}
-            >
+            <span className={`flag-detail-value ${changeCount > 0 ? 'has-changes' : ''}`}>
               {changeCount > 0 ? `+${changeCount}` : '-'}
             </span>
           </div>
@@ -221,9 +202,7 @@ function FlagCard({
           <div className="flag-detail">
             <span className="flag-detail-label">Variant</span>
             <span className="flag-detail-value">
-              <span className="pixel-chip variant-chip">
-                {flag.variant?.name || '-'}
-              </span>
+              <span className="pixel-chip variant-chip">{flag.variant?.name || '-'}</span>
             </span>
           </div>
 

@@ -18,21 +18,21 @@ import { EVENTS, type EvaluatedFlag } from '@gatrix/js-client-sdk';
  * ```
  */
 export function allFlags(): Readable<EvaluatedFlag[]> {
-    const client = getGatrixClient();
+  const client = getGatrixClient();
 
-    return readable<EvaluatedFlag[]>(client.features.getAllFlags(), (set) => {
-        const update = () => {
-            set(client.features.getAllFlags());
-        };
+  return readable<EvaluatedFlag[]>(client.features.getAllFlags(), (set) => {
+    const update = () => {
+      set(client.features.getAllFlags());
+    };
 
-        client.on(EVENTS.FLAGS_CHANGE, update);
-        client.on(EVENTS.FLAGS_READY, update);
-        client.on(EVENTS.FLAGS_SYNC, update);
+    client.on(EVENTS.FLAGS_CHANGE, update);
+    client.on(EVENTS.FLAGS_READY, update);
+    client.on(EVENTS.FLAGS_SYNC, update);
 
-        return () => {
-            client.off(EVENTS.FLAGS_CHANGE, update);
-            client.off(EVENTS.FLAGS_READY, update);
-            client.off(EVENTS.FLAGS_SYNC, update);
-        };
-    });
+    return () => {
+      client.off(EVENTS.FLAGS_CHANGE, update);
+      client.off(EVENTS.FLAGS_READY, update);
+      client.off(EVENTS.FLAGS_SYNC, update);
+    };
+  });
 }

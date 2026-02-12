@@ -1806,7 +1806,7 @@
 "@gatrix/server-sdk@file:packages/sdks/server-sdk":
   version "1.0.65"
   dependencies:
-    "@gatrix/shared" "file:../../../Users/jhseo/AppData/Local/Yarn/Cache/v6/npm-@gatrix-server-sdk-1.0.65-fa13dafa-b59d-4e99-a722-40eef9631fb6-1770781742376/node_modules/shared"
+    "@gatrix/shared" "file:../../../Users/jhseo/AppData/Local/Yarn/Cache/v6/npm-@gatrix-server-sdk-1.0.65-8148fb69-28d2-4c3e-b981-d305f05d189d-1770860148313/node_modules/shared"
     axios "^1.7.9"
     ioredis "^5.8.2"
     murmurhash "^2.0.1"
@@ -11916,6 +11916,11 @@ prelude-ls@^1.2.1:
   version "1.2.1"
   resolved "https://registry.npmjs.org/prelude-ls/-/prelude-ls-1.2.1.tgz"
   integrity sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==
+
+prettier@^3.8.1:
+  version "3.8.1"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-3.8.1.tgz#edf48977cf991558f4fcbd8a3ba6015ba2a3a173"
+  integrity sha512-UOnG6LftzbdaHZcKoPFtOcCKztrQ57WkHDeRD9t/PTQtmT0NHSeWWepj6pS0z/N7+08BHFDQVUrfmfMRcZwbMg==
 
 pretty-bytes@^5.6.0:
   version "5.6.0"

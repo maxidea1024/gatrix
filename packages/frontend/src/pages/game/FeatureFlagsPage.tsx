@@ -71,9 +71,6 @@ import {
   OpenInNew as OpenInNewIcon,
   BarChart as MetricsIcon,
   HelpOutline as HelpOutlineIcon,
-  Abc as StringIcon,
-  Numbers as NumberIcon,
-  DataObject as JsonIcon,
   Block as BlockIcon,
   ExpandMore as ExpandMoreIcon,
   PlayArrow as PlaygroundIcon,
@@ -81,6 +78,7 @@ import {
   SwapVert as ImportExportIcon,
   Tune as RemoteConfigIcon,
 } from '@mui/icons-material';
+import FieldTypeIcon from '../../components/common/FieldTypeIcon';
 import ValueEditorField from '../../components/common/ValueEditorField';
 import BooleanSwitch from '../../components/common/BooleanSwitch';
 import { useTranslation } from 'react-i18next';
@@ -127,7 +125,11 @@ function coerceValue(value: any, valueType: string): any {
       return Number(value) || 0;
     case 'json':
       if (typeof value === 'object') return value;
-      try { return JSON.parse(value); } catch { return {}; }
+      try {
+        return JSON.parse(value);
+      } catch {
+        return {};
+      }
     default:
       return String(value);
   }
@@ -152,19 +154,7 @@ const getStatusIcon = (status: string) => {
 
 // Icon helpers for valueType filter options
 const getValueTypeIcon = (type: string) => {
-  const iconProps = { sx: { fontSize: 16 } };
-  switch (type) {
-    case 'boolean':
-      return <CheckCircleIcon {...iconProps} color="success" />;
-    case 'string':
-      return <StringIcon {...iconProps} color="info" />;
-    case 'number':
-      return <NumberIcon {...iconProps} color="success" />;
-    case 'json':
-      return <JsonIcon {...iconProps} color="warning" />;
-    default:
-      return null;
-  }
+  return <FieldTypeIcon type={type} size={16} />;
 };
 
 const getTypeIconSmall = (type: string) => getFlagTypeIcon(type, 16);
@@ -202,7 +192,13 @@ const FeatureFlagsPage: React.FC = () => {
     flagName: '',
     displayName: '',
     description: '',
-    flagType: 'release' as 'release' | 'experiment' | 'operational' | 'killSwitch' | 'permission' | 'remoteConfig',
+    flagType: 'release' as
+      | 'release'
+      | 'experiment'
+      | 'operational'
+      | 'killSwitch'
+      | 'permission'
+      | 'remoteConfig',
     tags: [] as string[],
     impressionDataEnabled: false,
     valueType: 'boolean' as 'boolean' | 'string' | 'number' | 'json',
@@ -244,9 +240,7 @@ const FeatureFlagsPage: React.FC = () => {
   const [cloningFlag, setCloningFlag] = useState<FeatureFlag | null>(null);
   const [cloneNewName, setCloneNewName] = useState('');
   const [cloning, setCloning] = useState(false);
-  const [newFlagJsonError, setNewFlagJsonError] = useState<
-    string | null
-  >(null);
+  const [newFlagJsonError, setNewFlagJsonError] = useState<string | null>(null);
 
   // Column settings state
   const [columnSettingsAnchor, setColumnSettingsAnchor] = useState<null | HTMLElement>(null);
@@ -296,10 +290,6 @@ const FeatureFlagsPage: React.FC = () => {
     const filter = activeFilters.find((f) => f.key === 'tag');
     return filter?.value as string[] | undefined;
   }, [activeFilters]);
-
-
-
-
 
   // Filter definitions
   const availableFilterDefinitions: FilterDefinition[] = useMemo(
@@ -377,10 +367,26 @@ const FeatureFlagsPage: React.FC = () => {
         label: t('featureFlags.valueType'),
         type: 'multiselect',
         options: [
-          { value: 'boolean', label: t('featureFlags.valueTypes.boolean'), icon: getValueTypeIcon('boolean') },
-          { value: 'string', label: t('featureFlags.valueTypes.string'), icon: getValueTypeIcon('string') },
-          { value: 'number', label: t('featureFlags.valueTypes.number'), icon: getValueTypeIcon('number') },
-          { value: 'json', label: t('featureFlags.valueTypes.json'), icon: getValueTypeIcon('json') },
+          {
+            value: 'boolean',
+            label: t('featureFlags.valueTypes.boolean'),
+            icon: getValueTypeIcon('boolean'),
+          },
+          {
+            value: 'string',
+            label: t('featureFlags.valueTypes.string'),
+            icon: getValueTypeIcon('string'),
+          },
+          {
+            value: 'number',
+            label: t('featureFlags.valueTypes.number'),
+            icon: getValueTypeIcon('number'),
+          },
+          {
+            value: 'json',
+            label: t('featureFlags.valueTypes.json'),
+            icon: getValueTypeIcon('json'),
+          },
         ],
       },
     ],
@@ -473,8 +479,6 @@ const FeatureFlagsPage: React.FC = () => {
             tagFilter.some((tag) => f.tags?.includes(tag))
           );
         }
-
-
 
         // Sort favorites first (always show favorites at top, then apply normal sort)
         filteredFlags.sort((a, b) => {
@@ -783,7 +787,6 @@ const FeatureFlagsPage: React.FC = () => {
     flagTypeFilter,
     statusFilter,
     tagFilter,
-
   ]);
 
   useEffect(() => {
@@ -1164,11 +1167,11 @@ const FeatureFlagsPage: React.FC = () => {
       enqueueSnackbar(
         markAsStale
           ? t('featureFlags.bulkMarkStaleSuccess', {
-            count: targetFlags.length,
-          })
+              count: targetFlags.length,
+            })
           : t('featureFlags.bulkClearStaleSuccess', {
-            count: targetFlags.length,
-          }),
+              count: targetFlags.length,
+            }),
         { variant: 'success' }
       );
       setSelectedFlags(new Set());
@@ -1198,13 +1201,13 @@ const FeatureFlagsPage: React.FC = () => {
       enqueueSnackbar(
         enable
           ? t('featureFlags.bulkEnableSuccess', {
-            count: targetFlags.length,
-            env: environment,
-          })
+              count: targetFlags.length,
+              env: environment,
+            })
           : t('featureFlags.bulkDisableSuccess', {
-            count: targetFlags.length,
-            env: environment,
-          }),
+              count: targetFlags.length,
+              env: environment,
+            }),
         { variant: 'success' }
       );
       setSelectedFlags(new Set());
@@ -1408,7 +1411,7 @@ const FeatureFlagsPage: React.FC = () => {
                 </MenuItem>
                 <MenuItem onClick={() => handleOpenCreateDialog(true)}>
                   <ListItemIcon>
-                    <JsonIcon fontSize="small" />
+                    <FieldTypeIcon type="json" size={20} />
                   </ListItemIcon>
                   <ListItemText
                     primary={t('featureFlags.createRemoteConfigOption')}
@@ -1901,19 +1904,9 @@ const FeatureFlagsPage: React.FC = () => {
                               return (
                                 <TableCell key={col.id}>
                                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                    {flag.valueType === 'boolean' ? (
-                                      <CheckCircleIcon fontSize="small" color="success" />
-                                    ) : flag.valueType === 'json' ? (
-                                      <JsonIcon fontSize="small" color="secondary" />
-                                    ) : flag.valueType === 'number' ? (
-                                      <NumberIcon fontSize="small" color="info" />
-                                    ) : (
-                                      <StringIcon fontSize="small" color="action" />
-                                    )}
+                                    <FieldTypeIcon type={flag.valueType || 'string'} size={18} />
                                     <Typography variant="body2">
-                                      {t(
-                                        `featureFlags.valueTypes.${flag.valueType || 'string'}`
-                                      )}
+                                      {t(`featureFlags.valueTypes.${flag.valueType || 'string'}`)}
                                     </Typography>
                                   </Box>
                                 </TableCell>
@@ -2374,7 +2367,9 @@ const FeatureFlagsPage: React.FC = () => {
             <Box>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1 }}>
                 <Typography variant="subtitle2">
-                  {newFlag.flagType === 'remoteConfig' ? t('featureFlags.remoteConfigFlagName') : t('featureFlags.flagName')}{' '}
+                  {newFlag.flagType === 'remoteConfig'
+                    ? t('featureFlags.remoteConfigFlagName')
+                    : t('featureFlags.flagName')}{' '}
                   <Box component="span" sx={{ color: 'error.main' }}>
                     *
                   </Box>
@@ -2391,7 +2386,11 @@ const FeatureFlagsPage: React.FC = () => {
                     flagName: e.target.value.replace(/[^a-zA-Z0-9_-]/g, ''),
                   })
                 }
-                helperText={newFlag.flagType === 'remoteConfig' ? t('featureFlags.remoteConfigFlagNameHelp') : t('featureFlags.flagNameHelp')}
+                helperText={
+                  newFlag.flagType === 'remoteConfig'
+                    ? t('featureFlags.remoteConfigFlagNameHelp')
+                    : t('featureFlags.flagNameHelp')
+                }
                 inputProps={{ maxLength: 100 }}
               />
             </Box>
@@ -2399,10 +2398,18 @@ const FeatureFlagsPage: React.FC = () => {
             {/* Display Name */}
             <TextField
               fullWidth
-              label={newFlag.flagType === 'remoteConfig' ? t('featureFlags.remoteConfigDisplayName') : t('featureFlags.displayName')}
+              label={
+                newFlag.flagType === 'remoteConfig'
+                  ? t('featureFlags.remoteConfigDisplayName')
+                  : t('featureFlags.displayName')
+              }
               value={newFlag.displayName || ''}
               onChange={(e) => setNewFlag({ ...newFlag, displayName: e.target.value })}
-              helperText={newFlag.flagType === 'remoteConfig' ? t('featureFlags.remoteConfigDisplayNameHelp') : t('featureFlags.displayNameHelp')}
+              helperText={
+                newFlag.flagType === 'remoteConfig'
+                  ? t('featureFlags.remoteConfigDisplayNameHelp')
+                  : t('featureFlags.displayNameHelp')
+              }
             />
 
             {/* Description */}
@@ -2413,7 +2420,11 @@ const FeatureFlagsPage: React.FC = () => {
               label={t('featureFlags.description')}
               value={newFlag.description}
               onChange={(e) => setNewFlag({ ...newFlag, description: e.target.value })}
-              helperText={newFlag.flagType === 'remoteConfig' ? t('featureFlags.remoteConfigDescriptionHelp') : t('featureFlags.descriptionHelp')}
+              helperText={
+                newFlag.flagType === 'remoteConfig'
+                  ? t('featureFlags.remoteConfigDescriptionHelp')
+                  : t('featureFlags.descriptionHelp')
+              }
             />
 
             {/* Tags - moved here after description */}
@@ -2565,7 +2576,6 @@ const FeatureFlagsPage: React.FC = () => {
               </FormControl>
             )}
 
-
             {/* Value Settings Group */}
             <Paper variant="outlined" sx={{ p: 2 }}>
               <Stack spacing={2}>
@@ -2612,25 +2622,25 @@ const FeatureFlagsPage: React.FC = () => {
                     >
                       <MenuItem value="boolean">
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <CheckCircleIcon sx={{ fontSize: 16, color: 'success.main' }} />
+                          <FieldTypeIcon type="boolean" size={16} />
                           {t('featureFlags.valueTypes.boolean')}
                         </Box>
                       </MenuItem>
                       <MenuItem value="string">
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <StringIcon sx={{ fontSize: 16, color: 'info.main' }} />
+                          <FieldTypeIcon type="string" size={16} />
                           {t('featureFlags.valueTypes.string')}
                         </Box>
                       </MenuItem>
                       <MenuItem value="number">
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <NumberIcon sx={{ fontSize: 16, color: 'success.main' }} />
+                          <FieldTypeIcon type="number" size={16} />
                           {t('featureFlags.valueTypes.number')}
                         </Box>
                       </MenuItem>
                       <MenuItem value="json">
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <JsonIcon sx={{ fontSize: 16, color: 'warning.main' }} />
+                          <FieldTypeIcon type="json" size={16} />
                           {t('featureFlags.valueTypes.json')}
                         </Box>
                       </MenuItem>
@@ -2753,7 +2763,9 @@ const FeatureFlagsPage: React.FC = () => {
 
             {/* Info Alert */}
             <Alert severity="info">
-              {newFlag.flagType === 'remoteConfig' ? t('featureFlags.remoteConfigCreateDetailSettingsInfo') : t('featureFlags.createFlagDetailSettingsInfo')}
+              {newFlag.flagType === 'remoteConfig'
+                ? t('featureFlags.remoteConfigCreateDetailSettingsInfo')
+                : t('featureFlags.createFlagDetailSettingsInfo')}
             </Alert>
           </Stack>
         </Box>
@@ -2782,13 +2794,15 @@ const FeatureFlagsPage: React.FC = () => {
             }
             startIcon={creating ? <CircularProgress size={20} /> : undefined}
           >
-            {newFlag.flagType === 'remoteConfig' ? t('featureFlags.createRemoteConfig') : t('featureFlags.createFlag')}
+            {newFlag.flagType === 'remoteConfig'
+              ? t('featureFlags.createRemoteConfig')
+              : t('featureFlags.createFlag')}
           </Button>
         </Box>
-      </ResizableDrawer >
+      </ResizableDrawer>
 
       {/* Column Settings Dialog */}
-      < ColumnSettingsDialog
+      <ColumnSettingsDialog
         open={Boolean(columnSettingsAnchor)}
         anchorEl={columnSettingsAnchor}
         columns={columns}
@@ -2958,7 +2972,7 @@ const FeatureFlagsPage: React.FC = () => {
         initialFlags={playgroundInitialFlags}
         autoExecute={playgroundAutoExecute}
       />
-    </Box >
+    </Box>
   );
 };
 

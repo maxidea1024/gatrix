@@ -390,27 +390,15 @@ export class Environment extends Model implements EnvironmentData {
           this.where('varKey', 'like', 'kv:%').orWhere('varKey', 'like', '$%');
         });
       }),
-      safeQuery<{ id: string; flagId: string }>('g_feature_flag_environments', [
-        'id',
-        'flagId',
-      ]),
+      safeQuery<{ id: string; flagId: string }>('g_feature_flag_environments', ['id', 'flagId']),
       safeQuery<{ id: string; strategyName: string }>('g_feature_strategies', [
         'id',
         'strategyName',
       ]),
-      safeQuery<{ id: string; variantName: string }>('g_feature_variants', [
-        'id',
-        'variantName',
-      ]),
-      safeQuery<{ id: string; segmentName: string }>('g_feature_segments', [
-        'id',
-        'segmentName',
-      ]),
+      safeQuery<{ id: string; variantName: string }>('g_feature_variants', ['id', 'variantName']),
+      safeQuery<{ id: string; segmentName: string }>('g_feature_segments', ['id', 'segmentName']),
       safeQuery<{ id: string; flagName: string }>('g_feature_metrics', ['id', 'flagName']),
-      safeQuery<{ id: string; flagName: string }>('g_feature_variant_metrics', [
-        'id',
-        'flagName',
-      ]),
+      safeQuery<{ id: string; flagName: string }>('g_feature_variant_metrics', ['id', 'flagName']),
       safeQuery<{ id: number; appName: string }>('NetworkTraffic', ['id', 'appName']),
       safeQuery<{ id: number; flagName: string }>('unknown_flags', ['id', 'flagName']),
       safeQuery<{ id: string; title: string }>('g_change_requests', ['id', 'title']),

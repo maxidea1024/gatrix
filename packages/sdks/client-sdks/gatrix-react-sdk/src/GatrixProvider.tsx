@@ -60,8 +60,8 @@ const GatrixProvider: FC<PropsWithChildren<GatrixProviderProps>> = ({
     Boolean(
       gatrixClient
         ? (customConfig?.features?.bootstrap &&
-          customConfig?.features?.bootstrapOverride !== false) ||
-        gatrixClient.isReady?.()
+            customConfig?.features?.bootstrapOverride !== false) ||
+            gatrixClient.isReady?.()
         : config.features?.bootstrap && config.features?.bootstrapOverride !== false
     )
   );

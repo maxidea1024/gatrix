@@ -379,7 +379,6 @@ class FeatureFlagService {
 
     const updated = await this.getFlag(environment, flagName);
 
-
     // Audit log
     await AuditLogModel.create({
       action: 'feature_flag.update',

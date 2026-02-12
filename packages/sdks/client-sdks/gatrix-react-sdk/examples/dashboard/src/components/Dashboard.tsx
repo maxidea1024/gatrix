@@ -41,8 +41,14 @@ function Dashboard({ config }: DashboardProps) {
     cachedFlagsRef.current = rawFlags;
   }
   const flags = cachedFlagsRef.current;
-  const { flagsReady, flagsError, isExplicitSyncEnabled, hasPendingSyncFlags, fetchFlags, syncFlags } =
-    useGatrixContext();
+  const {
+    flagsReady,
+    flagsError,
+    isExplicitSyncEnabled,
+    hasPendingSyncFlags,
+    fetchFlags,
+    syncFlags,
+  } = useGatrixContext();
   const client = useGatrixClient();
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
   const [stats, setStats] = useState<Stats | null>(null);
@@ -54,7 +60,10 @@ function Dashboard({ config }: DashboardProps) {
   const [context, setContext] = useState<Record<string, any>>({});
   const [isFetching, setIsFetching] = useState(false);
   const [viewMode, setViewMode] = useState<'detailed' | 'simple' | 'list'>(() => {
-    return (localStorage.getItem('gatrix-dashboard-view-mode') as 'detailed' | 'simple' | 'list') || 'simple';
+    return (
+      (localStorage.getItem('gatrix-dashboard-view-mode') as 'detailed' | 'simple' | 'list') ||
+      'simple'
+    );
   });
   const [searchInput, setSearchInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
@@ -156,7 +165,7 @@ function Dashboard({ config }: DashboardProps) {
   // Get error message for display - only show when currently in error state
   const isInErrorState = stats?.sdkState === 'error';
   const errorMessage = isInErrorState
-    ? (flagsError?.message || (stats?.lastError as Error)?.message || 'Unknown error')
+    ? flagsError?.message || (stats?.lastError as Error)?.message || 'Unknown error'
     : null;
 
   // Check if we haven't fetched any flags yet (no cached data either)
@@ -165,7 +174,9 @@ function Dashboard({ config }: DashboardProps) {
   const [selectedFlag, setSelectedFlag] = useState<EvaluatedFlag | null>(null);
 
   return (
-    <div className={`dashboard-content ${showRecoveryEffect ? 'recovery-shimmer' : ''} ${showErrorEffect ? 'error-shimmer' : ''}`}>
+    <div
+      className={`dashboard-content ${showRecoveryEffect ? 'recovery-shimmer' : ''} ${showErrorEffect ? 'error-shimmer' : ''}`}
+    >
       {selectedFlag && (
         <FlagDetailModal flag={selectedFlag} onClose={() => setSelectedFlag(null)} />
       )}
@@ -184,7 +195,8 @@ function Dashboard({ config }: DashboardProps) {
       <section className="flags-section">
         <div className="nes-container is-dark with-title">
           <p className="title" style={{ backgroundColor: '#000' }}>
-            FEATURE FLAGS ({filteredFlags.length}{searchQuery ? `/${flags.length}` : ''})
+            FEATURE FLAGS ({filteredFlags.length}
+            {searchQuery ? `/${flags.length}` : ''})
           </p>
 
           <div
@@ -209,7 +221,10 @@ function Dashboard({ config }: DashboardProps) {
               {searchInput && (
                 <button
                   type="button"
-                  onClick={() => { setSearchInput(''); setSearchQuery(''); }}
+                  onClick={() => {
+                    setSearchInput('');
+                    setSearchQuery('');
+                  }}
                   style={{
                     position: 'absolute',
                     right: '8px',

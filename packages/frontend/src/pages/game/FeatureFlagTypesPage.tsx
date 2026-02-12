@@ -197,9 +197,19 @@ const FeatureFlagTypesPage: React.FC = () => {
                     </TableCell>
                     {canManage && (
                       <TableCell align="center">
-                        <Tooltip title={type.flagType === 'remoteConfig' ? t('featureFlags.systemTypeCannotEdit') : t('common.edit')}>
+                        <Tooltip
+                          title={
+                            type.flagType === 'remoteConfig'
+                              ? t('featureFlags.systemTypeCannotEdit')
+                              : t('common.edit')
+                          }
+                        >
                           <span>
-                            <IconButton size="small" onClick={() => handleEdit(type)} disabled={type.flagType === 'remoteConfig'}>
+                            <IconButton
+                              size="small"
+                              onClick={() => handleEdit(type)}
+                              disabled={type.flagType === 'remoteConfig'}
+                            >
                               <EditIcon fontSize="small" />
                             </IconButton>
                           </span>
@@ -237,9 +247,9 @@ const FeatureFlagTypesPage: React.FC = () => {
                       setEditingType((prev) =>
                         prev
                           ? {
-                            ...prev,
-                            lifetimeDays: e.target.checked ? null : 40,
-                          }
+                              ...prev,
+                              lifetimeDays: e.target.checked ? null : 40,
+                            }
                           : prev
                       )
                     }

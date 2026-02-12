@@ -245,5 +245,3 @@ export const ORB_MAP: (string | null)[][] = [
   [BK, '#9261ff', '#9261ff', '#9261ff', '#9261ff', BK, _],
   [_, BK, BK, BK, BK, _, _, _],
 ];
-
-

@@ -2,7 +2,13 @@ import api from './api';
 
 // ==================== Types ====================
 
-export type FlagType = 'release' | 'experiment' | 'operational' | 'killSwitch' | 'permission' | 'remoteConfig'; // Purpose
+export type FlagType =
+  | 'release'
+  | 'experiment'
+  | 'operational'
+  | 'killSwitch'
+  | 'permission'
+  | 'remoteConfig'; // Purpose
 export type FlagStatus = 'enabled' | 'disabled' | 'archived';
 
 // Per-environment settings

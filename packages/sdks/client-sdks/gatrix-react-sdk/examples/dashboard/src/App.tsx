@@ -17,22 +17,34 @@ let logIdCounter = 0;
 function createCaptureLogger(logsRef: React.MutableRefObject<LogEntry[]>, forceUpdate: () => void) {
   return {
     debug(message: string, ...args: any[]) {
-      logsRef.current = [...logsRef.current, { id: logIdCounter++, level: 'debug' as const, message, timestamp: new Date(), args }];
+      logsRef.current = [
+        ...logsRef.current,
+        { id: logIdCounter++, level: 'debug' as const, message, timestamp: new Date(), args },
+      ];
       forceUpdate();
       console.debug(`[GatrixClient] ${message}`, ...args);
     },
     info(message: string, ...args: any[]) {
-      logsRef.current = [...logsRef.current, { id: logIdCounter++, level: 'info' as const, message, timestamp: new Date(), args }];
+      logsRef.current = [
+        ...logsRef.current,
+        { id: logIdCounter++, level: 'info' as const, message, timestamp: new Date(), args },
+      ];
       forceUpdate();
       console.info(`[GatrixClient] ${message}`, ...args);
     },
     warn(message: string, ...args: any[]) {
-      logsRef.current = [...logsRef.current, { id: logIdCounter++, level: 'warn' as const, message, timestamp: new Date(), args }];
+      logsRef.current = [
+        ...logsRef.current,
+        { id: logIdCounter++, level: 'warn' as const, message, timestamp: new Date(), args },
+      ];
       forceUpdate();
       console.warn(`[GatrixClient] ${message}`, ...args);
     },
     error(message: string, ...args: any[]) {
-      logsRef.current = [...logsRef.current, { id: logIdCounter++, level: 'error' as const, message, timestamp: new Date(), args }];
+      logsRef.current = [
+        ...logsRef.current,
+        { id: logIdCounter++, level: 'error' as const, message, timestamp: new Date(), args },
+      ];
       forceUpdate();
       console.error(`[GatrixClient] ${message}`, ...args);
     },
@@ -146,7 +158,15 @@ function App() {
           }}
         >
           <div style={{ display: 'flex', height: '100%', overflow: 'hidden' }}>
-            <div style={{ flex: 1, minWidth: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+            <div
+              style={{
+                flex: 1,
+                minWidth: 0,
+                overflow: 'hidden',
+                display: 'flex',
+                flexDirection: 'column',
+              }}
+            >
               {showGame === 'slot' ? (
                 <SlotMachineGame onExit={() => setShowGame(false)} />
               ) : showGame === 'defense' ? (
@@ -206,9 +226,7 @@ function App() {
             >
               📋
               {errorLogCount > 0 && (
-                <span className="log-fab-badge">
-                  {errorLogCount > 99 ? '99+' : errorLogCount}
-                </span>
+                <span className="log-fab-badge">{errorLogCount > 99 ? '99+' : errorLogCount}</span>
               )}
             </button>
           )}

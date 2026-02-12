@@ -608,11 +608,15 @@ export class ClientController {
         } else {
           // Determine correct value based on state
           const rawValue = result.enabled ? resolvedEnabledValue : resolvedDisabledValue;
-          const valueToReturn = rawValue ?? (
-            dbFlag.valueType === 'boolean' ? false :
-              dbFlag.valueType === 'number' ? 0 :
-                dbFlag.valueType === 'json' ? {} : ''
-          );
+          const valueToReturn =
+            rawValue ??
+            (dbFlag.valueType === 'boolean'
+              ? false
+              : dbFlag.valueType === 'number'
+                ? 0
+                : dbFlag.valueType === 'json'
+                  ? {}
+                  : '');
 
           variant = {
             name: result.enabled ? '$default' : '$disabled',

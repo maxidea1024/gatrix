@@ -2,10 +2,7 @@
 // Idle Defense Roguelike - Game Engine (core logic, no rendering)
 // ============================================================
 
-import type {
-  Enemy,
-  GameState,
-} from './GameTypes';
+import type { Enemy, GameState } from './GameTypes';
 export type { Enemy, GameState } from './GameTypes';
 import { ENEMY_CONFIGS } from './GameTypes';
 import {

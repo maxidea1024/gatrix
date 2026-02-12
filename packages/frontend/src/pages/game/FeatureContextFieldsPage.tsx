@@ -38,13 +38,6 @@ import {
   Delete as DeleteIcon,
   ContentCopy as CopyIcon,
   ViewColumn as ViewColumnIcon,
-  Abc as StringIcon,
-  Numbers as NumberIcon,
-  ToggleOn as BooleanIcon,
-  Schedule as DateTimeIcon,
-  LocalOffer as SemverIcon,
-  DataArray as ArrayIcon,
-  Public as CountryIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -65,6 +58,7 @@ import api from '../../services/api';
 import { tagService } from '../../services/tagService';
 import { getContrastColor } from '../../utils/colorUtils';
 import FeatureSwitch from '../../components/common/FeatureSwitch';
+import FieldTypeIcon from '../../components/common/FieldTypeIcon';
 
 interface FeatureContextField {
   id: string;
@@ -202,24 +196,7 @@ const FeatureContextFieldsPage: React.FC = () => {
 
   // Field type icon helper for filter options
   const getFieldTypeIcon = (type: string) => {
-    switch (type) {
-      case 'string':
-        return <StringIcon sx={{ fontSize: 16 }} color="info" />;
-      case 'number':
-        return <NumberIcon sx={{ fontSize: 16 }} color="success" />;
-      case 'boolean':
-        return <BooleanIcon sx={{ fontSize: 16 }} color="warning" />;
-      case 'date':
-        return <DateTimeIcon sx={{ fontSize: 16 }} color="secondary" />;
-      case 'semver':
-        return <SemverIcon sx={{ fontSize: 16 }} color="primary" />;
-      case 'array':
-        return <ArrayIcon sx={{ fontSize: 16 }} color="info" />;
-      case 'country':
-        return <CountryIcon sx={{ fontSize: 16 }} color="success" />;
-      default:
-        return <StringIcon sx={{ fontSize: 16 }} color="disabled" />;
-    }
+    return <FieldTypeIcon type={type} size={16} />;
   };
 
   // Filter definitions
@@ -324,25 +301,7 @@ const FeatureContextFieldsPage: React.FC = () => {
 
   // Get type icon
   const getTypeIcon = (type: string) => {
-    const iconProps = { sx: { fontSize: 20, mr: 1 } };
-    switch (type) {
-      case 'string':
-        return <StringIcon {...iconProps} color="info" />;
-      case 'number':
-        return <NumberIcon {...iconProps} color="success" />;
-      case 'boolean':
-        return <BooleanIcon {...iconProps} color="warning" />;
-      case 'date':
-        return <DateTimeIcon {...iconProps} color="secondary" />;
-      case 'semver':
-        return <SemverIcon {...iconProps} color="primary" />;
-      case 'array':
-        return <ArrayIcon {...iconProps} color="info" />;
-      case 'country':
-        return <CountryIcon {...iconProps} color="success" />;
-      default:
-        return <StringIcon {...iconProps} color="disabled" />;
-    }
+    return <FieldTypeIcon type={type} size={20} sx={{ mr: 1 }} />;
   };
 
   // Handlers
@@ -804,8 +763,8 @@ const FeatureContextFieldsPage: React.FC = () => {
                                           {expandedLegalValues.has(field.id)
                                             ? t('featureFlags.showLess')
                                             : t('featureFlags.showMore', {
-                                              count: field.legalValues.length - 3,
-                                            })}
+                                                count: field.legalValues.length - 3,
+                                              })}
                                         </Typography>
                                       )}
                                     </Box>

@@ -98,7 +98,9 @@ export class GatrixClient {
   getStats(): GatrixSdkStats {
     const featStats = this.featuresClient.getStats();
     return {
-      sdkState: featStats.sdkState || (this.getError() ? 'error' : this.isReady() ? 'healthy' : 'initializing'),
+      sdkState:
+        featStats.sdkState ||
+        (this.getError() ? 'error' : this.isReady() ? 'healthy' : 'initializing'),
       startTime: featStats.startTime || null,
       connectionId: this.featuresClient.getConnectionId(),
       errorCount: featStats.errorCount ?? 0,

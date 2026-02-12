@@ -349,17 +349,8 @@ router.get(
     const environment = requireEnvironment(req, res);
     if (!environment) return;
 
-    const {
-      search,
-      flagType,
-      isEnabled,
-      isArchived,
-      tags,
-      page,
-      limit,
-      sortBy,
-      sortOrder,
-    } = req.query;
+    const { search, flagType, isEnabled, isArchived, tags, page, limit, sortBy, sortOrder } =
+      req.query;
 
     const result = await featureFlagService.listFlags({
       environment,
@@ -773,8 +764,7 @@ router.post(
               if (envOverride?.enabledValue !== undefined) {
                 value = envOverride.enabledValue;
                 valueSource = 'environment';
-              }
-              else if ((flag as any).enabledValue !== undefined) {
+              } else if ((flag as any).enabledValue !== undefined) {
                 value = (flag as any).enabledValue;
                 valueSource = 'flag';
               }
@@ -782,8 +772,7 @@ router.post(
               if (envOverride?.disabledValue !== undefined) {
                 value = envOverride.disabledValue;
                 valueSource = 'environment';
-              }
-              else if ((flag as any).disabledValue !== undefined) {
+              } else if ((flag as any).disabledValue !== undefined) {
                 value = (flag as any).disabledValue;
                 valueSource = 'flag';
               }
@@ -793,7 +782,8 @@ router.post(
             // But here we are constructing a response object.
             // Let's assume we want to return 'value' and 'valueType' in the response.
             (evalResult as any).variant = {
-              name: (evalResult as any).variant?.name || (evalResult.enabled ? 'default' : 'disabled'),
+              name:
+                (evalResult as any).variant?.name || (evalResult.enabled ? 'default' : 'disabled'),
               value: getFallbackValue(value, (flag as any).valueType),
               valueType: (flag as any).valueType || 'string',
               valueSource,
@@ -855,13 +845,13 @@ function evaluateFlagWithDetails(
         name: '$disabled',
         value: getFallbackValue(
           flag.environments?.find((e: any) => e.environment === environment)?.disabledValue ??
-          flag.disabledValue,
+            flag.disabledValue,
           flag.valueType
         ),
         valueType: flag.valueType || 'string',
         valueSource:
           flag.environments?.find((e: any) => e.environment === environment)?.disabledValue !==
-            undefined
+          undefined
             ? 'environment'
             : flag.disabledValue !== undefined
               ? 'flag'
@@ -885,7 +875,13 @@ function evaluateFlagWithDetails(
       passed: true,
       message: 'No strategies defined - enabled by default',
     });
-    const variant = selectVariantForFlag(flag, flag.variants || [], context, undefined, environment);
+    const variant = selectVariantForFlag(
+      flag,
+      flag.variants || [],
+      context,
+      undefined,
+      environment
+    );
     return {
       enabled: true,
       variant,
@@ -1015,7 +1011,13 @@ function evaluateFlagWithDetails(
     evaluationSteps.push(strategyStep);
 
     if (strategyMatched) {
-      const variant = selectVariantForFlag(flag, flag.variants || [], context, strategy, environment);
+      const variant = selectVariantForFlag(
+        flag,
+        flag.variants || [],
+        context,
+        strategy,
+        environment
+      );
       return {
         enabled: true,
         variant,
@@ -1036,7 +1038,13 @@ function evaluateFlagWithDetails(
   const allStrategiesDisabled = strategies.length > 0 && activeStrategies.length === 0;
 
   if (allStrategiesDisabled) {
-    const variant = selectVariantForFlag(flag, flag.variants || [], context, undefined, environment);
+    const variant = selectVariantForFlag(
+      flag,
+      flag.variants || [],
+      context,
+      undefined,
+      environment
+    );
     return {
       enabled: true,
       variant,
@@ -1062,7 +1070,7 @@ function evaluateFlagWithDetails(
       valueType: flag.valueType || 'string',
       valueSource:
         flag.environments?.find((e: any) => e.environment === environment)?.disabledValue !==
-          undefined
+        undefined
           ? 'environment'
           : flag.disabledValue !== undefined
             ? 'flag'
@@ -1233,11 +1241,15 @@ function evaluateConstraint(constraint: any, context: Record<string, any>): bool
       result = new Date(stringValue) <= new Date(targetValue);
       break;
     // Array operators
-    case 'arr_includes':
-      result = Array.isArray(contextValue) && contextValue.some((v: any) => targetValues.includes(String(v)));
+    case 'arr_any':
+      result =
+        Array.isArray(contextValue) &&
+        contextValue.some((v: any) => targetValues.includes(String(v)));
       break;
     case 'arr_all':
-      result = Array.isArray(contextValue) && targetValues.every((tv: string) => contextValue.map(String).includes(tv));
+      result =
+        Array.isArray(contextValue) &&
+        targetValues.every((tv: string) => contextValue.map(String).includes(tv));
       break;
     default:
       result = false;

@@ -164,14 +164,14 @@ export class FeatureFlagEvaluator {
     }
 
     // Array operators
-    if (constraint.operator === 'arr_includes' || constraint.operator === 'arr_all') {
+    if (constraint.operator === 'arr_any' || constraint.operator === 'arr_all') {
       const arr = Array.isArray(contextValue) ? contextValue.map(String) : [];
       const targetValues =
         constraint.values?.map((v) => (constraint.caseInsensitive ? v.toLowerCase() : v)) || [];
       const compareArr = constraint.caseInsensitive ? arr.map((v) => v.toLowerCase()) : arr;
 
       let result = false;
-      if (constraint.operator === 'arr_includes') {
+      if (constraint.operator === 'arr_any') {
         // At least one target value is in the array
         result = targetValues.some((tv) => compareArr.includes(tv));
       } else {

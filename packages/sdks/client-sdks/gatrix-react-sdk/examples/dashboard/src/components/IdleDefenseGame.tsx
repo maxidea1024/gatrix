@@ -122,7 +122,8 @@ const IdleDefenseGame: React.FC<IdleDefenseGameProps> = ({ onExit }) => {
       gs.hero.gold -= item.price;
       const invItem = shopItemToInventory(item);
       const existing = gs.inventory.find(
-        (i: { name: string; rarity: string }) => i.name === invItem.name && i.rarity === invItem.rarity
+        (i: { name: string; rarity: string }) =>
+          i.name === invItem.name && i.rarity === invItem.rarity
       );
       if (existing) {
         existing.quantity += 1;

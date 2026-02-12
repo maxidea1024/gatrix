@@ -295,7 +295,9 @@ function StatsPanel({
                   {Object.entries(context || {}).map(([key, value]) => (
                     <tr key={key}>
                       <td className="stats-label">{key}:</td>
-                      <td className="stats-value" colSpan={5}>{String(value)}</td>
+                      <td className="stats-value" colSpan={5}>
+                        {String(value)}
+                      </td>
                     </tr>
                   ))}
                 </tbody>

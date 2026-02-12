@@ -16,22 +16,22 @@ import type { GatrixContext } from '@gatrix/js-client-sdk';
  * ```
  */
 export function updateContext(): (context: Partial<GatrixContext>) => void {
-    const client = getGatrixClient();
-    return (context: Partial<GatrixContext>) => client.features.updateContext(context);
+  const client = getGatrixClient();
+  return (context: Partial<GatrixContext>) => client.features.updateContext(context);
 }
 
 /**
  * Get a function to manually sync flags (explicit sync mode).
  */
 export function syncFlags(): (fetchNow?: boolean) => void {
-    const client = getGatrixClient();
-    return (fetchNow?: boolean) => client.features.syncFlags(fetchNow);
+  const client = getGatrixClient();
+  return (fetchNow?: boolean) => client.features.syncFlags(fetchNow);
 }
 
 /**
  * Get a function to manually trigger a flag fetch.
  */
 export function fetchFlags(): () => void {
-    const client = getGatrixClient();
-    return () => client.features.fetchFlags();
+  const client = getGatrixClient();
+  return () => client.features.fetchFlags();
 }

@@ -42,6 +42,7 @@ import { parseApiErrorMessage } from '../../utils/errorUtils';
 import bannerService, { Banner, Sequence, LoopModeType } from '../../services/bannerService';
 import { generateULID } from '../../utils/ulid';
 import SequenceEditor from './SequenceEditor';
+import EmptyPlaceholder from '../common/EmptyPlaceholder';
 import BannerPreview from './BannerPreview';
 import { useEntityLock } from '../../hooks/useEntityLock';
 
@@ -704,17 +705,11 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({ open, onClose, onSa
               </Button>
             </Box>
             {sequences.length === 0 ? (
-              <Paper sx={{ p: 4, textAlign: 'center', bgcolor: 'action.hover' }}>
-                <Typography color="text.secondary">{t('banners.noSequences')}</Typography>
-                <Button
-                  variant="contained"
-                  startIcon={<AddIcon />}
-                  onClick={handleAddSequence}
-                  sx={{ mt: 2 }}
-                >
-                  {t('banners.addFirstSequence')}
-                </Button>
-              </Paper>
+              <EmptyPlaceholder
+                message={t('banners.noSequences')}
+                onAddClick={handleAddSequence}
+                addButtonLabel={t('banners.addFirstSequence')}
+              />
             ) : (
               <Stack spacing={2}>
                 {sequences.map((sequence, index) => (

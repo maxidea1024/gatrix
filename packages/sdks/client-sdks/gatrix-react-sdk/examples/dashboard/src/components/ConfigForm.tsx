@@ -31,9 +31,7 @@ type ServerLocation = 'local' | 'remote';
 type ServerType = 'edge' | 'backend';
 
 function getLocalUrl(serverType: ServerType): string {
-  return serverType === 'edge'
-    ? 'http://localhost:3400/api/v1'
-    : 'http://localhost:45000/api/v1';
+  return serverType === 'edge' ? 'http://localhost:3400/api/v1' : 'http://localhost:45000/api/v1';
 }
 
 function getDevToken(serverType: ServerType): string {
@@ -366,15 +364,15 @@ function ConfigForm({ onConnect }: ConfigFormProps) {
             {!offlineMode && (
               <>
                 <div className="form-group">
-                  <label className="form-label">
-                    POLLING INTERVAL (SEC)
-                  </label>
+                  <label className="form-label">POLLING INTERVAL (SEC)</label>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
                     <input
                       type="number"
                       className={`nes-input is-dark ${manualPolling ? 'is-disabled' : ''}`}
                       value={refreshInterval}
-                      onChange={(e) => setRefreshInterval(Math.max(1, parseInt(e.target.value) || 1))}
+                      onChange={(e) =>
+                        setRefreshInterval(Math.max(1, parseInt(e.target.value) || 1))
+                      }
                       min="1"
                       disabled={manualPolling}
                       style={{ flex: 1 }}

@@ -113,7 +113,9 @@ export class FeaturesClient implements VariationProvider {
     const cachePrefix = config.cacheKeyPrefix ? `${config.cacheKeyPrefix}:` : undefined;
     this.storage =
       config.storageProvider ??
-      (typeof window !== 'undefined' ? new LocalStorageProvider(cachePrefix) : new InMemoryStorageProvider());
+      (typeof window !== 'undefined'
+        ? new LocalStorageProvider(cachePrefix)
+        : new InMemoryStorageProvider());
 
     // Initialize logger
     this.logger = config.logger ?? new ConsoleLogger('GatrixFeatureClient');
@@ -222,7 +224,9 @@ export class FeaturesClient implements VariationProvider {
     this.consecutiveFailures = 0;
     this.pollingStopped = false;
 
-    this.devLog(`start() called. offlineMode=${this.config.offlineMode}, refreshInterval=${this.refreshInterval}ms, explicitSyncMode=${this.featuresConfig.explicitSyncMode}`);
+    this.devLog(
+      `start() called. offlineMode=${this.config.offlineMode}, refreshInterval=${this.refreshInterval}ms, explicitSyncMode=${this.featuresConfig.explicitSyncMode}`
+    );
 
     // Offline mode: skip all network requests, use cached/bootstrap flags only
     if (this.config.offlineMode) {
@@ -531,13 +535,15 @@ export class FeaturesClient implements VariationProvider {
       return {
         value: missingValue,
         reason: `type_mismatch:expected_boolean_got_${flag.valueType}`,
-        flagExists: true, enabled: flag.enabled,
+        flagExists: true,
+        enabled: flag.enabled,
       };
     }
     return {
       value: Boolean(flag.variant.value),
       reason: flag.reason ?? 'evaluated',
-      flagExists: true, enabled: flag.enabled,
+      flagExists: true,
+      enabled: flag.enabled,
     };
   }
 
@@ -552,13 +558,15 @@ export class FeaturesClient implements VariationProvider {
       return {
         value: missingValue,
         reason: `type_mismatch:expected_string_got_${flag.valueType}`,
-        flagExists: true, enabled: flag.enabled,
+        flagExists: true,
+        enabled: flag.enabled,
       };
     }
     return {
       value: String(flag.variant.value),
       reason: flag.reason ?? 'evaluated',
-      flagExists: true, enabled: flag.enabled,
+      flagExists: true,
+      enabled: flag.enabled,
     };
   }
 
@@ -573,14 +581,16 @@ export class FeaturesClient implements VariationProvider {
       return {
         value: missingValue,
         reason: `type_mismatch:expected_number_got_${flag.valueType}`,
-        flagExists: true, enabled: flag.enabled,
+        flagExists: true,
+        enabled: flag.enabled,
       };
     }
     const value = Number(flag.variant.value);
     return {
       value: isNaN(value) ? missingValue : value,
       reason: isNaN(value) ? 'type_mismatch:value_not_number' : (flag.reason ?? 'evaluated'),
-      flagExists: true, enabled: flag.enabled,
+      flagExists: true,
+      enabled: flag.enabled,
     };
   }
 
@@ -595,7 +605,8 @@ export class FeaturesClient implements VariationProvider {
       return {
         value: missingValue,
         reason: `type_mismatch:expected_json_got_${flag.valueType}`,
-        flagExists: true, enabled: flag.enabled,
+        flagExists: true,
+        enabled: flag.enabled,
       };
     }
     const value = flag.variant.value;
@@ -603,13 +614,15 @@ export class FeaturesClient implements VariationProvider {
       return {
         value: missingValue,
         reason: 'type_mismatch:value_not_object',
-        flagExists: true, enabled: flag.enabled,
+        flagExists: true,
+        enabled: flag.enabled,
       };
     }
     return {
       value: value as T,
       reason: flag.reason ?? 'evaluated',
-      flagExists: true, enabled: flag.enabled,
+      flagExists: true,
+      enabled: flag.enabled,
     };
   }
 
@@ -854,7 +867,9 @@ export class FeaturesClient implements VariationProvider {
     return this.fetchFlagsInternal('manual');
   }
 
-  private async fetchFlagsInternal(caller: 'init' | 'polling' | 'manual' | 'syncFlags' | 'contextChange'): Promise<void> {
+  private async fetchFlagsInternal(
+    caller: 'init' | 'polling' | 'manual' | 'syncFlags' | 'contextChange'
+  ): Promise<void> {
     // Offline mode: no network requests allowed
     if (this.config.offlineMode) {
       this.logger.warn('fetchFlags called but client is in offline mode, ignoring');
@@ -981,7 +996,7 @@ export class FeaturesClient implements VariationProvider {
         this.pollingStopped = true;
         this.logger.error(
           `Polling stopped due to non-retryable status code ${response.status}. ` +
-          `Call fetchFlags() manually to retry.`
+            `Call fetchFlags() manually to retry.`
         );
         this.emitter.emit(EVENTS.FLAGS_FETCH_ERROR, {
           status: response.status,
@@ -1063,7 +1078,9 @@ export class FeaturesClient implements VariationProvider {
       );
     }
 
-    this.devLog(`scheduleNextRefresh: delay=${delay}ms, consecutiveFailures=${this.consecutiveFailures}, pollingStopped=${this.pollingStopped}`);
+    this.devLog(
+      `scheduleNextRefresh: delay=${delay}ms, consecutiveFailures=${this.consecutiveFailures}, pollingStopped=${this.pollingStopped}`
+    );
 
     this.timerRef = setTimeout(async () => {
       await this.fetchFlagsInternal('polling');

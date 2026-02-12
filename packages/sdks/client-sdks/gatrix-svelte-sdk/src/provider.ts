@@ -4,13 +4,18 @@
 import { setContext } from 'svelte';
 import { writable, type Writable } from 'svelte/store';
 import { GatrixClient, EVENTS, type GatrixClientConfig } from '@gatrix/js-client-sdk';
-import { GATRIX_CLIENT_KEY, GATRIX_READY_KEY, GATRIX_HEALTHY_KEY, GATRIX_ERROR_KEY } from './context';
+import {
+  GATRIX_CLIENT_KEY,
+  GATRIX_READY_KEY,
+  GATRIX_HEALTHY_KEY,
+  GATRIX_ERROR_KEY,
+} from './context';
 
 export interface GatrixInitOptions {
-    config?: GatrixClientConfig;
-    client?: GatrixClient;
-    /** Whether to auto-start the client. Defaults to true. */
-    startClient?: boolean;
+  config?: GatrixClientConfig;
+  client?: GatrixClient;
+  /** Whether to auto-start the client. Defaults to true. */
+  startClient?: boolean;
 }
 
 /**
@@ -33,35 +38,35 @@ export interface GatrixInitOptions {
  * ```
  */
 export function initGatrix(options: GatrixInitOptions = {}): GatrixClient {
-    const { config, client: existingClient, startClient = true } = options;
+  const { config, client: existingClient, startClient = true } = options;
 
-    const client = existingClient || new GatrixClient(config!);
-    const ready: Writable<boolean> = writable(client.isReady());
-    const healthy: Writable<boolean> = writable(true);
-    const error: Writable<Error | null> = writable(null);
+  const client = existingClient || new GatrixClient(config!);
+  const ready: Writable<boolean> = writable(client.isReady());
+  const healthy: Writable<boolean> = writable(true);
+  const error: Writable<Error | null> = writable(null);
 
-    client.on(EVENTS.FLAGS_READY, () => {
-        ready.set(true);
-    });
+  client.on(EVENTS.FLAGS_READY, () => {
+    ready.set(true);
+  });
 
-    client.on(EVENTS.SDK_ERROR, (err: Error) => {
-        error.set(err);
-        healthy.set(false);
-    });
+  client.on(EVENTS.SDK_ERROR, (err: Error) => {
+    error.set(err);
+    healthy.set(false);
+  });
 
-    client.on(EVENTS.FLAGS_RECOVERED, () => {
-        error.set(null);
-        healthy.set(true);
-    });
+  client.on(EVENTS.FLAGS_RECOVERED, () => {
+    error.set(null);
+    healthy.set(true);
+  });
 
-    if (startClient && !client.isReady()) {
-        client.start();
-    }
+  if (startClient && !client.isReady()) {
+    client.start();
+  }
 
-    setContext(GATRIX_CLIENT_KEY, client);
-    setContext(GATRIX_READY_KEY, ready);
-    setContext(GATRIX_HEALTHY_KEY, healthy);
-    setContext(GATRIX_ERROR_KEY, error);
+  setContext(GATRIX_CLIENT_KEY, client);
+  setContext(GATRIX_READY_KEY, ready);
+  setContext(GATRIX_HEALTHY_KEY, healthy);
+  setContext(GATRIX_ERROR_KEY, error);
 
-    return client;
+  return client;
 }

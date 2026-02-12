@@ -422,7 +422,7 @@ describe('FeaturesClient', () => {
     beforeEach(async () => {
       await client.init();
       // Mock console.error to suppress expected error output during context changes
-      consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => { });
+      consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
       // Mock fetch to return empty flags response
       mockFetch.mockResolvedValue({
         ok: true,

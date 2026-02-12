@@ -55,8 +55,8 @@ const mockFeaturesClient = {
   stringVariation: () => '',
   numberVariation: () => 0,
   jsonVariation: () => ({}),
-  watchFlag: () => () => { },
-  watchFlagWithInitialState: () => () => { },
+  watchFlag: () => () => {},
+  watchFlagWithInitialState: () => () => {},
   getStats: () => ({}),
 } as unknown as FeaturesClient;
 
@@ -65,7 +65,7 @@ const mockGatrixClient = {
   ...mockMethods,
   features: mockFeaturesClient,
   start: () => Promise.resolve(),
-  stop: () => { },
+  stop: () => {},
   isReady: () => false,
   getError: () => null,
 } as unknown as GatrixClient;

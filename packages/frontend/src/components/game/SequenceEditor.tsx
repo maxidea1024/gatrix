@@ -57,6 +57,7 @@ import { useTranslation } from 'react-i18next';
 import { Sequence, Frame, LoopModeType, FrameType } from '../../services/bannerService';
 import { generateULID } from '../../utils/ulid';
 import FrameEditor from './FrameEditor';
+import EmptyPlaceholder from '../common/EmptyPlaceholder';
 import {
   DndContext,
   closestCenter,
@@ -1267,38 +1268,11 @@ const SequenceEditor: React.FC<SequenceEditorProps> = ({
             </Box>
 
             {sequence.frames.length === 0 ? (
-              <Paper
-                sx={{
-                  p: 3,
-                  textAlign: 'center',
-                  bgcolor: (theme) => (theme.palette.mode === 'dark' ? 'grey.800' : 'grey.50'),
-                  border: '2px dashed',
-                  borderColor: 'divider',
-                  borderRadius: 1,
-                }}
-              >
-                <Typography color="text.secondary" variant="body2">
-                  {t('banners.noFrames')}
-                </Typography>
-                <Button
-                  size="small"
-                  startIcon={<AddIcon />}
-                  onClick={handleAddFrame}
-                  sx={{
-                    mt: 1,
-                    animation: `${keyframes`
-                      0%, 100% { transform: scale(1); }
-                      50% { transform: scale(1.05); }
-                    `} 2s ease-in-out infinite`,
-                    '&:hover': {
-                      animation: 'none',
-                      transform: 'scale(1.05)',
-                    },
-                  }}
-                >
-                  {t('banners.addFirstFrame')}
-                </Button>
-              </Paper>
+              <EmptyPlaceholder
+                message={t('banners.noFrames')}
+                onAddClick={handleAddFrame}
+                addButtonLabel={t('banners.addFirstFrame')}
+              />
             ) : viewMode === 'timeline' ? (
               /* Timeline View - frames width based on duration, horizontal drag only */
               <DndContext
