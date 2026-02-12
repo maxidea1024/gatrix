@@ -25,6 +25,8 @@ export const EVENTS = {
   FLAGS_IMPRESSION: 'flags.impression',
   /** Flags synchronized (explicitSyncMode) */
   FLAGS_SYNC: 'flags.sync',
+  /** Pending sync flags available (explicitSyncMode) */
+  FLAGS_PENDING_SYNC: 'flags.pending_sync',
   /** One or more flags removed from server. Payload: string[] of removed flag names */
   FLAGS_REMOVED: 'flags.removed',
   /** SDK recovered from error state */

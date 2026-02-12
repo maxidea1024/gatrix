@@ -202,6 +202,7 @@ class FeaturesClient:
         self._context = config.context or GatrixContext()
         self._flags: Dict[str, EvaluatedFlag] = {}
         self._pending_flags: Optional[Dict[str, EvaluatedFlag]] = None
+        self._pending_sync = False
         self._etag: Optional[str] = None
         self._sdk_state = "initializing"
         self._ready = False
@@ -355,112 +356,124 @@ class FeaturesClient:
     # These implement the VariationProvider protocol.
     # All flag lookup + value extraction + metrics tracking happen here.
 
-    def is_enabled_internal(self, flag_name: str) -> bool:
-        flag = self._get_flag(flag_name)
+    def _select_flags(self, force_realtime: bool = False) -> Dict[str, EvaluatedFlag]:
+        """Select the appropriate flag source based on sync mode."""
+        if force_realtime and self._pending_flags is not None:
+            return self._pending_flags
+        return self._flags
+
+    def _lookup_flag(self, flag_name: str, force_realtime: bool = False) -> Optional[EvaluatedFlag]:
+        """Look up a flag from the appropriate source."""
+        flags = self._select_flags(force_realtime)
+        return flags.get(flag_name)
+
+    def is_enabled_internal(self, flag_name: str, force_realtime: bool = False) -> bool:
+        flag = self._lookup_flag(flag_name, force_realtime)
         if flag is None:
             self._track_flag_access(flag_name, None, "isEnabled")
             return False
         self._track_flag_access(flag_name, flag, "isEnabled", flag.variant.name)
         return flag.enabled
 
-    def get_variant_internal(self, flag_name: str) -> Variant:
-        flag = self._get_flag(flag_name)
+    def get_variant_internal(self, flag_name: str, force_realtime: bool = False) -> Variant:
+        flag = self._lookup_flag(flag_name, force_realtime)
         if flag is None:
             self._track_flag_access(flag_name, None, "getVariant")
             return MISSING_VARIANT
         self._track_flag_access(flag_name, flag, "getVariant", flag.variant.name)
         return flag.variant
 
-    def variation_internal(self, flag_name: str, missing_value: str) -> str:
+    def variation_internal(self, flag_name: str, fallback_value: str, force_realtime: bool = False) -> str:
         """Return variant name."""
-        flag = self._get_flag(flag_name)
+        flag = self._lookup_flag(flag_name, force_realtime)
         if flag is None:
             self._track_flag_access(flag_name, None, "getVariant")
-            return missing_value
+            return fallback_value
         self._track_flag_access(flag_name, flag, "getVariant", flag.variant.name)
         return flag.variant.name
 
-    def bool_variation_internal(self, flag_name: str, missing_value: bool) -> bool:
-        flag = self._get_flag(flag_name)
+    def bool_variation_internal(self, flag_name: str, fallback_value: bool, force_realtime: bool = False) -> bool:
+        flag = self._lookup_flag(flag_name, force_realtime)
         if flag is None:
             self._track_flag_access(flag_name, None, "getVariant")
-            return missing_value
+            return fallback_value
         self._track_flag_access(flag_name, flag, "getVariant", flag.variant.name)
         if flag.value_type != "boolean":
-            return missing_value
+            return fallback_value
         val = flag.variant.value
         if val is None:
-            return missing_value
+            return fallback_value
         if isinstance(val, bool):
             return val
         if isinstance(val, str):
             return val.lower() == "true"
         return bool(val)
 
-    def string_variation_internal(self, flag_name: str, missing_value: str) -> str:
-        flag = self._get_flag(flag_name)
+    def string_variation_internal(self, flag_name: str, fallback_value: str, force_realtime: bool = False) -> str:
+        flag = self._lookup_flag(flag_name, force_realtime)
         if flag is None:
             self._track_flag_access(flag_name, None, "getVariant")
-            return missing_value
+            return fallback_value
         self._track_flag_access(flag_name, flag, "getVariant", flag.variant.name)
         if flag.value_type != "string":
-            return missing_value
+            return fallback_value
         if flag.variant.value is None:
-            return missing_value
+            return fallback_value
         return str(flag.variant.value)
 
-    def int_variation_internal(self, flag_name: str, missing_value: int) -> int:
-        flag = self._get_flag(flag_name)
+    def int_variation_internal(self, flag_name: str, fallback_value: int, force_realtime: bool = False) -> int:
+        flag = self._lookup_flag(flag_name, force_realtime)
         if flag is None:
             self._track_flag_access(flag_name, None, "getVariant")
-            return missing_value
+            return fallback_value
         self._track_flag_access(flag_name, flag, "getVariant", flag.variant.name)
         if flag.value_type != "number":
-            return missing_value
+            return fallback_value
         if flag.variant.value is None:
-            return missing_value
+            return fallback_value
         try:
             return int(flag.variant.value)  # type: ignore[arg-type]
         except (ValueError, TypeError):
-            return missing_value
+            return fallback_value
 
-    def float_variation_internal(self, flag_name: str, missing_value: float) -> float:
-        flag = self._get_flag(flag_name)
+    def float_variation_internal(self, flag_name: str, fallback_value: float, force_realtime: bool = False) -> float:
+        flag = self._lookup_flag(flag_name, force_realtime)
         if flag is None:
             self._track_flag_access(flag_name, None, "getVariant")
-            return missing_value
+            return fallback_value
         self._track_flag_access(flag_name, flag, "getVariant", flag.variant.name)
         if flag.value_type != "number":
-            return missing_value
+            return fallback_value
         if flag.variant.value is None:
-            return missing_value
+            return fallback_value
         try:
             return float(flag.variant.value)  # type: ignore[arg-type]
         except (ValueError, TypeError):
-            return missing_value
+            return fallback_value
 
-    def json_variation_internal(self, flag_name: str, missing_value: Any) -> Any:
-        flag = self._get_flag(flag_name)
+    def json_variation_internal(self, flag_name: str, fallback_value: Any, force_realtime: bool = False) -> Any:
+        flag = self._lookup_flag(flag_name, force_realtime)
         if flag is None:
             self._track_flag_access(flag_name, None, "getVariant")
-            return missing_value
+            return fallback_value
         self._track_flag_access(flag_name, flag, "getVariant", flag.variant.name)
         if flag.value_type != "json":
-            return missing_value
+            return fallback_value
         if flag.variant.value is None:
-            return missing_value
+            return fallback_value
         if isinstance(flag.variant.value, (dict, list)):
             return flag.variant.value
         try:
             return json.loads(str(flag.variant.value))
         except (json.JSONDecodeError, TypeError):
-            return missing_value
+            return fallback_value
 
     # --------------------------------------------- Variation details internal
     def _make_details(
-        self, flag_name: str, value: Any, expected_type: str
+        self, flag_name: str, value: Any, expected_type: str,
+        force_realtime: bool = False
     ) -> VariationResult:
-        flag = self._get_flag(flag_name)
+        flag = self._lookup_flag(flag_name, force_realtime)
         exists = flag is not None
         reason = (flag.reason if flag else None) or (
             "evaluated" if exists else "flag_not_found"
@@ -475,38 +488,38 @@ class FeaturesClient:
         )
 
     def bool_variation_details_internal(
-        self, flag_name: str, missing_value: bool
+        self, flag_name: str, fallback_value: bool, force_realtime: bool = False
     ) -> VariationResult:
-        value = self.bool_variation_internal(flag_name, missing_value)
-        return self._make_details(flag_name, value, "boolean")
+        value = self.bool_variation_internal(flag_name, fallback_value, force_realtime)
+        return self._make_details(flag_name, value, "boolean", force_realtime)
 
     def string_variation_details_internal(
-        self, flag_name: str, missing_value: str
+        self, flag_name: str, fallback_value: str, force_realtime: bool = False
     ) -> VariationResult:
-        value = self.string_variation_internal(flag_name, missing_value)
-        return self._make_details(flag_name, value, "string")
+        value = self.string_variation_internal(flag_name, fallback_value, force_realtime)
+        return self._make_details(flag_name, value, "string", force_realtime)
 
     def int_variation_details_internal(
-        self, flag_name: str, missing_value: int
+        self, flag_name: str, fallback_value: int, force_realtime: bool = False
     ) -> VariationResult:
-        value = self.int_variation_internal(flag_name, missing_value)
-        return self._make_details(flag_name, value, "number")
+        value = self.int_variation_internal(flag_name, fallback_value, force_realtime)
+        return self._make_details(flag_name, value, "number", force_realtime)
 
     def float_variation_details_internal(
-        self, flag_name: str, missing_value: float
+        self, flag_name: str, fallback_value: float, force_realtime: bool = False
     ) -> VariationResult:
-        value = self.float_variation_internal(flag_name, missing_value)
-        return self._make_details(flag_name, value, "number")
+        value = self.float_variation_internal(flag_name, fallback_value, force_realtime)
+        return self._make_details(flag_name, value, "number", force_realtime)
 
     def json_variation_details_internal(
-        self, flag_name: str, missing_value: Any
+        self, flag_name: str, fallback_value: Any, force_realtime: bool = False
     ) -> VariationResult:
-        value = self.json_variation_internal(flag_name, missing_value)
-        return self._make_details(flag_name, value, "json")
+        value = self.json_variation_internal(flag_name, fallback_value, force_realtime)
+        return self._make_details(flag_name, value, "json", force_realtime)
 
     # ------------------------------------------------ Or-throw internal
-    def bool_variation_or_throw_internal(self, flag_name: str) -> bool:
-        flag = self._get_flag(flag_name)
+    def bool_variation_or_throw_internal(self, flag_name: str, force_realtime: bool = False) -> bool:
+        flag = self._lookup_flag(flag_name, force_realtime)
         if flag is None:
             self._track_flag_access(flag_name, None, "getVariant")
             raise GatrixFeatureError(f"Flag '{flag_name}' not found")
@@ -525,8 +538,8 @@ class FeaturesClient:
             return val.lower() == "true"
         return bool(val)
 
-    def string_variation_or_throw_internal(self, flag_name: str) -> str:
-        flag = self._get_flag(flag_name)
+    def string_variation_or_throw_internal(self, flag_name: str, force_realtime: bool = False) -> str:
+        flag = self._lookup_flag(flag_name, force_realtime)
         if flag is None:
             self._track_flag_access(flag_name, None, "getVariant")
             raise GatrixFeatureError(f"Flag '{flag_name}' not found")
@@ -540,8 +553,8 @@ class FeaturesClient:
             raise GatrixFeatureError(f"Flag '{flag_name}' has no string value")
         return str(flag.variant.value)
 
-    def int_variation_or_throw_internal(self, flag_name: str) -> int:
-        flag = self._get_flag(flag_name)
+    def int_variation_or_throw_internal(self, flag_name: str, force_realtime: bool = False) -> int:
+        flag = self._lookup_flag(flag_name, force_realtime)
         if flag is None:
             self._track_flag_access(flag_name, None, "getVariant")
             raise GatrixFeatureError(f"Flag '{flag_name}' not found")
@@ -560,8 +573,8 @@ class FeaturesClient:
                 f"Flag '{flag_name}' value is not a valid integer"
             ) from e
 
-    def float_variation_or_throw_internal(self, flag_name: str) -> float:
-        flag = self._get_flag(flag_name)
+    def float_variation_or_throw_internal(self, flag_name: str, force_realtime: bool = False) -> float:
+        flag = self._lookup_flag(flag_name, force_realtime)
         if flag is None:
             self._track_flag_access(flag_name, None, "getVariant")
             raise GatrixFeatureError(f"Flag '{flag_name}' not found")
@@ -580,8 +593,8 @@ class FeaturesClient:
                 f"Flag '{flag_name}' value is not a valid number"
             ) from e
 
-    def json_variation_or_throw_internal(self, flag_name: str) -> Any:
-        flag = self._get_flag(flag_name)
+    def json_variation_or_throw_internal(self, flag_name: str, force_realtime: bool = False) -> Any:
+        flag = self._lookup_flag(flag_name, force_realtime)
         if flag is None:
             self._track_flag_access(flag_name, None, "getVariant")
             raise GatrixFeatureError(f"Flag '{flag_name}' not found")
@@ -604,12 +617,12 @@ class FeaturesClient:
 
     # ============================================= Public methods (delegate)
 
-    def is_enabled(self, flag_name: str) -> bool:
-        return self.is_enabled_internal(flag_name)
+    def is_enabled(self, flag_name: str, force_realtime: bool = False) -> bool:
+        return self.is_enabled_internal(flag_name, force_realtime)
 
-    def get_variant(self, flag_name: str) -> Variant:
+    def get_variant(self, flag_name: str, force_realtime: bool = False) -> Variant:
         """Never returns None – returns MISSING_VARIANT for missing flags."""
-        return self.get_variant_internal(flag_name)
+        return self.get_variant_internal(flag_name, force_realtime)
 
     def get_all_flags(self) -> List[EvaluatedFlag]:
         return list(self._flags.values())
@@ -618,82 +631,99 @@ class FeaturesClient:
         return flag_name in self._flags
 
     # ----------------------------------------------------------- variations
-    def variation(self, flag_name: str, missing_value: str) -> str:
-        return self.variation_internal(flag_name, missing_value)
+    def variation(self, flag_name: str, fallback_value: str, force_realtime: bool = False) -> str:
+        return self.variation_internal(flag_name, fallback_value, force_realtime)
 
-    def bool_variation(self, flag_name: str, missing_value: bool) -> bool:
-        return self.bool_variation_internal(flag_name, missing_value)
+    def bool_variation(self, flag_name: str, fallback_value: bool, force_realtime: bool = False) -> bool:
+        return self.bool_variation_internal(flag_name, fallback_value, force_realtime)
 
-    def string_variation(self, flag_name: str, missing_value: str) -> str:
-        return self.string_variation_internal(flag_name, missing_value)
+    def string_variation(self, flag_name: str, fallback_value: str, force_realtime: bool = False) -> str:
+        return self.string_variation_internal(flag_name, fallback_value, force_realtime)
 
-    def int_variation(self, flag_name: str, missing_value: int) -> int:
-        return self.int_variation_internal(flag_name, missing_value)
+    def int_variation(self, flag_name: str, fallback_value: int, force_realtime: bool = False) -> int:
+        return self.int_variation_internal(flag_name, fallback_value, force_realtime)
 
-    def float_variation(self, flag_name: str, missing_value: float) -> float:
-        return self.float_variation_internal(flag_name, missing_value)
+    def float_variation(self, flag_name: str, fallback_value: float, force_realtime: bool = False) -> float:
+        return self.float_variation_internal(flag_name, fallback_value, force_realtime)
 
-    def json_variation(self, flag_name: str, missing_value: Any) -> Any:
-        return self.json_variation_internal(flag_name, missing_value)
+    def json_variation(self, flag_name: str, fallback_value: Any, force_realtime: bool = False) -> Any:
+        return self.json_variation_internal(flag_name, fallback_value, force_realtime)
 
     # ------------------------------------------------- variation details
     def bool_variation_details(
-        self, flag_name: str, missing_value: bool
+        self, flag_name: str, fallback_value: bool, force_realtime: bool = False
     ) -> VariationResult:
-        return self.bool_variation_details_internal(flag_name, missing_value)
+        return self.bool_variation_details_internal(flag_name, fallback_value, force_realtime)
 
     def string_variation_details(
-        self, flag_name: str, missing_value: str
+        self, flag_name: str, fallback_value: str, force_realtime: bool = False
     ) -> VariationResult:
-        return self.string_variation_details_internal(flag_name, missing_value)
+        return self.string_variation_details_internal(flag_name, fallback_value, force_realtime)
 
     def int_variation_details(
-        self, flag_name: str, missing_value: int
+        self, flag_name: str, fallback_value: int, force_realtime: bool = False
     ) -> VariationResult:
-        return self.int_variation_details_internal(flag_name, missing_value)
+        return self.int_variation_details_internal(flag_name, fallback_value, force_realtime)
 
     def float_variation_details(
-        self, flag_name: str, missing_value: float
+        self, flag_name: str, fallback_value: float, force_realtime: bool = False
     ) -> VariationResult:
-        return self.float_variation_details_internal(flag_name, missing_value)
+        return self.float_variation_details_internal(flag_name, fallback_value, force_realtime)
 
     def json_variation_details(
-        self, flag_name: str, missing_value: Any
+        self, flag_name: str, fallback_value: Any, force_realtime: bool = False
     ) -> VariationResult:
-        return self.json_variation_details_internal(flag_name, missing_value)
+        return self.json_variation_details_internal(flag_name, fallback_value, force_realtime)
 
     # ------------------------------------------------- or-throw variants
-    def bool_variation_or_throw(self, flag_name: str) -> bool:
-        return self.bool_variation_or_throw_internal(flag_name)
+    def bool_variation_or_throw(self, flag_name: str, force_realtime: bool = False) -> bool:
+        return self.bool_variation_or_throw_internal(flag_name, force_realtime)
 
-    def string_variation_or_throw(self, flag_name: str) -> str:
-        return self.string_variation_or_throw_internal(flag_name)
+    def string_variation_or_throw(self, flag_name: str, force_realtime: bool = False) -> str:
+        return self.string_variation_or_throw_internal(flag_name, force_realtime)
 
-    def int_variation_or_throw(self, flag_name: str) -> int:
-        return self.int_variation_or_throw_internal(flag_name)
+    def int_variation_or_throw(self, flag_name: str, force_realtime: bool = False) -> int:
+        return self.int_variation_or_throw_internal(flag_name, force_realtime)
 
-    def float_variation_or_throw(self, flag_name: str) -> float:
-        return self.float_variation_or_throw_internal(flag_name)
+    def float_variation_or_throw(self, flag_name: str, force_realtime: bool = False) -> float:
+        return self.float_variation_or_throw_internal(flag_name, force_realtime)
 
-    def json_variation_or_throw(self, flag_name: str) -> Any:
-        return self.json_variation_or_throw_internal(flag_name)
+    def json_variation_or_throw(self, flag_name: str, force_realtime: bool = False) -> Any:
+        return self.json_variation_or_throw_internal(flag_name, force_realtime)
 
     # ============================================================ Sync mode
     def is_explicit_sync_enabled(self) -> bool:
         return self._explicit_sync_mode
 
     def has_pending_sync_flags(self) -> bool:
-        return self._explicit_sync_mode and self._pending_flags is not None
+        return self._pending_sync
+
+    def can_sync_flags(self) -> bool:
+        return self._pending_sync
+
+    def set_explicit_sync_mode(self, enabled: bool) -> None:
+        """Dynamically enable/disable explicit sync mode at runtime."""
+        if self._explicit_sync_mode == enabled:
+            return
+        self._explicit_sync_mode = enabled
+        self._pending_sync = False
+        if not enabled and self._pending_flags is not None:
+            self._apply_flags(self._pending_flags)
+            self._pending_flags = None
 
     def sync_flags(self, fetch_now: bool = False) -> None:
         """Apply pending flag changes (explicit sync mode)."""
+        if not self._explicit_sync_mode:
+            return
         if fetch_now and not self._offline_mode:
             self.fetch_flags()
         if self._pending_flags is not None:
             self._apply_flags(self._pending_flags)
             self._pending_flags = None
+            self._pending_sync = False
             self._sync_count += 1
             self._emitter.emit(EVENTS.FLAGS_SYNC)
+            self._emitter.emit(EVENTS.FLAGS_CHANGE)
 
     # ============================================================ Watch
     def watch_flag(
@@ -819,7 +849,11 @@ class FeaturesClient:
 
             if self._explicit_sync_mode:
                 self._pending_flags = new_flags
+                if not self._pending_sync:
+                    self._pending_sync = True
+                    self._emitter.emit(EVENTS.FLAGS_PENDING_SYNC)
             else:
+                self._pending_sync = False
                 self._apply_flags(new_flags)
 
             self._update_count += 1

@@ -1,4 +1,4 @@
-import { FeaturesClient } from '../src/FeaturesClient';
+﻿import { FeaturesClient } from '../src/FeaturesClient';
 import { EventEmitter } from '../src/EventEmitter';
 import { EvaluatedFlag, GatrixClientConfig } from '../src/types';
 import { EVENTS } from '../src/events';
@@ -40,32 +40,32 @@ const bootstrapFlags: EvaluatedFlag[] = [
   {
     name: 'bool-enabled',
     enabled: true,
-    variant: { name: 'default', enabled: true },
-    variantType: 'none',
+    variant: { name: 'default', enabled: true, value: true },
+    valueType: 'boolean',
     version: 1,
     reason: 'targeting_match',
   },
   {
     name: 'bool-disabled',
     enabled: false,
-    variant: { name: 'disabled', enabled: false },
-    variantType: 'none',
+    variant: { name: 'disabled', enabled: false, value: false },
+    valueType: 'boolean',
     version: 2,
     reason: 'disabled',
   },
   {
     name: 'string-variant',
     enabled: true,
-    variant: { name: 'variantA', enabled: true, payload: 'hello world' },
-    variantType: 'string',
+    variant: { name: 'variantA', enabled: true, value: 'hello world' },
+    valueType: 'string',
     version: 3,
     reason: 'percentage_rollout',
   },
   {
     name: 'number-variant',
     enabled: true,
-    variant: { name: 'numVariant', enabled: true, payload: 42.5 },
-    variantType: 'number',
+    variant: { name: 'numVariant', enabled: true, value: 42.5 },
+    valueType: 'number',
     version: 4,
     reason: 'evaluated',
   },
@@ -75,9 +75,9 @@ const bootstrapFlags: EvaluatedFlag[] = [
     variant: {
       name: 'jsonVariant',
       enabled: true,
-      payload: { key: 'value', nested: { a: 1 } },
+      value: { key: 'value', nested: { a: 1 } },
     },
-    variantType: 'json',
+    valueType: 'json',
     version: 5,
     reason: 'evaluated',
     impressionData: true,
@@ -85,22 +85,22 @@ const bootstrapFlags: EvaluatedFlag[] = [
   {
     name: 'invalid-number',
     enabled: true,
-    variant: { name: 'badNum', enabled: true, payload: 'not-a-number' },
-    variantType: 'number',
+    variant: { name: 'badNum', enabled: true, value: 'not-a-number' },
+    valueType: 'number',
     version: 6,
   },
   {
     name: 'invalid-json',
     enabled: true,
-    variant: { name: 'badJson', enabled: true, payload: 'not valid json' },
-    variantType: 'json',
+    variant: { name: 'badJson', enabled: true, value: 'not valid json' },
+    valueType: 'json',
     version: 7,
   },
   {
     name: 'disabled-with-payload',
     enabled: false,
-    variant: { name: 'disabled', enabled: false, payload: 'ignored' },
-    variantType: 'string',
+    variant: { name: 'disabled', enabled: false, value: 'ignored' },
+    valueType: 'string',
     version: 8,
     reason: 'disabled',
   },
@@ -135,7 +135,7 @@ describe('FeaturesClient', () => {
 
     it('should emit READY event', async () => {
       const readyCallback = jest.fn();
-      emitter.on(EVENTS.READY, readyCallback);
+      emitter.on(EVENTS.FLAGS_READY, readyCallback);
 
       await client.init();
 
@@ -313,7 +313,7 @@ describe('FeaturesClient', () => {
       it('should return type_mismatch for invalid number', () => {
         const result = client.numberVariationDetails('invalid-number', 0);
 
-        expect(result.reason).toBe('type_mismatch:payload_not_number');
+        expect(result.reason).toBe('type_mismatch:value_not_number');
         expect(result.value).toBe(0);
       });
     });
@@ -333,7 +333,7 @@ describe('FeaturesClient', () => {
       it('should return type_mismatch for invalid json', () => {
         const result = client.jsonVariationDetails('invalid-json', {});
 
-        expect(result.reason).toBe('type_mismatch:payload_not_object');
+        expect(result.reason).toBe('type_mismatch:value_not_object');
       });
     });
   });
@@ -402,7 +402,7 @@ describe('FeaturesClient', () => {
       expect(variant).toEqual({
         name: 'variantA',
         enabled: true,
-        payload: 'hello world',
+        value: 'hello world',
       });
     });
 
@@ -410,7 +410,7 @@ describe('FeaturesClient', () => {
       const variant = client.getVariant('non-existent');
 
       expect(variant).toEqual({
-        name: 'disabled',
+        name: '$missing',
         enabled: false,
       });
     });
@@ -484,7 +484,7 @@ describe('FeaturesClient', () => {
     // TODO: This test needs to be updated to work with ky package mocking
     it.skip('should emit ERROR event on fetch failure', async () => {
       const errorCallback = jest.fn();
-      emitter.on(EVENTS.ERROR, errorCallback);
+      emitter.on(EVENTS.SDK_ERROR, errorCallback);
 
       mockFetch.mockRejectedValueOnce(new Error('Network error'));
 

@@ -25,7 +25,7 @@ export interface GatrixContext {
 export interface Variant {
   name: string;
   enabled: boolean;
-  value?: string | number | object; // undefined(none), string, number, json
+  value?: string | number | boolean | object; // undefined(none), string, number, boolean, json
 }
 
 /**

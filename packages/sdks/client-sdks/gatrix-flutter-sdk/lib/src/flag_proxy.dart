@@ -1,4 +1,4 @@
-import 'models.dart';
+﻿import 'models.dart';
 import 'variation_provider.dart';
 
 /// FlagProxy - Thin convenience shell that delegates ALL variation logic
@@ -10,6 +10,8 @@ import 'variation_provider.dart';
 /// - ALL variation / details / orThrow methods delegate to VariationProvider.
 /// - No type checking logic here — that's the VariationProvider's job.
 /// - No onAccess callback — metrics tracking is handled by VariationProvider.
+/// - FlagProxy does NOT expose forceRealtime; it is available only through
+///   FeaturesClient's public methods for direct flag access.
 class FlagProxy {
   final EvaluatedFlag _flag;
   final bool _exists;
@@ -43,40 +45,40 @@ class FlagProxy {
 
   // ==================== Variation Methods (pure delegation) ====================
 
-  String variation(String missingValue) =>
-      _client.variationInternal(_flagName, missingValue);
+  String variation(String fallbackValue) =>
+      _client.variationInternal(_flagName, fallbackValue);
 
-  bool boolVariation(bool missingValue) =>
-      _client.boolVariationInternal(_flagName, missingValue);
+  bool boolVariation(bool fallbackValue) =>
+      _client.boolVariationInternal(_flagName, fallbackValue);
 
-  String stringVariation(String missingValue) =>
-      _client.stringVariationInternal(_flagName, missingValue);
+  String stringVariation(String fallbackValue) =>
+      _client.stringVariationInternal(_flagName, fallbackValue);
 
-  int intVariation(int missingValue) =>
-      _client.intVariationInternal(_flagName, missingValue);
+  int intVariation(int fallbackValue) =>
+      _client.intVariationInternal(_flagName, fallbackValue);
 
-  double doubleVariation(double missingValue) =>
-      _client.doubleVariationInternal(_flagName, missingValue);
+  double doubleVariation(double fallbackValue) =>
+      _client.doubleVariationInternal(_flagName, fallbackValue);
 
-  T jsonVariation<T>(T missingValue) =>
-      _client.jsonVariationInternal<T>(_flagName, missingValue);
+  T jsonVariation<T>(T fallbackValue) =>
+      _client.jsonVariationInternal<T>(_flagName, fallbackValue);
 
   // ==================== Variation Details (pure delegation) ====================
 
-  VariationResult<bool> boolVariationDetails(bool missingValue) =>
-      _client.boolVariationDetailsInternal(_flagName, missingValue);
+  VariationResult<bool> boolVariationDetails(bool fallbackValue) =>
+      _client.boolVariationDetailsInternal(_flagName, fallbackValue);
 
-  VariationResult<String> stringVariationDetails(String missingValue) =>
-      _client.stringVariationDetailsInternal(_flagName, missingValue);
+  VariationResult<String> stringVariationDetails(String fallbackValue) =>
+      _client.stringVariationDetailsInternal(_flagName, fallbackValue);
 
-  VariationResult<int> intVariationDetails(int missingValue) =>
-      _client.intVariationDetailsInternal(_flagName, missingValue);
+  VariationResult<int> intVariationDetails(int fallbackValue) =>
+      _client.intVariationDetailsInternal(_flagName, fallbackValue);
 
-  VariationResult<double> doubleVariationDetails(double missingValue) =>
-      _client.doubleVariationDetailsInternal(_flagName, missingValue);
+  VariationResult<double> doubleVariationDetails(double fallbackValue) =>
+      _client.doubleVariationDetailsInternal(_flagName, fallbackValue);
 
-  VariationResult<T> jsonVariationDetails<T>(T missingValue) =>
-      _client.jsonVariationDetailsInternal<T>(_flagName, missingValue);
+  VariationResult<T> jsonVariationDetails<T>(T fallbackValue) =>
+      _client.jsonVariationDetailsInternal<T>(_flagName, fallbackValue);
 
   // ==================== OrThrow Methods (pure delegation) ====================
 

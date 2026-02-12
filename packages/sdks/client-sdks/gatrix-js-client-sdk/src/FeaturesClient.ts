@@ -1,4 +1,4 @@
-/**
+﻿/**
  * FeaturesClient - Feature Flags client for Gatrix SDK
  * Handles feature flag fetching, caching, and access
  */
@@ -402,28 +402,29 @@ export class FeaturesClient implements VariationProvider {
 
   /**
    * Look up a flag by name from the active flag set.
+   * When forceRealtime=true, always reads from realtimeFlags regardless of explicitSyncMode.
    */
-  private lookupFlag(flagName: string): EvaluatedFlag | undefined {
-    return this.selectFlags().get(flagName);
+  private lookupFlag(flagName: string, forceRealtime: boolean = false): EvaluatedFlag | undefined {
+    return this.selectFlags(forceRealtime).get(flagName);
   }
 
-  isEnabled(flagName: string): boolean {
-    return this.isEnabledInternal(flagName);
+  isEnabled(flagName: string, forceRealtime: boolean = false): boolean {
+    return this.isEnabledInternal(flagName, forceRealtime);
   }
 
-  getVariant(flagName: string): Variant {
-    return this.getVariantInternal(flagName);
+  getVariant(flagName: string, forceRealtime: boolean = false): Variant {
+    return this.getVariantInternal(flagName, forceRealtime);
   }
 
-  getAllFlags(): EvaluatedFlag[] {
-    const flags = this.selectFlags();
+  getAllFlags(forceRealtime: boolean = false): EvaluatedFlag[] {
+    const flags = this.selectFlags(forceRealtime);
     return Array.from(flags.values());
   }
 
   // ==================== Flag Query Methods ====================
 
-  hasFlag(flagName: string): boolean {
-    const flags = this.selectFlags();
+  hasFlag(flagName: string, forceRealtime: boolean = false): boolean {
+    const flags = this.selectFlags(forceRealtime);
     return flags.has(flagName);
   }
 
@@ -435,8 +436,8 @@ export class FeaturesClient implements VariationProvider {
   // Central implementation: flag lookup + value extraction + metrics tracking.
   // FlagProxy delegates to these. Public variation methods also call these directly.
 
-  isEnabledInternal(flagName: string): boolean {
-    const flag = this.lookupFlag(flagName);
+  isEnabledInternal(flagName: string, forceRealtime: boolean = false): boolean {
+    const flag = this.lookupFlag(flagName, forceRealtime);
     if (!flag) {
       this.trackFlagAccess(flagName, undefined, 'isEnabled');
       return false;
@@ -445,8 +446,8 @@ export class FeaturesClient implements VariationProvider {
     return flag.enabled;
   }
 
-  getVariantInternal(flagName: string): Variant {
-    const flag = this.lookupFlag(flagName);
+  getVariantInternal(flagName: string, forceRealtime: boolean = false): Variant {
+    const flag = this.lookupFlag(flagName, forceRealtime);
     if (!flag) {
       this.trackFlagAccess(flagName, undefined, 'getVariant');
       return { name: '$missing', enabled: false };
@@ -455,85 +456,105 @@ export class FeaturesClient implements VariationProvider {
     return { ...flag.variant };
   }
 
-  variationInternal(flagName: string, missingValue: string): string {
-    const flag = this.lookupFlag(flagName);
+  variationInternal(
+    flagName: string,
+    fallbackValue: string,
+    forceRealtime: boolean = false
+  ): string {
+    const flag = this.lookupFlag(flagName, forceRealtime);
     if (!flag) {
       this.trackFlagAccess(flagName, undefined, 'getVariant');
-      return missingValue;
+      return fallbackValue;
     }
     this.trackFlagAccess(flagName, flag, 'getVariant', flag.variant.name);
     return flag.variant.name;
   }
 
-  boolVariationInternal(flagName: string, missingValue: boolean): boolean {
-    const flag = this.lookupFlag(flagName);
+  boolVariationInternal(
+    flagName: string,
+    fallbackValue: boolean,
+    forceRealtime: boolean = false
+  ): boolean {
+    const flag = this.lookupFlag(flagName, forceRealtime);
     if (!flag) {
       this.trackFlagAccess(flagName, undefined, 'getVariant');
-      return missingValue;
+      return fallbackValue;
     }
     this.trackFlagAccess(flagName, flag, 'getVariant', flag.variant.name);
     if (flag.valueType !== 'boolean') {
-      return missingValue;
+      return fallbackValue;
     }
     return Boolean(flag.variant.value);
   }
 
-  stringVariationInternal(flagName: string, missingValue: string): string {
-    const flag = this.lookupFlag(flagName);
+  stringVariationInternal(
+    flagName: string,
+    fallbackValue: string,
+    forceRealtime: boolean = false
+  ): string {
+    const flag = this.lookupFlag(flagName, forceRealtime);
     if (!flag) {
       this.trackFlagAccess(flagName, undefined, 'getVariant');
-      return missingValue;
+      return fallbackValue;
     }
     this.trackFlagAccess(flagName, flag, 'getVariant', flag.variant.name);
     if (flag.valueType !== 'string') {
-      return missingValue;
+      return fallbackValue;
     }
     return String(flag.variant.value);
   }
 
-  numberVariationInternal(flagName: string, missingValue: number): number {
-    const flag = this.lookupFlag(flagName);
+  numberVariationInternal(
+    flagName: string,
+    fallbackValue: number,
+    forceRealtime: boolean = false
+  ): number {
+    const flag = this.lookupFlag(flagName, forceRealtime);
     if (!flag) {
       this.trackFlagAccess(flagName, undefined, 'getVariant');
-      return missingValue;
+      return fallbackValue;
     }
     this.trackFlagAccess(flagName, flag, 'getVariant', flag.variant.name);
     if (flag.valueType !== 'number') {
-      return missingValue;
+      return fallbackValue;
     }
     const value = Number(flag.variant.value);
-    return isNaN(value) ? missingValue : value;
+    return isNaN(value) ? fallbackValue : value;
   }
 
-  jsonVariationInternal<T>(flagName: string, missingValue: T): T {
-    const flag = this.lookupFlag(flagName);
+  jsonVariationInternal<T>(flagName: string, fallbackValue: T, forceRealtime: boolean = false): T {
+    const flag = this.lookupFlag(flagName, forceRealtime);
     if (!flag) {
       this.trackFlagAccess(flagName, undefined, 'getVariant');
-      return missingValue;
+      return fallbackValue;
     }
     this.trackFlagAccess(flagName, flag, 'getVariant', flag.variant.name);
     if (flag.valueType !== 'json') {
-      return missingValue;
+      return fallbackValue;
     }
     const value = flag.variant.value;
     if (typeof value !== 'object' || value === null) {
-      return missingValue;
+      return fallbackValue;
     }
     return value as T;
   }
 
   // ==================== Internal Variation Details ====================
 
-  boolVariationDetailsInternal(flagName: string, missingValue: boolean): VariationResult<boolean> {
-    const flag = this.lookupFlag(flagName);
+  boolVariationDetailsInternal(
+    flagName: string,
+    fallbackValue: boolean,
+    forceRealtime: boolean = false
+  ): VariationResult<boolean> {
+    const flag = this.lookupFlag(flagName, forceRealtime);
     if (!flag) {
       this.trackFlagAccess(flagName, undefined, 'getVariant');
-      return { value: missingValue, reason: 'flag_not_found', flagExists: false, enabled: false };
+      return { value: fallbackValue, reason: 'flag_not_found', flagExists: false, enabled: false };
     }
     this.trackFlagAccess(flagName, flag, 'getVariant', flag.variant.name);
     if (flag.valueType !== 'boolean') {
       return {
-        value: missingValue,
+        value: fallbackValue,
         reason: `type_mismatch:expected_boolean_got_${flag.valueType}`,
         flagExists: true,
         enabled: flag.enabled,
@@ -547,16 +568,20 @@ export class FeaturesClient implements VariationProvider {
     };
   }
 
-  stringVariationDetailsInternal(flagName: string, missingValue: string): VariationResult<string> {
-    const flag = this.lookupFlag(flagName);
+  stringVariationDetailsInternal(
+    flagName: string,
+    fallbackValue: string,
+    forceRealtime: boolean = false
+  ): VariationResult<string> {
+    const flag = this.lookupFlag(flagName, forceRealtime);
     if (!flag) {
       this.trackFlagAccess(flagName, undefined, 'getVariant');
-      return { value: missingValue, reason: 'flag_not_found', flagExists: false, enabled: false };
+      return { value: fallbackValue, reason: 'flag_not_found', flagExists: false, enabled: false };
     }
     this.trackFlagAccess(flagName, flag, 'getVariant', flag.variant.name);
     if (flag.valueType !== 'string') {
       return {
-        value: missingValue,
+        value: fallbackValue,
         reason: `type_mismatch:expected_string_got_${flag.valueType}`,
         flagExists: true,
         enabled: flag.enabled,
@@ -570,16 +595,20 @@ export class FeaturesClient implements VariationProvider {
     };
   }
 
-  numberVariationDetailsInternal(flagName: string, missingValue: number): VariationResult<number> {
-    const flag = this.lookupFlag(flagName);
+  numberVariationDetailsInternal(
+    flagName: string,
+    fallbackValue: number,
+    forceRealtime: boolean = false
+  ): VariationResult<number> {
+    const flag = this.lookupFlag(flagName, forceRealtime);
     if (!flag) {
       this.trackFlagAccess(flagName, undefined, 'getVariant');
-      return { value: missingValue, reason: 'flag_not_found', flagExists: false, enabled: false };
+      return { value: fallbackValue, reason: 'flag_not_found', flagExists: false, enabled: false };
     }
     this.trackFlagAccess(flagName, flag, 'getVariant', flag.variant.name);
     if (flag.valueType !== 'number') {
       return {
-        value: missingValue,
+        value: fallbackValue,
         reason: `type_mismatch:expected_number_got_${flag.valueType}`,
         flagExists: true,
         enabled: flag.enabled,
@@ -587,23 +616,27 @@ export class FeaturesClient implements VariationProvider {
     }
     const value = Number(flag.variant.value);
     return {
-      value: isNaN(value) ? missingValue : value,
+      value: isNaN(value) ? fallbackValue : value,
       reason: isNaN(value) ? 'type_mismatch:value_not_number' : (flag.reason ?? 'evaluated'),
       flagExists: true,
       enabled: flag.enabled,
     };
   }
 
-  jsonVariationDetailsInternal<T>(flagName: string, missingValue: T): VariationResult<T> {
-    const flag = this.lookupFlag(flagName);
+  jsonVariationDetailsInternal<T>(
+    flagName: string,
+    fallbackValue: T,
+    forceRealtime: boolean = false
+  ): VariationResult<T> {
+    const flag = this.lookupFlag(flagName, forceRealtime);
     if (!flag) {
       this.trackFlagAccess(flagName, undefined, 'getVariant');
-      return { value: missingValue, reason: 'flag_not_found', flagExists: false, enabled: false };
+      return { value: fallbackValue, reason: 'flag_not_found', flagExists: false, enabled: false };
     }
     this.trackFlagAccess(flagName, flag, 'getVariant', flag.variant.name);
     if (flag.valueType !== 'json') {
       return {
-        value: missingValue,
+        value: fallbackValue,
         reason: `type_mismatch:expected_json_got_${flag.valueType}`,
         flagExists: true,
         enabled: flag.enabled,
@@ -612,7 +645,7 @@ export class FeaturesClient implements VariationProvider {
     const value = flag.variant.value;
     if (typeof value !== 'object' || value === null) {
       return {
-        value: missingValue,
+        value: fallbackValue,
         reason: 'type_mismatch:value_not_object',
         flagExists: true,
         enabled: flag.enabled,
@@ -628,8 +661,8 @@ export class FeaturesClient implements VariationProvider {
 
   // ==================== Internal Strict Variation (OrThrow) ====================
 
-  boolVariationOrThrowInternal(flagName: string): boolean {
-    const flag = this.lookupFlag(flagName);
+  boolVariationOrThrowInternal(flagName: string, forceRealtime: boolean = false): boolean {
+    const flag = this.lookupFlag(flagName, forceRealtime);
     if (!flag) {
       this.trackFlagAccess(flagName, undefined, 'isEnabled');
       throw GatrixFeatureError.flagNotFound(flagName);
@@ -641,8 +674,8 @@ export class FeaturesClient implements VariationProvider {
     return Boolean(flag.variant.value);
   }
 
-  stringVariationOrThrowInternal(flagName: string): string {
-    const flag = this.lookupFlag(flagName);
+  stringVariationOrThrowInternal(flagName: string, forceRealtime: boolean = false): string {
+    const flag = this.lookupFlag(flagName, forceRealtime);
     if (!flag) {
       this.trackFlagAccess(flagName, undefined, 'getVariant');
       throw GatrixFeatureError.flagNotFound(flagName);
@@ -654,8 +687,8 @@ export class FeaturesClient implements VariationProvider {
     return String(flag.variant.value);
   }
 
-  numberVariationOrThrowInternal(flagName: string): number {
-    const flag = this.lookupFlag(flagName);
+  numberVariationOrThrowInternal(flagName: string, forceRealtime: boolean = false): number {
+    const flag = this.lookupFlag(flagName, forceRealtime);
     if (!flag) {
       this.trackFlagAccess(flagName, undefined, 'getVariant');
       throw GatrixFeatureError.flagNotFound(flagName);
@@ -671,8 +704,8 @@ export class FeaturesClient implements VariationProvider {
     return value;
   }
 
-  jsonVariationOrThrowInternal<T>(flagName: string): T {
-    const flag = this.lookupFlag(flagName);
+  jsonVariationOrThrowInternal<T>(flagName: string, forceRealtime: boolean = false): T {
+    const flag = this.lookupFlag(flagName, forceRealtime);
     if (!flag) {
       this.trackFlagAccess(flagName, undefined, 'getVariant');
       throw GatrixFeatureError.flagNotFound(flagName);
@@ -691,60 +724,76 @@ export class FeaturesClient implements VariationProvider {
   // ==================== Public Variation Methods ====================
   // Simple delegation to internal methods.
 
-  variation(flagName: string, missingValue: string): string {
-    return this.variationInternal(flagName, missingValue);
+  variation(flagName: string, fallbackValue: string, forceRealtime: boolean = false): string {
+    return this.variationInternal(flagName, fallbackValue, forceRealtime);
   }
 
-  boolVariation(flagName: string, missingValue: boolean): boolean {
-    return this.boolVariationInternal(flagName, missingValue);
+  boolVariation(flagName: string, fallbackValue: boolean, forceRealtime: boolean = false): boolean {
+    return this.boolVariationInternal(flagName, fallbackValue, forceRealtime);
   }
 
-  stringVariation(flagName: string, missingValue: string): string {
-    return this.stringVariationInternal(flagName, missingValue);
+  stringVariation(flagName: string, fallbackValue: string, forceRealtime: boolean = false): string {
+    return this.stringVariationInternal(flagName, fallbackValue, forceRealtime);
   }
 
-  numberVariation(flagName: string, missingValue: number): number {
-    return this.numberVariationInternal(flagName, missingValue);
+  numberVariation(flagName: string, fallbackValue: number, forceRealtime: boolean = false): number {
+    return this.numberVariationInternal(flagName, fallbackValue, forceRealtime);
   }
 
-  jsonVariation<T>(flagName: string, missingValue: T): T {
-    return this.jsonVariationInternal(flagName, missingValue);
+  jsonVariation<T>(flagName: string, fallbackValue: T, forceRealtime: boolean = false): T {
+    return this.jsonVariationInternal(flagName, fallbackValue, forceRealtime);
   }
 
   // ==================== Strict Variation Methods (OrThrow) ====================
 
-  boolVariationOrThrow(flagName: string): boolean {
-    return this.boolVariationOrThrowInternal(flagName);
+  boolVariationOrThrow(flagName: string, forceRealtime: boolean = false): boolean {
+    return this.boolVariationOrThrowInternal(flagName, forceRealtime);
   }
 
-  stringVariationOrThrow(flagName: string): string {
-    return this.stringVariationOrThrowInternal(flagName);
+  stringVariationOrThrow(flagName: string, forceRealtime: boolean = false): string {
+    return this.stringVariationOrThrowInternal(flagName, forceRealtime);
   }
 
-  numberVariationOrThrow(flagName: string): number {
-    return this.numberVariationOrThrowInternal(flagName);
+  numberVariationOrThrow(flagName: string, forceRealtime: boolean = false): number {
+    return this.numberVariationOrThrowInternal(flagName, forceRealtime);
   }
 
-  jsonVariationOrThrow<T>(flagName: string): T {
-    return this.jsonVariationOrThrowInternal<T>(flagName);
+  jsonVariationOrThrow<T>(flagName: string, forceRealtime: boolean = false): T {
+    return this.jsonVariationOrThrowInternal<T>(flagName, forceRealtime);
   }
 
   // ==================== Variation Details ====================
 
-  boolVariationDetails(flagName: string, missingValue: boolean): VariationResult<boolean> {
-    return this.boolVariationDetailsInternal(flagName, missingValue);
+  boolVariationDetails(
+    flagName: string,
+    fallbackValue: boolean,
+    forceRealtime: boolean = false
+  ): VariationResult<boolean> {
+    return this.boolVariationDetailsInternal(flagName, fallbackValue, forceRealtime);
   }
 
-  stringVariationDetails(flagName: string, missingValue: string): VariationResult<string> {
-    return this.stringVariationDetailsInternal(flagName, missingValue);
+  stringVariationDetails(
+    flagName: string,
+    fallbackValue: string,
+    forceRealtime: boolean = false
+  ): VariationResult<string> {
+    return this.stringVariationDetailsInternal(flagName, fallbackValue, forceRealtime);
   }
 
-  numberVariationDetails(flagName: string, missingValue: number): VariationResult<number> {
-    return this.numberVariationDetailsInternal(flagName, missingValue);
+  numberVariationDetails(
+    flagName: string,
+    fallbackValue: number,
+    forceRealtime: boolean = false
+  ): VariationResult<number> {
+    return this.numberVariationDetailsInternal(flagName, fallbackValue, forceRealtime);
   }
 
-  jsonVariationDetails<T>(flagName: string, missingValue: T): VariationResult<T> {
-    return this.jsonVariationDetailsInternal(flagName, missingValue);
+  jsonVariationDetails<T>(
+    flagName: string,
+    fallbackValue: T,
+    forceRealtime: boolean = false
+  ): VariationResult<T> {
+    return this.jsonVariationDetailsInternal(flagName, fallbackValue, forceRealtime);
   }
 
   async syncFlags(fetchNow: boolean = true): Promise<void> {
@@ -767,6 +816,24 @@ export class FeaturesClient implements VariationProvider {
    */
   public isExplicitSyncEnabled(): boolean {
     return !!this.featuresConfig.explicitSyncMode;
+  }
+
+  /**
+   * Change explicit sync mode at runtime.
+   * When enabling: synchronizedFlags = realtimeFlags, pendingSync = false
+   * When disabling: synchronizedFlags = realtimeFlags, pendingSync = false
+   * No-op if the mode is already set to the requested value.
+   */
+  public setExplicitSyncMode(enabled: boolean): void {
+    if (!!this.featuresConfig.explicitSyncMode === enabled) {
+      return;
+    }
+    const config = this.config.features ?? {};
+    config.explicitSyncMode = enabled;
+    this.config.features = config;
+    this.synchronizedFlags = new Map(this.realtimeFlags);
+    this.pendingSync = false;
+    this.devLog(`setExplicitSyncMode: ${enabled}`);
   }
 
   /**
@@ -1096,7 +1163,14 @@ export class FeaturesClient implements VariationProvider {
     }
   }
 
-  private selectFlags(): Map<string, EvaluatedFlag> {
+  /**
+   * Select the active flag set.
+   * When forceRealtime=true, always returns realtimeFlags regardless of explicitSyncMode.
+   */
+  private selectFlags(forceRealtime: boolean = false): Map<string, EvaluatedFlag> {
+    if (forceRealtime) {
+      return this.realtimeFlags;
+    }
     return this.featuresConfig.explicitSyncMode ? this.synchronizedFlags : this.realtimeFlags;
   }
 
@@ -1112,7 +1186,11 @@ export class FeaturesClient implements VariationProvider {
       this.synchronizedFlags = new Map(this.realtimeFlags);
       this.pendingSync = false;
     } else {
+      const wasPending = this.pendingSync;
       this.pendingSync = true;
+      if (!wasPending) {
+        this.emitter.emit(EVENTS.FLAGS_PENDING_SYNC);
+      }
     }
   }
 

@@ -38,6 +38,9 @@ namespace Gatrix.Unity.SDK
         /// <summary>Flags synchronized (explicitSyncMode)</summary>
         public const string FlagsSync = "flags.sync";
 
+        /// <summary>Pending sync flags available (explicitSyncMode)</summary>
+        public const string FlagsPendingSync = "flags.pending_sync";
+
         /// <summary>One or more flags removed from server. Payload: string[] of removed flag names</summary>
         public const string FlagsRemoved = "flags.removed";
 

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * VariationProvider - Interface for centralized variation logic.
  *
  * This interface defines the internal methods that handle all variation logic:
@@ -7,30 +7,50 @@
  * FeaturesClient implements this interface.
  * FlagProxy holds a reference to this interface (not FeaturesClient directly)
  * to avoid circular dependencies and keep a clean separation.
+ *
+ * All methods accept an optional `forceRealtime` parameter (default: false).
+ * When true, the method reads from realtimeFlags directly, bypassing
+ * explicitSyncMode's synchronizedFlags.
  */
 import { Variant, VariationResult } from './types';
 
 export interface VariationProvider {
   // Core access
-  isEnabledInternal(flagName: string): boolean;
-  getVariantInternal(flagName: string): Variant;
+  isEnabledInternal(flagName: string, forceRealtime?: boolean): boolean;
+  getVariantInternal(flagName: string, forceRealtime?: boolean): Variant;
 
   // Variation (returns value)
-  variationInternal(flagName: string, missingValue: string): string;
-  boolVariationInternal(flagName: string, missingValue: boolean): boolean;
-  stringVariationInternal(flagName: string, missingValue: string): string;
-  numberVariationInternal(flagName: string, missingValue: number): number;
-  jsonVariationInternal<T>(flagName: string, missingValue: T): T;
+  variationInternal(flagName: string, fallbackValue: string, forceRealtime?: boolean): string;
+  boolVariationInternal(flagName: string, fallbackValue: boolean, forceRealtime?: boolean): boolean;
+  stringVariationInternal(flagName: string, fallbackValue: string, forceRealtime?: boolean): string;
+  numberVariationInternal(flagName: string, fallbackValue: number, forceRealtime?: boolean): number;
+  jsonVariationInternal<T>(flagName: string, fallbackValue: T, forceRealtime?: boolean): T;
 
   // Variation Details (returns value + reason)
-  boolVariationDetailsInternal(flagName: string, missingValue: boolean): VariationResult<boolean>;
-  stringVariationDetailsInternal(flagName: string, missingValue: string): VariationResult<string>;
-  numberVariationDetailsInternal(flagName: string, missingValue: number): VariationResult<number>;
-  jsonVariationDetailsInternal<T>(flagName: string, missingValue: T): VariationResult<T>;
+  boolVariationDetailsInternal(
+    flagName: string,
+    fallbackValue: boolean,
+    forceRealtime?: boolean
+  ): VariationResult<boolean>;
+  stringVariationDetailsInternal(
+    flagName: string,
+    fallbackValue: string,
+    forceRealtime?: boolean
+  ): VariationResult<string>;
+  numberVariationDetailsInternal(
+    flagName: string,
+    fallbackValue: number,
+    forceRealtime?: boolean
+  ): VariationResult<number>;
+  jsonVariationDetailsInternal<T>(
+    flagName: string,
+    fallbackValue: T,
+    forceRealtime?: boolean
+  ): VariationResult<T>;
 
   // Strict Variation (throws on missing/mismatch)
-  boolVariationOrThrowInternal(flagName: string): boolean;
-  stringVariationOrThrowInternal(flagName: string): string;
-  numberVariationOrThrowInternal(flagName: string): number;
-  jsonVariationOrThrowInternal<T>(flagName: string): T;
+  boolVariationOrThrowInternal(flagName: string, forceRealtime?: boolean): boolean;
+  stringVariationOrThrowInternal(flagName: string, forceRealtime?: boolean): string;
+  numberVariationOrThrowInternal(flagName: string, forceRealtime?: boolean): number;
+  jsonVariationOrThrowInternal<T>(flagName: string, forceRealtime?: boolean): T;
 }

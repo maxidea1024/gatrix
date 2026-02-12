@@ -7,6 +7,11 @@
 # - ALL variation / details / orThrow methods delegate to VariationProvider.
 # - No type checking logic here - that's the VariationProvider's job.
 # - No onAccess callback - metrics tracking handled by VariationProvider.
+# - FlagProxy does NOT expose force_realtime; it is available only through
+#   FeaturesClient's public methods for direct flag access.
+#
+# IMPORTANT: client (VariationProvider) is ALWAYS non-null. FlagProxy is
+# exclusively created by FeaturesClient, which passes itself as the client.
 class_name GatrixFlagProxy
 
 var _flag: GatrixTypes.EvaluatedFlag
@@ -60,50 +65,50 @@ var raw:
 
 # ==================== Variation Methods (pure delegation) ====================
 
-func variation(missing_value: String) -> String:
-	return _client.variation_internal(_flag_name, missing_value)
+func variation(fallback_value: String) -> String:
+	return _client.variation_internal(_flag_name, fallback_value)
 
 
-func bool_variation(missing_value: bool) -> bool:
-	return _client.bool_variation_internal(_flag_name, missing_value)
+func bool_variation(fallback_value: bool) -> bool:
+	return _client.bool_variation_internal(_flag_name, fallback_value)
 
 
-func string_variation(missing_value: String) -> String:
-	return _client.string_variation_internal(_flag_name, missing_value)
+func string_variation(fallback_value: String) -> String:
+	return _client.string_variation_internal(_flag_name, fallback_value)
 
 
-func int_variation(missing_value: int) -> int:
-	return _client.int_variation_internal(_flag_name, missing_value)
+func int_variation(fallback_value: int) -> int:
+	return _client.int_variation_internal(_flag_name, fallback_value)
 
 
-func float_variation(missing_value: float) -> float:
-	return _client.float_variation_internal(_flag_name, missing_value)
+func float_variation(fallback_value: float) -> float:
+	return _client.float_variation_internal(_flag_name, fallback_value)
 
 
-func json_variation(missing_value = null):
-	return _client.json_variation_internal(_flag_name, missing_value)
+func json_variation(fallback_value = null):
+	return _client.json_variation_internal(_flag_name, fallback_value)
 
 
 # ==================== Variation Details (pure delegation) ====================
 
-func bool_variation_details(missing_value: bool) -> GatrixTypes.VariationResult:
-	return _client.bool_variation_details_internal(_flag_name, missing_value)
+func bool_variation_details(fallback_value: bool) -> GatrixTypes.VariationResult:
+	return _client.bool_variation_details_internal(_flag_name, fallback_value)
 
 
-func string_variation_details(missing_value: String) -> GatrixTypes.VariationResult:
-	return _client.string_variation_details_internal(_flag_name, missing_value)
+func string_variation_details(fallback_value: String) -> GatrixTypes.VariationResult:
+	return _client.string_variation_details_internal(_flag_name, fallback_value)
 
 
-func int_variation_details(missing_value: int) -> GatrixTypes.VariationResult:
-	return _client.int_variation_details_internal(_flag_name, missing_value)
+func int_variation_details(fallback_value: int) -> GatrixTypes.VariationResult:
+	return _client.int_variation_details_internal(_flag_name, fallback_value)
 
 
-func float_variation_details(missing_value: float) -> GatrixTypes.VariationResult:
-	return _client.float_variation_details_internal(_flag_name, missing_value)
+func float_variation_details(fallback_value: float) -> GatrixTypes.VariationResult:
+	return _client.float_variation_details_internal(_flag_name, fallback_value)
 
 
-func json_variation_details(missing_value = null) -> GatrixTypes.VariationResult:
-	return _client.json_variation_details_internal(_flag_name, missing_value)
+func json_variation_details(fallback_value = null) -> GatrixTypes.VariationResult:
+	return _client.json_variation_details_internal(_flag_name, fallback_value)
 
 
 # ==================== OrThrow Methods (pure delegation) ====================

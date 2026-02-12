@@ -1,4 +1,4 @@
-/**
+﻿/**
  * FlagProxy - Convenience wrapper for flag data access.
  *
  * FlagProxy is a thin shell that provides a convenient API for accessing
@@ -87,42 +87,42 @@ export class FlagProxy {
   // All methods delegate to FeaturesClient's internal methods.
   // FlagProxy is a convenience shell - no own logic.
 
-  variation(missingValue: string): string {
-    return this.client.variationInternal(this._flagName, missingValue);
+  variation(fallbackValue: string): string {
+    return this.client.variationInternal(this._flagName, fallbackValue);
   }
 
-  boolVariation(missingValue: boolean): boolean {
-    return this.client.boolVariationInternal(this._flagName, missingValue);
+  boolVariation(fallbackValue: boolean): boolean {
+    return this.client.boolVariationInternal(this._flagName, fallbackValue);
   }
 
-  stringVariation(missingValue: string): string {
-    return this.client.stringVariationInternal(this._flagName, missingValue);
+  stringVariation(fallbackValue: string): string {
+    return this.client.stringVariationInternal(this._flagName, fallbackValue);
   }
 
-  numberVariation(missingValue: number): number {
-    return this.client.numberVariationInternal(this._flagName, missingValue);
+  numberVariation(fallbackValue: number): number {
+    return this.client.numberVariationInternal(this._flagName, fallbackValue);
   }
 
-  jsonVariation<T>(missingValue: T): T {
-    return this.client.jsonVariationInternal(this._flagName, missingValue);
+  jsonVariation<T>(fallbackValue: T): T {
+    return this.client.jsonVariationInternal(this._flagName, fallbackValue);
   }
 
   // ==================== Variation Details ====================
 
-  boolVariationDetails(missingValue: boolean): VariationResult<boolean> {
-    return this.client.boolVariationDetailsInternal(this._flagName, missingValue);
+  boolVariationDetails(fallbackValue: boolean): VariationResult<boolean> {
+    return this.client.boolVariationDetailsInternal(this._flagName, fallbackValue);
   }
 
-  stringVariationDetails(missingValue: string): VariationResult<string> {
-    return this.client.stringVariationDetailsInternal(this._flagName, missingValue);
+  stringVariationDetails(fallbackValue: string): VariationResult<string> {
+    return this.client.stringVariationDetailsInternal(this._flagName, fallbackValue);
   }
 
-  numberVariationDetails(missingValue: number): VariationResult<number> {
-    return this.client.numberVariationDetailsInternal(this._flagName, missingValue);
+  numberVariationDetails(fallbackValue: number): VariationResult<number> {
+    return this.client.numberVariationDetailsInternal(this._flagName, fallbackValue);
   }
 
-  jsonVariationDetails<T>(missingValue: T): VariationResult<T> {
-    return this.client.jsonVariationDetailsInternal(this._flagName, missingValue);
+  jsonVariationDetails<T>(fallbackValue: T): VariationResult<T> {
+    return this.client.jsonVariationDetailsInternal(this._flagName, fallbackValue);
   }
 
   // ==================== Strict Variation Methods (OrThrow) ====================

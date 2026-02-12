@@ -1,4 +1,4 @@
-import 'package:flutter_test/flutter_test.dart';
+﻿import 'package:flutter_test/flutter_test.dart';
 import 'package:gatrix_flutter_sdk/src/models.dart';
 import 'package:gatrix_flutter_sdk/src/events.dart';
 import 'package:gatrix_flutter_sdk/src/features_client.dart';
@@ -168,7 +168,7 @@ void main() {
       expect(client.variation('disabled-flag', 'fallback'), r'$disabled');
     });
 
-    test('returns missingValue for non-existent flag', () {
+    test('returns fallbackValue for non-existent flag', () {
       final client = makeClient(bootstrap: fullBootstrap);
       expect(client.variation('nonexistent', 'default'), 'default');
     });
@@ -180,12 +180,12 @@ void main() {
       expect(client.boolVariation('bool-flag', false), true);
     });
 
-    test('returns missingValue for non-boolean valueType', () {
+    test('returns fallbackValue for non-boolean valueType', () {
       final client = makeClient(bootstrap: fullBootstrap);
       expect(client.boolVariation('string-flag', true), true);
     });
 
-    test('returns missingValue for missing flag', () {
+    test('returns fallbackValue for missing flag', () {
       final client = makeClient(bootstrap: fullBootstrap);
       expect(client.boolVariation('nonexistent', true), true);
     });
@@ -202,12 +202,12 @@ void main() {
       expect(client.stringVariation('string-flag', ''), 'hello world');
     });
 
-    test('returns missingValue for non-string valueType', () {
+    test('returns fallbackValue for non-string valueType', () {
       final client = makeClient(bootstrap: fullBootstrap);
       expect(client.stringVariation('bool-flag', 'def'), 'def');
     });
 
-    test('returns missingValue for missing flag', () {
+    test('returns fallbackValue for missing flag', () {
       final client = makeClient(bootstrap: fullBootstrap);
       expect(client.stringVariation('nonexistent', 'def'), 'def');
     });
@@ -224,12 +224,12 @@ void main() {
       expect(client.intVariation('float-flag', 0), 3);
     });
 
-    test('returns missingValue for non-number valueType', () {
+    test('returns fallbackValue for non-number valueType', () {
       final client = makeClient(bootstrap: fullBootstrap);
       expect(client.intVariation('bool-flag', 99), 99);
     });
 
-    test('returns missingValue for missing flag', () {
+    test('returns fallbackValue for missing flag', () {
       final client = makeClient(bootstrap: fullBootstrap);
       expect(client.intVariation('nonexistent', 7), 7);
     });
@@ -246,12 +246,12 @@ void main() {
       expect(client.doubleVariation('number-flag', 0.0), 42.0);
     });
 
-    test('returns missingValue for non-number valueType', () {
+    test('returns fallbackValue for non-number valueType', () {
       final client = makeClient(bootstrap: fullBootstrap);
       expect(client.doubleVariation('string-flag', 99.0), 99.0);
     });
 
-    test('returns missingValue for missing flag', () {
+    test('returns fallbackValue for missing flag', () {
       final client = makeClient(bootstrap: fullBootstrap);
       expect(client.doubleVariation('nonexistent', 7.0), 7.0);
     });
@@ -266,14 +266,14 @@ void main() {
       expect((result['nested'] as Map)['a'], 1);
     });
 
-    test('returns missingValue for non-json valueType', () {
+    test('returns fallbackValue for non-json valueType', () {
       final client = makeClient(bootstrap: fullBootstrap);
       final result = client.jsonVariation<Map<String, dynamic>>(
           'string-flag', {'default': true});
       expect(result['default'], true);
     });
 
-    test('returns missingValue for missing flag', () {
+    test('returns fallbackValue for missing flag', () {
       final client = makeClient(bootstrap: fullBootstrap);
       final result = client.jsonVariation<Map<String, dynamic>>(
           'nonexistent', {'fallback': true});
@@ -299,7 +299,7 @@ void main() {
       expect(result.reason, 'flag_not_found');
     });
 
-    test('boolVariationDetails type mismatch returns missingValue + reason', () {
+    test('boolVariationDetails type mismatch returns fallbackValue + reason', () {
       final client = makeClient(bootstrap: fullBootstrap);
       final result = client.boolVariationDetails('string-flag', true);
       expect(result.value, true);
@@ -419,10 +419,12 @@ void main() {
       expect(client.hasPendingSyncFlags(), false);
     });
 
-    test('hasPendingSyncFlags returns true when flags are pending', () {
+    test('hasPendingSyncFlags returns false after bootstrap (bootstrap force-syncs)', () {
       final client = makeClient(
           bootstrap: fullBootstrap, explicitSyncMode: true);
-      expect(client.hasPendingSyncFlags(), true);
+      // Bootstrap applies flags to both realtime and synchronized maps,
+      // so there are no pending sync flags right after bootstrap.
+      expect(client.hasPendingSyncFlags(), false);
     });
   });
 

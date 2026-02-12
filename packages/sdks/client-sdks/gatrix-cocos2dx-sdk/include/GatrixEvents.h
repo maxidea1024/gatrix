@@ -18,6 +18,7 @@ struct EVENTS {
   static constexpr const char *SDK_ERROR = "flags.error";
   static constexpr const char *FLAGS_RECOVERED = "flags.recovered";
   static constexpr const char *FLAGS_SYNC = "flags.sync";
+  static constexpr const char *FLAGS_PENDING_SYNC = "flags.pending_sync";
   static constexpr const char *FLAGS_REMOVED = "flags.removed";
   static constexpr const char *FLAGS_IMPRESSION = "flags.impression";
   static constexpr const char *FLAGS_METRICS_SENT = "flags.metrics.sent";

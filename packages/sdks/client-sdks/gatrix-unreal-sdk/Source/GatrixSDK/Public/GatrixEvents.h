@@ -29,6 +29,8 @@ static const FString SdkError = TEXT("flags.error");
 static const FString FlagsImpression = TEXT("flags.impression");
 /** Flags synchronized (explicitSyncMode) */
 static const FString FlagsSync = TEXT("flags.sync");
+/** Pending sync flags available (explicitSyncMode) */
+static const FString FlagsPendingSync = TEXT("flags.pending_sync");
 /** One or more flags removed from server. Payload: comma-separated removed flag
  * names */
 static const FString FlagsRemoved = TEXT("flags.removed");

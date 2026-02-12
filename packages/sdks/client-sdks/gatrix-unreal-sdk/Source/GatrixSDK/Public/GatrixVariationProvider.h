@@ -8,7 +8,6 @@
 #include "GatrixVariationProvider.generated.h"
 #include "UObject/Interface.h"
 
-
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
 class UGatrixVariationProvider : public UInterface {
@@ -25,45 +24,66 @@ class GATRIXSDK_API IGatrixVariationProvider {
   GENERATED_BODY()
 
 public:
-  virtual bool IsEnabledInternal(const FString &FlagName) = 0;
-  virtual FGatrixVariant GetVariantInternal(const FString &FlagName) = 0;
+  virtual bool IsEnabledInternal(const FString &FlagName,
+                                 bool bForceRealtime = false) = 0;
+  virtual FGatrixVariant GetVariantInternal(const FString &FlagName,
+                                            bool bForceRealtime = false) = 0;
 
   virtual FString VariationInternal(const FString &FlagName,
-                                    const FString &MissingValue) = 0;
+                                    const FString &FallbackValue,
+                                    bool bForceRealtime = false) = 0;
   virtual bool BoolVariationInternal(const FString &FlagName,
-                                     bool MissingValue) = 0;
+                                     bool FallbackValue,
+                                     bool bForceRealtime = false) = 0;
   virtual FString StringVariationInternal(const FString &FlagName,
-                                          const FString &MissingValue) = 0;
+                                          const FString &FallbackValue,
+                                          bool bForceRealtime = false) = 0;
   virtual float FloatVariationInternal(const FString &FlagName,
-                                       float MissingValue) = 0;
+                                       float FallbackValue,
+                                       bool bForceRealtime = false) = 0;
   virtual int32 IntVariationInternal(const FString &FlagName,
-                                     int32 MissingValue) = 0;
+                                     int32 FallbackValue,
+                                     bool bForceRealtime = false) = 0;
   virtual double DoubleVariationInternal(const FString &FlagName,
-                                         double MissingValue) = 0;
+                                         double FallbackValue,
+                                         bool bForceRealtime = false) = 0;
   virtual FString JsonVariationInternal(const FString &FlagName,
-                                        const FString &MissingValue) = 0;
+                                        const FString &FallbackValue,
+                                        bool bForceRealtime = false) = 0;
 
   virtual FGatrixVariationResult
-  BoolVariationDetailsInternal(const FString &FlagName, bool MissingValue) = 0;
+  BoolVariationDetailsInternal(const FString &FlagName, bool FallbackValue,
+                               bool bForceRealtime = false) = 0;
   virtual FGatrixVariationResult
   StringVariationDetailsInternal(const FString &FlagName,
-                                 const FString &MissingValue) = 0;
+                                 const FString &FallbackValue,
+                                 bool bForceRealtime = false) = 0;
   virtual FGatrixVariationResult
-  FloatVariationDetailsInternal(const FString &FlagName,
-                                float MissingValue) = 0;
+  FloatVariationDetailsInternal(const FString &FlagName, float FallbackValue,
+                                bool bForceRealtime = false) = 0;
   virtual FGatrixVariationResult
-  IntVariationDetailsInternal(const FString &FlagName, int32 MissingValue) = 0;
+  IntVariationDetailsInternal(const FString &FlagName, int32 FallbackValue,
+                              bool bForceRealtime = false) = 0;
   virtual FGatrixVariationResult
-  DoubleVariationDetailsInternal(const FString &FlagName,
-                                 double MissingValue) = 0;
+  DoubleVariationDetailsInternal(const FString &FlagName, double FallbackValue,
+                                 bool bForceRealtime = false) = 0;
   virtual FGatrixVariationResult
   JsonVariationDetailsInternal(const FString &FlagName,
-                               const FString &MissingValue) = 0;
+                               const FString &FallbackValue,
+                               bool bForceRealtime = false) = 0;
 
-  virtual bool BoolVariationOrThrowInternal(const FString &FlagName) = 0;
-  virtual FString StringVariationOrThrowInternal(const FString &FlagName) = 0;
-  virtual float FloatVariationOrThrowInternal(const FString &FlagName) = 0;
-  virtual int32 IntVariationOrThrowInternal(const FString &FlagName) = 0;
-  virtual double DoubleVariationOrThrowInternal(const FString &FlagName) = 0;
-  virtual FString JsonVariationOrThrowInternal(const FString &FlagName) = 0;
+  virtual bool BoolVariationOrThrowInternal(const FString &FlagName,
+                                            bool bForceRealtime = false) = 0;
+  virtual FString
+  StringVariationOrThrowInternal(const FString &FlagName,
+                                 bool bForceRealtime = false) = 0;
+  virtual float FloatVariationOrThrowInternal(const FString &FlagName,
+                                              bool bForceRealtime = false) = 0;
+  virtual int32 IntVariationOrThrowInternal(const FString &FlagName,
+                                            bool bForceRealtime = false) = 0;
+  virtual double
+  DoubleVariationOrThrowInternal(const FString &FlagName,
+                                 bool bForceRealtime = false) = 0;
+  virtual FString JsonVariationOrThrowInternal(const FString &FlagName,
+                                               bool bForceRealtime = false) = 0;
 };

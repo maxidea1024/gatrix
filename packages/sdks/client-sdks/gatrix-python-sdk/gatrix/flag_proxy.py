@@ -6,6 +6,12 @@ No onAccess callback – metrics tracking is handled by the internal methods.
 
 Uses null object pattern: _flag is never None.
 MISSING_FLAG sentinel is used for non-existent flags.
+
+IMPORTANT: client (VariationProvider) is ALWAYS non-null. FlagProxy is
+exclusively created by FeaturesClient, which passes itself as the client.
+
+FlagProxy does NOT expose force_realtime; it is available only through
+FeaturesClient's public methods for direct flag access.
 """
 from __future__ import annotations
 
@@ -38,9 +44,9 @@ class FlagProxy:
 
     def __init__(
         self,
-        flag: Optional[EvaluatedFlag] = None,
-        client: Optional[VariationProvider] = None,
-        flag_name: Optional[str] = None,
+        flag: Optional[EvaluatedFlag],
+        client: VariationProvider,
+        flag_name: str,
     ) -> None:
         self._exists = flag is not None
         self._flag = flag if flag is not None else MISSING_FLAG
@@ -55,9 +61,7 @@ class FlagProxy:
     @property
     def enabled(self) -> bool:
         """Check if the flag is enabled. Delegates to client for metrics."""
-        if self._client is not None:
-            return self._client.is_enabled_internal(self._flag_name)
-        return self._flag.enabled if self._exists else False
+        return self._client.is_enabled_internal(self._flag_name)
 
     @property
     def name(self) -> str:
@@ -88,97 +92,58 @@ class FlagProxy:
         return self._flag if self._exists else None
 
     # ----------------------------------------------------------- variations
-    # All variation methods delegate to VariationProvider
-
-    def variation(self, missing_value: str) -> str:
+    def variation(self, fallback_value: str) -> str:
         """Return variant name (or default)."""
-        if self._client is not None:
-            return self._client.variation_internal(self._flag_name, missing_value)
-        return self._flag.variant.name if self._exists else missing_value
+        return self._client.variation_internal(self._flag_name, fallback_value)
 
-    def bool_variation(self, missing_value: bool) -> bool:
+    def bool_variation(self, fallback_value: bool) -> bool:
         """Get boolean variation from variant value."""
-        if self._client is not None:
-            return self._client.bool_variation_internal(self._flag_name, missing_value)
-        return missing_value
+        return self._client.bool_variation_internal(self._flag_name, fallback_value)
 
-    def string_variation(self, missing_value: str) -> str:
+    def string_variation(self, fallback_value: str) -> str:
         """Get string variation."""
-        if self._client is not None:
-            return self._client.string_variation_internal(self._flag_name, missing_value)
-        return missing_value
+        return self._client.string_variation_internal(self._flag_name, fallback_value)
 
-    def int_variation(self, missing_value: int) -> int:
+    def int_variation(self, fallback_value: int) -> int:
         """Get integer variation. Strict: value_type must be 'number'."""
-        if self._client is not None:
-            return self._client.int_variation_internal(self._flag_name, missing_value)
-        return missing_value
+        return self._client.int_variation_internal(self._flag_name, fallback_value)
 
-    def float_variation(self, missing_value: float) -> float:
+    def float_variation(self, fallback_value: float) -> float:
         """Get float variation. Strict: value_type must be 'number'."""
-        if self._client is not None:
-            return self._client.float_variation_internal(self._flag_name, missing_value)
-        return missing_value
+        return self._client.float_variation_internal(self._flag_name, fallback_value)
 
-    def json_variation(self, missing_value: Any) -> Any:
+    def json_variation(self, fallback_value: Any) -> Any:
         """Get JSON variation."""
-        if self._client is not None:
-            return self._client.json_variation_internal(self._flag_name, missing_value)
-        return missing_value
+        return self._client.json_variation_internal(self._flag_name, fallback_value)
 
     # ------------------------------------------------- variation details
-    def bool_variation_details(self, missing_value: bool) -> VariationResult:
-        if self._client is not None:
-            return self._client.bool_variation_details_internal(self._flag_name, missing_value)
-        return VariationResult(value=missing_value, reason="no_client", flag_exists=False, enabled=False)
+    def bool_variation_details(self, fallback_value: bool) -> VariationResult:
+        return self._client.bool_variation_details_internal(self._flag_name, fallback_value)
 
-    def string_variation_details(self, missing_value: str) -> VariationResult:
-        if self._client is not None:
-            return self._client.string_variation_details_internal(self._flag_name, missing_value)
-        return VariationResult(value=missing_value, reason="no_client", flag_exists=False, enabled=False)
+    def string_variation_details(self, fallback_value: str) -> VariationResult:
+        return self._client.string_variation_details_internal(self._flag_name, fallback_value)
 
-    def int_variation_details(self, missing_value: int) -> VariationResult:
-        if self._client is not None:
-            return self._client.int_variation_details_internal(self._flag_name, missing_value)
-        return VariationResult(value=missing_value, reason="no_client", flag_exists=False, enabled=False)
+    def int_variation_details(self, fallback_value: int) -> VariationResult:
+        return self._client.int_variation_details_internal(self._flag_name, fallback_value)
 
-    def float_variation_details(self, missing_value: float) -> VariationResult:
-        if self._client is not None:
-            return self._client.float_variation_details_internal(self._flag_name, missing_value)
-        return VariationResult(value=missing_value, reason="no_client", flag_exists=False, enabled=False)
+    def float_variation_details(self, fallback_value: float) -> VariationResult:
+        return self._client.float_variation_details_internal(self._flag_name, fallback_value)
 
-    def json_variation_details(self, missing_value: Any) -> VariationResult:
-        if self._client is not None:
-            return self._client.json_variation_details_internal(self._flag_name, missing_value)
-        return VariationResult(value=missing_value, reason="no_client", flag_exists=False, enabled=False)
+    def json_variation_details(self, fallback_value: Any) -> VariationResult:
+        return self._client.json_variation_details_internal(self._flag_name, fallback_value)
 
     # ------------------------------------------------- or-throw variants
     def bool_variation_or_throw(self) -> bool:
-        if self._client is not None:
-            return self._client.bool_variation_or_throw_internal(self._flag_name)
-        from gatrix.errors import GatrixFeatureError
-        raise GatrixFeatureError(f"Flag '{self._flag_name}' not found (no client)")
+        return self._client.bool_variation_or_throw_internal(self._flag_name)
 
     def string_variation_or_throw(self) -> str:
-        if self._client is not None:
-            return self._client.string_variation_or_throw_internal(self._flag_name)
-        from gatrix.errors import GatrixFeatureError
-        raise GatrixFeatureError(f"Flag '{self._flag_name}' not found (no client)")
+        return self._client.string_variation_or_throw_internal(self._flag_name)
 
     def int_variation_or_throw(self) -> int:
-        if self._client is not None:
-            return self._client.int_variation_or_throw_internal(self._flag_name)
-        from gatrix.errors import GatrixFeatureError
-        raise GatrixFeatureError(f"Flag '{self._flag_name}' not found (no client)")
+        return self._client.int_variation_or_throw_internal(self._flag_name)
 
     def float_variation_or_throw(self) -> float:
-        if self._client is not None:
-            return self._client.float_variation_or_throw_internal(self._flag_name)
-        from gatrix.errors import GatrixFeatureError
-        raise GatrixFeatureError(f"Flag '{self._flag_name}' not found (no client)")
+        return self._client.float_variation_or_throw_internal(self._flag_name)
 
     def json_variation_or_throw(self) -> Any:
-        if self._client is not None:
-            return self._client.json_variation_or_throw_internal(self._flag_name)
-        from gatrix.errors import GatrixFeatureError
-        raise GatrixFeatureError(f"Flag '{self._flag_name}' not found (no client)")
+        return self._client.json_variation_or_throw_internal(self._flag_name)

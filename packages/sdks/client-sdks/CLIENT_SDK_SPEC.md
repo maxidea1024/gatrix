@@ -1,4 +1,4 @@
-# Gatrix Client SDK Specification
+﻿# Gatrix Client SDK Specification
 
 This document defines the core architecture, API, and behavior for all Gatrix Client SDKs.
 
@@ -17,7 +17,7 @@ This document defines the core architecture, API, and behavior for all Gatrix Cl
 ## Terminology
 
 > [!CAUTION]
-> Gatrix uses the term **"flag"** (or **"feature flag"**) — never **"toggle"** or **"feature toggle"**.
+> Gatrix uses the term **"flag"** (or **"feature flag"**) ??never **"toggle"** or **"feature toggle"**.
 > All SDK code, APIs, metrics payloads, documentation, and comments MUST use `flag`/`flags` consistently.
 > For example, metrics payloads use `bucket.flags`, not `bucket.toggles`.
 
@@ -52,8 +52,8 @@ When sending metrics to the backend, the payload MUST follow this structure:
 }
 ```
 
-- `bucket.flags` — per-flag access counts (`yes` = enabled, `no` = disabled, `variants` = variant name counts)
-- `bucket.missing` — flags that were accessed but not found in the local cache
+- `bucket.flags` ??per-flag access counts (`yes` = enabled, `no` = disabled, `variants` = variant name counts)
+- `bucket.missing` ??flags that were accessed but not found in the local cache
 
 ## Overview
 
@@ -357,6 +357,7 @@ All events use the `flags.*` prefix for namespacing:
 | `flags.error`             | General SDK error occurred                           | `{ type: string, error: Error }`     |
 | `flags.recovered`         | SDK recovered from error state                       | -                                    |
 | `flags.impression`        | Flag accessed (if impressionData enabled)            | `ImpressionEvent`                    |
+| `flags.pending_sync`      | Pending sync flags available (explicitSyncMode)      | -                                    |
 | `flags.{flagName}.change` | Specific flag created or updated                     | `(newFlag, oldFlag, changeType)` where changeType is `'created'` or `'updated'` |
 | `flags.metrics.sent`      | Metrics successfully sent to server                  | `{ count: number }`                  |
 
@@ -373,8 +374,8 @@ Per-flag change events are emitted when a flag is **created** (new flag) or **up
 
 `watchFlag(flagName, callback)` subscribes to `flags.{flagName}.change` events only. This means:
 
-- ✅ **Reacts to**: Flag created (`changeType: 'created'`), Flag updated (`changeType: 'updated'`)
-- ❌ **Does NOT react to**: Flag removal — use `on('flags.removed', callback)` to handle removals separately
+- ??**Reacts to**: Flag created (`changeType: 'created'`), Flag updated (`changeType: 'updated'`)
+- ??**Does NOT react to**: Flag removal ??use `on('flags.removed', callback)` to handle removals separately
 
 This design prevents ambiguous callback behavior when a watched flag is removed from the server.
 
@@ -413,32 +414,37 @@ class FeaturesClient implements VariationProvider {
   updateContext(context: Partial<GatrixContext>): Promise<void>;
 
   // Flag Access - Basic
-  isEnabled(flagName: string): boolean;
-  getVariant(flagName: string): Variant; // Never returns null/undefined
-  getAllFlags(): EvaluatedFlag[];
-  hasFlag(flagName: string): boolean;
+  // All flag access methods accept an optional `forceRealtime` parameter (default: false).
+  // When `forceRealtime: true`, the method always returns values from `realtimeFlags`
+  // regardless of `explicitSyncMode`. This is useful for displaying real-time
+  // status in dashboards or debug UIs while keeping the main app synchronized.
+  isEnabled(flagName: string, forceRealtime?: boolean): boolean;
+  getVariant(flagName: string, forceRealtime?: boolean): Variant; // Never returns null/undefined
+  getAllFlags(forceRealtime?: boolean): EvaluatedFlag[];
+  hasFlag(flagName: string, forceRealtime?: boolean): boolean;
 
-  // Flag Access - Typed Variations (missingValue is REQUIRED)
-  variation(flagName: string, missingValue: string): string; // Variant name only
-  boolVariation(flagName: string, missingValue: boolean): boolean;
-  stringVariation(flagName: string, missingValue: string): string;
-  numberVariation(flagName: string, missingValue: number): number; // JS/TS only. Other SDKs: intVariation + floatVariation/doubleVariation
-  jsonVariation<T>(flagName: string, missingValue: T): T;
+  // Flag Access - Typed Variations (fallbackValue is REQUIRED)
+  variation(flagName: string, fallbackValue: string, forceRealtime?: boolean): string; // Variant name only
+  boolVariation(flagName: string, fallbackValue: boolean, forceRealtime?: boolean): boolean;
+  stringVariation(flagName: string, fallbackValue: string, forceRealtime?: boolean): string;
+  numberVariation(flagName: string, fallbackValue: number, forceRealtime?: boolean): number; // JS/TS only
+  jsonVariation<T>(flagName: string, fallbackValue: T, forceRealtime?: boolean): T;
 
-  // Variation Details - Returns detailed result with reason (missingValue is REQUIRED)
-  boolVariationDetails(flagName: string, missingValue: boolean): VariationResult<boolean>;
-  stringVariationDetails(flagName: string, missingValue: string): VariationResult<string>;
-  numberVariationDetails(flagName: string, missingValue: number): VariationResult<number>;
-  jsonVariationDetails<T>(flagName: string, missingValue: T): VariationResult<T>;
+  // Variation Details - Returns detailed result with reason (fallbackValue is REQUIRED)
+  boolVariationDetails(flagName: string, fallbackValue: boolean, forceRealtime?: boolean): VariationResult<boolean>;
+  stringVariationDetails(flagName: string, fallbackValue: string, forceRealtime?: boolean): VariationResult<string>;
+  numberVariationDetails(flagName: string, fallbackValue: number, forceRealtime?: boolean): VariationResult<number>;
+  jsonVariationDetails<T>(flagName: string, fallbackValue: T, forceRealtime?: boolean): VariationResult<T>;
 
   // Strict Variations - Throws GatrixFeatureError on not found/disabled/invalid
-  boolVariationOrThrow(flagName: string): boolean;
-  stringVariationOrThrow(flagName: string): string;
-  numberVariationOrThrow(flagName: string): number;
-  jsonVariationOrThrow<T>(flagName: string): T;
+  boolVariationOrThrow(flagName: string, forceRealtime?: boolean): boolean;
+  stringVariationOrThrow(flagName: string, forceRealtime?: boolean): string;
+  numberVariationOrThrow(flagName: string, forceRealtime?: boolean): number;
+  jsonVariationOrThrow<T>(flagName: string, forceRealtime?: boolean): T;
 
   // Explicit Sync Mode
   isExplicitSyncEnabled(): boolean;
+  setExplicitSyncMode(enabled: boolean): void; // Change mode at runtime
   hasPendingSyncFlags(): boolean;
   syncFlags(fetchNow?: boolean): Promise<void>;
 
@@ -619,7 +625,7 @@ All variation functions:
 
 All variation methods require an explicit default value parameter. This is a deliberate design decision:
 
-1. **Prevents Ambiguity:** When a flag doesn't exist or has no value, the SDK returns your specified default—not `undefined` or `null`.
+1. **Prevents Ambiguity:** When a flag doesn't exist or has no value, the SDK returns your specified default?봭ot `undefined` or `null`.
 2. **Type Safety:** The default value establishes the expected return type.
 3. **Fail-Safe Behavior:** Your application always receives a usable value, even during network failures or SDK initialization.
 4. **Explicit Intent:** Forces developers to consider the fallback scenario, reducing bugs.
@@ -665,37 +671,38 @@ All SDKs MUST implement the `variationInternal` pattern for centralized flag log
 - `FeaturesClient` contains `*VariationInternal()` methods that handle **all** logic: flag lookup + value extraction + metrics tracking.
 - Public variation methods (e.g., `boolVariation`) simply delegate to the internal methods.
 - `FlagProxy` is a **convenience shell** that delegates all variation calls back to `FeaturesClient`'s internal methods.
+- All internal methods accept an optional `forceRealtime` parameter (default: `false`). When `true`, the method reads from `realtimeFlags` directly, bypassing `selectFlags()` logic.
 
 ```typescript
 // VariationProvider interface (separate file to avoid circular deps)
 interface VariationProvider {
-  isEnabledInternal(flagName: string): boolean;
-  getVariantInternal(flagName: string): Variant;
-  variationInternal(flagName: string, missingValue: string): string;
-  boolVariationInternal(flagName: string, missingValue: boolean): boolean;
-  stringVariationInternal(flagName: string, missingValue: string): string;
-  numberVariationInternal(flagName: string, missingValue: number): number;
-  jsonVariationInternal<T>(flagName: string, missingValue: T): T;
+  isEnabledInternal(flagName: string, forceRealtime?: boolean): boolean;
+  getVariantInternal(flagName: string, forceRealtime?: boolean): Variant;
+  variationInternal(flagName: string, fallbackValue: string, forceRealtime?: boolean): string;
+  boolVariationInternal(flagName: string, fallbackValue: boolean, forceRealtime?: boolean): boolean;
+  stringVariationInternal(flagName: string, fallbackValue: string, forceRealtime?: boolean): string;
+  numberVariationInternal(flagName: string, fallbackValue: number, forceRealtime?: boolean): number;
+  jsonVariationInternal<T>(flagName: string, fallbackValue: T, forceRealtime?: boolean): T;
   // ... Details and OrThrow variants follow the same pattern
 }
 
 // FeaturesClient implements VariationProvider
 class FeaturesClient implements VariationProvider {
   // Internal: does flag lookup + value extraction + metrics tracking
-  boolVariationInternal(flagName: string, missingValue: boolean): boolean {
+  boolVariationInternal(flagName: string, fallbackValue: boolean): boolean {
     const flag = this.lookupFlag(flagName);
     if (!flag) {
       this.trackFlagAccess(flagName, undefined, 'getVariant');
-      return missingValue;
+      return fallbackValue;
     }
     this.trackFlagAccess(flagName, flag, 'getVariant', flag.variant.name);
-    if (flag.valueType !== 'boolean') return missingValue;
+    if (flag.valueType !== 'boolean') return fallbackValue;
     return Boolean(flag.variant.value);
   }
 
   // Public: delegates to internal
-  boolVariation(flagName: string, missingValue: boolean): boolean {
-    return this.boolVariationInternal(flagName, missingValue);
+  boolVariation(flagName: string, fallbackValue: boolean): boolean {
+    return this.boolVariationInternal(flagName, fallbackValue);
   }
 }
 ```
@@ -709,11 +716,14 @@ FlagProxy is a **convenience shell** that delegates all variation logic to `Feat
 - Holds a reference to `VariationProvider` (interface, not `FeaturesClient` directly) to avoid circular dependencies.
 - All variation methods delegate to `VariationProvider`'s internal methods.
 - Read-only property accessors (`variant`, `valueType`, `version`, etc.) access flag data directly.
-- **No `onAccess` callback** — metrics tracking is handled entirely by the internal methods.
+- **No `onAccess` callback** ??metrics tracking is handled entirely by the internal methods.
 - **Strict type checking**: All variation methods validate `valueType` to prevent misuse.
 
 > [!WARNING]
 > **GC and Circular Reference Considerations**: FlagProxy holds a reference to VariationProvider (FeaturesClient). In languages with reference counting GC (C++, Swift), use weak pointers/references. In managed languages (JS, C#, Dart, Python) with mark-and-sweep GC, cycles are handled automatically. FlagProxy instances are typically short-lived (created for one-shot variation calls and immediately discarded).
+
+> [!IMPORTANT]
+> **FlagProxy.client is ALWAYS non-null**: FlagProxy is exclusively created by `FeaturesClient` (via `getFlag()`, `watchFlag()`, etc.) and always receives the creating client as its `VariationProvider`. SDK implementations MUST NOT add null/undefined checks for the `client` parameter inside FlagProxy methods. The `client` constructor parameter is non-optional and guaranteed to be a valid `VariationProvider` instance. Adding unnecessary null checks creates misleading code that suggests FlagProxy can function without a client, which is architecturally incorrect.
 
 **`boolVariation` behavior:**
 - Checks `valueType === 'boolean'` strictly.
@@ -740,17 +750,17 @@ class FlagProxy {
   get raw(): EvaluatedFlag | undefined;
 
   // All variation methods delegate to VariationProvider
-  variation(missingValue: string): string;
-  boolVariation(missingValue: boolean): boolean;
-  stringVariation(missingValue: string): string;
-  numberVariation(missingValue: number): number; // JS/TS only
-  jsonVariation<T>(missingValue: T): T;
+  variation(fallbackValue: string): string;
+  boolVariation(fallbackValue: boolean): boolean;
+  stringVariation(fallbackValue: string): string;
+  numberVariation(fallbackValue: number): number; // JS/TS only
+  jsonVariation<T>(fallbackValue: T): T;
 
   // Variation details
-  boolVariationDetails(missingValue: boolean): VariationResult<boolean>;
-  stringVariationDetails(missingValue: string): VariationResult<string>;
-  numberVariationDetails(missingValue: number): VariationResult<number>;
-  jsonVariationDetails<T>(missingValue: T): VariationResult<T>;
+  boolVariationDetails(fallbackValue: boolean): VariationResult<boolean>;
+  stringVariationDetails(fallbackValue: string): VariationResult<string>;
+  numberVariationDetails(fallbackValue: number): VariationResult<number>;
+  jsonVariationDetails<T>(fallbackValue: T): VariationResult<T>;
 
   // Strict variations
   boolVariationOrThrow(): boolean;
@@ -765,16 +775,16 @@ class FlagProxy {
 | Method | valueType Check | Value Source | Fallback |
 |--------|----------------|--------------|----------|
 | `enabled` | none | `flag.enabled` | `false` |
-| `variation` | none | `variant.name` | missingValue |
-| `boolVariation` | `boolean` | `Boolean(variant.value)` | missingValue |
-| `stringVariation` | `string` | `String(variant.value)` | missingValue |
-| `numberVariation` | `number` | `Number(variant.value)` | missingValue |
-| `intVariation` | `number` | `int(variant.value)` | missingValue |
-| `floatVariation` | `number` | `float(variant.value)` | missingValue |
-| `jsonVariation` | `json` + object check | `variant.value` | missingValue |
+| `variation` | none | `variant.name` | fallbackValue |
+| `boolVariation` | `boolean` | `Boolean(variant.value)` | fallbackValue |
+| `stringVariation` | `string` | `String(variant.value)` | fallbackValue |
+| `numberVariation` | `number` | `Number(variant.value)` | fallbackValue |
+| `intVariation` | `number` | `int(variant.value)` | fallbackValue |
+| `floatVariation` | `number` | `float(variant.value)` | fallbackValue |
+| `jsonVariation` | `json` + object check | `variant.value` | fallbackValue |
 
 > [!IMPORTANT]
-> **`boolVariation` ≠ `isEnabled`**: `isEnabled()` returns `flag.enabled`, while `boolVariation()` returns the boolean *value* from `variant.value`. These serve different purposes:
+> **`boolVariation` ??`isEnabled`**: `isEnabled()` returns `flag.enabled`, while `boolVariation()` returns the boolean *value* from `variant.value`. These serve different purposes:
 > - `isEnabled()`: Is the feature flag turned on?
 > - `boolVariation()`: What boolean value did the flag evaluate to?
 
@@ -806,9 +816,29 @@ group.unwatchAll();
 
 When `explicitSyncMode: true`:
 
-1. Flags are fetched in the background (realtime store)
+1. Flags are fetched in the background (forceRealtime store)
 2. Application reads from synchronized store
 3. Call `syncFlags()` at safe points to apply changes
+4. When `pendingSync` transitions from `false` to `true`, the SDK emits `flags.pending_sync` event
+5. Flag access methods accept an optional `forceRealtime` parameter to bypass sync and read directly from forceRealtime store
+
+### Runtime Mode Switching
+
+`setExplicitSyncMode(enabled)` allows changing the sync mode at runtime:
+
+- **Enabling** (`false ??true`): Current `realtimeFlags` are copied to `synchronizedFlags`, `pendingSync` is set to `false`. Subsequent fetches will buffer changes.
+- **Disabling** (`true ??false`): `synchronizedFlags` are updated to match `realtimeFlags`, `pendingSync` is set to `false`. All reads immediately return forceRealtime values.
+
+### forceRealtime Parameter
+
+All flag access methods (`isEnabled`, `*Variation`, `getVariant`, etc.) accept an optional `forceRealtime` parameter (default: `false`):
+
+- When `forceRealtime: false` (default): Returns values from `synchronizedFlags` if `explicitSyncMode` is enabled, otherwise from `realtimeFlags`.
+- When `forceRealtime: true`: Always returns values from `realtimeFlags`, regardless of `explicitSyncMode` setting.
+
+This is useful for:
+- Debug/monitoring UIs that need to show the latest server values
+- Dashboards displaying real-time flag status alongside the app's synchronized state
 
 ```typescript
 // Enable explicit sync mode
@@ -819,11 +849,22 @@ const client = new GatrixClient({
   explicitSyncMode: true,
 });
 
-// Read from synchronized store
+// Read from synchronized store (default)
 const enabled = client.isEnabled('my-feature');
+
+// Read from forceRealtime store (bypass sync)
+const realtimeEnabled = client.isEnabled('my-feature', true);
+
+// Listen for pending sync availability
+client.on('flags.pending_sync', () => {
+  console.log('New flag values available, call syncFlags() to apply');
+});
 
 // Apply pending changes at safe point (e.g., scene transition)
 await client.syncFlags();
+
+// Switch to non-explicit mode at runtime
+client.features.setExplicitSyncMode(false);
 ```
 
 ## Watch Pattern
@@ -861,6 +902,7 @@ SDK emits the following events that you can subscribe to:
 | `flags.error`         | `EVENTS.SDK_ERROR`     | General error occurred                               | `{ type: string, message: string }`                 |
 | `flags.recovered`     | `EVENTS.FLAGS_RECOVERED` | SDK recovered from error state                       | -                                                   |
 | `flags.sync`          | `EVENTS.FLAGS_SYNC`    | Flags synchronized (explicitSyncMode)                | -                                                   |
+| `flags.pending_sync`  | `EVENTS.FLAGS_PENDING_SYNC` | Pending sync flags available (explicitSyncMode)     | -                                                   |
 | `flags.impression`    | `EVENTS.FLAGS_IMPRESSION` | Flag accessed (if impressionData enabled)            | `{ featureName, enabled, variant, ... }`            |
 
 ### Event Subscription
@@ -932,7 +974,7 @@ track(eventName: string, ...eventArgs: any[]): void;
 - `*VariationOrThrow` methods throw for strict checking scenarios
 - Context updates trigger automatic re-fetch of flags
 - SessionId is automatically generated if not provided
-- `deviceId` is NOT a standard context field — SDKs MUST NOT include it automatically
+- `deviceId` is NOT a standard context field ??SDKs MUST NOT include it automatically
 
 ## Error Handling
 
@@ -958,9 +1000,9 @@ Error path behavior:
 > **Cached flags trigger ready state.** During `init()`, if cached flags are loaded from storage and the list is non-empty, the SDK MUST call `setReady()` immediately. This enables offline-first behavior where the application can start rendering flags from cache before the first network request completes.
 
 Ready state flow:
-1. `init()`: Load cached flags from storage → if non-empty, call `setReady()`
-2. `init()`: Load bootstrap flags → if present, call `setReady()` (may override cached)
-3. `start()`: First successful `fetchFlags()` → call `setReady()` if not already called
+1. `init()`: Load cached flags from storage ??if non-empty, call `setReady()`
+2. `init()`: Load bootstrap flags ??if present, call `setReady()` (may override cached)
+3. `start()`: First successful `fetchFlags()` ??call `setReady()` if not already called
 
 ### SDK State Reporting
 

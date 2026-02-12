@@ -18,6 +18,7 @@ class EVENTS:
     FLAGS_CHANGE = "flags.change"
     FLAGS_REMOVED = "flags.removed"
     FLAGS_SYNC = "flags.sync"
+    FLAGS_PENDING_SYNC = "flags.pending_sync"
     FLAGS_IMPRESSION = "flags.impression"
     FLAGS_METRICS_SENT = "flags.metrics.sent"
     FLAGS_METRICS_ERROR = "flags.metrics.error"

@@ -53,86 +53,110 @@ public:
 
   // ==================== Variation Methods ====================
 
-  std::string variation(const std::string &missingValue) const {
-    return _provider->variationInternal(_flagName, missingValue);
+  std::string variation(const std::string &fallbackValue,
+                        bool forceRealtime = false) const {
+    return _provider->variationInternal(_flagName, fallbackValue,
+                                        forceRealtime);
   }
 
-  bool boolVariation(bool missingValue) const {
-    return _provider->boolVariationInternal(_flagName, missingValue);
+  bool boolVariation(bool fallbackValue, bool forceRealtime = false) const {
+    return _provider->boolVariationInternal(_flagName, fallbackValue,
+                                            forceRealtime);
   }
 
-  std::string stringVariation(const std::string &missingValue) const {
-    return _provider->stringVariationInternal(_flagName, missingValue);
+  std::string stringVariation(const std::string &fallbackValue,
+                              bool forceRealtime = false) const {
+    return _provider->stringVariationInternal(_flagName, fallbackValue,
+                                              forceRealtime);
   }
 
-  int intVariation(int missingValue) const {
-    return _provider->intVariationInternal(_flagName, missingValue);
+  int intVariation(int fallbackValue, bool forceRealtime = false) const {
+    return _provider->intVariationInternal(_flagName, fallbackValue,
+                                           forceRealtime);
   }
 
-  float floatVariation(float missingValue) const {
-    return _provider->floatVariationInternal(_flagName, missingValue);
+  float floatVariation(float fallbackValue, bool forceRealtime = false) const {
+    return _provider->floatVariationInternal(_flagName, fallbackValue,
+                                             forceRealtime);
   }
 
-  double doubleVariation(double missingValue) const {
-    return _provider->doubleVariationInternal(_flagName, missingValue);
+  double doubleVariation(double fallbackValue,
+                         bool forceRealtime = false) const {
+    return _provider->doubleVariationInternal(_flagName, fallbackValue,
+                                              forceRealtime);
   }
 
-  std::string jsonVariation(const std::string &missingValue) const {
-    return _provider->jsonVariationInternal(_flagName, missingValue);
+  std::string jsonVariation(const std::string &fallbackValue,
+                            bool forceRealtime = false) const {
+    return _provider->jsonVariationInternal(_flagName, fallbackValue,
+                                            forceRealtime);
   }
 
   // ==================== Variation Details ====================
 
-  VariationResult<bool> boolVariationDetails(bool missingValue) const {
-    return _provider->boolVariationDetailsInternal(_flagName, missingValue);
+  VariationResult<bool> boolVariationDetails(bool fallbackValue,
+                                             bool forceRealtime = false) const {
+    return _provider->boolVariationDetailsInternal(_flagName, fallbackValue,
+                                                   forceRealtime);
   }
 
   VariationResult<std::string>
-  stringVariationDetails(const std::string &missingValue) const {
-    return _provider->stringVariationDetailsInternal(_flagName, missingValue);
+  stringVariationDetails(const std::string &fallbackValue,
+                         bool forceRealtime = false) const {
+    return _provider->stringVariationDetailsInternal(_flagName, fallbackValue,
+                                                     forceRealtime);
   }
 
-  VariationResult<float> floatVariationDetails(float missingValue) const {
-    return _provider->floatVariationDetailsInternal(_flagName, missingValue);
+  VariationResult<float>
+  floatVariationDetails(float fallbackValue, bool forceRealtime = false) const {
+    return _provider->floatVariationDetailsInternal(_flagName, fallbackValue,
+                                                    forceRealtime);
   }
 
-  VariationResult<int> intVariationDetails(int missingValue) const {
-    return _provider->intVariationDetailsInternal(_flagName, missingValue);
+  VariationResult<int> intVariationDetails(int fallbackValue,
+                                           bool forceRealtime = false) const {
+    return _provider->intVariationDetailsInternal(_flagName, fallbackValue,
+                                                  forceRealtime);
   }
 
-  VariationResult<double> doubleVariationDetails(double missingValue) const {
-    return _provider->doubleVariationDetailsInternal(_flagName, missingValue);
+  VariationResult<double>
+  doubleVariationDetails(double fallbackValue,
+                         bool forceRealtime = false) const {
+    return _provider->doubleVariationDetailsInternal(_flagName, fallbackValue,
+                                                     forceRealtime);
   }
 
   VariationResult<std::string>
-  jsonVariationDetails(const std::string &missingValue) const {
-    return _provider->jsonVariationDetailsInternal(_flagName, missingValue);
+  jsonVariationDetails(const std::string &fallbackValue,
+                       bool forceRealtime = false) const {
+    return _provider->jsonVariationDetailsInternal(_flagName, fallbackValue,
+                                                   forceRealtime);
   }
 
   // ==================== OrThrow Methods ====================
 
-  bool boolVariationOrThrow() const {
-    return _provider->boolVariationOrThrowInternal(_flagName);
+  bool boolVariationOrThrow(bool forceRealtime = false) const {
+    return _provider->boolVariationOrThrowInternal(_flagName, forceRealtime);
   }
 
-  std::string stringVariationOrThrow() const {
-    return _provider->stringVariationOrThrowInternal(_flagName);
+  std::string stringVariationOrThrow(bool forceRealtime = false) const {
+    return _provider->stringVariationOrThrowInternal(_flagName, forceRealtime);
   }
 
-  float floatVariationOrThrow() const {
-    return _provider->floatVariationOrThrowInternal(_flagName);
+  float floatVariationOrThrow(bool forceRealtime = false) const {
+    return _provider->floatVariationOrThrowInternal(_flagName, forceRealtime);
   }
 
-  int intVariationOrThrow() const {
-    return _provider->intVariationOrThrowInternal(_flagName);
+  int intVariationOrThrow(bool forceRealtime = false) const {
+    return _provider->intVariationOrThrowInternal(_flagName, forceRealtime);
   }
 
-  double doubleVariationOrThrow() const {
-    return _provider->doubleVariationOrThrowInternal(_flagName);
+  double doubleVariationOrThrow(bool forceRealtime = false) const {
+    return _provider->doubleVariationOrThrowInternal(_flagName, forceRealtime);
   }
 
-  std::string jsonVariationOrThrow() const {
-    return _provider->jsonVariationOrThrowInternal(_flagName);
+  std::string jsonVariationOrThrow(bool forceRealtime = false) const {
+    return _provider->jsonVariationOrThrowInternal(_flagName, forceRealtime);
   }
 
 private:

@@ -1,4 +1,4 @@
-import 'package:flutter_test/flutter_test.dart';
+﻿import 'package:flutter_test/flutter_test.dart';
 import 'package:gatrix_flutter_sdk/src/models.dart';
 import 'package:gatrix_flutter_sdk/src/flag_proxy.dart';
 import 'package:gatrix_flutter_sdk/src/variation_provider.dart';
@@ -36,121 +36,133 @@ class MockVariationProvider implements VariationProvider {
   EvaluatedFlag? _getFlag(String name) => _flags[name];
 
   @override
-  bool isEnabledInternal(String flagName) =>
+  bool isEnabledInternal(String flagName, {bool forceRealtime = false}) =>
       _getFlag(flagName)?.enabled ?? false;
 
   @override
-  Variant getVariantInternal(String flagName) =>
+  Variant getVariantInternal(String flagName, {bool forceRealtime = false}) =>
       _getFlag(flagName)?.variant ?? missingVariant;
 
   @override
-  String variationInternal(String flagName, String missingValue) {
+  String variationInternal(String flagName, String fallbackValue,
+      {bool forceRealtime = false}) {
     final flag = _getFlag(flagName);
-    if (flag == null) return missingValue;
+    if (flag == null) return fallbackValue;
     return flag.variant.name;
   }
 
   @override
-  bool boolVariationInternal(String flagName, bool missingValue) {
+  bool boolVariationInternal(String flagName, bool fallbackValue,
+      {bool forceRealtime = false}) {
     final flag = _getFlag(flagName);
-    if (flag == null) return missingValue;
-    if (flag.valueType != ValueType.boolean) return missingValue;
+    if (flag == null) return fallbackValue;
+    if (flag.valueType != ValueType.boolean) return fallbackValue;
     final val = flag.variant.value;
-    if (val == null) return missingValue;
+    if (val == null) return fallbackValue;
     if (val is bool) return val;
-    return missingValue;
+    return fallbackValue;
   }
 
   @override
-  String stringVariationInternal(String flagName, String missingValue) {
+  String stringVariationInternal(String flagName, String fallbackValue,
+      {bool forceRealtime = false}) {
     final flag = _getFlag(flagName);
-    if (flag == null) return missingValue;
-    if (flag.valueType != ValueType.string) return missingValue;
+    if (flag == null) return fallbackValue;
+    if (flag.valueType != ValueType.string) return fallbackValue;
     final val = flag.variant.value;
-    if (val == null) return missingValue;
+    if (val == null) return fallbackValue;
     return val.toString();
   }
 
   @override
-  int intVariationInternal(String flagName, int missingValue) {
+  int intVariationInternal(String flagName, int fallbackValue,
+      {bool forceRealtime = false}) {
     final flag = _getFlag(flagName);
-    if (flag == null) return missingValue;
-    if (flag.valueType != ValueType.number) return missingValue;
+    if (flag == null) return fallbackValue;
+    if (flag.valueType != ValueType.number) return fallbackValue;
     final val = flag.variant.value;
-    if (val == null) return missingValue;
+    if (val == null) return fallbackValue;
     if (val is num) return val.toInt();
-    return missingValue;
+    return fallbackValue;
   }
 
   @override
-  double doubleVariationInternal(String flagName, double missingValue) {
+  double doubleVariationInternal(String flagName, double fallbackValue,
+      {bool forceRealtime = false}) {
     final flag = _getFlag(flagName);
-    if (flag == null) return missingValue;
-    if (flag.valueType != ValueType.number) return missingValue;
+    if (flag == null) return fallbackValue;
+    if (flag.valueType != ValueType.number) return fallbackValue;
     final val = flag.variant.value;
-    if (val == null) return missingValue;
+    if (val == null) return fallbackValue;
     if (val is num) return val.toDouble();
-    return missingValue;
+    return fallbackValue;
   }
 
   @override
-  T jsonVariationInternal<T>(String flagName, T missingValue) {
+  T jsonVariationInternal<T>(String flagName, T fallbackValue,
+      {bool forceRealtime = false}) {
     final flag = _getFlag(flagName);
-    if (flag == null) return missingValue;
-    if (flag.valueType != ValueType.json) return missingValue;
+    if (flag == null) return fallbackValue;
+    if (flag.valueType != ValueType.json) return fallbackValue;
     final val = flag.variant.value;
-    if (val == null) return missingValue;
+    if (val == null) return fallbackValue;
     if (val is T) return val;
-    return missingValue;
+    return fallbackValue;
   }
 
   @override
   VariationResult<bool> boolVariationDetailsInternal(
-          String flagName, bool missingValue) =>
+          String flagName, bool fallbackValue,
+          {bool forceRealtime = false}) =>
       VariationResult(
-          value: boolVariationInternal(flagName, missingValue),
+          value: boolVariationInternal(flagName, fallbackValue),
           reason: _getFlag(flagName) == null ? 'flag_not_found' : 'evaluated',
           flagExists: _getFlag(flagName) != null,
           enabled: _getFlag(flagName)?.enabled ?? false);
 
   @override
   VariationResult<String> stringVariationDetailsInternal(
-          String flagName, String missingValue) =>
+          String flagName, String fallbackValue,
+          {bool forceRealtime = false}) =>
       VariationResult(
-          value: stringVariationInternal(flagName, missingValue),
+          value: stringVariationInternal(flagName, fallbackValue),
           reason: _getFlag(flagName) == null ? 'flag_not_found' : 'evaluated',
           flagExists: _getFlag(flagName) != null,
           enabled: _getFlag(flagName)?.enabled ?? false);
 
   @override
   VariationResult<int> intVariationDetailsInternal(
-          String flagName, int missingValue) =>
+          String flagName, int fallbackValue,
+          {bool forceRealtime = false}) =>
       VariationResult(
-          value: intVariationInternal(flagName, missingValue),
+          value: intVariationInternal(flagName, fallbackValue),
           reason: _getFlag(flagName) == null ? 'flag_not_found' : 'evaluated',
           flagExists: _getFlag(flagName) != null,
           enabled: _getFlag(flagName)?.enabled ?? false);
 
   @override
   VariationResult<double> doubleVariationDetailsInternal(
-          String flagName, double missingValue) =>
+          String flagName, double fallbackValue,
+          {bool forceRealtime = false}) =>
       VariationResult(
-          value: doubleVariationInternal(flagName, missingValue),
+          value: doubleVariationInternal(flagName, fallbackValue),
           reason: _getFlag(flagName) == null ? 'flag_not_found' : 'evaluated',
           flagExists: _getFlag(flagName) != null,
           enabled: _getFlag(flagName)?.enabled ?? false);
 
   @override
   VariationResult<T> jsonVariationDetailsInternal<T>(
-          String flagName, T missingValue) =>
+          String flagName, T fallbackValue,
+          {bool forceRealtime = false}) =>
       VariationResult(
-          value: jsonVariationInternal<T>(flagName, missingValue),
+          value: jsonVariationInternal<T>(flagName, fallbackValue),
           reason: _getFlag(flagName) == null ? 'flag_not_found' : 'evaluated',
           flagExists: _getFlag(flagName) != null,
           enabled: _getFlag(flagName)?.enabled ?? false);
 
   @override
-  bool boolVariationOrThrowInternal(String flagName) {
+  bool boolVariationOrThrowInternal(String flagName,
+      {bool forceRealtime = false}) {
     final flag = _getFlag(flagName);
     if (flag == null) throw GatrixException('Not found');
     if (flag.valueType != ValueType.boolean) throw GatrixException('Type mismatch');
@@ -161,7 +173,8 @@ class MockVariationProvider implements VariationProvider {
   }
 
   @override
-  String stringVariationOrThrowInternal(String flagName) {
+  String stringVariationOrThrowInternal(String flagName,
+      {bool forceRealtime = false}) {
     final flag = _getFlag(flagName);
     if (flag == null) throw GatrixException('Not found');
     if (flag.valueType != ValueType.string) throw GatrixException('Type mismatch');
@@ -171,7 +184,8 @@ class MockVariationProvider implements VariationProvider {
   }
 
   @override
-  int intVariationOrThrowInternal(String flagName) {
+  int intVariationOrThrowInternal(String flagName,
+      {bool forceRealtime = false}) {
     final flag = _getFlag(flagName);
     if (flag == null) throw GatrixException('Not found');
     if (flag.valueType != ValueType.number) throw GatrixException('Type mismatch');
@@ -182,7 +196,8 @@ class MockVariationProvider implements VariationProvider {
   }
 
   @override
-  double doubleVariationOrThrowInternal(String flagName) {
+  double doubleVariationOrThrowInternal(String flagName,
+      {bool forceRealtime = false}) {
     final flag = _getFlag(flagName);
     if (flag == null) throw GatrixException('Not found');
     if (flag.valueType != ValueType.number) throw GatrixException('Type mismatch');
@@ -193,7 +208,8 @@ class MockVariationProvider implements VariationProvider {
   }
 
   @override
-  T jsonVariationOrThrowInternal<T>(String flagName) {
+  T jsonVariationOrThrowInternal<T>(String flagName,
+      {bool forceRealtime = false}) {
     final flag = _getFlag(flagName);
     if (flag == null) throw GatrixException('Not found');
     if (flag.valueType != ValueType.json) throw GatrixException('Type mismatch');
@@ -491,7 +507,7 @@ void main() {
       expect(result['key'], 'value');
     });
 
-    test('missing flag returns missingValue', () {
+    test('missing flag returns fallbackValue', () {
       final proxy =
           FlagProxy(null, client: mockClient, flagName: 'nonexistent');
       expect(proxy.variation('fallback'), 'fallback');
@@ -501,7 +517,7 @@ void main() {
       expect(proxy.doubleVariation(99.0), 99.0);
     });
 
-    test('type mismatch returns missingValue', () {
+    test('type mismatch returns fallbackValue', () {
       final proxy =
           FlagProxy(null, client: mockClient, flagName: 'string-flag');
       expect(proxy.boolVariation(true), true);

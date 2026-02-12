@@ -1,4 +1,4 @@
-import 'dart:async';
+﻿import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 import 'package:http/http.dart' as http;
@@ -27,6 +27,7 @@ class FeaturesClient implements VariationProvider {
   final List<Map<String, dynamic>> _pendingImpressions = [];
 
   bool _explicitSyncMode = false;
+  bool _pendingSync = false;
   Timer? _pollTimer;
   Timer? _metricsTimer;
   String? _etag;
@@ -106,13 +107,17 @@ class FeaturesClient implements VariationProvider {
     }
   }
 
-  Map<String, EvaluatedFlag> get _activeFlags =>
-      _explicitSyncMode ? _synchronizedFlags : _realtimeFlags;
+  /// Select the active flag set.
+  /// When forceRealtime=true, always returns realtimeFlags regardless of explicitSyncMode.
+  Map<String, EvaluatedFlag> _selectFlags({bool forceRealtime = false}) {
+    if (forceRealtime) return _realtimeFlags;
+    return _explicitSyncMode ? _synchronizedFlags : _realtimeFlags;
+  }
 
   // ============================================================= Flag Access
 
   FlagProxy _createProxy(String flagName) {
-    final flag = _activeFlags[flagName];
+    final flag = _selectFlags()[flagName];
     return FlagProxy(flag, client: this, flagName: flagName);
   }
 
@@ -120,16 +125,16 @@ class FeaturesClient implements VariationProvider {
     return _createProxy(flagName);
   }
 
-  EvaluatedFlag? _getFlag(String flagName) {
-    return _activeFlags[flagName];
+  EvaluatedFlag? _getFlag(String flagName, {bool forceRealtime = false}) {
+    return _selectFlags(forceRealtime: forceRealtime)[flagName];
   }
 
-  List<EvaluatedFlag> getAllFlags() {
-    return _activeFlags.values.toList();
+  List<EvaluatedFlag> getAllFlags({bool forceRealtime = false}) {
+    return _selectFlags(forceRealtime: forceRealtime).values.toList();
   }
 
-  bool hasFlag(String flagName) {
-    return _activeFlags.containsKey(flagName);
+  bool hasFlag(String flagName, {bool forceRealtime = false}) {
+    return _selectFlags(forceRealtime: forceRealtime).containsKey(flagName);
   }
 
   // ============================================================= Metrics
@@ -179,8 +184,8 @@ class FeaturesClient implements VariationProvider {
   // All flag lookup + value extraction + metrics tracking happen here.
 
   @override
-  bool isEnabledInternal(String flagName) {
-    final flag = _getFlag(flagName);
+  bool isEnabledInternal(String flagName, {bool forceRealtime = false}) {
+    final flag = _getFlag(flagName, forceRealtime: forceRealtime);
     if (flag == null) {
       _trackFlagAccess(flagName, null, 'isEnabled');
       return false;
@@ -190,8 +195,8 @@ class FeaturesClient implements VariationProvider {
   }
 
   @override
-  Variant getVariantInternal(String flagName) {
-    final flag = _getFlag(flagName);
+  Variant getVariantInternal(String flagName, {bool forceRealtime = false}) {
+    final flag = _getFlag(flagName, forceRealtime: forceRealtime);
     if (flag == null) {
       _trackFlagAccess(flagName, null, 'getVariant');
       return missingVariant;
@@ -201,89 +206,95 @@ class FeaturesClient implements VariationProvider {
   }
 
   @override
-  String variationInternal(String flagName, String missingValue) {
-    final flag = _getFlag(flagName);
+  String variationInternal(String flagName, String fallbackValue,
+      {bool forceRealtime = false}) {
+    final flag = _getFlag(flagName, forceRealtime: forceRealtime);
     if (flag == null) {
       _trackFlagAccess(flagName, null, 'getVariant');
-      return missingValue;
+      return fallbackValue;
     }
     _trackFlagAccess(flagName, flag, 'getVariant', flag.variant.name);
     return flag.variant.name;
   }
 
   @override
-  bool boolVariationInternal(String flagName, bool missingValue) {
-    final flag = _getFlag(flagName);
+  bool boolVariationInternal(String flagName, bool fallbackValue,
+      {bool forceRealtime = false}) {
+    final flag = _getFlag(flagName, forceRealtime: forceRealtime);
     if (flag == null) {
       _trackFlagAccess(flagName, null, 'getVariant');
-      return missingValue;
+      return fallbackValue;
     }
     _trackFlagAccess(flagName, flag, 'getVariant', flag.variant.name);
-    if (flag.valueType != ValueType.boolean) return missingValue;
+    if (flag.valueType != ValueType.boolean) return fallbackValue;
     final val = flag.variant.value;
-    if (val == null) return missingValue;
+    if (val == null) return fallbackValue;
     if (val is bool) return val;
     if (val is String) return val.toLowerCase() == 'true';
-    return missingValue;
+    return fallbackValue;
   }
 
   @override
-  String stringVariationInternal(String flagName, String missingValue) {
-    final flag = _getFlag(flagName);
+  String stringVariationInternal(String flagName, String fallbackValue,
+      {bool forceRealtime = false}) {
+    final flag = _getFlag(flagName, forceRealtime: forceRealtime);
     if (flag == null) {
       _trackFlagAccess(flagName, null, 'getVariant');
-      return missingValue;
+      return fallbackValue;
     }
     _trackFlagAccess(flagName, flag, 'getVariant', flag.variant.name);
-    if (flag.valueType != ValueType.string) return missingValue;
+    if (flag.valueType != ValueType.string) return fallbackValue;
     final val = flag.variant.value;
-    if (val == null) return missingValue;
+    if (val == null) return fallbackValue;
     return val.toString();
   }
 
   @override
-  int intVariationInternal(String flagName, int missingValue) {
-    final flag = _getFlag(flagName);
+  int intVariationInternal(String flagName, int fallbackValue,
+      {bool forceRealtime = false}) {
+    final flag = _getFlag(flagName, forceRealtime: forceRealtime);
     if (flag == null) {
       _trackFlagAccess(flagName, null, 'getVariant');
-      return missingValue;
+      return fallbackValue;
     }
     _trackFlagAccess(flagName, flag, 'getVariant', flag.variant.name);
-    if (flag.valueType != ValueType.number) return missingValue;
+    if (flag.valueType != ValueType.number) return fallbackValue;
     final val = flag.variant.value;
-    if (val == null) return missingValue;
+    if (val == null) return fallbackValue;
     if (val is num) return val.toInt();
-    if (val is String) return int.tryParse(val) ?? missingValue;
-    return missingValue;
+    if (val is String) return int.tryParse(val) ?? fallbackValue;
+    return fallbackValue;
   }
 
   @override
-  double doubleVariationInternal(String flagName, double missingValue) {
-    final flag = _getFlag(flagName);
+  double doubleVariationInternal(String flagName, double fallbackValue,
+      {bool forceRealtime = false}) {
+    final flag = _getFlag(flagName, forceRealtime: forceRealtime);
     if (flag == null) {
       _trackFlagAccess(flagName, null, 'getVariant');
-      return missingValue;
+      return fallbackValue;
     }
     _trackFlagAccess(flagName, flag, 'getVariant', flag.variant.name);
-    if (flag.valueType != ValueType.number) return missingValue;
+    if (flag.valueType != ValueType.number) return fallbackValue;
     final val = flag.variant.value;
-    if (val == null) return missingValue;
+    if (val == null) return fallbackValue;
     if (val is num) return val.toDouble();
-    if (val is String) return double.tryParse(val) ?? missingValue;
-    return missingValue;
+    if (val is String) return double.tryParse(val) ?? fallbackValue;
+    return fallbackValue;
   }
 
   @override
-  T jsonVariationInternal<T>(String flagName, T missingValue) {
-    final flag = _getFlag(flagName);
+  T jsonVariationInternal<T>(String flagName, T fallbackValue,
+      {bool forceRealtime = false}) {
+    final flag = _getFlag(flagName, forceRealtime: forceRealtime);
     if (flag == null) {
       _trackFlagAccess(flagName, null, 'getVariant');
-      return missingValue;
+      return fallbackValue;
     }
     _trackFlagAccess(flagName, flag, 'getVariant', flag.variant.name);
-    if (flag.valueType != ValueType.json) return missingValue;
+    if (flag.valueType != ValueType.json) return fallbackValue;
     final val = flag.variant.value;
-    if (val == null) return missingValue;
+    if (val == null) return fallbackValue;
     if (val is T) return val;
     // Try JSON string parsing
     if (val is String) {
@@ -292,14 +303,15 @@ class FeaturesClient implements VariationProvider {
         if (parsed is T) return parsed;
       } catch (_) {}
     }
-    return missingValue;
+    return fallbackValue;
   }
 
   // --------------------------------------------- Variation details internal
 
   VariationResult<T> _makeDetails<T>(
-      String flagName, T value, String expectedType) {
-    final flag = _getFlag(flagName);
+      String flagName, T value, String expectedType,
+      {bool forceRealtime = false}) {
+    final flag = _getFlag(flagName, forceRealtime: forceRealtime);
     final exists = flag != null;
     var reason = (flag?.reason) ?? (exists ? 'evaluated' : 'flag_not_found');
     if (exists && flag!.valueType.toApiString() != expectedType) {
@@ -317,44 +329,55 @@ class FeaturesClient implements VariationProvider {
 
   @override
   VariationResult<bool> boolVariationDetailsInternal(
-      String flagName, bool missingValue) {
-    final value = boolVariationInternal(flagName, missingValue);
-    return _makeDetails(flagName, value, 'boolean');
+      String flagName, bool fallbackValue,
+      {bool forceRealtime = false}) {
+    final value =
+        boolVariationInternal(flagName, fallbackValue, forceRealtime: forceRealtime);
+    return _makeDetails(flagName, value, 'boolean', forceRealtime: forceRealtime);
   }
 
   @override
   VariationResult<String> stringVariationDetailsInternal(
-      String flagName, String missingValue) {
-    final value = stringVariationInternal(flagName, missingValue);
-    return _makeDetails(flagName, value, 'string');
+      String flagName, String fallbackValue,
+      {bool forceRealtime = false}) {
+    final value =
+        stringVariationInternal(flagName, fallbackValue, forceRealtime: forceRealtime);
+    return _makeDetails(flagName, value, 'string', forceRealtime: forceRealtime);
   }
 
   @override
   VariationResult<int> intVariationDetailsInternal(
-      String flagName, int missingValue) {
-    final value = intVariationInternal(flagName, missingValue);
-    return _makeDetails(flagName, value, 'number');
+      String flagName, int fallbackValue,
+      {bool forceRealtime = false}) {
+    final value =
+        intVariationInternal(flagName, fallbackValue, forceRealtime: forceRealtime);
+    return _makeDetails(flagName, value, 'number', forceRealtime: forceRealtime);
   }
 
   @override
   VariationResult<double> doubleVariationDetailsInternal(
-      String flagName, double missingValue) {
-    final value = doubleVariationInternal(flagName, missingValue);
-    return _makeDetails(flagName, value, 'number');
+      String flagName, double fallbackValue,
+      {bool forceRealtime = false}) {
+    final value =
+        doubleVariationInternal(flagName, fallbackValue, forceRealtime: forceRealtime);
+    return _makeDetails(flagName, value, 'number', forceRealtime: forceRealtime);
   }
 
   @override
   VariationResult<T> jsonVariationDetailsInternal<T>(
-      String flagName, T missingValue) {
-    final value = jsonVariationInternal<T>(flagName, missingValue);
-    return _makeDetails(flagName, value, 'json');
+      String flagName, T fallbackValue,
+      {bool forceRealtime = false}) {
+    final value =
+        jsonVariationInternal<T>(flagName, fallbackValue, forceRealtime: forceRealtime);
+    return _makeDetails(flagName, value, 'json', forceRealtime: forceRealtime);
   }
 
   // ------------------------------------------------ Or-throw internal
 
   @override
-  bool boolVariationOrThrowInternal(String flagName) {
-    final flag = _getFlag(flagName);
+  bool boolVariationOrThrowInternal(String flagName,
+      {bool forceRealtime = false}) {
+    final flag = _getFlag(flagName, forceRealtime: forceRealtime);
     if (flag == null) {
       _trackFlagAccess(flagName, null, 'getVariant');
       throw GatrixException("Flag '$flagName' not found",
@@ -381,8 +404,9 @@ class FeaturesClient implements VariationProvider {
   }
 
   @override
-  String stringVariationOrThrowInternal(String flagName) {
-    final flag = _getFlag(flagName);
+  String stringVariationOrThrowInternal(String flagName,
+      {bool forceRealtime = false}) {
+    final flag = _getFlag(flagName, forceRealtime: forceRealtime);
     if (flag == null) {
       _trackFlagAccess(flagName, null, 'getVariant');
       throw GatrixException("Flag '$flagName' not found",
@@ -404,8 +428,8 @@ class FeaturesClient implements VariationProvider {
   }
 
   @override
-  int intVariationOrThrowInternal(String flagName) {
-    final flag = _getFlag(flagName);
+  int intVariationOrThrowInternal(String flagName, {bool forceRealtime = false}) {
+    final flag = _getFlag(flagName, forceRealtime: forceRealtime);
     if (flag == null) {
       _trackFlagAccess(flagName, null, 'getVariant');
       throw GatrixException("Flag '$flagName' not found",
@@ -435,8 +459,9 @@ class FeaturesClient implements VariationProvider {
   }
 
   @override
-  double doubleVariationOrThrowInternal(String flagName) {
-    final flag = _getFlag(flagName);
+  double doubleVariationOrThrowInternal(String flagName,
+      {bool forceRealtime = false}) {
+    final flag = _getFlag(flagName, forceRealtime: forceRealtime);
     if (flag == null) {
       _trackFlagAccess(flagName, null, 'getVariant');
       throw GatrixException("Flag '$flagName' not found",
@@ -466,8 +491,9 @@ class FeaturesClient implements VariationProvider {
   }
 
   @override
-  T jsonVariationOrThrowInternal<T>(String flagName) {
-    final flag = _getFlag(flagName);
+  T jsonVariationOrThrowInternal<T>(String flagName,
+      {bool forceRealtime = false}) {
+    final flag = _getFlag(flagName, forceRealtime: forceRealtime);
     if (flag == null) {
       _trackFlagAccess(flagName, null, 'getVariant');
       throw GatrixException("Flag '$flagName' not found",
@@ -501,55 +527,84 @@ class FeaturesClient implements VariationProvider {
 
   // ============================================= Public methods (delegate)
 
-  bool isEnabled(String flagName) => isEnabledInternal(flagName);
-  Variant getVariant(String flagName) => getVariantInternal(flagName);
-  String variation(String flagName, String missingValue) =>
-      variationInternal(flagName, missingValue);
-  bool boolVariation(String flagName, bool missingValue) =>
-      boolVariationInternal(flagName, missingValue);
-  String stringVariation(String flagName, String missingValue) =>
-      stringVariationInternal(flagName, missingValue);
-  int intVariation(String flagName, int missingValue) =>
-      intVariationInternal(flagName, missingValue);
-  double doubleVariation(String flagName, double missingValue) =>
-      doubleVariationInternal(flagName, missingValue);
-  T jsonVariation<T>(String flagName, T missingValue) =>
-      jsonVariationInternal<T>(flagName, missingValue);
+  bool isEnabled(String flagName, {bool forceRealtime = false}) =>
+      isEnabledInternal(flagName, forceRealtime: forceRealtime);
+  Variant getVariant(String flagName, {bool forceRealtime = false}) =>
+      getVariantInternal(flagName, forceRealtime: forceRealtime);
+  String variation(String flagName, String fallbackValue,
+          {bool forceRealtime = false}) =>
+      variationInternal(flagName, fallbackValue, forceRealtime: forceRealtime);
+  bool boolVariation(String flagName, bool fallbackValue,
+          {bool forceRealtime = false}) =>
+      boolVariationInternal(flagName, fallbackValue, forceRealtime: forceRealtime);
+  String stringVariation(String flagName, String fallbackValue,
+          {bool forceRealtime = false}) =>
+      stringVariationInternal(flagName, fallbackValue, forceRealtime: forceRealtime);
+  int intVariation(String flagName, int fallbackValue,
+          {bool forceRealtime = false}) =>
+      intVariationInternal(flagName, fallbackValue, forceRealtime: forceRealtime);
+  double doubleVariation(String flagName, double fallbackValue,
+          {bool forceRealtime = false}) =>
+      doubleVariationInternal(flagName, fallbackValue, forceRealtime: forceRealtime);
+  T jsonVariation<T>(String flagName, T fallbackValue,
+          {bool forceRealtime = false}) =>
+      jsonVariationInternal<T>(flagName, fallbackValue, forceRealtime: forceRealtime);
 
   // Details delegates
   VariationResult<bool> boolVariationDetails(
-          String flagName, bool missingValue) =>
-      boolVariationDetailsInternal(flagName, missingValue);
+          String flagName, bool fallbackValue,
+          {bool forceRealtime = false}) =>
+      boolVariationDetailsInternal(flagName, fallbackValue,
+          forceRealtime: forceRealtime);
   VariationResult<String> stringVariationDetails(
-          String flagName, String missingValue) =>
-      stringVariationDetailsInternal(flagName, missingValue);
+          String flagName, String fallbackValue,
+          {bool forceRealtime = false}) =>
+      stringVariationDetailsInternal(flagName, fallbackValue,
+          forceRealtime: forceRealtime);
   VariationResult<int> intVariationDetails(
-          String flagName, int missingValue) =>
-      intVariationDetailsInternal(flagName, missingValue);
+          String flagName, int fallbackValue,
+          {bool forceRealtime = false}) =>
+      intVariationDetailsInternal(flagName, fallbackValue,
+          forceRealtime: forceRealtime);
   VariationResult<double> doubleVariationDetails(
-          String flagName, double missingValue) =>
-      doubleVariationDetailsInternal(flagName, missingValue);
+          String flagName, double fallbackValue,
+          {bool forceRealtime = false}) =>
+      doubleVariationDetailsInternal(flagName, fallbackValue,
+          forceRealtime: forceRealtime);
   VariationResult<T> jsonVariationDetails<T>(
-          String flagName, T missingValue) =>
-      jsonVariationDetailsInternal<T>(flagName, missingValue);
+          String flagName, T fallbackValue,
+          {bool forceRealtime = false}) =>
+      jsonVariationDetailsInternal<T>(flagName, fallbackValue,
+          forceRealtime: forceRealtime);
 
   // OrThrow delegates
-  bool boolVariationOrThrow(String flagName) =>
-      boolVariationOrThrowInternal(flagName);
-  String stringVariationOrThrow(String flagName) =>
-      stringVariationOrThrowInternal(flagName);
-  int intVariationOrThrow(String flagName) =>
-      intVariationOrThrowInternal(flagName);
-  double doubleVariationOrThrow(String flagName) =>
-      doubleVariationOrThrowInternal(flagName);
-  T jsonVariationOrThrow<T>(String flagName) =>
-      jsonVariationOrThrowInternal<T>(flagName);
+  bool boolVariationOrThrow(String flagName, {bool forceRealtime = false}) =>
+      boolVariationOrThrowInternal(flagName, forceRealtime: forceRealtime);
+  String stringVariationOrThrow(String flagName, {bool forceRealtime = false}) =>
+      stringVariationOrThrowInternal(flagName, forceRealtime: forceRealtime);
+  int intVariationOrThrow(String flagName, {bool forceRealtime = false}) =>
+      intVariationOrThrowInternal(flagName, forceRealtime: forceRealtime);
+  double doubleVariationOrThrow(String flagName, {bool forceRealtime = false}) =>
+      doubleVariationOrThrowInternal(flagName, forceRealtime: forceRealtime);
+  T jsonVariationOrThrow<T>(String flagName, {bool forceRealtime = false}) =>
+      jsonVariationOrThrowInternal<T>(flagName, forceRealtime: forceRealtime);
 
   // ============================================= Explicit Sync
 
   bool isExplicitSyncEnabled() => _explicitSyncMode;
+
+  /// Change explicit sync mode at runtime.
+  /// No-op if the mode is already set to the requested value.
+  void setExplicitSyncMode(bool enabled) {
+    if (_explicitSyncMode == enabled) return;
+    _explicitSyncMode = enabled;
+    _synchronizedFlags = Map.from(_realtimeFlags);
+    _pendingSync = false;
+    _devLog('setExplicitSyncMode: $enabled');
+  }
+
   bool hasPendingSyncFlags() =>
-      _explicitSyncMode && _realtimeFlags.isNotEmpty;
+      _explicitSyncMode && _pendingSync;
 
   // ============================================= Storage
 
@@ -757,6 +812,12 @@ class FeaturesClient implements VariationProvider {
           if (!_explicitSyncMode) {
             _synchronizedFlags = Map.from(_realtimeFlags);
             _events.emit(GatrixEvents.flagsChange);
+          } else {
+            final wasPending = _pendingSync;
+            _pendingSync = true;
+            if (!wasPending) {
+              _events.emit(GatrixEvents.flagsPendingSync);
+            }
           }
           await _saveToStorage();
         }
@@ -835,6 +896,7 @@ class FeaturesClient implements VariationProvider {
   void syncFlags() {
     if (!_explicitSyncMode) return;
     _synchronizedFlags = Map.from(_realtimeFlags);
+    _pendingSync = false;
     _syncFlagsCount++;
     _events.emit(GatrixEvents.flagsSync);
     _events.emit(GatrixEvents.flagsChange);
@@ -860,7 +922,7 @@ class FeaturesClient implements VariationProvider {
 
   Map<String, dynamic> getStats() {
     return {
-      'totalFlagCount': _activeFlags.length,
+      'totalFlagCount': _selectFlags().length,
       'missingFlags': Map<String, int>.from(_missingFlags),
       'fetchFlagsCount': _fetchCount,
       'updateCount': _updateCount,

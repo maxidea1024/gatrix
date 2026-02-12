@@ -113,16 +113,16 @@ func stop() -> void:
 
 # ==================== Flag Access ====================
 
-func _lookup_flag(flag_name: String) -> GatrixTypes.EvaluatedFlag:
+func _lookup_flag(flag_name: String, force_realtime: bool = false) -> GatrixTypes.EvaluatedFlag:
 	_mutex.lock()
-	var flags = _get_active_flags()
+	var flags = _get_active_flags(force_realtime)
 	var flag = flags.get(flag_name)
 	_mutex.unlock()
 	return flag
 
 
-func has_flag(flag_name: String) -> bool:
-	return _lookup_flag(flag_name) != null
+func has_flag(flag_name: String, force_realtime: bool = false) -> bool:
+	return _lookup_flag(flag_name, force_realtime) != null
 
 
 func get_flag(flag_name: String) -> GatrixFlagProxy:
@@ -130,9 +130,9 @@ func get_flag(flag_name: String) -> GatrixFlagProxy:
 	return GatrixFlagProxy.new(flag, self, flag_name)
 
 
-func get_all_flags() -> Array:
+func get_all_flags(force_realtime: bool = false) -> Array:
 	_mutex.lock()
-	var flags = _get_active_flags()
+	var flags = _get_active_flags(force_realtime)
 	var result: Array = flags.values()
 	_mutex.unlock()
 	return result
@@ -141,8 +141,8 @@ func get_all_flags() -> Array:
 # ==================== VariationProvider Internal Methods ====================
 # All flag lookup + value extraction + metrics tracking happen here.
 
-func is_enabled_internal(flag_name: String) -> bool:
-	var flag = _lookup_flag(flag_name)
+func is_enabled_internal(flag_name: String, force_realtime: bool = false) -> bool:
+	var flag = _lookup_flag(flag_name, force_realtime)
 	if flag == null:
 		_track_flag_access(flag_name, null, "isEnabled")
 		return false
@@ -150,8 +150,8 @@ func is_enabled_internal(flag_name: String) -> bool:
 	return flag.enabled
 
 
-func get_variant_internal(flag_name: String) -> GatrixTypes.Variant:
-	var flag = _lookup_flag(flag_name)
+func get_variant_internal(flag_name: String, force_realtime: bool = false) -> GatrixTypes.Variant:
+	var flag = _lookup_flag(flag_name, force_realtime)
 	if flag == null:
 		_track_flag_access(flag_name, null, "getVariant")
 		return GatrixTypes.MISSING_VARIANT
@@ -159,94 +159,94 @@ func get_variant_internal(flag_name: String) -> GatrixTypes.Variant:
 	return flag.variant
 
 
-func variation_internal(flag_name: String, missing_value: String) -> String:
-	var flag = _lookup_flag(flag_name)
+func variation_internal(flag_name: String, fallback_value: String, force_realtime: bool = false) -> String:
+	var flag = _lookup_flag(flag_name, force_realtime)
 	if flag == null:
 		_track_flag_access(flag_name, null, "getVariant")
-		return missing_value
+		return fallback_value
 	_track_flag_access(flag_name, flag, "getVariant", flag.variant.name)
 	return flag.variant.name
 
 
-func bool_variation_internal(flag_name: String, missing_value: bool) -> bool:
-	var flag = _lookup_flag(flag_name)
+func bool_variation_internal(flag_name: String, fallback_value: bool, force_realtime: bool = false) -> bool:
+	var flag = _lookup_flag(flag_name, force_realtime)
 	if flag == null:
 		_track_flag_access(flag_name, null, "getVariant")
-		return missing_value
+		return fallback_value
 	_track_flag_access(flag_name, flag, "getVariant", flag.variant.name)
 	if flag.value_type != GatrixTypes.ValueType.BOOLEAN:
-		return missing_value
+		return fallback_value
 	var val = flag.variant.value
 	if val == null:
-		return missing_value
+		return fallback_value
 	if val is bool:
 		return val
 	if val is String:
 		return val.to_lower() == "true"
-	return missing_value
+	return fallback_value
 
 
-func string_variation_internal(flag_name: String, missing_value: String) -> String:
-	var flag = _lookup_flag(flag_name)
+func string_variation_internal(flag_name: String, fallback_value: String, force_realtime: bool = false) -> String:
+	var flag = _lookup_flag(flag_name, force_realtime)
 	if flag == null:
 		_track_flag_access(flag_name, null, "getVariant")
-		return missing_value
+		return fallback_value
 	_track_flag_access(flag_name, flag, "getVariant", flag.variant.name)
 	if flag.value_type != GatrixTypes.ValueType.STRING:
-		return missing_value
+		return fallback_value
 	var val = flag.variant.value
 	if val == null:
-		return missing_value
+		return fallback_value
 	return str(val)
 
 
-func int_variation_internal(flag_name: String, missing_value: int) -> int:
-	var flag = _lookup_flag(flag_name)
+func int_variation_internal(flag_name: String, fallback_value: int, force_realtime: bool = false) -> int:
+	var flag = _lookup_flag(flag_name, force_realtime)
 	if flag == null:
 		_track_flag_access(flag_name, null, "getVariant")
-		return missing_value
+		return fallback_value
 	_track_flag_access(flag_name, flag, "getVariant", flag.variant.name)
 	if flag.value_type != GatrixTypes.ValueType.NUMBER:
-		return missing_value
+		return fallback_value
 	var val = flag.variant.value
 	if val == null:
-		return missing_value
+		return fallback_value
 	if val is int or val is float:
 		return int(val)
 	if val is String and val.is_valid_int():
 		return val.to_int()
-	return missing_value
+	return fallback_value
 
 
-func float_variation_internal(flag_name: String, missing_value: float) -> float:
-	var flag = _lookup_flag(flag_name)
+func float_variation_internal(flag_name: String, fallback_value: float, force_realtime: bool = false) -> float:
+	var flag = _lookup_flag(flag_name, force_realtime)
 	if flag == null:
 		_track_flag_access(flag_name, null, "getVariant")
-		return missing_value
+		return fallback_value
 	_track_flag_access(flag_name, flag, "getVariant", flag.variant.name)
 	if flag.value_type != GatrixTypes.ValueType.NUMBER:
-		return missing_value
+		return fallback_value
 	var val = flag.variant.value
 	if val == null:
-		return missing_value
+		return fallback_value
 	if val is int or val is float:
 		return float(val)
 	if val is String and val.is_valid_float():
 		return val.to_float()
-	return missing_value
+	return fallback_value
 
 
-func json_variation_internal(flag_name: String, missing_value = null):
-	var flag = _lookup_flag(flag_name)
+func json_variation_internal(flag_name: String, fallback_value = null, force_realtime: bool = false):
+	var flag = _lookup_flag(flag_name, force_realtime)
 	if flag == null:
 		_track_flag_access(flag_name, null, "getVariant")
-		return missing_value
+		return fallback_value
 	_track_flag_access(flag_name, flag, "getVariant", flag.variant.name)
 	if flag.value_type != GatrixTypes.ValueType.JSON:
-		return missing_value
+		return fallback_value
 	var val = flag.variant.value
 	if val == null:
-		return missing_value
+		return fallback_value
 	if val is Dictionary or val is Array:
 		return val
 	# Try JSON string parsing
@@ -254,7 +254,7 @@ func json_variation_internal(flag_name: String, missing_value = null):
 		var json := JSON.new()
 		if json.parse(val) == OK:
 			return json.data
-	return missing_value
+	return fallback_value
 
 
 # -------------------- Variation Details Internal --------------------
@@ -270,35 +270,35 @@ func _make_details(flag_name: String, value, expected_type: String) -> GatrixTyp
 	)
 
 
-func bool_variation_details_internal(flag_name: String, missing_value: bool) -> GatrixTypes.VariationResult:
-	var value := bool_variation_internal(flag_name, missing_value)
+func bool_variation_details_internal(flag_name: String, fallback_value: bool, force_realtime: bool = false) -> GatrixTypes.VariationResult:
+	var value := bool_variation_internal(flag_name, fallback_value, force_realtime)
 	return _make_details(flag_name, value, "boolean")
 
 
-func string_variation_details_internal(flag_name: String, missing_value: String) -> GatrixTypes.VariationResult:
-	var value := string_variation_internal(flag_name, missing_value)
+func string_variation_details_internal(flag_name: String, fallback_value: String, force_realtime: bool = false) -> GatrixTypes.VariationResult:
+	var value := string_variation_internal(flag_name, fallback_value, force_realtime)
 	return _make_details(flag_name, value, "string")
 
 
-func int_variation_details_internal(flag_name: String, missing_value: int) -> GatrixTypes.VariationResult:
-	var value := int_variation_internal(flag_name, missing_value)
+func int_variation_details_internal(flag_name: String, fallback_value: int, force_realtime: bool = false) -> GatrixTypes.VariationResult:
+	var value := int_variation_internal(flag_name, fallback_value, force_realtime)
 	return _make_details(flag_name, value, "number")
 
 
-func float_variation_details_internal(flag_name: String, missing_value: float) -> GatrixTypes.VariationResult:
-	var value := float_variation_internal(flag_name, missing_value)
+func float_variation_details_internal(flag_name: String, fallback_value: float, force_realtime: bool = false) -> GatrixTypes.VariationResult:
+	var value := float_variation_internal(flag_name, fallback_value, force_realtime)
 	return _make_details(flag_name, value, "number")
 
 
-func json_variation_details_internal(flag_name: String, missing_value = null) -> GatrixTypes.VariationResult:
-	var value = json_variation_internal(flag_name, missing_value)
+func json_variation_details_internal(flag_name: String, fallback_value = null, force_realtime: bool = false) -> GatrixTypes.VariationResult:
+	var value = json_variation_internal(flag_name, fallback_value, force_realtime)
 	return _make_details(flag_name, value, "json")
 
 
 # -------------------- OrThrow Internal --------------------
 
-func bool_variation_or_throw_internal(flag_name: String) -> bool:
-	var flag = _lookup_flag(flag_name)
+func bool_variation_or_throw_internal(flag_name: String, force_realtime: bool = false) -> bool:
+	var flag = _lookup_flag(flag_name, force_realtime)
 	if flag == null:
 		_track_flag_access(flag_name, null, "getVariant")
 		push_error("[GatrixSDK] Flag '%s' not found" % flag_name)
@@ -323,8 +323,8 @@ func bool_variation_or_throw_internal(flag_name: String) -> bool:
 	return false
 
 
-func string_variation_or_throw_internal(flag_name: String) -> String:
-	var flag = _lookup_flag(flag_name)
+func string_variation_or_throw_internal(flag_name: String, force_realtime: bool = false) -> String:
+	var flag = _lookup_flag(flag_name, force_realtime)
 	if flag == null:
 		_track_flag_access(flag_name, null, "getVariant")
 		push_error("[GatrixSDK] Flag '%s' not found" % flag_name)
@@ -343,8 +343,8 @@ func string_variation_or_throw_internal(flag_name: String) -> String:
 	return str(val)
 
 
-func int_variation_or_throw_internal(flag_name: String) -> int:
-	var flag = _lookup_flag(flag_name)
+func int_variation_or_throw_internal(flag_name: String, force_realtime: bool = false) -> int:
+	var flag = _lookup_flag(flag_name, force_realtime)
 	if flag == null:
 		_track_flag_access(flag_name, null, "getVariant")
 		push_error("[GatrixSDK] Flag '%s' not found" % flag_name)
@@ -369,8 +369,8 @@ func int_variation_or_throw_internal(flag_name: String) -> int:
 	return 0
 
 
-func float_variation_or_throw_internal(flag_name: String) -> float:
-	var flag = _lookup_flag(flag_name)
+func float_variation_or_throw_internal(flag_name: String, force_realtime: bool = false) -> float:
+	var flag = _lookup_flag(flag_name, force_realtime)
 	if flag == null:
 		_track_flag_access(flag_name, null, "getVariant")
 		push_error("[GatrixSDK] Flag '%s' not found" % flag_name)
@@ -395,8 +395,8 @@ func float_variation_or_throw_internal(flag_name: String) -> float:
 	return 0.0
 
 
-func json_variation_or_throw_internal(flag_name: String):
-	var flag = _lookup_flag(flag_name)
+func json_variation_or_throw_internal(flag_name: String, force_realtime: bool = false):
+	var flag = _lookup_flag(flag_name, force_realtime)
 	if flag == null:
 		_track_flag_access(flag_name, null, "getVariant")
 		push_error("[GatrixSDK] Flag '%s' not found" % flag_name)
@@ -425,78 +425,78 @@ func json_variation_or_throw_internal(flag_name: String):
 
 # ==================== Public Methods (delegate to internal) ====================
 
-func is_enabled(flag_name: String) -> bool:
-	return is_enabled_internal(flag_name)
+func is_enabled(flag_name: String, force_realtime: bool = false) -> bool:
+	return is_enabled_internal(flag_name, force_realtime)
 
 
-func get_variant(flag_name: String) -> GatrixTypes.Variant:
-	return get_variant_internal(flag_name)
+func get_variant(flag_name: String, force_realtime: bool = false) -> GatrixTypes.Variant:
+	return get_variant_internal(flag_name, force_realtime)
 
 
-func variation(flag_name: String, missing_value: String) -> String:
-	return variation_internal(flag_name, missing_value)
+func variation(flag_name: String, fallback_value: String, force_realtime: bool = false) -> String:
+	return variation_internal(flag_name, fallback_value, force_realtime)
 
 
-func bool_variation(flag_name: String, missing_value: bool) -> bool:
-	return bool_variation_internal(flag_name, missing_value)
+func bool_variation(flag_name: String, fallback_value: bool, force_realtime: bool = false) -> bool:
+	return bool_variation_internal(flag_name, fallback_value, force_realtime)
 
 
-func string_variation(flag_name: String, missing_value: String) -> String:
-	return string_variation_internal(flag_name, missing_value)
+func string_variation(flag_name: String, fallback_value: String, force_realtime: bool = false) -> String:
+	return string_variation_internal(flag_name, fallback_value, force_realtime)
 
 
-func int_variation(flag_name: String, missing_value: int) -> int:
-	return int_variation_internal(flag_name, missing_value)
+func int_variation(flag_name: String, fallback_value: int, force_realtime: bool = false) -> int:
+	return int_variation_internal(flag_name, fallback_value, force_realtime)
 
 
-func float_variation(flag_name: String, missing_value: float) -> float:
-	return float_variation_internal(flag_name, missing_value)
+func float_variation(flag_name: String, fallback_value: float, force_realtime: bool = false) -> float:
+	return float_variation_internal(flag_name, fallback_value, force_realtime)
 
 
-func json_variation(flag_name: String, missing_value = null):
-	return json_variation_internal(flag_name, missing_value)
+func json_variation(flag_name: String, fallback_value = null, force_realtime: bool = false):
+	return json_variation_internal(flag_name, fallback_value, force_realtime)
 
 
 # Variation details - delegate
-func bool_variation_details(flag_name: String, missing_value: bool) -> GatrixTypes.VariationResult:
-	return bool_variation_details_internal(flag_name, missing_value)
+func bool_variation_details(flag_name: String, fallback_value: bool, force_realtime: bool = false) -> GatrixTypes.VariationResult:
+	return bool_variation_details_internal(flag_name, fallback_value, force_realtime)
 
 
-func string_variation_details(flag_name: String, missing_value: String) -> GatrixTypes.VariationResult:
-	return string_variation_details_internal(flag_name, missing_value)
+func string_variation_details(flag_name: String, fallback_value: String, force_realtime: bool = false) -> GatrixTypes.VariationResult:
+	return string_variation_details_internal(flag_name, fallback_value, force_realtime)
 
 
-func int_variation_details(flag_name: String, missing_value: int) -> GatrixTypes.VariationResult:
-	return int_variation_details_internal(flag_name, missing_value)
+func int_variation_details(flag_name: String, fallback_value: int, force_realtime: bool = false) -> GatrixTypes.VariationResult:
+	return int_variation_details_internal(flag_name, fallback_value, force_realtime)
 
 
-func float_variation_details(flag_name: String, missing_value: float) -> GatrixTypes.VariationResult:
-	return float_variation_details_internal(flag_name, missing_value)
+func float_variation_details(flag_name: String, fallback_value: float, force_realtime: bool = false) -> GatrixTypes.VariationResult:
+	return float_variation_details_internal(flag_name, fallback_value, force_realtime)
 
 
-func json_variation_details(flag_name: String, missing_value = null) -> GatrixTypes.VariationResult:
-	return json_variation_details_internal(flag_name, missing_value)
+func json_variation_details(flag_name: String, fallback_value = null, force_realtime: bool = false) -> GatrixTypes.VariationResult:
+	return json_variation_details_internal(flag_name, fallback_value, force_realtime)
 
 
 # OrThrow - delegate
-func bool_variation_or_throw(flag_name: String) -> bool:
-	return bool_variation_or_throw_internal(flag_name)
+func bool_variation_or_throw(flag_name: String, force_realtime: bool = false) -> bool:
+	return bool_variation_or_throw_internal(flag_name, force_realtime)
 
 
-func string_variation_or_throw(flag_name: String) -> String:
-	return string_variation_or_throw_internal(flag_name)
+func string_variation_or_throw(flag_name: String, force_realtime: bool = false) -> String:
+	return string_variation_or_throw_internal(flag_name, force_realtime)
 
 
-func int_variation_or_throw(flag_name: String) -> int:
-	return int_variation_or_throw_internal(flag_name)
+func int_variation_or_throw(flag_name: String, force_realtime: bool = false) -> int:
+	return int_variation_or_throw_internal(flag_name, force_realtime)
 
 
-func float_variation_or_throw(flag_name: String) -> float:
-	return float_variation_or_throw_internal(flag_name)
+func float_variation_or_throw(flag_name: String, force_realtime: bool = false) -> float:
+	return float_variation_or_throw_internal(flag_name, force_realtime)
 
 
-func json_variation_or_throw(flag_name: String):
-	return json_variation_or_throw_internal(flag_name)
+func json_variation_or_throw(flag_name: String, force_realtime: bool = false):
+	return json_variation_or_throw_internal(flag_name, force_realtime)
 
 
 # ==================== Context ====================
@@ -519,10 +519,30 @@ func is_explicit_sync() -> bool:
 
 
 func can_sync_flags() -> bool:
-	return _has_pending_sync
+	return _config.explicit_sync_mode and _has_pending_sync
+
+
+func has_pending_sync_flags() -> bool:
+	return _config.explicit_sync_mode and _has_pending_sync
+
+
+func set_explicit_sync_mode(enabled: bool) -> void:
+	if _config.explicit_sync_mode == enabled:
+		return
+	_config.explicit_sync_mode = enabled
+	if enabled:
+		_mutex.lock()
+		_synchronized_flags = _realtime_flags.duplicate(true)
+		_has_pending_sync = false
+		_mutex.unlock()
+	else:
+		_has_pending_sync = false
 
 
 func sync_flags(fetch_now := true) -> void:
+	if not _config.explicit_sync_mode:
+		return
+
 	_stats.sync_flags_count += 1
 
 	if fetch_now and not _config.offline_mode:
@@ -534,6 +554,7 @@ func sync_flags(fetch_now := true) -> void:
 	_mutex.unlock()
 
 	_emitter.emit_event(GatrixEvents.FLAGS_SYNC)
+	_emitter.emit_event(GatrixEvents.FLAGS_CHANGE, [{ "flags": _synchronized_flags.values() }])
 
 
 # ==================== Watch ====================
@@ -587,10 +608,10 @@ func is_ready() -> bool:
 
 # ==================== Internal Methods ====================
 
-func _get_active_flags() -> Dictionary:
-	if _config.explicit_sync_mode:
-		return _synchronized_flags
-	return _realtime_flags
+func _get_active_flags(force_realtime: bool = false) -> Dictionary:
+	if force_realtime or not _config.explicit_sync_mode:
+		return _realtime_flags
+	return _synchronized_flags
 
 
 func _load_from_storage() -> void:
@@ -806,7 +827,10 @@ func _store_flags(new_flags: Array, is_initial_fetch: bool) -> void:
 		_stats.last_update_time = Time.get_unix_time_from_system()
 
 		if _config.explicit_sync_mode:
+			var was_pending := _has_pending_sync
 			_has_pending_sync = true
+			if not was_pending:
+				_emitter.emit_event(GatrixEvents.FLAGS_PENDING_SYNC)
 		else:
 			_synchronized_flags = _realtime_flags.duplicate(true)
 	else:
@@ -822,8 +846,9 @@ func _store_flags(new_flags: Array, is_initial_fetch: bool) -> void:
 
 	# Emit change events
 	if changed and not is_initial_fetch:
-		_emitter.emit_event(GatrixEvents.FLAGS_CHANGE, [{ "flags": new_flags }])
 		_emit_flag_changes(old_flags, _realtime_flags)
+		if not _config.explicit_sync_mode:
+			_emitter.emit_event(GatrixEvents.FLAGS_CHANGE, [{ "flags": new_flags }])
 
 
 func _flags_differ(old_flags: Dictionary, new_flags: Dictionary) -> bool:

@@ -13,88 +13,108 @@ void UGatrixFlagProxy::Initialize(const FGatrixEvaluatedFlag &InFlag,
   Provider = InProvider;
 }
 
-void UGatrixFlagProxy::TrackAccess(const FString &EventType) const {
-  // Logic centralized in VariationProvider
-}
-
 bool UGatrixFlagProxy::IsEnabled() const {
   return Provider->IsEnabledInternal(FlagName);
 }
 
-bool UGatrixFlagProxy::BoolVariation(bool MissingValue) const {
-  return Provider->BoolVariationInternal(FlagName, MissingValue);
+bool UGatrixFlagProxy::BoolVariation(bool FallbackValue,
+                                     bool bForceRealtime) const {
+  return Provider->BoolVariationInternal(FlagName, FallbackValue,
+                                         bForceRealtime);
 }
 
-FString UGatrixFlagProxy::StringVariation(const FString &MissingValue) const {
-  return Provider->StringVariationInternal(FlagName, MissingValue);
+FString UGatrixFlagProxy::StringVariation(const FString &FallbackValue,
+                                          bool bForceRealtime) const {
+  return Provider->StringVariationInternal(FlagName, FallbackValue,
+                                           bForceRealtime);
 }
 
-int32 UGatrixFlagProxy::IntVariation(int32 MissingValue) const {
-  return Provider->IntVariationInternal(FlagName, MissingValue);
+int32 UGatrixFlagProxy::IntVariation(int32 FallbackValue,
+                                     bool bForceRealtime) const {
+  return Provider->IntVariationInternal(FlagName, FallbackValue,
+                                        bForceRealtime);
 }
 
-float UGatrixFlagProxy::FloatVariation(float MissingValue) const {
-  return Provider->FloatVariationInternal(FlagName, MissingValue);
+float UGatrixFlagProxy::FloatVariation(float FallbackValue,
+                                       bool bForceRealtime) const {
+  return Provider->FloatVariationInternal(FlagName, FallbackValue,
+                                          bForceRealtime);
 }
 
-double UGatrixFlagProxy::DoubleVariation(double MissingValue) const {
-  return Provider->DoubleVariationInternal(FlagName, MissingValue);
+double UGatrixFlagProxy::DoubleVariation(double FallbackValue,
+                                         bool bForceRealtime) const {
+  return Provider->DoubleVariationInternal(FlagName, FallbackValue,
+                                           bForceRealtime);
 }
 
-FString UGatrixFlagProxy::JsonVariation(const FString &MissingValue) const {
-  return Provider->JsonVariationInternal(FlagName, MissingValue);
-}
-
-FGatrixVariationResult
-UGatrixFlagProxy::BoolVariationDetails(bool MissingValue) const {
-  return Provider->BoolVariationDetailsInternal(FlagName, MissingValue);
-}
-
-FGatrixVariationResult
-UGatrixFlagProxy::StringVariationDetails(const FString &MissingValue) const {
-  return Provider->StringVariationDetailsInternal(FlagName, MissingValue);
-}
-
-FGatrixVariationResult
-UGatrixFlagProxy::IntVariationDetails(int32 MissingValue) const {
-  return Provider->IntVariationDetailsInternal(FlagName, MissingValue);
+FString UGatrixFlagProxy::JsonVariation(const FString &FallbackValue,
+                                        bool bForceRealtime) const {
+  return Provider->JsonVariationInternal(FlagName, FallbackValue,
+                                         bForceRealtime);
 }
 
 FGatrixVariationResult
-UGatrixFlagProxy::FloatVariationDetails(float MissingValue) const {
-  return Provider->FloatVariationDetailsInternal(FlagName, MissingValue);
+UGatrixFlagProxy::BoolVariationDetails(bool FallbackValue,
+                                       bool bForceRealtime) const {
+  return Provider->BoolVariationDetailsInternal(FlagName, FallbackValue,
+                                                bForceRealtime);
 }
 
 FGatrixVariationResult
-UGatrixFlagProxy::DoubleVariationDetails(double MissingValue) const {
-  return Provider->DoubleVariationDetailsInternal(FlagName, MissingValue);
+UGatrixFlagProxy::StringVariationDetails(const FString &FallbackValue,
+                                         bool bForceRealtime) const {
+  return Provider->StringVariationDetailsInternal(FlagName, FallbackValue,
+                                                  bForceRealtime);
 }
 
 FGatrixVariationResult
-UGatrixFlagProxy::JsonVariationDetails(const FString &MissingValue) const {
-  return Provider->JsonVariationDetailsInternal(FlagName, MissingValue);
+UGatrixFlagProxy::IntVariationDetails(int32 FallbackValue,
+                                      bool bForceRealtime) const {
+  return Provider->IntVariationDetailsInternal(FlagName, FallbackValue,
+                                               bForceRealtime);
 }
 
-bool UGatrixFlagProxy::BoolVariationOrThrow() {
-  return Provider->BoolVariationOrThrowInternal(FlagName);
+FGatrixVariationResult
+UGatrixFlagProxy::FloatVariationDetails(float FallbackValue,
+                                        bool bForceRealtime) const {
+  return Provider->FloatVariationDetailsInternal(FlagName, FallbackValue,
+                                                 bForceRealtime);
 }
 
-FString UGatrixFlagProxy::StringVariationOrThrow() {
-  return Provider->StringVariationOrThrowInternal(FlagName);
+FGatrixVariationResult
+UGatrixFlagProxy::DoubleVariationDetails(double FallbackValue,
+                                         bool bForceRealtime) const {
+  return Provider->DoubleVariationDetailsInternal(FlagName, FallbackValue,
+                                                  bForceRealtime);
 }
 
-float UGatrixFlagProxy::FloatVariationOrThrow() {
-  return Provider->FloatVariationOrThrowInternal(FlagName);
+FGatrixVariationResult
+UGatrixFlagProxy::JsonVariationDetails(const FString &FallbackValue,
+                                       bool bForceRealtime) const {
+  return Provider->JsonVariationDetailsInternal(FlagName, FallbackValue,
+                                                bForceRealtime);
 }
 
-int32 UGatrixFlagProxy::IntVariationOrThrow() {
-  return Provider->IntVariationOrThrowInternal(FlagName);
+bool UGatrixFlagProxy::BoolVariationOrThrow(bool bForceRealtime) {
+  return Provider->BoolVariationOrThrowInternal(FlagName, bForceRealtime);
 }
 
-double UGatrixFlagProxy::DoubleVariationOrThrow() {
-  return Provider->DoubleVariationOrThrowInternal(FlagName);
+FString UGatrixFlagProxy::StringVariationOrThrow(bool bForceRealtime) {
+  return Provider->StringVariationOrThrowInternal(FlagName, bForceRealtime);
 }
 
-FString UGatrixFlagProxy::JsonVariationOrThrow() {
-  return Provider->JsonVariationOrThrowInternal(FlagName);
+float UGatrixFlagProxy::FloatVariationOrThrow(bool bForceRealtime) {
+  return Provider->FloatVariationOrThrowInternal(FlagName, bForceRealtime);
+}
+
+int32 UGatrixFlagProxy::IntVariationOrThrow(bool bForceRealtime) {
+  return Provider->IntVariationOrThrowInternal(FlagName, bForceRealtime);
+}
+
+double UGatrixFlagProxy::DoubleVariationOrThrow(bool bForceRealtime) {
+  return Provider->DoubleVariationOrThrowInternal(FlagName, bForceRealtime);
+}
+
+FString UGatrixFlagProxy::JsonVariationOrThrow(bool bForceRealtime) {
+  return Provider->JsonVariationOrThrowInternal(FlagName, bForceRealtime);
 }

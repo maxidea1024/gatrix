@@ -110,6 +110,18 @@ namespace Gatrix.Unity.SDK
         bool CanSyncFlags();
 
         /// <summary>
+        /// Check if there are pending sync flags using the pendingSync flag.
+        /// </summary>
+        /// <returns><c>true</c> if there are pending sync flags.</returns>
+        bool HasPendingSyncFlags();
+
+        /// <summary>
+        /// Dynamically enable/disable explicit sync mode at runtime.
+        /// </summary>
+        /// <param name="enabled">Whether to enable explicit sync mode.</param>
+        void SetExplicitSyncMode(bool enabled);
+
+        /// <summary>
         /// Check if offline mode is enabled.
         /// <para>
         /// In offline mode, no network requests are made. Flags are loaded from
@@ -218,7 +230,7 @@ namespace Gatrix.Unity.SDK
         /// }
         /// </code>
         /// </example>
-        bool IsEnabled(string flagName);
+        bool IsEnabled(string flagName, bool forceRealtime = false);
 
         /// <summary>
         /// Get the variant for a feature flag. Never returns <c>null</c>.
@@ -229,7 +241,7 @@ namespace Gatrix.Unity.SDK
         /// </summary>
         /// <param name="flagName">The feature flag key (case-sensitive).</param>
         /// <returns>The <see cref="Variant"/>, never <c>null</c>.</returns>
-        Variant GetVariant(string flagName);
+        Variant GetVariant(string flagName, bool forceRealtime = false);
 
         /// <summary>
         /// Check if a flag exists in the cache.
@@ -266,9 +278,9 @@ namespace Gatrix.Unity.SDK
         /// Get the variant name for a flag, or a default value if the flag is not found.
         /// </summary>
         /// <param name="flagName">The feature flag key.</param>
-        /// <param name="missingValue">Default value if flag not found or has no variant.</param>
-        /// <returns>The variant name, or <paramref name="missingValue"/>.</returns>
-        string Variation(string flagName, string missingValue);
+        /// <param name="fallbackValue">Default value if flag not found or has no variant.</param>
+        /// <returns>The variant name, or <paramref name="fallbackValue"/>.</returns>
+        string Variation(string flagName, string fallbackValue, bool forceRealtime = false);
 
         /// <summary>
         /// Get a boolean variation. Returns the flag's <c>Enabled</c> state.
@@ -278,9 +290,9 @@ namespace Gatrix.Unity.SDK
         /// </para>
         /// </summary>
         /// <param name="flagName">The feature flag key.</param>
-        /// <param name="missingValue">Default value if flag not found.</param>
-        /// <returns>The flag's enabled state, or <paramref name="missingValue"/>.</returns>
-        bool BoolVariation(string flagName, bool missingValue);
+        /// <param name="fallbackValue">Default value if flag not found.</param>
+        /// <returns>The flag's enabled state, or <paramref name="fallbackValue"/>.</returns>
+        bool BoolVariation(string flagName, bool fallbackValue, bool forceRealtime = false);
 
         /// <summary>
         /// Get a string variation from the variant's payload.
@@ -290,9 +302,9 @@ namespace Gatrix.Unity.SDK
         /// </para>
         /// </summary>
         /// <param name="flagName">The feature flag key.</param>
-        /// <param name="missingValue">Default value if flag not found or payload is empty.</param>
-        /// <returns>The payload as string, or <paramref name="missingValue"/>.</returns>
-        string StringVariation(string flagName, string missingValue);
+        /// <param name="fallbackValue">Default value if flag not found or payload is empty.</param>
+        /// <returns>The payload as string, or <paramref name="fallbackValue"/>.</returns>
+        string StringVariation(string flagName, string fallbackValue, bool forceRealtime = false);
 
         /// <summary>
         /// Get a numeric variation from the variant's payload as <c>double</c>.
@@ -302,33 +314,33 @@ namespace Gatrix.Unity.SDK
         /// </para>
         /// </summary>
         /// <param name="flagName">The feature flag key.</param>
-        /// <param name="missingValue">Default value if flag not found or not a valid number.</param>
-        /// <returns>The payload as double, or <paramref name="missingValue"/>.</returns>
-        double NumberVariation(string flagName, double missingValue);
+        /// <param name="fallbackValue">Default value if flag not found or not a valid number.</param>
+        /// <returns>The payload as double, or <paramref name="fallbackValue"/>.</returns>
+        double NumberVariation(string flagName, double fallbackValue, bool forceRealtime = false);
 
         /// <summary>
         /// Get an integer variation (convenience wrapper around <see cref="NumberVariation"/>).
         /// </summary>
         /// <param name="flagName">The feature flag key.</param>
-        /// <param name="missingValue">Default value if flag not found.</param>
-        /// <returns>The payload as int, or <paramref name="missingValue"/>.</returns>
-        int IntVariation(string flagName, int missingValue);
+        /// <param name="fallbackValue">Default value if flag not found.</param>
+        /// <returns>The payload as int, or <paramref name="fallbackValue"/>.</returns>
+        int IntVariation(string flagName, int fallbackValue, bool forceRealtime = false);
 
         /// <summary>
         /// Get a float variation (convenience wrapper around <see cref="NumberVariation"/>).
         /// </summary>
         /// <param name="flagName">The feature flag key.</param>
-        /// <param name="missingValue">Default value if flag not found.</param>
-        /// <returns>The payload as float, or <paramref name="missingValue"/>.</returns>
-        float FloatVariation(string flagName, float missingValue);
+        /// <param name="fallbackValue">Default value if flag not found.</param>
+        /// <returns>The payload as float, or <paramref name="fallbackValue"/>.</returns>
+        float FloatVariation(string flagName, float fallbackValue, bool forceRealtime = false);
 
         /// <summary>
         /// Get a double variation.
         /// </summary>
         /// <param name="flagName">The feature flag key.</param>
-        /// <param name="missingValue">Default value if flag not found.</param>
-        /// <returns>The payload as double, or <paramref name="missingValue"/>.</returns>
-        double DoubleVariation(string flagName, double missingValue);
+        /// <param name="fallbackValue">Default value if flag not found.</param>
+        /// <returns>The payload as double, or <paramref name="fallbackValue"/>.</returns>
+        double DoubleVariation(string flagName, double fallbackValue, bool forceRealtime = false);
 
         /// <summary>
         /// Get a JSON variation as a <see cref="Dictionary{TKey, TValue}"/>.
@@ -339,9 +351,9 @@ namespace Gatrix.Unity.SDK
         /// </para>
         /// </summary>
         /// <param name="flagName">The feature flag key.</param>
-        /// <param name="missingValue">Default value if flag not found or parse fails.</param>
-        /// <returns>The payload as Dictionary, or <paramref name="missingValue"/>.</returns>
-        Dictionary<string, object> JsonVariation(string flagName, Dictionary<string, object> missingValue);
+        /// <param name="fallbackValue">Default value if flag not found or parse fails.</param>
+        /// <returns>The payload as Dictionary, or <paramref name="fallbackValue"/>.</returns>
+        Dictionary<string, object> JsonVariation(string flagName, Dictionary<string, object> fallbackValue, bool forceRealtime = false);
 
         // ==================== Variations (Strict, throws on missing) ====================
 
@@ -351,7 +363,7 @@ namespace Gatrix.Unity.SDK
         /// <param name="flagName">The feature flag key.</param>
         /// <returns>The flag's enabled state.</returns>
         /// <exception cref="GatrixFeatureException">Thrown if the flag does not exist.</exception>
-        bool BoolVariationOrThrow(string flagName);
+        bool BoolVariationOrThrow(string flagName, bool forceRealtime = false);
 
         /// <summary>
         /// Get a string variation, throwing if the flag is not found.
@@ -359,7 +371,7 @@ namespace Gatrix.Unity.SDK
         /// <param name="flagName">The feature flag key.</param>
         /// <returns>The payload as string.</returns>
         /// <exception cref="GatrixFeatureException">Thrown if the flag does not exist.</exception>
-        string StringVariationOrThrow(string flagName);
+        string StringVariationOrThrow(string flagName, bool forceRealtime = false);
 
         /// <summary>
         /// Get a numeric variation, throwing if the flag is not found.
@@ -367,7 +379,7 @@ namespace Gatrix.Unity.SDK
         /// <param name="flagName">The feature flag key.</param>
         /// <returns>The payload as double.</returns>
         /// <exception cref="GatrixFeatureException">Thrown if the flag does not exist or payload is not numeric.</exception>
-        double NumberVariationOrThrow(string flagName);
+        double NumberVariationOrThrow(string flagName, bool forceRealtime = false);
 
         /// <summary>
         /// Get a JSON variation, throwing if the flag is not found.
@@ -375,7 +387,7 @@ namespace Gatrix.Unity.SDK
         /// <param name="flagName">The feature flag key.</param>
         /// <returns>The payload as Dictionary.</returns>
         /// <exception cref="GatrixFeatureException">Thrown if the flag does not exist or payload is not valid JSON.</exception>
-        Dictionary<string, object> JsonVariationOrThrow(string flagName);
+        Dictionary<string, object> JsonVariationOrThrow(string flagName, bool forceRealtime = false);
 
         // ==================== Variation Details ====================
 
@@ -388,34 +400,34 @@ namespace Gatrix.Unity.SDK
         /// </para>
         /// </summary>
         /// <param name="flagName">The feature flag key.</param>
-        /// <param name="missingValue">Default value if flag not found.</param>
+        /// <param name="fallbackValue">Default value if flag not found.</param>
         /// <returns>A <see cref="VariationResult{T}"/> with value and metadata.</returns>
-        VariationResult<bool> BoolVariationDetails(string flagName, bool missingValue);
+        VariationResult<bool> BoolVariationDetails(string flagName, bool fallbackValue, bool forceRealtime = false);
 
         /// <summary>
         /// Get a string variation with detailed evaluation metadata.
         /// </summary>
         /// <param name="flagName">The feature flag key.</param>
-        /// <param name="missingValue">Default value if flag not found.</param>
+        /// <param name="fallbackValue">Default value if flag not found.</param>
         /// <returns>A <see cref="VariationResult{T}"/> with value and metadata.</returns>
-        VariationResult<string> StringVariationDetails(string flagName, string missingValue);
+        VariationResult<string> StringVariationDetails(string flagName, string fallbackValue, bool forceRealtime = false);
 
         /// <summary>
         /// Get a numeric variation with detailed evaluation metadata.
         /// </summary>
         /// <param name="flagName">The feature flag key.</param>
-        /// <param name="missingValue">Default value if flag not found.</param>
+        /// <param name="fallbackValue">Default value if flag not found.</param>
         /// <returns>A <see cref="VariationResult{T}"/> with value and metadata.</returns>
-        VariationResult<double> NumberVariationDetails(string flagName, double missingValue);
+        VariationResult<double> NumberVariationDetails(string flagName, double fallbackValue, bool forceRealtime = false);
 
         /// <summary>
         /// Get a JSON variation with detailed evaluation metadata.
         /// </summary>
         /// <param name="flagName">The feature flag key.</param>
-        /// <param name="missingValue">Default value if flag not found.</param>
+        /// <param name="fallbackValue">Default value if flag not found.</param>
         /// <returns>A <see cref="VariationResult{T}"/> with value and metadata.</returns>
         VariationResult<Dictionary<string, object>> JsonVariationDetails(
-            string flagName, Dictionary<string, object> missingValue);
+            string flagName, Dictionary<string, object> fallbackValue, bool forceRealtime = false);
 
         // ==================== Sync ====================
 

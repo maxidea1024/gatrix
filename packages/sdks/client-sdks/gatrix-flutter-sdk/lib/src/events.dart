@@ -84,6 +84,7 @@ class GatrixEvents {
   static const String flagsMetricSent = 'flags.metrics_sent';
   static const String flagsMetricError = 'flags.metrics_error';
   static const String flagsSync = 'flags.sync';
+  static const String flagsPendingSync = 'flags.pending_sync';
   static const String flagsRemoved = 'flags.removed';
   static const String flagsRecovered = 'flags.recovered';
   static const String flagsFetchStart = 'flags.fetch_start';

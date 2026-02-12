@@ -37,6 +37,7 @@ FeaturesClient::FeaturesClient(const GatrixClientConfig &config,
 
   // Storage
   _storage = &_defaultStorage;
+  _explicitSyncMode = _config.explicitSyncMode;
 }
 
 FeaturesClient::~FeaturesClient() {
@@ -57,7 +58,7 @@ void FeaturesClient::start() {
     CCLOG("[GatrixSDK][DEV] start() called. offlineMode=%s, "
           "refreshInterval=%d, explicitSyncMode=%s",
           _config.offlineMode ? "True" : "False", _config.refreshInterval,
-          _config.explicitSyncMode ? "True" : "False");
+          _explicitSyncMode ? "True" : "False");
   }
   _stats.startTime = GatrixEventEmitter::nowISO(); // Would need to make this
                                                    // public or use a utility
@@ -112,15 +113,19 @@ void FeaturesClient::updateContext(const GatrixContext &context) {
 // ==================== Flag Access ====================
 
 const std::map<std::string, EvaluatedFlag> &
-FeaturesClient::activeFlags() const {
-  return _config.explicitSyncMode ? _synchronizedFlags : _realtimeFlags;
+FeaturesClient::selectFlags(bool forceRealtime) const {
+  if (forceRealtime)
+    return _realtimeFlags;
+  return _explicitSyncMode ? _synchronizedFlags : _realtimeFlags;
 }
 
 // Shared flag lookup: handles missing count, trackAccess, trackImpression
 const EvaluatedFlag *FeaturesClient::lookupFlag(const std::string &flagName,
-                                                const std::string &eventType) {
-  auto it = activeFlags().find(flagName);
-  if (it == activeFlags().end()) {
+                                                const std::string &eventType,
+                                                bool forceRealtime) {
+  const auto &flags = selectFlags(forceRealtime);
+  auto it = flags.find(flagName);
+  if (it == flags.end()) {
     _stats.missingFlags[flagName]++;
     return nullptr;
   }
@@ -130,156 +135,177 @@ const EvaluatedFlag *FeaturesClient::lookupFlag(const std::string &flagName,
   return &it->second;
 }
 
-bool FeaturesClient::isEnabled(const std::string &flagName) {
-  auto *flag = lookupFlag(flagName, "isEnabled");
+bool FeaturesClient::isEnabled(const std::string &flagName,
+                               bool forceRealtime) {
+  auto *flag = lookupFlag(flagName, "isEnabled", forceRealtime);
   if (!flag)
     return false;
   return flag->enabled;
 }
 
-Variant FeaturesClient::getVariant(const std::string &flagName) {
-  return getVariantInternal(flagName);
+Variant FeaturesClient::getVariant(const std::string &flagName,
+                                   bool forceRealtime) {
+  return getVariantInternal(flagName, forceRealtime);
 }
 
 std::vector<EvaluatedFlag> FeaturesClient::getAllFlags() const {
   std::vector<EvaluatedFlag> result;
-  for (const auto &[name, f] : activeFlags()) {
+  for (const auto &[name, f] : selectFlags()) {
     result.push_back(f);
   }
   return result;
 }
 
 FlagProxy FeaturesClient::getFlag(const std::string &flagName) {
-  auto it = activeFlags().find(flagName);
-  const EvaluatedFlag *flag =
-      (it != activeFlags().end()) ? &it->second : nullptr;
+  const auto &flags = selectFlags();
+  auto it = flags.find(flagName);
+  const EvaluatedFlag *flag = (it != flags.end()) ? &it->second : nullptr;
 
   return FlagProxy(flag, this, flagName);
 }
 
 bool FeaturesClient::hasFlag(const std::string &flagName) const {
-  return activeFlags().find(flagName) != activeFlags().end();
+  const auto &flags = selectFlags();
+  return flags.find(flagName) != flags.end();
 }
 
 // ==================== Variations ====================
 
 std::string FeaturesClient::variation(const std::string &flagName,
-                                      const std::string &missingValue) {
-  auto *flag = lookupFlag(flagName, "getVariant");
+                                      const std::string &fallbackValue,
+                                      bool forceRealtime) {
+  auto *flag = lookupFlag(flagName, "getVariant", forceRealtime);
   if (!flag)
-    return missingValue;
-  return flag->variant.name.empty() ? missingValue : flag->variant.name;
+    return fallbackValue;
+  return flag->variant.name.empty() ? fallbackValue : flag->variant.name;
 }
 
 bool FeaturesClient::boolVariation(const std::string &flagName,
-                                   bool missingValue) {
-  return boolVariationInternal(flagName, missingValue);
+                                   bool fallbackValue, bool forceRealtime) {
+  return boolVariationInternal(flagName, fallbackValue, forceRealtime);
 }
 
 std::string FeaturesClient::stringVariation(const std::string &flagName,
-                                            const std::string &missingValue) {
-  return stringVariationInternal(flagName, missingValue);
+                                            const std::string &fallbackValue,
+                                            bool forceRealtime) {
+  return stringVariationInternal(flagName, fallbackValue, forceRealtime);
 }
 
-int FeaturesClient::intVariation(const std::string &flagName,
-                                 int missingValue) {
-  return intVariationInternal(flagName, missingValue);
+int FeaturesClient::intVariation(const std::string &flagName, int fallbackValue,
+                                 bool forceRealtime) {
+  return intVariationInternal(flagName, fallbackValue, forceRealtime);
 }
 
 float FeaturesClient::floatVariation(const std::string &flagName,
-                                     float missingValue) {
-  return floatVariationInternal(flagName, missingValue);
+                                     float fallbackValue, bool forceRealtime) {
+  return floatVariationInternal(flagName, fallbackValue, forceRealtime);
 }
 
 double FeaturesClient::doubleVariation(const std::string &flagName,
-                                       double missingValue) {
-  return doubleVariationInternal(flagName, missingValue);
+                                       double fallbackValue,
+                                       bool forceRealtime) {
+  return doubleVariationInternal(flagName, fallbackValue, forceRealtime);
 }
 
 std::string FeaturesClient::jsonVariation(const std::string &flagName,
-                                          const std::string &missingValue) {
-  return jsonVariationInternal(flagName, missingValue);
+                                          const std::string &fallbackValue,
+                                          bool forceRealtime) {
+  return jsonVariationInternal(flagName, fallbackValue, forceRealtime);
 }
 
 // ==================== Variation Details ====================
 
 VariationResult<bool>
 FeaturesClient::boolVariationDetails(const std::string &flagName,
-                                     bool missingValue) {
-  return boolVariationDetailsInternal(flagName, missingValue);
+                                     bool fallbackValue, bool forceRealtime) {
+  return boolVariationDetailsInternal(flagName, fallbackValue, forceRealtime);
 }
 
 VariationResult<std::string>
 FeaturesClient::stringVariationDetails(const std::string &flagName,
-                                       const std::string &missingValue) {
-  return stringVariationDetailsInternal(flagName, missingValue);
+                                       const std::string &fallbackValue,
+                                       bool forceRealtime) {
+  return stringVariationDetailsInternal(flagName, fallbackValue, forceRealtime);
 }
 
 VariationResult<int>
 FeaturesClient::intVariationDetails(const std::string &flagName,
-                                    int missingValue) {
-  return intVariationDetailsInternal(flagName, missingValue);
+                                    int fallbackValue, bool forceRealtime) {
+  return intVariationDetailsInternal(flagName, fallbackValue, forceRealtime);
 }
 
 VariationResult<float>
 FeaturesClient::floatVariationDetails(const std::string &flagName,
-                                      float missingValue) {
-  return floatVariationDetailsInternal(flagName, missingValue);
+                                      float fallbackValue, bool forceRealtime) {
+  return floatVariationDetailsInternal(flagName, fallbackValue, forceRealtime);
 }
 
-VariationResult<double>
-FeaturesClient::doubleVariationDetails(const std::string &flagName,
-                                       double missingValue) {
-  return doubleVariationDetailsInternal(flagName, missingValue);
+VariationResult<double> FeaturesClient::doubleVariationDetails(
+    const std::string &flagName, double fallbackValue, bool forceRealtime) {
+  return doubleVariationDetailsInternal(flagName, fallbackValue, forceRealtime);
 }
 
 VariationResult<std::string>
 FeaturesClient::jsonVariationDetails(const std::string &flagName,
-                                     const std::string &missingValue) {
-  return jsonVariationDetailsInternal(flagName, missingValue);
+                                     const std::string &fallbackValue,
+                                     bool forceRealtime) {
+  return jsonVariationDetailsInternal(flagName, fallbackValue, forceRealtime);
 }
 
 // ==================== OrThrow ====================
 
-bool FeaturesClient::boolVariationOrThrow(const std::string &flagName) {
-  return boolVariationOrThrowInternal(flagName);
+bool FeaturesClient::boolVariationOrThrow(const std::string &flagName,
+                                          bool forceRealtime) {
+  return boolVariationOrThrowInternal(flagName, forceRealtime);
 }
 
-std::string
-FeaturesClient::stringVariationOrThrow(const std::string &flagName) {
-  return stringVariationOrThrowInternal(flagName);
+std::string FeaturesClient::stringVariationOrThrow(const std::string &flagName,
+                                                   bool forceRealtime) {
+  return stringVariationOrThrowInternal(flagName, forceRealtime);
 }
 
-float FeaturesClient::floatVariationOrThrow(const std::string &flagName) {
-  return floatVariationOrThrowInternal(flagName);
+float FeaturesClient::floatVariationOrThrow(const std::string &flagName,
+                                            bool forceRealtime) {
+  return floatVariationOrThrowInternal(flagName, forceRealtime);
 }
 
-int FeaturesClient::intVariationOrThrow(const std::string &flagName) {
-  return intVariationOrThrowInternal(flagName);
+int FeaturesClient::intVariationOrThrow(const std::string &flagName,
+                                        bool forceRealtime) {
+  return intVariationOrThrowInternal(flagName, forceRealtime);
 }
 
-double FeaturesClient::doubleVariationOrThrow(const std::string &flagName) {
-  return doubleVariationOrThrowInternal(flagName);
+double FeaturesClient::doubleVariationOrThrow(const std::string &flagName,
+                                              bool forceRealtime) {
+  return doubleVariationOrThrowInternal(flagName, forceRealtime);
 }
 
-std::string FeaturesClient::jsonVariationOrThrow(const std::string &flagName) {
-  return jsonVariationOrThrowInternal(flagName);
+std::string FeaturesClient::jsonVariationOrThrow(const std::string &flagName,
+                                                 bool forceRealtime) {
+  return jsonVariationOrThrowInternal(flagName, forceRealtime);
 }
 
 // ==================== Explicit Sync Mode ====================
 
-bool FeaturesClient::isExplicitSync() const { return _config.explicitSyncMode; }
+bool FeaturesClient::isExplicitSync() const { return _explicitSyncMode; }
 
-bool FeaturesClient::canSyncFlags() const {
-  return _config.explicitSyncMode && _hasPendingChanges;
+bool FeaturesClient::canSyncFlags() const { return _pendingSync; }
+
+bool FeaturesClient::hasPendingSyncFlags() const { return _pendingSync; }
+
+void FeaturesClient::setExplicitSyncMode(bool enabled) {
+  if (_explicitSyncMode == enabled)
+    return;
+  _explicitSyncMode = enabled;
+  _synchronizedFlags = _realtimeFlags;
+  _pendingSync = false;
 }
 
 void FeaturesClient::syncFlags(bool fetchNow) {
-  if (!_config.explicitSyncMode)
+  if (!_explicitSyncMode)
     return;
 
   _synchronizedFlags = _realtimeFlags;
-  _hasPendingChanges = false;
+  _pendingSync = false;
   _stats.syncFlagsCount++;
   _emitter.emit(EVENTS::FLAGS_SYNC);
   _emitter.emit(EVENTS::FLAGS_CHANGE);
@@ -549,11 +575,15 @@ void FeaturesClient::onFetchResponse(int statusCode, const std::string &body,
     _stats.lastUpdateTime = "now"; // simplified
     _stats.totalFlagCount = static_cast<int>(_realtimeFlags.size());
 
-    if (!_config.explicitSyncMode) {
+    if (!_explicitSyncMode) {
       _synchronizedFlags = _realtimeFlags;
+      _pendingSync = false;
       _emitter.emit(EVENTS::FLAGS_CHANGE);
     } else {
-      _hasPendingChanges = true;
+      if (!_pendingSync) {
+        _pendingSync = true;
+        _emitter.emit(EVENTS::FLAGS_PENDING_SYNC);
+      }
     }
     saveToStorage();
   }
@@ -729,7 +759,7 @@ void FeaturesClient::unschedulePolling() {
 
 GatrixSdkStats FeaturesClient::getStats() const {
   auto stats = _stats;
-  stats.totalFlagCount = static_cast<int>(activeFlags().size());
+  stats.totalFlagCount = static_cast<int>(selectFlags().size());
   stats.sdkState = _sdkState;
   stats.etag = _etag;
   stats.offlineMode = _config.offlineMode;

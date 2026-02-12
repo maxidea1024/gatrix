@@ -70,70 +70,70 @@ namespace Gatrix.Unity.SDK
 
         #region Variations (pure delegation)
 
-        public string Variation(string missingValue)
-            => _client.VariationInternal(_flagName, missingValue);
+        public string Variation(string fallbackValue, bool forceRealtime = false)
+            => _client.VariationInternal(_flagName, fallbackValue, forceRealtime);
 
-        public bool BoolVariation(bool missingValue)
-            => _client.BoolVariationInternal(_flagName, missingValue);
+        public bool BoolVariation(bool fallbackValue, bool forceRealtime = false)
+            => _client.BoolVariationInternal(_flagName, fallbackValue, forceRealtime);
 
-        public string StringVariation(string missingValue)
-            => _client.StringVariationInternal(_flagName, missingValue);
+        public string StringVariation(string fallbackValue, bool forceRealtime = false)
+            => _client.StringVariationInternal(_flagName, fallbackValue, forceRealtime);
 
-        public int IntVariation(int missingValue)
-            => _client.IntVariationInternal(_flagName, missingValue);
+        public int IntVariation(int fallbackValue, bool forceRealtime = false)
+            => _client.IntVariationInternal(_flagName, fallbackValue, forceRealtime);
 
-        public float FloatVariation(float missingValue)
-            => _client.FloatVariationInternal(_flagName, missingValue);
+        public float FloatVariation(float fallbackValue, bool forceRealtime = false)
+            => _client.FloatVariationInternal(_flagName, fallbackValue, forceRealtime);
 
-        public double DoubleVariation(double missingValue)
-            => _client.DoubleVariationInternal(_flagName, missingValue);
+        public double DoubleVariation(double fallbackValue, bool forceRealtime = false)
+            => _client.DoubleVariationInternal(_flagName, fallbackValue, forceRealtime);
 
-        public Dictionary<string, object> JsonVariation(Dictionary<string, object> missingValue)
-            => _client.JsonVariationInternal(_flagName, missingValue);
+        public Dictionary<string, object> JsonVariation(Dictionary<string, object> fallbackValue, bool forceRealtime = false)
+            => _client.JsonVariationInternal(_flagName, fallbackValue, forceRealtime);
 
         #endregion
 
         #region Variation Details (pure delegation)
 
-        public VariationResult<bool> BoolVariationDetails(bool missingValue)
-            => _client.BoolVariationDetailsInternal(_flagName, missingValue);
+        public VariationResult<bool> BoolVariationDetails(bool fallbackValue, bool forceRealtime = false)
+            => _client.BoolVariationDetailsInternal(_flagName, fallbackValue, forceRealtime);
 
-        public VariationResult<string> StringVariationDetails(string missingValue)
-            => _client.StringVariationDetailsInternal(_flagName, missingValue);
+        public VariationResult<string> StringVariationDetails(string fallbackValue, bool forceRealtime = false)
+            => _client.StringVariationDetailsInternal(_flagName, fallbackValue, forceRealtime);
 
-        public VariationResult<int> IntVariationDetails(int missingValue)
-            => _client.IntVariationDetailsInternal(_flagName, missingValue);
+        public VariationResult<int> IntVariationDetails(int fallbackValue, bool forceRealtime = false)
+            => _client.IntVariationDetailsInternal(_flagName, fallbackValue, forceRealtime);
 
-        public VariationResult<float> FloatVariationDetails(float missingValue)
-            => _client.FloatVariationDetailsInternal(_flagName, missingValue);
+        public VariationResult<float> FloatVariationDetails(float fallbackValue, bool forceRealtime = false)
+            => _client.FloatVariationDetailsInternal(_flagName, fallbackValue, forceRealtime);
 
-        public VariationResult<double> DoubleVariationDetails(double missingValue)
-            => _client.DoubleVariationDetailsInternal(_flagName, missingValue);
+        public VariationResult<double> DoubleVariationDetails(double fallbackValue, bool forceRealtime = false)
+            => _client.DoubleVariationDetailsInternal(_flagName, fallbackValue, forceRealtime);
 
-        public VariationResult<Dictionary<string, object>> JsonVariationDetails(Dictionary<string, object> missingValue)
-            => _client.JsonVariationDetailsInternal(_flagName, missingValue);
+        public VariationResult<Dictionary<string, object>> JsonVariationDetails(Dictionary<string, object> fallbackValue, bool forceRealtime = false)
+            => _client.JsonVariationDetailsInternal(_flagName, fallbackValue, forceRealtime);
 
         #endregion
 
         #region OrThrow (pure delegation)
 
-        public bool BoolVariationOrThrow()
-            => _client.BoolVariationOrThrowInternal(_flagName);
+        public bool BoolVariationOrThrow(bool forceRealtime = false)
+            => _client.BoolVariationOrThrowInternal(_flagName, forceRealtime);
 
-        public string StringVariationOrThrow()
-            => _client.StringVariationOrThrowInternal(_flagName);
+        public string StringVariationOrThrow(bool forceRealtime = false)
+            => _client.StringVariationOrThrowInternal(_flagName, forceRealtime);
 
-        public int IntVariationOrThrow()
-            => _client.IntVariationOrThrowInternal(_flagName);
+        public int IntVariationOrThrow(bool forceRealtime = false)
+            => _client.IntVariationOrThrowInternal(_flagName, forceRealtime);
 
-        public float FloatVariationOrThrow()
-            => _client.FloatVariationOrThrowInternal(_flagName);
+        public float FloatVariationOrThrow(bool forceRealtime = false)
+            => _client.FloatVariationOrThrowInternal(_flagName, forceRealtime);
 
-        public double DoubleVariationOrThrow()
-            => _client.DoubleVariationOrThrowInternal(_flagName);
+        public double DoubleVariationOrThrow(bool forceRealtime = false)
+            => _client.DoubleVariationOrThrowInternal(_flagName, forceRealtime);
 
-        public Dictionary<string, object> JsonVariationOrThrow()
-            => _client.JsonVariationOrThrowInternal(_flagName);
+        public Dictionary<string, object> JsonVariationOrThrow(bool forceRealtime = false)
+            => _client.JsonVariationOrThrowInternal(_flagName, forceRealtime);
 
         #endregion
     }
