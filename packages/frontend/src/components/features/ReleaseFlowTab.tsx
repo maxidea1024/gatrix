@@ -39,6 +39,7 @@ import {
     startMilestone,
 } from '../../services/releaseFlowService';
 import { formatRelativeTime } from '../../utils/dateFormat';
+import SafeguardPanel from './SafeguardPanel';
 
 interface ReleaseFlowTabProps {
     flagId: string;
@@ -59,10 +60,10 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
         environments.length > 0 ? environments[0].environment : ''
     );
 
-    const { data: templates, loading: loadingTemplates } = useReleaseFlowTemplates();
+    const { data: templates, isLoading: loadingTemplates } = useReleaseFlowTemplates();
     const {
         data: plan,
-        loading: loadingPlan,
+        isLoading: loadingPlan,
         mutate: mutatePlan
     } = useReleaseFlowPlan(flagId, selectedEnv);
 
@@ -228,6 +229,17 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                                                         </Box>
                                                     ))}
                                                 </Box>
+
+                                                {/* Safeguards for this milestone */}
+                                                {plan && index === currentMilestoneIndex && (
+                                                    <Box sx={{ mb: 2 }}>
+                                                        <SafeguardPanel
+                                                            flowId={plan.id}
+                                                            milestoneId={milestone.id}
+                                                            canManage={canManage}
+                                                        />
+                                                    </Box>
+                                                )}
 
                                                 {canManage && plan.activeMilestoneId !== 'completed' && (index === currentMilestoneIndex || (currentMilestoneIndex === -1 && index === 0)) && (
                                                     <Button
