@@ -3415,9 +3415,6 @@ const FeatureFlagDetailPage: React.FC = () => {
                     {t(`featureFlags.valueTypes.${flag.valueType || 'boolean'}`)}
                   </Typography>
                 </Box>
-                <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                  {t('featureFlags.valueTypeCannotChange')}
-                </Typography>
               </Box>
 
               {/* Flag Values */}
