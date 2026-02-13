@@ -2705,12 +2705,13 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                                                 borderRadius: 2,
                                                               }}
                                                             >
-                                                              {check.contextValue === ''
-                                                                ? t('common.emptyString')
-                                                                : String(
-                                                                  check.contextValue ??
-                                                                  'undefined'
-                                                                )}
+                                                              {check.contextValue === undefined || check.contextValue === null
+                                                                ? <span style={{ color: '#d32f2f', fontStyle: 'italic' }}>({t('playground.notProvided')})</span>
+                                                                : check.contextValue === ''
+                                                                  ? <span style={{ color: '#d32f2f' }}>&quot;&quot;</span>
+                                                                  : typeof check.contextValue === 'string'
+                                                                    ? <>&quot;{check.contextValue}&quot;</>
+                                                                    : String(check.contextValue)}
                                                             </code>
                                                           </Typography>
                                                         )}

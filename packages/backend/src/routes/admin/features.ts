@@ -1202,7 +1202,7 @@ function evaluateFlagWithDetails(
               segment: segmentName,
               constraint: constraint,
               passed: constraintPassed,
-              contextValue: getContextValue(constraint.contextName, context),
+              contextValue: getContextValue(constraint.contextName, context) ?? null,
             });
             if (!constraintPassed) {
               segmentsPassed = false;
@@ -1236,7 +1236,7 @@ function evaluateFlagWithDetails(
           type: 'STRATEGY_CONSTRAINT',
           constraint: constraint,
           passed: constraintPassed,
-          contextValue: getContextValue(constraint.contextName, context),
+          contextValue: getContextValue(constraint.contextName, context) ?? null,
         });
         if (!constraintPassed) {
           constraintsPassed = false;
