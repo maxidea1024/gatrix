@@ -231,7 +231,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                                                 </Box>
 
                                                 {/* Safeguards for this milestone */}
-                                                {plan && index === currentMilestoneIndex && (
+                                                {plan && (
                                                     <Box sx={{ mb: 2 }}>
                                                         <SafeguardPanel
                                                             flowId={plan.id}
