@@ -976,23 +976,9 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                       {t('featureFlags.addVariant')}
                     </Button>
                   ) : (
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 0.75,
-                        px: 1.5,
-                        py: 0.5,
-                        borderRadius: 1,
-                        bgcolor: 'info.main',
-                        color: 'info.contrastText',
-                      }}
-                    >
-                      <InfoIcon sx={{ fontSize: 16 }} />
-                      <Typography variant="caption" sx={{ fontWeight: 600 }}>
-                        {t('featureFlags.booleanVariantLimit')}
-                      </Typography>
-                    </Box>
+                    <Typography variant="caption" color="text.secondary">
+                      {t('featureFlags.booleanVariantLimit')}
+                    </Typography>
                   )
                 ) : (
                   <Box />
