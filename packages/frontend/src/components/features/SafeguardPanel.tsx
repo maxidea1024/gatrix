@@ -243,7 +243,7 @@ const SafeguardPanel: React.FC<SafeguardPanelProps> = ({ flowId, milestoneId, ca
                             </Button>
                         </Tooltip>
                     )}
-                    {canManage && (
+                    {canManage && safeguards.length > 0 && (
                         <Button
                             size="small"
                             variant="contained"
