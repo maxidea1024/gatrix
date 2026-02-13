@@ -248,28 +248,6 @@ class FeatureFlagService {
       isArchived: false,
     });
 
-    // For Remote Config, auto-create a default variant with 100% weight
-    if (isRemoteConfig && (!input.variants || input.variants.length === 0)) {
-      const defaultValue =
-        input.valueType === 'number'
-          ? { type: 'number', value: '0' }
-          : input.valueType === 'json'
-            ? { type: 'json', value: '{}' }
-            : input.valueType === 'boolean'
-              ? { type: 'boolean', value: 'false' }
-              : { type: 'string', value: '' };
-
-      await FeatureVariantModel.create({
-        flagId: flag.id,
-        environment: input.environment!,
-        variantName: '$config', // '$config' is default variant name for remote config
-        weight: 100,
-        value: defaultValue,
-        valueType: input.valueType || 'json',
-        createdBy: userId,
-      });
-    }
-
     // Create strategies if provided
     if (input.strategies && input.strategies.length > 0) {
       for (let i = 0; i < input.strategies.length; i++) {

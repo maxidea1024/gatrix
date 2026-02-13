@@ -59,6 +59,7 @@ import {
   Code as CodeIcon,
   SportsEsports as JoystickIcon,
   ContentCopy as CopyIcon,
+  AccountTree as ExtractIcon,
 } from '@mui/icons-material';
 import FieldTypeIcon from '../common/FieldTypeIcon';
 import CountrySelect from '../common/CountrySelect';
@@ -356,8 +357,8 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
       ALL_STRATEGIES_DISABLED: t('playground.reasons.ALL_STRATEGIES_DISABLED'),
       STRATEGY_MATCHED: reasonDetails?.strategyName
         ? t('playground.reasons.strategyMatched', {
-            strategy: localizeStrategyName(reasonDetails.strategyName),
-          })
+          strategy: localizeStrategyName(reasonDetails.strategyName),
+        })
         : t('playground.reasons.defaultStrategy'),
       NO_MATCHING_STRATEGY: t('playground.reasons.NO_MATCHING_STRATEGY'),
     };
@@ -437,6 +438,117 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
     if (rememberContext) {
       localStorage.setItem('gatrix_playground_saved_context', JSON.stringify(updated));
     }
+  };
+
+  // Extract context fields from flag definition (strategies constraints + segment constraints)
+  const handleExtractContextFields = async () => {
+    if (!initialFlagDetails) return;
+
+    const extractedFieldNames = new Set<string>();
+    const segmentNames = new Set<string>();
+
+    // Collect strategies from all environments via API
+    const flagName = initialFlagDetails.flagName;
+    const envsToCheck = environments.length > 0 ? environments : [];
+
+    if (envsToCheck.length > 0 && flagName) {
+      // Fetch flag data for each environment to get all strategies
+      for (const env of envsToCheck) {
+        try {
+          const response = await api.get(`/admin/features/${flagName}`, {
+            headers: { 'x-environment': env.environment },
+          });
+          const data = response.data?.flag || response.data;
+          const strategies = data.strategies || [];
+          for (const strategy of strategies) {
+            if (strategy.constraints) {
+              for (const constraint of strategy.constraints) {
+                if (constraint.contextName) {
+                  extractedFieldNames.add(constraint.contextName);
+                }
+              }
+            }
+            if (strategy.segments) {
+              for (const segName of strategy.segments) {
+                segmentNames.add(segName);
+              }
+            }
+          }
+        } catch {
+          // Skip environments that fail
+        }
+      }
+    } else {
+      // Fallback: use the strategies from initialFlagDetails
+      const allStrategies = initialFlagDetails.strategies || [];
+      for (const strategy of allStrategies) {
+        if (strategy.constraints) {
+          for (const constraint of strategy.constraints) {
+            if (constraint.contextName) {
+              extractedFieldNames.add(constraint.contextName);
+            }
+          }
+        }
+        if (strategy.segments) {
+          for (const segName of strategy.segments) {
+            segmentNames.add(segName);
+          }
+        }
+      }
+    }
+
+    // Fetch segment constraints if any segments are used
+    if (segmentNames.size > 0) {
+      try {
+        const response = await api.get('/admin/features/segments');
+        const segments = response.data?.segments || response.data?.data?.segments || [];
+        for (const segment of segments) {
+          if (segmentNames.has(segment.name) && segment.constraints) {
+            for (const constraint of segment.constraints) {
+              if (constraint.contextName) {
+                extractedFieldNames.add(constraint.contextName);
+              }
+            }
+          }
+        }
+      } catch {
+        // Silently ignore segment fetch errors
+      }
+    }
+
+    if (extractedFieldNames.size === 0) {
+      enqueueSnackbar(t('playground.noContextFieldsFound'), { variant: 'info' });
+      return;
+    }
+
+    // Merge with existing entries (skip already existing keys)
+    const existingKeys = new Set(contextEntries.map((e) => e.key).filter(Boolean));
+    const newEntries: ContextEntry[] = [];
+    for (const fieldName of extractedFieldNames) {
+      if (!existingKeys.has(fieldName)) {
+        const fieldDef = contextFields.find((f) => f.fieldName === fieldName);
+        newEntries.push({
+          key: fieldName,
+          value: '',
+          type: (fieldDef?.fieldType || 'string') as ContextEntry['type'],
+        });
+      }
+    }
+
+    if (newEntries.length === 0) {
+      enqueueSnackbar(t('playground.allContextFieldsAlreadyAdded'), { variant: 'info' });
+      return;
+    }
+
+    const updated = [...contextEntries, ...newEntries];
+    setContextEntries(updated);
+    if (rememberContext) {
+      localStorage.setItem('gatrix_playground_saved_context', JSON.stringify(updated));
+    }
+    enqueueSnackbar(
+      t('playground.contextFieldsExtracted', { count: newEntries.length }),
+      { variant: 'success' }
+    );
   };
 
   // Update context entry
@@ -705,15 +817,28 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
             <Typography variant="body2" color="text.secondary" textAlign="center">
               {t('playground.noContextProvidedDescription')}
             </Typography>
-            <Button
-              variant="outlined"
-              size="small"
-              startIcon={<AddIcon />}
-              onClick={handleAddContextEntry}
-              sx={{ borderRadius: '8px' }}
-            >
-              {t('playground.addContextField')}
-            </Button>
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <Button
+                variant="outlined"
+                size="small"
+                startIcon={<AddIcon />}
+                onClick={handleAddContextEntry}
+                sx={{ borderRadius: '8px' }}
+              >
+                {t('playground.addContextField')}
+              </Button>
+              {initialFlagDetails && (
+                <Button
+                  variant="outlined"
+                  size="small"
+                  startIcon={<ExtractIcon />}
+                  onClick={handleExtractContextFields}
+                  sx={{ borderRadius: '8px' }}
+                >
+                  {t('playground.extractFromFlag')}
+                </Button>
+              )}
+            </Box>
           </Box>
         ) : (
           <>
@@ -969,7 +1094,16 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                 );
               })}
             </Stack>
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, mb: 2 }}>
+              {initialFlagDetails && (
+                <Button
+                  size="small"
+                  startIcon={<ExtractIcon />}
+                  onClick={handleExtractContextFields}
+                >
+                  {t('playground.extractFromFlag')}
+                </Button>
+              )}
               <Button size="small" startIcon={<AddIcon />} onClick={handleAddContextEntry}>
                 {t('common.add')}
               </Button>
@@ -1337,9 +1471,9 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                 transition: 'all 0.2s',
                                 '&:hover': hasDetails
                                   ? {
-                                      bgcolor: 'action.hover',
-                                      transform: 'scale(1.1)',
-                                    }
+                                    bgcolor: 'action.hover',
+                                    transform: 'scale(1.1)',
+                                  }
                                   : {},
                               }}
                               onClick={(e) => {
@@ -1668,24 +1802,24 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                 position: 'relative',
                                 '&::before': isMatched
                                   ? {
+                                    content: '""',
+                                    position: 'absolute',
+                                    left: 0,
+                                    top: 0,
+                                    bottom: 0,
+                                    width: 4,
+                                    bgcolor: 'success.main',
+                                  }
+                                  : wasEvaluated && !stepResult?.passed
+                                    ? {
                                       content: '""',
                                       position: 'absolute',
                                       left: 0,
                                       top: 0,
                                       bottom: 0,
                                       width: 4,
-                                      bgcolor: 'success.main',
+                                      bgcolor: 'error.main',
                                     }
-                                  : wasEvaluated && !stepResult?.passed
-                                    ? {
-                                        content: '""',
-                                        position: 'absolute',
-                                        left: 0,
-                                        top: 0,
-                                        bottom: 0,
-                                        width: 4,
-                                        bgcolor: 'error.main',
-                                      }
                                     : {},
                               }}
                             >
@@ -1968,7 +2102,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                               sx={{
                                 borderBottom:
                                   stepIdx <
-                                  (selectedEvaluation.result.evaluationSteps?.length || 1) - 1
+                                    (selectedEvaluation.result.evaluationSteps?.length || 1) - 1
                                     ? 1
                                     : 0,
                                 borderColor: 'divider',
@@ -2253,10 +2387,10 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                                         {check.rollout === 100
                                                           ? t('playground.checkMessages.rollout100')
                                                           : t('playground.rolloutDetail', {
-                                                              percentage:
-                                                                check.percentage?.toFixed(1) ?? '?',
-                                                              rollout: check.rollout ?? 100,
-                                                            })}
+                                                            percentage:
+                                                              check.percentage?.toFixed(1) ?? '?',
+                                                            rollout: check.rollout ?? 100,
+                                                          })}
                                                       </Typography>
                                                     ) : check.constraint ? (
                                                       <Box sx={{ mt: 0.5 }}>
@@ -2287,9 +2421,9 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                                               {check.contextValue === ''
                                                                 ? t('common.emptyString')
                                                                 : String(
-                                                                    check.contextValue ??
-                                                                      'undefined'
-                                                                  )}
+                                                                  check.contextValue ??
+                                                                  'undefined'
+                                                                )}
                                                             </code>
                                                           </Typography>
                                                         )}
@@ -2319,15 +2453,15 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                                         sx={{ display: 'block' }}
                                                       >
                                                         {check.message ===
-                                                        'Segment has no constraints - passed'
+                                                          'Segment has no constraints - passed'
                                                           ? t(
-                                                              'playground.checkMessages.segmentNoConstraints'
-                                                            )
+                                                            'playground.checkMessages.segmentNoConstraints'
+                                                          )
                                                           : check.message ===
-                                                              'Segment not found - skipped'
+                                                            'Segment not found - skipped'
                                                             ? t(
-                                                                'playground.checkMessages.segmentNotFound'
-                                                              )
+                                                              'playground.checkMessages.segmentNotFound'
+                                                            )
                                                             : check.message}
                                                       </Typography>
                                                     ) : null}
@@ -2532,8 +2666,8 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                               {innerValue === ''
                                 ? t('common.emptyString')
                                 : typeof innerValue === 'object' &&
-                                    innerValue !== null &&
-                                    Object.keys(innerValue).length === 0
+                                  innerValue !== null &&
+                                  Object.keys(innerValue).length === 0
                                   ? t('common.emptyObject')
                                   : innerValue}
                             </Typography>
@@ -2722,7 +2856,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                     null,
                     2
                   )}
-                  onChange={() => {}}
+                  onChange={() => { }}
                   readOnly
                   height={200}
                 />

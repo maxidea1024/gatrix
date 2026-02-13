@@ -139,6 +139,7 @@ interface EnvironmentVariantsEditorProps {
   onSave: (variants: Variant[]) => Promise<void>;
   onSaveValues?: (enabledValue: any, disabledValue: any, useGlobal: boolean) => Promise<void>;
   onGoToPayloadTab: () => void;
+  defaultExpanded?: boolean;
 }
 
 // Helper function to distribute weights among variants
@@ -183,6 +184,7 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
   onSave,
   onSaveValues,
   onGoToPayloadTab,
+  defaultExpanded = false,
 }) => {
   const { t } = useTranslation();
 
@@ -194,7 +196,7 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
 
   const [saving, setSaving] = useState(false);
   const [savingValues, setSavingValues] = useState(false);
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(defaultExpanded);
   const [jsonErrors, setJsonErrors] = useState<Record<number, string | null>>({});
 
   // Ref to preserve expanded state
@@ -588,13 +590,13 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
 
     const viewOnlyStyle = !isActuallyEditable
       ? {
-          bgcolor: (theme: any) =>
-            theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.02)',
-          '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
-          '&:hover .MuiOutlinedInput-notchedOutline': { border: 'none' },
-          '&.Mui-focused .MuiOutlinedInput-notchedOutline': { border: 'none' },
-          borderRadius: 1,
-        }
+        bgcolor: (theme: any) =>
+          theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.02)',
+        '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
+        '&:hover .MuiOutlinedInput-notchedOutline': { border: 'none' },
+        '&.Mui-focused .MuiOutlinedInput-notchedOutline': { border: 'none' },
+        borderRadius: 1,
+      }
       : {};
 
     if (valueType === 'boolean') {
@@ -713,7 +715,7 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <Typography variant="subtitle2" fontWeight={600}>
             {flagType === 'remoteConfig'
-              ? t('featureFlags.fallbackAndConfiguration')
+              ? t('featureFlags.configurationValue')
               : t('featureFlags.envSpecificSettings')}
           </Typography>
           {!isInitialMount && (hasChanges || valuesHasChanges) && (
@@ -779,261 +781,251 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
 
       {/* Expanded content */}
       <Collapse in={expanded}>
-        <Box sx={{ mb: 3 }}>
-          {variantCount === 0 && (
-            <EmptyPlaceholder
-              message={
-                flagType === 'remoteConfig'
-                  ? t('featureFlags.noRemoteConfigValues')
-                  : t('featureFlags.noVariantsConfigured')
-              }
-              description={
-                flagType === 'remoteConfig'
-                  ? t('featureFlags.noRemoteConfigValuesGuide')
-                  : t('featureFlags.noVariantsGuide')
-              }
-              onAddClick={canManage && !isArchived ? addVariant : undefined}
-              addButtonLabel={
-                flagType === 'remoteConfig'
-                  ? t('featureFlags.setConfiguration')
-                  : t('featureFlags.addVariant')
-              }
-            />
-          )}
+        {flagType !== 'remoteConfig' && (
+          <Box sx={{ mb: 3 }}>
+            {variantCount === 0 && (
+              <EmptyPlaceholder
+                message={t('featureFlags.noVariantsConfigured')}
+                description={t('featureFlags.noVariantsGuide')}
+                onAddClick={canManage && !isArchived ? addVariant : undefined}
+                addButtonLabel={t('featureFlags.addVariant')}
+              />
+            )}
 
-          <Stack spacing={2}>
-            {editingVariants.map((variant, index) => {
-              const variantColor = VARIANT_COLORS[index % VARIANT_COLORS.length];
-              const isCurrentLocked = variant.weightLock;
-              const showWeightControls = variantCount > 1;
-              const isDuplicateName = editingVariants.some(
-                (v, i) =>
-                  i !== index && v.name.trim().toLowerCase() === variant.name.trim().toLowerCase()
-              );
+            <Stack spacing={2}>
+              {editingVariants.map((variant, index) => {
+                const variantColor = VARIANT_COLORS[index % VARIANT_COLORS.length];
+                const isCurrentLocked = variant.weightLock;
+                const showWeightControls = variantCount > 1;
+                const isDuplicateName = editingVariants.some(
+                  (v, i) =>
+                    i !== index && v.name.trim().toLowerCase() === variant.name.trim().toLowerCase()
+                );
 
-              return (
-                <Paper
-                  key={index}
-                  variant="outlined"
-                  sx={{
-                    p: 2,
-                    borderRadius: 2,
-                    borderLeft: flagType === 'remoteConfig' ? 1 : 4,
-                    borderColor: flagType === 'remoteConfig' ? 'divider' : undefined,
-                    borderLeftColor: flagType === 'remoteConfig' ? 'divider' : variantColor,
-                  }}
-                >
-                  <Box
+                return (
+                  <Paper
+                    key={index}
+                    variant="outlined"
                     sx={{
-                      display: 'flex',
-                      alignItems: 'flex-start',
-                      gap: 1.5,
-                      mb: variant.name === '$config' || flagType === 'remoteConfig' ? 0 : 1.5,
+                      p: 2,
+                      borderRadius: 2,
+                      borderLeft: flagType === 'remoteConfig' ? 1 : 4,
+                      borderColor: flagType === 'remoteConfig' ? 'divider' : undefined,
+                      borderLeftColor: flagType === 'remoteConfig' ? 'divider' : variantColor,
                     }}
                   >
-                    {variant.name !== '$config' && flagType !== 'remoteConfig' && (
-                      <TextField
-                        size="small"
-                        label={t('featureFlags.variantName')}
-                        value={variant.name}
-                        onChange={(e) => updateVariant(index, { name: e.target.value })}
-                        disabled={!canManage || isArchived}
-                        error={isDuplicateName}
-                        sx={{ flex: 1 }}
-                      />
-                    )}
-                    {showWeightControls && flagType !== 'remoteConfig' && (
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        gap: 1.5,
+                        mb: variant.name === '$config' || flagType === 'remoteConfig' ? 0 : 1.5,
+                      }}
+                    >
+                      {variant.name !== '$config' && flagType !== 'remoteConfig' && (
                         <TextField
                           size="small"
-                          label={t('featureFlags.weight')}
-                          type="number"
-                          value={variant.weight}
-                          onChange={(e) =>
-                            updateVariantWeight(
-                              index,
-                              parseInt(e.target.value) || 0,
-                              isCurrentLocked || false
-                            )
-                          }
+                          label={t('featureFlags.variantName')}
+                          value={variant.name}
+                          onChange={(e) => updateVariant(index, { name: e.target.value })}
                           disabled={!canManage || isArchived}
-                          sx={{ width: 90 }}
-                          InputProps={{
-                            endAdornment: <InputAdornment position="end">%</InputAdornment>,
-                          }}
+                          error={isDuplicateName}
+                          sx={{ flex: 1 }}
                         />
-                        <IconButton
-                          size="small"
-                          onClick={() => toggleWeightLock(index, !isCurrentLocked)}
-                          disabled={!canManage || isArchived}
-                          sx={{ color: isCurrentLocked ? 'warning.main' : 'action.disabled' }}
-                        >
-                          {isCurrentLocked ? (
-                            <LockIcon fontSize="small" />
-                          ) : (
-                            <LockOpenIcon fontSize="small" />
-                          )}
-                        </IconButton>
-                      </Box>
-                    )}
-                    {canManage && !isArchived && flagType !== 'remoteConfig' && (
-                      <IconButton size="small" color="error" onClick={() => removeVariant(index)}>
-                        <DeleteIcon fontSize="small" />
-                      </IconButton>
-                    )}
-                  </Box>
-
-                  <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
-                    {(valueType === 'string' || valueType === 'json') && (
-                      <Box sx={{ mt: 1 }}>
-                        <FieldTypeIcon type={valueType} size={18} />
-                      </Box>
-                    )}
-                    <Box sx={{ flex: 1 }}>
-                      {valueType === 'json' || valueType === 'string' ? (
-                        <ValueEditorField
-                          value={(() => {
-                            const raw = unwrapValue(variant.value);
-                            if (valueType === 'json') {
-                              if (raw === null || raw === undefined) return '{}';
-                              if (typeof raw === 'object') return JSON.stringify(raw, null, 2);
-                              if (raw === '[object Object]') return '{}';
-                              return String(raw);
+                      )}
+                      {showWeightControls && flagType !== 'remoteConfig' && (
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <TextField
+                            size="small"
+                            label={t('featureFlags.weight')}
+                            type="number"
+                            value={variant.weight}
+                            onChange={(e) =>
+                              updateVariantWeight(
+                                index,
+                                parseInt(e.target.value) || 0,
+                                isCurrentLocked || false
+                              )
                             }
-                            // For string type, if value is still an object somehow, stringify it
-                            if (typeof raw === 'object' && raw !== null) return JSON.stringify(raw);
-                            return raw ?? '';
-                          })()}
-                          onChange={(val) => {
-                            if (valueType === 'json') {
-                              // Value can be an object (from dialog) or a string (from inline)
-                              if (typeof val === 'object' && val !== null) {
-                                updateVariant(index, { value: val });
-                                setJsonErrors((prev) => ({ ...prev, [index]: null }));
-                              } else {
-                                try {
-                                  const parsed = JSON.parse(val);
-                                  updateVariant(index, { value: parsed });
-                                  setJsonErrors((prev) => ({ ...prev, [index]: null }));
-                                } catch (e: any) {
-                                  updateVariant(index, { value: val });
-                                  setJsonErrors((prev) => ({
-                                    ...prev,
-                                    [index]: e.message || 'Invalid JSON',
-                                  }));
-                                }
-                              }
-                            } else {
-                              updateVariant(index, { value: val });
-                            }
-                          }}
-                          valueType={valueType}
-                          disabled={!canManage || isArchived}
-                          label={
-                            flagType === 'remoteConfig'
-                              ? t('featureFlags.configuration')
-                              : t('featureFlags.variantValue')
-                          }
-                          onValidationError={(error) =>
-                            setJsonErrors((prev) => ({ ...prev, [index]: error }))
-                          }
-                        />
-                      ) : (
-                        <Box sx={{ display: 'flex', alignItems: 'center', minHeight: 40 }}>
-                          {valueType === 'boolean' ? (
-                            <BooleanSwitch
-                              checked={
-                                unwrapValue(variant.value) === true ||
-                                unwrapValue(variant.value) === 'true'
-                              }
-                              onChange={(e) => updateVariant(index, { value: e.target.checked })}
-                              disabled={!canManage || isArchived}
-                            />
-                          ) : (
-                            <TextField
-                              fullWidth
-                              size="small"
-                              type="number"
-                              value={unwrapValue(variant.value) ?? ''}
-                              onChange={(e) =>
-                                updateVariant(index, {
-                                  value: e.target.value === '' ? 0 : Number(e.target.value),
-                                })
-                              }
-                              disabled={!canManage || isArchived}
-                            />
-                          )}
+                            disabled={!canManage || isArchived}
+                            sx={{ width: 90 }}
+                            InputProps={{
+                              endAdornment: <InputAdornment position="end">%</InputAdornment>,
+                            }}
+                          />
+                          <IconButton
+                            size="small"
+                            onClick={() => toggleWeightLock(index, !isCurrentLocked)}
+                            disabled={!canManage || isArchived}
+                            sx={{ color: isCurrentLocked ? 'warning.main' : 'action.disabled' }}
+                          >
+                            {isCurrentLocked ? (
+                              <LockIcon fontSize="small" />
+                            ) : (
+                              <LockOpenIcon fontSize="small" />
+                            )}
+                          </IconButton>
                         </Box>
                       )}
+                      {canManage && !isArchived && flagType !== 'remoteConfig' && (
+                        <IconButton size="small" color="error" onClick={() => removeVariant(index)}>
+                          <DeleteIcon fontSize="small" />
+                        </IconButton>
+                      )}
                     </Box>
-                  </Box>
-                </Paper>
-              );
-            })}
-          </Stack>
 
-          {canManage && !isArchived && (
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-              {flagType !== 'remoteConfig' && variantCount > 0 ? (
-                !(valueType === 'boolean' && variantCount >= 2) ? (
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    startIcon={<AddIcon />}
-                    onClick={addVariant}
-                  >
-                    {t('featureFlags.addVariant')}
-                  </Button>
+                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
+                      {(valueType === 'string' || valueType === 'json') && (
+                        <Box sx={{ mt: 1 }}>
+                          <FieldTypeIcon type={valueType} size={18} />
+                        </Box>
+                      )}
+                      <Box sx={{ flex: 1 }}>
+                        {valueType === 'json' || valueType === 'string' ? (
+                          <ValueEditorField
+                            value={(() => {
+                              const raw = unwrapValue(variant.value);
+                              if (valueType === 'json') {
+                                if (raw === null || raw === undefined) return '{}';
+                                if (typeof raw === 'object') return JSON.stringify(raw, null, 2);
+                                if (raw === '[object Object]') return '{}';
+                                return String(raw);
+                              }
+                              // For string type, if value is still an object somehow, stringify it
+                              if (typeof raw === 'object' && raw !== null) return JSON.stringify(raw);
+                              return raw ?? '';
+                            })()}
+                            onChange={(val) => {
+                              if (valueType === 'json') {
+                                // Value can be an object (from dialog) or a string (from inline)
+                                if (typeof val === 'object' && val !== null) {
+                                  updateVariant(index, { value: val });
+                                  setJsonErrors((prev) => ({ ...prev, [index]: null }));
+                                } else {
+                                  try {
+                                    const parsed = JSON.parse(val);
+                                    updateVariant(index, { value: parsed });
+                                    setJsonErrors((prev) => ({ ...prev, [index]: null }));
+                                  } catch (e: any) {
+                                    updateVariant(index, { value: val });
+                                    setJsonErrors((prev) => ({
+                                      ...prev,
+                                      [index]: e.message || 'Invalid JSON',
+                                    }));
+                                  }
+                                }
+                              } else {
+                                updateVariant(index, { value: val });
+                              }
+                            }}
+                            valueType={valueType}
+                            disabled={!canManage || isArchived}
+                            label={
+                              flagType === 'remoteConfig'
+                                ? t('featureFlags.configuration')
+                                : t('featureFlags.variantValue')
+                            }
+                            onValidationError={(error) =>
+                              setJsonErrors((prev) => ({ ...prev, [index]: error }))
+                            }
+                          />
+                        ) : (
+                          <Box sx={{ display: 'flex', alignItems: 'center', minHeight: 40 }}>
+                            {valueType === 'boolean' ? (
+                              <BooleanSwitch
+                                checked={
+                                  unwrapValue(variant.value) === true ||
+                                  unwrapValue(variant.value) === 'true'
+                                }
+                                onChange={(e) => updateVariant(index, { value: e.target.checked })}
+                                disabled={!canManage || isArchived}
+                              />
+                            ) : (
+                              <TextField
+                                fullWidth
+                                size="small"
+                                type="number"
+                                value={unwrapValue(variant.value) ?? ''}
+                                onChange={(e) =>
+                                  updateVariant(index, {
+                                    value: e.target.value === '' ? 0 : Number(e.target.value),
+                                  })
+                                }
+                                disabled={!canManage || isArchived}
+                              />
+                            )}
+                          </Box>
+                        )}
+                      </Box>
+                    </Box>
+                  </Paper>
+                );
+              })}
+            </Stack>
+
+            {canManage && !isArchived && (
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
+                {flagType !== 'remoteConfig' && variantCount > 0 ? (
+                  !(valueType === 'boolean' && variantCount >= 2) ? (
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      startIcon={<AddIcon />}
+                      onClick={addVariant}
+                    >
+                      {t('featureFlags.addVariant')}
+                    </Button>
+                  ) : (
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 0.75,
+                        px: 1.5,
+                        py: 0.5,
+                        borderRadius: 1,
+                        bgcolor: 'info.main',
+                        color: 'info.contrastText',
+                      }}
+                    >
+                      <InfoIcon sx={{ fontSize: 16 }} />
+                      <Typography variant="caption" sx={{ fontWeight: 600 }}>
+                        {t('featureFlags.booleanVariantLimit')}
+                      </Typography>
+                    </Box>
+                  )
                 ) : (
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 0.75,
-                      px: 1.5,
-                      py: 0.5,
-                      borderRadius: 1,
-                      bgcolor: 'info.main',
-                      color: 'info.contrastText',
-                    }}
-                  >
-                    <InfoIcon sx={{ fontSize: 16 }} />
-                    <Typography variant="caption" sx={{ fontWeight: 600 }}>
-                      {t('featureFlags.booleanVariantLimit')}
-                    </Typography>
-                  </Box>
-                )
-              ) : (
-                <Box />
-              )}
-              <Box sx={{ display: 'flex', gap: 1 }}>
-                {hasChanges && (
-                  <Button
-                    variant="text"
-                    size="small"
-                    onClick={handleResetVariants}
-                    disabled={saving}
-                  >
-                    {t('common.reset')}
-                  </Button>
+                  <Box />
                 )}
-                <Button
-                  variant="contained"
-                  size="small"
-                  startIcon={<SaveIcon />}
-                  onClick={handleSaveVariants}
-                  disabled={saving || !hasChanges || hasDuplicateNames || hasJsonErrors}
-                >
-                  {saving ? t('common.saving') : t('common.save')}
-                </Button>
+                <Box sx={{ display: 'flex', gap: 1 }}>
+                  {hasChanges && (
+                    <Button
+                      variant="text"
+                      size="small"
+                      onClick={handleResetVariants}
+                      disabled={saving}
+                    >
+                      {t('common.reset')}
+                    </Button>
+                  )}
+                  <Button
+                    variant="contained"
+                    size="small"
+                    startIcon={<SaveIcon />}
+                    onClick={handleSaveVariants}
+                    disabled={saving || !hasChanges || hasDuplicateNames || hasJsonErrors}
+                  >
+                    {saving ? t('common.saving') : t('common.save')}
+                  </Button>
+                </Box>
               </Box>
-            </Box>
-          )}
-        </Box>
+            )}
+          </Box>
+        )}
 
         {/* Flag Values Section - shown for both types but more critical for 'flag' usage */}
         {onSaveValues && (
-          <Box sx={{ mt: 2, pt: 2, borderTop: 1, borderColor: 'divider' }}>
+          <Box sx={{ mt: flagType === 'remoteConfig' ? 0 : 2, pt: flagType === 'remoteConfig' ? 0 : 2, borderTop: flagType === 'remoteConfig' ? 0 : 1, borderColor: 'divider' }}>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                 <OverrideSwitch
