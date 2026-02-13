@@ -1,6 +1,7 @@
 import { Response, NextFunction } from 'express';
 import { AuthenticatedRequest } from '../middleware/auth';
 import { releaseFlowService } from '../services/ReleaseFlowService';
+import { safeguardService } from '../services/SafeguardService';
 import { GatrixError } from '../middleware/errorHandler';
 
 export class ReleaseFlowController {
@@ -345,6 +346,155 @@ export class ReleaseFlowController {
             res.json({
                 success: true,
                 data: milestone,
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    // ==================== Safeguards ====================
+
+    // List safeguards for a milestone
+    static async listSafeguards(
+        req: AuthenticatedRequest,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
+        try {
+            const { milestoneId } = req.params;
+            const safeguards = await safeguardService.getByMilestoneId(milestoneId);
+
+            res.json({
+                success: true,
+                data: safeguards,
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    // Create a safeguard for a milestone
+    static async createSafeguard(
+        req: AuthenticatedRequest,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
+        try {
+            const { flowId, milestoneId, metricName, aggregationMode, operator, threshold, timeRange, action } = req.body;
+
+            if (!flowId || !milestoneId || !metricName || threshold === undefined) {
+                throw new GatrixError('flowId, milestoneId, metricName, and threshold are required', 400);
+            }
+
+            const safeguard = await safeguardService.create({
+                flowId,
+                milestoneId,
+                metricName,
+                aggregationMode,
+                operator,
+                threshold,
+                timeRange,
+                action,
+            });
+
+            res.status(201).json({
+                success: true,
+                data: safeguard,
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    // Update a safeguard
+    static async updateSafeguard(
+        req: AuthenticatedRequest,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
+        try {
+            const { safeguardId } = req.params;
+            const { metricName, aggregationMode, operator, threshold, timeRange, action } = req.body;
+
+            const safeguard = await safeguardService.update(safeguardId, {
+                metricName,
+                aggregationMode,
+                operator,
+                threshold,
+                timeRange,
+                action,
+            });
+
+            if (!safeguard) {
+                throw new GatrixError('Safeguard not found', 404);
+            }
+
+            res.json({
+                success: true,
+                data: safeguard,
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    // Delete a safeguard
+    static async deleteSafeguard(
+        req: AuthenticatedRequest,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
+        try {
+            const { safeguardId } = req.params;
+            const deleted = await safeguardService.delete(safeguardId);
+
+            if (!deleted) {
+                throw new GatrixError('Safeguard not found', 404);
+            }
+
+            res.json({
+                success: true,
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    // Evaluate safeguards for a milestone (manual trigger)
+    static async evaluateSafeguards(
+        req: AuthenticatedRequest,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
+        try {
+            const { milestoneId } = req.params;
+            const result = await safeguardService.evaluateMilestoneSafeguards(milestoneId);
+
+            res.json({
+                success: true,
+                data: result,
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    // Reset a triggered safeguard
+    static async resetSafeguard(
+        req: AuthenticatedRequest,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
+        try {
+            const { safeguardId } = req.params;
+            const reset = await safeguardService.resetTriggered(safeguardId);
+
+            if (!reset) {
+                throw new GatrixError('Safeguard not found', 404);
+            }
+
+            res.json({
+                success: true,
             });
         } catch (error) {
             next(error);

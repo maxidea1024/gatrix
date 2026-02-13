@@ -29,4 +29,12 @@ router.post('/plans/:id/progress', requirePermission(PERMISSIONS.FEATURE_FLAGS_M
 router.put('/milestones/:milestoneId/transition', requirePermission(PERMISSIONS.FEATURE_FLAGS_MANAGE) as any, ReleaseFlowController.setTransitionCondition as any);
 router.delete('/milestones/:milestoneId/transition', requirePermission(PERMISSIONS.FEATURE_FLAGS_MANAGE) as any, ReleaseFlowController.removeTransitionCondition as any);
 
+// Safeguards (per-milestone)
+router.get('/milestones/:milestoneId/safeguards', ReleaseFlowController.listSafeguards as any);
+router.post('/safeguards', requirePermission(PERMISSIONS.FEATURE_FLAGS_MANAGE) as any, ReleaseFlowController.createSafeguard as any);
+router.put('/safeguards/:safeguardId', requirePermission(PERMISSIONS.FEATURE_FLAGS_MANAGE) as any, ReleaseFlowController.updateSafeguard as any);
+router.delete('/safeguards/:safeguardId', requirePermission(PERMISSIONS.FEATURE_FLAGS_MANAGE) as any, ReleaseFlowController.deleteSafeguard as any);
+router.post('/milestones/:milestoneId/safeguards/evaluate', requirePermission(PERMISSIONS.FEATURE_FLAGS_MANAGE) as any, ReleaseFlowController.evaluateSafeguards as any);
+router.post('/safeguards/:safeguardId/reset', requirePermission(PERMISSIONS.FEATURE_FLAGS_MANAGE) as any, ReleaseFlowController.resetSafeguard as any);
+
 export default router;

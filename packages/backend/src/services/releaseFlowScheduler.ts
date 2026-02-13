@@ -2,6 +2,7 @@ import logger from '../config/logger';
 import { QueueService, queueService } from './QueueService';
 import { ReleaseFlowMilestoneModel } from '../models/ReleaseFlow';
 import { releaseFlowService } from './ReleaseFlowService';
+import { safeguardService } from './SafeguardService';
 
 /**
  * Scheduler for automating release flow milestone progressions.
@@ -124,6 +125,17 @@ export class ReleaseFlowScheduler {
                     const requiredMs = transitionCondition.intervalMinutes * 60 * 1000;
 
                     if (elapsedMs >= requiredMs) {
+                        // Evaluate safeguards before progression
+                        if (plan.milestoneId) {
+                            const { anyTriggered, results } = await safeguardService.evaluateMilestoneSafeguards(plan.milestoneId);
+                            if (anyTriggered) {
+                                const triggeredNames = results.filter(r => r.triggered).map(r => r.metricName).join(', ');
+                                logger.warn(`Release flow plan ${flowId}: safeguard triggered (${triggeredNames}), pausing plan`);
+                                await releaseFlowService.pausePlan(flowId, 0);
+                                continue;
+                            }
+                        }
+
                         logger.info(`Release flow progression: plan ${flowId} milestone elapsed, progressing...`);
                         await releaseFlowService.progressToNextMilestone(flowId);
                         progressedCount++;
