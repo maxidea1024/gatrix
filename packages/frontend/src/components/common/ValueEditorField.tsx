@@ -201,7 +201,7 @@ const ValueEditorField: React.FC<ValueEditorFieldProps> = ({
           }
           sx={sx}
           FormHelperTextProps={{
-            sx: { minHeight: '1.25rem', m: 0, mt: 0.5 }
+            sx: { minHeight: '1.25rem', m: 0, mt: 0.5 },
           }}
           InputProps={{
             sx: showEmptyHint ? { fontStyle: 'italic', ...sx } : sx,
@@ -237,7 +237,7 @@ const ValueEditorField: React.FC<ValueEditorFieldProps> = ({
           onClick={valueType === 'json' && !disabled ? handleOpenDialog : undefined}
           sx={sx}
           FormHelperTextProps={{
-            sx: { minHeight: '1.25rem', m: 0, mt: 0.5 }
+            sx: { minHeight: '1.25rem', m: 0, mt: 0.5 },
           }}
           InputProps={{
             readOnly: valueType === 'json',

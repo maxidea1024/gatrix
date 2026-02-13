@@ -753,13 +753,19 @@ router.post(
     const segmentsMap = new Map(segments.map((s) => [s.segmentName, s]));
 
     // Analyze context values for common issues
-    const contextWarnings: { field: string; type: string; message: string; suggestion?: string; data?: any; severity: 'warning' | 'error' }[] = [];
+    const contextWarnings: {
+      field: string;
+      type: string;
+      message: string;
+      suggestion?: string;
+      data?: any;
+      severity: 'warning' | 'error';
+    }[] = [];
     // Load context field definitions for validation (used both for provided values and missing-field checks)
     const contextFieldDefs = await featureFlagService.listContextFields();
     const fieldDefMap = new Map(contextFieldDefs.map((f: any) => [f.fieldName, f]));
 
     if (context && typeof context === 'object') {
-
       for (const [key, value] of Object.entries(context)) {
         const fieldDef = fieldDefMap.get(key);
 
@@ -776,7 +782,7 @@ router.post(
               type: 'EMPTY_VALUE',
               message: `Value is missing or empty, but this field is required.`,
               data: { value },
-              severity: 'error'
+              severity: 'error',
             });
             continue; // Skip further validation for empty required fields
           }
@@ -797,7 +803,7 @@ router.post(
                 message: `Value has ${parts.join(' and ')} whitespace: "${value}" → trimmed: "${value.trim()}"`,
                 suggestion: value.trim(),
                 data: { value, trimmed: value.trim(), parts },
-                severity: isReject ? 'error' : 'warning'
+                severity: isReject ? 'error' : 'warning',
               });
 
               // If rejected, skip further validation as it's already an error
@@ -824,7 +830,7 @@ router.post(
               type: 'TYPE_MISMATCH',
               message: `Expected number but got ${typeof value}: "${value}"`,
               data: { expectedType, actualType: typeof value, value },
-              severity: 'error'
+              severity: 'error',
             });
           } else if (expectedType === 'boolean' && typeof value !== 'boolean') {
             contextWarnings.push({
@@ -832,7 +838,7 @@ router.post(
               type: 'TYPE_MISMATCH',
               message: `Expected boolean but got ${typeof value}: "${value}"`,
               data: { expectedType, actualType: typeof value, value },
-              severity: 'error'
+              severity: 'error',
             });
           }
 
@@ -850,7 +856,7 @@ router.post(
                 message: `Value "${strValue}" is not in the allowed values: [${legalValues.join(', ')}]`,
                 suggestion: trimmedMatch || undefined,
                 data: { value: strValue, allowedValues: legalValues, suggestion: trimmedMatch },
-                severity: 'error'
+                severity: 'error',
               });
             }
           }
@@ -864,8 +870,12 @@ router.post(
                   field: key,
                   type: 'PATTERN_MISMATCH',
                   message: `Value "${value}" does not match pattern: ${rules.pattern}`,
-                  data: { value, pattern: rules.pattern, patternDescription: rules.patternDescription },
-                  severity: 'error'
+                  data: {
+                    value,
+                    pattern: rules.pattern,
+                    patternDescription: rules.patternDescription,
+                  },
+                  severity: 'error',
                 });
               }
             } catch {
@@ -881,7 +891,7 @@ router.post(
                 type: 'MIN_LENGTH',
                 message: `Value "${value}" length (${value.length}) is less than minimum (${rules.minLength})`,
                 data: { value, length: value.length, minLength: rules.minLength },
-                severity: 'error'
+                severity: 'error',
               });
             }
             if (rules?.maxLength !== undefined && value.length > rules.maxLength) {
@@ -890,7 +900,7 @@ router.post(
                 type: 'MAX_LENGTH',
                 message: `Value "${value}" length (${value.length}) exceeds maximum (${rules.maxLength})`,
                 data: { value, length: value.length, maxLength: rules.maxLength },
-                severity: 'error'
+                severity: 'error',
               });
             }
           }
@@ -903,7 +913,7 @@ router.post(
                 type: 'MIN_VALUE',
                 message: `Value ${value} is less than minimum (${rules.min})`,
                 data: { value, min: rules.min },
-                severity: 'error'
+                severity: 'error',
               });
             }
             if (rules?.max !== undefined && value > rules.max) {
@@ -912,7 +922,7 @@ router.post(
                 type: 'MAX_VALUE',
                 message: `Value ${value} exceeds maximum (${rules.max})`,
                 data: { value, max: rules.max },
-                severity: 'error'
+                severity: 'error',
               });
             }
             if (rules?.integerOnly && !Number.isInteger(value)) {
@@ -921,7 +931,7 @@ router.post(
                 type: 'INTEGER_ONLY',
                 message: `Value ${value} must be an integer`,
                 data: { value },
-                severity: 'error'
+                severity: 'error',
               });
             }
           }
@@ -929,9 +939,8 @@ router.post(
       }
     }
 
-
     // If any context errors exist, we still proceed but include them in the response
-    const contextValid = !contextWarnings.some(w => w.severity === 'error');
+    const contextValid = !contextWarnings.some((w) => w.severity === 'error');
 
     // If specific flags are requested, create a Set for faster lookup
     const flagNamesSet =
@@ -981,7 +990,6 @@ router.post(
             }
           }
         }
-
       } catch (_) {
         // Silently ignore scan errors
       }
@@ -1014,8 +1022,6 @@ router.post(
       }
     }
 
-
-
     for (const env of environments) {
       try {
         // Load all flags for this environment
@@ -1039,7 +1045,13 @@ router.post(
           if (!flag) continue;
 
           // Evaluate the flag
-          let evalResult = evaluateFlagWithDetails(flag, context || {}, segmentsMap, env, contextWarnings);
+          let evalResult = evaluateFlagWithDetails(
+            flag,
+            context || {},
+            segmentsMap,
+            env,
+            contextWarnings
+          );
 
           // Manual override if variant is somehow missing (already handled in evaluateFlagWithDetails now)
           // But kept for safety
@@ -1084,14 +1096,25 @@ router.post(
 
           // Validate the returned value against validation rules if present
           let validation: any = undefined;
-          if (flag.validationRules && Object.keys(flag.validationRules).length > 0 && (evalResult as any).variant?.value !== undefined) {
+          if (
+            flag.validationRules &&
+            Object.keys(flag.validationRules).length > 0 &&
+            (evalResult as any).variant?.value !== undefined
+          ) {
             const valueToValidate = (evalResult as any).variant.value;
             const valueType = (flag as any).valueType || 'string';
-            const validationResult = validateFlagValue(valueToValidate, valueType, flag.validationRules);
+            const validationResult = validateFlagValue(
+              valueToValidate,
+              valueType,
+              flag.validationRules
+            );
             validation = {
               valid: validationResult.valid,
               errors: validationResult.errors,
-              transformedValue: validationResult.transformedValue !== valueToValidate ? validationResult.transformedValue : undefined,
+              transformedValue:
+                validationResult.transformedValue !== valueToValidate
+                  ? validationResult.transformedValue
+                  : undefined,
               rules: flag.validationRules,
             };
           }
@@ -1123,13 +1146,18 @@ router.post(
       data: {
         results,
         contextWarnings: contextWarnings.length > 0 ? contextWarnings : undefined,
-        referencedFields: referencedFields.size > 0
-          ? Array.from(referencedFields).map((name) => {
-            const fieldDef = fieldDefMap?.get(name);
-            const rules = fieldDef?.validationRules as any;
-            return { name, isRequired: rules?.isRequired === true, fieldType: (fieldDef?.fieldType as string) || 'string' };
-          })
-          : undefined,
+        referencedFields:
+          referencedFields.size > 0
+            ? Array.from(referencedFields).map((name) => {
+                const fieldDef = fieldDefMap?.get(name);
+                const rules = fieldDef?.validationRules as any;
+                return {
+                  name,
+                  isRequired: rules?.isRequired === true,
+                  fieldType: (fieldDef?.fieldType as string) || 'string',
+                };
+              })
+            : undefined,
       },
     });
   })
@@ -1197,13 +1225,13 @@ function evaluateFlagWithDetails(
         name: '$disabled',
         value: getFallbackValue(
           flag.environments?.find((e: any) => e.environment === environment)?.disabledValue ??
-          flag.disabledValue,
+            flag.disabledValue,
           flag.valueType
         ),
         valueType: flag.valueType || 'string',
         valueSource:
           flag.environments?.find((e: any) => e.environment === environment)?.disabledValue !==
-            undefined
+          undefined
             ? 'environment'
             : flag.disabledValue !== undefined
               ? 'flag'
@@ -1226,7 +1254,9 @@ function evaluateFlagWithDetails(
     evaluationSteps.push({
       step: 'STRATEGY_COUNT',
       passed: contextFailed ? null : true,
-      message: contextFailed ? 'Skipped due to context validation failure' : 'No strategies defined - enabled by default',
+      message: contextFailed
+        ? 'Skipped due to context validation failure'
+        : 'No strategies defined - enabled by default',
     });
     if (contextFailed) {
       return {
@@ -1236,7 +1266,7 @@ function evaluateFlagWithDetails(
           name: '$disabled',
           value: getFallbackValue(
             flag.environments?.find((e: any) => e.environment === environment)?.disabledValue ??
-            flag.disabledValue,
+              flag.disabledValue,
             flag.valueType
           ),
           valueType: flag.valueType || 'string',
@@ -1262,7 +1292,9 @@ function evaluateFlagWithDetails(
   evaluationSteps.push({
     step: 'STRATEGY_COUNT',
     passed: contextFailed ? null : true,
-    message: contextFailed ? 'Skipped due to context validation failure' : `${strategies.length} strategy(s) to evaluate`,
+    message: contextFailed
+      ? 'Skipped due to context validation failure'
+      : `${strategies.length} strategy(s) to evaluate`,
   });
 
   // Step 4+: Evaluate each strategy
@@ -1379,7 +1411,9 @@ function evaluateFlagWithDetails(
     strategyStep.passed = contextFailed ? null : strategyMatched;
     strategyStep.message = contextFailed
       ? 'Skipped - context validation failed'
-      : strategyMatched ? 'All conditions met' : 'One or more conditions failed';
+      : strategyMatched
+        ? 'All conditions met'
+        : 'One or more conditions failed';
     evaluationSteps.push(strategyStep);
 
     if (!contextFailed && strategyMatched) {
@@ -1414,7 +1448,7 @@ function evaluateFlagWithDetails(
         name: '$disabled',
         value: getFallbackValue(
           flag.environments?.find((e: any) => e.environment === environment)?.disabledValue ??
-          flag.disabledValue,
+            flag.disabledValue,
           flag.valueType
         ),
         valueType: flag.valueType || 'string',
@@ -1461,7 +1495,7 @@ function evaluateFlagWithDetails(
       valueType: flag.valueType || 'string',
       valueSource:
         flag.environments?.find((e: any) => e.environment === environment)?.disabledValue !==
-          undefined
+        undefined
           ? 'environment'
           : flag.disabledValue !== undefined
             ? 'flag'
@@ -1558,7 +1592,8 @@ function evaluateConstraint(constraint: any, context: Record<string, any>): bool
   if (constraint.operator === 'arr_any' || constraint.operator === 'arr_all') {
     const arr = Array.isArray(contextValue) ? contextValue.map(String) : [];
     const targetValues =
-      constraint.values?.map((v: string) => (constraint.caseInsensitive ? v.toLowerCase() : v)) || [];
+      constraint.values?.map((v: string) => (constraint.caseInsensitive ? v.toLowerCase() : v)) ||
+      [];
     const compareArr = constraint.caseInsensitive ? arr.map((v: string) => v.toLowerCase()) : arr;
 
     let result = false;
@@ -1567,7 +1602,8 @@ function evaluateConstraint(constraint: any, context: Record<string, any>): bool
       result = targetValues.some((tv: string) => compareArr.includes(tv));
     } else {
       // All target values are in the array
-      result = targetValues.length > 0 && targetValues.every((tv: string) => compareArr.includes(tv));
+      result =
+        targetValues.length > 0 && targetValues.every((tv: string) => compareArr.includes(tv));
     }
     return constraint.inverted ? !result : result;
   }

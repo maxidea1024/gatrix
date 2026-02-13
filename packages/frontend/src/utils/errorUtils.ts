@@ -63,18 +63,23 @@ export function parseApiErrorMessage(error: any, fallbackKey = 'common.saveFaile
 
   // Handle VALIDATION_ERROR format from feature flag validation
   // Format: VALIDATION_ERROR:fieldName:error1|error2|...
-  if (errorData?.message && typeof errorData.message === 'string' && errorData.message.startsWith('VALIDATION_ERROR:')) {
+  if (
+    errorData?.message &&
+    typeof errorData.message === 'string' &&
+    errorData.message.startsWith('VALIDATION_ERROR:')
+  ) {
     const parts = errorData.message.split(':');
     if (parts.length >= 3) {
       const field = parts[1];
       const errors = parts.slice(2).join(':').split('|');
 
       // Map field names to localized labels
-      const fieldLabelKey = field === 'enabledValue'
-        ? 'featureFlags.enabledValue'
-        : field === 'disabledValue'
-          ? 'featureFlags.disabledValue'
-          : field;
+      const fieldLabelKey =
+        field === 'enabledValue'
+          ? 'featureFlags.enabledValue'
+          : field === 'disabledValue'
+            ? 'featureFlags.disabledValue'
+            : field;
 
       const fieldLabel = i18n.exists(fieldLabelKey) ? String(i18n.t(fieldLabelKey)) : field;
 
@@ -105,7 +110,9 @@ export function parseApiErrorMessage(error: any, fallbackKey = 'common.saveFaile
         // Parse parameterized error codes
         if (trimmed.startsWith('PATTERN_MISMATCH:')) {
           const desc = trimmed.substring('PATTERN_MISMATCH:'.length);
-          return String(i18n.t('featureFlags.validation.errors.patternMismatch', { pattern: desc }));
+          return String(
+            i18n.t('featureFlags.validation.errors.patternMismatch', { pattern: desc })
+          );
         }
         if (trimmed.startsWith('PATTERN_MISMATCH_RAW:')) {
           const pattern = trimmed.substring('PATTERN_MISMATCH_RAW:'.length);
@@ -137,25 +144,31 @@ export function parseApiErrorMessage(error: any, fallbackKey = 'common.saveFaile
         }
         if (trimmed.startsWith('JSON_REQUIRED_FIELD:')) {
           const fieldName = trimmed.substring('JSON_REQUIRED_FIELD:'.length);
-          return String(i18n.t('featureFlags.validation.errors.jsonRequiredField', { field: fieldName }));
+          return String(
+            i18n.t('featureFlags.validation.errors.jsonRequiredField', { field: fieldName })
+          );
         }
         if (trimmed.startsWith('JSON_TYPE_MISMATCH:')) {
           const jsonParts = trimmed.substring('JSON_TYPE_MISMATCH:'.length).split(':');
-          return String(i18n.t('featureFlags.validation.errors.jsonTypeMismatch', {
-            field: jsonParts[0],
-            expected: jsonParts[1],
-            actual: jsonParts[2],
-          }));
+          return String(
+            i18n.t('featureFlags.validation.errors.jsonTypeMismatch', {
+              field: jsonParts[0],
+              expected: jsonParts[1],
+              actual: jsonParts[2],
+            })
+          );
         }
 
         // Fallback: return raw error
         return trimmed;
       });
 
-      return String(i18n.t('featureFlags.validation.errorMessage', {
-        field: fieldLabel,
-        errors: localizedErrors.join(', '),
-      }));
+      return String(
+        i18n.t('featureFlags.validation.errorMessage', {
+          field: fieldLabel,
+          errors: localizedErrors.join(', '),
+        })
+      );
     }
   }
 

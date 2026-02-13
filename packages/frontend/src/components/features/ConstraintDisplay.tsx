@@ -95,13 +95,17 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
         <ContextFieldChip
           fieldName={constraint.contextName}
-          fieldInfo={contextFieldInfo ? {
-            fieldName: contextFieldInfo.fieldName,
-            displayName: contextFieldInfo.displayName,
-            description: contextFieldInfo.description,
-            fieldType: contextFieldInfo.fieldType || 'string',
-            validationRules: contextFieldInfo.validationRules,
-          } : undefined}
+          fieldInfo={
+            contextFieldInfo
+              ? {
+                  fieldName: contextFieldInfo.fieldName,
+                  displayName: contextFieldInfo.displayName,
+                  description: contextFieldInfo.description,
+                  fieldType: contextFieldInfo.fieldType || 'string',
+                  validationRules: contextFieldInfo.validationRules,
+                }
+              : undefined
+          }
           fieldType={fieldType}
         />
         <OperatorIcon operator={constraint.operator} inverted={constraint.inverted} size={16} />
@@ -169,13 +173,17 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({
       >
         <ContextFieldChip
           fieldName={constraint.contextName}
-          fieldInfo={contextFieldInfo ? {
-            fieldName: contextFieldInfo.fieldName,
-            displayName: contextFieldInfo.displayName,
-            description: contextFieldInfo.description,
-            fieldType: contextFieldInfo.fieldType || 'string',
-            validationRules: contextFieldInfo.validationRules,
-          } : undefined}
+          fieldInfo={
+            contextFieldInfo
+              ? {
+                  fieldName: contextFieldInfo.fieldName,
+                  displayName: contextFieldInfo.displayName,
+                  description: contextFieldInfo.description,
+                  fieldType: contextFieldInfo.fieldType || 'string',
+                  validationRules: contextFieldInfo.validationRules,
+                }
+              : undefined
+          }
           fieldType={fieldType}
         />
       </Box>
@@ -283,73 +291,73 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({
       >
         {isMultiValue
           ? constraint.values!.map((val, idx) => {
-            const countryInfo = isCountryField ? getCountryByCode(val) : null;
-            const displayLabel = countryInfo
-              ? `${countryInfo.name} (${val.toUpperCase()})`
-              : val === ''
-                ? t('common.emptyString')
-                : val;
-            return (
-              <Chip
-                key={idx}
-                icon={isCountryField ? <FlagImage code={val} size={14} /> : undefined}
-                label={displayLabel}
-                size="small"
-                sx={{
-                  height: 22,
-                  fontSize: '0.75rem',
-                  fontWeight: 500,
-                  bgcolor: 'action.selected',
-                  color: 'text.primary',
-                  borderRadius: '4px',
-                  ...(val === '' && { fontStyle: 'italic', color: 'text.secondary' }),
-                  '& .MuiChip-icon': {
-                    ml: 0.5,
-                  },
-                  '& .MuiChip-label': {
-                    px: 1.25,
-                  },
-                }}
-              />
-            );
-          })
+              const countryInfo = isCountryField ? getCountryByCode(val) : null;
+              const displayLabel = countryInfo
+                ? `${countryInfo.name} (${val.toUpperCase()})`
+                : val === ''
+                  ? t('common.emptyString')
+                  : val;
+              return (
+                <Chip
+                  key={idx}
+                  icon={isCountryField ? <FlagImage code={val} size={14} /> : undefined}
+                  label={displayLabel}
+                  size="small"
+                  sx={{
+                    height: 22,
+                    fontSize: '0.75rem',
+                    fontWeight: 500,
+                    bgcolor: 'action.selected',
+                    color: 'text.primary',
+                    borderRadius: '4px',
+                    ...(val === '' && { fontStyle: 'italic', color: 'text.secondary' }),
+                    '& .MuiChip-icon': {
+                      ml: 0.5,
+                    },
+                    '& .MuiChip-label': {
+                      px: 1.25,
+                    },
+                  }}
+                />
+              );
+            })
           : (() => {
-            const singleVal = getSingleValueDisplay();
-            const countryCode = isCountryField ? constraint.value || '' : '';
-            const countryInfo = isCountryField ? getCountryByCode(countryCode) : null;
-            const displayLabel = countryInfo
-              ? `${countryInfo.name} (${countryCode.toUpperCase()})`
-              : singleVal;
-            return (
-              <Chip
-                icon={
-                  isCountryField && countryCode ? (
-                    <FlagImage code={countryCode} size={14} />
-                  ) : undefined
-                }
-                label={displayLabel}
-                size="small"
-                sx={{
-                  height: 22,
-                  fontSize: '0.75rem',
-                  fontWeight: 500,
-                  bgcolor: 'action.selected',
-                  color: 'text.primary',
-                  borderRadius: '4px',
-                  ...(singleVal === t('common.emptyString') && {
-                    fontStyle: 'italic',
-                    color: 'text.secondary',
-                  }),
-                  '& .MuiChip-icon': {
-                    ml: 0.5,
-                  },
-                  '& .MuiChip-label': {
-                    px: 1.25,
-                  },
-                }}
-              />
-            );
-          })()}
+              const singleVal = getSingleValueDisplay();
+              const countryCode = isCountryField ? constraint.value || '' : '';
+              const countryInfo = isCountryField ? getCountryByCode(countryCode) : null;
+              const displayLabel = countryInfo
+                ? `${countryInfo.name} (${countryCode.toUpperCase()})`
+                : singleVal;
+              return (
+                <Chip
+                  icon={
+                    isCountryField && countryCode ? (
+                      <FlagImage code={countryCode} size={14} />
+                    ) : undefined
+                  }
+                  label={displayLabel}
+                  size="small"
+                  sx={{
+                    height: 22,
+                    fontSize: '0.75rem',
+                    fontWeight: 500,
+                    bgcolor: 'action.selected',
+                    color: 'text.primary',
+                    borderRadius: '4px',
+                    ...(singleVal === t('common.emptyString') && {
+                      fontStyle: 'italic',
+                      color: 'text.secondary',
+                    }),
+                    '& .MuiChip-icon': {
+                      ml: 0.5,
+                    },
+                    '& .MuiChip-label': {
+                      px: 1.25,
+                    },
+                  }}
+                />
+              );
+            })()}
       </Box>
     </Box>
   );

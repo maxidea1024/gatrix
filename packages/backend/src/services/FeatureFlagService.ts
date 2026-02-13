@@ -353,17 +353,27 @@ class FeatureFlagService {
 
     // Separate environment-specific from global properties
     // isGlobal: if true, we are updating the base flag values even if an environment is provided
-    const { isEnabled, enabledValue, disabledValue, isGlobal, validationRules: inputValidationRules, ...globalUpdates } = input;
+    const {
+      isEnabled,
+      enabledValue,
+      disabledValue,
+      isGlobal,
+      validationRules: inputValidationRules,
+      ...globalUpdates
+    } = input;
 
     // Determine the effective validation rules (from input or existing flag)
-    const effectiveValidationRules = inputValidationRules !== undefined ? inputValidationRules : (flag as any).validationRules;
+    const effectiveValidationRules =
+      inputValidationRules !== undefined ? inputValidationRules : (flag as any).validationRules;
     const effectiveValueType = (globalUpdates as any).valueType || flag.valueType;
 
     // Validate values against validation rules
     if (effectiveValidationRules && effectiveValueType !== 'boolean') {
       const valuesToValidate: { field: string; value: any }[] = [];
-      if (enabledValue !== undefined) valuesToValidate.push({ field: 'enabledValue', value: enabledValue });
-      if (disabledValue !== undefined) valuesToValidate.push({ field: 'disabledValue', value: disabledValue });
+      if (enabledValue !== undefined)
+        valuesToValidate.push({ field: 'enabledValue', value: enabledValue });
+      if (disabledValue !== undefined)
+        valuesToValidate.push({ field: 'disabledValue', value: disabledValue });
 
       for (const { field, value } of valuesToValidate) {
         const result = validateFlagValue(value, effectiveValueType, effectiveValidationRules);
@@ -404,7 +414,11 @@ class FeatureFlagService {
       validationRulesUpdate.validationRules = inputValidationRules;
     }
 
-    if (Object.keys(globalUpdates).length > 0 || Object.keys(baseValues).length > 0 || Object.keys(validationRulesUpdate).length > 0) {
+    if (
+      Object.keys(globalUpdates).length > 0 ||
+      Object.keys(baseValues).length > 0 ||
+      Object.keys(validationRulesUpdate).length > 0
+    ) {
       await FeatureFlagModel.update(flag.id, {
         ...globalUpdates,
         ...baseValues,

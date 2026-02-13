@@ -211,9 +211,18 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
   });
   const [confirmDeleteAllOpen, setConfirmDeleteAllOpen] = useState(false);
   const [contextWarnings, setContextWarnings] = useState<
-    { field: string; type: string; message: string; suggestion?: string; data?: any; severity?: 'warning' | 'error' }[]
+    {
+      field: string;
+      type: string;
+      message: string;
+      suggestion?: string;
+      data?: any;
+      severity?: 'warning' | 'error';
+    }[]
   >([]);
-  const [referencedFields, setReferencedFields] = useState<{ name: string; isRequired: boolean; fieldType: string }[]>([]);
+  const [referencedFields, setReferencedFields] = useState<
+    { name: string; isRequired: boolean; fieldType: string }[]
+  >([]);
 
   // Evaluation details popover state
   const [evaluationPopoverAnchor, setEvaluationPopoverAnchor] = useState<HTMLElement | null>(null);
@@ -406,8 +415,8 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
       ALL_STRATEGIES_DISABLED: t('playground.reasons.ALL_STRATEGIES_DISABLED'),
       STRATEGY_MATCHED: reasonDetails?.strategyName
         ? t('playground.reasons.strategyMatched', {
-          strategy: localizeStrategyName(reasonDetails.strategyName),
-        })
+            strategy: localizeStrategyName(reasonDetails.strategyName),
+          })
         : t('playground.reasons.defaultStrategy'),
       NO_MATCHING_STRATEGY: t('playground.reasons.NO_MATCHING_STRATEGY'),
       CONTEXT_VALIDATION_FAILED: t('playground.reasons.contextValidationFailed'),
@@ -635,10 +644,9 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
     if (rememberContext) {
       localStorage.setItem('gatrix_playground_saved_context', JSON.stringify(updated));
     }
-    enqueueSnackbar(
-      t('playground.contextFieldsExtracted', { count: newEntries.length }),
-      { variant: 'success' }
-    );
+    enqueueSnackbar(t('playground.contextFieldsExtracted', { count: newEntries.length }), {
+      variant: 'success',
+    });
   };
 
   // Update context entry
@@ -915,9 +923,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
 
         {contextEntries.length === 0 ? (
           <Box sx={{ mb: 2 }}>
-            <EmptyPlaceholder
-              message={t('playground.noContextProvidedDescription')}
-            >
+            <EmptyPlaceholder message={t('playground.noContextProvidedDescription')}>
               <Box sx={{ display: 'flex', gap: 1, mt: 1.5, justifyContent: 'center' }}>
                 <Button
                   variant="outlined"
@@ -945,12 +951,14 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                 const contextField = getContextFieldByKey(entry.key);
                 const rulesEnabled = contextField?.validationRules?.enabled === true;
                 // Only use legalValues from validationRules when rules are enabled
-                const effectiveLegalValues = rulesEnabled
-                  && contextField?.validationRules?.legalValues
-                  && contextField.validationRules.legalValues.length > 0
-                  ? contextField.validationRules.legalValues
-                  : null;
-                const hasLegalValues = effectiveLegalValues != null && effectiveLegalValues.length > 0;
+                const effectiveLegalValues =
+                  rulesEnabled &&
+                  contextField?.validationRules?.legalValues &&
+                  contextField.validationRules.legalValues.length > 0
+                    ? contextField.validationRules.legalValues
+                    : null;
+                const hasLegalValues =
+                  effectiveLegalValues != null && effectiveLegalValues.length > 0;
                 const fieldType = contextField?.fieldType || 'string';
 
                 // Render value input based on field type
@@ -1155,7 +1163,10 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                   </Typography>
                                   {/* Required indicator */}
                                   {field.validationRules?.isRequired === true && (
-                                    <Tooltip title={t('playground.optionalField')} disableFocusListener>
+                                    <Tooltip
+                                      title={t('playground.optionalField')}
+                                      disableFocusListener
+                                    >
                                       <Typography
                                         component="span"
                                         variant="caption"
@@ -1175,42 +1186,51 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                     </Tooltip>
                                   )}
                                   {/* Trim whitespace indicator */}
-                                  {field.validationRules?.trimWhitespace && field.validationRules.trimWhitespace !== 'none' && (
-                                    <Tooltip title={`Trim: ${field.validationRules.trimWhitespace}`} disableFocusListener>
-                                      <Typography
-                                        component="span"
-                                        variant="caption"
-                                        sx={{
-                                          color: 'warning.main',
-                                          fontSize: '0.6rem',
-                                          fontWeight: 600,
-                                        }}
+                                  {field.validationRules?.trimWhitespace &&
+                                    field.validationRules.trimWhitespace !== 'none' && (
+                                      <Tooltip
+                                        title={`Trim: ${field.validationRules.trimWhitespace}`}
+                                        disableFocusListener
                                       >
-                                        ✂
-                                      </Typography>
-                                    </Tooltip>
-                                  )}
+                                        <Typography
+                                          component="span"
+                                          variant="caption"
+                                          sx={{
+                                            color: 'warning.main',
+                                            fontSize: '0.6rem',
+                                            fontWeight: 600,
+                                          }}
+                                        >
+                                          ✂
+                                        </Typography>
+                                      </Tooltip>
+                                    )}
                                   {/* Legal values indicator */}
-                                  {field.validationRules?.enabled && field.validationRules?.legalValues && field.validationRules.legalValues.length > 0 && (
-                                    <Tooltip title={t('playground.hasLegalValues')} disableFocusListener>
-                                      <Typography
-                                        component="span"
-                                        variant="caption"
-                                        sx={{
-                                          color: 'success.main',
-                                          fontSize: '0.65rem',
-                                          fontWeight: 600,
-                                          border: 1,
-                                          borderColor: 'success.main',
-                                          borderRadius: 0.5,
-                                          px: 0.5,
-                                          lineHeight: 1.4,
-                                        }}
+                                  {field.validationRules?.enabled &&
+                                    field.validationRules?.legalValues &&
+                                    field.validationRules.legalValues.length > 0 && (
+                                      <Tooltip
+                                        title={t('playground.hasLegalValues')}
+                                        disableFocusListener
                                       >
-                                        {field.validationRules.legalValues.length}
-                                      </Typography>
-                                    </Tooltip>
-                                  )}
+                                        <Typography
+                                          component="span"
+                                          variant="caption"
+                                          sx={{
+                                            color: 'success.main',
+                                            fontSize: '0.65rem',
+                                            fontWeight: 600,
+                                            border: 1,
+                                            borderColor: 'success.main',
+                                            borderRadius: 0.5,
+                                            px: 0.5,
+                                            lineHeight: 1.4,
+                                          }}
+                                        >
+                                          {field.validationRules.legalValues.length}
+                                        </Typography>
+                                      </Tooltip>
+                                    )}
                                   {isUsed && (
                                     <Typography
                                       component="span"
@@ -1311,11 +1331,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                 title={t('common.deleteAll')}
                 message={t('playground.confirmDeleteAllContext')}
               />
-              <Button
-                size="small"
-                startIcon={<ExtractIcon />}
-                onClick={handleExtractContextFields}
-              >
+              <Button size="small" startIcon={<ExtractIcon />} onClick={handleExtractContextFields}>
                 {t('playground.extractFromFlag')}
               </Button>
               <Button size="small" startIcon={<AddIcon />} onClick={handleAddContextEntry}>
@@ -1574,10 +1590,18 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
               severity={hasContextErrors ? 'error' : 'warning'}
               variant="outlined"
               sx={{ mb: 1.5, py: 0.5 }}
-              icon={hasContextErrors ? <ErrorOutlineIcon fontSize="small" /> : <WarningAmberIcon fontSize="small" />}
+              icon={
+                hasContextErrors ? (
+                  <ErrorOutlineIcon fontSize="small" />
+                ) : (
+                  <WarningAmberIcon fontSize="small" />
+                )
+              }
             >
               <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
-                {hasContextErrors ? t('playground.validationFailed') : t('playground.contextWarningsTitle')}
+                {hasContextErrors
+                  ? t('playground.validationFailed')
+                  : t('playground.contextWarningsTitle')}
               </Typography>
               <Stack spacing={0.5}>
                 {contextWarnings.map((w, i) => (
@@ -1602,7 +1626,11 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                     <Box sx={{ flex: 1 }}>
                       <Typography
                         variant="caption"
-                        sx={{ fontWeight: 500, color: w.severity === 'error' ? 'error.main' : 'text.primary', display: 'block' }}
+                        sx={{
+                          fontWeight: 500,
+                          color: w.severity === 'error' ? 'error.main' : 'text.primary',
+                          display: 'block',
+                        }}
                       >
                         {getLocalizedWarning(w)}
                       </Typography>
@@ -1696,7 +1724,9 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                 <FlagIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
                               )}
                               <Typography variant="body2">{flagName}</Typography>
-                              <OpenInNewIcon sx={{ fontSize: 12, color: 'text.disabled', ml: 0.5 }} />
+                              <OpenInNewIcon
+                                sx={{ fontSize: 12, color: 'text.disabled', ml: 0.5 }}
+                              />
                             </Box>
                             {flagInfo.displayName && flagInfo.displayName !== flagName && (
                               <Typography
@@ -1750,9 +1780,9 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                   transition: 'all 0.2s',
                                   '&:hover': hasDetails
                                     ? {
-                                      bgcolor: 'action.hover',
-                                      transform: 'scale(1.1)',
-                                    }
+                                        bgcolor: 'action.hover',
+                                        transform: 'scale(1.1)',
+                                      }
                                     : {},
                                 }}
                                 onClick={(e) => {
@@ -1768,7 +1798,10 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                   <FalseIcon color="error" sx={{ fontSize: 24 }} />
                                 )}
                                 {result.validation && !result.validation.valid && (
-                                  <Tooltip title={result.validation.errors.join(', ')} disableFocusListener>
+                                  <Tooltip
+                                    title={result.validation.errors.join(', ')}
+                                    disableFocusListener
+                                  >
                                     <WarningAmberIcon
                                       sx={{
                                         fontSize: 14,
@@ -1831,8 +1864,13 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
             <Box
               sx={{
                 p: 2,
-                pb: 0,
+                pb: 1,
                 bgcolor: 'background.paper',
+                borderBottom: '1px solid',
+                borderColor: 'divider',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+                position: 'relative',
+                zIndex: 10,
               }}
             >
               <Box
@@ -1855,7 +1893,6 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                   <CloseIcon fontSize="small" />
                 </IconButton>
               </Box>
-
 
               {/* SUMMARY TABLE */}
               <Box
@@ -2122,24 +2159,24 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                 position: 'relative',
                                 '&::before': isMatched
                                   ? {
-                                    content: '""',
-                                    position: 'absolute',
-                                    left: 0,
-                                    top: 0,
-                                    bottom: 0,
-                                    width: 4,
-                                    bgcolor: 'success.main',
-                                  }
-                                  : wasEvaluated && !stepResult?.passed
-                                    ? {
                                       content: '""',
                                       position: 'absolute',
                                       left: 0,
                                       top: 0,
                                       bottom: 0,
                                       width: 4,
-                                      bgcolor: 'error.main',
+                                      bgcolor: 'success.main',
                                     }
+                                  : wasEvaluated && !stepResult?.passed
+                                    ? {
+                                        content: '""',
+                                        position: 'absolute',
+                                        left: 0,
+                                        top: 0,
+                                        bottom: 0,
+                                        width: 4,
+                                        bgcolor: 'error.main',
+                                      }
                                     : {},
                               }}
                             >
@@ -2242,7 +2279,11 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                   const renderValue = (value: any, fieldType?: string) => {
                     if (value === undefined || value === null) {
                       return (
-                        <Typography component="span" variant="caption" sx={{ color: 'warning.main', fontStyle: 'italic' }}>
+                        <Typography
+                          component="span"
+                          variant="caption"
+                          sx={{ color: 'warning.main', fontStyle: 'italic' }}
+                        >
                           ({t('playground.noValue')})
                         </Typography>
                       );
@@ -2252,13 +2293,21 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                         // Boolean type with empty string likely means not set
                         if (fieldType === 'boolean') {
                           return (
-                            <Typography component="span" variant="caption" sx={{ color: 'warning.main', fontStyle: 'italic' }}>
+                            <Typography
+                              component="span"
+                              variant="caption"
+                              sx={{ color: 'warning.main', fontStyle: 'italic' }}
+                            >
                               ({t('playground.noValue')})
                             </Typography>
                           );
                         }
                         return (
-                          <Typography component="span" variant="caption" sx={{ color: 'error.main', fontFamily: 'monospace' }}>
+                          <Typography
+                            component="span"
+                            variant="caption"
+                            sx={{ color: 'error.main', fontFamily: 'monospace' }}
+                          >
                             &quot;&quot;
                           </Typography>
                         );
@@ -2284,17 +2333,40 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                           <EmptyPlaceholder message={t('playground.noContextProvided')} />
                         </Box>
                       ) : (
-                        <TableContainer component={Paper} variant="outlined" sx={{ maxHeight: 150, mb: 2 }}>
+                        <TableContainer
+                          component={Paper}
+                          variant="outlined"
+                          sx={{ maxHeight: 150, mb: 2 }}
+                        >
                           <Table size="small" stickyHeader sx={{ tableLayout: 'auto' }}>
                             <TableHead>
                               <TableRow>
-                                <TableCell sx={{ py: 0.5, fontWeight: 600, bgcolor: 'action.hover', whiteSpace: 'nowrap', width: 'auto' }}>
+                                <TableCell
+                                  sx={{
+                                    py: 0.5,
+                                    fontWeight: 600,
+                                    bgcolor: 'action.hover',
+                                    whiteSpace: 'nowrap',
+                                    width: 'auto',
+                                  }}
+                                >
                                   {t('playground.contextField')}
                                 </TableCell>
-                                <TableCell sx={{ py: 0.5, fontWeight: 600, bgcolor: 'action.hover', width: 60, textAlign: 'center', whiteSpace: 'nowrap' }}>
+                                <TableCell
+                                  sx={{
+                                    py: 0.5,
+                                    fontWeight: 600,
+                                    bgcolor: 'action.hover',
+                                    width: 60,
+                                    textAlign: 'center',
+                                    whiteSpace: 'nowrap',
+                                  }}
+                                >
                                   {t('playground.referenced')}
                                 </TableCell>
-                                <TableCell sx={{ py: 0.5, fontWeight: 600, bgcolor: 'action.hover' }}>
+                                <TableCell
+                                  sx={{ py: 0.5, fontWeight: 600, bgcolor: 'action.hover' }}
+                                >
                                   {t('playground.contextValue')}
                                 </TableCell>
                               </TableRow>
@@ -2311,9 +2383,13 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                   </TableCell>
                                   <TableCell sx={{ py: 0.5, textAlign: 'center' }}>
                                     {referencedFieldNames.has(entry.key) ? (
-                                      <CheckCircleOutlineIcon sx={{ fontSize: 14, color: 'success.main' }} />
+                                      <CheckCircleOutlineIcon
+                                        sx={{ fontSize: 14, color: 'success.main' }}
+                                      />
                                     ) : (
-                                      <Typography variant="caption" color="text.disabled">-</Typography>
+                                      <Typography variant="caption" color="text.disabled">
+                                        -
+                                      </Typography>
                                     )}
                                   </TableCell>
                                   <TableCell sx={{ py: 0.5 }}>
@@ -2340,20 +2416,52 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                       {referencedFields.length === 0 ? (
                         <EmptyPlaceholder message={t('playground.noReferencedFields')} />
                       ) : (
-                        <TableContainer component={Paper} variant="outlined" sx={{ maxHeight: 150 }}>
+                        <TableContainer
+                          component={Paper}
+                          variant="outlined"
+                          sx={{ maxHeight: 150 }}
+                        >
                           <Table size="small" stickyHeader sx={{ tableLayout: 'auto' }}>
                             <TableHead>
                               <TableRow>
-                                <TableCell sx={{ py: 0.5, fontWeight: 600, bgcolor: 'action.hover', whiteSpace: 'nowrap', width: 'auto' }}>
+                                <TableCell
+                                  sx={{
+                                    py: 0.5,
+                                    fontWeight: 600,
+                                    bgcolor: 'action.hover',
+                                    whiteSpace: 'nowrap',
+                                    width: 'auto',
+                                  }}
+                                >
                                   {t('playground.contextField')}
                                 </TableCell>
-                                <TableCell sx={{ py: 0.5, fontWeight: 600, bgcolor: 'action.hover', width: 60, textAlign: 'center', whiteSpace: 'nowrap' }}>
+                                <TableCell
+                                  sx={{
+                                    py: 0.5,
+                                    fontWeight: 600,
+                                    bgcolor: 'action.hover',
+                                    width: 60,
+                                    textAlign: 'center',
+                                    whiteSpace: 'nowrap',
+                                  }}
+                                >
                                   {t('featureFlags.validation.isRequired')}
                                 </TableCell>
-                                <TableCell sx={{ py: 0.5, fontWeight: 600, bgcolor: 'action.hover', width: 60, textAlign: 'center', whiteSpace: 'nowrap' }}>
+                                <TableCell
+                                  sx={{
+                                    py: 0.5,
+                                    fontWeight: 600,
+                                    bgcolor: 'action.hover',
+                                    width: 60,
+                                    textAlign: 'center',
+                                    whiteSpace: 'nowrap',
+                                  }}
+                                >
                                   {t('common.status')}
                                 </TableCell>
-                                <TableCell sx={{ py: 0.5, fontWeight: 600, bgcolor: 'action.hover' }}>
+                                <TableCell
+                                  sx={{ py: 0.5, fontWeight: 600, bgcolor: 'action.hover' }}
+                                >
                                   {t('playground.contextValue')}
                                 </TableCell>
                               </TableRow>
@@ -2363,7 +2471,10 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                 const provided = contextMap.has(ref.name);
                                 const value = contextMap.get(ref.name);
                                 return (
-                                  <TableRow key={idx} sx={{ '&:last-child td': { borderBottom: 0 } }}>
+                                  <TableRow
+                                    key={idx}
+                                    sx={{ '&:last-child td': { borderBottom: 0 } }}
+                                  >
                                     <TableCell sx={{ py: 0.5 }}>
                                       <ContextFieldChip
                                         fieldName={ref.name}
@@ -2373,22 +2484,40 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                     </TableCell>
                                     <TableCell sx={{ py: 0.5, textAlign: 'center' }}>
                                       {ref.isRequired ? (
-                                        <Typography variant="caption" sx={{ color: 'error.main', fontWeight: 600 }}>*</Typography>
+                                        <Typography
+                                          variant="caption"
+                                          sx={{ color: 'error.main', fontWeight: 600 }}
+                                        >
+                                          *
+                                        </Typography>
                                       ) : (
-                                        <Typography variant="caption" color="text.disabled">-</Typography>
+                                        <Typography variant="caption" color="text.disabled">
+                                          -
+                                        </Typography>
                                       )}
                                     </TableCell>
                                     <TableCell sx={{ py: 0.5, textAlign: 'center' }}>
                                       {provided ? (
-                                        <CheckCircleOutlineIcon sx={{ fontSize: 14, color: 'success.main' }} />
+                                        <CheckCircleOutlineIcon
+                                          sx={{ fontSize: 14, color: 'success.main' }}
+                                        />
                                       ) : (
-                                        <ErrorOutlineIcon sx={{ fontSize: 14, color: 'error.main' }} />
+                                        <ErrorOutlineIcon
+                                          sx={{ fontSize: 14, color: 'error.main' }}
+                                        />
                                       )}
                                     </TableCell>
                                     <TableCell sx={{ py: 0.5 }}>
-                                      <Typography variant="caption" sx={{ fontFamily: 'monospace' }}>
+                                      <Typography
+                                        variant="caption"
+                                        sx={{ fontFamily: 'monospace' }}
+                                      >
                                         {!provided ? (
-                                          <Typography component="span" variant="caption" sx={{ color: 'error.main', fontStyle: 'italic' }}>
+                                          <Typography
+                                            component="span"
+                                            variant="caption"
+                                            sx={{ color: 'error.main', fontStyle: 'italic' }}
+                                          >
                                             {t('playground.notProvided')}
                                           </Typography>
                                         ) : (
@@ -2529,7 +2658,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                 sx={{
                                   borderBottom:
                                     stepIdx <
-                                      (selectedEvaluation.result.evaluationSteps?.length || 1) - 1
+                                    (selectedEvaluation.result.evaluationSteps?.length || 1) - 1
                                       ? 1
                                       : 0,
                                   borderColor: 'divider',
@@ -2598,43 +2727,53 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                     </Typography>
 
                                     {/* Show detailed errors for context validation failure */}
-                                    {step.step === 'CONTEXT_VALIDATION' && !step.passed && step.details?.errors && (
-                                      <Box sx={{ mt: 1, pl: 1 }}>
-                                        {step.details.errors.map((err: any, errIdx: number) => (
-                                          <Box
-                                            key={errIdx}
-                                            sx={{
-                                              display: 'flex',
-                                              alignItems: 'center',
-                                              gap: 0.5,
-                                              py: 0.25,
-                                            }}
-                                          >
-                                            <Typography variant="caption" sx={{ color: 'error.main' }}>•</Typography>
-                                            <ContextFieldChip
-                                              fieldName={err.field}
-                                              fieldInfo={getFieldInfo(err.field)}
-                                            />
-                                            <Typography
-                                              variant="caption"
-                                              sx={{ color: 'error.main' }}
+                                    {step.step === 'CONTEXT_VALIDATION' &&
+                                      !step.passed &&
+                                      step.details?.errors && (
+                                        <Box sx={{ mt: 1, pl: 1 }}>
+                                          {step.details.errors.map((err: any, errIdx: number) => (
+                                            <Box
+                                              key={errIdx}
+                                              sx={{
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: 0.5,
+                                                py: 0.25,
+                                              }}
                                             >
-                                              {err.type === 'MISSING_REQUIRED'
-                                                ? t('playground.contextErrors.missingRequired')
-                                                : err.type === 'EMPTY_VALUE'
-                                                  ? t('playground.contextErrors.emptyValue')
-                                                  : err.type === 'TYPE_MISMATCH'
-                                                    ? t('playground.contextErrors.typeMismatch', { expected: err.data?.expectedType, actual: err.data?.actualType })
-                                                    : err.type === 'INVALID_VALUE'
-                                                      ? t('playground.contextErrors.invalidValue')
-                                                      : err.type === 'WHITESPACE'
-                                                        ? t('playground.contextErrors.whitespace')
-                                                        : err.message}
-                                            </Typography>
-                                          </Box>
-                                        ))}
-                                      </Box>
-                                    )}
+                                              <Typography
+                                                variant="caption"
+                                                sx={{ color: 'error.main' }}
+                                              >
+                                                •
+                                              </Typography>
+                                              <ContextFieldChip
+                                                fieldName={err.field}
+                                                fieldInfo={getFieldInfo(err.field)}
+                                              />
+                                              <Typography
+                                                variant="caption"
+                                                sx={{ color: 'error.main' }}
+                                              >
+                                                {err.type === 'MISSING_REQUIRED'
+                                                  ? t('playground.contextErrors.missingRequired')
+                                                  : err.type === 'EMPTY_VALUE'
+                                                    ? t('playground.contextErrors.emptyValue')
+                                                    : err.type === 'TYPE_MISMATCH'
+                                                      ? t('playground.contextErrors.typeMismatch', {
+                                                          expected: err.data?.expectedType,
+                                                          actual: err.data?.actualType,
+                                                        })
+                                                      : err.type === 'INVALID_VALUE'
+                                                        ? t('playground.contextErrors.invalidValue')
+                                                        : err.type === 'WHITESPACE'
+                                                          ? t('playground.contextErrors.whitespace')
+                                                          : err.message}
+                                              </Typography>
+                                            </Box>
+                                          ))}
+                                        </Box>
+                                      )}
 
                                     {/* Show detailed checks for strategy evaluation */}
                                     {isStrategy && step.checks && step.checks.length > 0 && (
@@ -2670,24 +2809,34 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                                 ? totalCount
                                                 : firstFailedIdx;
                                             const skippedCount = totalCount - evaluatedCount;
-                                            const allPassed = !allSkipped && passedCount === totalCount;
+                                            const allPassed =
+                                              !allSkipped && passedCount === totalCount;
                                             return (
                                               <>
                                                 <Chip
-                                                  label={allSkipped
-                                                    ? t('playground.checkAllSkipped')
-                                                    : t('playground.checkCountDetail', {
-                                                      passed: passedCount,
-                                                      total: totalCount,
-                                                    })
+                                                  label={
+                                                    allSkipped
+                                                      ? t('playground.checkAllSkipped')
+                                                      : t('playground.checkCountDetail', {
+                                                          passed: passedCount,
+                                                          total: totalCount,
+                                                        })
                                                   }
                                                   size="small"
                                                   sx={{
                                                     height: 18,
                                                     fontSize: '0.65rem',
                                                     fontWeight: 600,
-                                                    bgcolor: allSkipped ? 'grey.200' : allPassed ? 'success.100' : 'error.100',
-                                                    color: allSkipped ? 'grey.600' : allPassed ? 'success.dark' : 'error.dark',
+                                                    bgcolor: allSkipped
+                                                      ? 'grey.200'
+                                                      : allPassed
+                                                        ? 'success.100'
+                                                        : 'error.100',
+                                                    color: allSkipped
+                                                      ? 'grey.600'
+                                                      : allPassed
+                                                        ? 'success.dark'
+                                                        : 'error.dark',
                                                     '& .MuiChip-label': { px: 1 },
                                                   }}
                                                 />
@@ -2718,249 +2867,292 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                               (c: any) => c.passed === false
                                             );
 
-                                            return step.checks.map((check: any, checkIdx: number) => {
-                                              // Determine if this check was skipped (passed === null or came after first failure)
-                                              const isSkipped =
-                                                check.passed === null ||
-                                                (firstFailedIdx !== -1 && checkIdx > firstFailedIdx);
+                                            return step.checks.map(
+                                              (check: any, checkIdx: number) => {
+                                                // Determine if this check was skipped (passed === null or came after first failure)
+                                                const isSkipped =
+                                                  check.passed === null ||
+                                                  (firstFailedIdx !== -1 &&
+                                                    checkIdx > firstFailedIdx);
 
-                                              // Determine the operator to show before this check
-                                              const prevCheck =
-                                                checkIdx > 0 ? step.checks[checkIdx - 1] : null;
-                                              let showOperator = false;
-                                              let operatorType: 'AND' | 'OR' | null = null;
+                                                // Determine the operator to show before this check
+                                                const prevCheck =
+                                                  checkIdx > 0 ? step.checks[checkIdx - 1] : null;
+                                                let showOperator = false;
+                                                let operatorType: 'AND' | 'OR' | null = null;
 
-                                              if (prevCheck) {
-                                                // Same type constraints use AND
-                                                if (check.type === prevCheck.type) {
-                                                  showOperator = true;
-                                                  operatorType = 'AND';
+                                                if (prevCheck) {
+                                                  // Same type constraints use AND
+                                                  if (check.type === prevCheck.type) {
+                                                    showOperator = true;
+                                                    operatorType = 'AND';
+                                                  }
+                                                  // Different check categories (segments -> constraints -> rollout)
+                                                  else if (
+                                                    (prevCheck.type === 'SEGMENTS_CHECK' ||
+                                                      prevCheck.type === 'SEGMENT' ||
+                                                      prevCheck.type === 'SEGMENT_CONSTRAINT') &&
+                                                    (check.type === 'CONSTRAINTS_CHECK' ||
+                                                      check.type === 'STRATEGY_CONSTRAINT')
+                                                  ) {
+                                                    showOperator = true;
+                                                    operatorType = 'AND';
+                                                  } else if (
+                                                    (prevCheck.type === 'CONSTRAINTS_CHECK' ||
+                                                      prevCheck.type === 'STRATEGY_CONSTRAINT') &&
+                                                    check.type === 'ROLLOUT'
+                                                  ) {
+                                                    showOperator = true;
+                                                    operatorType = 'AND';
+                                                  } else if (
+                                                    (prevCheck.type === 'SEGMENTS_CHECK' ||
+                                                      prevCheck.type === 'SEGMENT' ||
+                                                      prevCheck.type === 'SEGMENT_CONSTRAINT') &&
+                                                    check.type === 'ROLLOUT'
+                                                  ) {
+                                                    showOperator = true;
+                                                    operatorType = 'AND';
+                                                  }
                                                 }
-                                                // Different check categories (segments -> constraints -> rollout)
-                                                else if (
-                                                  (prevCheck.type === 'SEGMENTS_CHECK' ||
-                                                    prevCheck.type === 'SEGMENT' ||
-                                                    prevCheck.type === 'SEGMENT_CONSTRAINT') &&
-                                                  (check.type === 'CONSTRAINTS_CHECK' ||
-                                                    check.type === 'STRATEGY_CONSTRAINT')
-                                                ) {
-                                                  showOperator = true;
-                                                  operatorType = 'AND';
-                                                } else if (
-                                                  (prevCheck.type === 'CONSTRAINTS_CHECK' ||
-                                                    prevCheck.type === 'STRATEGY_CONSTRAINT') &&
-                                                  check.type === 'ROLLOUT'
-                                                ) {
-                                                  showOperator = true;
-                                                  operatorType = 'AND';
-                                                } else if (
-                                                  (prevCheck.type === 'SEGMENTS_CHECK' ||
-                                                    prevCheck.type === 'SEGMENT' ||
-                                                    prevCheck.type === 'SEGMENT_CONSTRAINT') &&
-                                                  check.type === 'ROLLOUT'
-                                                ) {
-                                                  showOperator = true;
-                                                  operatorType = 'AND';
+                                                // Map check types to localized labels
+                                                let checkLabel = check.type;
+                                                if (check.type === 'SEGMENT_CONSTRAINT') {
+                                                  checkLabel = `${t('playground.checkTypes.segmentConstraint')}: ${check.segment}`;
+                                                } else if (check.type === 'STRATEGY_CONSTRAINT') {
+                                                  checkLabel = t(
+                                                    'playground.checkTypes.strategyConstraint'
+                                                  );
+                                                } else if (check.type === 'ROLLOUT') {
+                                                  checkLabel = t('playground.checkTypes.rollout');
+                                                } else if (check.type === 'SEGMENTS_CHECK') {
+                                                  checkLabel = t(
+                                                    'playground.checkTypes.segmentsCheck'
+                                                  );
+                                                } else if (check.type === 'CONSTRAINTS_CHECK') {
+                                                  checkLabel = t(
+                                                    'playground.checkTypes.constraintsCheck'
+                                                  );
+                                                } else if (check.type === 'SEGMENT') {
+                                                  checkLabel = `${t('playground.checkTypes.segment')}: ${check.name}`;
                                                 }
-                                              }
-                                              // Map check types to localized labels
-                                              let checkLabel = check.type;
-                                              if (check.type === 'SEGMENT_CONSTRAINT') {
-                                                checkLabel = `${t('playground.checkTypes.segmentConstraint')}: ${check.segment}`;
-                                              } else if (check.type === 'STRATEGY_CONSTRAINT') {
-                                                checkLabel = t(
-                                                  'playground.checkTypes.strategyConstraint'
-                                                );
-                                              } else if (check.type === 'ROLLOUT') {
-                                                checkLabel = t('playground.checkTypes.rollout');
-                                              } else if (check.type === 'SEGMENTS_CHECK') {
-                                                checkLabel = t('playground.checkTypes.segmentsCheck');
-                                              } else if (check.type === 'CONSTRAINTS_CHECK') {
-                                                checkLabel = t(
-                                                  'playground.checkTypes.constraintsCheck'
-                                                );
-                                              } else if (check.type === 'SEGMENT') {
-                                                checkLabel = `${t('playground.checkTypes.segment')}: ${check.name}`;
-                                              }
 
-                                              return (
-                                                <React.Fragment key={checkIdx}>
-                                                  {showOperator && operatorType && (
+                                                return (
+                                                  <React.Fragment key={checkIdx}>
+                                                    {showOperator && operatorType && (
+                                                      <Box
+                                                        sx={{
+                                                          display: 'flex',
+                                                          alignItems: 'center',
+                                                          pl: 3,
+                                                          my: '-5px',
+                                                          position: 'relative',
+                                                          zIndex: 1,
+                                                        }}
+                                                      >
+                                                        <Chip
+                                                          label={operatorType}
+                                                          size="small"
+                                                          sx={{
+                                                            height: 18,
+                                                            fontSize: '0.65rem',
+                                                            fontWeight: 600,
+                                                            bgcolor: 'grey.500',
+                                                            color: 'common.white',
+                                                            '& .MuiChip-label': { px: 1 },
+                                                          }}
+                                                        />
+                                                      </Box>
+                                                    )}
                                                     <Box
                                                       sx={{
                                                         display: 'flex',
-                                                        alignItems: 'center',
-                                                        pl: 3,
-                                                        my: '-5px',
-                                                        position: 'relative',
-                                                        zIndex: 1,
+                                                        alignItems: 'flex-start',
+                                                        gap: 1,
+                                                        p: 1,
+                                                        borderRadius: 1,
+                                                        border: '1px dashed',
+                                                        borderColor: isSkipped
+                                                          ? 'action.disabled'
+                                                          : check.passed
+                                                            ? 'success.light'
+                                                            : 'error.light',
+                                                        bgcolor: isSkipped
+                                                          ? 'action.disabledBackground'
+                                                          : check.passed
+                                                            ? 'success.50'
+                                                            : 'error.50',
+                                                        boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+                                                        opacity: isSkipped ? 0.7 : 1,
                                                       }}
                                                     >
-                                                      <Chip
-                                                        label={operatorType}
-                                                        size="small"
-                                                        sx={{
-                                                          height: 18,
-                                                          fontSize: '0.65rem',
-                                                          fontWeight: 600,
-                                                          bgcolor: 'grey.500',
-                                                          color: 'common.white',
-                                                          '& .MuiChip-label': { px: 1 },
-                                                        }}
-                                                      />
-                                                    </Box>
-                                                  )}
-                                                  <Box
-                                                    sx={{
-                                                      display: 'flex',
-                                                      alignItems: 'flex-start',
-                                                      gap: 1,
-                                                      p: 1,
-                                                      borderRadius: 1,
-                                                      border: '1px dashed',
-                                                      borderColor: isSkipped
-                                                        ? 'action.disabled'
-                                                        : check.passed
-                                                          ? 'success.light'
-                                                          : 'error.light',
-                                                      bgcolor: isSkipped
-                                                        ? 'action.disabledBackground'
-                                                        : check.passed
-                                                          ? 'success.50'
-                                                          : 'error.50',
-                                                      boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
-                                                      opacity: isSkipped ? 0.7 : 1,
-                                                    }}
-                                                  >
-                                                    <Box sx={{ pt: 0.3, flexShrink: 0 }}>
-                                                      {isSkipped ? (
-                                                        <RemoveCircleOutlineIcon
-                                                          sx={{ fontSize: 16, color: 'grey.500' }}
-                                                        />
-                                                      ) : check.passed ? (
-                                                        <TrueIcon
-                                                          sx={{ fontSize: 16, color: 'success.main' }}
-                                                        />
-                                                      ) : (
-                                                        <FalseIcon
-                                                          sx={{ fontSize: 16, color: 'error.main' }}
-                                                        />
-                                                      )}
-                                                    </Box>
-                                                    <Box sx={{ flex: 1, minWidth: 0 }}>
-                                                      <Typography
-                                                        variant="caption"
-                                                        fontWeight={500}
-                                                        color={
-                                                          isSkipped ? 'text.disabled' : 'text.primary'
-                                                        }
-                                                      >
-                                                        {checkLabel}
-                                                        {isSkipped &&
-                                                          ` (${t('playground.checkSkipped')})`}
-                                                      </Typography>
-                                                      {check.type === 'ROLLOUT' ? (
+                                                      <Box sx={{ pt: 0.3, flexShrink: 0 }}>
+                                                        {isSkipped ? (
+                                                          <RemoveCircleOutlineIcon
+                                                            sx={{ fontSize: 16, color: 'grey.500' }}
+                                                          />
+                                                        ) : check.passed ? (
+                                                          <TrueIcon
+                                                            sx={{
+                                                              fontSize: 16,
+                                                              color: 'success.main',
+                                                            }}
+                                                          />
+                                                        ) : (
+                                                          <FalseIcon
+                                                            sx={{
+                                                              fontSize: 16,
+                                                              color: 'error.main',
+                                                            }}
+                                                          />
+                                                        )}
+                                                      </Box>
+                                                      <Box sx={{ flex: 1, minWidth: 0 }}>
                                                         <Typography
                                                           variant="caption"
-                                                          color="text.secondary"
-                                                          sx={{ display: 'block' }}
+                                                          fontWeight={500}
+                                                          color={
+                                                            isSkipped
+                                                              ? 'text.disabled'
+                                                              : 'text.primary'
+                                                          }
                                                         >
-                                                          {check.rollout === 100
-                                                            ? t('playground.checkMessages.rollout100')
-                                                            : t('playground.rolloutDetail', {
-                                                              percentage:
-                                                                check.percentage?.toFixed(1) ?? '?',
-                                                              rollout: check.rollout ?? 100,
-                                                            })}
+                                                          {checkLabel}
+                                                          {isSkipped &&
+                                                            ` (${t('playground.checkSkipped')})`}
                                                         </Typography>
-                                                      ) : check.constraint ? (
-                                                        <Box sx={{ mt: 0.5 }}>
-                                                          <ConstraintDisplay
-                                                            constraint={check.constraint}
-                                                            compact
-                                                            contextFields={contextFields.map((f) => ({
-                                                              fieldName: f.fieldName,
-                                                              displayName: f.displayName,
-                                                              description: f.description,
-                                                              fieldType: f.fieldType,
-                                                              validationRules: f.validationRules,
-                                                            }))}
-                                                          />
-                                                          {check.contextValue !== undefined && (
-                                                            <Typography
-                                                              variant="caption"
-                                                              sx={{
-                                                                display: 'block',
-                                                                mt: 0.25,
-                                                                color: check.passed === null
-                                                                  ? 'text.disabled'
-                                                                  : check.passed
-                                                                    ? 'success.main'
-                                                                    : 'error.main',
-                                                              }}
-                                                            >
-                                                              {t('playground.contextValue')}:{' '}
-                                                              <code
-                                                                style={{
-                                                                  fontFamily: 'monospace',
-                                                                  backgroundColor: 'rgba(0,0,0,0.1)',
-                                                                  padding: '1px 4px',
-                                                                  borderRadius: 2,
+                                                        {check.type === 'ROLLOUT' ? (
+                                                          <Typography
+                                                            variant="caption"
+                                                            color="text.secondary"
+                                                            sx={{ display: 'block' }}
+                                                          >
+                                                            {check.rollout === 100
+                                                              ? t(
+                                                                  'playground.checkMessages.rollout100'
+                                                                )
+                                                              : t('playground.rolloutDetail', {
+                                                                  percentage:
+                                                                    check.percentage?.toFixed(1) ??
+                                                                    '?',
+                                                                  rollout: check.rollout ?? 100,
+                                                                })}
+                                                          </Typography>
+                                                        ) : check.constraint ? (
+                                                          <Box sx={{ mt: 0.5 }}>
+                                                            <ConstraintDisplay
+                                                              constraint={check.constraint}
+                                                              compact
+                                                              contextFields={contextFields.map(
+                                                                (f) => ({
+                                                                  fieldName: f.fieldName,
+                                                                  displayName: f.displayName,
+                                                                  description: f.description,
+                                                                  fieldType: f.fieldType,
+                                                                  validationRules:
+                                                                    f.validationRules,
+                                                                })
+                                                              )}
+                                                            />
+                                                            {check.contextValue !== undefined && (
+                                                              <Typography
+                                                                variant="caption"
+                                                                sx={{
+                                                                  display: 'block',
+                                                                  mt: 0.25,
+                                                                  color:
+                                                                    check.passed === null
+                                                                      ? 'text.disabled'
+                                                                      : check.passed
+                                                                        ? 'success.main'
+                                                                        : 'error.main',
                                                                 }}
                                                               >
-                                                                {check.contextValue === undefined || check.contextValue === null
-                                                                  ? <span style={{ color: '#d32f2f', fontStyle: 'italic' }}>({t('playground.notProvided')})</span>
-                                                                  : check.contextValue === ''
-                                                                    ? <span style={{ color: '#d32f2f' }}>&quot;&quot;</span>
-                                                                    : typeof check.contextValue === 'string'
-                                                                      ? <>&quot;{check.contextValue}&quot;</>
-                                                                      : String(check.contextValue)}
-                                                              </code>
-                                                            </Typography>
-                                                          )}
-                                                        </Box>
-                                                      ) : check.type === 'SEGMENTS_CHECK' ? (
-                                                        <Typography
-                                                          variant="caption"
-                                                          color="text.secondary"
-                                                          sx={{ display: 'block' }}
-                                                        >
-                                                          {t('playground.checkMessages.noSegments')}
-                                                        </Typography>
-                                                      ) : check.type === 'CONSTRAINTS_CHECK' ? (
-                                                        <Typography
-                                                          variant="caption"
-                                                          color="text.secondary"
-                                                          sx={{ display: 'block' }}
-                                                        >
-                                                          {t(
-                                                            'playground.checkMessages.noConstraints'
-                                                          )}
-                                                        </Typography>
-                                                      ) : check.type === 'SEGMENT' ? (
-                                                        <Typography
-                                                          variant="caption"
-                                                          color="text.secondary"
-                                                          sx={{ display: 'block' }}
-                                                        >
-                                                          {check.message ===
+                                                                {t('playground.contextValue')}:{' '}
+                                                                <code
+                                                                  style={{
+                                                                    fontFamily: 'monospace',
+                                                                    backgroundColor:
+                                                                      'rgba(0,0,0,0.1)',
+                                                                    padding: '1px 4px',
+                                                                    borderRadius: 2,
+                                                                  }}
+                                                                >
+                                                                  {check.contextValue ===
+                                                                    undefined ||
+                                                                  check.contextValue === null ? (
+                                                                    <span
+                                                                      style={{
+                                                                        color: '#d32f2f',
+                                                                        fontStyle: 'italic',
+                                                                      }}
+                                                                    >
+                                                                      ({t('playground.notProvided')}
+                                                                      )
+                                                                    </span>
+                                                                  ) : check.contextValue === '' ? (
+                                                                    <span
+                                                                      style={{ color: '#d32f2f' }}
+                                                                    >
+                                                                      &quot;&quot;
+                                                                    </span>
+                                                                  ) : typeof check.contextValue ===
+                                                                    'string' ? (
+                                                                    <>
+                                                                      &quot;{check.contextValue}
+                                                                      &quot;
+                                                                    </>
+                                                                  ) : (
+                                                                    String(check.contextValue)
+                                                                  )}
+                                                                </code>
+                                                              </Typography>
+                                                            )}
+                                                          </Box>
+                                                        ) : check.type === 'SEGMENTS_CHECK' ? (
+                                                          <Typography
+                                                            variant="caption"
+                                                            color="text.secondary"
+                                                            sx={{ display: 'block' }}
+                                                          >
+                                                            {t(
+                                                              'playground.checkMessages.noSegments'
+                                                            )}
+                                                          </Typography>
+                                                        ) : check.type === 'CONSTRAINTS_CHECK' ? (
+                                                          <Typography
+                                                            variant="caption"
+                                                            color="text.secondary"
+                                                            sx={{ display: 'block' }}
+                                                          >
+                                                            {t(
+                                                              'playground.checkMessages.noConstraints'
+                                                            )}
+                                                          </Typography>
+                                                        ) : check.type === 'SEGMENT' ? (
+                                                          <Typography
+                                                            variant="caption"
+                                                            color="text.secondary"
+                                                            sx={{ display: 'block' }}
+                                                          >
+                                                            {check.message ===
                                                             'Segment has no constraints - passed'
-                                                            ? t(
-                                                              'playground.checkMessages.segmentNoConstraints'
-                                                            )
-                                                            : check.message ===
-                                                              'Segment not found - skipped'
                                                               ? t(
-                                                                'playground.checkMessages.segmentNotFound'
-                                                              )
-                                                              : check.message}
-                                                        </Typography>
-                                                      ) : null}
+                                                                  'playground.checkMessages.segmentNoConstraints'
+                                                                )
+                                                              : check.message ===
+                                                                  'Segment not found - skipped'
+                                                                ? t(
+                                                                    'playground.checkMessages.segmentNotFound'
+                                                                  )
+                                                                : check.message}
+                                                          </Typography>
+                                                        ) : null}
+                                                      </Box>
                                                     </Box>
-                                                  </Box>
-                                                </React.Fragment>
-                                              );
-                                            });
+                                                  </React.Fragment>
+                                                );
+                                              }
+                                            );
                                           })()}
                                         </Stack>
                                       </Box>
@@ -2968,7 +3160,12 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
 
                                     {isStrategy && step.passed && step.variantName && (
                                       <Box
-                                        sx={{ mt: 1, display: 'flex', alignItems: 'center', gap: 1 }}
+                                        sx={{
+                                          mt: 1,
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          gap: 1,
+                                        }}
                                       >
                                         <Typography variant="caption" color="text.secondary">
                                           {t('playground.determinedVariant')}:
@@ -3022,7 +3219,9 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                           copyToClipboardWithNotification(
                             valueToCopy,
                             () =>
-                              enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+                              enqueueSnackbar(t('common.copiedToClipboard'), {
+                                variant: 'success',
+                              }),
                             () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
                           );
                         }}
@@ -3158,8 +3357,8 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                 {innerValue === ''
                                   ? t('common.emptyString')
                                   : typeof innerValue === 'object' &&
-                                    innerValue !== null &&
-                                    Object.keys(innerValue).length === 0
+                                      innerValue !== null &&
+                                      Object.keys(innerValue).length === 0
                                     ? t('common.emptyObject')
                                     : innerValue}
                               </Typography>
@@ -3326,17 +3525,20 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                           />
                         )}
                       </Box>
-                      {!selectedEvaluation.result.validation.valid && selectedEvaluation.result.validation.errors.length > 0 && (
-                        <Alert severity="warning" variant="outlined" sx={{ mb: 1 }}>
-                          <Stack spacing={0.5}>
-                            {selectedEvaluation.result.validation.errors.map((err: string, i: number) => (
-                              <Typography key={i} variant="body2">
-                                • {err}
-                              </Typography>
-                            ))}
-                          </Stack>
-                        </Alert>
-                      )}
+                      {!selectedEvaluation.result.validation.valid &&
+                        selectedEvaluation.result.validation.errors.length > 0 && (
+                          <Alert severity="warning" variant="outlined" sx={{ mb: 1 }}>
+                            <Stack spacing={0.5}>
+                              {selectedEvaluation.result.validation.errors.map(
+                                (err: string, i: number) => (
+                                  <Typography key={i} variant="body2">
+                                    • {err}
+                                  </Typography>
+                                )
+                              )}
+                            </Stack>
+                          </Alert>
+                        )}
                       {selectedEvaluation.result.validation.transformedValue !== undefined && (
                         <Box
                           sx={{
@@ -3347,7 +3549,11 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                             borderColor: 'divider',
                           }}
                         >
-                          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
+                          <Typography
+                            variant="caption"
+                            color="text.secondary"
+                            sx={{ display: 'block', mb: 0.5 }}
+                          >
                             {t('playground.validationTransformedValue')}
                           </Typography>
                           <Typography
@@ -3393,7 +3599,9 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                           copyToClipboardWithNotification(
                             jsonStr,
                             () =>
-                              enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+                              enqueueSnackbar(t('common.copiedToClipboard'), {
+                                variant: 'success',
+                              }),
                             () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
                           );
                         }}
@@ -3412,7 +3620,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                       null,
                       2
                     )}
-                    onChange={() => { }}
+                    onChange={() => {}}
                     readOnly
                     height={200}
                   />
@@ -3597,7 +3805,6 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
       </Dialog>
 
       {renderDetailedEvaluationPopover()}
-
     </>
   );
 };

@@ -35,7 +35,18 @@ export interface ValidationRules {
   // JSON type
   jsonSchema?: string;
 }
-export type FieldType = 'string' | 'number' | 'boolean' | 'date' | 'semver' | 'array' | 'country' | 'countryCode3' | 'languageCode' | 'localeCode' | 'timezone';
+export type FieldType =
+  | 'string'
+  | 'number'
+  | 'boolean'
+  | 'date'
+  | 'semver'
+  | 'array'
+  | 'country'
+  | 'countryCode3'
+  | 'languageCode'
+  | 'localeCode'
+  | 'timezone';
 
 export type ConstraintOperator =
   // String operators (use inverted flag for negation)
@@ -489,16 +500,16 @@ export class FeatureFlagModel {
         variants,
         environments: envSettings
           ? [
-            {
-              id: envSettings.id,
-              flagId: id,
-              environment,
-              isEnabled: Boolean(envSettings.isEnabled),
-              enabledValue: parseJsonField(envSettings.enabledValue),
-              disabledValue: parseJsonField(envSettings.disabledValue),
-              lastSeenAt: envSettings.lastSeenAt,
-            },
-          ]
+              {
+                id: envSettings.id,
+                flagId: id,
+                environment,
+                isEnabled: Boolean(envSettings.isEnabled),
+                enabledValue: parseJsonField(envSettings.enabledValue),
+                disabledValue: parseJsonField(envSettings.disabledValue),
+                lastSeenAt: envSettings.lastSeenAt,
+              },
+            ]
           : [],
       };
     } catch (error) {
@@ -587,7 +598,9 @@ export class FeatureFlagModel {
       if (data.tags !== undefined) updateData.tags = JSON.stringify(data.tags);
       if (data.links !== undefined) updateData.links = JSON.stringify(data.links);
       if (data.validationRules !== undefined)
-        updateData.validationRules = data.validationRules ? JSON.stringify(data.validationRules) : null;
+        updateData.validationRules = data.validationRules
+          ? JSON.stringify(data.validationRules)
+          : null;
       let effectiveValueType = data.valueType;
       if (data.valueType !== undefined) updateData.valueType = data.valueType;
 
@@ -1286,7 +1299,9 @@ export class FeatureContextFieldModel {
       if (data.displayName !== undefined) updateData.displayName = data.displayName;
       if (data.description !== undefined) updateData.description = data.description;
       if (data.validationRules !== undefined)
-        updateData.validationRules = data.validationRules ? JSON.stringify(data.validationRules) : null;
+        updateData.validationRules = data.validationRules
+          ? JSON.stringify(data.validationRules)
+          : null;
       if (data.tags !== undefined) updateData.tags = JSON.stringify(data.tags);
       if (data.stickiness !== undefined) updateData.stickiness = data.stickiness;
       if (data.sortOrder !== undefined) updateData.sortOrder = data.sortOrder;

@@ -208,7 +208,15 @@ const typeStyles: Record<string, TypeStyle> = {
     render: (fg) => (
       <>
         {/* Flag pole */}
-        <line x1="6" y1="4.5" x2="6" y2="19.5" stroke={fg} strokeWidth="1.8" strokeLinecap="round" />
+        <line
+          x1="6"
+          y1="4.5"
+          x2="6"
+          y2="19.5"
+          stroke={fg}
+          strokeWidth="1.8"
+          strokeLinecap="round"
+        />
         {/* Flag body */}
         <path
           d="M6,5 L16,7 L15,11.5 L6,13 Z"

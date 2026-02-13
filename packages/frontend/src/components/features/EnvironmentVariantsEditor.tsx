@@ -590,13 +590,13 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
 
     const viewOnlyStyle = !isActuallyEditable
       ? {
-        bgcolor: (theme: any) =>
-          theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.02)',
-        '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
-        '&:hover .MuiOutlinedInput-notchedOutline': { border: 'none' },
-        '&.Mui-focused .MuiOutlinedInput-notchedOutline': { border: 'none' },
-        borderRadius: 1,
-      }
+          bgcolor: (theme: any) =>
+            theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.02)',
+          '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
+          '&:hover .MuiOutlinedInput-notchedOutline': { border: 'none' },
+          '&.Mui-focused .MuiOutlinedInput-notchedOutline': { border: 'none' },
+          borderRadius: 1,
+        }
       : {};
 
     if (valueType === 'boolean') {
@@ -892,7 +892,8 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                                 return String(raw);
                               }
                               // For string type, if value is still an object somehow, stringify it
-                              if (typeof raw === 'object' && raw !== null) return JSON.stringify(raw);
+                              if (typeof raw === 'object' && raw !== null)
+                                return JSON.stringify(raw);
                               return raw ?? '';
                             })()}
                             onChange={(val) => {
@@ -1011,7 +1012,14 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
 
         {/* Flag Values Section - shown for both types but more critical for 'flag' usage */}
         {onSaveValues && (
-          <Box sx={{ mt: flagType === 'remoteConfig' ? 0 : 2, pt: flagType === 'remoteConfig' ? 0 : 2, borderTop: flagType === 'remoteConfig' ? 0 : 1, borderColor: 'divider' }}>
+          <Box
+            sx={{
+              mt: flagType === 'remoteConfig' ? 0 : 2,
+              pt: flagType === 'remoteConfig' ? 0 : 2,
+              borderTop: flagType === 'remoteConfig' ? 0 : 1,
+              borderColor: 'divider',
+            }}
+          >
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                 <OverrideSwitch

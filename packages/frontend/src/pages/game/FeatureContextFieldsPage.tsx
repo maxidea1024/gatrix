@@ -77,7 +77,17 @@ const TrimIconNone = (props: any) => (
   <SvgIcon {...props} viewBox="0 0 20 20">
     {/* Horizontal line with no trim indicators - represents "as-is" */}
     <rect x="2" y="9" width="16" height="2" rx="1" fill="currentColor" opacity="0.4" />
-    <text x="10" y="14" textAnchor="middle" fontSize="7" fontWeight="bold" fill="currentColor" opacity="0.5">—</text>
+    <text
+      x="10"
+      y="14"
+      textAnchor="middle"
+      fontSize="7"
+      fontWeight="bold"
+      fill="currentColor"
+      opacity="0.5"
+    >
+      —
+    </text>
   </SvgIcon>
 );
 
@@ -88,7 +98,14 @@ const TrimIconAuto = (props: any) => (
     <path d="M5 13L8 8" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" />
     <circle cx="4" cy="3" r="2" stroke="currentColor" strokeWidth="1.2" fill="none" />
     <circle cx="4" cy="13" r="2" stroke="currentColor" strokeWidth="1.2" fill="none" />
-    <path d="M8 8H17" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeDasharray="2 1.5" />
+    <path
+      d="M8 8H17"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      fill="none"
+      strokeLinecap="round"
+      strokeDasharray="2 1.5"
+    />
   </SvgIcon>
 );
 
@@ -96,7 +113,14 @@ const TrimIconStart = (props: any) => (
   <SvgIcon {...props} viewBox="0 0 20 20">
     {/* Arrow pushing content from left */}
     <path d="M3 10H17" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" />
-    <path d="M7 6L3 10L7 14" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+    <path
+      d="M7 6L3 10L7 14"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
     <rect x="1" y="4" width="1.5" height="12" rx="0.75" fill="currentColor" />
   </SvgIcon>
 );
@@ -105,7 +129,14 @@ const TrimIconEnd = (props: any) => (
   <SvgIcon {...props} viewBox="0 0 20 20">
     {/* Arrow pushing content from right */}
     <path d="M3 10H17" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" />
-    <path d="M13 6L17 10L13 14" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+    <path
+      d="M13 6L17 10L13 14"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
     <rect x="17.5" y="4" width="1.5" height="12" rx="0.75" fill="currentColor" />
   </SvgIcon>
 );
@@ -140,7 +171,18 @@ interface FeatureContextField {
   fieldName: string;
   displayName: string;
   description: string;
-  fieldType: 'string' | 'number' | 'boolean' | 'date' | 'semver' | 'array' | 'country' | 'countryCode3' | 'languageCode' | 'localeCode' | 'timezone';
+  fieldType:
+    | 'string'
+    | 'number'
+    | 'boolean'
+    | 'date'
+    | 'semver'
+    | 'array'
+    | 'country'
+    | 'countryCode3'
+    | 'languageCode'
+    | 'localeCode'
+    | 'timezone';
   validationRules?: ValidationRules;
   isEnabled: boolean;
   tags: string[];
@@ -819,7 +861,10 @@ const FeatureContextFieldsPage: React.FC = () => {
                               );
                             case 'legalValues': {
                               const rulesActive = field.validationRules?.enabled === true;
-                              const legalVals = rulesActive && field.validationRules?.legalValues ? field.validationRules.legalValues : [];
+                              const legalVals =
+                                rulesActive && field.validationRules?.legalValues
+                                  ? field.validationRules.legalValues
+                                  : [];
                               return (
                                 <TableCell key={col.id}>
                                   {legalVals.length > 0 ? (
@@ -868,8 +913,8 @@ const FeatureContextFieldsPage: React.FC = () => {
                                           {expandedLegalValues.has(field.id)
                                             ? t('featureFlags.showLess')
                                             : t('featureFlags.showMore', {
-                                              count: legalVals.length - 3,
-                                            })}
+                                                count: legalVals.length - 3,
+                                              })}
                                         </Typography>
                                       )}
                                     </Box>
@@ -1242,7 +1287,9 @@ const FeatureContextFieldsPage: React.FC = () => {
                     />
                   }
                   label={
-                    <Typography variant="body2">{t('featureFlags.validation.isRequired')}</Typography>
+                    <Typography variant="body2">
+                      {t('featureFlags.validation.isRequired')}
+                    </Typography>
                   }
                   sx={{ flexShrink: 0 }}
                 />
@@ -1259,7 +1306,8 @@ const FeatureContextFieldsPage: React.FC = () => {
                           ...prev,
                           validationRules: {
                             ...prev.validationRules,
-                            trimWhitespace: e.target.value === 'none' ? undefined : (e.target.value as any),
+                            trimWhitespace:
+                              e.target.value === 'none' ? undefined : (e.target.value as any),
                           },
                         }))
                       }
@@ -1295,15 +1343,24 @@ const FeatureContextFieldsPage: React.FC = () => {
             {editingField?.fieldType && (
               <ValidationRulesEditor
                 valueType={
-                  (['number'] as string[]).includes(editingField.fieldType) ? 'number'
-                    : editingField.fieldType === 'boolean' ? 'boolean'
-                      : editingField.fieldType === 'date' ? 'date'
-                        : editingField.fieldType === 'semver' ? 'semver'
-                          : editingField.fieldType === 'country' ? 'country'
-                            : editingField.fieldType === 'countryCode3' ? 'countryCode3'
-                              : editingField.fieldType === 'languageCode' ? 'languageCode'
-                                : editingField.fieldType === 'localeCode' ? 'localeCode'
-                                  : editingField.fieldType === 'timezone' ? 'timezone'
+                  (['number'] as string[]).includes(editingField.fieldType)
+                    ? 'number'
+                    : editingField.fieldType === 'boolean'
+                      ? 'boolean'
+                      : editingField.fieldType === 'date'
+                        ? 'date'
+                        : editingField.fieldType === 'semver'
+                          ? 'semver'
+                          : editingField.fieldType === 'country'
+                            ? 'country'
+                            : editingField.fieldType === 'countryCode3'
+                              ? 'countryCode3'
+                              : editingField.fieldType === 'languageCode'
+                                ? 'languageCode'
+                                : editingField.fieldType === 'localeCode'
+                                  ? 'localeCode'
+                                  : editingField.fieldType === 'timezone'
+                                    ? 'timezone'
                                     : 'string'
                 }
                 rules={editingField.validationRules}

@@ -111,17 +111,17 @@ export interface ContextField {
   displayName: string;
   description?: string;
   fieldType:
-  | 'string'
-  | 'number'
-  | 'boolean'
-  | 'date'
-  | 'semver'
-  | 'array'
-  | 'country'
-  | 'countryCode3'
-  | 'languageCode'
-  | 'localeCode'
-  | 'timezone';
+    | 'string'
+    | 'number'
+    | 'boolean'
+    | 'date'
+    | 'semver'
+    | 'array'
+    | 'country'
+    | 'countryCode3'
+    | 'languageCode'
+    | 'localeCode'
+    | 'timezone';
   validationRules?: any;
 }
 
@@ -614,7 +614,11 @@ export const ConstraintEditor: React.FC<ConstraintEditorProps> = ({
     if (!field) return [];
 
     // Only use legalValues from validationRules when rules are enabled
-    if (field.validationRules?.enabled && field.validationRules.legalValues && field.validationRules.legalValues.length > 0) {
+    if (
+      field.validationRules?.enabled &&
+      field.validationRules.legalValues &&
+      field.validationRules.legalValues.length > 0
+    ) {
       return field.validationRules.legalValues;
     }
 
