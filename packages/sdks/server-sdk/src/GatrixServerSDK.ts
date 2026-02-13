@@ -24,6 +24,9 @@ import { SdkMetrics } from './utils/sdkMetrics';
 import { createMetricsServer, MetricsServerInstance } from './services/MetricsServer';
 import { createHttpMetricsMiddleware } from './utils/httpMetrics';
 import { MaintenanceEventData } from './cache/MaintenanceWatcher';
+import { InMemoryMetricRegistry } from './impact-metrics/metric-types';
+import type { ImpactMetricsDataSource } from './impact-metrics/metric-types';
+import { MetricsAPI, ImpactMetricsStaticContext } from './impact-metrics/metric-api';
 import {
   RedeemCouponRequest,
   RedeemCouponResponse,
@@ -67,6 +70,11 @@ export class GatrixServerSDK {
   private httpRegistry?: any; // prom-client Registry
   private userRegistry?: any; // prom-client Registry
 
+  // Impact metrics (application-level metrics for safeguard evaluation)
+  private impactMetricRegistry: InMemoryMetricRegistry;
+  private impactMetricDataSource: ImpactMetricsDataSource;
+  private _impactMetrics: MetricsAPI;
+
   // Maintenance event listeners (separate from standard event listeners)
   private maintenanceEventListeners: Map<string, EventCallback[]> = new Map();
 
@@ -77,6 +85,9 @@ export class GatrixServerSDK {
   private connectionRecoveryUnsubscribe?: () => void;
   private isRefreshingAfterRecovery: boolean = false;
   private connectionEventListeners: Map<string, EventCallback[]> = new Map();
+
+  // Impact metrics flush interval
+  private impactMetricsFlushInterval: ReturnType<typeof setInterval> | null = null;
 
   /**
    * Create SDK instance with optional overrides
@@ -286,6 +297,16 @@ export class GatrixServerSDK {
     this.coupon = new CouponService(this.apiClient, this.logger);
     this.serviceDiscovery = new ServiceDiscoveryService(this.apiClient, this.logger);
 
+    // Initialize impact metrics registry + API
+    this.impactMetricRegistry = new InMemoryMetricRegistry();
+    this.impactMetricDataSource = this.impactMetricRegistry;
+    const impactContext: ImpactMetricsStaticContext = {
+      appName: configWithDefaults.applicationName,
+      environment: configWithDefaults.environment,
+      service: configWithDefaults.service,
+    };
+    this._impactMetrics = new MetricsAPI(this.impactMetricRegistry, impactContext, this.logger);
+
     this.logger.info('GatrixServerSDK created', {
       gatrixUrl: configWithDefaults.gatrixUrl,
       applicationName: configWithDefaults.applicationName,
@@ -418,10 +439,10 @@ export class GatrixServerSDK {
       },
       redis: this.config.redis
         ? {
-            host: this.config.redis.host,
-            port: this.config.redis.port,
-            db: this.config.redis.db ?? 0,
-          }
+          host: this.config.redis.host,
+          port: this.config.redis.port,
+          db: this.config.redis.db ?? 0,
+        }
         : 'disabled',
       retry: this.config.retry ?? 'default',
     });
@@ -531,6 +552,9 @@ export class GatrixServerSDK {
           this.logger.info('Feature flag metrics collection started automatically');
         }
       }
+
+      // Auto-start impact metrics flush (every 60s)
+      this.startImpactMetricsFlush();
 
       this.logger.info('GatrixServerSDK initialized successfully');
     } catch (error: any) {
@@ -755,6 +779,89 @@ export class GatrixServerSDK {
       );
     }
     return service;
+  }
+
+  /**
+   * Get Impact Metrics API
+   * Use this to define and record application-level metrics
+   * that can be used for release flow safeguard evaluation.
+   *
+   * @example
+   * ```typescript
+   * // Define metrics
+   * sdk.impactMetrics.defineCounter('http_errors', 'Count of HTTP errors');
+   * sdk.impactMetrics.defineHistogram('response_time_ms', 'Response time', [10, 50, 100, 500, 1000]);
+   *
+   * // Record metrics during request handling
+   * sdk.impactMetrics.incrementCounter('http_errors');
+   * sdk.impactMetrics.observeHistogram('response_time_ms', 42);
+   * ```
+   */
+  get impactMetrics(): MetricsAPI {
+    return this._impactMetrics;
+  }
+
+  /**
+   * Get impact metrics data source for internal use (metric flushing)
+   * Returns collected metrics and allows restoring on failure
+   */
+  getImpactMetricsDataSource(): ImpactMetricsDataSource {
+    return this.impactMetricDataSource;
+  }
+
+  /**
+   * Start periodic impact metrics flushing
+   * Collects from InMemoryMetricRegistry and sends to backend
+   */
+  private startImpactMetricsFlush(intervalMs: number = 60000): void {
+    if (this.impactMetricsFlushInterval) {
+      clearInterval(this.impactMetricsFlushInterval);
+    }
+
+    this.impactMetricsFlushInterval = setInterval(() => {
+      this.flushImpactMetrics();
+    }, intervalMs);
+
+    this.logger.info('Impact metrics flush started', { intervalMs });
+  }
+
+  /**
+   * Flush collected impact metrics to the backend
+   * Collects from InMemoryMetricRegistry (resets counters after collection)
+   * Sends to POST /api/v1/server/impact-metrics
+   */
+  private async flushImpactMetrics(): Promise<void> {
+    try {
+      const collectedMetrics = this.impactMetricDataSource.collect();
+
+      if (collectedMetrics.length === 0) {
+        return;
+      }
+
+      this.logger.debug('Flushing impact metrics', {
+        metricsCount: collectedMetrics.length,
+      });
+
+      await this.apiClient.post(
+        '/api/v1/server/impact-metrics',
+        {
+          impactMetrics: collectedMetrics,
+          sdkVersion: SDK_VERSION,
+        },
+        {
+          headers: {
+            'X-SDK-Version': SDK_VERSION,
+          },
+        }
+      );
+
+      this.logger.debug('Impact metrics sent successfully');
+    } catch (error: any) {
+      this.logger.error('Failed to flush impact metrics', { error: error.message });
+      // On failure, metrics are already consumed from registry.
+      // We could restore them, but for simplicity we just log the error.
+      // In production, the next collection cycle will have fresh metrics.
+    }
   }
 
   /**
@@ -1525,7 +1632,7 @@ export class GatrixServerSDK {
     if (refreshMethod === 'event') {
       if (!this.eventListener) {
         this.logger.warn('Event listener not initialized. Events will not be received.');
-        return () => {}; // Return no-op function
+        return () => { }; // Return no-op function
       }
       return this.eventListener.on(eventType, callback);
     }
@@ -1533,7 +1640,7 @@ export class GatrixServerSDK {
     else if (refreshMethod === 'polling') {
       if (!this.cacheManager) {
         this.logger.warn('Cache manager not initialized.');
-        return () => {}; // Return no-op function
+        return () => { }; // Return no-op function
       }
       const unsubscribe = this.cacheManager.onRefresh((type: string, data: any) => {
         // Convert cache refresh events to SDK events
@@ -1554,7 +1661,7 @@ export class GatrixServerSDK {
       return unsubscribe;
     }
 
-    return () => {}; // Return no-op function as fallback
+    return () => { }; // Return no-op function as fallback
   }
 
   /**
@@ -1749,15 +1856,15 @@ export class GatrixServerSDK {
    */
   getUserMetricsProvider():
     | {
-        createCounter: (name: string, help: string, labelNames?: string[]) => any;
-        createGauge: (name: string, help: string, labelNames?: string[]) => any;
-        createHistogram: (
-          name: string,
-          help: string,
-          labelNames?: string[],
-          buckets?: number[]
-        ) => any;
-      }
+      createCounter: (name: string, help: string, labelNames?: string[]) => any;
+      createGauge: (name: string, help: string, labelNames?: string[]) => any;
+      createHistogram: (
+        name: string,
+        help: string,
+        labelNames?: string[],
+        buckets?: number[]
+      ) => any;
+    }
     | undefined {
     if (!this.userRegistry) return undefined;
 

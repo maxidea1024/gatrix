@@ -119,12 +119,71 @@ async function createSampleUsers() {
   }
 }
 
+const { ulid } = require('ulid');
+
+async function createSampleReleaseFlows() {
+  try {
+    const existingFlows = await database.query(
+      'SELECT COUNT(*) as count FROM g_release_flows WHERE discriminator = "template"'
+    );
+
+    if (existingFlows[0].count > 0) {
+      logger.info('Sample release flows already exist, skipping creation');
+      return;
+    }
+
+    // 1. Standard Progressive Rollout Template
+    const templateId = ulid();
+    await database.query(
+      `INSERT INTO g_release_flows (id, flowName, displayName, description, discriminator, isArchived, createdBy, createdAt, updatedAt)
+       VALUES (?, 'standard-rollout', 'Standard Progressive Rollout', 'Gradual rollout: internal -> 10% -> 50% -> 100%', 'template', FALSE, 1, UTC_TIMESTAMP(), UTC_TIMESTAMP())`,
+      [templateId]
+    );
+
+    const milestones = [
+      { name: 'Internal Testing', sortOrder: 0, strategy: { name: 'flexibleRollout', params: { rollout: 0, stickiness: 'default', groupId: 'default' }, constraints: [{ contextName: 'appName', operator: 'IN', values: ['Gatrix-Admin'] }] } },
+      { name: 'Beta (10%)', sortOrder: 1, strategy: { name: 'flexibleRollout', params: { rollout: 10, stickiness: 'default', groupId: 'default' } } },
+      { name: 'Limited (50%)', sortOrder: 2, strategy: { name: 'flexibleRollout', params: { rollout: 50, stickiness: 'default', groupId: 'default' } } },
+      { name: 'Full Release (100%)', sortOrder: 3, strategy: { name: 'flexibleRollout', params: { rollout: 100, stickiness: 'default', groupId: 'default' } } },
+    ];
+
+    for (const m of milestones) {
+      const milestoneId = ulid();
+      await database.query(
+        `INSERT INTO g_release_flow_milestones (id, flowId, name, sortOrder, createdAt, updatedAt)
+         VALUES (?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`,
+        [milestoneId, templateId, m.name, m.sortOrder]
+      );
+
+      const strategyId = ulid();
+      await database.query(
+        `INSERT INTO g_release_flow_strategies (id, milestoneId, strategyName, parameters, constraints, sortOrder, createdAt, updatedAt)
+         VALUES (?, ?, ?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`,
+        [
+          strategyId,
+          milestoneId,
+          m.strategy.name,
+          JSON.stringify(m.strategy.params),
+          JSON.stringify(m.strategy.constraints || []),
+          0
+        ]
+      );
+    }
+
+    logger.info('Sample release flows created successfully');
+  } catch (error) {
+    logger.error('Failed to create sample release flows:', error);
+    throw error;
+  }
+}
+
 async function seedDatabase() {
   try {
     logger.info('Starting database seeding...');
 
     await createAdminUser();
     await createSampleUsers();
+    await createSampleReleaseFlows();
 
     logger.info('Database seeding completed successfully');
   } catch (error) {

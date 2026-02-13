@@ -442,6 +442,12 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
         permission: 'feature-flags',
       },
       {
+        text: 'releaseFlow.templates',
+        icon: 'Layers',
+        path: '/feature-flags/templates',
+        permission: 'feature-flags',
+      },
+      {
         text: 'sidebar.featureSegments',
         icon: 'People',
         path: '/feature-flags/segments',

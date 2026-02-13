@@ -42,6 +42,7 @@ import featureRoutes from './features';
 import platformDefaultsRoutes from './platformDefaults';
 import unknownFlagsRoutes from './unknownFlags';
 import integrationRoutes from './integrations';
+import releaseFlowRoutes from './releaseFlows';
 
 const router = express.Router();
 
@@ -292,6 +293,26 @@ router.use(
   '/integrations',
   requirePermission([PERMISSIONS.SECURITY_VIEW, PERMISSIONS.SECURITY_MANAGE]) as any,
   integrationRoutes
+);
+
+// Release Flows - requires feature-flags.view or feature-flags.manage permission
+router.use(
+  '/release-flows',
+  requirePermission([PERMISSIONS.FEATURE_FLAGS_VIEW, PERMISSIONS.FEATURE_FLAGS_MANAGE]) as any,
+  releaseFlowRoutes
+);
+
+// Impact Metrics (admin query endpoints for charts and safeguard evaluation)
+import ImpactMetricsController from '../../controllers/ImpactMetricsController';
+router.get(
+  '/impact-metrics/available',
+  requirePermission([PERMISSIONS.FEATURE_FLAGS_VIEW, PERMISSIONS.FEATURE_FLAGS_MANAGE]) as any,
+  ImpactMetricsController.getAvailableMetrics as any
+);
+router.get(
+  '/impact-metrics',
+  requirePermission([PERMISSIONS.FEATURE_FLAGS_VIEW, PERMISSIONS.FEATURE_FLAGS_MANAGE]) as any,
+  ImpactMetricsController.queryTimeSeries as any
 );
 
 export default router;
