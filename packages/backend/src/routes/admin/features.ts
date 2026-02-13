@@ -854,6 +854,77 @@ router.post(
               });
             }
           }
+
+          // Check pattern validation
+          if (rules?.pattern && typeof value === 'string') {
+            try {
+              const regex = new RegExp(rules.pattern);
+              if (!regex.test(value)) {
+                contextWarnings.push({
+                  field: key,
+                  type: 'PATTERN_MISMATCH',
+                  message: `Value "${value}" does not match pattern: ${rules.pattern}`,
+                  data: { value, pattern: rules.pattern, patternDescription: rules.patternDescription },
+                  severity: 'error'
+                });
+              }
+            } catch {
+              // Invalid regex pattern, skip validation
+            }
+          }
+
+          // Check minLength / maxLength
+          if (typeof value === 'string') {
+            if (rules?.minLength !== undefined && value.length < rules.minLength) {
+              contextWarnings.push({
+                field: key,
+                type: 'MIN_LENGTH',
+                message: `Value "${value}" length (${value.length}) is less than minimum (${rules.minLength})`,
+                data: { value, length: value.length, minLength: rules.minLength },
+                severity: 'error'
+              });
+            }
+            if (rules?.maxLength !== undefined && value.length > rules.maxLength) {
+              contextWarnings.push({
+                field: key,
+                type: 'MAX_LENGTH',
+                message: `Value "${value}" length (${value.length}) exceeds maximum (${rules.maxLength})`,
+                data: { value, length: value.length, maxLength: rules.maxLength },
+                severity: 'error'
+              });
+            }
+          }
+
+          // Check min / max for numbers
+          if (typeof value === 'number') {
+            if (rules?.min !== undefined && value < rules.min) {
+              contextWarnings.push({
+                field: key,
+                type: 'MIN_VALUE',
+                message: `Value ${value} is less than minimum (${rules.min})`,
+                data: { value, min: rules.min },
+                severity: 'error'
+              });
+            }
+            if (rules?.max !== undefined && value > rules.max) {
+              contextWarnings.push({
+                field: key,
+                type: 'MAX_VALUE',
+                message: `Value ${value} exceeds maximum (${rules.max})`,
+                data: { value, max: rules.max },
+                severity: 'error'
+              });
+            }
+            if (rules?.integerOnly && !Number.isInteger(value)) {
+              contextWarnings.push({
+                field: key,
+                type: 'INTEGER_ONLY',
+                message: `Value ${value} must be an integer`,
+                data: { value },
+                severity: 'error'
+              });
+            }
+          }
         }
       }
     }
@@ -1047,7 +1118,20 @@ router.post(
       }
     }
 
-    res.json({ success: true, data: { results, contextWarnings: contextWarnings.length > 0 ? contextWarnings : undefined } });
+    res.json({
+      success: true,
+      data: {
+        results,
+        contextWarnings: contextWarnings.length > 0 ? contextWarnings : undefined,
+        referencedFields: referencedFields.size > 0
+          ? Array.from(referencedFields).map((name) => {
+            const fieldDef = fieldDefMap?.get(name);
+            const rules = fieldDef?.validationRules as any;
+            return { name, isRequired: rules?.isRequired === true, fieldType: (fieldDef?.fieldType as string) || 'string' };
+          })
+          : undefined,
+      },
+    });
   })
 );
 
@@ -1069,6 +1153,7 @@ function evaluateFlagWithDetails(
 
   // Step 1: Context Validation
   const errorWarnings = contextWarnings?.filter((w) => w.severity === 'error') || [];
+  let contextFailed = false;
   if (errorWarnings.length > 0) {
     evaluationSteps.push({
       step: 'CONTEXT_VALIDATION',
@@ -1083,33 +1168,23 @@ function evaluateFlagWithDetails(
         })),
       },
     });
-
-    return {
-      enabled: false,
-      reason: 'CONTEXT_VALIDATION_FAILED',
-      variant: {
-        name: '$disabled',
-        value: getFallbackValue(
-          flag.environments?.find((e: any) => e.environment === environment)?.disabledValue ??
-          flag.disabledValue,
-          flag.valueType
-        ),
-        valueType: flag.valueType || 'string',
-        valueSource: 'default',
-      },
-      evaluationSteps,
-    };
+    contextFailed = true;
+  } else {
+    evaluationSteps.push({
+      step: 'CONTEXT_VALIDATION',
+      passed: true,
+      message: 'Context validation passed',
+    });
   }
 
-  evaluationSteps.push({
-    step: 'CONTEXT_VALIDATION',
-    passed: true,
-    message: 'Context validation passed',
-  });
-
   // Step 2: Check if flag is enabled in environment
-  // flag.isEnabled is already the correct value for the requested environment (set by getFlag)
-  if (!flag.isEnabled) {
+  if (contextFailed) {
+    evaluationSteps.push({
+      step: 'ENVIRONMENT_CHECK',
+      passed: null, // skipped
+      message: 'Skipped due to context validation failure',
+    });
+  } else if (!flag.isEnabled) {
     evaluationSteps.push({
       step: 'ENVIRONMENT_CHECK',
       passed: false,
@@ -1136,12 +1211,13 @@ function evaluateFlagWithDetails(
       },
       evaluationSteps,
     };
+  } else {
+    evaluationSteps.push({
+      step: 'ENVIRONMENT_CHECK',
+      passed: true,
+      message: 'Flag is enabled in this environment',
+    });
   }
-  evaluationSteps.push({
-    step: 'ENVIRONMENT_CHECK',
-    passed: true,
-    message: 'Flag is enabled in this environment',
-  });
 
   const strategies = flag.strategies || [];
 
@@ -1149,9 +1225,26 @@ function evaluateFlagWithDetails(
   if (strategies.length === 0) {
     evaluationSteps.push({
       step: 'STRATEGY_COUNT',
-      passed: true,
-      message: 'No strategies defined - enabled by default',
+      passed: contextFailed ? null : true,
+      message: contextFailed ? 'Skipped due to context validation failure' : 'No strategies defined - enabled by default',
     });
+    if (contextFailed) {
+      return {
+        enabled: false,
+        reason: 'CONTEXT_VALIDATION_FAILED',
+        variant: {
+          name: '$disabled',
+          value: getFallbackValue(
+            flag.environments?.find((e: any) => e.environment === environment)?.disabledValue ??
+            flag.disabledValue,
+            flag.valueType
+          ),
+          valueType: flag.valueType || 'string',
+          valueSource: 'default',
+        },
+        evaluationSteps,
+      };
+    }
     const variant = selectVariantForFlag(
       flag,
       flag.variants || [],
@@ -1168,8 +1261,8 @@ function evaluateFlagWithDetails(
   }
   evaluationSteps.push({
     step: 'STRATEGY_COUNT',
-    passed: true,
-    message: `${strategies.length} strategy(s) to evaluate`,
+    passed: contextFailed ? null : true,
+    message: contextFailed ? 'Skipped due to context validation failure' : `${strategies.length} strategy(s) to evaluate`,
   });
 
   // Step 4+: Evaluate each strategy
@@ -1212,7 +1305,7 @@ function evaluateFlagWithDetails(
               type: 'SEGMENT_CONSTRAINT',
               segment: segmentName,
               constraint: constraint,
-              passed: constraintPassed,
+              passed: contextFailed ? null : constraintPassed,
               contextValue: getContextValue(constraint.contextName, context) ?? null,
             });
             if (!constraintPassed) {
@@ -1224,7 +1317,7 @@ function evaluateFlagWithDetails(
           strategyStep.checks.push({
             type: 'SEGMENT',
             name: segmentName,
-            passed: true,
+            passed: contextFailed ? null : true,
             message: 'Segment has no constraints - passed',
           });
         }
@@ -1233,7 +1326,7 @@ function evaluateFlagWithDetails(
       // No segments defined
       strategyStep.checks.push({
         type: 'SEGMENTS_CHECK',
-        passed: true,
+        passed: contextFailed ? null : true,
         message: 'No segments defined - passed',
       });
     }
@@ -1246,7 +1339,7 @@ function evaluateFlagWithDetails(
         strategyStep.checks.push({
           type: 'STRATEGY_CONSTRAINT',
           constraint: constraint,
-          passed: constraintPassed,
+          passed: contextFailed ? null : constraintPassed,
           contextValue: getContextValue(constraint.contextName, context) ?? null,
         });
         if (!constraintPassed) {
@@ -1257,7 +1350,7 @@ function evaluateFlagWithDetails(
       // No constraints defined
       strategyStep.checks.push({
         type: 'CONSTRAINTS_CHECK',
-        passed: true,
+        passed: contextFailed ? null : true,
         message: 'No constraints defined - passed',
       });
     }
@@ -1277,17 +1370,19 @@ function evaluateFlagWithDetails(
       type: 'ROLLOUT',
       rollout: rollout,
       percentage: percentage,
-      passed: rolloutPassed,
+      passed: contextFailed ? null : rolloutPassed,
       message: rollout === 100 ? 'Rollout 100% - all users included' : undefined,
     });
 
     // Determine if strategy matched
     const strategyMatched = segmentsPassed && constraintsPassed && rolloutPassed;
-    strategyStep.passed = strategyMatched;
-    strategyStep.message = strategyMatched ? 'All conditions met' : 'One or more conditions failed';
+    strategyStep.passed = contextFailed ? null : strategyMatched;
+    strategyStep.message = contextFailed
+      ? 'Skipped - context validation failed'
+      : strategyMatched ? 'All conditions met' : 'One or more conditions failed';
     evaluationSteps.push(strategyStep);
 
-    if (strategyMatched) {
+    if (!contextFailed && strategyMatched) {
       const variant = selectVariantForFlag(
         flag,
         flag.variants || [],
@@ -1308,6 +1403,25 @@ function evaluateFlagWithDetails(
         evaluationSteps,
       };
     }
+  }
+
+  // Context validation failed - return after full evaluation
+  if (contextFailed) {
+    return {
+      enabled: false,
+      reason: 'CONTEXT_VALIDATION_FAILED',
+      variant: {
+        name: '$disabled',
+        value: getFallbackValue(
+          flag.environments?.find((e: any) => e.environment === environment)?.disabledValue ??
+          flag.disabledValue,
+          flag.valueType
+        ),
+        valueType: flag.valueType || 'string',
+        valueSource: 'default',
+      },
+      evaluationSteps,
+    };
   }
 
   // No strategy matched

@@ -23,6 +23,7 @@ import {
     Paper,
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
+import { useSnackbar } from 'notistack';
 import { ValidationRules } from '../../services/featureFlagService';
 import FeatureSwitch from '../common/FeatureSwitch';
 
@@ -122,6 +123,7 @@ const ValidationRulesEditor: React.FC<ValidationRulesEditorProps> = ({
     disabled = false,
 }) => {
     const { t } = useTranslation();
+    const { enqueueSnackbar } = useSnackbar();
 
     // Enable toggle: rules object exists and has enabled: true
     const isEnabled = !!rules?.enabled;
@@ -281,7 +283,7 @@ const ValidationRulesEditor: React.FC<ValidationRulesEditorProps> = ({
                                                 if (preset) {
                                                     handleBatchUpdate({
                                                         pattern: preset.pattern,
-                                                        patternDescription: t(preset.labelKey),
+                                                        patternDescription: preset.key,
                                                     });
                                                     setShowCustomPattern(false);
                                                 }
@@ -380,9 +382,57 @@ const ValidationRulesEditor: React.FC<ValidationRulesEditorProps> = ({
                                     freeSolo
                                     options={[]}
                                     value={currentRules.legalValues || []}
-                                    onChange={(_, newValue) =>
-                                        handleChange('legalValues', newValue.length > 0 ? newValue : undefined)
-                                    }
+                                    onChange={(_, newValue) => {
+                                        // Validate new entries against active rules
+                                        const existingValues = currentRules.legalValues || [];
+                                        const addedValues = newValue.filter((v) => !existingValues.includes(v));
+                                        const invalidValues: string[] = [];
+                                        let reason = '';
+
+                                        for (const val of addedValues) {
+                                            if (currentRules.minLength !== undefined && val.length < currentRules.minLength) {
+                                                invalidValues.push(val);
+                                                reason = t('featureFlags.validation.legalValueTooShort', { min: currentRules.minLength });
+                                                continue;
+                                            }
+                                            if (currentRules.maxLength !== undefined && val.length > currentRules.maxLength) {
+                                                invalidValues.push(val);
+                                                reason = t('featureFlags.validation.legalValueTooLong', { max: currentRules.maxLength });
+                                                continue;
+                                            }
+                                            if (currentRules.pattern) {
+                                                try {
+                                                    const regex = new RegExp(currentRules.pattern);
+                                                    if (!regex.test(val)) {
+                                                        invalidValues.push(val);
+                                                        // Show preset name instead of regex
+                                                        const desc = currentRules.patternDescription;
+                                                        const presetKey = desc
+                                                            ? `featureFlags.validation.preset${desc.charAt(0).toUpperCase()}${desc.slice(1)}`
+                                                            : '';
+                                                        const patternName = desc
+                                                            ? t(presetKey, { defaultValue: desc })
+                                                            : t('featureFlags.validation.patternLabel');
+                                                        reason = t('featureFlags.validation.legalValuePatternMismatch', { pattern: patternName });
+                                                        continue;
+                                                    }
+                                                } catch {
+                                                    // Invalid regex, skip validation
+                                                }
+                                            }
+                                        }
+
+                                        if (invalidValues.length > 0) {
+                                            // Show friendly feedback
+                                            enqueueSnackbar(reason, { variant: 'info' });
+                                            // Filter out invalid values
+                                            const validNewValue = newValue.filter((v) => !invalidValues.includes(v));
+                                            handleChange('legalValues', validNewValue.length > 0 ? validNewValue : undefined);
+                                            return;
+                                        }
+
+                                        handleChange('legalValues', newValue.length > 0 ? newValue : undefined);
+                                    }}
                                     disabled={disabled}
                                     renderTags={(value, getTagProps) =>
                                         value.map((option, index) => (

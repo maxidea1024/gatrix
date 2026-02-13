@@ -466,12 +466,12 @@ const FeatureContextFieldsPage: React.FC = () => {
     try {
       if (editingField.id) {
         await api.put(`/admin/features/context-fields/${editingField.fieldName}`, editingField);
-        enqueueSnackbar(t('featureFlags.updateSuccess'), {
+        enqueueSnackbar(t('contextFields.updateSuccess'), {
           variant: 'success',
         });
       } else {
         await api.post('/admin/features/context-fields', editingField);
-        enqueueSnackbar(t('featureFlags.createSuccess'), {
+        enqueueSnackbar(t('contextFields.createSuccess'), {
           variant: 'success',
         });
       }
