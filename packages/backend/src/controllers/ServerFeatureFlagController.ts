@@ -72,7 +72,7 @@ export default class ServerFeatureFlagController {
 
       // Record network traffic (fire-and-forget)
       const appName = (req.headers['x-application-name'] as string) || 'unknown';
-      networkTrafficService.recordTraffic(environment, appName, 'features').catch(() => { });
+      networkTrafficService.recordTraffic(environment, appName, 'features').catch(() => {});
 
       // Get all enabled, non-archived flags for this environment
       const result = await FeatureFlagModel.findAll({
@@ -251,7 +251,7 @@ export default class ServerFeatureFlagController {
       // Record network traffic (fire-and-forget)
       const appName = (req.headers['x-application-name'] as string) || 'unknown';
       const environment = req.params.env || 'global';
-      networkTrafficService.recordTraffic(environment, appName, 'segments').catch(() => { });
+      networkTrafficService.recordTraffic(environment, appName, 'segments').catch(() => {});
 
       const rawSegments = await FeatureSegmentModel.findAll();
 

@@ -335,9 +335,7 @@ router.get(
   asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { repository, branch } = req.query;
 
-    const { FeatureCodeReferenceModel } = await import(
-      '../../models/FeatureCodeReference'
-    );
+    const { FeatureCodeReferenceModel } = await import('../../models/FeatureCodeReference');
 
     const summary = await FeatureCodeReferenceModel.getSummary({
       repository: repository as string,
@@ -877,13 +875,13 @@ function evaluateFlagWithDetails(
         name: '$disabled',
         value: getFallbackValue(
           flag.environments?.find((e: any) => e.environment === environment)?.disabledValue ??
-          flag.disabledValue,
+            flag.disabledValue,
           flag.valueType
         ),
         valueType: flag.valueType || 'string',
         valueSource:
           flag.environments?.find((e: any) => e.environment === environment)?.disabledValue !==
-            undefined
+          undefined
             ? 'environment'
             : flag.disabledValue !== undefined
               ? 'flag'
@@ -1102,7 +1100,7 @@ function evaluateFlagWithDetails(
       valueType: flag.valueType || 'string',
       valueSource:
         flag.environments?.find((e: any) => e.environment === environment)?.disabledValue !==
-          undefined
+        undefined
           ? 'environment'
           : flag.disabledValue !== undefined
             ? 'flag'
@@ -1646,9 +1644,7 @@ router.get(
     const { flagName } = req.params;
     const { repository, branch, limit } = req.query;
 
-    const { FeatureCodeReferenceModel } = await import(
-      '../../models/FeatureCodeReference'
-    );
+    const { FeatureCodeReferenceModel } = await import('../../models/FeatureCodeReference');
 
     const references = await FeatureCodeReferenceModel.findByFlagName(flagName, {
       repository: repository as string,
