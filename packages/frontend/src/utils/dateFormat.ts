@@ -8,6 +8,7 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import 'dayjs/locale/ko';
 import 'dayjs/locale/en';
 import 'dayjs/locale/zh-cn';
+import i18next from 'i18next';
 
 // Enable plugins
 dayjs.extend(utc);
@@ -39,12 +40,12 @@ export const getStoredDateTimeFormat = (): string => {
 export const setStoredTimezone = (tz: string) => {
   try {
     localStorage.setItem('settings.timezone', tz);
-  } catch {}
+  } catch { }
 };
 export const setStoredDateTimeFormat = (fmt: string) => {
   try {
     localStorage.setItem('settings.datetimeFormat', fmt);
-  } catch {}
+  } catch { }
 };
 
 // 내부: 다양한 문자열을 dayjs로 변환 (UTC -> 사용자 timezone)
@@ -267,7 +268,7 @@ export const isYesterday = (date: string | Date | null | undefined): boolean => 
 export const getDateLocale = (currentLang?: string): string => {
   // If no language is provided, try to get it from i18n
   const lang =
-    currentLang || (typeof window !== 'undefined' && (window as any).i18n?.language) || 'ko';
+    currentLang || i18next.language || 'ko';
 
   switch (lang) {
     case 'en':

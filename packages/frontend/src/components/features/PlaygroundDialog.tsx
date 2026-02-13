@@ -74,6 +74,8 @@ import ConstraintDisplay from './ConstraintDisplay';
 import LocalizedDateTimePicker from '../common/LocalizedDateTimePicker';
 import JsonEditor from '../common/JsonEditor';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
+import EmptyPlaceholder from '../common/EmptyPlaceholder';
+import ConfirmDeleteDialog from '../common/ConfirmDeleteDialog';
 
 interface ContextField {
   fieldName: string;
@@ -184,6 +186,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
   const [rememberContext, setRememberContext] = useState<boolean>(() => {
     return localStorage.getItem('gatrix_playground_remember_context') === 'true';
   });
+  const [confirmDeleteAllOpen, setConfirmDeleteAllOpen] = useState(false);
 
   // Evaluation details popover state
   const [evaluationPopoverAnchor, setEvaluationPopoverAnchor] = useState<HTMLElement | null>(null);
@@ -443,43 +446,61 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
 
   // Extract context fields from flag definition (strategies constraints + segment constraints)
   const handleExtractContextFields = async () => {
-    if (!initialFlagDetails) return;
+    // Determine which flags to extract from
+    const flagNames: string[] = [];
+    if (initialFlagDetails?.flagName) {
+      flagNames.push(initialFlagDetails.flagName);
+    } else if (selectedFlags.length > 0) {
+      flagNames.push(...selectedFlags);
+    } else {
+      // No flags selected = all flags
+      flagNames.push(...availableFlags.map((f) => f.flagName));
+    }
+
+    if (flagNames.length === 0) {
+      enqueueSnackbar(t('playground.noContextFieldsFound'), { variant: 'info' });
+      return;
+    }
 
     const extractedFieldNames = new Set<string>();
     const segmentNames = new Set<string>();
 
-    // Collect strategies from all environments via API
-    const flagName = initialFlagDetails.flagName;
-    const envsToCheck = environments.length > 0 ? environments : [];
+    // Determine which environments to check (selected or all)
+    const envsToCheck =
+      selectedEnvironments.length > 0
+        ? environments.filter((e) => selectedEnvironments.includes(e.environment))
+        : environments;
 
-    if (envsToCheck.length > 0 && flagName) {
-      // Fetch flag data for each environment to get all strategies
-      for (const env of envsToCheck) {
-        try {
-          const response = await api.get(`/admin/features/${flagName}`, {
-            headers: { 'x-environment': env.environment },
-          });
-          const data = response.data?.flag || response.data;
-          const strategies = data.strategies || [];
-          for (const strategy of strategies) {
-            if (strategy.constraints) {
-              for (const constraint of strategy.constraints) {
-                if (constraint.contextName) {
-                  extractedFieldNames.add(constraint.contextName);
+    if (envsToCheck.length > 0) {
+      // Fetch flag data for each flag and environment to get all strategies
+      for (const flagName of flagNames) {
+        for (const env of envsToCheck) {
+          try {
+            const response = await api.get(`/admin/features/${flagName}`, {
+              headers: { 'x-environment': env.environment },
+            });
+            const data = response.data?.flag || response.data;
+            const strategies = data.strategies || [];
+            for (const strategy of strategies) {
+              if (strategy.constraints) {
+                for (const constraint of strategy.constraints) {
+                  if (constraint.contextName) {
+                    extractedFieldNames.add(constraint.contextName);
+                  }
+                }
+              }
+              if (strategy.segments) {
+                for (const segName of strategy.segments) {
+                  segmentNames.add(segName);
                 }
               }
             }
-            if (strategy.segments) {
-              for (const segName of strategy.segments) {
-                segmentNames.add(segName);
-              }
-            }
+          } catch {
+            // Skip environments that fail
           }
-        } catch {
-          // Skip environments that fail
         }
       }
-    } else {
+    } else if (initialFlagDetails) {
       // Fallback: use the strategies from initialFlagDetails
       const allStrategies = initialFlagDetails.strategies || [];
       for (const strategy of allStrategies) {
@@ -802,45 +823,29 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
         </Box>
 
         {contextEntries.length === 0 ? (
-          <Box
-            sx={{
-              p: 3,
-              border: '1px dashed',
-              borderColor: 'divider',
-              borderRadius: 1,
-              bgcolor: 'action.hover',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              gap: 1.5,
-              mb: 2,
-            }}
-          >
-            <Typography variant="body2" color="text.secondary" textAlign="center">
-              {t('playground.noContextProvidedDescription')}
-            </Typography>
-            <Box sx={{ display: 'flex', gap: 1 }}>
-              <Button
-                variant="outlined"
-                size="small"
-                startIcon={<AddIcon />}
-                onClick={handleAddContextEntry}
-                sx={{ borderRadius: '8px' }}
-              >
-                {t('playground.addContextField')}
-              </Button>
-              {initialFlagDetails && (
+          <Box sx={{ mb: 2 }}>
+            <EmptyPlaceholder
+              message={t('playground.noContextProvidedDescription')}
+            >
+              <Box sx={{ display: 'flex', gap: 1, mt: 1.5, justifyContent: 'center' }}>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  startIcon={<AddIcon />}
+                  onClick={handleAddContextEntry}
+                >
+                  {t('playground.addContextField')}
+                </Button>
                 <Button
                   variant="outlined"
                   size="small"
                   startIcon={<ExtractIcon />}
                   onClick={handleExtractContextFields}
-                  sx={{ borderRadius: '8px' }}
                 >
                   {t('playground.extractFromFlag')}
                 </Button>
-              )}
-            </Box>
+              </Box>
+            </EmptyPlaceholder>
           </Box>
         ) : (
           <>
@@ -1123,15 +1128,34 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
               })}
             </Paper>
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, mb: 2 }}>
-              {initialFlagDetails && (
-                <Button
-                  size="small"
-                  startIcon={<ExtractIcon />}
-                  onClick={handleExtractContextFields}
-                >
-                  {t('playground.extractFromFlag')}
-                </Button>
-              )}
+              <Button
+                size="small"
+                startIcon={<DeleteIcon />}
+                onClick={() => setConfirmDeleteAllOpen(true)}
+                color="error"
+              >
+                {t('common.deleteAll')}
+              </Button>
+              <ConfirmDeleteDialog
+                open={confirmDeleteAllOpen}
+                onClose={() => setConfirmDeleteAllOpen(false)}
+                onConfirm={() => {
+                  setContextEntries([]);
+                  if (rememberContext) {
+                    localStorage.setItem('gatrix_playground_saved_context', JSON.stringify([]));
+                  }
+                  setConfirmDeleteAllOpen(false);
+                }}
+                title={t('common.deleteAll')}
+                message={t('playground.confirmDeleteAllContext')}
+              />
+              <Button
+                size="small"
+                startIcon={<ExtractIcon />}
+                onClick={handleExtractContextFields}
+              >
+                {t('playground.extractFromFlag')}
+              </Button>
               <Button size="small" startIcon={<AddIcon />} onClick={handleAddContextEntry}>
                 {t('common.add')}
               </Button>

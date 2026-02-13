@@ -2239,7 +2239,6 @@ const FeatureFlagsPage: React.FC = () => {
                                 <React.Fragment key={col.id}>
                                   {environments.map((env, envIndex) => {
                                     const isEnabled = getEnvEnabled(flag, env.environment);
-                                    const tooltipText = `${t('featureFlags.toggleTooltip', { env: env.displayName })}\n${isEnabled ? t('featureFlags.toggleTooltipEnabled') : t('featureFlags.toggleTooltipDisabled')}`;
                                     return (
                                       <TableCell
                                         key={env.environment}
@@ -2261,39 +2260,20 @@ const FeatureFlagsPage: React.FC = () => {
                                             justifyContent: 'center',
                                           }}
                                         >
-                                          <Tooltip
-                                            title={
-                                              <span
-                                                style={{
-                                                  whiteSpace: 'pre-line',
-                                                }}
-                                              >
-                                                {tooltipText}
-                                              </span>
-                                            }
-                                            arrow
-                                            placement="top"
-                                            disableFocusListener
-                                            enterDelay={500}
-                                            leaveDelay={0}
-                                          >
-                                            <span>
-                                              <FeatureSwitch
-                                                key={`${flag.flagName}-${env.environment}-${isEnabled}`}
-                                                size="small"
-                                                checked={isEnabled}
-                                                onChange={() => {
-                                                  handleToggle(flag, env.environment, isEnabled);
-                                                }}
-                                                disabled={flag.isArchived || !canManage}
-                                                onClick={(e) => {
-                                                  e.stopPropagation();
-                                                }}
-                                                color={env.color}
-                                                label={env.displayName}
-                                              />
-                                            </span>
-                                          </Tooltip>
+                                          <FeatureSwitch
+                                            key={`${flag.flagName}-${env.environment}-${isEnabled}`}
+                                            size="small"
+                                            checked={isEnabled}
+                                            onChange={() => {
+                                              handleToggle(flag, env.environment, isEnabled);
+                                            }}
+                                            disabled={flag.isArchived || !canManage}
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                            }}
+                                            color={env.color}
+                                            label={env.displayName}
+                                          />
                                         </Box>
                                       </TableCell>
                                     );
