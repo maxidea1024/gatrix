@@ -200,6 +200,103 @@ export async function removeTransitionCondition(milestoneId: string): Promise<Re
     return response.data;
 }
 
+// ==================== Safeguards ====================
+
+export interface Safeguard {
+    id: string;
+    flowId: string;
+    milestoneId: string;
+    metricName: string;
+    aggregationMode: string;
+    operator: string;
+    threshold: number;
+    timeRange: string;
+    action: string;
+    isTriggered: boolean;
+    triggeredAt: string | null;
+    createdAt: string;
+    updatedAt: string;
+}
+
+export interface CreateSafeguardInput {
+    flowId: string;
+    milestoneId: string;
+    metricName: string;
+    aggregationMode?: string;
+    operator?: string;
+    threshold: number;
+    timeRange?: string;
+    action?: string;
+}
+
+export interface UpdateSafeguardInput {
+    metricName?: string;
+    aggregationMode?: string;
+    operator?: string;
+    threshold?: number;
+    timeRange?: string;
+    action?: string;
+}
+
+export interface SafeguardEvaluationResult {
+    safeguardId: string;
+    metricName: string;
+    currentValue: number | null;
+    threshold: number;
+    operator: string;
+    triggered: boolean;
+    error?: string;
+}
+
+/**
+ * List safeguards for a milestone
+ */
+export async function listSafeguards(milestoneId: string): Promise<Safeguard[]> {
+    const response = await api.get(`/admin/release-flows/milestones/${milestoneId}/safeguards`);
+    return response.data || [];
+}
+
+/**
+ * Create a safeguard
+ */
+export async function createSafeguard(data: CreateSafeguardInput): Promise<Safeguard> {
+    const response = await api.post('/admin/release-flows/safeguards', data);
+    return response.data;
+}
+
+/**
+ * Update a safeguard
+ */
+export async function updateSafeguard(safeguardId: string, data: UpdateSafeguardInput): Promise<Safeguard> {
+    const response = await api.put(`/admin/release-flows/safeguards/${safeguardId}`, data);
+    return response.data;
+}
+
+/**
+ * Delete a safeguard
+ */
+export async function deleteSafeguard(safeguardId: string): Promise<void> {
+    await api.delete(`/admin/release-flows/safeguards/${safeguardId}`);
+}
+
+/**
+ * Evaluate safeguards for a milestone
+ */
+export async function evaluateSafeguards(milestoneId: string): Promise<{
+    results: SafeguardEvaluationResult[];
+    anyTriggered: boolean;
+}> {
+    const response = await api.post(`/admin/release-flows/milestones/${milestoneId}/safeguards/evaluate`);
+    return response.data;
+}
+
+/**
+ * Reset a triggered safeguard
+ */
+export async function resetSafeguard(safeguardId: string): Promise<void> {
+    await api.post(`/admin/release-flows/safeguards/${safeguardId}/reset`);
+}
+
 const releaseFlowService = {
     getTemplates,
     getTemplate,
@@ -215,6 +312,13 @@ const releaseFlowService = {
     progressToNext,
     setTransitionCondition,
     removeTransitionCondition,
+    listSafeguards,
+    createSafeguard,
+    updateSafeguard,
+    deleteSafeguard,
+    evaluateSafeguards,
+    resetSafeguard,
 };
 
 export default releaseFlowService;
+
