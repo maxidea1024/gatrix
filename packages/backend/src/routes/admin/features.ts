@@ -1440,6 +1440,24 @@ function evaluateConstraint(constraint: any, context: Record<string, any>): bool
     return constraint.inverted ? true : false;
   }
 
+  // Array operators - handled before string conversion (matching shared evaluator)
+  if (constraint.operator === 'arr_any' || constraint.operator === 'arr_all') {
+    const arr = Array.isArray(contextValue) ? contextValue.map(String) : [];
+    const targetValues =
+      constraint.values?.map((v: string) => (constraint.caseInsensitive ? v.toLowerCase() : v)) || [];
+    const compareArr = constraint.caseInsensitive ? arr.map((v: string) => v.toLowerCase()) : arr;
+
+    let result = false;
+    if (constraint.operator === 'arr_any') {
+      // At least one target value is in the array
+      result = targetValues.some((tv: string) => compareArr.includes(tv));
+    } else {
+      // All target values are in the array
+      result = targetValues.length > 0 && targetValues.every((tv: string) => compareArr.includes(tv));
+    }
+    return constraint.inverted ? !result : result;
+  }
+
   const stringValue = String(contextValue);
   const compareValue = constraint.caseInsensitive ? stringValue.toLowerCase() : stringValue;
   const targetValue = constraint.value
@@ -1517,22 +1535,49 @@ function evaluateConstraint(constraint: any, context: Record<string, any>): bool
     case 'date_lte':
       result = new Date(stringValue) <= new Date(targetValue);
       break;
-    // Array operators
-    case 'arr_any':
-      result =
-        Array.isArray(contextValue) &&
-        contextValue.some((v: any) => targetValues.includes(String(v)));
+    // Semver operators
+    case 'semver_eq':
+      result = compareSemver(stringValue, targetValue) === 0;
       break;
-    case 'arr_all':
-      result =
-        Array.isArray(contextValue) &&
-        targetValues.every((tv: string) => contextValue.map(String).includes(tv));
+    case 'semver_gt':
+      result = compareSemver(stringValue, targetValue) > 0;
+      break;
+    case 'semver_gte':
+      result = compareSemver(stringValue, targetValue) >= 0;
+      break;
+    case 'semver_lt':
+      result = compareSemver(stringValue, targetValue) < 0;
+      break;
+    case 'semver_lte':
+      result = compareSemver(stringValue, targetValue) <= 0;
+      break;
+    case 'semver_in':
+      result = targetValues.some((v: string) => compareSemver(stringValue, v) === 0);
       break;
     default:
       result = false;
   }
 
   return constraint.inverted ? !result : result;
+}
+
+function compareSemver(a: string, b: string): number {
+  const parseVersion = (v: string): number[] => {
+    const cleaned = v.replace(/^v/, '');
+    return cleaned.split('.').map((n) => parseInt(n, 10) || 0);
+  };
+
+  const aParts = parseVersion(a);
+  const bParts = parseVersion(b);
+  const maxLen = Math.max(aParts.length, bParts.length);
+
+  for (let i = 0; i < maxLen; i++) {
+    const aVal = aParts[i] || 0;
+    const bVal = bParts[i] || 0;
+    if (aVal < bVal) return -1;
+    if (aVal > bVal) return 1;
+  }
+  return 0;
 }
 
 function getContextValue(name: string, context: Record<string, any>): any {
