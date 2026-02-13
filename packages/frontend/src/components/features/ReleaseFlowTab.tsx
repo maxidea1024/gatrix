@@ -193,7 +193,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                                     orientation="vertical"
                                 >
                                     {milestones.map((milestone, index) => (
-                                        <Step key={milestone.id}>
+                                        <Step key={milestone.id} expanded>
                                             <StepLabel
                                                 optional={
                                                     milestone.startedAt && (
