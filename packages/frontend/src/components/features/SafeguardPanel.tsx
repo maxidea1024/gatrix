@@ -28,6 +28,7 @@ import {
     InputLabel,
     Tooltip,
     CircularProgress,
+    Autocomplete,
 } from '@mui/material';
 import {
     Add as AddIcon,
@@ -48,11 +49,13 @@ import {
     deleteSafeguard,
     evaluateSafeguards,
     resetSafeguard,
+    getAvailableMetrics,
 } from '../../services/releaseFlowService';
 import type {
     Safeguard,
     CreateSafeguardInput,
     UpdateSafeguardInput,
+    AvailableMetric,
 } from '../../services/releaseFlowService';
 import ConfirmDialog from '../common/ConfirmDialog';
 import EmptyPlaceholder from '../common/EmptyPlaceholder';
@@ -78,6 +81,10 @@ const SafeguardPanel: React.FC<SafeguardPanelProps> = ({ flowId, milestoneId, ca
     const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
     const [selectedSafeguard, setSelectedSafeguard] = useState<Safeguard | null>(null);
 
+    // Available metrics for autocomplete
+    const [availableMetrics, setAvailableMetrics] = useState<AvailableMetric[]>([]);
+    const [metricsLoading, setMetricsLoading] = useState(false);
+
     // Form state
     const [metricName, setMetricName] = useState('');
     const [aggregationMode, setAggregationMode] = useState('count');
@@ -101,6 +108,19 @@ const SafeguardPanel: React.FC<SafeguardPanelProps> = ({ flowId, milestoneId, ca
         fetchSafeguards();
     }, [fetchSafeguards]);
 
+    // Fetch available metrics when dialog opens
+    const fetchAvailableMetrics = useCallback(async () => {
+        setMetricsLoading(true);
+        try {
+            const metrics = await getAvailableMetrics();
+            setAvailableMetrics(metrics);
+        } catch {
+            // Silent - user can still type manually
+        } finally {
+            setMetricsLoading(false);
+        }
+    }, []);
+
     const resetForm = () => {
         setMetricName('');
         setAggregationMode('count');
@@ -113,6 +133,7 @@ const SafeguardPanel: React.FC<SafeguardPanelProps> = ({ flowId, milestoneId, ca
     const handleOpenCreate = () => {
         resetForm();
         setDialogOpen(true);
+        fetchAvailableMetrics();
     };
 
     const handleOpenEdit = (safeguard: Safeguard) => {
@@ -123,6 +144,7 @@ const SafeguardPanel: React.FC<SafeguardPanelProps> = ({ flowId, milestoneId, ca
         setThreshold(safeguard.threshold);
         setTimeRange(safeguard.timeRange);
         setDialogOpen(true);
+        fetchAvailableMetrics();
     };
 
     const handleSave = async () => {
@@ -349,13 +371,37 @@ const SafeguardPanel: React.FC<SafeguardPanelProps> = ({ flowId, milestoneId, ca
                 </DialogTitle>
                 <DialogContent>
                     <Stack spacing={2} sx={{ mt: 1 }}>
-                        <TextField
-                            label={t('releaseFlow.safeguard.metricName')}
-                            placeholder={t('releaseFlow.safeguard.metricNamePlaceholder')}
+                        <Autocomplete
+                            freeSolo
+                            options={availableMetrics.map((m) => m.name)}
+                            loading={metricsLoading}
                             value={metricName}
-                            onChange={(e) => setMetricName(e.target.value)}
-                            fullWidth
-                            size="small"
+                            onInputChange={(_e, value) => setMetricName(value)}
+                            renderInput={(params) => (
+                                <TextField
+                                    {...params}
+                                    label={t('releaseFlow.safeguard.metricName')}
+                                    placeholder={t('releaseFlow.safeguard.metricNamePlaceholder')}
+                                    size="small"
+                                />
+                            )}
+                            renderOption={(props, option) => {
+                                const metric = availableMetrics.find((m) => m.name === option);
+                                return (
+                                    <li {...props} key={option}>
+                                        <Box>
+                                            <Typography variant="body2" fontFamily="monospace" fontSize="0.8rem">
+                                                {option}
+                                            </Typography>
+                                            {metric?.help && (
+                                                <Typography variant="caption" color="text.secondary">
+                                                    {metric.help} ({metric.type})
+                                                </Typography>
+                                            )}
+                                        </Box>
+                                    </li>
+                                );
+                            }}
                         />
                         <Stack direction="row" spacing={2}>
                             <FormControl size="small" sx={{ minWidth: 140 }}>

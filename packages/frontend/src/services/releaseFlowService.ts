@@ -297,6 +297,22 @@ export async function resetSafeguard(safeguardId: string): Promise<void> {
     await api.post(`/admin/release-flows/safeguards/${safeguardId}/reset`);
 }
 
+// ==================== Impact Metrics ====================
+
+export interface AvailableMetric {
+    name: string;
+    help: string;
+    type: string;
+}
+
+/**
+ * Get available impact metrics for autocomplete
+ */
+export async function getAvailableMetrics(): Promise<AvailableMetric[]> {
+    const response = await api.get('/admin/impact-metrics/available');
+    return response.data || [];
+}
+
 const releaseFlowService = {
     getTemplates,
     getTemplate,
@@ -318,6 +334,7 @@ const releaseFlowService = {
     deleteSafeguard,
     evaluateSafeguards,
     resetSafeguard,
+    getAvailableMetrics,
 };
 
 export default releaseFlowService;
