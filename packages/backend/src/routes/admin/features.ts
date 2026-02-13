@@ -767,14 +767,21 @@ router.post(
         if (fieldDef) {
           const expectedType = fieldDef.fieldType;
           const rules = fieldDef.validationRules as ValidationRules | undefined;
-          const isValidationEnabled = rules?.enabled !== false;
 
-          // Skip validation if disabled
-          if (!isValidationEnabled) {
-            continue;
+          // isRequired is always enforced regardless of validation enabled/disabled
+          const isEmpty = value === undefined || value === null || value === '';
+          if (isEmpty && rules?.isRequired === true) {
+            contextWarnings.push({
+              field: key,
+              type: 'EMPTY_VALUE',
+              message: `Value is missing or empty, but this field is required.`,
+              data: { value },
+              severity: 'error'
+            });
+            continue; // Skip further validation for empty required fields
           }
 
-          // Check for whitespace issues in string values if not explicitly disabled
+          // Trim whitespace check - always enforced regardless of validation enabled/disabled
           if (typeof value === 'string' && rules?.trimWhitespace !== 'none') {
             if (value !== value.trim()) {
               const hasLeading = value !== value.trimStart();
@@ -800,19 +807,14 @@ router.post(
             }
           }
 
-          // Handle empty values
-          const isEmpty = value === undefined || value === null || value === '';
-          if (isEmpty) {
-            const isRequired = rules?.isRequired === true;
-            if (isRequired) {
-              contextWarnings.push({
-                field: key,
-                type: 'EMPTY_VALUE',
-                message: `Value is missing or empty, but this field is required.`,
-                data: { value },
-                severity: 'error'
-              });
-            }
+          // Skip remaining detailed validation if disabled
+          const isValidationEnabled = rules?.enabled !== false;
+          if (!isValidationEnabled) {
+            continue;
+          }
+
+          // Handle empty values (non-required fields with empty values skip detailed validation)
+          if (value === undefined || value === null || value === '') {
             continue; // Skip further validation for empty values
           }
 
@@ -895,7 +897,9 @@ router.post(
 
           // Collect from strategies
           const strategies = (flag as any).strategies || [];
+          console.log(`[PLAYGROUND_SCAN] flag=${flagSummary.flagName} strategies=${strategies.length} keys=${Object.keys(flag).join(',')}`);
           for (const strategy of strategies) {
+            console.log(`[PLAYGROUND_SCAN]   strategy constraints=${(strategy.constraints || []).length} segments=${(strategy.segments || []).length}`);
             collectConstraintFields(strategy.constraints || []);
 
             // Collect from segments referenced by this strategy
@@ -908,23 +912,38 @@ router.post(
             }
           }
         }
-      } catch (_) {
-        // Silently ignore scan errors
+
+        console.log(`[PLAYGROUND_SCAN] referencedFields:`, Array.from(referencedFields));
+      } catch (err: any) {
+        console.error(`[PLAYGROUND_SCAN] Error during scan:`, err.message, err.stack);
       }
     }
 
     // Check referenced fields that are missing from context
+    console.log(`[PLAYGROUND_SCAN] contextKeys:`, Array.from(contextKeys), `referencedFields:`, Array.from(referencedFields), `fieldDefMap.size:`, fieldDefMap.size);
     if (referencedFields.size > 0 && fieldDefMap) {
       for (const fieldName of referencedFields) {
-        if (contextKeys.has(fieldName)) continue; // Already provided
+        if (contextKeys.has(fieldName)) {
+          console.log(`[PLAYGROUND_SCAN]   ${fieldName}: already provided, skip`);
+          continue;
+        }
 
         const fieldDef = fieldDefMap.get(fieldName);
-        if (!fieldDef) continue;
+        if (!fieldDef) {
+          console.log(`[PLAYGROUND_SCAN]   ${fieldName}: no field definition found, skip`);
+          continue;
+        }
 
         const rules = fieldDef.validationRules as ValidationRules | undefined;
-        if (!rules || rules.enabled === false) continue;
+        console.log(`[PLAYGROUND_SCAN]   ${fieldName}: rules=`, JSON.stringify(rules));
+        if (!rules) continue;
+
+        // isRequired is checked independently of enabled flag
+        // enabled controls detailed validation (pattern, length, etc.)
+        // isRequired is always enforced
 
         if (rules.isRequired === true) {
+          console.log(`[PLAYGROUND_SCAN]   ${fieldName}: MISSING_REQUIRED! Adding error.`);
           contextWarnings.push({
             field: fieldName,
             type: 'MISSING_REQUIRED',
@@ -935,6 +954,7 @@ router.post(
         }
       }
     }
+    console.log(`[PLAYGROUND_SCAN] contextWarnings after scan:`, contextWarnings.length, contextWarnings.map(w => `${w.field}:${w.type}:${w.severity}`));
 
 
 
