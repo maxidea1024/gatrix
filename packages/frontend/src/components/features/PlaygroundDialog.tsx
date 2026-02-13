@@ -2455,6 +2455,41 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                     {getLocalizedStepMessage(step, envDisplayName)}
                                   </Typography>
 
+                                  {/* Show detailed errors for context validation failure */}
+                                  {step.step === 'CONTEXT_VALIDATION' && !step.passed && step.details?.errors && (
+                                    <Box sx={{ mt: 1, pl: 1 }}>
+                                      {step.details.errors.map((err: any, errIdx: number) => (
+                                        <Box
+                                          key={errIdx}
+                                          sx={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: 0.5,
+                                            py: 0.25,
+                                          }}
+                                        >
+                                          <Typography
+                                            variant="caption"
+                                            sx={{ color: 'error.main', fontFamily: 'monospace' }}
+                                          >
+                                            • <strong>{err.field}</strong>:{' '}
+                                            {err.type === 'MISSING_REQUIRED'
+                                              ? t('playground.contextErrors.missingRequired')
+                                              : err.type === 'EMPTY_VALUE'
+                                                ? t('playground.contextErrors.emptyValue')
+                                                : err.type === 'TYPE_MISMATCH'
+                                                  ? t('playground.contextErrors.typeMismatch', { expected: err.data?.expectedType, actual: err.data?.actualType })
+                                                  : err.type === 'INVALID_VALUE'
+                                                    ? t('playground.contextErrors.invalidValue')
+                                                    : err.type === 'WHITESPACE'
+                                                      ? t('playground.contextErrors.whitespace')
+                                                      : err.message}
+                                          </Typography>
+                                        </Box>
+                                      ))}
+                                    </Box>
+                                  )}
+
                                   {/* Show detailed checks for strategy evaluation */}
                                   {isStrategy && step.checks && step.checks.length > 0 && (
                                     <Box sx={{ mt: 1.5, pl: 1 }}>

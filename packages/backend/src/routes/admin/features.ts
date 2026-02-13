@@ -897,9 +897,7 @@ router.post(
 
           // Collect from strategies
           const strategies = (flag as any).strategies || [];
-          console.log(`[PLAYGROUND_SCAN] flag=${flagSummary.flagName} strategies=${strategies.length} keys=${Object.keys(flag).join(',')}`);
           for (const strategy of strategies) {
-            console.log(`[PLAYGROUND_SCAN]   strategy constraints=${(strategy.constraints || []).length} segments=${(strategy.segments || []).length}`);
             collectConstraintFields(strategy.constraints || []);
 
             // Collect from segments referenced by this strategy
@@ -913,29 +911,20 @@ router.post(
           }
         }
 
-        console.log(`[PLAYGROUND_SCAN] referencedFields:`, Array.from(referencedFields));
-      } catch (err: any) {
-        console.error(`[PLAYGROUND_SCAN] Error during scan:`, err.message, err.stack);
+      } catch (_) {
+        // Silently ignore scan errors
       }
     }
 
     // Check referenced fields that are missing from context
-    console.log(`[PLAYGROUND_SCAN] contextKeys:`, Array.from(contextKeys), `referencedFields:`, Array.from(referencedFields), `fieldDefMap.size:`, fieldDefMap.size);
     if (referencedFields.size > 0 && fieldDefMap) {
       for (const fieldName of referencedFields) {
-        if (contextKeys.has(fieldName)) {
-          console.log(`[PLAYGROUND_SCAN]   ${fieldName}: already provided, skip`);
-          continue;
-        }
+        if (contextKeys.has(fieldName)) continue;
 
         const fieldDef = fieldDefMap.get(fieldName);
-        if (!fieldDef) {
-          console.log(`[PLAYGROUND_SCAN]   ${fieldName}: no field definition found, skip`);
-          continue;
-        }
+        if (!fieldDef) continue;
 
         const rules = fieldDef.validationRules as ValidationRules | undefined;
-        console.log(`[PLAYGROUND_SCAN]   ${fieldName}: rules=`, JSON.stringify(rules));
         if (!rules) continue;
 
         // isRequired is checked independently of enabled flag
@@ -943,7 +932,6 @@ router.post(
         // isRequired is always enforced
 
         if (rules.isRequired === true) {
-          console.log(`[PLAYGROUND_SCAN]   ${fieldName}: MISSING_REQUIRED! Adding error.`);
           contextWarnings.push({
             field: fieldName,
             type: 'MISSING_REQUIRED',
@@ -954,7 +942,6 @@ router.post(
         }
       }
     }
-    console.log(`[PLAYGROUND_SCAN] contextWarnings after scan:`, contextWarnings.length, contextWarnings.map(w => `${w.field}:${w.type}:${w.severity}`));
 
 
 
@@ -1081,16 +1068,20 @@ function evaluateFlagWithDetails(
   const evaluationSteps: any[] = [];
 
   // Step 1: Context Validation
-  if (contextWarnings && contextWarnings.some((w) => w.severity === 'error')) {
-    const errorMessages = contextWarnings
-      .filter((w) => w.severity === 'error')
-      .map((w) => `${w.field}: ${w.message}`);
-
+  const errorWarnings = contextWarnings?.filter((w) => w.severity === 'error') || [];
+  if (errorWarnings.length > 0) {
     evaluationSteps.push({
       step: 'CONTEXT_VALIDATION',
       passed: false,
       message: 'Context validation failed',
-      details: { errors: errorMessages },
+      details: {
+        errors: errorWarnings.map((w) => ({
+          field: w.field,
+          type: w.type,
+          message: w.message,
+          data: w.data,
+        })),
+      },
     });
 
     return {
