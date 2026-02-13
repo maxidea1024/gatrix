@@ -55,6 +55,7 @@ import type {
     UpdateSafeguardInput,
 } from '../../services/releaseFlowService';
 import ConfirmDialog from '../common/ConfirmDialog';
+import EmptyPlaceholder from '../common/EmptyPlaceholder';
 
 
 interface SafeguardPanelProps {
@@ -257,24 +258,12 @@ const SafeguardPanel: React.FC<SafeguardPanelProps> = ({ flowId, milestoneId, ca
 
             {/* Empty state */}
             {safeguards.length === 0 && (
-                <Box
-                    sx={{
-                        textAlign: 'center',
-                        py: 4,
-                        px: 2,
-                        border: '1px dashed',
-                        borderColor: 'divider',
-                        borderRadius: 1,
-                    }}
-                >
-                    <ShieldIcon sx={{ fontSize: 40, color: 'text.disabled', mb: 1 }} />
-                    <Typography variant="body2" color="text.secondary">
-                        {t('releaseFlow.safeguard.noSafeguards')}
-                    </Typography>
-                    <Typography variant="caption" color="text.disabled">
-                        {t('releaseFlow.safeguard.noSafeguardsDesc')}
-                    </Typography>
-                </Box>
+                <EmptyPlaceholder
+                    message={t('releaseFlow.safeguard.noSafeguards')}
+                    description={t('releaseFlow.safeguard.noSafeguardsDesc')}
+                    onAddClick={canManage ? handleOpenCreate : undefined}
+                    addButtonLabel={t('releaseFlow.safeguard.addSafeguard')}
+                />
             )}
 
             {/* Safeguards table */}
