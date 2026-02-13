@@ -14,7 +14,7 @@ export type FlagStatus = 'enabled' | 'disabled' | 'archived';
 export interface ValidationRules {
   enabled?: boolean;
   // Common
-  allowEmpty?: boolean;
+  isRequired?: boolean;
   description?: string;
 
   // String type

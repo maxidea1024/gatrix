@@ -87,7 +87,7 @@ interface ContextField {
   validationRules?: {
     enabled?: boolean;
     legalValues?: string[];
-    allowEmpty?: boolean;
+    isRequired?: boolean;
     trimWhitespace?: string;
     pattern?: string;
     patternDescription?: string;
@@ -1119,8 +1119,8 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                   <Typography variant="body2" fontWeight={500}>
                                     {field.displayName || field.fieldName}
                                   </Typography>
-                                  {/* Optional/nullable indicator */}
-                                  {field.validationRules?.allowEmpty === true && (
+                                  {/* Required indicator */}
+                                  {field.validationRules?.isRequired === true && (
                                     <Tooltip title={t('playground.optionalField')} disableFocusListener>
                                       <Typography
                                         component="span"

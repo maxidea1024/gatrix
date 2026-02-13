@@ -24,20 +24,16 @@ export function validateFlagValue(
     let transformedValue = value;
 
     // Check if value is not provided (null/undefined)
-    // allowEmpty means "nullable/optional" for context fields
+    // isRequired means the field must have a value
     const isNotProvided = value === null || value === undefined;
 
     if (isNotProvided) {
-        if (rules && rules.allowEmpty === false) {
+        if (rules && rules.isRequired === true) {
             // Context field is required but value not provided
             errors.push('EMPTY_NOT_ALLOWED');
             return { valid: false, errors, transformedValue };
         }
-        if (rules && rules.allowEmpty === true) {
-            // Context field is optional, value not provided - OK
-            return { valid: true, errors, transformedValue };
-        }
-        // No allowEmpty rule or no rules at all = valid
+        // Field is not required or no rules - value not provided is OK
         return { valid: true, errors, transformedValue };
     }
 

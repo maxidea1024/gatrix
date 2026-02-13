@@ -16,7 +16,7 @@ export type ValueType = 'string' | 'number' | 'boolean' | 'json';
 export interface ValidationRules {
   enabled?: boolean;
   // Common
-  allowEmpty?: boolean;
+  isRequired?: boolean;
   description?: string;
 
   // String type

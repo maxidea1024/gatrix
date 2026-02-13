@@ -26,10 +26,10 @@ export function useValueValidation(
 
             if (!rules) return errors;
 
-            // Check allowEmpty
+            // Check isRequired
             const isEmpty = value === null || value === undefined || value === '';
             if (isEmpty) {
-                if (rules.allowEmpty === false) {
+                if (rules.isRequired === true) {
                     errors.push(t('featureFlags.validation.valueCannotBeEmpty'));
                 }
                 return errors;

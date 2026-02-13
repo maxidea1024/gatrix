@@ -803,8 +803,8 @@ router.post(
           // Handle empty values
           const isEmpty = value === undefined || value === null || value === '';
           if (isEmpty) {
-            const allowEmpty = rules?.allowEmpty !== false;
-            if (!allowEmpty) {
+            const isRequired = rules?.isRequired === true;
+            if (isRequired) {
               contextWarnings.push({
                 field: key,
                 type: 'EMPTY_VALUE',
@@ -924,11 +924,11 @@ router.post(
         const rules = fieldDef.validationRules as ValidationRules | undefined;
         if (!rules || rules.enabled === false) continue;
 
-        if (rules.allowEmpty === false) {
+        if (rules.isRequired === true) {
           contextWarnings.push({
             field: fieldName,
             type: 'MISSING_REQUIRED',
-            message: `Field "${fieldName}" is used in flag strategies/segments but was not provided in context, and this field does not allow empty values.`,
+            message: `Field "${fieldName}" is used in flag strategies/segments but was not provided in context, and this field is required.`,
             data: { fieldName },
             severity: 'error',
           });

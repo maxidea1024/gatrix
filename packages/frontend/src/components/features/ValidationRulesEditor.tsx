@@ -195,7 +195,7 @@ const ValidationRulesEditor: React.FC<ValidationRulesEditorProps> = ({
         return PATTERN_PRESETS.find((p) => p.pattern === currentRules.pattern) || null;
     }, [currentRules.pattern]);
 
-    // Boolean type doesn't need detailed validation rules as common rules (allowEmpty) are moved out
+    // Boolean type doesn't need detailed validation rules as common rules (isRequired) are moved out
     if (valueType === 'boolean') return null;
 
     return (

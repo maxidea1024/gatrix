@@ -1224,17 +1224,17 @@ const FeatureContextFieldsPage: React.FC = () => {
             {/* Common field settings: Allow Empty + Trim Whitespace */}
             {editingField?.fieldType && (
               <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
-                {/* Allow Empty */}
+                {/* Required Field */}
                 <FormControlLabel
                   control={
                     <Checkbox
-                      checked={editingField.validationRules?.allowEmpty !== false}
+                      checked={editingField.validationRules?.isRequired === true}
                       onChange={(e) =>
                         setEditingField((prev) => ({
                           ...prev,
                           validationRules: {
                             ...prev.validationRules,
-                            allowEmpty: e.target.checked ? undefined : false,
+                            isRequired: e.target.checked || undefined,
                           },
                         }))
                       }
@@ -1242,7 +1242,7 @@ const FeatureContextFieldsPage: React.FC = () => {
                     />
                   }
                   label={
-                    <Typography variant="body2">{t('featureFlags.validation.allowEmpty')}</Typography>
+                    <Typography variant="body2">{t('featureFlags.validation.isRequired')}</Typography>
                   }
                   sx={{ flexShrink: 0 }}
                 />
