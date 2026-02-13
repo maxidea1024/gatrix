@@ -1831,7 +1831,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
             <Box
               sx={{
                 p: 2,
-                pb: 1,
+                pb: 0,
                 bgcolor: 'background.paper',
               }}
             >
@@ -1840,7 +1840,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                   display: 'flex',
                   alignItems: 'flex-start',
                   justifyContent: 'space-between',
-                  mb: 1.5,
+                  mb: 1,
                 }}
               >
                 <Box sx={{ display: 'flex', flexDirection: 'column' }}>
@@ -1860,7 +1860,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
               {/* SUMMARY TABLE */}
               <Box
                 sx={{
-                  mb: 2,
+                  mb: 1,
                   borderRadius: 1,
                   border: '1px solid',
                   borderColor: 'divider',
@@ -2037,7 +2037,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
             </Box>
 
             {/* SCROLLABLE BODY */}
-            <Box sx={{ p: 2, pt: 1, overflow: 'auto', flex: 1 }}>
+            <Box sx={{ px: 2, pb: 2, pt: 0, overflow: 'auto', flex: 1 }}>
               {/* Flag Strategy Structure (Evaluation Blueprint) */}
               {loadingFlagDetails ? (
                 <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -2231,872 +2231,980 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
               )}
 
               {/* Context Fields Used */}
-              <Divider sx={{ borderStyle: 'dashed', my: 2.5 }} />
-              {(() => {
-                const enabledEntries = contextEntries.filter((e) => e.enabled !== false);
-                const contextMap = new Map(enabledEntries.map((e) => [e.key, e.value]));
-                const entryTypeMap = new Map(enabledEntries.map((e) => [e.key, e.type]));
-                const referencedFieldNames = new Set(referencedFields.map((r) => r.name));
+              <Box sx={{ mt: 0.5 }}>
+                {(() => {
+                  const enabledEntries = contextEntries.filter((e) => e.enabled !== false);
+                  const contextMap = new Map(enabledEntries.map((e) => [e.key, e.value]));
+                  const entryTypeMap = new Map(enabledEntries.map((e) => [e.key, e.type]));
+                  const referencedFieldNames = new Set(referencedFields.map((r) => r.name));
 
-                // Value renderer helper
-                const renderValue = (value: any, fieldType?: string) => {
-                  if (value === undefined || value === null) {
-                    return (
-                      <Typography component="span" variant="caption" sx={{ color: 'warning.main', fontStyle: 'italic' }}>
-                        ({t('playground.noValue')})
-                      </Typography>
-                    );
-                  }
-                  if (typeof value === 'string') {
-                    if (value === '') {
-                      // Boolean type with empty string likely means not set
-                      if (fieldType === 'boolean') {
-                        return (
-                          <Typography component="span" variant="caption" sx={{ color: 'warning.main', fontStyle: 'italic' }}>
-                            ({t('playground.noValue')})
-                          </Typography>
-                        );
-                      }
+                  // Value renderer helper
+                  const renderValue = (value: any, fieldType?: string) => {
+                    if (value === undefined || value === null) {
                       return (
-                        <Typography component="span" variant="caption" sx={{ color: 'error.main', fontFamily: 'monospace' }}>
-                          &quot;&quot;
+                        <Typography component="span" variant="caption" sx={{ color: 'warning.main', fontStyle: 'italic' }}>
+                          ({t('playground.noValue')})
                         </Typography>
                       );
                     }
-                    return <>&quot;{value}&quot;</>;
-                  }
-                  return String(value);
-                };
+                    if (typeof value === 'string') {
+                      if (value === '') {
+                        // Boolean type with empty string likely means not set
+                        if (fieldType === 'boolean') {
+                          return (
+                            <Typography component="span" variant="caption" sx={{ color: 'warning.main', fontStyle: 'italic' }}>
+                              ({t('playground.noValue')})
+                            </Typography>
+                          );
+                        }
+                        return (
+                          <Typography component="span" variant="caption" sx={{ color: 'error.main', fontFamily: 'monospace' }}>
+                            &quot;&quot;
+                          </Typography>
+                        );
+                      }
+                      return <>&quot;{value}&quot;</>;
+                    }
+                    return String(value);
+                  };
 
-                return (
-                  <>
-                    {/* 1. Provided Context */}
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      fontWeight={600}
-                      sx={{ display: 'block', mb: 0.5 }}
-                    >
-                      {t('playground.usedContext')}:
-                    </Typography>
-                    {enabledEntries.length === 0 ? (
-                      <Box sx={{ mb: 2 }}>
-                        <EmptyPlaceholder message={t('playground.noContextProvided')} />
-                      </Box>
-                    ) : (
-                      <TableContainer component={Paper} variant="outlined" sx={{ maxHeight: 150, mb: 2 }}>
-                        <Table size="small" stickyHeader sx={{ tableLayout: 'auto' }}>
-                          <TableHead>
-                            <TableRow>
-                              <TableCell sx={{ py: 0.5, fontWeight: 600, bgcolor: 'action.hover', whiteSpace: 'nowrap', width: 'auto' }}>
-                                {t('playground.contextField')}
-                              </TableCell>
-                              <TableCell sx={{ py: 0.5, fontWeight: 600, bgcolor: 'action.hover', width: 60, textAlign: 'center', whiteSpace: 'nowrap' }}>
-                                {t('playground.referenced')}
-                              </TableCell>
-                              <TableCell sx={{ py: 0.5, fontWeight: 600, bgcolor: 'action.hover' }}>
-                                {t('playground.contextValue')}
-                              </TableCell>
-                            </TableRow>
-                          </TableHead>
-                          <TableBody>
-                            {enabledEntries.map((entry, idx) => (
-                              <TableRow key={idx} sx={{ '&:last-child td': { borderBottom: 0 } }}>
-                                <TableCell sx={{ py: 0.5 }}>
-                                  <ContextFieldChip
-                                    fieldName={entry.key}
-                                    fieldInfo={getFieldInfo(entry.key)}
-                                    fieldType={entry.type}
-                                  />
+                  return (
+                    <>
+                      {/* 1. Provided Context */}
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        fontWeight={600}
+                        sx={{ display: 'block', mb: 0.5 }}
+                      >
+                        {t('playground.usedContext')}:
+                      </Typography>
+                      {enabledEntries.length === 0 ? (
+                        <Box sx={{ mb: 2 }}>
+                          <EmptyPlaceholder message={t('playground.noContextProvided')} />
+                        </Box>
+                      ) : (
+                        <TableContainer component={Paper} variant="outlined" sx={{ maxHeight: 150, mb: 2 }}>
+                          <Table size="small" stickyHeader sx={{ tableLayout: 'auto' }}>
+                            <TableHead>
+                              <TableRow>
+                                <TableCell sx={{ py: 0.5, fontWeight: 600, bgcolor: 'action.hover', whiteSpace: 'nowrap', width: 'auto' }}>
+                                  {t('playground.contextField')}
                                 </TableCell>
-                                <TableCell sx={{ py: 0.5, textAlign: 'center' }}>
-                                  {referencedFieldNames.has(entry.key) ? (
-                                    <CheckCircleOutlineIcon sx={{ fontSize: 14, color: 'success.main' }} />
-                                  ) : (
-                                    <Typography variant="caption" color="text.disabled">-</Typography>
-                                  )}
+                                <TableCell sx={{ py: 0.5, fontWeight: 600, bgcolor: 'action.hover', width: 60, textAlign: 'center', whiteSpace: 'nowrap' }}>
+                                  {t('playground.referenced')}
                                 </TableCell>
-                                <TableCell sx={{ py: 0.5 }}>
-                                  <Typography variant="caption" sx={{ fontFamily: 'monospace' }}>
-                                    {renderValue(entry.value, entry.type)}
-                                  </Typography>
+                                <TableCell sx={{ py: 0.5, fontWeight: 600, bgcolor: 'action.hover' }}>
+                                  {t('playground.contextValue')}
                                 </TableCell>
                               </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
-                      </TableContainer>
-                    )}
-
-                    {/* 2. Referenced Fields */}
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      fontWeight={600}
-                      sx={{ display: 'block', mb: 0.5 }}
-                    >
-                      {t('playground.referencedFields')}:
-                    </Typography>
-                    {referencedFields.length === 0 ? (
-                      <EmptyPlaceholder message={t('playground.noReferencedFields')} />
-                    ) : (
-                      <TableContainer component={Paper} variant="outlined" sx={{ maxHeight: 150 }}>
-                        <Table size="small" stickyHeader sx={{ tableLayout: 'auto' }}>
-                          <TableHead>
-                            <TableRow>
-                              <TableCell sx={{ py: 0.5, fontWeight: 600, bgcolor: 'action.hover', whiteSpace: 'nowrap', width: 'auto' }}>
-                                {t('playground.contextField')}
-                              </TableCell>
-                              <TableCell sx={{ py: 0.5, fontWeight: 600, bgcolor: 'action.hover', width: 60, textAlign: 'center', whiteSpace: 'nowrap' }}>
-                                {t('featureFlags.validation.isRequired')}
-                              </TableCell>
-                              <TableCell sx={{ py: 0.5, fontWeight: 600, bgcolor: 'action.hover', width: 60, textAlign: 'center', whiteSpace: 'nowrap' }}>
-                                {t('common.status')}
-                              </TableCell>
-                              <TableCell sx={{ py: 0.5, fontWeight: 600, bgcolor: 'action.hover' }}>
-                                {t('playground.contextValue')}
-                              </TableCell>
-                            </TableRow>
-                          </TableHead>
-                          <TableBody>
-                            {referencedFields.map((ref, idx) => {
-                              const provided = contextMap.has(ref.name);
-                              const value = contextMap.get(ref.name);
-                              return (
+                            </TableHead>
+                            <TableBody>
+                              {enabledEntries.map((entry, idx) => (
                                 <TableRow key={idx} sx={{ '&:last-child td': { borderBottom: 0 } }}>
                                   <TableCell sx={{ py: 0.5 }}>
                                     <ContextFieldChip
-                                      fieldName={ref.name}
-                                      fieldInfo={getFieldInfo(ref.name)}
-                                      fieldType={ref.fieldType}
+                                      fieldName={entry.key}
+                                      fieldInfo={getFieldInfo(entry.key)}
+                                      fieldType={entry.type}
                                     />
                                   </TableCell>
                                   <TableCell sx={{ py: 0.5, textAlign: 'center' }}>
-                                    {ref.isRequired ? (
-                                      <Typography variant="caption" sx={{ color: 'error.main', fontWeight: 600 }}>*</Typography>
+                                    {referencedFieldNames.has(entry.key) ? (
+                                      <CheckCircleOutlineIcon sx={{ fontSize: 14, color: 'success.main' }} />
                                     ) : (
                                       <Typography variant="caption" color="text.disabled">-</Typography>
                                     )}
                                   </TableCell>
-                                  <TableCell sx={{ py: 0.5, textAlign: 'center' }}>
-                                    {provided ? (
-                                      <CheckCircleOutlineIcon sx={{ fontSize: 14, color: 'success.main' }} />
-                                    ) : (
-                                      <ErrorOutlineIcon sx={{ fontSize: 14, color: 'error.main' }} />
-                                    )}
-                                  </TableCell>
                                   <TableCell sx={{ py: 0.5 }}>
                                     <Typography variant="caption" sx={{ fontFamily: 'monospace' }}>
-                                      {!provided ? (
-                                        <Typography component="span" variant="caption" sx={{ color: 'error.main', fontStyle: 'italic' }}>
-                                          {t('playground.notProvided')}
-                                        </Typography>
-                                      ) : (
-                                        renderValue(value, ref.fieldType)
-                                      )}
+                                      {renderValue(entry.value, entry.type)}
                                     </Typography>
                                   </TableCell>
                                 </TableRow>
-                              );
-                            })}
-                          </TableBody>
-                        </Table>
-                      </TableContainer>
-                    )}
-                  </>
-                );
-              })()}
+                              ))}
+                            </TableBody>
+                          </Table>
+                        </TableContainer>
+                      )}
+
+                      {/* 2. Referenced Fields */}
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        fontWeight={600}
+                        sx={{ display: 'block', mb: 0.5 }}
+                      >
+                        {t('playground.referencedFields')}:
+                      </Typography>
+                      {referencedFields.length === 0 ? (
+                        <EmptyPlaceholder message={t('playground.noReferencedFields')} />
+                      ) : (
+                        <TableContainer component={Paper} variant="outlined" sx={{ maxHeight: 150 }}>
+                          <Table size="small" stickyHeader sx={{ tableLayout: 'auto' }}>
+                            <TableHead>
+                              <TableRow>
+                                <TableCell sx={{ py: 0.5, fontWeight: 600, bgcolor: 'action.hover', whiteSpace: 'nowrap', width: 'auto' }}>
+                                  {t('playground.contextField')}
+                                </TableCell>
+                                <TableCell sx={{ py: 0.5, fontWeight: 600, bgcolor: 'action.hover', width: 60, textAlign: 'center', whiteSpace: 'nowrap' }}>
+                                  {t('featureFlags.validation.isRequired')}
+                                </TableCell>
+                                <TableCell sx={{ py: 0.5, fontWeight: 600, bgcolor: 'action.hover', width: 60, textAlign: 'center', whiteSpace: 'nowrap' }}>
+                                  {t('common.status')}
+                                </TableCell>
+                                <TableCell sx={{ py: 0.5, fontWeight: 600, bgcolor: 'action.hover' }}>
+                                  {t('playground.contextValue')}
+                                </TableCell>
+                              </TableRow>
+                            </TableHead>
+                            <TableBody>
+                              {referencedFields.map((ref, idx) => {
+                                const provided = contextMap.has(ref.name);
+                                const value = contextMap.get(ref.name);
+                                return (
+                                  <TableRow key={idx} sx={{ '&:last-child td': { borderBottom: 0 } }}>
+                                    <TableCell sx={{ py: 0.5 }}>
+                                      <ContextFieldChip
+                                        fieldName={ref.name}
+                                        fieldInfo={getFieldInfo(ref.name)}
+                                        fieldType={ref.fieldType}
+                                      />
+                                    </TableCell>
+                                    <TableCell sx={{ py: 0.5, textAlign: 'center' }}>
+                                      {ref.isRequired ? (
+                                        <Typography variant="caption" sx={{ color: 'error.main', fontWeight: 600 }}>*</Typography>
+                                      ) : (
+                                        <Typography variant="caption" color="text.disabled">-</Typography>
+                                      )}
+                                    </TableCell>
+                                    <TableCell sx={{ py: 0.5, textAlign: 'center' }}>
+                                      {provided ? (
+                                        <CheckCircleOutlineIcon sx={{ fontSize: 14, color: 'success.main' }} />
+                                      ) : (
+                                        <ErrorOutlineIcon sx={{ fontSize: 14, color: 'error.main' }} />
+                                      )}
+                                    </TableCell>
+                                    <TableCell sx={{ py: 0.5 }}>
+                                      <Typography variant="caption" sx={{ fontFamily: 'monospace' }}>
+                                        {!provided ? (
+                                          <Typography component="span" variant="caption" sx={{ color: 'error.main', fontStyle: 'italic' }}>
+                                            {t('playground.notProvided')}
+                                          </Typography>
+                                        ) : (
+                                          renderValue(value, ref.fieldType)
+                                        )}
+                                      </Typography>
+                                    </TableCell>
+                                  </TableRow>
+                                );
+                              })}
+                            </TableBody>
+                          </Table>
+                        </TableContainer>
+                      )}
+                    </>
+                  );
+                })()}
+              </Box>
 
               {/* Evaluation Steps Group */}
-              <Divider sx={{ borderStyle: 'dashed', my: 2.5 }} />
-              {selectedEvaluation.result.evaluationSteps &&
-                selectedEvaluation.result.evaluationSteps.length > 0 && (
-                  <>
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      fontWeight={600}
-                      sx={{ display: 'block', mb: 1 }}
-                    >
-                      {t('playground.evaluationSteps')}:
-                    </Typography>
-                    <Box
-                      sx={{
-                        bgcolor: 'background.paper',
-                        borderRadius: 1,
-                        border: 1,
-                        borderColor: 'divider',
-                        overflow: 'hidden',
-                      }}
-                    >
-                      {/* Summary Row */}
-                      {(() => {
-                        const steps = selectedEvaluation.result.evaluationSteps || [];
-                        const totalSteps = steps.length;
-                        const passedSteps = steps.filter((s: any) => s.passed === true).length;
-                        const failedSteps = steps.filter((s: any) => s.passed === false).length;
-                        const subChecks = steps.reduce(
-                          (acc: number, s: any) => acc + (s.checks?.length || 0),
-                          0
-                        );
-                        const totalChecks = totalSteps + subChecks;
-                        const passedSubChecks = steps.reduce(
-                          (acc: number, s: any) =>
-                            acc + (s.checks?.filter((c: any) => c.passed).length || 0),
-                          0
-                        );
-                        const passedChecks = passedSteps + passedSubChecks;
-
-                        return (
-                          <Box
-                            sx={{
-                              p: 1.5,
-                              bgcolor: 'action.hover',
-                              borderBottom: 1,
-                              borderColor: 'divider',
-                              display: 'flex',
-                              gap: 2,
-                              flexWrap: 'wrap',
-                              alignItems: 'center',
-                            }}
-                          >
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                              <Typography variant="caption" color="text.secondary">
-                                {t('playground.summary.totalSteps')}:
-                              </Typography>
-                              <Chip
-                                label={totalSteps}
-                                size="small"
-                                sx={{ height: 20, fontSize: '0.7rem' }}
-                              />
-                            </Box>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                              <Typography variant="caption" color="text.secondary">
-                                {t('playground.summary.stepResults')}:
-                              </Typography>
-                              <Chip
-                                label={`${passedSteps} ${t('playground.summary.passed')}`}
-                                size="small"
-                                color="success"
-                                variant="outlined"
-                                sx={{ height: 20, fontSize: '0.7rem' }}
-                              />
-                              {failedSteps > 0 && (
-                                <Chip
-                                  label={`${failedSteps} ${t('playground.summary.failed')}`}
-                                  size="small"
-                                  color="error"
-                                  variant="outlined"
-                                  sx={{ height: 20, fontSize: '0.7rem' }}
-                                />
-                              )}
-                            </Box>
-                            {totalChecks > 0 && (
-                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                <Typography variant="caption" color="text.secondary">
-                                  {t('playground.summary.totalChecks')}:
-                                </Typography>
-                                <Chip
-                                  label={`${passedChecks}/${totalChecks}`}
-                                  size="small"
-                                  color={passedChecks === totalChecks ? 'success' : 'warning'}
-                                  variant="outlined"
-                                  sx={{
-                                    height: 20,
-                                    fontSize: '0.7rem',
-                                    fontWeight: 600,
-                                  }}
-                                />
-                              </Box>
-                            )}
-                          </Box>
-                        );
-                      })()}
-
-                      {/* Steps List */}
-                      {selectedEvaluation.result.evaluationSteps.map(
-                        (step: any, stepIdx: number) => {
-                          const isStrategy = step.step === 'STRATEGY_EVALUATION';
-                          const stepBgColor = stepIdx % 2 === 0 ? 'transparent' : 'action.hover';
-                          const envDisplayName =
-                            environments.find((e) => e.environment === selectedEvaluation.env)
-                              ?.displayName || selectedEvaluation.env;
+              <Box sx={{ mt: 2 }}>
+                {selectedEvaluation.result.evaluationSteps &&
+                  selectedEvaluation.result.evaluationSteps.length > 0 && (
+                    <>
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        fontWeight={600}
+                        sx={{ display: 'block', mb: 1 }}
+                      >
+                        {t('playground.evaluationSteps')}:
+                      </Typography>
+                      <Box
+                        sx={{
+                          bgcolor: 'background.paper',
+                          borderRadius: 1,
+                          border: 1,
+                          borderColor: 'divider',
+                          overflow: 'hidden',
+                        }}
+                      >
+                        {/* Summary Row */}
+                        {(() => {
+                          const steps = selectedEvaluation.result.evaluationSteps || [];
+                          const totalSteps = steps.length;
+                          const passedSteps = steps.filter((s: any) => s.passed === true).length;
+                          const failedSteps = steps.filter((s: any) => s.passed === false).length;
+                          const subChecks = steps.reduce(
+                            (acc: number, s: any) => acc + (s.checks?.length || 0),
+                            0
+                          );
+                          const totalChecks = totalSteps + subChecks;
+                          const passedSubChecks = steps.reduce(
+                            (acc: number, s: any) =>
+                              acc + (s.checks?.filter((c: any) => c.passed).length || 0),
+                            0
+                          );
+                          const passedChecks = passedSteps + passedSubChecks;
 
                           return (
                             <Box
-                              key={stepIdx}
                               sx={{
-                                borderBottom:
-                                  stepIdx <
-                                    (selectedEvaluation.result.evaluationSteps?.length || 1) - 1
-                                    ? 1
-                                    : 0,
+                                p: 1.5,
+                                bgcolor: 'action.hover',
+                                borderBottom: 1,
                                 borderColor: 'divider',
-                                bgcolor: stepBgColor,
+                                display: 'flex',
+                                gap: 2,
+                                flexWrap: 'wrap',
+                                alignItems: 'center',
                               }}
                             >
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                <Typography variant="caption" color="text.secondary">
+                                  {t('playground.summary.totalSteps')}:
+                                </Typography>
+                                <Chip
+                                  label={totalSteps}
+                                  size="small"
+                                  sx={{ height: 20, fontSize: '0.7rem' }}
+                                />
+                              </Box>
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                <Typography variant="caption" color="text.secondary">
+                                  {t('playground.summary.stepResults')}:
+                                </Typography>
+                                <Chip
+                                  label={`${passedSteps} ${t('playground.summary.passed')}`}
+                                  size="small"
+                                  color="success"
+                                  variant="outlined"
+                                  sx={{ height: 20, fontSize: '0.7rem' }}
+                                />
+                                {failedSteps > 0 && (
+                                  <Chip
+                                    label={`${failedSteps} ${t('playground.summary.failed')}`}
+                                    size="small"
+                                    color="error"
+                                    variant="outlined"
+                                    sx={{ height: 20, fontSize: '0.7rem' }}
+                                  />
+                                )}
+                              </Box>
+                              {totalChecks > 0 && (
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                  <Typography variant="caption" color="text.secondary">
+                                    {t('playground.summary.totalChecks')}:
+                                  </Typography>
+                                  <Chip
+                                    label={`${passedChecks}/${totalChecks}`}
+                                    size="small"
+                                    color={passedChecks === totalChecks ? 'success' : 'warning'}
+                                    variant="outlined"
+                                    sx={{
+                                      height: 20,
+                                      fontSize: '0.7rem',
+                                      fontWeight: 600,
+                                    }}
+                                  />
+                                </Box>
+                              )}
+                            </Box>
+                          );
+                        })()}
+
+                        {/* Steps List */}
+                        {selectedEvaluation.result.evaluationSteps.map(
+                          (step: any, stepIdx: number) => {
+                            const isStrategy = step.step === 'STRATEGY_EVALUATION';
+                            const stepBgColor = stepIdx % 2 === 0 ? 'transparent' : 'action.hover';
+                            const envDisplayName =
+                              environments.find((e) => e.environment === selectedEvaluation.env)
+                                ?.displayName || selectedEvaluation.env;
+
+                            return (
                               <Box
+                                key={stepIdx}
                                 sx={{
-                                  display: 'flex',
-                                  alignItems: 'flex-start',
-                                  p: 1.5,
+                                  borderBottom:
+                                    stepIdx <
+                                      (selectedEvaluation.result.evaluationSteps?.length || 1) - 1
+                                      ? 1
+                                      : 0,
+                                  borderColor: 'divider',
+                                  bgcolor: stepBgColor,
                                 }}
                               >
-                                <Box sx={{ width: 24, flexShrink: 0, pt: 0.2 }}>
-                                  {step.passed === true && (
-                                    <TrueIcon color="success" fontSize="small" />
-                                  )}
-                                  {step.passed === false && (
-                                    <FalseIcon color="error" fontSize="small" />
-                                  )}
-                                  {step.passed === null && (
-                                    <Box
-                                      sx={{
-                                        width: 20,
-                                        height: 20,
-                                        borderRadius: '50%',
-                                        bgcolor: 'grey.400',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                      }}
+                                <Box
+                                  sx={{
+                                    display: 'flex',
+                                    alignItems: 'flex-start',
+                                    p: 1.5,
+                                  }}
+                                >
+                                  <Box sx={{ width: 24, flexShrink: 0, pt: 0.2 }}>
+                                    {step.passed === true && (
+                                      <TrueIcon color="success" fontSize="small" />
+                                    )}
+                                    {step.passed === false && (
+                                      <FalseIcon color="error" fontSize="small" />
+                                    )}
+                                    {step.passed === null && (
+                                      <Box
+                                        sx={{
+                                          width: 20,
+                                          height: 20,
+                                          borderRadius: '50%',
+                                          bgcolor: 'grey.400',
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          justifyContent: 'center',
+                                        }}
+                                      >
+                                        <Typography variant="caption" color="white">
+                                          -
+                                        </Typography>
+                                      </Box>
+                                    )}
+                                  </Box>
+
+                                  <Box sx={{ width: 170, flexShrink: 0 }}>
+                                    <Typography
+                                      variant="body2"
+                                      fontWeight={isStrategy ? 600 : 500}
+                                      color={isStrategy ? 'primary.main' : 'text.primary'}
                                     >
-                                      <Typography variant="caption" color="white">
-                                        -
-                                      </Typography>
-                                    </Box>
-                                  )}
-                                </Box>
+                                      {step.step === 'FLAG_STATUS' &&
+                                        t('playground.steps.flagStatus')}
+                                      {step.step === 'CONTEXT_VALIDATION' &&
+                                        t('playground.steps.contextValidation')}
+                                      {step.step === 'ENVIRONMENT_CHECK' &&
+                                        t('playground.steps.environmentCheck')}
+                                      {step.step === 'STRATEGY_COUNT' &&
+                                        t('playground.steps.strategyCount')}
+                                      {step.step === 'STRATEGY_EVALUATION' &&
+                                        t('playground.steps.strategy', {
+                                          name: step.strategyName
+                                            ? getLocalizedStrategyName(step.strategyName)
+                                            : `#${(step.strategyIndex ?? 0) + 1}`,
+                                        })}
+                                    </Typography>
+                                  </Box>
 
-                                <Box sx={{ width: 170, flexShrink: 0 }}>
-                                  <Typography
-                                    variant="body2"
-                                    fontWeight={isStrategy ? 600 : 500}
-                                    color={isStrategy ? 'primary.main' : 'text.primary'}
-                                  >
-                                    {step.step === 'FLAG_STATUS' &&
-                                      t('playground.steps.flagStatus')}
-                                    {step.step === 'CONTEXT_VALIDATION' &&
-                                      t('playground.steps.contextValidation')}
-                                    {step.step === 'ENVIRONMENT_CHECK' &&
-                                      t('playground.steps.environmentCheck')}
-                                    {step.step === 'STRATEGY_COUNT' &&
-                                      t('playground.steps.strategyCount')}
-                                    {step.step === 'STRATEGY_EVALUATION' &&
-                                      t('playground.steps.strategy', {
-                                        name: step.strategyName
-                                          ? getLocalizedStrategyName(step.strategyName)
-                                          : `#${(step.strategyIndex ?? 0) + 1}`,
-                                      })}
-                                  </Typography>
-                                </Box>
+                                  <Box sx={{ flex: 1 }}>
+                                    <Typography variant="body2" color="text.secondary">
+                                      {getLocalizedStepMessage(step, envDisplayName)}
+                                    </Typography>
 
-                                <Box sx={{ flex: 1 }}>
-                                  <Typography variant="body2" color="text.secondary">
-                                    {getLocalizedStepMessage(step, envDisplayName)}
-                                  </Typography>
+                                    {/* Show detailed errors for context validation failure */}
+                                    {step.step === 'CONTEXT_VALIDATION' && !step.passed && step.details?.errors && (
+                                      <Box sx={{ mt: 1, pl: 1 }}>
+                                        {step.details.errors.map((err: any, errIdx: number) => (
+                                          <Box
+                                            key={errIdx}
+                                            sx={{
+                                              display: 'flex',
+                                              alignItems: 'center',
+                                              gap: 0.5,
+                                              py: 0.25,
+                                            }}
+                                          >
+                                            <Typography variant="caption" sx={{ color: 'error.main' }}>•</Typography>
+                                            <ContextFieldChip
+                                              fieldName={err.field}
+                                              fieldInfo={getFieldInfo(err.field)}
+                                            />
+                                            <Typography
+                                              variant="caption"
+                                              sx={{ color: 'error.main' }}
+                                            >
+                                              {err.type === 'MISSING_REQUIRED'
+                                                ? t('playground.contextErrors.missingRequired')
+                                                : err.type === 'EMPTY_VALUE'
+                                                  ? t('playground.contextErrors.emptyValue')
+                                                  : err.type === 'TYPE_MISMATCH'
+                                                    ? t('playground.contextErrors.typeMismatch', { expected: err.data?.expectedType, actual: err.data?.actualType })
+                                                    : err.type === 'INVALID_VALUE'
+                                                      ? t('playground.contextErrors.invalidValue')
+                                                      : err.type === 'WHITESPACE'
+                                                        ? t('playground.contextErrors.whitespace')
+                                                        : err.message}
+                                            </Typography>
+                                          </Box>
+                                        ))}
+                                      </Box>
+                                    )}
 
-                                  {/* Show detailed errors for context validation failure */}
-                                  {step.step === 'CONTEXT_VALIDATION' && !step.passed && step.details?.errors && (
-                                    <Box sx={{ mt: 1, pl: 1 }}>
-                                      {step.details.errors.map((err: any, errIdx: number) => (
+                                    {/* Show detailed checks for strategy evaluation */}
+                                    {isStrategy && step.checks && step.checks.length > 0 && (
+                                      <Box sx={{ mt: 1.5, pl: 1 }}>
                                         <Box
-                                          key={errIdx}
                                           sx={{
                                             display: 'flex',
                                             alignItems: 'center',
-                                            gap: 0.5,
-                                            py: 0.25,
+                                            gap: 1,
+                                            mb: 1,
                                           }}
                                         >
-                                          <Typography variant="caption" sx={{ color: 'error.main' }}>•</Typography>
-                                          <ContextFieldChip
-                                            fieldName={err.field}
-                                            fieldInfo={getFieldInfo(err.field)}
-                                          />
-                                          <Typography
-                                            variant="caption"
-                                            sx={{ color: 'error.main' }}
-                                          >
-                                            {err.type === 'MISSING_REQUIRED'
-                                              ? t('playground.contextErrors.missingRequired')
-                                              : err.type === 'EMPTY_VALUE'
-                                                ? t('playground.contextErrors.emptyValue')
-                                                : err.type === 'TYPE_MISMATCH'
-                                                  ? t('playground.contextErrors.typeMismatch', { expected: err.data?.expectedType, actual: err.data?.actualType })
-                                                  : err.type === 'INVALID_VALUE'
-                                                    ? t('playground.contextErrors.invalidValue')
-                                                    : err.type === 'WHITESPACE'
-                                                      ? t('playground.contextErrors.whitespace')
-                                                      : err.message}
+                                          <Typography variant="caption" color="text.secondary">
+                                            {t('playground.detailedChecks')}:
                                           </Typography>
-                                        </Box>
-                                      ))}
-                                    </Box>
-                                  )}
-
-                                  {/* Show detailed checks for strategy evaluation */}
-                                  {isStrategy && step.checks && step.checks.length > 0 && (
-                                    <Box sx={{ mt: 1.5, pl: 1 }}>
-                                      <Box
-                                        sx={{
-                                          display: 'flex',
-                                          alignItems: 'center',
-                                          gap: 1,
-                                          mb: 1,
-                                        }}
-                                      >
-                                        <Typography variant="caption" color="text.secondary">
-                                          {t('playground.detailedChecks')}:
-                                        </Typography>
-                                        {(() => {
-                                          const totalCount = step.checks.length;
-                                          const allSkipped = step.checks.every(
-                                            (c: any) => c.passed === null
-                                          );
-                                          const firstFailedIdx = step.checks.findIndex(
-                                            (c: any) => c.passed === false
-                                          );
-                                          // Only count checks that were actually evaluated (up to and including first failure)
-                                          const evaluatedCount = allSkipped
-                                            ? 0
-                                            : firstFailedIdx === -1
-                                              ? totalCount
-                                              : firstFailedIdx + 1;
-                                          const passedCount = allSkipped
-                                            ? 0
-                                            : firstFailedIdx === -1
-                                              ? totalCount
-                                              : firstFailedIdx;
-                                          const skippedCount = totalCount - evaluatedCount;
-                                          const allPassed = !allSkipped && passedCount === totalCount;
-                                          return (
-                                            <>
-                                              <Chip
-                                                label={allSkipped
-                                                  ? t('playground.checkAllSkipped')
-                                                  : t('playground.checkCountDetail', {
-                                                    passed: passedCount,
-                                                    total: totalCount,
-                                                  })
-                                                }
-                                                size="small"
-                                                sx={{
-                                                  height: 18,
-                                                  fontSize: '0.65rem',
-                                                  fontWeight: 600,
-                                                  bgcolor: allSkipped ? 'grey.200' : allPassed ? 'success.100' : 'error.100',
-                                                  color: allSkipped ? 'grey.600' : allPassed ? 'success.dark' : 'error.dark',
-                                                  '& .MuiChip-label': { px: 1 },
-                                                }}
-                                              />
-                                              {skippedCount > 0 && (
+                                          {(() => {
+                                            const totalCount = step.checks.length;
+                                            const allSkipped = step.checks.every(
+                                              (c: any) => c.passed === null
+                                            );
+                                            const firstFailedIdx = step.checks.findIndex(
+                                              (c: any) => c.passed === false
+                                            );
+                                            // Only count checks that were actually evaluated (up to and including first failure)
+                                            const evaluatedCount = allSkipped
+                                              ? 0
+                                              : firstFailedIdx === -1
+                                                ? totalCount
+                                                : firstFailedIdx + 1;
+                                            const passedCount = allSkipped
+                                              ? 0
+                                              : firstFailedIdx === -1
+                                                ? totalCount
+                                                : firstFailedIdx;
+                                            const skippedCount = totalCount - evaluatedCount;
+                                            const allPassed = !allSkipped && passedCount === totalCount;
+                                            return (
+                                              <>
                                                 <Chip
-                                                  label={t('playground.checkSkippedCount', {
-                                                    count: skippedCount,
-                                                  })}
+                                                  label={allSkipped
+                                                    ? t('playground.checkAllSkipped')
+                                                    : t('playground.checkCountDetail', {
+                                                      passed: passedCount,
+                                                      total: totalCount,
+                                                    })
+                                                  }
                                                   size="small"
                                                   sx={{
                                                     height: 18,
                                                     fontSize: '0.65rem',
                                                     fontWeight: 600,
-                                                    bgcolor: 'grey.200',
-                                                    color: 'grey.600',
+                                                    bgcolor: allSkipped ? 'grey.200' : allPassed ? 'success.100' : 'error.100',
+                                                    color: allSkipped ? 'grey.600' : allPassed ? 'success.dark' : 'error.dark',
                                                     '& .MuiChip-label': { px: 1 },
                                                   }}
                                                 />
-                                              )}
-                                            </>
-                                          );
-                                        })()}
-                                      </Box>
-                                      <Stack spacing={0}>
-                                        {(() => {
-                                          // Find the first failed check index to determine skipped checks
-                                          const firstFailedIdx = step.checks.findIndex(
-                                            (c: any) => c.passed === false
-                                          );
+                                                {skippedCount > 0 && (
+                                                  <Chip
+                                                    label={t('playground.checkSkippedCount', {
+                                                      count: skippedCount,
+                                                    })}
+                                                    size="small"
+                                                    sx={{
+                                                      height: 18,
+                                                      fontSize: '0.65rem',
+                                                      fontWeight: 600,
+                                                      bgcolor: 'grey.200',
+                                                      color: 'grey.600',
+                                                      '& .MuiChip-label': { px: 1 },
+                                                    }}
+                                                  />
+                                                )}
+                                              </>
+                                            );
+                                          })()}
+                                        </Box>
+                                        <Stack spacing={0}>
+                                          {(() => {
+                                            // Find the first failed check index to determine skipped checks
+                                            const firstFailedIdx = step.checks.findIndex(
+                                              (c: any) => c.passed === false
+                                            );
 
-                                          return step.checks.map((check: any, checkIdx: number) => {
-                                            // Determine if this check was skipped (passed === null or came after first failure)
-                                            const isSkipped =
-                                              check.passed === null ||
-                                              (firstFailedIdx !== -1 && checkIdx > firstFailedIdx);
+                                            return step.checks.map((check: any, checkIdx: number) => {
+                                              // Determine if this check was skipped (passed === null or came after first failure)
+                                              const isSkipped =
+                                                check.passed === null ||
+                                                (firstFailedIdx !== -1 && checkIdx > firstFailedIdx);
 
-                                            // Determine the operator to show before this check
-                                            const prevCheck =
-                                              checkIdx > 0 ? step.checks[checkIdx - 1] : null;
-                                            let showOperator = false;
-                                            let operatorType: 'AND' | 'OR' | null = null;
+                                              // Determine the operator to show before this check
+                                              const prevCheck =
+                                                checkIdx > 0 ? step.checks[checkIdx - 1] : null;
+                                              let showOperator = false;
+                                              let operatorType: 'AND' | 'OR' | null = null;
 
-                                            if (prevCheck) {
-                                              // Same type constraints use AND
-                                              if (check.type === prevCheck.type) {
-                                                showOperator = true;
-                                                operatorType = 'AND';
+                                              if (prevCheck) {
+                                                // Same type constraints use AND
+                                                if (check.type === prevCheck.type) {
+                                                  showOperator = true;
+                                                  operatorType = 'AND';
+                                                }
+                                                // Different check categories (segments -> constraints -> rollout)
+                                                else if (
+                                                  (prevCheck.type === 'SEGMENTS_CHECK' ||
+                                                    prevCheck.type === 'SEGMENT' ||
+                                                    prevCheck.type === 'SEGMENT_CONSTRAINT') &&
+                                                  (check.type === 'CONSTRAINTS_CHECK' ||
+                                                    check.type === 'STRATEGY_CONSTRAINT')
+                                                ) {
+                                                  showOperator = true;
+                                                  operatorType = 'AND';
+                                                } else if (
+                                                  (prevCheck.type === 'CONSTRAINTS_CHECK' ||
+                                                    prevCheck.type === 'STRATEGY_CONSTRAINT') &&
+                                                  check.type === 'ROLLOUT'
+                                                ) {
+                                                  showOperator = true;
+                                                  operatorType = 'AND';
+                                                } else if (
+                                                  (prevCheck.type === 'SEGMENTS_CHECK' ||
+                                                    prevCheck.type === 'SEGMENT' ||
+                                                    prevCheck.type === 'SEGMENT_CONSTRAINT') &&
+                                                  check.type === 'ROLLOUT'
+                                                ) {
+                                                  showOperator = true;
+                                                  operatorType = 'AND';
+                                                }
                                               }
-                                              // Different check categories (segments -> constraints -> rollout)
-                                              else if (
-                                                (prevCheck.type === 'SEGMENTS_CHECK' ||
-                                                  prevCheck.type === 'SEGMENT' ||
-                                                  prevCheck.type === 'SEGMENT_CONSTRAINT') &&
-                                                (check.type === 'CONSTRAINTS_CHECK' ||
-                                                  check.type === 'STRATEGY_CONSTRAINT')
-                                              ) {
-                                                showOperator = true;
-                                                operatorType = 'AND';
-                                              } else if (
-                                                (prevCheck.type === 'CONSTRAINTS_CHECK' ||
-                                                  prevCheck.type === 'STRATEGY_CONSTRAINT') &&
-                                                check.type === 'ROLLOUT'
-                                              ) {
-                                                showOperator = true;
-                                                operatorType = 'AND';
-                                              } else if (
-                                                (prevCheck.type === 'SEGMENTS_CHECK' ||
-                                                  prevCheck.type === 'SEGMENT' ||
-                                                  prevCheck.type === 'SEGMENT_CONSTRAINT') &&
-                                                check.type === 'ROLLOUT'
-                                              ) {
-                                                showOperator = true;
-                                                operatorType = 'AND';
+                                              // Map check types to localized labels
+                                              let checkLabel = check.type;
+                                              if (check.type === 'SEGMENT_CONSTRAINT') {
+                                                checkLabel = `${t('playground.checkTypes.segmentConstraint')}: ${check.segment}`;
+                                              } else if (check.type === 'STRATEGY_CONSTRAINT') {
+                                                checkLabel = t(
+                                                  'playground.checkTypes.strategyConstraint'
+                                                );
+                                              } else if (check.type === 'ROLLOUT') {
+                                                checkLabel = t('playground.checkTypes.rollout');
+                                              } else if (check.type === 'SEGMENTS_CHECK') {
+                                                checkLabel = t('playground.checkTypes.segmentsCheck');
+                                              } else if (check.type === 'CONSTRAINTS_CHECK') {
+                                                checkLabel = t(
+                                                  'playground.checkTypes.constraintsCheck'
+                                                );
+                                              } else if (check.type === 'SEGMENT') {
+                                                checkLabel = `${t('playground.checkTypes.segment')}: ${check.name}`;
                                               }
-                                            }
-                                            // Map check types to localized labels
-                                            let checkLabel = check.type;
-                                            if (check.type === 'SEGMENT_CONSTRAINT') {
-                                              checkLabel = `${t('playground.checkTypes.segmentConstraint')}: ${check.segment}`;
-                                            } else if (check.type === 'STRATEGY_CONSTRAINT') {
-                                              checkLabel = t(
-                                                'playground.checkTypes.strategyConstraint'
-                                              );
-                                            } else if (check.type === 'ROLLOUT') {
-                                              checkLabel = t('playground.checkTypes.rollout');
-                                            } else if (check.type === 'SEGMENTS_CHECK') {
-                                              checkLabel = t('playground.checkTypes.segmentsCheck');
-                                            } else if (check.type === 'CONSTRAINTS_CHECK') {
-                                              checkLabel = t(
-                                                'playground.checkTypes.constraintsCheck'
-                                              );
-                                            } else if (check.type === 'SEGMENT') {
-                                              checkLabel = `${t('playground.checkTypes.segment')}: ${check.name}`;
-                                            }
 
-                                            return (
-                                              <React.Fragment key={checkIdx}>
-                                                {showOperator && operatorType && (
+                                              return (
+                                                <React.Fragment key={checkIdx}>
+                                                  {showOperator && operatorType && (
+                                                    <Box
+                                                      sx={{
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        pl: 3,
+                                                        my: '-5px',
+                                                        position: 'relative',
+                                                        zIndex: 1,
+                                                      }}
+                                                    >
+                                                      <Chip
+                                                        label={operatorType}
+                                                        size="small"
+                                                        sx={{
+                                                          height: 18,
+                                                          fontSize: '0.65rem',
+                                                          fontWeight: 600,
+                                                          bgcolor: 'grey.500',
+                                                          color: 'common.white',
+                                                          '& .MuiChip-label': { px: 1 },
+                                                        }}
+                                                      />
+                                                    </Box>
+                                                  )}
                                                   <Box
                                                     sx={{
                                                       display: 'flex',
-                                                      alignItems: 'center',
-                                                      pl: 3,
-                                                      my: '-5px',
-                                                      position: 'relative',
-                                                      zIndex: 1,
+                                                      alignItems: 'flex-start',
+                                                      gap: 1,
+                                                      p: 1,
+                                                      borderRadius: 1,
+                                                      border: '1px dashed',
+                                                      borderColor: isSkipped
+                                                        ? 'action.disabled'
+                                                        : check.passed
+                                                          ? 'success.light'
+                                                          : 'error.light',
+                                                      bgcolor: isSkipped
+                                                        ? 'action.disabledBackground'
+                                                        : check.passed
+                                                          ? 'success.50'
+                                                          : 'error.50',
+                                                      boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+                                                      opacity: isSkipped ? 0.7 : 1,
                                                     }}
                                                   >
-                                                    <Chip
-                                                      label={operatorType}
-                                                      size="small"
-                                                      sx={{
-                                                        height: 18,
-                                                        fontSize: '0.65rem',
-                                                        fontWeight: 600,
-                                                        bgcolor: 'grey.500',
-                                                        color: 'common.white',
-                                                        '& .MuiChip-label': { px: 1 },
-                                                      }}
-                                                    />
-                                                  </Box>
-                                                )}
-                                                <Box
-                                                  sx={{
-                                                    display: 'flex',
-                                                    alignItems: 'flex-start',
-                                                    gap: 1,
-                                                    p: 1,
-                                                    borderRadius: 1,
-                                                    border: '1px dashed',
-                                                    borderColor: isSkipped
-                                                      ? 'action.disabled'
-                                                      : check.passed
-                                                        ? 'success.light'
-                                                        : 'error.light',
-                                                    bgcolor: isSkipped
-                                                      ? 'action.disabledBackground'
-                                                      : check.passed
-                                                        ? 'success.50'
-                                                        : 'error.50',
-                                                    boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
-                                                    opacity: isSkipped ? 0.7 : 1,
-                                                  }}
-                                                >
-                                                  <Box sx={{ pt: 0.3, flexShrink: 0 }}>
-                                                    {isSkipped ? (
-                                                      <RemoveCircleOutlineIcon
-                                                        sx={{ fontSize: 16, color: 'grey.500' }}
-                                                      />
-                                                    ) : check.passed ? (
-                                                      <TrueIcon
-                                                        sx={{ fontSize: 16, color: 'success.main' }}
-                                                      />
-                                                    ) : (
-                                                      <FalseIcon
-                                                        sx={{ fontSize: 16, color: 'error.main' }}
-                                                      />
-                                                    )}
-                                                  </Box>
-                                                  <Box sx={{ flex: 1, minWidth: 0 }}>
-                                                    <Typography
-                                                      variant="caption"
-                                                      fontWeight={500}
-                                                      color={
-                                                        isSkipped ? 'text.disabled' : 'text.primary'
-                                                      }
-                                                    >
-                                                      {checkLabel}
-                                                      {isSkipped &&
-                                                        ` (${t('playground.checkSkipped')})`}
-                                                    </Typography>
-                                                    {check.type === 'ROLLOUT' ? (
+                                                    <Box sx={{ pt: 0.3, flexShrink: 0 }}>
+                                                      {isSkipped ? (
+                                                        <RemoveCircleOutlineIcon
+                                                          sx={{ fontSize: 16, color: 'grey.500' }}
+                                                        />
+                                                      ) : check.passed ? (
+                                                        <TrueIcon
+                                                          sx={{ fontSize: 16, color: 'success.main' }}
+                                                        />
+                                                      ) : (
+                                                        <FalseIcon
+                                                          sx={{ fontSize: 16, color: 'error.main' }}
+                                                        />
+                                                      )}
+                                                    </Box>
+                                                    <Box sx={{ flex: 1, minWidth: 0 }}>
                                                       <Typography
                                                         variant="caption"
-                                                        color="text.secondary"
-                                                        sx={{ display: 'block' }}
+                                                        fontWeight={500}
+                                                        color={
+                                                          isSkipped ? 'text.disabled' : 'text.primary'
+                                                        }
                                                       >
-                                                        {check.rollout === 100
-                                                          ? t('playground.checkMessages.rollout100')
-                                                          : t('playground.rolloutDetail', {
-                                                            percentage:
-                                                              check.percentage?.toFixed(1) ?? '?',
-                                                            rollout: check.rollout ?? 100,
-                                                          })}
+                                                        {checkLabel}
+                                                        {isSkipped &&
+                                                          ` (${t('playground.checkSkipped')})`}
                                                       </Typography>
-                                                    ) : check.constraint ? (
-                                                      <Box sx={{ mt: 0.5 }}>
-                                                        <ConstraintDisplay
-                                                          constraint={check.constraint}
-                                                          compact
-                                                          contextFields={contextFields.map((f) => ({
-                                                            fieldName: f.fieldName,
-                                                            displayName: f.displayName,
-                                                            description: f.description,
-                                                            fieldType: f.fieldType,
-                                                            validationRules: f.validationRules,
-                                                          }))}
-                                                        />
-                                                        {check.contextValue !== undefined && (
-                                                          <Typography
-                                                            variant="caption"
-                                                            sx={{
-                                                              display: 'block',
-                                                              mt: 0.25,
-                                                              color: check.passed === null
-                                                                ? 'text.disabled'
-                                                                : check.passed
-                                                                  ? 'success.main'
-                                                                  : 'error.main',
-                                                            }}
-                                                          >
-                                                            {t('playground.contextValue')}:{' '}
-                                                            <code
-                                                              style={{
-                                                                fontFamily: 'monospace',
-                                                                backgroundColor: 'rgba(0,0,0,0.1)',
-                                                                padding: '1px 4px',
-                                                                borderRadius: 2,
+                                                      {check.type === 'ROLLOUT' ? (
+                                                        <Typography
+                                                          variant="caption"
+                                                          color="text.secondary"
+                                                          sx={{ display: 'block' }}
+                                                        >
+                                                          {check.rollout === 100
+                                                            ? t('playground.checkMessages.rollout100')
+                                                            : t('playground.rolloutDetail', {
+                                                              percentage:
+                                                                check.percentage?.toFixed(1) ?? '?',
+                                                              rollout: check.rollout ?? 100,
+                                                            })}
+                                                        </Typography>
+                                                      ) : check.constraint ? (
+                                                        <Box sx={{ mt: 0.5 }}>
+                                                          <ConstraintDisplay
+                                                            constraint={check.constraint}
+                                                            compact
+                                                            contextFields={contextFields.map((f) => ({
+                                                              fieldName: f.fieldName,
+                                                              displayName: f.displayName,
+                                                              description: f.description,
+                                                              fieldType: f.fieldType,
+                                                              validationRules: f.validationRules,
+                                                            }))}
+                                                          />
+                                                          {check.contextValue !== undefined && (
+                                                            <Typography
+                                                              variant="caption"
+                                                              sx={{
+                                                                display: 'block',
+                                                                mt: 0.25,
+                                                                color: check.passed === null
+                                                                  ? 'text.disabled'
+                                                                  : check.passed
+                                                                    ? 'success.main'
+                                                                    : 'error.main',
                                                               }}
                                                             >
-                                                              {check.contextValue === undefined || check.contextValue === null
-                                                                ? <span style={{ color: '#d32f2f', fontStyle: 'italic' }}>({t('playground.notProvided')})</span>
-                                                                : check.contextValue === ''
-                                                                  ? <span style={{ color: '#d32f2f' }}>&quot;&quot;</span>
-                                                                  : typeof check.contextValue === 'string'
-                                                                    ? <>&quot;{check.contextValue}&quot;</>
-                                                                    : String(check.contextValue)}
-                                                            </code>
-                                                          </Typography>
-                                                        )}
-                                                      </Box>
-                                                    ) : check.type === 'SEGMENTS_CHECK' ? (
-                                                      <Typography
-                                                        variant="caption"
-                                                        color="text.secondary"
-                                                        sx={{ display: 'block' }}
-                                                      >
-                                                        {t('playground.checkMessages.noSegments')}
-                                                      </Typography>
-                                                    ) : check.type === 'CONSTRAINTS_CHECK' ? (
-                                                      <Typography
-                                                        variant="caption"
-                                                        color="text.secondary"
-                                                        sx={{ display: 'block' }}
-                                                      >
-                                                        {t(
-                                                          'playground.checkMessages.noConstraints'
-                                                        )}
-                                                      </Typography>
-                                                    ) : check.type === 'SEGMENT' ? (
-                                                      <Typography
-                                                        variant="caption"
-                                                        color="text.secondary"
-                                                        sx={{ display: 'block' }}
-                                                      >
-                                                        {check.message ===
-                                                          'Segment has no constraints - passed'
-                                                          ? t(
-                                                            'playground.checkMessages.segmentNoConstraints'
-                                                          )
-                                                          : check.message ===
-                                                            'Segment not found - skipped'
+                                                              {t('playground.contextValue')}:{' '}
+                                                              <code
+                                                                style={{
+                                                                  fontFamily: 'monospace',
+                                                                  backgroundColor: 'rgba(0,0,0,0.1)',
+                                                                  padding: '1px 4px',
+                                                                  borderRadius: 2,
+                                                                }}
+                                                              >
+                                                                {check.contextValue === undefined || check.contextValue === null
+                                                                  ? <span style={{ color: '#d32f2f', fontStyle: 'italic' }}>({t('playground.notProvided')})</span>
+                                                                  : check.contextValue === ''
+                                                                    ? <span style={{ color: '#d32f2f' }}>&quot;&quot;</span>
+                                                                    : typeof check.contextValue === 'string'
+                                                                      ? <>&quot;{check.contextValue}&quot;</>
+                                                                      : String(check.contextValue)}
+                                                              </code>
+                                                            </Typography>
+                                                          )}
+                                                        </Box>
+                                                      ) : check.type === 'SEGMENTS_CHECK' ? (
+                                                        <Typography
+                                                          variant="caption"
+                                                          color="text.secondary"
+                                                          sx={{ display: 'block' }}
+                                                        >
+                                                          {t('playground.checkMessages.noSegments')}
+                                                        </Typography>
+                                                      ) : check.type === 'CONSTRAINTS_CHECK' ? (
+                                                        <Typography
+                                                          variant="caption"
+                                                          color="text.secondary"
+                                                          sx={{ display: 'block' }}
+                                                        >
+                                                          {t(
+                                                            'playground.checkMessages.noConstraints'
+                                                          )}
+                                                        </Typography>
+                                                      ) : check.type === 'SEGMENT' ? (
+                                                        <Typography
+                                                          variant="caption"
+                                                          color="text.secondary"
+                                                          sx={{ display: 'block' }}
+                                                        >
+                                                          {check.message ===
+                                                            'Segment has no constraints - passed'
                                                             ? t(
-                                                              'playground.checkMessages.segmentNotFound'
+                                                              'playground.checkMessages.segmentNoConstraints'
                                                             )
-                                                            : check.message}
-                                                      </Typography>
-                                                    ) : null}
+                                                            : check.message ===
+                                                              'Segment not found - skipped'
+                                                              ? t(
+                                                                'playground.checkMessages.segmentNotFound'
+                                                              )
+                                                              : check.message}
+                                                        </Typography>
+                                                      ) : null}
+                                                    </Box>
                                                   </Box>
-                                                </Box>
-                                              </React.Fragment>
-                                            );
-                                          });
-                                        })()}
-                                      </Stack>
-                                    </Box>
-                                  )}
+                                                </React.Fragment>
+                                              );
+                                            });
+                                          })()}
+                                        </Stack>
+                                      </Box>
+                                    )}
 
-                                  {isStrategy && step.passed && step.variantName && (
-                                    <Box
-                                      sx={{ mt: 1, display: 'flex', alignItems: 'center', gap: 1 }}
-                                    >
-                                      <Typography variant="caption" color="text.secondary">
-                                        {t('playground.determinedVariant')}:
-                                      </Typography>
-                                      <Chip
-                                        label={step.variantName}
-                                        size="small"
-                                        color="secondary"
-                                        variant="outlined"
-                                        sx={{ borderRadius: '16px' }}
-                                      />
-                                    </Box>
-                                  )}
+                                    {isStrategy && step.passed && step.variantName && (
+                                      <Box
+                                        sx={{ mt: 1, display: 'flex', alignItems: 'center', gap: 1 }}
+                                      >
+                                        <Typography variant="caption" color="text.secondary">
+                                          {t('playground.determinedVariant')}:
+                                        </Typography>
+                                        <Chip
+                                          label={step.variantName}
+                                          size="small"
+                                          color="secondary"
+                                          variant="outlined"
+                                          sx={{ borderRadius: '16px' }}
+                                        />
+                                      </Box>
+                                    )}
+                                  </Box>
                                 </Box>
                               </Box>
-                            </Box>
-                          );
-                        }
-                      )}
-                    </Box>
-                  </>
-                )}
+                            );
+                          }
+                        )}
+                      </Box>
+                    </>
+                  )}
+              </Box>
 
               {/* Final Payload View (Integrated Variant View) */}
-              <Divider sx={{ borderStyle: 'dashed', my: 2.5 }} />
-              <Box
-                sx={{
-                  mt: 1,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  mb: 1,
-                }}
-              >
-                <Typography variant="subtitle2" color="text.secondary">
-                  {t('playground.appliedVariant')}
-                </Typography>
-                {selectedEvaluation.result.variant && (
-                  <Tooltip title={t('common.copy')} disableFocusListener>
-                    <IconButton
-                      size="small"
-                      onClick={() => {
-                        const value = selectedEvaluation.result.variant?.value;
-                        const valueToCopy =
-                          typeof value === 'object' && value !== null && 'value' in value
-                            ? String(value.value)
-                            : typeof value === 'object'
-                              ? JSON.stringify(value)
-                              : String(value ?? '');
-                        copyToClipboardWithNotification(
-                          valueToCopy,
-                          () =>
-                            enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
-                          () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
-                        );
-                      }}
-                    >
-                      <CopyIcon fontSize="small" />
-                    </IconButton>
-                  </Tooltip>
-                )}
-              </Box>
-              <Box
-                sx={{
-                  p: 2,
-                  bgcolor: 'background.paper',
-                  borderRadius: 1,
-                  border: '1px solid',
-                  borderColor: 'divider',
-                }}
-              >
+              <Box sx={{ mt: 2 }}>
                 <Box
                   sx={{
+                    mt: 1,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    mb: 1.5,
+                    mb: 1,
                   }}
                 >
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                      {selectedEvaluation.result.enabled ? (
-                        <TrueIcon sx={{ fontSize: 20, color: 'success.main' }} />
+                  <Typography variant="subtitle2" color="text.secondary">
+                    {t('playground.appliedVariant')}
+                  </Typography>
+                  {selectedEvaluation.result.variant && (
+                    <Tooltip title={t('common.copy')} disableFocusListener>
+                      <IconButton
+                        size="small"
+                        onClick={() => {
+                          const value = selectedEvaluation.result.variant?.value;
+                          const valueToCopy =
+                            typeof value === 'object' && value !== null && 'value' in value
+                              ? String(value.value)
+                              : typeof value === 'object'
+                                ? JSON.stringify(value)
+                                : String(value ?? '');
+                          copyToClipboardWithNotification(
+                            valueToCopy,
+                            () =>
+                              enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+                            () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+                          );
+                        }}
+                      >
+                        <CopyIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  )}
+                </Box>
+                <Box
+                  sx={{
+                    p: 2,
+                    bgcolor: 'background.paper',
+                    borderRadius: 1,
+                    border: '1px solid',
+                    borderColor: 'divider',
+                  }}
+                >
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      mb: 1.5,
+                    }}
+                  >
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                        {selectedEvaluation.result.enabled ? (
+                          <TrueIcon sx={{ fontSize: 20, color: 'success.main' }} />
+                        ) : (
+                          <FalseIcon sx={{ fontSize: 20, color: 'error.main' }} />
+                        )}
+                      </Box>
+
+                      {selectedEvaluation.result.variant ? (
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <Typography variant="subtitle2" fontWeight={600} color="text.primary">
+                            {t('playground.appliedVariant')}:
+                          </Typography>
+                          <Chip
+                            label={selectedEvaluation.result.variant.name}
+                            size="small"
+                            color="secondary"
+                            sx={{
+                              borderRadius: '4px',
+                              fontWeight: 600,
+                              height: 20,
+                              fontSize: '0.75rem',
+                            }}
+                          />
+                        </Box>
                       ) : (
-                        <FalseIcon sx={{ fontSize: 20, color: 'error.main' }} />
+                        <Typography variant="subtitle2" fontWeight={600} color="text.disabled">
+                          {t('playground.noVariant')}
+                        </Typography>
                       )}
                     </Box>
-
-                    {selectedEvaluation.result.variant ? (
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Typography variant="subtitle2" fontWeight={600} color="text.primary">
-                          {t('playground.appliedVariant')}:
-                        </Typography>
-                        <Chip
-                          label={selectedEvaluation.result.variant.name}
-                          size="small"
-                          color="secondary"
-                          sx={{
-                            borderRadius: '4px',
-                            fontWeight: 600,
-                            height: 20,
-                            fontSize: '0.75rem',
-                          }}
-                        />
-                      </Box>
-                    ) : (
-                      <Typography variant="subtitle2" fontWeight={600} color="text.disabled">
-                        {t('playground.noVariant')}
-                      </Typography>
-                    )}
                   </Box>
-                </Box>
 
-                {selectedEvaluation.result.variant ? (
-                  <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
-                    <FieldTypeIcon
-                      type={selectedEvaluation.result.variant?.valueType || 'string'}
-                      size={20}
-                      sx={{ mt: 0.3 }}
-                    />
-                    <Box sx={{ flex: 1, minWidth: 0 }}>
-                      {(() => {
-                        const value = selectedEvaluation.result.variant?.value;
-                        const valueType = selectedEvaluation.result.variant?.valueType;
+                  {selectedEvaluation.result.variant ? (
+                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
+                      <FieldTypeIcon
+                        type={selectedEvaluation.result.variant?.valueType || 'string'}
+                        size={20}
+                        sx={{ mt: 0.3 }}
+                      />
+                      <Box sx={{ flex: 1, minWidth: 0 }}>
+                        {(() => {
+                          const value = selectedEvaluation.result.variant?.value;
+                          const valueType = selectedEvaluation.result.variant?.valueType;
 
-                        // If it's the specific Gatrix JSON structure, extract just the value
-                        if (typeof value === 'object' && value !== null && 'value' in value) {
-                          const innerValue = (value as any).value;
-                          if (valueType === 'json' || (value as any).type === 'json') {
+                          // If it's the specific Gatrix JSON structure, extract just the value
+                          if (typeof value === 'object' && value !== null && 'value' in value) {
+                            const innerValue = (value as any).value;
+                            if (valueType === 'json' || (value as any).type === 'json') {
+                              return (
+                                <Box
+                                  sx={{
+                                    p: 1,
+                                    bgcolor: 'action.hover',
+                                    border: '1px solid',
+                                    borderColor: 'divider',
+                                    borderRadius: 1,
+                                    maxHeight: 200,
+                                    overflow: 'auto',
+                                  }}
+                                >
+                                  <pre
+                                    style={{
+                                      margin: 0,
+                                      fontSize: '13px',
+                                      fontFamily: "'Consolas', 'Monaco', 'Courier New', monospace",
+                                      fontWeight: 500,
+                                      color: 'var(--mui-palette-text-primary)',
+                                      whiteSpace: 'pre-wrap',
+                                      wordBreak: 'break-word',
+                                    }}
+                                  >
+                                    {(() => {
+                                      try {
+                                        return JSON.stringify(JSON.parse(innerValue), null, 2);
+                                      } catch {
+                                        return innerValue;
+                                      }
+                                    })()}
+                                  </pre>
+                                </Box>
+                              );
+                            }
+                            return (
+                              <Typography
+                                variant="body1"
+                                sx={{
+                                  py: 1.5,
+                                  px: 2,
+                                  minHeight: 44,
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  bgcolor: 'action.hover',
+                                  border: '1px solid',
+                                  borderColor: 'divider',
+                                  borderRadius: 1,
+                                  fontFamily: "'Consolas', 'Monaco', 'Courier New', monospace",
+                                  fontWeight: 500,
+                                  wordBreak: 'break-all',
+                                  ...(innerValue === '' && {
+                                    fontStyle: 'italic',
+                                    color: 'text.disabled',
+                                  }),
+                                }}
+                              >
+                                {innerValue === ''
+                                  ? t('common.emptyString')
+                                  : typeof innerValue === 'object' &&
+                                    innerValue !== null &&
+                                    Object.keys(innerValue).length === 0
+                                    ? t('common.emptyObject')
+                                    : innerValue}
+                              </Typography>
+                            );
+                          }
+
+                          // Fallback for other formats
+                          if (value === undefined || value === null) {
+                            return (
+                              <Typography variant="body2" color="text.disabled" fontStyle="italic">
+                                {t('common.noValue')}
+                              </Typography>
+                            );
+                          }
+
+                          if (valueType === 'json') {
+                            // Check if JSON value is an empty object
+                            const isEmptyObj =
+                              typeof value === 'object' &&
+                              value !== null &&
+                              Object.keys(value).length === 0;
+                            if (isEmptyObj) {
+                              return (
+                                <Typography
+                                  variant="body1"
+                                  sx={{
+                                    py: 1.5,
+                                    px: 2,
+                                    minHeight: 44,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    bgcolor: 'action.hover',
+                                    border: '1px solid',
+                                    borderColor: 'divider',
+                                    borderRadius: 1,
+                                    fontFamily: "'Consolas', 'Monaco', 'Courier New', monospace",
+                                    fontWeight: 500,
+                                    fontStyle: 'italic',
+                                    color: 'text.disabled',
+                                  }}
+                                >
+                                  {t('common.emptyObject')}
+                                </Typography>
+                              );
+                            }
                             return (
                               <Box
                                 sx={{
@@ -3120,17 +3228,15 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                     wordBreak: 'break-word',
                                   }}
                                 >
-                                  {(() => {
-                                    try {
-                                      return JSON.stringify(JSON.parse(innerValue), null, 2);
-                                    } catch {
-                                      return innerValue;
-                                    }
-                                  })()}
+                                  {JSON.stringify(value, null, 2)}
                                 </pre>
                               </Box>
                             );
                           }
+
+                          const displayValue =
+                            typeof value === 'object' ? JSON.stringify(value) : String(value);
+                          const isEmpty = displayValue === '';
                           return (
                             <Typography
                               variant="body1"
@@ -3147,272 +3253,170 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                 fontFamily: "'Consolas', 'Monaco', 'Courier New', monospace",
                                 fontWeight: 500,
                                 wordBreak: 'break-all',
-                                ...(innerValue === '' && {
-                                  fontStyle: 'italic',
-                                  color: 'text.disabled',
-                                }),
+                                ...(isEmpty && { fontStyle: 'italic', color: 'text.disabled' }),
                               }}
                             >
-                              {innerValue === ''
-                                ? t('common.emptyString')
-                                : typeof innerValue === 'object' &&
-                                  innerValue !== null &&
-                                  Object.keys(innerValue).length === 0
-                                  ? t('common.emptyObject')
-                                  : innerValue}
+                              {isEmpty ? t('common.emptyString') : displayValue}
                             </Typography>
                           );
-                        }
-
-                        // Fallback for other formats
-                        if (value === undefined || value === null) {
-                          return (
-                            <Typography variant="body2" color="text.disabled" fontStyle="italic">
-                              {t('common.noValue')}
-                            </Typography>
-                          );
-                        }
-
-                        if (valueType === 'json') {
-                          // Check if JSON value is an empty object
-                          const isEmptyObj =
-                            typeof value === 'object' &&
-                            value !== null &&
-                            Object.keys(value).length === 0;
-                          if (isEmptyObj) {
-                            return (
-                              <Typography
-                                variant="body1"
-                                sx={{
-                                  py: 1.5,
-                                  px: 2,
-                                  minHeight: 44,
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  bgcolor: 'action.hover',
-                                  border: '1px solid',
-                                  borderColor: 'divider',
-                                  borderRadius: 1,
-                                  fontFamily: "'Consolas', 'Monaco', 'Courier New', monospace",
-                                  fontWeight: 500,
-                                  fontStyle: 'italic',
-                                  color: 'text.disabled',
-                                }}
-                              >
-                                {t('common.emptyObject')}
-                              </Typography>
-                            );
-                          }
-                          return (
-                            <Box
-                              sx={{
-                                p: 1,
-                                bgcolor: 'action.hover',
-                                border: '1px solid',
-                                borderColor: 'divider',
-                                borderRadius: 1,
-                                maxHeight: 200,
-                                overflow: 'auto',
-                              }}
-                            >
-                              <pre
-                                style={{
-                                  margin: 0,
-                                  fontSize: '13px',
-                                  fontFamily: "'Consolas', 'Monaco', 'Courier New', monospace",
-                                  fontWeight: 500,
-                                  color: 'var(--mui-palette-text-primary)',
-                                  whiteSpace: 'pre-wrap',
-                                  wordBreak: 'break-word',
-                                }}
-                              >
-                                {JSON.stringify(value, null, 2)}
-                              </pre>
-                            </Box>
-                          );
-                        }
-
-                        const displayValue =
-                          typeof value === 'object' ? JSON.stringify(value) : String(value);
-                        const isEmpty = displayValue === '';
-                        return (
+                        })()}
+                        {selectedEvaluation.result.variant.valueSource && (
                           <Typography
-                            variant="body1"
+                            variant="caption"
+                            color="text.secondary"
                             sx={{
-                              py: 1.5,
-                              px: 2,
-                              minHeight: 44,
-                              display: 'flex',
-                              alignItems: 'center',
-                              bgcolor: 'action.hover',
-                              border: '1px solid',
-                              borderColor: 'divider',
-                              borderRadius: 1,
-                              fontFamily: "'Consolas', 'Monaco', 'Courier New', monospace",
-                              fontWeight: 500,
-                              wordBreak: 'break-all',
-                              ...(isEmpty && { fontStyle: 'italic', color: 'text.disabled' }),
+                              display: 'block',
+                              mt: 1,
+                              fontStyle: 'italic',
                             }}
                           >
-                            {isEmpty ? t('common.emptyString') : displayValue}
+                            •{' '}
+                            {selectedEvaluation.result.variant.valueSource === 'environment'
+                              ? t('playground.valueSourceEnvironmentDesc')
+                              : selectedEvaluation.result.variant.valueSource === 'flag'
+                                ? t('playground.valueSourceFlagDesc')
+                                : t('playground.valueSourceVariantDesc')}
                           </Typography>
-                        );
-                      })()}
-                      {selectedEvaluation.result.variant.valueSource && (
-                        <Typography
-                          variant="caption"
-                          color="text.secondary"
+                        )}
+                      </Box>
+                    </Box>
+                  ) : (
+                    <Box
+                      sx={{
+                        p: 2,
+                        textAlign: 'center',
+                        border: '1px dashed',
+                        borderColor: 'divider',
+                        borderRadius: 1,
+                        bgcolor: 'background.paper',
+                      }}
+                    >
+                      <Typography variant="body2" color="text.disabled">
+                        {t('playground.noVariantDeterminedDesc') ||
+                          'No variant determined for this evaluation.'}
+                      </Typography>
+                    </Box>
+                  )}
+                </Box>
+
+                {/* Validation Results */}
+                {selectedEvaluation.result.validation && (
+                  <>
+                    <Divider sx={{ borderStyle: 'dashed', my: 2.5 }} />
+                    <Box>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                        <Typography variant="subtitle2" color="text.secondary">
+                          {t('playground.validationResults')}
+                        </Typography>
+                        {selectedEvaluation.result.validation.valid ? (
+                          <Chip
+                            label={t('playground.validationPassed')}
+                            size="small"
+                            color="success"
+                            variant="outlined"
+                            sx={{ height: 20, fontSize: '0.7rem' }}
+                          />
+                        ) : (
+                          <Chip
+                            label={t('playground.validationFailed')}
+                            size="small"
+                            color="warning"
+                            variant="outlined"
+                            sx={{ height: 20, fontSize: '0.7rem' }}
+                          />
+                        )}
+                      </Box>
+                      {!selectedEvaluation.result.validation.valid && selectedEvaluation.result.validation.errors.length > 0 && (
+                        <Alert severity="warning" variant="outlined" sx={{ mb: 1 }}>
+                          <Stack spacing={0.5}>
+                            {selectedEvaluation.result.validation.errors.map((err: string, i: number) => (
+                              <Typography key={i} variant="body2">
+                                • {err}
+                              </Typography>
+                            ))}
+                          </Stack>
+                        </Alert>
+                      )}
+                      {selectedEvaluation.result.validation.transformedValue !== undefined && (
+                        <Box
                           sx={{
-                            display: 'block',
-                            mt: 1,
-                            fontStyle: 'italic',
+                            p: 1.5,
+                            bgcolor: 'action.hover',
+                            borderRadius: 1,
+                            border: '1px solid',
+                            borderColor: 'divider',
                           }}
                         >
-                          •{' '}
-                          {selectedEvaluation.result.variant.valueSource === 'environment'
-                            ? t('playground.valueSourceEnvironmentDesc')
-                            : selectedEvaluation.result.variant.valueSource === 'flag'
-                              ? t('playground.valueSourceFlagDesc')
-                              : t('playground.valueSourceVariantDesc')}
-                        </Typography>
+                          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
+                            {t('playground.validationTransformedValue')}
+                          </Typography>
+                          <Typography
+                            variant="body2"
+                            sx={{ fontFamily: 'monospace', wordBreak: 'break-all' }}
+                          >
+                            {JSON.stringify(selectedEvaluation.result.validation.transformedValue)}
+                          </Typography>
+                        </Box>
                       )}
                     </Box>
-                  </Box>
-                ) : (
-                  <Box
-                    sx={{
-                      p: 2,
-                      textAlign: 'center',
-                      border: '1px dashed',
-                      borderColor: 'divider',
-                      borderRadius: 1,
-                      bgcolor: 'background.paper',
-                    }}
-                  >
-                    <Typography variant="body2" color="text.disabled">
-                      {t('playground.noVariantDeterminedDesc') ||
-                        'No variant determined for this evaluation.'}
-                    </Typography>
-                  </Box>
+                  </>
                 )}
               </Box>
 
-              {/* Validation Results */}
-              {selectedEvaluation.result.validation && (
-                <>
-                  <Divider sx={{ borderStyle: 'dashed', my: 2.5 }} />
-                  <Box>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                      <Typography variant="subtitle2" color="text.secondary">
-                        {t('playground.validationResults')}
-                      </Typography>
-                      {selectedEvaluation.result.validation.valid ? (
-                        <Chip
-                          label={t('playground.validationPassed')}
-                          size="small"
-                          color="success"
-                          variant="outlined"
-                          sx={{ height: 20, fontSize: '0.7rem' }}
-                        />
-                      ) : (
-                        <Chip
-                          label={t('playground.validationFailed')}
-                          size="small"
-                          color="warning"
-                          variant="outlined"
-                          sx={{ height: 20, fontSize: '0.7rem' }}
-                        />
-                      )}
-                    </Box>
-                    {!selectedEvaluation.result.validation.valid && selectedEvaluation.result.validation.errors.length > 0 && (
-                      <Alert severity="warning" variant="outlined" sx={{ mb: 1 }}>
-                        <Stack spacing={0.5}>
-                          {selectedEvaluation.result.validation.errors.map((err: string, i: number) => (
-                            <Typography key={i} variant="body2">
-                              • {err}
-                            </Typography>
-                          ))}
-                        </Stack>
-                      </Alert>
-                    )}
-                    {selectedEvaluation.result.validation.transformedValue !== undefined && (
-                      <Box
-                        sx={{
-                          p: 1.5,
-                          bgcolor: 'action.hover',
-                          borderRadius: 1,
-                          border: '1px solid',
-                          borderColor: 'divider',
+              {/* Raw Response JSON */}
+              <Box sx={{ mt: 2 }}>
+                <Box sx={{ mt: 1 }}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      mb: 1,
+                    }}
+                  >
+                    <Typography variant="subtitle2" color="text.secondary">
+                      {t('playground.rawResponse')}
+                    </Typography>
+                    <Tooltip title={t('common.copyToClipboard')} disableFocusListener>
+                      <IconButton
+                        size="small"
+                        onClick={() => {
+                          const jsonStr = JSON.stringify(
+                            {
+                              enabled: selectedEvaluation.result.enabled,
+                              variant: selectedEvaluation.result.variant,
+                              reason: selectedEvaluation.result.reason,
+                            },
+                            null,
+                            2
+                          );
+                          copyToClipboardWithNotification(
+                            jsonStr,
+                            () =>
+                              enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+                            () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+                          );
                         }}
                       >
-                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
-                          {t('playground.validationTransformedValue')}
-                        </Typography>
-                        <Typography
-                          variant="body2"
-                          sx={{ fontFamily: 'monospace', wordBreak: 'break-all' }}
-                        >
-                          {JSON.stringify(selectedEvaluation.result.validation.transformedValue)}
-                        </Typography>
-                      </Box>
-                    )}
+                        <CopyIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
                   </Box>
-                </>
-              )}
-
-              {/* Raw Response JSON */}
-              <Divider sx={{ borderStyle: 'dashed', my: 2.5 }} />
-              <Box sx={{ mt: 1 }}>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    mb: 1,
-                  }}
-                >
-                  <Typography variant="subtitle2" color="text.secondary">
-                    {t('playground.rawResponse')}
-                  </Typography>
-                  <Tooltip title={t('common.copyToClipboard')} disableFocusListener>
-                    <IconButton
-                      size="small"
-                      onClick={() => {
-                        const jsonStr = JSON.stringify(
-                          {
-                            enabled: selectedEvaluation.result.enabled,
-                            variant: selectedEvaluation.result.variant,
-                            reason: selectedEvaluation.result.reason,
-                          },
-                          null,
-                          2
-                        );
-                        copyToClipboardWithNotification(
-                          jsonStr,
-                          () =>
-                            enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
-                          () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
-                        );
-                      }}
-                    >
-                      <CopyIcon fontSize="small" />
-                    </IconButton>
-                  </Tooltip>
+                  <JsonEditor
+                    value={JSON.stringify(
+                      {
+                        enabled: selectedEvaluation.result.enabled,
+                        variant: selectedEvaluation.result.variant,
+                        reason: selectedEvaluation.result.reason,
+                      },
+                      null,
+                      2
+                    )}
+                    onChange={() => { }}
+                    readOnly
+                    height={200}
+                  />
                 </Box>
-                <JsonEditor
-                  value={JSON.stringify(
-                    {
-                      enabled: selectedEvaluation.result.enabled,
-                      variant: selectedEvaluation.result.variant,
-                      reason: selectedEvaluation.result.reason,
-                    },
-                    null,
-                    2
-                  )}
-                  onChange={() => { }}
-                  readOnly
-                  height={200}
-                />
               </Box>
             </Box>
           </>
