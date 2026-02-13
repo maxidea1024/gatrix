@@ -87,6 +87,7 @@ interface ContextEntry {
   key: string;
   value: string;
   type: 'string' | 'number' | 'boolean' | 'date' | 'datetime' | 'semver' | 'array' | 'country';
+  enabled?: boolean;
 }
 
 interface EvaluationResult {
@@ -423,7 +424,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
   const handleAddContextEntry = () => {
     const updated: ContextEntry[] = [
       ...contextEntries,
-      { key: '', value: '', type: 'string' as 'string' },
+      { key: '', value: '', type: 'string' as 'string', enabled: true },
     ];
     setContextEntries(updated);
     if (rememberContext) {
@@ -531,6 +532,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
           key: fieldName,
           value: '',
           type: (fieldDef?.fieldType || 'string') as ContextEntry['type'],
+          enabled: true,
         });
       }
     }
@@ -580,7 +582,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
   const buildContext = () => {
     const context: Record<string, any> = {};
     for (const entry of contextEntries) {
-      if (entry.key.trim()) {
+      if (entry.key.trim() && entry.enabled !== false) {
         let value: any = entry.value;
         // Convert value based on type
         switch (entry.type) {
@@ -842,7 +844,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
           </Box>
         ) : (
           <>
-            <Stack spacing={1} sx={{ mb: 1 }}>
+            <Paper variant="outlined" sx={{ mb: 1 }}>
               {contextEntries.map((entry, index) => {
                 const contextField = getContextFieldByKey(entry.key);
                 const hasLegalValues =
@@ -972,10 +974,36 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                   .filter(Boolean);
 
                 return (
-                  <Paper key={index} variant="outlined" sx={{ p: 1.5 }}>
+                  <Box
+                    key={index}
+                    sx={{
+                      p: 1.5,
+                      opacity: entry.enabled === false ? 0.5 : 1,
+                      transition: 'opacity 0.2s',
+                      borderBottom: index < contextEntries.length - 1 ? 1 : 0,
+                      borderColor: 'divider',
+                    }}
+                  >
                     <Box
                       sx={{ display: 'flex', gap: 1, alignItems: 'flex-start', flexWrap: 'wrap' }}
                     >
+                      {/* Enabled Checkbox */}
+                      <Checkbox
+                        size="small"
+                        checked={entry.enabled !== false}
+                        onChange={(e) => {
+                          const updated = [...contextEntries];
+                          updated[index] = { ...updated[index], enabled: e.target.checked };
+                          setContextEntries(updated);
+                          if (rememberContext) {
+                            localStorage.setItem(
+                              'gatrix_playground_saved_context',
+                              JSON.stringify(updated)
+                            );
+                          }
+                        }}
+                        sx={{ p: 0, mt: 0.5 }}
+                      />
                       {/* Context Field Selector */}
                       <Autocomplete
                         size="small"
@@ -1090,10 +1118,10 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                         </IconButton>
                       </Tooltip>
                     </Box>
-                  </Paper>
+                  </Box>
                 );
               })}
-            </Stack>
+            </Paper>
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, mb: 2 }}>
               {initialFlagDetails && (
                 <Button
@@ -1912,7 +1940,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
 
               {/* Context Fields Used */}
               <Divider sx={{ borderStyle: 'dashed', my: 2.5 }} />
-              {contextEntries.length > 0 && (
+              {contextEntries.filter((e) => e.enabled !== false).length > 0 && (
                 <Box sx={{ mb: 2 }}>
                   <Typography
                     variant="caption"
@@ -1936,26 +1964,28 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                         </TableRow>
                       </TableHead>
                       <TableBody>
-                        {contextEntries.map((entry, idx) => (
-                          <TableRow key={idx} sx={{ '&:last-child td': { borderBottom: 0 } }}>
-                            <TableCell sx={{ py: 0.5 }}>
-                              <Typography variant="caption" fontWeight={500}>
-                                {entry.key}
-                              </Typography>
-                            </TableCell>
-                            <TableCell sx={{ py: 0.5 }}>
-                              <Typography variant="caption" sx={{ fontFamily: 'monospace' }}>
-                                {entry.value}
-                              </Typography>
-                            </TableCell>
-                          </TableRow>
-                        ))}
+                        {contextEntries
+                          .filter((e) => e.enabled !== false)
+                          .map((entry, idx) => (
+                            <TableRow key={idx} sx={{ '&:last-child td': { borderBottom: 0 } }}>
+                              <TableCell sx={{ py: 0.5 }}>
+                                <Typography variant="caption" fontWeight={500}>
+                                  {entry.key}
+                                </Typography>
+                              </TableCell>
+                              <TableCell sx={{ py: 0.5 }}>
+                                <Typography variant="caption" sx={{ fontFamily: 'monospace' }}>
+                                  {entry.value}
+                                </Typography>
+                              </TableCell>
+                            </TableRow>
+                          ))}
                       </TableBody>
                     </Table>
                   </TableContainer>
                 </Box>
               )}
-              {contextEntries.length === 0 && (
+              {contextEntries.filter((e) => e.enabled !== false).length === 0 && (
                 <Box sx={{ mb: 2 }}>
                   <Typography
                     variant="caption"
