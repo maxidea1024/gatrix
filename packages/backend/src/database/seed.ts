@@ -141,10 +141,39 @@ async function createSampleReleaseFlows() {
     );
 
     const milestones = [
-      { name: 'Internal Testing', sortOrder: 0, strategy: { name: 'flexibleRollout', params: { rollout: 0, stickiness: 'default', groupId: 'default' }, constraints: [{ contextName: 'appName', operator: 'IN', values: ['Gatrix-Admin'] }] } },
-      { name: 'Beta (10%)', sortOrder: 1, strategy: { name: 'flexibleRollout', params: { rollout: 10, stickiness: 'default', groupId: 'default' } } },
-      { name: 'Limited (50%)', sortOrder: 2, strategy: { name: 'flexibleRollout', params: { rollout: 50, stickiness: 'default', groupId: 'default' } } },
-      { name: 'Full Release (100%)', sortOrder: 3, strategy: { name: 'flexibleRollout', params: { rollout: 100, stickiness: 'default', groupId: 'default' } } },
+      {
+        name: 'Internal Testing',
+        sortOrder: 0,
+        strategy: {
+          name: 'flexibleRollout',
+          params: { rollout: 0, stickiness: 'default', groupId: 'default' },
+          constraints: [{ contextName: 'appName', operator: 'IN', values: ['Gatrix-Admin'] }],
+        },
+      },
+      {
+        name: 'Beta (10%)',
+        sortOrder: 1,
+        strategy: {
+          name: 'flexibleRollout',
+          params: { rollout: 10, stickiness: 'default', groupId: 'default' },
+        },
+      },
+      {
+        name: 'Limited (50%)',
+        sortOrder: 2,
+        strategy: {
+          name: 'flexibleRollout',
+          params: { rollout: 50, stickiness: 'default', groupId: 'default' },
+        },
+      },
+      {
+        name: 'Full Release (100%)',
+        sortOrder: 3,
+        strategy: {
+          name: 'flexibleRollout',
+          params: { rollout: 100, stickiness: 'default', groupId: 'default' },
+        },
+      },
     ];
 
     for (const m of milestones) {
@@ -165,7 +194,7 @@ async function createSampleReleaseFlows() {
           m.strategy.name,
           JSON.stringify(m.strategy.params),
           JSON.stringify(m.strategy.constraints || []),
-          0
+          0,
         ]
       );
     }

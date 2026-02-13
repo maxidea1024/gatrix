@@ -439,10 +439,10 @@ export class GatrixServerSDK {
       },
       redis: this.config.redis
         ? {
-          host: this.config.redis.host,
-          port: this.config.redis.port,
-          db: this.config.redis.db ?? 0,
-        }
+            host: this.config.redis.host,
+            port: this.config.redis.port,
+            db: this.config.redis.db ?? 0,
+          }
         : 'disabled',
       retry: this.config.retry ?? 'default',
     });
@@ -1632,7 +1632,7 @@ export class GatrixServerSDK {
     if (refreshMethod === 'event') {
       if (!this.eventListener) {
         this.logger.warn('Event listener not initialized. Events will not be received.');
-        return () => { }; // Return no-op function
+        return () => {}; // Return no-op function
       }
       return this.eventListener.on(eventType, callback);
     }
@@ -1640,7 +1640,7 @@ export class GatrixServerSDK {
     else if (refreshMethod === 'polling') {
       if (!this.cacheManager) {
         this.logger.warn('Cache manager not initialized.');
-        return () => { }; // Return no-op function
+        return () => {}; // Return no-op function
       }
       const unsubscribe = this.cacheManager.onRefresh((type: string, data: any) => {
         // Convert cache refresh events to SDK events
@@ -1661,7 +1661,7 @@ export class GatrixServerSDK {
       return unsubscribe;
     }
 
-    return () => { }; // Return no-op function as fallback
+    return () => {}; // Return no-op function as fallback
   }
 
   /**
@@ -1856,15 +1856,15 @@ export class GatrixServerSDK {
    */
   getUserMetricsProvider():
     | {
-      createCounter: (name: string, help: string, labelNames?: string[]) => any;
-      createGauge: (name: string, help: string, labelNames?: string[]) => any;
-      createHistogram: (
-        name: string,
-        help: string,
-        labelNames?: string[],
-        buckets?: number[]
-      ) => any;
-    }
+        createCounter: (name: string, help: string, labelNames?: string[]) => any;
+        createGauge: (name: string, help: string, labelNames?: string[]) => any;
+        createHistogram: (
+          name: string,
+          help: string,
+          labelNames?: string[],
+          buckets?: number[]
+        ) => any;
+      }
     | undefined {
     if (!this.userRegistry) return undefined;
 

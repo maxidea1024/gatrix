@@ -6,519 +6,534 @@ import { GatrixError } from '../middleware/errorHandler';
 import { ReleaseFlowModel } from '../models/ReleaseFlow';
 
 export class ReleaseFlowController {
-    /**
-     * List all release flow templates
-     */
-    static async listTemplates(
-        req: AuthenticatedRequest,
-        res: Response,
-        next: NextFunction
-    ): Promise<void> {
-        try {
-            const search = req.query.search as string;
-            const templates = await releaseFlowService.getTemplates();
+  /**
+   * List all release flow templates
+   */
+  static async listTemplates(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const search = req.query.search as string;
+      const templates = await releaseFlowService.getTemplates();
 
-            // Basic filtering if search provided
-            let filtered = templates;
-            if (search) {
-                const s = search.toLowerCase();
-                filtered = templates.filter(t =>
-                    t.flowName.toLowerCase().includes(s) ||
-                    t.displayName?.toLowerCase().includes(s) ||
-                    t.description?.toLowerCase().includes(s)
-                );
-            }
+      // Basic filtering if search provided
+      let filtered = templates;
+      if (search) {
+        const s = search.toLowerCase();
+        filtered = templates.filter(
+          (t) =>
+            t.flowName.toLowerCase().includes(s) ||
+            t.displayName?.toLowerCase().includes(s) ||
+            t.description?.toLowerCase().includes(s)
+        );
+      }
 
-            res.json({
-                success: true,
-                data: filtered,
-            });
-        } catch (error) {
-            next(error);
-        }
+      res.json({
+        success: true,
+        data: filtered,
+      });
+    } catch (error) {
+      next(error);
     }
+  }
 
-    /**
-     * Create a new release flow template
-     */
-    static async createTemplate(
-        req: AuthenticatedRequest,
-        res: Response,
-        next: NextFunction
-    ): Promise<void> {
-        try {
-            const userId = req.user?.userId;
-            if (!userId) throw new GatrixError('Unauthorized', 401);
+  /**
+   * Create a new release flow template
+   */
+  static async createTemplate(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const userId = req.user?.userId;
+      if (!userId) throw new GatrixError('Unauthorized', 401);
 
-            const template = await releaseFlowService.createTemplate(req.body, userId);
-            res.status(201).json({
-                success: true,
-                data: template,
-            });
-        } catch (error) {
-            next(error);
-        }
+      const template = await releaseFlowService.createTemplate(req.body, userId);
+      res.status(201).json({
+        success: true,
+        data: template,
+      });
+    } catch (error) {
+      next(error);
     }
+  }
 
-    /**
-     * Get a single release flow template by ID (with milestones)
-     */
-    static async getTemplate(
-        req: AuthenticatedRequest,
-        res: Response,
-        next: NextFunction
-    ): Promise<void> {
-        try {
-            const { id } = req.params;
-            const template = await releaseFlowService.getTemplateById(id);
-            res.json({
-                success: true,
-                data: template,
-            });
-        } catch (error) {
-            next(error);
-        }
+  /**
+   * Get a single release flow template by ID (with milestones)
+   */
+  static async getTemplate(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const { id } = req.params;
+      const template = await releaseFlowService.getTemplateById(id);
+      res.json({
+        success: true,
+        data: template,
+      });
+    } catch (error) {
+      next(error);
     }
+  }
 
-    /**
-     * Update an existing release flow template
-     */
-    static async updateTemplate(
-        req: AuthenticatedRequest,
-        res: Response,
-        next: NextFunction
-    ): Promise<void> {
-        try {
-            const userId = req.user?.userId;
-            if (!userId) throw new GatrixError('Unauthorized', 401);
+  /**
+   * Update an existing release flow template
+   */
+  static async updateTemplate(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const userId = req.user?.userId;
+      if (!userId) throw new GatrixError('Unauthorized', 401);
 
-            const { id } = req.params;
-            const template = await releaseFlowService.updateTemplate(id, req.body, userId);
-            res.json({
-                success: true,
-                data: template,
-            });
-        } catch (error) {
-            next(error);
-        }
+      const { id } = req.params;
+      const template = await releaseFlowService.updateTemplate(id, req.body, userId);
+      res.json({
+        success: true,
+        data: template,
+      });
+    } catch (error) {
+      next(error);
     }
+  }
 
-    /**
-     * Delete (archive) a release flow template
-     */
-    static async deleteTemplate(
-        req: AuthenticatedRequest,
-        res: Response,
-        next: NextFunction
-    ): Promise<void> {
-        try {
-            const userId = req.user?.userId;
-            if (!userId) throw new GatrixError('Unauthorized', 401);
+  /**
+   * Delete (archive) a release flow template
+   */
+  static async deleteTemplate(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const userId = req.user?.userId;
+      if (!userId) throw new GatrixError('Unauthorized', 401);
 
-            const { id } = req.params;
-            await releaseFlowService.deleteTemplate(id, userId);
-            res.json({
-                success: true,
-                message: 'Template archived successfully',
-            });
-        } catch (error) {
-            next(error);
-        }
+      const { id } = req.params;
+      await releaseFlowService.deleteTemplate(id, userId);
+      res.json({
+        success: true,
+        message: 'Template archived successfully',
+      });
+    } catch (error) {
+      next(error);
     }
+  }
 
-    /**
-     * Get all active release flow plan summaries for a flag
-     */
-    static async getPlansByFlag(
-        req: AuthenticatedRequest,
-        res: Response,
-        next: NextFunction
-    ): Promise<void> {
-        try {
-            const { flagId } = req.params;
-            const plans = await ReleaseFlowModel.findPlansByFlag(flagId);
+  /**
+   * Get all active release flow plan summaries for a flag
+   */
+  static async getPlansByFlag(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const { flagId } = req.params;
+      const plans = await ReleaseFlowModel.findPlansByFlag(flagId);
 
-            res.json({
-                success: true,
-                data: plans,
-            });
-        } catch (error) {
-            next(error);
-        }
+      res.json({
+        success: true,
+        data: plans,
+      });
+    } catch (error) {
+      next(error);
     }
+  }
 
-    /**
-     * Get a release flow plan for a specific feature flag and environment
-     */
-    static async getPlan(
-        req: AuthenticatedRequest,
-        res: Response,
-        next: NextFunction
-    ): Promise<void> {
-        try {
-            const { flagId, environment } = req.params;
-            const plan = await releaseFlowService.getPlanForFlag(flagId, environment);
+  /**
+   * Get a release flow plan for a specific feature flag and environment
+   */
+  static async getPlan(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const { flagId, environment } = req.params;
+      const plan = await releaseFlowService.getPlanForFlag(flagId, environment);
 
-            res.json({
-                success: true,
-                data: plan,
-            });
-        } catch (error) {
-            next(error);
-        }
+      res.json({
+        success: true,
+        data: plan,
+      });
+    } catch (error) {
+      next(error);
     }
+  }
 
-    /**
-     * Apply a template to a feature flag
-     */
-    static async applyTemplate(
-        req: AuthenticatedRequest,
-        res: Response,
-        next: NextFunction
-    ): Promise<void> {
-        try {
-            const userId = req.user?.userId;
-            if (!userId) throw new GatrixError('Unauthorized', 401);
+  /**
+   * Apply a template to a feature flag
+   */
+  static async applyTemplate(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const userId = req.user?.userId;
+      if (!userId) throw new GatrixError('Unauthorized', 401);
 
-            const { flagId, environment, templateId } = req.body;
-            if (!flagId || !environment || !templateId) {
-                throw new GatrixError('flagId, environment, and templateId are required', 400);
-            }
+      const { flagId, environment, templateId } = req.body;
+      if (!flagId || !environment || !templateId) {
+        throw new GatrixError('flagId, environment, and templateId are required', 400);
+      }
 
-            const plan = await releaseFlowService.applyTemplateToFlag(flagId, environment, templateId, userId);
-            res.status(201).json({
-                success: true,
-                data: plan,
-            });
-        } catch (error) {
-            next(error);
-        }
+      const plan = await releaseFlowService.applyTemplateToFlag(
+        flagId,
+        environment,
+        templateId,
+        userId
+      );
+      res.status(201).json({
+        success: true,
+        data: plan,
+      });
+    } catch (error) {
+      next(error);
     }
+  }
 
-    /**
-     * Start/Activate a milestone in a release plan
-     */
-    static async startMilestone(
-        req: AuthenticatedRequest,
-        res: Response,
-        next: NextFunction
-    ): Promise<void> {
-        try {
-            const userId = req.user?.userId;
-            if (!userId) throw new GatrixError('Unauthorized', 401);
+  /**
+   * Start/Activate a milestone in a release plan
+   */
+  static async startMilestone(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const userId = req.user?.userId;
+      if (!userId) throw new GatrixError('Unauthorized', 401);
 
-            const { planId, milestoneId } = req.params;
-            const plan = await releaseFlowService.startMilestone(planId, milestoneId, userId);
+      const { planId, milestoneId } = req.params;
+      const plan = await releaseFlowService.startMilestone(planId, milestoneId, userId);
 
-            res.json({
-                success: true,
-                data: plan,
-            });
-        } catch (error) {
-            next(error);
-        }
+      res.json({
+        success: true,
+        data: plan,
+      });
+    } catch (error) {
+      next(error);
     }
+  }
 
-    /**
-     * Start a release plan (first milestone)
-     */
-    static async startPlan(
-        req: AuthenticatedRequest,
-        res: Response,
-        next: NextFunction
-    ): Promise<void> {
-        try {
-            const userId = req.user?.userId;
-            if (!userId) throw new GatrixError('Unauthorized', 401);
+  /**
+   * Start a release plan (first milestone)
+   */
+  static async startPlan(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const userId = req.user?.userId;
+      if (!userId) throw new GatrixError('Unauthorized', 401);
 
-            const { id } = req.params;
-            const plan = await releaseFlowService.startPlan(id, userId);
+      const { id } = req.params;
+      const plan = await releaseFlowService.startPlan(id, userId);
 
-            res.json({
-                success: true,
-                data: plan,
-            });
-        } catch (error) {
-            next(error);
-        }
+      res.json({
+        success: true,
+        data: plan,
+      });
+    } catch (error) {
+      next(error);
     }
+  }
 
-    /**
-     * Pause a running release plan
-     */
-    static async pausePlan(
-        req: AuthenticatedRequest,
-        res: Response,
-        next: NextFunction
-    ): Promise<void> {
-        try {
-            const userId = req.user?.userId;
-            if (!userId) throw new GatrixError('Unauthorized', 401);
+  /**
+   * Pause a running release plan
+   */
+  static async pausePlan(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const userId = req.user?.userId;
+      if (!userId) throw new GatrixError('Unauthorized', 401);
 
-            const { id } = req.params;
-            const plan = await releaseFlowService.pausePlan(id, userId);
+      const { id } = req.params;
+      const plan = await releaseFlowService.pausePlan(id, userId);
 
-            res.json({
-                success: true,
-                data: plan,
-            });
-        } catch (error) {
-            next(error);
-        }
+      res.json({
+        success: true,
+        data: plan,
+      });
+    } catch (error) {
+      next(error);
     }
+  }
 
-    /**
-     * Resume a paused release plan
-     */
-    static async resumePlan(
-        req: AuthenticatedRequest,
-        res: Response,
-        next: NextFunction
-    ): Promise<void> {
-        try {
-            const userId = req.user?.userId;
-            if (!userId) throw new GatrixError('Unauthorized', 401);
+  /**
+   * Resume a paused release plan
+   */
+  static async resumePlan(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const userId = req.user?.userId;
+      if (!userId) throw new GatrixError('Unauthorized', 401);
 
-            const { id } = req.params;
-            const plan = await releaseFlowService.resumePlan(id, userId);
+      const { id } = req.params;
+      const plan = await releaseFlowService.resumePlan(id, userId);
 
-            res.json({
-                success: true,
-                data: plan,
-            });
-        } catch (error) {
-            next(error);
-        }
+      res.json({
+        success: true,
+        data: plan,
+      });
+    } catch (error) {
+      next(error);
     }
+  }
 
-    /**
-     * Manually progress to the next milestone
-     */
-    static async progressToNext(
-        req: AuthenticatedRequest,
-        res: Response,
-        next: NextFunction
-    ): Promise<void> {
-        try {
-            const userId = req.user?.userId;
-            if (!userId) throw new GatrixError('Unauthorized', 401);
+  /**
+   * Manually progress to the next milestone
+   */
+  static async progressToNext(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const userId = req.user?.userId;
+      if (!userId) throw new GatrixError('Unauthorized', 401);
 
-            const { id } = req.params;
-            const plan = await releaseFlowService.progressToNextMilestone(id, userId);
+      const { id } = req.params;
+      const plan = await releaseFlowService.progressToNextMilestone(id, userId);
 
-            res.json({
-                success: true,
-                data: plan,
-            });
-        } catch (error) {
-            next(error);
-        }
+      res.json({
+        success: true,
+        data: plan,
+      });
+    } catch (error) {
+      next(error);
     }
+  }
 
-    /**
-     * Set transition condition on a milestone
-     */
-    static async setTransitionCondition(
-        req: AuthenticatedRequest,
-        res: Response,
-        next: NextFunction
-    ): Promise<void> {
-        try {
-            const userId = req.user?.userId;
-            if (!userId) throw new GatrixError('Unauthorized', 401);
+  /**
+   * Set transition condition on a milestone
+   */
+  static async setTransitionCondition(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const userId = req.user?.userId;
+      if (!userId) throw new GatrixError('Unauthorized', 401);
 
-            const { milestoneId } = req.params;
-            const { intervalMinutes } = req.body;
+      const { milestoneId } = req.params;
+      const { intervalMinutes } = req.body;
 
-            if (!intervalMinutes || intervalMinutes < 1) {
-                throw new GatrixError('intervalMinutes must be at least 1', 400);
-            }
+      if (!intervalMinutes || intervalMinutes < 1) {
+        throw new GatrixError('intervalMinutes must be at least 1', 400);
+      }
 
-            const milestone = await releaseFlowService.setTransitionCondition(
-                milestoneId,
-                { intervalMinutes },
-                userId
-            );
+      const milestone = await releaseFlowService.setTransitionCondition(
+        milestoneId,
+        { intervalMinutes },
+        userId
+      );
 
-            res.json({
-                success: true,
-                data: milestone,
-            });
-        } catch (error) {
-            next(error);
-        }
+      res.json({
+        success: true,
+        data: milestone,
+      });
+    } catch (error) {
+      next(error);
     }
+  }
 
-    /**
-     * Remove transition condition from a milestone
-     */
-    static async removeTransitionCondition(
-        req: AuthenticatedRequest,
-        res: Response,
-        next: NextFunction
-    ): Promise<void> {
-        try {
-            const userId = req.user?.userId;
-            if (!userId) throw new GatrixError('Unauthorized', 401);
+  /**
+   * Remove transition condition from a milestone
+   */
+  static async removeTransitionCondition(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const userId = req.user?.userId;
+      if (!userId) throw new GatrixError('Unauthorized', 401);
 
-            const { milestoneId } = req.params;
-            const milestone = await releaseFlowService.removeTransitionCondition(milestoneId, userId);
+      const { milestoneId } = req.params;
+      const milestone = await releaseFlowService.removeTransitionCondition(milestoneId, userId);
 
-            res.json({
-                success: true,
-                data: milestone,
-            });
-        } catch (error) {
-            next(error);
-        }
+      res.json({
+        success: true,
+        data: milestone,
+      });
+    } catch (error) {
+      next(error);
     }
+  }
 
-    // ==================== Safeguards ====================
+  // ==================== Safeguards ====================
 
-    // List safeguards for a milestone
-    static async listSafeguards(
-        req: AuthenticatedRequest,
-        res: Response,
-        next: NextFunction
-    ): Promise<void> {
-        try {
-            const { milestoneId } = req.params;
-            const safeguards = await safeguardService.getByMilestoneId(milestoneId);
+  // List safeguards for a milestone
+  static async listSafeguards(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const { milestoneId } = req.params;
+      const safeguards = await safeguardService.getByMilestoneId(milestoneId);
 
-            res.json({
-                success: true,
-                data: safeguards,
-            });
-        } catch (error) {
-            next(error);
-        }
+      res.json({
+        success: true,
+        data: safeguards,
+      });
+    } catch (error) {
+      next(error);
     }
+  }
 
-    // Create a safeguard for a milestone
-    static async createSafeguard(
-        req: AuthenticatedRequest,
-        res: Response,
-        next: NextFunction
-    ): Promise<void> {
-        try {
-            const { flowId, milestoneId, metricName, aggregationMode, operator, threshold, timeRange, action } = req.body;
+  // Create a safeguard for a milestone
+  static async createSafeguard(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const {
+        flowId,
+        milestoneId,
+        metricName,
+        aggregationMode,
+        operator,
+        threshold,
+        timeRange,
+        action,
+      } = req.body;
 
-            if (!flowId || !milestoneId || !metricName || threshold === undefined) {
-                throw new GatrixError('flowId, milestoneId, metricName, and threshold are required', 400);
-            }
+      if (!flowId || !milestoneId || !metricName || threshold === undefined) {
+        throw new GatrixError('flowId, milestoneId, metricName, and threshold are required', 400);
+      }
 
-            const safeguard = await safeguardService.create({
-                flowId,
-                milestoneId,
-                metricName,
-                aggregationMode,
-                operator,
-                threshold,
-                timeRange,
-                action,
-            });
+      const safeguard = await safeguardService.create({
+        flowId,
+        milestoneId,
+        metricName,
+        aggregationMode,
+        operator,
+        threshold,
+        timeRange,
+        action,
+      });
 
-            res.status(201).json({
-                success: true,
-                data: safeguard,
-            });
-        } catch (error) {
-            next(error);
-        }
+      res.status(201).json({
+        success: true,
+        data: safeguard,
+      });
+    } catch (error) {
+      next(error);
     }
+  }
 
-    // Update a safeguard
-    static async updateSafeguard(
-        req: AuthenticatedRequest,
-        res: Response,
-        next: NextFunction
-    ): Promise<void> {
-        try {
-            const { safeguardId } = req.params;
-            const { metricName, aggregationMode, operator, threshold, timeRange, action } = req.body;
+  // Update a safeguard
+  static async updateSafeguard(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const { safeguardId } = req.params;
+      const { metricName, aggregationMode, operator, threshold, timeRange, action } = req.body;
 
-            const safeguard = await safeguardService.update(safeguardId, {
-                metricName,
-                aggregationMode,
-                operator,
-                threshold,
-                timeRange,
-                action,
-            });
+      const safeguard = await safeguardService.update(safeguardId, {
+        metricName,
+        aggregationMode,
+        operator,
+        threshold,
+        timeRange,
+        action,
+      });
 
-            if (!safeguard) {
-                throw new GatrixError('Safeguard not found', 404);
-            }
+      if (!safeguard) {
+        throw new GatrixError('Safeguard not found', 404);
+      }
 
-            res.json({
-                success: true,
-                data: safeguard,
-            });
-        } catch (error) {
-            next(error);
-        }
+      res.json({
+        success: true,
+        data: safeguard,
+      });
+    } catch (error) {
+      next(error);
     }
+  }
 
-    // Delete a safeguard
-    static async deleteSafeguard(
-        req: AuthenticatedRequest,
-        res: Response,
-        next: NextFunction
-    ): Promise<void> {
-        try {
-            const { safeguardId } = req.params;
-            const deleted = await safeguardService.delete(safeguardId);
+  // Delete a safeguard
+  static async deleteSafeguard(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const { safeguardId } = req.params;
+      const deleted = await safeguardService.delete(safeguardId);
 
-            if (!deleted) {
-                throw new GatrixError('Safeguard not found', 404);
-            }
+      if (!deleted) {
+        throw new GatrixError('Safeguard not found', 404);
+      }
 
-            res.json({
-                success: true,
-            });
-        } catch (error) {
-            next(error);
-        }
+      res.json({
+        success: true,
+      });
+    } catch (error) {
+      next(error);
     }
+  }
 
-    // Evaluate safeguards for a milestone (manual trigger)
-    static async evaluateSafeguards(
-        req: AuthenticatedRequest,
-        res: Response,
-        next: NextFunction
-    ): Promise<void> {
-        try {
-            const { milestoneId } = req.params;
-            const result = await safeguardService.evaluateMilestoneSafeguards(milestoneId);
+  // Evaluate safeguards for a milestone (manual trigger)
+  static async evaluateSafeguards(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const { milestoneId } = req.params;
+      const result = await safeguardService.evaluateMilestoneSafeguards(milestoneId);
 
-            res.json({
-                success: true,
-                data: result,
-            });
-        } catch (error) {
-            next(error);
-        }
+      res.json({
+        success: true,
+        data: result,
+      });
+    } catch (error) {
+      next(error);
     }
+  }
 
-    // Reset a triggered safeguard
-    static async resetSafeguard(
-        req: AuthenticatedRequest,
-        res: Response,
-        next: NextFunction
-    ): Promise<void> {
-        try {
-            const { safeguardId } = req.params;
-            const reset = await safeguardService.resetTriggered(safeguardId);
+  // Reset a triggered safeguard
+  static async resetSafeguard(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const { safeguardId } = req.params;
+      const reset = await safeguardService.resetTriggered(safeguardId);
 
-            if (!reset) {
-                throw new GatrixError('Safeguard not found', 404);
-            }
+      if (!reset) {
+        throw new GatrixError('Safeguard not found', 404);
+      }
 
-            res.json({
-                success: true,
-            });
-        } catch (error) {
-            next(error);
-        }
+      res.json({
+        success: true,
+      });
+    } catch (error) {
+      next(error);
     }
+  }
 }

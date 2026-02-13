@@ -103,34 +103,79 @@ async function main() {
     const IMPACT_METRICS_INTERVAL = 30000; // 30 seconds
     const testMetrics = [
       { name: 'http_error_rate', type: 'counter' as const, help: 'HTTP 5xx error count', value: 0 },
-      { name: 'login_failure_count', type: 'counter' as const, help: 'Failed login attempts', value: 0 },
-      { name: 'api_response_time_ms', type: 'gauge' as const, help: 'Average API response time in ms', value: 0 },
-      { name: 'concurrent_users', type: 'gauge' as const, help: 'Number of concurrent users', value: 0 },
+      {
+        name: 'login_failure_count',
+        type: 'counter' as const,
+        help: 'Failed login attempts',
+        value: 0,
+      },
+      {
+        name: 'api_response_time_ms',
+        type: 'gauge' as const,
+        help: 'Average API response time in ms',
+        value: 0,
+      },
+      {
+        name: 'concurrent_users',
+        type: 'gauge' as const,
+        help: 'Number of concurrent users',
+        value: 0,
+      },
       { name: 'crash_rate', type: 'counter' as const, help: 'Application crash count', value: 0 },
-      { name: 'memory_usage_mb', type: 'gauge' as const, help: 'Memory usage in megabytes', value: 0 },
+      {
+        name: 'memory_usage_mb',
+        type: 'gauge' as const,
+        help: 'Memory usage in megabytes',
+        value: 0,
+      },
       { name: 'cpu_usage_percent', type: 'gauge' as const, help: 'CPU usage percentage', value: 0 },
-      { name: 'request_queue_length', type: 'gauge' as const, help: 'Pending request queue length', value: 0 },
-      { name: 'db_connection_pool_usage', type: 'gauge' as const, help: 'Database connection pool utilization', value: 0 },
-      { name: 'revenue_per_minute', type: 'gauge' as const, help: 'Revenue per minute (USD)', value: 0 },
-      { name: 'payment_failure_count', type: 'counter' as const, help: 'Payment processing failures', value: 0 },
-      { name: 'session_duration_avg_sec', type: 'gauge' as const, help: 'Average user session duration in seconds', value: 0 },
+      {
+        name: 'request_queue_length',
+        type: 'gauge' as const,
+        help: 'Pending request queue length',
+        value: 0,
+      },
+      {
+        name: 'db_connection_pool_usage',
+        type: 'gauge' as const,
+        help: 'Database connection pool utilization',
+        value: 0,
+      },
+      {
+        name: 'revenue_per_minute',
+        type: 'gauge' as const,
+        help: 'Revenue per minute (USD)',
+        value: 0,
+      },
+      {
+        name: 'payment_failure_count',
+        type: 'counter' as const,
+        help: 'Payment processing failures',
+        value: 0,
+      },
+      {
+        name: 'session_duration_avg_sec',
+        type: 'gauge' as const,
+        help: 'Average user session duration in seconds',
+        value: 0,
+      },
     ];
 
     async function sendImpactMetrics() {
       try {
         // Simulate metric values
-        testMetrics[0].value += Math.floor(Math.random() * 5);        // http errors accumulate
-        testMetrics[1].value += Math.floor(Math.random() * 3);        // login failures accumulate
-        testMetrics[2].value = 50 + Math.floor(Math.random() * 200);  // response time 50-250ms
+        testMetrics[0].value += Math.floor(Math.random() * 5); // http errors accumulate
+        testMetrics[1].value += Math.floor(Math.random() * 3); // login failures accumulate
+        testMetrics[2].value = 50 + Math.floor(Math.random() * 200); // response time 50-250ms
         testMetrics[3].value = 100 + Math.floor(Math.random() * 500); // 100-600 users
-        testMetrics[4].value += Math.random() < 0.1 ? 1 : 0;         // crash ~10% chance
+        testMetrics[4].value += Math.random() < 0.1 ? 1 : 0; // crash ~10% chance
         testMetrics[5].value = 256 + Math.floor(Math.random() * 512); // memory 256-768MB
-        testMetrics[6].value = 10 + Math.floor(Math.random() * 60);   // cpu 10-70%
-        testMetrics[7].value = Math.floor(Math.random() * 50);        // queue 0-50
-        testMetrics[8].value = 20 + Math.floor(Math.random() * 60);   // db pool 20-80%
-        testMetrics[9].value = 50 + Math.floor(Math.random() * 200);  // revenue $50-250/min
-        testMetrics[10].value += Math.random() < 0.05 ? 1 : 0;       // payment fail ~5%
-        testMetrics[11].value = 120 + Math.floor(Math.random() * 600);// session 2-12min
+        testMetrics[6].value = 10 + Math.floor(Math.random() * 60); // cpu 10-70%
+        testMetrics[7].value = Math.floor(Math.random() * 50); // queue 0-50
+        testMetrics[8].value = 20 + Math.floor(Math.random() * 60); // db pool 20-80%
+        testMetrics[9].value = 50 + Math.floor(Math.random() * 200); // revenue $50-250/min
+        testMetrics[10].value += Math.random() < 0.05 ? 1 : 0; // payment fail ~5%
+        testMetrics[11].value = 120 + Math.floor(Math.random() * 600); // session 2-12min
 
         const gatrixUrl = process.env.GATRIX_URL || 'http://localhost:45000';
         const apiToken = process.env.API_TOKEN || 'gatrix-unsecured-server-api-token';
@@ -150,7 +195,7 @@ async function main() {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${apiToken}`,
+            Authorization: `Bearer ${apiToken}`,
           },
           body: JSON.stringify(payload),
         });

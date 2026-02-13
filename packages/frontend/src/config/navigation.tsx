@@ -477,6 +477,12 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
         path: '/feature-flags/unknown',
         permission: 'feature-flags',
       },
+      {
+        text: 'sidebar.impactMetrics',
+        icon: 'ShowChart',
+        path: '/feature-flags/impact-metrics',
+        permission: 'feature-flags',
+      },
     ],
   },
 

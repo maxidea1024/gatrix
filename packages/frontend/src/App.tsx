@@ -130,6 +130,7 @@ import FeatureFlagTypesPage from './pages/game/FeatureFlagTypesPage';
 import FeatureNetworkPage from './pages/game/FeatureNetworkPage';
 import UnknownFlagsPage from './pages/features/UnknownFlagsPage';
 import ReleaseFlowTemplatesPage from './pages/game/ReleaseFlowTemplatesPage';
+import ImpactMetricsPage from './pages/game/ImpactMetricsPage';
 
 // Conditional Landing Page Component - Simplified since FirstVisitGuard handles first-visit logic
 const ConditionalLandingPage: React.FC = () => {
@@ -331,36 +332,36 @@ const AppContent: React.FC = () => {
                       },
                       // WebKit/Blink (Chrome, Edge, Safari)
                       'html::-webkit-scrollbar, body::-webkit-scrollbar, *::-webkit-scrollbar, div::-webkit-scrollbar':
-                      {
-                        width: '8px',
-                        height: '8px',
-                      },
+                        {
+                          width: '8px',
+                          height: '8px',
+                        },
                       'html::-webkit-scrollbar-track, body::-webkit-scrollbar-track, *::-webkit-scrollbar-track, div::-webkit-scrollbar-track':
-                      {
-                        background: 'transparent',
-                      },
+                        {
+                          background: 'transparent',
+                        },
                       'html::-webkit-scrollbar-thumb, body::-webkit-scrollbar-thumb, *::-webkit-scrollbar-thumb, div::-webkit-scrollbar-thumb':
-                      {
-                        backgroundColor:
-                          theme.palette.mode === 'dark'
-                            ? 'rgba(255, 255, 255, 0.2)'
-                            : 'rgba(0, 0, 0, 0.2)',
-                        borderRadius: 0,
-                      },
+                        {
+                          backgroundColor:
+                            theme.palette.mode === 'dark'
+                              ? 'rgba(255, 255, 255, 0.2)'
+                              : 'rgba(0, 0, 0, 0.2)',
+                          borderRadius: 0,
+                        },
                       'html::-webkit-scrollbar-thumb:hover, body::-webkit-scrollbar-thumb:hover, *::-webkit-scrollbar-thumb:hover, div::-webkit-scrollbar-thumb:hover':
-                      {
-                        backgroundColor:
-                          theme.palette.mode === 'dark'
-                            ? 'rgba(255, 255, 255, 0.3)'
-                            : 'rgba(0, 0, 0, 0.3)',
-                      },
+                        {
+                          backgroundColor:
+                            theme.palette.mode === 'dark'
+                              ? 'rgba(255, 255, 255, 0.3)'
+                              : 'rgba(0, 0, 0, 0.3)',
+                        },
                       'html::-webkit-scrollbar-thumb:active, body::-webkit-scrollbar-thumb:active, *::-webkit-scrollbar-thumb:active, div::-webkit-scrollbar-thumb:active':
-                      {
-                        backgroundColor:
-                          theme.palette.mode === 'dark'
-                            ? 'rgba(255, 255, 255, 0.4)'
-                            : 'rgba(0, 0, 0, 0.4)',
-                      },
+                        {
+                          backgroundColor:
+                            theme.palette.mode === 'dark'
+                              ? 'rgba(255, 255, 255, 0.4)'
+                              : 'rgba(0, 0, 0, 0.4)',
+                        },
                     })}
                   />
                   <SnackbarProvider
@@ -704,8 +705,12 @@ const AppContent: React.FC = () => {
                                     />
                                     <Route path="types" element={<FeatureFlagTypesPage />} />
                                     <Route path="network" element={<FeatureNetworkPage />} />
-                                    <Route path="templates" element={<ReleaseFlowTemplatesPage />} />
+                                    <Route
+                                      path="templates"
+                                      element={<ReleaseFlowTemplatesPage />}
+                                    />
                                     <Route path="unknown" element={<UnknownFlagsPage />} />
+                                    <Route path="impact-metrics" element={<ImpactMetricsPage />} />
                                     <Route path=":flagName" element={<FeatureFlagDetailPage />} />
                                   </Routes>
                                 </EnvironmentAwareLayout>

@@ -144,6 +144,24 @@ app.use('/api', apiLimiter as any);
 app.use(passport.initialize() as any);
 // app.use(passport.session() as any);
 
+// Metrics endpoint
+import { impactMetricsService } from './services/ImpactMetricsService';
+
+app.get('/metrics', async (req, res) => {
+  try {
+    const registry = impactMetricsService.getRegistry();
+    if (registry) {
+      res.set('Content-Type', registry.contentType);
+      const metrics = await registry.metrics();
+      res.end(metrics);
+    } else {
+      res.status(503).send('Metrics registry not initialized');
+    }
+  } catch (ex: any) {
+    res.status(500).send(ex.message);
+  }
+});
+
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.status(200).json({

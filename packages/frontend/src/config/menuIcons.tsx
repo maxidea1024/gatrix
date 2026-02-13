@@ -53,6 +53,7 @@ import {
   Extension as ExtensionIcon,
   Code as CodeIcon,
   Phonelink as PhonelinkIcon,
+  ShowChart as ShowChartIcon,
 } from '@mui/icons-material';
 
 // Icon name to component mapping
@@ -105,6 +106,7 @@ const ICON_MAP: Record<string, React.ReactElement> = {
   Extension: <ExtensionIcon />,
   Code: <CodeIcon />,
   Phonelink: <PhonelinkIcon />,
+  ShowChart: <ShowChartIcon />,
 };
 
 /**

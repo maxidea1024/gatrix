@@ -14,6 +14,14 @@ scrape_configs:
         labels:
           service: chat
 
+  # Scrape Backend running on Host Machine (for local dev)
+  - job_name: 'gatrix-host'
+    metrics_path: /metrics
+    static_configs:
+      - targets: ['host.docker.internal:45000', 'host.docker.internal:5000']
+        labels:
+          service: backend-host
+
   # Edge Server metrics (internal port only)
   - job_name: 'gatrix-edge'
     metrics_path: /metrics

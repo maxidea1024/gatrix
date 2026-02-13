@@ -310,9 +310,35 @@ router.get(
   ImpactMetricsController.getAvailableMetrics as any
 );
 router.get(
+  '/impact-metrics/labels',
+  requirePermission([PERMISSIONS.FEATURE_FLAGS_VIEW, PERMISSIONS.FEATURE_FLAGS_MANAGE]) as any,
+  ImpactMetricsController.getMetricLabels as any
+);
+router.get(
   '/impact-metrics',
   requirePermission([PERMISSIONS.FEATURE_FLAGS_VIEW, PERMISSIONS.FEATURE_FLAGS_MANAGE]) as any,
   ImpactMetricsController.queryTimeSeries as any
+);
+// Impact Metric Chart Configs (CRUD)
+router.get(
+  '/impact-metrics/configs/:flagId',
+  requirePermission([PERMISSIONS.FEATURE_FLAGS_VIEW, PERMISSIONS.FEATURE_FLAGS_MANAGE]) as any,
+  ImpactMetricsController.getConfigs.bind(ImpactMetricsController) as any
+);
+router.post(
+  '/impact-metrics/configs',
+  requirePermission([PERMISSIONS.FEATURE_FLAGS_MANAGE]) as any,
+  ImpactMetricsController.createConfig.bind(ImpactMetricsController) as any
+);
+router.put(
+  '/impact-metrics/configs/:id',
+  requirePermission([PERMISSIONS.FEATURE_FLAGS_MANAGE]) as any,
+  ImpactMetricsController.updateConfig.bind(ImpactMetricsController) as any
+);
+router.delete(
+  '/impact-metrics/configs/:id',
+  requirePermission([PERMISSIONS.FEATURE_FLAGS_MANAGE]) as any,
+  ImpactMetricsController.deleteConfig.bind(ImpactMetricsController) as any
 );
 
 export default router;

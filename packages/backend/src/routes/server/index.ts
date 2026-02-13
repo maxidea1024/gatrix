@@ -215,10 +215,6 @@ router.get('/:env/segments', serverSDKAuth as any, ServerFeatureFlagController.g
 
 // Impact metrics routes (SDK → backend)
 import ImpactMetricsController from '../../controllers/ImpactMetricsController';
-router.post(
-  '/impact-metrics',
-  serverAuthBase,
-  ImpactMetricsController.receiveMetrics as any
-);
+router.post('/impact-metrics', serverAuthBase, ImpactMetricsController.receiveMetrics as any);
 
 export default router;
