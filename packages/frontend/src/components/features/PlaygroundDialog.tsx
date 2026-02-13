@@ -1843,6 +1843,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                 </IconButton>
               </Box>
 
+
               {/* SUMMARY TABLE */}
               <Box
                 sx={{
@@ -2215,7 +2216,21 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                               </TableCell>
                               <TableCell sx={{ py: 0.5 }}>
                                 <Typography variant="caption" sx={{ fontFamily: 'monospace' }}>
-                                  {entry.value}
+                                  {entry.value === undefined || entry.value === null ? (
+                                    <Typography component="span" variant="caption" sx={{ color: 'warning.main', fontStyle: 'italic' }}>
+                                      ({t('playground.noValue')})
+                                    </Typography>
+                                  ) : typeof entry.value === 'string' ? (
+                                    entry.value === '' ? (
+                                      <Typography component="span" variant="caption" sx={{ color: 'error.main', fontFamily: 'monospace' }}>
+                                        &quot;&quot;
+                                      </Typography>
+                                    ) : (
+                                      <>&quot;{entry.value}&quot;</>
+                                    )
+                                  ) : (
+                                    String(entry.value)
+                                  )}
                                 </Typography>
                               </TableCell>
                             </TableRow>

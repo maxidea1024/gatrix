@@ -754,10 +754,11 @@ router.post(
 
     // Analyze context values for common issues
     const contextWarnings: { field: string; type: string; message: string; suggestion?: string; data?: any; severity: 'warning' | 'error' }[] = [];
+    // Load context field definitions for validation (used both for provided values and missing-field checks)
+    const contextFieldDefs = await featureFlagService.listContextFields();
+    const fieldDefMap = new Map(contextFieldDefs.map((f: any) => [f.fieldName, f]));
+
     if (context && typeof context === 'object') {
-      // Load context field definitions for validation
-      const contextFieldDefs = await featureFlagService.listContextFields();
-      const fieldDefMap = new Map(contextFieldDefs.map((f: any) => [f.fieldName, f]));
 
       for (const [key, value] of Object.entries(context)) {
         const fieldDef = fieldDefMap.get(key);
@@ -862,6 +863,80 @@ router.post(
     // If specific flags are requested, create a Set for faster lookup
     const flagNamesSet =
       flagNames && Array.isArray(flagNames) && flagNames.length > 0 ? new Set(flagNames) : null;
+
+    // Pre-load target flags to collect referenced context fields
+    // We'll check if any required fields are missing from the provided context
+    const contextKeys = new Set(Object.keys(context || {}));
+    const referencedFields = new Set<string>();
+
+    // Helper: collect contextNames from constraints
+    const collectConstraintFields = (constraints: any[]) => {
+      if (!Array.isArray(constraints)) return;
+      for (const c of constraints) {
+        if (c.contextName) referencedFields.add(c.contextName);
+      }
+    };
+
+    // Scan first environment to find referenced fields (same flag structure across envs)
+    if (environments.length > 0) {
+      try {
+        const scanFlagsResult = await featureFlagService.listFlags({
+          environment: environments[0],
+          isArchived: false,
+          page: 1,
+          limit: 10000,
+        });
+
+        for (const flagSummary of scanFlagsResult.data) {
+          if (flagNamesSet && !flagNamesSet.has(flagSummary.flagName)) continue;
+
+          const flag = await featureFlagService.getFlag(environments[0], flagSummary.flagName);
+          if (!flag) continue;
+
+          // Collect from strategies
+          const strategies = (flag as any).strategies || [];
+          for (const strategy of strategies) {
+            collectConstraintFields(strategy.constraints || []);
+
+            // Collect from segments referenced by this strategy
+            const segmentNames = strategy.segments || [];
+            for (const segName of segmentNames) {
+              const seg = segmentsMap.get(segName);
+              if (seg) {
+                collectConstraintFields((seg as any).constraints || []);
+              }
+            }
+          }
+        }
+      } catch (_) {
+        // Silently ignore scan errors
+      }
+    }
+
+    // Check referenced fields that are missing from context
+    if (referencedFields.size > 0 && fieldDefMap) {
+      for (const fieldName of referencedFields) {
+        if (contextKeys.has(fieldName)) continue; // Already provided
+
+        const fieldDef = fieldDefMap.get(fieldName);
+        if (!fieldDef) continue;
+
+        const rules = fieldDef.validationRules as ValidationRules | undefined;
+        if (!rules || rules.enabled === false) continue;
+
+        if (rules.allowEmpty === false) {
+          contextWarnings.push({
+            field: fieldName,
+            type: 'MISSING_REQUIRED',
+            message: `Field "${fieldName}" is used in flag strategies/segments but was not provided in context, and this field does not allow empty values.`,
+            data: { fieldName },
+            severity: 'error',
+          });
+        }
+      }
+    }
+
+
 
     for (const env of environments) {
       try {
