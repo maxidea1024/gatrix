@@ -4,7 +4,14 @@ description: How to create database migrations in this project
 
 # Database Migration Guidelines
 
-## ⚠️ CRITICAL - READ THIS FIRST ⚠️
+## 🚨🚨🚨 ABSOLUTE RULE - NEVER USE KNEX 🚨🚨🚨
+
+> **STOP! Before writing ANY migration, re-read this section!**
+> 
+> - The parameter name is `connection`, **NOT** `knex`
+> - Use `connection.execute(sql, params)` for ALL queries
+> - **NEVER** use `knex()`, `knex.schema`, `knex.raw()`, `knex('table')` — THEY WILL ALL FAIL!
+> - This mistake has been made MANY times. DO NOT repeat it!
 
 **THIS PROJECT DOES NOT USE KNEX FOR MIGRATIONS!**
 
@@ -49,12 +56,38 @@ If you use `knex.schema.alterTable()` or `knex.raw()`, IT WILL FAIL!
    };
    ```
 
-4. **Reference existing migrations**
+4. **Data migration example (JSON column updates):**
+
+   ```javascript
+   exports.up = async function (connection) {
+     const [rows] = await connection.execute(
+       `SELECT id, validationRules FROM g_feature_flags WHERE validationRules IS NOT NULL`
+     );
+
+     for (const row of rows) {
+       const rules = typeof row.validationRules === 'string'
+         ? JSON.parse(row.validationRules)
+         : row.validationRules;
+
+       if (rules && 'oldField' in rules) {
+         rules.newField = rules.oldField;
+         delete rules.oldField;
+
+         await connection.execute(
+           `UPDATE g_feature_flags SET validationRules = ? WHERE id = ?`,
+           [JSON.stringify(rules), row.id]
+         );
+       }
+     }
+   };
+   ```
+
+5. **Reference existing migrations**
    - Always check format of existing migration files before creating new ones
    - Location: `packages/backend/src/database/migrations/`
    - Migration runner: `packages/backend/src/database/Migration.ts`
 
-5. **Timestamp handling**
+6. **Timestamp handling**
    - Use `UTC_TIMESTAMP()` in SQL instead of `NOW()`
    - This is required per project rules
 
