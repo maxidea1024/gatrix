@@ -41,6 +41,9 @@ import {
   ListItemText,
   ClickAwayListener,
   Alert,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -106,6 +109,8 @@ import ResizableDrawer from '../../components/common/ResizableDrawer';
 import FeatureSwitch from '../../components/common/FeatureSwitch';
 import api from '../../services/api';
 import PlaygroundDialog from '../../components/features/PlaygroundDialog';
+import ValidationRulesEditor from '../../components/features/ValidationRulesEditor';
+import { ValidationRules } from '../../services/featureFlagService';
 import { getFlagTypeIcon } from '../../utils/flagTypeIcons';
 import FlagStatusIcon from '../../components/common/FlagStatusIcon';
 
@@ -210,6 +215,7 @@ const FeatureFlagsPage: React.FC = () => {
     valueType: 'boolean' as 'boolean' | 'string' | 'number' | 'json',
     enabledValue: '' as any,
     disabledValue: '' as any,
+    validationRules: undefined as ValidationRules | undefined,
   });
 
   // Sorting state
@@ -1287,6 +1293,7 @@ const FeatureFlagsPage: React.FC = () => {
         valueType: newFlag.valueType,
         enabledValue: coerceValue(newFlag.enabledValue, newFlag.valueType),
         disabledValue: coerceValue(newFlag.disabledValue, newFlag.valueType),
+        validationRules: newFlag.validationRules ?? undefined,
         strategies: [],
       });
 
@@ -1303,6 +1310,7 @@ const FeatureFlagsPage: React.FC = () => {
         valueType: 'boolean',
         enabledValue: true,
         disabledValue: false,
+        validationRules: undefined,
       });
       setNewFlagJsonError(null);
       // Navigate to the newly created flag's detail page
@@ -1333,6 +1341,7 @@ const FeatureFlagsPage: React.FC = () => {
       valueType: isRemoteConfig ? 'string' : 'boolean',
       enabledValue: isRemoteConfig ? '' : true,
       disabledValue: isRemoteConfig ? '' : false,
+      validationRules: undefined,
     });
     setNewFlagJsonError(null);
     setCreateMenuAnchor(null);
@@ -3098,6 +3107,16 @@ const FeatureFlagsPage: React.FC = () => {
                     {t('featureFlags.valueTypeCannotChange')}
                   </Typography>
                 </Box>
+
+                {/* Validation Rules - component returns null for boolean */}
+                <ValidationRulesEditor
+                  valueType={newFlag.valueType}
+                  rules={newFlag.validationRules}
+                  onChange={(rules) =>
+                    setNewFlag((prev) => ({ ...prev, validationRules: rules }))
+                  }
+                  disabled={creating}
+                />
 
                 {/* Enabled Value */}
                 <Box>

@@ -110,8 +110,19 @@ export interface ContextField {
   fieldName: string;
   displayName: string;
   description?: string;
-  fieldType: 'string' | 'number' | 'boolean' | 'date' | 'semver' | 'array' | 'country';
-  legalValues?: string[];
+  fieldType:
+  | 'string'
+  | 'number'
+  | 'boolean'
+  | 'date'
+  | 'semver'
+  | 'array'
+  | 'country'
+  | 'countryCode3'
+  | 'languageCode'
+  | 'localeCode'
+  | 'timezone';
+  validationRules?: any;
 }
 
 interface ConstraintEditorProps {
@@ -252,7 +263,7 @@ interface SortableConstraintCardProps {
   disabled: boolean;
   contextFields: ContextField[];
   showDragHandle: boolean;
-  t: (key: string, fallback?: string) => string;
+  t: any;
   handleConstraintChange: (index: number, field: keyof Constraint, value: any) => void;
   handleRemoveConstraint: (index: number) => void;
   renderValueInput: (constraint: Constraint, index: number) => React.ReactNode;
@@ -584,12 +595,30 @@ export const ConstraintEditor: React.FC<ConstraintEditorProps> = ({
 
   const getOperatorsForField = (contextName: string) => {
     const fieldType = getFieldType(contextName);
+    // Treat new specialized string types as regular strings for operators
+    const specializedStringTypes = [
+      'countryCode3',
+      'languageCode',
+      'localeCode',
+      'timezone',
+      'country',
+    ];
+    if (specializedStringTypes.includes(fieldType)) {
+      return OPERATORS_BY_TYPE.country || OPERATORS_BY_TYPE.string;
+    }
     return OPERATORS_BY_TYPE[fieldType] || OPERATORS_BY_TYPE.string;
   };
 
   const getLegalValues = (contextName: string): string[] => {
     const field = contextFields.find((f) => f.fieldName === contextName);
-    return field?.legalValues || [];
+    if (!field) return [];
+
+    // Only use legalValues from validationRules when rules are enabled
+    if (field.validationRules?.enabled && field.validationRules.legalValues && field.validationRules.legalValues.length > 0) {
+      return field.validationRules.legalValues;
+    }
+
+    return [];
   };
 
   // Get list of already used field names (for duplicate prevention)

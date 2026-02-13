@@ -8,7 +8,9 @@ import { AuthenticatedRequest } from '../../middleware/auth';
 import { asyncHandler } from '../../middleware/errorHandler';
 import { featureFlagService } from '../../services/FeatureFlagService';
 import { FeatureFlagTypeModel } from '../../models/FeatureFlagType';
+import { ValidationRules } from '../../models/FeatureFlag';
 import { networkTrafficService } from '../../services/NetworkTrafficService';
+import { validateFlagValue } from '../../utils/validateFlagValue';
 
 const router = Router();
 
@@ -750,6 +752,113 @@ router.post(
     const segments = await featureFlagService.listSegments();
     const segmentsMap = new Map(segments.map((s) => [s.segmentName, s]));
 
+    // Analyze context values for common issues
+    const contextWarnings: { field: string; type: string; message: string; suggestion?: string; data?: any; severity: 'warning' | 'error' }[] = [];
+    if (context && typeof context === 'object') {
+      // Load context field definitions for validation
+      const contextFieldDefs = await featureFlagService.listContextFields();
+      const fieldDefMap = new Map(contextFieldDefs.map((f: any) => [f.fieldName, f]));
+
+      for (const [key, value] of Object.entries(context)) {
+        const fieldDef = fieldDefMap.get(key);
+
+        // Check rules with field definition
+        if (fieldDef) {
+          const expectedType = fieldDef.fieldType;
+          const rules = fieldDef.validationRules as ValidationRules | undefined;
+          const isValidationEnabled = rules?.enabled !== false;
+
+          // Skip validation if disabled
+          if (!isValidationEnabled) {
+            continue;
+          }
+
+          // Check for whitespace issues in string values if not explicitly disabled
+          if (typeof value === 'string' && rules?.trimWhitespace !== 'none') {
+            if (value !== value.trim()) {
+              const hasLeading = value !== value.trimStart();
+              const hasTrailing = value !== value.trimEnd();
+              const parts = [];
+              if (hasLeading) parts.push('leading');
+              if (hasTrailing) parts.push('trailing');
+
+              const isReject = rules?.trimWhitespace === 'reject';
+              contextWarnings.push({
+                field: key,
+                type: 'WHITESPACE',
+                message: `Value has ${parts.join(' and ')} whitespace: "${value}" → trimmed: "${value.trim()}"`,
+                suggestion: value.trim(),
+                data: { value, trimmed: value.trim(), parts },
+                severity: isReject ? 'error' : 'warning'
+              });
+
+              // If rejected, skip further validation as it's already an error
+              if (isReject) {
+                continue;
+              }
+            }
+          }
+
+          // Handle empty values
+          const isEmpty = value === undefined || value === null || value === '';
+          if (isEmpty) {
+            const allowEmpty = rules?.allowEmpty !== false;
+            if (!allowEmpty) {
+              contextWarnings.push({
+                field: key,
+                type: 'EMPTY_VALUE',
+                message: `Value is missing or empty, but this field is required.`,
+                data: { value },
+                severity: 'error'
+              });
+            }
+            continue; // Skip further validation for empty values
+          }
+
+          if (expectedType === 'number' && typeof value !== 'number') {
+            contextWarnings.push({
+              field: key,
+              type: 'TYPE_MISMATCH',
+              message: `Expected number but got ${typeof value}: "${value}"`,
+              data: { expectedType, actualType: typeof value, value },
+              severity: 'error'
+            });
+          } else if (expectedType === 'boolean' && typeof value !== 'boolean') {
+            contextWarnings.push({
+              field: key,
+              type: 'TYPE_MISMATCH',
+              message: `Expected boolean but got ${typeof value}: "${value}"`,
+              data: { expectedType, actualType: typeof value, value },
+              severity: 'error'
+            });
+          }
+
+          // Check legal values from validationRules only (when rules are enabled)
+          const rulesEnabled = rules?.enabled !== false;
+          const legalValues = rulesEnabled ? rules?.legalValues : undefined;
+          if (legalValues && Array.isArray(legalValues) && legalValues.length > 0) {
+            const strValue = String(value);
+            if (!legalValues.includes(strValue)) {
+              // Check if trimmed value matches
+              const trimmedMatch = legalValues.find((lv: string) => lv === strValue.trim());
+              contextWarnings.push({
+                field: key,
+                type: 'INVALID_VALUE',
+                message: `Value "${strValue}" is not in the allowed values: [${legalValues.join(', ')}]`,
+                suggestion: trimmedMatch || undefined,
+                data: { value: strValue, allowedValues: legalValues, suggestion: trimmedMatch },
+                severity: 'error'
+              });
+            }
+          }
+        }
+      }
+    }
+
+
+    // If any context errors exist, we still proceed but include them in the response
+    const contextValid = !contextWarnings.some(w => w.severity === 'error');
+
     // If specific flags are requested, create a Set for faster lookup
     const flagNamesSet =
       flagNames && Array.isArray(flagNames) && flagNames.length > 0 ? new Set(flagNames) : null;
@@ -777,7 +886,7 @@ router.post(
           if (!flag) continue;
 
           // Evaluate the flag
-          let evalResult = evaluateFlagWithDetails(flag, context || {}, segmentsMap, env);
+          let evalResult = evaluateFlagWithDetails(flag, context || {}, segmentsMap, env, contextWarnings);
 
           // Manual override if variant is somehow missing (already handled in evaluateFlagWithDetails now)
           // But kept for safety
@@ -820,6 +929,20 @@ router.post(
             };
           }
 
+          // Validate the returned value against validation rules if present
+          let validation: any = undefined;
+          if (flag.validationRules && Object.keys(flag.validationRules).length > 0 && (evalResult as any).variant?.value !== undefined) {
+            const valueToValidate = (evalResult as any).variant.value;
+            const valueType = (flag as any).valueType || 'string';
+            const validationResult = validateFlagValue(valueToValidate, valueType, flag.validationRules);
+            validation = {
+              valid: validationResult.valid,
+              errors: validationResult.errors,
+              transformedValue: validationResult.transformedValue !== valueToValidate ? validationResult.transformedValue : undefined,
+              rules: flag.validationRules,
+            };
+          }
+
           envResults.push({
             flagName: flag.flagName,
             displayName: flag.displayName,
@@ -829,6 +952,7 @@ router.post(
             reason: evalResult.reason,
             reasonDetails: evalResult.reasonDetails,
             evaluationSteps: evalResult.evaluationSteps,
+            validation,
           });
         }
 
@@ -841,7 +965,7 @@ router.post(
       }
     }
 
-    res.json({ success: true, data: { results } });
+    res.json({ success: true, data: { results, contextWarnings: contextWarnings.length > 0 ? contextWarnings : undefined } });
   })
 );
 
@@ -850,7 +974,8 @@ function evaluateFlagWithDetails(
   flag: any,
   context: Record<string, any>,
   segmentsMap: Map<string, any>,
-  environment?: string
+  environment?: string,
+  contextWarnings?: any[]
 ): {
   enabled: boolean;
   variant: { name: string; value?: any; valueType?: string; valueSource?: string };
@@ -859,6 +984,42 @@ function evaluateFlagWithDetails(
   evaluationSteps?: any[];
 } {
   const evaluationSteps: any[] = [];
+
+  // Step 1: Context Validation
+  if (contextWarnings && contextWarnings.some((w) => w.severity === 'error')) {
+    const errorMessages = contextWarnings
+      .filter((w) => w.severity === 'error')
+      .map((w) => `${w.field}: ${w.message}`);
+
+    evaluationSteps.push({
+      step: 'CONTEXT_VALIDATION',
+      passed: false,
+      message: 'Context validation failed',
+      details: { errors: errorMessages },
+    });
+
+    return {
+      enabled: false,
+      reason: 'CONTEXT_VALIDATION_FAILED',
+      variant: {
+        name: '$disabled',
+        value: getFallbackValue(
+          flag.environments?.find((e: any) => e.environment === environment)?.disabledValue ??
+          flag.disabledValue,
+          flag.valueType
+        ),
+        valueType: flag.valueType || 'string',
+        valueSource: 'default',
+      },
+      evaluationSteps,
+    };
+  }
+
+  evaluationSteps.push({
+    step: 'CONTEXT_VALIDATION',
+    passed: true,
+    message: 'Context validation passed',
+  });
 
   // Step 2: Check if flag is enabled in environment
   // flag.isEnabled is already the correct value for the requested environment (set by getFlag)
@@ -875,13 +1036,13 @@ function evaluateFlagWithDetails(
         name: '$disabled',
         value: getFallbackValue(
           flag.environments?.find((e: any) => e.environment === environment)?.disabledValue ??
-            flag.disabledValue,
+          flag.disabledValue,
           flag.valueType
         ),
         valueType: flag.valueType || 'string',
         valueSource:
           flag.environments?.find((e: any) => e.environment === environment)?.disabledValue !==
-          undefined
+            undefined
             ? 'environment'
             : flag.disabledValue !== undefined
               ? 'flag'
@@ -1100,7 +1261,7 @@ function evaluateFlagWithDetails(
       valueType: flag.valueType || 'string',
       valueSource:
         flag.environments?.find((e: any) => e.environment === environment)?.disabledValue !==
-        undefined
+          undefined
           ? 'environment'
           : flag.disabledValue !== undefined
             ? 'flag'

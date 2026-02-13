@@ -274,17 +274,20 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
         </Box>
       </Box>
 
-      {error && (
-        <Alert severity="error" sx={{ mt: 1 }}>
-          {error}
-        </Alert>
-      )}
-
-      {helperText && !error && (
-        <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
-          {helperText}
-        </Typography>
-      )}
+      <Box sx={{ minHeight: '1.25rem' }}>
+        {error ? (
+          <Alert severity="error" sx={{ mt: 1 }}>
+            {error}
+          </Alert>
+        ) : helperText ? (
+          <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+            {helperText}
+          </Typography>
+        ) : (
+          /* Empty placeholder to reserve space */
+          <Box sx={{ height: 1 }} />
+        )}
+      </Box>
     </Box>
   );
 };

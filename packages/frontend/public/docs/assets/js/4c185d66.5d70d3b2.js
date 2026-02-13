@@ -1,11 +1,1 @@
-'use strict';
-(globalThis.webpackChunkdocs = globalThis.webpackChunkdocs || []).push([
-  [8332],
-  {
-    8637(a) {
-      a.exports = JSON.parse(
-        '{"tag":{"label":"automation","permalink":"/docs/blog/tags/automation","allTagsPath":"/docs/blog/tags","count":1,"unlisted":false},"listMetadata":{"permalink":"/docs/blog/tags/automation","page":1,"postsPerPage":10,"totalPages":1,"totalCount":1,"blogDescription":"Blog","blogTitle":"Blog"}}'
-      );
-    },
-  },
-]);
+"use strict";(globalThis.webpackChunkdocs=globalThis.webpackChunkdocs||[]).push([[8332],{8637(a){a.exports=JSON.parse('{"tag":{"label":"automation","permalink":"/docs/blog/tags/automation","allTagsPath":"/docs/blog/tags","count":1,"unlisted":false},"listMetadata":{"permalink":"/docs/blog/tags/automation","page":1,"postsPerPage":10,"totalPages":1,"totalCount":1,"blogDescription":"Blog","blogTitle":"Blog"}}')}}]);

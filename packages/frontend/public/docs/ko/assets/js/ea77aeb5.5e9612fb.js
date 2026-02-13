@@ -1,11 +1,1 @@
-'use strict';
-(globalThis.webpackChunkdocs = globalThis.webpackChunkdocs || []).push([
-  [4578],
-  {
-    2319(o) {
-      o.exports = JSON.parse(
-        '{"tag":{"label":"Jobs","permalink":"/docs/ko/blog/tags/jobs","description":"Job management and automation","allTagsPath":"/docs/ko/blog/tags","count":1,"unlisted":false},"listMetadata":{"permalink":"/docs/ko/blog/tags/jobs","page":1,"postsPerPage":10,"totalPages":1,"totalCount":1,"blogDescription":"Blog","blogTitle":"Blog"}}'
-      );
-    },
-  },
-]);
+"use strict";(globalThis.webpackChunkdocs=globalThis.webpackChunkdocs||[]).push([[4578],{2319(o){o.exports=JSON.parse('{"tag":{"label":"Jobs","permalink":"/docs/ko/blog/tags/jobs","description":"Job management and automation","allTagsPath":"/docs/ko/blog/tags","count":1,"unlisted":false},"listMetadata":{"permalink":"/docs/ko/blog/tags/jobs","page":1,"postsPerPage":10,"totalPages":1,"totalCount":1,"blogDescription":"Blog","blogTitle":"Blog"}}')}}]);

@@ -201,6 +201,93 @@ const typeStyles: Record<string, TypeStyle> = {
       </text>
     ),
   },
+  // "A3" text badge for 3-letter country code
+  countryCode3: {
+    bg: '#d1fae5',
+    fg: '#065f46',
+    render: (fg) => (
+      <>
+        {/* Flag pole */}
+        <line x1="6" y1="4.5" x2="6" y2="19.5" stroke={fg} strokeWidth="1.8" strokeLinecap="round" />
+        {/* Flag body */}
+        <path
+          d="M6,5 L16,7 L15,11.5 L6,13 Z"
+          fill={fg}
+          opacity={0.3}
+          stroke={fg}
+          strokeWidth="1.4"
+          strokeLinejoin="round"
+        />
+        {/* "3" badge */}
+        <text
+          x="18"
+          y="19"
+          textAnchor="middle"
+          fontFamily="'Inter','Segoe UI',sans-serif"
+          fontSize="8"
+          fontWeight="900"
+          fill={fg}
+        >
+          3
+        </text>
+      </>
+    ),
+  },
+  // Speech bubble "A" for language code
+  languageCode: {
+    bg: '#e0f2fe',
+    fg: '#0369a1',
+    render: (fg) => (
+      <>
+        <rect
+          x="4"
+          y="5"
+          width="16"
+          height="12"
+          rx="3"
+          fill={fg}
+          opacity={0.15}
+          stroke={fg}
+          strokeWidth="1.6"
+        />
+        <text
+          x="12"
+          y="14.5"
+          textAnchor="middle"
+          fontFamily="'Inter','Segoe UI',sans-serif"
+          fontSize="9"
+          fontWeight="900"
+          fill={fg}
+        >
+          A文
+        </text>
+      </>
+    ),
+  },
+  // Globe with text for locale code
+  localeCode: {
+    bg: '#fef3c7',
+    fg: '#92400e',
+    render: (fg) => (
+      <>
+        <circle cx="12" cy="12" r="7.5" fill={fg} opacity={0.15} stroke={fg} strokeWidth="1.6" />
+        <ellipse cx="12" cy="12" rx="3.5" ry="7.5" fill="none" stroke={fg} strokeWidth="1.2" />
+        <line x1="4.5" y1="12" x2="19.5" y2="12" stroke={fg} strokeWidth="1.2" />
+      </>
+    ),
+  },
+  // Clock icon for timezone
+  timezone: {
+    bg: '#f0fdf4',
+    fg: '#15803d',
+    render: (fg) => (
+      <>
+        <circle cx="12" cy="12" r="7.5" fill={fg} opacity={0.15} stroke={fg} strokeWidth="1.6" />
+        <line x1="12" y1="7" x2="12" y2="12" stroke={fg} strokeWidth="2" strokeLinecap="round" />
+        <line x1="12" y1="12" x2="15.5" y2="14" stroke={fg} strokeWidth="2" strokeLinecap="round" />
+      </>
+    ),
+  },
 };
 
 // Alias datetime → date

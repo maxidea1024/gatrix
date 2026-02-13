@@ -137,6 +137,8 @@ import EnvironmentVariantsEditor, {
 import FeatureFlagAuditLogs from '../../components/features/FeatureFlagAuditLogs';
 import FeatureFlagCodeReferences from '../../components/features/FeatureFlagCodeReferences';
 import PlaygroundDialog from '../../components/features/PlaygroundDialog';
+import ValidationRulesEditor from '../../components/features/ValidationRulesEditor';
+import { ValidationRules } from '../../services/featureFlagService';
 import { getFlagTypeIcon } from '../../utils/flagTypeIcons';
 
 // Playground panel constants (outside component for stable references)
@@ -206,6 +208,7 @@ interface FeatureFlag {
   valueType: 'boolean' | 'string' | 'json' | 'number';
   enabledValue?: any;
   disabledValue?: any;
+  validationRules?: ValidationRules;
   environments?: FeatureFlagEnvironment[];
   lastSeenAt?: string;
   archivedAt?: string;
@@ -561,9 +564,30 @@ const FeatureFlagDetailPage: React.FC = () => {
     try {
       const response = await api.get('/admin/features/context-fields');
       // API returns { success: true, data: { contextFields } }
-      const contextFieldsData =
-        response.data?.contextFields || response.data?.data?.contextFields || [];
-      setContextFields(contextFieldsData);
+      const fields = response.data?.contextFields || response.data?.data?.contextFields || [];
+
+      setContextFields(
+        fields
+          .filter((f: any) => f.isEnabled !== false)
+          .map((f: any) => {
+            let rules = f.validationRules;
+            if (typeof rules === 'string' && rules.trim()) {
+              try {
+                rules = JSON.parse(rules);
+              } catch (e) {
+                rules = null;
+              }
+            }
+
+            return {
+              fieldName: f.fieldName,
+              displayName: f.displayName || f.fieldName,
+              description: f.description || '',
+              fieldType: f.fieldType || 'string',
+              validationRules: rules,
+            };
+          })
+      );
     } catch {
       setContextFields([]);
     }
@@ -3417,6 +3441,18 @@ const FeatureFlagDetailPage: React.FC = () => {
                 </Box>
               </Box>
 
+              {/* Validation Rules - component has internal toggle, returns null for boolean */}
+              <ValidationRulesEditor
+                valueType={flag.valueType || 'boolean'}
+                rules={flag.validationRules}
+                onChange={(rules) =>
+                  setFlag((prev) =>
+                    prev ? { ...prev, validationRules: rules } : prev
+                  )
+                }
+                disabled={saving}
+              />
+
               {/* Flag Values */}
               <Grid container spacing={3}>
                 <Grid size={{ xs: 12 }}>
@@ -3457,6 +3493,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                             ...prev,
                             enabledValue: originalFlag.enabledValue,
                             disabledValue: originalFlag.disabledValue,
+                            validationRules: originalFlag.validationRules,
                           }
                           : prev
                       );
@@ -3467,7 +3504,9 @@ const FeatureFlagDetailPage: React.FC = () => {
                     (JSON.stringify(flag.enabledValue) ===
                       JSON.stringify(originalFlag?.enabledValue) &&
                       JSON.stringify(flag.disabledValue) ===
-                      JSON.stringify(originalFlag?.disabledValue))
+                      JSON.stringify(originalFlag?.disabledValue) &&
+                      JSON.stringify(flag.validationRules) ===
+                      JSON.stringify(originalFlag?.validationRules))
                   }
                 >
                   {t('common.cancel')}
@@ -3481,6 +3520,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                       await api.put(`/admin/features/${flag.flagName}`, {
                         enabledValue: flag.enabledValue,
                         disabledValue: flag.disabledValue,
+                        validationRules: flag.validationRules ?? null,
                         isGlobal: true,
                       });
                       setOriginalFlag((prev) =>
@@ -3489,6 +3529,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                             ...prev,
                             enabledValue: flag.enabledValue,
                             disabledValue: flag.disabledValue,
+                            validationRules: flag.validationRules,
                           }
                           : prev
                       );
@@ -3511,7 +3552,9 @@ const FeatureFlagDetailPage: React.FC = () => {
                     (JSON.stringify(flag.enabledValue) ===
                       JSON.stringify(originalFlag?.enabledValue) &&
                       JSON.stringify(flag.disabledValue) ===
-                      JSON.stringify(originalFlag?.disabledValue))
+                      JSON.stringify(originalFlag?.disabledValue) &&
+                      JSON.stringify(flag.validationRules) ===
+                      JSON.stringify(originalFlag?.validationRules))
                   }
                 >
                   {saving ? <CircularProgress size={20} /> : t('common.save')}

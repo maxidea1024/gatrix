@@ -200,6 +200,9 @@ const ValueEditorField: React.FC<ValueEditorFieldProps> = ({
               : placeholder
           }
           sx={sx}
+          FormHelperTextProps={{
+            sx: { minHeight: '1.25rem', m: 0, mt: 0.5 }
+          }}
           InputProps={{
             sx: showEmptyHint ? { fontStyle: 'italic', ...sx } : sx,
             endAdornment: !disabled && (
@@ -233,6 +236,9 @@ const ValueEditorField: React.FC<ValueEditorFieldProps> = ({
           }
           onClick={valueType === 'json' && !disabled ? handleOpenDialog : undefined}
           sx={sx}
+          FormHelperTextProps={{
+            sx: { minHeight: '1.25rem', m: 0, mt: 0.5 }
+          }}
           InputProps={{
             readOnly: valueType === 'json',
             sx: {
@@ -285,38 +291,42 @@ const ValueEditorField: React.FC<ValueEditorFieldProps> = ({
           sx={{ overflow: 'visible', display: 'flex', flexDirection: 'column' }}
         >
           {valueType === 'json' ? (
-            <Box sx={{ flex: 1, minHeight: 500 }}>
-              <JsonEditor
-                value={editingValue}
-                onChange={(val) => {
-                  setEditingValue(val);
-                  // Debounce dialog JSON validation
-                  if (dialogValidationTimer.current) clearTimeout(dialogValidationTimer.current);
-                  dialogValidationTimer.current = setTimeout(() => {
-                    try {
-                      JSON.parse(val);
-                      setDialogError(null);
-                    } catch (e: any) {
-                      setDialogError(e.message || 'Invalid JSON');
-                    }
-                  }, 300);
-                }}
-                height={500}
-              />
-              {dialogError && (
-                <Typography
-                  variant="caption"
-                  color="error"
-                  sx={{
-                    mt: 1,
-                    display: 'block',
-                    wordBreak: 'break-word',
-                    whiteSpace: 'normal',
+            <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+              <Box sx={{ flex: 1, minHeight: 500 }}>
+                <JsonEditor
+                  value={editingValue}
+                  onChange={(val) => {
+                    setEditingValue(val);
+                    // Debounce dialog JSON validation
+                    if (dialogValidationTimer.current) clearTimeout(dialogValidationTimer.current);
+                    dialogValidationTimer.current = setTimeout(() => {
+                      try {
+                        JSON.parse(val);
+                        setDialogError(null);
+                      } catch (e: any) {
+                        setDialogError(e.message || 'Invalid JSON');
+                      }
+                    }, 300);
                   }}
-                >
-                  {dialogError}
-                </Typography>
-              )}
+                  height={500}
+                />
+              </Box>
+              {/* Reserve space for error messages to stabilize layout */}
+              <Box sx={{ mt: 1, minHeight: '1.25rem' }}>
+                {dialogError && (
+                  <Typography
+                    variant="caption"
+                    color="error"
+                    sx={{
+                      display: 'block',
+                      wordBreak: 'break-word',
+                      whiteSpace: 'normal',
+                    }}
+                  >
+                    {dialogError}
+                  </Typography>
+                )}
+              </Box>
             </Box>
           ) : (
             <TextField

@@ -22,6 +22,7 @@ import {
   StrategyParameters,
   ValueType,
   FlagType,
+  ValidationRules,
 } from '../models/FeatureFlag';
 import { GatrixError } from '../middleware/errorHandler';
 import { ErrorCodes } from '../utils/apiResponse';
@@ -32,6 +33,7 @@ import { ENV_SCOPED } from '../constants/cacheKeys';
 import db from '../config/knex';
 import { IntegrationService } from './IntegrationService';
 import { INTEGRATION_EVENTS, IntegrationEventType } from '../types/integrationEvents';
+import { validateFlagValue } from '../utils/validateFlagValue';
 
 // Types for service methods
 export interface CreateFlagInput {
@@ -52,6 +54,7 @@ export interface CreateFlagInput {
   isEnabled?: boolean; // Optional: combined with environment
   strategies?: any[]; // Optional: strategies to create (used in import)
   variants?: any[]; // Optional: variants to create (used in import)
+  validationRules?: ValidationRules; // Optional: validation rules for flag values
 }
 
 export interface UpdateFlagInput {
@@ -70,6 +73,7 @@ export interface UpdateFlagInput {
   tags?: string[];
   links?: { url: string; title?: string }[];
   isGlobal?: boolean;
+  validationRules?: ValidationRules; // Optional: validation rules for flag values
 }
 
 export interface CreateStrategyInput {
@@ -230,6 +234,29 @@ class FeatureFlagService {
     // Determine valueType: for feature flags, default to 'boolean' (was none), for remote configs, it's required
     const valueType = isRemoteConfig ? input.valueType : input.valueType || 'boolean';
 
+    // Validate values against validation rules if provided
+    if (input.validationRules && valueType !== 'boolean') {
+      const fieldLabels: Record<string, string> = {
+        enabledValue: 'enabled value',
+        disabledValue: 'disabled value',
+      };
+      for (const field of ['enabledValue', 'disabledValue'] as const) {
+        const result = validateFlagValue(input[field], valueType, input.validationRules);
+        if (!result.valid) {
+          throw new GatrixError(
+            `VALIDATION_ERROR:${field}:${result.errors.join('|')}`,
+            400,
+            true,
+            ErrorCodes.BAD_REQUEST
+          );
+        }
+        // Apply transformed value (e.g. trimmed string)
+        if (result.transformedValue !== undefined) {
+          (input as any)[field] = result.transformedValue;
+        }
+      }
+    }
+
     const flag = await FeatureFlagModel.create({
       flagName: flagName!,
       displayName: input.displayName,
@@ -238,6 +265,7 @@ class FeatureFlagService {
       valueType: input.valueType,
       enabledValue: input.enabledValue,
       disabledValue: input.disabledValue,
+      validationRules: input.validationRules,
       impressionDataEnabled: input.impressionDataEnabled ?? false,
       staleAfterDays: input.staleAfterDays ?? 30,
       tags: input.tags,
@@ -325,7 +353,30 @@ class FeatureFlagService {
 
     // Separate environment-specific from global properties
     // isGlobal: if true, we are updating the base flag values even if an environment is provided
-    const { isEnabled, enabledValue, disabledValue, isGlobal, ...globalUpdates } = input;
+    const { isEnabled, enabledValue, disabledValue, isGlobal, validationRules: inputValidationRules, ...globalUpdates } = input;
+
+    // Determine the effective validation rules (from input or existing flag)
+    const effectiveValidationRules = inputValidationRules !== undefined ? inputValidationRules : (flag as any).validationRules;
+    const effectiveValueType = (globalUpdates as any).valueType || flag.valueType;
+
+    // Validate values against validation rules
+    if (effectiveValidationRules && effectiveValueType !== 'boolean') {
+      const valuesToValidate: { field: string; value: any }[] = [];
+      if (enabledValue !== undefined) valuesToValidate.push({ field: 'enabledValue', value: enabledValue });
+      if (disabledValue !== undefined) valuesToValidate.push({ field: 'disabledValue', value: disabledValue });
+
+      for (const { field, value } of valuesToValidate) {
+        const result = validateFlagValue(value, effectiveValueType, effectiveValidationRules);
+        if (!result.valid) {
+          throw new GatrixError(
+            `VALIDATION_ERROR:${field}:${result.errors.join('|')}`,
+            400,
+            true,
+            ErrorCodes.BAD_REQUEST
+          );
+        }
+      }
+    }
 
     // Update environment-specific settings (isEnabled, enabledValue, disabledValue)
     // ONLY if not explicitly requested to be a global-only update, or if environment is provided
@@ -347,10 +398,17 @@ class FeatureFlagService {
       if (disabledValue !== undefined) baseValues.disabledValue = disabledValue;
     }
 
-    if (Object.keys(globalUpdates).length > 0 || Object.keys(baseValues).length > 0) {
+    // Include validationRules in global updates if provided
+    const validationRulesUpdate: any = {};
+    if (inputValidationRules !== undefined) {
+      validationRulesUpdate.validationRules = inputValidationRules;
+    }
+
+    if (Object.keys(globalUpdates).length > 0 || Object.keys(baseValues).length > 0 || Object.keys(validationRulesUpdate).length > 0) {
       await FeatureFlagModel.update(flag.id, {
         ...globalUpdates,
         ...baseValues,
+        ...validationRulesUpdate,
         updatedBy: userId,
       });
     }
@@ -1167,7 +1225,7 @@ class FeatureFlagService {
       fieldName: input.fieldName!,
       fieldType: input.fieldType!,
       description: input.description,
-      legalValues: input.legalValues,
+      validationRules: input.validationRules,
       tags: input.tags,
       stickiness: input.stickiness ?? false,
       sortOrder: input.sortOrder ?? 0,

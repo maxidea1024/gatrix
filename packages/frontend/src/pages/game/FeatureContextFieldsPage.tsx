@@ -59,6 +59,80 @@ import { tagService } from '../../services/tagService';
 import { getContrastColor } from '../../utils/colorUtils';
 import FeatureSwitch from '../../components/common/FeatureSwitch';
 import FieldTypeIcon from '../../components/common/FieldTypeIcon';
+import ValidationRulesEditor from '../../components/features/ValidationRulesEditor';
+import { ValidationRules } from '../../services/featureFlagService';
+import SvgIcon from '@mui/material/SvgIcon';
+
+// Trim option value → localization key mapping
+const TRIM_LABEL_MAP: Record<string, string> = {
+  none: 'featureFlags.validation.trimNone',
+  trim: 'featureFlags.validation.trimAuto',
+  trimStart: 'featureFlags.validation.trimStart',
+  trimEnd: 'featureFlags.validation.trimEnd',
+  reject: 'featureFlags.validation.trimReject',
+};
+
+// Custom SVG trim icons with clear visual meaning
+const TrimIconNone = (props: any) => (
+  <SvgIcon {...props} viewBox="0 0 20 20">
+    {/* Horizontal line with no trim indicators - represents "as-is" */}
+    <rect x="2" y="9" width="16" height="2" rx="1" fill="currentColor" opacity="0.4" />
+    <text x="10" y="14" textAnchor="middle" fontSize="7" fontWeight="bold" fill="currentColor" opacity="0.5">—</text>
+  </SvgIcon>
+);
+
+const TrimIconAuto = (props: any) => (
+  <SvgIcon {...props} viewBox="0 0 20 20">
+    {/* Scissors icon - trim both sides */}
+    <path d="M5 3L8 8" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+    <path d="M5 13L8 8" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+    <circle cx="4" cy="3" r="2" stroke="currentColor" strokeWidth="1.2" fill="none" />
+    <circle cx="4" cy="13" r="2" stroke="currentColor" strokeWidth="1.2" fill="none" />
+    <path d="M8 8H17" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeDasharray="2 1.5" />
+  </SvgIcon>
+);
+
+const TrimIconStart = (props: any) => (
+  <SvgIcon {...props} viewBox="0 0 20 20">
+    {/* Arrow pushing content from left */}
+    <path d="M3 10H17" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+    <path d="M7 6L3 10L7 14" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+    <rect x="1" y="4" width="1.5" height="12" rx="0.75" fill="currentColor" />
+  </SvgIcon>
+);
+
+const TrimIconEnd = (props: any) => (
+  <SvgIcon {...props} viewBox="0 0 20 20">
+    {/* Arrow pushing content from right */}
+    <path d="M3 10H17" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+    <path d="M13 6L17 10L13 14" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+    <rect x="17.5" y="4" width="1.5" height="12" rx="0.75" fill="currentColor" />
+  </SvgIcon>
+);
+
+const TrimIconReject = (props: any) => (
+  <SvgIcon {...props} viewBox="0 0 20 20">
+    {/* Circle with X - reject whitespace */}
+    <circle cx="10" cy="10" r="7" stroke="currentColor" strokeWidth="1.5" fill="none" />
+    <path d="M7 7L13 13M13 7L7 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+  </SvgIcon>
+);
+
+const TRIM_ICONS: Record<string, React.FC<any>> = {
+  none: TrimIconNone,
+  trim: TrimIconAuto,
+  trimStart: TrimIconStart,
+  trimEnd: TrimIconEnd,
+  reject: TrimIconReject,
+};
+
+const TRIM_COLORS: Record<string, string> = {
+  none: 'text.secondary',
+  trim: 'primary.main',
+  trimStart: 'info.main',
+  trimEnd: 'info.main',
+  reject: 'error.main',
+};
 
 interface FeatureContextField {
   id: string;
@@ -66,8 +140,8 @@ interface FeatureContextField {
   fieldName: string;
   displayName: string;
   description: string;
-  fieldType: 'string' | 'number' | 'boolean' | 'date' | 'semver' | 'array' | 'country';
-  legalValues: string[];
+  fieldType: 'string' | 'number' | 'boolean' | 'date' | 'semver' | 'array' | 'country' | 'countryCode3' | 'languageCode' | 'localeCode' | 'timezone';
+  validationRules?: ValidationRules;
   isEnabled: boolean;
   tags: string[];
   sortOrder: number;
@@ -244,6 +318,26 @@ const FeatureContextFieldsPage: React.FC = () => {
             label: t('featureFlags.fieldTypes.country'),
             icon: getFieldTypeIcon('country'),
           },
+          {
+            value: 'countryCode3',
+            label: t('featureFlags.fieldTypes.countryCode3'),
+            icon: getFieldTypeIcon('countryCode3'),
+          },
+          {
+            value: 'languageCode',
+            label: t('featureFlags.fieldTypes.languageCode'),
+            icon: getFieldTypeIcon('languageCode'),
+          },
+          {
+            value: 'localeCode',
+            label: t('featureFlags.fieldTypes.localeCode'),
+            icon: getFieldTypeIcon('localeCode'),
+          },
+          {
+            value: 'timezone',
+            label: t('featureFlags.fieldTypes.timezone'),
+            icon: getFieldTypeIcon('timezone'),
+          },
         ],
       },
       {
@@ -319,7 +413,6 @@ const FeatureContextFieldsPage: React.FC = () => {
       displayName: '',
       description: '',
       fieldType: 'string' as const,
-      legalValues: [],
       tags: [],
       sortOrder: 0,
     };
@@ -345,12 +438,10 @@ const FeatureContextFieldsPage: React.FC = () => {
       (editingField.fieldType || 'string') !== (originalField.fieldType || 'string');
     const sortOrderChanged = (editingField.sortOrder || 0) !== (originalField.sortOrder || 0);
 
-    // Compare legalValues arrays
-    const editingLegalValues = editingField.legalValues || [];
-    const originalLegalValues = originalField.legalValues || [];
-    const legalValuesChanged =
-      editingLegalValues.length !== originalLegalValues.length ||
-      editingLegalValues.some((v, i) => v !== originalLegalValues[i]);
+    // Compare validationRules
+    const validationRulesChanged =
+      JSON.stringify(editingField.validationRules || {}) !==
+      JSON.stringify(originalField.validationRules || {});
 
     // Compare tags arrays
     const editingTags = editingField.tags || [];
@@ -365,7 +456,7 @@ const FeatureContextFieldsPage: React.FC = () => {
       descriptionChanged ||
       fieldTypeChanged ||
       sortOrderChanged ||
-      legalValuesChanged ||
+      validationRulesChanged ||
       tagsChanged
     );
   };
@@ -431,6 +522,14 @@ const FeatureContextFieldsPage: React.FC = () => {
         return t('featureFlags.fieldTypes.array');
       case 'country':
         return t('featureFlags.fieldTypes.country');
+      case 'countryCode3':
+        return t('featureFlags.fieldTypes.countryCode3');
+      case 'languageCode':
+        return t('featureFlags.fieldTypes.languageCode');
+      case 'localeCode':
+        return t('featureFlags.fieldTypes.localeCode');
+      case 'timezone':
+        return t('featureFlags.fieldTypes.timezone');
       default:
         return type;
     }
@@ -718,10 +817,12 @@ const FeatureContextFieldsPage: React.FC = () => {
                                   </Typography>
                                 </TableCell>
                               );
-                            case 'legalValues':
+                            case 'legalValues': {
+                              const rulesActive = field.validationRules?.enabled === true;
+                              const legalVals = rulesActive && field.validationRules?.legalValues ? field.validationRules.legalValues : [];
                               return (
                                 <TableCell key={col.id}>
-                                  {field.legalValues && field.legalValues.length > 0 ? (
+                                  {legalVals.length > 0 ? (
                                     <Box
                                       sx={{
                                         display: 'flex',
@@ -731,8 +832,8 @@ const FeatureContextFieldsPage: React.FC = () => {
                                       }}
                                     >
                                       {(expandedLegalValues.has(field.id)
-                                        ? field.legalValues
-                                        : field.legalValues.slice(0, 3)
+                                        ? legalVals
+                                        : legalVals.slice(0, 3)
                                       ).map((value, idx) => (
                                         <Chip
                                           key={idx}
@@ -742,7 +843,7 @@ const FeatureContextFieldsPage: React.FC = () => {
                                           sx={{ fontSize: '0.75rem' }}
                                         />
                                       ))}
-                                      {field.legalValues.length > 3 && (
+                                      {legalVals.length > 3 && (
                                         <Typography
                                           variant="caption"
                                           sx={{
@@ -767,8 +868,8 @@ const FeatureContextFieldsPage: React.FC = () => {
                                           {expandedLegalValues.has(field.id)
                                             ? t('featureFlags.showLess')
                                             : t('featureFlags.showMore', {
-                                                count: field.legalValues.length - 3,
-                                              })}
+                                              count: legalVals.length - 3,
+                                            })}
                                         </Typography>
                                       )}
                                     </Box>
@@ -779,6 +880,7 @@ const FeatureContextFieldsPage: React.FC = () => {
                                   )}
                                 </TableCell>
                               );
+                            }
                             case 'tags':
                               return (
                                 <TableCell key={col.id}>
@@ -1094,6 +1196,10 @@ const FeatureContextFieldsPage: React.FC = () => {
                   { value: 'semver', descKey: 'featureFlags.fieldTypeDesc.semver' },
                   { value: 'array', descKey: 'featureFlags.fieldTypeDesc.array' },
                   { value: 'country', descKey: 'featureFlags.fieldTypeDesc.country' },
+                  { value: 'countryCode3', descKey: 'featureFlags.fieldTypeDesc.countryCode3' },
+                  { value: 'languageCode', descKey: 'featureFlags.fieldTypeDesc.languageCode' },
+                  { value: 'localeCode', descKey: 'featureFlags.fieldTypeDesc.localeCode' },
+                  { value: 'timezone', descKey: 'featureFlags.fieldTypeDesc.timezone' },
                 ].map((item) => (
                   <MenuItem key={item.value} value={item.value} sx={{ py: 1.5 }}>
                     <Box>
@@ -1115,32 +1221,98 @@ const FeatureContextFieldsPage: React.FC = () => {
               <FormHelperText>{t('featureFlags.fieldTypeHelp')}</FormHelperText>
             </FormControl>
 
-            {/* Legal Values - only show for string and number types */}
-            {(editingField?.fieldType === 'string' || editingField?.fieldType === 'number') && (
-              <Autocomplete
-                multiple
-                freeSolo
-                options={[]}
-                value={editingField?.legalValues || []}
-                onChange={(_, newValue) =>
+            {/* Common field settings: Allow Empty + Trim Whitespace */}
+            {editingField?.fieldType && (
+              <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
+                {/* Allow Empty */}
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={editingField.validationRules?.allowEmpty !== false}
+                      onChange={(e) =>
+                        setEditingField((prev) => ({
+                          ...prev,
+                          validationRules: {
+                            ...prev.validationRules,
+                            allowEmpty: e.target.checked ? undefined : false,
+                          },
+                        }))
+                      }
+                      size="small"
+                    />
+                  }
+                  label={
+                    <Typography variant="body2">{t('featureFlags.validation.allowEmpty')}</Typography>
+                  }
+                  sx={{ flexShrink: 0 }}
+                />
+
+                {/* Trim Whitespace - always shown as requested */}
+                {editingField.fieldType && (
+                  <FormControl size="small" sx={{ minWidth: 180, flex: 1 }}>
+                    <InputLabel>{t('featureFlags.validation.trimWhitespace')}</InputLabel>
+                    <Select
+                      value={editingField.validationRules?.trimWhitespace || 'none'}
+                      label={t('featureFlags.validation.trimWhitespace')}
+                      onChange={(e) =>
+                        setEditingField((prev) => ({
+                          ...prev,
+                          validationRules: {
+                            ...prev.validationRules,
+                            trimWhitespace: e.target.value === 'none' ? undefined : (e.target.value as any),
+                          },
+                        }))
+                      }
+                      renderValue={(value) => {
+                        const IconComp = TRIM_ICONS[value as string] || TrimIconNone;
+                        const color = TRIM_COLORS[value as string] || 'text.secondary';
+                        const labelKey = TRIM_LABEL_MAP[value as string] || TRIM_LABEL_MAP.none;
+                        return (
+                          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                            <IconComp sx={{ mr: 1, fontSize: '1.1rem', color }} />
+                            {t(labelKey)}
+                          </Box>
+                        );
+                      }}
+                    >
+                      {Object.entries(TRIM_LABEL_MAP).map(([val, labelKey]) => {
+                        const IconComp = TRIM_ICONS[val];
+                        const color = TRIM_COLORS[val];
+                        return (
+                          <MenuItem key={val} value={val}>
+                            <IconComp sx={{ mr: 1, fontSize: '1.1rem', color }} />
+                            {t(labelKey)}
+                          </MenuItem>
+                        );
+                      })}
+                    </Select>
+                  </FormControl>
+                )}
+              </Box>
+            )}
+
+            {/* Validation Rules */}
+            {editingField?.fieldType && (
+              <ValidationRulesEditor
+                valueType={
+                  (['number'] as string[]).includes(editingField.fieldType) ? 'number'
+                    : editingField.fieldType === 'boolean' ? 'boolean'
+                      : editingField.fieldType === 'date' ? 'date'
+                        : editingField.fieldType === 'semver' ? 'semver'
+                          : editingField.fieldType === 'country' ? 'country'
+                            : editingField.fieldType === 'countryCode3' ? 'countryCode3'
+                              : editingField.fieldType === 'languageCode' ? 'languageCode'
+                                : editingField.fieldType === 'localeCode' ? 'localeCode'
+                                  : editingField.fieldType === 'timezone' ? 'timezone'
+                                    : 'string'
+                }
+                rules={editingField.validationRules}
+                onChange={(rules) =>
                   setEditingField((prev) => ({
                     ...prev,
-                    legalValues: newValue as string[],
+                    validationRules: rules,
                   }))
                 }
-                renderTags={(value, getTagProps) =>
-                  value.map((option, idx) => (
-                    <Chip size="small" label={option} {...getTagProps({ index: idx })} key={idx} />
-                  ))
-                }
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label={t('featureFlags.legalValues')}
-                    placeholder={t('featureFlags.legalValuesPlaceholder')}
-                    helperText={t('featureFlags.legalValuesHelp')}
-                  />
-                )}
               />
             )}
           </Stack>

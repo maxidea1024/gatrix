@@ -74,6 +74,8 @@ interface FeatureSegment {
   tags?: string[];
   createdAt: string;
   updatedAt: string;
+  createdByName?: string;
+  createdByEmail?: string;
 }
 
 const FeatureSegmentsPage: React.FC = () => {
@@ -137,13 +139,24 @@ const FeatureSegmentsPage: React.FC = () => {
       setContextFields(
         fields
           .filter((f: any) => f.isEnabled !== false)
-          .map((f: any) => ({
-            fieldName: f.fieldName,
-            displayName: f.displayName || f.fieldName,
-            description: f.description || '',
-            fieldType: f.fieldType || 'string',
-            legalValues: f.legalValues || [],
-          }))
+          .map((f: any) => {
+            let rules = f.validationRules;
+            if (typeof rules === 'string' && rules.trim()) {
+              try {
+                rules = JSON.parse(rules);
+              } catch (e) {
+                rules = null;
+              }
+            }
+
+            return {
+              fieldName: f.fieldName,
+              displayName: f.displayName || f.fieldName,
+              description: f.description || '',
+              fieldType: f.fieldType || 'string',
+              validationRules: rules,
+            };
+          })
       );
     } catch (error) {
       console.error('Failed to load context fields:', error);
@@ -155,16 +168,10 @@ const FeatureSegmentsPage: React.FC = () => {
           displayName: 'Session ID',
           fieldType: 'string',
         },
-        { fieldName: 'appName', displayName: 'App Name', fieldType: 'string' },
-        {
-          fieldName: 'environment',
-          displayName: 'Environment',
-          fieldType: 'string',
-        },
         {
           fieldName: 'currentTime',
           displayName: 'Current Time',
-          fieldType: 'datetime',
+          fieldType: 'date',
         },
       ]);
     }
@@ -667,8 +674,14 @@ const FeatureSegmentsPage: React.FC = () => {
                                               e.stopPropagation();
                                               copyToClipboardWithNotification(
                                                 segment.segmentName,
-                                                enqueueSnackbar,
-                                                t
+                                                () =>
+                                                  enqueueSnackbar(t('common.copySuccess'), {
+                                                    variant: 'success',
+                                                  }),
+                                                () =>
+                                                  enqueueSnackbar(t('common.copyFailed'), {
+                                                    variant: 'error',
+                                                  })
                                               );
                                             }}
                                             sx={{
@@ -981,7 +994,9 @@ const FeatureSegmentsPage: React.FC = () => {
                   value.map((option, idx) => {
                     const { key, ...chipProps } = getTagProps({ index: idx });
                     const tagData =
-                      typeof option === 'string' ? { name: option, color: '#888888' } : option;
+                      typeof option === 'string'
+                        ? { name: option, color: '#888888', description: '' }
+                        : { ...option, description: (option as any).description || '' };
                     return (
                       <Tooltip key={key} title={tagData.description || ''} arrow>
                         <Chip

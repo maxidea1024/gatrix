@@ -60,6 +60,8 @@ import {
   SportsEsports as JoystickIcon,
   ContentCopy as CopyIcon,
   AccountTree as ExtractIcon,
+  WarningAmber as WarningAmberIcon,
+  ErrorOutline as ErrorOutlineIcon,
 } from '@mui/icons-material';
 import FieldTypeIcon from '../common/FieldTypeIcon';
 import CountrySelect from '../common/CountrySelect';
@@ -82,7 +84,20 @@ interface ContextField {
   displayName: string;
   description?: string;
   fieldType: 'string' | 'number' | 'boolean' | 'date' | 'datetime' | 'semver' | 'array' | 'country';
-  legalValues?: string[];
+  validationRules?: {
+    enabled?: boolean;
+    legalValues?: string[];
+    allowEmpty?: boolean;
+    trimWhitespace?: string;
+    pattern?: string;
+    patternDescription?: string;
+    minLength?: number;
+    maxLength?: number;
+    min?: number;
+    max?: number;
+    integerOnly?: boolean;
+    [key: string]: any;
+  };
 }
 
 interface ContextEntry {
@@ -114,6 +129,12 @@ interface EvaluationResult {
     failedSegment?: string;
   };
   evaluationSteps?: EvaluationStep[];
+  validation?: {
+    valid: boolean;
+    errors: string[];
+    transformedValue?: any;
+    rules?: any;
+  };
 }
 
 interface EvaluationStep {
@@ -187,6 +208,9 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
     return localStorage.getItem('gatrix_playground_remember_context') === 'true';
   });
   const [confirmDeleteAllOpen, setConfirmDeleteAllOpen] = useState(false);
+  const [contextWarnings, setContextWarnings] = useState<
+    { field: string; type: string; message: string; suggestion?: string; data?: any; severity?: 'warning' | 'error' }[]
+  >([]);
 
   // Evaluation details popover state
   const [evaluationPopoverAnchor, setEvaluationPopoverAnchor] = useState<HTMLElement | null>(null);
@@ -365,6 +389,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
         })
         : t('playground.reasons.defaultStrategy'),
       NO_MATCHING_STRATEGY: t('playground.reasons.NO_MATCHING_STRATEGY'),
+      CONTEXT_VALIDATION_FAILED: t('playground.reasons.contextValidationFailed'),
     };
     return reasonMap[reason] || reason;
   };
@@ -375,6 +400,15 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
     const message = step.message;
 
     // Map messages to localization keys
+    if (stepType === 'CONTEXT_VALIDATION') {
+      if (message === 'Context validation failed') {
+        return t('playground.stepMessages.contextValidationFailed');
+      }
+      if (message === 'Context validation passed') {
+        return t('playground.stepMessages.contextValidationPassed');
+      }
+    }
+
     if (stepType === 'ENVIRONMENT_CHECK') {
       if (message === 'Flag is enabled in this environment') {
         return envName
@@ -607,9 +641,11 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
         let value: any = entry.value;
         // Convert value based on type
         switch (entry.type) {
-          case 'number':
-            value = Number(entry.value) || 0;
+          case 'number': {
+            const trimmed = String(entry.value || '').trim();
+            value = trimmed === '' ? undefined : Number(trimmed);
             break;
+          }
           case 'boolean':
             value = entry.value === 'true';
             break;
@@ -646,6 +682,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
   // Evaluate
   const handleEvaluate = async () => {
     setResults({});
+    setContextWarnings([]);
     setLoading(true);
     setAutoExecutePending(false);
     try {
@@ -672,7 +709,11 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
       const response = await api.post('/admin/features/playground', requestBody);
 
       setResults(response.data?.results || {});
+      setContextWarnings(response.data?.contextWarnings || []);
     } catch (error: any) {
+      if (error.response?.data?.contextWarnings) {
+        setContextWarnings(error.response.data.contextWarnings);
+      }
       enqueueSnackbar(parseApiErrorMessage(error, 'playground.evaluationFailed'), {
         variant: 'error',
       });
@@ -743,8 +784,24 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
       case 'ROLLOUT_INCLUDED':
         return t('playground.reasons.rolloutIncluded');
       default:
-        return result.reason;
+        return result.reason || t('common.unknown');
     }
+  };
+
+  // Get localized warning text
+  const getLocalizedWarning = (w: any) => {
+    if (!w.type) return w.message;
+
+    const params = { ...w.data };
+    if (params.allowedValues && Array.isArray(params.allowedValues)) {
+      params.allowedValues = params.allowedValues.join(', ');
+    }
+
+    const i18nKey = `playground.warning.${w.type.toLowerCase().replace(/_([a-z])/g, (_, c) => c.toUpperCase())}`;
+
+    const localized = t(i18nKey, params);
+    // If translation doesn't exist, it usually returns the key
+    return localized === i18nKey ? w.message : localized;
   };
 
   // Get type icon for flag type
@@ -814,7 +871,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
               />
             }
             label={
-              <Typography variant="caption" sx={{ color: 'text.secondary', userSelect: 'none' }}>
+              <Typography variant="body2" sx={{ color: 'text.secondary', userSelect: 'none' }}>
                 {t('playground.rememberContext')}
               </Typography>
             }
@@ -852,8 +909,14 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
             <Paper variant="outlined" sx={{ mb: 1 }}>
               {contextEntries.map((entry, index) => {
                 const contextField = getContextFieldByKey(entry.key);
-                const hasLegalValues =
-                  contextField?.legalValues && contextField.legalValues.length > 0;
+                const rulesEnabled = contextField?.validationRules?.enabled === true;
+                // Only use legalValues from validationRules when rules are enabled
+                const effectiveLegalValues = rulesEnabled
+                  && contextField?.validationRules?.legalValues
+                  && contextField.validationRules.legalValues.length > 0
+                  ? contextField.validationRules.legalValues
+                  : null;
+                const hasLegalValues = effectiveLegalValues != null && effectiveLegalValues.length > 0;
                 const fieldType = contextField?.fieldType || 'string';
 
                 // Render value input based on field type
@@ -920,7 +983,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                         size="small"
                         fullWidth
                         value={entry.value || ''}
-                        options={contextField?.legalValues || []}
+                        options={effectiveLegalValues || []}
                         freeSolo
                         autoHighlight
                         onChange={(_, newValue) =>
@@ -936,6 +999,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                             sx={{
                               '& .MuiInputBase-root': {
                                 px: '8px !important',
+                                fontSize: '0.9rem',
                               },
                             }}
                           />
@@ -954,6 +1018,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                         placeholder="0"
                         value={entry.value}
                         onChange={(e) => handleUpdateContextEntry(index, 'value', e.target.value)}
+                        sx={{ '& .MuiInputBase-input': { fontSize: '0.9rem' } }}
                       />
                     );
                   }
@@ -968,6 +1033,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                       }
                       value={entry.value}
                       onChange={(e) => handleUpdateContextEntry(index, 'value', e.target.value)}
+                      sx={{ '& .MuiInputBase-input': { fontSize: '0.9rem' } }}
                     />
                   );
                 };
@@ -1049,19 +1115,79 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                 </Box>
                               </Tooltip>
                               <Box sx={{ flex: 1, minWidth: 0 }}>
-                                <Typography variant="body2" fontWeight={500}>
-                                  {field.displayName || field.fieldName}
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                  <Typography variant="body2" fontWeight={500}>
+                                    {field.displayName || field.fieldName}
+                                  </Typography>
+                                  {/* Optional/nullable indicator */}
+                                  {field.validationRules?.allowEmpty === true && (
+                                    <Tooltip title={t('playground.optionalField')} disableFocusListener>
+                                      <Typography
+                                        component="span"
+                                        variant="caption"
+                                        sx={{
+                                          color: 'info.main',
+                                          fontSize: '0.65rem',
+                                          fontWeight: 600,
+                                          border: 1,
+                                          borderColor: 'info.main',
+                                          borderRadius: 0.5,
+                                          px: 0.5,
+                                          lineHeight: 1.4,
+                                        }}
+                                      >
+                                        OPT
+                                      </Typography>
+                                    </Tooltip>
+                                  )}
+                                  {/* Trim whitespace indicator */}
+                                  {field.validationRules?.trimWhitespace && field.validationRules.trimWhitespace !== 'none' && (
+                                    <Tooltip title={`Trim: ${field.validationRules.trimWhitespace}`} disableFocusListener>
+                                      <Typography
+                                        component="span"
+                                        variant="caption"
+                                        sx={{
+                                          color: 'warning.main',
+                                          fontSize: '0.6rem',
+                                          fontWeight: 600,
+                                        }}
+                                      >
+                                        ✂
+                                      </Typography>
+                                    </Tooltip>
+                                  )}
+                                  {/* Legal values indicator */}
+                                  {field.validationRules?.enabled && field.validationRules?.legalValues && field.validationRules.legalValues.length > 0 && (
+                                    <Tooltip title={t('playground.hasLegalValues')} disableFocusListener>
+                                      <Typography
+                                        component="span"
+                                        variant="caption"
+                                        sx={{
+                                          color: 'success.main',
+                                          fontSize: '0.65rem',
+                                          fontWeight: 600,
+                                          border: 1,
+                                          borderColor: 'success.main',
+                                          borderRadius: 0.5,
+                                          px: 0.5,
+                                          lineHeight: 1.4,
+                                        }}
+                                      >
+                                        {field.validationRules.legalValues.length}
+                                      </Typography>
+                                    </Tooltip>
+                                  )}
                                   {isUsed && (
                                     <Typography
                                       component="span"
                                       variant="caption"
                                       color="text.disabled"
-                                      sx={{ ml: 1 }}
+                                      sx={{ ml: 0.5 }}
                                     >
                                       ({t('featureFlags.alreadyUsed')})
                                     </Typography>
                                   )}
-                                </Typography>
+                                </Box>
                                 {field.description && (
                                   <Typography
                                     variant="caption"
@@ -1084,6 +1210,8 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                               sx={{
                                 '& .MuiInputBase-root': {
                                   px: '8px !important',
+                                  fontSize: '0.9rem',
+                                  fontWeight: 500,
                                 },
                               }}
                               InputProps={{
@@ -1341,7 +1469,10 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
       );
     }
 
-    if (Object.keys(results).length === 0) return null;
+    const hasWarnings = contextWarnings.length > 0;
+    const hasResults = Object.keys(results).length > 0;
+
+    if (!hasWarnings && !hasResults) return null;
 
     // Get list of environments evaluated
     const evaluatedEnvs = Object.keys(results);
@@ -1364,6 +1495,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
     });
 
     const flagNames = Object.keys(flagResultsMap).sort();
+    const hasContextErrors = contextWarnings.some((w) => w.severity === 'error');
 
     return (
       <Paper
@@ -1390,7 +1522,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
             {t('playground.results')} ({totalResults})
           </Typography>
           {/* Hide search in embedded mode (single flag) */}
-          {!embedded && (
+          {!embedded && hasResults && (
             <TextField
               size="small"
               placeholder={t('common.search')}
@@ -1401,156 +1533,240 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
           )}
         </Box>
 
-        <TableContainer component={Paper} variant="outlined">
-          <Table size="small">
-            <TableHead>
-              <TableRow>
-                {/* Hide flag name column in embedded mode (single flag) */}
-                {!embedded && <TableCell>{t('featureFlags.flagName')}</TableCell>}
-                {evaluatedEnvs.map((env) => {
-                  const envData = environments.find((e) => e.environment === env);
-                  const label = envData?.displayName || env;
-                  return (
-                    <TableCell
-                      key={env}
-                      align="center"
-                      sx={{ minWidth: 40, maxWidth: 56, px: 0.25, py: 1 }}
-                    >
-                      <Tooltip title={label} disableFocusListener>
+        <Box>
+          {/* Context Value Warnings */}
+          {contextWarnings.length > 0 && (
+            <Alert
+              severity={hasContextErrors ? 'error' : 'warning'}
+              variant="outlined"
+              sx={{ mb: 1.5, py: 0.5 }}
+              icon={hasContextErrors ? <ErrorOutlineIcon fontSize="small" /> : <WarningAmberIcon fontSize="small" />}
+            >
+              <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
+                {hasContextErrors ? t('playground.validationFailed') : t('playground.contextWarningsTitle')}
+              </Typography>
+              <Stack spacing={0.5}>
+                {contextWarnings.map((w, i) => (
+                  <Box
+                    key={i}
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 2,
+                      py: 0.5,
+                      borderBottom: i < contextWarnings.length - 1 ? '1px dashed' : 'none',
+                      borderColor: 'divider',
+                    }}
+                  >
+                    <Box sx={{ minWidth: 140 }}>
+                      <Chip
+                        label={w.field}
+                        size="small"
+                        variant="filled"
+                        sx={{
+                          height: 20,
+                          fontSize: '0.75rem',
+                          fontWeight: 600,
+                          fontFamily: 'monospace',
+                          borderRadius: 0.5,
+                          bgcolor: w.severity === 'error' ? 'error.light' : 'warning.light',
+                          color: w.severity === 'error' ? 'error.contrastText' : 'warning.contrastText',
+                        }}
+                      />
+                    </Box>
+                    <Box sx={{ flex: 1 }}>
+                      <Typography
+                        variant="caption"
+                        sx={{ fontWeight: 500, color: w.severity === 'error' ? 'error.main' : 'text.primary', display: 'block' }}
+                      >
+                        {getLocalizedWarning(w)}
+                      </Typography>
+                      {w.suggestion && (
                         <Chip
-                          label={label}
+                          label={`→ "${w.suggestion}"`}
                           size="small"
+                          color="info"
                           variant="outlined"
                           sx={{
-                            borderColor: envData?.color || '#888',
-                            color: envData?.color || '#888',
-                            borderRadius: '4px',
-                            borderWidth: 1,
-                            fontSize: '10px',
-                            fontWeight: 700,
-                            maxWidth: 42,
-                            height: 16,
-                            '& .MuiChip-label': {
-                              display: 'block',
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis',
-                              whiteSpace: 'nowrap',
-                              px: 0.5,
-                            },
+                            mt: 0.5,
+                            height: 18,
+                            fontSize: '0.65rem',
+                            fontFamily: 'monospace',
+                            cursor: 'default',
                           }}
                         />
-                      </Tooltip>
-                    </TableCell>
-                  );
-                })}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {flagNames.map((flagName) => {
-                const flagInfo = flagInfoMap[flagName];
-                const envResults = flagResultsMap[flagName];
+                      )}
+                    </Box>
+                  </Box>
+                ))}
+              </Stack>
+            </Alert>
+          )}
 
-                return (
-                  <TableRow key={flagName} hover>
-                    {/* Hide flag name column in embedded mode (single flag) */}
-                    {!embedded && (
-                      <TableCell>
-                        <Box
-                          sx={{
-                            cursor: 'pointer',
-                            '&:hover': { color: 'primary.main' },
-                          }}
-                          onClick={() => handleFlagClick(flagName)}
-                        >
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                            {flagInfo.flagType === 'remoteConfig' ? (
-                              <JsonIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-                            ) : (
-                              <FlagIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-                            )}
-                            <Typography variant="body2">{flagName}</Typography>
-                            <OpenInNewIcon sx={{ fontSize: 12, color: 'text.disabled', ml: 0.5 }} />
-                          </Box>
-                          {flagInfo.displayName && flagInfo.displayName !== flagName && (
-                            <Typography
-                              variant="caption"
-                              color="text.secondary"
-                              sx={{ display: 'block' }}
-                            >
-                              {flagInfo.displayName}
-                            </Typography>
-                          )}
-                        </Box>
+          <TableContainer component={Paper} variant="outlined">
+            <Table size="small">
+              <TableHead>
+                <TableRow>
+                  {/* Hide flag name column in embedded mode (single flag) */}
+                  {!embedded && <TableCell>{t('featureFlags.flagName')}</TableCell>}
+                  {evaluatedEnvs.map((env) => {
+                    const envData = environments.find((e) => e.environment === env);
+                    const label = envData?.displayName || env;
+                    return (
+                      <TableCell
+                        key={env}
+                        align="center"
+                        sx={{ minWidth: 40, maxWidth: 56, px: 0.25, py: 1 }}
+                      >
+                        <Tooltip title={label} disableFocusListener>
+                          <Chip
+                            label={label}
+                            size="small"
+                            variant="outlined"
+                            sx={{
+                              borderColor: envData?.color || '#888',
+                              color: envData?.color || '#888',
+                              borderRadius: '4px',
+                              borderWidth: 1,
+                              fontSize: '10px',
+                              fontWeight: 700,
+                              maxWidth: 42,
+                              height: 16,
+                              '& .MuiChip-label': {
+                                display: 'block',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap',
+                                px: 0.5,
+                              },
+                            }}
+                          />
+                        </Tooltip>
                       </TableCell>
-                    )}
-                    {evaluatedEnvs.map((env) => {
-                      const result = envResults[env];
-                      if (!result) {
+                    );
+                  })}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {flagNames.map((flagName) => {
+                  const flagInfo = flagInfoMap[flagName];
+                  const envResults = flagResultsMap[flagName];
+
+                  return (
+                    <TableRow key={flagName} hover>
+                      {/* Hide flag name column in embedded mode (single flag) */}
+                      {!embedded && (
+                        <TableCell>
+                          <Box
+                            sx={{
+                              cursor: 'pointer',
+                              '&:hover': { color: 'primary.main' },
+                            }}
+                            onClick={() => handleFlagClick(flagName)}
+                          >
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                              {flagInfo.flagType === 'remoteConfig' ? (
+                                <JsonIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+                              ) : (
+                                <FlagIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+                              )}
+                              <Typography variant="body2">{flagName}</Typography>
+                              <OpenInNewIcon sx={{ fontSize: 12, color: 'text.disabled', ml: 0.5 }} />
+                            </Box>
+                            {flagInfo.displayName && flagInfo.displayName !== flagName && (
+                              <Typography
+                                variant="caption"
+                                color="text.secondary"
+                                sx={{ display: 'block' }}
+                              >
+                                {flagInfo.displayName}
+                              </Typography>
+                            )}
+                          </Box>
+                        </TableCell>
+                      )}
+                      {evaluatedEnvs.map((env) => {
+                        const result = envResults[env];
+                        if (!result) {
+                          return (
+                            <TableCell
+                              key={env}
+                              align="center"
+                              sx={{ minWidth: 40, maxWidth: 56, px: 0.25 }}
+                            >
+                              <Typography variant="caption" color="text.disabled">
+                                -
+                              </Typography>
+                            </TableCell>
+                          );
+                        }
+
+                        const hasDetails =
+                          result.evaluationSteps && result.evaluationSteps.length > 0;
+
                         return (
                           <TableCell
                             key={env}
                             align="center"
                             sx={{ minWidth: 40, maxWidth: 56, px: 0.25 }}
                           >
-                            <Typography variant="caption" color="text.disabled">
-                              -
-                            </Typography>
+                            <Tooltip
+                              title={hasDetails ? t('playground.clickToViewEvaluationResult') : ''}
+                              disableFocusListener
+                            >
+                              <Box
+                                sx={{
+                                  display: 'inline-flex',
+                                  flexDirection: 'column',
+                                  alignItems: 'center',
+                                  cursor: hasDetails ? 'pointer' : 'default',
+                                  p: 1,
+                                  borderRadius: 1,
+                                  transition: 'all 0.2s',
+                                  '&:hover': hasDetails
+                                    ? {
+                                      bgcolor: 'action.hover',
+                                      transform: 'scale(1.1)',
+                                    }
+                                    : {},
+                                }}
+                                onClick={(e) => {
+                                  if (hasDetails) {
+                                    setEvaluationPopoverAnchor(e.currentTarget);
+                                    setSelectedEvaluation({ flagName, env, result });
+                                  }
+                                }}
+                              >
+                                {result.enabled ? (
+                                  <TrueIcon color="success" sx={{ fontSize: 24 }} />
+                                ) : (
+                                  <FalseIcon color="error" sx={{ fontSize: 24 }} />
+                                )}
+                                {result.validation && !result.validation.valid && (
+                                  <Tooltip title={result.validation.errors.join(', ')} disableFocusListener>
+                                    <WarningAmberIcon
+                                      sx={{
+                                        fontSize: 14,
+                                        color: 'warning.main',
+                                        position: 'absolute',
+                                        bottom: 4,
+                                        right: 4,
+                                      }}
+                                    />
+                                  </Tooltip>
+                                )}
+                              </Box>
+                            </Tooltip>
                           </TableCell>
                         );
-                      }
-
-                      const hasDetails =
-                        result.evaluationSteps && result.evaluationSteps.length > 0;
-
-                      return (
-                        <TableCell
-                          key={env}
-                          align="center"
-                          sx={{ minWidth: 40, maxWidth: 56, px: 0.25 }}
-                        >
-                          <Tooltip
-                            title={hasDetails ? t('playground.clickToViewEvaluationResult') : ''}
-                            disableFocusListener
-                          >
-                            <Box
-                              sx={{
-                                display: 'inline-flex',
-                                flexDirection: 'column',
-                                alignItems: 'center',
-                                cursor: hasDetails ? 'pointer' : 'default',
-                                p: 1,
-                                borderRadius: 1,
-                                transition: 'all 0.2s',
-                                '&:hover': hasDetails
-                                  ? {
-                                    bgcolor: 'action.hover',
-                                    transform: 'scale(1.1)',
-                                  }
-                                  : {},
-                              }}
-                              onClick={(e) => {
-                                if (hasDetails) {
-                                  setEvaluationPopoverAnchor(e.currentTarget);
-                                  setSelectedEvaluation({ flagName, env, result });
-                                }
-                              }}
-                            >
-                              {result.enabled ? (
-                                <TrueIcon color="success" sx={{ fontSize: 24 }} />
-                              ) : (
-                                <FalseIcon color="error" sx={{ fontSize: 24 }} />
-                              )}
-                            </Box>
-                          </Tooltip>
-                        </TableCell>
-                      );
-                    })}
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </TableContainer>
+                      })}
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Box>
       </Paper>
     );
   };
@@ -2204,6 +2420,8 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                   >
                                     {step.step === 'FLAG_STATUS' &&
                                       t('playground.steps.flagStatus')}
+                                    {step.step === 'CONTEXT_VALIDATION' &&
+                                      t('playground.steps.contextValidation')}
                                     {step.step === 'ENVIRONMENT_CHECK' &&
                                       t('playground.steps.environmentCheck')}
                                     {step.step === 'STRATEGY_COUNT' &&
@@ -2860,6 +3078,69 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                   </Box>
                 )}
               </Box>
+
+              {/* Validation Results */}
+              {selectedEvaluation.result.validation && (
+                <>
+                  <Divider sx={{ borderStyle: 'dashed', my: 2.5 }} />
+                  <Box>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                      <Typography variant="subtitle2" color="text.secondary">
+                        {t('playground.validationResults')}
+                      </Typography>
+                      {selectedEvaluation.result.validation.valid ? (
+                        <Chip
+                          label={t('playground.validationPassed')}
+                          size="small"
+                          color="success"
+                          variant="outlined"
+                          sx={{ height: 20, fontSize: '0.7rem' }}
+                        />
+                      ) : (
+                        <Chip
+                          label={t('playground.validationFailed')}
+                          size="small"
+                          color="warning"
+                          variant="outlined"
+                          sx={{ height: 20, fontSize: '0.7rem' }}
+                        />
+                      )}
+                    </Box>
+                    {!selectedEvaluation.result.validation.valid && selectedEvaluation.result.validation.errors.length > 0 && (
+                      <Alert severity="warning" variant="outlined" sx={{ mb: 1 }}>
+                        <Stack spacing={0.5}>
+                          {selectedEvaluation.result.validation.errors.map((err: string, i: number) => (
+                            <Typography key={i} variant="body2">
+                              • {err}
+                            </Typography>
+                          ))}
+                        </Stack>
+                      </Alert>
+                    )}
+                    {selectedEvaluation.result.validation.transformedValue !== undefined && (
+                      <Box
+                        sx={{
+                          p: 1.5,
+                          bgcolor: 'action.hover',
+                          borderRadius: 1,
+                          border: '1px solid',
+                          borderColor: 'divider',
+                        }}
+                      >
+                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
+                          {t('playground.validationTransformedValue')}
+                        </Typography>
+                        <Typography
+                          variant="body2"
+                          sx={{ fontFamily: 'monospace', wordBreak: 'break-all' }}
+                        >
+                          {JSON.stringify(selectedEvaluation.result.validation.transformedValue)}
+                        </Typography>
+                      </Box>
+                    )}
+                  </Box>
+                </>
+              )}
 
               {/* Raw Response JSON */}
               <Divider sx={{ borderStyle: 'dashed', my: 2.5 }} />

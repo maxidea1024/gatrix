@@ -11,6 +11,29 @@ export type FlagType =
   | 'remoteConfig'; // Purpose
 export type FlagStatus = 'enabled' | 'disabled' | 'archived';
 
+export interface ValidationRules {
+  enabled?: boolean;
+  // Common
+  allowEmpty?: boolean;
+  description?: string;
+
+  // String type
+  minLength?: number;
+  maxLength?: number;
+  pattern?: string;
+  patternDescription?: string;
+  legalValues?: string[];
+  trimWhitespace?: 'none' | 'trim' | 'trimStart' | 'trimEnd' | 'reject';
+
+  // Number type
+  min?: number;
+  max?: number;
+  integerOnly?: boolean;
+
+  // JSON type
+  jsonSchema?: string;
+}
+
 // Per-environment settings
 export interface FeatureFlagEnvironment {
   id: string;
@@ -35,6 +58,7 @@ export interface FeatureFlag {
   valueType: 'string' | 'number' | 'boolean' | 'json';
   enabledValue: any;
   disabledValue: any;
+  validationRules?: ValidationRules;
   archivedAt?: string;
   createdBy?: number;
   updatedBy?: number;
@@ -43,7 +67,6 @@ export interface FeatureFlag {
   // Per-environment settings
   environments?: FeatureFlagEnvironment[];
   // Legacy: for backward compatibility (current env's value)
-  isEnabled?: boolean;
   isEnabled?: boolean;
   lastSeenAt?: string;
   codeReferenceCount?: number;
@@ -81,6 +104,7 @@ export interface CreateFeatureFlagInput {
   impressionDataEnabled?: boolean;
   staleAfterDays?: number;
   tags?: string[];
+  validationRules?: ValidationRules;
 }
 
 export interface UpdateFeatureFlagInput {
@@ -93,6 +117,7 @@ export interface UpdateFeatureFlagInput {
   impressionDataEnabled?: boolean;
   staleAfterDays?: number;
   tags?: string[];
+  validationRules?: ValidationRules;
 }
 
 // ==================== Service ====================
