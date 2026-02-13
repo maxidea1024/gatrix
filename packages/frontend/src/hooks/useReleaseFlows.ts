@@ -40,3 +40,20 @@ export function useConditionalReleaseFlowPlan(
 
     return useConditionalApi<ReleaseFlowPlan>(url, condition);
 }
+
+export interface ReleaseFlowPlanSummary {
+    environment: string;
+    status: string;
+    displayName: string;
+}
+
+/**
+ * Hook for fetching all active release flow plans for a flag
+ */
+export function useReleaseFlowPlansByFlag(flagId: string | null) {
+    const url = flagId
+        ? `/admin/release-flows/plans/flag/${flagId}`
+        : null;
+
+    return useApi<ReleaseFlowPlanSummary[]>(url);
+}

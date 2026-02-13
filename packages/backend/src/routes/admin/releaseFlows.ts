@@ -16,6 +16,7 @@ router.delete('/templates/:id', requirePermission(PERMISSIONS.FEATURE_FLAGS_MANA
 router.post('/apply', requirePermission(PERMISSIONS.FEATURE_FLAGS_MANAGE) as any, ReleaseFlowController.applyTemplate as any);
 
 // Plans management
+router.get('/plans/flag/:flagId', ReleaseFlowController.getPlansByFlag as any);
 router.get('/plans/:flagId/:environment', ReleaseFlowController.getPlan as any);
 router.post('/plans/:planId/milestones/:milestoneId/start', requirePermission(PERMISSIONS.FEATURE_FLAGS_MANAGE) as any, ReleaseFlowController.startMilestone as any);
 

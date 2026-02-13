@@ -83,6 +83,7 @@ import {
   SportsEsports as JoystickIcon,
   Close as CloseIcon,
   LibraryAdd as TemplateIcon,
+  Shield as ShieldIcon,
 } from '@mui/icons-material';
 import FieldTypeIcon from '../../components/common/FieldTypeIcon';
 import { useAuth } from '../../contexts/AuthContext';
@@ -137,6 +138,7 @@ import EnvironmentVariantsEditor, {
 } from '../../components/features/EnvironmentVariantsEditor';
 import FeatureFlagAuditLogs from '../../components/features/FeatureFlagAuditLogs';
 import ReleaseFlowTab from '../../components/features/ReleaseFlowTab';
+import { useReleaseFlowPlansByFlag } from '../../hooks/useReleaseFlows';
 import FeatureFlagCodeReferences from '../../components/features/FeatureFlagCodeReferences';
 import PlaygroundDialog from '../../components/features/PlaygroundDialog';
 import ValidationRulesEditor from '../../components/features/ValidationRulesEditor';
@@ -458,6 +460,12 @@ const FeatureFlagDetailPage: React.FC = () => {
   // Environment-specific variants - key is environment name, value is array of variants
   const [envVariants, setEnvVariants] = useState<Record<string, Variant[]>>({});
   const [codeReferenceCount, setCodeReferenceCount] = useState<number | null>(null);
+
+  // Release flow plan summaries - to detect environments managed by release flow
+  const { data: releaseFlowPlans } = useReleaseFlowPlansByFlag(flag?.id || null);
+  const releaseFlowEnvs = new Set(
+    (releaseFlowPlans || []).map((p) => p.environment)
+  );
 
   // Fetch code reference count on mount
   useEffect(() => {
@@ -2239,7 +2247,16 @@ const FeatureFlagDetailPage: React.FC = () => {
                                 <Typography variant="subtitle1" fontWeight={600}>
                                   {env.displayName}
                                 </Typography>
-                                {strategiesCount > 0 && (
+                                {releaseFlowEnvs.has(env.environment) ? (
+                                  <Chip
+                                    icon={<ShieldIcon sx={{ fontSize: 14 }} />}
+                                    label={t('releaseFlow.tabTitle')}
+                                    size="small"
+                                    color="primary"
+                                    variant="outlined"
+                                    sx={{ height: 22, '& .MuiChip-label': { px: 0.75, fontSize: '0.7rem' } }}
+                                  />
+                                ) : strategiesCount > 0 && (
                                   <Typography
                                     variant="caption"
                                     sx={{
@@ -2369,7 +2386,38 @@ const FeatureFlagDetailPage: React.FC = () => {
                           </AccordionSummary>
 
                           <AccordionDetails sx={{ px: 2, pt: 0, pb: 2 }}>
-                            {strategies.length === 0 ? (
+                            {releaseFlowEnvs.has(env.environment) ? (
+                              <Box
+                                sx={{
+                                  textAlign: 'center',
+                                  py: 3,
+                                  px: 3,
+                                  border: '2px dashed',
+                                  borderColor: 'primary.main',
+                                  borderRadius: '4px',
+                                  bgcolor: (theme) =>
+                                    theme.palette.mode === 'dark'
+                                      ? 'rgba(33, 150, 243, 0.08)'
+                                      : 'rgba(33, 150, 243, 0.04)',
+                                }}
+                              >
+                                <ShieldIcon sx={{ fontSize: 36, color: 'primary.main', mb: 1 }} />
+                                <Typography variant="body2" color="text.secondary" fontWeight={500}>
+                                  {t('releaseFlow.managedByReleaseFlow')}
+                                </Typography>
+                                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
+                                  {t('releaseFlow.managedByReleaseFlowDesc')}
+                                </Typography>
+                                <Button
+                                  size="small"
+                                  variant="outlined"
+                                  sx={{ mt: 1.5 }}
+                                  onClick={() => setTabValue(2)}
+                                >
+                                  {t('releaseFlow.goToReleaseFlow')}
+                                </Button>
+                              </Box>
+                            ) : strategies.length === 0 ? (
                               <>
                                 <EmptyPlaceholder
                                   message={t('featureFlags.noStrategiesTitle')}

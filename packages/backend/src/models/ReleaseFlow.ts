@@ -83,6 +83,10 @@ export class ReleaseFlowModel {
     static async listTemplates(search?: string): Promise<ReleaseFlowAttributes[]> {
         try {
             let query = db('g_release_flows')
+                .select('g_release_flows.*')
+                .select(
+                    db.raw('(SELECT COUNT(*) FROM g_release_flow_milestones WHERE flowId = g_release_flows.id) as milestoneCount')
+                )
                 .where('discriminator', 'template')
                 .where('isArchived', false);
 
@@ -95,11 +99,20 @@ export class ReleaseFlowModel {
             }
 
             const templates = await query.orderBy('createdAt', 'desc');
-            return templates.map((t: any) => ({
-                ...t,
-                isArchived: Boolean(t.isArchived),
-                status: t.status || 'draft',
-            }));
+
+            // Load milestones for each template
+            const results = await Promise.all(
+                templates.map(async (t: any) => {
+                    const milestones = await ReleaseFlowMilestoneModel.findByFlowId(t.id);
+                    return {
+                        ...t,
+                        isArchived: Boolean(t.isArchived),
+                        status: t.status || 'draft',
+                        milestones,
+                    };
+                })
+            );
+            return results;
         } catch (error) {
             logger.error('Error listing release flow templates:', error);
             throw error;
@@ -141,6 +154,26 @@ export class ReleaseFlowModel {
             return this.findById(flow.id);
         } catch (error) {
             logger.error('Error finding release flow plan:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Find all active plans for a flag (across all environments).
+     * Returns lightweight summaries (environment + status).
+     */
+    static async findPlansByFlag(
+        flagId: string
+    ): Promise<Array<{ environment: string; status: string; displayName: string }>> {
+        try {
+            const flows = await db('g_release_flows')
+                .select('environment', 'status', 'displayName')
+                .where('flagId', flagId)
+                .where('discriminator', 'plan')
+                .where('isArchived', false);
+            return flows;
+        } catch (error) {
+            logger.error('Error finding release flow plans by flag:', error);
             throw error;
         }
     }

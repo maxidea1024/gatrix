@@ -3,6 +3,7 @@ import { AuthenticatedRequest } from '../middleware/auth';
 import { releaseFlowService } from '../services/ReleaseFlowService';
 import { safeguardService } from '../services/SafeguardService';
 import { GatrixError } from '../middleware/errorHandler';
+import { ReleaseFlowModel } from '../models/ReleaseFlow';
 
 export class ReleaseFlowController {
     /**
@@ -125,6 +126,26 @@ export class ReleaseFlowController {
         }
     }
 
+    /**
+     * Get all active release flow plan summaries for a flag
+     */
+    static async getPlansByFlag(
+        req: AuthenticatedRequest,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
+        try {
+            const { flagId } = req.params;
+            const plans = await ReleaseFlowModel.findPlansByFlag(flagId);
+
+            res.json({
+                success: true,
+                data: plans,
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
 
     /**
      * Get a release flow plan for a specific feature flag and environment
