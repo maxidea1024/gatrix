@@ -5,11 +5,11 @@
  * Semantics are inverted: allowEmpty:false → isRequired:true
  */
 
-exports.up = async function (knex) {
+exports.up = async function (connection) {
     // Update feature flags
-    const flags = await knex('g_feature_flags')
-        .whereNotNull('validationRules')
-        .select('id', 'validationRules');
+    const [flags] = await connection.execute(
+        `SELECT id, validationRules FROM g_feature_flags WHERE validationRules IS NOT NULL`
+    );
 
     for (const flag of flags) {
         try {
@@ -18,15 +18,15 @@ exports.up = async function (knex) {
                 : flag.validationRules;
 
             if (rules && 'allowEmpty' in rules) {
-                // Invert: allowEmpty:false → isRequired:true, allowEmpty:true → isRequired:false (or remove)
                 if (rules.allowEmpty === false) {
                     rules.isRequired = true;
                 }
                 delete rules.allowEmpty;
 
-                await knex('g_feature_flags')
-                    .where('id', flag.id)
-                    .update({ validationRules: JSON.stringify(rules) });
+                await connection.execute(
+                    `UPDATE g_feature_flags SET validationRules = ? WHERE id = ?`,
+                    [JSON.stringify(rules), flag.id]
+                );
             }
         } catch (e) {
             console.warn(`Failed to migrate validationRules for flag id=${flag.id}:`, e.message);
@@ -34,9 +34,9 @@ exports.up = async function (knex) {
     }
 
     // Update context fields
-    const fields = await knex('g_feature_context_fields')
-        .whereNotNull('validationRules')
-        .select('id', 'validationRules');
+    const [fields] = await connection.execute(
+        `SELECT id, validationRules FROM g_feature_context_fields WHERE validationRules IS NOT NULL`
+    );
 
     for (const field of fields) {
         try {
@@ -50,21 +50,24 @@ exports.up = async function (knex) {
                 }
                 delete rules.allowEmpty;
 
-                await knex('g_feature_context_fields')
-                    .where('id', field.id)
-                    .update({ validationRules: JSON.stringify(rules) });
+                await connection.execute(
+                    `UPDATE g_feature_context_fields SET validationRules = ? WHERE id = ?`,
+                    [JSON.stringify(rules), field.id]
+                );
             }
         } catch (e) {
             console.warn(`Failed to migrate validationRules for context field id=${field.id}:`, e.message);
         }
     }
+
+    console.log('✓ Renamed allowEmpty to isRequired in validationRules');
 };
 
-exports.down = async function (knex) {
+exports.down = async function (connection) {
     // Revert: isRequired:true → allowEmpty:false
-    const flags = await knex('g_feature_flags')
-        .whereNotNull('validationRules')
-        .select('id', 'validationRules');
+    const [flags] = await connection.execute(
+        `SELECT id, validationRules FROM g_feature_flags WHERE validationRules IS NOT NULL`
+    );
 
     for (const flag of flags) {
         try {
@@ -78,18 +81,19 @@ exports.down = async function (knex) {
                 }
                 delete rules.isRequired;
 
-                await knex('g_feature_flags')
-                    .where('id', flag.id)
-                    .update({ validationRules: JSON.stringify(rules) });
+                await connection.execute(
+                    `UPDATE g_feature_flags SET validationRules = ? WHERE id = ?`,
+                    [JSON.stringify(rules), flag.id]
+                );
             }
         } catch (e) {
             console.warn(`Failed to revert validationRules for flag id=${flag.id}:`, e.message);
         }
     }
 
-    const fields = await knex('g_feature_context_fields')
-        .whereNotNull('validationRules')
-        .select('id', 'validationRules');
+    const [fields] = await connection.execute(
+        `SELECT id, validationRules FROM g_feature_context_fields WHERE validationRules IS NOT NULL`
+    );
 
     for (const field of fields) {
         try {
@@ -103,12 +107,15 @@ exports.down = async function (knex) {
                 }
                 delete rules.isRequired;
 
-                await knex('g_feature_context_fields')
-                    .where('id', field.id)
-                    .update({ validationRules: JSON.stringify(rules) });
+                await connection.execute(
+                    `UPDATE g_feature_context_fields SET validationRules = ? WHERE id = ?`,
+                    [JSON.stringify(rules), field.id]
+                );
             }
         } catch (e) {
             console.warn(`Failed to revert validationRules for context field id=${field.id}:`, e.message);
         }
     }
+
+    console.log('✓ Reverted isRequired back to allowEmpty in validationRules');
 };
