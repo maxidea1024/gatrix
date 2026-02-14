@@ -1,11 +1,11 @@
 /**
  * Impact Metrics Chart Panel
  *
- * Grafana-like approach: users register metric chart configs,
- * then each config renders as a chart panel querying Prometheus.
+ * Grafana-like dashboard: drag-and-drop chart layout using react-grid-layout.
+ * Users can register metric chart configs, resize and reposition them freely.
  */
 
-import React, { useEffect, useState, useMemo, useCallback } from 'react';
+import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import {
   Box,
   Paper,
@@ -15,7 +15,6 @@ import {
   Button,
   IconButton,
   CircularProgress,
-  Alert,
   Chip,
   useTheme,
   Stack,
@@ -28,10 +27,10 @@ import {
   Select,
   MenuItem,
   InputLabel,
-  Grid,
   SelectChangeEvent,
   ToggleButton,
   ToggleButtonGroup,
+  Divider,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -41,8 +40,16 @@ import {
   Edit as EditIcon,
   ZoomIn as ExpandIcon,
   Close as CloseIcon,
+  BarChart as BarChartIcon,
+  StackedLineChart as AreaChartIcon,
+  Timeline as LineChartIcon,
+  GridView as GridViewIcon,
+  AccessTime as TimeIcon,
+  Autorenew as AutorenewIcon,
+  FilterList as FilterListIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router-dom';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -56,10 +63,19 @@ import {
   Filler,
 } from 'chart.js';
 import { Line, Bar } from 'react-chartjs-2';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore - direct submodule imports for Vite CJS compatibility
+import ReactGridLayout from 'react-grid-layout/build/ReactGridLayout';
+// @ts-ignore
+import WidthProvider from 'react-grid-layout/build/components/WidthProvider';
+import type { Layout } from 'react-grid-layout';
+import 'react-grid-layout/css/styles.css';
+import 'react-resizable/css/styles.css';
 import api from '../../services/api';
 import { useSnackbar } from 'notistack';
-import EmptyPlaceholder from '../common/EmptyPlaceholder';
 import ConfirmDialog from '../common/ConfirmDialog';
+
+const GridLayout = WidthProvider(ReactGridLayout);
 
 // Register Chart.js components
 ChartJS.register(
@@ -93,6 +109,10 @@ interface MetricConfig {
   aggregationMode: string;
   chartRange: string;
   displayOrder: number;
+  layoutX: number;
+  layoutY: number;
+  layoutW: number;
+  layoutH: number;
 }
 
 interface TimeSeriesSeries {
@@ -104,8 +124,9 @@ interface TimeSeriesResponse {
   series: TimeSeriesSeries[];
 }
 
-type RangeOption = 'hour' | 'day' | 'week' | 'month';
+type RangeOption = 'hour' | 'sixhour' | 'day' | 'week' | 'month';
 type AggregationMode = 'rps' | 'count' | 'avg' | 'sum' | 'p50' | 'p95' | 'p99';
+type ChartType = 'line' | 'area' | 'bar';
 
 interface ImpactMetricsChartProps {
   flagId?: string;
@@ -113,6 +134,14 @@ interface ImpactMetricsChartProps {
   compact?: boolean;
   hideTitle?: boolean;
 }
+
+// Grid config
+const GRID_COLS = 12;
+const ROW_HEIGHT = 120;
+const DEFAULT_W = 6;
+const DEFAULT_H = 3;
+const MIN_W = 3;
+const MIN_H = 2;
 
 // Colors for multiple series
 const SERIES_COLORS = [
@@ -134,63 +163,12 @@ interface ChartPanelProps {
   onDelete?: () => void;
   onEdit?: () => void;
   onExpand?: () => void;
-  onRangeChange?: (range: RangeOption) => void;
   isExpanded?: boolean;
+  onChartTypeChange?: (chartType: ChartType) => void;
+  globalRange: RangeOption;
+  refreshKey: number;
+  globalLabelFilter?: string;
 }
-
-const AddChartPlaceholder: React.FC<{ onClick: () => void; label: string }> = ({
-  onClick,
-  label,
-}) => {
-  const theme = useTheme();
-  return (
-    <Paper
-      variant="outlined"
-      onClick={onClick}
-      sx={{
-        height: 340,
-        width: '100%',
-        boxSizing: 'border-box',
-        borderRadius: 3,
-        borderStyle: 'dashed',
-        borderWidth: 2,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        cursor: 'pointer',
-        transition: 'all 0.2s',
-        bgcolor: theme.palette.action.hover + '05',
-        color: 'text.secondary',
-        '&:hover': {
-          bgcolor: theme.palette.action.hover + '10',
-          borderColor: theme.palette.primary.main,
-          color: theme.palette.primary.main,
-          transform: 'translateY(-2px)',
-          boxShadow: theme.shadows[2],
-        },
-      }}
-    >
-      <Box
-        sx={{
-          width: 48,
-          height: 48,
-          borderRadius: '50%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          bgcolor: 'action.selected',
-          mb: 1.5,
-        }}
-      >
-        <AddIcon sx={{ fontSize: 28 }} />
-      </Box>
-      <Typography variant="subtitle2" fontWeight={600}>
-        {label}
-      </Typography>
-    </Paper>
-  );
-};
 
 const ChartPanel: React.FC<ChartPanelProps> = ({
   config,
@@ -198,18 +176,29 @@ const ChartPanel: React.FC<ChartPanelProps> = ({
   onDelete,
   onEdit,
   onExpand,
-  onRangeChange,
   isExpanded = false,
+  onChartTypeChange,
+  globalRange,
+  refreshKey,
+  globalLabelFilter,
 }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const theme = useTheme();
   const [loading, setLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [seriesData, setSeriesData] = useState<TimeSeriesResponse | null>(null);
-  const [range, setRange] = useState<RangeOption>((config.chartRange as RangeOption) || 'hour');
+  const range = globalRange;
+  const [localChartType, setLocalChartType] = useState<ChartType>(config.chartType);
+  const hasLoadedRef = useRef(false);
 
   const fetchData = useCallback(async () => {
-    setLoading(true);
+    // Only show full loading spinner on first fetch
+    if (!hasLoadedRef.current) {
+      setLoading(true);
+    } else {
+      setIsRefreshing(true);
+    }
     setError(null);
     try {
       const params: any = {
@@ -217,34 +206,50 @@ const ChartPanel: React.FC<ChartPanelProps> = ({
         range,
         aggregationMode: config.aggregationMode || 'count',
       };
+
+      // Merge config labelSelectors with global label filter
+      let mergedLabels: Record<string, string[]> = {};
       if (config.labelSelectors) {
-        params.labels = JSON.stringify(config.labelSelectors);
+        mergedLabels = { ...config.labelSelectors };
       }
+      if (globalLabelFilter) {
+        globalLabelFilter.split(',').forEach((pair) => {
+          const [key, val] = pair.split('=').map((s) => s.trim());
+          if (key && val) {
+            mergedLabels[key] = mergedLabels[key]
+              ? [...mergedLabels[key], val]
+              : [val];
+          }
+        });
+      }
+      if (Object.keys(mergedLabels).length > 0) {
+        params.labels = JSON.stringify(mergedLabels);
+      }
+
       if (config.groupBy && config.groupBy.length > 0) {
-        // Axios handles array params by default
         params.groupBy = config.groupBy;
       }
 
       const response = await api.get<TimeSeriesResponse>('/admin/impact-metrics', { params });
       setSeriesData(response.data);
+      hasLoadedRef.current = true;
     } catch (err: any) {
       setError(err.message || 'Failed to fetch data');
     } finally {
       setLoading(false);
+      setIsRefreshing(false);
     }
-  }, [config.metricName, config.aggregationMode, config.labelSelectors, config.groupBy, range]);
+  }, [config.metricName, config.aggregationMode, config.labelSelectors, config.groupBy, range, globalLabelFilter]);
 
+  // Fetch on mount, range/filter change, or refresh trigger
   useEffect(() => {
     fetchData();
-    // Auto-refresh every 30 seconds
-    const interval = setInterval(fetchData, 30000);
-    return () => clearInterval(interval);
-  }, [fetchData]);
+  }, [fetchData, refreshKey]);
 
-  const handleRangeChange = (_: React.MouseEvent<HTMLElement>, newRange: RangeOption | null) => {
-    if (newRange) {
-      setRange(newRange);
-      onRangeChange?.(newRange);
+  const handleChartTypeChange = (_: React.MouseEvent<HTMLElement>, newType: ChartType | null) => {
+    if (newType) {
+      setLocalChartType(newType);
+      onChartTypeChange?.(newType);
     }
   };
 
@@ -258,16 +263,18 @@ const ChartPanel: React.FC<ChartPanelProps> = ({
     });
     const sorted = Array.from(allTimestamps).sort((a, b) => a - b);
 
+    const locale = i18n.language === 'ko' ? 'ko-KR' : i18n.language === 'zh' ? 'zh-CN' : 'en-US';
     const formatLabel = (ts: number) => {
       const d = new Date(ts * 1000);
       if (range === 'hour' || range === 'day') {
-        return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        return d.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', hour12: false });
       }
-      return d.toLocaleDateString([], {
+      return d.toLocaleDateString(locale, {
         month: 'short',
         day: 'numeric',
         hour: '2-digit',
         minute: '2-digit',
+        hour12: false,
       });
     };
 
@@ -276,22 +283,17 @@ const ChartPanel: React.FC<ChartPanelProps> = ({
       const color = SERIES_COLORS[idx % SERIES_COLORS.length];
       const tsMap = new Map(s.data.map(([ts, val]) => [ts, val]));
 
-      // Build label from groupBy or metric labels
       let label = config.metricName;
-
-      // Prioritize groupBy labels if available
       if (config.groupBy && config.groupBy.length > 0) {
         const groupParts = config.groupBy.map((key) => s.metric[key] || '').filter((v) => v);
         if (groupParts.length > 0) {
           label = groupParts.join(' / ');
         }
       } else {
-        // Fallback to all extra labels
         const metricLabels = Object.entries(s.metric || {}).filter(([k]) => k !== '__name__');
         if (metricLabels.length > 0 && metricLabels.length < 3) {
           label = metricLabels.map(([k, v]) => `${k}=${v}`).join(', ');
         } else if (metricLabels.length >= 3) {
-          // Too many labels, just show summary or ID?
           label = `${config.metricName} (${idx + 1})`;
         }
       }
@@ -300,34 +302,35 @@ const ChartPanel: React.FC<ChartPanelProps> = ({
         label,
         data: sorted.map((ts) => tsMap.get(ts) ?? null),
         borderColor: color.border,
-        backgroundColor: config.chartType === 'line' ? color.bg.replace('0.4', '0.1') : color.bg,
+        backgroundColor: localChartType === 'line' ? color.bg.replace('0.4', '0.1') : color.bg,
         borderWidth: 2,
         tension: 0.3,
-        pointRadius: 1,
+        pointRadius: isExpanded ? 2 : 1,
         pointHoverRadius: 4,
-        fill: config.chartType === 'area',
+        fill: localChartType === 'area',
         spanGaps: true,
       };
     });
 
     return { labels, datasets };
-  }, [seriesData, range, config]);
+  }, [seriesData, range, config, localChartType, isExpanded]);
 
   const chartOptions = useMemo(
     () => ({
       responsive: true,
       maintainAspectRatio: false,
+      animation: false as const,
       interaction: { mode: 'index' as const, intersect: false },
       plugins: {
         legend: {
-          display: chartData.datasets.length > 1,
+          display: true,
           position: 'bottom' as const,
           labels: {
             color: theme.palette.text.primary,
             usePointStyle: true,
-            padding: 10,
-            font: { size: 10 },
-            boxWidth: 8,
+            padding: isExpanded ? 16 : 12,
+            font: { size: isExpanded ? 13 : 12 },
+            boxWidth: 10,
           },
         },
         tooltip: {
@@ -353,10 +356,10 @@ const ChartPanel: React.FC<ChartPanelProps> = ({
           },
           ticks: {
             color: theme.palette.text.secondary,
-            font: { size: 9 },
+            font: { size: isExpanded ? 11 : 10 },
             maxRotation: 0,
             autoSkip: true,
-            maxTicksLimit: 8,
+            maxTicksLimit: isExpanded ? 16 : 8,
           },
         },
         y: {
@@ -364,51 +367,58 @@ const ChartPanel: React.FC<ChartPanelProps> = ({
           grid: {
             color: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
           },
-          ticks: { color: theme.palette.text.secondary, font: { size: 9 } },
+          ticks: {
+            color: theme.palette.text.secondary,
+            font: { size: isExpanded ? 11 : 10 },
+          },
         },
       },
     }),
-    [theme, chartData.datasets.length]
+    [theme, isExpanded]
   );
 
   const hasData = chartData.datasets.length > 0;
 
   return (
     <Paper
-      elevation={3}
+      elevation={isExpanded ? 0 : 3}
       sx={{
-        p: 2.5,
-        borderRadius: 3,
-        height: isExpanded ? '100%' : 340,
+        borderRadius: isExpanded ? 0 : 3,
+        height: '100%',
         width: '100%',
-        maxWidth: '100%',
         boxSizing: 'border-box',
         overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column',
-        transition: 'all 0.2s',
+        transition: 'box-shadow 0.2s',
         position: 'relative',
-        '&:hover': {
-          transform: isExpanded ? 'none' : 'translateY(-2px)',
-          boxShadow: isExpanded ? theme.shadows[3] : theme.shadows[6],
-        },
       }}
     >
-      {/* Header */}
+      {/* Header - title bar style */}
       <Box
+        className="chart-drag-handle"
         sx={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          mb: 2,
+          px: 1.5,
+          py: 0.8,
           minWidth: 0,
+          bgcolor: theme.palette.mode === 'dark'
+            ? 'rgba(255,255,255,0.04)'
+            : 'rgba(0,0,0,0.02)',
+          borderBottom: `1px solid ${theme.palette.divider}`,
+          borderRadius: isExpanded ? 0 : '12px 12px 0 0',
+          cursor: canManage ? 'grab' : 'default',
+          '&:active': canManage ? { cursor: 'grabbing' } : {},
         }}
       >
+        {/* Left: icon + title (truncated) */}
         <Box
           sx={{
             display: 'flex',
             alignItems: 'center',
-            gap: 1.5,
+            gap: 1,
             flex: 1,
             minWidth: 0,
             overflow: 'hidden',
@@ -416,8 +426,8 @@ const ChartPanel: React.FC<ChartPanelProps> = ({
         >
           <Box
             sx={{
-              width: 32,
-              height: 32,
+              width: 28,
+              height: 28,
               borderRadius: '50%',
               flexShrink: 0,
               display: 'flex',
@@ -427,90 +437,130 @@ const ChartPanel: React.FC<ChartPanelProps> = ({
               color: theme.palette.primary.main,
             }}
           >
-            <ChartIcon sx={{ fontSize: 18 }} />
+            <ChartIcon sx={{ fontSize: 16 }} />
           </Box>
-          <Box sx={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
-            <Typography
-              variant="subtitle1"
-              fontWeight={600}
-              title={config.title}
-              sx={{
-                lineHeight: 1.2,
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-                display: 'block',
-                width: '100%',
-              }}
-            >
-              {config.title}
-            </Typography>
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 1,
-                width: '100%',
-                overflow: 'hidden',
-              }}
-            >
+          <Box sx={{ flex: 1, minWidth: 0 }}>
+            <Tooltip title={config.title} enterDelay={500}>
               <Typography
-                variant="caption"
-                color="text.secondary"
-                title={config.metricName}
+                variant="subtitle2"
+                fontWeight={600}
                 sx={{
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
                   whiteSpace: 'nowrap',
                   display: 'block',
-                  flex: 1,
-                  minWidth: 0,
+                  lineHeight: 1.3,
+                }}
+              >
+                {config.title}
+              </Typography>
+            </Tooltip>
+            <Tooltip title={config.metricName} enterDelay={500}>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  display: 'block',
+                  lineHeight: 1.2,
                 }}
               >
                 {config.metricName}
               </Typography>
-              <Chip
-                label={config.aggregationMode.toUpperCase()}
-                size="small"
-                variant="filled"
-                color="default"
-                sx={{
-                  height: 16,
-                  fontSize: '0.6rem',
-                  bgcolor: theme.palette.action.selected,
-                  flexShrink: 0,
-                  '& .MuiChip-label': { px: 0.8 },
-                }}
-              />
-            </Box>
+            </Tooltip>
           </Box>
         </Box>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexShrink: 0 }}>
+
+        {/* Right: action icons */}
+        <Box
+          className="no-drag"
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 0.25,
+            flexShrink: 0,
+            ml: 0.5,
+          }}
+        >
+          <Chip
+            label={config.aggregationMode.toUpperCase()}
+            size="small"
+            variant="filled"
+            color="default"
+            sx={{
+              height: 18,
+              fontSize: '0.6rem',
+              bgcolor: theme.palette.action.selected,
+              '& .MuiChip-label': { px: 0.6 },
+            }}
+          />
+          <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+          {/* Chart type toggle */}
+          <ToggleButtonGroup
+            size="small"
+            value={localChartType}
+            exclusive
+            onChange={handleChartTypeChange}
+            sx={{
+              '& .MuiToggleButton-root': {
+                py: 0.1,
+                px: 0.4,
+                border: `1px solid ${theme.palette.divider}`,
+                '&.Mui-selected': {
+                  bgcolor: theme.palette.primary.main + '15',
+                  color: theme.palette.primary.main,
+                  borderColor: theme.palette.primary.main + '40',
+                },
+              },
+            }}
+          >
+            <ToggleButton value="line">
+              <Tooltip title={t('impactMetrics.chartType.line')}>
+                <LineChartIcon sx={{ fontSize: 14 }} />
+              </Tooltip>
+            </ToggleButton>
+            <ToggleButton value="area">
+              <Tooltip title={t('impactMetrics.chartType.area')}>
+                <AreaChartIcon sx={{ fontSize: 14 }} />
+              </Tooltip>
+            </ToggleButton>
+            <ToggleButton value="bar">
+              <Tooltip title={t('impactMetrics.chartType.bar')}>
+                <BarChartIcon sx={{ fontSize: 14 }} />
+              </Tooltip>
+            </ToggleButton>
+          </ToggleButtonGroup>
+          <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
           {!isExpanded && (
             <Tooltip title={t('common.expand')}>
-              <IconButton size="small" onClick={onExpand}>
-                <ExpandIcon sx={{ fontSize: 18 }} />
+              <IconButton size="small" onClick={onExpand} sx={{ p: 0.4 }}>
+                <ExpandIcon sx={{ fontSize: 16 }} />
               </IconButton>
             </Tooltip>
           )}
           <Tooltip title={t('common.refresh')}>
-            <IconButton size="small" onClick={fetchData} disabled={loading}>
-              <RefreshIcon sx={{ fontSize: 18 }} />
-            </IconButton>
+            <span>
+              <IconButton size="small" onClick={fetchData} disabled={loading} sx={{ p: 0.4 }}>
+                <RefreshIcon sx={{ fontSize: 16 }} />
+              </IconButton>
+            </span>
           </Tooltip>
           {canManage && !isExpanded && (
             <>
+              <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
               {onEdit && (
                 <Tooltip title={t('common.edit')}>
-                  <IconButton size="small" onClick={onEdit}>
-                    <EditIcon sx={{ fontSize: 18 }} />
+                  <IconButton size="small" onClick={onEdit} sx={{ p: 0.4 }}>
+                    <EditIcon sx={{ fontSize: 16 }} />
                   </IconButton>
                 </Tooltip>
               )}
               {onDelete && (
                 <Tooltip title={t('common.delete')}>
-                  <IconButton size="small" onClick={onDelete} color="error">
-                    <DeleteIcon sx={{ fontSize: 18 }} />
+                  <IconButton size="small" onClick={onDelete} color="error" sx={{ p: 0.4 }}>
+                    <DeleteIcon sx={{ fontSize: 16 }} />
                   </IconButton>
                 </Tooltip>
               )}
@@ -520,38 +570,7 @@ const ChartPanel: React.FC<ChartPanelProps> = ({
       </Box>
 
       {/* Content Area */}
-      <Box sx={{ flex: 1, minHeight: 0, position: 'relative' }}>
-        {/* Range Toggle Overlay for cleaner look */}
-        <Box sx={{ position: 'absolute', top: 0, right: 0, zIndex: 1 }}>
-          <ToggleButtonGroup
-            size="small"
-            value={range}
-            exclusive
-            onChange={handleRangeChange}
-            sx={{
-              bgcolor: theme.palette.background.paper,
-              boxShadow: 1,
-              '& .MuiToggleButton-root': {
-                py: 0.2,
-                px: 1,
-                fontSize: '0.65rem',
-                height: 22,
-                textTransform: 'none',
-                border: 'none',
-                '&.Mui-selected': {
-                  bgcolor: theme.palette.primary.main,
-                  color: '#fff',
-                  '&:hover': { bgcolor: theme.palette.primary.dark },
-                },
-              },
-            }}
-          >
-            <ToggleButton value="hour">1h</ToggleButton>
-            <ToggleButton value="day">24h</ToggleButton>
-            <ToggleButton value="week">7d</ToggleButton>
-          </ToggleButtonGroup>
-        </Box>
-
+      <Box sx={{ flex: 1, minHeight: 0, position: 'relative', px: 1.5, pb: 1 }}>
         {error ? (
           <Box
             sx={{
@@ -580,7 +599,6 @@ const ChartPanel: React.FC<ChartPanelProps> = ({
               flexDirection: 'column',
               color: 'text.secondary',
               opacity: 0.7,
-              pt: 4, // Make room for toggle
             }}
           >
             <Typography variant="body2" fontWeight={500}>
@@ -588,11 +606,11 @@ const ChartPanel: React.FC<ChartPanelProps> = ({
             </Typography>
           </Box>
         ) : (
-          <Box sx={{ height: '100%', pt: 4 }}>
-            {config.chartType === 'bar' ? (
-              <Bar data={chartData} options={chartOptions} />
+          <Box sx={{ height: '100%' }}>
+            {localChartType === 'bar' ? (
+              <Bar data={chartData} options={chartOptions} redraw={false} />
             ) : (
-              <Line data={chartData} options={chartOptions} />
+              <Line data={chartData} options={chartOptions} redraw={false} />
             )}
           </Box>
         )}
@@ -601,7 +619,7 @@ const ChartPanel: React.FC<ChartPanelProps> = ({
   );
 };
 
-// ==================== Add Chart Dialog ====================
+const MemoChartPanel = React.memo(ChartPanel);
 
 // ==================== Chart Config Dialog ====================
 
@@ -614,7 +632,6 @@ const ChartConfigDialog: React.FC<{
     chartType: 'line' | 'area' | 'bar';
     groupBy?: string[];
     aggregationMode: string;
-    chartRange: string;
   }) => void;
   availableMetrics: AvailableMetric[];
   loadingMetrics: boolean;
@@ -626,13 +643,10 @@ const ChartConfigDialog: React.FC<{
   const [chartType, setChartType] = useState<'line' | 'area' | 'bar'>('line');
   const [groupBy, setGroupBy] = useState<string[]>([]);
   const [aggregationMode, setAggregationMode] = useState<AggregationMode>('count');
-  const [chartRange, setChartRange] = useState<RangeOption>('hour');
 
-  // New state for labels
   const [availableLabels, setAvailableLabels] = useState<string[]>([]);
   const [loadingLabels, setLoadingLabels] = useState(false);
 
-  // Load initial values when dialog opens
   useEffect(() => {
     if (open && initialValues) {
       setTitle(initialValues.title);
@@ -640,19 +654,15 @@ const ChartConfigDialog: React.FC<{
       setChartType(initialValues.chartType);
       setGroupBy(initialValues.groupBy || []);
       setAggregationMode(initialValues.aggregationMode as AggregationMode);
-      setChartRange(initialValues.chartRange as RangeOption);
     } else if (open && !initialValues) {
-      // Reset for new chart
       setTitle('');
       setMetricName('');
       setChartType('line');
       setGroupBy([]);
       setAggregationMode('count');
-      setChartRange('hour');
     }
   }, [open, initialValues]);
 
-  // Fetch labels when metricName changes
   useEffect(() => {
     if (!metricName) {
       setAvailableLabels([]);
@@ -662,10 +672,10 @@ const ChartConfigDialog: React.FC<{
     const timer = setTimeout(async () => {
       setLoadingLabels(true);
       try {
-        const response = await api.get<{ data: string[] }>('/admin/impact-metrics/labels', {
+        const response = await api.get<string[]>('/admin/impact-metrics/labels', {
           params: { metric: metricName },
         });
-        setAvailableLabels(response.data?.data || []);
+        setAvailableLabels(response.data || []);
       } catch (err) {
         console.error('Failed to fetch labels:', err);
         setAvailableLabels([]);
@@ -685,7 +695,6 @@ const ChartConfigDialog: React.FC<{
       chartType,
       groupBy,
       aggregationMode,
-      chartRange,
     });
     onClose();
   };
@@ -697,7 +706,6 @@ const ChartConfigDialog: React.FC<{
       </DialogTitle>
       <DialogContent dividers>
         <Stack spacing={2.5} sx={{ pt: 1 }}>
-          {/* Metric name - disabled in edit mode if desired, but let's allow change */}
           <Autocomplete
             freeSolo
             loading={loadingMetrics}
@@ -711,6 +719,7 @@ const ChartConfigDialog: React.FC<{
                 label={t('impactMetrics.metricName')}
                 required
                 helperText={t('impactMetrics.metricNameHelp')}
+                autoFocus
               />
             )}
             renderOption={(props, option) => {
@@ -732,7 +741,6 @@ const ChartConfigDialog: React.FC<{
             }}
           />
 
-          {/* Group By - Now with autocomplete */}
           <Autocomplete
             multiple
             freeSolo
@@ -764,7 +772,6 @@ const ChartConfigDialog: React.FC<{
             }
           />
 
-          {/* Title */}
           <TextField
             label={t('impactMetrics.chartTitle')}
             value={title}
@@ -774,7 +781,6 @@ const ChartConfigDialog: React.FC<{
           />
 
           <Stack direction="row" spacing={2}>
-            {/* Chart Type */}
             <FormControl size="small" sx={{ flex: 1 }}>
               <InputLabel>{t('impactMetrics.chartType')}</InputLabel>
               <Select
@@ -790,7 +796,6 @@ const ChartConfigDialog: React.FC<{
               </Select>
             </FormControl>
 
-            {/* Aggregation */}
             <FormControl size="small" sx={{ flex: 1 }}>
               <InputLabel>{t('impactMetrics.aggregation')}</InputLabel>
               <Select
@@ -810,22 +815,6 @@ const ChartConfigDialog: React.FC<{
               </Select>
             </FormControl>
           </Stack>
-
-          {/* Range */}
-          <FormControl size="small" fullWidth>
-            <InputLabel>{t('impactMetrics.defaultRange')}</InputLabel>
-            <Select
-              value={chartRange}
-              label={t('impactMetrics.defaultRange')}
-              onChange={(e: SelectChangeEvent<RangeOption>) =>
-                setChartRange(e.target.value as RangeOption)
-              }
-            >
-              <MenuItem value="hour">{t('impactMetrics.range.hour')}</MenuItem>
-              <MenuItem value="day">{t('impactMetrics.range.day')}</MenuItem>
-              <MenuItem value="week">{t('impactMetrics.range.week')}</MenuItem>
-            </Select>
-          </FormControl>
         </Stack>
       </DialogContent>
       <DialogActions>
@@ -840,8 +829,6 @@ const ChartConfigDialog: React.FC<{
 
 // ==================== Main Component ====================
 
-// ==================== Main Component ====================
-
 const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
   flagId,
   canManage = false,
@@ -849,6 +836,7 @@ const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
   hideTitle = false,
 }) => {
   const { t } = useTranslation();
+  const theme = useTheme();
   const { enqueueSnackbar } = useSnackbar();
 
   // State
@@ -866,6 +854,123 @@ const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
 
   // Delete confirm
   const [deleteId, setDeleteId] = useState<string | null>(null);
+
+  // Auto-arrange confirm
+  const [showAutoArrangeConfirm, setShowAutoArrangeConfirm] = useState(false);
+
+  // Global label filter (applied to all charts, debounced)
+  const [labelFilterInput, setLabelFilterInput] = useState<string>('');
+  const [debouncedLabelFilter, setDebouncedLabelFilter] = useState<string>('');
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedLabelFilter(labelFilterInput);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [labelFilterInput]);
+
+  // URL params + localStorage persistence for dashboard controls
+  const [searchParams, setSearchParams] = useSearchParams();
+  const STORAGE_KEY = 'impactMetrics';
+  const validRanges: RangeOption[] = ['hour', 'sixhour', 'day', 'week', 'month'];
+  const validIntervals = [0, 5, 10, 30, 60, 300];
+
+  const resolveInitialRange = (): RangeOption => {
+    const fromUrl = searchParams.get('range');
+    if (fromUrl && validRanges.includes(fromUrl as RangeOption)) return fromUrl as RangeOption;
+    const fromStorage = localStorage.getItem(`${STORAGE_KEY}.range`);
+    if (fromStorage && validRanges.includes(fromStorage as RangeOption)) return fromStorage as RangeOption;
+    return 'hour';
+  };
+
+  const resolveInitialRefresh = (): number => {
+    const fromUrl = searchParams.get('refresh');
+    if (fromUrl !== null) {
+      const val = Number(fromUrl);
+      if (validIntervals.includes(val)) return val;
+    }
+    const fromStorage = localStorage.getItem(`${STORAGE_KEY}.refresh`);
+    if (fromStorage !== null) {
+      const val = Number(fromStorage);
+      if (validIntervals.includes(val)) return val;
+    }
+    return 30;
+  };
+
+  // Global dashboard controls (Grafana-style)
+  const [globalRange, setGlobalRangeState] = useState<RangeOption>(resolveInitialRange);
+  const [refreshInterval, setRefreshIntervalState] = useState<number>(resolveInitialRefresh);
+  const [refreshKey, setRefreshKey] = useState(0);
+  const refreshTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Sync to URL params + localStorage on change
+  const setGlobalRange = useCallback(
+    (range: RangeOption) => {
+      setGlobalRangeState(range);
+      localStorage.setItem(`${STORAGE_KEY}.range`, range);
+      setSearchParams((prev) => {
+        const next = new URLSearchParams(prev);
+        next.set('range', range);
+        return next;
+      }, { replace: true });
+    },
+    [setSearchParams]
+  );
+
+  const setRefreshInterval = useCallback(
+    (interval: number) => {
+      setRefreshIntervalState(interval);
+      localStorage.setItem(`${STORAGE_KEY}.refresh`, String(interval));
+      setSearchParams((prev) => {
+        const next = new URLSearchParams(prev);
+        next.set('refresh', String(interval));
+        return next;
+      }, { replace: true });
+    },
+    [setSearchParams]
+  );
+
+  // Auto-refresh timer
+  useEffect(() => {
+    if (refreshTimerRef.current) {
+      clearInterval(refreshTimerRef.current);
+      refreshTimerRef.current = null;
+    }
+    if (refreshInterval > 0) {
+      refreshTimerRef.current = setInterval(() => {
+        setRefreshKey((k) => k + 1);
+      }, refreshInterval * 1000);
+    }
+    return () => {
+      if (refreshTimerRef.current) {
+        clearInterval(refreshTimerRef.current);
+      }
+    };
+  }, [refreshInterval]);
+
+  // Manual refresh
+  const handleManualRefresh = useCallback(() => {
+    setRefreshKey((k) => k + 1);
+  }, []);
+
+  // Track refreshing state for toolbar spinner
+  const [globalRefreshing, setGlobalRefreshing] = useState(false);
+  useEffect(() => {
+    if (refreshKey === 0) return; // Skip initial mount
+    setGlobalRefreshing(true);
+    const timer = setTimeout(() => setGlobalRefreshing(false), 2000);
+    return () => clearTimeout(timer);
+  }, [refreshKey]);
+
+  // Suppress transition on initial mount (prevents WidthProvider resize flash)
+  const [isMounted, setIsMounted] = useState(false);
+  useEffect(() => {
+    const timer = setTimeout(() => setIsMounted(true), 300);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Layout save debounce
+  const layoutSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Fetch configs
   const fetchConfigs = useCallback(async () => {
@@ -886,6 +991,83 @@ const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
   useEffect(() => {
     fetchConfigs();
   }, [fetchConfigs]);
+
+  // Key to force GridLayout remount when auto-arrange is triggered
+  const [gridKey, setGridKey] = useState(0);
+
+  // Save layout to server (debounced)
+  const saveLayoutToServer = useCallback(
+    (newLayout: Layout[]) => {
+      if (!canManage) return;
+      if (layoutSaveTimerRef.current) {
+        clearTimeout(layoutSaveTimerRef.current);
+      }
+      layoutSaveTimerRef.current = setTimeout(async () => {
+        try {
+          await api.put('/admin/impact-metrics/configs/layouts', {
+            layouts: newLayout.map((l) => ({
+              id: l.i,
+              x: l.x,
+              y: l.y,
+              w: l.w,
+              h: l.h,
+            })),
+          });
+        } catch (err) {
+          console.error('Failed to save layout:', err);
+        }
+      }, 800);
+    },
+    [canManage]
+  );
+
+  // Sync final positions to configs + save when drag/resize completes
+  const handleDragResizeStop = useCallback(
+    (newLayout: Layout[]) => {
+      setConfigs((prev) =>
+        prev.map((config) => {
+          const layoutItem = newLayout.find((l) => l.i === config.id);
+          if (layoutItem) {
+            return {
+              ...config,
+              layoutX: layoutItem.x,
+              layoutY: layoutItem.y,
+              layoutW: layoutItem.w,
+              layoutH: layoutItem.h,
+            };
+          }
+          return config;
+        })
+      );
+      saveLayoutToServer(newLayout);
+    },
+    [saveLayoutToServer]
+  );
+
+  // Auto-arrange: reset to 2-column grid pattern
+  const handleAutoArrange = useCallback(() => {
+    setConfigs((prev) =>
+      prev.map((config, idx) => ({
+        ...config,
+        layoutX: (idx % 2) * DEFAULT_W,
+        layoutY: Math.floor(idx / 2) * DEFAULT_H,
+        layoutW: DEFAULT_W,
+        layoutH: DEFAULT_H,
+      }))
+    );
+    // Force remount to pick up new data-grid values
+    setGridKey((k) => k + 1);
+    const newLayout: Layout[] = configs.map((config, idx) => ({
+      i: config.id,
+      x: (idx % 2) * DEFAULT_W,
+      y: Math.floor(idx / 2) * DEFAULT_H,
+      w: DEFAULT_W,
+      h: DEFAULT_H,
+      minW: MIN_W,
+      minH: MIN_H,
+    }));
+    saveLayoutToServer(newLayout);
+  }, [configs, saveLayoutToServer]);
 
   // Fetch available metrics when dialog opens
   const handleOpenAddDialog = async () => {
@@ -920,28 +1102,28 @@ const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
     }
   };
 
-  // Add/Update chart config
   const handleSaveChart = async (data: {
     title: string;
     metricName: string;
     chartType: 'line' | 'area' | 'bar';
     groupBy?: string[];
     aggregationMode: string;
-    chartRange: string;
   }) => {
     try {
       if (editingConfig) {
-        // Update
-        await api.put(`/admin/impact-metrics/configs/${editingConfig.id}`, {
-          ...data,
-        });
+        await api.put(`/admin/impact-metrics/configs/${editingConfig.id}`, { ...data });
         enqueueSnackbar(t('impactMetrics.chartUpdated'), { variant: 'success' });
       } else {
-        // Create
+        // Find the next available position
+        const maxY = configs.reduce((max, c) => Math.max(max, c.layoutY + c.layoutH), 0);
         await api.post('/admin/impact-metrics/configs', {
-          flagId, // If null/undefined, backend treats as global
+          flagId,
           ...data,
           displayOrder: configs.length,
+          layoutX: 0,
+          layoutY: maxY,
+          layoutW: DEFAULT_W,
+          layoutH: DEFAULT_H,
         });
         enqueueSnackbar(t('impactMetrics.chartAdded'), { variant: 'success' });
       }
@@ -954,7 +1136,15 @@ const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
     }
   };
 
-  // Delete chart config
+  const handleChartTypeChange = async (configId: string, chartType: ChartType) => {
+    try {
+      await api.put(`/admin/impact-metrics/configs/${configId}`, { chartType });
+      setConfigs((prev) => prev.map((c) => (c.id === configId ? { ...c, chartType } : c)));
+    } catch (err) {
+      console.error('Failed to update chart type:', err);
+    }
+  };
+
   const handleDeleteClick = (id: string) => {
     setDeleteId(id);
   };
@@ -980,77 +1170,286 @@ const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
     );
   }
 
+  // No charts
+  if (configs.length === 0) {
+    return (
+      <Box>
+        {!hideTitle && (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+            <ChartIcon color="primary" />
+            <Typography variant={compact ? 'subtitle1' : 'h6'} fontWeight={600}>
+              {t('impactMetrics.chartTitle')}
+            </Typography>
+          </Box>
+        )}
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            py: 8,
+            color: 'text.secondary',
+          }}
+        >
+          <Typography variant="body1" sx={{ mb: 2 }}>
+            {t('impactMetrics.noCharts')}
+          </Typography>
+          {canManage && (
+            <Button variant="contained" startIcon={<AddIcon />} onClick={handleOpenAddDialog}>
+              {t('impactMetrics.addChart')}
+            </Button>
+          )}
+        </Box>
+
+        <ChartConfigDialog
+          open={showConfigDialog}
+          onClose={() => setShowConfigDialog(false)}
+          onSave={handleSaveChart}
+          availableMetrics={availableMetrics}
+          loadingMetrics={loadingMetrics}
+          initialValues={editingConfig}
+        />
+      </Box>
+    );
+  }
+
   return (
     <Box>
-      {/* Header */}
+      {/* Grafana-style Dashboard Toolbar */}
       <Box
         sx={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          mb: hideTitle ? 0 : 2,
+          mb: 2,
+          gap: 1,
         }}
       >
-        {!hideTitle ? (
+        {/* Left: Title */}
+        {!hideTitle && (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <ChartIcon color="primary" />
             <Typography variant={compact ? 'subtitle1' : 'h6'} fontWeight={600}>
               {t('impactMetrics.chartTitle')}
             </Typography>
-            {configs.length > 0 && (
-              <Chip label={configs.length} size="small" color="primary" sx={{ height: 20 }} />
-            )}
+            <Chip label={configs.length} size="small" color="primary" sx={{ height: 20 }} />
           </Box>
-        ) : (
-          <Box />
         )}
-      </Box>
 
-      {/* Chart Grid */}
-      <Box sx={{ width: '100%', overflow: 'hidden' }}>
-        <Grid container spacing={3}>
-          {configs.map((config) => (
-            <Grid
-              item
-              xs={12}
-              md={6}
-              key={config.id}
-              sx={{ minWidth: 0, display: 'flex', width: '100%' }}
+        {/* Right: Global Controls */}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, ml: 'auto' }}>
+          {/* Label Filter */}
+          <TextField
+            size="small"
+            placeholder={t('impactMetrics.labelFilter')}
+            value={labelFilterInput}
+            onChange={(e) => setLabelFilterInput(e.target.value)}
+            InputProps={{
+              startAdornment: <FilterListIcon sx={{ fontSize: 16, mr: 0.5, color: 'text.secondary' }} />,
+            }}
+            sx={{
+              minWidth: 160,
+              '& .MuiInputBase-root': { height: 30, fontSize: '0.8rem' },
+              '& .MuiInputBase-input': { py: 0.3 },
+            }}
+          />
+
+          {/* Divider */}
+          <Box sx={{ width: 1, height: 24, bgcolor: theme.palette.divider }} />
+          {/* Time Range Picker */}
+          <ToggleButtonGroup
+            size="small"
+            value={globalRange}
+            exclusive
+            onChange={(_, v) => v && setGlobalRange(v)}
+            sx={{
+              '& .MuiToggleButton-root': {
+                py: 0.3,
+                px: 1,
+                fontSize: '0.75rem',
+                height: 30,
+                textTransform: 'none',
+                border: `1px solid ${theme.palette.divider}`,
+                '&.Mui-selected': {
+                  bgcolor: theme.palette.primary.main,
+                  color: '#fff',
+                  '&:hover': { bgcolor: theme.palette.primary.dark },
+                },
+              },
+            }}
+          >
+            <ToggleButton value="hour">1h</ToggleButton>
+            <ToggleButton value="sixhour">6h</ToggleButton>
+            <ToggleButton value="day">24h</ToggleButton>
+            <ToggleButton value="week">7d</ToggleButton>
+            <ToggleButton value="month">30d</ToggleButton>
+          </ToggleButtonGroup>
+
+          {/* Divider */}
+          <Box sx={{ width: 1, height: 24, bgcolor: theme.palette.divider }} />
+
+          {/* Auto-Refresh Selector */}
+          <FormControl size="small" sx={{ minWidth: 80 }}>
+            <Select
+              value={refreshInterval}
+              onChange={(e: SelectChangeEvent<number>) =>
+                setRefreshInterval(e.target.value as number)
+              }
+              variant="outlined"
+              sx={{
+                height: 30,
+                fontSize: '0.75rem',
+                '& .MuiSelect-select': { py: 0.3, display: 'flex', alignItems: 'center', gap: 0.5 },
+              }}
+              renderValue={(val) => (
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                  <AutorenewIcon sx={{ fontSize: 14 }} />
+                  {val === 0 ? 'Off' : val < 60 ? `${val}s` : `${val / 60}m`}
+                </Box>
+              )}
             >
-              <Box
-                sx={{
-                  width: '100%',
-                  minWidth: 0,
-                  overflow: 'hidden',
-                  display: 'flex',
-                  flexDirection: 'column',
-                }}
-              >
-                <ChartPanel
-                  config={config}
-                  canManage={canManage}
-                  onDelete={() => handleDeleteClick(config.id)}
-                  onEdit={() => handleOpenEditDialog(config)}
-                  onExpand={() => setExpandedConfig(config)}
-                />
-              </Box>
-            </Grid>
-          ))}
+              <MenuItem value={0}>Off</MenuItem>
+              <MenuItem value={5}>5s</MenuItem>
+              <MenuItem value={10}>10s</MenuItem>
+              <MenuItem value={30}>30s</MenuItem>
+              <MenuItem value={60}>1m</MenuItem>
+              <MenuItem value={300}>5m</MenuItem>
+            </Select>
+          </FormControl>
 
+          {/* Manual Refresh */}
+          <Tooltip title={t('common.refresh')}>
+            <IconButton size="small" onClick={handleManualRefresh} sx={{ p: 0.5 }}>
+              <RefreshIcon
+                fontSize="small"
+                sx={{
+                  ...(globalRefreshing && {
+                    animation: 'toolbar-spin 1s linear infinite',
+                    '@keyframes toolbar-spin': {
+                      '0%': { transform: 'rotate(0deg)' },
+                      '100%': { transform: 'rotate(360deg)' },
+                    },
+                  }),
+                }}
+              />
+            </IconButton>
+          </Tooltip>
+
+          {/* Divider */}
+          <Box sx={{ width: 1, height: 24, bgcolor: theme.palette.divider }} />
+
+          {/* Auto-arrange */}
           {canManage && (
-            <Grid item xs={12} md={6} sx={{ minWidth: 0, display: 'flex', width: '100%' }}>
-              <Box sx={{ width: '100%', minWidth: 0, overflow: 'hidden' }}>
-                <AddChartPlaceholder
-                  onClick={handleOpenAddDialog}
-                  label={t('impactMetrics.addChartPlaceholder')}
-                />
-              </Box>
-            </Grid>
+            <Tooltip title={t('impactMetrics.autoArrange')}>
+              <IconButton size="small" onClick={() => setShowAutoArrangeConfirm(true)}>
+                <GridViewIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
           )}
-        </Grid>
+
+          {/* Add Chart */}
+          {canManage && (
+            <Button
+              size="small"
+              variant="outlined"
+              startIcon={<AddIcon />}
+              onClick={handleOpenAddDialog}
+              sx={{ whiteSpace: 'nowrap', flexShrink: 0 }}
+            >
+              {t('impactMetrics.addChart')}
+            </Button>
+          )}
+        </Box>
       </Box>
 
-      {/* Expanded Chart Dialog - Full Screen like Grafana */}
+      {/* react-grid-layout Dashboard */}
+      <Box
+        sx={{
+          // Override react-grid-layout styles for themed look
+          '& .react-grid-item.react-grid-placeholder': {
+            bgcolor: theme.palette.primary.main + '20',
+            borderRadius: 3,
+            border: `2px dashed ${theme.palette.primary.main}`,
+            opacity: 0.6,
+          },
+          // Disable transition during drag/resize to prevent offset jump
+          '& .react-grid-item.react-draggable-dragging': {
+            transition: 'none !important',
+            zIndex: 100,
+          },
+          '& .react-grid-item.resizing': {
+            transition: 'none !important',
+          },
+          // Suppress initial mount transition (WidthProvider measurement)
+          ...(!isMounted && {
+            '& .react-grid-item': {
+              transition: 'none !important',
+            },
+          }),
+          // Draggable cursor for resize handle
+          '& .react-grid-item > .react-resizable-handle': {
+            backgroundImage: 'none',
+            cursor: 'se-resize',
+            '&::after': {
+              content: '""',
+              position: 'absolute',
+              right: 4,
+              bottom: 4,
+              width: 10,
+              height: 10,
+              borderRight: `2px solid ${theme.palette.text.disabled}`,
+              borderBottom: `2px solid ${theme.palette.text.disabled}`,
+              borderRadius: '0 0 2px 0',
+            },
+          },
+        }}
+      >
+        <GridLayout
+          key={gridKey}
+          className="layout"
+          cols={GRID_COLS}
+          rowHeight={ROW_HEIGHT}
+          isDraggable={canManage}
+          isResizable={canManage}
+          onDragStop={(_layout: Layout[]) => handleDragResizeStop(_layout)}
+          onResizeStop={(_layout: Layout[]) => handleDragResizeStop(_layout)}
+          compactType="vertical"
+          margin={[16, 16]}
+          containerPadding={[0, 0]}
+          useCSSTransforms
+          draggableCancel=".no-drag"
+          draggableHandle=".chart-drag-handle"
+        >
+          {configs.map((config, idx) => (
+            <div
+              key={config.id}
+              data-grid={{
+                x: config.layoutX ?? (idx % 2) * DEFAULT_W,
+                y: config.layoutY ?? Math.floor(idx / 2) * DEFAULT_H,
+                w: config.layoutW ?? DEFAULT_W,
+                h: config.layoutH ?? DEFAULT_H,
+                minW: MIN_W,
+                minH: MIN_H,
+              }}
+            >
+              <MemoChartPanel
+                config={config}
+                canManage={canManage}
+                onDelete={() => handleDeleteClick(config.id)}
+                onEdit={() => handleOpenEditDialog(config)}
+                onExpand={() => setExpandedConfig(config)}
+                onChartTypeChange={(chartType) => handleChartTypeChange(config.id, chartType)}
+                globalRange={globalRange}
+                refreshKey={refreshKey}
+                globalLabelFilter={debouncedLabelFilter}
+              />
+            </div>
+          ))}
+        </GridLayout>
+      </Box>
+
+      {/* Expanded Chart Dialog */}
       <Dialog
         fullScreen
         open={!!expandedConfig}
@@ -1062,7 +1461,8 @@ const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
         <DialogTitle
           sx={{
             m: 0,
-            p: 2,
+            py: 1.5,
+            px: 2,
             display: 'flex',
             alignItems: 'center',
             bgcolor: 'background.paper',
@@ -1070,7 +1470,7 @@ const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
             borderColor: 'divider',
           }}
         >
-          <IconButton onClick={() => setExpandedConfig(null)} sx={{ mr: 2 }}>
+          <IconButton onClick={() => setExpandedConfig(null)} sx={{ mr: 1.5 }}>
             <CloseIcon />
           </IconButton>
           <Typography variant="h6" fontWeight={700} sx={{ flex: 1 }}>
@@ -1080,10 +1480,20 @@ const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
             {t('common.close')}
           </Button>
         </DialogTitle>
-        <DialogContent sx={{ p: 3, display: 'flex', flexDirection: 'column' }}>
+        <DialogContent sx={{ p: 0, display: 'flex', flexDirection: 'column' }}>
           {expandedConfig && (
-            <Box sx={{ flex: 1, display: 'flex' }}>
-              <ChartPanel config={expandedConfig} canManage={false} isExpanded={true} />
+            <Box sx={{ flex: 1, display: 'flex', p: 2 }}>
+              <ChartPanel
+                config={expandedConfig}
+                canManage={false}
+                isExpanded={true}
+                onChartTypeChange={(chartType) =>
+                  handleChartTypeChange(expandedConfig.id, chartType)
+                }
+                globalRange={globalRange}
+                refreshKey={refreshKey}
+                globalLabelFilter={debouncedLabelFilter}
+              />
             </Box>
           )}
         </DialogContent>
@@ -1110,6 +1520,18 @@ const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
           'Are you sure you want to delete this chart?'
         )}
         confirmColor="error"
+      />
+
+      {/* Auto Arrange Confirm Dialog */}
+      <ConfirmDialog
+        open={showAutoArrangeConfirm}
+        onClose={() => setShowAutoArrangeConfirm(false)}
+        onConfirm={() => {
+          setShowAutoArrangeConfirm(false);
+          handleAutoArrange();
+        }}
+        title={t('impactMetrics.autoArrange')}
+        message={t('impactMetrics.autoArrangeConfirmMessage')}
       />
     </Box>
   );

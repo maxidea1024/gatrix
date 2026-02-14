@@ -331,6 +331,11 @@ router.post(
   ImpactMetricsController.createConfig.bind(ImpactMetricsController) as any
 );
 router.put(
+  '/impact-metrics/configs/layouts',
+  requirePermission([PERMISSIONS.FEATURE_FLAGS_MANAGE]) as any,
+  ImpactMetricsController.updateLayouts.bind(ImpactMetricsController) as any
+);
+router.put(
   '/impact-metrics/configs/:id',
   requirePermission([PERMISSIONS.FEATURE_FLAGS_MANAGE]) as any,
   ImpactMetricsController.updateConfig.bind(ImpactMetricsController) as any

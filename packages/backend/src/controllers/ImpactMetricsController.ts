@@ -11,7 +11,6 @@ import { Request, Response } from 'express';
 import { impactMetricsService } from '../services/ImpactMetricsService';
 import { ImpactMetricConfigModel } from '../models/ImpactMetricConfig';
 import logger from '../config/logger';
-import { AuthenticatedRequest } from '../types/express';
 
 class ImpactMetricsController {
   private isInitialized = false;
@@ -92,7 +91,7 @@ class ImpactMetricsController {
 
       const result = await impactMetricsService.queryTimeSeries({
         series,
-        range: ((range as string) || 'hour') as 'hour' | 'day' | 'week' | 'month',
+        range: ((range as string) || 'hour') as 'hour' | 'sixhour' | 'day' | 'week' | 'month',
         aggregationMode: ((aggregationMode as string) || 'count') as any,
         labels: parsedLabels,
         groupBy: groupBy
@@ -100,6 +99,8 @@ class ImpactMetricsController {
             ? (groupBy as string[])
             : [groupBy as string]
           : undefined,
+        from: req.query.from ? Number(req.query.from) : undefined,
+        to: req.query.to ? Number(req.query.to) : undefined,
       });
 
       res.json({ success: true, data: result });
@@ -181,8 +182,7 @@ class ImpactMetricsController {
    */
   async createConfig(req: Request, res: Response): Promise<void> {
     try {
-      const authReq = req as AuthenticatedRequest;
-      const userId = authReq.user?.userId;
+      const userId = (req as any).user?.userId;
       const {
         flagId,
         title,
@@ -191,6 +191,10 @@ class ImpactMetricsController {
         aggregationMode,
         chartRange,
         displayOrder,
+        layoutX,
+        layoutY,
+        layoutW,
+        layoutH,
       } = req.body;
 
       if (!metricName) {
@@ -208,6 +212,10 @@ class ImpactMetricsController {
         aggregationMode: aggregationMode || 'count',
         chartRange: chartRange || 'hour',
         displayOrder: displayOrder ?? 0,
+        layoutX: layoutX ?? 0,
+        layoutY: layoutY ?? 0,
+        layoutW: layoutW ?? 6,
+        layoutH: layoutH ?? 2,
         createdBy: userId || null,
       });
 
@@ -238,25 +246,6 @@ class ImpactMetricsController {
   }
 
   /**
-   * Update a chart config
-   * PUT /api/v1/admin/impact-metrics/configs/:id
-   */
-  async updateConfig(req: Request, res: Response): Promise<void> {
-    try {
-      const { id } = req.params;
-      const updated = await ImpactMetricConfigModel.update(id, req.body);
-      if (!updated) {
-        res.status(404).json({ success: false, error: { message: 'Config not found' } });
-        return;
-      }
-      res.json({ success: true, data: updated });
-    } catch (error: any) {
-      logger.error('[ImpactMetrics] Failed to update config', { error: error.message });
-      res.status(500).json({ success: false, error: { message: 'Failed to update config' } });
-    }
-  }
-
-  /**
    * Delete a chart config
    * DELETE /api/v1/admin/impact-metrics/configs/:id
    */
@@ -268,6 +257,34 @@ class ImpactMetricsController {
     } catch (error: any) {
       logger.error('[ImpactMetrics] Failed to delete config', { error: error.message });
       res.status(500).json({ success: false, error: { message: 'Failed to delete config' } });
+    }
+  }
+
+  /**
+   * Batch update chart layouts
+   * PUT /api/v1/admin/impact-metrics/configs/layouts
+   */
+  async updateLayouts(req: Request, res: Response): Promise<void> {
+    try {
+      const { layouts } = req.body;
+      if (!Array.isArray(layouts)) {
+        res.status(400).json({ success: false, error: { message: 'layouts array is required' } });
+        return;
+      }
+      for (const layout of layouts) {
+        if (layout.id) {
+          await ImpactMetricConfigModel.update(layout.id, {
+            layoutX: layout.x,
+            layoutY: layout.y,
+            layoutW: layout.w,
+            layoutH: layout.h,
+          });
+        }
+      }
+      res.json({ success: true });
+    } catch (error: any) {
+      logger.error('[ImpactMetrics] Failed to update layouts', { error: error.message });
+      res.status(500).json({ success: false, error: { message: 'Failed to update layouts' } });
     }
   }
 }

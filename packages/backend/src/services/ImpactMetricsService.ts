@@ -33,11 +33,12 @@ export interface CollectedMetric {
 
 export interface ImpactMetricsTimeSeriesQuery {
   series: string; // metric name
-  range: 'hour' | 'day' | 'week' | 'month';
-  aggregationMode?: 'rps' | 'count' | 'avg' | 'sum' | 'p50' | 'p95' | 'p99';
+  range: 'hour' | 'sixhour' | 'day' | 'week' | 'month';
   aggregationMode?: 'rps' | 'count' | 'avg' | 'sum' | 'p50' | 'p95' | 'p99';
   labels?: Record<string, string[]>;
   groupBy?: string[];
+  from?: number; // unix timestamp (custom range)
+  to?: number; // unix timestamp (custom range)
 }
 
 export interface TimeSeriesPoint {
@@ -211,8 +212,8 @@ class ImpactMetricsService {
       const firstSample = bucketSamples[0];
       const buckets = firstSample
         ? firstSample.buckets
-            .map((b) => (b.le === '+Inf' ? Infinity : (b.le as number)))
-            .filter((b) => b !== Infinity)
+          .map((b) => (b.le === '+Inf' ? Infinity : (b.le as number)))
+          .filter((b) => b !== Infinity)
         : [0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10];
 
       const labelNames = this.extractLabelNames(bucketSamples);
@@ -263,7 +264,7 @@ class ImpactMetricsService {
   async queryTimeSeries(
     query: ImpactMetricsTimeSeriesQuery
   ): Promise<ImpactMetricsTimeSeriesResponse> {
-    const { series, range, aggregationMode, labels, groupBy } = query;
+    const { series, range, aggregationMode, labels, groupBy, from, to } = query;
 
     // Build PromQL query
     // If the metric name does not start with gatrix_impact_, assume it's a raw prometheus metric
@@ -279,11 +280,26 @@ class ImpactMetricsService {
 
     const promqlQuery = this.buildPromQL(series, aggregationMode, labels, range, groupBy);
 
-    // Calculate time range
-    const end = Math.floor(Date.now() / 1000);
-    const rangeSeconds = this.getRangeSeconds(range);
-    const start = end - rangeSeconds;
-    const step = this.getStepSeconds(range);
+    // Calculate time range (custom from/to overrides range-based calculation)
+    let end: number;
+    let start: number;
+    let step: number;
+    if (from && to) {
+      start = from;
+      end = to;
+      const duration = end - start;
+      // Auto-calculate step based on duration
+      if (duration <= 3600) step = 15;
+      else if (duration <= 21600) step = 60;
+      else if (duration <= 86400) step = 300;
+      else if (duration <= 604800) step = 1800;
+      else step = 7200;
+    } else {
+      end = Math.floor(Date.now() / 1000);
+      const rangeSeconds = this.getRangeSeconds(range);
+      start = end - rangeSeconds;
+      step = this.getStepSeconds(range);
+    }
 
     try {
       // Query Prometheus range API
@@ -579,6 +595,8 @@ class ImpactMetricsService {
     switch (range) {
       case 'hour':
         return 3600;
+      case 'sixhour':
+        return 21600;
       case 'day':
         return 86400;
       case 'week':
@@ -594,6 +612,8 @@ class ImpactMetricsService {
     switch (range) {
       case 'hour':
         return 15; // 15s step for 1h
+      case 'sixhour':
+        return 60; // 1min step for 6h
       case 'day':
         return 300; // 5min step for 1 day
       case 'week':
@@ -609,6 +629,8 @@ class ImpactMetricsService {
     switch (range) {
       case 'hour':
         return '5m'; // Smallest useful aggregation window
+      case 'sixhour':
+        return '15m';
       case 'day':
         return '1h';
       case 'week':

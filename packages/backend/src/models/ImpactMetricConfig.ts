@@ -19,6 +19,10 @@ export interface ImpactMetricConfigAttributes {
   aggregationMode: string;
   chartRange: string;
   displayOrder: number;
+  layoutX: number;
+  layoutY: number;
+  layoutW: number;
+  layoutH: number;
   createdBy?: string | null;
   createdAt?: string;
   updatedAt?: string;
@@ -98,6 +102,10 @@ export class ImpactMetricConfigModel {
         aggregationMode: data.aggregationMode || 'count',
         chartRange: data.chartRange || 'hour',
         displayOrder: data.displayOrder ?? 0,
+        layoutX: data.layoutX ?? 0,
+        layoutY: data.layoutY ?? 0,
+        layoutW: data.layoutW ?? 6,
+        layoutH: data.layoutH ?? 2,
         createdBy: data.createdBy || null,
       });
 
@@ -128,6 +136,10 @@ export class ImpactMetricConfigModel {
       if (data.aggregationMode !== undefined) updateData.aggregationMode = data.aggregationMode;
       if (data.chartRange !== undefined) updateData.chartRange = data.chartRange;
       if (data.displayOrder !== undefined) updateData.displayOrder = data.displayOrder;
+      if (data.layoutX !== undefined) updateData.layoutX = data.layoutX;
+      if (data.layoutY !== undefined) updateData.layoutY = data.layoutY;
+      if (data.layoutW !== undefined) updateData.layoutW = data.layoutW;
+      if (data.layoutH !== undefined) updateData.layoutH = data.layoutH;
 
       await db('g_impact_metric_configs').where('id', id).update(updateData);
       return this.findById(id);
