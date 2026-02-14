@@ -4,7 +4,7 @@
  * Similar to Unleash Network dashboard
  */
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
   Box,
@@ -28,6 +28,7 @@ import {
   Tab,
   Chip,
   Divider,
+  keyframes,
 } from '@mui/material';
 import {
   Refresh as RefreshIcon,
@@ -186,6 +187,11 @@ function fillMissingHours<T extends { bucket: string; displayTime: string }>(
   return result;
 }
 
+const spin = keyframes`
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+`;
+
 const FeatureNetworkPage: React.FC = () => {
   const { t } = useTranslation();
   const { currentEnvironment, allEnvironments } = useEnvironment();
@@ -196,6 +202,8 @@ const FeatureNetworkPage: React.FC = () => {
 
   // State - initialize from URL params
   const [loading, setLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const hasLoadedRef = useRef(false);
   const [trafficData, setTrafficData] = useState<TrafficDataPoint[]>([]);
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
   const [chartDataByApp, setChartDataByApp] = useState<ChartDataPointByApp[]>([]);
@@ -301,7 +309,11 @@ const FeatureNetworkPage: React.FC = () => {
 
   // Fetch traffic data
   const fetchData = useCallback(async () => {
-    setLoading(true);
+    if (!hasLoadedRef.current) {
+      setLoading(true);
+    } else {
+      setIsRefreshing(true);
+    }
     try {
       // If no environments selected, show no data
       if (selectedEnvironments.length === 0) {
@@ -380,6 +392,8 @@ const FeatureNetworkPage: React.FC = () => {
       console.error('Failed to fetch network traffic data:', error);
     } finally {
       setLoading(false);
+      setIsRefreshing(false);
+      hasLoadedRef.current = true;
     }
   }, [getTimeRange, selectedEnvironments, selectedApps, appsLoaded, applications.length]);
 
@@ -799,8 +813,10 @@ const FeatureNetworkPage: React.FC = () => {
         </Box>
         <Tooltip title={t('common.refresh')}>
           <span>
-            <IconButton onClick={fetchData} disabled={loading}>
-              <RefreshIcon />
+            <IconButton onClick={fetchData} disabled={loading || isRefreshing}>
+              <RefreshIcon
+                sx={{ animation: isRefreshing ? `${spin} 1s linear infinite` : 'none' }}
+              />
             </IconButton>
           </span>
         </Tooltip>
@@ -947,7 +963,7 @@ const FeatureNetworkPage: React.FC = () => {
                         {card.label}
                       </Typography>
                     </Box>
-                    {loading ? (
+                    {(loading || isRefreshing) && !summary ? (
                       <Skeleton variant="text" width={60} height={32} />
                     ) : (
                       <Typography variant="h5" fontWeight={600}>
@@ -979,7 +995,7 @@ const FeatureNetworkPage: React.FC = () => {
                 <ToggleButton value="env">{t('network.groupByEnv')}</ToggleButton>
               </ToggleButtonGroup>
             </Box>
-            {loading ? (
+            {(loading || isRefreshing) && chartDataByApp.length === 0 ? (
               <Skeleton variant="rectangular" height={300} />
             ) : chartDataByApp.length === 0 ? (
               <Box
@@ -1123,7 +1139,7 @@ const FeatureNetworkPage: React.FC = () => {
                         {card.label}
                       </Typography>
                     </Box>
-                    {loading ? (
+                    {(loading || isRefreshing) && !evaluations ? (
                       <Skeleton variant="text" width={60} height={32} />
                     ) : (
                       <Typography variant="h5" fontWeight={600}>
@@ -1155,7 +1171,7 @@ const FeatureNetworkPage: React.FC = () => {
                 <ToggleButton value="env">{t('network.groupByEnv')}</ToggleButton>
               </ToggleButtonGroup>
             </Box>
-            {loading ? (
+            {(loading || isRefreshing) && evaluationTimeSeriesByApp.length === 0 ? (
               <Skeleton variant="rectangular" height={300} />
             ) : evaluationTimeSeriesByApp.length === 0 ? (
               <Box

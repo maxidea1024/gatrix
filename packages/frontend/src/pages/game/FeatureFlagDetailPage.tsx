@@ -352,6 +352,22 @@ const FeatureFlagDetailPage: React.FC = () => {
 
   const isCreating = flagName === 'new';
 
+  const { data: releasePlans } = useReleaseFlowPlansByFlag(flagName || '');
+
+  const activeMilestoneByEnv = React.useMemo(() => {
+    if (!releasePlans) return {};
+    const map: Record<string, string> = {};
+    releasePlans.forEach((plan) => {
+      if (plan.status === 'active' || plan.status === 'paused') {
+        const milestone = plan.milestones.find((m) => m.id === plan.activeMilestoneId);
+        if (milestone) {
+          map[plan.environment] = milestone.name;
+        }
+      }
+    });
+    return map;
+  }, [releasePlans]);
+
   const generateDefaultFlagName = () => {
     const timestamp = Date.now().toString(36).slice(-4);
     return `new-feature-${timestamp}`;
@@ -362,15 +378,13 @@ const FeatureFlagDetailPage: React.FC = () => {
   const tabValue =
     tabParam === 'payload'
       ? 1
-      : tabParam === 'release-flow'
+      : tabParam === 'metrics'
         ? 2
-        : tabParam === 'metrics'
+        : tabParam === 'code-references'
           ? 3
-          : tabParam === 'code-references'
+          : tabParam === 'history'
             ? 4
-            : tabParam === 'history'
-              ? 5
-              : 0;
+            : 0;
 
   const setTabValue = (newValue: number) => {
     // Reset payload changes when leaving payload tab (tab 1)
@@ -390,12 +404,10 @@ const FeatureFlagDetailPage: React.FC = () => {
     if (newValue === 1) {
       newParams.set('tab', 'payload');
     } else if (newValue === 2) {
-      newParams.set('tab', 'release-flow');
-    } else if (newValue === 3) {
       newParams.set('tab', 'metrics');
-    } else if (newValue === 4) {
+    } else if (newValue === 3) {
       newParams.set('tab', 'code-references');
-    } else if (newValue === 5) {
+    } else if (newValue === 4) {
       newParams.set('tab', 'history');
     } else {
       newParams.delete('tab');
@@ -460,6 +472,8 @@ const FeatureFlagDetailPage: React.FC = () => {
   // Environment-specific variants - key is environment name, value is array of variants
   const [envVariants, setEnvVariants] = useState<Record<string, Variant[]>>({});
   const [codeReferenceCount, setCodeReferenceCount] = useState<number | null>(null);
+  // Track environments where the user chose to use Release Flow (but no plan exists yet)
+  const [envManualReleaseFlow, setEnvManualReleaseFlow] = useState<Set<string>>(new Set());
 
   // Release flow plan summaries - to detect environments managed by release flow
   const { data: releaseFlowPlans } = useReleaseFlowPlansByFlag(flag?.id || null);
@@ -1694,7 +1708,6 @@ const FeatureFlagDetailPage: React.FC = () => {
         <Tabs value={tabValue} onChange={(_, v) => setTabValue(v)}>
           <Tab label={t('featureFlags.overview')} />
           <Tab label={t('featureFlags.flagValues')} disabled={isCreating} />
-          <Tab label={t('releaseFlow.tabTitle')} disabled={isCreating} />
           <Tab label={t('featureFlags.metrics')} disabled={isCreating} />
           <Tab
             label={
@@ -2246,17 +2259,32 @@ const FeatureFlagDetailPage: React.FC = () => {
                                   {env.displayName}
                                 </Typography>
                                 {releaseFlowEnvs.has(env.environment) ? (
-                                  <Chip
-                                    icon={<ShieldIcon sx={{ fontSize: 14 }} />}
-                                    label={t('releaseFlow.tabTitle')}
-                                    size="small"
-                                    color="primary"
-                                    variant="outlined"
-                                    sx={{
-                                      height: 22,
-                                      '& .MuiChip-label': { px: 0.75, fontSize: '0.7rem' },
-                                    }}
-                                  />
+                                  activeMilestoneByEnv[env.environment] ? (
+                                    <Chip
+                                      label={activeMilestoneByEnv[env.environment]}
+                                      size="small"
+                                      color="primary"
+                                      variant="filled"
+                                      sx={{
+                                        height: 24,
+                                        fontWeight: 'bold',
+                                        '& .MuiChip-label': { px: 1, fontSize: '0.75rem' },
+                                        boxShadow: 1,
+                                      }}
+                                    />
+                                  ) : (
+                                    <Chip
+                                      icon={<ShieldIcon sx={{ fontSize: 14 }} />}
+                                      label={t('releaseFlow.tabTitle')}
+                                      size="small"
+                                      color="primary"
+                                      variant="outlined"
+                                      sx={{
+                                        height: 22,
+                                        '& .MuiChip-label': { px: 0.75, fontSize: '0.7rem' },
+                                      }}
+                                    />
+                                  )
                                 ) : (
                                   strategiesCount > 0 && (
                                     <Typography
@@ -2389,51 +2417,61 @@ const FeatureFlagDetailPage: React.FC = () => {
                           </AccordionSummary>
 
                           <AccordionDetails sx={{ px: 2, pt: 0, pb: 2 }}>
-                            {releaseFlowEnvs.has(env.environment) ? (
-                              <Box
-                                sx={{
-                                  textAlign: 'center',
-                                  py: 3,
-                                  px: 3,
-                                  border: '2px dashed',
-                                  borderColor: 'primary.main',
-                                  borderRadius: '4px',
-                                  bgcolor: (theme) =>
-                                    theme.palette.mode === 'dark'
-                                      ? 'rgba(33, 150, 243, 0.08)'
-                                      : 'rgba(33, 150, 243, 0.04)',
-                                }}
-                              >
-                                <ShieldIcon sx={{ fontSize: 36, color: 'primary.main', mb: 1 }} />
-                                <Typography variant="body2" color="text.secondary" fontWeight={500}>
-                                  {t('releaseFlow.managedByReleaseFlow')}
-                                </Typography>
-                                <Typography
-                                  variant="caption"
-                                  color="text.secondary"
-                                  sx={{ display: 'block', mt: 0.5 }}
-                                >
-                                  {t('releaseFlow.managedByReleaseFlowDesc')}
-                                </Typography>
-                                <Button
-                                  size="small"
-                                  variant="outlined"
-                                  sx={{ mt: 1.5 }}
-                                  onClick={() => setTabValue(2)}
-                                >
-                                  {t('releaseFlow.goToReleaseFlow')}
-                                </Button>
-                              </Box>
+                            {releaseFlowEnvs.has(env.environment) ||
+                            envManualReleaseFlow.has(env.environment) ? (
+                              <ReleaseFlowTab
+                                flagId={flag.id}
+                                flagName={flag.flagName}
+                                environments={[
+                                  { environment: env.environment, displayName: env.displayName },
+                                ]}
+                                canManage={canManage}
+                                initialShowTemplates={
+                                  envManualReleaseFlow.has(env.environment) &&
+                                  !releaseFlowEnvs.has(env.environment)
+                                }
+                                envEnabled={isEnabled}
+                                allSegments={segments}
+                                contextFields={contextFields}
+                              />
                             ) : strategies.length === 0 ? (
                               <>
                                 <EmptyPlaceholder
                                   message={t('featureFlags.noStrategiesTitle')}
                                   description={t('featureFlags.noStrategiesDescription')}
-                                  onAddClick={
-                                    canManage ? () => handleAddStrategy(env.environment) : undefined
-                                  }
-                                  addButtonLabel={t('featureFlags.addFirstStrategy')}
-                                />
+                                >
+                                  {canManage && (
+                                    <Box
+                                      sx={{
+                                        display: 'flex',
+                                        justifyContent: 'center',
+                                        gap: 2,
+                                        mt: 1.5,
+                                      }}
+                                    >
+                                      <Button
+                                        variant="contained"
+                                        size="small"
+                                        startIcon={<AddIcon />}
+                                        onClick={() => handleAddStrategy(env.environment)}
+                                      >
+                                        {t('featureFlags.addFirstStrategy')}
+                                      </Button>
+                                      <Button
+                                        variant="contained"
+                                        size="small"
+                                        startIcon={<TemplateIcon />}
+                                        onClick={() => {
+                                          setEnvManualReleaseFlow((prev) =>
+                                            new Set(prev).add(env.environment)
+                                          );
+                                        }}
+                                      >
+                                        {t('releaseFlow.tabTitle')}
+                                      </Button>
+                                    </Box>
+                                  )}
+                                </EmptyPlaceholder>
 
                                 {/* Divider between strategies and variants */}
                                 <Divider sx={{ my: 2 }} />
@@ -3636,21 +3674,8 @@ const FeatureFlagDetailPage: React.FC = () => {
         </Box>
       </TabPanel>
 
-      {/* Release Flow Tab */}
-      <TabPanel value={tabValue} index={2}>
-        <ReleaseFlowTab
-          flagId={flag.id}
-          flagName={flag.flagName}
-          environments={environments.map((e) => ({
-            environment: e.environment,
-            displayName: e.displayName,
-          }))}
-          canManage={canManage}
-        />
-      </TabPanel>
-
       {/* Metrics Tab */}
-      <TabPanel value={tabValue} index={3}>
+      <TabPanel value={tabValue} index={2}>
         <FeatureFlagMetrics
           flagName={flag.flagName}
           environments={(flag.environments || []).map((e) => ({
@@ -3660,13 +3685,13 @@ const FeatureFlagDetailPage: React.FC = () => {
           currentEnvironment={flag.environments?.[0]?.environment || 'production'}
         />
       </TabPanel>
-      <TabPanel value={tabValue} index={4}>
+      <TabPanel value={tabValue} index={3}>
         <FeatureFlagCodeReferences
           flagName={flag.flagName}
           onLoad={(count) => setCodeReferenceCount(count)}
         />
       </TabPanel>
-      <TabPanel value={tabValue} index={5}>
+      <TabPanel value={tabValue} index={4}>
         <FeatureFlagAuditLogs flagName={flag.flagName} />
       </TabPanel>
 

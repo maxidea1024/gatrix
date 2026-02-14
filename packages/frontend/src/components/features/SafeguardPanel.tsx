@@ -64,13 +64,19 @@ interface SafeguardPanelProps {
   flowId: string;
   milestoneId: string;
   canManage: boolean;
+  hideHeader?: boolean;
 }
 
 const AGGREGATION_OPTIONS = ['count', 'rps', 'avg', 'sum', 'p50', 'p95', 'p99'];
 const OPERATOR_OPTIONS = ['>', '<', '>=', '<=', '=='];
 const TIME_RANGE_OPTIONS = ['hour', 'day', 'week', 'month'];
 
-const SafeguardPanel: React.FC<SafeguardPanelProps> = ({ flowId, milestoneId, canManage }) => {
+const SafeguardPanel: React.FC<SafeguardPanelProps> = ({
+  flowId,
+  milestoneId,
+  canManage,
+  hideHeader = false,
+}) => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const [safeguards, setSafeguards] = useState<Safeguard[]>([]);
@@ -136,6 +142,9 @@ const SafeguardPanel: React.FC<SafeguardPanelProps> = ({ flowId, milestoneId, ca
   };
 
   const handleOpenEdit = (safeguard: Safeguard) => {
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
     setSelectedSafeguard(safeguard);
     setMetricName(safeguard.metricName);
     setAggregationMode(safeguard.aggregationMode);
@@ -181,6 +190,9 @@ const SafeguardPanel: React.FC<SafeguardPanelProps> = ({ flowId, milestoneId, ca
   };
 
   const handleDeleteClick = (safeguard: Safeguard) => {
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
     setSelectedSafeguard(safeguard);
     setDeleteConfirmOpen(true);
   };
@@ -246,28 +258,54 @@ const SafeguardPanel: React.FC<SafeguardPanelProps> = ({ flowId, milestoneId, ca
 
   return (
     <Box>
-      {/* Header */}
-      <Stack direction="row" alignItems="center" justifyContent="space-between" mb={2}>
-        <Stack direction="row" alignItems="center" spacing={1}>
-          <ShieldIcon fontSize="small" color="primary" />
-          <Typography variant="subtitle2">{t('releaseFlow.safeguards')}</Typography>
-          <Chip label={safeguards.length} size="small" />
-        </Stack>
-        <Stack direction="row" spacing={1}>
-          {safeguards.length > 0 && (
-            <Tooltip title={t('releaseFlow.safeguard.evaluateDesc')}>
+      {!hideHeader && (
+        <Stack direction="row" alignItems="center" justifyContent="space-between" mb={2}>
+          <Stack direction="row" alignItems="center" spacing={1}>
+            <ShieldIcon fontSize="small" color="primary" />
+            <Typography variant="subtitle2">{t('releaseFlow.safeguards')}</Typography>
+            <Chip label={safeguards.length} size="small" />
+          </Stack>
+          <Stack direction="row" spacing={1}>
+            {safeguards.length > 0 && (
+              <Tooltip title={t('releaseFlow.safeguard.evaluateDesc')}>
+                <Button
+                  size="small"
+                  variant="outlined"
+                  startIcon={evaluating ? <CircularProgress size={14} /> : <EvaluateIcon />}
+                  onClick={handleEvaluate}
+                  disabled={evaluating}
+                >
+                  {t('releaseFlow.safeguard.evaluate')}
+                </Button>
+              </Tooltip>
+            )}
+            {canManage && safeguards.length > 0 && (
               <Button
                 size="small"
-                variant="outlined"
-                startIcon={evaluating ? <CircularProgress size={14} /> : <EvaluateIcon />}
-                onClick={handleEvaluate}
-                disabled={evaluating}
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={handleOpenCreate}
               >
-                {t('releaseFlow.safeguard.evaluate')}
+                {t('releaseFlow.safeguard.addSafeguard')}
               </Button>
-            </Tooltip>
-          )}
-          {canManage && safeguards.length > 0 && (
+            )}
+          </Stack>
+        </Stack>
+      )}
+      {hideHeader && safeguards.length > 0 && (
+        <Stack direction="row" justifyContent="flex-end" spacing={1} mb={1}>
+          <Tooltip title={t('releaseFlow.safeguard.evaluateDesc')}>
+            <Button
+              size="small"
+              variant="outlined"
+              startIcon={evaluating ? <CircularProgress size={14} /> : <EvaluateIcon />}
+              onClick={handleEvaluate}
+              disabled={evaluating}
+            >
+              {t('releaseFlow.safeguard.evaluate')}
+            </Button>
+          </Tooltip>
+          {canManage && (
             <Button
               size="small"
               variant="contained"
@@ -278,7 +316,7 @@ const SafeguardPanel: React.FC<SafeguardPanelProps> = ({ flowId, milestoneId, ca
             </Button>
           )}
         </Stack>
-      </Stack>
+      )}
 
       {/* Empty state */}
       {safeguards.length === 0 && (
