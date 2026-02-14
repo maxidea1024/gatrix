@@ -47,6 +47,7 @@ import { useReleaseFlowTemplates, useReleaseFlowPlan } from '../../hooks/useRele
 import {
   applyTemplate,
   startMilestone,
+  startPlan,
   pausePlan,
   resumePlan,
   setTransitionCondition,
@@ -197,6 +198,15 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
           mutatePlan();
         } catch (error) {
           console.error('Auto-resume failed', error);
+        }
+      } else if (envEnabled && plan.status === 'draft') {
+        // Environment enabled with draft plan -> auto-start
+        try {
+          await startPlan(plan.id);
+          enqueueSnackbar(t('releaseFlow.startedSuccess'), { variant: 'success' });
+          mutatePlan();
+        } catch (error) {
+          console.error('Auto-start failed', error);
         }
       }
     };
@@ -980,10 +990,10 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                     overflow: 'visible',
                     '&:hover': !applying
                       ? {
-                          borderColor: 'primary.main',
-                          boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                          transform: 'translateY(-2px)',
-                        }
+                        borderColor: 'primary.main',
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                        transform: 'translateY(-2px)',
+                      }
                       : {},
                   }}
                   onClick={() => !applying && handleApplyTemplate(template.id)}
