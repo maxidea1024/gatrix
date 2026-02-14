@@ -583,8 +583,8 @@ const SortableListItem: React.FC<SortableListItemProps> = ({
                 {clipboardUrls.length === 1
                   ? t('banners.contextMenu.addFromClipboardBefore')
                   : t('banners.contextMenu.addFromClipboardBeforeMultiple', {
-                      count: clipboardUrls.length,
-                    })}
+                    count: clipboardUrls.length,
+                  })}
               </ListItemText>
             </MenuItem>
             <MenuItem
@@ -600,8 +600,8 @@ const SortableListItem: React.FC<SortableListItemProps> = ({
                 {clipboardUrls.length === 1
                   ? t('banners.contextMenu.addFromClipboardAfter')
                   : t('banners.contextMenu.addFromClipboardAfterMultiple', {
-                      count: clipboardUrls.length,
-                    })}
+                    count: clipboardUrls.length,
+                  })}
               </ListItemText>
             </MenuItem>
           </>
@@ -1147,7 +1147,7 @@ const SequenceEditor: React.FC<SequenceEditorProps> = ({
   };
 
   return (
-    <Paper sx={{ p: 2, border: 1, borderColor: 'divider' }}>
+    <Paper variant="outlined" sx={{ p: 2 }}>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
         <DragIndicatorIcon sx={{ color: 'text.secondary', cursor: 'grab' }} />
         <Typography variant="subtitle1" sx={{ flex: 1 }}>
@@ -1290,7 +1290,7 @@ const SequenceEditor: React.FC<SequenceEditorProps> = ({
                       display: 'flex',
                       gap: 0.5,
                       p: 1.5,
-                      bgcolor: (theme) => (theme.palette.mode === 'dark' ? 'grey.800' : 'grey.100'),
+                      bgcolor: 'action.hover',
                       borderRadius: 1,
                       overflowX: 'auto',
                     }}
@@ -1376,7 +1376,7 @@ const SequenceEditor: React.FC<SequenceEditorProps> = ({
                       gap: 1,
                       flexWrap: 'wrap',
                       p: 1.5,
-                      bgcolor: (theme) => (theme.palette.mode === 'dark' ? 'grey.800' : 'grey.100'),
+                      bgcolor: 'action.hover',
                       borderRadius: 1,
                     }}
                   >

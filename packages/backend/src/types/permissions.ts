@@ -121,6 +121,18 @@ export const PERMISSIONS = {
   SYSTEM_SETTINGS_VIEW: 'system-settings.view',
   SYSTEM_SETTINGS_MANAGE: 'system-settings.manage',
 
+  // Service Accounts
+  SERVICE_ACCOUNTS_VIEW: 'service-accounts.view',
+  SERVICE_ACCOUNTS_MANAGE: 'service-accounts.manage',
+
+  // Signal Endpoints
+  SIGNAL_ENDPOINTS_VIEW: 'signal-endpoints.view',
+  SIGNAL_ENDPOINTS_MANAGE: 'signal-endpoints.manage',
+
+  // Actions
+  ACTIONS_VIEW: 'actions.view',
+  ACTIONS_MANAGE: 'actions.manage',
+
   // Chat
   CHAT_ACCESS: 'chat.access',
 } as const;
@@ -187,6 +199,17 @@ export const PERMISSION_CATEGORIES = {
   EVENT_LENS: {
     label: 'Event Lens',
     permissions: [PERMISSIONS.EVENT_LENS_VIEW, PERMISSIONS.EVENT_LENS_MANAGE],
+  },
+  AUTOMATION: {
+    label: 'Automation',
+    permissions: [
+      PERMISSIONS.SERVICE_ACCOUNTS_VIEW,
+      PERMISSIONS.SERVICE_ACCOUNTS_MANAGE,
+      PERMISSIONS.SIGNAL_ENDPOINTS_VIEW,
+      PERMISSIONS.SIGNAL_ENDPOINTS_MANAGE,
+      PERMISSIONS.ACTIONS_VIEW,
+      PERMISSIONS.ACTIONS_MANAGE,
+    ],
   },
   SETTINGS: {
     label: 'Settings',

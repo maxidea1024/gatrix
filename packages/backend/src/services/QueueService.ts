@@ -101,6 +101,20 @@ export class QueueService {
         } else {
           logger.info('Repeatable job already exists: unknown-flags:flush');
         }
+
+        // Register signal processing job (every 10 seconds)
+        const signalProcessExists = repeatables.some((r) => r.name === 'signal:process');
+        if (!signalProcessExists) {
+          await this.addJob(
+            'scheduler',
+            'signal:process',
+            {},
+            { repeat: { every: 10000 } }
+          );
+          logger.info('Registered repeatable job: signal:process (every 10 seconds)');
+        } else {
+          logger.info('Repeatable job already exists: signal:process');
+        }
       } catch (e) {
         logger.error('Failed to register repeatable scheduler jobs:', e);
       }
@@ -587,6 +601,18 @@ export class QueueService {
           const { ReleaseFlowScheduler } = await import('./releaseFlowScheduler');
           await ReleaseFlowScheduler.getInstance().checkAndProgressMilestones();
           logger.info('release-flow:progression-check completed', { jobId: job.id });
+          break;
+        }
+        case 'signal:process': {
+          // Dynamic import to avoid circular dependency
+          const { ActionExecutionService } = await import('./ActionExecutionService');
+          const signalResult = await ActionExecutionService.processUnprocessedSignals();
+          if (signalResult.processed > 0 || signalResult.errors > 0) {
+            logger.info('signal:process completed', {
+              jobId: job.id,
+              ...signalResult,
+            });
+          }
           break;
         }
         default: {

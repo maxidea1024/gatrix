@@ -72,7 +72,7 @@ export default class ServerFeatureFlagController {
 
       // Record network traffic (fire-and-forget)
       const appName = (req.headers['x-application-name'] as string) || 'unknown';
-      networkTrafficService.recordTraffic(environment, appName, 'features').catch(() => {});
+      networkTrafficService.recordTraffic(environment, appName, 'features').catch(() => { });
 
       // Get all enabled, non-archived flags for this environment
       const result = await FeatureFlagModel.findAll({
@@ -251,7 +251,7 @@ export default class ServerFeatureFlagController {
       // Record network traffic (fire-and-forget)
       const appName = (req.headers['x-application-name'] as string) || 'unknown';
       const environment = req.params.env || 'global';
-      networkTrafficService.recordTraffic(environment, appName, 'segments').catch(() => {});
+      networkTrafficService.recordTraffic(environment, appName, 'segments').catch(() => { });
 
       const rawSegments = await FeatureSegmentModel.findAll();
 
@@ -438,6 +438,7 @@ export default class ServerFeatureFlagController {
         const { AuditLogModel } = await import('../models/AuditLog');
         await AuditLogModel.create({
           action: 'feature_code_references_report',
+          description: `Code references scan '${scanId}' from ${repository}/${branch} (${insertedCount} references, ${new Set(references.map((r: any) => r.flagName)).size} flags)`,
           resourceType: 'feature_flag',
           resourceId: `scan:${scanId}`,
           newValues: {

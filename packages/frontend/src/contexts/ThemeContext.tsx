@@ -156,10 +156,21 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
           },
         },
       },
+      MuiAccordion: {
+        styleOverrides: {
+          root: {
+            backgroundColor: mode === 'dark' ? 'transparent' : undefined,
+            '&:before': { display: 'none' },
+          },
+        },
+      },
       MuiPaper: {
         styleOverrides: {
           root: {
             borderRadius: 0,
+          },
+          outlined: {
+            backgroundColor: mode === 'dark' ? 'transparent' : undefined,
           },
         },
       },

@@ -105,6 +105,9 @@ import IntegrationsPage from './pages/settings/IntegrationsPage';
 import IntegrationsSdksPage from './pages/settings/IntegrationsSdksPage';
 import CreateIntegrationPage from './pages/settings/CreateIntegrationPage';
 import EditIntegrationPage from './pages/settings/EditIntegrationPage';
+import SignalEndpointsPage from './pages/admin/SignalEndpointsPage';
+import ActionSetsPage from './pages/admin/ActionSetsPage';
+import ServiceAccountsPage from './pages/admin/ServiceAccountsPage';
 // import AdvancedSettingsPage from './pages/admin/AdvancedSettingsPage'];
 
 // Pages - Game
@@ -332,36 +335,36 @@ const AppContent: React.FC = () => {
                       },
                       // WebKit/Blink (Chrome, Edge, Safari)
                       'html::-webkit-scrollbar, body::-webkit-scrollbar, *::-webkit-scrollbar, div::-webkit-scrollbar':
-                        {
-                          width: '8px',
-                          height: '8px',
-                        },
+                      {
+                        width: '8px',
+                        height: '8px',
+                      },
                       'html::-webkit-scrollbar-track, body::-webkit-scrollbar-track, *::-webkit-scrollbar-track, div::-webkit-scrollbar-track':
-                        {
-                          background: 'transparent',
-                        },
+                      {
+                        background: 'transparent',
+                      },
                       'html::-webkit-scrollbar-thumb, body::-webkit-scrollbar-thumb, *::-webkit-scrollbar-thumb, div::-webkit-scrollbar-thumb':
-                        {
-                          backgroundColor:
-                            theme.palette.mode === 'dark'
-                              ? 'rgba(255, 255, 255, 0.2)'
-                              : 'rgba(0, 0, 0, 0.2)',
-                          borderRadius: 0,
-                        },
+                      {
+                        backgroundColor:
+                          theme.palette.mode === 'dark'
+                            ? 'rgba(255, 255, 255, 0.2)'
+                            : 'rgba(0, 0, 0, 0.2)',
+                        borderRadius: 0,
+                      },
                       'html::-webkit-scrollbar-thumb:hover, body::-webkit-scrollbar-thumb:hover, *::-webkit-scrollbar-thumb:hover, div::-webkit-scrollbar-thumb:hover':
-                        {
-                          backgroundColor:
-                            theme.palette.mode === 'dark'
-                              ? 'rgba(255, 255, 255, 0.3)'
-                              : 'rgba(0, 0, 0, 0.3)',
-                        },
+                      {
+                        backgroundColor:
+                          theme.palette.mode === 'dark'
+                            ? 'rgba(255, 255, 255, 0.3)'
+                            : 'rgba(0, 0, 0, 0.3)',
+                      },
                       'html::-webkit-scrollbar-thumb:active, body::-webkit-scrollbar-thumb:active, *::-webkit-scrollbar-thumb:active, div::-webkit-scrollbar-thumb:active':
-                        {
-                          backgroundColor:
-                            theme.palette.mode === 'dark'
-                              ? 'rgba(255, 255, 255, 0.4)'
-                              : 'rgba(0, 0, 0, 0.4)',
-                        },
+                      {
+                        backgroundColor:
+                          theme.palette.mode === 'dark'
+                            ? 'rgba(255, 255, 255, 0.4)'
+                            : 'rgba(0, 0, 0, 0.4)',
+                      },
                     })}
                   />
                   <SnackbarProvider
@@ -613,6 +616,15 @@ const AppContent: React.FC = () => {
                                       element={<DataManagementPage />}
                                     />
                                     <Route path="gatrix-edges" element={<GatrixEdgesPage />} />
+                                    <Route
+                                      path="signal-endpoints"
+                                      element={<SignalEndpointsPage />}
+                                    />
+                                    <Route path="actions" element={<ActionSetsPage />} />
+                                    <Route
+                                      path="service-accounts"
+                                      element={<ServiceAccountsPage />}
+                                    />
                                   </Routes>
                                 </EnvironmentAwareLayout>
                               </ProtectedRoute>

@@ -697,7 +697,7 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
             border: 2,
             borderColor: isDragging ? 'primary.main' : 'transparent',
             cursor: 'pointer',
-            bgcolor: (theme) => (theme.palette.mode === 'dark' ? 'grey.800' : 'grey.100'),
+            bgcolor: 'action.hover',
             transition: 'border-color 0.2s, box-shadow 0.2s',
             flexShrink: 0, // Prevent shrinking in timeline mode
             '&:hover': {
@@ -1060,7 +1060,7 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
                 minWidth: 200,
                 display: 'flex',
                 flexDirection: 'column',
-                bgcolor: (theme) => (theme.palette.mode === 'dark' ? 'grey.900' : 'grey.100'),
+                bgcolor: 'action.hover',
                 borderRadius: 1,
                 p: 1.5,
               }}
@@ -1439,8 +1439,8 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
                 {clipboardUrls.length === 1
                   ? t('banners.contextMenu.addFromClipboardBefore')
                   : t('banners.contextMenu.addFromClipboardBeforeMultiple', {
-                      count: clipboardUrls.length,
-                    })}
+                    count: clipboardUrls.length,
+                  })}
               </ListItemText>
             </MenuItem>
             <MenuItem
@@ -1453,8 +1453,8 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
                 {clipboardUrls.length === 1
                   ? t('banners.contextMenu.addFromClipboardAfter')
                   : t('banners.contextMenu.addFromClipboardAfterMultiple', {
-                      count: clipboardUrls.length,
-                    })}
+                    count: clipboardUrls.length,
+                  })}
               </ListItemText>
             </MenuItem>
           </>

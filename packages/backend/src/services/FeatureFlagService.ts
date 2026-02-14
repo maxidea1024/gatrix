@@ -31,8 +31,6 @@ import logger from '../config/logger';
 import { pubSubService } from './PubSubService';
 import { ENV_SCOPED } from '../constants/cacheKeys';
 import db from '../config/knex';
-import { IntegrationService } from './IntegrationService';
-import { INTEGRATION_EVENTS, IntegrationEventType } from '../types/integrationEvents';
 import { validateFlagValue } from '../utils/validateFlagValue';
 
 // Types for service methods
@@ -308,12 +306,14 @@ class FeatureFlagService {
       }
     }
 
-    // Audit log
+    // Audit log (also triggers integration events via fire-and-forget)
     await AuditLogModel.create({
       action: 'feature_flag.create',
+      description: `Feature flag '${input.flagName}' created in [${input.environment}]`,
       resourceType: 'FeatureFlag',
       resourceId: flag.id,
       userId,
+      environment: input.environment,
       newValues: {
         ...flag,
         strategies: input.strategies,
@@ -323,15 +323,6 @@ class FeatureFlagService {
 
     // Invalidate cache
     await this.invalidateCache(input.environment!);
-
-    // Trigger integration event
-    await IntegrationService.handleEvent({
-      type: INTEGRATION_EVENTS.FEATURE_FLAG_CREATED,
-      environment: input.environment!,
-      createdByUserId: userId,
-      createdAt: new Date(),
-      data: flag as any,
-    });
 
     logger.info(`Feature flag created: ${input.flagName} in ${input.environment}`);
     return flag;
@@ -429,12 +420,20 @@ class FeatureFlagService {
 
     const updated = await this.getFlag(environment, flagName);
 
-    // Audit log
+    // Build human-readable description
+    let updateDesc = `Feature flag '${flagName}' updated in [${environment}]`;
+    if (input.isEnabled !== undefined) {
+      updateDesc = `Feature flag '${flagName}' ${input.isEnabled ? 'enabled' : 'disabled'} in [${environment}]`;
+    }
+
+    // Audit log (also triggers integration events via fire-and-forget)
     await AuditLogModel.create({
       action: 'feature_flag.update',
+      description: updateDesc,
       resourceType: 'FeatureFlag',
       resourceId: flag.id,
       userId,
+      environment,
       oldValues: flag,
       newValues: updated,
     });
@@ -442,24 +441,6 @@ class FeatureFlagService {
     // Increment version and invalidate cache
     await this.incrementFlagVersion(flag.id, environment);
     await this.invalidateCache(environment);
-
-    // Trigger integration event
-    let eventType: IntegrationEventType = INTEGRATION_EVENTS.FEATURE_FLAG_UPDATED;
-    if (input.isEnabled !== undefined) {
-      eventType = input.isEnabled
-        ? INTEGRATION_EVENTS.FEATURE_FLAG_ENVIRONMENT_ENABLED
-        : INTEGRATION_EVENTS.FEATURE_FLAG_ENVIRONMENT_DISABLED;
-    }
-
-    await IntegrationService.handleEvent({
-      type: eventType,
-      environment,
-      createdByUserId: userId,
-      createdAt: new Date(),
-      data: updated as any,
-      // Pass old values for context
-      preData: flag as any,
-    });
 
     return updated!;
   }
@@ -512,25 +493,17 @@ class FeatureFlagService {
 
     await AuditLogModel.create({
       action: 'feature_flag.archive',
+      description: `Feature flag '${flagName}' archived in [${environment}]`,
       resourceType: 'FeatureFlag',
       resourceId: flag.id,
       userId,
+      environment,
       oldValues: { isArchived: false },
       newValues: { isArchived: true },
     });
 
     // Invalidate cache
     await this.invalidateCache(environment);
-
-    // Trigger integration event
-    await IntegrationService.handleEvent({
-      type: INTEGRATION_EVENTS.FEATURE_FLAG_ARCHIVED,
-      environment,
-      createdByUserId: userId,
-      createdAt: new Date(),
-      data: updated as any,
-      preData: flag as any,
-    });
 
     return updated;
   }
@@ -554,18 +527,19 @@ class FeatureFlagService {
       updatedBy: userId,
     });
 
+    await AuditLogModel.create({
+      action: 'feature_flag.revive',
+      description: `Feature flag '${flagName}' revived (unarchived) in [${environment}]`,
+      resourceType: 'FeatureFlag',
+      resourceId: flag.id,
+      userId,
+      environment,
+      oldValues: { isArchived: true },
+      newValues: { isArchived: false },
+    });
+
     // Invalidate cache
     await this.invalidateCache(environment);
-
-    // Trigger integration event
-    await IntegrationService.handleEvent({
-      type: INTEGRATION_EVENTS.FEATURE_FLAG_REVIVED,
-      environment,
-      createdByUserId: userId,
-      createdAt: new Date(),
-      data: updated as any,
-      preData: flag as any,
-    });
 
     return updated;
   }
@@ -591,9 +565,11 @@ class FeatureFlagService {
 
     await AuditLogModel.create({
       action: isFavorite ? 'feature_flag.favorite' : 'feature_flag.unfavorite',
+      description: `Feature flag '${flagName}' ${isFavorite ? 'added to' : 'removed from'} favorites`,
       resourceType: 'FeatureFlag',
       resourceId: flag.id,
       userId,
+      environment,
       oldValues: { isFavorite: !isFavorite },
       newValues: { isFavorite },
     });
@@ -621,25 +597,17 @@ class FeatureFlagService {
 
     await AuditLogModel.create({
       action: 'feature_flag.mark_stale',
+      description: `Feature flag '${flagName}' marked as stale in [${environment}]`,
       resourceType: 'FeatureFlag',
       resourceId: flag.id,
       userId,
+      environment,
       oldValues: { stale: false },
       newValues: { stale: true },
     });
 
     // Invalidate cache
     await this.invalidateCache(environment);
-
-    // Trigger integration event
-    await IntegrationService.handleEvent({
-      type: INTEGRATION_EVENTS.FEATURE_FLAG_STALE_ON,
-      environment,
-      createdByUserId: userId,
-      createdAt: new Date(),
-      data: updated as any,
-      preData: flag as any,
-    });
 
     return updated;
   }
@@ -664,25 +632,17 @@ class FeatureFlagService {
 
     await AuditLogModel.create({
       action: 'feature_flag.unmark_stale',
+      description: `Feature flag '${flagName}' unmarked as stale in [${environment}]`,
       resourceType: 'FeatureFlag',
       resourceId: flag.id,
       userId,
+      environment,
       oldValues: { stale: true },
       newValues: { stale: false },
     });
 
     // Invalidate cache
     await this.invalidateCache(environment);
-
-    // Trigger integration event
-    await IntegrationService.handleEvent({
-      type: INTEGRATION_EVENTS.FEATURE_FLAG_STALE_OFF,
-      environment,
-      createdByUserId: userId,
-      createdAt: new Date(),
-      data: updated as any,
-      preData: flag as any,
-    });
 
     return updated;
   }
@@ -710,19 +670,12 @@ class FeatureFlagService {
 
     await AuditLogModel.create({
       action: 'feature_flag.delete',
+      description: `Feature flag '${flagName}' permanently deleted from [${environment}]`,
       resourceType: 'FeatureFlag',
       resourceId: flag.id,
       userId,
-      oldValues: flag,
-    });
-
-    // Trigger integration event
-    await IntegrationService.handleEvent({
-      type: INTEGRATION_EVENTS.FEATURE_FLAG_DELETED,
       environment,
-      createdByUserId: userId,
-      createdAt: new Date(),
-      data: flag as any,
+      oldValues: flag,
     });
 
     // Invalidate cache
@@ -762,15 +715,6 @@ class FeatureFlagService {
     // Invalidate cache
     await this.invalidateCache(environment);
 
-    // Trigger integration event
-    await IntegrationService.handleEvent({
-      type: INTEGRATION_EVENTS.FEATURE_FLAG_STRATEGY_ADDED,
-      environment,
-      createdByUserId: userId,
-      createdAt: new Date(),
-      data: { ...strategy, flagName: flag.flagName },
-    });
-
     return strategy;
   }
 
@@ -799,16 +743,6 @@ class FeatureFlagService {
       await this.invalidateCache(strategy.environment);
     }
 
-    // Trigger integration event
-    await IntegrationService.handleEvent({
-      type: INTEGRATION_EVENTS.FEATURE_FLAG_STRATEGY_UPDATED,
-      environment: strategy.environment,
-      createdByUserId: userId,
-      createdAt: new Date(),
-      data: { ...updated, flagName: flag?.flagName },
-      preData: { ...strategy },
-    });
-
     return updated;
   }
 
@@ -827,15 +761,6 @@ class FeatureFlagService {
 
     // Invalidate cache
     await this.invalidateCache(strategy.environment);
-
-    // Trigger integration event
-    await IntegrationService.handleEvent({
-      type: INTEGRATION_EVENTS.FEATURE_FLAG_STRATEGY_REMOVED,
-      environment: strategy.environment,
-      createdByUserId: userId,
-      createdAt: new Date(),
-      data: { ...strategy, flagName: flag?.flagName },
-    });
   }
 
   /**
@@ -892,21 +817,6 @@ class FeatureFlagService {
 
     // Invalidate cache
     await this.invalidateCache(environment);
-
-    // Trigger integration event
-    // For bulk update, we treat it as "strategies updated"
-    await IntegrationService.handleEvent({
-      type: INTEGRATION_EVENTS.FEATURE_FLAG_STRATEGY_UPDATED,
-      environment,
-      createdByUserId: userId,
-      createdAt: new Date(),
-      data: {
-        flagName,
-        strategies: newStrategies,
-        count: newStrategies.length,
-        action: 'bulk_update',
-      },
-    });
 
     return newStrategies;
   }
@@ -1119,14 +1029,6 @@ class FeatureFlagService {
       },
     });
 
-    // Trigger integration event
-    await IntegrationService.handleEvent({
-      type: INTEGRATION_EVENTS.FEATURE_SEGMENT_CREATED,
-      createdByUserId: userId,
-      createdAt: new Date(),
-      data: segment,
-    });
-
     return segment;
   }
 
@@ -1155,15 +1057,6 @@ class FeatureFlagService {
         id: updated.id,
         segmentName: updated.segmentName,
       },
-    });
-
-    // Trigger integration event
-    await IntegrationService.handleEvent({
-      type: INTEGRATION_EVENTS.FEATURE_SEGMENT_UPDATED,
-      createdByUserId: userId,
-      createdAt: new Date(),
-      data: updated as any,
-      preData: segment as any,
     });
 
     return updated;
@@ -1200,13 +1093,6 @@ class FeatureFlagService {
       },
     });
 
-    // Trigger integration event
-    await IntegrationService.handleEvent({
-      type: INTEGRATION_EVENTS.FEATURE_SEGMENT_DELETED,
-      createdByUserId: userId,
-      createdAt: new Date(),
-      data: segment,
-    });
   }
 
   // ==================== Context Fields ====================

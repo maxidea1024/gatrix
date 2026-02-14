@@ -39,7 +39,7 @@ const EmptyPlaceholder: React.FC<EmptyPlaceholderProps> = ({
         border: '2px dashed',
         borderColor: 'divider',
         borderRadius: '4px',
-        bgcolor: (theme) => (theme.palette.mode === 'dark' ? 'grey.900' : 'grey.100'),
+        bgcolor: 'action.hover',
       }}
     >
       <Typography variant="body2" color="text.secondary" fontWeight={500}>
@@ -57,16 +57,16 @@ const EmptyPlaceholder: React.FC<EmptyPlaceholderProps> = ({
       {children
         ? children
         : onAddClick && (
-            <Button
-              variant={addButtonVariant}
-              size="small"
-              startIcon={<AddIcon />}
-              onClick={onAddClick}
-              sx={{ mt: 1.5 }}
-            >
-              {addButtonLabel}
-            </Button>
-          )}
+          <Button
+            variant={addButtonVariant}
+            size="small"
+            startIcon={<AddIcon />}
+            onClick={onAddClick}
+            sx={{ mt: 1.5 }}
+          >
+            {addButtonLabel}
+          </Button>
+        )}
     </Box>
   );
 };

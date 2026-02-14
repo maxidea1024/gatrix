@@ -369,7 +369,7 @@ const CustomQueueMonitorPage: React.FC = () => {
               <Typography variant="subtitle1" gutterBottom>
                 <strong>데이터:</strong>
               </Typography>
-              <Paper sx={{ p: 2, bgcolor: 'grey.100' }}>
+              <Paper sx={{ p: 2, bgcolor: 'action.hover' }}>
                 <pre>{JSON.stringify(selectedJob.data, null, 2)}</pre>
               </Paper>
             </Box>

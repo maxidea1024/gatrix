@@ -670,13 +670,9 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
           <Stack spacing={3} sx={{ mt: 1 }}>
             {/* 기본 정보 섹션 */}
             <Paper
+              variant="outlined"
               elevation={0}
-              sx={{
-                p: 2,
-                bgcolor: 'background.default',
-                border: '1px solid',
-                borderColor: 'divider',
-              }}
+              sx={{ p: 2 }}
             >
               <Typography
                 variant="h6"
@@ -886,13 +882,9 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
 
             {/* 서버 주소 섹션 */}
             <Paper
+              variant="outlined"
               elevation={0}
-              sx={{
-                p: 2,
-                bgcolor: 'background.default',
-                border: '1px solid',
-                borderColor: 'divider',
-              }}
+              sx={{ p: 2 }}
             >
               <Typography
                 variant="h6"
@@ -1025,13 +1017,9 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
 
             {/* 태그 섹션 (추가 설정 밖) */}
             <Paper
+              variant="outlined"
               elevation={0}
-              sx={{
-                p: 2,
-                bgcolor: 'background.default',
-                border: '1px solid',
-                borderColor: 'divider',
-              }}
+              sx={{ p: 2 }}
             >
               <Typography
                 variant="h6"
@@ -1117,11 +1105,8 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
             <Accordion
               defaultExpanded={false}
               disableGutters
-              sx={{
-                border: '1px solid',
-                borderColor: 'divider',
-                bgcolor: 'background.default',
-              }}
+              variant="outlined"
+              sx={{ mb: 2 }}
             >
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                 <Typography

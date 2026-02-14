@@ -455,8 +455,6 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({ open, onClose, onSa
           onChange={(_, expanded) => setBasicInfoExpanded(expanded)}
           sx={{
             mb: 1,
-            bgcolor: (theme) => (theme.palette.mode === 'dark' ? 'grey.900' : 'grey.50'),
-            '&:before': { display: 'none' },
           }}
         >
           <AccordionSummary
@@ -650,8 +648,6 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({ open, onClose, onSa
           onChange={(_, expanded) => setSequenceExpanded(expanded)}
           sx={{
             mb: 1,
-            bgcolor: (theme) => (theme.palette.mode === 'dark' ? 'grey.900' : 'grey.50'),
-            '&:before': { display: 'none' },
           }}
         >
           <AccordionSummary

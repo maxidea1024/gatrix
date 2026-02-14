@@ -77,6 +77,7 @@ export class ReleaseFlowService {
 
       await AuditLogModel.create({
         action: 'release_flow.template_create',
+        description: `Release flow template '${input.flowName}' created with ${input.milestones.length} milestone(s)`,
         resourceType: 'ReleaseFlow',
         resourceId: flow.id,
         userId,
@@ -157,9 +158,11 @@ export class ReleaseFlowService {
 
       await AuditLogModel.create({
         action: 'release_flow.apply_plan',
+        description: `Release flow template '${template.flowName}' applied to flag '${flagId}' in [${environment}]`,
         resourceType: 'ReleaseFlow',
         resourceId: plan.id,
         userId,
+        environment,
         newValues: { flagId, environment, templateId },
       });
 
@@ -246,9 +249,11 @@ export class ReleaseFlowService {
 
       await AuditLogModel.create({
         action: 'release_flow.start_milestone',
+        description: `Release flow milestone '${milestone.name}' started for plan '${plan.flowName}'`,
         resourceType: 'ReleaseFlow',
         resourceId: plan.id,
         userId,
+        environment: plan.environment,
         newValues: { milestoneId, milestoneName: milestone.name },
       });
 
@@ -307,9 +312,11 @@ export class ReleaseFlowService {
 
     await AuditLogModel.create({
       action: 'release_flow.pause_plan',
+      description: `Release flow plan '${plan.flowName}' paused`,
       resourceType: 'ReleaseFlow',
       resourceId: planId,
       userId,
+      environment: plan.environment,
     });
 
     return (await ReleaseFlowModel.findById(planId))!;
@@ -352,9 +359,11 @@ export class ReleaseFlowService {
 
     await AuditLogModel.create({
       action: 'release_flow.resume_plan',
+      description: `Release flow plan '${plan.flowName}' resumed`,
       resourceType: 'ReleaseFlow',
       resourceId: planId,
       userId,
+      environment: plan.environment,
     });
 
     return (await ReleaseFlowModel.findById(planId))!;
@@ -391,9 +400,11 @@ export class ReleaseFlowService {
 
       await AuditLogModel.create({
         action: 'release_flow.complete_plan',
+        description: `Release flow plan '${plan.flowName}' completed`,
         resourceType: 'ReleaseFlow',
         resourceId: planId,
         userId: userId || 0,
+        environment: plan.environment,
       });
 
       return (await ReleaseFlowModel.findById(planId))!;
@@ -430,6 +441,7 @@ export class ReleaseFlowService {
 
     await AuditLogModel.create({
       action: 'release_flow.set_transition',
+      description: `Transition condition set on milestone '${milestone.name}' (${transitionCondition.intervalMinutes}min interval)`,
       resourceType: 'ReleaseFlowMilestone',
       resourceId: milestoneId,
       userId,
@@ -457,6 +469,7 @@ export class ReleaseFlowService {
 
     await AuditLogModel.create({
       action: 'release_flow.remove_transition',
+      description: `Transition condition removed from milestone '${milestone.name}'`,
       resourceType: 'ReleaseFlowMilestone',
       resourceId: milestoneId,
       userId,
@@ -522,6 +535,7 @@ export class ReleaseFlowService {
 
       await AuditLogModel.create({
         action: 'release_flow.template_update',
+        description: `Release flow template '${input.flowName || existing.flowName}' updated`,
         resourceType: 'ReleaseFlow',
         resourceId: id,
         userId,
@@ -552,6 +566,7 @@ export class ReleaseFlowService {
 
     await AuditLogModel.create({
       action: 'release_flow.template_delete',
+      description: `Release flow template '${existing.flowName}' archived`,
       resourceType: 'ReleaseFlow',
       resourceId: id,
       userId,

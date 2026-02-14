@@ -443,7 +443,7 @@ const BannerPreview: React.FC<BannerPreviewProps> = ({
           width: '100%',
           height: '100%',
           minHeight: 150,
-          bgcolor: (theme) => (theme.palette.mode === 'dark' ? 'grey.800' : 'grey.200'),
+          bgcolor: 'action.hover',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
@@ -466,12 +466,12 @@ const BannerPreview: React.FC<BannerPreviewProps> = ({
     <Box
       ref={containerRef}
       sx={{
-        bgcolor: (theme) => (theme.palette.mode === 'dark' ? 'grey.900' : 'grey.100'),
+        bgcolor: 'background.paper',
         borderRadius: 2,
         py: 2,
         px: 3,
         border: 1,
-        borderColor: (theme) => (theme.palette.mode === 'dark' ? 'grey.700' : 'grey.300'),
+        borderColor: 'divider',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',

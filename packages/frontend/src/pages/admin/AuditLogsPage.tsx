@@ -217,6 +217,7 @@ const AuditLogsPage: React.FC = () => {
     { id: 'action', labelKey: 'auditLogs.action', visible: true },
     { id: 'resource', labelKey: 'auditLogs.resource', visible: true },
     { id: 'resourceId', labelKey: 'auditLogs.resourceId', visible: true },
+    { id: 'description', labelKey: 'auditLogs.description', visible: true },
     { id: 'ipAddress', labelKey: 'auditLogs.ipAddress', visible: true },
   ];
 
@@ -532,6 +533,21 @@ const AuditLogsPage: React.FC = () => {
             {log.ip_address || '-'}
           </Typography>
         );
+      case 'description':
+        return (
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{
+              maxWidth: 300,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {log.details?.description || log.details?.summary || '-'}
+          </Typography>
+        );
       default:
         return null;
     }
@@ -809,17 +825,17 @@ const AuditLogsPage: React.FC = () => {
                                   {((log as any).resourceType ||
                                     (log as any).resource_type ||
                                     (log as any).entityType) && (
-                                    <Chip
-                                      label={t(
-                                        `auditLogs.resources.${(log as any).resourceType || (log as any).resource_type || (log as any).entityType}`,
-                                        (log as any).resourceType ||
+                                      <Chip
+                                        label={t(
+                                          `auditLogs.resources.${(log as any).resourceType || (log as any).resource_type || (log as any).entityType}`,
+                                          (log as any).resourceType ||
                                           (log as any).resource_type ||
                                           (log as any).entityType
-                                      )}
-                                      variant="outlined"
-                                      size="small"
-                                    />
-                                  )}
+                                        )}
+                                        variant="outlined"
+                                        size="small"
+                                      />
+                                    )}
                                 </Box>
 
                                 {/* Detail Fields in OpenSearch Discovery Style */}
@@ -910,69 +926,69 @@ const AuditLogsPage: React.FC = () => {
                                   {((log as any).resourceId ||
                                     (log as any).resource_id ||
                                     (log as any).entityId) && (
-                                    <>
-                                      <Box>
-                                        <Typography
-                                          variant="caption"
-                                          color="text.secondary"
-                                          sx={{
-                                            fontWeight: 600,
-                                            textTransform: 'uppercase',
-                                            letterSpacing: 0.5,
-                                          }}
-                                        >
-                                          {t('auditLogs.resource')}
-                                        </Typography>
-                                        <Box sx={{ mt: 0.5 }}>
-                                          {(() => {
-                                            const oldVals =
-                                              (log as any).oldValues || (log as any).old_values;
-                                            const newVals =
-                                              (log as any).newValues || (log as any).new_values;
-                                            const resourceName =
-                                              oldVals?.name ||
-                                              newVals?.name ||
-                                              oldVals?.worldId ||
-                                              newVals?.worldId;
-                                            const resourceType =
-                                              (log as any).resourceType ||
-                                              (log as any).resource_type ||
-                                              (log as any).entityType;
-                                            const resourceId =
-                                              (log as any).resourceId ||
-                                              (log as any).resource_id ||
-                                              (log as any).entityId;
+                                      <>
+                                        <Box>
+                                          <Typography
+                                            variant="caption"
+                                            color="text.secondary"
+                                            sx={{
+                                              fontWeight: 600,
+                                              textTransform: 'uppercase',
+                                              letterSpacing: 0.5,
+                                            }}
+                                          >
+                                            {t('auditLogs.resource')}
+                                          </Typography>
+                                          <Box sx={{ mt: 0.5 }}>
+                                            {(() => {
+                                              const oldVals =
+                                                (log as any).oldValues || (log as any).old_values;
+                                              const newVals =
+                                                (log as any).newValues || (log as any).new_values;
+                                              const resourceName =
+                                                oldVals?.name ||
+                                                newVals?.name ||
+                                                oldVals?.worldId ||
+                                                newVals?.worldId;
+                                              const resourceType =
+                                                (log as any).resourceType ||
+                                                (log as any).resource_type ||
+                                                (log as any).entityType;
+                                              const resourceId =
+                                                (log as any).resourceId ||
+                                                (log as any).resource_id ||
+                                                (log as any).entityId;
 
-                                            return (
-                                              <>
-                                                {resourceName && (
+                                              return (
+                                                <>
+                                                  {resourceName && (
+                                                    <Typography
+                                                      variant="body1"
+                                                      sx={{
+                                                        fontWeight: 600,
+                                                        mb: 0.5,
+                                                      }}
+                                                    >
+                                                      {resourceName}
+                                                    </Typography>
+                                                  )}
                                                   <Typography
-                                                    variant="body1"
+                                                    variant="body2"
                                                     sx={{
-                                                      fontWeight: 600,
-                                                      mb: 0.5,
+                                                      fontFamily: 'monospace',
+                                                      color: 'text.secondary',
                                                     }}
                                                   >
-                                                    {resourceName}
+                                                    {resourceType} #{resourceId}
                                                   </Typography>
-                                                )}
-                                                <Typography
-                                                  variant="body2"
-                                                  sx={{
-                                                    fontFamily: 'monospace',
-                                                    color: 'text.secondary',
-                                                  }}
-                                                >
-                                                  {resourceType} #{resourceId}
-                                                </Typography>
-                                              </>
-                                            );
-                                          })()}
+                                                </>
+                                              );
+                                            })()}
+                                          </Box>
                                         </Box>
-                                      </Box>
-                                      <Divider />
-                                    </>
-                                  )}
+                                        <Divider />
+                                      </>
+                                    )}
 
                                   {/* IP Address */}
                                   <Box>

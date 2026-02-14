@@ -242,6 +242,12 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
             path: '/admin/whitelist',
             permission: 'security',
           },
+          {
+            text: 'sidebar.serviceAccounts',
+            icon: 'ManageAccounts',
+            path: '/admin/service-accounts',
+            permission: 'service-accounts',
+          },
         ],
       },
       {
@@ -482,6 +488,28 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
         icon: 'ShowChart',
         path: '/feature-flags/impact-metrics',
         permission: 'feature-flags',
+      },
+    ],
+  },
+
+  // Actions & Signals
+  {
+    id: 'actions-signals',
+    text: 'sidebar.actionsSignals',
+    icon: 'Sensors',
+    adminOnly: true,
+    children: [
+      {
+        text: 'sidebar.signalEndpoints',
+        icon: 'Sensors',
+        path: '/admin/signal-endpoints',
+        permission: 'signal-endpoints',
+      },
+      {
+        text: 'sidebar.actionSets',
+        icon: 'SmartToy',
+        path: '/admin/actions',
+        permission: 'actions',
       },
     ],
   },
