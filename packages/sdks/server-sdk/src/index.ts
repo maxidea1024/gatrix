@@ -41,6 +41,19 @@ export {
 } from './services/MetricsServer';
 export { createHttpMetricsMiddleware, HttpMetricsOptions } from './utils/httpMetrics';
 
+// Export Impact Metrics API
+export { MetricsAPI, ImpactMetricsStaticContext } from './impact-metrics/metric-api';
+export {
+  InMemoryMetricRegistry,
+  Counter,
+  Gauge,
+  Histogram,
+  CollectedMetric,
+  MetricLabels,
+  ImpactMetricRegistry,
+  ImpactMetricsDataSource,
+} from './impact-metrics/metric-types';
+
 // Export environment resolver
 export { EnvironmentResolver } from './utils/EnvironmentResolver';
 

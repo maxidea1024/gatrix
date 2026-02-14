@@ -82,6 +82,8 @@ import {
   Flag as FlagIcon,
   SportsEsports as JoystickIcon,
   Close as CloseIcon,
+  LibraryAdd as TemplateIcon,
+  Shield as ShieldIcon,
 } from '@mui/icons-material';
 import FieldTypeIcon from '../../components/common/FieldTypeIcon';
 import { useAuth } from '../../contexts/AuthContext';
@@ -135,6 +137,8 @@ import EnvironmentVariantsEditor, {
   Variant as EditorVariant,
 } from '../../components/features/EnvironmentVariantsEditor';
 import FeatureFlagAuditLogs from '../../components/features/FeatureFlagAuditLogs';
+import ReleaseFlowTab from '../../components/features/ReleaseFlowTab';
+import { useReleaseFlowPlansByFlag } from '../../hooks/useReleaseFlows';
 import FeatureFlagCodeReferences from '../../components/features/FeatureFlagCodeReferences';
 import PlaygroundDialog from '../../components/features/PlaygroundDialog';
 import ValidationRulesEditor from '../../components/features/ValidationRulesEditor';
@@ -358,13 +362,15 @@ const FeatureFlagDetailPage: React.FC = () => {
   const tabValue =
     tabParam === 'payload'
       ? 1
-      : tabParam === 'metrics'
+      : tabParam === 'release-flow'
         ? 2
-        : tabParam === 'code-references'
+        : tabParam === 'metrics'
           ? 3
-          : tabParam === 'history'
+          : tabParam === 'code-references'
             ? 4
-            : 0;
+            : tabParam === 'history'
+              ? 5
+              : 0;
 
   const setTabValue = (newValue: number) => {
     // Reset payload changes when leaving payload tab (tab 1)
@@ -384,10 +390,12 @@ const FeatureFlagDetailPage: React.FC = () => {
     if (newValue === 1) {
       newParams.set('tab', 'payload');
     } else if (newValue === 2) {
-      newParams.set('tab', 'metrics');
+      newParams.set('tab', 'release-flow');
     } else if (newValue === 3) {
-      newParams.set('tab', 'code-references');
+      newParams.set('tab', 'metrics');
     } else if (newValue === 4) {
+      newParams.set('tab', 'code-references');
+    } else if (newValue === 5) {
       newParams.set('tab', 'history');
     } else {
       newParams.delete('tab');
@@ -452,6 +460,10 @@ const FeatureFlagDetailPage: React.FC = () => {
   // Environment-specific variants - key is environment name, value is array of variants
   const [envVariants, setEnvVariants] = useState<Record<string, Variant[]>>({});
   const [codeReferenceCount, setCodeReferenceCount] = useState<number | null>(null);
+
+  // Release flow plan summaries - to detect environments managed by release flow
+  const { data: releaseFlowPlans } = useReleaseFlowPlansByFlag(flag?.id || null);
+  const releaseFlowEnvs = new Set((releaseFlowPlans || []).map((p) => p.environment));
 
   // Fetch code reference count on mount
   useEffect(() => {
@@ -1682,6 +1694,7 @@ const FeatureFlagDetailPage: React.FC = () => {
         <Tabs value={tabValue} onChange={(_, v) => setTabValue(v)}>
           <Tab label={t('featureFlags.overview')} />
           <Tab label={t('featureFlags.flagValues')} disabled={isCreating} />
+          <Tab label={t('releaseFlow.tabTitle')} disabled={isCreating} />
           <Tab label={t('featureFlags.metrics')} disabled={isCreating} />
           <Tab
             label={
@@ -2232,21 +2245,35 @@ const FeatureFlagDetailPage: React.FC = () => {
                                 <Typography variant="subtitle1" fontWeight={600}>
                                   {env.displayName}
                                 </Typography>
-                                {strategiesCount > 0 && (
-                                  <Typography
-                                    variant="caption"
+                                {releaseFlowEnvs.has(env.environment) ? (
+                                  <Chip
+                                    icon={<ShieldIcon sx={{ fontSize: 14 }} />}
+                                    label={t('releaseFlow.tabTitle')}
+                                    size="small"
+                                    color="primary"
+                                    variant="outlined"
                                     sx={{
-                                      px: 1,
-                                      py: 0.25,
-                                      bgcolor: 'action.hover',
-                                      borderRadius: '4px',
-                                      color: 'text.secondary',
+                                      height: 22,
+                                      '& .MuiChip-label': { px: 0.75, fontSize: '0.7rem' },
                                     }}
-                                  >
-                                    {t('featureFlags.strategiesCount', {
-                                      count: strategiesCount,
-                                    })}
-                                  </Typography>
+                                  />
+                                ) : (
+                                  strategiesCount > 0 && (
+                                    <Typography
+                                      variant="caption"
+                                      sx={{
+                                        px: 1,
+                                        py: 0.25,
+                                        bgcolor: 'action.hover',
+                                        borderRadius: '4px',
+                                        color: 'text.secondary',
+                                      }}
+                                    >
+                                      {t('featureFlags.strategiesCount', {
+                                        count: strategiesCount,
+                                      })}
+                                    </Typography>
+                                  )
                                 )}
                               </Box>
                             </Box>
@@ -2362,7 +2389,42 @@ const FeatureFlagDetailPage: React.FC = () => {
                           </AccordionSummary>
 
                           <AccordionDetails sx={{ px: 2, pt: 0, pb: 2 }}>
-                            {strategies.length === 0 ? (
+                            {releaseFlowEnvs.has(env.environment) ? (
+                              <Box
+                                sx={{
+                                  textAlign: 'center',
+                                  py: 3,
+                                  px: 3,
+                                  border: '2px dashed',
+                                  borderColor: 'primary.main',
+                                  borderRadius: '4px',
+                                  bgcolor: (theme) =>
+                                    theme.palette.mode === 'dark'
+                                      ? 'rgba(33, 150, 243, 0.08)'
+                                      : 'rgba(33, 150, 243, 0.04)',
+                                }}
+                              >
+                                <ShieldIcon sx={{ fontSize: 36, color: 'primary.main', mb: 1 }} />
+                                <Typography variant="body2" color="text.secondary" fontWeight={500}>
+                                  {t('releaseFlow.managedByReleaseFlow')}
+                                </Typography>
+                                <Typography
+                                  variant="caption"
+                                  color="text.secondary"
+                                  sx={{ display: 'block', mt: 0.5 }}
+                                >
+                                  {t('releaseFlow.managedByReleaseFlowDesc')}
+                                </Typography>
+                                <Button
+                                  size="small"
+                                  variant="outlined"
+                                  sx={{ mt: 1.5 }}
+                                  onClick={() => setTabValue(2)}
+                                >
+                                  {t('releaseFlow.goToReleaseFlow')}
+                                </Button>
+                              </Box>
+                            ) : strategies.length === 0 ? (
                               <>
                                 <EmptyPlaceholder
                                   message={t('featureFlags.noStrategiesTitle')}
@@ -3235,15 +3297,26 @@ const FeatureFlagDetailPage: React.FC = () => {
                                   </SortableContext>
                                 </DndContext>
 
-                                {/* Add strategy button */}
+                                {/* Add strategy / Use template buttons */}
                                 {canManage && (
                                   <Box
                                     sx={{
                                       display: 'flex',
                                       justifyContent: 'flex-end',
+                                      gap: 1,
                                       mt: 2,
                                     }}
                                   >
+                                    <Button
+                                      variant="outlined"
+                                      startIcon={<TemplateIcon />}
+                                      onClick={() => {
+                                        setTabValue(2);
+                                      }}
+                                      size="small"
+                                    >
+                                      {t('releaseFlow.useTemplate')}
+                                    </Button>
                                     <Button
                                       variant="contained"
                                       startIcon={<AddIcon />}
@@ -3563,8 +3636,21 @@ const FeatureFlagDetailPage: React.FC = () => {
         </Box>
       </TabPanel>
 
-      {/* Metrics Tab */}
+      {/* Release Flow Tab */}
       <TabPanel value={tabValue} index={2}>
+        <ReleaseFlowTab
+          flagId={flag.id}
+          flagName={flag.flagName}
+          environments={environments.map((e) => ({
+            environment: e.environment,
+            displayName: e.displayName,
+          }))}
+          canManage={canManage}
+        />
+      </TabPanel>
+
+      {/* Metrics Tab */}
+      <TabPanel value={tabValue} index={3}>
         <FeatureFlagMetrics
           flagName={flag.flagName}
           environments={(flag.environments || []).map((e) => ({
@@ -3574,13 +3660,13 @@ const FeatureFlagDetailPage: React.FC = () => {
           currentEnvironment={flag.environments?.[0]?.environment || 'production'}
         />
       </TabPanel>
-      <TabPanel value={tabValue} index={3}>
+      <TabPanel value={tabValue} index={4}>
         <FeatureFlagCodeReferences
           flagName={flag.flagName}
           onLoad={(count) => setCodeReferenceCount(count)}
         />
       </TabPanel>
-      <TabPanel value={tabValue} index={4}>
+      <TabPanel value={tabValue} index={5}>
         <FeatureFlagAuditLogs flagName={flag.flagName} />
       </TabPanel>
 

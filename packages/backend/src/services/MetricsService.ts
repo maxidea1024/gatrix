@@ -207,8 +207,21 @@ export const initMetrics = (app: express.Application): void => {
     const metricsPath = (config as any).monitoring?.metricsPath || '/metrics';
     app.get(metricsPath, async (_req, res) => {
       try {
+        // Merge impact metrics registry if available
+        const { impactMetricsService } = await import('./ImpactMetricsService');
+        const impactRegistry = impactMetricsService.getRegistry();
+
+        let metricsOutput = await register.metrics();
+
+        if (impactRegistry) {
+          const impactOutput = await impactRegistry.metrics();
+          if (impactOutput) {
+            metricsOutput += '\n' + impactOutput;
+          }
+        }
+
         res.set('Content-Type', register.contentType);
-        res.end(await register.metrics());
+        res.end(metricsOutput);
       } catch (error) {
         res.status(500).end(String(error));
       }

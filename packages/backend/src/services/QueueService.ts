@@ -582,6 +582,13 @@ export class QueueService {
           }
           break;
         }
+        case 'release-flow:progression-check': {
+          // Dynamic import to avoid circular dependency
+          const { ReleaseFlowScheduler } = await import('./releaseFlowScheduler');
+          await ReleaseFlowScheduler.getInstance().checkAndProgressMilestones();
+          logger.info('release-flow:progression-check completed', { jobId: job.id });
+          break;
+        }
         default: {
           logger.info('Unhandled scheduler job type, logging only', {
             jobId: job.id,

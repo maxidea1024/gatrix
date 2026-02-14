@@ -277,6 +277,15 @@ const startServer = async () => {
       );
     }
 
+    // Initialize Impact Metrics Service
+    try {
+      const { impactMetricsService } = await import('./services/ImpactMetricsService');
+      impactMetricsService.initialize();
+      logger.info('Impact Metrics Service initialized');
+    } catch (error) {
+      logger.warn('Failed to initialize Impact Metrics Service:', error);
+    }
+
     // Initialize system-defined KV items for all environments
     try {
       const { initializeAllSystemKV } = await import('./utils/systemKV');

@@ -42,6 +42,7 @@ import featureRoutes from './features';
 import platformDefaultsRoutes from './platformDefaults';
 import unknownFlagsRoutes from './unknownFlags';
 import integrationRoutes from './integrations';
+import releaseFlowRoutes from './releaseFlows';
 
 const router = express.Router();
 
@@ -292,6 +293,57 @@ router.use(
   '/integrations',
   requirePermission([PERMISSIONS.SECURITY_VIEW, PERMISSIONS.SECURITY_MANAGE]) as any,
   integrationRoutes
+);
+
+// Release Flows - requires feature-flags.view or feature-flags.manage permission
+router.use(
+  '/release-flows',
+  requirePermission([PERMISSIONS.FEATURE_FLAGS_VIEW, PERMISSIONS.FEATURE_FLAGS_MANAGE]) as any,
+  releaseFlowRoutes
+);
+
+// Impact Metrics (admin query endpoints for charts and safeguard evaluation)
+import ImpactMetricsController from '../../controllers/ImpactMetricsController';
+router.get(
+  '/impact-metrics/available',
+  requirePermission([PERMISSIONS.FEATURE_FLAGS_VIEW, PERMISSIONS.FEATURE_FLAGS_MANAGE]) as any,
+  ImpactMetricsController.getAvailableMetrics as any
+);
+router.get(
+  '/impact-metrics/labels',
+  requirePermission([PERMISSIONS.FEATURE_FLAGS_VIEW, PERMISSIONS.FEATURE_FLAGS_MANAGE]) as any,
+  ImpactMetricsController.getMetricLabels as any
+);
+router.get(
+  '/impact-metrics',
+  requirePermission([PERMISSIONS.FEATURE_FLAGS_VIEW, PERMISSIONS.FEATURE_FLAGS_MANAGE]) as any,
+  ImpactMetricsController.queryTimeSeries as any
+);
+// Impact Metric Chart Configs (CRUD)
+router.get(
+  '/impact-metrics/configs/:flagId',
+  requirePermission([PERMISSIONS.FEATURE_FLAGS_VIEW, PERMISSIONS.FEATURE_FLAGS_MANAGE]) as any,
+  ImpactMetricsController.getConfigs.bind(ImpactMetricsController) as any
+);
+router.post(
+  '/impact-metrics/configs',
+  requirePermission([PERMISSIONS.FEATURE_FLAGS_MANAGE]) as any,
+  ImpactMetricsController.createConfig.bind(ImpactMetricsController) as any
+);
+router.put(
+  '/impact-metrics/configs/layouts',
+  requirePermission([PERMISSIONS.FEATURE_FLAGS_MANAGE]) as any,
+  ImpactMetricsController.updateLayouts.bind(ImpactMetricsController) as any
+);
+router.put(
+  '/impact-metrics/configs/:id',
+  requirePermission([PERMISSIONS.FEATURE_FLAGS_MANAGE]) as any,
+  ImpactMetricsController.updateConfig.bind(ImpactMetricsController) as any
+);
+router.delete(
+  '/impact-metrics/configs/:id',
+  requirePermission([PERMISSIONS.FEATURE_FLAGS_MANAGE]) as any,
+  ImpactMetricsController.deleteConfig.bind(ImpactMetricsController) as any
 );
 
 export default router;

@@ -442,6 +442,12 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
         permission: 'feature-flags',
       },
       {
+        text: 'releaseFlow.templates',
+        icon: 'Layers',
+        path: '/feature-flags/templates',
+        permission: 'feature-flags',
+      },
+      {
         text: 'sidebar.featureSegments',
         icon: 'People',
         path: '/feature-flags/segments',
@@ -469,6 +475,12 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
         text: 'sidebar.unknownFlags',
         icon: 'HelpOutline',
         path: '/feature-flags/unknown',
+        permission: 'feature-flags',
+      },
+      {
+        text: 'sidebar.impactMetrics',
+        icon: 'ShowChart',
+        path: '/feature-flags/impact-metrics',
         permission: 'feature-flags',
       },
     ],
