@@ -22,10 +22,12 @@ export interface Safeguard {
   flowId: string;
   milestoneId: string;
   metricName: string;
+  displayName: string | null;
   aggregationMode: string; // rps, count, avg, sum, p50, p95, p99
   operator: string; // > or <
   threshold: number;
-  timeRange: string; // hour, day, week, month
+  timeRangeMinutes: number; // time range in minutes
+  labelFilters: Record<string, string> | null; // label-based filtering
   action: string; // pause
   isTriggered: boolean;
   triggeredAt: string | null;
@@ -37,19 +39,23 @@ export interface CreateSafeguardInput {
   flowId: string;
   milestoneId: string;
   metricName: string;
+  displayName?: string;
   aggregationMode?: string;
   operator?: string;
   threshold: number;
-  timeRange?: string;
+  timeRangeMinutes?: number;
+  labelFilters?: Record<string, string>;
   action?: string;
 }
 
 export interface UpdateSafeguardInput {
   metricName?: string;
+  displayName?: string | null;
   aggregationMode?: string;
   operator?: string;
   threshold?: number;
-  timeRange?: string;
+  timeRangeMinutes?: number;
+  labelFilters?: Record<string, string> | null;
   action?: string;
 }
 
@@ -75,15 +81,17 @@ class SafeguardService {
    */
   async create(input: CreateSafeguardInput): Promise<Safeguard> {
     const id = ulid();
-    const safeguard = {
+    const safeguard: Record<string, any> = {
       id,
       flowId: input.flowId,
       milestoneId: input.milestoneId,
       metricName: input.metricName,
+      displayName: input.displayName || null,
       aggregationMode: input.aggregationMode || 'count',
       operator: input.operator || '>',
       threshold: input.threshold,
-      timeRange: input.timeRange || 'hour',
+      timeRangeMinutes: input.timeRangeMinutes || 60,
+      labelFilters: input.labelFilters ? JSON.stringify(input.labelFilters) : null,
       action: input.action || 'pause',
       isTriggered: false,
       triggeredAt: null,
@@ -132,7 +140,14 @@ class SafeguardService {
       return null;
     }
 
-    await db(TABLE_NAME).where({ id }).update(input);
+    const updateData: Record<string, any> = { ...input };
+    if (updateData.labelFilters !== undefined) {
+      updateData.labelFilters = updateData.labelFilters
+        ? JSON.stringify(updateData.labelFilters)
+        : null;
+    }
+
+    await db(TABLE_NAME).where({ id }).update(updateData);
 
     logger.info('[Safeguard] Updated safeguard', { id, ...input });
 
@@ -226,11 +241,13 @@ class SafeguardService {
    */
   private async evaluateSingleSafeguard(safeguard: Safeguard): Promise<SafeguardEvaluationResult> {
     try {
+      // Convert minutes to time range string for Prometheus query
+      const timeRangeStr = this.minutesToPromRange(safeguard.timeRangeMinutes);
       const currentValue = await impactMetricsService.queryInstant(
         safeguard.metricName,
         safeguard.aggregationMode,
-        undefined, // no label selectors for now
-        safeguard.timeRange
+        safeguard.labelFilters || undefined,
+        timeRangeStr
       );
 
       if (currentValue === null) {
@@ -271,6 +288,16 @@ class SafeguardService {
         error: error.message,
       };
     }
+  }
+
+  /**
+   * Convert minutes to Prometheus-compatible time range string
+   */
+  private minutesToPromRange(minutes: number): string {
+    if (minutes <= 0) return 'hour';
+    if (minutes < 60) return `${minutes}m`;
+    if (minutes < 1440) return `${Math.round(minutes / 60)}h`;
+    return `${Math.round(minutes / 1440)}d`;
   }
 
   /**

@@ -6,10 +6,6 @@ import {
   Button,
   Stack,
   Chip,
-  Stepper,
-  Step,
-  StepLabel,
-  StepContent,
   CircularProgress,
   Card,
   CardContent,
@@ -40,6 +36,9 @@ import {
   Timer as TimerIcon,
   Close as CloseIcon,
   Add as AddIcon,
+  CheckCircle as CompletedIcon,
+  ArrowDownward as ArrowDownIcon,
+  HelpOutline as HelpOutlineIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -165,6 +164,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
   const [jumpConfirmOpen, setJumpConfirmOpen] = useState(false);
   const [targetMilestoneId, setTargetMilestoneId] = useState<string | null>(null);
   const [safeguardExpanded, setSafeguardExpanded] = useState(false);
+  const [flowExpanded, setFlowExpanded] = useState(true);
 
   // Transition editing state: tracks which milestone is being edited
   const [editingTransitionId, setEditingTransitionId] = useState<string | null>(null);
@@ -351,133 +351,40 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
 
   // ==================== Render Helpers ====================
 
-  /** Step icon for each milestone */
-  const renderStepIcon = (index: number) => {
-    if (index !== currentMilestoneIndex) return undefined;
-
-    if (isActive) {
-      return () => (
-        <Box
-          sx={{
-            position: 'relative',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: 24,
-            height: 24,
-          }}
-        >
-          <CircularProgress
-            variant="indeterminate"
-            size={40}
-            thickness={3}
-            sx={{
-              position: 'absolute',
-              color: 'primary.main',
-              opacity: 0.6,
-              left: '50%',
-              top: '50%',
-              marginLeft: '-20px',
-              marginTop: '-20px',
-            }}
-          />
-          <Box
-            sx={{
-              bgcolor: 'primary.main',
-              color: 'white',
-              width: 24,
-              height: 24,
-              borderRadius: '50%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '0.75rem',
-              fontWeight: 'bold',
-              zIndex: 1,
-              boxShadow: '0 0 6px rgba(25, 118, 210, 0.6)',
-            }}
-          >
-            {index + 1}
-          </Box>
-        </Box>
-      );
+  /** Get milestone visual status */
+  const getMilestoneStatus = (index: number): 'completed' | 'active' | 'paused' | 'pending' => {
+    if (isCompleted || index < currentMilestoneIndex) return 'completed';
+    if (index === currentMilestoneIndex) {
+      if (isPaused) return 'paused';
+      return 'active';
     }
-
-    if (isPaused) {
-      return () => (
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: 24,
-            height: 24,
-          }}
-        >
-          <Box
-            sx={{
-              bgcolor: 'warning.main',
-              color: 'white',
-              width: 24,
-              height: 24,
-              borderRadius: '50%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              zIndex: 1,
-              boxShadow: '0 0 4px rgba(237, 108, 2, 0.5)',
-            }}
-          >
-            <PauseIcon sx={{ fontSize: '0.9rem' }} />
-          </Box>
-        </Box>
-      );
-    }
-
-    return undefined;
+    return 'pending';
   };
 
   /** Controls for each milestone row */
   const renderMilestoneControls = (milestoneId: string, index: number) => {
     if (!canManage || isCompleted) return null;
 
+    // Active milestone: only show pause button (resume is handled by re-enabling env)
     if (index === currentMilestoneIndex) {
+      // No pause on last milestone (nothing to transition to) or when already paused
+      if (isPaused || index >= milestones.length - 1) return null;
       return (
-        <Box sx={{ display: 'flex', gap: 1, flexShrink: 0 }}>
-          {isPaused ? (
-            <Tooltip title={!envEnabled ? t('releaseFlow.envDisabledWarning') : ''}>
-              <span>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  size="small"
-                  onClick={handleResume}
-                  startIcon={
-                    actionLoading ? <CircularProgress size={14} color="inherit" /> : <StartIcon />
-                  }
-                  disabled={actionLoading || !envEnabled}
-                >
-                  {t('releaseFlow.resume')}
-                </Button>
-              </span>
-            </Tooltip>
-          ) : (
-            <Button
-              variant="outlined"
-              color="warning"
-              size="small"
-              onClick={handlePause}
-              startIcon={
-                actionLoading ? <CircularProgress size={14} color="inherit" /> : <PauseIcon />
-              }
-              disabled={actionLoading}
-            >
-              {t('releaseFlow.pause')}
-            </Button>
-          )}
-        </Box>
+        <Button
+          variant="outlined"
+          color="warning"
+          size="small"
+          onClick={handlePause}
+          startIcon={actionLoading ? <CircularProgress size={14} color="inherit" /> : <PauseIcon />}
+          disabled={actionLoading}
+        >
+          {t('releaseFlow.pause')}
+        </Button>
       );
     }
+
+    // Other milestones: show "jump to" only when env is NOT enabled
+    if (envEnabled) return null;
 
     return (
       <Button
@@ -494,123 +401,140 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
     );
   };
 
-  /** Transition row between milestones */
-  const renderTransitionRow = (milestone: any, index: number) => {
-    if (index >= milestones.length - 1) return null; // No transition after last milestone
+  /** Connector + transition info between milestone cards */
+  const renderMilestoneConnector = (milestone: any, index: number) => {
+    if (index >= milestones.length - 1) return null;
 
     const hasTransition = !!milestone.transitionCondition?.intervalMinutes;
     const intervalMinutes = milestone.transitionCondition?.intervalMinutes || 0;
     const isEditing = editingTransitionId === milestone.id;
-    const nextMilestone = milestones[index + 1];
 
     // Is this the currently active milestone?
     const isCurrentActive = index === currentMilestoneIndex && (isActive || isPaused);
+    const status = getMilestoneStatus(index);
+    const lineColor = status === 'completed' ? 'success.main' : 'divider';
 
-    // Calculate scheduled time
+    // Estimated scheduled time
     const scheduledTime =
       isCurrentActive && hasTransition && milestone.startedAt
         ? getScheduledTime(milestone.startedAt, intervalMinutes)
         : null;
-    const now = new Date();
-    const isScheduledInFuture = scheduledTime && scheduledTime > now;
+    const isScheduledInFuture = scheduledTime && scheduledTime > new Date();
 
     return (
-      <Box
-        sx={{
-          ml: 1.5,
-          pl: 3,
-          py: 0.75,
-          borderLeft: 2,
-          borderColor: 'divider',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 1,
-          minHeight: 32,
-        }}
-      >
-        {isEditing ? (
-          /* ---- Editing mode: value + unit + save/cancel ---- */
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <TimerIcon sx={{ fontSize: 16, color: 'primary.main' }} />
-            <Typography variant="caption" color="text.secondary" sx={{ whiteSpace: 'nowrap' }}>
-              {t('releaseFlow.proceedAfter')}
-            </Typography>
-            <TextField
-              type="number"
+      <Box sx={{ display: 'flex', alignItems: 'stretch', py: 0 }}>
+        {/* Vertical connector line */}
+        <Box
+          sx={{
+            width: 40,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            flexShrink: 0,
+          }}
+        >
+          <Box sx={{ width: 2, flexGrow: 1, bgcolor: lineColor, minHeight: 16 }} />
+          <ArrowDownIcon sx={{ fontSize: 16, color: lineColor, my: -0.25 }} />
+          <Box sx={{ width: 2, flexGrow: 1, bgcolor: lineColor, minHeight: 16 }} />
+        </Box>
+
+        {/* Transition content */}
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+            py: 0.5,
+            pl: 1,
+          }}
+        >
+          {isEditing ? (
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <TimerIcon sx={{ fontSize: 16, color: 'primary.main' }} />
+              <Typography variant="caption" color="text.secondary" sx={{ whiteSpace: 'nowrap' }}>
+                {t('releaseFlow.proceedAfter')}
+              </Typography>
+              <TextField
+                type="number"
+                size="small"
+                value={transitionValue}
+                onChange={(e) => setTransitionValue(Math.max(1, parseInt(e.target.value) || 1))}
+                inputProps={{
+                  min: 1,
+                  style: { width: 50, padding: '4px 8px', fontSize: '0.8rem' },
+                }}
+                sx={{ '& .MuiOutlinedInput-root': { height: 28 } }}
+              />
+              <Select
+                size="small"
+                value={transitionUnit}
+                onChange={(e) => setTransitionUnit(e.target.value as TimeUnit)}
+                sx={{ height: 28, fontSize: '0.8rem', minWidth: 80 }}
+              >
+                <MenuItem value="minutes">{t('releaseFlow.unitMinutes')}</MenuItem>
+                <MenuItem value="hours">{t('releaseFlow.unitHours')}</MenuItem>
+                <MenuItem value="days">{t('releaseFlow.unitDays')}</MenuItem>
+              </Select>
+              <Button
+                size="small"
+                variant="contained"
+                onClick={handleSaveTransition}
+                disabled={transitionSaving || transitionValue <= 0}
+                sx={{ minWidth: 0, px: 1.5, height: 28, fontSize: '0.75rem' }}
+              >
+                {transitionSaving ? <CircularProgress size={14} /> : t('common.save')}
+              </Button>
+              <IconButton
+                size="small"
+                onClick={() => setEditingTransitionId(null)}
+                disabled={transitionSaving}
+              >
+                <CloseIcon sx={{ fontSize: 16 }} />
+              </IconButton>
+            </Box>
+          ) : hasTransition ? (
+            <Chip
+              icon={<TimerIcon sx={{ fontSize: 14 }} />}
+              label={formatTransitionInterval(intervalMinutes, t)}
               size="small"
-              value={transitionValue}
-              onChange={(e) => setTransitionValue(Math.max(1, parseInt(e.target.value) || 1))}
-              inputProps={{ min: 1, style: { width: 50, padding: '4px 8px', fontSize: '0.8rem' } }}
-              sx={{ '& .MuiOutlinedInput-root': { height: 28 } }}
+              variant="outlined"
+              color="primary"
+              sx={{ height: 24, '& .MuiChip-label': { fontSize: '0.75rem' } }}
+              onClick={
+                canManage && !isCompleted && !envEnabled
+                  ? () => handleOpenTransitionEdit(milestone.id, intervalMinutes)
+                  : undefined
+              }
+              onDelete={
+                canManage && !isCompleted && !envEnabled
+                  ? () => handleRemoveTransition(milestone.id)
+                  : undefined
+              }
             />
-            <Select
-              size="small"
-              value={transitionUnit}
-              onChange={(e) => setTransitionUnit(e.target.value as TimeUnit)}
-              sx={{ height: 28, fontSize: '0.8rem', minWidth: 80 }}
-            >
-              <MenuItem value="minutes">{t('releaseFlow.unitMinutes')}</MenuItem>
-              <MenuItem value="hours">{t('releaseFlow.unitHours')}</MenuItem>
-              <MenuItem value="days">{t('releaseFlow.unitDays')}</MenuItem>
-            </Select>
-            <Button
-              size="small"
-              variant="contained"
-              onClick={handleSaveTransition}
-              disabled={transitionSaving || transitionValue <= 0}
-              sx={{ minWidth: 0, px: 1.5, height: 28, fontSize: '0.75rem' }}
-            >
-              {transitionSaving ? <CircularProgress size={14} /> : t('common.save')}
-            </Button>
-            <IconButton
-              size="small"
-              onClick={() => setEditingTransitionId(null)}
-              disabled={transitionSaving}
-            >
-              <CloseIcon sx={{ fontSize: 16 }} />
-            </IconButton>
-          </Box>
-        ) : hasTransition ? (
-          /* ---- Display mode: show interval chip ---- */
-          <Chip
-            icon={<TimerIcon sx={{ fontSize: 14 }} />}
-            label={formatTransitionInterval(intervalMinutes, t)}
-            size="small"
-            variant="outlined"
-            color="primary"
-            sx={{ height: 24, '& .MuiChip-label': { fontSize: '0.75rem' } }}
-            onClick={
-              canManage && !isCompleted
-                ? () => handleOpenTransitionEdit(milestone.id, intervalMinutes)
-                : undefined
-            }
-            onDelete={
-              canManage && !isCompleted ? () => handleRemoveTransition(milestone.id) : undefined
-            }
-          />
-        ) : (
-          /* ---- No transition: show add button ---- */
-          canManage &&
-          !isCompleted && (
-            <Link
-              component="button"
-              variant="caption"
-              color="text.secondary"
-              underline="hover"
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 0.5,
-                cursor: 'pointer',
-                '&:hover': { color: 'primary.main' },
-              }}
-              onClick={() => handleOpenTransitionEdit(milestone.id)}
-            >
-              <AddIcon sx={{ fontSize: 14 }} />
-              {t('releaseFlow.addTransition')}
-            </Link>
-          )
-        )}
+          ) : (
+            canManage &&
+            !isCompleted &&
+            !envEnabled && (
+              <Link
+                component="button"
+                variant="caption"
+                color="text.secondary"
+                underline="hover"
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 0.5,
+                  cursor: 'pointer',
+                  '&:hover': { color: 'primary.main' },
+                }}
+                onClick={() => handleOpenTransitionEdit(milestone.id)}
+              >
+                <AddIcon sx={{ fontSize: 14 }} />
+                {t('releaseFlow.addTransition')}
+              </Link>
+            )
+          )}
+        </Box>
       </Box>
     );
   };
@@ -693,12 +617,19 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                 px: 2.5,
                 py: 1.5,
                 bgcolor: 'action.hover',
-                borderBottom: 1,
+                borderBottom: flowExpanded ? 1 : 0,
                 borderColor: 'divider',
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
+                cursor: 'pointer',
+                '&:hover': {
+                  bgcolor: (theme) =>
+                    theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)',
+                },
+                transition: 'background-color 0.15s',
               }}
+              onClick={() => setFlowExpanded(!flowExpanded)}
             >
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                 <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
@@ -734,7 +665,10 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                         size="small"
                         variant="outlined"
                         color="inherit"
-                        onClick={() => setShowApplyDialog(true)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowApplyDialog(true);
+                        }}
                         disabled={envEnabled || applying}
                         startIcon={<AdvanceIcon fontSize="small" />}
                         sx={{ ml: 1, fontSize: '0.75rem' }}
@@ -744,199 +678,308 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                     </span>
                   </Tooltip>
                 )}
+                <IconButton size="small" tabIndex={-1} sx={{ ml: 0.5 }}>
+                  {flowExpanded ? (
+                    <ExpandLessIcon fontSize="small" />
+                  ) : (
+                    <ExpandMoreIcon fontSize="small" />
+                  )}
+                </IconButton>
               </Box>
             </Box>
 
-            {/* ---- Safeguard Section (flow-level, collapsible) ---- */}
-            {safeguardMilestoneId && (
-              <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                <Box
-                  sx={{
-                    px: 2.5,
-                    py: 1,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    cursor: 'pointer',
-                    '&:hover': { bgcolor: 'action.hover' },
-                    transition: 'background-color 0.15s',
-                  }}
-                  onClick={() => setSafeguardExpanded(!safeguardExpanded)}
-                >
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <ShieldIcon fontSize="small" color="primary" />
-                    <Typography variant="subtitle2">{t('releaseFlow.safeguards')}</Typography>
-                  </Box>
-                  <IconButton size="small" tabIndex={-1}>
-                    {safeguardExpanded ? (
-                      <ExpandLessIcon fontSize="small" />
-                    ) : (
-                      <ExpandMoreIcon fontSize="small" />
-                    )}
-                  </IconButton>
-                </Box>
-                <Collapse in={safeguardExpanded}>
-                  <Box sx={{ px: 2.5, pb: 2 }}>
-                    <SafeguardPanel
-                      flowId={plan.id}
-                      milestoneId={safeguardMilestoneId}
-                      canManage={canManage}
-                      hideHeader
-                    />
-                  </Box>
-                </Collapse>
-              </Box>
-            )}
-
-            {/* ---- Milestone Stepper ---- */}
-            <CardContent sx={{ p: 2.5 }}>
-              <Stepper
-                activeStep={
-                  currentMilestoneIndex === -1 && isCompleted
-                    ? milestones.length
-                    : currentMilestoneIndex
-                }
-                orientation="vertical"
-              >
-                {milestones.map((milestone, index) => (
-                  <Step key={milestone.id} expanded>
-                    <StepLabel
-                      StepIconComponent={renderStepIcon(index)}
-                      optional={(() => {
-                        // Show started time for already started milestones
-                        if (
-                          milestone.startedAt &&
-                          (isCompleted || index <= currentMilestoneIndex)
-                        ) {
-                          return (
-                            <Typography variant="caption" color="text.secondary">
-                              {t('common.started')}: {formatRelativeTime(milestone.startedAt)}
-                            </Typography>
-                          );
-                        }
-
-                        // Show estimated start time for the NEXT milestone after current active one
-                        if (
-                          index > 0 &&
-                          index === currentMilestoneIndex + 1 &&
-                          (isActive || isPaused) &&
-                          !isCompleted
-                        ) {
-                          const prevMilestone = milestones[index - 1];
-                          const interval = prevMilestone.transitionCondition?.intervalMinutes;
-                          if (interval && prevMilestone.startedAt) {
-                            const scheduled = getScheduledTime(prevMilestone.startedAt, interval);
-                            if (scheduled && scheduled > new Date()) {
-                              return (
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                  <ScheduleIcon sx={{ fontSize: 13, color: 'info.main' }} />
-                                  <Typography
-                                    variant="caption"
-                                    color="info.main"
-                                    sx={{ fontWeight: 600 }}
-                                  >
-                                    {t('releaseFlow.estimatedStart')}:{' '}
-                                    {formatScheduledTime(scheduled)}
-                                  </Typography>
-                                  {canManage && (
-                                    <Link
-                                      component="button"
-                                      variant="caption"
-                                      color="primary"
-                                      underline="hover"
-                                      sx={{ fontWeight: 600, cursor: 'pointer', ml: 0.5 }}
-                                      onClick={() => handleStartMilestoneClick(milestone.id)}
-                                    >
-                                      {t('releaseFlow.startNow')}
-                                    </Link>
-                                  )}
-                                </Box>
-                              );
-                            }
-                          }
-                        }
-
-                        return undefined;
-                      })()}
-                      sx={{ '& .MuiStepLabel-label': { width: '100%' } }}
-                    >
-                      <Box
-                        sx={{
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                          width: '100%',
+            <Collapse in={flowExpanded}>
+              {/* ---- Safeguard Section (flow-level, collapsible) ---- */}
+              {safeguardMilestoneId && (
+                <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                  <Box
+                    sx={{
+                      px: 2.5,
+                      py: 1,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      cursor: 'pointer',
+                      '&:hover': { bgcolor: 'action.hover' },
+                      transition: 'background-color 0.15s',
+                    }}
+                    onClick={() => setSafeguardExpanded(!safeguardExpanded)}
+                  >
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <ShieldIcon fontSize="small" color="primary" />
+                      <Typography variant="subtitle2">{t('releaseFlow.safeguards')}</Typography>
+                      <Tooltip
+                        title={t('releaseFlow.safeguard.helpTooltip')}
+                        arrow
+                        placement="right"
+                        slotProps={{
+                          tooltip: {
+                            sx: { maxWidth: 360, whiteSpace: 'pre-line', fontSize: '0.8rem' },
+                          },
                         }}
                       >
-                        <Typography
-                          variant="subtitle2"
-                          fontWeight={index === currentMilestoneIndex ? 700 : 400}
-                          color={
-                            index === currentMilestoneIndex ? 'text.primary' : 'text.secondary'
-                          }
-                        >
-                          {milestone.name}
-                        </Typography>
-
-                        <Box onClick={(e: React.MouseEvent) => e.stopPropagation()} sx={{ ml: 2 }}>
-                          {renderMilestoneControls(milestone.id, index)}
-                        </Box>
-                      </Box>
-                    </StepLabel>
-
-                    <StepContent>
-                      {milestone.description && (
-                        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                          {milestone.description}
-                        </Typography>
+                        <HelpOutlineIcon
+                          sx={{ color: 'text.secondary', cursor: 'help', fontSize: 16 }}
+                          onClick={(e: React.MouseEvent) => e.stopPropagation()}
+                        />
+                      </Tooltip>
+                    </Box>
+                    <IconButton size="small" tabIndex={-1}>
+                      {safeguardExpanded ? (
+                        <ExpandLessIcon fontSize="small" />
+                      ) : (
+                        <ExpandMoreIcon fontSize="small" />
                       )}
+                    </IconButton>
+                  </Box>
+                  <Collapse in={safeguardExpanded}>
+                    <Box sx={{ px: 2.5, pb: 2 }}>
+                      <SafeguardPanel
+                        flowId={plan.id}
+                        milestoneId={safeguardMilestoneId}
+                        canManage={canManage}
+                        hideHeader
+                      />
+                    </Box>
+                  </Collapse>
+                </Box>
+              )}
 
-                      {/* Strategies */}
-                      <Box sx={{ mb: 1, pl: 1.5, borderLeft: 2, borderColor: 'divider' }}>
-                        <Typography
-                          variant="caption"
-                          fontWeight={600}
-                          display="block"
-                          sx={{ mb: 0.5 }}
+              {/* ---- Milestone Cards ---- */}
+              <CardContent sx={{ p: 2.5 }}>
+                {milestones.map((milestone, index) => {
+                  const status = getMilestoneStatus(index);
+                  const borderColorMap = {
+                    completed: 'success.main',
+                    active: 'primary.main',
+                    paused: 'warning.main',
+                    pending: 'grey.300',
+                  };
+                  const bgMap = {
+                    completed: 'success.main',
+                    active: 'primary.main',
+                    paused: 'warning.main',
+                    pending: 'grey.400',
+                  };
+
+                  return (
+                    <React.Fragment key={milestone.id}>
+                      {/* Milestone Card */}
+                      <Paper
+                        variant="outlined"
+                        sx={{
+                          borderLeft: 4,
+                          borderLeftColor: borderColorMap[status],
+                          borderRadius: 2,
+                          overflow: 'hidden',
+                          transition: 'all 0.2s',
+                          ...(status === 'active' && {
+                            boxShadow: '0 2px 8px rgba(25, 118, 210, 0.15)',
+                          }),
+                          ...(status === 'paused' && {
+                            boxShadow: '0 2px 8px rgba(237, 108, 2, 0.12)',
+                          }),
+                        }}
+                      >
+                        {/* Card Header */}
+                        <Box
+                          sx={{
+                            px: 2,
+                            py: 1.25,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            bgcolor:
+                              status === 'active' || status === 'paused'
+                                ? (theme) =>
+                                    theme.palette.mode === 'dark'
+                                      ? 'rgba(255,255,255,0.03)'
+                                      : 'rgba(0,0,0,0.015)'
+                                : 'transparent',
+                          }}
                         >
-                          {t('releaseFlow.appliedStrategies')}
-                        </Typography>
-                        {milestone.strategies?.map((strategy, sIdx) => (
                           <Box
-                            key={sIdx}
-                            sx={{ mb: sIdx < (milestone.strategies?.length || 0) - 1 ? 1.5 : 0 }}
+                            sx={{ display: 'flex', alignItems: 'center', gap: 1.5, minWidth: 0 }}
                           >
-                            <StrategyDetail
-                              strategyName={strategy.strategyName}
-                              parameters={strategy.parameters}
-                              constraints={strategy.constraints}
-                              segments={strategy.segments}
-                              allSegments={allSegments}
-                              contextFields={contextFields}
-                            />
-                            {sIdx < (milestone.strategies?.length || 0) - 1 && (
-                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1 }}>
-                                <Divider sx={{ flexGrow: 1, borderStyle: 'dashed' }} />
-                                <Chip
-                                  label="OR"
-                                  size="small"
-                                  variant="outlined"
-                                  sx={{ height: 16, fontSize: '0.6rem', opacity: 0.5 }}
+                            {/* Step number badge */}
+                            <Box
+                              sx={{
+                                position: 'relative',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                flexShrink: 0,
+                              }}
+                            >
+                              {status === 'active' && (
+                                <CircularProgress
+                                  variant="indeterminate"
+                                  size={32}
+                                  thickness={2.5}
+                                  sx={{
+                                    position: 'absolute',
+                                    color: 'primary.main',
+                                    opacity: 0.5,
+                                  }}
                                 />
-                                <Divider sx={{ flexGrow: 1, borderStyle: 'dashed' }} />
-                              </Box>
-                            )}
-                          </Box>
-                        ))}
-                      </Box>
-                    </StepContent>
+                              )}
+                              {status === 'completed' ? (
+                                <CompletedIcon sx={{ fontSize: 24, color: 'success.main' }} />
+                              ) : (
+                                <Box
+                                  sx={{
+                                    bgcolor: bgMap[status],
+                                    color: 'white',
+                                    width: 24,
+                                    height: 24,
+                                    borderRadius: '50%',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    fontSize: '0.75rem',
+                                    fontWeight: 'bold',
+                                  }}
+                                >
+                                  {status === 'paused' ? (
+                                    <PauseIcon sx={{ fontSize: '0.85rem' }} />
+                                  ) : (
+                                    index + 1
+                                  )}
+                                </Box>
+                              )}
+                            </Box>
 
-                    {/* Transition row between milestones */}
-                    {renderTransitionRow(milestone, index)}
-                  </Step>
-                ))}
-              </Stepper>
-            </CardContent>
+                            <Box sx={{ minWidth: 0 }}>
+                              <Typography
+                                variant="subtitle2"
+                                fontWeight={status === 'active' || status === 'paused' ? 700 : 500}
+                                color={status === 'pending' ? 'text.secondary' : 'text.primary'}
+                                noWrap
+                              >
+                                {milestone.name}
+                              </Typography>
+                              {milestone.startedAt &&
+                                (isCompleted || index <= currentMilestoneIndex) && (
+                                  <Typography variant="caption" color="text.secondary">
+                                    {t('common.started')}: {formatRelativeTime(milestone.startedAt)}
+                                  </Typography>
+                                )}
+                              {/* Estimated start time for next-up milestone */}
+                              {(() => {
+                                if (index <= 0 || status !== 'pending') return null;
+                                const prevMilestone = milestones[index - 1];
+                                const prevInterval =
+                                  prevMilestone?.transitionCondition?.intervalMinutes;
+                                if (!prevInterval || !prevMilestone.startedAt) return null;
+                                const prevStatus = getMilestoneStatus(index - 1);
+                                if (prevStatus !== 'active' && prevStatus !== 'paused') return null;
+                                const scheduled = getScheduledTime(
+                                  prevMilestone.startedAt,
+                                  prevInterval
+                                );
+                                if (!scheduled || scheduled <= new Date()) return null;
+                                return (
+                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                    <ScheduleIcon sx={{ fontSize: 13, color: 'info.main' }} />
+                                    <Typography
+                                      variant="caption"
+                                      color="info.main"
+                                      sx={{ fontWeight: 600 }}
+                                    >
+                                      {t('releaseFlow.estimatedStart')}:{' '}
+                                      {formatScheduledTime(scheduled)}
+                                    </Typography>
+                                    {canManage && (
+                                      <Link
+                                        component="button"
+                                        variant="caption"
+                                        color="primary"
+                                        underline="hover"
+                                        sx={{ fontWeight: 600, cursor: 'pointer', ml: 0.5 }}
+                                        onClick={() => handleStartMilestoneClick(milestone.id)}
+                                      >
+                                        {t('releaseFlow.startNow')}
+                                      </Link>
+                                    )}
+                                  </Box>
+                                );
+                              })()}
+                            </Box>
+                          </Box>
+
+                          <Box
+                            onClick={(e: React.MouseEvent) => e.stopPropagation()}
+                            sx={{ ml: 2, flexShrink: 0 }}
+                          >
+                            {renderMilestoneControls(milestone.id, index)}
+                          </Box>
+                        </Box>
+
+                        {/* Card Body */}
+                        <Box sx={{ px: 2, py: 1.5 }}>
+                          {milestone.description && (
+                            <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
+                              {milestone.description}
+                            </Typography>
+                          )}
+
+                          {/* Strategies */}
+                          <Box sx={{ pl: 1.5, borderLeft: 2, borderColor: 'divider' }}>
+                            <Typography
+                              variant="caption"
+                              fontWeight={600}
+                              display="block"
+                              sx={{ mb: 0.5 }}
+                            >
+                              {t('releaseFlow.appliedStrategies')}
+                            </Typography>
+                            {milestone.strategies?.map((strategy: any, sIdx: number) => (
+                              <Box
+                                key={sIdx}
+                                sx={{
+                                  mb: sIdx < (milestone.strategies?.length || 0) - 1 ? 1.5 : 0,
+                                }}
+                              >
+                                <StrategyDetail
+                                  strategyName={strategy.strategyName}
+                                  parameters={strategy.parameters}
+                                  constraints={strategy.constraints}
+                                  segments={strategy.segments}
+                                  allSegments={allSegments}
+                                  contextFields={contextFields}
+                                />
+                                {sIdx < (milestone.strategies?.length || 0) - 1 && (
+                                  <Box
+                                    sx={{
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      gap: 1,
+                                      mt: 1,
+                                    }}
+                                  >
+                                    <Divider sx={{ flexGrow: 1, borderStyle: 'dashed' }} />
+                                    <Chip
+                                      label="OR"
+                                      size="small"
+                                      variant="outlined"
+                                      sx={{ height: 16, fontSize: '0.6rem', opacity: 0.5 }}
+                                    />
+                                    <Divider sx={{ flexGrow: 1, borderStyle: 'dashed' }} />
+                                  </Box>
+                                )}
+                              </Box>
+                            ))}
+                          </Box>
+                        </Box>
+                      </Paper>
+
+                      {/* Connector between milestones */}
+                      {renderMilestoneConnector(milestone, index)}
+                    </React.Fragment>
+                  );
+                })}
+              </CardContent>
+            </Collapse>
           </Card>
         </Box>
       )}
@@ -990,10 +1033,10 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                     overflow: 'visible',
                     '&:hover': !applying
                       ? {
-                        borderColor: 'primary.main',
-                        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                        transform: 'translateY(-2px)',
-                      }
+                          borderColor: 'primary.main',
+                          boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                          transform: 'translateY(-2px)',
+                        }
                       : {},
                   }}
                   onClick={() => !applying && handleApplyTemplate(template.id)}

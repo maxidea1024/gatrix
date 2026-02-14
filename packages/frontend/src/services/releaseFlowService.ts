@@ -214,10 +214,12 @@ export interface Safeguard {
   flowId: string;
   milestoneId: string;
   metricName: string;
+  displayName: string | null;
   aggregationMode: string;
   operator: string;
   threshold: number;
-  timeRange: string;
+  timeRangeMinutes: number;
+  labelFilters: Record<string, string> | null;
   action: string;
   isTriggered: boolean;
   triggeredAt: string | null;
@@ -229,19 +231,23 @@ export interface CreateSafeguardInput {
   flowId: string;
   milestoneId: string;
   metricName: string;
+  displayName?: string;
   aggregationMode?: string;
   operator?: string;
   threshold: number;
-  timeRange?: string;
+  timeRangeMinutes?: number;
+  labelFilters?: Record<string, string>;
   action?: string;
 }
 
 export interface UpdateSafeguardInput {
   metricName?: string;
+  displayName?: string | null;
   aggregationMode?: string;
   operator?: string;
   threshold?: number;
-  timeRange?: string;
+  timeRangeMinutes?: number;
+  labelFilters?: Record<string, string> | null;
   action?: string;
 }
 

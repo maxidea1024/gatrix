@@ -46,6 +46,7 @@ import releaseFlowRoutes from './releaseFlows';
 import serviceAccountRoutes from './serviceAccounts';
 import signalEndpointRoutes from './signalEndpoints';
 import actionSetRoutes from './actionSets';
+import queueMonitorRoutes from './queueMonitor';
 
 const router = express.Router();
 
@@ -330,6 +331,13 @@ router.use(
   '/actions',
   requirePermission([PERMISSIONS.ACTIONS_VIEW, PERMISSIONS.ACTIONS_MANAGE]) as any,
   actionSetRoutes
+);
+
+// Queue Monitor - requires scheduler.view or scheduler.manage permission
+router.use(
+  '/queue-monitor',
+  requirePermission([PERMISSIONS.SCHEDULER_VIEW, PERMISSIONS.SCHEDULER_MANAGE]) as any,
+  queueMonitorRoutes
 );
 
 // Impact Metrics (admin query endpoints for charts and safeguard evaluation)

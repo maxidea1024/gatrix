@@ -1,6 +1,5 @@
 import React from 'react';
-import { Box, Typography, Stack, Paper, Chip, Divider, Grid } from '@mui/material';
-import { Timer as TimerIcon, HelpOutline as HelpOutlineIcon } from '@mui/icons-material';
+import { Box, Typography, Stack, Paper, Chip } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { ReleaseFlowTemplate } from '../../services/releaseFlowService';
 import StrategyDetail from './StrategyDetail';
@@ -27,17 +26,6 @@ const ReleaseFlowTemplatePreview: React.FC<ReleaseFlowTemplatePreviewProps> = ({
   contextFields,
 }) => {
   const { t } = useTranslation();
-
-  const formatIntervalFull = (totalMin: number) => {
-    if (totalMin % 1440 === 0) {
-      const val = totalMin / 1440;
-      return `${val} ${t('releaseFlow.unitDays')}`;
-    } else if (totalMin % 60 === 0) {
-      const val = totalMin / 60;
-      return `${val} ${t('releaseFlow.unitHours')}`;
-    }
-    return `${totalMin} ${t('releaseFlow.unitMinutes')}`;
-  };
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
@@ -130,37 +118,6 @@ const ReleaseFlowTemplatePreview: React.FC<ReleaseFlowTemplatePreviewProps> = ({
                 );
               })}
             </Stack>
-
-            {/* Transition Condition - Identical to Editor */}
-            {mIdx < (template.milestones?.length || 0) - 1 && (
-              <Box
-                sx={{
-                  mt: 2,
-                  p: 1.5,
-                  borderRadius: 1,
-                  bgcolor: 'action.hover',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 1,
-                  border: '1px solid',
-                  borderColor: 'divider',
-                }}
-              >
-                <TimerIcon fontSize="small" color="action" />
-                <Typography variant="body2" color="text.secondary">
-                  {t('releaseFlow.autoProgressAfter')}
-                </Typography>
-                {milestone.transitionCondition?.intervalMinutes ? (
-                  <Typography variant="body2" fontWeight={600} color="primary">
-                    {formatIntervalFull(milestone.transitionCondition.intervalMinutes)}
-                  </Typography>
-                ) : (
-                  <Typography variant="body2" fontWeight={600} color="text.secondary">
-                    {t('releaseFlow.manualTransition')}
-                  </Typography>
-                )}
-              </Box>
-            )}
           </Paper>
         ))}
       </Stack>

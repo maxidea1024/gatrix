@@ -110,6 +110,22 @@ export class QueueService {
         } else {
           logger.info('Repeatable job already exists: signal:process');
         }
+
+        // Register release flow progression check job (every minute)
+        const releaseFlowCheckExists = repeatables.some(
+          (r) => r.name === 'release-flow:progression-check'
+        );
+        if (!releaseFlowCheckExists) {
+          await this.addJob(
+            'scheduler',
+            'release-flow:progression-check',
+            {},
+            { repeat: { pattern: '* * * * *' } }
+          );
+          logger.info('Registered repeatable job: release-flow:progression-check (every minute)');
+        } else {
+          logger.info('Repeatable job already exists: release-flow:progression-check');
+        }
       } catch (e) {
         logger.error('Failed to register repeatable scheduler jobs:', e);
       }

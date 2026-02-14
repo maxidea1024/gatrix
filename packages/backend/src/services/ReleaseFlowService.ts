@@ -180,7 +180,7 @@ export class ReleaseFlowService {
   async startMilestone(
     planId: string,
     milestoneId: string,
-    userId: number
+    userId: number | null
   ): Promise<ReleaseFlowAttributes> {
     const plan = await ReleaseFlowModel.findById(planId);
     if (!plan || plan.discriminator !== 'plan') {
@@ -198,7 +198,7 @@ export class ReleaseFlowService {
       await ReleaseFlowModel.update(plan.id, {
         activeMilestoneId: milestone.id,
         status: 'active',
-        updatedBy: userId,
+        updatedBy: userId ?? undefined,
       });
       await ReleaseFlowMilestoneModel.update(milestone.id, {
         startedAt: new Date(),
@@ -225,7 +225,7 @@ export class ReleaseFlowService {
           constraints: ms.constraints ? JSON.stringify(ms.constraints) : '[]',
           sortOrder: ms.sortOrder,
           isEnabled: true,
-          createdBy: userId,
+          createdBy: userId ?? 0,
           createdAt: new Date(),
           updatedAt: new Date(),
         });
@@ -388,31 +388,37 @@ export class ReleaseFlowService {
       return null;
     }
 
-    // Mark the current milestone as progressed
-    await ReleaseFlowMilestoneModel.update(milestones[currentIndex].id, {
-      progressionExecutedAt: new Date(),
-    });
-
     // Check if this is the last milestone
     if (currentIndex >= milestones.length - 1) {
-      // Plan completed
-      await ReleaseFlowModel.update(planId, { status: 'completed', updatedBy: userId });
+      // Mark current milestone as progressed and complete the plan
+      await ReleaseFlowMilestoneModel.update(milestones[currentIndex].id, {
+        progressionExecutedAt: new Date(),
+      });
+      await ReleaseFlowModel.update(planId, { status: 'completed', updatedBy: userId || null });
 
       await AuditLogModel.create({
         action: 'release_flow.complete_plan',
         description: `Release flow plan '${plan.flowName}' completed`,
         resourceType: 'ReleaseFlow',
         resourceId: planId,
-        userId: userId || 0,
+        userId: userId || null,
         environment: plan.environment,
       });
 
       return (await ReleaseFlowModel.findById(planId))!;
     }
 
-    // Start the next milestone
+    // Start the next milestone first, then mark current as progressed
+    // This order prevents a stuck state if startMilestone fails
     const nextMilestone = milestones[currentIndex + 1];
-    return this.startMilestone(planId, nextMilestone.id, userId || 0);
+    const result = await this.startMilestone(planId, nextMilestone.id, userId || null);
+
+    // Only mark as progressed after successful transition
+    await ReleaseFlowMilestoneModel.update(milestones[currentIndex].id, {
+      progressionExecutedAt: new Date(),
+    });
+
+    return result;
   }
 
   /**

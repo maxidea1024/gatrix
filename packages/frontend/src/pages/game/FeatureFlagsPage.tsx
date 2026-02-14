@@ -91,7 +91,7 @@ import { useSnackbar } from 'notistack';
 import { parseApiErrorMessage } from '../../utils/errorUtils';
 import featureFlagService, { FeatureFlag, FlagType } from '../../services/featureFlagService';
 import SimplePagination from '../../components/common/SimplePagination';
-import EmptyState from '../../components/common/EmptyState';
+import EmptyPlaceholder from '../../components/common/EmptyPlaceholder';
 import DynamicFilterBar, {
   FilterDefinition,
   ActiveFilter,
@@ -1662,11 +1662,10 @@ const FeatureFlagsPage: React.FC = () => {
               <Typography color="text.secondary">{t('common.loadingData')}</Typography>
             </Box>
           ) : flags.length === 0 ? (
-            <EmptyState
+            <EmptyPlaceholder
               message={t('featureFlags.noFlagsFound')}
-              onAddClick={canManage ? () => navigate('/feature-flags/new') : undefined}
+              onAddClick={canManage ? () => handleOpenCreateDialog('featureFlag') : undefined}
               addButtonLabel={t('featureFlags.createFlag')}
-              subtitle={canManage ? t('common.addFirstItem') : undefined}
             />
           ) : compactView ? (
             <>

@@ -74,6 +74,7 @@ import 'react-resizable/css/styles.css';
 import api from '../../services/api';
 import { useSnackbar } from 'notistack';
 import ConfirmDialog from '../common/ConfirmDialog';
+import EmptyPlaceholder from '../common/EmptyPlaceholder';
 
 const GridLayout = WidthProvider(ReactGridLayout);
 
@@ -1192,25 +1193,11 @@ const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
             </Typography>
           </Box>
         )}
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            py: 8,
-            color: 'text.secondary',
-          }}
-        >
-          <Typography variant="body1" sx={{ mb: 2 }}>
-            {t('impactMetrics.noCharts')}
-          </Typography>
-          {canManage && (
-            <Button variant="contained" startIcon={<AddIcon />} onClick={handleOpenAddDialog}>
-              {t('impactMetrics.addChart')}
-            </Button>
-          )}
-        </Box>
+        <EmptyPlaceholder
+          message={t('impactMetrics.noCharts')}
+          onAddClick={canManage ? handleOpenAddDialog : undefined}
+          addButtonLabel={t('impactMetrics.addChart')}
+        />
 
         <ChartConfigDialog
           open={showConfigDialog}

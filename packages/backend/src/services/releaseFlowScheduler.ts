@@ -126,9 +126,9 @@ export class ReleaseFlowScheduler {
 
           if (elapsedMs >= requiredMs) {
             // Evaluate safeguards before progression
-            if (plan.milestoneId) {
+            if (plan.activeMilestoneId) {
               const { anyTriggered, results } = await safeguardService.evaluateMilestoneSafeguards(
-                plan.milestoneId
+                plan.activeMilestoneId
               );
               if (anyTriggered) {
                 const triggeredNames = results

@@ -669,7 +669,6 @@ const TemplateEditorDrawer: React.FC<TemplateEditorDrawerProps> = ({
           (initialData.milestones || []).map((m) => ({
             id: m.id || generateId(),
             name: m.name || '',
-            transitionCondition: m.transitionCondition || null,
             strategies: (m.strategies || []).map((s) => ({
               id: s.id || generateId(),
               strategyName: s.strategyName || 'flexibleRollout',
@@ -833,7 +832,6 @@ const TemplateEditorDrawer: React.FC<TemplateEditorDrawerProps> = ({
         milestones: milestones.map((m, idx) => ({
           name: m.name || `Milestone ${idx + 1}`,
           sortOrder: idx,
-          transitionCondition: m.transitionCondition || null,
           strategies: m.strategies.map((s, sIdx) => ({
             strategyName: s.strategyName,
             parameters: s.parameters,
@@ -973,97 +971,6 @@ const TemplateEditorDrawer: React.FC<TemplateEditorDrawerProps> = ({
                     >
                       {t('releaseFlow.addStrategy')}
                     </Button>
-
-                    {/* Transition Condition (auto-progression timer) */}
-                    {mIdx < milestones.length - 1 &&
-                      (() => {
-                        const totalMin = milestone.transitionCondition?.intervalMinutes || 0;
-                        // Derive best unit for display
-                        let displayUnit: 'minutes' | 'hours' | 'days' = 'minutes';
-                        let displayValue = totalMin;
-                        if (totalMin > 0) {
-                          if (totalMin % 1440 === 0) {
-                            displayUnit = 'days';
-                            displayValue = totalMin / 1440;
-                          } else if (totalMin % 60 === 0) {
-                            displayUnit = 'hours';
-                            displayValue = totalMin / 60;
-                          }
-                        }
-
-                        const handleValueChange = (val: number, unit: string) => {
-                          let minutes = 0;
-                          if (val > 0) {
-                            if (unit === 'days') minutes = val * 1440;
-                            else if (unit === 'hours') minutes = val * 60;
-                            else minutes = val;
-                          }
-                          const updated = [...milestones];
-                          updated[mIdx] = {
-                            ...updated[mIdx],
-                            transitionCondition: minutes > 0 ? { intervalMinutes: minutes } : null,
-                          };
-                          setMilestones(updated);
-                        };
-
-                        return (
-                          <Box
-                            sx={{
-                              mt: 2,
-                              p: 1.5,
-                              borderRadius: 1,
-                              bgcolor: 'action.hover',
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: 1,
-                            }}
-                          >
-                            <TimerIcon fontSize="small" color="action" />
-                            <Typography variant="body2" color="text.secondary" sx={{ mr: 1 }}>
-                              {t('releaseFlow.autoProgressAfter')}
-                            </Typography>
-                            <TextField
-                              type="number"
-                              size="small"
-                              value={totalMin > 0 ? displayValue : ''}
-                              onChange={(e) => {
-                                const val = parseInt(e.target.value, 10);
-                                handleValueChange(isNaN(val) ? 0 : val, displayUnit);
-                              }}
-                              sx={{ width: 80 }}
-                              inputProps={{ min: 0 }}
-                              placeholder="0"
-                            />
-                            <Select
-                              size="small"
-                              value={displayUnit}
-                              onChange={(e) => {
-                                handleValueChange(displayValue, e.target.value);
-                              }}
-                              sx={{ minWidth: 80 }}
-                            >
-                              <MenuItem value="minutes">{t('releaseFlow.unitMinutes')}</MenuItem>
-                              <MenuItem value="hours">{t('releaseFlow.unitHours')}</MenuItem>
-                              <MenuItem value="days">{t('releaseFlow.unitDays')}</MenuItem>
-                            </Select>
-                            {milestone.transitionCondition && (
-                              <IconButton
-                                size="small"
-                                onClick={() => {
-                                  const updated = [...milestones];
-                                  updated[mIdx] = {
-                                    ...updated[mIdx],
-                                    transitionCondition: null,
-                                  };
-                                  setMilestones(updated);
-                                }}
-                              >
-                                <DeleteIcon fontSize="small" />
-                              </IconButton>
-                            )}
-                          </Box>
-                        );
-                      })()}
                   </Paper>
                 ))}
               </Stack>
