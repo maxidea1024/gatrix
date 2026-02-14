@@ -161,8 +161,7 @@ export const auditUserDelete = enhancedAuditLog({
     userEmail: oldValues?.email,
     userRole: oldValues?.role,
   }),
-  getDescription: (_req, oldValues) =>
-    `User '${oldValues?.name}' (${oldValues?.email}) deleted`,
+  getDescription: (_req, oldValues) => `User '${oldValues?.name}' (${oldValues?.email}) deleted`,
 });
 
 export const auditUserApprove = enhancedAuditLog({
@@ -321,8 +320,7 @@ export const auditGameWorldCreate = enhancedAuditLog({
     worldId: req.body?.worldId,
     worldName: req.body?.name,
   }),
-  getDescription: (req) =>
-    `Game world '${req.body?.name}' (${req.body?.worldId}) created`,
+  getDescription: (req) => `Game world '${req.body?.name}' (${req.body?.worldId}) created`,
 });
 
 export const auditGameWorldUpdate = enhancedAuditLog({
@@ -507,7 +505,8 @@ export const auditServiceNoticeCreate = auditLog({
     startDate: req.body?.startDate,
     endDate: req.body?.endDate,
   }),
-  getDescription: (req) => `Service notice '${req.body?.title}' created (category: ${req.body?.category})`,
+  getDescription: (req) =>
+    `Service notice '${req.body?.title}' created (category: ${req.body?.category})`,
 });
 
 export const auditServiceNoticeUpdate = enhancedAuditLog({
@@ -574,8 +573,7 @@ export const auditServiceNoticeDelete = enhancedAuditLog({
     operation: 'delete_service_notice',
     noticeTitle: oldValues?.title,
   }),
-  getDescription: (_req, oldValues) =>
-    `Service notice '${oldValues?.title}' deleted`,
+  getDescription: (_req, oldValues) => `Service notice '${oldValues?.title}' deleted`,
 });
 
 export const auditServiceNoticeBulkDelete = auditLog({

@@ -132,6 +132,17 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
     ],
   },
 
+  // Profile Section
+  {
+    id: 'profile-menu',
+    text: 'sidebar.profile',
+    icon: 'Person',
+    children: [
+      { text: 'sidebar.profile', icon: 'Person', path: '/profile' },
+      { text: 'sidebar.logout', icon: 'Logout', path: '/logout' },
+    ],
+  },
+
   // Admin Panel
   {
     id: 'admin-panel',

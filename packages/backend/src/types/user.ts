@@ -1,5 +1,12 @@
 export type SupportedLanguage = 'en' | 'ko' | 'zh';
-export type AuthType = 'local' | 'google' | 'github' | 'qq' | 'wechat' | 'baidu' | 'service-account';
+export type AuthType =
+  | 'local'
+  | 'google'
+  | 'github'
+  | 'qq'
+  | 'wechat'
+  | 'baidu'
+  | 'service-account';
 
 export interface User {
   id: number;
@@ -50,7 +57,7 @@ export interface UpdateUserData {
   lastLoginAt?: Date;
 }
 
-export interface UserWithoutPassword extends Omit<User, 'passwordHash'> { }
+export interface UserWithoutPassword extends Omit<User, 'passwordHash'> {}
 
 export interface OAuthAccount {
   id: number;

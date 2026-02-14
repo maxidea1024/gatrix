@@ -105,12 +105,7 @@ export class QueueService {
         // Register signal processing job (every 10 seconds)
         const signalProcessExists = repeatables.some((r) => r.name === 'signal:process');
         if (!signalProcessExists) {
-          await this.addJob(
-            'scheduler',
-            'signal:process',
-            {},
-            { repeat: { every: 10000 } }
-          );
+          await this.addJob('scheduler', 'signal:process', {}, { repeat: { every: 10000 } });
           logger.info('Registered repeatable job: signal:process (every 10 seconds)');
         } else {
           logger.info('Repeatable job already exists: signal:process');

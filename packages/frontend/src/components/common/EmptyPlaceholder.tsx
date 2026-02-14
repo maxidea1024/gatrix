@@ -57,16 +57,16 @@ const EmptyPlaceholder: React.FC<EmptyPlaceholderProps> = ({
       {children
         ? children
         : onAddClick && (
-          <Button
-            variant={addButtonVariant}
-            size="small"
-            startIcon={<AddIcon />}
-            onClick={onAddClick}
-            sx={{ mt: 1.5 }}
-          >
-            {addButtonLabel}
-          </Button>
-        )}
+            <Button
+              variant={addButtonVariant}
+              size="small"
+              startIcon={<AddIcon />}
+              onClick={onAddClick}
+              sx={{ mt: 1.5 }}
+            >
+              {addButtonLabel}
+            </Button>
+          )}
     </Box>
   );
 };

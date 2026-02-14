@@ -1092,7 +1092,6 @@ class FeatureFlagService {
         segmentName: segment.segmentName,
       },
     });
-
   }
 
   // ==================== Context Fields ====================

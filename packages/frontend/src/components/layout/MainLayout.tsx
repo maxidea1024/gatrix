@@ -844,7 +844,9 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
   // Open external http(s) links in new tab; otherwise navigate within SPA
   const openOrNavigate = (path: string) => {
-    if (/^https?:\/\//i.test(path)) {
+    if (path === '/logout') {
+      handleLogoutClick();
+    } else if (/^https?:\/\//i.test(path)) {
       window.open(path, '_blank', 'noopener,noreferrer');
     } else {
       navigate(path);
@@ -2052,34 +2054,6 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                   <EnvironmentSelector size="small" />
                 </>
               )}
-
-              <Menu
-                anchorEl={userMenuAnchor}
-                open={Boolean(userMenuAnchor)}
-                onClose={handleUserMenuClose}
-                anchorOrigin={{
-                  vertical: 'bottom',
-                  horizontal: 'right',
-                }}
-                transformOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
-                }}
-              >
-                <MenuItem
-                  onClick={() => {
-                    navigate('/profile');
-                    handleUserMenuClose();
-                  }}
-                >
-                  <PersonIcon sx={{ mr: 1 }} />
-                  {t('sidebar.profile')}
-                </MenuItem>
-                <MenuItem onClick={handleLogoutClick}>
-                  <LogoutIcon sx={{ mr: 1 }} />
-                  {t('sidebar.logout')}
-                </MenuItem>
-              </Menu>
             </Box>
           </Toolbar>
         </AppBar>
@@ -2285,6 +2259,86 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           </Tooltip>
         </Box>
       </Zoom>
+      {/* SSE Notifications */}
+      {sseConnection.connected === false && (
+        <Tooltip title={t('common.connectionLost')}>
+          <Box
+            sx={{
+              position: 'fixed',
+              bottom: 16,
+              right: 16,
+              bgcolor: 'error.main',
+              color: 'white',
+              p: 1,
+              borderRadius: '50%',
+              boxShadow: 3,
+              zIndex: 9999,
+            }}
+          >
+            <BugReportIcon />
+          </Box>
+        </Tooltip>
+      )}
+
+      {/* Shared User Menu */}
+      <Menu
+        anchorEl={userMenuAnchor}
+        open={Boolean(userMenuAnchor)}
+        onClose={handleUserMenuClose}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'right',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
+        PaperProps={{
+          sx: {
+            mt: 0.5,
+            minWidth: 200,
+            boxShadow: '0px 5px 15px rgba(0,0,0,0.1)',
+            borderRadius: 2,
+            '& .MuiMenuItem-root': {
+              px: 2,
+              py: 1,
+              fontSize: '0.875rem',
+            },
+          },
+        }}
+      >
+        <Box sx={{ px: 2, py: 1.5, borderBottom: '1px solid ' + theme.palette.divider }}>
+          <Typography variant="subtitle2" fontWeight={600}>
+            {user?.name || user?.email}
+          </Typography>
+          <Typography variant="caption" color="text.secondary">
+            {user?.email}
+          </Typography>
+        </Box>
+        <MenuItem
+          onClick={() => {
+            navigate('/profile');
+            handleUserMenuClose();
+          }}
+        >
+          <PersonIcon sx={{ mr: 1.5, fontSize: 20 }} />
+          {t('sidebar.profile')}
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            navigate('/settings');
+            handleUserMenuClose();
+          }}
+        >
+          <SettingsIcon sx={{ mr: 1.5, fontSize: 20 }} />
+          {t('sidebar.settings')}
+        </MenuItem>
+        <Divider />
+        <MenuItem onClick={handleLogoutClick} sx={{ color: 'error.main' }}>
+          <LogoutIcon sx={{ mr: 1.5, fontSize: 20 }} />
+          {t('sidebar.logout')}
+        </MenuItem>
+      </Menu>
     </Box>
   );
 };

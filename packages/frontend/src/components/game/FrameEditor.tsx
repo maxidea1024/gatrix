@@ -1439,8 +1439,8 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
                 {clipboardUrls.length === 1
                   ? t('banners.contextMenu.addFromClipboardBefore')
                   : t('banners.contextMenu.addFromClipboardBeforeMultiple', {
-                    count: clipboardUrls.length,
-                  })}
+                      count: clipboardUrls.length,
+                    })}
               </ListItemText>
             </MenuItem>
             <MenuItem
@@ -1453,8 +1453,8 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
                 {clipboardUrls.length === 1
                   ? t('banners.contextMenu.addFromClipboardAfter')
                   : t('banners.contextMenu.addFromClipboardAfterMultiple', {
-                    count: clipboardUrls.length,
-                  })}
+                      count: clipboardUrls.length,
+                    })}
               </ListItemText>
             </MenuItem>
           </>

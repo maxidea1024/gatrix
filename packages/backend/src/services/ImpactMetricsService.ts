@@ -212,8 +212,8 @@ class ImpactMetricsService {
       const firstSample = bucketSamples[0];
       const buckets = firstSample
         ? firstSample.buckets
-          .map((b) => (b.le === '+Inf' ? Infinity : (b.le as number)))
-          .filter((b) => b !== Infinity)
+            .map((b) => (b.le === '+Inf' ? Infinity : (b.le as number)))
+            .filter((b) => b !== Infinity)
         : [0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10];
 
       const labelNames = this.extractLabelNames(bucketSamples);

@@ -16,13 +16,13 @@ const logger = createLogger('ActionSetRoutes');
  * Get all action sets
  */
 router.get('/', async (req: Request, res: Response) => {
-    try {
-        const actionSets = await ActionSetModel.findAll();
-        res.json({ data: actionSets });
-    } catch (error) {
-        logger.error('Error getting action sets:', error);
-        res.status(500).json({ error: 'Failed to get action sets' });
-    }
+  try {
+    const actionSets = await ActionSetModel.findAll();
+    res.json({ data: actionSets });
+  } catch (error) {
+    logger.error('Error getting action sets:', error);
+    res.status(500).json({ error: 'Failed to get action sets' });
+  }
 });
 
 /**
@@ -30,19 +30,19 @@ router.get('/', async (req: Request, res: Response) => {
  * Get a specific action set
  */
 router.get('/:id', async (req: Request, res: Response) => {
-    try {
-        const id = parseInt(req.params.id);
-        const actionSet = await ActionSetModel.findById(id);
+  try {
+    const id = parseInt(req.params.id);
+    const actionSet = await ActionSetModel.findById(id);
 
-        if (!actionSet) {
-            return res.status(404).json({ error: 'Action set not found' });
-        }
-
-        res.json({ data: actionSet });
-    } catch (error) {
-        logger.error('Error getting action set:', error);
-        res.status(500).json({ error: 'Failed to get action set' });
+    if (!actionSet) {
+      return res.status(404).json({ error: 'Action set not found' });
     }
+
+    res.json({ data: actionSet });
+  } catch (error) {
+    logger.error('Error getting action set:', error);
+    res.status(500).json({ error: 'Failed to get action set' });
+  }
 });
 
 /**
@@ -50,36 +50,36 @@ router.get('/:id', async (req: Request, res: Response) => {
  * Create a new action set
  */
 router.post('/', async (req: Request, res: Response) => {
-    try {
-        const { name, description, isEnabled, actorId, source, sourceId, filters, actions } = req.body;
-        const user = req.user as { id: number; name: string };
+  try {
+    const { name, description, isEnabled, actorId, source, sourceId, filters, actions } = req.body;
+    const user = req.user as { id: number; name: string };
 
-        if (!name || !name.trim()) {
-            return res.status(400).json({ error: 'Name is required' });
-        }
-
-        if (!actions || !Array.isArray(actions) || actions.length === 0) {
-            return res.status(400).json({ error: 'At least one action is required' });
-        }
-
-        const actionSet = await ActionSetModel.create({
-            name: name.trim(),
-            description,
-            isEnabled,
-            actorId,
-            source,
-            sourceId,
-            filters,
-            actions,
-            createdBy: user.id,
-        });
-
-        res.status(201).json({ data: actionSet });
-    } catch (error) {
-        logger.error('Error creating action set:', error);
-        const message = error instanceof Error ? error.message : 'Failed to create action set';
-        res.status(400).json({ error: message });
+    if (!name || !name.trim()) {
+      return res.status(400).json({ error: 'Name is required' });
     }
+
+    if (!actions || !Array.isArray(actions) || actions.length === 0) {
+      return res.status(400).json({ error: 'At least one action is required' });
+    }
+
+    const actionSet = await ActionSetModel.create({
+      name: name.trim(),
+      description,
+      isEnabled,
+      actorId,
+      source,
+      sourceId,
+      filters,
+      actions,
+      createdBy: user.id,
+    });
+
+    res.status(201).json({ data: actionSet });
+  } catch (error) {
+    logger.error('Error creating action set:', error);
+    const message = error instanceof Error ? error.message : 'Failed to create action set';
+    res.status(400).json({ error: message });
+  }
 });
 
 /**
@@ -87,33 +87,33 @@ router.post('/', async (req: Request, res: Response) => {
  * Update an action set
  */
 router.put('/:id', async (req: Request, res: Response) => {
-    try {
-        const id = parseInt(req.params.id);
-        const { name, description, isEnabled, actorId, source, sourceId, filters, actions } = req.body;
-        const user = req.user as { id: number; name: string };
+  try {
+    const id = parseInt(req.params.id);
+    const { name, description, isEnabled, actorId, source, sourceId, filters, actions } = req.body;
+    const user = req.user as { id: number; name: string };
 
-        const actionSet = await ActionSetModel.update(id, {
-            name,
-            description,
-            isEnabled,
-            actorId,
-            source,
-            sourceId,
-            filters,
-            actions,
-            updatedBy: user.id,
-        });
+    const actionSet = await ActionSetModel.update(id, {
+      name,
+      description,
+      isEnabled,
+      actorId,
+      source,
+      sourceId,
+      filters,
+      actions,
+      updatedBy: user.id,
+    });
 
-        if (!actionSet) {
-            return res.status(404).json({ error: 'Action set not found' });
-        }
-
-        res.json({ data: actionSet });
-    } catch (error) {
-        logger.error('Error updating action set:', error);
-        const message = error instanceof Error ? error.message : 'Failed to update action set';
-        res.status(400).json({ error: message });
+    if (!actionSet) {
+      return res.status(404).json({ error: 'Action set not found' });
     }
+
+    res.json({ data: actionSet });
+  } catch (error) {
+    logger.error('Error updating action set:', error);
+    const message = error instanceof Error ? error.message : 'Failed to update action set';
+    res.status(400).json({ error: message });
+  }
 });
 
 /**
@@ -121,19 +121,19 @@ router.put('/:id', async (req: Request, res: Response) => {
  * Delete an action set
  */
 router.delete('/:id', async (req: Request, res: Response) => {
-    try {
-        const id = parseInt(req.params.id);
-        const success = await ActionSetModel.delete(id);
+  try {
+    const id = parseInt(req.params.id);
+    const success = await ActionSetModel.delete(id);
 
-        if (!success) {
-            return res.status(404).json({ error: 'Action set not found' });
-        }
-
-        res.json({ message: 'Action set deleted successfully' });
-    } catch (error) {
-        logger.error('Error deleting action set:', error);
-        res.status(500).json({ error: 'Failed to delete action set' });
+    if (!success) {
+      return res.status(404).json({ error: 'Action set not found' });
     }
+
+    res.json({ message: 'Action set deleted successfully' });
+  } catch (error) {
+    logger.error('Error deleting action set:', error);
+    res.status(500).json({ error: 'Failed to delete action set' });
+  }
 });
 
 /**
@@ -141,21 +141,21 @@ router.delete('/:id', async (req: Request, res: Response) => {
  * Toggle action set enabled status
  */
 router.post('/:id/toggle', async (req: Request, res: Response) => {
-    try {
-        const id = parseInt(req.params.id);
-        const user = req.user as { id: number; name: string };
+  try {
+    const id = parseInt(req.params.id);
+    const user = req.user as { id: number; name: string };
 
-        const actionSet = await ActionSetModel.toggleEnabled(id, user.id);
+    const actionSet = await ActionSetModel.toggleEnabled(id, user.id);
 
-        if (!actionSet) {
-            return res.status(404).json({ error: 'Action set not found' });
-        }
-
-        res.json({ data: actionSet });
-    } catch (error) {
-        logger.error('Error toggling action set:', error);
-        res.status(500).json({ error: 'Failed to toggle action set' });
+    if (!actionSet) {
+      return res.status(404).json({ error: 'Action set not found' });
     }
+
+    res.json({ data: actionSet });
+  } catch (error) {
+    logger.error('Error toggling action set:', error);
+    res.status(500).json({ error: 'Failed to toggle action set' });
+  }
 });
 
 /**
@@ -163,30 +163,30 @@ router.post('/:id/toggle', async (req: Request, res: Response) => {
  * Get execution events for an action set
  */
 router.get('/:id/events', async (req: Request, res: Response) => {
-    try {
-        const id = parseInt(req.params.id);
-        const limit = parseInt(req.query.limit as string) || 50;
-        const offset = parseInt(req.query.offset as string) || 0;
+  try {
+    const id = parseInt(req.params.id);
+    const limit = parseInt(req.query.limit as string) || 50;
+    const offset = parseInt(req.query.offset as string) || 0;
 
-        const actionSet = await ActionSetModel.findById(id);
-        if (!actionSet) {
-            return res.status(404).json({ error: 'Action set not found' });
-        }
-
-        const result = await ActionSetModel.findEvents(id, limit, offset);
-
-        res.json({
-            data: result.events,
-            pagination: {
-                total: result.total,
-                limit,
-                offset,
-            },
-        });
-    } catch (error) {
-        logger.error('Error getting action set events:', error);
-        res.status(500).json({ error: 'Failed to get action set events' });
+    const actionSet = await ActionSetModel.findById(id);
+    if (!actionSet) {
+      return res.status(404).json({ error: 'Action set not found' });
     }
+
+    const result = await ActionSetModel.findEvents(id, limit, offset);
+
+    res.json({
+      data: result.events,
+      pagination: {
+        total: result.total,
+        limit,
+        offset,
+      },
+    });
+  } catch (error) {
+    logger.error('Error getting action set events:', error);
+    res.status(500).json({ error: 'Failed to get action set events' });
+  }
 });
 
 export default router;

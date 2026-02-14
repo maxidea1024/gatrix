@@ -308,7 +308,10 @@ router.use(
 // Service Accounts - requires service-accounts.view or service-accounts.manage permission
 router.use(
   '/service-accounts',
-  requirePermission([PERMISSIONS.SERVICE_ACCOUNTS_VIEW, PERMISSIONS.SERVICE_ACCOUNTS_MANAGE]) as any,
+  requirePermission([
+    PERMISSIONS.SERVICE_ACCOUNTS_VIEW,
+    PERMISSIONS.SERVICE_ACCOUNTS_MANAGE,
+  ]) as any,
   serviceAccountRoutes
 );
 
