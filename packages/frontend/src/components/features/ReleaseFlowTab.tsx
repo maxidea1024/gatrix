@@ -409,8 +409,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
       );
     }
 
-    // Other milestones: show "jump to" only when env is NOT enabled
-    if (envEnabled) return null;
+    // Other milestones: show "jump to" button
 
     return (
       <Button
@@ -856,9 +855,9 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                             bgcolor:
                               status === 'active' || status === 'paused'
                                 ? (theme) =>
-                                    theme.palette.mode === 'dark'
-                                      ? 'rgba(255,255,255,0.03)'
-                                      : 'rgba(0,0,0,0.015)'
+                                  theme.palette.mode === 'dark'
+                                    ? 'rgba(255,255,255,0.03)'
+                                    : 'rgba(0,0,0,0.015)'
                                 : 'transparent',
                             cursor: 'pointer',
                             '&:hover': {
@@ -1119,10 +1118,10 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                     overflow: 'visible',
                     '&:hover': !applying
                       ? {
-                          borderColor: 'primary.main',
-                          boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                          transform: 'translateY(-2px)',
-                        }
+                        borderColor: 'primary.main',
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                        transform: 'translateY(-2px)',
+                      }
                       : {},
                   }}
                   onClick={() => !applying && handleApplyTemplate(template.id)}
