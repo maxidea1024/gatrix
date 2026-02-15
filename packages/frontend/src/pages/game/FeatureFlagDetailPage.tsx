@@ -2506,20 +2506,23 @@ const FeatureFlagDetailPage: React.FC = () => {
                                       >
                                         {t('featureFlags.addFirstStrategy')}
                                       </Button>
-                                      {!isEnabled && (
-                                        <Button
-                                          variant="contained"
-                                          size="small"
-                                          startIcon={<TemplateIcon />}
-                                          onClick={() => {
-                                            setEnvManualReleaseFlow((prev) =>
-                                              new Set(prev).add(env.environment)
-                                            );
-                                          }}
-                                        >
-                                          {t('releaseFlow.tabTitle')}
-                                        </Button>
-                                      )}
+                                      <Tooltip title={isEnabled ? t('releaseFlow.cannotSwitchWhileEnabled') : ''}>
+                                        <span>
+                                          <Button
+                                            variant="contained"
+                                            size="small"
+                                            startIcon={<TemplateIcon />}
+                                            disabled={isEnabled}
+                                            onClick={() => {
+                                              setEnvManualReleaseFlow((prev) =>
+                                                new Set(prev).add(env.environment)
+                                              );
+                                            }}
+                                          >
+                                            {t('releaseFlow.tabTitle')}
+                                          </Button>
+                                        </span>
+                                      </Tooltip>
                                     </Box>
                                   )}
                                 </EmptyPlaceholder>
