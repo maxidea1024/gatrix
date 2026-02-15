@@ -392,11 +392,11 @@ const FeatureFlagDetailPage: React.FC = () => {
       setFlag((prev) =>
         prev
           ? {
-              ...prev,
-              valueType: originalFlag.valueType,
-              enabledValue: originalFlag.enabledValue,
-              disabledValue: originalFlag.disabledValue,
-            }
+            ...prev,
+            valueType: originalFlag.valueType,
+            enabledValue: originalFlag.enabledValue,
+            disabledValue: originalFlag.disabledValue,
+          }
           : prev
       );
     }
@@ -419,24 +419,24 @@ const FeatureFlagDetailPage: React.FC = () => {
   const [flag, setFlag] = useState<FeatureFlag | null>(
     isCreating
       ? {
-          id: '',
-          environment: '',
-          flagName: generateDefaultFlagName(),
-          displayName: '',
-          description: '',
-          flagType: 'release',
-          isEnabled: false,
-          isArchived: false,
-          impressionDataEnabled: false,
-          staleAfterDays: undefined,
-          tags: [],
-          strategies: [],
-          variants: [],
-          valueType: 'boolean',
-          enabledValue: true,
-          disabledValue: false,
-          createdAt: new Date().toISOString(),
-        }
+        id: '',
+        environment: '',
+        flagName: generateDefaultFlagName(),
+        displayName: '',
+        description: '',
+        flagType: 'release',
+        isEnabled: false,
+        isArchived: false,
+        impressionDataEnabled: false,
+        staleAfterDays: undefined,
+        tags: [],
+        strategies: [],
+        variants: [],
+        valueType: 'boolean',
+        enabledValue: true,
+        disabledValue: false,
+        createdAt: new Date().toISOString(),
+      }
       : null
   );
   const [loading, setLoading] = useState(!isCreating);
@@ -2420,7 +2420,7 @@ const FeatureFlagDetailPage: React.FC = () => {
 
                           <AccordionDetails sx={{ px: 2, pt: 0, pb: 2 }}>
                             {releaseFlowEnvs.has(env.environment) ||
-                            envManualReleaseFlow.has(env.environment) ? (
+                              envManualReleaseFlow.has(env.environment) ? (
                               <>
                                 <ReleaseFlowTab
                                   flagId={flag.id}
@@ -2485,44 +2485,46 @@ const FeatureFlagDetailPage: React.FC = () => {
                               </>
                             ) : strategies.length === 0 ? (
                               <>
-                                <EmptyPlaceholder
-                                  message={t('featureFlags.noStrategiesTitle')}
-                                  description={t('featureFlags.noStrategiesDescription')}
-                                >
-                                  {canManage && (
-                                    <Box
-                                      sx={{
-                                        display: 'flex',
-                                        justifyContent: 'center',
-                                        gap: 2,
-                                        mt: 1.5,
-                                      }}
-                                    >
-                                      <Button
-                                        variant="contained"
-                                        size="small"
-                                        startIcon={<AddIcon />}
-                                        onClick={() => handleAddStrategy(env.environment)}
+                                {isEnabled && (
+                                  <EmptyPlaceholder
+                                    message={t('featureFlags.noStrategiesTitle')}
+                                    description={t('featureFlags.noStrategiesDescription')}
+                                  >
+                                    {canManage && (
+                                      <Box
+                                        sx={{
+                                          display: 'flex',
+                                          justifyContent: 'center',
+                                          gap: 2,
+                                          mt: 1.5,
+                                        }}
                                       >
-                                        {t('featureFlags.addFirstStrategy')}
-                                      </Button>
-                                      {!isEnabled && (
                                         <Button
                                           variant="contained"
                                           size="small"
-                                          startIcon={<TemplateIcon />}
-                                          onClick={() => {
-                                            setEnvManualReleaseFlow((prev) =>
-                                              new Set(prev).add(env.environment)
-                                            );
-                                          }}
+                                          startIcon={<AddIcon />}
+                                          onClick={() => handleAddStrategy(env.environment)}
                                         >
-                                          {t('releaseFlow.tabTitle')}
+                                          {t('featureFlags.addFirstStrategy')}
                                         </Button>
-                                      )}
-                                    </Box>
-                                  )}
-                                </EmptyPlaceholder>
+                                        {!isEnabled && (
+                                          <Button
+                                            variant="contained"
+                                            size="small"
+                                            startIcon={<TemplateIcon />}
+                                            onClick={() => {
+                                              setEnvManualReleaseFlow((prev) =>
+                                                new Set(prev).add(env.environment)
+                                              );
+                                            }}
+                                          >
+                                            {t('releaseFlow.tabTitle')}
+                                          </Button>
+                                        )}
+                                      </Box>
+                                    )}
+                                  </EmptyPlaceholder>
+                                )}
 
                                 {/* Divider between strategies and variants */}
                                 <Divider sx={{ my: 2 }} />
@@ -2670,7 +2672,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                         strategy.name === 'gradualRolloutRandom' ||
                                                         strategy.name === 'gradualRolloutUserId') &&
                                                         strategy.parameters?.rollout !==
-                                                          undefined && (
+                                                        undefined && (
                                                           <Typography
                                                             component="span"
                                                             color="text.secondary"
@@ -2924,31 +2926,31 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                                 {/* AND marker after segment */}
                                                                 {segIdx <
                                                                   strategy.segments.length - 1 && (
-                                                                  <Box
-                                                                    sx={{
-                                                                      display: 'flex',
-                                                                      alignItems: 'center',
-                                                                      ml: 2,
-                                                                      my: -0.5,
-                                                                      position: 'relative',
-                                                                      zIndex: 2,
-                                                                    }}
-                                                                  >
-                                                                    <Chip
-                                                                      label="AND"
-                                                                      size="small"
+                                                                    <Box
                                                                       sx={{
-                                                                        height: 18,
-                                                                        fontSize: '0.6rem',
-                                                                        fontWeight: 700,
-                                                                        bgcolor: 'background.paper',
-                                                                        color: 'text.secondary',
-                                                                        border: 1,
-                                                                        borderColor: 'divider',
+                                                                        display: 'flex',
+                                                                        alignItems: 'center',
+                                                                        ml: 2,
+                                                                        my: -0.5,
+                                                                        position: 'relative',
+                                                                        zIndex: 2,
                                                                       }}
-                                                                    />
-                                                                  </Box>
-                                                                )}
+                                                                    >
+                                                                      <Chip
+                                                                        label="AND"
+                                                                        size="small"
+                                                                        sx={{
+                                                                          height: 18,
+                                                                          fontSize: '0.6rem',
+                                                                          fontWeight: 700,
+                                                                          bgcolor: 'background.paper',
+                                                                          color: 'text.secondary',
+                                                                          border: 1,
+                                                                          borderColor: 'divider',
+                                                                        }}
+                                                                      />
+                                                                    </Box>
+                                                                  )}
                                                               </Box>
                                                             );
                                                           }
@@ -3029,31 +3031,31 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                           {/* AND marker after constraint */}
                                                           {cIdx <
                                                             strategy.constraints.length - 1 && (
-                                                            <Box
-                                                              sx={{
-                                                                display: 'flex',
-                                                                alignItems: 'center',
-                                                                ml: 2,
-                                                                my: -0.5,
-                                                                position: 'relative',
-                                                                zIndex: 2,
-                                                              }}
-                                                            >
-                                                              <Chip
-                                                                label="AND"
-                                                                size="small"
+                                                              <Box
                                                                 sx={{
-                                                                  height: 18,
-                                                                  fontSize: '0.6rem',
-                                                                  fontWeight: 700,
-                                                                  bgcolor: 'background.paper',
-                                                                  color: 'text.secondary',
-                                                                  border: 1,
-                                                                  borderColor: 'divider',
+                                                                  display: 'flex',
+                                                                  alignItems: 'center',
+                                                                  ml: 2,
+                                                                  my: -0.5,
+                                                                  position: 'relative',
+                                                                  zIndex: 2,
                                                                 }}
-                                                              />
-                                                            </Box>
-                                                          )}
+                                                              >
+                                                                <Chip
+                                                                  label="AND"
+                                                                  size="small"
+                                                                  sx={{
+                                                                    height: 18,
+                                                                    fontSize: '0.6rem',
+                                                                    fontWeight: 700,
+                                                                    bgcolor: 'background.paper',
+                                                                    color: 'text.secondary',
+                                                                    border: 1,
+                                                                    borderColor: 'divider',
+                                                                  }}
+                                                                />
+                                                              </Box>
+                                                            )}
                                                         </Box>
                                                       )
                                                     )}
@@ -3175,8 +3177,8 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                     (Array.isArray(strategy.parameters.userIds)
                                                       ? strategy.parameters.userIds
                                                       : String(strategy.parameters.userIds).split(
-                                                          ','
-                                                        )
+                                                        ','
+                                                      )
                                                     ).length > 0 && (
                                                       <Box sx={{ mb: 1.5 }}>
                                                         <Paper variant="outlined" sx={{ p: 1.5 }}>
@@ -3203,8 +3205,8 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                             )
                                                               ? strategy.parameters.userIds
                                                               : String(
-                                                                  strategy.parameters.userIds
-                                                                ).split(',')
+                                                                strategy.parameters.userIds
+                                                              ).split(',')
                                                             )
                                                               .filter((id: string) => id.trim())
                                                               .map((userId: string) => (
@@ -3640,11 +3642,11 @@ const FeatureFlagDetailPage: React.FC = () => {
                       setFlag((prev) =>
                         prev
                           ? {
-                              ...prev,
-                              enabledValue: originalFlag.enabledValue,
-                              disabledValue: originalFlag.disabledValue,
-                              validationRules: originalFlag.validationRules,
-                            }
+                            ...prev,
+                            enabledValue: originalFlag.enabledValue,
+                            disabledValue: originalFlag.disabledValue,
+                            validationRules: originalFlag.validationRules,
+                          }
                           : prev
                       );
                     }
@@ -3654,9 +3656,9 @@ const FeatureFlagDetailPage: React.FC = () => {
                     (JSON.stringify(flag.enabledValue) ===
                       JSON.stringify(originalFlag?.enabledValue) &&
                       JSON.stringify(flag.disabledValue) ===
-                        JSON.stringify(originalFlag?.disabledValue) &&
+                      JSON.stringify(originalFlag?.disabledValue) &&
                       JSON.stringify(flag.validationRules) ===
-                        JSON.stringify(originalFlag?.validationRules))
+                      JSON.stringify(originalFlag?.validationRules))
                   }
                 >
                   {t('common.cancel')}
@@ -3676,11 +3678,11 @@ const FeatureFlagDetailPage: React.FC = () => {
                       setOriginalFlag((prev) =>
                         prev
                           ? {
-                              ...prev,
-                              enabledValue: flag.enabledValue,
-                              disabledValue: flag.disabledValue,
-                              validationRules: flag.validationRules,
-                            }
+                            ...prev,
+                            enabledValue: flag.enabledValue,
+                            disabledValue: flag.disabledValue,
+                            validationRules: flag.validationRules,
+                          }
                           : prev
                       );
                       enqueueSnackbar(t('common.saveSuccess'), {
@@ -3702,9 +3704,9 @@ const FeatureFlagDetailPage: React.FC = () => {
                     (JSON.stringify(flag.enabledValue) ===
                       JSON.stringify(originalFlag?.enabledValue) &&
                       JSON.stringify(flag.disabledValue) ===
-                        JSON.stringify(originalFlag?.disabledValue) &&
+                      JSON.stringify(originalFlag?.disabledValue) &&
                       JSON.stringify(flag.validationRules) ===
-                        JSON.stringify(originalFlag?.validationRules))
+                      JSON.stringify(originalFlag?.validationRules))
                   }
                 >
                   {saving ? <CircularProgress size={20} /> : t('common.save')}
@@ -3975,7 +3977,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                     editingFlagData?.description === (flag?.description || '') &&
                     editingFlagData?.impressionDataEnabled === flag?.impressionDataEnabled &&
                     JSON.stringify(editingFlagData?.tags || []) ===
-                      JSON.stringify(flag?.tags || []))
+                    JSON.stringify(flag?.tags || []))
                 }
               >
                 {saving ? <CircularProgress size={20} /> : t('common.save')}
@@ -4014,16 +4016,16 @@ const FeatureFlagDetailPage: React.FC = () => {
                       {(editingStrategy.segments?.length || 0) +
                         (editingStrategy.constraints?.length || 0) >
                         0 && (
-                        <Chip
-                          label={
-                            (editingStrategy.segments?.length || 0) +
-                            (editingStrategy.constraints?.length || 0)
-                          }
-                          size="small"
-                          color="primary"
-                          sx={{ height: 20, fontSize: '0.75rem' }}
-                        />
-                      )}
+                          <Chip
+                            label={
+                              (editingStrategy.segments?.length || 0) +
+                              (editingStrategy.constraints?.length || 0)
+                            }
+                            size="small"
+                            color="primary"
+                            sx={{ height: 20, fontSize: '0.75rem' }}
+                          />
+                        )}
                     </Box>
                   }
                 />
@@ -4107,148 +4109,148 @@ const FeatureFlagDetailPage: React.FC = () => {
                   {/* Rollout % for flexible rollout */}
                   {(editingStrategy.name === 'flexibleRollout' ||
                     editingStrategy.name?.includes('Rollout')) && (
-                    <Paper variant="outlined" sx={{ p: 2 }}>
-                      <Typography
-                        variant="subtitle2"
-                        gutterBottom
-                        sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
-                      >
-                        {t('featureFlags.rollout')}
-                        <Tooltip title={t('featureFlags.rolloutTooltip')}>
-                          <HelpOutlineIcon fontSize="small" color="action" />
-                        </Tooltip>
-                      </Typography>
-                      <Box sx={{ px: 2, pt: 3 }}>
-                        <Slider
-                          value={editingStrategy.parameters?.rollout ?? 100}
-                          onChange={(_, value) =>
-                            setEditingStrategy({
-                              ...editingStrategy,
-                              parameters: {
-                                ...editingStrategy.parameters,
-                                rollout: value as number,
-                              },
-                            })
-                          }
-                          valueLabelDisplay="on"
-                          min={0}
-                          max={100}
-                          marks={[
-                            { value: 0, label: '0%' },
-                            { value: 25, label: '25%' },
-                            { value: 50, label: '50%' },
-                            { value: 75, label: '75%' },
-                            { value: 100, label: '100%' },
-                          ]}
-                        />
-                      </Box>
+                      <Paper variant="outlined" sx={{ p: 2 }}>
+                        <Typography
+                          variant="subtitle2"
+                          gutterBottom
+                          sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
+                        >
+                          {t('featureFlags.rollout')}
+                          <Tooltip title={t('featureFlags.rolloutTooltip')}>
+                            <HelpOutlineIcon fontSize="small" color="action" />
+                          </Tooltip>
+                        </Typography>
+                        <Box sx={{ px: 2, pt: 3 }}>
+                          <Slider
+                            value={editingStrategy.parameters?.rollout ?? 100}
+                            onChange={(_, value) =>
+                              setEditingStrategy({
+                                ...editingStrategy,
+                                parameters: {
+                                  ...editingStrategy.parameters,
+                                  rollout: value as number,
+                                },
+                              })
+                            }
+                            valueLabelDisplay="on"
+                            min={0}
+                            max={100}
+                            marks={[
+                              { value: 0, label: '0%' },
+                              { value: 25, label: '25%' },
+                              { value: 50, label: '50%' },
+                              { value: 75, label: '75%' },
+                              { value: 100, label: '100%' },
+                            ]}
+                          />
+                        </Box>
 
-                      {/* Stickiness & GroupId */}
-                      <Grid container spacing={2} sx={{ mt: 2 }}>
-                        <Grid size={{ xs: 6 }}>
-                          <FormControl fullWidth size="small">
-                            <Typography
-                              variant="subtitle2"
-                              sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.5 }}
-                            >
-                              {t('featureFlags.stickiness')}
-                              <Tooltip title={t('featureFlags.stickinessHelp')}>
-                                <HelpOutlineIcon
-                                  fontSize="small"
-                                  color="action"
-                                  sx={{ cursor: 'pointer' }}
-                                />
-                              </Tooltip>
-                            </Typography>
-                            <Select
-                              value={editingStrategy.parameters?.stickiness || 'default'}
-                              onChange={(e) =>
-                                setEditingStrategy({
-                                  ...editingStrategy,
-                                  parameters: {
-                                    ...editingStrategy.parameters,
-                                    stickiness: e.target.value,
-                                  },
-                                })
-                              }
-                            >
-                              <MenuItem value="default">
-                                <Box>
-                                  <Typography variant="body2">
-                                    {t('featureFlags.stickinessDefault')}
-                                  </Typography>
-                                  <Typography variant="caption" color="text.secondary">
-                                    {t('featureFlags.stickinessDefaultDesc')}
-                                  </Typography>
-                                </Box>
-                              </MenuItem>
-                              <MenuItem value="userId">
-                                <Box>
-                                  <Typography variant="body2">
-                                    {t('featureFlags.stickinessUserId')}
-                                  </Typography>
-                                  <Typography variant="caption" color="text.secondary">
-                                    {t('featureFlags.stickinessUserIdDesc')}
-                                  </Typography>
-                                </Box>
-                              </MenuItem>
-                              <MenuItem value="sessionId">
-                                <Box>
-                                  <Typography variant="body2">
-                                    {t('featureFlags.stickinessSessionId')}
-                                  </Typography>
-                                  <Typography variant="caption" color="text.secondary">
-                                    {t('featureFlags.stickinessSessionIdDesc')}
-                                  </Typography>
-                                </Box>
-                              </MenuItem>
-                              <MenuItem value="random">
-                                <Box>
-                                  <Typography variant="body2">
-                                    {t('featureFlags.stickinessRandom')}
-                                  </Typography>
-                                  <Typography variant="caption" color="text.secondary">
-                                    {t('featureFlags.stickinessRandomDesc')}
-                                  </Typography>
-                                </Box>
-                              </MenuItem>
-                            </Select>
-                          </FormControl>
+                        {/* Stickiness & GroupId */}
+                        <Grid container spacing={2} sx={{ mt: 2 }}>
+                          <Grid size={{ xs: 6 }}>
+                            <FormControl fullWidth size="small">
+                              <Typography
+                                variant="subtitle2"
+                                sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.5 }}
+                              >
+                                {t('featureFlags.stickiness')}
+                                <Tooltip title={t('featureFlags.stickinessHelp')}>
+                                  <HelpOutlineIcon
+                                    fontSize="small"
+                                    color="action"
+                                    sx={{ cursor: 'pointer' }}
+                                  />
+                                </Tooltip>
+                              </Typography>
+                              <Select
+                                value={editingStrategy.parameters?.stickiness || 'default'}
+                                onChange={(e) =>
+                                  setEditingStrategy({
+                                    ...editingStrategy,
+                                    parameters: {
+                                      ...editingStrategy.parameters,
+                                      stickiness: e.target.value,
+                                    },
+                                  })
+                                }
+                              >
+                                <MenuItem value="default">
+                                  <Box>
+                                    <Typography variant="body2">
+                                      {t('featureFlags.stickinessDefault')}
+                                    </Typography>
+                                    <Typography variant="caption" color="text.secondary">
+                                      {t('featureFlags.stickinessDefaultDesc')}
+                                    </Typography>
+                                  </Box>
+                                </MenuItem>
+                                <MenuItem value="userId">
+                                  <Box>
+                                    <Typography variant="body2">
+                                      {t('featureFlags.stickinessUserId')}
+                                    </Typography>
+                                    <Typography variant="caption" color="text.secondary">
+                                      {t('featureFlags.stickinessUserIdDesc')}
+                                    </Typography>
+                                  </Box>
+                                </MenuItem>
+                                <MenuItem value="sessionId">
+                                  <Box>
+                                    <Typography variant="body2">
+                                      {t('featureFlags.stickinessSessionId')}
+                                    </Typography>
+                                    <Typography variant="caption" color="text.secondary">
+                                      {t('featureFlags.stickinessSessionIdDesc')}
+                                    </Typography>
+                                  </Box>
+                                </MenuItem>
+                                <MenuItem value="random">
+                                  <Box>
+                                    <Typography variant="body2">
+                                      {t('featureFlags.stickinessRandom')}
+                                    </Typography>
+                                    <Typography variant="caption" color="text.secondary">
+                                      {t('featureFlags.stickinessRandomDesc')}
+                                    </Typography>
+                                  </Box>
+                                </MenuItem>
+                              </Select>
+                            </FormControl>
+                          </Grid>
+                          <Grid size={{ xs: 6 }}>
+                            <Box>
+                              <Typography
+                                variant="subtitle2"
+                                sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.5 }}
+                              >
+                                {t('featureFlags.groupId')}
+                                <Tooltip title={t('featureFlags.groupIdHelp')}>
+                                  <HelpOutlineIcon
+                                    fontSize="small"
+                                    color="action"
+                                    sx={{ cursor: 'pointer' }}
+                                  />
+                                </Tooltip>
+                              </Typography>
+                              <TextField
+                                fullWidth
+                                size="small"
+                                value={editingStrategy.parameters?.groupId || flag?.flagName || ''}
+                                onChange={(e) =>
+                                  setEditingStrategy({
+                                    ...editingStrategy,
+                                    parameters: {
+                                      ...editingStrategy.parameters,
+                                      groupId: e.target.value,
+                                    },
+                                  })
+                                }
+                              />
+                            </Box>
+                          </Grid>
                         </Grid>
-                        <Grid size={{ xs: 6 }}>
-                          <Box>
-                            <Typography
-                              variant="subtitle2"
-                              sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.5 }}
-                            >
-                              {t('featureFlags.groupId')}
-                              <Tooltip title={t('featureFlags.groupIdHelp')}>
-                                <HelpOutlineIcon
-                                  fontSize="small"
-                                  color="action"
-                                  sx={{ cursor: 'pointer' }}
-                                />
-                              </Tooltip>
-                            </Typography>
-                            <TextField
-                              fullWidth
-                              size="small"
-                              value={editingStrategy.parameters?.groupId || flag?.flagName || ''}
-                              onChange={(e) =>
-                                setEditingStrategy({
-                                  ...editingStrategy,
-                                  parameters: {
-                                    ...editingStrategy.parameters,
-                                    groupId: e.target.value,
-                                  },
-                                })
-                              }
-                            />
-                          </Box>
-                        </Grid>
-                      </Grid>
-                    </Paper>
-                  )}
+                      </Paper>
+                    )}
 
                   {/* User IDs input for userWithId strategy */}
                   {editingStrategy.name === 'userWithId' && (
