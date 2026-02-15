@@ -28,7 +28,7 @@ import {
   ArrowForward as AdvanceIcon,
   LibraryAdd as TemplateIcon,
   Pause as PauseIcon,
-  SkipNext as SkipNextIcon,
+  DoubleArrow as DoubleArrowIcon,
   Shield as ShieldIcon,
   ExpandMore as ExpandMoreIcon,
   ExpandLess as ExpandLessIcon,
@@ -39,12 +39,14 @@ import {
   CheckCircle as CompletedIcon,
   ArrowDownward as ArrowDownIcon,
   HelpOutline as HelpOutlineIcon,
+  DeleteOutline as DeleteIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { useReleaseFlowTemplates, useReleaseFlowPlan } from '../../hooks/useReleaseFlows';
 import {
   applyTemplate,
+  deletePlan,
   startMilestone,
   startPlan,
   pausePlan,
@@ -69,6 +71,7 @@ interface ReleaseFlowTabProps {
   envEnabled?: boolean;
   allSegments?: any[];
   contextFields?: ContextFieldInfo[];
+  onPlanDeleted?: () => void;
 }
 
 // ==================== Types ====================
@@ -143,6 +146,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
   envEnabled = false,
   allSegments = [],
   contextFields = [],
+  onPlanDeleted,
 }) => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
@@ -165,6 +169,8 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
   const [targetMilestoneId, setTargetMilestoneId] = useState<string | null>(null);
   const [safeguardExpanded, setSafeguardExpanded] = useState(false);
   const [flowExpanded, setFlowExpanded] = useState(true);
+  const [collapsedMilestones, setCollapsedMilestones] = useState<Set<string>>(new Set());
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
 
   // Transition editing state: tracks which milestone is being edited
   const [editingTransitionId, setEditingTransitionId] = useState<string | null>(null);
@@ -219,6 +225,10 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
   const handleApplyTemplate = async (templateId: string) => {
     try {
       setApplying(true);
+      // If a plan already exists, archive it first before applying a new template
+      if (plan) {
+        await deletePlan(plan.id);
+      }
       await applyTemplate({ flagId, environment: selectedEnv, templateId });
       enqueueSnackbar(t('releaseFlow.applySuccess'), { variant: 'success' });
       mutatePlan();
@@ -227,6 +237,22 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
       enqueueSnackbar(error.message || t('releaseFlow.applyFailed'), { variant: 'error' });
     } finally {
       setApplying(false);
+    }
+  };
+
+  const handleDeletePlan = async () => {
+    if (!plan) return;
+    try {
+      setActionLoading(true);
+      await deletePlan(plan.id);
+      enqueueSnackbar(t('releaseFlow.planDeleteSuccess'), { variant: 'success' });
+      mutatePlan();
+      setDeleteConfirmOpen(false);
+      onPlanDeleted?.();
+    } catch (error: any) {
+      enqueueSnackbar(error.message || t('common.error'), { variant: 'error' });
+    } finally {
+      setActionLoading(false);
     }
   };
 
@@ -355,7 +381,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
   const getMilestoneStatus = (index: number): 'completed' | 'active' | 'paused' | 'pending' => {
     if (isCompleted || index < currentMilestoneIndex) return 'completed';
     if (index === currentMilestoneIndex) {
-      if (isPaused) return 'paused';
+      if (isPaused || !envEnabled) return 'paused';
       return 'active';
     }
     return 'pending';
@@ -392,7 +418,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
         variant="text"
         color="primary"
         onClick={() => handleStartMilestoneClick(milestoneId)}
-        startIcon={<SkipNextIcon />}
+        startIcon={<DoubleArrowIcon />}
         disabled={actionLoading}
         sx={{ whiteSpace: 'nowrap' }}
       >
@@ -635,15 +661,24 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                 <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
                   {plan.displayName || plan.flowName}
                 </Typography>
-                {isPaused && (
-                  <Chip
-                    icon={<PauseIcon sx={{ fontSize: 14 }} />}
-                    label={t('releaseFlow.pause').toUpperCase()}
-                    color="warning"
-                    size="small"
-                    sx={{ height: 22, '& .MuiChip-label': { px: 0.75, fontSize: '0.7rem' } }}
-                  />
-                )}
+                {isPaused &&
+                  (() => {
+                    const activeMilestone = milestones[currentMilestoneIndex];
+                    const pausedTime = activeMilestone?.pausedAt;
+                    return (
+                      <Chip
+                        icon={<PauseIcon sx={{ fontSize: 14 }} />}
+                        label={
+                          pausedTime
+                            ? `${t('releaseFlow.pausedAt')}: ${formatRelativeTime(pausedTime)}`
+                            : t('releaseFlow.pausedAt')
+                        }
+                        color="warning"
+                        size="small"
+                        sx={{ height: 22, '& .MuiChip-label': { px: 0.75, fontSize: '0.7rem' } }}
+                      />
+                    );
+                  })()}
                 {isCompleted && (
                   <Chip
                     label={t('common.completed').toUpperCase()}
@@ -678,6 +713,24 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                     </span>
                   </Tooltip>
                 )}
+                {canManage && !isCompleted && (
+                  <Tooltip title={envEnabled ? t('releaseFlow.cannotDeleteWhileEnabled') : ''}>
+                    <span>
+                      <IconButton
+                        size="small"
+                        color="error"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setDeleteConfirmOpen(true);
+                        }}
+                        disabled={envEnabled || actionLoading}
+                        sx={{ ml: 0.5 }}
+                      >
+                        <DeleteIcon fontSize="small" />
+                      </IconButton>
+                    </span>
+                  </Tooltip>
+                )}
                 <IconButton size="small" tabIndex={-1} sx={{ ml: 0.5 }}>
                   {flowExpanded ? (
                     <ExpandLessIcon fontSize="small" />
@@ -709,7 +762,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                       <ShieldIcon fontSize="small" color="primary" />
                       <Typography variant="subtitle2">{t('releaseFlow.safeguards')}</Typography>
                       <Tooltip
-                        title={t('releaseFlow.safeguard.helpTooltip')}
+                        title={t('releaseFlow.safeguard.helpTooltip').replace(/\\n/g, '\n')}
                         arrow
                         placement="right"
                         slotProps={{
@@ -774,15 +827,26 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                           overflow: 'hidden',
                           transition: 'all 0.2s',
                           ...(status === 'active' && {
-                            boxShadow: '0 2px 8px rgba(25, 118, 210, 0.15)',
+                            boxShadow: '0 0 12px 2px rgba(25, 118, 210, 0.25)',
                           }),
                           ...(status === 'paused' && {
-                            boxShadow: '0 2px 8px rgba(237, 108, 2, 0.12)',
+                            boxShadow: '0 0 10px 1px rgba(237, 108, 2, 0.18)',
                           }),
                         }}
                       >
                         {/* Card Header */}
                         <Box
+                          onClick={() => {
+                            setCollapsedMilestones((prev) => {
+                              const next = new Set(prev);
+                              if (next.has(milestone.id)) {
+                                next.delete(milestone.id);
+                              } else {
+                                next.add(milestone.id);
+                              }
+                              return next;
+                            });
+                          }}
                           sx={{
                             px: 2,
                             py: 1.25,
@@ -796,6 +860,13 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                                       ? 'rgba(255,255,255,0.03)'
                                       : 'rgba(0,0,0,0.015)'
                                 : 'transparent',
+                            cursor: 'pointer',
+                            '&:hover': {
+                              bgcolor: (theme) =>
+                                theme.palette.mode === 'dark'
+                                  ? 'rgba(255,255,255,0.05)'
+                                  : 'rgba(0,0,0,0.03)',
+                            },
                           }}
                         >
                           <Box
@@ -859,6 +930,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                                 {milestone.name}
                               </Typography>
                               {milestone.startedAt &&
+                                envEnabled &&
                                 (isCompleted || index <= currentMilestoneIndex) && (
                                   <Typography variant="caption" color="text.secondary">
                                     {t('common.started')}: {formatRelativeTime(milestone.startedAt)}
@@ -866,6 +938,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                                 )}
                               {/* Estimated start time for next-up milestone */}
                               {(() => {
+                                if (!envEnabled) return null;
                                 if (index <= 0 || status !== 'pending') return null;
                                 const prevMilestone = milestones[index - 1];
                                 const prevInterval =
@@ -896,7 +969,10 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                                         color="primary"
                                         underline="hover"
                                         sx={{ fontWeight: 600, cursor: 'pointer', ml: 0.5 }}
-                                        onClick={() => handleStartMilestoneClick(milestone.id)}
+                                        onClick={(e: React.MouseEvent) => {
+                                          e.stopPropagation();
+                                          handleStartMilestoneClick(milestone.id);
+                                        }}
                                       >
                                         {t('releaseFlow.startNow')}
                                       </Link>
@@ -907,70 +983,80 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                             </Box>
                           </Box>
 
-                          <Box
-                            onClick={(e: React.MouseEvent) => e.stopPropagation()}
-                            sx={{ ml: 2, flexShrink: 0 }}
-                          >
-                            {renderMilestoneControls(milestone.id, index)}
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                            <Box
+                              onClick={(e: React.MouseEvent) => e.stopPropagation()}
+                              sx={{ flexShrink: 0 }}
+                            >
+                              {renderMilestoneControls(milestone.id, index)}
+                            </Box>
+                            {collapsedMilestones.has(milestone.id) ? (
+                              <ExpandMoreIcon sx={{ fontSize: 20, color: 'text.secondary' }} />
+                            ) : (
+                              <ExpandLessIcon sx={{ fontSize: 20, color: 'text.secondary' }} />
+                            )}
                           </Box>
                         </Box>
 
                         {/* Card Body */}
-                        <Box sx={{ px: 2, py: 1.5 }}>
-                          {milestone.description && (
-                            <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
-                              {milestone.description}
-                            </Typography>
-                          )}
+                        <Collapse in={!collapsedMilestones.has(milestone.id)} timeout={200}>
+                          <Box sx={{ px: 2, py: 1.5 }}>
+                            {milestone.description && (
+                              <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
+                                {milestone.description}
+                              </Typography>
+                            )}
 
-                          {/* Strategies */}
-                          <Box sx={{ pl: 1.5, borderLeft: 2, borderColor: 'divider' }}>
-                            <Typography
-                              variant="caption"
-                              fontWeight={600}
-                              display="block"
-                              sx={{ mb: 0.5 }}
-                            >
-                              {t('releaseFlow.appliedStrategies')}
-                            </Typography>
-                            {milestone.strategies?.map((strategy: any, sIdx: number) => (
-                              <Box
-                                key={sIdx}
-                                sx={{
-                                  mb: sIdx < (milestone.strategies?.length || 0) - 1 ? 1.5 : 0,
-                                }}
+                            {/* Strategies */}
+                            <Box sx={{ pl: 1.5, borderLeft: 2, borderColor: 'divider' }}>
+                              <Typography
+                                variant="caption"
+                                fontWeight={600}
+                                display="block"
+                                sx={{ mb: 0.5 }}
                               >
-                                <StrategyDetail
-                                  strategyName={strategy.strategyName}
-                                  parameters={strategy.parameters}
-                                  constraints={strategy.constraints}
-                                  segments={strategy.segments}
-                                  allSegments={allSegments}
-                                  contextFields={contextFields}
-                                />
-                                {sIdx < (milestone.strategies?.length || 0) - 1 && (
-                                  <Box
-                                    sx={{
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      gap: 1,
-                                      mt: 1,
-                                    }}
-                                  >
-                                    <Divider sx={{ flexGrow: 1, borderStyle: 'dashed' }} />
-                                    <Chip
-                                      label="OR"
-                                      size="small"
-                                      variant="outlined"
-                                      sx={{ height: 16, fontSize: '0.6rem', opacity: 0.5 }}
-                                    />
-                                    <Divider sx={{ flexGrow: 1, borderStyle: 'dashed' }} />
-                                  </Box>
-                                )}
-                              </Box>
-                            ))}
+                                {t('releaseFlow.appliedStrategies')}
+                              </Typography>
+                              {milestone.strategies?.map((strategy: any, sIdx: number) => (
+                                <Box
+                                  key={sIdx}
+                                  sx={{
+                                    mb: sIdx < (milestone.strategies?.length || 0) - 1 ? 1.5 : 0,
+                                  }}
+                                >
+                                  <StrategyDetail
+                                    strategyName={strategy.strategyName}
+                                    parameters={strategy.parameters}
+                                    constraints={strategy.constraints}
+                                    segments={strategy.segments}
+                                    allSegments={allSegments}
+                                    contextFields={contextFields}
+                                    expandable
+                                  />
+                                  {sIdx < (milestone.strategies?.length || 0) - 1 && (
+                                    <Box
+                                      sx={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: 1,
+                                        mt: 1,
+                                      }}
+                                    >
+                                      <Divider sx={{ flexGrow: 1, borderStyle: 'dashed' }} />
+                                      <Chip
+                                        label="OR"
+                                        size="small"
+                                        variant="outlined"
+                                        sx={{ height: 16, fontSize: '0.6rem', opacity: 0.5 }}
+                                      />
+                                      <Divider sx={{ flexGrow: 1, borderStyle: 'dashed' }} />
+                                    </Box>
+                                  )}
+                                </Box>
+                              ))}
+                            </Box>
                           </Box>
-                        </Box>
+                        </Collapse>
                       </Paper>
 
                       {/* Connector between milestones */}
@@ -1227,6 +1313,17 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Delete Plan Confirmation */}
+      <ConfirmDialog
+        open={deleteConfirmOpen}
+        onClose={() => setDeleteConfirmOpen(false)}
+        onConfirm={handleDeletePlan}
+        title={t('releaseFlow.deletePlanTitle')}
+        message={t('releaseFlow.deletePlanMessage')}
+        confirmLabel={t('common.delete')}
+        confirmColor="error"
+      />
     </Box>
   );
 };

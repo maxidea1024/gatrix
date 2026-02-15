@@ -594,6 +594,31 @@ export class ReleaseFlowService {
   async getPlanForFlag(flagId: string, environment: string): Promise<ReleaseFlowAttributes | null> {
     return ReleaseFlowModel.findPlanByFlagAndEnv(flagId, environment);
   }
+
+  /**
+   * Delete (archive) an applied release flow plan
+   */
+  async deletePlan(planId: string, userId: number): Promise<void> {
+    const plan = await ReleaseFlowModel.findById(planId);
+    if (!plan || plan.discriminator !== 'plan') {
+      throw new GatrixError('Plan not found', 404, true, ErrorCodes.NOT_FOUND);
+    }
+
+    await ReleaseFlowModel.update(planId, {
+      isArchived: true,
+      updatedBy: userId,
+      archivedAt: new Date(),
+    });
+
+    await AuditLogModel.create({
+      action: 'release_flow.plan_delete',
+      description: `Release flow plan '${plan.flowName}' removed from flag '${plan.flagId}' in [${plan.environment}]`,
+      resourceType: 'ReleaseFlow',
+      resourceId: planId,
+      userId,
+      environment: plan.environment,
+    });
+  }
 }
 
 export const releaseFlowService = new ReleaseFlowService();

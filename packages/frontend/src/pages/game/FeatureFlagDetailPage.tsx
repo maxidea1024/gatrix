@@ -476,7 +476,9 @@ const FeatureFlagDetailPage: React.FC = () => {
   const [envManualReleaseFlow, setEnvManualReleaseFlow] = useState<Set<string>>(new Set());
 
   // Release flow plan summaries - to detect environments managed by release flow
-  const { data: releaseFlowPlans } = useReleaseFlowPlansByFlag(flag?.id || null);
+  const { data: releaseFlowPlans, mutate: mutateReleaseFlowPlans } = useReleaseFlowPlansByFlag(
+    flag?.id || null
+  );
   const releaseFlowEnvs = new Set((releaseFlowPlans || []).map((p) => p.environment));
 
   // Fetch code reference count on mount
@@ -2434,6 +2436,14 @@ const FeatureFlagDetailPage: React.FC = () => {
                                   envEnabled={isEnabled}
                                   allSegments={segments}
                                   contextFields={contextFields}
+                                  onPlanDeleted={() => {
+                                    setEnvManualReleaseFlow((prev) => {
+                                      const next = new Set(prev);
+                                      next.delete(env.environment);
+                                      return next;
+                                    });
+                                    mutateReleaseFlowPlans();
+                                  }}
                                 />
 
                                 {/* Divider between release flow and variants */}
@@ -2496,18 +2506,20 @@ const FeatureFlagDetailPage: React.FC = () => {
                                       >
                                         {t('featureFlags.addFirstStrategy')}
                                       </Button>
-                                      <Button
-                                        variant="contained"
-                                        size="small"
-                                        startIcon={<TemplateIcon />}
-                                        onClick={() => {
-                                          setEnvManualReleaseFlow((prev) =>
-                                            new Set(prev).add(env.environment)
-                                          );
-                                        }}
-                                      >
-                                        {t('releaseFlow.tabTitle')}
-                                      </Button>
+                                      {!isEnabled && (
+                                        <Button
+                                          variant="contained"
+                                          size="small"
+                                          startIcon={<TemplateIcon />}
+                                          onClick={() => {
+                                            setEnvManualReleaseFlow((prev) =>
+                                              new Set(prev).add(env.environment)
+                                            );
+                                          }}
+                                        >
+                                          {t('releaseFlow.tabTitle')}
+                                        </Button>
+                                      )}
                                     </Box>
                                   )}
                                 </EmptyPlaceholder>
@@ -3374,7 +3386,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                   </SortableContext>
                                 </DndContext>
 
-                                {/* Add strategy / Use template buttons */}
+                                {/* Add strategy button */}
                                 {canManage && (
                                   <Box
                                     sx={{
@@ -3384,16 +3396,6 @@ const FeatureFlagDetailPage: React.FC = () => {
                                       mt: 2,
                                     }}
                                   >
-                                    <Button
-                                      variant="outlined"
-                                      startIcon={<TemplateIcon />}
-                                      onClick={() => {
-                                        setTabValue(2);
-                                      }}
-                                      size="small"
-                                    >
-                                      {t('releaseFlow.useTemplate')}
-                                    </Button>
                                     <Button
                                       variant="contained"
                                       startIcon={<AddIcon />}

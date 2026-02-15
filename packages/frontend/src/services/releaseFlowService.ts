@@ -150,6 +150,13 @@ export async function deleteTemplate(id: string): Promise<void> {
   await api.delete(`/admin/release-flows/templates/${id}`);
 }
 
+/**
+ * Delete (archive) an applied plan
+ */
+export async function deletePlan(planId: string): Promise<void> {
+  await api.delete(`/admin/release-flows/plans/${planId}`);
+}
+
 // ==================== Plan Lifecycle ====================
 
 /**
@@ -338,6 +345,7 @@ const releaseFlowService = {
   updateTemplate,
   deleteTemplate,
   applyTemplate,
+  deletePlan,
   getPlan,
   startMilestone,
   startPlan,
