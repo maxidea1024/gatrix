@@ -2485,46 +2485,44 @@ const FeatureFlagDetailPage: React.FC = () => {
                               </>
                             ) : strategies.length === 0 ? (
                               <>
-                                {isEnabled && (
-                                  <EmptyPlaceholder
-                                    message={t('featureFlags.noStrategiesTitle')}
-                                    description={t('featureFlags.noStrategiesDescription')}
-                                  >
-                                    {canManage && (
-                                      <Box
-                                        sx={{
-                                          display: 'flex',
-                                          justifyContent: 'center',
-                                          gap: 2,
-                                          mt: 1.5,
-                                        }}
+                                <EmptyPlaceholder
+                                  message={t('featureFlags.noStrategiesTitle')}
+                                  description={t('featureFlags.noStrategiesDescription')}
+                                >
+                                  {canManage && (
+                                    <Box
+                                      sx={{
+                                        display: 'flex',
+                                        justifyContent: 'center',
+                                        gap: 2,
+                                        mt: 1.5,
+                                      }}
+                                    >
+                                      <Button
+                                        variant="contained"
+                                        size="small"
+                                        startIcon={<AddIcon />}
+                                        onClick={() => handleAddStrategy(env.environment)}
                                       >
+                                        {t('featureFlags.addFirstStrategy')}
+                                      </Button>
+                                      {!isEnabled && (
                                         <Button
                                           variant="contained"
                                           size="small"
-                                          startIcon={<AddIcon />}
-                                          onClick={() => handleAddStrategy(env.environment)}
+                                          startIcon={<TemplateIcon />}
+                                          onClick={() => {
+                                            setEnvManualReleaseFlow((prev) =>
+                                              new Set(prev).add(env.environment)
+                                            );
+                                          }}
                                         >
-                                          {t('featureFlags.addFirstStrategy')}
+                                          {t('releaseFlow.tabTitle')}
                                         </Button>
-                                        {!isEnabled && (
-                                          <Button
-                                            variant="contained"
-                                            size="small"
-                                            startIcon={<TemplateIcon />}
-                                            onClick={() => {
-                                              setEnvManualReleaseFlow((prev) =>
-                                                new Set(prev).add(env.environment)
-                                              );
-                                            }}
-                                          >
-                                            {t('releaseFlow.tabTitle')}
-                                          </Button>
-                                        )}
-                                      </Box>
-                                    )}
-                                  </EmptyPlaceholder>
-                                )}
+                                      )}
+                                    </Box>
+                                  )}
+                                </EmptyPlaceholder>
 
                                 {/* Divider between strategies and variants */}
                                 <Divider sx={{ my: 2 }} />
