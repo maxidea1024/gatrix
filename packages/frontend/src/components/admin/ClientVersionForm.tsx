@@ -669,15 +669,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
 
           <Stack spacing={3} sx={{ mt: 1 }}>
             {/* 기본 정보 섹션 */}
-            <Paper
-              elevation={0}
-              sx={{
-                p: 2,
-                bgcolor: 'background.default',
-                border: '1px solid',
-                borderColor: 'divider',
-              }}
-            >
+            <Paper variant="outlined" elevation={0} sx={{ p: 2 }}>
               <Typography
                 variant="h6"
                 gutterBottom
@@ -885,15 +877,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
             </Paper>
 
             {/* 서버 주소 섹션 */}
-            <Paper
-              elevation={0}
-              sx={{
-                p: 2,
-                bgcolor: 'background.default',
-                border: '1px solid',
-                borderColor: 'divider',
-              }}
-            >
+            <Paper variant="outlined" elevation={0} sx={{ p: 2 }}>
               <Typography
                 variant="h6"
                 gutterBottom
@@ -1024,15 +1008,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
             </Paper>
 
             {/* 태그 섹션 (추가 설정 밖) */}
-            <Paper
-              elevation={0}
-              sx={{
-                p: 2,
-                bgcolor: 'background.default',
-                border: '1px solid',
-                borderColor: 'divider',
-              }}
-            >
+            <Paper variant="outlined" elevation={0} sx={{ p: 2 }}>
               <Typography
                 variant="h6"
                 gutterBottom
@@ -1114,15 +1090,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
             </Paper>
 
             {/* 추가 설정 섹션 */}
-            <Accordion
-              defaultExpanded={false}
-              disableGutters
-              sx={{
-                border: '1px solid',
-                borderColor: 'divider',
-                bgcolor: 'background.default',
-              }}
-            >
+            <Accordion defaultExpanded={false} disableGutters variant="outlined" sx={{ mb: 2 }}>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                 <Typography
                   variant="subtitle1"

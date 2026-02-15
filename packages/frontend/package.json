@@ -43,7 +43,7 @@
     "@gatrix/shared": "file:../shared",
     "@hookform/resolvers": "^5.2.1",
     "@monaco-editor/react": "^4.7.0",
-    "@mui/icons-material": "^7.3.2",
+    "@mui/icons-material": "^7.3.8",
     "@mui/lab": "^7.0.0-beta.17",
     "@mui/material": "^7.3.2",
     "@mui/system": "^7.3.2",

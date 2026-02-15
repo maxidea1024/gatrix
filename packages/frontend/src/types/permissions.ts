@@ -121,6 +121,14 @@ export const PERMISSIONS = {
 
   // Chat
   CHAT_ACCESS: 'chat.access',
+
+  // Actions & Signals
+  SERVICE_ACCOUNTS_VIEW: 'service-accounts.view',
+  SERVICE_ACCOUNTS_MANAGE: 'service-accounts.manage',
+  SIGNAL_ENDPOINTS_VIEW: 'signal-endpoints.view',
+  SIGNAL_ENDPOINTS_MANAGE: 'signal-endpoints.manage',
+  ACTIONS_VIEW: 'actions.view',
+  ACTIONS_MANAGE: 'actions.manage',
 } as const;
 
 export type Permission = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];
@@ -188,6 +196,12 @@ export const PERMISSION_CATEGORIES: Record<string, PermissionCategory> = {
       PERMISSIONS.FEATURE_FLAGS_MANAGE,
       PERMISSIONS.CHANGE_REQUESTS_VIEW,
       PERMISSIONS.CHANGE_REQUESTS_MANAGE,
+      PERMISSIONS.SERVICE_ACCOUNTS_VIEW,
+      PERMISSIONS.SERVICE_ACCOUNTS_MANAGE,
+      PERMISSIONS.SIGNAL_ENDPOINTS_VIEW,
+      PERMISSIONS.SIGNAL_ENDPOINTS_MANAGE,
+      PERMISSIONS.ACTIONS_VIEW,
+      PERMISSIONS.ACTIONS_MANAGE,
     ],
   },
   EVENT_LENS: {

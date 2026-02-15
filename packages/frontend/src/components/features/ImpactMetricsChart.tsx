@@ -74,6 +74,7 @@ import 'react-resizable/css/styles.css';
 import api from '../../services/api';
 import { useSnackbar } from 'notistack';
 import ConfirmDialog from '../common/ConfirmDialog';
+import EmptyPlaceholder from '../common/EmptyPlaceholder';
 
 const GridLayout = WidthProvider(ReactGridLayout);
 
@@ -216,9 +217,7 @@ const ChartPanel: React.FC<ChartPanelProps> = ({
         globalLabelFilter.split(',').forEach((pair) => {
           const [key, val] = pair.split('=').map((s) => s.trim());
           if (key && val) {
-            mergedLabels[key] = mergedLabels[key]
-              ? [...mergedLabels[key], val]
-              : [val];
+            mergedLabels[key] = mergedLabels[key] ? [...mergedLabels[key], val] : [val];
           }
         });
       }
@@ -239,7 +238,14 @@ const ChartPanel: React.FC<ChartPanelProps> = ({
       setLoading(false);
       setIsRefreshing(false);
     }
-  }, [config.metricName, config.aggregationMode, config.labelSelectors, config.groupBy, range, globalLabelFilter]);
+  }, [
+    config.metricName,
+    config.aggregationMode,
+    config.labelSelectors,
+    config.groupBy,
+    range,
+    globalLabelFilter,
+  ]);
 
   // Fetch on mount, range/filter change, or refresh trigger
   useEffect(() => {
@@ -404,9 +410,7 @@ const ChartPanel: React.FC<ChartPanelProps> = ({
           px: 1.5,
           py: 0.8,
           minWidth: 0,
-          bgcolor: theme.palette.mode === 'dark'
-            ? 'rgba(255,255,255,0.04)'
-            : 'rgba(0,0,0,0.02)',
+          bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.02)',
           borderBottom: `1px solid ${theme.palette.divider}`,
           borderRadius: isExpanded ? 0 : '12px 12px 0 0',
           cursor: canManage ? 'grab' : 'default',
@@ -879,7 +883,8 @@ const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
     const fromUrl = searchParams.get('range');
     if (fromUrl && validRanges.includes(fromUrl as RangeOption)) return fromUrl as RangeOption;
     const fromStorage = localStorage.getItem(`${STORAGE_KEY}.range`);
-    if (fromStorage && validRanges.includes(fromStorage as RangeOption)) return fromStorage as RangeOption;
+    if (fromStorage && validRanges.includes(fromStorage as RangeOption))
+      return fromStorage as RangeOption;
     return 'hour';
   };
 
@@ -908,11 +913,14 @@ const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
     (range: RangeOption) => {
       setGlobalRangeState(range);
       localStorage.setItem(`${STORAGE_KEY}.range`, range);
-      setSearchParams((prev) => {
-        const next = new URLSearchParams(prev);
-        next.set('range', range);
-        return next;
-      }, { replace: true });
+      setSearchParams(
+        (prev) => {
+          const next = new URLSearchParams(prev);
+          next.set('range', range);
+          return next;
+        },
+        { replace: true }
+      );
     },
     [setSearchParams]
   );
@@ -921,11 +929,14 @@ const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
     (interval: number) => {
       setRefreshIntervalState(interval);
       localStorage.setItem(`${STORAGE_KEY}.refresh`, String(interval));
-      setSearchParams((prev) => {
-        const next = new URLSearchParams(prev);
-        next.set('refresh', String(interval));
-        return next;
-      }, { replace: true });
+      setSearchParams(
+        (prev) => {
+          const next = new URLSearchParams(prev);
+          next.set('refresh', String(interval));
+          return next;
+        },
+        { replace: true }
+      );
     },
     [setSearchParams]
   );
@@ -1182,25 +1193,11 @@ const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
             </Typography>
           </Box>
         )}
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            py: 8,
-            color: 'text.secondary',
-          }}
-        >
-          <Typography variant="body1" sx={{ mb: 2 }}>
-            {t('impactMetrics.noCharts')}
-          </Typography>
-          {canManage && (
-            <Button variant="contained" startIcon={<AddIcon />} onClick={handleOpenAddDialog}>
-              {t('impactMetrics.addChart')}
-            </Button>
-          )}
-        </Box>
+        <EmptyPlaceholder
+          message={t('impactMetrics.noCharts')}
+          onAddClick={canManage ? handleOpenAddDialog : undefined}
+          addButtonLabel={t('impactMetrics.addChart')}
+        />
 
         <ChartConfigDialog
           open={showConfigDialog}
@@ -1246,7 +1243,9 @@ const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
             value={labelFilterInput}
             onChange={(e) => setLabelFilterInput(e.target.value)}
             InputProps={{
-              startAdornment: <FilterListIcon sx={{ fontSize: 16, mr: 0.5, color: 'text.secondary' }} />,
+              startAdornment: (
+                <FilterListIcon sx={{ fontSize: 16, mr: 0.5, color: 'text.secondary' }} />
+              ),
             }}
             sx={{
               minWidth: 160,

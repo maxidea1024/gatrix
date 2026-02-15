@@ -24,6 +24,7 @@ export class SystemConsoleController {
         await AuditLogModel.create({
           userId: (req as any)?.user?.id || (req as any)?.userId,
           action: `console_${command}`,
+          description: `Console command '${command}' executed with args [${argv.join(', ')}]`,
           resourceType: 'console',
           resourceId: undefined, // Console commands don't have numeric entity IDs
           newValues: {

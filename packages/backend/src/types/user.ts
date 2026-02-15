@@ -1,5 +1,12 @@
 export type SupportedLanguage = 'en' | 'ko' | 'zh';
-export type AuthType = 'local' | 'google' | 'github' | 'qq' | 'wechat' | 'baidu';
+export type AuthType =
+  | 'local'
+  | 'google'
+  | 'github'
+  | 'qq'
+  | 'wechat'
+  | 'baidu'
+  | 'service-account';
 
 export interface User {
   id: number;
@@ -83,6 +90,7 @@ export interface AuditLog {
   id: number;
   userId?: number;
   action: string;
+  description?: string;
   entityType?: string;
   entityId?: number;
   oldValues?: any;
@@ -95,6 +103,7 @@ export interface AuditLog {
 export interface CreateAuditLogData {
   userId?: number;
   action: string;
+  description?: string;
   resourceType?: string;
   resourceId?: string;
   oldValues?: any;

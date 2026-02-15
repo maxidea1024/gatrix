@@ -105,6 +105,9 @@ import IntegrationsPage from './pages/settings/IntegrationsPage';
 import IntegrationsSdksPage from './pages/settings/IntegrationsSdksPage';
 import CreateIntegrationPage from './pages/settings/CreateIntegrationPage';
 import EditIntegrationPage from './pages/settings/EditIntegrationPage';
+import SignalEndpointsPage from './pages/admin/SignalEndpointsPage';
+import ActionSetsPage from './pages/admin/ActionSetsPage';
+import ServiceAccountsPage from './pages/admin/ServiceAccountsPage';
 // import AdvancedSettingsPage from './pages/admin/AdvancedSettingsPage'];
 
 // Pages - Game
@@ -613,6 +616,15 @@ const AppContent: React.FC = () => {
                                       element={<DataManagementPage />}
                                     />
                                     <Route path="gatrix-edges" element={<GatrixEdgesPage />} />
+                                    <Route
+                                      path="signal-endpoints"
+                                      element={<SignalEndpointsPage />}
+                                    />
+                                    <Route path="actions" element={<ActionSetsPage />} />
+                                    <Route
+                                      path="service-accounts"
+                                      element={<ServiceAccountsPage />}
+                                    />
                                   </Routes>
                                 </EnvironmentAwareLayout>
                               </ProtectedRoute>

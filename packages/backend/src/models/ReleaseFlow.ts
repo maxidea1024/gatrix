@@ -162,17 +162,39 @@ export class ReleaseFlowModel {
 
   /**
    * Find all active plans for a flag (across all environments).
-   * Returns lightweight summaries (environment + status).
+   * Returns lightweight summaries (environment + status + current milestone name).
+   * For draft plans (no activeMilestoneId), returns the first milestone by sortOrder.
    */
   static async findPlansByFlag(
     flagId: string
-  ): Promise<Array<{ environment: string; status: string; displayName: string }>> {
+  ): Promise<
+    Array<{
+      environment: string;
+      status: string;
+      displayName: string;
+      activeMilestoneName: string | null;
+    }>
+  > {
     try {
       const flows = await db('g_release_flows')
-        .select('environment', 'status', 'displayName')
-        .where('flagId', flagId)
-        .where('discriminator', 'plan')
-        .where('isArchived', false);
+        .select(
+          'g_release_flows.environment',
+          'g_release_flows.status',
+          'g_release_flows.displayName',
+          db.raw(`(
+            CASE
+              WHEN g_release_flows.activeMilestoneId = 'completed'
+                THEN (SELECT name FROM g_release_flow_milestones WHERE flowId = g_release_flows.id ORDER BY sortOrder DESC LIMIT 1)
+              WHEN g_release_flows.activeMilestoneId IS NOT NULL
+                THEN (SELECT name FROM g_release_flow_milestones WHERE id = g_release_flows.activeMilestoneId LIMIT 1)
+              ELSE
+                (SELECT name FROM g_release_flow_milestones WHERE flowId = g_release_flows.id ORDER BY sortOrder ASC LIMIT 1)
+            END
+          ) as activeMilestoneName`)
+        )
+        .where('g_release_flows.flagId', flagId)
+        .where('g_release_flows.discriminator', 'plan')
+        .where('g_release_flows.isArchived', false);
       return flows;
     } catch (error) {
       logger.error('Error finding release flow plans by flag:', error);

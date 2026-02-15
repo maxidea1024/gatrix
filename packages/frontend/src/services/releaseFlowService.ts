@@ -150,6 +150,13 @@ export async function deleteTemplate(id: string): Promise<void> {
   await api.delete(`/admin/release-flows/templates/${id}`);
 }
 
+/**
+ * Delete (archive) an applied plan
+ */
+export async function deletePlan(planId: string): Promise<void> {
+  await api.delete(`/admin/release-flows/plans/${planId}`);
+}
+
 // ==================== Plan Lifecycle ====================
 
 /**
@@ -214,10 +221,12 @@ export interface Safeguard {
   flowId: string;
   milestoneId: string;
   metricName: string;
+  displayName: string | null;
   aggregationMode: string;
   operator: string;
   threshold: number;
-  timeRange: string;
+  timeRangeMinutes: number;
+  labelFilters: Record<string, string> | null;
   action: string;
   isTriggered: boolean;
   triggeredAt: string | null;
@@ -229,19 +238,23 @@ export interface CreateSafeguardInput {
   flowId: string;
   milestoneId: string;
   metricName: string;
+  displayName?: string;
   aggregationMode?: string;
   operator?: string;
   threshold: number;
-  timeRange?: string;
+  timeRangeMinutes?: number;
+  labelFilters?: Record<string, string>;
   action?: string;
 }
 
 export interface UpdateSafeguardInput {
   metricName?: string;
+  displayName?: string | null;
   aggregationMode?: string;
   operator?: string;
   threshold?: number;
-  timeRange?: string;
+  timeRangeMinutes?: number;
+  labelFilters?: Record<string, string> | null;
   action?: string;
 }
 
@@ -332,6 +345,7 @@ const releaseFlowService = {
   updateTemplate,
   deleteTemplate,
   applyTemplate,
+  deletePlan,
   getPlan,
   startMilestone,
   startPlan,

@@ -157,6 +157,8 @@ export interface FeatureStrategyAttributes {
   flagId: string;
   environment: string;
   strategyName: string;
+  /** Optional user-facing display name */
+  title?: string;
   parameters?: StrategyParameters;
   constraints?: Constraint[];
   sortOrder: number;
@@ -903,6 +905,7 @@ export class FeatureStrategyModel {
         flagId: data.flagId,
         environment: data.environment,
         strategyName: data.strategyName,
+        title: data.title || null,
         parameters: data.parameters ? JSON.stringify(data.parameters) : null,
         constraints: data.constraints ? JSON.stringify(data.constraints) : '[]',
         sortOrder: data.sortOrder ?? 0,
@@ -927,6 +930,7 @@ export class FeatureStrategyModel {
       const updateData: any = { updatedAt: new Date() };
 
       if (data.strategyName !== undefined) updateData.strategyName = data.strategyName;
+      if (data.title !== undefined) updateData.title = data.title || null;
       if (data.parameters !== undefined) updateData.parameters = JSON.stringify(data.parameters);
       if (data.constraints !== undefined) updateData.constraints = JSON.stringify(data.constraints);
       if (data.sortOrder !== undefined) updateData.sortOrder = data.sortOrder;

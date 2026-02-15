@@ -91,7 +91,7 @@ import { useSnackbar } from 'notistack';
 import { parseApiErrorMessage } from '../../utils/errorUtils';
 import featureFlagService, { FeatureFlag, FlagType } from '../../services/featureFlagService';
 import SimplePagination from '../../components/common/SimplePagination';
-import EmptyState from '../../components/common/EmptyState';
+import EmptyPlaceholder from '../../components/common/EmptyPlaceholder';
 import DynamicFilterBar, {
   FilterDefinition,
   ActiveFilter,
@@ -1002,6 +1002,10 @@ const FeatureFlagsPage: React.FC = () => {
 
   const handleActionMenuClose = () => {
     setActionMenuAnchor(null);
+    // We don't clear actionMenuFlag here because confirmation dialogs might still need it
+  };
+
+  const handleActionMenuClear = () => {
     setActionMenuFlag(null);
   };
 
@@ -1074,6 +1078,8 @@ const FeatureFlagsPage: React.FC = () => {
       enqueueSnackbar(parseApiErrorMessage(error, 'featureFlags.updateFailed'), {
         variant: 'error',
       });
+    } finally {
+      handleActionMenuClear();
     }
   };
 
@@ -1105,10 +1111,11 @@ const FeatureFlagsPage: React.FC = () => {
   };
 
   // Archive confirmation handler
-  const handleArchiveConfirm = () => {
+  const handleArchiveConfirm = async () => {
     setArchiveConfirmOpen(false);
     if (actionMenuFlag) {
-      handleArchiveToggle(actionMenuFlag);
+      await handleArchiveToggle(actionMenuFlag);
+      handleActionMenuClear();
     }
   };
 
@@ -1662,11 +1669,10 @@ const FeatureFlagsPage: React.FC = () => {
               <Typography color="text.secondary">{t('common.loadingData')}</Typography>
             </Box>
           ) : flags.length === 0 ? (
-            <EmptyState
+            <EmptyPlaceholder
               message={t('featureFlags.noFlagsFound')}
-              onAddClick={canManage ? () => navigate('/feature-flags/new') : undefined}
+              onAddClick={canManage ? () => handleOpenCreateDialog('featureFlag') : undefined}
               addButtonLabel={t('featureFlags.createFlag')}
-              subtitle={canManage ? t('common.addFirstItem') : undefined}
             />
           ) : compactView ? (
             <>
@@ -2673,10 +2679,12 @@ const FeatureFlagsPage: React.FC = () => {
         })}
       />
 
-      {/* Archive Confirmation Dialog */}
       <Dialog
         open={archiveConfirmOpen}
-        onClose={() => setArchiveConfirmOpen(false)}
+        onClose={() => {
+          setArchiveConfirmOpen(false);
+          handleActionMenuClear();
+        }}
         maxWidth="xs"
         fullWidth
       >
@@ -2693,7 +2701,14 @@ const FeatureFlagsPage: React.FC = () => {
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setArchiveConfirmOpen(false)}>{t('common.cancel')}</Button>
+          <Button
+            onClick={() => {
+              setArchiveConfirmOpen(false);
+              handleActionMenuClear();
+            }}
+          >
+            {t('common.cancel')}
+          </Button>
           <Button
             variant="contained"
             color={actionMenuFlag?.isArchived ? 'success' : 'warning'}
@@ -2704,10 +2719,12 @@ const FeatureFlagsPage: React.FC = () => {
         </DialogActions>
       </Dialog>
 
-      {/* Stale Confirmation Dialog */}
       <Dialog
         open={staleConfirmOpen}
-        onClose={() => setStaleConfirmOpen(false)}
+        onClose={() => {
+          setStaleConfirmOpen(false);
+          handleActionMenuClear();
+        }}
         maxWidth="xs"
         fullWidth
       >
@@ -2724,7 +2741,14 @@ const FeatureFlagsPage: React.FC = () => {
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setStaleConfirmOpen(false)}>{t('common.cancel')}</Button>
+          <Button
+            onClick={() => {
+              setStaleConfirmOpen(false);
+              handleActionMenuClear();
+            }}
+          >
+            {t('common.cancel')}
+          </Button>
           <Button
             variant="contained"
             color={actionMenuFlag?.stale ? 'info' : 'secondary'}

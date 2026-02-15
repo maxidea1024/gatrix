@@ -43,6 +43,10 @@ import platformDefaultsRoutes from './platformDefaults';
 import unknownFlagsRoutes from './unknownFlags';
 import integrationRoutes from './integrations';
 import releaseFlowRoutes from './releaseFlows';
+import serviceAccountRoutes from './serviceAccounts';
+import signalEndpointRoutes from './signalEndpoints';
+import actionSetRoutes from './actionSets';
+import queueMonitorRoutes from './queueMonitor';
 
 const router = express.Router();
 
@@ -300,6 +304,40 @@ router.use(
   '/release-flows',
   requirePermission([PERMISSIONS.FEATURE_FLAGS_VIEW, PERMISSIONS.FEATURE_FLAGS_MANAGE]) as any,
   releaseFlowRoutes
+);
+
+// Service Accounts - requires service-accounts.view or service-accounts.manage permission
+router.use(
+  '/service-accounts',
+  requirePermission([
+    PERMISSIONS.SERVICE_ACCOUNTS_VIEW,
+    PERMISSIONS.SERVICE_ACCOUNTS_MANAGE,
+  ]) as any,
+  serviceAccountRoutes
+);
+
+// Signal Endpoints - requires signal-endpoints.view or signal-endpoints.manage permission
+router.use(
+  '/signal-endpoints',
+  requirePermission([
+    PERMISSIONS.SIGNAL_ENDPOINTS_VIEW,
+    PERMISSIONS.SIGNAL_ENDPOINTS_MANAGE,
+  ]) as any,
+  signalEndpointRoutes
+);
+
+// Actions - requires actions.view or actions.manage permission
+router.use(
+  '/actions',
+  requirePermission([PERMISSIONS.ACTIONS_VIEW, PERMISSIONS.ACTIONS_MANAGE]) as any,
+  actionSetRoutes
+);
+
+// Queue Monitor - requires scheduler.view or scheduler.manage permission
+router.use(
+  '/queue-monitor',
+  requirePermission([PERMISSIONS.SCHEDULER_VIEW, PERMISSIONS.SCHEDULER_MANAGE]) as any,
+  queueMonitorRoutes
 );
 
 // Impact Metrics (admin query endpoints for charts and safeguard evaluation)

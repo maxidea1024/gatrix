@@ -41,6 +41,11 @@ router.post(
 );
 
 // Plan lifecycle
+router.delete(
+  '/plans/:id',
+  requirePermission(PERMISSIONS.FEATURE_FLAGS_MANAGE) as any,
+  ReleaseFlowController.deletePlan as any
+);
 router.post(
   '/plans/:id/start',
   requirePermission(PERMISSIONS.FEATURE_FLAGS_MANAGE) as any,

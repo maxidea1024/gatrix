@@ -217,6 +217,7 @@ const AuditLogsPage: React.FC = () => {
     { id: 'action', labelKey: 'auditLogs.action', visible: true },
     { id: 'resource', labelKey: 'auditLogs.resource', visible: true },
     { id: 'resourceId', labelKey: 'auditLogs.resourceId', visible: true },
+    { id: 'description', labelKey: 'auditLogs.description', visible: true },
     { id: 'ipAddress', labelKey: 'auditLogs.ipAddress', visible: true },
   ];
 
@@ -530,6 +531,21 @@ const AuditLogsPage: React.FC = () => {
         return (
           <Typography variant="body2" fontFamily="monospace">
             {log.ip_address || '-'}
+          </Typography>
+        );
+      case 'description':
+        return (
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{
+              maxWidth: 300,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {log.details?.description || log.details?.summary || '-'}
           </Typography>
         );
       default:

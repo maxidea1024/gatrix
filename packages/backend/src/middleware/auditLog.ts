@@ -13,6 +13,7 @@ export interface AuditLogOptions {
   getResourceIdFromResponse?: (responseBody: any) => string | number | undefined;
   getOldValues?: (req: any) => any;
   getNewValues?: (req: any, res: any) => any;
+  getDescription?: (req: any, res: any) => string;
   skipIf?: (req: any, res: any) => boolean;
 }
 
@@ -56,10 +57,12 @@ export const auditLog = (options: AuditLogOptions) => {
 
         const oldValues = options.getOldValues ? options.getOldValues(req) : undefined;
         const newValues = options.getNewValues ? options.getNewValues(req, res) : req.body;
+        const description = options.getDescription ? options.getDescription(req, res) : undefined;
 
         await AuditLogModel.create({
           userId: req.user?.userId,
           action: options.action,
+          description,
           resourceType: options.resourceType,
           resourceId: resourceId ? resourceId.toString() : undefined,
           oldValues: oldValues,
@@ -87,6 +90,7 @@ export const auditUserLogin = auditLog({
     email: req.body?.email,
     loginMethod: 'password',
   }),
+  getDescription: (req) => `User '${req.body?.email}' logged in`,
 });
 
 export const auditUserRegister = auditLog({
@@ -97,6 +101,7 @@ export const auditUserRegister = auditLog({
     email: req.body?.email,
     name: req.body?.name,
   }),
+  getDescription: (req) => `User '${req.body?.name}' (${req.body?.email}) registered`,
 });
 
 export const auditUserUpdate = enhancedAuditLog({
@@ -128,6 +133,8 @@ export const auditUserUpdate = enhancedAuditLog({
     userEmail: oldValues?.email,
     changedFields: Object.keys(newValues || {}),
   }),
+  getDescription: (_req, oldValues, newValues) =>
+    `User '${oldValues?.name || oldValues?.email}' updated (${Object.keys(newValues || {}).join(', ')})`,
 });
 
 export const auditUserDelete = enhancedAuditLog({
@@ -154,6 +161,7 @@ export const auditUserDelete = enhancedAuditLog({
     userEmail: oldValues?.email,
     userRole: oldValues?.role,
   }),
+  getDescription: (_req, oldValues) => `User '${oldValues?.name}' (${oldValues?.email}) deleted`,
 });
 
 export const auditUserApprove = enhancedAuditLog({
@@ -175,6 +183,8 @@ export const auditUserApprove = enhancedAuditLog({
     userEmail: oldValues?.email,
     statusChange: `${oldValues?.status} → active`,
   }),
+  getDescription: (_req, oldValues) =>
+    `User '${oldValues?.name}' (${oldValues?.email}) approved (${oldValues?.status} → active)`,
 });
 
 export const auditUserReject = enhancedAuditLog({
@@ -196,6 +206,8 @@ export const auditUserReject = enhancedAuditLog({
     userEmail: oldValues?.email,
     statusChange: `${oldValues?.status} → deleted`,
   }),
+  getDescription: (_req, oldValues) =>
+    `User '${oldValues?.name}' (${oldValues?.email}) rejected (${oldValues?.status} → deleted)`,
 });
 
 export const auditUserSuspend = enhancedAuditLog({
@@ -217,6 +229,8 @@ export const auditUserSuspend = enhancedAuditLog({
     userEmail: oldValues?.email,
     statusChange: `${oldValues?.status} → suspended`,
   }),
+  getDescription: (_req, oldValues) =>
+    `User '${oldValues?.name}' (${oldValues?.email}) suspended (${oldValues?.status} → suspended)`,
 });
 
 export const auditUserUnsuspend = enhancedAuditLog({
@@ -238,6 +252,8 @@ export const auditUserUnsuspend = enhancedAuditLog({
     userEmail: oldValues?.email,
     statusChange: `${oldValues?.status} → active`,
   }),
+  getDescription: (_req, oldValues) =>
+    `User '${oldValues?.name}' (${oldValues?.email}) unsuspended (${oldValues?.status} → active)`,
 });
 
 export const auditUserPromote = enhancedAuditLog({
@@ -259,6 +275,8 @@ export const auditUserPromote = enhancedAuditLog({
     userEmail: oldValues?.email,
     roleChange: `${oldValues?.role} → admin`,
   }),
+  getDescription: (_req, oldValues) =>
+    `User '${oldValues?.name}' (${oldValues?.email}) promoted to admin (${oldValues?.role} → admin)`,
 });
 
 export const auditUserDemote = enhancedAuditLog({
@@ -280,6 +298,8 @@ export const auditUserDemote = enhancedAuditLog({
     userEmail: oldValues?.email,
     roleChange: `${oldValues?.role} → user`,
   }),
+  getDescription: (_req, oldValues) =>
+    `User '${oldValues?.name}' (${oldValues?.email}) demoted to user (${oldValues?.role} → user)`,
 });
 
 // Game world actions
@@ -300,6 +320,7 @@ export const auditGameWorldCreate = enhancedAuditLog({
     worldId: req.body?.worldId,
     worldName: req.body?.name,
   }),
+  getDescription: (req) => `Game world '${req.body?.name}' (${req.body?.worldId}) created`,
 });
 
 export const auditGameWorldUpdate = enhancedAuditLog({
@@ -341,6 +362,8 @@ export const auditGameWorldUpdate = enhancedAuditLog({
     worldName: oldValues?.name,
     changedFields: Object.keys(newValues || {}),
   }),
+  getDescription: (_req, oldValues, newValues) =>
+    `Game world '${oldValues?.name}' (${oldValues?.worldId}) updated (${Object.keys(newValues || {}).join(', ')})`,
 });
 
 export const auditGameWorldDelete = enhancedAuditLog({
@@ -366,6 +389,8 @@ export const auditGameWorldDelete = enhancedAuditLog({
     worldId: oldValues?.worldId,
     worldName: oldValues?.name,
   }),
+  getDescription: (_req, oldValues) =>
+    `Game world '${oldValues?.name}' (${oldValues?.worldId}) deleted`,
 });
 
 export const auditGameWorldToggleVisibility = enhancedAuditLog({
@@ -429,6 +454,7 @@ export const auditGameWorldUpdateOrders = auditLog({
   action: 'game_world_update_orders',
   resourceType: 'game_world',
   getNewValues: (req) => ({ orderUpdates: req.body?.orderUpdates }),
+  getDescription: () => `Game world display order updated`,
 });
 
 export const auditGameWorldMoveUp = auditLog({
@@ -436,6 +462,7 @@ export const auditGameWorldMoveUp = auditLog({
   resourceType: 'game_world',
   getResourceId: (req) => req.params?.id,
   getNewValues: () => ({ direction: 'up' }),
+  getDescription: (req) => `Game world #${req.params?.id} moved up`,
 });
 
 export const auditGameWorldMoveDown = auditLog({
@@ -443,12 +470,14 @@ export const auditGameWorldMoveDown = auditLog({
   resourceType: 'game_world',
   getResourceId: (req) => req.params?.id,
   getNewValues: () => ({ direction: 'down' }),
+  getDescription: (req) => `Game world #${req.params?.id} moved down`,
 });
 
 export const auditPasswordChange = auditLog({
   action: 'password_change',
   resourceType: 'user',
   getResourceId: (req: AuthenticatedRequest) => req.user?.userId?.toString(),
+  getDescription: (req: AuthenticatedRequest) => `User '${req.user?.email}' changed password`,
 });
 
 // 기본 auditLog 함수만 유지하고 개별 미들웨어는 제거
@@ -459,6 +488,7 @@ export const auditProfileUpdate = auditLog({
   resourceType: 'user',
   getResourceId: (req: AuthenticatedRequest) => req.user?.userId?.toString(),
   getNewValues: (req: AuthenticatedRequest) => req.body,
+  getDescription: (req: AuthenticatedRequest) => `User '${req.user?.email}' updated profile`,
 });
 
 // Service Notice actions
@@ -475,6 +505,8 @@ export const auditServiceNoticeCreate = auditLog({
     startDate: req.body?.startDate,
     endDate: req.body?.endDate,
   }),
+  getDescription: (req) =>
+    `Service notice '${req.body?.title}' created (category: ${req.body?.category})`,
 });
 
 export const auditServiceNoticeUpdate = enhancedAuditLog({
@@ -511,6 +543,8 @@ export const auditServiceNoticeUpdate = enhancedAuditLog({
     operation: 'update_service_notice',
     noticeTitle: oldValues?.title || req.body?.title,
   }),
+  getDescription: (req, oldValues) =>
+    `Service notice '${oldValues?.title || req.body?.title}' updated`,
 });
 
 export const auditServiceNoticeDelete = enhancedAuditLog({
@@ -539,6 +573,7 @@ export const auditServiceNoticeDelete = enhancedAuditLog({
     operation: 'delete_service_notice',
     noticeTitle: oldValues?.title,
   }),
+  getDescription: (_req, oldValues) => `Service notice '${oldValues?.title}' deleted`,
 });
 
 export const auditServiceNoticeBulkDelete = auditLog({
@@ -548,6 +583,7 @@ export const auditServiceNoticeBulkDelete = auditLog({
     ids: req.body?.ids,
     count: req.body?.ids?.length || 0,
   }),
+  getDescription: (req) => `${req.body?.ids?.length || 0} service notice(s) bulk deleted`,
 });
 
 export const auditServiceNoticeToggleActive = enhancedAuditLog({
@@ -576,4 +612,6 @@ export const auditServiceNoticeToggleActive = enhancedAuditLog({
     noticeTitle: oldValues?.title,
     statusChange: `${oldValues?.isActive ? 'active' : 'inactive'} → ${!oldValues?.isActive ? 'active' : 'inactive'}`,
   }),
+  getDescription: (_req, oldValues) =>
+    `Service notice '${oldValues?.title}' ${!oldValues?.isActive ? 'activated' : 'deactivated'}`,
 });

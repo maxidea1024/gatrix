@@ -17,6 +17,8 @@ export interface EnhancedAuditLogOptions {
   getNewValues?: (req: any, res: any, oldValues?: any) => any;
   // Enhanced: Get additional context information
   getContext?: (req: any, oldValues?: any, newValues?: any) => any;
+  // Human-readable description for audit trail (5W1H)
+  getDescription?: (req: any, oldValues?: any, newValues?: any) => string;
   skipIf?: (req: any, res: any) => boolean;
 }
 
@@ -89,9 +91,15 @@ export const enhancedAuditLog = (options: EnhancedAuditLogOptions) => {
         // Merge context into newValues if provided
         const finalNewValues = context ? { ...newValues, _context: context } : newValues;
 
+        // Build description from getDescription callback or context.description
+        const description = options.getDescription
+          ? options.getDescription(req, oldValues, newValues)
+          : context?.description;
+
         await AuditLogModel.create({
           userId: req.user?.userId,
           action: options.action,
+          description,
           resourceType: options.resourceType,
           resourceId: resourceId ? resourceId.toString() : undefined,
           oldValues: oldValues,

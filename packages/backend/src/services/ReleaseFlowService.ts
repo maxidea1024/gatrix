@@ -77,6 +77,7 @@ export class ReleaseFlowService {
 
       await AuditLogModel.create({
         action: 'release_flow.template_create',
+        description: `Release flow template '${input.flowName}' created with ${input.milestones.length} milestone(s)`,
         resourceType: 'ReleaseFlow',
         resourceId: flow.id,
         userId,
@@ -157,9 +158,11 @@ export class ReleaseFlowService {
 
       await AuditLogModel.create({
         action: 'release_flow.apply_plan',
+        description: `Release flow template '${template.flowName}' applied to flag '${flagId}' in [${environment}]`,
         resourceType: 'ReleaseFlow',
         resourceId: plan.id,
         userId,
+        environment,
         newValues: { flagId, environment, templateId },
       });
 
@@ -177,7 +180,7 @@ export class ReleaseFlowService {
   async startMilestone(
     planId: string,
     milestoneId: string,
-    userId: number
+    userId: number | null
   ): Promise<ReleaseFlowAttributes> {
     const plan = await ReleaseFlowModel.findById(planId);
     if (!plan || plan.discriminator !== 'plan') {
@@ -195,7 +198,7 @@ export class ReleaseFlowService {
       await ReleaseFlowModel.update(plan.id, {
         activeMilestoneId: milestone.id,
         status: 'active',
-        updatedBy: userId,
+        updatedBy: userId ?? undefined,
       });
       await ReleaseFlowMilestoneModel.update(milestone.id, {
         startedAt: new Date(),
@@ -222,7 +225,7 @@ export class ReleaseFlowService {
           constraints: ms.constraints ? JSON.stringify(ms.constraints) : '[]',
           sortOrder: ms.sortOrder,
           isEnabled: true,
-          createdBy: userId,
+          createdBy: userId || null,
           createdAt: new Date(),
           updatedAt: new Date(),
         });
@@ -246,9 +249,11 @@ export class ReleaseFlowService {
 
       await AuditLogModel.create({
         action: 'release_flow.start_milestone',
+        description: `Release flow milestone '${milestone.name}' started for plan '${plan.flowName}'`,
         resourceType: 'ReleaseFlow',
         resourceId: plan.id,
         userId,
+        environment: plan.environment,
         newValues: { milestoneId, milestoneName: milestone.name },
       });
 
@@ -307,9 +312,11 @@ export class ReleaseFlowService {
 
     await AuditLogModel.create({
       action: 'release_flow.pause_plan',
+      description: `Release flow plan '${plan.flowName}' paused`,
       resourceType: 'ReleaseFlow',
       resourceId: planId,
       userId,
+      environment: plan.environment,
     });
 
     return (await ReleaseFlowModel.findById(planId))!;
@@ -352,9 +359,11 @@ export class ReleaseFlowService {
 
     await AuditLogModel.create({
       action: 'release_flow.resume_plan',
+      description: `Release flow plan '${plan.flowName}' resumed`,
       resourceType: 'ReleaseFlow',
       resourceId: planId,
       userId,
+      environment: plan.environment,
     });
 
     return (await ReleaseFlowModel.findById(planId))!;
@@ -379,29 +388,37 @@ export class ReleaseFlowService {
       return null;
     }
 
-    // Mark the current milestone as progressed
-    await ReleaseFlowMilestoneModel.update(milestones[currentIndex].id, {
-      progressionExecutedAt: new Date(),
-    });
-
     // Check if this is the last milestone
     if (currentIndex >= milestones.length - 1) {
-      // Plan completed
-      await ReleaseFlowModel.update(planId, { status: 'completed', updatedBy: userId });
+      // Mark current milestone as progressed and complete the plan
+      await ReleaseFlowMilestoneModel.update(milestones[currentIndex].id, {
+        progressionExecutedAt: new Date(),
+      });
+      await ReleaseFlowModel.update(planId, { status: 'completed', updatedBy: userId || null });
 
       await AuditLogModel.create({
         action: 'release_flow.complete_plan',
+        description: `Release flow plan '${plan.flowName}' completed`,
         resourceType: 'ReleaseFlow',
         resourceId: planId,
-        userId: userId || 0,
+        userId: userId || null,
+        environment: plan.environment,
       });
 
       return (await ReleaseFlowModel.findById(planId))!;
     }
 
-    // Start the next milestone
+    // Start the next milestone first, then mark current as progressed
+    // This order prevents a stuck state if startMilestone fails
     const nextMilestone = milestones[currentIndex + 1];
-    return this.startMilestone(planId, nextMilestone.id, userId || 0);
+    const result = await this.startMilestone(planId, nextMilestone.id, userId || null);
+
+    // Only mark as progressed after successful transition
+    await ReleaseFlowMilestoneModel.update(milestones[currentIndex].id, {
+      progressionExecutedAt: new Date(),
+    });
+
+    return result;
   }
 
   /**
@@ -430,6 +447,7 @@ export class ReleaseFlowService {
 
     await AuditLogModel.create({
       action: 'release_flow.set_transition',
+      description: `Transition condition set on milestone '${milestone.name}' (${transitionCondition.intervalMinutes}min interval)`,
       resourceType: 'ReleaseFlowMilestone',
       resourceId: milestoneId,
       userId,
@@ -457,6 +475,7 @@ export class ReleaseFlowService {
 
     await AuditLogModel.create({
       action: 'release_flow.remove_transition',
+      description: `Transition condition removed from milestone '${milestone.name}'`,
       resourceType: 'ReleaseFlowMilestone',
       resourceId: milestoneId,
       userId,
@@ -522,6 +541,7 @@ export class ReleaseFlowService {
 
       await AuditLogModel.create({
         action: 'release_flow.template_update',
+        description: `Release flow template '${input.flowName || existing.flowName}' updated`,
         resourceType: 'ReleaseFlow',
         resourceId: id,
         userId,
@@ -552,6 +572,7 @@ export class ReleaseFlowService {
 
     await AuditLogModel.create({
       action: 'release_flow.template_delete',
+      description: `Release flow template '${existing.flowName}' archived`,
       resourceType: 'ReleaseFlow',
       resourceId: id,
       userId,
@@ -572,6 +593,31 @@ export class ReleaseFlowService {
 
   async getPlanForFlag(flagId: string, environment: string): Promise<ReleaseFlowAttributes | null> {
     return ReleaseFlowModel.findPlanByFlagAndEnv(flagId, environment);
+  }
+
+  /**
+   * Delete (archive) an applied release flow plan
+   */
+  async deletePlan(planId: string, userId: number): Promise<void> {
+    const plan = await ReleaseFlowModel.findById(planId);
+    if (!plan || plan.discriminator !== 'plan') {
+      throw new GatrixError('Plan not found', 404, true, ErrorCodes.NOT_FOUND);
+    }
+
+    await ReleaseFlowModel.update(planId, {
+      isArchived: true,
+      updatedBy: userId,
+      archivedAt: new Date(),
+    });
+
+    await AuditLogModel.create({
+      action: 'release_flow.plan_delete',
+      description: `Release flow plan '${plan.flowName}' removed from flag '${plan.flagId}' in [${plan.environment}]`,
+      resourceType: 'ReleaseFlow',
+      resourceId: planId,
+      userId,
+      environment: plan.environment,
+    });
   }
 }
 

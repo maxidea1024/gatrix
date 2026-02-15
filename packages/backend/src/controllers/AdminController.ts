@@ -843,6 +843,7 @@ export class AdminController {
           await AuditLogModel.create({
             userId: currentUserId,
             action: 'user_status_updated',
+            description: `User #${userId} status changed to '${status}' (bulk operation)`,
             resourceType: 'user',
             resourceId: userId.toString(),
             newValues: { status, bulkOperation: true },
@@ -895,6 +896,7 @@ export class AdminController {
           await AuditLogModel.create({
             userId: currentUserId,
             action: 'user_role_updated',
+            description: `User #${userId} role changed to '${role}' (bulk operation)`,
             resourceType: 'user',
             resourceId: userId.toString(),
             newValues: { role, bulkOperation: true },
@@ -947,6 +949,7 @@ export class AdminController {
           await AuditLogModel.create({
             userId: currentUserId,
             action: 'user_email_verified_updated',
+            description: `User #${userId} email verification set to ${emailVerified} (bulk operation)`,
             resourceType: 'user',
             resourceId: userId.toString(),
             newValues: { emailVerified, bulkOperation: true },
@@ -1011,6 +1014,7 @@ export class AdminController {
           await AuditLogModel.create({
             userId: currentUserId,
             action: 'user_tags_updated',
+            description: `User #${userId} tags updated to [${tagIds.join(', ')}] (bulk operation)`,
             resourceType: 'user',
             resourceId: userId.toString(),
             newValues: { tagIds, bulkOperation: true },
@@ -1059,6 +1063,7 @@ export class AdminController {
           await AuditLogModel.create({
             userId: currentUserId,
             action: 'user_deleted',
+            description: `User #${userId} deleted (bulk operation)`,
             resourceType: 'user',
             resourceId: userId.toString(),
             newValues: { bulkOperation: true },
@@ -1261,6 +1266,7 @@ export class AdminController {
       const actorId = (req.user as any)?.id ?? (req.user as any)?.userId;
       await AuditLogModel.create({
         action: 'user_permissions_updated',
+        description: `User #${userId} (${user.email}) permissions updated (${value.permissions.length} permissions)`,
         resourceType: 'user',
         resourceId: userId.toString(),
         userId: actorId,

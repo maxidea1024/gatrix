@@ -74,6 +74,7 @@ export class IntegrationService {
     await AuditLogModel.create({
       userId: auditUser.id,
       action: 'integration_created',
+      description: `Integration '${integration.description || integration.provider}' (${integration.provider}) created`,
       resourceType: 'integration',
       resourceId: integration.id,
       newValues: {
@@ -126,6 +127,7 @@ export class IntegrationService {
       await AuditLogModel.create({
         userId: auditUser.id,
         action: 'integration_updated',
+        description: `Integration '${updated.description || existing.provider}' (${existing.provider}) updated`,
         resourceType: 'integration',
         resourceId: id,
         oldValues: {
@@ -159,6 +161,7 @@ export class IntegrationService {
       await AuditLogModel.create({
         userId: auditUser.id,
         action: 'integration_deleted',
+        description: `Integration '${existing.description || existing.provider}' (${existing.provider}) deleted`,
         resourceType: 'integration',
         resourceId: id,
         oldValues: {
@@ -214,6 +217,7 @@ export class IntegrationService {
       await AuditLogModel.create({
         userId: auditUser.id,
         action: 'integration_updated',
+        description: `Integration '${existing.description || existing.provider}' ${updated.isEnabled ? 'enabled' : 'disabled'}`,
         resourceType: 'integration',
         resourceId: id,
         oldValues: { isEnabled: existing.isEnabled },

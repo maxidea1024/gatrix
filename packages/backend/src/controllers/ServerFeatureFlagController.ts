@@ -438,6 +438,7 @@ export default class ServerFeatureFlagController {
         const { AuditLogModel } = await import('../models/AuditLog');
         await AuditLogModel.create({
           action: 'feature_code_references_report',
+          description: `Code references scan '${scanId}' from ${repository}/${branch} (${insertedCount} references, ${new Set(references.map((r: any) => r.flagName)).size} flags)`,
           resourceType: 'feature_flag',
           resourceId: `scan:${scanId}`,
           newValues: {

@@ -8,6 +8,7 @@ export class AuditLogModel {
       const [insertId] = await db('g_audit_logs').insert({
         userId: auditData.userId || null,
         action: auditData.action,
+        description: auditData.description || null,
         entityType: auditData.resourceType || null,
         entityId: auditData.resourceId || null,
         oldValues: auditData.oldValues ? JSON.stringify(auditData.oldValues) : null,
@@ -111,12 +112,16 @@ export class AuditLogModel {
                 : auditData.oldValues;
           }
 
-          await IntegrationService.handleEvent({
+          // Fire-and-forget: do not await integration events
+          // This prevents slow addons from blocking the main API response
+          IntegrationService.handleEvent({
             type: eventType as any,
             environment: auditData.environment,
             createdByUserId: auditData.userId,
             data: eventData,
             createdAt: new Date(),
+          }).catch((err) => {
+            logger.error(`Failed to dispatch integration event ${eventType}:`, err);
           });
         }
       } catch (error) {

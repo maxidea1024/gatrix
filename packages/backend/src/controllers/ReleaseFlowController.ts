@@ -379,6 +379,29 @@ export class ReleaseFlowController {
     }
   }
 
+  /**
+   * Delete (archive) a release flow plan applied to a flag
+   */
+  static async deletePlan(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const userId = req.user?.userId;
+      if (!userId) throw new GatrixError('Unauthorized', 401);
+
+      const { id } = req.params;
+      await releaseFlowService.deletePlan(id, userId);
+      res.json({
+        success: true,
+        message: 'Plan removed successfully',
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   // ==================== Safeguards ====================
 
   // List safeguards for a milestone
@@ -411,10 +434,12 @@ export class ReleaseFlowController {
         flowId,
         milestoneId,
         metricName,
+        displayName,
         aggregationMode,
         operator,
         threshold,
-        timeRange,
+        timeRangeMinutes,
+        labelFilters,
         action,
       } = req.body;
 
@@ -426,10 +451,12 @@ export class ReleaseFlowController {
         flowId,
         milestoneId,
         metricName,
+        displayName,
         aggregationMode,
         operator,
         threshold,
-        timeRange,
+        timeRangeMinutes,
+        labelFilters,
         action,
       });
 
@@ -450,14 +477,25 @@ export class ReleaseFlowController {
   ): Promise<void> {
     try {
       const { safeguardId } = req.params;
-      const { metricName, aggregationMode, operator, threshold, timeRange, action } = req.body;
-
-      const safeguard = await safeguardService.update(safeguardId, {
+      const {
         metricName,
+        displayName,
         aggregationMode,
         operator,
         threshold,
-        timeRange,
+        timeRangeMinutes,
+        labelFilters,
+        action,
+      } = req.body;
+
+      const safeguard = await safeguardService.update(safeguardId, {
+        metricName,
+        displayName,
+        aggregationMode,
+        operator,
+        threshold,
+        timeRangeMinutes,
+        labelFilters,
         action,
       });
 
