@@ -76,6 +76,7 @@ export interface UpdateFlagInput {
 
 export interface CreateStrategyInput {
   strategyName: string;
+  title?: string;
   parameters?: StrategyParameters;
   constraints?: Constraint[];
   segments?: string[]; // Array of segment names
@@ -85,6 +86,7 @@ export interface CreateStrategyInput {
 
 export interface UpdateStrategyInput {
   strategyName?: string;
+  title?: string;
   parameters?: StrategyParameters;
   constraints?: Constraint[];
   sortOrder?: number;
@@ -705,6 +707,7 @@ class FeatureFlagService {
       flagId: flag.id,
       environment,
       strategyName: input.strategyName,
+      title: input.title,
       parameters: input.parameters,
       constraints: input.constraints,
       sortOrder: input.sortOrder ?? maxSortOrder + 1,
@@ -794,6 +797,7 @@ class FeatureFlagService {
         flagId: flag.id,
         environment,
         strategyName: input.strategyName,
+        title: input.title,
         parameters: input.parameters,
         constraints: input.constraints,
         sortOrder: input.sortOrder ?? i,

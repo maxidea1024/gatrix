@@ -14,13 +14,13 @@ import {
   DialogContent,
   DialogActions,
   Tooltip,
-  Divider,
   Alert,
   Collapse,
   IconButton,
   Link,
   TextField,
   Select,
+  Menu,
   MenuItem,
 } from '@mui/material';
 import {
@@ -40,6 +40,7 @@ import {
   ArrowDownward as ArrowDownIcon,
   HelpOutline as HelpOutlineIcon,
   DeleteOutline as DeleteIcon,
+  MoreVert as MoreVertIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -56,8 +57,7 @@ import {
 } from '../../services/releaseFlowService';
 import { formatRelativeTime } from '../../utils/dateFormat';
 import SafeguardPanel from './SafeguardPanel';
-import StrategyDetail from './StrategyDetail';
-import ReleaseFlowTemplatePreview from './ReleaseFlowTemplatePreview';
+import StrategyListReadonly from './StrategyListReadonly';
 import { ContextFieldInfo } from './ConstraintDisplay';
 import { ReleaseFlowTemplate } from '../../services/releaseFlowService';
 import ConfirmDialog from '../common/ConfirmDialog';
@@ -72,6 +72,7 @@ interface ReleaseFlowTabProps {
   allSegments?: any[];
   contextFields?: ContextFieldInfo[];
   onPlanDeleted?: () => void;
+  onPlanChange?: () => void;
 }
 
 // ==================== Types ====================
@@ -147,6 +148,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
   allSegments = [],
   contextFields = [],
   onPlanDeleted,
+  onPlanChange,
 }) => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
@@ -164,13 +166,15 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
   const [applying, setApplying] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
   const [showApplyDialog, setShowApplyDialog] = useState(initialShowTemplates);
-  const [previewTemplate, setPreviewTemplate] = useState<ReleaseFlowTemplate | null>(null);
+
   const [jumpConfirmOpen, setJumpConfirmOpen] = useState(false);
   const [targetMilestoneId, setTargetMilestoneId] = useState<string | null>(null);
   const [safeguardExpanded, setSafeguardExpanded] = useState(false);
   const [flowExpanded, setFlowExpanded] = useState(true);
-  const [collapsedMilestones, setCollapsedMilestones] = useState<Set<string>>(new Set());
+  const [expandedMilestones, setExpandedMilestones] = useState<Set<string>>(new Set());
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [expandedTemplates, setExpandedTemplates] = useState<Set<string>>(new Set());
+  const [flowMenuAnchor, setFlowMenuAnchor] = useState<null | HTMLElement>(null);
 
   // Transition editing state: tracks which milestone is being edited
   const [editingTransitionId, setEditingTransitionId] = useState<string | null>(null);
@@ -193,6 +197,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
           await pausePlan(plan.id);
           enqueueSnackbar(t('releaseFlow.pausedSuccess'), { variant: 'info' });
           mutatePlan();
+          if (onPlanChange) onPlanChange();
         } catch (error) {
           console.error('Auto-pause failed', error);
         }
@@ -202,6 +207,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
           await resumePlan(plan.id);
           enqueueSnackbar(t('releaseFlow.resumedSuccess'), { variant: 'info' });
           mutatePlan();
+          if (onPlanChange) onPlanChange();
         } catch (error) {
           console.error('Auto-resume failed', error);
         }
@@ -211,6 +217,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
           await startPlan(plan.id);
           enqueueSnackbar(t('releaseFlow.startedSuccess'), { variant: 'success' });
           mutatePlan();
+          if (onPlanChange) onPlanChange();
         } catch (error) {
           console.error('Auto-start failed', error);
         }
@@ -232,6 +239,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
       await applyTemplate({ flagId, environment: selectedEnv, templateId });
       enqueueSnackbar(t('releaseFlow.applySuccess'), { variant: 'success' });
       mutatePlan();
+      if (onPlanChange) onPlanChange();
       setShowApplyDialog(false);
     } catch (error: any) {
       enqueueSnackbar(error.message || t('releaseFlow.applyFailed'), { variant: 'error' });
@@ -247,6 +255,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
       await deletePlan(plan.id);
       enqueueSnackbar(t('releaseFlow.planDeleteSuccess'), { variant: 'success' });
       mutatePlan();
+      if (onPlanChange) onPlanChange();
       setDeleteConfirmOpen(false);
       onPlanDeleted?.();
     } catch (error: any) {
@@ -274,6 +283,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
 
       enqueueSnackbar(t('releaseFlow.milestoneStartSuccess'), { variant: 'success' });
       mutatePlan();
+      if (onPlanChange) onPlanChange();
       setJumpConfirmOpen(false);
       setTargetMilestoneId(null);
     } catch (error: any) {
@@ -290,6 +300,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
       await pausePlan(plan.id);
       enqueueSnackbar(t('releaseFlow.pausedSuccess'), { variant: 'success' });
       mutatePlan();
+      if (onPlanChange) onPlanChange();
     } catch (error: any) {
       enqueueSnackbar(error.message || t('releaseFlow.applyFailed'), { variant: 'error' });
     } finally {
@@ -304,6 +315,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
       await resumePlan(plan.id);
       enqueueSnackbar(t('releaseFlow.resumedSuccess'), { variant: 'success' });
       mutatePlan();
+      if (onPlanChange) onPlanChange();
     } catch (error: any) {
       enqueueSnackbar(error.message || t('releaseFlow.applyFailed'), { variant: 'error' });
     } finally {
@@ -335,6 +347,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
       const totalMinutes = toMinutes(transitionValue, transitionUnit);
       await setTransitionCondition(editingTransitionId, totalMinutes);
       mutatePlan();
+      if (onPlanChange) onPlanChange();
       setEditingTransitionId(null);
     } catch (error: any) {
       enqueueSnackbar(error.message || t('releaseFlow.applyFailed'), { variant: 'error' });
@@ -349,6 +362,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
         setTransitionSaving(true);
         await removeTransitionCondition(milestoneId);
         mutatePlan();
+        if (onPlanChange) onPlanChange();
         setEditingTransitionId(null);
       } catch (error: any) {
         enqueueSnackbar(error.message || t('releaseFlow.applyFailed'), { variant: 'error' });
@@ -369,6 +383,14 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
   const isPaused = plan?.status === 'paused';
   const isActive = plan?.status === 'active';
 
+  // Resolve the plan display name from the referenced template
+  const planDisplayName = useMemo(() => {
+    if (!plan) return '';
+    const matchedTemplate = templates?.find((t) => t.flowName === plan.flowName);
+    if (matchedTemplate) return matchedTemplate.displayName || matchedTemplate.flowName;
+    return plan.displayName || plan.flowName;
+  }, [plan, templates]);
+
   // Safeguard: use first milestone ID for flow-level safeguards
   const safeguardMilestoneId = useMemo(() => {
     if (!milestones.length) return '';
@@ -388,13 +410,17 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
   };
 
   /** Controls for each milestone row */
-  const renderMilestoneControls = (milestoneId: string, index: number) => {
+  const renderMilestoneControls = (milestoneId: string, index: number, isScheduled: boolean) => {
     if (!canManage || isCompleted) return null;
+    // Draft plans haven't started yet — no jump controls
+    if (plan?.status === 'draft') return null;
 
-    // Active milestone: only show pause button (resume is handled by re-enabling env)
+    // Active milestone: only show pause button when there is an automated transition timer
     if (index === currentMilestoneIndex) {
-      // No pause on last milestone (nothing to transition to) or when already paused
-      if (isPaused || index >= milestones.length - 1) return null;
+      const currentMilestone = milestones[index];
+      const hasAutomation = !!currentMilestone?.transitionCondition?.intervalMinutes;
+      // No pause on last milestone (nothing to transition to), when already paused, or when there's no automation
+      if (isPaused || index >= milestones.length - 1 || !hasAutomation) return null;
       return (
         <Button
           variant="outlined"
@@ -403,25 +429,33 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
           onClick={handlePause}
           startIcon={actionLoading ? <CircularProgress size={14} color="inherit" /> : <PauseIcon />}
           disabled={actionLoading}
+          sx={{ whiteSpace: 'nowrap' }}
         >
           {t('releaseFlow.pause')}
         </Button>
       );
     }
 
-    // Other milestones: show "jump to" button
-
+    // Other milestones: show "jump to" or "start now" button
     return (
       <Button
         size="small"
-        variant="text"
+        variant="outlined"
         color="primary"
         onClick={() => handleStartMilestoneClick(milestoneId)}
-        startIcon={<DoubleArrowIcon />}
+        startIcon={
+          actionLoading ? (
+            <CircularProgress size={14} color="inherit" />
+          ) : isScheduled ? (
+            <StartIcon />
+          ) : (
+            <DoubleArrowIcon />
+          )
+        }
         disabled={actionLoading}
         sx={{ whiteSpace: 'nowrap' }}
       >
-        {t('releaseFlow.moveToMilestone')}
+        {isScheduled ? t('releaseFlow.startNow') : t('releaseFlow.goToMilestone')}
       </Button>
     );
   };
@@ -628,81 +662,90 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
               }}
               onClick={() => setFlowExpanded(!flowExpanded)}
             >
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
-                  {plan.displayName || plan.flowName}
-                </Typography>
-                {isPaused &&
-                  (() => {
-                    const activeMilestone = milestones[currentMilestoneIndex];
-                    const pausedTime = activeMilestone?.pausedAt;
-                    return (
-                      <Chip
-                        icon={<PauseIcon sx={{ fontSize: 14 }} />}
-                        label={
-                          pausedTime
-                            ? `${t('releaseFlow.pausedAt')}: ${formatRelativeTime(pausedTime)}`
-                            : t('releaseFlow.pausedAt')
-                        }
-                        color="warning"
-                        size="small"
-                        sx={{ height: 22, '& .MuiChip-label': { px: 0.75, fontSize: '0.7rem' } }}
-                      />
-                    );
-                  })()}
-                {isCompleted && (
-                  <Chip
-                    label={t('common.completed').toUpperCase()}
-                    color="success"
-                    size="small"
-                    sx={{ height: 22, '& .MuiChip-label': { px: 0.75, fontSize: '0.7rem' } }}
-                  />
-                )}
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, minWidth: 0 }}>
+                <Tooltip title={planDisplayName} enterDelay={500}>
+                  <Typography
+                    variant="subtitle1"
+                    sx={{
+                      fontWeight: 700,
+                      maxWidth: 200,
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {planDisplayName}
+                  </Typography>
+                </Tooltip>
+                {(() => {
+                  const statusMap: Record<
+                    string,
+                    { label: string; color: 'default' | 'success' | 'primary' | 'warning' }
+                  > = {
+                    draft: { label: t('releaseFlow.statusDraft'), color: 'default' },
+                    active: { label: t('releaseFlow.statusActive'), color: 'primary' },
+                    paused: { label: t('releaseFlow.statusPaused'), color: 'warning' },
+                  };
+                  const status = isCompleted
+                    ? { label: t('releaseFlow.statusCompleted'), color: 'success' as const }
+                    : statusMap[plan?.status || 'draft'];
+                  return status ? (
+                    <Chip
+                      label={status.label}
+                      color={status.color}
+                      size="small"
+                      sx={{
+                        height: 22,
+                        '& .MuiChip-label': { px: 0.75, fontSize: '0.7rem', fontWeight: 600 },
+                      }}
+                    />
+                  ) : null;
+                })()}
               </Box>
 
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Typography variant="caption" color="text.secondary">
-                  {t('releaseFlow.planStarted')}: {formatRelativeTime(plan.createdAt)}
-                </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                 {canManage && !isCompleted && (
-                  <Tooltip title={envEnabled ? t('releaseFlow.cannotSwitchWhileEnabled') : ''}>
-                    <span>
-                      <Button
-                        size="small"
-                        variant="outlined"
-                        color="inherit"
-                        onClick={(e) => {
-                          e.stopPropagation();
+                  <>
+                    <IconButton
+                      size="small"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setFlowMenuAnchor(e.currentTarget);
+                      }}
+                    >
+                      <MoreVertIcon fontSize="small" />
+                    </IconButton>
+                    <Menu
+                      anchorEl={flowMenuAnchor}
+                      open={Boolean(flowMenuAnchor)}
+                      onClose={() => setFlowMenuAnchor(null)}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <MenuItem
+                        onClick={() => {
+                          setFlowMenuAnchor(null);
                           setShowApplyDialog(true);
                         }}
                         disabled={envEnabled || applying}
-                        startIcon={<AdvanceIcon fontSize="small" />}
-                        sx={{ ml: 1, fontSize: '0.75rem' }}
                       >
+                        <AdvanceIcon fontSize="small" sx={{ mr: 1 }} />
                         {t('releaseFlow.switchTemplate')}
-                      </Button>
-                    </span>
-                  </Tooltip>
-                )}
-                {canManage && !isCompleted && (
-                  <Tooltip title={envEnabled ? t('releaseFlow.cannotDeleteWhileEnabled') : ''}>
-                    <span>
-                      <IconButton
-                        size="small"
-                        color="error"
-                        onClick={(e) => {
-                          e.stopPropagation();
+                      </MenuItem>
+                      <MenuItem
+                        onClick={() => {
+                          setFlowMenuAnchor(null);
                           setDeleteConfirmOpen(true);
                         }}
                         disabled={envEnabled || actionLoading}
-                        sx={{ ml: 0.5 }}
+                        sx={{ color: 'error.main' }}
                       >
-                        <DeleteIcon fontSize="small" />
-                      </IconButton>
-                    </span>
-                  </Tooltip>
+                        <DeleteIcon fontSize="small" sx={{ mr: 1 }} />
+                        {t('releaseFlow.deleteTemplate')}
+                      </MenuItem>
+                    </Menu>
+                  </>
                 )}
-                <IconButton size="small" tabIndex={-1} sx={{ ml: 0.5 }}>
+                <IconButton size="small" tabIndex={-1}>
                   {flowExpanded ? (
                     <ExpandLessIcon fontSize="small" />
                   ) : (
@@ -786,6 +829,14 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                     pending: 'grey.400',
                   };
 
+                  const prevMilestone = index > 0 ? milestones[index - 1] : null;
+                  const prevInterval = prevMilestone?.transitionCondition?.intervalMinutes;
+                  const scheduledTime =
+                    prevInterval && prevMilestone?.startedAt
+                      ? getScheduledTime(prevMilestone.startedAt, prevInterval)
+                      : null;
+                  const isScheduled = !!(prevInterval && status === 'pending');
+
                   return (
                     <React.Fragment key={milestone.id}>
                       {/* Milestone Card */}
@@ -798,17 +849,17 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                           overflow: 'hidden',
                           transition: 'all 0.2s',
                           ...(status === 'active' && {
-                            boxShadow: '0 0 12px 2px rgba(25, 118, 210, 0.25)',
+                            boxShadow: '0 0 18px 4px rgba(25, 118, 210, 0.45)',
                           }),
                           ...(status === 'paused' && {
-                            boxShadow: '0 0 10px 1px rgba(237, 108, 2, 0.18)',
+                            boxShadow: '0 0 14px 3px rgba(237, 108, 2, 0.3)',
                           }),
                         }}
                       >
                         {/* Card Header */}
                         <Box
                           onClick={() => {
-                            setCollapsedMilestones((prev) => {
+                            setExpandedMilestones((prev) => {
                               const next = new Set(prev);
                               if (next.has(milestone.id)) {
                                 next.delete(milestone.id);
@@ -827,9 +878,9 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                             bgcolor:
                               status === 'active' || status === 'paused'
                                 ? (theme) =>
-                                  theme.palette.mode === 'dark'
-                                    ? 'rgba(255,255,255,0.03)'
-                                    : 'rgba(0,0,0,0.015)'
+                                    theme.palette.mode === 'dark'
+                                      ? 'rgba(255,255,255,0.03)'
+                                      : 'rgba(0,0,0,0.015)'
                                 : 'transparent',
                             cursor: 'pointer',
                             '&:hover': {
@@ -915,12 +966,10 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                                 const prevInterval =
                                   prevMilestone?.transitionCondition?.intervalMinutes;
                                 if (!prevInterval || !prevMilestone.startedAt) return null;
-                                const prevStatus = getMilestoneStatus(index - 1);
-                                if (prevStatus !== 'active' && prevStatus !== 'paused') return null;
-                                const scheduled = getScheduledTime(
-                                  prevMilestone.startedAt,
-                                  prevInterval
-                                );
+                                const scheduled =
+                                  prevInterval && prevMilestone?.startedAt
+                                    ? getScheduledTime(prevMilestone.startedAt, prevInterval)
+                                    : null;
                                 if (!scheduled || scheduled <= new Date()) return null;
                                 return (
                                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
@@ -933,21 +982,6 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                                       {t('releaseFlow.estimatedStart')}:{' '}
                                       {formatScheduledTime(scheduled)}
                                     </Typography>
-                                    {canManage && (
-                                      <Link
-                                        component="button"
-                                        variant="caption"
-                                        color="primary"
-                                        underline="hover"
-                                        sx={{ fontWeight: 600, cursor: 'pointer', ml: 0.5 }}
-                                        onClick={(e: React.MouseEvent) => {
-                                          e.stopPropagation();
-                                          handleStartMilestoneClick(milestone.id);
-                                        }}
-                                      >
-                                        {t('releaseFlow.startNow')}
-                                      </Link>
-                                    )}
                                   </Box>
                                 );
                               })()}
@@ -955,22 +989,43 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                           </Box>
 
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                            {/* Paused badge on the milestone itself */}
+                            {status === 'paused' &&
+                              (() => {
+                                const pausedTime = milestone.pausedAt;
+                                return (
+                                  <Chip
+                                    icon={<PauseIcon sx={{ fontSize: 14 }} />}
+                                    label={
+                                      pausedTime
+                                        ? `${t('releaseFlow.pausedAt')}: ${formatRelativeTime(pausedTime)}`
+                                        : t('releaseFlow.pausedAt')
+                                    }
+                                    color="warning"
+                                    size="small"
+                                    sx={{
+                                      height: 22,
+                                      '& .MuiChip-label': { px: 0.75, fontSize: '0.7rem' },
+                                    }}
+                                  />
+                                );
+                              })()}
                             <Box
                               onClick={(e: React.MouseEvent) => e.stopPropagation()}
                               sx={{ flexShrink: 0 }}
                             >
-                              {renderMilestoneControls(milestone.id, index)}
+                              {renderMilestoneControls(milestone.id, index, isScheduled)}
                             </Box>
-                            {collapsedMilestones.has(milestone.id) ? (
-                              <ExpandMoreIcon sx={{ fontSize: 20, color: 'text.secondary' }} />
-                            ) : (
+                            {expandedMilestones.has(milestone.id) ? (
                               <ExpandLessIcon sx={{ fontSize: 20, color: 'text.secondary' }} />
+                            ) : (
+                              <ExpandMoreIcon sx={{ fontSize: 20, color: 'text.secondary' }} />
                             )}
                           </Box>
                         </Box>
 
                         {/* Card Body */}
-                        <Collapse in={!collapsedMilestones.has(milestone.id)} timeout={200}>
+                        <Collapse in={expandedMilestones.has(milestone.id)} timeout={200}>
                           <Box sx={{ px: 2, py: 1.5 }}>
                             {milestone.description && (
                               <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
@@ -988,43 +1043,16 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                               >
                                 {t('releaseFlow.appliedStrategies')}
                               </Typography>
-                              {milestone.strategies?.map((strategy: any, sIdx: number) => (
-                                <Box
-                                  key={sIdx}
-                                  sx={{
-                                    mb: sIdx < (milestone.strategies?.length || 0) - 1 ? 1.5 : 0,
-                                  }}
-                                >
-                                  <StrategyDetail
-                                    strategyName={strategy.strategyName}
-                                    parameters={strategy.parameters}
-                                    constraints={strategy.constraints}
-                                    segments={strategy.segments}
-                                    allSegments={allSegments}
-                                    contextFields={contextFields}
-                                    expandable
-                                  />
-                                  {sIdx < (milestone.strategies?.length || 0) - 1 && (
-                                    <Box
-                                      sx={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: 1,
-                                        mt: 1,
-                                      }}
-                                    >
-                                      <Divider sx={{ flexGrow: 1, borderStyle: 'dashed' }} />
-                                      <Chip
-                                        label="OR"
-                                        size="small"
-                                        variant="outlined"
-                                        sx={{ height: 16, fontSize: '0.6rem', opacity: 0.5 }}
-                                      />
-                                      <Divider sx={{ flexGrow: 1, borderStyle: 'dashed' }} />
-                                    </Box>
-                                  )}
-                                </Box>
-                              ))}
+                              <StrategyListReadonly
+                                strategies={(milestone.strategies || []).map((s: any) => ({
+                                  strategyName: s.strategyName,
+                                  parameters: s.parameters,
+                                  constraints: s.constraints,
+                                  segments: s.segments,
+                                }))}
+                                allSegments={allSegments}
+                                contextFields={contextFields}
+                              />
                             </Box>
                           </Box>
                         </Collapse>
@@ -1073,153 +1101,216 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
             <Box
               sx={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))',
                 gap: 2,
               }}
             >
-              {templates?.map((template) => (
-                <Card
-                  key={template.id}
-                  variant="outlined"
-                  sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    cursor: applying ? 'default' : 'pointer',
-                    transition: 'all 0.2s',
-                    position: 'relative',
-                    overflow: 'visible',
-                    '&:hover': !applying
-                      ? {
-                        borderColor: 'primary.main',
-                        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                        transform: 'translateY(-2px)',
-                      }
-                      : {},
-                  }}
-                  onClick={() => !applying && handleApplyTemplate(template.id)}
-                >
-                  <CardContent sx={{ flexGrow: 1, p: 2.5 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
-                      <Box
-                        sx={{
-                          p: 1,
-                          borderRadius: 1,
-                          bgcolor: 'primary.main',
-                          color: 'primary.contrastText',
-                          display: 'flex',
-                        }}
-                      >
-                        <TemplateIcon fontSize="small" />
-                      </Box>
-                      <Typography variant="subtitle1" sx={{ fontWeight: 700, lineHeight: 1.2 }}>
-                        {template.displayName || template.flowName}
-                      </Typography>
-                    </Box>
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      sx={{
-                        mb: 2,
-                        height: '3em',
-                        overflow: 'hidden',
-                        display: '-webkit-box',
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrientation: 'vertical',
-                      }}
-                    >
-                      {template.description}
-                    </Typography>
-
-                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-                      {template.milestones?.map((m: any, idx: number) => (
-                        <Box key={idx}>
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-                            <Chip
-                              label={`${idx + 1}`}
-                              size="small"
-                              sx={{
-                                width: 18,
-                                height: 18,
-                                fontSize: '0.65rem',
-                                bgcolor: 'primary.light',
-                                color: 'primary.contrastText',
-                                '& .MuiChip-label': { px: 0 },
-                              }}
-                            />
-                            <Typography variant="caption" sx={{ fontWeight: 700 }}>
-                              {m.name}
-                            </Typography>
-                          </Box>
-                          <Box sx={{ pl: 2, display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                            {m.strategies?.map((s: any, sIdx: number) => (
-                              <StrategyDetail
-                                key={sIdx}
-                                strategyName={s.strategyName}
-                                parameters={s.parameters}
-                                compact
-                              />
-                            ))}
-                          </Box>
-                        </Box>
-                      ))}
-                    </Box>
-                  </CardContent>
-                  <Box
+              {templates?.map((template) => {
+                const isCurrentTemplate = plan?.flowName === template.flowName;
+                return (
+                  <Card
+                    key={template.id}
+                    variant="outlined"
                     sx={{
-                      p: 1,
-                      borderTop: 1,
-                      borderColor: 'divider',
                       display: 'flex',
-                      gap: 1,
-                      bgcolor: 'background.paper',
+                      flexDirection: 'column',
+                      transition: 'all 0.2s',
+                      position: 'relative',
+                      overflow: 'visible',
+                      opacity: isCurrentTemplate ? 0.6 : 1,
+                      '&:hover':
+                        !applying && !isCurrentTemplate
+                          ? {
+                              borderColor: 'primary.main',
+                              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                            }
+                          : {},
                     }}
                   >
-                    <Button
-                      fullWidth
-                      size="small"
-                      variant="outlined"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setPreviewTemplate(template);
-                      }}
-                      disabled={applying}
-                      sx={{ fontSize: '0.75rem' }}
-                    >
-                      {t('releaseFlow.viewTemplateDetails')}
-                    </Button>
-                    <Button
-                      fullWidth
-                      size="small"
-                      variant="contained"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleApplyTemplate(template.id);
-                      }}
-                      disabled={applying}
-                      sx={{ fontSize: '0.75rem' }}
-                    >
-                      {t('releaseFlow.useThisTemplate')}
-                    </Button>
-                  </Box>
+                    <CardContent sx={{ flexGrow: 1, p: 2.5, pb: 1.5 }}>
+                      {/* Template header */}
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                        <Box
+                          sx={{
+                            p: 0.8,
+                            borderRadius: 1,
+                            bgcolor: 'primary.main',
+                            color: 'primary.contrastText',
+                            display: 'flex',
+                          }}
+                        >
+                          <TemplateIcon fontSize="small" />
+                        </Box>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 700, lineHeight: 1.2 }}>
+                          {template.displayName || template.flowName}
+                        </Typography>
+                        {isCurrentTemplate && (
+                          <Chip
+                            label={t('releaseFlow.currentTemplate')}
+                            size="small"
+                            color="primary"
+                            variant="outlined"
+                            sx={{
+                              height: 20,
+                              '& .MuiChip-label': { px: 0.75, fontSize: '0.65rem' },
+                            }}
+                          />
+                        )}
+                      </Box>
+                      {template.description && (
+                        <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
+                          {template.description}
+                        </Typography>
+                      )}
 
-                  {applying && (
+                      {/* Milestone summary + collapsible details */}
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 1,
+                          cursor: 'pointer',
+                          py: 0.5,
+                          '&:hover': { opacity: 0.8 },
+                        }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setExpandedTemplates((prev) => {
+                            const next = new Set(prev);
+                            if (next.has(template.id)) {
+                              next.delete(template.id);
+                            } else {
+                              next.add(template.id);
+                            }
+                            return next;
+                          });
+                        }}
+                      >
+                        <Typography variant="caption" color="text.secondary">
+                          {template.milestones?.length || 0}{' '}
+                          {t('releaseFlow.milestones').toLowerCase()}
+                        </Typography>
+                        <IconButton size="small" tabIndex={-1} sx={{ p: 0 }}>
+                          {expandedTemplates.has(template.id) ? (
+                            <ExpandLessIcon sx={{ fontSize: 16 }} />
+                          ) : (
+                            <ExpandMoreIcon sx={{ fontSize: 16 }} />
+                          )}
+                        </IconButton>
+                      </Box>
+
+                      <Collapse in={expandedTemplates.has(template.id)}>
+                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mt: 0.5 }}>
+                          {template.milestones?.map((m: any, idx: number) => (
+                            <Paper
+                              key={idx}
+                              variant="outlined"
+                              sx={{
+                                overflow: 'hidden',
+                                bgcolor: 'background.paper',
+                              }}
+                            >
+                              {/* Milestone header */}
+                              <Box
+                                sx={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: 1,
+                                  px: 1.5,
+                                  py: 0.8,
+                                  bgcolor: 'action.hover',
+                                  borderBottom: 1,
+                                  borderColor: 'divider',
+                                }}
+                              >
+                                <Chip
+                                  label={`${idx + 1}`}
+                                  size="small"
+                                  sx={{
+                                    width: 20,
+                                    height: 20,
+                                    fontSize: '0.65rem',
+                                    bgcolor: 'primary.light',
+                                    color: 'primary.contrastText',
+                                    '& .MuiChip-label': { px: 0 },
+                                  }}
+                                />
+                                <Typography variant="caption" sx={{ fontWeight: 700 }}>
+                                  {m.name}
+                                </Typography>
+                                <Typography
+                                  variant="caption"
+                                  color="text.secondary"
+                                  sx={{ ml: 'auto' }}
+                                >
+                                  {m.strategies?.length || 0}{' '}
+                                  {t('releaseFlow.strategies').toLowerCase()}
+                                </Typography>
+                              </Box>
+
+                              {/* Strategies */}
+                              <Box sx={{ p: 1.5 }}>
+                                <StrategyListReadonly
+                                  strategies={(m.strategies || []).map((s: any) => ({
+                                    strategyName: s.strategyName,
+                                    parameters: s.parameters,
+                                    constraints: s.constraints,
+                                    segments: s.segments,
+                                  }))}
+                                  allSegments={allSegments}
+                                  contextFields={contextFields}
+                                />
+                              </Box>
+                            </Paper>
+                          ))}
+                        </Box>
+                      </Collapse>
+                    </CardContent>
+
+                    {/* Apply button */}
                     <Box
                       sx={{
-                        position: 'absolute',
-                        inset: 0,
-                        bgcolor: 'rgba(255,255,255,0.6)',
+                        p: 1.5,
+                        borderTop: 1,
+                        borderColor: 'divider',
                         display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        borderRadius: 1,
-                        zIndex: 1,
+                        justifyContent: 'flex-end',
                       }}
                     >
-                      <CircularProgress size={24} />
+                      <Button
+                        size="small"
+                        variant="contained"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleApplyTemplate(template.id);
+                        }}
+                        disabled={applying || isCurrentTemplate}
+                      >
+                        {isCurrentTemplate
+                          ? t('releaseFlow.currentTemplate')
+                          : t('releaseFlow.useThisTemplate')}
+                      </Button>
                     </Box>
-                  )}
-                </Card>
-              ))}
+
+                    {applying && (
+                      <Box
+                        sx={{
+                          position: 'absolute',
+                          inset: 0,
+                          bgcolor: 'rgba(255,255,255,0.6)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          borderRadius: 1,
+                          zIndex: 1,
+                        }}
+                      >
+                        <CircularProgress size={24} />
+                      </Box>
+                    )}
+                  </Card>
+                );
+              })}
               {templates?.length === 0 && (
                 <Box sx={{ gridColumn: '1 / -1', py: 4, textAlign: 'center' }}>
                   <Typography variant="body2" color="text.secondary">
@@ -1231,11 +1322,15 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
           )}
         </DialogContent>
         <DialogActions sx={{ px: 3, py: 2 }}>
-          <Button onClick={() => {
-            setShowApplyDialog(false);
-            // If no plan exists, go back to the original view
-            if (!plan) onPlanDeleted?.();
-          }} disabled={applying} color="inherit">
+          <Button
+            onClick={() => {
+              setShowApplyDialog(false);
+              // If no plan exists, go back to the original view
+              if (!plan) onPlanDeleted?.();
+            }}
+            disabled={applying}
+            color="inherit"
+          >
             {t('common.cancel')}
           </Button>
         </DialogActions>
@@ -1252,42 +1347,6 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
         })}
         confirmLabel={t('common.confirm')}
       />
-
-      {/* Template Preview Dialog */}
-      <Dialog
-        open={!!previewTemplate}
-        onClose={() => setPreviewTemplate(null)}
-        maxWidth="sm"
-        fullWidth
-        PaperProps={{ sx: { borderRadius: 2 } }}
-      >
-        <DialogContent sx={{ p: 3, bgcolor: 'action.hover' }}>
-          {previewTemplate && (
-            <ReleaseFlowTemplatePreview
-              template={previewTemplate}
-              allSegments={allSegments}
-              contextFields={contextFields}
-            />
-          )}
-        </DialogContent>
-        <DialogActions sx={{ px: 3, py: 2, borderTop: 1, borderColor: 'divider' }}>
-          <Button onClick={() => setPreviewTemplate(null)} color="inherit">
-            {t('common.close')}
-          </Button>
-          <Button
-            variant="contained"
-            onClick={() => {
-              if (previewTemplate) {
-                handleApplyTemplate(previewTemplate.id);
-                setPreviewTemplate(null);
-              }
-            }}
-            disabled={applying}
-          >
-            {t('releaseFlow.useThisTemplate')}
-          </Button>
-        </DialogActions>
-      </Dialog>
 
       {/* Delete Plan Confirmation */}
       <ConfirmDialog

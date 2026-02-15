@@ -225,7 +225,7 @@ export class ReleaseFlowService {
           constraints: ms.constraints ? JSON.stringify(ms.constraints) : '[]',
           sortOrder: ms.sortOrder,
           isEnabled: true,
-          createdBy: userId ?? 0,
+          createdBy: userId || null,
           createdAt: new Date(),
           updatedAt: new Date(),
         });

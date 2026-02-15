@@ -612,6 +612,7 @@ const TemplateEditorDrawer: React.FC<TemplateEditorDrawerProps> = ({
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const [flowName, setFlowName] = useState('');
+  const [displayName, setDisplayName] = useState('');
   const [description, setDescription] = useState('');
   const [milestones, setMilestones] = useState<MilestoneEditorData[]>([]);
   const [saving, setSaving] = useState(false);
@@ -664,6 +665,7 @@ const TemplateEditorDrawer: React.FC<TemplateEditorDrawerProps> = ({
     if (open) {
       if (initialData) {
         setFlowName(initialData.flowName || '');
+        setDisplayName(initialData.displayName || '');
         setDescription(initialData.description || '');
         setMilestones(
           (initialData.milestones || []).map((m) => ({
@@ -683,6 +685,7 @@ const TemplateEditorDrawer: React.FC<TemplateEditorDrawerProps> = ({
       } else {
         // New template: start with one milestone containing one flexibleRollout
         setFlowName('');
+        setDisplayName('');
         setDescription('');
         setMilestones([
           {
@@ -828,6 +831,7 @@ const TemplateEditorDrawer: React.FC<TemplateEditorDrawerProps> = ({
     try {
       await onSave({
         flowName: flowName.trim(),
+        displayName: displayName.trim() || undefined,
         description: description.trim() || undefined,
         milestones: milestones.map((m, idx) => ({
           name: m.name || `Milestone ${idx + 1}`,
@@ -875,6 +879,21 @@ const TemplateEditorDrawer: React.FC<TemplateEditorDrawerProps> = ({
                 fullWidth
                 size="small"
                 placeholder={t('releaseFlow.templateNamePlaceholder')}
+                disabled={!!initialData}
+                helperText={t('releaseFlow.templateNameHelp')}
+              />
+            </Box>
+            <Box>
+              <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                {t('releaseFlow.displayName')}
+              </Typography>
+              <TextField
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+                fullWidth
+                size="small"
+                placeholder={t('releaseFlow.displayNamePlaceholder')}
+                helperText={t('releaseFlow.displayNameHelp')}
               />
             </Box>
             <Box>

@@ -38,6 +38,7 @@ export interface ReleaseFlowPlanSummary {
   environment: string;
   status: string;
   displayName: string;
+  activeMilestoneName: string | null;
 }
 
 /**
