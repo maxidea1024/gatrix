@@ -597,35 +597,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
         </Box>
       )}
 
-      {!plan ? (
-        /* ==================== Empty State ==================== */
-        <Paper
-          variant="outlined"
-          sx={{
-            p: 4,
-            textAlign: 'center',
-            borderRadius: 2,
-            bgcolor: 'background.neutral',
-          }}
-        >
-          <TemplateIcon sx={{ fontSize: 48, color: 'text.disabled', mb: 2 }} />
-          <Typography variant="h6" gutterBottom>
-            {t('releaseFlow.noActivePlan')}
-          </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-            {t('releaseFlow.noActivePlanDesc')}
-          </Typography>
-          {canManage && (
-            <Button
-              variant="contained"
-              startIcon={<StartIcon />}
-              onClick={() => setShowApplyDialog(true)}
-            >
-              {t('releaseFlow.startReleaseFlow')}
-            </Button>
-          )}
-        </Paper>
-      ) : (
+      {plan && (
         /* ==================== Active Plan ==================== */
         <Box>
           {/* Environment disabled warning */}
@@ -1259,7 +1231,11 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
           )}
         </DialogContent>
         <DialogActions sx={{ px: 3, py: 2 }}>
-          <Button onClick={() => setShowApplyDialog(false)} disabled={applying} color="inherit">
+          <Button onClick={() => {
+            setShowApplyDialog(false);
+            // If no plan exists, go back to the original view
+            if (!plan) onPlanDeleted?.();
+          }} disabled={applying} color="inherit">
             {t('common.cancel')}
           </Button>
         </DialogActions>
