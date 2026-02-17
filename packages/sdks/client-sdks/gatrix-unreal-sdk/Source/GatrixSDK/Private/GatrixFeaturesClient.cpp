@@ -311,6 +311,7 @@ void UGatrixFeaturesClient::SyncFlags(bool bFetchNow) {
     TMap<FString, FGatrixEvaluatedFlag> OldFlags = SynchronizedFlags;
     SynchronizedFlags = RealtimeFlags;
     EmitFlagChanges(OldFlags, SynchronizedFlags);
+    InvokeWatchCallbacks(OldFlags, SynchronizedFlags);
   }
 
   {
@@ -737,6 +738,7 @@ void UGatrixFeaturesClient::StoreFlags(
     EmitFlagChanges(OldFlags, CurrentFlags);
 
     if (!ClientConfig.Features.bExplicitSyncMode) {
+      InvokeWatchCallbacks(OldFlags, CurrentFlags);
       if (EventEmitter) {
         EventEmitter->Emit(GatrixEvents::FlagsChange);
       }
@@ -925,21 +927,49 @@ void UGatrixFeaturesClient::TrackAccess(const FString &FlagName,
 int32 UGatrixFeaturesClient::WatchFlag(const FString &FlagName,
                                        FGatrixFlagWatchDelegate Callback,
                                        const FString &Name) {
-  FString EventName = GatrixEvents::FlagChange(FlagName);
-
-  // Capture FlagName and Callback for the event handler
-  return EventEmitter->On(
-      EventName,
-      [this, FlagName, Callback](const TArray<FString> &Args) {
-        UGatrixFlagProxy *Proxy = CreateProxy(FlagName);
-        Callback.ExecuteIfBound(Proxy);
-      },
-      Name);
+  FWatchCallbackEntry Entry;
+  Entry.FlagName = FlagName;
+  Entry.Callback = Callback;
+  Entry.Handle = NextWatchHandle++;
+  WatchCallbacks.Add(Entry);
+  return Entry.Handle;
 }
 
 void UGatrixFeaturesClient::UnwatchFlag(int32 Handle) {
-  if (EventEmitter) {
-    EventEmitter->Off(Handle);
+  WatchCallbacks.RemoveAll([Handle](const FWatchCallbackEntry &Entry) {
+    return Entry.Handle == Handle;
+  });
+}
+
+void UGatrixFeaturesClient::InvokeWatchCallbacks(
+    const TMap<FString, FGatrixEvaluatedFlag> &OldFlags,
+    const TMap<FString, FGatrixEvaluatedFlag> &NewFlags) {
+  // Check for changed/new flags
+  for (const auto &Pair : NewFlags) {
+    const FGatrixEvaluatedFlag *OldFlag = OldFlags.Find(Pair.Key);
+    if (!OldFlag || OldFlag->bEnabled != Pair.Value.bEnabled ||
+        OldFlag->Variant.Name != Pair.Value.Variant.Name ||
+        OldFlag->Variant.Value != Pair.Value.Variant.Value) {
+      // Invoke watch callbacks for this flag
+      for (const auto &Entry : WatchCallbacks) {
+        if (Entry.FlagName == Pair.Key) {
+          UGatrixFlagProxy *Proxy = CreateProxy(Pair.Key);
+          Entry.Callback.ExecuteIfBound(Proxy);
+        }
+      }
+    }
+  }
+
+  // Check for removed flags
+  for (const auto &Pair : OldFlags) {
+    if (!NewFlags.Contains(Pair.Key)) {
+      for (const auto &Entry : WatchCallbacks) {
+        if (Entry.FlagName == Pair.Key) {
+          UGatrixFlagProxy *Proxy = CreateProxy(Pair.Key);
+          Entry.Callback.ExecuteIfBound(Proxy);
+        }
+      }
+    }
   }
 }
 

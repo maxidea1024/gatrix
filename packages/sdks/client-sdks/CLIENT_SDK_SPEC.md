@@ -372,12 +372,23 @@ Per-flag change events are emitted when a flag is **created** (new flag) or **up
 
 ### watchFlag Behavior
 
-`watchFlag(flagName, callback)` subscribes to `flags.{flagName}.change` events only. This means:
+`watchFlag(flagName, callback)` and `watchFlagWithInitialState(flagName, callback)` register callbacks that are invoked when the specified flag changes.
 
-- ??**Reacts to**: Flag created (`changeType: 'created'`), Flag updated (`changeType: 'updated'`)
-- ??**Does NOT react to**: Flag removal ??use `on('flags.removed', callback)` to handle removals separately
+**Callback Invocation Mechanism:**
+- Callbacks are stored in an internal `watchCallbacks` map and invoked **directly** (not via event emitter).
+- In **normal mode** (`explicitSyncMode=false`): Callbacks are invoked immediately when flags are fetched from the server.
+- In **explicit sync mode** (`explicitSyncMode=true`): Callbacks are invoked only when `syncFlags()` is called, ensuring controlled synchronization points.
 
-This design prevents ambiguous callback behavior when a watched flag is removed from the server.
+**What triggers callbacks:**
+- ✅ **Reacts to**: Flag created (`changeType: 'created'`), Flag updated (`changeType: 'updated'`)
+- ✅ **Reacts to**: Flag removal — callback receives a proxy with `null`/`undefined` flag. The bulk `flags.removed` event is also emitted separately.
+
+**explicitSyncMode behavior:**
+- When `explicitSyncMode=true`, watch callbacks are **not** invoked when flags are fetched from the server in the background.
+- Instead, callbacks are invoked when `syncFlags()` is called, comparing `synchronizedFlags` (old) with `realtimeFlags` (new).
+- This prevents mid-session flag changes from affecting the user experience until the application explicitly synchronizes.
+
+This design ensures that `explicitSyncMode` properly controls when flag changes are applied, preventing mid-session disruptions.
 
 ## Main Interface
 

@@ -215,6 +215,9 @@ private:
   // Watch groups
   std::vector<WatchFlagGroup *> _watchGroups;
 
+  // Watch callbacks — direct callback management (not via emitter)
+  std::map<std::string, std::vector<WatchCallback>> _watchCallbacks;
+
   // Active flags getter
   const std::map<std::string, EvaluatedFlag> &
   selectFlags(bool forceRealtime = false) const;
@@ -240,6 +243,9 @@ private:
   void trackImpression(const EvaluatedFlag &flag, const std::string &eventType);
   void scheduleNextRefresh();
   void unschedulePolling();
+  void
+  invokeWatchCallbacks(const std::map<std::string, EvaluatedFlag> &oldFlags,
+                       const std::map<std::string, EvaluatedFlag> &newFlags);
 };
 
 // ==================== WatchFlagGroup ====================
