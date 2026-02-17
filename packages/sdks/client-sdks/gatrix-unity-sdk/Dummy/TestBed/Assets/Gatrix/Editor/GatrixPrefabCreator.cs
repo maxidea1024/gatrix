@@ -101,7 +101,11 @@ namespace Gatrix.Unity.SDK.Editor
 
         private static GameObject EnsureCanvasExists()
         {
+#if UNITY_2023_1_OR_NEWER
+            Canvas canvas = Object.FindFirstObjectByType<Canvas>();
+#else
             Canvas canvas = Object.FindObjectOfType<Canvas>();
+#endif
             if (canvas != null) return canvas.gameObject;
 
             GameObject canvasGo = new GameObject("Canvas");
@@ -112,7 +116,11 @@ namespace Gatrix.Unity.SDK.Editor
             canvasGo.AddComponent<GraphicRaycaster>();
             Undo.RegisterCreatedObjectUndo(canvasGo, "Create Canvas");
 
+#if UNITY_2023_1_OR_NEWER
+            if (Object.FindFirstObjectByType<EventSystem>() == null)
+#else
             if (Object.FindObjectOfType<EventSystem>() == null)
+#endif
             {
                 GameObject esGo = new GameObject("EventSystem");
                 esGo.AddComponent<EventSystem>();

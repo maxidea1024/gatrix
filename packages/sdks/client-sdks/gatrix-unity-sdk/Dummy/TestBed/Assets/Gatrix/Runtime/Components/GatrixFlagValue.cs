@@ -66,6 +66,10 @@ namespace Gatrix.Unity.SDK
             Unsubscribe();
         }
 
+        private static Type _cachedTmpType;
+        private static System.Reflection.PropertyInfo _cachedTmpTextProp;
+        private static bool _typeResolveAttempted;
+
         private void DetectTarget()
         {
             // Try Unity UI Text first
@@ -80,13 +84,23 @@ namespace Gatrix.Unity.SDK
                 _tmpChecked = true;
                 if (_targetText == null)
                 {
-                    var tmpType = Type.GetType("TMPro.TMP_Text, Unity.TextMeshPro");
-                    if (tmpType != null)
+                    if (!_typeResolveAttempted)
                     {
-                        _tmpComponent = GetComponent(tmpType);
-                        if (_tmpComponent != null)
+                        _typeResolveAttempted = true;
+                        _cachedTmpType = Type.GetType("TMPro.TMP_Text, Unity.TextMeshPro");
+                        if (_cachedTmpType != null)
                         {
-                            _tmpTextProperty = tmpType.GetProperty("text");
+                            _cachedTmpTextProp = _cachedTmpType.GetProperty("text");
+                        }
+                    }
+
+                    if (_cachedTmpType != null)
+                    {
+                        var cmp = GetComponent(_cachedTmpType);
+                        if (cmp != null)
+                        {
+                            _tmpComponent = cmp;
+                            _tmpTextProperty = _cachedTmpTextProp;
                         }
                     }
                 }

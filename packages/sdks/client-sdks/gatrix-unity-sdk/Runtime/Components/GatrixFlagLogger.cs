@@ -61,17 +61,22 @@ namespace Gatrix.Unity.SDK
             string type = _isFirst ? "Initial" : "Changed";
             _isFirst = false;
 
-            string msg = $"{_prefix} Flag '{_flagName}' {type}: Enabled={flag.Enabled}, Variant={flag.Variant?.Name ?? "none"}";
-            
+            var sb = new System.Text.StringBuilder(128);
+            sb.Append(_prefix).Append(" Flag '").Append(_flagName).Append("' ")
+              .Append(type).Append(": Enabled=").Append(flag.Enabled)
+              .Append(", Variant=").Append(flag.Variant?.Name ?? "none");
+
             if (_logValue)
             {
-                msg += $", Value={flag.Variant?.Value ?? "null"}";
+                sb.Append(", Value=").Append(flag.Variant?.Value ?? "null");
             }
 
             if (_logReason)
             {
-                msg += $", Reason={flag.Reason ?? "unknown"}";
+                sb.Append(", Reason=").Append(flag.Reason ?? "unknown");
             }
+
+            string msg = sb.ToString();
 
             switch (_logLevel)
             {
