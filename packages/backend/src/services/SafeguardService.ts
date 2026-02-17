@@ -243,10 +243,18 @@ class SafeguardService {
     try {
       // Convert minutes to time range string for Prometheus query
       const timeRangeStr = this.minutesToPromRange(safeguard.timeRangeMinutes);
+      // Convert Record<string, string> to Record<string, string[]> for queryInstant
+      let labelFilters: Record<string, string[]> | undefined;
+      if (safeguard.labelFilters) {
+        labelFilters = {};
+        for (const [key, value] of Object.entries(safeguard.labelFilters)) {
+          labelFilters[key] = [value];
+        }
+      }
       const currentValue = await impactMetricsService.queryInstant(
         safeguard.metricName,
         safeguard.aggregationMode,
-        safeguard.labelFilters || undefined,
+        labelFilters,
         timeRangeStr
       );
 

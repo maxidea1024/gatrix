@@ -35,6 +35,11 @@ async function main(): Promise<void> {
     // Initialize token usage tracker (for reporting usage to backend)
     await tokenUsageTracker.initialize();
 
+    // Initialize Flag Streaming Service (SSE for SDK clients)
+    const { flagStreamingService } = await import('./services/FlagStreamingService');
+    await flagStreamingService.start();
+    logger.info('Flag Streaming Service initialized');
+
     // Start main HTTP server
     const server = app.listen(config.port, () => {
       logger.info(`Edge server listening on port ${config.port}`);

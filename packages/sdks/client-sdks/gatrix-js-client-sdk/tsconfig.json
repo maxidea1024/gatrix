@@ -2,7 +2,13 @@
   "compilerOptions": {
     "target": "ES2020",
     "module": "ESNext",
-    "lib": ["ES2020", "DOM"],
+    "lib": [
+      "ES2020",
+      "DOM"
+    ],
+    "typeRoots": [
+      "./node_modules/@types"
+    ],
     "declaration": true,
     "sourceMap": true,
     "strict": true,
@@ -22,8 +28,13 @@
     "outDir": "./dist",
     "rootDir": "./src"
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist"],
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ],
   "ts-node": {
     "compilerOptions": {
       "module": "CommonJS"

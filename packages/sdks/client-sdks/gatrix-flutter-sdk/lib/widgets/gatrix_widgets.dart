@@ -90,7 +90,7 @@ class _GatrixFlagBuilderState extends State<GatrixFlagBuilder> {
       _client?.off(GatrixEvents.flagsReady);
       
       _client = newClient;
-      _flag = _client!.features.getFlag(widget.flagName);
+      _flag = _client!.features.createProxy(widget.flagName);
       
       _client!.on(GatrixEvents.flagChange(widget.flagName), _onUpdate, name: 'builder_${widget.flagName}');
       _client!.on(GatrixEvents.flagsReady, _onUpdate, name: 'builder_ready_${widget.flagName}');
@@ -101,7 +101,7 @@ class _GatrixFlagBuilderState extends State<GatrixFlagBuilder> {
   void _onUpdate(List<dynamic> args) {
     if (mounted) {
       setState(() {
-        _flag = _client!.features.getFlag(widget.flagName);
+        _flag = _client!.features.createProxy(widget.flagName);
       });
     }
   }

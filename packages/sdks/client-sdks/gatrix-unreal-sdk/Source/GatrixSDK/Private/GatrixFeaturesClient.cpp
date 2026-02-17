@@ -128,9 +128,10 @@ FGatrixVariant UGatrixFeaturesClient::GetVariant(const FString &FlagName,
       FlagName, bForceRealtime);
 }
 
-UGatrixFlagProxy *UGatrixFeaturesClient::GetFlag(const FString &FlagName) {
+UGatrixFlagProxy *UGatrixFeaturesClient::CreateProxy(const FString &FlagName) {
   FScopeLock Lock(&FlagsCriticalSection);
-  TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags();
+  // Always read from realtimeFlags for watch/proxy
+  TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags(true);
   UGatrixFlagProxy *Proxy = NewObject<UGatrixFlagProxy>(this);
 
   const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
@@ -930,7 +931,7 @@ int32 UGatrixFeaturesClient::WatchFlag(const FString &FlagName,
   return EventEmitter->On(
       EventName,
       [this, FlagName, Callback](const TArray<FString> &Args) {
-        UGatrixFlagProxy *Proxy = GetFlag(FlagName);
+        UGatrixFlagProxy *Proxy = CreateProxy(FlagName);
         Callback.ExecuteIfBound(Proxy);
       },
       Name);

@@ -16,7 +16,13 @@ import {
   SdkState,
   FeaturesStats,
   VariationResult,
+  StreamingConnectionState,
+  FlagsChangedEvent,
 } from './types';
+import {
+  fetchEventSource,
+  EventStreamContentType,
+} from '@microsoft/fetch-event-source';
 import { StorageProvider } from './StorageProvider';
 import { LocalStorageProvider } from './LocalStorageProvider';
 import { InMemoryStorageProvider } from './InMemoryStorageProvider';
@@ -66,6 +72,16 @@ export class FeaturesClient implements VariationProvider {
   private connectionId: string;
   private devMode: boolean;
   private pendingSync: boolean = false;
+
+  // Streaming state
+  private streamingState: StreamingConnectionState = 'disconnected';
+  private streamingAbortController: AbortController | null = null;
+  private streamingReconnectAttempt: number = 0;
+  private streamingReconnectTimer?: ReturnType<typeof setTimeout>;
+  private streamingReconnectCount: number = 0;
+  private lastStreamingEventTime: Date | null = null;
+  private localGlobalRevision: number = 0;
+  private pendingFetches: Set<string> = new Set();
 
   // Metrics
   private metrics: Metrics;
@@ -225,7 +241,7 @@ export class FeaturesClient implements VariationProvider {
     this.pollingStopped = false;
 
     this.devLog(
-      `start() called. offlineMode=${this.config.offlineMode}, refreshInterval=${this.refreshInterval}ms, explicitSyncMode=${this.featuresConfig.explicitSyncMode}`
+      `start() called. offlineMode=${this.config.offlineMode}, refreshInterval=${this.refreshInterval}ms, explicitSyncMode=${this.featuresConfig.explicitSyncMode}, enableStreaming=${this.featuresConfig.enableStreaming}`
     );
 
     // Offline mode: skip all network requests, use cached/bootstrap flags only
@@ -247,6 +263,11 @@ export class FeaturesClient implements VariationProvider {
     // Initial fetch (scheduleNextRefresh is called inside fetchFlags on completion)
     await this.fetchFlagsInternal('init');
 
+    // Start streaming if enabled (default: true)
+    if (this.featuresConfig.enableStreaming !== false) {
+      this.connectStreaming();
+    }
+
     // Start metrics collection
     this.metrics.start();
   }
@@ -260,6 +281,7 @@ export class FeaturesClient implements VariationProvider {
       clearTimeout(this.timerRef);
       this.timerRef = undefined;
     }
+    this.disconnectStreaming();
     this.pollingStopped = true;
     this.consecutiveFailures = 0;
     this.metrics.stop();
@@ -364,10 +386,12 @@ export class FeaturesClient implements VariationProvider {
   /**
    * Create a FlagProxy for a given flag name.
    * FlagProxy is a convenience shell - delegates all variation logic back to this client.
-   * Only used by getFlag(), watchFlag*() where returning a proxy object is needed.
+   * Only used by watchFlag*() where returning a proxy object is needed.
+   * Always reads from realtimeFlags — watch callbacks must reflect
+   * the latest server state regardless of explicitSyncMode.
    */
   private createProxy(flagName: string): FlagProxy {
-    const flags = this.selectFlags();
+    const flags = this.selectFlags(true); // always realtime for watch/proxy
     const flag = flags.get(flagName);
     return new FlagProxy(flag, this, flagName);
   }
@@ -426,10 +450,6 @@ export class FeaturesClient implements VariationProvider {
   hasFlag(flagName: string, forceRealtime: boolean = false): boolean {
     const flags = this.selectFlags(forceRealtime);
     return flags.has(flagName);
-  }
-
-  getFlag(flagName: string): FlagProxy {
-    return this.createProxy(flagName);
   }
 
   // ==================== Internal Variation Methods ====================
@@ -899,15 +919,15 @@ export class FeaturesClient implements VariationProvider {
     };
     this.emitter.on(eventName, wrappedCallback, name);
 
-    // Emit initial state
+    // Emit initial state — always from realtimeFlags
     if (this.readyEventEmitted) {
-      const flags = this.selectFlags();
+      const flags = this.selectFlags(true);
       callback(new FlagProxy(flags.get(flagName), this, flagName));
     } else {
       this.emitter.once(
         EVENTS.FLAGS_READY,
         () => {
-          const flags = this.selectFlags();
+          const flags = this.selectFlags(true);
           callback(new FlagProxy(flags.get(flagName), this, flagName));
         },
         name ? `${name}_initial` : undefined
@@ -935,7 +955,7 @@ export class FeaturesClient implements VariationProvider {
   }
 
   private async fetchFlagsInternal(
-    caller: 'init' | 'polling' | 'manual' | 'syncFlags' | 'contextChange'
+    caller: 'init' | 'polling' | 'manual' | 'syncFlags' | 'contextChange' | 'gap_recovery'
   ): Promise<void> {
     // Offline mode: no network requests allowed
     if (this.config.offlineMode) {
@@ -1063,7 +1083,7 @@ export class FeaturesClient implements VariationProvider {
         this.pollingStopped = true;
         this.logger.error(
           `Polling stopped due to non-retryable status code ${response.status}. ` +
-            `Call fetchFlags() manually to retry.`
+          `Call fetchFlags() manually to retry.`
         );
         this.emitter.emit(EVENTS.FLAGS_FETCH_ERROR, {
           status: response.status,
@@ -1143,6 +1163,13 @@ export class FeaturesClient implements VariationProvider {
       this.logger.warn(
         `Scheduling retry after ${delay}ms (consecutive failures: ${this.consecutiveFailures})`
       );
+    }
+
+    // Apply jitter to prevent thundering herd
+    const jitterMs = this.featuresConfig.pollingJitterMs ?? 5000;
+    if (jitterMs > 0 && this.consecutiveFailures === 0) {
+      const jitter = Math.random() * jitterMs - jitterMs / 2;
+      delay = Math.max(1000, delay + jitter);
     }
 
     this.devLog(
@@ -1346,6 +1373,237 @@ export class FeaturesClient implements VariationProvider {
     return String(e);
   }
 
+  // ==================== Streaming ====================
+
+  /**
+   * Connect to the streaming endpoint for real-time invalidation signals.
+   * Uses @microsoft/fetch-event-source for custom header support.
+   */
+  private connectStreaming(): void {
+    if (this.streamingState === 'connected' || this.streamingState === 'connecting') {
+      return;
+    }
+
+    this.streamingState = 'connecting';
+    this.devLog('Connecting to streaming endpoint...');
+
+    // Create abort controller for streaming
+    this.streamingAbortController = new AbortController();
+
+    const streamUrl = this.featuresConfig.streamingUrl ??
+      `${this.config.apiUrl}/client/features/${this.config.environment}/stream`;
+
+    const headers = this.buildHeaders();
+
+    fetchEventSource(streamUrl, {
+      method: 'GET',
+      headers,
+      signal: this.streamingAbortController.signal,
+      openWhenHidden: true, // Keep connection alive when tab is hidden
+
+      onopen: async (response) => {
+        if (response.ok && response.headers.get('content-type')?.includes(EventStreamContentType)) {
+          // Connection established successfully
+          this.streamingState = 'connected';
+          this.streamingReconnectAttempt = 0;
+          this.devLog(`Streaming connected. URL: ${streamUrl}`);
+          this.emitter.emit(EVENTS.FLAGS_STREAMING_CONNECTED, {});
+          return;
+        }
+
+        // Non-retryable error
+        const errorMessage = `Streaming connection failed: ${response.status} ${response.statusText}`;
+        this.logger.error(errorMessage);
+        throw new Error(errorMessage);
+      },
+
+      onmessage: (event) => {
+        this.lastStreamingEventTime = new Date();
+
+        switch (event.event) {
+          case 'connected': {
+            try {
+              const data = JSON.parse(event.data) as { globalRevision: number };
+              this.devLog(`Streaming 'connected' event: globalRevision=${data.globalRevision}`);
+              this.emitter.emit(EVENTS.FLAGS_STREAMING_CONNECTED, { globalRevision: data.globalRevision });
+
+              // Gap recovery: check if we missed any changes
+              if (data.globalRevision > this.localGlobalRevision && this.localGlobalRevision > 0) {
+                this.devLog(
+                  `Gap detected: server=${data.globalRevision}, local=${this.localGlobalRevision}. Triggering recovery.`
+                );
+                this.fetchFlagsInternal('gap_recovery');
+              } else if (this.localGlobalRevision === 0) {
+                // First connection, record initial revision
+                this.localGlobalRevision = data.globalRevision;
+              }
+            } catch (e) {
+              this.logger.warn('Failed to parse streaming connected event:', String(e));
+            }
+            break;
+          }
+
+          case 'flags_changed': {
+            try {
+              const data = JSON.parse(event.data) as FlagsChangedEvent;
+              this.devLog(
+                `Streaming 'flags_changed': globalRevision=${data.globalRevision}, ` +
+                `changedKeys=[${data.changedKeys.join(',')}]`
+              );
+
+              // Only process if server revision is ahead
+              if (data.globalRevision > this.localGlobalRevision) {
+                this.localGlobalRevision = data.globalRevision;
+                this.emitter.emit(EVENTS.FLAGS_INVALIDATED, {
+                  globalRevision: data.globalRevision,
+                  changedKeys: data.changedKeys,
+                });
+                this.handleStreamingInvalidation(data.changedKeys);
+              } else {
+                this.devLog(
+                  `Ignoring stale event: server=${data.globalRevision} <= local=${this.localGlobalRevision}`
+                );
+              }
+            } catch (e) {
+              this.logger.warn('Failed to parse flags_changed event:', String(e));
+            }
+            break;
+          }
+
+          case 'heartbeat': {
+            this.devLog('Streaming heartbeat received');
+            break;
+          }
+
+          default:
+            this.devLog(`Unknown streaming event: ${event.event}`);
+            break;
+        }
+      },
+
+      onclose: () => {
+        if (this.streamingState === 'disconnected') {
+          return; // Intentional disconnect
+        }
+        this.devLog('Streaming connection closed by server');
+        this.streamingState = 'reconnecting';
+        this.emitter.emit(EVENTS.FLAGS_STREAMING_DISCONNECTED);
+        this.scheduleStreamingReconnect();
+      },
+
+      onerror: (err) => {
+        if (this.streamingState === 'disconnected') {
+          return; // Intentional disconnect, don't retry
+        }
+
+        this.logger.warn('Streaming error:', String(err));
+        this.emitter.emit(EVENTS.FLAGS_STREAMING_ERROR, { error: err });
+
+        if (this.streamingState !== 'reconnecting') {
+          this.streamingState = 'reconnecting';
+          this.emitter.emit(EVENTS.FLAGS_STREAMING_DISCONNECTED);
+        }
+
+        // Throw to trigger fetch-event-source retry mechanism to stop
+        // We handle reconnection ourselves via scheduleStreamingReconnect
+        this.scheduleStreamingReconnect();
+        throw err;
+      },
+    }).catch((err) => {
+      // fetchEventSource promise rejected (e.g., aborted)
+      if (this.streamingState !== 'disconnected') {
+        this.devLog(`Streaming promise rejected: ${String(err)}`);
+      }
+    });
+  }
+
+  /**
+   * Disconnect from the streaming endpoint
+   */
+  private disconnectStreaming(): void {
+    this.devLog('Disconnecting streaming');
+    this.streamingState = 'disconnected';
+
+    if (this.streamingReconnectTimer) {
+      clearTimeout(this.streamingReconnectTimer);
+      this.streamingReconnectTimer = undefined;
+    }
+
+    if (this.streamingAbortController) {
+      this.streamingAbortController.abort();
+      this.streamingAbortController = null;
+    }
+  }
+
+  /**
+   * Schedule streaming reconnection with exponential backoff + jitter
+   */
+  private scheduleStreamingReconnect(): void {
+    if (this.streamingState === 'disconnected' || !this.started) {
+      return;
+    }
+
+    // Clear any existing reconnect timer
+    if (this.streamingReconnectTimer) {
+      clearTimeout(this.streamingReconnectTimer);
+    }
+
+    this.streamingReconnectAttempt++;
+    this.streamingReconnectCount++;
+
+    const baseMs = this.featuresConfig.streamingReconnectBaseMs ?? 1000;
+    const maxMs = this.featuresConfig.streamingReconnectMaxMs ?? 30000;
+
+    // Exponential backoff: base * 2^(attempt-1), capped at max
+    const exponentialDelay = Math.min(
+      baseMs * Math.pow(2, this.streamingReconnectAttempt - 1),
+      maxMs
+    );
+    // Add jitter (0 - 1000ms)
+    const jitter = Math.floor(Math.random() * 1000);
+    const delayMs = exponentialDelay + jitter;
+
+    this.devLog(
+      `Scheduling streaming reconnect: attempt=${this.streamingReconnectAttempt}, delay=${delayMs}ms`
+    );
+
+    this.emitter.emit(EVENTS.FLAGS_STREAMING_RECONNECTING, {
+      attempt: this.streamingReconnectAttempt,
+      delayMs,
+    });
+
+    // Transition to degraded after several failed attempts
+    if (this.streamingReconnectAttempt >= 5 && this.streamingState !== 'degraded') {
+      this.streamingState = 'degraded';
+      this.logger.warn('Streaming degraded: falling back to polling-only mode');
+    }
+
+    this.streamingReconnectTimer = setTimeout(() => {
+      this.streamingReconnectTimer = undefined;
+      // Abort previous controller before creating new connection
+      if (this.streamingAbortController) {
+        this.streamingAbortController.abort();
+        this.streamingAbortController = null;
+      }
+      this.connectStreaming();
+    }, delayMs);
+  }
+
+  /**
+   * Handle streaming invalidation signal by triggering conditional fetches.
+   * Deduplicates concurrent fetches for the same flag to prevent burst overhead.
+   */
+  private handleStreamingInvalidation(_changedKeys: string[]): void {
+    // For simplicity, trigger a full fetch since the current API returns all flags at once
+    // rather than per-key fetching. The ETag mechanism ensures only changed data is transferred.
+    if (!this.isFetchingFlags) {
+      // Reset the ETag so we get fresh data for changed flags
+      this.fetchFlagsInternal('manual');
+    } else {
+      this.devLog('Fetch already in progress, invalidation will be picked up on next poll');
+    }
+  }
+
   // ==================== Statistics ====================
 
   /**
@@ -1431,6 +1689,9 @@ export class FeaturesClient implements VariationProvider {
       flagLastChangedTimes: Object.fromEntries(this.flagLastChangedTimes),
       metricsSentCount: this.metricsSentCount,
       metricsErrorCount: this.metricsErrorCount,
+      streamingState: this.streamingState,
+      streamingReconnectCount: this.streamingReconnectCount,
+      lastStreamingEventTime: this.lastStreamingEventTime,
     };
   }
 }

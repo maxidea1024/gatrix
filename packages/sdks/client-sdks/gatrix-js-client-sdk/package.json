@@ -30,6 +30,7 @@
     "example:dashboard": "npx ts-node examples/dashboard.ts"
   },
   "dependencies": {
+    "@microsoft/fetch-event-source": "^2.0.1",
     "ky": "^1.14.3"
   },
   "devDependencies": {

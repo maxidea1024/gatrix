@@ -252,7 +252,7 @@ export class ReleaseFlowService {
         description: `Release flow milestone '${milestone.name}' started for plan '${plan.flowName}'`,
         resourceType: 'ReleaseFlow',
         resourceId: plan.id,
-        userId,
+        userId: userId ?? undefined,
         environment: plan.environment,
         newValues: { milestoneId, milestoneName: milestone.name },
       });
@@ -394,14 +394,14 @@ export class ReleaseFlowService {
       await ReleaseFlowMilestoneModel.update(milestones[currentIndex].id, {
         progressionExecutedAt: new Date(),
       });
-      await ReleaseFlowModel.update(planId, { status: 'completed', updatedBy: userId || null });
+      await ReleaseFlowModel.update(planId, { status: 'completed', updatedBy: userId ?? undefined });
 
       await AuditLogModel.create({
         action: 'release_flow.complete_plan',
         description: `Release flow plan '${plan.flowName}' completed`,
         resourceType: 'ReleaseFlow',
         resourceId: planId,
-        userId: userId || null,
+        userId: userId ?? undefined,
         environment: plan.environment,
       });
 

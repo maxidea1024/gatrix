@@ -95,13 +95,13 @@ function updateCacheSizeMetrics(): void {
     ?.labels('total')
     .set(
       versionsCount +
-        bannersCount +
-        noticesCount +
-        worldsCount +
-        surveysCount +
-        popupNoticesCount +
-        storeProductsCount +
-        whitelistsCount
+      bannersCount +
+      noticesCount +
+      worldsCount +
+      surveysCount +
+      popupNoticesCount +
+      storeProductsCount +
+      whitelistsCount
     );
 }
 
@@ -1299,6 +1299,60 @@ router.post(
 router.get('/features/:environment/eval', clientAuth, async (req: ClientRequest, res: Response) => {
   await performEvaluation(req, res, req.clientContext, false);
 });
+
+/**
+ * @openapi
+ * /client/features/{environment}/stream:
+ *   get:
+ *     tags: [EdgeClient]
+ *     summary: Stream feature flag changes (SSE)
+ *     description: |
+ *       Establishes a Server-Sent Events connection for real-time flag invalidation signals.
+ *       Events: 'connected' (initial), 'flags_changed' (invalidation), 'heartbeat' (keepalive).
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: environment
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200:
+ *         description: SSE stream established
+ *         content:
+ *           text/event-stream:
+ *             schema:
+ *               type: string
+ */
+router.get(
+  '/features/:environment/stream',
+  clientAuth,
+  async (req: ClientRequest, res: Response) => {
+    try {
+      const { environment } = req.clientContext!;
+
+      // Lazy-import to avoid import-time side effects
+      const { flagStreamingService } = await import('../services/FlagStreamingService');
+
+      // Generate unique client ID
+      const clientId = `edge-flag-stream-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
+
+      // Register SSE client (sets headers, sends 'connected' event, handles cleanup on close)
+      flagStreamingService.addClient(clientId, environment, res);
+    } catch (error) {
+      logger.error('Error establishing flag streaming connection:', error);
+      if (!res.headersSent) {
+        res.status(500).json({
+          success: false,
+          error: {
+            code: 'INTERNAL_SERVER_ERROR',
+            message: 'Failed to establish streaming connection',
+          },
+        });
+      }
+    }
+  }
+);
 
 /**
  * @openapi

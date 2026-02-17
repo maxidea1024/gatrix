@@ -125,8 +125,9 @@ func has_flag(flag_name: String, force_realtime: bool = false) -> bool:
 	return _lookup_flag(flag_name, force_realtime) != null
 
 
-func get_flag(flag_name: String) -> GatrixFlagProxy:
-	var flag = _lookup_flag(flag_name)
+func _create_proxy(flag_name: String) -> GatrixFlagProxy:
+	# Always read from realtimeFlags for watch/proxy
+	var flag = _lookup_flag(flag_name, true)
 	return GatrixFlagProxy.new(flag, self, flag_name)
 
 
@@ -572,7 +573,7 @@ func watch_flag_with_initial_state(flag_name: String, callback: Callable, watche
 	var unwatch := watch_flag(flag_name, callback, watcher_name)
 
 	# Fire immediately with current state
-	var proxy := get_flag(flag_name)
+	var proxy := _create_proxy(flag_name)
 	callback.call(proxy)
 
 	return unwatch

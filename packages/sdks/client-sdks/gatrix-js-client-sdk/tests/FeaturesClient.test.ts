@@ -97,7 +97,7 @@ const bootstrapFlags: EvaluatedFlag[] = [
     version: 7,
   },
   {
-    name: 'disabled-with-payload',
+    name: 'disabled-with-value',
     enabled: false,
     variant: { name: 'disabled', enabled: false, value: 'ignored' },
     valueType: 'string',
@@ -192,12 +192,12 @@ describe('FeaturesClient', () => {
       await client.init();
     });
 
-    it('should return payload for enabled string flag', () => {
+    it('should return value for enabled string flag', () => {
       expect(client.stringVariation('string-variant', 'default')).toBe('hello world');
     });
 
-    it('should return payload for disabled flag with payload', () => {
-      expect(client.stringVariation('disabled-with-payload', 'default')).toBe('ignored');
+    it('should return value for disabled flag with value', () => {
+      expect(client.stringVariation('disabled-with-value', 'default')).toBe('ignored');
     });
 
     it('should return default for non-existent flag', () => {
@@ -290,7 +290,7 @@ describe('FeaturesClient', () => {
       });
 
       it('should return disabled reason for disabled flag', () => {
-        const result = client.stringVariationDetails('disabled-with-payload', 'default');
+        const result = client.stringVariationDetails('disabled-with-value', 'default');
 
         expect(result.reason).toBe('disabled');
         expect(result.enabled).toBe(false);
@@ -372,7 +372,7 @@ describe('FeaturesClient', () => {
         expect(client.numberVariationOrThrow('number-variant')).toBe(42.5);
       });
 
-      it('should throw for invalid number payload', () => {
+      it('should throw for invalid number value', () => {
         expect(() => client.numberVariationOrThrow('invalid-number')).toThrow(GatrixFeatureError);
       });
     });
@@ -385,7 +385,7 @@ describe('FeaturesClient', () => {
         });
       });
 
-      it('should throw for invalid json payload', () => {
+      it('should throw for invalid json value', () => {
         expect(() => client.jsonVariationOrThrow('invalid-json')).toThrow(GatrixFeatureError);
       });
     });
@@ -422,7 +422,7 @@ describe('FeaturesClient', () => {
     beforeEach(async () => {
       await client.init();
       // Mock console.error to suppress expected error output during context changes
-      consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+      consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => { });
       // Mock fetch to return empty flags response
       mockFetch.mockResolvedValue({
         ok: true,

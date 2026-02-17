@@ -116,14 +116,16 @@ class FeaturesClient implements VariationProvider {
 
   // ============================================================= Flag Access
 
+  /// Always reads from realtimeFlags — watch callbacks must reflect
+  /// the latest server state regardless of explicitSyncMode.
   FlagProxy _createProxy(String flagName) {
-    final flag = _selectFlags()[flagName];
+    final flag = _selectFlags(forceRealtime: true)[flagName];
     return FlagProxy(flag, client: this, flagName: flagName);
   }
 
-  FlagProxy getFlag(String flagName) {
-    return _createProxy(flagName);
-  }
+  /// Create a FlagProxy. Used internally by SDK widgets/composables.
+  /// Not intended for direct use — prefer watchFlag or variation methods.
+  FlagProxy createProxy(String flagName) => _createProxy(flagName);
 
   EvaluatedFlag? _getFlag(String flagName, {bool forceRealtime = false}) {
     return _selectFlags(forceRealtime: forceRealtime)[flagName];

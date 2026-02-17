@@ -27,7 +27,7 @@ export const EVENTS = {
   FLAGS_SYNC: 'flags.sync',
   /** Pending sync flags available (explicitSyncMode) */
   FLAGS_PENDING_SYNC: 'flags.pending_sync',
-  /** One or more flags removed from server. Payload: string[] of removed flag names */
+  /** One or more flags removed from server. Data: string[] of removed flag names */
   FLAGS_REMOVED: 'flags.removed',
   /** SDK recovered from error state */
   FLAGS_RECOVERED: 'flags.recovered',
@@ -35,6 +35,16 @@ export const EVENTS = {
   FLAGS_METRICS_SENT: 'flags.metrics_sent',
   /** Error sending metrics */
   FLAGS_METRICS_ERROR: 'flags.metrics_error',
+  /** Streaming connected */
+  FLAGS_STREAMING_CONNECTED: 'flags.streaming_connected',
+  /** Streaming disconnected */
+  FLAGS_STREAMING_DISCONNECTED: 'flags.streaming_disconnected',
+  /** Streaming reconnecting */
+  FLAGS_STREAMING_RECONNECTING: 'flags.streaming_reconnecting',
+  /** Streaming error */
+  FLAGS_STREAMING_ERROR: 'flags.streaming_error',
+  /** Server invalidation signal received */
+  FLAGS_INVALIDATED: 'flags.invalidated',
 } as const;
 
 export type EventType = (typeof EVENTS)[keyof typeof EVENTS];

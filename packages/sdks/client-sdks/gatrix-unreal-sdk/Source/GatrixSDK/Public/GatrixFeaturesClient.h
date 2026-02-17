@@ -64,10 +64,6 @@ public:
   UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|Features")
   TArray<FGatrixEvaluatedFlag> GetAllFlags() const;
 
-  /** Get a FlagProxy for convenient access */
-  UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|Features")
-  UGatrixFlagProxy *GetFlag(const FString &FlagName) const;
-
   /** Check if a flag is registered in the cache */
   UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|Features")
   bool HasFlag(const FString &FlagName) const;
@@ -338,6 +334,7 @@ public:
 private:
   // ==================== Internal Methods ====================
 
+  UGatrixFlagProxy *CreateProxy(const FString &FlagName);
   void LoadFromStorage();
   void ApplyBootstrap();
   void DoFetchFlags();

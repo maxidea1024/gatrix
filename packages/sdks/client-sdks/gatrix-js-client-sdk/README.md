@@ -133,7 +133,7 @@ interface EvaluatedFlag {
   variant: {
     name: string; // Variant name
     enabled: boolean; // Whether variant is enabled
-    payload?: any; // Variant payload value (optional)
+    value?: any; // Variant value (optional)
   };
   variantType?: string; // Expected type: 'string' | 'number' | 'json' | 'none'
   reason?: string; // Evaluation reason
@@ -155,7 +155,7 @@ const value = client.features.stringVariation('my-flag');
 
 **Rationale:**
 
-1. **Prevents Ambiguity:** When a flag doesn't exist or has no payload, the SDK returns your specified default—not `undefined` or `null`.
+1. **Prevents Ambiguity:** When a flag doesn't exist or has no value, the SDK returns your specified default—not `undefined` or `null`.
 2. **Type Safety:** The default value establishes the expected return type.
 3. **Fail-Safe Behavior:** Your application always receives a usable value, even during network failures or SDK initialization.
 4. **Explicit Intent:** Forces developers to consider the fallback scenario, reducing bugs.
@@ -164,11 +164,11 @@ const value = client.features.stringVariation('my-flag');
 
 | Scenario                 | `enabled`   | `variant`        | Return Value          |
 | ------------------------ | ----------- | ---------------- | --------------------- |
-| Flag exists & enabled    | `true`      | Server variant   | Variant payload       |
+| Flag exists & enabled    | `true`      | Server variant   | Variant value         |
 | Flag exists but disabled | `false`     | Disabled variant | **Default value**     |
 | Flag not found           | N/A         | N/A              | **Default value**     |
 | Network error            | Last cached | Last cached      | Cached or **default** |
-| Payload type mismatch    | `true`      | Server variant   | **Default value**     |
+| Value type mismatch      | `true`      | Server variant   | **Default value**     |
 
 ```mermaid
 flowchart TD
@@ -177,11 +177,11 @@ flowchart TD
     C --> D["Return defaultValue"]
     B -->|Yes| E{Flag enabled?}
     E -->|No| D
-    E -->|Yes| F{Payload exists?}
+    E -->|Yes| F{Value exists?}
     F -->|No| D
     F -->|Yes| G{Type matches?}
     G -->|No| H["Return defaultValue<br/>(reason: type_mismatch)"]
-    G -->|Yes| I["Return payload"]
+    G -->|Yes| I["Return value"]
 ```
 
 ### Variation Methods
@@ -194,13 +194,13 @@ Return the value or default. Use when you don't need evaluation details:
 // Boolean - returns flag.enabled
 const isEnabled = client.features.boolVariation('my-flag', false);
 
-// String - returns variant.payload as string
+// String - returns variant.value as string
 const text = client.features.stringVariation('my-flag', 'default');
 
-// Number - returns variant.payload as number
+// Number - returns variant.value as number
 const count = client.features.numberVariation('my-flag', 0);
 
-// JSON - returns variant.payload as object
+// JSON - returns variant.value as object
 const config = client.features.jsonVariation('my-flag', { theme: 'light' });
 ```
 
@@ -225,9 +225,9 @@ console.log(result);
 - `evaluated` - Normal evaluation
 - `flag_not_found` - Flag doesn't exist
 - `disabled` - Flag is disabled
-- `no_payload` - No payload in variant
-- `type_mismatch:expected_X_got_Y` - Payload type doesn't match expected
-- `type_mismatch:payload_not_object` - JSON variation but payload is not object
+- `no_value` - No value in variant
+- `type_mismatch:expected_X_got_Y` - Value type doesn't match expected
+- `type_mismatch:value_not_object` - JSON variation but value is not object
 
 #### Strict Variations (OrThrow)
 
@@ -380,9 +380,9 @@ await client.features.syncFlags();
 | ----------------------------------------------- | --------------------------- |
 | `isEnabled(flagName)`                           | Check if flag is enabled    |
 | `boolVariation(flagName, default)`              | Get boolean (flag.enabled)  |
-| `stringVariation(flagName, default)`            | Get string payload          |
-| `numberVariation(flagName, default)`            | Get number payload          |
-| `jsonVariation(flagName, default)`              | Get JSON payload            |
+| `stringVariation(flagName, default)`            | Get string value            |
+| `numberVariation(flagName, default)`            | Get number value            |
+| `jsonVariation(flagName, default)`              | Get JSON value              |
 | `stringVariationDetails(flagName, default)`     | Get string with details     |
 | `numberVariationDetails(flagName, default)`     | Get number with details     |
 | `jsonVariationDetails(flagName, default)`       | Get JSON with details       |

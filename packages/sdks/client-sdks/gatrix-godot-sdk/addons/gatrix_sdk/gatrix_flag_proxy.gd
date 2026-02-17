@@ -23,7 +23,8 @@ var _flag_name: String = ""
 func _init(flag, client, flag_name := "") -> void:
 	_client = client
 	if flag != null:
-		_flag = flag
+		# Deep-clone for immutable snapshot safety
+		_flag = flag.duplicate()
 		_exists = true
 		_flag_name = flag_name if flag_name != "" else flag.name
 	else:
