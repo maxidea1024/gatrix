@@ -1338,7 +1338,7 @@ router.get(
       const clientId = `edge-flag-stream-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
 
       // Register SSE client (sets headers, sends 'connected' event, handles cleanup on close)
-      flagStreamingService.addClient(clientId, environment, res);
+      await flagStreamingService.addClient(clientId, environment, res);
     } catch (error) {
       logger.error('Error establishing flag streaming connection:', error);
       if (!res.headersSent) {

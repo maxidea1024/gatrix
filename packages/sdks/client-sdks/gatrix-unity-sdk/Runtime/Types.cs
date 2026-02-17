@@ -164,11 +164,11 @@ namespace Gatrix.Unity.SDK
         /// <summary>HTTP status codes that should stop polling entirely (default: 401, 403)</summary>
         public int[] NonRetryableStatusCodes { get; set; } = new int[] { 401, 403 };
 
-        /// <summary>Initial backoff delay in ms for retries (default: 1000)</summary>
-        public int InitialBackoffMs { get; set; } = 1000;
+        /// <summary>Initial backoff delay in seconds for retries (default: 1)</summary>
+        public int InitialBackoff { get; set; } = 1;
 
-        /// <summary>Maximum backoff delay in ms for retries (default: 60000)</summary>
-        public int MaxBackoffMs { get; set; } = 60000;
+        /// <summary>Maximum backoff delay in seconds for retries (default: 60)</summary>
+        public int MaxBackoff { get; set; } = 60;
 
         /// <summary>Streaming configuration for real-time flag invalidation</summary>
         public StreamingConfig Streaming { get; set; } = new StreamingConfig();

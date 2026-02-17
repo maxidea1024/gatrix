@@ -221,7 +221,7 @@ namespace Gatrix.Unity.SDK.Editor
                 _descriptionStyle);
 
             // Check if GatrixBehaviour exists in scene
-            var existing = FindObjectOfType<GatrixBehaviour>();
+            var existing = FindAnyObjectByType<GatrixBehaviour>();
 
             if (existing != null)
             {

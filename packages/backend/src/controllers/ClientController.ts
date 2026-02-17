@@ -803,6 +803,6 @@ export class ClientController {
     const clientId = `flag-stream-${ulid()}`;
 
     // Register SSE client (sets headers, sends 'connected' event, handles cleanup)
-    flagStreamingService.addClient(clientId, environment, res);
+    await flagStreamingService.addClient(clientId, environment, res);
   });
 }

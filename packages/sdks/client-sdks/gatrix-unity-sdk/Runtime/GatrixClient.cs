@@ -186,12 +186,12 @@ namespace Gatrix.Unity.SDK
                 ValidateRange(feat.MetricsIntervalInitial, "MetricsIntervalInitial", 0, 3600);
                 ValidateRange(feat.FetchRetryLimit, "FetchRetryLimit", 0, 10);
                 ValidateRange(feat.FetchTimeout, "FetchTimeout", 1, 120);
-                ValidateRange(feat.InitialBackoffMs, "InitialBackoffMs", 100, 60000);
-                ValidateRange(feat.MaxBackoffMs, "MaxBackoffMs", 1000, 600000);
+                ValidateRange(feat.InitialBackoff, "InitialBackoff", 1, 60);
+                ValidateRange(feat.MaxBackoff, "MaxBackoff", 1, 600);
 
-                if (feat.InitialBackoffMs > feat.MaxBackoffMs)
+                if (feat.InitialBackoff > feat.MaxBackoff)
                     throw new ArgumentException(
-                        $"InitialBackoffMs ({feat.InitialBackoffMs}) must be <= MaxBackoffMs ({feat.MaxBackoffMs})",
+                        $"InitialBackoff ({feat.InitialBackoff}) must be <= MaxBackoff ({feat.MaxBackoff})",
                         nameof(config));
 
                 if (feat.NonRetryableStatusCodes != null)

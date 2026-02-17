@@ -19,6 +19,7 @@ export type {
   GatrixClientConfig,
   GatrixContext,
   FeaturesConfig,
+  StreamingConfig,
   EvaluatedFlag,
   Variant,
   ValueType,

@@ -119,20 +119,28 @@ export interface FeaturesConfig {
   /** Disable local statistics tracking (default: false = tracking enabled) */
   disableStats?: boolean;
 
-  /** Enable streaming for real-time invalidation (default: true) */
-  enableStreaming?: boolean;
+  /** Streaming configuration for real-time flag invalidation */
+  streaming?: StreamingConfig;
+}
+
+/**
+ * Streaming configuration for real-time flag invalidation via SSE
+ */
+export interface StreamingConfig {
+  /** Enable streaming (default: true) */
+  enabled?: boolean;
 
   /** Streaming endpoint URL override (default: derived from apiUrl) */
-  streamingUrl?: string;
+  url?: string;
 
-  /** Streaming reconnect initial delay in ms (default: 1000) */
-  streamingReconnectBaseMs?: number;
+  /** Reconnect initial delay in seconds (default: 1) */
+  reconnectBase?: number;
 
-  /** Streaming reconnect max delay in ms (default: 30000) */
-  streamingReconnectMaxMs?: number;
+  /** Reconnect max delay in seconds (default: 30) */
+  reconnectMax?: number;
 
-  /** Polling jitter range in ms to prevent thundering herd (default: 5000) */
-  pollingJitterMs?: number;
+  /** Polling jitter range in seconds to prevent thundering herd (default: 5) */
+  pollingJitter?: number;
 }
 
 /**

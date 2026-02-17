@@ -102,9 +102,15 @@ namespace Gatrix.Unity.SDK
         /// <summary>Start metrics collection</summary>
         public void Start(int metricsIntervalMs = 60000, int metricsIntervalInitialMs = 2000)
         {
-            if (_disabled || _started) return;
+            if (_disabled)
+            {
+                LogOnMainThread("Metrics disabled, skipping start");
+                return;
+            }
+            if (_started) return;
             _started = true;
 
+            LogOnMainThread($"Metrics started. interval={metricsIntervalMs}ms, initialDelay={metricsIntervalInitialMs}ms");
             _cts = new CancellationTokenSource();
             _ = RunMetricsLoop(metricsIntervalMs, metricsIntervalInitialMs, _cts.Token);
         }
@@ -183,7 +189,15 @@ namespace Gatrix.Unity.SDK
             if (_disabled) return;
 
             var payload = GetPayload();
-            if (BucketIsEmpty(payload)) return;
+            if (BucketIsEmpty(payload))
+            {
+                LogOnMainThread("Metrics: bucket empty, skipping send");
+                return;
+            }
+
+            var flagCount = payload.Bucket.Flags.Count;
+            var missingCount = payload.Bucket.Missing.Count;
+            LogOnMainThread($"Metrics: sending. flags={flagCount}, missing={missingCount}");
 
             const int maxRetries = 2;
             var url = $"{_apiUrl}/client/features/{_environment}/metrics";
@@ -229,13 +243,23 @@ namespace Gatrix.Unity.SDK
                         continue;
                     }
 
-                    throw new Exception($"HTTP {statusCode}");
+                    var body = await response.Content.ReadAsStringAsync();
+                    throw new Exception($"HTTP {statusCode}: {body}");
                 }
                 catch (Exception e)
                 {
                     if (attempt >= maxRetries)
                     {
-                        _logger?.Error($"Failed to send metrics: {e.Message}");
+                        var errorMsg = $"Failed to send metrics after {maxRetries + 1} attempts: {e.Message}";
+                        // Log on main thread to ensure visibility in Unity console
+                        if (_syncContext != null)
+                        {
+                            _syncContext.Post(_ => _logger?.Error(errorMsg), null);
+                        }
+                        else
+                        {
+                            _logger?.Error(errorMsg);
+                        }
                         EmitOnMainThread(GatrixEvents.FlagsMetricsError, e);
                     }
                     else
@@ -285,6 +309,21 @@ namespace Gatrix.Unity.SDK
             else
             {
                 _emitter?.Emit(eventName, data);
+            }
+        }
+
+        /// <summary>
+        /// Log debug message on the main thread to ensure visibility in Unity console
+        /// </summary>
+        private void LogOnMainThread(string message)
+        {
+            if (_syncContext != null && SynchronizationContext.Current != _syncContext)
+            {
+                _syncContext.Post(_ => _logger?.Debug(message), null);
+            }
+            else
+            {
+                _logger?.Debug(message);
             }
         }
 

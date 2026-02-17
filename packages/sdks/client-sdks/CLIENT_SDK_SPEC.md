@@ -1083,26 +1083,37 @@ The streaming endpoint (`/client/features/{environment}/stream`) emits the follo
 
 ### Streaming Configuration
 
+Streaming options are grouped under a dedicated `streaming` sub-object within `FeaturesConfig`:
+
 ```typescript
 interface FeaturesConfig {
   // ... existing fields
 
-  /** Enable streaming for real-time invalidation (default: true) */
-  enableStreaming?: boolean;
+  /** Streaming configuration for real-time flag invalidation */
+  streaming?: StreamingConfig;
+}
+
+interface StreamingConfig {
+  /** Enable streaming (default: true) */
+  enabled?: boolean;
 
   /** Streaming endpoint URL override (default: derived from apiUrl) */
-  streamingUrl?: string;
+  url?: string;
 
-  /** Streaming reconnect initial delay in ms (default: 1000) */
-  streamingReconnectBaseMs?: number;
+  /** Reconnect initial delay in seconds (default: 1) */
+  reconnectBase?: number;
 
-  /** Streaming reconnect max delay in ms (default: 30000) */
-  streamingReconnectMaxMs?: number;
+  /** Reconnect max delay in seconds (default: 30) */
+  reconnectMax?: number;
 
-  /** Polling jitter range in ms to prevent thundering herd (default: 5000) */
-  pollingJitterMs?: number;
+  /** Polling jitter range in seconds to prevent thundering herd (default: 5) */
+  pollingJitter?: number;
 }
 ```
+
+> [!NOTE]
+> All time-related configuration values in Gatrix SDKs use **seconds** as the unit.
+> Internal implementations convert to milliseconds where needed (e.g., `reconnectBase * 1000`).
 
 ### Streaming Events (SDK)
 
@@ -1143,13 +1154,13 @@ stateDiagram-v2
 SDKs MUST implement exponential backoff with jitter for streaming reconnection:
 
 ```
-delay = min(streamingReconnectBaseMs * 2^(attempt-1), streamingReconnectMaxMs) + random(0, 1000)
+delay = min(reconnectBase * 1000 * 2^(attempt-1), reconnectMax * 1000) + random(0, 1000)
 ```
 
-- Default `streamingReconnectBaseMs`: 1000ms
-- Default `streamingReconnectMaxMs`: 30000ms
+- Default `reconnectBase`: 1 second
+- Default `reconnectMax`: 30 seconds
 - Jitter: 0-1000ms random offset to prevent thundering herd
-- In `degraded` state, reconnect attempts continue at `streamingReconnectMaxMs` interval
+- In `degraded` state, reconnect attempts continue at `reconnectMax` interval
 
 ### Revision Tracking
 
@@ -1187,6 +1198,14 @@ for each changedKey:
 > [!IMPORTANT]
 > **Fetch deduplication**: If a conditional fetch for a key is already in flight, subsequent requests for the same key MUST be skipped. This prevents duplicate requests during burst invalidation events.
 
+> [!CAUTION]
+> **Pending Invalidation**: When an SSE invalidation signal arrives while a fetch is already in progress, the SDK MUST NOT silently drop the invalidation. Instead:
+> 1. Set a `pendingInvalidation` flag to `true`
+> 2. When the current fetch completes (in the `finally` block), check `pendingInvalidation`
+> 3. If `true`, reset the flag and immediately trigger a new fetch
+>
+> Without this, rapid flag toggles (e.g., enable → disable within milliseconds) will cause the second change to be lost until the next polling cycle. This is especially noticeable with streaming-based real-time updates where users expect immediate reflection of changes.
+
 ### Gap Recovery
 
 When the streaming connection is re-established after a disconnection:
@@ -1209,7 +1228,8 @@ When streaming is active, polling serves as a **sanity check fallback**:
 
 **Jitter**: All SDKs MUST add random jitter to polling intervals to prevent thundering herd:
 ```
-actualDelay = refreshInterval + random(-pollingJitterMs/2, pollingJitterMs/2)
+jitterSec = streaming.pollingJitter  // default: 5 seconds
+actualDelay = refreshInterval + random(-jitterSec/2, jitterSec/2)
 ```
 
 ### Statistics Extensions

@@ -72,6 +72,12 @@ namespace Gatrix.Unity.SDK.Editor
 
         private void OnEditorUpdate()
         {
+            // Auto-start listening when SDK becomes available
+            if (!_isListening && GatrixBehaviour.IsInitialized)
+            {
+                StartListening();
+            }
+
             if (_autoRefresh && Time.realtimeSinceStartup - _lastRefreshTime > RefreshInterval)
             {
                 _lastRefreshTime = Time.realtimeSinceStartup;
@@ -250,6 +256,24 @@ namespace Gatrix.Unity.SDK.Editor
                 DrawField("Impressions", stats.ImpressionCount.ToString());
                 DrawField("Context Changes", stats.ContextChangeCount.ToString());
             }
+
+            EditorGUILayout.Space(8);
+            EditorGUILayout.LabelField("Streaming (SSE)", _subHeaderStyle);
+
+            if (stats != null)
+            {
+                var stateColor = stats.StreamingState == StreamingConnectionState.Connected
+                    ? "green"
+                    : stats.StreamingState == StreamingConnectionState.Disconnected
+                        ? "gray"
+                        : stats.StreamingState == StreamingConnectionState.Degraded
+                            ? "red"
+                            : "yellow";
+                DrawField("State",
+                    $"<color={stateColor}>{stats.StreamingState}</color>", true);
+                DrawField("Reconnections", stats.StreamingReconnectCount.ToString());
+                DrawField("Last Event", FormatTime(stats.LastStreamingEventTime));
+            }
         }
 
         // ==================== Flags ====================
@@ -289,9 +313,9 @@ namespace Gatrix.Unity.SDK.Editor
             EditorGUILayout.BeginHorizontal(EditorStyles.toolbar);
             EditorGUILayout.LabelField("Flag Name", EditorStyles.miniLabel, GUILayout.MinWidth(150));
             EditorGUILayout.LabelField("Enabled", EditorStyles.miniLabel, GUILayout.Width(55));
-            EditorGUILayout.LabelField("Variant", EditorStyles.miniLabel, GUILayout.Width(100));
+            EditorGUILayout.LabelField("Variant", EditorStyles.miniLabel, GUILayout.MinWidth(160));
             EditorGUILayout.LabelField("Type", EditorStyles.miniLabel, GUILayout.Width(55));
-            EditorGUILayout.LabelField("Payload", EditorStyles.miniLabel, GUILayout.MinWidth(100));
+            EditorGUILayout.LabelField("Value", EditorStyles.miniLabel, GUILayout.MinWidth(100));
             EditorGUILayout.LabelField("V", EditorStyles.miniLabel, GUILayout.Width(25));
             EditorGUILayout.EndHorizontal();
 
@@ -334,15 +358,28 @@ namespace Gatrix.Unity.SDK.Editor
 
             // Variant name
             EditorGUILayout.LabelField(
-                flag.Variant?.Name ?? "-", GUILayout.Width(100));
+                flag.Variant?.Name ?? "-", GUILayout.MinWidth(160));
 
             // Type
             EditorGUILayout.LabelField(
                 ValueTypeHelper.ToApiString(flag.ValueType), GUILayout.Width(55));
 
-            // Payload
+            // Value
             var payload = flag.Variant?.Value;
-            var payloadStr = payload != null ? payload.ToString() : "-";
+            string payloadStr;
+            if (payload == null)
+            {
+                payloadStr = "-";
+            }
+            else if (payload is bool boolVal)
+            {
+                payloadStr = boolVal ? "true" : "false";
+            }
+            else
+            {
+                var str = payload.ToString();
+                payloadStr = str == "" ? "\"\"" : str;
+            }
             if (payloadStr.Length > 50) payloadStr = payloadStr.Substring(0, 47) + "...";
             EditorGUILayout.LabelField(payloadStr, GUILayout.MinWidth(100));
 
@@ -384,7 +421,7 @@ namespace Gatrix.Unity.SDK.Editor
             }
 
             _eventLogScroll = EditorGUILayout.BeginScrollView(
-                _eventLogScroll, GUILayout.MinHeight(200));
+                _eventLogScroll, GUILayout.ExpandHeight(true));
 
             // Draw events in reverse (newest first)
             for (int i = _eventLog.Count - 1; i >= 0; i--)
@@ -455,6 +492,7 @@ namespace Gatrix.Unity.SDK.Editor
             DrawField("Last Update", FormatTime(_cachedStats.LastUpdateTime));
             DrawField("Last Error", FormatTime(_cachedStats.LastErrorTime));
             DrawField("Last Recovery", FormatTime(_cachedStats.LastRecoveryTime));
+            DrawField("Last Stream Event", FormatTime(_cachedStats.LastStreamingEventTime));
 
             // Flag access counts
             if (_cachedStats.FlagEnabledCounts != null && _cachedStats.FlagEnabledCounts.Count > 0)
@@ -620,7 +658,7 @@ namespace Gatrix.Unity.SDK.Editor
 
             _eventListener = (eventName, args) =>
             {
-                var details = args.Length > 0 ? args[0]?.ToString() ?? "" : "";
+                var details = args != null && args.Length > 0 ? args[0]?.ToString() ?? "" : "";
                 if (details.Length > 100) details = details.Substring(0, 97) + "...";
 
                 _eventLog.Add(new EventLogEntry
@@ -635,10 +673,23 @@ namespace Gatrix.Unity.SDK.Editor
                 {
                     _eventLog.RemoveAt(0);
                 }
+
+                // Immediately refresh data when flags change
+                if (eventName == GatrixEvents.FlagsChange ||
+                    eventName == GatrixEvents.FlagsFetchEnd ||
+                    eventName == GatrixEvents.FlagsPendingSync)
+                {
+                    RefreshData();
+                    Repaint();
+                }
             };
 
             client.Events.OnAny(_eventListener);
             _isListening = true;
+
+            // Refresh immediately when starting to listen
+            RefreshData();
+            Repaint();
         }
 
         private void StopListening()

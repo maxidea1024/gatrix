@@ -324,7 +324,7 @@ class FeatureFlagService {
     });
 
     // Invalidate cache
-    await this.invalidateCache(input.environment!);
+    await this.invalidateCache(input.environment!, [input.flagName!]);
 
     logger.info(`Feature flag created: ${input.flagName} in ${input.environment}`);
     return flag;
@@ -442,7 +442,7 @@ class FeatureFlagService {
 
     // Increment version and invalidate cache
     await this.incrementFlagVersion(flag.id, environment);
-    await this.invalidateCache(environment);
+    await this.invalidateCache(environment, [flagName]);
 
     return updated!;
   }
@@ -505,7 +505,7 @@ class FeatureFlagService {
     });
 
     // Invalidate cache
-    await this.invalidateCache(environment);
+    await this.invalidateCache(environment, [flagName]);
 
     return updated;
   }
@@ -541,7 +541,7 @@ class FeatureFlagService {
     });
 
     // Invalidate cache
-    await this.invalidateCache(environment);
+    await this.invalidateCache(environment, [flagName]);
 
     return updated;
   }
@@ -609,7 +609,7 @@ class FeatureFlagService {
     });
 
     // Invalidate cache
-    await this.invalidateCache(environment);
+    await this.invalidateCache(environment, [flagName]);
 
     return updated;
   }
@@ -644,7 +644,7 @@ class FeatureFlagService {
     });
 
     // Invalidate cache
-    await this.invalidateCache(environment);
+    await this.invalidateCache(environment, [flagName]);
 
     return updated;
   }
@@ -681,7 +681,7 @@ class FeatureFlagService {
     });
 
     // Invalidate cache
-    await this.invalidateCache(environment);
+    await this.invalidateCache(environment, [flagName]);
   }
 
   // ==================== Strategies ====================
@@ -716,7 +716,7 @@ class FeatureFlagService {
     });
 
     // Invalidate cache
-    await this.invalidateCache(environment);
+    await this.invalidateCache(environment, [flagName]);
 
     return strategy;
   }
@@ -743,7 +743,7 @@ class FeatureFlagService {
 
     // Invalidate cache
     if (flag) {
-      await this.invalidateCache(strategy.environment);
+      await this.invalidateCache(strategy.environment, [flag.flagName]);
     }
 
     return updated;
@@ -763,7 +763,7 @@ class FeatureFlagService {
     await FeatureStrategyModel.delete(strategyId);
 
     // Invalidate cache
-    await this.invalidateCache(strategy.environment);
+    await this.invalidateCache(strategy.environment, flag ? [flag.flagName] : undefined);
   }
 
   /**
@@ -820,7 +820,7 @@ class FeatureFlagService {
     }
 
     // Invalidate cache
-    await this.invalidateCache(environment);
+    await this.invalidateCache(environment, [flagName]);
 
     return newStrategies;
   }
@@ -975,7 +975,7 @@ class FeatureFlagService {
 
     // Increment version and invalidate cache after variants update
     await this.incrementFlagVersion(flag.id, environment);
-    await this.invalidateCache(environment);
+    await this.invalidateCache(environment, [flagName]);
 
     return resultVariants;
   }
@@ -1255,7 +1255,7 @@ class FeatureFlagService {
   /**
    * Invalidate feature flags cache for an environment
    */
-  async invalidateCache(environment: string): Promise<void> {
+  async invalidateCache(environment: string, changedFlagNames?: string[]): Promise<void> {
     try {
       // Invalidate feature flags cache (environment-scoped)
       await pubSubService.invalidateKey(`${ENV_SCOPED.FEATURE_FLAGS.ALL}:${environment}`);
@@ -1269,6 +1269,7 @@ class FeatureFlagService {
         type: 'feature_flag.changed',
         data: {
           environment,
+          changedKeys: changedFlagNames ?? [],
           timestamp: Date.now(),
         },
       });

@@ -260,7 +260,7 @@ namespace Gatrix.Unity.SDK
             sb.Append('{');
             sb.Append("\"name\":"); SerializeString(sb, flag.Name);
             sb.Append(",\"enabled\":"); sb.Append(flag.Enabled ? "true" : "false");
-            sb.Append(",\"variantType\":"); SerializeString(sb, ValueTypeHelper.ToApiString(flag.ValueType));
+            sb.Append(",\"valueType\":"); SerializeString(sb, ValueTypeHelper.ToApiString(flag.ValueType));
             sb.Append(",\"version\":"); sb.Append(flag.Version);
             sb.Append(",\"impressionData\":"); sb.Append(flag.ImpressionData ? "true" : "false");
             if (flag.Reason != null)
@@ -274,7 +274,7 @@ namespace Gatrix.Unity.SDK
                 sb.Append(",\"enabled\":"); sb.Append(flag.Variant.Enabled ? "true" : "false");
                 if (flag.Variant.Value != null)
                 {
-                    sb.Append(",\"payload\":");
+                    sb.Append(",\"value\":");
                     SerializeValue(sb, flag.Variant.Value);
                 }
                 sb.Append('}');
@@ -526,7 +526,7 @@ namespace Gatrix.Unity.SDK
             if (dict.TryGetValue("enabled", out var enabled))
                 flag.Enabled = enabled is bool b && b;
 
-            if (dict.TryGetValue("variantType", out var vt))
+            if (dict.TryGetValue("valueType", out var vt))
                 flag.ValueType = ValueTypeHelper.Parse(vt?.ToString());
 
             if (dict.TryGetValue("version", out var version))
@@ -560,7 +560,7 @@ namespace Gatrix.Unity.SDK
             if (dict.TryGetValue("enabled", out var enabled))
                 variant.Enabled = enabled is bool b && b;
 
-            if (dict.TryGetValue("payload", out var payload))
+            if (dict.TryGetValue("value", out var payload))
             {
                 // Map payload based on variantType
                 switch (variantType)

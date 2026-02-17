@@ -90,10 +90,10 @@ namespace Gatrix.Unity.SDK.Examples
             SetText(_variantNameText, flag.Variant?.Name ?? "-");
 
             // Variant type
-            SetText(_variantTypeText, VariantTypeHelper.ToApiString(flag.VariantType));
+            SetText(_variantTypeText, ValueTypeHelper.ToApiString(flag.ValueType));
 
             // Payload
-            var payload = flag.Variant?.Payload;
+            var payload = flag.Variant?.Value;
             if (payload != null)
             {
                 var payloadStr = payload.ToString();
