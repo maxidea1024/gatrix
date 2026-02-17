@@ -185,6 +185,7 @@ namespace Gatrix.Unity.SDK
                 config.Environment,
                 config.CustomHeaders,
                 featCfg.DisableMetrics,
+                config.EnableDevMode,
                 _logger,
                 _connectionId,
                 _emitter,
