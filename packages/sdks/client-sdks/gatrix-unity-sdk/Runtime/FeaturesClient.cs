@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Security.Cryptography;
@@ -62,6 +63,15 @@ namespace Gatrix.Unity.SDK
         private string _lastContextHash = "";
         private int _consecutiveFailures;
         private bool _pollingStopped;
+
+        // Streaming state
+        private StreamingConnectionState _streamingState = StreamingConnectionState.Disconnected;
+        private CancellationTokenSource _streamingCts;
+        private int _streamingReconnectAttempt;
+        private CancellationTokenSource _streamingReconnectCts;
+        private int _streamingReconnectCount;
+        private DateTime? _lastStreamingEventTime;
+        private long _localGlobalRevision;
 
         // Captured Unity SynchronizationContext for thread-safe callbacks
         private readonly SynchronizationContext _syncContext;
@@ -277,11 +287,17 @@ namespace Gatrix.Unity.SDK
             // Initial fetch (ScheduleNextRefresh is called inside FetchFlagsAsync on completion)
             await FetchFlagsAsync();
 
+            // Start streaming if enabled
+            if (FeaturesConfig.EnableStreaming)
+            {
+                ConnectStreaming();
+            }
+
             // Start metrics
             StartMetrics();
         }
 
-        /// <summary>Stop polling</summary>
+        /// <summary>Stop polling and streaming</summary>
         public void Stop()
         {
             DevLog("stop() called");
@@ -292,6 +308,8 @@ namespace Gatrix.Unity.SDK
             _fetchCts?.Cancel();
             _fetchCts?.Dispose();
             _fetchCts = null;
+
+            DisconnectStreaming();
 
             _metrics.Stop();
             _started = false;
@@ -1196,8 +1214,414 @@ namespace Gatrix.Unity.SDK
                 ActiveWatchGroups = activeWatchGroups,
                 Etag = string.IsNullOrEmpty(_etag) ? null : _etag,
                 MetricsSentCount = _metricsSentCount,
-                MetricsErrorCount = _metricsErrorCount
+                MetricsErrorCount = _metricsErrorCount,
+                StreamingState = _streamingState,
+                StreamingReconnectCount = _streamingReconnectCount,
+                LastStreamingEventTime = _lastStreamingEventTime
             };
+        }
+
+        // ==================== Streaming ====================
+
+        /// <summary>
+        /// Connect to the streaming endpoint for real-time invalidation signals.
+        /// Implements SSE (Server-Sent Events) parsing using HttpClient with streaming response.
+        /// </summary>
+        private void ConnectStreaming()
+        {
+            if (_streamingState == StreamingConnectionState.Connected ||
+                _streamingState == StreamingConnectionState.Connecting)
+            {
+                return;
+            }
+
+            _streamingState = StreamingConnectionState.Connecting;
+            DevLog("Connecting to streaming endpoint...");
+
+            // Cancel previous streaming connection
+            _streamingCts?.Cancel();
+            _streamingCts?.Dispose();
+            _streamingCts = new CancellationTokenSource();
+            var ct = _streamingCts.Token;
+
+            var streamUrl = FeaturesConfig.StreamingUrl
+                ?? $"{_config.ApiUrl}/client/features/{Uri.EscapeDataString(_config.Environment)}/stream";
+
+            _ = RunStreamingLoopAsync(streamUrl, ct);
+        }
+
+        /// <summary>
+        /// SSE streaming loop - runs on background thread, dispatches events to main thread.
+        /// </summary>
+        private async Task RunStreamingLoopAsync(string streamUrl, CancellationToken ct)
+        {
+            try
+            {
+                var request = new HttpRequestMessage(HttpMethod.Get, streamUrl);
+                request.Headers.TryAddWithoutValidation("Accept", "text/event-stream");
+                request.Headers.TryAddWithoutValidation("Cache-Control", "no-cache");
+                request.Headers.TryAddWithoutValidation("X-API-Token", _config.ApiToken);
+                request.Headers.TryAddWithoutValidation("X-Application-Name", _config.AppName);
+                request.Headers.TryAddWithoutValidation("X-Environment", _config.Environment);
+                request.Headers.TryAddWithoutValidation("X-Connection-Id", _connectionId);
+                request.Headers.TryAddWithoutValidation("X-SDK-Version", $"{GatrixClient.SdkName}/{GatrixClient.SdkVersion}");
+                if (_config.CustomHeaders != null)
+                {
+                    foreach (var kvp in _config.CustomHeaders)
+                    {
+                        request.Headers.TryAddWithoutValidation(kvp.Key, kvp.Value);
+                    }
+                }
+
+                using (var response = await _httpClient.SendAsync(
+                    request, HttpCompletionOption.ResponseHeadersRead, ct))
+                {
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        var errorMessage = $"Streaming connection failed: {(int)response.StatusCode} {response.ReasonPhrase}";
+                        _logger.Error(errorMessage);
+                        PostToMainThread(() =>
+                        {
+                            _streamingState = StreamingConnectionState.Reconnecting;
+                            _emitter.Emit(GatrixEvents.FlagsStreamingError,
+                                new ErrorEvent { Type = "streaming_connect", Error = new GatrixException(errorMessage) });
+                            _emitter.Emit(GatrixEvents.FlagsStreamingDisconnected);
+                            ScheduleStreamingReconnect();
+                        });
+                        return;
+                    }
+
+                    // Connected successfully
+                    PostToMainThread(() =>
+                    {
+                        _streamingState = StreamingConnectionState.Connected;
+                        _streamingReconnectAttempt = 0;
+                        DevLog($"Streaming connected. URL: {streamUrl}");
+                        _emitter.Emit(GatrixEvents.FlagsStreamingConnected);
+                    });
+
+                    // Read SSE stream line by line
+                    using (var stream = await response.Content.ReadAsStreamAsync())
+                    {
+                        var buffer = new byte[4096];
+                        var lineBuffer = new StringBuilder();
+                        string currentEventType = null;
+                        var dataBuilder = new StringBuilder();
+
+                        while (!ct.IsCancellationRequested)
+                        {
+                            var bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length, ct);
+                            if (bytesRead == 0)
+                            {
+                                // Stream closed by server
+                                break;
+                            }
+
+                            var chunk = System.Text.Encoding.UTF8.GetString(buffer, 0, bytesRead);
+                            lineBuffer.Append(chunk);
+
+                            // Process complete lines
+                            var text = lineBuffer.ToString();
+                            var lastNewline = text.LastIndexOf('\n');
+                            if (lastNewline < 0) continue;
+
+                            var completeText = text.Substring(0, lastNewline + 1);
+                            lineBuffer.Clear();
+                            if (lastNewline + 1 < text.Length)
+                            {
+                                lineBuffer.Append(text.Substring(lastNewline + 1));
+                            }
+
+                            var lines = completeText.Split('\n');
+                            foreach (var rawLine in lines)
+                            {
+                                var line = rawLine.TrimEnd('\r');
+
+                                if (string.IsNullOrEmpty(line))
+                                {
+                                    // Empty line = event dispatch
+                                    if (currentEventType != null || dataBuilder.Length > 0)
+                                    {
+                                        var eventType = currentEventType ?? "message";
+                                        var eventData = dataBuilder.ToString();
+                                        PostToMainThread(() => ProcessStreamingEvent(eventType, eventData));
+                                        currentEventType = null;
+                                        dataBuilder.Clear();
+                                    }
+                                    continue;
+                                }
+
+                                if (line.StartsWith("event:"))
+                                {
+                                    currentEventType = line.Substring(6).Trim();
+                                }
+                                else if (line.StartsWith("data:"))
+                                {
+                                    if (dataBuilder.Length > 0) dataBuilder.Append('\n');
+                                    dataBuilder.Append(line.Substring(5).Trim());
+                                }
+                                // Ignore 'id:', 'retry:', and comment lines starting with ':'
+                            }
+                        }
+                    }
+                }
+
+                // Stream ended normally
+                if (!ct.IsCancellationRequested && _streamingState != StreamingConnectionState.Disconnected)
+                {
+                    PostToMainThread(() =>
+                    {
+                        DevLog("Streaming connection closed by server");
+                        _streamingState = StreamingConnectionState.Reconnecting;
+                        _emitter.Emit(GatrixEvents.FlagsStreamingDisconnected);
+                        ScheduleStreamingReconnect();
+                    });
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // Intentional disconnect - ignore
+            }
+            catch (Exception ex)
+            {
+                if (_streamingState == StreamingConnectionState.Disconnected) return;
+
+                PostToMainThread(() =>
+                {
+                    _logger.Warn($"Streaming error: {ex.Message}");
+                    _emitter.Emit(GatrixEvents.FlagsStreamingError,
+                        new ErrorEvent { Type = "streaming", Error = ex });
+
+                    if (_streamingState != StreamingConnectionState.Reconnecting)
+                    {
+                        _streamingState = StreamingConnectionState.Reconnecting;
+                        _emitter.Emit(GatrixEvents.FlagsStreamingDisconnected);
+                    }
+                    ScheduleStreamingReconnect();
+                });
+            }
+        }
+
+        /// <summary>
+        /// Process a single SSE event on the main thread.
+        /// </summary>
+        private void ProcessStreamingEvent(string eventType, string eventData)
+        {
+            _lastStreamingEventTime = DateTime.UtcNow;
+
+            switch (eventType)
+            {
+                case "connected":
+                    try
+                    {
+                        var index = 0;
+                        var parsed = GatrixJson.ParseJsonValue(eventData, ref index)
+                            as Dictionary<string, object>;
+                        if (parsed != null && parsed.TryGetValue("globalRevision", out var revObj))
+                        {
+                            long serverRevision = 0;
+                            if (revObj is int ri) serverRevision = ri;
+                            else if (revObj is long rl) serverRevision = rl;
+                            else if (revObj is double rd) serverRevision = (long)rd;
+
+                            DevLog($"Streaming 'connected' event: globalRevision={serverRevision}");
+                            _emitter.Emit(GatrixEvents.FlagsStreamingConnected,
+                                new StreamingConnectedEvent { GlobalRevision = serverRevision });
+
+                            // Gap recovery: check if we missed any changes
+                            if (serverRevision > _localGlobalRevision && _localGlobalRevision > 0)
+                            {
+                                DevLog($"Gap detected: server={serverRevision}, local={_localGlobalRevision}. Triggering recovery.");
+                                _ = FetchFlagsAsync();
+                            }
+                            else if (_localGlobalRevision == 0)
+                            {
+                                // First connection, record initial revision
+                                _localGlobalRevision = serverRevision;
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        _logger.Warn($"Failed to parse streaming connected event: {e.Message}");
+                    }
+                    break;
+
+                case "flags_changed":
+                    try
+                    {
+                        var index = 0;
+                        var parsed = GatrixJson.ParseJsonValue(eventData, ref index)
+                            as Dictionary<string, object>;
+                        if (parsed != null)
+                        {
+                            long serverRevision = 0;
+                            if (parsed.TryGetValue("globalRevision", out var revObj))
+                            {
+                                if (revObj is int ri) serverRevision = ri;
+                                else if (revObj is long rl) serverRevision = rl;
+                                else if (revObj is double rd) serverRevision = (long)rd;
+                            }
+
+                            var changedKeys = new List<string>();
+                            if (parsed.TryGetValue("changedKeys", out var keysObj) && keysObj is List<object> keysList)
+                            {
+                                foreach (var k in keysList)
+                                {
+                                    if (k != null) changedKeys.Add(k.ToString());
+                                }
+                            }
+
+                            DevLog($"Streaming 'flags_changed': globalRevision={serverRevision}, changedKeys=[{string.Join(",", changedKeys)}]");
+
+                            // Only process if server revision is ahead
+                            if (serverRevision > _localGlobalRevision)
+                            {
+                                _localGlobalRevision = serverRevision;
+                                _emitter.Emit(GatrixEvents.FlagsInvalidated,
+                                    new FlagsChangedEvent
+                                    {
+                                        GlobalRevision = serverRevision,
+                                        ChangedKeys = changedKeys
+                                    });
+                                HandleStreamingInvalidation(changedKeys);
+                            }
+                            else
+                            {
+                                DevLog($"Ignoring stale event: server={serverRevision} <= local={_localGlobalRevision}");
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        _logger.Warn($"Failed to parse flags_changed event: {e.Message}");
+                    }
+                    break;
+
+                case "heartbeat":
+                    DevLog("Streaming heartbeat received");
+                    break;
+
+                default:
+                    DevLog($"Unknown streaming event: {eventType}");
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Disconnect from the streaming endpoint.
+        /// </summary>
+        private void DisconnectStreaming()
+        {
+            DevLog("Disconnecting streaming");
+            _streamingState = StreamingConnectionState.Disconnected;
+
+            _streamingReconnectCts?.Cancel();
+            _streamingReconnectCts?.Dispose();
+            _streamingReconnectCts = null;
+
+            _streamingCts?.Cancel();
+            _streamingCts?.Dispose();
+            _streamingCts = null;
+        }
+
+        /// <summary>
+        /// Schedule streaming reconnection with exponential backoff + jitter.
+        /// </summary>
+        private void ScheduleStreamingReconnect()
+        {
+            if (_streamingState == StreamingConnectionState.Disconnected || !_started)
+            {
+                return;
+            }
+
+            // Cancel any existing reconnect timer
+            _streamingReconnectCts?.Cancel();
+            _streamingReconnectCts?.Dispose();
+            _streamingReconnectCts = new CancellationTokenSource();
+
+            _streamingReconnectAttempt++;
+            _streamingReconnectCount++;
+
+            var baseMs = FeaturesConfig.StreamingReconnectBaseMs;
+            var maxMs = FeaturesConfig.StreamingReconnectMaxMs;
+
+            // Exponential backoff: base * 2^(attempt-1), capped at max
+            var exponentialDelay = (int)Math.Min(
+                baseMs * Math.Pow(2, _streamingReconnectAttempt - 1),
+                maxMs);
+            // Add jitter (0 - 1000ms)
+            var jitter = UnityEngine.Random.Range(0, 1000);
+            var delayMs = exponentialDelay + jitter;
+
+            DevLog($"Scheduling streaming reconnect: attempt={_streamingReconnectAttempt}, delay={delayMs}ms");
+
+            _emitter.Emit(GatrixEvents.FlagsStreamingReconnecting,
+                _streamingReconnectAttempt, delayMs);
+
+            // Transition to degraded after several failed attempts
+            if (_streamingReconnectAttempt >= 5 && _streamingState != StreamingConnectionState.Degraded)
+            {
+                _streamingState = StreamingConnectionState.Degraded;
+                _logger.Warn("Streaming degraded: falling back to polling-only mode");
+            }
+
+            var reconnectCt = _streamingReconnectCts.Token;
+            _ = ScheduleStreamingReconnectAsync(delayMs, reconnectCt);
+        }
+
+        private async Task ScheduleStreamingReconnectAsync(int delayMs, CancellationToken ct)
+        {
+            try
+            {
+                await Task.Delay(delayMs, ct);
+                if (ct.IsCancellationRequested) return;
+
+                PostToMainThread(() =>
+                {
+                    // Abort previous connection before creating new one
+                    _streamingCts?.Cancel();
+                    _streamingCts?.Dispose();
+                    _streamingCts = null;
+                    ConnectStreaming();
+                });
+            }
+            catch (OperationCanceledException)
+            {
+                // Expected on disconnect
+            }
+        }
+
+        /// <summary>
+        /// Handle streaming invalidation signal by triggering a full re-fetch.
+        /// The ETag mechanism ensures only changed data is transferred.
+        /// </summary>
+        private void HandleStreamingInvalidation(List<string> changedKeys)
+        {
+            if (!_isFetchingFlags)
+            {
+                _ = FetchFlagsAsync();
+            }
+            else
+            {
+                DevLog("Fetch already in progress, invalidation will be picked up on next poll");
+            }
+        }
+
+        /// <summary>
+        /// Post an action to the main thread via captured SynchronizationContext.
+        /// Falls back to direct invocation if no SynchronizationContext was captured.
+        /// </summary>
+        private void PostToMainThread(Action action)
+        {
+            if (_syncContext != null && SynchronizationContext.Current != _syncContext)
+            {
+                _syncContext.Post(_ => action(), null);
+            }
+            else
+            {
+                action();
+            }
         }
 
         // ==================== Private Methods ====================

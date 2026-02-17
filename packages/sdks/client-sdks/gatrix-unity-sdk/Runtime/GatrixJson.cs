@@ -76,6 +76,15 @@ namespace Gatrix.Unity.SDK
         }
 
         /// <summary>
+        /// Parse a JSON value string into a CLR object.
+        /// Used by streaming SSE event parser to parse event data.
+        /// </summary>
+        public static object ParseJsonValue(string json, ref int index)
+        {
+            return ParseValue(json, ref index);
+        }
+
+        /// <summary>
         /// Serialize a metrics payload to JSON
         /// </summary>
         public static string SerializeMetrics(MetricsPayload payload)

@@ -169,6 +169,21 @@ namespace Gatrix.Unity.SDK
 
         /// <summary>Maximum backoff delay in ms for retries (default: 60000)</summary>
         public int MaxBackoffMs { get; set; } = 60000;
+
+        /// <summary>Enable streaming for real-time invalidation (default: true)</summary>
+        public bool EnableStreaming { get; set; } = true;
+
+        /// <summary>Streaming endpoint URL override (default: derived from apiUrl)</summary>
+        public string StreamingUrl { get; set; }
+
+        /// <summary>Streaming reconnect initial delay in ms (default: 1000)</summary>
+        public int StreamingReconnectBaseMs { get; set; } = 1000;
+
+        /// <summary>Streaming reconnect max delay in ms (default: 30000)</summary>
+        public int StreamingReconnectMaxMs { get; set; } = 30000;
+
+        /// <summary>Polling jitter range in ms to prevent thundering herd (default: 5000)</summary>
+        public int PollingJitterMs { get; set; } = 5000;
     }
 
     /// <summary>
@@ -252,6 +267,18 @@ namespace Gatrix.Unity.SDK
     }
 
     /// <summary>
+    /// Streaming connection state machine
+    /// </summary>
+    public enum StreamingConnectionState
+    {
+        Disconnected,
+        Connecting,
+        Connected,
+        Reconnecting,
+        Degraded
+    }
+
+    /// <summary>
     /// Common SDK statistics
     /// </summary>
     public class GatrixSdkStats
@@ -311,6 +338,15 @@ namespace Gatrix.Unity.SDK
         public string Etag { get; set; }
         public int MetricsSentCount { get; set; }
         public int MetricsErrorCount { get; set; }
+
+        /// <summary>Current streaming connection state</summary>
+        public StreamingConnectionState StreamingState { get; set; }
+
+        /// <summary>Number of streaming reconnection attempts</summary>
+        public int StreamingReconnectCount { get; set; }
+
+        /// <summary>Timestamp of last streaming event received</summary>
+        public DateTime? LastStreamingEventTime { get; set; }
     }
 
     /// <summary>
@@ -351,5 +387,24 @@ namespace Gatrix.Unity.SDK
                 default: return "none";
             }
         }
+    }
+
+    /// <summary>
+    /// SSE flags_changed event data from streaming endpoint
+    /// </summary>
+    [Serializable]
+    public class FlagsChangedEvent
+    {
+        public long GlobalRevision { get; set; }
+        public List<string> ChangedKeys { get; set; }
+    }
+
+    /// <summary>
+    /// SSE connected event data from streaming endpoint
+    /// </summary>
+    [Serializable]
+    public class StreamingConnectedEvent
+    {
+        public long GlobalRevision { get; set; }
     }
 }

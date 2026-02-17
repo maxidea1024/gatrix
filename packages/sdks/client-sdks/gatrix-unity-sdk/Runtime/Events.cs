@@ -53,6 +53,21 @@ namespace Gatrix.Unity.SDK
         /// <summary>Error sending metrics</summary>
         public const string FlagsMetricsError = "flags.metrics_error";
 
+        /// <summary>Streaming connected</summary>
+        public const string FlagsStreamingConnected = "flags.streaming_connected";
+
+        /// <summary>Streaming disconnected</summary>
+        public const string FlagsStreamingDisconnected = "flags.streaming_disconnected";
+
+        /// <summary>Streaming reconnecting</summary>
+        public const string FlagsStreamingReconnecting = "flags.streaming_reconnecting";
+
+        /// <summary>Streaming error</summary>
+        public const string FlagsStreamingError = "flags.streaming_error";
+
+        /// <summary>Server invalidation signal received</summary>
+        public const string FlagsInvalidated = "flags.invalidated";
+
         /// <summary>Get the per-flag change event name</summary>
         public static string FlagChange(string flagName) => $"flags.{flagName}.change";
     }
