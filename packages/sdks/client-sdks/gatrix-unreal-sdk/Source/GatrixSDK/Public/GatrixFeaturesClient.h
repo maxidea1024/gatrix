@@ -353,6 +353,9 @@ private:
                    const FString &EventType, const FString &VariantName) const;
   void ScheduleNextPoll();
   void StopPolling();
+  void
+  InvokeWatchCallbacks(const TMap<FString, FGatrixEvaluatedFlag> &OldFlags,
+                       const TMap<FString, FGatrixEvaluatedFlag> &NewFlags);
 
   // Metrics
   void StartMetrics();
@@ -421,4 +424,13 @@ private:
 
   // Connection ID
   FString ConnectionId;
+
+  // Watch callbacks — direct callback management (not via emitter)
+  struct FWatchCallbackEntry {
+    FString FlagName;
+    FGatrixFlagWatchDelegate Callback;
+    int32 Handle;
+  };
+  TArray<FWatchCallbackEntry> WatchCallbacks;
+  int32 NextWatchHandle = 1;
 };

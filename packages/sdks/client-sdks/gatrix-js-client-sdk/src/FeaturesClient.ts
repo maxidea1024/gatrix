@@ -34,6 +34,7 @@ import { Logger, ConsoleLogger } from './Logger';
 import { Metrics } from './Metrics';
 import { GatrixError, GatrixFeatureError } from './errors';
 import { SDK_NAME, SDK_VERSION } from './version';
+import { VARIANT_SOURCE } from './variantSource';
 import ky from 'ky';
 
 const STORAGE_KEY_FLAGS = 'flags';
@@ -104,6 +105,7 @@ export class FeaturesClient implements VariationProvider {
   private metricsSentCount: number = 0;
   private metricsErrorCount: number = 0;
   private watchGroups: Map<string, WatchFlagGroup> = new Map();
+  private watchCallbacks: Map<string, Set<(flag: FlagProxy) => void | Promise<void>>> = new Map();
   private flagEnabledCounts: Map<string, { yes: number; no: number }> = new Map();
   private flagVariantCounts: Map<string, Map<string, number>> = new Map();
   private flagLastChangedTimes: Map<string, Date> = new Map();
@@ -470,7 +472,7 @@ export class FeaturesClient implements VariationProvider {
     const flag = this.lookupFlag(flagName, forceRealtime);
     if (!flag) {
       this.trackFlagAccess(flagName, undefined, 'getVariant');
-      return { name: '$missing', enabled: false };
+      return { name: VARIANT_SOURCE.MISSING, enabled: false };
     }
     this.trackFlagAccess(flagName, flag, 'getVariant', flag.variant.name);
     return { ...flag.variant };
@@ -500,10 +502,11 @@ export class FeaturesClient implements VariationProvider {
       this.trackFlagAccess(flagName, undefined, 'getVariant');
       return fallbackValue;
     }
-    this.trackFlagAccess(flagName, flag, 'getVariant', flag.variant.name);
     if (flag.valueType !== 'boolean') {
+      this.trackFlagAccess(flagName, flag, 'getVariant', VARIANT_SOURCE.TYPE_MISMATCH);
       return fallbackValue;
     }
+    this.trackFlagAccess(flagName, flag, 'getVariant', flag.variant.name);
     return Boolean(flag.variant.value);
   }
 
@@ -517,10 +520,11 @@ export class FeaturesClient implements VariationProvider {
       this.trackFlagAccess(flagName, undefined, 'getVariant');
       return fallbackValue;
     }
-    this.trackFlagAccess(flagName, flag, 'getVariant', flag.variant.name);
     if (flag.valueType !== 'string') {
+      this.trackFlagAccess(flagName, flag, 'getVariant', VARIANT_SOURCE.TYPE_MISMATCH);
       return fallbackValue;
     }
+    this.trackFlagAccess(flagName, flag, 'getVariant', flag.variant.name);
     return String(flag.variant.value);
   }
 
@@ -534,10 +538,11 @@ export class FeaturesClient implements VariationProvider {
       this.trackFlagAccess(flagName, undefined, 'getVariant');
       return fallbackValue;
     }
-    this.trackFlagAccess(flagName, flag, 'getVariant', flag.variant.name);
     if (flag.valueType !== 'number') {
+      this.trackFlagAccess(flagName, flag, 'getVariant', VARIANT_SOURCE.TYPE_MISMATCH);
       return fallbackValue;
     }
+    this.trackFlagAccess(flagName, flag, 'getVariant', flag.variant.name);
     const value = Number(flag.variant.value);
     return isNaN(value) ? fallbackValue : value;
   }
@@ -548,10 +553,11 @@ export class FeaturesClient implements VariationProvider {
       this.trackFlagAccess(flagName, undefined, 'getVariant');
       return fallbackValue;
     }
-    this.trackFlagAccess(flagName, flag, 'getVariant', flag.variant.name);
     if (flag.valueType !== 'json') {
+      this.trackFlagAccess(flagName, flag, 'getVariant', VARIANT_SOURCE.TYPE_MISMATCH);
       return fallbackValue;
     }
+    this.trackFlagAccess(flagName, flag, 'getVariant', flag.variant.name);
     const value = flag.variant.value;
     if (typeof value !== 'object' || value === null) {
       return fallbackValue;
@@ -569,22 +575,25 @@ export class FeaturesClient implements VariationProvider {
     const flag = this.lookupFlag(flagName, forceRealtime);
     if (!flag) {
       this.trackFlagAccess(flagName, undefined, 'getVariant');
-      return { value: fallbackValue, reason: 'flag_not_found', flagExists: false, enabled: false };
+      return { value: fallbackValue, reason: 'flag_not_found', flagExists: false, enabled: false, variantName: VARIANT_SOURCE.MISSING };
     }
-    this.trackFlagAccess(flagName, flag, 'getVariant', flag.variant.name);
     if (flag.valueType !== 'boolean') {
+      this.trackFlagAccess(flagName, flag, 'getVariant', VARIANT_SOURCE.TYPE_MISMATCH);
       return {
         value: fallbackValue,
         reason: `type_mismatch:expected_boolean_got_${flag.valueType}`,
         flagExists: true,
         enabled: flag.enabled,
+        variantName: VARIANT_SOURCE.TYPE_MISMATCH,
       };
     }
+    this.trackFlagAccess(flagName, flag, 'getVariant', flag.variant.name);
     return {
       value: Boolean(flag.variant.value),
       reason: flag.reason ?? 'evaluated',
       flagExists: true,
       enabled: flag.enabled,
+      variantName: flag.variant.name,
     };
   }
 
@@ -596,22 +605,25 @@ export class FeaturesClient implements VariationProvider {
     const flag = this.lookupFlag(flagName, forceRealtime);
     if (!flag) {
       this.trackFlagAccess(flagName, undefined, 'getVariant');
-      return { value: fallbackValue, reason: 'flag_not_found', flagExists: false, enabled: false };
+      return { value: fallbackValue, reason: 'flag_not_found', flagExists: false, enabled: false, variantName: VARIANT_SOURCE.MISSING };
     }
-    this.trackFlagAccess(flagName, flag, 'getVariant', flag.variant.name);
     if (flag.valueType !== 'string') {
+      this.trackFlagAccess(flagName, flag, 'getVariant', VARIANT_SOURCE.TYPE_MISMATCH);
       return {
         value: fallbackValue,
         reason: `type_mismatch:expected_string_got_${flag.valueType}`,
         flagExists: true,
         enabled: flag.enabled,
+        variantName: VARIANT_SOURCE.TYPE_MISMATCH,
       };
     }
+    this.trackFlagAccess(flagName, flag, 'getVariant', flag.variant.name);
     return {
       value: String(flag.variant.value),
       reason: flag.reason ?? 'evaluated',
       flagExists: true,
       enabled: flag.enabled,
+      variantName: flag.variant.name,
     };
   }
 
@@ -623,23 +635,26 @@ export class FeaturesClient implements VariationProvider {
     const flag = this.lookupFlag(flagName, forceRealtime);
     if (!flag) {
       this.trackFlagAccess(flagName, undefined, 'getVariant');
-      return { value: fallbackValue, reason: 'flag_not_found', flagExists: false, enabled: false };
+      return { value: fallbackValue, reason: 'flag_not_found', flagExists: false, enabled: false, variantName: VARIANT_SOURCE.MISSING };
     }
-    this.trackFlagAccess(flagName, flag, 'getVariant', flag.variant.name);
     if (flag.valueType !== 'number') {
+      this.trackFlagAccess(flagName, flag, 'getVariant', VARIANT_SOURCE.TYPE_MISMATCH);
       return {
         value: fallbackValue,
         reason: `type_mismatch:expected_number_got_${flag.valueType}`,
         flagExists: true,
         enabled: flag.enabled,
+        variantName: VARIANT_SOURCE.TYPE_MISMATCH,
       };
     }
+    this.trackFlagAccess(flagName, flag, 'getVariant', flag.variant.name);
     const value = Number(flag.variant.value);
     return {
       value: isNaN(value) ? fallbackValue : value,
       reason: isNaN(value) ? 'type_mismatch:value_not_number' : (flag.reason ?? 'evaluated'),
       flagExists: true,
       enabled: flag.enabled,
+      variantName: isNaN(value) ? VARIANT_SOURCE.TYPE_MISMATCH : flag.variant.name,
     };
   }
 
@@ -651,17 +666,19 @@ export class FeaturesClient implements VariationProvider {
     const flag = this.lookupFlag(flagName, forceRealtime);
     if (!flag) {
       this.trackFlagAccess(flagName, undefined, 'getVariant');
-      return { value: fallbackValue, reason: 'flag_not_found', flagExists: false, enabled: false };
+      return { value: fallbackValue, reason: 'flag_not_found', flagExists: false, enabled: false, variantName: VARIANT_SOURCE.MISSING };
     }
-    this.trackFlagAccess(flagName, flag, 'getVariant', flag.variant.name);
     if (flag.valueType !== 'json') {
+      this.trackFlagAccess(flagName, flag, 'getVariant', VARIANT_SOURCE.TYPE_MISMATCH);
       return {
         value: fallbackValue,
         reason: `type_mismatch:expected_json_got_${flag.valueType}`,
         flagExists: true,
         enabled: flag.enabled,
+        variantName: VARIANT_SOURCE.TYPE_MISMATCH,
       };
     }
+    this.trackFlagAccess(flagName, flag, 'getVariant', flag.variant.name);
     const value = flag.variant.value;
     if (typeof value !== 'object' || value === null) {
       return {
@@ -669,6 +686,7 @@ export class FeaturesClient implements VariationProvider {
         reason: 'type_mismatch:value_not_object',
         flagExists: true,
         enabled: flag.enabled,
+        variantName: VARIANT_SOURCE.TYPE_MISMATCH,
       };
     }
     return {
@@ -676,6 +694,7 @@ export class FeaturesClient implements VariationProvider {
       reason: flag.reason ?? 'evaluated',
       flagExists: true,
       enabled: flag.enabled,
+      variantName: flag.variant.name,
     };
   }
 
@@ -825,7 +844,11 @@ export class FeaturesClient implements VariationProvider {
       await this.fetchFlagsInternal('syncFlags');
     }
 
+    // Invoke watch callbacks directly for changed flags
+    const oldSynchronizedFlags = new Map(this.synchronizedFlags);
     this.synchronizedFlags = new Map(this.realtimeFlags);
+    this.invokeWatchCallbacks(oldSynchronizedFlags, this.synchronizedFlags);
+
     this.pendingSync = false;
     this.syncFlagsCount++;
     this.emitter.emit(EVENTS.FLAGS_SYNC);
@@ -894,48 +917,45 @@ export class FeaturesClient implements VariationProvider {
    */
   watchFlag(
     flagName: string,
-    callback: (flag: FlagProxy) => void | Promise<void>,
-    name?: string
+    callback: (flag: FlagProxy) => void | Promise<void>
   ): () => void {
-    const eventName = `flags.${flagName}.change`;
-    const wrappedCallback = (rawFlag: EvaluatedFlag | undefined) => {
-      callback(new FlagProxy(rawFlag, this, flagName));
-    };
-    this.emitter.on(eventName, wrappedCallback, name);
+    // Store callback for direct invocation
+    if (!this.watchCallbacks.has(flagName)) {
+      this.watchCallbacks.set(flagName, new Set());
+    }
+    this.watchCallbacks.get(flagName)!.add(callback);
 
     return () => {
-      this.emitter.off(eventName, wrappedCallback);
+      this.watchCallbacks.get(flagName)?.delete(callback);
     };
   }
 
   watchFlagWithInitialState(
     flagName: string,
-    callback: (flag: FlagProxy) => void | Promise<void>,
-    name?: string
+    callback: (flag: FlagProxy) => void | Promise<void>
   ): () => void {
-    const eventName = `flags.${flagName}.change`;
-    const wrappedCallback = (rawFlag: EvaluatedFlag | undefined) => {
-      callback(new FlagProxy(rawFlag, this, flagName));
-    };
-    this.emitter.on(eventName, wrappedCallback, name);
+    // Store callback for direct invocation
+    if (!this.watchCallbacks.has(flagName)) {
+      this.watchCallbacks.set(flagName, new Set());
+    }
+    this.watchCallbacks.get(flagName)!.add(callback);
 
-    // Emit initial state — always from realtimeFlags
+    // Emit initial state — use synchronized flags if in explicitSyncMode
     if (this.readyEventEmitted) {
-      const flags = this.selectFlags(true);
+      const flags = this.selectFlags(false); // respect explicitSyncMode for initial state
       callback(new FlagProxy(flags.get(flagName), this, flagName));
     } else {
       this.emitter.once(
         EVENTS.FLAGS_READY,
         () => {
-          const flags = this.selectFlags(true);
+          const flags = this.selectFlags(false); // respect explicitSyncMode for initial state
           callback(new FlagProxy(flags.get(flagName), this, flagName));
-        },
-        name ? `${name}_initial` : undefined
+        }
       );
     }
 
     return () => {
-      this.emitter.off(eventName, wrappedCallback);
+      this.watchCallbacks.get(flagName)?.delete(callback);
     };
   }
 
@@ -1229,8 +1249,12 @@ export class FeaturesClient implements VariationProvider {
     this.setFlags(flags, forceSync);
     await this.storage.save(STORAGE_KEY_FLAGS, flags);
 
-    // Emit flag change events
-    this.emitRealtimeFlagChanges(oldFlags, this.realtimeFlags);
+    // Emit flag change events only if not in explicitSyncMode or if forced
+    // In explicitSyncMode, watch callbacks are invoked when syncFlags() is called
+    if (!this.featuresConfig.explicitSyncMode || forceSync) {
+      this.emitRealtimeFlagChanges(oldFlags, this.realtimeFlags);
+      this.invokeWatchCallbacks(oldFlags, this.realtimeFlags);
+    }
 
     this.sdkState = 'healthy';
 
@@ -1274,6 +1298,64 @@ export class FeaturesClient implements VariationProvider {
         this.flagLastChangedTimes.set(name, now);
       }
     }
+    if (removedNames.length > 0) {
+      this.emitter.emit(EVENTS.FLAGS_REMOVED, removedNames);
+    }
+  }
+
+  /**
+   * Invoke watch callbacks directly when syncFlags() is called in explicitSyncMode.
+   * Compares old synchronized flags with new synchronized flags.
+   */
+  private invokeWatchCallbacks(
+    oldFlags: Map<string, EvaluatedFlag>,
+    newFlags: Map<string, EvaluatedFlag>
+  ): void {
+    const now = new Date();
+
+    // Check for changed/new flags (compare by version)
+    for (const [name, newFlag] of newFlags) {
+      const oldFlag = oldFlags.get(name);
+      if (!oldFlag || oldFlag.version !== newFlag.version) {
+        this.flagLastChangedTimes.set(name, now);
+
+        // Invoke watch callbacks directly
+        const callbacks = this.watchCallbacks.get(name);
+        if (callbacks && callbacks.size > 0) {
+          const proxy = new FlagProxy(newFlag, this, name);
+          callbacks.forEach(callback => {
+            try {
+              callback(proxy);
+            } catch (error) {
+              this.logger.error(`Error in watchFlag callback for ${name}:`, error);
+            }
+          });
+        }
+      }
+    }
+
+    // Check for removed flags
+    const removedNames: string[] = [];
+    for (const [name] of oldFlags) {
+      if (!newFlags.has(name)) {
+        removedNames.push(name);
+        this.flagLastChangedTimes.set(name, now);
+
+        // Invoke watch callbacks for removed flags
+        const callbacks = this.watchCallbacks.get(name);
+        if (callbacks && callbacks.size > 0) {
+          const proxy = new FlagProxy(undefined, this, name);
+          callbacks.forEach(callback => {
+            try {
+              callback(proxy);
+            } catch (error) {
+              this.logger.error(`Error in watchFlag callback for removed flag ${name}:`, error);
+            }
+          });
+        }
+      }
+    }
+
     if (removedNames.length > 0) {
       this.emitter.emit(EVENTS.FLAGS_REMOVED, removedNames);
     }

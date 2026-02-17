@@ -25,13 +25,6 @@ namespace Gatrix.Unity.SDK
         private string StorageKeySession;
         private string StorageKeyEtag;
 
-        private static readonly Variant MissingVariant = new Variant
-        {
-            Name = "$missing",
-            Enabled = false,
-            Value = null
-        };
-
         // System context fields that cannot be removed
         private static readonly HashSet<string> SystemContextFields
             = new HashSet<string> { "appName", "environment" };
@@ -98,6 +91,8 @@ namespace Gatrix.Unity.SDK
             = new Dictionary<string, Dictionary<string, int>>();
         private readonly Dictionary<string, DateTime> _flagLastChangedTimes
             = new Dictionary<string, DateTime>();
+        private readonly Dictionary<string, List<GatrixFlagWatchHandler>> _watchCallbacks
+            = new Dictionary<string, List<GatrixFlagWatchHandler>>();
 
         // Feature-specific config shortcut
         private FeaturesConfig FeaturesConfig => _config.Features ?? new FeaturesConfig();
@@ -549,7 +544,7 @@ namespace Gatrix.Unity.SDK
             if (flag == null)
             {
                 TrackFlagAccess(flagName, null, "getVariant");
-                return MissingVariant;
+                return new Variant { Name = VariantSource.Missing, Enabled = false };
             }
             TrackFlagAccess(flagName, flag, "getVariant", flag.Variant?.Name);
             return flag.Variant;
@@ -867,7 +862,9 @@ namespace Gatrix.Unity.SDK
 
             if (fetchNow) await FetchFlagsAsync();
 
+            var oldSynchronizedFlags = new Dictionary<string, EvaluatedFlag>(_synchronizedFlags);
             _synchronizedFlags = new Dictionary<string, EvaluatedFlag>(_realtimeFlags);
+            InvokeWatchCallbacks(oldSynchronizedFlags, _synchronizedFlags);
             _pendingSync = false;
             _syncFlagsCount++;
             _emitter.Emit(GatrixEvents.FlagsSync);
@@ -900,35 +897,37 @@ namespace Gatrix.Unity.SDK
 
         // ==================== Watch ====================
 
-        /// <summary>Watch a flag for changes. Returns unsubscribe action.</summary>
+        /// <summary>Watch a flag for changes. Returns unsubscribe action.
+        /// Callbacks are stored directly and invoked when flags change.
+        /// In explicitSyncMode, callbacks are only invoked when SyncFlagsAsync() is called.</summary>
         public Action WatchFlag(string flagName, GatrixFlagWatchHandler callback, string name = null)
         {
-            var eventName = GatrixEvents.FlagChange(flagName);
-            GatrixEventHandler wrappedCallback = args =>
+            if (!_watchCallbacks.TryGetValue(flagName, out var callbacks))
             {
-                var rawFlag = args.Length > 0 ? args[0] as EvaluatedFlag : null;
-                callback(new FlagProxy(rawFlag, this, flagName));
-            };
-            _emitter.On(eventName, wrappedCallback, name);
+                callbacks = new List<GatrixFlagWatchHandler>();
+                _watchCallbacks[flagName] = callbacks;
+            }
+            callbacks.Add(callback);
 
-            return () => { _emitter.Off(eventName, wrappedCallback); };
+            return () =>
+            {
+                if (_watchCallbacks.TryGetValue(flagName, out var cbs))
+                {
+                    cbs.Remove(callback);
+                }
+            };
         }
 
-        /// <summary>Watch a flag with initial state callback. Returns unsubscribe action.</summary>
+        /// <summary>Watch a flag with initial state callback. Returns unsubscribe action.
+        /// Uses synchronized flags in explicitSyncMode for initial state.</summary>
         public Action WatchFlagWithInitialState(string flagName, GatrixFlagWatchHandler callback, string name = null)
         {
-            var eventName = GatrixEvents.FlagChange(flagName);
-            GatrixEventHandler wrappedCallback = args =>
-            {
-                var rawFlag = args.Length > 0 ? args[0] as EvaluatedFlag : null;
-                callback(new FlagProxy(rawFlag, this, flagName));
-            };
-            _emitter.On(eventName, wrappedCallback, name);
+            var unsubscribe = WatchFlag(flagName, callback, name);
 
-            // Emit initial state — always from realtimeFlags
+            // Emit initial state — respect explicitSyncMode
             if (_readyEventEmitted)
             {
-                var flags = SelectFlags(true);
+                var flags = SelectFlags(false); // respect explicitSyncMode
                 flags.TryGetValue(flagName, out var flag);
                 callback(new FlagProxy(flag, this, flagName));
             }
@@ -936,13 +935,13 @@ namespace Gatrix.Unity.SDK
             {
                 _emitter.Once(GatrixEvents.FlagsReady, _ =>
                 {
-                    var flags = SelectFlags(true);
+                    var flags = SelectFlags(false); // respect explicitSyncMode
                     flags.TryGetValue(flagName, out var flag);
                     callback(new FlagProxy(flag, this, flagName));
                 }, name != null ? $"{name}_initial" : null);
             }
 
-            return () => { _emitter.Off(eventName, wrappedCallback); };
+            return unsubscribe;
         }
 
         /// <summary>Create a watch group for batch management</summary>
@@ -1328,6 +1327,7 @@ namespace Gatrix.Unity.SDK
 
             if (!FeaturesConfig.ExplicitSyncMode || forceSync)
             {
+                InvokeWatchCallbacks(oldFlags, _realtimeFlags);
                 _emitter.Emit(GatrixEvents.FlagsChange, flags);
             }
         }
@@ -1367,6 +1367,63 @@ namespace Gatrix.Unity.SDK
             if (removedNames.Count > 0)
             {
                 _emitter.Emit(GatrixEvents.FlagsRemoved, removedNames.ToArray());
+            }
+        }
+
+        /// <summary>Invoke watch callbacks for changed flags.</summary>
+        private void InvokeWatchCallbacks(
+            Dictionary<string, EvaluatedFlag> oldFlags,
+            Dictionary<string, EvaluatedFlag> newFlags)
+        {
+            var now = DateTime.UtcNow;
+
+            // Check for changed/new flags
+            foreach (var kvp in newFlags)
+            {
+                oldFlags.TryGetValue(kvp.Key, out var oldFlag);
+                if (oldFlag == null || oldFlag.Version != kvp.Value.Version)
+                {
+                    _flagLastChangedTimes[kvp.Key] = now;
+
+                    if (_watchCallbacks.TryGetValue(kvp.Key, out var callbacks) && callbacks.Count > 0)
+                    {
+                        var proxy = new FlagProxy(kvp.Value, this, kvp.Key);
+                        foreach (var cb in callbacks.ToArray()) // copy to avoid mutation during iteration
+                        {
+                            try
+                            {
+                                cb(proxy);
+                            }
+                            catch (Exception ex)
+                            {
+                                _logger?.Error($"Error in WatchFlag callback for {kvp.Key}: {ex.Message}");
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Check for removed flags
+            foreach (var kvp in oldFlags)
+            {
+                if (!newFlags.ContainsKey(kvp.Key))
+                {
+                    if (_watchCallbacks.TryGetValue(kvp.Key, out var callbacks) && callbacks.Count > 0)
+                    {
+                        var proxy = new FlagProxy(null, this, kvp.Key);
+                        foreach (var cb in callbacks.ToArray())
+                        {
+                            try
+                            {
+                                cb(proxy);
+                            }
+                            catch (Exception ex)
+                            {
+                                _logger?.Error($"Error in WatchFlag callback for removed flag {kvp.Key}: {ex.Message}");
+                            }
+                        }
+                    }
+                }
             }
         }
 

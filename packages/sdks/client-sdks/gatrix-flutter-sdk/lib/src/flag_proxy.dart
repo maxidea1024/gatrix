@@ -21,9 +21,9 @@ class FlagProxy {
   FlagProxy(EvaluatedFlag? flag,
       {required VariationProvider client, String? flagName})
       : _exists = flag != null,
-        _flag = flag ?? missingFlag,
-        _client = client,
-        _flagName = flagName ?? flag?.name ?? '';
+        _flagName = flagName ?? flag?.name ?? '',
+        _flag = flag ?? createMissingFlag(flagName ?? ''),
+        _client = client;
 
   // ==================== Properties ====================
 

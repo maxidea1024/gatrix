@@ -20,6 +20,7 @@ import {
   FeatureFlag,
   FeatureSegment,
   EvaluationContext,
+  VARIANT_SOURCE,
 } from '@gatrix/shared';
 import db from '../config/knex';
 
@@ -606,6 +607,18 @@ export class ClientController {
           };
           // result.variant from sdk already has the value (we mapped it from db)
           variant.value = (result.variant as any).value;
+
+          // Override variant name for default variants based on value source
+          if (
+            result.variant.name === VARIANT_SOURCE.FLAG_DEFAULT_ENABLED ||
+            result.variant.name === VARIANT_SOURCE.FLAG_DEFAULT_DISABLED
+          ) {
+            if (envSettings?.enabledValue !== undefined) {
+              variant.name = VARIANT_SOURCE.ENV_DEFAULT_ENABLED;
+            } else {
+              variant.name = VARIANT_SOURCE.FLAG_DEFAULT_ENABLED;
+            }
+          }
         } else {
           // Determine correct value based on state
           const rawValue = result.enabled ? resolvedEnabledValue : resolvedDisabledValue;
@@ -619,8 +632,22 @@ export class ClientController {
                   ? {}
                   : '');
 
+          // Determine explicit variant name based on value source
+          let variantName: string;
+          if (result.enabled) {
+            variantName =
+              envSettings?.enabledValue !== undefined
+                ? VARIANT_SOURCE.ENV_DEFAULT_ENABLED
+                : VARIANT_SOURCE.FLAG_DEFAULT_ENABLED;
+          } else {
+            variantName =
+              envSettings?.disabledValue !== undefined
+                ? VARIANT_SOURCE.ENV_DEFAULT_DISABLED
+                : VARIANT_SOURCE.FLAG_DEFAULT_DISABLED;
+          }
+
           variant = {
-            name: result.enabled ? '$default' : '$disabled',
+            name: variantName,
             enabled: result.enabled,
             value: valueToReturn,
           };

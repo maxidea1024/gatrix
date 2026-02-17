@@ -7,12 +7,12 @@ from gatrix.flag_proxy import FlagProxy
 from gatrix.storage import InMemoryStorageProvider
 from gatrix.types import (
     DISABLED_VARIANT,
-    MISSING_VARIANT,
     FeaturesConfig,
     GatrixClientConfig,
     GatrixContext,
     Variant,
 )
+from gatrix.variant_source import VariantSource
 from tests.fixtures import (
     BOOTSTRAP_FULL,
     BOOTSTRAP_IMPRESSION,
@@ -125,7 +125,7 @@ class TestGetVariant:
             _config(bootstrap=BOOTSTRAP_SIMPLE), EventEmitter()
         )
         v = fc.get_variant("nonexistent")
-        assert v == MISSING_VARIANT
+        assert v.name == VariantSource.MISSING
 
 
 class TestVariations:

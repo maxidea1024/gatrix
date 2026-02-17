@@ -5,6 +5,7 @@
 
 #include "CoreMinimal.h"
 #include "GatrixTypes.generated.h"
+#include "GatrixVariantSource.h"
 
 // ==================== Enums ====================
 
@@ -50,10 +51,6 @@ struct GATRIXSDK_API FGatrixVariant {
   FGatrixVariant(const FString &InName, bool bInEnabled,
                  const FString &InValue = TEXT(""))
       : Name(InName), bEnabled(bInEnabled), Value(InValue) {}
-
-  static FGatrixVariant Missing() {
-    return FGatrixVariant(TEXT("$missing"), false);
-  }
 };
 
 /** Evaluated feature flag from the server */

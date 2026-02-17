@@ -305,7 +305,9 @@ void FeaturesClient::syncFlags(bool fetchNow) {
   if (!_explicitSyncMode)
     return;
 
+  auto oldSynchronizedFlags = _synchronizedFlags;
   _synchronizedFlags = _realtimeFlags;
+  invokeWatchCallbacks(oldSynchronizedFlags, _synchronizedFlags);
   _pendingSync = false;
   _stats.syncFlagsCount++;
   _emitter.emit(EVENTS::FLAGS_SYNC);
@@ -321,24 +323,37 @@ void FeaturesClient::syncFlags(bool fetchNow) {
 std::function<void()> FeaturesClient::watchFlag(const std::string &flagName,
                                                 WatchCallback callback,
                                                 const std::string &name) {
-  std::string eventName = EVENTS::flagChange(flagName);
-  auto wrappedCb = [this, flagName,
-                    callback](const std::vector<std::string> &) {
-    callback(createProxy(flagName));
-  };
-  _emitter.on(eventName, wrappedCb, name.empty() ? "watch_" + flagName : name);
+  _watchCallbacks[flagName].push_back(callback);
 
-  return [this, eventName]() { _emitter.off(eventName); };
+  // Capture a copy of the callback for removal
+  auto cbPtr = &_watchCallbacks[flagName].back();
+  return [this, flagName, cbPtr]() {
+    auto it = _watchCallbacks.find(flagName);
+    if (it != _watchCallbacks.end()) {
+      auto &cbs = it->second;
+      for (auto cbIt = cbs.begin(); cbIt != cbs.end(); ++cbIt) {
+        if (&(*cbIt) == cbPtr) {
+          cbs.erase(cbIt);
+          break;
+        }
+      }
+    }
+  };
 }
 
 std::function<void()>
 FeaturesClient::watchFlagWithInitialState(const std::string &flagName,
                                           WatchCallback callback,
                                           const std::string &name) {
-  // Fire immediately with current state
-  callback(createProxy(flagName));
-  // Then watch for changes
-  return watchFlag(flagName, callback, name);
+  auto unwatchFn = watchFlag(flagName, callback, name);
+
+  // Fire immediately with current state — respect explicitSyncMode
+  const auto &flags = selectFlags(false);
+  auto it = flags.find(flagName);
+  const EvaluatedFlag *flag = (it != flags.end()) ? &it->second : nullptr;
+  callback(FlagProxy(flag, this, flagName));
+
+  return unwatchFn;
 }
 
 WatchFlagGroup *FeaturesClient::createWatchFlagGroup(const std::string &name) {
@@ -571,6 +586,7 @@ void FeaturesClient::onFetchResponse(int statusCode, const std::string &body,
   }
 
   if (changed || _realtimeFlags.size() != newFlags.size()) {
+    auto oldRealtimeFlags = _realtimeFlags;
     _realtimeFlags = newFlags;
     _stats.updateCount++;
     _stats.lastUpdateTime = "now"; // simplified
@@ -579,6 +595,7 @@ void FeaturesClient::onFetchResponse(int statusCode, const std::string &body,
     if (!_explicitSyncMode) {
       _synchronizedFlags = _realtimeFlags;
       _pendingSync = false;
+      invokeWatchCallbacks(oldRealtimeFlags, _realtimeFlags);
       _emitter.emit(EVENTS::FLAGS_CHANGE);
     } else {
       if (!_pendingSync) {
@@ -812,5 +829,54 @@ void WatchFlagGroup::unwatchAll() {
 }
 
 void WatchFlagGroup::destroy() { unwatchAll(); }
+
+// ==================== InvokeWatchCallbacks ====================
+
+void FeaturesClient::invokeWatchCallbacks(
+    const std::map<std::string, EvaluatedFlag> &oldFlags,
+    const std::map<std::string, EvaluatedFlag> &newFlags) {
+  // Check for changed/new flags
+  for (const auto &[name, newFlag] : newFlags) {
+    auto oldIt = oldFlags.find(name);
+    if (oldIt == oldFlags.end() || oldIt->second.version != newFlag.version) {
+      _stats.flagLastChangedTimes[name] = "now";
+
+      auto cbIt = _watchCallbacks.find(name);
+      if (cbIt != _watchCallbacks.end() && !cbIt->second.empty()) {
+        FlagProxy proxy(&newFlag, this, name);
+        // Copy to avoid mutation during iteration
+        auto callbacks = cbIt->second;
+        for (const auto &cb : callbacks) {
+          try {
+            cb(proxy);
+          } catch (const std::exception &e) {
+            CCLOG("[GatrixSDK] Error in watchFlag callback for %s: %s",
+                  name.c_str(), e.what());
+          }
+        }
+      }
+    }
+  }
+
+  // Check for removed flags
+  for (const auto &[name, oldFlag] : oldFlags) {
+    if (newFlags.find(name) == newFlags.end()) {
+      auto cbIt = _watchCallbacks.find(name);
+      if (cbIt != _watchCallbacks.end() && !cbIt->second.empty()) {
+        FlagProxy proxy(nullptr, this, name);
+        auto callbacks = cbIt->second;
+        for (const auto &cb : callbacks) {
+          try {
+            cb(proxy);
+          } catch (const std::exception &e) {
+            CCLOG("[GatrixSDK] Error in watchFlag callback for removed flag "
+                  "%s: %s",
+                  name.c_str(), e.what());
+          }
+        }
+      }
+    }
+  }
+}
 
 } // namespace gatrix

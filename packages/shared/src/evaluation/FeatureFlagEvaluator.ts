@@ -19,6 +19,7 @@ import {
   FeatureSegment,
   Constraint,
 } from './types';
+import { VARIANT_SOURCE } from './variantSource';
 
 export class FeatureFlagEvaluator {
   /**
@@ -39,7 +40,7 @@ export class FeatureFlagEvaluator {
           if (this.evaluateStrategy(strategy, context, flag, segmentsMap)) {
             const variantData = this.selectVariant(flag, context, strategy);
             const variant: Variant = {
-              name: variantData?.name || '$default',
+              name: variantData?.name || VARIANT_SOURCE.FLAG_DEFAULT_ENABLED,
               weight: variantData?.weight || 100,
               value: this.getFallbackValue(variantData?.value ?? flag.enabledValue, flag.valueType),
               valueType: flag.valueType || 'string',
@@ -61,7 +62,7 @@ export class FeatureFlagEvaluator {
         // No strategies or all disabled - enabled by default
         const variantData = this.selectVariant(flag, context);
         const variant: Variant = {
-          name: variantData?.name || '$default',
+          name: variantData?.name || VARIANT_SOURCE.FLAG_DEFAULT_ENABLED,
           weight: variantData?.weight || 100,
           value: this.getFallbackValue(variantData?.value ?? flag.enabledValue, flag.valueType),
           valueType: flag.valueType || 'string',
@@ -87,7 +88,7 @@ export class FeatureFlagEvaluator {
       enabled: false,
       reason,
       variant: {
-        name: '$disabled',
+        name: VARIANT_SOURCE.FLAG_DEFAULT_DISABLED,
         weight: 100,
         value: this.getFallbackValue(flag.disabledValue, flag.valueType),
         valueType: flag.valueType || 'string',

@@ -23,7 +23,7 @@ import {
   FlagMetric,
 } from '../types/featureFlags';
 import { FeatureFlagError, FeatureFlagErrorCode } from '../utils/errors';
-import { FeatureFlagEvaluator } from '@gatrix/shared';
+import { FeatureFlagEvaluator, VARIANT_SOURCE } from '@gatrix/shared';
 import { SDK_VERSION } from '../version';
 
 export class FeatureFlagService {
@@ -804,7 +804,7 @@ export class FeatureFlagService {
         enabled: false,
         reason: 'not_found',
         variant: {
-          name: '$missing',
+          name: VARIANT_SOURCE.MISSING,
           weight: 100,
           enabled: false,
           value: null,

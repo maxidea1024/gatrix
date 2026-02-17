@@ -1,6 +1,7 @@
 #ifndef GATRIX_TYPES_H
 #define GATRIX_TYPES_H
 
+#include "GatrixVariantSource.h"
 #include <chrono>
 #include <functional>
 #include <map>
@@ -21,13 +22,6 @@ struct Variant {
   std::string name;
   bool enabled = false;
   std::string value; // raw value string
-
-  static Variant fallbackMissing() {
-    Variant v;
-    v.name = "$missing";
-    v.enabled = false;
-    return v;
-  }
 };
 
 struct EvaluatedFlag {

@@ -204,7 +204,7 @@ float UGatrixClient::NumberVariation(const FString &FlagName,
 
 FGatrixVariant UGatrixClient::GetVariant(const FString &FlagName) const {
   return FeaturesClient ? FeaturesClient->GetVariant(FlagName)
-                        : FGatrixVariant::Missing();
+                        : FGatrixVariant(GatrixVariantSource::Missing, false);
 }
 
 TArray<FGatrixEvaluatedFlag> UGatrixClient::GetAllFlags() const {

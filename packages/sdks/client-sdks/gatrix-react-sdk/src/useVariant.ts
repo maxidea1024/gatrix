@@ -20,7 +20,7 @@
  */
 import { useState, useEffect, useRef } from 'react';
 import { useGatrixContext } from './useGatrixContext';
-import { EVENTS, type Variant } from '@gatrix/js-client-sdk';
+import { EVENTS, VARIANT_SOURCE, type Variant } from '@gatrix/js-client-sdk';
 
 /**
  * Check if variant has changed
@@ -36,11 +36,9 @@ export const variantHasChanged = (oldVariant: Variant, newVariant?: Variant): bo
   return !variantsAreEqual;
 };
 
-const MISSING_VARIANT: Variant = { name: '$missing', enabled: false };
-
 export function useVariant(flagName: string): Variant {
   const { getVariant, client } = useGatrixContext();
-  const [variant, setVariant] = useState<Variant>(() => getVariant(flagName) || MISSING_VARIANT);
+  const [variant, setVariant] = useState<Variant>(() => getVariant(flagName) || { name: VARIANT_SOURCE.MISSING, enabled: false });
   const variantRef = useRef<Variant>(variant);
   variantRef.current = variant;
 

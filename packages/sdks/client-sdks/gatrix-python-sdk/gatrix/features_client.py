@@ -20,7 +20,6 @@ from gatrix.flag_proxy import FlagProxy
 from gatrix.storage import InMemoryStorageProvider, StorageProvider
 from gatrix.types import (
     DISABLED_VARIANT,
-    MISSING_VARIANT,
     EvaluatedFlag,
     GatrixClientConfig,
     GatrixContext,
@@ -28,6 +27,7 @@ from gatrix.types import (
     Variant,
     VariationResult,
 )
+from gatrix.variant_source import VariantSource
 from gatrix.version import SDK_NAME, SDK_VERSION
 
 logger = logging.getLogger("gatrix")
@@ -237,6 +237,7 @@ class FeaturesClient:
         self._flag_variant_counts: Dict[str, Dict[str, int]] = {}
         self._flag_last_changed: Dict[str, datetime] = {}
         self._watch_groups: List[str] = []
+        self._watch_callbacks: Dict[str, List[Callable]] = {}
 
         # Metrics bucket
         self._metrics_bucket: Dict[str, Any] = {}
@@ -379,7 +380,7 @@ class FeaturesClient:
         flag = self._lookup_flag(flag_name, force_realtime)
         if flag is None:
             self._track_flag_access(flag_name, None, "getVariant")
-            return MISSING_VARIANT
+            return Variant(name=VariantSource.MISSING, enabled=False, value=None)
         self._track_flag_access(flag_name, flag, "getVariant", flag.variant.name)
         return flag.variant
 
@@ -718,7 +719,9 @@ class FeaturesClient:
         if fetch_now and not self._offline_mode:
             self.fetch_flags()
         if self._pending_flags is not None:
+            old_flags = dict(self._flags)
             self._apply_flags(self._pending_flags)
+            self._invoke_watch_callbacks(old_flags, self._flags)
             self._pending_flags = None
             self._pending_sync = False
             self._sync_count += 1
@@ -729,23 +732,38 @@ class FeaturesClient:
     def watch_flag(
         self, flag_name: str, callback: Callable, name: Optional[str] = None
     ) -> Callable[[], None]:
-        """Watch for changes to a specific flag. Returns unwatch function."""
-        event = f"flags.{flag_name}.change"
-        self._emitter.on(event, callback, name=name)
+        """Watch for changes to a specific flag. Returns unwatch function.
+
+        Callbacks are stored directly and invoked when flags change.
+        In explicitSyncMode, callbacks are only invoked when sync_flags() is called.
+        """
+        if flag_name not in self._watch_callbacks:
+            self._watch_callbacks[flag_name] = []
+        self._watch_callbacks[flag_name].append(callback)
 
         def unwatch() -> None:
-            self._emitter.off(event, callback)
+            cbs = self._watch_callbacks.get(flag_name)
+            if cbs and callback in cbs:
+                cbs.remove(callback)
 
         return unwatch
 
     def watch_flag_with_initial_state(
         self, flag_name: str, callback: Callable, name: Optional[str] = None
     ) -> Callable[[], None]:
-        """Watch flag and fire callback immediately with current state."""
-        flag = self._flags.get(flag_name)
+        """Watch flag and fire callback immediately with current state.
+
+        Uses synchronized flags in explicitSyncMode for initial state.
+        """
+        unwatch = self.watch_flag(flag_name, callback, name=name)
+
+        # Emit initial state — respect explicitSyncMode
+        flags = self._select_flags(False)
+        flag = flags.get(flag_name)
         proxy = FlagProxy(flag, client=self, flag_name=flag_name)
         callback(proxy)
-        return self.watch_flag(flag_name, callback, name=name)
+
+        return unwatch
 
     def create_watch_flag_group(self, name: str) -> WatchFlagGroup:
         self._watch_groups.append(name)
@@ -854,7 +872,9 @@ class FeaturesClient:
                     self._emitter.emit(EVENTS.FLAGS_PENDING_SYNC)
             else:
                 self._pending_sync = False
+                old_flags = dict(self._flags)
                 self._apply_flags(new_flags)
+                self._invoke_watch_callbacks(old_flags, self._flags)
 
             self._update_count += 1
             self._last_update_time = datetime.now(timezone.utc)
@@ -919,7 +939,11 @@ class FeaturesClient:
 
     # ============================================================ Apply flags
     def _apply_flags(self, new_flags: Dict[str, EvaluatedFlag]) -> None:
-        """Diff and apply new flags, emitting change/removed events."""
+        """Diff and apply new flags, emitting change/removed events.
+
+        Watch callbacks are NOT invoked here directly — they are invoked
+        by the caller (storeFlags for non-explicitSync, syncFlags for explicitSync).
+        """
         old_flags = self._flags
         now = datetime.now(timezone.utc)
 
@@ -976,6 +1000,46 @@ class FeaturesClient:
         if old.variant.value != new.variant.value:
             return True
         return False
+
+    def _invoke_watch_callbacks(
+        self,
+        old_flags: Dict[str, EvaluatedFlag],
+        new_flags: Dict[str, EvaluatedFlag],
+    ) -> None:
+        """Invoke watch callbacks for changed flags."""
+        now = datetime.now(timezone.utc)
+
+        # Check for changed/new flags
+        for name, new_flag in new_flags.items():
+            old_flag = old_flags.get(name)
+            if old_flag is None or self._flag_changed(old_flag, new_flag):
+                self._flag_last_changed[name] = now
+                callbacks = self._watch_callbacks.get(name)
+                if callbacks:
+                    proxy = FlagProxy(new_flag, client=self, flag_name=name)
+                    for cb in list(callbacks):  # copy to avoid mutation during iteration
+                        try:
+                            cb(proxy)
+                        except Exception:
+                            logger.error(
+                                "Error in watch_flag callback for %s", name,
+                                exc_info=True,
+                            )
+
+        # Check for removed flags
+        for name in old_flags:
+            if name not in new_flags:
+                callbacks = self._watch_callbacks.get(name)
+                if callbacks:
+                    proxy = FlagProxy(None, client=self, flag_name=name)
+                    for cb in list(callbacks):
+                        try:
+                            cb(proxy)
+                        except Exception:
+                            logger.error(
+                                "Error in watch_flag callback for removed flag %s",
+                                name, exc_info=True,
+                            )
 
     # ============================================================ Polling
     def _schedule_next_refresh(self) -> None:

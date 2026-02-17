@@ -1,4 +1,5 @@
 import 'package:collection/collection.dart';
+import 'variant_source.dart';
 
 enum ValueType {
   none,
@@ -54,8 +55,7 @@ class Variant {
       };
 }
 
-/// Sentinel variant for missing flags
-const Variant missingVariant = Variant(name: r'$missing', enabled: false);
+
 
 /// Sentinel variant for disabled flags
 const Variant disabledVariant = Variant(name: r'$disabled', enabled: false);
@@ -105,14 +105,17 @@ class EvaluatedFlag {
       };
 }
 
-/// Sentinel flag for non-existent flags
-final EvaluatedFlag missingFlag = EvaluatedFlag(
-  name: '',
-  enabled: false,
-  variant: missingVariant,
-  valueType: ValueType.none,
-  version: 0,
-);
+
+/// Create a missing flag sentinel with per-flag context
+EvaluatedFlag createMissingFlag(String flagName) {
+  return EvaluatedFlag(
+    name: flagName,
+    enabled: false,
+    variant: Variant(name: VariantSource.missing, enabled: false),
+    valueType: ValueType.none,
+    version: 0,
+  );
+}
 
 class VariationResult<T> {
   final T value;

@@ -3,6 +3,8 @@
  * Exports evaluator and all evaluation-related types
  */
 export { FeatureFlagEvaluator } from './FeatureFlagEvaluator';
+export { VARIANT_SOURCE } from './variantSource';
+export type { VariantSourceName } from './variantSource';
 export type {
   FeatureFlag,
   FeatureStrategy,

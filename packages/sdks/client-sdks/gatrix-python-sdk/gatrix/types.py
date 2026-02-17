@@ -7,6 +7,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Literal, Optional, Union
 
+from gatrix.variant_source import VariantSource
+
 # ---------------------------------------------------------------------------
 # Enums / unions
 # ---------------------------------------------------------------------------
@@ -22,12 +24,11 @@ SdkState = Literal["initializing", "ready", "healthy", "error"]
 @dataclass
 class Variant:
     """Variant information from server evaluation."""
-    name: str = "$missing"
+    name: str = VariantSource.MISSING
     enabled: bool = False
     value: Optional[Union[str, int, float, dict, list]] = None
 
 
-MISSING_VARIANT = Variant(name="$missing", enabled=False, value=None)
 DISABLED_VARIANT = Variant(name="$disabled", enabled=False, value=None)
 
 
