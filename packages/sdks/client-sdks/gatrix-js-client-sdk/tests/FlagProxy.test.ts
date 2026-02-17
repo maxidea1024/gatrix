@@ -115,7 +115,7 @@ describe('FlagProxy', () => {
   describe('undefined flag', () => {
     let proxy: FlagProxy;
     beforeAll(() => {
-      proxy = client.getFlag('non-existent-flag');
+      proxy = (client as any).createProxy('non-existent-flag');
     });
 
     it('should return flag name', () => {
@@ -145,7 +145,7 @@ describe('FlagProxy', () => {
   describe('enabled flag', () => {
     let proxy: FlagProxy;
     beforeAll(() => {
-      proxy = client.getFlag('enabled-flag');
+      proxy = (client as any).createProxy('enabled-flag');
     });
 
     it('should return correct name', () => {
@@ -173,7 +173,7 @@ describe('FlagProxy', () => {
   describe('disabled flag', () => {
     let proxy: FlagProxy;
     beforeAll(() => {
-      proxy = client.getFlag('disabled-flag');
+      proxy = (client as any).createProxy('disabled-flag');
     });
 
     it('should return false for enabled', () => {
@@ -188,7 +188,7 @@ describe('FlagProxy', () => {
   describe('string flag', () => {
     let proxy: FlagProxy;
     beforeAll(() => {
-      proxy = client.getFlag('string-flag');
+      proxy = (client as any).createProxy('string-flag');
     });
 
     it('should return valueType as string', () => {
@@ -203,7 +203,7 @@ describe('FlagProxy', () => {
   describe('number flag', () => {
     let proxy: FlagProxy;
     beforeAll(() => {
-      proxy = client.getFlag('number-flag');
+      proxy = (client as any).createProxy('number-flag');
     });
 
     it('should return valueType as number', () => {
@@ -218,7 +218,7 @@ describe('FlagProxy', () => {
   describe('json flag', () => {
     let proxy: FlagProxy;
     beforeAll(() => {
-      proxy = client.getFlag('json-flag');
+      proxy = (client as any).createProxy('json-flag');
     });
 
     it('should return valueType as json', () => {
@@ -239,14 +239,14 @@ describe('FlagProxy', () => {
 
   describe('invalid number flag', () => {
     it('should return default value for invalid number', () => {
-      const proxy = client.getFlag('invalid-number-flag');
+      const proxy = (client as any).createProxy('invalid-number-flag');
       expect(proxy.numberVariation(999)).toBe(999);
     });
   });
 
   describe('invalid json flag', () => {
     it('should return default value for invalid json', () => {
-      const proxy = client.getFlag('invalid-json-flag');
+      const proxy = (client as any).createProxy('invalid-json-flag');
       expect(proxy.jsonVariation({ fallback: true })).toEqual({
         fallback: true,
       });
@@ -256,7 +256,7 @@ describe('FlagProxy', () => {
   describe('disabled flag variations', () => {
     let proxy: FlagProxy;
     beforeAll(() => {
-      proxy = client.getFlag('disabled-flag');
+      proxy = (client as any).createProxy('disabled-flag');
     });
 
     it('should return default string for disabled flag', () => {
@@ -275,7 +275,7 @@ describe('FlagProxy', () => {
   describe('variationDetails', () => {
     describe('boolVariationDetails', () => {
       it('should return flag_not_found for non-existent flag', () => {
-        const proxy = client.getFlag('non-existent');
+        const proxy = (client as any).createProxy('non-existent');
         const result = proxy.boolVariationDetails(false);
         expect(result.reason).toBe('flag_not_found');
         expect(result.flagExists).toBe(false);
@@ -283,7 +283,7 @@ describe('FlagProxy', () => {
       });
 
       it('should return correct details for enabled flag', () => {
-        const proxy = client.getFlag('enabled-flag');
+        const proxy = (client as any).createProxy('enabled-flag');
         const result = proxy.boolVariationDetails(false);
         expect(result.value).toBe(true);
         expect(result.reason).toBe('targeting_match');
@@ -292,7 +292,7 @@ describe('FlagProxy', () => {
       });
 
       it('should return correct details for disabled flag', () => {
-        const proxy = client.getFlag('disabled-flag');
+        const proxy = (client as any).createProxy('disabled-flag');
         const result = proxy.boolVariationDetails(false);
         expect(result.value).toBe(false);
         expect(result.reason).toBe('disabled');
@@ -303,7 +303,7 @@ describe('FlagProxy', () => {
 
     describe('stringVariationDetails', () => {
       it('should return correct details for string flag', () => {
-        const proxy = client.getFlag('string-flag');
+        const proxy = (client as any).createProxy('string-flag');
         const result = proxy.stringVariationDetails('');
         expect(result.value).toBe('hello world');
         expect(result.reason).toBe('percentage_rollout');
@@ -314,7 +314,7 @@ describe('FlagProxy', () => {
 
     describe('numberVariationDetails', () => {
       it('should return correct value for valid number', () => {
-        const proxy = client.getFlag('number-flag');
+        const proxy = (client as any).createProxy('number-flag');
         const result = proxy.numberVariationDetails(0);
         expect(result.value).toBe(42.5);
         expect(result.reason).toBe('evaluated');
@@ -323,7 +323,7 @@ describe('FlagProxy', () => {
 
     describe('jsonVariationDetails', () => {
       it('should return correct value for valid json', () => {
-        const proxy = client.getFlag('json-flag');
+        const proxy = (client as any).createProxy('json-flag');
         const result = proxy.jsonVariationDetails({});
         expect(result.value).toEqual({ key: 'value', nested: { a: 1 } });
         expect(result.reason).toBe('evaluated');
@@ -334,48 +334,48 @@ describe('FlagProxy', () => {
   describe('variationOrThrow', () => {
     describe('boolVariationOrThrow', () => {
       it('should throw for non-existent flag', () => {
-        const proxy = client.getFlag('non-existent');
+        const proxy = (client as any).createProxy('non-existent');
         expect(() => proxy.boolVariationOrThrow()).toThrow('not found');
       });
 
       it('should return value for existing flag', () => {
-        const proxy = client.getFlag('enabled-flag');
+        const proxy = (client as any).createProxy('enabled-flag');
         expect(proxy.boolVariationOrThrow()).toBe(true);
       });
     });
 
     describe('stringVariationOrThrow', () => {
       it('should throw for non-existent flag', () => {
-        const proxy = client.getFlag('non-existent');
+        const proxy = (client as any).createProxy('non-existent');
         expect(() => proxy.stringVariationOrThrow()).toThrow('not found');
       });
 
       it('should return value for valid string flag', () => {
-        const proxy = client.getFlag('string-flag');
+        const proxy = (client as any).createProxy('string-flag');
         expect(proxy.stringVariationOrThrow()).toBe('hello world');
       });
     });
 
     describe('numberVariationOrThrow', () => {
       it('should throw for invalid number', () => {
-        const proxy = client.getFlag('invalid-number-flag');
+        const proxy = (client as any).createProxy('invalid-number-flag');
         expect(() => proxy.numberVariationOrThrow()).toThrow();
       });
 
       it('should return value for valid number', () => {
-        const proxy = client.getFlag('number-flag');
+        const proxy = (client as any).createProxy('number-flag');
         expect(proxy.numberVariationOrThrow()).toBe(42.5);
       });
     });
 
     describe('jsonVariationOrThrow', () => {
       it('should throw for invalid json', () => {
-        const proxy = client.getFlag('invalid-json-flag');
+        const proxy = (client as any).createProxy('invalid-json-flag');
         expect(() => proxy.jsonVariationOrThrow()).toThrow();
       });
 
       it('should return value for valid json', () => {
-        const proxy = client.getFlag('json-flag');
+        const proxy = (client as any).createProxy('json-flag');
         expect(proxy.jsonVariationOrThrow()).toEqual({
           key: 'value',
           nested: { a: 1 },
@@ -386,12 +386,12 @@ describe('FlagProxy', () => {
 
   describe('reason getter', () => {
     it('should return undefined for non-existent flag', () => {
-      const proxy = client.getFlag('non-existent');
+      const proxy = (client as any).createProxy('non-existent');
       expect(proxy.reason).toBeUndefined();
     });
 
     it('should return reason from flag', () => {
-      const proxy = client.getFlag('enabled-flag');
+      const proxy = (client as any).createProxy('enabled-flag');
       expect(proxy.reason).toBe('targeting_match');
     });
   });

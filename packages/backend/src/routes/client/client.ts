@@ -377,6 +377,9 @@ router.post('/invalidate-cache', clientSDKAuth, ClientController.invalidateCache
 router.post('/features/:environment/eval', clientSDKAuth, ClientController.evaluateFlags);
 router.get('/features/:environment/eval', clientSDKAuth, ClientController.evaluateFlags);
 
+// Feature Flag streaming route (SSE for real-time invalidation)
+router.get('/features/:environment/stream', clientSDKAuth, ClientController.streamFlags);
+
 // Metrics route
 router.post('/features/:environment/metrics', clientSDKAuth, ClientController.submitMetrics);
 

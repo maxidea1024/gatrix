@@ -43,7 +43,21 @@ namespace Gatrix.Unity.SDK
         public FlagProxy(EvaluatedFlag flag, IVariationProvider client, string flagName)
         {
             _exists = flag != null;
-            _flag = flag ?? MissingFlag;
+            // Deep-clone for immutable snapshot safety
+            _flag = flag != null
+                ? new EvaluatedFlag
+                {
+                    Name = flag.Name,
+                    Enabled = flag.Enabled,
+                    Variant = flag.Variant != null
+                        ? new Variant { Name = flag.Variant.Name, Enabled = flag.Variant.Enabled, Value = flag.Variant.Value }
+                        : null,
+                    ValueType = flag.ValueType,
+                    Version = flag.Version,
+                    Reason = flag.Reason,
+                    ImpressionData = flag.ImpressionData
+                }
+                : MissingFlag;
             _client = client;
             _flagName = flagName ?? _flag.Name;
         }

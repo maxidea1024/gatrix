@@ -36,7 +36,13 @@ export class FlagProxy {
 
   constructor(flag: EvaluatedFlag | undefined, client: VariationProvider, flagName?: string) {
     this._exists = flag !== undefined;
-    this.flag = flag ?? MISSING_FLAG;
+    // Deep-clone so FlagProxy holds an immutable snapshot
+    this.flag = flag
+      ? {
+        ...flag,
+        variant: { ...flag.variant },
+      }
+      : MISSING_FLAG;
     this.client = client;
     this._flagName = flagName ?? this.flag.name;
   }
@@ -60,7 +66,7 @@ export class FlagProxy {
   }
 
   get variant(): Variant {
-    return this.flag.variant;
+    return { ...this.flag.variant }; // defensive copy
   }
 
   get valueType(): ValueType {

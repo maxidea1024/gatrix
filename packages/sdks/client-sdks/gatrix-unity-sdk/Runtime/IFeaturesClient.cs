@@ -251,17 +251,6 @@ namespace Gatrix.Unity.SDK
         bool HasFlag(string flagName);
 
         /// <summary>
-        /// Get a FlagProxy for convenient flag access.
-        /// <para>
-        /// The returned proxy delegates all variation methods to the client's
-        /// internal methods for centralized type checking and metrics tracking.
-        /// </para>
-        /// </summary>
-        /// <param name="flagName">The feature flag key (case-sensitive).</param>
-        /// <returns>A <see cref="FlagProxy"/> instance (never null).</returns>
-        FlagProxy GetFlag(string flagName);
-
-        /// <summary>
         /// Get all evaluated flags currently in the cache.
         /// <para>
         /// Returns a list of all flags with their full evaluation results.

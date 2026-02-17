@@ -7,10 +7,8 @@
 #include "GatrixFlagProxy.h"
 #include "GatrixTypes.h"
 
-
 #include <cassert>
 #include <iostream>
-
 
 int main() {
   using namespace gatrix;
@@ -124,35 +122,62 @@ int main() {
     std::cout << "Error: " << e.what() << " code: " << e.code() << std::endl;
   }
 
-  // 13. FlagProxy
-  FlagProxy proxy = features->getFlag("test-flag");
-  bool proxyExists = proxy.exists();
-  bool proxyEnabled = proxy.enabled();
-  std::string proxyName = proxy.name();
-  Variant proxyVariant = proxy.variant();
-  VariantType proxyVarType = proxy.variantType();
-  int proxyVersion = proxy.version();
-  std::string proxyReason = proxy.reason();
-  bool proxyImpression = proxy.impressionData();
-  const EvaluatedFlag *proxyRaw = proxy.raw();
+  // 13. FlagProxy (obtained via watchFlagWithInitialState, not getFlag)
+  FlagProxy capturedProxy;
+  bool proxyCaptured = false;
+  auto unwatchProxy = features->watchFlagWithInitialState(
+      "test-flag",
+      [&capturedProxy, &proxyCaptured](FlagProxy flag) {
+        capturedProxy = flag;
+        proxyCaptured = true;
+      },
+      "proxy_test");
+  unwatchProxy();
 
-  // FlagProxy variations
-  std::string proxyVar = proxy.variation("disabled");
-  bool proxyBool = proxy.boolVariation(false);
-  std::string proxyStr = proxy.stringVariation("default");
-  double proxyNum = proxy.numberVariation(0.0);
-  std::string proxyJson = proxy.jsonVariation("{}");
+  if (proxyCaptured) {
+    bool proxyExists = capturedProxy.exists();
+    bool proxyEnabled = capturedProxy.enabled();
+    std::string proxyName = capturedProxy.name();
+    Variant proxyVariant = capturedProxy.variant();
+    VariantType proxyVarType = capturedProxy.variantType();
+    int proxyVersion = capturedProxy.version();
+    std::string proxyReason = capturedProxy.reason();
+    bool proxyImpression = capturedProxy.impressionData();
+    const EvaluatedFlag *proxyRaw = capturedProxy.raw();
 
-  // FlagProxy variation details
-  auto proxyBoolDetails = proxy.boolVariationDetails(false);
-  auto proxyStrDetails = proxy.stringVariationDetails("default");
-  auto proxyNumDetails = proxy.numberVariationDetails(0.0);
+    // FlagProxy variations
+    std::string proxyVar = capturedProxy.variation("disabled");
+    bool proxyBool = capturedProxy.boolVariation(false);
+    std::string proxyStr = capturedProxy.stringVariation("default");
+    double proxyNum = capturedProxy.numberVariation(0.0);
+    std::string proxyJson = capturedProxy.jsonVariation("{}");
 
-  // FlagProxy OrThrow
-  try {
-    bool pBool = proxy.boolVariationOrThrow();
-    (void)pBool;
-  } catch (const GatrixFeatureError &) {
+    // FlagProxy variation details
+    auto proxyBoolDetails = capturedProxy.boolVariationDetails(false);
+    auto proxyStrDetails = capturedProxy.stringVariationDetails("default");
+    auto proxyNumDetails = capturedProxy.numberVariationDetails(0.0);
+
+    // FlagProxy OrThrow
+    try {
+      bool pBool = capturedProxy.boolVariationOrThrow();
+      (void)pBool;
+    } catch (const GatrixFeatureError &) {
+    }
+
+    (void)proxyExists;
+    (void)proxyEnabled;
+    (void)proxyName;
+    (void)proxyVarType;
+    (void)proxyVersion;
+    (void)proxyReason;
+    (void)proxyImpression;
+    (void)proxyRaw;
+    (void)proxyVar;
+    (void)proxyBool;
+    (void)proxyStr;
+    (void)proxyNum;
+    (void)proxyJson;
+    (void)proxyVariant;
   }
 
   // 14. Explicit sync mode
@@ -241,19 +266,7 @@ int main() {
   (void)detailReason;
   (void)detailExists;
   (void)detailEnabled;
-  (void)proxyExists;
-  (void)proxyEnabled;
-  (void)proxyName;
-  (void)proxyVarType;
-  (void)proxyVersion;
-  (void)proxyReason;
-  (void)proxyImpression;
-  (void)proxyRaw;
-  (void)proxyVar;
-  (void)proxyBool;
-  (void)proxyStr;
-  (void)proxyNum;
-  (void)proxyJson;
+  (void)proxyCaptured;
   (void)isSyncMode;
   (void)canSync;
   (void)groupSize;
@@ -284,7 +297,6 @@ int main() {
   (void)error;
   (void)version;
   (void)variant;
-  (void)proxyVariant;
   (void)current;
 
   return 0;

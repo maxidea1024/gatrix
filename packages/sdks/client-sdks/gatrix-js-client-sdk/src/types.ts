@@ -118,6 +118,21 @@ export interface FeaturesConfig {
 
   /** Disable local statistics tracking (default: false = tracking enabled) */
   disableStats?: boolean;
+
+  /** Enable streaming for real-time invalidation (default: true) */
+  enableStreaming?: boolean;
+
+  /** Streaming endpoint URL override (default: derived from apiUrl) */
+  streamingUrl?: string;
+
+  /** Streaming reconnect initial delay in ms (default: 1000) */
+  streamingReconnectBaseMs?: number;
+
+  /** Streaming reconnect max delay in ms (default: 30000) */
+  streamingReconnectMaxMs?: number;
+
+  /** Polling jitter range in ms to prevent thundering herd (default: 5000) */
+  pollingJitterMs?: number;
 }
 
 /**
@@ -214,6 +229,19 @@ export interface ErrorEvent {
 export type SdkState = 'initializing' | 'ready' | 'healthy' | 'error';
 
 /**
+ * Streaming connection state
+ */
+export type StreamingConnectionState = 'disconnected' | 'connecting' | 'connected' | 'reconnecting' | 'degraded';
+
+/**
+ * Server invalidation event payload
+ */
+export interface FlagsChangedEvent {
+  globalRevision: number;
+  changedKeys: string[];
+}
+
+/**
  * Common SDK statistics
  */
 export interface GatrixSdkStats {
@@ -292,4 +320,10 @@ export interface FeaturesStats {
   metricsSentCount: number;
   /** Number of metrics send errors */
   metricsErrorCount: number;
+  /** Current streaming connection state */
+  streamingState: StreamingConnectionState;
+  /** Number of streaming reconnection attempts */
+  streamingReconnectCount: number;
+  /** Timestamp of last streaming event received */
+  lastStreamingEventTime: Date | null;
 }

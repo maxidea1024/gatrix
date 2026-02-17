@@ -258,6 +258,15 @@ const startServer = async () => {
       logger.warn('Failed to set up SSE PubSub bridge:', error);
     }
 
+    // Initialize Flag Streaming Service (SSE for SDK clients)
+    try {
+      const { flagStreamingService } = await import('./services/FlagStreamingService');
+      await flagStreamingService.start();
+      logger.info('Flag Streaming Service initialized');
+    } catch (error) {
+      logger.warn('Flag Streaming Service initialization failed, continuing:', error);
+    }
+
     // Initialize Queue service
     try {
       await queueService.initialize();

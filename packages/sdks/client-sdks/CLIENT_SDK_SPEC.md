@@ -715,15 +715,32 @@ FlagProxy is a **convenience shell** that delegates all variation logic to `Feat
 - Uses **null object pattern**: `this.flag` is never null/undefined. A `MISSING_FLAG` sentinel is used for non-existent flags.
 - Holds a reference to `VariationProvider` (interface, not `FeaturesClient` directly) to avoid circular dependencies.
 - All variation methods delegate to `VariationProvider`'s internal methods.
-- Read-only property accessors (`variant`, `valueType`, `version`, etc.) access flag data directly.
-- **No `onAccess` callback** ??metrics tracking is handled entirely by the internal methods.
+- Read-only property accessors (`variant`, `valueType`, `version`, etc.) access flag data directly from the snapshot.
+- **No `onAccess` callback** — metrics tracking is handled entirely by the internal methods.
 - **Strict type checking**: All variation methods validate `valueType` to prevent misuse.
+- **Not a public API**: `FlagProxy` is created internally by `watchFlag()` and `watchFlagWithInitialState()`. There is no public `getFlag()` method.
+
+#### Immutable Snapshot Requirement
+
+> [!CAUTION]
+> **FlagProxy MUST hold a deep-cloned snapshot of the `EvaluatedFlag` data at construction time.** FlagProxy MUST NOT hold a raw pointer or reference to the internal flags store. The internal flags map can be replaced at any time when new data is fetched from the server. If FlagProxy holds a pointer/reference to the old map entry, it becomes a **dangling pointer** (C/C++) or a **stale reference** (managed languages) after the map is updated.
+>
+> **Implementation by language:**
+> - **C/C++ (Cocos2d-x)**: Copy the `EvaluatedFlag` struct by value into FlagProxy (not a pointer). The `Variant` struct is also copied by value.
+> - **C++ (Unreal)**: Use `FGatrixEvaluatedFlag` as a value member (already a UStruct, copied by value via `Initialize`).
+> - **C# (Unity)**: Create a `new EvaluatedFlag` with all fields copied, including a `new Variant`.
+> - **JavaScript/TypeScript**: Spread-copy `{ ...flag, variant: { ...flag.variant } }`.
+> - **Dart (Flutter)**: Flag classes use `final` fields, making them effectively immutable after construction.
+> - **GDScript (Godot)**: Use `flag.duplicate()` to create a deep copy.
+> - **Python**: Use `copy.deepcopy()` or construct a new dataclass instance.
+>
+> The `variant` property getter should also return a defensive copy (e.g., `{ ...this.flag.variant }` in JS) to prevent callers from mutating the snapshot.
 
 > [!WARNING]
 > **GC and Circular Reference Considerations**: FlagProxy holds a reference to VariationProvider (FeaturesClient). In languages with reference counting GC (C++, Swift), use weak pointers/references. In managed languages (JS, C#, Dart, Python) with mark-and-sweep GC, cycles are handled automatically. FlagProxy instances are typically short-lived (created for one-shot variation calls and immediately discarded).
 
 > [!IMPORTANT]
-> **FlagProxy.client is ALWAYS non-null**: FlagProxy is exclusively created by `FeaturesClient` (via `getFlag()`, `watchFlag()`, etc.) and always receives the creating client as its `VariationProvider`. SDK implementations MUST NOT add null/undefined checks for the `client` parameter inside FlagProxy methods. The `client` constructor parameter is non-optional and guaranteed to be a valid `VariationProvider` instance. Adding unnecessary null checks creates misleading code that suggests FlagProxy can function without a client, which is architecturally incorrect.
+> **FlagProxy.client is ALWAYS non-null**: FlagProxy is exclusively created by `FeaturesClient` (via `watchFlag()`, etc.) and always receives the creating client as its `VariationProvider`. SDK implementations MUST NOT add null/undefined checks for the `client` parameter inside FlagProxy methods. The `client` constructor parameter is non-optional and guaranteed to be a valid `VariationProvider` instance. Adding unnecessary null checks creates misleading code that suggests FlagProxy can function without a client, which is architecturally incorrect.
 
 **`boolVariation` behavior:**
 - Checks `valueType === 'boolean'` strictly.
@@ -870,6 +887,15 @@ client.features.setExplicitSyncMode(false);
 ## Watch Pattern
 
 Reactive change detection for individual flags:
+
+> [!CAUTION]
+> **`watchFlag*` methods MUST always read from `realtimeFlags`**, regardless of `explicitSyncMode`.
+> The purpose of watch callbacks is to react to the latest server-side flag state in real-time.
+> If `watchFlagWithInitialState` reads from `synchronizedFlags` (which may be stale in explicit sync mode),
+> the initial callback would receive outdated data, defeating the purpose of watching.
+>
+> Implementation: When creating a `FlagProxy` for watch callbacks or emitting the initial state,
+> always call `selectFlags(forceRealtime: true)` (or equivalent) to ensure the latest data is used.
 
 ```typescript
 // Watch for changes (excludes initial state)
@@ -1022,6 +1048,178 @@ When the SDK transitions from `error` state to a successful fetch:
 3. Set `lastRecoveryTime`
 4. Emit `flags.recovered` event
 
+## Revision-Based Invalidate + Conditional Pull Synchronization
+
+This section defines the real-time flag synchronization protocol. All Client SDKs MUST implement this pattern for efficient, scalable flag updates.
+
+> [!IMPORTANT]
+> The streaming channel (implemented via SSE internally) is used **only for invalidation signals**, NOT for data delivery. Actual flag data is always fetched via HTTP Pull with ETag-based conditional requests.
+
+### Streaming Events
+
+The streaming endpoint (`/client/features/{environment}/stream`) emits the following server-sent events:
+
+| Event | Payload | Description |
+|-------|---------|-------------|
+| `connected` | `{ globalRevision: number }` | Initial connection established with current server revision |
+| `flags_changed` | `{ globalRevision: number, changedKeys: string[] }` | Invalidation signal: listed flags have evaluation-affecting changes |
+| `heartbeat` | `{ timestamp: number }` | Connection health check (every 30s) |
+
+**Rules:**
+- `changedKeys` only includes flags whose **evaluation result** has changed (not metadata-only changes)
+- `globalRevision` is monotonically increasing and never decreases
+- Event replay is NOT supported; clients reconcile by comparing revisions after reconnection
+
+### Streaming Configuration
+
+```typescript
+interface FeaturesConfig {
+  // ... existing fields
+
+  /** Enable streaming for real-time invalidation (default: true) */
+  enableStreaming?: boolean;
+
+  /** Streaming endpoint URL override (default: derived from apiUrl) */
+  streamingUrl?: string;
+
+  /** Streaming reconnect initial delay in ms (default: 1000) */
+  streamingReconnectBaseMs?: number;
+
+  /** Streaming reconnect max delay in ms (default: 30000) */
+  streamingReconnectMaxMs?: number;
+
+  /** Polling jitter range in ms to prevent thundering herd (default: 5000) */
+  pollingJitterMs?: number;
+}
+```
+
+### Streaming Events (SDK)
+
+| Event | Constant | Description | Payload |
+|-------|----------|-------------|---------|
+| `flags.streaming_connected` | `FLAGS_STREAMING_CONNECTED` | Streaming connected | `{ globalRevision: number }` |
+| `flags.streaming_disconnected` | `FLAGS_STREAMING_DISCONNECTED` | Streaming disconnected | - |
+| `flags.streaming_reconnecting` | `FLAGS_STREAMING_RECONNECTING` | Reconnection attempt | `{ attempt: number, delayMs: number }` |
+| `flags.streaming_error` | `FLAGS_STREAMING_ERROR` | Streaming error | `{ error: Error }` |
+| `flags.invalidated` | `FLAGS_INVALIDATED` | Server invalidation signal received | `{ globalRevision: number, changedKeys: string[] }` |
+
+### Connection State Machine
+
+```mermaid
+stateDiagram-v2
+    [*] --> disconnected
+    disconnected --> connecting: start()
+    connecting --> connected: connected event
+    connecting --> reconnecting: connection failed
+    connected --> reconnecting: connection lost
+    reconnecting --> connected: reconnected
+    reconnecting --> degraded: max retries exceeded
+    degraded --> connected: auto-reconnect success
+    connected --> disconnected: stop()
+    reconnecting --> disconnected: stop()
+    degraded --> disconnected: stop()
+```
+
+**State descriptions:**
+- `disconnected`: Streaming not active. Polling-only mode.
+- `connecting`: Initial connection attempt in progress.
+- `connected`: Streaming active. Receiving invalidation signals.
+- `reconnecting`: Connection lost, attempting to reconnect with exponential backoff.
+- `degraded`: Streaming failed after max retries. Polling fallback active. Periodic reconnect attempts continue.
+
+### Reconnection Strategy
+
+SDKs MUST implement exponential backoff with jitter for streaming reconnection:
+
+```
+delay = min(streamingReconnectBaseMs * 2^(attempt-1), streamingReconnectMaxMs) + random(0, 1000)
+```
+
+- Default `streamingReconnectBaseMs`: 1000ms
+- Default `streamingReconnectMaxMs`: 30000ms
+- Jitter: 0-1000ms random offset to prevent thundering herd
+- In `degraded` state, reconnect attempts continue at `streamingReconnectMaxMs` interval
+
+### Revision Tracking
+
+SDKs MUST track the following revision state:
+
+```typescript
+// Internal state
+localGlobalRevision: number;        // last known server globalRevision
+flagETags: Map<string, string>;     // per-flag ETag (e.g., "rev-16")
+```
+
+**Revision comparison rules:**
+1. On `flags_changed` event: if `event.globalRevision > localGlobalRevision`, trigger conditional fetch for each `changedKey`
+2. On successful fetch: update `localGlobalRevision` to `max(localGlobalRevision, response.globalRevision)`
+3. Revisions NEVER decrease; ignore events with `globalRevision <= localGlobalRevision`
+
+### Conditional Fetch Flow
+
+When an invalidation signal is received for specific keys:
+
+```
+for each changedKey:
+  1. If already fetching this key → skip (deduplication)
+  2. GET /client/features/{env}/eval?flagKey={changedKey}
+     Headers: If-None-Match: {flagETags[changedKey]}
+  3. If 200 OK:
+     - Update local flag cache
+     - Update flagETags[changedKey] from response ETag header
+     - Update localGlobalRevision
+     - Emit flag change events
+  4. If 304 Not Modified:
+     - No action needed (flag unchanged)
+```
+
+> [!IMPORTANT]
+> **Fetch deduplication**: If a conditional fetch for a key is already in flight, subsequent requests for the same key MUST be skipped. This prevents duplicate requests during burst invalidation events.
+
+### Gap Recovery
+
+When the streaming connection is re-established after a disconnection:
+
+1. Server sends `connected` event with current `globalRevision`
+2. Client compares `event.globalRevision` with `localGlobalRevision`
+3. If `event.globalRevision > localGlobalRevision`:
+   - Perform a full flag re-fetch (`fetchFlagsInternal('gap_recovery')`) to catch any missed changes
+4. If `event.globalRevision === localGlobalRevision`:
+   - No gap detected, resume normal operation
+
+### Polling with Streaming
+
+When streaming is active, polling serves as a **sanity check fallback**:
+
+- Polling continues at the configured `refreshInterval` (with jitter applied)
+- If streaming is `connected`, polling can optionally use a longer interval
+- Polling uses the existing ETag-based conditional request flow
+- If polling detects a revision mismatch that streaming missed, a full sync is triggered
+
+**Jitter**: All SDKs MUST add random jitter to polling intervals to prevent thundering herd:
+```
+actualDelay = refreshInterval + random(-pollingJitterMs/2, pollingJitterMs/2)
+```
+
+### Statistics Extensions
+
+`FeaturesStats` MUST include the following streaming-related fields:
+
+```typescript
+interface FeaturesStats {
+  // ... existing fields
+
+  /** Current streaming connection state */
+  streamingState: StreamingConnectionState;
+  /** Number of streaming reconnection attempts */
+  streamingReconnectCount: number;
+  /** Timestamp of last streaming event received */
+  lastStreamingEventTime: Date | null;
+}
+
+type StreamingConnectionState = 'disconnected' | 'connecting' | 'connected' | 'reconnecting' | 'degraded';
+```
+
 ## Implementation Checklist (gatrix-js-client-sdk)
 
 - [x] Core GatrixClient class with event emitter
@@ -1040,3 +1238,7 @@ When the SDK transitions from `error` state to a successful fetch:
 - [x] Browser build (ES modules + CJS + UMD)
 - [ ] track() event tracking
 - [ ] GET/POST method support
+- [ ] Streaming invalidation channel (SSE)
+- [ ] Revision-based conditional fetch
+- [ ] Gap recovery on reconnection
+- [ ] Polling jitter

@@ -17,12 +17,21 @@ namespace gatrix {
  */
 class FlagProxy {
 public:
+  /// Construct with a deep copy of the flag for immutable snapshot safety.
   FlagProxy(const EvaluatedFlag *flag, IVariationProvider *provider,
             const std::string &flagName)
-      : _flag(flag), _provider(provider), _flagName(flagName) {
+      : _provider(provider), _flagName(flagName) {
     assert(_provider != nullptr);
-    _exists = (_flag != nullptr && _flag->variant.name != "$missing");
+    if (flag && flag->variant.name != "$missing") {
+      _ownedFlag = *flag; // deep copy (value types)
+      _exists = true;
+    } else {
+      _exists = false;
+    }
   }
+
+  /// Default constructor for use as local variable (e.g. captured in lambda)
+  FlagProxy() : _provider(nullptr), _exists(false) {}
 
   // ==================== Properties ====================
 
@@ -35,21 +44,21 @@ public:
 
   const Variant &variant() const {
     static Variant fallback = Variant::fallbackMissing();
-    return _exists ? _flag->variant : fallback;
+    return _exists ? _ownedFlag.variant : fallback;
   }
 
   ValueType valueType() const {
-    return _exists ? _flag->valueType : ValueType::NONE;
+    return _exists ? _ownedFlag.valueType : ValueType::NONE;
   }
-  int version() const { return _exists ? _flag->version : 0; }
+  int version() const { return _exists ? _ownedFlag.version : 0; }
   const std::string &reason() const {
     static std::string empty;
-    return _exists ? _flag->reason : empty;
+    return _exists ? _ownedFlag.reason : empty;
   }
   bool impressionData() const {
-    return _exists ? _flag->impressionData : false;
+    return _exists ? _ownedFlag.impressionData : false;
   }
-  const EvaluatedFlag *raw() const { return _exists ? _flag : nullptr; }
+  const EvaluatedFlag *raw() const { return _exists ? &_ownedFlag : nullptr; }
 
   // ==================== Variation Methods ====================
 
@@ -160,7 +169,7 @@ public:
   }
 
 private:
-  const EvaluatedFlag *_flag;
+  EvaluatedFlag _ownedFlag; // deep-copied snapshot
   IVariationProvider *_provider;
   std::string _flagName;
   bool _exists;

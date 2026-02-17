@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import crypto from 'crypto';
+import { ulid } from 'ulid';
 import { ClientVersionService } from '../services/ClientVersionService';
 import { ClientVersionModel, ClientStatus } from '../models/ClientVersion';
 import { GameWorldService } from '../services/GameWorldService';
@@ -753,5 +754,28 @@ export class ClientController {
     }
 
     return sendSuccessResponse(res);
+  });
+
+  /**
+   * Stream feature flag changes (SSE endpoint)
+   * GET /api/v1/client/features/:environment/stream
+   *
+   * Establishes a Server-Sent Events connection for real-time flag invalidation.
+   * Sends 'connected', 'flags_changed', and 'heartbeat' events.
+   */
+  static streamFlags = asyncHandler(async (req: SDKRequest, res: Response) => {
+    const environment = req.params.environment || req.environment;
+    if (!environment) {
+      return res.status(400).json({ success: false, message: 'Environment is required' });
+    }
+
+    // Lazy-import to avoid circular dependencies and import-time side effects
+    const { flagStreamingService } = await import('../services/FlagStreamingService');
+
+    // Generate unique client ID
+    const clientId = `flag-stream-${ulid()}`;
+
+    // Register SSE client (sets headers, sends 'connected' event, handles cleanup)
+    flagStreamingService.addClient(clientId, environment, res);
   });
 }

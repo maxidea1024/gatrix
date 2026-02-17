@@ -122,32 +122,33 @@ try {
 ### FlagProxy
 
 ```cpp
-auto flag = features->getFlag("special-offer");
+// Watch a specific flag for changes (recommended pattern)
+features->watchFlagWithInitialState("special-offer", [](FlagProxy flag) {
+  flag.exists();          // bool
+  flag.enabled();         // bool
+  flag.name();            // const string&
+  flag.variant();         // Variant (never null - returns fallback)
+  flag.variantType();     // VariantType enum
+  flag.version();         // int
+  flag.reason();          // const string&
+  flag.impressionData();  // bool
+  flag.raw();             // const EvaluatedFlag*
 
-flag.exists();          // bool
-flag.enabled();         // bool
-flag.name();            // const string&
-flag.variant();         // Variant (never null - returns fallback)
-flag.variantType();     // VariantType enum
-flag.version();         // int
-flag.reason();          // const string&
-flag.impressionData();  // bool
-flag.raw();             // const EvaluatedFlag*
+  // Variations on proxy
+  flag.boolVariation(false);
+  flag.stringVariation("default");
+  flag.intVariation(0);
+  flag.floatVariation(0.0f);
+  flag.doubleVariation(0.0);
+  flag.jsonVariation("{}");
 
-// Variations on proxy
-flag.boolVariation(false);
-flag.stringVariation("default");
-flag.intVariation(0);
-flag.floatVariation(0.0f);
-flag.doubleVariation(0.0);
-flag.jsonVariation("{}");
+  // Details on proxy
+  auto details = flag.boolVariationDetails(false);
+  // details.value, details.reason, details.flagExists, details.enabled
 
-// Details on proxy
-auto details = flag.boolVariationDetails(false);
-// details.value, details.reason, details.flagExists, details.enabled
-
-// OrThrow on proxy
-flag.boolVariationOrThrow();
+  // OrThrow on proxy
+  flag.boolVariationOrThrow();
+}, "special_offer_watcher");
 ```
 
 ### Watch Pattern

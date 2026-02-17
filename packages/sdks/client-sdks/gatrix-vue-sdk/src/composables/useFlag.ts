@@ -1,37 +1,27 @@
 import { ref, onMounted, onUnmounted, computed } from 'vue';
 import { useGatrixClient } from './useGatrixClient';
-import { EVENTS } from '@gatrix/js-client-sdk';
 import type { FlagProxy } from '@gatrix/js-client-sdk';
 
 export function useFlagProxy(flagName: string) {
   const client = useGatrixClient();
-  const flag = ref<FlagProxy>(client.features.getFlag(flagName));
 
-  let unsubscribe: () => void;
+  // Initialize with a lightweight placeholder; watchFlagWithInitialState
+  // will fire immediately with the real proxy.
+  const flag = ref<FlagProxy | null>(null);
 
-  const updateFlag = () => {
-    flag.value = client.features.getFlag(flagName);
-  };
+  let unsubscribe: (() => void) | undefined;
 
   onMounted(() => {
-    client.on(EVENTS.FLAGS_CHANGE, updateFlag);
-    client.on(EVENTS.FLAGS_READY, updateFlag);
-    client.on(EVENTS.FLAGS_SYNC, updateFlag);
-
-    // Specifically watch this flag for changes
-    unsubscribe = client.features.watchFlag(
+    unsubscribe = client.features.watchFlagWithInitialState(
       flagName,
-      () => {
-        updateFlag();
+      (proxy: FlagProxy) => {
+        flag.value = proxy;
       },
       `vue_watch_${flagName}`
     );
   });
 
   onUnmounted(() => {
-    client.off(EVENTS.FLAGS_CHANGE, updateFlag);
-    client.off(EVENTS.FLAGS_READY, updateFlag);
-    client.off(EVENTS.FLAGS_SYNC, updateFlag);
     if (unsubscribe) {
       unsubscribe();
     }
@@ -42,5 +32,5 @@ export function useFlagProxy(flagName: string) {
 
 export function useFlag(flagName: string) {
   const flagProxy = useFlagProxy(flagName);
-  return computed(() => flagProxy.value.enabled);
+  return computed(() => flagProxy.value?.enabled ?? false);
 }

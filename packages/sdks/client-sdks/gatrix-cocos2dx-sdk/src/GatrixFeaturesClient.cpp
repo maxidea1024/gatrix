@@ -156,8 +156,9 @@ std::vector<EvaluatedFlag> FeaturesClient::getAllFlags() const {
   return result;
 }
 
-FlagProxy FeaturesClient::getFlag(const std::string &flagName) {
-  const auto &flags = selectFlags();
+FlagProxy FeaturesClient::createProxy(const std::string &flagName) {
+  // Always read from realtimeFlags for watch/proxy
+  const auto &flags = selectFlags(true);
   auto it = flags.find(flagName);
   const EvaluatedFlag *flag = (it != flags.end()) ? &it->second : nullptr;
 
@@ -323,7 +324,7 @@ std::function<void()> FeaturesClient::watchFlag(const std::string &flagName,
   std::string eventName = EVENTS::flagChange(flagName);
   auto wrappedCb = [this, flagName,
                     callback](const std::vector<std::string> &) {
-    callback(getFlag(flagName));
+    callback(createProxy(flagName));
   };
   _emitter.on(eventName, wrappedCb, name.empty() ? "watch_" + flagName : name);
 
@@ -335,7 +336,7 @@ FeaturesClient::watchFlagWithInitialState(const std::string &flagName,
                                           WatchCallback callback,
                                           const std::string &name) {
   // Fire immediately with current state
-  callback(getFlag(flagName));
+  callback(createProxy(flagName));
   // Then watch for changes
   return watchFlag(flagName, callback, name);
 }

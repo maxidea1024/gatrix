@@ -507,10 +507,12 @@ namespace Gatrix.Unity.SDK
         /// <summary>Check if a flag exists</summary>
         public bool HasFlag(string flagName) => LookupFlag(flagName) != null;
 
-        /// <summary>Get a FlagProxy for convenient flag access. Delegates to self for all operations.</summary>
-        public FlagProxy GetFlag(string flagName)
+        /// <summary>Create a FlagProxy. Used internally by WatchFlag, not part of public API.
+        /// Always reads from realtimeFlags — watch callbacks must reflect
+        /// the latest server state regardless of explicitSyncMode.</summary>
+        internal FlagProxy CreateProxy(string flagName)
         {
-            var flag = LookupFlag(flagName);
+            var flag = LookupFlag(flagName, forceRealtime: true);
             return new FlagProxy(flag, this, flagName);
         }
 
@@ -923,10 +925,10 @@ namespace Gatrix.Unity.SDK
             };
             _emitter.On(eventName, wrappedCallback, name);
 
-            // Emit initial state
+            // Emit initial state — always from realtimeFlags
             if (_readyEventEmitted)
             {
-                var flags = SelectFlags();
+                var flags = SelectFlags(true);
                 flags.TryGetValue(flagName, out var flag);
                 callback(new FlagProxy(flag, this, flagName));
             }
@@ -934,7 +936,7 @@ namespace Gatrix.Unity.SDK
             {
                 _emitter.Once(GatrixEvents.FlagsReady, _ =>
                 {
-                    var flags = SelectFlags();
+                    var flags = SelectFlags(true);
                     flags.TryGetValue(flagName, out var flag);
                     callback(new FlagProxy(flag, this, flagName));
                 }, name != null ? $"{name}_initial" : null);

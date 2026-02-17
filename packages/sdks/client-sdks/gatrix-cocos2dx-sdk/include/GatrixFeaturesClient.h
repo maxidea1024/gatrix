@@ -158,7 +158,6 @@ public:
                                            bool forceRealtime = false) override;
 
   // ==================== FlagProxy Access ====================
-  FlagProxy getFlag(const std::string &flagName);
   bool hasFlag(const std::string &flagName) const;
 
   // ==================== Explicit Sync Mode ====================
@@ -226,6 +225,7 @@ private:
                                   bool forceRealtime = false);
 
   // Internal
+  FlagProxy createProxy(const std::string &flagName);
   void initFromStorage();
   void initFromBootstrap();
   void saveToStorage();
