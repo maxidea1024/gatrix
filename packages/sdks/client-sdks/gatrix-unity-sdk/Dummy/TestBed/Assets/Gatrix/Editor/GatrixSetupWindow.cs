@@ -88,27 +88,25 @@ namespace Gatrix.Unity.SDK.Editor
 
         private void OnGUI()
         {
-            InitStyles();
-
             _scrollPos = EditorGUILayout.BeginScrollView(_scrollPos);
 
             // Title
-            EditorGUILayout.Space(8);
-            EditorGUILayout.LabelField("Gatrix SDK Setup", _titleStyle);
+            EditorGUILayout.Space(10);
+            EditorGUILayout.LabelField("Gatrix SDK Setup", GatrixEditorStyle.HeaderLabel); // Or create a TitleLabel
             EditorGUILayout.Space(4);
 
             // Description
             EditorGUILayout.LabelField(
                 "Configure and initialize the Gatrix Feature Flag SDK. " +
                 "This wizard creates a settings asset and sets up your scene for zero-code initialization.",
-                _descriptionStyle);
+                EditorStyles.wordWrappedLabel);
 
-            DrawSeparator();
+            GatrixEditorStyle.DrawSplitter();
 
             // Check if already configured
             if (_existingSettings != null)
             {
-                EditorGUILayout.HelpBox(
+                GatrixEditorStyle.DrawHelpBox(
                     "A GatrixSettings asset already exists. You can edit it directly or create a new one.",
                     MessageType.Info);
 

@@ -14,25 +14,22 @@ namespace Gatrix.Unity.SDK.Editor
     [CustomEditor(typeof(GatrixBehaviour))]
     public class GatrixBehaviourInspector : UnityEditor.Editor
     {
-        private bool _showFlags;
-        private bool _showContext;
-        private bool _showStats;
+        private bool _showFlags = true;
+        private bool _showContext = true;
+        private bool _showStats = true;
 
         // Column widths for table-style alignment
         private const float LabelWidth = 120f;
-        private const float FlagStateWidth = 50f;
-        private const float FlagNameWidth = 160f;
+        private const float FlagStateWidth = 40f;
+        private const float FlagNameWidth = 140f;
 
-        private GUIStyle _headerStyle;
+        private bool _stylesInitialized;
         private GUIStyle _richLabelStyle;
         private GUIStyle _valueLabelStyle;
-        private bool _stylesInitialized;
 
         private void InitStyles()
         {
             if (_stylesInitialized) return;
-
-            _headerStyle = new GUIStyle(EditorStyles.boldLabel) { fontSize = 14 };
 
             _richLabelStyle = new GUIStyle(EditorStyles.label) { richText = true };
 
@@ -49,7 +46,9 @@ namespace Gatrix.Unity.SDK.Editor
         {
             InitStyles();
 
-            GatrixEditorExtensions.DrawHeader("Gatrix SDK", "Unity Integration Component");
+            // Header
+            GatrixEditorStyle.DrawSection("Gatrix SDK", "Unity Integration Component");
+            
             var client = GatrixBehaviour.Client;
 
             if (client == null)
@@ -57,30 +56,35 @@ namespace Gatrix.Unity.SDK.Editor
                 if (!Application.isPlaying)
                 {
                     DrawDefaultInspector();
+                    EditorGUILayout.Space(10);
+                    GatrixEditorStyle.DrawHelpBox("SDK will initialize automatically in Play Mode.", MessageType.Info);
                 }
                 else
                 {
-                    EditorGUILayout.HelpBox("SDK is not initialized in Play Mode.", MessageType.None);
+                    GatrixEditorStyle.DrawHelpBox("SDK is not initialized in Play Mode.", MessageType.Warning);
                 }
                 return;
             }
 
+            // Status Box
+            GatrixEditorStyle.BeginBox();
+            
             // Status row
             var readyText = client.IsReady
-                ? "<color=green><b>Ready</b></color>"
-                : "<color=yellow><b>Not Ready</b></color>";
+                ? "<color=#88ff88><b>Ready</b></color>"
+                : "<color=#ffcc66><b>Not Ready</b></color>";
             DrawRow("Status", readyText, true);
             DrawRow("Connection", client.ConnectionId ?? "N/A");
-
+            
             EditorGUILayout.Space(4);
 
             // Buttons
             EditorGUILayout.BeginHorizontal();
-            if (GUILayout.Button("Open Monitor"))
+            if (GUILayout.Button("Open Monitor", GUILayout.Height(24)))
             {
                 GatrixMonitorWindow.ShowWindow();
             }
-            if (GUILayout.Button("Force Fetch"))
+            if (GUILayout.Button("Force Fetch", GUILayout.Height(24)))
             {
                 _ = client.Features.FetchFlagsAsync();
             }
@@ -89,10 +93,10 @@ namespace Gatrix.Unity.SDK.Editor
             // Sync Flags button (only when explicit sync mode has pending changes)
             if (client.Features.IsExplicitSync() && client.Features.HasPendingSyncFlags())
             {
-                EditorGUILayout.Space(2);
+                EditorGUILayout.Space(4);
                 var prevBg = GUI.backgroundColor;
                 GUI.backgroundColor = new Color(1f, 0.85f, 0.3f);
-                if (GUILayout.Button("⚡ Sync Flags (Pending Changes)"))
+                if (GUILayout.Button("⚡ Sync Flags (Pending Changes)", GUILayout.Height(30)))
                 {
                     _ = client.Features.SyncFlagsAsync(false);
                     // Force Monitor window to refresh immediately
@@ -104,25 +108,31 @@ namespace Gatrix.Unity.SDK.Editor
                 GUI.backgroundColor = prevBg;
             }
 
-            EditorGUILayout.Space(8);
+            GatrixEditorStyle.EndBox();
 
             // ==================== Flags ====================
-            _showFlags = EditorGUILayout.Foldout(_showFlags, "Feature Flags", true);
+            GatrixEditorStyle.DrawSection("Feature Flags");
+            
+            GatrixEditorStyle.BeginBox();
+            
+            // Custom simplified foldout/header
+            _showFlags = EditorGUILayout.Foldout(_showFlags, $"Flags ({client.Features.GetAllFlags().Count})", true, EditorStyles.foldoutHeader);
+            
             if (_showFlags)
             {
-                EditorGUI.indentLevel++;
                 var flags = client.Features.GetAllFlags();
                 if (flags.Count == 0)
                 {
-                    EditorGUILayout.LabelField("No flags loaded");
+                    EditorGUILayout.LabelField("No flags loaded", EditorStyles.centeredGreyMiniLabel);
                 }
                 else
                 {
+                    EditorGUILayout.Space(2);
+                    
                     // Table header
                     EditorGUILayout.BeginHorizontal(EditorStyles.toolbar);
-                    GUILayout.Space(EditorGUI.indentLevel * 15f);
-                    EditorGUILayout.LabelField("State", EditorStyles.miniLabel, GUILayout.Width(FlagStateWidth));
-                    EditorGUILayout.LabelField("Flag Name", EditorStyles.miniLabel, GUILayout.Width(FlagNameWidth));
+                    EditorGUILayout.LabelField("St", EditorStyles.miniLabel, GUILayout.Width(FlagStateWidth));
+                    EditorGUILayout.LabelField("Name", EditorStyles.miniLabel, GUILayout.Width(FlagNameWidth));
                     EditorGUILayout.LabelField("Variant", EditorStyles.miniLabel);
                     EditorGUILayout.EndHorizontal();
 
@@ -130,17 +140,19 @@ namespace Gatrix.Unity.SDK.Editor
                     foreach (var flag in flags)
                     {
                         EditorGUILayout.BeginHorizontal();
-                        GUILayout.Space(EditorGUI.indentLevel * 15f);
-
+                        
                         // State column
-                        var colorTag = flag.Enabled ? "green" : "red";
+                        var colorTag = flag.Enabled ? "#88ff88" : "#ff8888";
                         var state = flag.Enabled ? "ON" : "OFF";
                         EditorGUILayout.LabelField(
-                            $"<color={colorTag}><b>[{state}]</b></color>",
+                            $"<color={colorTag}><b>{state}</b></color>",
                             _richLabelStyle, GUILayout.Width(FlagStateWidth));
 
                         // Name column
-                        EditorGUILayout.LabelField(flag.Name, GUILayout.Width(FlagNameWidth));
+                        // Truncate if too long
+                        var name = flag.Name;
+                        if (name.Length > 25) name = name.Substring(0, 22) + "...";
+                        EditorGUILayout.LabelField(new GUIContent(name, flag.Name), GUILayout.Width(FlagNameWidth));
 
                         // Variant column
                         if (flag.Variant != null)
@@ -148,7 +160,12 @@ namespace Gatrix.Unity.SDK.Editor
                             var payloadStr = flag.Variant.Value?.ToString() ?? "";
                             if (payloadStr.Length > 30)
                                 payloadStr = payloadStr.Substring(0, 27) + "...";
-                            EditorGUILayout.LabelField($"{flag.Variant.Name}: {payloadStr}");
+                            
+                            var variantText = string.IsNullOrEmpty(flag.Variant.Name) 
+                                ? payloadStr 
+                                : $"{flag.Variant.Name}: {payloadStr}";
+                                
+                            EditorGUILayout.LabelField(variantText);
                         }
                         else
                         {
@@ -158,11 +175,14 @@ namespace Gatrix.Unity.SDK.Editor
                         EditorGUILayout.EndHorizontal();
                     }
                 }
-                EditorGUI.indentLevel--;
             }
+            GatrixEditorStyle.EndBox();
 
             // ==================== Context ====================
-            _showContext = EditorGUILayout.Foldout(_showContext, "Context", true);
+            GatrixEditorStyle.DrawSection("Context");
+            GatrixEditorStyle.BeginBox();
+            
+            _showContext = EditorGUILayout.Foldout(_showContext, "Evaluation Context", true, EditorStyles.foldoutHeader);
             if (_showContext)
             {
                 EditorGUI.indentLevel++;
@@ -180,32 +200,35 @@ namespace Gatrix.Unity.SDK.Editor
                 }
                 EditorGUI.indentLevel--;
             }
+            GatrixEditorStyle.EndBox();
 
             // ==================== Statistics ====================
-            _showStats = EditorGUILayout.Foldout(_showStats, "Statistics", true);
+            GatrixEditorStyle.DrawSection("Statistics");
+            GatrixEditorStyle.BeginBox();
+            
+            _showStats = EditorGUILayout.Foldout(_showStats, "Runtime Stats", true, EditorStyles.foldoutHeader);
             if (_showStats)
             {
                 EditorGUI.indentLevel++;
                 var stats = client.Features.GetStats();
                 DrawRow("State", stats.SdkState.ToString());
                 DrawRow("Total Flags", stats.TotalFlagCount.ToString());
-                DrawRow("Fetch Count", stats.FetchFlagsCount.ToString());
+                DrawRow("Fetches", stats.FetchFlagsCount.ToString());
                 DrawRow("Updates", stats.UpdateCount.ToString());
-                DrawRow("304s", stats.NotModifiedCount.ToString());
                 DrawRow("Errors", stats.ErrorCount.ToString());
                 DrawRow("Impressions", stats.ImpressionCount.ToString());
 
                 // Streaming
                 var stateColor = stats.StreamingState == StreamingConnectionState.Connected
-                    ? "green"
+                    ? "#88ff88"
                     : stats.StreamingState == StreamingConnectionState.Disconnected
                         ? "gray"
                         : "yellow";
                 DrawRow("Streaming",
                     $"<color={stateColor}>{stats.StreamingState}</color>", true);
-                DrawRow("Reconnects", stats.StreamingReconnectCount.ToString());
                 EditorGUI.indentLevel--;
             }
+            GatrixEditorStyle.EndBox();
 
             // Auto-repaint in play mode
             if (EditorApplication.isPlaying)
@@ -218,7 +241,7 @@ namespace Gatrix.Unity.SDK.Editor
         private void DrawRow(string label, string value, bool richValue = false)
         {
             EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField(label, EditorStyles.boldLabel, GUILayout.Width(LabelWidth));
+            EditorGUILayout.LabelField(label, EditorStyles.label, GUILayout.Width(LabelWidth));
             if (richValue)
             {
                 EditorGUILayout.LabelField(value, _richLabelStyle);

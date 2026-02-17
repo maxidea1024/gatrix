@@ -59,6 +59,7 @@ namespace Gatrix.Unity.SDK
         private readonly string _environment;
         private readonly Dictionary<string, string> _customHeaders;
         private readonly bool _disabled;
+        private readonly bool _enableDevMode;
         private readonly IGatrixLogger _logger;
         private readonly string _connectionId;
         private readonly GatrixEventEmitter _emitter;
@@ -78,6 +79,7 @@ namespace Gatrix.Unity.SDK
             string environment,
             Dictionary<string, string> customHeaders,
             bool disableMetrics,
+            bool enableDevMode,
             IGatrixLogger logger,
             string connectionId,
             GatrixEventEmitter emitter,
@@ -89,6 +91,7 @@ namespace Gatrix.Unity.SDK
             _environment = environment;
             _customHeaders = customHeaders;
             _disabled = disableMetrics;
+            _enableDevMode = enableDevMode;
             _logger = logger;
             _connectionId = connectionId ?? "";
             _emitter = emitter;
@@ -104,13 +107,13 @@ namespace Gatrix.Unity.SDK
         {
             if (_disabled)
             {
-                LogOnMainThread("Metrics disabled, skipping start");
+                if (_enableDevMode) LogOnMainThread("Metrics disabled, skipping start");
                 return;
             }
             if (_started) return;
             _started = true;
 
-            LogOnMainThread($"Metrics started. interval={metricsIntervalMs / 1000f}s, initialDelay={metricsIntervalInitialMs / 1000f}s");
+            if (_enableDevMode) LogOnMainThread($"Metrics started. interval={metricsIntervalMs / 1000f}s, initialDelay={metricsIntervalInitialMs / 1000f}s");
             _cts = new CancellationTokenSource();
             _ = RunMetricsLoop(metricsIntervalMs, metricsIntervalInitialMs, _cts.Token);
         }
@@ -123,6 +126,8 @@ namespace Gatrix.Unity.SDK
             _cts = null;
             _started = false;
         }
+
+        // ... existing Stop method ...
 
         /// <summary>Count flag access (called from main thread)</summary>
         public void Count(string flagName, bool enabled)
@@ -183,6 +188,7 @@ namespace Gatrix.Unity.SDK
             }
         }
 
+        // ... existing SendMetricsAsync start ...
         /// <summary>Send current metrics to server</summary>
         public async ValueTask SendMetricsAsync()
         {
@@ -191,15 +197,19 @@ namespace Gatrix.Unity.SDK
             var payload = GetPayload();
             if (BucketIsEmpty(payload))
             {
-                LogOnMainThread("Metrics: bucket empty, skipping send");
+                if (_enableDevMode)
+                {
+                    LogOnMainThread("Metrics: bucket empty, skipping send");
+                }
                 return;
             }
 
             var flagCount = payload.Bucket.Flags.Count;
             var missingCount = payload.Bucket.Missing.Count;
-            LogOnMainThread($"Metrics: sending. flags={flagCount}, missing={missingCount}");
+            if (_enableDevMode) LogOnMainThread($"Metrics: sending. flags={flagCount}, missing={missingCount}");
 
             const int maxRetries = 2;
+            // ... rest of method ...
             var url = $"{_apiUrl}/client/features/{_environment}/metrics";
             var json = GatrixJson.SerializeMetrics(payload);
 

@@ -5,9 +5,10 @@ using UnityEngine;
 namespace Gatrix.Unity.SDK
 {
     /// <summary>
-    /// Default logger implementation using Unity's Debug class
+    /// Default logger implementation using Unity's Debug class.
+    /// Supports verbose logging if GATRIX_VERBOSE symbol is defined.
     /// </summary>
-    public class UnityGatrixLogger : IGatrixLogger
+    public class UnityGatrixLogger : IGatrixLogger, IGatrixLoggerVerbose
     {
         private readonly string _prefix;
 
@@ -35,16 +36,24 @@ namespace Gatrix.Unity.SDK
         {
             UnityEngine.Debug.LogError($"[{_prefix}] {message}");
         }
+
+        public void Verbose(string message)
+        {
+#if GATRIX_VERBOSE
+            UnityEngine.Debug.Log($"[{_prefix}] [VERBOSE] {message}");
+#endif
+        }
     }
 
     /// <summary>
     /// No-op logger that discards all messages
     /// </summary>
-    public class NoOpLogger : IGatrixLogger
+    public class NoOpLogger : IGatrixLogger, IGatrixLoggerVerbose
     {
         public void Debug(string message) { }
         public void Info(string message) { }
         public void Warn(string message) { }
         public void Error(string message) { }
+        public void Verbose(string message) { }
     }
 }

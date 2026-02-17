@@ -113,40 +113,35 @@ namespace Gatrix.Unity.SDK.Editor
             if (_stylesInitialized) return;
             _stylesInitialized = true;
 
-            _headerStyle = new GUIStyle(EditorStyles.boldLabel)
-            {
-                fontSize = 14,
-                margin = new RectOffset(0, 0, 8, 4)
-            };
-
-            _subHeaderStyle = new GUIStyle(EditorStyles.boldLabel)
-            {
-                fontSize = 12,
-                margin = new RectOffset(0, 0, 4, 2)
-            };
+            // Use GatrixEditorStyle for shared styles
+            _headerStyle = GatrixEditorStyle.HeaderLabel;
+            _subHeaderStyle = GatrixEditorStyle.SubHeaderLabel;
 
             _statusLabelStyle = new GUIStyle(EditorStyles.label)
             {
-                richText = true
+                richText = true,
+                alignment = TextAnchor.MiddleLeft
             };
 
             _eventBoxStyle = new GUIStyle(EditorStyles.helpBox)
             {
-                fontSize = 10,
+                fontSize = 11,
                 richText = true,
-                padding = new RectOffset(4, 4, 2, 2),
-                margin = new RectOffset(0, 0, 1, 1)
+                padding = new RectOffset(6, 6, 4, 4),
+                margin = new RectOffset(0, 0, 2, 2),
+                alignment = TextAnchor.MiddleLeft
             };
 
             _flagNameStyle = new GUIStyle(EditorStyles.label)
             {
-                fontStyle = FontStyle.Bold
+                fontStyle = FontStyle.Bold,
+                alignment = TextAnchor.MiddleLeft
             };
 
             _sectionBoxStyle = new GUIStyle(EditorStyles.helpBox)
             {
-                padding = new RectOffset(6, 6, 4, 4),
-                margin = new RectOffset(0, 0, 2, 4)
+                padding = new RectOffset(10, 10, 8, 8),
+                margin = new RectOffset(0, 0, 5, 10)
             };
         }
 
@@ -233,74 +228,72 @@ namespace Gatrix.Unity.SDK.Editor
             var client = GatrixBehaviour.Client;
             if (client == null) return;
 
-            EditorGUILayout.LabelField("SDK Overview", _headerStyle);
-            EditorGUILayout.Space(4);
+            GatrixEditorStyle.DrawSection("SDK Summary", "Core connectivity and status");
+            GatrixEditorStyle.BeginBox();
 
             // Status
             var stats = _cachedStats;
             DrawField("SDK Version", $"{GatrixClient.SdkName} v{GatrixClient.SdkVersion}");
             DrawField("Connection ID", client.ConnectionId ?? "N/A");
-            DrawField("Ready", client.IsReady ? "<color=green>Yes</color>" : "<color=red>No</color>", true);
+            DrawField("Ready", client.IsReady ? "<color=#88ff88>Yes</color>" : "<color=#ff8888>No</color>", true);
 
             if (stats != null)
             {
-                DrawField("State",
-                    stats.SdkState == SdkState.Healthy
-                        ? "<color=green>Healthy</color>"
-                        : stats.SdkState == SdkState.Error
-                            ? "<color=red>Error</color>"
-                            : stats.SdkState.ToString(), true);
+                var stateColor = stats.SdkState == SdkState.Healthy ? "#88ff88" :
+                                 stats.SdkState == SdkState.Error ? "#ff8888" : "white";
+                DrawField("State", $"<color={stateColor}>{stats.SdkState}</color>", true);
+                
                 DrawField("Offline Mode", client.Features.IsOfflineMode() ? "Yes" : "No");
                 DrawField("Total Flags", stats.TotalFlagCount.ToString());
                 DrawField("ETag", stats.Etag ?? "none");
             }
+            GatrixEditorStyle.EndBox();
 
-            EditorGUILayout.Space(8);
-            EditorGUILayout.LabelField("Network", _subHeaderStyle);
+            GatrixEditorStyle.DrawSection("Network Activity", "Communication metrics");
+            GatrixEditorStyle.BeginBox();
 
             if (stats != null)
             {
                 DrawField("Fetch Count", stats.FetchFlagsCount.ToString());
                 DrawField("Update Count", stats.UpdateCount.ToString());
                 DrawField("304 Not Modified", stats.NotModifiedCount.ToString());
-                DrawField("Error Count", stats.ErrorCount.ToString());
+                DrawField("Error Count", stats.ErrorCount > 0 ? $"<color=#ff8888>{stats.ErrorCount}</color>" : "0", true);
                 DrawField("Recovery Count", stats.RecoveryCount.ToString());
                 DrawField("Last Fetch", FormatTime(stats.LastFetchTime));
                 DrawField("Last Update", FormatTime(stats.LastUpdateTime));
                 if (stats.LastError != null)
                 {
-                    DrawField("Last Error", stats.LastError.Message);
+                    DrawField("Last Error", $"<color=#ff8888>{stats.LastError.Message}</color>", true);
                 }
             }
+            GatrixEditorStyle.EndBox();
 
-            EditorGUILayout.Space(8);
-            EditorGUILayout.LabelField("Metrics", _subHeaderStyle);
+            GatrixEditorStyle.DrawSection("Metrics & Streaming", "Real-time data flow");
+            GatrixEditorStyle.BeginBox();
 
             if (stats != null)
             {
                 DrawField("Metrics Sent", stats.MetricsSentCount.ToString());
                 DrawField("Metrics Errors", stats.MetricsErrorCount.ToString());
                 DrawField("Impressions", stats.ImpressionCount.ToString());
-                DrawField("Context Changes", stats.ContextChangeCount.ToString());
             }
 
-            EditorGUILayout.Space(8);
-            EditorGUILayout.LabelField("Streaming (SSE)", _subHeaderStyle);
-
+            // Streaming (SSE)
             if (stats != null)
             {
                 var stateColor = stats.StreamingState == StreamingConnectionState.Connected
-                    ? "green"
+                    ? "#88ff88"
                     : stats.StreamingState == StreamingConnectionState.Disconnected
                         ? "gray"
                         : stats.StreamingState == StreamingConnectionState.Degraded
-                            ? "red"
+                            ? "#ff8888"
                             : "yellow";
-                DrawField("State",
-                    $"<color={stateColor}>{stats.StreamingState}</color>", true);
+                DrawField("Streaming State", $"<color={stateColor}>{stats.StreamingState}</color>", true);
                 DrawField("Reconnections", stats.StreamingReconnectCount.ToString());
                 DrawField("Last Event", FormatTime(stats.LastStreamingEventTime));
             }
+            
+            GatrixEditorStyle.EndBox();
         }
 
         // ==================== Flags ====================
@@ -352,11 +345,12 @@ namespace Gatrix.Unity.SDK.Editor
         private void DrawExplicitSyncView(string filter)
         {
             // Sync control bar
+            GatrixEditorStyle.BeginBox();
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField(
                 _cachedPendingSync
                     ? "<color=#ffcc66>● Pending changes available</color>"
-                    : "<color=#88cc88>● Synchronized</color>",
+                    : "<color=#88ff88>● Synchronized</color>",
                 _statusLabelStyle, GUILayout.ExpandWidth(true));
 
             GUI.enabled = _cachedPendingSync;
@@ -371,42 +365,31 @@ namespace Gatrix.Unity.SDK.Editor
             }
             GUI.enabled = true;
             EditorGUILayout.EndHorizontal();
-
-            EditorGUILayout.Space(4);
+            GatrixEditorStyle.EndBox();
 
             // Synchronized flags section
-            EditorGUILayout.LabelField("Synchronized Flags (Active)", _subHeaderStyle);
-            EditorGUILayout.BeginVertical(_sectionBoxStyle);
+            GatrixEditorStyle.DrawSection("Synchronized Flags (Active)");
             DrawFlagTable(_cachedFlags, filter);
-            EditorGUILayout.EndVertical();
 
             // Realtime flags section (pending)
             if (_cachedRealtimeFlags != null && _cachedPendingSync)
             {
-                // Horizontal divider
-                EditorGUILayout.Space(4);
-                var dividerRect = GUILayoutUtility.GetRect(1, 1, GUILayout.ExpandWidth(true));
-                EditorGUI.DrawRect(dividerRect, new Color(0.4f, 0.4f, 0.4f, 0.6f));
-                EditorGUILayout.Space(4);
-
-                EditorGUILayout.LabelField("Realtime Flags (Pending)", _subHeaderStyle);
-                EditorGUILayout.BeginVertical(_sectionBoxStyle);
+                GatrixEditorStyle.DrawSection("Realtime Flags (Pending Sync)");
                 DrawFlagTable(_cachedRealtimeFlags, filter);
-                EditorGUILayout.EndVertical();
             }
         }
 
         private void DrawFlagTable(List<EvaluatedFlag> flags, string filter)
         {
+            GatrixEditorStyle.BeginBox();
+            
             // Table header
             EditorGUILayout.BeginHorizontal(EditorStyles.toolbar);
-            EditorGUILayout.LabelField("Flag Name", EditorStyles.miniLabel, GUILayout.MinWidth(120));
-            EditorGUILayout.LabelField("ON", EditorStyles.miniLabel, GUILayout.Width(30));
+            EditorGUILayout.LabelField("Name", EditorStyles.miniLabel, GUILayout.MinWidth(120));
+            EditorGUILayout.LabelField("State", EditorStyles.miniLabel, GUILayout.Width(30));
             EditorGUILayout.LabelField("Variant", EditorStyles.miniLabel, GUILayout.Width(90));
+            EditorGUILayout.LabelField("Val", EditorStyles.miniLabel, GUILayout.MinWidth(80));
             EditorGUILayout.LabelField("Type", EditorStyles.miniLabel, GUILayout.Width(50));
-            EditorGUILayout.LabelField("Value", EditorStyles.miniLabel, GUILayout.MinWidth(80));
-            EditorGUILayout.LabelField("Reason", EditorStyles.miniLabel, GUILayout.Width(80));
-            EditorGUILayout.LabelField("Revision", EditorStyles.miniLabel, GUILayout.Width(50));
             EditorGUILayout.EndHorizontal();
 
             int visibleIndex = 0;
@@ -422,6 +405,13 @@ namespace Gatrix.Unity.SDK.Editor
                 DrawFlagRow(flag, visibleIndex);
                 visibleIndex++;
             }
+            
+            if (visibleIndex == 0)
+            {
+                GatrixEditorStyle.DrawHelpBox("No flags found matching filter.", MessageType.Info);
+            }
+            
+            GatrixEditorStyle.EndBox();
         }
 
         private void DrawFlagRow(EvaluatedFlag flag, int index)
@@ -440,7 +430,7 @@ namespace Gatrix.Unity.SDK.Editor
             else
             {
                 bgColor = index % 2 == 0
-                    ? new Color(0.22f, 0.22f, 0.22f, 0.3f)
+                    ? (EditorGUIUtility.isProSkin ? new Color(0.18f, 0.18f, 0.18f, 0.3f) : new Color(0.9f, 0.9f, 0.9f, 0.3f))
                     : Color.clear;
             }
 
@@ -451,35 +441,28 @@ namespace Gatrix.Unity.SDK.Editor
             }
 
             // Flag name
-            EditorGUILayout.LabelField(flag.Name, _flagNameStyle, GUILayout.MinWidth(120));
+            EditorGUILayout.LabelField(new GUIContent(flag.Name, flag.Name), _flagNameStyle, GUILayout.MinWidth(120));
 
             // Enabled
-            var enabledColor = flag.Enabled ? "green" : "red";
+            var enabledColor = flag.Enabled ? "#88ff88" : "#ff8888";
             var enabledText = flag.Enabled ? "ON" : "OFF";
             EditorGUILayout.LabelField(
                 $"<color={enabledColor}>{enabledText}</color>",
                 _statusLabelStyle, GUILayout.Width(30));
 
             // Variant name
-            EditorGUILayout.LabelField(
-                flag.Variant?.Name ?? "-", GUILayout.Width(90));
-
-            // Type
-            EditorGUILayout.LabelField(
-                ValueTypeHelper.ToApiString(flag.ValueType), GUILayout.Width(50));
+            var variantName = flag.Variant?.Name ?? "-";
+            if(variantName.Length > 15) variantName = variantName.Substring(0, 12) + "...";
+            EditorGUILayout.LabelField(new GUIContent(variantName, flag.Variant?.Name), GUILayout.Width(90));
 
             // Value (bordered box)
             var payloadStr = FormatPayload(flag.Variant?.Value);
             var valueRect = EditorGUILayout.GetControlRect(false, EditorGUIUtility.singleLineHeight, GUILayout.MinWidth(80));
             DrawDashedBorderBox(valueRect, payloadStr);
-
-            // Reason
-            var reason = string.IsNullOrEmpty(flag.Reason) ? "evaluated" : flag.Reason;
-            if (reason.Length > 20) reason = reason.Substring(0, 17) + "...";
-            EditorGUILayout.LabelField(reason, GUILayout.Width(80));
-
-            // Revision
-            EditorGUILayout.LabelField(flag.Version.ToString(), GUILayout.Width(50));
+            
+            // Type
+            EditorGUILayout.LabelField(
+                ValueTypeHelper.ToApiString(flag.ValueType), EditorStyles.miniLabel, GUILayout.Width(50));
 
             EditorGUILayout.EndHorizontal();
         }
@@ -518,35 +501,42 @@ namespace Gatrix.Unity.SDK.Editor
 
         // ==================== Events ====================
 
+        // ==================== Events ====================
+        
         private void DrawEventsTab()
         {
+            GatrixEditorStyle.BeginBox();
             EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("Event Log", _headerStyle, GUILayout.ExpandWidth(true));
+            GatrixEditorStyle.DrawSection("Event Log", "Live SDK events");
+            GUILayout.FlexibleSpace();
 
-            if (GUILayout.Button("Clear", GUILayout.Width(50)))
+            if (GUILayout.Button("Clear", GUILayout.Height(18)))
             {
                 _eventLog.Clear();
             }
 
             var listeningLabel = _isListening ? "Listening" : "Stopped";
-            if (GUILayout.Button(listeningLabel, GUILayout.Width(70)))
+            if (GUILayout.Button(listeningLabel, GUILayout.Width(70), GUILayout.Height(18)))
             {
                 if (_isListening) StopListening();
                 else StartListening();
             }
 
             EditorGUILayout.EndHorizontal();
+            GatrixEditorStyle.EndBox();
 
             EditorGUILayout.Space(4);
 
             if (_eventLog.Count == 0)
             {
-                EditorGUILayout.HelpBox(
+                GatrixEditorStyle.DrawHelpBox(
                     "No events captured yet. Start the SDK and interact with flags.",
                     MessageType.Info);
                 return;
             }
 
+            GatrixEditorStyle.BeginBox();
+            
             _eventLogScroll = EditorGUILayout.BeginScrollView(
                 _eventLogScroll, GUILayout.ExpandHeight(true));
 
@@ -563,39 +553,41 @@ namespace Gatrix.Unity.SDK.Editor
             }
 
             EditorGUILayout.EndScrollView();
+            GatrixEditorStyle.EndBox();
         }
 
         // ==================== Context ====================
 
         private void DrawContextTab()
         {
-            EditorGUILayout.LabelField("Evaluation Context", _headerStyle);
-            EditorGUILayout.Space(4);
-
             if (_cachedContext == null)
             {
-                EditorGUILayout.HelpBox("No context loaded.", MessageType.Info);
+                GatrixEditorStyle.DrawHelpBox("No context loaded.", MessageType.Info);
                 return;
             }
 
-            EditorGUILayout.LabelField("System Fields", _subHeaderStyle);
+            GatrixEditorStyle.DrawSection("System Fields");
+            GatrixEditorStyle.BeginBox();
             DrawField("AppName", _cachedContext.AppName ?? "-");
             DrawField("Environment", _cachedContext.Environment ?? "-");
+            GatrixEditorStyle.EndBox();
 
-            EditorGUILayout.Space(4);
-            EditorGUILayout.LabelField("Context Fields", _subHeaderStyle);
+            GatrixEditorStyle.DrawSection("Context Fields");
+            GatrixEditorStyle.BeginBox();
             DrawField("UserId", _cachedContext.UserId ?? "-");
             DrawField("SessionId", _cachedContext.SessionId ?? "-");
             DrawField("CurrentTime", _cachedContext.CurrentTime ?? "-");
+            GatrixEditorStyle.EndBox();
 
             if (_cachedContext.Properties != null && _cachedContext.Properties.Count > 0)
             {
-                EditorGUILayout.Space(4);
-                EditorGUILayout.LabelField("Custom Properties", _subHeaderStyle);
+                GatrixEditorStyle.DrawSection("Custom Properties");
+                GatrixEditorStyle.BeginBox();
                 foreach (var kvp in _cachedContext.Properties)
                 {
                     DrawField(kvp.Key, kvp.Value?.ToString() ?? "null");
                 }
+                GatrixEditorStyle.EndBox();
             }
         }
 
@@ -612,12 +604,13 @@ namespace Gatrix.Unity.SDK.Editor
 
             if (_cachedStats == null)
             {
-                EditorGUILayout.HelpBox("No statistics available.", MessageType.Info);
+                GatrixEditorStyle.DrawHelpBox("No statistics available.", MessageType.Info);
                 return;
             }
 
             // Timing
-            EditorGUILayout.LabelField("Timing", _subHeaderStyle);
+            GatrixEditorStyle.DrawSection("Timing");
+            GatrixEditorStyle.BeginBox();
             DrawField("Start Time", FormatTime(_cachedStats.StartTime));
             DrawField("Last Fetch", FormatTime(_cachedStats.LastFetchTime));
             DrawField("Last Update", FormatTime(_cachedStats.LastUpdateTime));
@@ -627,11 +620,11 @@ namespace Gatrix.Unity.SDK.Editor
                 DrawField("Last Recovery", FormatTime(_cachedStats.LastRecoveryTime));
             }
             DrawField("Last Stream Event", FormatTime(_cachedStats.LastStreamingEventTime));
-
-            EditorGUILayout.Space(8);
+            GatrixEditorStyle.EndBox();
 
             // Counter Summary
-            EditorGUILayout.LabelField("Counters", _subHeaderStyle);
+            GatrixEditorStyle.DrawSection("Counters");
+            GatrixEditorStyle.BeginBox();
             DrawField("Fetch Count", _cachedStats.FetchFlagsCount.ToString());
             DrawField("Updates (Changed)", _cachedStats.UpdateCount.ToString());
             DrawField("304 Not Modified", _cachedStats.NotModifiedCount.ToString());
@@ -647,12 +640,13 @@ namespace Gatrix.Unity.SDK.Editor
                 DrawField("Metrics Errors", _cachedStats.MetricsErrorCount.ToString());
                 DrawField("ETag", _cachedStats.Etag ?? "-");
             }
+            GatrixEditorStyle.EndBox();
 
             // Flag access counts
             if (_cachedStats.FlagEnabledCounts != null && _cachedStats.FlagEnabledCounts.Count > 0)
             {
-                EditorGUILayout.Space(8);
-                EditorGUILayout.LabelField("Flag Access Counts", _subHeaderStyle);
+                GatrixEditorStyle.DrawSection("Flag Access Counts");
+                GatrixEditorStyle.BeginBox();
 
                 EditorGUILayout.BeginHorizontal(EditorStyles.toolbar);
                 EditorGUILayout.LabelField("Flag", EditorStyles.miniLabel, GUILayout.MinWidth(150));
@@ -677,13 +671,14 @@ namespace Gatrix.Unity.SDK.Editor
                     }
                     EditorGUILayout.EndHorizontal();
                 }
+                GatrixEditorStyle.EndBox();
             }
 
             // Variant hit counts (Advanced only)
             if (_showAdvancedStats && _cachedStats.FlagVariantCounts != null && _cachedStats.FlagVariantCounts.Count > 0)
             {
-                EditorGUILayout.Space(8);
-                EditorGUILayout.LabelField("Variant Hit Counts", _subHeaderStyle);
+                GatrixEditorStyle.DrawSection("Variant Hit Counts");
+                GatrixEditorStyle.BeginBox();
 
                 foreach (var flagKvp in _cachedStats.FlagVariantCounts)
                 {
@@ -693,35 +688,23 @@ namespace Gatrix.Unity.SDK.Editor
                         DrawField($"    {variantKvp.Key}", variantKvp.Value.ToString());
                     }
                 }
+                GatrixEditorStyle.EndBox();
             }
 
             // Missing flags
             if (_cachedStats.MissingFlags != null && _cachedStats.MissingFlags.Count > 0)
             {
-                EditorGUILayout.Space(8);
-                EditorGUILayout.LabelField("Missing Flags (Requested but Not Found)", _subHeaderStyle);
+                GatrixEditorStyle.DrawSection("Missing Flags");
+                GatrixEditorStyle.BeginBox();
 
                 foreach (var kvp in _cachedStats.MissingFlags)
                 {
                     DrawField(kvp.Key, $"requested {kvp.Value} time(s)");
                 }
+                GatrixEditorStyle.EndBox();
             }
 
-            // Flag change times (Removed as it's integrated into Flag Access Counts)
-
-            // Watch groups
-            if (_cachedStats.ActiveWatchGroups != null && _cachedStats.ActiveWatchGroups.Count > 0)
-            {
-                EditorGUILayout.Space(8);
-                EditorGUILayout.LabelField("Active Watch Groups", _subHeaderStyle);
-
-                foreach (var name in _cachedStats.ActiveWatchGroups)
-                {
-                    EditorGUILayout.LabelField($"  • {name}");
-                }
-            }
-
-            // Event handler counts - useful for detecting leaked/duplicate listeners
+            // Event handler counts
             var client = GatrixBehaviour.Client;
             if (client != null)
             {
@@ -735,8 +718,8 @@ namespace Gatrix.Unity.SDK.Editor
                     totalCount += kvp.Value.Count;
                 }
 
-                EditorGUILayout.Space(8);
-                EditorGUILayout.LabelField($"Event Handlers (Total: {totalCount})", _subHeaderStyle);
+                GatrixEditorStyle.DrawSection($"Event Handlers (Total: {totalCount})");
+                GatrixEditorStyle.BeginBox();
 
                 if (listenerCounts.Count == 0)
                 {
@@ -769,6 +752,7 @@ namespace Gatrix.Unity.SDK.Editor
                         EditorGUILayout.EndHorizontal();
                     }
                 }
+                GatrixEditorStyle.EndBox();
             }
         }
 
