@@ -9,6 +9,7 @@ import 'events.dart';
 import 'flag_proxy.dart';
 import 'client.dart';
 import 'variation_provider.dart';
+import 'variant_source.dart';
 
 class FeaturesClient implements VariationProvider {
   final String _apiUrl;
@@ -201,7 +202,7 @@ class FeaturesClient implements VariationProvider {
     final flag = _getFlag(flagName, forceRealtime: forceRealtime);
     if (flag == null) {
       _trackFlagAccess(flagName, null, 'getVariant');
-      return missingVariant;
+      return Variant(name: VariantSource.missing, enabled: false);
     }
     _trackFlagAccess(flagName, flag, 'getVariant', flag.variant.name);
     return flag.variant;

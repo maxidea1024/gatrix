@@ -18,22 +18,19 @@ namespace Gatrix.Unity.SDK
     /// </summary>
     public class FlagProxy
     {
-        internal static readonly Variant MissingVariant = new Variant
+        /// <summary>Create a missing flag sentinel with per-flag context</summary>
+        internal static EvaluatedFlag CreateMissingFlag(string flagName)
         {
-            Name = "$missing",
-            Enabled = false,
-            Value = null
-        };
-
-        internal static readonly EvaluatedFlag MissingFlag = new EvaluatedFlag
-        {
-            Name = "",
-            Enabled = false,
-            Variant = MissingVariant,
-            ValueType = ValueType.None,
-            Version = 0,
-            ImpressionData = false
-        };
+            return new EvaluatedFlag
+            {
+                Name = flagName,
+                Enabled = false,
+                Variant = new Variant { Name = VariantSource.Missing, Enabled = false, Value = null },
+                ValueType = ValueType.None,
+                Version = 0,
+                ImpressionData = false
+            };
+        }
 
         private readonly EvaluatedFlag _flag;
         private readonly bool _exists;
@@ -43,6 +40,7 @@ namespace Gatrix.Unity.SDK
         public FlagProxy(EvaluatedFlag flag, IVariationProvider client, string flagName)
         {
             _exists = flag != null;
+            _flagName = flagName ?? flag?.Name ?? "";
             // Deep-clone for immutable snapshot safety
             _flag = flag != null
                 ? new EvaluatedFlag
@@ -57,9 +55,8 @@ namespace Gatrix.Unity.SDK
                     Reason = flag.Reason,
                     ImpressionData = flag.ImpressionData
                 }
-                : MissingFlag;
+                : CreateMissingFlag(_flagName);
             _client = client;
-            _flagName = flagName ?? _flag.Name;
         }
 
         #region Properties

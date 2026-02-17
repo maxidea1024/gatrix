@@ -18,23 +18,25 @@ from __future__ import annotations
 from typing import Any, Optional, TYPE_CHECKING
 
 from gatrix.types import (
-    MISSING_VARIANT,
     EvaluatedFlag,
     Variant,
     VariationResult,
 )
+from gatrix.variant_source import VariantSource
 
 if TYPE_CHECKING:
     from gatrix.variation_provider import VariationProvider
 
-# Null object for non-existent flags
-MISSING_FLAG = EvaluatedFlag(
-    name="",
-    enabled=False,
-    variant=MISSING_VARIANT,
-    value_type="none",
-    version=0,
-)
+
+def _create_missing_flag(flag_name: str) -> EvaluatedFlag:
+    """Create a missing flag sentinel with per-flag context."""
+    return EvaluatedFlag(
+        name=flag_name,
+        enabled=False,
+        variant=Variant(name=VariantSource.MISSING, enabled=False, value=None),
+        value_type="none",
+        version=0,
+    )
 
 
 class FlagProxy:
@@ -49,9 +51,9 @@ class FlagProxy:
         flag_name: str,
     ) -> None:
         self._exists = flag is not None
-        self._flag = flag if flag is not None else MISSING_FLAG
+        self._flag_name = flag_name or (flag.name if flag else "")
+        self._flag = flag if flag is not None else _create_missing_flag(self._flag_name)
         self._client = client
-        self._flag_name = flag_name or self._flag.name
 
     # ---------------------------------------------------------------- props
     @property

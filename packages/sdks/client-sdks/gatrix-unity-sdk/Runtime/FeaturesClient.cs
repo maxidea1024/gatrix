@@ -25,13 +25,6 @@ namespace Gatrix.Unity.SDK
         private string StorageKeySession;
         private string StorageKeyEtag;
 
-        private static readonly Variant MissingVariant = new Variant
-        {
-            Name = "$missing",
-            Enabled = false,
-            Value = null
-        };
-
         // System context fields that cannot be removed
         private static readonly HashSet<string> SystemContextFields
             = new HashSet<string> { "appName", "environment" };
@@ -549,7 +542,7 @@ namespace Gatrix.Unity.SDK
             if (flag == null)
             {
                 TrackFlagAccess(flagName, null, "getVariant");
-                return MissingVariant;
+                return new Variant { Name = VariantSource.Missing, Enabled = false };
             }
             TrackFlagAccess(flagName, flag, "getVariant", flag.Variant?.Name);
             return flag.Variant;

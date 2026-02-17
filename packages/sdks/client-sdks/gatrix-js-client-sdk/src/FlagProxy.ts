@@ -13,20 +13,18 @@
  */
 import { EvaluatedFlag, Variant, ValueType, VariationResult } from './types';
 import { VariationProvider } from './VariationProvider';
+import { VARIANT_SOURCE } from './variantSource';
 
-const MISSING_VARIANT: Variant = {
-  name: '$missing',
-  enabled: false,
-};
-
-/** Null object for non-existent flags */
-const MISSING_FLAG: EvaluatedFlag = {
-  name: '',
-  enabled: false,
-  variant: MISSING_VARIANT,
-  valueType: 'none',
-  version: 0,
-};
+/** Create a missing flag sentinel with per-flag context */
+function createMissingFlag(flagName: string): EvaluatedFlag {
+  return {
+    name: flagName,
+    enabled: false,
+    variant: { name: VARIANT_SOURCE.MISSING, enabled: false },
+    valueType: 'none',
+    version: 0,
+  };
+}
 
 export class FlagProxy {
   private flag: EvaluatedFlag;
@@ -36,15 +34,15 @@ export class FlagProxy {
 
   constructor(flag: EvaluatedFlag | undefined, client: VariationProvider, flagName?: string) {
     this._exists = flag !== undefined;
+    this._flagName = flagName ?? flag?.name ?? '';
     // Deep-clone so FlagProxy holds an immutable snapshot
     this.flag = flag
       ? {
         ...flag,
         variant: { ...flag.variant },
       }
-      : MISSING_FLAG;
+      : createMissingFlag(this._flagName);
     this.client = client;
-    this._flagName = flagName ?? this.flag.name;
   }
 
   // ==================== Properties ====================

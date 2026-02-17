@@ -20,7 +20,6 @@ from gatrix.flag_proxy import FlagProxy
 from gatrix.storage import InMemoryStorageProvider, StorageProvider
 from gatrix.types import (
     DISABLED_VARIANT,
-    MISSING_VARIANT,
     EvaluatedFlag,
     GatrixClientConfig,
     GatrixContext,
@@ -28,6 +27,7 @@ from gatrix.types import (
     Variant,
     VariationResult,
 )
+from gatrix.variant_source import VariantSource
 from gatrix.version import SDK_NAME, SDK_VERSION
 
 logger = logging.getLogger("gatrix")
@@ -379,7 +379,7 @@ class FeaturesClient:
         flag = self._lookup_flag(flag_name, force_realtime)
         if flag is None:
             self._track_flag_access(flag_name, None, "getVariant")
-            return MISSING_VARIANT
+            return Variant(name=VariantSource.MISSING, enabled=False, value=None)
         self._track_flag_access(flag_name, flag, "getVariant", flag.variant.name)
         return flag.variant
 

@@ -11,6 +11,7 @@ import { FeatureFlagTypeModel } from '../../models/FeatureFlagType';
 import { ValidationRules } from '../../models/FeatureFlag';
 import { networkTrafficService } from '../../services/NetworkTrafficService';
 import { validateFlagValue } from '../../utils/validateFlagValue';
+import { VARIANT_SOURCE } from '@gatrix/shared';
 
 const router = Router();
 
@@ -1085,9 +1086,15 @@ router.post(
             // Note: evalResult.variant structure might need update in playground response if defined locally
             // But here we are constructing a response object.
             // Let's assume we want to return 'value' and 'valueType' in the response.
+            // Determine explicit variant name based on value source
+            let variantName: string;
+            if (evalResult.enabled) {
+              variantName = valueSource === 'environment' ? VARIANT_SOURCE.ENV_DEFAULT_ENABLED : VARIANT_SOURCE.FLAG_DEFAULT_ENABLED;
+            } else {
+              variantName = valueSource === 'environment' ? VARIANT_SOURCE.ENV_DEFAULT_DISABLED : VARIANT_SOURCE.FLAG_DEFAULT_DISABLED;
+            }
             (evalResult as any).variant = {
-              name:
-                (evalResult as any).variant?.name || (evalResult.enabled ? 'default' : 'disabled'),
+              name: (evalResult as any).variant?.name || variantName,
               value: getFallbackValue(value, (flag as any).valueType),
               valueType: (flag as any).valueType || 'string',
               valueSource,
@@ -1149,14 +1156,14 @@ router.post(
         referencedFields:
           referencedFields.size > 0
             ? Array.from(referencedFields).map((name) => {
-                const fieldDef = fieldDefMap?.get(name);
-                const rules = fieldDef?.validationRules as any;
-                return {
-                  name,
-                  isRequired: rules?.isRequired === true,
-                  fieldType: (fieldDef?.fieldType as string) || 'string',
-                };
-              })
+              const fieldDef = fieldDefMap?.get(name);
+              const rules = fieldDef?.validationRules as any;
+              return {
+                name,
+                isRequired: rules?.isRequired === true,
+                fieldType: (fieldDef?.fieldType as string) || 'string',
+              };
+            })
             : undefined,
       },
     });
@@ -1218,24 +1225,19 @@ function evaluateFlagWithDetails(
       passed: false,
       message: 'Flag is disabled in this environment',
     });
+    const envDisabledValue = flag.environments?.find((e: any) => e.environment === environment)?.disabledValue;
+    const isEnvSource = envDisabledValue !== undefined;
     return {
       enabled: false,
       reason: 'FLAG_DISABLED',
       variant: {
-        name: '$disabled',
+        name: isEnvSource ? VARIANT_SOURCE.ENV_DEFAULT_DISABLED : VARIANT_SOURCE.FLAG_DEFAULT_DISABLED,
         value: getFallbackValue(
-          flag.environments?.find((e: any) => e.environment === environment)?.disabledValue ??
-            flag.disabledValue,
+          envDisabledValue ?? flag.disabledValue,
           flag.valueType
         ),
         valueType: flag.valueType || 'string',
-        valueSource:
-          flag.environments?.find((e: any) => e.environment === environment)?.disabledValue !==
-          undefined
-            ? 'environment'
-            : flag.disabledValue !== undefined
-              ? 'flag'
-              : 'default',
+        valueSource: isEnvSource ? 'environment' : 'flag',
       },
       evaluationSteps,
     };
@@ -1259,18 +1261,18 @@ function evaluateFlagWithDetails(
         : 'No strategies defined - enabled by default',
     });
     if (contextFailed) {
+      const ctxEnvDisVal = flag.environments?.find((e: any) => e.environment === environment)?.disabledValue;
       return {
         enabled: false,
         reason: 'CONTEXT_VALIDATION_FAILED',
         variant: {
-          name: '$disabled',
+          name: ctxEnvDisVal !== undefined ? VARIANT_SOURCE.ENV_DEFAULT_DISABLED : VARIANT_SOURCE.FLAG_DEFAULT_DISABLED,
           value: getFallbackValue(
-            flag.environments?.find((e: any) => e.environment === environment)?.disabledValue ??
-              flag.disabledValue,
+            ctxEnvDisVal ?? flag.disabledValue,
             flag.valueType
           ),
           valueType: flag.valueType || 'string',
-          valueSource: 'default',
+          valueSource: ctxEnvDisVal !== undefined ? 'environment' : 'flag',
         },
         evaluationSteps,
       };
@@ -1441,18 +1443,18 @@ function evaluateFlagWithDetails(
 
   // Context validation failed - return after full evaluation
   if (contextFailed) {
+    const ctxFailEnvDisVal = flag.environments?.find((e: any) => e.environment === environment)?.disabledValue;
     return {
       enabled: false,
       reason: 'CONTEXT_VALIDATION_FAILED',
       variant: {
-        name: '$disabled',
+        name: ctxFailEnvDisVal !== undefined ? VARIANT_SOURCE.ENV_DEFAULT_DISABLED : VARIANT_SOURCE.FLAG_DEFAULT_DISABLED,
         value: getFallbackValue(
-          flag.environments?.find((e: any) => e.environment === environment)?.disabledValue ??
-            flag.disabledValue,
+          ctxFailEnvDisVal ?? flag.disabledValue,
           flag.valueType
         ),
         valueType: flag.valueType || 'string',
-        valueSource: 'default',
+        valueSource: ctxFailEnvDisVal !== undefined ? 'environment' : 'flag',
       },
       evaluationSteps,
     };
@@ -1478,6 +1480,8 @@ function evaluateFlagWithDetails(
     };
   }
 
+  const noMatchEnvDisVal = flag.environments?.find((e: any) => e.environment === environment)?.disabledValue;
+  const noMatchIsEnvSource = noMatchEnvDisVal !== undefined;
   return {
     enabled: false,
     reason: 'NO_MATCHING_STRATEGY',
@@ -1487,19 +1491,10 @@ function evaluateFlagWithDetails(
     },
     evaluationSteps,
     variant: {
-      name: '$disabled',
-      value:
-        flag.environments?.find((e: any) => e.environment === environment)?.disabledValue ??
-        flag.disabledValue ??
-        null,
+      name: noMatchIsEnvSource ? VARIANT_SOURCE.ENV_DEFAULT_DISABLED : VARIANT_SOURCE.FLAG_DEFAULT_DISABLED,
+      value: noMatchEnvDisVal ?? flag.disabledValue ?? null,
       valueType: flag.valueType || 'string',
-      valueSource:
-        flag.environments?.find((e: any) => e.environment === environment)?.disabledValue !==
-        undefined
-          ? 'environment'
-          : flag.disabledValue !== undefined
-            ? 'flag'
-            : undefined,
+      valueSource: noMatchIsEnvSource ? 'environment' : 'flag',
     },
   };
 }
@@ -1790,20 +1785,20 @@ function selectVariantForFlag(
 
   if (variants.length === 0) {
     return {
-      name: '$default',
+      name: valueSource === 'environment' ? VARIANT_SOURCE.ENV_DEFAULT_ENABLED : VARIANT_SOURCE.FLAG_DEFAULT_ENABLED,
       value: getFallbackValue(resolvedEnabledValue, flag.valueType),
       valueType: flag.valueType || 'string',
-      valueSource: resolvedEnabledValue !== undefined ? valueSource : 'default',
+      valueSource,
     };
   }
 
   const totalWeight = variants.reduce((sum: number, v: any) => sum + v.weight, 0);
   if (totalWeight <= 0) {
     return {
-      name: '$default',
+      name: valueSource === 'environment' ? VARIANT_SOURCE.ENV_DEFAULT_ENABLED : VARIANT_SOURCE.FLAG_DEFAULT_ENABLED,
       value: getFallbackValue(resolvedEnabledValue, flag.valueType),
       valueType: flag.valueType || 'string',
-      valueSource: resolvedEnabledValue !== undefined ? valueSource : 'default',
+      valueSource,
     };
   }
 

@@ -1,7 +1,9 @@
 // Copyright Gatrix. All Rights Reserved.
 
 #include "GatrixFlagProxy.h"
+#include "GatrixVariantSource.h"
 #include "GatrixVariationProvider.h"
+
 
 void UGatrixFlagProxy::Initialize(const FGatrixEvaluatedFlag &InFlag,
                                   IGatrixVariationProvider *InProvider,
@@ -9,7 +11,8 @@ void UGatrixFlagProxy::Initialize(const FGatrixEvaluatedFlag &InFlag,
   check(InProvider); // Provider must not be null
   Flag = InFlag;
   FlagName = InFlagName;
-  bExists = InProvider->GetVariantInternal(InFlagName).Name != TEXT("$missing");
+  bExists = InProvider->GetVariantInternal(InFlagName).Name !=
+            GatrixVariantSource::Missing;
   Provider = InProvider;
 }
 

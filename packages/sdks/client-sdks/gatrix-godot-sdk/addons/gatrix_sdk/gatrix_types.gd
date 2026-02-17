@@ -11,20 +11,16 @@ enum ValueType { NONE, BOOLEAN, STRING, NUMBER, JSON }
 
 # Variant information from server evaluation
 class Variant:
-	var name: String = "$disabled"
+	var name: String = GatrixVariantSource.MISSING
 	var enabled: bool = false
 	var value = null  # Dynamic type: bool, string, float, Dictionary, Array, or null
 
-	func _init(p_name := "$disabled", p_enabled := false, p_value = null) -> void:
+	func _init(p_name := GatrixVariantSource.MISSING, p_enabled := false, p_value = null) -> void:
 		name = p_name
 		enabled = p_enabled
 		value = p_value
 
-	static func missing() -> Variant:
-		return Variant.new("$missing", false, null)
 
-	static func disabled() -> Variant:
-		return Variant.new("$disabled", false, null)
 
 	func to_dict() -> Dictionary:
 		return { "name": name, "enabled": enabled, "value": value }
@@ -33,15 +29,15 @@ class Variant:
 		# Support both 'value' (new) and 'payload' (legacy)
 		var val = d.get("value", d.get("payload"))
 		return Variant.new(
-			d.get("name", "$disabled"),
+			d.get("name", GatrixVariantSource.MISSING),
 			d.get("enabled", false),
 			val
 		)
 
 
 # Sentinel values
-static var MISSING_VARIANT := Variant.missing()
-static var DISABLED_VARIANT := Variant.disabled()
+static var MISSING_VARIANT := Variant.new(GatrixVariantSource.MISSING, false, null)
+static var DISABLED_VARIANT := Variant.new(GatrixVariantSource.MISSING, false, null)
 
 
 # Evaluated feature flag from the server
@@ -109,7 +105,7 @@ static func _create_missing_flag() -> EvaluatedFlag:
 	var f := EvaluatedFlag.new()
 	f.name = ""
 	f.enabled = false
-	f.variant = Variant.missing()
+	f.variant = Variant.new(GatrixVariantSource.MISSING, false, null)
 	f.value_type = ValueType.NONE
 	return f
 

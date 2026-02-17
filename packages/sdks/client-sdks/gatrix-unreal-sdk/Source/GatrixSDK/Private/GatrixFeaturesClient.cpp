@@ -905,7 +905,7 @@ void UGatrixFeaturesClient::TrackAccess(const FString &FlagName,
       }
 
       if (!VariantName.IsEmpty() && VariantName != TEXT("disabled") &&
-          VariantName != TEXT("$missing")) {
+          VariantName != GatrixVariantSource::Missing) {
         Metrics.Variants.FindOrAdd(VariantName)++;
       }
     }
@@ -1344,7 +1344,7 @@ UGatrixFeaturesClient::GetVariantInternal(const FString &FlagName,
   TrackAccess(FlagName, Found, TEXT("getVariant"),
               Found ? Found->Variant.Name : TEXT(""));
   if (!Found) {
-    return FGatrixVariant::Missing();
+    return FGatrixVariant(GatrixVariantSource::Missing, false);
   }
   return Found->Variant;
 }

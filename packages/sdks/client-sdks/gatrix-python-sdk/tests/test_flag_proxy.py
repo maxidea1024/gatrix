@@ -8,8 +8,9 @@ These tests verify:
 import pytest
 
 from gatrix.errors import GatrixFeatureError
-from gatrix.flag_proxy import FlagProxy, MISSING_FLAG
-from gatrix.types import MISSING_VARIANT, EvaluatedFlag, Variant, VariationResult
+from gatrix.flag_proxy import FlagProxy
+from gatrix.types import EvaluatedFlag, Variant, VariationResult
+from gatrix.variant_source import VariantSource
 from tests.fixtures import BOOTSTRAP_FULL, BOOTSTRAP_WITH_VARIANTS, make_flag
 
 
@@ -36,12 +37,12 @@ class MockVariationProvider:
     def get_variant_internal(self, flag_name, force_realtime=False):
         self._record("get_variant_internal", flag_name)
         f = self._get_flag(flag_name)
-        return f.variant if f else MISSING_VARIANT
+        return f.variant if f else Variant(name=VariantSource.MISSING, enabled=False, value=None)
 
     def variation_internal(self, flag_name, fallback_value, force_realtime=False):
         self._record("variation_internal", flag_name)
         f = self._get_flag(flag_name)
-        if f and f.variant.name != "$missing":
+        if f and f.variant.name != VariantSource.MISSING:
             return f.variant.name
         return fallback_value
 
@@ -212,7 +213,7 @@ class TestFlagProxyProperties:
 
     def test_variant_missing_flag(self):
         proxy, _ = _make_proxy(None)
-        assert proxy.variant == MISSING_VARIANT
+        assert proxy.variant.name == VariantSource.MISSING
 
     def test_version(self):
         proxy, _ = _make_proxy(make_flag("f", version=5))

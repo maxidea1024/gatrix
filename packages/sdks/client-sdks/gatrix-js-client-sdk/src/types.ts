@@ -212,6 +212,8 @@ export interface VariationResult<T> {
   reason: string;
   flagExists: boolean;
   enabled: boolean;
+  /** Variant name reported by the evaluation (e.g. '$type-mismatch', '$missing') */
+  variantName?: string;
 }
 
 /**

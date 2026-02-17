@@ -22,7 +22,7 @@ public:
             const std::string &flagName)
       : _provider(provider), _flagName(flagName) {
     assert(_provider != nullptr);
-    if (flag && flag->variant.name != "$missing") {
+    if (flag && flag->variant.name != VariantSourceNames::MISSING) {
       _ownedFlag = *flag; // deep copy (value types)
       _exists = true;
     } else {
@@ -43,8 +43,16 @@ public:
   const std::string &name() const { return _flagName; }
 
   const Variant &variant() const {
-    static Variant fallback = Variant::fallbackMissing();
-    return _exists ? _ownedFlag.variant : fallback;
+    if (_exists) {
+      return _ownedFlag.variant;
+    }
+    // Return inline-created missing variant (cannot include flagName in const
+    // method without mutable)
+    static thread_local Variant fallback;
+    fallback.name = VariantSourceNames::MISSING;
+    fallback.enabled = false;
+    fallback.value = "";
+    return fallback;
   }
 
   ValueType valueType() const {
