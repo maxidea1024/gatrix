@@ -113,6 +113,7 @@ import ValidationRulesEditor from '../../components/features/ValidationRulesEdit
 import { ValidationRules } from '../../services/featureFlagService';
 import { getFlagTypeIcon } from '../../utils/flagTypeIcons';
 import FlagStatusIcon from '../../components/common/FlagStatusIcon';
+import { getPlan, startPlan, pausePlan, resumePlan } from '../../services/releaseFlowService';
 
 interface FlagTypeInfo {
   flagType: string;
@@ -911,6 +912,29 @@ const FeatureFlagsPage: React.FC = () => {
         </span>,
         { variant: currentEnabled ? 'warning' : 'success' }
       );
+
+      // Auto-control release flow if one exists for this flag+environment
+      try {
+        const plan = await getPlan(flag.id, environment);
+        if (plan) {
+          if (!newEnabled && plan.status === 'active') {
+            // Environment disabled -> auto-pause
+            await pausePlan(plan.id);
+            enqueueSnackbar(t('releaseFlow.pausedSuccess'), { variant: 'info' });
+          } else if (newEnabled && plan.status === 'paused') {
+            // Environment re-enabled -> auto-resume
+            await resumePlan(plan.id);
+            enqueueSnackbar(t('releaseFlow.resumedSuccess'), { variant: 'info' });
+          } else if (newEnabled && plan.status === 'draft') {
+            // Environment enabled with draft plan -> auto-start
+            await startPlan(plan.id);
+            enqueueSnackbar(t('releaseFlow.startedSuccess'), { variant: 'success' });
+          }
+        }
+      } catch (flowError) {
+        // Release flow control is best-effort; don't fail the toggle
+        console.error('Release flow auto-control failed', flowError);
+      }
     } catch (error: any) {
       // Rollback on error
       setFlags((prev) =>
@@ -1207,11 +1231,11 @@ const FeatureFlagsPage: React.FC = () => {
       enqueueSnackbar(
         markAsStale
           ? t('featureFlags.bulkMarkStaleSuccess', {
-              count: targetFlags.length,
-            })
+            count: targetFlags.length,
+          })
           : t('featureFlags.bulkClearStaleSuccess', {
-              count: targetFlags.length,
-            }),
+            count: targetFlags.length,
+          }),
         { variant: 'success' }
       );
       setSelectedFlags(new Set());
@@ -1241,13 +1265,13 @@ const FeatureFlagsPage: React.FC = () => {
       enqueueSnackbar(
         enable
           ? t('featureFlags.bulkEnableSuccess', {
-              count: targetFlags.length,
-              env: environment,
-            })
+            count: targetFlags.length,
+            env: environment,
+          })
           : t('featureFlags.bulkDisableSuccess', {
-              count: targetFlags.length,
-              env: environment,
-            }),
+            count: targetFlags.length,
+            env: environment,
+          }),
         { variant: enable ? 'success' : 'warning' }
       );
       setSelectedFlags(new Set());
@@ -1795,32 +1819,32 @@ const FeatureFlagsPage: React.FC = () => {
                       {/* Row 2: Display name + description (when available) */}
                       {((flag.displayName && flag.displayName !== flag.flagName) ||
                         flag.description) && (
-                        <Box
-                          sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 1.5,
-                            mt: 0.25,
-                            pl: 3.5,
-                          }}
-                        >
-                          {flag.displayName && flag.displayName !== flag.flagName && (
-                            <Typography variant="body2" color="text.secondary" noWrap>
-                              {flag.displayName}
-                            </Typography>
-                          )}
-                          {flag.description && (
-                            <Typography
-                              variant="body2"
-                              color="text.disabled"
-                              noWrap
-                              sx={{ flex: 1, minWidth: 0 }}
-                            >
-                              — {flag.description}
-                            </Typography>
-                          )}
-                        </Box>
-                      )}
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 1.5,
+                              mt: 0.25,
+                              pl: 3.5,
+                            }}
+                          >
+                            {flag.displayName && flag.displayName !== flag.flagName && (
+                              <Typography variant="body2" color="text.secondary" noWrap>
+                                {flag.displayName}
+                              </Typography>
+                            )}
+                            {flag.description && (
+                              <Typography
+                                variant="body2"
+                                color="text.disabled"
+                                noWrap
+                                sx={{ flex: 1, minWidth: 0 }}
+                              >
+                                — {flag.description}
+                              </Typography>
+                            )}
+                          </Box>
+                        )}
 
                       {/* Row 3: Env switches + value info + tags + times */}
                       <Box

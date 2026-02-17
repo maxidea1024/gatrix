@@ -236,8 +236,22 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
       if (plan) {
         await deletePlan(plan.id);
       }
-      await applyTemplate({ flagId, environment: selectedEnv, templateId });
+      const newPlan = await applyTemplate({ flagId, environment: selectedEnv, templateId });
       enqueueSnackbar(t('releaseFlow.applySuccess'), { variant: 'success' });
+
+      // Auto-start the plan if the environment is already enabled
+      // (the useEffect only triggers on envEnabled *changes*, so it won't fire
+      // when a new plan is applied while the environment is already active)
+      if (envEnabled && newPlan?.id && canManage) {
+        try {
+          await startPlan(newPlan.id);
+          enqueueSnackbar(t('releaseFlow.startedSuccess'), { variant: 'success' });
+        } catch (startError) {
+          // Plan was applied successfully but auto-start failed — not critical
+          console.error('Auto-start after apply failed', startError);
+        }
+      }
+
       mutatePlan();
       if (onPlanChange) onPlanChange();
       setShowApplyDialog(false);
@@ -878,9 +892,9 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                             bgcolor:
                               status === 'active' || status === 'paused'
                                 ? (theme) =>
-                                    theme.palette.mode === 'dark'
-                                      ? 'rgba(255,255,255,0.03)'
-                                      : 'rgba(0,0,0,0.015)'
+                                  theme.palette.mode === 'dark'
+                                    ? 'rgba(255,255,255,0.03)'
+                                    : 'rgba(0,0,0,0.015)'
                                 : 'transparent',
                             cursor: 'pointer',
                             '&:hover': {
@@ -1121,9 +1135,9 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                       '&:hover':
                         !applying && !isCurrentTemplate
                           ? {
-                              borderColor: 'primary.main',
-                              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                            }
+                            borderColor: 'primary.main',
+                            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                          }
                           : {},
                     }}
                   >
