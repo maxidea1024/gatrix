@@ -24,6 +24,8 @@ namespace Gatrix.Unity.SDK
     ///   await GatrixBehaviour.InitializeAsync(config);
     /// </summary>
     [AddComponentMenu("Gatrix/Gatrix Behaviour")]
+    [DefaultExecutionOrder(-100)]
+    [DisallowMultipleComponent]
     public class GatrixBehaviour : MonoBehaviour
     {
         // ==================== Editor Fields ====================
@@ -50,6 +52,8 @@ namespace Gatrix.Unity.SDK
         [SerializeField] private SdkEventEntry _onFetchSuccess = new SdkEventEntry("flags.fetch_success");
         [SerializeField] private SdkEventEntry _onFetchError = new SdkEventEntry("flags.fetch_error");
         [SerializeField] private SdkEventEntry _onRecovered = new SdkEventEntry("flags.recovered");
+        [SerializeField] private SdkEventEntry _onFlagsSynced = new SdkEventEntry("flags.sync");
+        [SerializeField] private SdkEventEntry _onPendingSync = new SdkEventEntry("flags.pending_sync");
         [SerializeField] private SdkEventEntry _onStreamingConnected = new SdkEventEntry("flags.streaming_connected");
         [SerializeField] private SdkEventEntry _onStreamingDisconnected = new SdkEventEntry("flags.streaming_disconnected");
         [SerializeField] private SdkEventEntry _onImpression = new SdkEventEntry("flags.impression");
@@ -149,6 +153,8 @@ namespace Gatrix.Unity.SDK
             BindEvent(_onFetchSuccess);
             BindEvent(_onFetchError);
             BindEvent(_onRecovered);
+            BindEvent(_onFlagsSynced);
+            BindEvent(_onPendingSync);
             BindEvent(_onStreamingConnected);
             BindEvent(_onStreamingDisconnected);
             BindEvent(_onImpression);
@@ -166,6 +172,8 @@ namespace Gatrix.Unity.SDK
             UnbindEvent(_onFetchSuccess);
             UnbindEvent(_onFetchError);
             UnbindEvent(_onRecovered);
+            UnbindEvent(_onFlagsSynced);
+            UnbindEvent(_onPendingSync);
             UnbindEvent(_onStreamingConnected);
             UnbindEvent(_onStreamingDisconnected);
             UnbindEvent(_onImpression);

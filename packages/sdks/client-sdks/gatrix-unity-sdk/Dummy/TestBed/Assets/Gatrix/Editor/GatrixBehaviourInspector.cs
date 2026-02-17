@@ -49,20 +49,19 @@ namespace Gatrix.Unity.SDK.Editor
         {
             InitStyles();
 
-            EditorGUILayout.LabelField("Gatrix SDK", _headerStyle);
-            EditorGUILayout.Space(4);
-
+            GatrixEditorExtensions.DrawHeader("Gatrix SDK", "Unity Integration Component");
             var client = GatrixBehaviour.Client;
 
             if (client == null)
             {
-                // Draw default inspector for settings fields when not initialized
-                DrawDefaultInspector();
-
-                EditorGUILayout.Space(4);
-                EditorGUILayout.HelpBox(
-                    "SDK is not initialized. Assign a GatrixSettings asset with Auto Initialize enabled, or call GatrixBehaviour.InitializeAsync(config) from code.",
-                    MessageType.Info);
+                if (!Application.isPlaying)
+                {
+                    DrawDefaultInspector();
+                }
+                else
+                {
+                    EditorGUILayout.HelpBox("SDK is not initialized in Play Mode.", MessageType.None);
+                }
                 return;
             }
 
@@ -85,11 +84,25 @@ namespace Gatrix.Unity.SDK.Editor
             {
                 _ = client.Features.FetchFlagsAsync();
             }
-            if (GUILayout.Button("Shutdown"))
-            {
-                GatrixBehaviour.Shutdown();
-            }
             EditorGUILayout.EndHorizontal();
+
+            // Sync Flags button (only when explicit sync mode has pending changes)
+            if (client.Features.IsExplicitSync() && client.Features.HasPendingSyncFlags())
+            {
+                EditorGUILayout.Space(2);
+                var prevBg = GUI.backgroundColor;
+                GUI.backgroundColor = new Color(1f, 0.85f, 0.3f);
+                if (GUILayout.Button("⚡ Sync Flags (Pending Changes)"))
+                {
+                    _ = client.Features.SyncFlagsAsync(false);
+                    // Force Monitor window to refresh immediately
+                    if (EditorWindow.HasOpenInstances<GatrixMonitorWindow>())
+                    {
+                        EditorWindow.GetWindow<GatrixMonitorWindow>(false, null, false).ForceRefresh();
+                    }
+                }
+                GUI.backgroundColor = prevBg;
+            }
 
             EditorGUILayout.Space(8);
 

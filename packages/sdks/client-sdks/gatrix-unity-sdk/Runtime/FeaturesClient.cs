@@ -521,20 +521,25 @@ namespace Gatrix.Unity.SDK
         /// <summary>Check if a flag exists</summary>
         public bool HasFlag(string flagName) => LookupFlag(flagName) != null;
 
-        /// <summary>Create a FlagProxy. Used internally by WatchFlag, not part of public API.
+        /// <summary>Create a FlagProxy. Always reads from the appropriate cache based on explicitSyncMode.</summary>
+        public FlagProxy GetFlagProxy(string flagName, bool forceRealtime = false)
+        {
+            var flag = LookupFlag(flagName, forceRealtime);
+            return new FlagProxy(flag, this, flagName);
+        }
+
+        /// <summary>Create a FlagProxy. Used internally by WatchFlag.
         /// Always reads from realtimeFlags — watch callbacks must reflect
         /// the latest server state regardless of explicitSyncMode.</summary>
         internal FlagProxy CreateProxy(string flagName)
         {
-            var flag = LookupFlag(flagName, forceRealtime: true);
-            TrackFlagAccess(flagName, flag, "watch", flag?.Variant?.Name);
-            return new FlagProxy(flag, this, flagName);
+            return GetFlagProxy(flagName, true);
         }
 
         /// <summary>Get all flags</summary>
-        public List<EvaluatedFlag> GetAllFlags()
+        public List<EvaluatedFlag> GetAllFlags(bool forceRealtime = false)
         {
-            var flags = SelectFlags();
+            var flags = SelectFlags(forceRealtime);
             var result = new List<EvaluatedFlag>(flags.Count);
             foreach (var kvp in flags)
             {

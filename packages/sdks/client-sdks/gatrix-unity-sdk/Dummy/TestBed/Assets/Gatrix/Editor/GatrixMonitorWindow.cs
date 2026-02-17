@@ -28,6 +28,7 @@ namespace Gatrix.Unity.SDK.Editor
         private Vector2 _scrollPosition;
         private Vector2 _eventLogScroll;
         private string _flagSearchFilter = "";
+        private bool _showAdvancedStats = false;
         private bool _autoRefresh = true;
         private float _lastRefreshTime;
         private const float RefreshInterval = 1.0f;
@@ -41,7 +42,15 @@ namespace Gatrix.Unity.SDK.Editor
         // Cached data
         private FeaturesStats _cachedStats;
         private List<EvaluatedFlag> _cachedFlags;
+        private List<EvaluatedFlag> _cachedRealtimeFlags;
         private GatrixContext _cachedContext;
+        private bool _cachedExplicitSync;
+        private bool _cachedPendingSync;
+
+        // Flag change tracking
+        private Dictionary<string, FlagSnapshot> _previousFlagStates = new Dictionary<string, FlagSnapshot>();
+        private Dictionary<string, float> _changedFlagTimes = new Dictionary<string, float>();
+        private const float HighlightDuration = 3.0f;
 
         // Styles
         private GUIStyle _headerStyle;
@@ -49,6 +58,7 @@ namespace Gatrix.Unity.SDK.Editor
         private GUIStyle _statusLabelStyle;
         private GUIStyle _eventBoxStyle;
         private GUIStyle _flagNameStyle;
+        private GUIStyle _sectionBoxStyle;
         private bool _stylesInitialized;
 
         [MenuItem("Window/Gatrix/Monitor", priority = 40)]
@@ -56,6 +66,13 @@ namespace Gatrix.Unity.SDK.Editor
         {
             var window = GetWindow<GatrixMonitorWindow>("Gatrix Monitor");
             window.minSize = new Vector2(450, 350);
+        }
+
+        /// <summary>Force immediate data refresh and repaint (called externally after sync)</summary>
+        public void ForceRefresh()
+        {
+            RefreshData();
+            Repaint();
         }
 
         private void OnEnable()
@@ -82,6 +99,11 @@ namespace Gatrix.Unity.SDK.Editor
             {
                 _lastRefreshTime = Time.realtimeSinceStartup;
                 RefreshData();
+                Repaint();
+            }
+            // Repaint more frequently while highlights are fading
+            else if (_changedFlagTimes.Count > 0)
+            {
                 Repaint();
             }
         }
@@ -120,6 +142,12 @@ namespace Gatrix.Unity.SDK.Editor
             {
                 fontStyle = FontStyle.Bold
             };
+
+            _sectionBoxStyle = new GUIStyle(EditorStyles.helpBox)
+            {
+                padding = new RectOffset(6, 6, 4, 4),
+                margin = new RectOffset(0, 0, 2, 4)
+            };
         }
 
         private void OnGUI()
@@ -131,18 +159,17 @@ namespace Gatrix.Unity.SDK.Editor
 
             if (!GatrixBehaviour.IsInitialized)
             {
-                DrawNotInitialized();
+                EditorGUILayout.HelpBox("Gatrix SDK is not initialized. Please call GatrixBehaviour.InitializeAsync() or add a GatrixBehaviour to your scene.", MessageType.Warning);
+                EditorGUILayout.Space(2);
             }
-            else
+
+            switch (_currentTab)
             {
-                switch (_currentTab)
-                {
-                    case Tab.Overview: DrawOverview(); break;
-                    case Tab.Flags: DrawFlags(); break;
-                    case Tab.Events: DrawEventsTab(); break;
-                    case Tab.Context: DrawContextTab(); break;
-                    case Tab.Statistics: DrawStatistics(); break;
-                }
+                case Tab.Overview: DrawOverview(); break;
+                case Tab.Flags: DrawFlags(); break;
+                case Tab.Events: DrawEventsTab(); break;
+                case Tab.Context: DrawContextTab(); break;
+                case Tab.Statistics: DrawStatistics(); break;
             }
 
             EditorGUILayout.EndScrollView();
@@ -286,7 +313,7 @@ namespace Gatrix.Unity.SDK.Editor
             if (_cachedFlags != null)
             {
                 EditorGUILayout.LabelField(
-                    $"({_cachedFlags.Count} total)",
+                    $"({_cachedFlags.Count} flags)",
                     GUILayout.Width(80));
             }
             EditorGUILayout.EndHorizontal();
@@ -309,36 +336,113 @@ namespace Gatrix.Unity.SDK.Editor
                 return;
             }
 
-            // Table header
-            EditorGUILayout.BeginHorizontal(EditorStyles.toolbar);
-            EditorGUILayout.LabelField("Flag Name", EditorStyles.miniLabel, GUILayout.MinWidth(150));
-            EditorGUILayout.LabelField("Enabled", EditorStyles.miniLabel, GUILayout.Width(55));
-            EditorGUILayout.LabelField("Variant", EditorStyles.miniLabel, GUILayout.MinWidth(160));
-            EditorGUILayout.LabelField("Type", EditorStyles.miniLabel, GUILayout.Width(55));
-            EditorGUILayout.LabelField("Value", EditorStyles.miniLabel, GUILayout.MinWidth(100));
-            EditorGUILayout.LabelField("V", EditorStyles.miniLabel, GUILayout.Width(25));
+            var filter = _flagSearchFilter?.ToLowerInvariant() ?? "";
+
+            // Explicit sync mode: show two sections
+            if (_cachedExplicitSync)
+            {
+                DrawExplicitSyncView(filter);
+            }
+            else
+            {
+                DrawFlagTable(_cachedFlags, filter);
+            }
+        }
+
+        private void DrawExplicitSyncView(string filter)
+        {
+            // Sync control bar
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField(
+                _cachedPendingSync
+                    ? "<color=#ffcc66>● Pending changes available</color>"
+                    : "<color=#88cc88>● Synchronized</color>",
+                _statusLabelStyle, GUILayout.ExpandWidth(true));
+
+            GUI.enabled = _cachedPendingSync;
+            if (GUILayout.Button("Sync Flags", GUILayout.Width(90)))
+            {
+                var client = GatrixBehaviour.Client;
+                if (client != null)
+                {
+                    _ = client.Features.SyncFlagsAsync(false);
+                    RefreshData();
+                }
+            }
+            GUI.enabled = true;
             EditorGUILayout.EndHorizontal();
 
-            // Flag rows
-            var filter = _flagSearchFilter?.ToLowerInvariant() ?? "";
-            for (int i = 0; i < _cachedFlags.Count; i++)
+            EditorGUILayout.Space(4);
+
+            // Synchronized flags section
+            EditorGUILayout.LabelField("Synchronized Flags (Active)", _subHeaderStyle);
+            EditorGUILayout.BeginVertical(_sectionBoxStyle);
+            DrawFlagTable(_cachedFlags, filter);
+            EditorGUILayout.EndVertical();
+
+            // Realtime flags section (pending)
+            if (_cachedRealtimeFlags != null && _cachedPendingSync)
             {
-                var flag = _cachedFlags[i];
+                // Horizontal divider
+                EditorGUILayout.Space(4);
+                var dividerRect = GUILayoutUtility.GetRect(1, 1, GUILayout.ExpandWidth(true));
+                EditorGUI.DrawRect(dividerRect, new Color(0.4f, 0.4f, 0.4f, 0.6f));
+                EditorGUILayout.Space(4);
+
+                EditorGUILayout.LabelField("Realtime Flags (Pending)", _subHeaderStyle);
+                EditorGUILayout.BeginVertical(_sectionBoxStyle);
+                DrawFlagTable(_cachedRealtimeFlags, filter);
+                EditorGUILayout.EndVertical();
+            }
+        }
+
+        private void DrawFlagTable(List<EvaluatedFlag> flags, string filter)
+        {
+            // Table header
+            EditorGUILayout.BeginHorizontal(EditorStyles.toolbar);
+            EditorGUILayout.LabelField("Flag Name", EditorStyles.miniLabel, GUILayout.MinWidth(120));
+            EditorGUILayout.LabelField("ON", EditorStyles.miniLabel, GUILayout.Width(30));
+            EditorGUILayout.LabelField("Variant", EditorStyles.miniLabel, GUILayout.Width(90));
+            EditorGUILayout.LabelField("Type", EditorStyles.miniLabel, GUILayout.Width(50));
+            EditorGUILayout.LabelField("Value", EditorStyles.miniLabel, GUILayout.MinWidth(80));
+            EditorGUILayout.LabelField("Reason", EditorStyles.miniLabel, GUILayout.Width(80));
+            EditorGUILayout.LabelField("Revision", EditorStyles.miniLabel, GUILayout.Width(50));
+            EditorGUILayout.EndHorizontal();
+
+            int visibleIndex = 0;
+            for (int i = 0; i < flags.Count; i++)
+            {
+                var flag = flags[i];
                 if (!string.IsNullOrEmpty(filter) &&
                     !flag.Name.ToLowerInvariant().Contains(filter))
                 {
                     continue;
                 }
 
-                DrawFlagRow(flag, i);
+                DrawFlagRow(flag, visibleIndex);
+                visibleIndex++;
             }
         }
 
         private void DrawFlagRow(EvaluatedFlag flag, int index)
         {
-            var bgColor = index % 2 == 0
-                ? new Color(0.22f, 0.22f, 0.22f, 0.3f)
-                : Color.clear;
+            // Check if this flag was recently changed
+            bool isChanged = _changedFlagTimes.TryGetValue(flag.Name, out float changeTime);
+            float elapsed = isChanged ? (float)EditorApplication.timeSinceStartup - changeTime : HighlightDuration;
+            bool showHighlight = isChanged && elapsed < HighlightDuration;
+
+            Color bgColor;
+            if (showHighlight)
+            {
+                float alpha = Mathf.Lerp(0.35f, 0f, elapsed / HighlightDuration);
+                bgColor = new Color(1f, 0.85f, 0f, alpha);
+            }
+            else
+            {
+                bgColor = index % 2 == 0
+                    ? new Color(0.22f, 0.22f, 0.22f, 0.3f)
+                    : Color.clear;
+            }
 
             var rect = EditorGUILayout.BeginHorizontal();
             if (bgColor != Color.clear)
@@ -347,46 +451,69 @@ namespace Gatrix.Unity.SDK.Editor
             }
 
             // Flag name
-            EditorGUILayout.LabelField(flag.Name, _flagNameStyle, GUILayout.MinWidth(150));
+            EditorGUILayout.LabelField(flag.Name, _flagNameStyle, GUILayout.MinWidth(120));
 
             // Enabled
             var enabledColor = flag.Enabled ? "green" : "red";
             var enabledText = flag.Enabled ? "ON" : "OFF";
             EditorGUILayout.LabelField(
                 $"<color={enabledColor}>{enabledText}</color>",
-                _statusLabelStyle, GUILayout.Width(55));
+                _statusLabelStyle, GUILayout.Width(30));
 
             // Variant name
             EditorGUILayout.LabelField(
-                flag.Variant?.Name ?? "-", GUILayout.MinWidth(160));
+                flag.Variant?.Name ?? "-", GUILayout.Width(90));
 
             // Type
             EditorGUILayout.LabelField(
-                ValueTypeHelper.ToApiString(flag.ValueType), GUILayout.Width(55));
+                ValueTypeHelper.ToApiString(flag.ValueType), GUILayout.Width(50));
 
-            // Value
-            var payload = flag.Variant?.Value;
-            string payloadStr;
-            if (payload == null)
-            {
-                payloadStr = "-";
-            }
-            else if (payload is bool boolVal)
-            {
-                payloadStr = boolVal ? "true" : "false";
-            }
-            else
-            {
-                var str = payload.ToString();
-                payloadStr = str == "" ? "\"\"" : str;
-            }
-            if (payloadStr.Length > 50) payloadStr = payloadStr.Substring(0, 47) + "...";
-            EditorGUILayout.LabelField(payloadStr, GUILayout.MinWidth(100));
+            // Value (bordered box)
+            var payloadStr = FormatPayload(flag.Variant?.Value);
+            var valueRect = EditorGUILayout.GetControlRect(false, EditorGUIUtility.singleLineHeight, GUILayout.MinWidth(80));
+            DrawDashedBorderBox(valueRect, payloadStr);
 
-            // Version
-            EditorGUILayout.LabelField(flag.Version.ToString(), GUILayout.Width(25));
+            // Reason
+            var reason = string.IsNullOrEmpty(flag.Reason) ? "evaluated" : flag.Reason;
+            if (reason.Length > 20) reason = reason.Substring(0, 17) + "...";
+            EditorGUILayout.LabelField(reason, GUILayout.Width(80));
+
+            // Revision
+            EditorGUILayout.LabelField(flag.Version.ToString(), GUILayout.Width(50));
 
             EditorGUILayout.EndHorizontal();
+        }
+
+        private static string FormatPayload(object payload)
+        {
+            if (payload == null) return "-";
+            if (payload is bool boolVal) return boolVal ? "true" : "false";
+            var str = payload.ToString();
+            if (str == "") return "\"\"";
+            if (str.Length > 50) str = str.Substring(0, 47) + "...";
+            return str;
+        }
+
+        private static void DrawDashedBorderBox(Rect rect, string text)
+        {
+            // Background fill
+            var bgRect = new Rect(rect.x + 1, rect.y + 1, rect.width - 2, rect.height - 2);
+            EditorGUI.DrawRect(bgRect, new Color(0.15f, 0.15f, 0.15f, 0.5f));
+
+            // Solid border
+            var borderColor = new Color(0.5f, 0.5f, 0.5f, 0.6f);
+            EditorGUI.DrawRect(new Rect(rect.x, rect.y, rect.width, 1), borderColor);           // Top
+            EditorGUI.DrawRect(new Rect(rect.x, rect.yMax - 1, rect.width, 1), borderColor);    // Bottom
+            EditorGUI.DrawRect(new Rect(rect.x, rect.y, 1, rect.height), borderColor);           // Left
+            EditorGUI.DrawRect(new Rect(rect.xMax - 1, rect.y, 1, rect.height), borderColor);   // Right
+
+            // Text inside
+            var labelRect = new Rect(rect.x + 4, rect.y, rect.width - 8, rect.height);
+            var style = new GUIStyle(EditorStyles.miniLabel)
+            {
+                normal = { textColor = new Color(0.85f, 0.85f, 0.85f) }
+            };
+            GUI.Label(labelRect, text, style);
         }
 
         // ==================== Events ====================
@@ -476,7 +603,11 @@ namespace Gatrix.Unity.SDK.Editor
 
         private void DrawStatistics()
         {
+            EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("SDK Statistics", _headerStyle);
+            GUILayout.FlexibleSpace();
+            _showAdvancedStats = EditorGUILayout.ToggleLeft("Advanced View", _showAdvancedStats, GUILayout.Width(110));
+            EditorGUILayout.EndHorizontal();
             EditorGUILayout.Space(4);
 
             if (_cachedStats == null)
@@ -490,9 +621,32 @@ namespace Gatrix.Unity.SDK.Editor
             DrawField("Start Time", FormatTime(_cachedStats.StartTime));
             DrawField("Last Fetch", FormatTime(_cachedStats.LastFetchTime));
             DrawField("Last Update", FormatTime(_cachedStats.LastUpdateTime));
-            DrawField("Last Error", FormatTime(_cachedStats.LastErrorTime));
-            DrawField("Last Recovery", FormatTime(_cachedStats.LastRecoveryTime));
+            if (_showAdvancedStats || _cachedStats.ErrorCount > 0)
+            {
+                DrawField("Last Error", FormatTime(_cachedStats.LastErrorTime));
+                DrawField("Last Recovery", FormatTime(_cachedStats.LastRecoveryTime));
+            }
             DrawField("Last Stream Event", FormatTime(_cachedStats.LastStreamingEventTime));
+
+            EditorGUILayout.Space(8);
+
+            // Counter Summary
+            EditorGUILayout.LabelField("Counters", _subHeaderStyle);
+            DrawField("Fetch Count", _cachedStats.FetchFlagsCount.ToString());
+            DrawField("Updates (Changed)", _cachedStats.UpdateCount.ToString());
+            DrawField("304 Not Modified", _cachedStats.NotModifiedCount.ToString());
+            DrawField("Errors", _cachedStats.ErrorCount.ToString());
+            
+            if (_showAdvancedStats)
+            {
+                DrawField("Recoveries", _cachedStats.RecoveryCount.ToString());
+                DrawField("Sync Count", _cachedStats.SyncFlagsCount.ToString());
+                DrawField("Impression Count", _cachedStats.ImpressionCount.ToString());
+                DrawField("Context Changes", _cachedStats.ContextChangeCount.ToString());
+                DrawField("Metrics Sent", _cachedStats.MetricsSentCount.ToString());
+                DrawField("Metrics Errors", _cachedStats.MetricsErrorCount.ToString());
+                DrawField("ETag", _cachedStats.Etag ?? "-");
+            }
 
             // Flag access counts
             if (_cachedStats.FlagEnabledCounts != null && _cachedStats.FlagEnabledCounts.Count > 0)
@@ -504,6 +658,7 @@ namespace Gatrix.Unity.SDK.Editor
                 EditorGUILayout.LabelField("Flag", EditorStyles.miniLabel, GUILayout.MinWidth(150));
                 EditorGUILayout.LabelField("Enabled", EditorStyles.miniLabel, GUILayout.Width(60));
                 EditorGUILayout.LabelField("Disabled", EditorStyles.miniLabel, GUILayout.Width(60));
+                if (_showAdvancedStats) EditorGUILayout.LabelField("Last Use", EditorStyles.miniLabel, GUILayout.Width(100));
                 EditorGUILayout.EndHorizontal();
 
                 foreach (var kvp in _cachedStats.FlagEnabledCounts)
@@ -512,7 +667,31 @@ namespace Gatrix.Unity.SDK.Editor
                     EditorGUILayout.LabelField(kvp.Key, GUILayout.MinWidth(150));
                     EditorGUILayout.LabelField(kvp.Value.Yes.ToString(), GUILayout.Width(60));
                     EditorGUILayout.LabelField(kvp.Value.No.ToString(), GUILayout.Width(60));
+                    if (_showAdvancedStats)
+                    {
+                        DateTime lastChanged;
+                        string timeStr = "-";
+                        if (_cachedStats.FlagLastChangedTimes.TryGetValue(kvp.Key, out lastChanged))
+                            timeStr = FormatTime(lastChanged);
+                        EditorGUILayout.LabelField(timeStr, GUILayout.Width(100));
+                    }
                     EditorGUILayout.EndHorizontal();
+                }
+            }
+
+            // Variant hit counts (Advanced only)
+            if (_showAdvancedStats && _cachedStats.FlagVariantCounts != null && _cachedStats.FlagVariantCounts.Count > 0)
+            {
+                EditorGUILayout.Space(8);
+                EditorGUILayout.LabelField("Variant Hit Counts", _subHeaderStyle);
+
+                foreach (var flagKvp in _cachedStats.FlagVariantCounts)
+                {
+                    EditorGUILayout.LabelField($"  {flagKvp.Key}", EditorStyles.boldLabel);
+                    foreach (var variantKvp in flagKvp.Value)
+                    {
+                        DrawField($"    {variantKvp.Key}", variantKvp.Value.ToString());
+                    }
                 }
             }
 
@@ -528,17 +707,7 @@ namespace Gatrix.Unity.SDK.Editor
                 }
             }
 
-            // Flag change times
-            if (_cachedStats.FlagLastChangedTimes != null && _cachedStats.FlagLastChangedTimes.Count > 0)
-            {
-                EditorGUILayout.Space(8);
-                EditorGUILayout.LabelField("Flag Last Changed", _subHeaderStyle);
-
-                foreach (var kvp in _cachedStats.FlagLastChangedTimes)
-                {
-                    DrawField(kvp.Key, FormatTime(kvp.Value));
-                }
-            }
+            // Flag change times (Removed as it's integrated into Flag Access Counts)
 
             // Watch groups
             if (_cachedStats.ActiveWatchGroups != null && _cachedStats.ActiveWatchGroups.Count > 0)
@@ -645,8 +814,75 @@ namespace Gatrix.Unity.SDK.Editor
             if (client == null) return;
 
             _cachedStats = client.Features.GetStats();
-            _cachedFlags = client.Features.GetAllFlags();
             _cachedContext = client.Features.GetContext();
+            _cachedExplicitSync = client.Features.IsExplicitSync();
+            _cachedPendingSync = client.Features.HasPendingSyncFlags();
+
+            // In explicit sync mode, get both synchronized and realtime flags
+            var newFlags = client.Features.GetAllFlags();
+            if (_cachedExplicitSync)
+            {
+                _cachedRealtimeFlags = client.Features.GetAllFlags(forceRealtime: true);
+            }
+            else
+            {
+                _cachedRealtimeFlags = null;
+            }
+
+            // Detect changed flags by comparing with previous state
+            // Track changes from realtime flags (most up-to-date source)
+            var trackingFlags = _cachedExplicitSync && _cachedRealtimeFlags != null
+                ? _cachedRealtimeFlags : newFlags;
+
+            if (trackingFlags != null)
+            {
+                foreach (var flag in trackingFlags)
+                {
+                    if (_previousFlagStates.TryGetValue(flag.Name, out var prev))
+                    {
+                        bool changed = prev.Enabled != flag.Enabled
+                            || prev.VariantName != (flag.Variant?.Name ?? "")
+                            || prev.VariantValue != (flag.Variant?.Value?.ToString() ?? "")
+                            || prev.Version != flag.Version;
+
+                        if (changed)
+                        {
+                            _changedFlagTimes[flag.Name] = (float)EditorApplication.timeSinceStartup;
+                        }
+                    }
+
+                    // Update snapshot
+                    _previousFlagStates[flag.Name] = new FlagSnapshot
+                    {
+                        Enabled = flag.Enabled,
+                        VariantName = flag.Variant?.Name ?? "",
+                        VariantValue = flag.Variant?.Value?.ToString() ?? "",
+                        Version = flag.Version
+                    };
+                }
+
+                // Prune expired highlights
+                var now = (float)EditorApplication.timeSinceStartup;
+                var expired = new List<string>();
+                foreach (var kvp in _changedFlagTimes)
+                {
+                    if (now - kvp.Value >= HighlightDuration)
+                        expired.Add(kvp.Key);
+                }
+                foreach (var key in expired)
+                    _changedFlagTimes.Remove(key);
+            }
+
+            _cachedFlags = newFlags;
+        }
+
+        /// <summary>Lightweight snapshot for change detection</summary>
+        private struct FlagSnapshot
+        {
+            public bool Enabled;
+            public string VariantName;
+            public string VariantValue;
+            public int Version;
         }
 
         private void StartListening()

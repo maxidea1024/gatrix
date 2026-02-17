@@ -1,0 +1,27 @@
+{
+    "name": "com.gatrix.unity.sdk",
+    "version": "1.0.0",
+    "displayName": "Gatrix Unity SDK",
+    "description": "Gatrix Client SDK for Unity. Provides feature flag evaluation, context management, real-time updates, and editor monitoring tools.",
+    "unity": "2020.3",
+    "documentationUrl": "https://docs.gatrix.io/sdks/unity",
+    "keywords": [
+        "feature-flags",
+        "gatrix",
+        "sdk",
+        "feature-toggle",
+        "remote-config"
+    ],
+    "author": {
+        "name": "Gatrix",
+        "url": "https://gatrix.io"
+    },
+    "samples": [
+        {
+            "displayName": "Simplit - Feature Flag Dashboard",
+            "description": "Simple UGUI dashboard showing feature flag states, SDK stats, and real-time updates.",
+            "path": "Samples~/Simplit"
+        }
+    ],
+    "dependencies": {}
+}

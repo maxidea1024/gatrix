@@ -110,7 +110,7 @@ namespace Gatrix.Unity.SDK
             if (_started) return;
             _started = true;
 
-            LogOnMainThread($"Metrics started. interval={metricsIntervalMs}ms, initialDelay={metricsIntervalInitialMs}ms");
+            LogOnMainThread($"Metrics started. interval={metricsIntervalMs / 1000f}s, initialDelay={metricsIntervalInitialMs / 1000f}s");
             _cts = new CancellationTokenSource();
             _ = RunMetricsLoop(metricsIntervalMs, metricsIntervalInitialMs, _cts.Token);
         }

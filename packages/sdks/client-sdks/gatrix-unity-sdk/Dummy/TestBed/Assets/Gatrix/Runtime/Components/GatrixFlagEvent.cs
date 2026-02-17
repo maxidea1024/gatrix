@@ -22,6 +22,7 @@ namespace Gatrix.Unity.SDK
     {
         [Header("Flag Configuration")]
         [Tooltip("The feature flag name to watch")]
+        [GatrixFlagName]
         [SerializeField] private string _flagName;
 
         [Tooltip("Fire events on initial state (when component enables)")]

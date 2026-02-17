@@ -259,7 +259,13 @@ namespace Gatrix.Unity.SDK
         /// </para>
         /// </summary>
         /// <returns>A list of all <see cref="EvaluatedFlag"/> objects.</returns>
-        List<EvaluatedFlag> GetAllFlags();
+        List<EvaluatedFlag> GetAllFlags(bool forceRealtime = false);
+
+        /// <summary>
+        /// Get a FlagProxy for a specific flag.
+        /// Useful for manual logic or one-off checks with full metadata.
+        /// </summary>
+        FlagProxy GetFlagProxy(string flagName, bool forceRealtime = false);
 
         // ==================== Variations (Safe, with defaults) ====================
 
