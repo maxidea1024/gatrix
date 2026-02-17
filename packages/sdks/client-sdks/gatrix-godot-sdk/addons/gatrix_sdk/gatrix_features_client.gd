@@ -128,6 +128,7 @@ func has_flag(flag_name: String, force_realtime: bool = false) -> bool:
 func _create_proxy(flag_name: String) -> GatrixFlagProxy:
 	# Always read from realtimeFlags for watch/proxy
 	var flag = _lookup_flag(flag_name, true)
+	_track_flag_access(flag_name, flag, "watch", flag.variant.name if flag != null else "")
 	return GatrixFlagProxy.new(flag, self, flag_name)
 
 

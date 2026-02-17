@@ -53,6 +53,9 @@ namespace Gatrix.Unity.SDK
         [Tooltip("Cache key prefix for storage")]
         [SerializeField] private string _cacheKeyPrefix = "gatrix_cache";
 
+        [Tooltip("Track impressions for all flags")]
+        [SerializeField] private bool _impressionDataAll;
+
         // ==================== Polling Settings ====================
 
         [Header("Polling")]
@@ -74,9 +77,6 @@ namespace Gatrix.Unity.SDK
         [Tooltip("Disable metrics collection")]
         [SerializeField] private bool _disableMetrics;
 
-        [Tooltip("Track impressions for all flags")]
-        [SerializeField] private bool _impressionDataAll;
-
         [Tooltip("Initial delay before first metrics send in seconds")]
         [Range(0, 3600)]
         [SerializeField] private int _metricsIntervalInitial = 2;
@@ -97,13 +97,13 @@ namespace Gatrix.Unity.SDK
         [Range(1, 120)]
         [SerializeField] private int _fetchTimeout = 30;
 
-        [Tooltip("Initial backoff delay in ms for retries")]
-        [Range(100, 60000)]
-        [SerializeField] private int _initialBackoffMs = 1000;
+        [Tooltip("Initial backoff delay in seconds for retries")]
+        [Range(1, 60)]
+        [SerializeField] private int _initialBackoff = 1;
 
-        [Tooltip("Maximum backoff delay in ms for retries")]
-        [Range(1000, 600000)]
-        [SerializeField] private int _maxBackoffMs = 60000;
+        [Tooltip("Maximum backoff delay in seconds for retries")]
+        [Range(1, 600)]
+        [SerializeField] private int _maxBackoff = 60;
 
         // ==================== Streaming Settings ====================
 
@@ -148,8 +148,8 @@ namespace Gatrix.Unity.SDK
                     MetricsInterval = _metricsInterval,
                     FetchRetryLimit = _fetchRetryLimit,
                     FetchTimeout = _fetchTimeout,
-                    InitialBackoffMs = _initialBackoffMs,
-                    MaxBackoffMs = _maxBackoffMs,
+                    InitialBackoff = _initialBackoff,
+                    MaxBackoff = _maxBackoff,
                     Streaming = new StreamingConfig
                     {
                         Enabled = _streamingEnabled,

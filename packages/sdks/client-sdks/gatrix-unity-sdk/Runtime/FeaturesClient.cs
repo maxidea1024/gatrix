@@ -55,6 +55,7 @@ namespace Gatrix.Unity.SDK
         private bool _readyEventEmitted;
         private bool _fetchedFromServer;
         private bool _isFetchingFlags;
+        private bool _pendingInvalidation;
         private CancellationTokenSource _pollCts;
         private CancellationTokenSource _fetchCts;
         private string _etag = "";
@@ -526,6 +527,7 @@ namespace Gatrix.Unity.SDK
         internal FlagProxy CreateProxy(string flagName)
         {
             var flag = LookupFlag(flagName, forceRealtime: true);
+            TrackFlagAccess(flagName, flag, "watch", flag?.Variant?.Name);
             return new FlagProxy(flag, this, flagName);
         }
 
@@ -982,16 +984,18 @@ namespace Gatrix.Unity.SDK
 
             if (_isFetchingFlags) return;
             _isFetchingFlags = true;
-            _emitter.Emit(GatrixEvents.FlagsFetchStart);
-
-            // Cancel previous fetch
-            _fetchCts?.Cancel();
-            _fetchCts?.Dispose();
-            _fetchCts = new CancellationTokenSource();
-            var ct = _fetchCts.Token;
+            DevLog($"fetchFlags: starting fetch. etag={_etag}");
 
             try
             {
+                _emitter.Emit(GatrixEvents.FlagsFetchStart);
+
+                // Cancel previous fetch
+                _fetchCts?.Cancel();
+                _fetchCts?.Dispose();
+                _fetchCts = new CancellationTokenSource();
+                var ct = _fetchCts.Token;
+
                 _fetchFlagsCount++;
                 _lastFetchTime = DateTime.UtcNow;
 
@@ -1065,6 +1069,8 @@ namespace Gatrix.Unity.SDK
 
                 if (response == null) return;
 
+                DevLog($"fetchFlags: response received. status={(int)response.StatusCode}");
+
                 // Check for recovery
                 if (_sdkState == SdkState.Error && (int)response.StatusCode < 400)
                 {
@@ -1092,6 +1098,9 @@ namespace Gatrix.Unity.SDK
                     var json = await response.Content.ReadAsStringAsync();
                     var data = GatrixJson.DeserializeFlagsResponse(json);
 
+                    DevLog($"fetchFlags: parsed response. success={data?.Success}, flagCount={data?.Data?.Flags?.Count ?? 0}");
+
+
                     if (data != null && data.Success && data.Data?.Flags != null)
                     {
                         var isInitialFetch = !_fetchedFromServer;
@@ -1114,6 +1123,7 @@ namespace Gatrix.Unity.SDK
                 else if (response.StatusCode == HttpStatusCode.NotModified)
                 {
                     _notModifiedCount++;
+                    DevLog($"fetchFlags: 304 Not Modified (etag={_etag})");
                     if (!_fetchedFromServer)
                     {
                         _fetchedFromServer = true;
@@ -1150,7 +1160,7 @@ namespace Gatrix.Unity.SDK
             }
             catch (OperationCanceledException)
             {
-                // Cancelled - ignore
+                DevLog("fetchFlags: cancelled (timeout or shutdown)");
             }
             catch (Exception e)
             {
@@ -1171,6 +1181,14 @@ namespace Gatrix.Unity.SDK
             {
                 _isFetchingFlags = false;
                 _emitter.Emit(GatrixEvents.FlagsFetchEnd);
+
+                // If an invalidation arrived during fetch, re-fetch immediately
+                if (_pendingInvalidation)
+                {
+                    _pendingInvalidation = false;
+                    DevLog("Processing pending invalidation after fetch completed");
+                    _ = FetchFlagsAsync();
+                }
             }
         }
 
@@ -1597,13 +1615,17 @@ namespace Gatrix.Unity.SDK
         /// </summary>
         private void HandleStreamingInvalidation(List<string> changedKeys)
         {
+            // Clear ETag to force fresh data fetch (SSE already told us data changed)
+            _etag = "";
+
             if (!_isFetchingFlags)
             {
                 _ = FetchFlagsAsync();
             }
             else
             {
-                DevLog("Fetch already in progress, invalidation will be picked up on next poll");
+                _pendingInvalidation = true;
+                DevLog("Fetch in progress, marking pending invalidation for re-fetch after completion");
             }
         }
 
@@ -1652,8 +1674,8 @@ namespace Gatrix.Unity.SDK
             if (_consecutiveFailures > 0)
             {
                 var featCfg = FeaturesConfig;
-                var initialBackoff = featCfg.InitialBackoffMs;
-                var maxBackoff = featCfg.MaxBackoffMs;
+                var initialBackoff = featCfg.InitialBackoff * 1000;
+                var maxBackoff = featCfg.MaxBackoff * 1000;
                 var backoff = (int)Math.Min(
                     initialBackoff * Math.Pow(2, _consecutiveFailures - 1),
                     maxBackoff);

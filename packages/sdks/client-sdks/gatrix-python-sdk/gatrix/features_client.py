@@ -333,7 +333,8 @@ class FeaturesClient:
     # ============================================================= Flag Access
     def _create_proxy(self, flag_name: str) -> FlagProxy:
         """Create a FlagProxy backed by this client as VariationProvider."""
-        flag = self._get_flag(flag_name)
+        flag = self._lookup_flag(flag_name, force_realtime=True)
+        self._track_flag_access(flag_name, flag, "watch", flag.variant.name if flag else None)
         return FlagProxy(flag, client=self, flag_name=flag_name)
 
     # ---------------------------------------------- Metrics tracking helpers

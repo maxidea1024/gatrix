@@ -136,8 +136,10 @@ UGatrixFlagProxy *UGatrixFeaturesClient::CreateProxy(const FString &FlagName) {
 
   const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
   if (Found) {
+    TrackAccess(FlagName, Found, TEXT("watch"), Found->Variant.Name);
     Proxy->Initialize(*Found, this, FlagName);
   } else {
+    TrackAccess(FlagName, nullptr, TEXT("watch"), TEXT(""));
     FGatrixEvaluatedFlag EmptyFlag;
     EmptyFlag.Name = FlagName;
     Proxy->Initialize(EmptyFlag, this, FlagName);

@@ -65,6 +65,7 @@ export class FeaturesClient implements VariationProvider {
   private readyEventEmitted = false;
   private fetchedFromServer = false;
   private isFetchingFlags = false;
+  private pendingInvalidation = false;
   private timerRef?: ReturnType<typeof setTimeout>;
   private etag = '';
   private consecutiveFailures: number = 0;
@@ -243,7 +244,7 @@ export class FeaturesClient implements VariationProvider {
     this.pollingStopped = false;
 
     this.devLog(
-      `start() called. offlineMode=${this.config.offlineMode}, refreshInterval=${this.refreshInterval}ms, explicitSyncMode=${this.featuresConfig.explicitSyncMode}, enableStreaming=${this.featuresConfig.enableStreaming}`
+      `start() called. offlineMode=${this.config.offlineMode}, refreshInterval=${this.refreshInterval}ms, explicitSyncMode=${this.featuresConfig.explicitSyncMode}, enableStreaming=${this.featuresConfig.streaming?.enabled !== false}`
     );
 
     // Offline mode: skip all network requests, use cached/bootstrap flags only
@@ -266,7 +267,7 @@ export class FeaturesClient implements VariationProvider {
     await this.fetchFlagsInternal('init');
 
     // Start streaming if enabled (default: true)
-    if (this.featuresConfig.enableStreaming !== false) {
+    if (this.featuresConfig.streaming?.enabled !== false) {
       this.connectStreaming();
     }
 
@@ -395,6 +396,7 @@ export class FeaturesClient implements VariationProvider {
   private createProxy(flagName: string): FlagProxy {
     const flags = this.selectFlags(true); // always realtime for watch/proxy
     const flag = flags.get(flagName);
+    this.trackFlagAccess(flagName, flag, 'watch', flag?.variant?.name);
     return new FlagProxy(flag, this, flagName);
   }
 
@@ -405,7 +407,7 @@ export class FeaturesClient implements VariationProvider {
   private trackFlagAccess(
     flagName: string,
     flag: EvaluatedFlag | undefined,
-    eventType: 'isEnabled' | 'getVariant',
+    eventType: 'isEnabled' | 'getVariant' | 'watch',
     variantName?: string
   ): void {
     if (!flag) {
@@ -1145,6 +1147,13 @@ export class FeaturesClient implements VariationProvider {
       this.isFetchingFlags = false;
       this.abortController = null;
       this.emitter.emit(EVENTS.FLAGS_FETCH_END);
+
+      // If an invalidation arrived during fetch, re-fetch immediately
+      if (this.pendingInvalidation) {
+        this.pendingInvalidation = false;
+        this.devLog('Processing pending invalidation after fetch completed');
+        this.fetchFlagsInternal('pending_invalidation');
+      }
     }
   }
 
@@ -1186,7 +1195,8 @@ export class FeaturesClient implements VariationProvider {
     }
 
     // Apply jitter to prevent thundering herd
-    const jitterMs = this.featuresConfig.pollingJitterMs ?? 5000;
+    const jitterSec = this.featuresConfig.streaming?.pollingJitter ?? 5;
+    const jitterMs = jitterSec * 1000;
     if (jitterMs > 0 && this.consecutiveFailures === 0) {
       const jitter = Math.random() * jitterMs - jitterMs / 2;
       delay = Math.max(1000, delay + jitter);
@@ -1389,7 +1399,7 @@ export class FeaturesClient implements VariationProvider {
     flagName: string,
     enabled: boolean,
     flag: EvaluatedFlag | undefined,
-    eventType: 'isEnabled' | 'getVariant',
+    eventType: 'isEnabled' | 'getVariant' | 'watch',
     variantName?: string
   ): void {
     // Only track if impressionDataAll is enabled or flag has impressionData set
@@ -1472,7 +1482,7 @@ export class FeaturesClient implements VariationProvider {
     // Create abort controller for streaming
     this.streamingAbortController = new AbortController();
 
-    const streamUrl = this.featuresConfig.streamingUrl ??
+    const streamUrl = this.featuresConfig.streaming?.url ??
       `${this.config.apiUrl}/client/features/${this.config.environment}/stream`;
 
     const headers = this.buildHeaders();
@@ -1633,8 +1643,8 @@ export class FeaturesClient implements VariationProvider {
     this.streamingReconnectAttempt++;
     this.streamingReconnectCount++;
 
-    const baseMs = this.featuresConfig.streamingReconnectBaseMs ?? 1000;
-    const maxMs = this.featuresConfig.streamingReconnectMaxMs ?? 30000;
+    const baseMs = (this.featuresConfig.streaming?.reconnectBase ?? 1) * 1000;
+    const maxMs = (this.featuresConfig.streaming?.reconnectMax ?? 30) * 1000;
 
     // Exponential backoff: base * 2^(attempt-1), capped at max
     const exponentialDelay = Math.min(
@@ -1676,13 +1686,14 @@ export class FeaturesClient implements VariationProvider {
    * Deduplicates concurrent fetches for the same flag to prevent burst overhead.
    */
   private handleStreamingInvalidation(_changedKeys: string[]): void {
-    // For simplicity, trigger a full fetch since the current API returns all flags at once
-    // rather than per-key fetching. The ETag mechanism ensures only changed data is transferred.
+    // Clear ETag to force fresh data fetch (SSE already told us data changed)
+    this.etag = '';
+
     if (!this.isFetchingFlags) {
-      // Reset the ETag so we get fresh data for changed flags
       this.fetchFlagsInternal('manual');
     } else {
-      this.devLog('Fetch already in progress, invalidation will be picked up on next poll');
+      this.pendingInvalidation = true;
+      this.devLog('Fetch in progress, marking pending invalidation for re-fetch after completion');
     }
   }
 

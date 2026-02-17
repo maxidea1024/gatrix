@@ -162,6 +162,14 @@ FlagProxy FeaturesClient::createProxy(const std::string &flagName) {
   auto it = flags.find(flagName);
   const EvaluatedFlag *flag = (it != flags.end()) ? &it->second : nullptr;
 
+  if (flag) {
+    trackAccess(flagName, flag->enabled, flag->variant.name, "watch");
+    if (flag->impressionData || _config.impressionDataAll)
+      trackImpression(*flag, "watch");
+  } else {
+    _stats.missingFlags[flagName]++;
+  }
+
   return FlagProxy(flag, this, flagName);
 }
 

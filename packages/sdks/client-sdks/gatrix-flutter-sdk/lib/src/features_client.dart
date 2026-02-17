@@ -121,6 +121,7 @@ class FeaturesClient implements VariationProvider {
   /// the latest server state regardless of explicitSyncMode.
   FlagProxy _createProxy(String flagName) {
     final flag = _selectFlags(forceRealtime: true)[flagName];
+    _trackFlagAccess(flagName, flag, 'watch', flag?.variant.name);
     return FlagProxy(flag, client: this, flagName: flagName);
   }
 
