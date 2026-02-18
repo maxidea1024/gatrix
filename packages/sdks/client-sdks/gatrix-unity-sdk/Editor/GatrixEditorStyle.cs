@@ -128,75 +128,64 @@ namespace Gatrix.Unity.SDK.Editor
         /// </summary>
         public static void DrawTitleBar(string componentName, string subtitle = null, bool showLiveIndicator = true)
         {
-            var rect = EditorGUILayout.BeginHorizontal(GUILayout.Height(34));
+            // Use GetControlRect to avoid GUIClip imbalance from BeginHorizontal(GUILayout.Height)
+            float barHeight = string.IsNullOrEmpty(subtitle) ? 30f : 38f;
+            var rect = GUILayoutUtility.GetRect(0, barHeight, GUILayout.ExpandWidth(true));
 
             if (Event.current.type == EventType.Repaint)
             {
-                // Main background
-                EditorGUI.DrawRect(new Rect(rect.x - 4, rect.y, rect.width + 8, rect.height), _headerBgDark);
+                // Main background (extend to full width)
+                EditorGUI.DrawRect(new Rect(0, rect.y, rect.xMax + 4, rect.height), _headerBgDark);
                 // Blue accent bar on left
-                EditorGUI.DrawRect(new Rect(rect.x - 4, rect.y, 4, rect.height), _gatrixBlue);
+                EditorGUI.DrawRect(new Rect(0, rect.y, 4, rect.height), _gatrixBlue);
                 // Bottom border
-                EditorGUI.DrawRect(new Rect(rect.x - 4, rect.yMax - 1, rect.width + 8, 1), _gatrixBlueDim);
+                EditorGUI.DrawRect(new Rect(0, rect.yMax - 1, rect.xMax + 4, 1), _gatrixBlueDim);
             }
 
-            GUILayout.Space(8);
-
-            // Gatrix logo dot
-            var prevColor = GUI.color;
-            GUI.color = _gatrixBlue;
-            EditorGUILayout.LabelField("◆", new GUIStyle(EditorStyles.boldLabel)
+            // Diamond icon
+            var dotStyle = new GUIStyle(EditorStyles.boldLabel)
             {
                 fontSize = 10,
                 alignment = TextAnchor.MiddleCenter,
                 normal = { textColor = _gatrixBlue }
-            }, GUILayout.Width(14));
-            GUI.color = prevColor;
+            };
+            GUI.Label(new Rect(rect.x + 8, rect.y, 16, rect.height), "\u25c6", dotStyle);
 
-            GUILayout.Space(4);
+            // Title
+            var titleRect = new Rect(rect.x + 28, rect.y + (string.IsNullOrEmpty(subtitle) ? 6f : 4f), rect.width - 120, 18);
+            GUI.Label(titleRect, componentName.ToUpper(), TitleBarLabel);
 
-            // Title + subtitle
-            EditorGUILayout.BeginVertical();
-            GUILayout.Space(4);
-            EditorGUILayout.LabelField(componentName.ToUpper(), TitleBarLabel);
+            // Subtitle
             if (!string.IsNullOrEmpty(subtitle))
             {
-                EditorGUILayout.LabelField(subtitle, TitleBarSubLabel);
+                var subRect = new Rect(rect.x + 28, rect.y + 20, rect.width - 120, 14);
+                GUI.Label(subRect, subtitle, TitleBarSubLabel);
             }
-            EditorGUILayout.EndVertical();
 
-            GUILayout.FlexibleSpace();
-
-            // Live indicator
+            // LIVE indicator
             if (showLiveIndicator && Application.isPlaying && GatrixBehaviour.IsInitialized)
             {
-                EditorGUILayout.BeginVertical();
-                GUILayout.Space(8);
                 var liveStyle = new GUIStyle(EditorStyles.miniLabel)
                 {
                     fontStyle = FontStyle.Bold,
                     normal = { textColor = new Color(0.4f, 1f, 0.4f) }
                 };
-                EditorGUILayout.LabelField("● LIVE", liveStyle, GUILayout.Width(42));
-                EditorGUILayout.EndVertical();
-                GUILayout.Space(4);
+                var liveRect = new Rect(rect.xMax - 96, rect.y + (rect.height - 14) / 2f, 46, 14);
+                GUI.Label(liveRect, "\u25cf LIVE", liveStyle);
             }
 
-            // Gatrix label
-            EditorGUILayout.BeginVertical();
-            GUILayout.Space(10);
+            // GATRIX label (right side)
             var gatrixStyle = new GUIStyle(EditorStyles.miniLabel)
             {
                 normal = { textColor = new Color(0.5f, 0.6f, 0.8f) },
                 alignment = TextAnchor.MiddleRight
             };
-            EditorGUILayout.LabelField("GATRIX", gatrixStyle, GUILayout.Width(46));
-            EditorGUILayout.EndVertical();
-            GUILayout.Space(4);
+            var gatrixRect = new Rect(rect.xMax - 48, rect.y + (rect.height - 14) / 2f, 46, 14);
+            GUI.Label(gatrixRect, "GATRIX", gatrixStyle);
 
-            EditorGUILayout.EndHorizontal();
-            EditorGUILayout.Space(6);
+            EditorGUILayout.Space(4);
         }
+
 
         // ==================== Section ====================
 

@@ -172,7 +172,8 @@ namespace Gatrix.Unity.SDK.Editor
 
         private void DrawWindowTitleBar()
         {
-            var rect = EditorGUILayout.BeginHorizontal(GUILayout.Height(28));
+            // Use GetControlRect to avoid GUIClip imbalance from BeginHorizontal(GUILayout.Height)
+            var rect = GUILayoutUtility.GetRect(0, 28, GUILayout.ExpandWidth(true));
 
             if (Event.current.type == EventType.Repaint)
             {
@@ -184,52 +185,63 @@ namespace Gatrix.Unity.SDK.Editor
                 EditorGUI.DrawRect(new Rect(0, rect.yMax - 1, position.width, 1), new Color(0.1f, 0.1f, 0.1f, 1f));
             }
 
-            GUILayout.Space(10);
-
             var titleStyle = new GUIStyle(EditorStyles.boldLabel)
             {
                 fontSize = 11,
                 normal = { textColor = EditorGUIUtility.isProSkin ? new Color(0.9f, 0.9f, 0.9f) : new Color(0.1f, 0.1f, 0.1f) }
             };
-            EditorGUILayout.LabelField("◆  GATRIX MONITOR", titleStyle);
 
-            GUILayout.FlexibleSpace();
+            // Draw title text
+            var titleRect = new Rect(rect.x + 10, rect.y + 5, 200, 18);
+            GUI.Label(titleRect, "\u25c6  GATRIX MONITOR", titleStyle);
 
-            // Quick access buttons
-            if (GUILayout.Button("Setup", EditorStyles.miniButton, GUILayout.Width(44)))
+            // Quick access buttons (right-aligned)
+            var btnWidth = 44f;
+            var btnHeight = 18f;
+            var btnY = rect.y + (rect.height - btnHeight) / 2f;
+
+            var aboutRect = new Rect(rect.xMax - btnWidth - 4, btnY, btnWidth, btnHeight);
+            var setupRect = new Rect(aboutRect.x - btnWidth - 2, btnY, btnWidth, btnHeight);
+
+            if (GUI.Button(setupRect, "Setup", EditorStyles.miniButton))
             {
                 GatrixSetupWindow.ShowWindow();
             }
-            if (GUILayout.Button("About", EditorStyles.miniButton, GUILayout.Width(44)))
+            if (GUI.Button(aboutRect, "About", EditorStyles.miniButton))
             {
                 GatrixAboutWindow.ShowWindow();
             }
-            GUILayout.Space(4);
-
-            EditorGUILayout.EndHorizontal();
         }
 
         private void DrawSdkNotInitializedBanner()
         {
-            var rect = EditorGUILayout.BeginHorizontal(GUILayout.Height(28));
+            // Use GetControlRect to avoid GUIClip imbalance
+            var rect = GUILayoutUtility.GetRect(0, 26, GUILayout.ExpandWidth(true));
+
             if (Event.current.type == EventType.Repaint)
             {
                 EditorGUI.DrawRect(rect, new Color(0.5f, 0.35f, 0f, 0.35f));
             }
-            GUILayout.Space(6);
+
             var style = new GUIStyle(EditorStyles.miniLabel)
             {
                 richText = true,
-                normal = { textColor = new Color(1f, 0.85f, 0.3f) }
+                normal = { textColor = new Color(1f, 0.85f, 0.3f) },
+                clipping = TextClipping.Clip
             };
-            EditorGUILayout.LabelField("⚠  SDK not initialized — add GatrixBehaviour to your scene or call GatrixBehaviour.InitializeAsync()", style);
-            GUILayout.FlexibleSpace();
-            if (GUILayout.Button("Setup ↗", EditorStyles.miniButton, GUILayout.Width(60)))
+
+            var btnWidth = 60f;
+            var btnHeight = 18f;
+            var btnRect = new Rect(rect.xMax - btnWidth - 4, rect.y + (rect.height - btnHeight) / 2f, btnWidth, btnHeight);
+            var labelRect = new Rect(rect.x + 6, rect.y, rect.width - btnWidth - 12, rect.height);
+
+            GUI.Label(labelRect, "\u26a0  SDK not initialized \u2014 add GatrixBehaviour to scene or call GatrixBehaviour.InitializeAsync()", style);
+
+            if (GUI.Button(btnRect, "Setup \u2197", EditorStyles.miniButton))
             {
                 GatrixSetupWindow.ShowWindow();
             }
-            GUILayout.Space(4);
-            EditorGUILayout.EndHorizontal();
+
             EditorGUILayout.Space(2);
         }
 
