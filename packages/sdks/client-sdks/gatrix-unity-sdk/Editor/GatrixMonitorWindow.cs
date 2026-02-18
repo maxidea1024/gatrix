@@ -65,7 +65,7 @@ namespace Gatrix.Unity.SDK.Editor
         public static void ShowWindow()
         {
             var window = GetWindow<GatrixMonitorWindow>("Gatrix Monitor");
-            window.minSize = new Vector2(450, 350);
+            window.minSize = new Vector2(480, 380);
         }
 
         /// <summary>Force immediate data refresh and repaint (called externally after sync)</summary>
@@ -148,14 +148,14 @@ namespace Gatrix.Unity.SDK.Editor
         private void OnGUI()
         {
             InitStyles();
+            DrawWindowTitleBar();
             DrawToolbar();
 
             _scrollPosition = EditorGUILayout.BeginScrollView(_scrollPosition);
 
             if (!GatrixBehaviour.IsInitialized)
             {
-                EditorGUILayout.HelpBox("Gatrix SDK is not initialized. Please call GatrixBehaviour.InitializeAsync() or add a GatrixBehaviour to your scene.", MessageType.Warning);
-                EditorGUILayout.Space(2);
+                DrawSdkNotInitializedBanner();
             }
 
             switch (_currentTab)
@@ -170,13 +170,76 @@ namespace Gatrix.Unity.SDK.Editor
             EditorGUILayout.EndScrollView();
         }
 
+        private void DrawWindowTitleBar()
+        {
+            var rect = EditorGUILayout.BeginHorizontal(GUILayout.Height(28));
+
+            if (Event.current.type == EventType.Repaint)
+            {
+                var bgColor = EditorGUIUtility.isProSkin
+                    ? new Color(0.14f, 0.14f, 0.14f, 1f)
+                    : new Color(0.80f, 0.80f, 0.80f, 1f);
+                EditorGUI.DrawRect(new Rect(0, rect.y, position.width, 28), bgColor);
+                EditorGUI.DrawRect(new Rect(0, rect.y, 3, 28), new Color(0.18f, 0.48f, 0.92f, 1f));
+                EditorGUI.DrawRect(new Rect(0, rect.yMax - 1, position.width, 1), new Color(0.1f, 0.1f, 0.1f, 1f));
+            }
+
+            GUILayout.Space(10);
+
+            var titleStyle = new GUIStyle(EditorStyles.boldLabel)
+            {
+                fontSize = 11,
+                normal = { textColor = EditorGUIUtility.isProSkin ? new Color(0.9f, 0.9f, 0.9f) : new Color(0.1f, 0.1f, 0.1f) }
+            };
+            EditorGUILayout.LabelField("◆  GATRIX MONITOR", titleStyle);
+
+            GUILayout.FlexibleSpace();
+
+            // Quick access buttons
+            if (GUILayout.Button("Setup", EditorStyles.miniButton, GUILayout.Width(44)))
+            {
+                GatrixSetupWindow.ShowWindow();
+            }
+            if (GUILayout.Button("About", EditorStyles.miniButton, GUILayout.Width(44)))
+            {
+                GatrixAboutWindow.ShowWindow();
+            }
+            GUILayout.Space(4);
+
+            EditorGUILayout.EndHorizontal();
+        }
+
+        private void DrawSdkNotInitializedBanner()
+        {
+            var rect = EditorGUILayout.BeginHorizontal(GUILayout.Height(28));
+            if (Event.current.type == EventType.Repaint)
+            {
+                EditorGUI.DrawRect(rect, new Color(0.5f, 0.35f, 0f, 0.35f));
+            }
+            GUILayout.Space(6);
+            var style = new GUIStyle(EditorStyles.miniLabel)
+            {
+                richText = true,
+                normal = { textColor = new Color(1f, 0.85f, 0.3f) }
+            };
+            EditorGUILayout.LabelField("⚠  SDK not initialized — add GatrixBehaviour to your scene or call GatrixBehaviour.InitializeAsync()", style);
+            GUILayout.FlexibleSpace();
+            if (GUILayout.Button("Setup ↗", EditorStyles.miniButton, GUILayout.Width(60)))
+            {
+                GatrixSetupWindow.ShowWindow();
+            }
+            GUILayout.Space(4);
+            EditorGUILayout.EndHorizontal();
+            EditorGUILayout.Space(2);
+        }
+
         // ==================== Toolbar ====================
 
         private void DrawToolbar()
         {
             EditorGUILayout.BeginHorizontal(EditorStyles.toolbar);
 
-            var tabNames = new[] { "Overview", "Flags", "Events", "Context", "Statistics" };
+            var tabNames = new[] { "Overview", "Flags", "Events", "Context", "Stats" };
             for (int i = 0; i < tabNames.Length; i++)
             {
                 var isActive = (int)_currentTab == i;
@@ -188,9 +251,24 @@ namespace Gatrix.Unity.SDK.Editor
 
             GUILayout.FlexibleSpace();
 
-            _autoRefresh = GUILayout.Toggle(_autoRefresh, "Auto", EditorStyles.toolbarButton);
+            // Pending sync indicator
+            if (_cachedPendingSync)
+            {
+                var pendingStyle = new GUIStyle(EditorStyles.toolbarButton)
+                {
+                    normal = { textColor = new Color(1f, 0.85f, 0.3f) },
+                    fontStyle = FontStyle.Bold
+                };
+                if (GUILayout.Button("⚡ Sync", pendingStyle, GUILayout.Width(60)))
+                {
+                    var c = GatrixBehaviour.Client;
+                    if (c != null) _ = c.Features.SyncFlagsAsync(false);
+                }
+            }
 
-            if (GUILayout.Button("Refresh", EditorStyles.toolbarButton))
+            _autoRefresh = GUILayout.Toggle(_autoRefresh, "Auto", EditorStyles.toolbarButton, GUILayout.Width(40));
+
+            if (GUILayout.Button("↻", EditorStyles.toolbarButton, GUILayout.Width(22)))
             {
                 RefreshData();
             }
@@ -228,27 +306,55 @@ namespace Gatrix.Unity.SDK.Editor
             var client = GatrixBehaviour.Client;
             if (client == null) return;
 
+            var stats = _cachedStats;
+
+            // ── Quick Actions ──
+            EditorGUILayout.Space(4);
+            EditorGUILayout.BeginHorizontal();
+
+            if (GUILayout.Button("Force Fetch", GUILayout.Height(26)))
+            {
+                _ = client.Features.FetchFlagsAsync();
+            }
+            if (GUILayout.Button("Open Inspector", GUILayout.Height(26)))
+            {
+                // Select the GatrixBehaviour in hierarchy
+                var go = UnityEngine.Object.FindObjectOfType<GatrixBehaviour>();
+                if (go != null)
+                {
+                    UnityEditor.Selection.activeGameObject = go.gameObject;
+                    EditorGUIUtility.PingObject(go.gameObject);
+                }
+            }
+            if (GUILayout.Button("Setup Wizard", GUILayout.Height(26)))
+            {
+                GatrixSetupWindow.ShowWindow();
+            }
+
+            EditorGUILayout.EndHorizontal();
+            EditorGUILayout.Space(4);
+
+            // ── SDK Summary ──
             GatrixEditorStyle.DrawSection("SDK Summary", "Core connectivity and status");
             GatrixEditorStyle.BeginBox();
 
-            // Status
-            var stats = _cachedStats;
             DrawField("SDK Version", $"{GatrixClient.SdkName} v{GatrixClient.SdkVersion}");
-            DrawField("Connection ID", client.ConnectionId ?? "N/A");
-            DrawField("Ready", client.IsReady ? "<color=#88ff88>Yes</color>" : "<color=#ff8888>No</color>", true);
+            DrawFieldWithCopy("Connection ID", client.ConnectionId ?? "N/A");
+            DrawField("Ready", client.IsReady ? "<color=#88ff88>● Yes</color>" : "<color=#ff8888>● No</color>", true);
 
             if (stats != null)
             {
                 var stateColor = stats.SdkState == SdkState.Healthy ? "#88ff88" :
                                  stats.SdkState == SdkState.Error ? "#ff8888" : "white";
                 DrawField("State", $"<color={stateColor}>{stats.SdkState}</color>", true);
-                
-                DrawField("Offline Mode", client.Features.IsOfflineMode() ? "Yes" : "No");
+                DrawField("Offline Mode", client.Features.IsOfflineMode() ? "<color=#ffcc66>Yes</color>" : "No", true);
+                DrawField("Explicit Sync", _cachedExplicitSync ? "Yes" : "No");
                 DrawField("Total Flags", stats.TotalFlagCount.ToString());
                 DrawField("ETag", stats.Etag ?? "none");
             }
             GatrixEditorStyle.EndBox();
 
+            // ── Network Activity ──
             GatrixEditorStyle.DrawSection("Network Activity", "Communication metrics");
             GatrixEditorStyle.BeginBox();
 
@@ -268,6 +374,7 @@ namespace Gatrix.Unity.SDK.Editor
             }
             GatrixEditorStyle.EndBox();
 
+            // ── Metrics & Streaming ──
             GatrixEditorStyle.DrawSection("Metrics & Streaming", "Real-time data flow");
             GatrixEditorStyle.BeginBox();
 
@@ -276,11 +383,7 @@ namespace Gatrix.Unity.SDK.Editor
                 DrawField("Metrics Sent", stats.MetricsSentCount.ToString());
                 DrawField("Metrics Errors", stats.MetricsErrorCount.ToString());
                 DrawField("Impressions", stats.ImpressionCount.ToString());
-            }
 
-            // Streaming (SSE)
-            if (stats != null)
-            {
                 var stateColor = stats.StreamingState == StreamingConnectionState.Connected
                     ? "#88ff88"
                     : stats.StreamingState == StreamingConnectionState.Disconnected
@@ -288,11 +391,11 @@ namespace Gatrix.Unity.SDK.Editor
                         : stats.StreamingState == StreamingConnectionState.Degraded
                             ? "#ff8888"
                             : "yellow";
-                DrawField("Streaming State", $"<color={stateColor}>{stats.StreamingState}</color>", true);
+                DrawField("Streaming", $"<color={stateColor}>● {stats.StreamingState}</color>", true);
                 DrawField("Reconnections", stats.StreamingReconnectCount.ToString());
                 DrawField("Last Event", FormatTime(stats.LastStreamingEventTime));
             }
-            
+
             GatrixEditorStyle.EndBox();
         }
 
@@ -479,19 +582,38 @@ namespace Gatrix.Unity.SDK.Editor
 
         private static void DrawDashedBorderBox(Rect rect, string text)
         {
+            if (Event.current.type != EventType.Repaint)
+            {
+                // Still draw the label even during layout
+                var labelRectLayout = new Rect(rect.x + 4, rect.y, rect.width - 8, rect.height);
+                var layoutStyle = new GUIStyle(EditorStyles.miniLabel)
+                {
+                    normal = { textColor = new Color(0.85f, 0.85f, 0.85f) }
+                };
+                GUI.Label(labelRectLayout, text, layoutStyle);
+                return;
+            }
+
+            // Clamp to avoid overflow
+            var clampedRect = new Rect(
+                rect.x,
+                rect.y,
+                Mathf.Max(0, rect.width - 1),
+                rect.height);
+
             // Background fill
-            var bgRect = new Rect(rect.x + 1, rect.y + 1, rect.width - 2, rect.height - 2);
+            var bgRect = new Rect(clampedRect.x + 1, clampedRect.y + 1, clampedRect.width - 2, clampedRect.height - 2);
             EditorGUI.DrawRect(bgRect, new Color(0.15f, 0.15f, 0.15f, 0.5f));
 
             // Solid border
             var borderColor = new Color(0.5f, 0.5f, 0.5f, 0.6f);
-            EditorGUI.DrawRect(new Rect(rect.x, rect.y, rect.width, 1), borderColor);           // Top
-            EditorGUI.DrawRect(new Rect(rect.x, rect.yMax - 1, rect.width, 1), borderColor);    // Bottom
-            EditorGUI.DrawRect(new Rect(rect.x, rect.y, 1, rect.height), borderColor);           // Left
-            EditorGUI.DrawRect(new Rect(rect.xMax - 1, rect.y, 1, rect.height), borderColor);   // Right
+            EditorGUI.DrawRect(new Rect(clampedRect.x, clampedRect.y, clampedRect.width, 1), borderColor);
+            EditorGUI.DrawRect(new Rect(clampedRect.x, clampedRect.yMax - 1, clampedRect.width, 1), borderColor);
+            EditorGUI.DrawRect(new Rect(clampedRect.x, clampedRect.y, 1, clampedRect.height), borderColor);
+            EditorGUI.DrawRect(new Rect(clampedRect.xMax - 1, clampedRect.y, 1, clampedRect.height), borderColor);
 
             // Text inside
-            var labelRect = new Rect(rect.x + 4, rect.y, rect.width - 8, rect.height);
+            var labelRect = new Rect(clampedRect.x + 4, clampedRect.y, clampedRect.width - 8, clampedRect.height);
             var style = new GUIStyle(EditorStyles.miniLabel)
             {
                 normal = { textColor = new Color(0.85f, 0.85f, 0.85f) }
@@ -501,44 +623,55 @@ namespace Gatrix.Unity.SDK.Editor
 
         // ==================== Events ====================
 
-        // ==================== Events ====================
-        
         private void DrawEventsTab()
         {
-            GatrixEditorStyle.BeginBox();
-            EditorGUILayout.BeginHorizontal();
-            GatrixEditorStyle.DrawSection("Event Log", "Live SDK events");
+            // Control bar
+            EditorGUILayout.BeginHorizontal(EditorStyles.toolbar);
+            EditorGUILayout.LabelField(
+                $"Event Log  <color=#888888>({_eventLog.Count}/{MaxEventLogEntries})</color>",
+                new GUIStyle(EditorStyles.toolbarButton) { richText = true, alignment = TextAnchor.MiddleLeft },
+                GUILayout.ExpandWidth(true));
             GUILayout.FlexibleSpace();
 
-            if (GUILayout.Button("Clear", GUILayout.Height(18)))
+            if (GUILayout.Button("Clear", EditorStyles.toolbarButton, GUILayout.Width(44)))
             {
                 _eventLog.Clear();
             }
 
-            var listeningLabel = _isListening ? "Listening" : "Stopped";
-            if (GUILayout.Button(listeningLabel, GUILayout.Width(70), GUILayout.Height(18)))
+            var listeningLabel = _isListening ? "● Listening" : "○ Stopped";
+            var listeningColor = _isListening ? new Color(0.4f, 1f, 0.4f) : new Color(0.7f, 0.7f, 0.7f);
+            var listeningStyle = new GUIStyle(EditorStyles.toolbarButton)
+            {
+                normal = { textColor = listeningColor },
+                fontStyle = FontStyle.Bold
+            };
+            if (GUILayout.Button(listeningLabel, listeningStyle, GUILayout.Width(80)))
             {
                 if (_isListening) StopListening();
                 else StartListening();
             }
-
             EditorGUILayout.EndHorizontal();
-            GatrixEditorStyle.EndBox();
 
-            EditorGUILayout.Space(4);
+            EditorGUILayout.Space(2);
 
             if (_eventLog.Count == 0)
             {
-                GatrixEditorStyle.DrawHelpBox(
-                    "No events captured yet. Start the SDK and interact with flags.",
-                    MessageType.Info);
+                EditorGUILayout.Space(20);
+                EditorGUILayout.BeginHorizontal();
+                GUILayout.FlexibleSpace();
+                EditorGUILayout.LabelField("No events captured yet.", EditorStyles.centeredGreyMiniLabel, GUILayout.Width(200));
+                GUILayout.FlexibleSpace();
+                EditorGUILayout.EndHorizontal();
+                EditorGUILayout.Space(4);
+                EditorGUILayout.BeginHorizontal();
+                GUILayout.FlexibleSpace();
+                EditorGUILayout.LabelField("Start the SDK and interact with flags.", EditorStyles.centeredGreyMiniLabel, GUILayout.Width(250));
+                GUILayout.FlexibleSpace();
+                EditorGUILayout.EndHorizontal();
                 return;
             }
 
-            GatrixEditorStyle.BeginBox();
-            
-            _eventLogScroll = EditorGUILayout.BeginScrollView(
-                _eventLogScroll, GUILayout.ExpandHeight(true));
+            _eventLogScroll = EditorGUILayout.BeginScrollView(_eventLogScroll, GUILayout.ExpandHeight(true));
 
             // Draw events in reverse (newest first)
             for (int i = _eventLog.Count - 1; i >= 0; i--)
@@ -553,7 +686,6 @@ namespace Gatrix.Unity.SDK.Editor
             }
 
             EditorGUILayout.EndScrollView();
-            GatrixEditorStyle.EndBox();
         }
 
         // ==================== Context ====================
@@ -769,6 +901,18 @@ namespace Gatrix.Unity.SDK.Editor
             else
             {
                 EditorGUILayout.LabelField(value);
+            }
+            EditorGUILayout.EndHorizontal();
+        }
+
+        private void DrawFieldWithCopy(string label, string value)
+        {
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField(label, GUILayout.Width(150));
+            EditorGUILayout.LabelField(value);
+            if (GUILayout.Button("Copy", EditorStyles.miniButton, GUILayout.Width(40)))
+            {
+                GUIUtility.systemCopyBuffer = value;
             }
             EditorGUILayout.EndHorizontal();
         }

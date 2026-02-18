@@ -319,5 +319,202 @@ namespace Gatrix.Unity.SDK.Editor
             serializedObject.ApplyModifiedProperties();
         }
     }
+
+    // ==========================================
+    // FLAG AUDIO EDITOR
+    // ==========================================
+    [CustomEditor(typeof(GatrixFlagAudio))]
+    public class GatrixFlagAudioEditor : UnityEditor.Editor
+    {
+        public override void OnInspectorGUI()
+        {
+            serializedObject.Update();
+            GatrixEditorExtensions.DrawHeader("Flag Audio", "Play AudioClips via Feature Flags");
+
+            GatrixEditorExtensions.BeginGroup("Configuration");
+            var flagName = serializedObject.FindProperty("_flagName");
+            EditorGUILayout.PropertyField(flagName);
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("_mode"));
+            GatrixEditorExtensions.DrawFlagStatus(flagName.stringValue);
+            GatrixEditorExtensions.EndGroup();
+
+            var mode = serializedObject.FindProperty("_mode");
+            if (mode.enumValueIndex == 0) // ByState
+            {
+                GatrixEditorExtensions.BeginGroup("State Clips");
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("_enabledClip"));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("_disabledClip"));
+                GatrixEditorExtensions.EndGroup();
+            }
+            else
+            {
+                GatrixEditorExtensions.BeginGroup("Variant Clips");
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("_variantClips"), true);
+                GatrixEditorExtensions.EndGroup();
+            }
+
+            GatrixEditorExtensions.BeginGroup("Options");
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("_playOnChange"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("_loop"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("_volume"));
+            GatrixEditorExtensions.EndGroup();
+
+            serializedObject.ApplyModifiedProperties();
+        }
+    }
+
+    // ==========================================
+    // FLAG ANIMATOR EDITOR
+    // ==========================================
+    [CustomEditor(typeof(GatrixFlagAnimator))]
+    public class GatrixFlagAnimatorEditor : UnityEditor.Editor
+    {
+        public override void OnInspectorGUI()
+        {
+            serializedObject.Update();
+            GatrixEditorExtensions.DrawHeader("Flag Animator", "Control Animator Parameters via Flags");
+
+            GatrixEditorExtensions.BeginGroup("Configuration");
+            var flagName = serializedObject.FindProperty("_flagName");
+            EditorGUILayout.PropertyField(flagName);
+            GatrixEditorExtensions.DrawFlagStatus(flagName.stringValue);
+            GatrixEditorExtensions.EndGroup();
+
+            GatrixEditorExtensions.BeginGroup("Bool Parameter");
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("_boolParameter"));
+            GatrixEditorExtensions.EndGroup();
+
+            GatrixEditorExtensions.BeginGroup("Trigger Parameters");
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("_enabledTrigger"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("_disabledTrigger"));
+            GatrixEditorExtensions.EndGroup();
+
+            GatrixEditorExtensions.BeginGroup("Variant → Int Parameter");
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("_variantIntParameter"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("_variantIntMap"), true);
+            GatrixEditorExtensions.EndGroup();
+
+            serializedObject.ApplyModifiedProperties();
+        }
+    }
+
+    // ==========================================
+    // FLAG PARTICLES EDITOR
+    // ==========================================
+    [CustomEditor(typeof(GatrixFlagParticles))]
+    public class GatrixFlagParticlesEditor : UnityEditor.Editor
+    {
+        public override void OnInspectorGUI()
+        {
+            serializedObject.Update();
+            GatrixEditorExtensions.DrawHeader("Flag Particles", "Control ParticleSystem via Feature Flags");
+
+            GatrixEditorExtensions.BeginGroup("Configuration");
+            var flagName = serializedObject.FindProperty("_flagName");
+            EditorGUILayout.PropertyField(flagName);
+            GatrixEditorExtensions.DrawFlagStatus(flagName.stringValue);
+            GatrixEditorExtensions.EndGroup();
+
+            GatrixEditorExtensions.BeginGroup("Behavior");
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("_onEnabled"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("_onDisabled"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("_withChildren"));
+            GatrixEditorExtensions.EndGroup();
+
+            serializedObject.ApplyModifiedProperties();
+        }
+    }
+
+    // ==========================================
+    // FLAG COLOR EDITOR
+    // ==========================================
+    [CustomEditor(typeof(GatrixFlagColor))]
+    public class GatrixFlagColorEditor : UnityEditor.Editor
+    {
+        public override void OnInspectorGUI()
+        {
+            serializedObject.Update();
+            GatrixEditorExtensions.DrawHeader("Flag Color", "Tint Graphics/Renderers via Feature Flags");
+
+            GatrixEditorExtensions.BeginGroup("Configuration");
+            var flagName = serializedObject.FindProperty("_flagName");
+            EditorGUILayout.PropertyField(flagName);
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("_mode"));
+            GatrixEditorExtensions.DrawFlagStatus(flagName.stringValue);
+            GatrixEditorExtensions.EndGroup();
+
+            var mode = serializedObject.FindProperty("_mode");
+            if (mode.enumValueIndex == 0) // ByState
+            {
+                GatrixEditorExtensions.BeginGroup("State Colors");
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("_enabledColor"));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("_disabledColor"));
+                GatrixEditorExtensions.EndGroup();
+            }
+            else
+            {
+                GatrixEditorExtensions.BeginGroup("Variant Colors");
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("_variantColors"), true);
+                GatrixEditorExtensions.EndGroup();
+            }
+
+            GatrixEditorExtensions.BeginGroup("Transition");
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("_animate"));
+            if (serializedObject.FindProperty("_animate").boolValue)
+            {
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("_lerpSpeed"));
+            }
+            GatrixEditorExtensions.EndGroup();
+
+            GatrixEditorExtensions.BeginGroup("Targets");
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("_graphic"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("_renderer"));
+            GatrixEditorExtensions.EndGroup();
+
+            serializedObject.ApplyModifiedProperties();
+        }
+    }
+
+    // ==========================================
+    // FLAG CANVAS EDITOR
+    // ==========================================
+    [CustomEditor(typeof(GatrixFlagCanvas))]
+    public class GatrixFlagCanvasEditor : UnityEditor.Editor
+    {
+        public override void OnInspectorGUI()
+        {
+            serializedObject.Update();
+            GatrixEditorExtensions.DrawHeader("Flag Canvas", "Control CanvasGroup visibility via Flags");
+
+            GatrixEditorExtensions.BeginGroup("Configuration");
+            var flagName = serializedObject.FindProperty("_flagName");
+            EditorGUILayout.PropertyField(flagName);
+            GatrixEditorExtensions.DrawFlagStatus(flagName.stringValue);
+            GatrixEditorExtensions.EndGroup();
+
+            GatrixEditorExtensions.BeginGroup("Enabled State");
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("_enabledAlpha"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("_enabledInteractable"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("_enabledBlocksRaycasts"));
+            GatrixEditorExtensions.EndGroup();
+
+            GatrixEditorExtensions.BeginGroup("Disabled State");
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("_disabledAlpha"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("_disabledInteractable"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("_disabledBlocksRaycasts"));
+            GatrixEditorExtensions.EndGroup();
+
+            GatrixEditorExtensions.BeginGroup("Transition");
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("_animate"));
+            if (serializedObject.FindProperty("_animate").boolValue)
+            {
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("_fadeSpeed"));
+            }
+            GatrixEditorExtensions.EndGroup();
+
+            serializedObject.ApplyModifiedProperties();
+        }
+    }
 }
 #endif
+

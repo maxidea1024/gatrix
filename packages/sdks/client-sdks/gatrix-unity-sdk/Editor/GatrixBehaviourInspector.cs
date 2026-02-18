@@ -46,9 +46,9 @@ namespace Gatrix.Unity.SDK.Editor
         {
             InitStyles();
 
-            // Header
-            GatrixEditorStyle.DrawSection("Gatrix SDK", "Unity Integration Component");
-            
+            // Feel-style title bar
+            GatrixEditorStyle.DrawTitleBar("Gatrix Behaviour", "Feature Flag SDK Entry Point");
+
             var client = GatrixBehaviour.Client;
 
             if (client == null)
@@ -58,6 +58,11 @@ namespace Gatrix.Unity.SDK.Editor
                     DrawDefaultInspector();
                     EditorGUILayout.Space(10);
                     GatrixEditorStyle.DrawHelpBox("SDK will initialize automatically in Play Mode.", MessageType.Info);
+                    EditorGUILayout.Space(4);
+                    if (GUILayout.Button("Open Setup Wizard", GUILayout.Height(28)))
+                    {
+                        GatrixSetupWindow.ShowWindow();
+                    }
                 }
                 else
                 {
@@ -65,6 +70,7 @@ namespace Gatrix.Unity.SDK.Editor
                 }
                 return;
             }
+
 
             // Status Box
             GatrixEditorStyle.BeginBox();
