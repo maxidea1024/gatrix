@@ -134,12 +134,13 @@ namespace Gatrix.Unity.SDK.Editor
 
             if (Event.current.type == EventType.Repaint)
             {
-                // Main background (extend to full width)
-                EditorGUI.DrawRect(new Rect(0, rect.y, rect.xMax + 4, rect.height), _headerBgDark);
+                float fullWidth = EditorGUIUtility.currentViewWidth;
+                // Main background (extend to full window width)
+                EditorGUI.DrawRect(new Rect(0, rect.y, fullWidth, rect.height), _headerBgDark);
                 // Blue accent bar on left
                 EditorGUI.DrawRect(new Rect(0, rect.y, 4, rect.height), _gatrixBlue);
                 // Bottom border
-                EditorGUI.DrawRect(new Rect(0, rect.yMax - 1, rect.xMax + 4, 1), _gatrixBlueDim);
+                EditorGUI.DrawRect(new Rect(0, rect.yMax - 1, fullWidth, 1), _gatrixBlueDim);
             }
 
             // Diamond icon
@@ -248,11 +249,93 @@ namespace Gatrix.Unity.SDK.Editor
         // ==================== Help Box ====================
 
         /// <summary>
-        /// Draws a help box with a cleaner look.
+        /// Draws a styled help/info/warning box with correct text color in both dark and light themes.
+        /// Replaces EditorGUILayout.HelpBox which renders black text in dark theme.
         /// </summary>
-        public static void DrawHelpBox(string message, MessageType type)
+        public static void DrawHelpBox(string message, MessageType type = MessageType.None)
         {
-            EditorGUILayout.HelpBox(message, type);
+            // Icon and colors per message type
+            string icon;
+            Color bgColor;
+            Color borderColor;
+            Color textColor;
+
+            bool isDark = EditorGUIUtility.isProSkin;
+
+            switch (type)
+            {
+                case MessageType.Warning:
+                    icon = "\u26a0";  // ⚠
+                    bgColor    = isDark ? new Color(0.45f, 0.35f, 0f, 0.45f)   : new Color(1f, 0.95f, 0.7f, 1f);
+                    borderColor = isDark ? new Color(0.8f, 0.65f, 0f, 0.6f)    : new Color(0.8f, 0.65f, 0f, 0.8f);
+                    textColor  = isDark ? new Color(1f, 0.88f, 0.4f)            : new Color(0.4f, 0.3f, 0f);
+                    break;
+                case MessageType.Error:
+                    icon = "\u2716";  // ✖
+                    bgColor    = isDark ? new Color(0.5f, 0.1f, 0.1f, 0.45f)   : new Color(1f, 0.85f, 0.85f, 1f);
+                    borderColor = isDark ? new Color(0.9f, 0.3f, 0.3f, 0.6f)   : new Color(0.8f, 0.2f, 0.2f, 0.8f);
+                    textColor  = isDark ? new Color(1f, 0.55f, 0.55f)           : new Color(0.5f, 0.05f, 0.05f);
+                    break;
+                case MessageType.Info:
+                    icon = "\u2139";  // ℹ
+                    bgColor    = isDark ? new Color(0.1f, 0.25f, 0.45f, 0.45f) : new Color(0.85f, 0.93f, 1f, 1f);
+                    borderColor = isDark ? new Color(0.2f, 0.5f, 0.9f, 0.5f)   : new Color(0.2f, 0.5f, 0.9f, 0.6f);
+                    textColor  = isDark ? new Color(0.75f, 0.88f, 1f)           : new Color(0.05f, 0.2f, 0.45f);
+                    break;
+                default:
+                    icon = "\u2022";  // •
+                    bgColor    = isDark ? new Color(0.2f, 0.2f, 0.2f, 0.4f)    : new Color(0.9f, 0.9f, 0.9f, 1f);
+                    borderColor = isDark ? new Color(0.4f, 0.4f, 0.4f, 0.5f)   : new Color(0.6f, 0.6f, 0.6f, 0.6f);
+                    textColor  = isDark ? new Color(0.85f, 0.85f, 0.85f)        : new Color(0.15f, 0.15f, 0.15f);
+                    break;
+            }
+
+            var textStyle = new GUIStyle(EditorStyles.wordWrappedLabel)
+            {
+                fontSize = 11,
+                richText = false,
+                wordWrap = true,
+                normal = { textColor = textColor },
+                padding = new RectOffset(0, 0, 0, 0),
+                margin  = new RectOffset(0, 0, 0, 0),
+            };
+
+            var iconStyle = new GUIStyle(EditorStyles.boldLabel)
+            {
+                fontSize = 13,
+                alignment = TextAnchor.UpperCenter,
+                normal = { textColor = textColor },
+                padding = new RectOffset(0, 0, 0, 0),
+                margin  = new RectOffset(0, 0, 0, 0),
+            };
+
+            // Measure height needed
+            float textWidth = EditorGUIUtility.currentViewWidth - 52f; // account for icon + padding
+            float textHeight = textStyle.CalcHeight(new GUIContent(message), textWidth);
+            float boxHeight = Mathf.Max(28f, textHeight + 12f);
+
+            var boxRect = GUILayoutUtility.GetRect(0, boxHeight, GUILayout.ExpandWidth(true));
+
+            if (Event.current.type == EventType.Repaint)
+            {
+                // Background
+                EditorGUI.DrawRect(boxRect, bgColor);
+                // Border (top, bottom, left, right)
+                EditorGUI.DrawRect(new Rect(boxRect.x, boxRect.y, boxRect.width, 1), borderColor);
+                EditorGUI.DrawRect(new Rect(boxRect.x, boxRect.yMax - 1, boxRect.width, 1), borderColor);
+                EditorGUI.DrawRect(new Rect(boxRect.x, boxRect.y, 1, boxRect.height), borderColor);
+                EditorGUI.DrawRect(new Rect(boxRect.xMax - 1, boxRect.y, 1, boxRect.height), borderColor);
+            }
+
+            // Icon
+            var iconRect = new Rect(boxRect.x + 6, boxRect.y + 6, 18, 18);
+            GUI.Label(iconRect, icon, iconStyle);
+
+            // Message text
+            var msgRect = new Rect(boxRect.x + 28, boxRect.y + 6, boxRect.width - 34, boxHeight - 12);
+            GUI.Label(msgRect, message, textStyle);
+
+            EditorGUILayout.Space(2);
         }
     }
 }

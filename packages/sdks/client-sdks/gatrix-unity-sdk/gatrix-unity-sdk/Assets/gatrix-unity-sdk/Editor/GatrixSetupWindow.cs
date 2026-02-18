@@ -162,7 +162,7 @@ namespace Gatrix.Unity.SDK.Editor
 
             if (!hasRequired)
             {
-                EditorGUILayout.HelpBox("All required fields must be filled.", MessageType.Warning);
+                GatrixEditorStyle.DrawHelpBox("All required fields must be filled.", MessageType.Warning);
             }
 
             DrawSeparator();
@@ -223,7 +223,7 @@ namespace Gatrix.Unity.SDK.Editor
 
             if (existing != null)
             {
-                EditorGUILayout.HelpBox(
+                GatrixEditorStyle.DrawHelpBox(
                     $"GatrixBehaviour found on \"{existing.gameObject.name}\".",
                     MessageType.Info);
 

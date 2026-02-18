@@ -177,12 +177,13 @@ namespace Gatrix.Unity.SDK.Editor
 
             if (Event.current.type == EventType.Repaint)
             {
+                float fullWidth = EditorGUIUtility.currentViewWidth;
                 var bgColor = EditorGUIUtility.isProSkin
                     ? new Color(0.14f, 0.14f, 0.14f, 1f)
                     : new Color(0.80f, 0.80f, 0.80f, 1f);
-                EditorGUI.DrawRect(new Rect(0, rect.y, position.width, 28), bgColor);
+                EditorGUI.DrawRect(new Rect(0, rect.y, fullWidth, 28), bgColor);
                 EditorGUI.DrawRect(new Rect(0, rect.y, 3, 28), new Color(0.18f, 0.48f, 0.92f, 1f));
-                EditorGUI.DrawRect(new Rect(0, rect.yMax - 1, position.width, 1), new Color(0.1f, 0.1f, 0.1f, 1f));
+                EditorGUI.DrawRect(new Rect(0, rect.yMax - 1, fullWidth, 1), new Color(0.1f, 0.1f, 0.1f, 1f));
             }
 
             var titleStyle = new GUIStyle(EditorStyles.boldLabel)
