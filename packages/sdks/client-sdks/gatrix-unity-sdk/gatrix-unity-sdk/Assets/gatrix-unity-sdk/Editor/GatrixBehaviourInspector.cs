@@ -1,5 +1,5 @@
 // GatrixBehaviourInspector - Custom inspector for GatrixBehaviour
-// Shows SDK status and controls in the Inspector panel
+// Emerald AI-inspired: color-coded sections, bold headers, clean table layout
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -9,34 +9,56 @@ namespace Gatrix.Unity.SDK.Editor
 {
     /// <summary>
     /// Custom inspector for GatrixBehaviour showing live SDK state.
-    /// Uses table-style layout for aligned display of labels and values.
+    /// Emerald AI-inspired layout: color-coded sections, bold headers, clean table rows.
     /// </summary>
     [CustomEditor(typeof(GatrixBehaviour))]
     public class GatrixBehaviourInspector : UnityEditor.Editor
     {
-        private bool _showFlags = true;
+        private bool _showFlags   = true;
         private bool _showContext = true;
-        private bool _showStats = true;
+        private bool _showStats   = true;
 
-        // Column widths for table-style alignment
-        private const float LabelWidth = 120f;
-        private const float FlagStateWidth = 40f;
-        private const float FlagNameWidth = 140f;
+        private const float LabelWidth   = 120f;
+        private const float FlagStateWidth = 36f;
+        private const float FlagNameWidth  = 150f;
 
         private bool _stylesInitialized;
-        private GUIStyle _richLabelStyle;
-        private GUIStyle _valueLabelStyle;
+        private GUIStyle _richLabel;
+        private GUIStyle _monoLabel;
+        private GUIStyle _tableRowLabel;
+        private GUIStyle _flagOnStyle;
+        private GUIStyle _flagOffStyle;
 
         private void InitStyles()
         {
             if (_stylesInitialized) return;
 
-            _richLabelStyle = new GUIStyle(EditorStyles.label) { richText = true };
+            _richLabel = new GUIStyle(EditorStyles.label) { richText = true };
 
-            _valueLabelStyle = new GUIStyle(EditorStyles.label)
+            _monoLabel = new GUIStyle(EditorStyles.label)
             {
-                fontStyle = FontStyle.Normal,
+                fontSize = 10,
+                normal   = { textColor = EditorGUIUtility.isProSkin ? new Color(0.70f, 0.85f, 1f) : new Color(0.10f, 0.25f, 0.55f) }
+            };
+
+            _tableRowLabel = new GUIStyle(EditorStyles.label)
+            {
+                fontSize = 11,
                 richText = true
+            };
+
+            _flagOnStyle = new GUIStyle(EditorStyles.miniLabel)
+            {
+                fontStyle = FontStyle.Bold,
+                alignment = TextAnchor.MiddleCenter,
+                normal    = { textColor = new Color(0.25f, 0.90f, 0.40f) }
+            };
+
+            _flagOffStyle = new GUIStyle(EditorStyles.miniLabel)
+            {
+                fontStyle = FontStyle.Bold,
+                alignment = TextAnchor.MiddleCenter,
+                normal    = { textColor = new Color(0.90f, 0.35f, 0.35f) }
             };
 
             _stylesInitialized = true;
@@ -46,8 +68,8 @@ namespace Gatrix.Unity.SDK.Editor
         {
             InitStyles();
 
-            // Feel-style title bar
-            GatrixEditorStyle.DrawTitleBar("Gatrix Behaviour", "Feature Flag SDK Entry Point");
+            // Title bar (blue accent)
+            GatrixEditorStyle.DrawTitleBar("Gatrix Behaviour", "Feature Flag SDK Entry Point", true, GatrixEditorStyle.AccentBlue);
 
             var client = GatrixBehaviour.Client;
 
@@ -60,9 +82,7 @@ namespace Gatrix.Unity.SDK.Editor
                     GatrixEditorStyle.DrawHelpBox("SDK will initialize automatically in Play Mode.", MessageType.Info);
                     EditorGUILayout.Space(4);
                     if (GUILayout.Button("Open Setup Wizard", GUILayout.Height(28)))
-                    {
                         GatrixSetupWindow.ShowWindow();
-                    }
                 }
                 else
                 {
@@ -71,59 +91,50 @@ namespace Gatrix.Unity.SDK.Editor
                 return;
             }
 
-
-            // Status Box
+            // ── Status Section ──────────────────────────────────
+            GatrixEditorStyle.DrawSection("Status", null, GatrixEditorStyle.AccentBlue);
             GatrixEditorStyle.BeginBox();
-            
-            // Status row
-            var readyText = client.IsReady
-                ? "<color=#88ff88><b>Ready</b></color>"
-                : "<color=#ffcc66><b>Not Ready</b></color>";
-            DrawRow("Status", readyText, true);
-            DrawRow("Connection", client.ConnectionId ?? "N/A");
-            
+
+            DrawStatusRow("Status",
+                client.IsReady
+                    ? "<color=#44ee66><b>Ready</b></color>"
+                    : "<color=#ffcc44><b>Not Ready</b></color>",
+                richText: true);
+            DrawStatusRow("Connection", client.ConnectionId ?? "N/A");
+
             EditorGUILayout.Space(4);
 
-            // Buttons
+            // Action buttons
             EditorGUILayout.BeginHorizontal();
-            if (GUILayout.Button("Open Monitor", GUILayout.Height(24)))
-            {
+            if (GUILayout.Button("Open Monitor", GUILayout.Height(26)))
                 GatrixMonitorWindow.ShowWindow();
-            }
-            if (GUILayout.Button("Force Fetch", GUILayout.Height(24)))
-            {
+            if (GUILayout.Button("Force Fetch", GUILayout.Height(26)))
                 _ = client.Features.FetchFlagsAsync();
-            }
             EditorGUILayout.EndHorizontal();
 
-            // Sync Flags button (only when explicit sync mode has pending changes)
+            // Pending sync button
             if (client.Features.IsExplicitSync() && client.Features.HasPendingSyncFlags())
             {
                 EditorGUILayout.Space(4);
                 var prevBg = GUI.backgroundColor;
-                GUI.backgroundColor = new Color(1f, 0.85f, 0.3f);
-                if (GUILayout.Button("⚡ Sync Flags (Pending Changes)", GUILayout.Height(30)))
+                GUI.backgroundColor = new Color(1f, 0.82f, 0.20f);
+                if (GUILayout.Button("\u26a1 Sync Flags  (Pending Changes)", GUILayout.Height(28)))
                 {
                     _ = client.Features.SyncFlagsAsync(false);
-                    // Force Monitor window to refresh immediately
                     if (EditorWindow.HasOpenInstances<GatrixMonitorWindow>())
-                    {
                         EditorWindow.GetWindow<GatrixMonitorWindow>(false, null, false).ForceRefresh();
-                    }
                 }
                 GUI.backgroundColor = prevBg;
             }
 
             GatrixEditorStyle.EndBox();
 
-            // ==================== Flags ====================
-            GatrixEditorStyle.DrawSection("Feature Flags");
-            
+            // ── Feature Flags Section ────────────────────────────
+            GatrixEditorStyle.DrawSection("Feature Flags", null, GatrixEditorStyle.AccentGreen);
             GatrixEditorStyle.BeginBox();
-            
-            // Custom simplified foldout/header
-            _showFlags = EditorGUILayout.Foldout(_showFlags, $"Flags ({client.Features.GetAllFlags().Count})", true, EditorStyles.foldoutHeader);
-            
+
+            _showFlags = DrawFoldoutHeader($"Flags  ({client.Features.GetAllFlags().Count})", _showFlags, GatrixEditorStyle.AccentGreen);
+
             if (_showFlags)
             {
                 var flags = client.Features.GetAllFlags();
@@ -134,129 +145,165 @@ namespace Gatrix.Unity.SDK.Editor
                 else
                 {
                     EditorGUILayout.Space(2);
-                    
+
                     // Table header
-                    EditorGUILayout.BeginHorizontal(EditorStyles.toolbar);
-                    EditorGUILayout.LabelField("St", EditorStyles.miniLabel, GUILayout.Width(FlagStateWidth));
-                    EditorGUILayout.LabelField("Name", EditorStyles.miniLabel, GUILayout.Width(FlagNameWidth));
-                    EditorGUILayout.LabelField("Variant", EditorStyles.miniLabel);
-                    EditorGUILayout.EndHorizontal();
-
-                    // Table rows
-                    foreach (var flag in flags)
+                    var headerRect = EditorGUILayout.GetControlRect(false, 18);
+                    bool isDark    = EditorGUIUtility.isProSkin;
+                    if (Event.current.type == EventType.Repaint)
                     {
-                        EditorGUILayout.BeginHorizontal();
-                        
-                        // State column
-                        var colorTag = flag.Enabled ? "#88ff88" : "#ff8888";
-                        var state = flag.Enabled ? "ON" : "OFF";
-                        EditorGUILayout.LabelField(
-                            $"<color={colorTag}><b>{state}</b></color>",
-                            _richLabelStyle, GUILayout.Width(FlagStateWidth));
+                        EditorGUI.DrawRect(headerRect,
+                            isDark ? new Color(0.14f, 0.14f, 0.16f, 1f) : new Color(0.72f, 0.72f, 0.74f, 1f));
+                    }
+                    var hStyle = new GUIStyle(EditorStyles.miniLabel)
+                    {
+                        fontStyle = FontStyle.Bold,
+                        normal    = { textColor = isDark ? new Color(0.65f, 0.70f, 0.75f) : new Color(0.30f, 0.32f, 0.35f) }
+                    };
+                    GUI.Label(new Rect(headerRect.x + 4,  headerRect.y, FlagStateWidth, headerRect.height), "St",      hStyle);
+                    GUI.Label(new Rect(headerRect.x + 44, headerRect.y, FlagNameWidth,  headerRect.height), "Name",    hStyle);
+                    GUI.Label(new Rect(headerRect.x + 44 + FlagNameWidth, headerRect.y, 200, headerRect.height), "Variant", hStyle);
 
-                        // Name column
-                        // Truncate if too long
-                        var name = flag.Name;
-                        if (name.Length > 25) name = name.Substring(0, 22) + "...";
-                        EditorGUILayout.LabelField(new GUIContent(name, flag.Name), GUILayout.Width(FlagNameWidth));
+                    // Rows
+                    for (int i = 0; i < flags.Count; i++)
+                    {
+                        var flag    = flags[i];
+                        var rowRect = EditorGUILayout.GetControlRect(false, 18);
 
-                        // Variant column
+                        // Alternating row background
+                        if (Event.current.type == EventType.Repaint && i % 2 == 0)
+                        {
+                            EditorGUI.DrawRect(rowRect,
+                                isDark ? new Color(0.18f, 0.18f, 0.20f, 0.4f) : new Color(0.86f, 0.86f, 0.88f, 0.4f));
+                        }
+
+                        // State badge
+                        var badgeBg = flag.Enabled
+                            ? new Color(0.10f, 0.38f, 0.14f, 0.8f)
+                            : new Color(0.38f, 0.10f, 0.10f, 0.8f);
+                        var badgeRect = new Rect(rowRect.x + 4, rowRect.y + 2, 32, 14);
+                        if (Event.current.type == EventType.Repaint)
+                            EditorGUI.DrawRect(badgeRect, badgeBg);
+                        GUI.Label(badgeRect, flag.Enabled ? "ON" : "OFF", flag.Enabled ? _flagOnStyle : _flagOffStyle);
+
+                        // Flag name
+                        var name = flag.Name.Length > 26 ? flag.Name.Substring(0, 23) + "..." : flag.Name;
+                        GUI.Label(new Rect(rowRect.x + 44, rowRect.y, FlagNameWidth, rowRect.height),
+                            new GUIContent(name, flag.Name), _tableRowLabel);
+
+                        // Variant
                         if (flag.Variant != null)
                         {
-                            var payloadStr = flag.Variant.Value?.ToString() ?? "";
-                            if (payloadStr.Length > 30)
-                                payloadStr = payloadStr.Substring(0, 27) + "...";
-                            
-                            var variantText = string.IsNullOrEmpty(flag.Variant.Name) 
-                                ? payloadStr 
-                                : $"{flag.Variant.Name}: {payloadStr}";
-                                
-                            EditorGUILayout.LabelField(variantText);
+                            var payload = flag.Variant.Value?.ToString() ?? "";
+                            if (payload.Length > 30) payload = payload.Substring(0, 27) + "...";
+                            var variantText = string.IsNullOrEmpty(flag.Variant.Name)
+                                ? payload
+                                : $"{flag.Variant.Name}: {payload}";
+                            GUI.Label(new Rect(rowRect.x + 44 + FlagNameWidth, rowRect.y, 200, rowRect.height),
+                                variantText, _tableRowLabel);
                         }
-                        else
-                        {
-                            EditorGUILayout.LabelField("-");
-                        }
-
-                        EditorGUILayout.EndHorizontal();
                     }
                 }
             }
             GatrixEditorStyle.EndBox();
 
-            // ==================== Context ====================
-            GatrixEditorStyle.DrawSection("Context");
+            // ── Context Section ──────────────────────────────────
+            GatrixEditorStyle.DrawSection("Context", null, GatrixEditorStyle.AccentTeal);
             GatrixEditorStyle.BeginBox();
-            
-            _showContext = EditorGUILayout.Foldout(_showContext, "Evaluation Context", true, EditorStyles.foldoutHeader);
+
+            _showContext = DrawFoldoutHeader("Evaluation Context", _showContext, GatrixEditorStyle.AccentTeal);
             if (_showContext)
             {
-                EditorGUI.indentLevel++;
                 var ctx = client.Features.GetContext();
-                DrawRow("AppName", ctx.AppName ?? "-");
-                DrawRow("Environment", ctx.Environment ?? "-");
-                DrawRow("UserId", ctx.UserId ?? "-");
-                DrawRow("SessionId", ctx.SessionId ?? "-");
+                DrawStatusRow("AppName",     ctx.AppName     ?? "-");
+                DrawStatusRow("Environment", ctx.Environment ?? "-");
+                DrawStatusRow("UserId",      ctx.UserId      ?? "-");
+                DrawStatusRow("SessionId",   ctx.SessionId   ?? "-");
                 if (ctx.Properties != null)
                 {
                     foreach (var kvp in ctx.Properties)
-                    {
-                        DrawRow(kvp.Key, kvp.Value?.ToString() ?? "-");
-                    }
+                        DrawStatusRow(kvp.Key, kvp.Value?.ToString() ?? "-");
                 }
-                EditorGUI.indentLevel--;
             }
             GatrixEditorStyle.EndBox();
 
-            // ==================== Statistics ====================
-            GatrixEditorStyle.DrawSection("Statistics");
+            // ── Statistics Section ───────────────────────────────
+            GatrixEditorStyle.DrawSection("Statistics", null, GatrixEditorStyle.AccentOrange);
             GatrixEditorStyle.BeginBox();
-            
-            _showStats = EditorGUILayout.Foldout(_showStats, "Runtime Stats", true, EditorStyles.foldoutHeader);
+
+            _showStats = DrawFoldoutHeader("Runtime Stats", _showStats, GatrixEditorStyle.AccentOrange);
             if (_showStats)
             {
-                EditorGUI.indentLevel++;
                 var stats = client.Features.GetStats();
-                DrawRow("State", stats.SdkState.ToString());
-                DrawRow("Total Flags", stats.TotalFlagCount.ToString());
-                DrawRow("Fetches", stats.FetchFlagsCount.ToString());
-                DrawRow("Updates", stats.UpdateCount.ToString());
-                DrawRow("Errors", stats.ErrorCount.ToString());
-                DrawRow("Impressions", stats.ImpressionCount.ToString());
+                DrawStatusRow("State",       stats.SdkState.ToString());
+                DrawStatusRow("Total Flags", stats.TotalFlagCount.ToString());
+                DrawStatusRow("Fetches",     stats.FetchFlagsCount.ToString());
+                DrawStatusRow("Updates",     stats.UpdateCount.ToString());
+                DrawStatusRow("Errors",      stats.ErrorCount.ToString());
+                DrawStatusRow("Impressions", stats.ImpressionCount.ToString());
 
-                // Streaming
-                var stateColor = stats.StreamingState == StreamingConnectionState.Connected
-                    ? "#88ff88"
+                var streamColor = stats.StreamingState == StreamingConnectionState.Connected
+                    ? "#44ee66"
                     : stats.StreamingState == StreamingConnectionState.Disconnected
-                        ? "gray"
-                        : "yellow";
-                DrawRow("Streaming",
-                    $"<color={stateColor}>{stats.StreamingState}</color>", true);
-                EditorGUI.indentLevel--;
+                        ? "#888888"
+                        : "#ffcc44";
+                DrawStatusRow("Streaming",
+                    $"<color={streamColor}>{stats.StreamingState}</color>", richText: true);
             }
             GatrixEditorStyle.EndBox();
 
-            // Auto-repaint in play mode
             if (EditorApplication.isPlaying)
-            {
                 Repaint();
-            }
         }
 
-        /// <summary>Draw a label-value row with fixed column alignment</summary>
-        private void DrawRow(string label, string value, bool richValue = false)
+        // ==================== Helpers ====================
+
+        /// <summary>Draws a label-value row with fixed column alignment.</summary>
+        private void DrawStatusRow(string label, string value, bool richText = false)
         {
             EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField(label, EditorStyles.label, GUILayout.Width(LabelWidth));
-            if (richValue)
+            var labelStyle = new GUIStyle(EditorStyles.label)
             {
-                EditorGUILayout.LabelField(value, _richLabelStyle);
-            }
+                normal = { textColor = EditorGUIUtility.isProSkin
+                    ? new Color(0.60f, 0.65f, 0.72f)
+                    : new Color(0.35f, 0.38f, 0.42f) }
+            };
+            EditorGUILayout.LabelField(label, labelStyle, GUILayout.Width(LabelWidth));
+            if (richText)
+                EditorGUILayout.LabelField(value, _richLabel);
             else
-            {
-                EditorGUILayout.LabelField(value, _valueLabelStyle);
-            }
+                EditorGUILayout.LabelField(value);
             EditorGUILayout.EndHorizontal();
+        }
+
+        /// <summary>
+        /// Draws a foldout header row with a colored left accent bar.
+        /// Returns the new foldout state.
+        /// </summary>
+        private static bool DrawFoldoutHeader(string label, bool expanded, Color accentColor)
+        {
+            var rect = EditorGUILayout.GetControlRect(false, 20);
+            bool isDark = EditorGUIUtility.isProSkin;
+
+            if (Event.current.type == EventType.Repaint)
+            {
+                EditorGUI.DrawRect(rect,
+                    isDark ? new Color(0.16f, 0.16f, 0.18f, 0.8f) : new Color(0.76f, 0.76f, 0.78f, 0.8f));
+                EditorGUI.DrawRect(new Rect(rect.x, rect.y, 3, rect.height), accentColor);
+            }
+
+            // Arrow
+            var arrowStyle = new GUIStyle(EditorStyles.foldout)
+            {
+                fontStyle = FontStyle.Bold,
+                fontSize  = 11,
+            };
+            arrowStyle.normal.textColor   = isDark ? new Color(0.85f, 0.85f, 0.85f) : new Color(0.10f, 0.10f, 0.10f);
+            arrowStyle.onNormal.textColor = arrowStyle.normal.textColor;
+
+            expanded = EditorGUI.Foldout(new Rect(rect.x + 8, rect.y, rect.width - 8, rect.height),
+                expanded, label, true, arrowStyle);
+
+            return expanded;
         }
     }
 }

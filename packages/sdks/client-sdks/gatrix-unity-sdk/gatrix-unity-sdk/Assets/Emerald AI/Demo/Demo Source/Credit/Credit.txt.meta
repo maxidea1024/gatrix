@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 20864a1ec2f89dc40b2c95e06988c254
+timeCreated: 1507274506
+licenseType: Store
+TextScriptImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 268519
+  packageName: Emerald AI 2025
+  packageVersion: 1.3.2
+  assetPath: Assets/Emerald AI/Demo/Demo Source/Credit/Credit.txt
+  uploadId: 823122

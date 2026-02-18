@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: c592432529b5cbc4d8a073c80b4e28cd
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 8574412962073106934
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 268519
+  packageName: Emerald AI 2025
+  packageVersion: 1.3.2
+  assetPath: Assets/Emerald AI/Demo/Demo Source/Models/Terrain/Demo Terrain Layer.terrainlayer
+  uploadId: 823122

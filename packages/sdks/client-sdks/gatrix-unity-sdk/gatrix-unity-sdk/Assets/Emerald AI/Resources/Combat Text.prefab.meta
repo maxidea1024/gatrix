@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: a7c07f6ef797487428a1c787146a9148
+timeCreated: 1572302175
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 268519
+  packageName: Emerald AI 2025
+  packageVersion: 1.3.2
+  assetPath: Assets/Emerald AI/Resources/Combat Text.prefab
+  uploadId: 823122

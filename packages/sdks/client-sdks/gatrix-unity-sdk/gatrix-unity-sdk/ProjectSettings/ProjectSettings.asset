@@ -825,7 +825,8 @@ PlayerSettings:
   webGLCloseOnQuit: 0
   webWasm2023: 0
   webEnableSubmoduleStrippingCompatibility: 0
-  scriptingDefineSymbols: {}
+  scriptingDefineSymbols:
+    Standalone: EMERALD_AI_2024_PRESENT
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend:

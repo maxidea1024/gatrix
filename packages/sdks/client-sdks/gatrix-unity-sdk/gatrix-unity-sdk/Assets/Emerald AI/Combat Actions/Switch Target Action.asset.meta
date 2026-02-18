@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 1180a21f374979740ad44d4bbdee43fd
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 268519
+  packageName: Emerald AI 2025
+  packageVersion: 1.3.2
+  assetPath: Assets/Emerald AI/Combat Actions/Switch Target Action.asset
+  uploadId: 823122

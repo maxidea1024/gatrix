@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: ea76c308fe3a2484cb2a751af4029708
+timeCreated: 1507164265
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 268519
+  packageName: Emerald AI 2025
+  packageVersion: 1.3.2
+  assetPath: Assets/Emerald AI/Scripts/Managers/Editor/EmeraldWikiManager.cs
+  uploadId: 823122

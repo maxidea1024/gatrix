@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 93381ae66b503b744bd1f51f095e20c9
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 268519
+  packageName: Emerald AI 2025
+  packageVersion: 1.3.2
+  assetPath: Assets/Emerald AI/Scripts/Internal/Property Drawers/LayerAttribute.cs
+  uploadId: 823122

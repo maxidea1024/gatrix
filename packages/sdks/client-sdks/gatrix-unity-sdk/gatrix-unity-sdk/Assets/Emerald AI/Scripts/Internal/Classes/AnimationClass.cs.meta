@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 63a47e5720f75cf4a9d3a28c0d699b90
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 268519
+  packageName: Emerald AI 2025
+  packageVersion: 1.3.2
+  assetPath: Assets/Emerald AI/Scripts/Internal/Classes/AnimationClass.cs
+  uploadId: 823122

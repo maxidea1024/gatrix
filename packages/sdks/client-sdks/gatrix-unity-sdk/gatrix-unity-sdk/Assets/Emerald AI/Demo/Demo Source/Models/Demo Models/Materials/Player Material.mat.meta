@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 35d55cc45a4f2ff42b5679870ed26dae
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 268519
+  packageName: Emerald AI 2025
+  packageVersion: 1.3.2
+  assetPath: Assets/Emerald AI/Demo/Demo Source/Models/Demo Models/Materials/Player
+    Material.mat
+  uploadId: 823122

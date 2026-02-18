@@ -18,20 +18,20 @@ namespace Gatrix.Unity.SDK.Editor
         public override void OnInspectorGUI()
         {
             serializedObject.Update();
-            GatrixEditorExtensions.DrawHeader("Flag Toggle", "Enable/Disable GameObjects via Feature Flags");
+            GatrixEditorExtensions.DrawHeader("Flag Toggle", "Enable/Disable GameObjects via Feature Flags", GatrixEditorStyle.AccentGreen);
             
-            GatrixEditorExtensions.BeginGroup("Flag Setup");
+            GatrixEditorExtensions.BeginGroup("Flag Setup", GatrixEditorStyle.AccentGreen);
             EditorGUILayout.PropertyField(serializedObject.FindProperty("_flagName"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("_invertLogic"));
             GatrixEditorExtensions.DrawFlagStatus(serializedObject.FindProperty("_flagName").stringValue);
             GatrixEditorExtensions.EndGroup();
 
-            GatrixEditorExtensions.BeginGroup("Target GameObjects");
+            GatrixEditorExtensions.BeginGroup("Target GameObjects", GatrixEditorStyle.AccentGreen);
             EditorGUILayout.PropertyField(serializedObject.FindProperty("_whenEnabled"), true);
             EditorGUILayout.PropertyField(serializedObject.FindProperty("_whenDisabled"), true);
             GatrixEditorExtensions.EndGroup();
 
-            GatrixEditorExtensions.BeginGroup("Self Control");
+            GatrixEditorExtensions.BeginGroup("Self Control", GatrixEditorStyle.AccentGreen);
             var selfControl = serializedObject.FindProperty("_controlSelf");
             EditorGUILayout.PropertyField(selfControl);
             if (selfControl.boolValue)
@@ -54,26 +54,26 @@ namespace Gatrix.Unity.SDK.Editor
         public override void OnInspectorGUI()
         {
             serializedObject.Update();
-            GatrixEditorExtensions.DrawHeader("Flag Value", "Sync Text components with Feature Flag values");
+            GatrixEditorExtensions.DrawHeader("Flag Value", "Sync Text components with Feature Flag values", GatrixEditorStyle.AccentTeal);
 
-            GatrixEditorExtensions.BeginGroup("Configuration");
+            GatrixEditorExtensions.BeginGroup("Configuration", GatrixEditorStyle.AccentTeal);
             var flagName = serializedObject.FindProperty("_flagName");
             EditorGUILayout.PropertyField(flagName);
             GatrixEditorExtensions.DrawFlagStatus(flagName.stringValue);
             GatrixEditorExtensions.EndGroup();
 
-            GatrixEditorExtensions.BeginGroup("Display Options");
+            GatrixEditorExtensions.BeginGroup("Display Options", GatrixEditorStyle.AccentTeal);
             EditorGUILayout.PropertyField(serializedObject.FindProperty("_format"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("_fallbackText"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("_hideWhenDisabled"));
             GatrixEditorExtensions.EndGroup();
 
-            GatrixEditorExtensions.BeginGroup("Target Component");
+            GatrixEditorExtensions.BeginGroup("Target Component", GatrixEditorStyle.AccentTeal);
             var target = serializedObject.FindProperty("_targetText");
             EditorGUILayout.PropertyField(target);
             if (target.objectReferenceValue == null)
             {
-                EditorGUILayout.HelpBox("Will auto-detect UI Text or TextMeshPro component.", MessageType.Info);
+                GatrixEditorStyle.DrawHelpBox("Will auto-detect UI Text or TextMeshPro component.", MessageType.Info);
             }
             GatrixEditorExtensions.EndGroup();
 
@@ -91,16 +91,16 @@ namespace Gatrix.Unity.SDK.Editor
         public override void OnInspectorGUI()
         {
             serializedObject.Update();
-            GatrixEditorExtensions.DrawHeader("Flag Event", "Fire UnityEvents via Feature Flags");
+            GatrixEditorExtensions.DrawHeader("Flag Event", "Fire UnityEvents via Feature Flags", GatrixEditorStyle.AccentOrange);
 
-            GatrixEditorExtensions.BeginGroup("Configuration");
+            GatrixEditorExtensions.BeginGroup("Configuration", GatrixEditorStyle.AccentOrange);
             var flagName = serializedObject.FindProperty("_flagName");
             EditorGUILayout.PropertyField(flagName);
             EditorGUILayout.PropertyField(serializedObject.FindProperty("_fireOnInitial"));
             GatrixEditorExtensions.DrawFlagStatus(flagName.stringValue);
             GatrixEditorExtensions.EndGroup();
 
-            GatrixEditorExtensions.BeginGroup("UnityEvents");
+            GatrixEditorExtensions.BeginGroup("UnityEvents", GatrixEditorStyle.AccentOrange);
             EditorGUILayout.PropertyField(serializedObject.FindProperty("_onEnabled"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("_onDisabled"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("_onChanged"));
@@ -198,7 +198,7 @@ namespace Gatrix.Unity.SDK.Editor
             EditorGUILayout.PropertyField(serializedObject.FindProperty("_propertyName"));
             GatrixEditorExtensions.EndGroup();
 
-            GatrixEditorExtensions.BeginGroup("Mapping");
+            GatrixEditorExtensions.BeginGroup("Mapping", GatrixEditorStyle.AccentPurple);
             if (mode.enumValueIndex == 0) // SwapMaterial
             {
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("_defaultMaterial"));
@@ -206,7 +206,7 @@ namespace Gatrix.Unity.SDK.Editor
             }
             else
             {
-                EditorGUILayout.HelpBox("Value from flag will be applied to the property.", MessageType.Info);
+                GatrixEditorStyle.DrawHelpBox("Value from flag will be applied to the property.", MessageType.Info);
             }
             GatrixEditorExtensions.EndGroup();
 
@@ -255,9 +255,9 @@ namespace Gatrix.Unity.SDK.Editor
         public override void OnInspectorGUI()
         {
             serializedObject.Update();
-            GatrixEditorExtensions.DrawHeader("SDK Event Listener", "SDK Lifecycle to UnityEvents");
+            GatrixEditorExtensions.DrawHeader("SDK Event Listener", "SDK Lifecycle to UnityEvents", GatrixEditorStyle.AccentOrange);
             
-            EditorGUILayout.HelpBox("Select SDK events and assign callbacks.", MessageType.None);
+            GatrixEditorStyle.DrawHelpBox("Select SDK events and assign callbacks.", MessageType.None);
             EditorGUILayout.Space(2);
 
             DrawEventSection("SDK Lifecycle", "_onReady", "_onError", "_onRecovered");

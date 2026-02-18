@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 0031e8e6c6ffc6343a58267750f4cd0e
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 268519
+  packageName: Emerald AI 2025
+  packageVersion: 1.3.2
+  assetPath: Assets/Emerald AI/Demo/Demo Source/Animator Controllers/Sorcerer Example
+    AI.overrideController
+  uploadId: 823122

@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: fa1b0ca94785d6a41909e8b139df704c
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 268519
+  packageName: Emerald AI 2025
+  packageVersion: 1.3.2
+  assetPath: Assets/Emerald AI/Scripts/Internal/Enums/AnimationStateTypes.cs
+  uploadId: 823122

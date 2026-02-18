@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: a935740a62e270749bc63b5d2a643bc4
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 268519
+  packageName: Emerald AI 2025
+  packageVersion: 1.3.2
+  assetPath: Assets/Emerald AI/Scripts/Profiles and Objects/Ability Objects/Ability
+    Object Scripts/Healing/HealingAbility.cs
+  uploadId: 823122

@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: 746ca6c9e1242614fa60ba2cd5421a4e
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 268519
+  packageName: Emerald AI 2025
+  packageVersion: 1.3.2
+  assetPath: Assets/Emerald AI/Scripts/Profiles and Objects/Combat Actions/Combat
+    Action Scripts/DodgeAction.cs
+  uploadId: 823122

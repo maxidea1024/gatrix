@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 2ed4a775d9ab2ce40b00c0c4f9665db7
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 268519
+  packageName: Emerald AI 2025
+  packageVersion: 1.3.2
+  assetPath: Assets/Emerald AI/Scripts/Components/Optional/EmeraldFootsteps.cs
+  uploadId: 823122

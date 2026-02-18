@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: b702dd8c4a0db0344937adfc3b4b8879
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 268519
+  packageName: Emerald AI 2025
+  packageVersion: 1.3.2
+  assetPath: Assets/Emerald AI/Demo/Demo Source/Animation Profiles/Healing Example
+    AI.asset
+  uploadId: 823122

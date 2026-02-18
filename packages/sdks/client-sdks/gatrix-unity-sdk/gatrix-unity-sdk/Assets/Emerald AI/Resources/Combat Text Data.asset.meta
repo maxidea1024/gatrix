@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: dda0050eeb953ea499243ef9ce567944
+timeCreated: 1572838573
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 268519
+  packageName: Emerald AI 2025
+  packageVersion: 1.3.2
+  assetPath: Assets/Emerald AI/Resources/Combat Text Data.asset
+  uploadId: 823122

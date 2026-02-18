@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: f0bc8a66927c16c4b83ee5dcf5643429
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 268519
+  packageName: Emerald AI 2025
+  packageVersion: 1.3.2
+  assetPath: Assets/Emerald AI/Scripts/Components/Optional/Sound Detection/Enums/TriggerTypes.cs
+  uploadId: 823122

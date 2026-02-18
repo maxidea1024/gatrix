@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 0d678346cdcab0448bfe0135bd2c08a7
+timeCreated: 1536036646
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 268519
+  packageName: Emerald AI 2025
+  packageVersion: 1.3.2
+  assetPath: Assets/Emerald AI/Resources/Combat Text Font.mat
+  uploadId: 823122

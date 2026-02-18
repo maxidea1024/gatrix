@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: c49fa35b3f63d44448451362963bcbcd
+timeCreated: 1579730087
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 268519
+  packageName: Emerald AI 2025
+  packageVersion: 1.3.2
+  assetPath: Assets/Emerald AI/Resources/Faction Data.asset
+  uploadId: 823122

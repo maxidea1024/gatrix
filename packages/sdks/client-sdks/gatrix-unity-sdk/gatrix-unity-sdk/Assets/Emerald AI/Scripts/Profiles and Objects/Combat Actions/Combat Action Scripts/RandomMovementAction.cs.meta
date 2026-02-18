@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: 0d7a5c708683ce14686bcc528ef04d64
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 268519
+  packageName: Emerald AI 2025
+  packageVersion: 1.3.2
+  assetPath: Assets/Emerald AI/Scripts/Profiles and Objects/Combat Actions/Combat
+    Action Scripts/RandomMovementAction.cs
+  uploadId: 823122

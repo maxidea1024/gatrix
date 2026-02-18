@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 57018ae490346eb48966fc1f0d510b10
+timeCreated: 1512340732
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 268519
+  packageName: Emerald AI 2025
+  packageVersion: 1.3.2
+  assetPath: Assets/Emerald AI/Resources/AI Health Bar Canvas.prefab
+  uploadId: 823122

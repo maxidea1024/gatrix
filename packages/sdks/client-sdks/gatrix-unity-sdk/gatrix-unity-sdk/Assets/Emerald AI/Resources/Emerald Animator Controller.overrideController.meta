@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 3d7f700e56ef9ba47ad382608805dc9d
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 268519
+  packageName: Emerald AI 2025
+  packageVersion: 1.3.2
+  assetPath: Assets/Emerald AI/Resources/Emerald Animator Controller.overrideController
+  uploadId: 823122

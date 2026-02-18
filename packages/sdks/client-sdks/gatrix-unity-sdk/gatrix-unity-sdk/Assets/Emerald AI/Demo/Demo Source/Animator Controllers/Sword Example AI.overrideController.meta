@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 4a7752f91b85736489977554d0846f9d
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 268519
+  packageName: Emerald AI 2025
+  packageVersion: 1.3.2
+  assetPath: Assets/Emerald AI/Demo/Demo Source/Animator Controllers/Sword Example
+    AI.overrideController
+  uploadId: 823122

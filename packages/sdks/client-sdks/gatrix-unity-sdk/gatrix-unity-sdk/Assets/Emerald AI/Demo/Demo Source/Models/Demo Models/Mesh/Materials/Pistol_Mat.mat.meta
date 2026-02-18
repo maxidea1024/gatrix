@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 5dab9b02e6e25d34f83b21af29a7767f
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 268519
+  packageName: Emerald AI 2025
+  packageVersion: 1.3.2
+  assetPath: Assets/Emerald AI/Demo/Demo Source/Models/Demo Models/Mesh/Materials/Pistol_Mat.mat
+  uploadId: 823122

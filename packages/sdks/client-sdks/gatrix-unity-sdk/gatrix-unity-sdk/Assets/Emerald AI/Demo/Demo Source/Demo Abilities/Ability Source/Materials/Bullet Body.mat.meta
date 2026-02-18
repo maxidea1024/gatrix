@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 3d8ae4711c4d93945bd16c9c2d47baed
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 268519
+  packageName: Emerald AI 2025
+  packageVersion: 1.3.2
+  assetPath: Assets/Emerald AI/Demo/Demo Source/Demo Abilities/Ability Source/Materials/Bullet
+    Body.mat
+  uploadId: 823122

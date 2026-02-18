@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 02490f38574ec9541a91585b214de9f6
+timeCreated: 1573673199
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 268519
+  packageName: Emerald AI 2025
+  packageVersion: 1.3.2
+  assetPath: Assets/Emerald AI/Demo/Demo Source/Animations/Villager and Basic/Basic
+    Motions/Materials/BasicMotionsFloor.mat
+  uploadId: 823122

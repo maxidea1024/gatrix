@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: bc385f21fb4e16a409668906400a76f9
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 23800000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 268519
+  packageName: Emerald AI 2025
+  packageVersion: 1.3.2
+  assetPath: Assets/Emerald AI/Demo/Demo Source/NavMesh Data/Working Villager Demo/NavMesh.asset
+  uploadId: 823122

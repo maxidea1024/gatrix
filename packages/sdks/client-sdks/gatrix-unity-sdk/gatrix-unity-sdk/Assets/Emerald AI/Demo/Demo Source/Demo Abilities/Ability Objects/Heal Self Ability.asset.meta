@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: e4a847e0dde653a408cf9bb127ad6cbc
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 268519
+  packageName: Emerald AI 2025
+  packageVersion: 1.3.2
+  assetPath: Assets/Emerald AI/Demo/Demo Source/Demo Abilities/Ability Objects/Heal
+    Self Ability.asset
+  uploadId: 823122

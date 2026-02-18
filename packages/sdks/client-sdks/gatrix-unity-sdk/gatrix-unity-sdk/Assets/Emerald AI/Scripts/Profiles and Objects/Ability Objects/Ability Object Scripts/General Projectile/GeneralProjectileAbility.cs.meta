@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: 08f6e2140fad9cc4bb236717104d750e
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 268519
+  packageName: Emerald AI 2025
+  packageVersion: 1.3.2
+  assetPath: Assets/Emerald AI/Scripts/Profiles and Objects/Ability Objects/Ability
+    Object Scripts/General Projectile/GeneralProjectileAbility.cs
+  uploadId: 823122

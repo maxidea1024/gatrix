@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: c3dd33cc83bb4934fb49f3b799773339
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 268519
+  packageName: Emerald AI 2025
+  packageVersion: 1.3.2
+  assetPath: Assets/Emerald AI/Demo/Demo Source/Models/Demo Models/Materials/Rock
+    Material.mat
+  uploadId: 823122

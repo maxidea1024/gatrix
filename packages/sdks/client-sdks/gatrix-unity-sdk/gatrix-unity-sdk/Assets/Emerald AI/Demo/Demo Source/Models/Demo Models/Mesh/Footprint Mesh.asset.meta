@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 083bd9e21de4c804aa5be90ac42e245f
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 4300000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 268519
+  packageName: Emerald AI 2025
+  packageVersion: 1.3.2
+  assetPath: Assets/Emerald AI/Demo/Demo Source/Models/Demo Models/Mesh/Footprint
+    Mesh.asset
+  uploadId: 823122

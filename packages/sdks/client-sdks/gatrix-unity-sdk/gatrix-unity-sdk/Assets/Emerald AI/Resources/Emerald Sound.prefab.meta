@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 3ede2e37b8057874c87ded2a25c2ed62
+timeCreated: 1513729503
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: -1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 268519
+  packageName: Emerald AI 2025
+  packageVersion: 1.3.2
+  assetPath: Assets/Emerald AI/Resources/Emerald Sound.prefab
+  uploadId: 823122

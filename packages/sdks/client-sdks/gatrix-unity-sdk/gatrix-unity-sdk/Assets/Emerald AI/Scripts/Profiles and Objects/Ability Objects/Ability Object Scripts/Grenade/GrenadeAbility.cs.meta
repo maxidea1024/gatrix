@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: fe42a88d76ed5f349bdb72cee4b18b62
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 268519
+  packageName: Emerald AI 2025
+  packageVersion: 1.3.2
+  assetPath: Assets/Emerald AI/Scripts/Profiles and Objects/Ability Objects/Ability
+    Object Scripts/Grenade/GrenadeAbility.cs
+  uploadId: 823122

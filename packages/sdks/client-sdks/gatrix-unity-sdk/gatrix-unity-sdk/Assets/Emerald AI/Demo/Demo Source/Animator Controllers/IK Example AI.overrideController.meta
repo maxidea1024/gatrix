@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 22e597addfc275e43a5b6bb4b051f7a0
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 268519
+  packageName: Emerald AI 2025
+  packageVersion: 1.3.2
+  assetPath: Assets/Emerald AI/Demo/Demo Source/Animator Controllers/IK Example AI.overrideController
+  uploadId: 823122

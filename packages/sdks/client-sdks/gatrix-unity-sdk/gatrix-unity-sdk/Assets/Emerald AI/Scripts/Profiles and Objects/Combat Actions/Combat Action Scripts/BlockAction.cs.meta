@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: 42e67c9438eee2e4cae1199e275d0ee3
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 268519
+  packageName: Emerald AI 2025
+  packageVersion: 1.3.2
+  assetPath: Assets/Emerald AI/Scripts/Profiles and Objects/Combat Actions/Combat
+    Action Scripts/BlockAction.cs
+  uploadId: 823122
