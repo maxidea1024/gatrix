@@ -287,6 +287,14 @@ bool value = proxy.BoolVariation(true); // false (설정된 값)
 2. API URL, 토큰, 앱 이름 입력
 3. **Create SDK Manager** 클릭 — 완료!
 
+![Window > Gatrix 메뉴](doc/images/menu-window-gatrix.png)
+
+![Setup Wizard](doc/images/setup-wizard.png)
+
+설정이 완료되면 **GatrixBehaviour** 컴포넌트가 자동으로 씬에 추가됩니다:
+
+![GatrixBehaviour Inspector](doc/images/gatrix-behaviour-inspector.png)
+
 ### 옵션 B: 코드로 설정
 
 ```csharp
@@ -553,10 +561,16 @@ group.Destroy();
 
 `MonoBehaviour` 컴포넌트를 GameObject에 추가하기만 하면 됩니다 — 코딩이 필요 없습니다.
 
+컨텍스트 메뉴에서 Gatrix 컴포넌트를 추가할 수 있습니다: **우클릭 → Gatrix → UI / Logic / Debug / Visual / Audio Animation**
+
+![컨텍스트 메뉴 - Gatrix 컴포넌트](doc/images/context-menu-gatrix-ui.png)
+
 ### `GatrixFlagToggle`
 **플래그에 따라 GameObject를 활성화/비활성화합니다.**
 
 적합한 용도: 기능 게이팅, UI 패널 표시/숨기기, 디버그 도구 활성화.
+
+![FlagToggle Inspector](doc/images/component-flag-toggle.png)
 
 ```
 Inspector:
@@ -572,6 +586,8 @@ Inspector:
 
 적합한 용도: 서버 주도 텍스트 표시, A/B 테스트 카피, 라이브 카운트다운 타이머.
 
+![FlagValue Inspector](doc/images/component-flag-value.png)
+
 ```
 Inspector:
   Flag Name: "welcome-message"
@@ -585,6 +601,8 @@ Inspector:
 **플래그의 배리언트 이름에 따라 스프라이트를 교체합니다.**
 
 적합한 용도: 시즌 이벤트 배너, 버튼 아트 A/B 테스트, 캐릭터 스킨 롤아웃.
+
+> 📷 *이미지 추가예정*
 
 ```
 Inspector:
@@ -602,6 +620,8 @@ Inspector:
 
 적합한 용도: 비주얼 A/B 테스트, 시즌 셰이더 효과, 품질 단계 전환.
 
+![FlagMaterial Inspector](doc/images/component-flag-material.png)
+
 ```
 Inspector:
   Flag Name: "visual-quality"
@@ -618,6 +638,8 @@ Inspector:
 
 적합한 용도: 라이브 UI 레이아웃 튜닝, 스폰 위치 조정, 요소 배치 A/B 테스트.
 
+> 📷 *이미지 추가예정*
+
 ```
 Inspector:
   Flag Name: "button-scale"
@@ -631,6 +653,8 @@ Inspector:
 **플래그 상태 또는 배리언트에 따라 UI Graphics 또는 Renderer의 색상을 변경합니다.**
 
 적합한 용도: UI 컬러 테마 A/B 테스트, 상태 표시기, 시즌 색상 변경.
+
+> 📷 *이미지 추가예정*
 
 ```
 Inspector:
@@ -649,6 +673,8 @@ Inspector:
 
 GatrixFlagToggle보다 강력한 UI 제어 — 숨기지 않고 알파 페이드 및 레이캐스트 비활성화를 지원합니다.
 
+> 📷 *이미지 추가예정*
+
 ```
 Inspector:
   Flag Name: "premium-hud"
@@ -663,6 +689,8 @@ Inspector:
 **플래그 상태 또는 배리언트에 따라 다른 AudioClip을 재생합니다.**
 
 적합한 용도: 음악/SFX A/B 테스트, 시즌 오디오, 특수 사운드 이펙트 활성화.
+
+![FlagAudio Inspector](doc/images/component-flag-audio.png)
 
 ```
 Inspector:
@@ -681,6 +709,8 @@ Inspector:
 
 적합한 용도: 특수 애니메이션 활성화, 캐릭터 애니메이션 A/B 테스트, 컷신 트리거.
 
+> 📷 *이미지 추가예정*
+
 ```
 Inspector:
   Flag Name: "hero-animation"
@@ -695,6 +725,8 @@ Inspector:
 **플래그에 따라 ParticleSystem을 재생, 중지, 또는 일시정지합니다.**
 
 적합한 용도: 시즌 파티클 이펙트, 특수 VFX 활성화, 비주얼 피드백 A/B 테스트.
+
+> 📷 *이미지 추가예정*
 
 ```
 Inspector:
@@ -711,6 +743,8 @@ Inspector:
 
 적합한 용도: 커스텀 게임 로직 트리거, 기존 이벤트 시스템과 통합.
 
+> 📷 *이미지 추가예정*
+
 ```
 Inspector:
   Flag Name: "tutorial-mode"
@@ -725,6 +759,8 @@ Inspector:
 
 적합한 용도: SDK 초기화 중 로딩 스피너 표시, 오류의 우아한 처리.
 
+![EventListener Inspector](doc/images/component-event-listener.png)
+
 ```
 Inspector:
   On Ready: [UIManager.HideLoadingScreen()]
@@ -738,6 +774,8 @@ Inspector:
 
 적합한 용도: 개발 중 플래그 동작 디버깅.
 
+> 📷 *이미지 추가예정*
+
 ---
 
 ### `GatrixVariantSwitch`
@@ -745,12 +783,16 @@ Inspector:
 
 적합한 용도: 다중 배리언트 UI 레이아웃, 게임 모드 전환.
 
+> 📷 *이미지 추가예정*
+
 ---
 
 ### `GatrixFlagSceneRedirect`
 **플래그에 따라 다른 씬을 로드합니다.**
 
 적합한 용도: 온보딩 플로우 A/B 테스트, 시즌 이벤트 씬, 새로운 영역의 점진적 롤아웃.
+
+> 📷 *이미지 추가예정*
 
 ---
 
@@ -770,7 +812,19 @@ SDK 상태에 대한 실시간 대시보드:
 | **Metrics** | 이중 뷰 메트릭: 실시간 시계열 차트의 **Graph** 모드 또는 상세 테이블의 **Report** 모드. 플래그별 타임라인 차트 |
 | **Stats** | 상세 카운터, 스트리밍 카운터, 플래그 접근 횟수, 배리언트 히트 횟수, 누락된 플래그, 이벤트 핸들러 누수 감지 |
 
-#### 메트릭 그래프 뷰
+#### Overview 탭
+![Monitor Overview](doc/images/monitor-overview.png)
+
+#### Flags 탭
+![Monitor Flags](doc/images/monitor-flags.png)
+
+#### Events 탭
+![Monitor Events](doc/images/monitor-events.png)
+
+#### Context 탭
+![Monitor Context](doc/images/monitor-context.png)
+
+#### Metrics 탭
 **Metrics** 탭에는 에디터에서 직접 렌더링되는 인터랙티브 시계열 그래프가 포함됩니다:
 - **Network Activity** — 시간에 따른 페치, 업데이트, 오류 표시
 - **Impressions & Delivery** — 시간에 따른 노출 횟수와 메트릭 전송
@@ -780,6 +834,11 @@ SDK 상태에 대한 실시간 대시보드:
 - 자동 스케일 Y축, 그리드 라인, 시간축 레이블, 컬러 코딩된 범례
 - 시간 오프셋 슬라이더로 과거 데이터 스크롤
 - **Graph**와 **Report** 뷰를 원클릭으로 전환
+
+![Monitor Metrics](doc/images/monitor-metrics.png)
+
+#### Stats 탭
+![Monitor Stats](doc/images/monitor-stats.png)
 
 **툴바 빠른 동작:**
 - **⚡ Sync** — 명시적 동기화 모드에서 보류 중인 변경이 있을 때 표시
@@ -795,6 +854,17 @@ SDK 상태에 대한 실시간 대시보드:
 
 최초 구성을 위한 가이드 설정. 사전 구성된 SDK Manager 프리팹을 생성합니다.
 
+![Setup Wizard](doc/images/setup-wizard.png)
+
+---
+
+### About 윈도우
+**Window → Gatrix → About**
+
+SDK 버전, Unity 버전, 플랫폼 정보, 런타임 연결 상태를 확인할 수 있습니다.
+
+![About Window](doc/images/about-window.png)
+
 ---
 
 ### 커스텀 인스펙터
@@ -804,6 +874,8 @@ SDK 상태에 대한 실시간 대시보드:
 - **실시간 플래그 상태** — 현재 ON/OFF 상태와 배리언트 표시
 - **Monitor ↗** — 모니터 윈도우로 바로 이동하는 빠른 접근 버튼
 - 명확한 레이블이 있는 정리된 그룹
+
+![Inspector - Feature Flags](doc/images/inspector-feature-flags.png)
 
 ---
 

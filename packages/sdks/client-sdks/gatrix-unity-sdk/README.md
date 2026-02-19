@@ -287,6 +287,14 @@ Or use **Window → Package Manager → Add package from disk...** and select `p
 2. Enter your API URL, token, and app name
 3. Click **Create SDK Manager** — done!
 
+![Window > Gatrix Menu](doc/images/menu-window-gatrix.png)
+
+![Setup Wizard](doc/images/setup-wizard.png)
+
+Once setup is complete, the **GatrixBehaviour** component is automatically added to your scene:
+
+![GatrixBehaviour Inspector](doc/images/gatrix-behaviour-inspector.png)
+
 ### Option B: Code Setup
 
 ```csharp
@@ -551,10 +559,16 @@ group.Destroy();
 
 Drop these `MonoBehaviour` components onto any GameObject — no scripting required.
 
+You can add Gatrix components via the context menu: **Right-click → Gatrix → UI / Logic / Debug / Visual / Audio Animation**
+
+![Context Menu - Gatrix Components](doc/images/context-menu-gatrix-ui.png)
+
 ### `GatrixFlagToggle`
 **Enable or disable GameObjects based on a flag.**
 
 Perfect for: feature gating entire game systems, showing/hiding UI panels, enabling debug tools.
+
+![FlagToggle Inspector](doc/images/component-flag-toggle.png)
 
 ```
 Inspector:
@@ -570,6 +584,8 @@ Inspector:
 
 Perfect for: displaying server-driven text, showing A/B test copy, live countdown timers.
 
+![FlagValue Inspector](doc/images/component-flag-value.png)
+
 ```
 Inspector:
   Flag Name: "welcome-message"
@@ -583,6 +599,8 @@ Inspector:
 **Swap sprites based on a flag's variant name.**
 
 Perfect for: seasonal event banners, A/B testing button art, character skin rollouts.
+
+> 📷 *Screenshot coming soon*
 
 ```
 Inspector:
@@ -600,6 +618,8 @@ Inspector:
 
 Perfect for: visual A/B tests, seasonal shader effects, quality tier switching.
 
+![FlagMaterial Inspector](doc/images/component-flag-material.png)
+
 ```
 Inspector:
   Flag Name: "visual-quality"
@@ -616,6 +636,8 @@ Inspector:
 
 Perfect for: live-tuning UI layout, adjusting spawn positions, A/B testing element placement.
 
+> 📷 *Screenshot coming soon*
+
 ```
 Inspector:
   Flag Name: "button-scale"
@@ -629,6 +651,8 @@ Inspector:
 **Tint UI Graphics or Renderers based on flag state or variant.**
 
 Perfect for: A/B testing UI color themes, status indicators, seasonal color changes.
+
+> 📷 *Screenshot coming soon*
 
 ```
 Inspector:
@@ -647,6 +671,8 @@ Inspector:
 
 More powerful than GatrixFlagToggle for UI — supports alpha fading and disabling raycasts without hiding.
 
+> 📷 *Screenshot coming soon*
+
 ```
 Inspector:
   Flag Name: "premium-hud"
@@ -661,6 +687,8 @@ Inspector:
 **Play different AudioClips based on flag state or variant.**
 
 Perfect for: A/B testing music/SFX, seasonal audio, enabling special sound effects.
+
+![FlagAudio Inspector](doc/images/component-flag-audio.png)
 
 ```
 Inspector:
@@ -679,6 +707,8 @@ Inspector:
 
 Perfect for: enabling special animations, A/B testing character animations, triggering cutscenes.
 
+> 📷 *Screenshot coming soon*
+
 ```
 Inspector:
   Flag Name: "hero-animation"
@@ -693,6 +723,8 @@ Inspector:
 **Play, stop, or pause ParticleSystems based on a flag.**
 
 Perfect for: seasonal particle effects, enabling special VFX, A/B testing visual feedback.
+
+> 📷 *Screenshot coming soon*
 
 ```
 Inspector:
@@ -709,6 +741,8 @@ Inspector:
 
 Perfect for: triggering custom game logic, integrating with existing event systems.
 
+> 📷 *Screenshot coming soon*
+
 ```
 Inspector:
   Flag Name: "tutorial-mode"
@@ -723,6 +757,8 @@ Inspector:
 
 Perfect for: showing loading spinners while SDK initializes, handling errors gracefully.
 
+![EventListener Inspector](doc/images/component-event-listener.png)
+
 ```
 Inspector:
   On Ready: [UIManager.HideLoadingScreen()]
@@ -736,6 +772,8 @@ Inspector:
 
 Perfect for: debugging flag behavior during development.
 
+> 📷 *Screenshot coming soon*
+
 ---
 
 ### `GatrixVariantSwitch`
@@ -743,12 +781,16 @@ Perfect for: debugging flag behavior during development.
 
 Perfect for: multi-variant UI layouts, switching between game modes.
 
+> 📷 *Screenshot coming soon*
+
 ---
 
 ### `GatrixFlagSceneRedirect`
 **Load a different scene based on a flag.**
 
 Perfect for: A/B testing onboarding flows, seasonal event scenes, gradual rollouts of new areas.
+
+> 📷 *Screenshot coming soon*
 
 ---
 
@@ -768,7 +810,19 @@ A real-time dashboard for your SDK state:
 | **Metrics** | Dual-view metrics: **Graph** mode with real-time time-series charts, or **Report** mode with detailed tables. Per-flag timeline charts for boolean/variant state history. |
 | **Stats** | Detailed counters, streaming counters, flag access counts, variant hit counts, missing flags, event handler leak detection |
 
-#### Metrics Graph View
+#### Overview Tab
+![Monitor Overview](doc/images/monitor-overview.png)
+
+#### Flags Tab
+![Monitor Flags](doc/images/monitor-flags.png)
+
+#### Events Tab
+![Monitor Events](doc/images/monitor-events.png)
+
+#### Context Tab
+![Monitor Context](doc/images/monitor-context.png)
+
+#### Metrics Tab
 The **Metrics** tab includes interactive time-series graphs rendered directly in the Editor:
 - **Network Activity** — fetches, updates, and errors plotted over time
 - **Impressions & Delivery** — impression count and metrics sent over time
@@ -778,6 +832,11 @@ The **Metrics** tab includes interactive time-series graphs rendered directly in
 - Auto-scaling Y axis, grid lines, time axis labels, and color-coded legends
 - Time offset slider for scrolling through historical data
 - Toggle between **Graph** and **Report** views with a single click
+
+![Monitor Metrics](doc/images/monitor-metrics.png)
+
+#### Stats Tab
+![Monitor Stats](doc/images/monitor-stats.png)
 
 **Quick actions in the toolbar:**
 - **⚡ Sync** — appears when explicit sync mode has pending changes
@@ -793,6 +852,17 @@ The **Metrics** tab includes interactive time-series graphs rendered directly in
 
 Guided setup for first-time configuration. Creates a pre-configured SDK Manager prefab.
 
+![Setup Wizard](doc/images/setup-wizard.png)
+
+---
+
+### About Window
+**Window → Gatrix → About**
+
+View SDK version, Unity version, platform information, and runtime connection status.
+
+![About Window](doc/images/about-window.png)
+
 ---
 
 ### Custom Inspectors
@@ -802,6 +872,8 @@ Every Gatrix component has a polished custom inspector:
 - **Live flag status** showing current ON/OFF state and variant
 - **Monitor ↗** quick-access button to jump to the Monitor window
 - Organized groups with clear labels
+
+![Inspector - Feature Flags](doc/images/inspector-feature-flags.png)
 
 ---
 
