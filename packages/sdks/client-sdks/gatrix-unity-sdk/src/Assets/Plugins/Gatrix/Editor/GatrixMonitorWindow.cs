@@ -453,19 +453,48 @@ namespace Gatrix.Unity.SDK.Editor
 
                 if (behaviour.Settings != null)
                 {
-                    DrawField("Settings Asset", behaviour.Settings.name);
-                    DrawField("App Name", behaviour.Settings.AppName ?? "-");
-                    DrawField("Environment", behaviour.Settings.Environment ?? "-");
-                    DrawField("API URL", !string.IsNullOrEmpty(behaviour.Settings.ApiUrl)
-                        ? TruncateMiddle(behaviour.Settings.ApiUrl, 40)
+                    var s = behaviour.Settings;
+
+                    // ── Connection ──
+                    DrawField("Settings Asset", s.name);
+                    DrawField("App Name", s.AppName ?? "-");
+                    DrawField("Environment", s.Environment ?? "-");
+                    DrawField("API URL", !string.IsNullOrEmpty(s.ApiUrl)
+                        ? TruncateMiddle(s.ApiUrl, 40)
                         : "<color=#ff8888>Not set</color>", true);
-                    DrawField("API Token", !string.IsNullOrEmpty(behaviour.Settings.ApiToken)
+                    DrawField("API Token", !string.IsNullOrEmpty(s.ApiToken)
                         ? "\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022 (configured)"
                         : "<color=#ff8888>Not set</color>", true);
 
-                    // Streaming transport
-                    var transport = behaviour.Settings.StreamingTransport;
-                    DrawField("Streaming", transport.ToString());
+                    // Separator
+                    DrawSeparator();
+
+                    // ── Behavior ──
+                    DrawField("Offline Mode", s.OfflineMode
+                        ? "<color=#ffcc66>Yes</color>"
+                        : "No", true);
+                    DrawField("Explicit Sync", s.ExplicitSyncMode
+                        ? "<color=#ffcc66>Yes</color>"
+                        : "No", true);
+                    DrawField("Dev Mode", s.EnableDevMode
+                        ? "<color=#ffcc66>Yes</color>"
+                        : "No", true);
+
+                    // Separator
+                    DrawSeparator();
+
+                    // ── Data Refresh (strikethrough when offline) ──
+                    var isOffline = s.OfflineMode;
+
+                    string pollingText = s.DisableRefresh
+                        ? "<color=#888888>Disabled</color>"
+                        : $"<color=#88ff88>Enabled</color>  ({s.RefreshInterval}s)";
+                    DrawFieldWithStrikethrough("Polling", pollingText, isOffline);
+
+                    string streamingText = !s.StreamingEnabled
+                        ? "<color=#888888>Disabled</color>"
+                        : $"<color=#88ff88>Enabled</color>  ({s.StreamingTransport})";
+                    DrawFieldWithStrikethrough("Streaming", streamingText, isOffline);
                 }
                 else
                 {
@@ -596,6 +625,14 @@ namespace Gatrix.Unity.SDK.Editor
 
         // ==================== Helpers ====================
 
+        private void DrawSeparator()
+        {
+            EditorGUILayout.Space(3);
+            var rect = GUILayoutUtility.GetRect(0, 1, GUILayout.ExpandWidth(true));
+            EditorGUI.DrawRect(rect, new Color(0.5f, 0.5f, 0.5f, 0.2f));
+            EditorGUILayout.Space(3);
+        }
+
         private void DrawField(string label, string value, bool richText = false)
         {
             EditorGUILayout.BeginHorizontal();
@@ -608,6 +645,35 @@ namespace Gatrix.Unity.SDK.Editor
             {
                 EditorGUILayout.LabelField(value);
             }
+            EditorGUILayout.EndHorizontal();
+        }
+
+        private void DrawFieldWithStrikethrough(string label, string value, bool strikethrough)
+        {
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField(label, GUILayout.Width(150));
+
+            if (strikethrough)
+            {
+                // Draw dimmed text
+                var dimStyle = new GUIStyle(_statusLabelStyle)
+                {
+                    normal = { textColor = new Color(0.5f, 0.5f, 0.5f, 0.5f) }
+                };
+                var valueRect = GUILayoutUtility.GetRect(
+                    new GUIContent(value), dimStyle, GUILayout.ExpandWidth(true));
+                EditorGUI.LabelField(valueRect, value, dimStyle);
+
+                // Draw strikethrough line across value area
+                var lineY = valueRect.y + valueRect.height * 0.5f;
+                var lineRect = new Rect(valueRect.x, lineY, valueRect.width * 0.6f, 1);
+                EditorGUI.DrawRect(lineRect, new Color(0.6f, 0.6f, 0.6f, 0.5f));
+            }
+            else
+            {
+                EditorGUILayout.LabelField(value, _statusLabelStyle);
+            }
+
             EditorGUILayout.EndHorizontal();
         }
 
