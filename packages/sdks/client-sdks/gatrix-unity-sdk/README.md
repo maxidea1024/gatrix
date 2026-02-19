@@ -27,6 +27,47 @@ Gatrix isn't the right fit for every project. Consider whether these apply to yo
 
 ---
 
+## 🏗️ Evaluation Model: Server-Side (Remote) Only
+
+Gatrix uses **server-side evaluation** exclusively. This is a deliberate architectural decision for security and consistency.
+
+### How It Works
+
+```mermaid
+flowchart LR
+    A["🎮 Client SDK"] -->|"context<br/>(userId, env, properties)"| B["🖥️ Gatrix Server"]
+    B -->|"evaluated flag values"| A
+    B -.- C["🔒 Targeting rules,<br/>segments, rollout %<br/>never leave the server"]
+```
+
+1. The SDK sends **context** (userId, environment, custom properties) to the Gatrix server.
+2. The server evaluates all targeting rules, segments, and rollout percentages **on the server side**.
+3. The SDK receives only the **final evaluated flag values** — no rules, no segments, no raw configuration.
+
+### Remote Evaluation vs Local Evaluation
+
+| | Server-Side (Remote) Evaluation | Client-Side (Local) Evaluation |
+|---|---|---|
+| **How it works** | Server evaluates rules → client receives final values | Client downloads all rules → evaluates locally |
+| **Security** | ✅ Targeting rules, segment definitions, and rollout logic are **never exposed** to the client | ⚠️ All rules are sent to the client and can be inspected, reverse-engineered, or tampered with |
+| **Consistency** | ✅ Evaluation logic is centralized — all SDKs and platforms get identical results | ⚠️ Each SDK must implement the same evaluation engine independently; subtle differences can lead to inconsistent results |
+| **Payload size** | ✅ Only final values are transmitted (small payload) | ⚠️ Full rule set must be downloaded (can be large with many flags/segments) |
+| **Offline support** | ⚠️ Requires an initial network request; offline use relies on cached values or bootstrap data | ✅ Once rules are downloaded, evaluation works fully offline |
+| **Evaluation latency** | ⚠️ Depends on network round-trip for the initial fetch | ✅ No network needed after initial download |
+| **Rule update speed** | ✅ New values are available immediately via streaming/polling | ⚠️ Client must re-download the full rule set to pick up changes |
+
+### Why Gatrix Chose Server-Side Evaluation
+
+1. **Security first.** In game development, clients are inherently untrusted. Sending targeting rules (e.g., "10% rollout for users in segment X") to the client exposes your rollout strategy, internal segments, and business logic. With server-side evaluation, only the final `true`/`false` or variant string reaches the client.
+
+2. **Consistency across SDKs.** Gatrix supports Unity, Unreal, Cocos2d-x, Godot, JavaScript, Flutter, Python, and more. Implementing identical evaluation logic in every language is error-prone. Server-side evaluation guarantees identical results regardless of SDK.
+
+3. **Simpler SDK.** The client SDK is a thin cache layer — it doesn't need to understand targeting rules, percentage rollouts, or segment membership. This keeps the SDK lightweight and reduces the surface area for bugs.
+
+> 💡 **Offline & Bootstrap:** Even though evaluation happens on the server, the SDK caches the last known flag values locally. You can also provide **bootstrap data** for fully offline scenarios. See the [Operating Modes](#-operating-modes) section for details.
+
+---
+
 ## 📦 Installation
 
 ### Unity Package Manager (UPM)
