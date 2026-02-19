@@ -166,30 +166,23 @@ Realtime mode is simple and convenient, but applying flag changes **instantly** 
 
 ### 📊 Flow Diagram: Realtime vs Synced
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                    REALTIME MODE                                │
-│                                                                 │
-│  Server ──fetch──► SDK Cache ──immediate──► Your Game Code      │
-│                         │                                       │
-│                         └── flag changes apply INSTANTLY        │
-│                             (even mid-gameplay!)                │
-└─────────────────────────────────────────────────────────────────┘
+**Realtime Mode:**
 
-┌─────────────────────────────────────────────────────────────────┐
-│                    SYNCED MODE (ExplicitSyncMode)                │
-│                                                                 │
-│  Server ──fetch──► SDK Cache ──buffered──► Pending Store        │
-│                                               │                 │
-│                         YOU decide when ──────┘                 │
-│                         to apply changes                        │
-│                              │                                  │
-│                    SyncFlagsAsync()                              │
-│                              │                                  │
-│                              ▼                                  │
-│                    Synced Store ──► Your Game Code               │
-│                    (safe timing!)                                │
-└─────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    A["🖥️ Server"] -->|fetch| B["SDK Cache"]
+    B -->|immediate| C["🎮 Your Game Code"]
+    B -.- D["⚡ Flag changes apply INSTANTLY\neven mid-gameplay!"]
+```
+
+**Synced Mode (ExplicitSyncMode):**
+
+```mermaid
+flowchart LR
+    A["🖥️ Server"] -->|fetch| B["SDK Cache"]
+    B -->|buffered| C["Pending Store"]
+    C -->|"YOU decide when\nSyncFlagsAsync()"| D["Synced Store"]
+    D -->|safe timing| E["🎮 Your Game Code"]
 ```
 
 ### `forceRealtime` Parameter
@@ -598,18 +591,18 @@ Without context, the server has no way to differentiate users and can only retur
 
 Context can be provided at **three different stages**, depending on what information is available:
 
-```
-App Launch                    User Login                   During Session
-    │                              │                              │
-    ▼                              ▼                              ▼
-┌──────────┐              ┌──────────────┐               ┌──────────────┐
-│ Init     │              │ Update       │               │ Set Field    │
-│ Context  │              │ Context      │               │ Async        │
-│          │              │              │               │              │
-│ device,  │              │ userId,      │               │ level, plan, │
-│ platform,│              │ plan,        │               │ score...     │
-│ version  │              │ country...   │               │              │
-└──────────┘              └──────────────┘               └──────────────┘
+```mermaid
+flowchart LR
+    subgraph S1 ["📱 App Launch"]
+        A["Init Context\ndevice, platform, version"]
+    end
+    subgraph S2 ["🔑 User Login"]
+        B["Update Context\nuserId, plan, country"]
+    end
+    subgraph S3 ["🎮 During Session"]
+        C["Set Field Async\nlevel, plan, score"]
+    end
+    S1 --> S2 --> S3
 ```
 
 **Stage 1: At Initialization (before login)**
@@ -815,31 +808,23 @@ The SDK supports three operating modes. Choose based on your connectivity requir
 
 ### Flow Diagram
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│              STREAMING + POLLING (Default)                      │
-│                                                                 │
-│  Server ──stream──► SDK (sub-second updates)                    │
-│         ──poll────► SDK (every RefreshInterval as fallback)     │
-│                                                                 │
-│  Best for: live games, A/B testing, real-time feature control   │
-└─────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    subgraph M1 ["⚡ Streaming + Polling (Default)"]
+        direction LR
+        A1["🖥️ Server"] -->|stream| B1["SDK"]
+        A1 -->|poll| B1
+    end
 
-┌─────────────────────────────────────────────────────────────────┐
-│              POLLING ONLY                                       │
-│                                                                 │
-│  Server ──poll────► SDK (every RefreshInterval seconds)         │
-│                                                                 │
-│  Best for: infrequent changes, low-bandwidth environments       │
-└─────────────────────────────────────────────────────────────────┘
+    subgraph M2 ["🔄 Polling Only"]
+        direction LR
+        A2["🖥️ Server"] -->|poll| B2["SDK"]
+    end
 
-┌─────────────────────────────────────────────────────────────────┐
-│              OFFLINE                                            │
-│                                                                 │
-│  Bootstrap / Cache ──► SDK (no network at all)                  │
-│                                                                 │
-│  Best for: development, testing, airplane mode                  │
-└─────────────────────────────────────────────────────────────────┘
+    subgraph M3 ["📴 Offline"]
+        direction LR
+        A3["Bootstrap/Cache"] --> B3["SDK"]
+    end
 ```
 
 ### Mode 1: Streaming + Polling (Default)
@@ -1244,12 +1229,13 @@ await features.SyncFlagsAsync();
 
 **Quick decision guide:**
 
-```
-Is ExplicitSyncMode enabled?
-├── NO  → Both behave the same. Use either (WatchRealtimeFlag recommended)
-└── YES → Does this flag affect gameplay mid-session?
-    ├── YES → Use WatchSyncedFlag (changes apply at SyncFlagsAsync)
-    └── NO  → Use WatchRealtimeFlag (debug UI, monitoring, non-disruptive)
+```mermaid
+flowchart TD
+    Q1{"ExplicitSyncMode\nenabled?"}
+    Q1 -->|NO| A1["Both behave the same\nUse WatchRealtimeFlag"]
+    Q1 -->|YES| Q2{"Does this flag affect\ngameplay mid-session?"}
+    Q2 -->|YES| A2["Use WatchSyncedFlag\nApplied at SyncFlagsAsync"]
+    Q2 -->|NO| A3["Use WatchRealtimeFlag\nDebug UI, monitoring"]
 ```
 
 ---
