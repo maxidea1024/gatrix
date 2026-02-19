@@ -285,7 +285,7 @@ The SDK uses `$`-prefixed variant names to indicate value origin. These are defi
 | Variant Name | Meaning | `enabled` | When It Happens |
 |:-------------|---------|:---------:|-----------------|
 | `$missing` | Flag does not exist in SDK cache | `false` | Flag name typo, flag not created yet, or SDK not initialized |
-| `$type-mismatch` | Requested type doesn't match flag's `valueType` | — | Called `BoolVariation` on a `string` flag, etc. |
+| `$type-mismatch` | Requested type doesn't match flag's `valueType` | `false` | Called `BoolVariation` on a `string` flag, etc. |
 | `$env-default-enabled` | Flag enabled, value from environment-level `enabledValue` | `true` | No variant matched; env override is set |
 | `$flag-default-enabled` | Flag enabled, value from flag-level (global) `enabledValue` | `true` | No variant matched; no env override |
 | `$env-default-disabled` | Flag disabled, value from environment-level `disabledValue` | `false` | Flag disabled; env override is set |

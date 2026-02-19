@@ -85,7 +85,7 @@ string difficulty = GatrixBehaviour.Client.Features.StringVariation("difficulty"
 
 #### 📱 모바일 앱 스토어 심사 대응
 
-모바일 게임 업데이트는 앱 스토어 심사 과정을 거쳐야 하며, **수일에서 수주**까지 소요될 수 있습니다. 피처 플래그를 사용하면 새 기능의 코드가 **이미 포함되어 있지만 비활성화된 상태**로 빌드를 제출하고, 심사가 승인된 후 — 또는 원하는 시점에 — 대시보드에서 즉시 활성화할 수 있습니다.
+모바일 게임 업데이트는 앱 스토어 심사 과정을 거쳐야 하며, **수일 이상** 소요될 수 있습니다. 피처 플래그를 사용하면 새 기능의 코드가 **이미 포함되어 있지만 비활성화된 상태**로 빌드를 제출하고, 심사가 승인된 후 — 또는 원하는 시점에 — 대시보드에서 즉시 활성화할 수 있습니다.
 
 ```mermaid
 sequenceDiagram
@@ -285,7 +285,7 @@ SDK는 `$` 접두사가 붙은 배리언트 이름으로 값의 출처를 나타
 | 배리언트 이름 | 의미 | `enabled` | 발생 시점 |
 |:-------------|------|:---------:|----------|
 | `$missing` | SDK 캐시에 플래그가 없음 | `false` | 플래그 이름 오타, 아직 생성되지 않음, 또는 SDK 미초기화 |
-| `$type-mismatch` | 요청 타입이 플래그의 `valueType`과 불일치 | — | `string` 플래그에 `BoolVariation` 호출 등 |
+| `$type-mismatch` | 요청 타입이 플래그의 `valueType`과 불일치 | `false` | `string` 플래그에 `BoolVariation` 호출 등 |
 | `$env-default-enabled` | 플래그 활성화, 환경 수준 `enabledValue`에서 값 가져옴 | `true` | 배리언트 매칭 없음; 환경 오버라이드 설정됨 |
 | `$flag-default-enabled` | 플래그 활성화, 플래그 수준(글로벌) `enabledValue`에서 값 가져옴 | `true` | 배리언트 매칭 없음; 환경 오버라이드 없음 |
 | `$env-default-disabled` | 플래그 비활성화, 환경 수준 `disabledValue`에서 값 가져옴 | `false` | 플래그 비활성화; 환경 오버라이드 설정됨 |
