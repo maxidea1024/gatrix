@@ -68,7 +68,141 @@ flowchart LR
 
 ---
 
-## 📦 Installation
+## � Flag Value Resolution Flow
+
+Understanding how a flag value travels from the server to your game code is essential for correct usage.
+
+### End-to-End Flow Overview
+
+```mermaid
+flowchart TD
+    subgraph SERVER ["🖥️ Gatrix Server"]
+        S1{"Is flag enabled<br/>in this environment?"}
+        S1 -->|No| S2["variant.name = $disabled<br/>value = disabledValue"]
+        S1 -->|Yes| S3{"Are there<br/>targeting strategies?"}
+        S3 -->|No| S4["variant.name = $default<br/>value = enabledValue"]
+        S3 -->|Yes| S5{"Does any strategy<br/>match context?"}
+        S5 -->|Yes| S6["variant.name = matched variant<br/>value = variant.value"]
+        S5 -->|No| S7["variant.name = $disabled<br/>value = disabledValue"]
+    end
+
+    S2 --> NET["📡 Network"]
+    S4 --> NET
+    S6 --> NET
+    S7 --> NET
+
+    subgraph SDK ["🎮 Unity SDK (Client)"]
+        NET --> CACHE["SDK Cache<br/>(realtimeFlags / synchronizedFlags)"]
+        CACHE --> ACCESS["Your Code Calls<br/>boolVariation, stringVariation, etc."]
+    end
+```
+
+### Server-Side: Value Source Priority
+
+When the server evaluates a flag, values are resolved in the following priority order:
+
+| Priority | Condition | Value Source | `variant.name` |
+|:--------:|-----------|-------------|:---------------|
+| 1 | Flag enabled + strategy matched | `variant.value` from matched variant | Variant name (e.g., `"dark-theme"`) |
+| 2 | Flag enabled + no strategy matched | `env.enabledValue` → `flag.enabledValue` | `$default` |
+| 3 | Flag disabled | `env.disabledValue` → `flag.disabledValue` | `$disabled` |
+| 4 | Flag not found on server | Not included in response | *(SDK generates `$missing`)* |
+
+> 💡 Environment-level values (`env.enabledValue`, `env.disabledValue`) override global-level values (`flag.enabledValue`, `flag.disabledValue`) when set.
+
+### SDK-Side: How Your Code Receives Values
+
+```mermaid
+flowchart TD
+    A["Your Code:<br/>proxy.BoolVariation(false)"] --> B{"Does flag exist<br/>in SDK cache?"}
+    B -->|No| C["Return fallback value<br/>variant = $missing"]
+    B -->|Yes| D{"Is flag enabled?"}
+    D -->|No| E["Return fallback value<br/>variant = $disabled"]
+    D -->|Yes| F{"Does valueType<br/>match requested type?"}
+    F -->|No| G["Return fallback value<br/>(type mismatch safety)"]
+    F -->|Yes| H["Return variant.value<br/>(actual evaluated value)"]
+
+    style C fill:#ff6b6b,color:#fff
+    style E fill:#ffa94d,color:#fff
+    style G fill:#ffa94d,color:#fff
+    style H fill:#51cf66,color:#fff
+```
+
+### Reserved Variant Names
+
+The SDK uses `$`-prefixed variant names to represent special states:
+
+| Variant Name | Meaning | `enabled` | When It Happens |
+|:-------------|---------|:---------:|-----------------|
+| `$missing` | Flag does not exist in SDK cache | `false` | Flag name typo, flag not created yet, or SDK not initialized |
+| `$disabled` | Flag is disabled | `false` | Flag turned off in dashboard, or all strategies failed |
+| `$default` | Flag is enabled, no variant matched | `true` | No targeting strategies, or flag has no variants defined |
+| *(user name)* | A specific variant was selected | `true` | Strategy matched and selected this variant |
+
+### Complete Example: All Scenarios
+
+```csharp
+// Scenario 1: Flag exists, enabled, variant matched → returns actual value
+this.WatchSyncedFlagWithInitialState("dark-theme", proxy =>
+{
+    // proxy.Exists     == true
+    // proxy.Enabled    == true
+    // proxy.Variant    == { name: "dark", value: true }
+    // proxy.ValueType  == "boolean"
+
+    bool isDark = proxy.BoolVariation(false);
+    // isDark == true (from variant.value)
+});
+
+// Scenario 2: Flag exists, enabled, no variant matched → returns enabledValue
+this.WatchSyncedFlagWithInitialState("welcome-message", proxy =>
+{
+    // proxy.Variant == { name: "$default", value: "Hello!" }
+
+    string msg = proxy.StringVariation("Fallback");
+    // msg == "Hello!" (from enabledValue)
+});
+
+// Scenario 3: Flag exists, disabled → returns fallback
+this.WatchSyncedFlagWithInitialState("maintenance-mode", proxy =>
+{
+    // proxy.Enabled    == false
+    // proxy.Variant    == { name: "$disabled", value: "..." }
+
+    bool maintenance = proxy.BoolVariation(false);
+    // maintenance == false (fallback, because flag is disabled)
+});
+
+// Scenario 4: Flag does NOT exist → returns fallback
+this.WatchSyncedFlagWithInitialState("typo-flag-nmae", proxy =>
+{
+    // proxy.Exists     == false
+    // proxy.Variant    == { name: "$missing" }
+
+    bool val = proxy.BoolVariation(false);
+    // val == false (fallback, because flag is missing)
+});
+```
+
+### isEnabled vs BoolVariation
+
+These two methods serve **different purposes** — don't confuse them:
+
+| Method | Returns | Purpose |
+|--------|---------|---------|
+| `proxy.Enabled` | `flag.enabled` | Is the feature flag **turned on**? |
+| `proxy.BoolVariation(fallback)` | `variant.value` as bool | What **boolean value** did the flag evaluate to? |
+
+```csharp
+// A flag can be enabled but return false as its boolean value!
+// enabled=true, variant.value=false → "Feature is ON, but the bool config is false"
+bool isOn = proxy.Enabled;           // true (flag is on)
+bool value = proxy.BoolVariation(true); // false (the configured value)
+```
+
+---
+
+## �📦 Installation
 
 ### Unity Package Manager (UPM)
 

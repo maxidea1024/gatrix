@@ -68,6 +68,140 @@ flowchart LR
 
 ---
 
+## 🔍 플래그 값 리졸루션 흐름
+
+플래그 값이 서버에서 게임 코드로 전달되는 과정을 이해하는 것이 올바른 사용의 핵심입니다.
+
+### 전체 흐름 개요
+
+```mermaid
+flowchart TD
+    subgraph SERVER ["🖥️ Gatrix 서버"]
+        S1{"이 환경에서<br/>플래그가 활성화?"}
+        S1 -->|아니오| S2["variant.name = $disabled<br/>value = disabledValue"]
+        S1 -->|예| S3{"타게팅 전략이<br/>있는가?"}
+        S3 -->|아니오| S4["variant.name = $default<br/>value = enabledValue"]
+        S3 -->|예| S5{"컨텍스트와 매칭되는<br/>전략이 있는가?"}
+        S5 -->|예| S6["variant.name = 매칭된 배리언트<br/>value = variant.value"]
+        S5 -->|아니오| S7["variant.name = $disabled<br/>value = disabledValue"]
+    end
+
+    S2 --> NET["📡 네트워크"]
+    S4 --> NET
+    S6 --> NET
+    S7 --> NET
+
+    subgraph SDK ["🎮 Unity SDK (클라이언트)"]
+        NET --> CACHE["SDK 캐시<br/>(realtimeFlags / synchronizedFlags)"]
+        CACHE --> ACCESS["게임 코드 호출<br/>BoolVariation, StringVariation 등"]
+    end
+```
+
+### 서버 측: 값 소스 우선순위
+
+서버가 플래그를 평가할 때, 다음 우선순위로 값이 결정됩니다:
+
+| 우선순위 | 조건 | 값 소스 | `variant.name` |
+|:--------:|------|--------|:---------------|
+| 1 | 플래그 활성화 + 전략 매칭 | 매칭된 배리언트의 `variant.value` | 배리언트 이름 (예: `"dark-theme"`) |
+| 2 | 플래그 활성화 + 전략 매칭 없음 | `env.enabledValue` → `flag.enabledValue` | `$default` |
+| 3 | 플래그 비활성화 | `env.disabledValue` → `flag.disabledValue` | `$disabled` |
+| 4 | 서버에 플래그 없음 | 응답에 포함되지 않음 | *(SDK가 `$missing` 생성)* |
+
+> 💡 환경 수준의 값(`env.enabledValue`, `env.disabledValue`)이 설정되어 있으면 글로벌 수준의 값(`flag.enabledValue`, `flag.disabledValue`)보다 우선합니다.
+
+### SDK 측: 게임 코드가 값을 받는 방식
+
+```mermaid
+flowchart TD
+    A["게임 코드:<br/>proxy.BoolVariation(false)"] --> B{"SDK 캐시에<br/>플래그가 존재?"}
+    B -->|아니오| C["폴백 값 반환<br/>variant = $missing"]
+    B -->|예| D{"플래그가<br/>활성화?"}
+    D -->|아니오| E["폴백 값 반환<br/>variant = $disabled"]
+    D -->|예| F{"valueType이<br/>요청 타입과 일치?"}
+    F -->|아니오| G["폴백 값 반환<br/>(타입 불일치 안전장치)"]
+    F -->|예| H["variant.value 반환<br/>(실제 평가된 값)"]
+
+    style C fill:#ff6b6b,color:#fff
+    style E fill:#ffa94d,color:#fff
+    style G fill:#ffa94d,color:#fff
+    style H fill:#51cf66,color:#fff
+```
+
+### 예약된 배리언트 이름
+
+SDK는 `$` 접두사가 붙은 배리언트 이름으로 특수 상태를 나타냅니다:
+
+| 배리언트 이름 | 의미 | `enabled` | 발생 시점 |
+|:-------------|------|:---------:|----------|
+| `$missing` | SDK 캐시에 플래그가 없음 | `false` | 플래그 이름 오타, 아직 생성되지 않음, 또는 SDK 미초기화 |
+| `$disabled` | 플래그가 비활성화됨 | `false` | 대시보드에서 꺼짐, 또는 모든 전략이 실패 |
+| `$default` | 플래그 활성화, 매칭된 배리언트 없음 | `true` | 타게팅 전략 없음, 또는 배리언트 미정의 |
+| *(사용자 이름)* | 특정 배리언트가 선택됨 | `true` | 전략이 매칭되어 해당 배리언트 선택 |
+
+### 전체 예제: 모든 시나리오
+
+```csharp
+// 시나리오 1: 플래그 존재, 활성화, 배리언트 매칭 → 실제 값 반환
+this.WatchSyncedFlagWithInitialState("dark-theme", proxy =>
+{
+    // proxy.Exists     == true
+    // proxy.Enabled    == true
+    // proxy.Variant    == { name: "dark", value: true }
+    // proxy.ValueType  == "boolean"
+
+    bool isDark = proxy.BoolVariation(false);
+    // isDark == true (variant.value에서 가져옴)
+});
+
+// 시나리오 2: 플래그 존재, 활성화, 배리언트 매칭 없음 → enabledValue 반환
+this.WatchSyncedFlagWithInitialState("welcome-message", proxy =>
+{
+    // proxy.Variant == { name: "$default", value: "Hello!" }
+
+    string msg = proxy.StringVariation("Fallback");
+    // msg == "Hello!" (enabledValue에서 가져옴)
+});
+
+// 시나리오 3: 플래그 존재, 비활성화 → 폴백 반환
+this.WatchSyncedFlagWithInitialState("maintenance-mode", proxy =>
+{
+    // proxy.Enabled    == false
+    // proxy.Variant    == { name: "$disabled", value: "..." }
+
+    bool maintenance = proxy.BoolVariation(false);
+    // maintenance == false (플래그가 비활성화이므로 폴백)
+});
+
+// 시나리오 4: 플래그가 존재하지 않음 → 폴백 반환
+this.WatchSyncedFlagWithInitialState("typo-flag-nmae", proxy =>
+{
+    // proxy.Exists     == false
+    // proxy.Variant    == { name: "$missing" }
+
+    bool val = proxy.BoolVariation(false);
+    // val == false (플래그가 없으므로 폴백)
+});
+```
+
+### isEnabled vs BoolVariation
+
+이 두 메서드는 **서로 다른 목적**을 가집니다 — 혼동하지 마세요:
+
+| 메서드 | 반환 값 | 용도 |
+|--------|---------|------|
+| `proxy.Enabled` | `flag.enabled` | 피처 플래그가 **켜져 있는가?** |
+| `proxy.BoolVariation(fallback)` | `variant.value` (bool) | 플래그가 평가한 **불리언 값**은 무엇인가? |
+
+```csharp
+// 플래그가 활성화되어 있지만 불리언 값으로 false를 반환할 수 있습니다!
+// enabled=true, variant.value=false → "기능은 켜졌지만, 불리언 설정은 false"
+bool isOn = proxy.Enabled;           // true (플래그가 켜져 있음)
+bool value = proxy.BoolVariation(true); // false (설정된 값)
+```
+
+---
+
 ## 📦 설치
 
 ### Unity Package Manager (UPM)
