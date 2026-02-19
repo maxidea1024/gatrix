@@ -137,13 +137,28 @@ Sometimes you don't know *when* — or even *if* — a feature should go live:
 
 > With feature flags, your code is **always ready**. The business decision of *when to launch* is completely decoupled from the engineering timeline.
 
-#### 🚨 Emergency Kill Switch
+#### � A/B Testing & Data-Driven Decisions
+Stop guessing what players want. Use feature flags to show different variants to different groups and measure the impact:
+
+- **Difficulty Tuning**: Group A gets "Normal", Group B gets "Hard". Which group plays longer?
+- **Monetization**: Test two different shop layouts. Which one drives more revenue?
+- **User Feedback**: Release a feature to 5% of users first. If community feedback is negative, disable it immediately and iterate.
+
+> Instead of arguing about which design is better, **let the data decide.**
+
+#### �🚨 Emergency Kill Switch
 
 When something goes wrong in production — a crash-causing feature, an exploit, or unexpected server load — you need to act *fast*:
 
 - **Disable the problematic feature** in seconds, not hours
 - **No hotfix build required** — just toggle the flag
 - **Gradual re-enable** — roll out to 1% → 10% → 50% → 100% after the fix is verified
+
+#### 🛡️ SafeGuard (Automated Circuit Breaker)
+You're not always awake to press the kill switch. **Gatrix SafeGuard** connects to your monitoring tools (Datadog, Prometheus, Sentry):
+
+- **Auto-Disable**: If the crash rate or error count spikes above a threshold after a release, SafeGuard **automatically disables** the flag.
+- **Sleep Soundly**: Let SafeGuard watch your release while you sleep.
 
 ### 🤔 When you might NOT need Gatrix
 
