@@ -310,7 +310,9 @@ export class FeatureFlagEvaluator {
       case 'remoteAddress':
         return context.remoteAddress;
       default:
-        return context.properties?.[name];
+        // Check properties first, then fallback to root context for compatibility
+        // (e.g., playground sends flat context without wrapping in properties)
+        return context.properties?.[name] ?? (context as any)[name];
     }
   }
 

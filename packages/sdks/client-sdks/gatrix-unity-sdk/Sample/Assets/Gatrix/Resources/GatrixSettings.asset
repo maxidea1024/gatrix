@@ -14,17 +14,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: Gatrix.Unity.SDK::Gatrix.Unity.SDK.GatrixSettings
   _apiUrl: http://localhost:3400/api/v1
   _apiToken: gatrix-unsecured-edge-api-token
-  _appName: gatrix-unity-sample-app
+  _appName: unity-example-app
   _environment: development
   _userId: 
   _sessionId: 
   _contextProperties:
-  - Key: mycontext
-    Value: hello
-    Type: 0
-  - Key: myfield
-    Value: kkkk
+  - Key: vipTier
+    Value: 10
     Type: 1
+  - Key: store
+    Value: appstore
+    Type: 0
   _offlineMode: 0
   _enableDevMode: 0
   _cacheKeyPrefix: gatrix_cache
@@ -33,7 +33,7 @@ MonoBehaviour:
   _bootstrapOverride: 1
   _refreshInterval: 30
   _disableRefresh: 0
-  _explicitSyncMode: 1
+  _explicitSyncMode: 0
   _disableMetrics: 0
   _metricsIntervalInitial: 2
   _metricsInterval: 60
@@ -42,7 +42,7 @@ MonoBehaviour:
   _initialBackoff: 1
   _maxBackoff: 60
   _streamingEnabled: 1
-  _streamingTransport: 1
+  _streamingTransport: 0
   _sseUrl: 
   _sseReconnectBase: 1
   _sseReconnectMax: 30
